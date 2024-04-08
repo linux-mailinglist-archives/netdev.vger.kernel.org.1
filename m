@@ -1,156 +1,199 @@
-Return-Path: <netdev+bounces-85689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A464189BDAE
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:01:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BBF889BDBC
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 13:06:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C5B51F225AC
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 11:01:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8A201F22659
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 11:06:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307E66168C;
-	Mon,  8 Apr 2024 11:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59296626DB;
+	Mon,  8 Apr 2024 11:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ik6WSzJN"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="i5OSdp55"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64BE75FB8C
-	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 11:01:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F9962172
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 11:05:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712574090; cv=none; b=VTSI/nwMgWS5kR5H6cqe48bTxkwZOOg1hZt79BloqwqA75FTa2JEHP45lECconl65D4nv2/VwxzsyLSxtz3sonj+CD43ERDp6LJj0bOKkm3nL30DYrwQPQqQJyAKu4kuYea5220cPO7hlUUdffkXPjt6xmDLW9ChdaOOE6bzeog=
+	t=1712574359; cv=none; b=WEBdVLJvu/wL04jRFf0jYh9iyEP6qnYMdnZOt4+cdKYznRAK0Eg+xjo+G0E2e15DyHwZn0tqF2CZlRwUHMa5wj1hh4FUQsKGz4x4aGegqYJ3mv4s/9F6ybLGD3ive3FZCJAXrIXeyvmak+U97QeMyAf5X+I92+AXNBMThSiGhEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712574090; c=relaxed/simple;
-	bh=nbt5DrxQ/4u9cBOhUW34//4c6cXw9zNn2WAthk/Qgg0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q2guDBWT2OxnyeusvC7sq5+CMI+m6T55L2ynTuWdbzmEqFXODbe6Db8jxy32Nq56JvTBAiHs1ZPxRIYB6aoxYoKzGBgBWpyTS1WVPzxDJHvJUQdfKoJdXPNM/WYzuoq2Uv/RhxTtgJfC3A1x7MTBu0dLmT8XVi/wXk82fh3UVAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ik6WSzJN; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712574087;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ScJ1E+wTN6zvVZouf3O4q8jXzLSJvBWlc012JYotauk=;
-	b=ik6WSzJN3ftwGF/si2Q/8bBSYNHyT/E18IBVFNrKCggKqkJZncR38GuV0ptzfoi5y3h6uY
-	8FoMj97W0JaVy5JvfcD6b0T2XwoJbAMsj5j1W4H/h/DxB38wBqhykco+0YHzWT3LLlQqJm
-	yGdz/oanJvTBG/dtevxwuRdyywrTGbo=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-61-q8VjxRqLN2mwP9a3j2QLHA-1; Mon, 08 Apr 2024 07:01:25 -0400
-X-MC-Unique: q8VjxRqLN2mwP9a3j2QLHA-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-78d5e9230c3so168779985a.3
-        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 04:01:25 -0700 (PDT)
+	s=arc-20240116; t=1712574359; c=relaxed/simple;
+	bh=zM2KL1dlfHVkNTCdDlpu+garEC5EGnZ6scFm29Gurnw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sg//Kfkg53vpDEN40STbep6Vi4ov+1XnJ3f7qzKv8HpbK/RlDc3SEp2KQvlxhrQzPpjnmYRjBoPlyZuv5k+mLBhZ4KfIRRBIhkFsVq4ytGL6+OXSUsmVOdqmT687O4T3L/LRijnDG0II+xmzrAS9mz5E8mh55vtW062TKCgBM64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=i5OSdp55; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-41634598125so14077565e9.3
+        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 04:05:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712574355; x=1713179155; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OMnCEktl6VPEor/EtmygqHdTOC4ZhH17Kew2a55Br6I=;
+        b=i5OSdp55h7WeBx7+AOh2Kx+ZEUMKA8Pv4BVH2A69VrAbcWiEkVz8tm2tkc3OebrdeA
+         TujfVovm/A8wliDWlb7B9PGbktidK1PopuOwq9/s8QKXAYjdJPLbmywj2Ztmx2z+xwqd
+         km6Z4wVz33WHpYDPIjXw4NVv3aJaWC2WnG7ZO3W6hspLUrbMZbtbJfgnBBHb1b9k8OfA
+         8VPAmjFJRtsYrQWyJgjetmA8g7/tXszgeQK5cXUSjphxHFmy0q8j5+WD7Habccbvh+s0
+         /yn6dTz+IIS0jdZKdDQuExIKk+T8iaXhzPzD7q6/Uj5sp3sPf7OzN3qUHvbXJj0XCv0H
+         +2tg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712574085; x=1713178885;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ScJ1E+wTN6zvVZouf3O4q8jXzLSJvBWlc012JYotauk=;
-        b=RyjVita5pSHIW09SdyXWddpnF8/MdYdoaYF7TlM/aDqtsa/6nD1DdIq9iCEXQslVxV
-         Z2f3nyXo9NVkUpFZ61YGDXTajo+R2Pe/l0CdnW3sB3noNhbBriM7CKuV53DBV/6td4mv
-         Un72DVrUHfhjNYFtzGCu/CGHdrWXZhxCvSsAe+8EoPl+Pc0nC50XhNbC+ot+UGEw31Kn
-         MKj+9VO72QpPFrBm0HovROJd38WGc1v4rVFnFajoZmULLAh8ZShzVViBOVpzZGVBYUl9
-         ysvFuc23MA8VNju18da5e18WKp4Ju19Wg56DP9uYnkA33uFpnAhqrRk1F9RhU3X2TRYq
-         CNYA==
-X-Gm-Message-State: AOJu0YyKKTrXE0HTj2r6w/MOaKtNyoJDpS3YEngCM10tHl9Y0Q0E+K0W
-	4Z5kkZDMD1q9nZmTo8xhjlcwOzVEQc8J7X66gfj2H5WNQjk+LFwhN+tNhlyJBIxtC08B0xcd48C
-	78Sa5pAd3jQzRnKkZXfIMdilVVDnJTdrT4ZbQX+5PRS1pexTVe5rxSQ==
-X-Received: by 2002:ae9:e70b:0:b0:78d:61b6:1c73 with SMTP id m11-20020ae9e70b000000b0078d61b61c73mr3390304qka.32.1712574085330;
-        Mon, 08 Apr 2024 04:01:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG1kmAHyHCUlER63MzU4IogIvtkzBiNFkrKk+I6vzDaIpObb8eGoIjXFLUowHhT3VazPTu6eA==
-X-Received: by 2002:ae9:e70b:0:b0:78d:61b6:1c73 with SMTP id m11-20020ae9e70b000000b0078d61b61c73mr3390251qka.32.1712574084320;
-        Mon, 08 Apr 2024 04:01:24 -0700 (PDT)
-Received: from [10.0.0.97] ([24.225.234.80])
-        by smtp.gmail.com with ESMTPSA id m6-20020a05620a214600b0078d65a42db6sm1008186qkm.95.2024.04.08.04.01.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 08 Apr 2024 04:01:24 -0700 (PDT)
-Message-ID: <f0819d6d-338a-8441-d12a-771dbfd9028a@redhat.com>
-Date: Mon, 8 Apr 2024 07:01:22 -0400
+        d=1e100.net; s=20230601; t=1712574355; x=1713179155;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OMnCEktl6VPEor/EtmygqHdTOC4ZhH17Kew2a55Br6I=;
+        b=MUSzywViPdnRbeg1iyYQ/LVYm7Osy9fMIpzI2xi6qqqRUcim+edvyeFfvlrh9zct4z
+         +2knT5ajM/x+gB9stjHTj4er5RtwXlzU+3DjfJwvtr4jQ0Atw+LqgS+1F1ILX0vRljhE
+         3zwq6L37JrkJ85KGadRqt1jfJBsm8GTSnXKuYIQsVahEllxt1oT9iO72pxwxQf2wLhFM
+         cRWSj+XzpfSSOdxdhBeYKtBl7rNqh2vz2zAJXvczt6dRdRY+8FzuBnrFXjVTN2qxDqif
+         lRqcu9Eskf0oZTQwrFecrJJxztTTnHepS7XBCPOapXD9NgKqu1x4uNv1PDxNikugbMgg
+         kq5g==
+X-Forwarded-Encrypted: i=1; AJvYcCWtx3tA6fDsqmWAEh4ost9zFpSzGSFvGq2EPNIKKBOzz9BIncKy/CN00Ui+gtz0yikJjqD8EOtRyYWsEFVsXEchz5H+pNi5
+X-Gm-Message-State: AOJu0YzKjc7SpwL2eM2wf5yrfDfrseOsiAS4w6axdNSbeklyi8ODmaJ2
+	BMc4WeieHYo2lmLo3ayJ6KyCGHARecEoJkybznIqh/eCnRIgXh6OrXWCrd3xd3k=
+X-Google-Smtp-Source: AGHT+IFEu0SHGL5hRh1blS9YTewqyjw2lrCuZ05aUmjypwpaXpgEpZOFspLhJjl70xWRRNoAsXlPVQ==
+X-Received: by 2002:a05:600c:358f:b0:415:4853:f722 with SMTP id p15-20020a05600c358f00b004154853f722mr6251223wmq.10.1712574355244;
+        Mon, 08 Apr 2024 04:05:55 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id t21-20020adfa2d5000000b00345690c160esm4620787wra.15.2024.04.08.04.05.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Apr 2024 04:05:54 -0700 (PDT)
+Date: Mon, 8 Apr 2024 13:05:51 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
+	bhelgaas@google.com, linux-pci@vger.kernel.org,
+	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net,
+	pabeni@redhat.com
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <ZhPPjzEuOyne8qX7@nanopsycho>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <Zg6Q8Re0TlkDkrkr@nanopsycho>
+ <CAKgT0Uf8sJK-x2nZqVBqMkDLvgM2P=UHZRfXBtfy=hv7T_B=TA@mail.gmail.com>
+ <Zg7JDL2WOaIf3dxI@nanopsycho>
+ <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
+ <20240404132548.3229f6c8@kernel.org>
+ <660f22c56a0a2_442282088b@john.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [net-next 2/2] tcp: correct handling of extreme menory squeeze
-Content-Language: en-US
-To: Menglong Dong <menglong8.dong@gmail.com>,
- Jason Xing <kerneljasonxing@gmail.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- passt-dev@passt.top, sbrivio@redhat.com, lvivier@redhat.com,
- dgibson@redhat.com, eric.dumazet@gmail.com, dongmenglong.8@bytedance.com
-References: <20240406182107.261472-1-jmaloy@redhat.com>
- <20240406182107.261472-3-jmaloy@redhat.com>
- <CANn89iJgXBXaZyX5gBwr4WiAz5DRn8sH_v0LLtNOSB84yDP3yg@mail.gmail.com>
- <CAL+tcoC8LBQGe7ES01bxKFkU15GoFpEgT5jx1tnwb2Yb_BOKfw@mail.gmail.com>
- <CADxym3ZfC5WF7C2B8oYq=38rsLnQ-DOfvhH3iSk6+L0g2=XWDQ@mail.gmail.com>
-From: Jon Maloy <jmaloy@redhat.com>
-In-Reply-To: <CADxym3ZfC5WF7C2B8oYq=38rsLnQ-DOfvhH3iSk6+L0g2=XWDQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <660f22c56a0a2_442282088b@john.notmuch>
+
+Thu, Apr 04, 2024 at 11:59:33PM CEST, john.fastabend@gmail.com wrote:
+>Jakub Kicinski wrote:
+>> On Thu, 4 Apr 2024 12:22:02 -0700 Alexander Duyck wrote:
+>> > The argument itself doesn't really hold water. The fact is the Meta
+>> > data centers are not an insignificant consumer of Linux, 
+>> 
+>> customer or beneficiary ?
+>> 
+>> > so it isn't as if the driver isn't going to be used. This implies
+>> > some lack of good faith from Meta.
+>> 
+>> "Good faith" is not a sufficient foundation for a community consisting
+>> of volunteers, and commercial entities (with the xz debacle maybe even
+>> less today than it was a month ago). As a maintainer I really don't want
+>> to be in position of judging the "good faith" of corporate actors.
+>> 
+>> > I don't understand that as we are
+>> > contributing across multiple areas in the kernel including networking
+>> > and ebpf. Is Meta expected to start pulling time from our upstream
+>> > maintainers to have them update out-of-tree kernel modules since the
+>> > community isn't willing to let us maintain it in the kernel? Is the
+>> > message that the kernel is expected to get value from Meta, but that
+>> > value is not meant to be reciprocated? Would you really rather have
+>> > us start maintaining our own internal kernel with our own
+>> > "proprietary goodness", and ask other NIC vendors to have to maintain
+>> > their drivers against yet another kernel if they want to be used in
+>> > our data centers?
+>> 
+>> Please allow the community to make rational choices in the interest of
+>> the project and more importantly the interest of its broader user base.
+>> 
+>> Google would also claim "good faith" -- undoubtedly is supports 
+>> the kernel, and lets some of its best engineers contribute.
+>> Did that make them stop trying to build Fuchsia? The "good faith" of
+>> companies operates with the limits of margin of error of they consider
+>> rational and beneficial.
+>> 
+>> I don't want to put my thumb on the scale (yet?), but (with my
+>> maintainer hat on) please don't use the "Meta is good" argument, because
+>> someone will send a similar driver from a less involved company later on
+>> and we'll be accused of playing favorites :( Plus companies can change
+>> their approach to open source from "inclusive" to "extractive" 
+>> (to borrow the economic terminology) rather quickly.
+>> 
+>
+>I'll throw my $.02 in. In this case you have a driver that I only scanned
+>so far, but looks well done. Alex has written lots of drivers I trust he
+>will not just abondon it. And if it does end up abondoned and no one
+>supports it at some future point we can deprecate it same as any other
+>driver in the networking tree. All the feedback is being answered and
+>debate is happening so I expect will get a v2, v3 or so. All good signs
+>in my point.
+>
+>Back to your point about faith in a company. I don't think we even need
+>to care about whatever companies business plans. The author could have
+>submitted with their personal address for what its worth and called it
+>drivers/alexware/duyck.o Bit extreme and I would have called him on it,
+>but hopefully the point is clear.
+>
+>We have lots of drivers in the tree that are hard to physically get ahold
+>of. Or otherwise gated by paying some vendor for compute time, etc. to
+>use. We even have some drivers where the hardware itself never made
+>it out into the wild or only a single customer used it before sellers 
+>burned it for commercial reasons or hw wasn't workable, team was cut, etc.
+>
+>I can't see how if I have a physical NIC for it on my desk here makes
+>much difference one way or the other.
+>
+>The alternative is much worse someone builds a team of engineers locks
+>them up they build some interesting pieces and we never get to see it
+>because we tried to block someone from opensourcing their driver?
+>Eventually they need some kernel changes and than we block those too
+>because we didn't allow the driver that was the use case? This seems
+>wrong to me.
+>
+>Anyways we have zero ways to enforce such a policy. Have vendors
+>ship a NIC to somebody with the v0 of the patch set? Attach a picture? 
+
+Come on. Are you kidding? Isn't this case crystal clear?
 
 
-
-On 2024-04-07 03:51, Menglong Dong wrote:
-> On Sun, Apr 7, 2024 at 2:52 PM Jason Xing <kerneljasonxing@gmail.com> wrote:
->> On Sun, Apr 7, 2024 at 2:38 AM Eric Dumazet <edumazet@google.com> wrote:
-[...]
->>>> [5201<->54494]: tcp_recvmsg_locked(<-) returning -11 bytes, window now: 250164, qlen: 0
->>>>
->>>> We can see that although we are adverising a window size of zero,
->>>> tp->rcv_wnd is not updated accordingly. This leads to a discrepancy
->>>> between this side's and the peer's view of the current window size.
->>>> - The peer thinks the window is zero, and stops sending.
-> Hi!
+>Even if vendor X claims they will have a product in N months and
+>than only sells it to qualified customers what to do we do then.
+>Driver author could even believe the hardware will be available
+>when they post the driver, but business may change out of hands
+>of the developer.
 >
-> In my original logic, the client will send a zero-window
-> ack when it drops the skb because it is out of the
-> memory. And the peer SHOULD keep retrans the dropped
-> packet.
->
-> Does the peer do the transmission in this case? The receive
-> window of the peer SHOULD recover once the
-> retransmission is successful.
-The "peer" is this case is our user-space protocol splicer, emulating
-the behavior of of the remote end socket.
-At a first glance, it looks like it is *not* performing any retransmits
-at all when it sees a zero window at the receiver, so this might indeed
-be the problem.
-I will be out of office today, but I will test this later this week.
+>I'm 100% on letting this through assuming Alex is on top of feedback
+>and the code is good. I think any other policy would be very ugly
+>to enforce, prove, and even understand. Obviously code and architecture
+>debates I'm all for. Ensuring we have a trusted, experienced person
+>signed up to review code, address feedback, fix whatever syzbot finds
+>and so on is also a must I think. I'm sure Alex will take care of
+>it.
 
-///jon
+You are for some reason making this submission very personal on Alex.
+Just to be clear, this has nothing to do with Alex.
+
 
 >
->>>> - This side ends up in a cycle where it repeatedly caclulates a new
->>>>    window size it finds too small to advertise.
-> Yeah,  the zero-window suppressed the sending of ack in
-> __tcp_cleanup_rbuf, which I wasn't aware of.
->
-> The ack will recover the receive window of the peer. Does
-> it make the peer retrans the dropped data immediately?
-> In my opinion, the peer still needs to retrans the dropped
-> packet until the retransmission timer timeout. Isn't it?
->
-> If it is, maybe we can do the retransmission immediately
-> if we are in zero-window from a window-shrink, which can
-> make the recovery faster.
->
-> [......]
->>> Any particular reason to not cc Menglong Dong ?
->>> (I just did)
->> He is not working at Tencent any more. Let me CC here one more time.
-> Thanks for CC the new email of mine, it's very kind of you,
-> xing :/
->
-
+>Thanks,
+>John
 
