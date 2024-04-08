@@ -1,114 +1,127 @@
-Return-Path: <netdev+bounces-85577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C59B589B78E
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 08:18:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93F9589B7B1
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 08:36:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 807EE2825CA
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 06:18:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 342D51F226BE
+	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 06:36:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D6038820;
-	Mon,  8 Apr 2024 06:18:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C926B7462;
+	Mon,  8 Apr 2024 06:35:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MlOndreW"
+	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="PiVHLjsZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A36479FE;
-	Mon,  8 Apr 2024 06:18:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AD3A171B0
+	for <netdev@vger.kernel.org>; Mon,  8 Apr 2024 06:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712557131; cv=none; b=CXg9iTmBP2PYXlDjhQfVW5Tu60488x0+PPcs5hQ+wpeifkHubip7pJ7+aKUOiTt10/DVzV3saIPCjV1WmZf6TdDfALcmf76ypM61vX/22dtCk8wphgks/Wg5OvE55uT/FEfQNrUCiVAkQPO3xzFzoNsirbXwIUlbgAu6fY1gpbM=
+	t=1712558159; cv=none; b=sxI/Um9gje4T6GxuMuU68QmBbMMhFV+ZrCni+hFRoecqBnrFDRtmbaC1l7PsGwbAiH9DDxB6mgJhEC7jXYkwaoxkPiNQmEADN+DRGgbGEMLEXy+CT+LhT07Go3DXdHpvRzqRwtLpQiImmlq1ngIjveaCb8o0/0IXwnFrcpnLJoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712557131; c=relaxed/simple;
-	bh=DIuA8oFwm/vpb38UIq95JDqRuLtIzxfyMX4vnoI6NeY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rLAFt78N5T+ABg2OYiI9cIPiWOcbip+SKtsANu42jJxx+nF+a0GYRIyuLg0OZBIea1EOya6L6XnXVobu7nVoIho9h1W8Do0om6WEGT3CjJcfBnQRpHD90F1zyX4d2QNE8+08vxfk/FHAbLAggGaX8TAYdUEMMPvZKo6WiNuErXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MlOndreW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BC4AC433F1;
-	Mon,  8 Apr 2024 06:18:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712557130;
-	bh=DIuA8oFwm/vpb38UIq95JDqRuLtIzxfyMX4vnoI6NeY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MlOndreWiIQHypWltN1SBSVOe0uo7bN2o4w2w2hIhozWzGK/7D9L3GyKt8BGqh40n
-	 XqQZeDmuyHtFLAeLQknY5Vv2tU9ibBrLM77CUPg/kmRtdGsI9OHtd53KCRJdFN6o5J
-	 DFxHHuRjTD1OzaOYHaS5ia9o99el5EdwmurHqyc5rTEXbSnR8zGHdORqdO17M9H1wH
-	 ePfbRVfGIUfuXKeIx6easXKTi3oE0VQzPxUfvf5R4txiUdRr93FjvaQBLfJ4015y6V
-	 jKYLpkc2P+p24BKmpysS7KJ0VgUvFMCjhIUmQt+B3qkvpTyoRCwtIR4TAkiiKqi+ju
-	 qJlGRVUB+J1qA==
-Date: Mon, 8 Apr 2024 09:18:46 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
-	bhelgaas@google.com, linux-pci@vger.kernel.org,
-	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net,
-	pabeni@redhat.com
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-Message-ID: <20240408061846.GA8764@unreal>
-References: <Zg6Q8Re0TlkDkrkr@nanopsycho>
- <CAKgT0Uf8sJK-x2nZqVBqMkDLvgM2P=UHZRfXBtfy=hv7T_B=TA@mail.gmail.com>
- <Zg7JDL2WOaIf3dxI@nanopsycho>
- <CAKgT0Ufgm9-znbnxg3M3wQ-A13W5JDaJJL0yXy3_QaEacw9ykQ@mail.gmail.com>
- <20240404132548.3229f6c8@kernel.org>
- <660f22c56a0a2_442282088b@john.notmuch>
- <20240404165000.47ce17e6@kernel.org>
- <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
- <20240404193817.500523aa@kernel.org>
- <CAKgT0UdAz1mb48kFEngY5sCvHwYM2vYtEK81VceKj-xo6roFyA@mail.gmail.com>
+	s=arc-20240116; t=1712558159; c=relaxed/simple;
+	bh=GB58bQle6/TE9XhpcBSQjj6cikX2bR8e+VuUWv1u+SE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aLcWx+MfAlOgzqSnrxC+oq9rImNBtwFtXf6VdJp7CSBhNSwaZaktcGO1scRdtTTmiUJVC+GKRNZ9f+HB/udznEG9KCaLaxG3SI/AbpDachxeyzd/0F5DeIwZhFNvQeea/rusU40Hla311AiHggN8GvQH95J6up2DiC59tj8xcJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=PiVHLjsZ; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a51a7dc45easo314849366b.2
+        for <netdev@vger.kernel.org>; Sun, 07 Apr 2024 23:35:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gooddata.com; s=google; t=1712558156; x=1713162956; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GB58bQle6/TE9XhpcBSQjj6cikX2bR8e+VuUWv1u+SE=;
+        b=PiVHLjsZEyeApXJdxfGALGW1z5oS6aYyaXctRE2Yw88k3GCEQRr0DWo4ofr3+E7Gr/
+         BLPG5DGcdsH4vKrkjleF++t9NcXJJWH+dbtA/dioTBSUrh5Qu2eLen0P0C2e6EHXgG8k
+         woehRemp38+VRVkmmpP/NMXh8NpEm6KRyDU/Y=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712558156; x=1713162956;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GB58bQle6/TE9XhpcBSQjj6cikX2bR8e+VuUWv1u+SE=;
+        b=RuTvBOb/DkliN9B6f0ppPs/aFOhHogU1DtZfe7JFDyU+cQ4hDjHSryJqbRylNhWRKy
+         uZ9XoT1zdNylDRapzGHCvW/UCCA8zqIIVBKsC+0GkoouQHS7Ezroyx2xz/I3KE4uHVtj
+         vH/kJsJOOnqtPaAWiL95QNBSp6e6YCsOluEDMDzEtyyzP5/Ltz4bh6folZiOcJKbNqY2
+         1nz6SeRoQ4ATzl5IT8Trdz+8N9RgHE5kk1ulfl5aCQUTwSvWwxfvPDKBTgjTSwMZ/anA
+         +73bN2UamamvgrmfyX8D44BLKccguT6jEoF4nA0FnhJ16qLzfFeeOewgY7s0zaRW/Luq
+         RsGA==
+X-Forwarded-Encrypted: i=1; AJvYcCWDCmqFeTESlzNC/Dy6aiNxv1+gJEYQ3od4/rF2c/osmwBLBElzEKzdcYpa0xH0dSmKoESP4cTANyYX18KuM+N49c2sQJo9
+X-Gm-Message-State: AOJu0YzB6acZCIs4Zu36Ar/eZgTL8UFqAO6f4tuSRwL61IfpYSzRIc2O
+	uk0MtESScMKEKH2b09qgY5xl7j7qro/Y5ND84LPl3ZqKUMf0gNNWeXst41URdFf6sYKlRgiUGjj
+	uGGHsnMZseWWjEW1TDbLocCYEqyqUpeV2s04N
+X-Google-Smtp-Source: AGHT+IHgOG1QFRsazaJJTQAM1OpfXlCUvvdH9XD6u9F4YJ8KIuAm8siPgnu/FFrnysbhWv7Ny+9JXK+VCjeK9WS7Rgs=
+X-Received: by 2002:a17:906:565a:b0:a51:9737:f23d with SMTP id
+ v26-20020a170906565a00b00a519737f23dmr4595803ejr.70.1712558156369; Sun, 07
+ Apr 2024 23:35:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKgT0UdAz1mb48kFEngY5sCvHwYM2vYtEK81VceKj-xo6roFyA@mail.gmail.com>
+References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
+ <20240319131207.GB1096131@fedora> <CA+9S74jMBbgrxaH2Nit50uDQsHES+e+VHnOXkxnq2TrUFtAQRA@mail.gmail.com>
+ <CACGkMEvX2R+wKcH5V45Yd6CkgGhADVbpvfmWsHducN2zCS=OKw@mail.gmail.com>
+ <CA+9S74g5fR=hBxWk1U2TyvW1uPmU3XgJnjw4Owov8LNwLiiOZw@mail.gmail.com>
+ <CACGkMEt4MbyDgdqDGUqQ+0gV-1kmp6CWASDgwMpZnRU8dfPd2Q@mail.gmail.com>
+ <CA+9S74hUt_aZCrgN3Yx9Y2OZtwHNan7gmbBa1TzBafW6=YLULQ@mail.gmail.com>
+ <CA+9S74ia-vUag2QMo6zFL7r+wZyOZVmcpe317RdMbK-rpomn+Q@mail.gmail.com>
+ <CA+9S74hs_1Ft9iyXOPU_vF_EFKuoG8LjDpSna0QSPMFnMywd_g@mail.gmail.com>
+ <CACGkMEvHiAN7X_QBgihWX6zzEUOxhrV2Nqg1arw1sfYy2A5K0g@mail.gmail.com>
+ <CAK8fFZ6P6e+6V6NUkc-H5SdkXqgHdZ-GEMEPp4hKZSJVaGbBYQ@mail.gmail.com>
+ <20240404063737.7b6e3843@kernel.org> <CAK8fFZ5LHFMPAOFCKu-vr7JQJHKo9jshrgvCCP50d596nFiXUQ@mail.gmail.com>
+In-Reply-To: <CAK8fFZ5LHFMPAOFCKu-vr7JQJHKo9jshrgvCCP50d596nFiXUQ@mail.gmail.com>
+From: Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Date: Mon, 8 Apr 2024 08:35:30 +0200
+Message-ID: <CAK8fFZ74tj=u5HKfpFue1ejy_9V3xWdf-ekC0gLt8BmJs7Y5ZQ@mail.gmail.com>
+Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jason Wang <jasowang@redhat.com>, Igor Raits <igor@gooddata.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, Stefano Garzarella <sgarzare@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 05, 2024 at 08:41:11AM -0700, Alexander Duyck wrote:
-> On Thu, Apr 4, 2024 at 7:38 PM Jakub Kicinski <kuba@kernel.org> wrote:
-
-<...>
-
-> > > > Technical solution? Maybe if it's not a public device regression rules
-> > > > don't apply? Seems fairly reasonable.
-> > >
-> > > This is a hypothetical. This driver currently isn't changing anything
-> > > outside of itself. At this point the driver would only be build tested
-> > > by everyone else. They could just not include it in their Kconfig and
-> > > then out-of-sight, out-of-mind.
+=C4=8Dt 4. 4. 2024 v 20:17 odes=C3=ADlatel Jaroslav Pulchart
+<jaroslav.pulchart@gooddata.com> napsal:
+>
+> =C4=8Dt 4. 4. 2024 v 15:37 odes=C3=ADlatel Jakub Kicinski <kuba@kernel.or=
+g> napsal:
 > >
-> > Not changing does not mean not depending on existing behavior.
-> > Investigating and fixing properly even the hardest regressions in
-> > the stack is a bar that Meta can so easily clear. I don't understand
-> > why you are arguing.
-> 
-> I wasn't saying the driver wouldn't be dependent on existing behavior.
-> I was saying that it was a hypothetical that Meta would be a "less
-> than cooperative user" and demand a revert.  It is also a hypothetical
-> that Linus wouldn't just propose a revert of the fbnic driver instead
-> of the API for the crime of being a "less than cooperative maintainer"
-> and  then give Meta the Nvidia treatment.
+> > On Thu, 4 Apr 2024 07:42:45 +0200 Jaroslav Pulchart wrote:
+> > > We do not have much progress
+> >
+> > Random thought - do you have KFENCE enabled?
+> > It's sufficiently low overhead to run in production and maybe it could
+> > help catch the bug? You also hit some inexplicable bug in the Intel
+> > driver, IIRC, there may be something odd going on.. (it's not all
+> > happening on a single machine, right?)
+>
+> We have KFENCE enabled.
+>
+> Issue was observed at multiple servers. It is not a problem to reproduce =
+it
+> everywhere where we deploy Loki service. The trigger is: I click
+> once/twice "run query" (LogQL) button by Grafana UI. the Loki is
+> starting to load data from the minio cluster at a speed of ~2GB/s and
+> almost immediately it crashes.
+>
+> The Intel ICE driver is in my suspicion as well, it will not be for
+> the first time when we are hitting some bugs there. I will try one
+> testing server where we have different NIC vendor later.
 
-It is very easy to be "less than cooperative maintainer" in netdev world.
-1. Be vendor.
-2. Propose ideas which are different.
-3. Report for user-visible regression.
-4. Ask for a fix from the patch author or demand a revert according to netdev rules/practice.
-
-And voilà, you are "less than cooperative maintainer".
-
-So in reality, the "hypothetical" is very close to the reality, unless
-Meta contribution will be treated as a special case.
-
-Thanks
+I run the setup on a server with a different network card than E810, I
+used BCM57414 NetXtreme-E + driver bnxt_en. The issue is not
+reproducible there. So it looks to be connected with Intel's ice
+driver for E810 network card and introduced in 6.3.
 
