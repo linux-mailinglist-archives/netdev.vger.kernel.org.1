@@ -1,134 +1,148 @@
-Return-Path: <netdev+bounces-86273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F362289E4B5
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 22:53:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E64289E4BD
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 23:06:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93AF71F23213
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 20:53:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3476F1F2324B
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 21:06:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6345158861;
-	Tue,  9 Apr 2024 20:53:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7BF4158A00;
+	Tue,  9 Apr 2024 21:06:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="B24348M/"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PGRHbB1y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5094538DC9
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 20:53:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EDEA15887B;
+	Tue,  9 Apr 2024 21:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712696021; cv=none; b=ivMSY4T3eCkhpWup3KexuycqCX9xi5u7KshsgDW5Aqt/m4XWGUytu1rEcd+tCL7ZKsqnHQQHqZnXFQV56r0baT5VzNDb82rid+80gI3MSy+SX2C7+RXQ/kJ/Qi65/EjbMROHF5j++B/tQZDloccwcI/Zt11IVsOwtQAB1sYetpY=
+	t=1712696772; cv=none; b=tbfRnRJUqJj/wZmgNuJdX/kjWnELJGElmocGm+MVxNyaZOEENr7XLL9QNWeAWhpy+Dd7MJP94cjLoXaMegnjp5WOQ8bGJCCiiwNkbfMUaemzmmawi9EBSQrqK+gyFC8TkCdqrYnuC07HIFnJFKhE0z8woIPZBmFE1xj0AhVTLhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712696021; c=relaxed/simple;
-	bh=+ZK6BDpDzYocSVlMPON5u26LhnESeioKNtZjljPu2Vs=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=S7UzAIhUcRrQM5NBovI95oVq4HMaXuRqW497g0lt6Rv2R3NI5He9Q+4o6p320GhfwM/6y71MiruBJs0HnhTOVQkDjGUJrTppdTl2V4Ggw1C2dCss3/t37n/tBKHIL/jnTOzeLXTm5TTyhuj5nzXyFHdIAu4wr0c83ldZLg8RMa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=B24348M/; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com [209.85.210.200])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 676433F19A
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 20:53:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1712696017;
-	bh=EJ+HKk9Bo4Vt82jOzdBeHEs05+j74HpwAzSSP87YFvw=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=B24348M/ZRgmdsPJD5HuoY18dgvpU5PQkUrYyMgcFfcUv6eHfLi91B+4ExGyZBfSz
-	 CqM0PttTYyAOt/FbS4jB0UFFTg+c7LT1kcGQcrD91iWs9U6TKz/nck+sAS+z8MC0xt
-	 ukPw1UJHuUeHWh4OAZ8TPzCXHmeKF3yhaCF2dgjM10x0sqs3MTnBWyqaAGBIjYiRKu
-	 bob2+v8EPMtZIkuO4oVFKPXmGZvbVhCxAfsREnNrSSjEIBa66SbkUmpF3pX6Np0bIU
-	 XyDY0zK75+NegJqyrhmob41x1b46O+09uiSkqxj7itM8kEObAYA8MfYp1eMWiaeGtR
-	 Y3TBOSZXTBpig==
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-6ed34f8b3c8so1830665b3a.1
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 13:53:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712696016; x=1713300816;
-        h=message-id:date:content-transfer-encoding:mime-version:comments
-         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=EJ+HKk9Bo4Vt82jOzdBeHEs05+j74HpwAzSSP87YFvw=;
-        b=CrpaWi63zvE4byiFxWMPOLM1nnPtWgPqUfEgHx3YqnYPblcX+HR/wq6wtWFH+CwtEB
-         sgZQ7y+zfNYUcwJNkTz/+xTaPDK1G/wXwy8r0YJssayy+Nrm1OSlCCDgadyGrWSuIoSJ
-         I6zaXvcKQkVQsTbgTjXScrjaGzm5PlskQCj38YEUc7w6QxGSugY2FpnLpwMa/TvW/ws+
-         aKtdHNv7rpU6p9dHqH9sw9BW9ZV1yrtKAao0lmqu5qFSXWHIhmiBn5hFXp1qsSv/sn+Y
-         BpSHsZpjuOTsvJgeFJD5IfjfrJ8ZmvVhgub0uFPSRDJ9FnUCsWeGpCodvc+E1BZcryBL
-         sczg==
-X-Forwarded-Encrypted: i=1; AJvYcCVkQVMdDo3V0Wnj3PGQSf4omizVlqcGk/7OAXnQ7xysVnI5HSzSSJ3SGkcnn+z/a/thBoPlgvlQTCTapbyu9V1jq5/uWjNH
-X-Gm-Message-State: AOJu0YzKs1AZJs+47XVih0H3zko54AU4D7rmNA51YjpCD3z7cH22/tco
-	hHEE7FwIxC6iOE3tmUfpiY09eVQo+TTNSWC0Qjb4A6l+Ec4nocphw7ODHmiKpH3oxokJ8dwxgnm
-	3zBIeLxPwWT/j0/0HxHp2JGf8SUI5z7QcXNT1Jb4vCyqRfAmBXU57iy2ylGjKCPGZDZVneQ==
-X-Received: by 2002:a05:6a21:6d89:b0:1a7:47b1:e8e2 with SMTP id wl9-20020a056a216d8900b001a747b1e8e2mr1200771pzb.9.1712696015844;
-        Tue, 09 Apr 2024 13:53:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH6OeCdchdkFd7XezQq8GET4N961DHEuYaM1VglblFz+o1eJU/psF271D3liB8WjJFG+4ALHA==
-X-Received: by 2002:a05:6a21:6d89:b0:1a7:47b1:e8e2 with SMTP id wl9-20020a056a216d8900b001a747b1e8e2mr1200742pzb.9.1712696015191;
-        Tue, 09 Apr 2024 13:53:35 -0700 (PDT)
-Received: from famine.localdomain ([50.125.80.253])
-        by smtp.gmail.com with ESMTPSA id l3-20020a17090ac58300b002a46a6ab205sm26408pjt.5.2024.04.09.13.53.34
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 09 Apr 2024 13:53:34 -0700 (PDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 7DFDF604B6; Tue,  9 Apr 2024 13:53:34 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 76AB09FA74;
-	Tue,  9 Apr 2024 13:53:34 -0700 (PDT)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: Eric Dumazet <edumazet@google.com>
-cc: "David S . Miller" <davem@davemloft.net>,
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-    Andy Gospodarek <andy@greyhouse.net>, netdev@vger.kernel.org,
-    eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 3/3] bonding: no longer use RTNL in bonding_show_queue_id()
-In-reply-to: <CANn89i+qQ0zk4+jua1oiTNz6wqj2r1LTbp+W+d5eUaK38U8THA@mail.gmail.com>
-References: <20240408190437.2214473-1-edumazet@google.com> <20240408190437.2214473-4-edumazet@google.com> <17498.1712695173@famine> <CANn89i+qQ0zk4+jua1oiTNz6wqj2r1LTbp+W+d5eUaK38U8THA@mail.gmail.com>
-Comments: In-reply-to Eric Dumazet <edumazet@google.com>
-   message dated "Tue, 09 Apr 2024 22:47:38 +0200."
-X-Mailer: MH-E 8.6+git; nmh 1.6; Emacs 29.0.50
+	s=arc-20240116; t=1712696772; c=relaxed/simple;
+	bh=Jy24e7oy1xu/OFetGGcYd/gTCThcS3dxJIyooq7Oqyc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RBMmPtrGTecY3+ORViasAN4Qvy6xyW6m5UqmKeh0MRbk0pjUNTWxtFk3s3EHV3p3ACPf220qFO5SN7SqYeR+7ZFgpZrC1Gywap0AjUs8xYH7i7Nqi1J1ABsbHmeO+B2r8J1LUNVR6I93LgDUj53BVaNuRsOU/E3K8anefo356Lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=PGRHbB1y; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 439KZcrF016172;
+	Tue, 9 Apr 2024 21:05:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding; s=qcppdkim1; bh=V1SuP6eXVBFGYGm7m/1G
+	hxLxiPFrHOkbv1QHcvwMGWc=; b=PGRHbB1ywlb7UzhJysUAaEBExh8K43CSbV8f
+	Wx15QmwwQkjYki/2bvpGeoiZqMCXTvAkUv1MUDHVTbypbL52sG1vyiJws4VICY7O
+	kgz4IZUrF1NcyEvCKusNVdHunxp3WG2h4JYssArXJL64IAuAmTywDvggfBPL61u7
+	5r2Zo3JJNihA33fD++yX8QLCtpJ8UELr2pNG9nZJYYCSYUCI24GB8Tg+BWYNWWLy
+	f4Vj9EfzRCR+01uHjo8hIeVqDNayA8TVipDzhpwtUGHPAn4YmCZZDvl/NF3uege6
+	zkuA4HeaukzrvgshdC7C6Ex12d6fg3R7Yj0jpWuQdqzyW8mwAg==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xd3dy9f7w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Apr 2024 21:05:49 +0000 (GMT)
+Received: from pps.filterd (NALASPPMTA01.qualcomm.com [127.0.0.1])
+	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 439L5mZF025389;
+	Tue, 9 Apr 2024 21:05:48 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by NALASPPMTA01.qualcomm.com (PPS) with ESMTPS id 3xayfmk1ed-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Apr 2024 21:05:48 +0000
+Received: from NALASPPMTA01.qualcomm.com (NALASPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 439L5lpB025383;
+	Tue, 9 Apr 2024 21:05:47 GMT
+Received: from hu-devc-lv-u20-a-new.qualcomm.com (hu-abchauha-lv.qualcomm.com [10.81.25.35])
+	by NALASPPMTA01.qualcomm.com (PPS) with ESMTPS id 439L5l6S025379
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Apr 2024 21:05:47 +0000
+Received: by hu-devc-lv-u20-a-new.qualcomm.com (Postfix, from userid 214165)
+	id 4F182220AB; Tue,  9 Apr 2024 14:05:47 -0700 (PDT)
+From: Abhishek Chauhan <quic_abchauha@quicinc.com>
+To: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
+        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        Martin KaFai Lau <martin.lau@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>
+Cc: kernel@quicinc.com
+Subject: [RFC PATCH bpf-next v1 0/3] Rename mono_delivery_time to
+Date: Tue,  9 Apr 2024 14:05:44 -0700
+Message-Id: <20240409210547.3815806-1-quic_abchauha@quicinc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Apr 2024 13:53:34 -0700
-Message-ID: <18657.1712696014@famine>
+Content-Transfer-Encoding: 8bit
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: QX38xT3t_NKNPLtQtrd_2YlODkrC3Axh
+X-Proofpoint-ORIG-GUID: QX38xT3t_NKNPLtQtrd_2YlODkrC3Axh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-09_12,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=688
+ malwarescore=0 impostorscore=0 phishscore=0 bulkscore=0 clxscore=1011
+ adultscore=0 spamscore=0 lowpriorityscore=0 suspectscore=0
+ priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2404010003 definitions=main-2404090142
 
-Eric Dumazet <edumazet@google.com> wrote:
+Patch 1 :- This patch takes care of only renaming the mono delivery
+timestamp to tstamp_type with no change in functionality of 
+existing available code in kernel. 
 
->On Tue, Apr 9, 2024 at 10:39=E2=80=AFPM Jay Vosburgh <jay.vosburgh@canonic=
-al.com> wrote:
->>
->> Eric Dumazet <edumazet@google.com> wrote:
->>
->> >Annotate lockless reads of slave->queue_id.
->> >
->> >Annotate writes of slave->queue_id.
->> >
->> >Switch bonding_show_queue_id() to rcu_read_lock()
->> >and bond_for_each_slave_rcu().
->>
->>         This is combining two logical changes into one patch, isn't it?
->> The annotation change isn't part of what's stated in the Subject.
->
->The annotations are really part of this change, otherwise KCSAN might
->find races.
+Patch 2 :- Starts assigning tstamp_type with either mono or real and 
+introduces a new enum in the skbuff.h, again no change in functionality 
+of the existing available code in kernel , just making the code scalable 
 
-	Works for me.
+Patch 3 :- Additional bit was added to support userspace timestamp to 
+avoid tstamp drops in the forwarding path when testing TC-ETF. 
+With this patch i am not sure what impacts it has towards BPF code. 
+I need upstream BPF community to help me in adding the necessary BPF 
+changes to avoid any BPF test case failures. 
+I haven't changed any of the BPF functionalities and hence i need 
+upstream BPF help to assist me with those changes so i can make them as 
+part of this patch.    
 
-Acked-by: Jay Vosburgh <jay.vosburgh@canonical.com>
 
-	-J
+Abhishek Chauhan (3):
+  net: Rename mono_delivery_time to tstamp_type for scalibilty
+  net: assign enum to skb->tstamp_type to distinguish between tstamp
+  net: Add additional bit to support userspace timestamp type
 
----
-	-Jay Vosburgh, jay.vosburgh@canonical.com
+ include/linux/skbuff.h                     | 40 ++++++++++++++++------
+ include/net/inet_frag.h                    |  4 +--
+ net/bridge/netfilter/nf_conntrack_bridge.c |  6 ++--
+ net/core/dev.c                             |  2 +-
+ net/core/filter.c                          |  8 ++---
+ net/ipv4/inet_fragment.c                   |  2 +-
+ net/ipv4/ip_fragment.c                     |  2 +-
+ net/ipv4/ip_output.c                       | 10 +++---
+ net/ipv4/raw.c                             |  2 +-
+ net/ipv4/tcp_output.c                      | 14 ++++----
+ net/ipv6/ip6_output.c                      |  8 ++---
+ net/ipv6/netfilter.c                       |  6 ++--
+ net/ipv6/netfilter/nf_conntrack_reasm.c    |  2 +-
+ net/ipv6/raw.c                             |  2 +-
+ net/ipv6/reassembly.c                      |  2 +-
+ net/ipv6/tcp_ipv6.c                        |  2 +-
+ net/packet/af_packet.c                     |  6 ++--
+ net/sched/act_bpf.c                        |  4 +--
+ net/sched/cls_bpf.c                        |  4 +--
+ 19 files changed, 73 insertions(+), 53 deletions(-)
+
+-- 
+2.25.1
+
 
