@@ -1,145 +1,130 @@
-Return-Path: <netdev+bounces-86163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 377C889DC04
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:18:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E5A789DC2D
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:26:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5A9C28157A
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:18:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 291F1B21B39
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:26:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 671D212FB0D;
-	Tue,  9 Apr 2024 14:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5065512FB0B;
+	Tue,  9 Apr 2024 14:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g5m0cUey"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="icS/oM+I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9589612F5A0
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 14:17:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E68812F598;
+	Tue,  9 Apr 2024 14:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712672280; cv=none; b=j8KYYAN6E69/i2A31DetpfGd84j5zz5n9suWoySey8IxpgzKJMJPd2mjbHUI9fTZfjtE9DCW7maUQFgNM22cJ+XLX6+XD2hLc6it/tKedtfhnV6W1+KpMx7NxDg1djfFVK1yi0SgaF+aEEyiLKaNfncRJB3ehy0f/mt6M8B/Sr0=
+	t=1712672781; cv=none; b=oqiQIjCElpWRmFnaQtyaixC2nIdeDO2LVH9KrOGtKV7zyIqp/ahaKMQoo6YSPZw4rN0Cp/HdeHdnQcKM+iTO+IQJA1b9jtCctZ5lUv+/tUN6BghRbwdBf/4B/scNyWZ++Pi3PXf6nmn5bhnGZ2jtOVyKZqvYdj+iAprH2q45kMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712672280; c=relaxed/simple;
-	bh=CQJJ+EXkS8vzXDSQGCdhZzOcQSnJl9LGsjKU2h6iW4g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qFq9wdBLtKG9+HDMpMleoA8oH2J8rZ654kUjJMUCnnbqIElD7zFBq66zTLj1keYjmi4jLPGTmxbOCwtwwXH/c7OXqAEBZrybqYOLGYKs5f4QsKKjhJprDQqcAlJ+ZlFxrgpJkWhUs/ATWkArpcUV+obMxxMNQh8LV0KsHoeytSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g5m0cUey; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56e67402a3fso14987a12.0
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 07:17:58 -0700 (PDT)
+	s=arc-20240116; t=1712672781; c=relaxed/simple;
+	bh=0FCx0ExAOuO47pPXq+LvIi7sP+m6A6+hblbEodnSxDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mQF8nvPTgdQn5bPEcm+99Bh7l5/ix/J7GGfrU/j962er0/jXNGmiXglfouI8W7irOaZS91o048MMFmv6/msIg6g6/kp45QvkncfMEsx+KKP2lL2u6IJ5tNG2t4Ndvr5I+2TeOOuFikNAAj4To2FGd3qaUwPSQ15jHldJ/HE2ryY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=icS/oM+I; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-516ef30b16eso3282638e87.3;
+        Tue, 09 Apr 2024 07:26:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712672277; x=1713277077; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VmZzs0VOF7pCa24C6qKP0DzgKs89B6zI1lNihOdcCC8=;
-        b=g5m0cUeyt3OPmYkjeSaCYLiqKCKoOiiJTSs8Hmnilp+hftyUFIBS1fVNM/3U1waNh1
-         jufjXbupOQXE7izYYd2czwgvfM+BH8UiDEnRT6+891cKMjOLoJF6C7tGfkz4A3Kn7/yn
-         FAF1Spp8EgkxJ/B/UNYkXLq4F11OdyBLFTD26Ejp/vbnqjqOc0Y51THJ94qjUs5s7bT1
-         Nzgwn3/2S6/2LdD8G/5xS8Y59feo2Mvj2fRQeoju8BmsHHvYUULBLbVmypi458U+FmNE
-         3wQ+UUU+//UXMxgFXw+QdH6D/CcAddYcSkk106wULLqMkvVgvarBxFak6a9OG/LVXzfy
-         Douw==
+        d=gmail.com; s=20230601; t=1712672778; x=1713277578; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5siHBidFUu/f/+SSwIYn7JsHrl83u4UHX8WsLfWFlHk=;
+        b=icS/oM+I76ESzKryfrKgYOof1JiUqjVl5zNQzYbMPdO3U2NtIRAtH/iL6NOUXVSGf4
+         h+uv7OmQZbpDGqFPd+ic0nbIvyXZ7bFCnUF6JwqmMf90yOKSwER43B9CG4jfwSJkS3Q0
+         G7vCigFk/WSbFM4pFoU1ijVsep/Dyrc2/E35XTN/HLVPNo+JhYWbnp8CImd1WHbXCQt2
+         l4d9/AUNzfHnhocz1KYwJlMPLB9m8sT4dKxPngOgH9J8y7wFFbeNQIzAwMyET44Q9nqT
+         NWk5L4hTSIvRp5a5FAhJDsSWozQgNEh4qZ2IDb32lObBbeyLL2G5CApjg6eC3L3oO+3h
+         dp4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712672277; x=1713277077;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VmZzs0VOF7pCa24C6qKP0DzgKs89B6zI1lNihOdcCC8=;
-        b=EQ1oeZ9HQi0q4YM/C0NBTPbMIgbL/u5WmdD1cEVYD20z2RwEeFfP23/vPfdSe7ou5u
-         n0p+Wn9BN/8XRdDKf4BP3McVjKj2E4AdZaF2NxxRKpz+A/D5yPqufv3Ymjj5B6oG9tiu
-         /5/kZlD6y2SeTPXnGCR4mLZMzAYc2o0jJzxIQ5cUymXtExaNszYyZWRYdF/uUisOAAU/
-         YCNdtJ9AY47++mwNVX61LU+tSnnakRuTxLzGKcV8mpoaRGhyEBxsNDVmWfABYWSLAWyj
-         ECNrSs/5oVkih4ANXFBalkxuuTWILsltejVGotLfSHMvsMFLwUJ4kAXFetL2/3BCX6Ss
-         WPeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUULVeVJPRl1N1u6IkS7WrabMT2w0MMOFJdf+p0gvdL14IHlHkxfdyfwgjqtrTW9cTg4JQ/ecmn/bNj/JnZoMrV8Hm3G8fI
-X-Gm-Message-State: AOJu0YwdmjUAYBRIp+AHZB7yHDKduN2Ojoaf7jSPvYdapmqFV8k+SqDr
-	MO1fksO6B64v/uS7fKkBXhnaEqfxGclbD18aXH9a5hfbqDLdQg3SnWYpGDDpNi5qazrgo+UTm8x
-	pDKXgJsDVJCjDmxmOo0aSZviwpBPkqZZs1icb
-X-Google-Smtp-Source: AGHT+IEotRWbGGi6bZ2X7QllsriEs5XuAfrmYSsR3+QQhN3IykwUSZgSv9+89fLvM1ymkT3RaeWYlpR5hL6VjU0ap8U=
-X-Received: by 2002:a05:6402:40cc:b0:56e:72a3:e5a8 with SMTP id
- z12-20020a05640240cc00b0056e72a3e5a8mr161277edb.3.1712672276490; Tue, 09 Apr
- 2024 07:17:56 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712672778; x=1713277578;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5siHBidFUu/f/+SSwIYn7JsHrl83u4UHX8WsLfWFlHk=;
+        b=K91FrIF712UCUlmXZv3Td0zOHtI8MSbniDDylYkBKf/K5JbNZXrjStMKlgrHY5m7Pc
+         SmklOS5qlUFQwWnpRlijpTTSQ691O/4U4McVIdxhfCGmgrM46XKzFoV3O+wkTNMW0n+e
+         4lOBeQqi8F+S5VRAyqMrja4gvc66IqRA51yoztyogEsAHISkKHijt74eIx54tFz0mD2P
+         i6pTnaGDkvk9y39VMNZcbmF1Ge3lhrHyJVqWo/xKfHZxzfhiujDUN438SOxSWj28+F6C
+         C4r7v95efWddDqfBjcyFeMeEdjpqcVIjC348w1UbISgLp/UvNz/Y/nh24UKi6haIzS2j
+         hLuw==
+X-Forwarded-Encrypted: i=1; AJvYcCWOpzcu77cHQkotNfBBz+w1ZYM5fdvxy/Mo4gf5fCMEHbT2nLnFQ0CesKJOIn8YQeug9KERGJCdiaZR5qsascMm5IHGfQhrSMQROS8NhoZcfm3ZnJeA2PZVIq+KUAqN9ToqO3aJ
+X-Gm-Message-State: AOJu0YywA9tTBVF4CvxPgRD6iDUgG3H1sFN0qcxMg2OlgxzONJhp/O5J
+	fav0yT8S2bxMlSDz4MJEV1q4B8wxIOuo8snN7Y8SfmJjarRrtB/zh5lw/G9j
+X-Google-Smtp-Source: AGHT+IHj+m5LwCmCOAmqAI1oRxRP3QiTiWCZAHVTOsuuo4TMQQOeU4/As9nnE1nRGMtnNgpgroibvA==
+X-Received: by 2002:ac2:5337:0:b0:513:dac5:ee22 with SMTP id f23-20020ac25337000000b00513dac5ee22mr6953932lfh.28.1712672777495;
+        Tue, 09 Apr 2024 07:26:17 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id s17-20020a195e11000000b00515d55b66acsm1558748lfb.64.2024.04.09.07.26.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Apr 2024 07:26:17 -0700 (PDT)
+Date: Tue, 9 Apr 2024 17:26:13 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Minda Chen <minda.chen@starfivetech.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/2] Add missing mmc statistics in DW GMAC
+Message-ID: <qfsmz4mtjknbul2e43mvqghinqvpqq3hsnp5p5prtpbmoa47at@g3zuvdq7kirx>
+References: <20240408012943.66508-1-minda.chen@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <7cf0848b-f44c-42ad-848a-369a249bff77@gmail.com> <tencent_88401767377846C9736D0363C96C23BB4405@qq.com>
-In-Reply-To: <tencent_88401767377846C9736D0363C96C23BB4405@qq.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 9 Apr 2024 16:17:42 +0200
-Message-ID: <CANn89iJAyCKbL1Gx9mbBMuEvDB7nr-Ao6vB7KbtOK5D0UhiQNQ@mail.gmail.com>
-Subject: Re: [PATCH] net/socket: Ensure length of input socket option param >= sizeof(int)
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: eric.dumazet@gmail.com, johan.hedberg@gmail.com, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org, 
-	pmenzel@molgen.mpg.de, syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240408012943.66508-1-minda.chen@starfivetech.com>
 
-On Tue, Apr 9, 2024 at 4:02=E2=80=AFPM Edward Adam Davis <eadavis@qq.com> w=
-rote:
->
-> On Tue, 9 Apr 2024 15:07:41 +0200, Eric Dumazet wrote:
-> > > The optlen value passed by syzbot to _sys_setsockopt() is 2, which re=
-sults in
-> > > only 2 bytes being allocated when allocating memory to kernel_optval,=
- and the
-> > > optval size passed when calling the function copy_from_sockptr() is 4=
- bytes.
-> > > Here, optlen is determined uniformly in the entry function __sys_sets=
-ockopt().
-> > > If its value is less than 4, the parameter is considered invalid.
-> > >
-> > > Reported-by: syzbot+837ba09d9db969068367@syzkaller.appspotmail.com
-> > > Reported-by: syzbot+b71011ec0a23f4d15625@syzkaller.appspotmail.com
-> > > Reported-by: syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com
-> > > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
-> >
-> >
-> > I think I gave my feedback already.
-> >
-> > Please do not ignore maintainers feedback.
-> >
-> > This patch is absolutely wrong.
-> >
-> > Some setsockopt() deal with optlen =3D=3D 1 just fine, thank you very m=
-uch.
-> It's better to use evidence to support your claim, rather than your "main=
-tainer" title.
+On Mon, Apr 08, 2024 at 09:29:41AM +0800, Minda Chen wrote:
+> Add miss MMC statistic in DW GMAC
+> 
+> base on 6.9-rc1
+> 
+> changed
+> v2:
+>    patch2 : remove mmc_rx_control_g due to it is gotten in
+> ethtool_ops::get_eth_ctrl_stats.
 
-I will answer since you ask so nicely,
-but if you plan sending linux kernel patches, I suggest you look in
-the source code.
+The series has already been merged in. Just a small note about the
+patches. Both the changes seems reasonable:
+LPI-statistics for DW GMAC and DW QoS Eth,
+and
+Rx-Recv and Tx-oversize errors stat for DW GMAC and DW QoS Eth.
+The former stats has originally been added for DW XGMAC and the later
+stats aren't supported by DW XGMAC. So the provided change is
+complete. Thanks.
 
-Look at do_ip_setsockopt(), which is one of the most used setsockopt()
-in the world.
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
 
-The code is at least 20 years old.
+-Serge(y)
 
-It even supports optlen =3D=3D 0
-
-               if (optlen >=3D sizeof(int)) {
-                       if (copy_from_sockptr(&val, optval, sizeof(val)))
-                               return -EFAULT;
-               } else if (optlen >=3D sizeof(char)) {
-                       unsigned char ucval;
-
-                       if (copy_from_sockptr(&ucval, optval, sizeof(ucval))=
-)
-                               return -EFAULT;
-                       val =3D (int) ucval;
-               }
-       }
-
-       /* If optlen=3D=3D0, it is equivalent to val =3D=3D 0 */
+> 
+> Minda Chen (2):
+>   net: stmmac: mmc_core: Add GMAC LPI statistics
+>   net: stmmac: mmc_core: Add GMAC mmc tx/rx missing statistics
+> 
+>  drivers/net/ethernet/stmicro/stmmac/mmc.h         |  2 ++
+>  drivers/net/ethernet/stmicro/stmmac/mmc_core.c    | 15 +++++++++++++++
+>  .../net/ethernet/stmicro/stmmac/stmmac_ethtool.c  |  2 ++
+>  3 files changed, 19 insertions(+)
+> 
+> 
+> base-commit: 4cece764965020c22cff7665b18a012006359095
+> -- 
+> 2.17.1
+> 
+> 
 
