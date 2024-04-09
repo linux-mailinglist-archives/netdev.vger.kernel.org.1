@@ -1,30 +1,31 @@
-Return-Path: <netdev+bounces-86005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CA8189D416
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 10:21:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A17E489D40E
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 10:19:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A78D11F21777
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 08:21:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3F201C212FE
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 08:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9402F81AB4;
-	Tue,  9 Apr 2024 08:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED0D7F7C5;
+	Tue,  9 Apr 2024 08:19:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C9B7E591
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D377E59A
 	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 08:19:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712650744; cv=none; b=IMy5GV7G2gmCpyqF3/MszCEvo/WmBlYZ/XJnrx8XNXwAnlOe2V9E6LasfRftR7aMsUKpWfFtZuhrN7Synt7XNDrrWeHxbtOnVlPiEjXy3L63DVVMSEs8h3fSxmmV8ugCUAWZJSX/pJTOnLHtbdh6lMvXP+tjWayOBvZwFqsfdoQ=
+	t=1712650743; cv=none; b=sSHx3FtLZSMAbMAcCwXQf08+psKwR2PB8dLXWVOwnyDYUKfoqzWcYuCfz15vYQ80foTS68XOV1LBQ0jzeBKLLZn9vGfwGWzhhe42GIZAL3Sa+vixDKo5g4rDCMWjWvyuKcYHl74W2AjyIthFnA5O8C3fhInbMg9jpJRI6VRfdT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712650744; c=relaxed/simple;
-	bh=+vKAnVxOOtaFR5Lbw6OBExvNJzg7jbglJsu/e1xdY1E=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GAEJB/cpHjU2LkMl9E6DzgBkzxH/FSpco3ZmS2sI/IKa/p99CQSFYqxShgAZpJl58pGbscvz6xpdnsc28H1XHSomxzS9mkLt4OA14UtUmjlA3JnZLpsx+RtVgME7/w2k5kBCAV6wFul4WaAr7+n/DxfRelAxGlEnkP8aKe0iKjY=
+	s=arc-20240116; t=1712650743; c=relaxed/simple;
+	bh=oNE2Ro8bkWHCpERvlQWe0qFnsxIFXbaTSbvqasJT+GU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=QbBwe17rAW+Uz1aBtQbF4lzUIsDDEKP35j32Y1wELsteSkVbzEelmUC9yMwft8GJkkAGJXRcl1ZYAv53sKxFq5wwu/u7lB/ACPPsTwOiBLQ06dudsmYuZ1/ytc0I0yNVoXdvnwcNod0fYVt1UM3HPTtKcUZgClQ933AZBUUE6p0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -32,15 +33,15 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1ru6gw-0006VG-Nk; Tue, 09 Apr 2024 10:18:54 +0200
+	id 1ru6gw-0006VH-PK; Tue, 09 Apr 2024 10:18:54 +0200
 Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ore@pengutronix.de>)
-	id 1ru6gu-00BGpN-Kj; Tue, 09 Apr 2024 10:18:52 +0200
+	id 1ru6gu-00BGpO-Lf; Tue, 09 Apr 2024 10:18:52 +0200
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1ru6gu-00EoUQ-1p;
+	id 1ru6gu-00EoUa-1v;
 	Tue, 09 Apr 2024 10:18:52 +0200
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
@@ -53,6 +54,7 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Woojung Huh <woojung.huh@microchip.com>,
 	Arun Ramadoss <arun.ramadoss@microchip.com>
 Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
 	kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
@@ -61,10 +63,12 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	Simon Horman <horms@kernel.org>,
 	Willem de Bruijn <willemb@google.com>,
 	=?UTF-8?q?S=C3=B8ren=20Andersen?= <san@skov.dk>
-Subject: [PATCH net-next v5 0/9] Enhanced DCB and DSCP Support for KSZ Switches
-Date: Tue,  9 Apr 2024 10:18:42 +0200
-Message-Id: <20240409081851.3530641-1-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v5 1/9] net: dsa: add support for DCB get/set apptrust configuration
+Date: Tue,  9 Apr 2024 10:18:43 +0200
+Message-Id: <20240409081851.3530641-2-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240409081851.3530641-1-o.rempel@pengutronix.de>
+References: <20240409081851.3530641-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,54 +81,82 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-This patch series is aimed at improving support for DCB (Data Center
-Bridging) and DSCP (Differentiated Services Code Point) on KSZ switches.
+Add DCB support to get/set trust configuration for different packet
+priority information sources. Some switch allow to chose different
+source of packet priority classification. For example on KSZ switches it
+is possible to configure VLAN PCP and/or DSCP sources.
 
-The main goal is to introduce global DSCP and PCP (Priority Code Point)
-mapping support, addressing the limitation of KSZ switches not having
-per-port DSCP priority mapping. This involves extending the DSA
-framework with new callbacks for managing trust settings for global DSCP
-and PCP maps. Additionally, we introduce IEEE 802.1q helpers for default
-configurations, benefiting other drivers too.
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+---
+changes v3:
+- s/to choice/to chose/
+---
+ include/net/dsa.h |  4 ++++
+ net/dsa/user.c    | 28 ++++++++++++++++++++++++++++
+ 2 files changed, 32 insertions(+)
 
-Change logs are in separate patches.
-
-Oleksij Rempel (9):
-  net: dsa: add support for DCB get/set apptrust configuration
-  net: dsa: microchip: add IPV information support
-  net: add IEEE 802.1q specific helpers
-  net: dsa: microchip: add multi queue support for KSZ88X3 variants
-  net: dsa: microchip: add support for different DCB app configurations
-  net: dsa: microchip: dcb: add special handling for KSZ88X3 family
-  net: dsa: microchip: enable ETS support for KSZ989X variants
-  net: dsa: microchip: init predictable IPV to queue mapping for all non
-    KSZ8xxx variants
-  net: dsa: microchip: let DCB code do PCP and DSCP policy configuration
-
- drivers/net/dsa/microchip/Kconfig       |   2 +
- drivers/net/dsa/microchip/Makefile      |   2 +-
- drivers/net/dsa/microchip/ksz8.h        |   1 +
- drivers/net/dsa/microchip/ksz8795.c     | 106 ++--
- drivers/net/dsa/microchip/ksz8795_reg.h |   9 +-
- drivers/net/dsa/microchip/ksz9477.c     |   6 -
- drivers/net/dsa/microchip/ksz_common.c  | 100 ++--
- drivers/net/dsa/microchip/ksz_common.h  |  11 +-
- drivers/net/dsa/microchip/ksz_dcb.c     | 764 ++++++++++++++++++++++++
- drivers/net/dsa/microchip/ksz_dcb.h     |  21 +
- include/net/dsa.h                       |   4 +
- include/net/dscp.h                      |  76 +++
- include/net/ieee8021q.h                 |  51 ++
- net/Kconfig                             |   4 +
- net/core/Makefile                       |   1 +
- net/core/ieee8021q_helpers.c            | 171 ++++++
- net/dsa/user.c                          |  28 +
- 17 files changed, 1271 insertions(+), 86 deletions(-)
- create mode 100644 drivers/net/dsa/microchip/ksz_dcb.c
- create mode 100644 drivers/net/dsa/microchip/ksz_dcb.h
- create mode 100644 include/net/dscp.h
- create mode 100644 include/net/ieee8021q.h
- create mode 100644 net/core/ieee8021q_helpers.c
-
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index 7c0da9effe4e9..96bde2aa86efd 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -955,6 +955,10 @@ struct dsa_switch_ops {
+ 				      u8 prio);
+ 	int	(*port_del_dscp_prio)(struct dsa_switch *ds, int port, u8 dscp,
+ 				      u8 prio);
++	int	(*port_set_apptrust)(struct dsa_switch *ds, int port,
++				     const u8 *sel, int nsel);
++	int	(*port_get_apptrust)(struct dsa_switch *ds, int port, u8 *sel,
++				     int *nsel);
+ 
+ 	/*
+ 	 * Suspend and resume
+diff --git a/net/dsa/user.c b/net/dsa/user.c
+index 16d395bb1a1fe..b6aec6615c76e 100644
+--- a/net/dsa/user.c
++++ b/net/dsa/user.c
+@@ -2136,6 +2136,32 @@ int dsa_user_change_mtu(struct net_device *dev, int new_mtu)
+ 	return err;
+ }
+ 
++static int __maybe_unused
++dsa_user_dcbnl_set_apptrust(struct net_device *dev, u8 *sel, int nsel)
++{
++	struct dsa_port *dp = dsa_user_to_port(dev);
++	struct dsa_switch *ds = dp->ds;
++	int port = dp->index;
++
++	if (!ds->ops->port_get_apptrust)
++		return -EOPNOTSUPP;
++
++	return ds->ops->port_set_apptrust(ds, port, sel, nsel);
++}
++
++static int __maybe_unused
++dsa_user_dcbnl_get_apptrust(struct net_device *dev, u8 *sel, int *nsel)
++{
++	struct dsa_port *dp = dsa_user_to_port(dev);
++	struct dsa_switch *ds = dp->ds;
++	int port = dp->index;
++
++	if (!ds->ops->port_get_apptrust)
++		return -EOPNOTSUPP;
++
++	return ds->ops->port_get_apptrust(ds, port, sel, nsel);
++}
++
+ static int __maybe_unused
+ dsa_user_dcbnl_set_default_prio(struct net_device *dev, struct dcb_app *app)
+ {
+@@ -2376,6 +2402,8 @@ static const struct ethtool_ops dsa_user_ethtool_ops = {
+ static const struct dcbnl_rtnl_ops __maybe_unused dsa_user_dcbnl_ops = {
+ 	.ieee_setapp		= dsa_user_dcbnl_ieee_setapp,
+ 	.ieee_delapp		= dsa_user_dcbnl_ieee_delapp,
++	.dcbnl_setapptrust	= dsa_user_dcbnl_set_apptrust,
++	.dcbnl_getapptrust	= dsa_user_dcbnl_get_apptrust,
+ };
+ 
+ static void dsa_user_get_stats64(struct net_device *dev,
 -- 
 2.39.2
 
