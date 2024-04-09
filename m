@@ -1,70 +1,90 @@
-Return-Path: <netdev+bounces-86214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19EF489E04A
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 18:25:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D68689E02C
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 18:18:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87DFEB2B429
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:15:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B85931F21F3B
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1023413D8AB;
-	Tue,  9 Apr 2024 16:15:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7763113D8A3;
+	Tue,  9 Apr 2024 16:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hk3e+T5w"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="KsXVlU5Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC76F13D8A0;
-	Tue,  9 Apr 2024 16:15:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E85764F883
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 16:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712679321; cv=none; b=g3k1qFm2kFNlA2pzpEB3RiFr+Lhwej5VykU5AoJC/eaR/gZ7PsoH9zNyYGRUKZ/Ysa1PMLj4McuThBtIrlsKhdOD9XanvyAKvPVW+XHTpre08ZaMZOs+vavb7JTj3/ra3jLkSCcTXZDMowzQyP6Nz1HXGvLmv+2bQe2+0FpyQ9c=
+	t=1712679476; cv=none; b=G7VW6YF+ygKQqbn2SNYAB1PinjvgbVklI27fOAXfdGF4f7iPupOpt7e0cwTu5xWN3UIjUyxDc7fhPMqm4nvUpD6MAt0WeTwKGumQ6KskNBjpnT8g6Fo7XAcd9JnBG0gS+nugW5ncPx8kSFTAuPd2ucKUv8v9ylamA+iLF9JwY2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712679321; c=relaxed/simple;
-	bh=aQnXMHVSse19+ZZ5n5B1a+ECbXRCEMx+99YFJTJvLZ4=;
+	s=arc-20240116; t=1712679476; c=relaxed/simple;
+	bh=cJq3TaB12y1+3tX/CpoQNDUPIteKzZNWbXEr1MNnXlE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mceUZbe7EsObDX7LtXrBy+kAWo2ZLRA1VVWOgsXkUQXBgciE5NeLIH5nABbJ3V/dlKdvII7RC8/LkGROJrzJ/Ljr0vcpDRegUIPfamfImta0nBDcCQGkG4VA7RHI1jW61MDVqCISpfdxgeGTdhbn9NTQTYmYB4UKI/ZBE1k4LkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hk3e+T5w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32A2AC433F1;
-	Tue,  9 Apr 2024 16:15:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712679320;
-	bh=aQnXMHVSse19+ZZ5n5B1a+ECbXRCEMx+99YFJTJvLZ4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hk3e+T5wh0K9Kad+FZuar56N0ZsAlmRAJwkkOgstUx5MMjyakXAd3tuT1BItcL+w1
-	 bWWSW5ioBrtKbw8Qt5gCwr915JRo0jesU2hD4Q26gIJ3yYa0AV4hQAr+EV7vTFFI+H
-	 GqmhWn8Pli4YMOBs5+19b+MyGAM+ppmX9cqkZWFdkL4/Di4EGtYtzYR1OO+fUJkcER
-	 0zUCzflp3O2liOCbbuG8iz2p2sCXVzMYGUtv2DckZLOGZedO2cSaqGoCfPdOCv1GiV
-	 Ea2hz+dGJvBPzTXvJjlzunxRnZEY6622if4iEHFFvcFGIcDSHJCEe57X8vR2da+OUn
-	 /okM8DtsW6K0Q==
-Date: Tue, 9 Apr 2024 09:15:17 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Arnd Bergmann <arnd@arndb.de>
-Cc: Kees Cook <keescook@chromium.org>, Arnd Bergmann <arnd@kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Leon Romanovsky <leon@kernel.org>, Lin Ma <linma@zju.edu.cn>,
-	Simon Horman <horms@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Tobias Brunner <tobias@strongswan.org>,
-	Raed Salem <raeds@nvidia.com>, Netdev <netdev@vger.kernel.org>,
-	linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH] [RFC] xfrm: work around a clang-19 fortifiy-string
- false-positive
-Message-ID: <20240409161517.GA3219862@dev-arch.thelio-3990X>
-References: <20240216202657.2493685-1-arnd@kernel.org>
- <202402161301.BBFA14EE@keescook>
- <763214eb-20eb-4627-8d4b-2e7f29db829a@app.fastmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qs2GpUxPnsa24we2e4ImevCFBnbxzf8MqmSRo8YfAdvChGAyT6uq5fYE4lcN+Lc1IwE5RTyPHAy5EFCoTU1RSEouVMr+VCY8FSGEszMcbNJ7I/VssYt3g29W9TL0kTOPP6M8ei5JiFT9B7Tk53KiUdBjO3yVfQ7trMlC3R3t5/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=KsXVlU5Q; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6ed0938cd1dso3673898b3a.2
+        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 09:17:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1712679474; x=1713284274; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VlcmHNsCwSvCc74TrBcs49hXKJM0udmD4CNSlCrF+Lo=;
+        b=KsXVlU5QbFYMDKbO4iO93x3QNISOWDpBERnT0yXNQ0YF5TKpxiOhMBxYHqJ5pl4wVV
+         7bcoRugnIXsaVTwkoIUEGXNIZR+CvPeIOZbGPc5oR0zWQ4M1KhDi6i+tDKj+rQ3sJkwq
+         j/IEB0lbRPo7V+dp9/nT25nDh0/7DRf+jmsI4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712679474; x=1713284274;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VlcmHNsCwSvCc74TrBcs49hXKJM0udmD4CNSlCrF+Lo=;
+        b=umjPTZpyP4AW2ke6BiCLLGN7YJPDRE8bEH4CxKlLelEHPn5jwZhyfdymFm9XcDX9vp
+         UOVdk09hi/e4FzM8YPVHvAmmHWVP4VGG2fo7ryA+R+QlPuxuzckG8tqcJxZskhJU8aGS
+         JbD099ObpLEKpceBhh4b2SHQyEDIcyobI7pAS+0lnr3zrO79fWS0sGFqBTd2nYeWMTJe
+         gIZyaG1RPGabteDQeL7AZf0XLD2A4Z+SEu7CGsOMztekasboHZQ0aSXKPZxqD/F/7DMH
+         7zOzP2HaRtTXPt1DKG0wlzPOeG+97nFYg8VkDK+OYuALRa7AppAeB8iJ+Q9d97vY8XM7
+         Aywg==
+X-Forwarded-Encrypted: i=1; AJvYcCVLtGJaOdp64MZ7D75qjkrGokJTSonqu7SpZs5wK6ZHajQPcaROea1rswBAN1tInhzvztwRux9b72TA7Qn0LPvRvsqCsPc+
+X-Gm-Message-State: AOJu0YwN0Kdh7GgzTHeM6UTizUDup2LYDJ3wygGBa8edFMZ6qTgMuz6d
+	5ink0lDjBMt/VTE4UTdtE6BM522IOThKg7/tIZPCtlQR0KBVTRvydNLAqXhH4A==
+X-Google-Smtp-Source: AGHT+IF+HuccTfimdnMNYhgaM6Pzx7wcEOoErnnFz7FQkS1gRTkWP5q8FoX5RgQ6dGyVfovJAJRQEA==
+X-Received: by 2002:a05:6a20:244d:b0:1a7:a3ba:2bc1 with SMTP id t13-20020a056a20244d00b001a7a3ba2bc1mr405903pzc.15.1712679474281;
+        Tue, 09 Apr 2024 09:17:54 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id y16-20020aa78550000000b006ecda086db2sm8483699pfn.110.2024.04.09.09.17.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Apr 2024 09:17:53 -0700 (PDT)
+Date: Tue, 9 Apr 2024 09:17:53 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Christoph Lameter <cl@linux.com>, Vlastimil Babka <vbabka@suse.cz>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v9 7/9] libeth: add Rx buffer management
+Message-ID: <202404090909.51BAC81A6@keescook>
+References: <20240404154402.3581254-1-aleksander.lobakin@intel.com>
+ <20240404154402.3581254-8-aleksander.lobakin@intel.com>
+ <20240405212513.0d189968@kernel.org>
+ <1dda8fd5-233b-4b26-95cc-f4eb339a7f88@intel.com>
+ <755c17b2-0ec2-49dd-9352-63e5d2f1ba4c@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,59 +93,93 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <763214eb-20eb-4627-8d4b-2e7f29db829a@app.fastmail.com>
+In-Reply-To: <755c17b2-0ec2-49dd-9352-63e5d2f1ba4c@intel.com>
 
-On Mon, Apr 08, 2024 at 09:06:21AM +0200, Arnd Bergmann wrote:
-> On Fri, Feb 16, 2024, at 22:19, Kees Cook wrote:
-> > On Fri, Feb 16, 2024 at 09:26:40PM +0100, Arnd Bergmann wrote:
-> >> From: Arnd Bergmann <arnd@arndb.de>
-> >> 
-> >> clang-19 recently got branched from clang-18 and is not yet released.
-> >> The current version introduces exactly one new warning that I came
-> >> across in randconfig testing, in the copy_to_user_tmpl() function:
-> >> 
-> >> include/linux/fortify-string.h:420:4: error: call to '__write_overflow_field' declared with 'warning' attribute: detected write beyond size of field (1st parameter); maybe use struct_group()? [-Werror,-Wattribute-warning]
-> >>   420 |                         __write_overflow_field(p_size_field, size);
-> >> 
-> >> I have not yet produced a minimized test case for it, but I have a
-> >> local workaround, which avoids the memset() here by replacing it with
-> >> an initializer.
-> >> 
-> >> The memset is required to avoid leaking stack data to user space
-> >> and was added in commit 1f86840f8977 ("xfrm_user: fix info leak in
-> >> copy_to_user_tmpl()"). Simply changing the initializer to set all fields
-> >> still risks leaking data in the padding between them, which the compiler
-> >> is free to do here. To work around that problem, explicit padding fields
-> >> have to get added as well.
-> >
-> > Per C11, padding bits are zero initialized if there is an initializer,
-> > so "= { }" here should be sufficient -- no need to add the struct
-> > members.
-> >
-> >> Since this is a false positive, a better fix would likely be to
-> >> fix the compiler.
-> >
-> > As Nathan has found, this appears to be a loop unrolling bug in Clang.
-> > https://github.com/ClangBuiltLinux/linux/issues/1985
-> >
-> > The shorter fix (in the issue) is to explicitly range-check before
-> > the loop:
-> >
-> >        if (xp->xfrm_nr > XFRM_MAX_DEPTH)
-> >                return -ENOBUFS;
+On Mon, Apr 08, 2024 at 11:45:32AM +0200, Alexander Lobakin wrote:
+> From: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Date: Mon, 8 Apr 2024 11:11:12 +0200
 > 
-> I ran into this issue again and I see that Nathan's fix has
-> made it into mainline and backports, but it's apparently
-> not sufficient.
+> > From: Jakub Kicinski <kuba@kernel.org>
+> > Date: Fri, 5 Apr 2024 21:25:13 -0700
+> > 
+> >> On Thu,  4 Apr 2024 17:44:00 +0200 Alexander Lobakin wrote:
+> >>> +/**
+> >>> + * struct libeth_fq - structure representing a buffer queue
+> >>> + * @fp: hotpath part of the structure
+> >>
+> >> Second time this happens this week, so maybe some tooling change in 6.9
+> >> but apparently kdoc does not want to know about the tagged struct:
+> >>
+> >> include/net/libeth/rx.h:69: warning: Excess struct member 'fp' description in 'libeth_fq'
+> > 
+> > Oh no, maybe we should teach kdoc to parse struct_group*()?
 > 
-> I don't see the warning with my patch from this thread, but
-> there may still be a better fix.
+> scripts/kernel-doc apparently can handle them...
+> 
+> + Kees
+> 
 
-Is it the exact same warning? clang-19 or older? What
-architecture/configuration? If my change is not sufficient then maybe
-there are two separate issues here? I have not seen this warning appear
-in our CI since my change was applied.
+Ah, hm, scripts/kernel-doc throws away the early arguments of
+struct_group_tagged, but I suspect it needs to create a synthetic member
+for the tag. i.e. instead of:
 
-Cheers,
-Nathan
+	struct_group_tagged(tag, name, members...)
+
+becoming
+
+	members...
+
+it needs to become
+
+	struct tag name;
+	members...
+
+It seems this is the first place anyone has tried to document the tagged
+struct name! :)
+
+Does this work? I haven't tested it...
+
+diff --git a/scripts/kernel-doc b/scripts/kernel-doc
+index 967f1abb0edb..64a19228d5dd 100755
+--- a/scripts/kernel-doc
++++ b/scripts/kernel-doc
+@@ -1151,7 +1151,8 @@ sub dump_struct($$) {
+         # - first eat non-declaration parameters and rewrite for final match
+         # - then remove macro, outer parens, and trailing semicolon
+         $members =~ s/\bstruct_group\s*\(([^,]*,)/STRUCT_GROUP(/gos;
+-        $members =~ s/\bstruct_group_(attr|tagged)\s*\(([^,]*,){2}/STRUCT_GROUP(/gos;
++        $members =~ s/\bstruct_group_attr\s*\(([^,]*,){2}/STRUCT_GROUP(/gos;
++        $members =~ s/\bstruct_group_tagged\s*\(([^,]*,)([^,]*,)/struct $1 $2; STRUCT_GROUP(/gos;
+         $members =~ s/\b__struct_group\s*\(([^,]*,){3}/STRUCT_GROUP(/gos;
+         $members =~ s/\bSTRUCT_GROUP(\(((?:(?>[^)(]+)|(?1))*)\))[^;]*;/$2/gos;
+ 
+
+> > 
+> >>
+> >>> + * @pp: &page_pool for buffer management
+> >>> + * @fqes: array of Rx buffers
+> >>> + * @truesize: size to allocate per buffer, w/overhead
+> >>> + * @count: number of descriptors/buffers the queue has
+> >>> + * @buf_len: HW-writeable length per each buffer
+> >>> + * @nid: ID of the closest NUMA node with memory
+> >>> + */
+> >>> +struct libeth_fq {
+> >>> +	struct_group_tagged(libeth_fq_fp, fp,
+> >>> +		struct page_pool	*pp;
+> >>> +		struct libeth_fqe	*fqes;
+> >>> +
+> >>> +		u32			truesize;
+> >>> +		u32			count;
+> >>> +	);
+> >>> +
+> >>> +	/* Cold fields */
+> >>> +	u32			buf_len;
+> >>> +	int			nid;
+> >>> +};
+> 
+> Thanks,
+> Olek
+
+-- 
+Kees Cook
 
