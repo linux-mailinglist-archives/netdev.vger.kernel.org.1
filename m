@@ -1,163 +1,135 @@
-Return-Path: <netdev+bounces-85977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABF5689D252
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 08:24:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B75589D2DC
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 09:13:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61724281E94
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 06:24:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 559032851E5
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 07:13:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C622F71B3D;
-	Tue,  9 Apr 2024 06:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3FD0763FC;
+	Tue,  9 Apr 2024 07:13:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="mBd5Jynk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LDc7Gocd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3AC95467C
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 06:24:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5113D537E6
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 07:13:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712643880; cv=none; b=gTOGsVLGS9UH9onWs2au0fZCUhJq8iySFTN/xgLL5pmDqEpmRev+n635DcB9wnmW/5IUCHEO68rV8Sng07H2OGRmgs8UOiUsPufCtlYtGJkMiHEF/aQH1lo5/ZQlPvfc4LW6O+KOkX0afiA60ac1Qpe9YY0yhbrs1AD5Xyz6uH8=
+	t=1712646795; cv=none; b=B9i3lF+yilyIfKVnhphADkfTfJaY7G/FhsLykv+c6eo8J5Uj+LhJDiXog4QSEJOVBzbV6OZIeCIq/ZTltgU6+ghZ3flVpHvXXITl3DE4FufpPC/V3VPn6MZkB2GhbjEnaVQ5Es0JnilF7Y/OPZbR0yWbYDf/je9cQOyFwG/fofw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712643880; c=relaxed/simple;
-	bh=hVKnFrLXVZo8p+orNJL7U1TZAHHwpoF0x03Pjb20TCk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZzU6fXvMRskM/XkKxMV6h6QafaV1QcSyKyrtxJHvoVBjJkAJuwsat38//QB7a3GhlFq728QfcYjFO7InohFH709ObUrrCzwGBYItGODZ2d6VVYEOU4VA/LB7B+W+Jrf2k35xbL7R9WeOrzOyV/pH8+3hwdbafdeC4/q68tYRo4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=mBd5Jynk; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-5dcc4076c13so3511906a12.0
-        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 23:24:38 -0700 (PDT)
+	s=arc-20240116; t=1712646795; c=relaxed/simple;
+	bh=O/+lv9xKYS1TjaI4TFFN+HVxO8K7p0kncTwAGlXat20=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g37yZkDUNcbRMrOa2h75C23Sq5uJKjTflM48HHk0nvgd0DHfP+XU8HB/RLV48GASFanG7Xdv2Iu2eh4F5hgOHt7Suyt3td1TqhxtIYB64dh/Vf5j9IYa26m5zUfxCSQf4rDNQxotxuxmWriESE6LdZBnxya5XqMEelEnqwTmDx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LDc7Gocd; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-36a2825cdf7so85545ab.1
+        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 00:13:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1712643878; x=1713248678; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=g6D3U2MYkd4kdAs30T5VMng1DzF96mHXquQn1nVv4ZA=;
-        b=mBd5Jynks25yreFEZQWRSRjY4Yem2lFqSfqIGYy0OCXwL893b8UT4dUwOPCIfeVDyV
-         UWk5epMxi0vV2t+xVtC1BzqzcFg77xGdCC9+kqSld+KHqeZMzaO8JWMrvzVJHUECm/jV
-         saTwn0xvhSemn3RlvwF+Bc31JQstmHm8HaXk0wUwU3MaIBWE4QgrmbuWvu71BfWsRisd
-         FX/vUhWWB5aPtWiM/2AU77RdLsDr4pE2qW/skyBzyTnsIqiEsYWSeHONrSYbjn2l5rgU
-         0UYkewDzMuYF4COYfEmLr2pDjkMMauRLeJEw/QFGwR3B7G0joa2BLHn/G8eg6Z7K0n8z
-         bF4Q==
+        d=google.com; s=20230601; t=1712646793; x=1713251593; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O/+lv9xKYS1TjaI4TFFN+HVxO8K7p0kncTwAGlXat20=;
+        b=LDc7GocdCa5PVaJgDwIECuSkfN6eNlpiBfymVAve6WG7kdHdv8HN9m2FEDRk1tHhbs
+         lYDInBu6gaHUSg8UsbuoKnU74fHrRGSdeAlmS3LdpqlU0BVhqEqAj2XL/Ri+dlNIKpao
+         Z48cd/l74ZHgGnUdqPJUxClLlnaRvoSgL57KScMaeZtl8ucY4KlV9jutqpO5RgQ4mffc
+         0iLdAHcMw1Nw44RbxWtFa8EoYKyuKzbIJg6oalB/Bl4iZ1gih1rsLRfC8aCYnjqdy01N
+         h/bH3qaVtXGtCM8cHvg75F/tuEIV3zIZrGrFwPSJrXY7z/lTylY0X7rKKDsAn5jE8h7C
+         pjig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712643878; x=1713248678;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=g6D3U2MYkd4kdAs30T5VMng1DzF96mHXquQn1nVv4ZA=;
-        b=NKoaz3sKzqxQFNLqKekXI01YL5kLHG5AViB28XQKSzfg9sEFLcEl5LgimhRnHDvLMi
-         6sv8eBDD0/q38J4859fRyhL5bzzvN3j6XOqLxFEotxBJi2KOgpXTuYBlyL4SR1HTZhZd
-         mlNztA+Xwx0ZWmLdmGBE9bw3w0H+aAgnl/x5c4/9yNoOPjeuXvh8r51BK0NvU8yI4Qvo
-         x3hrpVHCL371LNnkpziS1YrWq0+4P7ZquhXlGkDWMK+V9WenDQiUTQNG/tAVWLcRIcM/
-         u8XwfXI0Y7U6r+p5ockzf49jP5hLZJTo3UOC1beL5/opH2LacobOwz//1gEVQm0LZGbR
-         Us9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXCymZdhohSZ4Eo+76HCFG5hXm65k3MHe+XIVu5vgYCtzyotDflVNs/2G6KslH0+KWfLrgLGcPfCyxEG2fqQAS6yxUTJK1x
-X-Gm-Message-State: AOJu0Yx0HctLXef8T7HwE89ShSeNy3GM4f6RPVUlADhDFC25CFBYMv7z
-	lppmArEagOD3iQoNNsTAh+i8mKzglMq7RLMOZIG7cz3jLBu38mGiTfpe1ilnkwk=
-X-Google-Smtp-Source: AGHT+IHk8SNceULlelSKpjfik0Ixk4C2Iug/nD5xWOoL0/StFu5CRaSBKWkAto4Tbf41CVCY5kkl2w==
-X-Received: by 2002:a17:90a:fa92:b0:2a5:3c66:25a8 with SMTP id cu18-20020a17090afa9200b002a53c6625a8mr2754090pjb.15.1712643877210;
-        Mon, 08 Apr 2024 23:24:37 -0700 (PDT)
-Received: from localhost.localdomain ([8.210.91.195])
-        by smtp.googlemail.com with ESMTPSA id h21-20020a63c015000000b005b458aa0541sm7372906pgg.15.2024.04.08.23.24.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Apr 2024 23:24:36 -0700 (PDT)
-From: Lei Chen <lei.chen@smartx.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Lei Chen <lei.chen@smartx.com>,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH] net:tun: limit printing rate when illegal packet received by tun dev
-Date: Tue,  9 Apr 2024 02:24:05 -0400
-Message-ID: <20240409062407.1952728-1-lei.chen@smartx.com>
-X-Mailer: git-send-email 2.44.0
+        d=1e100.net; s=20230601; t=1712646793; x=1713251593;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=O/+lv9xKYS1TjaI4TFFN+HVxO8K7p0kncTwAGlXat20=;
+        b=MjeDr0EGjd0M9FiMBmbB9PH/uYgcRX7VSCHwGwz4bc+Ql1x76jBqV2EFEi5Ab7wZ4z
+         kyI7QgJmvyor9U+tWWqRkB3KOrc3HoFi5OS7mtzf1cJijy8/7yJ2y4v1H7Q8ai5kf3h7
+         PeDdMw8+tvNTEgYHiDbxxVyRmz6FcUOgGwKje3bOx3m8z12bUPwCyQq7ufWxiLySUJPD
+         q7NKcHWxfsdqksPpMWEH7/cizXMGvlwQgvJvtJ/cu+nQn+/K+3sdHr3jN2LYnnxPz8q+
+         yIAB8O+lRUbi6+CENpdM7PxwHm6G7A3r5CkCIfg+4iN7pjD6swQpAZ+xtFkq9GioE66m
+         sOcg==
+X-Forwarded-Encrypted: i=1; AJvYcCVry4JnTj0Py/y41bRQ6ev8C8kWMz1HhgUj1LSZ6/Nj68bw70D3nF1j4LouvetiGTeQOm0V2nJ+VD23otsl5S71IGByuuSt
+X-Gm-Message-State: AOJu0YxZ3j3MPKA8wotvnBGxAmgtSouZK2lskdsr9nklqiqf5/foSZ5q
+	Wzeohww3snO06u2v+4DN1WriYanYxPX0eI1sALV++JXyHUe8mn15RpV79b0oe9mqXCyh6Gqpehe
+	RaCj3CBM0koAAkvnr2EDpFUG3BijEIv1MbPaw
+X-Google-Smtp-Source: AGHT+IGWf6qkNiqVm6LYYI4on3p94wttDCDx5SLbMV8f83CFxbAhdenIa+ftysHDaX8f1u2OvlJaPaN52bKLJF0WdiU=
+X-Received: by 2002:a92:d346:0:b0:36a:19a6:bc78 with SMTP id
+ a6-20020a92d346000000b0036a19a6bc78mr102437ilh.1.1712646793192; Tue, 09 Apr
+ 2024 00:13:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CANn89iJgr3f23-t2O+cMcyQixNhcTGVVwp3m69J3G28zW4MPkg@mail.gmail.com>
+ <20240408233200.1701282-1-hli@netflix.com>
+In-Reply-To: <20240408233200.1701282-1-hli@netflix.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 9 Apr 2024 09:12:57 +0200
+Message-ID: <CANn89iKe=GCvSp1u5=6F+NYNUoGeOLyp0-ce8_Y-z8Vo=6-xMA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] tcp: increase the default TCP scaling ratio
+To: Hechao Li <hli@netflix.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Soheil Hassas Yeganeh <soheil@google.com>, netdev@vger.kernel.org, 
+	Tycho Andersen <tycho@tycho.pizza>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-vhost_worker will call tun call backs to receive packets. If too many
-illegal packets arrives, tun_do_read will keep dumping packet contents.
-When console is enabled, it will costs much more cpu time to dump
-packet and soft lockup will be detected.
+On Tue, Apr 9, 2024 at 1:32=E2=80=AFAM Hechao Li <hli@netflix.com> wrote:
+>
+> After commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale"),
+> we noticed an application-level timeout due to reduced throughput.
+>
+> Before the commit, for a client that sets SO_RCVBUF to 65k, it takes
+> around 22 seconds to transfer 10M data. After the commit, it takes 40
+> seconds. Because our application has a 30-second timeout, this
+> regression broke the application.
+>
+> The reason that it takes longer to transfer data is that
+> tp->scaling_ratio is initialized to a value that results in ~0.25 of
+> rcvbuf. In our case, SO_RCVBUF is set to 65536 by the application, which
+> translates to 2 * 65536 =3D 131,072 bytes in rcvbuf and hence a ~28k
+> initial receive window.
+>
+> Later, even though the scaling_ratio is updated to a more accurate
+> skb->len/skb->truesize, which is ~0.66 in our environment, the window
+> stays at ~0.25 * rcvbuf. This is because tp->window_clamp does not
+> change together with the tp->scaling_ratio update.
 
-Rate limit mechanism can be used to limit the dumping rate.
+< when autotuning is disabled because of SO_RCVBUF >
 
-PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980"
- #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
- #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
- #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
- #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
- #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
-    [exception RIP: io_serial_in+20]
-    RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
-    RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 0000000000000000
-    RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428a0
-    RBP: 0000000000002710   R8: 0000000000000004   R9: 000000000000000f
-    R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 0000000000000020
-    R13: ffffffff8acbf698  R14: 0000000000000058  R15: 0000000000000000
-    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
---- <NMI exception stack> ---
- #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
- #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
- #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
- #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
- #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
+Most modern applications let the kernel do autotuning, and benefit from the
+increased scaling_ratio.
 
-Signed-off-by: Lei Chen <lei.chen@smartx.com>
----
- drivers/net/tun.c | 19 +++++++++++--------
- 1 file changed, 11 insertions(+), 8 deletions(-)
+ As a result, the
+> window size is capped at the initial window_clamp, which is also ~0.25 *
+> rcvbuf, and never grows bigger.
+>
+> This patch increases the initial scaling_ratio from ~25% to 50% in order
+> to be backward compatible with the original default
+> sysctl_tcp_adv_win_scale.
+>
+> Fixes: dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
+> Signed-off-by: Hechao Li <hli@netflix.com>
+> Reviewed-by: Tycho Andersen <tycho@tycho.pizza>, Eric Dumazet <edumazet@g=
+oogle.com>
 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 0b3f21cba552..34c6b043764d 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -2087,6 +2087,7 @@ static ssize_t tun_put_user(struct tun_struct *tun,
- 			    struct sk_buff *skb,
- 			    struct iov_iter *iter)
- {
-+	static DEFINE_RATELIMIT_STATE(ratelimit, 60 * HZ, 5);
- 	struct tun_pi pi = { 0, skb->protocol };
- 	ssize_t total;
- 	int vlan_offset = 0;
-@@ -2125,14 +2126,16 @@ static ssize_t tun_put_user(struct tun_struct *tun,
- 					    tun_is_little_endian(tun), true,
- 					    vlan_hlen)) {
- 			struct skb_shared_info *sinfo = skb_shinfo(skb);
--			pr_err("unexpected GSO type: "
--			       "0x%x, gso_size %d, hdr_len %d\n",
--			       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
--			       tun16_to_cpu(tun, gso.hdr_len));
--			print_hex_dump(KERN_ERR, "tun: ",
--				       DUMP_PREFIX_NONE,
--				       16, 1, skb->head,
--				       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
-+
-+			if (__ratelimit(&ratelimit)) {
-+				pr_err("unexpected GSO type: 0x%x, gso_size %d, hdr_len %d\n",
-+				       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
-+				       tun16_to_cpu(tun, gso.hdr_len));
-+				print_hex_dump(KERN_ERR, "tun: ",
-+					       DUMP_PREFIX_NONE,
-+					       16, 1, skb->head,
-+					       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
-+			}
- 			WARN_ON_ONCE(1);
- 			return -EINVAL;
- 		}
--- 
-2.44.0
+This tag is not standard, please use one line per reviewer.
+Also please include the link to V1, for further reference.
 
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Link: https://lore.kernel.org/netdev/20240402215405.432863-1-hli@netflix.co=
+m/
+
+Thanks.
 
