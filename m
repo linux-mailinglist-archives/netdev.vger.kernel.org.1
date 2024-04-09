@@ -1,224 +1,220 @@
-Return-Path: <netdev+bounces-86203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E54C889DFBE
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 17:54:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0386B89DF6B
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 17:40:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C02CB3594E
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:38:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 247541C22E0B
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CB113D520;
-	Tue,  9 Apr 2024 15:35:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2636B13DB9B;
+	Tue,  9 Apr 2024 15:37:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="M8RQIUlD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oqgd5tS8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01A3F135A4D
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 15:35:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A88813B5B8
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 15:37:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712676952; cv=none; b=oLPkla8Y9Ul65Hr2ksTN59YIRzBmvU1164yjE09X84uwuteZw1SYUhrznGwI5SEry3Z3Vh0h7Z2NQ4Ot8VKVGtwEBmWagroz9Fm9kIgetQ+1KcEkvbS/zANwbrF5phZr9xwsHCk+YWomKmJpQb6t4uTMJSlbPhbQ9ObqH83jjeQ=
+	t=1712677062; cv=none; b=tluiA6jjAHeQCCBZVufjq7g6+JJib/mIDvXLl/bvp+YxcMuvnlGGUILCxLRK7BT/szs+q8twp69JJXsf/tw0jHwprcOVCkp8Zz1vmNHU2e20fJtOQSoBQeYaWp/WNM9LDAt14KcQL1ddzgfctAb7vvSJ7J2hANG4TYKNwrudJAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712676952; c=relaxed/simple;
-	bh=0pjTPnekrZ6Mo2O3A8pGX4AK75zIDzNbFZm+tv/AiyM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=h+8VkL+2+9mWk5ncmKkvZ4OmZtUjwgsjYmpobsHfV6FCi+K+6I/Qn3IldUwoWxrI/7usVFyQ15oP53IaCTLVIBsJYTnaEAiyMG01mHo2MW91Kif0xHNssEcXgP6nkl6CqPSX3yvBe1z9Jr9f84ymNjmPmV0RolZxRfuvDe65cnc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=M8RQIUlD; arc=none smtp.client-ip=209.85.208.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d6ff0422a2so71439841fa.2
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 08:35:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1712676948; x=1713281748; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nARArI/JGxcqeVSW+91I3DRTdX+G+3rkUWRdOGuyuMs=;
-        b=M8RQIUlDboOKc3mYlmgZamgiQC/aqLQdEjingQuXqsMIhm0B833yg2d/kFvFgYpdcs
-         uI+RCkeL7K7XLOF/96xLDwC4TbsVVRzLdv3icLl0LbRBslasba4tb2KPocIze+zr9O24
-         tGobTO82QFpSI01PDd9R/PIqqdqEHl3XFIhJxdf+MiL+I2oPBRvjlk2cSkwsLYvgqoR/
-         YW58TtOa+ApGdF7yexxbzbmvIHajgQlMIMa9jTil8T4fJg2HAARCZpAsJmdTktmgwkRc
-         qXPZOxCylHAAHTn1sCxK5OWt2JuGhCGFF2KvvdtpBvYSXePb/br+ec+iNyk53+5Z65uH
-         WihA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712676948; x=1713281748;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nARArI/JGxcqeVSW+91I3DRTdX+G+3rkUWRdOGuyuMs=;
-        b=ncbbBf47V10EKarifo8ymbwuIcbZzi7S9CCRrAOJzU8VVv81veVHZaMe5NfuocQ/1j
-         qiUvwmB2wh1ScoFhvb8xIW2XGjaxE1saR6SwoJJ7nycieHeuiSFztP0wi3XU6AZ7uKmM
-         txAL2ojtSmZTe2Ph+/TCuRvxkAUlJy8RV+oy6Tfnk4M9Cz5GblHzmz1q8ds1gcOHxDf1
-         IZWXTnCIYkWIF7XTcC+nh+jxgqhkvN1ZW6bR8cX1hReBBA3XgdEYGH4spF+7KPp7TcTL
-         E9qS1TGdgctRY9ffNHlH9tLWV9S0A837XHcYgixiDkVHMM7hlJN3eMl3d/oNcWUFvGyn
-         nd+g==
-X-Forwarded-Encrypted: i=1; AJvYcCVp90YqFcyvmWtu/UGKyHef4YMOdGniGxvF5zJwpUbJssrhN//MCqFPlSjGLxDe9Ifg90KvX8st0EIBWr6uw+DA2hIJKXXV
-X-Gm-Message-State: AOJu0YxDZO6MAp5oS8jv3D5aYCurCYfmf+3GQylT/ERaB6a4zmHGH6Ro
-	ks4CdadIaGghXHw9IcCSoqaTXiyu2PuxARfv5Djazdb4Emfx4CG2QvwAeivHUtMHL7fO5XdkAkb
-	iSAKUu8NuJeNA6JrjNLipNA7A+w+Rkk8vBI+BXw==
-X-Google-Smtp-Source: AGHT+IGYR0H515M8Yuyw6jAM8maTiRT7zQOgLaut79Nmzv6VqTS4JpTG+pUsMdsTdhL2wX5eqAgRDApWqIUOQCBytW4=
-X-Received: by 2002:a2e:b8c3:0:b0:2d8:a814:583d with SMTP id
- s3-20020a2eb8c3000000b002d8a814583dmr166320ljp.30.1712676947967; Tue, 09 Apr
- 2024 08:35:47 -0700 (PDT)
+	s=arc-20240116; t=1712677062; c=relaxed/simple;
+	bh=FiYua9qt5cyPKbD5gkueRzUtbADCS1A0G5W11GlLtqo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HOghCf1ifFRM8wFwXowgc2RJ3LLNZygTjiMRNO9dNYbuFkgVdFyqtcwOkeo5q9geW6la30B5k67O/9NjxHhhH5wQg7GcRjcawdUjMwfBRSeUChLHFxu9sq3delGN+umI4qV97/dzwtuCQp0uN0Nq+3lKwz4nMG7/zldHuW7vOGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Oqgd5tS8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712677058;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=A3Hwu2ip+GHzxQ0LRYtJWTGCmx4DOpmKRqbnqLq7zeM=;
+	b=Oqgd5tS8M/2LXupcvUbExTDld+UXUPPm/Lhkhtj3ABPTY3jvUYnG4v47Yo4fOmYJBx+7re
+	Q+oslOKmyCz2zUU8S6YkSBWecDdibUq91y9rHVUfOxt7O0w2TOFwc6w9NSujdXhh1KtT89
+	DdRFdbkoh1GmaVk5qxYHdky4KoEr6GY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-86-J_fxg3y_Mgi_b_A_o-ulDA-1; Tue, 09 Apr 2024 11:37:35 -0400
+X-MC-Unique: J_fxg3y_Mgi_b_A_o-ulDA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C11061807ACD;
+	Tue,  9 Apr 2024 15:37:34 +0000 (UTC)
+Received: from [10.22.10.13] (unknown [10.22.10.13])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8AE001C06666;
+	Tue,  9 Apr 2024 15:37:33 +0000 (UTC)
+Message-ID: <96728c6d-3863-48c7-986b-b0b37689849e@redhat.com>
+Date: Tue, 9 Apr 2024 11:37:31 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240325131624.26023-1-brgl@bgdev.pl> <6b63d5d2-5f30-4fbd-a872-91f32dc32c87@gmail.com>
-In-Reply-To: <6b63d5d2-5f30-4fbd-a872-91f32dc32c87@gmail.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Tue, 9 Apr 2024 17:35:36 +0200
-Message-ID: <CAMRc=McWdU-=MoGe+yVnj4OKzM-2D9KUZnQuj0MmtxDG10e3kw@mail.gmail.com>
-Subject: Re: [PATCH v6 00/16] power: sequencing: implement the subsystem and
- add first users
-To: Xilin Wu <wuxilin123@gmail.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
-	Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
-	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: Advice on cgroup rstat lock
+Content-Language: en-US
+To: Jesper Dangaard Brouer <hawk@kernel.org>,
+ Yosry Ahmed <yosryahmed@google.com>, Johannes Weiner <hannes@cmpxchg.org>
+Cc: Tejun Heo <tj@kernel.org>, Jesper Dangaard Brouer
+ <jesper@cloudflare.com>, "David S. Miller" <davem@davemloft.net>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Shakeel Butt <shakeelb@google.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Daniel Bristot de Oliveira <bristot@redhat.com>,
+ kernel-team <kernel-team@cloudflare.com>, cgroups@vger.kernel.org,
+ Linux-MM <linux-mm@kvack.org>, Netdev <netdev@vger.kernel.org>,
+ bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+ Ivan Babrou <ivan@cloudflare.com>
+References: <7cd05fac-9d93-45ca-aa15-afd1a34329c6@kernel.org>
+ <20240319154437.GA144716@cmpxchg.org>
+ <56556042-5269-4c7e-99ed-1a1ab21ac27f@kernel.org>
+ <CAJD7tkYbO7MdKUBsaOiSp6-qnDesdmVsTCiZApN_ncS3YkDqGQ@mail.gmail.com>
+ <bf94f850-fab4-4171-8dfe-b19ada22f3be@kernel.org>
+ <CAJD7tkbn-wFEbhnhGWTy0-UsFoosr=m7wiJ+P96XnDoFnSH7Zg@mail.gmail.com>
+ <ac4cf07f-52dd-454f-b897-2a4b3796a4d9@kernel.org>
+From: Waiman Long <longman@redhat.com>
+In-Reply-To: <ac4cf07f-52dd-454f-b897-2a4b3796a4d9@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-On Sat, Apr 6, 2024 at 5:03=E2=80=AFAM Xilin Wu <wuxilin123@gmail.com> wrot=
-e:
+On 4/9/24 07:08, Jesper Dangaard Brouer wrote:
+> Let move this discussion upstream.
 >
-> I tested the patchset on SM8550 and it does give me working WiFi. However=
- I
-> seethe following warnings during boot.
+> On 22/03/2024 19.32, Yosry Ahmed wrote:
+>> [..]
+>>>> There was a couple of series that made all calls to
+>>>> cgroup_rstat_flush() sleepable, which allows the lock to be dropped
+>>>> (and IRQs enabled) in between CPU iterations. This fixed a similar
+>>>> problem that we used to face (except in our case, we saw hard lockups
+>>>> in extreme scenarios):
+>>>> https://lore.kernel.org/linux-mm/20230330191801.1967435-1-yosryahmed@google.com/ 
+>>>>
+>>>> https://lore.kernel.org/lkml/20230421174020.2994750-1-yosryahmed@google.com/ 
+>>>>
+>>>
+>>> I've only done the 6.6 backport, and these were in 6.5/6.6.
 >
-> [    5.973011] mhi mhi0: Requested to power ON
-> [    6.597591] mhi mhi0: Power on setup success
-> [    6.597631] sysfs: cannot create duplicate filename '/devices/platform=
-/soc@0/1c00000.pcie/pci0000:00/0000:00:00.0/resource0'
-> [    6.597634] CPU: 7 PID: 154 Comm: kworker/u32:5 Tainted: G S          =
-       6.9.0-rc1-next-20240328-g955237c9980c #1
-> [    6.597635] Hardware name: AYN Odin 2 (DT)
-> [    6.597637] Workqueue: async async_run_entry_fn
-> [    6.597645] Call trace:
-> [    6.597646]  dump_backtrace+0xa0/0x128
-> [    6.597649]  show_stack+0x20/0x38
-> [    6.597650]  dump_stack_lvl+0x74/0x90
-> [    6.597653]  dump_stack+0x18/0x28
-> [    6.597654]  sysfs_warn_dup+0x6c/0x90
-> [    6.597658]  sysfs_add_bin_file_mode_ns+0xdc/0x100
-> [    6.597660]  sysfs_create_bin_file+0x7c/0xb8
-> [    6.597662]  pci_create_attr+0xb4/0x1a8
-> [    6.597665]  pci_create_resource_files+0x64/0xd0
-> [    6.597667]  pci_create_sysfs_dev_files+0x24/0x40
-> [    6.597669]  pci_bus_add_device+0x54/0x138
-> [    6.597670]  pci_bus_add_devices+0x40/0x98
-> [    6.597672]  pci_host_probe+0x70/0xf0
-> [    6.597673]  dw_pcie_host_init+0x248/0x658
-> [    6.597676]  qcom_pcie_probe+0x234/0x330
-> [    6.597677]  platform_probe+0x70/0xd8
-> [    6.597680]  really_probe+0xc8/0x3a0
-> [    6.597681]  __driver_probe_device+0x84/0x170
-> [    6.597682]  driver_probe_device+0x44/0x120
-> [    6.597683]  __device_attach_driver+0xc4/0x168
-> [    6.597684]  bus_for_each_drv+0x8c/0xf0
-> [    6.597686]  __device_attach_async_helper+0xb4/0x118
-> [    6.597687]  async_run_entry_fn+0x40/0x178
-> [    6.597689]  process_one_work+0x16c/0x410
-> [    6.597691]  worker_thread+0x284/0x3a0
-> [    6.597693]  kthread+0x118/0x128
-> [    6.597693]  ret_from_fork+0x10/0x20
-> [    6.597698] ------------[ cut here ]------------
-> [    6.597698] proc_dir_entry '0000:00/00.0' already registered
-> [    6.597710] WARNING: CPU: 7 PID: 154 at fs/proc/generic.c:375 proc_reg=
-ister+0x138/0x1d0
-> [    6.597713] Modules linked in:
-> [    6.597714] CPU: 7 PID: 154 Comm: kworker/u32:5 Tainted: G S          =
-       6.9.0-rc1-next-20240328-g955237c9980c #1
-> [    6.597715] Hardware name: AYN Odin 2 (DT)
-> [    6.597716] Workqueue: async async_run_entry_fn
-> [    6.597718] pstate: 61400005 (nZCv daif +PAN -UAO -TCO +DIT -SSBS BTYP=
-E=3D--)
-> [    6.597719] pc : proc_register+0x138/0x1d0
-> [    6.597721] lr : proc_register+0x138/0x1d0
-> [    6.597723] sp : ffff800081e3b9a0
-> [    6.597723] x29: ffff800081e3b9a0 x28: 0000000000000000 x27: ffffddb2a=
-28eabe0
-> [    6.597725] x26: ffff3425c9ada5c0 x25: ffffddb2a2d4eef0 x24: ffff3425c=
-9ada540
-> [    6.597726] x23: 0000000000000004 x22: ffff3425c7b1822c x21: 000000000=
-0000004
-> [    6.597727] x20: ffff3425c7b18180 x19: ffff3425c9adaec8 x18: fffffffff=
-fffffff
-> [    6.597729] x17: 3040636f732f6d72 x16: 6f6674616c702f73 x15: ffff80008=
-1e3b910
-> [    6.597730] x14: 0000000000000000 x13: 0a64657265747369 x12: 676572207=
-9646165
-> [    6.597731] x11: fffffffffff00000 x10: ffffddb2a27c4fb0 x9 : ffffddb29=
-f5d7528
-> [    6.597733] x8 : 00000000ffff7fff x7 : ffffddb2a27c4fb0 x6 : 80000000f=
-fff8000
-> [    6.597734] x5 : 0000000000000358 x4 : 0000000000000000 x3 : 00000000f=
-fffffff
-> [    6.597736] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff3425c=
-5ce0000
-> [    6.597737] Call trace:
-> [    6.597737]  proc_register+0x138/0x1d0
-> [    6.597739]  proc_create_data+0x48/0x78
-> [    6.597741]  pci_proc_attach_device+0x84/0x118
-> [    6.597743]  pci_bus_add_device+0x5c/0x138
-> [    6.597744]  pci_bus_add_devices+0x40/0x98
-> [    6.597745]  pci_host_probe+0x70/0xf0
-> [    6.597746]  dw_pcie_host_init+0x248/0x658
-> [    6.597748]  qcom_pcie_probe+0x234/0x330
-> [    6.597749]  platform_probe+0x70/0xd8
-> [    6.597750]  really_probe+0xc8/0x3a0
-> [    6.597751]  __driver_probe_device+0x84/0x170
-> [    6.597752]  driver_probe_device+0x44/0x120
-> [    6.597753]  __device_attach_driver+0xc4/0x168
-> [    6.597754]  bus_for_each_drv+0x8c/0xf0
-> [    6.597756]  __device_attach_async_helper+0xb4/0x118
-> [    6.597757]  async_run_entry_fn+0x40/0x178
-> [    6.597759]  process_one_work+0x16c/0x410
-> [    6.597760]  worker_thread+0x284/0x3a0
-> [    6.597761]  kthread+0x118/0x128
-> [    6.597762]  ret_from_fork+0x10/0x20
-> [    6.597763] ---[ end trace 0000000000000000 ]---
+> Given I have these in my 6.6 kernel. You are basically saying I should
+> be able to avoid IRQ-disable for the lock, right?
 >
-> This probably only occurs when the relevant drivers on compiled as built-=
-in.
-> Similar behavior has been noticed before as well:
+> My main problem with the global cgroup_rstat_lock[3] is it disables IRQs
+> and (thereby also) BH/softirq (spin_lock_irq).  This cause production
+> issues elsewhere, e.g. we are seeing network softirq "not-able-to-run"
+> latency issues (debug via softirq_net_latency.bt [5]).
 >
-> https://lore.kernel.org/lkml/20240201155532.49707-1-brgl@bgdev.pl/T/#mdee=
-ca9bc8e19458787d53738298abcfff443068a
+>   [3] 
+> https://elixir.bootlin.com/linux/v6.9-rc3/source/kernel/cgroup/rstat.c#L10
+>   [5] 
+> https://github.com/xdp-project/xdp-project/blob/master/areas/latency/softirq_net_latency.bt 
 >
-> Thanks,
-> Xilin
 >
+>>> And between 6.1 to 6.6 we did observe an improvement in this area.
+>>> (Maybe I don't have to do the 6.1 backport if the 6.6 release plan 
+>>> progress)
+>>>
+>>> I've had a chance to get running in prod for 6.6 backport.
+>>> As you can see in attached grafana heatmap pictures, we do observe an
+>>> improved/reduced softirq wait time.
+>>> These softirq "not-able-to-run" outliers is *one* of the prod issues we
+>>> observed.  As you can see, I still have other areas to improve/fix.
+>>
+>> I am not very familiar with such heatmaps, but I am glad there is an
+>> improvement with 6.6 and the backports. Let me know if there is
+>> anything I could do to help with your effort.
+>
+> The heatmaps give me an overview, but I needed a debugging tool, so I
+> developed some bpftrace scripts [1][2] I'm running on production.
+> To measure how long time we hold the cgroup rstat lock (results below).
+> Adding ACME and Daniel as I hope there is an easier way to measure lock
+> hold time and congestion. Notice tricky release/yield in
+> cgroup_rstat_flush_locked[4].
+>
+> My production results on 6.6 with backported patches (below signature)
+> vs a our normal 6.6 kernel, with script [2]. The `@lock_time_hist_ns`
+> shows how long time the lock+IRQs were disabled (taking into account it
+> can be released in the loop [4]).
+>
+> Patched kernel:
+>
+> 21:49:02  time elapsed: 43200 sec
+> @lock_time_hist_ns:
+> [2K, 4K)              61 |      |
+> [4K, 8K)             734 |      |
+> [8K, 16K)         121500 |@@@@@@@@@@@@@@@@      |
+> [16K, 32K)        385714 
+> |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> [32K, 64K)        145600 |@@@@@@@@@@@@@@@@@@@      |
+> [64K, 128K)       156873 |@@@@@@@@@@@@@@@@@@@@@      |
+> [128K, 256K)      261027 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ |
+> [256K, 512K)      291986 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      |
+> [512K, 1M)        101859 |@@@@@@@@@@@@@      |
+> [1M, 2M)           19866 |@@      |
+> [2M, 4M)           10146 |@      |
+> [4M, 8M)           30633 |@@@@      |
+> [8M, 16M)          40365 |@@@@@      |
+> [16M, 32M)         21650 |@@      |
+> [32M, 64M)          5842 |      |
+> [64M, 128M)            8 |      |
+>
+> And normal 6.6 kernel:
+>
+> 21:48:32  time elapsed: 43200 sec
+> @lock_time_hist_ns:
+> [1K, 2K)              25 |      |
+> [2K, 4K)            1146 |      |
+> [4K, 8K)           59397 |@@@@      |
+> [8K, 16K)         571528 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      |
+> [16K, 32K)        542648 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      |
+> [32K, 64K)        202810 |@@@@@@@@@@@@@      |
+> [64K, 128K)       134564 |@@@@@@@@@      |
+> [128K, 256K)       72870 |@@@@@      |
+> [256K, 512K)       56914 |@@@      |
+> [512K, 1M)         83140 |@@@@@      |
+> [1M, 2M)          170514 |@@@@@@@@@@@      |
+> [2M, 4M)          396304 |@@@@@@@@@@@@@@@@@@@@@@@@@@@      |
+> [4M, 8M)          755537 
+> |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> [8M, 16M)         231222 |@@@@@@@@@@@@@@@      |
+> [16M, 32M)         76370 |@@@@@      |
+> [32M, 64M)          1043 |      |
+> [64M, 128M)           12 |      |
+>
+>
+> For the unpatched kernel we see more events in 4ms to 8ms bucket than
+> any other bucket.
+> For patched kernel, we clearly see a significant reduction of events in
+> the 4 ms to 64 ms area, but we still have some events in this area.  I'm
+> very happy to see these patches improves the situation.  But for network
+> processing I'm not happy to see events in area 16ms to 128ms area.  If
+> we can just avoid disabling IRQs/softirq for the lock, I would be happy.
+>
+> How far can we go... could cgroup_rstat_lock be converted to a mutex?
 
-Thanks for the report. The reason for this was populating the platform
-devices before the bridge device was fully added. In case of loadable
-modules this meant the pwrctl probe would be deferred long enough for
-that to complete so I didn't see it but with pwrctl built-in this
-would trigger the problem. I fixed it locally and will resend with
-that addressed.
+The cgroup_rstat_lock was originally a mutex. It was converted to a 
+spinlock in commit 0fa294fb1985 ("group: Replace cgroup_rstat_mutex with 
+a spinlock"). Irq was disabled to enable calling from atomic context. 
+Since commit 0a2dc6ac3329 ("cgroup: remove 
+cgroup_rstat_flush_atomic()"), the rstat API hadn't been called from 
+atomic context anymore. Theoretically, we could change it back to a 
+mutex or not disabling interrupt. That will require that the API cannot 
+be called from atomic context going forward.
 
-Bart
+Cheers,
+Longman
+
+
 
