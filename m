@@ -1,204 +1,127 @@
-Return-Path: <netdev+bounces-86090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D593489D836
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:40:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A456B89D83B
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:41:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89439288AA5
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:40:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B8521F21964
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:41:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36AEC12DD85;
-	Tue,  9 Apr 2024 11:38:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B73191272D5;
+	Tue,  9 Apr 2024 11:40:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="aVb5VoWC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cNNsbZnK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA5E12DD84;
-	Tue,  9 Apr 2024 11:38:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86EE386AF4;
+	Tue,  9 Apr 2024 11:40:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712662699; cv=none; b=HwsHK3cdbkox0YqopcklEyHspZdNPrzJlWL2EdLhcZsFqz7vbyqYkOIxysqJYd6i/a61Yfovi+JJ95nPGJ2Das3U1u68ZBLLPAdbxmjlz82jE0gK2tq3UAKxuMmoCJYqczTLn2dDAn1qPudXMby85jQW37Ugdm+pZBQpyPrPIOw=
+	t=1712662814; cv=none; b=LI4lb5I8zbTncJ7JOdI1Fts/3ZW1LEK75AiZK3VGwHUSD2uQ23r8Jz1wWsPgp7FGsagTYijZl66BShXnahF3uCIeyBYItpNxGSw4mQT8t+9HkLd7fVyKZWiLCBqLFfzwHIODr1dAlxFmBNtvfTg7YVZzHyLwmHoBtHUzb5pZLjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712662699; c=relaxed/simple;
-	bh=6vC1mJ5GazGW7BDjWM1xiZUkKNPwSg2Bb5ytJgiXO+M=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Uzmc8xzAYyOuBx1Ziv5L7EUKP1+Dx8zFwBq/YuNOySmsi2fzJeKYvlalaiVrcJxJipFq3nlLrjWD1T5aEkWQslI43vAR3eChxJqwiYfC0f2W/uhWGr3pfxf+NAlI0ZJCXRv+29N3GD2zmoIuHtYtLst1rxuR9sZl8o3iKOVgUoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=aVb5VoWC; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 439B1N6N030724;
-	Tue, 9 Apr 2024 11:38:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=2yuqS5Khw7084zEnbbKJBNp9GQR5WjpgzXBBu/4s3kA=;
- b=aVb5VoWCYMFNuUDiStBJ4bbN+KZLP5pOP26H9cQP1htDKJg8qnIt9nuImcop7sQ1g4tv
- DhKNr4Fne2++flqU8L/bhof8tic7hfraToZgGF6Jr97WHIt8dBzvITea48yN8aF12Szu
- CW88hD/8Ejj/CYlE/OH5gBIWs7tgRd7C+FMgj20l5g5M5s+op36zJqABFyM3yKyu9sv9
- RhfOEvpmG9Eb3KFSxRaR6hBItJYoFEgY0oy6WtbcLBtBCljYQRvvvkG3kNIfaGB0US4w
- p5VK4Qfbg6bpeXepsAjJsgtDI7tFNfGqMqL5IcnaXWchINFrtdQkQ2s+uCE70xmXq43/ sw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xd2nsg8u6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Apr 2024 11:38:03 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 439Bc2vQ023253;
-	Tue, 9 Apr 2024 11:38:02 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xd2nsg8u3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Apr 2024 11:38:02 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 439A4boL021515;
-	Tue, 9 Apr 2024 11:38:02 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xbjxknmww-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Apr 2024 11:38:01 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 439BbuaT16908656
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 9 Apr 2024 11:37:58 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9ABA42004D;
-	Tue,  9 Apr 2024 11:37:56 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 30A2220043;
-	Tue,  9 Apr 2024 11:37:56 +0000 (GMT)
-Received: from dilbert5.boeblingen.de.ibm.com (unknown [9.155.208.153])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  9 Apr 2024 11:37:56 +0000 (GMT)
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Heiko Carstens <hca@linux.ibm.com>, Paolo Abeni <pabeni@redhat.com>,
-        Christoph Hellwig <hch@lst.de>, Jakub Kicinski <kuba@kernel.org>,
-        "David S . Miller" <davem@davemloft.net>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, pasic@linux.ibm.com,
-        schnelle@linux.ibm.com, Gerd Bayer <gbayer@linux.ibm.com>
-Subject: [PATCH net] Revert "s390/ism: fix receive message buffer allocation"
-Date: Tue,  9 Apr 2024 13:37:53 +0200
-Message-ID: <20240409113753.2181368-1-gbayer@linux.ibm.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1712662814; c=relaxed/simple;
+	bh=RW86VgmMfAcJkSsLpIIwkE6YL29bSdtmFPZKlRKZqL0=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=P8YQ8uGKNbWW/sng04lZfeP08D5Hyg62ftfnlnh9UtR0/w+g5KTYQUKN4HTXadZOwkIkapV9IXfp3/fz5VsnFcBgvNTUic3qQzSch6lQ2IM4IleW5JqKwUTnVzBsBQTIrAGzhn2U95tKOElK8plqBWiJhW7Qc1+PTorDiEm/mO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cNNsbZnK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C080C433C7;
+	Tue,  9 Apr 2024 11:40:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712662814;
+	bh=RW86VgmMfAcJkSsLpIIwkE6YL29bSdtmFPZKlRKZqL0=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=cNNsbZnKiwP9ciyhq95bqBZiXTBTVFFgYSa0BH8/TOyoMtYsUYDOM8eGjT5kpXOyc
+	 +WV5ZDL9ZbB6xUc9X/VydgYqxgFyGzi/W4wvyfn1o4Pf4sYEEc6LNpQn/wIr8z8+yL
+	 yAUZPgv/kCrsUFZvNvgmsCsXJcUT5dlXakXCx3g7OW15HMdj5h1VRj4xo/PPkaXMKi
+	 dxL2qEkqWFsd5aEhhRi5WCJEvDMlID4FvN7eMcvQ61i9uiAxgo2M3uGhfYgAcG+y7W
+	 m9SolINR2DOwFgtfq079+zgmxQkVg1Y7DS3zIjow9jE+CweF+L3zZ7ExVChXTPfLqW
+	 MElB5W1pVMrsA==
+From: Kalle Valo <kvalo@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org,  ath11k@lists.infradead.org,
+  ath10k@lists.infradead.org,  linux-wireless@vger.kernel.org,
+  imitsyanko@quantenna.com,  geomatsi@gmail.com,
+  linux-kernel@vger.kernel.org,  netdev@vger.kernel.org
+Subject: Re: [PATCH 0/3] wifi: Un-embed ath10k and ath11k dummy netdev
+References: <20240405122123.4156104-1-leitao@debian.org>
+	<87y19r264m.fsf@kernel.org> <ZhPyRHHlVot+a8Xq@gmail.com>
+	<87pluz24ap.fsf@kernel.org> <ZhRGo3I57rXxsMV/@gmail.com>
+	<87edbe26qe.fsf@kernel.org> <ZhUdxpnC+nMkNp+U@gmail.com>
+Date: Tue, 09 Apr 2024 14:40:10 +0300
+In-Reply-To: <ZhUdxpnC+nMkNp+U@gmail.com> (Breno Leitao's message of "Tue, 9
+	Apr 2024 03:51:50 -0700")
+Message-ID: <875xwq2291.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: ih4EjGBrz3HQRV4aRx3BJBmsd9AaJ37J
-X-Proofpoint-ORIG-GUID: FWlATgMz-U1Pm9dHBEzHkK0XLFkr_vDf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-09_08,2024-04-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 phishscore=0
- mlxscore=0 priorityscore=1501 impostorscore=0 mlxlogscore=999 bulkscore=0
- adultscore=0 suspectscore=0 lowpriorityscore=0 clxscore=1015 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
- definitions=main-2404090074
+Content-Type: text/plain
 
-This reverts commit 58effa3476536215530c9ec4910ffc981613b413.
-Review was not finished on this patch. So it's not ready for
-upstreaming.
+Breno Leitao <leitao@debian.org> writes:
 
-Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
----
+> On Tue, Apr 09, 2024 at 01:03:21PM +0300, Kalle Valo wrote:
+>
+>> Breno Leitao <leitao@debian.org> writes:
+>> 
+>> >> > Reading the issue, I am afraid that freeing netdev explicitly
+>> >> > (free_netdev()) might not be the best approach at the exit path.
+>> >> >
+>> >> > I would like to try to leverage the ->needs_free_netdev netdev
+>> >> > mechanism to do the clean-up, if that makes sense. I've updated the
+>> >> > ath11k patch, and I am curious if that is what we want.
+>> >> >
+>> >> > Would you mind testing a net patch I have, please?
+>> >> >
+>> >> >   https://github.com/leitao/linux/tree/wireless-dummy_v2
+>> >> 
+>> >> I tested this again with my WCN6855 hw2.0 x86 test box on this commit:
+>> >> 
+>> >> a87674ac820e wifi: ath11k: allocate dummy net_device dynamically
+>> >> 
+>> >> It passes my tests and doesn't crash, but I see this kmemleak warning a
+>> >> lot:
+>> >
+>> > Thanks Kalle, that was helpful. The device is not being clean-up
+>> > automatically.
+>> >
+>> > Chatting with Jakub, he suggested coming back to the original approach,
+>> > but, adding a additional patch, at the free_netdev().
+>> >
+>> > Would you mind running another test, please?
+>> >
+>> > 	https://github.com/leitao/linux/tree/wireless-dummy_v3
+>> >
+>> > The branch above is basically the original branch (as in this patch
+>> > series), with this additional patch:
+>> >
+>> > 	Author: Breno Leitao <leitao@debian.org>
+>> > 	Date:   Mon Apr 8 11:37:32 2024 -0700
+>> >
+>> > 	    net: free_netdev: exit earlier if dummy
+>> 
+>> I tested with the same ath11k hardware and this one passes all my
+>> (simple) ath11k tests, no issues found. I used this commit:
+>> 
+>> 1c10aebaa8ce net: free_netdev: exit earlier if dummy
+>
+> Thank you so much for the test.
+>
+> I will respin a v2 of this patchset with the additional patch included.
 
-Hi,
+Sounds good. Feel free to add:
 
-this is broken for a little while already and I'd rather have the full 
-solution properly reviewed and acked in one patch. So please do not upstream
-this yet.
+Tested-by: Kalle Valo <kvalo@kernel.org>
 
-Thank you,
-Gerd
-
- drivers/s390/net/ism_drv.c | 38 +++++++++-----------------------------
- 1 file changed, 9 insertions(+), 29 deletions(-)
-
-diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-index affb05521e14..2c8e964425dc 100644
---- a/drivers/s390/net/ism_drv.c
-+++ b/drivers/s390/net/ism_drv.c
-@@ -14,8 +14,6 @@
- #include <linux/err.h>
- #include <linux/ctype.h>
- #include <linux/processor.h>
--#include <linux/dma-mapping.h>
--#include <linux/mm.h>
- 
- #include "ism.h"
- 
-@@ -294,15 +292,13 @@ static int ism_read_local_gid(struct ism_dev *ism)
- static void ism_free_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
- {
- 	clear_bit(dmb->sba_idx, ism->sba_bitmap);
--	dma_unmap_page(&ism->pdev->dev, dmb->dma_addr, dmb->dmb_len,
--		       DMA_FROM_DEVICE);
--	folio_put(virt_to_folio(dmb->cpu_addr));
-+	dma_free_coherent(&ism->pdev->dev, dmb->dmb_len,
-+			  dmb->cpu_addr, dmb->dma_addr);
- }
- 
- static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
- {
- 	unsigned long bit;
--	int rc;
- 
- 	if (PAGE_ALIGN(dmb->dmb_len) > dma_get_max_seg_size(&ism->pdev->dev))
- 		return -EINVAL;
-@@ -319,30 +315,14 @@ static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
- 	    test_and_set_bit(dmb->sba_idx, ism->sba_bitmap))
- 		return -EINVAL;
- 
--	dmb->cpu_addr =
--		folio_address(folio_alloc(GFP_KERNEL | __GFP_NOWARN |
--					  __GFP_NOMEMALLOC | __GFP_NORETRY,
--					  get_order(dmb->dmb_len)));
-+	dmb->cpu_addr = dma_alloc_coherent(&ism->pdev->dev, dmb->dmb_len,
-+					   &dmb->dma_addr,
-+					   GFP_KERNEL | __GFP_NOWARN |
-+					   __GFP_NOMEMALLOC | __GFP_NORETRY);
-+	if (!dmb->cpu_addr)
-+		clear_bit(dmb->sba_idx, ism->sba_bitmap);
- 
--	if (!dmb->cpu_addr) {
--		rc = -ENOMEM;
--		goto out_bit;
--	}
--	dmb->dma_addr = dma_map_page(&ism->pdev->dev,
--				     virt_to_page(dmb->cpu_addr), 0,
--				     dmb->dmb_len, DMA_FROM_DEVICE);
--	if (dma_mapping_error(&ism->pdev->dev, dmb->dma_addr)) {
--		rc = -ENOMEM;
--		goto out_free;
--	}
--
--	return 0;
--
--out_free:
--	kfree(dmb->cpu_addr);
--out_bit:
--	clear_bit(dmb->sba_idx, ism->sba_bitmap);
--	return rc;
-+	return dmb->cpu_addr ? 0 : -ENOMEM;
- }
- 
- int ism_register_dmb(struct ism_dev *ism, struct ism_dmb *dmb,
-
-base-commit: b46f4eaa4f0ec38909fb0072eea3aeddb32f954e
 -- 
-2.44.0
+https://patchwork.kernel.org/project/linux-wireless/list/
 
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
