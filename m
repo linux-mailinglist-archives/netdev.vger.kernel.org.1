@@ -1,126 +1,145 @@
-Return-Path: <netdev+bounces-85986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C01F589D30E
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 09:31:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D795189D336
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 09:34:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0FFF1C21F9F
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 07:31:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05F7F1C21971
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 07:34:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168187E56B;
-	Tue,  9 Apr 2024 07:30:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E1407EF1F;
+	Tue,  9 Apr 2024 07:32:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cn8ZLU9v"
+	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="WTs1uqhW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2092.outbound.protection.outlook.com [40.107.212.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57A397E116
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 07:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712647834; cv=none; b=A429GYNvUmB8gsrgL8lIEwWBLWx4onphNavGKJhrt8S9bivGqTyYb5XluFs32Iub8Iw9gDjQz6dhgid073pxXAVBOXjrraHoqGTDsmHrU6P/q0xnj+gW+/9/R5D+xFKIJ8gsF2DjfDrk81yINmnYGwunElz6guUIGPlINYDg9tg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712647834; c=relaxed/simple;
-	bh=gIz7MdS/+GZwGdahnbu/fUAyMyBCexr2zybpIeHADT8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=p0PWu/dNobXoXgazodQKi0Mdfjr9+qRUdFaEgiz+WQrvZuYASIq/3+nS11JTwGT/Dlg5wEjMKPLBarjGen0gm4/XE7rv0UDmkhhj4Xf8OpBzKJpzy50vJYK4oHwHhFW6GPUkB/djc7lLnwowwqThVxcypAgcVTNJ4eB92cPLK/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cn8ZLU9v; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a51abd0d7c2so514740866b.2
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 00:30:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA7B7EF03
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 07:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.92
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712647966; cv=fail; b=hJWvHQ4rJz3dsaqmQmk8B0kJAzzwtKczAp8KFT4Ph2Bi5hkMNvALUrJMvCTFV9YR3jNvYoGo4UyEje6jwa+WPVKIzqPcJRiZF4hsc9p5UsrR7CUsy6vMMA7FVoB6Hl3bhKXiiLcDczwAqPcfaQgrG10NIsYBTuvKCmchnC/U81Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712647966; c=relaxed/simple;
+	bh=LfsYnNYZGUSImQ7kgat5zLJ5v+JxTs22zP8ClwaQCzA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=WT32z1UFROhMrv7QBzBuHtNIcF+WV4NUVuiFWNcQSe1WWIP9zRoFXqtMvcRlmX0fm4LfaieEuK2v4GKTuvP8dLvdzDO6x9yBO97uTiLzwz2dazPTTGEU2Izl8Vxt718W7Ln1+eDGU38M/9SOJNDN8boChnIQ1QRhOg8Swg2Gbsk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com; spf=pass smtp.mailfrom=corigine.com; dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b=WTs1uqhW; arc=fail smtp.client-ip=40.107.212.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=corigine.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=hY8dwYsT2c74XDTYv+JwJEl5ljWgdk8AiLuiR8KcBYMUMcu7zXMIDb6HmI4r5O7v0tZ6gsBcwslgM14KOBpVBJt1YCZLgvyTcFWyYxQNCAuU2SViNgYyRxidrFPb0Z7Ir4t44MfvxbD5qzmkE+b+zjrTowN5t/8PEBgkcWkGhX8TKpL+5zVFvdFbtFONsjRR3T91Tto4NjYNbOyZIsWiGASVGJ/aucZCM2ItanpEHVmIoMExDIU3In7I/Kcki2dYGooyUKYIOhVosgSPPCqeUWwYuZslvqadfUf5i7zAzIBqg5UtFbU/UOaVedd3fX2W3jHVaBZMEFGl5Bq4LWEZZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fmgqBJ4YE0Js8/zqvG4jlsCcbFz4zJb9VtGJWjM8KjU=;
+ b=fVzJgxQcNcPwgi2rPa0twH9Ig3oOF0ghskXfk/IVUDejfEHq6/VHlU4UgX+OAK20wiHDRhSP0AYQX/aj11IwaDgbFxMUcdGZWhv/4E4oq8CziwG6+SdgRmKzJjiRF8bip6TOyYk2iQn65IvXIReQ8MDat4Da3OY8/m7n7F9uXCoMngIBsWXai7u/wNKz/0EGzXmlm+wSCODJ5lPN2hmY7N04GMVV6qfhAQpTukeDjkpDZgBoLXd9Wwopz5ezsSWqpjq4OgAYR8Ob0TeAnN1ATSCY8kWrnISXMb6LHG8cQ2I/9umCnW2jBe5VzMpQfscyxJRAgn99PsNduffIy7VJCw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712647829; x=1713252629; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YDkw88b3lYtuDM0Po1l0W+9RfoTKioIBFPIWL2ETjQQ=;
-        b=Cn8ZLU9vTohx1aDiofsJY7ebXX62QtHYyavEQiAHhYjL4Wk18nhXjuKU/Vb8BMhLbg
-         bixcpiGH+PT3+ls8jlUAzwmbV/WTN33du8Ef8iQabu98KPHu7hMxurBcekuCXY8vmr15
-         96e0CeIz2H469vlB/A4ts01QY4zjH5m9SpnSXmF/BMlkF+R6vRUHci9bU2fL7lR+cnd3
-         jKrc4Y39S5dvAVG8JUhC0nN9I2eU2EfNMk+2PEH+ByIjby5o9TpUhFCgIf1wvNYJjvXI
-         RhHoBXUGHl91xXaY5QvT5XTCcCd0Ried9jqQcNBmjos98+sh6flV4KhBd0rKmt8ClGgw
-         yEuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712647829; x=1713252629;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YDkw88b3lYtuDM0Po1l0W+9RfoTKioIBFPIWL2ETjQQ=;
-        b=byWVRjMQCHUH6P2tXyoWulr4uI/HPMrrhSV96OPD0TM7Vj6XErdXFCS4qLrTCypKSk
-         VyyXiYsi95wQ3XaoeUgmaxBqZoeA1fg5bI3xVE7tZ6A91z03P6E/VtItTyTmBXeSFuwV
-         0W7IVkSs3Gn6BSf2dvL3IJQuulmXZ4v0wNyMDZU58ARRcMTVToxtr2SXfWCbQzj7stjo
-         +sTdG1/Y80hW2cjmYh6uNqkA6ZuGp/s+6QJ9+0Jge2lJ//dZvcfqUfYFzj4YKO+cWZXh
-         Y8zBo9wUTk0JsUdT4jf34mfVRIkW6gz5Bp7Kia1iMOGl6DAy3FWKz1Ao7EsEZus0hUOw
-         w4Gw==
-X-Gm-Message-State: AOJu0Yy03tXakWFse5H+N2RFSTYGF7SsNSzw6E07O2/ZWO24PuNWI2IE
-	BUOAj3Qt1S3A1B0po4T16PP//fFEYFqO859sAYfSr5PT2FjAyIvaBtlJaVVo5gU=
-X-Google-Smtp-Source: AGHT+IEJj4qTvawNrr/1mvzrgObjIkXXMzC0xE2m4ZuH1Iu2C5jjXms5vA5AA5SI2Jq722sfHhf7Fg==
-X-Received: by 2002:a17:906:2e88:b0:a51:e5b1:6d4a with SMTP id o8-20020a1709062e8800b00a51e5b16d4amr1229036eji.64.1712647829602;
-        Tue, 09 Apr 2024 00:30:29 -0700 (PDT)
-Received: from corebook.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id j25-20020a1709066dd900b00a473362062fsm5315694ejt.220.2024.04.09.00.30.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Apr 2024 00:30:29 -0700 (PDT)
-From: Eric Woudstra <ericwouds@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	"Frank Wunderlich" <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>
-Cc: netdev@vger.kernel.org,
-	Eric Woudstra <ericwouds@gmail.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>
-Subject: [PATCH v4 net-next 6/6] net: sfp: add quirk for another multigig RollBall transceiver
-Date: Tue,  9 Apr 2024 09:30:16 +0200
-Message-ID: <20240409073016.367771-7-ericwouds@gmail.com>
-X-Mailer: git-send-email 2.42.1
-In-Reply-To: <20240409073016.367771-1-ericwouds@gmail.com>
-References: <20240409073016.367771-1-ericwouds@gmail.com>
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fmgqBJ4YE0Js8/zqvG4jlsCcbFz4zJb9VtGJWjM8KjU=;
+ b=WTs1uqhWBLVJtTm41Q2zp06MCwgQzDyV01OcUqtgmXF6vTchaSL/ulnszaA0iF7/EFKFcfti/y1hiBcprK1CbZrE0wdRHL3xp0ES0XhxLQMEd2s1oX8/Ne4BxJRvHabTxQEH01w92EPc9tq1YcYs88a56IJpP52ePfU8FvUTVPQ=
+Received: from BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
+ by MW3PR13MB3930.namprd13.prod.outlook.com (2603:10b6:303:57::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.55; Tue, 9 Apr
+ 2024 07:32:40 +0000
+Received: from BL0PR13MB4403.namprd13.prod.outlook.com
+ ([fe80::bbcb:1c13:7639:bdc0]) by BL0PR13MB4403.namprd13.prod.outlook.com
+ ([fe80::bbcb:1c13:7639:bdc0%5]) with mapi id 15.20.7409.053; Tue, 9 Apr 2024
+ 07:32:40 +0000
+Date: Tue, 9 Apr 2024 09:31:32 +0200
+From: Louis Peens <louis.peens@corigine.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Fei Qin <fei.qin@corigine.com>,
+	netdev@vger.kernel.org, oss-drivers@corigine.com
+Subject: Re: [PATCH net-next v4 2/4] nfp: update devlink device info output
+Message-ID: <ZhTu1HWnduRMdFoo@LouisNoVo>
+References: <20240405081547.20676-1-louis.peens@corigine.com>
+ <20240405081547.20676-3-louis.peens@corigine.com>
+ <20240408195815.5e932da3@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240408195815.5e932da3@kernel.org>
+X-ClientProxiedBy: JN2P275CA0039.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:2::27)
+ To BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL0PR13MB4403:EE_|MW3PR13MB3930:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	p8TefaNOOMVXTSTc2y77Dgr/1emgYGW8yZDfAuPPslA4AF7JDfGTWQmE1+T6/GPPrZjBvpQASGcRduDPbJTwSaQ2pMD8CBZoCKczPT0/qTPWKmkCSEtsuKbsrIIooG06IjmhMrNj2jTgJqWzL4mJXCe4avdBbWlgE8PnE7vva2A6Mw+SO/tro9rf+WrWr5KYjzCm/S4Le/VYGtlQrP9NX3W9j5OpWg9mWzGSlzI77wmCjs8tytkJY11vJ8qXmU6+fbW+If1V2/g2dPNWv3b/bRNnlm4JwpwgUQCZRrHiuzKMYDZldYNz+iP3oHztjjhoNTfMpsPvC3JrdKskoR2zLxyV99Y6s+RmTsTLDXvYdnINO7mcfHDEtmO5Lh+2AcCP7eamQX61wkEkMrAzJggtFWwQXvTxHdtX35pa/Lnbp41r9kOX3tBylPZBIQHkz5WZWipwdTTC7U2hVSy0o6tOvAntrimiW0h8ijeCWDxN5APg5bfCujE6mt4Lx2ym36HAg9b5hOWua4Yt4EHZ1vQ8+64HmrHU089lliqTss58qAx9c/03Ovww6sA/oNfzW6FgrSv54eFOozMGVsmdvFSiuLirhVaMQt+SzeKiMMSVsFTklCBj1zhniGz23TrQo8G542j6EPgw568dyC/GyQqaVnmm0SFk3kLgOuIWyPNA1f8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR13MB4403.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Sbm1X4Vf/3MciITRGK/LxHuc/MHIfr23tvoakABuPLT4Q2aepJvt0fGnkCe2?=
+ =?us-ascii?Q?TYXeOSE0dY2U8DQ4cxQRt3Ab7ArvGodc9/kVoJbVus0m7bXKrVd+Udd+dfoV?=
+ =?us-ascii?Q?oEk9OG6JGW9pYd9HL+4f9nVEUSV4P0WOY60VmzE3yDVaSTXua7HBJQFAZJAL?=
+ =?us-ascii?Q?3Ufr9iDXGvEOB5X2F4dJJIhFrZvvhUfXAoNzLD3Ql5BJVTv8OSvqu65cJubh?=
+ =?us-ascii?Q?/xKxExbB9iHVmq+5SDnENq2ACZsPVXVHiY+C6OcxBE60IbMq2Kfq9pnG9OO5?=
+ =?us-ascii?Q?pIFNWc1NuW2jb/WW6ju/+VY5Qt0/tH79z1PrSGSLL0bnqhu8N27ImpZdfp6X?=
+ =?us-ascii?Q?6x8YnQRu4Pjv47JTZ/MfLKqNNgnaOD/bD+spjrBb/NrmTccbdWNKCjK234hJ?=
+ =?us-ascii?Q?e3Cj5RRUOsjtiUpRYsBcRjeKSJrKuUpwQ4Vk8sxpS0Gpr+O25Lw0Trpfwt85?=
+ =?us-ascii?Q?OCc+WY4lZ9V8AzEWX+tHmq8Wn0bTVGJfKDCwyoaCO6EsekPLjQoCUgCr3Bz1?=
+ =?us-ascii?Q?oBh4ECGIKQHZ5L3h90YnAe7oCac4CRIdHDFsSzUstK2W86lWW4+3J/h2ap6u?=
+ =?us-ascii?Q?cpBQ0euFEaHcQXNtL7D9ilUza583p7BXr+8UWJAmJCk2dXhUgXZ6FAPn6sMY?=
+ =?us-ascii?Q?eUSNrvvDMvCaAZ/WuafuOXwT9Kg5i8T2HgBflunNkzPYEkg5Mn87LYIJ7AhX?=
+ =?us-ascii?Q?OZKkAd7ha3pI2ikFKlJJXmA5VY3sDgDgQeDZmnxMxwQYyrejxUMhmPf4muqr?=
+ =?us-ascii?Q?e7tau25JEwNndEFWU9WKR2HRH5woDdBxM+VEVH3ruZu1DB7zjywWjpcJcKkb?=
+ =?us-ascii?Q?bgNyJbvwH90Jv+iDH+ucysqeyEv2+PRyClimY2Vokc5M3O7OAM291tfH5xUV?=
+ =?us-ascii?Q?/3f8Vge3hXX8rE760mGTZX7mHJRJYpaR9aUUpyJfBa8h/wpjjeM3b+Z08UcE?=
+ =?us-ascii?Q?vGepBd1ZRB1eeq2TO6hWWNqEWUMPxEI313TD2AGZG6ubBZ3DYgT2AnKwIk3E?=
+ =?us-ascii?Q?D6IaiPQLwZhpn90CPa8TDB+t3ib6sYZA1IEBF2ZINgBAi4MoQp0+KsrPLPT+?=
+ =?us-ascii?Q?bj94PkhImC0QaUQyMS/YCnMn9fLlcw++3zTfI8rGp1EQYm82nHC8TEwOtKon?=
+ =?us-ascii?Q?zkBZ7Btge8dlc5LWbWQvLz5rfDagPNqHtdM3plloTg2vmXYeSH8QeuEI4c01?=
+ =?us-ascii?Q?RMxtqJY7PtXkTB1sQJ8qVQdx6mvmzQ4/6rDRN5ej+2besPPJrDZnoYuXUxjO?=
+ =?us-ascii?Q?D472pueiP3Rrj23FPQ2QSdVA9VQyHe5/PKMlwxwjYNaXr8zws+TmXo86JsjX?=
+ =?us-ascii?Q?YeG8VSYxuQcFLincdhikBGityt17nduPYdlZrNpVpDs0HpTiGVMKbu3ul2B9?=
+ =?us-ascii?Q?HBavCSy+VYEnGHeRFpxWA8+k+t16KdA7+0wlOdUQYcocc1SLkMkMRuZcrcCy?=
+ =?us-ascii?Q?qW/bPZsEnA0Pjh0GZWKcwEHDJwdMuipxhit+8XQ4adifX0LYoixjJIda5ivt?=
+ =?us-ascii?Q?O5MdsTvw+YcuOJcmZzQlvDLwZjhFZMEo9RaWZSIO4/YqfsBxglwXN72y1Waw?=
+ =?us-ascii?Q?OYIjX6oluN07X+ucXIHk4jXcJaBUtVBioxFEExlWCMW+ZBdp2CzzcffNq2mC?=
+ =?us-ascii?Q?cQ=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ff51aa2d-6c6e-4ccc-1d72-08dc58673c4b
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR13MB4403.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2024 07:32:40.2513
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iS68+1olosTIig0JD1FtAOgczYFxQlzv5xY6d/vm0vFCwynGHagKZ8shf5hUSdRmUbnKSv4b/D9TLgEmNTdz/Tw016t3JV7+sG5HNu/OcaE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR13MB3930
 
-From: Marek Behún <kabel@kernel.org>
+On Mon, Apr 08, 2024 at 07:58:15PM -0700, Jakub Kicinski wrote:
+> On Fri,  5 Apr 2024 10:15:45 +0200 Louis Peens wrote:
+> > +   * - ``board.part_number``
+> > +     - fixed
+> > +     - Part number of the board design
+> 
+> Sorry, one more nit. Part number is not "of the board design"
+> Part number is a part number, AFAIU it's a customer-facing
+> identifier of a product. Let's drop the design or say "of the 
+> board and its components"? Since AFAIU part number may also
+> change if you replace a component even if you don't have to
+> redesign the PCB?
 
-Add quirk for another RollBall copper transceiver: Turris RTSFP-2.5G,
-containing 2.5g capable RTL8221B PHY.
-
-Signed-off-by: Marek Behún <kabel@kernel.org>
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
-
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/phy/sfp.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index f75c9eb3958e..6e7639fc64dd 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -506,6 +506,7 @@ static const struct sfp_quirk sfp_quirks[] = {
- 	SFP_QUIRK_M("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
- 	SFP_QUIRK_F("OEM", "RTSFP-10", sfp_fixup_rollball_cc),
- 	SFP_QUIRK_F("OEM", "RTSFP-10G", sfp_fixup_rollball_cc),
-+	SFP_QUIRK_F("Turris", "RTSFP-2.5G", sfp_fixup_rollball),
- 	SFP_QUIRK_F("Turris", "RTSFP-10", sfp_fixup_rollball),
- 	SFP_QUIRK_F("Turris", "RTSFP-10G", sfp_fixup_rollball),
- };
--- 
-2.42.1
-
+I like "of the board and its components", will update, thanks.
 
