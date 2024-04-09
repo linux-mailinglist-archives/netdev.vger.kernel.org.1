@@ -1,127 +1,128 @@
-Return-Path: <netdev+bounces-85973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2479589D186
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 06:32:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F20B89D1CF
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 07:09:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8AB91F243E7
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 04:32:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 182F6282B64
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 05:09:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 125AF79F0;
-	Tue,  9 Apr 2024 04:32:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA987535A2;
+	Tue,  9 Apr 2024 05:08:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Dfw/g7pr"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56CF26AC7
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 04:32:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 495774F887
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 05:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712637129; cv=none; b=krHgITtY+8U53cljtHidYy85Hj78PJMaPHCHyMrCiDG7c2d1AuTf6/emoFH6Png7qygWmihrocBUhVvYqfOoGA1+VTBz815bMltKRJO0hZGFQwJblB6ENyZXeSW6SKTq70Rm4Bx8/uzQBPV/6zhut6ObiwBZF0nEkO/Gd0YZrBI=
+	t=1712639339; cv=none; b=E77gakW0uyyMx2W4XYTAVRPU/dDU7EYV50V9NAklMoPtbjhZwUTOeygLpmZX6hmUCph+opMC3aCqsLBOFlTVRBv8L7AGXQHER1UCXTvSe8aVpiDn8veeyLjo8PwMaIMSWTNOEY9yMYGqmnpM+vci2lpEbA2o/ohBw+hKzu94cz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712637129; c=relaxed/simple;
-	bh=dPvPqUERy12DlCuYBp4kJOrK+EGsyRWG0aIs7+b7590=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X4zBTPYOD3yCIZVM/N1yiudhl5dQJzTn0/kdZvP5FA1VRedM/MeL70zasoI3ePqGrzm2cMWu97bLxCOktuqB6E7XEqfxIabiZzneRQJMxKkm/qJ88fjs/pSQEote2tuSRxD3wq5DGjpAvpX6rng3FtURaleGGy6szaPwa/Q5NI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ru39E-0004ek-Fn; Tue, 09 Apr 2024 06:31:52 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ru39C-00BErS-Fh; Tue, 09 Apr 2024 06:31:50 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ru39C-004MsH-1F;
-	Tue, 09 Apr 2024 06:31:50 +0200
-Date: Tue, 9 Apr 2024 06:31:50 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Arun.Ramadoss@microchip.com
-Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
-	Woojung.Huh@microchip.com, pabeni@redhat.com, edumazet@google.com,
-	f.fainelli@gmail.com, kuba@kernel.org, kernel@pengutronix.de,
-	dsahern@kernel.org, san@skov.dk, willemb@google.com,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	horms@kernel.org, UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net-next v4 5/9] net: dsa: microchip: add support for
- different DCB app configurations
-Message-ID: <ZhTEtmcvubthMXmB@pengutronix.de>
-References: <20240408074758.1825674-1-o.rempel@pengutronix.de>
- <20240408074758.1825674-6-o.rempel@pengutronix.de>
- <40d90a28d95bff48f352a3aaf81df2b1a6133cc7.camel@microchip.com>
+	s=arc-20240116; t=1712639339; c=relaxed/simple;
+	bh=dpumPbGeuszlGgZ/6QcYn1ZPkL3r/LCYuwQdgcIzQWU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZMpa/IZvhHcVVx53Ip6MYmrWrSMoFgefFcaKCWcQDzxQqlXZ1eLM4oh086er7/DRwFijSBXGhZW6Gy3ob9M6nQQM1v3F1elpDQ/GwP8NJndY8Kn/MXzYaULeSv/ix59VZz3GySkEFjVrPBWLqIiQOeClQ1gm2Hs8TDjdy4vk/EU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Dfw/g7pr; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-36a2825cdf7so73505ab.1
+        for <netdev@vger.kernel.org>; Mon, 08 Apr 2024 22:08:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712639337; x=1713244137; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LEL615D0PAohpi/ZueAVrRaSlrpex4n/Ywu5HFL+HUA=;
+        b=Dfw/g7prRaRj41bE9F3PnmZH0yjd/3qWG/f8Cct7o8dyajA5KcnkENxar7Kn9W9PxB
+         eWJS8hgWXJxpEeRuAG0gOwjGfM7SmGzH2n4phkqd+zAAT7T/fF+AGvgC3i4ZftPcIy0Z
+         DesGy71tpK8cnLrRBij5j4Bdb86nMel+0ag8l013tLxml2owzoK7t7T6Q06LHYnsgJzG
+         iKHUv2X4Tx0D6AozHiSlXRMFJrHmZt+9qZ9VbB71VpTNs5VPjINiSqYUNbPC6XqvHajn
+         ec3pKm3Z4oY/AdG/dJrJq0SbslUih+Z0e1OkRjweujqqz3NQZZF3FCEXl2XQP6ASFDWF
+         tFKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712639337; x=1713244137;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LEL615D0PAohpi/ZueAVrRaSlrpex4n/Ywu5HFL+HUA=;
+        b=wdF74Dc/3FrXRmefKuQUV6VdX03Rzfd6fubLJm0qqm1QqDBnzazYk1+mI+f5fdNYJM
+         pe3IF4yS+KnksDOeIxAe+1MfsyL/EN2aS3koY+GcGSmGAMxAbuRhWcoEDSS0Grrwu8U8
+         33V9NCQTr8ZLXj1K/D9lcq5+CjH6yqPfPcYL88gPAxrJVhYA1P1lB+zuCu3l+Celep3V
+         iVT+42yKT2eTSW1UUyd9l8D6JowFnL9iaZgQkiwiB3el/2B0tkViulChLC7Vp6AjBEiX
+         8AHvPZAwAW0kFc+pZRIRIGDpj/BMT6yA2yqSFJyI5rKldZCJuteUoPvsWfe9zHusuVd2
+         ZEoA==
+X-Forwarded-Encrypted: i=1; AJvYcCW5e5VZFJXq9bfP5ty3dQY1piEo5uAKRutVloWHNAA0OD2zWJNHvIyp7H63l7U7hHItG9HR6az/uub5W6C0nDgeHmHmTzsH
+X-Gm-Message-State: AOJu0YzsbIguCVViebIxNMFKitUez5Y6LwN29fjhAtP8x/ymzjBMuFAH
+	i1CTq7GKnIUGJZP8yz6ztQqJKVtW5bEXg2JKzCH+zgzq1mrELTwXj1zFO+XF9bjLqr/S1Wpt5Vu
+	AbB0F3rJ66eBnk5Yk+DYZ3Q0I9NCtExzzYPFy
+X-Google-Smtp-Source: AGHT+IH7efisCsDzy68bbh6f3D2qyn7Zhr5zd6BXbQlYQ1t6gloGyZQkP7PdJR/HI8I6TtSndLyjiGhNNjGm2w1rVPE=
+X-Received: by 2002:a05:6e02:1d86:b0:36a:1278:5c5 with SMTP id
+ h6-20020a056e021d8600b0036a127805c5mr177596ila.26.1712639337111; Mon, 08 Apr
+ 2024 22:08:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <40d90a28d95bff48f352a3aaf81df2b1a6133cc7.camel@microchip.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <202404082207.HCEdQhUO-lkp@intel.com> <20240408230632.5ml3amaztr5soyfs@skbuf>
+In-Reply-To: <20240408230632.5ml3amaztr5soyfs@skbuf>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 9 Apr 2024 07:08:42 +0200
+Message-ID: <CANn89iJ8EcqiF8YCPhDxcp5t79J1RLzTh6GHHgAxbTXbC+etRA@mail.gmail.com>
+Subject: Re: [net-next:main 26/50] net/ipv4/tcp.c:4673:2: error: call to
+ '__compiletime_assert_1030' declared with 'error' attribute: BUILD_BUG_ON
+ failed: offsetof(struct tcp_sock, __cacheline_group_end__tcp_sock_write_txrx)
+ - offsetofend(struct tcp_sock, __cacheline_group_begin__tcp_sock_...
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: kernel test robot <lkp@intel.com>, llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Arun,
+On Tue, Apr 9, 2024 at 1:06=E2=80=AFAM Vladimir Oltean <olteanv@gmail.com> =
+wrote:
+>
+> Hi Eric,
+>
+> On Mon, Apr 08, 2024 at 10:49:35PM +0800, kernel test robot wrote:
+> > >> net/ipv4/tcp.c:4673:2: error: call to '__compiletime_assert_1030' de=
+clared with 'error' attribute: BUILD_BUG_ON failed: offsetof(struct tcp_soc=
+k, __cacheline_group_end__tcp_sock_write_txrx) - offsetofend(struct tcp_soc=
+k, __cacheline_group_begin__tcp_sock_write_txrx) > 92
+> > > 4673                CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_=
+sock_write_txrx, 92);
+>
+> I can confirm the same compile time assertion with an armv7 gcc 7.3.1 com=
+piler.
+> If I revert commit 86dad9aebd0d ("Revert "tcp: more struct tcp_sock adjus=
+tments")
+> it goes away.
+>
+> Before the change (actually with it reverted), I can see that the
+> tcp_sock_write_txrx cacheline group begins at offset 1821 with a 3 byte
+> hole, and ends at offset 1897 (it has 76 bytes).
 
-On Mon, Apr 08, 2024 at 04:10:15PM +0000, Arun.Ramadoss@microchip.com wrote:
-> > +int ksz_port_get_default_prio(struct dsa_switch *ds, int port)
-> > +{
-> > +       struct ksz_device *dev = ds->priv;
-> > +       int ret, reg, shift;
-> > +       u8 data, mask;
-> > +
-> > +       ksz_get_defult_port_prio_reg(dev, &reg, &mask, &shift);
-> > +
-> > +       ret = ksz_pread8(dev, port, reg, &data);
-> > +       if (ret)
-> > +               return ret;
-> > +
-> > +       return (data & mask) >> shift;
-> 
-> I assume we can use retrun FIELD_GET(mask, data), since mask is GENMASK
-> format. 
-> 
-> > 
-> > +int ksz_port_set_default_prio(struct dsa_switch *ds, int port, u8
-> > prio)
-> > prio)
-> > +{
-> > +       struct ksz_device *dev = ds->priv;
-> > +       int reg, shift;
-> > +       u8 mask;
-> > +
-> > +       if (prio >= dev->info->num_tx_queues)
-> > +               return -EINVAL;
-> > +
-> > +       ksz_get_defult_port_prio_reg(dev, &reg, &mask, &shift);
-> > +
-> > +       return ksz_prmw8(dev, port, reg, mask, (prio << shift) &
-> > mask);
-> 
-> FIELD_PREP(mask, prio)
 
-Sadly, FIELD_GET() and FIELD_PREP() do not work with dynamic masks.
+...
 
-Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> It gained 20 bytes in the change. Most notably, it gained a 4 byte hole
+> between pred_flags and tcp_clock_cache.
+>
+> I haven't followed the development of these optimizations, and I tried a
+> few trivial things, some of which didn't work, and some of which did.
+> Of those that worked, the most notable one was letting the 2 u64 fields,
+> tcp_clock_cache and tcp_mstamp, be the first members of the group, and
+> moving the __be32 pred_flags right below them.
+>
+> Obviously my level of confidence in the fix is quite low, so it would be
+> great if you could cast an expert eye onto this.
+
+I am on it, do not worry, thanks !
 
