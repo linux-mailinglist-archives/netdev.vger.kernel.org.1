@@ -1,64 +1,50 @@
-Return-Path: <netdev+bounces-85968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D1F489D0ED
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 05:17:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D6F889D10A
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 05:30:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03150281D2E
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 03:17:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B91111C2414D
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 03:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56D2C75809;
-	Tue,  9 Apr 2024 03:17:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A42548F9;
+	Tue,  9 Apr 2024 03:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WYhPB++W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FdL4mJNl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B247757F2;
-	Tue,  9 Apr 2024 03:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF41C2572
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 03:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712632620; cv=none; b=rqxVug048fLLszvtRhpx+htkA25kLxBBQtKDN53jcwPGmlCiUGbgI2mlXkUZvp6FzE85bbwQzCBI2ftM/65HGnKAIPAWsi5XF2E7dtKCVC3rd0Uy8XGoZAdd/d38raCXbpb1fOzyALKcQFkR2LvW+HYDMAmdyrR5gKQMJ++uV5s=
+	t=1712633427; cv=none; b=deK18ykHgSOWj8biDd+Z13gVvkrlcxQ5xeWO7GVG5Bo6rSM9zFwt+H0aCxYuJVxuiwha66XS5sMJcsTkFtvZSs42hx5Q00HbqMHgAe7wAq6S/T0fEUMKcLftF/wyxk6zv/2fWwzH2mAvMH49hcIz3fidNCP65U5Jj5b7Pgd6M5w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712632620; c=relaxed/simple;
-	bh=Z/Z8IlwKg0DOKmCaX2DcqO+CWrYkrLbpU61AvW66MnE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a3Z7OQEYhLIIIX8/ztJFkGuSWU9LEcdh1LlHse9iiblLn5hIPMhtc73NZ1yma0ISaZv0FIMwbNSz+6J4NsPZ6k9zcAkEoBWFHXfEJBrXHIqPJZmGxprzBaVN+eZZGV/ZgoBFbepfxURtJHF6vK8WJlSXZyiXpHknTNsdGy3KKPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WYhPB++W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 358E5C43390;
-	Tue,  9 Apr 2024 03:16:59 +0000 (UTC)
+	s=arc-20240116; t=1712633427; c=relaxed/simple;
+	bh=/cnROwdNL11P9DMvZ+TbXMOX92JS2D235YqPpr3M0+0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=aBlWX60qS7tozygl47OH8VTNBWU8vnNqpGQw7YdILtBmb7I7UNpnsTHNXKWgKzgDFJVP6ZAIZonxBDLH0OHOxyNRPrC9jf78BeKK4jkkeX6ueQQXYjCLl/r5JtA2ycD+C/sbR60/LGbB76WUqXhQLoheOOqM236s6os6hFA4pVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FdL4mJNl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7FC00C433F1;
+	Tue,  9 Apr 2024 03:30:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712632619;
-	bh=Z/Z8IlwKg0DOKmCaX2DcqO+CWrYkrLbpU61AvW66MnE=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WYhPB++WZu/LPm/IFraHVcou/Jgwm5/v7dVc/6pVrA48aVoK3jpA1ccTfnvOf0yOB
-	 9k2zBJjR+s8yPDPdED8tkrjAh7MutSp9xYHa78Fn/ZJ9a4lLVEa8D7eBB/rWB7wYnt
-	 jehETlHI582imUFHtzSCROkmD3W0wf82jSiwkV66uO5fUrB5dvKB1kQ4+pyUUggPpB
-	 0xLhbAKaUFSTnqwZgGOuyyCyAWfjOxQhULkTepGL+QxMg3+LglAU+oyzIPmL8Ek+ir
-	 PW+c8vKieLbWyC+pPFttD8sqjSYO8hjOqrGBkWaadknnzKV4lJBBlcB3LLCdo4DJIN
-	 zDgudzdWWLMIA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	bpf@vger.kernel.org,
-	andrii@kernel.org,
-	mykolal@fb.com,
-	eddyz87@gmail.com,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 4/4] selftests: net: reuse common code in bpf_offload
-Date: Mon,  8 Apr 2024 20:15:49 -0700
-Message-ID: <20240409031549.3531084-5-kuba@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240409031549.3531084-1-kuba@kernel.org>
-References: <20240409031549.3531084-1-kuba@kernel.org>
+	s=k20201202; t=1712633427;
+	bh=/cnROwdNL11P9DMvZ+TbXMOX92JS2D235YqPpr3M0+0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FdL4mJNl4+GArdilWnX9GOiM4iNcOMpkqtb4ZUMSpvOOSILMw98grX7VmoACFzQIv
+	 UaB4K+x+poPENat3/HNm61D69QDncL7C41ig7x50Hb7wFoy6OVCMcuLumuqwBlkuXx
+	 HykcNWGp3humdFBuWAJDXZ1Cc0NBw2wZo0xbzjxpUDXERmuAhVcic7VToQLGrcaZGh
+	 T9q3gWdnpnLIZdF9e4Hn++SeeQchrpyLDT5keHxsQ1zIZJmV2Akek+V98Jlj422lHW
+	 6KkP85iQrmRo9ry4y8Zad/3dlRzLwMkrDiQNSvfmFFLxLg/cQT9wmutaGb/BuuU1hY
+	 OtoM5TMGAzOOQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 69DF0C54BD3;
+	Tue,  9 Apr 2024 03:30:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,296 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 1/2] net: ks8851: Inline ks8851_rx_skb()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171263342743.31710.1700532342959631639.git-patchwork-notify@kernel.org>
+Date: Tue, 09 Apr 2024 03:30:27 +0000
+References: <20240405203204.82062-1-marex@denx.de>
+In-Reply-To: <20240405203204.82062-1-marex@denx.de>
+To: Marek Vasut <marex@denx.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net,
+ u.kleine-koenig@pengutronix.de, andriy.shevchenko@linux.intel.com,
+ dmitry.torokhov@gmail.com, edumazet@google.com, kuba@kernel.org,
+ broonie@kernel.org, pabeni@redhat.com, rkannoth@marvell.com,
+ ronald.wahl@raritan.com, horms@kernel.org
 
-net/lib/py/nsim.py already contains the most useful parts
-of the netdevsim wrapper classes. Reuse them.
+Hello:
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/testing/selftests/net/bpf_offload.py | 120 +++++----------------
- tools/testing/selftests/net/lib/py/nsim.py |   9 +-
- 2 files changed, 35 insertions(+), 94 deletions(-)
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-diff --git a/tools/testing/selftests/net/bpf_offload.py b/tools/testing/selftests/net/bpf_offload.py
-index 76b53ac2c8c6..3efe44f6e92a 100755
---- a/tools/testing/selftests/net/bpf_offload.py
-+++ b/tools/testing/selftests/net/bpf_offload.py
-@@ -29,6 +29,9 @@ import subprocess
- import time
- import traceback
- 
-+from lib.py import NetdevSim, NetdevSimDev
-+
-+
- logfile = None
- log_level = 1
- skip_extack = False
-@@ -145,8 +148,10 @@ netns = [] # net namespaces to be removed
-     if JSON:
-         params += "%s " % (flags["json"])
- 
--    if ns != "":
-+    if ns:
-         ns = "ip netns exec %s " % (ns)
-+    elif ns is None:
-+        ns = ""
- 
-     if include_stderr:
-         ret, stdout, stderr = cmd(ns + name + " " + params + args,
-@@ -334,72 +339,16 @@ def bpftool_prog_load(sample, file_name, maps=[], prog_type="xdp", dev=None,
- 
-         return dfs
- 
--class NetdevSimDev:
-+class BpfNetdevSimDev(NetdevSimDev):
-     """
-     Class for netdevsim bus device and its attributes.
-     """
--    @staticmethod
--    def ctrl_write(path, val):
--        fullpath = os.path.join("/sys/bus/netdevsim/", path)
--        try:
--            with open(fullpath, "w") as f:
--                f.write(val)
--        except OSError as e:
--            log("WRITE %s: %r" % (fullpath, val), -e.errno)
--            raise e
--        log("WRITE %s: %r" % (fullpath, val), 0)
--
--    def __init__(self, port_count=1):
--        addr = 0
--        while True:
--            try:
--                self.ctrl_write("new_device", "%u %u" % (addr, port_count))
--            except OSError as e:
--                if e.errno == errno.ENOSPC:
--                    addr += 1
--                    continue
--                raise e
--            break
--        self.addr = addr
--
--        # As probe of netdevsim device might happen from a workqueue,
--        # so wait here until all netdevs appear.
--        self.wait_for_netdevs(port_count)
--
--        ret, out = cmd("udevadm settle", fail=False)
--        if ret:
--            raise Exception("udevadm settle failed")
--        ifnames = self.get_ifnames()
--
-+    def __init__(self, port_count=1, ns=None):
-+        super().__init__(port_count, ns=ns)
-         devs.append(self)
--        self.dfs_dir = "/sys/kernel/debug/netdevsim/netdevsim%u/" % addr
- 
--        self.nsims = []
--        for port_index in range(port_count):
--            self.nsims.append(NetdevSim(self, port_index, ifnames[port_index]))
--
--    def get_ifnames(self):
--        ifnames = []
--        listdir = os.listdir("/sys/bus/netdevsim/devices/netdevsim%u/net/" % self.addr)
--        for ifname in listdir:
--            ifnames.append(ifname)
--        ifnames.sort()
--        return ifnames
--
--    def wait_for_netdevs(self, port_count):
--        timeout = 5
--        timeout_start = time.time()
--
--        while True:
--            try:
--                ifnames = self.get_ifnames()
--            except FileNotFoundError as e:
--                ifnames = []
--            if len(ifnames) == port_count:
--                break
--            if time.time() < timeout_start + timeout:
--                continue
--            raise Exception("netdevices did not appear within timeout")
-+    def _make_port(self, port_index, ifname):
-+        return BpfNetdevSim(self, port_index, ifname, self.ns)
- 
-     def dfs_num_bound_progs(self):
-         path = os.path.join(self.dfs_dir, "bpf_bound_progs")
-@@ -415,33 +364,20 @@ def bpftool_prog_load(sample, file_name, maps=[], prog_type="xdp", dev=None,
-         return progs
- 
-     def remove(self):
--        self.ctrl_write("del_device", "%u" % (self.addr, ))
-+        super().remove()
-         devs.remove(self)
- 
--    def remove_nsim(self, nsim):
--        self.nsims.remove(nsim)
--        self.ctrl_write("devices/netdevsim%u/del_port" % (self.addr, ),
--                        "%u" % (nsim.port_index, ))
- 
--class NetdevSim:
-+class BpfNetdevSim(NetdevSim):
-     """
-     Class for netdevsim netdevice and its attributes.
-     """
- 
--    def __init__(self, nsimdev, port_index, ifname):
--        # In case udev renamed the netdev to according to new schema,
--        # check if the name matches the port_index.
--        nsimnamere = re.compile("eni\d+np(\d+)")
--        match = nsimnamere.match(ifname)
--        if match and int(match.groups()[0]) != port_index + 1:
--            raise Exception("netdevice name mismatches the expected one")
-+    def __init__(self, nsimdev, port_index, ifname, ns=None):
-+        super().__init__(nsimdev, port_index, ifname, ns=ns)
- 
--        self.nsimdev = nsimdev
--        self.port_index = port_index
--        self.ns = ""
-         self.dfs_dir = "%s/ports/%u/" % (nsimdev.dfs_dir, port_index)
-         self.dfs_refresh()
--        _, [self.dev] = ip("link show dev %s" % ifname)
- 
-     def __getitem__(self, key):
-         return self.dev[key]
-@@ -468,7 +404,7 @@ def bpftool_prog_load(sample, file_name, maps=[], prog_type="xdp", dev=None,
-         raise Exception("Time out waiting for program counts to stabilize want %d/%d, have %d bound, %d loaded" % (bound, total, nbound, nprogs))
- 
-     def set_ns(self, ns):
--        name = "1" if ns == "" else ns
-+        name = ns if ns else "1"
-         ip("link set dev %s netns %s" % (self.dev["ifname"], name), ns=self.ns)
-         self.ns = ns
- 
-@@ -744,7 +680,7 @@ def bpftool_prog_load(sample, file_name, maps=[], prog_type="xdp", dev=None,
-     start_test("Test multi-attachment XDP - device remove...")
-     simdev.remove()
- 
--    simdev = NetdevSimDev()
-+    simdev = BpfNetdevSimDev()
-     sim, = simdev.nsims
-     sim.set_ethtool_tc_offloads(True)
-     return [simdev, sim]
-@@ -809,13 +745,13 @@ netns = []
-     bytecode = bpf_bytecode("1,6 0 0 4294967295,")
- 
-     start_test("Test destruction of generic XDP...")
--    simdev = NetdevSimDev()
-+    simdev = BpfNetdevSimDev()
-     sim, = simdev.nsims
-     sim.set_xdp(obj, "generic")
-     simdev.remove()
-     bpftool_prog_list_wait(expected=0)
- 
--    simdev = NetdevSimDev()
-+    simdev = BpfNetdevSimDev()
-     sim, = simdev.nsims
-     sim.tc_add_ingress()
- 
-@@ -967,7 +903,7 @@ netns = []
-     simdev.remove()
-     bpftool_prog_list_wait(expected=0)
- 
--    simdev = NetdevSimDev()
-+    simdev = BpfNetdevSimDev()
-     sim, = simdev.nsims
-     sim.set_ethtool_tc_offloads(True)
- 
-@@ -976,7 +912,7 @@ netns = []
-     simdev.remove()
-     bpftool_prog_list_wait(expected=0)
- 
--    simdev = NetdevSimDev()
-+    simdev = BpfNetdevSimDev()
-     sim, = simdev.nsims
-     sim.set_ethtool_tc_offloads(True)
- 
-@@ -1080,7 +1016,7 @@ netns = []
-     bpftool_prog_list_wait(expected=0)
- 
-     start_test("Test attempt to use a program for a wrong device...")
--    simdev2 = NetdevSimDev()
-+    simdev2 = BpfNetdevSimDev()
-     sim2, = simdev2.nsims
-     sim2.set_xdp(obj, "offload")
-     pin_file, pinned = pin_prog("/sys/fs/bpf/tmp")
-@@ -1169,7 +1105,7 @@ netns = []
-     clean_up()
-     bpftool_prog_list_wait(expected=0)
- 
--    simdev = NetdevSimDev()
-+    simdev = BpfNetdevSimDev()
-     sim, = simdev.nsims
-     map_obj = bpf_obj("sample_map_ret0.bpf.o")
-     start_test("Test loading program with maps...")
-@@ -1201,7 +1137,7 @@ netns = []
-     clean_up()
-     bpftool_prog_list_wait(expected=0)
- 
--    simdev = NetdevSimDev()
-+    simdev = BpfNetdevSimDev()
-     sim, = simdev.nsims
- 
-     start_test("Test map update (no flags)...")
-@@ -1285,14 +1221,14 @@ netns = []
-     bpftool_map_list_wait(expected=0)
-     simdev.remove()
- 
--    simdev = NetdevSimDev()
-+    simdev = BpfNetdevSimDev()
-     sim, = simdev.nsims
-     sim.set_xdp(map_obj, "offload", JSON=False) # map fixup msg breaks JSON
-     simdev.remove()
-     bpftool_map_list_wait(expected=0)
- 
-     start_test("Test map creation fail path...")
--    simdev = NetdevSimDev()
-+    simdev = BpfNetdevSimDev()
-     sim, = simdev.nsims
-     sim.dfs["bpf_map_accept"] = "N"
-     ret, _ = sim.set_xdp(map_obj, "offload", JSON=False, fail=False)
-@@ -1302,9 +1238,9 @@ netns = []
-     simdev.remove()
- 
-     start_test("Test multi-dev ASIC program reuse...")
--    simdevA = NetdevSimDev()
-+    simdevA = BpfNetdevSimDev()
-     simA, = simdevA.nsims
--    simdevB = NetdevSimDev(3)
-+    simdevB = BpfNetdevSimDev(3)
-     simB1, simB2, simB3 = simdevB.nsims
-     sims = (simA, simB1, simB2, simB3)
-     simB = (simB1, simB2, simB3)
-diff --git a/tools/testing/selftests/net/lib/py/nsim.py b/tools/testing/selftests/net/lib/py/nsim.py
-index b2d696e12805..97457aca7e08 100644
---- a/tools/testing/selftests/net/lib/py/nsim.py
-+++ b/tools/testing/selftests/net/lib/py/nsim.py
-@@ -21,8 +21,11 @@ from .utils import cmd, ip
-         if match and int(match.groups()[0]) != port_index + 1:
-             raise Exception("netdevice name mismatches the expected one")
- 
-+        self.ifname = ifname
-         self.nsimdev = nsimdev
-         self.port_index = port_index
-+        self.ns = ns
-+        self.dfs_dir = "%s/ports/%u/" % (nsimdev.dfs_dir, port_index)
-         ret = ip("-j link show dev %s" % ifname, ns=ns)
-         self.dev = json.loads(ret.stdout)[0]
- 
-@@ -79,8 +82,10 @@ from .utils import cmd, ip
- 
-         self.nsims = []
-         for port_index in range(port_count):
--            self.nsims.append(NetdevSim(self, port_index, ifnames[port_index],
--                                        ns=ns))
-+            self.nsims.append(self._make_port(port_index, ifnames[port_index]))
-+
-+    def _make_port(self, port_index, ifname):
-+        return NetdevSim(self, port_index, ifname, self.ns)
- 
-     def get_ifnames(self):
-         ifnames = []
+On Fri,  5 Apr 2024 22:30:39 +0200 you wrote:
+> Both ks8851_rx_skb_par() and ks8851_rx_skb_spi() call netif_rx(skb),
+> inline the netif_rx(skb) call directly into ks8851_common.c and drop
+> the .rx_skb callback and ks8851_rx_skb() wrapper. This removes one
+> indirect call from the driver, no functional change otherwise.
+> 
+> Signed-off-by: Marek Vasut <marex@denx.de>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2,1/2] net: ks8851: Inline ks8851_rx_skb()
+    https://git.kernel.org/netdev/net/c/f96f700449b6
+  - [net,v2,2/2] net: ks8851: Handle softirqs at the end of IRQ thread to fix hang
+    https://git.kernel.org/netdev/net/c/be0384bf599c
+
+You are awesome, thank you!
 -- 
-2.44.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
