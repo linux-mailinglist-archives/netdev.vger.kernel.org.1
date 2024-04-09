@@ -1,154 +1,226 @@
-Return-Path: <netdev+bounces-85949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC26C89CFF7
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 03:45:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 795DF89D039
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 04:07:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46C5AB21815
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 01:45:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 089BC28495A
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 02:07:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A69D4E1CA;
-	Tue,  9 Apr 2024 01:44:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="OxJbJBS+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CFDD4EB41;
+	Tue,  9 Apr 2024 02:07:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D32110A;
-	Tue,  9 Apr 2024 01:44:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F7E4EB3A
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 02:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712627098; cv=none; b=b+NdToi3wprJFJfcUy7JB7Fte9UAPwTuDrVZD01EIr7z52j2eV+wc3vvTHNVNZmHCnB/bpzqaZqm4RsC/uhSqunnvFmuZ4X7JG2YWKHRrP65hB8VI43Q1wn4eeGoJfDy/THFb7xgNjGs785hQBx5QKgD/H9RfhqYW+fbpb5yP3w=
+	t=1712628469; cv=none; b=uvin5k77G91qFgpQliuqTcHDi12t1EPIOAbUBXugYTqJ73cBallOwLum9ly5ZdvUICoxv+FtB6uOyQSPOcgbx5jJe6XAva2Frn2jRNEqbHhap7e2VivIckWJ3H/eUONjAoKLjpzo9e8RwH8LfSjz4SIPAaRnKSwwZlo8+P9yWE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712627098; c=relaxed/simple;
-	bh=j7urtP4ouQoNOdaRnsPEz8WC+3ThBpb8ls9QDzEF4Eo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hTCv5bJezaT1uopkKDogo2R73n8qb8GVKTpP834bN1WbSz+ouPSK/Ds+ASpL10A/2DxOVpJFNPg9+cK+L8Ie0PamJTFFb3s1xRuM05gy8aZpRi8h8Ow4waWc99NAponyVKMrq9rCiPoP6knIWndozwDnPf26lVyeSrXZKlGX31c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=OxJbJBS+; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1712627086; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=hRt60i/N6X7YihbK5ksUh4m+JDUuCca3dbuWQD3MwgY=;
-	b=OxJbJBS+f2iklXpZHfajm1L91ez6DVDqSYOZPnUq4q83H/xsF8EhctjkaoXEgrgbGWsu0wpOkcHqd+72E2digUy5zrOTxeWlL4jPuti+ok4TiqOdDU0Pgrr7RfItDoJp7LLOKZPXVg/DB/FRGMb3gPUxD2kRneQUBYPXsv1TS5M=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R701e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0W4CYNQs_1712627084;
-Received: from 30.221.129.235(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W4CYNQs_1712627084)
-          by smtp.aliyun-inc.com;
-          Tue, 09 Apr 2024 09:44:46 +0800
-Message-ID: <46e8e227-8058-4062-a9db-6b9c774f63cc@linux.alibaba.com>
-Date: Tue, 9 Apr 2024 09:44:44 +0800
+	s=arc-20240116; t=1712628469; c=relaxed/simple;
+	bh=TOuiGi6IkRgg2lEXRK7f5/JPL/u4/yYafD7FOpHuVa4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=poUMrkXfN1CjfoSUvxlexaxEqkicqdu3B+Oq8RU5M7InKvfMfsmZt3idEr4yNuZBPF8Arwzdy+10J77WxRCCaK8yTzQT9ApA1ppeSxgKtl5rpCdQiC7U2pvlZR8RhnflZ+jGuUG6Jh5xLEqOkxASY3le8wYDzwTUffd3ezCQrk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4VD8S941qJz1ylT4;
+	Tue,  9 Apr 2024 10:05:29 +0800 (CST)
+Received: from dggpemd100005.china.huawei.com (unknown [7.185.36.102])
+	by mail.maildlp.com (Postfix) with ESMTPS id BF9CF1A0172;
+	Tue,  9 Apr 2024 10:07:43 +0800 (CST)
+Received: from localhost.huawei.com (10.137.16.203) by
+ dggpemd100005.china.huawei.com (7.185.36.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Tue, 9 Apr 2024 10:07:43 +0800
+From: renmingshuai <renmingshuai@huawei.com>
+To: <stephen@networkplumber.org>
+CC: <dsahern@gmail.com>, <liaichun@huawei.com>, <netdev@vger.kernel.org>,
+	<renmingshuai@huawei.com>, <yanan@huawei.com>
+Subject: Re: [PATCH] iplink: add an option to set IFLA_EXT_MASK attribute
+Date: Tue, 9 Apr 2024 09:53:50 +0800
+Message-ID: <20240409015350.52377-1-renmingshuai@huawei.com>
+X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20240408172955.13511188@hermes.local>
+References: <20240408172955.13511188@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v5 04/11] net/smc: implement some unsupported
- operations of loopback-ism
-To: Niklas Schnelle <schnelle@linux.ibm.com>,
- Gerd Bayer <gbayer@linux.ibm.com>, wintera@linux.ibm.com,
- twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
- agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240324135522.108564-1-guwen@linux.alibaba.com>
- <20240324135522.108564-5-guwen@linux.alibaba.com>
- <3122eece5b484abcf8d23f85d6c18c36f0b939ff.camel@linux.ibm.com>
- <1db6ccab-b49f-45d2-a93c-05b0f79371a3@linux.alibaba.com>
- <3b3ff37643e9030ec1246e67720683a2cf5660e5.camel@linux.ibm.com>
- <7a0fc481-658e-4c99-add7-ccbd5f9dce1e@linux.alibaba.com>
- <7291dd1b2d16fd9bbd90988ac5bcc3a46d17e3f4.camel@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <7291dd1b2d16fd9bbd90988ac5bcc3a46d17e3f4.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemd100005.china.huawei.com (7.185.36.102)
 
-
-
-On 2024/4/4 23:15, Niklas Schnelle wrote:
-> On Thu, 2024-04-04 at 21:12 +0800, Wen Gu wrote:
->>
->> On 2024/4/4 19:42, Niklas Schnelle wrote:
->>> On Thu, 2024-04-04 at 17:32 +0800, Wen Gu wrote:
->>>>
->>>> On 2024/4/4 00:25, Gerd Bayer wrote:
->>>>> On Sun, 2024-03-24 at 21:55 +0800, Wen Gu wrote:
->>>>>> This implements some operations that loopback-ism does not support
->>>>>> currently:
->>>>>>     - vlan operations, since there is no strong use-case for it.
->>>>>>     - signal_event operations, since there is no event to be processed
->>>>>> by the loopback-ism device.
->>>>>
->>>>> Hi Wen,
->>>>>
->>>>> I wonder if the these operations that are not supported by loopback-ism
->>>>> should rather be marked "optional" in the struct smcd_ops, and the
->>>>> calling code should call these only when they are implemented.
->>>>>
->>>>> Of course this would mean more changes to net/smc/smc_core.c - but
->>>>> loopback-ism could omit these "boiler-plate" functions.
->>>>>
->>>>
->>>> Hi Gerd.
->>>>
->>>> Thank you for the thoughts! I agree that checks like 'if(smcd->ops->xxx)'
->>>> can avoid the device driver from implementing unsupported operations. But I
->>>> am afraid that which operations need to be defined as 'optional' may differ
->>>> from different device perspectives (e.g. for loopback-ism they are vlan-related
->>>> opts and signal_event). So I perfer to simply let the smc protocol assume
->>>> that all operations have been implemented, and let drivers to decide which
->>>> ones are unsupported in implementation. What do you think?
->>>>
->>>> Thanks!
->>>>
->>>
->>> I agree with Gerd, in my opinion it is better to document ops as
->>> optional and then allow their function pointers to be NULL and check
->>> for that. Acting like they are supported and then they turn out to be
->>> nops to me seems to contradict the principle of least surprises. I also
->>> think we can find a subset of mandatory ops without which SMC-D is
->>> impossible and then everything else should be optional.
->>
->> I see. If we all agree to classify smcd_ops into mandatory and optional ones,
->> I'll add a patch to mark the optional ops and check if they are implemented.
+> > >> Kernel has add IFLA_EXT_MASK attribute for indicating that certain
+> > >> extended ifinfo values are requested by the user application. The ip
+> > >> link show cmd always request VFs extended ifinfo.
+> > >> 
+> > >> RTM_GETLINK for greater than about 220 VFs truncates IFLA_VFINFO_LIST
+> > >> due to the maximum reach of nlattr's nla_len being exceeded.
+> > >> As a result, ip link show command only show the truncated VFs info
+> > >> sucn as:
+> > >> 
+> > >>     #ip link show dev eth0
+> > >>     1: eth0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 ...
+> > >>         link/ether ...
+> > >>         vf 0     link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff
+> > >>         ...
+> > >>     Truncated VF list: eth0
+> > >> 
+> > >> Add an option to set IFLA_EXT_MASK attribute and users can choose to
+> > >> show the extended ifinfo or not.
+> > >> 
+> > >> Signed-off-by: Mingshuai Ren <renmingshuai@huawei.com>  
+> > >
+> > > Adding a new option with on/off seems like more than is necessary.
+> > > If we need an option it should just be one word. Any new filter should
+> > > have same conventions as existing filters.  Maybe 'novf'
+> > > 
+> > > And it looks like not sending IFLA_EXT_MASK will break the changes
+> > > made for the link filter already done for VF's.  
+> > 
+> > Thanks for your reply. As you suggested, I've added an option
+> > named noVF, which has same conventions as existing filter.
+> > Also, this new patch does not send RTEXT_FILTER_VF instead of
+> > IFLA_EXT_MASK, and it does not break the changes made for the link
+> > filter already done for VF's.
+> > Please review it again.
 > 
-> Keep in mind I don't speak for the SMC maintainers but that does sound
-> reasonable to me.
-> 
+> Did you read my comment. Any new option should look the same as all
+> the other options in the command.  Is there any option to ip commands
+> that uses mixed case? No. Please stick to lower case.
 
-Hi Wenjia and Jan, do you have any comments on this and [1]? Thanks!
+Apologies for not considering the use of lower case. I have replaced noVF with novf.
+Please review it again. Thanks a lot.
+By the way, do I need to submit a new patch?
 
-[1] https://lore.kernel.org/netdev/60b4aec0b4bf4474d651b653c86c280dafc4518a.camel@linux.ibm.com/
+---
+ ip/ip_common.h        |  1 +
+ ip/ipaddress.c        | 15 ++++++++++-----
+ ip/iplink.c           |  2 +-
+ man/man8/ip-link.8.in |  7 ++++++-
+ 4 files changed, 18 insertions(+), 7 deletions(-)
 
->>
->>>
->>> As a first guess I think the following options may be mandatory:
->>>
->>> * query_remote_gid()
->>> * register_dmb()/unregister_dmb()
->>> * move_data()
->>>     For this one could argue that either move_data() or
->>>     attach_dmb()/detach_dmb() is required though personally I would
->>>     prefer to always have move_data() as a fallback and simple API
->>> * supports_v2()
->>> * get_local_gid()
->>> * get_chid()
->>> * get_dev()
->> I agree with this classification. Just one point, maybe we can take
->> supports_v2() as an optional ops, like support_dmb_nocopy()? e.g. if
->> it is not implemented, we treat it as an ISMv1.
->>
->> Thanks!
-> 
-> Interpreting a NULL supports_v2() as not supporting v2 sounds
-> reasonable to me.
+diff --git a/ip/ip_common.h b/ip/ip_common.h
+index b65c2b41..d3645a2c 100644
+--- a/ip/ip_common.h
++++ b/ip/ip_common.h
+@@ -30,6 +30,7 @@ struct link_filter {
+ 	int target_nsid;
+ 	bool have_proto;
+ 	int proto;
++	int vfinfo;
+ };
+ 
+ const char *get_ip_lib_dir(void);
+diff --git a/ip/ipaddress.c b/ip/ipaddress.c
+index e536912f..e7e5ce76 100644
+--- a/ip/ipaddress.c
++++ b/ip/ipaddress.c
+@@ -2029,10 +2029,11 @@ static int ipaddr_flush(void)
+ 
+ static int iplink_filter_req(struct nlmsghdr *nlh, int reqlen)
+ {
+-	__u32 filt_mask;
++	__u32 filt_mask = 0;
+ 	int err;
+ 
+-	filt_mask = RTEXT_FILTER_VF;
++	if (!filter.vfinfo)
++		filt_mask |= RTEXT_FILTER_VF;
+ 	if (!show_stats)
+ 		filt_mask |= RTEXT_FILTER_SKIP_STATS;
+ 	err = addattr32(nlh, reqlen, IFLA_EXT_MASK, filt_mask);
+@@ -2070,12 +2071,13 @@ static int ipaddr_link_get(int index, struct nlmsg_chain *linfo)
+ 		.i.ifi_family = filter.family,
+ 		.i.ifi_index = index,
+ 	};
+-	__u32 filt_mask = RTEXT_FILTER_VF;
++	__u32 filt_mask = 0;
+ 	struct nlmsghdr *answer;
+ 
++	if (!filter.vfinfo)
++		filt_mask |= RTEXT_FILTER_VF;
+ 	if (!show_stats)
+ 		filt_mask |= RTEXT_FILTER_SKIP_STATS;
+-
+ 	addattr32(&req.n, sizeof(req), IFLA_EXT_MASK, filt_mask);
+ 
+ 	if (rtnl_talk(&rth, &req.n, &answer) < 0) {
+@@ -2139,6 +2141,7 @@ static int ipaddr_list_flush_or_save(int argc, char **argv, int action)
+ 	ipaddr_reset_filter(oneline, 0);
+ 	filter.showqueue = 1;
+ 	filter.family = preferred_family;
++	filter.vfinfo = 0;
+ 
+ 	if (action == IPADD_FLUSH) {
+ 		if (argc <= 0) {
+@@ -2221,6 +2224,8 @@ static int ipaddr_list_flush_or_save(int argc, char **argv, int action)
+ 				invarg("\"proto\" value is invalid\n", *argv);
+ 			filter.have_proto = true;
+ 			filter.proto = proto;
++		} else if (strcmp(*argv, "novf") == 0) {
++			filter.vfinfo = -1;
+ 		} else {
+ 			if (strcmp(*argv, "dev") == 0)
+ 				NEXT_ARG();
+@@ -2274,7 +2279,7 @@ static int ipaddr_list_flush_or_save(int argc, char **argv, int action)
+ 	 * the link device
+ 	 */
+ 	if (filter_dev && filter.group == -1 && do_link == 1) {
+-		if (iplink_get(filter_dev, RTEXT_FILTER_VF) < 0) {
++		if (iplink_get(filter_dev, filter.vfinfo < 0 ? 0 : RTEXT_FILTER_VF) < 0) {
+ 			perror("Cannot send link get request");
+ 			delete_json_obj();
+ 			exit(1);
+diff --git a/ip/iplink.c b/ip/iplink.c
+index 95314af5..1bb4a998 100644
+--- a/ip/iplink.c
++++ b/ip/iplink.c
+@@ -111,7 +111,7 @@ void iplink_usage(void)
+ 		"		[ gro_max_size BYTES ] [ gro_ipv4_max_size BYTES ]\n"
+ 		"\n"
+ 		"	ip link show [ DEVICE | group GROUP ] [up] [master DEV] [vrf NAME] [type TYPE]\n"
+-		"		[nomaster]\n"
++		"		[nomaster] [ novf ]\n"
+ 		"\n"
+ 		"	ip link xstats type TYPE [ ARGS ]\n"
+ 		"\n"
+diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
+index 31e2d7f0..066ad874 100644
+--- a/man/man8/ip-link.8.in
++++ b/man/man8/ip-link.8.in
+@@ -202,7 +202,8 @@ ip-link \- network device configuration
+ .IR ETYPE " ] ["
+ .B vrf
+ .IR NAME " ] ["
+-.BR nomaster " ]"
++.BR nomaster " ] ["
++.BR novf " ]"
+ 
+ .ti -8
+ .B ip link xstats
+@@ -2898,6 +2899,10 @@ output.
+ .B nomaster
+ only show devices with no master
+ 
++.TP
++.B novf
++only show devices with no VF info
++
+ .SS  ip link xstats - display extended statistics
+ 
+ .TP
+-- 
+2.33.0
+
 
