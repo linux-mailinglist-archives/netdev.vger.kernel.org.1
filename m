@@ -1,268 +1,358 @@
-Return-Path: <netdev+bounces-86265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9ECAF89E48E
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 22:39:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E4DB89E49A
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 22:42:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2DC6B20EB9
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 20:39:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A7B0B212CD
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 20:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBAF158849;
-	Tue,  9 Apr 2024 20:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3C63158855;
+	Tue,  9 Apr 2024 20:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="WGPOEFQc"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="AGpeJL1N"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AAD12A14F
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 20:39:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD507370
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 20:41:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712695184; cv=none; b=R8abWkfqRSoiwOL+IAFOJqt44sqzXJyZT8HdB7H0fiCWTwGlqdCwoEvdGMpgxHCgBJGjimZz+M40rAphdgjVBdWdl7dy0DME6yncaLc8nCkgu/9jy2sFCTi11llYAy2xOhgfwPDvZLGvK1v5Y8yZj/ewHri2WPChWsQMikaIl8o=
+	t=1712695311; cv=none; b=H+3VMfclqzWExJEkPjq5O82tLrqo6WXKVxB4+Y/KoEMx148ifT77dqeCFMq6dydyFZaCM6QhXC+7UfDsKvRtPEC+LrZcAgPXqLAmj40JFE38dKF1BTq80fYCVon16VAXgGuKkOG+oPL7+Pn4KCpx/nlh1HxGUpHGCjWZDLjdiYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712695184; c=relaxed/simple;
-	bh=kxt1xaIGiRfKn8bnmgxnEvhy1erQkY1WkntNJvIErrk=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=UvgnEXlMR+g3uc+6LkyChq2qFL5H0KWTEhzLEk5MO2WAooXgGnQgxv4RIoKmq5W5FFPBLOQiS55DXq0eqNGNTlEg7mOQwVV12wYZlDL12DaBDcQgKD1Z8/Clw4GJ2GVXl5hQqayJs1XyHdNYfxEH9wrPPDtgZQLdx+pd5z2ubW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=WGPOEFQc; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 6E93F4015F
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 20:39:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1712695176;
-	bh=3LgqTXD4OHIXECybmpM50M/MOaCc4Fc1qQRvh2f+gFA=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=WGPOEFQcCWexpnki8tCZaLyovh4ShOm7t75Jsl+zZ/wI4F/oW68SVAjB4RUcmq7m2
-	 njOjYMLJBc5AyJ3qulY4ur4pKgM1BkLwD3TVui7e8aJEI64lUxqSUW7mDI1yLaanqo
-	 NqmEbkzdHrCyJArjBY/b1k/Nmbr5/ZryX6gaREW3+v6RZ3QmpAk4TLH8MuJSVWNOEN
-	 SmMtVzhqBe/MBOI+1hZ+WbdLsCHPOfg2vpnWHD5c4t8EW0Xpif3SK+uxL4cbGliBUd
-	 jK0edcSa28Ez/wsMdSWVeG+GY4KMq/O/p196VLTkpIXf2R8Yd+zMJ2oljbH+A9fDvv
-	 O/LWO0z+Caf/A==
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2a53909676fso1736596a91.3
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 13:39:36 -0700 (PDT)
+	s=arc-20240116; t=1712695311; c=relaxed/simple;
+	bh=8uJ1vm1NnJVgCom2OIp3mk6gnRet2EiLZCzaPgm11Gs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eI0em1gPtzxPxDLJnGsUo2IVXuWMtpvvXLxIQnpBpisqnk4ZsO0ZXf/y1Fn3ay3+WsqLTo5mHcvbBkOV333z2giWyLh9tYIjJ2lKh5lHEKeeszX5Qk4n0zahe7/nxDe9WftPF/qAYQbcrgQyNs6oYoGpR1xQXX6M3KYUZI+fQ+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=AGpeJL1N; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6ecf05fd12fso5044585b3a.2
+        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 13:41:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1712695309; x=1713300109; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PGyJX38wnFqYGBNAj4KjT/ne2bOJ/gMGIdiV7jXYLkA=;
+        b=AGpeJL1NViBN2LGyHfUxV98G9ZIY5cyAeS4Mfmi99grZpN9QXyxkNBw0EcLUOv4mJu
+         OHdAjVCEa1e7AmzfBwmJZKVB63rGAe8S57QznXwza81FXm/CynNWAqLKwhl5dnTj0a74
+         9iWJxx4dJG4tgIcFkKwDUQXI/u9di8+6W12dM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712695175; x=1713299975;
-        h=message-id:date:content-transfer-encoding:content-id:mime-version
-         :comments:references:in-reply-to:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3LgqTXD4OHIXECybmpM50M/MOaCc4Fc1qQRvh2f+gFA=;
-        b=J9onfJLSw03DgOl9Bji2ofjxg4MkxOvY8aeiuc4MPUd2+D2XpzwScACsLXVLEfVlTx
-         f7xrxA6IIu8Hy6lNVFJKVrXlNbEfZ+rj776KuNQ8L80PU5zLJiPglU3mJqo019RV4l4l
-         3UcOkJWu7YVAY3aMsdxkCWfCLx++xpr5KOxunJa0YUthvpVQBKHolhOAr0cXe8T8aRj/
-         fo166rlgE1VaDZoaFJ6U0qOBFPSj4s47bMhiHwpiKXB0xWhyYX9/JmNMOI90p5c2iQ1p
-         dD7mUf5wJasu023WqEpmaLuKC0+eV80P8wXHShCQQAGNFDUc+DeCAtQ8UCsRy6WQ2X5A
-         aAfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV0Hw9e5qfN3uZw3gz8Ve03eG+gDZRWL3AXHlbZf9xyGW51RMnFjznVxUdx4nXkXOodTeQb3pj86Joj4THiPHKZSfDSc10a
-X-Gm-Message-State: AOJu0Yzt3QekDJdE5J+0RorxCh3KewlPYVA8mUKbpewvFc1d2wL/GyRQ
-	08L8aJCbxMYCC2rjzC+JforhtKUbRvjlf8wXTcQVy5hz2esLP3P35vG0IsTED7Sgo5Lty3Ph4oK
-	hjRK4AkcTaQUPs9PMCtarGxyCmyDM75/aVZxasDzexutPPcTNSS38QQMm0k0X8xwfW198ig==
-X-Received: by 2002:a17:90a:bf15:b0:29f:ef34:3004 with SMTP id c21-20020a17090abf1500b0029fef343004mr805982pjs.43.1712695174767;
-        Tue, 09 Apr 2024 13:39:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEoGAF0CYRF0Bztmk+nxl4gdACM9zZDWlUkJyF49N3CyvmX3cBdMc/jHGmQgBHUyY4hKJm0hg==
-X-Received: by 2002:a17:90a:bf15:b0:29f:ef34:3004 with SMTP id c21-20020a17090abf1500b0029fef343004mr805962pjs.43.1712695174113;
-        Tue, 09 Apr 2024 13:39:34 -0700 (PDT)
-Received: from famine.localdomain ([50.125.80.253])
-        by smtp.gmail.com with ESMTPSA id lw14-20020a17090b180e00b0029c7963a33fsm14034pjb.10.2024.04.09.13.39.33
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 09 Apr 2024 13:39:33 -0700 (PDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 5F938604B6; Tue,  9 Apr 2024 13:39:33 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 57C2D9FA74;
-	Tue,  9 Apr 2024 13:39:33 -0700 (PDT)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: Eric Dumazet <edumazet@google.com>
-cc: "David S . Miller" <davem@davemloft.net>,
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-    Andy Gospodarek <andy@greyhouse.net>, netdev@vger.kernel.org,
-    eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 3/3] bonding: no longer use RTNL in bonding_show_queue_id()
-In-reply-to: <20240408190437.2214473-4-edumazet@google.com>
-References: <20240408190437.2214473-1-edumazet@google.com> <20240408190437.2214473-4-edumazet@google.com>
-Comments: In-reply-to Eric Dumazet <edumazet@google.com>
-   message dated "Mon, 08 Apr 2024 19:04:37 -0000."
-X-Mailer: MH-E 8.6+git; nmh 1.6; Emacs 29.0.50
+        d=1e100.net; s=20230601; t=1712695309; x=1713300109;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PGyJX38wnFqYGBNAj4KjT/ne2bOJ/gMGIdiV7jXYLkA=;
+        b=ZJQFLj82PZDxBR8u/7coKYo1hUyZnMHqSoK2eFAf9DdmRg1Ack0UVE4SNrSNBjmIlu
+         zQB6KhZ+ngtv3bTjLz528VbVbfEV4l9legQgWx9Ppf2wXBFYBGzyelkHAcwNQ7uSUYxj
+         m0XAEUpML+vyi+izUMCPPNapjocqkubwm6jxKccXG/dCHneq5DHC5IkGYEhyIwNF5e32
+         EOKiSEHACH1vmFpVtUd5XIoZT0MGxqr4CXpwJM6xrpcZ8oPNjQz0nD1dJ7tskOd5VdRD
+         PspWxIGMeTPSYhD0fzpHXVTugGhDzn5jOtQ+ZMv9wrdtIJ9rWBwIh0Up9XhSL4SS3qLV
+         2ByA==
+X-Gm-Message-State: AOJu0Ywrc+XuZKJWkVMpIexMLQdUMImrMyuIEBQYYhNS7Vnd/Xb+TqAa
+	BvIYXtdaLsQGaMymSO89Mj2pxCE26DFMgWGi9gefooOhNCm6Q6ZcpR27SkrzoA==
+X-Google-Smtp-Source: AGHT+IEe0ADaLmADUdbDdLb3V7fh3EiKEHkEjIiZQFUQhU0n24mY9XPkPkX28/VeTktkovBO8/HfMQ==
+X-Received: by 2002:a05:6a20:3258:b0:1a7:8978:a6b1 with SMTP id hm24-20020a056a20325800b001a78978a6b1mr933700pzc.16.1712695308894;
+        Tue, 09 Apr 2024 13:41:48 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id v20-20020aa78514000000b006e740d23674sm9054763pfn.140.2024.04.09.13.41.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Apr 2024 13:41:46 -0700 (PDT)
+Message-ID: <4826747e-0dd5-4ab9-af02-9d17a1ab7358@broadcom.com>
+Date: Tue, 9 Apr 2024 13:41:43 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <17497.1712695173.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 09 Apr 2024 13:39:33 -0700
-Message-ID: <17498.1712695173@famine>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: genet: Fixup EEE
+To: Andrew Lunn <andrew@lunn.ch>, Doug Berger <opendmb@gmail.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: netdev@vger.kernel.org
+References: <20240408-stmmac-eee-v1-1-3d65d671c06b@lunn.ch>
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20240408-stmmac-eee-v1-1-3d65d671c06b@lunn.ch>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000008665990615aff392"
 
-Eric Dumazet <edumazet@google.com> wrote:
+--0000000000008665990615aff392
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
->Annotate lockless reads of slave->queue_id.
->
->Annotate writes of slave->queue_id.
->
->Switch bonding_show_queue_id() to rcu_read_lock()
->and bond_for_each_slave_rcu().
+On 4/8/24 17:54, Andrew Lunn wrote:
+> The enabling/disabling of EEE in the MAC should happen as a result of
+> auto negotiation. So move the enable/disable into bcmgenet_mii_setup()
+> which gets called by phylib when there is a change in link status.
+> 
+> bcmgenet_set_eee() now just writes the LPI timer value to the
+> hardware.  Everything else is passed to phylib, so it can correctly
+> setup the PHY.
+> 
+> bcmgenet_get_eee() relies on phylib doing most of the work, the MAC
+> driver just adds the LPI timer value from hardware.
+> 
+> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+> ---
+>   drivers/net/ethernet/broadcom/genet/bcmgenet.c | 26 ++++++--------------------
+>   drivers/net/ethernet/broadcom/genet/bcmgenet.h |  6 +-----
+>   drivers/net/ethernet/broadcom/genet/bcmmii.c   |  7 +------
+>   3 files changed, 8 insertions(+), 31 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> index b1f84b37032a..c090b519255a 100644
+> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+> @@ -1272,13 +1272,14 @@ static void bcmgenet_get_ethtool_stats(struct net_device *dev,
+>   	}
+>   }
+>   
+> -void bcmgenet_eee_enable_set(struct net_device *dev, bool enable,
+> -			     bool tx_lpi_enabled)
+> +void bcmgenet_eee_enable_set(struct net_device *dev, bool enable)
+>   {
+>   	struct bcmgenet_priv *priv = netdev_priv(dev);
+> -	u32 off = priv->hw_params->tbuf_offset + TBUF_ENERGY_CTRL;
+> +	u32 off;
+>   	u32 reg;
+>   
+> +	off = priv->hw_params->tbuf_offset + TBUF_ENERGY_CTRL;
+> +
+>   	if (enable && !priv->clk_eee_enabled) {
+>   		clk_prepare_enable(priv->clk_eee);
+>   		priv->clk_eee_enabled = true;
+> @@ -1293,7 +1294,7 @@ void bcmgenet_eee_enable_set(struct net_device *dev, bool enable,
+>   
+>   	/* Enable EEE and switch to a 27Mhz clock automatically */
+>   	reg = bcmgenet_readl(priv->base + off);
+> -	if (tx_lpi_enabled)
+> +	if (enable)
+>   		reg |= TBUF_EEE_EN | TBUF_PM_EN;
+>   	else
+>   		reg &= ~(TBUF_EEE_EN | TBUF_PM_EN);
+> @@ -1311,15 +1312,11 @@ void bcmgenet_eee_enable_set(struct net_device *dev, bool enable,
+>   		clk_disable_unprepare(priv->clk_eee);
+>   		priv->clk_eee_enabled = false;
+>   	}
+> -
+> -	priv->eee.eee_enabled = enable;
+> -	priv->eee.tx_lpi_enabled = tx_lpi_enabled;
+>   }
+>   
+>   static int bcmgenet_get_eee(struct net_device *dev, struct ethtool_keee *e)
+>   {
+>   	struct bcmgenet_priv *priv = netdev_priv(dev);
+> -	struct ethtool_keee *p = &priv->eee;
+>   
+>   	if (GENET_IS_V1(priv))
+>   		return -EOPNOTSUPP;
+> @@ -1327,7 +1324,6 @@ static int bcmgenet_get_eee(struct net_device *dev, struct ethtool_keee *e)
+>   	if (!dev->phydev)
+>   		return -ENODEV;
+>   
+> -	e->tx_lpi_enabled = p->tx_lpi_enabled;
+>   	e->tx_lpi_timer = bcmgenet_umac_readl(priv, UMAC_EEE_LPI_TIMER);
+>   
+>   	return phy_ethtool_get_eee(dev->phydev, e);
+> @@ -1336,8 +1332,6 @@ static int bcmgenet_get_eee(struct net_device *dev, struct ethtool_keee *e)
+>   static int bcmgenet_set_eee(struct net_device *dev, struct ethtool_keee *e)
+>   {
+>   	struct bcmgenet_priv *priv = netdev_priv(dev);
+> -	struct ethtool_keee *p = &priv->eee;
+> -	bool active;
+>   
+>   	if (GENET_IS_V1(priv))
+>   		return -EOPNOTSUPP;
+> @@ -1345,15 +1339,7 @@ static int bcmgenet_set_eee(struct net_device *dev, struct ethtool_keee *e)
+>   	if (!dev->phydev)
+>   		return -ENODEV;
+>   
+> -	p->eee_enabled = e->eee_enabled;
+> -
+> -	if (!p->eee_enabled) {
+> -		bcmgenet_eee_enable_set(dev, false, false);
+> -	} else {
+> -		active = phy_init_eee(dev->phydev, false) >= 0;
+> -		bcmgenet_umac_writel(priv, e->tx_lpi_timer, UMAC_EEE_LPI_TIMER);
+> -		bcmgenet_eee_enable_set(dev, active, e->tx_lpi_enabled);
+> -	}
+> +	bcmgenet_umac_writel(priv, e->tx_lpi_timer, UMAC_EEE_LPI_TIMER);
+>   
+>   	return phy_ethtool_set_eee(dev->phydev, e);
+>   }
+> diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.h b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
+> index 7523b60b3c1c..bb82ecb2e220 100644
+> --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.h
+> +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
+> @@ -644,8 +644,6 @@ struct bcmgenet_priv {
+>   	bool wol_active;
+>   
+>   	struct bcmgenet_mib_counters mib;
+> -
+> -	struct ethtool_keee eee;
+>   };
+>   
+>   #define GENET_IO_MACRO(name, offset)					\
+> @@ -703,7 +701,5 @@ int bcmgenet_wol_power_down_cfg(struct bcmgenet_priv *priv,
+>   void bcmgenet_wol_power_up_cfg(struct bcmgenet_priv *priv,
+>   			       enum bcmgenet_power_mode mode);
+>   
+> -void bcmgenet_eee_enable_set(struct net_device *dev, bool enable,
+> -			     bool tx_lpi_enabled);
+> -
+> +void bcmgenet_eee_enable_set(struct net_device *dev, bool enable);
+>   #endif /* __BCMGENET_H__ */
+> diff --git a/drivers/net/ethernet/broadcom/genet/bcmmii.c b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+> index 9ada89355747..25eeea4c1965 100644
+> --- a/drivers/net/ethernet/broadcom/genet/bcmmii.c
+> +++ b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+> @@ -30,7 +30,6 @@ static void bcmgenet_mac_config(struct net_device *dev)
+>   	struct bcmgenet_priv *priv = netdev_priv(dev);
+>   	struct phy_device *phydev = dev->phydev;
+>   	u32 reg, cmd_bits = 0;
+> -	bool active;
+>   
+>   	/* speed */
+>   	if (phydev->speed == SPEED_1000)
+> @@ -88,11 +87,6 @@ static void bcmgenet_mac_config(struct net_device *dev)
+>   		reg |= CMD_TX_EN | CMD_RX_EN;
+>   	}
+>   	bcmgenet_umac_writel(priv, reg, UMAC_CMD);
+> -
+> -	active = phy_init_eee(phydev, 0) >= 0;
+> -	bcmgenet_eee_enable_set(dev,
+> -				priv->eee.eee_enabled && active,
+> -				priv->eee.tx_lpi_enabled);
 
-	This is combining two logical changes into one patch, isn't it?
-The annotation change isn't part of what's stated in the Subject.
+You can keep the call to bcmgenet_eee_enable_set() where it currently is 
+and just change the arguments?
+-- 
+Florian
 
-	-J
 
->Signed-off-by: Eric Dumazet <edumazet@google.com>
->---
-> drivers/net/bonding/bond_main.c        |  2 +-
-> drivers/net/bonding/bond_netlink.c     |  3 ++-
-> drivers/net/bonding/bond_options.c     |  2 +-
-> drivers/net/bonding/bond_procfs.c      |  2 +-
-> drivers/net/bonding/bond_sysfs.c       | 10 +++++-----
-> drivers/net/bonding/bond_sysfs_slave.c |  2 +-
-> 6 files changed, 11 insertions(+), 10 deletions(-)
->
->diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_m=
-ain.c
->index 08e9bdbf450afdc103931249259c58a08665dc02..b3a7d60c3a5ca60be1d9eed18=
-4ec1dad593a182b 100644
->--- a/drivers/net/bonding/bond_main.c
->+++ b/drivers/net/bonding/bond_main.c
->@@ -5245,7 +5245,7 @@ static inline int bond_slave_override(struct bondin=
-g *bond,
-> =
+--0000000000008665990615aff392
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-> 	/* Find out if any slaves have the same mapping as this skb. */
-> 	bond_for_each_slave_rcu(bond, slave, iter) {
->-		if (slave->queue_id =3D=3D skb_get_queue_mapping(skb)) {
->+		if (READ_ONCE(slave->queue_id) =3D=3D skb_get_queue_mapping(skb)) {
-> 			if (bond_slave_is_up(slave) &&
-> 			    slave->link =3D=3D BOND_LINK_UP) {
-> 				bond_dev_queue_xmit(bond, skb, slave->dev);
->diff --git a/drivers/net/bonding/bond_netlink.c b/drivers/net/bonding/bon=
-d_netlink.c
->index 29b4c3d1b9b6ff873fe067e80bedf7cb681d18f1..2a6a424806aa603ad8a00ca79=
-7e9e22d38bd0435 100644
->--- a/drivers/net/bonding/bond_netlink.c
->+++ b/drivers/net/bonding/bond_netlink.c
->@@ -51,7 +51,8 @@ static int bond_fill_slave_info(struct sk_buff *skb,
-> 		    slave_dev->addr_len, slave->perm_hwaddr))
-> 		goto nla_put_failure;
-> =
-
->-	if (nla_put_u16(skb, IFLA_BOND_SLAVE_QUEUE_ID, slave->queue_id))
->+	if (nla_put_u16(skb, IFLA_BOND_SLAVE_QUEUE_ID,
->+			READ_ONCE(slave->queue_id)))
-> 		goto nla_put_failure;
-> =
-
-> 	if (nla_put_s32(skb, IFLA_BOND_SLAVE_PRIO, slave->prio))
->diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bon=
-d_options.c
->index 4cdbc7e084f4b4cb3b150656aa765531806d8ad9..0cacd7027e352dbf3204d82b7=
-ce1672469a186de 100644
->--- a/drivers/net/bonding/bond_options.c
->+++ b/drivers/net/bonding/bond_options.c
->@@ -1589,7 +1589,7 @@ static int bond_option_queue_id_set(struct bonding =
-*bond,
-> 		goto err_no_cmd;
-> =
-
-> 	/* Actually set the qids for the slave */
->-	update_slave->queue_id =3D qid;
->+	WRITE_ONCE(update_slave->queue_id, qid);
-> =
-
-> out:
-> 	return ret;
->diff --git a/drivers/net/bonding/bond_procfs.c b/drivers/net/bonding/bond=
-_procfs.c
->index 43be458422b3f9448d96383b0fb140837562f446..7edf72ec816abd8b66917bdec=
-d2c93d237629ffa 100644
->--- a/drivers/net/bonding/bond_procfs.c
->+++ b/drivers/net/bonding/bond_procfs.c
->@@ -209,7 +209,7 @@ static void bond_info_show_slave(struct seq_file *seq=
-,
-> =
-
-> 	seq_printf(seq, "Permanent HW addr: %*phC\n",
-> 		   slave->dev->addr_len, slave->perm_hwaddr);
->-	seq_printf(seq, "Slave queue ID: %d\n", slave->queue_id);
->+	seq_printf(seq, "Slave queue ID: %d\n", READ_ONCE(slave->queue_id));
-> =
-
-> 	if (BOND_MODE(bond) =3D=3D BOND_MODE_8023AD) {
-> 		const struct port *port =3D &SLAVE_AD_INFO(slave)->port;
->diff --git a/drivers/net/bonding/bond_sysfs.c b/drivers/net/bonding/bond_=
-sysfs.c
->index 75ee7ca369034ef6fa58fc9399b566dd7044fedc..1e13bb17051567e2b5d9451ce=
-ef47f2cf1a588ec 100644
->--- a/drivers/net/bonding/bond_sysfs.c
->+++ b/drivers/net/bonding/bond_sysfs.c
->@@ -625,10 +625,9 @@ static ssize_t bonding_show_queue_id(struct device *=
-d,
-> 	struct slave *slave;
-> 	int res =3D 0;
-> =
-
->-	if (!rtnl_trylock())
->-		return restart_syscall();
->+	rcu_read_lock();
-> =
-
->-	bond_for_each_slave(bond, slave, iter) {
->+	bond_for_each_slave_rcu(bond, slave, iter) {
-> 		if (res > (PAGE_SIZE - IFNAMSIZ - 6)) {
-> 			/* not enough space for another interface_name:queue_id pair */
-> 			if ((PAGE_SIZE - res) > 10)
->@@ -637,12 +636,13 @@ static ssize_t bonding_show_queue_id(struct device =
-*d,
-> 			break;
-> 		}
-> 		res +=3D sysfs_emit_at(buf, res, "%s:%d ",
->-				     slave->dev->name, slave->queue_id);
->+				     slave->dev->name,
->+				     READ_ONCE(slave->queue_id));
-> 	}
-> 	if (res)
-> 		buf[res-1] =3D '\n'; /* eat the leftover space */
-> =
-
->-	rtnl_unlock();
->+	rcu_read_unlock();
-> =
-
-> 	return res;
-> }
->diff --git a/drivers/net/bonding/bond_sysfs_slave.c b/drivers/net/bonding=
-/bond_sysfs_slave.c
->index 313866f2c0e49ac96299ffea307b1613955713ec..36d0e8440b5b94464b3226ce1=
-a04f32361de5aa6 100644
->--- a/drivers/net/bonding/bond_sysfs_slave.c
->+++ b/drivers/net/bonding/bond_sysfs_slave.c
->@@ -53,7 +53,7 @@ static SLAVE_ATTR_RO(perm_hwaddr);
-> =
-
-> static ssize_t queue_id_show(struct slave *slave, char *buf)
-> {
->-	return sysfs_emit(buf, "%d\n", slave->queue_id);
->+	return sysfs_emit(buf, "%d\n", READ_ONCE(slave->queue_id));
-> }
-> static SLAVE_ATTR_RO(queue_id);
-> =
-
->-- =
-
->2.44.0.478.gd926399ef9-goog
->
->
-
----
-	-Jay Vosburgh, jay.vosburgh@canonical.com
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
+9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
+AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
+UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
+KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
+nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
+Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
+VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
+ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
+CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
+MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
+d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
+hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
+bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
+BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
+KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
+kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
+2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
+3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
+NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
+AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
+LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGabokddPw0koncP
+6xbUmxLsedDz6TGvnH04GuN381zeMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTI0MDQwOTIwNDE0OVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB3uj4s6TaFbOPw63ev+7wFkSkAABtsmveO
+gh5PaSc9sz4DzgkBVQPxOq7kuUDNYmSZD2tRKvG08zHXO/llRanUXPDGKu8tn+XMQIxFO+5EVewj
+1lp5g0fnfyQ6tBnJkVLt9fkCTo4qmSz9kYoMDZgVABrei+NIAUA9MkkUgNBxibeardXGXyEybpqR
+Y11WlUNszn7UnN35Z+y8dezId9I2UqM3EartG5/JNdep5TQUFbOKxIUVkZHqTea7e9dU54jxyQjn
+12qh4jPQflFj1pxMuvHxKf4Ij286M7sEUukqZoZhLZtf9EvxRsfmSSKZRMJejzivacxcqu4EStVd
+xiHW
+--0000000000008665990615aff392--
 
