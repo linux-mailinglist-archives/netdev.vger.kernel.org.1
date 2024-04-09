@@ -1,142 +1,154 @@
-Return-Path: <netdev+bounces-85948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A15B89CFEA
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 03:40:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC26C89CFF7
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 03:45:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F34E1284780
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 01:40:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46C5AB21815
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 01:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5DE54DA03;
-	Tue,  9 Apr 2024 01:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A69D4E1CA;
+	Tue,  9 Apr 2024 01:44:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="I9OQ7OcN"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="OxJbJBS+"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75AA925757;
-	Tue,  9 Apr 2024 01:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45D32110A;
+	Tue,  9 Apr 2024 01:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712626840; cv=none; b=QRSGfvn3lqW7redQZg8FsROeoOFG5JNBt8eDZxwIL903GhnPmGqKZ4lswal8qxkBJ1juUw5mD5ihQQouYoKoBA5zWRSjwyB5vxtmLclDhEMHDGWjnJnfPx65PBTGvmuuhkGFhQ85+Kpl7szWa5l7SBbLL6uHrN23+MXfxZCIDUw=
+	t=1712627098; cv=none; b=b+NdToi3wprJFJfcUy7JB7Fte9UAPwTuDrVZD01EIr7z52j2eV+wc3vvTHNVNZmHCnB/bpzqaZqm4RsC/uhSqunnvFmuZ4X7JG2YWKHRrP65hB8VI43Q1wn4eeGoJfDy/THFb7xgNjGs785hQBx5QKgD/H9RfhqYW+fbpb5yP3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712626840; c=relaxed/simple;
-	bh=u1b5vGF6fjegDxFgiSzn3/ni0Say/Sygjxb+PXPiyGI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=GHDfkUyfchLagdP+WS9QLLFDjUHYBrJtlKzPsOdY6U6Gq+h6zOA3d5iMg5Cyy/hh3wykomJDK59Ja2ayiVt5y+rUG4JZnXXtqDAyKBDOvnWmL7PPU+JVIt21DQ19BVQ+o8myucknIAWJxr++iMEyPo7LoKF1bIGYe3hZGOTlWQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=I9OQ7OcN; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1712626831;
-	bh=ZKghRgYADVS4N/Cyb6zg9wI0ZitXOazy/b7vObIc1LQ=;
-	h=Date:From:To:Cc:Subject:From;
-	b=I9OQ7OcNPpC7QC5rlfP4lr57hdihskhK0pC3z7gtpslUzXmz97T1UrCUp2mxudMED
-	 Ge2P6YMMLGmmfNHlhV7PAQdSAy0LjcFyT1vIyjtzEEBOcK6O6kZepu6c1ICCKf4M8R
-	 3eF4vohGMBcEczuhPBxK7ew6ty9E+6d8VuvRcDid2DRywzJq8e1HbG3VyOzuB2jOAt
-	 f7J+XccTY93+MSvHL7Kh/jAaMY0MQsMPDki3wvpWO3VSj8a7tvZxnIYxL/T6G7BxgO
-	 YT5IFVt2cz62uMc56QfUbstB7cZkAS2LpBb6Mjedk09Ycl67Qu7hyRygqrhyuCpdAE
-	 HfqYJRygo7y8Q==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VD7vL6tSYz4x1Y;
-	Tue,  9 Apr 2024 11:40:30 +1000 (AEST)
-Date: Tue, 9 Apr 2024 11:40:28 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>, Networking <netdev@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: build failure after merge of the net-next tree
-Message-ID: <20240409114028.76ede66a@canb.auug.org.au>
+	s=arc-20240116; t=1712627098; c=relaxed/simple;
+	bh=j7urtP4ouQoNOdaRnsPEz8WC+3ThBpb8ls9QDzEF4Eo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hTCv5bJezaT1uopkKDogo2R73n8qb8GVKTpP834bN1WbSz+ouPSK/Ds+ASpL10A/2DxOVpJFNPg9+cK+L8Ie0PamJTFFb3s1xRuM05gy8aZpRi8h8Ow4waWc99NAponyVKMrq9rCiPoP6knIWndozwDnPf26lVyeSrXZKlGX31c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=OxJbJBS+; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1712627086; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=hRt60i/N6X7YihbK5ksUh4m+JDUuCca3dbuWQD3MwgY=;
+	b=OxJbJBS+f2iklXpZHfajm1L91ez6DVDqSYOZPnUq4q83H/xsF8EhctjkaoXEgrgbGWsu0wpOkcHqd+72E2digUy5zrOTxeWlL4jPuti+ok4TiqOdDU0Pgrr7RfItDoJp7LLOKZPXVg/DB/FRGMb3gPUxD2kRneQUBYPXsv1TS5M=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R701e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=20;SR=0;TI=SMTPD_---0W4CYNQs_1712627084;
+Received: from 30.221.129.235(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W4CYNQs_1712627084)
+          by smtp.aliyun-inc.com;
+          Tue, 09 Apr 2024 09:44:46 +0800
+Message-ID: <46e8e227-8058-4062-a9db-6b9c774f63cc@linux.alibaba.com>
+Date: Tue, 9 Apr 2024 09:44:44 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/ZBgaFDbHVPMizQTjD3D=DAu";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next v5 04/11] net/smc: implement some unsupported
+ operations of loopback-ism
+To: Niklas Schnelle <schnelle@linux.ibm.com>,
+ Gerd Bayer <gbayer@linux.ibm.com>, wintera@linux.ibm.com,
+ twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+ agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240324135522.108564-1-guwen@linux.alibaba.com>
+ <20240324135522.108564-5-guwen@linux.alibaba.com>
+ <3122eece5b484abcf8d23f85d6c18c36f0b939ff.camel@linux.ibm.com>
+ <1db6ccab-b49f-45d2-a93c-05b0f79371a3@linux.alibaba.com>
+ <3b3ff37643e9030ec1246e67720683a2cf5660e5.camel@linux.ibm.com>
+ <7a0fc481-658e-4c99-add7-ccbd5f9dce1e@linux.alibaba.com>
+ <7291dd1b2d16fd9bbd90988ac5bcc3a46d17e3f4.camel@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <7291dd1b2d16fd9bbd90988ac5bcc3a46d17e3f4.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---Sig_/ZBgaFDbHVPMizQTjD3D=DAu
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
 
-After merging the net-next tree, today's linux-next build (arm
-multi_v7_defconfig) failed like this:
+On 2024/4/4 23:15, Niklas Schnelle wrote:
+> On Thu, 2024-04-04 at 21:12 +0800, Wen Gu wrote:
+>>
+>> On 2024/4/4 19:42, Niklas Schnelle wrote:
+>>> On Thu, 2024-04-04 at 17:32 +0800, Wen Gu wrote:
+>>>>
+>>>> On 2024/4/4 00:25, Gerd Bayer wrote:
+>>>>> On Sun, 2024-03-24 at 21:55 +0800, Wen Gu wrote:
+>>>>>> This implements some operations that loopback-ism does not support
+>>>>>> currently:
+>>>>>>     - vlan operations, since there is no strong use-case for it.
+>>>>>>     - signal_event operations, since there is no event to be processed
+>>>>>> by the loopback-ism device.
+>>>>>
+>>>>> Hi Wen,
+>>>>>
+>>>>> I wonder if the these operations that are not supported by loopback-ism
+>>>>> should rather be marked "optional" in the struct smcd_ops, and the
+>>>>> calling code should call these only when they are implemented.
+>>>>>
+>>>>> Of course this would mean more changes to net/smc/smc_core.c - but
+>>>>> loopback-ism could omit these "boiler-plate" functions.
+>>>>>
+>>>>
+>>>> Hi Gerd.
+>>>>
+>>>> Thank you for the thoughts! I agree that checks like 'if(smcd->ops->xxx)'
+>>>> can avoid the device driver from implementing unsupported operations. But I
+>>>> am afraid that which operations need to be defined as 'optional' may differ
+>>>> from different device perspectives (e.g. for loopback-ism they are vlan-related
+>>>> opts and signal_event). So I perfer to simply let the smc protocol assume
+>>>> that all operations have been implemented, and let drivers to decide which
+>>>> ones are unsupported in implementation. What do you think?
+>>>>
+>>>> Thanks!
+>>>>
+>>>
+>>> I agree with Gerd, in my opinion it is better to document ops as
+>>> optional and then allow their function pointers to be NULL and check
+>>> for that. Acting like they are supported and then they turn out to be
+>>> nops to me seems to contradict the principle of least surprises. I also
+>>> think we can find a subset of mandatory ops without which SMC-D is
+>>> impossible and then everything else should be optional.
+>>
+>> I see. If we all agree to classify smcd_ops into mandatory and optional ones,
+>> I'll add a patch to mark the optional ops and check if they are implemented.
+> 
+> Keep in mind I don't speak for the SMC maintainers but that does sound
+> reasonable to me.
+> 
 
-In file included from <command-line>:
-In function 'tcp_struct_check',
-    inlined from 'tcp_init' at net/ipv4/tcp.c:4703:2:
-include/linux/compiler_types.h:460:45: error: call to '__compiletime_assert=
-_940' declared with attribute error: BUILD_BUG_ON failed: offsetof(struct t=
-cp_sock, __cacheline_group_end__tcp_sock_write_txrx) - offsetofend(struct t=
-cp_sock, __cacheline_group_begin__tcp_sock_write_txrx) > 92
-  460 |         _compiletime_assert(condition, msg, __compiletime_assert_, =
-__COUNTER__)
-      |                                             ^
-include/linux/compiler_types.h:441:25: note: in definition of macro '__comp=
-iletime_assert'
-  441 |                         prefix ## suffix();                        =
-     \
-      |                         ^~~~~~
-include/linux/compiler_types.h:460:9: note: in expansion of macro '_compile=
-time_assert'
-  460 |         _compiletime_assert(condition, msg, __compiletime_assert_, =
-__COUNTER__)
-      |         ^~~~~~~~~~~~~~~~~~~
-include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_a=
-ssert'
-   39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
-      |                                     ^~~~~~~~~~~~~~~~~~
-include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_M=
-SG'
-   50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condit=
-ion)
-      |         ^~~~~~~~~~~~~~~~
-include/linux/cache.h:108:9: note: in expansion of macro 'BUILD_BUG_ON'
-  108 |         BUILD_BUG_ON(offsetof(TYPE, __cacheline_group_end__##GROUP)=
- - \
-      |         ^~~~~~~~~~~~
-net/ipv4/tcp.c:4673:9: note: in expansion of macro 'CACHELINE_ASSERT_GROUP_=
-SIZE'
- 4673 |         CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write=
-_txrx, 92);
-      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+Hi Wenjia and Jan, do you have any comments on this and [1]? Thanks!
 
-Presumably caused by commit
+[1] https://lore.kernel.org/netdev/60b4aec0b4bf4474d651b653c86c280dafc4518a.camel@linux.ibm.com/
 
-  d2c3a7eb1afa ("tcp: more struct tcp_sock adjustments")
-
-I have reverted that commit for today.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/ZBgaFDbHVPMizQTjD3D=DAu
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYUnIwACgkQAVBC80lX
-0GwXGwf9FONJR9D6iryOPmMaLVw43NAJJ+G5ykiKuCx/yn+JRUCILh7+ntM8Z2CM
-aUAC0D5iJYS+qwoxemf+XPUhY30mxZc01x3ZP967OEn+kG+oGqhv5NeIRZ8eT7hq
-Qr+I3vDWv/i/zOMsBoaIgACFN0BvVVd1AOOkcLlZt/HJ+leGbTOXVcS4HSI94fLp
-FiEhlvLyPnebhGRgC0kXGdDP8Jn/Sk4Lrt7jqxwOhiJf4Jj8WGumInLxOZJYJnjk
-tltuNDZVNeO23Bm9YRNtgD/fkgrF3tfSqwzgdNxH1QwKGSmype5dxoTnkMcVxs1m
-XNEcuj0Ycv6PkfSQXWgnd/4ysziZeg==
-=urwm
------END PGP SIGNATURE-----
-
---Sig_/ZBgaFDbHVPMizQTjD3D=DAu--
+>>
+>>>
+>>> As a first guess I think the following options may be mandatory:
+>>>
+>>> * query_remote_gid()
+>>> * register_dmb()/unregister_dmb()
+>>> * move_data()
+>>>     For this one could argue that either move_data() or
+>>>     attach_dmb()/detach_dmb() is required though personally I would
+>>>     prefer to always have move_data() as a fallback and simple API
+>>> * supports_v2()
+>>> * get_local_gid()
+>>> * get_chid()
+>>> * get_dev()
+>> I agree with this classification. Just one point, maybe we can take
+>> supports_v2() as an optional ops, like support_dmb_nocopy()? e.g. if
+>> it is not implemented, we treat it as an ISMv1.
+>>
+>> Thanks!
+> 
+> Interpreting a NULL supports_v2() as not supporting v2 sounds
+> reasonable to me.
 
