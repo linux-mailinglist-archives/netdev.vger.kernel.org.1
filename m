@@ -1,116 +1,126 @@
-Return-Path: <netdev+bounces-86208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A45789DFE4
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 18:00:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5854089E006
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 18:08:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43E23282210
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:00:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D9401F2417A
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E941137937;
-	Tue,  9 Apr 2024 15:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 919A713D880;
+	Tue,  9 Apr 2024 16:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ea7iwEIb"
+	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="P8sCLLQl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mta-65-225.siemens.flowmailer.net (mta-65-225.siemens.flowmailer.net [185.136.65.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D78135A6C
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 15:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1518B13A3F8
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 16:08:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712678397; cv=none; b=rNbyAzx8wJgBEYgoFuf4BEJMxP0XhPFq6zzLIY2gMK/AFkfhxZJJi7UWv/Lf1n5mgjwo6nd0iVDlwV8VqSxHmftsnu3s3x70Y+5ZMGZ7Y4Q2MVdVU5drek/QWC+UotGCun99pxzkfkrPhOYApPTiGCv77PjAacjGhs7Msydf9+o=
+	t=1712678910; cv=none; b=Vq1JCngFiqG4o5arM8+ePcAMjx1W0+aXAQ98XtFxAwNWlySWTjsDp2UcKLcQ9kFsXRNkAQMXD44NBS4SX6UK8qofu6POi4uZhN6u7AtT3yfIdYogv4En+4rQwn0V1lrIGkl6NcyEW7BrEJY1gRvWZZTq9CyIThiwmrw0xAGIL1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712678397; c=relaxed/simple;
-	bh=R/UKSJmmZmpmPfrid0VP/uklt14bKRE2DJxN9wKrclk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bB/f0IKrOJVWyalUsnZpGab2dQmziDCVgAe7lANKNuI5bfCcj7zr6SwvyVOiuNgSM+VD0XzMtvAmLujtda5UBfmdCF66XV0EdZFqOf0T0TwqlpziBchjLjmM219GjSmXEtD47jioteJqNBlQ7rZB8zA6RErs0nuNChB1o1Uw6FQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ea7iwEIb; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-56e5174ffc2so14039a12.1
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 08:59:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712678394; x=1713283194; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R/UKSJmmZmpmPfrid0VP/uklt14bKRE2DJxN9wKrclk=;
-        b=Ea7iwEIbB1his7GskUl+II/tP0hPaqEqDan+qBPgVjb/0hv/xayCEoQtx7vDRTKQxP
-         9Uo2PSDvXHyZbErf4jSxRWcN2Xzo3I/Rkzkilb1L74PLt7X4QspIKS00n/HMzmxVlP0l
-         D8Q1IKvJZq5IfqbBj1shIveOlvdzPCvHCYejMknJRz5ym4UEuKrdzxQAvjrVzDIH78Bp
-         2gwCNCCUwGhKgArr8MwdmMjtAyWfWxnQksB7YHaamaMJva0XC8lCk6LkO6BMFfKA8Dil
-         qcHzH0281DUL6oOX8CbIdSBGapRIWk8HbvPKPneE3jhi39YXr5ll71nYm0tfxVGp7mBs
-         BXAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712678394; x=1713283194;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=R/UKSJmmZmpmPfrid0VP/uklt14bKRE2DJxN9wKrclk=;
-        b=hywQI4DUh137YUphbfECWtCjZemusyeejsN96ixnVGkaPdPxse+l26HIke5HSxY31S
-         5+i2mZQ25yqqdHh5pVpTwI4R6g1jobekXoYpyy2PxzxBohlNkm9VREQOVjLrFXjiV+IP
-         h9yk1vtR+elJiqvmFXN/R0CWpUmEAUEW4PTy8xi6VsFin8oJ3Pxqpfv9ynRDoUwfRtjO
-         nc+KYz6S+OTR/wvR65SrBYmali3mBURtLs2CIhpGey8dWdqUMRtdAp3KSWoecvWfFEYe
-         9K+rnlxDqPs3ovq4NKFmfdHHTZZIBJQy+OF1UvZyA3SFckzyc4DoWiLEo6C4Lc/9XeiU
-         K8SA==
-X-Gm-Message-State: AOJu0YzdtDCMPoPUIEFHgl5UoX7VbcPt+8emVDuzbPB1lKOLB2I6bNXs
-	9ATCJS/Vumz8ru/xJrENLTn7cHhN+4KzQMmm84R/EDQMZ67g2jw2nNTU+lYZfovGTYALvKDA17z
-	27+XBHm444FF2pBOpK92WnJg6zzTy7Wt40bsH
-X-Google-Smtp-Source: AGHT+IFm9aPzYO7/xwO7KoweJXTiMzSSKxU3eUsnKdjN0yDeR2ckVA0sVXcOxiBT9dPEy12p4xYjGgZjvF413NgdTb0=
-X-Received: by 2002:aa7:c906:0:b0:56e:5681:ff3e with SMTP id
- b6-20020aa7c906000000b0056e5681ff3emr219681edt.2.1712678393837; Tue, 09 Apr
- 2024 08:59:53 -0700 (PDT)
+	s=arc-20240116; t=1712678910; c=relaxed/simple;
+	bh=9wOZKcfYb1DHXSdbJBmLH4+aODCdlyhybGA03BNw6WM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kgutzSR2fCojvRim2grSWkv5sxTFSvgFDFA/EY81B13zLcmIVHdQn3HTBNs/OWFOs/U6g0BlEO77d2CgR+xbLle0Lh8EcZhLIF/Luyz8SNFhMI3RH8eQZQeenTRTLK8QVgSkjWUSTHv0F0GRUgPy0bFIBOjCTiRPsuLuL0/Dlno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=P8sCLLQl; arc=none smtp.client-ip=185.136.65.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-65-225.siemens.flowmailer.net with ESMTPSA id 202404091608177845470ce10ca661c5
+        for <netdev@vger.kernel.org>;
+        Tue, 09 Apr 2024 18:08:17 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=diogo.ivo@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
+ bh=5bZRgZjFamHYpcfAWiC6iNhqiE1pqmA7ylXM2ybc0E0=;
+ b=P8sCLLQl6eRPwtBVh87kSHrNQC7D9No3pKWdFkw6DJ60p4xAu4fSf308U/fxa4dV1apWM7
+ HReP1ixUcKdbmSN1qFOSrgW4DUbqr/s/JN88Hq9ReOiaRn+OhiBZ4u1UzQVQUV7F2cmvsSdV
+ eT4lFjlAd9z1b9FSP5BbMRwPfLCyQ=;
+From: Diogo Ivo <diogo.ivo@siemens.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	aleksander.lobakin@intel.com,
+	netdev@vger.kernel.org
+Cc: Diogo Ivo <diogo.ivo@siemens.com>,
+	jan.kiszka@siemens.com
+Subject: [PATCH net-next] net: ethernet: Move eth_*_addr_base to global symbols
+Date: Tue,  9 Apr 2024 17:07:18 +0100
+Message-ID: <20240409160720.154470-2-diogo.ivo@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240409152805.913891-1-jmaloy@redhat.com>
-In-Reply-To: <20240409152805.913891-1-jmaloy@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 9 Apr 2024 17:59:39 +0200
-Message-ID: <CANn89iKSO=P0Vr03ZaXn35-At+SRRvT=b3YrAuW7J5VR0hiFpQ@mail.gmail.com>
-Subject: Re: [net-next v4] tcp: add support for SO_PEEK_OFF socket option
-To: jmaloy@redhat.com
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	passt-dev@passt.top, sbrivio@redhat.com, lvivier@redhat.com, 
-	dgibson@redhat.com, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-1320519:519-21489:flowmailer
 
-On Tue, Apr 9, 2024 at 5:28=E2=80=AFPM <jmaloy@redhat.com> wrote:
->
-> From: Jon Maloy <jmaloy@redhat.com>
->
-> When reading received messages from a socket with MSG_PEEK, we may want
-> to read the contents with an offset, like we can do with pread/preadv()
-> when reading files. Currently, it is not possible to do that.
->
-> In this commit, we add support for the SO_PEEK_OFF socket option for TCP,
-> in a similar way it is done for Unix Domain sockets.
->
-> In the iperf3 log examples shown below, we can observe a throughput
-> improvement of 15-20 % in the direction host->namespace when using the
-> protocol splicer 'pasta' (https://passt.top).
-> This is a consistent result.
->
-> pasta(1) and passt(1) implement user-mode networking for network
-> namespaces (containers) and virtual machines by means of a translation
-> layer between Layer-2 network interface and native Layer-4 sockets
-> (TCP, UDP, ICMP/ICMPv6 echo).
->
-> Received, pending TCP data to the container/guest is kept in kernel
-> buffers until acknowledged, so the tool routinely needs to fetch new
-> data from socket, skipping data that was already sent.
->
-> Suggested-by: Paolo Abeni <pabeni@redhat.com>
-> Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
-> Signed-off-by: Jon Maloy <jmaloy@redhat.com>
+Promote IPv4/6 and Ethernet reserved base addresses to global symbols
+to avoid local copies being created when these addresses are referenced.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
+---
+ include/linux/etherdevice.h | 10 +++-------
+ net/ethernet/eth.c          | 15 +++++++++++++++
+ 2 files changed, 18 insertions(+), 7 deletions(-)
+
+diff --git a/include/linux/etherdevice.h b/include/linux/etherdevice.h
+index 8d6daf828427..6002dabca0f8 100644
+--- a/include/linux/etherdevice.h
++++ b/include/linux/etherdevice.h
+@@ -67,15 +67,11 @@ struct sk_buff *eth_gro_receive(struct list_head *head, struct sk_buff *skb);
+ int eth_gro_complete(struct sk_buff *skb, int nhoff);
+ 
+ /* Reserved Ethernet Addresses per IEEE 802.1Q */
+-static const u8 eth_reserved_addr_base[ETH_ALEN] __aligned(2) =
+-{ 0x01, 0x80, 0xc2, 0x00, 0x00, 0x00 };
++extern const u8 eth_reserved_addr_base[ETH_ALEN];
+ #define eth_stp_addr eth_reserved_addr_base
+ 
+-static const u8 eth_ipv4_mcast_addr_base[ETH_ALEN] __aligned(2) =
+-{ 0x01, 0x00, 0x5e, 0x00, 0x00, 0x00 };
+-
+-static const u8 eth_ipv6_mcast_addr_base[ETH_ALEN] __aligned(2) =
+-{ 0x33, 0x33, 0x00, 0x00, 0x00, 0x00 };
++extern const u8 eth_ipv4_mcast_addr_base[ETH_ALEN];
++extern const u8 eth_ipv6_mcast_addr_base[ETH_ALEN];
+ 
+ /**
+  * is_link_local_ether_addr - Determine if given Ethernet address is link-local
+diff --git a/net/ethernet/eth.c b/net/ethernet/eth.c
+index 2edc8b796a4e..8141e5c7e4f3 100644
+--- a/net/ethernet/eth.c
++++ b/net/ethernet/eth.c
+@@ -63,6 +63,21 @@
+ #include <linux/uaccess.h>
+ #include <net/pkt_sched.h>
+ 
++const u8 eth_reserved_addr_base[ETH_ALEN] __aligned(2) = {
++	0x01, 0x80, 0xc2, 0x00, 0x00, 0x00
++};
++EXPORT_SYMBOL(eth_reserved_addr_base);
++
++const u8 eth_ipv4_mcast_addr_base[ETH_ALEN] __aligned(2) = {
++	0x01, 0x00, 0x5e, 0x00, 0x00, 0x00
++};
++EXPORT_SYMBOL(eth_ipv4_mcast_addr_base);
++
++const u8 eth_ipv6_mcast_addr_base[ETH_ALEN] __aligned(2) = {
++	0x33, 0x33, 0x00, 0x00, 0x00, 0x00
++};
++EXPORT_SYMBOL(eth_ipv6_mcast_addr_base);
++
+ /**
+  * eth_header - create the Ethernet header
+  * @skb:	buffer to alter
+-- 
+2.44.0
+
 
