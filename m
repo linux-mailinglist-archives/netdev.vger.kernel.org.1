@@ -1,115 +1,115 @@
-Return-Path: <netdev+bounces-86160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73C0989DBE1
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:13:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B43389DBE7
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:14:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 292C21F24B56
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:13:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C77A1C20491
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3699412FB0F;
-	Tue,  9 Apr 2024 14:13:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 060C312FB15;
+	Tue,  9 Apr 2024 14:14:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcmNOzfF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BmuoP5Nn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8420412FB14;
-	Tue,  9 Apr 2024 14:13:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4308212E1C9;
+	Tue,  9 Apr 2024 14:14:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712672002; cv=none; b=PiX5Bq7KrgfFfF4zBSIa4/VoxdHqGLWxrtXHu23niD4vK6rfRJoUIX9C1pDwIYrqG0hf0MHclCICGFQ7aX86BFU0saMF0oQBh6JsUFzL8tFIi87qaQVvzhYGDnotNANpUOeL3CNNtO67qiB2wOln3lyZGePf8aHRzNYLnjp/sOY=
+	t=1712672047; cv=none; b=l+VvgmEfLItlNHqiwu3OJsOH7WJRYg4HdlLiBudUsXbe7TVZ3/ApDCGgacEWYvNPin9T7PMkRy0Bj68n3tr5Rz/SS1vA1yWh6gXn2ajtcJ+aF96M7kcGbTaSYwVMmCE/ACF+1gRRGkvOtxvT2dADSUZxrHq8Ef5wM1p21I1rcig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712672002; c=relaxed/simple;
-	bh=uVFj3eEWGusMGg0TJT4HW5K8dPUQ3fTRX3RDNimTIeI=;
+	s=arc-20240116; t=1712672047; c=relaxed/simple;
+	bh=iI6TUwJ+4xZZn35YTNr/rWQaQ7yJfKuSXYeSODViy0w=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BzSAmJjy6kfnBwMSzevd4O8Lu67h9zqZBdGpOmuDqfaCb4m2HpDYGvpqF8yA3aOYiM1qk7aaqFDAT96DXUbh9koqCG4ZKm3pDu0wLvujXfTCvQIEFVqAjgxo5LuSJJoChJdacvUOQMg4UVPl7KJ9wQ+kaomMsLJORIHwxKpkmpc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bcmNOzfF; arc=none smtp.client-ip=209.85.208.170
+	 To:Cc:Content-Type; b=RO+yyck2OjFc1pPw4TwUvndB7MITWWdsUIZFT2+SNc9/ujTkhaJa9bcnPSOSoDkG148/irv/23cGs6CLq0pNJhyCkaP3gMsAOm+GsIX88HottgrOawGNj0hQCN4SSvMMQfSxfR3NkIpTsJAheDxN6p1ADtd7b0AEGVN+T4wm/Q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BmuoP5Nn; arc=none smtp.client-ip=209.85.208.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d87660d5c9so33385281fa.2;
-        Tue, 09 Apr 2024 07:13:20 -0700 (PDT)
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2d485886545so99544411fa.2;
+        Tue, 09 Apr 2024 07:14:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712671999; x=1713276799; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712672044; x=1713276844; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EhUjQDS0NzeGHvz85xqgzQ8HO2kzFaCylmDchNxvoNg=;
-        b=bcmNOzfFO1LeRZQXXjDadQPgm2Zpg95Km0IpYiTDDOybgsBlsOYCjmrKykRAmOybx1
-         c+sLVHi5BPcacDzf8TSJbOnLRc6LG3c7NLv9q6mU0qzuI0palQai7Izh4PCR37PI6XCT
-         ZKQZzJMXnyIU8vKWHShBjdiHktYPxNpajUSd/bh/YqCSKmAk42O6BzK8SzMdealvzloc
-         azDV1Om7RfhxY9tmeZs4wtOulBi4imCP5mjcSppq03kYKf08Z+Uzo9xXsHBMGdXNxn7l
-         +3L9qu7BmFgFKgLcACgXwLQI/LT6ycle3QNjqMTdwqOQ8BOgf1a1ppVX/03J6tosBybf
-         eGWA==
+        bh=LzfyOHOSc6LNVDwhY/kA+Wui8S7EUeFyPAPKPUuG2fA=;
+        b=BmuoP5Nn0nO001H5U38iBzU7cGHES+XxLH7VXTiLfnN1hSio+tyGpR3x62UCocyUGP
+         k0w3IL6ItigjrAu86I9Tp/OunRKxpL4OvfuYU2FsKMv+pP+6k3Xjxsk7vG7YxobFBXfy
+         EqPOGPDeB+C/S8vh8LfVVkqGDSYxkDIHbk/R44X3R6WCGCL4kNJyJU/9SKIs1ftxJUFb
+         G9WRlnnGRQjoW5bCpbcrXM4hdHI5KRTJjCivq4gYs9Km00rkdTY/LFG2nRdXtBhzeA7S
+         478DSNQ+Kcbgvh3gtm9MDc7OQqgKcjQH4229hblfti0n8GglCvFqi66bgWlHppdW4zTh
+         DrPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712671999; x=1713276799;
+        d=1e100.net; s=20230601; t=1712672044; x=1713276844;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EhUjQDS0NzeGHvz85xqgzQ8HO2kzFaCylmDchNxvoNg=;
-        b=Lch1EQyW8UZBSEozuGpBve6wRn/r5+1wjRAjjUpzPK2ra0hAGVvq/WoCqC9AP5mGhE
-         Y8XpDZLdLWFRVUGy8tCtVXQcNVMmqAFApFgKRBOMn9IEue9F+o8TpUa21heXMwiTt9wt
-         sikb9OZVOEeUeRp70zf7pKV1wUMBdwuujen64FrZKY9kJBHhWh8ALzYzNVtTFFzMoGyc
-         nzrSifno2M8KFHAjVhkyGV9sbsJ+ygkoo36ydmZ6zoZPjBII4G5ZkR1L0S7PLPF2qyXj
-         4qOU7GR2K74YgZAxGmroeNnfbVIBRruro62VlMb4bLvOT5bBdB51QWvZJRPsCBxX755y
-         wgOw==
-X-Forwarded-Encrypted: i=1; AJvYcCWOqYtIPar+jvu5/mQGBqozuM6jlTqGbRPMtrhgbeKlaTlkAoL3UT9UmOd/vZYs00ys4N3FqVEwOVPmlaVAyYFUu8mK7fV1XWTclrOmpfYpKEkH4gn/Ek397B0qwwOd1DDub1rPoomu5oIZ/7dOnQLgS4kwL4TVMTJgIiLQ8F7jFalBs7ij
-X-Gm-Message-State: AOJu0YzcsaUXYcG6u4DPrLLDTmeWVHLJy11gDeD0yU8AkNvU9eWOjOga
-	Ox4wZ8Dgyv9SSfDmFP67jk5MRRDZaLbT2tfAcAr/6WztoHlEqqWENvdBtp2MYPkPC/ISwqLFJLB
-	eMJvTNfX/sklzWDu803/fTFS9ARM=
-X-Google-Smtp-Source: AGHT+IEczva+4SCPbTs7vBV2lQA0NUDuhzBicKjkrY6Jll2b3zgVf7tYe2m56GMlccMbhYvj7MTDd/efmZAUt6DtVWA=
-X-Received: by 2002:a05:651c:220a:b0:2d8:3d0d:aa03 with SMTP id
- y10-20020a05651c220a00b002d83d0daa03mr10666462ljq.29.1712671998459; Tue, 09
- Apr 2024 07:13:18 -0700 (PDT)
+        bh=LzfyOHOSc6LNVDwhY/kA+Wui8S7EUeFyPAPKPUuG2fA=;
+        b=h9fEfK+fB3F3m4jyjYCMF/XmsiC2Krhi09IqfHw0QOOwtJbG4lFMxD4MLSF2Xg33IO
+         6X0ZG3MSKSTuxN0RbiYWN/8dXm5P5+Zs05QX7p2n9yYSCNWKTlFFnr760+0QpT5ANnEY
+         YpiUyaQ3Za2StJCVbEIjQ2z3y+HuFJlvBVlkuvRSeaJrZJIMjivvekXenLhbCtzHcXJa
+         n3PRLz6mEaRbqtH2dXV8tjWK+vWy6hGUJQkqXeLrTTcVVrSd7daIIHsVqqJLRFzGmQWj
+         UUFWBM5tF2CX4fb24qZaMb+kHv9j/LnGrMWRJ7tTeBf/ceCmd+SxFSEfmjNANUvqNtSR
+         c5vA==
+X-Forwarded-Encrypted: i=1; AJvYcCWmS8tFNGgK00v4CF44IHO0kPf1okxlM/QlHVAgGXSKBVW4duR4FslV0ij+P0FfBtuV8LCSkFqJUMhCf5ErYIh595ofhZPwoT2rSg5ud+7Mu2SMSZZzcSZi6QsFogaG0gpVw/aLHByaa0CB0kZaTnLBMLBJNbEHc20MCpH81GocSFZvNIwd
+X-Gm-Message-State: AOJu0YxP+zJJmdInmh8lHxV3q0DEjLwcmal5WRx/ou/NxsIvLxR7WAmP
+	UiyY+Gj7rq0tqc3+vzheQaaWhjzkr9CIxVqEWkHsbihUvBH2kh4wzIw36pszumegT0TcyaofNkH
+	HDGGWyTcZrxI1jlUA8aamw2DhAFpqb8djsRA=
+X-Google-Smtp-Source: AGHT+IGxWzHXNwA6fYq9XaMmgdIaj875VnQfp9L46tSmf2TReZ4lcOT4hRE+GOuiiRAFHCtJageC5nORvdk0S4x3lwM=
+X-Received: by 2002:a05:651c:331:b0:2d8:5fe6:820d with SMTP id
+ b17-20020a05651c033100b002d85fe6820dmr9978784ljp.11.1712672044171; Tue, 09
+ Apr 2024 07:14:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0000000000007558ae061553f41b@google.com> <tencent_EDCC88A7DB46D3D2F7C64449976EC56EE006@qq.com>
-In-Reply-To: <tencent_EDCC88A7DB46D3D2F7C64449976EC56EE006@qq.com>
+References: <000000000000b0848f061553f0d5@google.com> <tencent_D423A78448F764177A26CAB3716365096705@qq.com>
+In-Reply-To: <tencent_D423A78448F764177A26CAB3716365096705@qq.com>
 From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Tue, 9 Apr 2024 10:13:06 -0400
-Message-ID: <CABBYNZLA_AjSXTooBTqLccJschR4gUJ717hM_m1rcKv3fhye8w@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: fix oob in hci_sock_setsockopt
+Date: Tue, 9 Apr 2024 10:13:52 -0400
+Message-ID: <CABBYNZJ-XJv8nLC9WMcMskYtAkzir5JC+wFNZwk+5k-85g2gRg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: fix oob in sco_sock_setsockopt
 To: Edward Adam Davis <eadavis@qq.com>
-Cc: syzbot+837ba09d9db969068367@syzkaller.appspotmail.com, 
+Cc: syzbot+b71011ec0a23f4d15625@syzkaller.appspotmail.com, 
 	johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, marcel@holtmann.org, 
-	syzkaller-bugs@googlegroups.com, netdev@vger.kernel.org
+	linux-kernel@vger.kernel.org, marcel@holtmann.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi Edward,
 
-On Tue, Apr 9, 2024 at 9:42=E2=80=AFAM Edward Adam Davis <eadavis@qq.com> w=
+On Tue, Apr 9, 2024 at 9:49=E2=80=AFAM Edward Adam Davis <eadavis@qq.com> w=
 rote:
 >
-> If len < sizeof(opt) it will trigger oob, so take the min of them.
+> If optlen < sizeof(u32) it will trigger oob, so take the min of them.
 >
-> Reported-by: syzbot+837ba09d9db969068367@syzkaller.appspotmail.com
+> Reported-by: syzbot+b71011ec0a23f4d15625@syzkaller.appspotmail.com
 > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 > ---
->  net/bluetooth/hci_sock.c | 2 +-
+>  net/bluetooth/sco.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> index 4ee1b976678b..cee7ec1adbd2 100644
-> --- a/net/bluetooth/hci_sock.c
-> +++ b/net/bluetooth/hci_sock.c
-> @@ -1946,7 +1946,7 @@ static int hci_sock_setsockopt_old(struct socket *s=
-ock, int level, int optname,
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index 43daf965a01e..815646d9e72b 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -890,7 +890,7 @@ static int sco_sock_setsockopt(struct socket *sock, i=
+nt level, int optname,
+>                 break;
 >
->         switch (optname) {
->         case HCI_DATA_DIR:
-> -               if (copy_from_sockptr(&opt, optval, sizeof(opt))) {
-> +               if (copy_from_sockptr(&opt, optval, min_t(int, sizeof(opt=
-), len))) {
+>         case BT_PKT_STATUS:
+> -               if (copy_from_sockptr(&opt, optval, sizeof(u32))) {
+> +               if (copy_from_sockptr(&opt, optval, min_t(int, sizeof(u32=
+), optlen))) {
 >                         err =3D -EFAULT;
 >                         break;
 >                 }
@@ -117,7 +117,7 @@ ock, int level, int optname,
 > 2.43.0
 
 https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
-t/commit/?id=3D35d2c39b23fffa3d5a216142cc51d86354024363
+t/commit/?id=3D289bfd91fcf22f7864f3817acff5d8ce9fe73307
 
 
 --=20
