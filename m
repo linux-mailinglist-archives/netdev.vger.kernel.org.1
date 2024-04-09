@@ -1,82 +1,142 @@
-Return-Path: <netdev+bounces-85947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08A8189CFE2
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 03:37:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A15B89CFEA
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 03:40:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6FC91B216D6
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 01:37:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F34E1284780
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 01:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED7D98C15;
-	Tue,  9 Apr 2024 01:37:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5DE54DA03;
+	Tue,  9 Apr 2024 01:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hd2hHsiK"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="I9OQ7OcN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC12C79CC;
-	Tue,  9 Apr 2024 01:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75AA925757;
+	Tue,  9 Apr 2024 01:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712626620; cv=none; b=pQ2cUbhvIzUVI209GVbmKPAg46jqUBQfKORs+b/4BCLU/yGmpXtLRaGQsiDppGofdOVc78CYhxPwPFahN6b/DEwUYHQirxKiEiibhyWqZtgGyi1XJ6LsDzrqW1kKe5WlIHiQKACTSUI2QcCbYAihWWZ83/R0quJ5Pv0/ckLVWTM=
+	t=1712626840; cv=none; b=QRSGfvn3lqW7redQZg8FsROeoOFG5JNBt8eDZxwIL903GhnPmGqKZ4lswal8qxkBJ1juUw5mD5ihQQouYoKoBA5zWRSjwyB5vxtmLclDhEMHDGWjnJnfPx65PBTGvmuuhkGFhQ85+Kpl7szWa5l7SBbLL6uHrN23+MXfxZCIDUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712626620; c=relaxed/simple;
-	bh=QiC3HcFltPSH+8IPm65nID/AeFgYSMHRNQTGacGvZOE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OlPqDd7RN0xVGYqCyLckxZdSrBruv7BJqGjA5gzZYl0lhggzNEGg6kQw1XhVPIc/gehyogbbjW6BMZcEFRZABnOSTrNU//o3hjpm3bnxDMD0M2/lereEiUP0sMev4hyeV/Rog7edsb/pGGxWrtXDZvYbNP8bFYBSy4lF85yVdo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hd2hHsiK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F4070C433F1;
-	Tue,  9 Apr 2024 01:36:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712626620;
-	bh=QiC3HcFltPSH+8IPm65nID/AeFgYSMHRNQTGacGvZOE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hd2hHsiKY2UEOVT1Qo8Is9fP+8NlV9vFq1pFkwShK1QSb4PyHre9do08np2q02862
-	 9enyc9/neSjA2H8IQzUSAIuI0Jg9bInVlMeeSkFbjKLFEkKfXYH3E23E8aaf0Mgc47
-	 aozIVu8MqpYNnSRp5AIC7reAeGwKCQsOGD/kFGd3AOSu/uGW82z66dTTQ8ERoCjF1O
-	 8ALULnvzgVnkSN/RrFC3K/qe6yD1Ze5FMw/FCgYVYiAX7yZ+1ldaqB21TVvl3/CHzv
-	 C6fWmup12uvWZv2IePJduWEJq1PkVuk2mlhVheHPL97CX/t0wZPBdkIeeQp4C3mDsX
-	 Uuok8x4qQIcNQ==
-Date: Mon, 8 Apr 2024 18:36:57 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Erick Archer <erick.archer@outlook.com>, Long Li <longli@microsoft.com>,
- Ajay Sharma <sharmaajay@microsoft.com>, "K. Y. Srinivasan"
- <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu
- <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Kees Cook <keescook@chromium.org>, "Gustavo A. R.
- Silva" <gustavoars@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nick
- Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>,
- Justin Stitt <justinstitt@google.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Shradha Gupta <shradhagupta@linux.microsoft.com>, Konstantin Taranov
- <kotaranov@microsoft.com>, linux-rdma@vger.kernel.org,
- linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
- llvm@lists.linux.dev
-Subject: Re: [PATCH v3 0/3] RDMA/mana_ib: Add flex array to struct
- mana_cfg_rx_steer_req_v2
-Message-ID: <20240408183657.7fb6cc35@kernel.org>
-In-Reply-To: <20240408110730.GE8764@unreal>
-References: <AS8PR02MB72374BD1B23728F2E3C3B1A18B022@AS8PR02MB7237.eurprd02.prod.outlook.com>
-	<20240408110730.GE8764@unreal>
+	s=arc-20240116; t=1712626840; c=relaxed/simple;
+	bh=u1b5vGF6fjegDxFgiSzn3/ni0Say/Sygjxb+PXPiyGI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=GHDfkUyfchLagdP+WS9QLLFDjUHYBrJtlKzPsOdY6U6Gq+h6zOA3d5iMg5Cyy/hh3wykomJDK59Ja2ayiVt5y+rUG4JZnXXtqDAyKBDOvnWmL7PPU+JVIt21DQ19BVQ+o8myucknIAWJxr++iMEyPo7LoKF1bIGYe3hZGOTlWQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=I9OQ7OcN; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1712626831;
+	bh=ZKghRgYADVS4N/Cyb6zg9wI0ZitXOazy/b7vObIc1LQ=;
+	h=Date:From:To:Cc:Subject:From;
+	b=I9OQ7OcNPpC7QC5rlfP4lr57hdihskhK0pC3z7gtpslUzXmz97T1UrCUp2mxudMED
+	 Ge2P6YMMLGmmfNHlhV7PAQdSAy0LjcFyT1vIyjtzEEBOcK6O6kZepu6c1ICCKf4M8R
+	 3eF4vohGMBcEczuhPBxK7ew6ty9E+6d8VuvRcDid2DRywzJq8e1HbG3VyOzuB2jOAt
+	 f7J+XccTY93+MSvHL7Kh/jAaMY0MQsMPDki3wvpWO3VSj8a7tvZxnIYxL/T6G7BxgO
+	 YT5IFVt2cz62uMc56QfUbstB7cZkAS2LpBb6Mjedk09Ycl67Qu7hyRygqrhyuCpdAE
+	 HfqYJRygo7y8Q==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VD7vL6tSYz4x1Y;
+	Tue,  9 Apr 2024 11:40:30 +1000 (AEST)
+Date: Tue, 9 Apr 2024 11:40:28 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Eric Dumazet <edumazet@google.com>, Networking <netdev@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
+ Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the net-next tree
+Message-ID: <20240409114028.76ede66a@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/ZBgaFDbHVPMizQTjD3D=DAu";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/ZBgaFDbHVPMizQTjD3D=DAu
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 8 Apr 2024 14:07:30 +0300 Leon Romanovsky wrote:
-> Jakub, do you want shared branch for this series or should I take
-> everything through RDMA tree as netdev part is small enough?
+Hi all,
 
-Shared branch would be good. Ed has some outstanding patches 
-to refactor the ethtool RSS API.
+After merging the net-next tree, today's linux-next build (arm
+multi_v7_defconfig) failed like this:
+
+In file included from <command-line>:
+In function 'tcp_struct_check',
+    inlined from 'tcp_init' at net/ipv4/tcp.c:4703:2:
+include/linux/compiler_types.h:460:45: error: call to '__compiletime_assert=
+_940' declared with attribute error: BUILD_BUG_ON failed: offsetof(struct t=
+cp_sock, __cacheline_group_end__tcp_sock_write_txrx) - offsetofend(struct t=
+cp_sock, __cacheline_group_begin__tcp_sock_write_txrx) > 92
+  460 |         _compiletime_assert(condition, msg, __compiletime_assert_, =
+__COUNTER__)
+      |                                             ^
+include/linux/compiler_types.h:441:25: note: in definition of macro '__comp=
+iletime_assert'
+  441 |                         prefix ## suffix();                        =
+     \
+      |                         ^~~~~~
+include/linux/compiler_types.h:460:9: note: in expansion of macro '_compile=
+time_assert'
+  460 |         _compiletime_assert(condition, msg, __compiletime_assert_, =
+__COUNTER__)
+      |         ^~~~~~~~~~~~~~~~~~~
+include/linux/build_bug.h:39:37: note: in expansion of macro 'compiletime_a=
+ssert'
+   39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond), msg)
+      |                                     ^~~~~~~~~~~~~~~~~~
+include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_ON_M=
+SG'
+   50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #condit=
+ion)
+      |         ^~~~~~~~~~~~~~~~
+include/linux/cache.h:108:9: note: in expansion of macro 'BUILD_BUG_ON'
+  108 |         BUILD_BUG_ON(offsetof(TYPE, __cacheline_group_end__##GROUP)=
+ - \
+      |         ^~~~~~~~~~~~
+net/ipv4/tcp.c:4673:9: note: in expansion of macro 'CACHELINE_ASSERT_GROUP_=
+SIZE'
+ 4673 |         CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write=
+_txrx, 92);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Presumably caused by commit
+
+  d2c3a7eb1afa ("tcp: more struct tcp_sock adjustments")
+
+I have reverted that commit for today.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/ZBgaFDbHVPMizQTjD3D=DAu
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYUnIwACgkQAVBC80lX
+0GwXGwf9FONJR9D6iryOPmMaLVw43NAJJ+G5ykiKuCx/yn+JRUCILh7+ntM8Z2CM
+aUAC0D5iJYS+qwoxemf+XPUhY30mxZc01x3ZP967OEn+kG+oGqhv5NeIRZ8eT7hq
+Qr+I3vDWv/i/zOMsBoaIgACFN0BvVVd1AOOkcLlZt/HJ+leGbTOXVcS4HSI94fLp
+FiEhlvLyPnebhGRgC0kXGdDP8Jn/Sk4Lrt7jqxwOhiJf4Jj8WGumInLxOZJYJnjk
+tltuNDZVNeO23Bm9YRNtgD/fkgrF3tfSqwzgdNxH1QwKGSmype5dxoTnkMcVxs1m
+XNEcuj0Ycv6PkfSQXWgnd/4ysziZeg==
+=urwm
+-----END PGP SIGNATURE-----
+
+--Sig_/ZBgaFDbHVPMizQTjD3D=DAu--
 
