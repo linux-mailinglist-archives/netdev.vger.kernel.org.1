@@ -1,135 +1,124 @@
-Return-Path: <netdev+bounces-85978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B75589D2DC
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 09:13:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3357F89D2F0
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 09:22:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 559032851E5
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 07:13:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C80501F234D9
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 07:22:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3FD0763FC;
-	Tue,  9 Apr 2024 07:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7693F7B3E5;
+	Tue,  9 Apr 2024 07:22:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LDc7Gocd"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="HfAtdVBB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5113D537E6
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 07:13:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D860377F3E;
+	Tue,  9 Apr 2024 07:22:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712646795; cv=none; b=B9i3lF+yilyIfKVnhphADkfTfJaY7G/FhsLykv+c6eo8J5Uj+LhJDiXog4QSEJOVBzbV6OZIeCIq/ZTltgU6+ghZ3flVpHvXXITl3DE4FufpPC/V3VPn6MZkB2GhbjEnaVQ5Es0JnilF7Y/OPZbR0yWbYDf/je9cQOyFwG/fofw=
+	t=1712647343; cv=none; b=HMR65ukWQNNxrl31qReDH2DDNmqJxubGpqufWjYGR6kh3DIeoJ8HMFCIOwzXE3m7OF4DCIbukTU1seoL0Gg8zt9LBf6ImCFDdV/LoRrXmNSFWrkzw0QyeqXj6ULAso/s2BoczGXsKkTYbmhPOs4lVzFYyYtQvidLYoRorXYygI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712646795; c=relaxed/simple;
-	bh=O/+lv9xKYS1TjaI4TFFN+HVxO8K7p0kncTwAGlXat20=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g37yZkDUNcbRMrOa2h75C23Sq5uJKjTflM48HHk0nvgd0DHfP+XU8HB/RLV48GASFanG7Xdv2Iu2eh4F5hgOHt7Suyt3td1TqhxtIYB64dh/Vf5j9IYa26m5zUfxCSQf4rDNQxotxuxmWriESE6LdZBnxya5XqMEelEnqwTmDx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LDc7Gocd; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-36a2825cdf7so85545ab.1
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 00:13:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712646793; x=1713251593; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O/+lv9xKYS1TjaI4TFFN+HVxO8K7p0kncTwAGlXat20=;
-        b=LDc7GocdCa5PVaJgDwIECuSkfN6eNlpiBfymVAve6WG7kdHdv8HN9m2FEDRk1tHhbs
-         lYDInBu6gaHUSg8UsbuoKnU74fHrRGSdeAlmS3LdpqlU0BVhqEqAj2XL/Ri+dlNIKpao
-         Z48cd/l74ZHgGnUdqPJUxClLlnaRvoSgL57KScMaeZtl8ucY4KlV9jutqpO5RgQ4mffc
-         0iLdAHcMw1Nw44RbxWtFa8EoYKyuKzbIJg6oalB/Bl4iZ1gih1rsLRfC8aCYnjqdy01N
-         h/bH3qaVtXGtCM8cHvg75F/tuEIV3zIZrGrFwPSJrXY7z/lTylY0X7rKKDsAn5jE8h7C
-         pjig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712646793; x=1713251593;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=O/+lv9xKYS1TjaI4TFFN+HVxO8K7p0kncTwAGlXat20=;
-        b=MjeDr0EGjd0M9FiMBmbB9PH/uYgcRX7VSCHwGwz4bc+Ql1x76jBqV2EFEi5Ab7wZ4z
-         kyI7QgJmvyor9U+tWWqRkB3KOrc3HoFi5OS7mtzf1cJijy8/7yJ2y4v1H7Q8ai5kf3h7
-         PeDdMw8+tvNTEgYHiDbxxVyRmz6FcUOgGwKje3bOx3m8z12bUPwCyQq7ufWxiLySUJPD
-         q7NKcHWxfsdqksPpMWEH7/cizXMGvlwQgvJvtJ/cu+nQn+/K+3sdHr3jN2LYnnxPz8q+
-         yIAB8O+lRUbi6+CENpdM7PxwHm6G7A3r5CkCIfg+4iN7pjD6swQpAZ+xtFkq9GioE66m
-         sOcg==
-X-Forwarded-Encrypted: i=1; AJvYcCVry4JnTj0Py/y41bRQ6ev8C8kWMz1HhgUj1LSZ6/Nj68bw70D3nF1j4LouvetiGTeQOm0V2nJ+VD23otsl5S71IGByuuSt
-X-Gm-Message-State: AOJu0YxZ3j3MPKA8wotvnBGxAmgtSouZK2lskdsr9nklqiqf5/foSZ5q
-	Wzeohww3snO06u2v+4DN1WriYanYxPX0eI1sALV++JXyHUe8mn15RpV79b0oe9mqXCyh6Gqpehe
-	RaCj3CBM0koAAkvnr2EDpFUG3BijEIv1MbPaw
-X-Google-Smtp-Source: AGHT+IGWf6qkNiqVm6LYYI4on3p94wttDCDx5SLbMV8f83CFxbAhdenIa+ftysHDaX8f1u2OvlJaPaN52bKLJF0WdiU=
-X-Received: by 2002:a92:d346:0:b0:36a:19a6:bc78 with SMTP id
- a6-20020a92d346000000b0036a19a6bc78mr102437ilh.1.1712646793192; Tue, 09 Apr
- 2024 00:13:13 -0700 (PDT)
+	s=arc-20240116; t=1712647343; c=relaxed/simple;
+	bh=oHme9/dDZsEdFHN/BY3NRMrHNqDmitKSrLLeYs0Vi3U=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fhLqILTzlBk3gXG7tTb9Lj1iVRt1tX60Vdoqr72Q2ptA4Qz5NpjyHeqpv8F7FC1ibDl1Y7rDByzQQ/YWaHmr7aAhAaQZzxzQmy1EqZ8uhJb21ZW0hRoCOOmFq5To/ls9P/IGqqSmAR9nrBAwogmWa0VLrmwjn15wKDTelySjyRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=HfAtdVBB; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E34731BF205;
+	Tue,  9 Apr 2024 07:22:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1712647338;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Pvw9AzoIribB443iVs8M8ZfxBHEw2RZYwtFmzziLEz8=;
+	b=HfAtdVBB5KwAiQIu6/bxkPznaIbrpYTCOwFeUypkvB7yRdwsxYfMXUXjAihY5tdy3/ZDBn
+	Hb0gA9BrKgW+iUj165fkdqhkRseH12/m/KUoFqSbLw5op09N6gRpcvyDd57/UQOZ02Ma/r
+	AYScZVtPMXaiFjNSHJpi/EbIk+7PZDAxGc8AQvFdwi3IgVu6A0JEZ4W4vc0WGd6g4QEHRO
+	g/zK5aPs7siIvaEoGqo3Zw5FYCdRDzI3aE7pOao8uK76/YQIvd42EEPSXbp3Zi4RdUpB5p
+	GKL5q/DkjmFsEfYYZ7n6dXqcPNDIRRIbnKpA2ALpmbVWJ8Eflfw+OAtehyMDRg==
+Date: Tue, 9 Apr 2024 09:22:14 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: patchwork-bot+netdevbpf@kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, linux@armlinux.org.uk,
+ linux-arm-kernel@lists.infradead.org, christophe.leroy@csgroup.eu,
+ herve.codina@bootlin.com, f.fainelli@gmail.com, hkallweit1@gmail.com,
+ vladimir.oltean@nxp.com, kory.maincent@bootlin.com,
+ jesse.brandeburg@intel.com, corbet@lwn.net, kabel@kernel.org,
+ piergiorgio.beruto@gmail.com, o.rempel@pengutronix.de,
+ nicveronese@gmail.com, horms@kernel.org, mwojtas@chromium.org
+Subject: Re: [PATCH net-next v11 00/13] Introduce PHY listing and
+ link_topology tracking
+Message-ID: <20240409092214.437e5909@device-28.home>
+In-Reply-To: <6c5f731e-a21e-4a4c-87a4-9585b2267c9e@lunn.ch>
+References: <20240404093004.2552221-1-maxime.chevallier@bootlin.com>
+	<171242462917.4000.9759453824684907063.git-patchwork-notify@kernel.org>
+	<20240408163219.64fe77b3@device-28.home>
+	<6c5f731e-a21e-4a4c-87a4-9585b2267c9e@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANn89iJgr3f23-t2O+cMcyQixNhcTGVVwp3m69J3G28zW4MPkg@mail.gmail.com>
- <20240408233200.1701282-1-hli@netflix.com>
-In-Reply-To: <20240408233200.1701282-1-hli@netflix.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 9 Apr 2024 09:12:57 +0200
-Message-ID: <CANn89iKe=GCvSp1u5=6F+NYNUoGeOLyp0-ce8_Y-z8Vo=6-xMA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] tcp: increase the default TCP scaling ratio
-To: Hechao Li <hli@netflix.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Soheil Hassas Yeganeh <soheil@google.com>, netdev@vger.kernel.org, 
-	Tycho Andersen <tycho@tycho.pizza>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On Tue, Apr 9, 2024 at 1:32=E2=80=AFAM Hechao Li <hli@netflix.com> wrote:
->
-> After commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale"),
-> we noticed an application-level timeout due to reduced throughput.
->
-> Before the commit, for a client that sets SO_RCVBUF to 65k, it takes
-> around 22 seconds to transfer 10M data. After the commit, it takes 40
-> seconds. Because our application has a 30-second timeout, this
-> regression broke the application.
->
-> The reason that it takes longer to transfer data is that
-> tp->scaling_ratio is initialized to a value that results in ~0.25 of
-> rcvbuf. In our case, SO_RCVBUF is set to 65536 by the application, which
-> translates to 2 * 65536 =3D 131,072 bytes in rcvbuf and hence a ~28k
-> initial receive window.
->
-> Later, even though the scaling_ratio is updated to a more accurate
-> skb->len/skb->truesize, which is ~0.66 in our environment, the window
-> stays at ~0.25 * rcvbuf. This is because tp->window_clamp does not
-> change together with the tp->scaling_ratio update.
+On Tue, 9 Apr 2024 01:50:54 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-< when autotuning is disabled because of SO_RCVBUF >
+> > > Here is the summary with links:
+> > >   - [net-next,v11,01/13] net: phy: Introduce ethernet link topology representation
+> > >     https://git.kernel.org/netdev/net-next/c/6916e461e793
+> > >   - [net-next,v11,02/13] net: sfp: pass the phy_device when disconnecting an sfp module's PHY
+> > >     https://git.kernel.org/netdev/net-next/c/0ec5ed6c130e
+> > >   - [net-next,v11,03/13] net: phy: add helpers to handle sfp phy connect/disconnect
+> > >     https://git.kernel.org/netdev/net-next/c/e75e4e074c44
+> > >   - [net-next,v11,04/13] net: sfp: Add helper to return the SFP bus name
+> > >     https://git.kernel.org/netdev/net-next/c/fdd353965b52
+> > >   - [net-next,v11,05/13] net: ethtool: Allow passing a phy index for some commands
+> > >     https://git.kernel.org/netdev/net-next/c/841942bc6212
+> > >   - [net-next,v11,06/13] netlink: specs: add phy-index as a header parameter
+> > >     (no matching commit)
+> > >   - [net-next,v11,07/13] net: ethtool: Introduce a command to list PHYs on an interface
+> > >     (no matching commit)
+> > >   - [net-next,v11,08/13] netlink: specs: add ethnl PHY_GET command set
+> > >     (no matching commit)
+> > >   - [net-next,v11,09/13] net: ethtool: plca: Target the command to the requested PHY
+> > >     (no matching commit)
+> > >   - [net-next,v11,10/13] net: ethtool: pse-pd: Target the command to the requested PHY
+> > >     (no matching commit)
+> > >   - [net-next,v11,11/13] net: ethtool: cable-test: Target the command to the requested PHY
+> > >     (no matching commit)
+> > >   - [net-next,v11,12/13] net: ethtool: strset: Allow querying phy stats by index
+> > >     (no matching commit)
+> > >   - [net-next,v11,13/13] Documentation: networking: document phy_link_topology
+> > >     (no matching commit)  
+> > 
+> > It looks like commits 6 to 13 didn't make it upstream with (the "no
+> > matching commit" messages above). Is that expected ?  
+> 
+> They are not in net-next, unlike 1-5.
+> 
+> You probably need to repost them.
 
-Most modern applications let the kernel do autotuning, and benefit from the
-increased scaling_ratio.
+I'll repost indeed.
 
- As a result, the
-> window size is capped at the initial window_clamp, which is also ~0.25 *
-> rcvbuf, and never grows bigger.
->
-> This patch increases the initial scaling_ratio from ~25% to 50% in order
-> to be backward compatible with the original default
-> sysctl_tcp_adv_win_scale.
->
-> Fixes: dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
-> Signed-off-by: Hechao Li <hli@netflix.com>
-> Reviewed-by: Tycho Andersen <tycho@tycho.pizza>, Eric Dumazet <edumazet@g=
-oogle.com>
+Thanks Andrew BTW for all the reviews !
 
-This tag is not standard, please use one line per reviewer.
-Also please include the link to V1, for further reference.
-
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Link: https://lore.kernel.org/netdev/20240402215405.432863-1-hli@netflix.co=
-m/
-
-Thanks.
+Maxime
 
