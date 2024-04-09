@@ -1,157 +1,93 @@
-Return-Path: <netdev+bounces-86084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67CAB89D7AF
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:13:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C09989D7C0
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:20:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07E621F2553F
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:13:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99B04B2356E
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416CE85954;
-	Tue,  9 Apr 2024 11:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 793761272D5;
+	Tue,  9 Apr 2024 11:20:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="NPlx3xSk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y4HyrJxt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CA08593D;
-	Tue,  9 Apr 2024 11:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5201B1272A7;
+	Tue,  9 Apr 2024 11:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712661232; cv=none; b=nBlMFbXrgSDYP7qXZiQSvsC1wQ1kItAW2SxBh7goRzDEUY8EASlE9DXfBvIf7ovC3oZrc6dtG96bfxio2eqd3IK15krs9aFwu71mcLpeCuAa08slKisDXrLVkregcL+yVetldu+CrkEhQQwU2g7QwCK5zJcLLAFixrHARTOBmbI=
+	t=1712661627; cv=none; b=GbCUomljji7dvwFZ3wUMHv1vQdEPw3nsAmoizpp3DMA6246U5ykbzHMH/ChEGnqLa+HXARqz+1OiV5OhoOn3QE1Zr1kqOivnb5I2fVrKsbcLNf1WHYTX2cE5IQB18bydEVwzmSDggsiAlaLNTaKG9mNyBRLgRCNgF6M2bMDM2Ao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712661232; c=relaxed/simple;
-	bh=5bVejtBKpem9uNwEH+4qa25UXT6wHLuTwQMG/ZuVVxE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cLyfSfsBk+aF4wN/n/FNmrpsggv1l6zWoM8XceUwXr2DxIeKgduuVgGsmQxaf4T+k4BNfjkffksGPDfk/mQ1W/GuYnKy5flrnz2rv7WGSrj0ntxGkm7ceAXRUlcZKhNsam2W8nhF/u/Lrov4BkEfSHkj1uCsAO2nAil2SrTOXR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=NPlx3xSk; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 17B06600A2;
-	Tue,  9 Apr 2024 11:13:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1712661225;
-	bh=5bVejtBKpem9uNwEH+4qa25UXT6wHLuTwQMG/ZuVVxE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NPlx3xSkfUiMDONhRbRsqPpV+K1d2QECtICZ0PCzvIi/FQ9hoJifUC9lY/42UM9RF
-	 w3XruSMWqTXl9FtLnPEloIVnZhzIK/A5md/K56AkZOgNjzxl3c9oFCjMjeq+C0nJ2Y
-	 P1EiqXucYSz3yKeHnoa4+3iMXNvmosE/oiHkAP66cEBKJEAdV9dwlD70/DKbqEpiFr
-	 3sUqFF/gxksTcusQPcfg9bB0vOttXMbM2qF1QCRjt3bCpRHkSTuBRX3zyo0Et5f5uy
-	 8QApBPWgNL+3+vRx4bgw5rUmvmMRlSVoE8EpDI1X9oKqkxtPW3kEAVQP55+EIfMppb
-	 fF9xP8vWu848g==
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id F200B200A3D;
-	Tue, 09 Apr 2024 11:13:22 +0000 (UTC)
-Message-ID: <2c7bc566-c975-4dd8-a17c-10c7b9ff3928@fiberby.net>
-Date: Tue, 9 Apr 2024 11:13:22 +0000
+	s=arc-20240116; t=1712661627; c=relaxed/simple;
+	bh=WZ8PSReSVvOlS6rKHacwYvIcpPb3u1xgWFdo685nbps=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=sBQ+2sBytstve0bz+BrOA9gN4D8thWlk//MDV2afDY/PBsPAWXXapAusepw07g3I8vG0h8ONyhJ1RBXlYEloYLdklaam8uNd4kTsOPuRiyuU9gEbDc0T8AnEBCDS2m+PMhkeYyonV6VjzAYcdltnBnc/bX+UBJOzc3uW1CrwFHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y4HyrJxt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D5B78C433C7;
+	Tue,  9 Apr 2024 11:20:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712661626;
+	bh=WZ8PSReSVvOlS6rKHacwYvIcpPb3u1xgWFdo685nbps=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Y4HyrJxt0RJAtNkABWoW5AG98JXvnQadPRahI1DhNTrVJcvs8U1mOijPXMDzQHmG1
+	 At2sYH0QuzjjHQtcwdmaeMMvWl7qtyQbeZ7vXt2DK7TbN97TNFKyVqyMi1weW2340N
+	 hl7zlH0mDS1XAUnVvzmDKfLKZeVLKdt6LfRjGEYkAxDRl9THJqDNjxgcOMj/V4fOtw
+	 UnHEQvrKua5CfFIczzQd7W5q3hDAdASnhcq3LKxhMsWbz0REaHCCA3sCtYphJS7scb
+	 RT8yemf9oqKNyUZ3zsUTYe3fVHXucgH6d4S1IhTYTmwM33vePuFMSu6LEqNJTEhps1
+	 fG0sILAZkRC3A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C88A6D6030D;
+	Tue,  9 Apr 2024 11:20:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/6] flow_offload: add
- flow_rule_no_unsupp_control_flags()
-To: Louis Peens <louis.peens@corigine.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Taras Chornyi <taras.chornyi@plvision.eu>,
- Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Yanguo Li <yanguo.li@corigine.com>, oss-drivers@corigine.com,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, Edward Cree <ecree.xilinx@gmail.com>,
- Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
- Jiri Pirko <jiri@resnulli.us>
-References: <20240408130927.78594-1-ast@fiberby.net>
- <20240408130927.78594-2-ast@fiberby.net> <ZhT/E1qDsMmMxGwb@LouisNoVo>
-Content-Language: en-US
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <ZhT/E1qDsMmMxGwb@LouisNoVo>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Subject: Re: [net PATCH] octeontx2-af: Fix NIX SQ mode and BP config
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171266162681.18559.12947263220508270217.git-patchwork-notify@kernel.org>
+Date: Tue, 09 Apr 2024 11:20:26 +0000
+References: <20240408063643.26288-1-gakula@marvell.com>
+In-Reply-To: <20240408063643.26288-1-gakula@marvell.com>
+To: Geetha sowjanya <gakula@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
+ davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
 
-Hi Louis,
+Hello:
 
-On 4/9/24 8:40 AM, Louis Peens wrote:
-> On Mon, Apr 08, 2024 at 01:09:19PM +0000, Asbjørn Sloth Tønnesen wrote:
->> [Some people who received this message don't often get email from ast@fiberby.net. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
->>
->> This helper can be used by drivers to check for the
->> presence of unsupported control flags.
->>
->> It mirrors the existing check done in sfc:
->>    drivers/net/ethernet/sfc/tc.c +276
->>
->> This is aimed at drivers, which implements some control flags.
->>
->> This should also be used by drivers that implement all
->> current flags, so that future flags will be unsupported
->> by default.
->>
->> Only compile-tested.
->>
->> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
->> ---
->>   include/net/flow_offload.h | 22 ++++++++++++++++++++++
->>   1 file changed, 22 insertions(+)
->>
->> diff --git a/include/net/flow_offload.h b/include/net/flow_offload.h
->> index 314087a5e1818..c1317b14da08c 100644
->> --- a/include/net/flow_offload.h
->> +++ b/include/net/flow_offload.h
->> @@ -449,6 +449,28 @@ static inline bool flow_rule_match_key(const struct flow_rule *rule,
->>          return dissector_uses_key(rule->match.dissector, key);
->>   }
->>
->> +/**
->> + * flow_rule_no_unsupp_control_flags() - check for unsupported control flags
->> + * @supp_flags: flags supported by driver
->> + * @flags: flags present in rule
->> + * @extack: The netlink extended ACK for reporting errors.
->> + *
->> + * Returns true if only supported control flags are set, false otherwise.
->> + */
->> +static inline bool flow_rule_no_unsupp_control_flags(const u32 supp_flags,
->> +                                                    const u32 flags,
->> +                                                    struct netlink_ext_ack *extack)
-> Thanks for the change Asbjørn, I like the series in general. I do have
-> some nitpicking with the naming of this function, the double negative
-> makes it a bit hard to read. Especially where it gets used, where it
-> then reads as:
->      'if not no unsupported'
-> 
-> I think something like:
->      'if not supported'
-> or
->      'if unsupported'
-> 
-> will read much better - personally I think the first option is the best,
-> otherwise you might end up with 'if not unsupported', which is also
-> weird.
-> 
-> Some possible suggestions I can think of:
->      flow_rule_control_flags_is_supp()
->      flow_rule_is_supp_control_flags()
->      flow_rule_check_supp_control_flags()
-> 
-> or perhaps some even better variant of this. I hope it's not just me, if
-> that's the case please feel free to ignore.
-I agree, I will update the naming in v2:
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-flow_rule_no_unsupp_control_flags             => flow_rule_is_supp_control_flags
-flow_rule_no_control_flags        + s/no/has/ => flow_rule_has_control_flags
-flow_rule_match_no_control_flags  + s/no/has/ => flow_rule_match_has_control_flags
+On Mon, 8 Apr 2024 12:06:43 +0530 you wrote:
+> NIX SQ mode and link backpressure configuration is required for
+> all platforms. But in current driver this code is wrongly placed
+> under specific platform check. This patch fixes the issue by
+> moving the code out of platform check.
+> 
+> Fixes: 5d9b976d4480 ("octeontx2-af: Support fixed transmit scheduler topology")
+> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+> 
+> [...]
 
+Here is the summary with links:
+  - [net] octeontx2-af: Fix NIX SQ mode and BP config
+    https://git.kernel.org/netdev/net/c/faf23006185e
+
+You are awesome, thank you!
 -- 
-Best regards
-Asbjørn Sloth Tønnesen
-Network Engineer
-Fiberby - AS42541
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
