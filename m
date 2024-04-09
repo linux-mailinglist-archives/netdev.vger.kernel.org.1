@@ -1,243 +1,178 @@
-Return-Path: <netdev+bounces-86033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 570B189D507
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:00:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D51D289D512
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:07:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A3BA283260
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 09:00:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DED2283F01
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 09:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDCF7E785;
-	Tue,  9 Apr 2024 09:00:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED0057E792;
+	Tue,  9 Apr 2024 09:07:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MAyBpHGD"
+	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="NQPtyfNm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 181A77E580;
-	Tue,  9 Apr 2024 09:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712653253; cv=fail; b=m6D+Jr6z34pkjofPmPPYOVwcWlYX3K71uPHDsa9P/4HDl5UeFyLmlnX6lQkry+qvjclOgWdvAjBf8G9Jy+mMv9A03MnR1KU1Gzeb90MxZTzvKFfHmg1kvBIMfhJ7IE+KOiQYlLnMXUVZdkced3lq1qC30DqjCgvhZiV4cREzCUc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712653253; c=relaxed/simple;
-	bh=ipeW9eZEK6BvQFw96U3AMSG3OnRBnlfjmbFbz7lSDbM=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=GLW8AxRJ6/RcgvnzxOstnWFa8TgilCQEmiC0x1wnUabkYUvdcgsD+fy05BBsJqYKd+hRYWHDkEMtMtQXiWFxesQeTuFOc076/10sH0O/EUivZCZrJ9YrqxrQVG4/lRe4EHxVfzlJ9ZfpVZv4erFsMPejBcaNOE5I6ZZLPIewenA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MAyBpHGD; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712653252; x=1744189252;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ipeW9eZEK6BvQFw96U3AMSG3OnRBnlfjmbFbz7lSDbM=;
-  b=MAyBpHGDefY/z2bO6Puz0og9+IrmQzIDq69uNDcZoIVBRw2I6gZc08Kv
-   5T5EI8L4uXE3icnWqsWvYTb3pR53xDbVWqIdDGmtmIJ7wrQo33Pg9kL1b
-   3FzFIueyzPt4PTueFEsCPflSzA9hJH3T9Rlh6cQ9fP92U9tzDvYl7Kf2R
-   AwyX3DYucJKUwqXksLst4+hKhkzcmkpuvGGUcQQ3MbrecIvpO6s4E61hW
-   3ZmSVobD11cnylFQrj1lgK1sXv+HZGEsBhLqyY9VZFPlM9rDA9amILyXa
-   rrh6U6yR1kpK8ZwPIZkX/zJwLDN9oc5goH6MaAMllqlb909Jo80rNOHZG
-   w==;
-X-CSE-ConnectionGUID: cfbpzEAJSTOGZ6zmUMxPMQ==
-X-CSE-MsgGUID: zi/MDlgURAW8itWNl16i1Q==
-X-IronPort-AV: E=McAfee;i="6600,9927,11038"; a="8188813"
-X-IronPort-AV: E=Sophos;i="6.07,189,1708416000"; 
-   d="scan'208";a="8188813"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 02:00:48 -0700
-X-CSE-ConnectionGUID: 8tkKTq7OTXOpMByXQjFPwQ==
-X-CSE-MsgGUID: Yp9O+h7MQhaGekmVh8U9RA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,189,1708416000"; 
-   d="scan'208";a="20076071"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Apr 2024 02:00:46 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 9 Apr 2024 02:00:45 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 9 Apr 2024 02:00:44 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 9 Apr 2024 02:00:44 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.40) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 9 Apr 2024 02:00:44 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=L9MTyD6kcHiyz/iy+bp9p+/7E/5HfqrWkDdMztSs2yjcDM21RqDnRix7CKz7EvyhsnmDsdKde4sHMOwAEUSjINw1O3aGy3G78l5know1qliEb/p4j9xEU8yZkErOTvt4rsFxN6Xkqru3U4NFn31F8sJvrL5dRNb0OpMj7Sfq0RZ8d3w1frYvn4SwtD7v9qXwhe5MwVWFou5ycCplT3C1mLt3fecB1Q6qhtIU9SIkBEPlKNMBYsgHJBm9K4sroNp9G0FslGFXZYzKB23qkyLpCp9bl7ZpL81TD4rU+pTv0KfLX1wVX6QUitBLNcZpoZ4Y0cIfLfGklYTBzwMEn1jJoQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Jnayr4X27IWSidtX2ZChtV+ZUFmUx3+QGY8ASyObpuY=;
- b=Tly9OkXnMgaMsDURN392UmpqGMb/C/r3wD0e2ymAwsPKPqPR81DFO2eExuSsTDQSfRKfK9UljVGvdwZBBJH5vtAxblBSC3Z2lUZRAvgbXDkI54RXp8O523GxDECcnm31sVXuA04il+qCrCSlozXEav4niIyqwsfjM+qpdgWYsNBmu2IeNEfU+zdxU4ZMl2l0LwbUNOYzCLv5Iqd6oK8M5h8ZuskkcPxmjyy+KXKRCW6Ue2PGeL7VpbuIE938pbg87SyALQkxkbu9NO2ZBCtWyKN/yAQNt3lBtbezq1xC2JCdC9VklZhAy2gy47RjSNmMc3afKxYNgkHf6eY3LKyvKQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by SJ0PR11MB4847.namprd11.prod.outlook.com (2603:10b6:a03:2d9::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.33; Tue, 9 Apr
- 2024 09:00:42 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::654c:d66a:ec8e:45e9]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::654c:d66a:ec8e:45e9%6]) with mapi id 15.20.7452.019; Tue, 9 Apr 2024
- 09:00:42 +0000
-Message-ID: <da430107-23ff-4984-b6ff-2f2e94f1429d@intel.com>
-Date: Tue, 9 Apr 2024 10:58:41 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] net: dsa: lan9303: use ethtool_puts() for
- lan9303_get_strings()
-To: Justin Stitt <justinstitt@google.com>
-CC: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-hardening@vger.kernel.org>, Kees Cook
-	<keescook@chromium.org>
-References: <20240408-strncpy-drivers-net-dsa-lan9303-core-c-v3-1-0c313694d25b@google.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20240408-strncpy-drivers-net-dsa-lan9303-core-c-v3-1-0c313694d25b@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR2P278CA0049.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:53::15) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B7A5339A;
+	Tue,  9 Apr 2024 09:07:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712653641; cv=none; b=LHy8ka/U3rQaY1zK0SlgQR5Sn7FqItS7IbTFL64Nox0StcJPLAQQaWViXfOKykEOhKCMIlFuINupepbgGOxRDz1jU1gK88GzU5OQ58IzSuQGVT2dw5ZZOQXbJFjvetm7cHmYhgcReMhOP51TgE+GJnUtDnvVr/lrZueXFm/AQVc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712653641; c=relaxed/simple;
+	bh=nsVDit+POVQZ2H6w/6IpwlVYrA58ci/3Jlcy44bs/kE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HpZ/cnKDpxP1oOdiPRqfWmtrVqIaoB2u9uhxf/l5eV1R7OYwLx8JNjLwkzXTwMlJfzY1hGHBor8fWep8pEz2Gkn3W6hYaBjgGhCnqNDM2jrD9FuiolBjajB8Ij6NC+QgrPEVv2hYkTlW+6xXCvhiRGX0pZzMil5JNV9cSa6ZwkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=NQPtyfNm; arc=none smtp.client-ip=109.73.34.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
+Received: from mx1.t-argos.ru (localhost [127.0.0.1])
+	by mx1.t-argos.ru (Postfix) with ESMTP id 6D9A7100003;
+	Tue,  9 Apr 2024 12:06:52 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
+	t=1712653612; bh=6MJ6fVJnN7Gpxxf8TraZt1FowXJlJ9GCYXfReimphcE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=NQPtyfNmcjh89rBodlhXy1EsylX+VHfcn9U02hLYvaH6up/r/D9hxcvuoMxhm0EPU
+	 DxbSf6L+M9GBDmrafkeANR6UVwvvPOW435hfGXCYaw9Pcot438f5neUbAEJtVr3FPz
+	 AVjIKRwNMopl1uKScEndfTPW6rdTEgeVxOjIL4FtlUR5yBJpfqKNr2l/9NLePjtqF5
+	 mjeCVtyAEZ4/GAva59U8lvd3yDAR3xi86i6GhuE9aryNO6ULiT2uMMwkRPCkIK1LkP
+	 AFvh7mhVGE+aXag/ssPp+hfYRVtesELjE24VrIpDcI65To5tUSOo0Ok7AHqy+49Toi
+	 S7du+yl8W3RoQ==
+Received: from mx1.t-argos.ru.ru (ta-mail-02.ta.t-argos.ru [172.17.13.212])
+	by mx1.t-argos.ru (Postfix) with ESMTP;
+	Tue,  9 Apr 2024 12:05:45 +0300 (MSK)
+Received: from localhost.localdomain (172.17.215.6) by ta-mail-02
+ (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 9 Apr 2024
+ 12:05:15 +0300
+From: Aleksandr Mishin <amishin@t-argos.ru>
+To: Atul Gupta <atul.gupta@chelsio.com>
+CC: Aleksandr Mishin <amishin@t-argos.ru>, Ayush Sawal
+	<ayush.sawal@chelsio.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, Michael Werner
+	<werner@chelsio.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Subject: [PATCH net] crypto: chtls: Fix possible null pointer dereferences
+Date: Tue, 9 Apr 2024 12:05:07 +0300
+Message-ID: <20240409090507.21441-1-amishin@t-argos.ru>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|SJ0PR11MB4847:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: aYn3oYeJ5BgE81fGn2U9G3KGY2vdyjvjo3B70sxcdck5ILEqR/FzPRuhanWEi1EIlSdYCg98cz7lKy8TL5gLhQ7zard++wWlrcSa0kurzPnZaDRWaTWXtNMNRpDFiZycU+LdAAHxazCya96SGn6css44yQZZJyx6qEwxFmebtXbSHU/+2F/EpxN5C2EWsaeHy9BXgPWomWeTlmxh0Ed39qX0gb797qnOm3bubG0gutbx7ELxiiu/1aEjS/Mljhxp0hd4uwQaZo+G90UtE/GZH1US44L90t5223koFvM2kxhk+UqoNMCbOijnh8q/eMzzstXYBnTZuv2hrNsGX7dtc98hxTrtWu01OWfnjx2/mT2lM3BJ74y9Z/cCjU4g+bccsDLrQ/YTIgckLC9wzpRZK+Z3B8YtDLwgeVzn2p5aPfUk3Ky4CZwQjfFv95O2zXFLneIs1j3o5oOyL9a7RNMw7nxSjjpSdVE/0/WfH7Q2/yIrGV1rit2aTIvZyfivlM+Wnv7jiyH1XAmuoa9vM/6KI3t2V4BKHCoy4GV7z84pG/gMkaUz4xrr30v3w/so+HSBmtb0tSb+JtHTq9T281Mje5OEG5Zj1Hfb5xzuCPaZ+I13uwfVzqgQQ221CathaTHt
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(7416005)(1800799015)(376005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bzMxeFZkTmNjUmlBOFk1ZzloK1Jpc0xBQjU2OUVsNWMwdHc1ejA3N2h3Q1Jm?=
- =?utf-8?B?d1puWnlJcnRZOTRwbXBlZWxjeHpCK3IvZ29JVjdyOXppNUhGNW1kZG9ERUxa?=
- =?utf-8?B?T29OR1QxWjA2REx4eDBDTExidU5HY2VjV1VQdlBsem05Qkk0T2tzcGF6aE1W?=
- =?utf-8?B?VmR1MW9zZDFReHBJRVNCTnZmck9Sam96aVVvbHdqSmtkZk1ySFFmMnI4SitY?=
- =?utf-8?B?Qk5mTkg0Nk9XSjFUekFGc3FBcDZEODRKT2VWUVZRbEhSbFgwelpLbUo4UkY0?=
- =?utf-8?B?Q0pGdkgxZkRHYjdHTzBLRndsWkR1enFNeWIxK0dKWGRha09BenFVSUJnV3lX?=
- =?utf-8?B?QlR0VFdXTUlBU29sMTEzU1hteW4yUTVha000K2JsMjQ3OU5mVFQzRndoUk14?=
- =?utf-8?B?c0hNUnJrUEwvTG1PZThuWUhJMnZjNEUrTUt1M0hvcFpNdmpNMU9pNUNXYmVJ?=
- =?utf-8?B?cjduUHhrbE5uS2d6cFNMdHhXY20wNy9OTk55aHZuME9OTXlIREphVkFmSlRZ?=
- =?utf-8?B?THd3SjgvbjBQTUVBYjI1cnBrZytMYlc0dWpzSVlDUldPYnhKa0tNakdWNERt?=
- =?utf-8?B?T21BVHlxVEd4eGhpQlZ1MVNEL2VmaEdoSHBmVG0zYVQ1UXBCRnBZNVpnOVRo?=
- =?utf-8?B?Qk4vVG9vTmVVYkV1c3RMWmV2aXNqQWd6cTI0R1RvcHdINVo4OTRla1doMW9T?=
- =?utf-8?B?bHhFcDZaR3JkbkVXbWUwZlZlNlI5Qzk5TWxNbU5RdkxCZkJtQjM1aGhJMXV3?=
- =?utf-8?B?aHhCbDdlclJFdEJtZUZZb256WnVuV2JoSW56U0g5bkhhdUJGL251bGNRbG5z?=
- =?utf-8?B?bXdDTHd4VjA3czkraWxTa1BhL09IV0VuYlhnNnNVN3ZFY3huK0MxMFRZVGh0?=
- =?utf-8?B?RlRXd21KdHRtZ2VldDZ3Q3J4NUdlQkMrL3JqaFJXU2pkNXZweDljM0c2YjY4?=
- =?utf-8?B?TmtldWRRaFYrMlh2Q2ZiUm45MDRzS1c2VWNDTmI2eTFybkFQNlhJbDMxTlVn?=
- =?utf-8?B?TW1vNXQxb1dYRDlWdlhOVzlyZWU1aDlRY0graDM4emNZUGNsME5mNUZzanVn?=
- =?utf-8?B?Y054aTR3bGxnQWprbDN5S0VSMEZrT1BzRkFTbDFrMlhSZGJsQXlKL2tOd3ds?=
- =?utf-8?B?ekMvd09rMXArVDB0L2NmN3cya29INTEwenZGMWY1dmdjcjhRcGwyeVRkWEpv?=
- =?utf-8?B?OXQ1UG1rRlU5M0tvY1VKY0QyUzlzemc3U29GUm9oWWRNUFAya0d0SGR3aEJ4?=
- =?utf-8?B?T1JkOXVOa2ttdndJL0FlZk0rcldiQ0twY0dLeFcwVEQ1UXFFQWc5YWZRNDFk?=
- =?utf-8?B?SjBjQTd5SkdpN2JkWS9PQkk3WFR1WHI3N2MyRWhMWHJoUkpRd0laZGlEQXNU?=
- =?utf-8?B?WmdyMTU0Y1RSL0N3cFhXbksxM05MWmZFWllWSWVDUHlsUlVXb3RxK0dpcVFm?=
- =?utf-8?B?QjJvcXFqZ1o2d29ZWGlIQmxteGVac08rV3ZXNTNuVENWM1FZa2dCSzRlSFYx?=
- =?utf-8?B?cmZMZjhMWTlocnNwaW5XalZRbnVpMGZ4L0Y4VUYrcnArZ1YwRDFYQTdpR1ho?=
- =?utf-8?B?Z2I5cjM1cythWXZtZ0t5Wnc4MzV0bTZHRzlJOEhyb2htTmZrN0ZWUmtpZWZs?=
- =?utf-8?B?NTFBNUNPMGU2NjhpRGwzd096WGQ3bG5ZRDVhM2pJNDBEcHRRUm5QVjF2Tm84?=
- =?utf-8?B?WWppSmRtd1pKUVRkSndJMXY4TnNCT0N4bHhYbE5PWFB3WC9CbDVCZ1V1WDNL?=
- =?utf-8?B?aDhOQVpLcFlOMjRIcTBHWVdrWlVYWTBVWHRIYWwwNVVzMW85YmkxZ0xmR1NS?=
- =?utf-8?B?ZG1ldXFacEI4ODBBWmVuR2JRWjBjdzdzSjRWb1NvT3I5aXRTbDBmNlB6bWNx?=
- =?utf-8?B?cDY4ejAxUllNUGk1aVJCU0lyNUplYzRVc1IyTEtERmpFSnZLcHpaSmFtY0xp?=
- =?utf-8?B?ZWl3bGYvdUtYMmtMOTBqNmxoS1E1YnVXQTAxbmtQSFpsOVBiNnhNWndkeHRY?=
- =?utf-8?B?b0JNN1QyYXJzN0tsc2VNKy9SVVNzM0YwQmVWcklsTjM4dHBEeURDL2pGQkUz?=
- =?utf-8?B?dDZQZ0ZNQlpQcGZtZlg0ekF1V0xLMlRXcUg2L0VtOEJSQTB2eDEvWTR1cDZU?=
- =?utf-8?B?WWFNQzYyZGgxcTFneU5OSGU1bDdScHUwVE01RTB1b0txTm5PYkgxRXROVER2?=
- =?utf-8?B?QUE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3938a212-4da8-4e2e-c5a1-08dc5873891a
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2024 09:00:42.6549
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mEhKWpq9RDMvgCNXlxX/HevO4OfxDx8IhCte1DotBEXP3BmUdFf52C7+F0jjnJQDlmTuU+hCLwA8hxu4rAYNLdczWEVxGVMW3Qxqj80KrP8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4847
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
+ (172.17.13.212)
+X-KSMG-Rule-ID: 1
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 184636 [Apr 09 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 15 0.3.15 adb41f89e2951eb37b279104a7abb8e79494a5e7, {Tracking_from_domain_doesnt_match_to}, mx1.t-argos.ru.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;t-argos.ru:7.1.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/04/09 08:22:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/04/09 07:19:00 #24714583
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-From: Justin Stitt <justinstitt@google.com>
-Date: Mon, 08 Apr 2024 21:01:57 +0000
+In chtls_pass_accept_rpl() and chtls_select_mss() __sk_dst_get() may
+return NULL which is later dereferenced. Fix this bug by adding NULL check.
 
-> This pattern of strncpy with some pointer arithmetic setting fixed-sized
-> intervals with string literal data is a bit weird so let's use
-> ethtool_puts() as this has more obvious behavior and is less-error
-> prone.
-> 
-> Nicely, we also get to drop a usage of the now deprecated strncpy() [1].
-> 
-> Link: https://www.kernel.org/doc/html/latest/process/deprecated.html#strncpy-on-nul-terminated-strings [1]
-> Link: https://github.com/KSPP/linux/issues/90
-> Cc: linux-hardening@vger.kernel.org
-> Cc: Kees Cook <keescook@chromium.org>
-> Signed-off-by: Justin Stitt <justinstitt@google.com>
-> Suggested-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
-> Changes in v3:
-> - use ethtool_puts over ethtool_sprintf
-> - Link to v2: https://lore.kernel.org/r/20231005-strncpy-drivers-net-dsa-lan9303-core-c-v2-1-feb452a532db@google.com
-> 
-> Changes in v2:
-> - use ethtool_sprintf (thanks Alexander)
-> - Link to v1: https://lore.kernel.org/r/20231005-strncpy-drivers-net-dsa-lan9303-core-c-v1-1-5a66c538147e@google.com
-> ---
->  drivers/net/dsa/lan9303-core.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/lan9303-core.c b/drivers/net/dsa/lan9303-core.c
-> index fcb20eac332a..04d3af0eb28e 100644
-> --- a/drivers/net/dsa/lan9303-core.c
-> +++ b/drivers/net/dsa/lan9303-core.c
-> @@ -1007,14 +1007,14 @@ static const struct lan9303_mib_desc lan9303_mib[] = {
->  static void lan9303_get_strings(struct dsa_switch *ds, int port,
->  				u32 stringset, uint8_t *data)
->  {
-> +	u8 *buf = data;
->  	unsigned int u;
->  
->  	if (stringset != ETH_SS_STATS)
->  		return;
->  
->  	for (u = 0; u < ARRAY_SIZE(lan9303_mib); u++) {
-> -		strncpy(data + u * ETH_GSTRING_LEN, lan9303_mib[u].name,
-> -			ETH_GSTRING_LEN);
-> +		ethtool_puts(&buf, lan9303_mib[u].name);
->  	}
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-The braces { } around ethtool_puts() aren't needed anymore.
+Fixes: cc35c88ae4db ("crypto : chtls - CPL handler definition")
+Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+---
+ .../chelsio/inline_crypto/chtls/chtls_cm.c    | 24 +++++++++++++------
+ 1 file changed, 17 insertions(+), 7 deletions(-)
 
->  }
->  
-> 
-> ---
-> base-commit: c85af715cac0a951eea97393378e84bb49384734
-> change-id: 20231005-strncpy-drivers-net-dsa-lan9303-core-c-6386858e5c22
-> 
-> Best regards,
-> --
-> Justin Stitt <justinstitt@google.com>
+diff --git a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c
+index 6f6525983130..6d88cbc9fbb0 100644
+--- a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c
++++ b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c
+@@ -939,15 +939,15 @@ static void chtls_accept_rpl_arp_failure(void *handle,
+ 	sock_put(sk);
+ }
+ 
+-static unsigned int chtls_select_mss(const struct chtls_sock *csk,
++static bool chtls_select_mss(const struct chtls_sock *csk,
+ 				     unsigned int pmtu,
+-				     struct cpl_pass_accept_req *req)
++				     struct cpl_pass_accept_req *req,
++					 unsigned int *mtu_idx)
+ {
+ 	struct chtls_dev *cdev;
+ 	struct dst_entry *dst;
+ 	unsigned int tcpoptsz;
+ 	unsigned int iphdrsz;
+-	unsigned int mtu_idx;
+ 	struct tcp_sock *tp;
+ 	unsigned int mss;
+ 	struct sock *sk;
+@@ -955,6 +955,9 @@ static unsigned int chtls_select_mss(const struct chtls_sock *csk,
+ 	mss = ntohs(req->tcpopt.mss);
+ 	sk = csk->sk;
+ 	dst = __sk_dst_get(sk);
++	if (!dst)
++		return false;
++
+ 	cdev = csk->cdev;
+ 	tp = tcp_sk(sk);
+ 	tcpoptsz = 0;
+@@ -979,11 +982,11 @@ static unsigned int chtls_select_mss(const struct chtls_sock *csk,
+ 	tp->advmss = cxgb4_best_aligned_mtu(cdev->lldi->mtus,
+ 					    iphdrsz + tcpoptsz,
+ 					    tp->advmss - tcpoptsz,
+-					    8, &mtu_idx);
++					    8, mtu_idx);
+ 	tp->advmss -= iphdrsz;
+ 
+ 	inet_csk(sk)->icsk_pmtu_cookie = pmtu;
+-	return mtu_idx;
++	return true;
+ }
+ 
+ static unsigned int select_rcv_wscale(int space, int wscale_ok, int win_clamp)
+@@ -1016,8 +1019,13 @@ static void chtls_pass_accept_rpl(struct sk_buff *skb,
+ 	struct sock *sk;
+ 	u32 opt2, hlen;
+ 	u64 opt0;
++	struct dst_entry *dst;
+ 
+ 	sk = skb->sk;
++	dst = __sk_dst_get(sk);
++	if (!dst)
++		return;
++
+ 	tp = tcp_sk(sk);
+ 	csk = sk->sk_user_data;
+ 	csk->tid = tid;
+@@ -1029,8 +1037,10 @@ static void chtls_pass_accept_rpl(struct sk_buff *skb,
+ 
+ 	OPCODE_TID(rpl5) = cpu_to_be32(MK_OPCODE_TID(CPL_PASS_ACCEPT_RPL,
+ 						     csk->tid));
+-	csk->mtu_idx = chtls_select_mss(csk, dst_mtu(__sk_dst_get(sk)),
+-					req);
++	if (!chtls_select_mss(csk, dst_mtu(dst),
++					req, &csk->mtu_idx))
++		return;
++
+ 	opt0 = TCAM_BYPASS_F |
+ 	       WND_SCALE_V(RCV_WSCALE(tp)) |
+ 	       MSS_IDX_V(csk->mtu_idx) |
+-- 
+2.30.2
 
-Thanks,
-Olek
 
