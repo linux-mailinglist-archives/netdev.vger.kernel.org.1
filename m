@@ -1,105 +1,104 @@
-Return-Path: <netdev+bounces-86267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C891589E4A6
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 22:47:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41DAF89E4B0
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 22:51:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82EB6282742
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 20:47:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A09C7B2274B
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 20:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C77158209;
-	Tue,  9 Apr 2024 20:47:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3190E15885F;
+	Tue,  9 Apr 2024 20:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pFeIJf8h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GCmXK9w8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28E772905
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 20:47:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E1B15885E;
+	Tue,  9 Apr 2024 20:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712695672; cv=none; b=qXDi9YYg5OCuAdbVOLCTYfZSRcvqBhgV7z3ORA6qiodYlLf97VfpEmLqsEyTxdDDvHHomlqQdqeG2ASnxAaSViCov9CF5LQ9aqRA0MCyEJuNMyKz3bjFPSjOcyvzfjdO6Ky/uT536AfncjDzDfsIorh4FuaRpaa29VjIiN1dn7k=
+	t=1712695905; cv=none; b=PiNDIQYZ8fJpUhJ++eQ9/AxiL8Ndw1Vk5YwfUGo/jl3M7M+vFn8zsFHebT5rQkBC+mmCzmDRNYDvYbp+8E6xWetIwUYXI5THIaWEsGm7GTY1xmGniqTywmoF5wCE88EJFsr8Kpns5+k/UOLd4Yzjdjl+IeIBMppiP5GSXcqurfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712695672; c=relaxed/simple;
-	bh=ly4HEDGRIIfWSmkQwmZD7sqaKCpGxTM16mzbWb1iDFQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NxvipDrs9JFiByVwbMlokMyjSPokdqawtzmzw2r0r6PPHvYLj9wTWxrpugW/jVyTjaHX1KvQT2YibACNQVurcGdvagKo/FYoTVA1whnIMPtJLsykg2RliFYP9Ztb5vg65VZG2FQw1zWh9oDi/MlYnuqvpGsbh7QS2kpKWoSo0rA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pFeIJf8h; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56e85b7d2d1so1603a12.1
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 13:47:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712695669; x=1713300469; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vk639B3gQVwH7movCKIr1m3a+eQVk9EtJRWyGcsGvTs=;
-        b=pFeIJf8hf04e4CquHKkBLUe+cXFLIKbbg/Q8vlwJeD4AYkowD5FnWkl5SZZZqt+5JZ
-         HXZsDICc1Lya6L9LKOglNcJY/g42jxS0ppYHhPEo/kDEZyCImhPmwfQSb6l0vFycuxV8
-         9UyOsO2n9sVJc2mdAVOo3ey/JcdIUTmdaMrUqdNWwvmBo6L0mKoyt8t25rwP9htsmPf5
-         Fo2raXY3xjGIpWNrF856J/IADh6CYupdfym5qd1fpTklwxzzqL0gTOGCnVpdCyZjCQI9
-         5gH89OTixOSJt3OOjbphnLO4fzUnaoa0u2rw24b+DyoptGTpTsTQ+SSap29BWXkxbpAT
-         SElA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712695669; x=1713300469;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vk639B3gQVwH7movCKIr1m3a+eQVk9EtJRWyGcsGvTs=;
-        b=lUUIWcygrcdupvyZn42k6ccMlPql9lpMCrgcWr0QEecJaIufVQEXGWnBfSh9+S6wJN
-         pN6STmVoQeD9nRTZvqQiGxFKxkRdMEMt6SPY4UmPcHHY6gBvWvwI5roYk9xZt8saD3ai
-         VZlWB2e032g2DCMmm2elVJQ028+KZq0xhMrMyGjnYbVSZGUq+JQ97pc+GK198GGumKIz
-         uY3zsmwqOFDQK06kFtZTGJ5CGsT6GS4YHip7zJr/mxnEHCZ4AM2azws9sFk9waFVwJBe
-         y3Bw7gpxZmxHslJGHGDoVeBUV0xPJMOvYNnqDGYsh4cBrkwFC1Ko/WtZMYRGasQo8od2
-         Bj1A==
-X-Forwarded-Encrypted: i=1; AJvYcCUkB+h5VqTJ44jzOLWTQJMAAQHBZMewGmfjYR867MiLedMAKlgsG44m7ub/kM+xQGScsbL7yLJQ/PH7x6K8snO5EEOYVMBP
-X-Gm-Message-State: AOJu0Yw/hm9vXJgBjdi9J+NaSwsHe41QCsyyqa43rJA2152yCQUy++A0
-	Wzbl48RHLopJCdIF9hnijE67BU8Qo8pKhs8pDeo+UTMRu9oItghV1c95ttyplTMnzCg9DyHzLUr
-	kdRmIes9VYBkyDB1bHU++zKQBWWCkLax/SJDV
-X-Google-Smtp-Source: AGHT+IHgLlIUnAxHuTFgN0iM5kbclBWYNM9VcM9ykxsg7GgDSkxIXFSip877hi3CzGcilCpoHJA1TmTVanaegzQnhPc=
-X-Received: by 2002:a05:6402:1612:b0:56e:6e04:4fb9 with SMTP id
- f18-20020a056402161200b0056e6e044fb9mr3669edv.1.1712695669190; Tue, 09 Apr
- 2024 13:47:49 -0700 (PDT)
+	s=arc-20240116; t=1712695905; c=relaxed/simple;
+	bh=DFYamkTUiKJCDN84G+HDkI8zC4pAoOFajfa9annO4DE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ncymG8f1k0scUjacedfiHBSc7LrV7uGXF63LaSRhVHUV6xh2pJ0MpFsjo/4VfzTmlvjOCSYzE6WrpiHr96se6zaOZco+2egA4QJRfKZDgyiGH1vBo5A6L6Gy7x03FFTbba6twV5x0301L4/sGrfo7IdiJWYW8cX9kwQlQ4kmC2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GCmXK9w8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D842BC433C7;
+	Tue,  9 Apr 2024 20:51:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712695904;
+	bh=DFYamkTUiKJCDN84G+HDkI8zC4pAoOFajfa9annO4DE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=GCmXK9w8u7fnZDGqoG6kdvjEGSmoWw+dPpoo+VGoeFKGAPXM6ZwOIisdcG2x37tqb
+	 lefuEnMWDMsfmi+FapR4StYZFjwJ1tIun7Mf6qwGoG4a/KQjcoHGhWUJx1FC2BJIMi
+	 P7ABxhC/g6hTleIV32zBPb/qMdx+f6dHrPP37wZ3dDHbhzCpd7KcmuxbUWQLBzQLmY
+	 T3c737m6fMFWjVSkKKRzOmt2bFSEFylV4yKohMqOy8yOjSiuzFrFTIQ8K46FoJ89mB
+	 u5C/yMH3ssMLHRJiBdNYefuUxD0kAjOhNn3FnzpS9EQtL3QV+KRXocgVfsa35paawP
+	 JSbcygcAp5PDA==
+Date: Tue, 9 Apr 2024 13:51:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: pabeni@redhat.com, John Fastabend <john.fastabend@gmail.com>, Alexander
+ Lobakin <aleksander.lobakin@intel.com>, Florian Fainelli
+ <f.fainelli@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Daniel Borkmann
+ <daniel@iogearbox.net>, Edward Cree <ecree.xilinx@gmail.com>
+Cc: Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
+ bhelgaas@google.com, linux-pci@vger.kernel.org, Alexander Duyck
+ <alexanderduyck@fb.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <20240409135142.692ed5d9@kernel.org>
+In-Reply-To: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240408190437.2214473-1-edumazet@google.com> <20240408190437.2214473-4-edumazet@google.com>
- <17498.1712695173@famine>
-In-Reply-To: <17498.1712695173@famine>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 9 Apr 2024 22:47:38 +0200
-Message-ID: <CANn89i+qQ0zk4+jua1oiTNz6wqj2r1LTbp+W+d5eUaK38U8THA@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/3] bonding: no longer use RTNL in bonding_show_queue_id()
-To: Jay Vosburgh <jay.vosburgh@canonical.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Andy Gospodarek <andy@greyhouse.net>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 9, 2024 at 10:39=E2=80=AFPM Jay Vosburgh <jay.vosburgh@canonica=
-l.com> wrote:
->
-> Eric Dumazet <edumazet@google.com> wrote:
->
-> >Annotate lockless reads of slave->queue_id.
-> >
-> >Annotate writes of slave->queue_id.
-> >
-> >Switch bonding_show_queue_id() to rcu_read_lock()
-> >and bond_for_each_slave_rcu().
->
->         This is combining two logical changes into one patch, isn't it?
-> The annotation change isn't part of what's stated in the Subject.
+On Wed, 03 Apr 2024 13:08:24 -0700 Alexander Duyck wrote:
+> This patch set includes the necessary patches to enable basic Tx and Rx
+> over the Meta Platforms Host Network Interface. To do this we introduce a
+> new driver and driver and directories in the form of
+> "drivers/net/ethernet/meta/fbnic".
 
-The annotations are really part of this change, otherwise KCSAN might
-find races.
+Let me try to restate some takeaways and ask for further clarification
+on the main question...
+
+First, I think there's broad support for merging the driver itself.
+
+IIUC there is also broad support to raise the expectations from
+maintainers of drivers for private devices, specifically that they will:
+ - receive weaker "no regression" guarantees
+ - help with refactoring / adapting their drivers more actively
+ - not get upset when we delete those drivers if they stop participating
+
+If you think that the drivers should be merged *without* setting these
+expectations, please speak up.
+
+Nobody picked me up on the suggestion to use the CI as a proactive
+check whether the maintainer / owner is still paying attention, 
+but okay :(
+
+
+What is less clear to me is what do we do about uAPI / core changes.
+Of those who touched on the subject - few people seem to be curious /
+welcoming to any reasonable features coming out for private devices
+(John, Olek, Florian)? Others are more cautious focusing on blast
+radius and referring to the "two driver rule" (Daniel, Paolo)?
+Whether that means outright ban on touching common code or uAPI
+in ways which aren't exercised by commercial NICs, is unclear. 
+Andrew and Ed did not address the question directly AFAICT.
+
+Is my reading correct? Does anyone have an opinion on whether we should
+try to dig more into this question prior to merging the driver, and
+set some ground rules? Or proceed and learn by doing?
 
