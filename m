@@ -1,62 +1,144 @@
-Return-Path: <netdev+bounces-86131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C03C89DA51
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:35:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90C4389DA73
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:38:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EED8C1F21EA6
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:35:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B49228E141
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:38:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27FF6136E2A;
-	Tue,  9 Apr 2024 13:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OsAQjYq3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D58D1327EE;
+	Tue,  9 Apr 2024 13:35:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006B1136E29;
-	Tue,  9 Apr 2024 13:27:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF2D712F376;
+	Tue,  9 Apr 2024 13:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712669257; cv=none; b=QCON95Bmlcj6nRIb6PuLOLvRazQh2Bn8K8hilN8pMgAlakZNfqilyn7E9W3i++xCuUjRSdn0maWtUCnTGpzyKYrrQI1UeqeefRx08+ZKxV3AvjkX1imFkNHagZ+h05xX62w20sntOPa2HPld7XKEPvcVZsARVQ5mVbxwGkcHc4I=
+	t=1712669721; cv=none; b=bTIkRmSL6uyIzcAPzKhiy5WBLM88fdCzwZ/MBr03kgE7j+ohBl9on56I0YZDfhQVLxsJPigfdeWhm2uRggglP0ZL/5Z6hp+dLHYeGUL5jx5Yu/Eni073tDuKVuafwFx3NuE1r/mr+p5RpePAq4Udh7RySMiFaZbm6SLBssuGd9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712669257; c=relaxed/simple;
-	bh=Rcx44Jywg4fp0GB6abwphb0WTJLB/yX5eE14LI5C9vY=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=RLwdNiayOy9zDQ5H7UOiqrGI1x/kuM8of/aByB1uk1kiTALh9yIy0iCAqblsGhZusVFOIdqnDYH2ZSnEtAJ4hnW+HRigdF5H1Y+WCoNhD3kDfZniRVYedv1AARPetRgXQMxuRUIu+K/Kz/edx+Ju6UcAmsjPfFaoK/6ljabONiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OsAQjYq3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1292C433C7;
-	Tue,  9 Apr 2024 13:27:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712669256;
-	bh=Rcx44Jywg4fp0GB6abwphb0WTJLB/yX5eE14LI5C9vY=;
-	h=Date:From:To:Subject:From;
-	b=OsAQjYq3ef6pzQOeNd3lG9oJjrvbDZKG3uUJJayeJADrrtwuKcEZ78Vyvwpz4K7/J
-	 QPAI5BEpQ2j8BOmlao7xU1hnXFV/ZvYlnwU3zy0Usx7A5SFue4DH+WQcVYDP6CFkyf
-	 reQzjD5luas53joEHZaukQhjOox2BaF58yYv/89D+dz1YWY71PaEAT+3EmlVVY+3uV
-	 wMsn+pv2ecYwe8ZtPjtB/Q2SxsX05AkMVmgM77QTLF6bv1hInLT0pyoqFM8TZrInqq
-	 4Bt9MOpT9NOOstxworPzZSyD0D9u3sWxJvjxevzdbYwJ2Gt1N6q9si936vhBbz+NoL
-	 T59Hx/DeYnpDg==
-Date: Tue, 9 Apr 2024 06:27:35 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: [ANN] netdev call - April 9th
-Message-ID: <20240409062735.2811d3f8@kernel.org>
+	s=arc-20240116; t=1712669721; c=relaxed/simple;
+	bh=f9nTh0EfACiC5uRI99Wmu8UneIV2W1Qj3qTkTY7pT+w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ay/qFASev01rOsV4gzGj+DonaYrd8l1VfAT61li2RCwMjU3yPw3L//y97nvOurLn/8JYnHCE8FJcc+VL6dYIfMQQDzHuFUc8KftFQIdPIQmuoTYFJAo7F2m2IZj9zwMzINBWVF8bWoVuL67ve2cE/SOR+DpZPUn5UR+I7T8AEdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-56c5d05128dso6298157a12.0;
+        Tue, 09 Apr 2024 06:35:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712669718; x=1713274518;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=O6lqza+y20jmgL1FUPxo6ruPEO/LBvmrDYaeR7EHG0c=;
+        b=kMI6byNhrmySNkJU/VxQedIEhwmjRpfTqBXbkipVlQh8zogrry3xfd1M403xJ7s2l4
+         +QILkVK4WrkrmaNIcQPrQfdL5qs6zTcHaVFqfW1DzCHe7IhaDhrZ3i5Ff7XVqaRoS378
+         kgiu8CszkCfr/mXPbZjYtwqOAgEGptsF9uB8ZoLv1gG2c9lo6Fl2ikX/y9pxh8X8bHGs
+         z0fqI5OCCIGA6gVJTYAKxHVgdzjn8fBPbdPH5Fbd6RwQNA88HTfPlh81p9VhGNohQ9a2
+         jmEnibFW/FAj3810L0BrKDgAxg2OMHeIWnpnGTdq1ENmfXdxzhaR4y3x7mMgkq0RwJ70
+         9XlA==
+X-Forwarded-Encrypted: i=1; AJvYcCWCWuVk9mkAg3h3gvl37cAFLGYfrLBhrrgkK5eQNK3rOqoLr1cKpmIlk9OvCU8oU4OhP+prCXtKbV/iLCkFpAMDhipKkuNj2mQxfTxMMmLAStyrLwS9G5RCjHtN8Ml4G9yf
+X-Gm-Message-State: AOJu0Ywa9hzETCsr8O9J7HS0Vwtt6ep/NP3BKLC6pBQeyuf/IhFGCBtW
+	opxietGiNBp4xgYCsKety08PjZ+qNLqni+LlHXjHppnZCHY/TaDG9MEwVYn3
+X-Google-Smtp-Source: AGHT+IF4N0TpR/1q5j5evnyE0GihgQz26tXPuy2DErdFrHORTKmYrFyu8s8q3bMATTb1WkDayA2P9Q==
+X-Received: by 2002:a17:906:694f:b0:a51:b228:9282 with SMTP id c15-20020a170906694f00b00a51b2289282mr5964031ejs.44.1712669717916;
+        Tue, 09 Apr 2024 06:35:17 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-119.fbsv.net. [2a03:2880:30ff:77::face:b00c])
+        by smtp.gmail.com with ESMTPSA id j5-20020a170906830500b00a4734125fd2sm5704159ejx.31.2024.04.09.06.35.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Apr 2024 06:35:17 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	=?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
+	Oliver Neukum <oneukum@suse.com>
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org (open list:USB NETWORKING DRIVERS)
+Subject: [PATCH net-next 1/2] net: usb: qmi_wwan: Leverage core stats allocator
+Date: Tue,  9 Apr 2024 06:33:05 -0700
+Message-ID: <20240409133307.2058099-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi!
+With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
+convert veth & vrf"), stats allocation could be done on net core
+instead of in this driver.
 
-Yes, the bi-weekly call is happening today, I forgot to send out 
-the reminder. Time zones are aligned again, so 8:30 am (PT) / 
-5:30 pm (~EU). See you at https://bbb.lwn.net/b/jak-wkr-seg-hjn
+With this new approach, the driver doesn't have to bother with error
+handling (allocation failure checking, making sure free happens in the
+right spot, etc). This is core responsibility now.
+
+Remove the allocation in the qmi_wwan driver and leverage the network
+core allocation instead.
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+PS: This was compiled-tested only due to lack of hardware.
+---
+ drivers/net/usb/qmi_wwan.c | 8 +-------
+ drivers/net/usb/usbnet.c   | 1 +
+ 2 files changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+index e2e181378f41..5528a9c2b9d6 100644
+--- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+@@ -133,6 +133,7 @@ static void qmimux_setup(struct net_device *dev)
+ 	dev->flags           = IFF_POINTOPOINT | IFF_NOARP | IFF_MULTICAST;
+ 	dev->netdev_ops      = &qmimux_netdev_ops;
+ 	dev->mtu             = 1500;
++	dev->pcpu_stat_type  = NETDEV_PCPU_STAT_TSTATS;
+ 	dev->needs_free_netdev = true;
+ }
+ 
+@@ -257,12 +258,6 @@ static int qmimux_register_device(struct net_device *real_dev, u8 mux_id)
+ 	priv->mux_id = mux_id;
+ 	priv->real_dev = real_dev;
+ 
+-	new_dev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
+-	if (!new_dev->tstats) {
+-		err = -ENOBUFS;
+-		goto out_free_newdev;
+-	}
+-
+ 	new_dev->sysfs_groups[0] = &qmi_wwan_sysfs_qmimux_attr_group;
+ 
+ 	err = register_netdevice(new_dev);
+@@ -295,7 +290,6 @@ static void qmimux_unregister_device(struct net_device *dev,
+ 	struct qmimux_priv *priv = netdev_priv(dev);
+ 	struct net_device *real_dev = priv->real_dev;
+ 
+-	free_percpu(dev->tstats);
+ 	netdev_upper_dev_unlink(real_dev, dev);
+ 	unregister_netdevice_queue(dev, head);
+ 
+diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
+index e84efa661589..f3f7f686fe9c 100644
+--- a/drivers/net/usb/usbnet.c
++++ b/drivers/net/usb/usbnet.c
+@@ -1733,6 +1733,7 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
+ 	dev->hard_mtu = net->mtu + net->hard_header_len;
+ 	net->min_mtu = 0;
+ 	net->max_mtu = ETH_MAX_MTU;
++	net->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+ 
+ 	net->netdev_ops = &usbnet_netdev_ops;
+ 	net->watchdog_timeo = TX_TIMEOUT_JIFFIES;
+-- 
+2.43.0
+
 
