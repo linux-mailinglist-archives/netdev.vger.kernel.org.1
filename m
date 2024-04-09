@@ -1,222 +1,113 @@
-Return-Path: <netdev+bounces-86120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F66B89D9AC
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:01:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41AD089D9B0
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:02:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 931381C2304A
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:01:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73A35B255EA
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:02:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E56B1132483;
-	Tue,  9 Apr 2024 12:58:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6472D12E1F8;
+	Tue,  9 Apr 2024 12:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="umM6X5LZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F8312EBCA;
-	Tue,  9 Apr 2024 12:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8985A12E1EE
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 12:59:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712667531; cv=none; b=uSbMYtbCSeJtWftJODz7f5E2g8vVf+XCUc2i9K1NjQpUO5vsBMP9d4uwIcOXPHtxkCaFTQWMKeeRUwUhmdcqHEkhX89WBlcmyRqWZ0ultiZRPqpd9yhkkXumoZGPgUHe6ldOOk0mrBUGMc9rM390+fY6pXJ1MQd+lVcfdwa310w=
+	t=1712667580; cv=none; b=hU1FBVeZ8IDg3Mlv6b7+gVRPyMO7bCFV/tMS+ft5wuDaHZF2QWqBzFxWzJ9DlS3VnIrilrGNI2THFPTfFQQ47NX36roW6pyS3AZv1VDlXNNOYbReryfiTcQmheIq9fBpX3ImPzEL1bwKvQ8mn5Pe3Tw+0y7Qnmz/zLZ7SnGDMmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712667531; c=relaxed/simple;
-	bh=C2/enydAC2YCsBNnm5NUTUC6WvB4CkjpCpQsFsdVyag=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MIzltAW8tBrf5ir+5fDXnJUsFwHfjFgJHRWC6ApJeEU1FoR+uBLgudiDZLDI8Fhr8a9/oVbyDllxWUouyW1TLQOwJxN3ms1BCowjTC7c81kOiM/mgJIEXZkuMjR7a40GTSHCSoXYTTY8dEa1XgVtrCcxWu4S2/YOwTHeXMMP9Y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a51a80b190bso282529766b.3;
-        Tue, 09 Apr 2024 05:58:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712667528; x=1713272328;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xrYnp1tDsZ0sxZFnn5u9gBZrt+Gb2bRXco5M67sATos=;
-        b=Mm9HJvJU/WSAiQ6RroEz7pc3mnB2lwCjZjmO3baso9E6VtvTYCKblzb5PRJKlAiIXv
-         Ft288lRkrHoG5GDMeKbFju/AnXyFx2Cb5gGcn5iXNMYwAR8WeeJpzOa1cLXdV8noCxS2
-         Sy771GFjeTxzmEB8Ub7UOW9WwwWTTmG36LR2soc3x4l6saqjq+N5JvJWjv53q3t8maxn
-         yurwaik79TjxXekmIg0BKbi8SOSmR1LsJTmqPomqAfhnuErCCR/7vdG+1wEp5KE/cGhS
-         5jevsw8o6M+mHoGJYVQ/oz5nnXXG9wo8M74El5yJ9vQav0iFz36ovdUsyaxpG7q+ydsH
-         XOkA==
-X-Forwarded-Encrypted: i=1; AJvYcCU7a2k/MpQI1PBCBB1NQPATmHQ6cQiDeaFsGUs6+0aYHkO1gABt+0Om0jZfmS3UcMIA5BVgvKKu0hKhCA4IFQKskF/cjzE5zZKMEgnt4HDuD3jeDo0Xwqp7WC5h7mI7cjz7X13vjVPD/hMZkx6bQSdJy1QCJJSwrMF4ZJ9blpUxDvNNdk2FRrWpa3fPf5+2I+kDRl8Ik9szedg=
-X-Gm-Message-State: AOJu0YyWIimIgfejnXs1rwI5E1O+oO0ymzivkvTN3VfV72GcggptI2yl
-	wf+eLiyufAXk0xZaYv6Uw4r/Gh5YhmkmSXplf2LE5WM1/lpMmaJZ
-X-Google-Smtp-Source: AGHT+IFWbbwWw6wBloVf2pT4eFhSFrEA8FnCKj6FSU15WISPqlCBgNputQ7rdLR70eQG8NtTDx8VvQ==
-X-Received: by 2002:a50:8d15:0:b0:56e:ddc:17ad with SMTP id s21-20020a508d15000000b0056e0ddc17admr9776816eds.30.1712667528396;
-        Tue, 09 Apr 2024 05:58:48 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-004.fbsv.net. [2a03:2880:30ff:4::face:b00c])
-        by smtp.gmail.com with ESMTPSA id dm16-20020a05640222d000b0056e44b681a6sm3977858edb.57.2024.04.09.05.58.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Apr 2024 05:58:48 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: aleksander.lobakin@intel.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	elder@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	nbd@nbd.name,
-	sean.wang@mediatek.com,
-	Mark-MC.Lee@mediatek.com,
-	lorenzo@kernel.org,
-	taras.chornyi@plvision.eu,
-	ath11k@lists.infradead.org,
-	ath10k@lists.infradead.org,
-	linux-wireless@vger.kernel.org,
-	geomatsi@gmail.com,
-	kvalo@kernel.org,
-	Jeff Johnson <jjohnson@kernel.org>
-Cc: quic_jjohnson@quicinc.com,
-	leon@kernel.org,
-	dennis.dalessandro@cornelisnetworks.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH net-next v4 9/9] wifi: ath11k: allocate dummy net_device dynamically
-Date: Tue,  9 Apr 2024 05:57:23 -0700
-Message-ID: <20240409125738.1824983-10-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240409125738.1824983-1-leitao@debian.org>
-References: <20240409125738.1824983-1-leitao@debian.org>
+	s=arc-20240116; t=1712667580; c=relaxed/simple;
+	bh=jQJKiYpggXZsVIvtiU6FzaXSQIqNLDYtFSYQhKgi2gg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VSM9gybtz3QrvyRYRb1qmZljYJWIPhEUrjbUFyrwiqlCbHvMwKE4rG/Z5Srfc/BcH4NfaCV0tKxFf/Y8Gp+KhYeWYNYJ0F0WEo+oqjZ75JqUwhjIYgtFSz4eVH6EkF/Db38p5scRQ4Qc4ykxixmHGbT1qSiYtk2RtY5kukuuHQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=umM6X5LZ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=PKdKIZDXiyhovL0/1WHUbsMIMdPri30JkTxtUvEKHtM=; b=um
+	M6X5LZ+jihGlBcpkpLHUc6WjZ6Vl1vR0L+nbTQXR5aOORe/ZonSV0Hms5M5R3AJ2qpiJf35BABv0X
+	HXjQNm+v3dY9cmZtG8e8lQlckkuaYz3PFeULMbIUVT4NmvlmllZHYxshI60eKawG8gnfiYfwNwJek
+	60Irhm3EDKMmzpw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ruB4T-00CZiz-6r; Tue, 09 Apr 2024 14:59:29 +0200
+Date: Tue, 9 Apr 2024 14:59:29 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	Alexander Couzens <lynxis@fe80.eu>,
+	Russell King <rmk+kernel@armlinux.org.uk>
+Subject: Re: [PATCH v4 net-next 1/6] net: phy: realtek: configure SerDes mode
+ for rtl822xb PHYs
+Message-ID: <417f3e08-136b-47db-880b-c80aa5698c9b@lunn.ch>
+References: <20240409073016.367771-1-ericwouds@gmail.com>
+ <20240409073016.367771-2-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240409073016.367771-2-ericwouds@gmail.com>
 
-Embedding net_device into structures prohibits the usage of flexible
-arrays in the net_device structure. For more details, see the discussion
-at [1].
+On Tue, Apr 09, 2024 at 09:30:11AM +0200, Eric Woudstra wrote:
+> From: Alexander Couzens <lynxis@fe80.eu>
+> 
+> The rtl8221b and rtl8226b series support switching SerDes mode between
+> 2500base-x and sgmii based on the negotiated copper speed.
+> 
+> Configure this switching mode according to SerDes modes supported by
+> host.
+> 
+> There is an additional datasheet for RTL8226B/RTL8221B called
+> "SERDES MODE SETTING FLOW APPLICATION NOTE" where a sequence is
+> described to setup interface and rate adapter mode.
+> 
+> However, there is no documentation about the meaning of registers
+> and bits, it's literally just magic numbers and pseudo-code.
+> 
+> Signed-off-by: Alexander Couzens <lynxis@fe80.eu>
+> [ refactored, dropped HiSGMII mode and changed commit message ]
+> Signed-off-by: Marek Behún <kabel@kernel.org>
+> [ changed rtl822x_update_interface() to use vendor register ]
+> [ always fill in possible interfaces ]
+> [ only apply to rtl8221b and rtl8226b phy's ]
+> [ set phydev->rate_matching in .config_init() ]
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+> 
+> Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Un-embed the net_device from struct ath11k_ext_irq_grp by converting it
-into a pointer. Then use the leverage alloc_netdev() to allocate the
-net_device object at ath11k_ahb_config_ext_irq() for ahb, and
-ath11k_pcic_ext_irq_config() for pcic.
+Hi Eric
 
-The free of the device occurs at ath11k_ahb_free_ext_irq() for the ahb
-case, and ath11k_pcic_free_ext_irq() for the pcic case.
+The ordering of these tags should put your Signed-off-by last.
+Reviewed-by: should come before them, without any blank lines. As the
+patch makes it way towards mainline, each Maintainer will add a
+Signed-off: by, and it is nice to keep them together.
 
-[1] https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/
+This is not enough to need a respin, but please remember this for
+future patches.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Tested-by: Kalle Valo <kvalo@kernel.org>
----
- drivers/net/wireless/ath/ath11k/ahb.c  |  9 +++++++--
- drivers/net/wireless/ath/ath11k/core.h |  2 +-
- drivers/net/wireless/ath/ath11k/pcic.c | 21 +++++++++++++++++----
- 3 files changed, 25 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/wireless/ath/ath11k/ahb.c b/drivers/net/wireless/ath/ath11k/ahb.c
-index 7c0a23517949..7f3f6479d553 100644
---- a/drivers/net/wireless/ath/ath11k/ahb.c
-+++ b/drivers/net/wireless/ath/ath11k/ahb.c
-@@ -442,6 +442,7 @@ static void ath11k_ahb_free_ext_irq(struct ath11k_base *ab)
- 			free_irq(ab->irq_num[irq_grp->irqs[j]], irq_grp);
- 
- 		netif_napi_del(&irq_grp->napi);
-+		free_netdev(irq_grp->napi_ndev);
- 	}
- }
- 
-@@ -533,8 +534,12 @@ static int ath11k_ahb_config_ext_irq(struct ath11k_base *ab)
- 
- 		irq_grp->ab = ab;
- 		irq_grp->grp_id = i;
--		init_dummy_netdev(&irq_grp->napi_ndev);
--		netif_napi_add(&irq_grp->napi_ndev, &irq_grp->napi,
-+
-+		irq_grp->napi_ndev = alloc_netdev_dummy(0);
-+		if (!irq_grp->napi_ndev)
-+			return -ENOMEM;
-+
-+		netif_napi_add(irq_grp->napi_ndev, &irq_grp->napi,
- 			       ath11k_ahb_ext_grp_napi_poll);
- 
- 		for (j = 0; j < ATH11K_EXT_IRQ_NUM_MAX; j++) {
-diff --git a/drivers/net/wireless/ath/ath11k/core.h b/drivers/net/wireless/ath/ath11k/core.h
-index b3fb74a226fb..590307ca7a11 100644
---- a/drivers/net/wireless/ath/ath11k/core.h
-+++ b/drivers/net/wireless/ath/ath11k/core.h
-@@ -174,7 +174,7 @@ struct ath11k_ext_irq_grp {
- 	u64 timestamp;
- 	bool napi_enabled;
- 	struct napi_struct napi;
--	struct net_device napi_ndev;
-+	struct net_device *napi_ndev;
- };
- 
- enum ath11k_smbios_cc_type {
-diff --git a/drivers/net/wireless/ath/ath11k/pcic.c b/drivers/net/wireless/ath/ath11k/pcic.c
-index add4db4c50bc..79eb3f9c902f 100644
---- a/drivers/net/wireless/ath/ath11k/pcic.c
-+++ b/drivers/net/wireless/ath/ath11k/pcic.c
-@@ -316,6 +316,7 @@ static void ath11k_pcic_free_ext_irq(struct ath11k_base *ab)
- 			free_irq(ab->irq_num[irq_grp->irqs[j]], irq_grp);
- 
- 		netif_napi_del(&irq_grp->napi);
-+		free_netdev(irq_grp->napi_ndev);
- 	}
- }
- 
-@@ -558,7 +559,7 @@ ath11k_pcic_get_msi_irq(struct ath11k_base *ab, unsigned int vector)
- 
- static int ath11k_pcic_ext_irq_config(struct ath11k_base *ab)
- {
--	int i, j, ret, num_vectors = 0;
-+	int i, j, n, ret, num_vectors = 0;
- 	u32 user_base_data = 0, base_vector = 0;
- 	unsigned long irq_flags;
- 
-@@ -578,8 +579,11 @@ static int ath11k_pcic_ext_irq_config(struct ath11k_base *ab)
- 
- 		irq_grp->ab = ab;
- 		irq_grp->grp_id = i;
--		init_dummy_netdev(&irq_grp->napi_ndev);
--		netif_napi_add(&irq_grp->napi_ndev, &irq_grp->napi,
-+		irq_grp->napi_ndev = alloc_netdev_dummy(0);
-+		if (!irq_grp->napi_ndev)
-+			return -ENOMEM;
-+
-+		netif_napi_add(irq_grp->napi_ndev, &irq_grp->napi,
- 			       ath11k_pcic_ext_grp_napi_poll);
- 
- 		if (ab->hw_params.ring_mask->tx[i] ||
-@@ -601,8 +605,13 @@ static int ath11k_pcic_ext_irq_config(struct ath11k_base *ab)
- 			int vector = (i % num_vectors) + base_vector;
- 			int irq = ath11k_pcic_get_msi_irq(ab, vector);
- 
--			if (irq < 0)
-+			if (irq < 0) {
-+				for (n = 0; n <= i; n++) {
-+					irq_grp = &ab->ext_irq_grp[n];
-+					free_netdev(irq_grp->napi_ndev);
-+				}
- 				return irq;
-+			}
- 
- 			ab->irq_num[irq_idx] = irq;
- 
-@@ -615,6 +624,10 @@ static int ath11k_pcic_ext_irq_config(struct ath11k_base *ab)
- 			if (ret) {
- 				ath11k_err(ab, "failed request irq %d: %d\n",
- 					   vector, ret);
-+				for (n = 0; n <= i; n++) {
-+					irq_grp = &ab->ext_irq_grp[n];
-+					free_netdev(irq_grp->napi_ndev);
-+				}
- 				return ret;
- 			}
- 		}
--- 
-2.43.0
-
+       Andrew
 
