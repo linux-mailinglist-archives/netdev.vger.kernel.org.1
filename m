@@ -1,116 +1,301 @@
-Return-Path: <netdev+bounces-86106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC06089D91F
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:21:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 912B689D91E
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:20:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 729381F22B15
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 12:21:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3D6C1C21D51
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 12:20:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7238D12C531;
-	Tue,  9 Apr 2024 12:21:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0CCD12BE8B;
+	Tue,  9 Apr 2024 12:20:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="TED4AZaz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S93/ecwh"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-251-36.mail.qq.com (out203-205-251-36.mail.qq.com [203.205.251.36])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7C512A14A;
-	Tue,  9 Apr 2024 12:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.251.36
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712665270; cv=none; b=jBy7s7ECE3lmwFx2FQrcK63/szidOfA53bK8wVht6wWuEnwTPIxwvtcB4UtGn5KUAA2nqZGFqcrwQCk0TX41ATMc4If6nrCFMDcXeqi+1fD7VLmQHPuU6ruom7GXdLfP5c7sufhTBQ9tLaISowlsuf2xUR2tqbpxpCc/al/o0to=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712665270; c=relaxed/simple;
-	bh=jrEVmurNChR635/98zUzfrOEmqHwm6pz2Gs4BB4fM/U=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=awbG4Oshwxl7s0iU8L4+Zxrc7HRkSlgaZ0TR+eSWqs07nSReEXauQul+2WKQM9HoI9SAoLrgxC1o0h5xrdC3QTfzBz2V35Z3pZA8rkGkStICp3/NRW+ynQRl/vpXEDcnIThR2o4qhpWZcvzD7w7sz8V8UKmPA/nNXhuqYymQCVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=TED4AZaz; arc=none smtp.client-ip=203.205.251.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1712664955; bh=m7LPkZgpaLXkeV+NlINHfY4LTk6VgwNuhgIGOECBU/Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=TED4AZazadVmz02KoBj9mLpeTYvnEHFfTP8iTBVACg688gtmXlteo8M91K0WkE+1Q
-	 HWJcFy6mPs5O4JW98HZ3BMbR/ipDkp6DCjlFF9pbDzaHxqcToYINQvLGeaMC6jQyoE
-	 qYUmdJoqByqDc3557fBAie9tqG3UxI1SlqsNIxyk=
-Received: from pek-lxu-l1.wrs.com ([111.198.228.153])
-	by newxmesmtplogicsvrszc5-1.qq.com (NewEsmtp) with SMTP
-	id 3F42CEE6; Tue, 09 Apr 2024 20:15:52 +0800
-X-QQ-mid: xmsmtpt1712664952t56msp9an
-Message-ID: <tencent_15CA920ADD9ADDCA19654FBE8DB5A5B88D07@qq.com>
-X-QQ-XMAILINFO: M/NR0wiIuy70cja9QE9nCnfHiWUrmFrx6SyJ6zXMlwqNTeLWeP3YgIknp56w7q
-	 JaCfxar0ZIijJg+R38JDABsQpREo2ny8FmA++eunPiHn3wd1f9X+DN8NieKe4181Uwdrv7STZfCx
-	 mUySDtHLdAAJS5IWMVWyrgJCKOwL7Kz5liwDAjE2t9lleBP39qER6ARP9Z2JUnQ1moUl5IrGyMs6
-	 VRk1ZSyJ0iZJyBD/YSKnyH+1HgHN2XSOvn3lDh2BLVWhSMLq2WlNnKaBZgwQ0wy/yVxK3nFFbGZa
-	 CcF0VY0Siw7kGhHQunsrWl+nM+60zyXMuMaHSC9sPLVGO5qjKJpqhQZmCBoXqqSKJaQH3kT5ZTHH
-	 m5Gx2u3MTuG8pSQ3Zp9DObbouzrPBO9Yz+uFFPcn01lywH3f6WCNnHMfyIx0IsF+A1oHthWKi3oq
-	 53gYYu5kSTJfZG7C+3vtkn4eLKzpWj2Adt/si0TLhweklUBDS5CN0RyBVPa1Z6ZmcVuFbmJpb0MT
-	 FL5tsQylDQ3F6mI1Sw6fQhFpT1GgUR66E5KA68Z2rPXFYRDM0TjGDu/CEm80Ld21reoYvT1g4vS+
-	 qMM0QJz2vD7omVG3R/rfud8vZ7UqpbN++6/+bS3bV1v17oGN1Kb1XkxmP1svc8J0iFH6oxNgEc9c
-	 zLtcMEK4rd34V6ATnDbgkUz1YRXxJVhRwPwMyxetq/eW458H84yXR5x70J6cr0D5fnmR3/c6Mv2r
-	 opl4LEHypk/XtdvCAaQIUDq/BM/Afqk+38Y1JsJyq9+r/8oWxbIy+Raqrt1o3HynpC9wsaH9tgfK
-	 83TiVjxXNbURyLp1ilnPGyWm8Yw1slm8si/t18J0M/GU4Bo9/FZxYG9w/uv5p6PHCNOYNEgKd7/T
-	 vImOuyCNyJrgmBRDiX/UZBTE62Pk1RYBDuMPDFlG154/z0la5/K85nJIs1KDkqp0+qzRBO8t5yKJ
-	 NEQVpHh+MzkQ5CzIgRSU7666VU04hT0suaGsGCCZ4QJGe5GwvdKj74yd6JoDxcz4Dkw7VG6lw=
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-From: Edward Adam Davis <eadavis@qq.com>
-To: pmenzel@molgen.mpg.de
-Cc: netdev@vger.kernel.org,
-	eadavis@qq.com,
-	johan.hedberg@gmail.com,
-	linux-bluetooth@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	luiz.dentz@gmail.com,
-	marcel@holtmann.org,
-	syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH] net/socket: Ensure length of input socket option param >= sizeof(int)
-Date: Tue,  9 Apr 2024 20:15:53 +0800
-X-OQ-MSGID: <20240409121552.4098965-2-eadavis@qq.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <234da60a-709f-4430-b594-386b7c2b65f5@molgen.mpg.de>
-References: <234da60a-709f-4430-b594-386b7c2b65f5@molgen.mpg.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD64858119
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 12:20:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712665240; cv=fail; b=o+urOa8jixQlp1Vc2U6M3lPlN3Zf8AKBzN+CKtFnhvCbOkomM19FwPt7b5BmNfnkuub2TA0FEWQIwCxim7QL/KgzOumwTAcD0Jc/S9F40e1lkbUXN7MwF9tAyuTkYIS7W1kLs42ZwgC9Al8C/xWUq+HyqejqQmZWVf9CwwO2M0s=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712665240; c=relaxed/simple;
+	bh=hW0vE201MZJsLeoqLedKSw+YFv1M/AfjWGCWMbtx1Ec=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=iAazUQdXw2586D5JqH84X4EGtr85oK0rX9HUh3OGP5xxpam2PvTMMU1KxcU8rMtzWwuVebPOymKTWwOW7vAE/fq1Wz2xI/QiivN6u8KeoCVzCKaOAj7GO4r/U3/G+14q1zHR7soJL8vaJmIn74Z9lj5Bx16X7VvEZhSKA4a2EqE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S93/ecwh; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712665239; x=1744201239;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=hW0vE201MZJsLeoqLedKSw+YFv1M/AfjWGCWMbtx1Ec=;
+  b=S93/ecwhCT8FTyZ44LqJAOWl2LBKaTnjil+i/4Zpw6dMvw0T+wIunJ/T
+   iP2hfgPKDcgZlmTnsou/3LVH1poX+FzAlRsJ0WUWTtI1UkPrQMHQHdNuT
+   LJL9Qc7kcWEWLTrt38LyyZW0FJpC443iD35pbwAO34y08Ad/PLa30nTuo
+   Blfw+rJlkFa29HH2U3Xgz26lrfDPQF/sV2M10yhiAYKw77h1J7VTLTyvc
+   UemARoeE3p0e7kitIXQTHLTemtBMia0UkNXi4kBta0gqaBBXSimpUUAZq
+   +OnBh4+Mt8xOwRi/U4MGFoPFtmlW/KU1Dn05LgHBjuxjSwqREmYQTpP30
+   A==;
+X-CSE-ConnectionGUID: oRRr96rAR2SWCbOSbnWnOg==
+X-CSE-MsgGUID: +0trjYX1TkaUswYaEe5Rrg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11038"; a="33381312"
+X-IronPort-AV: E=Sophos;i="6.07,189,1708416000"; 
+   d="scan'208";a="33381312"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 05:20:38 -0700
+X-CSE-ConnectionGUID: cvIgl6HmTnSO5p6WUipv6Q==
+X-CSE-MsgGUID: zFMvgADTTzSQPcp5JYIHAA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,189,1708416000"; 
+   d="scan'208";a="20096994"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Apr 2024 05:20:38 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 9 Apr 2024 05:20:37 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 9 Apr 2024 05:20:37 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 9 Apr 2024 05:20:37 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 9 Apr 2024 05:20:36 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DfvZJ6KV4lX3DovBZsJ/ZuyLRWjxlrdgVztZXodSo9hWenu3CzU9HS0dmLCzis5+WBTiJKwlgFfBqFxmovZln+zu/gXV7JfJym/u3A867i9cDWoaUju9Cw61itNN2iBLQLZAn5nhTO/SBnZoTwECfzFbav4xbu0qkeqBaTG3lcZtkY77r9dX0VL+aKx8iwe//8rBYsgZHKA5s0x4K625WaY2GSKR4jtrgK2wjH2EqZvVdmyWkFfVrwHpLNah1VTiSuB+NRjfVme4K0iah+VFH9mOQB8iXtx7JJxetqo/6mRFjrRVg/TPkbfam3wVpX46o8XADFrrLR1wmIUUoak9ag==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=x9lib4P1hqyx8YNVg5a9qJji2+Jtjf4acH4Q7M2J73Y=;
+ b=RHORVA+Ua6twXsDVg5B6EvD3BSSZpKdyHoO8sDXBRnxJO3b73+Jo04rao47ikmwMV6W0OWAcGzYormpvnVrKCtb9HW0xpgi1tOSd3T4in7xPSY9qn6IeX03Dxvi/8jdUHqn/r3hJgJlfgxDGFu33fNy6FJJb4CFIZff+i2JMTExznhMbUDbpaSwA6+uTmGsInXqrS5/EpqlIzJyx3EMkx9xwaYTAXezBMSgttYHwh8Hun/yoqjveoWbw+gFr1ANfnkFIzKlVvTSUK6Z4L/gryP4WcpvWXBNU7ZUqSb4LIHYcK6ChSsw1C08LpxY3ggzqvvo6GUoHGvbPa5jNxCA1+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by SJ2PR11MB8469.namprd11.prod.outlook.com (2603:10b6:a03:57b::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.25; Tue, 9 Apr
+ 2024 12:20:30 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ac3:a242:4abe:a665]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ac3:a242:4abe:a665%4]) with mapi id 15.20.7452.019; Tue, 9 Apr 2024
+ 12:20:30 +0000
+Message-ID: <cf30ce2e-ab70-4bbe-82ab-d687c2ea2efc@intel.com>
+Date: Tue, 9 Apr 2024 14:20:23 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next 0/3] ethtool: Max power support
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <netdev@vger.kernel.org>, <idosch@nvidia.com>, <edumazet@google.com>,
+	<marcin.szycik@linux.intel.com>, <anthony.l.nguyen@intel.com>,
+	<kuba@kernel.org>, <intel-wired-lan@lists.osuosl.org>, <pabeni@redhat.com>,
+	<przemyslaw.kitszel@intel.com>
+References: <20240329092321.16843-1-wojciech.drewek@intel.com>
+ <38d874e3-f25b-4af2-8c1c-946ab74c1925@lunn.ch>
+ <a3fd2b83-93af-4a59-a651-1ffe0dbddbe4@intel.com>
+ <dc601a7c-7bb7-4857-8991-43357b15ed5a@lunn.ch>
+ <ad026426-f6a4-4581-b090-31ab65fb4782@intel.com>
+ <61a89488-e79a-4175-8868-3de36af7f62d@lunn.ch>
+ <206686dc-c39b-4b52-a35c-914b93fe3f36@intel.com>
+ <e4224da7-0a09-41b7-b652-bf651cfea0d0@lunn.ch>
+Content-Language: en-US
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+In-Reply-To: <e4224da7-0a09-41b7-b652-bf651cfea0d0@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MI0P293CA0008.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:44::13) To MW4PR11MB5776.namprd11.prod.outlook.com
+ (2603:10b6:303:183::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|SJ2PR11MB8469:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: KoBrYyzl8116O9Y3EbdMs0mo2ba8YssSeWhTN9NpSsvfgmtUQPv7PfjuprriutN++/hgZab4PdZTDh/nEWSsmx26CPzSmmSgj8z7WygKa2WDP1uhvvoYfh1CzdXh1Rr3eeO5rPLgHrdoyMcVACmOftTESbam5jvkyODVw1YFoXicw5jA5kmokzzhlRfVQgJr1CQNsUIIpcMlW+63coXiP5xrhZaJoHxNAzqZt8HBkNNQPswIu/yFFNVqJLL/fTAfhVZdWmPwOSS/EDQ4l3+RybBZCDxl7Tny2tTq934AdXD0pI3fJKJkpKT3BNJdRvHaKMiotJBk4XPB8uL4SBeu6iEmay3a5WNZLXrc5YrgYJF1WL5pJUDT5lIMaIXdeTEmkoSIUFe2AL159YOImCPuTzWQx6mfS675C4h9VhgDBY9mKtNWR83+ybyfsr5OgabLIw7wR2C5zDLE3IjVAaa0MPaTJVyBmIZn37WkSwwsrZfCArYygv/GuKTZn81Xbvtc7EdZGVIOZPZkuWX+KXPlfWV9a/Y1IKtw0t8oN0LzBSxCe773N8YoDnbcstQL0iB/ySgw9MDJShvSErMpFVklfVinrWd9pIF5s3aASU1tUbfANLrwIA9/JVbWvEjA+N2U
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?NUlVbkNaa1FxcXUzNVFHZTRSYTVuRjlKczdSSlR4N3ZXMXp4TGtRQzN0azdL?=
+ =?utf-8?B?ZTRGUkZ2b0ZoRU9EckdGeXNuSDNlRjFKQkJuUkdzdFZxVFYxcjBmZTVhMTRT?=
+ =?utf-8?B?VlpWV2Q1QUxHaGE2NE5wSHJCK0R6cytxcSt3eEFkUVlmemFsSUFuRHd5ckVm?=
+ =?utf-8?B?eUFkdEF2ekhjVHM2N2FBdkJLTXZxZkU0aDJSZW9yVzcxa2paNW42VXRWSG1i?=
+ =?utf-8?B?aEhmUVF1VjJTNEZkVVY5cmpPbGVpbUpLU0sxUFEzSjYwb1gvS0xNVFB5MmI1?=
+ =?utf-8?B?UGQ2QzFjTjZhYWFTM3RHYTlac2xLY05YSDBKQVBjNzlDQzJMMkt3VjE3UXk0?=
+ =?utf-8?B?T2szbFhXNkVEOWZCTGtvRVRFUVc3WlBjNUM0UHRHWUZ4UzdLTFVtRHhxYTly?=
+ =?utf-8?B?L282NnRpRlRBNEdaZjdUTmw0aDhZRjBoWUxUYzMvVzdxbFNMQ1Vlblp2blN1?=
+ =?utf-8?B?NzJyc1lXT2dhSUtIOU5hdU03T3laRUNFM1hCNStSazB6TWUyRGpHWXJHcGJt?=
+ =?utf-8?B?eTUzV1kxSThPZVlFZTV5dWtYTWNFYkVKcXpmZHdScnFaRjdQbGlmUENsZ1Ja?=
+ =?utf-8?B?UVdhNkk2UlJmZWhvc3dHOWxDY1h6Vnk5U0s5YlZETGNBcFJ3MjZ6Q3J6RnlT?=
+ =?utf-8?B?a0JJVFp6cUg3bEt0cXVQOE92V1AwOEJNcUFDNm9SWGRvWDR1bWpVdkw4d21v?=
+ =?utf-8?B?UUNGcXlxYmxyMXZWYVNIaWNJWjg0eEhVYU9tU1hZK0tHbnQvZmxkL2tGcVI2?=
+ =?utf-8?B?VDZJcmhkN1dDN3hsYm9USU16bmZGaFVMZ2lxbGQzS0srV3gvS2t3ZWFqL0k0?=
+ =?utf-8?B?dlB1NEkwTzZLN29vdmJ0T0FwUFFjUkR6NDd0MUdEaCtDeG94VktJZ21XN2JY?=
+ =?utf-8?B?RzZHbVRteXVSdFpPcExuWndlUTBqSFJVWWlkMGg3YWM1VzJvSFhTRVBzaE13?=
+ =?utf-8?B?WWs3d09XM0syN3ovOWNtVjlkWXJiaEpMclUySVZpSkxiR3M5ZExnLzRRazRu?=
+ =?utf-8?B?RFhyMXV0S1o5MW5EcWRqbVZOYXFDZUpJZVlWK3ZTYU5WMGQ3bFBPYk1pNzZp?=
+ =?utf-8?B?K2hRdjE1QXkraGE0TUNuNndUd3RKeWQvdHJhSDFIQmVGV2h0QXpndU5tT2wx?=
+ =?utf-8?B?UDBwdnB2QldndFhycDRDdTdKb0lpSzB1bWp2WWNkb3V1TVZ2Q2ZrRnErUWRz?=
+ =?utf-8?B?S2o1c1hweUlYdlBqTG9FRHErSXI1c2ZpS2RhLzYzS0xhRzZTbmRXSzAvTkNn?=
+ =?utf-8?B?QWJHb3R0OFJkYWNTWWQ2aWJlbDVOV1BQTDRjWlZqTlJCOW0zaG9RQWNldjNh?=
+ =?utf-8?B?YjVVN2lYVnF4UklYcXpEN2c0Nnd4eFE4SDVBSW5QZzA1ZWROMDhKMHdZZVJN?=
+ =?utf-8?B?TEsyN2x6VjFJeWsza0pVcUl3bDNVbXk4elB0SHRUc3dVQ21GUzN6eDVMbUJo?=
+ =?utf-8?B?WjZmUGloVU04a05XaHE0Q0ozL21YSElCMFpEc0R3UUluWFhtTVUxLzRaNS9k?=
+ =?utf-8?B?ejRabU1ZZFdJNStrek9oUUpud2c2c0hGWTFBQTlFbWxVSGlVQkU3SVNhaGdD?=
+ =?utf-8?B?TFpya3NrNGZwbGpCZmtSbEx5WDZlaXE1d2NhRWUxMVdrOEtRRkI4eElJZGZP?=
+ =?utf-8?B?T1BZamxFaFRmeUdnQmxDUWpFME1iMDczVE1XKzIyMnY5UGtwaWRRUE5NOHZU?=
+ =?utf-8?B?eTZFUHRGWnRLQW1uNGg5TS9mSFdiK1ZNZXF3eU1QVi8yVVh1UlBDWTZYOHVN?=
+ =?utf-8?B?djdrMFVBRlJVUitjckVMWEN5ZWxubGZ6MnIyZlJBNkROVEtPZlBISkwzbjhn?=
+ =?utf-8?B?UTNWeXhMVEJ4eVgvZys4Z1ZsbnlHSzNXU2Ixb3REMEh0MkdCQWFaU2x4emtG?=
+ =?utf-8?B?clN2eGdVMUNrTTNqNVpPR2FDRmx0WG5jdTN3NzNNWXUzTnR1c1NBM0xwWXk4?=
+ =?utf-8?B?aURnbUJwUGphNC95SmZJUyt1aUlCUFpDZmJ4d3EwcnVVeUZ4R1hlVkl6eGFF?=
+ =?utf-8?B?T1BRSjNTT25hNXVFVVFralVNNml3RSt0eTBld09sbHp6SzZmL3dTZkFZcjRu?=
+ =?utf-8?B?U244c0h1eUhZWFN6RGpwbjRkM3BrZUcxYVQ0ZE9SY2U4ZFA4aExjTnFTTFR1?=
+ =?utf-8?B?TGVsMmtqSU1oa0VadWFFOG1QVlBCMEcwUWpBQnNNNUNOSVNMdVZKdnhYaGNC?=
+ =?utf-8?B?MHc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1ee025e7-6858-43aa-186e-08dc588f721a
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2024 12:20:30.0418
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: u/e8Gw56y0dgSuBZXIy0ka5y0qnInztnxTp2mM0doeCKX7IA0hUrtdYKVBxYt7nlkQttrIPhAmA9vboVqWgS7XiJYPYM5Tjbx6dp1OR5d+s=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR11MB8469
+X-OriginatorOrg: intel.com
 
-The optlen value passed by syzbot to _sys_setsockopt() is 2, which results in
-only 2 bytes being allocated when allocating memory to kernel_optval, and the
-optval size passed when calling the function copy_from_sockptr() is 4 bytes.
-Here, optlen is determined uniformly in the entry function __sys_setsockopt(). 
-If its value is less than 4, the parameter is considered invalid.
 
-Reported-by: syzbot+837ba09d9db969068367@syzkaller.appspotmail.com
-Reported-by: syzbot+b71011ec0a23f4d15625@syzkaller.appspotmail.com
-Reported-by: syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com
-Signed-off-by: Edward Adam Davis <eadavis@qq.com>
----
- net/socket.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/net/socket.c b/net/socket.c
-index e5f3af49a8b6..ac8fd4f6ebfe 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -2327,6 +2327,9 @@ int __sys_setsockopt(int fd, int level, int optname, char __user *user_optval,
- 	int err, fput_needed;
- 	struct socket *sock;
- 
-+	if (optlen < sizeof(int))
-+		return -EINVAL;
-+
- 	sock = sockfd_lookup_light(fd, &err, &fput_needed);
- 	if (!sock)
- 		return err;
--- 
-2.43.0
+On 04.04.2024 15:53, Andrew Lunn wrote:
+> On Thu, Apr 04, 2024 at 02:45:43PM +0200, Wojciech Drewek wrote:
+>>
+>>
+>> On 03.04.2024 15:49, Andrew Lunn wrote:
+>>>>> $ ethtool --set-module enp1s0f0np0 power-max-set 4000
+>>>>>
+>>>>> actually talk to the SFP module and tell it the maximum power it can
+>>>>> consume. So in this case, it is not the cage, but the module?
+>>>>
+>>>> It does not work that way in ice example.
+>>>>>
+>>>>> Or is it talking to some entity which is managing the overall power
+>>>>> consumption of a number of cages, and asking it to allocate a maximum
+>>>>> of 4W to this cage. It might return an error message saying there is
+>>>>> no power budget left?
+>>>>
+>>>> That's right, we talk to firmware to set those restrictions.
+>>>> In the ice implementation, the driver is responsible for checking if the
+>>>> overall board budget is not exceeded.
+>>>
+>>> So i can get the board to agree that the cage can supply 3W to the
+>>> module, but how do i then tell the module this?
+>>
+>> I'd assume it is not possible, if the module consumes more power
+>> than maximum than the link will not come up and error will be printed.
+> 
+> Take a look at the Linux SFP driver. In sfp_probe() is reads the DT
+> property maximum-power-milliwatt:
+> 
+> https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/sfp.c#L3030
+> 
+> When the module is inserted and probed, the modules power capabilities
+> are read from the EEPROM:
+> 
+> https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/sfp.c#L2320
+> 
+> https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/sfp.c#L1929
+> 
+> The code looks to see what conformance level the module has, so to
+> know if it even supports different power levels, and the registers
+> needed have been implemented.
+> 
+> Later, the SFP state machine will transition the module to higher
+> power:
+> https://elixir.bootlin.com/linux/latest/source/drivers/net/phy/sfp.c#L1995
+> 
+> by writing a register in the SFP.
+> 
+>>> I would also suggest you don't focus too much on ICE. I find it better
+>>> to think about an abstract system. A board with a power supply to a
+>>> number of SFP cages, and some cages have modules in them. What does
+>>> the kAPI look like, the use cases for this abstract system.
+>>
+>> My design for this API is to have an option to get and set maximum
+>> power that the module in the cage can consume. It's not about modifying
+>> module's power consumption, it's about setting restrictions for it.
+>>
+>> The use case is to let the user change maximum power in the given cage
+>> (so he can plug in the module with higher power consumption). Before that
+>> he will lower maximum power in different cage. Thanks to that the overall
+>> budget for the board won't be exceeded. Does it make sense for the abstract
+>> system you described?
+> 
+> So there are a few different phases here. The standard says the module
+> start up in low power mode.
+> 
+> Something needs to enumerate what the module actually supports in
+> terms of different power modes.
 
+So, this is something that would require new netlink attribute.
+From what you described, SFP driver is capable of reading module's
+power capabilities so it could be implemented there.
+
+> 
+> Something then needs to determine if the board/cage can support higher
+> power operation, that there is sufficient power budged. Budget then
+> needs to be allocated to the cage.
+
+This is something my current design supports I think. Using
+ETHTOOL_A_MODULE_MAX_POWER_SET user can get what cage supports
+and change it.
+
+> 
+> Lastly, the module needs to be told it can go to a higher power level.
+
+This could be done using ethtool_module_power_mode_policy I think.
+
+> 
+> I would say the current Linux SFP code is overly simple, by design. It
+> supports the concept of cage supplied by a dedicated regulator. There
+> is no sharing of power across a number of cages. Hence it just ups the
+> power if the board indicates the power is available and the module
+> support a higher power level.
+> 
+> However, you have a more complex setup, shared power supplies,
+> etc. The policy of what modules gets how much power should come from
+> user space. So we need user space APIs for this, and a clear
+> understanding of how they work. Please could you describe how i would
+> use ethtool to go through these phases. And how do i down grade a
+> modules power consumption to make more power available to another
+> module.
+
+I described how I see it for each phase above. 
+Downgrading module's power consumption is not possible with my initial
+design. You can downgrade max power for the cage and if the module
+plugged in to it consumes more power than error will be printed and
+link will not be established.
+In the end it looks like we would need new netlink attribute to support
+modification of module's power consumption.
+
+> 
+> 	Andrew
+> 
+> 
 
