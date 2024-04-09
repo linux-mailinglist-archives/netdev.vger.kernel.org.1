@@ -1,345 +1,191 @@
-Return-Path: <netdev+bounces-86172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB56289DD17
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:44:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2168789DD1D
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:45:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F5E02839A8
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:44:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D73E1F231F6
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3044A130E2E;
-	Tue,  9 Apr 2024 14:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FF0812FF99;
+	Tue,  9 Apr 2024 14:44:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IE9oYGBn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Alofp5dw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE1850275
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 14:43:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BADA50275;
+	Tue,  9 Apr 2024 14:44:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712673796; cv=none; b=umRdoPiJRPGJ5Qeb+MIOt69X+bVggdI8AxiuzVTGrQdtyYW/uby6yQzb/YhRtZCyvwo9sLCBKThKVPrZTgyhhf9P4OL7N555lV3/YdzCQYlZii3tSfuaHOkDDQMSishCg/PyfdIdEEp7Fk+HP/gtmy0o4ZXAqMf39xYPy9gLv2U=
+	t=1712673842; cv=none; b=qTIdOGK72g/XznKMU2xdSrpuHgElAH57mMh9oGkf4DpnLJnIu6zJuL68mHHpAjmTuM4PIDH9p1zcCnivmpVtkEJ1rXH8Cpg2gAROLPq4HDAcBvBDyj/2LP+leQm670Qj4laM/kKkbBTgvbWfXv1as8paC9lPU7aY7Bom2BQSvFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712673796; c=relaxed/simple;
-	bh=xYvbLyqnvDTM8173lluuVdBXKzaAM+04axcQIK+9sBQ=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=hUmLvf6xpszWOiCyseArprTI7uRs5WTKI5GdLXeHcO7/1A8rYUEqgn0bxxsGKwDreBsZIAnRM7tAoOIDthNWURL3Ro7YbidrkybGt7VkRjSOt2/3z72OyJ0ELyo9hYq5XBRm+KD/11cKEITHmbt4louBfoiPE/OZ6Dqyyzz66OA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IE9oYGBn; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712673793;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fhOSJsio7Y05Zi/cvlHB81uhNVYoOCf165mU3ruAKFc=;
-	b=IE9oYGBnG3l7qI3uOl0F3o1nu7k0ZPp+TJ34idnE0YmSniirIi7GHvnywxP/GHch+j8An2
-	0loVPl8dYXnEu0dmm0DC6qL4NDf3t9UnA04plE0D8dnknJYfE04P3G6N2ocJ1B4n9Ufy87
-	la9qsjs8UYQS+FOvjvlkFj786OyTL4o=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-688-4JECR4DiPgScIcy0Q97ZGQ-1; Tue, 09 Apr 2024 10:43:09 -0400
-X-MC-Unique: 4JECR4DiPgScIcy0Q97ZGQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 75738104B508;
-	Tue,  9 Apr 2024 14:43:09 +0000 (UTC)
-Received: from RHTPC1VM0NT (dhcp-17-72.bos.redhat.com [10.18.17.72])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 330FF1C0666D;
-	Tue,  9 Apr 2024 14:43:09 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: Ilya Maximets <i.maximets@ovn.org>,  netdev@vger.kernel.org,
-  jiri@resnulli.us,  xiyou.wangcong@gmail.com,  cmi@nvidia.com,
-  yotam.gi@gmail.com,  echaudro@redhat.com,  horms@kernel.org
-Subject: Re: [RFC net-next v2 2/5] net: psample: add multicast filtering on
- group_id
-References: <20240408125753.470419-1-amorenoz@redhat.com>
-	<20240408125753.470419-3-amorenoz@redhat.com>
-	<2b79ebe9-4e83-418a-ae40-93024a3fb433@ovn.org>
-	<801ccf5c-5ac9-455f-8d9a-48517d7db614@redhat.com>
-Date: Tue, 09 Apr 2024 10:43:08 -0400
-In-Reply-To: <801ccf5c-5ac9-455f-8d9a-48517d7db614@redhat.com> (Adrian
-	Moreno's message of "Mon, 8 Apr 2024 21:24:17 +0200")
-Message-ID: <f7til0qmwar.fsf@redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.3 (gnu/linux)
+	s=arc-20240116; t=1712673842; c=relaxed/simple;
+	bh=TX7drptoizj7yMo7tlk2MRiASPssDjpb1m0JlS/t/KY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Y1ok1ioTQWwIxhdVS7q/C+FE/ZTw1DMT34MazuCQKEvVT1m7P53wPFmibejy1MHZ63wJflOcIvB/+97I5lHNHJi5ZkjYd8E+n6H7UCcKRuPAEGhzK0RhDk314i7EXr2As9xulPxUnN1Apy19FdHt762JQ9NyJXuJxs/rJEfXmko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Alofp5dw; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-434925427c6so9780031cf.1;
+        Tue, 09 Apr 2024 07:44:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712673839; x=1713278639; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oHL0RXFr2CJfinyZBuEKsLTHwq4/wJAcA1+55f/eT84=;
+        b=Alofp5dwcQ4HFF3tC+bzA8ooj5UKbyx1AF/QICKOHTygxcLTCvOjGz4eQdk0uE9Q3k
+         vwWzFZA3Kp3fsanyxEwIXCbhwItasXZ4usb/N7jmTsqPVLJFoUYna7bhgI774g5lC9GR
+         NShic+zAJvdcujUjeEBnrNKyoDAIyniI4RoWUu9zQYcpoz6MHjeWMtggJKfc/1LLmVG4
+         ZCZstH0nzBJw7iAH29s3xYCSUdGjWdW/w/H5nrAiS9JginQ2Jds+1aEwu7F07lTO3laz
+         V3ytmywhBcd+FzfEuUTipN4PU33fwosw//Gj/nDEgsu8kTZmt2DgTqhhsP8kNTDMvEJA
+         SYpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712673839; x=1713278639;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=oHL0RXFr2CJfinyZBuEKsLTHwq4/wJAcA1+55f/eT84=;
+        b=tHsXzPuU3FUsQGhvwmRUyYVJ8ogrXvAXxyKHXWroD8Tx7eb78vwuiPeOcH8q9ENfec
+         MojYsTqIRtCp8FLWeTPpMTBmMNdjoKajAvunn/FCSlS99njjTvXvtR4KPh5yzvrYsGxr
+         sxFW1x3r3nWYp6kD/SoZxc+1a0wh1TiuINh1/Nf+Icg1OWPu7nEzGX9HB1yS5Q9R6DZp
+         dv1czOW5bwe1J4Q4rAjbICbW4CiFA5tDBp/NB+P7yPrJraeTv2ODAUgBsrncH92RQ8ws
+         vgqaVlCeFemXpFdo8ytfvaOLWyktUaGpEOxg9MKZk0IxV3o7NedK/hpm5lllGufU1JV8
+         OVag==
+X-Forwarded-Encrypted: i=1; AJvYcCV1lQyHrqJlqm6NzZB9nlhXRnIOLX5/XFXtXQ3av12MvzhKQpNY6JJ6mqsGEbdj3mZM6HZ2nBTUksJ9WDY0Lgk4ZK6YznSoFnL+hmb3XW/5Uui5q2ziKhWc9didLDByzpp7ff8wuyteS9xIvWi7eRx3y4PbSkiV5nJqnnLhkcaM
+X-Gm-Message-State: AOJu0Yy3vTfgX9EisHG8ktzUmTlmxJpBbDhmq0TYLpa5Mfie0kWYbxqo
+	RKVCX8FGCmfdociBO+5u1nu9WGv3Ut8hYh/T3y9wKNfDrcJNDT8Y
+X-Google-Smtp-Source: AGHT+IGmVVuOOT+gaywxcpqHxcdLnkGDJu/jgmHipvFXgrAm3d0jeVJNp5P+ms8PkckE1M5QcbwFhA==
+X-Received: by 2002:a05:622a:389:b0:432:f69d:aa1c with SMTP id j9-20020a05622a038900b00432f69daa1cmr14283424qtx.49.1712673839387;
+        Tue, 09 Apr 2024 07:43:59 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id bw9-20020a05622a098900b004330090b874sm4672604qtb.95.2024.04.09.07.43.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Apr 2024 07:43:59 -0700 (PDT)
+Date: Tue, 09 Apr 2024 10:43:58 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Kory Maincent <kory.maincent@bootlin.com>, 
+ Florian Fainelli <florian.fainelli@broadcom.com>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+ Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Radu Pirea <radu-nicolae.pirea@oss.nxp.com>, 
+ Jay Vosburgh <j.vosburgh@gmail.com>, 
+ Andy Gospodarek <andy@greyhouse.net>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Horatiu Vultur <horatiu.vultur@microchip.com>, 
+ UNGLinuxDriver@microchip.com, 
+ Simon Horman <horms@kernel.org>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
+ Kory Maincent <kory.maincent@bootlin.com>
+Message-ID: <6615542edc90f_23a2b2294ee@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240409-feature_ptp_netnext-v10-2-0fa2ea5c89a9@bootlin.com>
+References: <20240409-feature_ptp_netnext-v10-0-0fa2ea5c89a9@bootlin.com>
+ <20240409-feature_ptp_netnext-v10-2-0fa2ea5c89a9@bootlin.com>
+Subject: Re: [PATCH net-next v10 02/13] net: Move dev_set_hwtstamp_phylib to
+ net/core/dev.h
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Adrian Moreno <amorenoz@redhat.com> writes:
+Kory Maincent wrote:
+> This declaration was added to the header to be called from ethtool.
+> ethtool is separated from core for code organization but it is not really
+> a separate entity, it controls very core things.
+> As ethtool is an internal stuff it is not wise to have it in netdevice.h.
+> Move the declaration to net/core/dev.h instead.
+> 
+> Remove the EXPORT_SYMBOL_GPL call as ethtool can not be built as a module.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
-> On 4/8/24 15:18, Ilya Maximets wrote:
->> [copying my previous reply since this version actually has netdev@ in Cc]
->> On 4/8/24 14:57, Adrian Moreno wrote:
->>> Packet samples can come from several places (e.g: different tc sample
->>> actions), typically using the sample group (PSAMPLE_ATTR_SAMPLE_GROUP)
->>> to differentiate them.
->>>
->>> Likewise, sample consumers that listen on the multicast group may only
->>> be interested on a single group. However, they are currently forced to
->>> receive all samples and discard the ones that are not relevant, causing
->>> unnecessary overhead.
->>>
->>> Allow users to filter on the desired group_id by adding a new command
->>> SAMPLE_FILTER_SET that can be used to pass the desired group id.
->>> Store this filter on the per-socket private pointer and use it for
->>> filtering multicasted samples.
->>>
->>> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
->>> ---
->>>   include/uapi/linux/psample.h |   1 +
->>>   net/psample/psample.c        | 127 +++++++++++++++++++++++++++++++++--
->>>   2 files changed, 122 insertions(+), 6 deletions(-)
->>>
->>> diff --git a/include/uapi/linux/psample.h b/include/uapi/linux/psample.h
->>> index e585db5bf2d2..5e0305b1520d 100644
->>> --- a/include/uapi/linux/psample.h
->>> +++ b/include/uapi/linux/psample.h
->>> @@ -28,6 +28,7 @@ enum psample_command {
->>>   	PSAMPLE_CMD_GET_GROUP,
->>>   	PSAMPLE_CMD_NEW_GROUP,
->>>   	PSAMPLE_CMD_DEL_GROUP,
->>> +	PSAMPLE_CMD_SAMPLE_FILTER_SET,
->> Other commands are names as PSAMPLE_CMD_VERB_NOUN, so this new one
->> should be PSAMPLE_CMD_SET_FILTER.  (The SAMPLE part seems unnecessary.)
->> Some functions/structures need to be renamed accordingly.
->> 
->
-> Sure, I'll rename it when I sent the next version.
->
->>>   };
->>>     enum psample_tunnel_key_attr {
->>> diff --git a/net/psample/psample.c b/net/psample/psample.c
->>> index a5d9b8446f77..a0cef63dfdec 100644
->>> --- a/net/psample/psample.c
->>> +++ b/net/psample/psample.c
->>> @@ -98,13 +98,84 @@ static int psample_nl_cmd_get_group_dumpit(struct sk_buff *msg,
->>>   	return msg->len;
->>>   }
->>>   -static const struct genl_small_ops psample_nl_ops[] = {
->>> +struct psample_obj_desc {
->>> +	struct rcu_head rcu;
->>> +	u32 group_num;
->>> +	bool group_num_valid;
->>> +};
->>> +
->>> +struct psample_nl_sock_priv {
->>> +	struct psample_obj_desc __rcu *flt;
->> Can we call it 'fileter' ?  I find it hard to read the code with
->> this unnecessary abbreviation.  Same for the lock below.
->> 
->
-> Sure.
->
->>> +	spinlock_t flt_lock; /* Protects flt. */
->>> +};
->>> +
->>> +static void psample_nl_sock_priv_init(void *priv)
->>> +{
->>> +	struct psample_nl_sock_priv *sk_priv = priv;
->>> +
->>> +	spin_lock_init(&sk_priv->flt_lock);
->>> +}
->>> +
->>> +static void psample_nl_sock_priv_destroy(void *priv)
->>> +{
->>> +	struct psample_nl_sock_priv *sk_priv = priv;
->>> +	struct psample_obj_desc *flt;
->>> +
->>> +	flt = rcu_dereference_protected(sk_priv->flt, true);
->>> +	kfree_rcu(flt, rcu);
->>> +}
->>> +
->>> +static int psample_nl_sample_filter_set_doit(struct sk_buff *skb,
->>> +					     struct genl_info *info)
->>> +{
->>> +	struct psample_nl_sock_priv *sk_priv;
->>> +	struct nlattr **attrs = info->attrs;
->>> +	struct psample_obj_desc *flt;
->>> +
->>> +	flt = kzalloc(sizeof(*flt), GFP_KERNEL);
->>> +
->>> +	if (attrs[PSAMPLE_ATTR_SAMPLE_GROUP]) {
->>> +		flt->group_num = nla_get_u32(attrs[PSAMPLE_ATTR_SAMPLE_GROUP]);
->>> +		flt->group_num_valid = true;
->>> +	}
->>> +
->>> +	if (!flt->group_num_valid) {
->>> +		kfree(flt);
->> Might be better to not allocate it in the first place.
->> 
->
-> Absolutely.
->
->>> +		flt = NULL;
->>> +	}
->>> +
->>> +	sk_priv = genl_sk_priv_get(&psample_nl_family, NETLINK_CB(skb).sk);
->>> +	if (IS_ERR(sk_priv)) {
->>> +		kfree(flt);
->>> +		return PTR_ERR(sk_priv);
->>> +	}
->>> +
->>> +	spin_lock(&sk_priv->flt_lock);
->>> +	flt = rcu_replace_pointer(sk_priv->flt, flt,
->>> +				  lockdep_is_held(&sk_priv->flt_lock));
->>> +	spin_unlock(&sk_priv->flt_lock);
->>> +	kfree_rcu(flt, rcu);
->>> +	return 0;
->>> +}
->>> +
->>> +static const struct nla_policy
->>> +	psample_sample_filter_set_policy[PSAMPLE_ATTR_SAMPLE_GROUP + 1] = {
->>> +	[PSAMPLE_ATTR_SAMPLE_GROUP] = { .type = NLA_U32, },
->> This indentation is confusing, though I'm not sure what's a better
->> way.
->> 
->
-> I now! I'll try to move it around see if it improves things.
->
->>> +};
->>> +
->>> +static const struct genl_ops psample_nl_ops[] = {
->>>   	{
->>>   		.cmd = PSAMPLE_CMD_GET_GROUP,
->>>   		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
->>>   		.dumpit = psample_nl_cmd_get_group_dumpit,
->>>   		/* can be retrieved by unprivileged users */
->>> -	}
->>> +	},
->>> +	{
->>> +		.cmd		= PSAMPLE_CMD_SAMPLE_FILTER_SET,
->>> +		.doit		= psample_nl_sample_filter_set_doit,
->>> +		.policy		= psample_sample_filter_set_policy,
->>> +		.flags		= 0,
->>> +	},
->>>   };
->>>     static struct genl_family psample_nl_family __ro_after_init = {
->>> @@ -114,10 +185,13 @@ static struct genl_family psample_nl_family __ro_after_init = {
->>>   	.netnsok	= true,
->>>   	.module		= THIS_MODULE,
->>>   	.mcgrps		= psample_nl_mcgrps,
->>> -	.small_ops	= psample_nl_ops,
->>> -	.n_small_ops	= ARRAY_SIZE(psample_nl_ops),
->>> +	.ops		= psample_nl_ops,
->>> +	.n_ops		= ARRAY_SIZE(psample_nl_ops),
->>>   	.resv_start_op	= PSAMPLE_CMD_GET_GROUP + 1,
->>>   	.n_mcgrps	= ARRAY_SIZE(psample_nl_mcgrps),
->>> +	.sock_priv_size		= sizeof(struct psample_nl_sock_priv),
->>> +	.sock_priv_init		= psample_nl_sock_priv_init,
->>> +	.sock_priv_destroy	= psample_nl_sock_priv_destroy,
->>>   };
->>>     static void psample_group_notify(struct psample_group *group,
->>> @@ -360,6 +434,42 @@ static int psample_tunnel_meta_len(struct ip_tunnel_info *tun_info)
->>>   }
->>>   #endif
->>>   +static inline void psample_nl_obj_desc_init(struct
->>> psample_obj_desc *desc,
->>> +					    u32 group_num)
->>> +{
->>> +	memset(desc, 0, sizeof(*desc));
->>> +	desc->group_num = group_num;
->>> +	desc->group_num_valid = true;
->>> +}
->>> +
->>> +static bool psample_obj_desc_match(struct psample_obj_desc *desc,
->>> +				   struct psample_obj_desc *flt)
->>> +{
->>> +	if (desc->group_num_valid && flt->group_num_valid &&
->>> +	    desc->group_num != flt->group_num)
->>> +		return false;
->>> +	return true;
->> This fucntion returns 'true' if one of the arguments is not valid.
->> I'd not expect such behavior from a 'match' function.
->> I understand the intention that psample should sample everything
->> to sockets that do not request filters, but that should not be part
->> of the 'match' logic, or more appropriate function name should be
->> chosen.  Also, if the group is not initialized, but the filter is,
->> it should not match, logically.  The validity on filter and the
->> current sample is not symmetric.
->> 
->
-> The descriptor should always be initialized but I think double
-> checking should be OK as in the context of this particular function,
-> it might not be clear it is.
->
->> And I'm not really sure if the 'group_num_valid' is actually needed.
->> Can the NULL pointer be used as an indicator?  If so, then maybe
->> the whole psample_obj_desc structure is not needed as it will
->> contain a single field.
->
-> If we only filter on group_id, then yes. However, as I was writing
-> this, I thought maybe opening the door to filtering on more fields
-> such as the protocol in/out interfaces, etc. Now that I read this I
-> understand the current code is confusing: I should have left a comment
-> or mention it in the commit message.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-If you want to have such filtering options, does it make sense to
-instead have the listening program send a set of bpf instructions for
-filtering instead?  I think the data should be available at the point
-where simple bpf is attached (SO_ATTACH_BPF to the psample socket, and
-the filter should run as part of the broadcast message IIRC since it
-populates the sk_filter field).
+At this point this function does not need to be defined in a header at
+all. But patch 12 will change that.
 
->> 
->>> +}
->>> +
->>> +static int psample_nl_sample_filter(struct sock *dsk, struct sk_buff *skb,
->>> +				    void *data)
->>> +{
->>> +	struct psample_obj_desc *desc = data;
->>> +	struct psample_nl_sock_priv *sk_priv;
->>> +	struct psample_obj_desc *flt;
->>> +	int ret = 0;
->>> +
->>> +	rcu_read_lock();
->>> +	sk_priv = __genl_sk_priv_get(&psample_nl_family, dsk);
->>> +	if (!IS_ERR_OR_NULL(sk_priv)) {
->>> +		flt = rcu_dereference(sk_priv->flt);
->>> +		if (flt)
->>> +			ret = !psample_obj_desc_match(desc, flt);
->>> +	}
->>> +	rcu_read_unlock();
->>> +	return ret;
->>> +}
->>> +
->>>   void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
->>>   			   u32 sample_rate, const struct psample_metadata *md)
->>>   {
->>> @@ -370,6 +480,7 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
->>>   #ifdef CONFIG_INET
->>>   	struct ip_tunnel_info *tun_info;
->>>   #endif
->>> +	struct psample_obj_desc desc;
->>>   	struct sk_buff *nl_skb;
->>>   	int data_len;
->>>   	int meta_len;
->>> @@ -487,8 +598,12 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
->>>   #endif
->>>     	genlmsg_end(nl_skb, data);
->>> -	genlmsg_multicast_netns(&psample_nl_family, group->net, nl_skb, 0,
->>> -				PSAMPLE_NL_MCGRP_SAMPLE, GFP_ATOMIC);
->>> +	psample_nl_obj_desc_init(&desc, group->group_num);
->>> +	genlmsg_multicast_netns_filtered(&psample_nl_family,
->>> +					 group->net, nl_skb, 0,
->>> +					 PSAMPLE_NL_MCGRP_SAMPLE,
->>> +					 GFP_ATOMIC, psample_nl_sample_filter,
->>> +					 &desc);
->>>     	return;
->>>   error:
->> 
+net/ethtool can be built-in or not, but cannot be built as module, so
+no need for the EXPORT_SYMBOL_GPL indeed.
+
+> ---
+> 
+> Change in v10:
+> - New patch.
+> ---
+>  include/linux/netdevice.h | 3 ---
+>  net/core/dev.h            | 4 ++++
+>  net/core/dev_ioctl.c      | 1 -
+>  3 files changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index d45f330d083d..9a4b92b49fac 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -3901,9 +3901,6 @@ int generic_hwtstamp_get_lower(struct net_device *dev,
+>  int generic_hwtstamp_set_lower(struct net_device *dev,
+>  			       struct kernel_hwtstamp_config *kernel_cfg,
+>  			       struct netlink_ext_ack *extack);
+> -int dev_set_hwtstamp_phylib(struct net_device *dev,
+> -			    struct kernel_hwtstamp_config *cfg,
+> -			    struct netlink_ext_ack *extack);
+>  int dev_ethtool(struct net *net, struct ifreq *ifr, void __user *userdata);
+>  unsigned int dev_get_flags(const struct net_device *);
+>  int __dev_change_flags(struct net_device *dev, unsigned int flags,
+> diff --git a/net/core/dev.h b/net/core/dev.h
+> index 8572d2c8dc4a..39819fffece7 100644
+> --- a/net/core/dev.h
+> +++ b/net/core/dev.h
+> @@ -167,4 +167,8 @@ static inline void dev_xmit_recursion_dec(void)
+>  	__this_cpu_dec(softnet_data.xmit.recursion);
+>  }
+>  
+> +int dev_set_hwtstamp_phylib(struct net_device *dev,
+> +			    struct kernel_hwtstamp_config *cfg,
+> +			    struct netlink_ext_ack *extack);
+> +
+>  #endif
+> diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
+> index 9a66cf5015f2..b9719ed3c3fd 100644
+> --- a/net/core/dev_ioctl.c
+> +++ b/net/core/dev_ioctl.c
+> @@ -363,7 +363,6 @@ int dev_set_hwtstamp_phylib(struct net_device *dev,
+>  
+>  	return 0;
+>  }
+> -EXPORT_SYMBOL_GPL(dev_set_hwtstamp_phylib);
+>  
+>  static int dev_set_hwtstamp(struct net_device *dev, struct ifreq *ifr)
+>  {
+> 
+> -- 
+> 2.34.1
+> 
+
 
 
