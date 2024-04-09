@@ -1,154 +1,251 @@
-Return-Path: <netdev+bounces-86219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 319A889E0AE
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 18:45:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 644F489E0BB
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 18:46:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44826B22E85
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:44:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87BF31C2294A
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E1F8153574;
-	Tue,  9 Apr 2024 16:44:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D25615381A;
+	Tue,  9 Apr 2024 16:46:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=netflix.com header.i=@netflix.com header.b="lvM1jpc9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dZBAFjo8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1BF12FB38
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 16:44:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D799713A267
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 16:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712681060; cv=none; b=KSeUMQddTwiWrHtrWKwJCHh3jo3c8C2ae+IB+gpPqn1dxD0ZHKjMSY9V2SmR1Q7ywONPgDZ+zrFxmrLg/5vfDhWJRz3MMZjf14e/VSPWB/FcIIiZFaWV1qWaxV2KCBnRnaB5NQ1MVpd/lxnRpyZmKCSaDN6uRxZwsYV00OhpliQ=
+	t=1712681165; cv=none; b=tJrQ8iP+vVJ/aJbq261loUf5m2tPjb6NS2JDmucyX5Xs3XTqkBugXW9D1h9QVqKVp/unFqW7/8L6sg7LCEyGQzt21hSnCrcUUypmPo7cvFBa4RpvIg6gwFeZYGGssR5GrMZQeDNPigHtQraCwxkeNGltGp4TRV2ESDcLMVIoKoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712681060; c=relaxed/simple;
-	bh=CdpJGAEXXXNAgx3aGCK/nVQpHRQb5I3Wu1z30rm8qjg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=P6gSY/2KqhaTvs1XrTtf3DQeD0L8cR+Fhfz5dr943d4G9MQfuamxRFyYYpVWfLM7eUKoPdY+0EdivS7cygEJpEWyI3Ina4Ti0xQIYFYnk8mUWV07O6Ld3FNj9lmKKr5E5XSztRshk89hssICIqRbqC80eJYk6FzusperMbedN4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=netflix.com; spf=pass smtp.mailfrom=netflix.com; dkim=pass (1024-bit key) header.d=netflix.com header.i=@netflix.com header.b=lvM1jpc9; arc=none smtp.client-ip=209.85.214.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=netflix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netflix.com
-Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-1e3ff14f249so17977005ad.1
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 09:44:18 -0700 (PDT)
+	s=arc-20240116; t=1712681165; c=relaxed/simple;
+	bh=V7RrbkpWyu/aIYEhwOeEBFK0kd8UsWPtMudxgDSgPSk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QUQK7LKZo6pp+2BVw03STBPg+fvhsdbPJPkU881DE3ux/NiaMgjy2p8kK4DwT0WoceuAf/ptSZ71RqPZEkmgRL65Lm0DXXAQYjmdg79X+X8eIkl3tr1DOxRTKmYbZasfdSSFSSQZ2UfIpve0ifJ0k71qmEIkEXdNmtsjJJ8dSgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dZBAFjo8; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-56e2ac1c16aso5861592a12.0
+        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 09:46:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=netflix.com; s=google; t=1712681058; x=1713285858; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1712681160; x=1713285960; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WprSy5gaOswrxUq16HxLGVIpP7UNz6Zb1HwY60dlbPQ=;
-        b=lvM1jpc93GMdacQubdrD3lfzxP5SrGS2tD84FyeGFBpApw6AaP5LoUFSv3SU5tZmCy
-         FriYHh6CZdNQDlCa9S45IDWiD0OaNJv4KdK3yXn/hBIW5+0nN+mdgsOYdCLoeQ1MoLQw
-         3OIEAs2fiiHfLxtBePXdzDE5c4clogBakPakc=
+        bh=VO0sU5Arn6X6D0Lm7h4afSioZzK6RHLZrYO4mvTd0q4=;
+        b=dZBAFjo8iO3CPpZVxnQEA/DT3hIJ2vYeyqMJJ5G+xlXxKxbuIHPuT2dswntKD9CXTr
+         3w1Uxh2lDyUF8iPSozeWzWbWpgqdO7dKW3c+CJWuMh4cyG6KEOrdQ8TBft4y4A3jQU7p
+         N1hnfEWA1XH6eueeR6dC2uws75bpdxKf6OSVlRp/AvjbXRfr1/hxDb+KwU6wRXCbyx4u
+         LTZK5uiVtPieLR1w66CGtoma6wdzj6P9LWfG9xUdujlb++6RjxVGlB8LpqM9FOOGBxiy
+         qYjeHwDpQhscSF5AD2p6uHR09WGDV07/gPAItNCkQHthfnUoPbV5f1FKSbcNN0TWTyor
+         PPeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712681058; x=1713285858;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1712681160; x=1713285960;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WprSy5gaOswrxUq16HxLGVIpP7UNz6Zb1HwY60dlbPQ=;
-        b=Ea7rIBHFhI0MjIeZ8vRNbUueC3EhfUbAN9yIVfn9mIvquxiBa9uy/Fe4dUOtLcqGlC
-         Lb9mekKo81w465GgI6PzYs2WCJ2Fwo0tVgD0sght+Do/87R4wSH+GyaWATkO/NDn+zVu
-         +1LzcF0nl4CC9jpt8AR1xeBOZyzEQmzfdSPmvH/AkGNH6rLsJtaGPuzqzpND3f+Srqyu
-         MbIPj51ZxfLp+ZG46iEZ6TpSaB0o0jVdMVwzf/rYac6fAuWKW0Ff+R8OtZ/Fagn4QuC3
-         iPOSamFCaQNjULk9iccUQ9u6J4FlFEpD+8As8yO2exS+mp8H3Uqfz1vI0M5RDbPmJb39
-         /ElQ==
-X-Gm-Message-State: AOJu0YyTDiruwPxdRu9RH9SXYBpr1v2q564F7EtN01ETCWsf5WUbWceS
-	cyU1Vli5Iz1ym4NuXzQmpEyCS7V/IcEExPpSyMKZ1K4FaGCYYwm/eE5NKAQGtYA=
-X-Google-Smtp-Source: AGHT+IGpjfjW9TJ7hzyoZ0nVHwp6ng6JTjp9cytMntyKurIPB35t8pr+lqldK0ZW1LQpTLC/OpHYjg==
-X-Received: by 2002:a17:903:32d2:b0:1e4:7bf1:521 with SMTP id i18-20020a17090332d200b001e47bf10521mr4936530plr.19.1712681057550;
-        Tue, 09 Apr 2024 09:44:17 -0700 (PDT)
-Received: from localhost ([2607:fb10:7302::1])
-        by smtp.gmail.com with UTF8SMTPSA id e7-20020a170902784700b001e2ad8cd0f0sm9259911pln.133.2024.04.09.09.44.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Apr 2024 09:44:16 -0700 (PDT)
-From: Hechao Li <hli@netflix.com>
-To: Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Soheil Hassas Yeganeh <soheil@google.com>
-Cc: netdev@vger.kernel.org,
-	Hechao Li <hli@netflix.com>,
-	Tycho Andersen <tycho@tycho.pizza>
-Subject: [PATCH net-next v3] tcp: increase the default TCP scaling ratio
-Date: Tue,  9 Apr 2024 09:43:55 -0700
-Message-Id: <20240409164355.1721078-1-hli@netflix.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CANn89iKe=GCvSp1u5=6F+NYNUoGeOLyp0-ce8_Y-z8Vo=6-xMA@mail.gmail.com>
-References: <CANn89iKe=GCvSp1u5=6F+NYNUoGeOLyp0-ce8_Y-z8Vo=6-xMA@mail.gmail.com>
+        bh=VO0sU5Arn6X6D0Lm7h4afSioZzK6RHLZrYO4mvTd0q4=;
+        b=fGSYOHFYXw8tqOzUDX5xA+m5RVgR5GfNwF7ckfSVqkypa6eCmnzUdM8wUlPpdkJhPC
+         J6vDVmxMYE0CcXfPmw6DXgHCNNyKiYU6giCrf5az/kkgntDcheeFcoTmr7rqjXQ9DW7S
+         vawyGIv2LSjghjpL2b1mrRy3uUf9OP7WrHjPwwEDUZilGrQXqJSmO0AB/ZCNXDd7WBCw
+         NVupQnVxwO6/Gf1pQH5WPLkm2MC1qJiRriYngaO134WqHCSszloaKELHLNhd1loToubq
+         IGb+nzRKgVhXgVa5ER2UQeh0qYfVlI/+MxmdlpAo8lWVzJ4cHPKXcKKY19OebgLDzRlM
+         hQdA==
+X-Forwarded-Encrypted: i=1; AJvYcCWe3/bLwTjr5Cz0cyLNVMYpMGBjlEBG/m8ua4e3pKoT2eKrPpUkXf4DSkplYd6i4HovhE7LMrBMuSdkU1YnnHOZ9GBrkRVK
+X-Gm-Message-State: AOJu0YxfE4LocIt5hMk5Yeq9FQthqR8wMZdjKBrYy5WqB8FiUeLRY56O
+	SDhbJFS2cgcczr+jbadKf4ov7S06U5Op+vslE2yiWoF4Gt2xvKgO0phg+6+iwDJdyMTCCULaZyl
+	C6b4aTjwRJ6qAvIkUv/oljdYhBkNF+NGdb9EJ
+X-Google-Smtp-Source: AGHT+IHbJIK6+gNvsrEEhA3aRLXLxWwMGZFgt2rB8VsNwxjaanEbTa+QMHBaWUOnv0UHfwCq83FRne/wbfIulHTT99c=
+X-Received: by 2002:a17:906:248f:b0:a51:d5ce:b79e with SMTP id
+ e15-20020a170906248f00b00a51d5ceb79emr8906ejb.47.1712681159869; Tue, 09 Apr
+ 2024 09:45:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <7cd05fac-9d93-45ca-aa15-afd1a34329c6@kernel.org>
+ <20240319154437.GA144716@cmpxchg.org> <56556042-5269-4c7e-99ed-1a1ab21ac27f@kernel.org>
+ <CAJD7tkYbO7MdKUBsaOiSp6-qnDesdmVsTCiZApN_ncS3YkDqGQ@mail.gmail.com>
+ <bf94f850-fab4-4171-8dfe-b19ada22f3be@kernel.org> <CAJD7tkbn-wFEbhnhGWTy0-UsFoosr=m7wiJ+P96XnDoFnSH7Zg@mail.gmail.com>
+ <ac4cf07f-52dd-454f-b897-2a4b3796a4d9@kernel.org> <96728c6d-3863-48c7-986b-b0b37689849e@redhat.com>
+In-Reply-To: <96728c6d-3863-48c7-986b-b0b37689849e@redhat.com>
+From: Yosry Ahmed <yosryahmed@google.com>
+Date: Tue, 9 Apr 2024 09:45:21 -0700
+Message-ID: <CAJD7tkZrVjhe5PPUZQNoAZ5oOO4a+MZe283MVTtQHghGSxAUnA@mail.gmail.com>
+Subject: Re: Advice on cgroup rstat lock
+To: Waiman Long <longman@redhat.com>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, Johannes Weiner <hannes@cmpxchg.org>, Tejun Heo <tj@kernel.org>, 
+	Jesper Dangaard Brouer <jesper@cloudflare.com>, "David S. Miller" <davem@davemloft.net>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Shakeel Butt <shakeelb@google.com>, 
+	Arnaldo Carvalho de Melo <acme@kernel.org>, Daniel Bristot de Oliveira <bristot@redhat.com>, 
+	kernel-team <kernel-team@cloudflare.com>, cgroups@vger.kernel.org, 
+	Linux-MM <linux-mm@kvack.org>, Netdev <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, Ivan Babrou <ivan@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-After commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale"),
-we noticed an application-level timeout due to reduced throughput.
+On Tue, Apr 9, 2024 at 8:37=E2=80=AFAM Waiman Long <longman@redhat.com> wro=
+te:
+>
+> On 4/9/24 07:08, Jesper Dangaard Brouer wrote:
+> > Let move this discussion upstream.
+> >
+> > On 22/03/2024 19.32, Yosry Ahmed wrote:
+> >> [..]
+> >>>> There was a couple of series that made all calls to
+> >>>> cgroup_rstat_flush() sleepable, which allows the lock to be dropped
+> >>>> (and IRQs enabled) in between CPU iterations. This fixed a similar
+> >>>> problem that we used to face (except in our case, we saw hard lockup=
+s
+> >>>> in extreme scenarios):
+> >>>> https://lore.kernel.org/linux-mm/20230330191801.1967435-1-yosryahmed=
+@google.com/
+> >>>>
+> >>>> https://lore.kernel.org/lkml/20230421174020.2994750-1-yosryahmed@goo=
+gle.com/
+> >>>>
+> >>>
+> >>> I've only done the 6.6 backport, and these were in 6.5/6.6.
+> >
+> > Given I have these in my 6.6 kernel. You are basically saying I should
+> > be able to avoid IRQ-disable for the lock, right?
+> >
+> > My main problem with the global cgroup_rstat_lock[3] is it disables IRQ=
+s
+> > and (thereby also) BH/softirq (spin_lock_irq).  This cause production
+> > issues elsewhere, e.g. we are seeing network softirq "not-able-to-run"
+> > latency issues (debug via softirq_net_latency.bt [5]).
+> >
+> >   [3]
+> > https://elixir.bootlin.com/linux/v6.9-rc3/source/kernel/cgroup/rstat.c#=
+L10
+> >   [5]
+> > https://github.com/xdp-project/xdp-project/blob/master/areas/latency/so=
+ftirq_net_latency.bt
+> >
+> >
+> >>> And between 6.1 to 6.6 we did observe an improvement in this area.
+> >>> (Maybe I don't have to do the 6.1 backport if the 6.6 release plan
+> >>> progress)
+> >>>
+> >>> I've had a chance to get running in prod for 6.6 backport.
+> >>> As you can see in attached grafana heatmap pictures, we do observe an
+> >>> improved/reduced softirq wait time.
+> >>> These softirq "not-able-to-run" outliers is *one* of the prod issues =
+we
+> >>> observed.  As you can see, I still have other areas to improve/fix.
+> >>
+> >> I am not very familiar with such heatmaps, but I am glad there is an
+> >> improvement with 6.6 and the backports. Let me know if there is
+> >> anything I could do to help with your effort.
+> >
+> > The heatmaps give me an overview, but I needed a debugging tool, so I
+> > developed some bpftrace scripts [1][2] I'm running on production.
+> > To measure how long time we hold the cgroup rstat lock (results below).
+> > Adding ACME and Daniel as I hope there is an easier way to measure lock
+> > hold time and congestion. Notice tricky release/yield in
+> > cgroup_rstat_flush_locked[4].
+> >
+> > My production results on 6.6 with backported patches (below signature)
+> > vs a our normal 6.6 kernel, with script [2]. The `@lock_time_hist_ns`
+> > shows how long time the lock+IRQs were disabled (taking into account it
+> > can be released in the loop [4]).
+> >
+> > Patched kernel:
+> >
+> > 21:49:02  time elapsed: 43200 sec
+> > @lock_time_hist_ns:
+> > [2K, 4K)              61 |      |
+> > [4K, 8K)             734 |      |
+> > [8K, 16K)         121500 |@@@@@@@@@@@@@@@@      |
+> > [16K, 32K)        385714
+> > |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> > [32K, 64K)        145600 |@@@@@@@@@@@@@@@@@@@      |
+> > [64K, 128K)       156873 |@@@@@@@@@@@@@@@@@@@@@      |
+> > [128K, 256K)      261027 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ |
+> > [256K, 512K)      291986 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      =
+|
+> > [512K, 1M)        101859 |@@@@@@@@@@@@@      |
+> > [1M, 2M)           19866 |@@      |
+> > [2M, 4M)           10146 |@      |
+> > [4M, 8M)           30633 |@@@@      |
+> > [8M, 16M)          40365 |@@@@@      |
+> > [16M, 32M)         21650 |@@      |
+> > [32M, 64M)          5842 |      |
+> > [64M, 128M)            8 |      |
+> >
+> > And normal 6.6 kernel:
+> >
+> > 21:48:32  time elapsed: 43200 sec
+> > @lock_time_hist_ns:
+> > [1K, 2K)              25 |      |
+> > [2K, 4K)            1146 |      |
+> > [4K, 8K)           59397 |@@@@      |
+> > [8K, 16K)         571528 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      =
+|
+> > [16K, 32K)        542648 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      |
+> > [32K, 64K)        202810 |@@@@@@@@@@@@@      |
+> > [64K, 128K)       134564 |@@@@@@@@@      |
+> > [128K, 256K)       72870 |@@@@@      |
+> > [256K, 512K)       56914 |@@@      |
+> > [512K, 1M)         83140 |@@@@@      |
+> > [1M, 2M)          170514 |@@@@@@@@@@@      |
+> > [2M, 4M)          396304 |@@@@@@@@@@@@@@@@@@@@@@@@@@@      |
+> > [4M, 8M)          755537
+> > |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+> > [8M, 16M)         231222 |@@@@@@@@@@@@@@@      |
+> > [16M, 32M)         76370 |@@@@@      |
+> > [32M, 64M)          1043 |      |
+> > [64M, 128M)           12 |      |
+> >
+> >
+> > For the unpatched kernel we see more events in 4ms to 8ms bucket than
+> > any other bucket.
+> > For patched kernel, we clearly see a significant reduction of events in
+> > the 4 ms to 64 ms area, but we still have some events in this area.  I'=
+m
+> > very happy to see these patches improves the situation.  But for networ=
+k
+> > processing I'm not happy to see events in area 16ms to 128ms area.  If
+> > we can just avoid disabling IRQs/softirq for the lock, I would be happy=
+.
+> >
+> > How far can we go... could cgroup_rstat_lock be converted to a mutex?
+>
+> The cgroup_rstat_lock was originally a mutex. It was converted to a
+> spinlock in commit 0fa294fb1985 ("group: Replace cgroup_rstat_mutex with
+> a spinlock"). Irq was disabled to enable calling from atomic context.
+> Since commit 0a2dc6ac3329 ("cgroup: remove
+> cgroup_rstat_flush_atomic()"), the rstat API hadn't been called from
+> atomic context anymore. Theoretically, we could change it back to a
+> mutex or not disabling interrupt. That will require that the API cannot
+> be called from atomic context going forward.
 
-Before the commit, for a client that sets SO_RCVBUF to 65k, it takes
-around 22 seconds to transfer 10M data. After the commit, it takes 40
-seconds. Because our application has a 30-second timeout, this
-regression broke the application.
+I think we should avoid flushing from atomic contexts going forward
+anyway tbh. It's just too much work to do with IRQs disabled, and we
+observed hard lockups before in worst case scenarios.
 
-The reason that it takes longer to transfer data is that
-tp->scaling_ratio is initialized to a value that results in ~0.25 of
-rcvbuf. In our case, SO_RCVBUF is set to 65536 by the application, which
-translates to 2 * 65536 = 131,072 bytes in rcvbuf and hence a ~28k
-initial receive window.
+I think one problem that was discussed before is that flushing is
+exercised from multiple contexts and could have very high concurrency
+(e.g. from reclaim when the system is under memory pressure). With a
+mutex, the flusher could sleep with the mutex held and block other
+threads for a while.
 
-Later, even though the scaling_ratio is updated to a more accurate
-skb->len/skb->truesize, which is ~0.66 in our environment, the window
-stays at ~0.25 * rcvbuf. This is because tp->window_clamp does not
-change together with the tp->scaling_ratio update when autotuning is
-disabled due to SO_RCVBUF. As a result, the window size is capped at the
-initial window_clamp, which is also ~0.25 * rcvbuf, and never grows
-bigger.
+I vaguely recall experimenting locally with changing that lock into a
+mutex and not liking the results, but I can't remember much more. I
+could be misremembering though.
 
-Most modern applications let the kernel do autotuning, and benefit from
-the increased scaling_ratio. But there are applications such as kafka
-that has a default setting of SO_RCVBUF=64k.
-
-This patch increases the initial scaling_ratio from ~25% to 50% in order
-to make it backward compatible with the original default
-sysctl_tcp_adv_win_scale for applications setting SO_RCVBUF.
-
-Fixes: dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
-Signed-off-by: Hechao Li <hli@netflix.com>
-Reviewed-by: Tycho Andersen <tycho@tycho.pizza>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Link: https://lore.kernel.org/netdev/20240402215405.432863-1-hli@netflix.com/
-
----
-v1->v2: increase the default tcp scaling ratio instead of updating
-window_clamp and update the commit message
-v2->v3: Update commit message and add the link to v1
----
- include/net/tcp.h | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 6ae35199d3b3..2bcf30381d75 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -1539,11 +1539,10 @@ static inline int tcp_space_from_win(const struct sock *sk, int win)
- 	return __tcp_space_from_win(tcp_sk(sk)->scaling_ratio, win);
- }
- 
--/* Assume a conservative default of 1200 bytes of payload per 4K page.
-+/* Assume a 50% default for skb->len/skb->truesize ratio.
-  * This may be adjusted later in tcp_measure_rcv_mss().
-  */
--#define TCP_DEFAULT_SCALING_RATIO ((1200 << TCP_RMEM_TO_WIN_SCALE) / \
--				   SKB_TRUESIZE(4096))
-+#define TCP_DEFAULT_SCALING_RATIO (1 << (TCP_RMEM_TO_WIN_SCALE - 1))
- 
- static inline void tcp_scaling_ratio_init(struct sock *sk)
- {
--- 
-2.34.1
-
+Currently, the lock is dropped in cgroup_rstat_flush_locked() between
+CPU iterations if rescheduling is needed or the lock is being
+contended (i.e. spin_needbreak() returns true). I had always wondered
+if it's possible to introduce a similar primitive for IRQs? We could
+also drop the lock (and re-enable IRQs) if IRQs are pending then.
 
