@@ -1,111 +1,139 @@
-Return-Path: <netdev+bounces-86138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B6F589DB27
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:52:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE1E189DB2A
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:52:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9C6E289B26
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:52:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68C6E284B06
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:52:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 802611350EA;
-	Tue,  9 Apr 2024 13:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17A6A12F586;
+	Tue,  9 Apr 2024 13:43:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wl+fOySI"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Iy4NTzVF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B0FA1350C0
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 13:43:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AED6112F39A;
+	Tue,  9 Apr 2024 13:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712670199; cv=none; b=oCkSAXWooE8l1uobeHf31iwStMwzUnMfGklP6b92XKNULs8kbimkFYY69ReLpMmozr48hxL4EdY34X8f1NI41SpOuFhNVhjeUQoJhdTc0BkeFKq6iIZc9v0BCrr4zMK1iAmCC3+DOP1LhqnBZwFpKUaCZjHOgVKGTZHQooAafjw=
+	t=1712670232; cv=none; b=GiiNmgGvcrhGEFua5Impk+4NViFnxkD9JkqKaHHsxmf+9uWT41CXdg9yOr9vC27oyQFjLGc8CxqGgAnX0578A+SadefZdLj9KUAiu4AnB1+yq2ArrPOiag9MRp4E5sw51cM5pz1dJ/bgQz+zGPQ27TT1Yh38ID4zSGNxlVITlp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712670199; c=relaxed/simple;
-	bh=yKJSXOjjWfUT4oVrQVVn4bWizSfYjLz+IXERJbRqhJ0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jQcfPxV2608uYVEj0BlDVosYtgRADYryYB0lSP5SIOw4MN633xN7C4CC1gXXwfMIRuqUUGMRSYWivHWQal0JdBACDdoBADxjKvYFLL3Z8i7hZGMRH4NrTExa+O4T9Bz55QEan2/umpi54UKH8omKhJ1vTCi68dpw0d4NQRAStAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wl+fOySI; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6ed04c91c46so3755910b3a.0
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 06:43:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712670197; x=1713274997; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HbJaku5S1saOKhyxjx+ImI9HX4ZZf5UgoTZfbk+GrEE=;
-        b=Wl+fOySIIl3kjuIlugdD0vxygLTC4LkXy6RP+Oo3yMkaPrCs9FaVKIUfG4jGoOp0Dh
-         Te2y/bMQFw5p1ZbH4uv1Xknk0S0OFiNdHbJ04fy3Co01TsSiNDvwz0xgN0Sw31AvMj58
-         6fT0pdA+D9AnEKatruYU6l0UL773besoiRUGvu0UdLr/eG/xtu9gpaeT5ay/tWW2kpyc
-         ySqr8jybg5YyFFTPQBqmg7eH7B5/9H8gnHwS9Fzf10UFxLfA89jggHMz8TI2azDfIxj+
-         FV/wmThg+B+bd7GtEPkfC6jfDT90lEOZCfxRJISXjrlFqJglm8EOqwzhWFouxhhmsXxM
-         ZLfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712670197; x=1713274997;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HbJaku5S1saOKhyxjx+ImI9HX4ZZf5UgoTZfbk+GrEE=;
-        b=M5Cf/KdF1uJ9ErvDbklLfW3ZOZ623OZRouiF/zFZuCCfvd28ehuXGYmtEoutnCiVBt
-         9n7drywi6MsdlEZlSkPzYDy2X4wvFgMaKrOCMsf2eS5dh9x1VkKq8gr8/oJmXefK7z5w
-         Zks5Y7uCv7NpnLk5yUXY5FieDCzhuSBpNbRunmmZANzXEJOvQ4otif8ylFc0OpyEp5SK
-         5B/6ddpK5zW04trdcdiWulYY7ZCMXBHkAIdcWbVV8rEPI+jxaECriQuZbftMNJXgY8Nj
-         nWBMfi2mFdrm9mfPylXhbl0UWS4UY0UN7rTIn8fY9hLylVR0AF3mjW0KC8qLdtPqrnI4
-         gTuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXLuXpfLlf8oBW0dvrZQgKRbt2EppVrQSjcTIIQG9fzCsQkMeWe+zX38KVULAuAQcxvUBzHntC+LMy4zvi5iQqI9W2oKf7i
-X-Gm-Message-State: AOJu0Yw7pXNa+XoMWEfkWPNrhc3GytfjiZ1BKgn8ykMClqTNAh8p5z7L
-	R+CTOaeH/WpKkHVBfqB+6tQY4uXUpmW1805/KcywvrUrlZ+G9g7s
-X-Google-Smtp-Source: AGHT+IGCnfzv1LTc7yB069rXcbqX/zcq4EBmmLGOl3gyBwZoBWcDcQVr4NX3Wsm/uzwz+DnzgvCOrA==
-X-Received: by 2002:a05:6a20:d498:b0:1a7:50b1:8f90 with SMTP id im24-20020a056a20d49800b001a750b18f90mr12533691pzb.37.1712670197169;
-        Tue, 09 Apr 2024 06:43:17 -0700 (PDT)
-Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
-        by smtp.gmail.com with ESMTPSA id lb14-20020a056a004f0e00b006ecf3e302ffsm8618520pfb.174.2024.04.09.06.43.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Apr 2024 06:43:16 -0700 (PDT)
-From: Jeongjun Park <aha310510@gmail.com>
-To: kuniyu@amazon.com
-Cc: aha310510@gmail.com,
-	daan.j.demeyer@gmail.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	eric.dumazet@gmail.com,
-	kuba@kernel.org,
-	martin.lau@kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	willemdebruijn.kernel@gmail.com
-Subject: Re: [PATCH net] net: implement lockless setsockopt(SO_PEEK_OFF)
-Date: Tue,  9 Apr 2024 22:43:11 +0900
-Message-Id: <20240409134311.11505-1-aha310510@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240408183114.76329-1-kuniyu@amazon.com>
-References: <20240408183114.76329-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1712670232; c=relaxed/simple;
+	bh=y/xaSl/jhXl08yoalUQ5vH76MCEpZVtsR/1x4w43g8k=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d6C78SBbRtpG7KbDxKkgD8DzeyqBFfgqlTVvCwWmRACM+WabTR6+024ZCVtvceOVSEOxGbURpvl8p4XaYmtpaXIcPTAumig3dXcUMi3RtMjjw6KwGhxur/CXLSstNNjZG5Chw5p52SqvzcVj3ebpNrXukEMgWyqk2Qve76nByUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Iy4NTzVF; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 3041F240008;
+	Tue,  9 Apr 2024 13:43:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1712670228;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=m5UDulmenCwJXHuGMpELuxhDA4GFyujVsdxEaX2Dr8g=;
+	b=Iy4NTzVFWYIISKvZb3P1zAUEKQXE6VFTgx/iZnMms4cEObuZ97PE1okjL+Zx6GUOhH358F
+	2TUZr25TtQN/aJaJVeGL0chkGZ/cllV0WOROlZwrnz63KbJg+ZWwW1XRb/T5jK5+dLIdsD
+	O6x426KxtkdX3k+CnUx7Fzlrl714fiPVBxr5l5EutPwJJSKtFdwl3I+E/IUjaelg4j9R9B
+	v4tvJls4ZOgiyxBiOvO7UHwoBygwhpUxWCetIkKY0XowlW2uLs5g0zh17FV5u96wtMk1nh
+	hPIClv4uh+Ulc8a1PD8GzVB7Svcg0wZuAFHM0GL3R6rVBVu0As4CvUsd53TT4Q==
+Date: Tue, 9 Apr 2024 15:43:45 +0200
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Rob Herring <robh@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
+ <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
+ Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v6 14/17] dt-bindings: net: pse-pd: Add
+ bindings for PD692x0 PSE controller
+Message-ID: <20240409154345.7a2a73a5@kmaincent-XPS-13-7390>
+In-Reply-To: <20240402132834.GB3744978-robh@kernel.org>
+References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
+	<20240326-feature_poe-v6-14-c1011b6ea1cb@bootlin.com>
+	<20240402132834.GB3744978-robh@kernel.org>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Kuniyuki Iwashima wrote:
-> It might mitigate your risk, but it does not exist upstream.
+On Tue, 2 Apr 2024 08:28:34 -0500
+Rob Herring <robh@kernel.org> wrote:
 
-> We don't accept such a patch that adds unnecessary locks just
-> for a future possible issue.  It should be fixed when such an
-> option requiring u->iolock is added.
+> > +    patternProperties:
+> > +      "^manager@0[0-9]|1[0-2]$": =20
+>=20
+> Unit-addresses are typically in hex.
+>=20
+> Is 'manager' something specific to this device or should be common?
 
+Specific to this device.
+=20
+> > +        $ref: /schemas/graph.yaml#/properties/ports =20
+>=20
+> This is not using the graph binding. Furthermore, I don't want to see=20
+> new cases of 'port' node names which are not graph nodes. We have it=20
+> already with ethernet switches, but 'ethernet-port' is preferred over=20
+> 'port'.
 
-Ah i see.
+Ok I will remove the ref then.
+=20
+> Why is this one 'managers' and the other device binding 'channels'?
 
-I learned that you should not carelessly patch major code 
-considering potential elements that do not immediately exist upstream.
+Here each manager can have up to 8 ports.
+The ports in tps23881 are called channels in the datasheet but I can use the
+port naming for both if you prefer.
 
-Thanks.
+> > +        description:
+> > +          PD69208T4/PD69204T4/PD69208M PSE manager exposing 4 or 8 phy=
+sical
+> > +          ports.
+> > +
+> > +        properties:
+> > +          reg:
+> > +            description:
+> > +              Incremental index of the PSE manager starting from 0, ra=
+nging
+> > +              from lowest to highest chip select, up to 12.
+> > +            maxItems: 1
+> > +
+> > +        patternProperties:
+> > +          '^port@[0-7]$':
+> > +            type: object
+> > +            required:
+> > +              - reg =20
+>=20
+> Any property you want is allowed in this node. You are missing=20
+> 'additionalProperties'.
+
+Indeed.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
