@@ -1,124 +1,128 @@
-Return-Path: <netdev+bounces-86158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C595089DBC6
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:09:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BC9489DBD7
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:12:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F2DA282B87
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:09:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 213841F23649
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:12:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C08712F596;
-	Tue,  9 Apr 2024 14:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AD1D12F5A3;
+	Tue,  9 Apr 2024 14:12:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C41Es8d5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LBuRzoDW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9900F12A144
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 14:09:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFF5A12F5A0;
+	Tue,  9 Apr 2024 14:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712671758; cv=none; b=bS05pZSsXxZgZNYQRfNsDfvbht4hTrvQEztnfYAdR94EODOUurhPBvK7l/P6xMl49ehhs+1YnXldV4EBphTdhibDFf/1JLIlM0cKIPdjDj2fq2yQldx4LbbPpIrPrht3CktidiAkzJOpOauc7l3JE0A9U8nf548E7bARGMgNONQ=
+	t=1712671926; cv=none; b=mN/nbAPjQPckq5qeKxkOS8i4wxaar6mmSC6l6Zv+R/wyVBMq/ANK8wnhml5oFQXJxPQtl7QvpvLFtnVek5XJnH7PgYMUl9DN5bW2QjWYCKRzDvCYiaEj0bOgf+nN8sOwiAom49dfrSPEbxx7qtsF01+L/0jmxt0cv0MTQTMupmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712671758; c=relaxed/simple;
-	bh=rLJ7AUBvoE9N2FTnZtcPOjIENrFtiSS+TWCUgpeJ+gY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=C2xOVe5onVJKu4u0PQ7C0aPN94KESro3cMRhPSG4yZt9O8sKtrFxkwiM7dKb/0jITLjapYp5KsvN3dNtCbKgqPKHa/XYimObC8gb19AeWj2yiWmAf1HyKB36d+BF3zm0mqBuWsvoTtsnWh9kfrkaf7FUWuyMhhvzAHs+7nSQebU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C41Es8d5; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dcbfe1a42a4so9367626276.2
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 07:09:16 -0700 (PDT)
+	s=arc-20240116; t=1712671926; c=relaxed/simple;
+	bh=Pb3U8o0znOa+FZrFMgY8KaP+XUwl/EDu8Wcwfm7QUUM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EtZLSueHVd5UqTYXBW4A75YnnFFAtBbnR+jmfk0fvp6U1x33JJcvGHI1shFC+BnlzN/XDuJNlVtGvjtSRedSIv98fEY6250am/AqEvAd3hzddVGDZLNRuHAfWF/5WvIrA2aqlheeTjzyo/73yLCkDHIqgCssOeqpC7/MJ0UYVnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LBuRzoDW; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d8a24f8a3cso12861491fa.1;
+        Tue, 09 Apr 2024 07:12:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712671755; x=1713276555; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=izh0m/N2Vxkxb1/vSeUgPJ5g3NFGUOzcsP3CX+GQ5pI=;
-        b=C41Es8d52Ps2Spis/GsXVeODTIiizfDLWYViej9egODW7zaj151PeJIa3rhKZMZ9HZ
-         nWkldlrBpUOOEMwveT0uDjqg/lqTpXDIg4K5w6JI2TYWqjyJuud8fDDWWYxPxdtWGLMN
-         NrXpTmIwmBeFwLkvHHcE9RUzFTsEiHV5tksfGn+Lv0Pxrzk7xxcnPCF/h4HoYYPORx4M
-         4zJpwhZxSvUbjYwc8+RInXfavMYCbvDuoow2lEjKzq3ZJNpT6DXKtHugEhjmpJLC8QAA
-         xHB03sYs8kRbXLOSOJSCA6fZHj0/x4serzonJ3IBWo0Ok1hAm6i6mco7Z5CBOcnINdEj
-         nYgQ==
+        d=gmail.com; s=20230601; t=1712671923; x=1713276723; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Yq7Ve/MoVtY976kXQjQT0Gp8ZXknYj2h3YGm3jklcHo=;
+        b=LBuRzoDWuSO277Om9dbcVaTEPdeuJoUlgB4e7qKErAO0vWtCvEQmM/sowiY0saXUMo
+         GVyrRKSBE06/Yd0b03rVmKrtpqm5QhsO8hYz91ix631/nfW+usRz3H6qiyFq+ixhcnJz
+         iyFb+D8px5TRzRuJcl4KxS2rb5ZMjS/08oUHgaFvhWhyKLEFliUm9QlEmMxufgGqnHkq
+         7rpbMJVlRFgubjSOQF8CD2cGvBm8Y+mCwvzPcQYTS6IUDTd9He3Z6Jhg4QwejQyUHJpu
+         ZFDlrCtFwUodPLPBrvi71VL0zwNkRP2E1HTEJWCnD9sWnUgGF4cKYFRbiWiS9H7POsjm
+         HHOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712671755; x=1713276555;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=izh0m/N2Vxkxb1/vSeUgPJ5g3NFGUOzcsP3CX+GQ5pI=;
-        b=MCrh0b9Ye1hnRjDI/i/HRZVxkjtNiARqCjL/oRr19Ki9n9ZS4r6y7lkm/C9xWIhpYF
-         EN9h1I14kVdQLnrGKDNX8UAS9sRMIKpmpkaYVRgz3i0Xei7lAzYylV2OX1FuRRx9GFfm
-         WyMV3MZaP4NmhpBQNZLGQMCRPUFFW3chk3rq+ta6pNXKNT86RGgGENnB43J7PaBe5TXp
-         44EB9i3hrGlqU8cT+wVOi/8dL/XupkgI7wRg2X9Wdi/Na0zbqNStouaCs4sNWCFCZV4V
-         3YjmBVvjdhZaxqCFh9aEwRRL2SVo7S9s1g5xrbd4eTqs+XX/NS2+FjdrLcV9MRTmmTm1
-         loxQ==
-X-Gm-Message-State: AOJu0YznwgtqJrA8XauGxp078Ga7DXXWLPkpq4MO9wa9eB7RzbjjdSvE
-	c4gt13eeeKsV66hEk1hjgqNRdxx6ADHKX2cc5jx5T1fC8iesTwhgFi2/Rywegi4OUZf1w5GJm8b
-	FqikIGNNTlw==
-X-Google-Smtp-Source: AGHT+IHI/JkGKRQ5QTCPFCG+H19NhFQNMjz9LKiUO58A4eyz5Et/WlUeKbUfVOBLiQdkBMVjJ7BcdAMBj6yZHg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1508:b0:dcc:e1a6:aca9 with SMTP
- id q8-20020a056902150800b00dcce1a6aca9mr3625810ybu.9.1712671755379; Tue, 09
- Apr 2024 07:09:15 -0700 (PDT)
-Date: Tue,  9 Apr 2024 14:09:14 +0000
+        d=1e100.net; s=20230601; t=1712671923; x=1713276723;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Yq7Ve/MoVtY976kXQjQT0Gp8ZXknYj2h3YGm3jklcHo=;
+        b=fKc0kuDoEtG/NHXlxoUb9QiQQCU9Z5ViyMK/5GxqSnIIo9p2/RTJhw8SuXcFhBzNDz
+         iY6yP17yjmOJYiBaJIbGPmTlEjGVd5g6KbnSlh/OPm17R/F1FX4csLbYh/ubLcKdR5o5
+         PGg7czQII8Nr+t9rYe6spMMzYyVaiMajtMBDysDrBPhCTpBZPNAglQ4wGmLgGIhm6AGX
+         LEXh7N2a2hstSg7gpM27m+tt0R37l7pHx5cFpLXXoUfc7PuitwMsD8rE9DQfIMX4t3z0
+         pIZMCTo+pHbYdglxiqonT1wBEvV0VjltRc17TOIrWQ7oFbBGYR2iWhCrPMoS/esRwzXb
+         1sBg==
+X-Forwarded-Encrypted: i=1; AJvYcCVeN2pod8QLBs7mqvk8BrndHyYsO1OymGRbKgAn3+xzdTf7Lh+dsCBsq8/Fs3NHbhia0eZMKC5uvIO/9I5sUm5fJKHGZJzfWJm+MjVoKxvSB69uMSycSYFUPsoZm9tY1EprqMYjs/yuelVDZDdyfhxNPrIkLEvlO0cCnIZYYDSac/hJtjX+
+X-Gm-Message-State: AOJu0YzPxtpfoPF03aW7e0Kf6vLiqSz734VnpmKMOaXUtLlrJfseVnln
+	ZqadjUYic09RVsc2ZIEM7I8p/LpS7fOpWvBdgkisc5uYgN1VKCCqAUo1pBe+1Y5t8P4hrwRqAMX
+	5wL+pLsBxVxSuDLsvVy+mR4fs9Ao=
+X-Google-Smtp-Source: AGHT+IEbW1mmDB2SJKlZlyubQTwI+ixEezwvqOpNrsOBopPAXAxjksYWvJ7cuiCIlWgNkVvgZu+Z+14EdCJbAfxHdOY=
+X-Received: by 2002:a2e:9602:0:b0:2d8:1267:3202 with SMTP id
+ v2-20020a2e9602000000b002d812673202mr7627397ljh.10.1712671922638; Tue, 09 Apr
+ 2024 07:12:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240409140914.4105429-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp: tweak tcp_sock_write_txrx size assertion
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, kernel test robot <lkp@intel.com>, 
-	Vladimir Oltean <vladimir.oltean@nxp.com>
+MIME-Version: 1.0
+References: <7cf0848b-f44c-42ad-848a-369a249bff77@gmail.com> <tencent_FE3C6F369E968237444B7E74BD7625670A09@qq.com>
+In-Reply-To: <tencent_FE3C6F369E968237444B7E74BD7625670A09@qq.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 9 Apr 2024 10:11:50 -0400
+Message-ID: <CABBYNZ+4x2XxgL2eGYU0dd1+83quVajEk-bAqt3FG7wPx+=nFg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: fix oob in rfcomm_sock_setsockopt
+To: Edward Adam Davis <eadavis@qq.com>
+Cc: eric.dumazet@gmail.com, edumazet@google.com, johan.hedberg@gmail.com, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	marcel@holtmann.org, netdev@vger.kernel.org, pmenzel@molgen.mpg.de, 
+	syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I forgot 32bit arches might have 64bit alignment for u64
-fields.
+Hi Edward,
 
-tcp_sock_write_txrx group does not contain pointers,
-but two u64 fields. It is possible that on 32bit kernel,
-a 32bit hole is before tp->tcp_clock_cache.
+On Tue, Apr 9, 2024 at 9:36=E2=80=AFAM Edward Adam Davis <eadavis@qq.com> w=
+rote:
+>
+> If optlen < sizeof(u32) it will trigger oob, so take the min of them.
+>
+> Reported-by: syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> ---
+>  net/bluetooth/rfcomm/sock.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+> index b54e8a530f55..42c55c756b51 100644
+> --- a/net/bluetooth/rfcomm/sock.c
+> +++ b/net/bluetooth/rfcomm/sock.c
+> @@ -629,7 +629,7 @@ static int rfcomm_sock_setsockopt_old(struct socket *=
+sock, int optname,
+>
+>         switch (optname) {
+>         case RFCOMM_LM:
+> -               if (copy_from_sockptr(&opt, optval, sizeof(u32))) {
+> +               if (copy_from_sockptr(&opt, optval, min_t(int, sizeof(u32=
+), optlen))) {
+>                         err =3D -EFAULT;
+>                         break;
+>                 }
+> --
+> 2.43.0
 
-I will try to remember a group can be bigger on 32bit
-kernels in the future.
+This has been dealt with already:
 
-With help from Vladimir Oltean.
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
+t/commit/?id=3Dee77912bc0bbd78fceb785a81cc9108fa954982f
 
-Fixes: d2c3a7eb1afa ("tcp: more struct tcp_sock adjustments")
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202404082207.HCEdQhUO-lkp@intel.com/
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- net/ipv4/tcp.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index b07aa71b24ec147d2f1f148e288231b3a492fb5a..e1bf468e0d22aad01532dce6e226ca095d578b91 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -4673,7 +4673,11 @@ static void __init tcp_struct_check(void)
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, app_limited);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rcv_wnd);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_txrx, rx_opt);
--	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 92);
-+
-+	/* 32bit arches with 8byte alignment on u64 fields might need padding
-+	 * before tcp_clock_cache.
-+	 */
-+	CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_write_txrx, 92 + 4);
- 
- 	/* RX read-write hotpath cache lines */
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct tcp_sock, tcp_sock_write_rx, bytes_received);
--- 
-2.44.0.478.gd926399ef9-goog
-
+--=20
+Luiz Augusto von Dentz
 
