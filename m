@@ -1,59 +1,50 @@
-Return-Path: <netdev+bounces-86149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61A7C89DB80
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:01:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B45289DB78
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:00:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B4B31F23662
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:01:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06DD6284DDC
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B02F812FB03;
-	Tue,  9 Apr 2024 14:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D87CD12A144;
+	Tue,  9 Apr 2024 14:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kfSgojQT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7581112FB26
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 14:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD1C12F585;
+	Tue,  9 Apr 2024 14:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712671233; cv=none; b=hoIoK27xe6qGEusWjRvqPRZVhzLrKMsQ0rydwstbnnCCNWO1eJLD03TszDhLsaj5MQ/kn7FLCuND7NcuTdohjNZYBBVjVR15s/6L2dsrMmBtcvng/5EIzd1hm1/2H0yn6z2BJ5NUd9uELtxeKNIcJaC6ztC8Ory8N77GwypUrEc=
+	t=1712671228; cv=none; b=Gr484KpJKutTnUp5xdq+amyKTZMpNqUQgye9ZrC0JAOZLYvq8PdF3adsSVgWwaGPmDz5HASaMVm/Pc+lgWVWDmrjEn/ue4zaJQqlj4LT/7ZvwzPXYW/QMN9UkiUnqqLvnjlmW9PBz0ltvZuoRp08VonKRETdLI33nmrVFdJlMYA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712671233; c=relaxed/simple;
-	bh=2vhUk8W5k99hPTXIbnWDV/Sn7muqSxyLS1aHheW49m0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=bTaMzuVKb7QXc9Gd6ataFfbb3UiO7NIR27Y5gQ/AC4BRs30MKCsPJImizfGBdtWQsxSP1ddAGKj69XWC0PMDOQCkpvdVZswDGXreCPEFsjPn4PjaDWFm09VrVnxw9CUmJK1GcEoDskSRBZGSqsja1OGNLtVOTOftlbLjtD6zhOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.109.80])
-	by gateway (Coremail) with SMTP id _____8Dx6uj8SRVmI+AkAA--.64707S3;
-	Tue, 09 Apr 2024 22:00:28 +0800 (CST)
-Received: from localhost.localdomain (unknown [112.20.109.80])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxSRLwSRVmf5R2AA--.20615S5;
-	Tue, 09 Apr 2024 22:00:27 +0800 (CST)
-From: Yanteng Si <siyanteng@loongson.cn>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	fancer.lancer@gmail.com
-Cc: Yanteng Si <siyanteng@loongson.cn>,
-	Jose.Abreu@synopsys.com,
-	chenhuacai@kernel.org,
-	linux@armlinux.org.uk,
-	guyinggang@loongson.cn,
-	netdev@vger.kernel.org,
-	chris.chenfeiyang@gmail.com,
-	siyanteng01@gmail.com
-Subject: [PATCH net-next v10 3/6] net: stmmac: dwmac-loongson: Use PCI_DEVICE_DATA() macro for device identification
-Date: Tue,  9 Apr 2024 22:00:03 +0800
-Message-Id: <3c9c90eca36453dbe28204053ef6a8a7b607856c.1712668711.git.siyanteng@loongson.cn>
-X-Mailer: git-send-email 2.31.4
-In-Reply-To: <cover.1712668711.git.siyanteng@loongson.cn>
-References: <cover.1712668711.git.siyanteng@loongson.cn>
+	s=arc-20240116; t=1712671228; c=relaxed/simple;
+	bh=3imqkCaF0cUyufJVCbO+U0FzUIq5rDIjHYANKbEr5gQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TX9QbhhJhbpHhuDY4gUKE/LkndTkVkjsnoN4zWccS656ueuOumswwHBEE5FVu/jhMeMUh85/1wwKnGK0IhmwFx7uHxOgZuj2fW8l2sNF5fi61qpMo9+XMm8s6da08yzUqMQwl1rvy1TaCxsMsu4/+s5mMkpbsMacyzENUb5KBuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kfSgojQT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2E9B0C43394;
+	Tue,  9 Apr 2024 14:00:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712671228;
+	bh=3imqkCaF0cUyufJVCbO+U0FzUIq5rDIjHYANKbEr5gQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kfSgojQToREe1AnpRsrJ9xZqHeOdDGf1PsYfQpKiv5S03fwMOMTYSokV9KgAAMQad
+	 /CoEuaPwgQK02Tzxnr3IKF2BomxcydkhdTlAeMRZAb+jSTOuwqMtURUd/qK023VEO5
+	 8+CB37LJtbbs3jgIkO5wWMZviOTYyk2cNvop6V4AeOFtBZtkonngwZ2/ZMz6vz3Pkx
+	 aHMykdf0vGsFw0HPu6Wi1wWPL99gjLStOQFylfZiqgkmOI1G0rYLtkfMhc9+CQRkZ4
+	 pjaZtbhgslJr6ixOSTHU91cikQ0ueAmX+Akrmx6wNWbLSHwNjAJDxQNQstLS/GXkk6
+	 07+Oxm795KdvA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0C961C395F6;
+	Tue,  9 Apr 2024 14:00:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,50 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8AxSRLwSRVmf5R2AA--.20615S5
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj9xXoWrKw17ZrW3Zry7GF1ftr1xXrc_yoWkXrc_WF
-	y2vrn3Was8Gr4Ik390g345XryS9w1kX3WfCanrKayvvay2vwn8Jr93CrnxJF13Gr1UZFnx
-	Wr4fGr4xCw1xJosvyTuYvTs0mTUanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvT
-	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-	cSsGvfJTRUUUbSxYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
-	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q
-	6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64
-	vIr41lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
-	Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
-	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
-	cI8IcVAFwI0_Xr0_Ar1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8V
-	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E
-	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4Xo7DUUUU
+Subject: Re: [PATCH 1/2] ipv6: fib: hide unused 'pn' variable
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171267122804.20541.9875437937830919479.git-patchwork-notify@kernel.org>
+Date: Tue, 09 Apr 2024 14:00:28 +0000
+References: <20240408074219.3030256-1-arnd@kernel.org>
+In-Reply-To: <20240408074219.3030256-1-arnd@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, arnd@arndb.de, leitao@debian.org,
+ thinker.li@gmail.com, chentao@kylinos.cn, kuniyu@amazon.com,
+ vnuorval@tcs.hut.fi, yoshfuji@linux-ipv6.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-Just use PCI_DEVICE_DATA() macro for device identification,
-No changes to function functionality.
+Hello:
 
-Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index 9e40c28d453a..995c9bd144e0 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -213,7 +213,7 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
- 			 loongson_dwmac_resume);
- 
- static const struct pci_device_id loongson_dwmac_id_table[] = {
--	{ PCI_VDEVICE(LOONGSON, 0x7a03) },
-+	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
- 	{}
- };
- MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
+On Mon,  8 Apr 2024 09:42:02 +0200 you wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> When CONFIG_IPV6_SUBTREES is disabled, the only user is hidden, causing
+> a 'make W=1' warning:
+> 
+> net/ipv6/ip6_fib.c: In function 'fib6_add':
+> net/ipv6/ip6_fib.c:1388:32: error: variable 'pn' set but not used [-Werror=unused-but-set-variable]
+> 
+> [...]
+
+Here is the summary with links:
+  - [1/2] ipv6: fib: hide unused 'pn' variable
+    https://git.kernel.org/netdev/net/c/74043489fcb5
+  - [2/2] ipv4/route: avoid unused-but-set-variable warning
+    https://git.kernel.org/netdev/net/c/cf1b7201df59
+
+You are awesome, thank you!
 -- 
-2.31.4
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
