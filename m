@@ -1,123 +1,154 @@
-Return-Path: <netdev+bounces-86225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A6E389E111
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 19:07:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14BDD89E119
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 19:08:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4AC7EB29A20
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 17:02:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8AA81F2393C
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 17:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85EB915381F;
-	Tue,  9 Apr 2024 17:01:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70427155392;
+	Tue,  9 Apr 2024 17:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BiOTYIXu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BT4sStbq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEEBF13E3E3;
-	Tue,  9 Apr 2024 17:01:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39570153BDD;
+	Tue,  9 Apr 2024 17:08:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712682105; cv=none; b=t5Qi2phtKjoYWc0zSdHiWxQNn7JWc38S9zwvIA/GMaIVfowbTSvu8LDcrgzb2Nqz5A+/Wm/6nmtR+Y4U4aDeCVT0hfl0X85pr0CN/jkekuxVNABLxJjF4DYuj1tVPcuOA7MWanrndGudn216s55fpwKdT0zG7YdYDOeTJ/l+8gU=
+	t=1712682510; cv=none; b=Awjq/n3vLI9vyYUooCIWqspWa1ZHX7qa0XT08Ppk2fLnisWsiVPY6bnjww2ZqABxBkGmCalO8hbEh4vPZhGFd9r3NGKB2sg+rj23d5Mxg65eAEaKa34P1wOXajPqSKSTWTkCQvX6HKP6035ryTAR+oMHHBKBXZmR5SUSFtIgKlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712682105; c=relaxed/simple;
-	bh=lftnbDb228AtGqRmKG1GruD9Tdr0r/t4M1ad2PBgPI0=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=rVU4Isdw3oUOfj6eaPqGmnzBPEbq3YelMor1SCZpWY8qjDU3wjGDRcMrHgN1cL37UOKSZGFAh0kEQxidFA2SvosXDqvyckoJa9v1CMVKRJhdANqgrYwSledPQECrOfcXCCarvtdQKe7e/UP4SyMwiAPmgLwv6t0fbUE5JzeiW4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BiOTYIXu; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4165caf9b2dso26806845e9.1;
-        Tue, 09 Apr 2024 10:01:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712682102; x=1713286902; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3GsMNEF3lUCa87J+AsjZLBs3nM/4xYgj2UZQkqon9I0=;
-        b=BiOTYIXu2TLP2gHl4EZzzZLlQ1nQ2bB56cBV1K2u06aT0qZaYJF1Lu/XUjEsEI/UO7
-         7UheVc2e8xE4gC+JuAinsYOtq1H2FPXIUsWukW8jb/8UaN5qZf5c+or5Pm19BdJtt6ro
-         NmAhj2aIOBYYImzl52lh5HFxyI24Tb0a0f0/ojY/YBMAELLrrXTREDEyTO2sQYKTJoCb
-         U/AaQaPTnaCmOJIw4BBQdrUD1r7H7M4QB2zxFCDnPLuvzPFdhP7pb0czI3ziGWGSTcx0
-         JZoy27zUciPTVW5kFdtzOHd9J495QrLetE6vlx/U01gJS6Y28fssNSUUja2eDuZ1ylSn
-         /hJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712682102; x=1713286902;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3GsMNEF3lUCa87J+AsjZLBs3nM/4xYgj2UZQkqon9I0=;
-        b=P5mJG6RveXWWek2UG80GNmYUl4A7z3MClv2f2De2noGigbseGwBJYagkm4xB1CTzpN
-         ZbRzdYd+LKi4hxjoL2pm+XhI6Z3ixmJU9aeqBbqHQ2T4NJWjdwsjPVW62KJ7NNCnLs4b
-         0GaLaV2c8XHuYllfy07uFJ0cWwDD+judXpuObP3w6/PVsFPA13qNKlUpWM8il4hFoJUE
-         DPu08rd4xufnVvI37Bwnqw3/OX4Ugcbam4kkVAtn3lM+5Y46xEMoiHRpeYshydNfb7ep
-         vznLAh5RZBfNfpNw27Z6jYk9dZw7uS1UVtO79ptWPGqQPhhpe+h6QEMz4jdUMFvVO4/N
-         nNwg==
-X-Forwarded-Encrypted: i=1; AJvYcCXPnEcR3z/VHFtbHPnNxUwNoUYZsTg868Hb/0ghXbzh5iN1qK4QD5rf1yTynR6QLhO11kfcpTd4isR+MgQAd0+NHtO4prVdC+CBrYyR7WOLaZ6f/gpKnmy3tNN9lJglXHaSRcZaLuWnxGg/8Xtb6FB6nQ/JPZX8C6NNCprcX4KO9i11aDy88OLms8NvVDdQ155KAQnjY5KzS7alGQlBrltKey2GOEpjKQa/2ZXwFtiA9WMWmH0VTEwE0DskZciLPQ==
-X-Gm-Message-State: AOJu0YwdXAqvUHVwOTj0OqVFhovnU9Ik7XJWfXlwmHlrEnd47qbDNPXV
-	RU729cXaocD6f6MCGu0ihQGVd8SJ86MI8vp2Fqd4hvLrOGO2W0xg
-X-Google-Smtp-Source: AGHT+IElBhBg+n7nv1ufKcp4gnBNnHktsGfVzpiFGSrsNs4iqAFH5OsrMWEV2AOFNAmH/WjJusDm8g==
-X-Received: by 2002:a05:600c:198c:b0:416:6b95:c631 with SMTP id t12-20020a05600c198c00b004166b95c631mr244269wmq.6.1712682102085;
-        Tue, 09 Apr 2024 10:01:42 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id o34-20020a05600c512200b0041627ab1554sm21366717wms.22.2024.04.09.10.01.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Apr 2024 10:01:41 -0700 (PDT)
-Subject: Re: [PATCH v3 0/3] RDMA/mana_ib: Add flex array to struct
- mana_cfg_rx_steer_req_v2
-To: Jakub Kicinski <kuba@kernel.org>, Leon Romanovsky <leon@kernel.org>
-Cc: Erick Archer <erick.archer@outlook.com>, Long Li <longli@microsoft.com>,
- Ajay Sharma <sharmaajay@microsoft.com>, "K. Y. Srinivasan"
- <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
- Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Kees Cook <keescook@chromium.org>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>,
- Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
- <morbo@google.com>, Justin Stitt <justinstitt@google.com>,
- Jason Gunthorpe <jgg@ziepe.ca>,
- Shradha Gupta <shradhagupta@linux.microsoft.com>,
- Konstantin Taranov <kotaranov@microsoft.com>, linux-rdma@vger.kernel.org,
- linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
- llvm@lists.linux.dev
-References: <AS8PR02MB72374BD1B23728F2E3C3B1A18B022@AS8PR02MB7237.eurprd02.prod.outlook.com>
- <20240408110730.GE8764@unreal> <20240408183657.7fb6cc35@kernel.org>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <ca8a0df8-b178-31ff-026f-b2d298f3aa84@gmail.com>
-Date: Tue, 9 Apr 2024 18:01:40 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1712682510; c=relaxed/simple;
+	bh=IBrPy/VRgkXjAmLoTcbWD/V6xOFypit8UNvaKEHXqFw=;
+	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
+	 Message-Id:Subject; b=BFzBej03pZ4Xo3PlBQfGIF1FXtc+Z3lb32vrX8sbnxj3Kz5ujFKTPZotc31meYQrWd0gKf/VUqLJlUNHbOuPAYDW/kMXFQYuAmxIOks3bQn7/xvJJjG1qtBTGQzb6Jqt81thx7V58mY5RdsUtHn01VvogWoTlUImA7eAcQ08rOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BT4sStbq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FD91C433F1;
+	Tue,  9 Apr 2024 17:08:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712682509;
+	bh=IBrPy/VRgkXjAmLoTcbWD/V6xOFypit8UNvaKEHXqFw=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=BT4sStbqjxoS8PnAW8QDGHqTvZD0JLUbhpBgG9q7zyB0gi8UlPqxXgdZIXWaPup0/
+	 wbPgK4m8I7MR4mQpnMuUT8pJz/V82v7apLtsRNF3GavKlbFSRlIFXgvOoQ6SntWzz3
+	 vhOPbD0iFOX+CNlBg83vgQn5d3ffnSrBwgqfMrkDKqULvWIi6qVfoQLIBzcGgzOE40
+	 9f9qDblCbN720+m0V2A36hUWwiUZaEpA3IrjvJasdToCiZifSw4kJTYonSNCpQUYin
+	 MZs30ZqFTn1gVeZVyV4ikOy4lJzXGrXCCFFe/yA7+fEb/mC85+hQed0eaSbljF7T2m
+	 Qx4qF1QUtA77A==
+Date: Tue, 09 Apr 2024 12:08:28 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240408183657.7fb6cc35@kernel.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+From: Rob Herring <robh@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Frank Rowand <frowand.list@gmail.com>, netdev@vger.kernel.org, 
+ Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, 
+ linux-doc@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Oleksij Rempel <o.rempel@pengutronix.de>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ linux-kernel@vger.kernel.org, kernel@pengutronix.de, 
+ Russell King <linux@armlinux.org.uk>, Paolo Abeni <pabeni@redhat.com>, 
+ Luis Chamberlain <mcgrof@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>, devicetree@vger.kernel.org, 
+ Russ Weight <russ.weight@linux.dev>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Mark Brown <broonie@kernel.org>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Rob Herring <robh+dt@kernel.org>
+In-Reply-To: <20240409-feature_poe-v7-11-11e38efd4dee@bootlin.com>
+References: <20240409-feature_poe-v7-0-11e38efd4dee@bootlin.com>
+ <20240409-feature_poe-v7-11-11e38efd4dee@bootlin.com>
+Message-Id: <171268250759.1417949.4847589611667849571.robh@kernel.org>
+Subject: Re: [PATCH net-next v7 11/17] dt-bindings: net: pse-pd: Add
+ another way of describing several PSE PIs
 
-On 09/04/2024 02:36, Jakub Kicinski wrote:
-> On Mon, 8 Apr 2024 14:07:30 +0300 Leon Romanovsky wrote:
->> Jakub, do you want shared branch for this series or should I take
->> everything through RDMA tree as netdev part is small enough?
+
+On Tue, 09 Apr 2024 17:04:01 +0200, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 > 
-> Shared branch would be good. Ed has some outstanding patches 
-> to refactor the ethtool RSS API.
+> PSE PI setup may encompass multiple PSE controllers or auxiliary circuits
+> that collectively manage power delivery to one Ethernet port.
+> Such configurations might support a range of PoE standards and require
+> the capability to dynamically configure power delivery based on the
+> operational mode (e.g., PoE2 versus PoE4) or specific requirements of
+> connected devices. In these instances, a dedicated PSE PI node becomes
+> essential for accurately documenting the system architecture. This node
+> would serve to detail the interactions between different PSE controllers,
+> the support for various PoE modes, and any additional logic required to
+> coordinate power delivery across the network infrastructure.
+> 
+> The old usage of "#pse-cells" is unsuficient as it carries only the PSE PI
+> index information.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
+> 
+> Changes in v3:
+> - New patch
+> 
+> Changes in v4:
+> - Remove $def
+> - Fix pairset-names item list
+> - Upgrade few properties description
+> - Update the commit message
+> 
+> Changes in v5:
+> - Fix yamllint error.
+> - Replace underscore by dash in properties names.
+> - Add polarity-supported property.
+> 
+> Changes in v6:
+> - Reorder the pairset pinout table documentation to shrink the lines size.
+> - Remove pairset and polarity as required fields.
+> - Add vpwr-supply regulator supply.
+> 
+> Changes in v7:
+> - Fix weird characters issue.
+> - Fix documentation nit.
+> ---
+>  .../bindings/net/pse-pd/pse-controller.yaml        | 101 ++++++++++++++++++++-
+>  1 file changed, 98 insertions(+), 3 deletions(-)
+> 
 
-For the record I am extremely unlikely to have time to get those
- done this cycle :(
-Though in any case fwiw it doesn't look like this series touches
- anything that would conflict; mana doesn't appear to support
- custom RSS contexts and besides the changes are well away from
- the ethtool API handling.
+My bot found errors running 'make dt_binding_check' on your patch:
 
--e
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+
+
+doc reference errors (make refcheckdocs):
+Warning: Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml references a file that doesn't exist: Documentation/networking/pse-pd/pse-pi.rst
+Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml: Documentation/networking/pse-pd/pse-pi.rst
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240409-feature_poe-v7-11-11e38efd4dee@bootlin.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
