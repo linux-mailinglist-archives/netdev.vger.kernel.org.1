@@ -1,191 +1,94 @@
-Return-Path: <netdev+bounces-86174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2168789DD1D
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:45:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50B4789DD40
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:49:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D73E1F231F6
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:45:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0763F289DF8
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:49:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FF0812FF99;
-	Tue,  9 Apr 2024 14:44:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61D6F132471;
+	Tue,  9 Apr 2024 14:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Alofp5dw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ay4VanE0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-io1-f49.google.com (mail-io1-f49.google.com [209.85.166.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BADA50275;
-	Tue,  9 Apr 2024 14:44:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94153131196
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 14:47:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712673842; cv=none; b=qTIdOGK72g/XznKMU2xdSrpuHgElAH57mMh9oGkf4DpnLJnIu6zJuL68mHHpAjmTuM4PIDH9p1zcCnivmpVtkEJ1rXH8Cpg2gAROLPq4HDAcBvBDyj/2LP+leQm670Qj4laM/kKkbBTgvbWfXv1as8paC9lPU7aY7Bom2BQSvFQ=
+	t=1712674057; cv=none; b=Wxrbq5tX3+ZDtmhN3htnDCUzAkwZ3dDAly51TAUb+4NmiAGrLsL5+IWT6cAikBDLxg5MjO+Xc+t2mU17tbiAJtn4C0/hyN70Qy/iUjVUcc739pilebVVSNcwR/z970YXWLDFLqOwrqYPjuJB8Ke7udhE9ECIM1s6Fty06YHVNmg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712673842; c=relaxed/simple;
-	bh=TX7drptoizj7yMo7tlk2MRiASPssDjpb1m0JlS/t/KY=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Y1ok1ioTQWwIxhdVS7q/C+FE/ZTw1DMT34MazuCQKEvVT1m7P53wPFmibejy1MHZ63wJflOcIvB/+97I5lHNHJi5ZkjYd8E+n6H7UCcKRuPAEGhzK0RhDk314i7EXr2As9xulPxUnN1Apy19FdHt762JQ9NyJXuJxs/rJEfXmko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Alofp5dw; arc=none smtp.client-ip=209.85.160.182
+	s=arc-20240116; t=1712674057; c=relaxed/simple;
+	bh=ofPunjjFjnR0PRWbq8WvIg9PGrzB96G/bM4mjNxQOnY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MQlzlzkQgvRdqvsrvxneoTnuOhtlV7FEkueXgXkKXIqF2+9piHSpO3nmn/bvbWo5dx+FWmTyqy9p3DnmqXZxm8xssgaVmIt9BFiOny/JJOSHAqvOiB1qI82bq8zXyxdQpIBwrbrZWM96nZApbq2fFAGBGq1CzzzD6xQP4Ve0z+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ay4VanE0; arc=none smtp.client-ip=209.85.166.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-434925427c6so9780031cf.1;
-        Tue, 09 Apr 2024 07:44:00 -0700 (PDT)
+Received: by mail-io1-f49.google.com with SMTP id ca18e2360f4ac-7c8ae457b27so159101839f.2
+        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 07:47:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712673839; x=1713278639; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oHL0RXFr2CJfinyZBuEKsLTHwq4/wJAcA1+55f/eT84=;
-        b=Alofp5dwcQ4HFF3tC+bzA8ooj5UKbyx1AF/QICKOHTygxcLTCvOjGz4eQdk0uE9Q3k
-         vwWzFZA3Kp3fsanyxEwIXCbhwItasXZ4usb/N7jmTsqPVLJFoUYna7bhgI774g5lC9GR
-         NShic+zAJvdcujUjeEBnrNKyoDAIyniI4RoWUu9zQYcpoz6MHjeWMtggJKfc/1LLmVG4
-         ZCZstH0nzBJw7iAH29s3xYCSUdGjWdW/w/H5nrAiS9JginQ2Jds+1aEwu7F07lTO3laz
-         V3ytmywhBcd+FzfEuUTipN4PU33fwosw//Gj/nDEgsu8kTZmt2DgTqhhsP8kNTDMvEJA
-         SYpQ==
+        d=gmail.com; s=20230601; t=1712674055; x=1713278855; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ofPunjjFjnR0PRWbq8WvIg9PGrzB96G/bM4mjNxQOnY=;
+        b=ay4VanE0TUv0zx5Fslx6QUml6tR+WQxicOzjw1raC/J5Jvg4yLTTlyJBdKNTQAyCNc
+         5+Hf0EUWKZXgBUpsxGgjHRX20rkPj2dBfj8FaPTyAPN8WJpgH317UUi1uwWqToL3cgY/
+         HsYoqsKbQaqfxyQS1PQN1RhOWl+Tcf27+TbCBfOt2uoiTG8QfCqfAW5+QLETudlum/bV
+         7w/F9GWcGTmZShsvC13PDt+ehIhJk4gsY8cQlbeGhEM0km5an3G+7j4xigHB9hiUBtxn
+         aA/EbME1WSuRUwU3y86qIONjTAdjIM1nUkpIO+NEgAgMjODduT8u6t++v6T9qd3ITEtN
+         JF6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712673839; x=1713278639;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=oHL0RXFr2CJfinyZBuEKsLTHwq4/wJAcA1+55f/eT84=;
-        b=tHsXzPuU3FUsQGhvwmRUyYVJ8ogrXvAXxyKHXWroD8Tx7eb78vwuiPeOcH8q9ENfec
-         MojYsTqIRtCp8FLWeTPpMTBmMNdjoKajAvunn/FCSlS99njjTvXvtR4KPh5yzvrYsGxr
-         sxFW1x3r3nWYp6kD/SoZxc+1a0wh1TiuINh1/Nf+Icg1OWPu7nEzGX9HB1yS5Q9R6DZp
-         dv1czOW5bwe1J4Q4rAjbICbW4CiFA5tDBp/NB+P7yPrJraeTv2ODAUgBsrncH92RQ8ws
-         vgqaVlCeFemXpFdo8ytfvaOLWyktUaGpEOxg9MKZk0IxV3o7NedK/hpm5lllGufU1JV8
-         OVag==
-X-Forwarded-Encrypted: i=1; AJvYcCV1lQyHrqJlqm6NzZB9nlhXRnIOLX5/XFXtXQ3av12MvzhKQpNY6JJ6mqsGEbdj3mZM6HZ2nBTUksJ9WDY0Lgk4ZK6YznSoFnL+hmb3XW/5Uui5q2ziKhWc9didLDByzpp7ff8wuyteS9xIvWi7eRx3y4PbSkiV5nJqnnLhkcaM
-X-Gm-Message-State: AOJu0Yy3vTfgX9EisHG8ktzUmTlmxJpBbDhmq0TYLpa5Mfie0kWYbxqo
-	RKVCX8FGCmfdociBO+5u1nu9WGv3Ut8hYh/T3y9wKNfDrcJNDT8Y
-X-Google-Smtp-Source: AGHT+IGmVVuOOT+gaywxcpqHxcdLnkGDJu/jgmHipvFXgrAm3d0jeVJNp5P+ms8PkckE1M5QcbwFhA==
-X-Received: by 2002:a05:622a:389:b0:432:f69d:aa1c with SMTP id j9-20020a05622a038900b00432f69daa1cmr14283424qtx.49.1712673839387;
-        Tue, 09 Apr 2024 07:43:59 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id bw9-20020a05622a098900b004330090b874sm4672604qtb.95.2024.04.09.07.43.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Apr 2024 07:43:59 -0700 (PDT)
-Date: Tue, 09 Apr 2024 10:43:58 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Kory Maincent <kory.maincent@bootlin.com>, 
- Florian Fainelli <florian.fainelli@broadcom.com>, 
- Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
- Andrew Lunn <andrew@lunn.ch>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Radu Pirea <radu-nicolae.pirea@oss.nxp.com>, 
- Jay Vosburgh <j.vosburgh@gmail.com>, 
- Andy Gospodarek <andy@greyhouse.net>, 
- Nicolas Ferre <nicolas.ferre@microchip.com>, 
- Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jonathan Corbet <corbet@lwn.net>, 
- Horatiu Vultur <horatiu.vultur@microchip.com>, 
- UNGLinuxDriver@microchip.com, 
- Simon Horman <horms@kernel.org>, 
- Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- linux-doc@vger.kernel.org, 
- Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
- Kory Maincent <kory.maincent@bootlin.com>
-Message-ID: <6615542edc90f_23a2b2294ee@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240409-feature_ptp_netnext-v10-2-0fa2ea5c89a9@bootlin.com>
-References: <20240409-feature_ptp_netnext-v10-0-0fa2ea5c89a9@bootlin.com>
- <20240409-feature_ptp_netnext-v10-2-0fa2ea5c89a9@bootlin.com>
-Subject: Re: [PATCH net-next v10 02/13] net: Move dev_set_hwtstamp_phylib to
- net/core/dev.h
+        d=1e100.net; s=20230601; t=1712674055; x=1713278855;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ofPunjjFjnR0PRWbq8WvIg9PGrzB96G/bM4mjNxQOnY=;
+        b=aJtu+z9PiVvujMICjXznHAKkLcs7gMfRL7hqY+Q38YOBkL2iaYggss4O9an7/6o0b/
+         Du6ubSgxrqpQNpuat0eFAtYQVI5XMbCuhnC8J4yQTNc0KgcfcFE8MuF/otFhKC84IirC
+         I9w6fyFUmS/vp/2wdx6bQhkvjHB59rhv5WQaQrqa+RXUCUQRussrwhh8Fu6dC5fIYG2r
+         VSxD6VSEHGou8E1UQoAdhWbGqJMpSmzHJ1iBurLpwZkdOIY3gs4P5qZjip/rO4B6YBrb
+         WLLRnx6vfklIJYFf8BX6+YP+e7vct8F/jNyz8rI/DSWbul+sHL7oetGi4Vn3WOHpuf8h
+         xTCw==
+X-Forwarded-Encrypted: i=1; AJvYcCWjZog83mcejiSydNRSjal/jlHBmbitt9ldz2m518jsULsmvewRRIyAr8lL22KCyeRvFbTWWUJmqp1hcYP73C4Y1G3N5YC0
+X-Gm-Message-State: AOJu0YzyIyvnCu0aK/xCo9sTLYQqjbpI87p31qJiYfKrpW3rAXWh2DCS
+	0T7Kv/nPt0ke87dtVkjYoP5pEeWp8iFw2VOXWHiS5gsoCTS/qxRV
+X-Google-Smtp-Source: AGHT+IGCMeMRtP+qxFjPBWrKK4G8EsHrrnrb3F41uc2tLE9+GcsIOiDJfOG/qbONc+ZarjuXu/fafg==
+X-Received: by 2002:a05:6602:3e83:b0:7d5:e9ed:efb4 with SMTP id el3-20020a0566023e8300b007d5e9edefb4mr8422012iob.10.1712674054645;
+        Tue, 09 Apr 2024 07:47:34 -0700 (PDT)
+Received: from ?IPV6:2601:282:1e82:2350:6dd8:136a:4594:269? ([2601:282:1e82:2350:6dd8:136a:4594:269])
+        by smtp.googlemail.com with ESMTPSA id b16-20020a056638151000b00482a0c1bfddsm749452jat.29.2024.04.09.07.47.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Apr 2024 07:47:34 -0700 (PDT)
+Message-ID: <0858cc27-8d5f-4de5-897c-33cb44aaa6f1@gmail.com>
+Date: Tue, 9 Apr 2024 08:47:32 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] iplink: add an option to set IFLA_EXT_MASK attribute
+Content-Language: en-US
+To: renmingshuai <renmingshuai@huawei.com>, stephen@networkplumber.org
+Cc: liaichun@huawei.com, netdev@vger.kernel.org, yanan@huawei.com
+References: <20240408172955.13511188@hermes.local>
+ <20240409015350.52377-1-renmingshuai@huawei.com>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <20240409015350.52377-1-renmingshuai@huawei.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Kory Maincent wrote:
-> This declaration was added to the header to be called from ethtool.
-> ethtool is separated from core for code organization but it is not really
-> a separate entity, it controls very core things.
-> As ethtool is an internal stuff it is not wise to have it in netdevice.h.
-> Move the declaration to net/core/dev.h instead.
-> 
-> Remove the EXPORT_SYMBOL_GPL call as ethtool can not be built as a module.
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+On 4/8/24 7:53 PM, renmingshuai wrote:
+> By the way, do I need to submit a new patch?
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-
-At this point this function does not need to be defined in a header at
-all. But patch 12 will change that.
-
-net/ethtool can be built-in or not, but cannot be built as module, so
-no need for the EXPORT_SYMBOL_GPL indeed.
-
-> ---
-> 
-> Change in v10:
-> - New patch.
-> ---
->  include/linux/netdevice.h | 3 ---
->  net/core/dev.h            | 4 ++++
->  net/core/dev_ioctl.c      | 1 -
->  3 files changed, 4 insertions(+), 4 deletions(-)
-> 
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index d45f330d083d..9a4b92b49fac 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -3901,9 +3901,6 @@ int generic_hwtstamp_get_lower(struct net_device *dev,
->  int generic_hwtstamp_set_lower(struct net_device *dev,
->  			       struct kernel_hwtstamp_config *kernel_cfg,
->  			       struct netlink_ext_ack *extack);
-> -int dev_set_hwtstamp_phylib(struct net_device *dev,
-> -			    struct kernel_hwtstamp_config *cfg,
-> -			    struct netlink_ext_ack *extack);
->  int dev_ethtool(struct net *net, struct ifreq *ifr, void __user *userdata);
->  unsigned int dev_get_flags(const struct net_device *);
->  int __dev_change_flags(struct net_device *dev, unsigned int flags,
-> diff --git a/net/core/dev.h b/net/core/dev.h
-> index 8572d2c8dc4a..39819fffece7 100644
-> --- a/net/core/dev.h
-> +++ b/net/core/dev.h
-> @@ -167,4 +167,8 @@ static inline void dev_xmit_recursion_dec(void)
->  	__this_cpu_dec(softnet_data.xmit.recursion);
->  }
->  
-> +int dev_set_hwtstamp_phylib(struct net_device *dev,
-> +			    struct kernel_hwtstamp_config *cfg,
-> +			    struct netlink_ext_ack *extack);
-> +
->  #endif
-> diff --git a/net/core/dev_ioctl.c b/net/core/dev_ioctl.c
-> index 9a66cf5015f2..b9719ed3c3fd 100644
-> --- a/net/core/dev_ioctl.c
-> +++ b/net/core/dev_ioctl.c
-> @@ -363,7 +363,6 @@ int dev_set_hwtstamp_phylib(struct net_device *dev,
->  
->  	return 0;
->  }
-> -EXPORT_SYMBOL_GPL(dev_set_hwtstamp_phylib);
->  
->  static int dev_set_hwtstamp(struct net_device *dev, struct ifreq *ifr)
->  {
-> 
-> -- 
-> 2.34.1
-> 
-
-
+yes, please send a formal patch.
 
