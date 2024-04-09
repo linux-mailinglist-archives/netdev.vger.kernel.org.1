@@ -1,48 +1,54 @@
-Return-Path: <netdev+bounces-86082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBB8C89D79F
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:08:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67CAB89D7AF
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:13:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2BD93B23313
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:08:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07E621F2553F
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D158594B;
-	Tue,  9 Apr 2024 11:08:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416CE85954;
+	Tue,  9 Apr 2024 11:13:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NNpCvWSq"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="NPlx3xSk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2C955E55;
-	Tue,  9 Apr 2024 11:08:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4CA08593D;
+	Tue,  9 Apr 2024 11:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712660925; cv=none; b=kSy6wnyTscxHZbK1rAX5mkAoXmimISvZnNwbZxhSLL1qNT72JIIPGVnMlo2cXflQc7OPy/eymJ3VzWjNhFRe7nUhJ40O03rThaBwNzJ4OiGXcpx91K+e3XrsCx/Tt9Lg7s9YrEFbe+82bDnd2ZPq4AR10Exbf3lQkRPnVg8E/WY=
+	t=1712661232; cv=none; b=nBlMFbXrgSDYP7qXZiQSvsC1wQ1kItAW2SxBh7goRzDEUY8EASlE9DXfBvIf7ovC3oZrc6dtG96bfxio2eqd3IK15krs9aFwu71mcLpeCuAa08slKisDXrLVkregcL+yVetldu+CrkEhQQwU2g7QwCK5zJcLLAFixrHARTOBmbI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712660925; c=relaxed/simple;
-	bh=/sm4kX1swFuH3/fk4VBbgStTVFZvjDNK4GzFuMcXv3E=;
+	s=arc-20240116; t=1712661232; c=relaxed/simple;
+	bh=5bVejtBKpem9uNwEH+4qa25UXT6wHLuTwQMG/ZuVVxE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n93cGPWMDskf1bqu4VCsNYQ7fHhhwh9wUCDGKNx1iHI0M0RLKNJ22TGYLFy8I0e2tms2NRW/UrrEuqmrGxujr5VMKy5bq8MBisIRS+UOxYcx3qODp5yvOG8OtEspy86CMziZIe5s639DjZrgNXtjo4YtzF2xm+Tiaj8nESQxoBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NNpCvWSq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DC50C43390;
-	Tue,  9 Apr 2024 11:08:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712660925;
-	bh=/sm4kX1swFuH3/fk4VBbgStTVFZvjDNK4GzFuMcXv3E=;
+	 In-Reply-To:Content-Type; b=cLyfSfsBk+aF4wN/n/FNmrpsggv1l6zWoM8XceUwXr2DxIeKgduuVgGsmQxaf4T+k4BNfjkffksGPDfk/mQ1W/GuYnKy5flrnz2rv7WGSrj0ntxGkm7ceAXRUlcZKhNsam2W8nhF/u/Lrov4BkEfSHkj1uCsAO2nAil2SrTOXR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=NPlx3xSk; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 17B06600A2;
+	Tue,  9 Apr 2024 11:13:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1712661225;
+	bh=5bVejtBKpem9uNwEH+4qa25UXT6wHLuTwQMG/ZuVVxE=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NNpCvWSqkWul/egx7NVJwm4jafVgkx3tZNQaStdbFp+7boVk89vj/6Qsk5rsyGLJs
-	 BUVVvm1cKemPxUKTkNHkVLsI7xmV66rIZR+F+UYafCHFnxvt8xA756tPkDwkHzyOxh
-	 vUJeeTRE1QGtp/ok386aXtJ3HVxnHzXtluRnXCCtZVr8X9BT6AQp929myMb8l1nHTJ
-	 xgPS0T/0L/Bz+70Q9rPs5wRWSqu0AnuFQLR8BCXvKqBaPGcYMlJ9mZ8n3Y4coFsh82
-	 F/PxsOvpECTCMDz3CC/FebcsKxPX+L7+TNxXXvcWIbgGt6pV0KSEscrQz/qPZaa2US
-	 mI0yKEZxUhlzg==
-Message-ID: <ac4cf07f-52dd-454f-b897-2a4b3796a4d9@kernel.org>
-Date: Tue, 9 Apr 2024 13:08:40 +0200
+	b=NPlx3xSkfUiMDONhRbRsqPpV+K1d2QECtICZ0PCzvIi/FQ9hoJifUC9lY/42UM9RF
+	 w3XruSMWqTXl9FtLnPEloIVnZhzIK/A5md/K56AkZOgNjzxl3c9oFCjMjeq+C0nJ2Y
+	 P1EiqXucYSz3yKeHnoa4+3iMXNvmosE/oiHkAP66cEBKJEAdV9dwlD70/DKbqEpiFr
+	 3sUqFF/gxksTcusQPcfg9bB0vOttXMbM2qF1QCRjt3bCpRHkSTuBRX3zyo0Et5f5uy
+	 8QApBPWgNL+3+vRx4bgw5rUmvmMRlSVoE8EpDI1X9oKqkxtPW3kEAVQP55+EIfMppb
+	 fF9xP8vWu848g==
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id F200B200A3D;
+	Tue, 09 Apr 2024 11:13:22 +0000 (UTC)
+Message-ID: <2c7bc566-c975-4dd8-a17c-10c7b9ff3928@fiberby.net>
+Date: Tue, 9 Apr 2024 11:13:22 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,216 +56,102 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Advice on cgroup rstat lock
-To: Yosry Ahmed <yosryahmed@google.com>, Johannes Weiner <hannes@cmpxchg.org>
-Cc: Tejun Heo <tj@kernel.org>, Jesper Dangaard Brouer
- <jesper@cloudflare.com>, "David S. Miller" <davem@davemloft.net>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Waiman Long <longman@redhat.com>, Shakeel Butt <shakeelb@google.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Daniel Bristot de Oliveira <bristot@redhat.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- kernel-team <kernel-team@cloudflare.com>, cgroups@vger.kernel.org,
- Linux-MM <linux-mm@kvack.org>, Netdev <netdev@vger.kernel.org>,
- bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
- Ivan Babrou <ivan@cloudflare.com>
-References: <7cd05fac-9d93-45ca-aa15-afd1a34329c6@kernel.org>
- <20240319154437.GA144716@cmpxchg.org>
- <56556042-5269-4c7e-99ed-1a1ab21ac27f@kernel.org>
- <CAJD7tkYbO7MdKUBsaOiSp6-qnDesdmVsTCiZApN_ncS3YkDqGQ@mail.gmail.com>
- <bf94f850-fab4-4171-8dfe-b19ada22f3be@kernel.org>
- <CAJD7tkbn-wFEbhnhGWTy0-UsFoosr=m7wiJ+P96XnDoFnSH7Zg@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/6] flow_offload: add
+ flow_rule_no_unsupp_control_flags()
+To: Louis Peens <louis.peens@corigine.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Taras Chornyi <taras.chornyi@plvision.eu>,
+ Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Yanguo Li <yanguo.li@corigine.com>, oss-drivers@corigine.com,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>, Edward Cree <ecree.xilinx@gmail.com>,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+ Jiri Pirko <jiri@resnulli.us>
+References: <20240408130927.78594-1-ast@fiberby.net>
+ <20240408130927.78594-2-ast@fiberby.net> <ZhT/E1qDsMmMxGwb@LouisNoVo>
 Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <CAJD7tkbn-wFEbhnhGWTy0-UsFoosr=m7wiJ+P96XnDoFnSH7Zg@mail.gmail.com>
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <ZhT/E1qDsMmMxGwb@LouisNoVo>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Let move this discussion upstream.
+Hi Louis,
 
-On 22/03/2024 19.32, Yosry Ahmed wrote:
-> [..]
->>> There was a couple of series that made all calls to
->>> cgroup_rstat_flush() sleepable, which allows the lock to be dropped
->>> (and IRQs enabled) in between CPU iterations. This fixed a similar
->>> problem that we used to face (except in our case, we saw hard lockups
->>> in extreme scenarios):
->>> https://lore.kernel.org/linux-mm/20230330191801.1967435-1-yosryahmed@google.com/
->>> https://lore.kernel.org/lkml/20230421174020.2994750-1-yosryahmed@google.com/
+On 4/9/24 8:40 AM, Louis Peens wrote:
+> On Mon, Apr 08, 2024 at 01:09:19PM +0000, Asbjørn Sloth Tønnesen wrote:
+>> [Some people who received this message don't often get email from ast@fiberby.net. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
 >>
->> I've only done the 6.6 backport, and these were in 6.5/6.6.
-
-Given I have these in my 6.6 kernel. You are basically saying I should
-be able to avoid IRQ-disable for the lock, right?
-
-My main problem with the global cgroup_rstat_lock[3] is it disables IRQs
-and (thereby also) BH/softirq (spin_lock_irq).  This cause production
-issues elsewhere, e.g. we are seeing network softirq "not-able-to-run"
-latency issues (debug via softirq_net_latency.bt [5]).
-
-   [3] 
-https://elixir.bootlin.com/linux/v6.9-rc3/source/kernel/cgroup/rstat.c#L10
-   [5] 
-https://github.com/xdp-project/xdp-project/blob/master/areas/latency/softirq_net_latency.bt 
-
-
->> And between 6.1 to 6.6 we did observe an improvement in this area.
->> (Maybe I don't have to do the 6.1 backport if the 6.6 release plan progress)
+>> This helper can be used by drivers to check for the
+>> presence of unsupported control flags.
 >>
->> I've had a chance to get running in prod for 6.6 backport.
->> As you can see in attached grafana heatmap pictures, we do observe an
->> improved/reduced softirq wait time.
->> These softirq "not-able-to-run" outliers is *one* of the prod issues we
->> observed.  As you can see, I still have other areas to improve/fix.
+>> It mirrors the existing check done in sfc:
+>>    drivers/net/ethernet/sfc/tc.c +276
+>>
+>> This is aimed at drivers, which implements some control flags.
+>>
+>> This should also be used by drivers that implement all
+>> current flags, so that future flags will be unsupported
+>> by default.
+>>
+>> Only compile-tested.
+>>
+>> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+>> ---
+>>   include/net/flow_offload.h | 22 ++++++++++++++++++++++
+>>   1 file changed, 22 insertions(+)
+>>
+>> diff --git a/include/net/flow_offload.h b/include/net/flow_offload.h
+>> index 314087a5e1818..c1317b14da08c 100644
+>> --- a/include/net/flow_offload.h
+>> +++ b/include/net/flow_offload.h
+>> @@ -449,6 +449,28 @@ static inline bool flow_rule_match_key(const struct flow_rule *rule,
+>>          return dissector_uses_key(rule->match.dissector, key);
+>>   }
+>>
+>> +/**
+>> + * flow_rule_no_unsupp_control_flags() - check for unsupported control flags
+>> + * @supp_flags: flags supported by driver
+>> + * @flags: flags present in rule
+>> + * @extack: The netlink extended ACK for reporting errors.
+>> + *
+>> + * Returns true if only supported control flags are set, false otherwise.
+>> + */
+>> +static inline bool flow_rule_no_unsupp_control_flags(const u32 supp_flags,
+>> +                                                    const u32 flags,
+>> +                                                    struct netlink_ext_ack *extack)
+> Thanks for the change Asbjørn, I like the series in general. I do have
+> some nitpicking with the naming of this function, the double negative
+> makes it a bit hard to read. Especially where it gets used, where it
+> then reads as:
+>      'if not no unsupported'
 > 
-> I am not very familiar with such heatmaps, but I am glad there is an
-> improvement with 6.6 and the backports. Let me know if there is
-> anything I could do to help with your effort.
+> I think something like:
+>      'if not supported'
+> or
+>      'if unsupported'
+> 
+> will read much better - personally I think the first option is the best,
+> otherwise you might end up with 'if not unsupported', which is also
+> weird.
+> 
+> Some possible suggestions I can think of:
+>      flow_rule_control_flags_is_supp()
+>      flow_rule_is_supp_control_flags()
+>      flow_rule_check_supp_control_flags()
+> 
+> or perhaps some even better variant of this. I hope it's not just me, if
+> that's the case please feel free to ignore.
+I agree, I will update the naming in v2:
 
-The heatmaps give me an overview, but I needed a debugging tool, so I
-developed some bpftrace scripts [1][2] I'm running on production.
-To measure how long time we hold the cgroup rstat lock (results below).
-Adding ACME and Daniel as I hope there is an easier way to measure lock
-hold time and congestion. Notice tricky release/yield in
-cgroup_rstat_flush_locked[4].
+flow_rule_no_unsupp_control_flags             => flow_rule_is_supp_control_flags
+flow_rule_no_control_flags        + s/no/has/ => flow_rule_has_control_flags
+flow_rule_match_no_control_flags  + s/no/has/ => flow_rule_match_has_control_flags
 
-My production results on 6.6 with backported patches (below signature)
-vs a our normal 6.6 kernel, with script [2]. The `@lock_time_hist_ns`
-shows how long time the lock+IRQs were disabled (taking into account it
-can be released in the loop [4]).
-
-Patched kernel:
-
-21:49:02  time elapsed: 43200 sec
-@lock_time_hist_ns:
-[2K, 4K)              61 | 
-      |
-[4K, 8K)             734 | 
-      |
-[8K, 16K)         121500 |@@@@@@@@@@@@@@@@ 
-      |
-[16K, 32K)        385714 
-|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[32K, 64K)        145600 |@@@@@@@@@@@@@@@@@@@ 
-      |
-[64K, 128K)       156873 |@@@@@@@@@@@@@@@@@@@@@ 
-      |
-[128K, 256K)      261027 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
-      |
-[256K, 512K)      291986 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
-      |
-[512K, 1M)        101859 |@@@@@@@@@@@@@ 
-      |
-[1M, 2M)           19866 |@@ 
-      |
-[2M, 4M)           10146 |@ 
-      |
-[4M, 8M)           30633 |@@@@ 
-      |
-[8M, 16M)          40365 |@@@@@ 
-      |
-[16M, 32M)         21650 |@@ 
-      |
-[32M, 64M)          5842 | 
-      |
-[64M, 128M)            8 | 
-      |
-
-And normal 6.6 kernel:
-
-21:48:32  time elapsed: 43200 sec
-@lock_time_hist_ns:
-[1K, 2K)              25 | 
-      |
-[2K, 4K)            1146 | 
-      |
-[4K, 8K)           59397 |@@@@ 
-      |
-[8K, 16K)         571528 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
-      |
-[16K, 32K)        542648 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
-      |
-[32K, 64K)        202810 |@@@@@@@@@@@@@ 
-      |
-[64K, 128K)       134564 |@@@@@@@@@ 
-      |
-[128K, 256K)       72870 |@@@@@ 
-      |
-[256K, 512K)       56914 |@@@ 
-      |
-[512K, 1M)         83140 |@@@@@ 
-      |
-[1M, 2M)          170514 |@@@@@@@@@@@ 
-      |
-[2M, 4M)          396304 |@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
-      |
-[4M, 8M)          755537 
-|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-[8M, 16M)         231222 |@@@@@@@@@@@@@@@ 
-      |
-[16M, 32M)         76370 |@@@@@ 
-      |
-[32M, 64M)          1043 | 
-      |
-[64M, 128M)           12 | 
-      |
-
-
-For the unpatched kernel we see more events in 4ms to 8ms bucket than
-any other bucket.
-For patched kernel, we clearly see a significant reduction of events in
-the 4 ms to 64 ms area, but we still have some events in this area.  I'm
-very happy to see these patches improves the situation.  But for network
-processing I'm not happy to see events in area 16ms to 128ms area.  If
-we can just avoid disabling IRQs/softirq for the lock, I would be happy.
-
-How far can we go... could cgroup_rstat_lock be converted to a mutex?
-
---Jesper
-
-  [1] 
-https://github.com/xdp-project/xdp-project/blob/master/areas/latency/cgroup_rstat_latency.bt
-  [2] 
-https://github.com/xdp-project/xdp-project/blob/master/areas/latency/cgroup_rstat_latency_steroids.bt
-  [3] 
-https://elixir.bootlin.com/linux/v6.9-rc3/source/kernel/cgroup/rstat.c#L10
-  [4] 
-https://elixir.bootlin.com/linux/v6.9-rc3/source/kernel/cgroup/rstat.c#L226 
-cgroup_rstat_flush_locked
-  [5] 
-https://github.com/xdp-project/xdp-project/blob/master/areas/latency/softirq_net_latency.bt 
-
-
-
-Backported to 6.6
-
-List of **main** patches address issue - to backport for 6.6:
-  - 508bed884767 mm: memcg: change flush_next_time to flush_last_time
-    - v6.8-rc1~180^2~205
-  - e0bf1dc859fd mm: memcg: move vmstats structs definition above 
-flushing code
-    - v6.8-rc1~180^2~204
-  - 8d59d2214c23 mm: memcg: make stats flushing threshold per-memcg
-    - v6.8-rc1~180^2~203
-  - b00684722262 mm: workingset: move the stats flush into 
-workingset_test_recent()
-    - v6.8-rc1~180^2~202
-  - 7d7ef0a4686a mm: memcg: restore subtree stats flushing
-    - v6.8-rc1~180^2~201
-
-And extra (thanks Longman)
-
-  - e76d28bdf9ba ("cgroup/rstat: Reduce cpu_lock hold time in 
-cgroup_rstat_flush_locked()")
-   - v6.8-rc1~182^2~8
-
-And list of patches that contain **fixes** for backports above:
-  - 9cee7e8ef3e3 mm: memcg: optimize parent iteration in 
-memcg_rstat_updated()
-    - v6.8-rc4~3^2~12
-  - 13ef7424577f mm: memcg: don't periodically flush stats when memcg is 
-disabled
-    - v6.8-rc5-69-g13ef7424577f
-
-
+-- 
+Best regards
+Asbjørn Sloth Tønnesen
+Network Engineer
+Fiberby - AS42541
 
