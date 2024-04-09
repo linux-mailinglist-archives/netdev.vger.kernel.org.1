@@ -1,117 +1,145 @@
-Return-Path: <netdev+bounces-86198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF48A89DE8B
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 17:16:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A1B1F89DF26
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 17:32:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C6011C20984
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:16:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D32121C22812
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EFE5135A63;
-	Tue,  9 Apr 2024 15:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RN5yBGbZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 019BD13A405;
+	Tue,  9 Apr 2024 15:28:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314921350D2;
-	Tue,  9 Apr 2024 15:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D96113541F;
+	Tue,  9 Apr 2024 15:28:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712675556; cv=none; b=L9wSi3UwCZCy0bG0YyZ8uSWSCXr7AW6PQY/9ukybeeNes1uSUnLbYkd9pGbN08gtgnIDV0mfuX+Fi6ULyzNnjDI7fMD+uHHePa7B+UJn1/xiph+qLXR81G353JuyMga3dVCOPfd88T0Pj6OXELqfW4mDkbDLft8ktrDH1BhFLHA=
+	t=1712676497; cv=none; b=ifc71VwP9uofLxvHBrQzQDiHgrDTfmxmf98JLtv3NUt/2Woovj6LsBB6eMYTNVzVVZFlidK9A/oeMWR2fLm2+f7V++5ULMfuPxwMu3y9mo8o+h2KOGeA/TAeYRS9GTLTBrr5DWM8LzrZxmau0RDJn5YDiIX/PKHHFiM6X9EIiEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712675556; c=relaxed/simple;
-	bh=yABctAo805xjpg7U8FgXkQBd8qT9ep2vZCs5aKbSz0A=;
+	s=arc-20240116; t=1712676497; c=relaxed/simple;
+	bh=5CBoTmLG4y7e/KRyazSSY1LYpq2J5NObpY/pXkbyRWc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ScwxCDjSufLNsnj3bv/gWu6mrNR+zAHcsIhYMFEIN4b1OyP538w2/XuiyQw3D0BEEd3pMzAx9iFkcW2GjhFXz1kdnSEZ/aWjcnfsuLatGFCEdcdwQwqyVQS2SovRKgCeF6sB4MtWVpoNSZfbrNGptguGgkc0UsQK6tRgtAG+rg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RN5yBGbZ; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	 To:Cc:Content-Type; b=dX78Y257OvBpAqjQpbuzPUn7IRQjU+Gfqkpt0MGMXwlCVsLGDJdQ6z0YeyJ4sgAgI+Fzv/fLVut8xh2TRKUvJYSUzrP3P+RdM3usedXCFEzsi+w/3TCEf2Yr8JjiSldOwjVRREPPfJuA3xxBmOv7oG15i+xmXwV5kYC+je14mV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-415523d9824so58876895e9.3;
-        Tue, 09 Apr 2024 08:12:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712675552; x=1713280352; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yABctAo805xjpg7U8FgXkQBd8qT9ep2vZCs5aKbSz0A=;
-        b=RN5yBGbZJOenNRR1ddXLF/8zYVj4f2KlhTutDKBdalynlYMEnCloMeVyui/elU8jTF
-         ZlPjZv5BYQwUC27mTOUS2i5zDUS3d1FWXl52rAYKT1D8u9SRqdnEl1R5PVjyLWrzyclt
-         o7aoxINsLThoC4tZGQCjnv2rBZdDiTS/vo4NimGbKLZlGTQsmorwxOcsGvN6/6cefinu
-         fENHbpbJ2wgOfHz/UHD9q6Ccvu98+la3+oBRQsweBn0gKpvj5+dUin6Txt1/gsYR2ztM
-         BOViF4edg6XQp03ste5rozHbcMbsOmR3Qne07QaAesFEMAp+Oqf9VFCiOcqxBzVbJa20
-         HvYA==
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-617ddc988f5so45721007b3.2;
+        Tue, 09 Apr 2024 08:28:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712675552; x=1713280352;
+        d=1e100.net; s=20230601; t=1712676493; x=1713281293;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yABctAo805xjpg7U8FgXkQBd8qT9ep2vZCs5aKbSz0A=;
-        b=Ik9xPPKxZjw0+TsmiJOIXodRi7E5KTIeyduK+kOIsawk5IR3JQsarVeLpWq0Bz8MGk
-         Sv5kczMIKuKkCz250IOLobwdKqiy7zQFufl9I8+VbOpfYV2s2IIEjFFJ0qbBNDYsXOHB
-         hpASe38BTJLAoDNOGZWdfWUkYQLOwsLc4ikEydiPoClBTyE0UVQe1L/b+rQaG+1KmxEG
-         oSBQFaWJiStMwn1Xn4PVhts0cvCEUXqS+kID3j7HoIxcl9JX6M8T57YJQRbt54PzSTZS
-         k3nobbBW+lUd+6INubTAd3IdHx589d26APhkso1z8NDcmi3euP+oWL2rBTTjA8LXPrzp
-         OGRA==
-X-Forwarded-Encrypted: i=1; AJvYcCUfSsvkqeBMOy+M6dwdgUUsZg6/8snVdCsA1mFW9N13LROIjNemfGwCsKMfmFthxKykkSC7vjC+zezOgWcJdD/LQ64CX/rc15SoUxWp4Odqtlg8himf3T2/GBD/QVcv/5u8W9R+lr9xULBkh1N9WV0I+XVR75+W89S0s1atItAu
-X-Gm-Message-State: AOJu0Ywz7+BVwv99MaD0mbN/rtjoXjC/Y5bLwoZtSjEsnz2V0avRe3ss
-	7jV06+CKjoqwP6tQIOMxuf5kI1aqAFTmyJMlX8X7PzZi6F82RRTR0eVVn08SoN9oFj3aoGfiSLf
-	rax/CzDMdWhmR6pAB1yPKk+SX7Hw=
-X-Google-Smtp-Source: AGHT+IEnfA8z4HxYt7Ye3dMfz4SZ+PR7TbjhtSSH2Ys+ESDSFz5zhjFVZ7rjXvdBpUczd5ZIVbVyLWd2UUTSuPnWJfA=
-X-Received: by 2002:a05:600c:1906:b0:416:3217:15be with SMTP id
- j6-20020a05600c190600b00416321715bemr12441128wmq.35.1712675552276; Tue, 09
- Apr 2024 08:12:32 -0700 (PDT)
+        bh=S9fHLaOg0xQHrvlM1IV1UTtnZ4u0DmXFhb6dRTtO4eE=;
+        b=TSAgnPt+H85F7Om0hUUhfEv+n9CNj7eugrFT1uTkf/7nLZRWnQ6UCs/kMQzfuhdxjL
+         XMy5Qri4yV5gZYeFHDrzYAYb7kzG/EapSX9jo91oLZYOfY2WvbbPxiAVPTLc3Nw3Ga6s
+         umq5Wv+CHuIWefh3DmPyb4NKFcyQWt1WqxqCO9py3zrkG4w2sGe5D2LluxuUtuA1gIRC
+         SZir9sEABstTkvOSQij6msr8G4pGr9zwZL6Dh22LaJovdt0lm8FyW6Iyd9oNAiUQZRos
+         Ht1UPBlHqTkHInziqavmmfGBYckL8zA6YIgluDYIVhOSYBza5tPYDIIOCqHWODoYnFrg
+         K2Lw==
+X-Forwarded-Encrypted: i=1; AJvYcCVhWKcOpKHsSyjaMdfcym8qov+V5l9VvdB57cC8obQXUXL19s2D5BaPQsyyj5wvkWmh1r3hAPfZHD3i7/IYEcFJ0VKhiQOsRI6ORZGQwRnRc+LPWPRxoDHVPHMNsANxmMMKgudD6StHY5VF5RyghdBmmWXcCGiDVWe3E1purju2r7hSc1/39sPozjuowWLxwJpuW2F9ZtonHW1UxQkZ3v59uvEF
+X-Gm-Message-State: AOJu0Yy8gTuKAHRs3VSr6FJJ2uvjKXNnF0AX3MSPGOzfpjAZ0zeBAPTR
+	Ie0ScHNzhUzNnVV76EMDA+DrJwtD/k1FkSyD9db+qiviW4UD450uPERBL3ITqOk=
+X-Google-Smtp-Source: AGHT+IGEdiWWT0vLFsfDZbjn7QIX2MQqmNy+Wk/VC1Hli3HWTQZo8BsD8oiAyaxT0pIEAgpjhIex/A==
+X-Received: by 2002:a81:7b85:0:b0:615:1dee:6b0e with SMTP id w127-20020a817b85000000b006151dee6b0emr11379477ywc.39.1712676491686;
+        Tue, 09 Apr 2024 08:28:11 -0700 (PDT)
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com. [209.85.219.179])
+        by smtp.gmail.com with ESMTPSA id jx4-20020a05690c380400b00615bd0701c7sm2206364ywb.118.2024.04.09.08.28.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Apr 2024 08:28:11 -0700 (PDT)
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dc23bf7e5aaso6157781276.0;
+        Tue, 09 Apr 2024 08:28:10 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXk8AV9QMHJtuhhi7TayLP5vDD2j7F+AQI0+C5m8FgMfIqPIrsCZCgvWsmI2XZ1M/4vbDq/F0OTeyMxQRkd6XoqhEjYoHFuy4Yo0nsAZh/UfpPA2vBnrwxGFejEovwY3JIucM7V7kqBq3gJE9oO78mD+f1MaRBIETrcG2IL84RRFQJweOxvAq/amNE54z1IZBD0mJI2P2TyK4+SvCCT/nNrZhxQ
+X-Received: by 2002:a25:a249:0:b0:dcc:56b6:6606 with SMTP id
+ b67-20020a25a249000000b00dcc56b66606mr69104ybi.40.1712676490322; Tue, 09 Apr
+ 2024 08:28:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240407130850.19625-1-linyunsheng@huawei.com>
- <20240407130850.19625-13-linyunsheng@huawei.com> <b5c5866e626f6c90657a32b5e9adff724d5896db.camel@gmail.com>
- <c1f5a78a-3040-0cc7-f113-d5ec82c6010f@huawei.com> <CAKgT0UfZBGEVJa1O7cdNt6zy_EEPoGo=aW6ugRKy8a44qg0j8w@mail.gmail.com>
- <09d7d59b-9da3-52f7-b039-acd0344c88c8@huawei.com> <20240409062504.26cfcdde@kernel.org>
-In-Reply-To: <20240409062504.26cfcdde@kernel.org>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 9 Apr 2024 08:11:55 -0700
-Message-ID: <CAKgT0UfqDRxhUyfQhwsDrRhQmCw4qNw_7Jwq+xN1Z4f6_1Bthg@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 12/12] mm: page_frag: update documentation and
- maintainer for page_frag
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org, 
-	linux-doc@vger.kernel.org
+References: <20240409-rzn1-gmac1-v2-0-79ca45f2fc79@bootlin.com> <20240409-rzn1-gmac1-v2-4-79ca45f2fc79@bootlin.com>
+In-Reply-To: <20240409-rzn1-gmac1-v2-4-79ca45f2fc79@bootlin.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 9 Apr 2024 17:27:58 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdX-F8LXWx=Ras4f+Dt_r485HKjRDLydDXZsnZBW8HJzxw@mail.gmail.com>
+Message-ID: <CAMuHMdX-F8LXWx=Ras4f+Dt_r485HKjRDLydDXZsnZBW8HJzxw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 4/5] net: stmmac: add support for RZ/N1 GMAC
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 9, 2024 at 6:25=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Tue, 9 Apr 2024 15:59:58 +0800 Yunsheng Lin wrote:
-> > > Just to be clear this isn't an Ack, but if you are going to list
-> > > maintainers for this my name should be on the list so this is the
-> > > preferred format. There are still some things to be cleaned up in thi=
-s
-> > > patch.
-> >
-> > Sure, I was talking about "Alexander seems to be the orginal author for
-> > page_frag, we can add him to the MAINTAINERS later if we have an ack fr=
-om
-> > him." in the commit log.
->
-> Do we have to have a MAINTAINERS entry for every 1000 lines of code?
-> It really feels forced :/
+Hi Romain,
 
-I don't disagree. However, if nothing else I think it gets used as a
-part of get_maintainers.pl that tells you who to email about changes
-doesn't it? It might make sense in my case since I am still
-maintaining it using my gmail account, but I think the commits for
-that were mostly from my Intel account weren't they? So if nothing
-else it might be a way to provide a trail of breadcrumbs on how to
-find a maintainer who changed employers..
+On Tue, Apr 9, 2024 at 11:21=E2=80=AFAM Romain Gantois
+<romain.gantois@bootlin.com> wrote:
+> From: Cl=C3=A9ment L=C3=A9ger <clement.leger@bootlin.com>
+>
+> Add support for the Renesas RZ/N1 GMAC. This support can make use of a
+> custom RZ/N1 PCS which is fetched by parsing the pcs-handle device tree
+> property.
+>
+> Signed-off-by: "Cl=C3=A9ment L=C3=A9ger" <clement.leger@bootlin.com>
+> Co-developed-by: Romain Gantois <romain.gantois@bootlin.com>
+> Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
+
+Thanks for your patch!
+
+> --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
+> @@ -142,6 +142,18 @@ config DWMAC_ROCKCHIP
+>           This selects the Rockchip RK3288 SoC glue layer support for
+>           the stmmac device driver.
+>
+> +config DWMAC_RZN1
+> +       tristate "Renesas RZ/N1 dwmac support"
+> +       default ARCH_RZN1
+
+Why default to enabled?
+
+> +       depends on OF && (ARCH_RZN1 || COMPILE_TEST)
+> +       select PCS_RZN1_MIIC
+> +       help
+> +         Support for Ethernet controller on Renesas RZ/N1 SoC family.
+> +
+> +         This selects the Renesas RZ/N1 SoC glue layer support for
+> +         the stmmac device driver. This support can make use of a custom=
+ MII
+> +         converter PCS device.
+> +
+>  config DWMAC_SOCFPGA
+>         tristate "SOCFPGA dwmac support"
+>         default ARCH_INTEL_SOCFPGA
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
