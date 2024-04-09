@@ -1,74 +1,92 @@
-Return-Path: <netdev+bounces-86288-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82F889E513
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 23:42:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A684D89E51C
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 23:44:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E82951F2271B
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 21:42:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D802E1C227C2
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 21:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85D07158A28;
-	Tue,  9 Apr 2024 21:42:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6552C158A2E;
+	Tue,  9 Apr 2024 21:44:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j8oIrGlv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kBeC0vs6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6E3158A09;
-	Tue,  9 Apr 2024 21:42:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9C412F381;
+	Tue,  9 Apr 2024 21:44:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712698926; cv=none; b=S6ziQvZwSYySoOKHHs0eV9UzdVJLYk0Cz2DW4XcZtMOv1dcjQcKiP1PNsq4eJYRElbqcPdB0wEg2TrVNzJcqPdP+Bv+g5rIkiBby4th/Bq+YRXAYkiE/USeajJo2aRbFkIHuPi6MZLX4dB9Xg9texltS1Tyz0BDIH2i2RTf70ow=
+	t=1712699062; cv=none; b=pR3SkwVmediL7WE7q3Ps9KTQoqUd0Vr2M8+lKwUUNVfMGWQTlL0KHcEip6MaS9ciF8XCtO7BNEl/kGX8i/qx5WsXmZSv0S8ZLuqVP2JmAG2u3EBdrE+j76X2ju3+MevjM2wiL0wn/fInYQtvrSuMXCqdV7Jf8RIUdRhl77iTzEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712698926; c=relaxed/simple;
-	bh=5I1KP0MI3m2b78fWq623tWUuBU2WB1RVyh5tQpUvABU=;
+	s=arc-20240116; t=1712699062; c=relaxed/simple;
+	bh=gmPhoEZQy7H8+eEDT13YM1nQeRhuIBur3SEMSC6wVTg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YMr+gSgIqomYrUtQj0MEA0bHAvzJWne4nryAsFj0zNeRTRvu/u+XqMN7nkcFS0P9MJgXM3t1LpU5X8oqYwfA0ie1dDItpUjK+vFx8W+iyCy65XCOAW581DMDAlNPFpyjI98JF7uaFTE0gMM415UwWrCWTwEfGRDlrzgIHMZkBX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j8oIrGlv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CDA6C433F1;
-	Tue,  9 Apr 2024 21:42:05 +0000 (UTC)
+	 MIME-Version:Content-Type; b=slKe03b1UeHzx4cD3a2XZMdVAQINfWIKxLEnq2lnnR2IHQTqq/qSc/Pgrwa/wkX4qfKqVGmQi3pYsbiUVJjki/2QlaPZVT7EOM5zY+9hZHGTg+rc3Us0djRpUe+snQSU2YxG1/MGGhueq0NUUl5LeyMWige/BP3BV2YhYS0yRG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kBeC0vs6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51721C433F1;
+	Tue,  9 Apr 2024 21:44:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712698925;
-	bh=5I1KP0MI3m2b78fWq623tWUuBU2WB1RVyh5tQpUvABU=;
+	s=k20201202; t=1712699061;
+	bh=gmPhoEZQy7H8+eEDT13YM1nQeRhuIBur3SEMSC6wVTg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=j8oIrGlvoDxbi3j/516Cm5YFo5s1GnfkJb2iZ5gV5X0luxOT0mDFAkkJ6A6SGne37
-	 VRsGjGqN2tLqC/uOIioWPZ1od9drdbGbuxES53flCNRPlL4+3RIEvcF3v8OcL5dZa+
-	 7DKfuXDL/CBiQ3C6aqOTbzLRtmeIGVjzmJYd4Qqk0611B9yw8PFWuBjblVahoQzpqa
-	 uIiqA10UlwOQVhQF7QV+6GKHxfKgWyGhKI3YvpeQL0GjJ9EgKFD+1xgUyxnnynfGjR
-	 W35hiPfk8M/x5RCdtlGiZbEi/38cdXV6uVmAlDYQvd7SLba4U+ikLKFPQ1wmu5OsVU
-	 23MrTtMBmhFxw==
-Date: Tue, 9 Apr 2024 14:42:04 -0700
+	b=kBeC0vs6D2fvf+lsS/n8G0lta7BNfZAuk1/4mf/TRvmI4GVp05cmjiZ96zfT2IRvz
+	 XMzlzbe1pUq4KXjae9qBQivng6f+ciojwBrNToODd/XXXE2LiQLs12GREzh5sZPhfY
+	 7rvi8THMxQKfLg+xdwQDMh9YyfjT0wLMmpmfeyRwvnsd4942DAMDc5drnu3st4ATr4
+	 6Qp+B7XtXqjl/a9Elw14myYvdSHMvbMft5p3W3K33PqcXWHTA4MIGLoSDQKtGHPCU1
+	 2qohVAGUHihmNDPFH0Dy+XSeGTWdSWT8KA4X3jJLzQL8Or8pRD8UqZIexkxTgCqKPG
+	 b9AkuzVskncag==
+Date: Tue, 9 Apr 2024 14:44:19 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <u.kleine-koenig@pengutronix.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Li Yang
- <leoyang.li@nxp.com>, Shawn Guo <shawnguo@kernel.org>,
- linux-arm-kernel@lists.infradead.org, Zhang Wei <zw@zh-kernel.org>,
- linuxppc-dev@lists.ozlabs.org, netdev@vger.kernel.org,
- linux-usb@vger.kernel.org, kernel@pengutronix.de
-Subject: Re: [PATCH] MAINTAINERS: Drop Li Yang as their email address
- stopped working
-Message-ID: <20240409144204.00cc76ce@kernel.org>
-In-Reply-To: <20240405072042.697182-2-u.kleine-koenig@pengutronix.de>
-References: <20240405072042.697182-2-u.kleine-koenig@pengutronix.de>
+To: Edward Cree <ecree.xilinx@gmail.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Erick Archer
+ <erick.archer@outlook.com>, Long Li <longli@microsoft.com>, Ajay Sharma
+ <sharmaajay@microsoft.com>, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang
+ Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Kees Cook
+ <keescook@chromium.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
+ <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
+ <justinstitt@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, Shradha Gupta
+ <shradhagupta@linux.microsoft.com>, Konstantin Taranov
+ <kotaranov@microsoft.com>, linux-rdma@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ llvm@lists.linux.dev
+Subject: Re: [PATCH v3 0/3] RDMA/mana_ib: Add flex array to struct
+ mana_cfg_rx_steer_req_v2
+Message-ID: <20240409144419.6dc12ebb@kernel.org>
+In-Reply-To: <ca8a0df8-b178-31ff-026f-b2d298f3aa84@gmail.com>
+References: <AS8PR02MB72374BD1B23728F2E3C3B1A18B022@AS8PR02MB7237.eurprd02.prod.outlook.com>
+	<20240408110730.GE8764@unreal>
+	<20240408183657.7fb6cc35@kernel.org>
+	<ca8a0df8-b178-31ff-026f-b2d298f3aa84@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri,  5 Apr 2024 09:20:41 +0200 Uwe Kleine-K=C3=B6nig wrote:
-> When sending a patch to (among others) Li Yang the nxp MTA replied that
-> the address doesn't exist and so the mail couldn't be delivered. The
-> error code was 550, so at least technically that's not a temporal issue.
->=20
-> Signed-off-by: Uwe Kleine-K=C3=B6nig <u.kleine-koenig@pengutronix.de>
+On Tue, 9 Apr 2024 18:01:40 +0100 Edward Cree wrote:
+> > Shared branch would be good. Ed has some outstanding patches 
+> > to refactor the ethtool RSS API.  
+> 
+> For the record I am extremely unlikely to have time to get those
+>  done this cycle :(
+> Though in any case fwiw it doesn't look like this series touches
+>  anything that would conflict; mana doesn't appear to support
+>  custom RSS contexts and besides the changes are well away from
+>  the ethtool API handling.
 
-FWIW it's eaac25d026a1 in net, thanks!
+Better safe than sorry, since the change applies cleanly on an -rc tag
+having it applied to both trees should be very little extra work.
 
