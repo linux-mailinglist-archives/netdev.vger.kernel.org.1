@@ -1,134 +1,173 @@
-Return-Path: <netdev+bounces-86094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86A4C89D865
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:46:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE30C89D87C
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:47:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06D3CB21B60
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:46:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89C5328848D
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:47:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311DC12D1E9;
-	Tue,  9 Apr 2024 11:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Re2MZHX5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 124811272CA;
+	Tue,  9 Apr 2024 11:47:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3284B127B4E;
-	Tue,  9 Apr 2024 11:45:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A31DC80629
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 11:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712663153; cv=none; b=njl/IZizOHf9Oy2AvUpkEgQLImugWOneEnneYLjndQlNeObg/eiCozv7bhqOyYEBjt+QMCAXbclZhfJaiwmb+P7Yr70WZ/zYkJ5QyUw7rPf7X8hobtFPj/0935KPeCmBDhCU98C4x2T950AlV69bSUdyUXqP7ClOFme8nHd/+FM=
+	t=1712663259; cv=none; b=PExEYLDOFNqDbA8bItEAOA/V2Dcsjv7TpzJsOPzWWBZqp/uGlqieIi9B8ArXTLlR/QyJ30AZfa3JywBXFzmX5cRzXdFclUiDRPfDsPidHnO/FAiHsv/VwO/CsemAxKzuxyUwyOslStusQwoNVtZ/NfLDAbZ1o6kBXXgXPDd8OrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712663153; c=relaxed/simple;
-	bh=GFjr+qUI/xJlRfC49pDYbbQ+5mOHCUk/2gN5wZX0VPA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=lBIR1ZzgNFAiDhBZgiwFTJ1Hjbtgxh5r2XlqjC9uK91LBmTo0zonDD0RFLMilwlSPXoKVCFuu7RFValzVMoe7lSmHU/wR3KLx2txQVIah3cPmVakFvodIiyvfOU99UkKhMWn7HIsMlQWeYtdowO9yUrUIx5A89DElmMUefkbEi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Re2MZHX5; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1712663151; x=1744199151;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=GFjr+qUI/xJlRfC49pDYbbQ+5mOHCUk/2gN5wZX0VPA=;
-  b=Re2MZHX5GydCM8B6KilkbcXlSGPSLv0DHVNAFcmqvWsd0IZ1NH+wl46p
-   jp+rvzqYg9VvAX9wn3JpJghaHuXQWE2yPEhE8P08rq+2tVNxto7uD3tbV
-   QrLFtsNiMvuJGKG0kOuG7Rz2NIhkvDaaqqVhKqvF/2RhKVIbglEWBhS4x
-   g=;
-X-IronPort-AV: E=Sophos;i="6.07,189,1708387200"; 
-   d="scan'208";a="650727234"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 11:45:43 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:49900]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.27.169:2525] with esmtp (Farcaster)
- id 3f52ccb2-10c8-4639-a2de-4651f9e21034; Tue, 9 Apr 2024 11:45:42 +0000 (UTC)
-X-Farcaster-Flow-ID: 3f52ccb2-10c8-4639-a2de-4651f9e21034
-Received: from EX19D020UWC004.ant.amazon.com (10.13.138.149) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Tue, 9 Apr 2024 11:45:38 +0000
-Received: from [0.0.0.0] (10.253.83.51) by EX19D020UWC004.ant.amazon.com
- (10.13.138.149) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.28; Tue, 9 Apr
- 2024 11:45:22 +0000
-Message-ID: <7c82670e-6063-4b0f-9bbf-805a0d949d84@amazon.com>
-Date: Tue, 9 Apr 2024 13:45:18 +0200
+	s=arc-20240116; t=1712663259; c=relaxed/simple;
+	bh=nhIPRPdz5+MafAyjDvmSPmsnqy2nxzObKAKF/VArt4I=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=pBBHk6+ecOruJazh0BadLjx0on55aMOiOv5WwrJ8knU5uMHpjBXWkTUzp5bUBMlYqjWn6pYIGs5LOrEc1aQnFkIgBvDBdGWATgogBMdZpUSLiVunCb2wq/yluDq4xGL0H/k3O03LiHW38MWp1gozIzmZoGNCSXkc/NHR0FBzFvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4VDPK62Yprz1ymf5;
+	Tue,  9 Apr 2024 19:45:14 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 04DDB1402C7;
+	Tue,  9 Apr 2024 19:47:29 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Tue, 9 Apr
+ 2024 19:47:28 +0800
+Subject: Re: [net-next PATCH 13/15] eth: fbnic: add basic Rx handling
+To: Alexander Duyck <alexander.duyck@gmail.com>, <netdev@vger.kernel.org>
+CC: Alexander Duyck <alexanderduyck@fb.com>, <kuba@kernel.org>,
+	<davem@davemloft.net>, <pabeni@redhat.com>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <171217496013.1598374.10126180029382922588.stgit@ahduyck-xeon-server.home.arpa>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <41a39896-480b-f08d-ba67-17e129e39c0f@huawei.com>
+Date: Tue, 9 Apr 2024 19:47:28 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 15/25] misc: nsm: drop owner assignment
+In-Reply-To: <171217496013.1598374.10126180029382922588.stgit@ahduyck-xeon-server.home.arpa>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, "Michael S. Tsirkin"
-	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
-	<xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>, "David
- Hildenbrand" <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>, "Richard
- Weinberger" <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>, Paolo Bonzini
-	<pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe
-	<axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>, "Luiz Augusto von
- Dentz" <luiz.dentz@gmail.com>, Olivia Mackall <olivia@selenic.com>, Herbert
- Xu <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>, Arnd Bergmann
-	<arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei
-	<arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>, "Sudeep
- Holla" <sudeep.holla@arm.com>, Cristian Marussi <cristian.marussi@arm.com>,
-	Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>,
-	Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu <olvaffe@gmail.com>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>, Maxime Ripard
-	<mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>, Daniel Vetter
-	<daniel@ffwll.ch>, Jean-Philippe Brucker <jean-philippe@linaro.org>, "Joerg
- Roedel" <joro@8bytes.org>, Will Deacon <will@kernel.org>, Robin Murphy
-	<robin.murphy@arm.com>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen
-	<ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>, Dominique Martinet
-	<asmadeus@codewreck.org>, Christian Schoenebeck <linux_oss@crudebyte.com>,
-	Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>, "Dan
- Williams" <dan.j.williams@intel.com>, Vishal Verma
-	<vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>, Ira Weiny
-	<ira.weiny@intel.com>, "Pankaj Gupta" <pankaj.gupta.linux@gmail.com>, Bjorn
- Andersson <andersson@kernel.org>, Mathieu Poirier
-	<mathieu.poirier@linaro.org>, "James E.J. Bottomley" <jejb@linux.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>, Vivek Goyal
-	<vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>, "Anton Yakovlev"
-	<anton.yakovlev@opensynergy.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
- Iwai <tiwai@suse.com>
-CC: <virtualization@lists.linux.dev>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-um@lists.infradead.org>,
-	<linux-block@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>,
-	<linux-crypto@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-gpio@vger.kernel.org>, <dri-devel@lists.freedesktop.org>,
-	<iommu@lists.linux.dev>, <netdev@vger.kernel.org>, <v9fs@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <linux-wireless@vger.kernel.org>,
-	<nvdimm@lists.linux.dev>, <linux-remoteproc@vger.kernel.org>,
-	<linux-scsi@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-	<alsa-devel@alsa-project.org>, <linux-sound@vger.kernel.org>
-References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
- <20240331-module-owner-virtio-v2-15-98f04bfaf46a@linaro.org>
-From: Alexander Graf <graf@amazon.com>
-In-Reply-To: <20240331-module-owner-virtio-v2-15-98f04bfaf46a@linaro.org>
-X-ClientProxiedBy: EX19D035UWA002.ant.amazon.com (10.13.139.60) To
- EX19D020UWC004.ant.amazon.com (10.13.138.149)
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-Ck9uIDMxLjAzLjI0IDEwOjQ0LCBLcnp5c3p0b2YgS296bG93c2tpIHdyb3RlOgo+IHZpcnRpbyBj
-b3JlIGFscmVhZHkgc2V0cyB0aGUgLm93bmVyLCBzbyBkcml2ZXIgZG9lcyBub3QgbmVlZCB0by4K
-Pgo+IFNpZ25lZC1vZmYtYnk6IEtyenlzenRvZiBLb3psb3dza2kgPGtyenlzenRvZi5rb3psb3dz
-a2lAbGluYXJvLm9yZz4KCgpSZXZpZXdlZC1ieTogQWxleGFuZGVyIEdyYWYgPGdyYWZAYW1hem9u
-LmNvbT4KCgpBbGV4CgoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApL
-cmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4g
-U2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFy
-bG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1JRDogREUgMjg5
-IDIzNyA4NzkKCgo=
+On 2024/4/4 4:09, Alexander Duyck wrote:
+> From: Alexander Duyck <alexanderduyck@fb.com>
 
+...
+
+> +
+> +static int fbnic_clean_rcq(struct fbnic_napi_vector *nv,
+> +			   struct fbnic_q_triad *qt, int budget)
+> +{
+> +	struct fbnic_ring *rcq = &qt->cmpl;
+> +	struct fbnic_pkt_buff *pkt;
+> +	s32 head0 = -1, head1 = -1;
+> +	__le64 *raw_rcd, done;
+> +	u32 head = rcq->head;
+> +	u64 packets = 0;
+> +
+> +	done = (head & (rcq->size_mask + 1)) ? cpu_to_le64(FBNIC_RCD_DONE) : 0;
+> +	raw_rcd = &rcq->desc[head & rcq->size_mask];
+> +	pkt = rcq->pkt;
+> +
+> +	/* Walk the completion queue collecting the heads reported by NIC */
+> +	while (likely(packets < budget)) {
+> +		struct sk_buff *skb = ERR_PTR(-EINVAL);
+> +		u64 rcd;
+> +
+> +		if ((*raw_rcd & cpu_to_le64(FBNIC_RCD_DONE)) == done)
+> +			break;
+> +
+> +		dma_rmb();
+> +
+> +		rcd = le64_to_cpu(*raw_rcd);
+> +
+> +		switch (FIELD_GET(FBNIC_RCD_TYPE_MASK, rcd)) {
+> +		case FBNIC_RCD_TYPE_HDR_AL:
+> +			head0 = FIELD_GET(FBNIC_RCD_AL_BUFF_ID_MASK, rcd);
+> +			fbnic_pkt_prepare(nv, rcd, pkt, qt);
+> +
+> +			break;
+> +		case FBNIC_RCD_TYPE_PAY_AL:
+> +			head1 = FIELD_GET(FBNIC_RCD_AL_BUFF_ID_MASK, rcd);
+> +			fbnic_add_rx_frag(nv, rcd, pkt, qt);
+> +
+> +			break;
+> +		case FBNIC_RCD_TYPE_OPT_META:
+> +			/* Only type 0 is currently supported */
+> +			if (FIELD_GET(FBNIC_RCD_OPT_META_TYPE_MASK, rcd))
+> +				break;
+> +
+> +			/* We currently ignore the action table index */
+> +			break;
+> +		case FBNIC_RCD_TYPE_META:
+> +			if (likely(!fbnic_rcd_metadata_err(rcd)))
+> +				skb = fbnic_build_skb(nv, pkt);
+> +
+> +			/* populate skb and invalidate XDP */
+> +			if (!IS_ERR_OR_NULL(skb)) {
+> +				fbnic_populate_skb_fields(nv, rcd, skb, qt);
+> +
+> +				packets++;
+> +
+> +				napi_gro_receive(&nv->napi, skb);
+> +			}
+> +
+> +			pkt->buff.data_hard_start = NULL;
+> +
+> +			break;
+> +		}
+> +
+> +		raw_rcd++;
+> +		head++;
+> +		if (!(head & rcq->size_mask)) {
+> +			done ^= cpu_to_le64(FBNIC_RCD_DONE);
+> +			raw_rcd = &rcq->desc[0];
+> +		}
+> +	}
+> +
+> +	/* Unmap and free processed buffers */
+> +	if (head0 >= 0)
+> +		fbnic_clean_bdq(nv, budget, &qt->sub0, head0);
+> +	fbnic_fill_bdq(nv, &qt->sub0);
+> +
+> +	if (head1 >= 0)
+> +		fbnic_clean_bdq(nv, budget, &qt->sub1, head1);
+> +	fbnic_fill_bdq(nv, &qt->sub1);
+
+I am not sure how complicated the rx handling will be for the advanced
+feature. For the current code, for each entry/desc in both qt->sub0 and
+qt->sub1 at least need one page, and the page seems to be only used once
+no matter however small the page is used?
+
+I am assuming you want to do 'tightly optimized' operation for this by
+calling page_pool_fragment_page(), but manipulating page->pp_ref_count
+directly does not seems to add any value for the current code, but seem
+to waste a lot of memory by not using the frag API, especially PAGE_SIZE
+> 4K?
+
+> +
+> +	/* Record the current head/tail of the queue */
+> +	if (rcq->head != head) {
+> +		rcq->head = head;
+> +		writel(head & rcq->size_mask, rcq->doorbell);
+> +	}
+> +
+> +	return packets;
+> +}
+>  
+> 
 
