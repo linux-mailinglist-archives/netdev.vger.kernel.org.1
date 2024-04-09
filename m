@@ -1,202 +1,167 @@
-Return-Path: <netdev+bounces-86227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A86B289E136
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 19:13:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB8E289E168
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 19:18:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D8EE2861C2
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 17:13:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F7CEB24F78
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 17:14:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D22A12E1D5;
-	Tue,  9 Apr 2024 17:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5392D155A22;
+	Tue,  9 Apr 2024 17:14:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DS/GYcgL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pcmC9XFN"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2096.outbound.protection.outlook.com [40.107.223.96])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6C8155387;
-	Tue,  9 Apr 2024 17:12:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.96
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712682764; cv=fail; b=c7UStKf0Y7YuxEHQhw6QLVHd67aH7GX2YaXacVs+5GeQdU13ytYGL05cUgbDjKSGiNX+I17WvMmjwx5hLYHSq0s4skFuwYFCdGI4AsoKqezkH5HWYh5RgR7SapsKoOKH7jlBNtk3LdS8OjQLU+JIaZcMUyJIs1/RdRCK4v0cPiE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712682764; c=relaxed/simple;
-	bh=a3jQR4p3eKLAojy6kKNY+jzHdnuQmaeovFZ4BSmyMVw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=eWO2d3XRo9jKEgGnzTTmAxGzGasK4/7d6ix5mBXY1gPvtVmRIskoaBCf0Gww/Usurd4QMP433UpiVKUrKFR+DUu3O9dA55jWYYe07w87RSbzCvXHeyhX3gxZ5ruAOz87wzW9EH3Gn6uC06JYGdDXC2ToyxwjS/hJj+jeoMPpMds=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DS/GYcgL; arc=fail smtp.client-ip=40.107.223.96
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZqtqhL5GlEiaRZyZEjMIly1ocycR5tExtSw41uTxARqmXOEF47y0Mvp/+xmJgmimoawXqANHTHOLbShksi7J0Lpn6Q1yt/5+bY9Zk7NyjENLejPzQNqNC5AZkr9Q0AipgosDPYI5sAG0WAS4BhRm9Opm8t1ci4NT4GHsnO1CkUojo/8PyZ+RB0vzwvd3Ebz1MILfKGHqvTnLYVA07gylVx2gJwW8zCLHccaFpbP9zprQZW3QRAihI8FtkQ2vYosbDSSEpzcsFZHHyhrAkPqV1MFZBlylChyGX8M7ytVP60ia/9+9l+p3EuqUczMmAccRx3KTzjvUvxR5r2to6JhiWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=l667UAFEyg4/N8e+I2SDs5GFnJ4fVw+K7VgNBcOZx+M=;
- b=Aab2inKg5/RVkN1TSs4ov7UTzzP+pfNk77o4DVpbVilcob/KHsQXSFs5oxqt01hF4qp86iC0L+Nb4OMA6/9bwEHZ7WDhC77JIWrks3X2HeCUw/mGZK5h2vj/+OcAr0NYWO8azLAcv1rCPw80/XMbbMOMd8477hGDAKF2TpSNrbmtg2RSKj/gjhaPOlDHTm23PVkDfk0hki5QJxcs6U/huTIQ6+8pdrEiWCgwqMbPcIbT+WD+Rhgy2pNj9GM/Z1SSbu575rXCNIrjk2YGjhZVceF1lj3M3BTmglNT8dyfPJpELMtV0jB6gsfHzhSOEtYqZqVpatLbTTubf8PY3mwHwQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=l667UAFEyg4/N8e+I2SDs5GFnJ4fVw+K7VgNBcOZx+M=;
- b=DS/GYcgLG507HAD13tqDkq7n8KFddfyR8UcA4UY+Qv20vQMjwPou4HnajUPKMP5ptUSZa49albnAuMBy82BXlh0FqxQjMC6fTHlk3OELEUrRx0qc6grgdMfRkWbeWqslokAENDpu3JCd+iBuRgoTUYzQTcXuMu3erPktMMVRj/XZ0AeNEFVGcA+m2fipkpNWxybmjAo4EAk/DUsHs0qta2jFzfrc86JPRfbZx8MBxjjVEUOPeGW9PI/IIxZDZMjjQ2ahBs+g+HFIvDO00uLgiRzJj8PwgPnpzzSnMdj+7o3iYUEEAtVZ+xtLeOxpZ/qZ5ir4qdWCyr6Y15Co4P71pA==
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by PH7PR12MB7356.namprd12.prod.outlook.com (2603:10b6:510:20f::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 9 Apr
- 2024 17:12:37 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::6aec:dbca:a593:a222]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::6aec:dbca:a593:a222%5]) with mapi id 15.20.7409.053; Tue, 9 Apr 2024
- 17:12:37 +0000
-Date: Tue, 9 Apr 2024 14:12:35 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
-	bhelgaas@google.com, linux-pci@vger.kernel.org,
-	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net,
-	pabeni@redhat.com
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-Message-ID: <20240409171235.GZ5383@nvidia.com>
-References: <20240404193817.500523aa@kernel.org>
- <CAKgT0UdAz1mb48kFEngY5sCvHwYM2vYtEK81VceKj-xo6roFyA@mail.gmail.com>
- <20240408061846.GA8764@unreal>
- <CAKgT0UcE5cOKO4JgR-PBstP3e9r02+NyG3YrNQe8p2_25Xpf8g@mail.gmail.com>
- <20240408184102.GA4195@unreal>
- <CAKgT0UcLWEP5GOqFEDeyGFpJre+g2_AbmBOSXJsoXZuCprGH0Q@mail.gmail.com>
- <20240409081856.GC4195@unreal>
- <CAKgT0UewAZSqU6JF4-cPf7hZM41n_QMuiF_K8SY8hyoROQLgfQ@mail.gmail.com>
- <20240409153932.GY5383@nvidia.com>
- <CAKgT0UeSNxbq3JYe8oNaoWYWSn9+vd1c+AfjvUsietUtS09r0g@mail.gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKgT0UeSNxbq3JYe8oNaoWYWSn9+vd1c+AfjvUsietUtS09r0g@mail.gmail.com>
-X-ClientProxiedBy: BL1P222CA0021.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:208:2c7::26) To DM6PR12MB3849.namprd12.prod.outlook.com
- (2603:10b6:5:1c7::26)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04CD155397;
+	Tue,  9 Apr 2024 17:14:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712682844; cv=none; b=bo6UstUyqhpeezNaWIQm0Wp77Wq9eakklgQYj06zY5E61MfitHMmLqjFq7dNXXNwiWxxtYKYjvGFGXDuC2GkpQtPxgvlcZK0u6HzB9VSr7sseX4xxNUORd8Wenn6GehwfR9gMDzrJZs9c5DgBDyXYD0MT/KfA1IZggfi84s5Siw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712682844; c=relaxed/simple;
+	bh=LPEx6tsL7wgLYi+kk5vkpbbYiQkRmiIS+PLtSy0YjfY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Yqy98l8tOnyWAvP89YAN5nbNU6/RPN/PRInvhCJxj9fiqfg0dUX22fS2eQa3KjF1LamfNFyyDlkXp0C4WpnRwtyc2nSyqwub5kmA2n8vhSSR5wJjPyiD1lBaxH5FXti1to1ze4xSLHRdGKHuXLhEwUdobGGVyahXA6mVvJUukfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pcmC9XFN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC579C43330;
+	Tue,  9 Apr 2024 17:14:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712682843;
+	bh=LPEx6tsL7wgLYi+kk5vkpbbYiQkRmiIS+PLtSy0YjfY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=pcmC9XFN912RMvFMTBsOxs05rus3ioP7iQqJNazGrzDoiP7Ljc4Y9u/OFo2drMYc5
+	 Y47oEgBi7UKRS5do5zUKwbtZ6obphKVWoEavPZT728bSAwtVk7J8TSsQZX4ZSa7DKv
+	 hpFtmGvI8QwKr8MN2FMRQIJIRKkYD8x6LP5+Ja/yJW27JqneVDqXo/cNBtG96EGr+G
+	 T2mQsRtFnusKVDFoDxcoM5aumg8aLfbIe3M865YcFvvVFW1WBeBZOTRWODvbam1aBD
+	 yAl1wwAPpS2WSDZ6sYFOjTipL19UOEuq8sVy1JM2KysQHpLosxbKubCxvsHDf3sSbL
+	 +uaHRk85y/R4A==
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-516cbf3fd3dso6787566e87.2;
+        Tue, 09 Apr 2024 10:14:03 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUGzY1zWuLSYCs+1xo743OhxbMPN5RQOSzwNAiHvmkzlBpweYvcLDGd7ZXIQtJPvHFEhFP/wLa3mooqYmzGx3nE+ptY0OsFsH1FJ/MJuNdcd5XejtSqwoKHWXnU98b8y3wQowID6aegWdRYTHgchWUfTIhlqMrWyRaNQtqTTail5WV9epIDIZt83p3mtGjmOOsn42PzBIMNF/g9G+sS80G73EsV/YYxq8yDfpgwQQa9tJrHRESHOJzOrluDBxZyv1Es3yA5AfmS+O+vWatjzU/Y7S74yh5G5LzFRDCRp4tEypYV9LpR+adw16gs/Lc6DKPFOzPcgYxsqDNG8cMrva4X2y1VvlxdhD+P7Tiga41vOmLoKV9ZkJPYd4usdaSYNvZyzMzIgMSmI+kPauXSbgaPOrjS7GN+nsCrI1aCzaPgcNfFtCBfkz1gScl5f7ppd6qkZeqTF+VMk824UK+UXMUPmTIFY0TVuV9+ZRPM6taVbBmRg4WhfW7AQy5u
+X-Gm-Message-State: AOJu0Yxe+jgjSgCNwm0uGuMhypskIFiKPv0wdyU9heYr3dxsGcXSkU45
+	9uvrPveJfSRhTZaNVROUChiPBJc86eu/GrdJi1/VYsBmUobzNcL1nEbM9dIuM2KjtaKViXucikM
+	GT3jdSbhdc4xkTnTjE/FHnQvxgw==
+X-Google-Smtp-Source: AGHT+IHdmA/YWkORigJ39s8mUHP/Uw9g5JVSthQiryNaRNFp29Jw8Pu75u88BQ1j6apcee4IbBJ9bbXspK3Ch4S3xfA=
+X-Received: by 2002:ac2:4acb:0:b0:515:99f6:2ca4 with SMTP id
+ m11-20020ac24acb000000b0051599f62ca4mr50062lfp.36.1712682841868; Tue, 09 Apr
+ 2024 10:14:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|PH7PR12MB7356:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	qEmVtir4HXuT1Qzcyhi6rIaGqnjIKUnlAaWmvVkBb4Na43UwYDFlhG54oATv2vMGifLSYGh+EJWcbYuU5/NHHhZHkklkKMrSYsFtKk+5psuafl5iDjjWNNWwbjCmf2nPRCBipyGyK9j1G7IK2/mtOlAiLUi+69qZPgBeNMHBjqrHMc5hp1Qv84irIRDaphNfxXsNLy3FJxOseQJXHWUMA2cgc1IhEK0cPQtVuOaA2k9w4GY6hTm7BDBFyulwdwieTy1kGLIhMpf7KK15gBkb36fo/Ri/nDrv30czkzBtZE7+imzGkTxHb4jaAnh4Llg/RXp/rfwthZltkGTTE5Y985Qi6znYGgwA/f/Cv+xROPtH4nUZvCkK/f+ueqH+Lw9oNSbGDjM9n0ENlhOHOOhBuwsHV2WeyY13Of37uwB91NlQRJKZHJxuwb5kfnF2SqG95EOs7Saz4+EjKuQhzJibXvjRu4RNsM2RqGvXk9cooG0uVwaDgYAwhZfGLRqZinlDxxOWJ/KxnLGvNzlFTeQPPN4rqn8LQ5qHjXftD3sz5j0AyJpU2Nqopq85MyLjrxFDxDKADfBE/ePyOIAbZ4zGzCiPmxjY9jynS+RN8K4hlo2NDBKcmXu2SEyzCckctUWnhylo02PXfW2fBHLTj/3w08UkL8WERiUMZkeTretB+EE=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(376005)(366007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?/vzW6ipAIXNRJbztW6a5MrNB9MSDo4FTqPrZeqQVm4gUR8Zdoprs//nif2K+?=
- =?us-ascii?Q?TJFl3bJuc47hXu9s6yuApA8GBwbtxGl98KGSyt/IgEU5HfTvCI7IO3mJP+8c?=
- =?us-ascii?Q?0cCynBQKKhNwcAJwngmpXrquOX+9km7TwFbFjXu6p+eDtZb3YlZKutZzKXNk?=
- =?us-ascii?Q?dtflOU2H0QMvbrs0lNpiMoBfWXtwH42R8ymYCQQ01p/Y66inBp66+K9WOSsQ?=
- =?us-ascii?Q?WUeqMixb1AkZeCTt8qPLXe6W6VzWeKJ7jUuhqrm+LiD5gC6Ib/jYRZ3372LU?=
- =?us-ascii?Q?sMqhpCA0M3MJIzzpJofQxjwcWbvRr/DfPN+PR5b5wduqKCmS6hFNVSsyUlXY?=
- =?us-ascii?Q?hVhz2YkLdJWmLmYrzHmpIceIjFPgNbuwG7saQdRDjfi4HscgyA2Pknjc9Hoq?=
- =?us-ascii?Q?EBnmGCRcoiopmBykpSEO9JPeD8AdszDHCmxM/een8YVFQGhpQFHw2juSnTl8?=
- =?us-ascii?Q?CFE5JuYeQqE9fg89Fy1GdVhJiX+KV/qK4bwbMady4W57vncB/N3PaNh9it9l?=
- =?us-ascii?Q?Lsbg+uThGoXTnpnleLpqrhzV4W9SukREzH0lbjpXRiE7bLsFs8FTdP7rtCHX?=
- =?us-ascii?Q?iwTOauEL6GbtZH+0zMgvXWYaXfK90cv3F49PbsJmC3voQ9+aNOgV11puGIcj?=
- =?us-ascii?Q?mSLe9mzUos5yOv7WtCeH3QAg/zbEp6L6YOrPVv1m6sVyjUUxzOjIUsK/yztS?=
- =?us-ascii?Q?Ad/VmTBZh3DdSamLFCOI5wv1tQza4HJq8cecZC8qRj7Uhvnykz0zdkGBqJbZ?=
- =?us-ascii?Q?JGoql6/MGOMxpQD2jrT6IkaSqWz5oWDvm5d/gZ6zdHhKcWC8l4ESW2oiI2Zj?=
- =?us-ascii?Q?wBWH0mbj2EMGCeOWgRqunQtmCPMdnz61WRz3KSYWGpwXLcDhYVnkNlapfC4v?=
- =?us-ascii?Q?CQMY0e1wqtusCJJN5Wp+XK43jt0Nb5v+VaP1kef/GY4N/dNwc4lLi7nc930c?=
- =?us-ascii?Q?r5jcWpl3qhwLQNJ+hvSiCKhmlhJTSu/VzRQ21+HYTvqegdklZI7W69iBXnzf?=
- =?us-ascii?Q?dJgR2tortYL2v7V0NHat5TB24/BNoQrg+VtyFVCXfspWVCUAST2kJ1h3COIO?=
- =?us-ascii?Q?h9GxAIxnizXdPnHz9aV6BR7iKdB4dAboK5Idta6ucKEofQIqv+HXIgVyfuls?=
- =?us-ascii?Q?2R0D1YFJmHP+lthBIPW6UE2VCvGdiNKftNgckBPwpKbylGjf5O3mdssbAJYJ?=
- =?us-ascii?Q?WVU5WmRhdnxtR+9P9IwrqpxjduaznMbtBq/AUylKSKhu/qdTyBF1yLxBAwr5?=
- =?us-ascii?Q?GT4sbZAReRXsZiO9p4Y02YCkobfZtIZ0oGWhgBJCyZPDZKoluis4VLSSOFnv?=
- =?us-ascii?Q?VwXSZau8PM95zBUd1Gq6M7fCazdGh5MxSk35tWiuGmzs5rxvvkO/VewQcyqM?=
- =?us-ascii?Q?5gau36Ij2BIrvLUcyL5cgU3IZwgfqedx4rxxvHCR/zfNOuD1qAXdMnGY21Yj?=
- =?us-ascii?Q?Gbzv9uvfjEM/uJP1PjebtCPSLUGmdmUW+aLXqjocc4P9XtV7122awveROMOH?=
- =?us-ascii?Q?cUfQGOgZAOW9nh04H+GLcCy+QCYsnPjwgwv5GiEzgc/XD8ID/BOwH62+fuFc?=
- =?us-ascii?Q?hXBP66uwu/lahqo8xOpS/NJoFQLI+yeNZof+geP2?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2901cf3d-edaa-47fd-e7e3-08dc58b84110
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2024 17:12:37.0196
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Vg1e4LlNCc4vNLTR5kjqhvspIG0Zt8YtNH4jEYRLQT3gThPYC2mtC7svdBtUAZfB
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7356
+References: <20240105130404.301172-1-gatien.chevallier@foss.st.com> <61608010-fbce-46c6-a83d-94c04d0f000d@foss.st.com>
+In-Reply-To: <61608010-fbce-46c6-a83d-94c04d0f000d@foss.st.com>
+From: Rob Herring <robh+dt@kernel.org>
+Date: Tue, 9 Apr 2024 12:13:48 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqJTiBK3qzdMzL-ZuARosKGqnf_PjyCj13_H=V415y9sHQ@mail.gmail.com>
+Message-ID: <CAL_JsqJTiBK3qzdMzL-ZuARosKGqnf_PjyCj13_H=V415y9sHQ@mail.gmail.com>
+Subject: Re: [PATCH v9 00/13] Introduce STM32 Firewall framework
+To: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+Cc: Gatien Chevallier <gatien.chevallier@foss.st.com>, Oleksii_Moisieiev@epam.com, 
+	gregkh@linuxfoundation.org, herbert@gondor.apana.org.au, davem@davemloft.net, 
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, vkoul@kernel.org, 
+	jic23@kernel.org, olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com, 
+	mchehab@kernel.org, fabrice.gasnier@foss.st.com, andi.shyti@kernel.org, 
+	ulf.hansson@linaro.org, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, hugues.fruchet@foss.st.com, lee@kernel.org, 
+	will@kernel.org, catalin.marinas@arm.com, arnd@kernel.org, 
+	richardcochran@gmail.com, Frank Rowand <frowand.list@gmail.com>, peng.fan@oss.nxp.com, 
+	lars@metafoo.de, rcsekar@samsung.com, wg@grandegger.com, mkl@pengutronix.de, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-iio@vger.kernel.org, alsa-devel@alsa-project.org, 
+	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-phy@lists.infradead.org, 
+	linux-serial@vger.kernel.org, linux-spi@vger.kernel.org, 
+	linux-usb@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 09, 2024 at 09:31:06AM -0700, Alexander Duyck wrote:
-
-> > expectation is generally things like:
+On Mon, Apr 8, 2024 at 3:44=E2=80=AFAM Alexandre TORGUE
+<alexandre.torgue@foss.st.com> wrote:
+>
+> Hi Gatien,
+>
+> On 1/5/24 14:03, Gatien Chevallier wrote:
+> > Introduce STM32 Firewall framework for STM32MP1x and STM32MP2x
+> > platforms. STM32MP1x(ETZPC) and STM32MP2x(RIFSC) Firewall controllers
+> > register to the framework to offer firewall services such as access
+> > granting.
 > >
-> >  - The bug is fixed immediately because the issue is obvious to the
-> >    author
-> >  - Iteration and rapid progress is seen toward enlightening the author
-> >  - The patch is reverted, often rapidly, try again later with a good
-> >    patch
-> 
-> When working on a development branch that shouldn't be the
-> expectation. I suspect that is why the revert was pushed back on
-> initially. The developer wanted a chance to try to debug and resolve
-> the issue with root cause.
+> > This series of patches is a new approach on the previous STM32 system
+> > bus, history is available here:
+> > https://lore.kernel.org/lkml/20230127164040.1047583/
+> >
+> > The need for such framework arises from the fact that there are now
+> > multiple hardware firewalls implemented across multiple products.
+> > Drivers are shared between different products, using the same code.
+> > When it comes to firewalls, the purpose mostly stays the same: Protect
+> > hardware resources. But the implementation differs, and there are
+> > multiple types of firewalls: peripheral, memory, ...
+> >
+> > Some hardware firewall controllers such as the RIFSC implemented on
+> > STM32MP2x platforms may require to take ownership of a resource before
+> > being able to use it, hence the requirement for firewall services to
+> > take/release the ownership of such resources.
+> >
+> > On the other hand, hardware firewall configurations are becoming
+> > more and more complex. These mecanisms prevent platform crashes
+> > or other firewall-related incoveniences by denying access to some
+> > resources.
+> >
+> > The stm32 firewall framework offers an API that is defined in
+> > firewall controllers drivers to best fit the specificity of each
+> > firewall.
+> >
+> > For every peripherals protected by either the ETZPC or the RIFSC, the
+> > firewall framework checks the firewall controlelr registers to see if
+> > the peripheral's access is granted to the Linux kernel. If not, the
+> > peripheral is configured as secure, the node is marked populated,
+> > so that the driver is not probed for that device.
+> >
+> > The firewall framework relies on the access-controller device tree
+> > binding. It is used by peripherals to reference a domain access
+> > controller. In this case a firewall controller. The bus uses the ID
+> > referenced by the access-controller property to know where to look
+> > in the firewall to get the security configuration for the peripheral.
+> > This allows a device tree description rather than a hardcoded periphera=
+l
+> > table in the bus driver.
+> >
+> > The STM32 ETZPC device is responsible for filtering accesses based on
+> > security level, or co-processor isolation for any resource connected
+> > to it.
+> >
+> > The RIFSC is responsible for filtering accesses based on Compartment
+> > ID / security level / privilege level for any resource connected to
+> > it.
+> >
+> > STM32MP13/15/25 SoC device tree files are updated in this series to
+> > implement this mecanism.
+> >
+>
+> ...
+>
+> After minor cosmetic fixes, series applied on stm32-next.
+> Seen with Arnd: it will be part on my next PR and will come through
+> arm-soc tree.
 
-Even mm-unstable drops patches on a hair trigger, as an example.
+And there's some new warnings in next with it:
 
-You can't have an orderly development process if your development tree
-is broken in your CI.. Personally I'm grateful for the people who test
-linux-next (or the various constituent sub trees), it really helps.
+      1  venc@480e0000: 'access-controllers' does not match any of the
+regexes: 'pinctrl-[0-9]+'
+      1  vdec@480d0000: 'access-controllers' does not match any of the
+regexes: 'pinctrl-[0-9]+'
 
-> Well much of it has to do with the fact that this is supposed to be a
-> community. Generally I help you, you help me and together we both make
-> progress. So within the community people tend to build up what we
-> could call karma. Generally I think some of the messages sent seemed
-> to make it come across that the Mellanox/Nvidia folks felt it "wasn't
-> their problem" so they elicited a bit of frustration from the other
-> maintainers and built up some negative karma.
-
-How could it be NVIDIA folks problem? They are not experts in TCP and
-can't debug it. The engineer running the CI systems did what he was
-asked by Eric from what I can tell.
-
-> phenomenon where if we even brushed against block of upstream code
-> that wasn't being well maintained we would be asked to fix it up and
-> address existing issues before we could upstream any patches.
-
-Well, Intel has it's own karma problems in the kernel community. :(
-
-> > In my view the vendor/!vendor distinction is really toxic and should
-> > stop.
-> 
-> I agree. However that was essentially what started all this when Jiri
-> pointed out that we weren't selling the NIC to anyone else. That made
-> this all about vendor vs !vendor, 
-
-That is not how I would sum up Jiri's position.
-
-By my read he is saying that contributing code to the kernel that only
-Meta can actually use is purely extractive. It is not about vendor or
-!vendor, it is taking-free-forwardporting or not. You have argued,
-and I would agree, that there is a grey scale between
-extractive/collaborative - but I also agree with Jiri that fbnic is
-undeniably far toward the extractive side.
-
-If being extractive is a problem in this case or not is another
-question, but I would say Jiri's objection is definitely not about
-selling or vendor vs !vendor.
-
-Jason
+Rob
 
