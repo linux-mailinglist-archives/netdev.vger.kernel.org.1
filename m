@@ -1,49 +1,46 @@
-Return-Path: <netdev+bounces-86092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7D4089D841
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:41:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77A0C89D853
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:43:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 730DA289F91
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:41:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CDB21F21207
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B8D86AF4;
-	Tue,  9 Apr 2024 11:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F86486242;
+	Tue,  9 Apr 2024 11:43:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pzL+6kJa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d46EgBGB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05EE28004E;
-	Tue,  9 Apr 2024 11:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B46B42053;
+	Tue,  9 Apr 2024 11:43:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712662828; cv=none; b=lAonO4iXSemaQN6m2TPg+rwXNtNSGwPKfkHpHfUBgRsGFg2HmkEAaz7KlCAE/AQX2X2MZgqm9nWj6dpU1Yh1cvSjvBNljA+keTRnqUMirMKOg2IR9ZJX/pGtYGYdqY3OJBLzOUB07E/gmquh9+p4mbJpaH54mOjqs8UACtF8Iao=
+	t=1712663034; cv=none; b=MbiNnLYYSMF1KTcUlop/hulVv/DG84zJphKCLOcLkR3bQsqE0x7jjNVlJA4DWyx9OX6w07KXzamtBSEhBFQoRwEi2iyLL7dTqm4ctxnRkM68trH9Qp6Ri4MIVx7eRafrBS1jRd6/bJ6X8oR6Zf+titRTgEi+/6VOUj+uRc9x774=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712662828; c=relaxed/simple;
-	bh=MDm0KRglBzo5PbbZbHHd+NCNNsHxXViVQ+IbGUpzics=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=b36M2QwJ3sk8R15F2whzObFWhJ3awy3nN7xDvz8xT4fLVTEWRStmMnMTzMFhu3t412bN5fbU+x5afJjBN9RqiBPQc+ROG2NizWoZVs+FnuZMIlspLW2RhdRSrYI232Q6pyQuaFduSfjVIc7SwLVwBBiEkhlRAVbytNlHJmYYnbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pzL+6kJa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 859F1C433C7;
-	Tue,  9 Apr 2024 11:40:27 +0000 (UTC)
+	s=arc-20240116; t=1712663034; c=relaxed/simple;
+	bh=nbeeO/HdiPZM8HHVLpt1fCwCNBVTR0HOgVLESsZWhOI=;
+	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:References:To:
+	 Cc:Message-ID:Date; b=MYvmVbl0o0W672vnkOrw+BfPjRyRGGdHo5rHW7mnMBJytKUVKvUIqwsLc0k9noQVKz+Wulo8cksNvVssKYpPsrM+hWGI5/A9Y4BiPwovlo+C4O1CO29fQn9rlFKevbkXiJ5dEhuAforHNT1GkBXBa9+95U0rx+mP+8OsoAgbVs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d46EgBGB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D44DC433F1;
+	Tue,  9 Apr 2024 11:43:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712662827;
-	bh=MDm0KRglBzo5PbbZbHHd+NCNNsHxXViVQ+IbGUpzics=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pzL+6kJaDdYmTmRlcOvJ2z5VrVEFabYiYR/bxbdw6mPCztSRaxTjlVXSELOVjzSuF
-	 h3Ui2P3fLh2PL3460wQDcaEKnZNHS64gKULMQ/ywho9MwUqniWuDm/s4VIdiNDudi5
-	 RK47zeRtn45sYzkLQxJzUvFCsehKRdkBf0m4b4hk/0tlSqhnMXWRt++b8nypQwXGvv
-	 e/ecFRCO606xd8j/7j2rxNpoWpyHVOx1wLQ2rHH5Gdd7f+E/lJmt26F5VAgEYOPggM
-	 s5y3MOuf9E+8Wm5Cm8zwvqIEtTr2MDOqKxuQv12El8ExSf+A8tcExN6leXFEefb53h
-	 X02ogHi+iqlJg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 73C10C395F6;
-	Tue,  9 Apr 2024 11:40:27 +0000 (UTC)
+	s=k20201202; t=1712663033;
+	bh=nbeeO/HdiPZM8HHVLpt1fCwCNBVTR0HOgVLESsZWhOI=;
+	h=Subject:From:In-Reply-To:References:To:Cc:Date:From;
+	b=d46EgBGBB+dImlGf5ySrLOyH8Ij3UrZQPzy4rRGGekUc48s6LOWgQaPOdY3zEgMrb
+	 DO+ftabH7b6ZH6g39eV2l9yV0LxEDg9HCUZxy3wN+9z9gffSuupiELVlZgLW9Akbya
+	 M3RLvjkJZ8ObgnMZwfjMMpd0zsNZUO92xmeIOKNA1e36B/vBLCWYDPtJObdYvr6VaS
+	 Q3jTycG3C8+o8NDe3wVxTpZglXPlZNeb9zp2ceyNA9qlJ3Ci43tHFQeuZWi93DQc8q
+	 pew28ArfhUw0IXj+aeUC7J4vyQ8YCqrXjhpTQex3N6zSlEl40rMQdQD50sxIuRR8rU
+	 tK+FeYLqyrmUw==
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -51,45 +48,52 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] dt-bindings: net: rockchip-dwmac: use rgmii-id in example
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171266282747.30909.11983889718535172879.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Apr 2024 11:40:27 +0000
-References: <20240408-rockchip-dwmac-rgmii-id-binding-v1-1-3886d1a8bd54@pengutronix.de>
-In-Reply-To: <20240408-rockchip-dwmac-rgmii-id-binding-v1-1-3886d1a8bd54@pengutronix.de>
-To: Sascha Hauer <s.hauer@pengutronix.de>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, heiko@sntech.de, david.wu@rock-chips.com,
- netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org,
- linux-kernel@vger.kernel.org, andrew@lunn.ch
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v7 2/3] net: qrtr: support suspend/hibernation
+From: Kalle Valo <kvalo@kernel.org>
+In-Reply-To: <20240305021320.3367-3-quic_bqiang@quicinc.com>
+References: <20240305021320.3367-3-quic_bqiang@quicinc.com>
+To: Baochen Qiang <quic_bqiang@quicinc.com>
+Cc: <ath11k@lists.infradead.org>, <manivannan.sadhasivam@linaro.org>,
+ <linux-wireless@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+ <mhi@lists.linux.dev>, <quic_bqiang@quicinc.com>, <davem@davemloft.net>,
+ <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>
+User-Agent: pwcli/0.1.1-git (https://github.com/kvalo/pwcli/) Python/3.11.2
+Message-ID: <171266302937.3197288.10067259080549350573.kvalo@kernel.org>
+Date: Tue,  9 Apr 2024 11:43:51 +0000 (UTC)
 
-Hello:
+Baochen Qiang <quic_bqiang@quicinc.com> wrote:
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon, 08 Apr 2024 08:44:10 +0200 you wrote:
-> The dwmac supports specifying the RGMII clock delays, but it is
-> recommended to use rgmii-id and to specify the delays in the phy node
-> instead [1].
+> MHI devices may not be destroyed during suspend/hibernation, so need
+> to unprepare/prepare MHI channels throughout the transition, this is
+> done by adding suspend/resume callbacks.
 > 
-> Change the example accordingly to no longer promote this undesired
-> setting.
+> The suspend callback is called in the late suspend stage, this means
+> MHI channels are still alive at suspend stage, and that makes it
+> possible for an MHI controller driver to communicate with others over
+> those channels at suspend stage. While the resume callback is called
+> in the early resume stage, for a similar reason.
 > 
-> [...]
+> Also note that we won't do unprepare/prepare when MHI device is in
+> suspend state because it's pointless if MHI is only meant to go through
+> a suspend/resume transition, instead of a complete power cycle.
+> 
+> Tested-on: WCN6855 hw2.0 PCI WLAN.HSP.1.1-03125-QCAHSPSWPL_V1_V2_SILICONZ_LITE-3.6510.30
+> 
+> Signed-off-by: Baochen Qiang <quic_bqiang@quicinc.com>
+> Reviewed-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+> Reviewed-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+> Signed-off-by: Kalle Valo <quic_kvalo@quicinc.com>
 
-Here is the summary with links:
-  - dt-bindings: net: rockchip-dwmac: use rgmii-id in example
-    https://git.kernel.org/netdev/net-next/c/220d63f249ec
+2 patches applied to ath-next branch of ath.git, thanks.
 
-You are awesome, thank you!
+e0cd1185900e net: qrtr: support suspend/hibernation
+166a490f59ac wifi: ath11k: support hibernation
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+https://patchwork.kernel.org/project/linux-wireless/patch/20240305021320.3367-3-quic_bqiang@quicinc.com/
 
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
 
