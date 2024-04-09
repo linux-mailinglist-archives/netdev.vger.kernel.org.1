@@ -1,83 +1,127 @@
-Return-Path: <netdev+bounces-86128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9B1189DA1C
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:25:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A6B789DA49
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:34:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 895001F225EF
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:25:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BA281C20291
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:34:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D804612F36B;
-	Tue,  9 Apr 2024 13:25:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50877131BCB;
+	Tue,  9 Apr 2024 13:26:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HqKVDGWe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LC2ntJhT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC8EE8287F;
-	Tue,  9 Apr 2024 13:25:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BCB613541A;
+	Tue,  9 Apr 2024 13:26:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712669106; cv=none; b=XjpoqjN938O2JevvKgTnjJjd13GWjSbPh7D+9cQYvfUjZaimD/0sWoZgvjlskCPJFDDxYq9g0cyW1TUiIj1Ox52qjHANq4MqYObGmmDjM2C5mmTFAstkoy69fxpvhxz3k3N/nA/TG8SeujhchvXTxTGWGdEVWHpss0ckFzP2IcE=
+	t=1712669173; cv=none; b=Hx4nXku9XEcT6eBv5ewohFlL1n8S3YdpepLCJ2nTjLKz9GK5VI4GxfVbx+8UMS6ZKMjHZjv5AkxGq7QDOWmJvvUa/q1L9ZlFSyvYgWdoFkTIDn3tLMctyGZLYx/6lQ6l8O1eKqvbtE3LzZSMkWu7+bdZy8Jn2XeOzn7yZVswMJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712669106; c=relaxed/simple;
-	bh=lYb+9nYvWZ6/nFOvZ0AnbCOYQrH9S92MDjSojdFNMLo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FMq90WqEo4ch4sZap+DRShXRmfrVVdWkQgXgCct5gldTPLl0ayWA+OkLXJjZHHDEY/5btnmJINU87e2KiBLhhlJWa7Ch+TGJp+WskN19k94+pXHU+4NzZRmb1jhrHKwdNVcS0lEyBWPcZTZPvAf63L2LpMaBSKSkNmNoFpfLU9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HqKVDGWe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7152C433C7;
-	Tue,  9 Apr 2024 13:25:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712669106;
-	bh=lYb+9nYvWZ6/nFOvZ0AnbCOYQrH9S92MDjSojdFNMLo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HqKVDGWenvKG+1md3BZViUm6OUHXEea/2xOh2UiaGdonxT4FUiFtM1NT2NixP5VGQ
-	 kSjB057DuhGjauEDkP2xAReiF710GsfjZPBXelpwdZbM3aOsCQBnXITOHm9QiNXZ/S
-	 9DPGMVwKGUjEoUcu0RRqnM1OXIPjAQBXkA8PbeAV3thF/pxPisMniFwQNte7DWCu55
-	 y6SgfbgH0Jn5th/ApTmco0xS254asHOulc6gDn6RoZu7q24XRd9DvwP/Q4/Vo9lW4Z
-	 uDbyjYONqXNLvB06PUVjzVlpvWVrItB67YbwX35+6wRFS+eX4o1F739ZpF7muD/yEt
-	 37bl8nBTDdhEA==
-Date: Tue, 9 Apr 2024 06:25:04 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>, <davem@davemloft.net>,
- <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew
- Morton <akpm@linux-foundation.org>, <linux-mm@kvack.org>,
- <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH net-next v1 12/12] mm: page_frag: update documentation
- and maintainer for page_frag
-Message-ID: <20240409062504.26cfcdde@kernel.org>
-In-Reply-To: <09d7d59b-9da3-52f7-b039-acd0344c88c8@huawei.com>
-References: <20240407130850.19625-1-linyunsheng@huawei.com>
-	<20240407130850.19625-13-linyunsheng@huawei.com>
-	<b5c5866e626f6c90657a32b5e9adff724d5896db.camel@gmail.com>
-	<c1f5a78a-3040-0cc7-f113-d5ec82c6010f@huawei.com>
-	<CAKgT0UfZBGEVJa1O7cdNt6zy_EEPoGo=aW6ugRKy8a44qg0j8w@mail.gmail.com>
-	<09d7d59b-9da3-52f7-b039-acd0344c88c8@huawei.com>
+	s=arc-20240116; t=1712669173; c=relaxed/simple;
+	bh=NRfonwhpoIHlyGTCngWwrNE/NRmaYKM3LIAHKHkw2ak=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WhAJseAPmUMDwUatU3vWFRywazXgOG0DoiJ+X0RbP6PIzTpP9ssT2FMfZw8k5cL2XbcJ6pLQ+btLEGHqX72MUC4K0X4H6MKRqUTVkGoF3gsq2spIoV/OGhpDK5QUsGjEVQD4caRRiuVC29hNpfpTm9OFmEi5qCtlj8fQB8go78w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LC2ntJhT; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2d4a8bddc21so79257751fa.0;
+        Tue, 09 Apr 2024 06:26:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712669169; x=1713273969; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NRfonwhpoIHlyGTCngWwrNE/NRmaYKM3LIAHKHkw2ak=;
+        b=LC2ntJhT05GfrRp8yCBzBJhiTIM83cChFNknn/f+34utFUnPedY9bJZEo7R4vE6KEA
+         B4iy+ed9QSHwbzqRz2w/BcjbdyVYXuRgLJ/rLRmnBj8EcJF70Zi2JriWe22SR9dzaDBZ
+         8J1IQW0G9/1fAefXkVUO7NE8aw42XvvuaK6qcBapRwDnYX2lwZhRSRHi6d8xv2lovQUQ
+         jTrccqeSRRE7PqmxWhsyofP+Az7iHS4dnkgSCK/hzMGXynWLTk+J0IxQNGhEv4aUP1i3
+         gk+ekNZjGFDPJKMNxSbdKMC71sTNzNIVQON1LjijVO7qXaAOeD9i2S14HH4nRH4vSXF3
+         H6wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712669169; x=1713273969;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NRfonwhpoIHlyGTCngWwrNE/NRmaYKM3LIAHKHkw2ak=;
+        b=I1uoXklv81Jbs9F3Qa960EW86oE4YehCigkOBQjE3mpsSY68g0UiVPMZ0EHam62iN4
+         ywXFK+Cg8xOZkuwk6ZGkN+qKAnQLApE/W5OvlVHIxruIco2I3dpQjE+APVlnESs60Jue
+         fentgPt047SvL7m3x7ggpJjDrOhJ/4c+IrV29yg0BYGOOojpGH2bgs8f12S7xRR81T3R
+         Ec39ZbInZjc2E8lNleqfSItMVfrWk65Ip/zk7snAzmlOS3mIYcRpUtnVv5pJQY8yD2nL
+         rw6K7WWn1/dYXH/MZSA//miXhsqLH6OAJ78mdcuET4HoHKb0coW2AeAk93BPF2UCrUdi
+         v2YA==
+X-Forwarded-Encrypted: i=1; AJvYcCVjuRKnCa10KADetygJ8cKPid2vvS76EmCjsOjY74Jq3ukRnqFyfWZosyRmshkRsrQMHhNyBgir5EgL8FJjYC88wGOVh/QZuL2P4ka00G/jigJ2p+Vy58UP/FbGiBsWBmhmfHHbFdMGFvbQrONBu4sTYjjz8D/2fAvobVYTQnnrP/ej/B0J
+X-Gm-Message-State: AOJu0YyzZaLvxFKrFM7bZSADw68yJH/tksH7a8x7IOESQ7pyLWQr8gF5
+	syXP6GNXkhHhA/HYVzN+s9s9qKDYscqS/ANn3io7kgTNvy8KIVeEYiOarC3URxJTvZPmSW27jd/
+	/b0X8KfHNxs/aXJaSN35ZFo4pKoY=
+X-Google-Smtp-Source: AGHT+IHAPHXHtgUs1qAu/E5SZP8WJRLPM9FzA79lxB78vKF9mD5MkB/RXLIGH/UeMbfELkRBzsmtbxm7HxUeige5O2M=
+X-Received: by 2002:a2e:9b84:0:b0:2d6:cbf2:ed2b with SMTP id
+ z4-20020a2e9b84000000b002d6cbf2ed2bmr8075321lji.30.1712669169282; Tue, 09 Apr
+ 2024 06:26:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <234da60a-709f-4430-b594-386b7c2b65f5@molgen.mpg.de>
+ <tencent_15CA920ADD9ADDCA19654FBE8DB5A5B88D07@qq.com> <7cf0848b-f44c-42ad-848a-369a249bff77@gmail.com>
+In-Reply-To: <7cf0848b-f44c-42ad-848a-369a249bff77@gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Tue, 9 Apr 2024 09:25:56 -0400
+Message-ID: <CABBYNZJ2hGRAaPOkyC8vHrsqNtfMS2N4cMAMQTY6M9gdYdthog@mail.gmail.com>
+Subject: Re: [PATCH] net/socket: Ensure length of input socket option param >= sizeof(int)
+To: Eric Dumazet <eric.dumazet@gmail.com>
+Cc: Edward Adam Davis <eadavis@qq.com>, pmenzel@molgen.mpg.de, edumazet@google.com, 
+	netdev@vger.kernel.org, johan.hedberg@gmail.com, 
+	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	marcel@holtmann.org, syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 9 Apr 2024 15:59:58 +0800 Yunsheng Lin wrote:
-> > Just to be clear this isn't an Ack, but if you are going to list
-> > maintainers for this my name should be on the list so this is the
-> > preferred format. There are still some things to be cleaned up in this
-> > patch.  
-> 
-> Sure, I was talking about "Alexander seems to be the orginal author for
-> page_frag, we can add him to the MAINTAINERS later if we have an ack from
-> him." in the commit log.
+Hi,
 
-Do we have to have a MAINTAINERS entry for every 1000 lines of code?
-It really feels forced :/
+On Tue, Apr 9, 2024 at 9:07=E2=80=AFAM Eric Dumazet <eric.dumazet@gmail.com=
+> wrote:
+>
+>
+> On 4/9/24 14:15, Edward Adam Davis wrote:
+> > The optlen value passed by syzbot to _sys_setsockopt() is 2, which resu=
+lts in
+> > only 2 bytes being allocated when allocating memory to kernel_optval, a=
+nd the
+> > optval size passed when calling the function copy_from_sockptr() is 4 b=
+ytes.
+> > Here, optlen is determined uniformly in the entry function __sys_setsoc=
+kopt().
+> > If its value is less than 4, the parameter is considered invalid.
+> >
+> > Reported-by: syzbot+837ba09d9db969068367@syzkaller.appspotmail.com
+> > Reported-by: syzbot+b71011ec0a23f4d15625@syzkaller.appspotmail.com
+> > Reported-by: syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com
+> > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+>
+>
+> I think I gave my feedback already.
+>
+> Please do not ignore maintainers feedback.
+>
+> This patch is absolutely wrong.
+>
+> Some setsockopt() deal with optlen =3D=3D 1 just fine, thank you very muc=
+h.
+
++1, I don't think the setsockopt interface has a fixed minimum of
+sizeof(int), so this is a nak from me as well.
+
+--=20
+Luiz Augusto von Dentz
 
