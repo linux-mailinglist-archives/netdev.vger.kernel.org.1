@@ -1,93 +1,127 @@
-Return-Path: <netdev+bounces-85971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0932789D10C
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 05:30:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2479589D186
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 06:32:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89A242857A7
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 03:30:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B8AB91F243E7
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 04:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 446F654BEF;
-	Tue,  9 Apr 2024 03:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TWx//MqQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 125AF79F0;
+	Tue,  9 Apr 2024 04:32:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4D154902;
-	Tue,  9 Apr 2024 03:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56CF26AC7
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 04:32:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712633428; cv=none; b=OC+f88X0G7duijsSiGbyc5CSDdTBGEe06wmubHUFcCUY1fae7ngj9ALoARmwCOSG8yfp7IZRs6ZOLiMSAKq3QAgb8dUFzp6sTaXKqnqYQKMoaMdd4wY0qw12cC30QThqd0ZaYYs/GrJjsmXxNQj9hn7Wzrcz4HUx6PGw3SKSIU8=
+	t=1712637129; cv=none; b=krHgITtY+8U53cljtHidYy85Hj78PJMaPHCHyMrCiDG7c2d1AuTf6/emoFH6Png7qygWmihrocBUhVvYqfOoGA1+VTBz815bMltKRJO0hZGFQwJblB6ENyZXeSW6SKTq70Rm4Bx8/uzQBPV/6zhut6ObiwBZF0nEkO/Gd0YZrBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712633428; c=relaxed/simple;
-	bh=IT9K8ZBAJIEBsxtEWZHP8/Co0XZaLR9maZwSDZWmjRk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hN1ci0kHx8eSPuJl+SKJTo3DHMwUtFMQRHXtGCrEOHnZgNtDG3Ulhl3dwk4l26CijFRek0en/ltjd2ZghsRZ/LVZ33XiRk3B9T8iwTJX/Ofz9eJXq2cw61wsEVT8gxri9UNheK/Yg/Fi/z5qO8SQr/Dr15LPFpAzRQN6sRYYcQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TWx//MqQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DCB27C43141;
-	Tue,  9 Apr 2024 03:30:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712633427;
-	bh=IT9K8ZBAJIEBsxtEWZHP8/Co0XZaLR9maZwSDZWmjRk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TWx//MqQgAbZQ867FwtZPD/D4KLHhsyFD/HBGdv08XkF6TZeScS1yEZ3AJjTBKREO
-	 xchEISXFoJRA3cgbU3l+xmfC2Kv/+MQmgqzarM7HlZFOhAy1OTAc9QHcS5rfu+KITu
-	 2wRkWzEcSOlcrqf3qOwGUgS6qkGmmD6xq3qXGDHsVa1DzAVtHKcKVUS9dQpUweLPQx
-	 pugoh3CUiAATMoYGUJ9KvMAduP+DR7GGj6sri664CB11m0MWwf4FHidQVV/QkVudU7
-	 3cjFFi8Fv5Qi8YLH7rPqOWykToZp9TqeLH7VAocNYlTbywUTAF14y3ZmAW+g/fXQbB
-	 jaz7lEEhovhvQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D20BBC54BD4;
-	Tue,  9 Apr 2024 03:30:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1712637129; c=relaxed/simple;
+	bh=dPvPqUERy12DlCuYBp4kJOrK+EGsyRWG0aIs7+b7590=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X4zBTPYOD3yCIZVM/N1yiudhl5dQJzTn0/kdZvP5FA1VRedM/MeL70zasoI3ePqGrzm2cMWu97bLxCOktuqB6E7XEqfxIabiZzneRQJMxKkm/qJ88fjs/pSQEote2tuSRxD3wq5DGjpAvpX6rng3FtURaleGGy6szaPwa/Q5NI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ru39E-0004ek-Fn; Tue, 09 Apr 2024 06:31:52 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ru39C-00BErS-Fh; Tue, 09 Apr 2024 06:31:50 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ru39C-004MsH-1F;
+	Tue, 09 Apr 2024 06:31:50 +0200
+Date: Tue, 9 Apr 2024 06:31:50 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Arun.Ramadoss@microchip.com
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+	Woojung.Huh@microchip.com, pabeni@redhat.com, edumazet@google.com,
+	f.fainelli@gmail.com, kuba@kernel.org, kernel@pengutronix.de,
+	dsahern@kernel.org, san@skov.dk, willemb@google.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	horms@kernel.org, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next v4 5/9] net: dsa: microchip: add support for
+ different DCB app configurations
+Message-ID: <ZhTEtmcvubthMXmB@pengutronix.de>
+References: <20240408074758.1825674-1-o.rempel@pengutronix.de>
+ <20240408074758.1825674-6-o.rempel@pengutronix.de>
+ <40d90a28d95bff48f352a3aaf81df2b1a6133cc7.camel@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phy: air_en8811h: fix some error codes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171263342785.31710.18050007236455622800.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Apr 2024 03:30:27 +0000
-References: <7ef2e230-dfb7-4a77-8973-9e5be1a99fc2@moroto.mountain>
-In-Reply-To: <7ef2e230-dfb7-4a77-8973-9e5be1a99fc2@moroto.mountain>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: ericwouds@gmail.com, andrew@lunn.ch, hkallweit1@gmail.com,
- linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <40d90a28d95bff48f352a3aaf81df2b1a6133cc7.camel@microchip.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello:
+Hi Arun,
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri, 5 Apr 2024 13:08:59 +0300 you wrote:
-> These error paths accidentally return "ret" which is zero/success
-> instead of the correct error code.
+On Mon, Apr 08, 2024 at 04:10:15PM +0000, Arun.Ramadoss@microchip.com wrote:
+> > +int ksz_port_get_default_prio(struct dsa_switch *ds, int port)
+> > +{
+> > +       struct ksz_device *dev = ds->priv;
+> > +       int ret, reg, shift;
+> > +       u8 data, mask;
+> > +
+> > +       ksz_get_defult_port_prio_reg(dev, &reg, &mask, &shift);
+> > +
+> > +       ret = ksz_pread8(dev, port, reg, &data);
+> > +       if (ret)
+> > +               return ret;
+> > +
+> > +       return (data & mask) >> shift;
 > 
-> Fixes: 71e79430117d ("net: phy: air_en8811h: Add the Airoha EN8811H PHY driver")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
->  drivers/net/phy/air_en8811h.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+> I assume we can use retrun FIELD_GET(mask, data), since mask is GENMASK
+> format. 
+> 
+> > 
+> > +int ksz_port_set_default_prio(struct dsa_switch *ds, int port, u8
+> > prio)
+> > prio)
+> > +{
+> > +       struct ksz_device *dev = ds->priv;
+> > +       int reg, shift;
+> > +       u8 mask;
+> > +
+> > +       if (prio >= dev->info->num_tx_queues)
+> > +               return -EINVAL;
+> > +
+> > +       ksz_get_defult_port_prio_reg(dev, &reg, &mask, &shift);
+> > +
+> > +       return ksz_prmw8(dev, port, reg, mask, (prio << shift) &
+> > mask);
+> 
+> FIELD_PREP(mask, prio)
 
-Here is the summary with links:
-  - [net-next] net: phy: air_en8811h: fix some error codes
-    https://git.kernel.org/netdev/net-next/c/87c33315af38
+Sadly, FIELD_GET() and FIELD_PREP() do not work with dynamic masks.
 
-You are awesome, thank you!
+Regards,
+Oleksij
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
