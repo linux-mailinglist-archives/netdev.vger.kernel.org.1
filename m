@@ -1,227 +1,205 @@
-Return-Path: <netdev+bounces-86314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C057489E60E
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 01:26:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8546189E610
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 01:27:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AACCB2186E
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 23:26:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EEE31F21F82
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 23:27:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7C88158DBE;
-	Tue,  9 Apr 2024 23:26:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD7A8158D6E;
+	Tue,  9 Apr 2024 23:27:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="culHpbtS"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="I/RaT1BF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34081EA6F
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 23:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712705194; cv=fail; b=Vf03Lf01KatGIVCH4xHdGA7TatyrftRoC6+AtTupVlq6a810uhmTh6jyyY5DPqqp8qLH6O0WL3xxU3WhdWEwTSQMQdKbQbg8RP/62yabo4JfbiQ1sYzNpnkd+oD0/UunttA7enxmfP/zWN8vPG9vfqpCs5FutTqrjI8AjooyYzM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712705194; c=relaxed/simple;
-	bh=JmIPXKe4ZFWDGi0qUlMPEfEVO0rE1p9Cmwj1kM6Yq7g=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=hsSaqT2+kYXOhzcl/VfoZKeUyubOQz+O4PulX8sgljz8uB+khJxr01qSXcWsnHjpLoHyYIKivAiy/e3clDgyIOGozHBi/5XgxKg0r/+ZRVw7d62NoELb7IQbpXv4BHDkZSbRFTn788Mvysz9uBBZFpnBxCFJTvu0XmODXZYd0EU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=culHpbtS; arc=fail smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712705192; x=1744241192;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=JmIPXKe4ZFWDGi0qUlMPEfEVO0rE1p9Cmwj1kM6Yq7g=;
-  b=culHpbtS7JyvSCIfMl/XfV6F9gTnfTuGqaN+59EiYK5l1uLleDzDvZWD
-   OG96/h+gjWgrPkvLWGj4RknhMttdWR3z4AucUPxI1KQWv7/6vY3XostE/
-   zfWb/HTR2yuGsbg7G1sL08/o+FuLvlb6U3k3zMESLrW/8bnLDpSuXr571
-   L6NaSXt883eZB7cCkbqaNuLARoDF9GvQvpf/CNMhO1LIGl5I+Z2sSn0aT
-   bHAmMlUonlqqb6CcEzA+BBWVrnsK1THfopFAnnDOZ1308Szwd0HTTfuK+
-   L/Mc/f7NFKFzA7RlUVZpamOOltDN+bF9FWsS8E78Rlu53/wT+WNC7ff0M
-   w==;
-X-CSE-ConnectionGUID: jS/Bguz/Rqauyfn9kU2fFA==
-X-CSE-MsgGUID: z3dsYV03RH629kuAOHc3Fw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="7901929"
-X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="7901929"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 16:26:31 -0700
-X-CSE-ConnectionGUID: MiP2VM78QWGjaXvfQjJ6lg==
-X-CSE-MsgGUID: H8nhLKLLQrmOcx75xfC1qA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="20350695"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 09 Apr 2024 16:26:31 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 9 Apr 2024 16:26:30 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 9 Apr 2024 16:26:29 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 9 Apr 2024 16:26:29 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.41) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20AD1E491
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 23:27:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712705237; cv=none; b=tZgdnis/fkCv13O7hiv2qHCbBnWq2x/hBaKMHlC974PXciYY04QeCPsVdtiklpobyOEpp52RHpbU9uk8O5gek9lhF4pzMM0q6ju/skBKDM0AYzoRY4r2DSOvPKShE1ytQ/zpSlR7NZ8E2MJBN79CU+Aw7gxr6b7S5u9JPmFObEE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712705237; c=relaxed/simple;
+	bh=fNeqRVOwZzV5wHs2j9Xy9PDbixHuZsXUsJ5e6TZhr3s=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TcBiGa5LHyPm7CEipdlJIhou82W1HAD993k5vBts/PKmR93OOO3IYPburDwJB7/cJ/pGWsoOX21yWvr55SGALpd2wCH1KPVsmCXBDMJWZs6ZsLC2oTpetCwfajHW3940ITNbo/y/YdD48/wNmGNwpClqpiSd8Cjcd8bXyKUMXZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=I/RaT1BF; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1712705235; x=1744241235;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=OzVKdqAXFeFy9aFjTXv7nAszT2GydUGeixqWy+oWZ+o=;
+  b=I/RaT1BFWJMMc8jHggaA8DzXL25aEYlkX4tfpThVT6jz6xAdGDrma58T
+   ppervDCHS3+Vue8nlyuUVc0mOWMgrGYODflKQzK0B0ioACFb0XegfJkbD
+   uOYuq3IL7neLzO/cSPFdE4J5E1LdKO45Fsuod8BxzqNKz8o9RATsHs1Ag
+   M=;
+X-IronPort-AV: E=Sophos;i="6.07,190,1708387200"; 
+   d="scan'208";a="79946757"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 23:27:14 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:20003]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.36.40:2525] with esmtp (Farcaster)
+ id faf7531f-a1a5-4c8d-a1b8-533782f4be8b; Tue, 9 Apr 2024 23:27:13 +0000 (UTC)
+X-Farcaster-Flow-ID: faf7531f-a1a5-4c8d-a1b8-533782f4be8b
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 9 Apr 2024 16:26:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PsOzeDaEgIzk3HFH/iwMR7P3qyhJ+dQR9JD51PhcAoEqf33ZR18Xe9Oq721GUYzH4yuCTK1dAxRsfj2yMd14xy4gcDpkpptsPHz+LWH4hA0GZJVXrdMTGcGChqti5uvH7BH6vC8EaUrJxBVL6aDtGF51qNngQFY5iMFzjbcQR8xBI2QvIJQvEOy3WPr6TIN2B/Qw9uqQJDtRw1V9r2yaFNDyEMtJCqbBYp+R+TY/c07Ge8Q4KMsAEIPP4wbsg42bYvPuCTNRwkQW53fTCHKI3jiIIssqsNCNkPZNJ04t8l8vsUlexjUx9EC3YBeyYlgSpzvjSU6fsmIEJdCSWB3Bmg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3I5cEG9KNxuNCc4Vy9hTKczVO+WuPgLShweFSQOs5Io=;
- b=Jfbj1BiKjERYTiUgjScKYSmWonOorv82GYfBy3xbuPCTe0vTl/fOFkyUISN8Ixrq185e0OeQGcgoolYQHbPWm0xDiIraFbY3uN2wUCq4bzrZ8X6OHSIeIQAXXKmfP9IHTqj36h/wMWfV2ixFka9yzCdMq43QF5pjToNSHyeYQSvhNB33/J7CGDE2CZ//0jB0dYNUtojrDDmVQatxZvWNRMkhQEPwdZzQe1eKN8UrRGKIPHl/+IKHVQOwPzCV7ix5NvGwwZaBQgw8GVisBsJkZOPqQGWOUYGOaK36BIGJnAEQsWu7DWPXg01XbAll8ShbdUAerg360LCcPzR7z7UEtg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by MW5PR11MB5905.namprd11.prod.outlook.com (2603:10b6:303:19f::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26; Tue, 9 Apr
- 2024 23:26:27 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::b383:e86d:874:245a]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::b383:e86d:874:245a%5]) with mapi id 15.20.7452.019; Tue, 9 Apr 2024
- 23:26:27 +0000
-Message-ID: <721f07ab-4dc1-4802-957d-1e71524ac31a@intel.com>
-Date: Tue, 9 Apr 2024 16:26:16 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/7] bnxt_en: Skip ethtool RSS context
- configuration in ifdown state
-To: Michael Chan <michael.chan@broadcom.com>, <davem@davemloft.net>
-CC: <netdev@vger.kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <pavan.chebbi@broadcom.com>,
-	<andrew.gospodarek@broadcom.com>, Kalesh AP
-	<kalesh-anakkur.purayil@broadcom.com>, Somnath Kotur
-	<somnath.kotur@broadcom.com>
-References: <20240409215431.41424-1-michael.chan@broadcom.com>
- <20240409215431.41424-2-michael.chan@broadcom.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20240409215431.41424-2-michael.chan@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0093.namprd04.prod.outlook.com
- (2603:10b6:303:83::8) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+ 15.2.1258.28; Tue, 9 Apr 2024 23:27:13 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.100.45) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Tue, 9 Apr 2024 23:27:10 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <mhal@rbox.co>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net v2] af_unix: Fix garbage collector racing against connect()
+Date: Tue, 9 Apr 2024 16:26:59 -0700
+Message-ID: <20240409232700.61277-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240409201047.1032217-1-mhal@rbox.co>
+References: <20240409201047.1032217-1-mhal@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|MW5PR11MB5905:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 44vYV4fDCKVxqqfgeGqfJopQRcLIFwpFhIrltoSydEtfPu+9ervhheN6FzExNdRVqv0nly/1qyTzRWO2Q9uDWiD46T3wvSDDQ8dmPXzXSkY6pNcGoXIx3kzb0x7ZjGI0tDSLpFVWC2lSBRLQSYS8nWsFgkF+2HsRkl9eztky0K15TvWG4dnFhONAJO9vNR/FsvSbFzrEc4v8FSC767Bwtncr5zMJ2XivVH/gFwh1YvOWA8t9ZzsvR5n2p+IqYxGHTYDY4MuohaWpuf9w0n2sRHJRvkQOU+xLQDg7OrGPxDVFo6U4XJLQcrbE77sR3cPtgsLYjj/Au6EN3R+OftVrrsBRCQiSxvb81BLMjsizaZpPOkqZLIv3LGprfg0jREZDrEeI7m+7r8L4P0kFBRFCEHELyxFDY9QShaKz7BbLMPXPEjCGbPCKvudZuT314xVGF395NcL3Xk4lPwyf8BVue4TAuXTDYZtopbEiIEAQI6CNEqPTnNethYmp6YGlHmp+aJalvSzXXpmUZrURs9Q/d2Ywu4llYSYCPQ3tgDHb/cmYpluv+qlN3QTZjRq1MzAvEGWE7W2Xg/imMh18JoejuebGTdHoVveoffEFyismLhWPLQDK678wXr11qqM2jlsq+zSGHx9zml9UR4qTSMmk6yzQ6TImZ2hect925P+fmTw=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(7416005)(376005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RWlUdVNxTTRLZXhrRU1MUmc2OE9IV29uOGdjWVViazJkRHU0MFV6akErcThJ?=
- =?utf-8?B?UHB3Vm5NUTdiNjlseHZYRE1PbXFUQ2liZzlhc2RLNDA1akszK2hvSjhxRStH?=
- =?utf-8?B?M3hXUnphUjdvVXBhczBkQ0RDNURwOTBBR2RZQWR6K0xGOG9sLy85TDRJaGZ1?=
- =?utf-8?B?U05VcWxvNEROdFpSOHNNdmdBUkMrV3FSZ09xbDdaRlYzY21vVWpmUys0R3hG?=
- =?utf-8?B?T004aWJtdVVHUEloclBKNnhCNU8zZWhUWlhwZDRaUlVFU05LQUxjczdvcnYx?=
- =?utf-8?B?THEyRnBIMmllQXVOL0w2cTZNZmJtNkFDbExxNU9oNkx3UVhyQXFiVEdPSVR5?=
- =?utf-8?B?ckVTZlg4cGZzNjBzR3ZvZ1diTlo4dDNtMklmbm1BN3RhSTlUWW5wdVNZL3V5?=
- =?utf-8?B?cHB6M3Q0VXVSSlljRGloSUJ1bWd1enVTUHZMVEEvb3RIdDF2aUI3N0VxYTRM?=
- =?utf-8?B?WGJKdTkvb3Y1eTh3WEhYbjFLQXQ2eWY3dENseWtCdGczQVFuMTZqQ3FZQ3l0?=
- =?utf-8?B?VUNVWCtxQjd2Y1YvRytrR0lyMElZd0E0MnRJcmNvcFdkR053amVlV0h6Q3pQ?=
- =?utf-8?B?YmlTTDFKcjBMTTV0Y2Y3TmFzWGh5Sk5kaEZkU2VLYjIxMk8zbU1ZRVljTTg3?=
- =?utf-8?B?ZXIrWVlXM1hmd1BCNWY1MXIwdm1VdjN1ZlRoWExHbUVMM20vTkt6Qk9qeDYx?=
- =?utf-8?B?aHF6c1pMbm15dXljTjBUeDlpV0prb1VQOTBMWk9QRXp0QnRwajlXM2tOZlJ2?=
- =?utf-8?B?UkVYZVgySHA4UU1sZE12aWtWTTVyVTJsaGVCQmpacktwRzZOSFpnMHJ1N3Nl?=
- =?utf-8?B?UDdzcUl4bDZId2RLdktIakRBSTFBL0ZhK3Q4ZGFwVmoxcmVGVHUwcVdxZ3VI?=
- =?utf-8?B?akR3bGswanhJeGUxN1FTeWhQbHhiOVJLVVNhK3NzcG4ra0VubW9rc25QTlpu?=
- =?utf-8?B?WlBpSHFHakNBbkFUMXprUS9QWmg2d252ZUhqc0ltR2Q1UW5YRW1NU3ZxRmQ3?=
- =?utf-8?B?NFZjSFdoZ1NlYTRsUkFVWm55ZzMrcW8xMTJZYjBqRzhKc0xvd0tuVGd1ZFVI?=
- =?utf-8?B?bGlpUyt5VWxJUVFRWlFMbk5YWlVrQUJMVHhXUlNJQnk0MDFCVm8wWjlnc2pB?=
- =?utf-8?B?ZTN5dmVIL2MzWm9HTkpSTmdnZFd2Y0hWVEtBaEo3NVNkWmhhNlJBS01MSVNl?=
- =?utf-8?B?UWVVci9WK2RSTWtCUXVoNi9TY0pQR3hxM0JJb2VxWUN2NWxwSkY2NURSa25Y?=
- =?utf-8?B?UHVPK0p4SlZwZmNYemlwYnNwaUZBeUVtMnFUdnhZTGUxYmtpRnA2TkZpbDdF?=
- =?utf-8?B?UEVXSjFTUWdpSU9rMi9QWldQUkZVcVJxRnpMWEpMZHFMSDRVeGl1WVFsS2hv?=
- =?utf-8?B?RTd5UXA1VFhRNXdIVSt6UmI3eUl3VmthT3RpaEo4ZElWamFkYXBaS1NpNlpp?=
- =?utf-8?B?QXI2clg5Q2dqYm91TG1oeldwMGdjVnA3OVpQcjdBUmNZeHRLK2poZzFZTVpB?=
- =?utf-8?B?ZXVpeDNpb2gybEdjNTd5K3Q3bFA1OHorUGpaRHZrdFZDYVJ4a21xYnVkVEhS?=
- =?utf-8?B?OSswMGduU09JamErbVlrRzdoZVRSbVEzSkFHeFUxajdxYzBpVEdlV1ZaWjlF?=
- =?utf-8?B?REJqLzN0VUF5dGRqVEpqaWlQMnc4N2lneDI1dDJpUE1XazlMaUY0UWVpdXpI?=
- =?utf-8?B?a3FxSXdkc1VDWXZmcU8zMkQ4azNjTUhZZzM2VTZ4emZ0MmlTSkxNZzVkOXVj?=
- =?utf-8?B?czJheEJ2UnJNR3N3ZHUzVFQxeXIwbDh1OHhDd1oxQ3B0TTVpazJhalQreG5i?=
- =?utf-8?B?R2lLaUNQZTRvOWh4YWdubXVGaEdnTWxOaHpqekp2NUpLWU5EVW5QZGxsRG82?=
- =?utf-8?B?MENrK2ZSOHlRaDZLYUJWVUpUMmZUd1NUdllqYXR1MGxEUitrLzFsSlVPZVYx?=
- =?utf-8?B?eGJzd3dhQ2k1WXZBbmxhZlRYZTdmdkZIYTd2c3I5OVdrY3g0cXprYnEwdWh2?=
- =?utf-8?B?RjNvVFIxNlRlWVNac3lkM2wzQ0xZTjdUTlhQandFN1dDYURVSzJLYk8rM3o5?=
- =?utf-8?B?UHdsK3c3TlFmVnlxaUFlVGdZam5zdVBQOUNpRXN3SFYydGg2OUFDWDFuU0JG?=
- =?utf-8?B?VkNIU01Yb3owNWIzckJ6OWM3alBwOWFrVFg5MzVWV0JqY0NHR1JvdmMrWWJQ?=
- =?utf-8?B?aWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f364a66c-1f8e-4bf0-d4b8-08dc58ec7a51
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2024 23:26:27.0587
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: adrZxPkT7IbwmRs5z+ysCLTJWRSkZFI9Y5P9aEyDoI11aqOTc4cj2T8127OlGPyct8PZK4PLcuTq8gyajk7Q+ONRGqGNQMaFIOmuyVDt1gk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR11MB5905
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWA002.ant.amazon.com (10.13.139.96) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+
+From: Michal Luczaj <mhal@rbox.co>
+Date: Tue,  9 Apr 2024 22:09:39 +0200
+> Garbage collector does not take into account the risk of embryo getting
+> enqueued during the garbage collection. If such embryo has a peer that
+> carries SCM_RIGHTS, two consecutive passes of scan_children() may see a
+> different set of children. Leading to an incorrectly elevated inflight
+> count, and then a dangling pointer within the gc_inflight_list.
+> 
+> sockets are AF_UNIX/SOCK_STREAM
+> S is an unconnected socket
+> L is a listening in-flight socket bound to addr, not in fdtable
+> V's fd will be passed via sendmsg(), gets inflight count bumped
+> 
+> connect(S, addr)	sendmsg(S, [V]); close(V)	__unix_gc()
+> ----------------	-------------------------	-----------
+> 
+> NS = unix_create1()
+> skb1 = sock_wmalloc(NS)
+> L = unix_find_other(addr)
+> unix_state_lock(L)
+> unix_peer(S) = NS
+> 			// V count=1 inflight=0
+> 
+>  			NS = unix_peer(S)
+>  			skb2 = sock_alloc()
+> 			skb_queue_tail(NS, skb2[V])
+> 
+> 			// V became in-flight
+> 			// V count=2 inflight=1
+> 
+> 			close(V)
+> 
+> 			// V count=1 inflight=1
+> 			// GC candidate condition met
+> 
+> 						for u in gc_inflight_list:
+> 						  if (total_refs == inflight_refs)
+> 						    add u to gc_candidates
+> 
+> 						// gc_candidates={L, V}
+> 
+> 						for u in gc_candidates:
+> 						  scan_children(u, dec_inflight)
+> 
+> 						// embryo (skb1) was not
+> 						// reachable from L yet, so V's
+> 						// inflight remains unchanged
+> __skb_queue_tail(L, skb1)
+> unix_state_unlock(L)
+> 						for u in gc_candidates:
+> 						  if (u.inflight)
+> 						    scan_children(u, inc_inflight_move_tail)
+> 
+> 						// V count=1 inflight=2 (!)
+> 
+> If there is a GC-candidate listening socket, lock/unlock its state. This
+> makes GC wait until the end of any ongoing connect() to that socket. After
+> flipping the lock, a possibly SCM-laden embryo is already enqueued. And if
+> there is another embryo coming, it can not possibly carry SCM_RIGHTS. At
+> this point, unix_inflight() can not happen because unix_gc_lock is already
+> taken. Inflight graph remains unaffected.
+> 
+> Fixes: 1fd05ba5a2f2 ("[AF_UNIX]: Rewrite garbage collector, fixes race.")
+> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+Thanks!
 
 
-
-On 4/9/2024 2:54 PM, Michael Chan wrote:
-> From: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> 
-> The current implementation requires the ifstate to be up when
-> configuring the RSS contexts.  It will try to fetch the RX ring
-> IDs and will crash if it is in ifdown state.  Return error if
-> !netif_running() to prevent the crash.
-> 
-> An improved implementation is in the works to allow RSS contexts
-> to be changed while in ifdown state.
-> 
-> Fixes: b3d0083caf9a ("bnxt_en: Support RSS contexts in ethtool .{get|set}_rxfh()")
-> Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-> Reviewed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-> Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 > ---
-
-Makes sense, though I think you could send this fix directly to net as
-its clearly a bug fix and preventing a crash is good.
-
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-
-Thanks,
-Jake
-
->  drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 5 +++++
->  1 file changed, 5 insertions(+)
+> v2:
+>   - Adhere to reverse xmas tree variable ordering
+>   - Expand commit message
+>   - Drop the reproducer
 > 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> index 9c49f629d565..68444234b268 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> @@ -1876,6 +1876,11 @@ static int bnxt_set_rxfh_context(struct bnxt *bp,
->  		return -EOPNOTSUPP;
+> v1: https://lore.kernel.org/netdev/20240408161336.612064-1-mhal@rbox.co/
+> 
+>  net/unix/garbage.c | 18 +++++++++++++++++-
+>  1 file changed, 17 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+> index fa39b6265238..6433a414acf8 100644
+> --- a/net/unix/garbage.c
+> +++ b/net/unix/garbage.c
+> @@ -274,11 +274,22 @@ static void __unix_gc(struct work_struct *work)
+>  	 * receive queues.  Other, non candidate sockets _can_ be
+>  	 * added to queue, so we must make sure only to touch
+>  	 * candidates.
+> +	 *
+> +	 * Embryos, though never candidates themselves, affect which
+> +	 * candidates are reachable by the garbage collector.  Before
+> +	 * being added to a listener's queue, an embryo may already
+> +	 * receive data carrying SCM_RIGHTS, potentially making the
+> +	 * passed socket a candidate that is not yet reachable by the
+> +	 * collector.  It becomes reachable once the embryo is
+> +	 * enqueued.  Therefore, we must ensure that no SCM-laden
+> +	 * embryo appears in a (candidate) listener's queue between
+> +	 * consecutive scan_children() calls.
+>  	 */
+>  	list_for_each_entry_safe(u, next, &gc_inflight_list, link) {
+> +		struct sock *sk = &u->sk;
+>  		long total_refs;
+>  
+> -		total_refs = file_count(u->sk.sk_socket->file);
+> +		total_refs = file_count(sk->sk_socket->file);
+>  
+>  		WARN_ON_ONCE(!u->inflight);
+>  		WARN_ON_ONCE(total_refs < u->inflight);
+> @@ -286,6 +297,11 @@ static void __unix_gc(struct work_struct *work)
+>  			list_move_tail(&u->link, &gc_candidates);
+>  			__set_bit(UNIX_GC_CANDIDATE, &u->gc_flags);
+>  			__set_bit(UNIX_GC_MAYBE_CYCLE, &u->gc_flags);
+> +
+> +			if (sk->sk_state == TCP_LISTEN) {
+> +				unix_state_lock(sk);
+> +				unix_state_unlock(sk);
+> +			}
+>  		}
 >  	}
 >  
-> +	if (!netif_running(bp->dev)) {
-> +		NL_SET_ERR_MSG_MOD(extack, "Unable to set RSS contexts when interface is down");
-> +		return -EAGAIN;
-> +	}
-> +
->  	if (*rss_context != ETH_RXFH_CONTEXT_ALLOC) {
->  		rss_ctx = bnxt_get_rss_ctx_from_index(bp, *rss_context);
->  		if (!rss_ctx) {
+> -- 
+> 2.44.0
+> 
 
