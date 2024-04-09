@@ -1,154 +1,173 @@
-Return-Path: <netdev+bounces-86103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A44089D8DE
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:07:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A45E089D8E3
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:08:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8D3A71C2257B
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 12:07:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BD7228165F
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 12:08:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB0D12B14A;
-	Tue,  9 Apr 2024 12:07:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6D412BE8B;
+	Tue,  9 Apr 2024 12:07:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SeOQL3cE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kpEGDTOH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B723480043
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 12:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8767612A14A
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 12:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712664428; cv=none; b=lYwlxIPLTrw7l2kLorQ3ZjGw4e0fUZTofvCZX4FkOGiaj1tAeH2VkwbpWccvbM/6JpHj7Zs5OnSyoLEdd8l2riVzBWTj25DvR6dyXKniK90eQ7BsyiMNnjmGo3UTcmcUQL59IUWCZmouq4jA/wZY7oDeQPygFEhNkW7ukrb09o8=
+	t=1712664468; cv=none; b=eCKmc54C4shxSlrkfDb1AiuX/XDTTJmYEqEWZW3ISQP6ajF/uk1rqpgBKSiK/VS+AhgoC2wos72R6IUgWBk+8r/mXaTkkxkzqgYobtQGEWcOiBwmSJ+JAiDjxUcDzpRSHG1NnpPv5GEIGiiCegBig8Y0Pm0A/CwIuSZ+vnZBSvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712664428; c=relaxed/simple;
-	bh=dEqzAVisY4aRigVueLVKUe0ncxS5i6fSVpRxQ6Ued50=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=BkOEbP8Yblv/mRx48mccxkIB07F1Qy12n6ltIt/jW+URC8JC4KDDFMvHD0fGXcwvIX7von+HqJ3oS78bKf6kfUdAFUgtiqfBU7oZ4iP17fuyHJZjRIFvNSOE6M3du3iUIQvCKn8R9MaAP6L3zD2So76EOP4/N0w1sdEHLtriBR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SeOQL3cE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712664425;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HkFcR2uVpCjKDxBhnTR7ZuYMiqqDHFNAcHHxyhfV8EE=;
-	b=SeOQL3cE78t4xiBys2EM2UKlkFAryym4M54utUClwJxeH4sg6xLlcqhK3KBYPw4Q123R15
-	SocP4SI8arME4ySvoA3L5Ks1LNAC7z4+KNlXZb2jF/PuikbqK2d6KwNhY2od+En9eFOJWo
-	SiQHiCNMu4Y787bw8Pzmdtgvf+E5/D0=
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
- [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-352-L7f7_1DyPHmQupG5sm_BYQ-1; Tue, 09 Apr 2024 08:07:04 -0400
-X-MC-Unique: L7f7_1DyPHmQupG5sm_BYQ-1
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-5aa1b6f6c0fso836927eaf.1
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 05:07:04 -0700 (PDT)
+	s=arc-20240116; t=1712664468; c=relaxed/simple;
+	bh=l5l43CTGs4TRsZBMa9+0NJ+7WZiGMwQpgrkBUU52NkU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=j4XOaqoQ6e7NRn830vSAovb9K7+IeeU+8NtNc1BsDENvt6kQRkqNTBLyNmmOs96vhwApsovV/7UCjrz/Vno97onten2CqzOLcbRgh7MwVIu+e2l3gn/PCM0v7Gner/RRj8qozooB2boVIFWoOsRzf4xnHMCh+YsNsVsHSlvk6lg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kpEGDTOH; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dd933a044baso7819619276.0
+        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 05:07:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712664465; x=1713269265; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vwOIo5EyE2gpBidCPc6JSquLxlgRn1jmXrlTCb7YzQ4=;
+        b=kpEGDTOHE3i9ppJRxt+fUMH5ipWArbYDIAjAYkwwpAg/957kka3VbOdacX0GqNEbQ3
+         lbe5YZeER2mCirizAlYBsEDeTYsOf6Lq8pAWwIHd437JgSnGk3psIbMv0sHNu7oAObuI
+         30LsZXhBW6OX7uOjYEvFKOw8uAFoSEESd8/LwKPnCvNjGq3gXpKvibucLWZ0OnhD33Pk
+         gwm27VW0z1jfsuDZ7Bf1Qu9VhpWLjR6uRtcUuhE1i2zp4BnxAga5cVTlvsk4GrFbu3L4
+         gvQjUnVS89WhC77eKJKaMUTpZ/5WFLdFY4R4FUiHmcejicjC4G10BAKw7Z/DNIVNIUN0
+         Sl2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712664423; x=1713269223;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HkFcR2uVpCjKDxBhnTR7ZuYMiqqDHFNAcHHxyhfV8EE=;
-        b=Z8YAMQoENnLbnMXeQEF5uGibaXHtZFJcX9cMH3Lda8vtHf+4j9o0I7r54FKJDDB6Vw
-         NYCbRkebT0DUYTRHrgPTor0pP0C75QtMzNAaEJgBkMRcNkbj4dopRPSeZyC9u0lUNgy4
-         47UfSrbvV7ZXv3m8MII1oL+twX9cVlBMWjUb8njCnuVWHn9iMuXC8aPIIn8vx/hN5ag9
-         Bt+UmukqhCGblFx3TV+tBcufxxKqk8/TD3BWu5tnFosa3+9dbHtIwwtb7GUpuqM5x97w
-         7BV88+COFuqLXd/JIDIym/L3hMQJkrdaMx72hdWzhmjPW7VGZpyfuSYllOtIbAoqyKox
-         KyKg==
-X-Forwarded-Encrypted: i=1; AJvYcCXXAAs9PRxF8u8s/trq94NreKPh0fJ1M30EW7Vh4mDw9bsBoWrbMzZX+HORhb4C1U668XRaqyN927PcWAZCDxPAKVcge51s
-X-Gm-Message-State: AOJu0YxecgwiVcA0JiPLhybj7hkVpI8iNEv1L4bGS+wm8BMGDfwbK3sz
-	dJJNg8vgzSTKHJI5YQzofGZ8MbQ4nsi3QMRPsCNjoQPC3q2WcKxNGTGR4w7O3navJ7l4UJhHakI
-	bxgd4gnzpYTQuh48t0bHOvPeD/Hd12HRE1O/pc+YKwmhNziatfsWE+Q==
-X-Received: by 2002:a05:6870:1651:b0:220:bd4d:674d with SMTP id c17-20020a056870165100b00220bd4d674dmr12011968oae.5.1712664423611;
-        Tue, 09 Apr 2024 05:07:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHrN5ENLVbSZMW4W4CJ9xO7Y0P9AkyPe6V8i2fZEJ34nveaznGa9nVEA0vvlaoe76fryf7Fmw==
-X-Received: by 2002:a05:6870:1651:b0:220:bd4d:674d with SMTP id c17-20020a056870165100b00220bd4d674dmr12011947oae.5.1712664423318;
-        Tue, 09 Apr 2024 05:07:03 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-244-144.dyn.eolo.it. [146.241.244.144])
-        by smtp.gmail.com with ESMTPSA id po27-20020a05620a385b00b0078d5e60b52esm2787845qkn.114.2024.04.09.05.07.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Apr 2024 05:07:02 -0700 (PDT)
-Message-ID: <d9fde608268413dda70bb6ef328b8d823d568f74.camel@redhat.com>
-Subject: Re: [net-next PATCH] octeontx2-pf: Add support for offload tc with
- skbedit mark action
-From: Paolo Abeni <pabeni@redhat.com>
-To: Geetha sowjanya <gakula@marvell.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Cc: kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
-	sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
-Date: Tue, 09 Apr 2024 14:06:59 +0200
-In-Reply-To: <20240408072638.26674-1-gakula@marvell.com>
-References: <20240408072638.26674-1-gakula@marvell.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        d=1e100.net; s=20230601; t=1712664465; x=1713269265;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vwOIo5EyE2gpBidCPc6JSquLxlgRn1jmXrlTCb7YzQ4=;
+        b=Ajn2mOOcFMZgyBY9JaHiN7g/POEqNjr1K2HMLZFz04CuJHkpPPXDqCxpwcxSnHAX3+
+         n55iqBLBqwZqn971nTUyky6hHiBhMLRIm2Bxnkve9zTeVAbqrImXil66XRAcBgS3niF1
+         F7tWY7tjSZNGR0gOV8MozHgeFFngYJVryVQ/C3lCSbfjqbx0TzTKki6mGWSKmPn3RXmN
+         o1hFTVNGISFLMkCgbd+e3ytNDKfJSReXy45vWTBTUJc4U4T4TnksmHozXdSxwDqm2R/K
+         pzV4V7O6vvNwYEB9TK1+SbFsClOUE5iX7zaxW6XLSg1RaSxmw63fxSvxMaxk/bX8rMG1
+         pMbw==
+X-Gm-Message-State: AOJu0YzlCdOCiq58MzpWT0RPxJea102kunFa4qJ2ylDJniutz1u+yIDH
+	K0N1VE0f7nu1xoTYgGSNOnyj8NqXA+AsL7uD1BIRDb6CcIpH1DG3QdHVQBxytZYl1gjvbdZywjn
+	eKFEa6VvyZg==
+X-Google-Smtp-Source: AGHT+IEZ/p+1Sye8Qw8C9x1uzuZWJX1qMx0WaJodivY2Y78eM5sjMxJ8ou6KDGiK3e8vkVdFBtHBQYPyhINENg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1001:b0:dc6:e884:2342 with SMTP
+ id w1-20020a056902100100b00dc6e8842342mr815876ybt.5.1712664465563; Tue, 09
+ Apr 2024 05:07:45 -0700 (PDT)
+Date: Tue,  9 Apr 2024 12:07:41 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240409120741.3538135-1-edumazet@google.com>
+Subject: [PATCH net] netfilter: complete validation of user input
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+	coreteam@netfilter.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 2024-04-08 at 12:56 +0530, Geetha sowjanya wrote:
-> Support offloading of skbedit mark action.
->=20
-> For example, to mark with 0x0008, with dest ip 60.60.60.2 on eth2
-> interface:
->=20
->  # tc qdisc add dev eth2 ingress
->  # tc filter add dev eth2 ingress protocol ip flower \
->       dst_ip 60.60.60.2 action skbedit mark 0x0008 skip_sw
->=20
-> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
-> ---
->  .../net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c  |  2 ++
->  .../ethernet/marvell/octeontx2/nic/otx2_common.h    |  2 ++
->  .../net/ethernet/marvell/octeontx2/nic/otx2_tc.c    | 13 +++++++++++++
->  .../net/ethernet/marvell/octeontx2/nic/otx2_txrx.c  |  3 +++
->  .../net/ethernet/marvell/octeontx2/nic/otx2_txrx.h  |  3 +++
->  5 files changed, 23 insertions(+)
->=20
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/dri=
-vers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-> index c75669c8fde7..6188921e9a20 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
-> @@ -1183,6 +1183,8 @@ static int npc_update_rx_entry(struct rvu *rvu, str=
-uct rvu_pfvf *pfvf,
->  			action.pf_func =3D target;
->  			action.op =3D NIX_RX_ACTIONOP_UCAST;
->  		}
-> +		if (req->match_id)
-> +			action.match_id =3D req->match_id;
->  	}
-> =20
->  	entry->action =3D *(u64 *)&action;
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/d=
-rivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-> index 06910307085e..815ae13c371c 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-> @@ -363,6 +363,7 @@ struct otx2_flow_config {
->  	struct list_head	flow_list;
->  	u32			dmacflt_max_flows;
->  	u16                     max_flows;
-> +	u16			mark_flows;
+In my recent commit, I missed that do_replace() handlers
+use copy_from_sockptr() (which I fixed), followed
+by unsafe copy_from_sockptr_offset() calls.
 
-Since the above fields is used as (reference) counter for the
-OTX2_FLAG_TC_MARK_ENABLED bit, what about using a refcount_t, so you
-gain sanity checks for free?
+In all functions, we can perform the @optlen validation
+before even calling xt_alloc_table_info() with the following
+check:
 
-Thanks!
+if ((u64)optlen < (u64)tmp.size + sizeof(tmp))
+        return -EINVAL;
 
-Paolo
+Fixes: 0c83842df40f ("netfilter: validate user input for expected length")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv4/netfilter/arp_tables.c | 4 ++++
+ net/ipv4/netfilter/ip_tables.c  | 4 ++++
+ net/ipv6/netfilter/ip6_tables.c | 4 ++++
+ 3 files changed, 12 insertions(+)
+
+diff --git a/net/ipv4/netfilter/arp_tables.c b/net/ipv4/netfilter/arp_tables.c
+index b150c9929b12e86219a55c77da480e0c538b3449..14365b20f1c5c09964dd7024060116737f22cb63 100644
+--- a/net/ipv4/netfilter/arp_tables.c
++++ b/net/ipv4/netfilter/arp_tables.c
+@@ -966,6 +966,8 @@ static int do_replace(struct net *net, sockptr_t arg, unsigned int len)
+ 		return -ENOMEM;
+ 	if (tmp.num_counters == 0)
+ 		return -EINVAL;
++	if ((u64)len < (u64)tmp.size + sizeof(tmp))
++		return -EINVAL;
+ 
+ 	tmp.name[sizeof(tmp.name)-1] = 0;
+ 
+@@ -1266,6 +1268,8 @@ static int compat_do_replace(struct net *net, sockptr_t arg, unsigned int len)
+ 		return -ENOMEM;
+ 	if (tmp.num_counters == 0)
+ 		return -EINVAL;
++	if ((u64)len < (u64)tmp.size + sizeof(tmp))
++		return -EINVAL;
+ 
+ 	tmp.name[sizeof(tmp.name)-1] = 0;
+ 
+diff --git a/net/ipv4/netfilter/ip_tables.c b/net/ipv4/netfilter/ip_tables.c
+index 487670759578168c5ff53bce6642898fc41936b3..fe89a056eb06c43743b2d7449e59f4e9360ba223 100644
+--- a/net/ipv4/netfilter/ip_tables.c
++++ b/net/ipv4/netfilter/ip_tables.c
+@@ -1118,6 +1118,8 @@ do_replace(struct net *net, sockptr_t arg, unsigned int len)
+ 		return -ENOMEM;
+ 	if (tmp.num_counters == 0)
+ 		return -EINVAL;
++	if ((u64)len < (u64)tmp.size + sizeof(tmp))
++		return -EINVAL;
+ 
+ 	tmp.name[sizeof(tmp.name)-1] = 0;
+ 
+@@ -1504,6 +1506,8 @@ compat_do_replace(struct net *net, sockptr_t arg, unsigned int len)
+ 		return -ENOMEM;
+ 	if (tmp.num_counters == 0)
+ 		return -EINVAL;
++	if ((u64)len < (u64)tmp.size + sizeof(tmp))
++		return -EINVAL;
+ 
+ 	tmp.name[sizeof(tmp.name)-1] = 0;
+ 
+diff --git a/net/ipv6/netfilter/ip6_tables.c b/net/ipv6/netfilter/ip6_tables.c
+index 636b360311c5365fba2330f6ca2f7f1b6dd1363e..131f7bb2110d3a08244c6da40ff9be45a2be711b 100644
+--- a/net/ipv6/netfilter/ip6_tables.c
++++ b/net/ipv6/netfilter/ip6_tables.c
+@@ -1135,6 +1135,8 @@ do_replace(struct net *net, sockptr_t arg, unsigned int len)
+ 		return -ENOMEM;
+ 	if (tmp.num_counters == 0)
+ 		return -EINVAL;
++	if ((u64)len < (u64)tmp.size + sizeof(tmp))
++		return -EINVAL;
+ 
+ 	tmp.name[sizeof(tmp.name)-1] = 0;
+ 
+@@ -1513,6 +1515,8 @@ compat_do_replace(struct net *net, sockptr_t arg, unsigned int len)
+ 		return -ENOMEM;
+ 	if (tmp.num_counters == 0)
+ 		return -EINVAL;
++	if ((u64)len < (u64)tmp.size + sizeof(tmp))
++		return -EINVAL;
+ 
+ 	tmp.name[sizeof(tmp.name)-1] = 0;
+ 
+-- 
+2.44.0.478.gd926399ef9-goog
 
 
