@@ -1,118 +1,116 @@
-Return-Path: <netdev+bounces-86207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46B8489DF7E
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 17:45:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A45789DFE4
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 18:00:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDAC3282AF8
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:45:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43E23282210
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:00:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0061C136994;
-	Tue,  9 Apr 2024 15:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E941137937;
+	Tue,  9 Apr 2024 15:59:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="doiYMy1h"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ea7iwEIb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49DE64AED6
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 15:45:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D78135A6C
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 15:59:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712677502; cv=none; b=i6IoL3flnKLQ5h9iSnd3tHsI8+VG007Urrqz/yWgNxJTlOSE+QJTQhtWPm/3APfAkYhEgOSEzsYTNnEPkqb8UIr0LnBWUKQXhsMBHZm4Ba7Ldod6x89pfHeUgIlQ/wxXrtDQSoNJAqApK1YVxJxOPM7g8iphgXDeBSMAoMoujUk=
+	t=1712678397; cv=none; b=rNbyAzx8wJgBEYgoFuf4BEJMxP0XhPFq6zzLIY2gMK/AFkfhxZJJi7UWv/Lf1n5mgjwo6nd0iVDlwV8VqSxHmftsnu3s3x70Y+5ZMGZ7Y4Q2MVdVU5drek/QWC+UotGCun99pxzkfkrPhOYApPTiGCv77PjAacjGhs7Msydf9+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712677502; c=relaxed/simple;
-	bh=K7xBs4xpIv+5qSMwNv/cpdYuxUrRNfSRUXsK1NN2ZDY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lh8MT89a5dO5PK8HSdGKRLzVSjwDZ3S/4Hx/laXFpYyrau+XIFtUyGOCjUkA70EECVLMnMtaXo1elaOGgMX05cQyaXot0AP+ugSw2rJnyQCW98Xg7iWB3ABvLnzYhko1RE6SjFZye5T4I/0IQU5VxQ7C3RdJhU5pSLDCapRUw0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=doiYMy1h; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712677501; x=1744213501;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=K7xBs4xpIv+5qSMwNv/cpdYuxUrRNfSRUXsK1NN2ZDY=;
-  b=doiYMy1hJS9He9rFgVYGYU+hE/4FMtv3Up6f++Mz5O9JDg17MHrFz3vz
-   +mNpCHpXA1WaoI1Sblx37UHeX7Iqq85RwSWRB5u9mTtSSM3ESI/7CsRmp
-   ZQ8LsUeGIu5jp5JIFj73vFazvWfehBWV0lk0fmrg/KJyjyIVmZHY+kuEG
-   z6SJraYxnvo40fWee+A0Z/7HfNRlXjLJpT/oxMWRTOjiOC9ugzA0fb+CG
-   E8zJMF92x4WWngumnU/JmdWbB/+a8RKb+44tP+aTLCt8wgAlIj869SRWp
-   pe9hAZtsREIJKoz05pQJBS99M7ewE3oCq0xFwCk3BSDjrQMFMcVhXHT0w
-   w==;
-X-CSE-ConnectionGUID: QOVOetePRoqpd/PvW6uR0g==
-X-CSE-MsgGUID: EyvTYF04QcmGO9UYgp3PjA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="19427720"
-X-IronPort-AV: E=Sophos;i="6.07,189,1708416000"; 
-   d="scan'208";a="19427720"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 08:44:29 -0700
-X-CSE-ConnectionGUID: mGOUQNrFQPSC6FcLlUWIeg==
-X-CSE-MsgGUID: 74zR2XfmQz+G2ZnCNS+ogQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,189,1708416000"; 
-   d="scan'208";a="20303003"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa009.fm.intel.com with ESMTP; 09 Apr 2024 08:44:28 -0700
-Received: from mystra-4.igk.intel.com (mystra-4.igk.intel.com [10.123.220.40])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 9E9F428199;
-	Tue,  9 Apr 2024 16:44:20 +0100 (IST)
-From: Marcin Szycik <marcin.szycik@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: [PATCH iwl-net] ice: Fix checking for unsupported keys on non-tunnel device
-Date: Tue,  9 Apr 2024 17:45:44 +0200
-Message-ID: <20240409154543.8181-2-marcin.szycik@linux.intel.com>
-X-Mailer: git-send-email 2.41.0
+	s=arc-20240116; t=1712678397; c=relaxed/simple;
+	bh=R/UKSJmmZmpmPfrid0VP/uklt14bKRE2DJxN9wKrclk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bB/f0IKrOJVWyalUsnZpGab2dQmziDCVgAe7lANKNuI5bfCcj7zr6SwvyVOiuNgSM+VD0XzMtvAmLujtda5UBfmdCF66XV0EdZFqOf0T0TwqlpziBchjLjmM219GjSmXEtD47jioteJqNBlQ7rZB8zA6RErs0nuNChB1o1Uw6FQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ea7iwEIb; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-56e5174ffc2so14039a12.1
+        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 08:59:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712678394; x=1713283194; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R/UKSJmmZmpmPfrid0VP/uklt14bKRE2DJxN9wKrclk=;
+        b=Ea7iwEIbB1his7GskUl+II/tP0hPaqEqDan+qBPgVjb/0hv/xayCEoQtx7vDRTKQxP
+         9Uo2PSDvXHyZbErf4jSxRWcN2Xzo3I/Rkzkilb1L74PLt7X4QspIKS00n/HMzmxVlP0l
+         D8Q1IKvJZq5IfqbBj1shIveOlvdzPCvHCYejMknJRz5ym4UEuKrdzxQAvjrVzDIH78Bp
+         2gwCNCCUwGhKgArr8MwdmMjtAyWfWxnQksB7YHaamaMJva0XC8lCk6LkO6BMFfKA8Dil
+         qcHzH0281DUL6oOX8CbIdSBGapRIWk8HbvPKPneE3jhi39YXr5ll71nYm0tfxVGp7mBs
+         BXAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712678394; x=1713283194;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=R/UKSJmmZmpmPfrid0VP/uklt14bKRE2DJxN9wKrclk=;
+        b=hywQI4DUh137YUphbfECWtCjZemusyeejsN96ixnVGkaPdPxse+l26HIke5HSxY31S
+         5+i2mZQ25yqqdHh5pVpTwI4R6g1jobekXoYpyy2PxzxBohlNkm9VREQOVjLrFXjiV+IP
+         h9yk1vtR+elJiqvmFXN/R0CWpUmEAUEW4PTy8xi6VsFin8oJ3Pxqpfv9ynRDoUwfRtjO
+         nc+KYz6S+OTR/wvR65SrBYmali3mBURtLs2CIhpGey8dWdqUMRtdAp3KSWoecvWfFEYe
+         9K+rnlxDqPs3ovq4NKFmfdHHTZZIBJQy+OF1UvZyA3SFckzyc4DoWiLEo6C4Lc/9XeiU
+         K8SA==
+X-Gm-Message-State: AOJu0YzdtDCMPoPUIEFHgl5UoX7VbcPt+8emVDuzbPB1lKOLB2I6bNXs
+	9ATCJS/Vumz8ru/xJrENLTn7cHhN+4KzQMmm84R/EDQMZ67g2jw2nNTU+lYZfovGTYALvKDA17z
+	27+XBHm444FF2pBOpK92WnJg6zzTy7Wt40bsH
+X-Google-Smtp-Source: AGHT+IFm9aPzYO7/xwO7KoweJXTiMzSSKxU3eUsnKdjN0yDeR2ckVA0sVXcOxiBT9dPEy12p4xYjGgZjvF413NgdTb0=
+X-Received: by 2002:aa7:c906:0:b0:56e:5681:ff3e with SMTP id
+ b6-20020aa7c906000000b0056e5681ff3emr219681edt.2.1712678393837; Tue, 09 Apr
+ 2024 08:59:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240409152805.913891-1-jmaloy@redhat.com>
+In-Reply-To: <20240409152805.913891-1-jmaloy@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 9 Apr 2024 17:59:39 +0200
+Message-ID: <CANn89iKSO=P0Vr03ZaXn35-At+SRRvT=b3YrAuW7J5VR0hiFpQ@mail.gmail.com>
+Subject: Re: [net-next v4] tcp: add support for SO_PEEK_OFF socket option
+To: jmaloy@redhat.com
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	passt-dev@passt.top, sbrivio@redhat.com, lvivier@redhat.com, 
+	dgibson@redhat.com, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add missing FLOW_DISSECTOR_KEY_ENC_* checks to TC flower filter parsing.
-Without these checks, it would be possible to add filters with tunnel
-options on non-tunnel devices. enc_* options are only valid for tunnel
-devices.
+On Tue, Apr 9, 2024 at 5:28=E2=80=AFPM <jmaloy@redhat.com> wrote:
+>
+> From: Jon Maloy <jmaloy@redhat.com>
+>
+> When reading received messages from a socket with MSG_PEEK, we may want
+> to read the contents with an offset, like we can do with pread/preadv()
+> when reading files. Currently, it is not possible to do that.
+>
+> In this commit, we add support for the SO_PEEK_OFF socket option for TCP,
+> in a similar way it is done for Unix Domain sockets.
+>
+> In the iperf3 log examples shown below, we can observe a throughput
+> improvement of 15-20 % in the direction host->namespace when using the
+> protocol splicer 'pasta' (https://passt.top).
+> This is a consistent result.
+>
+> pasta(1) and passt(1) implement user-mode networking for network
+> namespaces (containers) and virtual machines by means of a translation
+> layer between Layer-2 network interface and native Layer-4 sockets
+> (TCP, UDP, ICMP/ICMPv6 echo).
+>
+> Received, pending TCP data to the container/guest is kept in kernel
+> buffers until acknowledged, so the tool routinely needs to fetch new
+> data from socket, skipping data that was already sent.
+>
+> Suggested-by: Paolo Abeni <pabeni@redhat.com>
+> Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
+> Signed-off-by: Jon Maloy <jmaloy@redhat.com>
 
-Example:
-  devlink dev eswitch set $PF1_PCI mode switchdev
-  echo 1 > /sys/class/net/$PF1/device/sriov_numvfs
-  tc qdisc add dev $VF1_PR ingress
-  ethtool -K $PF1 hw-tc-offload on
-  tc filter add dev $VF1_PR ingress flower enc_ttl 12 skip_sw action drop
-
-Fixes: 9e300987d4a8 ("ice: VXLAN and Geneve TC support")
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
----
- drivers/net/ethernet/intel/ice/ice_tc_lib.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-index f8df93e1a9de..b49aa6554024 100644
---- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-@@ -1489,7 +1489,10 @@ ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
- 		  (BIT_ULL(FLOW_DISSECTOR_KEY_ENC_IPV4_ADDRS) |
- 		   BIT_ULL(FLOW_DISSECTOR_KEY_ENC_IPV6_ADDRS) |
- 		   BIT_ULL(FLOW_DISSECTOR_KEY_ENC_KEYID) |
--		   BIT_ULL(FLOW_DISSECTOR_KEY_ENC_PORTS))) {
-+		   BIT_ULL(FLOW_DISSECTOR_KEY_ENC_PORTS) |
-+		   BIT_ULL(FLOW_DISSECTOR_KEY_ENC_IP) |
-+		   BIT_ULL(FLOW_DISSECTOR_KEY_ENC_OPTS) |
-+		   BIT_ULL(FLOW_DISSECTOR_KEY_ENC_CONTROL))) {
- 		NL_SET_ERR_MSG_MOD(fltr->extack, "Tunnel key used, but device isn't a tunnel");
- 		return -EOPNOTSUPP;
- 	} else {
--- 
-2.41.0
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
