@@ -1,72 +1,92 @@
-Return-Path: <netdev+bounces-86258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C00C89E39C
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 21:31:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CECE89E30D
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 21:11:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE027B2219A
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 19:31:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90EE71C21939
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 19:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6B70157A4F;
-	Tue,  9 Apr 2024 19:29:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72623157A60;
+	Tue,  9 Apr 2024 19:09:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="KSraSJDR"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LyM4b/uO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2085.outbound.protection.outlook.com [40.107.220.85])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC2A1E566
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 19:29:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712690982; cv=none; b=FUgYvCPaekE92ofHkOBeyxiVbAMa9+RQExXIpiuSDk/eWCPpgcRu7wkzVKxnmRkuMNhdnehRaaMt11ieN2wVc1t6oFijLY7tanOR6P8nFWGb9x6pv3dWjhznS2LF1y/9295JckknDhdRnFzaqHIPJVb5DA1vgqj2HIWrwhQPuWw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712690982; c=relaxed/simple;
-	bh=Nmce0s+q7CeFszkXUJv43TBjffrn7zBQr8AniNQGVEY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RymI+iyRCeab4qWsv/eFJTsC6mPmgKGq2piN7hCuKVmUc1vMZyrZHFGxQnn5C/EKdohi7MR6uDVBmXnQtx9sTi53t+o7WmJCFgnWfHI6iDLQq8hlvl0ksvEym30JdRH2YaHGwdv+fG3/RVAKac9sIf8XLDGeFBeLpgWToK4+J7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=KSraSJDR; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1712690980; x=1744226980;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=+vTCRuNTq1476EcXfIXyNBFpgRJA6AnUGjAL2MgsCsI=;
-  b=KSraSJDRpUeZkkkxIRXhvx7yel/XGTbNxzDiC2w3jpOYrFO8E2pjKCe6
-   QFAWepmZtwlR8JrHcwyJMGDACVTLxDx88sB4p8EQPk7Du4K40ItcUIRzR
-   h7OImMK/+b+SPMXrsJL0Uh9XkC8Aksu6bfdjiT1XXtP1s+/avE3eoduZs
-   0=;
-X-IronPort-AV: E=Sophos;i="6.07,190,1708387200"; 
-   d="scan'208";a="388595529"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 19:02:59 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:60632]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.49:2525] with esmtp (Farcaster)
- id 0330f748-2681-4a6e-921b-035af8680ea0; Tue, 9 Apr 2024 19:02:58 +0000 (UTC)
-X-Farcaster-Flow-ID: 0330f748-2681-4a6e-921b-035af8680ea0
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Tue, 9 Apr 2024 19:02:57 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.100.45) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Tue, 9 Apr 2024 19:02:54 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <mhal@rbox.co>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net 1/2] af_unix: Fix garbage collector racing against connect()
-Date: Tue, 9 Apr 2024 12:02:44 -0700
-Message-ID: <20240409190244.26402-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <30c3f9d4-bcc8-471e-b8d4-4dc2c044925a@rbox.co>
-References: <30c3f9d4-bcc8-471e-b8d4-4dc2c044925a@rbox.co>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C14C8157A5D
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 19:09:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.85
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712689761; cv=fail; b=Z3KX2ZQAWAQohAJLDTokUtBsAJ5+t7GmQ9EZ6FBFgtl6gqpISxnp3tmgnIS5kDSSi3vX0sAjFPRRwQ6+vdcavT/UVSr5PH0bUMZD/eChA7pxwnKFL58uRKRT1OjtRHG83bShXKUSyN4LBY7cMVvNpV0hHDWD09MwWlVZjkn0OsU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712689761; c=relaxed/simple;
+	bh=waBp2CIJFpkfiPH7RwQcCTuGx/KZZaHE8vE06GdMJRU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TgE1PdoXL2DNZ1VSLkfryYRXmi7TvQ89MdqXUqsd/JXmfn9SiNtC4JvHz8kKzjE+yeFBh4kfjHczQNfTYMa/mMuUIsaUMNx5zX1YRrkxfEw34ZVOw8ElNjUmUP7gdP9Iw/gnXymbK2g9bZpJdnpzTub8hWf1NAJvYEyqKMHEcls=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=LyM4b/uO; arc=fail smtp.client-ip=40.107.220.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PELtxGoDJUlbRdxAFMFDsCftsGfE3bjAW5MJ6+vhT1n5R/8SiePKHmGrDzogrGaDq0ZuJDrqtAg38t+CiFaiYC+W+FQk8mstVo2Roh78GBG/8ovS+Mp7PX64WaNQV2ktHzyfFqNFIJTHPHbxOd0rrwCpXdRtAAvhdG8paVQsmO70G2z24zuQUS2ebr06dbb4ttETlYm62bNfkE1W8/zWixTSKXl7hL2mi+yOFuILO4hdcsDgKUWD3zJcIj3G6qHeb1Mc6gT/EyKHVDt+d7lsUzjsdQHd32zQQxJZ8EY7BIsL1xf6lrN/I61XGpBGgBtfjwCPIiz1nAGlJ/ZsO3wblw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GYzrOlrrLbxgZDc1gWbS+/4xPQLWK9s253iL4wwo3Qo=;
+ b=hQMuyw0eexeiWwxQl3kVgw+hFNWroG5cy3r0pEgNhSFxD3bpfyVm3ZvO0Z6bzTHMRSseayOShoOP4yII2++jPLAnNztcYg6N3qiC2EobmpapzHgjaabt+mSsi4JFyYdvm+37LvK4yioDio5vtPIZtYIVB/lLAsa0nUjTxFua3x5GatuQXI/ERcwIJKCyJjtsd20485O6ANWCXq3nHlX/hkxb/YkSueniPEBy64lY6rqW9VrWTG2KuL/HtzC76IKaA42gMzXXJm7TupkW/+A+7qoFYvGA5KK3LHwTpDJxJ+Th4MqyYE2BKPxMdltfYelBrUsuyauCHXxz0fIJqwzM1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GYzrOlrrLbxgZDc1gWbS+/4xPQLWK9s253iL4wwo3Qo=;
+ b=LyM4b/uOT9wKRjaTNKDbjdjrxHV7SCmzB1VwwjUInp6RUZgnSFRJczO5tGZgWU2XC1+B1PUw5/Q2/8PC+a4etiwOoQ2my50cA5OmxQxu1OhrnUfdsgHxvikxILOvkRz/lhNGgz4hDj340SBoC8CPk9XCAZa0r0lPVyG42rECxVGfgeT0r5woubr3juLXit4NmwvOTUZLasoXp2g3ALZOB35XT7q/KxKkL9UzWXFQ4HAt9F9Csq43KZAzOC/aFZXl+0Qsifm6JKowzFARemBYIez6uT63GXhsyuw7Zvz9ZQdfa4598fBdsbgw2Ow2Rp3+cQzrOQL2aiyp9yXUsPHalQ==
+Received: from BY5PR04CA0015.namprd04.prod.outlook.com (2603:10b6:a03:1d0::25)
+ by CY5PR12MB6346.namprd12.prod.outlook.com (2603:10b6:930:21::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 9 Apr
+ 2024 19:09:15 +0000
+Received: from MWH0EPF000A6735.namprd04.prod.outlook.com
+ (2603:10b6:a03:1d0:cafe::d2) by BY5PR04CA0015.outlook.office365.com
+ (2603:10b6:a03:1d0::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.19 via Frontend
+ Transport; Tue, 9 Apr 2024 19:09:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ MWH0EPF000A6735.mail.protection.outlook.com (10.167.249.27) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.22 via Frontend Transport; Tue, 9 Apr 2024 19:09:14 +0000
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 9 Apr 2024
+ 12:08:41 -0700
+Received: from rnnvmail205.nvidia.com (10.129.68.10) by rnnvmail203.nvidia.com
+ (10.129.68.9) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Tue, 9 Apr
+ 2024 12:08:41 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.10)
+ with Microsoft SMTP Server id 15.2.1258.12 via Frontend Transport; Tue, 9 Apr
+ 2024 12:08:39 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Tariq Toukan
+	<tariqt@nvidia.com>
+Subject: [PATCH net V2 00/12] mlx5 misc fixes
+Date: Tue, 9 Apr 2024 22:08:08 +0300
+Message-ID: <20240409190820.227554-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,100 +95,91 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D044UWA004.ant.amazon.com (10.13.139.7) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000A6735:EE_|CY5PR12MB6346:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2de4191f-0480-4982-0aeb-08dc58c88c54
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	gVr8mpQLEwxBestH7ALmiwS+LZqTBFQe5wYGIw8/x3Z0NvBdTJZmv7RSM0TSXeY8BYudzo4utCAWV3vRasGb2ago4X+j3M7t6VBy3qdFsEoHzBI4xu/QyRQrFPgRcc9OBcitAY+OLhzJkdwhcuH6fekfWISKwNXwCaYqihSiu/COZ7ubPYzaBgOFo9qdoOX/UubtrujBQIknzC8ZWTNd7ZdHWam5P8baPVg9dCRD+bUChS2TmOHJWdPkvxZwBlIXBkBFkl+qnPFNNQQKtLmmE+g4TZYvM/KCvv6K2p2fFUQN41Fgrzp3C5zz7ob/lt26XMRUto8WrcKqHVXB3gt4U/iz2DhCrOlZNdMzgwJAPqIo1alJ5aUcJUA6gqRSQgJqnoUkpO64ULJH+xPJa/vUGBjyYqTXk/nbmBnBsjF5Y7ZH7QqYcY6GHBFLUqCE0CqEku64WPhSMZr4CRJieazV0ZnJtKLkyuS0a/CBqD3VyFmYuwaAPbqsjniMIWheLsgOh36lbUx5c3b0ugA5Iymbr5cq/9J3O4XStJ8nGVL8og4m2V8j5yzzdFc4w5q8YfCkoO7KUaIJ0beCzILSnBGT+hrWtppvcx+CG1tz5gTYy0VCzLUbOtgsdU1/7cALB8lYUG68hDfIm65foGJxMJ4jhvgRJA2ezXQJVKUKX9eLYlhGQ0fJ4tgC5x5CzpnY2LBxmKNj3rAE70oSMVcMx2CsyZfuJ37jqBfAlwYYk/9HiICJ/FeaePW6wM00E6a+UWp1
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(1800799015)(36860700004)(82310400014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2024 19:09:14.9226
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2de4191f-0480-4982-0aeb-08dc58c88c54
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000A6735.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6346
 
-From: Michal Luczaj <mhal@rbox.co>
-Date: Tue, 9 Apr 2024 11:16:35 +0200
-> On 4/9/24 02:22, Kuniyuki Iwashima wrote:
-> > From: Michal Luczaj <mhal@rbox.co>
-> > Date: Tue, 9 Apr 2024 01:25:23 +0200
-> >> On 4/8/24 23:18, Kuniyuki Iwashima wrote:
-> >>> From: Michal Luczaj <mhal@rbox.co>
-> >>> Date: Mon,  8 Apr 2024 17:58:45 +0200
-> >> ...
-> >>>>  	list_for_each_entry_safe(u, next, &gc_inflight_list, link) {
-> > 
-> > Please move sk declaration here and
-> > 
-> >>>> -		long total_refs;
-> >>>> -
-> >>>> -		total_refs = file_count(u->sk.sk_socket->file);
-> > 
-> > keep these 3 lines for reverse xmax tree order.
-> 
-> Tricky to have them all 3 in reverse xmax. Did you mean
-> 
-> 	struct sock *sk = &u->sk;
-> 	long total_refs;
-> 
-> 	total_refs = file_count(sk->sk_socket->file);
-> 
-> ?
+Hi,
 
-Yes, it's netdev convention.
-https://docs.kernel.org/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
+This patchset provides bug fixes to mlx5 driver.
 
+This is V2 of the series previously submitted as PR by Saeed:
+https://lore.kernel.org/netdev/20240326144646.2078893-1-saeed@kernel.org/T/
 
-> 
-> >>> connect(S, addr)	sendmsg(S, [V]); close(V)	__unix_gc()
-> >>> ----------------	-------------------------	-----------
-> >>> NS = unix_create1()
-> >>> skb1 = sock_wmalloc(NS)
-> >>> L = unix_find_other(addr)
-> >>> 						for u in gc_inflight_list:
-> >>> 						  if (total_refs == inflight_refs)
-> >>> 						    add u to gc_candidates
-> >>> 						    // L was already traversed
-> >>> 						    // in a previous iteration.
-> >>> unix_state_lock(L)
-> >>> unix_peer(S) = NS
-> >>>
-> >>> 						// gc_candidates={L, V}
-> >>>
-> >>> 						for u in gc_candidates:
-> >>> 						  scan_children(u, dec_inflight)
-> >>>
-> >>> 						// embryo (skb1) was not
-> >>> 						// reachable from L yet, so V's
-> >>> 						// inflight remains unchanged
-> >>> __skb_queue_tail(L, skb1)
-> >>> unix_state_unlock(L)
-> >>> 						for u in gc_candidates:
-> >>> 						  if (u.inflight)
-> >>> 						    scan_children(u, inc_inflight_move_tail)
-> >>>
-> >>> 						// V count=1 inflight=2 (!)
-> >>
-> >> If I understand your question, in this case L's queue technically does change
-> >> between scan_children()s: embryo appears, but that's meaningless. __unix_gc()
-> >> already holds unix_gc_lock, so the enqueued embryo can not carry any SCM_RIGHTS
-> >> (i.e. it doesn't affect the inflight graph). Note that unix_inflight() takes the
-> >> same unix_gc_lock.
-> >>
-> >> Is there something I'm missing?
-> > 
-> > Ah exactly, you are right.
-> > 
-> > Could you repost this patch only with my comment above addressed ?
-> 
-> Yeah, sure. One question though: what I wrote above is basically a rephrasing of
-> the commit message:
-> 
->     (...) After flipping the lock, a possibly SCM-laden embryo is already
->     enqueued. And if there is another connect() coming, its embryo won't
->     carry SCM_RIGHTS as we already took the unix_gc_lock.
-> 
-> As I understand, the important missing part was the clarification that embryo,
-> even though enqueued after the lock flipping, won't affect the inflight graph,
-> right? So how about:
-> 
->     (...) After flipping the lock, a possibly SCM-laden embryo is already
->     enqueued. And if there is another embryo coming, it can not possibly carry
->     SCM_RIGHTS. At this point, unix_inflight() can not happen because
->     unix_gc_lock is already taken. Inflight graph remains unaffected.
+Series generated against:
+commit 237f3cf13b20 ("xsk: validate user input for XDP_{UMEM|COMPLETION}_FILL_RING")
 
-Sounds good to me.
+Thanks,
+Tariq.
 
-Thanks!
+V2:
+- Updated patchset #6 per Jakub's comments.
+- Added two multi-PF (socket-direct) fixes.
+
+Carolina Jubran (4):
+  net/mlx5e: RSS, Block changing channels number when RXFH is configured
+  net/mlx5e: Fix mlx5e_priv_init() cleanup flow
+  net/mlx5e: HTB, Fix inconsistencies with QoS SQs number
+  net/mlx5e: RSS, Block XOR hash with over 128 channels
+
+Cosmin Ratiu (2):
+  net/mlx5: Properly link new fs rules into the tree
+  net/mlx5: Correctly compare pkt reformat ids
+
+Michael Liang (1):
+  net/mlx5: offset comp irq index in name by one
+
+Rahul Rameshbabu (1):
+  net/mlx5e: Do not produce metadata freelist entries in Tx port ts WQE
+    xmit
+
+Shay Drory (2):
+  net/mlx5: E-switch, store eswitch pointer before registering
+    devlink_param
+  net/mlx5: Register devlink first under devlink lock
+
+Tariq Toukan (2):
+  net/mlx5: Disallow SRIOV switchdev mode when in multi-PF netdev
+  net/mlx5: SD, Handle possible devcom ERR_PTR
+
+ .../net/ethernet/mellanox/mlx5/core/en/ptp.h  |  8 +++-
+ .../net/ethernet/mellanox/mlx5/core/en/qos.c  | 33 +++++++-------
+ .../net/ethernet/mellanox/mlx5/core/en/rqt.c  |  7 +++
+ .../net/ethernet/mellanox/mlx5/core/en/rqt.h  |  1 +
+ .../net/ethernet/mellanox/mlx5/core/en/selq.c |  2 +
+ .../ethernet/mellanox/mlx5/core/en_ethtool.c  | 45 ++++++++++++++++++-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c |  2 -
+ .../net/ethernet/mellanox/mlx5/core/en_tx.c   |  7 ++-
+ .../net/ethernet/mellanox/mlx5/core/eswitch.c |  9 ++--
+ .../mellanox/mlx5/core/eswitch_offloads.c     | 11 +++++
+ .../net/ethernet/mellanox/mlx5/core/fs_core.c | 17 +++++--
+ .../net/ethernet/mellanox/mlx5/core/lib/sd.c  |  4 +-
+ .../net/ethernet/mellanox/mlx5/core/main.c    | 37 ++++++++-------
+ .../net/ethernet/mellanox/mlx5/core/pci_irq.c |  4 +-
+ .../mellanox/mlx5/core/sf/dev/driver.c        |  1 -
+ 15 files changed, 133 insertions(+), 55 deletions(-)
+
+-- 
+2.44.0
+
 
