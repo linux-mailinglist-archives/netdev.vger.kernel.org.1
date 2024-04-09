@@ -1,106 +1,107 @@
-Return-Path: <netdev+bounces-86309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3804089E5D4
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 00:59:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B0E089E5DD
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 01:05:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E25F21F22722
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 22:59:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DF191F22843
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 23:05:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93A2158D8D;
-	Tue,  9 Apr 2024 22:59:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1BF1158DA5;
+	Tue,  9 Apr 2024 23:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h2keEnzR"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="n2dljnVZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A61A4158A3D
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 22:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC996158D9B;
+	Tue,  9 Apr 2024 23:05:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712703549; cv=none; b=NiMO0DJzLUwXo4cOJoc8aDIiZRVVZ41fGgQVoHT/B+K2JM1Xpj+l1XTU4RoQgHexUrdpLUYiP67smVRSxVfsa5fKYOIUDVXvIHlaJUxvtsP23vqgA8I9668ZDq4YjwCNm9L3sCWc8G6sF9oMQ9l73iybKLL9y1Hd3rRyGfAQSwM=
+	t=1712703913; cv=none; b=mdXy/buMTb7NLJ4CtaXezRKmfUpfIrwv/CLTe1kOVSNzQXdJRT7d5OEdg1kFxSiIIjFjUWK0g7YvgbddxhTI+v+ncACLqDtxiM8DNPSsR2oJZ0zqWmZBK2+3Gw5bzeKly8NeL0U5xEXTPznzL0vRjz9Hyg3bpQQlaOirSblYoak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712703549; c=relaxed/simple;
-	bh=SBcb1ap0n3wfkMdktfctqcMOmOejsMT/AbczyTGbBrc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UZxN58mANEDWsTLXXr0tSd/Ebdcx5rGDl5DF9d29i9YmiASBidPMX4Qgu5M1DkY/HaAwmHgsjc2ZMoKLnvu3REKO9CAvNLFtMTXIDQxnThfxT55EvRiPQS4NQWuIgTng8UirFL92SqjCl73Smk1we0nZSL0tAmSeVUiIzAykZD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h2keEnzR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51146C433C7;
-	Tue,  9 Apr 2024 22:59:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712703549;
-	bh=SBcb1ap0n3wfkMdktfctqcMOmOejsMT/AbczyTGbBrc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h2keEnzRu99yug9bKZaijm8nYqHMUA8VLsCxuIVhp0guqhswHUoBAeWhVJSIQwV4A
-	 nxsYAQXjdHWTQp1RFR8mqYbnGvzgxCPSZh5/Z0SYqeOckLBFnKHN9c4KfiMZxXOoAK
-	 kIy1uNhonwnG/FrBgOF9ukXOHofrZqEQDRDG0bHbjRxzYd103v8PmGW/BDaEpDZJN7
-	 xN1FJ6o6SNb7mpRxxWs2TK3NqigNGp1A/sPUJLzIyatZptMLMfx94HehudtQkqyeLf
-	 elLCRKenVBJ77wIH0oJq6eCCN+qTImdEHKfB0nPGLYMZRPTe1CH8hgGRLGf9dAI0RD
-	 eqD4MFFZv48Fg==
-Date: Tue, 9 Apr 2024 15:59:07 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc: Sagi Grimberg <sagi@grimberg.me>, Aurelien Aptel <aaptel@nvidia.com>,
- "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "hch@lst.de"
- <hch@lst.de>, "kbusch@kernel.org" <kbusch@kernel.org>, "axboe@fb.com"
- <axboe@fb.com>, "davem@davemloft.net" <davem@davemloft.net>,
- "aurelien.aptel@gmail.com" <aurelien.aptel@gmail.com>, Shai Malin
- <smalin@nvidia.com>, "malin1024@gmail.com" <malin1024@gmail.com>, Or
- Gerlitz <ogerlitz@nvidia.com>, Yoray Zack <yorayz@nvidia.com>, Boris
- Pismenny <borisp@nvidia.com>, Gal Shalom <galshalom@nvidia.com>, Max
- Gurtovoy <mgurtovoy@nvidia.com>, "edumazet@google.com"
- <edumazet@google.com>
-Subject: Re: [PATCH v24 00/20] nvme-tcp receive offloads
-Message-ID: <20240409155907.2726de60@kernel.org>
-In-Reply-To: <838605ca-3071-4158-b271-1073500cbbd7@nvidia.com>
-References: <20240404123717.11857-1-aaptel@nvidia.com>
-	<20240405224504.4cb620de@kernel.org>
-	<1efd49da-5f4a-4602-85c0-fa957aa95565@grimberg.me>
-	<838605ca-3071-4158-b271-1073500cbbd7@nvidia.com>
+	s=arc-20240116; t=1712703913; c=relaxed/simple;
+	bh=6zF5YooyCsfpmE0BWmrEU0IfZ+u+69VzuF8AtWFfHOE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=ONdORhUG8IOX4w+hqLYZTZDV0byFW/gMdFAc88gxqTlidTAggcD8pswXXdGKYvw1dLn9qW/aONIuU5+Mm6uJcslSyFJRU5GD8fyj+/jYARvpImsvM7KaLYcMCe/QdWo13QTneW/cDZBtB/9sD+7CFgg8E9aEM1mHmNVXOATZwBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=n2dljnVZ; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1712703902;
+	bh=m4aSe3eXvdJ364oYuaB9qdyFtcfbMXUheiXw1fUAsao=;
+	h=Date:From:To:Cc:Subject:From;
+	b=n2dljnVZpPsB3lGuTlRECWPt3eg2LFOiqR5GIrb4TWxLSxXtauICVQjNiyXlcIrzU
+	 F822Ws7C+2g4IRibYegwtDjHCUygddf/Dx9ugkKkzKZh09PAf4oMN6X1BMSewOGLea
+	 v10hMTnQ68y4Xna4pM6OUatJi4QYWfw0VJkh4EkwMl3u9YbokVIWpG8yYl5vw1PGde
+	 MFJLJN0abj/fHzP3DcW3QUxU5V9nxu1OY2/Tv6WVl0UZ1WtV1PPB0TUlg9F7YQQS+G
+	 2W2ThuAeWOLtysJVwDXOGUbHVmwG1rhPmdOfgw29ui2BO/najHMvcNmB/tPXCEYoD/
+	 6a6UtDI0ywLDQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VDhPT723Vz4wc5;
+	Wed, 10 Apr 2024 09:05:01 +1000 (AEST)
+Date: Wed, 10 Apr 2024 09:05:00 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Greg KH <greg@kroah.com>, David Miller <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: duplicate patch in the usb.current tree
+Message-ID: <20240410090500.4018b9a0@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed; boundary="Sig_/PD4=+Su.GmnavOII5I9PHSi";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/PD4=+Su.GmnavOII5I9PHSi
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 9 Apr 2024 22:35:51 +0000 Chaitanya Kulkarni wrote:
-> blktests seems to be the right framework to add all the testcases to=20
-> cover the targeted subsystem(s) for this patchset. Daniel from Suse has=20
-> already posted an RFC (see [1]) to add support for blktests so we can=C2=
-=A0=20
-> use real controllers for better test coverage. We will be discussing=C2=
-=A0=20
-> that at LSFMM session this year in detail.
+Hi all,
 
-No preference on the framework or where the tests live, FWIW.
+The following commit is also in the net tree as a different commit
+(but the same patch):
 
-> With this support in the blktest framework, we can definitely generate=C2=
-=A0=20
-> right test-coverage for the tcp-offload that can be run by anyone who=C2=
-=A0=20
-> has this H/W. Just like I run NVMe tests on the code going from NVMe=C2=
-=A0=20
-> tree to block tree for every pull request, we are planning to run new=C2=
-=A0=20
-> nvme tcp offload specific tests regularly on NVMe tree. We will be happy=
-=20
-> to provide the H/W to distros=C2=A0who are supporting this feature in ord=
-er=20
-> to make testing easier for=C2=A0others as well.
+  fbdd90334a62 ("MAINTAINERS: Drop Li Yang as their email address stopped w=
+orking")
 
-You're not sending these patches to the distros, you're sending them
-to the upstream Linux kernel. And unfortunately we don't have a test
-lab where we could put your HW, so it's on you. To be clear all you
-need to do is periodically build and test certain upstream branches=20
-and report results. By "report" all I mean is put a JSON file with the
-result somewhere we can HTTP GET. KernelCI has been around for a while,
-I don't think this is a crazy ask.
+This is commit
+
+  eaac25d026a1 ("MAINTAINERS: Drop Li Yang as their email address stopped w=
+orking")
+
+in the net tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/PD4=+Su.GmnavOII5I9PHSi
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYVyZwACgkQAVBC80lX
+0GyA8AgAozQu1zovR4LIvcLiO4YXYKoMRXk2sDIh+OHD4atSqQS9li4uEV4PG+D/
+hhKkpZazyJE4EQy2OMBBIOCZ6zqrE2pU2AuofukuJnMELF94frg3kfqc5PrC1dU7
+zwIsqGOkvGnGBpfGQl/IYQnHxoICETqgWcUvUm00qP+o0XX2YJugmVWOUMrkV+sn
+Ov+jA0DGLZR5jOILTlifjxisAaSc72yOBzJ3HPbeGB5b0+Vjd4q7QxJ+zY6tnKkL
++rdsJOSBEDR7IldC2ImXTHlhw00isWD0OA9x3OYu2Hbj9jNEM0JV/GVlxIR52EfF
+y3+qnxD1KS7mkiOC+g4yI1YuPGFjGQ==
+=vvpf
+-----END PGP SIGNATURE-----
+
+--Sig_/PD4=+Su.GmnavOII5I9PHSi--
 
