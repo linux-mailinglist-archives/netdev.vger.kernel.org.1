@@ -1,135 +1,150 @@
-Return-Path: <netdev+bounces-86257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D5F489E325
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 21:15:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B107E89E3D4
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 21:41:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F582B20BCF
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 19:15:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28B3F1F22B61
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 19:41:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3453313A3F8;
-	Tue,  9 Apr 2024 19:15:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3F0157A42;
+	Tue,  9 Apr 2024 19:41:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FEn1bDFu"
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="EfW+m/MH";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="rb1V6qJS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from wfout6-smtp.messagingengine.com (wfout6-smtp.messagingengine.com [64.147.123.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03BEA130A72;
-	Tue,  9 Apr 2024 19:15:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D54B15749E;
+	Tue,  9 Apr 2024 19:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712690151; cv=none; b=cE2fB2jTSDRk9AESbk1GfhbmHlZdKGHn+1bwSNLNSJNhY2A4M+udV3LDL0Iso7eH/89EqLlf2XdB35VAE/Cjq/MAMibxM56e7IQcxecvaCLCwtDMd84Qfgs5OxZlSh2HwQH5pEgho+yZlT0R6FKAneExDm5LKVvz93hO7x0j1g8=
+	t=1712691697; cv=none; b=rXQ+LbPZ6hLvT38m/hnHDKAeEuqJOoAN8xtHAKryp0tLif1teVtPZ5aNFcbXt0694zJGpZYtznbZK7t8jukzNbJ491Pzg0+7DlJjXrqI7F+jMLhKEUflLb+JYc5MF/UxRlMETDAarqinqldLLciFLZ/6Kw4LLUn1AzJaibulvRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712690151; c=relaxed/simple;
-	bh=Fi6Dm51HnSpoA/lFX3RdvNX2WUP4OdXxt7yt8AtCDow=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cirb2mmLwogt86QDQDBE79Ra5keFXoyoIm2OTsDyPwjEf6tJ15Y3R5NQSXv1KkfMb6ZNMPI8/j47hosjIVcLMfmSJ8DSN1q/cYJHJ6XeATSoMcRcTnhFZDQaCzEyqX9qHeksUt946zDq+5pSlRuS8BqQsYe5/lAOJiLqfHcU9rI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FEn1bDFu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B428DC433C7;
-	Tue,  9 Apr 2024 19:15:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712690150;
-	bh=Fi6Dm51HnSpoA/lFX3RdvNX2WUP4OdXxt7yt8AtCDow=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FEn1bDFuSK5AL6JNR/iromo5QHbWpRMO7p80DmnWCRfNqikb/L64BtNSsjRdUbHIj
-	 D0EKHegMmu8t6f1f9sJDKZ05VQ97yNnS4SBYrT+phiaE4FlQWKLX13gAZ60Qslc0aN
-	 3R70SZbdXfIDAmcuTGsaRfAoGQnBKmVdaoZVlhM+IKHjrxNlfs63JewmIyp6Y2W9/M
-	 XbqpXapbq7eQzd9Sfe5lRxHiaHEm8CtTDEoIKYI2tT7aXkJxpKRWDEbZRpaXAzeZPs
-	 EtpiOgJPqQrTi3OFBOUbMxzrkRw5Eh8LUVWyD7VbKb7iqeR/LHsHq/87dxXU1x89WL
-	 IK8TOvhBhvvQQ==
-Date: Tue, 9 Apr 2024 22:15:45 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Jakub Kicinski <kuba@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
-	bhelgaas@google.com, linux-pci@vger.kernel.org,
-	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net,
-	pabeni@redhat.com
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-Message-ID: <20240409191545.GI4195@unreal>
-References: <20240408061846.GA8764@unreal>
- <CAKgT0UcE5cOKO4JgR-PBstP3e9r02+NyG3YrNQe8p2_25Xpf8g@mail.gmail.com>
- <20240408184102.GA4195@unreal>
- <CAKgT0UcLWEP5GOqFEDeyGFpJre+g2_AbmBOSXJsoXZuCprGH0Q@mail.gmail.com>
- <20240409081856.GC4195@unreal>
- <CAKgT0UewAZSqU6JF4-cPf7hZM41n_QMuiF_K8SY8hyoROQLgfQ@mail.gmail.com>
- <20240409153932.GY5383@nvidia.com>
- <CAKgT0UeSNxbq3JYe8oNaoWYWSn9+vd1c+AfjvUsietUtS09r0g@mail.gmail.com>
- <20240409171235.GZ5383@nvidia.com>
- <CAKgT0Ufc0Zx6-UwCNbwtEahdbCv=eVqJKoDuoQdz6QMD2tv-ww@mail.gmail.com>
+	s=arc-20240116; t=1712691697; c=relaxed/simple;
+	bh=mz+ivdvfJu2xvIClgoV0DYYhljRVDMHl7FLu7Sohooc=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=o/cJOL8nCFaU/ChqnERJbMKMlPb3uW1I9DkequHddzyi5KcuBtDkbBcYS7mzkLplvamu+MrKnXOAn+GW80uPHu/9e2/p/3ebfYx/KlrEz9XIQGKxPu5VOIpHlOKGUUml7D0gdDm7XT8YO11Yz51UhrGuzNrcQahZgdq1xM5GUYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=EfW+m/MH; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=rb1V6qJS; arc=none smtp.client-ip=64.147.123.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfout.west.internal (Postfix) with ESMTP id C91921C00099;
+	Tue,  9 Apr 2024 15:41:33 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Tue, 09 Apr 2024 15:41:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm2; t=1712691693; x=1712778093; bh=tr06fHvNZN
+	R9qLnaA0dmPX0JUluTiub3QurVgyRyKZs=; b=EfW+m/MHJuGNp7wXiicYMOS8Gv
+	We8w+3YSyD4clKI2gkcpD2WNcM0lQ9rd3MZpLFaCfYJG/zaBs1ebm5M36gKoh32W
+	m8ZJcu4hezY4WiZYb3o6qwEVNUvpBCHDrkWbW3iCekIOgfB7UgaSRvDaQpWd/eT1
+	sfO3+wrjTi8XIaSfXXbtDJSaZD9/zJurHdTgcqF04AtwZ51AOeZxhY3TcBdjVtSv
+	uSEOpvZD1vQ4QxdJGvAMTfM1h/FkXk7rUpHnLIGqN880m2sVYRMZskVlQ1eEp9/Y
+	F0hGlWQ0lZq53kXiJiT/jTm1nfOXIhA+dpOh5yIY9SOi5PQI0HH1BdEo6hpQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1712691693; x=1712778093; bh=tr06fHvNZNR9qLnaA0dmPX0JUluT
+	iub3QurVgyRyKZs=; b=rb1V6qJSNgbGGdqQQU9F4tJTo59+boX82uQrHnvyee53
+	veZDR6VeYq32/e8LTKaRr7pPjNZ4sRR9J3ZeagHdbOsuwPNCJB+i5T6AD02wBzKw
+	uS1Onk40A6IKHwti7aQ859+qrruqGLO8rvf+aoTy49lKEOgc5qsup5BVTqoYXIYj
+	8XOslqgIJg1aINSMFq4Yu31JdQehXDuDlcNb2MNcspoi8dpIoB+7vBoUAAeRPOR7
+	5yBMC0YW1Obp+fRUbQr42UFD1bQls9AcbXAlSJje87gOmhNum4UaBVqJvpQW/gmn
+	4CfNu2/KcxrVy+E2y8lCyrnj5L96+LZbC+4NuK3mvQ==
+X-ME-Sender: <xms:65kVZuzRHlJqdc8gdCzRnkf8Q5ICABlpTnwB__2u8GKHgUS6o_S3vw>
+    <xme:65kVZqSFPx1AOaA9Ahf5D6FhxcO6mVb__3arlEEMbfd5rSJVuxA7OhxWfv8NLrAsp
+    rfqUMfSyy6s8tMnZXI>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudehgedgudduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepgeetiefhjedvhfeffffhvddvvdffgfetvdetiefghefhheduffeljeeuuddv
+    lefgnecuffhomhgrihhnpehprghsthgvsghinhdrtghomhenucevlhhushhtvghrufhiii
+    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:65kVZgWXrehyrpr_yQTpXeJMDMlXSa5f93wRP0adgsABvMDmPxO8tA>
+    <xmx:65kVZkg3F9scO3itqMlmUro250T6g6FD2KHWCAUPmBb7jcXTNzrZXw>
+    <xmx:65kVZgD-MMeK6JG039kFpxTCq9eOS2IsuXw3zwG-6svuTA3ajUKJbQ>
+    <xmx:65kVZlLC9nycoVuLJytyvSLwJdZF5wGT69HIPkEJagB0yKXdiv_CXw>
+    <xmx:7ZkVZi6U0iWQBsONeDhxJFwA3KH0jkXBGDvxYYDjJukURMTilmxli-Pj>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 0176CB6008D; Tue,  9 Apr 2024 15:41:30 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-379-gabd37849b7-fm-20240408.001-gabd37849
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKgT0Ufc0Zx6-UwCNbwtEahdbCv=eVqJKoDuoQdz6QMD2tv-ww@mail.gmail.com>
+Message-Id: <f94c6943-eb93-4533-8e4d-3645ef38b990@app.fastmail.com>
+In-Reply-To: <20240409161517.GA3219862@dev-arch.thelio-3990X>
+References: <20240216202657.2493685-1-arnd@kernel.org>
+ <202402161301.BBFA14EE@keescook>
+ <763214eb-20eb-4627-8d4b-2e7f29db829a@app.fastmail.com>
+ <20240409161517.GA3219862@dev-arch.thelio-3990X>
+Date: Tue, 09 Apr 2024 21:41:09 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Nathan Chancellor" <nathan@kernel.org>
+Cc: "Kees Cook" <keescook@chromium.org>, "Arnd Bergmann" <arnd@kernel.org>,
+ "Steffen Klassert" <steffen.klassert@secunet.com>,
+ "Herbert Xu" <herbert@gondor.apana.org.au>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Paolo Abeni" <pabeni@redhat.com>,
+ "Nick Desaulniers" <ndesaulniers@google.com>,
+ "Bill Wendling" <morbo@google.com>, "Justin Stitt" <justinstitt@google.com>,
+ "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ "Leon Romanovsky" <leon@kernel.org>, "Lin Ma" <linma@zju.edu.cn>,
+ "Simon Horman" <horms@kernel.org>, "Breno Leitao" <leitao@debian.org>,
+ "Tobias Brunner" <tobias@strongswan.org>, "Raed Salem" <raeds@nvidia.com>,
+ Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
+ llvm@lists.linux.dev
+Subject: Re: [PATCH] [RFC] xfrm: work around a clang-19 fortifiy-string false-positive
+Content-Type: text/plain
 
-On Tue, Apr 09, 2024 at 11:38:59AM -0700, Alexander Duyck wrote:
-> On Tue, Apr 9, 2024 at 10:12 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
-> >
-> > On Tue, Apr 09, 2024 at 09:31:06AM -0700, Alexander Duyck wrote:
-> >
-> > > > expectation is generally things like:
-> > > >
-> > > >  - The bug is fixed immediately because the issue is obvious to the
-> > > >    author
-> > > >  - Iteration and rapid progress is seen toward enlightening the author
-> > > >  - The patch is reverted, often rapidly, try again later with a good
-> > > >    patch
-> > >
-> > > When working on a development branch that shouldn't be the
-> > > expectation. I suspect that is why the revert was pushed back on
-> > > initially. The developer wanted a chance to try to debug and resolve
-> > > the issue with root cause.
-> >
-> > Even mm-unstable drops patches on a hair trigger, as an example.
-> >
-> > You can't have an orderly development process if your development tree
-> > is broken in your CI.. Personally I'm grateful for the people who test
-> > linux-next (or the various constituent sub trees), it really helps.
-> >
-> > > Well much of it has to do with the fact that this is supposed to be a
-> > > community. Generally I help you, you help me and together we both make
-> > > progress. So within the community people tend to build up what we
-> > > could call karma. Generally I think some of the messages sent seemed
-> > > to make it come across that the Mellanox/Nvidia folks felt it "wasn't
-> > > their problem" so they elicited a bit of frustration from the other
-> > > maintainers and built up some negative karma.
-> >
-> > How could it be NVIDIA folks problem? They are not experts in TCP and
-> > can't debug it. The engineer running the CI systems did what he was
-> > asked by Eric from what I can tell.
-> 
-> No, I get your message. I wasn't saying it was your problem. All that
-> can be asked for is such cooperation. Like I said I think some of the
-> problem was the messaging more than the process.
+On Tue, Apr 9, 2024, at 18:15, Nathan Chancellor wrote:
+> On Mon, Apr 08, 2024 at 09:06:21AM +0200, Arnd Bergmann wrote:
+>> >
+>> > The shorter fix (in the issue) is to explicitly range-check before
+>> > the loop:
+>> >
+>> >        if (xp->xfrm_nr > XFRM_MAX_DEPTH)
+>> >                return -ENOBUFS;
+>> 
+>> I ran into this issue again and I see that Nathan's fix has
+>> made it into mainline and backports, but it's apparently
+>> not sufficient.
+>> 
+>> I don't see the warning with my patch from this thread, but
+>> there may still be a better fix.
+>
+> Is it the exact same warning? clang-19 or older?
+> What > architecture/configuration? If my change is not sufficient then maybe
+> there are two separate issues here? I have not seen this warning appear
+> in our CI since my change was applied.
 
-Patch with revert came month+ after we reported the issue and were ready
-to do anything to find the root cause, so it is not the messaging issue,
-it was the exclusion from process issue.
+I only see it with clang-19. I've never seen it with arm32 and
+currently only see it with arm64, though I had seen it with x86-64
+as well in February before your patch.
 
-I tried to avoid to write the below, but because Jason brought it
-already, I'll write my feelings.
+The warning is the same as before aside from the line number,
+which which is now include/linux/fortify-string.h:462:4
+where it was line 420, but I think that is just a context
+change.
 
-Current netdev has very toxic environment, with binary separation to
-vendors and not-vendors.
+I have a number of configs that reproduce this bug, see
+https://pastebin.com/tMgfD7cu for an example with current
+linux-next.
 
-Vendors are bad guys who day and night try to cheat and sneak their
-dirty hacks into the kernel. Their contributions are negligible and
-can't be trusted by definition.
-
-Luckily enough, there are some "not-vendors" and they are the good
-guys who know what is the best for the community and all other world.
-
-Thanks
+     Arnd
 
