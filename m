@@ -1,134 +1,210 @@
-Return-Path: <netdev+bounces-86170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F49189DD0E
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:43:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF15C89DD10
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:43:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7022F1C21156
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:43:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5433D1F25B2C
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E49757873;
-	Tue,  9 Apr 2024 14:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9464B12FF84;
+	Tue,  9 Apr 2024 14:41:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZvKs02Yg"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="BW0d5GQ+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 962CCC139
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 14:40:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8817E2C695
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 14:41:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712673645; cv=none; b=OEnAVDedkANE0eUU2cahPIJw4ywLqgX+dtoPlcHUkogQFOAR2qWKZ+ewoEnbjeM5ervPRTuBWL0ZK7m1kELmxYeoFnZCIdm8mfhXXVLqo5Td8CUcsjR4Oe6/M4YO9C6BCx7/gLhbEO099rl23rlUNXj107OUMTZTUP/0Qy0mMc8=
+	t=1712673676; cv=none; b=YHiE6RPSt/M1TNjhKh2gOl4HLysUs1VmGe7mFwTOFQSlvdkAKIhvIVnF5Awux4uQEAA6ahKOpW3CeY2KZ4hdJInnzt8U32TDFiHFlmUvnOFZiouM17pNjVwFzCfxghGLsiprrFGay5e9Gi/qADDMsaN7gSYDznlz6AWIqIjYr/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712673645; c=relaxed/simple;
-	bh=3OUCC3FZUTl/rt+qxJ7RgQNicPYwq+CFcKZXghoIBxI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jz0OEd6rQ916eHpdssOq+6y7p7KEwEsvj3NbZB5rFztrndu2y1wjMgpmyReLw4VAYffLl1EUVOWKOBQOaxFYibGhZ8v6aXhDZKVpD/8eBzurQBpq43KWyyeUKqTkHAS1QCOTgMHWWS8t6WA832FQDWjKT4e4mjfwEzmyTz1QGXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZvKs02Yg; arc=none smtp.client-ip=209.85.166.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-7d5db134badso132043939f.2
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 07:40:43 -0700 (PDT)
+	s=arc-20240116; t=1712673676; c=relaxed/simple;
+	bh=crZHliPSczw38fmT73x6jx2VXnB+ZuL4FAMKSW97us4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TXamHNwVyChv9bc8uOf2Ytx6RqIz64CMSwdLBqBWwpE6YS+wCTNL0HAryZgw5tUiAjvtCsbd89bOyRlb1TpzITwYOUoE3jhm2R8kIC1E52lcwHSRtLqmxQ8lMHNR669WKLEmVXn8qV5+pFb428AY5Bz3u+nF6U5L6dGZC8eRee4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=BW0d5GQ+; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-56e56ee8d5cso3464131a12.2
+        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 07:41:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712673642; x=1713278442; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BAhfhJBQ3KuCQAwVFtPaFqwMIpUNSR4aVdjDu/jhZ0M=;
-        b=ZvKs02Ygg6FixVE2tf1k41fQyraMB7YN7cTGzzMEf/m1fvIv+LeK3dLewr2jBkIa+S
-         mxk/F3kmSUTgnA5jsEFuJgTKtGHBIceUWuOqpRy7XUiQUHnNvqLUNOXpxDy+ycbcRsOs
-         jg/5xz1umbVZjjh3h2aFMYcuvdHhswUya4LTPuY66JPaaCv44RerIj8VWBuk+qQUhO79
-         bMj4xb9FebgWU0JS18ZTxIYOOjaVxeggKYXmyQlO7J3/QuaceZzxIlWk1kFUG7XwKXW6
-         3ggXau/R5lR2/Uf4gibgD15pJ8yyMP38Y/1Lzy+L0w6hYP2UqEG6RlK4kXo9iy25lqFF
-         sf2g==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712673673; x=1713278473; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3YM0svOKwvw0vj20M9m4hQD/WKGUTfYpCfTIb0VEe5Y=;
+        b=BW0d5GQ+cU+MHypDX38aEB1KvT3DIEHGUjnTWt7aZ/E2LH/74iVHO9mCippxcz2kIg
+         FjD6o/0JF6Z4V0VoqcTvRLnAiTDe1EIcWDGKclRPGweelma3BZZqSs44ELZrPzBGWOGO
+         /SaRdnR0FAqqZjwOMhWDobWzN++7uD0jEk2uiEZ7JZSVapOKuI6SFZMoegHBNqnAX7J+
+         CjXrdE2aivd8fb3ttmWRz8ku3/CRoU9Iba1ZG57ZcECoC+MKCps8GbpbldCakuymIBuD
+         ij0HowEEIORpDxkIQYB6DSsfZZwcnsSD6YUGbzNyn1Z9eD7NLQ1uBsCvOJTIrH6+b4RA
+         l2Ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712673642; x=1713278442;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1712673673; x=1713278473;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BAhfhJBQ3KuCQAwVFtPaFqwMIpUNSR4aVdjDu/jhZ0M=;
-        b=L4cnCZJYkzClYhe9I/dSzf5HgEWwp9CNTzx0lXlObd0qEsFXV3Nuxruo8s2NIhQoKa
-         CsW9UxmT/HMPcZHl348cFmPOTcoYEicNeZXj5Klf0BDSvZtwkqyQx4WnODdq0zrwe2nf
-         dMH8HnWpb5xtapawzCvIZddFmy4IC6FuBz1zcglMNcBVfmACxxDkRxnOzfLX+oJPjAXS
-         DdbIU/fM1nsuQi9TmbYrdXPf1RcDMOa1NwtAjsBvd8VDH6ibxshkbvbYtlWxe8f1RjQU
-         wEeiB4C2QuolNAeK2G1oKhULpLIj6TqLQpj8JB9JlM2m2zUALePTFZFgzQf9Ing1cwkD
-         46mg==
-X-Forwarded-Encrypted: i=1; AJvYcCUSxfu/S3w63nCaDjxcLRoG8cLecFfozVmesyyAwxYqVg/YbXTtU4+N0i4LnQYEh/jSkaJ7JXbj+aNCAizNiui344xvHqTj
-X-Gm-Message-State: AOJu0YxYV9JT+DY8KhH1AC9oKXYuIywadJYoJqOlnSZdR2wK4KJKV5a6
-	Y4JF6yjfWX7U/Qp2ffY6dHypKjcctmD6ClWNrm4kEIQXfjFCzfadfqFQ8Wqf
-X-Google-Smtp-Source: AGHT+IF1qSQbjZANAV+ocsYnzXLRclbAXbC4pxks+DflTaOzw5MSj55GnlVr2VHC/we08IrDlRVvjA==
-X-Received: by 2002:a5d:8744:0:b0:7d0:8cff:cff3 with SMTP id k4-20020a5d8744000000b007d08cffcff3mr11590351iol.8.1712673642598;
-        Tue, 09 Apr 2024 07:40:42 -0700 (PDT)
-Received: from ?IPV6:2601:282:1e82:2350:6dd8:136a:4594:269? ([2601:282:1e82:2350:6dd8:136a:4594:269])
-        by smtp.googlemail.com with ESMTPSA id o1-20020a05660213c100b007d609763041sm693791iov.5.2024.04.09.07.40.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Apr 2024 07:40:42 -0700 (PDT)
-Message-ID: <63122565-b5a3-48d6-829e-2e2a3d5a1021@gmail.com>
-Date: Tue, 9 Apr 2024 08:40:40 -0600
+        bh=3YM0svOKwvw0vj20M9m4hQD/WKGUTfYpCfTIb0VEe5Y=;
+        b=N+sBIAxYDDQsu2EY7YmPqK8V2NxIqy7JRJCOMgnrfcn+wbRffHVki+Zjz31KnNYMfh
+         wsqItVYnVl7Bhv961K98vlKDUhl4NRh9NHpGppe0dvVF1kZcx0bTEavHgW0kwMXXnXGF
+         Zh6tPuDKHcK6xRF1biZq58Vyxd9GjDoXz7tolY6iYiBD5UlBP4QbU2NRLttV0yDYc+07
+         ISh8xOSOpsRPFG97nTEDmOCQDO5LSumeM6WONp/6fPlpN8jAcUl0HRlTbgo3rd1/ipY/
+         pNQ2rkGcDo/Mwnz4rLz/D9p3A/3ZIP2v4KjXzfFhLFqJA4aXPOjxlsaMBr2e3tJ1+rcG
+         +dhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWpUXd/sYMznjwrfOI6hhhbp4HMuEc/Hu2ea6uGXy5Gp5LMbSkg+yxU1hbOs4TNAOw7Uv00WjpFgJFeCYcHDOIQklFtw1oJ
+X-Gm-Message-State: AOJu0YyonKkZ1KDPyD5HeVzP9iC4eeNkyH3UspMiqMIPgIRKqXVNsWSm
+	3KPy1QrJMd/IKQjrWVhnWg3pCBAeZPFZDhBmXnHM03Ikt0Oaij/o3RlQPknM6iY=
+X-Google-Smtp-Source: AGHT+IE8BN7L+U9byp33eLZHsIGbXcOcBnUDnv+w8oAvonuY0OxyonFU4AewVbRCx1e8iaeM4hOIoQ==
+X-Received: by 2002:a50:c358:0:b0:56e:6d9:7bd6 with SMTP id q24-20020a50c358000000b0056e06d97bd6mr11113651edb.34.1712673672424;
+        Tue, 09 Apr 2024 07:41:12 -0700 (PDT)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id bc23-20020a056402205700b0056e064a6d2dsm5321689edb.2.2024.04.09.07.41.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Apr 2024 07:41:11 -0700 (PDT)
+Date: Tue, 9 Apr 2024 16:41:10 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+	Alexander Duyck <alexander.duyck@gmail.com>,
+	Jason Gunthorpe <jgg@nvidia.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	bhelgaas@google.com, linux-pci@vger.kernel.org,
+	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <ZhVThhwFSV0HgQ0B@nanopsycho>
+References: <20240405122646.GA166551@nvidia.com>
+ <CAKgT0UeBCBfeq5TxTjND6G_S=CWYZsArxQxVb-2paK_smfcn2w@mail.gmail.com>
+ <20240405151703.GF5383@nvidia.com>
+ <CAKgT0UeK=KdCJN3BX7+Lvy1vC2hXvucpj5CPs6A0F7ekx59qeg@mail.gmail.com>
+ <ZhPaIjlGKe4qcfh_@nanopsycho>
+ <CAKgT0UfcK8cr8UPUBmqSCxyLDpEZ60tf1YwTAxoMVFyR1wwdsQ@mail.gmail.com>
+ <ZhQgmrH-QGu6HP-k@nanopsycho>
+ <66142a4b402d5_2cb7208ec@john.notmuch>
+ <ZhUgH9_beWrKbwwg@nanopsycho>
+ <9dd78c52-868e-4955-aba2-36bbaf3e0d88@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] selftests: fib_rule_tests: Add VRF tests
-Content-Language: en-US
-To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, liuhangbin@gmail.com, gnault@redhat.com,
- ssuryaextr@gmail.com
-References: <20240409110816.2508498-1-idosch@nvidia.com>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <20240409110816.2508498-1-idosch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9dd78c52-868e-4955-aba2-36bbaf3e0d88@intel.com>
 
-On 4/9/24 5:08 AM, Ido Schimmel wrote:
-> After commit 40867d74c374 ("net: Add l3mdev index to flow struct and
-> avoid oif reset for port devices") it is possible to configure FIB rules
-> that match on iif / oif being a l3mdev port. It was not possible before
-> as these parameters were reset to the ifindex of the l3mdev device
-> itself prior to the FIB rules lookup.
-> 
-> Add tests that cover this functionality as it does not seem to be
-> covered by existing ones and I am aware of at least one user that needs
-> this functionality in addition to the one mentioned in [1].
-> 
-> Reuse the existing FIB rules tests by simply configuring a VRF prior to
-> the test and removing it afterwards. Differentiate the output of the
-> non-VRF tests from the VRF tests by appending "(VRF)" to the test name
-> if a l3mdev FIB rule is present.
-> 
-> Verified that these tests do fail on kernel 5.15.y which does not
-> include the previously mentioned commit:
-> 
->  # ./fib_rule_tests.sh -t fib_rule6_vrf
->  [...]
->      TEST: rule6 check: oif redirect to table (VRF)                      [FAIL]
->  [...]
->      TEST: rule6 check: iif redirect to table (VRF)                      [FAIL]
-> 
->  # ./fib_rule_tests.sh -t fib_rule4_vrf
->  [...]
->      TEST: rule4 check: oif redirect to table (VRF)                      [FAIL]
->  [...]
->      TEST: rule4 check: iif redirect to table (VRF)                      [FAIL]
-> 
-> [1] https://lore.kernel.org/netdev/20200922131122.GB1601@ICIPI.localdomain/
-> 
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> ---
->  tools/testing/selftests/net/fib_rule_tests.sh | 46 +++++++++++++++++--
->  1 file changed, 43 insertions(+), 3 deletions(-)
-> 
+Tue, Apr 09, 2024 at 03:11:21PM CEST, aleksander.lobakin@intel.com wrote:
+>From: Jiri Pirko <jiri@resnulli.us>
+>Date: Tue, 9 Apr 2024 13:01:51 +0200
+>
+>> Mon, Apr 08, 2024 at 07:32:59PM CEST, john.fastabend@gmail.com wrote:
+>>> Jiri Pirko wrote:
+>>>> Mon, Apr 08, 2024 at 05:46:35PM CEST, alexander.duyck@gmail.com wrote:
+>>>>> On Mon, Apr 8, 2024 at 4:51 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>>>>>>
+>>>>>> Fri, Apr 05, 2024 at 08:38:25PM CEST, alexander.duyck@gmail.com wrote:
+>>>>>>> On Fri, Apr 5, 2024 at 8:17 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>>>>>>>
+>>>>>>>> On Fri, Apr 05, 2024 at 07:24:32AM -0700, Alexander Duyck wrote:
+>>>>>>>>>> Alex already indicated new features are coming, changes to the core
+>>>>>>>>>> code will be proposed. How should those be evaluated? Hypothetically
+>>>>>>>>>> should fbnic be allowed to be the first implementation of something
+>>>>>>>>>> invasive like Mina's DMABUF work? Google published an open userspace
+>>>>>>>>>> for NCCL that people can (in theory at least) actually run. Meta would
+>>>>>>>>>> not be able to do that. I would say that clearly crosses the line and
+>>>>>>>>>> should not be accepted.
+>>>>>>>>>
+>>>>>>>>> Why not? Just because we are not commercially selling it doesn't mean
+>>>>>>>>> we couldn't look at other solutions such as QEMU. If we were to
+>>>>>>>>> provide a github repo with an emulation of the NIC would that be
+>>>>>>>>> enough to satisfy the "commercial" requirement?
+>>>>>>>>
+>>>>>>>> My test is not "commercial", it is enabling open source ecosystem vs
+>>>>>>>> benefiting only proprietary software.
+>>>>>>>
+>>>>>>> Sorry, that was where this started where Jiri was stating that we had
+>>>>>>> to be selling this.
+>>>>>>
+>>>>>> For the record, I never wrote that. Not sure why you repeat this over
+>>>>>> this thread.
+>>>>>
+>>>>> Because you seem to be implying that the Meta NIC driver shouldn't be
+>>>>> included simply since it isn't going to be available outside of Meta.
+>
+>BTW idpf is also not something you can go and buy in a store, but it's
+>here in the kernel. Anyway, see below.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+IDK, why so many people in this thread are so focused on "buying" nic.
+IDPF device is something I assume one may see on a VM hosted in some
+cloud, isn't it? If yes, it is completely legit to have it in. Do I miss
+something?
 
-Thanks, Ido.
 
+>
+>>>>> The fact is Meta employs a number of kernel developers and as a result
+>>>>> of that there will be a number of kernel developers that will have
+>>>>> access to this NIC and likely do development on systems containing it.
+>
+>[...]
+>
+>>> Vendors would happily spin up a NIC if a DC with scale like this
+>>> would pay for it. They just don't advertise it in patch 0/X,
+>>> "adding device for cloud provider foo".
+>>>
+>>> There is no difference here. We gain developers, we gain insights,
+>>> learnings and Linux and OSS drivers are running on another big
+>>> DC. They improve things and find bugs they upstream them its a win.
+>>>
+>>> The opposite is also true if we exclude a driver/NIC HW that is
+>>> running on major DCs we lose a lot of insight, experience, value.
+>> 
+>> Could you please describe in details and examples what exactly is we
+>> are about to loose? I don't see it.
+>
+>As long as driver A introduces new features / improvements / API /
+>whatever to the core kernel, we benefit from this no matter whether I'm
+>actually able to run this driver on my system.
+>
+>Some drivers even give us benefit by that they are of good quality (I
+>don't speak for this driver, just some hypothetical) and/or have
+>interesting design / code / API / etc. choices. The drivers I work on
+>did gain a lot just from that I was reading new commits / lore threads
+>and look at changes in other drivers.
+>
+>I saw enough situations when driver A started using/doing something the
+>way it wasn't ever done anywhere before, and then more and more drivers
+>stated doing the same thing and at the end it became sorta standard.
+
+So bottom line is, the unused driver *may* introduce some features and
+*may* provide as an example of how to do things for other people.
+Is this really that beneficial for the community that it overweights
+the obvious cons (not going to repeat them)?
+
+Like with any other patch/set we merge in, we always look at the cons
+and pros. I'm honestly surprised that so many people here
+want to make exception for Meta's internal toy project.
+
+
+>
+>I didn't read this patchset and thus can't say if it will bring us good
+>immediately or some time later, but I believe there's no reason to
+>reject the driver only because you can't buy a board for it in your
+>gadget store next door.
+
+Again with "buying", uff.
+
+
+>
+>[...]
+>
+>Thanks,
+>Olek
 
