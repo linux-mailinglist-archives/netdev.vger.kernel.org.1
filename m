@@ -1,426 +1,341 @@
-Return-Path: <netdev+bounces-86231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42CB989E1AD
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 19:37:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9524F89E1BA
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 19:42:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9810F1F23687
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 17:37:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 942601C21311
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 17:42:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D304131732;
-	Tue,  9 Apr 2024 17:37:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17335155390;
+	Tue,  9 Apr 2024 17:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="J53quNxm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sa9qh3IL"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7030B4C85
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 17:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A7914C85;
+	Tue,  9 Apr 2024 17:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712684255; cv=none; b=j5WEpKfqx9m6OpL+PiKLm404RNg8bLgE7qlb3pR2AXe+dUxGUaWAiwKdwYiuUOz8KE2gxfI0kb9e1ta6OQJVeQ5iRd2vDZoq3IYxeak0x7aVwmhu6fV3t7OMXwCgbtt0Z61dlml3yBPIBt9g6LH8Pu3hQ9e86YS/WizJafdVVn8=
+	t=1712684573; cv=none; b=hJW4tOsIDGA1WFwXdYw142NOJ8Oln8kMT+3sZLze4NILbVCxyZ33dq7okVaeQ7CevGo4pxYyPrk2UtqzT86X8mzHsrMi2sDbra2YYseSQLDsHZCEvLJAoiq3hJeP00JHJ+hDjpbHGc1l/A+by1WOb7/DCbLJoaSRKhWpD+IfFAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712684255; c=relaxed/simple;
-	bh=Ij6S2q25G3XO/4HXJhzq3w07xUcIybHvIdp9GAzytMQ=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=B352uHsZQexxkL4Nnk9wI1xWlAkpwhdGd/VCaIrk/43JL79AVg/VB7cJ5dzkpXDwJHvcWh3+VXPLlncX+SWHfE0Wx/+6U8nuWXBbo/faMT2N8b9peJtQ2MLwwSkDIz3bUyAvRb/frHTbAxTVCNqboWv52uoWoTwxju1Y13LzUng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=J53quNxm; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 0C8362083E;
-	Tue,  9 Apr 2024 19:37:29 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id OBkie9uOH8WU; Tue,  9 Apr 2024 19:37:28 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 29442205ED;
-	Tue,  9 Apr 2024 19:37:28 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 29442205ED
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1712684248;
-	bh=pid8xrddRiss1UhqDE5MKIbO53hY8dIQcSKpv3gcxCY=;
-	h=Date:From:To:CC:Subject:Reply-To:From;
-	b=J53quNxm+A3FW53jE9s2QgZB531P3JSjSsuOzjnIRFJa9u3dK85UiMkqYPwymHLCU
-	 4yKZFAAf/e0TsC30p75dJa3zlWNVkAs5AbEwOSkqP8nY46tFzesSI2RyZj4SHHO8qv
-	 +J+E2FzkLknfdsswypc5DsWNa5TrmWoC5U56vnlSrFw1y5TWAENYz1WyOdEM75JgKL
-	 8hs3wcZDo1qqJNDLLFW9uu0FkTrMQthgA9Lfz0p81lQobRaHG4SwEvqDaYlr++gyI9
-	 qBOmpixuZmGQECP5rTCAXCc/zfSzLZ8V97TDJxSlJN3n/j+XUx1rHDCSDRd7xlHDzC
-	 0Rl0F+YSB0qJA==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 1A14880004A;
-	Tue,  9 Apr 2024 19:37:28 +0200 (CEST)
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 9 Apr 2024 19:37:27 +0200
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Tue, 9 Apr
- 2024 19:37:27 +0200
-Date: Tue, 9 Apr 2024 19:37:20 +0200
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <devel@linux-ipsec.org>, Leon Romanovsky
-	<leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>, Nicolas Dichtel
-	<nicolas.dichtel@6wind.com>, Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH ipsec-next v8] xfrm: Add Direction to the SA in or out
-Message-ID: <9e2ddbac8c3625b460fa21a3bfc8ebc4db53bd00.1712684076.git.antony.antony@secunet.com>
-Reply-To: <antony.antony@secunet.com>
+	s=arc-20240116; t=1712684573; c=relaxed/simple;
+	bh=y4yPbOW7qBshpM0WkZh6ezHgsetm01AnkA/aNdq3fLI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AIB6u/RNUt7v0QyXX5WuHUl/s4eKmvoVwmr33aMkT5bvp6TIt+Bl04RnYihbXSHobFTcssR7G6vFoCF1gaFAJc2FFkM8+qSbZ+UIKH4wbnKY5Y1dMBShCs4bEMR6aRKczTYUef0sW6ZSAl2pVu+FK2lxm5qZw55l1PeF/Y6XPVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sa9qh3IL; arc=none smtp.client-ip=209.85.219.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-69943ef42b2so27703686d6.3;
+        Tue, 09 Apr 2024 10:42:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712684570; x=1713289370; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=JyJEVdf65G5mngbuhja1fnaYo/P2N0p8fC3BOf7G3NA=;
+        b=Sa9qh3ILr+8wXh+5EoSMalqw9kvIZS8a7155IMTlXWLO0HvCHuR48AYwOaVJwBgOKX
+         zW2E05wC6nb3vIqmKaRB2mzywMpCHcsAQXRvK5jqPTCcsLg4OIPdnXu+ICoy9cD67qKu
+         kyeQ6E0Kq7vMV8XULxsOmoJnEBQnT7nbAeHWA4A5kcAWgMaE/dn7kGJv8vM9XKCw9ia2
+         8aekA411zmIkEF5rKW4iiBvDvYB7Yv47YY9naVVyr008lwhB5Pf+18i8Wpr/agYkNNLz
+         +YnFB+aTPakjv4lmhliW5MjYkvckbx4hsFFhlS3edBByTtIm+StEEFjtB2SemjQwNeMO
+         cO0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712684570; x=1713289370;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JyJEVdf65G5mngbuhja1fnaYo/P2N0p8fC3BOf7G3NA=;
+        b=hvQn84x7zkW17F15C/ODzBb9O5n/IN4rsHn165jywkFDbvUonksv7AftOdqk7FemNr
+         DxmLkAhwP4jBNAP2SEYrsF19YvWTE6Y1RinnEeEKqaiVv/wfgfwwa7wcIaUEt8X6CdTY
+         zVZEOTnBC8xVXoFgGzYLJUJPiMeN4SzkL1SXI2jHSRhO4njc8S7V0cj1CVAeFSbEaDPi
+         MPf0JlqSPLAEl9bjFupzHkhtjSHQRzTmKOFUZdPooV0b4DggW/DbD4BRwIc47HEHEs7O
+         0E9yyOyRafm75IvgAg2zAI0oo3cGQHTLgFfkCfapDp72nQuR+jyKI+MD/E3arYKas7TQ
+         APSw==
+X-Forwarded-Encrypted: i=1; AJvYcCW3u+dfqka5uzBWjw8F1Fp8F+q+yREZ8jwa8ZBtBtXJBTXo/fnmCnwACjklC4oBdXSZDNAiPKQQg2rs/HeTamG+Y6tHqnbrHGjjmVg7kUawa3dzHs9x+MWTUYHivmz39ypY
+X-Gm-Message-State: AOJu0YysSjr2L6jUmgI6t8P0IlGCd+YETjkIcGG7LwwoiByXbqds3m+7
+	ZynrOskXgL+4nMQ9Jupwdh7Wzte1OslPCn4+KOCjpWBVpHNWA5iU
+X-Google-Smtp-Source: AGHT+IFj+BVzECEn2HaF1nQsPqqlZFIQaVpBm30sGDqGq6GHAeJofCc1k/lUf/Y9lkOG+9pbY3TrPg==
+X-Received: by 2002:ad4:5744:0:b0:69b:33fc:e1d4 with SMTP id q4-20020ad45744000000b0069b33fce1d4mr218175qvx.43.1712684569799;
+        Tue, 09 Apr 2024 10:42:49 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id d6-20020a0ce446000000b0069945e9d305sm3702230qvm.42.2024.04.09.10.42.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Apr 2024 10:42:49 -0700 (PDT)
+Message-ID: <22f44220-80ae-49f7-bc7a-246e017cb77b@gmail.com>
+Date: Tue, 9 Apr 2024 10:42:44 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-01.secunet.de (10.53.40.197)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Content-Language: en-US
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Alexander Duyck <alexander.duyck@gmail.com>,
+ Jason Gunthorpe <jgg@nvidia.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+ netdev@vger.kernel.org, bhelgaas@google.com, linux-pci@vger.kernel.org,
+ Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net,
+ Christoph Hellwig <hch@lst.de>
+References: <20240405122646.GA166551@nvidia.com>
+ <CAKgT0UeBCBfeq5TxTjND6G_S=CWYZsArxQxVb-2paK_smfcn2w@mail.gmail.com>
+ <20240405151703.GF5383@nvidia.com>
+ <CAKgT0UeK=KdCJN3BX7+Lvy1vC2hXvucpj5CPs6A0F7ekx59qeg@mail.gmail.com>
+ <ZhPaIjlGKe4qcfh_@nanopsycho>
+ <CAKgT0UfcK8cr8UPUBmqSCxyLDpEZ60tf1YwTAxoMVFyR1wwdsQ@mail.gmail.com>
+ <ZhQgmrH-QGu6HP-k@nanopsycho>
+ <ae67d1a6-8ca6-432e-8f1d-2e3e45cad848@gmail.com>
+ <ZhUexUl-kD6F1huf@nanopsycho>
+ <49d7e1ba-0d07-43d2-a5e7-81f142152f8a@gmail.com>
+ <ZhVQo32UiiSxDC6h@nanopsycho>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <ZhVQo32UiiSxDC6h@nanopsycho>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-This patch introduces the 'dir' attribute, 'in' or 'out', to the
-xfrm_state, SA, enhancing usability by delineating the scope of values
-based on direction. An input SA will now exclusively encompass values
-pertinent to input, effectively segregating them from output-related
-values. This change aims to streamline the configuration process and
-improve the overall clarity of SA attributes.
+On 4/9/24 07:28, Jiri Pirko wrote:
+> Tue, Apr 09, 2024 at 03:05:47PM CEST, f.fainelli@gmail.com wrote:
+>>
+>>
+>> On 4/9/2024 3:56 AM, Jiri Pirko wrote:
+>>> Mon, Apr 08, 2024 at 11:36:42PM CEST, f.fainelli@gmail.com wrote:
+>>>> On 4/8/24 09:51, Jiri Pirko wrote:
+>>>>> Mon, Apr 08, 2024 at 05:46:35PM CEST, alexander.duyck@gmail.com wrote:
+>>>>>> On Mon, Apr 8, 2024 at 4:51 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>>>>>>>
+>>>>>>> Fri, Apr 05, 2024 at 08:38:25PM CEST, alexander.duyck@gmail.com wrote:
+>>>>>>>> On Fri, Apr 5, 2024 at 8:17 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>>>>>>>>
+>>>>>>>>> On Fri, Apr 05, 2024 at 07:24:32AM -0700, Alexander Duyck wrote:
+>>>>>>>>>>> Alex already indicated new features are coming, changes to the core
+>>>>>>>>>>> code will be proposed. How should those be evaluated? Hypothetically
+>>>>>>>>>>> should fbnic be allowed to be the first implementation of something
+>>>>>>>>>>> invasive like Mina's DMABUF work? Google published an open userspace
+>>>>>>>>>>> for NCCL that people can (in theory at least) actually run. Meta would
+>>>>>>>>>>> not be able to do that. I would say that clearly crosses the line and
+>>>>>>>>>>> should not be accepted.
+>>>>>>>>>>
+>>>>>>>>>> Why not? Just because we are not commercially selling it doesn't mean
+>>>>>>>>>> we couldn't look at other solutions such as QEMU. If we were to
+>>>>>>>>>> provide a github repo with an emulation of the NIC would that be
+>>>>>>>>>> enough to satisfy the "commercial" requirement?
+>>>>>>>>>
+>>>>>>>>> My test is not "commercial", it is enabling open source ecosystem vs
+>>>>>>>>> benefiting only proprietary software.
+>>>>>>>>
+>>>>>>>> Sorry, that was where this started where Jiri was stating that we had
+>>>>>>>> to be selling this.
+>>>>>>>
+>>>>>>> For the record, I never wrote that. Not sure why you repeat this over
+>>>>>>> this thread.
+>>>>>>
+>>>>>> Because you seem to be implying that the Meta NIC driver shouldn't be
+>>>>>> included simply since it isn't going to be available outside of Meta.
+>>>>>> The fact is Meta employs a number of kernel developers and as a result
+>>>>>> of that there will be a number of kernel developers that will have
+>>>>>> access to this NIC and likely do development on systems containing it.
+>>>>>> In addition simply due to the size of the datacenters that we will be
+>>>>>> populating there is actually a strong likelihood that there will be
+>>>>>> more instances of this NIC running on Linux than there are of some
+>>>>>> other vendor devices that have been allowed to have drivers in the
+>>>>>> kernel.
+>>>>>
+>>>>> So? The gain for community is still 0. No matter how many instances is
+>>>>> private hw you privately have. Just have a private driver.
+>>>>
+>>>> I am amazed and not in a good way at how far this has gone, truly.
+>>>>
+>>>> This really is akin to saying that any non-zero driver count to maintain is a
+>>>> burden on the community. Which is true, by definition, but if the goal was to
+>>>> build something for no users, then clearly this is the wrong place to be in,
+>>>> or too late. The systems with no users are the best to maintain, that is for
+>>>> sure.
+>>>>
+>>>> If the practical concern is wen you make tree wide API change that fbnic
+>>>> happens to use, and you have yet another driver (fbnic) to convert, so what?
+>>>> Work with Alex ahead of time, get his driver to be modified, post the patch
+>>>> series. Even if Alex happens to move on and stop being responsible and there
+>>>> is no maintainer, so what? Give the driver a depreciation window for someone
+>>>> to step in, rip it, end of story. Nothing new, so what has specifically
+>>>> changed as of April 4th 2024 to oppose such strong rejection?
+>>>
+>>> How you describe the flow of internal API change is totally distant from
+>>> reality. Really, like no part is correct:
+>>> 1) API change is responsibility of the person doing it. Imagine working
+>>>      with 40 driver maintainers for every API change. I did my share of
+>>>      API changes in the past, maintainer were only involved to be cced.
+>>
+>> As a submitter you propose changes and silence is acknowledgement. If one of
+>> your API changes broke someone's driver and they did not notify you of the
+>> breakage during the review cycle, it falls on their shoulder to fix it for
+>> themselves and they should not be holding back your work, that would not be
+> 
+> Does it? I don't think so. If you break something, better try to fix it
+> before somebody else has to.
 
-This feature sets the groundwork for future patches, including
-the upcoming IP-TFS patch.
 
-v7->v8:
- - add extra validation check on replay window and seq
- - XFRM_MSG_UPDSA old and new SA should match "dir"
 
-v6->v7:
- - add replay-window check non-esn 0 and ESN 1.
- - remove :XFRMA_SA_DIR only allowed with HW OFFLOAD
+> 
+> 
+>> fair. If you know about the breakage, and there is still no fix, that is an
+>> indication the driver is not actively used and maintained.
+> 
+> So? That is not my point. If I break something in fbnic, why does anyone
+> care? Nobody is ever to hit that bug, only Meta DC.
 
-v5->v6:
- - XFRMA_SA_DIR only allowed with HW OFFLOAD
+They care, and they will jump in to fix it. There is no expectation that 
+as a community member you should be able to make 100% correct patches, 
+this is absolutely not humanly possible, even less so with scarce access 
+to the hardware. All you can hope for is that your changes work, and 
+that someone catches it, sooner rather than later.
 
-v4->v5:
- - add details to commit message
+> 
+> 
+>>
+>> This also does not mean you have to do the entire API changes to a driver you
+>> do not know about on your own. Nothing ever prevents you from posting the
+>> patches as RFC and say: "here is how I would go about changing your driver,
+>> please review and help me make corrections". If the driver maintainers do not
+>> respond there is no reason their lack of involvement should refrain your
+>> work, and so your proposed changes will be merged eventually.
+> 
+> Realistically, did you see that ever happen. I can't recall.
 
-v3->v4:
- - improve HW OFFLOAD DIR check add the other direction
+This happens all of the time, if you make a netdev tree wide change, how 
+many maintainer's Acked-by do we collect before merging those changes: 
+none typically because some netdev maintainers are just quicker than 
+reviewers could be. In other subsystems we might actually wait for 
+people to give a change to give their A-b or R-b tags, not always though.
 
-v2->v3:
- - delete redundant XFRM_SA_DIR_USE
- - use u8 for "dir"
- - fix HW OFFLOAD DIR check
+> 
+> 
+>>
+>> Is not this the whole point of being a community and be able to delegate and
+>> mitigate the risk of large scale changes?
+>>
+>>> 2) To deprecate driver because the maintainer is not responsible. Can
+>>>      you please show me one example when that happened in the past?
+>>
+>> I cannot show you an example because we never had to go that far and I did
+>> not say that this is an established practice, but that we *could* do that if
+>> we ever reached that point.
+> 
+> You are talking about a flow that does not exist. I don't understand how
+> is that related to this discussion then.
 
-v1->v2:
- - use .strict_start_type in struct nla_policy xfrma_policy
- - delete redundant XFRM_SA_DIR_MAX enum
+I was trying to appease your concerns about additional maintenance 
+burden. If the burden becomes real, we ditch it. We can dismiss this 
+point as being not relevant if you want.
 
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
----
- include/net/xfrm.h        |  1 +
- include/uapi/linux/xfrm.h |  6 +++
- net/xfrm/xfrm_compat.c    |  7 +++-
- net/xfrm/xfrm_device.c    |  6 +++
- net/xfrm/xfrm_state.c     |  4 ++
- net/xfrm/xfrm_user.c      | 85 +++++++++++++++++++++++++++++++++++++--
- 6 files changed, 103 insertions(+), 6 deletions(-)
+> 
+> 
+>>
+>>>
+>>>
+>>>>
+>>>> Like it was said, there are tons of drivers in the Linux kernel that have a
+>>>> single user, this one might have a few more than a single one, that should be
+>>>> good enough.
+>>>
+>>> This will have exactly 0. That is my point. Why to merge something
+>>> nobody will ever use?
+>>
+>> Even if Alex and his firmware colleague end up being the only two people
+>> using this driver if the decision is to make it upstream because this is the
+>> desired distribution and development model of the driver we should respect
+>> that.
+>>
+>> And just to be clear, we should not be respecting that because Meta, or Alex
+>> or anyone decided that they were doing the world a favor by working in the
+>> open rather than being closed door, but simply because we cannot *presume*
+> 
+> I don't see any favor for the community. What's the favor exactly?
 
-diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index 57c743b7e4fe..7c9be06f8302 100644
---- a/include/net/xfrm.h
-+++ b/include/net/xfrm.h
-@@ -291,6 +291,7 @@ struct xfrm_state {
- 	/* Private data of this transformer, format is opaque,
- 	 * interpreted by xfrm_type methods. */
- 	void			*data;
-+	u8			dir;
- };
- 
- static inline struct net *xs_net(struct xfrm_state *x)
-diff --git a/include/uapi/linux/xfrm.h b/include/uapi/linux/xfrm.h
-index 6a77328be114..18ceaba8486e 100644
---- a/include/uapi/linux/xfrm.h
-+++ b/include/uapi/linux/xfrm.h
-@@ -141,6 +141,11 @@ enum {
- 	XFRM_POLICY_MAX	= 3
- };
- 
-+enum xfrm_sa_dir {
-+	XFRM_SA_DIR_IN	= 1,
-+	XFRM_SA_DIR_OUT = 2
-+};
-+
- enum {
- 	XFRM_SHARE_ANY,		/* No limitations */
- 	XFRM_SHARE_SESSION,	/* For this session only */
-@@ -315,6 +320,7 @@ enum xfrm_attr_type_t {
- 	XFRMA_SET_MARK_MASK,	/* __u32 */
- 	XFRMA_IF_ID,		/* __u32 */
- 	XFRMA_MTIMER_THRESH,	/* __u32 in seconds for input SA */
-+	XFRMA_SA_DIR,		/* __u8 */
- 	__XFRMA_MAX
- 
- #define XFRMA_OUTPUT_MARK XFRMA_SET_MARK	/* Compatibility */
-diff --git a/net/xfrm/xfrm_compat.c b/net/xfrm/xfrm_compat.c
-index 655fe4ff8621..007dee03b1bc 100644
---- a/net/xfrm/xfrm_compat.c
-+++ b/net/xfrm/xfrm_compat.c
-@@ -98,6 +98,7 @@ static const int compat_msg_min[XFRM_NR_MSGTYPES] = {
- };
- 
- static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
-+	[XFRMA_UNSPEC]          = { .strict_start_type = XFRMA_SA_DIR },
- 	[XFRMA_SA]		= { .len = XMSGSIZE(compat_xfrm_usersa_info)},
- 	[XFRMA_POLICY]		= { .len = XMSGSIZE(compat_xfrm_userpolicy_info)},
- 	[XFRMA_LASTUSED]	= { .type = NLA_U64},
-@@ -129,6 +130,7 @@ static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
- 	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
- 	[XFRMA_IF_ID]		= { .type = NLA_U32 },
- 	[XFRMA_MTIMER_THRESH]	= { .type = NLA_U32 },
-+	[XFRMA_SA_DIR]          = { .type = NLA_U8}
- };
- 
- static struct nlmsghdr *xfrm_nlmsg_put_compat(struct sk_buff *skb,
-@@ -277,9 +279,10 @@ static int xfrm_xlate64_attr(struct sk_buff *dst, const struct nlattr *src)
- 	case XFRMA_SET_MARK_MASK:
- 	case XFRMA_IF_ID:
- 	case XFRMA_MTIMER_THRESH:
-+	case XFRMA_SA_DIR:
- 		return xfrm_nla_cpy(dst, src, nla_len(src));
- 	default:
--		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
-+		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
- 		pr_warn_once("unsupported nla_type %d\n", src->nla_type);
- 		return -EOPNOTSUPP;
- 	}
-@@ -434,7 +437,7 @@ static int xfrm_xlate32_attr(void *dst, const struct nlattr *nla,
- 	int err;
- 
- 	if (type > XFRMA_MAX) {
--		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
-+		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
- 		NL_SET_ERR_MSG(extack, "Bad attribute");
- 		return -EOPNOTSUPP;
- 	}
-diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-index 6346690d5c69..2455a76a1cff 100644
---- a/net/xfrm/xfrm_device.c
-+++ b/net/xfrm/xfrm_device.c
-@@ -253,6 +253,12 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
- 		return -EINVAL;
- 	}
- 
-+	if ((xuo->flags & XFRM_OFFLOAD_INBOUND && x->dir == XFRM_SA_DIR_OUT) ||
-+	    (!(xuo->flags & XFRM_OFFLOAD_INBOUND) && x->dir == XFRM_SA_DIR_IN)) {
-+		NL_SET_ERR_MSG(extack, "Mismatched SA and offload direction");
-+		return -EINVAL;
-+	}
-+
- 	is_packet_offload = xuo->flags & XFRM_OFFLOAD_PACKET;
- 
- 	/* We don't yet support UDP encapsulation and TFC padding. */
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index 0c306473a79d..f7771a69ae2e 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -1744,6 +1744,7 @@ static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig,
- 	x->lastused = orig->lastused;
- 	x->new_mapping = 0;
- 	x->new_mapping_sport = 0;
-+	x->dir = orig->dir;
- 
- 	return x;
- 
-@@ -1857,6 +1858,9 @@ int xfrm_state_update(struct xfrm_state *x)
- 	if (!x1)
- 		goto out;
- 
-+	if (x1->dir != x->dir)
-+		goto out;
-+
- 	if (xfrm_state_kern(x1)) {
- 		to_put = x1;
- 		err = -EEXIST;
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index 810b520493f3..4e5256155c73 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -360,6 +360,55 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
- 		}
- 	}
- 
-+	if (attrs[XFRMA_SA_DIR]) {
-+		u8 sa_dir = nla_get_u8(attrs[XFRMA_SA_DIR]);
-+
-+		if (sa_dir != XFRM_SA_DIR_IN && sa_dir != XFRM_SA_DIR_OUT)  {
-+			NL_SET_ERR_MSG(extack, "XFRMA_SA_DIR attribute is out of range");
-+			err = -EINVAL;
-+			goto out;
-+		}
-+
-+		if (sa_dir == XFRM_SA_DIR_OUT)  {
-+			if (p->replay_window > 0) {
-+				NL_SET_ERR_MSG(extack, "Replay window should not be set for OUT SA");
-+				err = -EINVAL;
-+				goto out;
-+			}
-+
-+			if (attrs[XFRMA_REPLAY_VAL]) {
-+				struct xfrm_replay_state *rp;
-+
-+				rp = nla_data(attrs[XFRMA_REPLAY_VAL]);
-+				if (rp->oseq ||  rp->seq || rp->bitmap) {
-+					NL_SET_ERR_MSG(extack,
-+						       "Replay seq, oseq, or bitmap should not be set for OUT SA with ESN");
-+					err = -EINVAL;
-+					goto out;
-+				}
-+			}
-+
-+			if (attrs[XFRMA_REPLAY_ESN_VAL]) {
-+				struct xfrm_replay_state_esn *esn;
-+
-+				esn = nla_data(attrs[XFRMA_REPLAY_ESN_VAL]);
-+				if (esn->replay_window > 1) {
-+					NL_SET_ERR_MSG(extack,
-+						       "Replay window should be 1 for  OUT SA with ESN");
-+					err = -EINVAL;
-+					goto out;
-+				}
-+
-+				if (esn->seq || esn->seq_hi || esn->bmp_len) {
-+					NL_SET_ERR_MSG(extack,
-+						       "Replay seq, seq_hi, bmp_len should not be set for OUT SA with ESN");
-+					err = -EINVAL;
-+					goto out;
-+				}
-+			}
-+		}
-+	}
-+
- out:
- 	return err;
- }
-@@ -627,6 +676,7 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
- 	struct nlattr *et = attrs[XFRMA_ETIMER_THRESH];
- 	struct nlattr *rt = attrs[XFRMA_REPLAY_THRESH];
- 	struct nlattr *mt = attrs[XFRMA_MTIMER_THRESH];
-+	struct nlattr *dir = attrs[XFRMA_SA_DIR];
- 
- 	if (re && x->replay_esn && x->preplay_esn) {
- 		struct xfrm_replay_state_esn *replay_esn;
-@@ -661,6 +711,9 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
- 
- 	if (mt)
- 		x->mapping_maxage = nla_get_u32(mt);
-+
-+	if (dir)
-+		x->dir = nla_get_u8(dir);
- }
- 
- static void xfrm_smark_init(struct nlattr **attrs, struct xfrm_mark *m)
-@@ -1182,8 +1235,13 @@ static int copy_to_user_state_extra(struct xfrm_state *x,
- 		if (ret)
- 			goto out;
- 	}
--	if (x->mapping_maxage)
-+	if (x->mapping_maxage) {
- 		ret = nla_put_u32(skb, XFRMA_MTIMER_THRESH, x->mapping_maxage);
-+		if (ret)
-+			goto out;
-+	}
-+	if (x->dir)
-+		ret = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
- out:
- 	return ret;
- }
-@@ -2402,7 +2460,8 @@ static inline unsigned int xfrm_aevent_msgsize(struct xfrm_state *x)
- 	       + nla_total_size_64bit(sizeof(struct xfrm_lifetime_cur))
- 	       + nla_total_size(sizeof(struct xfrm_mark))
- 	       + nla_total_size(4) /* XFRM_AE_RTHR */
--	       + nla_total_size(4); /* XFRM_AE_ETHR */
-+	       + nla_total_size(4) /* XFRM_AE_ETHR */
-+	       + nla_total_size(sizeof(x->dir)); /* XFRMA_SA_DIR */
- }
- 
- static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
-@@ -2459,6 +2518,12 @@ static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct
- 	if (err)
- 		goto out_cancel;
- 
-+	if (x->dir) {
-+		err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
-+		if (err)
-+			goto out_cancel;
-+	}
-+
- 	nlmsg_end(skb, nlh);
- 	return 0;
- 
-@@ -3018,6 +3083,7 @@ EXPORT_SYMBOL_GPL(xfrm_msg_min);
- #undef XMSGSIZE
- 
- const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
-+	[XFRMA_UNSPEC]		= { .strict_start_type = XFRMA_SA_DIR },
- 	[XFRMA_SA]		= { .len = sizeof(struct xfrm_usersa_info)},
- 	[XFRMA_POLICY]		= { .len = sizeof(struct xfrm_userpolicy_info)},
- 	[XFRMA_LASTUSED]	= { .type = NLA_U64},
-@@ -3049,6 +3115,7 @@ const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
- 	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
- 	[XFRMA_IF_ID]		= { .type = NLA_U32 },
- 	[XFRMA_MTIMER_THRESH]   = { .type = NLA_U32 },
-+	[XFRMA_SA_DIR]          = { .type = NLA_U8 }
- };
- EXPORT_SYMBOL_GPL(xfrma_policy);
- 
-@@ -3189,8 +3256,9 @@ static void xfrm_netlink_rcv(struct sk_buff *skb)
- 
- static inline unsigned int xfrm_expire_msgsize(void)
- {
--	return NLMSG_ALIGN(sizeof(struct xfrm_user_expire))
--	       + nla_total_size(sizeof(struct xfrm_mark));
-+	return NLMSG_ALIGN(sizeof(struct xfrm_user_expire)) +
-+	       nla_total_size(sizeof(struct xfrm_mark)) +
-+	       nla_total_size(sizeof_field(struct xfrm_state, dir));
- }
- 
- static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
-@@ -3217,6 +3285,12 @@ static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct
- 	if (err)
- 		return err;
- 
-+	if (x->dir) {
-+		err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
-+		if (err)
-+			return err;
-+	}
-+
- 	nlmsg_end(skb, nlh);
- 	return 0;
- }
-@@ -3324,6 +3398,9 @@ static inline unsigned int xfrm_sa_len(struct xfrm_state *x)
- 	if (x->mapping_maxage)
- 		l += nla_total_size(sizeof(x->mapping_maxage));
- 
-+	if (x->dir)
-+		l += nla_total_size(sizeof(x->dir));
-+
- 	return l;
- }
- 
+There is no exchange of favors or "this" for "that", this is not how a 
+community works. You bring your code to the table, solicit review 
+feedback, then go on to maintain it within your bounds, and, time 
+permitting, beyond your driver. What we gain as a community is 
+additional visibility, more API users (eventually real world users, 
+too), and therefore a somewhat more objective way of coming up with new 
+APIs and features, and just a broader understanding of what is out 
+there. This is better than speculation since that creates a less skewed 
+mental model.
+
+Let us say that someone at Meta wanted to get this core netdev feature 
+that could be super cool for others included in the upstream kernel, we 
+would shut it down on the basis that no user exists and we would be 
+right about doing it that. Turns out there is a user, but the driver 
+lives out of tree, but now we also reject that driver? Who benefits from 
+doing that: nobody.
+
+You need a membership card to join the club that you can only enter if 
+you have a membership card already? No thank you.
+
+> The only favor I see is the in the opposite direction, community giving
+> Meta free cycles saving their backporting costs. Why?
+
+Technically it would be both forward porting cycles, since they would no 
+longer need to rebase the driver against their most recent kernel used, 
+and backporting cycles for the first kernel including fbnic onwards.
+
+That comes almost for free these days anyways thanks to static analysis 
+tools. The overwhelming cost of the maintenance remains on Meta 
+engineers, being the only ones with access to the hardware. If they end 
+up with customers in the future, they can offload some of that to their 
+customers, too.
+
+Let's just look at a few high profile drivers by lines changed:
+
+Summary for: drivers/net/ethernet/mellanox/mlxsw
+Total: 133422 (+), 44952 (-)
+Own: 131180 (+), 42725 (-)
+Community: 2242 (+) (1.680 %), 2227 (-) (4.954 %)
+
+Summary for: drivers/net/ethernet/mellanox/mlx5
+Total: 265368 (+), 107690 (-)
+Own: 259213 (+), 100328 (-)
+Community: 6155 (+) (2.319 %), 7362 (-) (6.836 %)%
+
+Summary for: drivers/net/ethernet/broadcom/bnxt
+Total: 70355 (+), 25402 (-)
+Own: 68458 (+), 23358 (-)
+Community: 1897 (+) (2.696 %), 2044 (-) (8.047 %)
+
+Summary for: drivers/net/ethernet/intel/e1000e/
+Total: 39760 (+), 9924 (-)
+Own: 38514 (+), 8905 (-)
+Community: 1246 (+) (3.134 %), 1019 (-) (10.268 %)
+
+I admit this is simplistic because both mlxsw and mlx5 drivers helped 
+greatly improve the networking stack in parts that I benefited directly 
+from within DSA for instance.
+
+The point is, you paid the maintenance price though, the community did not.
+
+> 
+> 
+>> about their intentions and the future.
+> 
+> Heh, the intention is pretty clear from this discussion, isn't it? If
+> they ever by any chance decide to go public with their device, driver
+> for that could be submitted at a time. But this is totally hypothetical.
+
+I think your opposition is unreasonable and is unfair. Using your 
+argument to the extreme, I may go as far as saying that it encourages 
+working out of tree, rather than in tree. This is the exact opposite of 
+what made Linux successful as an OS.
+
+Can I buy a Spectrum switch off Amazon?
 -- 
-2.30.2
+Florian
 
 
