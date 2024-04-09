@@ -1,115 +1,134 @@
-Return-Path: <netdev+bounces-86048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0685389D59A
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:30:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C67DC89D59B
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:30:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80CAFB22A19
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 09:30:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C443283165
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 09:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5F1C7F7CB;
-	Tue,  9 Apr 2024 09:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230607F7F4;
+	Tue,  9 Apr 2024 09:30:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S7Fy2HCg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c+pY/74f"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B38DB1EB45;
-	Tue,  9 Apr 2024 09:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0397EF1F;
+	Tue,  9 Apr 2024 09:30:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712654999; cv=none; b=fAaKbCkbxQ8n68J79oz2+fXxm0M5zqwb7YRlR50Akx7ul27v1SqX1YyOUFfHzQGQhNsp4w//TEtJY/6e72YriynX2v45stzCTtSGMqBq9cBx5gt+ntQeWyu2sx64w4ukZdp61IWVKbg5/23719pz13Jp7Gn9iPJ98bvQ2Lao5Ck=
+	t=1712655055; cv=none; b=VIESJebtXa+2E0MbHylYGQqWNxW77Ozk2xwOTDPsDwo+rGMevSZjNDbgmK5MurdtLl782DIsrC+nmcutBvXUCYy6IB7He1wPr6W6vivYnnYaKIiXGTbVxVdk3zyjnNIj+d8jkcDrKwR33dc7UIX0ldkfAXJa+E6HCUDyBIsorG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712654999; c=relaxed/simple;
-	bh=VxGe2y2hTT/OKqj/iuGp7AuAf+llkMhGqGe3IdyOeRU=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=hZPb5SPWyMSdPaDMVskFNt579oaRoGLYC+OU4OW25XyvrM9Z8cvzHLXew9Y2TBE813tImzC/o+a7bOwv+MNgez4TEtlI3kPteoLHyFGvZT5ZE57MqQjZI0QM2UPHjwc+Zm2HOAGZAqDUCK6K2hoAN+5LIv1I3Qq4MXM37SBuC5w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S7Fy2HCg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E850DC433F1;
-	Tue,  9 Apr 2024 09:29:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712654999;
-	bh=VxGe2y2hTT/OKqj/iuGp7AuAf+llkMhGqGe3IdyOeRU=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=S7Fy2HCguTBT9VYHJZclIYbNIIKYyjGS4SJ6JNEwheRqDkW8jfuBojcHs5bYHEfQ1
-	 +pJCicyv9U3TRrhFv8uSfPDBhs90GB7CwzWYY8ojXd5Fh79vzTbZUMBAH5VUIr51dP
-	 1rr/V69bZgCBGlKNxH7zw1DI/1WZgRsv3/xFWVAqfk5oVqt6qPVd9TnwpRt+9OCIOy
-	 5v79PvNGYxcVicC0wpkpRecp3upICbOWfUQZHEQ/RMFzydcBr2RkDeZfOZ4AzrbsuB
-	 8zCxyqoVo9bCM2CCZKLvwrq/qpDUkSRNoVkw7Y5oBA1MeaxzNjcPJS5AedbUMKorq2
-	 aricVyz3cg8yQ==
-From: Kalle Valo <kvalo@kernel.org>
-To: <davem@davemloft.net>, <edumazet@google.com>,  <kuba@kernel.org>,
-  <pabeni@redhat.com>
-Cc: Baochen Qiang <quic_bqiang@quicinc.com>,  <ath11k@lists.infradead.org>,
-  <manivannan.sadhasivam@linaro.org>,  <linux-wireless@vger.kernel.org>,
-  <linux-arm-msm@vger.kernel.org>,  <mhi@lists.linux.dev>,
-  <netdev@vger.kernel.org>
-Subject: Re: [PATCH v7 2/3] net: qrtr: support suspend/hibernation
-References: <20240305021320.3367-1-quic_bqiang@quicinc.com>
-	<20240305021320.3367-3-quic_bqiang@quicinc.com>
-	<8734s02b3s.fsf@kernel.org>
-Date: Tue, 09 Apr 2024 12:29:54 +0300
-In-Reply-To: <8734s02b3s.fsf@kernel.org> (Kalle Valo's message of "Fri, 05 Apr
-	2024 16:27:35 +0300")
-Message-ID: <87il0q28a5.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1712655055; c=relaxed/simple;
+	bh=jEtT5oh0VuwdEukTzdXhBGXjl3jsARbIDDLFOf2IqPY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=n448dcd7xgBLHDAjV/FL2v5JKspKsQp6tG3Mf6edu1eMub6ekmiwUWzHMN828dTv267BDZzZ+8T8qx1CPEIEF2ws8+fp0OHo6yfCPNVDRtsI2hzEhiBr37sUDHhTszDIMh+Jv3GnHaffU/NfzfvcUFKXum7AEYIpfaHvgkhenos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c+pY/74f; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4169ebcc924so5458975e9.0;
+        Tue, 09 Apr 2024 02:30:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712655052; x=1713259852; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WrQFgW5NMDk7lpDGirGRe1MHp1a/P3mgVccPOJo0IK4=;
+        b=c+pY/74f1VE8gAnbPytMWqEVJBmhJ9ol7gfBdZhpQkhNnFPXhpbsj772UkCJxdEooj
+         CWeywDTVyxWSu9cKCYmdu6Z8um/AVuB0k8G6Yv15DTm3bCWXDzd+mOFsyAYK36VsrMmt
+         C5he/kQD2RQzXTXNFAkc7dcZP6XWPLUR+1u04OPipNXISNMDZBdOhtGfEA4uaTYGOGXc
+         Fgl3j3QPo6Fk2bCrz07YK+HisEHpUt8aDf/j4KQNomFuvpsIN9CNxz1BXWB3NDZwjn0J
+         n8xjCJfPP4uqPsHVRglnYUNiZdFpcvwqSjlJX50nu9G1jGYbAGXlpVwqZzIX958mVcEb
+         aQjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712655052; x=1713259852;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WrQFgW5NMDk7lpDGirGRe1MHp1a/P3mgVccPOJo0IK4=;
+        b=h+TJ4BK9o3U8fVSl7d0GxXtvyTxnEsZayRaLOzqKq+fAPazXj9lOpwQjGq5h8ntDz8
+         OSSy44Km5DWix0FlBKSu0ssO0mfm1NlS3zQjyzqgYSyN8VNXx7jWc9Y5nUs7xrDDSW5n
+         Kv61FN95B/iFk+5eZd5eAHIicFHZSKe6husgy+o15NzdoMbi8tJwktAPHUZWhRJIA/kw
+         u4KxxnPUvY8jMXjfEa8Yur0MtTVKmMI7jQbXSuxpWaXJSVPFVNTlxq8gOcuU1++1pe8x
+         bD2LphsIyLKQU6YYNrFytagL+EhkFxcr6OYR+mZbOjMHLl+NqGbGS3c9YNNbKH9BMfYj
+         2EtA==
+X-Forwarded-Encrypted: i=1; AJvYcCVxuv/1h4AhUVdHNNdqCJXO4ICqs4pGWAdDrUY4LCHYCDOqAcW0XRxcO6ZM2FZkyiumScK2C/1zLw6HPiRsQ6R2wM7dNnY1wAQZkHEZo7uVrUVTXHWwbpO3G4OkYKoXCr97aH1i4DdqVTqMN3TBe1bSeDh+oLGAU5eH
+X-Gm-Message-State: AOJu0YyuHiH83Rmh+agrRjmLT8GSiIKm39mpfMMB/Qs2Nrkj/0eidnty
+	2OUTq3hZlYKKDrzNgShfoMcfuFbUT3FLZjmYwq6poEmA7jIr3zSR
+X-Google-Smtp-Source: AGHT+IHdx8m3SXXRh9w1ZQWKaJqtKhg2r8xplLgr4jH1JriaRbjVj9T8P9OaSiD70FncD1cHxBlxxg==
+X-Received: by 2002:a05:600c:358b:b0:416:8e14:cd90 with SMTP id p11-20020a05600c358b00b004168e14cd90mr2441118wmq.11.1712655051599;
+        Tue, 09 Apr 2024 02:30:51 -0700 (PDT)
+Received: from pc-de-david.. ([2a04:cec0:1021:d54f:6305:1522:b3ea:4a38])
+        by smtp.gmail.com with ESMTPSA id e9-20020a05600c4e4900b00416a7313deasm1716750wmq.4.2024.04.09.02.30.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Apr 2024 02:30:51 -0700 (PDT)
+From: David Gouarin <dgouarin@gmail.com>
+To: 
+Cc: david.gouarin@thalesgroup.com,
+	David Gouarin <dgouarin@gmail.com>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Camelia Groza <camelia.groza@nxp.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH net v4] dpaa_eth: fix XDP queue index
+Date: Tue,  9 Apr 2024 11:30:46 +0200
+Message-Id: <20240409093047.5833-1-dgouarin@gmail.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <8edda7aa8ff27cee1b3fa60421734e508d319481.camel@redhat.com>
+References: <8edda7aa8ff27cee1b3fa60421734e508d319481.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 
-Kalle Valo <kvalo@kernel.org> writes:
+Make it possible to bind a XDP socket to a queue id.
+The DPAA FQ Id was passed to the XDP program in the
+xdp_rxq_info->queue_index instead of the Ethernet device queue number,
+which made it unusable with bpf_map_redirect.
+Instead of the DPAA FQ Id, initialise the XDP rx queue with the queue number.
 
-> Hi netdev maintainers,
->
-> Baochen Qiang <quic_bqiang@quicinc.com> writes:
->
->> MHI devices may not be destroyed during suspend/hibernation, so need
->> to unprepare/prepare MHI channels throughout the transition, this is
->> done by adding suspend/resume callbacks.
->>
->> The suspend callback is called in the late suspend stage, this means
->> MHI channels are still alive at suspend stage, and that makes it
->> possible for an MHI controller driver to communicate with others over
->> those channels at suspend stage. While the resume callback is called
->> in the early resume stage, for a similar reason.
->>
->> Also note that we won't do unprepare/prepare when MHI device is in
->> suspend state because it's pointless if MHI is only meant to go through
->> a suspend/resume transition, instead of a complete power cycle.
->>
->> Tested-on: WCN6855 hw2.0 PCI
->> WLAN.HSP.1.1-03125-QCAHSPSWPL_V1_V2_SILICONZ_LITE-3.6510.30
->>
->> Signed-off-by: Baochen Qiang <quic_bqiang@quicinc.com>
->> Reviewed-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
->> Reviewed-by: Jeff Johnson <quic_jjohnson@quicinc.com>
->
-> Could I take this patch via ath.git tree? Full patch here (same patch
-> but links to both patchwork projects):
->
-> https://patchwork.kernel.org/project/linux-wireless/patch/20240305021320.3367-3-quic_bqiang@quicinc.com/
->
-> https://patchwork.kernel.org/project/netdevbpf/patch/20240305021320.3367-3-quic_bqiang@quicinc.com/
->
-> I ask because we need it to get hibernation working on ath11k (and ath12k):
->
-> https://patchwork.kernel.org/project/linux-wireless/patch/20240305021320.3367-4-quic_bqiang@quicinc.com/
+Fixes: d57e57d0cd04 ("dpaa_eth: add XDP_TX support")
+Signed-off-by: David Gouarin <dgouarin@gmail.com>
+---
+v4: fix patch formatting
+v3: reword commit message
+v2: add Fixes: in description
+---
+ drivers/net/ethernet/freescale/dpaa/dpaa_eth.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-No reply from netdev maintainers but as the patch is marked as 'Not
-Applicable' in netdev patchwork I guess they would not have major
-objection to take this to ath.git. It should go to net-next in the next
-wireless-next pull request anyway.
-
+diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+index dcbc598b11c6..988dc9237368 100644
+--- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
++++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
+@@ -1154,7 +1154,7 @@ static int dpaa_fq_init(struct dpaa_fq *dpaa_fq, bool td_enable)
+ 	if (dpaa_fq->fq_type == FQ_TYPE_RX_DEFAULT ||
+ 	    dpaa_fq->fq_type == FQ_TYPE_RX_PCD) {
+ 		err = xdp_rxq_info_reg(&dpaa_fq->xdp_rxq, dpaa_fq->net_dev,
+-				       dpaa_fq->fqid, 0);
++				       dpaa_fq->channel, 0);
+ 		if (err) {
+ 			dev_err(dev, "xdp_rxq_info_reg() = %d\n", err);
+ 			return err;
 -- 
-https://patchwork.kernel.org/project/linux-wireless/list/
+2.34.1
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
