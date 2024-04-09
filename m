@@ -1,262 +1,163 @@
-Return-Path: <netdev+bounces-86278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20D8089E4C6
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 23:06:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB99989E4BC
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 23:06:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78859B22417
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 21:06:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3267828439B
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 21:06:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33746158D83;
-	Tue,  9 Apr 2024 21:06:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AFE1158866;
+	Tue,  9 Apr 2024 21:06:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="h9jSXXOx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MhYFTx5j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51122158A0A;
-	Tue,  9 Apr 2024 21:06:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700E28562A;
+	Tue,  9 Apr 2024 21:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712696775; cv=none; b=jfKP7ktnqMbwa1JzfHfJsfgA9u8F3apT3zJALPWWRhPEgDVC0S6BdGDGF+fV3EEmtfRKi+kzDio8fS1oP26AG/j9iocLwwFv7l6CasNZr4rMgvpwmWSWZF8T3ojj/tvcboGQJZg8GZTGMeG6dnWTLgt4Ch3qTcN8LPK7pKvyc3U=
+	t=1712696770; cv=none; b=iWLKJbZwvfiKRCxNtiCSzDNb0dhqY0eq3wZno4P3BhdVmJxcQHR2ppAo5yMAjWn+RUlocT8uY7Gnvj38qcKdDFo2onSF5UBXsxItyybsJQ2WFt70bRbk9z2CcWd1H31CRaCdv7hc27GjWWm8TDV4XKRhwKpIwQhgFJfNudOiUag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712696775; c=relaxed/simple;
-	bh=IXZ3wehDL47oIrDVEqc1to7GI/Ih+JeeuxlsU4odIjQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tVO3xWq+BeXvmmxRyhOazq59Aj4bDrD/4t1zKazXpd+1xCkywH6hIz+0dEjSZ+Ui486xSYwtQ0WaPYR9a+5rK521fLr3ugfCAIY6m1TyZYf52ifzOU5S0jpUM58OPweqM9ulhML3F2tgC3RE4R4yanm/hy297Z1/kp2kM8pxO+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=h9jSXXOx; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 439L09BY004107;
-	Tue, 9 Apr 2024 21:05:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding; s=qcppdkim1; bh=nGD4Cy8
-	CEtmS0/ua8iwCgBBYBbeQ8uQnKTFsG8Fp0PU=; b=h9jSXXOxYB6OUqDO3t29tGn
-	iPUd1zCvK1mJR147XkVA4/KT9FdsvYwIVhMmFfruIwN8iCES66rT4lh1LpYA2On1
-	ZdG0IF1WCBN0+/+/N7nhPXtJsfcloZ1r8ptyvzySWkswmswebf6eMRKLK/XQxcKF
-	s8LjcgqaigyhYJv8N9Bh5twr//dcw78+y3Q503Eb1pGVjgvnWk40lrVBBpyW8WPB
-	iJ6GUQcims4r2HK1Ayf5gZ6JEelWh4EN+LPJbfAXT74O1GL/2M3IjF+nZISUo/OJ
-	PR8n77ONVa9xlZq2LxqesvZSFAlZL9hQ6oPpGft3kBWC9vHfuY+xqzJUELvpRow=
-	=
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xd3dy9f7t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Apr 2024 21:05:49 +0000 (GMT)
-Received: from pps.filterd (NALASPPMTA03.qualcomm.com [127.0.0.1])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 439L5lFe011042;
-	Tue, 9 Apr 2024 21:05:47 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 3xayfmu59f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Apr 2024 21:05:47 +0000
-Received: from NALASPPMTA03.qualcomm.com (NALASPPMTA03.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 439L5liw011037;
-	Tue, 9 Apr 2024 21:05:47 GMT
-Received: from hu-devc-lv-u20-a-new.qualcomm.com (hu-abchauha-lv.qualcomm.com [10.81.25.35])
-	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 439L5lRv011034
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Apr 2024 21:05:47 +0000
-Received: by hu-devc-lv-u20-a-new.qualcomm.com (Postfix, from userid 214165)
-	id 56B8623333; Tue,  9 Apr 2024 14:05:47 -0700 (PDT)
-From: Abhishek Chauhan <quic_abchauha@quicinc.com>
-To: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        Martin KaFai Lau <martin.lau@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>
-Cc: kernel@quicinc.com
-Subject: [RFC PATCH bpf-next v1 3/3] net: Add additional bit to support userspace timestamp type
-Date: Tue,  9 Apr 2024 14:05:47 -0700
-Message-Id: <20240409210547.3815806-4-quic_abchauha@quicinc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240409210547.3815806-1-quic_abchauha@quicinc.com>
-References: <20240409210547.3815806-1-quic_abchauha@quicinc.com>
+	s=arc-20240116; t=1712696770; c=relaxed/simple;
+	bh=6z1+RdCcqb/CBTYitm+BtQkT5A1/JzJsiQV8l07KZ6o=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=KpDLoyoU1/Nbu9lKI0NYw4rwYpPF5WKaCny3JPqQyD9alifAIR3NkGKcGFztcJkAr2KV8elt7rfKmTfD8InGCzdUvvPQRTQErgsz1ndlg4afvo/2hSaJohdK8ZBMkI9itKq4lW4rroLOu3r8G485b4hgbbLYTamDaN0VmzfApik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MhYFTx5j; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-78a2a97c296so351857385a.2;
+        Tue, 09 Apr 2024 14:06:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712696767; x=1713301567; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EiiaHNmJsReIJo5FVxsSThVW7lNMMSYq5RIKd+Z8MPg=;
+        b=MhYFTx5jt1432Xoh6tetjHeRrjkwOksZnlAOMYJac42OTDnclPnslRDsCL7iJaM652
+         a+wBtSpRykkBnL8xqA/k0jRjzGmEZYOBHLmrye1BTjjPUzR0wraKDjSz8PU+UyfGe7Xh
+         XfsILerENZvDrWnc5dRy5hW7uOSdjetZO8z0g0KdHy+NYmW/LzyenMtEXacwbAM8HYD0
+         lyBCnN68dBC5v+zHTbwY3NCIgbTlNpQWzC4TTMtXoeoa/libEc3Ly5ehXflhVcq5DibA
+         wQBuBQO1OVW6N4zbmqyuCP/420oqJ8xEyhlvsDlMGXgBjJYtQg8kqBu0DDcTHZ/1alPw
+         7yJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712696767; x=1713301567;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=EiiaHNmJsReIJo5FVxsSThVW7lNMMSYq5RIKd+Z8MPg=;
+        b=LIaIKrHwRsPdtHZgVFVAEau8Gb3NbdN2EHuxkB0+QndmTwlfZnRrkUicqNk18G7an2
+         Hzz/XRQRluUuLBDAjF0Kd3bM1T2prn4FQ35sidLIIdPjTct/GNHWu8FTtJSuyEmK7U7f
+         Vxwxpp1Rn03OVtZXSLEbEH8roWh6dUA45BBoGbnbxNi2MZXWdKkHutEz2TsG4kqJ1WXv
+         Iv/hY1/bBtsBITfvqRnRlAtAMIF985ZW6PwjVYgA5HAZrCM/rlGrtGR2+Di0+XRf0VL1
+         NbMIjYit+JVYBJMyRcrn7hiBISO8t96Ep8aU0B647523hogAVoPdDA/Kg0mKO4O9Xl3m
+         Co2A==
+X-Forwarded-Encrypted: i=1; AJvYcCWI3yM2u9+sSKKgxsPcABxA6gAiye9QtXcvV+7rpMUOVUf77T4S+ZIIjsFX+ZP8INrcZUqSl+sYh0+w6ySiDcEgDM/UYeydnJaXY+khnY3SmurMudxw7I2V6QmhSipMPYKW
+X-Gm-Message-State: AOJu0YyM/+GXLimvinN6RqPyyX2VyuEXYOgH0H/rgLkMk+jv5jMl+icj
+	YPLkkSbuBc1PB+GqV5c2cz3OTcm70U2jkdsKpvnPRuWQJi2hTdlX
+X-Google-Smtp-Source: AGHT+IGRCjM3Wztikucl9H4B8RXePYAYxBhfjiF2FaTYXzsdrz6I9+iPcOkSwkQYid4Jg9kxZ1aEcw==
+X-Received: by 2002:a05:620a:1113:b0:78d:74f8:a333 with SMTP id o19-20020a05620a111300b0078d74f8a333mr943344qkk.27.1712696767188;
+        Tue, 09 Apr 2024 14:06:07 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id d7-20020a05620a166700b0078d671c943fsm2093400qko.45.2024.04.09.14.06.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Apr 2024 14:06:06 -0700 (PDT)
+Date: Tue, 09 Apr 2024 17:06:05 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ pabeni@redhat.com, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Alexander Lobakin <aleksander.lobakin@intel.com>, 
+ Florian Fainelli <f.fainelli@gmail.com>, 
+ Andrew Lunn <andrew@lunn.ch>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Edward Cree <ecree.xilinx@gmail.com>
+Cc: Alexander Duyck <alexander.duyck@gmail.com>, 
+ netdev@vger.kernel.org, 
+ bhelgaas@google.com, 
+ linux-pci@vger.kernel.org, 
+ Alexander Duyck <alexanderduyck@fb.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Message-ID: <6615adbde1430_249cf52944@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240409135142.692ed5d9@kernel.org>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <20240409135142.692ed5d9@kernel.org>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: -EKcwDbQRFfTQzYiGhKFhhFFgCttyLFq
-X-Proofpoint-ORIG-GUID: -EKcwDbQRFfTQzYiGhKFhhFFgCttyLFq
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-09_12,2024-04-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- malwarescore=0 impostorscore=0 phishscore=0 bulkscore=0 clxscore=1015
- adultscore=0 spamscore=0 lowpriorityscore=0 suspectscore=0
- priorityscore=1501 mlxscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2404010003 definitions=main-2404090142
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-tstamp_type can be real, mono or userspace timestamp.
+Jakub Kicinski wrote:
+> On Wed, 03 Apr 2024 13:08:24 -0700 Alexander Duyck wrote:
+> > This patch set includes the necessary patches to enable basic Tx and Rx
+> > over the Meta Platforms Host Network Interface. To do this we introduce a
+> > new driver and driver and directories in the form of
+> > "drivers/net/ethernet/meta/fbnic".
+> 
+> Let me try to restate some takeaways and ask for further clarification
+> on the main question...
+> 
+> First, I think there's broad support for merging the driver itself.
+> 
+> IIUC there is also broad support to raise the expectations from
+> maintainers of drivers for private devices, specifically that they will:
+>  - receive weaker "no regression" guarantees
+>  - help with refactoring / adapting their drivers more actively
+>  - not get upset when we delete those drivers if they stop participating
+> 
+> If you think that the drivers should be merged *without* setting these
+> expectations, please speak up.
+> 
+> Nobody picked me up on the suggestion to use the CI as a proactive
+> check whether the maintainer / owner is still paying attention, 
+> but okay :(
+> 
+> 
+> What is less clear to me is what do we do about uAPI / core changes.
+> Of those who touched on the subject - few people seem to be curious /
+> welcoming to any reasonable features coming out for private devices
+> (John, Olek, Florian)? Others are more cautious focusing on blast
+> radius and referring to the "two driver rule" (Daniel, Paolo)?
+> Whether that means outright ban on touching common code or uAPI
+> in ways which aren't exercised by commercial NICs, is unclear. 
+> Andrew and Ed did not address the question directly AFAICT.
+> 
+> Is my reading correct? Does anyone have an opinion on whether we should
+> try to dig more into this question prior to merging the driver, and
+> set some ground rules? Or proceed and learn by doing?
 
-This commit adds userspace timestamp and sets it if there is
-valid transmit_time available in socket coming from userspace.
+Thanks for summarizing. That was my reading too
 
-To make the design scalable for future needs this commit bring in
-the change to extend the tstamp_type:1 to tstamp_type:2 to support
-userspace timestamp.
+Two distict questions
 
-Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
-Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
----
- include/linux/skbuff.h | 19 +++++++++++++++++--
- net/ipv4/ip_output.c   |  2 +-
- net/ipv4/raw.c         |  2 +-
- net/ipv6/ip6_output.c  |  2 +-
- net/ipv6/raw.c         |  2 +-
- net/packet/af_packet.c |  6 +++---
- 6 files changed, 24 insertions(+), 9 deletions(-)
+1. whether a standard driver is as admissible if the device is not
+   available on the open market.
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 6160185f0fe0..2f91a8a2157a 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -705,6 +705,9 @@ typedef unsigned char *sk_buff_data_t;
- enum skb_tstamp_type {
- 	SKB_TSTAMP_TYPE_RX_REAL = 0,    /* A RX (receive) time in real */
- 	SKB_TSTAMP_TYPE_TX_MONO = 1,    /* A TX (delivery) time in mono */
-+	SKB_TSTAMP_TYPE_TX_USER = 2,    /* A TX (delivery) time and its clock
-+									 * is in skb->sk->sk_clockid.
-+									 */
- };
- 
- /**
-@@ -830,6 +833,9 @@ enum skb_tstamp_type {
-  *		delivery_time in mono clock base (i.e. EDT).  Otherwise, the
-  *		skb->tstamp has the (rcv) timestamp at ingress and
-  *		delivery_time at egress.
-+ *		delivery_time in mono clock base (i.e., EDT) or a clock base chosen
-+ *		by SO_TXTIME. If zero, skb->tstamp has the (rcv) timestamp at
-+ *		ingress.
-  *	@napi_id: id of the NAPI struct this skb came from
-  *	@sender_cpu: (aka @napi_id) source CPU in XPS
-  *	@alloc_cpu: CPU which did the skb allocation.
-@@ -960,7 +966,7 @@ struct sk_buff {
- 	/* private: */
- 	__u8			__mono_tc_offset[0];
- 	/* public: */
--	__u8			tstamp_type:1;	/* See SKB_MONO_DELIVERY_TIME_MASK */
-+	__u8			tstamp_type:2;	/* See SKB_MONO_DELIVERY_TIME_MASK */
- #ifdef CONFIG_NET_XGRESS
- 	__u8			tc_at_ingress:1;	/* See TC_AT_INGRESS_MASK */
- 	__u8			tc_skip_classify:1;
-@@ -4274,7 +4280,16 @@ static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
- 					enum skb_tstamp_type tstamp_type)
- {
- 	skb->tstamp = kt;
--	skb->tstamp_type = kt && tstamp_type;
-+
-+	if (skb->tstamp_type)
-+		return;
-+
-+	if (kt && tstamp_type == SKB_TSTAMP_TYPE_TX_MONO)
-+		skb->tstamp_type = SKB_TSTAMP_TYPE_TX_MONO;
-+
-+	if (kt && tstamp_type == SKB_TSTAMP_TYPE_TX_USER)
-+		skb->tstamp_type = SKB_TSTAMP_TYPE_TX_USER;
-+
- }
- 
- DECLARE_STATIC_KEY_FALSE(netstamp_needed_key);
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 62e457f7c02c..9aea6e810f52 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -1457,7 +1457,7 @@ struct sk_buff *__ip_make_skb(struct sock *sk,
- 
- 	skb->priority = (cork->tos != -1) ? cork->priority: READ_ONCE(sk->sk_priority);
- 	skb->mark = cork->mark;
--	skb->tstamp = cork->transmit_time;
-+	skb_set_delivery_time(skb, cork->transmit_time, SKB_TSTAMP_TYPE_TX_USER);
- 	/*
- 	 * Steal rt from cork.dst to avoid a pair of atomic_inc/atomic_dec
- 	 * on dst refcount
-diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
-index dcb11f22cbf2..d8f52bc06ed3 100644
---- a/net/ipv4/raw.c
-+++ b/net/ipv4/raw.c
-@@ -360,7 +360,7 @@ static int raw_send_hdrinc(struct sock *sk, struct flowi4 *fl4,
- 	skb->protocol = htons(ETH_P_IP);
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = sockc->mark;
--	skb->tstamp = sockc->transmit_time;
-+	skb_set_delivery_time(skb, sockc->transmit_time, SKB_TSTAMP_TYPE_TX_USER);
- 	skb_dst_set(skb, &rt->dst);
- 	*rtp = NULL;
- 
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index a9e819115622..2beb9fc8c0b1 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -1924,7 +1924,7 @@ struct sk_buff *__ip6_make_skb(struct sock *sk,
- 
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = cork->base.mark;
--	skb->tstamp = cork->base.transmit_time;
-+	skb_set_delivery_time(skb, cork->base.transmit_time, SKB_TSTAMP_TYPE_TX_USER);
- 
- 	ip6_cork_steal_dst(skb, cork);
- 	IP6_INC_STATS(net, rt->rt6i_idev, IPSTATS_MIB_OUTREQUESTS);
-diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
-index 0d896ca7b589..3a68ca80bf83 100644
---- a/net/ipv6/raw.c
-+++ b/net/ipv6/raw.c
-@@ -621,7 +621,7 @@ static int rawv6_send_hdrinc(struct sock *sk, struct msghdr *msg, int length,
- 	skb->protocol = htons(ETH_P_IPV6);
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = sockc->mark;
--	skb->tstamp = sockc->transmit_time;
-+	skb_set_delivery_time(skb, sockc->transmit_time, SKB_TSTAMP_TYPE_TX_USER);
- 
- 	skb_put(skb, length);
- 	skb_reset_network_header(skb);
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index 18f616f487ea..27ea972dfc56 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -2056,7 +2056,7 @@ static int packet_sendmsg_spkt(struct socket *sock, struct msghdr *msg,
- 	skb->dev = dev;
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = READ_ONCE(sk->sk_mark);
--	skb->tstamp = sockc.transmit_time;
-+	skb_set_delivery_time(skb, sockc.transmit_time, SKB_TSTAMP_TYPE_TX_USER);
- 
- 	skb_setup_tx_timestamp(skb, sockc.tsflags);
- 
-@@ -2585,7 +2585,7 @@ static int tpacket_fill_skb(struct packet_sock *po, struct sk_buff *skb,
- 	skb->dev = dev;
- 	skb->priority = READ_ONCE(po->sk.sk_priority);
- 	skb->mark = READ_ONCE(po->sk.sk_mark);
--	skb->tstamp = sockc->transmit_time;
-+	skb_set_delivery_time(skb, sockc->transmit_time, SKB_TSTAMP_TYPE_TX_USER);
- 	skb_setup_tx_timestamp(skb, sockc->tsflags);
- 	skb_zcopy_set_nouarg(skb, ph.raw);
- 
-@@ -3063,7 +3063,7 @@ static int packet_snd(struct socket *sock, struct msghdr *msg, size_t len)
- 	skb->dev = dev;
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = sockc.mark;
--	skb->tstamp = sockc.transmit_time;
-+	skb_set_delivery_time(skb, sockc.transmit_time, SKB_TSTAMP_TYPE_TX_USER);
- 
- 	if (unlikely(extra_len == 4))
- 		skb->no_fcs = 1;
--- 
-2.25.1
+2. whether new device features can be supported without at least
+   two available devices supporting it.
+
+FWIW, +1 for 1 from me. Any serious device that exists in quantity
+and is properly maintained should be in-tree.
+
+In terms of trusting Meta, it is less about karma, but an indication
+of these two requirements when the driver first appears. We would not
+want to merge vaporware drivers from unknown sources or university
+research projects.
+
+2 is out of scope for this series. But I would always want to hear
+about potential new features that an organization finds valuable
+enough to implement. Rather than a blanket rule against them.
 
 
