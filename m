@@ -1,131 +1,109 @@
-Return-Path: <netdev+bounces-85991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDE4A89D3AB
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 10:00:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D329189D3BA
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 10:02:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7244E1F22AEC
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 08:00:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 734851F22824
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 08:02:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 906C87E56B;
-	Tue,  9 Apr 2024 08:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DAB7D3F4;
+	Tue,  9 Apr 2024 08:02:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B184B7CF2B;
-	Tue,  9 Apr 2024 08:00:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CAD06A012
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 08:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712649602; cv=none; b=g5gYcPZHaMJitkgJ2L/pX+5W0xToR63mle6UJqWyiuRBNg/EZOy+DperrlQrTGbkVeD7oVIe7AYX6Uovwogf5OP1/yVmeW+UZXdaZl+O5yxrr8+5GMoaZ3xRpDAv5mUEVlKkseaIG0zeVB/dnySIwBe2kbOq1LiPH7wTJCu7QJA=
+	t=1712649751; cv=none; b=jzURZZRISNLXQyaTE2HreKdFqzSwIkYeG1nI4gY/wwDvsV0BNnEhlzj9JFKUmicI3fj+223QF+jMpp8SNyVzfCUqofDlYePkyZOVqLiw3yk+GS5TjcwN/WtANnGTsKA4x0MFmcp7o5EhdYE3f2hyvQYAgvq8ls2+YMjuVXoZujU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712649602; c=relaxed/simple;
-	bh=+3z6auRQhul1eNrO/m8FYJ1d51wSu1m5tm67G9k2QnA=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=ZVv3hBof+BevAh3qhdVGdFttqO+0qG59N8AFkoUR3sxuieAVCCutBcvqrN4X09LwsILd4esLqMYocQNibS74LPop8TYUdNShfnY4GxOyYhk30VJtJSrGvRkCDdJo7RAkpIluU4UNQzsrDHugWxeSMgTEQh01nHUgiL1uSdG31Wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4VDJFv6FkRz29kj0;
-	Tue,  9 Apr 2024 15:57:07 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id C68911402C7;
-	Tue,  9 Apr 2024 15:59:58 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Tue, 9 Apr
- 2024 15:59:58 +0800
-Subject: Re: [PATCH net-next v1 12/12] mm: page_frag: update documentation and
- maintainer for page_frag
-To: Alexander Duyck <alexander.duyck@gmail.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Jonathan Corbet
-	<corbet@lwn.net>, Andrew Morton <akpm@linux-foundation.org>,
-	<linux-mm@kvack.org>, <linux-doc@vger.kernel.org>
-References: <20240407130850.19625-1-linyunsheng@huawei.com>
- <20240407130850.19625-13-linyunsheng@huawei.com>
- <b5c5866e626f6c90657a32b5e9adff724d5896db.camel@gmail.com>
- <c1f5a78a-3040-0cc7-f113-d5ec82c6010f@huawei.com>
- <CAKgT0UfZBGEVJa1O7cdNt6zy_EEPoGo=aW6ugRKy8a44qg0j8w@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <09d7d59b-9da3-52f7-b039-acd0344c88c8@huawei.com>
-Date: Tue, 9 Apr 2024 15:59:58 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	s=arc-20240116; t=1712649751; c=relaxed/simple;
+	bh=Ht+zLsqe77IM1iTP8cb68mcbeS237HYbrtzTXyf4W8M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HgHVA+zbzVSDKf/UCbjYJRZN1PRO5bKc1iabmBl+pE/nxCdJh2fDjNjn6vHvlD7YfRPqd7sXB+vSrqNPv2EY0fI4qhgv+Jc2+VJH2zMnYl7njIcMy9kB3z8/LyT2Pboy5+LYc6GC1b7ON/DzLOU5Ny44AaBTbOVqL8tUuQSBxzs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ru6Qv-0002UM-UW; Tue, 09 Apr 2024 10:02:21 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ru6Qu-00BGSs-45; Tue, 09 Apr 2024 10:02:20 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ru6Qu-004P6s-05;
+	Tue, 09 Apr 2024 10:02:20 +0200
+Date: Tue, 9 Apr 2024 10:02:20 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Arun.Ramadoss@microchip.com
+Cc: andrew@lunn.ch, olteanv@gmail.com, davem@davemloft.net,
+	Woojung.Huh@microchip.com, pabeni@redhat.com, edumazet@google.com,
+	f.fainelli@gmail.com, kuba@kernel.org, kernel@pengutronix.de,
+	dsahern@kernel.org, san@skov.dk, willemb@google.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	horms@kernel.org, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net-next v4 6/9] net: dsa: microchip: dcb: add special
+ handling for KSZ88X3 family
+Message-ID: <ZhT2DEowBo4c46_I@pengutronix.de>
+References: <20240408074758.1825674-1-o.rempel@pengutronix.de>
+ <20240408074758.1825674-7-o.rempel@pengutronix.de>
+ <7f0684fb1729dafc92f8b81ce81f10c91385c0c2.camel@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAKgT0UfZBGEVJa1O7cdNt6zy_EEPoGo=aW6ugRKy8a44qg0j8w@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <7f0684fb1729dafc92f8b81ce81f10c91385c0c2.camel@microchip.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 2024/4/9 0:13, Alexander Duyck wrote:
-> On Mon, Apr 8, 2024 at 6:39 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>
->> On 2024/4/8 2:13, Alexander H Duyck wrote:
->>> On Sun, 2024-04-07 at 21:08 +0800, Yunsheng Lin wrote:
->>>> Update documentation about design, implementation and API usages
->>>> for page_frag.
->>>>
->>>> Also update MAINTAINERS for page_frag. Alexander seems to be the
->>>> orginal author for page_frag, we can add him to the MAINTAINERS
->>>> later if we have an ack from him.
->>>>
->>>> CC: Alexander Duyck <alexander.duyck@gmail.com>
->>>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->>>
->>> Again, this seems more like 2 different pathches at least. One for the
->>> Documentation and MAINTAINERS changes, and one for the function
->>> documentation.
->>
->> Sure.
->>
-> 
-> [...]
-> 
->>>> --- a/MAINTAINERS
->>>> +++ b/MAINTAINERS
->>>> @@ -16683,6 +16683,16 @@ F:  mm/page-writeback.c
->>>>  F:  mm/readahead.c
->>>>  F:  mm/truncate.c
->>>>
->>>> +PAGE FRAG
->>>> +M:  Yunsheng Lin <linyunsheng@huawei.com>
->>>> +L:  linux-mm@kvack.org
->>>> +L:  netdev@vger.kernel.org
->>>> +S:  Supported
->>>> +F:  Documentation/mm/page_frags.rst
->>>> +F:  include/linux/page_frag_cache.h
->>>> +F:  mm/page_frag_cache.c
->>>> +F:  mm/page_frag_test.c
->>>> +
->>>
->>> I would appreciate it if you could add me as I usually am having to
->>> deal with issues people have with this anyway. You can probably just go
->>> with:
->>> Alexander Duyck <alexander.duyck@gmail.com>
->>
->> Sure, good to your ack here.
-> 
-> Just to be clear this isn't an Ack, but if you are going to list
-> maintainers for this my name should be on the list so this is the
-> preferred format. There are still some things to be cleaned up in this
-> patch.
+Hi Arun,
 
-Sure, I was talking about "Alexander seems to be the orginal author for
-page_frag, we can add him to the MAINTAINERS later if we have an ack from
-him." in the commit log.
-
-> .
+On Mon, Apr 08, 2024 at 04:26:34PM +0000, Arun.Ramadoss@microchip.com wrote:
+> Hi Oleksij,
+> > + * Return: 0 on success, or a negative error code on failure
+> > + */
+> > +static int ksz88x3_port0_apptrust_quirk(struct ksz_device *dev, int
+> > port,
+> > +                                       int reg, u8 data)
+> > +{
+> > +       u8 port1_data;
 > 
+> why can't we have some common reference, because it is somewhat
+> confusing. function name is port0, but apptrust config is for port1 and
+> u8 port1_data. atleast instead of port1_data, port0_data, we can have
+> variable name as data, since they are handled in two different
+> functions. 
+
+Ack, I renamed variables and functions to be more in sync with the
+documentation and add defines for ports
+
+Is it possible to add this erratum to the chip errata documentation?
+
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
