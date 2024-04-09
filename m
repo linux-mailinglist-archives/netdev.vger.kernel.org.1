@@ -1,148 +1,189 @@
-Return-Path: <netdev+bounces-86260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E51AF89E41C
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 22:03:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C03F689E434
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 22:12:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69D631F21439
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 20:03:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1DFD1C21C5B
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 20:12:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C925F1581E6;
-	Tue,  9 Apr 2024 20:03:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CF5F157E79;
+	Tue,  9 Apr 2024 20:12:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hk8+QkA5"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="oix8zb5a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF1D157E97;
-	Tue,  9 Apr 2024 20:03:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3421581E6
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 20:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712693026; cv=none; b=Trlcn1omo8o/pZ1xqVh34SY8QvH3LjkgGpN3CK2gdahMNT699ADzt5d3E8wkBghIe8xlLhaFU1T084R7KCavbj6uBgZwJeF0OH/gb+90UeuqQ4wPmReWFlJhucPWtozN/VkwrOQBvuPeHQ+DzPbqIUNzix816Y+INa6iqEeGDCI=
+	t=1712693524; cv=none; b=WOse4KV1vMgWWScY14fwhsMJme3bYcWoiyTbXhUMoqZJe8IflIo/bPJCn1TD1MB+t1lFWRpcs4Ne6FroVViz3TjrhoRwMYHnwdpiJnYcTd7ZaE7xhc+3ubgHkHAatg9bnz0C0N4patSY8F+vBQxb/R4KOqEwW/EAf6owtQUhT/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712693026; c=relaxed/simple;
-	bh=BKPwDcilCk7Fpstj6G3Bqf1RwwGG2vSjtmGmwoMFgxI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eWfS42erFxmEhyU+wark02GOpkFzhHv8u+lA7tqam4biX+A53FqLAP/jDUw5AUsvywrftTeBjtuAXB+x9uniNvLmbS/mgu5/VoUuHOmRNPf+rkSzk5e1ODd3Vk+Thd8H/0flr9QAf4w2FrRbUpZpr2x/thM+T0CLG2anL+VQRkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hk8+QkA5; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4169ebcc924so9840745e9.0;
-        Tue, 09 Apr 2024 13:03:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712693023; x=1713297823; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BKPwDcilCk7Fpstj6G3Bqf1RwwGG2vSjtmGmwoMFgxI=;
-        b=Hk8+QkA5d8uf+E/jZE103P2edF9EcjOz+FMGbfpX+AYz/LQGaD9FKytkcRxQ76GJNa
-         bGfzyPBx1BCAmhGmoTRDqlDcEWDQ1O4mXAM+JvrXGBbtWz0MrhpXwnllrfx88LWwPAdm
-         NZ4sZRsowH9BHdMcO7wG+7OEWL4jWhAcBfqMA8qcrNcylRjb4qI3Vhs49ABL1KWfSPoP
-         7R2Pgqjx2AKY46EDPPKLto6TDkMrjsH5p9Ey+qAkRB9UYvju9Xw5Ub/tvBXEeOUG+Ptt
-         7yHHZVKc0Wjiqrc7NG4LQFIUhD6J2CxwULMtZBKNcWxVdxwB9DzXZbbnBBWHVh8j/g+n
-         PpWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712693023; x=1713297823;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BKPwDcilCk7Fpstj6G3Bqf1RwwGG2vSjtmGmwoMFgxI=;
-        b=UKajBP5NPYkZWXizbNDlAYubAv0Onl8k49hiEK/0QXxnrLW61sMzulYu3T/qkJJJTu
-         6hXbxlT4gA8tltBgz5DL4elQi8NZ25T7qDtm+FrcXSIYweE4c5x4FuyoXkSuTUWKGqdg
-         Yw6pDtNd0B9BLZuGwC+Jxq9MvWNYExHNE71/22DTWxrv5hIuu3qYYHTYNe2RT/5CVrw0
-         B72xGxiFz3hQ9ajS83fB5BA+mVIWi2XwtdgQBtrhnmIrGiAuDVJ6jrR1ZeX+gG/fmXt3
-         V17G//OSujo2PtlBMPis9TySEGSKAeygBV7YLC3ShzKkhK69cwvZf24P061smIPk6uLP
-         To/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUQFvrQVtG/CEqMp1yEEq7t5s0oKKyDgWMpPMmIV3Re9TNouOUbtl/lj9ibZXOX0WU7V+U1Ag7oPGo6vIi51u9htLN0hlHD9X2JE8p7Q+qO/iksR8jNOvzKcT1CZVhpPX3j
-X-Gm-Message-State: AOJu0Yy8KqcbHeXqUvQ4FmkY4J13IlTkYy3HPKIifmiRNsc1ZtS4qGj0
-	1wRNxs3Nhhb+MTyfrlOG78co+beDMrRETT1RAcER1qW1XkDnW3Ucqj8+PDVpDTOTsylYtUTCkeP
-	L7TH60qpiWGHvI3YNVpb+KBBN4Hg=
-X-Google-Smtp-Source: AGHT+IHhhLBHCcP6lU7shcoNGE+mY6oH/uAljMisFfwT1uSEfASNoK/aaQGGa1ES7AjXNjhEKSZkVxq/oG0TerZcM0A=
-X-Received: by 2002:adf:f8d0:0:b0:343:f335:58b with SMTP id
- f16-20020adff8d0000000b00343f335058bmr459924wrq.62.1712693023173; Tue, 09 Apr
- 2024 13:03:43 -0700 (PDT)
+	s=arc-20240116; t=1712693524; c=relaxed/simple;
+	bh=S6kNxgeQ441DPUc2s5JY4j62c0ZhniBmCQKYyiSY1Kc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Lwr7Ls3dmBRlMiLmTQJWRQ4zVbAsRV7aZUBvRfw7g5YaJonBvBi1QPHr1ZYaJXeceRrRjpoSc4bWtf9GAivWHUA1TQcnb/7+Omj/3Bv7EF3dfBCYD3QBwCvIQWZuDlJ9vRHiI6vMEs49k0IhlkGMo6VNoSGCjfEjX3c/l7OVSxQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=oix8zb5a; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1ruHoq-00Eoxe-D0; Tue, 09 Apr 2024 22:11:48 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject
+	:Cc:To:From; bh=+QsVcOoPiFBtxzHKM9rCzcD3HHQF9MKmYCtBXAxZHRA=; b=oix8zb5arHNu7
+	2qXyF6pQrp3w/eHFE45uCkOQ9MjueDPunkOha3yjXvzrlIDH9Uk21+om7NmfUfZShoMmeQxpYoqgY
+	AnhstvOlegQoFG3sFqzoIWgUWvZesqUkBmuQwm7OVy84B8VyNQ0P1KalpSQ4QB6cWgwT/7xCyOC7b
+	0+Mnz3dCtqS86c9uYs1YRThro2gtpsXQ+boCswP263OAZuEIY/+DcrbO3e/EhPplRo6Yj7+dVk24J
+	anaUs8W7osiicrRmXo+kYT/c35s3G9AcezAxHgNKMxf36CALLcHpth9a1kcffY8LwTI6uPJx1P2x+
+	QGL+suD4IlB3LM8Hk7IVA==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1ruHop-0005eq-Hp; Tue, 09 Apr 2024 22:11:47 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1ruHoj-003gOm-6p; Tue, 09 Apr 2024 22:11:41 +0200
+From: Michal Luczaj <mhal@rbox.co>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kuniyu@amazon.com,
+	Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net v2] af_unix: Fix garbage collector racing against connect()
+Date: Tue,  9 Apr 2024 22:09:39 +0200
+Message-ID: <20240409201047.1032217-1-mhal@rbox.co>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240408061846.GA8764@unreal> <CAKgT0UcE5cOKO4JgR-PBstP3e9r02+NyG3YrNQe8p2_25Xpf8g@mail.gmail.com>
- <20240408184102.GA4195@unreal> <CAKgT0UcLWEP5GOqFEDeyGFpJre+g2_AbmBOSXJsoXZuCprGH0Q@mail.gmail.com>
- <20240409081856.GC4195@unreal> <CAKgT0UewAZSqU6JF4-cPf7hZM41n_QMuiF_K8SY8hyoROQLgfQ@mail.gmail.com>
- <20240409153932.GY5383@nvidia.com> <CAKgT0UeSNxbq3JYe8oNaoWYWSn9+vd1c+AfjvUsietUtS09r0g@mail.gmail.com>
- <20240409171235.GZ5383@nvidia.com> <CAKgT0Ufc0Zx6-UwCNbwtEahdbCv=eVqJKoDuoQdz6QMD2tv-ww@mail.gmail.com>
- <20240409185457.GF5383@nvidia.com>
-In-Reply-To: <20240409185457.GF5383@nvidia.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 9 Apr 2024 13:03:06 -0700
-Message-ID: <CAKgT0UcqJr4s8jMGW0a4BA6gUs+ey9X2JAOpeEP9cBW1qHmizw@mail.gmail.com>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	bhelgaas@google.com, linux-pci@vger.kernel.org, 
-	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 9, 2024 at 11:55=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> wr=
-ote:
->
-> On Tue, Apr 09, 2024 at 11:38:59AM -0700, Alexander Duyck wrote:
-> > > > phenomenon where if we even brushed against block of upstream code
-> > > > that wasn't being well maintained we would be asked to fix it up an=
-d
-> > > > address existing issues before we could upstream any patches.
-> > >
-> > > Well, Intel has it's own karma problems in the kernel community. :(
-> >
-> > Oh, I know. I resisted the urge to push out the driver as "idgaf:
-> > Internal Device Generated at Facebook" on April 1st instead of
-> > "fbnic"
->
-> That would have been hilarious!
->
-> > to poke fun at the presentation they did at Netdev 0x16 where they
-> > were trying to say all the vendors should be implementing "idpf" since
-> > they made it a standard.
->
-> Yes, I noticed this also. For all the worries I've heard lately about
-> lack of commonality/etc it seems like a major missed ecosystem
-> opportunity to have not invested in an industry standard. From what I
-> can see fbnic has no hope of being anything more than a one-off
-> generation for Meta. Too many silicon design micro-details are exposed
-> to the OS.
+Garbage collector does not take into account the risk of embryo getting
+enqueued during the garbage collection. If such embryo has a peer that
+carries SCM_RIGHTS, two consecutive passes of scan_children() may see a
+different set of children. Leading to an incorrectly elevated inflight
+count, and then a dangling pointer within the gc_inflight_list.
 
-I know. The fact is we aren't trying to abstract away anything as that
-would mean a larger firmware blob. That is the problem with an
-abstraction like idpf is that it just adds more overhead as you have
-to have the firmware manage more of the control plane.
+sockets are AF_UNIX/SOCK_STREAM
+S is an unconnected socket
+L is a listening in-flight socket bound to addr, not in fdtable
+V's fd will be passed via sendmsg(), gets inflight count bumped
 
-> > It all depends on your definition of being extractive. I would assume
-> > a "consumer" that is running a large number of systems and is capable
-> > of providing sophisticated feedback on issues found within the kernel,
-> > in many cases providing fixes for said issues, or working with
-> > maintainers on resolution of said issues, is not extractive.
->
-> I don't know, as I said there is some grey scale.
->
-> IMHO it is not appropriate to make such decisions based on some
-> company wide metric. fbnic team alone should be judged and shouldn't
-> get a free ride based on the other good work Meta is doing. Otherwise
-> it turns into a thing where bigger/richer companies just get to do
-> whatever they want because they do the most "good" in aggregate.
+connect(S, addr)	sendmsg(S, [V]); close(V)	__unix_gc()
+----------------	-------------------------	-----------
 
-The problem here in this case is that I am pretty much the heart of
-the software driver team with a few new hires onboarding the next
-couple months. People were asking why others were jumping to my
-defense, well if we are going to judge the team they are mostly
-judging me. I'm just hoping my reputation has spoken for itself
-considering I was making significant contributions to the drivers even
-after I have gone through several changes of employer.
+NS = unix_create1()
+skb1 = sock_wmalloc(NS)
+L = unix_find_other(addr)
+unix_state_lock(L)
+unix_peer(S) = NS
+			// V count=1 inflight=0
+
+ 			NS = unix_peer(S)
+ 			skb2 = sock_alloc()
+			skb_queue_tail(NS, skb2[V])
+
+			// V became in-flight
+			// V count=2 inflight=1
+
+			close(V)
+
+			// V count=1 inflight=1
+			// GC candidate condition met
+
+						for u in gc_inflight_list:
+						  if (total_refs == inflight_refs)
+						    add u to gc_candidates
+
+						// gc_candidates={L, V}
+
+						for u in gc_candidates:
+						  scan_children(u, dec_inflight)
+
+						// embryo (skb1) was not
+						// reachable from L yet, so V's
+						// inflight remains unchanged
+__skb_queue_tail(L, skb1)
+unix_state_unlock(L)
+						for u in gc_candidates:
+						  if (u.inflight)
+						    scan_children(u, inc_inflight_move_tail)
+
+						// V count=1 inflight=2 (!)
+
+If there is a GC-candidate listening socket, lock/unlock its state. This
+makes GC wait until the end of any ongoing connect() to that socket. After
+flipping the lock, a possibly SCM-laden embryo is already enqueued. And if
+there is another embryo coming, it can not possibly carry SCM_RIGHTS. At
+this point, unix_inflight() can not happen because unix_gc_lock is already
+taken. Inflight graph remains unaffected.
+
+Fixes: 1fd05ba5a2f2 ("[AF_UNIX]: Rewrite garbage collector, fixes race.")
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+v2:
+  - Adhere to reverse xmas tree variable ordering
+  - Expand commit message
+  - Drop the reproducer
+
+v1: https://lore.kernel.org/netdev/20240408161336.612064-1-mhal@rbox.co/
+
+ net/unix/garbage.c | 18 +++++++++++++++++-
+ 1 file changed, 17 insertions(+), 1 deletion(-)
+
+diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+index fa39b6265238..6433a414acf8 100644
+--- a/net/unix/garbage.c
++++ b/net/unix/garbage.c
+@@ -274,11 +274,22 @@ static void __unix_gc(struct work_struct *work)
+ 	 * receive queues.  Other, non candidate sockets _can_ be
+ 	 * added to queue, so we must make sure only to touch
+ 	 * candidates.
++	 *
++	 * Embryos, though never candidates themselves, affect which
++	 * candidates are reachable by the garbage collector.  Before
++	 * being added to a listener's queue, an embryo may already
++	 * receive data carrying SCM_RIGHTS, potentially making the
++	 * passed socket a candidate that is not yet reachable by the
++	 * collector.  It becomes reachable once the embryo is
++	 * enqueued.  Therefore, we must ensure that no SCM-laden
++	 * embryo appears in a (candidate) listener's queue between
++	 * consecutive scan_children() calls.
+ 	 */
+ 	list_for_each_entry_safe(u, next, &gc_inflight_list, link) {
++		struct sock *sk = &u->sk;
+ 		long total_refs;
+ 
+-		total_refs = file_count(u->sk.sk_socket->file);
++		total_refs = file_count(sk->sk_socket->file);
+ 
+ 		WARN_ON_ONCE(!u->inflight);
+ 		WARN_ON_ONCE(total_refs < u->inflight);
+@@ -286,6 +297,11 @@ static void __unix_gc(struct work_struct *work)
+ 			list_move_tail(&u->link, &gc_candidates);
+ 			__set_bit(UNIX_GC_CANDIDATE, &u->gc_flags);
+ 			__set_bit(UNIX_GC_MAYBE_CYCLE, &u->gc_flags);
++
++			if (sk->sk_state == TCP_LISTEN) {
++				unix_state_lock(sk);
++				unix_state_unlock(sk);
++			}
+ 		}
+ 	}
+ 
+-- 
+2.44.0
+
 
