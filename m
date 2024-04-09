@@ -1,145 +1,287 @@
-Return-Path: <netdev+bounces-86200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1B1F89DF26
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 17:32:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B727A89DF29
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 17:32:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D32121C22812
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:32:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 569AD28BEA5
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:32:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 019BD13A405;
-	Tue,  9 Apr 2024 15:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56673135A56;
+	Tue,  9 Apr 2024 15:28:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EZcfkn0q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D96113541F;
-	Tue,  9 Apr 2024 15:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F89B13541F
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 15:28:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712676497; cv=none; b=ifc71VwP9uofLxvHBrQzQDiHgrDTfmxmf98JLtv3NUt/2Woovj6LsBB6eMYTNVzVVZFlidK9A/oeMWR2fLm2+f7V++5ULMfuPxwMu3y9mo8o+h2KOGeA/TAeYRS9GTLTBrr5DWM8LzrZxmau0RDJn5YDiIX/PKHHFiM6X9EIiEk=
+	t=1712676494; cv=none; b=soApBJAe4PVMPwLo6tQwdWahBxMbENuqZE8vaNyco6rFqVGaMREnhx395PRYLJ2uS3iZqeoqDurOyKLzXePMsoUbZOcwoSabdhrzOZSLQU+2COgY3LR+5SgNxtAD8Qs0FCZkN7Mf2KZuGelRqkp+nf1Rvhun2MCtGErheStVJUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712676497; c=relaxed/simple;
-	bh=5CBoTmLG4y7e/KRyazSSY1LYpq2J5NObpY/pXkbyRWc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dX78Y257OvBpAqjQpbuzPUn7IRQjU+Gfqkpt0MGMXwlCVsLGDJdQ6z0YeyJ4sgAgI+Fzv/fLVut8xh2TRKUvJYSUzrP3P+RdM3usedXCFEzsi+w/3TCEf2Yr8JjiSldOwjVRREPPfJuA3xxBmOv7oG15i+xmXwV5kYC+je14mV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-617ddc988f5so45721007b3.2;
-        Tue, 09 Apr 2024 08:28:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712676493; x=1713281293;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=S9fHLaOg0xQHrvlM1IV1UTtnZ4u0DmXFhb6dRTtO4eE=;
-        b=TSAgnPt+H85F7Om0hUUhfEv+n9CNj7eugrFT1uTkf/7nLZRWnQ6UCs/kMQzfuhdxjL
-         XMy5Qri4yV5gZYeFHDrzYAYb7kzG/EapSX9jo91oLZYOfY2WvbbPxiAVPTLc3Nw3Ga6s
-         umq5Wv+CHuIWefh3DmPyb4NKFcyQWt1WqxqCO9py3zrkG4w2sGe5D2LluxuUtuA1gIRC
-         SZir9sEABstTkvOSQij6msr8G4pGr9zwZL6Dh22LaJovdt0lm8FyW6Iyd9oNAiUQZRos
-         Ht1UPBlHqTkHInziqavmmfGBYckL8zA6YIgluDYIVhOSYBza5tPYDIIOCqHWODoYnFrg
-         K2Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCVhWKcOpKHsSyjaMdfcym8qov+V5l9VvdB57cC8obQXUXL19s2D5BaPQsyyj5wvkWmh1r3hAPfZHD3i7/IYEcFJ0VKhiQOsRI6ORZGQwRnRc+LPWPRxoDHVPHMNsANxmMMKgudD6StHY5VF5RyghdBmmWXcCGiDVWe3E1purju2r7hSc1/39sPozjuowWLxwJpuW2F9ZtonHW1UxQkZ3v59uvEF
-X-Gm-Message-State: AOJu0Yy8gTuKAHRs3VSr6FJJ2uvjKXNnF0AX3MSPGOzfpjAZ0zeBAPTR
-	Ie0ScHNzhUzNnVV76EMDA+DrJwtD/k1FkSyD9db+qiviW4UD450uPERBL3ITqOk=
-X-Google-Smtp-Source: AGHT+IGEdiWWT0vLFsfDZbjn7QIX2MQqmNy+Wk/VC1Hli3HWTQZo8BsD8oiAyaxT0pIEAgpjhIex/A==
-X-Received: by 2002:a81:7b85:0:b0:615:1dee:6b0e with SMTP id w127-20020a817b85000000b006151dee6b0emr11379477ywc.39.1712676491686;
-        Tue, 09 Apr 2024 08:28:11 -0700 (PDT)
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com. [209.85.219.179])
-        by smtp.gmail.com with ESMTPSA id jx4-20020a05690c380400b00615bd0701c7sm2206364ywb.118.2024.04.09.08.28.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Apr 2024 08:28:11 -0700 (PDT)
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dc23bf7e5aaso6157781276.0;
-        Tue, 09 Apr 2024 08:28:10 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXk8AV9QMHJtuhhi7TayLP5vDD2j7F+AQI0+C5m8FgMfIqPIrsCZCgvWsmI2XZ1M/4vbDq/F0OTeyMxQRkd6XoqhEjYoHFuy4Yo0nsAZh/UfpPA2vBnrwxGFejEovwY3JIucM7V7kqBq3gJE9oO78mD+f1MaRBIETrcG2IL84RRFQJweOxvAq/amNE54z1IZBD0mJI2P2TyK4+SvCCT/nNrZhxQ
-X-Received: by 2002:a25:a249:0:b0:dcc:56b6:6606 with SMTP id
- b67-20020a25a249000000b00dcc56b66606mr69104ybi.40.1712676490322; Tue, 09 Apr
- 2024 08:28:10 -0700 (PDT)
+	s=arc-20240116; t=1712676494; c=relaxed/simple;
+	bh=z9GsAUOcb10kW10cXeTGlgDogI4Yv8S+kfEzRw148/s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TCntwNH1sO+2R/n7OgT4DlGNTFnGKvKRi1Eetqa/JdSK9P9ONxXaTUloa6Tpo8+Lh/EbitFCJbVJcGmVat2PefE3UvHclAPmMYJET5KFzc2pZyWQSKe5HdiFroGHRL/ObTcYawckyNGWAappeP1OWyCDmb19k+qd4mlomrB+GXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EZcfkn0q; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712676491;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=nkgYrxjL0uqszJbbD8cR7MTsYdHeRVM/o9fq3RdqUTs=;
+	b=EZcfkn0quH5FhJInoxRzFpveW7CiVYOZBaHvHviXJAdUuxVp8p3LhdwBjnpVw2iasEkBtP
+	t5S7WGVMu/CASCF6N/bcr5V0VNPx9d4u6JvAsuqi16Tp6ofjtdFNuWri2nvnI4VfstgsHw
+	r/S00OtJ1yEhC8DyQmviFPRHOY6EmiQ=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-187-0D9dMticNoudtPSiNtVCjQ-1; Tue,
+ 09 Apr 2024 11:28:07 -0400
+X-MC-Unique: 0D9dMticNoudtPSiNtVCjQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2C66D380009E;
+	Tue,  9 Apr 2024 15:28:07 +0000 (UTC)
+Received: from fenrir.redhat.com (unknown [10.22.8.7])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4EC5D444301;
+	Tue,  9 Apr 2024 15:28:06 +0000 (UTC)
+From: jmaloy@redhat.com
+To: netdev@vger.kernel.org,
+	davem@davemloft.net
+Cc: kuba@kernel.org,
+	passt-dev@passt.top,
+	jmaloy@redhat.com,
+	sbrivio@redhat.com,
+	lvivier@redhat.com,
+	dgibson@redhat.com,
+	eric.dumazet@gmail.com,
+	edumazet@google.com
+Subject: [net-next v4] tcp: add support for SO_PEEK_OFF socket option
+Date: Tue,  9 Apr 2024 11:28:05 -0400
+Message-ID: <20240409152805.913891-1-jmaloy@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240409-rzn1-gmac1-v2-0-79ca45f2fc79@bootlin.com> <20240409-rzn1-gmac1-v2-4-79ca45f2fc79@bootlin.com>
-In-Reply-To: <20240409-rzn1-gmac1-v2-4-79ca45f2fc79@bootlin.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Tue, 9 Apr 2024 17:27:58 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdX-F8LXWx=Ras4f+Dt_r485HKjRDLydDXZsnZBW8HJzxw@mail.gmail.com>
-Message-ID: <CAMuHMdX-F8LXWx=Ras4f+Dt_r485HKjRDLydDXZsnZBW8HJzxw@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 4/5] net: stmmac: add support for RZ/N1 GMAC
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-Hi Romain,
+From: Jon Maloy <jmaloy@redhat.com>
 
-On Tue, Apr 9, 2024 at 11:21=E2=80=AFAM Romain Gantois
-<romain.gantois@bootlin.com> wrote:
-> From: Cl=C3=A9ment L=C3=A9ger <clement.leger@bootlin.com>
->
-> Add support for the Renesas RZ/N1 GMAC. This support can make use of a
-> custom RZ/N1 PCS which is fetched by parsing the pcs-handle device tree
-> property.
->
-> Signed-off-by: "Cl=C3=A9ment L=C3=A9ger" <clement.leger@bootlin.com>
-> Co-developed-by: Romain Gantois <romain.gantois@bootlin.com>
-> Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
+When reading received messages from a socket with MSG_PEEK, we may want
+to read the contents with an offset, like we can do with pread/preadv()
+when reading files. Currently, it is not possible to do that.
 
-Thanks for your patch!
+In this commit, we add support for the SO_PEEK_OFF socket option for TCP,
+in a similar way it is done for Unix Domain sockets.
 
-> --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> @@ -142,6 +142,18 @@ config DWMAC_ROCKCHIP
->           This selects the Rockchip RK3288 SoC glue layer support for
->           the stmmac device driver.
->
-> +config DWMAC_RZN1
-> +       tristate "Renesas RZ/N1 dwmac support"
-> +       default ARCH_RZN1
+In the iperf3 log examples shown below, we can observe a throughput
+improvement of 15-20 % in the direction host->namespace when using the
+protocol splicer 'pasta' (https://passt.top).
+This is a consistent result.
 
-Why default to enabled?
+pasta(1) and passt(1) implement user-mode networking for network
+namespaces (containers) and virtual machines by means of a translation
+layer between Layer-2 network interface and native Layer-4 sockets
+(TCP, UDP, ICMP/ICMPv6 echo).
 
-> +       depends on OF && (ARCH_RZN1 || COMPILE_TEST)
-> +       select PCS_RZN1_MIIC
-> +       help
-> +         Support for Ethernet controller on Renesas RZ/N1 SoC family.
-> +
-> +         This selects the Renesas RZ/N1 SoC glue layer support for
-> +         the stmmac device driver. This support can make use of a custom=
- MII
-> +         converter PCS device.
-> +
->  config DWMAC_SOCFPGA
->         tristate "SOCFPGA dwmac support"
->         default ARCH_INTEL_SOCFPGA
+Received, pending TCP data to the container/guest is kept in kernel
+buffers until acknowledged, so the tool routinely needs to fetch new
+data from socket, skipping data that was already sent.
 
-Gr{oetje,eeting}s,
+At the moment this is implemented using a dummy buffer passed to
+recvmsg(). With this change, we don't need a dummy buffer and the
+related buffer copy (copy_to_user()) anymore.
 
-                        Geert
+passt and pasta are supported in KubeVirt and libvirt/qemu.
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+jmaloy@freyr:~/passt$ perf record -g ./pasta --config-net -f
+SO_PEEK_OFF not supported by kernel.
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+jmaloy@freyr:~/passt# iperf3 -s
+-----------------------------------------------------------
+Server listening on 5201 (test #1)
+-----------------------------------------------------------
+Accepted connection from 192.168.122.1, port 44822
+[  5] local 192.168.122.180 port 5201 connected to 192.168.122.1 port 44832
+[ ID] Interval           Transfer     Bitrate
+[  5]   0.00-1.00   sec  1.02 GBytes  8.78 Gbits/sec
+[  5]   1.00-2.00   sec  1.06 GBytes  9.08 Gbits/sec
+[  5]   2.00-3.00   sec  1.07 GBytes  9.15 Gbits/sec
+[  5]   3.00-4.00   sec  1.10 GBytes  9.46 Gbits/sec
+[  5]   4.00-5.00   sec  1.03 GBytes  8.85 Gbits/sec
+[  5]   5.00-6.00   sec  1.10 GBytes  9.44 Gbits/sec
+[  5]   6.00-7.00   sec  1.11 GBytes  9.56 Gbits/sec
+[  5]   7.00-8.00   sec  1.07 GBytes  9.20 Gbits/sec
+[  5]   8.00-9.00   sec   667 MBytes  5.59 Gbits/sec
+[  5]   9.00-10.00  sec  1.03 GBytes  8.83 Gbits/sec
+[  5]  10.00-10.04  sec  30.1 MBytes  6.36 Gbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate
+[  5]   0.00-10.04  sec  10.3 GBytes  8.78 Gbits/sec   receiver
+-----------------------------------------------------------
+Server listening on 5201 (test #2)
+-----------------------------------------------------------
+^Ciperf3: interrupt - the server has terminated
+jmaloy@freyr:~/passt#
+logout
+[ perf record: Woken up 23 times to write data ]
+[ perf record: Captured and wrote 5.696 MB perf.data (35580 samples) ]
+jmaloy@freyr:~/passt$
+
+jmaloy@freyr:~/passt$ perf record -g ./pasta --config-net -f
+SO_PEEK_OFF supported by kernel.
+
+jmaloy@freyr:~/passt# iperf3 -s
+-----------------------------------------------------------
+Server listening on 5201 (test #1)
+-----------------------------------------------------------
+Accepted connection from 192.168.122.1, port 52084
+[  5] local 192.168.122.180 port 5201 connected to 192.168.122.1 port 52098
+[ ID] Interval           Transfer     Bitrate
+[  5]   0.00-1.00   sec  1.32 GBytes  11.3 Gbits/sec
+[  5]   1.00-2.00   sec  1.19 GBytes  10.2 Gbits/sec
+[  5]   2.00-3.00   sec  1.26 GBytes  10.8 Gbits/sec
+[  5]   3.00-4.00   sec  1.36 GBytes  11.7 Gbits/sec
+[  5]   4.00-5.00   sec  1.33 GBytes  11.4 Gbits/sec
+[  5]   5.00-6.00   sec  1.21 GBytes  10.4 Gbits/sec
+[  5]   6.00-7.00   sec  1.31 GBytes  11.2 Gbits/sec
+[  5]   7.00-8.00   sec  1.25 GBytes  10.7 Gbits/sec
+[  5]   8.00-9.00   sec  1.33 GBytes  11.5 Gbits/sec
+[  5]   9.00-10.00  sec  1.24 GBytes  10.7 Gbits/sec
+[  5]  10.00-10.04  sec  56.0 MBytes  12.1 Gbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID] Interval           Transfer     Bitrate
+[  5]   0.00-10.04  sec  12.9 GBytes  11.0 Gbits/sec  receiver
+-----------------------------------------------------------
+Server listening on 5201 (test #2)
+-----------------------------------------------------------
+^Ciperf3: interrupt - the server has terminated
+logout
+[ perf record: Woken up 20 times to write data ]
+[ perf record: Captured and wrote 5.040 MB perf.data (33411 samples) ]
+jmaloy@freyr:~/passt$
+
+The perf record confirms this result. Below, we can observe that the
+CPU spends significantly less time in the function ____sys_recvmsg()
+when we have offset support.
+
+Without offset support:
+----------------------
+jmaloy@freyr:~/passt$ perf report -q --symbol-filter=do_syscall_64 \
+                       -p ____sys_recvmsg -x --stdio -i  perf.data | head -1
+46.32%     0.00%  passt.avx2  [kernel.vmlinux]  [k] do_syscall_64  ____sys_recvmsg
+
+With offset support:
+----------------------
+jmaloy@freyr:~/passt$ perf report -q --symbol-filter=do_syscall_64 \
+                       -p ____sys_recvmsg -x --stdio -i  perf.data | head -1
+28.12%     0.00%  passt.avx2  [kernel.vmlinux]  [k] do_syscall_64  ____sys_recvmsg
+
+Suggested-by: Paolo Abeni <pabeni@redhat.com>
+Reviewed-by: Stefano Brivio <sbrivio@redhat.com>
+Signed-off-by: Jon Maloy <jmaloy@redhat.com>
+
+---
+v3: - Applied changes suggested by Stefano Brivio and Paolo Abeni
+v4: - Same as v3. Posting was delayed because I first had to debug
+      an issue that turned out to not be directly related to this
+      change.
+
+Signed-off-by: Jon Maloy <jmaloy@redhat.com>
+---
+ net/ipv4/af_inet.c |  1 +
+ net/ipv4/tcp.c     | 16 ++++++++++------
+ 2 files changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
+index 55bd72997b31..a7cfeda28bb2 100644
+--- a/net/ipv4/af_inet.c
++++ b/net/ipv4/af_inet.c
+@@ -1072,6 +1072,7 @@ const struct proto_ops inet_stream_ops = {
+ #endif
+ 	.splice_eof	   = inet_splice_eof,
+ 	.splice_read	   = tcp_splice_read,
++	.set_peek_off      = sk_set_peek_off,
+ 	.read_sock	   = tcp_read_sock,
+ 	.read_skb	   = tcp_read_skb,
+ 	.sendmsg_locked    = tcp_sendmsg_locked,
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 92ee60492314..c0d6fd576d32 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -1416,8 +1416,6 @@ static int tcp_peek_sndq(struct sock *sk, struct msghdr *msg, int len)
+ 	struct sk_buff *skb;
+ 	int copied = 0, err = 0;
+ 
+-	/* XXX -- need to support SO_PEEK_OFF */
+-
+ 	skb_rbtree_walk(skb, &sk->tcp_rtx_queue) {
+ 		err = skb_copy_datagram_msg(skb, 0, msg, skb->len);
+ 		if (err)
+@@ -2328,6 +2326,7 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
+ 	int target;		/* Read at least this many bytes */
+ 	long timeo;
+ 	struct sk_buff *skb, *last;
++	u32 peek_offset = 0;
+ 	u32 urg_hole = 0;
+ 
+ 	err = -ENOTCONN;
+@@ -2361,7 +2360,8 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
+ 
+ 	seq = &tp->copied_seq;
+ 	if (flags & MSG_PEEK) {
+-		peek_seq = tp->copied_seq;
++		peek_offset = max(sk_peek_offset(sk, flags), 0);
++		peek_seq = tp->copied_seq + peek_offset;
+ 		seq = &peek_seq;
+ 	}
+ 
+@@ -2464,11 +2464,11 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
+ 		}
+ 
+ 		if ((flags & MSG_PEEK) &&
+-		    (peek_seq - copied - urg_hole != tp->copied_seq)) {
++		    (peek_seq - peek_offset - copied - urg_hole != tp->copied_seq)) {
+ 			net_dbg_ratelimited("TCP(%s:%d): Application bug, race in MSG_PEEK\n",
+ 					    current->comm,
+ 					    task_pid_nr(current));
+-			peek_seq = tp->copied_seq;
++			peek_seq = tp->copied_seq + peek_offset;
+ 		}
+ 		continue;
+ 
+@@ -2509,7 +2509,10 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
+ 		WRITE_ONCE(*seq, *seq + used);
+ 		copied += used;
+ 		len -= used;
+-
++		if (flags & MSG_PEEK)
++			sk_peek_offset_fwd(sk, used);
++		else
++			sk_peek_offset_bwd(sk, used);
+ 		tcp_rcv_space_adjust(sk);
+ 
+ skip_copy:
+@@ -3010,6 +3013,7 @@ int tcp_disconnect(struct sock *sk, int flags)
+ 	__skb_queue_purge(&sk->sk_receive_queue);
+ 	WRITE_ONCE(tp->copied_seq, tp->rcv_nxt);
+ 	WRITE_ONCE(tp->urg_data, 0);
++	sk_set_peek_off(sk, -1);
+ 	tcp_write_queue_purge(sk);
+ 	tcp_fastopen_active_disable_ofo_check(sk);
+ 	skb_rbtree_purge(&tp->out_of_order_queue);
+-- 
+2.42.0
+
 
