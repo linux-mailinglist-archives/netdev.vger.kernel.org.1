@@ -1,197 +1,154 @@
-Return-Path: <netdev+bounces-86218-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86219-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6942B89E070
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 18:31:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 319A889E0AE
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 18:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CC4D1C212D2
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:31:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44826B22E85
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:44:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AEA414EC46;
-	Tue,  9 Apr 2024 16:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E1F8153574;
+	Tue,  9 Apr 2024 16:44:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NPhJdsli"
+	dkim=pass (1024-bit key) header.d=netflix.com header.i=@netflix.com header.b="lvM1jpc9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-pl1-f193.google.com (mail-pl1-f193.google.com [209.85.214.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC79314E2FA;
-	Tue,  9 Apr 2024 16:31:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C1BF12FB38
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 16:44:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712680307; cv=none; b=bqglP1Txf7jt3X9mnaiq8CFEz0cs418PCPgwG/x1sjwmojg1m8PaX0m/eusBV3bNDaviGpFqno8g0CYNmcuXlc7xhntt6QAPrg2wy2VffxH9S19ZDkXmbJ2dFIExdG+9HYrDRIITBVYVXwt4aDsJSiZkgBIq/DqYHvyNpiz32uA=
+	t=1712681060; cv=none; b=KSeUMQddTwiWrHtrWKwJCHh3jo3c8C2ae+IB+gpPqn1dxD0ZHKjMSY9V2SmR1Q7ywONPgDZ+zrFxmrLg/5vfDhWJRz3MMZjf14e/VSPWB/FcIIiZFaWV1qWaxV2KCBnRnaB5NQ1MVpd/lxnRpyZmKCSaDN6uRxZwsYV00OhpliQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712680307; c=relaxed/simple;
-	bh=4+5+t9ivZThSeoTjClZN1zIyssiggPgMe259i9/bH6A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lTtzhADHJYDC2pzOxAzVKZ1JdPmOnKs+9aFtjo5JCyV+G8ytOOZJLQMl9SpIrX9wJPlT6Zhkqn9lr7TnTUVI/q5FMxj98M6sylDiWuOydmDhfx7TXMLiXeRJOhpZtThFpVmTrU0dVgGhRSdVvJk5dZKtpXKyOGXw8zFqWwpinP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NPhJdsli; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-415515178ceso37808915e9.0;
-        Tue, 09 Apr 2024 09:31:45 -0700 (PDT)
+	s=arc-20240116; t=1712681060; c=relaxed/simple;
+	bh=CdpJGAEXXXNAgx3aGCK/nVQpHRQb5I3Wu1z30rm8qjg=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=P6gSY/2KqhaTvs1XrTtf3DQeD0L8cR+Fhfz5dr943d4G9MQfuamxRFyYYpVWfLM7eUKoPdY+0EdivS7cygEJpEWyI3Ina4Ti0xQIYFYnk8mUWV07O6Ld3FNj9lmKKr5E5XSztRshk89hssICIqRbqC80eJYk6FzusperMbedN4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=netflix.com; spf=pass smtp.mailfrom=netflix.com; dkim=pass (1024-bit key) header.d=netflix.com header.i=@netflix.com header.b=lvM1jpc9; arc=none smtp.client-ip=209.85.214.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=netflix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netflix.com
+Received: by mail-pl1-f193.google.com with SMTP id d9443c01a7336-1e3ff14f249so17977005ad.1
+        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 09:44:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712680304; x=1713285104; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=netflix.com; s=google; t=1712681058; x=1713285858; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9gCQfMJnF5/zaFvkv148A9uprhljB7Ds6cmqVUuQOMk=;
-        b=NPhJdsli81ZJh2Yhr9lCq2Qrw3cP4kb1b4UK5xk5q7tP3skpODZsaiVoYFMAcCYNTg
-         jgM1LTK6BH6FOWdkS/qmeNkcPap0vPnb0weo/clijbSfzuitRwaBcAin9QcT9FrkYqKQ
-         lXULm17uWQkEWM/4EADK01SBB9CXtKhEpV/hp/sL9XpPY5s5YF85r0Jnvb3IwTgWNG7t
-         7lBV/g98HHtP3TQGxUDqkV6+DY8Hdwt8ZrHvN3v8WOcYIuIR/rkuHhgdJMx6UnN8povE
-         D8DHDbbfAnQUAI7DyBaT0bkJxWMlIqvjA+ji22CK2NwhwS9ETx8hPkpP7tlL4TBoZ5m6
-         EZTw==
+        bh=WprSy5gaOswrxUq16HxLGVIpP7UNz6Zb1HwY60dlbPQ=;
+        b=lvM1jpc93GMdacQubdrD3lfzxP5SrGS2tD84FyeGFBpApw6AaP5LoUFSv3SU5tZmCy
+         FriYHh6CZdNQDlCa9S45IDWiD0OaNJv4KdK3yXn/hBIW5+0nN+mdgsOYdCLoeQ1MoLQw
+         3OIEAs2fiiHfLxtBePXdzDE5c4clogBakPakc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712680304; x=1713285104;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1712681058; x=1713285858;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9gCQfMJnF5/zaFvkv148A9uprhljB7Ds6cmqVUuQOMk=;
-        b=J/PseOLPQTcvlXG4Mrn8L5I9Lg4Sg/36rLc/Wnp2NhmbnyWnpJl6MWFR1yL25vQ6gf
-         Oa3y0OKHKA7mT1LY8rimCcDeDyLU+6rLvTQqxg2a6xJ8zOK7KXb4i1i1+tW/OcV5DtFN
-         BpovmNcNzIaRPc9nwlv7JB+kz9DbWj9zKN+KgBwxZ0SfEkwmydMRSqqHMPNv82UXbczB
-         1rIZq+J5q9BOBdrejRl2hY3rnfyJibxrbGIun3YSPysSabsmkzrBYx/fHiK0ZOEkM/JX
-         fPBu3QmaJ+r88qNjP75xa+bdrxyFhyfoBXBEt06WR8qN1SL51t607VoeDIrdOLVc8zKY
-         ztEA==
-X-Forwarded-Encrypted: i=1; AJvYcCURTprlNDOkntJWooj6BSVLGrlqRve2Fz78lrJOv0uS3fROp50AQvDRUOx7y0r65g3/GeYnINogTeyu2eLSlJ0xnwMDQh9NU/Izwk7pslkcz7RqHeJVAwxSHqfeQiiQKMJ7
-X-Gm-Message-State: AOJu0Yz03ymNffWGuPZWEtI9endWTsTaCfESR82Kw1rGIGPRMU3OHAzr
-	/NBfuejRfoz8d/m4zsmpp2CIE0I3jnS/S3V/BrhjxlJCr7YFsUe/dxWwY4F8Fv1w+pjyI3oycb4
-	LNAiz3l6T56uPgqt5Bl/4VFk7psY=
-X-Google-Smtp-Source: AGHT+IH3ZMJs8B8V2n9l9tJX0XL9K3/OdZubIcGN8oNrV+TqdQ05Qu2wsK4v0rCz6IACPnEde/F2qOCL8j33X8ZxaA4=
-X-Received: by 2002:a5d:6d85:0:b0:33e:48f9:169d with SMTP id
- l5-20020a5d6d85000000b0033e48f9169dmr194224wrs.31.1712680303633; Tue, 09 Apr
- 2024 09:31:43 -0700 (PDT)
+        bh=WprSy5gaOswrxUq16HxLGVIpP7UNz6Zb1HwY60dlbPQ=;
+        b=Ea7rIBHFhI0MjIeZ8vRNbUueC3EhfUbAN9yIVfn9mIvquxiBa9uy/Fe4dUOtLcqGlC
+         Lb9mekKo81w465GgI6PzYs2WCJ2Fwo0tVgD0sght+Do/87R4wSH+GyaWATkO/NDn+zVu
+         +1LzcF0nl4CC9jpt8AR1xeBOZyzEQmzfdSPmvH/AkGNH6rLsJtaGPuzqzpND3f+Srqyu
+         MbIPj51ZxfLp+ZG46iEZ6TpSaB0o0jVdMVwzf/rYac6fAuWKW0Ff+R8OtZ/Fagn4QuC3
+         iPOSamFCaQNjULk9iccUQ9u6J4FlFEpD+8As8yO2exS+mp8H3Uqfz1vI0M5RDbPmJb39
+         /ElQ==
+X-Gm-Message-State: AOJu0YyTDiruwPxdRu9RH9SXYBpr1v2q564F7EtN01ETCWsf5WUbWceS
+	cyU1Vli5Iz1ym4NuXzQmpEyCS7V/IcEExPpSyMKZ1K4FaGCYYwm/eE5NKAQGtYA=
+X-Google-Smtp-Source: AGHT+IGpjfjW9TJ7hzyoZ0nVHwp6ng6JTjp9cytMntyKurIPB35t8pr+lqldK0ZW1LQpTLC/OpHYjg==
+X-Received: by 2002:a17:903:32d2:b0:1e4:7bf1:521 with SMTP id i18-20020a17090332d200b001e47bf10521mr4936530plr.19.1712681057550;
+        Tue, 09 Apr 2024 09:44:17 -0700 (PDT)
+Received: from localhost ([2607:fb10:7302::1])
+        by smtp.gmail.com with UTF8SMTPSA id e7-20020a170902784700b001e2ad8cd0f0sm9259911pln.133.2024.04.09.09.44.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Apr 2024 09:44:16 -0700 (PDT)
+From: Hechao Li <hli@netflix.com>
+To: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Soheil Hassas Yeganeh <soheil@google.com>
+Cc: netdev@vger.kernel.org,
+	Hechao Li <hli@netflix.com>,
+	Tycho Andersen <tycho@tycho.pizza>
+Subject: [PATCH net-next v3] tcp: increase the default TCP scaling ratio
+Date: Tue,  9 Apr 2024 09:43:55 -0700
+Message-Id: <20240409164355.1721078-1-hli@netflix.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <CANn89iKe=GCvSp1u5=6F+NYNUoGeOLyp0-ce8_Y-z8Vo=6-xMA@mail.gmail.com>
+References: <CANn89iKe=GCvSp1u5=6F+NYNUoGeOLyp0-ce8_Y-z8Vo=6-xMA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240404165000.47ce17e6@kernel.org> <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
- <20240404193817.500523aa@kernel.org> <CAKgT0UdAz1mb48kFEngY5sCvHwYM2vYtEK81VceKj-xo6roFyA@mail.gmail.com>
- <20240408061846.GA8764@unreal> <CAKgT0UcE5cOKO4JgR-PBstP3e9r02+NyG3YrNQe8p2_25Xpf8g@mail.gmail.com>
- <20240408184102.GA4195@unreal> <CAKgT0UcLWEP5GOqFEDeyGFpJre+g2_AbmBOSXJsoXZuCprGH0Q@mail.gmail.com>
- <20240409081856.GC4195@unreal> <CAKgT0UewAZSqU6JF4-cPf7hZM41n_QMuiF_K8SY8hyoROQLgfQ@mail.gmail.com>
- <20240409153932.GY5383@nvidia.com>
-In-Reply-To: <20240409153932.GY5383@nvidia.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 9 Apr 2024 09:31:06 -0700
-Message-ID: <CAKgT0UeSNxbq3JYe8oNaoWYWSn9+vd1c+AfjvUsietUtS09r0g@mail.gmail.com>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	bhelgaas@google.com, linux-pci@vger.kernel.org, 
-	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 9, 2024 at 8:39=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> wro=
-te:
->
-> On Tue, Apr 09, 2024 at 07:43:07AM -0700, Alexander Duyck wrote:
->
-> > I see. So this is what you were referencing. Arguably I can see both
-> > sides of the issue. Ideally what should have been presented would have
-> > been the root cause of why the diff
->
-> Uh, that almost never happens in the kernel world. Someone does a
-> great favour to us all to test rc kernels and finds bugs. The
+After commit dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale"),
+we noticed an application-level timeout due to reduced throughput.
 
-Thus why I mentioned "Ideally". Most often that cannot be the case due
-to various reasons. However, that said that would have been the Ideal
-solution, not the practical one.
+Before the commit, for a client that sets SO_RCVBUF to 65k, it takes
+around 22 seconds to transfer 10M data. After the commit, it takes 40
+seconds. Because our application has a 30-second timeout, this
+regression broke the application.
 
-> expectation is generally things like:
->
->  - The bug is fixed immediately because the issue is obvious to the
->    author
->  - Iteration and rapid progress is seen toward enlightening the author
->  - The patch is reverted, often rapidly, try again later with a good
->    patch
+The reason that it takes longer to transfer data is that
+tp->scaling_ratio is initialized to a value that results in ~0.25 of
+rcvbuf. In our case, SO_RCVBUF is set to 65536 by the application, which
+translates to 2 * 65536 = 131,072 bytes in rcvbuf and hence a ~28k
+initial receive window.
 
-When working on a development branch that shouldn't be the
-expectation. I suspect that is why the revert was pushed back on
-initially. The developer wanted a chance to try to debug and resolve
-the issue with root cause.
+Later, even though the scaling_ratio is updated to a more accurate
+skb->len/skb->truesize, which is ~0.66 in our environment, the window
+stays at ~0.25 * rcvbuf. This is because tp->window_clamp does not
+change together with the tp->scaling_ratio update when autotuning is
+disabled due to SO_RCVBUF. As a result, the window size is capped at the
+initial window_clamp, which is also ~0.25 * rcvbuf, and never grows
+bigger.
 
-Honestly what I probably would have proposed was a build flag that
-would have allowed the code to stay but be disabled with a "Broken"
-label to allow both developers to work on their own thing. Then if
-people complained about the RFC non-compliance issue, but didn't care
-about the Vagrant setup they could have just turned it on to test and
-verify it fixed their issue and get additional testing. However I
-assume that would have introduced additional maintenance overhead.
+Most modern applications let the kernel do autotuning, and benefit from
+the increased scaling_ratio. But there are applications such as kafka
+that has a default setting of SO_RCVBUF=64k.
 
-> Unsophisticated reporters should not experience regressions,
-> period. Unsophisticated reporters shuld not be expected to debug
-> things on their own (though it sure is nice if they can!). We really
-> like it and appreciate it if reporters can run experiments!
+This patch increases the initial scaling_ratio from ~25% to 50% in order
+to make it backward compatible with the original default
+sysctl_tcp_adv_win_scale for applications setting SO_RCVBUF.
 
-Unsophisticated reporters/users shouldn't be running net-next. If this
-has made it to or is about to go into Linus's tree then I would agree
-the regression needs to be resolved ASAP as that stuff shouldn't exist
-past rc1 at the latest.
+Fixes: dfa2f0483360 ("tcp: get rid of sysctl_tcp_adv_win_scale")
+Signed-off-by: Hechao Li <hli@netflix.com>
+Reviewed-by: Tycho Andersen <tycho@tycho.pizza>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Link: https://lore.kernel.org/netdev/20240402215405.432863-1-hli@netflix.com/
 
-> In this particular instance there was some resistance getting to a fix
-> quickly. I think a revert for something like this that could not be
-> immediately fixed is the correct thing, especially when it effects
-> significant work within the community. It gives the submitter time to
-> find out how to solve the regression.
->
-> That there is now so much ongoing bad blood over such an ordinary
-> matter is what is really distressing here.
+---
+v1->v2: increase the default tcp scaling ratio instead of updating
+window_clamp and update the commit message
+v2->v3: Update commit message and add the link to v1
+---
+ include/net/tcp.h | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-Well much of it has to do with the fact that this is supposed to be a
-community. Generally I help you, you help me and together we both make
-progress. So within the community people tend to build up what we
-could call karma. Generally I think some of the messages sent seemed
-to make it come across that the Mellanox/Nvidia folks felt it "wasn't
-their problem" so they elicited a bit of frustration from the other
-maintainers and built up some negative karma.
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 6ae35199d3b3..2bcf30381d75 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -1539,11 +1539,10 @@ static inline int tcp_space_from_win(const struct sock *sk, int win)
+ 	return __tcp_space_from_win(tcp_sk(sk)->scaling_ratio, win);
+ }
+ 
+-/* Assume a conservative default of 1200 bytes of payload per 4K page.
++/* Assume a 50% default for skb->len/skb->truesize ratio.
+  * This may be adjusted later in tcp_measure_rcv_mss().
+  */
+-#define TCP_DEFAULT_SCALING_RATIO ((1200 << TCP_RMEM_TO_WIN_SCALE) / \
+-				   SKB_TRUESIZE(4096))
++#define TCP_DEFAULT_SCALING_RATIO (1 << (TCP_RMEM_TO_WIN_SCALE - 1))
+ 
+ static inline void tcp_scaling_ratio_init(struct sock *sk)
+ {
+-- 
+2.34.1
 
-As I had mentioned in the case of the e1000e NVRAM corruption. It
-wasn't an Intel issue that caused the problem but Intel had to jump in
-to address it until they found the root cause that was function
-tracing. Unfortunately one thing that tends to happen with upstream is
-that we get asked to do things that aren't directly related to the
-project we are working on. We saw that at Intel quite often. I
-referred to it at one point as the "you stepped in it, you own it"
-phenomenon where if we even brushed against block of upstream code
-that wasn't being well maintained we would be asked to fix it up and
-address existing issues before we could upstream any patches.
-
-> I think Leon's point is broadly that those on the "vendor" side seem
-> to often be accused of being a "bad vendor". I couldn't help but
-> notice the language from Meta on this thread seemed to place Meta
-> outside of being a vendor, despite having always very much been doing
-> typical vendor activities like downstream forks, proprietary userspace
-> and now drivers for their own devices.
-
-I wouldn't disagree that we are doing "vendor" things. Up until about
-4 years ago I was on the "vendor" side at Intel. One difference is
-that Meta is also the "consumer". So if I report an issue it is me
-complaining about something as a sophisticated user instead of a
-unsophisticated one. So hopefully we have gone though and done some
-triage to at least bisect it down to a patch and are willing to work
-with the community as you guys did. If we can work with the other
-maintainers to enable them to debug and root cause the issue then even
-better. The revert is normally the weapon of last resort to be broken
-out before the merge window opens, or if an issue is caught in Linus's
-tree.
-
-> In my view the vendor/!vendor distinction is really toxic and should
-> stop.
-
-I agree. However that was essentially what started all this when Jiri
-pointed out that we weren't selling the NIC to anyone else. That made
-this all about vendor vs !vendor, and his suggestion of just giving
-the NICs away isn't exactly practical. At least not an any sort of
-large scale. Maybe we should start coming up with a new term for the
-!vendor case. How about "prosumer", as in "producer" and "consumer"?
 
