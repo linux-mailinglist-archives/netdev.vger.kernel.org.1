@@ -1,50 +1,83 @@
-Return-Path: <netdev+bounces-86145-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B45289DB78
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:00:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBBF189DBBF
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 16:08:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06DD6284DDC
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:00:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A8861F230E6
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 14:08:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D87CD12A144;
-	Tue,  9 Apr 2024 14:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F2012F591;
+	Tue,  9 Apr 2024 14:08:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kfSgojQT"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="QbA/vVeH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out203-205-221-247.mail.qq.com (out203-205-221-247.mail.qq.com [203.205.221.247])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD1C12F585;
-	Tue,  9 Apr 2024 14:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F097275809;
+	Tue,  9 Apr 2024 14:08:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.221.247
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712671228; cv=none; b=Gr484KpJKutTnUp5xdq+amyKTZMpNqUQgye9ZrC0JAOZLYvq8PdF3adsSVgWwaGPmDz5HASaMVm/Pc+lgWVWDmrjEn/ue4zaJQqlj4LT/7ZvwzPXYW/QMN9UkiUnqqLvnjlmW9PBz0ltvZuoRp08VonKRETdLI33nmrVFdJlMYA=
+	t=1712671686; cv=none; b=jKFA6Xb39jHt9TItvG7bVcmGEgxL3W5J+nSNdswb6HIGWmaZE1qvybtS32Kne45Z+5XXEglrb8FpJfRXAcA/YL6XM7Nxjk72zVO+ufRWFgutusK7iUg/wZqaYZrCWPE9bl55UfT5gkMB7EH7Wv2QI/FUpQgLD37DUI+RiAUXIKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712671228; c=relaxed/simple;
-	bh=3imqkCaF0cUyufJVCbO+U0FzUIq5rDIjHYANKbEr5gQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TX9QbhhJhbpHhuDY4gUKE/LkndTkVkjsnoN4zWccS656ueuOumswwHBEE5FVu/jhMeMUh85/1wwKnGK0IhmwFx7uHxOgZuj2fW8l2sNF5fi61qpMo9+XMm8s6da08yzUqMQwl1rvy1TaCxsMsu4/+s5mMkpbsMacyzENUb5KBuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kfSgojQT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2E9B0C43394;
-	Tue,  9 Apr 2024 14:00:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712671228;
-	bh=3imqkCaF0cUyufJVCbO+U0FzUIq5rDIjHYANKbEr5gQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kfSgojQToREe1AnpRsrJ9xZqHeOdDGf1PsYfQpKiv5S03fwMOMTYSokV9KgAAMQad
-	 /CoEuaPwgQK02Tzxnr3IKF2BomxcydkhdTlAeMRZAb+jSTOuwqMtURUd/qK023VEO5
-	 8+CB37LJtbbs3jgIkO5wWMZviOTYyk2cNvop6V4AeOFtBZtkonngwZ2/ZMz6vz3Pkx
-	 aHMykdf0vGsFw0HPu6Wi1wWPL99gjLStOQFylfZiqgkmOI1G0rYLtkfMhc9+CQRkZ4
-	 pjaZtbhgslJr6ixOSTHU91cikQ0ueAmX+Akrmx6wNWbLSHwNjAJDxQNQstLS/GXkk6
-	 07+Oxm795KdvA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0C961C395F6;
-	Tue,  9 Apr 2024 14:00:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1712671686; c=relaxed/simple;
+	bh=aZ3VspYYkKY1SKuWGstld2SVTKAJS1fjt3YHHePeFqk=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=hv953NuHCJfBi/JSskVfRPCK3di5fyvtxgQZLZf23qYB6degIL5t8tiJsEyoN3QhNHtNmeIAno+mnu0GLIQrowoWpj3t595ruzXivjvfJXWchNmJincwKufmfljzYrOe/1nircYknIlIMzrrXz+ZuNRtFF/kmi1eExl45xtVchk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=QbA/vVeH; arc=none smtp.client-ip=203.205.221.247
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1712671681; bh=Nq7x37qnBv79sD920Br4gJu3bwEbV/pMCm95FU3naDk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=QbA/vVeHqGIdL6GIN5Aabs8VRYJcnKVkyAEZpqoJnTbrE+UVVtFogERdirJS5TTx8
+	 8G41AnRxLXGdb6W3TwtTKbx+kbcpxmqur6/OwhdRBnGuDTY0qFCrC6zqJUsAypWzLU
+	 /IGMoU2dERkECnOmypwBuOt+zb9j+HKt0j9kAjm8=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.153])
+	by newxmesmtplogicsvrsza1-0.qq.com (NewEsmtp) with SMTP
+	id 6D16000; Tue, 09 Apr 2024 22:01:45 +0800
+X-QQ-mid: xmsmtpt1712671305t2hlw4hd1
+Message-ID: <tencent_88401767377846C9736D0363C96C23BB4405@qq.com>
+X-QQ-XMAILINFO: MXFwphgysCmN7alFT54dUzQwy3Yf4UCiwHgtXIu9oHZ6X2/XiOTaFGgsyzuF2u
+	 BWJEbWMOcQXfFTLTOQpeeXrdVWRtoapk4/0M7AQRhNgbeFb62N+u9liwhKDDAHWWegr8w8OkiBw1
+	 ioQ42KrhMBTgM52VRYhCcNhjT4eab7Zsq92OHoTtzRqZHHkpu5No+MlG+0E4yudhDgiKQWivQCKg
+	 cLqEuj5DtRR+UPU9xjL3DQNckNqMF2Wi9kWe83m8eezRIloBb2d4mfQdO80iVoFBRwLBj4HMfSM9
+	 dkS5QOzS5BNfLV6I7gqEpiwVwgjbN7DAxqWwh8UB20bZXEaeVPthNVidYI4DZKsuobSzErjlGuVv
+	 l5HOy4xpNztv22onDE10Y6EhZ0rGXIYr9I+oNN9P0eRCyjl/EA1/sknQaqjxgNNA3mFAdbmXeBCB
+	 oNCUYgStbGpWPDYCK2hOTACTrgwcBPOomlREYsuS0LRiKE2CSdDEW+6PLLo80ZbPN0PO27xVP3HU
+	 kqpKiIiSLoIuE+rrA0tuSRF1HwBLvxsn++9qD4eiOL6hZHuR25pC8vxyAUprvIM4lyAvq5lU6T2T
+	 O7A+PresvyPjUyIroSypXsB7xBe0ZXlVG7M4HuU7kZOvc/96/nH/tbCT3BS12yK4WqtoHBIPPkQs
+	 h5dD73wlRTamZCMYrcNlii3Gt35JL8MsVTCoK1jQ0HWWJ0UnQPG+HXBQqt0Jw6qIIyhmaRXf25qQ
+	 acGhHoF63hZfbTa5e8U4yTLVykNw+cm5V7CZ1GJHydpZs4+5/Pu/24cqwCXntRla5HTup+ONOEHt
+	 WNsGEcTuFVELID/U1nLr9wVtfi1HCGt6eO8AbsVSFPJEGquYzhg3RTBVYBEM3HcCEWv7dafBhvjO
+	 0onQLX5QebODGDtWpSmG6KGNNOjlaeWIAOIyCtKkPo7aSTeBSc8Nr+edtaTYlaBjRH6ZENX1Y501
+	 R831j7dHsTX5gaL/RILH+sbcR5GSJlRQBRqGD2x1CiSAGxI5NYWPHhrv4tKSRNps4pxkx2INMbGW
+	 7V3eDBB9LsqkXRQj4a8WTCnxd6wjQ4gjNKdwHTIAdNuzNfSSYGM/A6zhg0F4hUQgHjb9R9kgk28Y
+	 zyKEdW
+X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
+From: Edward Adam Davis <eadavis@qq.com>
+To: eric.dumazet@gmail.com
+Cc: eadavis@qq.com,
+	edumazet@google.com,
+	johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	netdev@vger.kernel.org,
+	pmenzel@molgen.mpg.de,
+	syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [PATCH] net/socket: Ensure length of input socket option param >= sizeof(int)
+Date: Tue,  9 Apr 2024 22:01:45 +0800
+X-OQ-MSGID: <20240409140144.28412-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <7cf0848b-f44c-42ad-848a-369a249bff77@gmail.com>
+References: <7cf0848b-f44c-42ad-848a-369a249bff77@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,46 +85,27 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/2] ipv6: fib: hide unused 'pn' variable
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171267122804.20541.9875437937830919479.git-patchwork-notify@kernel.org>
-Date: Tue, 09 Apr 2024 14:00:28 +0000
-References: <20240408074219.3030256-1-arnd@kernel.org>
-In-Reply-To: <20240408074219.3030256-1-arnd@kernel.org>
-To: Arnd Bergmann <arnd@kernel.org>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, arnd@arndb.de, leitao@debian.org,
- thinker.li@gmail.com, chentao@kylinos.cn, kuniyu@amazon.com,
- vnuorval@tcs.hut.fi, yoshfuji@linux-ipv6.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon,  8 Apr 2024 09:42:02 +0200 you wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
+On Tue, 9 Apr 2024 15:07:41 +0200, Eric Dumazet wrote:
+> > The optlen value passed by syzbot to _sys_setsockopt() is 2, which results in
+> > only 2 bytes being allocated when allocating memory to kernel_optval, and the
+> > optval size passed when calling the function copy_from_sockptr() is 4 bytes.
+> > Here, optlen is determined uniformly in the entry function __sys_setsockopt().
+> > If its value is less than 4, the parameter is considered invalid.
+> >
+> > Reported-by: syzbot+837ba09d9db969068367@syzkaller.appspotmail.com
+> > Reported-by: syzbot+b71011ec0a23f4d15625@syzkaller.appspotmail.com
+> > Reported-by: syzbot+d4ecae01a53fd9b42e7d@syzkaller.appspotmail.com
+> > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 > 
-> When CONFIG_IPV6_SUBTREES is disabled, the only user is hidden, causing
-> a 'make W=1' warning:
 > 
-> net/ipv6/ip6_fib.c: In function 'fib6_add':
-> net/ipv6/ip6_fib.c:1388:32: error: variable 'pn' set but not used [-Werror=unused-but-set-variable]
+> I think I gave my feedback already.
 > 
-> [...]
-
-Here is the summary with links:
-  - [1/2] ipv6: fib: hide unused 'pn' variable
-    https://git.kernel.org/netdev/net/c/74043489fcb5
-  - [2/2] ipv4/route: avoid unused-but-set-variable warning
-    https://git.kernel.org/netdev/net/c/cf1b7201df59
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+> Please do not ignore maintainers feedback.
+> 
+> This patch is absolutely wrong.
+> 
+> Some setsockopt() deal with optlen == 1 just fine, thank you very much.
+It's better to use evidence to support your claim, rather than your "maintainer" title.
 
 
