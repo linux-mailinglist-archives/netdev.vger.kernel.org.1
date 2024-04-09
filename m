@@ -1,220 +1,92 @@
-Return-Path: <netdev+bounces-86205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0386B89DF6B
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 17:40:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C64B489E01D
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 18:14:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 247541C22E0B
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:40:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08B00B3699C
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:39:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2636B13DB9B;
-	Tue,  9 Apr 2024 15:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oqgd5tS8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB8C1136664;
+	Tue,  9 Apr 2024 15:36:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A88813B5B8
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 15:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A30A135A67;
+	Tue,  9 Apr 2024 15:36:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712677062; cv=none; b=tluiA6jjAHeQCCBZVufjq7g6+JJib/mIDvXLl/bvp+YxcMuvnlGGUILCxLRK7BT/szs+q8twp69JJXsf/tw0jHwprcOVCkp8Zz1vmNHU2e20fJtOQSoBQeYaWp/WNM9LDAt14KcQL1ddzgfctAb7vvSJ7J2hANG4TYKNwrudJAY=
+	t=1712676974; cv=none; b=GXGRlSRbVKerSDrf91RfUTm0sesZn5ChDuFXPjrf4ZYhm1caeBrC1VE6vrujVBcFXZuTEtJ0wGyHW9gWWUeMm6rvRPuiiElIFNuKX2GXODDx5Ts9WilPOOZHHwyIfBWv04A4LmTLDdhYIDhJiZyx5S34CiKVAWJDXfD7+oum+VE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712677062; c=relaxed/simple;
-	bh=FiYua9qt5cyPKbD5gkueRzUtbADCS1A0G5W11GlLtqo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HOghCf1ifFRM8wFwXowgc2RJ3LLNZygTjiMRNO9dNYbuFkgVdFyqtcwOkeo5q9geW6la30B5k67O/9NjxHhhH5wQg7GcRjcawdUjMwfBRSeUChLHFxu9sq3delGN+umI4qV97/dzwtuCQp0uN0Nq+3lKwz4nMG7/zldHuW7vOGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Oqgd5tS8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712677058;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=A3Hwu2ip+GHzxQ0LRYtJWTGCmx4DOpmKRqbnqLq7zeM=;
-	b=Oqgd5tS8M/2LXupcvUbExTDld+UXUPPm/Lhkhtj3ABPTY3jvUYnG4v47Yo4fOmYJBx+7re
-	Q+oslOKmyCz2zUU8S6YkSBWecDdibUq91y9rHVUfOxt7O0w2TOFwc6w9NSujdXhh1KtT89
-	DdRFdbkoh1GmaVk5qxYHdky4KoEr6GY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-86-J_fxg3y_Mgi_b_A_o-ulDA-1; Tue, 09 Apr 2024 11:37:35 -0400
-X-MC-Unique: J_fxg3y_Mgi_b_A_o-ulDA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C11061807ACD;
-	Tue,  9 Apr 2024 15:37:34 +0000 (UTC)
-Received: from [10.22.10.13] (unknown [10.22.10.13])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8AE001C06666;
-	Tue,  9 Apr 2024 15:37:33 +0000 (UTC)
-Message-ID: <96728c6d-3863-48c7-986b-b0b37689849e@redhat.com>
-Date: Tue, 9 Apr 2024 11:37:31 -0400
+	s=arc-20240116; t=1712676974; c=relaxed/simple;
+	bh=ZllP92/rBztqSQFwtsA/VIM+vevUvKCza45kq5uSvXY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mNxjKP0tDV2jEFDcRCZYNHgVLwy9krwJw2CXB6kxu2l8BTxnd9Zm0Rv4logCQxAUIgNPTznseTKgaYNtN38HZTtgeJCgxYFdXnlSRdDHvDk94qwN1cra8DhbYduPOwQ7ccxBCOesL7c6YG8nxrpoHKYs/5JRY1rujbQ3JaZcOP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75864C433C7;
+	Tue,  9 Apr 2024 15:36:12 +0000 (UTC)
+Date: Tue, 9 Apr 2024 11:38:46 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ dsahern@kernel.org, matttbe@kernel.org, martineau@kernel.org,
+ geliang@kernel.org, mptcp@lists.linux.dev,
+ linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, Jason Xing
+ <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next v3 6/6] rstreason: make it work in trace world
+Message-ID: <20240409113846.5559359a@gandalf.local.home>
+In-Reply-To: <20240409100934.37725-7-kerneljasonxing@gmail.com>
+References: <20240409100934.37725-1-kerneljasonxing@gmail.com>
+	<20240409100934.37725-7-kerneljasonxing@gmail.com>
+X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Advice on cgroup rstat lock
-Content-Language: en-US
-To: Jesper Dangaard Brouer <hawk@kernel.org>,
- Yosry Ahmed <yosryahmed@google.com>, Johannes Weiner <hannes@cmpxchg.org>
-Cc: Tejun Heo <tj@kernel.org>, Jesper Dangaard Brouer
- <jesper@cloudflare.com>, "David S. Miller" <davem@davemloft.net>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Shakeel Butt <shakeelb@google.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Daniel Bristot de Oliveira <bristot@redhat.com>,
- kernel-team <kernel-team@cloudflare.com>, cgroups@vger.kernel.org,
- Linux-MM <linux-mm@kvack.org>, Netdev <netdev@vger.kernel.org>,
- bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
- Ivan Babrou <ivan@cloudflare.com>
-References: <7cd05fac-9d93-45ca-aa15-afd1a34329c6@kernel.org>
- <20240319154437.GA144716@cmpxchg.org>
- <56556042-5269-4c7e-99ed-1a1ab21ac27f@kernel.org>
- <CAJD7tkYbO7MdKUBsaOiSp6-qnDesdmVsTCiZApN_ncS3YkDqGQ@mail.gmail.com>
- <bf94f850-fab4-4171-8dfe-b19ada22f3be@kernel.org>
- <CAJD7tkbn-wFEbhnhGWTy0-UsFoosr=m7wiJ+P96XnDoFnSH7Zg@mail.gmail.com>
- <ac4cf07f-52dd-454f-b897-2a4b3796a4d9@kernel.org>
-From: Waiman Long <longman@redhat.com>
-In-Reply-To: <ac4cf07f-52dd-454f-b897-2a4b3796a4d9@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 4/9/24 07:08, Jesper Dangaard Brouer wrote:
-> Let move this discussion upstream.
->
-> On 22/03/2024 19.32, Yosry Ahmed wrote:
->> [..]
->>>> There was a couple of series that made all calls to
->>>> cgroup_rstat_flush() sleepable, which allows the lock to be dropped
->>>> (and IRQs enabled) in between CPU iterations. This fixed a similar
->>>> problem that we used to face (except in our case, we saw hard lockups
->>>> in extreme scenarios):
->>>> https://lore.kernel.org/linux-mm/20230330191801.1967435-1-yosryahmed@google.com/ 
->>>>
->>>> https://lore.kernel.org/lkml/20230421174020.2994750-1-yosryahmed@google.com/ 
->>>>
->>>
->>> I've only done the 6.6 backport, and these were in 6.5/6.6.
->
-> Given I have these in my 6.6 kernel. You are basically saying I should
-> be able to avoid IRQ-disable for the lock, right?
->
-> My main problem with the global cgroup_rstat_lock[3] is it disables IRQs
-> and (thereby also) BH/softirq (spin_lock_irq).  This cause production
-> issues elsewhere, e.g. we are seeing network softirq "not-able-to-run"
-> latency issues (debug via softirq_net_latency.bt [5]).
->
->   [3] 
-> https://elixir.bootlin.com/linux/v6.9-rc3/source/kernel/cgroup/rstat.c#L10
->   [5] 
-> https://github.com/xdp-project/xdp-project/blob/master/areas/latency/softirq_net_latency.bt 
->
->
->>> And between 6.1 to 6.6 we did observe an improvement in this area.
->>> (Maybe I don't have to do the 6.1 backport if the 6.6 release plan 
->>> progress)
->>>
->>> I've had a chance to get running in prod for 6.6 backport.
->>> As you can see in attached grafana heatmap pictures, we do observe an
->>> improved/reduced softirq wait time.
->>> These softirq "not-able-to-run" outliers is *one* of the prod issues we
->>> observed.  As you can see, I still have other areas to improve/fix.
->>
->> I am not very familiar with such heatmaps, but I am glad there is an
->> improvement with 6.6 and the backports. Let me know if there is
->> anything I could do to help with your effort.
->
-> The heatmaps give me an overview, but I needed a debugging tool, so I
-> developed some bpftrace scripts [1][2] I'm running on production.
-> To measure how long time we hold the cgroup rstat lock (results below).
-> Adding ACME and Daniel as I hope there is an easier way to measure lock
-> hold time and congestion. Notice tricky release/yield in
-> cgroup_rstat_flush_locked[4].
->
-> My production results on 6.6 with backported patches (below signature)
-> vs a our normal 6.6 kernel, with script [2]. The `@lock_time_hist_ns`
-> shows how long time the lock+IRQs were disabled (taking into account it
-> can be released in the loop [4]).
->
-> Patched kernel:
->
-> 21:49:02  time elapsed: 43200 sec
-> @lock_time_hist_ns:
-> [2K, 4K)              61 |      |
-> [4K, 8K)             734 |      |
-> [8K, 16K)         121500 |@@@@@@@@@@@@@@@@      |
-> [16K, 32K)        385714 
-> |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-> [32K, 64K)        145600 |@@@@@@@@@@@@@@@@@@@      |
-> [64K, 128K)       156873 |@@@@@@@@@@@@@@@@@@@@@      |
-> [128K, 256K)      261027 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ |
-> [256K, 512K)      291986 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      |
-> [512K, 1M)        101859 |@@@@@@@@@@@@@      |
-> [1M, 2M)           19866 |@@      |
-> [2M, 4M)           10146 |@      |
-> [4M, 8M)           30633 |@@@@      |
-> [8M, 16M)          40365 |@@@@@      |
-> [16M, 32M)         21650 |@@      |
-> [32M, 64M)          5842 |      |
-> [64M, 128M)            8 |      |
->
-> And normal 6.6 kernel:
->
-> 21:48:32  time elapsed: 43200 sec
-> @lock_time_hist_ns:
-> [1K, 2K)              25 |      |
-> [2K, 4K)            1146 |      |
-> [4K, 8K)           59397 |@@@@      |
-> [8K, 16K)         571528 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      |
-> [16K, 32K)        542648 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@      |
-> [32K, 64K)        202810 |@@@@@@@@@@@@@      |
-> [64K, 128K)       134564 |@@@@@@@@@      |
-> [128K, 256K)       72870 |@@@@@      |
-> [256K, 512K)       56914 |@@@      |
-> [512K, 1M)         83140 |@@@@@      |
-> [1M, 2M)          170514 |@@@@@@@@@@@      |
-> [2M, 4M)          396304 |@@@@@@@@@@@@@@@@@@@@@@@@@@@      |
-> [4M, 8M)          755537 
-> |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
-> [8M, 16M)         231222 |@@@@@@@@@@@@@@@      |
-> [16M, 32M)         76370 |@@@@@      |
-> [32M, 64M)          1043 |      |
-> [64M, 128M)           12 |      |
->
->
-> For the unpatched kernel we see more events in 4ms to 8ms bucket than
-> any other bucket.
-> For patched kernel, we clearly see a significant reduction of events in
-> the 4 ms to 64 ms area, but we still have some events in this area.  I'm
-> very happy to see these patches improves the situation.  But for network
-> processing I'm not happy to see events in area 16ms to 128ms area.  If
-> we can just avoid disabling IRQs/softirq for the lock, I would be happy.
->
-> How far can we go... could cgroup_rstat_lock be converted to a mutex?
+On Tue,  9 Apr 2024 18:09:34 +0800
+Jason Xing <kerneljasonxing@gmail.com> wrote:
 
-The cgroup_rstat_lock was originally a mutex. It was converted to a 
-spinlock in commit 0fa294fb1985 ("group: Replace cgroup_rstat_mutex with 
-a spinlock"). Irq was disabled to enable calling from atomic context. 
-Since commit 0a2dc6ac3329 ("cgroup: remove 
-cgroup_rstat_flush_atomic()"), the rstat API hadn't been called from 
-atomic context anymore. Theoretically, we could change it back to a 
-mutex or not disabling interrupt. That will require that the API cannot 
-be called from atomic context going forward.
+>  /*
+>   * tcp event with arguments sk and skb
+> @@ -74,20 +75,38 @@ DEFINE_EVENT(tcp_event_sk_skb, tcp_retransmit_skb,
+>  	TP_ARGS(sk, skb)
+>  );
+>  
+> +#undef FN1
+> +#define FN1(reason)	TRACE_DEFINE_ENUM(SK_RST_REASON_##reason);
+> +#undef FN2
+> +#define FN2(reason)	TRACE_DEFINE_ENUM(SKB_DROP_REASON_##reason);
+> +DEFINE_RST_REASON(FN1, FN1)
 
-Cheers,
-Longman
+Interesting. I've never seen the passing of the internal macros to the main
+macro before. I see that you are using it for handling both the
+SK_RST_REASON and the SK_DROP_REASON.
 
+> +
+> +#undef FN1
+> +#undef FNe1
+> +#define FN1(reason)	{ SK_RST_REASON_##reason, #reason },
+> +#define FNe1(reason)	{ SK_RST_REASON_##reason, #reason }
+> +
+> +#undef FN2
+> +#undef FNe2
+> +#define FN2(reason)	{ SKB_DROP_REASON_##reason, #reason },
+> +#define FNe2(reason)	{ SKB_DROP_REASON_##reason, #reason }
 
+Anyway, from a tracing point of view, as it looks like it would work
+(I haven't tested it).
+
+Reviewed-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+
+-- Steve
 
