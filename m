@@ -1,236 +1,263 @@
-Return-Path: <netdev+bounces-86080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A0DC89D787
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:02:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38BEE89D7A2
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:09:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 778151F20F7D
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:02:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8312AB20DC5
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:09:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EC5485636;
-	Tue,  9 Apr 2024 11:01:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D96CD84D02;
+	Tue,  9 Apr 2024 11:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="xQjy2pj2"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="kYvc3X+0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2085.outbound.protection.outlook.com [40.107.223.85])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7CE07D3E8
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 11:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712660519; cv=none; b=cwPgPMYrYJDDWSunjZU9YSz10KIM18TRwIeiVWzNqpgh9EvlEv3TTwBVD9m+dm0LRumHXRf6t9jkPiQft5gyZyr5Y/nunRqcG9Efx+j2JO7uvDKGTtroDvy7VkT2yQ1put8WJe4rMJfOU0B/MHO1JMKfmaPmRbrCBf2Lyf1YnDE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712660519; c=relaxed/simple;
-	bh=cyKMv918CGWEOV5m/jVZ6fedw33r0JWxw/IGrvBc0Ys=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nW9d3+eJXIcS69t3jrMSBTOz2xhOeb9Ljv4h/umbk3kcP0DHKZBkLKBaO/aKRAQZrwFsGOrW4QZzDvbuJDXH0fQ1IAIQ9zC3ST3IVY+uLjmMVKJp2/eD6qRwNcEGY8psETdfEdMTOWuJDTZszl1ZVHwMKh+ywojvE/SocMMrwJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=xQjy2pj2; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4169d794358so5440765e9.1
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 04:01:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712660516; x=1713265316; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ghzoZZbiK4pCy4yVHv3cKJnocQh3hGrEdW9JRT2mUaM=;
-        b=xQjy2pj2W4jczdc7wGDNw3iiSAn18ne8PXTSKDrfWkrnebRD2uAT46N15MKcz12SEt
-         kVz+FXwEUov6AVHNAqS4HSPsIUMg2Ev7yThhnwTzrDEoN6g8FaG2CRDQnRRqmRvjUGmA
-         EQIJri1lO3zGUCrsNiCiCuuVsvgA3URfldoujnhdO/dADr+E1hDjvl2S9jONPzhKUdsa
-         P8TaFzS8MrcpbP+2NJl4xUsqPiYEHsdI4LlP1ebBJncWnd+GSTOzrfbAA/mQwl7fUmjL
-         G2aPepPSb9CcMomHhwFQKbWsgtLGwvF4q2e+IRQQnmSWRgpvhtHn4WYkItjIJkjFqR65
-         g2nA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712660516; x=1713265316;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ghzoZZbiK4pCy4yVHv3cKJnocQh3hGrEdW9JRT2mUaM=;
-        b=HEQT4RnwFtvc1HPknCeT56wLmW2yNkcYz2CLXPI7HYvpXpW/0ijIksw3SUfrb5WM0Z
-         dOU2jtKtP6i2D4ynCS4EPOUb9RJUUsIlfVl0u1GQL68U/515I3O9koh31uJwtCbKkIyJ
-         Kfp5ex5FjtY1M52GYoGo7NrwXi1qVTAeEnhTuFwRCgjvxfONC8lppAmsjRMKhP+bfT4d
-         e7GllGetMy4Szl3fa1um2I7kyHBQisTFx/A3RwezpzZRLcKwaDRTzkV/rCO2xOAZkSAT
-         wV9zoifHleubucFWZRaGWw2uJFI/sYCcuIfG1DpbNlo3FWcuRZu5hjf7akzvMvb3IXvK
-         irng==
-X-Forwarded-Encrypted: i=1; AJvYcCUS1TPL3LD3fLnnIaueXKvXrJkcfp7+3r3jm8jj1//TKXpz8PVbqlZFKLbL+K6ed2n+XZLan3pSK42hc650dpJTgjGBeUvo
-X-Gm-Message-State: AOJu0YwieIKdglnyazKH9Xh6prVok1Ok1zvapBu4xWwO9RQUZYZ1KjQf
-	P+nUdxQYZ4PVg805vOfVovz92n5xC1Riz5dvrT1nGiiqjr78nYETVZ0PeP43Y2k=
-X-Google-Smtp-Source: AGHT+IFOvJd21kmVeIM6N9PkG+qQRefctpXlG9vlyyHwj2ExttRLNEEhInVzA6Ph+qNg7LoR/crftg==
-X-Received: by 2002:a05:600c:4fc3:b0:416:a36b:995 with SMTP id o3-20020a05600c4fc300b00416a36b0995mr1298568wmq.18.1712660515782;
-        Tue, 09 Apr 2024 04:01:55 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id n1-20020a05600c4f8100b004169836bf9asm3487052wmq.23.2024.04.09.04.01.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Apr 2024 04:01:55 -0700 (PDT)
-Date: Tue, 9 Apr 2024 13:01:51 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>,
-	Jason Gunthorpe <jgg@nvidia.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	bhelgaas@google.com, linux-pci@vger.kernel.org,
-	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net,
-	Christoph Hellwig <hch@lst.de>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-Message-ID: <ZhUgH9_beWrKbwwg@nanopsycho>
-References: <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
- <678f49b06a06d4f6b5d8ee37ad1f4de804c7751d.camel@redhat.com>
- <20240405122646.GA166551@nvidia.com>
- <CAKgT0UeBCBfeq5TxTjND6G_S=CWYZsArxQxVb-2paK_smfcn2w@mail.gmail.com>
- <20240405151703.GF5383@nvidia.com>
- <CAKgT0UeK=KdCJN3BX7+Lvy1vC2hXvucpj5CPs6A0F7ekx59qeg@mail.gmail.com>
- <ZhPaIjlGKe4qcfh_@nanopsycho>
- <CAKgT0UfcK8cr8UPUBmqSCxyLDpEZ60tf1YwTAxoMVFyR1wwdsQ@mail.gmail.com>
- <ZhQgmrH-QGu6HP-k@nanopsycho>
- <66142a4b402d5_2cb7208ec@john.notmuch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21CF78594E
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 11:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.85
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712660960; cv=fail; b=URY0ig6R9Ml2A+3+ZxvX5T16F6WdALn0kDhSMSpqtIj2hwBUpdHzoJpfhbUGVXJCOPx1XPwc7+KvNbhxqDq1hFpM1x8NS5MUHbq9hOepgE+wkqT0gz4uThMI9Yph2oCYpIRzr0QTwYCiyWcO0AvzX3osXgXfOmn2/NN+TOsNQu0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712660960; c=relaxed/simple;
+	bh=+DhS7CYkHkdMSOW5e0drI5RVEWLy18FKfidB0EERvjU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=D30I6a52yJRiVD6IH5U2F2MXbrKjkSwL8iSVTxGTj6PcUuLnY405JVY0ZuL7hzm7Qqbgs5JqdaxmFvw4AcVYxhPQQx6EAMfUEETn6mxRDepG0pTyppIVMfCQUtGu1TxkYG0A6Lh6H9b4zyDvYNfbmWABmnXv+Ti3QpREchJxXXo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=kYvc3X+0; arc=fail smtp.client-ip=40.107.223.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KqPPvj5oaGHo9IcxbqQxFfAuVTTImTp0LW4M59t/h2p9yXZZcDdxllcaEGbl7ecy944VuIYBaDYcurW5nsnwoYCdNPiCz2kbJ73A7viXMfQ5jDTdA60Rizvf8BDiU7n8h+3wZGny+WBZMeCn9Mr8ePVqhGogT/wElGUCBfyvoXYdt2S112RsCZgIwVGUdz+oZYx0RQpiBImtUaDq6gkTnhRlAVUklfXHSXC51kiHCQ74R7Wcc9TEL2P4ad/HLiqVwbGUylZUS/Gr56Ke+36K57JsTrtkcVp8JUhRS8ZfYexFqHrA2HmGiR+wQQvjkb52k1D8dUNy0kP67vcKeoxLCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BRgTFggJbnBVVu6ZhJfO97/UwlHRlT/dBpb7Pps483o=;
+ b=dSXHJggqXCVpwJELnwcIzERlJQ7ol/qf7nIUR0NHAZ8OR55sXVYJaNFXaAXz1aq1MnlB40IbkxloBs1ZFtAzfPudPRxfRw2QQ1eCUWcPvDNnesfRONX4g8iLOc1IUq65+2z8uGFxb/cnCgT0S6pBvmF6cDW9w+2O4Ivrc78hwMQvC7RiciQBkarTK+67+LrktfetspkcIJzR20stGWsQ0XagMRcaUlMcSDSZILm0sBP3JEJ9FfaCJcts3JKdOmekOnXtbDpHCUNhCZNji6iVCDSCvuMMdD8AZUkRXaf2tOUFH0ycnBF0XSSFc0mj6h2Tc3KitCNr16DYiiFw8qp6vw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BRgTFggJbnBVVu6ZhJfO97/UwlHRlT/dBpb7Pps483o=;
+ b=kYvc3X+03t6PLKqTAWDRw1FRc2H03SaBI7G6NZmbzgF6r8NfbKyPM/xh03ptCj4rPp4o8Y9fRr8eUIw87yIjNTeSDD3j5pvfskkbfkqlCqdlDZLeZlaf0GVYqwiGQzuN6RrmCk+hzjmu1kbYuR1AAASuH+uAISJWB2RuQ5sSimGSWzGHhaXzzYY9L81LrrnNgczBv/R7SUJq7Shle3un6WYgYuynCpnpo0ZmGyLTmXPdaZvo18GaGyDLZK7lQz6OP5Dd15wXNQ91rbXLVbf3clqGQfHwRpi2SRhRTXBhi/4tAhF6ZcB51a5l5u1cONb/2Teri/k3jk+WPqALIU3/iw==
+Received: from CH2PR02CA0028.namprd02.prod.outlook.com (2603:10b6:610:4e::38)
+ by MW4PR12MB5626.namprd12.prod.outlook.com (2603:10b6:303:169::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 9 Apr
+ 2024 11:09:16 +0000
+Received: from CH1PEPF0000A34C.namprd04.prod.outlook.com
+ (2603:10b6:610:4e:cafe::cc) by CH2PR02CA0028.outlook.office365.com
+ (2603:10b6:610:4e::38) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.19 via Frontend
+ Transport; Tue, 9 Apr 2024 11:09:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CH1PEPF0000A34C.mail.protection.outlook.com (10.167.244.6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.22 via Frontend Transport; Tue, 9 Apr 2024 11:09:15 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 9 Apr 2024
+ 04:08:55 -0700
+Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Tue, 9 Apr 2024 04:08:52 -0700
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <dsahern@gmail.com>, <liuhangbin@gmail.com>,
+	<gnault@redhat.com>, <ssuryaextr@gmail.com>, Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net-next] selftests: fib_rule_tests: Add VRF tests
+Date: Tue, 9 Apr 2024 14:08:16 +0300
+Message-ID: <20240409110816.2508498-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <66142a4b402d5_2cb7208ec@john.notmuch>
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000A34C:EE_|MW4PR12MB5626:EE_
+X-MS-Office365-Filtering-Correlation-Id: f4256739-420b-4b15-b18b-08dc58857e89
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	+5wt+IWQBPteLVI3/5xqfTrihDAP0+h1GkgmXygPTKgGVoLobSOHpC05im17OzTJVFmCsskWcA2qaWtymQMj4s6BGploRkDLCGzS7I0X9cOIHuDGtfbltyZshGQ1rj1dZ0VEyhy1x4BKRpaMB/E3520sXJkSYv8JY6gqRhDdbCLCNjxtnR1gb+TNGa619ee2qup7N+lQBTcJx7bIEnKms3fb3ouIqbbW9Y2BushPgjsRW69IcDbcRFXCEITXN9lVSofcLN0AFDY0OfOV5SFN+dFAWwevqYaotR+rm7M5f0KaZBaqEWKoARBMZvS/gGAabyKtFPqzDdVqSYTmKoseM/meaFedZFoU5Vkanlzzkrm2tzwB9dTF18kV3iw/bAQNsDBBsj4/AGaYgRQSePdlXPSGzICqNZjdQYYWhmppxFjRxayNizEgdG6Eiybl1y0+MlPwbfSGC5MEL+Lork8/j2pGXbQdKghiLuriGW9RXUAr27CMTaPj+SGtMEMtidvviAkHEC+KaVMv8fqkLgDhmVS9VCcJ4s7G9w+LrJjbO9wLWordy+mP/JVQ868SCJKKBz3In5IavSU52jl7khsgqtFrtBpSdnNarRDwac0MPdd4plExBQO31CtTwlQyV5JVpCERmMX7XHh0ICyVEDMk9uyDVwh46/blAEVaOw14ELPdawwBk3iT3ASvAOte1s7JqEj6+Gjppdh5UuDvpTJH23irfO6cedkRXAukwPIdrIw+lp4Je2EOfJrbaFNcD0+g
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(1800799015)(376005)(82310400014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2024 11:09:15.4896
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f4256739-420b-4b15-b18b-08dc58857e89
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000A34C.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5626
 
-Mon, Apr 08, 2024 at 07:32:59PM CEST, john.fastabend@gmail.com wrote:
->Jiri Pirko wrote:
->> Mon, Apr 08, 2024 at 05:46:35PM CEST, alexander.duyck@gmail.com wrote:
->> >On Mon, Apr 8, 2024 at 4:51 AM Jiri Pirko <jiri@resnulli.us> wrote:
->> >>
->> >> Fri, Apr 05, 2024 at 08:38:25PM CEST, alexander.duyck@gmail.com wrote:
->> >> >On Fri, Apr 5, 2024 at 8:17 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
->> >> >>
->> >> >> On Fri, Apr 05, 2024 at 07:24:32AM -0700, Alexander Duyck wrote:
->> >> >> > > Alex already indicated new features are coming, changes to the core
->> >> >> > > code will be proposed. How should those be evaluated? Hypothetically
->> >> >> > > should fbnic be allowed to be the first implementation of something
->> >> >> > > invasive like Mina's DMABUF work? Google published an open userspace
->> >> >> > > for NCCL that people can (in theory at least) actually run. Meta would
->> >> >> > > not be able to do that. I would say that clearly crosses the line and
->> >> >> > > should not be accepted.
->> >> >> >
->> >> >> > Why not? Just because we are not commercially selling it doesn't mean
->> >> >> > we couldn't look at other solutions such as QEMU. If we were to
->> >> >> > provide a github repo with an emulation of the NIC would that be
->> >> >> > enough to satisfy the "commercial" requirement?
->> >> >>
->> >> >> My test is not "commercial", it is enabling open source ecosystem vs
->> >> >> benefiting only proprietary software.
->> >> >
->> >> >Sorry, that was where this started where Jiri was stating that we had
->> >> >to be selling this.
->> >>
->> >> For the record, I never wrote that. Not sure why you repeat this over
->> >> this thread.
->> >
->> >Because you seem to be implying that the Meta NIC driver shouldn't be
->> >included simply since it isn't going to be available outside of Meta.
->> >The fact is Meta employs a number of kernel developers and as a result
->> >of that there will be a number of kernel developers that will have
->> >access to this NIC and likely do development on systems containing it.
->> >In addition simply due to the size of the datacenters that we will be
->> >populating there is actually a strong likelihood that there will be
->> >more instances of this NIC running on Linux than there are of some
->> >other vendor devices that have been allowed to have drivers in the
->> >kernel.
->> 
->> So? The gain for community is still 0. No matter how many instances is
->> private hw you privately have. Just have a private driver.
->
->The gain is the same as if company X makes a card and sells it
->exclusively to datacenter provider Y. We know this happens.
+After commit 40867d74c374 ("net: Add l3mdev index to flow struct and
+avoid oif reset for port devices") it is possible to configure FIB rules
+that match on iif / oif being a l3mdev port. It was not possible before
+as these parameters were reset to the ifindex of the l3mdev device
+itself prior to the FIB rules lookup.
 
-Different story. The driver is still the same. Perhaps only some parts
-of it are tailored to fit one person's need, maybe. But here, the whole
-thing is obviously is targeted to one person. Can't you see the scale on
-which these are different?
+Add tests that cover this functionality as it does not seem to be
+covered by existing ones and I am aware of at least one user that needs
+this functionality in addition to the one mentioned in [1].
 
+Reuse the existing FIB rules tests by simply configuring a VRF prior to
+the test and removing it afterwards. Differentiate the output of the
+non-VRF tests from the VRF tests by appending "(VRF)" to the test name
+if a l3mdev FIB rule is present.
 
->Vendors would happily spin up a NIC if a DC with scale like this
->would pay for it. They just don't advertise it in patch 0/X,
->"adding device for cloud provider foo".
->
->There is no difference here. We gain developers, we gain insights,
->learnings and Linux and OSS drivers are running on another big
->DC. They improve things and find bugs they upstream them its a win.
->
->The opposite is also true if we exclude a driver/NIC HW that is
->running on major DCs we lose a lot of insight, experience, value.
+Verified that these tests do fail on kernel 5.15.y which does not
+include the previously mentioned commit:
 
-Could you please describe in details and examples what exactly is we
-are about to loose? I don't see it.
+ # ./fib_rule_tests.sh -t fib_rule6_vrf
+ [...]
+     TEST: rule6 check: oif redirect to table (VRF)                      [FAIL]
+ [...]
+     TEST: rule6 check: iif redirect to table (VRF)                      [FAIL]
 
+ # ./fib_rule_tests.sh -t fib_rule4_vrf
+ [...]
+     TEST: rule4 check: oif redirect to table (VRF)                      [FAIL]
+ [...]
+     TEST: rule4 check: iif redirect to table (VRF)                      [FAIL]
 
->DCs are all starting to build their own hardware if we lose this
->section of HW we lose those developers too. We are less likely
->to get any advances they come up with. I think you have it backwards.
->Eventually Linux networking becomes either commodity and irrelevant
->for DC deployments.
->
->So I strongly disagree we lose by excluding drivers and win by
->bringing it in.
->
->> 
->> 
->> >
->> >So from what I can tell the only difference is if we are manufacturing
->> >this for sale, or for personal use. Thus why I mention "commercial"
->> >since the only difference from my perspective is the fact that we are
->> >making it for our own use instead of selling it.
->> 
->> Give it for free.
->
->Huh?
->
->> 
->> 
->> >
->> >[...]
->> >
->> >> >> > I agree. We need a consistent set of standards. I just strongly
->> >> >> > believe commercial availability shouldn't be one of them.
->> >> >>
->> >> >> I never said commercial availability. I talked about open source vs
->> >> >> proprietary userspace. This is very standard kernel stuff.
->> >> >>
->> >> >> You have an unavailable NIC, so we know it is only ever operated with
->> >> >> Meta's proprietary kernel fork, supporting Meta's proprietary
->> >> >> userspace software. Where exactly is the open source?
->> >> >
->> >> >It depends on your definition of "unavailable". I could argue that for
->> >> >many most of the Mellanox NICs are also have limited availability as
->> >> >they aren't exactly easy to get a hold of without paying a hefty
->> >> >ransom.
->> >>
->> >> Sorry, but I have to say this is ridiculous argument, really Alex.
->> >> Apples and oranges.
->> >
->> >Really? So would you be making the same argument if it was
->> >Nvidia/Mellanox pushing the driver and they were exclusively making it
->> >just for Meta, Google, or some other big cloud provider? I suspect
->> 
->> Heh, what ifs :) Anyway, chance that happens is very close to 0.
->> 
->> 
->> >not. If nothing else they likely wouldn't disclose the plan for
->> >exclusive sales to get around this sort of thing. The fact is I know
->> >many of the vendors make proprietary spins of their firmware and
->> >hardware for specific customers. The way I see it this patchset is
->> >being rejected as I was too honest about the general plan and use case
->> >for it.
->> >
->> >This is what I am getting at. It just seems like we are playing games
->> >with semantics where if it is a vendor making the arrangement then it
->> >is okay for them to make hardware that is inaccessible to most, but if
->> >it is Meta then somehow it isn't.
->
->
+[1] https://lore.kernel.org/netdev/20200922131122.GB1601@ICIPI.localdomain/
+
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+---
+ tools/testing/selftests/net/fib_rule_tests.sh | 46 +++++++++++++++++--
+ 1 file changed, 43 insertions(+), 3 deletions(-)
+
+diff --git a/tools/testing/selftests/net/fib_rule_tests.sh b/tools/testing/selftests/net/fib_rule_tests.sh
+index 51157a5559b7..7c01f58a20de 100755
+--- a/tools/testing/selftests/net/fib_rule_tests.sh
++++ b/tools/testing/selftests/net/fib_rule_tests.sh
+@@ -9,6 +9,7 @@ PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
+ 
+ RTABLE=100
+ RTABLE_PEER=101
++RTABLE_VRF=102
+ GW_IP4=192.51.100.2
+ SRC_IP=192.51.100.3
+ GW_IP6=2001:db8:1::2
+@@ -17,7 +18,14 @@ SRC_IP6=2001:db8:1::3
+ DEV_ADDR=192.51.100.1
+ DEV_ADDR6=2001:db8:1::1
+ DEV=dummy0
+-TESTS="fib_rule6 fib_rule4 fib_rule6_connect fib_rule4_connect"
++TESTS="
++	fib_rule6
++	fib_rule4
++	fib_rule6_connect
++	fib_rule4_connect
++	fib_rule6_vrf
++	fib_rule4_vrf
++"
+ 
+ SELFTEST_PATH=""
+ 
+@@ -27,13 +35,18 @@ log_test()
+ 	local expected=$2
+ 	local msg="$3"
+ 
++	$IP rule show | grep -q l3mdev
++	if [ $? -eq 0 ]; then
++		msg="$msg (VRF)"
++	fi
++
+ 	if [ ${rc} -eq ${expected} ]; then
+ 		nsuccess=$((nsuccess+1))
+-		printf "\n    TEST: %-50s  [ OK ]\n" "${msg}"
++		printf "\n    TEST: %-60s  [ OK ]\n" "${msg}"
+ 	else
+ 		ret=1
+ 		nfail=$((nfail+1))
+-		printf "\n    TEST: %-50s  [FAIL]\n" "${msg}"
++		printf "\n    TEST: %-60s  [FAIL]\n" "${msg}"
+ 		if [ "${PAUSE_ON_FAIL}" = "yes" ]; then
+ 			echo
+ 			echo "hit enter to continue, 'q' to quit"
+@@ -130,6 +143,17 @@ cleanup_peer()
+ 	ip netns del $peerns
+ }
+ 
++setup_vrf()
++{
++	$IP link add name vrf0 up type vrf table $RTABLE_VRF
++	$IP link set dev $DEV master vrf0
++}
++
++cleanup_vrf()
++{
++	$IP link del dev vrf0
++}
++
+ fib_check_iproute_support()
+ {
+ 	ip rule help 2>&1 | grep -q $1
+@@ -248,6 +272,13 @@ fib_rule6_test()
+ 	fi
+ }
+ 
++fib_rule6_vrf_test()
++{
++	setup_vrf
++	fib_rule6_test
++	cleanup_vrf
++}
++
+ # Verify that the IPV6_TCLASS option of UDPv6 and TCPv6 sockets is properly
+ # taken into account when connecting the socket and when sending packets.
+ fib_rule6_connect_test()
+@@ -385,6 +416,13 @@ fib_rule4_test()
+ 	fi
+ }
+ 
++fib_rule4_vrf_test()
++{
++	setup_vrf
++	fib_rule4_test
++	cleanup_vrf
++}
++
+ # Verify that the IP_TOS option of UDPv4 and TCPv4 sockets is properly taken
+ # into account when connecting the socket and when sending packets.
+ fib_rule4_connect_test()
+@@ -467,6 +505,8 @@ do
+ 	fib_rule4_test|fib_rule4)		fib_rule4_test;;
+ 	fib_rule6_connect_test|fib_rule6_connect)	fib_rule6_connect_test;;
+ 	fib_rule4_connect_test|fib_rule4_connect)	fib_rule4_connect_test;;
++	fib_rule6_vrf_test|fib_rule6_vrf)	fib_rule6_vrf_test;;
++	fib_rule4_vrf_test|fib_rule4_vrf)	fib_rule4_vrf_test;;
+ 
+ 	help) echo "Test names: $TESTS"; exit 0;;
+ 
+-- 
+2.43.0
+
 
