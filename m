@@ -1,98 +1,98 @@
-Return-Path: <netdev+bounces-85940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2272D89CF16
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 01:53:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A776889CF1B
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 02:00:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1FAE1F21FED
-	for <lists+netdev@lfdr.de>; Mon,  8 Apr 2024 23:53:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47AF72845F8
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 00:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ACF9149C78;
-	Mon,  8 Apr 2024 23:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71C1928376;
+	Tue,  9 Apr 2024 00:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dDvWjcTW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W2C7WKU+"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BBE17745;
-	Mon,  8 Apr 2024 23:53:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A30D6FCC;
+	Tue,  9 Apr 2024 00:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712620415; cv=none; b=eDZSx3admhByTii1RGsiIJAYvEAgAP92dCnNfmqT9LcH1BzJjUYWCMZ3aF3rpdMPTToSC5AGF3e7YYVhcv/z6i3RTP4+IiMRvG1k+pFPBfnF38VSFik3+mpp386LKyY62biCO1mB2MjcP9kHE0pt5dHzlLQP5xkzpfp90bU+tmc=
+	t=1712620828; cv=none; b=it1Voyur1AuYvzD+EloZszzsV9un2VkLECgbf0jrXr/VwUn7YjaBKvdv5C2VBo06FnA51XNxbnzKArZCBn2wjYdKbdM8IhLzTcbls8n7IY7oIkWoEWDglTzEBLf6dzPMsUgmlGyts7a/J9og2A2lLNi9r+RddmgatY1U6hEnUAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712620415; c=relaxed/simple;
-	bh=WSCtpelLx1Ea3b5e2lFmBqD4BR4bFylzkoiMqtckb08=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BkxhgXD/tpDfziQm3a6QEP3kr/rSt+Uf0N0onl59npBv7lpibK2NXuX+ubd31gL7dUgc0Ltk76VmT3iUeO65v6ON0y2EJdRfUy38hSqhO9M0Essyrd3oBCU+MaGX9bUx2sQMKhPU/mNOP0blt4JwgkBDHOBPSBjfaSeYb5ht6bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dDvWjcTW; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=tDqBPkxmd7B14/uRg9vwFvYaFbd8qXypV891MvbNPAs=; b=dDvWjcTWxDQAzb9q2qqJSivqth
-	kAHO9AoI9LD1RS0sc+1J6TjBQgGvU61Bs/6GtQhBEpmUGzenC2/znPDOEtpb3SAv9ZhfazTBrd8Mk
-	ldSkF4YxZ5g/4VQByc83BBhjdZXc0gi6aJlX8qGVw6BwWgFAyViPHlZSGYrd53uOxnK8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rtynh-00CWf1-9L; Tue, 09 Apr 2024 01:53:21 +0200
-Date: Tue, 9 Apr 2024 01:53:21 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"sdf@google.com" <sdf@google.com>,
-	"kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
-	"maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
-	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
-	"przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
-	"ahmed.zaki@intel.com" <ahmed.zaki@intel.com>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"shayagr@amazon.com" <shayagr@amazon.com>,
-	"paul.greenwalt@intel.com" <paul.greenwalt@intel.com>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	mlxsw <mlxsw@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>
-Subject: Re: [RFC PATCH net-next 9/9] ethtool: Add ability to flash
- transceiver modules' firmware
-Message-ID: <649f6db7-d0ef-41da-b2bb-e91fd0c21c7a@lunn.ch>
-References: <20240122084530.32451-1-danieller@nvidia.com>
- <20240122084530.32451-10-danieller@nvidia.com>
- <5bf6b526-02c4-4940-b8ec-bf858f9d4a58@lunn.ch>
- <DM6PR12MB45161C82F43B67AD8EDB950BD87C2@DM6PR12MB4516.namprd12.prod.outlook.com>
- <DM6PR12MB4516BC80DBF383A186707F19D87C2@DM6PR12MB4516.namprd12.prod.outlook.com>
- <DM6PR12MB45161B8BB3E13CED7EAE3311D8002@DM6PR12MB4516.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1712620828; c=relaxed/simple;
+	bh=mtYqmMazK3B5/swMxdH4wpMinpuhi6LpgjrcrjQY750=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Ru1zLxiH0r50C4bWEl2RIlq/f7paNwZvynr8P0ruJ4AlWoQlmZqyzwRBd2PqqsN9yfAbst1a0DpDoBG/JHop/8TcGv4XVWrqGxSMwUjF3jUyhw7Za8XVYFjoFDwzDT/5EgiDr8QkTz5SJjPK9zXj1nnfPeVKcVb3XkVh+HW63bI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W2C7WKU+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B5A51C433F1;
+	Tue,  9 Apr 2024 00:00:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712620827;
+	bh=mtYqmMazK3B5/swMxdH4wpMinpuhi6LpgjrcrjQY750=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=W2C7WKU+/Ttw4qo2lt2Q7WHqjOOSQaixBaBXAc06LdVxTd0tuKFVHb/5CeG3ejrJz
+	 F+IpKFy7Rn+4tcwYHJjUDJARVdvhev7J8nWFpRXyCQh9ctQ+ctkjFOho59VcNmaw70
+	 /mOUhhh5spxDcjQeEFcuqu301f0DEzyUp9/XNJBWcRGMHsTEOh4VOE/esX3XVQM5ur
+	 xtCXSAtdgYJqbchGuZAJNTJGCKDNdKU1t4gaK6tb97dulgEAmljeWHXnGoa2PH+wDg
+	 PvgJznckLmQrqdj5MvfEE4ZcCxdLGlGv2Iq7G4pCn94OmQeWi64YljMwJ5VqSQQStk
+	 BNdFBsbbAFlLQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A4862C54BD3;
+	Tue,  9 Apr 2024 00:00:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR12MB45161B8BB3E13CED7EAE3311D8002@DM6PR12MB4516.namprd12.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] selftests/bpf: eliminate warning of
+ get_cgroup_id_from_path()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171262082766.22195.12036150932807338138.git-patchwork-notify@kernel.org>
+Date: Tue, 09 Apr 2024 00:00:27 +0000
+References: <20240406144613.4434-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20240406144613.4434-1-kerneljasonxing@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@google.com, haoluo@google.com, jolsa@kernel.org, mykolal@fb.com,
+ shuah@kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org, kernelxing@tencent.com
 
-> Thanks again for your feedback.
-> I thought again about you comment, and this patchset adds support for flashing CMIS compliant modules only.
-> Later on, if it will be expanded to more modules, it will be more reasonable to add support like you have suggested to fit the new supported standard.
-> So, currently I think it is better to not add it to this specific patchset.
+Hello:
 
-O.K. It should not be a big change, and i doubt it has any major
-performance impacts. I2C is not very fast, so we can probably get it
-off the disk faster than it can be written to the device.
+This patch was applied to bpf/bpf-next.git (master)
+by Martin KaFai Lau <martin.lau@kernel.org>:
 
-    Andrew
+On Sat,  6 Apr 2024 22:46:13 +0800 you wrote:
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> The output goes like this if I make samples/bpf:
+> ...warning: no previous prototype for ‘get_cgroup_id_from_path’...
+> 
+> Make this function static could solve the warning problem since
+> no one outside of the file calls it.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] selftests/bpf: eliminate warning of get_cgroup_id_from_path()
+    https://git.kernel.org/bpf/bpf-next/c/bb761fcb8217
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
