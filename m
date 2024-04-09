@@ -1,140 +1,158 @@
-Return-Path: <netdev+bounces-85997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-85996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D17FF89D40D
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 10:19:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05C9C89D406
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 10:19:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E84A61C217D2
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 08:19:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BD9D1F223A2
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 08:19:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A4647F49F;
-	Tue,  9 Apr 2024 08:19:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02BFE7E78E;
+	Tue,  9 Apr 2024 08:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FgEoe7En"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6317E586
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 08:19:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8EF77E77B;
+	Tue,  9 Apr 2024 08:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712650743; cv=none; b=UjKdhNWcY0Teo2RuFyX1rudbrlPOva6W6VfYJ39Z0vNXcov6E1JDOymkAVuIYMzm49cu8WIodblZfCDaeios/g8KMImW6u+pp+F9mOx3J2sONPvjMR/KpJsB4oJjmnShEjORK7L4cYreNBUS04QCCRuzTG2mD+QcvhKC5q7+WBg=
+	t=1712650741; cv=none; b=ljPspaX++Pz1NH7zNoYZQTT5+U3T8I1Vf4wruazWdPV2BGbOuW1pzZgasM8VZ4A9mYKEnjbwXz4Y5bkHaJVIhf6Yv9beGCap5YZQB7oyV2PiIDYCA8m1CNHRVR1EXS31i9h6mWwomJp1xRhbOfMNhM0hZUyVnYGque1iwW8z8p0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712650743; c=relaxed/simple;
-	bh=6TvtF4NcUjwSEWS6vvstymDlOJi8iMtHrlEm5IRSfNE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=G4zwZsM9jYbgBZpjrzftH/HcfsENDAhYntaLv+jmJqxchM/vSvIX8Uo7r44Bsd0XyNizwmZS1YHFIiLj3IU0YkdwLYIcdHnduEa4KmXSgV8l3kpFfWrLzvsyRDJycZfSahUa5mFvksnpmUOUgzB1ATMK8CR/gklxOhqnHQJnetU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ru6gw-0006VP-Nj; Tue, 09 Apr 2024 10:18:54 +0200
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ru6gu-00BGpb-SI; Tue, 09 Apr 2024 10:18:52 +0200
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ru6gu-00EoVv-2S;
-	Tue, 09 Apr 2024 10:18:52 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: "David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	David Ahern <dsahern@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	=?UTF-8?q?S=C3=B8ren=20Andersen?= <san@skov.dk>
-Subject: [PATCH net-next v5 9/9] net: dsa: microchip: let DCB code do PCP and DSCP policy configuration
-Date: Tue,  9 Apr 2024 10:18:51 +0200
-Message-Id: <20240409081851.3530641-10-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240409081851.3530641-1-o.rempel@pengutronix.de>
-References: <20240409081851.3530641-1-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1712650741; c=relaxed/simple;
+	bh=Q3XIy7GKrH3hBQ7X0khzJAv0hJN0tBosWvY47yskPCM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QIJIFQzcqd0/5mI2IgYloUy1UpbpSwJQhVukFVIGSV/48V1As/N8b3bpk/sRH3pMDDq2aBr2Dwtf8dDC5MdV9lF6GQRq4n7ykwSpRK7ak2HTwA48fC10lv/SZS6pexxq/qayLoJ7Ul7ys2v4pNflPbQNbDyPuDV/hDZ4jFXqa+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FgEoe7En; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87B6CC433F1;
+	Tue,  9 Apr 2024 08:19:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712650741;
+	bh=Q3XIy7GKrH3hBQ7X0khzJAv0hJN0tBosWvY47yskPCM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FgEoe7EnyqYvOdFKQgcmu+ZTQ6OECLlFfpPmcl40xwH9936kdrho2yu5S5hyXOO9i
+	 S6Om9zTbmsIs2XsKWVWvGu+/6Vjy17UAtkIFCun3acPIrs87hOisFvNOPWH0fhbYu1
+	 zKMRTQfj8vrJrnh7DqinCQMwjd3gllYDBvL+Apcldon34pm6tdH2ip5NFuS7xktKWb
+	 rMDbKB1vE8PcGww3IFram/6fqGj2Aixo/egio5cVUlnBKZZF9Y+sm4GDpvp2EAwZ95
+	 Fbq0z2DyMRZtAUBHU3UB6mP4LBMAlf32ypb9DUUh+qjcuA4pHQp9dIXfQ+pWqlW5ZY
+	 8nc6du6zCmQhw==
+Date: Tue, 9 Apr 2024 11:18:56 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+	bhelgaas@google.com, linux-pci@vger.kernel.org,
+	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net,
+	pabeni@redhat.com
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <20240409081856.GC4195@unreal>
+References: <20240404132548.3229f6c8@kernel.org>
+ <660f22c56a0a2_442282088b@john.notmuch>
+ <20240404165000.47ce17e6@kernel.org>
+ <CAKgT0UcmE_cr2F0drUtUjd+RY-==s-Veu_kWLKw8yrds1ACgnw@mail.gmail.com>
+ <20240404193817.500523aa@kernel.org>
+ <CAKgT0UdAz1mb48kFEngY5sCvHwYM2vYtEK81VceKj-xo6roFyA@mail.gmail.com>
+ <20240408061846.GA8764@unreal>
+ <CAKgT0UcE5cOKO4JgR-PBstP3e9r02+NyG3YrNQe8p2_25Xpf8g@mail.gmail.com>
+ <20240408184102.GA4195@unreal>
+ <CAKgT0UcLWEP5GOqFEDeyGFpJre+g2_AbmBOSXJsoXZuCprGH0Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <CAKgT0UcLWEP5GOqFEDeyGFpJre+g2_AbmBOSXJsoXZuCprGH0Q@mail.gmail.com>
 
-802.1P (PCP) and DiffServ (DSCP) are handled now by DCB code. Let it do
-all needed initial configuration.
+On Mon, Apr 08, 2024 at 01:43:28PM -0700, Alexander Duyck wrote:
+> On Mon, Apr 8, 2024 at 11:41 AM Leon Romanovsky <leon@kernel.org> wrote:
+> >
+> > On Mon, Apr 08, 2024 at 08:26:33AM -0700, Alexander Duyck wrote:
+> > > On Sun, Apr 7, 2024 at 11:18 PM Leon Romanovsky <leon@kernel.org> wrote:
+> > > >
+> > > > On Fri, Apr 05, 2024 at 08:41:11AM -0700, Alexander Duyck wrote:
+> > > > > On Thu, Apr 4, 2024 at 7:38 PM Jakub Kicinski <kuba@kernel.org> wrote:
+> > > >
+> > > > <...>
+> > > >
+> > > > > > > > Technical solution? Maybe if it's not a public device regression rules
+> > > > > > > > don't apply? Seems fairly reasonable.
+> > > > > > >
+> > > > > > > This is a hypothetical. This driver currently isn't changing anything
+> > > > > > > outside of itself. At this point the driver would only be build tested
+> > > > > > > by everyone else. They could just not include it in their Kconfig and
+> > > > > > > then out-of-sight, out-of-mind.
+> > > > > >
+> > > > > > Not changing does not mean not depending on existing behavior.
+> > > > > > Investigating and fixing properly even the hardest regressions in
+> > > > > > the stack is a bar that Meta can so easily clear. I don't understand
+> > > > > > why you are arguing.
+> > > > >
+> > > > > I wasn't saying the driver wouldn't be dependent on existing behavior.
+> > > > > I was saying that it was a hypothetical that Meta would be a "less
+> > > > > than cooperative user" and demand a revert.  It is also a hypothetical
+> > > > > that Linus wouldn't just propose a revert of the fbnic driver instead
+> > > > > of the API for the crime of being a "less than cooperative maintainer"
+> > > > > and  then give Meta the Nvidia treatment.
+> > > >
+> > > > It is very easy to be "less than cooperative maintainer" in netdev world.
+> > > > 1. Be vendor.
+> > > > 2. Propose ideas which are different.
+> > > > 3. Report for user-visible regression.
+> > > > 4. Ask for a fix from the patch author or demand a revert according to netdev rules/practice.
+> > > >
+> > > > And voilà, you are "less than cooperative maintainer".
+> > > >
+> > > > So in reality, the "hypothetical" is very close to the reality, unless
+> > > > Meta contribution will be treated as a special case.
+> > > >
+> > > > Thanks
+> > >
+> > > How many cases of that have we had in the past? I'm honestly curious
+> > > as I don't actually have any reference.
+> >
+> > And this is the problem, you don't have "any reference" and accurate
+> > knowledge what happened, but you are saying "less than cooperative
+> > maintainer".
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
----
- drivers/net/dsa/microchip/ksz8795.c | 6 ------
- drivers/net/dsa/microchip/ksz9477.c | 6 ------
- 2 files changed, 12 deletions(-)
+<...>
 
-diff --git a/drivers/net/dsa/microchip/ksz8795.c b/drivers/net/dsa/microchip/ksz8795.c
-index 8838c80f6131a..359b823daf608 100644
---- a/drivers/net/dsa/microchip/ksz8795.c
-+++ b/drivers/net/dsa/microchip/ksz8795.c
-@@ -1565,16 +1565,10 @@ void ksz8_port_setup(struct ksz_device *dev, int port, bool cpu_port)
- 
- 	ksz8_port_queue_split(dev, port, queues);
- 
--	/* disable DiffServ priority */
--	ksz_port_cfg(dev, port, P_PRIO_CTRL, PORT_DIFFSERV_ENABLE, false);
--
- 	/* replace priority */
- 	ksz_port_cfg(dev, port, P_802_1P_CTRL,
- 		     masks[PORT_802_1P_REMAPPING], false);
- 
--	/* enable 802.1p priority */
--	ksz_port_cfg(dev, port, P_PRIO_CTRL, PORT_802_1P_ENABLE, true);
--
- 	if (cpu_port)
- 		member = dsa_user_ports(ds);
- 	else
-diff --git a/drivers/net/dsa/microchip/ksz9477.c b/drivers/net/dsa/microchip/ksz9477.c
-index 7f745628c84d1..f8ad7833f5d9d 100644
---- a/drivers/net/dsa/microchip/ksz9477.c
-+++ b/drivers/net/dsa/microchip/ksz9477.c
-@@ -1158,18 +1158,12 @@ void ksz9477_port_setup(struct ksz_device *dev, int port, bool cpu_port)
- 	/* enable broadcast storm limit */
- 	ksz_port_cfg(dev, port, P_BCAST_STORM_CTRL, PORT_BROADCAST_STORM, true);
- 
--	/* disable DiffServ priority */
--	ksz_port_cfg(dev, port, P_PRIO_CTRL, PORT_DIFFSERV_PRIO_ENABLE, false);
--
- 	/* replace priority */
- 	ksz_port_cfg(dev, port, REG_PORT_MRI_MAC_CTRL, PORT_USER_PRIO_CEILING,
- 		     false);
- 	ksz9477_port_cfg32(dev, port, REG_PORT_MTI_QUEUE_CTRL_0__4,
- 			   MTI_PVID_REPLACE, false);
- 
--	/* enable 802.1p priority */
--	ksz_port_cfg(dev, port, P_PRIO_CTRL, PORT_802_1P_PRIO_ENABLE, true);
--
- 	/* force flow control for non-PHY ports only */
- 	ksz_port_cfg(dev, port, REG_PORT_CTRL_0,
- 		     PORT_FORCE_TX_FLOW_CTRL | PORT_FORCE_RX_FLOW_CTRL,
--- 
-2.39.2
+> Any more info on this? Without context it is hard to say one way or the other.
 
+<...>
+
+> I didn't say you couldn't. Without context I cannot say if it was
+> deserved or not. 
+
+Florian gave links to the context, so I'll skip this part.
+
+In this thread, Jakub tried to revive the discussion about it.
+https://lore.kernel.org/netdev/20240326133412.47cf6d99@kernel.org/
+
+<...>
+
+> The point I was trying to make is that if you are the only owner of
+> something, and not willing to work with the community as a maintainer
+
+Like Jakub, I don't understand why you are talking about regressions in
+the driver, while you brought the label of "less than cooperative maintainer"
+and asked for "then give Meta the Nvidia treatment".
+
+I don't want to get into the discussion about if this driver should be
+accepted or not.
+
+I'm just asking to stop label people and companies based on descriptions
+from other people, but rely on facts.
+
+Thanks
 
