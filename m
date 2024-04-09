@@ -1,263 +1,265 @@
-Return-Path: <netdev+bounces-86083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38BEE89D7A2
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:09:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EBB8C89D79F
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:08:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8312AB20DC5
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:09:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2BD93B23313
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:08:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D96CD84D02;
-	Tue,  9 Apr 2024 11:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D158594B;
+	Tue,  9 Apr 2024 11:08:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="kYvc3X+0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NNpCvWSq"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2085.outbound.protection.outlook.com [40.107.223.85])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21CF78594E
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 11:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712660960; cv=fail; b=URY0ig6R9Ml2A+3+ZxvX5T16F6WdALn0kDhSMSpqtIj2hwBUpdHzoJpfhbUGVXJCOPx1XPwc7+KvNbhxqDq1hFpM1x8NS5MUHbq9hOepgE+wkqT0gz4uThMI9Yph2oCYpIRzr0QTwYCiyWcO0AvzX3osXgXfOmn2/NN+TOsNQu0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712660960; c=relaxed/simple;
-	bh=+DhS7CYkHkdMSOW5e0drI5RVEWLy18FKfidB0EERvjU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=D30I6a52yJRiVD6IH5U2F2MXbrKjkSwL8iSVTxGTj6PcUuLnY405JVY0ZuL7hzm7Qqbgs5JqdaxmFvw4AcVYxhPQQx6EAMfUEETn6mxRDepG0pTyppIVMfCQUtGu1TxkYG0A6Lh6H9b4zyDvYNfbmWABmnXv+Ti3QpREchJxXXo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=kYvc3X+0; arc=fail smtp.client-ip=40.107.223.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KqPPvj5oaGHo9IcxbqQxFfAuVTTImTp0LW4M59t/h2p9yXZZcDdxllcaEGbl7ecy944VuIYBaDYcurW5nsnwoYCdNPiCz2kbJ73A7viXMfQ5jDTdA60Rizvf8BDiU7n8h+3wZGny+WBZMeCn9Mr8ePVqhGogT/wElGUCBfyvoXYdt2S112RsCZgIwVGUdz+oZYx0RQpiBImtUaDq6gkTnhRlAVUklfXHSXC51kiHCQ74R7Wcc9TEL2P4ad/HLiqVwbGUylZUS/Gr56Ke+36K57JsTrtkcVp8JUhRS8ZfYexFqHrA2HmGiR+wQQvjkb52k1D8dUNy0kP67vcKeoxLCw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=BRgTFggJbnBVVu6ZhJfO97/UwlHRlT/dBpb7Pps483o=;
- b=dSXHJggqXCVpwJELnwcIzERlJQ7ol/qf7nIUR0NHAZ8OR55sXVYJaNFXaAXz1aq1MnlB40IbkxloBs1ZFtAzfPudPRxfRw2QQ1eCUWcPvDNnesfRONX4g8iLOc1IUq65+2z8uGFxb/cnCgT0S6pBvmF6cDW9w+2O4Ivrc78hwMQvC7RiciQBkarTK+67+LrktfetspkcIJzR20stGWsQ0XagMRcaUlMcSDSZILm0sBP3JEJ9FfaCJcts3JKdOmekOnXtbDpHCUNhCZNji6iVCDSCvuMMdD8AZUkRXaf2tOUFH0ycnBF0XSSFc0mj6h2Tc3KitCNr16DYiiFw8qp6vw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BRgTFggJbnBVVu6ZhJfO97/UwlHRlT/dBpb7Pps483o=;
- b=kYvc3X+03t6PLKqTAWDRw1FRc2H03SaBI7G6NZmbzgF6r8NfbKyPM/xh03ptCj4rPp4o8Y9fRr8eUIw87yIjNTeSDD3j5pvfskkbfkqlCqdlDZLeZlaf0GVYqwiGQzuN6RrmCk+hzjmu1kbYuR1AAASuH+uAISJWB2RuQ5sSimGSWzGHhaXzzYY9L81LrrnNgczBv/R7SUJq7Shle3un6WYgYuynCpnpo0ZmGyLTmXPdaZvo18GaGyDLZK7lQz6OP5Dd15wXNQ91rbXLVbf3clqGQfHwRpi2SRhRTXBhi/4tAhF6ZcB51a5l5u1cONb/2Teri/k3jk+WPqALIU3/iw==
-Received: from CH2PR02CA0028.namprd02.prod.outlook.com (2603:10b6:610:4e::38)
- by MW4PR12MB5626.namprd12.prod.outlook.com (2603:10b6:303:169::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Tue, 9 Apr
- 2024 11:09:16 +0000
-Received: from CH1PEPF0000A34C.namprd04.prod.outlook.com
- (2603:10b6:610:4e:cafe::cc) by CH2PR02CA0028.outlook.office365.com
- (2603:10b6:610:4e::38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.19 via Frontend
- Transport; Tue, 9 Apr 2024 11:09:15 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CH1PEPF0000A34C.mail.protection.outlook.com (10.167.244.6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7452.22 via Frontend Transport; Tue, 9 Apr 2024 11:09:15 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 9 Apr 2024
- 04:08:55 -0700
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.12; Tue, 9 Apr 2024 04:08:52 -0700
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <dsahern@gmail.com>, <liuhangbin@gmail.com>,
-	<gnault@redhat.com>, <ssuryaextr@gmail.com>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next] selftests: fib_rule_tests: Add VRF tests
-Date: Tue, 9 Apr 2024 14:08:16 +0300
-Message-ID: <20240409110816.2508498-1-idosch@nvidia.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2C955E55;
+	Tue,  9 Apr 2024 11:08:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712660925; cv=none; b=kSy6wnyTscxHZbK1rAX5mkAoXmimISvZnNwbZxhSLL1qNT72JIIPGVnMlo2cXflQc7OPy/eymJ3VzWjNhFRe7nUhJ40O03rThaBwNzJ4OiGXcpx91K+e3XrsCx/Tt9Lg7s9YrEFbe+82bDnd2ZPq4AR10Exbf3lQkRPnVg8E/WY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712660925; c=relaxed/simple;
+	bh=/sm4kX1swFuH3/fk4VBbgStTVFZvjDNK4GzFuMcXv3E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n93cGPWMDskf1bqu4VCsNYQ7fHhhwh9wUCDGKNx1iHI0M0RLKNJ22TGYLFy8I0e2tms2NRW/UrrEuqmrGxujr5VMKy5bq8MBisIRS+UOxYcx3qODp5yvOG8OtEspy86CMziZIe5s639DjZrgNXtjo4YtzF2xm+Tiaj8nESQxoBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NNpCvWSq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DC50C43390;
+	Tue,  9 Apr 2024 11:08:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712660925;
+	bh=/sm4kX1swFuH3/fk4VBbgStTVFZvjDNK4GzFuMcXv3E=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=NNpCvWSqkWul/egx7NVJwm4jafVgkx3tZNQaStdbFp+7boVk89vj/6Qsk5rsyGLJs
+	 BUVVvm1cKemPxUKTkNHkVLsI7xmV66rIZR+F+UYafCHFnxvt8xA756tPkDwkHzyOxh
+	 vUJeeTRE1QGtp/ok386aXtJ3HVxnHzXtluRnXCCtZVr8X9BT6AQp929myMb8l1nHTJ
+	 xgPS0T/0L/Bz+70Q9rPs5wRWSqu0AnuFQLR8BCXvKqBaPGcYMlJ9mZ8n3Y4coFsh82
+	 F/PxsOvpECTCMDz3CC/FebcsKxPX+L7+TNxXXvcWIbgGt6pV0KSEscrQz/qPZaa2US
+	 mI0yKEZxUhlzg==
+Message-ID: <ac4cf07f-52dd-454f-b897-2a4b3796a4d9@kernel.org>
+Date: Tue, 9 Apr 2024 13:08:40 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000A34C:EE_|MW4PR12MB5626:EE_
-X-MS-Office365-Filtering-Correlation-Id: f4256739-420b-4b15-b18b-08dc58857e89
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	+5wt+IWQBPteLVI3/5xqfTrihDAP0+h1GkgmXygPTKgGVoLobSOHpC05im17OzTJVFmCsskWcA2qaWtymQMj4s6BGploRkDLCGzS7I0X9cOIHuDGtfbltyZshGQ1rj1dZ0VEyhy1x4BKRpaMB/E3520sXJkSYv8JY6gqRhDdbCLCNjxtnR1gb+TNGa619ee2qup7N+lQBTcJx7bIEnKms3fb3ouIqbbW9Y2BushPgjsRW69IcDbcRFXCEITXN9lVSofcLN0AFDY0OfOV5SFN+dFAWwevqYaotR+rm7M5f0KaZBaqEWKoARBMZvS/gGAabyKtFPqzDdVqSYTmKoseM/meaFedZFoU5Vkanlzzkrm2tzwB9dTF18kV3iw/bAQNsDBBsj4/AGaYgRQSePdlXPSGzICqNZjdQYYWhmppxFjRxayNizEgdG6Eiybl1y0+MlPwbfSGC5MEL+Lork8/j2pGXbQdKghiLuriGW9RXUAr27CMTaPj+SGtMEMtidvviAkHEC+KaVMv8fqkLgDhmVS9VCcJ4s7G9w+LrJjbO9wLWordy+mP/JVQ868SCJKKBz3In5IavSU52jl7khsgqtFrtBpSdnNarRDwac0MPdd4plExBQO31CtTwlQyV5JVpCERmMX7XHh0ICyVEDMk9uyDVwh46/blAEVaOw14ELPdawwBk3iT3ASvAOte1s7JqEj6+Gjppdh5UuDvpTJH23irfO6cedkRXAukwPIdrIw+lp4Je2EOfJrbaFNcD0+g
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(1800799015)(376005)(82310400014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Apr 2024 11:09:15.4896
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f4256739-420b-4b15-b18b-08dc58857e89
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000A34C.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5626
+User-Agent: Mozilla Thunderbird
+Subject: Re: Advice on cgroup rstat lock
+To: Yosry Ahmed <yosryahmed@google.com>, Johannes Weiner <hannes@cmpxchg.org>
+Cc: Tejun Heo <tj@kernel.org>, Jesper Dangaard Brouer
+ <jesper@cloudflare.com>, "David S. Miller" <davem@davemloft.net>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Waiman Long <longman@redhat.com>, Shakeel Butt <shakeelb@google.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Daniel Bristot de Oliveira <bristot@redhat.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ kernel-team <kernel-team@cloudflare.com>, cgroups@vger.kernel.org,
+ Linux-MM <linux-mm@kvack.org>, Netdev <netdev@vger.kernel.org>,
+ bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+ Ivan Babrou <ivan@cloudflare.com>
+References: <7cd05fac-9d93-45ca-aa15-afd1a34329c6@kernel.org>
+ <20240319154437.GA144716@cmpxchg.org>
+ <56556042-5269-4c7e-99ed-1a1ab21ac27f@kernel.org>
+ <CAJD7tkYbO7MdKUBsaOiSp6-qnDesdmVsTCiZApN_ncS3YkDqGQ@mail.gmail.com>
+ <bf94f850-fab4-4171-8dfe-b19ada22f3be@kernel.org>
+ <CAJD7tkbn-wFEbhnhGWTy0-UsFoosr=m7wiJ+P96XnDoFnSH7Zg@mail.gmail.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <CAJD7tkbn-wFEbhnhGWTy0-UsFoosr=m7wiJ+P96XnDoFnSH7Zg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-After commit 40867d74c374 ("net: Add l3mdev index to flow struct and
-avoid oif reset for port devices") it is possible to configure FIB rules
-that match on iif / oif being a l3mdev port. It was not possible before
-as these parameters were reset to the ifindex of the l3mdev device
-itself prior to the FIB rules lookup.
+Let move this discussion upstream.
 
-Add tests that cover this functionality as it does not seem to be
-covered by existing ones and I am aware of at least one user that needs
-this functionality in addition to the one mentioned in [1].
+On 22/03/2024 19.32, Yosry Ahmed wrote:
+> [..]
+>>> There was a couple of series that made all calls to
+>>> cgroup_rstat_flush() sleepable, which allows the lock to be dropped
+>>> (and IRQs enabled) in between CPU iterations. This fixed a similar
+>>> problem that we used to face (except in our case, we saw hard lockups
+>>> in extreme scenarios):
+>>> https://lore.kernel.org/linux-mm/20230330191801.1967435-1-yosryahmed@google.com/
+>>> https://lore.kernel.org/lkml/20230421174020.2994750-1-yosryahmed@google.com/
+>>
+>> I've only done the 6.6 backport, and these were in 6.5/6.6.
 
-Reuse the existing FIB rules tests by simply configuring a VRF prior to
-the test and removing it afterwards. Differentiate the output of the
-non-VRF tests from the VRF tests by appending "(VRF)" to the test name
-if a l3mdev FIB rule is present.
+Given I have these in my 6.6 kernel. You are basically saying I should
+be able to avoid IRQ-disable for the lock, right?
 
-Verified that these tests do fail on kernel 5.15.y which does not
-include the previously mentioned commit:
+My main problem with the global cgroup_rstat_lock[3] is it disables IRQs
+and (thereby also) BH/softirq (spin_lock_irq).  This cause production
+issues elsewhere, e.g. we are seeing network softirq "not-able-to-run"
+latency issues (debug via softirq_net_latency.bt [5]).
 
- # ./fib_rule_tests.sh -t fib_rule6_vrf
- [...]
-     TEST: rule6 check: oif redirect to table (VRF)                      [FAIL]
- [...]
-     TEST: rule6 check: iif redirect to table (VRF)                      [FAIL]
+   [3] 
+https://elixir.bootlin.com/linux/v6.9-rc3/source/kernel/cgroup/rstat.c#L10
+   [5] 
+https://github.com/xdp-project/xdp-project/blob/master/areas/latency/softirq_net_latency.bt 
 
- # ./fib_rule_tests.sh -t fib_rule4_vrf
- [...]
-     TEST: rule4 check: oif redirect to table (VRF)                      [FAIL]
- [...]
-     TEST: rule4 check: iif redirect to table (VRF)                      [FAIL]
 
-[1] https://lore.kernel.org/netdev/20200922131122.GB1601@ICIPI.localdomain/
+>> And between 6.1 to 6.6 we did observe an improvement in this area.
+>> (Maybe I don't have to do the 6.1 backport if the 6.6 release plan progress)
+>>
+>> I've had a chance to get running in prod for 6.6 backport.
+>> As you can see in attached grafana heatmap pictures, we do observe an
+>> improved/reduced softirq wait time.
+>> These softirq "not-able-to-run" outliers is *one* of the prod issues we
+>> observed.  As you can see, I still have other areas to improve/fix.
+> 
+> I am not very familiar with such heatmaps, but I am glad there is an
+> improvement with 6.6 and the backports. Let me know if there is
+> anything I could do to help with your effort.
 
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
----
- tools/testing/selftests/net/fib_rule_tests.sh | 46 +++++++++++++++++--
- 1 file changed, 43 insertions(+), 3 deletions(-)
+The heatmaps give me an overview, but I needed a debugging tool, so I
+developed some bpftrace scripts [1][2] I'm running on production.
+To measure how long time we hold the cgroup rstat lock (results below).
+Adding ACME and Daniel as I hope there is an easier way to measure lock
+hold time and congestion. Notice tricky release/yield in
+cgroup_rstat_flush_locked[4].
 
-diff --git a/tools/testing/selftests/net/fib_rule_tests.sh b/tools/testing/selftests/net/fib_rule_tests.sh
-index 51157a5559b7..7c01f58a20de 100755
---- a/tools/testing/selftests/net/fib_rule_tests.sh
-+++ b/tools/testing/selftests/net/fib_rule_tests.sh
-@@ -9,6 +9,7 @@ PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
- 
- RTABLE=100
- RTABLE_PEER=101
-+RTABLE_VRF=102
- GW_IP4=192.51.100.2
- SRC_IP=192.51.100.3
- GW_IP6=2001:db8:1::2
-@@ -17,7 +18,14 @@ SRC_IP6=2001:db8:1::3
- DEV_ADDR=192.51.100.1
- DEV_ADDR6=2001:db8:1::1
- DEV=dummy0
--TESTS="fib_rule6 fib_rule4 fib_rule6_connect fib_rule4_connect"
-+TESTS="
-+	fib_rule6
-+	fib_rule4
-+	fib_rule6_connect
-+	fib_rule4_connect
-+	fib_rule6_vrf
-+	fib_rule4_vrf
-+"
- 
- SELFTEST_PATH=""
- 
-@@ -27,13 +35,18 @@ log_test()
- 	local expected=$2
- 	local msg="$3"
- 
-+	$IP rule show | grep -q l3mdev
-+	if [ $? -eq 0 ]; then
-+		msg="$msg (VRF)"
-+	fi
-+
- 	if [ ${rc} -eq ${expected} ]; then
- 		nsuccess=$((nsuccess+1))
--		printf "\n    TEST: %-50s  [ OK ]\n" "${msg}"
-+		printf "\n    TEST: %-60s  [ OK ]\n" "${msg}"
- 	else
- 		ret=1
- 		nfail=$((nfail+1))
--		printf "\n    TEST: %-50s  [FAIL]\n" "${msg}"
-+		printf "\n    TEST: %-60s  [FAIL]\n" "${msg}"
- 		if [ "${PAUSE_ON_FAIL}" = "yes" ]; then
- 			echo
- 			echo "hit enter to continue, 'q' to quit"
-@@ -130,6 +143,17 @@ cleanup_peer()
- 	ip netns del $peerns
- }
- 
-+setup_vrf()
-+{
-+	$IP link add name vrf0 up type vrf table $RTABLE_VRF
-+	$IP link set dev $DEV master vrf0
-+}
-+
-+cleanup_vrf()
-+{
-+	$IP link del dev vrf0
-+}
-+
- fib_check_iproute_support()
- {
- 	ip rule help 2>&1 | grep -q $1
-@@ -248,6 +272,13 @@ fib_rule6_test()
- 	fi
- }
- 
-+fib_rule6_vrf_test()
-+{
-+	setup_vrf
-+	fib_rule6_test
-+	cleanup_vrf
-+}
-+
- # Verify that the IPV6_TCLASS option of UDPv6 and TCPv6 sockets is properly
- # taken into account when connecting the socket and when sending packets.
- fib_rule6_connect_test()
-@@ -385,6 +416,13 @@ fib_rule4_test()
- 	fi
- }
- 
-+fib_rule4_vrf_test()
-+{
-+	setup_vrf
-+	fib_rule4_test
-+	cleanup_vrf
-+}
-+
- # Verify that the IP_TOS option of UDPv4 and TCPv4 sockets is properly taken
- # into account when connecting the socket and when sending packets.
- fib_rule4_connect_test()
-@@ -467,6 +505,8 @@ do
- 	fib_rule4_test|fib_rule4)		fib_rule4_test;;
- 	fib_rule6_connect_test|fib_rule6_connect)	fib_rule6_connect_test;;
- 	fib_rule4_connect_test|fib_rule4_connect)	fib_rule4_connect_test;;
-+	fib_rule6_vrf_test|fib_rule6_vrf)	fib_rule6_vrf_test;;
-+	fib_rule4_vrf_test|fib_rule4_vrf)	fib_rule4_vrf_test;;
- 
- 	help) echo "Test names: $TESTS"; exit 0;;
- 
--- 
-2.43.0
+My production results on 6.6 with backported patches (below signature)
+vs a our normal 6.6 kernel, with script [2]. The `@lock_time_hist_ns`
+shows how long time the lock+IRQs were disabled (taking into account it
+can be released in the loop [4]).
+
+Patched kernel:
+
+21:49:02  time elapsed: 43200 sec
+@lock_time_hist_ns:
+[2K, 4K)              61 | 
+      |
+[4K, 8K)             734 | 
+      |
+[8K, 16K)         121500 |@@@@@@@@@@@@@@@@ 
+      |
+[16K, 32K)        385714 
+|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+[32K, 64K)        145600 |@@@@@@@@@@@@@@@@@@@ 
+      |
+[64K, 128K)       156873 |@@@@@@@@@@@@@@@@@@@@@ 
+      |
+[128K, 256K)      261027 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
+      |
+[256K, 512K)      291986 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
+      |
+[512K, 1M)        101859 |@@@@@@@@@@@@@ 
+      |
+[1M, 2M)           19866 |@@ 
+      |
+[2M, 4M)           10146 |@ 
+      |
+[4M, 8M)           30633 |@@@@ 
+      |
+[8M, 16M)          40365 |@@@@@ 
+      |
+[16M, 32M)         21650 |@@ 
+      |
+[32M, 64M)          5842 | 
+      |
+[64M, 128M)            8 | 
+      |
+
+And normal 6.6 kernel:
+
+21:48:32  time elapsed: 43200 sec
+@lock_time_hist_ns:
+[1K, 2K)              25 | 
+      |
+[2K, 4K)            1146 | 
+      |
+[4K, 8K)           59397 |@@@@ 
+      |
+[8K, 16K)         571528 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
+      |
+[16K, 32K)        542648 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
+      |
+[32K, 64K)        202810 |@@@@@@@@@@@@@ 
+      |
+[64K, 128K)       134564 |@@@@@@@@@ 
+      |
+[128K, 256K)       72870 |@@@@@ 
+      |
+[256K, 512K)       56914 |@@@ 
+      |
+[512K, 1M)         83140 |@@@@@ 
+      |
+[1M, 2M)          170514 |@@@@@@@@@@@ 
+      |
+[2M, 4M)          396304 |@@@@@@@@@@@@@@@@@@@@@@@@@@@ 
+      |
+[4M, 8M)          755537 
+|@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+[8M, 16M)         231222 |@@@@@@@@@@@@@@@ 
+      |
+[16M, 32M)         76370 |@@@@@ 
+      |
+[32M, 64M)          1043 | 
+      |
+[64M, 128M)           12 | 
+      |
+
+
+For the unpatched kernel we see more events in 4ms to 8ms bucket than
+any other bucket.
+For patched kernel, we clearly see a significant reduction of events in
+the 4 ms to 64 ms area, but we still have some events in this area.  I'm
+very happy to see these patches improves the situation.  But for network
+processing I'm not happy to see events in area 16ms to 128ms area.  If
+we can just avoid disabling IRQs/softirq for the lock, I would be happy.
+
+How far can we go... could cgroup_rstat_lock be converted to a mutex?
+
+--Jesper
+
+  [1] 
+https://github.com/xdp-project/xdp-project/blob/master/areas/latency/cgroup_rstat_latency.bt
+  [2] 
+https://github.com/xdp-project/xdp-project/blob/master/areas/latency/cgroup_rstat_latency_steroids.bt
+  [3] 
+https://elixir.bootlin.com/linux/v6.9-rc3/source/kernel/cgroup/rstat.c#L10
+  [4] 
+https://elixir.bootlin.com/linux/v6.9-rc3/source/kernel/cgroup/rstat.c#L226 
+cgroup_rstat_flush_locked
+  [5] 
+https://github.com/xdp-project/xdp-project/blob/master/areas/latency/softirq_net_latency.bt 
+
+
+
+Backported to 6.6
+
+List of **main** patches address issue - to backport for 6.6:
+  - 508bed884767 mm: memcg: change flush_next_time to flush_last_time
+    - v6.8-rc1~180^2~205
+  - e0bf1dc859fd mm: memcg: move vmstats structs definition above 
+flushing code
+    - v6.8-rc1~180^2~204
+  - 8d59d2214c23 mm: memcg: make stats flushing threshold per-memcg
+    - v6.8-rc1~180^2~203
+  - b00684722262 mm: workingset: move the stats flush into 
+workingset_test_recent()
+    - v6.8-rc1~180^2~202
+  - 7d7ef0a4686a mm: memcg: restore subtree stats flushing
+    - v6.8-rc1~180^2~201
+
+And extra (thanks Longman)
+
+  - e76d28bdf9ba ("cgroup/rstat: Reduce cpu_lock hold time in 
+cgroup_rstat_flush_locked()")
+   - v6.8-rc1~182^2~8
+
+And list of patches that contain **fixes** for backports above:
+  - 9cee7e8ef3e3 mm: memcg: optimize parent iteration in 
+memcg_rstat_updated()
+    - v6.8-rc4~3^2~12
+  - 13ef7424577f mm: memcg: don't periodically flush stats when memcg is 
+disabled
+    - v6.8-rc5-69-g13ef7424577f
+
 
 
