@@ -1,104 +1,163 @@
-Return-Path: <netdev+bounces-86268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41DAF89E4B0
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 22:51:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09A3489E4B1
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 22:53:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A09C7B2274B
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 20:51:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7436F1F22CCC
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 20:53:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3190E15885F;
-	Tue,  9 Apr 2024 20:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30AEE158844;
+	Tue,  9 Apr 2024 20:53:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GCmXK9w8"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="X1jiuxmX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E1B15885E;
-	Tue,  9 Apr 2024 20:51:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71F3370
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 20:53:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712695905; cv=none; b=PiNDIQYZ8fJpUhJ++eQ9/AxiL8Ndw1Vk5YwfUGo/jl3M7M+vFn8zsFHebT5rQkBC+mmCzmDRNYDvYbp+8E6xWetIwUYXI5THIaWEsGm7GTY1xmGniqTywmoF5wCE88EJFsr8Kpns5+k/UOLd4Yzjdjl+IeIBMppiP5GSXcqurfg=
+	t=1712696012; cv=none; b=nsXeY8HIILZKC0MVjEepFsDSWZ04DUJS9jriZXbI664eoJAzApcxdp44/H8qBCOytoAOm3uh4W5yGOpHD/YV/BhOeaI+zlrr5GgKbB1b65cCIRijuR3UI2C5FCTeG+xXjY1+CIPeeshF36Xf4PiYBBndA8gEXWwxL22VNESN+o0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712695905; c=relaxed/simple;
-	bh=DFYamkTUiKJCDN84G+HDkI8zC4pAoOFajfa9annO4DE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ncymG8f1k0scUjacedfiHBSc7LrV7uGXF63LaSRhVHUV6xh2pJ0MpFsjo/4VfzTmlvjOCSYzE6WrpiHr96se6zaOZco+2egA4QJRfKZDgyiGH1vBo5A6L6Gy7x03FFTbba6twV5x0301L4/sGrfo7IdiJWYW8cX9kwQlQ4kmC2I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GCmXK9w8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D842BC433C7;
-	Tue,  9 Apr 2024 20:51:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712695904;
-	bh=DFYamkTUiKJCDN84G+HDkI8zC4pAoOFajfa9annO4DE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GCmXK9w8u7fnZDGqoG6kdvjEGSmoWw+dPpoo+VGoeFKGAPXM6ZwOIisdcG2x37tqb
-	 lefuEnMWDMsfmi+FapR4StYZFjwJ1tIun7Mf6qwGoG4a/KQjcoHGhWUJx1FC2BJIMi
-	 P7ABxhC/g6hTleIV32zBPb/qMdx+f6dHrPP37wZ3dDHbhzCpd7KcmuxbUWQLBzQLmY
-	 T3c737m6fMFWjVSkKKRzOmt2bFSEFylV4yKohMqOy8yOjSiuzFrFTIQ8K46FoJ89mB
-	 u5C/yMH3ssMLHRJiBdNYefuUxD0kAjOhNn3FnzpS9EQtL3QV+KRXocgVfsa35paawP
-	 JSbcygcAp5PDA==
-Date: Tue, 9 Apr 2024 13:51:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: pabeni@redhat.com, John Fastabend <john.fastabend@gmail.com>, Alexander
- Lobakin <aleksander.lobakin@intel.com>, Florian Fainelli
- <f.fainelli@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Daniel Borkmann
- <daniel@iogearbox.net>, Edward Cree <ecree.xilinx@gmail.com>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
- bhelgaas@google.com, linux-pci@vger.kernel.org, Alexander Duyck
- <alexanderduyck@fb.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-Message-ID: <20240409135142.692ed5d9@kernel.org>
-In-Reply-To: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+	s=arc-20240116; t=1712696012; c=relaxed/simple;
+	bh=VL1OmKXRS/86ZdIbWGoKSYYbSe/N0+x/bX3Wrz2QxfI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aJ/6s4cQE3ZHfCHi8+/VceGFC1SpAmDIHxmy9/Kc5gUXtnhNkV4WrkEj88ckSjn40CJCVlEBo6y5sQqE8uuH+xo5KaUDGy9HPWX5veuUzSpnkdPAlDoic3pxrpy+5QT1cQSYbKUzoGE5yuj3HVHGzjpPCruXKSNbfC8GV15DFSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=X1jiuxmX; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-78d70890182so81585785a.0
+        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 13:53:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1712696008; x=1713300808; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QJNXfRJkpQZ0B1RTrSZqquRN7ck1z6S/P0CBX+NCW9o=;
+        b=X1jiuxmXS6h/r4DAmUdMy4ePSli9ODmbgWAHNlov9sHbSS8QF3lYIs+DioyhYFHefp
+         7oidMy9z51TPM53OAtraQiVJ0GO11O40M2fG0ysGaCF6GwDrO1gxIOD2DNy7O/mY2T6E
+         z9038zJOpiaqV/pP8JZR3vatrBUzBy7MObruupsoo5ScVJRw20XrmRAAeSzkz1iOwRiQ
+         HFRjgHiukbKixw+NraW+tBpccwBzfXf4H66ok8YHjIvbI+dgRJDmPUN5AxGAuYNDuYaJ
+         1oq3gNz1o6bVBwZkcrJdCoTD4lLYEF/g8at+4SU7jiieFGRrUH+BBRHR4YBUw2o02ZXH
+         nklA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712696008; x=1713300808;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QJNXfRJkpQZ0B1RTrSZqquRN7ck1z6S/P0CBX+NCW9o=;
+        b=LVIjQEeotqJKop/B2O0whhgBisqhdfl9ohGk5hyswK6wJ/bnMLkwDgYvLWNXP4chqR
+         6v5Q2VG2zzVHey4PI/rKPbOzj/zXkR3GyaridvP5h9aCGCFE10luAfGbGvCS8gCvs5Ut
+         AtcUnYVWcGR2dNWxl5U/xvZ3Rt8irvgOX/Q/UXHMGV4ykVZqcaB7e2tNM5g9mAxd6FNF
+         1fIrvQntGqtpI1gwPiqYf56jWDBQoU103cKVf4njbmIIEY3WFoK3TuRcSy4NCYs315c9
+         5OROjbmXWPf0qJ33kbccnvUGlJVpLvzQgQo64KnwWd7QxdLJP28t7qm9wATrdltmAILE
+         yfAg==
+X-Gm-Message-State: AOJu0Yxt4iJ7iXH+Ld8kiZWI5fHNU35lrznSBO2fukKl/orYKoLDF83Y
+	X3wI7LuaMNnj9RU6mEdz5qwIO/CslKz0u3B7cev2XEBh2Jzt21we3yW6ZUFduFBixvsTbRxG+6j
+	W
+X-Google-Smtp-Source: AGHT+IErcOKldDVJXbLtLuqlIzGgw0Jz4+0+VCKz6tko4gAMknXxH+8L6ZL0JP7Qun733WKiqp8LBA==
+X-Received: by 2002:a05:620a:3dd:b0:78d:777d:7d15 with SMTP id r29-20020a05620a03dd00b0078d777d7d15mr972845qkm.5.1712696008111;
+        Tue, 09 Apr 2024 13:53:28 -0700 (PDT)
+Received: from n191-036-066.byted.org ([147.160.184.150])
+        by smtp.gmail.com with ESMTPSA id vy3-20020a05620a490300b0078d6bcfb580sm1151619qkn.10.2024.04.09.13.53.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Apr 2024 13:53:27 -0700 (PDT)
+From: zijianzhang@bytedance.com
+To: netdev@vger.kernel.org
+Cc: edumazet@google.com,
+	willemdebruijn.kernel@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	cong.wang@bytedance.com,
+	xiaochun.lu@bytedance.com,
+	Zijian Zhang <zijianzhang@bytedance.com>
+Subject: [PATCH net-next 0/3] net: socket sendmsg MSG_ZEROCOPY_UARG
+Date: Tue,  9 Apr 2024 20:52:57 +0000
+Message-Id: <20240409205300.1346681-1-zijianzhang@bytedance.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 03 Apr 2024 13:08:24 -0700 Alexander Duyck wrote:
-> This patch set includes the necessary patches to enable basic Tx and Rx
-> over the Meta Platforms Host Network Interface. To do this we introduce a
-> new driver and driver and directories in the form of
-> "drivers/net/ethernet/meta/fbnic".
+From: Zijian Zhang <zijianzhang@bytedance.com>
 
-Let me try to restate some takeaways and ask for further clarification
-on the main question...
+Original notification mechanism needs poll + recvmmsg which is not
+easy for applcations to accommodate. And, it also incurs unignorable
+overhead including extra system calls and usage of optmem.
 
-First, I think there's broad support for merging the driver itself.
+While making maximum reuse of the existing MSG_ZEROCOPY related code,
+this patch set introduces zerocopy socket send flag MSG_ZEROCOPY_UARG.
+It provides a new notification method. Users of sendmsg pass a control
+message as a placeholder for the incoming notifications. Upon returning,
+kernel embeds notifications directly into user arguments passed in. By
+doing so, we can significantly reduce the complexity and overhead for
+managing notifications. In an ideal pattern, the user will keep calling
+sendmsg with MSG_ZEROCOPY_UARG flag, and the notification will be
+delivered as soon as possible.
 
-IIUC there is also broad support to raise the expectations from
-maintainers of drivers for private devices, specifically that they will:
- - receive weaker "no regression" guarantees
- - help with refactoring / adapting their drivers more actively
- - not get upset when we delete those drivers if they stop participating
+MSG_ZEROCOPY_UARG does not need to queue skb into errqueue. Thus,
+skbuffs allocated from optmem are not a must. In theory, a new struct
+carrying the zcopy information should be defined along with its memory
+management code. However, existing zcopy generic code assumes the
+information is skbuff. Given the very limited performance gain or maybe
+no gain of this method, and the need to change a lot of existing code,
+we still use skbuffs allocated from optmem to carry zcopy information.
 
-If you think that the drivers should be merged *without* setting these
-expectations, please speak up.
+* Performance
 
-Nobody picked me up on the suggestion to use the CI as a proactive
-check whether the maintainer / owner is still paying attention, 
-but okay :(
+I extend the selftests/msg_zerocopy.c to accommodate the new flag, test
+result is as follows, the new flag performs 7% better in TCP and 4%
+better in UDP.
+
+cfg_notification_limit = 8
++---------------------+---------+---------+---------+---------+
+| Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
++---------------------+---------+---------+---------+---------+
+| Copy                | 5328    | 5159    | 8581    | 8457    |
++---------------------+---------+---------+---------+---------+
+| ZCopy               | 5877    | 5568    | 10314   | 10091   |
++---------------------+---------+---------+---------+---------+
+| New ZCopy           | 6254    | 5901    | 10674   | 10293   |
++---------------------+---------+---------+---------+---------+
+| ZCopy / Copy        | 110.30% | 107.93% | 120.20% | 119.32% |
++---------------------+---------+---------+---------+---------+
+| New ZCopy / Copy    | 117.38% | 114.38% | 124.39% | 121.71% |
++---------------------+---------+---------+---------+---------+
 
 
-What is less clear to me is what do we do about uAPI / core changes.
-Of those who touched on the subject - few people seem to be curious /
-welcoming to any reasonable features coming out for private devices
-(John, Olek, Florian)? Others are more cautious focusing on blast
-radius and referring to the "two driver rule" (Daniel, Paolo)?
-Whether that means outright ban on touching common code or uAPI
-in ways which aren't exercised by commercial NICs, is unclear. 
-Andrew and Ed did not address the question directly AFAICT.
+Zijian Zhang (3):
+  sock: add MSG_ZEROCOPY_UARG
+  selftests: fix OOM problem in msg_zerocopy selftest
+  selftests: add msg_zerocopy_uarg test
 
-Is my reading correct? Does anyone have an opinion on whether we should
-try to dig more into this question prior to merging the driver, and
-set some ground rules? Or proceed and learn by doing?
+ include/linux/skbuff.h                      |   7 +-
+ include/linux/socket.h                      |   1 +
+ include/linux/tcp.h                         |   3 +
+ include/linux/udp.h                         |   3 +
+ include/net/sock.h                          |  17 +++
+ include/net/udp.h                           |   1 +
+ include/uapi/asm-generic/socket.h           |   2 +
+ include/uapi/linux/socket.h                 |  17 +++
+ net/core/skbuff.c                           | 137 ++++++++++++++++--
+ net/core/sock.c                             |  50 +++++++
+ net/ipv4/ip_output.c                        |   6 +-
+ net/ipv4/tcp.c                              |   7 +-
+ net/ipv4/udp.c                              |   9 ++
+ net/ipv6/ip6_output.c                       |   5 +-
+ net/ipv6/udp.c                              |   9 ++
+ net/vmw_vsock/virtio_transport_common.c     |   2 +-
+ tools/testing/selftests/net/msg_zerocopy.c  | 150 ++++++++++++++++++--
+ tools/testing/selftests/net/msg_zerocopy.sh |   1 +
+ 18 files changed, 397 insertions(+), 30 deletions(-)
+
+-- 
+2.20.1
+
 
