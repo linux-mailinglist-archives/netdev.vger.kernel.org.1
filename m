@@ -1,138 +1,112 @@
-Return-Path: <netdev+bounces-86036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A40689D527
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:12:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBF9289D572
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 11:24:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 968341C2137D
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 09:12:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 884E32836FD
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 09:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5DFE7E78B;
-	Tue,  9 Apr 2024 09:12:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BC577EF02;
+	Tue,  9 Apr 2024 09:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="dVGzmd31"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mta-64-227.siemens.flowmailer.net (mta-64-227.siemens.flowmailer.net [185.136.64.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37E4182DA
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 09:12:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E991B7F487
+	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 09:23:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.64.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712653937; cv=none; b=CA6Ch0amYFC1RkUz5G4R8jMBOQnIrjQTuu11MJa3pCR5rr1JUG+WkV8LhPtrgY1pm3qmaf2gyhg9m/JsTbVQT88wr9JmJL/96Gulxy1SlDL32f9KmjY6LssoBATBgOD4d44j3MJb/W7tmMAHZRmcYVUzk1uZh4qvm4L9Tr8BYlQ=
+	t=1712654628; cv=none; b=bAyume1l6O7nyGcKcSQAPkqOwW8p/+TW75Iusv4pvLKtcXlIVsYXW36ycsb54TLljPIwEUyYwUWwJpboZKGRGRVp7jPUPI0MzicIoCbTtpyF8j9cWSZoVfJX8YvsndOHQuf3BxI4M6d6hw2/9dufRADJNsH/BuWGu0KynSIOyS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712653937; c=relaxed/simple;
-	bh=S3Lq+GiaWb2mL82KHngXon5KStQinTLItPD02AlUWRg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gG06NStQinq7dMVS/p0/NbhQ8qW6DAphs3J6/GOuV9+qrOa4NDXmOiDxiUBsTnLwgasJSCfl3dqO1vN8rWQdUE9x/wtD00zPphwpEfFshv7P8Yu5kP/0G9qKj7q9DA+A3MyVYS3o88xTE44ys3YWlDlKCCXdgSotj6Zk15gM50w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1ru7WS-00047E-W0; Tue, 09 Apr 2024 11:12:09 +0200
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1ru7WQ-00BH1V-Sl; Tue, 09 Apr 2024 11:12:06 +0200
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1ru7WQ-00GqYs-2Z;
-	Tue, 09 Apr 2024 11:12:06 +0200
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	kernel@pengutronix.de
-Subject: [PATCH net-next] net: wan: fsl_qmc_hdlc: Convert to platform remove callback returning void
-Date: Tue,  9 Apr 2024 11:12:04 +0200
-Message-ID: <20240409091203.39062-2-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1712654628; c=relaxed/simple;
+	bh=ATcJ3L75SBuQiCChFA4mEUfgnkW7L16yPOdRV8sp60g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bi4YWsn7qXD4ZMzAhHQqT/0/E7v56IKPwixEie6+ACsd4kSQSUBR7ceevquyELfJ2TaGeYHRzhEDrkpXkWbPq7IQHmgegMI/qyGjdmYMlIDv9PzAsNkdrR398nlvydmwwkoIfjivCMBP+SFkoy1Z9LYNKZH1D3r9p23uthjgk7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=dVGzmd31; arc=none smtp.client-ip=185.136.64.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-64-227.siemens.flowmailer.net with ESMTPSA id 20240409091331bb497318e6964b7779
+        for <netdev@vger.kernel.org>;
+        Tue, 09 Apr 2024 11:13:31 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=diogo.ivo@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
+ bh=4Kw71aoe8njcZtPrp28GbNsxnD6SNgQ2lS14UhfIrRA=;
+ b=dVGzmd31SW8X65XCb81/LP/gZPThSsVwpVM7FCQ1V4526BpcPap/nWGuD1t7bvc9OSAiAV
+ PSAvVPPo/p8U0u+P1DaPYPaco09THFXBOmLllXrRyphl8BXI7sOg6l9NQqo6Q21/LFkmjKaV
+ lmGyxH2/qTMwZ0W1QXTNi1VlRQrc0=;
+Message-ID: <65ac9f42-1b51-4603-839c-cbaf69d2daf0@siemens.com>
+Date: Tue, 9 Apr 2024 10:13:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2240; i=u.kleine-koenig@pengutronix.de; h=from:subject; bh=S3Lq+GiaWb2mL82KHngXon5KStQinTLItPD02AlUWRg=; b=owGbwMvMwMXY3/A7olbonx/jabUkhjRRtpSpTpd7z1jUKnEc678iu0QgwSp34mv7V+KKyYu/h M0x5u/vZDRmYWDkYpAVU2Sxb1yTaVUlF9m59t9lmEGsTCBTGLg4BWAiXofY//AF79mZn8F6NGfO 5vYJ9x3FFoenukxTZM93vm7UrC3J+G96ttZD6V73zK7jbN5n5ou8PBF++4DW6eyaBb6zNTJeOHD OPvQv56fokqoXZ1eyzOCXXMy3rCvJc47Fs98/FYQbc2qmOXC8W3dVdKW3yM3ix7tOKHp27bHKvL Swr9u0Zf7u1jfbn65d//NY7pmzLx00rritEo6oY2TyOWi3JMzs012WJJed65wdFpje+/gkltszP PdIcGRWpku43SufFs3Zgi4qhleFRCod0noM1JNVxRVaul6WHROcKN/2Tvhd0T6NyZkBf3e53Vtp uDfwC//zPwIqkzb4WNRYqOl9KXkexu9kkrBg4ck/F/zNAQ==
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v6 02/10] eth: Move IPv4/IPv6 multicast address
+ bases to their own symbols
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, andrew@lunn.ch,
+ danishanwar@ti.com, rogerq@kernel.org, vigneshr@ti.com,
+ jan.kiszka@siemens.com
+References: <20240403104821.283832-1-diogo.ivo@siemens.com>
+ <20240403104821.283832-3-diogo.ivo@siemens.com>
+ <03660271-c04c-4872-8483-b3a1bfa568ef@intel.com>
+Content-Language: en-US
+From: Diogo Ivo <diogo.ivo@siemens.com>
+In-Reply-To: <03660271-c04c-4872-8483-b3a1bfa568ef@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-1320519:519-21489:flowmailer
 
-The .remove() callback for a platform driver returns an int which makes
-many driver authors wrongly assume it's possible to do error handling by
-returning an error code. However the value returned is ignored (apart
-from emitting a warning) and this typically results in resource leaks.
+On 4/9/24 10:07 AM, Alexander Lobakin wrote:
+> From: Diogo Ivo <diogo.ivo@siemens.com>
+> Date: Wed,  3 Apr 2024 11:48:12 +0100
+> 
+>> As these addresses can be useful outside of checking if an address
+>> is a multicast address (for example in device drivers) make them
+>> accessible to users of etherdevice.h to avoid code duplication.
+>>
+>> Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
+>> Reviewed-by: MD Danish Anwar <danishanwar@ti.com>
+>> ---
+>> Changes in v5:
+>>   - Added Reviewed-by tag from Danish
+>>
+>>   include/linux/etherdevice.h | 12 ++++++++----
+>>   1 file changed, 8 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/include/linux/etherdevice.h b/include/linux/etherdevice.h
+>> index 224645f17c33..8d6daf828427 100644
+>> --- a/include/linux/etherdevice.h
+>> +++ b/include/linux/etherdevice.h
+>> @@ -71,6 +71,12 @@ static const u8 eth_reserved_addr_base[ETH_ALEN] __aligned(2) =
+>>   { 0x01, 0x80, 0xc2, 0x00, 0x00, 0x00 };
+>>   #define eth_stp_addr eth_reserved_addr_base
+>>   
+>> +static const u8 eth_ipv4_mcast_addr_base[ETH_ALEN] __aligned(2) =
+>> +{ 0x01, 0x00, 0x5e, 0x00, 0x00, 0x00 };
+>> +
+>> +static const u8 eth_ipv6_mcast_addr_base[ETH_ALEN] __aligned(2) =
+>> +{ 0x33, 0x33, 0x00, 0x00, 0x00, 0x00 };
+> 
+> I see this is applied already, but I don't like static symbols in header
+> files. This will make a local copy of every used symbol each time it's
+> referenced.
+> We usually make such symbols global consts and export them. Could you
+> please send a follow-up?
 
-To improve here there is a quest to make the remove callback return
-void. In the first step of this quest all drivers are converted to
-.remove_new(), which already returns void. Eventually after all drivers
-are converted, .remove_new() will be renamed to .remove().
+Yes, I'll send a patch addressing this issue.
 
-Trivially convert this driver from always returning zero in the remove
-callback to the void returning variant.
-
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
-Hello,
-
-the drivers below of drivers/net were already converted to struct
-platform_driver::remove_new during the v6.9-rc1 development cycle. This
-driver was added for v6.9-rc1 and so missed during my conversion.
-
-There are still more drivers to be converted, so there is from my side
-no need to get this into v6.9, but the next merge window would be nice.
-
-Best regards
-Uwe
-
- drivers/net/wan/fsl_qmc_hdlc.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hdlc.c
-index f69b1f579a0c..c5e7ca793c43 100644
---- a/drivers/net/wan/fsl_qmc_hdlc.c
-+++ b/drivers/net/wan/fsl_qmc_hdlc.c
-@@ -765,15 +765,13 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 	return ret;
- }
- 
--static int qmc_hdlc_remove(struct platform_device *pdev)
-+static void qmc_hdlc_remove(struct platform_device *pdev)
- {
- 	struct qmc_hdlc *qmc_hdlc = platform_get_drvdata(pdev);
- 
- 	unregister_hdlc_device(qmc_hdlc->netdev);
- 	free_netdev(qmc_hdlc->netdev);
- 	qmc_hdlc_framer_exit(qmc_hdlc);
--
--	return 0;
- }
- 
- static const struct of_device_id qmc_hdlc_id_table[] = {
-@@ -788,7 +786,7 @@ static struct platform_driver qmc_hdlc_driver = {
- 		.of_match_table = qmc_hdlc_id_table,
- 	},
- 	.probe = qmc_hdlc_probe,
--	.remove = qmc_hdlc_remove,
-+	.remove_new = qmc_hdlc_remove,
- };
- module_platform_driver(qmc_hdlc_driver);
- 
-base-commit: 11cb68ad52ac78c81e33b806b531f097e68edfa2
--- 
-2.43.0
+Best regards,
+Diogo
 
 
