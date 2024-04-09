@@ -1,150 +1,148 @@
-Return-Path: <netdev+bounces-86259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B107E89E3D4
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 21:41:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E51AF89E41C
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 22:03:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28B3F1F22B61
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 19:41:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69D631F21439
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 20:03:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3F0157A42;
-	Tue,  9 Apr 2024 19:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C925F1581E6;
+	Tue,  9 Apr 2024 20:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="EfW+m/MH";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="rb1V6qJS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hk8+QkA5"
 X-Original-To: netdev@vger.kernel.org
-Received: from wfout6-smtp.messagingengine.com (wfout6-smtp.messagingengine.com [64.147.123.149])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D54B15749E;
-	Tue,  9 Apr 2024 19:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.149
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF1D157E97;
+	Tue,  9 Apr 2024 20:03:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712691697; cv=none; b=rXQ+LbPZ6hLvT38m/hnHDKAeEuqJOoAN8xtHAKryp0tLif1teVtPZ5aNFcbXt0694zJGpZYtznbZK7t8jukzNbJ491Pzg0+7DlJjXrqI7F+jMLhKEUflLb+JYc5MF/UxRlMETDAarqinqldLLciFLZ/6Kw4LLUn1AzJaibulvRU=
+	t=1712693026; cv=none; b=Trlcn1omo8o/pZ1xqVh34SY8QvH3LjkgGpN3CK2gdahMNT699ADzt5d3E8wkBghIe8xlLhaFU1T084R7KCavbj6uBgZwJeF0OH/gb+90UeuqQ4wPmReWFlJhucPWtozN/VkwrOQBvuPeHQ+DzPbqIUNzix816Y+INa6iqEeGDCI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712691697; c=relaxed/simple;
-	bh=mz+ivdvfJu2xvIClgoV0DYYhljRVDMHl7FLu7Sohooc=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=o/cJOL8nCFaU/ChqnERJbMKMlPb3uW1I9DkequHddzyi5KcuBtDkbBcYS7mzkLplvamu+MrKnXOAn+GW80uPHu/9e2/p/3ebfYx/KlrEz9XIQGKxPu5VOIpHlOKGUUml7D0gdDm7XT8YO11Yz51UhrGuzNrcQahZgdq1xM5GUYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=EfW+m/MH; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=rb1V6qJS; arc=none smtp.client-ip=64.147.123.149
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfout.west.internal (Postfix) with ESMTP id C91921C00099;
-	Tue,  9 Apr 2024 15:41:33 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Tue, 09 Apr 2024 15:41:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1712691693; x=1712778093; bh=tr06fHvNZN
-	R9qLnaA0dmPX0JUluTiub3QurVgyRyKZs=; b=EfW+m/MHJuGNp7wXiicYMOS8Gv
-	We8w+3YSyD4clKI2gkcpD2WNcM0lQ9rd3MZpLFaCfYJG/zaBs1ebm5M36gKoh32W
-	m8ZJcu4hezY4WiZYb3o6qwEVNUvpBCHDrkWbW3iCekIOgfB7UgaSRvDaQpWd/eT1
-	sfO3+wrjTi8XIaSfXXbtDJSaZD9/zJurHdTgcqF04AtwZ51AOeZxhY3TcBdjVtSv
-	uSEOpvZD1vQ4QxdJGvAMTfM1h/FkXk7rUpHnLIGqN880m2sVYRMZskVlQ1eEp9/Y
-	F0hGlWQ0lZq53kXiJiT/jTm1nfOXIhA+dpOh5yIY9SOi5PQI0HH1BdEo6hpQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1712691693; x=1712778093; bh=tr06fHvNZNR9qLnaA0dmPX0JUluT
-	iub3QurVgyRyKZs=; b=rb1V6qJSNgbGGdqQQU9F4tJTo59+boX82uQrHnvyee53
-	veZDR6VeYq32/e8LTKaRr7pPjNZ4sRR9J3ZeagHdbOsuwPNCJB+i5T6AD02wBzKw
-	uS1Onk40A6IKHwti7aQ859+qrruqGLO8rvf+aoTy49lKEOgc5qsup5BVTqoYXIYj
-	8XOslqgIJg1aINSMFq4Yu31JdQehXDuDlcNb2MNcspoi8dpIoB+7vBoUAAeRPOR7
-	5yBMC0YW1Obp+fRUbQr42UFD1bQls9AcbXAlSJje87gOmhNum4UaBVqJvpQW/gmn
-	4CfNu2/KcxrVy+E2y8lCyrnj5L96+LZbC+4NuK3mvQ==
-X-ME-Sender: <xms:65kVZuzRHlJqdc8gdCzRnkf8Q5ICABlpTnwB__2u8GKHgUS6o_S3vw>
-    <xme:65kVZqSFPx1AOaA9Ahf5D6FhxcO6mVb__3arlEEMbfd5rSJVuxA7OhxWfv8NLrAsp
-    rfqUMfSyy6s8tMnZXI>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudehgedgudduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepgeetiefhjedvhfeffffhvddvvdffgfetvdetiefghefhheduffeljeeuuddv
-    lefgnecuffhomhgrihhnpehprghsthgvsghinhdrtghomhenucevlhhushhtvghrufhiii
-    gvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrhhnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:65kVZgWXrehyrpr_yQTpXeJMDMlXSa5f93wRP0adgsABvMDmPxO8tA>
-    <xmx:65kVZkg3F9scO3itqMlmUro250T6g6FD2KHWCAUPmBb7jcXTNzrZXw>
-    <xmx:65kVZgD-MMeK6JG039kFpxTCq9eOS2IsuXw3zwG-6svuTA3ajUKJbQ>
-    <xmx:65kVZlLC9nycoVuLJytyvSLwJdZF5wGT69HIPkEJagB0yKXdiv_CXw>
-    <xmx:7ZkVZi6U0iWQBsONeDhxJFwA3KH0jkXBGDvxYYDjJukURMTilmxli-Pj>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 0176CB6008D; Tue,  9 Apr 2024 15:41:30 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-379-gabd37849b7-fm-20240408.001-gabd37849
+	s=arc-20240116; t=1712693026; c=relaxed/simple;
+	bh=BKPwDcilCk7Fpstj6G3Bqf1RwwGG2vSjtmGmwoMFgxI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eWfS42erFxmEhyU+wark02GOpkFzhHv8u+lA7tqam4biX+A53FqLAP/jDUw5AUsvywrftTeBjtuAXB+x9uniNvLmbS/mgu5/VoUuHOmRNPf+rkSzk5e1ODd3Vk+Thd8H/0flr9QAf4w2FrRbUpZpr2x/thM+T0CLG2anL+VQRkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hk8+QkA5; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4169ebcc924so9840745e9.0;
+        Tue, 09 Apr 2024 13:03:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712693023; x=1713297823; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BKPwDcilCk7Fpstj6G3Bqf1RwwGG2vSjtmGmwoMFgxI=;
+        b=Hk8+QkA5d8uf+E/jZE103P2edF9EcjOz+FMGbfpX+AYz/LQGaD9FKytkcRxQ76GJNa
+         bGfzyPBx1BCAmhGmoTRDqlDcEWDQ1O4mXAM+JvrXGBbtWz0MrhpXwnllrfx88LWwPAdm
+         NZ4sZRsowH9BHdMcO7wG+7OEWL4jWhAcBfqMA8qcrNcylRjb4qI3Vhs49ABL1KWfSPoP
+         7R2Pgqjx2AKY46EDPPKLto6TDkMrjsH5p9Ey+qAkRB9UYvju9Xw5Ub/tvBXEeOUG+Ptt
+         7yHHZVKc0Wjiqrc7NG4LQFIUhD6J2CxwULMtZBKNcWxVdxwB9DzXZbbnBBWHVh8j/g+n
+         PpWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712693023; x=1713297823;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BKPwDcilCk7Fpstj6G3Bqf1RwwGG2vSjtmGmwoMFgxI=;
+        b=UKajBP5NPYkZWXizbNDlAYubAv0Onl8k49hiEK/0QXxnrLW61sMzulYu3T/qkJJJTu
+         6hXbxlT4gA8tltBgz5DL4elQi8NZ25T7qDtm+FrcXSIYweE4c5x4FuyoXkSuTUWKGqdg
+         Yw6pDtNd0B9BLZuGwC+Jxq9MvWNYExHNE71/22DTWxrv5hIuu3qYYHTYNe2RT/5CVrw0
+         B72xGxiFz3hQ9ajS83fB5BA+mVIWi2XwtdgQBtrhnmIrGiAuDVJ6jrR1ZeX+gG/fmXt3
+         V17G//OSujo2PtlBMPis9TySEGSKAeygBV7YLC3ShzKkhK69cwvZf24P061smIPk6uLP
+         To/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUQFvrQVtG/CEqMp1yEEq7t5s0oKKyDgWMpPMmIV3Re9TNouOUbtl/lj9ibZXOX0WU7V+U1Ag7oPGo6vIi51u9htLN0hlHD9X2JE8p7Q+qO/iksR8jNOvzKcT1CZVhpPX3j
+X-Gm-Message-State: AOJu0Yy8KqcbHeXqUvQ4FmkY4J13IlTkYy3HPKIifmiRNsc1ZtS4qGj0
+	1wRNxs3Nhhb+MTyfrlOG78co+beDMrRETT1RAcER1qW1XkDnW3Ucqj8+PDVpDTOTsylYtUTCkeP
+	L7TH60qpiWGHvI3YNVpb+KBBN4Hg=
+X-Google-Smtp-Source: AGHT+IHhhLBHCcP6lU7shcoNGE+mY6oH/uAljMisFfwT1uSEfASNoK/aaQGGa1ES7AjXNjhEKSZkVxq/oG0TerZcM0A=
+X-Received: by 2002:adf:f8d0:0:b0:343:f335:58b with SMTP id
+ f16-20020adff8d0000000b00343f335058bmr459924wrq.62.1712693023173; Tue, 09 Apr
+ 2024 13:03:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <f94c6943-eb93-4533-8e4d-3645ef38b990@app.fastmail.com>
-In-Reply-To: <20240409161517.GA3219862@dev-arch.thelio-3990X>
-References: <20240216202657.2493685-1-arnd@kernel.org>
- <202402161301.BBFA14EE@keescook>
- <763214eb-20eb-4627-8d4b-2e7f29db829a@app.fastmail.com>
- <20240409161517.GA3219862@dev-arch.thelio-3990X>
-Date: Tue, 09 Apr 2024 21:41:09 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Nathan Chancellor" <nathan@kernel.org>
-Cc: "Kees Cook" <keescook@chromium.org>, "Arnd Bergmann" <arnd@kernel.org>,
- "Steffen Klassert" <steffen.klassert@secunet.com>,
- "Herbert Xu" <herbert@gondor.apana.org.au>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>,
- "Nick Desaulniers" <ndesaulniers@google.com>,
- "Bill Wendling" <morbo@google.com>, "Justin Stitt" <justinstitt@google.com>,
- "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- "Leon Romanovsky" <leon@kernel.org>, "Lin Ma" <linma@zju.edu.cn>,
- "Simon Horman" <horms@kernel.org>, "Breno Leitao" <leitao@debian.org>,
- "Tobias Brunner" <tobias@strongswan.org>, "Raed Salem" <raeds@nvidia.com>,
- Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org,
- llvm@lists.linux.dev
-Subject: Re: [PATCH] [RFC] xfrm: work around a clang-19 fortifiy-string false-positive
-Content-Type: text/plain
+References: <20240408061846.GA8764@unreal> <CAKgT0UcE5cOKO4JgR-PBstP3e9r02+NyG3YrNQe8p2_25Xpf8g@mail.gmail.com>
+ <20240408184102.GA4195@unreal> <CAKgT0UcLWEP5GOqFEDeyGFpJre+g2_AbmBOSXJsoXZuCprGH0Q@mail.gmail.com>
+ <20240409081856.GC4195@unreal> <CAKgT0UewAZSqU6JF4-cPf7hZM41n_QMuiF_K8SY8hyoROQLgfQ@mail.gmail.com>
+ <20240409153932.GY5383@nvidia.com> <CAKgT0UeSNxbq3JYe8oNaoWYWSn9+vd1c+AfjvUsietUtS09r0g@mail.gmail.com>
+ <20240409171235.GZ5383@nvidia.com> <CAKgT0Ufc0Zx6-UwCNbwtEahdbCv=eVqJKoDuoQdz6QMD2tv-ww@mail.gmail.com>
+ <20240409185457.GF5383@nvidia.com>
+In-Reply-To: <20240409185457.GF5383@nvidia.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 9 Apr 2024 13:03:06 -0700
+Message-ID: <CAKgT0UcqJr4s8jMGW0a4BA6gUs+ey9X2JAOpeEP9cBW1qHmizw@mail.gmail.com>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	bhelgaas@google.com, linux-pci@vger.kernel.org, 
+	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 9, 2024, at 18:15, Nathan Chancellor wrote:
-> On Mon, Apr 08, 2024 at 09:06:21AM +0200, Arnd Bergmann wrote:
->> >
->> > The shorter fix (in the issue) is to explicitly range-check before
->> > the loop:
->> >
->> >        if (xp->xfrm_nr > XFRM_MAX_DEPTH)
->> >                return -ENOBUFS;
->> 
->> I ran into this issue again and I see that Nathan's fix has
->> made it into mainline and backports, but it's apparently
->> not sufficient.
->> 
->> I don't see the warning with my patch from this thread, but
->> there may still be a better fix.
+On Tue, Apr 9, 2024 at 11:55=E2=80=AFAM Jason Gunthorpe <jgg@nvidia.com> wr=
+ote:
 >
-> Is it the exact same warning? clang-19 or older?
-> What > architecture/configuration? If my change is not sufficient then maybe
-> there are two separate issues here? I have not seen this warning appear
-> in our CI since my change was applied.
+> On Tue, Apr 09, 2024 at 11:38:59AM -0700, Alexander Duyck wrote:
+> > > > phenomenon where if we even brushed against block of upstream code
+> > > > that wasn't being well maintained we would be asked to fix it up an=
+d
+> > > > address existing issues before we could upstream any patches.
+> > >
+> > > Well, Intel has it's own karma problems in the kernel community. :(
+> >
+> > Oh, I know. I resisted the urge to push out the driver as "idgaf:
+> > Internal Device Generated at Facebook" on April 1st instead of
+> > "fbnic"
+>
+> That would have been hilarious!
+>
+> > to poke fun at the presentation they did at Netdev 0x16 where they
+> > were trying to say all the vendors should be implementing "idpf" since
+> > they made it a standard.
+>
+> Yes, I noticed this also. For all the worries I've heard lately about
+> lack of commonality/etc it seems like a major missed ecosystem
+> opportunity to have not invested in an industry standard. From what I
+> can see fbnic has no hope of being anything more than a one-off
+> generation for Meta. Too many silicon design micro-details are exposed
+> to the OS.
 
-I only see it with clang-19. I've never seen it with arm32 and
-currently only see it with arm64, though I had seen it with x86-64
-as well in February before your patch.
+I know. The fact is we aren't trying to abstract away anything as that
+would mean a larger firmware blob. That is the problem with an
+abstraction like idpf is that it just adds more overhead as you have
+to have the firmware manage more of the control plane.
 
-The warning is the same as before aside from the line number,
-which which is now include/linux/fortify-string.h:462:4
-where it was line 420, but I think that is just a context
-change.
+> > It all depends on your definition of being extractive. I would assume
+> > a "consumer" that is running a large number of systems and is capable
+> > of providing sophisticated feedback on issues found within the kernel,
+> > in many cases providing fixes for said issues, or working with
+> > maintainers on resolution of said issues, is not extractive.
+>
+> I don't know, as I said there is some grey scale.
+>
+> IMHO it is not appropriate to make such decisions based on some
+> company wide metric. fbnic team alone should be judged and shouldn't
+> get a free ride based on the other good work Meta is doing. Otherwise
+> it turns into a thing where bigger/richer companies just get to do
+> whatever they want because they do the most "good" in aggregate.
 
-I have a number of configs that reproduce this bug, see
-https://pastebin.com/tMgfD7cu for an example with current
-linux-next.
-
-     Arnd
+The problem here in this case is that I am pretty much the heart of
+the software driver team with a few new hires onboarding the next
+couple months. People were asking why others were jumping to my
+defense, well if we are going to judge the team they are mostly
+judging me. I'm just hoping my reputation has spoken for itself
+considering I was making significant contributions to the drivers even
+after I have gone through several changes of employer.
 
