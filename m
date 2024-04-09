@@ -1,98 +1,107 @@
-Return-Path: <netdev+bounces-86137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 035E889DAC6
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:43:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63FFA89DB2D
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 15:53:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 631531F24AA5
-	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:43:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0281E1F23E72
+	for <lists+netdev@lfdr.de>; Tue,  9 Apr 2024 13:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5C2613281C;
-	Tue,  9 Apr 2024 13:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9FE412F591;
+	Tue,  9 Apr 2024 13:44:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ZyYEMOrG"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="Td6C2W+p"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out162-62-63-194.mail.qq.com (out162-62-63-194.mail.qq.com [162.62.63.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D201B131BB8
-	for <netdev@vger.kernel.org>; Tue,  9 Apr 2024 13:39:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9751812F378;
+	Tue,  9 Apr 2024 13:44:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.63.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712669956; cv=none; b=oav2BVBL7X/7UqPyLSceurKW3+4dP9HXwD7r+T2d/cfnWCBYhMrolR+H5ry2ni/Kkl/iJ9km+aPdYaWbBCWWF0ohg4HZWpn9rw8PtzSqLLXfBbZZxTNT5bFMaHdS6BLUhskaDSB1nbNzSpQJRlnro8tKSqKHSyN3mOS/LOLUY/g=
+	t=1712670268; cv=none; b=Y/Jm2Ryd/ojaqsciFzqOAYTNa5X5BR3vXlCK+7jLoCcDntIIADPOGsKeHZXn97/rUp6fsnVd3E6aICH/kjIk/NeWrb8J/oVaPc0VxCfHScIRC3eCUMnp/f3CZMvmRYkAsFWQkU5FhSBscd+4BwhcHy2D5UpYOyWSrgmmO+XMmg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712669956; c=relaxed/simple;
-	bh=pggNsCuA2c3MpOl07TMLcMBLc52OofzgsaO8d6VC9g0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IFEAt+cJaX199mO3GnPGhNe9xAa0fZM/QkCrVLs/yNEwN3FRs6dEtgKy4pL29q0v+JJ8ZFGnE/4WY1LQuBjbhnXz5ttW7DxrGTeUSMfzYSxItWzYSAftYH9Z+E8ZVvVsh81kWfR9sxbZIWXVzC4nwovxRFxmPMtqhJx1R+9g4Wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ZyYEMOrG; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=T/r8BfXohVHFI2G7WWPeP1tiK6eBX+Y2sctROwXYGoY=; b=ZyYEMOrG0/R+2XPecvJOEkGO6e
-	6hcO1kbUwIQX8H0eUIPjS5r69bF2sdEoXOLoM9cm53mb62vjkFAJFrOAvvNwRok/ixsfQHVgTxbts
-	xPvnMPenm3v05CArVJMaijZK/yorXMIszUoas7NNGfhdj/SJcRR/SGvNLRiWfbcmI1x8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ruBgs-00CZvJ-KB; Tue, 09 Apr 2024 15:39:10 +0200
-Date: Tue, 9 Apr 2024 15:39:10 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-Cc: netdev@vger.kernel.org, idosch@nvidia.com, edumazet@google.com,
-	marcin.szycik@linux.intel.com, anthony.l.nguyen@intel.com,
-	kuba@kernel.org, intel-wired-lan@lists.osuosl.org,
-	pabeni@redhat.com, przemyslaw.kitszel@intel.com,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH net-next 0/3] ethtool: Max power support
-Message-ID: <c6258afd-2631-4e5d-ab25-6b2b7e2f4df4@lunn.ch>
-References: <20240329092321.16843-1-wojciech.drewek@intel.com>
- <38d874e3-f25b-4af2-8c1c-946ab74c1925@lunn.ch>
- <a3fd2b83-93af-4a59-a651-1ffe0dbddbe4@intel.com>
- <dc601a7c-7bb7-4857-8991-43357b15ed5a@lunn.ch>
- <ad026426-f6a4-4581-b090-31ab65fb4782@intel.com>
- <61a89488-e79a-4175-8868-3de36af7f62d@lunn.ch>
- <206686dc-c39b-4b52-a35c-914b93fe3f36@intel.com>
- <e4224da7-0a09-41b7-b652-bf651cfea0d0@lunn.ch>
- <cf30ce2e-ab70-4bbe-82ab-d687c2ea2efc@intel.com>
+	s=arc-20240116; t=1712670268; c=relaxed/simple;
+	bh=/kxZXr+rwuZWsLpAl0SSYwp1srPD3nqS4ULZVWAuf8k=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=dIt76et7EEqLBftYxYnbsX7KnKajy5nB1wWjnE45bCGk/AJTdjvCoQ1hSfV5hhfYq/TbJnSMeeC5yK7BvlsLTWPkFbIMgJlSFZTo8G49G8vJNe+4d6WaSTAPAyzXqh6IfGEuKlTAlVO2RA2szjHC/GVlbEoNUQRDOhkj6SZ0SIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=Td6C2W+p; arc=none smtp.client-ip=162.62.63.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1712670258; bh=mV+2uXEU0mxyaFTSC+dqJ7oImfFIcAAupTtNJvfgJYA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=Td6C2W+pebgIe4I12hp+cKrXcRfD/tNrb6/WJ0wRlrtl5RwOT+TsnPky8kEafErPQ
+	 fCzNkZ47jO19lUSEqk+vJE9MswA68HnGSzY6w0rLmO0PfSPrCoZYM5J9SOYNZyDuwG
+	 //j0JlKmq406vNRMAgosdznENIhY5hIAOH7X7leU=
+Received: from pek-lxu-l1.wrs.com ([111.198.228.153])
+	by newxmesmtplogicsvrszc5-0.qq.com (NewEsmtp) with SMTP
+	id AB23389E; Tue, 09 Apr 2024 21:42:50 +0800
+X-QQ-mid: xmsmtpt1712670170tkjmb0sae
+Message-ID: <tencent_EDCC88A7DB46D3D2F7C64449976EC56EE006@qq.com>
+X-QQ-XMAILINFO: OCYbvBDBNb9rerlANBwTUHLlLdyj8SmQAzuXuPK9Ob3UVeMTOUlb2KXNa0+x5z
+	 CriuoSgInpV8P2aXGt1YyYfx154hu2f1Yvlydw6FtioPyI9zqjDX7GfWc6eCcYz88908p6Sn5al2
+	 bsnAegt/UzKNcGgnYJyiHzszdulrN2bIfan6CEK2brvGFI8AKYGffxhlLLgSvljvPbogo3HdKE2g
+	 bkCeVoeGCF5wnTK9NkLVUhPnLOAy8hAnbzMQC5imHkST880ZuwsqCFT86XnKRYpuLdvbl65piPrA
+	 iH4I/80v3ALIHlCI/zdisN+cTQyyKOLt4axc2v7GevNjzluOjamKO8gxjC/tYO1qKUOHA7jYAm3J
+	 t8heAypBDIdCLKlrBy8yqajqfkZQjIlsv98Rqx1WQGcRfF5j9NqPuxIXsHre22hnTX6zArERnmi4
+	 o4hrfC3j2daxLqTgwNR/3NmpuqI95ICUa8rc3uqj5FyQwfhOYHklKbxxBje3dv+dEzRh5PD7uwiD
+	 pAKRsXDHlTl69FssNHh9xQrPHoR3MaTUtkhxWqDVl151sK1HH7lRqjvzxj+Yza5KhoHCOJS4fmP0
+	 KuemLKhoi6X6Hede9Pag0GlEsZxbSZtVIcL6oXth27WyXTU8Thncq9K4u620biye4mOADV3Rffok
+	 OZOGhmLz14NEY9+hEQVGluKVONp1KhMmQDEfUJCzUij2osiB/WLsqpxO3qawDOexVgFquXeDGYYV
+	 hpXuLwstk2JAOUV+HIzBHHRkhiHdUWyrc0gJYDFLMpQ/GY8e2q56iJJtPZxQ3uxAp676Tfjyr3V/
+	 v/0wDr1qScqyah7gCUeAgHoewwDNc2PDGd/SRQ0imyaFqSltV+7cqIiZtR351mZFMbEXQOqgETk/
+	 v4bYcMGTWKm5GvB7jOkjejHb0zKtG8XX/ZOnlDnJL/pVU+a8C330cIGs0NinTbNqoFuuV8PcYh4A
+	 bQPfsAuc6VSjSSivdBuZlPSuP5BSZm0C+sdLhmCp5SDxs5GYdJZM3RKvodBZLS
+X-QQ-XMRINFO: M/715EihBoGSf6IYSX1iLFg=
+From: Edward Adam Davis <eadavis@qq.com>
+To: syzbot+837ba09d9db969068367@syzkaller.appspotmail.com
+Cc: johan.hedberg@gmail.com,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	luiz.dentz@gmail.com,
+	marcel@holtmann.org,
+	syzkaller-bugs@googlegroups.com,
+	netdev@vger.kernel.org
+Subject: [PATCH] Bluetooth: fix oob in hci_sock_setsockopt
+Date: Tue,  9 Apr 2024 21:42:51 +0800
+X-OQ-MSGID: <20240409134250.1414-2-eadavis@qq.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <0000000000007558ae061553f41b@google.com>
+References: <0000000000007558ae061553f41b@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cf30ce2e-ab70-4bbe-82ab-d687c2ea2efc@intel.com>
+Content-Transfer-Encoding: 8bit
 
-> This is something my current design supports I think. Using
-> ETHTOOL_A_MODULE_MAX_POWER_SET user can get what cage supports
-> and change it.
+If len < sizeof(opt) it will trigger oob, so take the min of them.
+
+Reported-by: syzbot+837ba09d9db969068367@syzkaller.appspotmail.com
+Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+---
+ net/bluetooth/hci_sock.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 4ee1b976678b..cee7ec1adbd2 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -1946,7 +1946,7 @@ static int hci_sock_setsockopt_old(struct socket *sock, int level, int optname,
  
-> This could be done using ethtool_module_power_mode_policy I think.
+ 	switch (optname) {
+ 	case HCI_DATA_DIR:
+-		if (copy_from_sockptr(&opt, optval, sizeof(opt))) {
++		if (copy_from_sockptr(&opt, optval, min_t(int, sizeof(opt), len))) {
+ 			err = -EFAULT;
+ 			break;
+ 		}
+-- 
+2.43.0
 
-All these 'I think' don't give me a warm fuzzy feeling this is a well
-thought out and designed uAPI.
-
-I assume you have ethtool patches for your new netlink attributes. So
-show us the real usage. Start with an SFP in its default lower power
-mode. Show us the commands to display the current status. Allocate it
-more power, tell the module it can use more power, and then show us
-the status after the change has been made.
-
-Then lower the power to that cage and assign the power to a different
-cage.
-
-This is something you can later reuse in the 0/X patch describing the
-big picture of what the patchset does, and it will guide others who
-want to implement the same API in the Linux SFP driver, or other MAC
-drivers.
-
-	Andrew
 
