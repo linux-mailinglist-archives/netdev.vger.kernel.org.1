@@ -1,175 +1,115 @@
-Return-Path: <netdev+bounces-86382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13CE489E8C8
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 06:23:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0442389E8F0
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 06:35:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49C4EB23E8A
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 04:23:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 934651F22FC9
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 04:35:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C4A48F44;
-	Wed, 10 Apr 2024 04:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89AA3BA2B;
+	Wed, 10 Apr 2024 04:35:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="kVT8cq7b"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gmgcX4go"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f194.google.com (mail-oi1-f194.google.com [209.85.167.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09EE610A03
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 04:22:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBD401396
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 04:35:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712722977; cv=none; b=sLo43T/YrcnKuTwvKm9IY38hJqO4eNm/n3kwzHJuYUZ5k4++OXThGWR1OQL8I5XfuceKjLqiFWRkxgFVUY/C1mo147Du3iAASjV5vKbAa00e08RuCfVUXW5pQLrDDHYnAoiG5KV/VZqkHAtnxX8QoXKSmF3p63dxPqjzb80Mklc=
+	t=1712723722; cv=none; b=BhoihXQbTFxM/+bRaI7VG4+BgEu78T408/V8KogO35/zFOecEM1G8mCI18PSusc4uyf1DISwEUn+UKiraTpeKV4MRlkZ9UZM4l2hhS/iyPAFJ/G5Frc0q6ZUyYKKA6lzgd6wqZtvVGwgZBF9TmHfFkr8AIaEzQkbpEVUuXb9+/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712722977; c=relaxed/simple;
-	bh=9X8K69Z9AlUuQYNsXtc2K5ZmdBKKto46xQO0C62fowo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ow/P7QdjRUUazZ9A7PYFajnKry4Z6+n5lXb36GTDcfK11eRtDQG8gOmojMhqegVkrYba+v8rAzN5eh5M87BKFMuFU+Wk8SvxU3SjTNEMb11ArLxFL1SJ5B45Fe523xt0IxuA0rYB/mu9AQaHR2bYyn9n9mIIVViolIC45X9JeFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=kVT8cq7b; arc=none smtp.client-ip=209.85.167.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
-Received: by mail-oi1-f194.google.com with SMTP id 5614622812f47-3c5f38fabcbso716861b6e.3
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 21:22:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1712722974; x=1713327774; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Nel0BDOQg9x0X/rMPJc3bspVJYDD63CLeCUabNFV1dk=;
-        b=kVT8cq7bZMHPYj+CNS23cDd+bVTHdPfExOu37ikF+EXYDVtdu/rczdSIa8U97KjAEe
-         wyYDkHGYKUMTCI02XNAhqKsczUybCd8EyedWVWd3FcqhDS68fOsB5/09q8RGeJRXf2u0
-         7+Jtr3UgDKT3w7++8WR84XOo2KgL372KIHH/Yju8wlK+QkHQld/WWLZOoV/7MEvW3jqx
-         DJz68QwmKK/X1/DBEFLlBuvRr/HUZRBZx7iCGT4Hp3Hvdq61QE6MdIoPrlYoV/NrgOnI
-         egr3TBevlZ8hFoiOnCQZyRo9lms3iBA6pQ3cY/r05Zv8a1aKesYBx1EzVdmpN3l1rpuA
-         x3xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712722974; x=1713327774;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Nel0BDOQg9x0X/rMPJc3bspVJYDD63CLeCUabNFV1dk=;
-        b=q/31Jnd9QXp2+djtG1qlhAlJAKSt7jUqqF7Y1mc8zO8F2idsnKo9R3Qtn1pO3zHGhT
-         vI8Y09PMkT+tTSHoS4wCAEYpWtbWdULZwwDJJrxTlW2EqLV129aoXogZ9+O47Q0Riel9
-         vbjlRnpQwUk7C5ix3MqigUuUOVx30olUo5qcT/IcW4UHCCzs7NLI7PKpQvarsjMOAcTz
-         M8A3ukiOBzzjfXV2PV2uFiNYBQblFTPKxCWAjba3WIoBKBl0jd93ztAnvpGcNV+RMTmq
-         3ga2wcoCa6arfDVwRNe6W2ORngBO+sLOZwiqkB6W+r+i94ENfsrn6iA0ObOgOBpZtWPg
-         vscw==
-X-Forwarded-Encrypted: i=1; AJvYcCXmvLrlkRA6llJnI9CF1FI76cDAf+zoRpqo+Fymu710bpFBOiG2uKPGSVqlEiYLFqJmuG/sFemGDepSOKEEyPPXcrzvGtvj
-X-Gm-Message-State: AOJu0YwAMuwYOQFXcE57xfXUca6Mg7YWbaT4V0wKk1pkPVq3No4moGKJ
-	krkunZIhoJEeR5IkC+/l+7rjY26E7/HDwWFM41+sNxdGO2rw6bC14ZHTvLFSf8g=
-X-Google-Smtp-Source: AGHT+IEjLSHWQzsXdB08KDkWZi4Rm+0b46QwgSQ/meOmZHKvCWbCu4ldgeOC3Wi7WtNhudyHeXaKLQ==
-X-Received: by 2002:a54:4809:0:b0:3c6:5da:1635 with SMTP id j9-20020a544809000000b003c605da1635mr1705770oij.3.1712722973485;
-        Tue, 09 Apr 2024 21:22:53 -0700 (PDT)
-Received: from localhost.localdomain ([103.172.41.206])
-        by smtp.googlemail.com with ESMTPSA id ll24-20020a056a00729800b006ed97aa7975sm1722125pfb.111.2024.04.09.21.22.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Apr 2024 21:22:53 -0700 (PDT)
-From: Lei Chen <lei.chen@smartx.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Lei Chen <lei.chen@smartx.com>,
+	s=arc-20240116; t=1712723722; c=relaxed/simple;
+	bh=GTPYWUExqaKJ1ffWv/5oel5WsLqZgzXUVtWMpIIX7Mw=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=E7OrpGr8hbgSSBy24fLc6Hc5bL4pd7yFnkxtZfl5EQkvdxfwvp+eGQGvBuIf0x+3b6lUhF56QQSQNrTZmG1wTI3lco0bWUJ8pa8Mh5TBn6sK71HdA5YI/q0BT+o3uxS074V+9e210bj8EER09FggTX5yoA/AjaOi2JFDIXIGczk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gmgcX4go; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712723720;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=lUyt2lP+iaweP7GGIQcQN2/vMQc1UDRPtDmxt5CULrM=;
+	b=gmgcX4go+d49x3tB4QofJmWMMN0vbV4390Etxaz6hcE19r7gxGgJcvdaMlsHASPSEXGRmq
+	Fhb3t2/75cGPEorX3x9YpmAEiO0q9LFL1EgFRMMUfbkKxAGIxrNz5u5HeYUM8KArlc97qV
+	kG376r4T0mDLQPe0arBzd0A7wMVG90s=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-76-xXVMCXk2OW2YAcuTvXrPhQ-1; Wed,
+ 10 Apr 2024 00:35:16 -0400
+X-MC-Unique: xXVMCXk2OW2YAcuTvXrPhQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5C1F21C0C644;
+	Wed, 10 Apr 2024 04:35:16 +0000 (UTC)
+Received: from server.redhat.com (unknown [10.72.112.217])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CC93C47B;
+	Wed, 10 Apr 2024 04:35:12 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: lulu@redhat.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] net:tun: limit printing rate when illegal packet received by tun dev
-Date: Wed, 10 Apr 2024 00:22:44 -0400
-Message-ID: <20240410042245.2044516-1-lei.chen@smartx.com>
-X-Mailer: git-send-email 2.44.0
+Subject: [PATCH v2 0/1] virtio-pci: Fix the crash that the vector was used after released
+Date: Wed, 10 Apr 2024 12:33:14 +0800
+Message-ID: <20240410043450.416752-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=y
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-vhost_worker will call tun call backs to receive packets. If too many
-illegal packets arrives, tun_do_read will keep dumping packet contents.
-When console is enabled, it will costs much more cpu time to dump
-packet and soft lockup will be detected.
+During the booting process of the Vyatta image, the behavior of the
+called function in qemu is as follows:
 
-net_ratelimit mechanism can be used to limit the dumping rate.
+1. vhost_net_stop() was triggered by guest image . This will call the function
+virtio_pci_set_guest_notifiers() with assgin= false, and
+virtio_pci_set_guest_notifiers(） will release the irqfd for vector 0
 
-PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980"
- #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
- #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
- #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
- #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
- #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
-    [exception RIP: io_serial_in+20]
-    RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
-    RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 0000000000000000
-    RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428a0
-    RBP: 0000000000002710   R8: 0000000000000004   R9: 000000000000000f
-    R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 0000000000000020
-    R13: ffffffff8acbf698  R14: 0000000000000058  R15: 0000000000000000
-    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
- #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
- #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
- #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
- #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
- #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
- #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
- #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
- #12 [ffffa65531497b68] printk at ffffffff89318306
- #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
- #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
- #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
- #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
- #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
- #18 [ffffa65531497f10] kthread at ffffffff892d2e72
- #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
+2. virtio_reset() was called -->set configure vector to VIRTIO_NO_VECTOR
 
-Signed-off-by: Lei Chen <lei.chen@smartx.com>
+3.vhost_net_start() was called (at this time, the configure vector is
+still VIRTIO_NO_VECTOR) and call virtio_pci_set_guest_notifiers() with
+assgin= true, so the irqfd for vector 0 is still not "init" during this process
 
----
-Changes from v1:
-https://lore.kernel.org/all/20240409062407.1952728-1-lei.chen@smartx.com/
- 1. Use net_ratelimit instead of raw __ratelimit.
- 2. Use netdev_err instead of pr_err to print more info abort net dev.
- 3. Adjust git commit message to make git am happy.
+4. The system continues to boot,set the vector back to 0, and msix_fire_vector_notifier() was triggered
+ unmask the vector 0 and then met the crash
+[msix_fire_vector_notifier] 112 called vector 0 is_masked 1
+[msix_fire_vector_notifier] 112 called vector 0 is_masked 0
 
- drivers/net/tun.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+To fix this, we need to call the function "kvm_virtio_pci_vector_use_one()"
+when the vector changes back from VIRTIO_NO_VECTOR.
 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 0b3f21cba552..ca9b4bc89de7 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -2125,14 +2125,16 @@ static ssize_t tun_put_user(struct tun_struct *tun,
- 					    tun_is_little_endian(tun), true,
- 					    vlan_hlen)) {
- 			struct skb_shared_info *sinfo = skb_shinfo(skb);
--			pr_err("unexpected GSO type: "
--			       "0x%x, gso_size %d, hdr_len %d\n",
--			       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
--			       tun16_to_cpu(tun, gso.hdr_len));
--			print_hex_dump(KERN_ERR, "tun: ",
--				       DUMP_PREFIX_NONE,
--				       16, 1, skb->head,
--				       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
-+
-+			if (net_ratelimit()) {
-+				netdev_err(tun->dev, "unexpected GSO type: 0x%x, gso_size %d, hdr_len %d\n",
-+				       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
-+				       tun16_to_cpu(tun, gso.hdr_len));
-+				print_hex_dump(KERN_ERR, "tun: ",
-+					       DUMP_PREFIX_NONE,
-+					       16, 1, skb->head,
-+					       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
-+			}
- 			WARN_ON_ONCE(1);
- 			return -EINVAL;
- 		}
+The reason that we don't need to call kvm_virtio_pci_vector_release_one while the vector changes to
+VIRTIO_NO_VECTOR is this function will called in vhost_net_stop(),
+So this step will not lost during this process.
 
-base-commit: fec50db7033ea478773b159e0e2efb135270e3b7
-prerequisite-patch-id: 8952e320c0272899e153c953db09446879ed0d87
-prerequisite-patch-id: 2f1e3234a4ac0bf421df2061505612538f128672
+Change from V1
+1.add the check for if using irqfd
+2.remove the check for bool recovery, irqfd's user is enough to check status
+
+Cindy Lu (1):
+  virtio-pci: Fix the crash that the vector was used after released.
+
+ hw/virtio/virtio-pci.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
+
 -- 
-2.44.0
+2.43.0
 
 
