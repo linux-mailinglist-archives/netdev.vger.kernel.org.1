@@ -1,166 +1,102 @@
-Return-Path: <netdev+bounces-86371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A288789E7F3
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 03:49:56 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DE5589E7F4
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 03:50:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DB892833A7
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 01:49:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B83CEB2165C
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 01:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B90C1854;
-	Wed, 10 Apr 2024 01:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B861FAA;
+	Wed, 10 Apr 2024 01:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="peqvizFg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D7B837C
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 01:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1032964A;
+	Wed, 10 Apr 2024 01:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712713792; cv=none; b=Dzo3k0hJwRxzeRAPuuYTRhb1+dhh0QRVeo+I8khRaovHSLK3IItyvBrTe1aCs3Nri7Lkrml/vFI9qGWk5TWzuXmflxP+HMVl6dHN4Cp3AjAece1Nn7Zc3GwXEIhzS8O4sXYLzJR5rgoknBM04ngF8ZjWq4ZILDfkT1lWJuntTzA=
+	t=1712713829; cv=none; b=sVUYbyCciamlherocGTfNzYEISq0SL2x0m/12XACj75A/0bp8kJEgR/Rdiv1y9otNHAoYqDSVk5dd/aikOLgyJ6dwbdLRh3S83RUj1NxDbh137U74at9Fxy/Yd2T0qLTZn3A4zp28a8T3Yvqq51HR801tYv9FZaRtb1lrP62aIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712713792; c=relaxed/simple;
-	bh=94qK/oVlTt4PFH+NnCa4mc3rW/S9Ooh2EVXsz/pN2yY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nr8g4Na3W69kfAkULpm6d1ZD+vJnsubHZT5VPbQmiPVSAr9zsLzlZXloBLnG4X6IDRbwkDaIlLZEd0zD9QSWlOrseKAW5ycQYbiBsIKL8NDRzkW2cxmG7vzocaoPO80tdPNvRxrY0Z3TJmgQbpRfG/tjVnn7eDC8NN+U4SX8mOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.109.80])
-	by gateway (Coremail) with SMTP id _____8Dx+7o78BVm7gwlAA--.3909S3;
-	Wed, 10 Apr 2024 09:49:47 +0800 (CST)
-Received: from [192.168.100.126] (unknown [112.20.109.80])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxTRM38BVmNQ53AA--.32543S3;
-	Wed, 10 Apr 2024 09:49:45 +0800 (CST)
-Message-ID: <6506ff6c-b5b9-43c1-804d-e1ca1029afa0@loongson.cn>
-Date: Wed, 10 Apr 2024 09:49:43 +0800
+	s=arc-20240116; t=1712713829; c=relaxed/simple;
+	bh=C7uzs+pRecO5vt0/mJMXKHRDYPy1ocmPRZF7qiuwzcU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=I6I9wMoRqfxjRbPUDtN8POQlAEXScT9rBn8gE2oTwxbFVC1Un3MdPpZM05582edF6W2gFEh9bcNga5mMfdPdnzL/fachqlPS/BHa+NOEdjI4oUoq/ALBmtPo2vj7nzVrEeLcmHemlPv/sOULkoiK8Cvu10CKIIKweev7b8WRbqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=peqvizFg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CCE9EC43390;
+	Wed, 10 Apr 2024 01:50:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712713828;
+	bh=C7uzs+pRecO5vt0/mJMXKHRDYPy1ocmPRZF7qiuwzcU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=peqvizFg2+AZZ1hTZ+ii7ZBDykemh1OdN+i0jnc8+UX/RYNgE84XGWAdhntfxmJGZ
+	 iToKsl2zFVXcgPYQ0x/WD8lCAlcAax+7bMePFOHubiGlomfppRX02XtONeyrl/pnNW
+	 nvsqBvtd+XkEV+HegrWRVzG1eIYYE3+2+WwVPTNqMc79IgF6kuylBV4+4eiMf1Ubex
+	 CTxAYiqHDGWXyPeilvolTQs4c2/JyaMFZQAdRori7S87lG5W9zM83oJkWVC9mrA8/6
+	 M3SU5b38X8t2joqmoXxfh/Obm4NmJtYNTP8VINTcwqvxvomcx7uvSjL2VpHQFaRdbO
+	 fWGb8n2paHimg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B830FC395F6;
+	Wed, 10 Apr 2024 01:50:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 6/6] net: stmmac: dwmac-loongson: Add
- Loongson GNET support
-To: Simon Horman <horms@kernel.org>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, fancer.lancer@gmail.com,
- Jose.Abreu@synopsys.com, chenhuacai@kernel.org, linux@armlinux.org.uk,
- guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com,
- siyanteng01@gmail.com
-References: <cover.1712668711.git.siyanteng@loongson.cn>
- <77daabe9ca5c62168d9e54a81b5822e9b898eeb3.1712668711.git.siyanteng@loongson.cn>
- <20240409185809.GN26556@kernel.org>
-Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <20240409185809.GN26556@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8AxTRM38BVmNQ53AA--.32543S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7KF45XF15KrW7CFW7WF1fXwc_yoW8uw1Dp3
-	98AFyYqryrXryava1qv3yUJF1YqrW2934kCw42k3Wj9asYyr9aqFy8KrW29ryxArZ3Cw4f
-	ZrW5Zrs7uF1vkagCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r4j6ryUMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
-	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8_gA5UUUUU==
+Subject: Re: [PATCH net-next v5 0/3] Minor cleanups to skb frag ref/unref
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171271382875.18237.12454972110569663249.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Apr 2024 01:50:28 +0000
+References: <20240408153000.2152844-1-almasrymina@google.com>
+In-Reply-To: <20240408153000.2152844-1-almasrymina@google.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ ayush.sawal@chelsio.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, hawk@kernel.org,
+ ilias.apalodimas@linaro.org, steffen.klassert@secunet.com,
+ herbert@gondor.apana.org.au, dsahern@kernel.org, borisp@nvidia.com,
+ john.fastabend@gmail.com, dtatulea@nvidia.com
 
+Hello:
 
-在 2024/4/10 02:58, Simon Horman 写道:
-> On Tue, Apr 09, 2024 at 10:04:34PM +0800, Yanteng Si wrote:
->
-> ...
->
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> ...
->
->> @@ -145,42 +568,37 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->>   			goto err_disable_device;
->>   		}
->>   		plat->phy_interface = phy_mode;
->> -
->> -		res.irq = of_irq_get_byname(np, "macirq");
->> -		if (res.irq < 0) {
->> -			dev_err(&pdev->dev, "IRQ macirq not found\n");
->> -			ret = -ENODEV;
->> -			goto err_disable_msi;
->> -		}
->> -
->> -		res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
->> -		if (res.wol_irq < 0) {
->> -			dev_info(&pdev->dev, "IRQ eth_wake_irq not found, using macirq\n");
->> -			res.wol_irq = res.irq;
->> -		}
->> -
->> -		res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
->> -		if (res.lpi_irq < 0) {
->> -			dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
->> -			ret = -ENODEV;
->> -			goto err_disable_msi;
->> -		}
->> -	} else {
->> -		res.irq = pdev->irq;
->>   	}
->>   
->> -	pci_enable_msi(pdev);
->>   	memset(&res, 0, sizeof(res));
->>   	res.addr = pcim_iomap_table(pdev)[0];
->>   
->> +	ld->dev = &pdev->dev;
->> +	plat->bsp_priv = ld;
->> +	loongson_gmac = readl(res.addr + GMAC_VERSION) & 0xff;
->> +
->> +	switch (loongson_gmac) {
->> +	case LOONGSON_DWMAC_CORE_1_00:
->> +		plat->setup = loongson_gnet_setup;
->> +		/* Only channel 0 of the 0x10 device supports checksum,
->> +		 * so turn off checksum to enable multiple channels.
->> +		 */
->> +		for (i = 1; i < CHANNEL_NUM; i++) {
->> +			plat->tx_queues_cfg[i].coe_unsupported = 1;
->> +		};
-> nit: '}' rather than '};'
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-OK.
+On Mon,  8 Apr 2024 08:29:55 -0700 you wrote:
+> v5:
+> - Applied feedback from Eric to inline napi_pp_get_page().
+> - Applied Reviewed-By's.
+> 
+> v4:
+> - Rebased to net-next.
+> - Clarified skb_shift() code change in commit message.
+> - Use skb->pp_recycle in a couple of places where I previously hardcoded
+>   'false'.
+> 
+> [...]
 
+Here is the summary with links:
+  - [net-next,v5,1/3] net: make napi_frag_unref reuse skb_page_unref
+    https://git.kernel.org/netdev/net-next/c/959fa5c188bf
+  - [net-next,v5,2/3] net: mirror skb frag ref/unref helpers
+    (no matching commit)
+  - [net-next,v5,3/3] net: remove napi_frag_unref
+    https://git.kernel.org/netdev/net-next/c/f58f3c956340
 
-Thanks,
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Yanteng
-
->
->> +		ret = loongson_dwmac_config_msi(pdev, plat, &res, np);
->> +		break;
->> +	default:	/* 0x35 device and 0x37 device. */
->> +		ret = loongson_dwmac_config_legacy(pdev, plat, &res, np);
->> +		break;
->> +	}
->> +
->>   	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
->>   	if (ret)
->> -		goto err_disable_msi;
->> +		goto err_disable_device;
->>   
->>   	return ret;
->>   
->> -err_disable_msi:
->> -	pci_disable_msi(pdev);
->>   err_disable_device:
->>   	pci_disable_device(pdev);
->>   err_put_node:
-> ...
 
 
