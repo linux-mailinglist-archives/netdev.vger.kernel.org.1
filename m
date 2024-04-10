@@ -1,153 +1,135 @@
-Return-Path: <netdev+bounces-86694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFDFA89FFA0
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 20:17:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9C7D89FFA5
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 20:20:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 854141F22C58
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 18:17:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 654FD286A3A
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 18:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDC3417F365;
-	Wed, 10 Apr 2024 18:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1F8417F397;
+	Wed, 10 Apr 2024 18:19:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OgoDnO7o"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kIxEOQb6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B9217BB35
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 18:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4641E17B4E6;
+	Wed, 10 Apr 2024 18:19:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712773003; cv=none; b=qcgRWaUvzgC63jeJltrQn1kWhbE6Hds86RdK1z+hyj/06rqhYokTMaKHbzhJ+tvPK+g55pYmU1nDRGuhHAnDzoKHcd73LZyLW0rfhpLaP/A8Ir1AOkriM7XPWZzHD2+/SwXT8sT09/UP+xnZbYb1ahOx8MNtOVxH1ZqTamUor+A=
+	t=1712773197; cv=none; b=GD9eNvCrDrzisIIf+ReOXN01go9KXOnspWUa0hHzmnSp8V5T1HQlMwgDyvmkQVVAoPCFX3fDnEGWW6qcIWvo2ZzkLdXEhmDTF0IYWEIwLBmWh4IfY2libYUstLS9csTRRjiUsbJE7Q88f4vXEfe3fwecumU14O1ZLgCeJ8wMYfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712773003; c=relaxed/simple;
-	bh=pO9x0IyEbfYYyhuv6Ay0cUlhwEO/Fb1/tmk8mv1J7jc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A9d4e1EqCvzNvkCRsvjtoQKjnHtWl3z4jlJ2GDVOvPCWnB2M2Z3PpC4TN8eOtLD8wHNqWYSMdgQwyPRJaic9bXbPF3ffdI3M9J2LDqAPHwWFBdT8AknVk3FUK4AvqAauE9h3/gVncMeXi92zkfdPI07Hg29rYpzzwM7c20YmC94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OgoDnO7o; arc=none smtp.client-ip=209.85.208.169
+	s=arc-20240116; t=1712773197; c=relaxed/simple;
+	bh=4LaxoFkmQwPe5fwPIktwCrCnuxyfeMUCXbjHbB/+wSk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u31HZG6EMRm/7EKv126xO7kSjjQuxzLcvbMDfIN5G56IwyCzgiCg2p5fF+eeJcbaBexaHniBU23GQgqIh5E3RZRqYp+Ou+8Q57CavmyekxshkK+8EVpyat9lx62Ra6TCVGQtnUWcLDck62Z0yGBUAUd0L7fhOB2Y01NPCvk8GNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kIxEOQb6; arc=none smtp.client-ip=209.85.221.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2d886dd4f18so43952621fa.1
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 11:16:41 -0700 (PDT)
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-343d6b55c42so5061052f8f.2;
+        Wed, 10 Apr 2024 11:19:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712773000; x=1713377800; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vnylT+ImFuAYAlZ2eTr248rzDjIWzNMC6ClpV09yqrg=;
-        b=OgoDnO7oQu98pdp3Rd59eH0vT5PZiy9FfdQ1FVyKLRGAry3qqUe0/6rYAjV8qwC1oV
-         GXNEmH3yMWZcqy5TynMnxaC3MyHdLt6NAP/b6a3HKtCx+7oNMMLZviqpF6ON2pI+kbKy
-         EOIq0RtOO64aq0WNANWHbBpViA7G03OUFTAmHlj3Ucsf+wdwoVGSe9z6Sv3wibO8MsDu
-         gQyONcZTqjGNlKOi10V/FNind6AA025mPqP+uZ/d3t+17ShwmyZbcU7qHdcYzz6paom7
-         GBrOKcuu3iYavu2eSt+SKp10UzJAqP61PDOWrTrMxzDhavBQCaiU19OxzZs3aNpZ5RYF
-         Xc1g==
+        d=gmail.com; s=20230601; t=1712773194; x=1713377994; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4LaxoFkmQwPe5fwPIktwCrCnuxyfeMUCXbjHbB/+wSk=;
+        b=kIxEOQb6GufgMVXGt2EjYV6kqbRGHa1SLS9aProgsVi0Ita0XRBRLDIzWjjZQJv5y4
+         telbaIylnoAebasm4yPFa6MFyQnlqWK5c7fCogulNeWy7fwzbWPnzWpVHHlFjnEROdbl
+         FaTUPn+qn2UKYugPLtz3Hd+eOtl6INNO/AiGA6KSz5MzuyaZTcMgTRjasovZFvDq7d1s
+         vIPgbgrOCGobBuJ+rL/NtlXKJy6N5s2UdkpbCLBnsZ52iILUYj9gTDs/7Oyixfu9bCJL
+         Zqs9Xvl2D3TQEeeUjLMBClct/eMom0NwbCpeH5OIEWFdwV+ctkJgKYSwfhv9QFshqkNP
+         L+7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712773000; x=1713377800;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vnylT+ImFuAYAlZ2eTr248rzDjIWzNMC6ClpV09yqrg=;
-        b=Djmhn611j9SRsKpAWjiJPOhwjbwnnkh31XOtHoOhJQxgSpxQLGKAINeaVH+c7+/FtX
-         t7Gb74qexUeHbAvb7crIbW2EU7oGLc6YQWWHJSJWGBpkpwZY31AqIOeOOG2XJQRtl2Mx
-         ytpPUnDwQZwa7cKAi0acfye+rppa8JUN+DZAc54JBwYxkva7m4USrMp/UMpevXG3MobV
-         NGqNtP455HwyuJTEJjHr4RzVBZcbDeGsTN3dXo2JIBuZ3T/3fB3DRg+z+wpNj3QQGmvl
-         jb7tvkQKgkwb9MfjumhCmask9oYQYjA6AmF3imXIESw3yDXJ+5Bkrdt5K0XlVfLO75Dp
-         VIVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVwcxygOkjRDi7bkqt9qBr/TS1eUHj3XI2skIJe4bUZCK0qz7JqdoNsn9GHLbepGH/H78TmeDZSZMNo5xn6YjB1Rk1Klvh/
-X-Gm-Message-State: AOJu0YzCaHBM/IXS7aIXeLAyah3HkSYNpW+5vQfX+r8YBquIfBGmdFMD
-	TWz94De5es2F269tRtWKgID2bqEhA+r8MqnHpgDAGGceiuXgDb9/
-X-Google-Smtp-Source: AGHT+IHvweHK447Y8j+0aUy9h053i9QIKVzMiLA2t0LTrql8Z5TVCaf5XuoFbqoj1ZByc/3+9RCQnA==
-X-Received: by 2002:a2e:80d8:0:b0:2d8:36ee:350d with SMTP id r24-20020a2e80d8000000b002d836ee350dmr2190193ljg.16.1712772999671;
-        Wed, 10 Apr 2024 11:16:39 -0700 (PDT)
-Received: from [172.27.56.106] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id m6-20020adff386000000b00343300a4eb8sm14209660wro.49.2024.04.10.11.16.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Apr 2024 11:16:39 -0700 (PDT)
-Message-ID: <43f4a10f-b5d1-4a1e-a765-c2324d03c6a7@gmail.com>
-Date: Wed, 10 Apr 2024 21:16:37 +0300
+        d=1e100.net; s=20230601; t=1712773194; x=1713377994;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4LaxoFkmQwPe5fwPIktwCrCnuxyfeMUCXbjHbB/+wSk=;
+        b=QnRBewXB5YD3G5jYNWOwN6DSjvxiExyhaEDx79CcaMN9MaZMS3RjpxHo+9nz12iiVE
+         S5RKfSwg+4NO+kVAQWFw4hZAuXZ60nQXhn38wU3/XhN+Q9Ca0cpZmgb8F/zYvZzgzhi8
+         v8FEZtNraTmp/F2+SmMotUTBOBkfCSf3LDGoZtOpm2bpTY1Pyp0U8SFnOJX1d2O3KWGx
+         oCRsJWJNrIvNvpvpwamkhkXp09En31tDImoPk5yG0A89ZERVXuQ6bJuKIKLLhDyjjG3J
+         4ViotXqi+dhZLs2Q4tTKE2UIsCkopklzyquElu+x0kM5AOHqzL8ObBqCzAUq1myq0i1k
+         ua+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVIUEZYvounv7ozfzPpMd2gd9BSfe4npZktTBbnEMiVVgSNx10aUGlI+nGHGSHLBW/GFOEtAkQCNLb8PIbWv3ku+WBMbBxKu/SVWMwfR4w3/LPNACqW1C5+55bfIcV6U4Nk5PLydvsDPrYb9EB8yz+GB/kjBePBm0DxtRnBOLAB
+X-Gm-Message-State: AOJu0YxHT2RJJ73d4tASRy+XYjtoo7et3GjCjy6wwsCk2xxzlxTr9SiK
+	WWM7PWRlv46pz6K1Fr+5BNo4UWZUNUE5ZWrIpebyC3H05x8auM3Cjckg4BjRuy3nQ8cPjmAevR6
+	cTlCAuTYHyWVKgpXNLCaIm0ANR90=
+X-Google-Smtp-Source: AGHT+IE7CylsTqdzSF2Bzjl85NlbYY5eOLUFjOWjSVdCeNlEle2uCuzBN0OwDrWEG4LT5ER3gmDyq8Y4yOzn5uaO/Rs=
+X-Received: by 2002:a5d:53ce:0:b0:343:7032:7283 with SMTP id
+ a14-20020a5d53ce000000b0034370327283mr3224766wrw.8.1712773194553; Wed, 10 Apr
+ 2024 11:19:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net V2 12/12] net/mlx5: SD, Handle possible devcom ERR_PTR
-To: Dan Carpenter <dan.carpenter@linaro.org>, Tariq Toukan <tariqt@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
- Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
- Leon Romanovsky <leonro@nvidia.com>
-References: <20240409190820.227554-1-tariqt@nvidia.com>
- <20240409190820.227554-13-tariqt@nvidia.com>
- <ebf275e7-f986-436d-b665-3320a04eb83e@moroto.mountain>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <ebf275e7-f986-436d-b665-3320a04eb83e@moroto.mountain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240407130850.19625-1-linyunsheng@huawei.com>
+ <20240407130850.19625-13-linyunsheng@huawei.com> <b5c5866e626f6c90657a32b5e9adff724d5896db.camel@gmail.com>
+ <c1f5a78a-3040-0cc7-f113-d5ec82c6010f@huawei.com> <CAKgT0UfZBGEVJa1O7cdNt6zy_EEPoGo=aW6ugRKy8a44qg0j8w@mail.gmail.com>
+ <09d7d59b-9da3-52f7-b039-acd0344c88c8@huawei.com> <20240409062504.26cfcdde@kernel.org>
+ <CAKgT0UfqDRxhUyfQhwsDrRhQmCw4qNw_7Jwq+xN1Z4f6_1Bthg@mail.gmail.com> <6517b5ae-e302-4cbe-8a4c-716e604822ce@redhat.com>
+In-Reply-To: <6517b5ae-e302-4cbe-8a4c-716e604822ce@redhat.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Wed, 10 Apr 2024 11:19:17 -0700
+Message-ID: <CAKgT0UcAw8tENoS7r2YYV2vQ562PPUcgQwfJXhzi8aS+ujZEYA@mail.gmail.com>
+Subject: Re: [PATCH net-next v1 12/12] mm: page_frag: update documentation and
+ maintainer for page_frag
+To: David Hildenbrand <david@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org, 
+	linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Wed, Apr 10, 2024 at 9:06=E2=80=AFAM David Hildenbrand <david@redhat.com=
+> wrote:
+>
+> On 09.04.24 17:11, Alexander Duyck wrote:
+> > On Tue, Apr 9, 2024 at 6:25=E2=80=AFAM Jakub Kicinski <kuba@kernel.org>=
+ wrote:
+> >>
+> >> On Tue, 9 Apr 2024 15:59:58 +0800 Yunsheng Lin wrote:
+> >>>> Just to be clear this isn't an Ack, but if you are going to list
+> >>>> maintainers for this my name should be on the list so this is the
+> >>>> preferred format. There are still some things to be cleaned up in th=
+is
+> >>>> patch.
+> >>>
+> >>> Sure, I was talking about "Alexander seems to be the orginal author f=
+or
+> >>> page_frag, we can add him to the MAINTAINERS later if we have an ack =
+from
+> >>> him." in the commit log.
+> >>
+> >> Do we have to have a MAINTAINERS entry for every 1000 lines of code?
+> >> It really feels forced :/
+> >
+> > I don't disagree. However, if nothing else I think it gets used as a
+> > part of get_maintainers.pl that tells you who to email about changes
+> > doesn't it? It might make sense in my case since I am still
+> > maintaining it using my gmail account, but I think the commits for
+> > that were mostly from my Intel account weren't they? So if nothing
+> > else it might be a way to provide a trail of breadcrumbs on how to
+> > find a maintainer who changed employers..
+>
+> Would a .mailmap entry also help for your case, such that the mail
+> address might get mapped to the new one? (note, I never edited .mailmap
+> myself)
 
+Not sure. My concern is that it might undo the existing tracking for
+contributions by employer as I know they use the emails for the most
+basic setup for that. I suppose that is one downside of being a job
+hopper.. :-P
 
-On 10/04/2024 16:24, Dan Carpenter wrote:
-> On Tue, Apr 09, 2024 at 10:08:20PM +0300, Tariq Toukan wrote:
->> Check if devcom holds an error pointer and return immediately.
->>
->> This fixes Smatch static checker warning:
->> drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c:221 sd_register()
->> error: 'devcom' dereferencing possible ERR_PTR()
->>
->> Fixes: d3d057666090 ("net/mlx5: SD, Implement devcom communication and primary election")
->> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
->> Link: https://lore.kernel.org/all/f09666c8-e604-41f6-958b-4cc55c73faf9@gmail.com/T/
->> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
->> Reviewed-by: Gal Pressman <gal@nvidia.com>
->> ---
->>   drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
->> index 5b28084e8a03..adbafed44ce7 100644
->> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
->> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
->> @@ -213,8 +213,8 @@ static int sd_register(struct mlx5_core_dev *dev)
->>   	sd = mlx5_get_sd(dev);
->>   	devcom = mlx5_devcom_register_component(dev->priv.devc, MLX5_DEVCOM_SD_GROUP,
->>   						sd->group_id, NULL, dev);
->> -	if (!devcom)
->> -		return -ENOMEM;
->> +	if (IS_ERR_OR_NULL(devcom))
->> +		return devcom ? PTR_ERR(devcom) : -ENOMEM;
-> 
-> Why not just change mlx5_devcom_register_component() to return
-> ERR_PTR(-EINVAL); instead of NULL?  Then the callers could just do:
-> 
-> 	if (IS_ERR(devcom))
-> 		return PTR_ERR(devcom);
-> 
-> We only have a sample size of 4 callers but doing it in this
-> non-standard way seems to introduce bugs in 25% of the callers.
-> 
-> regards,
-> dan carpenter
-> 
-> 
-
-Hi Dan,
-
-Touching mlx5_devcom_register_component() as a fix for commit 
-d3d057666090 ("net/mlx5: SD, Implement devcom communication and primary 
-election") doesn't look right to me.
-In addition, I prefer minimal fixes to net.
-
-After this one is accepted to net, we can enhance the code in a followup 
-patch to net-next.
-
-Regards,
-Tariq
+I'd rather not make more work for someone like Jon Corbet or Jakub who
+I know maintain statistics based on the emails used and such.
 
