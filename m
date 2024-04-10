@@ -1,100 +1,99 @@
-Return-Path: <netdev+bounces-86353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9500389E6F1
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 02:39:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DDA989E6F9
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 02:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD1181C210AB
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 00:39:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 325892839C1
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 00:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A46337C;
-	Wed, 10 Apr 2024 00:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC0EA38F;
+	Wed, 10 Apr 2024 00:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lgDGr5W+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V28Z7BJM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA4919E;
-	Wed, 10 Apr 2024 00:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8300B389;
+	Wed, 10 Apr 2024 00:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712709591; cv=none; b=PikxkSgMfBiQvDNnlAqywjRTPn5kWJy38cf2g4PfeqYErxs6YyUKwL4+LFEOS5gC5Bn1JH0s/sFM6kso1WfOFRHFdZXYD5m9RPUuKzWgmJhAfk5MP0JyeS1Hue4mT+jJIHvsemPz8Py3phZr68slwhHTQbc0Be/qalvAOmK8TGc=
+	t=1712709629; cv=none; b=eIzWIOcS1K4YhfZM4RW4d6Bl95dSr42nw1Gx6IzcGayNjmTqSOzndx5w1nIIRJvz1ppDhEIXWk0sLqWyqo9iBqM/UAkQqftCz2f7Fqmup0sOtunC33fNc8/M4XI7QutkJwsYoflgmFET63MKVW4vxkb+ssZnuKUT11HHw+2OZ7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712709591; c=relaxed/simple;
-	bh=rPIGcmKkaKL77xy0kE1sS+HitVg+d/OiK8zkBdMTGF4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LSmq3q9iwMgpVM4VjOjwSh1waNTUPGcesNnDC95PabPRRlpD9E9UpH78CZB/rtqKYfxhLrWyr3/2lx1fYhmy7TIxGkQ33nwEVd+UDQ8vuOUflLbAB+LiQfhNgdALoyOYyRgOAAbUsT05rvWonyVLORIx86A74ZU3v5KBPGCaGgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lgDGr5W+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05537C433F1;
-	Wed, 10 Apr 2024 00:39:49 +0000 (UTC)
+	s=arc-20240116; t=1712709629; c=relaxed/simple;
+	bh=aUA1ELwfLCjzbEMadjR63fa0VXR/DbucV3JFWkjrQFw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ZUtvIOGbr9l7298yI6js9Orxu+2d5YHPVTJSgH96R04o8A8d8eWpl77Y6QMlu12389Jyn3yIsqsbFUQuYWLdr3VDXMJej7fKVtVYmKx+ZCeCR2OdL4srSiG6SUd6t70dPa1fEKXVQoh3DMrn1w2zdNW/gBYK74Y0M1dcZoyy/q4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V28Z7BJM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 57EA2C43394;
+	Wed, 10 Apr 2024 00:40:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712709591;
-	bh=rPIGcmKkaKL77xy0kE1sS+HitVg+d/OiK8zkBdMTGF4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lgDGr5W+S1Mo/vVh51AzT36WYsN43KOdv2HUfV5OeoOGAeleNf+qD1QCKnVmw0f0U
-	 KO/r9TUZ8143nBmmM0Qm0kfLSuNPR+q603FcX4WKnZ9O2zPhGlRLyZk9ouI3oEE2u+
-	 xS4V4CtN5844T1z0xi98+DiGzT+tVt6J9U0tn83SkLMJlJBqb8J70g1FlMh3BnZk1t
-	 PFyuwjn9p18IQ3bR9TgpM4o/aAIY9pOiY2znYey78v9rqgcBeo9vq8WCC/pnMi2gxg
-	 TMgOlogCc1vvBqYyXQZzoy3ij/wFam0X+B4vIoxFbJH+PSXVmgCcnY4V7cUgtU0Uy/
-	 ZcEuE+smnLljw==
-Date: Tue, 9 Apr 2024 17:39:48 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Julien Panis <jpanis@baylibre.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
- <linux@armlinux.org.uk>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Sumit Semwal
- <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
- <christian.koenig@amd.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
- <andrew@lunn.ch>, Ratheesh Kannoth <rkannoth@marvell.com>, Naveen
- Mamindlapalli <naveenm@marvell.com>, danishanwar@ti.com,
- yuehaibing@huawei.com, rogerq@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org
-Subject: Re: [PATCH net-next v8 2/3] net: ethernet: ti: Add desc_infos
- member to struct k3_cppi_desc_pool
-Message-ID: <20240409173948.66abe6fa@kernel.org>
-In-Reply-To: <20240223-am65-cpsw-xdp-basic-v8-2-f3421b58da09@baylibre.com>
-References: <20240223-am65-cpsw-xdp-basic-v8-0-f3421b58da09@baylibre.com>
-	<20240223-am65-cpsw-xdp-basic-v8-2-f3421b58da09@baylibre.com>
+	s=k20201202; t=1712709629;
+	bh=aUA1ELwfLCjzbEMadjR63fa0VXR/DbucV3JFWkjrQFw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=V28Z7BJMRVulMpngZvE+E8t16lG7IXYvI8NGZrVmTTcmOwbAomMF9CzsZf0t0DPtk
+	 cEbOLP1FGxCvne9i155pmWUWhthj8q7K0hcMcTsn/vcwbEGSBSGCuXWjaaTq4W4BAe
+	 tNRa0cbVutWCEC4xlSPPROtWbahZDUT6410OyacZHIfRbBvF51k8z9VNUP6X13tD1d
+	 3Iozb4yeawq81M77JPxgZDMo5yS8kU0TW0rbh/6YhnhNWlCJm7UN6xNCVSPuSdg/i+
+	 ADureUYvmG8xYj5A3hEKO0bIn1ZdVhNzrx9qtI37XzttrLwHkSqS4X0Xa3y7bg3oua
+	 +wF4DCPjTyXnA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 415B3C395F6;
+	Wed, 10 Apr 2024 00:40:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] net: sched: cake: Optimize the number of function
+ calls and branches in heap construction
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171270962926.13694.12417499918923919527.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Apr 2024 00:40:29 +0000
+References: <20240408174716.751069-1-visitorckw@gmail.com>
+In-Reply-To: <20240408174716.751069-1-visitorckw@gmail.com>
+To: Kuan-Wei Chiu <visitorckw@gmail.com>
+Cc: toke@toke.dk, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, jserv@ccns.ncku.edu.tw, cake@lists.bufferbloat.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Mon, 08 Apr 2024 11:38:03 +0200 Julien Panis wrote:
->  		goto gen_pool_create_fail;
->  	}
->  
-> +	pool->desc_infos = kcalloc(pool->num_desc,
-> +				   sizeof(*pool->desc_infos), GFP_KERNEL);
-> +	if (!pool->desc_infos) {
-> +		ret = -ENOMEM;
-> +		dev_err(pool->dev,
-> +			"pool descriptor infos alloc failed %d\n", ret);
+Hello:
 
-Please don't add errors on mem alloc failures. They just bloat the
-kernel, there will be a rather large OOM splat in the logs if GFP_KERNEL
-allocation fails.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> +		kfree_const(pool_name);
-> +		goto gen_pool_desc_infos_alloc_fail;
-> +	}
-> +
->  	pool->gen_pool->name = pool_name;
+On Tue,  9 Apr 2024 01:47:16 +0800 you wrote:
+> When constructing a heap, heapify operations are required on all
+> non-leaf nodes. Thus, determining the index of the first non-leaf node
+> is crucial. In a heap, the left child's index of node i is 2 * i + 1
+> and the right child's index is 2 * i + 2. Node CAKE_MAX_TINS *
+> CAKE_QUEUES / 2 has its left and right children at indexes
+> CAKE_MAX_TINS * CAKE_QUEUES + 1 and CAKE_MAX_TINS * CAKE_QUEUES + 2,
+> respectively, which are beyond the heap's range, indicating it as a
+> leaf node. Conversely, node CAKE_MAX_TINS * CAKE_QUEUES / 2 - 1 has a
+> left child at index CAKE_MAX_TINS * CAKE_QUEUES - 1, confirming its
+> non-leaf status. The loop should start from it since it's not a leaf
+> node.
+> 
+> [...]
 
-If you add the new allocation after this line, I think you wouldn't
-have to free pool_name under the if () explicitly.
+Here is the summary with links:
+  - [net-next,v2] net: sched: cake: Optimize the number of function calls and branches in heap construction
+    https://git.kernel.org/netdev/net-next/c/d034d02de882
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
