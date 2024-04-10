@@ -1,120 +1,128 @@
-Return-Path: <netdev+bounces-86532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B40B89F1FE
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 14:25:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E783589F278
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 14:39:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5D9F1F22AB9
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 12:25:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32EB1B25703
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 12:39:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C96D15B14E;
-	Wed, 10 Apr 2024 12:24:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B7B015B979;
+	Wed, 10 Apr 2024 12:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kz/0yk2P"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Br9Qs7mP"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7521415E219;
-	Wed, 10 Apr 2024 12:24:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C87815B577
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 12:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712751888; cv=none; b=Pww3n9DOQRZbViFUswNQsGFmjSPMZsYRgrLuNo2vA0gVw68e3Ar+NkpFWnYr4QJgWJ3PoxDTefJI+M3HS2F9h599uHSYEGqiOGqZup8YhQ5ybH31tj8Tj3RbPsiHwWd0EhN8vYF7ZeF4BvnWcNDzoorNz3FSxRjjpFOxTKPVeHE=
+	t=1712752637; cv=none; b=hvFakRVtWjQ8ZUNEXsAnETA9GiS1BlL8ZnRxPycV5hGnbhQt/XmpOmuoNJnarhzKVFklrNV10KBMG7iQND4e/GNSoSTYBHaIAwch/JDX/nbOqibmNYEDyOCsyavsXv36GJjrVf0UesLlb3VHpDPZItaQWUMQ1069nwT5ZSy0KjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712751888; c=relaxed/simple;
-	bh=C6TTaj8C3gGDyMgcwpzgLzOx1oB8jniHUKHvI6XaAHM=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=VRTUhhmYEOxbuvblwYYCvpmSJj8oXj5ljwEV8zPw4eESQaBv9/A42KJwgQwQI9/4YqsxwWimkDmuhUwcy/ONyX193zJLIMIu5ohR3oRQA5fS3nM3iWBFB1GITPwcPer0j94MwsQY77McfBS7rMhIWqVagXJJXoL5ChhmX0Cj2TY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kz/0yk2P; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 68EDD1C0002;
-	Wed, 10 Apr 2024 12:24:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1712751883;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l3ws31mOJD6WJ5PiqoLqg0x1rdfJP9Z5AmhmFZmsojA=;
-	b=kz/0yk2P0u15uvLO3V2bIiiBeyKMosuhBgHxZkWris1gH74OkoU5jCPXSknQz1fwnbqCjo
-	WU93j8pFtyf1I68J1uRLHRNfAg5gHZOVcMlMzHVsVuI0NHrTx8HflyI9e+u4/KSZym1ID/
-	dLY1ynmBrfb0tNGPH9M0ukL+GBN7W+zJIfMTRlKVe+QSU7q152nT7Stn4Lg2mBWWFD4IAz
-	is0Ld37Wwxu3wR4M4tX6oiZtMUnmBiv5xa+BA5V0S6lyrm4TKrsHU9+Xh30ivTw3v9rkKM
-	KjmEQ3u/Z+jx+Z9jJ5DewvT9iMBn+e0lu7mg7yh+wHeLPrLuMrtg83iOywZIEQ==
-Date: Wed, 10 Apr 2024 14:25:18 +0200 (CEST)
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-cc: Romain Gantois <romain.gantois@bootlin.com>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-    Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-    Conor Dooley <conor+dt@kernel.org>, 
-    Geert Uytterhoeven <geert+renesas@glider.be>, 
-    Magnus Damm <magnus.damm@gmail.com>, 
-    Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-    Jose Abreu <joabreu@synopsys.com>, 
-    Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-    Russell King <linux@armlinux.org.uk>, 
-    =?ISO-8859-15?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>, 
-    Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
-    devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-    linux-renesas-soc@vger.kernel.org, 
-    linux-stm32@st-md-mailman.stormreply.com, 
-    linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next v2 4/5] net: stmmac: add support for RZ/N1
- GMAC
-In-Reply-To: <CAMuHMdX-F8LXWx=Ras4f+Dt_r485HKjRDLydDXZsnZBW8HJzxw@mail.gmail.com>
-Message-ID: <9bd8eee4-952d-d5b2-c462-45c1466c54d6@bootlin.com>
-References: <20240409-rzn1-gmac1-v2-0-79ca45f2fc79@bootlin.com> <20240409-rzn1-gmac1-v2-4-79ca45f2fc79@bootlin.com> <CAMuHMdX-F8LXWx=Ras4f+Dt_r485HKjRDLydDXZsnZBW8HJzxw@mail.gmail.com>
+	s=arc-20240116; t=1712752637; c=relaxed/simple;
+	bh=xRrHyW4X9SdDAi+dFNHUCGkbj81z5Sq4E+V0suXtta4=;
+	h=Message-ID:Date:MIME-Version:To:From:Cc:Subject:Content-Type; b=AjCRXCCJ4o46eL6FgH/1yfC8jvMfsLNx+PIL6l7j85b68fMvYDLzII/gxLHm0u3jS/QDni+0LxP3kGdD/TQ4OU+k5WXL8+QxHiX4Q/X3yjVA4UyZnQewikPFh6q3J2ZoW6qwSQZGoSoJVBXkdSJ403OzZ/UvJuFEzT7rG35Ty4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Br9Qs7mP; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43ACavQG002215;
+	Wed, 10 Apr 2024 12:37:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : from : cc : subject : content-type :
+ content-transfer-encoding; s=pp1;
+ bh=6lUBT9ZLl1zd6q9c5X1BlPbztVlwrFiCW8Y9wFzZfoU=;
+ b=Br9Qs7mPRC8daLePgQi5ck3NkZ1+qRt2E4qL3woV3X3tP/pu4wllD8ep9yLYjaOVRROM
+ wrg2B1ThPfWPOeD8hRRQqvXnl931Jr7LXVKIKD8Yj9odyJQ2g6zZ9TNfNXQXDYbDa+Pb
+ VuUK7Kx7+KUGAmmt77M/JGn+sXM/KlHyQZ/DQm0wpdkT35OvZR1CKLxvFBTJWMnMpwyW
+ Wpb8mdvoqMPxJFyntKeVd6WzViF7vXyWS9DfBxXXr0aU9kiYlMOUL0N/QO1y8stFnvvj
+ +eU6SkB4omfnwvabMLSz7yBATEHq1c87PPXEt/1kg8cIKncC8wZK2RkSap0Z9RtjydWd IQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xdt5003hh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Apr 2024 12:37:09 +0000
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43ACb9sF003511;
+	Wed, 10 Apr 2024 12:37:09 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xdt5003fd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Apr 2024 12:37:09 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43AAN9uF022627;
+	Wed, 10 Apr 2024 12:33:16 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xbhqp4pw8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Apr 2024 12:33:16 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43ACXDxO26542458
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 10 Apr 2024 12:33:16 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AF22858062;
+	Wed, 10 Apr 2024 12:33:13 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 609A95806B;
+	Wed, 10 Apr 2024 12:33:10 +0000 (GMT)
+Received: from [9.43.108.21] (unknown [9.43.108.21])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 10 Apr 2024 12:33:09 +0000 (GMT)
+Message-ID: <c02a14f9-670c-42be-bf27-7d788575e3c9@linux.vnet.ibm.com>
+Date: Wed, 10 Apr 2024 18:03:08 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="1582177605-1727822458-1712751921=:538696"
-X-GND-Sasl: romain.gantois@bootlin.com
+User-Agent: Mozilla Thunderbird
+Content-Language: en-GB
+To: hkallweit1@gmail.com, davem@davemloft.net, andrew@lunn.ch, lukas@wunner.de
+From: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
+Cc: netdev@vger.kernel.org, abdhalee@linux.vnet.ibm.com,
+        mputtash@linux.vnet.com, sachinp@linux.vnet.com
+Subject: [netdev/net]Kernel Compliation Fails on PowerPC
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: iTTd5vEY6Yhn7UC2VpkAyFKIrbLLAez3
+X-Proofpoint-ORIG-GUID: UGxLhbb7hxhZnFeXITGEks3pvr_pj0vf
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-10_04,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 mlxscore=0
+ bulkscore=0 adultscore=0 malwarescore=0 clxscore=1011 suspectscore=0
+ priorityscore=1501 mlxlogscore=562 phishscore=0 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404100091
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Greetings!!!
 
---1582177605-1727822458-1712751921=:538696
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
 
-Hi Geert,
 
-On Tue, 9 Apr 2024, Geert Uytterhoeven wrote:
+I see kernel compliation fails with below error, on PowerPC.
 
-> > +config DWMAC_RZN1
-> > +       tristate "Renesas RZ/N1 dwmac support"
-> > +       default ARCH_RZN1
-> 
-> Why default to enabled?
-> 
-> > +       depends on OF && (ARCH_RZN1 || COMPILE_TEST)
 
-The kernel doc states this as one of the possible cases where setting default 
-y/m makes sense:
+ERROR: modpost: "r8169_remove_leds" 
+[drivers/net/ethernet/realtek/r8169.ko] undefined!
+make[2]: *** [scripts/Makefile.modpost:145: Module.symvers] Error 1
+make[1]: *** [/home/linux_src/linux/Makefile:1871: modpost] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
 
-```
-Sub-driver behavior or similar options for a driver that is “default n”. This 
-allows you to provide sane defaults.
-```
+After reverting the below patch, compilation is successful.
 
-In the case of DWMAC_RZN1, it is a suboption of stmmac which is "default n", and 
-I think it makes sense to enable the RZN1 ethernet controller driver if both the 
-stmmac driver and the RZN1 architecture were explicitely selected.
+Commit ID: 19fa4f2a85d777a8052e869c1b892a2f7556569d
 
-Best Regards,
+r8169: fix LED-related deadlock on module removal
 
--- 
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
---1582177605-1727822458-1712751921=:538696--
+Regards,
+
+Venkat.
+
 
