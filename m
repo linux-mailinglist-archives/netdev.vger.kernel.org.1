@@ -1,144 +1,169 @@
-Return-Path: <netdev+bounces-86608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B94489F904
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:58:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE3CD89F936
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 16:03:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE2371F2D079
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 13:58:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE7F0B29D2E
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 13:59:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D408015EFBA;
-	Wed, 10 Apr 2024 13:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D0115EFC8;
+	Wed, 10 Apr 2024 13:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ZrTQ2QM8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CHd8WYs6"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5CA15E80D;
-	Wed, 10 Apr 2024 13:54:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B5D15E5B1;
+	Wed, 10 Apr 2024 13:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712757260; cv=none; b=qrBz6UvqRyW81E2MfcGoGvVgX8MgIiw/XefT2JZpBYNAMAp5VUKhZtnjlg8hPyZ68id6WkXlt7PJ60jH0npPxq7jcp4m4wcqR/gdTGj8gdwow1PYGyNNDfmpN7vx98POHVpzspFy5RIJhM6oKcJ2GpkTRpO6EPzRChuA35n0XmU=
+	t=1712757361; cv=none; b=eQpsKCZsY6YlYJd01GgdmvE6XffJO0TqfRnmWLFatcDjMz+6nHLX1H6wGP8OW+WalNDC+OfZwJaxmA//+YSV37bipfafNzmc16XeMZLBESsiCgMgLN9nq0sA0OC4myaw5nFpzAOrdzCBQR1kOrIcyfr80PN3hNp+Nr6+hvbw1uY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712757260; c=relaxed/simple;
-	bh=qXgUkN/ZVhwE3W9k+C8UdVjBcT37D8ecxyft3UoOeCQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o8+BJHdBUBscO9hvm7snJrv3QU+MjshPeW7Cu1+fnrLDnKGXU8JDteBD0+C3wbJVxe6l7dYietervG8ycwV5X+pmMwDt0MrZBouqzTpjDx4+rgMO294PLQF9AMhaXKN+w7kLwZWHZv1zjo2cLASKXKn0LhpZrVUzjuhR2vP/bCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ZrTQ2QM8; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 1B17C60008;
-	Wed, 10 Apr 2024 13:54:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1712757255;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JCEBE0ZN4OCzSX6TY382vI7qZ2HEUdWjDQGoDSCw+Mg=;
-	b=ZrTQ2QM8b0VdoGlNRf/5eqC2AbdRaW74M5OQka9hEkmseL0pW75UoGr7nDzC31/bniRwlT
-	K5ut/65XW1lIb10ii2zpJwlcLDzXAGTLbbxW550BvAS6ecdr5dbQlo7JUR0jEPzNjD6ZOs
-	h9msQpN31KtZ9QrOoXMd8jleKxGTRrKkyQ1o7CCDpPxTWmNY8kb4flCKy1sMY6kp7UvwuN
-	XnEmU/nHtKCR/hcwsRehON9JO1MWFIcgksg2NY/R00R/EPKEcSqdTBQzoZ/o3gBARAgagB
-	WhYuV0AkR9NqfEzUqVtXH0Qat/EcR3wF5o29xJrOw7JZNctyzYEUW84OPN0G8Q==
-Date: Wed, 10 Apr 2024 15:54:12 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Jakub Kicinski <kuba@kernel.org>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Radu Pirea
- <radu-nicolae.pirea@oss.nxp.com>, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
- Gospodarek <andy@greyhouse.net>, Nicolas Ferre
- <nicolas.ferre@microchip.com>, Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jonathan Corbet
- <corbet@lwn.net>, Horatiu Vultur <horatiu.vultur@microchip.com>,
- UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, Maxime Chevallier
- <maxime.chevallier@bootlin.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
- Alexandra Winter <wintera@linux.ibm.com>
-Subject: Re: [PATCH net-next v10 07/13] net: Add struct
- kernel_ethtool_ts_info
-Message-ID: <20240410155412.2f34a117@kmaincent-XPS-13-7390>
-In-Reply-To: <ZhZkNEYnY3FV7Q8E@shell.armlinux.org.uk>
-References: <20240409-feature_ptp_netnext-v10-0-0fa2ea5c89a9@bootlin.com>
-	<20240409-feature_ptp_netnext-v10-7-0fa2ea5c89a9@bootlin.com>
-	<20240409182725.139856d5@kernel.org>
-	<20240410101200.0178e594@kmaincent-XPS-13-7390>
-	<ZhZkNEYnY3FV7Q8E@shell.armlinux.org.uk>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1712757361; c=relaxed/simple;
+	bh=2itrPDvQqyqeFaRt8NzSdpPSErUeSETmFVRFFPor3nM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CU2fLXInLjPJiD+znsdyfery0mb8w64D7E7eduvSjmV7M5ZE7uGjwtoLgW9uOVxhaZXc+p48bCF9Xb7Wq0dc/y1LT+zJNquPce2WJUwyCHDnCTvzOx8lu1sY4HKc3PZDM0aWEyS9b1VveKZhEQzQi1IDHtUt7mj2DOm3COlsSFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CHd8WYs6; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a51c8274403so480979466b.1;
+        Wed, 10 Apr 2024 06:55:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712757358; x=1713362158; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QWQlsDTYX7kv+ayRisA7/g7aN7I7JCIFXwuugQXW9Og=;
+        b=CHd8WYs6Ro+q9v9z+VX7FL8HXhr96QPA3+Wh2yLaNKH1g2CfP+FUfUIslGJmvtJrnX
+         IQxJ2OG7fm+q6pbtCk1iEY3suJSLiE6G71tAmBM+yVJnoyJ5k9O33yfUBUBETxeeUHIk
+         jYowLTPTaIaL8WidmD5q9doFh5FLSIecEeyqxLWQcyMmXYD2wDrSugAXfWZcdevyCFGN
+         JKa45mQtr1wrSqIzwF04/e/J3h3FDoqcyF95UT6zKSgCP15lY5ScQqvGY/JugUhteI3C
+         s+0JyqNCrXC/WQsr2YSMk1SGUmTOmGehC572B4pWzYtVdB5mQcvAHa/VCc3itPhqmy75
+         qq7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712757358; x=1713362158;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QWQlsDTYX7kv+ayRisA7/g7aN7I7JCIFXwuugQXW9Og=;
+        b=lJbU935UyOX2LWjUVmpqE/lR9vdgCluGTELZIVHeP0lQJO988JfrIv6i/RYALjtace
+         F3rFceDTvX/ODjwr8m99bE+raksqa87B8OBeDqBTfD0yyeITwcIwSi5HMd0gwLmby0ey
+         I/hpdpXeh8XZHQnYrex3Vc51lp3fpDxJvg7FjcAjG7SOLLtBq4Lg1ZxJPtJGXbZYkm3T
+         id8S7Zc30hKlpL82ZVKFcgtREuMWZuoPAwF1vGh/CoKuHnaOqjrTQeRDcFa9Ufs8fzeW
+         pRpj2/yJon9vo0buKSt+I6cOmhnY4EHMFIYPvFfDAEk1boC0kCD9tChMEG8SqgEc5ChA
+         Ezbg==
+X-Forwarded-Encrypted: i=1; AJvYcCUYcdaNd7Id8/SWPATAGWRYti6Uf5wb+SoaMGTFtrofbfgbRh9lT1ps2WQ2B0uvYOOAZM/Aav6wWqEbYMn4u7q7by3FcBllcoJ/a/Uidemms+xbTnpNiNyRp0U4Ugdh1ufQJdTe6SBnGJdz
+X-Gm-Message-State: AOJu0YwJlualjYCPQ2b1F6YxwvdysnbIMyhWBL8k7IVPwK8BwMALN4nn
+	NWPXqGmxDzIpKQRZ2JYvG1A1pO7Q7AYBC+T3eAKhNC2xiooXqfHiktqZwqSJe+vfW+kS+9mFZNM
+	sttJvT6Y0gzsAtGK5AQNNgXBAl2c=
+X-Google-Smtp-Source: AGHT+IENVXsgKB+31fO+svP4FXBa8f0BYNY349jc/+9Z5zgvSx/G+YkJ/+z+Q4TwbSXYF7YRjy0MwLX/L1AUCXb3Tl8=
+X-Received: by 2002:a17:906:1b4a:b0:a51:dc1f:a44b with SMTP id
+ p10-20020a1709061b4a00b00a51dc1fa44bmr1604044ejg.29.1712757358225; Wed, 10
+ Apr 2024 06:55:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20240409100934.37725-1-kerneljasonxing@gmail.com>
+ <20240409100934.37725-3-kerneljasonxing@gmail.com> <171275126085.4303.2994301700079496197@kwain>
+ <CAL+tcoCk_RTp6EBiRQ96nrdN7cuY1z+zxzxepyar4nXEJkAB9A@mail.gmail.com> <171275527215.4303.17205725451869291289@kwain>
+In-Reply-To: <171275527215.4303.17205725451869291289@kwain>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 10 Apr 2024 21:55:21 +0800
+Message-ID: <CAL+tcoBpAOhbLC5TqwMBG6Q3hgiJYSV+ZAkZfLPNmG_OK22r1A@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/6] rstreason: prepare for passive reset
+To: Antoine Tenart <atenart@kernel.org>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	geliang@kernel.org, kuba@kernel.org, martineau@kernel.org, 
+	mathieu.desnoyers@efficios.com, matttbe@kernel.org, mhiramat@kernel.org, 
+	pabeni@redhat.com, rostedt@goodmis.org, mptcp@lists.linux.dev, 
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Wed, 10 Apr 2024 11:04:36 +0100
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+On Wed, Apr 10, 2024 at 9:21=E2=80=AFPM Antoine Tenart <atenart@kernel.org>=
+ wrote:
+>
+> Quoting Jason Xing (2024-04-10 14:54:51)
+> > Hi Antoine,
+> >
+> > On Wed, Apr 10, 2024 at 8:14=E2=80=AFPM Antoine Tenart <atenart@kernel.=
+org> wrote:
+> > >
+> > > Quoting Jason Xing (2024-04-09 12:09:30)
+> > > >         void            (*send_reset)(const struct sock *sk,
+> > > > -                                     struct sk_buff *skb);
+> > > > +                                     struct sk_buff *skb,
+> > > > +                                     int reason);
+> >
+> > > what should be 'reason' harder. Eg. when looking at the code or when
+> > > using BTF (to then install debugging probes with BPF) this is not
+> > > obvious.
+> >
+> > Only one number if we want to extract the reason with BPF, right? I
+> > haven't tried it.
+>
+> Yes, we can get 'reason'. Knowing the type helps.
+>
+> > > A similar approach could be done as the one used for drop reasons: en=
+um
+> > > skb_drop_reason is used for parameters (eg. kfree_skb_reason) but oth=
+er
+> > > valid values (subsystem drop reasons) can be used too if casted (to
+> > > u32). We could use 'enum sk_rst_reason' and cast the other values. WD=
+YT?
+> >
+> > I have been haunted by this 'issue' for a long time...
+> >
+> > Are you suggesting doing so as below for readability:
+> > 1) replace the reason parameter in all the related functions (like
+> > .send_reset(), tcp_v4_send_reset(), etc) by using 'enum sk_rst_reason'
+> > type?
+> > 2) in patch [4/6], when it needs to pass the specific reason in those
+> > functions, we can cast it to 'enum sk_rst_reason'?
+> >
+> > One modification I just made based on this patchset if I understand cor=
+rectly:
+> > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> > index 4889fccbf754..e0419b8496b5 100644
+> > --- a/net/ipv4/tcp_ipv4.c
+> > +++ b/net/ipv4/tcp_ipv4.c
+> > @@ -725,7 +725,7 @@ static bool tcp_v4_ao_sign_reset(const struct sock
+> > *sk, struct sk_buff *skb,
+> >   */
+> >
+> >  static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *s=
+kb,
+> > -                             int reason)
+> > +                             enum sk_rst_reason reason)
+> >  {
+> >         const struct tcphdr *th =3D tcp_hdr(skb);
+> >         struct {
+> > @@ -1935,7 +1935,7 @@ int tcp_v4_do_rcv(struct sock *sk, struct sk_buff=
+ *skb)
+> >         return 0;
+> >
+> >  reset:
+> > -       tcp_v4_send_reset(rsk, skb, reason);
+> > +       tcp_v4_send_reset(rsk, skb, (enum sk_rst_reason)reason);
+> >  discard:
+> >         kfree_skb_reason(skb, reason);
+> >         /* Be careful here. If this function gets more complicated and
+> >
+>
+> That's right. I think (u32) can also be used for the cast to make the
+> compiler happy in 2), but the above makes sense.
 
-> On Wed, Apr 10, 2024 at 10:12:00AM +0200, Kory Maincent wrote:
-> > On Tue, 9 Apr 2024 18:27:25 -0700
-> > Jakub Kicinski <kuba@kernel.org> wrote:
-> >  =20
-> > > On Tue, 09 Apr 2024 10:26:29 +0200 Kory Maincent wrote: =20
-> > > > In prevision to add new UAPI for hwtstamp we will be limited to the
-> > > > struct ethtool_ts_info that is currently passed in fixed binary for=
-mat
-> > > > through the ETHTOOL_GET_TS_INFO ethtool ioctl. It would be good if =
-new
-> > > > kernel code already started operating on an extensible kernel varia=
-nt
-> > > > of that structure, similar in concept to struct kernel_hwtstamp_con=
-fig
-> > > > vs struct hwtstamp_config.
-> > > >=20
-> > > > Since struct ethtool_ts_info is in include/uapi/linux/ethtool.h, he=
-re
-> > > > we introduce the kernel-only structure in include/linux/ethtool.h.
-> > > > The manual copy is then made in the function called by
-> > > > ETHTOOL_GET_TS_INFO.=20
-> > >=20
-> > > This one now conflicts :(
-> > >=20
-> > > Applying: net: Add struct kernel_ethtool_ts_info
-> > > error: sha1 information is lacking or useless
-> > > (drivers/net/phy/marvell_ptp.c). error: could not build fake ancestor=
- =20
-> >=20
-> > gnn patching my out of tree patch in the series! Sorry for that. =20
->=20
-> Given that this path corresponds to the driver I wrote, do I assume
-> that you've picked up my work on PTP support for Marvell PHYs? You
-> should be aware that I still have the patches out of tree but it's
-> been pointless me reposting it until the issue of which PTP gets
-> used has been solved. (Publishing will just increase the pressure
-> to merge it without the PTP problems being solved, and thus break
-> Marvell PP2 PTP.)
+Got it :) Will update soon.
 
-Yes I did with few fixes and I know you don't want to post the patches until
-setting which PTP gets used has been solved. As you can see this is one of =
-the
-subject of this series. About it, could you review this series? This would =
-help
-a lot and you will be able to post again your Marvell PTP patches if its get
-merged.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Thanks,
+Jason
 
