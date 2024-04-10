@@ -1,302 +1,120 @@
-Return-Path: <netdev+bounces-86545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A1DC89F219
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 14:27:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B40B89F1FE
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 14:25:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9F091C230C0
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 12:27:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5D9F1F22AB9
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 12:25:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89E215E7F3;
-	Wed, 10 Apr 2024 12:26:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C96D15B14E;
+	Wed, 10 Apr 2024 12:24:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SsELMgAP"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kz/0yk2P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95FDF15E5BB
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 12:26:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7521415E219;
+	Wed, 10 Apr 2024 12:24:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712752003; cv=none; b=qFpkxSfGC8m5ewFWZxW3rwRjCyAUxoSiWMEtvpsX/2POD11wBl0pQTf9OCym2Ad6j8dqBVOieuth9Bsbn+VtCWxPMMbEaru9F6whSkpNeV3tprvLEpOWSu344x7G1RDgvEHyDsZZzkJXSM8qSgq4UBawxVRCtPO6+oIn/cWLdfQ=
+	t=1712751888; cv=none; b=Pww3n9DOQRZbViFUswNQsGFmjSPMZsYRgrLuNo2vA0gVw68e3Ar+NkpFWnYr4QJgWJ3PoxDTefJI+M3HS2F9h599uHSYEGqiOGqZup8YhQ5ybH31tj8Tj3RbPsiHwWd0EhN8vYF7ZeF4BvnWcNDzoorNz3FSxRjjpFOxTKPVeHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712752003; c=relaxed/simple;
-	bh=8etUKHNJG31eTKGit/6QcJyQW5g+REOseSxs35Lehik=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=qRKoGNg87Moz3gDjj1Gmxv+F0BjS/PizmDMJEapKLVVSYjcl9d3EktgDnlH1V0tmRWnkd/CZbhQcdEzuER2G3XjHHs+4ghxcb36t7qZewmUmg7DGKEjzkDFTPfB2IFP1kiROYx9Iy7NLe4DMOZc2rQEV/yOSX1NDohJMC4j16KQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SsELMgAP; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712752000; x=1744288000;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=8etUKHNJG31eTKGit/6QcJyQW5g+REOseSxs35Lehik=;
-  b=SsELMgAPH2DcjVtNJJNQce24oPyY3Ypk+IIvSYEMsHLf03fIePmXysM6
-   y38mUI+EmVjT1hTIY5ozbsVoghdL7znVxjKph0yJ/rfNoyDxeul+ikwBH
-   uCRmnnCNQdY5rez2qDneFOlGGeAkvnqoMGC20wyXw+DHObYLNQXsLhNW1
-   WldQ9SF5YGnbTF2Rw8DMNiey9ltfrr+Qanj3FJ4v6hNOJVggAEa+GrqLq
-   QWU7JqVyzhA3TpP8ktsJFm/8hkE9xoKMSSIFfkFVvN/gOpvmE9C08hETz
-   qSxiDg8LsSpDARY09QmLr3dIh4xAccP+N59dkOpT6zAXrlt6J3Ef1krnv
-   w==;
-X-CSE-ConnectionGUID: 050DwTMcTqW+6h+l/LBaoA==
-X-CSE-MsgGUID: R3HEux9OSOisG2De409QBg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="7982295"
-X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="7982295"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 05:26:40 -0700
-X-CSE-ConnectionGUID: f4GPnvxuQBmGh0L57voz/Q==
-X-CSE-MsgGUID: qJXdY43YQAirUqaEAz675w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="51760159"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa001.fm.intel.com with ESMTP; 10 Apr 2024 05:26:37 -0700
-Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 40A362879D;
-	Wed, 10 Apr 2024 13:26:36 +0100 (IST)
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	horms@kernel.org,
-	anthony.l.nguyen@intel.com,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-next v4 12/12] iavf: add support for Rx timestamps to hotpath
-Date: Wed, 10 Apr 2024 08:17:06 -0400
-Message-Id: <20240410121706.6223-13-mateusz.polchlopek@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20240410121706.6223-1-mateusz.polchlopek@intel.com>
-References: <20240410121706.6223-1-mateusz.polchlopek@intel.com>
+	s=arc-20240116; t=1712751888; c=relaxed/simple;
+	bh=C6TTaj8C3gGDyMgcwpzgLzOx1oB8jniHUKHvI6XaAHM=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=VRTUhhmYEOxbuvblwYYCvpmSJj8oXj5ljwEV8zPw4eESQaBv9/A42KJwgQwQI9/4YqsxwWimkDmuhUwcy/ONyX193zJLIMIu5ohR3oRQA5fS3nM3iWBFB1GITPwcPer0j94MwsQY77McfBS7rMhIWqVagXJJXoL5ChhmX0Cj2TY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kz/0yk2P; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 68EDD1C0002;
+	Wed, 10 Apr 2024 12:24:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1712751883;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l3ws31mOJD6WJ5PiqoLqg0x1rdfJP9Z5AmhmFZmsojA=;
+	b=kz/0yk2P0u15uvLO3V2bIiiBeyKMosuhBgHxZkWris1gH74OkoU5jCPXSknQz1fwnbqCjo
+	WU93j8pFtyf1I68J1uRLHRNfAg5gHZOVcMlMzHVsVuI0NHrTx8HflyI9e+u4/KSZym1ID/
+	dLY1ynmBrfb0tNGPH9M0ukL+GBN7W+zJIfMTRlKVe+QSU7q152nT7Stn4Lg2mBWWFD4IAz
+	is0Ld37Wwxu3wR4M4tX6oiZtMUnmBiv5xa+BA5V0S6lyrm4TKrsHU9+Xh30ivTw3v9rkKM
+	KjmEQ3u/Z+jx+Z9jJ5DewvT9iMBn+e0lu7mg7yh+wHeLPrLuMrtg83iOywZIEQ==
+Date: Wed, 10 Apr 2024 14:25:18 +0200 (CEST)
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+cc: Romain Gantois <romain.gantois@bootlin.com>, 
+    "David S. Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+    Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+    Conor Dooley <conor+dt@kernel.org>, 
+    Geert Uytterhoeven <geert+renesas@glider.be>, 
+    Magnus Damm <magnus.damm@gmail.com>, 
+    Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+    Jose Abreu <joabreu@synopsys.com>, 
+    Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+    Russell King <linux@armlinux.org.uk>, 
+    =?ISO-8859-15?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>, 
+    Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+    devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+    linux-renesas-soc@vger.kernel.org, 
+    linux-stm32@st-md-mailman.stormreply.com, 
+    linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v2 4/5] net: stmmac: add support for RZ/N1
+ GMAC
+In-Reply-To: <CAMuHMdX-F8LXWx=Ras4f+Dt_r485HKjRDLydDXZsnZBW8HJzxw@mail.gmail.com>
+Message-ID: <9bd8eee4-952d-d5b2-c462-45c1466c54d6@bootlin.com>
+References: <20240409-rzn1-gmac1-v2-0-79ca45f2fc79@bootlin.com> <20240409-rzn1-gmac1-v2-4-79ca45f2fc79@bootlin.com> <CAMuHMdX-F8LXWx=Ras4f+Dt_r485HKjRDLydDXZsnZBW8HJzxw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed; boundary="1582177605-1727822458-1712751921=:538696"
+X-GND-Sasl: romain.gantois@bootlin.com
 
-From: Jacob Keller <jacob.e.keller@intel.com>
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Add support for receive timestamps to the Rx hotpath. This support only
-works when using the flexible descriptor format, so make sure that we
-request this format by default if we have receive timestamp support
-available in the PTP capabilities.
+--1582177605-1727822458-1712751921=:538696
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-In order to report the timestamps to userspace, we need to perform
-timestamp extension. The Rx descriptor does actually contain the "40
-bit" timestamp. However, upper 32 bits which contain nanoseconds are
-conveniently stored separately in the descriptor. We could extract the
-32bits and lower 8 bits, then perform a bitwise OR to calculate the
-40bit value. This makes no sense, because the timestamp extension
-algorithm would simply discard the lower 8 bits anyways.
+Hi Geert,
 
-Thus, implement timestamp extension as iavf_ptp_extend_32b_timestamp(),
-and extract and forward only the 32bits of nominal nanoseconds.
+On Tue, 9 Apr 2024, Geert Uytterhoeven wrote:
 
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
----
- drivers/net/ethernet/intel/iavf/iavf_main.c |  9 +++
- drivers/net/ethernet/intel/iavf/iavf_ptp.c  | 67 +++++++++++++++++++++
- drivers/net/ethernet/intel/iavf/iavf_ptp.h  |  4 ++
- drivers/net/ethernet/intel/iavf/iavf_txrx.c | 44 ++++++++++++++
- 4 files changed, 124 insertions(+)
+> > +config DWMAC_RZN1
+> > +       tristate "Renesas RZ/N1 dwmac support"
+> > +       default ARCH_RZN1
+> 
+> Why default to enabled?
+> 
+> > +       depends on OF && (ARCH_RZN1 || COMPILE_TEST)
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index d079d3bfb146..c5839b4b20d0 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -726,6 +726,15 @@ static u8 iavf_select_rx_desc_format(struct iavf_adapter *adapter)
- 	if (!RXDID_ALLOWED(adapter))
- 		return VIRTCHNL_RXDID_1_32B_BASE;
- 
-+	/* Rx timestamping requires the use of flexible NIC descriptors */
-+	if (iavf_ptp_cap_supported(adapter, VIRTCHNL_1588_PTP_CAP_RX_TSTAMP)) {
-+		if (supported_rxdids & BIT(VIRTCHNL_RXDID_2_FLEX_SQ_NIC))
-+			return VIRTCHNL_RXDID_2_FLEX_SQ_NIC;
-+
-+		dev_dbg(&adapter->pdev->dev,
-+			"Unable to negotiate flexible descriptor format.\n");
-+	}
-+
- 	/* Warn if the PF does not list support for the default legacy
- 	 * descriptor format. This shouldn't happen, as this is the format
- 	 * used if VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC is not supported. It is
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.c b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-index 0e5cae23f9be..f422ce4cc3fc 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-@@ -428,6 +428,9 @@ void iavf_ptp_release(struct iavf_adapter *adapter)
- 	adapter->aq_required &= ~IAVF_FLAG_AQ_SEND_PTP_CMD;
- 	spin_unlock(&adapter->ptp.aq_cmd_lock);
- 
-+	adapter->ptp.hwtstamp_config.rx_filter = HWTSTAMP_FILTER_NONE;
-+	iavf_ptp_disable_rx_tstamp(adapter);
-+
- 	adapter->ptp.initialized = false;
- }
- 
-@@ -461,3 +464,67 @@ void iavf_ptp_process_caps(struct iavf_adapter *adapter)
- 		iavf_ptp_disable_rx_tstamp(adapter);
- 	}
- }
-+
-+/**
-+ * iavf_ptp_extend_32b_timestamp - Convert a 32b nanoseconds timestamp to 64b
-+ * nanoseconds
-+ * @cached_phc_time: recently cached copy of PHC time
-+ * @in_tstamp: Ingress/egress 32b nanoseconds timestamp value
-+ *
-+ * Hardware captures timestamps which contain only 32 bits of nominal
-+ * nanoseconds, as opposed to the 64bit timestamps that the stack expects.
-+ *
-+ * Extend the 32bit nanosecond timestamp using the following algorithm and
-+ * assumptions:
-+ *
-+ * 1) have a recently cached copy of the PHC time
-+ * 2) assume that the in_tstamp was captured 2^31 nanoseconds (~2.1
-+ *    seconds) before or after the PHC time was captured.
-+ * 3) calculate the delta between the cached time and the timestamp
-+ * 4) if the delta is smaller than 2^31 nanoseconds, then the timestamp was
-+ *    captured after the PHC time. In this case, the full timestamp is just
-+ *    the cached PHC time plus the delta.
-+ * 5) otherwise, if the delta is larger than 2^31 nanoseconds, then the
-+ *    timestamp was captured *before* the PHC time, i.e. because the PHC
-+ *    cache was updated after the timestamp was captured by hardware. In this
-+ *    case, the full timestamp is the cached time minus the inverse delta.
-+ *
-+ * This algorithm works even if the PHC time was updated after a Tx timestamp
-+ * was requested, but before the Tx timestamp event was reported from
-+ * hardware.
-+ *
-+ * This calculation primarily relies on keeping the cached PHC time up to
-+ * date. If the timestamp was captured more than 2^31 nanoseconds after the
-+ * PHC time, it is possible that the lower 32bits of PHC time have
-+ * overflowed more than once, and we might generate an incorrect timestamp.
-+ *
-+ * This is prevented by (a) periodically updating the cached PHC time once
-+ * a second, and (b) discarding any Tx timestamp packet if it has waited for
-+ * a timestamp for more than one second.
-+ */
-+u64 iavf_ptp_extend_32b_timestamp(u64 cached_phc_time, u32 in_tstamp)
-+{
-+	const u64 mask = GENMASK_ULL(31, 0);
-+	u32 delta;
-+	u64 ns;
-+
-+	/* Calculate the delta between the lower 32bits of the cached PHC
-+	 * time and the in_tstamp value
-+	 */
-+	delta = (in_tstamp - (u32)(cached_phc_time & mask));
-+
-+	/* Do not assume that the in_tstamp is always more recent than the
-+	 * cached PHC time. If the delta is large, it indicates that the
-+	 * in_tstamp was taken in the past, and should be converted
-+	 * forward.
-+	 */
-+	if (delta > (mask / 2)) {
-+		/* reverse the delta calculation here */
-+		delta = ((u32)(cached_phc_time & mask) - in_tstamp);
-+		ns = cached_phc_time - delta;
-+	} else {
-+		ns = cached_phc_time + delta;
-+	}
-+
-+	return ns;
-+}
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.h b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-index 337bf184a7ea..66e113ae27f5 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_ptp.h
-@@ -6,6 +6,9 @@
- 
- #include <linux/ptp_clock_kernel.h>
- 
-+/* bit indicating whether a 40bit timestamp is valid */
-+#define IAVF_PTP_40B_TSTAMP_VALID	BIT(0)
-+
- /* structure used to queue PTP commands for processing */
- struct iavf_ptp_aq_cmd {
- 	struct list_head list;
-@@ -38,5 +41,6 @@ void iavf_virtchnl_send_ptp_cmd(struct iavf_adapter *adapter);
- long iavf_ptp_do_aux_work(struct ptp_clock_info *ptp);
- int iavf_ptp_get_ts_config(struct iavf_adapter *adapter, struct ifreq *ifr);
- int iavf_ptp_set_ts_config(struct iavf_adapter *adapter, struct ifreq *ifr);
-+u64 iavf_ptp_extend_32b_timestamp(u64 cached_phc_time, u32 in_tstamp);
- 
- #endif /* _IAVF_PTP_H_ */
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.c b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-index b97da9c946ce..eaefb223008c 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-@@ -1237,6 +1237,48 @@ static void iavf_flex_rx_hash(struct iavf_ring *ring,
- 	}
- }
- 
-+/**
-+ * iavf_flex_rx_tstamp - Capture Rx timestamp from the descriptor
-+ * @rx_ring: descriptor ring
-+ * @rx_desc: specific descriptor
-+ * @skb: skb currently being received
-+ *
-+ * Read the Rx timestamp value from the descriptor and pass it to the stack.
-+ *
-+ * This function only operates on the VIRTCHNL_RXDID_2_FLEX_SQ_NIC flexible
-+ * descriptor writeback format.
-+ */
-+static void iavf_flex_rx_tstamp(struct iavf_ring *rx_ring,
-+				union iavf_rx_desc *rx_desc,
-+				struct sk_buff *skb)
-+{
-+	struct skb_shared_hwtstamps *skb_tstamps;
-+	struct iavf_adapter *adapter;
-+	u32 tstamp;
-+	u64 ns;
-+
-+	/* Skip processing if timestamps aren't enabled */
-+	if (!(rx_ring->flags & IAVF_TXRX_FLAGS_HW_TSTAMP))
-+		return;
-+
-+	/* Check if this Rx descriptor has a valid timestamp */
-+	if (!(rx_desc->flex_wb.ts_low & IAVF_PTP_40B_TSTAMP_VALID))
-+		return;
-+
-+	adapter = netdev_priv(rx_ring->netdev);
-+
-+	/* the ts_low field only contains the valid bit and sub-nanosecond
-+	 * precision, so we don't need to extract it.
-+	 */
-+	tstamp = le32_to_cpu(rx_desc->flex_wb.flex_ts.ts_high);
-+	ns = iavf_ptp_extend_32b_timestamp(adapter->ptp.cached_phc_time,
-+					   tstamp);
-+
-+	skb_tstamps = skb_hwtstamps(skb);
-+	memset(skb_tstamps, 0, sizeof(*skb_tstamps));
-+	skb_tstamps->hwtstamp = ns_to_ktime(ns);
-+}
-+
- /**
-  * iavf_process_skb_fields - Populate skb header fields from Rx descriptor
-  * @rx_ring: rx descriptor ring packet is being transacted on
-@@ -1260,6 +1302,8 @@ static void iavf_process_skb_fields(struct iavf_ring *rx_ring,
- 		iavf_flex_rx_hash(rx_ring, rx_desc, skb, rx_ptype);
- 
- 		iavf_flex_rx_csum(rx_ring->vsi, skb, rx_desc);
-+
-+		iavf_flex_rx_tstamp(rx_ring, rx_desc, skb);
- 	}
- 
- 	skb_record_rx_queue(skb, rx_ring->queue_index);
+The kernel doc states this as one of the possible cases where setting default 
+y/m makes sense:
+
+```
+Sub-driver behavior or similar options for a driver that is “default n”. This 
+allows you to provide sane defaults.
+```
+
+In the case of DWMAC_RZN1, it is a suboption of stmmac which is "default n", and 
+I think it makes sense to enable the RZN1 ethernet controller driver if both the 
+stmmac driver and the RZN1 architecture were explicitely selected.
+
+Best Regards,
+
 -- 
-2.38.1
-
+Romain Gantois, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+--1582177605-1727822458-1712751921=:538696--
 
