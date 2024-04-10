@@ -1,205 +1,160 @@
-Return-Path: <netdev+bounces-86431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2E8C89EC75
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:42:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A97C789EC81
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:43:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA1F61C20C53
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:42:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C38461C20D92
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:43:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0EF313D292;
-	Wed, 10 Apr 2024 07:42:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D93A013D2A0;
+	Wed, 10 Apr 2024 07:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xrPmfdoq"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="CaCJ8AJc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C7613D280
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 07:42:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1204713C9CE
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 07:42:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712734928; cv=none; b=U5dqdty615wauB7rmDSj/Lw60KXFTBUfk3VA5lJgxmdY2u4RBfIAS7/03Pj8/Q02kv7Sl1xehxjF2GBr8LwQ2UpYGUBebqhh494MYGhUXfUJaTYJB+5yTeZP7pHjB4d+7+NilbufWoEBoYdMhf1yPlOAA0aF/21kiMIdzeHx3DA=
+	t=1712734939; cv=none; b=YVW2BcEcM3AQxk5mLxcRUZHNjlwubBI0Zrjg9xVDZo7tl+8rQm/4ujaqIHf4NWZi/xrv42is4OOxViGc6z9pnwV0wXz3DuMFznVBqZzMX75rJFCNQ3WlpEmSG0oyfKnSbl1ROjyDbIpEMaSd4kNgQIf/rPKmZ7Djc6CgtFu625k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712734928; c=relaxed/simple;
-	bh=6JimvKABjGAhaAunVcg5wLuwEFqMbqXRS1l6okPFEp4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c1lszYVZqTSJNRYCGgavw6L7nwSG6CE22UUo9W3+3EVVZeWTLk92SRPTgR6KjWMAoRHOPTHWG2Zc67JK2W2I2b6tGts/SLH+rF/vh3jaGHsSyP9ek1/7Kf9wK9gd7FiEXvMNvUpdnjIrE95US61/lUk9VfVkR7na+BusrWH4wt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=xrPmfdoq; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-56845954ffeso8569635a12.2
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 00:42:04 -0700 (PDT)
+	s=arc-20240116; t=1712734939; c=relaxed/simple;
+	bh=kztqXTJAoSz+e/mj1kuKESJlzUgr1+yO6Mcuo2khv80=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bTRH9T0O2lhi1q6cDzzgPzERnFG1KwrCLEEgeLdlU1qZBVWJRmMidRwhDfyXxrZ526SNdH5+m61aYqfiL4AnXjvka2nykj8ooZPRgChIVFnUFelsS/hoGkHRtOP7/g+eumuDt8nBWO3xaOxlGnE8kkW5vYRLDARKTj5t3hMZKtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=CaCJ8AJc; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a51b5633c9cso511616966b.2
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 00:42:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1712734923; x=1713339723; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=k3mXYs19jtAC2YbwmDdropY4/qIjzCwyc3vsFS2GcGA=;
-        b=xrPmfdoqalT722GL6FLJ3+UTBNIFGwP1Q4CURE/dJUGeXOZuf9ghUXjZ1jqQ2pjvf9
-         TRs0m8ql8yKJ+6GndJHDuM77rOMh80p6GdkLuedldi9iuvVzj7sGPSn1l5mnl9ZiX6GE
-         7A8zLS7ooUBD0BC5HyazuelJ2xNzIpu8YIXi1LOJD8WxrIM8xc2K0kuLslEddvWGIkLP
-         R9Lk4B2fpScQsDOM6Jw2aB3QPAJpIUyPySAyNvVq4XU/RCfUlp5cysFYX/wo7UYBW5sG
-         lgKNhEHDIrtOrQxGeL8UFcw6yEuiMtS913F+S7t/dircm4yc7Wx/JfkKUvjYTaBwMW+P
-         jcVg==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712734936; x=1713339736; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=y//drBcHk8K2aIKsW3skZ7g4m243pzURRAAm6EHv+Vo=;
+        b=CaCJ8AJcInWzOxvJwxd5KYv0dkEtACSAMPcTnk07OUkHfQIPsr8G5zcbroZWQ08bFD
+         TGj3F7zGEBkzZ07w8IXejXfGNp1duJdFSpfzCUVcsTvJp1xBai+in52Yi0tnWFP3SQcT
+         2A5qXb0zxCwha9kjBQH5J+Alky7VeC4cELgHIW92XM4+Mn3a4tr6ZS+RmtU6zCFsziay
+         3jGlxy/hIK/98ltMNsR4FwSC+ULIrBpLkLlRQfrhM4zJSz7ejk6BRXb8gC/mhAbIACN4
+         6thdLOnmKjNCNk2sQKpmeM08WZir5F1vYJIl3YVRkWhPs3P/WdyiGCQoWyUEiivMaDk0
+         m0OQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712734923; x=1713339723;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1712734936; x=1713339736;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=k3mXYs19jtAC2YbwmDdropY4/qIjzCwyc3vsFS2GcGA=;
-        b=kPpQUQClVCGHORCWxsvV9+0vmQ6QRh3fRgh0BZqwhUhhhAJfhyZf8kSG91VuNQDFP0
-         PpBWDfFQplvNm828fhEs76dHcGwENNvTmb+Z6PMQPm970D0dFrxLczghUNzAikEZe3nS
-         f3TGSyrAB6fJ+wu7aEN0uei4B2gULftKikb2tzn97jvkzsqXNxMRSqUXcqfxHgu4ggRD
-         4oQP96AdOIPimCoSHDVBCIJShm9BulZZwIgg2/uYw5+z2rKv90wYf85yTMwnYQfLPBxf
-         lEwbJu2sgeKwiO45qvF0+2N6v1Y85/kRpCSg9qEDqBSgxQ+/STxEhStgKOY4h1ngiqT4
-         Ki/A==
-X-Forwarded-Encrypted: i=1; AJvYcCWgc60jmuJdwQnl3+dJcbwGE+bw+JQHwNZieIU7EoslR65fYW08L8RTzH6/f/JG39CtTbx6o7x7xDKYkqi1JHGPLba+yquN
-X-Gm-Message-State: AOJu0Yz2HaCetkIDfHWMs5tuzRs9RKirXTQWKGppM0ik6POsO5x+kaV5
-	7Q9jON3NVJV5swb183JDC9c5B7WbulHmzTYiuAW1dWueillAg1+OeF2KLxVz+r0=
-X-Google-Smtp-Source: AGHT+IHbsaGMHaULq45hB1RQzGJ2jQouzCDk/Qs5dl99Xk4dB9Un2GtOpuqSHCNaJjxWq+FiwtopyQ==
-X-Received: by 2002:a17:907:9914:b0:a51:a688:3e9c with SMTP id ka20-20020a170907991400b00a51a6883e9cmr887114ejc.35.1712734923162;
-        Wed, 10 Apr 2024 00:42:03 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.223.16])
-        by smtp.gmail.com with ESMTPSA id y6-20020a17090668c600b00a46d049ff63sm6575359ejr.21.2024.04.10.00.41.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Apr 2024 00:42:02 -0700 (PDT)
-Message-ID: <285be63c-8939-495c-8411-ce2a68e25b2b@linaro.org>
-Date: Wed, 10 Apr 2024 09:41:57 +0200
+        bh=y//drBcHk8K2aIKsW3skZ7g4m243pzURRAAm6EHv+Vo=;
+        b=iV79iQpkLWsx6qWS7rwr8LCS+lbxYkEncWDUpK2OAnfSt7YALcjXUkJNJs7UC7iqtB
+         YZEfQw2y5WJpBxDJ4KtdERqttD4kno2Av7TYbtW8Q/4WjmwVS7kdbjgmDxp0cjUbP+uV
+         5E2jyLyzO2G2QPuFH5+JO/GpP5lAwb1aN9ofWJO6rTMK8xP2z5TmIXib3k+a2nEDaYvg
+         FkAgVRGOkYqlkbXAEN7j0sdWvy9qyDsd6qKgQ3awdi/TCWDeCOHUBz7+WRr44xlHM4tN
+         z9Kp4AZXyGv//CHQCrKc8wxM/JSNoP0pIWVaiU6YDK/xDrw3F4gY4HoxjTH1S+Pzwhvy
+         jpnA==
+X-Forwarded-Encrypted: i=1; AJvYcCUXDpav16x/R5cpl6k+78zRFjURvJ7q2Xe/GN2ySf38+kr+y1f+ka4PNJzwvOi20DT41mQpUDxyt98GKMuJIHDA8DTWWkqg
+X-Gm-Message-State: AOJu0YxUgpsc+KdaPmjnz2mFFn4cEH/uBWuPbIwSai78XrbfyzEnnAeJ
+	m4akvykUuxoXDQr0JzRTIqzW9XFCpBYEA3yNvWAujAKAbr8Oa1+bS28/heWhjDo=
+X-Google-Smtp-Source: AGHT+IGfZsCjrYN8kp3I8JH38RfST/SpsvUGrNp8ERPfOLl+fqXHnm7ZKPgfclYor4Uat0DIcfMB1g==
+X-Received: by 2002:a17:906:6d51:b0:a51:a10c:cc3 with SMTP id a17-20020a1709066d5100b00a51a10c0cc3mr1087478ejt.17.1712734936215;
+        Wed, 10 Apr 2024 00:42:16 -0700 (PDT)
+Received: from localhost (78-80-106-99.customers.tmcz.cz. [78.80.106.99])
+        by smtp.gmail.com with ESMTPSA id k12-20020a17090646cc00b00a4e3fda23f5sm6588972ejs.165.2024.04.10.00.42.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 00:42:15 -0700 (PDT)
+Date: Wed, 10 Apr 2024 09:42:14 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: pabeni@redhat.com, John Fastabend <john.fastabend@gmail.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Edward Cree <ecree.xilinx@gmail.com>,
+	Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
+	bhelgaas@google.com, linux-pci@vger.kernel.org,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <ZhZC1kKMCKRvgIhd@nanopsycho>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <20240409135142.692ed5d9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 00/25] virtio: store owner from modules with
- register_virtio_driver()
-To: "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>,
- David Hildenbrand <david@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Paolo Bonzini <pbonzini@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Jens Axboe <axboe@kernel.dk>, Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
- Olivia Mackall <olivia@selenic.com>, Herbert Xu
- <herbert@gondor.apana.org.au>, Amit Shah <amit@kernel.org>,
- Arnd Bergmann <arnd@arndb.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Gonglei <arei.gonglei@huawei.com>, "David S. Miller" <davem@davemloft.net>,
- Sudeep Holla <sudeep.holla@arm.com>,
- Cristian Marussi <cristian.marussi@arm.com>,
- Viresh Kumar <vireshk@kernel.org>, Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <brgl@bgdev.pl>, David Airlie <airlied@redhat.com>,
- Gurchetan Singh <gurchetansingh@chromium.org>, Chia-I Wu
- <olvaffe@gmail.com>, Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
- Maxime Ripard <mripard@kernel.org>, Thomas Zimmermann <tzimmermann@suse.de>,
- Daniel Vetter <daniel@ffwll.ch>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>,
- Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
- Robin Murphy <robin.murphy@arm.com>, Alexander Graf <graf@amazon.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Van Hensbergen <ericvh@kernel.org>,
- Latchesar Ionkov <lucho@ionkov.net>,
- Dominique Martinet <asmadeus@codewreck.org>,
- Christian Schoenebeck <linux_oss@crudebyte.com>,
- Stefano Garzarella <sgarzare@redhat.com>, Kalle Valo <kvalo@kernel.org>,
- Dan Williams <dan.j.williams@intel.com>,
- Vishal Verma <vishal.l.verma@intel.com>, Dave Jiang <dave.jiang@intel.com>,
- Ira Weiny <ira.weiny@intel.com>, Pankaj Gupta
- <pankaj.gupta.linux@gmail.com>, Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- "James E.J. Bottomley" <jejb@linux.ibm.com>,
- "Martin K. Petersen" <martin.petersen@oracle.com>,
- Vivek Goyal <vgoyal@redhat.com>, Miklos Szeredi <miklos@szeredi.hu>,
- Anton Yakovlev <anton.yakovlev@opensynergy.com>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc: virtualization@lists.linux.dev, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-um@lists.infradead.org,
- linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
- linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
- iommu@lists.linux.dev, netdev@vger.kernel.org, v9fs@lists.linux.dev,
- kvm@vger.kernel.org, linux-wireless@vger.kernel.org, nvdimm@lists.linux.dev,
- linux-remoteproc@vger.kernel.org, linux-scsi@vger.kernel.org,
- linux-fsdevel@vger.kernel.org, alsa-devel@alsa-project.org,
- linux-sound@vger.kernel.org,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- Viresh Kumar <viresh.kumar@linaro.org>
-References: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240331-module-owner-virtio-v2-0-98f04bfaf46a@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240409135142.692ed5d9@kernel.org>
 
-On 31/03/2024 10:43, Krzysztof Kozlowski wrote:
-> Changes in v2:
-> - Three new patches: virtio mem+input+balloon
-> - Minor commit msg adjustments
-> - Add tags
-> - Link to v1: https://lore.kernel.org/r/20240327-module-owner-virtio-v1-0-0feffab77d99@linaro.org
-> 
-> Merging
-> =======
-> All further patches depend on the first virtio patch, therefore please ack
-> and this should go via one tree: maybe virtio?
+Tue, Apr 09, 2024 at 10:51:42PM CEST, kuba@kernel.org wrote:
+>On Wed, 03 Apr 2024 13:08:24 -0700 Alexander Duyck wrote:
+>> This patch set includes the necessary patches to enable basic Tx and Rx
+>> over the Meta Platforms Host Network Interface. To do this we introduce a
+>> new driver and driver and directories in the form of
+>> "drivers/net/ethernet/meta/fbnic".
+>
+>Let me try to restate some takeaways and ask for further clarification
+>on the main question...
+>
+>First, I think there's broad support for merging the driver itself.
+>
+>IIUC there is also broad support to raise the expectations from
+>maintainers of drivers for private devices, specifically that they will:
+> - receive weaker "no regression" guarantees
+> - help with refactoring / adapting their drivers more actively
 
-Michael, Jason, Xuan,
+:)
 
-Will you be able to take the entire patchset through virtio?
 
-Best regards,
-Krzysztof
+> - not get upset when we delete those drivers if they stop participating
 
+Sorry for being pain, but I would still like to see some sumarization of
+what is actually the gain for the community to merge this unused driver.
+So far, I don't recall to read anything solid.
+
+btw:
+Kconfig description should contain:
+ Say N here, you can't ever see this device in real world.
+
+
+>
+>If you think that the drivers should be merged *without* setting these
+>expectations, please speak up.
+>
+>Nobody picked me up on the suggestion to use the CI as a proactive
+>check whether the maintainer / owner is still paying attention, 
+>but okay :(
+>
+>
+>What is less clear to me is what do we do about uAPI / core changes.
+>Of those who touched on the subject - few people seem to be curious /
+>welcoming to any reasonable features coming out for private devices
+>(John, Olek, Florian)? Others are more cautious focusing on blast
+>radius and referring to the "two driver rule" (Daniel, Paolo)?
+>Whether that means outright ban on touching common code or uAPI
+>in ways which aren't exercised by commercial NICs, is unclear. 
+
+For these kind of unused drivers, I think it would be legit to
+disallow any internal/external api changes. Just do that for some
+normal driver, then benefit from the changes in the unused driver.
+
+Now the question is, how to distinguish these 2 driver kinds? Maybe to
+put them under some directory so it is clear?
+drivers/net/unused/ethernet/meta/fbnic/
+
+
+>Andrew and Ed did not address the question directly AFAICT.
+>
+>Is my reading correct? Does anyone have an opinion on whether we should
+>try to dig more into this question prior to merging the driver, and
+>set some ground rules? Or proceed and learn by doing?
+>
 
