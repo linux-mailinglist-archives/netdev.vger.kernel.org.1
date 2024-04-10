@@ -1,102 +1,129 @@
-Return-Path: <netdev+bounces-86372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DE5589E7F4
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 03:50:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6D8989E81A
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 04:23:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B83CEB2165C
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 01:50:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C0AEB23BD0
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 02:23:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B861FAA;
-	Wed, 10 Apr 2024 01:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C68B5664;
+	Wed, 10 Apr 2024 02:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="peqvizFg"
+	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="GOM5bUwg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1032964A;
-	Wed, 10 Apr 2024 01:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 318B746B5
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 02:23:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712713829; cv=none; b=sVUYbyCciamlherocGTfNzYEISq0SL2x0m/12XACj75A/0bp8kJEgR/Rdiv1y9otNHAoYqDSVk5dd/aikOLgyJ6dwbdLRh3S83RUj1NxDbh137U74at9Fxy/Yd2T0qLTZn3A4zp28a8T3Yvqq51HR801tYv9FZaRtb1lrP62aIg=
+	t=1712715804; cv=none; b=iE0EZjx8ka3BSy2VSTES4TVlQhXnYi0uCKgI3SNXBtLV7vtfK9e5m8dhWB+IBfwsLMSzGivmR/KPlc2foKJo8j21/I3dlUdx4Ob0RBurXSgbDHmrsc1cpQk//AD1IkTkh5Tq9dpOodz0ygMPSNB34Tip1LuGrQS0VxBzANI2R/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712713829; c=relaxed/simple;
-	bh=C7uzs+pRecO5vt0/mJMXKHRDYPy1ocmPRZF7qiuwzcU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=I6I9wMoRqfxjRbPUDtN8POQlAEXScT9rBn8gE2oTwxbFVC1Un3MdPpZM05582edF6W2gFEh9bcNga5mMfdPdnzL/fachqlPS/BHa+NOEdjI4oUoq/ALBmtPo2vj7nzVrEeLcmHemlPv/sOULkoiK8Cvu10CKIIKweev7b8WRbqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=peqvizFg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CCE9EC43390;
-	Wed, 10 Apr 2024 01:50:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712713828;
-	bh=C7uzs+pRecO5vt0/mJMXKHRDYPy1ocmPRZF7qiuwzcU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=peqvizFg2+AZZ1hTZ+ii7ZBDykemh1OdN+i0jnc8+UX/RYNgE84XGWAdhntfxmJGZ
-	 iToKsl2zFVXcgPYQ0x/WD8lCAlcAax+7bMePFOHubiGlomfppRX02XtONeyrl/pnNW
-	 nvsqBvtd+XkEV+HegrWRVzG1eIYYE3+2+WwVPTNqMc79IgF6kuylBV4+4eiMf1Ubex
-	 CTxAYiqHDGWXyPeilvolTQs4c2/JyaMFZQAdRori7S87lG5W9zM83oJkWVC9mrA8/6
-	 M3SU5b38X8t2joqmoXxfh/Obm4NmJtYNTP8VINTcwqvxvomcx7uvSjL2VpHQFaRdbO
-	 fWGb8n2paHimg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B830FC395F6;
-	Wed, 10 Apr 2024 01:50:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1712715804; c=relaxed/simple;
+	bh=9sHL5LbebkwrBdLiCkbTw2BdnFhiSCphYDK66lRVEPo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iBgGV9JXgaHJptpXX3Fc/J4tb9Q14zyybUJQjQOW6LqUh1WXGrUIi1TlpN1rie5uX1vbPEyJ1rF2Z3QZYP1lk5rRbRqZoce5DTfMNm1kSh9zF6scKMI5MEIYol8OXC7wx1CpaB5ZoGkxbbmle/mx4v2P2cw7JiiHiv1CLYqCVPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=GOM5bUwg; arc=none smtp.client-ip=209.85.219.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-dc6d8bd618eso5899104276.3
+        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 19:23:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1712715801; x=1713320601; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=khwZnWm14dL8uE/PMsqyX7hSnOPMt8GrfT/vNnwgL7k=;
+        b=GOM5bUwgxTHMLE7T0inRujbxzHL8rViue4maA0FB4EwuBFQbLzxXgQBKcuQlOiRKP/
+         nOBDI8yHyFvQ1ngnchomXh/wdzrwKgLbDPmYGnqMdkKIZvdo85ueZTvnznnCNrF7qGlh
+         7JT4cxEXzoMc3EN1fq7X7U3UfXJHFEyHGjPsq2reYKuaabrXQpjeXT52JUyr0JXlITh1
+         U6lZaQlV9Hv5xUsRx58aDPFqzjGpceWUOWvlGbeWxVF1l1RiHdtnTi7YiA2nlTisTLed
+         DSHHfzyoouDEabnRoqTwToPW3WUaobocJGdSTOnhpQf1K1CdIjZ7hX9MyEzArZPcZ71c
+         ciIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712715801; x=1713320601;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=khwZnWm14dL8uE/PMsqyX7hSnOPMt8GrfT/vNnwgL7k=;
+        b=IMdx5cfqvXvPJGRS7Wi/4I6pHolL+T1uizto54xiBIaPTSzyyvDC30KVKtHZyP7v82
+         DYdfICvoPeaj+RfYVm2M8V/Gr04W6b5eh1W9rYrs5UDKZ+YDbpaP3wfG+rz+n6woUhJ2
+         VwZVh7olldpeGzkxhC6ojMvHyYKLnyUcIRjQ5NtTqFduTz4S1VOirMuyfbMPyJlGe7JU
+         fSUFMMNyBHVsYps+VoAdveP3Dnop1NbY3CupYJakQbId700p4xYZbCX9INgva4VFkKoV
+         fHsypxlVOsP/VNnnBUgQ8WwBD+TZrjePDA5ZvKTHrlpRa/P1vKTrhpxugBaZxej0eKPS
+         HPwg==
+X-Forwarded-Encrypted: i=1; AJvYcCVoxwsmduRrafKyHheaucsiJ55UI3dGzdSVoCU+Uet5hZVBZgTtCXkXAXDA6cmi11E+wlMuLvmV6gTCcR098JICxiRHGaOq
+X-Gm-Message-State: AOJu0YwPFZFG6jWxv0tDQiDXSFgGs1ztnWA/G44/K7yxRKVI4l+aDqqt
+	zOTAs8QgvE0gdytISiZWgjZ/oy3y0EB9LY5TJvEwrhygFUU+kxkZIOB7OWkoa8lV+cH/j0/BDOZ
+	uhcdkPfbJb3UOTJc1QImV4n/gWoncZLiX+UlvCw==
+X-Google-Smtp-Source: AGHT+IFtrp/7l/2i9POMHsw6eREWDmyeLqci9yjdmkaQt9VIn2HnOxOlbHcG2dl4PfW2xl1WKSUQr8erN9u+LieXHos=
+X-Received: by 2002:a25:30c6:0:b0:de0:d2fe:d499 with SMTP id
+ w189-20020a2530c6000000b00de0d2fed499mr1325133ybw.21.1712715800493; Tue, 09
+ Apr 2024 19:23:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v5 0/3] Minor cleanups to skb frag ref/unref
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171271382875.18237.12454972110569663249.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Apr 2024 01:50:28 +0000
-References: <20240408153000.2152844-1-almasrymina@google.com>
-In-Reply-To: <20240408153000.2152844-1-almasrymina@google.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- ayush.sawal@chelsio.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, hawk@kernel.org,
- ilias.apalodimas@linaro.org, steffen.klassert@secunet.com,
- herbert@gondor.apana.org.au, dsahern@kernel.org, borisp@nvidia.com,
- john.fastabend@gmail.com, dtatulea@nvidia.com
+References: <20240409062407.1952728-1-lei.chen@smartx.com> <0e5a96b6-0862-4c00-b07f-7485af232475@lunn.ch>
+In-Reply-To: <0e5a96b6-0862-4c00-b07f-7485af232475@lunn.ch>
+From: Lei Chen <lei.chen@smartx.com>
+Date: Wed, 10 Apr 2024 10:23:08 +0800
+Message-ID: <CAKcXpBwE-8p+naDgJnCU41ODxRhWq7CkhEeeOAw+Ode4-J6CLw@mail.gmail.com>
+Subject: Re: [PATCH] net:tun: limit printing rate when illegal packet received
+ by tun dev
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jason Wang <jasowang@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Tue, Apr 9, 2024 at 8:52=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Tue, Apr 09, 2024 at 02:24:05AM -0400, Lei Chen wrote:
+> > vhost_worker will call tun call backs to receive packets. If too many
+> > illegal packets arrives, tun_do_read will keep dumping packet contents.
+> > When console is enabled, it will costs much more cpu time to dump
+> > packet and soft lockup will be detected.
+> >
+> > Rate limit mechanism can be used to limit the dumping rate.
+> > @@ -2125,14 +2126,16 @@ static ssize_t tun_put_user(struct tun_struct *=
+tun,
+> >                                           tun_is_little_endian(tun), tr=
+ue,
+> >                                           vlan_hlen)) {
+> >                       struct skb_shared_info *sinfo =3D skb_shinfo(skb)=
+;
+> > -                     pr_err("unexpected GSO type: "
+> > -                            "0x%x, gso_size %d, hdr_len %d\n",
+> > -                            sinfo->gso_type, tun16_to_cpu(tun, gso.gso=
+_size),
+> > -                            tun16_to_cpu(tun, gso.hdr_len));
+> > -                     print_hex_dump(KERN_ERR, "tun: ",
+> > -                                    DUMP_PREFIX_NONE,
+> > -                                    16, 1, skb->head,
+> > -                                    min((int)tun16_to_cpu(tun, gso.hdr=
+_len), 64), true);
+> > +
+> > +                     if (__ratelimit(&ratelimit)) {
+>
+> Maybe just use net_ratelimit() rather than add a new ratelimit
+> variable?
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Thanks for your suggestion, net_ratelimit is a better way to make it.
 
-On Mon,  8 Apr 2024 08:29:55 -0700 you wrote:
-> v5:
-> - Applied feedback from Eric to inline napi_pp_get_page().
-> - Applied Reviewed-By's.
-> 
-> v4:
-> - Rebased to net-next.
-> - Clarified skb_shift() code change in commit message.
-> - Use skb->pp_recycle in a couple of places where I previously hardcoded
->   'false'.
-> 
-> [...]
+>
+> A separate issue, i wounder if rather than pr_err(),
+> netdev_err(tun->dev, ...) should be used to indicate which TUN device
+> has been given bad GSO packets?
 
-Here is the summary with links:
-  - [net-next,v5,1/3] net: make napi_frag_unref reuse skb_page_unref
-    https://git.kernel.org/netdev/net-next/c/959fa5c188bf
-  - [net-next,v5,2/3] net: mirror skb frag ref/unref helpers
-    (no matching commit)
-  - [net-next,v5,3/3] net: remove napi_frag_unref
-    https://git.kernel.org/netdev/net-next/c/f58f3c956340
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I got it, I'll remake the patch, thanks.
 
