@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-86349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB82389E6DB
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 02:30:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C7F089E6DD
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 02:30:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5547283DF6
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 00:30:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE91E1C21400
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 00:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0533D387;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77DD5A59;
 	Wed, 10 Apr 2024 00:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O7L4C9W5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dK05UXMI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D511437C
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 00:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 502F339B;
+	Wed, 10 Apr 2024 00:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712709030; cv=none; b=IDSHM6V2oqBkTWQBbq1uBVjZSGJ+mLPKFegtRg8NofSvXtVLBpHEIADpQh289Z+F94pljEscEh7S/kKjv+Z3A/CQwaan7Gaq1gI3EogO6LqIc6HGhGQkH11mscI/CzW8JAeQwe2OPd7VFc+SrN5L/aUOd+hOJ7Iwf4zEjJene9M=
+	t=1712709031; cv=none; b=SaAt6hirhuuoFAp2OVJgGB906LxhKqQ5/fvoY7jRLLu1MeKvebum5sVt/ywXBDd4DwAPhQc3shekSQr8Z5xIK+vZ0PusTD3trhdO3AWqn1kvf2MEFH095hkp18En2PhbYQDVq4VDczAsxb9tWRhSrtZoScltHTWEkQ3FP7tejXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712709030; c=relaxed/simple;
-	bh=a48+8ZKh3QhgevDww7G2yhFb++nH8beceaD0y9XlnrA=;
+	s=arc-20240116; t=1712709031; c=relaxed/simple;
+	bh=gqTHKqsyAU163NzCL7lYEHSF6VfvBNSuZd9R9+AQZqc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fk6ee767fUvGJtlUjZtcj0tUWP/lDcy0h0UvWrGIxID9mENANI5Le5PdkDvFbqLWWNOFvZX7xpl7ebxiLmMmasI9GmBp7mKvIoNd23KfT89w1ZozsXJEp6g1s8R0jwuZU/Izw2XBPpHXufPMCIp1MKzD+FwHzmH14K7bEKfjMUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O7L4C9W5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7EA50C433F1;
+	 In-Reply-To:To:Cc; b=DG72SX2NFNp9RJbCiyNv/gVwcwdcj5PCVcYeLAiYTFcINNPrbCdVeGpRJQVMdsdHoOA9aewqgjw2ID8pdz6TujuV4El0Vr5U/AdaS81CK8uzNIWarpI+U38o5z27Yci5UHIJu8dV2lOgZadjnZ/C8JPvFC67oNuVgJd0Q9KTzrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dK05UXMI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E9F2EC433C7;
 	Wed, 10 Apr 2024 00:30:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712709030;
-	bh=a48+8ZKh3QhgevDww7G2yhFb++nH8beceaD0y9XlnrA=;
+	s=k20201202; t=1712709031;
+	bh=gqTHKqsyAU163NzCL7lYEHSF6VfvBNSuZd9R9+AQZqc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=O7L4C9W5jJWAKN0k/O7kDnyo9cM0oUF9X3EDv4XI5BuhEFsVKk8qHlHZtxcZ9eGv+
-	 7/fvVzvhwWP9rvmgF36GWx//Dqb3dRt+xwOX/QDyDQ3BqAknx7GpELinZDYd3GWKWQ
-	 iMjUK59Buunl0E2ZRMTs68l0E9yxuqa7p1uvpCprIFD1glVkwinUKUOK6Fa3T5kW6s
-	 AP6R6JkL4TAwNR2OjL9IXzy/ZWGGEMciV7NnW88Qk57NXGoJDDIaXH0QeaTY157ayJ
-	 SQbEaCwRmPr3Y6REywbGZG/muQQSfoE7cWoI/efWimNKDoEmSmSgQDAmTPeAfrfRXI
-	 4IqYGEgvfMsiA==
+	b=dK05UXMIKJS9bTTkN6VoRZQwzZdOOamuMz/PfZ32eYh4mvihBoH2/1sHSDVGMWhLh
+	 RY+sOe66A1VdfWQHSvo71ZjvoXlGG6PZ5oexaC6VwwiHUgpqzyj4XyJLjjUheBma9H
+	 1IzDQlT6ZO5ZTPucd1dTpIvCHYLdcJqhrgwNFF7wiQbU3FLsZoy4Rfqh/LyzpJJY3v
+	 2Inv/j5x5jFHx8+7viw1Fraxx8EOwdo2do4LEo/9Wj6JxOpLEaTSvMU8kpQZfhFR/6
+	 IoIF5iTYrpBHrjQ3IjElj9xzsmICpC5mLVbnih3hehgmQX+pkx5m8+SSfTGIIyW8UP
+	 7NFCXZGnQt67w==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 70981D60313;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DD26ED60313;
 	Wed, 10 Apr 2024 00:30:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] ipv6: fix race condition between ipv6_get_ifaddr and
- ipv6_del_addr
+Subject: Re: [PATCH net-next v4] net: phy: dp8382x: keep WOL settings across
+ suspends
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171270903045.7096.13589832911072928239.git-patchwork-notify@kernel.org>
+ <171270903090.7096.4342007764039088497.git-patchwork-notify@kernel.org>
 Date: Wed, 10 Apr 2024 00:30:30 +0000
-References: <8ab821e36073a4a406c50ec83c9e8dc586c539e4.1712585809.git.jbenc@redhat.com>
-In-Reply-To: <8ab821e36073a4a406c50ec83c9e8dc586c539e4.1712585809.git.jbenc@redhat.com>
-To: Jiri Benc <jbenc@redhat.com>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org, dsahern@kernel.org,
- edumazet@google.com
+References: <20240408082602.3654090-1-catalin.popescu@leica-geosystems.com>
+In-Reply-To: <20240408082602.3654090-1-catalin.popescu@leica-geosystems.com>
+To: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ m.felsch@pengutronix.de, bsp-development.geo@leica-geosystems.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  8 Apr 2024 16:18:21 +0200 you wrote:
-> Although ipv6_get_ifaddr walks inet6_addr_lst under the RCU lock, it
-> still means hlist_for_each_entry_rcu can return an item that got removed
-> from the list. The memory itself of such item is not freed thanks to RCU
-> but nothing guarantees the actual content of the memory is sane.
-> 
-> In particular, the reference count can be zero. This can happen if
-> ipv6_del_addr is called in parallel. ipv6_del_addr removes the entry
-> from inet6_addr_lst (hlist_del_init_rcu(&ifp->addr_lst)) and drops all
-> references (__in6_ifa_put(ifp) + in6_ifa_put(ifp)). With bad enough
-> timing, this can happen:
+On Mon,  8 Apr 2024 10:26:02 +0200 you wrote:
+> Unlike other ethernet PHYs from TI, PHY dp8382x has WOL enabled
+> at reset. The driver explicitly disables WOL in config_init callback
+> which is called during init and during resume from suspend. Hence,
+> WOL is unconditionally disabled during resume, even if it was enabled
+> before the suspend. We make sure that WOL configuration is persistent
+> across suspends.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] ipv6: fix race condition between ipv6_get_ifaddr and ipv6_del_addr
-    https://git.kernel.org/netdev/net/c/7633c4da919a
+  - [net-next,v4] net: phy: dp8382x: keep WOL settings across suspends
+    https://git.kernel.org/netdev/net-next/c/9ef9ecfa9e9f
 
 You are awesome, thank you!
 -- 
