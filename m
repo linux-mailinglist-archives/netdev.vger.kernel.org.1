@@ -1,175 +1,93 @@
-Return-Path: <netdev+bounces-86485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B099E89EF1B
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 11:49:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40AEF89EF32
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 11:51:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1ED41C20E48
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:49:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D02FB1F21A49
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C92158DD0;
-	Wed, 10 Apr 2024 09:48:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6142156C77;
+	Wed, 10 Apr 2024 09:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aHsIIZWT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n1xPPM9A"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14778158D99;
-	Wed, 10 Apr 2024 09:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04DD156976
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 09:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712742518; cv=none; b=NJLvO4pisRuve+89eL0W/PQ53O3JoNvhXw2/nyGdB+hdYJ6aaiTnrgG3BvH5PHGnLuJs4vxCQHD7fTaNTdSAaGi0jmklBqEWPpn7VeSpQ0iYyeqQXZcEBBTf+IXK5ruERo0ofv8znZpJMePArsAEzyre3LNE2T4D7hqmNkg4so0=
+	t=1712742628; cv=none; b=Q39Ny/H5M1g8lyDePv1G8VWCqKxf+VtvMUq+qsaORLVyNy7epIX/Ko+0G223xEndFI7xSjpyPE0F78XylPtBE+5bwBB417D2Tih3mGZYeiYXHV7XgCbcyin5wKur2qC3XMuHkGmpyGQUoaBoXAHStega/jnLHAMGncCCbU7qQgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712742518; c=relaxed/simple;
-	bh=cNRHTNoB1FjvRBTrgLJ9wDmPMMbth4hYAQoyT329fAU=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=YLsg/D3lR2zxs6EWKlLcaezGMlMMNaGk/ZnIR6k9kdiaxRzSaY1Q/Y+Ca7k0jomNM2tLQzBz6XpNjJJwORbCAsben5HFL/bIVagXlDHd2jscPpMfnwp+AYD5rgrpUcDvuOhIqVOY556BpU6Jebb7Dn1zWNWDFOyeDOAZTFU5s1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aHsIIZWT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D11FAC433C7;
-	Wed, 10 Apr 2024 09:48:34 +0000 (UTC)
+	s=arc-20240116; t=1712742628; c=relaxed/simple;
+	bh=YDnrSmiElwvSdoASS7BbBJGUrtvl4j9PjEpY/jxaMjw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=RQeh3Q6Fg25LWJ0yz43KmTa2CaGImIqMJSk/4aPEMJKyz91WYZtqrIoRrw9p+Eq1QHNsYy00iUDNoScCk5V0AXo9kaZ27WBLSWIXflduWJc3h5Mcv7vRpGGLoiPcjwcqVAQIl4JsQ4ZKIAnTtr7nsgMS8x9gslZOGK+fmDItx3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n1xPPM9A; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 47313C43394;
+	Wed, 10 Apr 2024 09:50:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712742517;
-	bh=cNRHTNoB1FjvRBTrgLJ9wDmPMMbth4hYAQoyT329fAU=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=aHsIIZWTdrWCQTEQxm7maSsnNu5eWu3tl49W/CG76To3Em1c/kDOAfSjVyw3j70Df
-	 rOi/dpuP6QNPEUk3QKEey98REJ9o8DaJoQnAXnSd+DSpMT7eHAvl/M9SMfngFQ+v9m
-	 zi7QfvnssKU1GP5uQcHe3t0+bpBXWbrAPfhnR7wlKevTQOueLiizMMpadO70ZAkQOo
-	 UH1N5TOqMvLiFXBdW1tKScQDK/mj88zHkwt317PA1NTNWxjV5DPVd0fzxHoQDDXJbx
-	 M2RmsFJ2AGUnW3ipNaughqw6JioHOlBHfNwYyDFQXD3xTt72gv0GPxpHNT0vAnhKDS
-	 9YsCvpBJwgYHA==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Wed, 10 Apr 2024 11:48:25 +0200
-Subject: [PATCH net-next v2 2/2] selftests: mptcp: test last time
- mptcp_info
+	s=k20201202; t=1712742628;
+	bh=YDnrSmiElwvSdoASS7BbBJGUrtvl4j9PjEpY/jxaMjw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=n1xPPM9AbocwzbBI/dzyadkUQxKA6nv8ir9ftCD6AZyESPZL4kmmreR7eXLHinrRJ
+	 inUmuuIUosNXtQvV2+a9irzkGwQJ2Cnqo2I17rN8SUUVKMi7vGZLc1g/TPwRm2wREx
+	 yK+5QyYI8HT6QiUDDUQ8OEOe1tcIVkSWi6XOd5VJEJ992YZNTjb/43HgSJsQ/ejW5Q
+	 uH4zS3qVmgpFx4a0dW9xqDsx+SuM81FTM0UDB00YwAUvLb9S0cjw0bTJZwA3pv4zu0
+	 pZAspcJ2uio3C5246/4frWLfk91Q2NviG1fKWw86lM/BNNDOJYpVb+Ps3JfnulXf0R
+	 4afbM4bmo83Zw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3DE22D60310;
+	Wed, 10 Apr 2024 09:50:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240410-upstream-net-next-20240405-mptcp-last-time-info-v2-2-f95bd6b33e51@kernel.org>
-References: <20240410-upstream-net-next-20240405-mptcp-last-time-info-v2-0-f95bd6b33e51@kernel.org>
-In-Reply-To: <20240410-upstream-net-next-20240405-mptcp-last-time-info-v2-0-f95bd6b33e51@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
- Geliang Tang <tanggeliang@kylinos.cn>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2718; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=y6e1hT6fB4Z4RvFtfA4YiCJgrUME8UDpc0J3qux4/kQ=;
- b=owEBbAKT/ZANAwAIAfa3gk9CaaBzAcsmYgBmFmBs2dzr/QMaUnyVUnEaaqXee3OoP6+PiAo5P
- qTTczB3w3KJAjIEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZhZgbAAKCRD2t4JPQmmg
- c5zzD/UccNx5cv2z4AZgIwqtZAMNa9oSub2dtGGs7w4a37Dly9wnwevqLL6JZNEaKnicrH9EPCG
- G0E/yVBkNrjUyYbWkArW4Mb3O9QOqbuYCb24/8sIz5y20uXeuzsdQ4hFTSkq4f/C6wYtfrq7s6W
- EAdvYhARM7C4aQIH42Kmbq5+zLFaIpnZN2n7z6Bvdz+G0Uwx3wfrdZp5B9B/AHKpVgz/+HY+Ele
- PEwcxOt6rhsd373VBWS7YIPpL+mwmxw2+V/n8wJk1SNkm5VyXsxhy90H8HCc0o6aL14RM1QuCn5
- 5wLCjwiTjLQGp+aYk3TMY2R0VVA7/kEf+jBTzF5r/a403BLCLquL5mdUxAeYMO3Qz7BtzXk/VyD
- wzvg6QOkIs2gF23yDf8dnIDIihEqoHMfbIW6zVzWUHYdsPkZS7dKul0qxwJsgrGWJfGHW0xhchD
- 2EzyritNrntgeembKq0akTpVWdFNNwyk8ou7XbRSW8ZjBwioVwVgITbaswTopMZVGGTQInhG73n
- hyoiw+d/IzAFgLKpzNVsR8EMmycTBDmdlKXhobrNhefxdVurMBHzMsxeP9rtIrWUzpCcY2nm9oV
- RrxYa04qyPuBRxvVF3bbSx+nMoz+8sCJSpn4e3ZsR6sOjn53IT/n3ZDYFfJoupb+aAhRZhCrMnu
- YRkQ2xHh3G63r
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] r8169: fix LED-related deadlock on module removal
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171274262824.13361.13300515768136013023.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Apr 2024 09:50:28 +0000
+References: <2695e9db-a5a0-4564-9812-a50b91fb1b46@gmail.com>
+In-Reply-To: <2695e9db-a5a0-4564-9812-a50b91fb1b46@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: edumazet@google.com, pabeni@redhat.com, kuba@kernel.org,
+ davem@davemloft.net, nic_swsd@realtek.com, lukas@wunner.de,
+ netdev@vger.kernel.org, andrew@lunn.ch
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+Hello:
 
-This patch adds a new helper chk_msk_info() to show the counters in
-mptcp_info of the given info, and check that the timestamps move
-forward. Use it to show newly added last_data_sent, last_data_recv
-and last_ack_recv in mptcp_info in chk_last_time_info().
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Reviewed-by: Mat Martineau <martineau@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- tools/testing/selftests/net/mptcp/diag.sh | 53 +++++++++++++++++++++++++++++++
- 1 file changed, 53 insertions(+)
+On Mon, 8 Apr 2024 20:47:40 +0200 you wrote:
+> Binding devm_led_classdev_register() to the netdev is problematic
+> because on module removal we get a RTNL-related deadlock. Fix this
+> by avoiding the device-managed LED functions.
+> 
+> Note: We can safely call led_classdev_unregister() for a LED even
+> if registering it failed, because led_classdev_unregister() detects
+> this and is a no-op in this case.
+> 
+> [...]
 
-diff --git a/tools/testing/selftests/net/mptcp/diag.sh b/tools/testing/selftests/net/mptcp/diag.sh
-index bc97ab33a00e..776d43a6922d 100755
---- a/tools/testing/selftests/net/mptcp/diag.sh
-+++ b/tools/testing/selftests/net/mptcp/diag.sh
-@@ -200,6 +200,58 @@ chk_msk_cestab()
- 		 "${expected}" "${msg}" ""
- }
- 
-+msk_info_get_value()
-+{
-+	local port="${1}"
-+	local info="${2}"
-+
-+	ss -N "${ns}" -inHM dport "${port}" | \
-+		mptcp_lib_get_info_value "${info}" "${info}"
-+}
-+
-+chk_msk_info()
-+{
-+	local port="${1}"
-+	local info="${2}"
-+	local cnt="${3}"
-+	local msg="....chk ${info}"
-+	local delta_ms=250  # half what we waited before, just to be sure
-+	local now
-+
-+	now=$(msk_info_get_value "${port}" "${info}")
-+
-+	mptcp_lib_print_title "${msg}"
-+	if { [ -z "${cnt}" ] || [ -z "${now}" ]; } &&
-+	   ! mptcp_lib_expect_all_features; then
-+		mptcp_lib_pr_skip "Feature probably not supported"
-+		mptcp_lib_result_skip "${msg}"
-+	elif [ "$((cnt + delta_ms))" -lt "${now}" ]; then
-+		mptcp_lib_pr_ok
-+		mptcp_lib_result_pass "${msg}"
-+	else
-+		mptcp_lib_pr_fail "value of ${info} changed by $((now - cnt))ms," \
-+				  "expected at least ${delta_ms}ms"
-+		mptcp_lib_result_fail "${msg}"
-+		ret=${KSFT_FAIL}
-+	fi
-+}
-+
-+chk_last_time_info()
-+{
-+	local port="${1}"
-+	local data_sent data_recv ack_recv
-+
-+	data_sent=$(msk_info_get_value "${port}" "last_data_sent")
-+	data_recv=$(msk_info_get_value "${port}" "last_data_recv")
-+	ack_recv=$(msk_info_get_value "${port}" "last_ack_recv")
-+
-+	sleep 0.5  # wait to check after if the timestamps difference
-+
-+	chk_msk_info "${port}" "last_data_sent" "${data_sent}"
-+	chk_msk_info "${port}" "last_data_recv" "${data_recv}"
-+	chk_msk_info "${port}" "last_ack_recv" "${ack_recv}"
-+}
-+
- wait_connected()
- {
- 	local listener_ns="${1}"
-@@ -233,6 +285,7 @@ echo "b" | \
- 				127.0.0.1 >/dev/null &
- wait_connected $ns 10000
- chk_msk_nr 2 "after MPC handshake "
-+chk_last_time_info 10000
- chk_msk_remote_key_nr 2 "....chk remote_key"
- chk_msk_fallback_nr 0 "....chk no fallback"
- chk_msk_inuse 2
+Here is the summary with links:
+  - [v2,net] r8169: fix LED-related deadlock on module removal
+    https://git.kernel.org/netdev/net/c/19fa4f2a85d7
 
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
