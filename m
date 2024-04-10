@@ -1,113 +1,153 @@
-Return-Path: <netdev+bounces-86720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD4568A00A8
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:32:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E14788A00BB
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:38:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CB741F21810
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 19:32:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EA581C236D3
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 19:38:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6518181BAB;
-	Wed, 10 Apr 2024 19:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE40A18132C;
+	Wed, 10 Apr 2024 19:37:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QUN9iV7j"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="E2POfess"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C04181B86;
-	Wed, 10 Apr 2024 19:32:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8F4181311;
+	Wed, 10 Apr 2024 19:37:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712777555; cv=none; b=ODU1o0RW9qEFaWeEDc59bgXgivnKjUgwdXCysRb6N0vhwxA4EziEnvPWrBRV/sDroxf9RY9sSMTA0SmzNZx4GIScuvKhIG8U522wSIDxYfFJ9Q1L68nm0V5d1Gj4pWUgL57OG0Tzd7+8I0r5d3nRHjJUMW98INgiSIqhZvb42FA=
+	t=1712777876; cv=none; b=sQpuU+wH4BJ8GX9t90Yz41bbFpc4PoA+P6MN3reU7HTv3AqqwFS5w22A7XLbjAAZihdSJ4mk5+SRadAUgyOt7/4jmRy/kHIUEF6frzTQOIa9MUXe4SJoFzhkgrlv2UUNHFPQhOPyQ//bb30B6MrOIBsHsp+85zEpYZSLQrNfz7s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712777555; c=relaxed/simple;
-	bh=W1pe4p0h/ujYmBzxMk5Ld9IBc7vdbm9CU60zRdoevJs=;
-	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
-	 Message-Id:Subject; b=N9OTPkv+LmrF6q19SQsENJIczxce3IGRPHnm8Xt9vBuWSErzLOv7Tg+3sEvoOKg1fu/jm0CEkGU3EbRD7zijVhIHrhHaB+1O0Y2xv2xKaEx76imGBP7iGL31PHoZKGx9oFDtsDbRsQTLXUqndGCftMWO1mT1NoHYn/+L6Dz7d8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QUN9iV7j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F294BC43390;
-	Wed, 10 Apr 2024 19:32:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712777555;
-	bh=W1pe4p0h/ujYmBzxMk5Ld9IBc7vdbm9CU60zRdoevJs=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=QUN9iV7j3hJdbVToMFjz25UtvJhH+Pc1R2x/Q1OIjFLOMNd94JMAD7yp/7b3Z8U1y
-	 lQaiFwONOFH4Wi5NnNQc78Adk0vKaRY3s/BlQ7bs7NRYtdNzOekErCHgjAf98IJEcO
-	 yNo4EgSvlOVdHo/uZ85QJHhUKqGHnBt/iyKNqogR7CwkXQyDIHivlsSDFsoapzRNqH
-	 Kh4md4TI5vef4sb+eXMV7W1IfLfSva3aJ1+Y1F2CQWDxZVa6b4p+bmjFCVu6r9oaGF
-	 QVeAl97FnGX8LVsvUo2R6uifLuRmv/l7R/uEHz3eW4zBRsgZfCDFdLreiOdQziC0yD
-	 MArqcIFTChYYA==
-Date: Wed, 10 Apr 2024 14:32:34 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1712777876; c=relaxed/simple;
+	bh=K6oeNAjQ7C0hW+8CzLz9+z7T4W2t9RvIZXZ2cFItEQs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eWvFHUHswGH8qqBTCzUw5Yzmr1ImB3mn48xrwJCuraie/wNKm3J2lz+N3EjpM8Wvi3CAOtIczFhy9JDZqzfpW6igq7WHVo4oPLoewXJ+FUYBrIaDQZFip+5+EWLopQJr/4U0M7gcKpcEsH6yZ52DrQFXtIDNsmAdrF8ftPxCSVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=E2POfess; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=9hg2PSHk8E57TWYc2JeAWBrRdzJuP4lckAGhxVr40SI=; b=E2POfessUrhzeAkOj6YxIsuTDA
+	5MSm9FGxBlByPThoFcsd928J9T7kuZFVBsC1QxL1CWf7txL2yPGrbT6SNAMeLpTbkNCvFugS6GV35
+	WQRP+RzfwSeLAmzjsMC2B0nf6sWGoV+8yePiaNUvEnKqh03HDf+4WZ2yfU8ZegXqBecMsag894oWm
+	dhBDXIGYsSpgsuJCc3dJGEY1kX9CJCgkHPxIbI8KOhzERGud6KtLMjB12iMt6bhcTrmc9zdr7dn+R
+	XD3NvgLEWzU4Es6lYZROcPROfKJrV6glt+ppwnALjrDpG7sjto+t4Fb/cJ47q97/4Q3ARfVkBy3GF
+	M5IlChNg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38562)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rudlF-0008SU-1J;
+	Wed, 10 Apr 2024 20:37:33 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rudlB-0006Cv-25; Wed, 10 Apr 2024 20:37:29 +0100
+Date: Wed, 10 Apr 2024 20:37:28 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Alexandra Winter <wintera@linux.ibm.com>
+Subject: Re: [PATCH net-next v10 07/13] net: Add struct kernel_ethtool_ts_info
+Message-ID: <ZhbqeCeTHIU0LrIn@shell.armlinux.org.uk>
+References: <20240409-feature_ptp_netnext-v10-0-0fa2ea5c89a9@bootlin.com>
+ <20240409-feature_ptp_netnext-v10-7-0fa2ea5c89a9@bootlin.com>
+ <20240409182725.139856d5@kernel.org>
+ <20240410101200.0178e594@kmaincent-XPS-13-7390>
+ <ZhZkNEYnY3FV7Q8E@shell.armlinux.org.uk>
+ <20240410155412.2f34a117@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Min Li <lnimi@hotmail.com>
-Cc: richardcochran@gmail.com, linux-kernel@vger.kernel.org, 
- robh+dt@kernel.org, conor+dt@kernel.org, Min Li <min.li.xe@renesas.com>, 
- devicetree@vger.kernel.org, krzysztof.kozlowski+dt@linaro.org, 
- netdev@vger.kernel.org
-In-Reply-To: 
- <LV3P220MB1202BACF71E85F949FC09A29A0062@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
-References: 
- <LV3P220MB1202BACF71E85F949FC09A29A0062@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
-Message-Id: <171277755055.1212793.1486171322736151590.robh@kernel.org>
-Subject: Re: [PATCH net-next 1/1] dt-bindings: ptp: Add device tree binding
- for IDT FemtoClock
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240410155412.2f34a117@kmaincent-XPS-13-7390>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-
-On Wed, 10 Apr 2024 14:41:47 -0400, Min Li wrote:
-> From: Min Li <min.li.xe@renesas.com>
+On Wed, Apr 10, 2024 at 03:54:12PM +0200, Kory Maincent wrote:
+> On Wed, 10 Apr 2024 11:04:36 +0100
+> "Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
 > 
-> Add device tree binding doc for the IDT FemtoClock Frequency
-> Clock Synthesizers.
+> > On Wed, Apr 10, 2024 at 10:12:00AM +0200, Kory Maincent wrote:
+> > > On Tue, 9 Apr 2024 18:27:25 -0700
+> > > Jakub Kicinski <kuba@kernel.org> wrote:
+> > >   
+> > > > On Tue, 09 Apr 2024 10:26:29 +0200 Kory Maincent wrote:  
+> > > > > In prevision to add new UAPI for hwtstamp we will be limited to the
+> > > > > struct ethtool_ts_info that is currently passed in fixed binary format
+> > > > > through the ETHTOOL_GET_TS_INFO ethtool ioctl. It would be good if new
+> > > > > kernel code already started operating on an extensible kernel variant
+> > > > > of that structure, similar in concept to struct kernel_hwtstamp_config
+> > > > > vs struct hwtstamp_config.
+> > > > > 
+> > > > > Since struct ethtool_ts_info is in include/uapi/linux/ethtool.h, here
+> > > > > we introduce the kernel-only structure in include/linux/ethtool.h.
+> > > > > The manual copy is then made in the function called by
+> > > > > ETHTOOL_GET_TS_INFO. 
+> > > > 
+> > > > This one now conflicts :(
+> > > > 
+> > > > Applying: net: Add struct kernel_ethtool_ts_info
+> > > > error: sha1 information is lacking or useless
+> > > > (drivers/net/phy/marvell_ptp.c). error: could not build fake ancestor  
+> > > 
+> > > gnn patching my out of tree patch in the series! Sorry for that.  
+> > 
+> > Given that this path corresponds to the driver I wrote, do I assume
+> > that you've picked up my work on PTP support for Marvell PHYs? You
+> > should be aware that I still have the patches out of tree but it's
+> > been pointless me reposting it until the issue of which PTP gets
+> > used has been solved. (Publishing will just increase the pressure
+> > to merge it without the PTP problems being solved, and thus break
+> > Marvell PP2 PTP.)
 > 
-> Signed-off-by: Min Li <min.li.xe@renesas.com>
-> ---
->  .../devicetree/bindings/ptp/ptp-idtfc3.yaml   | 47 +++++++++++++++++++
->  1 file changed, 47 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/ptp/ptp-idtfc3.yaml
-> 
+> Yes I did with few fixes and I know you don't want to post the patches until
+> setting which PTP gets used has been solved. As you can see this is one of the
+> subject of this series. About it, could you review this series? This would help
+> a lot and you will be able to post again your Marvell PTP patches if its get
+> merged.
 
-My bot found errors running 'make dt_binding_check' on your patch:
+I wish I could, but I'm seriously short of available time at the
+moment. I'm fitting in what I can day by day and there are many
+things wanting my attention - but I don't have enough time at the
+moment for everything. So really I can't take on anything new
+right now.
 
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/ptp/ptp-idtfc3.yaml:43:1: [error] syntax error: found character '\t' that cannot start any token (syntax)
-
-dtschema/dtc warnings/errors:
-make[2]: *** Deleting file 'Documentation/devicetree/bindings/ptp/ptp-idtfc3.example.dts'
-Documentation/devicetree/bindings/ptp/ptp-idtfc3.yaml:43:1: found a tab character where an indentation space is expected
-make[2]: *** [Documentation/devicetree/bindings/Makefile:26: Documentation/devicetree/bindings/ptp/ptp-idtfc3.example.dts] Error 1
-make[2]: *** Waiting for unfinished jobs....
-./Documentation/devicetree/bindings/ptp/ptp-idtfc3.yaml:43:1: found a tab character where an indentation space is expected
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/ptp/ptp-idtfc3.yaml: ignoring, error parsing file
-make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1430: dt_binding_check] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/LV3P220MB1202BACF71E85F949FC09A29A0062@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
