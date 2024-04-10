@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-86786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D7C48A042F
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:45:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94F078A043B
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:51:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEE6E1F242AD
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:45:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FE77B24F9F
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:51:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37453EA83;
-	Wed, 10 Apr 2024 23:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9E0381B1;
+	Wed, 10 Apr 2024 23:50:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DWHvSbHV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hJHVGoyh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2ABE381B1
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 23:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F633F8F1
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 23:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712792746; cv=none; b=lLiHLStMbIEgl8B+q2MRqg1B/ZKQFQBuNQ5UfdDM6pukTXTCyysYGXGoPeo40YgpCWwaN6vQa/qulFWKQftoJBnocG0a1e6h6I8UzIs2jsgm33S4rSa1Gtqf0iZ7PrXfKtCvqQw8vdKBJomy7S63brF5DT3pU7QBVG0P6LeqUMo=
+	t=1712793059; cv=none; b=gShVJj6AVxH60Qxf0lqWT9OOkwEe/Seli9nA8z4s1ZwSlZ5QFBkIBdvtoxff9z5TRWT8QA1CcRuxAoPqfAhlgO66oqJ/ZFm5abeHKspGR2CKWirLpeBXc0LVPoxgPpL5fdaVkK0E/E8s1Ym3kVtMfVWXOkw+D0Pj40fSqaBHak0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712792746; c=relaxed/simple;
-	bh=xlHHpyel625hv0e8fs6eveC/+T7pEb0TwqE9qnoAarI=;
+	s=arc-20240116; t=1712793059; c=relaxed/simple;
+	bh=R7GLHASk5lrra9DDaXvA4iPJFyp4IhEgQo/7mH1HBlw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dOQOs2VQ8UDM5fqDNXIRG2PPGF17KN5bZ0hdN4nU0ofz4WkvGaXeZu/29pwzZDQa/Wpd/XSIi2NAZfACwfcjm174X6m+QNyi5dDn53pVdjKVB4hs6W2Cpw3d0RcMUTt62UQQK85r27f1AshyI1irTYGiidnCl/+Kcy20yp/muP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DWHvSbHV; arc=none smtp.client-ip=209.85.221.46
+	 Content-Type:Content-Disposition:In-Reply-To; b=T6FYeCIwyn7bUh502MzNNP3kp3gSBz1naRwL3QhunS6WHvmgJuPAXO6fFCmpw9EDBTeQtENmFY1lJ0a1R1E6PjPuNkcNWkfWHhTg9KPlQ//o7kNk4lybJNYb/P0Dbe+OfGWVMuZ/sq6uoerfPxJ0sRxY1Pd1UuxT+VzPwffg9ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hJHVGoyh; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-346b94fa7ecso101242f8f.3
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 16:45:44 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-417d73dedb6so772565e9.2
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 16:50:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712792743; x=1713397543; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712793056; x=1713397856; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aV++u6adkTTcTKvgjjAL6SJv3v9G8Es9CBpCVV0vhxw=;
-        b=DWHvSbHV4PIii4zcOpHdwfq6fvem1kFE22yJ+Y4fCa8Y+qG16n/LgCSitLsgN1hg0q
-         K0fTlt8OOcJl449h9lAtTzxO3AbT0lmSGhCENxFUCPBOXlWp1zPdeNy5IeEHqtqBqIrf
-         dpP7euUUs27g+ClgS+a5KxxFoPgW+ICwvD0vI8Y10PO1St5XjooNRw1HF+Qzd/PmUZAD
-         pwQc9Xc6QBs7NCsEW2ioMkWfKYATgQmJD9vnlflAPSMuACXKJR9CemPUALXHH2z8IB3q
-         zF8mUZpuH8pXl9mlK81WmnbNAKXl9Ob2YJg9g6jjuGSMjqaTKJ591891V+K8rKdZ9tNB
-         a4iQ==
+        bh=Es3XA4to4YejteRCMUbukyMW+UrEfmNKzT+xSe16LG4=;
+        b=hJHVGoyhgBcnG3wf7d1edNLFOLvjB2hFoCBHRABnbSUkhTJsSyGhy7pqk9j0wZHPy9
+         teYkHvyoJv7YF9qa1nn5z0Fa4VyFepQgDcSN1RojuGXQDIPi2FAh6CDNnkHUaBqiJfCm
+         qaW2qZQwEjv/cFSHzX/hhLj5r+G/MF0JN1FKEfiwv9MSVij6QbjF5mRQnFtH1NNtutYm
+         K3DINPBVP4pBtkvlbGGXQcqjoNttHvVlEPfDewsJKlxgk3bDWgzCRyC+0R2JeOTcZm3c
+         egz7AGDJtxvQrz12FIAKcnJG/vZgtonS8HkCBd3Hf1I80Qaux0tTMImgqPxigZC8Hs2k
+         OkBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712792743; x=1713397543;
+        d=1e100.net; s=20230601; t=1712793056; x=1713397856;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aV++u6adkTTcTKvgjjAL6SJv3v9G8Es9CBpCVV0vhxw=;
-        b=vaRkSJnLxsiyayt0A4M8kzXIpw0ww7k4OJJcYoD5q3H2naVHvUe3s42TdwJ1pbsBB0
-         4M3c8yTt9nWvUoYcaf29P+T7S89lP04Wo/BdZ4PiVE0DR+9Xt3y5N/1ySDg4Ctf4wmVe
-         tm/7lNCkWowu/wlp9DgA0LnBCU6K5iwKaPDl/Wwx0y7FiFSHPvY7K0FeUpoF+8aw6eS3
-         3jBYXYv/zUtv1wVZ9jAfRYYj4bBe/Fb1Fco1QAbymRq027E2dcBGMXFYcFjjU4kVRSMg
-         qOhhzhfB50c/S1mNOG0nKK7WtngOj3Jz1PYpE9IOaBmxqJ5pu52l25O97CLzmHHPNhXt
-         M5/A==
-X-Forwarded-Encrypted: i=1; AJvYcCWtK8Lxhv/vNUYvLQApCbnEmPfJbxkP4QQI4fNmeX7aezNH5oxwTpio3j6S7Hn6owz8JzBKK26kiuWbeVWaIjTZD+jBxEWQ
-X-Gm-Message-State: AOJu0YxpaAmBazuY9O8mTYF0fb6Iyxc6N81v97cj9ij27tNHw9JOYsdW
-	jEikMYR1CSvkRCw100TcyBaXdw/Wnea3qjXU5fL49ZVIJKPsrf5cPl8nwJj3
-X-Google-Smtp-Source: AGHT+IFdVs/oCVJ6E8JOvZSBGQEc46ZbvuEmfc5bSQciik7OmR7VKxqncVIfueAuaVp6Cs+iDneyCg==
-X-Received: by 2002:a05:6000:188a:b0:344:4bcc:ed28 with SMTP id a10-20020a056000188a00b003444bcced28mr4590724wri.32.1712792743028;
-        Wed, 10 Apr 2024 16:45:43 -0700 (PDT)
+        bh=Es3XA4to4YejteRCMUbukyMW+UrEfmNKzT+xSe16LG4=;
+        b=P+GXTvsHss/QGYYh28QwMZm/cHQ61ntZQKJatWlKHNbettr3YGHFYfSiz4WK1usSUV
+         oJTxI0vHSP70yfGQm6ST6iK83I7nILoJregql1oVG+LL5alHgBK9w8NZPF6c/yOEwapE
+         Syhslb7WRhQG1FG4FgzaSTYFdYaMLe74vD6WypsYKGd1K/NU8QlLHNvO341Kn+XD5KLK
+         rg5u5GXIaX8y6hkBeOozOVCtqisFfc2/X4whsvvgAIH60X9/o0SlAt153MRjbHGEvSL8
+         6+s4RUTa55xFlTRas99/3HrZviJY9lEhUchizP30/8wJ9oK9CqgzIbYWovea4es/7LOO
+         Dt7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWe9LpXoVuWwtHit0mXrNiy7xJfKBna+rAL35ofSuaP8eOURFUNJP0/lqMtS7PmfFO2WDRs8VamXFm7rMmo7P0CcF5YpTpa
+X-Gm-Message-State: AOJu0YwFXz3GiaV69u+2I2gkobRpp1MhIcWmcWXx+iJTRyE/DZOE4IC9
+	ce2BO3YmN3QCtODIqnHUzaS9DKcivUDm4idNljL4Nn6ddQLveTHN
+X-Google-Smtp-Source: AGHT+IFBd+sxzw42AM74xrecBf93O/8djx0rLTBaeFxvcZ0qs4ug7Twlu/NQN7MFvTxY6bv0jI6J6A==
+X-Received: by 2002:a05:600c:4ec8:b0:417:c34a:c42b with SMTP id g8-20020a05600c4ec800b00417c34ac42bmr1439893wmq.3.1712793055507;
+        Wed, 10 Apr 2024 16:50:55 -0700 (PDT)
 Received: from skbuf ([2a02:2f04:d201:1f00::b2c])
-        by smtp.gmail.com with ESMTPSA id i4-20020a5d6304000000b003437ad152f9sm364897wru.105.2024.04.10.16.45.41
+        by smtp.gmail.com with ESMTPSA id m4-20020adffe44000000b00343e760c637sm376527wrs.84.2024.04.10.16.50.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 16:45:42 -0700 (PDT)
-Date: Thu, 11 Apr 2024 02:45:39 +0300
+        Wed, 10 Apr 2024 16:50:54 -0700 (PDT)
+Date: Thu, 11 Apr 2024 02:50:52 +0300
 From: Vladimir Oltean <olteanv@gmail.com>
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: Florian Fainelli <f.fainelli@gmail.com>,
@@ -75,11 +75,12 @@ Cc: Florian Fainelli <f.fainelli@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Russell King <linux@armlinux.org.uk>,
 	Gregory Clement <gregory.clement@bootlin.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v4 7/8] dsa: mv88e6xxx: Create port/netdev LEDs
-Message-ID: <20240410234539.gzqt223s4kgpjwko@skbuf>
+	netdev@vger.kernel.org, Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net-next v4 3/8] net: dsa: move call to driver port_setup
+ after creation of netdev
+Message-ID: <20240410235052.utn6c2ryyfxgo4zq@skbuf>
 References: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-0-eb97665e7f96@lunn.ch>
- <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-7-eb97665e7f96@lunn.ch>
+ <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-3-eb97665e7f96@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,182 +89,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-7-eb97665e7f96@lunn.ch>
+In-Reply-To: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-3-eb97665e7f96@lunn.ch>
 
-Nitpick: title: net: dsa: mv88e6xxx
-
-On Sat, Apr 06, 2024 at 03:13:34PM -0500, Andrew Lunn wrote:
-> Make use of the helpers to add LEDs to the user ports when the port is
-> setup. Also remove the LEDs when the port is destroyed to avoid any
-> race conditions with users of /sys/class/leds and LED triggers after
-> the driver has been removed.
+On Sat, Apr 06, 2024 at 03:13:30PM -0500, Andrew Lunn wrote:
+> From: Vladimir Oltean <vladimir.oltean@nxp.com>
 > 
+> The driver-facing method port_setup() is a good place to add the LEDs of
+> a port to the netdev representing the port. However, when port_setup()
+> is called in dsa_port_devlink_setup(), the netdev does not exist
+> yet. That only happens in dsa_user_create(), which is later in
+> dsa_port_setup().
+> 
+> Move the call to port_setup() out of dsa_port_devlink_setup() and to
+> the end of dsa_port_setup() where the netdev will exist. For the other
+> port types, the call to port_setup() and port_teardown() remains where
+> it was before (functionally speaking), but now it needs to be open-coded
+> in their respective setup/teardown logic.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 > Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 > ---
->  drivers/net/dsa/mv88e6xxx/Kconfig |   1 +
->  drivers/net/dsa/mv88e6xxx/chip.c  | 119 +++++++++++++++++++++++++++++++++++++-
->  drivers/net/dsa/mv88e6xxx/chip.h  |  13 +++++
->  3 files changed, 132 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/dsa/mv88e6xxx/Kconfig b/drivers/net/dsa/mv88e6xxx/Kconfig
-> index e3181d5471df..ded5c6b9132b 100644
-> --- a/drivers/net/dsa/mv88e6xxx/Kconfig
-> +++ b/drivers/net/dsa/mv88e6xxx/Kconfig
-> @@ -5,6 +5,7 @@ config NET_DSA_MV88E6XXX
->  	select IRQ_DOMAIN
->  	select NET_DSA_TAG_EDSA
->  	select NET_DSA_TAG_DSA
-> +	select NETDEV_LEDS
 
-Do we want mv88e6xxx to select NETDEV_LEDS, or also to be able to build
-it without LED control?
-
-If we want to select, do we always want drivers to select NETDEV_LEDS?
-Maybe hide the help text from the NETDEV_LEDS option, make it invisible
-to the user?
-
->  	help
->  	  This driver adds support for most of the Marvell 88E6xxx models of
->  	  Ethernet switch chips, except 88E6060.
-> diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-> index 3d7e4aa9293a..4e4031f11088 100644
-> --- a/drivers/net/dsa/mv88e6xxx/chip.c
-> +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-> @@ -31,6 +31,7 @@
->  #include <linux/gpio/consumer.h>
->  #include <linux/phylink.h>
->  #include <net/dsa.h>
-> +#include <net/netdev_leds.h>
->  
->  #include "chip.h"
->  #include "devlink.h"
-> @@ -3129,6 +3130,105 @@ static int mv88e6xxx_switch_reset(struct mv88e6xxx_chip *chip)
->  	return mv88e6xxx_software_reset(chip);
->  }
->  
-> +static int mv88e6xxx_led_brightness_set(struct net_device *ndev,
-> +					u8 led, enum led_brightness value)
-> +{
-> +	struct dsa_port *dp = dsa_port_from_netdev(ndev);
-> +	struct mv88e6xxx_chip *chip = dp->ds->priv;
-> +	int port = dp->index;
-> +	int err;
-> +
-> +	if (chip->info->ops->led_brightness_set) {
-> +		mv88e6xxx_reg_lock(chip);
-> +		err = chip->info->ops->led_brightness_set(chip, port, led,
-> +							  value);
-> +		mv88e6xxx_reg_unlock(chip);
-> +		return err;
-> +	}
-> +	return -EOPNOTSUPP;
-
-The opposite looks more natural, if (!ops) return -EOPNOTSUPP, followed
-by the normal code with 1 level of indentation less.
-
-Comment applicable to all netdev_leds_ops below.
-
-> +}
-> +
->  static int mv88e6xxx_set_port_mode(struct mv88e6xxx_chip *chip, int port,
->  				   enum mv88e6xxx_frame_mode frame,
->  				   enum mv88e6xxx_egress_mode egress, u16 etype)
-> @@ -4006,7 +4106,9 @@ static int mv88e6xxx_setup(struct dsa_switch *ds)
->  
->  static int mv88e6xxx_port_setup(struct dsa_switch *ds, int port)
->  {
-> +	struct dsa_port *dp = dsa_to_port(ds, port);
->  	struct mv88e6xxx_chip *chip = ds->priv;
-> +	struct mv88e6xxx_port *p;
->  	int err;
->  
->  	if (chip->info->ops->pcs_ops &&
-> @@ -4016,13 +4118,28 @@ static int mv88e6xxx_port_setup(struct dsa_switch *ds, int port)
->  			return err;
->  	}
->  
-> -	return mv88e6xxx_setup_devlink_regions_port(ds, port);
-
-Unfortunate, but there is an existing bug here. chip->info->ops->pcs_ops->pcs_init()
-allocates memory. If mv88e6xxx_setup_devlink_regions_port() fails here,
-that's memory we're not freeing, by not calling chip->info->ops->pcs_ops->pcs_teardown().
-
-> +	err  = mv88e6xxx_setup_devlink_regions_port(ds, port);
-> +	if (err)
-> +		return err;
-> +
-> +	if (dp->dn && dsa_is_user_port(ds, port)) {
-> +		p = &chip->ports[port];
-> +		INIT_LIST_HEAD(&p->leds);
-> +		err = netdev_leds_setup(dp->user, dp->dn, &p->leds,
-> +					&mv88e6xxx_netdev_leds_ops, 2);
-
-Does anything bad happen with netdev_leds_setup() on platform_data?
-OF APIs are pretty NULL-tolerant.
-
-> +		if (err)
-> +			mv88e6xxx_teardown_devlink_regions_port(ds, port);
-> +	}
-> +	return err;
->  }
->  
->  static void mv88e6xxx_port_teardown(struct dsa_switch *ds, int port)
->  {
->  	struct mv88e6xxx_chip *chip = ds->priv;
->  
-> +	if (dsa_is_user_port(ds, port))
-> +		netdev_leds_teardown(&chip->ports[port].leds);
-
-On platform_data, we are calling netdev_leds_teardown() when we never
-called netdev_leds_setup() and never initialized the port leds list.
-
-> +
->  	mv88e6xxx_teardown_devlink_regions_port(ds, port);
->  
->  	if (chip->info->ops->pcs_ops &&
-> diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
-> index 64f8bde68ccf..d15bb5810831 100644
-> --- a/drivers/net/dsa/mv88e6xxx/chip.h
-> +++ b/drivers/net/dsa/mv88e6xxx/chip.h
-> @@ -291,6 +291,9 @@ struct mv88e6xxx_port {
->  
->  	/* MacAuth Bypass control flag */
->  	bool mab;
-> +
-> +	/* LEDs associated to the port */
-> +	struct list_head leds;
->  };
->  
->  enum mv88e6xxx_region_id {
-> @@ -432,6 +435,7 @@ struct mv88e6xxx_chip {
->  
->  	/* Bridge MST to SID mappings */
->  	struct list_head msts;
-> +
-
-Stray change.
-
->  };
->  
->  struct mv88e6xxx_bus_ops {
-> @@ -668,6 +672,15 @@ struct mv88e6xxx_ops {
->  	int (*led_blink_set)(struct mv88e6xxx_chip *chip, int port, u8 led,
->  			     unsigned long *delay_on,
->  			     unsigned long *delay_off);
-> +	int (*led_hw_control_is_supported)(struct mv88e6xxx_chip *chip,
-> +					   int port, u8 led,
-> +					   unsigned long flags);
-> +	int (*led_hw_control_set)(struct mv88e6xxx_chip *chip,
-> +				  int port, u8 led,
-> +				  unsigned long flags);
-> +	int (*led_hw_control_get)(struct mv88e6xxx_chip *chip,
-> +				  int port, u8 led,
-> +				  unsigned long *flags);
->  };
->  
->  struct mv88e6xxx_irq_ops {
-> 
-> -- 
-> 2.43.0
-> 
+You can keep your author name and me as co-developer. If I changed your
+author information it was probably a mistake.
 
