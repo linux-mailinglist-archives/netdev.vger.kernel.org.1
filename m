@@ -1,118 +1,91 @@
-Return-Path: <netdev+bounces-86365-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D4F589E7CF
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 03:28:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1481A89E7D9
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 03:34:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 089A6B21FC9
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 01:28:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8976E1C20FC7
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 01:34:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7A8E4C6B;
-	Wed, 10 Apr 2024 01:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA60D10F9;
+	Wed, 10 Apr 2024 01:34:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jiEx6yOz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cGaVed5+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022F51854
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 01:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CB7064A;
+	Wed, 10 Apr 2024 01:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712712506; cv=none; b=sThCIFUwL0B2VfCEr5XTRaJ9j1LgsXKko1n0A4mguOx2JgPejf2ObGVjOQF197rqfvnUEVL9DhqyfNqS2ZYg5avxB+qBlxblIoYQqdXIGg1FHPp+72HOAdNd9o05da+Gkrp4KVl00G8+GVwGRkOOE84LYRCdgiTV0Cove58Zd/o=
+	t=1712712848; cv=none; b=fzEqpqNP1N00DvpplO6091f5N6JuoPH8QODL+gPAAYLQtNd9diZk6G7NS6jldrQ1jdjLXdmK7uXh+UD1SbsL/SfLZ74Hv8veo4QxrR5i40/2e8d0Y/CiMCiGs4fmxhy+Sh+IeU1hLUfIIebImP1CZDW7kqpVTsa3pRNYu1U2Kjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712712506; c=relaxed/simple;
-	bh=DWZK/UJGZHhquHjjYLX9QdvhDHNBqfJ5AazYXNuKFtY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=oFyIfGLcnNo0NLqRxQqjBRGtcPUCFlkqj2fuZajOKNztmAEikrF39CZ230OFnm0t9r/4Uh0Rz5SZ/j8uB5/KV3rbU5w71+w8YWfGPfnmx2QXP03R1eLkheDG9KIW0eXAPSpma23FKWqjwy6/DhNcPUiAIpEH/ElNm0ijbDUPLtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jiEx6yOz; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-416920b1a2aso14487175e9.2
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 18:28:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712712503; x=1713317303; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4Xy7Rp0Ks4CrFC/soZjLWSDkjjF/4a6OhQT4APR7Aqw=;
-        b=jiEx6yOztwGKmCoOX0FZMg/ZMnHsLVf85Kw7HYRwMnkVypwYBEzBG62oqfde257ow4
-         jvjWil9mnyobufgzZM4FLne9y9ygEumVwzJXt4Pb6JGulnrvOsaVhM7HpphCnugJsxqc
-         FQX7AaWKZXYmRkeCyWUF7O4G5fGSASiZrnol2iwXoEjpjk6cEWU89gCaM/quwvmrb0yI
-         p5moDjRC/MLILACilUKmwD718TsSdsdVOoqqp+dVd2D8avn2g7wykgmWPAZ0udkfQWf9
-         wo69d19IRUGlJf9htCAXcO9JY9Emg/LhcF3PA9O4+j5K1zcxncVqrVrsMDDWkdHWnirC
-         wzaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712712503; x=1713317303;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4Xy7Rp0Ks4CrFC/soZjLWSDkjjF/4a6OhQT4APR7Aqw=;
-        b=RDLhvoV4ijJw6AxF2uJTo04pbYxEicS6YZtjK607iJu7yW2qx1Z451jh8UwnWnPG/J
-         fxDYBSxMFkKrxy5bVP2xiLeiPo06Fk4tHeoSlpncfpFYyIRLvrAnyRaGM5EFbuheNXhQ
-         YIYziGUdzltVbJxAH25WpR6q6U8v0fTFmJDjSqDZqRrxDcVrxsI92L7G3oT1NQ4vnh7J
-         4pfN4fzL3Vdm3WnBtGaXc/ja5y7jp+4qF12CRrFWD8PaublMAsYqZQAKbDk32lxFEkiv
-         1C8Ob9+MQ+GAR1TFIprhh7TO4zDro4+9r2eYz4KDc2hrXKLKXyE7x5q0e/Kt77C4EhLL
-         bfog==
-X-Gm-Message-State: AOJu0YwwnfuRNB3qb0U7IYfJ1tDPg5Yad0qfnvRTldnOGs/N3HTFC5aF
-	JDNoVihH0SvanzPK40Hp1cNLTHqaUedl3AsB/XU8kyExXMSTqT6cjYWrh8SU
-X-Google-Smtp-Source: AGHT+IHEar27TtXu2kfG4hO3nDUvjwzBBDyE5Bgx8O6pCrxWuZVgTIcdQvwdTiPg8wz/c+vXU05+bA==
-X-Received: by 2002:a05:600c:4f02:b0:416:a6da:beeb with SMTP id l2-20020a05600c4f0200b00416a6dabeebmr814160wmq.4.1712712503173;
-        Tue, 09 Apr 2024 18:28:23 -0700 (PDT)
-Received: from 127.0.0.1localhost ([148.252.132.24])
-        by smtp.gmail.com with ESMTPSA id h8-20020a05600c314800b00416b8da335esm659522wmo.48.2024.04.09.18.28.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Apr 2024 18:28:22 -0700 (PDT)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: netdev@vger.kernel.org
-Cc: edumazet@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Jason Xing <kerneljasonxing@gmail.com>
-Subject: [PATCH net-next v4 2/2] net: use SKB_CONSUMED in skb_attempt_defer_free()
-Date: Wed, 10 Apr 2024 02:28:10 +0100
-Message-ID: <bcf5dbdda79688b074ab7ae2238535840a6d3fc2.1712711977.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <cover.1712711977.git.asml.silence@gmail.com>
-References: <cover.1712711977.git.asml.silence@gmail.com>
+	s=arc-20240116; t=1712712848; c=relaxed/simple;
+	bh=DqEyzDB6gA9tY2cLBHY0HaJ2TcbP4Rj1/3pQs/AVjDY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gVqx98oCzTf4VKpXoEscwvilUEko8VvxbFX9t3MSPFmhoY9MHRsWsjjySyULpVEJ0j/krIOGOa/B+2nm/jzxuNWJIrxg7NN9v2t+KFYhVoBTKAKnLBYlJorXptzo3I0Z2cjjcIfXa9KN24WBb9/Zkc7iF/etoI3MZhrd1pzuKq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cGaVed5+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03DCFC433F1;
+	Wed, 10 Apr 2024 01:34:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712712847;
+	bh=DqEyzDB6gA9tY2cLBHY0HaJ2TcbP4Rj1/3pQs/AVjDY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=cGaVed5+yN7xmkmbHJVfElRpnFUDSFbABfqVWya2USmjMjKEmBJh5A+s0Sm5J5PVE
+	 7uuAeJ6v9qqvRo5Ac43XM2HQqpk7FaeJFsC3W4scazZHmI2OEfZBWeNoem+I5nWSNF
+	 9Pobqaw9ShSFnL2Bb7GbaXUjvJ9xbqJtjlls3NdHfj0PaqmoYu9ovNHemu8W4q8ICw
+	 zKymKoS8f5WjJphpOZFTZmqDgugBL9r4ggGRd17rn787M6se9cNEd3PW/NBzksRI5p
+	 IOWp3Sh3SvTViEXjsqiKPFiKe9XJBvC7CPm1anTc7uiC9Xva5F/ZPkT4wW+DSQuUiT
+	 k853Gh/qEOTAA==
+Date: Tue, 9 Apr 2024 18:34:04 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Geert Uytterhoeven
+ <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, Alexandre
+ Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?=
+ <clement.leger@bootlin.com>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, "Russell King (Oracle)"
+ <rmk+kernel@armlinux.org.uk>, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v2 3/5] net: stmmac: dwmac-socfpga: use
+ pcs_init/pcs_exit
+Message-ID: <20240409183404.7d3eb04f@kernel.org>
+In-Reply-To: <20240409-rzn1-gmac1-v2-3-79ca45f2fc79@bootlin.com>
+References: <20240409-rzn1-gmac1-v2-0-79ca45f2fc79@bootlin.com>
+	<20240409-rzn1-gmac1-v2-3-79ca45f2fc79@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-skb_attempt_defer_free() is used to free already processed skbs, so pass
-SKB_CONSUMED as the reason in kfree_skb_napi_cache().
+On Tue, 09 Apr 2024 11:21:46 +0200 Romain Gantois wrote:
+> +	struct regmap_config pcs_regmap_cfg = {
+> +		.reg_bits = 16,
+> +		.val_bits = 16,
+> +		.reg_shift = regmap_upshift(1),
 
-Suggested-by: Jason Xing <kerneljasonxing@gmail.com>
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- net/core/skbuff.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This appears to displease the compiler:
 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 62b07ed3af98..dd266f44aaff 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -6983,7 +6983,7 @@ static void kfree_skb_napi_cache(struct sk_buff *skb)
- 	}
- 
- 	local_bh_disable();
--	__napi_kfree_skb(skb, SKB_DROP_REASON_NOT_SPECIFIED);
-+	__napi_kfree_skb(skb, SKB_CONSUMED);
- 	local_bh_enable();
- }
- 
+drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c:389:16: error: call to undeclared function 'regmap_upshift'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+  389 |                 .reg_shift = regmap_upshift(1),
+      |                              ^
 -- 
-2.44.0
-
+pw-bot: cr
 
