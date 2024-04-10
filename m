@@ -1,152 +1,176 @@
-Return-Path: <netdev+bounces-86707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E98BD8A003E
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:04:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 704CE8A0046
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:05:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B535283FDE
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 19:04:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27258288C27
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 19:05:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0281F180A72;
-	Wed, 10 Apr 2024 19:04:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B66418131D;
+	Wed, 10 Apr 2024 19:05:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="UPyw8BLE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="x+VEU+E5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9047460;
-	Wed, 10 Apr 2024 19:04:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3562180A8A
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 19:05:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712775875; cv=none; b=gvivG6DsYK4f52eU1YQxHSEVGTpPKQIlDms5ICgBpNAQAZJc0lrg1gjo9szDVVEmmtFYuHPvIUeOGBKgLlsKc+Ghej4gh7bRLKk+RqI9C1+W7V0qLthvq9n3pXDGQkcipkG94c0O6LiFQtzQw+l8c8kfKvZfdfbAZIokP8MuTVw=
+	t=1712775911; cv=none; b=TuRB8cME/M6pEBfSuWKZ54b0FGL4LucSzSRCaGQJaNOsaBvY9+8oRPzLUvlvyeGt9E7L1xsLEcGFhvua7Sr3racxIGDM2loD4v0GNyw516zXDrC/5nVkkerU1cvynsh9sNLjIoo3hjguJDs56HDok8svpyi8Rze3MlafJmNyqJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712775875; c=relaxed/simple;
-	bh=WNUHRnuL/nPa/KdZjEbb1Yec0muX2H7NaxT84SbLG+o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=RlXcUth3pHaBcf9SS3Vrm1ACfIS2RClT7dFX3iEkDINn2yWBE4SDrmweFJZDIxXl0xWWDUWfQmhj8CSjmHrqZQY0gT0fV61QZ9LiwEnnhkhttS+A2A0u6q8nYfCYL1xwTUwI5eFGrppxq+QiTv19pgrZONtK72u1j5oGcKlLMNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=UPyw8BLE; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43AEFVpt031790;
-	Wed, 10 Apr 2024 19:04:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=McZIZ4RkNyMqFdfx+BLnURSG0gx07exkf3P/nz9bFEk=; b=UP
-	yw8BLENpdWV1k3PlqVVCFwwJIkjna/c/YldXBHce6NcvOkvYqn3tBoOpsmLIebVs
-	FlBOa8p34dDNVi1dFVYLZkUHj1Reo53ydytnO7YMV0SxWII2eALJ7pzMJ+8Rf+Jo
-	jaIhDVf7Cl68YSeI6jnt2wY6wPlqVw8y2cRQqHUCUs54/WD7fVolF0c323iJiYMC
-	x/V634ulbM9T/ytbfmwAZ7hqUQD3wHuT+vi4W55LajlRWntAkIvmISMjEMacrUs7
-	Q2EZxG7SLMVrdJJJ57roPtJUmejoygTpQySA6+t7na5ftPKLrmN73PmedA6aLCa6
-	X961rZAPS+L/WK/eIPHA==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xdphau2cf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Apr 2024 19:04:12 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43AJ4BSS016238
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Apr 2024 19:04:11 GMT
-Received: from [10.46.19.239] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 10 Apr
- 2024 12:04:07 -0700
-Message-ID: <f6066cc2-410a-4043-9657-7168dbd2a2ce@quicinc.com>
-Date: Wed, 10 Apr 2024 12:04:06 -0700
+	s=arc-20240116; t=1712775911; c=relaxed/simple;
+	bh=fmONSPwwncQRNVe6gLdC7y2dFGVtjszuSrUkmPvCfMc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gztmGzzit6KwwlDV0oU8Jmss8JWzIA6P91QXfIb3XIc7KyM/6M0PxGGHAoLGVvHBnQ3ywcmpTuQ6ugEB2Vs5v7JsW4SYt3wWyUhEPBtI3Iw5Zb25aKv5eVUV7vhoWm8nHt0KDIkK9iOKvzqt/DJAeP+l12b7b+ceOI77ipQb1vY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=x+VEU+E5; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-617fffab703so60016737b3.0
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 12:05:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712775909; x=1713380709; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=NUsqaY3FlD+Zy5gL3/6y26rsQKtdUSDBl6T6cUgvwGY=;
+        b=x+VEU+E5c4GbDaPYaNdZcxDOslPEALGSRJLuem9mUjVeMcSNBLP3ASaxZPQqQ5XUQZ
+         GZMXRyCkhx2ZoxxyRLPMKrCqPZ+3yvuZEPa5AUd/6FJ8/yzq1XcF4hnROHBlxlK7Vgcx
+         2pyZa2zNev3R91omeeXv2aO0gV3B/NJBobuMHBIRA1cVejh4jjPsHoitvpHL3Zd/40WE
+         8JXRx0qZSqdCyEyWcppCQJYcHhwxeQ66pzqYrqYfjyIhXJ7KWt3JYnWgKWiEzv/g1wpN
+         95gbBhqfIKateV6/hlTY1IgJOxtlJjoG83yPoufIOVhEi2xSPNNRakvoMC/x0k8EFMCl
+         OBYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712775909; x=1713380709;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NUsqaY3FlD+Zy5gL3/6y26rsQKtdUSDBl6T6cUgvwGY=;
+        b=YWsIUS9a949lOUP6r2C8WFHrtgp5JLpQ6vkE54X5eG26MTjruSkFXArjfEMD82CkrX
+         VtMXEja95U7UgpDVRxGzWa0OhdTfcT0Vf6EbGDd0MjyRQpXRH7LyNJwjTCmdUxpNa4pT
+         MlU0/K5XvS0b0NQ0zu1YRI6ttJLsCEmg09FTcd9WsyWRu0IT8L73KpFeNk/y3EL47b4V
+         PNfb23GvPT8ac/vwVhV2hhE4QETIVXtjrEv8ANBqgyD3lq4XrP60cNJioG0JwsPNj9+2
+         jnXGWkSBtL6vLxLz3xHTXTTfHW7VNLig/oUUHt5ylxxp2Wh+xVQPPDVEjYAObjVHmQsY
+         pgrg==
+X-Forwarded-Encrypted: i=1; AJvYcCUbEEfHO1dPK9xQUyg4TZZPYLnpsvt3NrU+mLik+WU40sCc+Op80etIn6Iwu44PIzlKk3nbjMHV86ybPhoGuRtrzi02ZNWW
+X-Gm-Message-State: AOJu0YxPodWQVZ/nuptFzNbhTYyE5nzwl+4mdzbjY/lmONcXZnFP9Wew
+	97L4cUIhGah5x7wjrfrxsPpg6oFEav7mSxsyQkbsX8TMA22vmuVkIj+gSp/zc69eI79zC/kDqbM
+	iCisyRDatw9G6/5/RQLKbaA==
+X-Google-Smtp-Source: AGHT+IEqVOgcwBysoxKVNXvqkW6QcqgDsjz5wi5Y/eDCWWMsTGxmIgG0Wg30HM+okFcwb6g2q2KBLiBBmJSIPM1hCA==
+X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:21f0:1a3a:493e:cf21])
+ (user=almasrymina job=sendgmr) by 2002:a5b:34e:0:b0:dc7:4af0:8c6c with SMTP
+ id q14-20020a5b034e000000b00dc74af08c6cmr344899ybp.6.1712775908813; Wed, 10
+ Apr 2024 12:05:08 -0700 (PDT)
+Date: Wed, 10 Apr 2024 12:05:00 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH bpf-next v1 1/3] net: Rename mono_delivery_time to
- tstamp_type for scalabilty
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
-        "Martin
- KaFai Lau" <martin.lau@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>
-CC: <kernel@quicinc.com>
-References: <20240409210547.3815806-1-quic_abchauha@quicinc.com>
- <20240409210547.3815806-2-quic_abchauha@quicinc.com>
- <6616b0af63eed_2a98a52947e@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-In-Reply-To: <6616b0af63eed_2a98a52947e@willemb.c.googlers.com.notmuch>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
+Message-ID: <20240410190505.1225848-1-almasrymina@google.com>
+Subject: [PATCH net-next v6 0/2] Minor cleanups to skb frag ref/unref
+From: Mina Almasry <almasrymina@google.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-rdma@vger.kernel.org
+Cc: Mina Almasry <almasrymina@google.com>, Ayush Sawal <ayush.sawal@chelsio.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Mirko Lindner <mlindner@marvell.com>, Stephen Hemminger <stephen@networkplumber.org>, 
+	Tariq Toukan <tariqt@nvidia.com>, Wei Liu <wei.liu@kernel.org>, Paul Durrant <paul@xen.org>, 
+	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	David Ahern <dsahern@kernel.org>, Boris Pismenny <borisp@nvidia.com>, 
+	John Fastabend <john.fastabend@gmail.com>, Dragos Tatulea <dtatulea@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 8QFGfTKv0lAOUgSU9Ht80HCesRaoTJFS
-X-Proofpoint-ORIG-GUID: 8QFGfTKv0lAOUgSU9Ht80HCesRaoTJFS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-10_04,2024-04-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- clxscore=1015 adultscore=0 lowpriorityscore=0 impostorscore=0
- mlxlogscore=942 mlxscore=0 priorityscore=1501 spamscore=0 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2404010003 definitions=main-2404100138
+
+v6:
+- Rebased on top of net-next; dropped the merged patches.
+- Move skb ref helpers to a new header file. (Jakub).
+
+v5:
+- Applied feedback from Eric to inline napi_pp_get_page().
+- Applied Reviewed-By's.
+
+v4:
+- Rebased to net-next.
+- Clarified skb_shift() code change in commit message.
+- Use skb->pp_recycle in a couple of places where I previously hardcoded
+  'false'.
+
+v3:
+- Fixed patchwork build errors/warnings from patch-by-patch modallconfig
+  build
+
+v2:
+- Removed RFC tag.
+- Rebased on net-next after the merge window opening.
+- Added 1 patch at the beginning, "net: make napi_frag_unref reuse
+  skb_page_unref" because a recent patch introduced some code
+  duplication that can also be improved.
+- Addressed feedback from Dragos & Yunsheng.
+- Added Dragos's Reviewed-by.
+
+This series is largely motivated by a recent discussion where there was
+some confusion on how to properly ref/unref pp pages vs non pp pages:
+
+https://lore.kernel.org/netdev/CAHS8izOoO-EovwMwAm9tLYetwikNPxC0FKyVGu1TPJWSz4bGoA@mail.gmail.com/T/#t
+
+There is some subtely there because pp uses page->pp_ref_count for
+refcounting, while non-pp uses get_page()/put_page() for ref counting.
+Getting the refcounting pairs wrong can lead to kernel crash.
+
+Additionally currently it may not be obvious to skb users unaware of
+page pool internals how to properly acquire a ref on a pp frag. It
+requires checking of skb->pp_recycle & is_pp_page() to make the correct
+calls and may require some handling at the call site aware of arguable pp
+internals.
+
+This series is a minor refactor with a couple of goals:
+
+1. skb users should be able to ref/unref a frag using
+   [__]skb_frag_[un]ref() functions without needing to understand pp
+   concepts and pp_ref_count vs get/put_page() differences.
+
+2. reference counting functions should have a mirror opposite. I.e. there
+   should be a foo_unref() to every foo_ref() with a mirror opposite
+   implementation (as much as possible).
+
+This is RFC to collect feedback if this change is desirable, but also so
+that I don't race with the fix for the issue Dragos is seeing for his
+crash.
+
+https://lore.kernel.org/lkml/CAHS8izN436pn3SndrzsCyhmqvJHLyxgCeDpWXA4r1ANt3RCDLQ@mail.gmail.com/T/
+
+Cc: Dragos Tatulea <dtatulea@nvidia.com>
 
 
+Mina Almasry (2):
+  net: move skb ref helpers to new header
+  net: mirror skb frag ref/unref helpers
 
-On 4/10/2024 8:30 AM, Willem de Bruijn wrote:
-> Abhishek Chauhan wrote:
->> mono_delivery_time was added to check if skb->tstamp has delivery
->> time in mono clock base (i.e. EDT) otherwise skb->tstamp has
->> timestamp in ingress and delivery_time at egress.
->>
->> Renaming the bitfield from mono_delivery_time to tstamp_type is for
->> extensibilty for other timestamps such as userspace timestamp
->> (i.e. SO_TXTIME) set via sock opts.
->>
->> Bridge driver today has no support to forward the userspace timestamp
->> packets and ends up resetting the timestamp. ETF qdisc checks the
->> packet coming from userspace and encounters to be 0 thereby dropping
->> time sensitive packets. These changes will allow userspace timestamps
->> packets to be forwarded from the bridge to NIC drivers.
->>
->> In future tstamp_type:1 can be extended to support userspace timestamp
->> by increasing the bitfield.
->>
->> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
->> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
->> ---
->>  include/linux/skbuff.h                     | 18 +++++++++---------
->>  include/net/inet_frag.h                    |  4 ++--
->>  net/bridge/netfilter/nf_conntrack_bridge.c |  6 +++---
->>  net/core/dev.c                             |  2 +-
->>  net/core/filter.c                          |  8 ++++----
->>  net/ipv4/inet_fragment.c                   |  2 +-
->>  net/ipv4/ip_fragment.c                     |  2 +-
->>  net/ipv4/ip_output.c                       |  8 ++++----
->>  net/ipv6/ip6_output.c                      |  6 +++---
->>  net/ipv6/netfilter.c                       |  6 +++---
->>  net/ipv6/netfilter/nf_conntrack_reasm.c    |  2 +-
->>  net/ipv6/reassembly.c                      |  2 +-
->>  net/sched/act_bpf.c                        |  4 ++--
->>  net/sched/cls_bpf.c                        |  4 ++--
->>  14 files changed, 37 insertions(+), 37 deletions(-)
-> 
-> Since the next patch against touches many of the same lines, probably
-> can just squash the two.
+ .../chelsio/inline_crypto/ch_ktls/chcr_ktls.c |   3 +-
+ drivers/net/ethernet/marvell/sky2.c           |   1 +
+ drivers/net/ethernet/mellanox/mlx4/en_rx.c    |   1 +
+ drivers/net/ethernet/sun/cassini.c            |   5 +-
+ drivers/net/veth.c                            |   3 +-
+ drivers/net/xen-netback/netback.c             |   1 +
+ include/linux/skbuff.h                        |  63 -----------
+ include/linux/skbuff_ref.h                    | 106 ++++++++++++++++++
+ net/core/gro.c                                |   1 +
+ net/core/skbuff.c                             |  47 +-------
+ net/ipv4/esp4.c                               |   1 +
+ net/ipv4/tcp_output.c                         |   1 +
+ net/ipv6/esp6.c                               |   1 +
+ net/tls/tls_device.c                          |   1 +
+ net/tls/tls_device_fallback.c                 |   3 +-
+ net/tls/tls_strp.c                            |   1 +
+ 16 files changed, 129 insertions(+), 110 deletions(-)
+ create mode 100644 include/linux/skbuff_ref.h
 
-Sounds good i can do that. 
-Make only 2 patches 
-1. rename + assign tstamp_type
-2. introduce another bit for clock_id base time 
+-- 
+2.44.0.478.gd926399ef9-goog
+
 
