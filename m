@@ -1,167 +1,190 @@
-Return-Path: <netdev+bounces-86742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A93628A0232
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:34:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 421B58A024A
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:41:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D61341C2194F
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:34:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA608B21E87
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CDA618410E;
-	Wed, 10 Apr 2024 21:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 570E0181CFD;
+	Wed, 10 Apr 2024 21:41:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XNCJ3vRD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6876184111;
-	Wed, 10 Apr 2024 21:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712784879; cv=none; b=B4Y6y5/xPcWaSABbn5PTW28OrWmRrRcy3zDAZbQ8BmLLaxPOTUn/YS7riLb5KvUAsUyKbFYXWrBkzez2rrFkqleafhe8P/3xWM0nLMD64srmEWLWErLxLBDX6C4cUiVnqExe1W8Jy5LoxSHEsFJQEq9DWZSBMoIkqwjCqoR6gaY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712784879; c=relaxed/simple;
-	bh=VBmhZuhy9OiQHnd1DGErAQ0jyjLmeXi8kVR0g4eoQ4g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MpSy8ZeuCwLHxwaKVaQOhy3RZrUe9+YPQbkIZ5D9ZfTNtDflH5rlL7xaj2hP0HJqisZ4weOE7AfpVhmw+QsU8unUVrwmk2T1x9dgpN0Gr8RUZnDjDGTjfZTocGB7xuUfUWo0BY3ZObrScyAlRrslUPwGTgsZ62OU39OmAkzVbvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-36a06a409caso29867765ab.3;
-        Wed, 10 Apr 2024 14:34:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712784877; x=1713389677;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bG7sCu17jkSV6yBnpltEJ7rJachKjyYSICFCQUTjj7o=;
-        b=vhVBSR0iFUNbNPvzUxO1CB/btukJbaHXT5f7j2mAcu93UrASMQtgYvrMrUoVzjYVUM
-         hnc49iN5Oa/+tYOGU1wmEm8rQqZa7HPrJm55LA7wvetb31CgFsmObEknA/fHRRMkBRrh
-         UmhNGYsQBZFIpCXjePOaIDzKGTUB3ojpwjdgxo3+DUtAvs+gld9aiXbz1dyzLrRjekjg
-         dKyrisUSo7qr+us+AeyLuDUOnmghij6MULu0fczxCZvyz+1mwnFykS6ZAziqKQUOkU8d
-         53hhF/jUkb0fdp4suAU5r99b4sxbB429fmMHoAtQW5tl0cMJzyquPWZlI2d8gaZ9Y5eh
-         mVLA==
-X-Forwarded-Encrypted: i=1; AJvYcCUhJFCVwt53JpTUBt10yI4IDzKHSJr7ZMA+l8RmK6oHoMxZo5KW4iAqwhoEGLVXaDI0GJVZa3zQgidRCqDr5Fl+/uVSCyseQtGa4E+efnFFC2xkYnDf20d3z+/eDzh8DxtN4GV6rD9NkLZK1SUbVzPTk0zuCMm4RydFcUpc2PiDelL6
-X-Gm-Message-State: AOJu0YyDhpcNVMTBn4fmLFSdpQU4HsOm2/yV9le95JQbdXqX/uNNloJE
-	yz16+Td7X7wceLG8Sgl8oyFc/d0FnAF9QcGQYvuwmD7MTqbU+wrs
-X-Google-Smtp-Source: AGHT+IGygycenL7WG6EoKl2az0kNMkHo2YmNsYnvLqzVt/ufhtiQR7jXbASbhbWPWL0cnqC+N+eTDw==
-X-Received: by 2002:a05:6e02:1aa8:b0:36a:e011:15ba with SMTP id l8-20020a056e021aa800b0036ae01115bamr1460926ilv.9.1712784876707;
-        Wed, 10 Apr 2024 14:34:36 -0700 (PDT)
-Received: from liuwe-devbox-debian-v2 ([20.69.120.36])
-        by smtp.gmail.com with ESMTPSA id e14-20020a65648e000000b005dc98d9114bsm5526pgv.43.2024.04.10.14.34.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 14:34:36 -0700 (PDT)
-Date: Wed, 10 Apr 2024 21:34:27 +0000
-From: Wei Liu <wei.liu@kernel.org>
-To: mhklinux@outlook.com
-Cc: rick.p.edgecombe@intel.com, kys@microsoft.com, haiyangz@microsoft.com,
-	wei.liu@kernel.org, decui@microsoft.com, gregkh@linuxfoundation.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, kirill.shutemov@linux.intel.com,
-	dave.hansen@linux.intel.com, linux-kernel@vger.kernel.org,
-	linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-coco@lists.linux.dev,
-	sathyanarayanan.kuppuswamy@linux.intel.com,
-	elena.reshetova@intel.com
-Subject: Re: [PATCH 0/5] Handle set_memory_XXcrypted() errors in Hyper-V
-Message-ID: <ZhcF44AEkKy0Z0HR@liuwe-devbox-debian-v2>
-References: <20240311161558.1310-1-mhklinux@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8605513CF86
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 21:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.9
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712785262; cv=fail; b=TDGfYa951AwnrwCMCBINDKDqiMkDhkHLySN5IzMjhHY9DcoCXs7tjHFNKy2XBzWdwvzrcrnoqoIuHz6LaYGsKtWBrgL+J8KbZ0kL4CfJyK08114mdS88yJUCQbgq6ljmNLfQlM1EmtnLz23Hw8B3bDrm8+rtNF1vSl2v0hEnEkg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712785262; c=relaxed/simple;
+	bh=mI8DZLtq/6KYAq9eac57pE+q2ddBVI9tGNDKtqOXnSU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=XiuJw/XMvMGLE/9kInLBbbmWmvkgmvVeBC8sl91SPQ6svN1n2YspMzO1zS6EaO/BJsBfmYYHoYfQg/RyaBaMUxkqxe9Lzmz/pSRkvGTQvLjvwGMcNBZVyGTzQbkgOKIetvH5+O7veBwvsHL3R3eW3IIqLvvZGPm0UohYbKvE9ro=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XNCJ3vRD; arc=fail smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712785260; x=1744321260;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=mI8DZLtq/6KYAq9eac57pE+q2ddBVI9tGNDKtqOXnSU=;
+  b=XNCJ3vRDIgd8ZzIeX8DB29t9l+pbsO072VqGUpj5tkfsYFu5nHiEKBlf
+   8A5LJ8+Agy37Ozf2hhpY3xNKAhRm1fSHrYvujayacBnpfd1w8we5yxIZQ
+   lxmbuqALSZ36a+WAm6WLHp+ftwfT+Qw86hQN5ERPinw0WJnG9xYTm27ux
+   9KermYl8DOs+mP/WX79OTSAXrlHtVSs8dpD9DI9h511TiIXmqJumuiAHm
+   9K3CGxoGtWMlK11cS/5R50bSCATxKR08hdhsnUljVRkksy8sViI6lCJ16
+   qqDOEYpjq3B8TNbTlsG4fuEnXDswcf+NELgmxvuTKuSM4sflhYzRx3udj
+   g==;
+X-CSE-ConnectionGUID: 1hlkWPTQThKRZTe+LFPlRg==
+X-CSE-MsgGUID: XINKPTpdSU6rEYJdaaGurQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="30659237"
+X-IronPort-AV: E=Sophos;i="6.07,191,1708416000"; 
+   d="scan'208";a="30659237"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 14:41:00 -0700
+X-CSE-ConnectionGUID: FS3KNmt/RzaSS/j71k3T6A==
+X-CSE-MsgGUID: wLMucYvMTjCb8fO5gxQ1RQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,191,1708416000"; 
+   d="scan'208";a="58117199"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Apr 2024 14:41:00 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 10 Apr 2024 14:40:59 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 10 Apr 2024 14:40:59 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.172)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 10 Apr 2024 14:40:58 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=n68BqnxhlBPOvZSaAlyzNPq58UbfK1Pjup34NAd5cd6riyi0wGa1NVuB023mTZy9dP0hAluSFY26/DVvMij4V1xmf/Ddd7Yu+BrrCnlDd8gXqMfJU1ETsej5LIduM638gQA+69mSgp71CKXoGAk8NDanWG++anK4lVTr7JT4I42aAcs/qOGGfJmKErFdMKtS5xroWadaiMeB1HNDzITZ+FKAZXQle19O4RHPVnDGN7TRAhtYOJix/zmisTqMMmXyXOuOH/xTXF5ZqPOpaaFwN7wnaGC1JqtQTqp17VPFyMUrHvcGmMTWtlR7H75bAI8es56dm36dVtAmFxQPtB6+mg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mI8DZLtq/6KYAq9eac57pE+q2ddBVI9tGNDKtqOXnSU=;
+ b=b53olBKKN+5qirm/QoRlX2FucISSHL54CwiCshX+LeLr0Oz7gd/Ywn2NJT6DwKzNkRtrKcZuT1z4hNBFRDEJOhRUrLBHm0uIu4JOONiyAfof/fJMb0tpA8eUkh4FwR7S2GIAuLMzcVIKvBP1JxpKxIj3ze1k9DtdUXJv3uDQ0nzVvK6ya3hHQvf0id9VaPxnj4LDA6AFtLxUMIyNvFsCyjssbWss4b+ds4gQvhKqfXeP+CIKO0gYqom0WZ05ZcrXEsCkXIiKzBsxzs2maRdoyph68ubUPeQgfK4xVwa4Iab2+0xc6uS/4gE071cp/UFjb0BZeivYWt3TsXJxb+jsRQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
+ by DM4PR11MB6333.namprd11.prod.outlook.com (2603:10b6:8:b4::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.26; Wed, 10 Apr 2024 21:40:50 +0000
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::9c80:a200:48a2:b308]) by BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::9c80:a200:48a2:b308%4]) with mapi id 15.20.7452.019; Wed, 10 Apr 2024
+ 21:40:50 +0000
+Message-ID: <0eaf238b-0d00-51d8-9bf5-f9fb875277e7@intel.com>
+Date: Wed, 10 Apr 2024 14:40:47 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [Intel-wired-lan] [iwl-net v1] ice: tc: do default match on all
+ profiles
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, "Buvaneswaran,
+ Sujai" <sujai.buvaneswaran@intel.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Marcin Szycik
+	<marcin.szycik@linux.intel.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "Kubiak, Michal"
+	<michal.kubiak@intel.com>
+References: <20240312105259.2450-1-michal.swiatkowski@linux.intel.com>
+ <PH0PR11MB50130FD5A519919523197C7C96362@PH0PR11MB5013.namprd11.prod.outlook.com>
+ <ZgZ6/6/R+5EfQvbb@mev-dev>
+ <PH0PR11MB5013EC7967F8B7694B2F5C8C963F2@PH0PR11MB5013.namprd11.prod.outlook.com>
+ <Zg+5mIUtMruFRck0@mev-dev> <ZhZio9Kc0FrgNwnN@mev-dev>
+Content-Language: en-US
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <ZhZio9Kc0FrgNwnN@mev-dev>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0003.namprd03.prod.outlook.com
+ (2603:10b6:303:8f::8) To BL3PR11MB6435.namprd11.prod.outlook.com
+ (2603:10b6:208:3bb::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240311161558.1310-1-mhklinux@outlook.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|DM4PR11MB6333:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: fSHC29OV29xBLW93A9pydqzB+9HsKJOBhavdsSDYbneunxpVms7RMR5ji1J6W/6ju90N3CSmkYYzQUXv59Djf2T7YFarnkvWecU1jtnRwWqBUTUJUVex+UdAY9GAEVgy1RVE1uGbb7IPzzQrN8GVAHhy7lNKceTgwCz2EA+TLeYtd7brpDH1PDnVRR+O1mEaRifCENbOyD+8A0wRaEnJnP9IUVlholBlPFopaeyKDpdwaz9b3viMQ+vPQT1chnyic+QHODxaDOIu26/CgOFU5Ub8N4UbD0msMCZHzT5vsMVL0UgPnwUxqu/Jf6HkemX2AZokqtBXHAr7BeU775K3PkQtnzxmdtDBjkaNBUDZXYJVFRi+3Zgt3q87feaX7hQ9Vq6QFRY2lqw+u9MB5olYzaTV1d+se5DgARdn7YDgnqcLS2lefRzMjbxotoADqmBQB4Jt3EmIQCrEsTVbmxrizYKqObilQ16kBoUcLYdWp5NoDSON265adnEwyJT2dghNmmtvR4xXw64dNxncN+gxqwn+WpvSzG8dDJYL7s9VkKhKMTg2OREYk4pc0z8OZJbThK/MFwLp14P34KIykFpnkgwO2WL0zujuAsuNzQxrr8cfJ3bnZdW78Ulc6TspanQTou4bH1jSSjAbdP1ATdQStMj8U5k1IRfpsq2Aj63qIMI=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aFl2WmQ1MmhwelMwOFRtNmtYdjJLNWxqZEZuN2kyRmdCNXZuM0ZmUUVhMTUv?=
+ =?utf-8?B?dW9ScnJndzM0SDFaUWpTaE45NHg4d0VWV1k4Y2xjL1JLQlpDL0dGMXZ6WXNw?=
+ =?utf-8?B?NDgzaStUYlJRMFVrNVdXSGxPK1I0VzM4eHF3cVNCNE9vN0NVVWtCeGNFZ0VY?=
+ =?utf-8?B?a3U4b2lMZFd6bVpUUDdDNjI0ZE5aWm1pbG9SMDVBaWMzOWppNW5hcEpiVHhN?=
+ =?utf-8?B?UmpCVVJBUlorbEN4NENpbmxZakRhQVRsanYvVGtpV0MzRmorS05QeDVUSHU0?=
+ =?utf-8?B?VHIxQ3JhR1U1enBFZERvVXY5TC9HMDkvQmRwRGhRVW8vTnRYTFNGdTQwVEZ6?=
+ =?utf-8?B?Z0lMQlRHNG90UmhwMmptcTFLb0NqUkZXc0ZPUFlUSHdFM2VwUjJTU09aa25X?=
+ =?utf-8?B?TlpXN2gyUktVNWJ5V0ZZWUNqb3pWQ2VjLzJFN2RWUHVacnRvM0NxZytqMjNB?=
+ =?utf-8?B?MGdLTWlZNGp4N3VOeElKbGhkMEQ2My9ub2JsQm5iUnhuZWR6cEtNNlg1bVVW?=
+ =?utf-8?B?Qnp2NXdTTHpaMDFVZXhXWk5lRkNCK2xMaHAyQ1JheXJZRkdGYTk4R1lQLzQ0?=
+ =?utf-8?B?dVNQQWVUTnkvVXFpVkIxS2MxUE1BakRmYkVIOXI0dWJSOCtZVUJmb0g5Zk9B?=
+ =?utf-8?B?MGQ3NWhSYnRuc3JVelZsbFJMdjBEL1JWVXpJaVAvOFAwUWIyaHh5RUFzY25W?=
+ =?utf-8?B?Nmc2amlESWJjUmNWK29ucTIvSUtVbGkyU3RsaGtOa3NxbjJ6VnhXZlR3M2hu?=
+ =?utf-8?B?OVFla2x3UHBNeDNUbGR1SUY5MitEOUFtT1lzVTlnVHhSSVdodndyN0NIVU01?=
+ =?utf-8?B?N1VhRzRCR0VOdmlBNGx0M25IekV4TUk5Tjk0Mm9NTWdNeDJITlpKcGZzMVhZ?=
+ =?utf-8?B?eWVSeEpDUmVRNDFDS1o2eStkVDdGRU4rV3hjTWU2bUFIeGZnZGV4U01Sc0xE?=
+ =?utf-8?B?ZHhiblRGZHdhZzRXZEdiMWcraUdNdUVzV3l6cEFVck9BZnVtWkErdCszR0Er?=
+ =?utf-8?B?a0pMeHcyYjhyNllHMDBYNXIrNXFRRXVLSm4vS3UvMzYzeHlBV2V4dlQvTSs3?=
+ =?utf-8?B?QkVGdE9SaSszb3FNc1JwSHhoWVEwdVM5Y1JBeEsrNGlibUJYNzFydzVJdVha?=
+ =?utf-8?B?b0t6Y2tiL1Nic1paY2c1OURxWEpIKzJCYnVNSnpEa2NRbUdlMys1SDJwV0FF?=
+ =?utf-8?B?MWp1MlJvU0dRTlRUWVNzWWFsdHFkSllJSytPWlMxM3ZXemU5T0UySlg3azJD?=
+ =?utf-8?B?VU9KcFlVeFBtWTh1cm1vejI2V2djenZhTFpySmp3T21pL3RFZ0hOTHJDNDJE?=
+ =?utf-8?B?djl4L2kvWnRDQXhTQkRRblE3OFJCNVJDNFBMT0xxMVNMSlBxdWRGZTFpcmww?=
+ =?utf-8?B?TnBzYlk4M2Y4V0orOEV4dDQwaEYxTE5hK05HaCtaRWhPblI5cUlVY2l4YUox?=
+ =?utf-8?B?VUprVnlyWmh6Z280M1NQR3JLVnZCVTNnSFJTVWh1bVNiY3E2emxxdnZ5cmti?=
+ =?utf-8?B?cE9PaENiRXl2VlRBV3pUMGpnb2V6OVRkSXdHMHd4bzB4b1BzamNMZTA3RnJm?=
+ =?utf-8?B?TTM4Sk9NVXBZTUs4eFM3L2RidElOZ2VlWCsyZ1BkbEFGSTF3YytWWVRSS3ZB?=
+ =?utf-8?B?K2Qrdkp2RCtpdGZ4WXB5MjFGSlI1NUQ3ZXpSd1ZiQXlpY1I0eldBTHQ0eE5Y?=
+ =?utf-8?B?UTZHUmdtYVFLUlRxRldGOVVrbTBrWGFSUkx4R0Y0R2ZtYlhVWnZFK203YWU4?=
+ =?utf-8?B?OVFyK2N0VkpiOUJncVR0ZVBJNUVTU25HNE5LS0ZKU25rZVgrcXRsK1ZxQWJx?=
+ =?utf-8?B?bjZRNUdFVFFEdjJiTDYrNXhqeE84ZGdkb3RBaFFRekVncjlUZjFqL1haOG42?=
+ =?utf-8?B?aklSYm5vTHg4VVJQdS92eW5ZckZ3VHJROEpxcUhFaUxkRHZIeHlPZmZmTUdI?=
+ =?utf-8?B?QXVTbFV5UHVIVU1aOEdKVFhwZ254RXdqMXZrMmZNaVY1czFUMTZmTlNoQ0xB?=
+ =?utf-8?B?K3A5aWtBbDh0d2tsMDdxeFY5d0F0U3pUTXFzSytDZkhqN0JsQnVKSGxzNFN6?=
+ =?utf-8?B?cVhwN2dKUXVtMG8vZDU4T1lDTkRVdmdIYWx2L2JjU0FlOEFoRDZjMldtWlFs?=
+ =?utf-8?B?M3N5QUdaamZkUjBBbWRwRVJBRFNzSXJlYklzNmE0MitmTFhkNDJCREl0akZr?=
+ =?utf-8?B?Tmc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c6fd76a-3de7-4ab5-f59c-08dc59a6e418
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2024 21:40:50.8175
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tfTdl/hGNGOR8gAw19Q0SMj80pnYslTubSIedqnztlUgXb8JlVt7kh9mFbyPI793wPo78QjMEv4RAxKIr7jwRPbLYCUTN4YU3Q0vMPR15Ec=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6333
+X-OriginatorOrg: intel.com
 
-On Mon, Mar 11, 2024 at 09:15:53AM -0700, mhkelley58@gmail.com wrote:
-> From: Michael Kelley <mhklinux@outlook.com>
-> 
-> Shared (decrypted) pages should never be returned to the page allocator,
-> lest future usage of the pages store data that should not be exposed to
-> the host. They may also cause the guest to crash if the page is used in
-> a way disallowed by HW (i.e. for executable code or as a page table).
-> 
-> Normally set_memory() call failures are rare. But in CoCo VMs
-> set_memory_XXcrypted() may involve calls to the untrusted host, and an
-> attacker could fail these calls such that:
->  1. set_memory_encrypted() returns an error and leaves the pages fully
->     shared.
->  2. set_memory_decrypted() returns an error, but the pages are actually
->     full converted to shared.
-> 
-> This means that patterns like the below can cause problems:
-> void *addr = alloc();
-> int fail = set_memory_decrypted(addr, 1);
-> if (fail)
-> 	free_pages(addr, 0);
-> 
-> And:
-> void *addr = alloc();
-> int fail = set_memory_decrypted(addr, 1);
-> if (fail) {
-> 	set_memory_encrypted(addr, 1);
-> 	free_pages(addr, 0);
-> }
-> 
-> Unfortunately these patterns appear in the kernel. And what the
-> set_memory() callers should do in this situation is not clear either. They
-> shouldn’t use them as shared because something clearly went wrong, but
-> they also need to fully reset the pages to private to free them. But, the
-> kernel needs the host's help to do this and the host is already being
-> uncooperative around the needed operations. So this isn't guaranteed to
-> succeed and the caller is kind of stuck with unusable pages.
-> 
-> The only choice is to panic or leak the pages. The kernel tries not to
-> panic if at all possible, so just leak the pages at the call sites.
-> Separately there is a patch[1] to warn if the guest detects strange host
-> behavior around this. It is stalled, so in the mean time I’m proceeding
-> with fixing the callers to leak the pages. No additional warnings are
-> added, because the plan is to warn in a single place in x86 set_memory()
-> code.
-> 
-> This series fixes the cases in the Hyper-V code.
-> 
-> This is the non-RFC/RFT version of Rick Edgecombe's previous series.[2]
-> Rick asked me to do this version based on my comments and the testing
-> I did. I've tested most of the error paths by hacking
-> set_memory_encrypted() to fail, and observing /proc/vmallocinfo and
-> /proc/buddyinfo to confirm that the memory is leaked as expected
-> instead of freed.
-> 
-> Changes in this version:
-> * Expanded commit message references to "TDX" to be "CoCo VMs" since
->   set_memory_encrypted() could fail in other configurations, such as
->   Hyper-V CoCo guests running with a paravisor on SEV-SNP processors.
-> * Changed "Subject:" prefixes to match historical practice in Hyper-V
->   related source files
-> * Patch 1: Added handling of set_memory_decrypted() failure
-> * Patch 2: Changed where the "decrypted" flag is set so that
->   error cases not related to set_memory_encrypted() are handled
->   correctly
-> * Patch 2: Fixed the polarity of the test for set_memory_encrypted()
->   failing
-> * Added Patch 5 to the series to properly handle free'ing of
->   ring buffer memory
-> * Fixed a few typos throughout
-> 
-> [1] https://lore.kernel.org/lkml/20240122184003.129104-1-rick.p.edgecombe@intel.com/
-> [2] https://lore.kernel.org/linux-hyperv/20240222021006.2279329-1-rick.p.edgecombe@intel.com/
-> 
-> Michael Kelley (1):
->   Drivers: hv: vmbus: Don't free ring buffers that couldn't be
->     re-encrypted
-> 
-> Rick Edgecombe (4):
->   Drivers: hv: vmbus: Leak pages if set_memory_encrypted() fails
->   Drivers: hv: vmbus: Track decrypted status in vmbus_gpadl
->   hv_netvsc: Don't free decrypted memory
->   uio_hv_generic: Don't free decrypted memory
 
-Applied to hyperv-fixes. Thanks.
+
+On 4/10/2024 2:57 AM, Michal Swiatkowski wrote:
+> For now please Tony remove it from next-queue. I am trying
+> to figure out how to implement matching on all profiles using less
+> indexes. If I find the correct way I will submit new patch.
+
+Patch has been dropped.
+
+Thanks,
+Tony
 
