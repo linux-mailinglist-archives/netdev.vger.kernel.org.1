@@ -1,80 +1,53 @@
-Return-Path: <netdev+bounces-86663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A4EF89FC04
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 17:54:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A49C389FC05
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 17:54:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70A00B28390
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:54:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D61651C2161A
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:54:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA1116F272;
-	Wed, 10 Apr 2024 15:53:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="nafOrhTQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB90416F0EE;
+	Wed, 10 Apr 2024 15:53:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8164E16E86C
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 15:53:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97781156C67;
+	Wed, 10 Apr 2024 15:53:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712764406; cv=none; b=LVx3N/eCkRlNG36BKlzhntSNIOX/JPC70jnHDlF3HCbRkpd5fE9F/b3Mee5Vs7qCwxiclZfDNHLW6JL38yvvnpjGkQIv5dCf4mOqyYiQ1/bb/hwc9X/PXCdm+vdxqiQO2f0wfdKJuzECwRjMcXQjaUR5zTE43DmqC7uZ78nPj3c=
+	t=1712764422; cv=none; b=X7MjGwJ3nW87M/fh0Iu7JnpcCedf1kOUKN6z0W2qEOpGJqHiKIwvNS0yi5suUC3d0qAzaCoIju7RpYjhwPf3XfRNaHMj8cwPlj3YWku6zbgzhAWMU3SRs8s6wSYIn3MZDbpTB16b47yfM0ubgWHMzec5QB9eOajroCxCmJZxqws=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712764406; c=relaxed/simple;
-	bh=/Y1qzOn+30DznShDaw07uMYVYAFX+JUDunHxGSZrRQ4=;
+	s=arc-20240116; t=1712764422; c=relaxed/simple;
+	bh=Yj2mjB7xGY/t85UZ8jq4NsVg3CMycDTWl975T4rbgkU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Fy+d9tNEPIUHCFQhiyq+aQskfF/K/qf+Z6btg/C/eG+JYLlEzLytPkakk4/bVZYFYwEESMh8KLNP8++ZfZQjFC5rnUPayJTlOojSzNABkDsggQtVtMm1h7XA2u67OhQcSikSXAPgjeoRnh1COkwu9n3ZYEtvHaEkGvkscAd8j6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=nafOrhTQ; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6ecf3f001c5so5680720b3a.1
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 08:53:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1712764402; x=1713369202; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/Y1qzOn+30DznShDaw07uMYVYAFX+JUDunHxGSZrRQ4=;
-        b=nafOrhTQQDm+wEzM1xOPgJ9NknalbwidEvciZhQBHDjq6hRNGzQLwnB3JuiXsBTan5
-         HXm1QDW9VfkK1iseRuQSpQCWGlpwe6IC15v8BHnVycdXPsgRrW84q1QsFwKJRlKfHoHL
-         Hv8bknRZDs3KdupCIiBkHp8yZmbDrsWQxK2zwayW67RjpBPc9Up08UR6CwK3cKYvv6Fr
-         Gtn4T1FU1ReOmaqJeWfg/oFXBlQxeiOKzYcMN43oKN4p2hxML6vWrcYhIvEds5Fs2v9t
-         xLlPpIbrQMT0XZi3SrgkYOs0ye7JvZF9v7ya583m0UKxnTcm6rumraobca8KqYeggDno
-         GQ1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712764402; x=1713369202;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/Y1qzOn+30DznShDaw07uMYVYAFX+JUDunHxGSZrRQ4=;
-        b=NhSYPh0Ybo/SWFg1dW6ba+VJCQapqL0Y2fLU5gwv7ZiptPijapZqm1Kvvd8/c7jWXw
-         bHnqLaNuQxoc33Q0zXOcQ71Je7tGWHr4s5Ox2Eg6rC6I9LSPzfUSi22f1UPadKxSi8At
-         9sKnhw6o4wZIPvPkWC9Td9zvXRTJOyJ5ZGKnPg15fQwfT771sdL7za8qSUoQUgnVMMUT
-         nlPfSWkLYHSnvQ2e20zbxCXHR+b6PkybYZwD4UQaCAjcFSYQpGngkpucowxKBUg8ZhXX
-         OXna31BPOc08NbMs9nbGsw8T4yECxP3+Xc3u9L/mVdGpYOiKZIqs1r6vliU7KN8UxWiM
-         DeWA==
-X-Gm-Message-State: AOJu0Yw8+2V4ukAnPVsNAg6Pa01BAg+zXCqEQNnzodJBzj7/yOkp/oOy
-	FjL8efj+ydE4l+5kZoyRaNjeZydgWxXQnrdtfhcVPO9F1zG4L+6AuwUN2M/Liow=
-X-Google-Smtp-Source: AGHT+IGlSYszNygu7yJbhha7sK1FYA0WW2Vp2H2Rzojh0U+usac4cJKHJwZvrcf3C/hkF5LnBsSTrg==
-X-Received: by 2002:a05:6a00:4b4f:b0:6ec:ceb4:49b8 with SMTP id kr15-20020a056a004b4f00b006ecceb449b8mr3742786pfb.0.1712764401660;
-        Wed, 10 Apr 2024 08:53:21 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id y1-20020a62f241000000b006ecfd2ad4ddsm10550541pfl.146.2024.04.10.08.53.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 08:53:21 -0700 (PDT)
-Date: Wed, 10 Apr 2024 08:53:19 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-Cc: netdev@vger.kernel.org, dsahern@gmail.com
-Subject: Re: [PATCH iproute2-next 2/2] f_flower: implement pfcp opts
-Message-ID: <20240410085319.2cc6a94a@hermes.local>
-In-Reply-To: <20240410101440.9885-3-wojciech.drewek@intel.com>
-References: <20240410101440.9885-1-wojciech.drewek@intel.com>
-	<20240410101440.9885-3-wojciech.drewek@intel.com>
+	 MIME-Version:Content-Type; b=ZwmWoZmQFVDAGO02ysKpSCNcLuR3WNGqdqZ3QCAKXEIK+iFbbAtW4fUYGwJ1ejXV+jPXX6qxgWqJComEEoe0hp2a324sv9lsqxsaiAFZgk6NWBTWIRMskoAw6aI+DpRK7Ng2l/jebs/LFKffHHXV+L044vfxFo8cSlcwvx6ONis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65E3CC433F1;
+	Wed, 10 Apr 2024 15:53:40 +0000 (UTC)
+Date: Wed, 10 Apr 2024 11:56:17 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Chuck Lever <chuck.lever@oracle.com>
+Cc: Justin Stitt <justinstitt@google.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Masami Hiramatsu <mhiramat@kernel.org>, Mathieu
+ Desnoyers <mathieu.desnoyers@efficios.com>, Jeff Layton
+ <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga Kornievskaia
+ <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
+ <tom@talpey.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, linux-nfs@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] trace: events: cleanup deprecated strncpy uses
+Message-ID: <20240410115617.14804133@gandalf.local.home>
+In-Reply-To: <ZhazHrz4SxBs+BFD@tissot.1015granger.net>
+References: <20240401-strncpy-include-trace-events-mdio-h-v1-1-9cb5a4cda116@google.com>
+	<20240410113614.39b61b0d@gandalf.local.home>
+	<ZhazHrz4SxBs+BFD@tissot.1015granger.net>
+X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,21 +57,42 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 10 Apr 2024 12:14:40 +0200
-Wojciech Drewek <wojciech.drewek@intel.com> wrote:
+On Wed, 10 Apr 2024 11:41:18 -0400
+Chuck Lever <chuck.lever@oracle.com> wrote:
 
-> +pfcp_opts
-> +.I OPTIONS
-> +doesn't support multiple options, and it consists of a key followed by a slash
-> +and corresponding mask. If the mask is missing, \fBtc\fR assumes a full-length
-> +match. The option can be described in the form TYPE:SEID/TYPE_MASK:SEID_MASK
-> +where TYPE is represented as a 8bit number, SEID is represented by 64bit, both
-> +of them are in hex.
+> > If anything, it needs to be:
+> > 
+> > 		__string_len(acceptor, data, len)
+> > 
+> > as the macro code has changed recently, and the current code will crash!  
+> 
+> A general question:
+> 
+> Is there a test suite we should run regularly to build some
+> confidence in the kernel's observability apparatus? We're building
+> a menagerie of tests around kdevops, and one area where we know
+> there is a testing gap is the tracepoints in NFSD and SunRPC.
 
-Best practices in English writing style is to make all clauses have similar
-starting phrase.
+I try to add self tests within the macros. As __assign_str() is going to
+turn into just __assign_str(field) (instead of __assign_str(field, src)), I
+added a test to make sure what was passed to __string() is also what
+__assign_str() gets. But using strcpy() in place of __assign_str() really
+is doing something that one should not be doing.
 
-Existing paragraph here is a mess already, so not unique to this.
-That part of tc-flower man page needs some grammar fixes, as well
-as being broken up.
+There's checks in the tracepoint code as well for things like referencing a
+pointer that was not saved in the event, and other things. But a generic
+test on a custom trace event, I don't really have.
+
+Note, you could enable CONFIG_TRACE_EVENT_INJECT where an "inject" file is
+created, and you can write into it:
+
+ # cd /sys/kernel/tracing
+ # echo 1 > events/rpcgss/rpcgss_context/enable
+ # echo 'expiry=123456 now=222' > events/rpcgss/rpcgss_context/inject
+ # cat trace
+bash-843     [001] .....   720.083189: rpcgss_context: win_size=0 expiry=123456 now=222 timeout=0 acceptor=
+
+And you could use that for testing.
+
+-- Steve
 
