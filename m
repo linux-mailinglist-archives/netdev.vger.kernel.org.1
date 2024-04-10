@@ -1,159 +1,135 @@
-Return-Path: <netdev+bounces-86491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 917B389EF66
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 12:04:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFADA89EF6F
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 12:05:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CE5E284218
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:04:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78E7D282871
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16C0F157E6E;
-	Wed, 10 Apr 2024 10:04:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 733C6158D60;
+	Wed, 10 Apr 2024 10:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="QwEFMdhw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E88DD155733
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 10:03:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D57156996;
+	Wed, 10 Apr 2024 10:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712743443; cv=none; b=XDu58DIPrSP29r0EhmyJn47Ydc0pr4yPmkmcOgp9OLNAdOtb7bKKlaUUM40hvLT4jvtH0E/B30Ht+XGO5DWYLIbzB22TALVqdSLHlDxhbB6mcFTqUNdK5raZOns9Qu5AXIhKhqHXpxoezG3LveS1WWnmDpwYJS1GJxldFx2jgkA=
+	t=1712743514; cv=none; b=P8gk/KrrsC/mmeopwUa7QPVym5HpDtBhPmqrio2CsMunzKcN7WPDd5jK2wYHJ0HwV4VV15srV0jVXmNrwAux9icQ8ZkiPYXzd/24CMiWuzu26PfbGMIhagx/g9D4rcffSCXD1e+34vq5K0WgXh+upPxwg+oQJ6PLmn/8gALZotw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712743443; c=relaxed/simple;
-	bh=cHfSIDkmtptlYbYaQcalsbmRuRJEiXsREDavsHE6xJs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PwzMjstX7GwNlPwdE06JehonfVM+/TK9iU6IkHOCX5xnWHP5co3Ni3Esg4rtmE00UTNXyKUxP+8ALl8zcVxZN9ji8E3tOGS7jA+Exsq6uYL8UeWUK0cEOvADPu5WOj0AUjHcTfvW1/6u0z+56vo86yPI3azfX2hBx3llg5PbnSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.109.80])
-	by gateway (Coremail) with SMTP id _____8DxbOkNZBZm2TAlAA--.9498S3;
-	Wed, 10 Apr 2024 18:03:57 +0800 (CST)
-Received: from [192.168.100.126] (unknown [112.20.109.80])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxLs8KZBZmcVd3AA--.31017S3;
-	Wed, 10 Apr 2024 18:03:55 +0800 (CST)
-Message-ID: <027eca32-3310-422d-ab52-5002af96d960@loongson.cn>
-Date: Wed, 10 Apr 2024 18:03:54 +0800
+	s=arc-20240116; t=1712743514; c=relaxed/simple;
+	bh=30woaapoAH8NpTmPC9U/LfaEmvc6WtNWd+ZQ9CZZTGY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nsBM8WC9CEeLq2ZKtuJOuQk/Q39uWPu2fV4iOJ+T9tsMI/dzkywMt0gAEZ1jKYGC7N/ldmoe19sV++3apAu5alzGdR7MRVZBleZQ+PNhK129dbJNs6mGGfaC9CdM/khHi/QMfYxrisiOo9i+3soZ6ozmMKn9xET+5utSLFj3eZo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=QwEFMdhw; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=xGW6DVRYYKhZUWlvDMf+rQo/nW9gpAKrBh3OHMIwwlE=; b=QwEFMdhwMuz0wcDl9wC/hPW66K
+	07mOUX3JJ0RMXfGCtOeDxYS4j4nIVZBYL2lWPSxsCatpmM9cfqPt3h0CKj9RlOq2zwmzkzRp6fEjJ
+	joJ+91K/2P8ILqnSb+J+Mk2mTzhxRkeoEwIY6nA5EPseC1p1ArJHtG7+x78yWbpA9IYV6JYlsi6wn
+	w6P3j6GrORcbtmYss3I5cFLvJNAOv9YvhTO6XxqCTrmYbZOrskXqk0ATDXr3E5H8dVOS4f/wy7Pc3
+	noPZPm4VUJKTzsL7/KQmPTr/zpUSfQ720TUIyV0E1i8q+r7uk/+wuWe7VzARQr+HS8JL6V47eaEWk
+	LKcTh93A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45298)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1ruUou-0007it-0q;
+	Wed, 10 Apr 2024 11:04:44 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1ruUom-0005tk-D4; Wed, 10 Apr 2024 11:04:36 +0100
+Date: Wed, 10 Apr 2024 11:04:36 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Alexandra Winter <wintera@linux.ibm.com>
+Subject: Re: [PATCH net-next v10 07/13] net: Add struct kernel_ethtool_ts_info
+Message-ID: <ZhZkNEYnY3FV7Q8E@shell.armlinux.org.uk>
+References: <20240409-feature_ptp_netnext-v10-0-0fa2ea5c89a9@bootlin.com>
+ <20240409-feature_ptp_netnext-v10-7-0fa2ea5c89a9@bootlin.com>
+ <20240409182725.139856d5@kernel.org>
+ <20240410101200.0178e594@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 6/6] net: stmmac: dwmac-loongson: Add
- Loongson GNET support
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, fancer.lancer@gmail.com,
- Jose.Abreu@synopsys.com, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
-References: <cover.1712668711.git.siyanteng@loongson.cn>
- <77daabe9ca5c62168d9e54a81b5822e9b898eeb3.1712668711.git.siyanteng@loongson.cn>
- <CAAhV-H45G+5kB9zvcYuXhEgc4Z41D3AdSNpW+TW0NXLfmapasA@mail.gmail.com>
-Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <CAAhV-H45G+5kB9zvcYuXhEgc4Z41D3AdSNpW+TW0NXLfmapasA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8BxLs8KZBZmcVd3AA--.31017S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxZF18uFy8Ar1ftr47CF1kCrX_yoW5Jw1kpa
-	yfA3Z8Gr1UGr1jkayDZr4DXrySv3y5C3y3Gw43J34093sIyFWxXFWFkrWDA3s7urykur10
-	q34Uta1DuFykJrgCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUB2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E
-	14v26F4UJVW0owAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
-	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
-	Wrv_ZF1lYx0Ex4A2jsIE14v26F4j6r4UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64
-	vIr41lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
-	Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
-	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
-	cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
-	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E
-	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUI0eHUUUUU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240410101200.0178e594@kmaincent-XPS-13-7390>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Wed, Apr 10, 2024 at 10:12:00AM +0200, Kory Maincent wrote:
+> On Tue, 9 Apr 2024 18:27:25 -0700
+> Jakub Kicinski <kuba@kernel.org> wrote:
+> 
+> > On Tue, 09 Apr 2024 10:26:29 +0200 Kory Maincent wrote:
+> > > In prevision to add new UAPI for hwtstamp we will be limited to the struct
+> > > ethtool_ts_info that is currently passed in fixed binary format through the
+> > > ETHTOOL_GET_TS_INFO ethtool ioctl. It would be good if new kernel code
+> > > already started operating on an extensible kernel variant of that
+> > > structure, similar in concept to struct kernel_hwtstamp_config vs struct
+> > > hwtstamp_config.
+> > > 
+> > > Since struct ethtool_ts_info is in include/uapi/linux/ethtool.h, here
+> > > we introduce the kernel-only structure in include/linux/ethtool.h.
+> > > The manual copy is then made in the function called by ETHTOOL_GET_TS_INFO.
+> > >  
+> > 
+> > This one now conflicts :(
+> > 
+> > Applying: net: Add struct kernel_ethtool_ts_info
+> > error: sha1 information is lacking or useless (drivers/net/phy/marvell_ptp.c).
+> > error: could not build fake ancestor
+> 
+> gnn patching my out of tree patch in the series! Sorry for that.
 
-在 2024/4/10 11:15, Huacai Chen 写道:
-> Hi, Yanteng,
->
->
-> +        * post 3.5 mode bit acts as 8*PBL.
-> +        */
-> +       if (dma_cfg->pblx8)
-> +               value |= DMA_BUS_MODE_MAXPBL;
-> Adding a new blank line is better here.
-> OK.
->> +static void loongson_phylink_get_caps(struct stmmac_priv *priv)
->> +{
->> +       struct pci_dev *pdev = to_pci_dev(priv->device);
->> +       struct stmmac_resources res;
->> +       u32 loongson_gmac;
->> +
->> +       memset(&res, 0, sizeof(res));
->> +       res.addr = pcim_iomap_table(pdev)[0];
->> +       loongson_gmac = readl(res.addr + GMAC_VERSION) & 0xff;
->> +
->> +       /* The GMAC device with PCI ID 7a03 does not support any pause mode.
->> +        * The GNET device (only LS7A2000) does not support half-duplex.
->> +        */
->> +       if (pdev->device == PCI_DEVICE_ID_LOONGSON_GMAC) {
->> +               priv->hw->link.caps = MAC_10FD | MAC_100FD |
->> +                       MAC_1000FD;
->> +       } else {
->> +               priv->hw->link.caps = (MAC_ASYM_PAUSE |
->> +                       MAC_SYM_PAUSE | MAC_10FD | MAC_100FD | MAC_1000FD);
-> I think some GNET support HD while others don't, so we should enable
-> HD here, and clear HD only for the later 0x37 case. Otherwise you
-> disable HD for all devices indeed.
-Yeah, you are right. I will fix it in v11.
->> +
->> +               if (loongson_gmac == DWMAC_CORE_3_70) {
->> +                       priv->hw->link.caps &= ~(MAC_10HD |
->> +                               MAC_100HD | MAC_1000HD);
-> I remember that kernel code allows a line exceeding 80 columns now,
-> and keeping in one line looks better at least in this case. Moreover,
-> we don't need { and } here.
+Given that this path corresponds to the driver I wrote, do I assume
+that you've picked up my work on PTP support for Marvell PHYs? You
+should be aware that I still have the patches out of tree but it's
+been pointless me reposting it until the issue of which PTP gets
+used has been solved. (Publishing will just increase the pressure
+to merge it without the PTP problems being solved, and thus break
+Marvell PP2 PTP.)
 
-  Networking code (still) prefers code to be 80 columns wide or less.
-
-  see https://lore.kernel.org/netdev/20240202123034.GO530335@kernel.org/
-
->> +static int loongson_dwmac_probe(struct pci_dev *pdev,
->> +                               const struct pci_device_id *id)
->>   {
->>          struct plat_stmmacenet_data *plat;
->>          int ret, i, bus_id, phy_mode;
->>          struct stmmac_pci_info *info;
->>          struct stmmac_resources res;
->> +       struct loongson_data *ld;
->>          struct device_node *np;
->> +       u32 loongson_gmac;
->>
->>          plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
->>          if (!plat)
->> @@ -87,11 +514,16 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->>          if (!plat->mdio_bus_data)
->>                  return -ENOMEM;
->>
->> -       plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
->> -       if (!plat->dma_cfg) {
->> -               ret = -ENOMEM;
->> -               goto err_put_node;
->> -       }
->> +       plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg),
->> +                                    GFP_KERNEL);
-> This is an irrelevant modification, don't do that in this patch.
-OK.
-
-
-
-Thanks,
-
-Yanteng
-
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
