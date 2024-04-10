@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-86407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9AB389EA68
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:10:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7239689EA6B
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:10:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D1F7B21C9A
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 06:10:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29132286F72
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 06:10:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05A3C29CFA;
-	Wed, 10 Apr 2024 06:09:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF4D28363;
+	Wed, 10 Apr 2024 06:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fZRtU12n"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CDbYMbyw"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D621219E2
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 06:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6724E20E3
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 06:09:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712729377; cv=none; b=LgeqtgDWngfX6O2tGLrKo6KAzHoFFepyFEyxsKLcAje6ODD1N+PpgrZ+rAt3NYlxttYiBIwgK8Xlf4yYXIIqLTqkE0yaowVutKX71TAe56zcT6w3AAT30qEG23IPD9LqLeTyk875I6OYt0NFlwS74p0dCx711ffhWcPZlf7vebw=
+	t=1712729385; cv=none; b=QBH3g2pCyrBvPc4eMJpuQ8jLAD5orvTIRrcIHgQ5JZCV+5j6ag/mvIaPG251uA7fVbTo6oaNvo8xlPQj1nTex+AAH6OZ357O9ZeSJcyrvbqDkoSIKnt39Y2GVabc3k5MjfAhz4/FpduJXdvo9UGghgVoONSx5os5eGbbG0ogh08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712729377; c=relaxed/simple;
-	bh=fN93S+O/a4r8919HDaOpaGLyUFbfFTR4Yqdw+94Pp/g=;
+	s=arc-20240116; t=1712729385; c=relaxed/simple;
+	bh=s90vUA+0CmlCg+7OVXXnHOKcS1AZxDumeuLgbVwG6L4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a/Ur/b7TD59RMcql5mXNvmBlmdJ0hM2p9MtThiowydEyUjWUK5kJBu3OhxuIPW7DxYMIETadwL8vcY4Z4T/cNaXYnTqwO39gvhSjovZvlARHJQ9NtlbfwcZ0OJ/HmacJnAXPT8LsWb1VdYRLAjEvJrGfe6Vn1+Y3Qg+CTo1nT7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fZRtU12n; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=u4+/J/Ys8zP6PtFw5QI9oHTHSRm/8UikbDVnz07ZMErVlT/aAu8G1DB40POQkdygZ+TzmmNK3VfT2DoYxRNpqzcBkO6OTa13ytuBnm6wyE59qyNvOgQtT/h5YHSaI0paphQ82tVnBHbrtOD19HjgggWqCDjESf94dABVIGgDLaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CDbYMbyw; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712729375;
+	s=mimecast20190719; t=1712729382;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6b5vs9vSUGn8ADK8g0iw0wXboKE+rPl/OAO5DzwLqrA=;
-	b=fZRtU12n45pOJ6eEU0t7R+icutVp5J4sDxQJjIl05v5agDvLFygkfMXyNblYgAt6s3zg5g
-	E8DSpXUSCQehICZv3HQslUk/NUuSMOey1WOrc2Ez+JUU3aA53WKQG34P3yKO2Ajr7zhms4
-	nnV1iJfaYAUeDu0hEJ8GiUgTZeSFJcQ=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=TzZgZUqHnRI4hR2l8nmAWzRXv8cQW8dE5s/4SvbTeXM=;
+	b=CDbYMbywVsyiGZzLKcl+ADzaCEOxcwnHquzZeH8Yv1grYBMLs1j6g5sAw6Tbxk72on80Xt
+	ow8EJ4xm65o26PpYND3/sG0MhsGRqpVk+msAi2UVO3d5wtncw7mIU7t9mB7BRhHNIW3BdQ
+	D4ucxFVXqHlCshBngYTFCuQGv2peTT8=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-654-F7Y6Zu0EOL2fPkNHu2umDg-1; Wed, 10 Apr 2024 02:09:33 -0400
-X-MC-Unique: F7Y6Zu0EOL2fPkNHu2umDg-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2a4b60f8806so3577836a91.1
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 23:09:33 -0700 (PDT)
+ us-mta-682-KqqxTQR2Ooy6zWum-mq5nA-1; Wed, 10 Apr 2024 02:09:35 -0400
+X-MC-Unique: KqqxTQR2Ooy6zWum-mq5nA-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2a4fc4cf54dso2979864a91.1
+        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 23:09:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712729372; x=1713334172;
+        d=1e100.net; s=20230601; t=1712729374; x=1713334174;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6b5vs9vSUGn8ADK8g0iw0wXboKE+rPl/OAO5DzwLqrA=;
-        b=eApqWmGlUXJ/zr9ZSLz9L4UPl3Jpdj58p7e67UVYuxsfJ4pOeVYNiVntMemd8dNB9S
-         CgXEhkz3iRD28LJm4mon/CCls0j6HP3ukO5yaRdrbRWpQH686NhreEF38aTOLRcc1GzL
-         Wb2PBUDOZ5fyENkws+L7TWoNCMtObrdxRsWJI7j4HAVvytxJRJwUXZW/cwwwPPYBxLSI
-         hJ7PNXugJE0qU6Z96f4I8LEtgt6rUWs70IrA6Kwq2jnAL8z2cQiXNMtjiPVi+hwq1h8F
-         8V5dcEeqjTkZ33KU+dJncgEimR+qv1+UIyDRbC968z8CB3wlRepgjC4z73TwLRBJwptF
-         jG2g==
-X-Gm-Message-State: AOJu0YznuH5kVer3225u5s6cDJ0i23F87ZVtFlWnPTA1ZsUKljvCVIW4
-	nT+ly/4TMNA1Hm09oBhGnxoN5cXb0GTtdwmBxlOcCf0PtnakynmfvnPKoHl61ksU5XRy8ATmbSz
-	8OxFrfYzOWCT/fhgZCzzNS/AxECtKMFZq16j9Vt7A44oTE6ySvL+jAlC4iYlLBcSy4NY2MwbCHP
-	BCSD31FnUw0ur4SxrhRyp8HXW55ih5
-X-Received: by 2002:a17:90a:f011:b0:2a5:decc:47e5 with SMTP id bt17-20020a17090af01100b002a5decc47e5mr325840pjb.38.1712729372255;
-        Tue, 09 Apr 2024 23:09:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE4OypenlPPbiCIKXCbwYuLlk6d1UE613DACQ8FfIH/rLE/xnrB/ReP5oeXLI6ZF1tM/VeXhwAWDVRBi1ckH5s=
-X-Received: by 2002:a17:90a:f011:b0:2a5:decc:47e5 with SMTP id
- bt17-20020a17090af01100b002a5decc47e5mr325822pjb.38.1712729371974; Tue, 09
- Apr 2024 23:09:31 -0700 (PDT)
+        bh=TzZgZUqHnRI4hR2l8nmAWzRXv8cQW8dE5s/4SvbTeXM=;
+        b=fce78cBjil95XYBzKLuP3KaOB+wM+curCi49BhZRaSCrxkHSUxTOgpGXMoE1F2mwHH
+         MLndxYcrcynoSeM547/DVIt5IQv84y3ivDq5e4GYo2Rp8/6XlrJCS5alTiqfNPP5FYgv
+         wtw4jfPbjLBpoNOf7JFGXgKGoZf515es1JEwK3Y5ZYo3+xMmH2j8nVmPxoEvzxKhYoH8
+         +ieIxhKysvkP6t13p7zqGwF588A2XsLMPv+zHgow2k4XjvCGfF3ATfxMbyz28OV+EtHH
+         FlbkZwPas1575NbZHobfkpr66s27TXHNDx8sxT8ZZPIU15YeCmQvTIKhH4O+Ixs4hQQz
+         KI4Q==
+X-Gm-Message-State: AOJu0Yy0WJr3+0QSvmEkGv2L3OHXUrMX7hGL9doh8cECNOo0N4L1r8cg
+	zSzg3Tk7cMfy9ac2nWuwvGCgXtrh63J/uSPmN5HiIuzvGVyGYGLO/Ta6NMEzsAboXCtO/GvS2Y+
+	9rTgOVJ4Rge7W9f0JgyCwiykrUphmx9J+8GcC5Ey3vOBZQU0p8xsNJSxbPGRoOetnzVVR409Z7q
+	kH2zmNADoDWgUDxZvSUi5t/kYgbCl+
+X-Received: by 2002:a17:90a:d50b:b0:2a5:3f30:f5f9 with SMTP id t11-20020a17090ad50b00b002a53f30f5f9mr1745486pju.25.1712729374471;
+        Tue, 09 Apr 2024 23:09:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE4hwXzb5/ATbrRyhXyQJvmMJxSwXG3AjRuXRworhznmblGl7UIwASHNvJlrajeADEoPAQweYs7ikLX4bS6sk0=
+X-Received: by 2002:a17:90a:d50b:b0:2a5:3f30:f5f9 with SMTP id
+ t11-20020a17090ad50b00b002a53f30f5f9mr1745466pju.25.1712729374108; Tue, 09
+ Apr 2024 23:09:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240318110602.37166-1-xuanzhuo@linux.alibaba.com> <20240318110602.37166-8-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20240318110602.37166-8-xuanzhuo@linux.alibaba.com>
+References: <20240318110602.37166-1-xuanzhuo@linux.alibaba.com> <20240318110602.37166-5-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20240318110602.37166-5-xuanzhuo@linux.alibaba.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 10 Apr 2024 14:09:20 +0800
-Message-ID: <CACGkMEvd3cg_W64aMMvER03vNqkrxYM6VAMYTj7z3zAkfdaSVQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 7/9] virtio_net: rename stat tx_timeout to timeout
+Date: Wed, 10 Apr 2024 14:09:23 +0800
+Message-ID: <CACGkMEujuYh+Ups9jx5jEwe7bydtgCyurG5bPLe3X8jpSJhqvA@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 4/9] virtio_net: support device stats
 To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -90,83 +90,654 @@ Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Stanislav Fomichev <sdf@google.com>, Amritha Nambiar <amritha.nambiar@intel.com>, 
 	Larysa Zaremba <larysa.zaremba@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>, 
 	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, virtualization@lists.linux.dev, 
-	bpf@vger.kernel.org, Jiri Pirko <jiri@nvidia.com>
+	bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Mon, Mar 18, 2024 at 7:06=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
 om> wrote:
 >
-> Now, we have this:
+> As the spec https://github.com/oasis-tcs/virtio-spec/commit/42f3899898230=
+39724f95bbbd243291ab0064f82
 >
->     tx_queue_0_tx_timeouts
+> make virtio-net support getting the stats from the device by ethtool -S
+> <eth0>.
 >
-> This is used to record the tx schedule timeout.
-> But this has two "tx". I think the below is enough.
+> Due to the numerous descriptors stats, an organization method is
+> required. For this purpose, I have introduced the "virtnet_stats_map".
+> Utilizing this array simplifies coding tasks such as generating field
+> names, calculating buffer sizes for requests and responses, and parsing
+> replies from the device. By iterating over the "virtnet_stats_map,"
+> these operations become more streamlined and efficient.
 >
->     tx_queue_0_timeouts
->
-> So I rename this field.
+> NIC statistics:
+>      rx0_packets: 582951
+>      rx0_bytes: 155307077
+>      rx0_drops: 0
+>      rx0_xdp_packets: 0
+>      rx0_xdp_tx: 0
+>      rx0_xdp_redirects: 0
+>      rx0_xdp_drops: 0
+>      rx0_kicks: 17007
+>      rx0_hw_packets: 2179409
+>      rx0_hw_bytes: 510015040
+>      rx0_hw_notifications: 0
+>      rx0_hw_interrupts: 0
+>      rx0_hw_drops: 12964
+>      rx0_hw_drop_overruns: 0
+>      rx0_hw_csum_valid: 2179409
+>      rx0_hw_csum_none: 0
+>      rx0_hw_csum_bad: 0
+>      rx0_hw_needs_csum: 2179409
+>      rx0_hw_ratelimit_packets: 0
+>      rx0_hw_ratelimit_bytes: 0
+>      tx0_packets: 15361
+>      tx0_bytes: 1918970
+>      tx0_xdp_tx: 0
+>      tx0_xdp_tx_drops: 0
+>      tx0_kicks: 15361
+>      tx0_timeouts: 0
+>      tx0_hw_packets: 32272
+>      tx0_hw_bytes: 4311698
+>      tx0_hw_notifications: 0
+>      tx0_hw_interrupts: 0
+>      tx0_hw_drops: 0
+>      tx0_hw_drop_malformed: 0
+>      tx0_hw_csum_none: 0
+>      tx0_hw_needs_csum: 32272
+>      tx0_hw_ratelimit_packets: 0
+>      tx0_hw_ratelimit_bytes: 0
 >
 > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 > ---
->  drivers/net/virtio_net.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  drivers/net/virtio_net.c | 401 ++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 397 insertions(+), 4 deletions(-)
 >
 > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 12dc1d0d8d2b..a24cfde30d08 100644
+> index 8cb5bdd7ad91..70c1d4e850e0 100644
 > --- a/drivers/net/virtio_net.c
 > +++ b/drivers/net/virtio_net.c
-> @@ -87,7 +87,7 @@ struct virtnet_sq_stats {
->         u64_stats_t xdp_tx;
->         u64_stats_t xdp_tx_drops;
->         u64_stats_t kicks;
-> -       u64_stats_t tx_timeouts;
-> +       u64_stats_t timeouts;
+> @@ -128,6 +128,129 @@ static const struct virtnet_stat_desc virtnet_rq_st=
+ats_desc[] =3D {
+>  #define VIRTNET_SQ_STATS_LEN   ARRAY_SIZE(virtnet_sq_stats_desc)
+>  #define VIRTNET_RQ_STATS_LEN   ARRAY_SIZE(virtnet_rq_stats_desc)
+>
+> +#define VIRTNET_STATS_DESC_CQ(name) \
+> +       {#name, offsetof(struct virtio_net_stats_cvq, name)}
+> +
+> +#define VIRTNET_STATS_DESC_RX(class, name) \
+> +       {#name, offsetof(struct virtio_net_stats_rx_ ## class, rx_ ## nam=
+e)}
+> +
+> +#define VIRTNET_STATS_DESC_TX(class, name) \
+> +       {#name, offsetof(struct virtio_net_stats_tx_ ## class, tx_ ## nam=
+e)}
+> +
+> +static const struct virtnet_stat_desc virtnet_stats_cvq_desc[] =3D {
+> +       VIRTNET_STATS_DESC_CQ(command_num),
+> +       VIRTNET_STATS_DESC_CQ(ok_num),
+> +};
+> +
+> +static const struct virtnet_stat_desc virtnet_stats_rx_basic_desc[] =3D =
+{
+> +       VIRTNET_STATS_DESC_RX(basic, packets),
+> +       VIRTNET_STATS_DESC_RX(basic, bytes),
+> +
+> +       VIRTNET_STATS_DESC_RX(basic, notifications),
+> +       VIRTNET_STATS_DESC_RX(basic, interrupts),
+> +
+> +       VIRTNET_STATS_DESC_RX(basic, drops),
+> +       VIRTNET_STATS_DESC_RX(basic, drop_overruns),
+> +};
+> +
+> +static const struct virtnet_stat_desc virtnet_stats_tx_basic_desc[] =3D =
+{
+> +       VIRTNET_STATS_DESC_TX(basic, packets),
+> +       VIRTNET_STATS_DESC_TX(basic, bytes),
+> +
+> +       VIRTNET_STATS_DESC_TX(basic, notifications),
+> +       VIRTNET_STATS_DESC_TX(basic, interrupts),
+> +
+> +       VIRTNET_STATS_DESC_TX(basic, drops),
+> +       VIRTNET_STATS_DESC_TX(basic, drop_malformed),
+> +};
+> +
+> +static const struct virtnet_stat_desc virtnet_stats_rx_csum_desc[] =3D {
+> +       VIRTNET_STATS_DESC_RX(csum, csum_valid),
+> +       VIRTNET_STATS_DESC_RX(csum, needs_csum),
+> +
+> +       VIRTNET_STATS_DESC_RX(csum, csum_none),
+> +       VIRTNET_STATS_DESC_RX(csum, csum_bad),
+> +};
+> +
+> +static const struct virtnet_stat_desc virtnet_stats_tx_csum_desc[] =3D {
+> +       VIRTNET_STATS_DESC_TX(csum, needs_csum),
+> +       VIRTNET_STATS_DESC_TX(csum, csum_none),
+> +};
+> +
+> +static const struct virtnet_stat_desc virtnet_stats_rx_gso_desc[] =3D {
+> +       VIRTNET_STATS_DESC_RX(gso, gso_packets),
+> +       VIRTNET_STATS_DESC_RX(gso, gso_bytes),
+> +       VIRTNET_STATS_DESC_RX(gso, gso_packets_coalesced),
+> +       VIRTNET_STATS_DESC_RX(gso, gso_bytes_coalesced),
+> +};
+> +
+> +static const struct virtnet_stat_desc virtnet_stats_tx_gso_desc[] =3D {
+> +       VIRTNET_STATS_DESC_TX(gso, gso_packets),
+> +       VIRTNET_STATS_DESC_TX(gso, gso_bytes),
+> +       VIRTNET_STATS_DESC_TX(gso, gso_segments),
+> +       VIRTNET_STATS_DESC_TX(gso, gso_segments_bytes),
+> +       VIRTNET_STATS_DESC_TX(gso, gso_packets_noseg),
+> +       VIRTNET_STATS_DESC_TX(gso, gso_bytes_noseg),
+> +};
+> +
+> +static const struct virtnet_stat_desc virtnet_stats_rx_speed_desc[] =3D =
+{
+> +       VIRTNET_STATS_DESC_RX(speed, ratelimit_packets),
+> +       VIRTNET_STATS_DESC_RX(speed, ratelimit_bytes),
+> +};
+> +
+> +static const struct virtnet_stat_desc virtnet_stats_tx_speed_desc[] =3D =
+{
+> +       VIRTNET_STATS_DESC_TX(speed, ratelimit_packets),
+> +       VIRTNET_STATS_DESC_TX(speed, ratelimit_bytes),
+> +};
+> +
+> +#define VIRTNET_Q_TYPE_RX 0
+> +#define VIRTNET_Q_TYPE_TX 1
+> +#define VIRTNET_Q_TYPE_CQ 2
+> +
+> +struct virtnet_stats_map {
+> +       /* The stat type in bitmap. */
+> +       u64 stat_type;
+> +
+> +       /* The bytes of the response for the stat. */
+> +       u32 len;
+> +
+> +       /* The num of the response fields for the stat. */
+> +       u32 num;
+> +
+> +       /* The type of queue corresponding to the statistics. (cq, rq, sq=
+) */
+> +       u32 queue_type;
+> +
+> +       /* The reply type of the stat. */
+> +       u8 reply_type;
+> +
+> +       /* Describe the name and the offset in the response. */
+> +       const struct virtnet_stat_desc *desc;
+> +};
+> +
+> +#define VIRTNET_DEVICE_STATS_MAP_ITEM(TYPE, type, queue_type)  \
+> +       {                                                       \
+> +               VIRTIO_NET_STATS_TYPE_##TYPE,                   \
+> +               sizeof(struct virtio_net_stats_ ## type),       \
+> +               ARRAY_SIZE(virtnet_stats_ ## type ##_desc),     \
+> +               VIRTNET_Q_TYPE_##queue_type,                    \
+> +               VIRTIO_NET_STATS_TYPE_REPLY_##TYPE,             \
+> +               &virtnet_stats_##type##_desc[0]                 \
+> +       }
+> +
+> +static struct virtnet_stats_map virtio_net_stats_map[] =3D {
+> +       VIRTNET_DEVICE_STATS_MAP_ITEM(CVQ, cvq, CQ),
+> +
+> +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_BASIC, rx_basic, RX),
+> +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_CSUM,  rx_csum,  RX),
+> +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_GSO,   rx_gso,   RX),
+> +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_SPEED, rx_speed, RX),
+> +
+> +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_BASIC, tx_basic, TX),
+> +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_CSUM,  tx_csum,  TX),
+> +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_GSO,   tx_gso,   TX),
+> +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_SPEED, tx_speed, TX),
+> +};
+
+I think the reason you did this is to ease the future extensions but
+multiple levels of nested macros makes the code hard to review. Any
+way to eliminate this?
+
+> +
+>  struct virtnet_interrupt_coalesce {
+>         u32 max_packets;
+>         u32 max_usecs;
+> @@ -244,6 +367,7 @@ struct control_buf {
+>         struct virtio_net_ctrl_coal_tx coal_tx;
+>         struct virtio_net_ctrl_coal_rx coal_rx;
+>         struct virtio_net_ctrl_coal_vq coal_vq;
+> +       struct virtio_net_stats_capabilities stats_cap;
 >  };
 >
->  struct virtnet_rq_stats {
-> @@ -111,7 +111,7 @@ static const struct virtnet_stat_desc virtnet_sq_stat=
-s_desc[] =3D {
->         VIRTNET_SQ_STAT("xdp_tx",       xdp_tx),
->         VIRTNET_SQ_STAT("xdp_tx_drops", xdp_tx_drops),
->         VIRTNET_SQ_STAT("kicks",        kicks),
-> -       VIRTNET_SQ_STAT("tx_timeouts",  tx_timeouts),
-
-This is noticeable by userspace, not sure if it's too late.
-
-Thanks
-
-
-> +       VIRTNET_SQ_STAT("timeouts",     timeouts),
+>  struct virtnet_info {
+> @@ -329,6 +453,8 @@ struct virtnet_info {
+>
+>         /* failover when STANDBY feature enabled */
+>         struct failover *failover;
+> +
+> +       u64 device_stats_cap;
 >  };
 >
->  static const struct virtnet_stat_desc virtnet_rq_stats_desc[] =3D {
-> @@ -2780,7 +2780,7 @@ static void virtnet_stats(struct net_device *dev,
->                         start =3D u64_stats_fetch_begin(&sq->stats.syncp)=
+>  struct padded_vnet_hdr {
+> @@ -389,6 +515,17 @@ static int rxq2vq(int rxq)
+>         return rxq * 2;
+>  }
+>
+> +static int vq_type(struct virtnet_info *vi, int qid)
+> +{
+> +       if (qid =3D=3D vi->max_queue_pairs * 2)
+> +               return VIRTNET_Q_TYPE_CQ;
+> +
+> +       if (qid % 2)
+> +               return VIRTNET_Q_TYPE_TX;
+> +
+> +       return VIRTNET_Q_TYPE_RX;
+> +}
+> +
+>  static inline struct virtio_net_common_hdr *
+>  skb_vnet_common_hdr(struct sk_buff *skb)
+>  {
+> @@ -3263,6 +3400,223 @@ static int virtnet_set_channels(struct net_device=
+ *dev,
+>         return err;
+>  }
+>
+> +static void virtnet_get_hw_stats_string(struct virtnet_info *vi, int typ=
+e, int qid, u8 **data)
+> +{
+> +       struct virtnet_stats_map *m;
+> +       int i, j;
+> +       u8 *p =3D *data;
+> +
+> +       if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_DEVICE_STATS))
+> +               return;
+> +
+> +       for (i =3D 0; i < ARRAY_SIZE(virtio_net_stats_map); ++i) {
+> +               m =3D &virtio_net_stats_map[i];
+> +
+> +               if (m->queue_type !=3D type)
+> +                       continue;
+> +
+> +               if (!(vi->device_stats_cap & m->stat_type))
+> +                       continue;
+> +
+> +               for (j =3D 0; j < m->num; ++j) {
+> +                       switch (type) {
+> +                       case VIRTNET_Q_TYPE_RX:
+> +                               ethtool_sprintf(&p, "rx_queue_hw_%u_%s", =
+qid, m->desc[j].desc);
+> +                               break;
+> +
+> +                       case VIRTNET_Q_TYPE_TX:
+> +                               ethtool_sprintf(&p, "tx_queue_hw_%u_%s", =
+qid, m->desc[j].desc);
+> +                               break;
+> +
+> +                       case VIRTNET_Q_TYPE_CQ:
+> +                               ethtool_sprintf(&p, "cq_hw_%s", m->desc[j=
+].desc);
+> +                               break;
+> +                       }
+> +               }
+> +       }
+> +
+> +       *data =3D p;
+> +}
+> +
+> +struct virtnet_stats_ctx {
+> +       u32 desc_num[3];
+> +
+> +       u32 bitmap[3];
+> +
+> +       u32 size[3];
+> +
+> +       u64 *data;
+> +};
+
+Let's explain the meaning of each field here.
+
+> +
+> +static void virtnet_stats_ctx_init(struct virtnet_info *vi,
+> +                                  struct virtnet_stats_ctx *ctx,
+> +                                  u64 *data)
+> +{
+> +       struct virtnet_stats_map *m;
+> +       int i;
+> +
+> +       ctx->data =3D data;
+> +
+> +       for (i =3D 0; i < ARRAY_SIZE(virtio_net_stats_map); ++i) {
+> +               m =3D &virtio_net_stats_map[i];
+> +
+> +               if (!(vi->device_stats_cap & m->stat_type))
+> +                       continue;
+> +
+> +               ctx->bitmap[m->queue_type]   |=3D m->stat_type;
+> +               ctx->desc_num[m->queue_type] +=3D m->num;
+> +               ctx->size[m->queue_type]     +=3D m->len;
+> +       }
+> +}
+> +
+> +/* virtnet_fill_stats - copy the stats to ethtool -S
+> + * The stats source is the device.
+> + *
+> + * @vi: virtio net info
+> + * @qid: the vq id
+> + * @ctx: stats ctx (initiated by virtnet_stats_ctx_init())
+> + * @base: pointer to the device reply.
+> + * @type: the type of the device reply
+> + */
+> +static void virtnet_fill_stats(struct virtnet_info *vi, u32 qid,
+> +                              struct virtnet_stats_ctx *ctx,
+> +                              const u8 *base, u8 type)
+> +{
+> +       u32 queue_type, num_rx, num_tx, num_cq;
+> +       struct virtnet_stats_map *m;
+> +       u64 offset, bitmap;
+> +       const __le64 *v;
+> +       int i, j;
+> +
+> +       num_rx =3D VIRTNET_RQ_STATS_LEN + ctx->desc_num[VIRTNET_Q_TYPE_RX=
+];
+> +       num_tx =3D VIRTNET_SQ_STATS_LEN + ctx->desc_num[VIRTNET_Q_TYPE_TX=
+];
+> +       num_cq =3D ctx->desc_num[VIRTNET_Q_TYPE_CQ];
+> +
+> +       queue_type =3D vq_type(vi, qid);
+> +       bitmap =3D ctx->bitmap[queue_type];
+> +       offset =3D 0;
+> +
+> +       if (queue_type =3D=3D VIRTNET_Q_TYPE_TX) {
+> +               offset =3D num_cq + num_rx * vi->curr_queue_pairs + num_t=
+x * (qid / 2);
+> +               offset +=3D VIRTNET_SQ_STATS_LEN;
+> +       } else if (queue_type =3D=3D VIRTNET_Q_TYPE_RX) {
+> +               offset =3D num_cq + num_rx * (qid / 2) + VIRTNET_RQ_STATS=
+_LEN;
+> +       }
+> +
+> +       for (i =3D 0; i < ARRAY_SIZE(virtio_net_stats_map); ++i) {
+> +               m =3D &virtio_net_stats_map[i];
+> +
+> +               if (m->stat_type & bitmap)
+> +                       offset +=3D m->num;
+> +
+> +               if (type !=3D m->reply_type)
+> +                       continue;
+> +
+> +               for (j =3D 0; j < m->num; ++j) {
+> +                       v =3D (const __le64 *)(base + m->desc[j].offset);
+> +                       ctx->data[offset + j] =3D le64_to_cpu(*v);
+> +               }
+> +
+> +               break;
+> +       }
+> +}
+> +
+> +static int __virtnet_get_hw_stats(struct virtnet_info *vi,
+> +                                 struct virtnet_stats_ctx *ctx,
+> +                                 struct virtio_net_ctrl_queue_stats *req=
+,
+> +                                 int req_size, void *reply, int res_size=
+)
+> +{
+> +       struct virtio_net_stats_reply_hdr *hdr;
+> +       struct scatterlist sgs_in, sgs_out;
+> +       void *p;
+> +       u32 qid;
+> +       int ok;
+> +
+> +       sg_init_one(&sgs_out, req, req_size);
+> +       sg_init_one(&sgs_in, reply, res_size);
+> +
+> +       ok =3D virtnet_send_command(vi, VIRTIO_NET_CTRL_STATS,
+> +                                 VIRTIO_NET_CTRL_STATS_GET,
+> +                                 &sgs_out, &sgs_in);
+> +       kfree(req);
+
+I'd suggest letting the caller free this for simplicity.
+
+> +
+> +       if (!ok) {
+> +               kfree(reply);
+> +               return ok;
+> +       }
+> +
+> +       for (p =3D reply; p - reply < res_size; p +=3D le16_to_cpu(hdr->s=
+ize)) {
+
+hdr->size is under the control of a device which might be malicious?
+
+Btw, I'd expect that type implies size but looks not, any reason for that?
+
+> +               hdr =3D p;
+> +               qid =3D le16_to_cpu(hdr->vq_index);
+> +               virtnet_fill_stats(vi, qid, ctx, p, hdr->type);
+> +       }
+> +
+> +       kfree(reply);
+
+As caller has the logic for err handling like:
+
+        reply =3D kmalloc(res_size, GFP_KERNEL);
+        if (!reply) {
+                kfree(req);
+                return -ENOMEM;
+        }
+
+So let's free it from the caller.
+
+> +       return 0;
+> +}
+> +
+> +static void virtnet_make_stat_req(struct virtnet_info *vi,
+> +                                 struct virtnet_stats_ctx *ctx,
+> +                                 struct virtio_net_ctrl_queue_stats *req=
+,
+> +                                 int qid, int *idx)
+> +{
+> +       int qtype =3D vq_type(vi, qid);
+> +       u64 bitmap =3D ctx->bitmap[qtype];
+> +
+> +       if (!bitmap)
+> +               return;
+> +
+> +       req->stats[*idx].vq_index =3D cpu_to_le16(qid);
+> +       req->stats[*idx].types_bitmap[0] =3D cpu_to_le64(bitmap);
+> +       *idx +=3D 1;
+> +}
+> +
+> +static int virtnet_get_hw_stats(struct virtnet_info *vi,
+> +                               struct virtnet_stats_ctx *ctx)
+> +{
+> +       struct virtio_net_ctrl_queue_stats *req;
+> +       int qnum, i, j, res_size, qtype, last_vq;
+> +       void *reply;
+> +
+> +       if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_DEVICE_STATS))
+> +               return 0;
+> +
+> +       last_vq =3D vi->curr_queue_pairs * 2 - 1;
+> +
+> +       qnum =3D 0;
+> +       res_size =3D 0;
+> +       for (i =3D 0; i <=3D last_vq ; ++i) {
+> +               qtype =3D vq_type(vi, i);
+> +               if (ctx->bitmap[qtype]) {
+> +                       ++qnum;
+> +                       res_size +=3D ctx->size[qtype];
+> +               }
+> +       }
+> +
+> +       if (ctx->bitmap[VIRTNET_Q_TYPE_CQ]) {
+> +               res_size +=3D ctx->size[VIRTNET_Q_TYPE_CQ];
+> +               qnum +=3D 1;
+> +       }
+> +
+> +       req =3D kcalloc(qnum, sizeof(*req), GFP_KERNEL);
+> +       if (!req)
+> +               return -ENOMEM;
+> +
+> +       reply =3D kmalloc(res_size, GFP_KERNEL);
+> +       if (!reply) {
+> +               kfree(req);
+> +               return -ENOMEM;
+> +       }
+> +
+> +       j =3D 0;
+> +       for (i =3D 0; i <=3D last_vq ; ++i)
+> +               virtnet_make_stat_req(vi, ctx, req, i, &j);
+> +
+> +       virtnet_make_stat_req(vi, ctx, req, vi->max_queue_pairs * 2, &j);
+
+Instead of preparing those on the fly, could we prepare the request
+during the probe instead of here? As most of the field (except the
+data) won't be changed.
+
+> +
+> +       return __virtnet_get_hw_stats(vi, ctx, req, sizeof(*req) * j, rep=
+ly, res_size);
+> +}
+> +
+>  static void virtnet_get_strings(struct net_device *dev, u32 stringset, u=
+8 *data)
+>  {
+>         struct virtnet_info *vi =3D netdev_priv(dev);
+> @@ -3271,16 +3625,22 @@ static void virtnet_get_strings(struct net_device=
+ *dev, u32 stringset, u8 *data)
+>
+>         switch (stringset) {
+>         case ETH_SS_STATS:
+> +               virtnet_get_hw_stats_string(vi, VIRTNET_Q_TYPE_CQ, 0, &p)=
 ;
->                         tpackets =3D u64_stats_read(&sq->stats.packets);
->                         tbytes   =3D u64_stats_read(&sq->stats.bytes);
-> -                       terrors  =3D u64_stats_read(&sq->stats.tx_timeout=
-s);
-> +                       terrors  =3D u64_stats_read(&sq->stats.timeouts);
+> +
+>                 for (i =3D 0; i < vi->curr_queue_pairs; i++) {
+>                         for (j =3D 0; j < VIRTNET_RQ_STATS_LEN; j++)
+>                                 ethtool_sprintf(&p, "rx%u_%s", i,
+>                                                 virtnet_rq_stats_desc[j].=
+desc);
+> +
+> +                       virtnet_get_hw_stats_string(vi, VIRTNET_Q_TYPE_RX=
+, i, &p);
+>                 }
+>
+>                 for (i =3D 0; i < vi->curr_queue_pairs; i++) {
+>                         for (j =3D 0; j < VIRTNET_SQ_STATS_LEN; j++)
+>                                 ethtool_sprintf(&p, "tx%u_%s", i,
+>                                                 virtnet_sq_stats_desc[j].=
+desc);
+> +
+> +                       virtnet_get_hw_stats_string(vi, VIRTNET_Q_TYPE_TX=
+, i, &p);
+>                 }
+>                 break;
+>         }
+> @@ -3289,11 +3649,35 @@ static void virtnet_get_strings(struct net_device=
+ *dev, u32 stringset, u8 *data)
+>  static int virtnet_get_sset_count(struct net_device *dev, int sset)
+>  {
+>         struct virtnet_info *vi =3D netdev_priv(dev);
+> +       struct virtnet_stats_ctx ctx =3D {0};
+> +       u32 pair_count;
+>
+>         switch (sset) {
+>         case ETH_SS_STATS:
+> -               return vi->curr_queue_pairs * (VIRTNET_RQ_STATS_LEN +
+> -                                              VIRTNET_SQ_STATS_LEN);
+> +               if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_DEVICE_STAT=
+S) &&
+> +                   !vi->device_stats_cap) {
+> +                       struct scatterlist sg;
+> +
+> +                       sg_init_one(&sg, &vi->ctrl->stats_cap, sizeof(vi-=
+>ctrl->stats_cap));
+> +
+> +                       if (!virtnet_send_command(vi, VIRTIO_NET_CTRL_STA=
+TS,
+> +                                                 VIRTIO_NET_CTRL_STATS_Q=
+UERY,
+> +                                                 NULL, &sg)) {
+> +                               dev_warn(&dev->dev, "Fail to get stats ca=
+pability\n");
+
+Should we fail here?
+
+> +                       } else {
+> +                               __le64 v;
+> +
+> +                               v =3D vi->ctrl->stats_cap.supported_stats=
+_types[0];
+> +                               vi->device_stats_cap =3D le64_to_cpu(v);
+> +                       }
+> +               }
+> +
+> +               virtnet_stats_ctx_init(vi, &ctx, NULL);
+> +
+> +               pair_count =3D VIRTNET_RQ_STATS_LEN + VIRTNET_SQ_STATS_LE=
+N;
+> +               pair_count +=3D ctx.desc_num[VIRTNET_Q_TYPE_RX] + ctx.des=
+c_num[VIRTNET_Q_TYPE_TX];
+> +
+> +               return ctx.desc_num[VIRTNET_Q_TYPE_CQ] + vi->curr_queue_p=
+airs * pair_count;
+
+I wonder why we don't do this during the probe?
+
+>         default:
+>                 return -EOPNOTSUPP;
+>         }
+> @@ -3303,11 +3687,18 @@ static void virtnet_get_ethtool_stats(struct net_=
+device *dev,
+>                                       struct ethtool_stats *stats, u64 *d=
+ata)
+>  {
+>         struct virtnet_info *vi =3D netdev_priv(dev);
+> -       unsigned int idx =3D 0, start, i, j;
+> +       struct virtnet_stats_ctx ctx =3D {0};
+> +       unsigned int idx, start, i, j;
+>         const u8 *stats_base;
+>         const u64_stats_t *p;
+>         size_t offset;
+>
+> +       virtnet_stats_ctx_init(vi, &ctx, data);
+> +       if (virtnet_get_hw_stats(vi, &ctx))
+> +               dev_warn(&vi->dev->dev, "Failed to get hw stats.\n");
+> +
+> +       idx =3D ctx.desc_num[VIRTNET_Q_TYPE_CQ];
+> +
+>         for (i =3D 0; i < vi->curr_queue_pairs; i++) {
+>                 struct receive_queue *rq =3D &vi->rq[i];
+>
+> @@ -3321,6 +3712,7 @@ static void virtnet_get_ethtool_stats(struct net_de=
+vice *dev,
+>                         }
+>                 } while (u64_stats_fetch_retry(&rq->stats.syncp, start));
+>                 idx +=3D VIRTNET_RQ_STATS_LEN;
+> +               idx +=3D ctx.desc_num[VIRTNET_Q_TYPE_RX];
+>         }
+>
+>         for (i =3D 0; i < vi->curr_queue_pairs; i++) {
+> @@ -3336,6 +3728,7 @@ static void virtnet_get_ethtool_stats(struct net_de=
+vice *dev,
+>                         }
 >                 } while (u64_stats_fetch_retry(&sq->stats.syncp, start));
+>                 idx +=3D VIRTNET_SQ_STATS_LEN;
+> +               idx +=3D ctx.desc_num[VIRTNET_Q_TYPE_TX];
+>         }
+>  }
 >
->                 do {
-> @@ -4568,7 +4568,7 @@ static void virtnet_tx_timeout(struct net_device *d=
-ev, unsigned int txqueue)
->         struct netdev_queue *txq =3D netdev_get_tx_queue(dev, txqueue);
+> @@ -4963,7 +5356,7 @@ static struct virtio_device_id id_table[] =3D {
+>         VIRTIO_NET_F_SPEED_DUPLEX, VIRTIO_NET_F_STANDBY, \
+>         VIRTIO_NET_F_RSS, VIRTIO_NET_F_HASH_REPORT, VIRTIO_NET_F_NOTF_COA=
+L, \
+>         VIRTIO_NET_F_VQ_NOTF_COAL, \
+> -       VIRTIO_NET_F_GUEST_HDRLEN
+> +       VIRTIO_NET_F_GUEST_HDRLEN, VIRTIO_NET_F_DEVICE_STATS
 >
->         u64_stats_update_begin(&sq->stats.syncp);
-> -       u64_stats_inc(&sq->stats.tx_timeouts);
-> +       u64_stats_inc(&sq->stats.timeouts);
->         u64_stats_update_end(&sq->stats.syncp);
->
->         netdev_err(dev, "TX timeout on queue: %u, sq: %s, vq: 0x%x, name:=
- %s, %u usecs ago\n",
+>  static unsigned int features[] =3D {
+>         VIRTNET_FEATURES,
 > --
 > 2.32.0.3.g01195cf9f
 >
+
+Thanks
 
 
