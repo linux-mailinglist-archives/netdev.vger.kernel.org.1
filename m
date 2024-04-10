@@ -1,203 +1,159 @@
-Return-Path: <netdev+bounces-86490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA39889EF53
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 11:58:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 917B389EF66
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 12:04:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD2EA1C20AC6
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:58:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CE5E284218
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:04:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAEA0156861;
-	Wed, 10 Apr 2024 09:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dF83plSu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16C0F157E6E;
+	Wed, 10 Apr 2024 10:04:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21B38F4E
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 09:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E88DD155733
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 10:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712743099; cv=none; b=AFgg7MEPFG72vCepyJecKJTjGMJoV4XexQGPMqz5hKEpRqZuL3o2GvmbJ6j/DuQ69386ptWtfUd5OrJWZKCeJ/HoQRb0f5ys15T8ZRYYIpDd6XfVKwEyhPNooGs1bL/11DVtm2wufRI8azW5o5FZN2rWp7Z6+qnKbnE3sl2aGWY=
+	t=1712743443; cv=none; b=XDu58DIPrSP29r0EhmyJn47Ydc0pr4yPmkmcOgp9OLNAdOtb7bKKlaUUM40hvLT4jvtH0E/B30Ht+XGO5DWYLIbzB22TALVqdSLHlDxhbB6mcFTqUNdK5raZOns9Qu5AXIhKhqHXpxoezG3LveS1WWnmDpwYJS1GJxldFx2jgkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712743099; c=relaxed/simple;
-	bh=8kljXWF9cM8kvyiMlAHuhlM0UfE1pXGPxynSESs+2dQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OIGHEOeN/tK7bXKWOnbQEzwzVxTLqFoFqOndoRuO/21ewZ3CkNekjilsz/m3Vb8SsEHYBKDSEZQDd3W4W13FyoW8Tly/13H3jWyQ9lxgx561au9fwXmMkn4MTtph5baKppO5EmX3sX9nNkE47q364VPHJVLvqIyzMghJn6AbyOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dF83plSu; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712743098; x=1744279098;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8kljXWF9cM8kvyiMlAHuhlM0UfE1pXGPxynSESs+2dQ=;
-  b=dF83plSuPiXQTi3r0FozgRuVDqvJj1xVNE+uczju8F+bSStlLCthNoUJ
-   kPkrmMO42VLInL+PCBmk1BVTRhHuIuwtmGD0iUIRO4izjVUN+wczp6osn
-   A6GUVEnfM/U0RG/jxN3jo9bqqkpXgNwlvdNMWEgZe7ixKxcKBibHbEEeW
-   Ujd1uayMLRuJEYGZfZ44NTS3a8ZSeRW3RAyVYdQJhunjwBD59QMCqxsTK
-   fWjQx3gkWqdNO0vq+yROXBlsJZhhqipZNbcHn1JQGqDRK+XSvuPvCBORb
-   N7szOGWj+sdKRlLaGrRhkr8PVTIPxXhnwJXibX0xGs3Y7k0RBI6gknCdZ
-   Q==;
-X-CSE-ConnectionGUID: zYT2Wya7TdCen8VyNCRJeg==
-X-CSE-MsgGUID: s60Y++N1SdCsg2MxMG27Uw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="25601425"
-X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="25601425"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 02:58:17 -0700
-X-CSE-ConnectionGUID: aYy+foZLSn2r2UUZc3n3tg==
-X-CSE-MsgGUID: iIgP4Th0SfSAleBxwmoMpg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="20542691"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 02:58:15 -0700
-Date: Wed, 10 Apr 2024 11:57:55 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
-Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	"Kubiak, Michal" <michal.kubiak@intel.com>
-Subject: Re: [Intel-wired-lan] [iwl-net v1] ice: tc: do default match on all
- profiles
-Message-ID: <ZhZio9Kc0FrgNwnN@mev-dev>
-References: <20240312105259.2450-1-michal.swiatkowski@linux.intel.com>
- <PH0PR11MB50130FD5A519919523197C7C96362@PH0PR11MB5013.namprd11.prod.outlook.com>
- <ZgZ6/6/R+5EfQvbb@mev-dev>
- <PH0PR11MB5013EC7967F8B7694B2F5C8C963F2@PH0PR11MB5013.namprd11.prod.outlook.com>
- <Zg+5mIUtMruFRck0@mev-dev>
+	s=arc-20240116; t=1712743443; c=relaxed/simple;
+	bh=cHfSIDkmtptlYbYaQcalsbmRuRJEiXsREDavsHE6xJs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PwzMjstX7GwNlPwdE06JehonfVM+/TK9iU6IkHOCX5xnWHP5co3Ni3Esg4rtmE00UTNXyKUxP+8ALl8zcVxZN9ji8E3tOGS7jA+Exsq6uYL8UeWUK0cEOvADPu5WOj0AUjHcTfvW1/6u0z+56vo86yPI3azfX2hBx3llg5PbnSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.109.80])
+	by gateway (Coremail) with SMTP id _____8DxbOkNZBZm2TAlAA--.9498S3;
+	Wed, 10 Apr 2024 18:03:57 +0800 (CST)
+Received: from [192.168.100.126] (unknown [112.20.109.80])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxLs8KZBZmcVd3AA--.31017S3;
+	Wed, 10 Apr 2024 18:03:55 +0800 (CST)
+Message-ID: <027eca32-3310-422d-ab52-5002af96d960@loongson.cn>
+Date: Wed, 10 Apr 2024 18:03:54 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zg+5mIUtMruFRck0@mev-dev>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v10 6/6] net: stmmac: dwmac-loongson: Add
+ Loongson GNET support
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, fancer.lancer@gmail.com,
+ Jose.Abreu@synopsys.com, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+References: <cover.1712668711.git.siyanteng@loongson.cn>
+ <77daabe9ca5c62168d9e54a81b5822e9b898eeb3.1712668711.git.siyanteng@loongson.cn>
+ <CAAhV-H45G+5kB9zvcYuXhEgc4Z41D3AdSNpW+TW0NXLfmapasA@mail.gmail.com>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <CAAhV-H45G+5kB9zvcYuXhEgc4Z41D3AdSNpW+TW0NXLfmapasA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8BxLs8KZBZmcVd3AA--.31017S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoWxZF18uFy8Ar1ftr47CF1kCrX_yoW5Jw1kpa
+	yfA3Z8Gr1UGr1jkayDZr4DXrySv3y5C3y3Gw43J34093sIyFWxXFWFkrWDA3s7urykur10
+	q34Uta1DuFykJrgCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUB2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E
+	14v26F4UJVW0owAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
+	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
+	Wrv_ZF1lYx0Ex4A2jsIE14v26F4j6r4UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64
+	vIr41lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
+	Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8Gjc
+	xK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0
+	cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8V
+	AvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E
+	14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUI0eHUUUUU
 
-On Fri, Apr 05, 2024 at 10:43:04AM +0200, Michal Swiatkowski wrote:
-> On Mon, Apr 01, 2024 at 09:28:30AM +0000, Buvaneswaran, Sujai wrote:
-> > > -----Original Message-----
-> > > From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> > > Sent: Friday, March 29, 2024 1:56 PM
-> > > To: Buvaneswaran, Sujai <sujai.buvaneswaran@intel.com>
-> > > Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Marcin Szycik
-> > > <marcin.szycik@linux.intel.com>; Kubiak, Michal <michal.kubiak@intel.com>
-> > > Subject: Re: [Intel-wired-lan] [iwl-net v1] ice: tc: do default match on all
-> > > profiles
-> > > 
-> > > On Mon, Mar 25, 2024 at 06:36:56AM +0000, Buvaneswaran, Sujai wrote:
-> > > > > -----Original Message-----
-> > > > > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
-> > > > > Of Michal Swiatkowski
-> > > > > Sent: Tuesday, March 12, 2024 4:23 PM
-> > > > > To: intel-wired-lan@lists.osuosl.org
-> > > > > Cc: netdev@vger.kernel.org; Marcin Szycik
-> > > > > <marcin.szycik@linux.intel.com>; Kubiak, Michal
-> > > > > <michal.kubiak@intel.com>; Michal Swiatkowski
-> > > > > <michal.swiatkowski@linux.intel.com>
-> > > > > Subject: [Intel-wired-lan] [iwl-net v1] ice: tc: do default match on
-> > > > > all profiles
-> > > > >
-> > > > > A simple non-tunnel rule (e.g. matching only on destination MAC) in
-> > > > > hardware will be hit only if the packet isn't a tunnel. In software
-> > > > > execution of the same command, the rule will match both tunnel and
-> > > non-tunnel packets.
-> > > > >
-> > > > > Change the hardware behaviour to match tunnel and non-tunnel packets
-> > > > > in this case. Do this by considering all profiles when adding
-> > > > > non-tunnel rule (rule not added on tunnel, or not redirecting to tunnel).
-> > > > >
-> > > > > Example command:
-> > > > > tc filter add dev pf0 ingress protocol ip flower skip_sw action mirred \
-> > > > > 	egress redirect dev pr0
-> > > > >
-> > > > > It should match also tunneled packets, the same as command with
-> > > > > skip_hw will do in software.
-> > > > >
-> > > > > Fixes: 9e300987d4a8 ("ice: VXLAN and Geneve TC support")
-> > > > > Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> > > > > Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
-> > > > > Signed-off-by: Michal Swiatkowski
-> > > > > <michal.swiatkowski@linux.intel.com>
-> > > > > ---
-> > > > > v1 --> v2:
-> > > > >  * fix commit message sugested by Marcin
-> > > > > ---
-> > > > >  drivers/net/ethernet/intel/ice/ice_tc_lib.c | 2 +-
-> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > >
-> > > > Hi,
-> > > >
-> > > > We are seeing error while adding HW tc rules on PF with the latest net-
-> > > queue patches. This issue is blocking the validation of latest net-queue
-> > > Switchdev patches.
-> > > >
-> > > > + tc filter add dev ens5f0np0 ingress protocol ip prio 1 flower
-> > > > + src_mac b4:96:91:9f:65:58 dst_mac 52:54:00:00:16:01 skip_sw action
-> > > > + mirred egress redirect dev eth0
-> > > > Error: ice: Unable to add filter due to error.
-> > > > We have an error talking to the kernel
-> > > > + tc filter add dev ens5f0np0 ingress protocol ip prio 1 flower
-> > > > + src_mac b4:96:91:9f:65:58 dst_mac 52:54:00:00:16:02 skip_sw action
-> > > > + mirred egress redirect dev eth1
-> > > > Error: ice: Unable to add filter due to error.
-> > > > We have an error talking to the kernel
-> > > 
-> > > Hi,
-> > > 
-> > > The same command is working fine on my setup. I suspect that it isn't related
-> > > to this patch. The change is only in command validation, there is no
-> > > functional changes here that can cause error during adding filters which
-> > > previously was working fine.
-> > > 
-> > > Can you share more information about the setup? It was the first filter added
-> > > on the PF? Did you do sth else before checking tc?
-> > 
-> > Hi Michal,
-> > I have used the setup with latest upstream dev-queue kernel and this issue is observed while adding HW tc rules on PF using
-> > 'Script A' from below link.
-> > https://edc.intel.com/content/www/us/en/design/products/ethernet/appnote-e810-eswitch-switchdev-mode-config-guide/script-a-switchdev-mode-with-linux-bridge-configuration/
-> > 
-> > This issue is reproducible on two of our setups with latest upstream kernel - 6.9.0-rc1+. Please check and let me know if more information is needed.
-> > 
-> 
-> I tried script from the link and it is working. I am aware of the
-> problem when the same rule is being added with different destination.
-> Are you sure there are no more exsisting rule before calling the script?
-> In the script VFs are removed, but PF qdisc isn't removed. Old rule can
-> exsist there. I suggest to add sth like, before adding new qdiscs:
-> $tc qdisc del dev $PF1 ingress
-> 
-> I tested on 6.9.0-rc1+ kernel.
-> 
 
-I have found the problem. I was using different DDP package.
+在 2024/4/10 11:15, Huacai Chen 写道:
+> Hi, Yanteng,
+>
+>
+> +        * post 3.5 mode bit acts as 8*PBL.
+> +        */
+> +       if (dma_cfg->pblx8)
+> +               value |= DMA_BUS_MODE_MAXPBL;
+> Adding a new blank line is better here.
+> OK.
+>> +static void loongson_phylink_get_caps(struct stmmac_priv *priv)
+>> +{
+>> +       struct pci_dev *pdev = to_pci_dev(priv->device);
+>> +       struct stmmac_resources res;
+>> +       u32 loongson_gmac;
+>> +
+>> +       memset(&res, 0, sizeof(res));
+>> +       res.addr = pcim_iomap_table(pdev)[0];
+>> +       loongson_gmac = readl(res.addr + GMAC_VERSION) & 0xff;
+>> +
+>> +       /* The GMAC device with PCI ID 7a03 does not support any pause mode.
+>> +        * The GNET device (only LS7A2000) does not support half-duplex.
+>> +        */
+>> +       if (pdev->device == PCI_DEVICE_ID_LOONGSON_GMAC) {
+>> +               priv->hw->link.caps = MAC_10FD | MAC_100FD |
+>> +                       MAC_1000FD;
+>> +       } else {
+>> +               priv->hw->link.caps = (MAC_ASYM_PAUSE |
+>> +                       MAC_SYM_PAUSE | MAC_10FD | MAC_100FD | MAC_1000FD);
+> I think some GNET support HD while others don't, so we should enable
+> HD here, and clear HD only for the later 0x37 case. Otherwise you
+> disable HD for all devices indeed.
+Yeah, you are right. I will fix it in v11.
+>> +
+>> +               if (loongson_gmac == DWMAC_CORE_3_70) {
+>> +                       priv->hw->link.caps &= ~(MAC_10HD |
+>> +                               MAC_100HD | MAC_1000HD);
+> I remember that kernel code allows a line exceeding 80 columns now,
+> and keeping in one line looks better at least in this case. Moreover,
+> we don't need { and } here.
 
-The problem is with lack of free indexes in profiles when matching is
-done on both tunnel and not tunnel packet (so all profiles are
-considered). For now please Tony remove it from next-queue. I am trying
-to figure out how to implement matching on all profiles using less
-indexes. If I find the correct way I will submit new patch.
+  Networking code (still) prefers code to be 80 columns wide or less.
 
-Thanks
+  see https://lore.kernel.org/netdev/20240202123034.GO530335@kernel.org/
 
-> Thanks,
-> Michal
-> > Thanks,
-> > Sujai B
-> > > 
-> > > Thanks,
-> > > Michal
-> > > >
-> > > > Thanks,
-> > > > Sujai B
+>> +static int loongson_dwmac_probe(struct pci_dev *pdev,
+>> +                               const struct pci_device_id *id)
+>>   {
+>>          struct plat_stmmacenet_data *plat;
+>>          int ret, i, bus_id, phy_mode;
+>>          struct stmmac_pci_info *info;
+>>          struct stmmac_resources res;
+>> +       struct loongson_data *ld;
+>>          struct device_node *np;
+>> +       u32 loongson_gmac;
+>>
+>>          plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+>>          if (!plat)
+>> @@ -87,11 +514,16 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>>          if (!plat->mdio_bus_data)
+>>                  return -ENOMEM;
+>>
+>> -       plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
+>> -       if (!plat->dma_cfg) {
+>> -               ret = -ENOMEM;
+>> -               goto err_put_node;
+>> -       }
+>> +       plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg),
+>> +                                    GFP_KERNEL);
+> This is an irrelevant modification, don't do that in this patch.
+OK.
+
+
+
+Thanks,
+
+Yanteng
+
 
