@@ -1,128 +1,185 @@
-Return-Path: <netdev+bounces-86412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5F0A89EAE6
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:32:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43FD689EAEE
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:34:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08179B2126E
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 06:32:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 759111C20FD3
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 06:34:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48FC7C15D;
-	Wed, 10 Apr 2024 06:32:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="UJlhDRxu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54F820312;
+	Wed, 10 Apr 2024 06:34:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7F4946C
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 06:32:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F5A2030B
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 06:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712730747; cv=none; b=es5fzDmvV7eIRNTuZGTFZnUOXXTx4enyTkgzacfrr6toEOhS0JvvPnWmT9xXhqbLHO/DrM5TLYFq3F1LyJOiuEweNHqVKKLfMhIZfzvYnHJ/XRmELBrrg84xDrd8BdFF/+GV4sU2e66vaI5Hxl8rBS6eI2TfQMH72kBk4FjeS3A=
+	t=1712730857; cv=none; b=VaTZ2CDQEpIWiCW96Uq0mNTDp/70Sig7NNoLH1hYKaE7+fUhcXjZNsnTfKH3Tiwks6tg8Vpq1sJvfyUvogEvf3mcKak6ytm8libYambOwZQiBEdFsqQePU91BBJL/EZ5s2XzjtY6FI1NEl+6M59O8JwGXTDpYB8TdfruB+SHwso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712730747; c=relaxed/simple;
-	bh=FVHjvHWCCKAfWdDVFdPLlJPgJ6K8npiB9BsouyxqL1s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q11EKqK2TMj1A0exK3oGQfh6sxCLEtSAHt9zi7CxD/TK3ECE3naFqb9XU6OCk9aGum23uqXWxpF5khC3KDO/Owf6RWq0zhmB7ZLIvurRqVy1ovkW00iCZFVaNYGvPg5lRxsy58MoiCo85V4xfEFyGxaz9GWK1xf/ePOnum4mfaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=UJlhDRxu; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4155819f710so50633205e9.2
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 23:32:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1712730742; x=1713335542; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=byZ2fzEV3Nigcoml3fzvC/ATVqTbhJfX1w6V9jkj85U=;
-        b=UJlhDRxuNkV9FkhslJbmRhisR4wXVyYGY+Ut1mYVoBzw6WPB4+eWhZc7u6+jY3oOo8
-         Ay7OeP+wcVKVQnjMtQuh4foa80zC70MWm83M+2zlzzqCHAViIYvcc2oqcuZm+8Uph5bK
-         2xIuOoj3zCz0L2w6KEK5+of7BOGUc1nxA4gjl99g1PnizZfH5vspKb67CShpQCVN1FjK
-         8yUSgvewbdFo/SpeNhyb6qYdWZeb6K4K68XkqOE++HwaJs9ChkdntMV8yQ4wcxU8sIs4
-         4mmi9ERNNxE4OgPVk5QoQEvtp/12OnQrDuoDxpjGwpnsLRKo0cmwVArTJ/GPFaCgQX8E
-         AI2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712730742; x=1713335542;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=byZ2fzEV3Nigcoml3fzvC/ATVqTbhJfX1w6V9jkj85U=;
-        b=Eq+XKBr5MfLS/wSoeHz8ZkuPxb8JptQeAyWnLFY2r+2tD9enQO0sp+98fL8Mhu09gu
-         rkeo6I2e+1rzbKUSn5yNH52OmJ8lKU/+RNH0hmpGBuN4yBttPvRsRlYKIxuVccjp06Ak
-         SGtQTFo2kaB1cF11Os8zcCqj2/ITOm1L9tYOYKN40dpuOOl6hvLQP4OkHTAxeGsv8dqW
-         IFVrEOY7h1Pi4ComJftm7JMbq9R1VdlLoUsKYDHyNK02lAEl4sMkjc0ylOBrHpX8R4wD
-         vr+S3vVHxcop07V2twgEsfnHtHD/vqinDKx6xO6ifkW5PhlxT5A+p2ftSdwkKJ3IMSvd
-         Argg==
-X-Forwarded-Encrypted: i=1; AJvYcCWSnJ5v8LXyQJLhHl19uXarBv5BUqZ9xTMp616/CdBPXRbGYwTa/mkq7ykX8nOY+bp1ZdkN1K+pAzSPqhnTfA5qtnhd4aym
-X-Gm-Message-State: AOJu0YyZrC7RChRz0hR7d0Sjwj6DhTjAZJBPJD9Dh2zQ6Ovi6EWmBcQz
-	5Z9cfS1GFY1BQqRcbYxUrDuq53Ooj/uBROSAXHtIgbA74LiOP/GltgrHgvFdA2Y=
-X-Google-Smtp-Source: AGHT+IEaUL7sHQeV3J9lGbAGfPM1O22iAet+mbhXRT2/iUB63lsIQJf3K93ZvbZU7NBjIj7rTONajQ==
-X-Received: by 2002:a05:600c:1388:b0:415:46be:622f with SMTP id u8-20020a05600c138800b0041546be622fmr1646605wmf.14.1712730741962;
-        Tue, 09 Apr 2024 23:32:21 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:ea6e:5384:4ff9:abac? ([2a01:e0a:b41:c160:ea6e:5384:4ff9:abac])
-        by smtp.gmail.com with ESMTPSA id p5-20020a05600c468500b004149536479esm1270128wmo.12.2024.04.09.23.32.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Apr 2024 23:32:21 -0700 (PDT)
-Message-ID: <0a51d41e-124e-479e-afd7-50246e3b0520@6wind.com>
-Date: Wed, 10 Apr 2024 08:32:20 +0200
+	s=arc-20240116; t=1712730857; c=relaxed/simple;
+	bh=L8qUFpUH7Renm5tiH9WqQL0bEhl/mJAzS7iP1fS8R1U=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=eT2V4yL22VSq3RWC61/vB5nxeJ7mtuorpHAMdgpQuYGkA4gdxHWHZd6Vo2EG/ALtm1bOeSBTHaNSNp1axhuXwUbpzmbvuGwqb3JrWORMJCffAQApNnyurYYcGuTNIJjCBJOVhtCp0CxAQAFrR1T3LRAoRHhZQpyw61dqUviTq1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <s.hauer@pengutronix.de>)
+	id 1ruRX0-0001d0-MD; Wed, 10 Apr 2024 08:34:02 +0200
+Received: from [2a0a:edc0:0:1101:1d::28] (helo=dude02.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <s.hauer@pengutronix.de>)
+	id 1ruRWy-00BRRq-U5; Wed, 10 Apr 2024 08:34:00 +0200
+Received: from localhost ([::1] helo=dude02.red.stw.pengutronix.de)
+	by dude02.red.stw.pengutronix.de with esmtp (Exim 4.96)
+	(envelope-from <s.hauer@pengutronix.de>)
+	id 1ruRWy-0057ls-2k;
+	Wed, 10 Apr 2024 08:34:00 +0200
+From: Sascha Hauer <s.hauer@pengutronix.de>
+Date: Wed, 10 Apr 2024 08:33:07 +0200
+Subject: [PATCH] tls: defer close to kernel task
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH ipsec-next v9] xfrm: Add Direction to the SA in or out
-To: antony.antony@secunet.com, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, devel@linux-ipsec.org,
- Leon Romanovsky <leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>,
- Sabrina Dubroca <sd@queasysnail.net>
-References: <bb191b37cd631341552ee87eb349f0525b90f14f.1712685187.git.antony.antony@secunet.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <bb191b37cd631341552ee87eb349f0525b90f14f.1712685187.git.antony.antony@secunet.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240410-ktls-defer-close-v1-1-b59e6626b8e4@pengutronix.de>
+X-B4-Tracking: v=1; b=H4sIAKIyFmYC/x3MwQpAQBCA4VfRnE2NtRSvIgfWLBOhHUlp393m+
+ B3+/wXlIKzQZi8EvkXl2BOKPAO3DPvMKFMyGDKWbEG4XpvixJ4Duu1QRiLTlLaq7UgNpOwM7OX
+ 5l10f4wdE1IL9YgAAAA==
+To: Boris Pismenny <borisp@nvidia.com>, 
+ John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Pavel Begunkov <asml.silence@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
+ kernel@pengutronix.de, Sascha Hauer <s.hauer@pengutronix.de>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1712730840; l=3347;
+ i=s.hauer@pengutronix.de; s=20230412; h=from:subject:message-id;
+ bh=L8qUFpUH7Renm5tiH9WqQL0bEhl/mJAzS7iP1fS8R1U=;
+ b=ZWLnNgSyiZsCAzmR7gR76h5X3Eps1/swO+Yn89chwI9IWznsIqLFQWRoWpJdGL+f3VBXgiTT7
+ Jiq7fXS28WAALdd6n/HyKZbwulGDbeoLWiE3Hpq0R45tvv2Rk3niDcl
+X-Developer-Key: i=s.hauer@pengutronix.de; a=ed25519;
+ pk=4kuc9ocmECiBJKWxYgqyhtZOHj5AWi7+d0n/UjhkwTg=
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: s.hauer@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Le 09/04/2024 à 19:56, Antony Antony a écrit :
-> This patch introduces the 'dir' attribute, 'in' or 'out', to the
-> xfrm_state, SA, enhancing usability by delineating the scope of values
-> based on direction. An input SA will now exclusively encompass values
-> pertinent to input, effectively segregating them from output-related
-> values. This change aims to streamline the configuration process and
-> improve the overall clarity of SA attributes.
-> 
-> This feature sets the groundwork for future patches, including
-> the upcoming IP-TFS patch.
-> 
-> Signed-off-by: Antony Antony <antony.antony@secunet.com>
-> ---
-> v8->v9:
->  - add validation XFRM_STATE_ICMP not allowed on OUT SA.
-> 
-> v7->v8:
->  - add extra validation check on replay window and seq
->  - XFRM_MSG_UPDSA old and new SA should match "dir"
-> 
-> v6->v7:
->  - add replay-window check non-esn 0 and ESN 1.
->  - remove :XFRMA_SA_DIR only allowed with HW OFFLOAD
-Why? I still think that having an 'input' SA used in the output path is wrong
-and confusing.
-Please, don't drop this check.
+proto->close is normally called from a userspace task which can be
+interrupted by signals. When asynchronous encryption is used then KTLS
+sends out the final data at close time. When a signal comes in during
+close then it can happen tcp_sendmsg_locked() is interrupted by that
+signal while waiting for memory in sk_stream_wait_memory() which then
+returns with -ERSTARTSYS. It is not possible to recover from this situation
+and the final transmit data is lost.
 
+With this patch we defer the close operation to a kernel task which
+doesn't get signals.
 
-Regards,
-Nicolas
+The described situation happens when KTLS is used in conjunction with
+io_uring, as io_uring uses task_work_add() to add work to the current
+userspace task.
+
+The problem is discussed in [1] and [2] and the solution implemented in
+this patch is suggested by Pavel Begunkov here [3]
+
+[1] https://lore.kernel.org/all/20231010141932.GD3114228@pengutronix.de/
+[2] https://lore.kernel.org/all/20240315100159.3898944-1-s.hauer@pengutronix.de/
+[3] https://lore.kernel.org/all/bfc6afa9-501f-40b6-929a-3aa8c0298265@gmail.com
+
+Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
+---
+
+Note I only need this asynchronous close for the
+ctx->tx_conf == TLS_SW case. I can refactor the patch to only go
+asynchronous when necessary if that's desired.
+---
+ net/tls/tls_main.c | 37 +++++++++++++++++++++++++++++++------
+ 1 file changed, 31 insertions(+), 6 deletions(-)
+
+diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
+index b4674f03d71a9..b0b7e0d2f1145 100644
+--- a/net/tls/tls_main.c
++++ b/net/tls/tls_main.c
+@@ -365,16 +365,21 @@ static void tls_sk_proto_cleanup(struct sock *sk,
+ 	}
+ }
+ 
+-static void tls_sk_proto_close(struct sock *sk, long timeout)
++struct tls_close_work {
++	struct work_struct work;
++	struct tls_context *ctx;
++	long timeout;
++};
++
++static void deferred_close(struct work_struct *work)
+ {
++	struct tls_close_work *cw = container_of(work, struct tls_close_work, work);
++	struct tls_context *ctx = cw->ctx;
++	struct sock *sk = ctx->sk;
+ 	struct inet_connection_sock *icsk = inet_csk(sk);
+-	struct tls_context *ctx = tls_get_ctx(sk);
+ 	long timeo = sock_sndtimeo(sk, 0);
+ 	bool free_ctx;
+ 
+-	if (ctx->tx_conf == TLS_SW)
+-		tls_sw_cancel_work_tx(ctx);
+-
+ 	lock_sock(sk);
+ 	free_ctx = ctx->tx_conf != TLS_HW && ctx->rx_conf != TLS_HW;
+ 
+@@ -395,10 +400,30 @@ static void tls_sk_proto_close(struct sock *sk, long timeout)
+ 		tls_sw_strparser_done(ctx);
+ 	if (ctx->rx_conf == TLS_SW)
+ 		tls_sw_free_ctx_rx(ctx);
+-	ctx->sk_proto->close(sk, timeout);
++	ctx->sk_proto->close(sk, cw->timeout);
+ 
+ 	if (free_ctx)
+ 		tls_ctx_free(sk, ctx);
++
++	kfree(cw);
++}
++
++static void tls_sk_proto_close(struct sock *sk, long timeout)
++{
++	struct tls_context *ctx = tls_get_ctx(sk);
++	struct tls_close_work *cw;
++
++	if (ctx->tx_conf == TLS_SW)
++		tls_sw_cancel_work_tx(ctx);
++
++	cw = kmalloc(sizeof(*cw), GFP_KERNEL);
++	if (!cw)
++		return;
++
++	INIT_WORK(&cw->work, deferred_close);
++	cw->timeout = timeout;
++	cw->ctx = ctx;
++	queue_work(system_unbound_wq, &cw->work);
+ }
+ 
+ static __poll_t tls_sk_poll(struct file *file, struct socket *sock,
+
+---
+base-commit: fec50db7033ea478773b159e0e2efb135270e3b7
+change-id: 20240410-ktls-defer-close-002934564b09
+
+Best regards,
+-- 
+Sascha Hauer <s.hauer@pengutronix.de>
+
 
