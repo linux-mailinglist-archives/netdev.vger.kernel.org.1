@@ -1,208 +1,143 @@
-Return-Path: <netdev+bounces-86703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86704-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C75E8A0011
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 20:52:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E3B48A0013
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 20:53:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81589B2454E
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 18:52:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8EAF1F2361C
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 18:53:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849511802AD;
-	Wed, 10 Apr 2024 18:52:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SxRlRSCQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB9216D33A;
+	Wed, 10 Apr 2024 18:53:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E116415B0E4
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 18:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A992E405;
+	Wed, 10 Apr 2024 18:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712775143; cv=none; b=ULAGgdv8ixnzF8DTA0iQZubRDXBblySvHF1iXyLens0B7bVpgsWJD4z8T4HINfV+41U6Wtz1Jds2MYtpc4GoxjL0BNzqi1fnBgOAksjHieztWjkHiuRzuNQKvLHoaFTpB7DoWiYsv4venT6oq3g5Knum9la1RLxeIrRNY4iFgrA=
+	t=1712775185; cv=none; b=VT/TvYBVFVmpaODPA3ip1pjqrecNi1xeLq3r+RzcHwCDFUh2w9OtSJOdviARYW8z3h8Gd2AjHWLXIA6CZ0E7EiUZA0Ee4bMCib9vLoc1W4SjXRj/1emWIK3Ia3BTiDt9zR95sM4c/Hp5s0pXpXNCOUydqOZKvCPHRoNqJJpSzvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712775143; c=relaxed/simple;
-	bh=bgeNqKKDFNVE2g4BL0ob14S3E2t26nti9t5qsTsF0W8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mj7IJRww4oLiu73Y0HBqQYUOSIO2CVO4ERivf5fGJ010tDAD/oUGh041fsK4gKM1d3fGKeqp6MQdLO0XpoBkILcH4fMnlH7R8zFjF4QGFo9Wn8BrE0DnKpxpF+WUMVMz4R5pOtHgrdJ2vQ7N/DM4CA4Xo6AaIwToJls87i+6B8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SxRlRSCQ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712775140;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=dpcZLw76LIR56GIqHDiCzppCNN/JqkgmvUZ9GFBgLhI=;
-	b=SxRlRSCQxojmV55XVa8WR1J/PToTZ57h7CG9A6jcgSoOd3FlwMOmYa73zx+ZCkVVFSRleh
-	QdU3BPF70piuIrbkDwfLhuAoxQs2eu+WL3MkZRCJ5IJdwwdKBt5itH4SdiQacBC7rCmmn0
-	8No0mnFbSsTPkG0+e/hYWV7r2fRz+vs=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-563-o6gRQO0HMSOLCKK7_dthzg-1; Wed, 10 Apr 2024 14:52:17 -0400
-X-MC-Unique: o6gRQO0HMSOLCKK7_dthzg-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a51c76700adso12111366b.0
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 11:52:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712775136; x=1713379936;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=dpcZLw76LIR56GIqHDiCzppCNN/JqkgmvUZ9GFBgLhI=;
-        b=GYAhvMOlSTX8vfYHi7WgWfHXpLWJhvSJwZwmy8YY+2IoIeAahBHXsKN1ve49naHD56
-         0Rf+y5GZXkQemcPVzouML0OCrlTQybSMTFfdccPiaTV+YwM6HWIHxqZpeG6JzxsEJ7vq
-         +k02IA2++iNfmw9bnrJ23R3yJcB0r+E6tZ94Dxn4iWh++YJzM57bFujAgZktr+qpY/E5
-         Z3gZz364BPIJ3ktCLMarAKOfafThT51uwd7E9avs7G6Ri2QXKsxsyvnpGRnHB+K+icQp
-         NhDZ/iYx0KEesAdnmGLJMyprcgDFDf0iIEKB/6mxyKLgi3+J2nbwnB4mAHZ9egE/iwiO
-         MbhA==
-X-Forwarded-Encrypted: i=1; AJvYcCUNBYjtu/24tKwIgATLndD5P2rePrPVIym/4JK3LR1ElrRRcadNXw0hTDB/o59cSn9caJLRK5vc1tI17gsNziHoemIEKFCr
-X-Gm-Message-State: AOJu0YwezY+Vb22I5+686hDTMZ+aKmijCmkgmHZsvHK6EjHury/ZiXSk
-	ahGznTDsFUHv8EBmP7rzwtEvp/LZurCCGNzDbZbBvH8Mi5iIOk82jajSMyuvdPEMa5c6RLhnx4C
-	2VEREj21LEpn53OSo98LIafTXbxIBaZ88F/pYaYxytcB0p2HdWAlIvrDhPIbiUA==
-X-Received: by 2002:a17:906:6d6:b0:a51:9c84:452a with SMTP id v22-20020a17090606d600b00a519c84452amr370371ejb.32.1712775136366;
-        Wed, 10 Apr 2024 11:52:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE1iFYjQA8OwfFC6VX0bBrJyiQxPUlS2gTGbMCNuytFyfhjITYLIoqbcfKI0qJUO2jG4uTADA==
-X-Received: by 2002:a17:906:6d6:b0:a51:9c84:452a with SMTP id v22-20020a17090606d600b00a519c84452amr370347ejb.32.1712775135919;
-        Wed, 10 Apr 2024 11:52:15 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c712:fa00:38eb:93ad:be38:d469? (p200300cbc712fa0038eb93adbe38d469.dip0.t-ipconnect.de. [2003:cb:c712:fa00:38eb:93ad:be38:d469])
-        by smtp.gmail.com with ESMTPSA id qx3-20020a170906fcc300b00a4e26377bf1sm7332917ejb.175.2024.04.10.11.52.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Apr 2024 11:52:15 -0700 (PDT)
-Message-ID: <6218ebd9-b5b7-4065-99b2-a742df6197d1@redhat.com>
-Date: Wed, 10 Apr 2024 20:52:14 +0200
+	s=arc-20240116; t=1712775185; c=relaxed/simple;
+	bh=MB/GDTg7r7l13A4bD83ZT67rRbSgLdSJjmRK2twUutQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nokbph4ybGfF7b8riGLiwpXcSVo5WAQzTGKWGUMpTi61JQ06Bu850fn15scJvsld60lo/Rluv/zQf5HicV6rpPHCY3WwJDJBN8GI3TYMrbbRZnUggnc/n34oh1d/I+pkyMqAG7DNiZoWzixIBnhpeREGo8HVTyahydD5FVdPgGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1rud3c-0001D4-1U;
+	Wed, 10 Apr 2024 18:52:28 +0000
+Date: Wed, 10 Apr 2024 19:52:24 +0100
+From: Daniel Golle <daniel@makrotopia.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: arinc.unal@arinc9.com, DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	=?iso-8859-1?Q?Ren=E9?= van Dorst <opensource@vdorst.com>,
+	Russell King <linux@armlinux.org.uk>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Florian Fainelli <florian.fainelli@broadcom.com>
+Subject: Re: [PATCH net v3] net: dsa: mt7530: fix enabling EEE on MT7531
+ switch on all boards
+Message-ID: <Zhbf6AtfBfxXMIGc@makrotopia.org>
+References: <20240408-for-net-mt7530-fix-eee-for-mt7531-mt7988-v3-1-84fdef1f008b@arinc9.com>
+ <1f2bc5416a0a73756cc1f45f3300619eb201b0a4.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1 12/12] mm: page_frag: update documentation and
- maintainer for page_frag
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Yunsheng Lin <linyunsheng@huawei.com>,
- davem@davemloft.net, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
- Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
- linux-doc@vger.kernel.org
-References: <20240407130850.19625-1-linyunsheng@huawei.com>
- <20240407130850.19625-13-linyunsheng@huawei.com>
- <b5c5866e626f6c90657a32b5e9adff724d5896db.camel@gmail.com>
- <c1f5a78a-3040-0cc7-f113-d5ec82c6010f@huawei.com>
- <CAKgT0UfZBGEVJa1O7cdNt6zy_EEPoGo=aW6ugRKy8a44qg0j8w@mail.gmail.com>
- <09d7d59b-9da3-52f7-b039-acd0344c88c8@huawei.com>
- <20240409062504.26cfcdde@kernel.org>
- <CAKgT0UfqDRxhUyfQhwsDrRhQmCw4qNw_7Jwq+xN1Z4f6_1Bthg@mail.gmail.com>
- <6517b5ae-e302-4cbe-8a4c-716e604822ce@redhat.com>
- <CAKgT0UcAw8tENoS7r2YYV2vQ562PPUcgQwfJXhzi8aS+ujZEYA@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <CAKgT0UcAw8tENoS7r2YYV2vQ562PPUcgQwfJXhzi8aS+ujZEYA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <1f2bc5416a0a73756cc1f45f3300619eb201b0a4.camel@redhat.com>
 
-On 10.04.24 20:19, Alexander Duyck wrote:
-> On Wed, Apr 10, 2024 at 9:06 AM David Hildenbrand <david@redhat.com> wrote:
->>
->> On 09.04.24 17:11, Alexander Duyck wrote:
->>> On Tue, Apr 9, 2024 at 6:25 AM Jakub Kicinski <kuba@kernel.org> wrote:
->>>>
->>>> On Tue, 9 Apr 2024 15:59:58 +0800 Yunsheng Lin wrote:
->>>>>> Just to be clear this isn't an Ack, but if you are going to list
->>>>>> maintainers for this my name should be on the list so this is the
->>>>>> preferred format. There are still some things to be cleaned up in this
->>>>>> patch.
->>>>>
->>>>> Sure, I was talking about "Alexander seems to be the orginal author for
->>>>> page_frag, we can add him to the MAINTAINERS later if we have an ack from
->>>>> him." in the commit log.
->>>>
->>>> Do we have to have a MAINTAINERS entry for every 1000 lines of code?
->>>> It really feels forced :/
->>>
->>> I don't disagree. However, if nothing else I think it gets used as a
->>> part of get_maintainers.pl that tells you who to email about changes
->>> doesn't it? It might make sense in my case since I am still
->>> maintaining it using my gmail account, but I think the commits for
->>> that were mostly from my Intel account weren't they? So if nothing
->>> else it might be a way to provide a trail of breadcrumbs on how to
->>> find a maintainer who changed employers..
->>
->> Would a .mailmap entry also help for your case, such that the mail
->> address might get mapped to the new one? (note, I never edited .mailmap
->> myself)
+On Tue, Apr 09, 2024 at 01:58:56PM +0200, Paolo Abeni wrote:
+> On Mon, 2024-04-08 at 10:08 +0300, Arınç ÜNAL via B4 Relay wrote:
+> > From: Arınç ÜNAL <arinc.unal@arinc9.com>
+> > 
+> > The commit 40b5d2f15c09 ("net: dsa: mt7530: Add support for EEE features")
+> > brought EEE support but did not enable EEE on MT7531  MACs. EEE is
+> > enabled on MT7531 switch MACs by pulling the LAN2LED0 pin low on the board
+> > (bootstrapping), unsetting the EEE_DIS bit on the trap register, or setting
+> > the internal EEE switch bit on the CORE_PLL_GROUP4 register. Thanks to
+> > SkyLake Huang (黃啟澤) from MediaTek for providing information on the
+> > internal EEE switch bit.
+> > 
+> > There are existing boards that were not designed to pull the pin low.
+> > Because of that, the EEE status currently depends on the board design.
+> > 
+> > The EEE_DIS bit on the trap pertains to the LAN2LED0 pin which is usually
+> > used to control an LED. Once the bit is unset, the pin will be low. That
+> > will make the active low LED turn on. The pin is controlled by the switch
+> > PHY. It seems that the PHY controls the pin in the way that it inverts the
+> > pin state. That means depending on the wiring of the LED connected to
+> > LAN2LED0 on the board, the LED may be on without an active link.
+> > 
+> > To not cause this unwanted behaviour whilst enabling EEE on all boards, set
+> > the internal EEE switch bit on the CORE_PLL_GROUP4 register.
+> > 
+> > My testing on MT7531 shows a certain amount of traffic loss when EEE is
+> > enabled. That said, I haven't come across a board that enables EEE. So
+> > enable EEE on the switch MACs but disable EEE advertisement on the switch
+> > PHYs. This way, we don't change the behaviour of the majority of the boards
+> > that have this switch. The mediatek-ge PHY driver already disables EEE
+> > advertisement on the switch PHYs but my testing shows that it is somehow
+> > enabled afterwards. Disabling EEE advertisement before the PHY driver
+> > initialises keeps it off.
+> > 
+> > With this change, EEE can now be enabled using ethtool.
+> > 
+> > Fixes: 40b5d2f15c09 ("net: dsa: mt7530: Add support for EEE features")
+> > Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> > Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> > ---
+> > Here's some information for the record. EEE could not be enabled on MT7531
+> > on most boards using ethtool before this. On MT7988 SoC switch, EEE is
+> > disabled by default but can be turned on normally using ethtool. EEE is
+> > enabled by default on MT7530 and there's no need to make changes on the DSA
+> > subdriver for it.
+> > ---
+> > Changes in v3:
+> > - Remove patch 2, it was revealed that it doesn't fix a bug.
+> > - Patch 1
+> >   - Use the internal EEE switch bit provided by SkyLake Huang (黃啟澤). It
+> >     is a better method compared to unsetting the EEE_DIS bit of the trap as
+> >     the latter method causes unwanted behaviour on the LED connected to the
+> >     pin that pertains to the EEE_DIS bit.
 > 
-> Not sure. My concern is that it might undo the existing tracking for
-> contributions by employer as I know they use the emails for the most
-> basic setup for that. I suppose that is one downside of being a job
-> hopper.. :-P
+> Since this leverages something relatively obscure, it would be great if
+> someone in the CC list could independently test it. Let's wait a bit
+> more.
 
-I wouldn't be concerned about undoing existing tracking. I can spot 
-people in .mailmap with more than 5 entries / different employers, so it 
-is quite common!
+I've excessively tested this patch on MT7531 today, and reviewed it
+today and yesterday. I've also picked it as downstream patch[1] to
+OpenWrt, so an even wider audience will have the pleasure of working
+EEE on those switch ICs and in-SoC switches.
 
-> 
-> I'd rather not make more work for someone like Jon Corbet or Jakub who
-> I know maintain statistics based on the emails used and such.
+Tested-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: Daniel Golle <daniel@makrotopia.org>
 
- From what I recall, they do have their own mapping of mail addresses to 
-employers, for example for people that just don't use corporate mail 
-addresses.
-
--- 
-Cheers,
-
-David / dhildenb
-
+[1]: https://git.openwrt.org/?p=openwrt/openwrt.git;a=commit;h=98f9154316fe8371c709bd11ae8f263e22075ec6
 
