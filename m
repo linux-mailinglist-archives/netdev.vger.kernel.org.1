@@ -1,148 +1,131 @@
-Return-Path: <netdev+bounces-86712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DB8A8A0060
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:09:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D34498A006C
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:16:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE7EA1C21741
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 19:09:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E2CC288A1D
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 19:16:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EC2F180A88;
-	Wed, 10 Apr 2024 19:09:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8297B180A9F;
+	Wed, 10 Apr 2024 19:16:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2+gvAbxm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QWh3ApwF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABFA6180A7F
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 19:09:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC5E1802CF;
+	Wed, 10 Apr 2024 19:16:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712776182; cv=none; b=TWSvAvYXJAiGLdNOnXeuTJB4nV5ak7EvcZNwCC+mFz2MgnPzh0B7EAB29KC0nU0W3tlEm58wzXHM+HkyOhvMto4frorurQx/DXetoLAL2VLIpDh8+RkXt/v6KAQkqipIllJoqBJ8HBYq74dm16uUuptdg4mUD9R7GoY/JYgEK3U=
+	t=1712776575; cv=none; b=B6J/Nk3NSz6Zl0oF4+JGKKRqc1PU1ff116luUV31G8JOb0rWc2IbLt0z0UQV7lWXMq7tT+bR0V+TvwGLQBQxhBiWFa9sUUhK+uUE6XZN1ACr1iOZZ23cbVYFzCQNybiMhaozkjfZeD3A6WbMHbSa+3jbp+kbWqHhlAMrobA6VYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712776182; c=relaxed/simple;
-	bh=3vpVF4t7apopDMRyVXzObK4S1vRFFr2BvTpMBTZ17jw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=meU2Gvv2LbXVBfokjhRDgrD2Ah+brCi2zdUP4gtPl81TWYgop/CuRRcpBNzbGpK0LVcAdrVQyNOns2zyGwZ5f1QBMqSxWK7/4/qBivkS4sfGGy6uYQdEwKvlawYuxLb0MnpE1ZN04wb9yWuzhRkLWaIr4R9aacJ0T2933bM9p00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2+gvAbxm; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-516d4d80d00so6828201e87.0
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 12:09:40 -0700 (PDT)
+	s=arc-20240116; t=1712776575; c=relaxed/simple;
+	bh=N3eMWVi75+MA86c+aJe5TeWSasUakhFVRf4PZ2GV+P8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OHUzyGpNBJdwnBlpR7Bmmv3f/HQlN22pszrwWCDkrGvLLlUh3Ihhbx6GRkMfayx8IuuxSopFJDdRs86HW5hjGDPfNPlmBMythrhFyDISf2UEp/xuhcAoPuUc2OFaWEuvwZ8c8belRpGcJR/gHbqttBrvSNmQURa4UxhmMMu9d9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QWh3ApwF; arc=none smtp.client-ip=209.85.221.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-4da702e48e0so3033828e0c.0;
+        Wed, 10 Apr 2024 12:16:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712776179; x=1713380979; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bIo2EVourWrLaohp5j6QNkkQsISAFdO4wMswAJKmsJ4=;
-        b=2+gvAbxmmzzAKUt5ZFXEgjLwBBIoYd/znXmBjZyRqa6rG60mYcFviZ5Tqm3sU8QCAq
-         s8KIOnyM6wewe++PgEuS2J0X1Df8ZrFzX7VOmtUSp5dBjBkrIm533TaoVrFh1ISIWlSe
-         sKd/B0npqipRnNgpjLz3JiTogQqXippRTpOVO6DHRgr2JCG3YxGjVd3MapjSSPCSMT7C
-         dcymDAylEUkb2Cg31D9rZHY+az0xM4/IrdPCfy3d9es/HUxT8dLXdeyFWGd/bEKWa7qu
-         pp4qp3+/u8XJbv4wXDlFAteHHqTxe/ZqlC38A8TuekES/xj5DwLxHRmS/V0EQgp/ye3u
-         SDvQ==
+        d=gmail.com; s=20230601; t=1712776573; x=1713381373; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BpSOzU15LzKweAegnrAsIh5K/sd1ekTGfCpD+wWSpac=;
+        b=QWh3ApwFb02bdqcOF8zTKLtwoZUo/Fw93sZIPZlOwwkFFRb2L9IsPox2LqpJVqhau6
+         jLyisMvW6WrZZNOzL3IJ9k1rNmaLqEZXuNBuTV8RAMgxG6caKD2/ieg/G9pVKDshMiqw
+         dF7v5EXKnyltxjMJOLChBJlpna9hpMbkYR03ZywiNcCpIHkv91XJKWTJX49+xOLh0Iql
+         bQCpjRbaPK27+GgL4Eenw94xhpJVhMlT2FfmEl/WiaUGHkFAsnW3WzqGaf9chrga7Wol
+         3FyRAZ4v6FUnwThtrfgJ8v6+t6k8bQknjEH/GT3AFTx4dtvH29Qt8040jlsB1IdfQ0gL
+         6v6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712776179; x=1713380979;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bIo2EVourWrLaohp5j6QNkkQsISAFdO4wMswAJKmsJ4=;
-        b=aEUNdnG0G10zEZexD1Q/j9iPH5sTgajXlr+NMJkpZmIG18nBT9N/kWBJQULOh0dqNP
-         7NlVkk9+Xxv6IPWE5Cq3R5cAqmJpWc+HvlHkMzfSbFEeICJLtVuyh5PygmZ9JMQF7VH/
-         Y3O3Z06Lc8556Rs4xBCbqb8GbQyIGT18ZJQiuuZzZZHSix6xG8bT53Av/Xa+69iRNhGa
-         NDNDp0/uN+pXCGBKyAvgVIB3iyFKFGDOLPB77ScAV8ERU2sjORTQSYIWoQtUjMWqUnZO
-         U+Bm6dV3JYbIJ83sJzEshBv5efq4ASWFeqSQ7jG5fhhrGkhw/zYGGPEVTPJ/Q4VJjpNK
-         a6VA==
-X-Gm-Message-State: AOJu0YzKFn+gj5e3cPeX9c7Z2yHibuGmrX/VIZxI8ajtE3ULKLRxp8E7
-	ZlgxQcGQ+b8b8TV8M8xNescKKR4A16rWMAR/d5z7kZerDb3LqIwiknx9gdnqDvlkYuf4+xkXoR6
-	gEAi7GT+F0jQZfJJcLwgmLCc2lfc8MYI2zb+i
-X-Google-Smtp-Source: AGHT+IH5P3MBCNgnfVNKHRh/3p0kXImGKWwPLqhR8qXKbY22t/CU4Q5cuxfS1hEk4O6f0dElkgcrJEVfk3FCIRv4BiY=
-X-Received: by 2002:a05:6512:33cb:b0:517:854e:2c91 with SMTP id
- d11-20020a05651233cb00b00517854e2c91mr925647lfg.64.1712776178375; Wed, 10 Apr
- 2024 12:09:38 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712776573; x=1713381373;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BpSOzU15LzKweAegnrAsIh5K/sd1ekTGfCpD+wWSpac=;
+        b=QpiBhwgGLvjjyzcGIEgIAc9Ze8GA199YZZRwpCKrVpKo/DLAa23WfJ6a+jVHfsjlb9
+         VNcAbndxYbZmCng/wrbSFoTq/PZfAQleACAdYtj1/MlmIRASk2j3uWr3gdkVQyze5SB/
+         IMc5zP2R504awKNbQ3PowTU9j4B0b4c7guNSObvH7gWM0QD3W+UzbMNS9XKrxehAYVVx
+         C8fYERiUrkqEOMOCwaFWSzHLHMJPHzW9BYFc0H6/KRiEtfuaKgu5NomQUmVrJdW+I+ez
+         yFweY3GdMD3z8yGf5VZY+5gbPtmH8Xn4iC6Auuv7fbObk0wEEB63Jz3OoYKw1A3FedG7
+         sY7w==
+X-Forwarded-Encrypted: i=1; AJvYcCX/M8KBdCpoiA2Bjo3pjmg97GXab9FIQw+trDoJFq0GkeHTBOd1hF/lE15SKKirhFlGH9umcc3YyKfUu5jL89ZvhVeiRUFb
+X-Gm-Message-State: AOJu0YzPJw7Q8BCfn/T4SJ+jwE5JnKolh9DtEoleJSjmX/lbnNcdtmS3
+	tzqsOutHP8UoWpSPjkpLRQdeOE5Y5kW0aKzKHp7s5GPJFaPXNLKh
+X-Google-Smtp-Source: AGHT+IFHRjFkE9KByYgCvObvf3f7ksWVv9j/dH67V+lePm8YK7b2QA5nG9xG4KTV7kAEgN44mPt06g==
+X-Received: by 2002:a05:6122:1795:b0:4d8:797b:94df with SMTP id o21-20020a056122179500b004d8797b94dfmr4261683vkf.2.1712776572666;
+        Wed, 10 Apr 2024 12:16:12 -0700 (PDT)
+Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
+        by smtp.gmail.com with ESMTPSA id eq15-20020a056122398f00b004d895c72d56sm1524223vkb.50.2024.04.10.12.16.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 12:16:12 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth 2024-04-10
+Date: Wed, 10 Apr 2024 15:16:10 -0400
+Message-ID: <20240410191610.4156653-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240408153000.2152844-1-almasrymina@google.com>
- <20240408153000.2152844-3-almasrymina@google.com> <20240409182301.227c9ff7@kernel.org>
-In-Reply-To: <20240409182301.227c9ff7@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 10 Apr 2024 12:09:26 -0700
-Message-ID: <CAHS8izM+S=j1DLsb6JdKFFUurotcw3eArGDOz9NBvksDoh=11Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 2/3] net: mirror skb frag ref/unref helpers
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Ayush Sawal <ayush.sawal@chelsio.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	David Ahern <dsahern@kernel.org>, Boris Pismenny <borisp@nvidia.com>, 
-	John Fastabend <john.fastabend@gmail.com>, Dragos Tatulea <dtatulea@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 9, 2024 at 6:23=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Mon,  8 Apr 2024 08:29:57 -0700 Mina Almasry wrote:
-> > +#ifdef CONFIG_PAGE_POOL
-> > +static inline bool is_pp_page(struct page *page)
-> > +{
-> > +     return (page->pp_magic & ~0x3UL) =3D=3D PP_SIGNATURE;
-> > +}
-> > +
-> > +/* page_pool_unref_page() lives in net/page_pool/helpers.h */
-> > +static inline void page_pool_ref_page(struct page *page)
-> > +{
-> > +     atomic_long_inc(&page->pp_ref_count);
-> > +}
-> > +
-> > +static inline bool napi_pp_get_page(struct page *page)
-> > +{
-> > +     page =3D compound_head(page);
-> > +
-> > +     if (!is_pp_page(page))
-> > +             return false;
-> > +
-> > +     page_pool_ref_page(page);
-> > +     return true;
-> > +}
-> > +#endif
-> > +
-> > +static inline void skb_page_ref(struct page *page, bool recycle)
-> > +{
-> > +#ifdef CONFIG_PAGE_POOL
-> > +     if (recycle && napi_pp_get_page(page))
-> > +             return;
-> > +#endif
-> > +     get_page(page);
-> > +}
->
-> Shifting of all this code from pp to skbuff catches the eye.
-> There aren't that many callers to these, can we start a new header?
+The following changes since commit 19fa4f2a85d777a8052e869c1b892a2f7556569d:
 
-I am not 100% sure what the new header should be named and what
-exactly you wanted moved to the new header, but made a guess and
-uploaded v6 with this change. Let me know if it's not what you had in
-mind. I added a new linux/skbuff_ref.h header file, moved all the ref
-functions there, and included page pool headers in that without worry.
+  r8169: fix LED-related deadlock on module removal (2024-04-10 10:44:29 +0100)
 
-v6: https://patchwork.kernel.org/project/netdevbpf/list/?series=3D843380
+are available in the Git repository at:
 
-> We can then include page pool headers in the without worry.
->
-> I'll apply the other patches, they look independent.
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-04-10
 
+for you to fetch changes up to 600b0bbe73d3a9a264694da0e4c2c0800309141e:
 
+  Bluetooth: l2cap: Don't double set the HCI_CONN_MGMT_CONNECTED bit (2024-04-10 15:10:16 -0400)
 
---=20
-Thanks,
-Mina
+----------------------------------------------------------------
+bluetooth pull request for net:
+
+  - L2CAP: Don't double set the HCI_CONN_MGMT_CONNECTED bit
+  - Fix memory leak in hci_req_sync_complete
+  - hci_sync: Fix using the same interval and window for Coded PHY
+  - Fix not validating setsockopt user input
+
+----------------------------------------------------------------
+Archie Pusaka (1):
+      Bluetooth: l2cap: Don't double set the HCI_CONN_MGMT_CONNECTED bit
+
+Dmitry Antipov (1):
+      Bluetooth: Fix memory leak in hci_req_sync_complete()
+
+Luiz Augusto von Dentz (7):
+      Bluetooth: ISO: Don't reject BT_ISO_QOS if parameters are unset
+      Bluetooth: hci_sync: Fix using the same interval and window for Coded PHY
+      Bluetooth: SCO: Fix not validating setsockopt user input
+      Bluetooth: RFCOMM: Fix not validating setsockopt user input
+      Bluetooth: L2CAP: Fix not validating setsockopt user input
+      Bluetooth: ISO: Fix not validating setsockopt user input
+      Bluetooth: hci_sock: Fix not validating setsockopt user input
+
+ include/net/bluetooth/bluetooth.h |  9 +++++++
+ net/bluetooth/hci_request.c       |  4 ++-
+ net/bluetooth/hci_sock.c          | 21 ++++++----------
+ net/bluetooth/hci_sync.c          |  6 ++---
+ net/bluetooth/iso.c               | 46 +++++++++++++++-------------------
+ net/bluetooth/l2cap_core.c        |  3 +--
+ net/bluetooth/l2cap_sock.c        | 52 +++++++++++++++------------------------
+ net/bluetooth/rfcomm/sock.c       | 14 ++++-------
+ net/bluetooth/sco.c               | 23 ++++++++---------
+ 9 files changed, 79 insertions(+), 99 deletions(-)
 
