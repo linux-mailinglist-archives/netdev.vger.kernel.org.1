@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-86550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AE4789F2A5
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 14:47:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A76289F2A7
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 14:47:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE0081C22CC8
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 12:47:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD3121C23593
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 12:47:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB85515ECC6;
-	Wed, 10 Apr 2024 12:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F2415ECE1;
+	Wed, 10 Apr 2024 12:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="1h4R48Li"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="rS1ARDiz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1879815B995
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 12:46:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3429615CD70
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 12:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712753217; cv=none; b=F0YcOSkC5/WBD3/z4N3JkfkT2iYNaXek2eGAbhNpNhBiWae8Wv9u0PBhhHzLKoixFdx2PPMtQHtEndfsjwGUamWouDgmyqaL5gTkF112O/UIokm0QSbS+tsuKqmXZ2N9it+k/y2jzZR58kuvLiLppE6EZgfK63ckYvvFBHkiSog=
+	t=1712753217; cv=none; b=aSjz8zMEqKyH3BrN9dnQI9E3VWQfv1sf8IR75jwFWtUpS7kNYiaZpEMeftlDHABCQmlx1T1WSVLJmiQdjPRhNXnM8rRzS4DYSS68IVroC6IkyB28Vf+HsuXjlucaj49qRq8gFhbnYFF9ixSOU0dA2r5KtFKUa/qpl6c1WwMat5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712753217; c=relaxed/simple;
-	bh=iwTEu+lkt5abe7LUv0S7o0y0lG2vPok6myhH0fsG1TU=;
+	bh=MUjIQBvJOiC/7Sk0sNr5/dsV71Wum/L6nN9MsfPFHbs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=H0Azv+XcesCfcg9eKco7GbNbeK9iR89Chn74CaWMrjeuHl7F7pRI07ueYzvqda2s8Z/JXyFTCawrf28dyHNZRY+NVZOI3zeWK0wQH9zM1tX+Fh8W2W94HJL0xXYffa4BluMI7YCFtd/ol7fMz22bntW4NIgCDLOxDJ72luFEtKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=1h4R48Li; arc=none smtp.client-ip=209.85.208.182
+	 MIME-Version; b=YlHlfkLUt5uSLJsJdB66MxOdJ+z5S9Za/DTUwOSSdulT+FuMTMgC6WQ6sapT7Lc52PLt+GcJQyGfVRMYbUezyyzIF3Ja9rAzete1up/4NYtZSTYQi67Fs1aIO3taADPjksCTNxMuG44cQbOmFMeeUhCRuaK7wbGP97I+tlCXmUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=rS1ARDiz; arc=none smtp.client-ip=209.85.167.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d8a2cbe1baso23020551fa.0
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 05:46:53 -0700 (PDT)
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-516ef30b16eso4613577e87.3
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 05:46:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1712753212; x=1713358012; darn=vger.kernel.org;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1712753213; x=1713358013; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=neYnvsYoFsS5j9G8zlh2o75lXgcagfPjZrPssEkiwjs=;
-        b=1h4R48LiHRTNnhrU7aHlq8vO58Sk1fqzOxvbZNnxlBjavl8AIhpN6xuqmf+aUv+4de
-         3bcvErcmK52nJks4w7FZ96+WMO+MW5axHXe/hmO1LOMr9gnEWPRx0UA3p1B2YBjpLk/H
-         oQbvGX0b9jpvV9znYww2taZs5+gB29lKJl5pogUk2r4M3lllvMAOwhlYq9MFjjtr/0zy
-         M5UQCZTveMJggejxWcLa646UWxjsFnge9VB5CFWQNpPv67Ks3FyRrlIKyOfDeyiw4oDg
-         Q8UASbcllTye0DdBlmbHBXpPlNIieJY5jHrhNbAS9P5jezOP+1wEKPzVXm9ylcPvYl/b
-         cVLg==
+        bh=ROLNBRTJMkk3QD0/QYv3fhL3ZXVxKfd2xATXL1q1dGU=;
+        b=rS1ARDiznv0LUNq1SwctJ8DSF2nFAvy85MROcanSwVO+40T+U3Tid+VIeg9BqNWkwP
+         BEm6f6pKUxDLl0EgpEbTCkRCmk+pbFORfS5/eFEw640FFbp1aJtRCTmDl1ZP64DJ6+sK
+         rpZL+JiYhsSQmjH/f/FZr8ME/5HCV3ZHlypiq0mEQCHxyI0WKmvpVAXoBjIrEYhDAUcL
+         4g7rhtxSlShm7ztBMrPQQmPkI5UoL1hxHTyy+vXVtgWYcf+aDQnTyf/QP9ZRKsVtwmVt
+         LUxF75pYnXHauDbgwQzRKOiJKG1cEfg+hom19HEVY6BrxRLgZXQQimF6q2ALc5jxf4m0
+         621w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712753212; x=1713358012;
+        d=1e100.net; s=20230601; t=1712753213; x=1713358013;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=neYnvsYoFsS5j9G8zlh2o75lXgcagfPjZrPssEkiwjs=;
-        b=Rpz2mKH8rshATQEFnH+wsRwzyh0NJu8NWdAELG50fVSBUKmTWPq++sbw91dfttxfF8
-         so02pK4OJ4psuUOhpQvILF3CRh8lTLyKpaN2PX+HvbTdOhmOjUe8X0WwZwG172dvZ0Ge
-         OBHBgz5sgQ5ulFqrxqOMZFrpDeWS1ayGUiHjrNQBw3How7kYF70dte3MS9Rm4acnNFSu
-         SE95wk9CSla8YQ30JqsHbNsxyq1YKlbG7yQ6JshQUwsX2bT7/nTtbA6s0EjRsCkVYj8I
-         /Ejv8lgj6hsxuSMdo8zu2yBcL3WQvalHQPUjKAHFiIlBlfNgfHgRnsO7UTPbJ3mEJzQg
-         s4bQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWY5Y8WQCeqLxWDmRRaP+D8AtWUobsRBcmuUJ8c1RG8UdLLW29M7NCa3LerzGo8qjnYLxmNemD28wCX+LOUGDRkv1PI2kkT
-X-Gm-Message-State: AOJu0YyEL/jcDOxXno+3MN+5VBkDzSj9RwppzzDzehgZRJ2Yz4KTIKKH
-	6L11HrdEfLHG/RHn3Tgc0mXrqJEpiijNEONTzTnjC5vwai+2fa14dgiP4sYj3N8=
-X-Google-Smtp-Source: AGHT+IHSbFMXQvrmGeIxNyHVsaPU74TeWomF+UpL7T4ZfurUbVNKiyVURBlLY4fBFmuDmQSahnXYqA==
-X-Received: by 2002:a2e:9096:0:b0:2d8:45fc:c9d6 with SMTP id l22-20020a2e9096000000b002d845fcc9d6mr1972308ljg.45.1712753211761;
-        Wed, 10 Apr 2024 05:46:51 -0700 (PDT)
+        bh=ROLNBRTJMkk3QD0/QYv3fhL3ZXVxKfd2xATXL1q1dGU=;
+        b=TKqTf9D4TtxsUJJIawVoA3lQU81qNFEoo7fkdI4+ULBA/HoRR4JPTgols1Lk3/f+iS
+         S98gUaiktsn0iSCmxxf2UP0/uabCvcrIBS3cPhjSLO/q6340IgDgk6un1Yk5uDVV3owE
+         igdFaxg8Kj/NF3e7Y850K5VREC6aM+7IQhdUDcyazJeDyFiJkcH1ITFZ+U+Ogym6IeMP
+         FSQ38qAyHuqcudcB2RDIdwULtJ7xzMvSvAQt0Ee3AdXkr7gp+tTbnAlkE0gaqxICqXSm
+         74dQ25lUf5CajzckxZ4N77uI7uRsPCOO2YhlO+LIMzQbWSQkDLLfZ9Am60Xi6Tz8Ezpq
+         tp0A==
+X-Forwarded-Encrypted: i=1; AJvYcCVdZXVc13F1AG/nMR1K8fJpk07qA4lho/+2l3Y0jKB8GGHblRWzcrOeHcLKwmaes+NrqSQ+gjlMQyvumrwYweXdSVlJxUf4
+X-Gm-Message-State: AOJu0YyBTu4LkUt2GxULQcOHNV73rJkhvE2GMi3IanE0YEHAIYlGA6sd
+	KlIH3YeiaAnNDovzcPnnT8bqiXr3HKYKAPXjK5IvsJfVAdHej5FsZXv06jp/j0g=
+X-Google-Smtp-Source: AGHT+IGcE17iy2sNXYQsxYzAek5ZghfDLdvdj03jEMwZ8tyclrpGGb6yIV78jLd5Tw3AyCSfFGF+Kw==
+X-Received: by 2002:a05:6512:3282:b0:516:be66:4d0 with SMTP id p2-20020a056512328200b00516be6604d0mr1508391lfe.56.1712753213325;
+        Wed, 10 Apr 2024 05:46:53 -0700 (PDT)
 Received: from brgl-uxlite.home ([2a01:cb1d:75a:e000:6908:7e99:35c9:d585])
-        by smtp.gmail.com with ESMTPSA id v13-20020a05600c444d00b0041663450a4asm2150929wmn.45.2024.04.10.05.46.50
+        by smtp.gmail.com with ESMTPSA id v13-20020a05600c444d00b0041663450a4asm2150929wmn.45.2024.04.10.05.46.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 05:46:51 -0700 (PDT)
+        Wed, 10 Apr 2024 05:46:53 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
 To: Marcel Holtmann <marcel@holtmann.org>,
 	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -111,9 +111,9 @@ Cc: linux-bluetooth@vger.kernel.org,
 	linux-pm@vger.kernel.org,
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
 	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH v7 01/16] regulator: dt-bindings: describe the PMU module of the QCA6390 package
-Date: Wed, 10 Apr 2024 14:46:13 +0200
-Message-Id: <20240410124628.171783-2-brgl@bgdev.pl>
+Subject: [PATCH v7 02/16] regulator: dt-bindings: describe the PMU module of the WCN7850 package
+Date: Wed, 10 Apr 2024 14:46:14 +0200
+Message-Id: <20240410124628.171783-3-brgl@bgdev.pl>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240410124628.171783-1-brgl@bgdev.pl>
 References: <20240410124628.171783-1-brgl@bgdev.pl>
@@ -127,175 +127,92 @@ Content-Transfer-Encoding: 8bit
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-The QCA6390 package contains discreet modules for WLAN and Bluetooth. They
+The WCN7850 package contains discreet modules for WLAN and Bluetooth. They
 are powered by the Power Management Unit (PMU) that takes inputs from the
-host and provides LDO outputs. This document describes this module.
+host and provides LDO outputs. Extend the bindings for QCA6390 to also
+document this model.
 
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 Acked-by: Mark Brown <broonie@kernel.org>
 Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 ---
- .../bindings/regulator/qcom,qca6390-pmu.yaml  | 151 ++++++++++++++++++
- 1 file changed, 151 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
+ .../bindings/regulator/qcom,qca6390-pmu.yaml  | 36 ++++++++++++++++++-
+ 1 file changed, 35 insertions(+), 1 deletion(-)
 
 diff --git a/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml b/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
-new file mode 100644
-index 000000000000..9d39ff9a75fd
---- /dev/null
+index 9d39ff9a75fd..2e543661a1e2 100644
+--- a/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
 +++ b/Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
-@@ -0,0 +1,151 @@
-+# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/regulator/qcom,qca6390-pmu.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+@@ -16,20 +16,37 @@ description:
+ 
+ properties:
+   compatible:
+-    const: qcom,qca6390-pmu
++    enum:
++      - qcom,qca6390-pmu
++      - qcom,wcn7850-pmu
 +
-+title: Qualcomm Technologies, Inc. QCA6390 PMU Regulators
++  vdd-supply:
++    description: VDD supply regulator handle
+ 
+   vddaon-supply:
+     description: VDD_AON supply regulator handle
+ 
++  vdddig-supply:
++    description: VDD_DIG supply regulator handle
 +
-+maintainers:
-+  - Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+   vddpmu-supply:
+     description: VDD_PMU supply regulator handle
+ 
++  vddio1p2-supply:
++    description: VDD_IO_1P2 supply regulator handle
 +
-+description:
-+  The QCA6390 package contains discreet modules for WLAN and Bluetooth. They
-+  are powered by the Power Management Unit (PMU) that takes inputs from the
-+  host and provides LDO outputs. This document describes this module.
+   vddrfa0p95-supply:
+     description: VDD_RFA_0P95 supply regulator handle
+ 
++  vddrfa1p2-supply:
++    description: VDD_RFA_1P2 supply regulator handle
 +
-+properties:
-+  compatible:
-+    const: qcom,qca6390-pmu
+   vddrfa1p3-supply:
+     description: VDD_RFA_1P3 supply regulator handle
+ 
++  vddrfa1p8-supply:
++    description: VDD_RFA_1P8 supply regulator handle
 +
-+  vddaon-supply:
-+    description: VDD_AON supply regulator handle
-+
-+  vddpmu-supply:
-+    description: VDD_PMU supply regulator handle
-+
-+  vddrfa0p95-supply:
-+    description: VDD_RFA_0P95 supply regulator handle
-+
-+  vddrfa1p3-supply:
-+    description: VDD_RFA_1P3 supply regulator handle
-+
-+  vddrfa1p9-supply:
-+    description: VDD_RFA_1P9 supply regulator handle
-+
-+  vddpcie1p3-supply:
-+    description: VDD_PCIE_1P3 supply regulator handle<S-Del>
-+
-+  vddpcie1p9-supply:
-+    description: VDD_PCIE_1P9 supply regulator handle
-+
-+  vddio-supply:
-+    description: VDD_IO supply regulator handle
-+
-+  wlan-enable-gpios:
+   vddrfa1p9-supply:
+     description: VDD_RFA_1P9 supply regulator handle
+ 
+@@ -50,6 +67,10 @@ properties:
+     maxItems: 1
+     description: GPIO line enabling the ATH11K Bluetooth module supplied by the PMU
+ 
++  clocks:
 +    maxItems: 1
-+    description: GPIO line enabling the ATH11K WLAN module supplied by the PMU
++    description: Reference clock handle
 +
-+  bt-enable-gpios:
-+    maxItems: 1
-+    description: GPIO line enabling the ATH11K Bluetooth module supplied by the PMU
-+
-+  regulators:
-+    type: object
-+    description:
-+      LDO outputs of the PMU
-+
-+    patternProperties:
-+      "^ldo[0-9]$":
-+        $ref: regulator.yaml#
-+        type: object
-+        unevaluatedProperties: false
-+
-+    additionalProperties: false
-+
-+required:
-+  - compatible
-+  - regulators
-+
-+allOf:
+   regulators:
+     type: object
+     description:
+@@ -83,6 +104,19 @@ allOf:
+         - vddpcie1p3-supply
+         - vddpcie1p9-supply
+         - vddio-supply
 +  - if:
 +      properties:
 +        compatible:
 +          contains:
-+            const: qcom,qca6390-pmu
++            const: qcom,wcn7850-pmu
 +    then:
 +      required:
-+        - vddaon-supply
-+        - vddpmu-supply
-+        - vddrfa0p95-supply
-+        - vddrfa1p3-supply
-+        - vddrfa1p9-supply
-+        - vddpcie1p3-supply
-+        - vddpcie1p9-supply
++        - vdd-supply
 +        - vddio-supply
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+    pmu {
-+        compatible = "qcom,qca6390-pmu";
-+
-+        pinctrl-names = "default";
-+        pinctrl-0 = <&bt_en_state>, <&wlan_en_state>;
-+
-+        vddaon-supply = <&vreg_s6a_0p95>;
-+        vddpmu-supply = <&vreg_s2f_0p95>;
-+        vddrfa0p95-supply = <&vreg_s2f_0p95>;
-+        vddrfa1p3-supply = <&vreg_s8c_1p3>;
-+        vddrfa1p9-supply = <&vreg_s5a_1p9>;
-+        vddpcie1p3-supply = <&vreg_s8c_1p3>;
-+        vddpcie1p9-supply = <&vreg_s5a_1p9>;
-+        vddio-supply = <&vreg_s4a_1p8>;
-+
-+        wlan-enable-gpios = <&tlmm 20 GPIO_ACTIVE_HIGH>;
-+        bt-enable-gpios = <&tlmm 21 GPIO_ACTIVE_HIGH>;
-+
-+        regulators {
-+            vreg_pmu_rfa_cmn: ldo0 {
-+                regulator-name = "vreg_pmu_rfa_cmn";
-+            };
-+
-+            vreg_pmu_aon_0p59: ldo1 {
-+                regulator-name = "vreg_pmu_aon_0p59";
-+            };
-+
-+            vreg_pmu_wlcx_0p8: ldo2 {
-+                regulator-name = "vreg_pmu_wlcx_0p8";
-+            };
-+
-+            vreg_pmu_wlmx_0p85: ldo3 {
-+                regulator-name = "vreg_pmu_wlmx_0p85";
-+            };
-+
-+            vreg_pmu_btcmx_0p85: ldo4 {
-+                regulator-name = "vreg_pmu_btcmx_0p85";
-+            };
-+
-+            vreg_pmu_rfa_0p8: ldo5 {
-+                regulator-name = "vreg_pmu_rfa_0p8";
-+            };
-+
-+            vreg_pmu_rfa_1p2: ldo6 {
-+                regulator-name = "vreg_pmu_rfa_1p2";
-+            };
-+
-+            vreg_pmu_rfa_1p7: ldo7 {
-+                regulator-name = "vreg_pmu_rfa_1p7";
-+            };
-+
-+            vreg_pmu_pcie_0p9: ldo8 {
-+                regulator-name = "vreg_pmu_pcie_0p9";
-+            };
-+
-+            vreg_pmu_pcie_1p8: ldo9 {
-+                regulator-name = "vreg_pmu_pcie_1p8";
-+            };
-+        };
-+    };
++        - vddaon-supply
++        - vdddig-supply
++        - vddrfa1p2-supply
++        - vddrfa1p8-supply
+ 
+ additionalProperties: false
+ 
 -- 
 2.40.1
 
