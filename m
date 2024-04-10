@@ -1,264 +1,182 @@
-Return-Path: <netdev+bounces-86387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA27089E912
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 06:40:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5237889E934
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 06:51:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F2F5284B0E
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 04:40:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CEEB41F23275
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 04:51:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F62168C4;
-	Wed, 10 Apr 2024 04:39:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED438C8E0;
+	Wed, 10 Apr 2024 04:51:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Z9ymBpcj"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NXT98Bi6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2107.outbound.protection.outlook.com [40.107.94.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F3D10A11
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 04:39:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712723988; cv=none; b=ZsZafwGWZL8FpZEkCRyHjlKPxawmGel6sNhGNUmILN8wS559O/y8/wBMuOha19023KTwhG1fnLUTpeMNPJeDFDRIS4rJR0CYXhlVdrKJADnQRX7Mk1vh0A1lS3BkwA24TyT4znNJAj/0/ylHyORDezupPvyWFGb4AmJqgCN7zI4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712723988; c=relaxed/simple;
-	bh=qADNludrHn0nc/n3sXykDX8DmQnp4rVQ8oPh8FnxDb4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KjOe7LLaeYbrY/A6GQrneiEM8Kk4/zUL38zKgH/kiMN4tQ6gNXB0oCDSHHSBraQtkFSY2Ys4FJYqJAg5sNXu8ZVhGIBLXYUML8KqR+u9+w+Ca2Oa0FgmusLPx5KgMKTqpaSpRD8KtYQb/saKJo5TiluSel9LX/zNU2ovSq84JjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Z9ymBpcj; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2a526803fccso1818178a91.1
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 21:39:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1712723986; x=1713328786; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i0AdTuh0LPKFRBexJVBgnFt0ViqxZ8bYbsSVukVY5u0=;
-        b=Z9ymBpcjJb5ixTl2KWhRChOFhFvIeAjf1FNJb/fllmPbhalanmUUdBkC1eIcecJtkb
-         jU27Dj7ZoSIOnPy37p/TH8V6+Iwhiwz3qg/OxdYDvEnW+6HaIP0w07TXQ1sEr7jgw3Tu
-         GH+Nm7qUtduX6rIeaJK1Dcxt6b5G6H9apHTC8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712723986; x=1713328786;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i0AdTuh0LPKFRBexJVBgnFt0ViqxZ8bYbsSVukVY5u0=;
-        b=DMwHvfqNG0ly0a6EeemUheKg8or22cYlZ2wm/m5EFv/74ACQg8y8pjI/zEEEQrXr6L
-         8n7/HHHf0NUcdZiK7y6fSG74JvS6aVAO4i9p6ux3Ud2aB+JO8zcAc6EkQ2iaoNLh4/Ju
-         /dfdZfpbGqOn7UTabf9wGsNfdT4CeCoRIpyyiRKxxN/jVSaLMS9Y4PeUrRHX+1NFO9an
-         Twxb8L/CjDhp4Qa9Apj0wllYpBOf2vW/d/y5u6bLLfZRIrkUVOBf5or2yOod/9xcXREh
-         wFM2hfHpr8YNLqjcEQxCBDzNgUL7mLoRiatmzij9u+WCV0kXIvZ/Tdgk0EQQme8R4LVr
-         S8AA==
-X-Forwarded-Encrypted: i=1; AJvYcCXHzK6kwFs+D2GIlvdASHOZex0b99dHgceyDOr5X3tmzxz1TOgzVyZRCCrIBFs3mQcVPHtghcAqVyFyKOzWKm/SCuK+uHal
-X-Gm-Message-State: AOJu0YxMcYNLGcmu2Tgp3yLbPryWwAAs3rO2kRXXrILDEK4JaCgGJWzV
-	S72QQKoVCYUi73opvwfgZfiTacNRU5VxTdL5izvdPg02BV+NMUbv1Tkct6JmKkY=
-X-Google-Smtp-Source: AGHT+IHCyg7IsSIZZPCE6CWyUBvBJNPmvz99+2Xq8imlDAOCx7E9BrLRdX6eCg6d+6LVmmu7blclnw==
-X-Received: by 2002:a17:90a:f690:b0:2a5:74ab:7f52 with SMTP id cl16-20020a17090af69000b002a574ab7f52mr1570409pjb.16.1712723985964;
-        Tue, 09 Apr 2024 21:39:45 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id gn4-20020a17090ac78400b002a5d71d48e8sm260773pjb.39.2024.04.09.21.39.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 09 Apr 2024 21:39:45 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org
-Cc: sridhar.samudrala@intel.com,
-	amritha.nambiar@intel.com,
-	nalramli@fastly.com,
-	Joe Damato <jdamato@fastly.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [intel-next 2/2] net/i40e: add support for per queue netlink stats
-Date: Wed, 10 Apr 2024 04:39:35 +0000
-Message-Id: <20240410043936.206169-3-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240410043936.206169-1-jdamato@fastly.com>
-References: <20240410043936.206169-1-jdamato@fastly.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358BC8C1E;
+	Wed, 10 Apr 2024 04:51:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.107
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712724703; cv=fail; b=bIzauLDRBxFqmxgmboQlPZyfMgSwshhdOtpKM7h+cQBsp1fE8AeeM9aGwkDXfwKzfHQLOOcpbNhOBcJgExJwWMYciWNzjb5vcFJDpFUOJcjR9Kni2ztK3D2KFVq4/lXNixXBRFdXG8MnmDRuHaBiGSIh2/BNlahUsdmOq60jV6k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712724703; c=relaxed/simple;
+	bh=KOfdkg7pmTTZnbAQHjhfkGFTBjevo2U+6UPNLtziTM4=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 Content-Type:MIME-Version; b=iOVIh3/F45/jsIpbJO43IJvhvGmh67cD6pNCtGPC1lrsv7gZ4jxAo79L8l7i9cpPEPzcn+xZjOHto/GXaNaGygFFWh+WQVXFxSYy34pDg5CLWA7S6I3gW9sfou9e+KcnB6Tebsi3p6xGtv0n9BkJF/er3owd5uBojt2lOJ4zl7E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NXT98Bi6; arc=fail smtp.client-ip=40.107.94.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RQp6L0KzHuqOW9wf17TTU8xy7b0KOpaOCQ6L8cRiZNarI2c+K++ODJfokZe2qQhRsRfCYWbemLHZDdUDO54R/zMt+M4b78MsQ70Fv5o9BhvyvAmKkhyf0Hz9A1A9cPDL0tJX39NBn1pdlKTw0wjhCK4LXglbCoq/MDxOp0OSMhHMQS9o9DFTHU3z8QAhAVJiNyKpzLeoE67so46/ANTgWnCSl5jW807qGxli6PXdxqLosSsVIjPGrZQDOvuWnwzSxsKim+xTnCI0BftjVULIzidEoXTaQT6Oms89Oxb5EviKO9i4gHIw2CxGs197V7N11gqT/HuAdXL3Ctthz5+Esw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fqYWPZlAKbhbzazxuFefZuuw6dzZIc1zWybZx7ccs4s=;
+ b=l7U4dEx7u3q3QSfEu52sE+bryTyiN7ik9vAw80QcquZw6GUr8Yioh2NQQ7KswN56RZLMKv58Av6Qv0Znj61SUMEu4AkYMJWsoaIyfhm2ccnkszr1CjSV8goVLYbPrjk4nFTNzp37QpNQWQnH1coIggEerlY3nJzlTpGrTBdwfslHJrTemtJPi0W+FgClVgd7D+WwOTKgMeS28SBT8QScwKLl3QnyLD8nAKAWpzWnubW43mne8NeBdBU3UgqfYezs+6cLQ1d4neRiSH3KLKnM4tK/tNZm2bw5JC0sJMxe13TjW2iex9SOd0UtK9DYnBBT8vpQU9m7we5vIzCD/p35gw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fqYWPZlAKbhbzazxuFefZuuw6dzZIc1zWybZx7ccs4s=;
+ b=NXT98Bi6CO7ao37n0flSsUgW7xIhn/kcH68hu/aCEqOlJNzkoTd5bA5WydeQnr9mH0w+AcZO3+Pfx8yvLMub2XCn4ksaILeHPAu41hom9aLG3/pc7W2wvHM6zFmAsMzGmVB0XdCiGZzs69549QvkvCcIxH8dv8+jAMGHLQxpUHkUAcAu6Msiyw7hUByDFJuShru99JV0TPiUi5tg9Besc/I+KTGDiJueO+SafJWK7M7JAFa+XEe5S1FC1F+RyiSbTbj/d4EMYkFnKzitTXALzDD/BYgJCfRulUdJIqsKo3jEqfZjPJ8Wo4ovpur527oe+iXO7vt/66L8iGvwMyEPGw==
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+ by LV8PR12MB9181.namprd12.prod.outlook.com (2603:10b6:408:18d::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.55; Wed, 10 Apr
+ 2024 04:51:38 +0000
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::459b:b6fe:a74c:5fbf]) by BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::459b:b6fe:a74c:5fbf%6]) with mapi id 15.20.7409.042; Wed, 10 Apr 2024
+ 04:51:36 +0000
+References: <20240408180918.2773238-1-jfraker@google.com>
+ <661550e348224_23a2b2294f7@willemb.c.googlers.com.notmuch>
+ <20240409172838.247738f3@kernel.org>
+User-agent: mu4e 1.10.8; emacs 28.2
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, John Fraker
+ <jfraker@google.com>, netdev@vger.kernel.org, Praveen  Kaligineedi
+ <pkaligineedi@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>,
+ Shailend Chand <shailend@google.com>, Willem de  Bruijn
+ <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, Junfeng Guo
+ <junfeng.guo@intel.com>, Ziwei Xiao <ziweixiao@google.com>, Jeroen de
+ Borst <jeroendb@google.com>, linux-kernel@vger.kernel.org,
+ kory.maincent@bootlin.com, andrew@lunn.ch, richardcochran@gmail.com
+Subject: Re: [PATCH net-next] gve: Correctly report software timestamping
+ capabilities
+Date: Tue, 09 Apr 2024 21:40:46 -0700
+In-reply-to: <20240409172838.247738f3@kernel.org>
+Message-ID: <87jzl5akh5.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: BYAPR07CA0087.namprd07.prod.outlook.com
+ (2603:10b6:a03:12b::28) To BYAPR12MB2743.namprd12.prod.outlook.com
+ (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|LV8PR12MB9181:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	JGEVK9Ok1A5CWUj3RYNQF5aa1YkpBm2N92sir7FUpLXiu+rBAqzsOfQeruOWdAICm9ukWHi1/pBm+bPMG+ghmxmsTJPiJtwhHl8GV6pc7W9EHBHbjznd4Xn/L1868tbwHAUBs4jazfACKGJLjoP7pKOD4cG8Q5UXfAvYkNWnly2Opy9JHwtjoBpGFD486PQCUeli2aCw1MwKN+OinAhJgZABflVSofVMfRlOUV+uWn6ZW8+etm2lVENlomLZLunB04aMRT9Ui6WJlGSukDY+qxNfnVa5CaaIfQNLxU4cvFo7sxhPiTo4N+jTbZIq/GK4Q9b2p4eX2COUm9HDrI4BciBjLxWbyYDq7bWPUifw4ih/Z+3x2iZB6vWgOiRYCsl4saydDRm7MytV4RFXwTkIjvJoNaxTtIDixK5HnNDrod3J0/30atQWz7Vu05ggGNOO6le8m+Ev4/YjWcC8mYaHZzDlYjnye8aCZnMnXqvR4Yd6H24Raxr8a55GMQFZiA4rrjsDObvumz9AnTfjC5iqX3HtxYRRk/4CvcryAwp0Nf3PQLJ5ZZQ9esSZS0svK+AbbCKWuVuFFPL/zZUyJaM6VDRVkqZ/qQ2ZsMYLbbYTxeoFmCZ5mshkrkJMIOyUnq2tsE8fyCRC1mEs5T9Sy3lz4k5xED/oEv1Ies3k+ess504=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(7416005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?RXqNgJ7JlZwCsjkpgSWFjpF6FwqPPFd7WFSG/M+D4CBHNfL18wAJVkZ5q7TK?=
+ =?us-ascii?Q?eH4LHiLupM/XyeevwJX+G4wUqPbUsVRVS2Jib/Tn3BiafYTAJhfWI0Dya2oU?=
+ =?us-ascii?Q?RrTU/yMh0q2wba4JuiBI86haT+qbDgoUeSV7MbnmUOum6O+MiZM1ZO9CHnfP?=
+ =?us-ascii?Q?KoH1Rc1i4avuhvhueIEa7sPkFe8fPBpRzhF9/RL8OOt2N9e9+3g5ZA/AW9Q4?=
+ =?us-ascii?Q?JKxNm+W291sN8SY30r4CZUouwgwwQVf5DMYn8xDKKoiPgw2GOgziuyDLubwo?=
+ =?us-ascii?Q?0uLbH5P4jk2xnHkq7aIxGdN+eH8yFbB5Gef+BsIPGm/1loHiItBvpd0cjP6A?=
+ =?us-ascii?Q?vdAJdInLY5cf8kQcXUMRZLI8r/F/EapZUR9x1woDllobZSUaonsS6KsXmVLW?=
+ =?us-ascii?Q?tu22aLLE9qrgNmCRlSuBpOllNm/huVh7X4dfSUaHz3TKQqFN/8C7JtSzcL2h?=
+ =?us-ascii?Q?wdEEEvKZ1mHP7JyhSvpGImcUSji+mto5XtbTXjOwhnGLmxSfJPgTqYs/uDML?=
+ =?us-ascii?Q?D35lyijjnuJsNhmLr1Ec9LA6UFj8ojPqCt/YqJBdnNZgSyXVaYmo1SRwDHz5?=
+ =?us-ascii?Q?YTGoK2gnC8UKe2oVX7WAe8ZPqM5Nf/b7f2MgI5oNI7a91kc9qIRuoVhSKFD+?=
+ =?us-ascii?Q?zAsdTI0gIax80Gc9yZX69tpsS3h5piBjg2XfRCgHlTrOTqCef25/tGlQZL4z?=
+ =?us-ascii?Q?I/4f2YuN/lm9kh8Y3rxkTscFyoKdtRNiO7jCdKybP/2r2ZARzFZnPOazZwIY?=
+ =?us-ascii?Q?t8bXkE49c7vOzG0gQ1HvpOV5pVubE5YAWi9lELwvC0mA1//cng2PFehGqZJo?=
+ =?us-ascii?Q?XhichhSjgY55r7UzmFdDFV3NCREBuG1y7TVfoSuzcHadN6kd91C2j9HijM6G?=
+ =?us-ascii?Q?32++YTJVDqO11FVbnKMU8u/JAF4EPsE3Z1NzxbJqOe4SyoGIpDlS8L8UJVxQ?=
+ =?us-ascii?Q?x+2nQTN9KvnoqG9s5giQr08rOvlS5c89G+LMag4BChS8Ru+QwvKOPAO38p2r?=
+ =?us-ascii?Q?uNunWnc6VIZel+Yt68rSs56yXmz8pNz6o+3MIIONuHf1cE/K4i4RJwSgh8O8?=
+ =?us-ascii?Q?zFjR58DxzhUvq/9d2//9ykyM6G1Dyb0f7mIBG2IxCH5opTZjMYMF13kCDavL?=
+ =?us-ascii?Q?XG1mS5/3qsA9L2PZ0tb+c9JL+t8bNVJqhX3weWIE7KsBNolcP705xPdZB2lR?=
+ =?us-ascii?Q?rObuoZn7gGbUErffben51A8L64trRSVMsrxkLRvBQmNYgTEmXyuaUYiBNd+/?=
+ =?us-ascii?Q?c7LJIRuGGH5tf4k8JZN74W3P5TdmuEmrmUf1UMFKFd+gIMVskEFiehuEOx3+?=
+ =?us-ascii?Q?/0oTrUxY5bVKrfajBbHC6oCE5r2BfEdxLKOL+KWUoPxOLO+kuk3is1YnwQhe?=
+ =?us-ascii?Q?mz1PfAwPMwdIrxq8pcTYOiqFIibUJZomzX7BAJzu9aFR1agS0VBeRN80ezfe?=
+ =?us-ascii?Q?BrNQEMHQFby9Ow9AD2lrIgRDhkfFm9LmwJLLzdZCNe8KxVjh3AenwY1AoZbj?=
+ =?us-ascii?Q?Tw9X2CmMuHXSJ/9TGntLj2getUAY/gRyT5cf2dVVdorL8AxKD+V/AZv7ugQK?=
+ =?us-ascii?Q?Pt1Y8zPg/WFgjAmtxvPbVLY8kOGV6PW0tHuwkioxKjaDZCGFyVtcj/ZMCH5F?=
+ =?us-ascii?Q?IQ=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 917bbe88-d6d8-4b57-ce7d-08dc5919e6d9
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2024 04:51:36.3913
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 81PxZcunekDPbpZlHGUuV4lvqw0cG95cZ7apAT7KiqMDLy3kfLKBpJjY76dttGoR46EPMYRB5KDEJVqzeZ0GeQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9181
 
-Make i40e compatible with the newly added netlink per queue stats.
 
-$ ./cli.py --spec ../../../Documentation/netlink/specs/netdev.yaml \
-           --dump qstats-get --json '{"scope": "queue"}'
+On Tue, 09 Apr, 2024 17:28:38 -0700 Jakub Kicinski <kuba@kernel.org> wrote:
+> On Tue, 09 Apr 2024 10:29:55 -0400 Willem de Bruijn wrote:
+>> This device calls skb_tx_timestamp in its ndo_start_xmit: the
+>> prerequisite for SOF_TIMESTAMPING_TX_SOFTWARE.
+>> 
+>> All devices support SOF_TIMESTAMPING_RX_SOFTWARE by virtue of
+>> net_timestamp_check being called in the device independent code.
+>> 
+>> To ethtool timestamping maintainers: It's quite unnecessary to have
+>> each device advertise SOF_TIMESTAMPING_RX_SOFTWARE |
+>> SOF_TIMESTAMPING_SOFTWARE. In __ethtool_get_ts_info we could just
+>> always add those flags to the result from the callees.
+>> 
+>>         if (phy_has_tsinfo(phydev))
+>>                 return phy_ts_info(phydev, info);
+>>         if (ops->get_ts_info)
+>>                 return ops->get_ts_info(dev, info);
+>> 
+>>         info->so_timestamping = SOF_TIMESTAMPING_RX_SOFTWARE |
+>>                                 SOF_TIMESTAMPING_SOFTWARE;
+>
+> My gut tells me we force drivers to set the ethtool op because
+> while at it they will probably also implement tx stamping.
 
-[{'ifindex': 3,
-  'queue-id': 0,
-  'queue-type': 'rx',
-  'rx-alloc-fail': 0,
-  'rx-bytes': 45540208,
-  'rx-packets': 57112},
- {'ifindex': 3,
-  'queue-id': 1,
-  'queue-type': 'rx',
-  'rx-alloc-fail': 0,
-  'rx-bytes': 8717844,
-  'rx-packets': 31256},
-...
+I think the logic should be the other way (in terms of the
+relationship). A call to skb_tx_timestamp should throw a warning if the
+driver does not advertise its timestamping capabilities. This way, a
+naive netdev driver for some lightweight device does not need to worry
+about this. I agree that anyone implementing tx timestamping should have
+this operation defined. An skb does not contain any mechanism to
+reference the driver's ethtool callback. Maybe the right choice is to
+have a ts capability function registered for each netdev that can be
+used by the core stack and that powers the ethtool operation as well
+instead of the existing callback for ethtool?
 
-Comparing to ethtool to verify:
+>
+> Even more unhelpful point I'll risk making is that we could 
+> add a test and make people who submit new drivers run it :)
 
-$ ethtool -S eth3 | egrep 'rx-[01]\.'
-     rx-0.packets: 57112
-     rx-0.bytes: 45540208
-     rx-1.packets: 31256
-     rx-1.bytes: 8717844
+--
+Thanks,
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- drivers/net/ethernet/intel/i40e/i40e_main.c | 102 ++++++++++++++++++++
- 1 file changed, 102 insertions(+)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 6384a0c73a05..40574f54a380 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -6,6 +6,7 @@
- #include <linux/if_bridge.h>
- #include <linux/if_macvlan.h>
- #include <linux/module.h>
-+#include <net/netdev_queues.h>
- #include <net/pkt_cls.h>
- #include <net/xdp_sock_drv.h>
- 
-@@ -515,6 +516,100 @@ static void i40e_get_netdev_stats_struct(struct net_device *netdev,
- 	stats->rx_length_errors	= vsi_stats->rx_length_errors;
- }
- 
-+static void i40e_get_queue_stats_rx(struct net_device *dev, int i,
-+				    struct netdev_queue_stats_rx *stats)
-+{
-+	struct i40e_netdev_priv *np = netdev_priv(dev);
-+	struct i40e_vsi *vsi = np->vsi;
-+	struct i40e_ring *ring;
-+	unsigned int start;
-+
-+	stats->bytes = 0xff;
-+	stats->packets = 0xff;
-+	stats->alloc_fail = 0xff;
-+
-+	if (test_bit(__I40E_VSI_DOWN, vsi->state))
-+		return;
-+
-+	if (!vsi->rx_rings)
-+		return;
-+
-+	rcu_read_lock();
-+	ring = READ_ONCE(vsi->rx_rings[i]);
-+	if (ring) {
-+		do {
-+			start = u64_stats_fetch_begin(&ring->syncp);
-+			stats->packets = ring->stats.packets;
-+			stats->bytes = ring->stats.bytes;
-+			stats->alloc_fail = ring->rx_stats.alloc_page_failed;
-+		} while (u64_stats_fetch_retry(&ring->syncp, start));
-+	}
-+	rcu_read_unlock();
-+}
-+
-+static void i40e_get_queue_stats_tx(struct net_device *dev, int i,
-+				    struct netdev_queue_stats_tx *stats)
-+{
-+	struct i40e_netdev_priv *np = netdev_priv(dev);
-+	struct i40e_vsi *vsi = np->vsi;
-+	struct i40e_ring *ring;
-+	unsigned int start;
-+
-+	stats->bytes = 0xff;
-+	stats->packets = 0xff;
-+
-+	if (test_bit(__I40E_VSI_DOWN, vsi->state))
-+		return;
-+
-+	if (!vsi->tx_rings)
-+		return;
-+
-+	rcu_read_lock();
-+	ring = READ_ONCE(vsi->tx_rings[i]);
-+	if (ring) {
-+		do {
-+			start = u64_stats_fetch_begin(&ring->syncp);
-+			stats->packets = ring->stats.packets;
-+			stats->bytes = ring->stats.bytes;
-+		} while (u64_stats_fetch_retry(&ring->syncp, start));
-+	}
-+	rcu_read_unlock();
-+}
-+
-+static void i40e_get_base_stats(struct net_device *dev,
-+				struct netdev_queue_stats_rx *rx,
-+				struct netdev_queue_stats_tx *tx)
-+{
-+	struct i40e_netdev_priv *np = netdev_priv(dev);
-+	struct rtnl_link_stats64 stats = {0};
-+	struct i40e_vsi *vsi = np->vsi;
-+
-+	rx->bytes = 0xff;
-+	rx->packets = 0xff;
-+	rx->alloc_fail = 0xff;
-+
-+	tx->bytes = 0xff;
-+	tx->packets = 0xff;
-+
-+	if (test_bit(__I40E_VSI_DOWN, vsi->state))
-+		return;
-+
-+	if (!vsi->tx_rings)
-+		return;
-+
-+	if (!vsi->num_queue_pairs)
-+		return;
-+
-+	i40e_get_netdev_stats_struct(dev, &stats);
-+
-+	rx->bytes = stats.rx_bytes;
-+	rx->packets = stats.rx_packets;
-+	rx->alloc_fail = vsi->rx_buf_failed;
-+
-+	tx->bytes = stats.tx_bytes;
-+	tx->packets = stats.tx_packets;
-+}
-+
- /**
-  * i40e_vsi_reset_stats - Resets all stats of the given vsi
-  * @vsi: the VSI to have its stats reset
-@@ -13693,6 +13788,12 @@ static const struct net_device_ops i40e_netdev_ops = {
- 	.ndo_dfwd_del_station	= i40e_fwd_del,
- };
- 
-+static const struct netdev_stat_ops i40e_stat_ops = {
-+	.get_queue_stats_rx     = i40e_get_queue_stats_rx,
-+	.get_queue_stats_tx     = i40e_get_queue_stats_tx,
-+	.get_base_stats         = i40e_get_base_stats,
-+};
-+
- /**
-  * i40e_config_netdev - Setup the netdev flags
-  * @vsi: the VSI being configured
-@@ -13854,6 +13955,7 @@ static int i40e_config_netdev(struct i40e_vsi *vsi)
- 	/* Setup netdev TC information */
- 	i40e_vsi_config_netdev_tc(vsi, vsi->tc_config.enabled_tc);
- 
-+	netdev->stat_ops = &i40e_stat_ops;
- 	netdev->netdev_ops = &i40e_netdev_ops;
- 	netdev->watchdog_timeo = 5 * HZ;
- 	i40e_set_ethtool_ops(netdev);
--- 
-2.25.1
-
+Rahul Rameshbabu
 
