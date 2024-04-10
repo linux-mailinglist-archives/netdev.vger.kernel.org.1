@@ -1,147 +1,326 @@
-Return-Path: <netdev+bounces-86735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D515C8A01B5
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:07:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61FAB8A01C3
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:12:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76C531F23AE9
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:07:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1057D285EC8
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:12:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9433F181D1B;
-	Wed, 10 Apr 2024 21:07:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10EF51836C5;
+	Wed, 10 Apr 2024 21:12:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXvDEJlo"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2+ZlXqGn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1C2181BBF;
-	Wed, 10 Apr 2024 21:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BCF515920B
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 21:12:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712783263; cv=none; b=ohqslGsCqP9bYMmEj3I+TByP6lS3McKL4k+6sJhjWfoh3LfDY+N8J9Z3BPxrCizKVS0+HXz8iKWCiLZ37dcsSZ6ykx5zqXQz/i+q7KAIMTZ5TtaFmpna5vKw7MJI3wJLb+mJwTgCi6MqACGeXFtcWXFIkZwwEX/K31hR38r80Sg=
+	t=1712783528; cv=none; b=niQyj7vOPbjKv8f2GwvIq54psQw1SYsx1XxT1yzk1+ILQrs1pmmEdDjgC3NwuSmjfrO4noAreekrWvouawsKvPFHmcq2r8J8iG6fMWslJ/l7jTojf9qwHQjY+sawMgJlHirpSrKUbEINsMyQTXBUhjU4iFlbfi454tiARxQErmk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712783263; c=relaxed/simple;
-	bh=tVgQIDwbSdQwUlahpci6ahtFLNpumdd3V7FRxsMhjYM=;
+	s=arc-20240116; t=1712783528; c=relaxed/simple;
+	bh=/LLo1AXRGmGK6vk5KP6wU+ZJ9RLYp9FcgGGnd7hSOnQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gDZ1GOb29EMjD1hpUr4VtvDiBGCbCampPsNxzWMSY7nkW0R0ACtqhUnXgJSqycPxQAD2f51QflwvHZzT4ZVl5BVeTAHaALp69b7VshVKMc+HDFnoa62gEkysUpz2bLs9cECLlWYwMevu7g1pN8CtmSoP6gcBn6NbcfC8wPyqaY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KXvDEJlo; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-417d029bf15so1474975e9.3;
-        Wed, 10 Apr 2024 14:07:41 -0700 (PDT)
+	 To:Cc:Content-Type; b=HE+X62RrLa8wka3HlUV8N/PFa0GruIHGxevTo2GLO7wKhtN7QJhxXjURsdzZVkpk/9FK/yi8L9oO2ItBkGKr+2Hf0NWxiMJCdPjLnG7GMYO8zqTmSrGmYgYJ8n5qNRloIXw2jl9MhwxhIMti8I9Y7QFJpHKD1COSw5HKjCuT6MA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2+ZlXqGn; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4154d38ce9dso10825e9.0
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 14:12:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712783260; x=1713388060; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1712783524; x=1713388324; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0qQQYgKvYQRWXJV9/5TVuEp1hplQNtziCS82L6bFylQ=;
-        b=KXvDEJlok1YyPZ4vk3h3xp7uJ5P7qYq/F5A2XSEjD/n8S58B3S3cfo8h2ni22i1yBN
-         gnL4emV2skw5aeFDee+qQLmkotsUZbHR0Oy+0oHwpFs+qrqCroM2YG702QYNTy5v3G0U
-         5POoQldO3HBhB8DpbrL8sPDq6zDw1uQp8c1oTR5wgATDXTsDSXU9MFnJOYNGlR1nacsI
-         dMDxMWKILamjeEy/ufe5T8IVSQczjACeero4xZFhMkcvEs8ZnOt/32duQWzbLf71WzlP
-         cX9zplST4VfkrGvhO/e0njSwaLUKoCVi2nlUXrptuqqsNXD5yrDp3J8oyKdc02tKa2AK
-         kJHA==
+        bh=f/UHQzscbXfp6d3taFX11Sxu71IaLE12E0S/qUfdgX4=;
+        b=2+ZlXqGn6A/bR1AtXKR1LR4TPA9l2LMocAwLYkUZcCIKF+t/M8SLONj7HTyp4rqI/f
+         KEJem0ppIg+HOQMrlLLW3vi62Kkk7cHlYDmhXd4xN19eHEgIfyxpRYPtTJX91ieLb6UK
+         mspNKiXk6Ipo11vNIeWnwT2D8OK2rxOe7N4S5zPTepnjyEYGTblZwHDU8eLTl1Tnk9+H
+         bTvGcuqLLGnseDNDY0CVvYVG/2ABFqX7EnKkGCaLO3LKGozVihqOocheNfgBd7hzrXgH
+         xiEok0RDKfqcYZee/EiQKMzGPJfASz5vox7m4qjyy7mrub3sVrzOxr5EUP3XVKlB+jmu
+         Xq7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712783260; x=1713388060;
+        d=1e100.net; s=20230601; t=1712783524; x=1713388324;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0qQQYgKvYQRWXJV9/5TVuEp1hplQNtziCS82L6bFylQ=;
-        b=NVLY9Mlcrsb7eF7b3kGt4UJmyFDMOL0Awtzju/nBC08vu8JK9ZOwqtoll0IWiZ/y1J
-         RiQMyVl+w/Lnv1ssjDYzx3ihIWPI6ChT5eT+Fm3Hq0l2OCu+1t9AFnYmS088Iu1jWTQO
-         h/VArujTGS8XVjJ+sHJ/PeNuTNn2BQ8UAENbZqtA5UKeeS5FB+yuEAWCc3YuKpQ5dpof
-         mZLNbqwSl9iGG9olZ89z2hesMgjvL61f+cWVTyxazqmypIPwBYDln+JQS5Otyax+/dIk
-         fpfHjytu/6Rw0hqVghHPUzgWVw0RjkNx3JeUWCbqZU/p1t7T3VM/NOvdBwxN0//I2eTV
-         FuiA==
-X-Forwarded-Encrypted: i=1; AJvYcCWxrzQgt5exvXA8Z9ZFqdJAnCp7vFvGkmmBRW2CVrhqF5ZWfQxrf1TgyaBGEq0YuwiVp3EJAFzaWIsCHLJhu/X11f/hLOL5TNVlMRXq6fGiMkJNWOLsT9w5aJu0arpsowd1
-X-Gm-Message-State: AOJu0YwCEs29qVDjqelo3ZE997JI2wVvIQHg72pJdmxBtw1Bu7xcYxSs
-	XjOLjr9/rYs8Ga49HbV2XzGH8iRI6FTR+SiCIeuaHgM/G41ADEX5/xGBjU2YiCmOGSZLlEEPe/P
-	HGz0eG8uInq+Nvv6GY6zsfFGRplk=
-X-Google-Smtp-Source: AGHT+IEADVvfiWhgUy2YljmuMUKwmAjGLdohNJrq+mqsxYO3BY0AdPzAL96haUo8WfMDLAoBdjN+hH/OpImi5hRmAeg=
-X-Received: by 2002:a05:600c:3504:b0:416:5a88:4b49 with SMTP id
- h4-20020a05600c350400b004165a884b49mr3008330wmq.15.1712783259805; Wed, 10 Apr
- 2024 14:07:39 -0700 (PDT)
+        bh=f/UHQzscbXfp6d3taFX11Sxu71IaLE12E0S/qUfdgX4=;
+        b=DNz6S9Rb+FU3oM5fQdFxWblX44tI9sghg302yE2HeWYGb2tWTDRmruBZkcWyOUAJnW
+         4oWRRr8ZY9KF5bZKSNZ4QiirZ+eJM5eq9eFDmcZGLqYgtjqvW2lJ6L7NWLs6K7LYlt5z
+         W1U0P0EAetddwuI8Nuxolajm1QkbuG8EiFUmELhOwHg3ZLMaD7xPLcaffSX/tL/Y45rD
+         xyQ4hb/fsSBK1qk0uczfxhxRNphAv/MjIIKzdw9JKrU8uvvR/GtwiRaaCq4atxVp3Ube
+         XYA/Dz19leIGwsxH5GbpruY9Pk8VSIFXQ2l9ktina2mArFfFzzQiU2KPqTDHC6pyD7xj
+         fVdg==
+X-Forwarded-Encrypted: i=1; AJvYcCX/szXgIKUwei2s+yzfack/S9QCYmWOXcbHXKBROMJP5dm06sC59bYuZPz8mWtx2tnukpxnGeXk/g2fzfiK4Dw1f2AOmon+
+X-Gm-Message-State: AOJu0Yw5lKIwK73PLtjqCuDQuYHSJu+5zbZIgVSoL3FVwnbjoTRAarNt
+	KR/A7l95Pc6RGFfGUNDMMkhCREkdR/wS35YRxn1ROgMeThsxlIhJQLL/thk3WO7sENcYiPzc0TW
+	nmPDDKOSnnmnDv6iEqMcLF4wVm6RSsxpJYp/5
+X-Google-Smtp-Source: AGHT+IHSipiM6QF4aaZa9YIT1wVL1fkdiAlKOwIZS5dLlTuUi6xe5zso1j+Burkts9ijBAGg/Eg6bElUqNIyEbylhTo=
+X-Received: by 2002:a05:600c:1c0f:b0:416:b76e:b9ad with SMTP id
+ j15-20020a05600c1c0f00b00416b76eb9admr13134wms.7.1712783524227; Wed, 10 Apr
+ 2024 14:12:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <20240409135142.692ed5d9@kernel.org> <44093329-f90e-41a6-a610-0f9dd88254eb@lunn.ch>
- <CAKgT0UcVnhgmXNU2FGcy6hbzUQZwNBZw0EKbFF3DsKDc8r452A@mail.gmail.com> <c820695d-bda7-4452-a563-170700baf958@lunn.ch>
-In-Reply-To: <c820695d-bda7-4452-a563-170700baf958@lunn.ch>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Wed, 10 Apr 2024 14:07:02 -0700
-Message-ID: <CAKgT0Uf4i_MN-Wkvpk29YevwsgFrQ3TeQ5-ogLrF-QyMSjtiug@mail.gmail.com>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, pabeni@redhat.com, 
-	John Fastabend <john.fastabend@gmail.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org, bhelgaas@google.com, 
-	linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+References: <PH0PR06MB75605BCCB343F06F5E93580094062@PH0PR06MB7560.namprd06.prod.outlook.com>
+In-Reply-To: <PH0PR06MB75605BCCB343F06F5E93580094062@PH0PR06MB7560.namprd06.prod.outlook.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 10 Apr 2024 23:11:51 +0200
+Message-ID: <CANn89iKj9DsT-j3dxFRTk9ZzbL7a1gNC9g0GqaQc61m1kFowdw@mail.gmail.com>
+Subject: Re: KASAN: slab-out-of-bounds Write in ops_init
+To: Cem Topcuoglu <topcuoglu.c@northeastern.edu>
+Cc: "stable@vger.kernel.org" <stable@vger.kernel.org>, Parthik Bhardwaj <bhardwaj.p@northeastern.edu>, 
+	Changming Liu <liu.changm@northeastern.edu>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"regressions@lists.linux.dev" <regressions@lists.linux.dev>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 10, 2024 at 1:01=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+On Wed, Apr 10, 2024 at 10:31=E2=80=AFPM Cem Topcuoglu
+<topcuoglu.c@northeastern.edu> wrote:
 >
-> On Wed, Apr 10, 2024 at 08:56:31AM -0700, Alexander Duyck wrote:
-> > On Tue, Apr 9, 2024 at 4:42=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wro=
-te:
-> > >
-> > > > What is less clear to me is what do we do about uAPI / core changes=
-.
-> > >
-> > > I would differentiate between core change and core additions. If ther=
-e
-> > > is very limited firmware on this device, i assume Linux is managing
-> > > the SFP cage, and to some extend the PCS. Extending the core to handl=
-e
-> > > these at higher speeds than currently supported would be one such cor=
-e
-> > > addition. I've no problem with this. And i doubt it will be a single
-> > > NIC using such additions for too long. It looks like ClearFog CX LX2
-> > > could make use of such extensions as well, and there are probably
-> > > other boards and devices, maybe the Zynq 7000?
-> >
-> > The driver on this device doesn't have full access over the PHY.
-> > Basically we control everything from the PCS north, and the firmware
-> > controls everything from the PMA south as the physical connection is
-> > MUXed between 4 slices. So this means the firmware also controls all
-> > the I2C and the QSFP and EEPROM. The main reason for this is that
-> > those blocks are shared resources between the slices, as such the
-> > firmware acts as the arbitrator for 4 slices and the BMC.
+> Hi,
 >
-> Ah, shame. You took what is probably the least valuable intellectual
-> property, and most shareable with the community and locked it up in
-> firmware where nobody can use it.
 >
-> You should probably stop saying there is not much firmware with this
-> device, and that Linux controls it. It clearly does not...
 >
->         Andrew
+> We encountered a bug labelled =E2=80=9CKASAN: slab-out-of-bounds Write in=
+ ops_init=E2=80=9D while fuzzing kernel version 5.15.124 with Syzkaller (li=
+nes exist in 5.15.154 as well).
+>
+>
+>
+> In the net_namespace.c file, we have an if condition at line 89. Subseque=
+ntly, Syzkaller encounters the bug at line 90.
+>
+>
+>
+> 89           if (old_ng->s.len > id) {
+>
+> 90                                           old_ng->ptr[id] =3D data;
+>
+> 91                                           return 0;
+>
+> 92           }
+>
+>
+>
+> Upon inspecting the net_generic struct, we noticed that this struct uses =
+union which puts the array and the header (including the array length infor=
+mation) together.
+>
+> We suspect that with this union, modifying the ng->ptr[0] is essentially =
+modifying ng->s.len, which might fail the check in 89. This might be the ca=
+use for Syzkaller detecting this slab-out-of-bound.
+>
 
-Well I was referring more to the data path level more than the phy
-configuration. I suspect different people have different levels of
-expectations on what minimal firmware is. With this hardware we at
-least don't need to use firmware commands to enable or disable queues,
-get the device stats, or update a MAC address.
+Look for MIN_PERNET_OPS_ID   (this should be 3)
 
-When it comes to multi-host NICs I am not sure there are going to be
-any solutions that don't have some level of firmware due to the fact
-that the cable is physically shared with multiple slots.
+ng->ptr[0] , [1], [2] can not be overwritten.
 
-I am assuming we still want to do the PCS driver. So I will still see
-what I can do to get that setup.
+Do you have a repro ?
 
-Thanks,
+Also please use the latest stable (5.15.154).
 
-- Alex
+> Since we are CS PhD students and Linux hobbyists, we do not have a full u=
+nderstanding of what could lead to this. We would really appreciate if you =
+guys can share some insights into this matter : )
+>
+>
+>
+> We attached the syzkaller=E2=80=99s bug report below.
+>
+>
+>
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> BUG: KASAN: slab-out-of-bounds in net_assign_generic
+>
+> usr/src/kernel/net/core/net_namespace.c:90 [inline]
+>
+> BUG: KASAN: slab-out-of-bounds in ops_init+0x44b/0x4d0
+>
+> usr/src/kernel/net/core/net_namespace.c:129
+>
+> Write of size 8 at addr ffff888043c62ae8 by task (coredump)/5424
+>
+> CPU: 1 PID: 5424 Comm: (coredump) Not tainted 5.15.124-yocto-standard #1
+>
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.10.2-1ubunt=
+u1 04/01/2014
+>
+> Call Trace:
+>
+> <TASK>
+>
+> __dump_stack usr/src/kernel/lib/dump_stack.c:88 [inline]
+>
+> dump_stack_lvl+0x51/0x70 usr/src/kernel/lib/dump_stack.c:106
+>
+> print_address_description.constprop.0+0x24/0x140 usr/src/kernel/mm/kasan/=
+report.c:248
+>
+> __kasan_report usr/src/kernel/mm/kasan/report.c:434 [inline]
+>
+> kasan_report.cold+0x7d/0x117 usr/src/kernel/mm/kasan/report.c:451
+>
+> __asan_report_store8_noabort+0x17/0x20 usr/src/kernel/mm/kasan/report_gen=
+eric.c:314
+>
+> net_assign_generic usr/src/kernel/net/core/net_namespace.c:90 [inline]
+>
+> ops_init+0x44b/0x4d0 usr/src/kernel/net/core/net_namespace.c:129
+>
+> setup_net+0x40a/0x970 usr/src/kernel/net/core/net_namespace.c:329
+>
+> copy_net_ns+0x2ac/0x680 usr/src/kernel/net/core/net_namespace.c:473
+>
+> create_new_namespaces+0x390/0xa50 usr/src/kernel/kernel/nsproxy.c:110
+>
+> unshare_nsproxy_namespaces+0xb0/0x1d0 usr/src/kernel/kernel/nsproxy.c:226
+>
+> ksys_unshare+0x30c/0x850 usr/src/kernel/kernel/fork.c:3094
+>
+> __do_sys_unshare usr/src/kernel/kernel/fork.c:3168 [inline]
+>
+> __se_sys_unshare usr/src/kernel/kernel/fork.c:3166 [inline]
+>
+> __x64_sys_unshare+0x36/0x50 usr/src/kernel/kernel/fork.c:3166
+>
+> do_syscall_x64 usr/src/kernel/arch/x86/entry/common.c:50 [inline]
+>
+> do_syscall_64+0x40/0x90 usr/src/kernel/arch/x86/entry/common.c:80
+>
+> entry_SYSCALL_64_after_hwframe+0x61/0xcb
+>
+> RIP: 0033:0x7fbafce1b39b
+>
+> Code: 73 01 c3 48 8b 0d 85 2a 0e 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0=
+f 1f 84 00 00 00 00
+>
+> 00 90 f3 0f 1e fa b8 10 01 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b=
+ 0d 55 2a 0e 00 f7
+>
+> d8 64 89 01 48
+>
+> RSP: 002b:00007ffddc8dfda8 EFLAGS: 00000246 ORIG_RAX: 0000000000000110
+>
+> RAX: ffffffffffffffda RBX: 0000557e645dd018 RCX: 00007fbafce1b39b
+>
+> RDX: 0000000000000000 RSI: 00007ffddc8dfd10 RDI: 0000000040000000
+>
+> RBP: 00007ffddc8dfde0 R08: 0000000000000000 R09: 00007ffd00000067
+>
+> R10: 0000000000000000 R11: 0000000000000246 R12: 00000000fffffff5
+>
+> R13: 00007fbafd26ba60 R14: 0000000040000000 R15: 0000000000000000
+>
+> </TASK>
+>
+> Allocated by task 5424:
+>
+> kasan_save_stack+0x26/0x60 usr/src/kernel/mm/kasan/common.c:38
+>
+> kasan_set_track usr/src/kernel/mm/kasan/common.c:46 [inline]
+>
+> set_alloc_info usr/src/kernel/mm/kasan/common.c:434 [inline]
+>
+> ____kasan_kmalloc usr/src/kernel/mm/kasan/common.c:513 [inline]
+>
+> ____kasan_kmalloc usr/src/kernel/mm/kasan/common.c:472 [inline]
+>
+> __kasan_kmalloc+0xae/0xe0 usr/src/kernel/mm/kasan/common.c:522
+>
+> kasan_kmalloc usr/src/kernel/include/linux/kasan.h:264 [inline]
+>
+> __kmalloc+0x308/0x560 usr/src/kernel/mm/slub.c:4407
+>
+> kmalloc usr/src/kernel/include/linux/slab.h:596 [inline]
+>
+> kzalloc usr/src/kernel/include/linux/slab.h:721 [inline]
+>
+> net_alloc_generic+0x28/0x80 usr/src/kernel/net/core/net_namespace.c:74
+>
+> net_alloc usr/src/kernel/net/core/net_namespace.c:401 [inline]
+>
+> copy_net_ns+0xc3/0x680 usr/src/kernel/net/core/net_namespace.c:460
+>
+> create_new_namespaces+0x390/0xa50 usr/src/kernel/kernel/nsproxy.c:110
+>
+> unshare_nsproxy_namespaces+0xb0/0x1d0 usr/src/kernel/kernel/nsproxy.c:226
+>
+> ksys_unshare+0x30c/0x850 usr/src/kernel/kernel/fork.c:3094
+>
+> __do_sys_unshare usr/src/kernel/kernel/fork.c:3168 [inline]
+>
+> __se_sys_unshare usr/src/kernel/kernel/fork.c:3166 [inline]
+>
+> __x64_sys_unshare+0x36/0x50 usr/src/kernel/kernel/fork.c:3166
+>
+> do_syscall_x64 usr/src/kernel/arch/x86/entry/common.c:50 [inline]
+>
+> do_syscall_64+0x40/0x90 usr/src/kernel/arch/x86/entry/common.c:80
+>
+> entry_SYSCALL_64_after_hwframe+0x61/0xcb
+>
+> The buggy address belongs to the object at ffff888043c62a00
+>
+> which belongs to the cache kmalloc-256 of size 256
+>
+> The buggy address is located 232 bytes inside of
+>
+> 256-byte region [ffff888043c62a00, ffff888043c62b00)
+>
+> The buggy address belongs to the page:
+>
+> page:000000008dd0a6b6 refcount:1 mapcount:0 mapping:0000000000000000 inde=
+x:0x0 pfn:0x43c62
+>
+> head:000000008dd0a6b6 order:1 compound_mapcount:0
+>
+> flags: 0x4000000000010200(slab|head|zone=3D1)
+>
+> raw: 4000000000010200 ffffea0001108f00 0000000700000007 ffff888001041b40
+>
+> raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
+>
+> page dumped because: kasan: bad access detected
+>
+> Memory state around the buggy address:
+>
+> ffff888043c62980: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>
+> ffff888043c62a00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>
+> >ffff888043c62a80: 00 00 00 00 00 00 00 00 00 00 00 00 00 fc fc fc
+>
+> ^
+>
+> ffff888043c62b00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>
+> ffff888043c62b80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+> kmemleak: 2 new suspected memory leaks (see /sys/kernel/debug/kmemleak)
+>
+>
+>
+> Best
+>
+>
 
