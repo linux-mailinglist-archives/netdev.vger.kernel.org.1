@@ -1,248 +1,217 @@
-Return-Path: <netdev+bounces-86758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5578B8A02FF
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 00:13:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D84588A031B
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 00:16:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D20351F23364
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 22:13:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FE99282ABC
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 22:16:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E7A184102;
-	Wed, 10 Apr 2024 22:13:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7367F184124;
+	Wed, 10 Apr 2024 22:15:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="JPeoTgcS"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="v4npgz+5";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="MVfPV07b"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD4416D4FC
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 22:13:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C507184107;
+	Wed, 10 Apr 2024 22:15:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712787196; cv=none; b=r4XnzfVHjJgSQxeihlnVn/ONirJLErZQkvNFvs4r+daUhhqdbjrhyRMJRktZSO2L1kWkPk7zh1Y2GO1z1ZbxH1B855acgP1BcQxchAtOYQaJuZWngT1MzztYNFE6xUqBaFj3R6b8TX3DqMas5BKqOBF1t2+OOPR0+ofk6o3Uy3I=
+	t=1712787335; cv=none; b=JrTLF4XjP5fp6E8teXZpeWm+mkSwzMzFnFYIYM6+AOrtCBlRpBZThRzI8XAOID+l+xKvkjISbvwCx4IRDXEHIXmXcD1zTwofbocjFERzojCcnaMBvcPYA5QqrDGG6b4E76fT85N+GBWYYhy6udLXzViLN7K5zXcF8NwIJ9IGQK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712787196; c=relaxed/simple;
-	bh=337PoNy5hHXi/nBtubQGpqzHN+7XoK2mpmWg0n1Xpto=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VOtZJpZu8EU+WMEouw2d2s4SFG+OFOlcoK/eULvzp1H1SvOAR3SQYFXkq7FbKBtImSPDoPvKokJiD8wzXg+XPX4iZ93rMZ79b3N51FuhePX9BeJkRxa1+GztUe00+4HvfZ2xVU+uF0Z1sz0wX64hHUoyhJmjeRXqYMBoRwnEqUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=JPeoTgcS; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1712787195; x=1744323195;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=vmJlHtyCaojXycyHhl57A6ON5T4AIb8dBCbBDEzRK60=;
-  b=JPeoTgcSsDrEjJo+bZq65ddVnAjyhrs8Z3zgrSWdA38g8zerYucrDE+x
-   vPVzWjC9mSO8KxS6pEQqDpr2XywX9rswhd9VGfQ4MlLHcCSIk2IlYNqDT
-   cwYnrz+eRVJDcfpkk1bHa2ONlAlMV4Gtzimb1PxioUqy7yGElD3I0o5+W
-   c=;
-X-IronPort-AV: E=Sophos;i="6.07,191,1708387200"; 
-   d="scan'208";a="287754973"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 22:13:13 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:30600]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.50.203:2525] with esmtp (Farcaster)
- id 55995940-58b8-4c29-86d9-3757c3f49946; Wed, 10 Apr 2024 22:13:12 +0000 (UTC)
-X-Farcaster-Flow-ID: 55995940-58b8-4c29-86d9-3757c3f49946
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 10 Apr 2024 22:13:12 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.44) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Wed, 10 Apr 2024 22:13:10 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <krisman@suse.de>
-CC: <davem@davemloft.net>, <lmb@isovalent.com>, <martin.lau@kernel.org>,
-	<netdev@vger.kernel.org>, <willemdebruijn.kernel@gmail.com>, "Kuniyuki
- Iwashima" <kuniyu@amazon.com>
-Subject: Re: [PATCH v2] udp: Avoid call to compute_score on multiple sites
-Date: Wed, 10 Apr 2024 15:13:01 -0700
-Message-ID: <20240410221301.44576-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240410215047.21462-1-krisman@suse.de>
-References: <20240410215047.21462-1-krisman@suse.de>
+	s=arc-20240116; t=1712787335; c=relaxed/simple;
+	bh=A/lV+1Ac2zw9xElc0bPbLpO1AnYokiSgY0NCWvJTk3E=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=UirZ5H42tOrexrFjM7BL9YraCLeq8QmicnLBSHUhpwXluKr2H3VIEzqK11H/VOuq5lTGEeywbEsMte4fJ/FzCJLR+Vz5rExSomUUau1j/+4or4NrgS0DeYsf9D9MQt2n8objk1aJgAwNlWkTe2Fa4/92d7AVlYSp9B1zvVmPfis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=v4npgz+5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=MVfPV07b; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1712787331;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yv1aoSAnbbHpJLpzRKC+j97D6+Bc6CY0CLsHS2K8ILg=;
+	b=v4npgz+5aALgAbCa4gYmW+sAu1VbuMi5mmGWhrk2cAcWRxxH4pHy5nrXHNxv1At5IAeB/0
+	iSKfMviSNGaDOtJ64MoFjVFPiPswQ4GMq/F/eukaTkHCHFNIV9ltqfTCJSY+Jeax8N38/D
+	lociKYTR0SP6bWY88di3mNDqOJ2v4jw/yrpwKM4Ap/hBjWIUp4jfBzy5ADDWKciQVkHii4
+	AsmmAgMXdEbP+H4MHxrGcJ19Q9Q6+iDOy8GJm/WCfGkm8BbiZayNHjlxiSc5P+L8ngWZou
+	Vmd3GeXzCMuHXTxPB23DGxecr3ziWocyC/q7y2/Icbjqrn4ZjN0s49rvjEw8ow==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1712787331;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yv1aoSAnbbHpJLpzRKC+j97D6+Bc6CY0CLsHS2K8ILg=;
+	b=MVfPV07bOUJ3KqluWXxG3YvId4KrFUETz3y7W9lQh/AJfTIl0ORZdyzcntjr/e71k8Q7nD
+	CAkHiH4iXKD2ipBA==
+To: lakshmi.sowjanya.d@intel.com, jstultz@google.com, giometti@enneenne.com,
+ corbet@lwn.net, linux-kernel@vger.kernel.org
+Cc: x86@kernel.org, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, andriy.shevchenko@linux.intel.com,
+ eddie.dong@intel.com, christopher.s.hall@intel.com,
+ jesse.brandeburg@intel.com, davem@davemloft.net,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ mcoquelin.stm32@gmail.com, perex@perex.cz, linux-sound@vger.kernel.org,
+ anthony.l.nguyen@intel.com, peter.hilber@opensynergy.com,
+ pandith.n@intel.com, subramanian.mohan@intel.com,
+ thejesh.reddy.t.r@intel.com, lakshmi.sowjanya.d@intel.com
+Subject: Re: [PATCH v6 08/11] timekeeping: Add function to convert realtime
+ to base clock
+In-Reply-To: <20240410114828.25581-9-lakshmi.sowjanya.d@intel.com>
+References: <20240410114828.25581-1-lakshmi.sowjanya.d@intel.com>
+ <20240410114828.25581-9-lakshmi.sowjanya.d@intel.com>
+Date: Thu, 11 Apr 2024 00:15:31 +0200
+Message-ID: <877ch43lvg.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWC001.ant.amazon.com (10.13.139.223) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Gabriel Krisman Bertazi <krisman@suse.de>
-Date: Wed, 10 Apr 2024 17:50:47 -0400
-> We've observed a 7-12% performance regression in iperf3 UDP ipv4 and
-> ipv6 tests with multiple sockets on Zen3 cpus, which we traced back to
-> commit f0ea27e7bfe1 ("udp: re-score reuseport groups when connected
-> sockets are present").  The failing tests were those that would spawn
-> UDP sockets per-cpu on systems that have a high number of cpus.
-> 
-> Unsurprisingly, it is not caused by the extra re-scoring of the reused
-> socket, but due to the compiler no longer inlining compute_score, once
-> it has the extra call site in udp4_lib_lookup2.  This is augmented by
-> the "Safe RET" mitigation for SRSO, needed in our Zen3 cpus.
-> 
-> We could just explicitly inline it, but compute_score() is quite a large
-> function, around 300b.  Inlining in two sites would almost double
-> udp4_lib_lookup2, which is a silly thing to do just to workaround a
-> mitigation.  Instead, this patch shuffles the code a bit to avoid the
-> multiple calls to compute_score.  Since it is a static function used in
-> one spot, the compiler can safely fold it in, as it did before, without
-> increasing the text size.
-> 
-> With this patch applied I ran my original iperf3 testcases.  The failing
-> cases all looked like this (ipv4):
-> 	iperf3 -c 127.0.0.1 --udp -4 -f K -b $R -l 8920 -t 30 -i 5 -P 64 -O 2
-> 
-> where $R is either 1G/10G/0 (max, unlimited).  I ran 3 times each.
-> baseline is 6.9.0-rc1-g962490525cff, just a recent checkout of Linus
-> tree. harmean == harmonic mean; CV == coefficient of variation.
-> 
-> ipv4:
->                  1G                10G                  MAX
-> 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
-> baseline 1730488.20(0.0050) 1639269.91(0.0795) 1436340.05(0.0954)
-> patched  1980936.14(0.0020) 1933614.06(0.0866) 1784184.51(0.0961)
-> 
-> ipv6:
->                  1G                10G                  MAX
-> 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
-> baseline  1679016.07(0.0053) 1697504.56(0.0064) 1481432.74(0.0840)
-> patched   1924003.38(0.0153) 1852277.31(0.0457) 1690991.46(0.1848)
-> 
-> This restores the performance we had before the change above with this
-> benchmark.  We obviously don't expect any real impact when mitigations
-> are disabled, but just to be sure it also doesn't regresses:
-> 
-> mitigations=off ipv4:
->                  1G                10G                  MAX
-> 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
-> baseline 3230279.97(0.0066) 3229320.91(0.0060) 2605693.19(0.0697)
-> patched  3242802.36(0.0073) 3239310.71(0.0035) 2502427.19(0.0882)
-> 
-> Cc: Lorenz Bauer <lmb@isovalent.com>
-> Fixes: f0ea27e7bfe1 ("udp: re-score reuseport groups when connected sockets are present")
-> Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
-> 
-> ---
-> Changes since v1:
-> (me)
->   - recollected performance data after changes below only for the
->   mitigations enabled case.
-> (suggested by Willem de Bruijn)
->   - Drop __always_inline in compute_score
->   - Simplify logic by replacing third struct sock pointer with bool
->   - Fix typo in commit message
->   - Don't explicitly break out of loop after rescore
-> ---
->  net/ipv4/udp.c | 18 +++++++++++++-----
->  net/ipv6/udp.c | 17 +++++++++++++----
->  2 files changed, 26 insertions(+), 9 deletions(-)
-> 
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index 661d0e0d273f..a13ef8e06093 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -427,12 +427,15 @@ static struct sock *udp4_lib_lookup2(struct net *net,
->  {
->  	struct sock *sk, *result;
->  	int score, badness;
-> +	bool rescore = false;
+On Wed, Apr 10 2024 at 17:18, lakshmi.sowjanya.d@intel.com wrote:
+> From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
+>
+> PPS(Pulse Per Second) generates signals in realtime, but Timed IO
 
-nit: Keep reverse xmax tree order.
-https://docs.kernel.org/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
+... generates signals based on CLOCK_REALTIME, but ...
 
->  
->  	result = NULL;
->  	badness = 0;
->  	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
-> -		score = compute_score(sk, net, saddr, sport,
-> -				      daddr, hnum, dif, sdif);
-> +rescore:
-> +		score = compute_score((rescore ? result : sk), net, saddr,
+> hardware understands time in base clock reference.
 
-I guess () is not needed around rescore ?
+The hardware does not understand anything.
 
-Both same for IPv6.
+> Add an interface,
+> ktime_real_to_base_clock() to convert realtime to base clock.
+>
+> Add the helper function timekeeping_clocksource_has_base(), to check
+> whether the current clocksource has the same base clock. This will be
+> used by Timed IO device to check if the base clock is X86_ART(Always
+> Running Timer).
 
-Otherwise, looks good to me.
+Again this fails to explain the rationale and as this is a core change
+which is hardware agnostic the whole Timed IO and ART reference is not
+really helpful. Something like this:
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+  "PPS (Pulse Per Second) generates a hardware pulse every second based
+   on CLOCK_REALTIME. This works fine when the pulse is generated in
+   software from a hrtimer callback function.
 
+   For hardware which generates the pulse by programming a timer it's
+   required to convert CLOCK_REALTIME to the underlying hardware clock.
 
-> +				      sport, daddr, hnum, dif, sdif);
-> +		rescore = false;
->  		if (score > badness) {
->  			badness = score;
->  
-> @@ -456,9 +459,14 @@ static struct sock *udp4_lib_lookup2(struct net *net,
->  			if (IS_ERR(result))
->  				continue;
->  
-> -			badness = compute_score(result, net, saddr, sport,
-> -						daddr, hnum, dif, sdif);
-> -
-> +			/* compute_score is too long of a function to be
-> +			 * inlined, and calling it again here yields
-> +			 * measureable overhead for some
-> +			 * workloads. Work around it by jumping
-> +			 * backwards to rescore 'result'.
-> +			 */
-> +			rescore = true;
-> +			goto rescore;
->  		}
->  	}
->  	return result;
-> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-> index 7c1e6469d091..7a55c050de2b 100644
-> --- a/net/ipv6/udp.c
-> +++ b/net/ipv6/udp.c
-> @@ -168,12 +168,15 @@ static struct sock *udp6_lib_lookup2(struct net *net,
->  {
->  	struct sock *sk, *result;
->  	int score, badness;
-> +	bool rescore = false;
->  
->  	result = NULL;
->  	badness = -1;
->  	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
-> -		score = compute_score(sk, net, saddr, sport,
-> -				      daddr, hnum, dif, sdif);
-> +rescore:
-> +		score = compute_score((rescore ? result : sk), net, saddr,
-> +				      sport, daddr, hnum, dif, sdif);
-> +		rescore = false;
->  		if (score > badness) {
->  			badness = score;
->  
-> @@ -197,8 +200,14 @@ static struct sock *udp6_lib_lookup2(struct net *net,
->  			if (IS_ERR(result))
->  				continue;
->  
-> -			badness = compute_score(sk, net, saddr, sport,
-> -						daddr, hnum, dif, sdif);
-> +			/* compute_score is too long of a function to be
-> +			 * inlined, and calling it again here yields
-> +			 * measureable overhead for some
-> +			 * workloads. Work around it by jumping
-> +			 * backwards to rescore 'result'.
-> +			 */
-> +			rescore = true;
-> +			goto rescore;
->  		}
->  	}
->  	return result;
-> -- 
-> 2.44.0
+   The X86 Timed IO device is based on the Always Running Timer (ART),
+   which is the base clock of the TSC, which is usually the system
+   clocksource on X86.
 
+   The core code already has functionality to convert base clock
+   timestamps to system clocksource timestamps, but there is no support
+   for converting the other way around.
+
+   Provide the required functionality to support such devices in a
+   generic way to avoid code duplication in drivers:
+
+      1) ktime_real_to_base_clock() to convert a CLOCK_REALTIME
+         timestamp to a base clock timestamp
+
+      2) timekeeping_clocksource_has_base() to allow drivers to validate
+         that the system clocksource is based on a particular
+         clocksource ID.
+  
+> +static bool convert_cs_to_base(u64 *cycles, enum clocksource_ids base_id)
+> +{
+> +	struct clocksource *cs = tk_core.timekeeper.tkr_mono.clock;
+> +	struct clocksource_base *base = cs->base;
+> +
+> +	/* Check whether base_id matches the base clock */
+> +	if (!base || base->id != base_id)
+> +		return false;
+> +
+> +	*cycles -= base->offset;
+> +	if (!convert_clock(cycles, base->denominator, base->numerator))
+> +		return false;
+> +	return true;
+> +}
+> +
+> +static u64 convert_ns_to_cs(u64 delta)
+> +{
+> +	struct tk_read_base *tkr = &tk_core.timekeeper.tkr_mono;
+> +
+> +	return div_u64((delta << tkr->shift) - tkr->xtime_nsec, tkr->mult);
+> +}
+
+> +bool ktime_real_to_base_clock(ktime_t treal, enum clocksource_ids base_id, u64 *cycles)
+
+As this is a kernel API function it really wants kernel-doc comment to
+explain the functionality, the arguments and the return value.
+
+> +{
+> +	struct timekeeper *tk = &tk_core.timekeeper;
+> +	unsigned int seq;
+> +	u64 delta;
+> +
+> +	do {
+> +		seq = read_seqcount_begin(&tk_core.seq);
+> +		if ((u64)treal < tk->tkr_mono.base_real)
+> +			return false;
+> +		delta = (u64)treal - tk->tkr_mono.base_real;
+
+In the previous version you had a sanity check on delta:
+
+>>> +		if (delta > tk->tkr_mono.clock->max_idle_ns)
+>>> +			return false;
+
+And I told you:
+
+>> I don't think this cutoff is valid. There is no guarantee that this is
+>> linear unless:
+>>
+>>       Treal[last timekeeper update] <= treal < Treal[next timekeeper update]
+>>
+>> Look at the dance in get_device_system_crosststamp() and
+>> adjust_historical_crosststamp() to see why.
+
+So now there is not even a check anymore whether the delta conversion
+can overflow.
+
+There is zero explanation why this conversion is considered to be
+correct.
+
+> +		*cycles = tk->tkr_mono.cycle_last + convert_ns_to_cs(delta);
+> +		if (!convert_cs_to_base(cycles, base_id))
+> +			return false;
+> +	} while (read_seqcount_retry(&tk_core.seq, seq));
+> +
+> +	return true;
+> +}
+
+> +/**
+> + * timekeeping_clocksource_has_base - Check whether the current clocksource
+> + *     has a base clock
+
+s/has a base clock/is based on a given base clock
+
+> + * @id:		The clocksource ID to check for
+
+base clocksource ID
+
+> + *
+> + * Note:	The return value is a snapshot which can become invalid right
+> + *		after the function returns.
+> + *
+> + * Return:	true if the timekeeper clocksource has a base clock with @id,
+> + *		false otherwise
+> + */
+
+Thanks,
+
+        tglx
 
