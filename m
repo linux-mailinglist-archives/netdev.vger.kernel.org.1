@@ -1,136 +1,131 @@
-Return-Path: <netdev+bounces-86434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 305DE89ED0D
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:03:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB01A89ED25
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:06:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62ABE1C21077
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:03:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B3DC1F2372A
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:06:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6C013DBA0;
-	Wed, 10 Apr 2024 08:02:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6111313D8AE;
+	Wed, 10 Apr 2024 08:06:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66AF113DB88;
-	Wed, 10 Apr 2024 08:02:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1B913D508
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 08:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712736158; cv=none; b=VzLqshVh6+i8H2/hwBk2/4pynxVXyOsNXdsWNr545zSFnv0RBPI+XGNsxEQh0c0QGeXCDeew7Z4geDFl0awWkTZtZYVdMiz7tjfhRIkXzbzyjzF/iFGScCJKEpyIuuqrs4vGT87tbtJHhLH3FFmF2rllVobhjZZINfkmxiG3m1w=
+	t=1712736369; cv=none; b=c1xfI7mnoCFeuOuuMkF6ZwbTvAMNUekm7eRhjVNhPjXVQUJE8jsFyQWAJTPOzEz58dnjwa9SnCFkHwNwvBVUd6vV6TqwmGeo9v54u/8d51LEhpDf4wOU1S8hDyRDFYHHbCOlpoKg2YX1zZrY7annhCe2AQEcyxhonid7J3l8/0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712736158; c=relaxed/simple;
-	bh=KElYbch9PwjyMMyu6DqQ19Q1q06S1GdiKB4kYIvJsOA=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=CU2uvUcuRRxzKzHhb2m122yvYwZBKteQeqxjKdf1daPChN3DafuqJ9KAxjpbzYtBTA5hlGJIqDCdABWYN0Tr+jwJFsVOAUu5MT3rPRNKKBLcNlN8MFMyZLfzZclgr5iSL5z87e2iZbFaHApzydDGNzctGZ/oLSbc8mY9hXaiNvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16B5EC43141;
-	Wed, 10 Apr 2024 08:02:38 +0000 (UTC)
-Received: by mercury (Postfix, from userid 1000)
-	id 324081063262; Wed, 10 Apr 2024 10:02:32 +0200 (CEST)
-From: Sebastian Reichel <sebastian.reichel@collabora.com>
-To: linux-kernel@vger.kernel.org, Arnd Bergmann <arnd@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, Michael Ellerman <mpe@ellerman.id.au>, 
- Christophe Leroy <christophe.leroy@csgroup.eu>, 
- Damien Le Moal <dlemoal@kernel.org>, Jiri Kosina <jikos@kernel.org>, 
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
- Corey Minyard <minyard@acm.org>, Peter Huewe <peterhuewe@gmx.de>, 
- Jarkko Sakkinen <jarkko@kernel.org>, Tero Kristo <kristo@kernel.org>, 
- Stephen Boyd <sboyd@kernel.org>, Ian Abbott <abbotti@mev.co.uk>, 
- H Hartley Sweeten <hsweeten@visionengravers.com>, 
- Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, 
- Len Brown <lenb@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, 
- John Allen <john.allen@amd.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
- Vinod Koul <vkoul@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, 
- Bjorn Andersson <andersson@kernel.org>, Moritz Fischer <mdf@kernel.org>, 
- Liviu Dudau <liviu.dudau@arm.com>, 
- Benjamin Tissoires <benjamin.tissoires@redhat.com>, 
- Andi Shyti <andi.shyti@kernel.org>, 
- Michael Hennerich <michael.hennerich@analog.com>, 
- Peter Rosin <peda@axentia.se>, Lars-Peter Clausen <lars@metafoo.de>, 
- Jonathan Cameron <jic23@kernel.org>, 
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
- Markuss Broks <markuss.broks@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, Lee Jones <lee@kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Shyam Sundar S K <Shyam-sundar.S-k@amd.com>, 
- Iyappan Subramanian <iyappan@os.amperecomputing.com>, 
- Yisen Zhuang <yisen.zhuang@huawei.com>, Stanislaw Gruszka <stf_xl@wp.pl>, 
- Kalle Valo <kvalo@kernel.org>, Sebastian Reichel <sre@kernel.org>, 
- Tony Lindgren <tony@atomide.com>, Mark Brown <broonie@kernel.org>, 
- Alexandre Belloni <alexandre.belloni@bootlin.com>, 
- Xiang Chen <chenxiang66@hisilicon.com>, 
- "Martin K. Petersen" <martin.petersen@oracle.com>, 
- Neil Armstrong <neil.armstrong@linaro.org>, 
- Heiko Stuebner <heiko@sntech.de>, 
- Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, 
- Vaibhav Hiremath <hvaibhav.linux@gmail.com>, Alex Elder <elder@kernel.org>, 
- Jiri Slaby <jirislaby@kernel.org>, Jacky Huang <ychuang3@nuvoton.com>, 
- Helge Deller <deller@gmx.de>, Christoph Hellwig <hch@lst.de>, 
- Robin Murphy <robin.murphy@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- Andrew Morton <akpm@linux-foundation.org>, 
- Kees Cook <keescook@chromium.org>, 
- Trond Myklebust <trond.myklebust@hammerspace.com>, 
- Anna Schumaker <anna@kernel.org>, Masahiro Yamada <masahiroy@kernel.org>, 
- Nathan Chancellor <nathan@kernel.org>, Takashi Iwai <tiwai@suse.com>, 
- linuxppc-dev@lists.ozlabs.org, linux-ide@vger.kernel.org, 
- openipmi-developer@lists.sourceforge.net, linux-integrity@vger.kernel.org, 
- linux-omap@vger.kernel.org, linux-clk@vger.kernel.org, 
- linux-pm@vger.kernel.org, linux-crypto@vger.kernel.org, 
- dmaengine@vger.kernel.org, linux-efi@vger.kernel.org, 
- linux-arm-msm@vger.kernel.org, linux-fpga@vger.kernel.org, 
- dri-devel@lists.freedesktop.org, linux-input@vger.kernel.org, 
- linux-i2c@vger.kernel.org, linux-iio@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, 
- linux-leds@vger.kernel.org, linux-wireless@vger.kernel.org, 
- linux-rtc@vger.kernel.org, linux-scsi@vger.kernel.org, 
- linux-spi@vger.kernel.org, linux-amlogic@lists.infradead.org, 
- linux-rockchip@lists.infradead.org, linux-samsung-soc@vger.kernel.org, 
- greybus-dev@lists.linaro.org, linux-staging@lists.linux.dev, 
- linux-serial@vger.kernel.org, linux-usb@vger.kernel.org, 
- linux-fbdev@vger.kernel.org, iommu@lists.linux.dev, 
- linux-trace-kernel@vger.kernel.org, kasan-dev@googlegroups.com, 
- linux-hardening@vger.kernel.org, linux-nfs@vger.kernel.org, 
- linux-kbuild@vger.kernel.org, alsa-devel@alsa-project.org, 
- linux-sound@vger.kernel.org
-In-Reply-To: <20240403080702.3509288-1-arnd@kernel.org>
-References: <20240403080702.3509288-1-arnd@kernel.org>
-Subject: Re: (subset) [PATCH 00/34] address all -Wunused-const warnings
-Message-Id: <171273615213.1094883.18382201508159771859.b4-ty@collabora.com>
-Date: Wed, 10 Apr 2024 10:02:32 +0200
+	s=arc-20240116; t=1712736369; c=relaxed/simple;
+	bh=W7fnSk3fbYYgmx0QN0RX3r5eACexf4oPRUSnMF8edrA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pohK+F++d4Pmqj3xTi7jlEYTnoVmInLEQerFxrDaPn1HFDWTDUUp/HxhCw6gG6lEe0s8VkDd7nWaG2RFUvShajJrUsAuV1Nijq8OtaOKl8rxm/nvxDyyNAeB1gDZ6LRIq9Mn8tR0NoGXS7L4yO9qxvtMjXVSpq1xqS1dCPqPQLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ruSy0-0004NM-Bh; Wed, 10 Apr 2024 10:06:00 +0200
+Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ruSxx-00BSau-QP; Wed, 10 Apr 2024 10:05:57 +0200
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1ruSxx-005Cta-2P;
+	Wed, 10 Apr 2024 10:05:57 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: "David S. Miller" <davem@davemloft.net>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com,
+	David Ahern <dsahern@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	=?UTF-8?q?S=C3=B8ren=20Andersen?= <san@skov.dk>
+Subject: [PATCH net-next v6 0/9] Enhanced DCB and DSCP Support for KSZ Switches
+Date: Wed, 10 Apr 2024 10:05:47 +0200
+Message-Id: <20240410080556.1241048-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Mailer: b4 0.13.0
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+This patch series is aimed at improving support for DCB (Data Center
+Bridging) and DSCP (Differentiated Services Code Point) on KSZ switches.
 
-On Wed, 03 Apr 2024 10:06:18 +0200, Arnd Bergmann wrote:
-> From: Arnd Bergmann <arnd@arndb.de>
-> 
-> Compilers traditionally warn for unused 'static' variables, but not
-> if they are constant. The reason here is a custom for C++ programmers
-> to define named constants as 'static const' variables in header files
-> instead of using macros or enums.
-> 
-> [...]
+The main goal is to introduce global DSCP and PCP (Priority Code Point)
+mapping support, addressing the limitation of KSZ switches not having
+per-port DSCP priority mapping. This involves extending the DSA
+framework with new callbacks for managing trust settings for global DSCP
+and PCP maps. Additionally, we introduce IEEE 802.1q helpers for default
+configurations, benefiting other drivers too.
 
-Applied, thanks!
+Change logs are in separate patches.
 
-[09/34] power: rt9455: hide unused rt9455_boost_voltage_values
-        commit: 452d8950db3e839aba1bb13bc5378f4bac11fa04
+Oleksij Rempel (9):
+  net: dsa: add support for DCB get/set apptrust configuration
+  net: dsa: microchip: add IPV information support
+  net: add IEEE 802.1q specific helpers
+  net: dsa: microchip: add multi queue support for KSZ88X3 variants
+  net: dsa: microchip: add support for different DCB app configurations
+  net: dsa: microchip: dcb: add special handling for KSZ88X3 family
+  net: dsa: microchip: enable ETS support for KSZ989X variants
+  net: dsa: microchip: init predictable IPV to queue mapping for all non
+    KSZ8xxx variants
+  net: dsa: microchip: let DCB code do PCP and DSCP policy configuration
 
-Best regards,
+ drivers/net/dsa/microchip/Kconfig       |   2 +
+ drivers/net/dsa/microchip/Makefile      |   2 +-
+ drivers/net/dsa/microchip/ksz8.h        |   1 +
+ drivers/net/dsa/microchip/ksz8795.c     | 106 ++--
+ drivers/net/dsa/microchip/ksz8795_reg.h |   9 +-
+ drivers/net/dsa/microchip/ksz9477.c     |   6 -
+ drivers/net/dsa/microchip/ksz_common.c  | 100 ++--
+ drivers/net/dsa/microchip/ksz_common.h  |  11 +-
+ drivers/net/dsa/microchip/ksz_dcb.c     | 764 ++++++++++++++++++++++++
+ drivers/net/dsa/microchip/ksz_dcb.h     |  21 +
+ include/net/dsa.h                       |   4 +
+ include/net/dscp.h                      |  76 +++
+ include/net/ieee8021q.h                 |  55 ++
+ net/Kconfig                             |   3 +
+ net/core/Makefile                       |   1 +
+ net/core/ieee8021q_helpers.c            | 208 +++++++
+ net/dsa/user.c                          |  28 +
+ 17 files changed, 1311 insertions(+), 86 deletions(-)
+ create mode 100644 drivers/net/dsa/microchip/ksz_dcb.c
+ create mode 100644 drivers/net/dsa/microchip/ksz_dcb.h
+ create mode 100644 include/net/dscp.h
+ create mode 100644 include/net/ieee8021q.h
+ create mode 100644 net/core/ieee8021q_helpers.c
+
 -- 
-Sebastian Reichel <sebastian.reichel@collabora.com>
+2.39.2
 
 
