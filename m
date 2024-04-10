@@ -1,73 +1,82 @@
-Return-Path: <netdev+bounces-86547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F46689F27C
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 14:42:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E08E89F291
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 14:45:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1BC61F22C41
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 12:42:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCA122849E2
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 12:45:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6272A158DA7;
-	Wed, 10 Apr 2024 12:42:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HQpO3gwE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9256915B10D;
+	Wed, 10 Apr 2024 12:45:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5B1B158A0E;
-	Wed, 10 Apr 2024 12:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67CF158DB9;
+	Wed, 10 Apr 2024 12:45:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712752939; cv=none; b=ogsg5IG1CGikyFYOrqVCF57eXm1/dk5PeDgBF7CyOtTVcUffEhlwI3ibcwnLhKFr1+Dvy4FGeKyRcY6JXEAItRsh5vwVE4ndWrV2RKFLXzxCnFb/jpf7ITCpgNEZxyHcKcmGvuVPa8bzoEJosmNM6hjzcQvSmWAGqcYjXFjSMek=
+	t=1712753149; cv=none; b=pwFcqdp/TPgbLmtge9pfcY7DyR25sUImWc4GSLRcK7jpIFtKZW4Twoue0w8p81TxKc6EN+5tBIrss4QgPM6TH8GFKFfd1zD79Ah4kJ5P7h4i8hmYYEEu6TbgnLWFYSAOZzY3AoqZikHdndly7Nt+4eRb0dc2eGiGhGVqDdx+Pd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712752939; c=relaxed/simple;
-	bh=GMjLD7SrG5OMOHBq4gNh8kcYTqr3qX6bK7WATxsuZmw=;
+	s=arc-20240116; t=1712753149; c=relaxed/simple;
+	bh=tD4QkZOAj61aCZGjCPwk6wEvCiQTwcMYYHOPnCN8QvY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aM+8g2Ez5OLepaYKmYMX2LFXPtqrmjaWz75yU8wQqyOUaAYlwUO/r2Vp5l+d9J78KMir4SgzlnEzcHW6E8ILnDFCL88E5d7ndtT+MTMasc/yCFZutlluRu/96NGryXPa/soDQRpA3lsNje/1HUrzIKHyWGJ36eN/EbtIWbagCXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HQpO3gwE; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=SoSZEGve+s5t8k0cVonVLJJcTb59TwfC12mY12O7vPI=; b=HQpO3gwEqMugshjrtccT1UNovt
-	ATwKjSsZUwc3haLkrpAML1vw7N0mAtGRLw/E8TD146xGcratbz+LEiWHD1gYEVOn0jLPOT/JAnYiF
-	WwQ5FACtKesKEIKsvKR7STFdjYHNV8S26wlTHqVeuzVN2p+noIOtzoLRJuUIGlQTCXd8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1ruXH6-00CfUH-35; Wed, 10 Apr 2024 14:42:00 +0200
-Date: Wed, 10 Apr 2024 14:42:00 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: Diogo Ivo <diogo.ivo@siemens.com>, Rob Herring <robh@kernel.org>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Jan Kiszka <jan.kiszka@siemens.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=caLjvBYQF2gG3KQLDtNgX6WwWMt01kt1OgJZjkCueVgqJ+Hzi2qgyPubdIwSXUpOXUgmJZqmMxqY4GJam2GHX37zvw0hXNbk7zLRPd/F0/LOWtXLx/6kx265ISAtQtHl24xL6t6M8x5L+UPdLEekUrc5crJ+3gXJPXVcEQOP7Zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a51beae2f13so478433466b.1;
+        Wed, 10 Apr 2024 05:45:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712753146; x=1713357946;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0v050svZEeKX6xCxDWehqmojLYZEjuvnVFUXjaedZaw=;
+        b=oM4wLB39UtR0jl7LNNK73uySSZsDUcXqjMr08JwAQt6iA5zVWcmCEQ7AuUwNbHul51
+         fQ1yoIGjLgCKmo7oFhqLj1YoRCHm87qmCyN0KBfYLBmx63QT6ckzbzTwJgkYizU1MdgZ
+         xtXdvlSsOEsPEOz9F6Vjk7fG4kkUdePf34+jeQ90vINYOLzn4qB0MG3ndybCijEaotFp
+         rRiP9dMFzp+iEHPyO2UgJyaJ5wIisRqAIjVJwpwlURkl777dUfDr7WySAMpmZ+tNRpaV
+         qmdP+afNTN1QIE5bDvOG9thW/L2uHyTFg15YbEs5s5UcbkdVtpCQP5Icf3uN+4XFFT2+
+         AQ2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWqEHAnxPxseS6ZbAWYAiPOsM5ePTbpU97taATHRGZEoK8MWtko540Y93K2Yo+D7lN1/aMGyHxjL5+bNS8pcZzVwrxe5vahnog6sz7bYnrUkHWZyHkNmCNX59gn66+8KZXEtjmwbreaMRDkMY7FSPvQpq3WeMJekiwUQf8jcfoN8TTx2OMxCdTtWQIC0D9GzwsWSQrgPWGkUfg=
+X-Gm-Message-State: AOJu0YwWsSuTyF+03FPZ9BsTbv2sKbxotTbpw1eVBw4NrVLTgSGu3bBn
+	3zTC4U73YTorMM/g1IaewTfAA2SK22WXk96VqNzcs67e0qEBlfKn
+X-Google-Smtp-Source: AGHT+IGHTIvSnYbc16oL+rmZ6uXCsyNfTppKX/R1tU+P7ojp/FGa9JEJ+FKYxGWNNfYEH5ZZNCyv/A==
+X-Received: by 2002:a17:907:7da8:b0:a51:dd50:6a with SMTP id oz40-20020a1709077da800b00a51dd50006amr2008839ejc.66.1712753145630;
+        Wed, 10 Apr 2024 05:45:45 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
+        by smtp.gmail.com with ESMTPSA id jg18-20020a170907971200b00a51a60bf400sm6765658ejc.76.2024.04.10.05.45.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 05:45:45 -0700 (PDT)
+Date: Wed, 10 Apr 2024 05:45:41 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Ido Schimmel <idosch@idosch.org>
+Cc: aleksander.lobakin@intel.com, kuba@kernel.org, davem@davemloft.net,
+	pabeni@redhat.com, edumazet@google.com, elder@kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, nbd@nbd.name,
+	sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+	lorenzo@kernel.org, taras.chornyi@plvision.eu,
+	ath11k@lists.infradead.org, ath10k@lists.infradead.org,
+	linux-wireless@vger.kernel.org, geomatsi@gmail.com,
+	kvalo@kernel.org, quic_jjohnson@quicinc.com, leon@kernel.org,
+	dennis.dalessandro@cornelisnetworks.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>,
 	Simon Horman <horms@kernel.org>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, srk@ti.com, r-gunasekaran@ti.com
-Subject: Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add support for
- ICSSG switch firmware
-Message-ID: <0039b9d9-9dc5-4b88-99f0-92f275b0b4d3@lunn.ch>
-References: <20240327114054.1907278-1-danishanwar@ti.com>
- <20240327114054.1907278-4-danishanwar@ti.com>
- <27d960ed-8e67-431b-a910-e6b2fc12e292@lunn.ch>
- <c94815f8-798a-4167-8f69-359b9b28b7ce@ti.com>
- <cca25c3d-a352-4531-a8ae-5a0fb7de44df@lunn.ch>
- <ff567495-d966-42c9-9015-ba0ba0dbe011@ti.com>
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	amcohen@nvidia.com
+Subject: Re: [PATCH net-next v4 2/9] net: create a dummy net_device allocator
+Message-ID: <ZhaJ9WkG2OYXkvGo@gmail.com>
+References: <20240409125738.1824983-1-leitao@debian.org>
+ <20240409125738.1824983-3-leitao@debian.org>
+ <ZhZzjNDRaHtdYjDg@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,53 +85,72 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ff567495-d966-42c9-9015-ba0ba0dbe011@ti.com>
+In-Reply-To: <ZhZzjNDRaHtdYjDg@shredder>
 
-> I have been working on this and have found a way to change firmwares
-> without bringing the interfaces up / down.
+On Wed, Apr 10, 2024 at 02:10:04PM +0300, Ido Schimmel wrote:
+> On Tue, Apr 09, 2024 at 05:57:16AM -0700, Breno Leitao wrote:
+> > It is impossible to use init_dummy_netdev together with alloc_netdev()
+> > as the 'setup' argument.
+> > 
+> > This is because alloc_netdev() initializes some fields in the net_device
+> > structure, and later init_dummy_netdev() memzero them all. This causes
+> > some problems as reported here:
+> > 
+> > 	https://lore.kernel.org/all/20240322082336.49f110cc@kernel.org/
+> > 
+> > Split the init_dummy_netdev() function in two. Create a new function called
+> > init_dummy_netdev_core() that does not memzero the net_device structure.
+> > Then have init_dummy_netdev() memzero-ing and calling
+> > init_dummy_netdev_core(), keeping the old behaviour.
+> > 
+> > init_dummy_netdev_core() is the new function that could be called as an
+> > argument for alloc_netdev().
+> > 
+> > Also, create a helper to allocate and initialize dummy net devices,
+> > leveraging init_dummy_netdev_core() as the setup argument. This function
+> > basically simplify the allocation of dummy devices, by allocating and
+> > initializing it. Freeing the device continue to be done through
+> > free_netdev()
+> > 
+> > Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
 > 
-> By default the interfaces are in MAC mode and the ICSSG EMAC firmwares
-> are running on pru cores. To enable switch mode we will need to stop the
-> cores and reload them with the ICSSG Switch firmwares. We can do this
-> without bringing the interfaces up / down.
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 > 
-> When first interface is added to bridge it will still run emac
-> firmwares. The moment second interface gets added to bridge, we will
-> disable the ports and stop the pru cores. Load the switch firmwares on
-> to the cores, start the cores and enable the ports. All of this is done
-> from the driver.
-> 
-> The user need not to bring the interfaces up / down. Loading / Reloading
-> of firmwares will be handled inside the driver only. But we do need to
-> stop the cores for changing firmwares. For stopping the cores we will
-> change the port state to disable by sending r30 command to firmware.
-> 
-> As we are not restarting the interfaces, the DRAM, SMEM and MSMC RAM
-> doesn't get cleared. As a result with this approach all configurations
-> will be saved.
-> 
-> Please let me know if this approach looks ok to you.
-> 
-> Below will be the commands to enable switch mode now,
-> 
->      ip link add name br0 type bridge
->      ip link set dev eth1 master br0
->      ip link set dev eth2 master br0 (At this point we will stop the
-> cores, reload switch firmware, start the cores)
->      ip link set dev br0 up
->      bridge vlan add dev br0 vid 1 pvid untagged
+> We were about to submit another user of init_dummy_netdev() when I
+> noticed this patch. Converted the code to use alloc_netdev_dummy() [1]
+> and it seems to be working fine. Will submit after your patch is
+> accepted.
 
-This sounds a lot better.
+Thanks. It seems that this patch is close to get accepted. Let's see...
 
-Note that the bridge interface br0 might already be up when the
-interfaces are added. So that is a different order to what you showed
-here.
+> See a few minor comments below.
+> 
+> [...]
+> 
+> > +/**
+> > + *	init_dummy_netdev	- init a dummy network device for NAPI
+> > + *	@dev: device to init
+> > + *
+> > + *	This takes a network device structure and initialize the minimum
+> 
+> s/initialize/initializes/
+> 
+> > + *	amount of fields so it can be used to schedule NAPI polls without
+> > + *	registering a full blown interface. This is to be used by drivers
+> > + *	that need to tie several hardware interfaces to a single NAPI
+> > + *	poll scheduler due to HW limitations.
+> > + */
+> > +void init_dummy_netdev(struct net_device *dev)
+> > +{
+> > +	/* Clear everything. Note we don't initialize spinlocks
+> > +	 * are they aren't supposed to be taken by any of the
+> 
+> I assume you meant s/are/as/ ?
 
-There will be some packet losses when you swap firmware, but it
-probably is not that bad. When interfaces are added to a bridge
-packets are dropped anywhere while spanning tree determines the
-network topology. It will just appear your device is slow at doing
-that.
+Thanks for the feedback, I agree with all of them.
 
-	Andrew
+Since these lines were not introduced by this patch, and this patch is
+just moving code (and comments) around, I would add a new patch to the
+patch series fixing the grammar errors.
 
