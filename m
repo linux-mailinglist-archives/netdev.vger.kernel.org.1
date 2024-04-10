@@ -1,94 +1,100 @@
-Return-Path: <netdev+bounces-86351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C7F089E6DD
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 02:30:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9500389E6F1
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 02:39:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE91E1C21400
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 00:30:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD1181C210AB
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 00:39:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77DD5A59;
-	Wed, 10 Apr 2024 00:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A46337C;
+	Wed, 10 Apr 2024 00:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dK05UXMI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lgDGr5W+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 502F339B;
-	Wed, 10 Apr 2024 00:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA4919E;
+	Wed, 10 Apr 2024 00:39:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712709031; cv=none; b=SaAt6hirhuuoFAp2OVJgGB906LxhKqQ5/fvoY7jRLLu1MeKvebum5sVt/ywXBDd4DwAPhQc3shekSQr8Z5xIK+vZ0PusTD3trhdO3AWqn1kvf2MEFH095hkp18En2PhbYQDVq4VDczAsxb9tWRhSrtZoScltHTWEkQ3FP7tejXc=
+	t=1712709591; cv=none; b=PikxkSgMfBiQvDNnlAqywjRTPn5kWJy38cf2g4PfeqYErxs6YyUKwL4+LFEOS5gC5Bn1JH0s/sFM6kso1WfOFRHFdZXYD5m9RPUuKzWgmJhAfk5MP0JyeS1Hue4mT+jJIHvsemPz8Py3phZr68slwhHTQbc0Be/qalvAOmK8TGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712709031; c=relaxed/simple;
-	bh=gqTHKqsyAU163NzCL7lYEHSF6VfvBNSuZd9R9+AQZqc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DG72SX2NFNp9RJbCiyNv/gVwcwdcj5PCVcYeLAiYTFcINNPrbCdVeGpRJQVMdsdHoOA9aewqgjw2ID8pdz6TujuV4El0Vr5U/AdaS81CK8uzNIWarpI+U38o5z27Yci5UHIJu8dV2lOgZadjnZ/C8JPvFC67oNuVgJd0Q9KTzrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dK05UXMI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E9F2EC433C7;
-	Wed, 10 Apr 2024 00:30:30 +0000 (UTC)
+	s=arc-20240116; t=1712709591; c=relaxed/simple;
+	bh=rPIGcmKkaKL77xy0kE1sS+HitVg+d/OiK8zkBdMTGF4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LSmq3q9iwMgpVM4VjOjwSh1waNTUPGcesNnDC95PabPRRlpD9E9UpH78CZB/rtqKYfxhLrWyr3/2lx1fYhmy7TIxGkQ33nwEVd+UDQ8vuOUflLbAB+LiQfhNgdALoyOYyRgOAAbUsT05rvWonyVLORIx86A74ZU3v5KBPGCaGgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lgDGr5W+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05537C433F1;
+	Wed, 10 Apr 2024 00:39:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712709031;
-	bh=gqTHKqsyAU163NzCL7lYEHSF6VfvBNSuZd9R9+AQZqc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dK05UXMIKJS9bTTkN6VoRZQwzZdOOamuMz/PfZ32eYh4mvihBoH2/1sHSDVGMWhLh
-	 RY+sOe66A1VdfWQHSvo71ZjvoXlGG6PZ5oexaC6VwwiHUgpqzyj4XyJLjjUheBma9H
-	 1IzDQlT6ZO5ZTPucd1dTpIvCHYLdcJqhrgwNFF7wiQbU3FLsZoy4Rfqh/LyzpJJY3v
-	 2Inv/j5x5jFHx8+7viw1Fraxx8EOwdo2do4LEo/9Wj6JxOpLEaTSvMU8kpQZfhFR/6
-	 IoIF5iTYrpBHrjQ3IjElj9xzsmICpC5mLVbnih3hehgmQX+pkx5m8+SSfTGIIyW8UP
-	 7NFCXZGnQt67w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DD26ED60313;
-	Wed, 10 Apr 2024 00:30:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1712709591;
+	bh=rPIGcmKkaKL77xy0kE1sS+HitVg+d/OiK8zkBdMTGF4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lgDGr5W+S1Mo/vVh51AzT36WYsN43KOdv2HUfV5OeoOGAeleNf+qD1QCKnVmw0f0U
+	 KO/r9TUZ8143nBmmM0Qm0kfLSuNPR+q603FcX4WKnZ9O2zPhGlRLyZk9ouI3oEE2u+
+	 xS4V4CtN5844T1z0xi98+DiGzT+tVt6J9U0tn83SkLMJlJBqb8J70g1FlMh3BnZk1t
+	 PFyuwjn9p18IQ3bR9TgpM4o/aAIY9pOiY2znYey78v9rqgcBeo9vq8WCC/pnMi2gxg
+	 TMgOlogCc1vvBqYyXQZzoy3ij/wFam0X+B4vIoxFbJH+PSXVmgCcnY4V7cUgtU0Uy/
+	 ZcEuE+smnLljw==
+Date: Tue, 9 Apr 2024 17:39:48 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Julien Panis <jpanis@baylibre.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, Sumit Semwal
+ <sumit.semwal@linaro.org>, Christian =?UTF-8?B?S8O2bmln?=
+ <christian.koenig@amd.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
+ <andrew@lunn.ch>, Ratheesh Kannoth <rkannoth@marvell.com>, Naveen
+ Mamindlapalli <naveenm@marvell.com>, danishanwar@ti.com,
+ yuehaibing@huawei.com, rogerq@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org
+Subject: Re: [PATCH net-next v8 2/3] net: ethernet: ti: Add desc_infos
+ member to struct k3_cppi_desc_pool
+Message-ID: <20240409173948.66abe6fa@kernel.org>
+In-Reply-To: <20240223-am65-cpsw-xdp-basic-v8-2-f3421b58da09@baylibre.com>
+References: <20240223-am65-cpsw-xdp-basic-v8-0-f3421b58da09@baylibre.com>
+	<20240223-am65-cpsw-xdp-basic-v8-2-f3421b58da09@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v4] net: phy: dp8382x: keep WOL settings across
- suspends
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171270903090.7096.4342007764039088497.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Apr 2024 00:30:30 +0000
-References: <20240408082602.3654090-1-catalin.popescu@leica-geosystems.com>
-In-Reply-To: <20240408082602.3654090-1-catalin.popescu@leica-geosystems.com>
-To: Catalin Popescu <catalin.popescu@leica-geosystems.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- m.felsch@pengutronix.de, bsp-development.geo@leica-geosystems.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 08 Apr 2024 11:38:03 +0200 Julien Panis wrote:
+>  		goto gen_pool_create_fail;
+>  	}
+>  
+> +	pool->desc_infos = kcalloc(pool->num_desc,
+> +				   sizeof(*pool->desc_infos), GFP_KERNEL);
+> +	if (!pool->desc_infos) {
+> +		ret = -ENOMEM;
+> +		dev_err(pool->dev,
+> +			"pool descriptor infos alloc failed %d\n", ret);
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Please don't add errors on mem alloc failures. They just bloat the
+kernel, there will be a rather large OOM splat in the logs if GFP_KERNEL
+allocation fails.
 
-On Mon,  8 Apr 2024 10:26:02 +0200 you wrote:
-> Unlike other ethernet PHYs from TI, PHY dp8382x has WOL enabled
-> at reset. The driver explicitly disables WOL in config_init callback
-> which is called during init and during resume from suspend. Hence,
-> WOL is unconditionally disabled during resume, even if it was enabled
-> before the suspend. We make sure that WOL configuration is persistent
-> across suspends.
-> 
-> [...]
+> +		kfree_const(pool_name);
+> +		goto gen_pool_desc_infos_alloc_fail;
+> +	}
+> +
+>  	pool->gen_pool->name = pool_name;
 
-Here is the summary with links:
-  - [net-next,v4] net: phy: dp8382x: keep WOL settings across suspends
-    https://git.kernel.org/netdev/net-next/c/9ef9ecfa9e9f
-
-You are awesome, thank you!
+If you add the new allocation after this line, I think you wouldn't
+have to free pool_name under the if () explicitly.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
