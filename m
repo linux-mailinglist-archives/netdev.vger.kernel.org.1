@@ -1,286 +1,286 @@
-Return-Path: <netdev+bounces-86456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 965ED89EDAD
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:34:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6B1289EDBA
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 082F21F21A34
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:34:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5346C1F22A10
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:36:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB1B15444A;
-	Wed, 10 Apr 2024 08:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D94A7154BE7;
+	Wed, 10 Apr 2024 08:36:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cYJ/lPQY"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Lt5jNozI";
+	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="FP6kNg42"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C90EAD0
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 08:33:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712738039; cv=none; b=THbPBIMqyh0gVIeygqzyiDONTqcZb6lLPPDkBCBbseGK/Q9uf0zVMzvbIYCWGjhCBnh5D8+6wFU1BtHv+54CG081nHOei1Z867+G01ngrBFUqkXFIs3ealQ8deOlh5SRaE10grmQhfqXWr7ZHj4vojBKQyqPQWZGPlMixGwlLF0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712738039; c=relaxed/simple;
-	bh=YQC7N8/VOpELgaWdx5gm8wOC8q9dKvBRRJpbqzd/fPg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=l90T6ybjutYBSqGAtpuHYHkRnyhrlggPeomjV8fh5CkBm9Cwx9sIgtYw83MO8qvk8eaVmBsNVnIszJWt9RA++UHWMcwKUp9lnmdqtXdO0h4mlK5yIhI1nkfXyMdjqZSgmv4vFU9ygBNG6QiMHan/XQ36N2CeU8VByxjUXLcwaWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cYJ/lPQY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712738036;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=cKvQy3maeOtyZ2KywgHESSRs2TunlrIU1XYxc2U3wgc=;
-	b=cYJ/lPQYOfv/qy6Et+CPjNWAkK44i31f+pzBlg36WJnlD50lB+IpG/ix6AkrfIOq89kI+R
-	Vv0pMODYLvnfpNzHzFucxqO1NXkpyLoWkmia/WuvXFxSYmdkbGzvZCI6uLCBdAlmrMqgf9
-	WM2ibf0ipvbbQDJGHQ6lkcFVGtwGgnM=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-627-tTVmJsFnOBeqpXJIupBbaQ-1; Wed, 10 Apr 2024 04:33:54 -0400
-X-MC-Unique: tTVmJsFnOBeqpXJIupBbaQ-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-344035328d9so839408f8f.0
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 01:33:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712738033; x=1713342833;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cKvQy3maeOtyZ2KywgHESSRs2TunlrIU1XYxc2U3wgc=;
-        b=XBwDU5PByW8ioxayiKbFsbB3ajJeHh9z09GRS/hsG5/AnJLiDBA3tRu2kqDiQAbT8g
-         6G/EfX+M02Oj2gMVaYTR9BONjnL1E4Kk2Zf6terzGbdVemqKYevLCKW+bam+hWcuxyDq
-         i8xhd7oO0C0LEVSyJ9CnshglzWFnfSPYUnMj/HP0UrTQRZHjCW/IDFpIL0ahie7f1a/U
-         Kj/SQqmCVw7rYR9IbBlLzFzKWn3QP3VFTUj9ffgBWfr31PFbPtQ7NGs3Tquyk5D1zzc/
-         sgLq7J2cJmc5/DvyB6jKTCNz2m9N+R+m0PiBOiR4opJZY1tDXy4xqLVc3o6oJnNNGIFa
-         Sx6w==
-X-Gm-Message-State: AOJu0YzlNaRYemVcAomwudv2tAqJjZ4mL78PCd86PtLWCLvpZSQQxwlh
-	t2pGMCyUnNK1fa+bNLNcUjhJVyR+jKjZpY9aex/o59/XqeDvuAUoJfo4x9G1krVZo9tbNHmIgEm
-	MHDPDFsIWF4K+G+kzzRvD0dIk04yMSUQc0QBp8psg+3IPOdZptH1BXKZOjNSFGQ==
-X-Received: by 2002:a5d:6da5:0:b0:346:6d9d:431a with SMTP id u5-20020a5d6da5000000b003466d9d431amr878025wrs.5.1712738032989;
-        Wed, 10 Apr 2024 01:33:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGlm7lLMlpZmfdF2NT/Ou9qgdIRBBHX07Cjn6aapfyEvNkVemQ88pBChWZXGCwPQStEOhuSOA==
-X-Received: by 2002:a5d:6da5:0:b0:346:6d9d:431a with SMTP id u5-20020a5d6da5000000b003466d9d431amr878005wrs.5.1712738032563;
-        Wed, 10 Apr 2024 01:33:52 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-233-180.dyn.eolo.it. [146.241.233.180])
-        by smtp.gmail.com with ESMTPSA id z11-20020a5d654b000000b003437fec702dsm13254570wrv.21.2024.04.10.01.33.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 01:33:52 -0700 (PDT)
-Message-ID: <91451f2da3dcd70de3138975ad7d21f0548e19c9.camel@redhat.com>
-Subject: Re: [RFC] HW TX Rate Limiting Driver API
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
-	 <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>
-Date: Wed, 10 Apr 2024 10:33:50 +0200
-In-Reply-To: <20240409153250.574369e4@kernel.org>
-References: <20240405102313.GA310894@kernel.org>
-	 <20240409153250.574369e4@kernel.org>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119C613D607
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 08:36:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712738193; cv=fail; b=GU5U0ResJOVA4/gtRkZqM2qW8g6qkqqaHrCUP+kPbrJ97tmMDQDvamPHeKTK9kHfFvBSkPUqY05IXtTcgMnFUNORh9V34rxTWodfsmSTJv3dQOSh45s1XoZikn4vbn8egRXmS7ejScigAfuqfc5e1LTHWt+3hWZioxP4Wwb8ajg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712738193; c=relaxed/simple;
+	bh=dGHLDZ9ZeecRE0jc5/9OMSzGxWBdkBgmY4JrHy8Hlcw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=TWYu+3UOzeJpwcNMPlkHMSJu2odzg9nUI/Id3YR887Mxjf4jeqNUpnve9VpZvjRTliYs96Cva2UWMhaOfXfZG5SYPbbS1ncYwMH5zyXknD4CzAZekfDqjyih3t1pnuAeYgc2ll2cCqnCgeUyz0jjS32HH220b8qIDpBtwvN84Uw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=Lt5jNozI; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=FP6kNg42; arc=fail smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43A7jkMC007051;
+	Wed, 10 Apr 2024 08:36:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2023-11-20;
+ bh=6JUMhHpGPdNiuukYKmboZOzykmNx4FLKCrNyL3tuDKM=;
+ b=Lt5jNozIYB7KNAF6J79UAs0b6cmguTaMApC1lliNPNQjZzsGDhVGxsI3qcm2U9DNhvRt
+ izHz+Bt5+kiIbw8s/25/2S6BOWadL19tX1re5Qho6L1cKZE9vk85aOd4/tl8+ySDXZVY
+ UyxLbONgmdZob2Q90czBBkCAkkyxZ/5U7gvvu34b821u0R8U4XjQyTz799hLtrYEyM/e
+ NXE2JybAYq6zKq68N5zASeTHVNYwmL99P3G7VXx9IDNnw+NCM2Cjp9Qk7funazcQvFZx
+ +AbxJzQPzhJQyD9MNeJ9JAyzqo8QYjvR6byzsThXN4t3Uwng6Bt4fSIZGutOvnhm+RZR gg== 
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xaxedpv9b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 10 Apr 2024 08:36:23 +0000
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 43A7PPRR007875;
+	Wed, 10 Apr 2024 08:36:22 GMT
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2101.outbound.protection.outlook.com [104.47.55.101])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3xavu7trte-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 10 Apr 2024 08:36:22 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fgCWLD2psWwQwhV68ysmBHmnIAWinwQPb99zeVQTnrAT4QO+7gP7joTkfEG7T8N+SlgzRDV7rI66yUF8K5vHSuKMz1+QJepRky8AUojSgwQZMaBsCYw3FZFuOBm2962Bnq1Uz4/OVexlrQiirBnOROfFmYtPkOiCq9ubi9cK72S9gx7jieQMWNSZdEIOYZe5tY/fyOzIoeXptiGjf8b/QNDa1MT4kyMCPNe5ImV/NXH+DXA6FLJuBYhQRebk1AGaICc7oR6ZVY/UG6YaAVqeg3hfq57ApUY0KWzyyUT6lsJHNEUjObtsupkxmqkMfux89voIvDB5u7I9jkR8YgXpMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6JUMhHpGPdNiuukYKmboZOzykmNx4FLKCrNyL3tuDKM=;
+ b=YLFsDKSNlKlflDww/0b3tNZ4IpxgYMPrGUvc1aiSqlZ2BNR1JR20BTgSw8ID++AxvLyrAwTFoo7jF8LG3P6dWbe3YwGnFY5viPnkPDEIAMOiiVsFS0iivr7XRi6L8b9QTU/P1pRDT7ly1gctiZBD0i9OPS7xrACx4mcNY7fDOKElfUa6YVjhb4U2lPIa39CSqV7iufPr+/s+hGgaXNydxG3tXbH9Bskt6DX+NH7l1g9FeKfDt+yWdE0d0lvnnn7IDIpPexYrFxzNRC2YA/d/cgI5PYImdEGNvbnovHm9gVc26sPKdQGrF4Rx7Se3C+cQ4kHIzRezE1CqFsZCbdkjpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6JUMhHpGPdNiuukYKmboZOzykmNx4FLKCrNyL3tuDKM=;
+ b=FP6kNg42yF+R7tlmLp/PXSdPMjAoLrZ+GxBqrVSJ0tGLED+MRSttL3yZRfvl9XKxNrCmH3gdmlig/BHhaRUSDpYurxKSTH/i4a2XR42hbink7lqk33QqENsHPoRd1/q495S7WZWox4VS0LR08f8bBMtPAUuiwV7YC9JEf73QMNg=
+Received: from CH3PR10MB6833.namprd10.prod.outlook.com (2603:10b6:610:150::8)
+ by CO1PR10MB4609.namprd10.prod.outlook.com (2603:10b6:303:91::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Wed, 10 Apr
+ 2024 08:36:05 +0000
+Received: from CH3PR10MB6833.namprd10.prod.outlook.com
+ ([fe80::40af:fb74:10b1:1300]) by CH3PR10MB6833.namprd10.prod.outlook.com
+ ([fe80::40af:fb74:10b1:1300%5]) with mapi id 15.20.7409.042; Wed, 10 Apr 2024
+ 08:36:05 +0000
+Message-ID: <0ff1d6c8-d56d-4f73-b5be-d0ce2a223d28@oracle.com>
+Date: Wed, 10 Apr 2024 01:36:01 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 net 3/3] af_unix: Prepare MSG_OOB deprecation.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        kuni1840@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com
+References: <22994084-e0a2-4829-b759-73e98418b510@oracle.com>
+ <20240410060109.96131-1-kuniyu@amazon.com>
+Content-Language: en-US
+From: Rao Shoaib <rao.shoaib@oracle.com>
+In-Reply-To: <20240410060109.96131-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR03CA0349.namprd03.prod.outlook.com
+ (2603:10b6:a03:39c::24) To CH3PR10MB6833.namprd10.prod.outlook.com
+ (2603:10b6:610:150::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR10MB6833:EE_|CO1PR10MB4609:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	VzSglO/6g6H3BsL5vQXCkLyqMzLd6bqs7fj2zzh1qrq1wz3T3+y8YJcq1KgXtUb6IJIV0EtdY0fMdQKx1fe2xboCIfATw/92ijoK/Lb/g11XtRLLwiSMYKE5OxZk8tJEBfMnz/Iee1EvwcVBiRujZKveys5810fiA/jR7lkiMjsKCB+ucPPf2QzCfKxMjnYmtxZdBNgoHMrIaLcpexar97prPTpK9fKvkcF90ByeKrY/Ed+TBPJt8N9lFtKRkWFCh9ZvQX5tZjSU3QAzApVtIeDDJb3kH/J/zqZbUYy9+kJK0O1QJpWsTjpBDiaZN9vEn/nhNsfVP0uqm0bI7iGIdA66l0owELFBPQxIwO2evVsM96gYwDD3kq2M6h0wH9ReGYdHSrVbwUjIi5xspeVnEXMj9dsSKG78QEyaSyOchaZSp/vTshJRlFLVssR+C5WwirAVNmxN9jOTWm1ApRv0Zm3XBliy0o+MaEk2g3gj2BLXuBloqO94ksrwKgwB91iVDa/x6HJX8qot1O0sx55CrgrkV9BeRVBXwdXTAMh279De3vv3sP5kDLG0cNUqTI66i/Oy3/6dpzUaqqlLjchcbw2yF/TCxN8GCsuV9Pe+qvVC+guyDzIejraBBAy/lp51OJ07j8hOAs71sSvpg6kgBXafHhaUGVX1RfsM8X1gTI8=
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR10MB6833.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?VnlYeTBicTJWSXRhTktaUkJqeG43ZC8zdmpSS3k0dG9kVm85cGVsU2IzWU9R?=
+ =?utf-8?B?aTg1dUVEOUpBaC9kcUpFQmN6NUhtNzBxZlZjL3BDTkMwL0RkUWRselV5QlNO?=
+ =?utf-8?B?U2hvd2pWclZ6ZFRDcHFVT1NyZTFWN1BDM1hPeTlQT2dpdUVGQm0vMlF1UGFW?=
+ =?utf-8?B?RFBwYWovSldJY2pSckFQbndpRlRLRlBYOXpxendpMFNIdUxlTmZ1T3FDeWdZ?=
+ =?utf-8?B?VzJ1Y1J2Z1FDSXRrbGNRdGREQlZ3clhFRnpnMG5LUmVUVzg4bUtsTElCNVM1?=
+ =?utf-8?B?Tkx5cWszNk90ZUdKMU55eit1OWJnMlpZckFXWUw1Y2dOYi9Gc3dmZjJ0b3Zn?=
+ =?utf-8?B?eVgveW1MQVNBS3BxS0xEamxTR0RIU3ozWDZxTUZmdTEzV0k2YjdhMGVBVmFk?=
+ =?utf-8?B?Lyt5SFcxTXhGSEV3UUZVYSsyeWgveVcyR1hlOGMreTF4NFVZWGxxTjZVeGhn?=
+ =?utf-8?B?azAxZHh4M3ZNQVZqMkdHTmNqMTRaczEzMWkyV01yZE1TNG9WZXpITitHbVpN?=
+ =?utf-8?B?djBKU0Z1amJkZ09KYU45L3Zkb3cyNWFIY1RjK1FyK2h1MmRpZXdjYm1ieDRi?=
+ =?utf-8?B?eWtVeXk5Tmw0Yi9DT3FVcjgweGJ1ejYwbk9EbEhzdm96bU8yRGl3bkszUC9j?=
+ =?utf-8?B?V1hoMktwRGFoQjNCYWwrN0hTSEtGVWlpZmlmdVhMQ1VXSWwxSkhlK25JK3lH?=
+ =?utf-8?B?ejZSdmhMamdORm5aaUZWVkgreHAyZGdXNXUxRERqMFBIb2JWNTZVYkNmQ1BQ?=
+ =?utf-8?B?blZqT0Z6SzNJYldJSU1IZ2RvZXEvOGE1c21nRCtNUjl0SHNFUGpOU1NBckh3?=
+ =?utf-8?B?YVBEdnJsSUxBOFF6dkYxRlRxd2RKYi9DU3F1K052THkxRThVZnZjdmRqSDRP?=
+ =?utf-8?B?Q2JvRm5zTnJOMVMzYXRjT3F3emdzeG56NHlKVmw0bFJYRm4rd0dmcUlucWtZ?=
+ =?utf-8?B?akZRRloxU25uVjJjTDE0eTlBbGxOR3FmOGMwaFF0U1AxL09SejhCTXVVM1Z5?=
+ =?utf-8?B?MmVmVzh3K3FLTXJraHcrS3lTR1dPUzQwdnVkSXo4bzBESE9hK0xha0l2MzJj?=
+ =?utf-8?B?Qm5YeGlKcGhCVWNkeSt5SUpNQVNRbFZuODdFTDU2ZjZ1dUZjUlJaTHZOQ216?=
+ =?utf-8?B?dm1ERHF6Q3VtdHBMUE9aS2RGbThNdndaZjJKUGV0TFB1TzVFTld4d3UxbTho?=
+ =?utf-8?B?Rzd1L0l1d0YyL2dnSUJPZ3ZXS2IxMDNuSzB2RGlBVFgyRjNHU3VPdU1DTjNr?=
+ =?utf-8?B?YkNKRllLMU5Mbk9DRkE3SG03MFRnZ1Z4VHBxNTVaZmFyVUFOVm80Ni9IZUVy?=
+ =?utf-8?B?VStEU2Q4VWt6TW1Zam5VZGExVDVZL2tJQzVnZ1pmZlJCWC9Kc2FDU2RMcFV2?=
+ =?utf-8?B?czcwNkVtc2gzeWtwY21LQ3kyZDJ6UmxGUVBkVnNaaGZ3dUZoRG80b2d2THhS?=
+ =?utf-8?B?U2ZXQmtmRVVnSmQ1RUYyQUVhN2RsWGgrOTltNTBYWEkrcGoxTTEvempkMUZL?=
+ =?utf-8?B?WHBWU1RNck40NmZmQ281YllKbDB5SGFtK0tkWDlhL21WZUViczByMmIrZkp6?=
+ =?utf-8?B?VjRUU3NlLzRUcGZ0TTFFamFuUFBXT09zMHdnRHh6d0I2elg0K2VkcWRLQ2NM?=
+ =?utf-8?B?clljRnpMQW5leFV0QVBkRnVDdlRPd3lDU292Z2FVSkVvdTF2MzR2ZDh2bzEw?=
+ =?utf-8?B?V3g1amhqRU9EakdEdzFUOC9qcVVGZWZyTFBFaDA3UmlINWZ3SThLZmhmNm1k?=
+ =?utf-8?B?M2hBMmpkUFB4QTlFblUrcFAxVWVMallXVHFLVG1MWXF4aVZsNzczbDZYMUNT?=
+ =?utf-8?B?MEtQYXFycG9VS25aY2NqK0p0Z0wrZVFxUGlzSlhnZld1ejRjcDFVeHZoUmQy?=
+ =?utf-8?B?OWNzamd3MW5mNWdQSjVUcGJoeUlHKzdaMU9KcVU5WDVZOE55djd6a2RSV3VI?=
+ =?utf-8?B?d1pmRjR1ZFJyNkg3N3FxYklvNUxHcC8wa3Vyek53ZVk4NU1RK2JXYUE1RFJu?=
+ =?utf-8?B?VzQ3RXhBci9SbEFGS3p4cWwvb3Y3ekhaQTFYVmI3cVVJYmN4K0lOdEk1UWdC?=
+ =?utf-8?B?MW00UHlyOVg5VDR2Y20vMDA2Vk43WE40TlFVdmFpQVQ1UVZ3bElYVTQ0ei9L?=
+ =?utf-8?Q?nZ8+tIuJhl/Nzmk1XbOU4ijKx?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	V5CoPpWNy1gCV7/zLK9NSxyzg7SNUxuGUh20pqYAJ1KuZl/NF9MVycpHvMqxzScM5cQI5XM0Klx/HOsmbIm3oNRLmEt6WSONNmFNVIFY6yIk3wLF0stsLYgaZCz0bXShSLU31vFQMMBZP0bfqnT3ICDLsq2Ts89VvZKHeZ3PUxGrDeZuqsPwTxDGpmqRDYMMja50AlbTnH85Zo9j9AE7A4Cq6jVWyUD7c8aAE3EUUgT/0YVo8fEdpT9FCq6MiQ0tJuHDrntCj+d58MWfZq98ps0jJ46U5V7ieJgnynvDoAc04oc84NafXyd/7nnjdBppeZCLqPvj99hsTZbiUoafl1reDJFxXPJoOyUvR7H8oPAITOSJoDclcPYbFv47ZAFlcEx/GhbB2T76uw9z4vjxDg1ueHuoc6WP6Bp6KnUhbRxwztarNbzrr/tKmh9BDMEhDAJ8r05R9hDBDVBfhrzbox3HYIn0rjRPr2ZIYIVsIPQk+Fup90Jj8ZjoFUcgCnnbJhy3TdcGFOTDqpksGBzxa8Zl6WxhTSLS2IiNGVCAMX5J6JdXld0E68ZM8tPHQE5zJjPgwXoIcue3/zottCGFurdq1smO62dEk9/1rIPfOeY=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 836572e5-11c5-4167-98dd-08dc593942d2
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR10MB6833.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2024 08:36:05.0878
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6ErpxDihaRxZ3H+j0MraakfG1JSCq1gOJuks6OXN13dOuiGBvOkMQeCN+/GwRpo/v+YnoDEo5ssS9LyPAbQQng==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR10MB4609
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-10_03,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=890 suspectscore=0
+ mlxscore=0 adultscore=0 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404100061
+X-Proofpoint-GUID: 7MonI8DIZRoWj454cZOmZfZJ_8wIcK68
+X-Proofpoint-ORIG-GUID: 7MonI8DIZRoWj454cZOmZfZJ_8wIcK68
 
-On Tue, 2024-04-09 at 15:32 -0700, Jakub Kicinski wrote:
-> On Fri, 5 Apr 2024 11:23:13 +0100 Simon Horman wrote:
-> > /**
-> >  * enum shaper_lookup_mode - Lookup method used to access a shaper
-> >  * @SHAPER_LOOKUP_BY_PORT: The root shaper for the whole H/W, @id is un=
-used
-> >  * @SHAPER_LOOKUP_BY_NETDEV: The main shaper for the given network devi=
-ce,
-> >  *                           @id is unused
-> >  * @SHAPER_LOOKUP_BY_VF: @id is a virtual function number.
-> >  * @SHAPER_LOOKUP_BY_QUEUE: @id is a queue identifier.
-> >  * @SHAPER_LOOKUP_BY_TREE_ID: @id is the unique shaper identifier insid=
-e the
-> >  *                            shaper hierarchy as in shaper_info.id
-> >  *
-> >  * SHAPER_LOOKUP_BY_PORT and SHAPER_LOOKUP_BY_VF, SHAPER_LOOKUP_BY_TREE=
-_ID are
-> >  * only available on PF devices, usually inside the host/hypervisor.
-> >  * SHAPER_LOOKUP_BY_NETDEV is available on both PFs and VFs devices, bu=
-t
-> >  * only if the latter are privileged ones.
->=20
-> The privileged part is an implementation limitation.=C2=A0
-> Limiting oneself
-> or subqueues should not require elevated privileges, in principle,
-> right?
+It is used by Oracle products. File bugs and someone from Oracle will 
+fix it (most likely me). Oracle has addressed any bugs reported in a 
+very timely manner. So in summary the feature is being used and is 
+actively maintained.
 
-The reference to privileged functions is here to try to ensure proper
-isolation when required.
+You can also turn off the feature in your private/closed distro and not 
+worry about it.
 
-E.g. Let's suppose the admin in the the host wants to restricts/limits
-the B/W for a given VF (the VF itself, not the representor! See below
-WRT shaper_lookup_mode) to some rate, he/she likely wants intends
-additionally preventing the guest from relaxing the setting configuring
-the such rate on the guest device.
+That is all I have to say on this subject.
 
-> >  * The same shaper can be reached with different lookup mode/id pairs,
-> >  * mapping network visible objects (devices, VFs, queues) to the schedu=
-ler
-> >  * hierarchy and vice-versa.
->=20
-> :o
->=20
-> > enum shaper_lookup_mode {
-> >     SHAPER_LOOKUP_BY_PORT,
-> >     SHAPER_LOOKUP_BY_NETDEV,
-> >     SHAPER_LOOKUP_BY_VF,
-> >     SHAPER_LOOKUP_BY_QUEUE,
-> >     SHAPER_LOOKUP_BY_TREE_ID,
->=20
-> Two questions.
->=20
-> 1) are these looking up real nodes or some special kind of node which
-> can't have settings assigned directly?=C2=A0
-> IOW if I want to rate limit=20
-> the port do I get + set the port object or create a node above it and
-> link it up?
+Shoaib
 
-There is no concept of such special kind of nodes. Probably the above
-enum needs a better/clearer definition of each element.
-How to reach a specific configuration for the port shaper depends on
-the NIC defaults - whatever hierarchy it provides/creates at
-initialization time.=C2=A0
-
-The NIC/firmware can either provide a default shaper for the port level
-- in such case the user/admin just need to set it. Otherwise user/admin
-will have to create the shaper and link it.
-
-I guess the first option should be more common/the expected one.
-
-This proposal allows both cases.
-
-> Or do those special nodes not exit implicitly (from the example it
-> seems like they do?)
-
-Could you please re-phrase the above?
-
-> 2) the objects themselves seem rather different. I'm guessing we need
-> port/netdev/vf because either some users don't want to use switchdev
-> (vf =3D repr netdev) or drivers don't implement it "correctly" (port !=3D
-> netdev?!)?
-
-Yes, the nodes inside the hierarchy can be linked to very different
-objects. The different lookup mode are there just to provide easy
-access to relevant objects.
-
-Likely a much better description is needed:  'port' here is really the
-cable plug level, 'netdev' refers to the Linux network device. There
-could be multiple netdev for the same port as 'netdev' could be either
-referring to a PF or a VFs. Finally VF is really the virtual function
-device, not the representor, so that the host can configure/limits the
-guest tx rate.=20
-
-The same shaper can be reached/looked-up with different ids.
-
-e.g. the device level shaper for a virtual function can be reached
-with:
-
-- SHAPER_LOOKUP_BY_TREE_ID + unique tree id (every node is reachable
-this way) from any host device in the same hierarcy
-- SHAPER_LOOKUP_BY_VF + virtual function id, from the host PF device
-- SHAPER_LOOKUP_BY_NETDEV, from the guest VF device
-
-> Also feels like some of these are root nodes, some are leaf nodes?
-
-There is a single root node (the port's parent), possibly many internal
-nodes (port, netdev, vf, possibly more intermediate levels depending on
-the actual configuration [e.g. the firmware or the admin could create
-'device groups' or 'queue groups']) and likely many leave nodes (queue
-level).
-
-My personal take is than from an API point of view differentiating
-between leaves and internal nodes makes the API more complex with no
-practical advantage for the API users.
-
-> > };
-> >=20
-> >=20
-> > /**
-> >  * struct shaper_ops - Operations on shaper hierarchy
-> >  * @get: Access the specified shaper.
-> >  * @set: Modify the specifier shaper.
-> >  * @move: Move the specifier shaper inside the hierarchy.
-> >  * @add: Add a shaper inside the shaper hierarchy.
-> >  * @delete: Delete the specified shaper .
-> >  *
-> >  * The netdevice exposes a pointer to these ops.
-> >  *
-> >  * It=E2=80=99s up to the driver or firmware to create the default shap=
-ers hierarchy,
-> >  * according to the H/W capabilities.
-> >  */
-> > struct shaper_ops {
-> > 	/* get - Fetch the specified shaper, if it exists
-> > 	 * @dev: Netdevice to operate on.
-> > 	 * @lookup_mode: How to perform the shaper lookup
-> > 	 * @id: ID of the specified shaper,
-> > 	 *      relative to the specified @lookup_mode.
-> > 	 * @shaper: Object to return shaper.
-> > 	 * @extack: Netlink extended ACK for reporting errors.
-> > 	 *
-> > 	 * Multiple placement domain/id pairs can refer to the same shaper.
-> > 	 * And multiple entities (e.g. VF and PF) can try to access the same
-> > 	 * shaper concurrently.
-> > 	 *
-> > 	 * Values of @id depend on the @access_type:
-> > 	 * * If @access_type is SHAPER_LOOKUP_BY_PORT or
-> > 	 *   SHAPER_LOOKUP_BY_NETDEV, then @placement_id is unused.
-> > 	 * * If @access_type is SHAPER_LOOKUP_BY_VF,
-> > 	 *   then @id is a virtual function number, relative to @dev
-> > 	 *   which should be phisical function
-> > 	 * * If @access_type is SHAPER_LOOKUP_BY_QUEUE,
-> > 	 *   Then @id represents the queue number, relative to @dev
-> > 	 * * If @access_type is SHAPER_LOOKUP_BY_TREE_ID,
-> > 	 *   then @id is a @shaper_info.id and any shaper inside the
-> > 	 *   hierarcy can be accessed directly.
-> > 	 *
-> > 	 * Return:
-> > 	 * * %0 - Success
-> > 	 * * %-EOPNOTSUPP - Operation is not supported by hardware, driver,
-> > 	 *		    or core for any reason. @extack should be set
-> > 	 *		    to text describing the reason.
-> > 	 * * Other negative error value on failure.
-> > 	 */
-> > 	int (*get)(struct net_device *dev,
-> > 		   enum shaper_lookup_mode lookup_mode, u32 id,
-> >                    struct shaper_info *shaper, struct netlink_ext_ack *=
-extack);
->=20
-> How about we store the hierarchy in the core?
-> Assume core has the source of truth, no need to get?
-
-One design choice was _not_ duplicating the hierarchy in the core: the
-full hierarchy is maintained only by the NIC/firmware.=C2=A0The NIC/firmwar=
-e
-can perform some changes "automatically" e.g. when adding or deleting
-VFs or queues it will likely create/delete the paired shaper. The
-synchronization looks cumbersome and error prone.
-
-The hierarchy could be exposed to both host and guests, I guess only
-the host core could be the source of truth, right?
-
-
-Thanks for the feedback,
-
-Paolo
-
+On 4/9/24 23:01, Kuniyuki Iwashima wrote:
+> From: Rao Shoaib <rao.shoaib@oracle.com>
+> Date: Tue, 9 Apr 2024 17:48:37 -0700
+>> On 4/9/24 17:27, Kuniyuki Iwashima wrote:
+>>> From: Rao Shoaib <rao.shoaib@oracle.com>
+>>> Date: Tue, 9 Apr 2024 17:09:24 -0700
+>>>> This feature was added because it was needed by Oracle products.
+>>>
+>>> I know.  What's about now ?
+> 
+> Why do you ingore this again ?
+> 
+> If it's really used in Oracle products, you can just say yes,
+> but it seems no ?
+> 
+> 
+>>>
+>>> I just took the silence as no here.
+>>> https://urldefense.com/v3/__https://lore.kernel.org/netdev/472044aa-4427-40f0-9b9a-bce75d5c8aac@oracle.com/__;!!ACWV5N9M2RV99hQ!Nk1WvCk4-rstASn7PUW4QiAejf0gQ7ktNz-AhuB2UHt9Vx7yUVcfcJ82f9XM3tsDanwnWusycGdUfF4$
+>>>
+>>> As I noted in the cover letter, I'm fine to drop this patch if there's
+>>> a real user.
+>>>
+>>>
+>>>> The
+>>>> bugs found are corner cases and happen with new feature, at the time all
+>>>> tests passed.
+>>>
+>>> Yes, but the test was not sufficient.
+>>>
+>>
+>> Yes they were not but we ran the tests that were required and available.
+>> If bugs are found later we are responsible for fixing them and we will.
+> 
+> This is nice,
+> 
+> 
+>>
+>>>
+>>>> If you do not feel like fixing these bugs that is fine,
+>>>> let me know and I will address them,
+>>>
+>>> Please do even if I don't let you know.
+>>>
+>>
+>> The way we use it we have not run into these unusual test cases. If you
+>> or anyone runs into any bugs please report and I personally will debug
+>> and fix the issue, just like open source is suppose to work.
+> 
+> but why personally ?  because Oracle products no longer use it ?
+> If so, why do you want to keep the feature with no user ?
+> 
+> 
+>>>
+>>>> but removing the feature completely
+>>>> should not be an option.
+>>>>
+>>>> Plus Amazon has it's own closed/proprietary distribution. If this is an
+>>>> issue please configure your repo to not include this feature. Many
+>>>> distributions choose not to include several features.
+>>>
+>>> The problem is that the buggy feature risks many distributions.
+>>> If not-well-maintained feature is really needed only for a single
+>>> distro, it should be rather maintained as downstream patch.
+>>>
+>>> If no one is using it, no reason to keep the attack sarface alive.
+>>
+>> Tell me one feature in Linux that does not have bugs?
+> 
+> I'm not talking about features with no bug.  It's fine to have bugs
+> if it's maintained and fixed in timely manner.
+> 
+> I'm talking about a feature with bugs that seems not to be used by
+> anyone nor maintained.
+> 
+> 
+>> The feature if used normally works just fine, the bugs that have been
+>> found do not cause any stability issue, may be functional issue at best.
+> 
+> It caused memory leaks in some ways easily without admin privilege.
+> 
+> 
+>> How many applications do you know use MSG_PEEK that these tests are
+>> exploiting.
+> 
+> Security is not that way of thinking.  Even when the bug is triggered
+> with unusual sequence of calls, it must be fixed, especially on a host
+> that could execute untrusted code.
+> 
+> 
+>>
+>> Plus if it is annoying to you just remove the feature from your private
+>> distribution and let the others decide for them selves.
+> 
+> If no one uses the feature that has bugs without maintenance,
+> it's natural to deprecate it.  Then, no one need to be burdened
+> by unnecessary bug fixes.
+> 
 
