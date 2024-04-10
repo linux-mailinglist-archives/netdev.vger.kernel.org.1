@@ -1,192 +1,160 @@
-Return-Path: <netdev+bounces-86644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 815F489FB40
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 17:14:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB3D489FB46
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 17:14:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4DEC1C21F84
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:14:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 908081C20BBA
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:14:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FFC516E86D;
-	Wed, 10 Apr 2024 15:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B22316EBF0;
+	Wed, 10 Apr 2024 15:12:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KRH0rJEh"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="RFNq99eP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557D516D9D6;
-	Wed, 10 Apr 2024 15:12:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A3116D9D6
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 15:12:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712761930; cv=none; b=rg7nMqQJFr+E86qzPsRiuKqUevbIqGVmcpovyI2B/w4HJjIcT0skxzXpxtLa15pbvuonEx1i0Ho35qgNIOONxsR4wX+E2oCzZCgaEHIpMgtoQHseyz2Nh2ZYaLcQ+FwGl99X9vHzIN6YBk7d5FIcUr5D4pNNqGxqgCcHhClvEqw=
+	t=1712761944; cv=none; b=VivNxIiUyylOycKiTrUigoAYqe/KIiD302yqTo7BSxzQoHP6q7cHPjMSJq4RcR2wdLtd55kdeUJVuY2X6I9WZD+/Jgj9MtXI1iNiT+jLxjYSXCkh45PklW2d6D6AyNyW9FOutXfpRTcsa7NNt9OPJuT5xyy19xo+h7fJDSvp/gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712761930; c=relaxed/simple;
-	bh=PnLlpX0dYoTh3H+VJ66VFsqkSeqUQJ+av22z2WeY/Vw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Fme7KYhi5BIy5PAI16W+BQuRdHaKwDDCQgkhRC7xut6Cy3H5ASFU/FJbgefyElUhEaLkH8ZioapXVBmHlck+a1GmFNzlJTqn3IiMpeF63/zRYGSgesz6z2ySksZmLGAB6iChXREGM/tmeZ9gVnZH+RAu3Eie+bWamiMe1lEagUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KRH0rJEh; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-78d5e80bc42so325571585a.0;
-        Wed, 10 Apr 2024 08:12:08 -0700 (PDT)
+	s=arc-20240116; t=1712761944; c=relaxed/simple;
+	bh=dro+vPCe2U+w0dBuIw0QsOIWpPz2nwt7smR+9wMhLjg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AMrgmY78UokFE7zjhuC7K2Q7iED5Amvl/cyw1rQl0Ea5FEPTeQkdEuzr79I2qL7JZARuURcWIrFPWSJmwMxBIARYoKArmeHYoHQSqKIZ9lDsWLBs6lWVGWvYfwisDfEtINSDsRRN6C7xz6kc15i3+2R5cg3DV2gU5OIgNkJxZpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=RFNq99eP; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4166d6dab3dso24381405e9.0
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 08:12:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712761927; x=1713366727; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0buxD5ergyhlwM/bRZhq0kApiLYLTYaqWVCh0lur+7o=;
-        b=KRH0rJEhqlmQ90CUCQF/L7ZUhbfpufi04WSvIQucnf4vb88pn3dKlcgLWUFeky97XP
-         QRIGJ4JMZ4YwK8NRQTSNbC9SQlYRqxONgWhTucdoIc+QurWaaWy1eqLcBC9yR2zbiZ54
-         uXFkBGP1X+bUc9ae90RwpP63Kj/+4pdpKPM5AUWgkufseRq7tf5naZP99BFlAF7bkN+W
-         URsZedJ/fZlEIFYWmIIVXuk1gs+B4XzX1/Kn13IRQne3iDtRG8bIL3neo1JMDLRkhYRz
-         ZKIZB++pQ+DPF5uGEEp/prf/MAIxeUHYB/DswHChaLA0C0F98XmG+ly6CvWLa2nRsikR
-         wfXA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712761941; x=1713366741; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=F7rN1y8Su7AEcLYNY+nm6JUkKcjJmsiVN5hdUvdf8WI=;
+        b=RFNq99ePoSZPB6XtKM96olsmSrDEGQPviojaumUunioloMe36R6ree8AkVuBoCIUG+
+         39h3aJQHFc0DuCjSkzGbxtnc1zKctAJ90ZZQ8m+EoMwuGEL7u1jg1gPYIhHwr4I5yTLU
+         jOJY5n+C+1eX/Ff9Ob03AKXaoZlC/YzhOw2nJ2XIb2jJ6UTJMZ5ZeNU+75Dp+4nNPRqn
+         ReMa3rIv0azQXD1idmAkeV7b+0WdQxnUjHJYWKkux9PzbgrKFulJd1tZmmYpNc4VO/1Z
+         0E3ERvs3vSV7huRfqkwNAd0u4i5BoeMO4626jgDEK6oiz7L6PAnRym1qUNEWpgbiDzXT
+         yybA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712761927; x=1713366727;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0buxD5ergyhlwM/bRZhq0kApiLYLTYaqWVCh0lur+7o=;
-        b=B4HHI1dMnb6+l+T+0ZBqTxrVZMaAYaAlxDNJ/s44D5SheADHC0/Ua7CqsPE8JidmDF
-         D7otlvPBmgnzREdc5lfBylQ2YdzpW5lgFn25U/ED7hSIfZUQ9yxc3VHlQo5DR1mMR1k+
-         p9GMj7ZA0mCHfUv3uiynzK/bIs6jPd8kAXin4nR08dvl/eNNvMVI2t7KQcIIinsNlSa5
-         gXTsASD+eEQC9fF/5JW5eQ00QYzlBsGeIMqrMt8oRIWNSXp3DDTZ1j5ckItSZuh5tPa8
-         uTY5Zl3Ci4vgYJzDC5N76TB+4nfvIur8qRJNNUdYoSPNWlSetX9pEn+6ZWRdqi+zYWdU
-         YpLw==
-X-Forwarded-Encrypted: i=1; AJvYcCUzfnquCbfq9s+ixeD6AtmwqMdZOocQKcHNibsJmtY+ai7pGzXz+Fnprjhg7uvzKimONFJdH/BXVTq/T09ZZ/bNItHy8GI7qYcrGiJ2dsXbhbIfVpy4V+D2BnsGXnDXIo+7+6Lv
-X-Gm-Message-State: AOJu0YwJTab4H0DcqqkJI7jUEEHdC6nRr9NNU1+LSsAi11IR2N+a8Dls
-	qCod4gTl6A+vgatENAqTt3+zTNedseh+skQUxaQdIiXEjtfFH/M9
-X-Google-Smtp-Source: AGHT+IHJoIt77ZZ/Sf8A2EyQW5gFaUj6YT0Erl2mWhULF1CQepi/9pSvO8uF7i1PtRhlCiuN+Gm9uw==
-X-Received: by 2002:a05:6214:c26:b0:698:f66f:bdf3 with SMTP id a6-20020a0562140c2600b00698f66fbdf3mr2930121qvd.28.1712761927259;
-        Wed, 10 Apr 2024 08:12:07 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id f4-20020ad45584000000b0069937049aadsm5178528qvx.88.2024.04.10.08.12.06
+        d=1e100.net; s=20230601; t=1712761941; x=1713366741;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F7rN1y8Su7AEcLYNY+nm6JUkKcjJmsiVN5hdUvdf8WI=;
+        b=qNl1k4Z5bocrGAjy4TNA/Rslp0X0bbvZcDZnuGQ2s4tVZPOA/DEwQZ90aQ/Kmqin1L
+         O4yBc/LOUYSTNfW6Aci6Qf6Qyv0sPXznK6XApP4fon2K4h4DqqTZspSId97qt3c+n0xu
+         FfDyWH0hlIt11r8doBrt40tcIMdkawWgSpOzPJCv0c2WCZ6WBLHierNeLv5JqL24Gl9W
+         kLc6FKyMX2X2MKR3UuoVla7ss87ofw8zMEE4wzAE+anfKyqSGMrClV1AY3OSmB6ysWUe
+         I79ua3hAXATFCMRO3mxhkzJhEWWWoJFfihnOYoDNbO1gOVjxDuH/3YGj5UB6UFeJSP+Y
+         GzuA==
+X-Forwarded-Encrypted: i=1; AJvYcCUTE+YztvNZ9hB8/Uv2HjRX09+fXxQR46YlLredDqP6ddv8BGUm8qgRivC+SO1Uc5xEvEykMbgUFjJzCio2mMXPhocaNzyh
+X-Gm-Message-State: AOJu0YyaR5jZDc5JG6JLqPMTccfhMkKSjPhNp9du3meQyYCdSPpCYVtk
+	V7Fvl85YSsB23qtm/YfVsGOoBMTSSCDUDIhy98T0v8NA+c5qlK7aUHB7mWRSbSc=
+X-Google-Smtp-Source: AGHT+IGfRdwp7YdHDmADXZUQcfeOK3231gjb7h18oltQrh9IKQ008j1dLXBNnVtlYrgVFmzwI3CjSQ==
+X-Received: by 2002:a05:600c:3ba5:b0:415:613b:6dc4 with SMTP id n37-20020a05600c3ba500b00415613b6dc4mr1898009wms.28.1712761940707;
+        Wed, 10 Apr 2024 08:12:20 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id p5-20020a05600c468500b004149536479esm2557042wmo.12.2024.04.10.08.12.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 08:12:06 -0700 (PDT)
-Date: Wed, 10 Apr 2024 11:12:06 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Lei Chen <lei.chen@smartx.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Lei Chen <lei.chen@smartx.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <6616ac464484f_2a98a52941f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240410042245.2044516-1-lei.chen@smartx.com>
-References: <20240410042245.2044516-1-lei.chen@smartx.com>
-Subject: Re: [PATCH v2] net:tun: limit printing rate when illegal packet
- received by tun dev
+        Wed, 10 Apr 2024 08:12:20 -0700 (PDT)
+Date: Wed, 10 Apr 2024 17:12:18 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: pabeni@redhat.com, John Fastabend <john.fastabend@gmail.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Edward Cree <ecree.xilinx@gmail.com>,
+	Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
+	bhelgaas@google.com, linux-pci@vger.kernel.org,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <ZhasUvIMdewdM3KI@nanopsycho>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <20240409135142.692ed5d9@kernel.org>
+ <ZhZC1kKMCKRvgIhd@nanopsycho>
+ <20240410064611.553c22e9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240410064611.553c22e9@kernel.org>
 
-For a next patch, include the target branch: [PATCH net-next v2]
+Wed, Apr 10, 2024 at 03:46:11PM CEST, kuba@kernel.org wrote:
+>On Wed, 10 Apr 2024 09:42:14 +0200 Jiri Pirko wrote:
+>> > - not get upset when we delete those drivers if they stop participating  
+>> 
+>> Sorry for being pain, but I would still like to see some sumarization of
+>> what is actually the gain for the community to merge this unused driver.
+>> So far, I don't recall to read anything solid.
+>
+>From the discussion I think some folks made the point that it's
+>educational to see what big companies do, and seeing the work
+>may lead to reuse and other people adopting features / ideas.
 
-Lei Chen wrote:
-> vhost_worker will call tun call backs to receive packets. If too many
-> illegal packets arrives, tun_do_read will keep dumping packet contents.
-> When console is enabled, it will costs much more cpu time to dump
-> packet and soft lockup will be detected.
-> 
-> net_ratelimit mechanism can be used to limit the dumping rate.
-> 
-> PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980"
->  #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
->  #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
->  #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
->  #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
->  #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
->     [exception RIP: io_serial_in+20]
->     RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
->     RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 0000000000000000
->     RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428a0
->     RBP: 0000000000002710   R8: 0000000000000004   R9: 000000000000000f
->     R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 0000000000000020
->     R13: ffffffff8acbf698  R14: 0000000000000058  R15: 0000000000000000
->     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
->  #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
->  #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
->  #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
->  #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
->  #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
->  #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
->  #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
->  #12 [ffffa65531497b68] printk at ffffffff89318306
->  #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
->  #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
->  #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
->  #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
->  #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
->  #18 [ffffa65531497f10] kthread at ffffffff892d2e72
->  #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
-> 
-> Signed-off-by: Lei Chen <lei.chen@smartx.com>
-
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-> 
-> ---
-> Changes from v1:
-> https://lore.kernel.org/all/20240409062407.1952728-1-lei.chen@smartx.com/
->  1. Use net_ratelimit instead of raw __ratelimit.
->  2. Use netdev_err instead of pr_err to print more info abort net dev.
->  3. Adjust git commit message to make git am happy.
-> 
->  drivers/net/tun.c | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 0b3f21cba552..ca9b4bc89de7 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -2125,14 +2125,16 @@ static ssize_t tun_put_user(struct tun_struct *tun,
->  					    tun_is_little_endian(tun), true,
->  					    vlan_hlen)) {
->  			struct skb_shared_info *sinfo = skb_shinfo(skb);
-> -			pr_err("unexpected GSO type: "
-> -			       "0x%x, gso_size %d, hdr_len %d\n",
-> -			       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
-> -			       tun16_to_cpu(tun, gso.hdr_len));
-> -			print_hex_dump(KERN_ERR, "tun: ",
-> -				       DUMP_PREFIX_NONE,
-> -				       16, 1, skb->head,
-> -				       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
-> +
-> +			if (net_ratelimit()) {
-> +				netdev_err(tun->dev, "unexpected GSO type: 0x%x, gso_size %d, hdr_len %d\n",
-> +				       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
-> +				       tun16_to_cpu(tun, gso.hdr_len));
-> +				print_hex_dump(KERN_ERR, "tun: ",
-> +					       DUMP_PREFIX_NONE,
-> +					       16, 1, skb->head,
-> +					       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
-> +			}
->  			WARN_ON_ONCE(1);
->  			return -EINVAL;
->  		}
-> 
-> base-commit: fec50db7033ea478773b159e0e2efb135270e3b7
-> prerequisite-patch-id: 8952e320c0272899e153c953db09446879ed0d87
-> prerequisite-patch-id: 2f1e3234a4ac0bf421df2061505612538f128672
-
-Where does this footer come from? Should not be present.
-
-> -- 
-> 2.44.0
-> 
+Okay, if that's all, does it justify the cons? Will someone put this on
+weights?
 
 
+>
+>> btw:
+>> Kconfig description should contain:
+>>  Say N here, you can't ever see this device in real world.
+>
+>We do use standard distro kernels in some corners of the DC, AFAIU.
+
+I find it amusing to think about a distro vendor, for example RedHat,
+to support driver for a proprietary private device.
+
+
+>
+>> >If you think that the drivers should be merged *without* setting these
+>> >expectations, please speak up.
+>> >
+>> >Nobody picked me up on the suggestion to use the CI as a proactive
+>> >check whether the maintainer / owner is still paying attention, 
+>> >but okay :(
+>> >
+>> >
+>> >What is less clear to me is what do we do about uAPI / core changes.
+>> >Of those who touched on the subject - few people seem to be curious /
+>> >welcoming to any reasonable features coming out for private devices
+>> >(John, Olek, Florian)? Others are more cautious focusing on blast
+>> >radius and referring to the "two driver rule" (Daniel, Paolo)?
+>> >Whether that means outright ban on touching common code or uAPI
+>> >in ways which aren't exercised by commercial NICs, is unclear.   
+>> 
+>> For these kind of unused drivers, I think it would be legit to
+>> disallow any internal/external api changes. Just do that for some
+>> normal driver, then benefit from the changes in the unused driver.
+>
+>Unused is a bit strong, and we didn't put netdevsim in a special
+>directory. Let's see if more such drivers appear and if there
+>are practical uses for the separation for scripts etc?
+
+The practical use I see that the reviewer would spot right away is
+someone pushes a feature implemented in this unused driver only.
+Say it would be a clear mark for a driver of lower category.
+For the person doing API change it would be an indication that he
+does not have that cautious to not to break anything in this driver.
+The driver maintainer should be the one to deal with potential issues.
+
+With this clear marking and Documentation to describe it, I think I
+would be ok to let this in, FWIW.
 
