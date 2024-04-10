@@ -1,89 +1,286 @@
-Return-Path: <netdev+bounces-86455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8291A89ED84
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:25:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 965ED89EDAD
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:34:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B429A1C20A10
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:25:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 082F21F21A34
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:34:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2588613D529;
-	Wed, 10 Apr 2024 08:25:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB1B15444A;
+	Wed, 10 Apr 2024 08:33:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="KDPNsaBu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cYJ/lPQY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF92713D28C;
-	Wed, 10 Apr 2024 08:25:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C90EAD0
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 08:33:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712737530; cv=none; b=o3jja0yQJpTEwB0rq26bhgi0WUADORTF5HRKXWB4svc7rcQzGRj/UVQxeidkgszKzEw7i2C9hGNYwRvyEsDoIRTlva14p/fjPBZGv8iowOHl+g6qTqSH9z3RiUbCvC+nVsYn234Cd0FOt8q5ypXEYaMOI0rORNWSvNrU1HymJQ8=
+	t=1712738039; cv=none; b=THbPBIMqyh0gVIeygqzyiDONTqcZb6lLPPDkBCBbseGK/Q9uf0zVMzvbIYCWGjhCBnh5D8+6wFU1BtHv+54CG081nHOei1Z867+G01ngrBFUqkXFIs3ealQ8deOlh5SRaE10grmQhfqXWr7ZHj4vojBKQyqPQWZGPlMixGwlLF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712737530; c=relaxed/simple;
-	bh=Dhybrf/jRqbpyhuhIWlZvPbxMVOS0VFGt4WJR1DnMNo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QEP5a3yxzv34+8rBOFqL+kaWJlP5HTWnRaoVzP7ghvAfZKIX8KB6tNHcy1Out81LnGIt7GsnbWtSIAm7v0vZcAou8KVmsUVdHsDhy58Bz3VmeMOf7OdyiAy08bjLgBXUPWhFhqUhF+srloiU6E3TaWjHlzbzLLh92UNo7PU5sec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=KDPNsaBu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 222B4C433F1;
-	Wed, 10 Apr 2024 08:25:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1712737529;
-	bh=Dhybrf/jRqbpyhuhIWlZvPbxMVOS0VFGt4WJR1DnMNo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KDPNsaBudn+n4+RXzxU38zA293P9i01hK4pr+EzsNlygvUAPOjzwvf/oUbikrXg95
-	 /N9KFTY1uuvoJgBUoJH4BkRDQEIr3X5LSBVt6P6w3X2XFz+Etf1/yCAYNPWYH2L813
-	 KkAO4Cql9cMJLXpMa0g0EbkaGil+/s1j6TdGGz4k=
-Date: Wed, 10 Apr 2024 10:25:26 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: Jakub Kicinski <kuba@kernel.org>, linux-usb@vger.kernel.org,
-	Li Yang <leoyang.li@nxp.com>, Zhang Wei <zw@zh-kernel.org>,
-	kernel@pengutronix.de, netdev@vger.kernel.org,
-	Shawn Guo <shawnguo@kernel.org>, linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH] MAINTAINERS: Drop Li Yang as their email address stopped
- working
-Message-ID: <2024041010-neuron-vividness-8202@gregkh>
-References: <20240405072042.697182-2-u.kleine-koenig@pengutronix.de>
- <20240409144204.00cc76ce@kernel.org>
- <u4bhjzjr4jjx26r3r4jupqd5u273xsvuyfzq5ecv6binoyoqzq@5zib23vgtlsx>
+	s=arc-20240116; t=1712738039; c=relaxed/simple;
+	bh=YQC7N8/VOpELgaWdx5gm8wOC8q9dKvBRRJpbqzd/fPg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=l90T6ybjutYBSqGAtpuHYHkRnyhrlggPeomjV8fh5CkBm9Cwx9sIgtYw83MO8qvk8eaVmBsNVnIszJWt9RA++UHWMcwKUp9lnmdqtXdO0h4mlK5yIhI1nkfXyMdjqZSgmv4vFU9ygBNG6QiMHan/XQ36N2CeU8VByxjUXLcwaWs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cYJ/lPQY; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712738036;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=cKvQy3maeOtyZ2KywgHESSRs2TunlrIU1XYxc2U3wgc=;
+	b=cYJ/lPQYOfv/qy6Et+CPjNWAkK44i31f+pzBlg36WJnlD50lB+IpG/ix6AkrfIOq89kI+R
+	Vv0pMODYLvnfpNzHzFucxqO1NXkpyLoWkmia/WuvXFxSYmdkbGzvZCI6uLCBdAlmrMqgf9
+	WM2ibf0ipvbbQDJGHQ6lkcFVGtwGgnM=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-627-tTVmJsFnOBeqpXJIupBbaQ-1; Wed, 10 Apr 2024 04:33:54 -0400
+X-MC-Unique: tTVmJsFnOBeqpXJIupBbaQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-344035328d9so839408f8f.0
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 01:33:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712738033; x=1713342833;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cKvQy3maeOtyZ2KywgHESSRs2TunlrIU1XYxc2U3wgc=;
+        b=XBwDU5PByW8ioxayiKbFsbB3ajJeHh9z09GRS/hsG5/AnJLiDBA3tRu2kqDiQAbT8g
+         6G/EfX+M02Oj2gMVaYTR9BONjnL1E4Kk2Zf6terzGbdVemqKYevLCKW+bam+hWcuxyDq
+         i8xhd7oO0C0LEVSyJ9CnshglzWFnfSPYUnMj/HP0UrTQRZHjCW/IDFpIL0ahie7f1a/U
+         Kj/SQqmCVw7rYR9IbBlLzFzKWn3QP3VFTUj9ffgBWfr31PFbPtQ7NGs3Tquyk5D1zzc/
+         sgLq7J2cJmc5/DvyB6jKTCNz2m9N+R+m0PiBOiR4opJZY1tDXy4xqLVc3o6oJnNNGIFa
+         Sx6w==
+X-Gm-Message-State: AOJu0YzlNaRYemVcAomwudv2tAqJjZ4mL78PCd86PtLWCLvpZSQQxwlh
+	t2pGMCyUnNK1fa+bNLNcUjhJVyR+jKjZpY9aex/o59/XqeDvuAUoJfo4x9G1krVZo9tbNHmIgEm
+	MHDPDFsIWF4K+G+kzzRvD0dIk04yMSUQc0QBp8psg+3IPOdZptH1BXKZOjNSFGQ==
+X-Received: by 2002:a5d:6da5:0:b0:346:6d9d:431a with SMTP id u5-20020a5d6da5000000b003466d9d431amr878025wrs.5.1712738032989;
+        Wed, 10 Apr 2024 01:33:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGlm7lLMlpZmfdF2NT/Ou9qgdIRBBHX07Cjn6aapfyEvNkVemQ88pBChWZXGCwPQStEOhuSOA==
+X-Received: by 2002:a5d:6da5:0:b0:346:6d9d:431a with SMTP id u5-20020a5d6da5000000b003466d9d431amr878005wrs.5.1712738032563;
+        Wed, 10 Apr 2024 01:33:52 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-233-180.dyn.eolo.it. [146.241.233.180])
+        by smtp.gmail.com with ESMTPSA id z11-20020a5d654b000000b003437fec702dsm13254570wrv.21.2024.04.10.01.33.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 01:33:52 -0700 (PDT)
+Message-ID: <91451f2da3dcd70de3138975ad7d21f0548e19c9.camel@redhat.com>
+Subject: Re: [RFC] HW TX Rate Limiting Driver API
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>, Madhu Chittim
+	 <madhu.chittim@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>
+Date: Wed, 10 Apr 2024 10:33:50 +0200
+In-Reply-To: <20240409153250.574369e4@kernel.org>
+References: <20240405102313.GA310894@kernel.org>
+	 <20240409153250.574369e4@kernel.org>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
+ 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
+ iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
+ sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <u4bhjzjr4jjx26r3r4jupqd5u273xsvuyfzq5ecv6binoyoqzq@5zib23vgtlsx>
 
-On Wed, Apr 10, 2024 at 08:42:06AM +0200, Uwe Kleine-König wrote:
-> On Tue, Apr 09, 2024 at 02:42:04PM -0700, Jakub Kicinski wrote:
-> > On Fri,  5 Apr 2024 09:20:41 +0200 Uwe Kleine-König wrote:
-> > > When sending a patch to (among others) Li Yang the nxp MTA replied that
-> > > the address doesn't exist and so the mail couldn't be delivered. The
-> > > error code was 550, so at least technically that's not a temporal issue.
-> > > 
-> > > Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> > 
-> > FWIW it's eaac25d026a1 in net, thanks!
-> 
-> Greg also picked it up, it's fbdd90334a6205e8a99d0bc2dfc738ee438f00bc in
-> https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-linus
-> . Both are included in next-20240410. I guess that's not a big problem.
-> (And please prevent that the patch is dropped from both trees as it's
-> already included in the other :-)
+On Tue, 2024-04-09 at 15:32 -0700, Jakub Kicinski wrote:
+> On Fri, 5 Apr 2024 11:23:13 +0100 Simon Horman wrote:
+> > /**
+> >  * enum shaper_lookup_mode - Lookup method used to access a shaper
+> >  * @SHAPER_LOOKUP_BY_PORT: The root shaper for the whole H/W, @id is un=
+used
+> >  * @SHAPER_LOOKUP_BY_NETDEV: The main shaper for the given network devi=
+ce,
+> >  *                           @id is unused
+> >  * @SHAPER_LOOKUP_BY_VF: @id is a virtual function number.
+> >  * @SHAPER_LOOKUP_BY_QUEUE: @id is a queue identifier.
+> >  * @SHAPER_LOOKUP_BY_TREE_ID: @id is the unique shaper identifier insid=
+e the
+> >  *                            shaper hierarchy as in shaper_info.id
+> >  *
+> >  * SHAPER_LOOKUP_BY_PORT and SHAPER_LOOKUP_BY_VF, SHAPER_LOOKUP_BY_TREE=
+_ID are
+> >  * only available on PF devices, usually inside the host/hypervisor.
+> >  * SHAPER_LOOKUP_BY_NETDEV is available on both PFs and VFs devices, bu=
+t
+> >  * only if the latter are privileged ones.
+>=20
+> The privileged part is an implementation limitation.=C2=A0
+> Limiting oneself
+> or subqueues should not require elevated privileges, in principle,
+> right?
 
-We already got a report from linux-next about this, it's fine, we will
-both keep it.
+The reference to privileged functions is here to try to ensure proper
+isolation when required.
 
-thanks,
+E.g. Let's suppose the admin in the the host wants to restricts/limits
+the B/W for a given VF (the VF itself, not the representor! See below
+WRT shaper_lookup_mode) to some rate, he/she likely wants intends
+additionally preventing the guest from relaxing the setting configuring
+the such rate on the guest device.
 
-greg k-h
+> >  * The same shaper can be reached with different lookup mode/id pairs,
+> >  * mapping network visible objects (devices, VFs, queues) to the schedu=
+ler
+> >  * hierarchy and vice-versa.
+>=20
+> :o
+>=20
+> > enum shaper_lookup_mode {
+> >     SHAPER_LOOKUP_BY_PORT,
+> >     SHAPER_LOOKUP_BY_NETDEV,
+> >     SHAPER_LOOKUP_BY_VF,
+> >     SHAPER_LOOKUP_BY_QUEUE,
+> >     SHAPER_LOOKUP_BY_TREE_ID,
+>=20
+> Two questions.
+>=20
+> 1) are these looking up real nodes or some special kind of node which
+> can't have settings assigned directly?=C2=A0
+> IOW if I want to rate limit=20
+> the port do I get + set the port object or create a node above it and
+> link it up?
+
+There is no concept of such special kind of nodes. Probably the above
+enum needs a better/clearer definition of each element.
+How to reach a specific configuration for the port shaper depends on
+the NIC defaults - whatever hierarchy it provides/creates at
+initialization time.=C2=A0
+
+The NIC/firmware can either provide a default shaper for the port level
+- in such case the user/admin just need to set it. Otherwise user/admin
+will have to create the shaper and link it.
+
+I guess the first option should be more common/the expected one.
+
+This proposal allows both cases.
+
+> Or do those special nodes not exit implicitly (from the example it
+> seems like they do?)
+
+Could you please re-phrase the above?
+
+> 2) the objects themselves seem rather different. I'm guessing we need
+> port/netdev/vf because either some users don't want to use switchdev
+> (vf =3D repr netdev) or drivers don't implement it "correctly" (port !=3D
+> netdev?!)?
+
+Yes, the nodes inside the hierarchy can be linked to very different
+objects. The different lookup mode are there just to provide easy
+access to relevant objects.
+
+Likely a much better description is needed:  'port' here is really the
+cable plug level, 'netdev' refers to the Linux network device. There
+could be multiple netdev for the same port as 'netdev' could be either
+referring to a PF or a VFs. Finally VF is really the virtual function
+device, not the representor, so that the host can configure/limits the
+guest tx rate.=20
+
+The same shaper can be reached/looked-up with different ids.
+
+e.g. the device level shaper for a virtual function can be reached
+with:
+
+- SHAPER_LOOKUP_BY_TREE_ID + unique tree id (every node is reachable
+this way) from any host device in the same hierarcy
+- SHAPER_LOOKUP_BY_VF + virtual function id, from the host PF device
+- SHAPER_LOOKUP_BY_NETDEV, from the guest VF device
+
+> Also feels like some of these are root nodes, some are leaf nodes?
+
+There is a single root node (the port's parent), possibly many internal
+nodes (port, netdev, vf, possibly more intermediate levels depending on
+the actual configuration [e.g. the firmware or the admin could create
+'device groups' or 'queue groups']) and likely many leave nodes (queue
+level).
+
+My personal take is than from an API point of view differentiating
+between leaves and internal nodes makes the API more complex with no
+practical advantage for the API users.
+
+> > };
+> >=20
+> >=20
+> > /**
+> >  * struct shaper_ops - Operations on shaper hierarchy
+> >  * @get: Access the specified shaper.
+> >  * @set: Modify the specifier shaper.
+> >  * @move: Move the specifier shaper inside the hierarchy.
+> >  * @add: Add a shaper inside the shaper hierarchy.
+> >  * @delete: Delete the specified shaper .
+> >  *
+> >  * The netdevice exposes a pointer to these ops.
+> >  *
+> >  * It=E2=80=99s up to the driver or firmware to create the default shap=
+ers hierarchy,
+> >  * according to the H/W capabilities.
+> >  */
+> > struct shaper_ops {
+> > 	/* get - Fetch the specified shaper, if it exists
+> > 	 * @dev: Netdevice to operate on.
+> > 	 * @lookup_mode: How to perform the shaper lookup
+> > 	 * @id: ID of the specified shaper,
+> > 	 *      relative to the specified @lookup_mode.
+> > 	 * @shaper: Object to return shaper.
+> > 	 * @extack: Netlink extended ACK for reporting errors.
+> > 	 *
+> > 	 * Multiple placement domain/id pairs can refer to the same shaper.
+> > 	 * And multiple entities (e.g. VF and PF) can try to access the same
+> > 	 * shaper concurrently.
+> > 	 *
+> > 	 * Values of @id depend on the @access_type:
+> > 	 * * If @access_type is SHAPER_LOOKUP_BY_PORT or
+> > 	 *   SHAPER_LOOKUP_BY_NETDEV, then @placement_id is unused.
+> > 	 * * If @access_type is SHAPER_LOOKUP_BY_VF,
+> > 	 *   then @id is a virtual function number, relative to @dev
+> > 	 *   which should be phisical function
+> > 	 * * If @access_type is SHAPER_LOOKUP_BY_QUEUE,
+> > 	 *   Then @id represents the queue number, relative to @dev
+> > 	 * * If @access_type is SHAPER_LOOKUP_BY_TREE_ID,
+> > 	 *   then @id is a @shaper_info.id and any shaper inside the
+> > 	 *   hierarcy can be accessed directly.
+> > 	 *
+> > 	 * Return:
+> > 	 * * %0 - Success
+> > 	 * * %-EOPNOTSUPP - Operation is not supported by hardware, driver,
+> > 	 *		    or core for any reason. @extack should be set
+> > 	 *		    to text describing the reason.
+> > 	 * * Other negative error value on failure.
+> > 	 */
+> > 	int (*get)(struct net_device *dev,
+> > 		   enum shaper_lookup_mode lookup_mode, u32 id,
+> >                    struct shaper_info *shaper, struct netlink_ext_ack *=
+extack);
+>=20
+> How about we store the hierarchy in the core?
+> Assume core has the source of truth, no need to get?
+
+One design choice was _not_ duplicating the hierarchy in the core: the
+full hierarchy is maintained only by the NIC/firmware.=C2=A0The NIC/firmwar=
+e
+can perform some changes "automatically" e.g. when adding or deleting
+VFs or queues it will likely create/delete the paired shaper. The
+synchronization looks cumbersome and error prone.
+
+The hierarchy could be exposed to both host and guests, I guess only
+the host core could be the source of truth, right?
+
+
+Thanks for the feedback,
+
+Paolo
+
 
