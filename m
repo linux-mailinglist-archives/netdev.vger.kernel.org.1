@@ -1,131 +1,118 @@
-Return-Path: <netdev+bounces-86713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D34498A006C
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:16:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D38A8A0084
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:20:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E2CC288A1D
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 19:16:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6AF1AB21BDD
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 19:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8297B180A9F;
-	Wed, 10 Apr 2024 19:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DF3E181304;
+	Wed, 10 Apr 2024 19:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QWh3ApwF"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jnBOFofu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC5E1802CF;
-	Wed, 10 Apr 2024 19:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D857BA39;
+	Wed, 10 Apr 2024 19:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712776575; cv=none; b=B6J/Nk3NSz6Zl0oF4+JGKKRqc1PU1ff116luUV31G8JOb0rWc2IbLt0z0UQV7lWXMq7tT+bR0V+TvwGLQBQxhBiWFa9sUUhK+uUE6XZN1ACr1iOZZ23cbVYFzCQNybiMhaozkjfZeD3A6WbMHbSa+3jbp+kbWqHhlAMrobA6VYQ=
+	t=1712776814; cv=none; b=fmduH/mz10T9PFHOh+46UPZ+eOVPSIzKyXpTtwcUDYL/aLH5Tx9AjUGkxKI52isrzcHppF3Z985VqPdDrRN1y5qINDf/MZfynBuDujkcXxuYUDnn2DALmRvaX8z1buZVVoJluVfpUXdEVZuURzy6DiLqPwrsKuG6mr4qbL7tozY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712776575; c=relaxed/simple;
-	bh=N3eMWVi75+MA86c+aJe5TeWSasUakhFVRf4PZ2GV+P8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OHUzyGpNBJdwnBlpR7Bmmv3f/HQlN22pszrwWCDkrGvLLlUh3Ihhbx6GRkMfayx8IuuxSopFJDdRs86HW5hjGDPfNPlmBMythrhFyDISf2UEp/xuhcAoPuUc2OFaWEuvwZ8c8belRpGcJR/gHbqttBrvSNmQURa4UxhmMMu9d9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QWh3ApwF; arc=none smtp.client-ip=209.85.221.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-4da702e48e0so3033828e0c.0;
-        Wed, 10 Apr 2024 12:16:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712776573; x=1713381373; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=BpSOzU15LzKweAegnrAsIh5K/sd1ekTGfCpD+wWSpac=;
-        b=QWh3ApwFb02bdqcOF8zTKLtwoZUo/Fw93sZIPZlOwwkFFRb2L9IsPox2LqpJVqhau6
-         jLyisMvW6WrZZNOzL3IJ9k1rNmaLqEZXuNBuTV8RAMgxG6caKD2/ieg/G9pVKDshMiqw
-         dF7v5EXKnyltxjMJOLChBJlpna9hpMbkYR03ZywiNcCpIHkv91XJKWTJX49+xOLh0Iql
-         bQCpjRbaPK27+GgL4Eenw94xhpJVhMlT2FfmEl/WiaUGHkFAsnW3WzqGaf9chrga7Wol
-         3FyRAZ4v6FUnwThtrfgJ8v6+t6k8bQknjEH/GT3AFTx4dtvH29Qt8040jlsB1IdfQ0gL
-         6v6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712776573; x=1713381373;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BpSOzU15LzKweAegnrAsIh5K/sd1ekTGfCpD+wWSpac=;
-        b=QpiBhwgGLvjjyzcGIEgIAc9Ze8GA199YZZRwpCKrVpKo/DLAa23WfJ6a+jVHfsjlb9
-         VNcAbndxYbZmCng/wrbSFoTq/PZfAQleACAdYtj1/MlmIRASk2j3uWr3gdkVQyze5SB/
-         IMc5zP2R504awKNbQ3PowTU9j4B0b4c7guNSObvH7gWM0QD3W+UzbMNS9XKrxehAYVVx
-         C8fYERiUrkqEOMOCwaFWSzHLHMJPHzW9BYFc0H6/KRiEtfuaKgu5NomQUmVrJdW+I+ez
-         yFweY3GdMD3z8yGf5VZY+5gbPtmH8Xn4iC6Auuv7fbObk0wEEB63Jz3OoYKw1A3FedG7
-         sY7w==
-X-Forwarded-Encrypted: i=1; AJvYcCX/M8KBdCpoiA2Bjo3pjmg97GXab9FIQw+trDoJFq0GkeHTBOd1hF/lE15SKKirhFlGH9umcc3YyKfUu5jL89ZvhVeiRUFb
-X-Gm-Message-State: AOJu0YzPJw7Q8BCfn/T4SJ+jwE5JnKolh9DtEoleJSjmX/lbnNcdtmS3
-	tzqsOutHP8UoWpSPjkpLRQdeOE5Y5kW0aKzKHp7s5GPJFaPXNLKh
-X-Google-Smtp-Source: AGHT+IFHRjFkE9KByYgCvObvf3f7ksWVv9j/dH67V+lePm8YK7b2QA5nG9xG4KTV7kAEgN44mPt06g==
-X-Received: by 2002:a05:6122:1795:b0:4d8:797b:94df with SMTP id o21-20020a056122179500b004d8797b94dfmr4261683vkf.2.1712776572666;
-        Wed, 10 Apr 2024 12:16:12 -0700 (PDT)
-Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id eq15-20020a056122398f00b004d895c72d56sm1524223vkb.50.2024.04.10.12.16.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 12:16:12 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-04-10
-Date: Wed, 10 Apr 2024 15:16:10 -0400
-Message-ID: <20240410191610.4156653-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1712776814; c=relaxed/simple;
+	bh=l9o/uTy+0cwr3zODJ1peUNnlmhVhrhKvdmKJKAavIUs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rOPXaG+lFj4HCODm5gCqk9e+ta4ldlObuRxbYgx5aNt8zXgSOUknf0hJyv0EhwemBP021nejDaapM0tpsTdLk4kPa0gzxlh8g+oaNABJ93pvCwoI0V0h4V4H+zmJbQle4n+TBPoNd8cWJIar1Wi2HwtbJ0Q/pMt315JRMeE436I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jnBOFofu; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=dd1aVZalUKuA+B9so3sWEVj2LqaGyKO5Aioahoz1vu8=; b=jnBOFofuCRHm+O8XMCs99fUn+L
+	UXp75jYAtDxJlu/wtMb4foX7uSRRD+Q+TwX+nFozurCdwnW8f4TJw0fhYisFCNbgE8TlvJrWRJRl8
+	+qHegzmIZKXaqDrVHvrE4X/DZnbbdHlNKL879QPzG33DfG8e/YHsp8uqcl9kUOrIf0DeyZMlAVa5O
+	pb0kM09fXSNtS7935t6ShX040phZEI0K+QxhJLXNfRgpiVuKwueeSBF+TNkbXcN4m35qjxnMErYyN
+	rpP/4SIGhD8z5sdcmBfKPf3om8cujhnuVjHkociKGNJS6mN2Sld8TTFard2pldEdDHcQBpiyrDZrn
+	h7PnNJkg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33334)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rudU9-0008QF-1o;
+	Wed, 10 Apr 2024 20:19:53 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rudU6-0006Cb-09; Wed, 10 Apr 2024 20:19:50 +0100
+Date: Wed, 10 Apr 2024 20:19:49 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Romain Gantois <romain.gantois@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Magnus Damm <magnus.damm@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v2 3/5] net: stmmac: dwmac-socfpga: use
+ pcs_init/pcs_exit
+Message-ID: <ZhbmVVXgu27ZZaNf@shell.armlinux.org.uk>
+References: <20240409-rzn1-gmac1-v2-0-79ca45f2fc79@bootlin.com>
+ <20240409-rzn1-gmac1-v2-3-79ca45f2fc79@bootlin.com>
+ <20240409183404.7d3eb04f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240409183404.7d3eb04f@kernel.org>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-The following changes since commit 19fa4f2a85d777a8052e869c1b892a2f7556569d:
+On Tue, Apr 09, 2024 at 06:34:04PM -0700, Jakub Kicinski wrote:
+> On Tue, 09 Apr 2024 11:21:46 +0200 Romain Gantois wrote:
+> > +	struct regmap_config pcs_regmap_cfg = {
+> > +		.reg_bits = 16,
+> > +		.val_bits = 16,
+> > +		.reg_shift = regmap_upshift(1),
+> 
+> This appears to displease the compiler:
+> 
+> drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c:389:16: error: call to undeclared function 'regmap_upshift'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+>   389 |                 .reg_shift = regmap_upshift(1),
+>       |                              ^
 
-  r8169: fix LED-related deadlock on module removal (2024-04-10 10:44:29 +0100)
+Yes, annoyingly I accidentally it 'u' instead of 'y' in vi which
+lower-cased the entire function, and didn't realise before sending the
+patch as a theoretical solution to Romain. After build-testing it locally
+I did notice it. I would've thought that Romain would've build-tested
+before sending out his patch set and would've fixed it up... I didn't
+have time to properly fix up my patch (essentially would've ment
+redoing the edits from scratch to ensure that it was correct.) Still
+don't have time to do that. Sorry.
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-04-10
-
-for you to fetch changes up to 600b0bbe73d3a9a264694da0e4c2c0800309141e:
-
-  Bluetooth: l2cap: Don't double set the HCI_CONN_MGMT_CONNECTED bit (2024-04-10 15:10:16 -0400)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
-  - L2CAP: Don't double set the HCI_CONN_MGMT_CONNECTED bit
-  - Fix memory leak in hci_req_sync_complete
-  - hci_sync: Fix using the same interval and window for Coded PHY
-  - Fix not validating setsockopt user input
-
-----------------------------------------------------------------
-Archie Pusaka (1):
-      Bluetooth: l2cap: Don't double set the HCI_CONN_MGMT_CONNECTED bit
-
-Dmitry Antipov (1):
-      Bluetooth: Fix memory leak in hci_req_sync_complete()
-
-Luiz Augusto von Dentz (7):
-      Bluetooth: ISO: Don't reject BT_ISO_QOS if parameters are unset
-      Bluetooth: hci_sync: Fix using the same interval and window for Coded PHY
-      Bluetooth: SCO: Fix not validating setsockopt user input
-      Bluetooth: RFCOMM: Fix not validating setsockopt user input
-      Bluetooth: L2CAP: Fix not validating setsockopt user input
-      Bluetooth: ISO: Fix not validating setsockopt user input
-      Bluetooth: hci_sock: Fix not validating setsockopt user input
-
- include/net/bluetooth/bluetooth.h |  9 +++++++
- net/bluetooth/hci_request.c       |  4 ++-
- net/bluetooth/hci_sock.c          | 21 ++++++----------
- net/bluetooth/hci_sync.c          |  6 ++---
- net/bluetooth/iso.c               | 46 +++++++++++++++-------------------
- net/bluetooth/l2cap_core.c        |  3 +--
- net/bluetooth/l2cap_sock.c        | 52 +++++++++++++++------------------------
- net/bluetooth/rfcomm/sock.c       | 14 ++++-------
- net/bluetooth/sco.c               | 23 ++++++++---------
- 9 files changed, 79 insertions(+), 99 deletions(-)
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
