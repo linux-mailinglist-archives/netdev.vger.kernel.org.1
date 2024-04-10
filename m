@@ -1,102 +1,92 @@
-Return-Path: <netdev+bounces-86418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86419-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C728C89EBE5
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:27:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD9C489EBFF
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:30:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 044831C218A6
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:27:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 962D9283517
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:30:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA8413C9A5;
-	Wed, 10 Apr 2024 07:27:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8DD13D256;
+	Wed, 10 Apr 2024 07:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YbL/KKXs"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71CDB13CFAC
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 07:27:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B4913CFA1
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 07:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712734039; cv=none; b=rx6AcNLgcOpReV4BbHUCOPK8GGwAOZYD4uJcgvfvCIugSv0c0C0mEVgz8MV67Bdzd0B8pzquTU+amGWbIUUO2+r/B5Po0GgKkhdMKbEWzOPFuHzS+liJBykOVbvWRhu/ygHneD8Hq6dgmE81EIDm9WTw+iHh5EZ7AnjLHeT48nE=
+	t=1712734227; cv=none; b=LppSOzf1Id8BQ6bmj0MkchGw54FLF3s83zQQp+8Czsq/5FGa2IOFrBCVRek6csSE242TFGXaLVVSs6txaQzh/ubQTCYBl6aB3H2y3Jdnqx7qtkBmEiacX+xAGfNxdJ6DQxn8kgy1vFeHsTYBsHzckbG/SUKbftnDAZrQZhfw1OM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712734039; c=relaxed/simple;
-	bh=Axk5w7oiky9Hhs0dRsLltIaPpNCc3SGBAiYSkJ5A8KI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=QyTkBeNJU/xxUScjwbpfzGh+40y+S3ZIglMiZO4V6qzB7PE+/fr8NKZkyUQJM8bNIvnXVMAMmyc9P6SOMLFZphNwjEfXyLAA8G5CYME+CsWO7Omyy1hg9B91KT+h83UhpzTEPU0FVLpXPzJr+wX8TDAn8pzqZkPWg8BXsDFAqgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-604-7cVesN8YPdi5fwCdLxmTDw-1; Wed,
- 10 Apr 2024 03:27:14 -0400
-X-MC-Unique: 7cVesN8YPdi5fwCdLxmTDw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 218783800096;
-	Wed, 10 Apr 2024 07:27:14 +0000 (UTC)
-Received: from hog (unknown [10.39.192.7])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9FF0240B4983;
-	Wed, 10 Apr 2024 07:27:12 +0000 (UTC)
-Date: Wed, 10 Apr 2024 09:26:51 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: Antony Antony <antony@phenome.org>,
-	Antony Antony <antony.antony@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	devel@linux-ipsec.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v6] xfrm: Add Direction to the
- SA in or out
-Message-ID: <ZhY_O_6w1Yz_R6aS@hog>
-References: <a53333717022906933e9113980304fa4717118e9.1712320696.git.antony.antony@secunet.com>
- <ZhBzcMrpBCNXXVBV@hog>
- <ZhJX-Rn50RxteJam@Antony2201.local>
- <ZhPq542VY18zl6z3@hog>
- <658b4081-bc8a-4958-ae62-7d805fcacdcd@6wind.com>
+	s=arc-20240116; t=1712734227; c=relaxed/simple;
+	bh=ztxDn4fas7IPy5ph0fnOURmNjydalmi2bul+yxZwcQw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=B37gwoxXSWNjbxGWZF+qq4g3Vbsuf2b0qxUGDG5Yk6ZXTtZ6ogwMC+K9WE8vk7MkOD6YdSG4R6QBKemIznX5+hJYHZURGB7+ti1c9I9oZTVPSgsW8ZuJtShJBOFdmo+IVuc2IyIU/GpTuN12HlmN6rwhOSetPKYhS4xJa8YzhGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YbL/KKXs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4D763C43390;
+	Wed, 10 Apr 2024 07:30:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712734227;
+	bh=ztxDn4fas7IPy5ph0fnOURmNjydalmi2bul+yxZwcQw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YbL/KKXszW1wFoD+qdx20DP5DI9ETxGSudZdK/y0v3NeqRH20/rg3U+gvvkCQCQra
+	 eN+tBGX6xKCcFHZwDg6iEkyn+yvbU9gs2zVhcPHYQmrrXGn61nin32Wj45cNAnJq5F
+	 We6gmqHejYMoIJUhM6IMYkqncFTcmiN92JigGHimzHH+W74PYfFPtW0K7tbMY++MR/
+	 7CjnVlYLU0VNccD9wuLfJEyUouerdyAry0meZOUHJMOhoKTzpsobEg8R8Ce91X2Cxd
+	 KFW3MWuf8nf4G3n3iWwb/I/dzkfJZxm0w6g0Tyo93Zfflvyop2m/9jQzqr1fxwwg+E
+	 HKb+6lq/jmsaw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3724BD60312;
+	Wed, 10 Apr 2024 07:30:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <658b4081-bc8a-4958-ae62-7d805fcacdcd@6wind.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: sched: cls_api: fix slab-use-after-free in
+ fl_dump_key
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171273422722.9319.15926353601229442056.git-patchwork-notify@kernel.org>
+Date: Wed, 10 Apr 2024 07:30:27 +0000
+References: <20240408134817.35065-1-jianbol@nvidia.com>
+In-Reply-To: <20240408134817.35065-1-jianbol@nvidia.com>
+To: Jianbo Liu <jianbol@nvidia.com>
+Cc: netdev@vger.kernel.org, ast@fiberby.net, davem@davemloft.net,
+ marcelo.leitner@gmail.com, horms@kernel.org, cratiu@nvidia.com
 
-2024-04-10, 08:27:49 +0200, Nicolas Dichtel wrote:
-> Le 08/04/2024 =C3=A0 15:02, Sabrina Dubroca a =C3=A9crit=C2=A0:
-> [snip]
-> > Nicolas, since you were objecting to the informational nature of the
-> > attribute in v5: would you still object to the new attribute (and not
-> > just limited to offload cases) if it properly restricted attributes
-> > that don't match the direction?
-> It's a good step, sure. Does this prevent an 'input' SA to be used in the=
- output
-> path? This is the case I'm objecting.
+Hello:
 
-Not in the latest version, what we were discussing here was only
-checking attributes that don't match the direction of the SA.
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Adding checks on the input and output patch to only look up and use
-SAs with the correct direction (or no direction set) should be doable,
-and probably has a negligible impact on performance. If we do this, we
-should maybe add a counter for direction mismatch
-(Xfrm{In,Out}StateDirMismatch?) to help admins.
+On Mon, 8 Apr 2024 16:48:17 +0300 you wrote:
+> The filter counter is updated under the protection of cb_lock in the
+> cited commit. While waiting for the lock, it's possible the filter is
+> being deleted by other thread, and thus causes UAF when dump it.
+> 
+> Fix this issue by moving tcf_block_filter_cnt_update() after
+> tfilter_put().
+> 
+> [...]
 
-I agree that it would make more sense.
+Here is the summary with links:
+  - [net-next] net: sched: cls_api: fix slab-use-after-free in fl_dump_key
+    https://git.kernel.org/netdev/net-next/c/2ecd487b670f
 
---=20
-Sabrina
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
