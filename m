@@ -1,100 +1,115 @@
-Return-Path: <netdev+bounces-86737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86738-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5D368A01DE
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:20:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E72D48A01E3
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:20:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D6BAD1C21AE6
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:20:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A01AA288DEC
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:20:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 885441836E1;
-	Wed, 10 Apr 2024 21:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B4D1836EF;
+	Wed, 10 Apr 2024 21:20:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YgF08dYE"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="FwHViD6I";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="TNxLVhfT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52EC31836D6;
-	Wed, 10 Apr 2024 21:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613CA1836E0;
+	Wed, 10 Apr 2024 21:20:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712784030; cv=none; b=RYuYFEPh7cEgj0WkAE6n/yhe3IHEKr63M0W45R/ON1kivoatn+4nBrC5AcTpUwHaP4SNZLjlPpYqtYVxIC6pHGNMDc+dVt4sLBsiophyAcYUNF7J7uO/SfcjVb55wJiG/3JWeybUptcr2DRK6MLs4ASSJWD80d3q6E5WDuwfRxQ=
+	t=1712784048; cv=none; b=ohQeQS6ggrSH4r+FVqBQyKsSf2JO5AF4GpzrY1rjEpD1M9QCo5dbtBaV5fL6grJvpqe+7PAprMdrlKwGlSWhtxKEHTm/tGgIQs+s09iZ7aOrY4a8e5z7wtRAPpocVrluXGdrI8uM7066gINgHx8V/oWL9PJIN1rvX1cTJxCJNl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712784030; c=relaxed/simple;
-	bh=I8rt88j/K6xT26aoxxh7wz7o02RbdPxTDHlEEqGV5Wk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=A2i0mqQPCWjiKBoiwpdkdCNcbs4SxPoz+tcrlKfj9vY22JELzUztAZJQOffk5pEZvtVeSgV83unzl719xrj+BBhpcxlefG1v8rEglQGgCiK95zpmUX3wOsBVUgucmr3plAkHN4udX+mvL+Y4Wdnh/i7EBHja3L7kBPu+rKMztOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YgF08dYE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B95AAC43390;
-	Wed, 10 Apr 2024 21:20:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712784029;
-	bh=I8rt88j/K6xT26aoxxh7wz7o02RbdPxTDHlEEqGV5Wk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YgF08dYEqet4XMOlNpOO/v6j/nNukHNjCwjelIgTxWKhAWAw4pV+qIPvLjBlzZhM9
-	 c7Vq6gIcVvZqlhb0PtkUvKjaa65hkjZJvscPAi45oOv1xm1jvPg5pZgAuyTbbU7fO6
-	 ICBnQadiz1jcTiYMYsLD/57CYpdBulpUdS4HHXo69SEwMU6tiTcmIsxzIlXwh8TnOZ
-	 gejwAAdbhRoH8U2X7afHtPk/+N5MP5iMdnWtjDOv2yk7K1sNvT/UyKtBrMuP1UnvVN
-	 4VQ7TklXwo83hX8jgLNai0DuvzfI5d1y+wvVXyusC9Gn8v77JaVEHq1lMTWrHJyDWT
-	 W2S4vXg5QSSQA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AF45DC395F8;
-	Wed, 10 Apr 2024 21:20:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1712784048; c=relaxed/simple;
+	bh=yZahjj479XacXe+rCfUPbnex64OHH7QkFDRhj0D3+IY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=VIlPaWxQ7Vx2uACWdB9wwuWwqaes+yeai+j/Rp//Cg7j3+7Fe9/Wh0PpH9HQekdawCASodRGBg1fRBUfY0gAlRxOMYAuw+8XpVFLt7qCw4gqBF6lpy3kuyfs4cIOZZmVIM+wPX7Nto5Lwa78/0t2I7JJQPy1qt4mUc3Jho/yb0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=FwHViD6I; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=TNxLVhfT; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1712784045;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=g6ekiFLA/bmLDiyq+3gVUA+kaAF0OcFabHDmCSx7h2A=;
+	b=FwHViD6IqUH6Dt4mypFv+cxXod1xbN1HB4zKr64xGYPMeUgzzfMUVoJ3kvd+VB2CvQpdqb
+	fHo+D2Hfhz+bnR9R4itTegQZbQC9gWjqfNAP97Llf0WXcwoDD5xaImLbrPk+rqf6FjuFyB
+	fHpeCmy15bhH+oQNJH7DqekBYuMT//0O0aXrqBfHWIoAPFByXVaF9lHZVB2LgJDfSvlr0O
+	xM9V1b7QNSNIm8LxQB3w5XPt/I8/WZ58t03zkl9PF+P+kz8pp+8somxMWj8WR2dOCLhV3k
+	9zeaX8Ie/CHyXq55h5LUCieWmzP0hClz+gEEztT1OutcdXmqjLFiHcEhoESLog==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1712784045;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=g6ekiFLA/bmLDiyq+3gVUA+kaAF0OcFabHDmCSx7h2A=;
+	b=TNxLVhfTSGEjRdOUAJEdbT0v1iAfoxcexXJbxNXc0RJ2rOoS0urv9iS637SyXee84icb4A
+	v2DWCNmgXp4sKaDg==
+To: lakshmi.sowjanya.d@intel.com, jstultz@google.com, giometti@enneenne.com,
+ corbet@lwn.net, linux-kernel@vger.kernel.org
+Cc: x86@kernel.org, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, andriy.shevchenko@linux.intel.com,
+ eddie.dong@intel.com, christopher.s.hall@intel.com,
+ jesse.brandeburg@intel.com, davem@davemloft.net,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ mcoquelin.stm32@gmail.com, perex@perex.cz, linux-sound@vger.kernel.org,
+ anthony.l.nguyen@intel.com, peter.hilber@opensynergy.com,
+ pandith.n@intel.com, subramanian.mohan@intel.com,
+ thejesh.reddy.t.r@intel.com, lakshmi.sowjanya.d@intel.com
+Subject: Re: [PATCH v6 01/11] x86/tsc: Add base clock properties in
+ clocksource structure
+In-Reply-To: <20240410114828.25581-2-lakshmi.sowjanya.d@intel.com>
+References: <20240410114828.25581-1-lakshmi.sowjanya.d@intel.com>
+ <20240410114828.25581-2-lakshmi.sowjanya.d@intel.com>
+Date: Wed, 10 Apr 2024 23:20:44 +0200
+Message-ID: <87frvs3oer.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/4] selftests: move bpf-offload test from bpf to net
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171278402971.16914.2708494251817673120.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Apr 2024 21:20:29 +0000
-References: <20240409031549.3531084-1-kuba@kernel.org>
-In-Reply-To: <20240409031549.3531084-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, bpf@vger.kernel.org, andrii@kernel.org, mykolal@fb.com,
- eddyz87@gmail.com, shuah@kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain
 
-Hello:
+On Wed, Apr 10 2024 at 17:18, lakshmi.sowjanya.d@intel.com wrote:
+> From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
+>
+> Add base clock hardware abstraction in clocksource structure.
+>
+> Add clocksource ID for x86 ART(Always Running Timer). The newly added
+> clocksource ID and conversion parameters are used to convert time in a
+> clocksource domain to base clock and vice versa.
+>
+> Convert the base clock to the system clock using convert_base_to_cs() in
+> get_device_system_crosststamp().
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+In https://lore.kernel.org/all/875xxhi1ty.ffs@tglx I asked you to
+provide a change log which explains the WHY and not the WHAT. The new
+change log still fails to explain WHY this change is needed and which
+problem it is trying to solve.
 
-On Mon,  8 Apr 2024 20:15:45 -0700 you wrote:
-> The test_offload.py test fits in networking and bpf equally
-> well. We started adding more Python tests in networking
-> and some of the code in test_offload.py can be reused,
-> so move it to networking. Looks like it bit rotted over
-> time and some fixes are needed.
-> 
-> Admittedly more code could be extracted but I only had
-> the time for a minor cleanup :(
-> 
-> [...]
+I further asked you to do:
 
-Here is the summary with links:
-  - [net-next,1/4] selftests: move bpf-offload test from bpf to net
-    https://git.kernel.org/netdev/net-next/c/e59f0e93e92e
-  - [net-next,2/4] selftests: net: bpf_offload: wait for maps
-    https://git.kernel.org/netdev/net-next/c/fc50c698c28b
-  - [net-next,3/4] selftests: net: declare section names for bpf_offload
-    https://git.kernel.org/netdev/net-next/c/b1c2ce11d428
-  - [net-next,4/4] selftests: net: reuse common code in bpf_offload
-    https://git.kernel.org/netdev/net-next/c/6ce2b689932b
+    1) Add the clocksource_base struct and provide the infrastructure in
+       get_device_system_crosststamp()
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+    2) Make TSC/ART use it
 
+But this still does #1 and #2 in one go.
 
+If you don't understand my review comments, then please ask. If you
+disagree with them then please tell me and argue with me.
+
+Just ignoring them is not an option.
+
+Thanks,
+
+        tglx
 
