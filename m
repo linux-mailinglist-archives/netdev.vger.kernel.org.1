@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-86457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51C5389EDB5
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:36:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91B1489EDBF
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:37:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83F301C21567
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:36:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C6892839A4
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DC4C154BEC;
-	Wed, 10 Apr 2024 08:36:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB8114F113;
+	Wed, 10 Apr 2024 08:37:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="luiGW5o5"
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="FoYyOSdp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1850513E3F3
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 08:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87E6913D607
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 08:37:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712738184; cv=none; b=Coj+iTN+OZTorANyCy9ZbRKwkixiSIGKJ0SFQF2rfE2XlJ76NVmkRspfW4HmI8Zdx68i/Om+Ihj8C425Jg5QAAh8uqTrVXYwExuEXt1RXgAKZ6Fl8MgXyp0vPd+Mtq4D8Yub3ie7LWzSVCwr175o4t4JcZrvf88azloYgTJZsuw=
+	t=1712738253; cv=none; b=gMMztzApfSIlMrjr4fTLaDv/hlA6L9zq2Ak27Npcn3QMSy4Sinava9nI4fvB8l7ZEhpzSwASOLC4jNqFib/5sjBz8doSib29dVDTe9nKxSU6BilDCmyxbA86nLZsWes2oC0ATtc/Rxhu5ae6vXnoSVWhSE4rGzBrCel3W5oN0Yo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712738184; c=relaxed/simple;
-	bh=CHdAxLoBOGL9I5p8Ew8usJ4IwvLH18ZThFBDeQwsKf4=;
+	s=arc-20240116; t=1712738253; c=relaxed/simple;
+	bh=FYAo2/dIeQdn2ZanZzlG930Vpz+rf/Q5KdpGZ7ZWSb0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u4KUmDNot4kh9MGvmn7Qn0XIG5szKxz4DbZhzhzYjnVSes9kmdzcSXLOleqOE+0o6UNq/ifZmC4kqR6Wd4Hz4Qx6+vfBJSFApRqfLOyGmRGuCRianK24NJeR4wQPbos9viT3g/t7uvL5C0ty+GBYqmFYmb+578AV6BY0y+lswfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=luiGW5o5; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-516ef30b16eso4358542e87.3
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 01:36:21 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=kjDg5noDuzuRjbpRdkaAoho68UjfpR3WkVD9HcHVunlu6vOsOcBLQ8UKSNTRhHvgh1zHjmVT+x7zm04w3HOQMhKH6jJB2pqKRCGnmGuykHTexbURLtdLXn3HwGiJ4UPUAyhAwiK4v8zOI4WyDWQtgSPDPLbhXs6y+lr7A75qoAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=FoYyOSdp; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-416b66163a9so13130265e9.2
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 01:37:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1712738180; x=1713342980; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=j9442A62TET00hjBhezvrYLKwHX+oM+EzqcfF+cyAB4=;
-        b=luiGW5o5J9NhDfsYt/Wxk8bc46+t6JG4OSiMlwDj8ptz8BuqRq7/Dn3DbH2B7tPlFi
-         kGXKlUE4ZzSDetkQvr+ZZgoAvlwkfhdI13bLjK/AU1VMWrhvtxbdBh1NDe6ryMXeOQmx
-         v+gN6n5UFbmQT+9VGklXqKbFjQjysncrRJWnHIlb8VAkGnroOx6rkfiBM16C4QcE21mG
-         U/UcAxxw1sDGMrJShkNBI6V/jbo8PoaeYXOSSEuoUvBuxgUqMfh4YlHMPssRgEzRLi4W
-         u1aF4PfCz/ES/xncEyNL6C+3PM0DBf3IbYQjRn4Chy3bfYeEJaK1aw0QM9PCrb2igIrT
-         2X3g==
+        d=6wind.com; s=google; t=1712738250; x=1713343050; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=99G2ssJEZsbhsIji5LLAb7rBxLp1dxN5cU7ZF7Ofo2E=;
+        b=FoYyOSdpSJIs0ooXFh3CJNPeiZc8cTIgsIcxWjkUJXz9F8pXPZi7b6wN4ltC31IzbA
+         wHGsCHsv4zbyoNx9q4ZEkO3D91SiEO3EMAQJnmroeOTmkQriAwHdQvXXvtxNRqIwwQOk
+         g9BzTaylN01no0/hg3FnNCxOcbfzAGCVzuEKpW/lA2swYU2aJsrZ04L9yPvkafauDpVl
+         8M2OzkcQxwtjIXhmDBU3yhc+hD2lrqhjMeTvvNBUkUaIsM0ystymregtPgiA4ADr9dPe
+         pjW7/koslOjT+3nl7mueSFtoZyR179vEMzC71Vwyv9mJbH6BECI0jeKUP0yx/Z0R+Gef
+         WNrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712738180; x=1713342980;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j9442A62TET00hjBhezvrYLKwHX+oM+EzqcfF+cyAB4=;
-        b=Fon4x+wxCDbmcXizACdFm8wRByDaRXcprjnrJJvJq6XH8ky906Ta7zMeoJ1Ib5F8MM
-         Y958eRvRLGPCQawC3yGbPmXtaalQY+tirYbI/NFm7sXgmxoRJ9rQNRnpYtdyUjpzSfyw
-         iiQ5DwkYv9N/ncy4Lp34ZByOyT51zORM4D7PUCEx1ug3zocRKsOrgNuCZ2rSgqQPxPUc
-         aYxX89bNXLep4ujz2RD2MzDhlmnwNQUw4SSVORUIXSnLBW0Dn2EvF9+IHF2gDqh/Corc
-         rfYfdY0DNJcaRYlFhFARn+yUs79s7jeRkiJg8o5Ew5+/pBvlt+YZYGerfd6U8w7hgvae
-         JZqg==
-X-Forwarded-Encrypted: i=1; AJvYcCU6DjCOilN8RgFuQ1bAOCn/drXrGY3LrFuL+KwNasMH3p9qkRQj1SC6YIsSK0l3X7X6NGQ93k68ITUBv/K3gkTIrWzmjP+Y
-X-Gm-Message-State: AOJu0Yw0YRpRMVa/Kp9brMzwGBGdjGkUjnHCMlqcq2/DmpqWyEiSsrzI
-	HYrpRjN5sbRuYPQrCzkak01kjvX6vQ3wObddGm7v1GO0SfndyDUcgzu010Jm3S0=
-X-Google-Smtp-Source: AGHT+IFjuM+EmbthlDbYjlSk1kmQ8trGtibZz10xcKh0nWxgzTalqLJgyFM1d4+Ue232gWWi76+xmw==
-X-Received: by 2002:ac2:54a4:0:b0:516:c11a:4dbc with SMTP id w4-20020ac254a4000000b00516c11a4dbcmr981724lfk.22.1712738180088;
-        Wed, 10 Apr 2024 01:36:20 -0700 (PDT)
-Received: from [192.168.1.70] ([84.102.31.74])
-        by smtp.gmail.com with ESMTPSA id iv6-20020a05600c548600b00417bc4820acsm528157wmb.0.2024.04.10.01.36.17
+        d=1e100.net; s=20230601; t=1712738250; x=1713343050;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=99G2ssJEZsbhsIji5LLAb7rBxLp1dxN5cU7ZF7Ofo2E=;
+        b=G9K0CZXhI7WTkA1Nn4wNZfB/B19tQkdkur/jZ+IKuS/T7dst4Jq/6tm2153pfR5wSo
+         0R5D8P/PwnvYv7CJ8GDGzpdgsj9XWmr9+eQy1P//conUYXcmP18nyDvqXR84Sbw6Wzk0
+         H0zQlyDxGf3OLt8NsOq89zHRjgHyXRsCdVpUQcOhBU5UoSkIN0CPg3z9VbYXyOZfNm/9
+         8SedT3CVWoGZcKS4c5WiBQXi5aaQvU3NDWLZP4FP2gDPlEIrCTat4OIfjI/FVsddn08z
+         uCkcyNEV3C97ZJ/dwGEnwGEO65g5Y2TkP2xzJb5SNFzZykWJDL6DTYoA5h326p/xiejR
+         vQ+g==
+X-Forwarded-Encrypted: i=1; AJvYcCWB/DcOKP/tJuY4RTxbiP43GqKq936kl8WHLyoublbjg88QeKfbDSQWZ2xQtnGW4OS/c3rZQmj2MxZLpDhVFHOipCkw0rRl
+X-Gm-Message-State: AOJu0YyERrN05ViFuvj1DpOQY+aIFbsVtQ58SzL8WxmS4slaHX5rnSqC
+	280qGItVSebLL/knYLyTS0YyHgWfeBDbSQ9pyNdx7iBNs2jvqePtOWIto74U6eM=
+X-Google-Smtp-Source: AGHT+IFKUvThV9mqYvSlZmF7R8A0q41osKTYthm4fPbWcaDCaOMpjuEkcaIpFo3COzoaVkCbC/eMDA==
+X-Received: by 2002:a05:600c:1d83:b0:417:240e:9ac3 with SMTP id p3-20020a05600c1d8300b00417240e9ac3mr928977wms.2.1712738249833;
+        Wed, 10 Apr 2024 01:37:29 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:51b5:9a7a:d2c:9ae? ([2a01:e0a:b41:c160:51b5:9a7a:d2c:9ae])
+        by smtp.gmail.com with ESMTPSA id v13-20020a05600c444d00b0041663450a4asm1560021wmn.45.2024.04.10.01.37.27
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Apr 2024 01:36:19 -0700 (PDT)
-Message-ID: <6f356fec-4384-4367-8812-a18b71156116@baylibre.com>
-Date: Wed, 10 Apr 2024 10:36:16 +0200
+        Wed, 10 Apr 2024 01:37:28 -0700 (PDT)
+Message-ID: <1909116d-15e1-48ac-ab55-21bce409fe64@6wind.com>
+Date: Wed, 10 Apr 2024 10:37:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,76 +77,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 2/3] net: ethernet: ti: Add desc_infos member
- to struct k3_cppi_desc_pool
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Russell King <linux@armlinux.org.uk>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Ratheesh Kannoth <rkannoth@marvell.com>,
- Naveen Mamindlapalli <naveenm@marvell.com>, danishanwar@ti.com,
- yuehaibing@huawei.com, rogerq@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
- linaro-mm-sig@lists.linaro.org
-References: <20240223-am65-cpsw-xdp-basic-v8-0-f3421b58da09@baylibre.com>
- <20240223-am65-cpsw-xdp-basic-v8-2-f3421b58da09@baylibre.com>
- <20240409173948.66abe6fa@kernel.org>
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH ipsec-next v9] xfrm: Add Direction to the SA in or out
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: antony.antony@secunet.com, Steffen Klassert
+ <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, devel@linux-ipsec.org,
+ Leon Romanovsky <leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>
+References: <bb191b37cd631341552ee87eb349f0525b90f14f.1712685187.git.antony.antony@secunet.com>
+ <0a51d41e-124e-479e-afd7-50246e3b0520@6wind.com> <ZhY_EE8miFAgZkkC@hog>
+ <f2c52a01-925c-4e3a-8a42-aeb809364cc9@6wind.com> <ZhZLHNS41G2AJpE_@hog>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 Content-Language: en-US
-From: Julien Panis <jpanis@baylibre.com>
-In-Reply-To: <20240409173948.66abe6fa@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Organization: 6WIND
+In-Reply-To: <ZhZLHNS41G2AJpE_@hog>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-On 4/10/24 02:39, Jakub Kicinski wrote:
-> On Mon, 08 Apr 2024 11:38:03 +0200 Julien Panis wrote:
->>   		goto gen_pool_create_fail;
->>   	}
->>   
->> +	pool->desc_infos = kcalloc(pool->num_desc,
->> +				   sizeof(*pool->desc_infos), GFP_KERNEL);
->> +	if (!pool->desc_infos) {
->> +		ret = -ENOMEM;
->> +		dev_err(pool->dev,
->> +			"pool descriptor infos alloc failed %d\n", ret);
-> Please don't add errors on mem alloc failures. They just bloat the
-> kernel, there will be a rather large OOM splat in the logs if GFP_KERNEL
-> allocation fails.
->
->> +		kfree_const(pool_name);
->> +		goto gen_pool_desc_infos_alloc_fail;
->> +	}
->> +
->>   	pool->gen_pool->name = pool_name;
-> If you add the new allocation after this line, I think you wouldn't
-> have to free pool_name under the if () explicitly.
-
-Hello Jakub,
-
-Thanks for these suggestions, I'll implement them in next version.
-
-Also, about mem alloc failures, shouldn't we free 'pool' on kstrdup_const()
-error at the beginning of k3_cppi_desc_pool_create_name() ?
-I mean, it's not visible in my patch but I now wonder if this was done
-properly even before I modify the file.
-
-Currently, we have:
-     pool_name = kstrdup_const(...)
-     if (!pool_name)
-         return ERR_PTR(ret);
-
-Shouldnt we have instead:
-     pool_name = kstrdup_const(...)
-     if (!pool_name)
-         goto gen_pool_create_fail;
-(maybe label to be renamed)
-...so that 'pool' can be freed before returning error.
-
-Julien
+Le 10/04/2024 à 10:17, Sabrina Dubroca a écrit :
+[snip]
+>> Why isn't it possible to restrict the use of an input SA to the input path and
+>> output SA to xmit path?
+> 
+> Because nobody has written a patch for it yet :)
+> 
+For me, it should be done in this patch/series ;-)
 
