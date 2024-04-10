@@ -1,214 +1,221 @@
-Return-Path: <netdev+bounces-86528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41CB089F1C0
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 14:12:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1327389F1C2
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 14:12:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB872285728
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 12:12:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB1A82859CF
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 12:12:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E6715B0FF;
-	Wed, 10 Apr 2024 12:12:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C8515B10D;
+	Wed, 10 Apr 2024 12:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jLzeR86+"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="0xkzE5Oy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33592159599
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 12:12:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B299515ADAD
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 12:12:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712751128; cv=none; b=ZtcvhgqG5c8yBAaTv3NP/1S4kW9Oxdcwu7pxBg0HdcbaZIBTY56oWG6hFxHfRMUVk4aWVCX01YoChPtVAHitKSDHuZTqbj7HJQ3sVS81VblVb4osqiQ8h/uYhmjfbaykcjODA81dekrSmjFNogBUk6nmTJrYqJRbUNG2dGjJi+0=
+	t=1712751171; cv=none; b=YlAv6qtz4jS5UKlJCLEl+efOrFArwp4so/g85Vbcud53+8DutI6kubFvZqagtY+cGM7MA4v9C6ojvxyfUzngZoseVx4fBIPklJSVuvLyvrB/76oTqJwfePnGpsZAVDQskKXIOB2KmqvaSok0askciaA5Grm9m3JRg+HvoxglyFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712751128; c=relaxed/simple;
-	bh=5YMqMDRaXj4Von9b/H8JmMP7Ll5GImNilbUuPUfK+1A=;
+	s=arc-20240116; t=1712751171; c=relaxed/simple;
+	bh=H21IK5kaNxJvV7WV8XeSBXhrOO9f1Hme4WViXUTcysY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eS3vuGW0Gr4KgU+knSV3+Q4NgtpBJlQJKjLlPu9hXTKYYjidaZGBSWvnB/kRDIPGJW3bdKpFqREQM9Yg5r0QZf4ZNXhAZDpgRPT4ZJ02QrjLlWe7BICLETpicuMfUR0fu3fygWSXHk0DEs9sFYDqppIEr0VN+ZywQf/ErjwRetw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jLzeR86+; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712751126; x=1744287126;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=5YMqMDRaXj4Von9b/H8JmMP7Ll5GImNilbUuPUfK+1A=;
-  b=jLzeR86+qmtXrrmYQMAOgV3MGmBlvVFYqqcYqpdxsostXD1wffRuDfm7
-   7ROUMaxjHmrNsGWufQAU5ewvZlopZa87kP38ZMCliYSCqT7+S7xEHq0+n
-   jrS4BXNTOv0zKqcZnYlJueFyVS7Bk8wugMnEcHcBpQXnt99mX1HtHvPqo
-   SdMqRBfmKAtKSrJlFSRVacC0V+H6Nhh2ujm604c4ndvVljEMRLTQceBpA
-   Ln+2Qp3T3TWk5GIFypLy6UAmUs5Kw+7KrBOxSiEbXCRQjsauQWZCMLsdU
-   QmCslK/2oS17WbyImYFXoaXUoWBxo7oqXLtqr5Vg75lnyeImhW45VO57w
-   Q==;
-X-CSE-ConnectionGUID: Jg5vqMorRj2D39hsq15HyQ==
-X-CSE-MsgGUID: oYSH7iVCSPS/kTJ+rWNW9w==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="19534969"
-X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="19534969"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 05:12:06 -0700
-X-CSE-ConnectionGUID: iwxB65u1S9CyRrE0PPz4Tw==
-X-CSE-MsgGUID: gFi+XHuMT+qS3ZM+DXa6Ew==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="21019113"
-Received: from lkp-server01.sh.intel.com (HELO e61807b1d151) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 10 Apr 2024 05:12:03 -0700
-Received: from kbuild by e61807b1d151 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ruWo4-0007O6-2y;
-	Wed, 10 Apr 2024 12:12:00 +0000
-Date: Wed, 10 Apr 2024 20:11:23 +0800
-From: kernel test robot <lkp@intel.com>
-To: zijianzhang@bytedance.com, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, edumazet@google.com,
-	willemdebruijn.kernel@gmail.com, davem@davemloft.net,
-	kuba@kernel.org, cong.wang@bytedance.com, xiaochun.lu@bytedance.com,
-	Zijian Zhang <zijianzhang@bytedance.com>
-Subject: Re: [PATCH net-next 1/3] sock: add MSG_ZEROCOPY_UARG
-Message-ID: <202404101954.FBZojOXG-lkp@intel.com>
-References: <20240409205300.1346681-2-zijianzhang@bytedance.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FDSDEfywPxuAA1qCE82D7aTOkctWL0KzaaUuuyvm0n0+GTHiGEOvFfNH28JF1+x5StxjxaxZYcGZFJ0OCoIsFByOo3FZOdlEJyn+HZADG0WY08kpfb0w66WWozQyfSb60x6f560QYiljXnbLA+KzeHPeP+BIFnKPhsDHJC0QW4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=0xkzE5Oy; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a450bedffdfso928894366b.3
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 05:12:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712751167; x=1713355967; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=AfPWn54N7knEAS1AXT/Gw/Pc7DAeDG1cBFQXDzRacMY=;
+        b=0xkzE5OyA2q7IYKiIObh9hYU5OK4n1vK6dsDJfE10OTiBUchcKfUyMvLgObcP9+ZG1
+         LDNKGIILMxmvdxSWGAgBeBFSXjqHMTGjwpITNmO7Db4csHVkdCGUomXdwXmUyijagxtZ
+         ffIfLbhLglLGGAnCRwaSiWSzZ1+TrjkHiNukQWzFPUDIjMbUkm6JlWmuF7DPvuA1Vzbh
+         B3/W9bTz4A1PJwWDDrZENqw52N9BRH60JCP+vLTd2OYfcVuCGIZqPr0IFMg3eC/CKvDv
+         vRaXK8tgyfpwQoVdvDDLM01RZ++Tuw6h0/hwjMVTBT/BPCzW65rBCLmFxbeeLiKrnvdy
+         MmrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712751167; x=1713355967;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AfPWn54N7knEAS1AXT/Gw/Pc7DAeDG1cBFQXDzRacMY=;
+        b=SPrbRdbdxVZInAyKYmnoF0IqvU7Er6v/beYE/KFbhW6M1Nd+crtiquYXWSeKyJ3j9e
+         DspvivOwHi0sl1M+vwCQ8h4Poa+BC3UnTUArv61mr2pjRUb7TmLBE4cjKZLwYPR4WhBI
+         BXmrjW5uiq8Sunej9kTGe6BdUCMYUOYyYuyVbj4IzEAorgP9QYrjWHn5VdhaPXGf2Fbl
+         m6YL6MgU8Y4KW3ZorFKEDAldxGlqFiupcgsGQXr8fxD93nw+Iql99s3QWv/uhG+N3I6v
+         aS2cWa9YwO6CjEP6W6yFXm8lbY17wwmajdBAa3FtLiCLyuaI9jN0IZ/izLrFYegZcLxX
+         dr7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXJ5XwDSTzg7qQxJF9IsCd+wBlNCgGFGzCn4kG3JDZ1Iu3F0h5XirA7njALhlmeaJ7nPqDcPrLibiunit1TixLhq4VJWdM4
+X-Gm-Message-State: AOJu0Yz54KbQ6w05z8RYPbBscNfqetXku1jzrg6kqelWRt6idpGt2rU+
+	7nGNjzNNdem8oHNgBDioJGIvKOxUcSNaOeDcIUiuzEYOduK/g/N0JPcSqC4Mx/k=
+X-Google-Smtp-Source: AGHT+IGDmR4gdoHnckU6TWE0tDNbUAIWbD6AMJ0CXEJf+TLoL3L/SDjPimz7MwydmYJdQ5AO7amrkQ==
+X-Received: by 2002:a17:907:ea5:b0:a51:c281:60f3 with SMTP id ho37-20020a1709070ea500b00a51c28160f3mr1775965ejc.77.1712751166607;
+        Wed, 10 Apr 2024 05:12:46 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id d16-20020a170906041000b00a4e781bd30dsm6832583eja.24.2024.04.10.05.12.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 05:12:45 -0700 (PDT)
+Date: Wed, 10 Apr 2024 14:12:43 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: John Fastabend <john.fastabend@gmail.com>,
+	Alexander Duyck <alexander.duyck@gmail.com>,
+	Jason Gunthorpe <jgg@nvidia.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	bhelgaas@google.com, linux-pci@vger.kernel.org,
+	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net,
+	Christoph Hellwig <hch@lst.de>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <ZhaCOwc9oUqbkZoF@nanopsycho>
+References: <20240405151703.GF5383@nvidia.com>
+ <CAKgT0UeK=KdCJN3BX7+Lvy1vC2hXvucpj5CPs6A0F7ekx59qeg@mail.gmail.com>
+ <ZhPaIjlGKe4qcfh_@nanopsycho>
+ <CAKgT0UfcK8cr8UPUBmqSCxyLDpEZ60tf1YwTAxoMVFyR1wwdsQ@mail.gmail.com>
+ <ZhQgmrH-QGu6HP-k@nanopsycho>
+ <66142a4b402d5_2cb7208ec@john.notmuch>
+ <ZhUgH9_beWrKbwwg@nanopsycho>
+ <9dd78c52-868e-4955-aba2-36bbaf3e0d88@intel.com>
+ <ZhVThhwFSV0HgQ0B@nanopsycho>
+ <043179b5-d499-41cc-8d99-3f15b72a27cc@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240409205300.1346681-2-zijianzhang@bytedance.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <043179b5-d499-41cc-8d99-3f15b72a27cc@intel.com>
 
-Hi,
+Wed, Apr 10, 2024 at 01:45:54PM CEST, aleksander.lobakin@intel.com wrote:
+>From: Jiri Pirko <jiri@resnulli.us>
+>Date: Tue, 9 Apr 2024 16:41:10 +0200
+>
+>> Tue, Apr 09, 2024 at 03:11:21PM CEST, aleksander.lobakin@intel.com wrote:
+>>> From: Jiri Pirko <jiri@resnulli.us>
+>>> Date: Tue, 9 Apr 2024 13:01:51 +0200
+>>>
+>>>> Mon, Apr 08, 2024 at 07:32:59PM CEST, john.fastabend@gmail.com wrote:
+>>>>> Jiri Pirko wrote:
+>>>>>> Mon, Apr 08, 2024 at 05:46:35PM CEST, alexander.duyck@gmail.com wrote:
+>>>>>>> On Mon, Apr 8, 2024 at 4:51 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>>>>>>>>
+>>>>>>>> Fri, Apr 05, 2024 at 08:38:25PM CEST, alexander.duyck@gmail.com wrote:
+>>>>>>>>> On Fri, Apr 5, 2024 at 8:17 AM Jason Gunthorpe <jgg@nvidia.com> wrote:
+>>>>>>>>>>
+>>>>>>>>>> On Fri, Apr 05, 2024 at 07:24:32AM -0700, Alexander Duyck wrote:
+>>>>>>>>>>>> Alex already indicated new features are coming, changes to the core
+>>>>>>>>>>>> code will be proposed. How should those be evaluated? Hypothetically
+>>>>>>>>>>>> should fbnic be allowed to be the first implementation of something
+>>>>>>>>>>>> invasive like Mina's DMABUF work? Google published an open userspace
+>>>>>>>>>>>> for NCCL that people can (in theory at least) actually run. Meta would
+>>>>>>>>>>>> not be able to do that. I would say that clearly crosses the line and
+>>>>>>>>>>>> should not be accepted.
+>>>>>>>>>>>
+>>>>>>>>>>> Why not? Just because we are not commercially selling it doesn't mean
+>>>>>>>>>>> we couldn't look at other solutions such as QEMU. If we were to
+>>>>>>>>>>> provide a github repo with an emulation of the NIC would that be
+>>>>>>>>>>> enough to satisfy the "commercial" requirement?
+>>>>>>>>>>
+>>>>>>>>>> My test is not "commercial", it is enabling open source ecosystem vs
+>>>>>>>>>> benefiting only proprietary software.
+>>>>>>>>>
+>>>>>>>>> Sorry, that was where this started where Jiri was stating that we had
+>>>>>>>>> to be selling this.
+>>>>>>>>
+>>>>>>>> For the record, I never wrote that. Not sure why you repeat this over
+>>>>>>>> this thread.
+>>>>>>>
+>>>>>>> Because you seem to be implying that the Meta NIC driver shouldn't be
+>>>>>>> included simply since it isn't going to be available outside of Meta.
+>>>
+>>> BTW idpf is also not something you can go and buy in a store, but it's
+>>> here in the kernel. Anyway, see below.
+>> 
+>> IDK, why so many people in this thread are so focused on "buying" nic.
+>> IDPF device is something I assume one may see on a VM hosted in some
+>> cloud, isn't it? If yes, it is completely legit to have it in. Do I miss
+>> something?
+>
+>Anyhow, we want the upstream Linux kernel to work out of box on most
+>systems. Rejecting this driver basically encourages to still prefer
+>OOT/proprietary crap.
 
-kernel test robot noticed the following build warnings:
+Totally true. Out of the box on as many systems as possible. This is not
+the case. Can you show me an example of a person outside-of-Meta can
+benefit from using this driver out-of-box?
 
-[auto build test WARNING on net-next/main]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/zijianzhang-bytedance-com/sock-add-MSG_ZEROCOPY_UARG/20240410-045616
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240409205300.1346681-2-zijianzhang%40bytedance.com
-patch subject: [PATCH net-next 1/3] sock: add MSG_ZEROCOPY_UARG
-config: i386-randconfig-061-20240410 (https://download.01.org/0day-ci/archive/20240410/202404101954.FBZojOXG-lkp@intel.com/config)
-compiler: gcc-13 (Ubuntu 13.2.0-4ubuntu3) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240410/202404101954.FBZojOXG-lkp@intel.com/reproduce)
+>
+>> 
+>> 
+>>>
+>>>>>>> The fact is Meta employs a number of kernel developers and as a result
+>>>>>>> of that there will be a number of kernel developers that will have
+>>>>>>> access to this NIC and likely do development on systems containing it.
+>>>
+>>> [...]
+>>>
+>>>>> Vendors would happily spin up a NIC if a DC with scale like this
+>>>>> would pay for it. They just don't advertise it in patch 0/X,
+>>>>> "adding device for cloud provider foo".
+>>>>>
+>>>>> There is no difference here. We gain developers, we gain insights,
+>>>>> learnings and Linux and OSS drivers are running on another big
+>>>>> DC. They improve things and find bugs they upstream them its a win.
+>>>>>
+>>>>> The opposite is also true if we exclude a driver/NIC HW that is
+>>>>> running on major DCs we lose a lot of insight, experience, value.
+>>>>
+>>>> Could you please describe in details and examples what exactly is we
+>>>> are about to loose? I don't see it.
+>>>
+>>> As long as driver A introduces new features / improvements / API /
+>>> whatever to the core kernel, we benefit from this no matter whether I'm
+>>> actually able to run this driver on my system.
+>>>
+>>> Some drivers even give us benefit by that they are of good quality (I
+>>> don't speak for this driver, just some hypothetical) and/or have
+>>> interesting design / code / API / etc. choices. The drivers I work on
+>>> did gain a lot just from that I was reading new commits / lore threads
+>>> and look at changes in other drivers.
+>>>
+>>> I saw enough situations when driver A started using/doing something the
+>>> way it wasn't ever done anywhere before, and then more and more drivers
+>>> stated doing the same thing and at the end it became sorta standard.
+>> 
+>> So bottom line is, the unused driver *may* introduce some features and
+>> *may* provide as an example of how to do things for other people.
+>> Is this really that beneficial for the community that it overweights
+>> the obvious cons (not going to repeat them)?
+>> 
+>> Like with any other patch/set we merge in, we always look at the cons
+>> and pros. I'm honestly surprised that so many people here
+>> want to make exception for Meta's internal toy project.
+>
+>It's not me who wants to make an exception. I haven't ever seen a driver
+>rejected due to "it can be used only somewhere where I can't go", so
+>looks like it's you who wants to make an exception :>
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202404101954.FBZojOXG-lkp@intel.com/
+Could you please point me to some other existing driver for device
+that does not exist (/exist only at some person's backyard)?
 
-sparse warnings: (new ones prefixed by >>)
->> net/core/sock.c:2878:37: sparse: sparse: incorrect type in argument 1 (different address spaces) @@     expected void [noderef] __user *to @@     got void * @@
-   net/core/sock.c:2878:37: sparse:     expected void [noderef] __user *to
-   net/core/sock.c:2878:37: sparse:     got void *
-   net/core/sock.c:2393:9: sparse: sparse: context imbalance in 'sk_clone_lock' - wrong count at exit
-   net/core/sock.c:2397:6: sparse: sparse: context imbalance in 'sk_free_unlock_clone' - unexpected unlock
-   net/core/sock.c:4083:13: sparse: sparse: context imbalance in 'proto_seq_start' - wrong count at exit
-   net/core/sock.c:4095:13: sparse: sparse: context imbalance in 'proto_seq_stop' - wrong count at exit
 
-vim +2878 net/core/sock.c
-
-  2807	
-  2808	int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
-  2809			     struct sockcm_cookie *sockc)
-  2810	{
-  2811		u32 tsflags;
-  2812	
-  2813		switch (cmsg->cmsg_type) {
-  2814		case SO_MARK:
-  2815			if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
-  2816			    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
-  2817				return -EPERM;
-  2818			if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
-  2819				return -EINVAL;
-  2820			sockc->mark = *(u32 *)CMSG_DATA(cmsg);
-  2821			break;
-  2822		case SO_TIMESTAMPING_OLD:
-  2823		case SO_TIMESTAMPING_NEW:
-  2824			if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
-  2825				return -EINVAL;
-  2826	
-  2827			tsflags = *(u32 *)CMSG_DATA(cmsg);
-  2828			if (tsflags & ~SOF_TIMESTAMPING_TX_RECORD_MASK)
-  2829				return -EINVAL;
-  2830	
-  2831			sockc->tsflags &= ~SOF_TIMESTAMPING_TX_RECORD_MASK;
-  2832			sockc->tsflags |= tsflags;
-  2833			break;
-  2834		case SCM_TXTIME:
-  2835			if (!sock_flag(sk, SOCK_TXTIME))
-  2836				return -EINVAL;
-  2837			if (cmsg->cmsg_len != CMSG_LEN(sizeof(u64)))
-  2838				return -EINVAL;
-  2839			sockc->transmit_time = get_unaligned((u64 *)CMSG_DATA(cmsg));
-  2840			break;
-  2841		/* SCM_RIGHTS and SCM_CREDENTIALS are semantically in SOL_UNIX. */
-  2842		case SCM_RIGHTS:
-  2843		case SCM_CREDENTIALS:
-  2844			break;
-  2845		case SO_ZEROCOPY_NOTIFICATION:
-  2846			if (sock_flag(sk, SOCK_ZEROCOPY)) {
-  2847				int i = 0;
-  2848				struct tx_usr_zcopy_info sys_zcopy_info;
-  2849				struct tx_msg_zcopy_node *zcopy_node_p, *tmp;
-  2850				struct tx_msg_zcopy_queue *zcopy_queue;
-  2851				struct tx_msg_zcopy_node *zcopy_node_ps[SOCK_USR_ZC_INFO_MAX];
-  2852				unsigned long flags;
-  2853	
-  2854				if (cmsg->cmsg_len != CMSG_LEN(sizeof(void *)))
-  2855					return -EINVAL;
-  2856	
-  2857				if (sk_is_tcp(sk))
-  2858					zcopy_queue = &tcp_sk(sk)->tx_zcopy_queue;
-  2859				else if (sk_is_udp(sk))
-  2860					zcopy_queue = &udp_sk(sk)->tx_zcopy_queue;
-  2861				else
-  2862					return -EINVAL;
-  2863	
-  2864				spin_lock_irqsave(&zcopy_queue->lock, flags);
-  2865				list_for_each_entry_safe(zcopy_node_p, tmp, &zcopy_queue->head, node) {
-  2866					sys_zcopy_info.info[i].lo = zcopy_node_p->info.lo;
-  2867					sys_zcopy_info.info[i].hi = zcopy_node_p->info.hi;
-  2868					sys_zcopy_info.info[i].zerocopy = zcopy_node_p->info.zerocopy;
-  2869					list_del(&zcopy_node_p->node);
-  2870					zcopy_node_ps[i++] = zcopy_node_p;
-  2871					if (i == SOCK_USR_ZC_INFO_MAX)
-  2872						break;
-  2873				}
-  2874				spin_unlock_irqrestore(&zcopy_queue->lock, flags);
-  2875	
-  2876				if (i > 0) {
-  2877					sys_zcopy_info.length = i;
-> 2878					if (unlikely(copy_to_user(*(void **)CMSG_DATA(cmsg),
-  2879								  &sys_zcopy_info,
-  2880								  sizeof(sys_zcopy_info))
-  2881						)) {
-  2882						spin_lock_irqsave(&zcopy_queue->lock, flags);
-  2883						while (i > 0)
-  2884							list_add(&zcopy_node_ps[--i]->node,
-  2885								 &zcopy_queue->head);
-  2886						spin_unlock_irqrestore(&zcopy_queue->lock, flags);
-  2887						return -EFAULT;
-  2888					}
-  2889	
-  2890					while (i > 0)
-  2891						consume_skb(zcopy_node_ps[--i]->skb);
-  2892				}
-  2893			}
-  2894			break;
-  2895		default:
-  2896			return -EINVAL;
-  2897		}
-  2898		return 0;
-  2899	}
-  2900	EXPORT_SYMBOL(__sock_cmsg_send);
-  2901	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+>
+>Thanks,
+>Olek
 
