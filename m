@@ -1,183 +1,151 @@
-Return-Path: <netdev+bounces-86774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D1998A03DA
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:01:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 216E58A03DF
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:06:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C89271F2CB0D
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:01:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE262289104
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:06:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEAF21DFC6;
-	Wed, 10 Apr 2024 22:59:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34EAC10971;
+	Wed, 10 Apr 2024 23:06:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="wAUBy8gs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H0Q+WZpB"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2920146B5
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 22:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDBD138E
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 23:06:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712789999; cv=none; b=U6VyjQ3fk74aOVgkmIOHisnHqFvj7vuMWpuYbWle9YRd8FGMN2gK5FsZRi4R0yirdXkpRbJrG0NQHzFynLbCwKztbFjhyAT9uzHwqXxW4Z6+BcbM9nLKOBsa39Hcv9eQ+Wn7wPBomEPUjLXkAgmMJhI7N7SZSFBgWxeEuG+MWu8=
+	t=1712790414; cv=none; b=KFhN1DnpcEjRFCiZLC/CGOR+MoB2geCl9/lIeOOkbaNdBI5PtZsm0/7GcGQSJk0gkC4mWQhNJFXi2wCJd+phFotnisupx9T8DciCsp3I3ajNuK7nXSQe/Jj+lZ5K7S70yAsRugaHoZet8TWjJ33SevcNmu+spuViVaFraRiq5/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712789999; c=relaxed/simple;
-	bh=B5nf8EMAb6fOku+8gaxW8GPTaZcZz/zqzmDzZgJcGwA=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=MRZ2UW80qmyG9jUoW8vAxiuQnH/hl+cKa4dQ74quPt1mL7AX6FEFJGUL7mmvwebRKzWzuVt4VndoLaEX+Zp5hkftabXMKlvGWw9dijN44DxI3Rc76jNVDdAvx2naTNmjXoX89GQ3oo65eg+agDoLHRuteTHzmj+iS8OcXdEl9/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=wAUBy8gs; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id A4FA82C02A5
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 10:59:47 +1200 (NZST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1712789987;
-	bh=B5nf8EMAb6fOku+8gaxW8GPTaZcZz/zqzmDzZgJcGwA=;
-	h=From:To:CC:Subject:Date:From;
-	b=wAUBy8gsAfxD1z2dPdj3XegffUUJsZFOiDWRYvLRT+1Z4gbNqZ2OgnV2CZ8IfW9gs
-	 BpFMRXTvPwvulXDqmPhV/gH61C+dBXbqKht8q4lDsRWyDCcHQbEa7rRPVqEn5KJevQ
-	 7uzBbjLscp1U2DXlrP6LRcvi9betCE/6RBIwxIGp6v0aljdndqoPq0WWEKm9epcARD
-	 Zift7g59y5+KWhftJNvkp6VEa1CzkV5kNXP7/xSH/ze80iHGL2GusXsCd67lhPc9Z8
-	 XFd81tJWOgeWcgzCTsRamLtsYliRR9PSt2OHpBGcRWVUTPTqPPoY+iVl4ub5Y6qyWY
-	 klsqliL9S2C6A==
-Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B661719e30001>; Thu, 11 Apr 2024 10:59:47 +1200
-Received: from svr-chch-ex1.atlnz.lc (2001:df5:b000:bc8::77) by
- svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.1544.9; Thu, 11 Apr 2024 10:59:47 +1200
-Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) by
- svr-chch-ex1.atlnz.lc (2001:df5:b000:bc8:409d:36f5:8899:92e8) with Microsoft
- SMTP Server (TLS) id 15.0.1497.48; Thu, 11 Apr 2024 10:59:47 +1200
-Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
- svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
- 15.02.1544.009; Thu, 11 Apr 2024 10:59:47 +1200
-From: Paul Davey <Paul.Davey@alliedtelesis.co.nz>
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-CC: "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>
-Subject: combination of dot1q tagging and gro esp offload appears to corrupt
- esp transport mode traffic
-Thread-Topic: combination of dot1q tagging and gro esp offload appears to
- corrupt esp transport mode traffic
-Thread-Index: AQHai5rI/W0yy5fgMECZ0HYsEAGQCw==
-Date: Wed, 10 Apr 2024 22:59:47 +0000
-Message-ID: <ecf16770431c8b30782e3443085641eb685aa5f9.camel@alliedtelesis.co.nz>
-Accept-Language: en-NZ, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <70B9126075D7BC4DBE3EE8CE09E65D1F@atlnz.lc>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1712790414; c=relaxed/simple;
+	bh=CAVxlM9Jf9TCc8Gu1VAFQRjdoA7J3HNipBscehG7leE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=JWL2xNebsPlRTY/3OkkuNi315tglCtNK4jz68xCkRp3p5F02fCZxoiiU2Njumq1RZ1u1163D0AhZ90aT51lYCg8448iH4i/cO3VZYiwAnPKUR0lzBbLowR2TqLCjgWQUueoUjmoqbrXSrRlryrE2EmxZxtCJOlobV+rtVyDVTRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H0Q+WZpB; arc=none smtp.client-ip=209.85.219.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-69b44071a07so4061686d6.3
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 16:06:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712790411; x=1713395211; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ptQdhZdIBXP/seHo2T/94bCd3+LKNU/mNFZDFHMq0YM=;
+        b=H0Q+WZpBf1UC0y3hesyP9rAqSoTC34285RJgrocrSxBF8RIogT210/OArZ9/6aIAw4
+         /tH+wcWyNrhj+sj09RxNsB1LH+ksejI7w8x320CzEMbc2qQv1vlnRBLMePvOpP6O85no
+         J/6mUepyFRix3Gxp/zaYWb70uvT4jq3lhs+C8hWaH5r7L4T/M9w1PSKTxn0TsJ0OdnBn
+         6F3T5whEqJDV+Zz6l9lk+y48KiWVROxTlUY0irqUZE4+hNuqyEWFAXztNnlND5gBci/R
+         2bIBJx7n1cbOACkhhzMBC/e8o27bhwR54GPa/a75Tk/shR2zLrW++wZ9rzBhBCXkgDeS
+         ZWww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712790411; x=1713395211;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ptQdhZdIBXP/seHo2T/94bCd3+LKNU/mNFZDFHMq0YM=;
+        b=EbYdqWeBaGiNYrMljhS5QXTZN3tjDrOQL3Y5sMos3DBXCAVn7qnTEkjpfbEPcR9u2q
+         7+H6EgGgNbuSQIdsnXR9+yQhRAq6PGJ3R+ZOqB0/XJIsu7sD7tlf4+YsGffUNqdHtK21
+         0OOJIJKOJEg1Fs5t2Zun7et/Tsrrpuuuj7KA1B3K1M6728zt00fRzdD7KFcRHYZG6ScV
+         NpYf5Q1nXCJQLiU8+1WV+WZGyBQhL3eDWeUAl+pleCYPf2ePdwxgzvXyB96StaTv1ldV
+         YxSaqrsYqsZCz5VcEEjAXZWFj+HU545cL5AZ7mdGqso5ztFZ/ypKJ5ULwgf/P+zu/1wp
+         csfQ==
+X-Gm-Message-State: AOJu0YySRxh/kfSLUbwyzofc0ntwoWru+r4FqLFmLw37hMD6X5PR6oqK
+	W57VejCIT+llnwCIti5iv/DtqmdjDqxKOn0w5Z4xraBDCADzGyA0
+X-Google-Smtp-Source: AGHT+IHppdcoYDo5kBIDwzJRyJyifx9cX47mS7lEhYilmP9t8F0qgcPkUQNmFREJ/Rzk+qrlT969NQ==
+X-Received: by 2002:ad4:5d6a:0:b0:69b:18bc:f65a with SMTP id fn10-20020ad45d6a000000b0069b18bcf65amr4522565qvb.19.1712790411464;
+        Wed, 10 Apr 2024 16:06:51 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id s9-20020ad45249000000b0069b1ef5d425sm128853qvq.134.2024.04.10.16.06.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 16:06:51 -0700 (PDT)
+Date: Wed, 10 Apr 2024 19:06:51 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Zijian Zhang <zijianzhang@bytedance.com>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ cong.wang@bytedance.com, 
+ xiaochun.lu@bytedance.com
+Message-ID: <66171b8b595b_2d123b29472@willemb.c.googlers.com.notmuch>
+In-Reply-To: <0c6fc173-45c4-463f-bc0e-9fed8c3efc02@bytedance.com>
+References: <20240409205300.1346681-1-zijianzhang@bytedance.com>
+ <20240409205300.1346681-3-zijianzhang@bytedance.com>
+ <6615b264894a0_24a51429432@willemb.c.googlers.com.notmuch>
+ <CANn89iLTiq-29ceiQHc2Mi4na+kRb9K-MA1hGMn=G0ek6-mfjQ@mail.gmail.com>
+ <0c6fc173-45c4-463f-bc0e-9fed8c3efc02@bytedance.com>
+Subject: Re: [External] Re: [PATCH net-next 2/3] selftests: fix OOM problem in
+ msg_zerocopy selftest
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=dY4j3mXe c=1 sm=1 tr=0 ts=661719e3 a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=raytVjVEu-sA:10 a=Ps9EOGGnFkRWtYQg8yYA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-SEG-SpamProfiler-Score: 0
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-SGksDQoNCkkgaGF2ZSBvYnNlcnZlZCBhIHdoYXQgSSBiZWxpZXZlIGlzIGEgYnVnIGluIElQU2Vj
-IGVzcDQgdHJhbnNwb3J0IG1vZGUNCndpdGggZ3JvIGVuYWJsZWQgaW4gdGhlIHByZXNlbmNlIG9m
-IDgwMi4xUSB0YWdnZWQgcGFja2V0cy4NCkhvd2V2ZXIgSSBhbSBub3Qgc3VyZSB3aGF0IHRoZSBi
-ZXN0IGNvdXJzZSBvZiBhY3Rpb24gaXMgdG8gcmVzb2x2ZSB0aGUNCnByb2JsZW0uDQoNCkkgYmVs
-aWV2ZSB0aGUgaXNzdWUgb2NjdXJzIHdpdGggdGhlIGZvbGxvd2luZyBjaGFpbiBvZiBrZXkgZXZl
-bnRzOg0KDQoxKSBBbiBFU1AgdHJhbnNwb3J0IG1vZGUgcGFja2V0IGNvbnRhaW5pbmcgYW4gODAy
-LjFRIHRhZyBpcyByZWNlaXZlZA0KICAgb24gYSBuZXR3b3JrIGludGVyZmFjZSB3aXRoIEdSTyBl
-bmFibGVkLg0KMikgZGV2X2dyb19yZWNlaXZlIHdpbGwgZmluZCB0aGUgRVRIX1BfODAyMVEgcGFj
-a2V0IG9mZmxvYWQgYW5kIGNhbGwNCiAgIHZsYW5fZ3JvX3JlY2VpdmUgd2hpY2ggZGV0ZXJtaW5l
-cyB0aGUgaW5uZXIgZXRoZXIgdHlwZSBhbmQNCiAgIGNvbnRpbnVlcyB0aGUgZ3JvIGhhbmRsZXIg
-Y2hhaW4NCjMpIHRoZSBncm8gaGFuZGxlcnMgZXZlbnR1YWxseSByZWFjaCBlc3A0X2dyb19yZWNl
-aXZlIHdoaWNoIGxvb2tzIHVwDQogICB0aGUgeGZybSBzdGF0ZSBmcm9tIHRoZSBzcGkgYW5kIHN1
-Ym1pdHMgdGhlIHNrYiB0byB4ZnJtX2lucHV0IGFmdGVyDQogICBzZXR0aW5nIHRoZSBYRlJNX0dS
-TyBmbGFnIGluIHhmcm1fb2ZmbG9hZCBmbGFncy4NCjQpIHhmcm00X3RyYW5zcG9ydF9pbnB1dCBy
-ZW1vdmVzIHRoZSBlbmNhcHN1bGF0aW9uIGhlYWRlciBieSBtb3ZpbmcNCiAgIHRoZSBuZXR3b3Jr
-IGhlYWRlciBmb3J3YXJkIHRvIGp1c3QgYmVmb3JlIHRoZSBkZWNyeXB0ZWQgcGF5bG9hZA0KICAg
-Y29udGVudC4NCjUpIHhmcm00X3RyYW5wb3J0X2ZpbmlzaCBhZGp1c3RzIG5ldyBuZXR3b3JrIGhl
-YWRlciBwcm90b2NvbCwgcHVzaGVzDQogICBza2IgdG8gaW5jbHVkZSBuZXcgbmV0d29yayBoZWFk
-ZXIgYW5kIHVwZGF0ZXMgdG90YWwgbGVuZ3RoIGFuZA0KICAgdXBkYXRlcyBjaGVja3N1bQ0KNikg
-eGZybTRfdHJhbnBvcnRfZmluaXNoIGNoZWNrcyBpZiBYRlJNX0dSTyB3YXMgc2V0IGluIHRoZQ0K
-ICAgeGZybV9vZmZsb2FkIGZsYWdzIGFuZCBpZiBzbyBjYWxscyBza2JfbWFjX2hlYWRlcl9yZWJ1
-aWxkLg0KNykgc2tiX21hY19oZWFkZXJfcmVidWlsZCBtb3ZlcyB0aGUgbWFjIGhlYWRlciBmcm9t
-IGl0J3Mgb3JpZ2luYWwNCiAgIHBvc2l0aW9uIHRvIGp1c3QgYmVmb3JlIHRoZSBuZXcgbmV0d29y
-ayBoZWFkZXIuICANCiAgIEhvd2V2ZXIgbWFjX2xlbiBpcyBzdGlsbCB0aGUgb3JpZ2luYWwgZXRo
-ZXJuZXQgbWFjIGxlbmd0aCBhbmQgdGhlDQogICBtYWMgaGVhZGVyIHN0aWxsIGNvbnRhaW5zIEVU
-SF9QXzgwMjFRIGFzIHRoZSBldGhlcnR5cGUsIHJlc3VsdGluZw0KICAgaW4gYSBwYWNrZXQgY2xh
-aW1pbmcgdG8gYmUgODAyLjFRIGJ1dCBzdGFydGluZyB3aXRoIGFuIElQIGhlYWRlcg0KICAgd2l0
-aCBubyBUQ0kgb3IgaW5uZXIgZXRoZXJ0eXBlLg0KOCkgc2tiIGlzIHF1ZXVlZCBvbiB0aGUgeGZy
-bSBuYXBpIGluc3RhbmNlIGZvciByZWNlcHRpb24NCjkpIHNrYiBpcyBwcm9jZXNzZWQgYnkgc2ti
-X3ZsYW5fdW50YWcgaW4gX19uZXRpZl9yZWNlaXZlX3NrYl9jb3JlIGFzDQogICBza2ItPnByb3Rv
-Y29sIGlzIGEgVkxBTiBldGhlcnR5cGUuDQoxMCkgc2tiX3ZsYW5fdW50YWcgcmVtb3ZlcyB0aGUg
-InZsYW4gdGFnIiBsZWF2aW5nIGFuIHNrYiB3aXRoDQogICAgc2tiLT5wcm90b2NvbCBzZXQgdG8g
-dGhlIHRvdGFsIGxlbmd0aCBmcm9tIHRoZSBJUCBoZWFkZXIgYW5kDQogICAgbWlzc2luZyB0aGUg
-c3RhcnQgb2YgdGhlIElQIGhlYWRlciBhbmQgYW55IGV0aGVydHlwZS4NCjExKSBUaGlzIHNrYiBp
-cyBvYnZpb3VzbHkgbm90IHJlY29nbmlzZWQgYXMgSVAgYW5kIG5vdCBzZW50IHRoZQ0KICAgIGV4
-cGVjdGVkIGRlc3RpbmF0aW9uLCBpbnN0ZWFkIHVzdWFsbHkgcmVjZWl2ZWQgYXMgRVRIX1BfODAy
-XzIgaWYNCiAgICB0aGUgSVAgZGF0YWdyYW0gd2FzIHNob3J0IGVub3VnaC4NCg0KSXQgYXBwZWFy
-cyB0aGUgbG9hZCBiZWFyaW5nIGtlcm5lbCBjb25maWdzIGZvciB0aGlzIHRvIGhhcHBlbiB3b3Vs
-ZCBiZQ0KQ09ORklHX1ZMQU5fODAyMVEgYXMgdGhpcyB3b3VsZCBnYXRlIHRoZSBwcmVzZW5jZSBv
-ZiB2bGFuX2dyb19yZWNlaXZlDQphbmQgQ09ORklHX0lORVRfRVNQX09GRkxPQUQgb3IgQ09ORklH
-X0lORVQ2X0VTUF9PRkZMT0FEIGFzIHRoaXMgd2lsbA0KZ2F0ZSB0aGUgZXNwNF9ncm9fcmVjZWl2
-ZSBvciBlc3A2X2dyb19yZWNlaXZlIHBhdGhzIGFuZCBzZXR0aW5nIG9mDQpYRlJNX0dSTyBmbGFn
-Lg0KDQpnZW5lcmljLXJlY2VpdmUtb2ZmbG9hZCBuZWVkcyB0byBiZSBlbmFibGVkIG9uIHRoZSB1
-bmRlcmx5aW5nDQpyZWNlaXZpbmcgaW50ZXJmYWNlLg0KDQpJIGhhdmUgcmVwcm9kdWNlZCB0aGlz
-IG9uIDYuOC4yIHVzaW5nIGFuIGlwc2VjIHByb3RlY3RlZCBsMnRwIHR1bm5lbA0Kb3ZlciBhbiA4
-MDIuMVEgdGFnZ2luZyBpbnRlcmZhY2UgYmV0d2VlbiBhIHZtIGFuZCB0aGUgaG9zdCBtYWNoaW5l
-Lg0KDQpUaGUgdHVubmVsIG1vZGUgZW5jYXBzdWxhdGlvbiByZW1vdmFsIGNvZGUgc2VlbXMgdG8g
-YXZvaWQgdGhpcyBpc3N1ZQ0KYnkgZm9yY2luZyB0aGUgc2tiLT5wcm90b2NvbCB0byBFVEhfUF9J
-UCBvciBFVEhfUF9JUFY2IGFuZCBhbHNvDQpzZXR0aW5nIHRoaXMgaW4gdGhlIG1hYyBoZWFkZXIg
-aWYgcHJlc2VudC4NCg0KSSB3b3VsZCBhcHByZWNpYXRlIGFueSBhZHZpY2Ugb24gaG93IHRvIGdv
-IGFib3V0IGZpeGluZyB0aGlzIGlzc3VlLg0KDQpSZXByb2R1Y3Rpb24gc2V0dXAgYmVsb3cgdGhl
-IGxpbmUsIHN1YnN0aXR1dGUgaW50ZXJmYWNlIG5hbWVzIGFzDQpuZWNlc3NhcnkuDQoNClRoYW5r
-cywNClBhdWwgRGF2ZXkNCg0KLS0tDQoNCkRVVDoNCg0KaXAgbGluayBzZXQgZXRoMCB1cA0KaXAg
-bGluayBhZGQgbGluayBldGgwIGV0aDAuMTAgdHlwZSB2bGFuIGlkIDEwDQppcCBhZGRyIGFkZCAx
-MC4wLjEuMS8yNCBkZXYgZXRoMC4xMA0KaXAgbGluayBzZXQgdXAgZGV2IGV0aDAuMTANCg0KaXAg
-bDJ0cCBhZGQgdHVubmVsIHJlbW90ZSAxMC4wLjEuMiBsb2NhbCAxMC4wLjEuMSB0dW5uZWxfaWQg
-MSBcDQpwZWVyX3R1bm5lbF9pZCAyIGVuY2FwIHVkcCB1ZHBfc3BvcnQgNTAwMCB1ZHBfZHBvcnQg
-NTAwMQ0KaXAgbDJ0cCBhZGQgc2Vzc2lvbiBuYW1lIGwydHAxIHR1bm5lbF9pZCAxIHNlc3Npb25f
-aWQgMSBcDQpwZWVyX3Nlc3Npb25faWQgMiANCg0KaXAgbGluayBzaG93IGwydHAxDQppcCBhZGRy
-IGFkZCAxMC4xLjAuMS8yNCBkZXYgbDJ0cDENCmlwIGxpbmsgc2V0IGwydHAxIHVwDQoNCmlwIHhm
-cm0gcG9saWN5IGFkZCBzcmMgMTAuMC4xLjEgZHN0IDEwLjAuMS4yIHByb3RvIHVkcCBzcG9ydCA1
-MDAwIFwNCmRwb3J0IDUwMDEgZGlyIG91dCB0bXBsIHNyYyAwLjAuMC4wIGRzdCAwLjAuMC4wIHBy
-b3RvIGVzcCBzcGkgMHgxMDAgXA0KbW9kZSB0cmFuc3BvcnQgcmVxaWQgMQ0KaXAgeGZybSBwb2xp
-Y3kgYWRkIHNyYyAxMC4wLjEuMiBkc3QgMTAuMC4xLjEgcHJvdG8gdWRwIHNwb3J0IDUwMDEgXA0K
-ZHBvcnQgNTAwMCBkaXIgaW4gdG1wbCBzcmMgMC4wLjAuMCBkc3QgMC4wLjAuMCBwcm90byBlc3Ag
-XA0KbW9kZSB0cmFuc3BvcnQgcmVxaWQgMQ0KDQppcCB4ZnJtIHN0YXRlIGFkZCBzcmMgMTAuMC4x
-LjEgZHN0IDEwLjAuMS4yIHByb3RvIGVzcCBzcGkgMHgxMDAgXA0KcmVxaWQgMSBtb2RlIHRyYW5z
-cG9ydCByZXBsYXktd2luZG93IDEgZmxhZyBlc24gXA0KYWVhZCAicmZjNDEwNihnY20oYWVzKSki
-IDB4ODUxNjY4N2M1NDljMzkyMWRhM2U1N2IyNTAzODUxMDk1MDAwZjA5MCAxMjgNCmlwIHhmcm0g
-c3RhdGUgYWRkIHNyYyAxMC4wLjEuMiBkc3QgMTAuMC4xLjEgcHJvdG8gZXNwIHNwaSAweDEwMSBc
-DQpyZXFpZCAxIG1vZGUgdHJhbnNwb3J0IHJlcGxheS13aW5kb3cgMSBmbGFnIGVzbiBcDQphZWFk
-ICJyZmM0MTA2KGdjbShhZXMpKSIgMHg4NTE2Njg3YzU0OWMzOTIxZGEzZTU3YjI1MDM4NTEwOTUw
-MDBmMDkwIDEyOA0KDQojIENvcnJ1cHRlZCBwYWNrZXRzIGNhbiBiZSBzZWVuIGhlcmUgYXMgc3Ry
-YW5nZSA4MDIuM0xMQyBmcmFtZXMgDQojIG9uIHZsYW4gMTI4MA0KdGNwZHVtcCAtZSAtaSBldGgw
-DQoNCkxpbmstUGFydG5lcjoNCg0KaXAgbGluayBhZGQgbGluayB0YXAwIHRhcDAuMTAgdHlwZSB2
-bGFuIGlkIDEwDQppcCBhZGRyIGFkZCAxMC4wLjEuMi8yNCBkZXYgdGFwMC4xMA0KaXAgbGluayBz
-ZXQgdXAgZGV2IHRhcDAuMTANCg0KaXAgbDJ0cCBhZGQgdHVubmVsIHJlbW90ZSAxMC4wLjEuMSBs
-b2NhbCAxMC4wLjEuMiB0dW5uZWxfaWQgMiBcDQpwZWVyX3R1bm5lbF9pZCAxIGVuY2FwIHVkcCB1
-ZHBfc3BvcnQgNTAwMSB1ZHBfZHBvcnQgNTAwMA0KaXAgbDJ0cCBhZGQgc2Vzc2lvbiBuYW1lIGwy
-dHAyIHR1bm5lbF9pZCAyIHNlc3Npb25faWQgMiBcDQpwZWVyX3Nlc3Npb25faWQgMQ0KDQppcCBh
-ZGRyIGFkZCBkZXYgbDJ0cDIgMTAuMS4wLjIvMjQNCmlwIGxpbmsgc2V0IGwydHAyIHVwDQoNCmlw
-IHhmcm0gcG9saWN5IGFkZCBzcmMgMTAuMC4xLjEgZHN0IDEwLjAuMS4yIHByb3RvIHVkcCBzcG9y
-dCA1MDAwIFwNCmRwb3J0IDUwMDEgZGlyIGluIHRtcGwgc3JjIDAuMC4wLjAgZHN0IDAuMC4wLjAg
-cHJvdG8gZXNwIFwNCm1vZGUgdHJhbnNwb3J0IHJlcWlkIDENCmlwIHhmcm0gcG9saWN5IGFkZCBz
-cmMgMTAuMC4xLjIgZHN0IDEwLjAuMS4xIHByb3RvIHVkcCBzcG9ydCA1MDAxIFwNCmRwb3J0IDUw
-MDAgZGlyIG91dCB0bXBsIHNyYyAwLjAuMC4wIGRzdCAwLjAuMC4wIHByb3RvIGVzcCBzcGkgMHgx
-MDEgXA0KbW9kZSB0cmFuc3BvcnQgcmVxaWQgMQ0KDQppcCB4ZnJtIHN0YXRlIGFkZCBzcmMgMTAu
-MC4xLjEgZHN0IDEwLjAuMS4yIHByb3RvIGVzcCBzcGkgMHgxMDAgXA0KcmVxaWQgMSBtb2RlIHRy
-YW5zcG9ydCByZXBsYXktd2luZG93IDEgZmxhZyBlc24gXA0KYWVhZCAicmZjNDEwNihnY20oYWVz
-KSkiIDB4ODUxNjY4N2M1NDljMzkyMWRhM2U1N2IyNTAzODUxMDk1MDAwZjA5MCAxMjgNCmlwIHhm
-cm0gc3RhdGUgYWRkIHNyYyAxMC4wLjEuMiBkc3QgMTAuMC4xLjEgcHJvdG8gZXNwIHNwaSAweDEw
-MSBcDQpyZXFpZCAxIG1vZGUgdHJhbnNwb3J0IHJlcGxheS13aW5kb3cgMSBmbGFnIGVzbiBcDQph
-ZWFkICJyZmM0MTA2KGdjbShhZXMpKSIgMHg4NTE2Njg3YzU0OWMzOTIxZGEzZTU3YjI1MDM4NTEw
-OTUwMDBmMDkwIDEyOA0KDQojIFRoaXMgd2lsbCBzaG93IERlc3RpbmF0aW9uIEhvc3QgVW5yZWFj
-aGFibGUgYXMgQVJQIGluIGwydHAgaXMgbmV2ZXINCiMgcmVjZWl2ZWQgb24gdGhlIERVVA0KcGlu
-ZyAxMC4xLjAuMQ0K
+> >>> In this case, for some reason, notifications do not
+> >>> come in order now. We introduce "cfg_notification_order_check" to
+> >>> possibly ignore the checking for order.
+> >>
+> >> Were you testing UDP?
+> >>
+> >> I don't think this is needed. I wonder what you were doing to see
+> >> enough of these events to want to suppress the log output.
+> 
+> I tested again on both TCP and UDP just now, and it happened to both of 
+> them. For tcp test, too many printfs will delay the sending and thus 
+> affect the throughput.
+> 
+> ipv4 tcp -z -t 1
+> gap: 277..277 does not append to 276
+
+There is something wrong here. 277 clearly appends to 276
+
+> gap: 276..276 does not append to 278
+
+This would be an actual reordering. But the above line already
+indicates that 276 is the next expected value.
+
+> gap: 278..1112 does not append to 277
+> gap: 1114..1114 does not append to 1113
+> gap: 1113..1113 does not append to 1115
+> gap: 1115..2330 does not append to 1114
+> gap: 2332..2332 does not append to 2331
+> gap: 2331..2331 does not append to 2333
+> gap: 2333..2559 does not append to 2332
+> gap: 2562..2562 does not append to 2560
+> ...
+> gap: 25841..25841 does not append to 25843
+> gap: 25843..25997 does not append to 25842
+> 
+> ...
+> 
+> ipv6 udp -z -t 1
+> gap: 11632..11687 does not append to 11625
+> gap: 11625..11631 does not append to 11688
+> gap: 11688..54662 does not append to 11632
+
+If you ran this on a kernel with a variety of changes, please repeat
+this on a clean kernel with no other changes besides the
+skb_orphan_frags_rx loopback change.
+
+It this is a real issue, I don't mind moving this behind cfg_verbose.
+And prefer that approach over adding a new flag.
+
+But I have never seen this before, and this kind of reordering is rare
+with UDP and should not happen with TCP except for really edge cases:
+the uarg is released only when both the skb was delivered and the ACK
+response was received to free the clone on the retransmit queue.
 
