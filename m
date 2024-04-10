@@ -1,101 +1,152 @@
-Return-Path: <netdev+bounces-86706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16AFE8A002C
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 20:58:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E98BD8A003E
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:04:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C19D21F26416
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 18:58:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B535283FDE
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 19:04:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A711802C6;
-	Wed, 10 Apr 2024 18:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0281F180A72;
+	Wed, 10 Apr 2024 19:04:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NctKVa6n"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="UPyw8BLE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4360617F371;
-	Wed, 10 Apr 2024 18:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9047460;
+	Wed, 10 Apr 2024 19:04:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712775507; cv=none; b=AZhoX4wwqh1CyzbahRyqyDHM2xgYKbZVuJesqeYGQKVjPY3A+Jrz3a150EGAjiDKWZZOyGTuTqa1PsQ9sQPk5PwjXU6Bg71si+HVijshGifPZkue8c9h78jahOGlKLYv2IcETpxWGJE5KLAPIkMym6V2xunQBN7V+KVArjeafEw=
+	t=1712775875; cv=none; b=gvivG6DsYK4f52eU1YQxHSEVGTpPKQIlDms5ICgBpNAQAZJc0lrg1gjo9szDVVEmmtFYuHPvIUeOGBKgLlsKc+Ghej4gh7bRLKk+RqI9C1+W7V0qLthvq9n3pXDGQkcipkG94c0O6LiFQtzQw+l8c8kfKvZfdfbAZIokP8MuTVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712775507; c=relaxed/simple;
-	bh=9YYPyx0qIUyI2HnU5/vkhTGz6+QCGmfdShkQKgzhQ6A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HTErlucS5XhFHraCFYMvCa30A8OlR8+XFCjux2+7F3XlxPFLSorAHnPLK/Rf+AsKLoefCEOkDP3xQvxcWotK8D3FZAsyUXPQ0rxBR5wGiMIeuxEpUiS8h8RYAPt2v/LyFcmRm2bU1DbC/OyqULQd6RN1djgtfIDs9M8IsdxEv/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NctKVa6n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C449AC433C7;
-	Wed, 10 Apr 2024 18:58:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712775506;
-	bh=9YYPyx0qIUyI2HnU5/vkhTGz6+QCGmfdShkQKgzhQ6A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NctKVa6nDuwhkik7DjWM/8gh6F+hOS55GKTNqBVCX1nBdzkyfiYssDUSeRGXdCF2S
-	 wxkoec0/uuRSCRW7Pq9Hi/Ha4DvgRKER3vzJ3UHVdATxV7WQlxWo3GNSvHIVE35aqx
-	 bsSYCoy+DFdkQW2vjW4ebXc9IH9SRhMxnDOl3XjC4NvcVIPC8xPC/B/9gT8BaqDCCY
-	 KvQWXcWzW+TSyFFnROqICrLEUwMaeMFms0kmBgJBAayEctO6ln8J34GTEZ7ScOb8zy
-	 lHcNfa0Wt6RGjRIAL6b7ilVf22abWc7Wj2xhgf9XyTvvADKixDs7OD44sWp35AQkdP
-	 EFEigzh7HECrw==
-Date: Wed, 10 Apr 2024 13:58:23 -0500
-From: Rob Herring <robh@kernel.org>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: Magnus Damm <magnus.damm@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org,
-	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
-	linux-kernel@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-renesas-soc@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Subject: Re: [PATCH net-next v2 1/5] dt-bindings: net: renesas,rzn1-gmac:
- Document RZ/N1 GMAC support
-Message-ID: <171277550043.890351.16696873966908975164.robh@kernel.org>
-References: <20240409-rzn1-gmac1-v2-0-79ca45f2fc79@bootlin.com>
- <20240409-rzn1-gmac1-v2-1-79ca45f2fc79@bootlin.com>
+	s=arc-20240116; t=1712775875; c=relaxed/simple;
+	bh=WNUHRnuL/nPa/KdZjEbb1Yec0muX2H7NaxT84SbLG+o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=RlXcUth3pHaBcf9SS3Vrm1ACfIS2RClT7dFX3iEkDINn2yWBE4SDrmweFJZDIxXl0xWWDUWfQmhj8CSjmHrqZQY0gT0fV61QZ9LiwEnnhkhttS+A2A0u6q8nYfCYL1xwTUwI5eFGrppxq+QiTv19pgrZONtK72u1j5oGcKlLMNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=UPyw8BLE; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43AEFVpt031790;
+	Wed, 10 Apr 2024 19:04:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=McZIZ4RkNyMqFdfx+BLnURSG0gx07exkf3P/nz9bFEk=; b=UP
+	yw8BLENpdWV1k3PlqVVCFwwJIkjna/c/YldXBHce6NcvOkvYqn3tBoOpsmLIebVs
+	FlBOa8p34dDNVi1dFVYLZkUHj1Reo53ydytnO7YMV0SxWII2eALJ7pzMJ+8Rf+Jo
+	jaIhDVf7Cl68YSeI6jnt2wY6wPlqVw8y2cRQqHUCUs54/WD7fVolF0c323iJiYMC
+	x/V634ulbM9T/ytbfmwAZ7hqUQD3wHuT+vi4W55LajlRWntAkIvmISMjEMacrUs7
+	Q2EZxG7SLMVrdJJJ57roPtJUmejoygTpQySA6+t7na5ftPKLrmN73PmedA6aLCa6
+	X961rZAPS+L/WK/eIPHA==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xdphau2cf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Apr 2024 19:04:12 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43AJ4BSS016238
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Apr 2024 19:04:11 GMT
+Received: from [10.46.19.239] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 10 Apr
+ 2024 12:04:07 -0700
+Message-ID: <f6066cc2-410a-4043-9657-7168dbd2a2ce@quicinc.com>
+Date: Wed, 10 Apr 2024 12:04:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240409-rzn1-gmac1-v2-1-79ca45f2fc79@bootlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH bpf-next v1 1/3] net: Rename mono_delivery_time to
+ tstamp_type for scalabilty
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
+        "Martin
+ KaFai Lau" <martin.lau@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>
+CC: <kernel@quicinc.com>
+References: <20240409210547.3815806-1-quic_abchauha@quicinc.com>
+ <20240409210547.3815806-2-quic_abchauha@quicinc.com>
+ <6616b0af63eed_2a98a52947e@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+In-Reply-To: <6616b0af63eed_2a98a52947e@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 8QFGfTKv0lAOUgSU9Ht80HCesRaoTJFS
+X-Proofpoint-ORIG-GUID: 8QFGfTKv0lAOUgSU9Ht80HCesRaoTJFS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-10_04,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
+ clxscore=1015 adultscore=0 lowpriorityscore=0 impostorscore=0
+ mlxlogscore=942 mlxscore=0 priorityscore=1501 spamscore=0 phishscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2404100138
 
 
-On Tue, 09 Apr 2024 11:21:44 +0200, Romain Gantois wrote:
-> From: Clément Léger <clement.leger@bootlin.com>
-> 
-> The RZ/N1 series of MPUs feature up to two Gigabit Ethernet controllers.
-> These controllers are based on Synopsys IPs. They can be connected to
-> RZ/N1 RGMII/RMII converters.
-> 
-> Add a binding that describes these GMAC devices.
-> 
-> Signed-off-by: "Clément Léger" <clement.leger@bootlin.com>
-> [rgantois: commit log]
-> Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
-> ---
->  .../devicetree/bindings/net/renesas,rzn1-gmac.yaml | 66 ++++++++++++++++++++++
->  1 file changed, 66 insertions(+)
-> 
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+On 4/10/2024 8:30 AM, Willem de Bruijn wrote:
+> Abhishek Chauhan wrote:
+>> mono_delivery_time was added to check if skb->tstamp has delivery
+>> time in mono clock base (i.e. EDT) otherwise skb->tstamp has
+>> timestamp in ingress and delivery_time at egress.
+>>
+>> Renaming the bitfield from mono_delivery_time to tstamp_type is for
+>> extensibilty for other timestamps such as userspace timestamp
+>> (i.e. SO_TXTIME) set via sock opts.
+>>
+>> Bridge driver today has no support to forward the userspace timestamp
+>> packets and ends up resetting the timestamp. ETF qdisc checks the
+>> packet coming from userspace and encounters to be 0 thereby dropping
+>> time sensitive packets. These changes will allow userspace timestamps
+>> packets to be forwarded from the bridge to NIC drivers.
+>>
+>> In future tstamp_type:1 can be extended to support userspace timestamp
+>> by increasing the bitfield.
+>>
+>> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
+>> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
+>> ---
+>>  include/linux/skbuff.h                     | 18 +++++++++---------
+>>  include/net/inet_frag.h                    |  4 ++--
+>>  net/bridge/netfilter/nf_conntrack_bridge.c |  6 +++---
+>>  net/core/dev.c                             |  2 +-
+>>  net/core/filter.c                          |  8 ++++----
+>>  net/ipv4/inet_fragment.c                   |  2 +-
+>>  net/ipv4/ip_fragment.c                     |  2 +-
+>>  net/ipv4/ip_output.c                       |  8 ++++----
+>>  net/ipv6/ip6_output.c                      |  6 +++---
+>>  net/ipv6/netfilter.c                       |  6 +++---
+>>  net/ipv6/netfilter/nf_conntrack_reasm.c    |  2 +-
+>>  net/ipv6/reassembly.c                      |  2 +-
+>>  net/sched/act_bpf.c                        |  4 ++--
+>>  net/sched/cls_bpf.c                        |  4 ++--
+>>  14 files changed, 37 insertions(+), 37 deletions(-)
+> 
+> Since the next patch against touches many of the same lines, probably
+> can just squash the two.
 
+Sounds good i can do that. 
+Make only 2 patches 
+1. rename + assign tstamp_type
+2. introduce another bit for clock_id base time 
 
