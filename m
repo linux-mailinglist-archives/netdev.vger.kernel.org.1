@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-86477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DB9489EEEC
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 11:33:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB1CF89EEF2
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 11:33:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA8201F21EB0
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:33:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DDC0B24A77
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:33:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FB8F156996;
-	Wed, 10 Apr 2024 09:33:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC105158DDE;
+	Wed, 10 Apr 2024 09:33:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="FX71Y6W6"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="ni7csRqO"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8962C144312;
-	Wed, 10 Apr 2024 09:32:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6961C155389;
+	Wed, 10 Apr 2024 09:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712741581; cv=none; b=uV8Lbw3DYgVwWavdBz/m6i+soYsiuexwWu1CMFHMLQXpGpwXEHc0uKhIbydmu8fCi8/PoF0aLmP2mWIyJ1VVm8tXZYCs3G9EWhlQmfnjPUmk9nwMvBEoD/LGMEylTXg3rxDhuPCX76zWwITOi7pwYs0kTaLF8X1S3D3aceW2P+s=
+	t=1712741582; cv=none; b=hKQxjuGZ3DpSB1yGQBlhU3x0GS+hqboEK5L4j62QlGLFMRe3kU43G4+1MDsflGVpuS01qqYfLfLt9CaLHIJwrlglOVd8wkJ/58DKfA/ZeXAPjgjuZf55tXn9EOICRkefXBzwOLMzctlL4YnajPVFCTLGK096zfjpCI1gW451U0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712741581; c=relaxed/simple;
-	bh=dz2ZRjqTz89ZMEMlnTX6GlK7nVgj8fTZW8/LNxn/yyo=;
+	s=arc-20240116; t=1712741582; c=relaxed/simple;
+	bh=GT4plfdJZt39vVnqpYEPKRuMEYhANrU28JfgNwwGJys=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aaVsKRNJCHp/G4tdcOXStMNsujJFe36ClWklmj+iu1kVNPAzkl2BWql6B24KVPDHRRmyiVXRND9t3fOasv40mr63izcQyEVfwATuzUDU+RGcPyF/K6s4wrom47/kAv7MgxB7yjZWuwMBx63ARmZbmWskYkrkiuRI1ecSQuk5FQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=FX71Y6W6; arc=none smtp.client-ip=193.104.135.124
+	 MIME-Version:Content-Type; b=tZh8Zkfd2hUCFdjRQHTUrlW+h4MiN8Dpgi02kkaiOoNICrabUN7jW5dWxufIM9qJOo8DZg5U820GmLWSH3s7oVhRA3n+/0kCc18vBAYrgid0SJDyfqghcdKXyfPsGdHjTPRN2TsUOXKhAU5xjGhrVMLBlWBz7X+n4iMHMIYTEiU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=ni7csRqO; arc=none smtp.client-ip=193.104.135.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
 Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id C7AA4600A9;
+	by mail1.fiberby.net (Postfix) with ESMTPSA id E3EBB600AF;
 	Wed, 10 Apr 2024 09:32:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1712741568;
-	bh=dz2ZRjqTz89ZMEMlnTX6GlK7nVgj8fTZW8/LNxn/yyo=;
+	s=202008; t=1712741573;
+	bh=GT4plfdJZt39vVnqpYEPKRuMEYhANrU28JfgNwwGJys=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FX71Y6W6XKB/HF9n8dBmNZuiUpUkRHrzi9ypWd4iqYandQNSHpRZ5fRiHwPmFdxte
-	 g2Y4mUX9/k1u2IJFUUsUcmHLGZGaah20geWMXzivCTVLO7yuLDUjkNfL/deKxlyF7O
-	 CHoE9LhtNixMXetnfTgQHb/LIeynzlRZPhqBkKx8mFNMCEZANjorxN0p15xpr3J1Q6
-	 bjqQ1I8Fkt/JbrMDCxeXr01TmnhcADmWsy4LnZAZQzm8YT9HeN7rfuS6uT+rGbIXj7
-	 kMuFEI4JfF+XiJOTfiDtzqEZ/fjHDfj9zL2Rv/03RU5pI7OHTk3KnvvTx4lnJZu7ZV
-	 VtR5HPXh23rGg==
+	b=ni7csRqODiV1tTRkAlCPkK5OzuQ85mHFohlaufJJEYUjYvlzJ1lqDQnOPYyt09PJT
+	 18Hdkle/tBFD8EFNt6vG43PchFqjaTP2a4+3EZlYvTVAwdZXiS+uR7OHQwe8ezoMRa
+	 p5ZH2MQRBn36cLIyJRsK5PvkH9+F4At68wT4HTf+zg/rRM32AOdoBgUdeurF5I8TRb
+	 w5Z3ufhbsyeLtL5fzW26Tzjqm/vKcYIp8wuriytdP56LJXznkcWZhBoNHC4WtHXf40
+	 h2g0+dorGGpdE6hfZNrmV3QEmCSgrTCBe8EbteB+t5NlCw33YhPFDM98GDHcS21/4N
+	 g2M5z7AFkYAKQ==
 Received: by x201s (Postfix, from userid 1000)
-	id A92CE20B99F; Wed, 10 Apr 2024 09:32:39 +0000 (UTC)
+	id 62CF020BDE2; Wed, 10 Apr 2024 09:32:40 +0000 (UTC)
 From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
 To: netdev@vger.kernel.org
 Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
@@ -67,9 +67,9 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	Jamal Hadi Salim <jhs@mojatatu.com>,
 	Cong Wang <xiyou.wangcong@gmail.com>,
 	Jiri Pirko <jiri@resnulli.us>
-Subject: [PATCH net-next v2 1/4] flow_offload: add control flag checking helpers
-Date: Wed, 10 Apr 2024 09:32:22 +0000
-Message-ID: <20240410093235.5334-2-ast@fiberby.net>
+Subject: [PATCH net-next v2 2/4] nfp: flower: fix check for unsupported control flags
+Date: Wed, 10 Apr 2024 09:32:23 +0000
+Message-ID: <20240410093235.5334-3-ast@fiberby.net>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240410093235.5334-1-ast@fiberby.net>
 References: <20240410093235.5334-1-ast@fiberby.net>
@@ -82,99 +82,35 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-These helpers aim to help drivers, with checking
-for the presence of unsupported control flags.
+Use flow_rule_is_supp_control_flags()
 
-For drivers supporting at least one control flag:
-  flow_rule_is_supp_control_flags()
+Check the mask, not the key, for unsupported control flags.
 
-For drivers using flow_rule_match_control(), but not using flags:
-  flow_rule_has_control_flags()
-
-For drivers not using flow_rule_match_control():
-  flow_rule_match_has_control_flags()
-
-While primarily aimed at FLOW_DISSECTOR_KEY_CONTROL
-and flow_rule_match_control(), then the first two
-can also be used with FLOW_DISSECTOR_KEY_ENC_CONTROL
-and flow_rule_match_enc_control().
-
-These helpers mirrors the existing check done in sfc:
-  drivers/net/ethernet/sfc/tc.c +276
-
-Only compile-tested.
+Only compile-tested, no access to HW
 
 Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 ---
- include/net/flow_offload.h | 55 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+ drivers/net/ethernet/netronome/nfp/flower/offload.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/flow_offload.h b/include/net/flow_offload.h
-index 314087a5e1818..9ee3ad4a308a8 100644
---- a/include/net/flow_offload.h
-+++ b/include/net/flow_offload.h
-@@ -449,6 +449,61 @@ static inline bool flow_rule_match_key(const struct flow_rule *rule,
- 	return dissector_uses_key(rule->match.dissector, key);
- }
+diff --git a/drivers/net/ethernet/netronome/nfp/flower/offload.c b/drivers/net/ethernet/netronome/nfp/flower/offload.c
+index 0aceef9fe5826..8e0a890381b60 100644
+--- a/drivers/net/ethernet/netronome/nfp/flower/offload.c
++++ b/drivers/net/ethernet/netronome/nfp/flower/offload.c
+@@ -527,10 +527,10 @@ nfp_flower_calculate_key_layers(struct nfp_app *app,
+ 		struct flow_match_control ctl;
  
-+/**
-+ * flow_rule_is_supp_control_flags() - check for supported control flags
-+ * @supp_flags: control flags supported by driver
-+ * @ctrl_flags: control flags present in rule
-+ * @extack: The netlink extended ACK for reporting errors.
-+ *
-+ * @returns true if only supported control flags are set, false otherwise.
-+ */
-+static inline bool flow_rule_is_supp_control_flags(const u32 supp_flags,
-+						   const u32 ctrl_flags,
-+						   struct netlink_ext_ack *extack)
-+{
-+	if (likely((ctrl_flags & ~supp_flags) == 0))
-+		return true;
+ 		flow_rule_match_control(rule, &ctl);
+-		if (ctl.key->flags & ~NFP_FLOWER_SUPPORTED_CTLFLAGS) {
+-			NL_SET_ERR_MSG_MOD(extack, "unsupported offload: match on unknown control flag");
 +
-+	NL_SET_ERR_MSG_FMT_MOD(extack,
-+			       "Unsupported match on control.flags %#x",
-+			       ctrl_flags);
-+
-+	return false;
-+}
-+
-+/**
-+ * flow_rule_has_control_flags() - check for presence of any control flags
-+ * @ctrl_flags: control flags present in rule
-+ * @extack: The netlink extended ACK for reporting errors.
-+ *
-+ * @returns true if control flags are set, false otherwise.
-+ */
-+static inline bool flow_rule_has_control_flags(const u32 ctrl_flags,
-+					       struct netlink_ext_ack *extack)
-+{
-+	return !flow_rule_is_supp_control_flags(0, ctrl_flags, extack);
-+}
-+
-+/**
-+ * flow_rule_match_has_control_flags() - match and check for any control flags
-+ * @rule: The flow_rule under evaluation.
-+ * @extack: The netlink extended ACK for reporting errors.
-+ *
-+ * @returns true if control flags are set, false otherwise.
-+ */
-+static inline bool flow_rule_match_has_control_flags(struct flow_rule *rule,
-+						     struct netlink_ext_ack *extack)
-+{
-+	struct flow_match_control match;
-+
-+	if (!flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_CONTROL))
-+		return false;
-+
-+	flow_rule_match_control(rule, &match);
-+
-+	return flow_rule_has_control_flags(match.mask->flags, extack);
-+}
-+
- struct flow_stats {
- 	u64	pkts;
- 	u64	bytes;
++		if (!flow_rule_is_supp_control_flags(NFP_FLOWER_SUPPORTED_CTLFLAGS,
++						     ctl.mask->flags, extack))
+ 			return -EOPNOTSUPP;
+-		}
+ 	}
+ 
+ 	ret_key_ls->key_layer = key_layer;
 -- 
 2.43.0
 
