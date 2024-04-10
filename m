@@ -1,132 +1,89 @@
-Return-Path: <netdev+bounces-86454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09B3889ED6A
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:18:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8291A89ED84
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:25:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B1161C20BF1
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:18:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B429A1C20A10
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:25:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56D613D523;
-	Wed, 10 Apr 2024 08:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2588613D529;
+	Wed, 10 Apr 2024 08:25:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="KDPNsaBu"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59041119F
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 08:17:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF92713D28C;
+	Wed, 10 Apr 2024 08:25:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712737077; cv=none; b=BG+Bd7xyXbC6ZCfIaNWulAvenLfZC0HhQDrdvnPkisZjtL1nLY1mt7v8fG/Ff/a4SK6VKP8CwqLnlbIO8Gw1lnlNjebd8lmlW6ZBUpdY0fBVZzVDw20Rq4cai/pSezSWdMUt1cNax5Qc1k35a2iPXaV+rn9FkYBQrLTa2OYsZg0=
+	t=1712737530; cv=none; b=o3jja0yQJpTEwB0rq26bhgi0WUADORTF5HRKXWB4svc7rcQzGRj/UVQxeidkgszKzEw7i2C9hGNYwRvyEsDoIRTlva14p/fjPBZGv8iowOHl+g6qTqSH9z3RiUbCvC+nVsYn234Cd0FOt8q5ypXEYaMOI0rORNWSvNrU1HymJQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712737077; c=relaxed/simple;
-	bh=xC8ShbvJxqkkvxJat6EB7q8qZhQNhNNdUP6nh25diog=;
+	s=arc-20240116; t=1712737530; c=relaxed/simple;
+	bh=Dhybrf/jRqbpyhuhIWlZvPbxMVOS0VFGt4WJR1DnMNo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=AbZXLVlAW+1+MHWvHdlG32EpG4MnkVfNWgTg7LePcZrK5r39LwXFpfLb7uroxCUnxgdyc3STHLG2TdoKMJKsJJFea0AcwRGNc0r17qIz1LD2kyaycf0mQEMpzOvEpjGB1+51J9kkRVdWSjjqmFAQpIq0pV8LH/onFGyda3Ewkiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-575-03eTqZvqPL6wle2To4eTmw-1; Wed,
- 10 Apr 2024 04:17:39 -0400
-X-MC-Unique: 03eTqZvqPL6wle2To4eTmw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 17DA029AA3AC;
-	Wed, 10 Apr 2024 08:17:39 +0000 (UTC)
-Received: from hog (unknown [10.39.192.7])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 451BE1121306;
-	Wed, 10 Apr 2024 08:17:37 +0000 (UTC)
-Date: Wed, 10 Apr 2024 10:17:32 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: antony.antony@secunet.com,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	devel@linux-ipsec.org, Leon Romanovsky <leon@kernel.org>,
-	Eyal Birger <eyal.birger@gmail.com>
-Subject: Re: [PATCH ipsec-next v9] xfrm: Add Direction to the SA in or out
-Message-ID: <ZhZLHNS41G2AJpE_@hog>
-References: <bb191b37cd631341552ee87eb349f0525b90f14f.1712685187.git.antony.antony@secunet.com>
- <0a51d41e-124e-479e-afd7-50246e3b0520@6wind.com>
- <ZhY_EE8miFAgZkkC@hog>
- <f2c52a01-925c-4e3a-8a42-aeb809364cc9@6wind.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QEP5a3yxzv34+8rBOFqL+kaWJlP5HTWnRaoVzP7ghvAfZKIX8KB6tNHcy1Out81LnGIt7GsnbWtSIAm7v0vZcAou8KVmsUVdHsDhy58Bz3VmeMOf7OdyiAy08bjLgBXUPWhFhqUhF+srloiU6E3TaWjHlzbzLLh92UNo7PU5sec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=KDPNsaBu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 222B4C433F1;
+	Wed, 10 Apr 2024 08:25:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1712737529;
+	bh=Dhybrf/jRqbpyhuhIWlZvPbxMVOS0VFGt4WJR1DnMNo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KDPNsaBudn+n4+RXzxU38zA293P9i01hK4pr+EzsNlygvUAPOjzwvf/oUbikrXg95
+	 /N9KFTY1uuvoJgBUoJH4BkRDQEIr3X5LSBVt6P6w3X2XFz+Etf1/yCAYNPWYH2L813
+	 KkAO4Cql9cMJLXpMa0g0EbkaGil+/s1j6TdGGz4k=
+Date: Wed, 10 Apr 2024 10:25:26 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
+Cc: Jakub Kicinski <kuba@kernel.org>, linux-usb@vger.kernel.org,
+	Li Yang <leoyang.li@nxp.com>, Zhang Wei <zw@zh-kernel.org>,
+	kernel@pengutronix.de, netdev@vger.kernel.org,
+	Shawn Guo <shawnguo@kernel.org>, linuxppc-dev@lists.ozlabs.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH] MAINTAINERS: Drop Li Yang as their email address stopped
+ working
+Message-ID: <2024041010-neuron-vividness-8202@gregkh>
+References: <20240405072042.697182-2-u.kleine-koenig@pengutronix.de>
+ <20240409144204.00cc76ce@kernel.org>
+ <u4bhjzjr4jjx26r3r4jupqd5u273xsvuyfzq5ecv6binoyoqzq@5zib23vgtlsx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <f2c52a01-925c-4e3a-8a42-aeb809364cc9@6wind.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <u4bhjzjr4jjx26r3r4jupqd5u273xsvuyfzq5ecv6binoyoqzq@5zib23vgtlsx>
 
-2024-04-10, 09:35:08 +0200, Nicolas Dichtel wrote:
-> Le 10/04/2024 =C3=A0 09:26, Sabrina Dubroca a =C3=A9crit=C2=A0:
-> > 2024-04-10, 08:32:20 +0200, Nicolas Dichtel wrote:
-> >> Le 09/04/2024 =C3=A0 19:56, Antony Antony a =C3=A9crit=C2=A0:
-> >>> v6->v7:
-> >>>  - add replay-window check non-esn 0 and ESN 1.
-> >>>  - remove :XFRMA_SA_DIR only allowed with HW OFFLOAD
-> >> Why? I still think that having an 'input' SA used in the output path i=
-s wrong
-> >> and confusing.
-> >> Please, don't drop this check.
-> >=20
-> > Limiting XFRMA_SA_DIR to only HW offload makes no sense. It's
-> > completely redundant with an existing property. We should also try to
-> > limit the divergence between offload and non-offload configuration. If
-> Sure.
->=20
-> > something is clearly only for offloaded configs, then fine, but
-> > otherwise the APIs should be identical.
-> But right now, the property is enforced for offload and but not for non-o=
-ffload.
-> In that sense, the api is not identical. I'm only asking to make this exp=
-licit.
+On Wed, Apr 10, 2024 at 08:42:06AM +0200, Uwe Kleine-König wrote:
+> On Tue, Apr 09, 2024 at 02:42:04PM -0700, Jakub Kicinski wrote:
+> > On Fri,  5 Apr 2024 09:20:41 +0200 Uwe Kleine-König wrote:
+> > > When sending a patch to (among others) Li Yang the nxp MTA replied that
+> > > the address doesn't exist and so the mail couldn't be delivered. The
+> > > error code was 550, so at least technically that's not a temporal issue.
+> > > 
+> > > Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+> > 
+> > FWIW it's eaac25d026a1 in net, thanks!
+> 
+> Greg also picked it up, it's fbdd90334a6205e8a99d0bc2dfc738ee438f00bc in
+> https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-linus
+> . Both are included in next-20240410. I guess that's not a big problem.
+> (And please prevent that the patch is dropped from both trees as it's
+> already included in the other :-)
 
-We can't get rid of the offload-specific way of setting the direction,
-because it's a flag (off =3D out, on =3D in), but if we add another way of
-setting the direction, it should be for all cases (we already have one
-for offload, we don't need a 2nd offload-specific flag), and it should
-correctly lock down uses (incompatible options, and use of the SA in
-the datapath as you said).
+We already got a report from linux-next about this, it's fine, we will
+both keep it.
 
-> > And based on what Antony says, this is intended in large part for
-> > IPTFS, which is not going to be offloaded any time soon (or probably
-> > ever), so that restriction would have to be lifted immediately. I'm
-> > not sure why Antony accepted your request.
-> I don't see the problem with that. The attribute can be relaxed later for=
- IPTFS
-> if needed.
+thanks,
 
-Then we would have landed back on v4 (unless we add the checks we're
-discussing now)...
-
-> But there are use cases without offload and without IPTFS.
-
-Sure. That's probably the vast majority of IPsec users.
-
-> Why isn't it possible to restrict the use of an input SA to the input pat=
-h and
-> output SA to xmit path?
-
-Because nobody has written a patch for it yet :)
-
---=20
-Sabrina
-
+greg k-h
 
