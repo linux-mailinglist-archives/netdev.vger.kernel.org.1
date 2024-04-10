@@ -1,145 +1,203 @@
-Return-Path: <netdev+bounces-86489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95AF489EF4E
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 11:56:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA39889EF53
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 11:58:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50D562825B7
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:56:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD2EA1C20AC6
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F3F5158204;
-	Wed, 10 Apr 2024 09:56:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAEA0156861;
+	Wed, 10 Apr 2024 09:58:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DyUCFHh5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dF83plSu"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A79F157A46
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 09:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B21B38F4E
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 09:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712742990; cv=none; b=FjWWGCrIZLhftRDmTxcM5bZ9ldRebdemqtZScJSoBU+4ua3r/gvCvLJjnULCyDu9jwlpkkqikxrv+Fd+VuhV8mqOB31h7RA9rqnGmhUhdOysd4e0q4/CLPsfJzYqOLE/QnmvmqZgq8X5hzD2W98FmsGdNOmcfo64YXglNrD+omU=
+	t=1712743099; cv=none; b=AFgg7MEPFG72vCepyJecKJTjGMJoV4XexQGPMqz5hKEpRqZuL3o2GvmbJ6j/DuQ69386ptWtfUd5OrJWZKCeJ/HoQRb0f5ys15T8ZRYYIpDd6XfVKwEyhPNooGs1bL/11DVtm2wufRI8azW5o5FZN2rWp7Z6+qnKbnE3sl2aGWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712742990; c=relaxed/simple;
-	bh=6RyjuDcWsZO20Mdq+RG05EtCrq1VHou3GzobE5FL86k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HPwhwrV2aUvAr6VVAYHMh5eYvwCDl2JoWyV7KN/6fP6lvkOWIqQMF5q3KOn7KHs3b9/3122/iCa7ffddadNMExE1vA59z8dQcvS0oqk5aotdCJMg+V3ZHDCq6Auvde1LooUJm97CSSULcdpGKErX00j+ZEXbf1ue0zNbr+A7xyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DyUCFHh5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712742987;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=GpBfMhS04qgT23TOMbDyVoHFEuB0U5xK3Cly3cM2U5g=;
-	b=DyUCFHh5o+OnXjvq6E80W/YQ7A72qhcr2oMjN4IKBB6kqvp4PLLQzH55QtbAai1FTCwakw
-	oYj+WtA8+kwwdqJMZS0isqtM7nhZLDB1hgG9f5umuTlDy3IplGqXdeC19d8FAR5FF79hZA
-	/Kay5U+1lVvqCXk4ANtVohRcFmC7rE0=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-511-LXAg-BT_NdmBkTKRCBGFEg-1; Wed,
- 10 Apr 2024 05:56:24 -0400
-X-MC-Unique: LXAg-BT_NdmBkTKRCBGFEg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 80ECC1C4C381;
-	Wed, 10 Apr 2024 09:56:23 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.39.192.244])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 170DA2166B34;
-	Wed, 10 Apr 2024 09:56:19 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
-	stable@vger.kernel.org,
-	Jarkko Palviainen <jarkko.palviainen@gmail.com>
-Subject: [PATCH] net: usb: ax88179_178a: avoid writing the mac address before first reading
-Date: Wed, 10 Apr 2024 11:55:49 +0200
-Message-ID: <20240410095603.502566-1-jtornosm@redhat.com>
+	s=arc-20240116; t=1712743099; c=relaxed/simple;
+	bh=8kljXWF9cM8kvyiMlAHuhlM0UfE1pXGPxynSESs+2dQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OIGHEOeN/tK7bXKWOnbQEzwzVxTLqFoFqOndoRuO/21ewZ3CkNekjilsz/m3Vb8SsEHYBKDSEZQDd3W4W13FyoW8Tly/13H3jWyQ9lxgx561au9fwXmMkn4MTtph5baKppO5EmX3sX9nNkE47q364VPHJVLvqIyzMghJn6AbyOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dF83plSu; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712743098; x=1744279098;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=8kljXWF9cM8kvyiMlAHuhlM0UfE1pXGPxynSESs+2dQ=;
+  b=dF83plSuPiXQTi3r0FozgRuVDqvJj1xVNE+uczju8F+bSStlLCthNoUJ
+   kPkrmMO42VLInL+PCBmk1BVTRhHuIuwtmGD0iUIRO4izjVUN+wczp6osn
+   A6GUVEnfM/U0RG/jxN3jo9bqqkpXgNwlvdNMWEgZe7ixKxcKBibHbEEeW
+   Ujd1uayMLRuJEYGZfZ44NTS3a8ZSeRW3RAyVYdQJhunjwBD59QMCqxsTK
+   fWjQx3gkWqdNO0vq+yROXBlsJZhhqipZNbcHn1JQGqDRK+XSvuPvCBORb
+   N7szOGWj+sdKRlLaGrRhkr8PVTIPxXhnwJXibX0xGs3Y7k0RBI6gknCdZ
+   Q==;
+X-CSE-ConnectionGUID: zYT2Wya7TdCen8VyNCRJeg==
+X-CSE-MsgGUID: s60Y++N1SdCsg2MxMG27Uw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="25601425"
+X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
+   d="scan'208";a="25601425"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 02:58:17 -0700
+X-CSE-ConnectionGUID: aYy+foZLSn2r2UUZc3n3tg==
+X-CSE-MsgGUID: iIgP4Th0SfSAleBxwmoMpg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
+   d="scan'208";a="20542691"
+Received: from unknown (HELO mev-dev) ([10.237.112.144])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 02:58:15 -0700
+Date: Wed, 10 Apr 2024 11:57:55 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
+Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	"Kubiak, Michal" <michal.kubiak@intel.com>
+Subject: Re: [Intel-wired-lan] [iwl-net v1] ice: tc: do default match on all
+ profiles
+Message-ID: <ZhZio9Kc0FrgNwnN@mev-dev>
+References: <20240312105259.2450-1-michal.swiatkowski@linux.intel.com>
+ <PH0PR11MB50130FD5A519919523197C7C96362@PH0PR11MB5013.namprd11.prod.outlook.com>
+ <ZgZ6/6/R+5EfQvbb@mev-dev>
+ <PH0PR11MB5013EC7967F8B7694B2F5C8C963F2@PH0PR11MB5013.namprd11.prod.outlook.com>
+ <Zg+5mIUtMruFRck0@mev-dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zg+5mIUtMruFRck0@mev-dev>
 
-After the commit d2689b6a86b9 ("net: usb: ax88179_178a: avoid two
-consecutive device resets"), reset operation, in which the default mac
-address from the device is read, is not executed from bind operation and
-the random address, that is pregenerated just in case, is direclty written
-the first time in the device, so the default one from the device is not
-even read. This writing is not dangerous because is volatile and the
-default mac address is not missed.
+On Fri, Apr 05, 2024 at 10:43:04AM +0200, Michal Swiatkowski wrote:
+> On Mon, Apr 01, 2024 at 09:28:30AM +0000, Buvaneswaran, Sujai wrote:
+> > > -----Original Message-----
+> > > From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> > > Sent: Friday, March 29, 2024 1:56 PM
+> > > To: Buvaneswaran, Sujai <sujai.buvaneswaran@intel.com>
+> > > Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Marcin Szycik
+> > > <marcin.szycik@linux.intel.com>; Kubiak, Michal <michal.kubiak@intel.com>
+> > > Subject: Re: [Intel-wired-lan] [iwl-net v1] ice: tc: do default match on all
+> > > profiles
+> > > 
+> > > On Mon, Mar 25, 2024 at 06:36:56AM +0000, Buvaneswaran, Sujai wrote:
+> > > > > -----Original Message-----
+> > > > > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf
+> > > > > Of Michal Swiatkowski
+> > > > > Sent: Tuesday, March 12, 2024 4:23 PM
+> > > > > To: intel-wired-lan@lists.osuosl.org
+> > > > > Cc: netdev@vger.kernel.org; Marcin Szycik
+> > > > > <marcin.szycik@linux.intel.com>; Kubiak, Michal
+> > > > > <michal.kubiak@intel.com>; Michal Swiatkowski
+> > > > > <michal.swiatkowski@linux.intel.com>
+> > > > > Subject: [Intel-wired-lan] [iwl-net v1] ice: tc: do default match on
+> > > > > all profiles
+> > > > >
+> > > > > A simple non-tunnel rule (e.g. matching only on destination MAC) in
+> > > > > hardware will be hit only if the packet isn't a tunnel. In software
+> > > > > execution of the same command, the rule will match both tunnel and
+> > > non-tunnel packets.
+> > > > >
+> > > > > Change the hardware behaviour to match tunnel and non-tunnel packets
+> > > > > in this case. Do this by considering all profiles when adding
+> > > > > non-tunnel rule (rule not added on tunnel, or not redirecting to tunnel).
+> > > > >
+> > > > > Example command:
+> > > > > tc filter add dev pf0 ingress protocol ip flower skip_sw action mirred \
+> > > > > 	egress redirect dev pr0
+> > > > >
+> > > > > It should match also tunneled packets, the same as command with
+> > > > > skip_hw will do in software.
+> > > > >
+> > > > > Fixes: 9e300987d4a8 ("ice: VXLAN and Geneve TC support")
+> > > > > Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> > > > > Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
+> > > > > Signed-off-by: Michal Swiatkowski
+> > > > > <michal.swiatkowski@linux.intel.com>
+> > > > > ---
+> > > > > v1 --> v2:
+> > > > >  * fix commit message sugested by Marcin
+> > > > > ---
+> > > > >  drivers/net/ethernet/intel/ice/ice_tc_lib.c | 2 +-
+> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > >
+> > > > Hi,
+> > > >
+> > > > We are seeing error while adding HW tc rules on PF with the latest net-
+> > > queue patches. This issue is blocking the validation of latest net-queue
+> > > Switchdev patches.
+> > > >
+> > > > + tc filter add dev ens5f0np0 ingress protocol ip prio 1 flower
+> > > > + src_mac b4:96:91:9f:65:58 dst_mac 52:54:00:00:16:01 skip_sw action
+> > > > + mirred egress redirect dev eth0
+> > > > Error: ice: Unable to add filter due to error.
+> > > > We have an error talking to the kernel
+> > > > + tc filter add dev ens5f0np0 ingress protocol ip prio 1 flower
+> > > > + src_mac b4:96:91:9f:65:58 dst_mac 52:54:00:00:16:02 skip_sw action
+> > > > + mirred egress redirect dev eth1
+> > > > Error: ice: Unable to add filter due to error.
+> > > > We have an error talking to the kernel
+> > > 
+> > > Hi,
+> > > 
+> > > The same command is working fine on my setup. I suspect that it isn't related
+> > > to this patch. The change is only in command validation, there is no
+> > > functional changes here that can cause error during adding filters which
+> > > previously was working fine.
+> > > 
+> > > Can you share more information about the setup? It was the first filter added
+> > > on the PF? Did you do sth else before checking tc?
+> > 
+> > Hi Michal,
+> > I have used the setup with latest upstream dev-queue kernel and this issue is observed while adding HW tc rules on PF using
+> > 'Script A' from below link.
+> > https://edc.intel.com/content/www/us/en/design/products/ethernet/appnote-e810-eswitch-switchdev-mode-config-guide/script-a-switchdev-mode-with-linux-bridge-configuration/
+> > 
+> > This issue is reproducible on two of our setups with latest upstream kernel - 6.9.0-rc1+. Please check and let me know if more information is needed.
+> > 
+> 
+> I tried script from the link and it is working. I am aware of the
+> problem when the same rule is being added with different destination.
+> Are you sure there are no more exsisting rule before calling the script?
+> In the script VFs are removed, but PF qdisc isn't removed. Old rule can
+> exsist there. I suggest to add sth like, before adding new qdiscs:
+> $tc qdisc del dev $PF1 ingress
+> 
+> I tested on 6.9.0-rc1+ kernel.
+> 
 
-In order to avoid this, do not allow writing a mac address directly into
-the device, if the default mac address from the device has not been read
-yet.
+I have found the problem. I was using different DDP package.
 
-cc: stable@vger.kernel.org # 6.6+
-Fixes: d2689b6a86b9 ("net: usb: ax88179_178a: avoid two consecutive device resets")
-Reported-by: Jarkko Palviainen <jarkko.palviainen@gmail.com>
-Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
----
- drivers/net/usb/ax88179_178a.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+The problem is with lack of free indexes in profiles when matching is
+done on both tunnel and not tunnel packet (so all profiles are
+considered). For now please Tony remove it from next-queue. I am trying
+to figure out how to implement matching on all profiles using less
+indexes. If I find the correct way I will submit new patch.
 
-diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
-index 69169842fa2f..650bb7b6badf 100644
---- a/drivers/net/usb/ax88179_178a.c
-+++ b/drivers/net/usb/ax88179_178a.c
-@@ -174,6 +174,7 @@ struct ax88179_data {
- 	u32 wol_supported;
- 	u32 wolopts;
- 	u8 disconnecting;
-+	u8 mac_address_read;
- };
- 
- struct ax88179_int_data {
-@@ -969,9 +970,12 @@ static int ax88179_change_mtu(struct net_device *net, int new_mtu)
- static int ax88179_set_mac_addr(struct net_device *net, void *p)
- {
- 	struct usbnet *dev = netdev_priv(net);
-+	struct ax88179_data *ax179_data = dev->driver_priv;
- 	struct sockaddr *addr = p;
- 	int ret;
- 
-+	if (!ax179_data->mac_address_read)
-+		return -EAGAIN;
- 	if (netif_running(net))
- 		return -EBUSY;
- 	if (!is_valid_ether_addr(addr->sa_data))
-@@ -1256,6 +1260,7 @@ static int ax88179_led_setting(struct usbnet *dev)
- 
- static void ax88179_get_mac_addr(struct usbnet *dev)
- {
-+	struct ax88179_data *ax179_data = dev->driver_priv;
- 	u8 mac[ETH_ALEN];
- 
- 	memset(mac, 0, sizeof(mac));
-@@ -1281,6 +1286,9 @@ static void ax88179_get_mac_addr(struct usbnet *dev)
- 
- 	ax88179_write_cmd(dev, AX_ACCESS_MAC, AX_NODE_ID, ETH_ALEN, ETH_ALEN,
- 			  dev->net->dev_addr);
-+
-+	ax179_data->mac_address_read = 1;
-+	netdev_info(dev->net, "MAC address: %pM\n", dev->net->dev_addr);
- }
- 
- static int ax88179_bind(struct usbnet *dev, struct usb_interface *intf)
--- 
-2.44.0
+Thanks
 
+> Thanks,
+> Michal
+> > Thanks,
+> > Sujai B
+> > > 
+> > > Thanks,
+> > > Michal
+> > > >
+> > > > Thanks,
+> > > > Sujai B
 
