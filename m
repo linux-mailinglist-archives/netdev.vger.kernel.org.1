@@ -1,105 +1,111 @@
-Return-Path: <netdev+bounces-86628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C710389F974
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 16:08:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6132889F901
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:58:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82EFA2857C3
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 14:08:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B46928226E
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 13:58:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4495216F0CC;
-	Wed, 10 Apr 2024 14:02:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nohats.ca header.i=@nohats.ca header.b="WmFiF2q/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67FA116F0FC;
+	Wed, 10 Apr 2024 13:53:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.nohats.ca (mx.nohats.ca [193.110.157.85])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA1816F0C8
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 14:02:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.110.157.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94F2915FA6D;
+	Wed, 10 Apr 2024 13:53:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712757752; cv=none; b=qCgcB2qJItbvqwOVJ7Y8W3Sspsf80E4sA9SShlvnaXBo7Ix38v0HLdvBCODlquN2xPg6VnrcBju5JvIza9k7PRumb+KuER4LCIFA9PuSW/r8F/dhwgIqSEerFWl0IdkT9CSpZEOwjx1B9uaF8ASjEA8edUvKVlMQqcdIxEi9EdA=
+	t=1712757182; cv=none; b=VouapikejDUDKDB6J9pdD9uJmUdjtPMwQPUwocg8rjLfAo+N7f+RUn1kPY8orL2oJb0mUkPnnM8vsct02vzk6WqbqZJNZ48QkfRJu1Y6qcymaRe4ZoECNR1f3FaMSPhK2ten4XpHAS7zbLF8PISds7YIbxZQFZkLJDp5D7yaxQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712757752; c=relaxed/simple;
-	bh=t626WBz4QG/pFsr1u7jA/gEzclLp/uWG/Qu8ZxQ4/aM=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=V/7a8DxIlJMOnFcSkPm9jCJ6IadYXl8lzQVPHK6E0lEerR+w+NCb4wu2l77teEHiUuBQduCqyBXDv8so9PV/itPUXZlri2KMjTwvbosSOwza0k62EDhj3zqa6gADX8iQpEjcJ44wKUx2L66a5pzrHOGbWC3tfch1UNFw88JctVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nohats.ca; spf=fail smtp.mailfrom=nohats.ca; dkim=pass (1024-bit key) header.d=nohats.ca header.i=@nohats.ca header.b=WmFiF2q/; arc=none smtp.client-ip=193.110.157.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nohats.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nohats.ca
-Received: from localhost (localhost [IPv6:::1])
-	by mx.nohats.ca (Postfix) with ESMTP id 4VF45f6fKLz3Km;
-	Wed, 10 Apr 2024 15:52:38 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nohats.ca;
-	s=default; t=1712757158;
-	bh=SBc68PnW8f1XdN8Pmd9O7gqoDGaa/9Xx2mWi0WiqVgw=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=WmFiF2q/HQyMaCch1YltbFH7XJoT0F5w8ozLh2l7OFXrIxHPxikRSUcEJScz53h5K
-	 LFqwUmFFsZB10Ph4TRh/3ii7p7WJFcfw6TFGtbSnDSLjVe0SMqcmbP8POGrmBzNvSh
-	 A4wTJNT8CPA22zVlPFuBncII/qH40a7+LQ6HzuSs=
-X-Virus-Scanned: amavisd-new at mx.nohats.ca
-X-Spam-Flag: NO
-X-Spam-Score: 0.566
-X-Spam-Level:
-Received: from mx.nohats.ca ([IPv6:::1])
-	by localhost (mx.nohats.ca [IPv6:::1]) (amavisd-new, port 10024)
-	with ESMTP id Q0D7DMqxW0qF; Wed, 10 Apr 2024 15:52:38 +0200 (CEST)
-Received: from bofh.nohats.ca (bofh.nohats.ca [193.110.157.194])
-	(using TLSv1.2 with cipher ADH-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mx.nohats.ca (Postfix) with ESMTPS;
-	Wed, 10 Apr 2024 15:52:37 +0200 (CEST)
-Received: by bofh.nohats.ca (Postfix, from userid 1000)
-	id DDE5911BD543; Wed, 10 Apr 2024 09:52:36 -0400 (EDT)
-Received: from localhost (localhost [127.0.0.1])
-	by bofh.nohats.ca (Postfix) with ESMTP id DA1A311BD542;
-	Wed, 10 Apr 2024 09:52:36 -0400 (EDT)
-Date: Wed, 10 Apr 2024 09:52:36 -0400 (EDT)
-From: Paul Wouters <paul@nohats.ca>
-To: Sabrina Dubroca <sd@queasysnail.net>
-cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>, antony.antony@secunet.com, 
-    Steffen Klassert <steffen.klassert@secunet.com>, 
-    Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, devel@linux-ipsec.org, 
-    Leon Romanovsky <leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v9] xfrm: Add Direction to the
- SA in or out
-In-Reply-To: <ZhZUcNKD8viY6Y3W@hog>
-Message-ID: <8b27d067-d401-88b9-f784-4589b27f8e32@nohats.ca>
-References: <bb191b37cd631341552ee87eb349f0525b90f14f.1712685187.git.antony.antony@secunet.com> <0a51d41e-124e-479e-afd7-50246e3b0520@6wind.com> <ZhY_EE8miFAgZkkC@hog> <f2c52a01-925c-4e3a-8a42-aeb809364cc9@6wind.com> <ZhZLHNS41G2AJpE_@hog>
- <1909116d-15e1-48ac-ab55-21bce409fe64@6wind.com> <ZhZUcNKD8viY6Y3W@hog>
+	s=arc-20240116; t=1712757182; c=relaxed/simple;
+	bh=eQCGM2hLXlsELqKGuPmo5wliilM5OD/y4FEKpn+8sGk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BBtS8+DxXH3AT5A7YMrNvOuockvJTmjDDXyTy8C7Y9+PsrMZ3OKPfM3QDMJ3NAh+RXkoFt3CCc7JHAcj/DmwZCxBRd8uPoZ9ofRO8d161X/TqfYDxxJGyUV/ASvTMUqf5oHkucXAGrEWw1bNbKAGGyfPjq5fdOQzUDIzHdFh9iQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-56e56ee8d5cso5168267a12.2;
+        Wed, 10 Apr 2024 06:53:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712757179; x=1713361979;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2+nHNpjc7nbxViZPMz2OFh3H9yMSlCGh2OFCJgFJuZo=;
+        b=Z+VaWFsbPVq6dDJWUOb9pXZQRfcGKH+czXiR4CetyKNmrr1ZhWVE1QEZEqVHkUx5cx
+         /QnBhUewDWTZC69ESUrpXjhSCfVcY6weUmiWR/V0Q2Ih+uSpwfMM6v/dvq9JksJlXBzf
+         ObHxU3ICh/zL2FbqMk1TFlfVIW2diWpw+CWMJ+94WySYY4alFX3wVWfPkQTNVlQhOycd
+         bQfWrg1SMxife+J894iHBq4EzP60I/urKIG/pZkbu5eqFuck9iuIjh4nZW6TSETiQLUw
+         TgwJVT45/wiPzR/gAryhIENfjC3MXE8y3dsw2PSrGQDvOUYyMJMbVX+fzCf6zltjA5cG
+         Aojw==
+X-Forwarded-Encrypted: i=1; AJvYcCWnFBsOoFGFYjBtda9voFAYrpPvnThjcyBn/zOaHrSPX9X26Ce6wYnd/vfKbIZWGtNAuLl2jgVf0ljdEPK4Crgqyy1yyA8NkEDLfwck8YenuJ8w77NBrToJZaDNAfHcM57F4J15
+X-Gm-Message-State: AOJu0YyOqdZv0Dm/uJjmub/ue6vSCXoSm0wKpOEpIalSVULZls3GLFJA
+	OAUl4kLxb2ZPSdJXZ7BA2Hb5FxriCiSM+Yw8KRd8GtR5Y9YA5S1fRSAyT437E94=
+X-Google-Smtp-Source: AGHT+IG05QuaAme6XNB1Zazal7AkIHNsiesYPGMti7akMyeAGlOnHNnoucOCpYJxxJ36YjZL2akARQ==
+X-Received: by 2002:a50:8a84:0:b0:56d:c722:93a3 with SMTP id j4-20020a508a84000000b0056dc72293a3mr2098616edj.21.1712757178778;
+        Wed, 10 Apr 2024 06:52:58 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-007.fbsv.net. [2a03:2880:30ff:7::face:b00c])
+        by smtp.gmail.com with ESMTPSA id t9-20020aa7d709000000b0056e785e6b46sm1520621edq.3.2024.04.10.06.52.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 06:52:58 -0700 (PDT)
+Date: Wed, 10 Apr 2024 06:52:56 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 4/4] net: dqs: make struct dql more cache
+ efficient
+Message-ID: <ZhaZuOjq+b5nzqcs@gmail.com>
+References: <20240408172605.635508-1-leitao@debian.org>
+ <20240408172605.635508-5-leitao@debian.org>
+ <20240409172149.6f285b68@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240409172149.6f285b68@kernel.org>
 
-On Wed, 10 Apr 2024, Sabrina Dubroca via Devel wrote:
+On Tue, Apr 09, 2024 at 05:21:49PM -0700, Jakub Kicinski wrote:
+> On Mon,  8 Apr 2024 10:25:56 -0700 Breno Leitao wrote:
+> > With the previous change, struct dqs->stall_thrs will be in the hot path
+> > (at queue side), even if DQS is disabled.
+> > 
+> > The other fields accessed in this function (last_obj_cnt and num_queued)
+> > are in the first cache line, let's move this field  (stall_thrs) to the
+> > very first cache line, since there is a hole there.
+> > 
+> > This does not change the structure size, since it moves an short (2
+> > bytes) to 4-bytes whole in the first cache line.
+> 
+> Doesn't this move the cache line bouncing problem to the other side?
 
-> 2024-04-10, 10:37:27 +0200, Nicolas Dichtel wrote:
->> Le 10/04/2024 à 10:17, Sabrina Dubroca a écrit :
->> [snip]
->> >> Why isn't it possible to restrict the use of an input SA to the input path and
->> >> output SA to xmit path?
->> > 
->> > Because nobody has written a patch for it yet :)
->> > 
->> For me, it should be done in this patch/series ;-)
->
-> Sounds good to me.
+I think so. Looking at dql_check_stall(), it only uses fields in the
+second cache line, except now 'dql->stall_thrs' that is in the first
+cache line.
 
-If this is not the case currently, what happens when our own generated
-SPI clashes with a peer generated SPI? Could it be we end up using the
-wrong SA state?
+> Eric said "copy" I read that as "have two fields with the same value".
 
-Paul
+Sorry, I misunderstood it. I can create two fields, and update them
+together at the only place where they will be updated
+(bql_set_stall_thrs).
+
+> I think it's single digit number of alu instructions we'd be saving
+> here, not super convinced patch 3 is the right trade off...
+
+Right. I was more concerned about the write barriers (smp_wmb()) inside
+the loop which happen quite frequently.
+
+But, if you think that the this is not the right approach, I can drop
+this whole patchset. Do you think a profiler will us here?
+
+Thanks!
 
