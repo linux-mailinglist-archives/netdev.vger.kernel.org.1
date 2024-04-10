@@ -1,103 +1,108 @@
-Return-Path: <netdev+bounces-86769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D36F28A037B
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 00:37:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 663508A0380
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 00:42:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 547CFB218E9
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 22:37:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 825D31C2221C
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 22:42:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469E579CC;
-	Wed, 10 Apr 2024 22:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B397BA49;
+	Wed, 10 Apr 2024 22:42:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XUV1hJ3x"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="Bp4CzHNE"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C407F;
-	Wed, 10 Apr 2024 22:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FB632629C;
+	Wed, 10 Apr 2024 22:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712788653; cv=none; b=oMXHV23XREROpXQEqa6gM9BMIGBB+GgOQdHWACKMpzXGG3zQImYUrWQMMeNxApHoNYedzEhP4spLbeppdOaHQrtCra+esBbcX68kkrUvHBqoJRi3+VJ+bf2KF+wptyYZatIg9dcHyOWKpNhNJzr19MjYngoy7m+S76GJo7G9QxY=
+	t=1712788933; cv=none; b=Zbczs5EFIC5lg5eDiXpcg3sJkRXIh7sjFK3/omHUbHIHcvMcyV+Ybd0eXAdk7pyGsNn3RNhpCqytBwc8MC9Z7MFgiDLDn1Eq7D7jQw15xXsHqM2yVmWkjxLePwA/BA4/PWXBwnPmz/kpNQ3DwO2uokWJSTp+LCo5smGNcvAHoUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712788653; c=relaxed/simple;
-	bh=rJd3I0lFxC/TyIkFxSTVQ+nTVKLHJ2m2+xlQZAXqST0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bxIrmHWZeyy2tY/0qWXBuxwiR74/iTu9lVSxWl/zYjyv4rkTapNhG/V9PoeUpJ4EZNjlMftpe+g3fL3WRwWXg8xVFC1gPwvt9GKUnB7ork8OOdxigl/u15EQeQBxpMbvaxg+bhqUZLppyTrAke7iUsWo7HUGpI8UM536GNwuzgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XUV1hJ3x; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zUFTjk3Uz1sjAZCF89cY7ibFazq/lwzoV5czJsG613U=; b=XUV1hJ3xAeU9NZpY4WaspCHDiH
-	TcU+rk8t3HXnAavXpdF3M5vSZGcYFoP93BgyIuwdQlWP9T4RJb6L0fImTVE5H9qlUWzFi3HhT/MHd
-	Dc/6trPjdYii/s0ZkSrBBtTXYg5W2QD/Px3Gy0r2JvEzptj6zjbCTy/HB6Vb7BeJBsjU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rugZF-00Ci8j-KA; Thu, 11 Apr 2024 00:37:21 +0200
-Date: Thu, 11 Apr 2024 00:37:21 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, pabeni@redhat.com,
-	John Fastabend <john.fastabend@gmail.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org,
-	bhelgaas@google.com, linux-pci@vger.kernel.org,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-Message-ID: <c437cf8e-57d5-44d3-a71d-c95ea84838fd@lunn.ch>
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <20240409135142.692ed5d9@kernel.org>
- <44093329-f90e-41a6-a610-0f9dd88254eb@lunn.ch>
- <CAKgT0UcVnhgmXNU2FGcy6hbzUQZwNBZw0EKbFF3DsKDc8r452A@mail.gmail.com>
- <c820695d-bda7-4452-a563-170700baf958@lunn.ch>
- <CAKgT0Uf4i_MN-Wkvpk29YevwsgFrQ3TeQ5-ogLrF-QyMSjtiug@mail.gmail.com>
+	s=arc-20240116; t=1712788933; c=relaxed/simple;
+	bh=50pj4Nx8ZyIs9Ah52P70ERpaXuyZGbI/i2NNrXS9olc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=n1ZFcFzml9rOICQ/i8uZQrKB0jJo9rWHiTiN8BPodgnzG7F4tVclxUzWJNpcrgIZVFzKGumbqjyxaE95C1dvKxgn3Xm5a6bl2BwAGlW598ZerHCuhanzo9wFh78yNQLAcNVZhWWMTVWQ5PJge25H+l5N5u9yb6nwM+rgmpqCoys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=Bp4CzHNE; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1712788926;
+	bh=Q2SsuTrAGoRt9Xal2JN80k4d9A0UXPX8wyMhBLpD4qY=;
+	h=Date:From:To:Cc:Subject:From;
+	b=Bp4CzHNES9OPMJkRfBf32bm5CaFJiyWSHxvD3jOP/CweoCKxzkJAW4ZBsA2nu8eP2
+	 gLm8YPwjot21Qp2K8/KtBWm8k2jUZdI58jhMBK9vynVNaE9Jl52HCBJkllAluStjzB
+	 o7s1YzxaNTxbLI/rKkIq81pbo7JKkZi+3qZ9tk/dcRMlpRfS5J1VBlHmxlvlHq32Sm
+	 PmT7iiTlaJUax4eVOb5R7SiJ6a30D8WeTHFdE5XTU7EjvyUvpjq4/ngqxZykt6QGGn
+	 /Q8sXVwy2461w0TlxJV1AyUnEGsNKc2ZUA4gc8qSOu0M/qSmE1Av2Y71R/s/XIey3d
+	 WyahwdUIotCRA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VFHrY6Gymz4wqM;
+	Thu, 11 Apr 2024 08:42:05 +1000 (AEST)
+Date: Thu, 11 Apr 2024 08:42:04 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Networking
+ <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the net tree
+Message-ID: <20240411084204.0d82fb04@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKgT0Uf4i_MN-Wkvpk29YevwsgFrQ3TeQ5-ogLrF-QyMSjtiug@mail.gmail.com>
+Content-Type: multipart/signed; boundary="Sig_/2xAgszze_szggfSWGWvYUY1";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-> Well I was referring more to the data path level more than the phy
-> configuration. I suspect different people have different levels of
-> expectations on what minimal firmware is. With this hardware we at
-> least don't need to use firmware commands to enable or disable queues,
-> get the device stats, or update a MAC address.
-> 
-> When it comes to multi-host NICs I am not sure there are going to be
-> any solutions that don't have some level of firmware due to the fact
-> that the cable is physically shared with multiple slots.
+--Sig_/2xAgszze_szggfSWGWvYUY1
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This is something Russell King at least considered. I don't really
-know enough to know why its impossible for Linux to deal with multiple
-slots.
+Hi all,
 
-> I am assuming we still want to do the PCS driver. So I will still see
-> what I can do to get that setup.
+After merging the net tree, today's linux-next build (arm
+multi_v7_defconfig) failed like this:
 
-You should look at the API offered by drivers in drivers/net/pcs. It
-is designed to be used with drivers which actually drive the hardware,
-and use phylink. Who is responsible for configuring and looking at the
-results of auto negotiation? Who is responsible for putting the PCS
-into the correct mode depending on the SFP modules capabilities?
-Because you seemed to of split the PCS into two, and hidden some of it
-away, i don't know if it makes sense to try to shoehorn what is left
-into a Linux driver.
+arm-linux-gnueabi-ld: drivers/net/ethernet/realtek/r8169_main.o: in functio=
+n `rtl_remove_one':
+r8169_main.c:(.text+0x62e4): undefined reference to `r8169_remove_leds'
 
-     Andrew
+Caused by commit
+
+  19fa4f2a85d7 ("r8169: fix LED-related deadlock on module removal")
+
+I have used the net tree from next-20240410 for today.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/2xAgszze_szggfSWGWvYUY1
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYXFbwACgkQAVBC80lX
+0GxzuQf/etTjADKncB+DqgBucpBNkX+2Ob++7plEiNukyk9ns8ooeL2AxbUD292p
+z1TaIiPEbxhp320ap/TfUU2zbXjwybHnntv3rfhBFjYolvi+r9CbUOtFu7USDjpc
+Mm1T7ft7aSJxj9wRv4XYiSFgjEeWM8XTC/7dFP3WZ3XOaiuEaOP8MYs9bRahmwHX
+ro/WCTmRBBuduR4R2+YgwiWOME/IGL1xlU8/djBon1CPmRyFgvF/xiLLmeyX5Dx4
+uf2I5GwLk64G7EfTYapUheEdj0qcANW3XAkFEoPjqUAyAYWm4OUS4UbfO98bQRyu
+a6tLDRS/Dlkl0rxT8rer3aMXQ0U0Vg==
+=qxKD
+-----END PGP SIGNATURE-----
+
+--Sig_/2xAgszze_szggfSWGWvYUY1--
 
