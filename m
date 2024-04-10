@@ -1,50 +1,52 @@
-Return-Path: <netdev+bounces-86358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D301289E746
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 02:50:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D789B89E79E
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 03:09:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7366C2813BA
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 00:50:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED451282B22
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 01:09:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5285338B;
-	Wed, 10 Apr 2024 00:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E420623;
+	Wed, 10 Apr 2024 01:09:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Au+xBVkB"
+	dkim=pass (4096-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b="oU/EncLI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from perseus.uberspace.de (perseus.uberspace.de [95.143.172.134])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E88737C
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 00:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF2225256
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 01:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.172.134
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712710233; cv=none; b=Z1q9BVmKOhfqrlwtX/ux+LAnNCO89XLX+buCXZxu8BbRyCEqVu64Oxdk4PzRAJEDBG8wU2puOlZnWLnvaOxlW8TBoFLFVgK9BvTYNgK4RA7/4J8cBz7G8wNdmOFVwAqZ8Nr8HCxGDudoVycWR0DN30G+Oq6lhrU96zYFjFtLeNk=
+	t=1712711376; cv=none; b=V4UeyiqGSyQi8WIqUnlVRMg3PosJYO726hPS2RHMPqMMm6l/O3NZrF4hkzqB/CFTXxel2Akvg4vVP78gVLyz71ZDCVjf2L/t86w9IcYlOezu0vqPQeZcEQXPQCDyM4xTOVhfMCImIs+vCmTUEEa0dCc49Hsypb8CoEmXdsr+AoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712710233; c=relaxed/simple;
-	bh=nQSsQKZ7OTzfCDLl3YrPnOQfVmcSBJsCUVA/uFhXSqI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hCqsvTQ3bBtIy65VhBHRlF1MUpXZ9qUW4rZRwehqtH+i2LCUfp4WhZ0XBAKsLFOoxGCkKTE5LFdJuPoRewZFKAeijTqaKAv7a1uQHSVkpGLyJZGutpNza2HSfEdRAxuXkY+cKY249d+uAAnJvvyrCsMhZMKzR5bVDFzs+4YHNJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Au+xBVkB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CD067C433F1;
-	Wed, 10 Apr 2024 00:50:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712710232;
-	bh=nQSsQKZ7OTzfCDLl3YrPnOQfVmcSBJsCUVA/uFhXSqI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Au+xBVkBuPaYFA6xGdEj19NbcwG5KbkZhj9Du7tYOSqWhTdt+07x/+C82U6+Otq/+
-	 o7eerW/YpEtXL+XQ1bWuhCgdnE/5+yTX69xO1NZ2lUnJibK59offeDcpVuE37hTqJQ
-	 UO0ZPm0hYGf9wuNbfCJi6D7QnuPt6esL/XiNlOsNlZT8iuVzyOalDIwFe0hI7m+SXy
-	 TYJ9ziijf4CM727pOglUltZ5+SxvDbHSc8UqYuFvt12PMvk+w7uUO0IEXv5K+MC+HQ
-	 hdPOm9xmM4h83Svl+BZVsVcMfc0XOO90+P+a2drB6jrUvOCbup/xLXSlP0pQETiSc/
-	 pRgBwCZ6yfq/A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C3916D6030E;
-	Wed, 10 Apr 2024 00:50:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1712711376; c=relaxed/simple;
+	bh=JMDtbVQvNoVZnEUI8oFlwfBSFIoh1iyLMNNNLojxVgU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Mm6nQP93KvI0oogGqZ6C6E55Q1wAqqkIvyjG2YZlpFUStO87y71BJqbSgWYgLDmWRzBSwOoGSWbID/gScC4gBIS1mpiFN7FYYmStIy7CQLB1Pkp/4qQUr4K3URjdDrvpS7OGobcmKiEgPG4exuVOTQyNF48/capZON1Mlfo2xug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=david-bauer.net; spf=pass smtp.mailfrom=david-bauer.net; dkim=pass (4096-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b=oU/EncLI; arc=none smtp.client-ip=95.143.172.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=david-bauer.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=david-bauer.net
+Received: (qmail 26566 invoked by uid 988); 10 Apr 2024 01:09:24 -0000
+Authentication-Results: perseus.uberspace.de;
+	auth=pass (plain)
+Received: from unknown (HELO unkown) (::1)
+	by perseus.uberspace.de (Haraka/3.0.1) with ESMTPSA; Wed, 10 Apr 2024 03:09:23 +0200
+From: David Bauer <mail@david-bauer.net>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	amcohen@nvidia.com
+Cc: netdev@vger.kernel.org,
+	Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net] vxlan: drop packets from invalid src-address
+Date: Wed, 10 Apr 2024 03:09:17 +0200
+Message-ID: <20240410010917.90115-1-mail@david-bauer.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,47 +54,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/3][pull request] net/e1000e, igb,
- igc: Remove redundant runtime resume
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171271023279.18947.16880251680949469185.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Apr 2024 00:50:32 +0000
-References: <20240408210849.3641172-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20240408210849.3641172-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, bhelgaas@google.com
+X-Rspamd-Bar: -
+X-Rspamd-Report: MID_CONTAINS_FROM(1) BAYES_HAM(-3) MIME_GOOD(-0.1) R_MISSING_CHARSET(0.5)
+X-Rspamd-Score: -1.6
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=david-bauer.net; s=uberspace;
+	h=from:to:cc:subject:date;
+	bh=JMDtbVQvNoVZnEUI8oFlwfBSFIoh1iyLMNNNLojxVgU=;
+	b=oU/EncLIUiJbYF4Q1BSounOWryUQbO1elSzPMkKCdLP6jHkxsn9FLmdKn/mtvfuvVGsyAOzmJQ
+	2g183ZRzZwcObSPgHP6uE8ayOs+cjoLrUBagNhUqCAebfQ4T03co1qzT2Bzq8jZxyzLa+j/7+fRV
+	bL/yWSM2mleV3jWDNbkVbrALSO7/4fvEauilpxX4iU12gdzbUqZ7aqPc9NkUvYt2Re9/xJZTmv+g
+	je26GTze93/WjpcQMF0LugZcRsu0vqc3/wRUTpd9qV5j/18V+Gidk8HdH/FjypcWn9sYx5e0XcLj
+	FhaTAzuRTmISBbO7ajynlvaGSXBN14VSqu1D5RO6FYIwgRTEgNf+8U9dgw5uzuNtTaxf1WxToL2z
+	1HDvSI6byhep1tqVUuoKTVrDoy9ZtCBH9dbQogmrepcTNKO/x61RiFVIQCpdUWLvO9iaYE2IZLr3
+	IQGBhosfcr+JFqvlDU2THGF0A0ln6NuLngzN+9uPK6KGoTP6rqtP6ABIPmNR+mPnjAFPqaV80sw5
+	4MzTzbLhmYLo+RPBvknUHyz4Ti/tp55WQ1MpRTgXbzLgw3HHYw+QyQU/RqIK4XZerzKxldqdkZIY
+	OLQ6uwcGorF7ELV3ttCIl8W6NXpO/6gWsVDuIAaAG9ikV27j4l9FlvXl3/SO5T/FX8m0ljTkR8Iv
+	Y=
 
-Hello:
+The VXLAN driver currently does not check if the inner layer2
+source-address is valid.
 
-This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+In case source-address snooping/learning is enabled, a entry in the FDB
+for the invalid address is created with the layer3 address of the tunnel
+endpoint.
 
-On Mon,  8 Apr 2024 14:08:45 -0700 you wrote:
-> Bjorn Helgaas says:
-> 
-> e1000e, igb, and igc all have code to runtime resume the device during
-> ethtool operations.
-> 
-> Since f32a21376573 ("ethtool: runtime-resume netdev parent before ethtool
-> ioctl ops"), dev_ethtool() does this for us, so remove it from the
-> individual drivers.
-> 
-> [...]
+If the frame happens to have a non-unicast address set, all this
+non-unicast traffic is subsequently not flooded to the tunnel network
+but sent to the learnt host in the FDB. To make matters worse, this FDB
+entry does not expire.
 
-Here is the summary with links:
-  - [net-next,1/3] e1000e: Remove redundant runtime resume for ethtool_ops
-    https://git.kernel.org/netdev/net-next/c/b2c289415b2b
-  - [net-next,2/3] igb: Remove redundant runtime resume for ethtool_ops
-    https://git.kernel.org/netdev/net-next/c/461359c4f370
-  - [net-next,3/3] igc: Remove redundant runtime resume for ethtool ops
-    https://git.kernel.org/netdev/net-next/c/75f16e06dfb8
+Apply the same filtering for packets as it is done for bridges. This not
+only drops these invalid packets but avoids them from being learnt into
+the FDB.
 
-You are awesome, thank you!
+Fixes: d342894c5d2f ("vxlan: virtual extensible lan")
+
+Suggested-by: Ido Schimmel <idosch@nvidia.com>
+Signed-off-by: David Bauer <mail@david-bauer.net>
+---
+ drivers/net/vxlan/vxlan_core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 3495591a5c29..ba319fc21957 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -1615,6 +1615,10 @@ static bool vxlan_set_mac(struct vxlan_dev *vxlan,
+ 	if (ether_addr_equal(eth_hdr(skb)->h_source, vxlan->dev->dev_addr))
+ 		return false;
+ 
++	/* Ignore packets from invalid src-address */
++	if (!is_valid_ether_addr(eth_hdr(skb)->h_source))
++		return false;
++
+ 	/* Get address from the outer IP header */
+ 	if (vxlan_get_sk_family(vs) == AF_INET) {
+ 		saddr.sin.sin_addr.s_addr = ip_hdr(skb)->saddr;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
