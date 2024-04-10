@@ -1,221 +1,155 @@
-Return-Path: <netdev+bounces-86460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A447389EDE2
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:44:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20CC789EDF8
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:46:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DFBF1F21B5B
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:44:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A227A1F23632
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2793A15530C;
-	Wed, 10 Apr 2024 08:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369B015538F;
+	Wed, 10 Apr 2024 08:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="uvVfbqTx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WnCUYsL0"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A5F1552E0;
-	Wed, 10 Apr 2024 08:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D682154C0A
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 08:46:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712738573; cv=none; b=DKtXRxUMugU9MOzFeRPvoxGwxLsEAZ3hshf6JTLVl4KEMpaqTcJIvvlV9m9pPdxuVba5DwFsn4BjUs0ox1Sc4x45Drge+4LOf04if2mEJXugzmU0bgrv3Blb/Q+FwT4umd6nBYv2PSoC3VHKOHFiFEXXKtXKnvxOP9wVbmqc8bk=
+	t=1712738774; cv=none; b=cjZsMLRo/WyF0tKPI1430SwSWBanpzHfvgReSpBypjd6bYg/bg77xm217fKW8xjo8xpc50fu3lCuhCwD0bgROSNcsqIYaco888tdQ0no2zDaPdAQvVw4xc8pgahJU3HVt4J6V0uBPdLaxs4ubcKBAtrBIbbdJ2k0iDEVqL4EWPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712738573; c=relaxed/simple;
-	bh=7k0geQtKctDRHUCAeNxKnmtqw7tTLtM5JqO5OR0ecVM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=P4rpDGsipguDTFBlE30QBaAREduQfBEg/ax2DTUbnF9XBVX+EUeFsZJGUnUn/72ruX0YqNS4GQlVuNfsISMsUA2IDrPN3sW1r+kk3aDH1VOzpEkD+dDKXoQyUxWdIHrrl5LZVYKV5KtRwZ91LgZcuaY+n1+qqqSXNBz99Xc7eeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=uvVfbqTx; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43A8gNUL041435;
-	Wed, 10 Apr 2024 03:42:23 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1712738543;
-	bh=swUSXL7PVIUJc7GOlNkYC+/+3PmSDVyctkmAasa7e3w=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=uvVfbqTxMB6C7tidhT/angdvB1LljKC8xOvMMhROV3iULd8fdTg4P5+LkBh8+a1pg
-	 CjSbMYwyuD5L0iGhxfNNgTGmXcsqksSRqrBwIRB2mK47jQijFJZHxo4o0oGd+Z1eka
-	 XkjImJ2b0aRYuYhNvPcONtGPK4vy461Gj8g0zjhY=
-Received: from DFLE104.ent.ti.com (dfle104.ent.ti.com [10.64.6.25])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43A8gNMG018789
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 10 Apr 2024 03:42:23 -0500
-Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE104.ent.ti.com
- (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 10
- Apr 2024 03:42:22 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 10 Apr 2024 03:42:22 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43A8gF3u011914;
-	Wed, 10 Apr 2024 03:42:17 -0500
-Message-ID: <ff567495-d966-42c9-9015-ba0ba0dbe011@ti.com>
-Date: Wed, 10 Apr 2024 14:12:15 +0530
+	s=arc-20240116; t=1712738774; c=relaxed/simple;
+	bh=3pgPPV6B17SwLTg0XYgMMHEmNOtnjT2keY//R4viWB8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Dsp/d/nq6cpjNhkzvNDVGMi3QnremQO2fBA+9SV0ltZqFiE/NsgpyumwRH3hlg1tg/VfPhMRVhJ1HExRS3YiuQ43L4HHtiEcLWKUNYlnyWpC1IXZ2f4/cOzwbAcDFVCb8yNiHGdkHf/Mlfru8anbEYfaE6Ryy0Buef0Ox8qwszo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WnCUYsL0; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712738771;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=vs2rp2L6tCQ7g5xi3s0wrn5TKcp9p/YiGVc014R2eMU=;
+	b=WnCUYsL0295gAc66AWFzoYN/qzkSCl5V1kHVWDo3orx1mvCfxAtDcey5E8In+N1nZq4i58
+	Y3t7sOKcSfh57Z2AreAOhCuJrPGT7y7NDsLBGqbwC1IhP1j4jA3HjiWMJXJTqCNt5x4/GC
+	kFzv5aPVIhbWzb8hawDv16GlYHRxKCM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-594-kV1qwjNXNser-bYPXkc_YQ-1; Wed, 10 Apr 2024 04:46:09 -0400
+X-MC-Unique: kV1qwjNXNser-bYPXkc_YQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-416a207b107so3605705e9.0
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 01:46:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712738768; x=1713343568;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vs2rp2L6tCQ7g5xi3s0wrn5TKcp9p/YiGVc014R2eMU=;
+        b=EwrU1Jq942IPnliFFrPa/IfYUOxung3pxm+0rwyqHvSmOAZ6xeE9dA9/O0eJ3NLZNZ
+         cBaORjww7Du/BgE1s/F3DpG2Mn5r5d/3qTdOnuO9nduuMpCYoqZb+nFFzzRjDMSip6dh
+         qWPqtRhdlx3ySCpa3YrE6oOQ3yU9D3q/NWeOVXQtKzNBNNDnRU4sxhbUD1tfg+2KIlc7
+         yL3dfnQaNaDsj99/dSn6mOc3j9vKcNB3xjNiNRV6nCFbpihgRLYSRNz3d5Vch8LxFZei
+         KCgN2uWbCDDExrVeA6YyEJkocg67Hauzyn1WMqTWWoj5bN3w2N4U3E4lCmjPbsBmfTOE
+         t85A==
+X-Forwarded-Encrypted: i=1; AJvYcCXvEVtfAdNwLt0i1HANyUnZ4E9onECfLkpC26YPoq/B3IlgAbacd4tYt1VTh0i4QjB6ZH58H+9Ais/U3zl+Z6U1qSlxxpQK
+X-Gm-Message-State: AOJu0Yz7brx0Hp+01b/uRylUyRHm+Lj2thOguCamgLE+ltEl7DWdjGIn
+	MiBQJBiwtzRmwjcbMqXf/Anhuiz+zwXsXA4vWtVsV/RK2G7ZmIqajJ3dby4brgUhlMuDbw9Dxja
+	XJAuz2WN83Y6PGvfLShcNSCn8uchcdJaBC82L5JmkE85cZQbz3K8RIQ==
+X-Received: by 2002:a05:600c:3b8c:b0:417:29a3:3c92 with SMTP id n12-20020a05600c3b8c00b0041729a33c92mr694176wms.2.1712738768676;
+        Wed, 10 Apr 2024 01:46:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHNJfzyhNv2wGxGiUu9uxWvkmHt6L2DotR0M9w0HcxAf95iza2ncu4tSL7gteeUokmoVJmNRQ==
+X-Received: by 2002:a05:600c:3b8c:b0:417:29a3:3c92 with SMTP id n12-20020a05600c3b8c00b0041729a33c92mr694165wms.2.1712738768226;
+        Wed, 10 Apr 2024 01:46:08 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-233-180.dyn.eolo.it. [146.241.233.180])
+        by smtp.gmail.com with ESMTPSA id s12-20020a05600c45cc00b00416253a0dbdsm1593727wmo.36.2024.04.10.01.46.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 01:46:07 -0700 (PDT)
+Message-ID: <ae625989c2b1a21b9f2550ff1d835210d2cf2ca9.camel@redhat.com>
+Subject: Re: [PATCH net-next 0/3] net: socket sendmsg MSG_ZEROCOPY_UARG
+From: Paolo Abeni <pabeni@redhat.com>
+To: zijianzhang@bytedance.com, netdev@vger.kernel.org
+Cc: edumazet@google.com, willemdebruijn.kernel@gmail.com,
+ davem@davemloft.net,  kuba@kernel.org, cong.wang@bytedance.com,
+ xiaochun.lu@bytedance.com
+Date: Wed, 10 Apr 2024 10:46:06 +0200
+In-Reply-To: <20240409205300.1346681-1-zijianzhang@bytedance.com>
+References: <20240409205300.1346681-1-zijianzhang@bytedance.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add support for
- ICSSG switch firmware
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Diogo Ivo <diogo.ivo@siemens.com>, Rob Herring <robh@kernel.org>,
-        Dan
- Carpenter <dan.carpenter@linaro.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>, Simon Horman <horms@kernel.org>,
-        Wolfram Sang
-	<wsa+renesas@sang-engineering.com>,
-        Arnd Bergmann <arnd@arndb.de>, Vignesh
- Raghavendra <vigneshr@ti.com>,
-        Vladimir Oltean <vladimir.oltean@nxp.com>,
-        Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub
- Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
-References: <20240327114054.1907278-1-danishanwar@ti.com>
- <20240327114054.1907278-4-danishanwar@ti.com>
- <27d960ed-8e67-431b-a910-e6b2fc12e292@lunn.ch>
- <c94815f8-798a-4167-8f69-359b9b28b7ce@ti.com>
- <cca25c3d-a352-4531-a8ae-5a0fb7de44df@lunn.ch>
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <cca25c3d-a352-4531-a8ae-5a0fb7de44df@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Hi Andrew,
+On Tue, 2024-04-09 at 20:52 +0000, zijianzhang@bytedance.com wrote:
+> From: Zijian Zhang <zijianzhang@bytedance.com>
+>=20
+> Original notification mechanism needs poll + recvmmsg which is not
+> easy for applcations to accommodate. And, it also incurs unignorable
+> overhead including extra system calls and usage of optmem.
+>=20
+> While making maximum reuse of the existing MSG_ZEROCOPY related code,
+> this patch set introduces zerocopy socket send flag MSG_ZEROCOPY_UARG.
+> It provides a new notification method. Users of sendmsg pass a control
+> message as a placeholder for the incoming notifications. Upon returning,
+> kernel embeds notifications directly into user arguments passed in. By
+> doing so, we can significantly reduce the complexity and overhead for
+> managing notifications. In an ideal pattern, the user will keep calling
+> sendmsg with MSG_ZEROCOPY_UARG flag, and the notification will be
+> delivered as soon as possible.
+>=20
+> MSG_ZEROCOPY_UARG does not need to queue skb into errqueue. Thus,
+> skbuffs allocated from optmem are not a must. In theory, a new struct
+> carrying the zcopy information should be defined along with its memory
+> management code. However, existing zcopy generic code assumes the
+> information is skbuff. Given the very limited performance gain or maybe
+> no gain of this method, and the need to change a lot of existing code,
+> we still use skbuffs allocated from optmem to carry zcopy information.
+>=20
+> * Performance
+>=20
+> I extend the selftests/msg_zerocopy.c to accommodate the new flag, test
+> result is as follows, the new flag performs 7% better in TCP and 4%
+> better in UDP.
+>=20
+> cfg_notification_limit =3D 8
+> +---------------------+---------+---------+---------+---------+
+> > Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
+> +---------------------+---------+---------+---------+---------+
+> > Copy                | 5328    | 5159    | 8581    | 8457    |
+> +---------------------+---------+---------+---------+---------+
+> > ZCopy               | 5877    | 5568    | 10314   | 10091   |
+> +---------------------+---------+---------+---------+---------+
+> > New ZCopy           | 6254    | 5901    | 10674   | 10293   |
+> +---------------------+---------+---------+---------+---------+
+> > ZCopy / Copy        | 110.30% | 107.93% | 120.20% | 119.32% |
+> +---------------------+---------+---------+---------+---------+
+> > New ZCopy / Copy    | 117.38% | 114.38% | 124.39% | 121.71% |
+> +---------------------+---------+---------+---------+---------+
 
-On 28/03/24 6:09 pm, Andrew Lunn wrote:
-> On Thu, Mar 28, 2024 at 11:39:33AM +0530, MD Danish Anwar wrote:
->> Hi Andrew,
->>
->> On 27/03/24 6:05 pm, Andrew Lunn wrote:
->>> On Wed, Mar 27, 2024 at 05:10:54PM +0530, MD Danish Anwar wrote:
->>>> Add support for ICSSG switch firmware using existing Dual EMAC driver
->>>> with switchdev.
->>>>
->>>> Limitations:
->>>> VLAN offloading is limited to 0-256 IDs.
->>>> MDB/FDB static entries are limited to 511 entries and different FDBs can
->>>> hash to same bucket and thus may not completely offloaded
->>>>
->>>> Switch mode requires loading of new firmware into ICSSG cores. This
->>>> means interfaces have to taken down and then reconfigured to switch
->>>> mode.
->>>
->>> Patch 0/3 does not say this. It just shows the interfaces being added
->>
->> I will modify the cover letter to state that.
->>
->>> to the bridge. There should not be any need to down the interfaces.
->>>
->>
->> The interfaces needs to be turned down for switching between dual emac
->> and switch mode.
->>
->> Dual Emac mode runs with ICSSG Dual Emac firmware where as Switch mode
->> works with ICSSG Switch firmware. These firmware are running on the
->> dedicated PRU RPROC cores (pru0, rtu0, txpru0). When switch mode is
->> enabled, these pru cores need to be stopped and then Switch firmware is
->> loaded on these cores and then the cores are started again.
->>
->> We stop the cores when interfaces are down and start the cores when
->> interfaces are up.
->>
->> In short, Dual EMAC firmware runs on pru cores, we put down the
->> interface, stop pru cores, load switch firmware on the cores, bring the
->> interface up and start the pru cores and now Switch mode is enabled.
-> 
-> This is not the Linux model. Try it, add an interface to a software
-> bridge. It does not care if it is admin up or down.
-> 
-> You need to hide this difference in your driver.
-> 
+Minor nit for a future revision: the relevant part here is the 'New
+ZCopy/ ZCopy' direct comparison, which is missing - even if inferable
+from the above.  You should provide such data, and you could drop the
+'ZCopy / Copy' 'New ZCopy / Copy' and possibly even 'Copy' lines.
 
-I have been working on this and have found a way to change firmwares
-without bringing the interfaces up / down.
+Thanks,
 
-By default the interfaces are in MAC mode and the ICSSG EMAC firmwares
-are running on pru cores. To enable switch mode we will need to stop the
-cores and reload them with the ICSSG Switch firmwares. We can do this
-without bringing the interfaces up / down.
+Paolo
 
-When first interface is added to bridge it will still run emac
-firmwares. The moment second interface gets added to bridge, we will
-disable the ports and stop the pru cores. Load the switch firmwares on
-to the cores, start the cores and enable the ports. All of this is done
-from the driver.
-
-The user need not to bring the interfaces up / down. Loading / Reloading
-of firmwares will be handled inside the driver only. But we do need to
-stop the cores for changing firmwares. For stopping the cores we will
-change the port state to disable by sending r30 command to firmware.
-
-As we are not restarting the interfaces, the DRAM, SMEM and MSMC RAM
-doesn't get cleared. As a result with this approach all configurations
-will be saved.
-
-Please let me know if this approach looks ok to you.
-
-Below will be the commands to enable switch mode now,
-
-     ip link add name br0 type bridge
-     ip link set dev eth1 master br0
-     ip link set dev eth2 master br0 (At this point we will stop the
-cores, reload switch firmware, start the cores)
-     ip link set dev br0 up
-     bridge vlan add dev br0 vid 1 pvid untagged
-
-
->>> I keep asking this, so it would be good to explain it in the commit
->>> message. What configuration is preserved over a firmware reload, and
->>> what is lost?
->>>
->>> Can i add VLAN in duel MAC mode and then swap into the switch firmware
->>> and all the VLANs are preserved? Can i add fdb entries to a port in
->>> dual MAC mode, and then swap into the swtich firmware and the FDB
->>> table is preserved? What about STP port state? What about ... ?
->>>
->>
->> When ports are brought up (firmware reload) we do a full cleaning of all
->> the shared memories i.e. SMEM (shared RAM). [1]
->>
->> Vlan table and FDB table are stored in SMEM so all the configuration
->> done to VLAN / FDB tables will be lost.
->>
->> We don't clear DRAM. DRAM is used for sending r30 commands [see
->> emac_r30_cmd_init()], configure half duplex [see
->> icssg_config_half_duplex()] and configure link speed [see
->> icssg_config_set_speed()]. r30 commands are used to set port state (stp).
->>
->> Now when the interfaces are brought up (firmware reload) r30 command is
->> reconfigured as a result any changes done to port state (stp) will be
->> lost. But the duplex and speed settings will be preserved.
->>
->> To summarize,
->> VLAN table / FDB table and port states are lost during a firmware reload.
-> 
-> So you also need to work around this in your driver. I think it is
-> possible to get the network stack to enumerate the configuration. Take
-> a look at the Mellanox driver. If i remember it does something like
-> this, but i don't remember the details.
-> 
->       Andrew
-
--- 
-Thanks and Regards,
-Danish
 
