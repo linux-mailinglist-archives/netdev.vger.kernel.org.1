@@ -1,222 +1,300 @@
-Return-Path: <netdev+bounces-86776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31B208A03E1
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:07:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F2888A03E3
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:13:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1FBE1F219D2
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:07:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7D0BB22543
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:13:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE1C510A11;
-	Wed, 10 Apr 2024 23:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 212931DFC6;
+	Wed, 10 Apr 2024 23:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gAM6xfBh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MmAlMcvt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 040BC138E
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 23:07:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28DF3138E;
+	Wed, 10 Apr 2024 23:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712790457; cv=none; b=eTOFS9HLww9dL7d1ZhfLX8cODs125Mo+JFRM7KmPsjsYlQTVU95VNx1w0c4J5MzLqU0NcvphVUTVBNXKQkKnqBdFd6LM8L3lRkQBh2Kyz68TU+UtTFi4BStkRcBmRWpZZJVKl9ZfNDvcx7kij+pYEzaH51ua5Bc+865wUnMTt6M=
+	t=1712790779; cv=none; b=lXcMDdeoJgtShw6hRAXU7J5J6hHPcDTCPkMR+0Rm/1W09bt4+8Z8faC6VAlTfjQFtM41QHowl08kPEFpWz8vnIoZKI1gquqUHWSBvgnbbSTH2E/2gwWMzQw9xjFO8Hiipnc1/TaGn/8a38BiptkxroAzGWz/2REa56dbOJLhO/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712790457; c=relaxed/simple;
-	bh=cSl4dyUPlDyuxR8OwxGk2j9bJe7QIzlwletsYl/mV5s=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Re92Pf+yOUhnNn7KQ4NzYppQlvGF3PaFq/xV2WgJ11zkxvo+SC1yZ4grYNfYVCa3VP37fV8k7GIi03vHW+Zybd4ifixbDV8yMVcQBL3FTY5T4dyxiFRiQLs79+FYJlkhq321s4z+bc7tgmh1iLDpBjwIP9xCFDPpr+USPTCMEDk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gAM6xfBh; arc=none smtp.client-ip=207.171.188.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1712790779; c=relaxed/simple;
+	bh=vWRuW7lzyPc780lUHE3AcSYdVlra858Bi8u2gWUkz5U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WaoFqBq+MdIkCc0JleSVkwgSbmEMz7jK1RPkXdNkY/WKrhP3cOISn+RpFRlfkqfaALh+suobpIjB63wAzl4XefOrAEsu5avgzDzXnCZF/ii2XA8YN72F/MHh+elF60YqZINi1/iae4iPyaO8xilUlM7FobLzJFfWKKTItX+VKnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MmAlMcvt; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-417d02ab780so2476065e9.3;
+        Wed, 10 Apr 2024 16:12:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1712790457; x=1744326457;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=JL3aQECcDXchxdqd81VAqUn3k0b21Xsyq0kANbKUpvY=;
-  b=gAM6xfBhri0iDalYdZEcK3SNpdHXHIfoOP6krDxXKcXZNfhOsluG91d8
-   U+LMjTm4XfBQ6PZZxmdEMQ5YPG4FU7vFEcC4v5QL2Eg6t1DJDNk4HmZeA
-   T4eJTOIcRZOgCe8JkNfq2f2pDh9L0NUcSTlnuV1gXusTyugB4iqDo17bP
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.07,191,1708387200"; 
-   d="scan'208";a="718235126"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 23:07:30 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:64608]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.50.203:2525] with esmtp (Farcaster)
- id f6d60884-1ddc-4396-8760-14b0dbf452e8; Wed, 10 Apr 2024 23:07:29 +0000 (UTC)
-X-Farcaster-Flow-ID: f6d60884-1ddc-4396-8760-14b0dbf452e8
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 10 Apr 2024 23:07:28 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.44) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Wed, 10 Apr 2024 23:07:26 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <willemdebruijn.kernel@gmail.com>
-CC: <davem@davemloft.net>, <krisman@suse.de>, <kuniyu@amazon.com>,
-	<lmb@isovalent.com>, <martin.lau@kernel.org>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH v2] udp: Avoid call to compute_score on multiple sites
-Date: Wed, 10 Apr 2024 16:07:18 -0700
-Message-ID: <20240410230718.49778-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <661717f5c2839_2d123b294f@willemb.c.googlers.com.notmuch>
-References: <661717f5c2839_2d123b294f@willemb.c.googlers.com.notmuch>
+        d=gmail.com; s=20230601; t=1712790775; x=1713395575; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eerM5DZNJ3dNzt0n7ddacenMb0Icz/3xgHh4jA8RJSQ=;
+        b=MmAlMcvtdWMETrfg7s6MQdVWRBBafrfVhxrm25qdO8q5B82XCwkWSkUNf0vAEeQQUT
+         bHinAZysozGertq+N5PZEN8V2FSUYdmbC4WqAOpEB3PWq0zY0CiSJreFfSEU4KwY3jBP
+         HqVZut3GORA7XQN/FY3hAV0SYQ2cEHZGPZ+G01pV9FLdOVbAgz6Jn9dIsuipJewwoB0R
+         aY36vnVoIkttmAn1U7AAVKSuZQxqb5MbIrYjp3G01VS8jt4rF8dneszKtKWqL9VLY4Hs
+         9hR3P4WTsB6haVK+CTQwFiJHJJWYgh+SBsZ8Yt3DD+npKDdXucpuBrAPSqwkKGODXSjb
+         bntw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712790775; x=1713395575;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eerM5DZNJ3dNzt0n7ddacenMb0Icz/3xgHh4jA8RJSQ=;
+        b=FJpy/aQav6DvXYNvCbPEdSvMvKxWvs1EftQvl5I87JXE4r5bfp9v7gWM6YpjYrYkG1
+         ebwAeS6airIdX7Gx03DUQywJCK7BdSeahdHsgS+f8nGPOmV1Ckgh5blVpdJgv/MNk8Kl
+         1hAvu9tM6p65+EP0jblXABJVqEQ6zkoR40FZeMDZDZ97X36B3Rq4kElfIahKKdgr910/
+         cqzQSvYwTK5FWm6tPE7eYnB6G9X+8+lz8uCzWvYvTsg4pOjKh4OcFdJrjDtdHcwSsExC
+         G0IchzWi0c0FnlO/Ab6f/dlCuUBPM5dKAi+UxY65TNnVSmLNB9+spzKriG0RHZgZw/FK
+         Ch6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVslNlyhhRJqr2ucLOx3bNsRynhdax7rRFPW73XyLzFYRx7NzpaVvT10goJ1LMz+iyfiHkXuuRWj19ZANWgEuNp32MUQDXMOEa1Ztuybmeosdo0TJQmxoi8tbrRqlmQ9DMp0+t8
+X-Gm-Message-State: AOJu0YyapZIWSJ2cE11qpDt6wsdwMl4Y2frUx1RXYBNjwyzEhSfT0vab
+	J5JfbFnE4r38dM2oNIbaQGCOfRb7jLLGmUsw7PSpZMk9MhiUNb9O
+X-Google-Smtp-Source: AGHT+IEqznyyY4xiYDQTESnJnknYHn1Plkq2O/xSnLgP3+Kz8k0k0IiUglGHlJmm4O+6GYjp8tJS8A==
+X-Received: by 2002:a05:600c:19cc:b0:417:c38d:5351 with SMTP id u12-20020a05600c19cc00b00417c38d5351mr1314492wmq.10.1712790775136;
+        Wed, 10 Apr 2024 16:12:55 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d201:1f00::b2c])
+        by smtp.gmail.com with ESMTPSA id m17-20020a056000009100b003462fec9f5asm318140wrx.62.2024.04.10.16.12.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 16:12:54 -0700 (PDT)
+Date: Thu, 11 Apr 2024 02:12:51 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, David Ahern <dsahern@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	=?utf-8?B?U8O4cmVu?= Andersen <san@skov.dk>
+Subject: Re: [PATCH net-next v6 5/9] net: dsa: microchip: add support for
+ different DCB app configurations
+Message-ID: <20240410231251.macw4i46jfi57wtc@skbuf>
+References: <20240410080556.1241048-1-o.rempel@pengutronix.de>
+ <20240410080556.1241048-1-o.rempel@pengutronix.de>
+ <20240410080556.1241048-6-o.rempel@pengutronix.de>
+ <20240410080556.1241048-6-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWB004.ant.amazon.com (10.13.139.164) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240410080556.1241048-6-o.rempel@pengutronix.de>
+ <20240410080556.1241048-6-o.rempel@pengutronix.de>
 
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Date: Wed, 10 Apr 2024 18:51:33 -0400
-> Kuniyuki Iwashima wrote:
-> > From: Gabriel Krisman Bertazi <krisman@suse.de>
-> > Date: Wed, 10 Apr 2024 17:50:47 -0400
-> > > We've observed a 7-12% performance regression in iperf3 UDP ipv4 and
-> > > ipv6 tests with multiple sockets on Zen3 cpus, which we traced back to
-> > > commit f0ea27e7bfe1 ("udp: re-score reuseport groups when connected
-> > > sockets are present").  The failing tests were those that would spawn
-> > > UDP sockets per-cpu on systems that have a high number of cpus.
-> > > 
-> > > Unsurprisingly, it is not caused by the extra re-scoring of the reused
-> > > socket, but due to the compiler no longer inlining compute_score, once
-> > > it has the extra call site in udp4_lib_lookup2.  This is augmented by
-> > > the "Safe RET" mitigation for SRSO, needed in our Zen3 cpus.
-> > > 
-> > > We could just explicitly inline it, but compute_score() is quite a large
-> > > function, around 300b.  Inlining in two sites would almost double
-> > > udp4_lib_lookup2, which is a silly thing to do just to workaround a
-> > > mitigation.  Instead, this patch shuffles the code a bit to avoid the
-> > > multiple calls to compute_score.  Since it is a static function used in
-> > > one spot, the compiler can safely fold it in, as it did before, without
-> > > increasing the text size.
-> > > 
-> > > With this patch applied I ran my original iperf3 testcases.  The failing
-> > > cases all looked like this (ipv4):
-> > > 	iperf3 -c 127.0.0.1 --udp -4 -f K -b $R -l 8920 -t 30 -i 5 -P 64 -O 2
-> > > 
-> > > where $R is either 1G/10G/0 (max, unlimited).  I ran 3 times each.
-> > > baseline is 6.9.0-rc1-g962490525cff, just a recent checkout of Linus
-> > > tree. harmean == harmonic mean; CV == coefficient of variation.
-> > > 
-> > > ipv4:
-> > >                  1G                10G                  MAX
-> > > 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
-> > > baseline 1730488.20(0.0050) 1639269.91(0.0795) 1436340.05(0.0954)
-> > > patched  1980936.14(0.0020) 1933614.06(0.0866) 1784184.51(0.0961)
-> > > 
-> > > ipv6:
-> > >                  1G                10G                  MAX
-> > > 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
-> > > baseline  1679016.07(0.0053) 1697504.56(0.0064) 1481432.74(0.0840)
-> > > patched   1924003.38(0.0153) 1852277.31(0.0457) 1690991.46(0.1848)
-> > > 
-> > > This restores the performance we had before the change above with this
-> > > benchmark.  We obviously don't expect any real impact when mitigations
-> > > are disabled, but just to be sure it also doesn't regresses:
-> > > 
-> > > mitigations=off ipv4:
-> > >                  1G                10G                  MAX
-> > > 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
-> > > baseline 3230279.97(0.0066) 3229320.91(0.0060) 2605693.19(0.0697)
-> > > patched  3242802.36(0.0073) 3239310.71(0.0035) 2502427.19(0.0882)
-> > > 
-> > > Cc: Lorenz Bauer <lmb@isovalent.com>
-> > > Fixes: f0ea27e7bfe1 ("udp: re-score reuseport groups when connected sockets are present")
-> > > Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
-> > > 
-> > > ---
-> > > Changes since v1:
-> > > (me)
-> > >   - recollected performance data after changes below only for the
-> > >   mitigations enabled case.
-> > > (suggested by Willem de Bruijn)
-> > >   - Drop __always_inline in compute_score
-> > >   - Simplify logic by replacing third struct sock pointer with bool
-> > >   - Fix typo in commit message
-> > >   - Don't explicitly break out of loop after rescore
-> > > ---
-> > >  net/ipv4/udp.c | 18 +++++++++++++-----
-> > >  net/ipv6/udp.c | 17 +++++++++++++----
-> > >  2 files changed, 26 insertions(+), 9 deletions(-)
-> > > 
-> > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> > > index 661d0e0d273f..a13ef8e06093 100644
-> > > --- a/net/ipv4/udp.c
-> > > +++ b/net/ipv4/udp.c
-> > > @@ -427,12 +427,15 @@ static struct sock *udp4_lib_lookup2(struct net *net,
-> > >  {
-> > >  	struct sock *sk, *result;
-> > >  	int score, badness;
-> > > +	bool rescore = false;
-> > 
-> > nit: Keep reverse xmax tree order.
-> > https://docs.kernel.org/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
-> > 
-> > >  
-> > >  	result = NULL;
-> > >  	badness = 0;
-> > >  	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
-> > > -		score = compute_score(sk, net, saddr, sport,
-> > > -				      daddr, hnum, dif, sdif);
-> > > +rescore:
-> > > +		score = compute_score((rescore ? result : sk), net, saddr,
-> > 
-> > I guess () is not needed around rescore ?
-> > 
-> > Both same for IPv6.
-> > 
-> > Otherwise, looks good to me.
-> > 
-> > Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> 
-> Can we avoid using the same name for the label and boolean?
-> 
-> And since if looping result will have state TCP_ESTABLISHED, can it
-> just be
-> 
->     sk = result;
->     goto rescore;
+Hi Oleksij,
 
-TCP_ESTABLISHED never reaches the rescore jump as it's checked
-before calling inet_lookup_reuseport() and inet_lookup_reuseport()
-also does not select TCP_ESTABLISHED.
+On Wed, Apr 10, 2024 at 10:05:52AM +0200, Oleksij Rempel wrote:
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+> index b2d1c61400c51..78a9622adecde 100644
+> --- a/drivers/net/dsa/microchip/ksz_common.c
+> +++ b/drivers/net/dsa/microchip/ksz_common.c
+> @@ -2364,6 +2365,10 @@ static int ksz_setup(struct dsa_switch *ds)
+>  		goto out_ptp_clock_unregister;
+>  	}
+>  
+> +	ret = ksz_dcb_init(dev);
+> +	if (ret)
+> +		goto out_ptp_clock_unregister;
+> +
+>  	/* start switch */
+>  	regmap_update_bits(ksz_regmap_8(dev), regs[S_START_CTRL],
+>  			   SW_START, SW_START);
+> @@ -2691,7 +2696,7 @@ static int ksz_port_setup(struct dsa_switch *ds, int port)
+>  	 * there is no need to do anything.
+>  	 */
+>  
+> -	return 0;
+> +	return ksz_dcb_init_port(dev, port);
+>  }
+>  
+>  void ksz_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
+> @@ -3943,6 +3948,11 @@ static const struct dsa_switch_ops ksz_switch_ops = {
+>  	.port_setup_tc		= ksz_setup_tc,
+>  	.get_mac_eee		= ksz_get_mac_eee,
+>  	.set_mac_eee		= ksz_set_mac_eee,
+> +	.port_get_default_prio	= ksz_port_get_default_prio,
+> +	.port_set_default_prio	= ksz_port_set_default_prio,
+> +	.port_get_dscp_prio	= ksz_port_get_dscp_prio,
+> +	.port_get_apptrust	= ksz_port_get_apptrust,
+> +	.port_set_apptrust	= ksz_port_set_apptrust,
+>  };
+>  
+>  struct ksz_device *ksz_switch_alloc(struct device *base, void *priv)
+> diff --git a/drivers/net/dsa/microchip/ksz_dcb.c b/drivers/net/dsa/microchip/ksz_dcb.c
+> new file mode 100644
+> index 0000000000000..d2122f844c80b
+> --- /dev/null
+> +++ b/drivers/net/dsa/microchip/ksz_dcb.c
+> +/**
+> + * ksz_init_global_dscp_map - Initializes the global DSCP-to-priority mapping
+> + * @dev: Pointer to the KSZ switch device structure
+> + *
+> + * This function initializes the global DSCP-to-priority mapping table for the
+> + * switch.
+> + *
+> + * Return: 0 on success, or a negative error code on failure
+> + */
+> +static int ksz_init_global_dscp_map(struct ksz_device *dev)
+> +{
+> +	int reg, per_reg, ret, dscp;
+> +	u8 data = 0;
+> +	u8 mask;
+> +
+> +	/* On KSZ9xxx variants, DSCP remapping is disabled by default.
+> +	 * Enable to have, predictable and reproducible behavior across
+> +	 * different devices.
+> +	 */
+> +	if (!is_ksz8(dev)) {
+> +		ret = ksz_rmw8(dev, KSZ9477_REG_SW_MAC_TOS_CTRL,
+> +			       KSZ9477_SW_TOS_DSCP_REMAP,
+> +			       KSZ9477_SW_TOS_DSCP_REMAP);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	ksz_get_dscp_prio_reg(dev, &reg, &per_reg, &mask);
+> +
+> +	for (dscp = 0; dscp < DSCP_MAX; dscp++) {
+> +		int ipv, shift, tt;
+> +
+> +		/* Map DSCP to Traffic Type, which is corresponding to the
+> +		 * Internal Priority Value (IPV) in the switch.
+> +		 */
+> +		if (!is_ksz8(dev)) {
+> +			ipv = ietf_dscp_to_ieee8021q_tt(dscp);
+> +		} else {
+> +			/* On KSZ8xxx variants we do not have IPV to queue
+> +			 * remapping table. We need to convert DSCP to Traffic
+> +			 * Type and then to queue.
+> +			 */
+> +			tt = ietf_dscp_to_ieee8021q_tt(dscp);
+> +			if (tt < 0)
+> +				return tt;
+> +
+> +			ipv = ieee8021q_tt_to_tc(tt, dev->info->num_tx_queues);
+> +		}
+> +
+> +		if (ipv < 0)
+> +			return ipv;
+> +
+> +		shift = (dscp % per_reg) * (8 / per_reg);
+> +		data |= (ipv & mask) << shift;
+> +
+> +		if (dscp % per_reg == per_reg - 1) {
+> +			ret = ksz_write8(dev, reg + (dscp / per_reg), data);
+> +			if (ret)
+> +				return ret;
+> +
+> +			data = 0;
+> +		}
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +/**
+> + * ksz_dcb_init_port - Initializes the DCB configuration for a port on a KSZ
+> + * @dev: Pointer to the KSZ switch device structure
+> + * @port: Port number for which to initialize the DCB configuration
+> + *
+> + * This function initializes the DCB configuration for the specified port on a
+> + * KSZ switch. Particular DCB configuration is set for the port, including the
+> + * default priority and apptrust selectors.
+> + * The default priority is set to Best Effort, and the apptrust selectors are
+> + * set to all supported selectors.
+> + *
+> + * Return: 0 on success, or a negative error code on failure
+> + */
+> +int ksz_dcb_init_port(struct ksz_device *dev, int port)
+> +{
+> +	int ret, ipv;
+> +
+> +	if (is_ksz8(dev)) {
+> +		ipv = ieee8021q_tt_to_tc(IEEE8021Q_TT_BE,
+> +					 dev->info->num_tx_queues);
+> +		if (ipv < 0)
+> +			return ipv;
+> +	} else {
+> +		ipv = IEEE8021Q_TT_BE;
+> +	}
+> +
+> +	/* Set the default priority for the port to Best Effort */
+> +	ret = ksz_port_set_default_prio(dev->ds, port, ipv);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return ksz_port_set_apptrust(dev->ds, port, ksz_supported_apptrust,
+> +				     ARRAY_SIZE(ksz_supported_apptrust));
+> +}
+> +
+> +/**
+> + * ksz_dcb_init - Initializes the DCB configuration for a KSZ switch
+> + * @dev: Pointer to the KSZ switch device structure
+> + *
+> + * This function initializes the DCB configuration for a KSZ switch. The global
+> + * DSCP-to-priority mapping table is initialized.
+> + *
+> + * Return: 0 on success, or a negative error code on failure
+> + */
+> +int ksz_dcb_init(struct ksz_device *dev)
+> +{
+> +	int ret;
+> +
+> +	ret = ksz_init_global_dscp_map(dev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+> +}
 
+Sorry for not responding to your previous question about this:
+https://lore.kernel.org/netdev/ZfmJ-O8XMT8oO-TS@pengutronix.de/
+Simply put, I had a period with not a lot of free time, even for reading
+emails.
 
-> 
-> 
-> > 
-> > > +				      sport, daddr, hnum, dif, sdif);
-> > > +		rescore = false;
-> > >  		if (score > badness) {
-> > >  			badness = score;
-> > >  
-> > > @@ -456,9 +459,14 @@ static struct sock *udp4_lib_lookup2(struct net *net,
-> > >  			if (IS_ERR(result))
-> > >  				continue;
-> > >  
-> > > -			badness = compute_score(result, net, saddr, sport,
-> > > -						daddr, hnum, dif, sdif);
-> > > -
-> > > +			/* compute_score is too long of a function to be
-> > > +			 * inlined, and calling it again here yields
-> > > +			 * measureable overhead for some
-> > > +			 * workloads. Work around it by jumping
-> > > +			 * backwards to rescore 'result'.
-> > > +			 */
-> > > +			rescore = true;
-> > > +			goto rescore;
-> > >  		}
-> > >  	}
+I'm on the fence on whether your solution to the "global DSCP-to-prio
+mapping rather than per-port" problem is the right one.
+
+We try to avoid baking policies into the kernel, no matter how well
+intended the 802.1Q and IETF RFC8325 recommendations are. They are still
+just recommendations and examples, and a particular use case may want to
+configure things completely differently (or as hinted in the Wi-Fi specific
+RFC8325: maybe the administrator doesn't want to assign the higher
+traffic classes, for network control protocols, by using IP DSCP, and
+doesn't want user flows to request DSCP values that would get access to
+these traffic classes. It can indeed be seen as a security concern).
+
+I empathize with the incovenience of having to map the per-netdev dcbnl
+application priority table API with a piece of hardware where that table
+is shared across all ports. But yet, I don't think it is a strong enough
+justification for us to make an exception and say: "yeah, ok, let's not
+even implement .port_set_dscp_prio() to make the thing configurable, but
+let's bake into the kernel a fixed policy that's good for everyone".
+
+No, I think we _need_ the thing to be configurable, and not try so hard
+with the ieee8021q helpers to hardcode things just right in the kernel.
+
+Have you tried the obvious: "every time there is a change to the global
+DSCP mapping table, push the change into the dcbnl app table of all user
+netdevs, so that the user becomes aware of what happens"? Kernel drivers
+can do that, through direct calls to dcb_ieee_setapp(). DSA does it too,
+to probe the initial QoS configuration of the ports and push it to the
+application priority tables.
 
