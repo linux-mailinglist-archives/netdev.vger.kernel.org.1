@@ -1,135 +1,107 @@
-Return-Path: <netdev+bounces-86492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFADA89EF6F
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 12:05:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8B9489EFAF
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 12:17:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78E7D282871
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:05:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA56A1C229EA
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:17:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 733C6158D60;
-	Wed, 10 Apr 2024 10:05:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F6C3158D62;
+	Wed, 10 Apr 2024 10:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="QwEFMdhw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jNy4En03"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5D57156996;
-	Wed, 10 Apr 2024 10:05:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E68155737
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 10:16:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712743514; cv=none; b=P8gk/KrrsC/mmeopwUa7QPVym5HpDtBhPmqrio2CsMunzKcN7WPDd5jK2wYHJ0HwV4VV15srV0jVXmNrwAux9icQ8ZkiPYXzd/24CMiWuzu26PfbGMIhagx/g9D4rcffSCXD1e+34vq5K0WgXh+upPxwg+oQJ6PLmn/8gALZotw=
+	t=1712744219; cv=none; b=bmWSDPfvDX5+Z6YlGjwA4UfztVPy1z7K0sHxjhunoyq8RPimx9jmakN4M//mpSy6DxRKDOt/0AAHVX0xV6Yz4JmgTQjHtmiyGpE2sbVgLr36YbvwU994Jm1zdWkKRacJHwaXvZxWz6XIu/LodTYG8I6j2Bh5C/zE09uRr7tkmHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712743514; c=relaxed/simple;
-	bh=30woaapoAH8NpTmPC9U/LfaEmvc6WtNWd+ZQ9CZZTGY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nsBM8WC9CEeLq2ZKtuJOuQk/Q39uWPu2fV4iOJ+T9tsMI/dzkywMt0gAEZ1jKYGC7N/ldmoe19sV++3apAu5alzGdR7MRVZBleZQ+PNhK129dbJNs6mGGfaC9CdM/khHi/QMfYxrisiOo9i+3soZ6ozmMKn9xET+5utSLFj3eZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=QwEFMdhw; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=xGW6DVRYYKhZUWlvDMf+rQo/nW9gpAKrBh3OHMIwwlE=; b=QwEFMdhwMuz0wcDl9wC/hPW66K
-	07mOUX3JJ0RMXfGCtOeDxYS4j4nIVZBYL2lWPSxsCatpmM9cfqPt3h0CKj9RlOq2zwmzkzRp6fEjJ
-	joJ+91K/2P8ILqnSb+J+Mk2mTzhxRkeoEwIY6nA5EPseC1p1ArJHtG7+x78yWbpA9IYV6JYlsi6wn
-	w6P3j6GrORcbtmYss3I5cFLvJNAOv9YvhTO6XxqCTrmYbZOrskXqk0ATDXr3E5H8dVOS4f/wy7Pc3
-	noPZPm4VUJKTzsL7/KQmPTr/zpUSfQ720TUIyV0E1i8q+r7uk/+wuWe7VzARQr+HS8JL6V47eaEWk
-	LKcTh93A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45298)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1ruUou-0007it-0q;
-	Wed, 10 Apr 2024 11:04:44 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1ruUom-0005tk-D4; Wed, 10 Apr 2024 11:04:36 +0100
-Date: Wed, 10 Apr 2024 11:04:36 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Radu Pirea <radu-nicolae.pirea@oss.nxp.com>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	UNGLinuxDriver@microchip.com, Simon Horman <horms@kernel.org>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Alexandra Winter <wintera@linux.ibm.com>
-Subject: Re: [PATCH net-next v10 07/13] net: Add struct kernel_ethtool_ts_info
-Message-ID: <ZhZkNEYnY3FV7Q8E@shell.armlinux.org.uk>
-References: <20240409-feature_ptp_netnext-v10-0-0fa2ea5c89a9@bootlin.com>
- <20240409-feature_ptp_netnext-v10-7-0fa2ea5c89a9@bootlin.com>
- <20240409182725.139856d5@kernel.org>
- <20240410101200.0178e594@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1712744219; c=relaxed/simple;
+	bh=APFMnIFuItwRd16mAPXH4UZOOrLZxnfCUvZBgH/GZno=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gDJS0KzFYZzYJaClzrlt3QHyvHMtvymQxQJQvJa98xRzuFKh/Yz27LzatVo0NH/VFYOOR9h6gCZppKi7zh2KjGArCy9mBo0YPPpIkW08S6z7UQrqYAkXxylQ7mklf3ysgLxucFgVHkEbLOxmSc8K1Mk2gCRTxYxjNkpMvOwC/Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jNy4En03; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712744217; x=1744280217;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=APFMnIFuItwRd16mAPXH4UZOOrLZxnfCUvZBgH/GZno=;
+  b=jNy4En03xQcV3iEBv/sAWGq8guCruVtqcLBplUzcqAXh+rjvqiUYNZNm
+   Mh4zBU2lSIkO+tAc05KuFQFRiU7nSBHxgkoyoCrJ2Y+fe2JaYt9s1YlDB
+   QpwQd4Vie27CyEA3C5vHFtrQZb1YIl9mVzw1SBxBYeekU7VKNdYnfyXom
+   33FAWLakf/Zl/Rp+R43AQ99e5nlIX0x5j5kMrwM3qpozzbc/XNK/a51wx
+   6oCiEbOeBKPqbXM1RVkUABLtG0yj/8S8m+oirwLhaMMQcvquTB4eVcRNp
+   KeMkXhns0dv3AMKqBIrUQwglWt9CeDYBHrA5+vg68rper4HDR/zlT24yE
+   Q==;
+X-CSE-ConnectionGUID: W4l/RgdJQcWeB5GwYTRT6g==
+X-CSE-MsgGUID: 9297R3/PR32qcecVpbmWXw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="19525384"
+X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
+   d="scan'208";a="19525384"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 03:16:56 -0700
+X-CSE-ConnectionGUID: +xVvnjjzRG+xaBd1Wk6KNg==
+X-CSE-MsgGUID: afgF+IoeRJaFE5FLUeTL+g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
+   d="scan'208";a="51737638"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa001.fm.intel.com with ESMTP; 10 Apr 2024 03:16:54 -0700
+Received: from rozewie.igk.intel.com (unknown [10.211.8.69])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 9FF3C28790;
+	Wed, 10 Apr 2024 11:16:52 +0100 (IST)
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+To: netdev@vger.kernel.org
+Cc: dsahern@gmail.com,
+	stephen@networkplumber.org
+Subject: [PATCH iproute2-next 0/2] PFCP support
+Date: Wed, 10 Apr 2024 12:14:38 +0200
+Message-Id: <20240410101440.9885-1-wojciech.drewek@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240410101200.0178e594@kmaincent-XPS-13-7390>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 10, 2024 at 10:12:00AM +0200, Kory Maincent wrote:
-> On Tue, 9 Apr 2024 18:27:25 -0700
-> Jakub Kicinski <kuba@kernel.org> wrote:
-> 
-> > On Tue, 09 Apr 2024 10:26:29 +0200 Kory Maincent wrote:
-> > > In prevision to add new UAPI for hwtstamp we will be limited to the struct
-> > > ethtool_ts_info that is currently passed in fixed binary format through the
-> > > ETHTOOL_GET_TS_INFO ethtool ioctl. It would be good if new kernel code
-> > > already started operating on an extensible kernel variant of that
-> > > structure, similar in concept to struct kernel_hwtstamp_config vs struct
-> > > hwtstamp_config.
-> > > 
-> > > Since struct ethtool_ts_info is in include/uapi/linux/ethtool.h, here
-> > > we introduce the kernel-only structure in include/linux/ethtool.h.
-> > > The manual copy is then made in the function called by ETHTOOL_GET_TS_INFO.
-> > >  
-> > 
-> > This one now conflicts :(
-> > 
-> > Applying: net: Add struct kernel_ethtool_ts_info
-> > error: sha1 information is lacking or useless (drivers/net/phy/marvell_ptp.c).
-> > error: could not build fake ancestor
-> 
-> gnn patching my out of tree patch in the series! Sorry for that.
+New PFCP module was accepted in the kernel together with cls_flower
+changes which allow to filter the packets using PFCP specific fields [1].
+Packet Forwarding Control Protocol is a 3GPP Protocol defined in
+TS 29.244 [2].
 
-Given that this path corresponds to the driver I wrote, do I assume
-that you've picked up my work on PTP support for Marvell PHYs? You
-should be aware that I still have the patches out of tree but it's
-been pointless me reposting it until the issue of which PTP gets
-used has been solved. (Publishing will just increase the pressure
-to merge it without the PTP problems being solved, and thus break
-Marvell PP2 PTP.)
+Extended ip link with the support for the new PFCP device.
+Add pfcp_opts support in tc-flower.
+
+[1] https://lore.kernel.org/netdev/171196563119.11638.12210788830829801735.git-patchwork-notify@kernel.org/
+[2] https://portal.3gpp.org/desktopmodules/Specifications/SpecificationDetails.aspx?specificationId=3111
+
+Michal Swiatkowski (1):
+  f_flower: implement pfcp opts
+
+Wojciech Drewek (1):
+  ip: PFCP device support
+
+ include/libnetlink.h         |   6 ++
+ include/uapi/linux/pkt_cls.h |  14 ++++
+ ip/iplink.c                  |   2 +-
+ man/man8/ip-link.8.in        |  10 +++
+ man/man8/tc-flower.8         |  11 +++
+ tc/f_flower.c                | 126 +++++++++++++++++++++++++++++++++++
+ 6 files changed, 168 insertions(+), 1 deletion(-)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.40.1
+
 
