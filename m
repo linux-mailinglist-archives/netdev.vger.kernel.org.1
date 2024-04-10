@@ -1,83 +1,85 @@
-Return-Path: <netdev+bounces-86785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 019338A0429
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:43:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D7C48A042F
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:45:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B03AB25B15
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:43:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEE6E1F242AD
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:45:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22B873F8D0;
-	Wed, 10 Apr 2024 23:43:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37453EA83;
+	Wed, 10 Apr 2024 23:45:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="tOfgIubf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DWHvSbHV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89EB3EA9C
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 23:43:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2ABE381B1
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 23:45:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712792591; cv=none; b=NcvrpF+5RKWdshvsXsWt+y/P3FZgIz8cQ9g6dBnMinBSYfQGKr6dPxkRdFcIO4jZjMK1AkiNj0MZCNz5wFWc8+EVDqtYPjZSHUEdIgB9J5SyggaymdJrZSoZleGxYp9MRvSaeKxXWymXSNsCMLGDk0Y0jaZZF0jluN2JYaczazg=
+	t=1712792746; cv=none; b=lLiHLStMbIEgl8B+q2MRqg1B/ZKQFQBuNQ5UfdDM6pukTXTCyysYGXGoPeo40YgpCWwaN6vQa/qulFWKQftoJBnocG0a1e6h6I8UzIs2jsgm33S4rSa1Gtqf0iZ7PrXfKtCvqQw8vdKBJomy7S63brF5DT3pU7QBVG0P6LeqUMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712792591; c=relaxed/simple;
-	bh=IqdwwrJPd3GJlIifxyj04ecjUnITr3Yy4Frv+BOv5fM=;
+	s=arc-20240116; t=1712792746; c=relaxed/simple;
+	bh=xlHHpyel625hv0e8fs6eveC/+T7pEb0TwqE9qnoAarI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JVvEH6MXaGcAwnVsLkgKm44nCeozvyCmVQ/JexanWwNR7WTclm+NBO2rMOVpAY055tnQ/1UzRqDQ9NL/xm4nnifY9OBanV4RXeME5E/B/XGEOveK8FFBm4LVKiRJVaBN3hco65qE72EacN2+RTlw5fMEOcgvO59yXrZIc7e44wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=tOfgIubf; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-4347cbdb952so19966431cf.3
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 16:43:08 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=dOQOs2VQ8UDM5fqDNXIRG2PPGF17KN5bZ0hdN4nU0ofz4WkvGaXeZu/29pwzZDQa/Wpd/XSIi2NAZfACwfcjm174X6m+QNyi5dDn53pVdjKVB4hs6W2Cpw3d0RcMUTt62UQQK85r27f1AshyI1irTYGiidnCl/+Kcy20yp/muP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DWHvSbHV; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-346b94fa7ecso101242f8f.3
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 16:45:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1712792588; x=1713397388; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712792743; x=1713397543; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EEVESkcf0S03MSgXfRfIQaKVMDK3fwo2I1//tbTNVXQ=;
-        b=tOfgIubf3/ocYukDBb1IxGM6IqHASnkHizCEL0PvL+Sc2M6Tl4p3Q+F+NDs7/SSubf
-         mBi+H0cZtPUQEhUyeheUs7mwQxqlsB2KkGswZJqv9l5Odn1q3wlicccdUzrmN5Or1Es6
-         q1LVr4pxpikwLxLrGH2/vaUBb1K9lXaIpioYI=
+        bh=aV++u6adkTTcTKvgjjAL6SJv3v9G8Es9CBpCVV0vhxw=;
+        b=DWHvSbHV4PIii4zcOpHdwfq6fvem1kFE22yJ+Y4fCa8Y+qG16n/LgCSitLsgN1hg0q
+         K0fTlt8OOcJl449h9lAtTzxO3AbT0lmSGhCENxFUCPBOXlWp1zPdeNy5IeEHqtqBqIrf
+         dpP7euUUs27g+ClgS+a5KxxFoPgW+ICwvD0vI8Y10PO1St5XjooNRw1HF+Qzd/PmUZAD
+         pwQc9Xc6QBs7NCsEW2ioMkWfKYATgQmJD9vnlflAPSMuACXKJR9CemPUALXHH2z8IB3q
+         zF8mUZpuH8pXl9mlK81WmnbNAKXl9Ob2YJg9g6jjuGSMjqaTKJ591891V+K8rKdZ9tNB
+         a4iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712792588; x=1713397388;
+        d=1e100.net; s=20230601; t=1712792743; x=1713397543;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EEVESkcf0S03MSgXfRfIQaKVMDK3fwo2I1//tbTNVXQ=;
-        b=blK6hjTigigH/alZ3tSVetZAtWfjMd6cTmUZIQyxfLioW5AG42nyVS3Cc6s7WOC1Ng
-         2pHk0qyJU5mHSV2dNDTYtdAR5HxCyYkuRbrnbzers/9F2JwPxfFA9qWxxm9VGh/W+UeT
-         PBkF7I+wnlmUY9P2SDw3leynZ0Abusa2TgSUWu6zZmsJlP/zGbHR1xKJX/0I5lBM7YtO
-         seWiVTuNK1+gns4c2huKt83tiQK2m8ex8n52x3Zr9TvZmT95tCUpZyFuSt/LZM0Hi6NU
-         dsMfFPUVCkfhmphwXR5recp0QvN3MT6/ltzfI4AaYZifFy0Lhs0ytMzUQ2Q2zTMfW2yM
-         ch4g==
-X-Forwarded-Encrypted: i=1; AJvYcCWX2mzs0q2X/tYHUpGyJSkr2kaohahTbI19P07mdwrSxXL/1txgLTlHqpRCT5dHDYjb+jwfniGzHr1egNu6J3m8xk5lVfip
-X-Gm-Message-State: AOJu0YyJGWdxDvpkeYNzz5KQmCwYsdVh8W8yzY4/rnAZyW5+AJuhqf66
-	iqiYKQ2IR7BghujjQdzyrOXdbIOuuwSwxO0f43C1Nc01vTzBM1wgp/x8J7tkktE=
-X-Google-Smtp-Source: AGHT+IHhMI9p8LiUmOEhI4Zhyv4Ub3Hen9Jkjl+UE8ibgFi4W+Ov80I6AzGhOsyLJ+8N4BfQpioxYA==
-X-Received: by 2002:ac8:5907:0:b0:434:cfe4:90fe with SMTP id 7-20020ac85907000000b00434cfe490femr5580676qty.38.1712792587604;
-        Wed, 10 Apr 2024 16:43:07 -0700 (PDT)
-Received: from LQ3V64L9R2 ([74.92.140.241])
-        by smtp.gmail.com with ESMTPSA id w14-20020ac84d0e000000b004364e61ce09sm158979qtv.66.2024.04.10.16.43.06
+        bh=aV++u6adkTTcTKvgjjAL6SJv3v9G8Es9CBpCVV0vhxw=;
+        b=vaRkSJnLxsiyayt0A4M8kzXIpw0ww7k4OJJcYoD5q3H2naVHvUe3s42TdwJ1pbsBB0
+         4M3c8yTt9nWvUoYcaf29P+T7S89lP04Wo/BdZ4PiVE0DR+9Xt3y5N/1ySDg4Ctf4wmVe
+         tm/7lNCkWowu/wlp9DgA0LnBCU6K5iwKaPDl/Wwx0y7FiFSHPvY7K0FeUpoF+8aw6eS3
+         3jBYXYv/zUtv1wVZ9jAfRYYj4bBe/Fb1Fco1QAbymRq027E2dcBGMXFYcFjjU4kVRSMg
+         qOhhzhfB50c/S1mNOG0nKK7WtngOj3Jz1PYpE9IOaBmxqJ5pu52l25O97CLzmHHPNhXt
+         M5/A==
+X-Forwarded-Encrypted: i=1; AJvYcCWtK8Lxhv/vNUYvLQApCbnEmPfJbxkP4QQI4fNmeX7aezNH5oxwTpio3j6S7Hn6owz8JzBKK26kiuWbeVWaIjTZD+jBxEWQ
+X-Gm-Message-State: AOJu0YxpaAmBazuY9O8mTYF0fb6Iyxc6N81v97cj9ij27tNHw9JOYsdW
+	jEikMYR1CSvkRCw100TcyBaXdw/Wnea3qjXU5fL49ZVIJKPsrf5cPl8nwJj3
+X-Google-Smtp-Source: AGHT+IFdVs/oCVJ6E8JOvZSBGQEc46ZbvuEmfc5bSQciik7OmR7VKxqncVIfueAuaVp6Cs+iDneyCg==
+X-Received: by 2002:a05:6000:188a:b0:344:4bcc:ed28 with SMTP id a10-20020a056000188a00b003444bcced28mr4590724wri.32.1712792743028;
+        Wed, 10 Apr 2024 16:45:43 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d201:1f00::b2c])
+        by smtp.gmail.com with ESMTPSA id i4-20020a5d6304000000b003437ad152f9sm364897wru.105.2024.04.10.16.45.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 16:43:07 -0700 (PDT)
-Date: Wed, 10 Apr 2024 19:43:04 -0400
-From: Joe Damato <jdamato@fastly.com>
-To: "Nambiar, Amritha" <amritha.nambiar@intel.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, sridhar.samudrala@intel.com,
-	nalramli@fastly.com, Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
+        Wed, 10 Apr 2024 16:45:42 -0700 (PDT)
+Date: Thu, 11 Apr 2024 02:45:39 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [intel-next 1/2] net/i40e: link NAPI instances to queues and IRQs
-Message-ID: <ZhckCOFplMR0GMjr@LQ3V64L9R2>
-References: <20240410043936.206169-1-jdamato@fastly.com>
- <20240410043936.206169-2-jdamato@fastly.com>
- <bb0fbd29-c098-4a62-9217-c9fd1a450250@intel.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Gregory Clement <gregory.clement@bootlin.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v4 7/8] dsa: mv88e6xxx: Create port/netdev LEDs
+Message-ID: <20240410234539.gzqt223s4kgpjwko@skbuf>
+References: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-0-eb97665e7f96@lunn.ch>
+ <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-7-eb97665e7f96@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,309 +88,182 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <bb0fbd29-c098-4a62-9217-c9fd1a450250@intel.com>
+In-Reply-To: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-7-eb97665e7f96@lunn.ch>
 
-On Wed, Apr 10, 2024 at 02:10:52AM -0700, Nambiar, Amritha wrote:
-> On 4/9/2024 9:39 PM, Joe Damato wrote:
-> > Make i40e compatible with the newly added netlink queue GET APIs.
-> > 
-> > $ ./cli.py --spec ../../../Documentation/netlink/specs/netdev.yaml \
-> >    --do queue-get --json '{"ifindex": 3, "id": 1, "type": "rx"}'
-> > 
-> > {'id': 1, 'ifindex': 3, 'napi-id': 162, 'type': 'rx'}
-> > 
-> > $ ./cli.py --spec ../../../Documentation/netlink/specs/netdev.yaml \
-> >    --do napi-get --json '{"id": 162}'
-> > 
-> > {'id': 162, 'ifindex': 3, 'irq': 136}
-> > 
-> > The above output suggests that irq 136 was allocated for queue 1, which has
-> > a NAPI ID of 162.
-> > 
-> > To double check this is correct, the IRQ to queue mapping can be verified
-> > by checking /proc/interrupts:
-> > 
-> > $ cat /proc/interrupts  | grep 136\: | \
-> >    awk '{print "irq: " $1 " name " $76}'
-> > 
-> > irq: 136: name i40e-vlan300-TxRx-1
-> > 
-> > Suggests that queue 1 has IRQ 136, as expected.
-> > 
-> > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> > ---
-> >   drivers/net/ethernet/intel/i40e/i40e.h      |  2 +
-> >   drivers/net/ethernet/intel/i40e/i40e_main.c | 58 +++++++++++++++++++++
-> >   drivers/net/ethernet/intel/i40e/i40e_txrx.c |  4 ++
-> >   3 files changed, 64 insertions(+)
-> > 
-> > diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
-> > index 2fbabcdb5bb5..5900ed5c7170 100644
-> > --- a/drivers/net/ethernet/intel/i40e/i40e.h
-> > +++ b/drivers/net/ethernet/intel/i40e/i40e.h
-> > @@ -1267,6 +1267,8 @@ int i40e_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd);
-> >   int i40e_open(struct net_device *netdev);
-> >   int i40e_close(struct net_device *netdev);
-> >   int i40e_vsi_open(struct i40e_vsi *vsi);
-> > +void i40e_queue_set_napi(struct i40e_vsi *vsi, unsigned int queue_index,
-> > +			 enum netdev_queue_type type, struct napi_struct *napi);
-> >   void i40e_vlan_stripping_disable(struct i40e_vsi *vsi);
-> >   int i40e_add_vlan_all_mac(struct i40e_vsi *vsi, s16 vid);
-> >   int i40e_vsi_add_vlan(struct i40e_vsi *vsi, u16 vid);
-> > diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> > index 0bdcdea0be3e..6384a0c73a05 100644
-> > --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> > +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> > @@ -3448,6 +3448,58 @@ static struct xsk_buff_pool *i40e_xsk_pool(struct i40e_ring *ring)
-> >   	return xsk_get_pool_from_qid(ring->vsi->netdev, qid);
-> >   }
-> > +/**
-> > + * __i40e_queue_set_napi - Set the napi instance for the queue
-> > + * @dev: device to which NAPI and queue belong
-> > + * @queue_index: Index of queue
-> > + * @type: queue type as RX or TX
-> > + * @napi: NAPI context
-> > + * @locked: is the rtnl_lock already held
-> > + *
-> > + * Set the napi instance for the queue. Caller indicates the lock status.
-> > + */
-> > +static void
-> > +__i40e_queue_set_napi(struct net_device *dev, unsigned int queue_index,
-> > +		      enum netdev_queue_type type, struct napi_struct *napi,
-> > +		      bool locked)
-> > +{
-> > +	if (!locked)
-> > +		rtnl_lock();
-> > +	netif_queue_set_napi(dev, queue_index, type, napi);
-> > +	if (!locked)
-> > +		rtnl_unlock();
-> > +}
-> > +
-> > +/**
-> > + * i40e_queue_set_napi - Set the napi instance for the queue
-> > + * @vsi: VSI being configured
-> > + * @queue_index: Index of queue
-> > + * @type: queue type as RX or TX
-> > + * @napi: NAPI context
-> > + *
-> > + * Set the napi instance for the queue. The rtnl lock state is derived from the
-> > + * execution path.
-> > + */
-> > +void
-> > +i40e_queue_set_napi(struct i40e_vsi *vsi, unsigned int queue_index,
-> > +		    enum netdev_queue_type type, struct napi_struct *napi)
-> > +{
-> > +	struct i40e_pf *pf = vsi->back;
-> > +
-> > +	if (!vsi->netdev)
-> > +		return;
-> > +
-> > +	if (current_work() == &pf->service_task ||
-> > +	    test_bit(__I40E_PF_RESET_REQUESTED, pf->state) ||
+Nitpick: title: net: dsa: mv88e6xxx
+
+On Sat, Apr 06, 2024 at 03:13:34PM -0500, Andrew Lunn wrote:
+> Make use of the helpers to add LEDs to the user ports when the port is
+> setup. Also remove the LEDs when the port is destroyed to avoid any
+> race conditions with users of /sys/class/leds and LED triggers after
+> the driver has been removed.
 > 
-> I think we might need something like ICE_PREPARED_FOR_RESET which detects
-> all kinds of resets(PFR/CORE/GLOBR). __I40E_PF_RESET_REQUESTED handles PFR
-> only. So, this might assert for RTNL lock on CORER/GLOBR.
-
-The i40e code is a bit tricky so I'm not sure about these cases. Here's
-what it looks like to me, but hopefully Intel can weigh-in here as well.
-
-As some one who is not an expert in i40e, what follows is a guess that is
-likely wrong ;)
-
-The __I40E_GLOBAL_RESET_REQUESTED case it looks to me (I could totally
-be wrong here) that the i40e_reset_subtask calls i40e_rebuild with
-lock_acquired = false. In this case, we want __i40e_queue_set_napi to
-pass locked = true (because i40e_rebuild will acquire the lock for us).
-
-The __I40E_CORE_RESET_REQUESTED case appears to be the same as the
-__I40E_GLOBAL_RESET_REQUESTED case in that i40e_rebuild is called with
-lock_acquired = false meaning we also want __i40e_queue_set_napi to pass
-locked = true (because i40e_rebuild will acquire the lock for us).
-
-__I40E_PF_RESET_REQUESTED is more complex.
-
-It seems:
-          When the __I40E_PF_RESET_REQUESTED bit is set in:
-            - i40e_handle_lldp_event
-            - i40e_tx_timeout
-            - i40e_intr
-            - i40e_resume_port_tx
-            - i40e_suspend_port_tx
-            - i40e_hw_dcb_config
-
-          then: i40e_service_event_schedule is called which queues
-          i40e_service_task, which calls i40e_reset_subtask, which
-          clears the __I40E_PF_RESET_REQUESTED bit and calls
-          i40e_do_reset passing lock_acquired = false. In the
-          __I40E_PF_RESET_REQUESTED case, i40e_reset_and_rebuild
-	  called with lock_acquired = false again and passed through to
-	  i40e_rebuild which will take rtnl on its own. This means
-          in these cases, __i40e_queue_set_napi can pass locked = true.
-
-          However...
-
-            - i40e_set_features
-            - i40e_ndo_bridge_setlink
-            - i40e_create_queue_channel
-            - i40e_configure_queue_channels
-            - Error case in i40e_vsi_open
-
-          call i40e_do_reset directly and pass lock_acquired = true so
-          i40e_reset_and_rebuild will not take the RTNL.
-
-	  Important assumption: I assume that passing lock_acquired = true
-	  means that the lock really was previously acquired (and not simply
-	  unnecessary and not taken ?).
-
-	  If that is correct, then __i40e_queue_set_napi should also not take the rtnl (e.g.
-          locked = true).
-
-Again, I could be totally off here, but it looks like when:
-
-  (current_work() == &pf->service_task) && test_bit(__I40E_PF_RESET_REQUESTED, pf->state)
-
-is true, we want to call __i40e_queue_set_napi with locked = true,
-
-and also all the other cases we want __i40e_queue_set_napi with locked = true
-
-> > +	    test_bit(__I40E_DOWN, pf->state) ||
-> > +	    test_bit(__I40E_SUSPENDED, pf->state))
-> > +		__i40e_queue_set_napi(vsi->netdev, queue_index, type, napi,
-> > +				      false);
-> > +	else
-> > +		__i40e_queue_set_napi(vsi->netdev, queue_index, type, napi,
-> > +				      true);
-
-I *think* (but honestly... I have no idea) the correct if statement *might* be
-something like:
-
-  /* __I40E_PF_RESET_REQUESTED via the service_task will
-   * call i40e_rebuild with lock_acquired = false, causing rtnl to be
-   * taken, meaning __i40e_queue_set_napi should *NOT* take the lock.
-   *
-   * __I40E_PF_RESET_REQUESTED when set directly and not via the
-   * service task, i40e_reset is called with lock_acquired = true,
-   * implying that the rtnl was already taken (and, more
-   * specifically, the lock was not simply unnecessary and skipped)
-   * and so __i40e_queue_set_napi should *NOT* take the lock.
-   *
-   * __I40E_GLOBAL_RESET_REQUESTED and __I40E_CORE_RESET_REQUESTED
-   * trigger the service_task (via i40e_intr) which will cause
-   * i40e_rebuild to acquire rtnl and so __i40e_queue_set_napi should
-   * not acquire it.
-   */
-  if (current_work() == &pf->service_task ||
-      test_bit(__I40E_PF_RESET_REQUESTED, pf->state) ||
-      test_bit(__I40E_GLOBAL_RESET_REQUESTED, pf->state) ||
-      test_bit(__I40E_CORE_RESET_REQUESTED, pf->state))
-          __i40e_queue_set_napi(vsi->netdev, queue_index, type, napi,
-                                true);
-  else if (test_bit(__I40E_DOWN, pf->state) ||
-           test_bit(__I40E_SUSPENDED, pf->state))
-          __i40e_queue_set_napi(vsi->netdev, queue_index, type, napi,
-                                false);
-  else
-          __i40e_queue_set_napi(vsi->netdev, queue_index, type, napi,
-                                true);
-
-I suppose to figure this out, I'd need to investigate all cases where
-i40e_rebuild is called with lock_acquired = true to ensure that the lock was
-actually acquired (and not just unnecessary).
-
-Unless some one who knows about i40e can answer this question more
-definitively.
-
-> > +}
-> > +
-> >   /**
-> >    * i40e_configure_tx_ring - Configure a transmit ring context and rest
-> >    * @ring: The Tx ring to configure
-> > @@ -3558,6 +3610,8 @@ static int i40e_configure_tx_ring(struct i40e_ring *ring)
-> >   	/* cache tail off for easier writes later */
-> >   	ring->tail = hw->hw_addr + I40E_QTX_TAIL(pf_q);
-> > +	i40e_queue_set_napi(vsi, ring->queue_index, NETDEV_QUEUE_TYPE_TX,
-> > +			    &ring->q_vector->napi);
+> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+> ---
+>  drivers/net/dsa/mv88e6xxx/Kconfig |   1 +
+>  drivers/net/dsa/mv88e6xxx/chip.c  | 119 +++++++++++++++++++++++++++++++++++++-
+>  drivers/net/dsa/mv88e6xxx/chip.h  |  13 +++++
+>  3 files changed, 132 insertions(+), 1 deletion(-)
 > 
-> I am not sure very sure of this, have you tested this for the reset/rebuild
-> path as well (example: ethtool -L and change queues). Just wondering if this
-> path is taken for first time VSI init or additionally for any VSI rebuilds
-> as well.
+> diff --git a/drivers/net/dsa/mv88e6xxx/Kconfig b/drivers/net/dsa/mv88e6xxx/Kconfig
+> index e3181d5471df..ded5c6b9132b 100644
+> --- a/drivers/net/dsa/mv88e6xxx/Kconfig
+> +++ b/drivers/net/dsa/mv88e6xxx/Kconfig
+> @@ -5,6 +5,7 @@ config NET_DSA_MV88E6XXX
+>  	select IRQ_DOMAIN
+>  	select NET_DSA_TAG_EDSA
+>  	select NET_DSA_TAG_DSA
+> +	select NETDEV_LEDS
 
-Can you explain more about what your concern is? I'm not sure I follow.
-Was the concern just that on rebuild this code path might not be
-executed because the driver might take a different path?
+Do we want mv88e6xxx to select NETDEV_LEDS, or also to be able to build
+it without LED control?
 
-If so, I traced the code (and tested with ethtool):
+If we want to select, do we always want drivers to select NETDEV_LEDS?
+Maybe hide the help text from the NETDEV_LEDS option, make it invisible
+to the user?
 
-When the device is probed:
+>  	help
+>  	  This driver adds support for most of the Marvell 88E6xxx models of
+>  	  Ethernet switch chips, except 88E6060.
+> diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+> index 3d7e4aa9293a..4e4031f11088 100644
+> --- a/drivers/net/dsa/mv88e6xxx/chip.c
+> +++ b/drivers/net/dsa/mv88e6xxx/chip.c
+> @@ -31,6 +31,7 @@
+>  #include <linux/gpio/consumer.h>
+>  #include <linux/phylink.h>
+>  #include <net/dsa.h>
+> +#include <net/netdev_leds.h>
+>  
+>  #include "chip.h"
+>  #include "devlink.h"
+> @@ -3129,6 +3130,105 @@ static int mv88e6xxx_switch_reset(struct mv88e6xxx_chip *chip)
+>  	return mv88e6xxx_software_reset(chip);
+>  }
+>  
+> +static int mv88e6xxx_led_brightness_set(struct net_device *ndev,
+> +					u8 led, enum led_brightness value)
+> +{
+> +	struct dsa_port *dp = dsa_port_from_netdev(ndev);
+> +	struct mv88e6xxx_chip *chip = dp->ds->priv;
+> +	int port = dp->index;
+> +	int err;
+> +
+> +	if (chip->info->ops->led_brightness_set) {
+> +		mv88e6xxx_reg_lock(chip);
+> +		err = chip->info->ops->led_brightness_set(chip, port, led,
+> +							  value);
+> +		mv88e6xxx_reg_unlock(chip);
+> +		return err;
+> +	}
+> +	return -EOPNOTSUPP;
 
-i40e_probe
-  i40e_vsi_open
-    i40e_vsi_configure
-      i40e_vsi_configure_rx
-        i40e_configure_rx_ring
-      i40e_vsi_configure_tx
-        i40e_configure_tx_ring
+The opposite looks more natural, if (!ops) return -EOPNOTSUPP, followed
+by the normal code with 1 level of indentation less.
 
-When you use ethtool to change the channel count:
+Comment applicable to all netdev_leds_ops below.
 
-i40e_set_channels
-  i40e_reconfig_rss_queues
-    i40e_reset_and_rebuild
-      i40e_rebuild
-        i40e_pf_unquiesce_all_vsi
-          i40e_unquiesce_vsi
-            i40e_vsi_open
-              [.. the call stack above for i40e_vsi_open ..]
+> +}
+> +
+>  static int mv88e6xxx_set_port_mode(struct mv88e6xxx_chip *chip, int port,
+>  				   enum mv88e6xxx_frame_mode frame,
+>  				   enum mv88e6xxx_egress_mode egress, u16 etype)
+> @@ -4006,7 +4106,9 @@ static int mv88e6xxx_setup(struct dsa_switch *ds)
+>  
+>  static int mv88e6xxx_port_setup(struct dsa_switch *ds, int port)
+>  {
+> +	struct dsa_port *dp = dsa_to_port(ds, port);
+>  	struct mv88e6xxx_chip *chip = ds->priv;
+> +	struct mv88e6xxx_port *p;
+>  	int err;
+>  
+>  	if (chip->info->ops->pcs_ops &&
+> @@ -4016,13 +4118,28 @@ static int mv88e6xxx_port_setup(struct dsa_switch *ds, int port)
+>  			return err;
+>  	}
+>  
+> -	return mv88e6xxx_setup_devlink_regions_port(ds, port);
 
-Are those the two paths you had in mind or were there other ones? FWIW, using
-ethtool to change the channel count followed by using the cli.py returns what
-appears to be correct data, so I think the ethtool -L case is covered.
+Unfortunate, but there is an existing bug here. chip->info->ops->pcs_ops->pcs_init()
+allocates memory. If mv88e6xxx_setup_devlink_regions_port() fails here,
+that's memory we're not freeing, by not calling chip->info->ops->pcs_ops->pcs_teardown().
 
-Let me know if I am missing any cases you had in mind or if this answers your
-question.
+> +	err  = mv88e6xxx_setup_devlink_regions_port(ds, port);
+> +	if (err)
+> +		return err;
+> +
+> +	if (dp->dn && dsa_is_user_port(ds, port)) {
+> +		p = &chip->ports[port];
+> +		INIT_LIST_HEAD(&p->leds);
+> +		err = netdev_leds_setup(dp->user, dp->dn, &p->leds,
+> +					&mv88e6xxx_netdev_leds_ops, 2);
 
-> >   	return 0;
-> >   }
-> > @@ -3716,6 +3770,8 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
-> >   			 ring->queue_index, pf_q);
-> >   	}
-> > +	i40e_queue_set_napi(vsi, ring->queue_index, NETDEV_QUEUE_TYPE_RX,
-> > +			    &ring->q_vector->napi);
-> > 
-> Same as above.
+Does anything bad happen with netdev_leds_setup() on platform_data?
+OF APIs are pretty NULL-tolerant.
+
+> +		if (err)
+> +			mv88e6xxx_teardown_devlink_regions_port(ds, port);
+> +	}
+> +	return err;
+>  }
+>  
+>  static void mv88e6xxx_port_teardown(struct dsa_switch *ds, int port)
+>  {
+>  	struct mv88e6xxx_chip *chip = ds->priv;
+>  
+> +	if (dsa_is_user_port(ds, port))
+> +		netdev_leds_teardown(&chip->ports[port].leds);
+
+On platform_data, we are calling netdev_leds_teardown() when we never
+called netdev_leds_setup() and never initialized the port leds list.
+
+> +
+>  	mv88e6xxx_teardown_devlink_regions_port(ds, port);
+>  
+>  	if (chip->info->ops->pcs_ops &&
+> diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
+> index 64f8bde68ccf..d15bb5810831 100644
+> --- a/drivers/net/dsa/mv88e6xxx/chip.h
+> +++ b/drivers/net/dsa/mv88e6xxx/chip.h
+> @@ -291,6 +291,9 @@ struct mv88e6xxx_port {
+>  
+>  	/* MacAuth Bypass control flag */
+>  	bool mab;
+> +
+> +	/* LEDs associated to the port */
+> +	struct list_head leds;
+>  };
+>  
+>  enum mv88e6xxx_region_id {
+> @@ -432,6 +435,7 @@ struct mv88e6xxx_chip {
+>  
+>  	/* Bridge MST to SID mappings */
+>  	struct list_head msts;
+> +
+
+Stray change.
+
+>  };
+>  
+>  struct mv88e6xxx_bus_ops {
+> @@ -668,6 +672,15 @@ struct mv88e6xxx_ops {
+>  	int (*led_blink_set)(struct mv88e6xxx_chip *chip, int port, u8 led,
+>  			     unsigned long *delay_on,
+>  			     unsigned long *delay_off);
+> +	int (*led_hw_control_is_supported)(struct mv88e6xxx_chip *chip,
+> +					   int port, u8 led,
+> +					   unsigned long flags);
+> +	int (*led_hw_control_set)(struct mv88e6xxx_chip *chip,
+> +				  int port, u8 led,
+> +				  unsigned long flags);
+> +	int (*led_hw_control_get)(struct mv88e6xxx_chip *chip,
+> +				  int port, u8 led,
+> +				  unsigned long *flags);
+>  };
+>  
+>  struct mv88e6xxx_irq_ops {
 > 
->   	return 0;
-> >   }
-> > @@ -4178,6 +4234,8 @@ static int i40e_vsi_request_irq_msix(struct i40e_vsi *vsi, char *basename)
-> >   		q_vector->affinity_notify.notify = i40e_irq_affinity_notify;
-> >   		q_vector->affinity_notify.release = i40e_irq_affinity_release;
-> >   		irq_set_affinity_notifier(irq_num, &q_vector->affinity_notify);
-> > +		netif_napi_set_irq(&q_vector->napi, q_vector->irq_num);
-> > +
-> >   		/* Spread affinity hints out across online CPUs.
-> >   		 *
-> >   		 * get_cpu_mask returns a static constant mask with
-> > diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> > index 64d198ed166b..d380885ff26d 100644
-> > --- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> > +++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> > @@ -821,6 +821,8 @@ void i40e_clean_tx_ring(struct i40e_ring *tx_ring)
-> >   void i40e_free_tx_resources(struct i40e_ring *tx_ring)
-> >   {
-> >   	i40e_clean_tx_ring(tx_ring);
-> > +	i40e_queue_set_napi(tx_ring->vsi, tx_ring->queue_index,
-> > +			    NETDEV_QUEUE_TYPE_TX, NULL);
-> >   	kfree(tx_ring->tx_bi);
-> >   	tx_ring->tx_bi = NULL;
-> > @@ -1526,6 +1528,8 @@ void i40e_clean_rx_ring(struct i40e_ring *rx_ring)
-> >   void i40e_free_rx_resources(struct i40e_ring *rx_ring)
-> >   {
-> >   	i40e_clean_rx_ring(rx_ring);
-> > +	i40e_queue_set_napi(rx_ring->vsi, rx_ring->queue_index,
-> > +			    NETDEV_QUEUE_TYPE_RX, NULL);
-> >   	if (rx_ring->vsi->type == I40E_VSI_MAIN)
-> >   		xdp_rxq_info_unreg(&rx_ring->xdp_rxq);
-> >   	rx_ring->xdp_prog = NULL;
+> -- 
+> 2.43.0
+> 
 
