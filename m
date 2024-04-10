@@ -1,217 +1,96 @@
-Return-Path: <netdev+bounces-86759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D84588A031B
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 00:16:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE00C8A0332
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 00:19:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FE99282ABC
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 22:16:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E24A1F224C9
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 22:19:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7367F184124;
-	Wed, 10 Apr 2024 22:15:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E193C1836CB;
+	Wed, 10 Apr 2024 22:19:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="v4npgz+5";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="MVfPV07b"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HmxkiMyM"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C507184107;
-	Wed, 10 Apr 2024 22:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCBF2181CE4;
+	Wed, 10 Apr 2024 22:19:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712787335; cv=none; b=JrTLF4XjP5fp6E8teXZpeWm+mkSwzMzFnFYIYM6+AOrtCBlRpBZThRzI8XAOID+l+xKvkjISbvwCx4IRDXEHIXmXcD1zTwofbocjFERzojCcnaMBvcPYA5QqrDGG6b4E76fT85N+GBWYYhy6udLXzViLN7K5zXcF8NwIJ9IGQK8=
+	t=1712787573; cv=none; b=Gnjy6WMRrCSndffOB8V/1NqQ2vnSDJvN1+Je2tl0lB0085SWwL3QJcSEmcixpE0ei51jT8n1/dxVRLrMUWMMErRm/Kwq/k5OYv8V4X/R/3sXFLIhM876eubwLto5ud79RnPomu+aGR6/jS07MwyI2dC3T04LZnhWutBTjN7irvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712787335; c=relaxed/simple;
-	bh=A/lV+1Ac2zw9xElc0bPbLpO1AnYokiSgY0NCWvJTk3E=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=UirZ5H42tOrexrFjM7BL9YraCLeq8QmicnLBSHUhpwXluKr2H3VIEzqK11H/VOuq5lTGEeywbEsMte4fJ/FzCJLR+Vz5rExSomUUau1j/+4or4NrgS0DeYsf9D9MQt2n8objk1aJgAwNlWkTe2Fa4/92d7AVlYSp9B1zvVmPfis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=v4npgz+5; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=MVfPV07b; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1712787331;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yv1aoSAnbbHpJLpzRKC+j97D6+Bc6CY0CLsHS2K8ILg=;
-	b=v4npgz+5aALgAbCa4gYmW+sAu1VbuMi5mmGWhrk2cAcWRxxH4pHy5nrXHNxv1At5IAeB/0
-	iSKfMviSNGaDOtJ64MoFjVFPiPswQ4GMq/F/eukaTkHCHFNIV9ltqfTCJSY+Jeax8N38/D
-	lociKYTR0SP6bWY88di3mNDqOJ2v4jw/yrpwKM4Ap/hBjWIUp4jfBzy5ADDWKciQVkHii4
-	AsmmAgMXdEbP+H4MHxrGcJ19Q9Q6+iDOy8GJm/WCfGkm8BbiZayNHjlxiSc5P+L8ngWZou
-	Vmd3GeXzCMuHXTxPB23DGxecr3ziWocyC/q7y2/Icbjqrn4ZjN0s49rvjEw8ow==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1712787331;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yv1aoSAnbbHpJLpzRKC+j97D6+Bc6CY0CLsHS2K8ILg=;
-	b=MVfPV07bOUJ3KqluWXxG3YvId4KrFUETz3y7W9lQh/AJfTIl0ORZdyzcntjr/e71k8Q7nD
-	CAkHiH4iXKD2ipBA==
-To: lakshmi.sowjanya.d@intel.com, jstultz@google.com, giometti@enneenne.com,
- corbet@lwn.net, linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, andriy.shevchenko@linux.intel.com,
- eddie.dong@intel.com, christopher.s.hall@intel.com,
- jesse.brandeburg@intel.com, davem@davemloft.net,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- mcoquelin.stm32@gmail.com, perex@perex.cz, linux-sound@vger.kernel.org,
- anthony.l.nguyen@intel.com, peter.hilber@opensynergy.com,
- pandith.n@intel.com, subramanian.mohan@intel.com,
- thejesh.reddy.t.r@intel.com, lakshmi.sowjanya.d@intel.com
-Subject: Re: [PATCH v6 08/11] timekeeping: Add function to convert realtime
- to base clock
-In-Reply-To: <20240410114828.25581-9-lakshmi.sowjanya.d@intel.com>
-References: <20240410114828.25581-1-lakshmi.sowjanya.d@intel.com>
- <20240410114828.25581-9-lakshmi.sowjanya.d@intel.com>
-Date: Thu, 11 Apr 2024 00:15:31 +0200
-Message-ID: <877ch43lvg.ffs@tglx>
+	s=arc-20240116; t=1712787573; c=relaxed/simple;
+	bh=RBqljQm7JMEgswn2qtxe3dR7eQ1g8PHIfsgJYiV3nf4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tSLopWMOCfh30WmTbo+Ip+6Ku354eNLO30SI2CZR085yUzXJer6JXiZYeOKWLpAqKIMfQg6vzzPo4VyKCWGs0LEjkSTHyiAQbpT7sntjKyhcoXzH0AvPPaQJq4P2NF6GZ3jJIZTibJ7sjsAzDCgZvfjBYOVDzW4Hg8SrXGMvklY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HmxkiMyM; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=lLc/qmGcLY8CIbx/gZ/1esqXMmyRWUNlzhQigQOjjZM=; b=HmxkiMyMtPH3j8+tJmE7bKSvMW
+	NG4xWukEDGTsIhjtyxvwHyOyeEDDf69EPd0HC8ycnEEpL3lxB+7GIGkkXpHQ5E4QTWlA3Q82gUYiq
+	SCvFcW9pD17iXr6+0VVBUTmFRfP3f6Zybtfuj3CrpfhEBrNfJGtfNIAnauyVuXQy3aeM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rugHf-00Ci4U-Rp; Thu, 11 Apr 2024 00:19:11 +0200
+Date: Thu, 11 Apr 2024 00:19:11 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Jiri Pirko <jiri@resnulli.us>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, pabeni@redhat.com,
+	John Fastabend <john.fastabend@gmail.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Edward Cree <ecree.xilinx@gmail.com>,
+	Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
+	bhelgaas@google.com, linux-pci@vger.kernel.org,
+	Alexander Duyck <alexanderduyck@fb.com>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <6a775533-bd50-4f57-85f7-125c107bd77a@lunn.ch>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <20240409135142.692ed5d9@kernel.org>
+ <6615adbde1430_249cf52944@willemb.c.googlers.com.notmuch>
+ <ZhY_MVfBMMlGAuK5@nanopsycho>
+ <885f0615-81e8-4f1f-9e97-b82f4d9509d3@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <885f0615-81e8-4f1f-9e97-b82f4d9509d3@intel.com>
 
-On Wed, Apr 10 2024 at 17:18, lakshmi.sowjanya.d@intel.com wrote:
-> From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
->
-> PPS(Pulse Per Second) generates signals in realtime, but Timed IO
+> I think its good practice to ensure multiple vendors/drivers can use
+> whatever common uAPI or kernel API exists. It can be frustrating when
+> some new API gets introduced but then can't be used by another device..
+> In most cases thats on the vendors for being slow to respond or work
+> with each other when developing the new API.
 
-... generates signals based on CLOCK_REALTIME, but ...
+I tend to agree with the last part. Vendors tend not to reviewer other
+vendors patches, and so often don't notice a new API being added which
+they could use, if it was a little bit more generic. Also vendors
+often seem to focus on their devices/firmware requirements, not an
+abstract device, and so end up with something not generic.
 
-> hardware understands time in base clock reference.
+As a reviewer, i try to take more notice of new APIs than most other
+things, and ideally it is something we should all do.
 
-The hardware does not understand anything.
+	 Andrew
 
-> Add an interface,
-> ktime_real_to_base_clock() to convert realtime to base clock.
->
-> Add the helper function timekeeping_clocksource_has_base(), to check
-> whether the current clocksource has the same base clock. This will be
-> used by Timed IO device to check if the base clock is X86_ART(Always
-> Running Timer).
 
-Again this fails to explain the rationale and as this is a core change
-which is hardware agnostic the whole Timed IO and ART reference is not
-really helpful. Something like this:
 
-  "PPS (Pulse Per Second) generates a hardware pulse every second based
-   on CLOCK_REALTIME. This works fine when the pulse is generated in
-   software from a hrtimer callback function.
-
-   For hardware which generates the pulse by programming a timer it's
-   required to convert CLOCK_REALTIME to the underlying hardware clock.
-
-   The X86 Timed IO device is based on the Always Running Timer (ART),
-   which is the base clock of the TSC, which is usually the system
-   clocksource on X86.
-
-   The core code already has functionality to convert base clock
-   timestamps to system clocksource timestamps, but there is no support
-   for converting the other way around.
-
-   Provide the required functionality to support such devices in a
-   generic way to avoid code duplication in drivers:
-
-      1) ktime_real_to_base_clock() to convert a CLOCK_REALTIME
-         timestamp to a base clock timestamp
-
-      2) timekeeping_clocksource_has_base() to allow drivers to validate
-         that the system clocksource is based on a particular
-         clocksource ID.
-  
-> +static bool convert_cs_to_base(u64 *cycles, enum clocksource_ids base_id)
-> +{
-> +	struct clocksource *cs = tk_core.timekeeper.tkr_mono.clock;
-> +	struct clocksource_base *base = cs->base;
-> +
-> +	/* Check whether base_id matches the base clock */
-> +	if (!base || base->id != base_id)
-> +		return false;
-> +
-> +	*cycles -= base->offset;
-> +	if (!convert_clock(cycles, base->denominator, base->numerator))
-> +		return false;
-> +	return true;
-> +}
-> +
-> +static u64 convert_ns_to_cs(u64 delta)
-> +{
-> +	struct tk_read_base *tkr = &tk_core.timekeeper.tkr_mono;
-> +
-> +	return div_u64((delta << tkr->shift) - tkr->xtime_nsec, tkr->mult);
-> +}
-
-> +bool ktime_real_to_base_clock(ktime_t treal, enum clocksource_ids base_id, u64 *cycles)
-
-As this is a kernel API function it really wants kernel-doc comment to
-explain the functionality, the arguments and the return value.
-
-> +{
-> +	struct timekeeper *tk = &tk_core.timekeeper;
-> +	unsigned int seq;
-> +	u64 delta;
-> +
-> +	do {
-> +		seq = read_seqcount_begin(&tk_core.seq);
-> +		if ((u64)treal < tk->tkr_mono.base_real)
-> +			return false;
-> +		delta = (u64)treal - tk->tkr_mono.base_real;
-
-In the previous version you had a sanity check on delta:
-
->>> +		if (delta > tk->tkr_mono.clock->max_idle_ns)
->>> +			return false;
-
-And I told you:
-
->> I don't think this cutoff is valid. There is no guarantee that this is
->> linear unless:
->>
->>       Treal[last timekeeper update] <= treal < Treal[next timekeeper update]
->>
->> Look at the dance in get_device_system_crosststamp() and
->> adjust_historical_crosststamp() to see why.
-
-So now there is not even a check anymore whether the delta conversion
-can overflow.
-
-There is zero explanation why this conversion is considered to be
-correct.
-
-> +		*cycles = tk->tkr_mono.cycle_last + convert_ns_to_cs(delta);
-> +		if (!convert_cs_to_base(cycles, base_id))
-> +			return false;
-> +	} while (read_seqcount_retry(&tk_core.seq, seq));
-> +
-> +	return true;
-> +}
-
-> +/**
-> + * timekeeping_clocksource_has_base - Check whether the current clocksource
-> + *     has a base clock
-
-s/has a base clock/is based on a given base clock
-
-> + * @id:		The clocksource ID to check for
-
-base clocksource ID
-
-> + *
-> + * Note:	The return value is a snapshot which can become invalid right
-> + *		after the function returns.
-> + *
-> + * Return:	true if the timekeeper clocksource has a base clock with @id,
-> + *		false otherwise
-> + */
-
-Thanks,
-
-        tglx
 
