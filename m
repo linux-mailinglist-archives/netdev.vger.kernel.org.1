@@ -1,30 +1,31 @@
-Return-Path: <netdev+bounces-86421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C0F089EC2E
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:35:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 98B7789EC31
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:35:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B22D21F2255F
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:35:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C83F1F2278E
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:35:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5528713D2B1;
-	Wed, 10 Apr 2024 07:35:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45E1A13D520;
+	Wed, 10 Apr 2024 07:35:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D15713D2A0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D10813D29F
 	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 07:35:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712734506; cv=none; b=p5M4BRHQbWs54G2SqevHKkSntvSo5A7Jw4sVU3ZcYSsuDCUbmuR/q0O9wr1DNZMmSXCS3CZ9ueXG74MTYEbCONzwTbpWou4Z9wamKpJFqLe1ZIBddMZ0+6qqZc1WIvOGAvyReksFyy0k9+DafVGTnfdmMwmZc0pTLrmO7me/5S8=
+	t=1712734507; cv=none; b=IDLWK7A8l3GEGGHGjAHLkDCbmZ/ZgnuEzLD6gf+iZLRXGzW5tFVtwjlDPIBKCNE0xk6Q2E1xYt3LiWNve9CyCOHG90lTPsTM4JxKeKFDar9/YE2Z0k6elrrmG9ErqXMxzAkm+EiaUXK8Zt8mxDOsbwlxzvBd21cnlTR6ASk8xhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712734506; c=relaxed/simple;
-	bh=gROKBkMa0ThexFE+zSeTQYHlPSPQGkYJ0/VJWbgMt9I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sDnVlsrkrwZF/WrTiKjJA7fudlQN1URQn5B8tt/ncdvIcK9BpCJhoZV+324Ra5jyVUgMsD5Bm0D3D4i/8VgrEcawTPAIs426Wwt1vPw41AHt8XVUCpPWWq6hWwpV/UKTZd+AUSpz8K4VN4xbf5nZ3Y/Nufb2uCz8mPQQxTi8yDc=
+	s=arc-20240116; t=1712734507; c=relaxed/simple;
+	bh=I0XDCJ0jSC3RZZlCBrBai5GWRKEW6z/idZ0NTi135XM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JjcAqk/bUI5tuTLJkGQxDFV8tojR+TjQ15w5UYiYKIqpONfjQsyo+1gnrRyBwsaop4iFjuBuUj4MUrk6SuMZkxW7RsTUpNXc+eoZDcvVAF+9SGPwwwW9srcT5P6ZHYl97GstUVurjEGTg6UznnjOs1czZ9Nm9kP98z7mcnvgbk0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -32,25 +33,26 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1ruSU2-00041S-OD; Wed, 10 Apr 2024 09:35:02 +0200
+	id 1ruSU2-00041U-M4; Wed, 10 Apr 2024 09:35:02 +0200
 Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1ruSU2-00BS0z-13; Wed, 10 Apr 2024 09:35:02 +0200
+	id 1ruSU2-00BS12-5Z; Wed, 10 Apr 2024 09:35:02 +0200
 Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ukl@pengutronix.de>)
-	id 1ruSU1-00HQ6I-33;
-	Wed, 10 Apr 2024 09:35:01 +0200
+	id 1ruSU2-00HQ6O-0I;
+	Wed, 10 Apr 2024 09:35:02 +0200
 From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
 To: Richard Cochran <richardcochran@gmail.com>
 Cc: netdev@vger.kernel.org,
-	kernel@pengutronix.de,
-	Yangbo Lu <yangbo.lu@nxp.com>
-Subject: [PATCH net-next 0/5] ptp: Convert to platform remove callback returning void
-Date: Wed, 10 Apr 2024 09:34:49 +0200
-Message-ID: <cover.1712734365.git.u.kleine-koenig@pengutronix.de>
+	kernel@pengutronix.de
+Subject: [PATCH net-next 1/5] ptp: ptp_clockmatrix: Convert to platform remove callback returning void
+Date: Wed, 10 Apr 2024 09:34:50 +0200
+Message-ID:  <0f0f5680c1a2a3ef19975935a2c6828a98bc4d25.1712734365.git.u.kleine-koenig@pengutronix.de>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <cover.1712734365.git.u.kleine-koenig@pengutronix.de>
+References: <cover.1712734365.git.u.kleine-koenig@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,7 +60,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1256; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=gROKBkMa0ThexFE+zSeTQYHlPSPQGkYJ0/VJWbgMt9I=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBmFkEa1OENiFx3nu3eIywrBneG2+nWTwfDrc5Qz SNKv/XkO2GJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZhZBGgAKCRCPgPtYfRL+ TmJiB/0WWoW2e67iiVO9cK3kw/sDxwxxlOpVKYnb2HMXlfqOYuNGDj9hf7HfPCD8M6iPnrhP5M7 MzZCn64Y1HJ52bsOH7zfEFgCZbaLLfRU7l8FMPRIdV07/9B/hzFzxWQOFz4RhLRhEn8LgRfkAYu o6zi8fKVnDTeIRV6pEYboILneMEVmpZ/jYR7EMwsA2tp+KtzNqNALEI24bP6EI3d6Hp215yoo8/ 41z2MpchYKLahBowqLoMN0GPysiSn1WDvnNbPu9iIPXF3spjFy+L7PGKEw8fQmus8MduP+gw0We 9zxHCEyWPhe3bVVp85daYU5ytNgWW1dBP1/SSrYP9QIFmklU
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1738; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=I0XDCJ0jSC3RZZlCBrBai5GWRKEW6z/idZ0NTi135XM=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBmFkEb6O1ejE4C6uGLQMhKOCekurzrCGYpXtAV7 SvAblUzkFiJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZhZBGwAKCRCPgPtYfRL+ TtWUCACH4stU4JhoY4A10opFfOKYezgusbaUhcGdSiNHlddn20obHpsuxhtBp8XRx6JqLR8oGPe N1QcW+Hx+iGt2yS71sRbtaBbXL2VOwW1UubRdGBsDTjeu3nP+gyrpc7lQpQftFK0T56xhlvVQ23 x+xsgEeLk901pRYdO7FbiP3XKNX9IMwal4T3jLVSEz7Bmaz5NZKT9SoD5gIprlgPPlrV957Uj7/ D6gstcmvktLHXRTvVweOEDpRtAz/gbNh/WGkiwCHmvd94WMy9yOR17cz8ng7WanUKx5Ej/2TRsw 3wqSug/hcIw036CNBGX1471Hp8wiXHTGGM/kJA6LKVZEdsoI
 X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
@@ -66,38 +68,54 @@ X-SA-Exim-Mail-From: ukl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello,
+The .remove() callback for a platform driver returns an int which makes
+many driver authors wrongly assume it's possible to do error handling by
+returning an error code. However the value returned is ignored (apart
+from emitting a warning) and this typically results in resource leaks.
 
-this series converts all platform drivers below drivers/ptp/ to not use
-struct platform_device::remove() any more. See commit 5c5a7680e67b
-("platform: Provide a remove callback that returns no value") for an
-extended explanation and the eventual goal.
+To improve here there is a quest to make the remove callback return
+void. In the first step of this quest all drivers are converted to
+.remove_new(), which already returns void. Eventually after all drivers
+are converted, .remove_new() will be renamed to .remove().
 
-All conversations are trivial, because the driver's .remove() callbacks
-returned zero unconditionally.
+Trivially convert this driver from always returning zero in the remove
+callback to the void returning variant.
 
-There are no interdependencies between these patches, so they can be
-applied independently if needed. This is merge window material.
-
-Best regards
-Uwe
-
-Uwe Kleine-König (5):
-  ptp: ptp_clockmatrix: Convert to platform remove callback returning
-    void
-  ptp: ptp_dte: Convert to platform remove callback returning void
-  ptp: ptp_idt82p33: Convert to platform remove callback returning void
-  ptp: ptp_ines: Convert to platform remove callback returning void
-  ptp: ptp_qoriq: Convert to platform remove callback returning void
-
+Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+---
  drivers/ptp/ptp_clockmatrix.c | 6 ++----
- drivers/ptp/ptp_dte.c         | 6 ++----
- drivers/ptp/ptp_idt82p33.c    | 6 ++----
- drivers/ptp/ptp_ines.c        | 5 ++---
- drivers/ptp/ptp_qoriq.c       | 5 ++---
- 5 files changed, 10 insertions(+), 18 deletions(-)
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-base-commit: 6ebf211bb11dfc004a2ff73a9de5386fa309c430
+diff --git a/drivers/ptp/ptp_clockmatrix.c b/drivers/ptp/ptp_clockmatrix.c
+index f6f9d4adce04..209a45a76e6b 100644
+--- a/drivers/ptp/ptp_clockmatrix.c
++++ b/drivers/ptp/ptp_clockmatrix.c
+@@ -2457,15 +2457,13 @@ static int idtcm_probe(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
+-static int idtcm_remove(struct platform_device *pdev)
++static void idtcm_remove(struct platform_device *pdev)
+ {
+ 	struct idtcm *idtcm = platform_get_drvdata(pdev);
+ 
+ 	idtcm->extts_mask = 0;
+ 	ptp_clock_unregister_all(idtcm);
+ 	cancel_delayed_work_sync(&idtcm->extts_work);
+-
+-	return 0;
+ }
+ 
+ static struct platform_driver idtcm_driver = {
+@@ -2473,7 +2471,7 @@ static struct platform_driver idtcm_driver = {
+ 		.name = "8a3400x-phc",
+ 	},
+ 	.probe = idtcm_probe,
+-	.remove	= idtcm_remove,
++	.remove_new = idtcm_remove,
+ };
+ 
+ module_platform_driver(idtcm_driver);
 -- 
 2.43.0
 
