@@ -1,84 +1,71 @@
-Return-Path: <netdev+bounces-86578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A053789F3A2
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:07:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E509189F3AE
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:08:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0F181C26FEF
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 13:07:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 220471C210C8
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 13:08:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FF47159571;
-	Wed, 10 Apr 2024 13:07:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 194A515CD69;
+	Wed, 10 Apr 2024 13:08:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="N6lr7Zu5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="pEOLrIik"
 X-Original-To: netdev@vger.kernel.org
-Received: from wfhigh1-smtp.messagingengine.com (wfhigh1-smtp.messagingengine.com [64.147.123.152])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95186158D6B
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 13:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A3215B54E
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 13:07:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712754425; cv=none; b=KPhjlc5Lz6QyxEVdHEwSIoGOJ26lrCZTAvcLQLHGkq7c6LvSKMEBSRB+bELHadzhTmKNqTkNo89PXzZuo6VYviQr/w7h91/FVjKIdWL094J7OJ2556TknujGeplk4wOWFXvQ7zrzoENiV+q17mFa6kQYG1L3584YTgfLV62gaDE=
+	t=1712754480; cv=none; b=hnnqp5x7vBlQyVBJN71Fp0GWc8m2GWHwvP2kAG+uvxr1tqi2eZ3wE8dNYLiKvFpU9D+Gte4cB7mhoC+1bY3cFldTduCXNtFhOtmaq98v4ZHCWNJPYmzRnu5jSNZhx5OXHCYiPzkxovxSgZlqnQxSTi3uMSHAL3ymmhFo5p1Sfts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712754425; c=relaxed/simple;
-	bh=1RdXe49Nr0BUfBhxAxoB7xhhanmGSXEwgJBE/pVPfQQ=;
+	s=arc-20240116; t=1712754480; c=relaxed/simple;
+	bh=Md0Yiu7Qg0+EaiF79o5u1ASslwTjp/vtZxzjovffZPI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k8hu7aG75n3rNe2qY8f0cxQ6vrRw7Fy2AEM3IwAD20H7DMGGbvk51bnhYAclbRsgtuEcKAsTbznHJdo2KvWjNgj1fJShbZVpMgkZPiRo9hep22e38pEMGl9//pxYfeSLCy8Xrwfe8EfJOOzMdOdug5ooVlLqBMYKeo4BX5Evfy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=N6lr7Zu5; arc=none smtp.client-ip=64.147.123.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-	by mailfhigh.west.internal (Postfix) with ESMTP id DB3E0180007F;
-	Wed, 10 Apr 2024 09:07:01 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Wed, 10 Apr 2024 09:07:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1712754421; x=1712840821; bh=q9OoP9Jwkq14R8q4sz0FIVc+xvHD
-	l0XslUKBvsyra+I=; b=N6lr7Zu5AP1q/o+4KpXhcOWBvzFIzc3t0uaPWhHwXJxi
-	S0z0sJSg+Wkh4iKw0FwtkAYCQrUy32AleaZcoUWRI3YeVIEbG1Rmrw/VHjL0lNg3
-	FMQTCwf+aGzZnI+UKq3plFcb1tI57HAOEz020KlI5snT+gVpRn4LT1UEbzRulDMC
-	vi4aLyUBjbih2GSFdZT9c85GrFqJrzChRWbYWYenv+LZcVoFHgVtHIsah3ZXqj2n
-	8rdd5BYxqukwTllDk9rdt6MdjSTJ0REPxjFwulYQe035cr1EDT2S34HW3WvesJ6q
-	zhcAkeZCHvanWNw/5GU/fv+cmby2n84s/JBw0KF6Pw==
-X-ME-Sender: <xms:9I4WZqyaAPHxFb3i9aK4SNzVmRvk2dILR3XdwlAHX5brop0k9Tpg0w>
-    <xme:9I4WZmR_vi6y0n_yBUEyhunJeYqNF6iRXRGei3QWGIJ0hNV57R3dh-oTnVUECE-1b
-    y8aIWqIMDDKXJk>
-X-ME-Received: <xmr:9I4WZsVtIC2D94DexU559jaw9wMszel1PLSmGXFJJzdEwQaEeS2OU8CRGXfF>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudehiedgheekucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtuggjsehttd
-    ertddttddvnecuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihgu
-    ohhstghhrdhorhhgqeenucggtffrrghtthgvrhhnpefhffejgefhjeehjeevheevhfetve
-    evfefgueduueeivdeijeeihfegheeljefgueenucffohhmrghinhepghhithhhuhgsrdgt
-    ohhmnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepih
-    guohhstghhsehiughoshgthhdrohhrgh
-X-ME-Proxy: <xmx:9I4WZggn7aWeG8vb7iia-m4baa0be4l2AJ2NwwK7mcAos1LH9yH9VA>
-    <xmx:9I4WZsCSrt5wRxMmciQ5vnqs0au4bZ95MWFQFf2tHF-FR5efaeqJpg>
-    <xmx:9I4WZhKYE_JktiR6hFxyfb8yMAiDrpmov7SgTf6UyXwrdgOJgUQR6Q>
-    <xmx:9I4WZjB9LeypsXvCmeVbmRIWkZ6Jyd33AbDJC72nFDLErrFXlxhLlA>
-    <xmx:9Y4WZssZOsi0EL5NxAyfqifc4pjhMNbOx0G9qNXV26tKtq9-0zDBVkkO>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 10 Apr 2024 09:06:59 -0400 (EDT)
-Date: Wed, 10 Apr 2024 16:06:57 +0300
-From: Ido Schimmel <idosch@idosch.org>
-To: Adrian Moreno <amorenoz@redhat.com>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, xiyou.wangcong@gmail.com,
-	cmi@nvidia.com, yotam.gi@gmail.com, i.maximets@ovn.org,
-	aconole@redhat.com, echaudro@redhat.com, horms@kernel.org
-Subject: Re: [RFC net-next v2 2/5] net: psample: add multicast filtering on
- group_id
-Message-ID: <ZhaO8bOQ6Bm0Uh1H@shredder>
-References: <20240408125753.470419-1-amorenoz@redhat.com>
- <20240408125753.470419-3-amorenoz@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Bi9X0YWS8rUGp+qhkrbOj5Zv056wdDoQiyc385CPFFpsTXlRc2CuZp5ZQ4Uvzh1hOeqGkZPj99IsIvHnqE3sasrgawcvPbMia6vk2DSWWFEqWTvlUUH1JcjARpSphygntQ2bSolgiRXJK6UdPBHbe7VnAf2xF52smNNqPvo3ojY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=pEOLrIik; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=+1SLsua+e1rjd26Xm4MLfYXzsr2YhirDF6WCfjVTU3Y=; b=pEOLrIikxO5VHvZSe8lTUH+Gy7
+	pUyVKOCfNtmb49cNgfWwTC/Wvho3trWLYogc+stODHl617lbmzpBC4U3OBLlsypPnHMHrKBUA25Ed
+	WK/U9eQI1cANtV34AaT3OEBr5hRrRHsIML+2G7eNi8ixMkv78ys/drz5E/OyLCvVJem99COMyIOV7
+	+BmkgBK4Co/B+Xfi+fCyCEsuqrnv9AIO4BKzPgbaqb0EYQhG5WRGrvfFZImXr9vf1I1O16hMvNpkz
+	0pq4H4M6RVFMuIav4kAatLBYusP/DLR9Lf2EiPNSOawV7r7uUiQVsoyU7FxM7DJ/z62Y5SVAdhOdC
+	bRV96ANw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37330)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1ruXfv-0007yD-1O;
+	Wed, 10 Apr 2024 14:07:39 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1ruXfs-000601-Be; Wed, 10 Apr 2024 14:07:36 +0100
+Date: Wed, 10 Apr 2024 14:07:36 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	fancer.lancer@gmail.com, Jose.Abreu@synopsys.com,
+	chenhuacai@kernel.org, guyinggang@loongson.cn,
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com,
+	siyanteng01@gmail.com
+Subject: Re: [PATCH net-next v10 6/6] net: stmmac: dwmac-loongson: Add
+ Loongson GNET support
+Message-ID: <ZhaPGO77dcYxiqqA@shell.armlinux.org.uk>
+References: <cover.1712668711.git.siyanteng@loongson.cn>
+ <77daabe9ca5c62168d9e54a81b5822e9b898eeb3.1712668711.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,26 +74,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240408125753.470419-3-amorenoz@redhat.com>
+In-Reply-To: <77daabe9ca5c62168d9e54a81b5822e9b898eeb3.1712668711.git.siyanteng@loongson.cn>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Apr 08, 2024 at 02:57:41PM +0200, Adrian Moreno wrote:
-> Packet samples can come from several places (e.g: different tc sample
-> actions), typically using the sample group (PSAMPLE_ATTR_SAMPLE_GROUP)
-> to differentiate them.
-> 
-> Likewise, sample consumers that listen on the multicast group may only
-> be interested on a single group. However, they are currently forced to
-> receive all samples and discard the ones that are not relevant, causing
-> unnecessary overhead.
-> 
-> Allow users to filter on the desired group_id by adding a new command
-> SAMPLE_FILTER_SET that can be used to pass the desired group id.
-> Store this filter on the per-socket private pointer and use it for
-> filtering multicasted samples.
+On Tue, Apr 09, 2024 at 10:04:34PM +0800, Yanteng Si wrote:
+> +	/* The GMAC device with PCI ID 7a03 does not support any pause mode.
+> +	 * The GNET device (only LS7A2000) does not support half-duplex.
+> +	 */
+> +	if (pdev->device == PCI_DEVICE_ID_LOONGSON_GMAC) {
+> +		priv->hw->link.caps = MAC_10FD | MAC_100FD |
+> +			MAC_1000FD;
+> +	} else {
 
-Did you consider using BPF for this type of filtering instead of new
-uAPI?
+I'm sorry, but what follows looks totally broken to me.
 
-See example here:
-https://github.com/Mellanox/libpsample/blob/master/src/psample.c#L290
+> +		priv->hw->link.caps = (MAC_ASYM_PAUSE |
+> +			MAC_SYM_PAUSE | MAC_10FD | MAC_100FD | MAC_1000FD);
+
+Parens not required.
+
+This sets 10Mbps full duplex, 100Mbps full duplex, 1000Mbps full duplex.
+It does *not* set 10Mbps half duplex, 100Mbps half duplex, nor 1000Mbps
+half duplex.
+
+> +
+> +		if (loongson_gmac == DWMAC_CORE_3_70) {
+> +			priv->hw->link.caps &= ~(MAC_10HD |
+> +				MAC_100HD | MAC_1000HD);
+> +		}
+
+Braces not required.
+
+This clears 10Mbps half duplex, 100Mbps half duplex, 1000Mbps half
+duplex, all of which were _NOT_ set. Therefore this code as written
+can be entirely deleted.
+
+Alternatively, this code is completely untested and is functionally
+incorrect.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
