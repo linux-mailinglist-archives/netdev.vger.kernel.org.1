@@ -1,92 +1,73 @@
-Return-Path: <netdev+bounces-86757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78ADA8A02F4
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 00:12:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5578B8A02FF
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 00:13:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE4E7B237C2
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 22:11:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D20351F23364
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 22:13:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93E9190681;
-	Wed, 10 Apr 2024 22:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E7A184102;
+	Wed, 10 Apr 2024 22:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ngyscE2+"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="JPeoTgcS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A972318410C;
-	Wed, 10 Apr 2024 22:11:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD4416D4FC
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 22:13:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712787080; cv=none; b=o/K/8bp4O/j+mjHZNGd8TMVURcOvAU9Ivm57IyxWTiTkfbQJlgSi3adfMtR9vq4MAXuXzIUxRPBpTSHp8h9R+gYQScq9VVyAxCi9Ls0fcgKeXpYZuINnSOYXK5Kj0zAfbw2MQIoCwRmhYn9RTbpVu5vQqQ8Xr277vJ8BvmcWH34=
+	t=1712787196; cv=none; b=r4XnzfVHjJgSQxeihlnVn/ONirJLErZQkvNFvs4r+daUhhqdbjrhyRMJRktZSO2L1kWkPk7zh1Y2GO1z1ZbxH1B855acgP1BcQxchAtOYQaJuZWngT1MzztYNFE6xUqBaFj3R6b8TX3DqMas5BKqOBF1t2+OOPR0+ofk6o3Uy3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712787080; c=relaxed/simple;
-	bh=uSIGNHPH80FDsjMfRya/6PvEZZEX9bykFwMA91RBOA0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=A9YuLT8tVusBjloozdvSNcgSK5ndm9wQfsm9oqCOH1BKjiwbIkwQgkor9/xw5RCzjsTOXkYrh01hULSsHBkKTQObvWjDFjZSGdcyO1+wing3VvlsTJ6O7hfkBTdW+pMQpXTuwlF2BxtDCjGv79OZERRVBXqECDxFZocTh1sYXmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ngyscE2+; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-417d14c3426so1651475e9.3;
-        Wed, 10 Apr 2024 15:11:18 -0700 (PDT)
+	s=arc-20240116; t=1712787196; c=relaxed/simple;
+	bh=337PoNy5hHXi/nBtubQGpqzHN+7XoK2mpmWg0n1Xpto=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VOtZJpZu8EU+WMEouw2d2s4SFG+OFOlcoK/eULvzp1H1SvOAR3SQYFXkq7FbKBtImSPDoPvKokJiD8wzXg+XPX4iZ93rMZ79b3N51FuhePX9BeJkRxa1+GztUe00+4HvfZ2xVU+uF0Z1sz0wX64hHUoyhJmjeRXqYMBoRwnEqUc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=JPeoTgcS; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712787076; x=1713391876; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m3LeUQH6aJYsfgaURLzKskwdq+qYjaj7h0bjz/8vcGg=;
-        b=ngyscE2+tK40nIVjcS306QdhXGTkjUPw/3T+OfCN565DQXIvNw+M5NnOr08bYodPeR
-         aVd/vNaX3hmhAcv2pvigGcPlAh463wqQ/z3baj/bALZG6RnYgJsI6iWbmL44vD7S7ans
-         7KRKyewMqGSYuRbLbndfg7Cevy8RhDM2dwLqU9iyCG/DTmdSroflSLV0vmREDAlaQZlW
-         CkMmVKSrSCnsPDxHK/DQVuXLg6gwcnE4J2S64dC12RQSnS9mjcB0TFf+Gi+eAXZin+7M
-         RxSbHc7s8w+EZiwjl6i7YDg4/u9mGwBloEp82OLeIymDObK2FJ5tZgJRDDRzQBT8lqWq
-         dnqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712787076; x=1713391876;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=m3LeUQH6aJYsfgaURLzKskwdq+qYjaj7h0bjz/8vcGg=;
-        b=JZVG1Zz4GfInCoLieMVO/56g2DkOj4e1Vir/4WOFXfe1EtqDjinWFe8/e8Ad1/0vMg
-         db9yQK5sqZX+YTyY6a3mZ3AO1cJ4Ok2V7ulaNjVjpoRuRbZcsqj+t4OuJXgwLng1OpDH
-         iEgB73ewc+WccrUAYG5BEGmmNzloXwK/19PukROnUkXj/kP2PQpEuisVkyvJovOTjS1r
-         fGe6G6ln2HT6Dqulx1fDmZ1Df6tma4+RZc4WPZneiQ/h/G0127X9cASbam8NkzfXiaDn
-         8EwowASVVFRPCFyBLgKrn5GWgOzYZU7c8pYsAmwFou3HU4pybHYUUUCgAUHdV44d+KMl
-         xV7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU+g4hAjU32BD1OhSe29MSr0L/Uolmu7cWOKHdOL/R15Bg6T9mFZ1yVDfJYRCnqbhRPh4/hbG4Nw+7zJDBM6ehxoOkggFWBDfFKRO3aOeeW
-X-Gm-Message-State: AOJu0YycSNozsF2iYzh7oJidTZxYJLC+jG6ebo5O/+CKe1AjWyhCv1TA
-	OsokHF/i7tKleZCSd8LeQlMKO38k9zpa6DC33whreSSunClWAXufSDzMhLjP
-X-Google-Smtp-Source: AGHT+IFhJpOoHhpehzYnZrFrP6zeSLy6co5A6Rsu4MV5FWEedSFXkLbBYhUUhA/k8CgU8RD8/BbiWg==
-X-Received: by 2002:a05:600c:4707:b0:416:6344:895b with SMTP id v7-20020a05600c470700b004166344895bmr2675652wmo.4.1712787076535;
-        Wed, 10 Apr 2024 15:11:16 -0700 (PDT)
-Received: from imac.fritz.box ([2a02:8010:60a0:0:2cff:b314:57ee:c426])
-        by smtp.gmail.com with ESMTPSA id v7-20020a05600c470700b00416b2cbad06sm3531244wmo.41.2024.04.10.15.11.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 15:11:15 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org
-Cc: donald.hunter@redhat.com,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v2 3/3] tools/net/ynl: Add multi message support to ynl
-Date: Wed, 10 Apr 2024 23:11:08 +0100
-Message-ID: <20240410221108.37414-4-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240410221108.37414-1-donald.hunter@gmail.com>
-References: <20240410221108.37414-1-donald.hunter@gmail.com>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1712787195; x=1744323195;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=vmJlHtyCaojXycyHhl57A6ON5T4AIb8dBCbBDEzRK60=;
+  b=JPeoTgcSsDrEjJo+bZq65ddVnAjyhrs8Z3zgrSWdA38g8zerYucrDE+x
+   vPVzWjC9mSO8KxS6pEQqDpr2XywX9rswhd9VGfQ4MlLHcCSIk2IlYNqDT
+   cwYnrz+eRVJDcfpkk1bHa2ONlAlMV4Gtzimb1PxioUqy7yGElD3I0o5+W
+   c=;
+X-IronPort-AV: E=Sophos;i="6.07,191,1708387200"; 
+   d="scan'208";a="287754973"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 22:13:13 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.38.20:30600]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.50.203:2525] with esmtp (Farcaster)
+ id 55995940-58b8-4c29-86d9-3757c3f49946; Wed, 10 Apr 2024 22:13:12 +0000 (UTC)
+X-Farcaster-Flow-ID: 55995940-58b8-4c29-86d9-3757c3f49946
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 10 Apr 2024 22:13:12 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.44) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
+ Wed, 10 Apr 2024 22:13:10 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <krisman@suse.de>
+CC: <davem@davemloft.net>, <lmb@isovalent.com>, <martin.lau@kernel.org>,
+	<netdev@vger.kernel.org>, <willemdebruijn.kernel@gmail.com>, "Kuniyuki
+ Iwashima" <kuniyu@amazon.com>
+Subject: Re: [PATCH v2] udp: Avoid call to compute_score on multiple sites
+Date: Wed, 10 Apr 2024 15:13:01 -0700
+Message-ID: <20240410221301.44576-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240410215047.21462-1-krisman@suse.de>
+References: <20240410215047.21462-1-krisman@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,205 +75,174 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWC001.ant.amazon.com (10.13.139.223) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Add a "--multi <do-op> <json>" command line to ynl that makes it
-possible to add several operations to a single netlink request payload.
-The --multi command line option is repeated for each operation.
+From: Gabriel Krisman Bertazi <krisman@suse.de>
+Date: Wed, 10 Apr 2024 17:50:47 -0400
+> We've observed a 7-12% performance regression in iperf3 UDP ipv4 and
+> ipv6 tests with multiple sockets on Zen3 cpus, which we traced back to
+> commit f0ea27e7bfe1 ("udp: re-score reuseport groups when connected
+> sockets are present").  The failing tests were those that would spawn
+> UDP sockets per-cpu on systems that have a high number of cpus.
+> 
+> Unsurprisingly, it is not caused by the extra re-scoring of the reused
+> socket, but due to the compiler no longer inlining compute_score, once
+> it has the extra call site in udp4_lib_lookup2.  This is augmented by
+> the "Safe RET" mitigation for SRSO, needed in our Zen3 cpus.
+> 
+> We could just explicitly inline it, but compute_score() is quite a large
+> function, around 300b.  Inlining in two sites would almost double
+> udp4_lib_lookup2, which is a silly thing to do just to workaround a
+> mitigation.  Instead, this patch shuffles the code a bit to avoid the
+> multiple calls to compute_score.  Since it is a static function used in
+> one spot, the compiler can safely fold it in, as it did before, without
+> increasing the text size.
+> 
+> With this patch applied I ran my original iperf3 testcases.  The failing
+> cases all looked like this (ipv4):
+> 	iperf3 -c 127.0.0.1 --udp -4 -f K -b $R -l 8920 -t 30 -i 5 -P 64 -O 2
+> 
+> where $R is either 1G/10G/0 (max, unlimited).  I ran 3 times each.
+> baseline is 6.9.0-rc1-g962490525cff, just a recent checkout of Linus
+> tree. harmean == harmonic mean; CV == coefficient of variation.
+> 
+> ipv4:
+>                  1G                10G                  MAX
+> 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
+> baseline 1730488.20(0.0050) 1639269.91(0.0795) 1436340.05(0.0954)
+> patched  1980936.14(0.0020) 1933614.06(0.0866) 1784184.51(0.0961)
+> 
+> ipv6:
+>                  1G                10G                  MAX
+> 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
+> baseline  1679016.07(0.0053) 1697504.56(0.0064) 1481432.74(0.0840)
+> patched   1924003.38(0.0153) 1852277.31(0.0457) 1690991.46(0.1848)
+> 
+> This restores the performance we had before the change above with this
+> benchmark.  We obviously don't expect any real impact when mitigations
+> are disabled, but just to be sure it also doesn't regresses:
+> 
+> mitigations=off ipv4:
+>                  1G                10G                  MAX
+> 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
+> baseline 3230279.97(0.0066) 3229320.91(0.0060) 2605693.19(0.0697)
+> patched  3242802.36(0.0073) 3239310.71(0.0035) 2502427.19(0.0882)
+> 
+> Cc: Lorenz Bauer <lmb@isovalent.com>
+> Fixes: f0ea27e7bfe1 ("udp: re-score reuseport groups when connected sockets are present")
+> Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
+> 
+> ---
+> Changes since v1:
+> (me)
+>   - recollected performance data after changes below only for the
+>   mitigations enabled case.
+> (suggested by Willem de Bruijn)
+>   - Drop __always_inline in compute_score
+>   - Simplify logic by replacing third struct sock pointer with bool
+>   - Fix typo in commit message
+>   - Don't explicitly break out of loop after rescore
+> ---
+>  net/ipv4/udp.c | 18 +++++++++++++-----
+>  net/ipv6/udp.c | 17 +++++++++++++----
+>  2 files changed, 26 insertions(+), 9 deletions(-)
+> 
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index 661d0e0d273f..a13ef8e06093 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -427,12 +427,15 @@ static struct sock *udp4_lib_lookup2(struct net *net,
+>  {
+>  	struct sock *sk, *result;
+>  	int score, badness;
+> +	bool rescore = false;
 
-This is used by the nftables family for transaction batches. For
-example:
+nit: Keep reverse xmax tree order.
+https://docs.kernel.org/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
 
-./tools/net/ynl/cli.py \
- --spec Documentation/netlink/specs/nftables.yaml \
- --multi batch-begin '{"res-id": 10}' \
- --multi newtable '{"name": "test", "nfgen-family": 1}' \
- --multi newchain '{"name": "chain", "table": "test", "nfgen-family": 1}' \
- --multi batch-end '{"res-id": 10}'
+>  
+>  	result = NULL;
+>  	badness = 0;
+>  	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
+> -		score = compute_score(sk, net, saddr, sport,
+> -				      daddr, hnum, dif, sdif);
+> +rescore:
+> +		score = compute_score((rescore ? result : sk), net, saddr,
 
-It can also be used for bundling get requests:
+I guess () is not needed around rescore ?
 
-./tools/net/ynl/cli.py \
- --spec Documentation/netlink/specs/nftables.yaml \
- --multi gettable '{"name": "test", "nfgen-family": 1}' \
- --multi getchain '{"name": "chain", "table": "test", "nfgen-family": 1}' \
- --output-json
-[{"name": "test", "use": 1, "handle": 1, "flags": [],
- "nfgen-family": 1, "version": 0, "res-id": 2},
- {"table": "test", "name": "chain", "handle": 1, "use": 0,
- "nfgen-family": 1, "version": 0, "res-id": 2}]
+Both same for IPv6.
 
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
----
- tools/net/ynl/cli.py     | 25 ++++++++++++++--
- tools/net/ynl/lib/ynl.py | 64 +++++++++++++++++++++++++++-------------
- 2 files changed, 66 insertions(+), 23 deletions(-)
+Otherwise, looks good to me.
 
-diff --git a/tools/net/ynl/cli.py b/tools/net/ynl/cli.py
-index f131e33ac3ee..058926d69ef0 100755
---- a/tools/net/ynl/cli.py
-+++ b/tools/net/ynl/cli.py
-@@ -19,13 +19,28 @@ class YnlEncoder(json.JSONEncoder):
- 
- 
- def main():
--    parser = argparse.ArgumentParser(description='YNL CLI sample')
-+    description = """
-+    YNL CLI utility - a general purpose netlink utility that uses YAML
-+    specs to drive protocol encoding and decoding.
-+    """
-+    epilog = """
-+    The --multi option can be repeated to include several do operations
-+    in the same netlink payload.
-+    """
-+
-+    parser = argparse.ArgumentParser(description=description,
-+                                     epilog=epilog)
-     parser.add_argument('--spec', dest='spec', type=str, required=True)
-     parser.add_argument('--schema', dest='schema', type=str)
-     parser.add_argument('--no-schema', action='store_true')
-     parser.add_argument('--json', dest='json_text', type=str)
--    parser.add_argument('--do', dest='do', type=str)
--    parser.add_argument('--dump', dest='dump', type=str)
-+
-+    group = parser.add_mutually_exclusive_group()
-+    group.add_argument('--do', dest='do', metavar='DO-OPERATION', type=str)
-+    group.add_argument('--multi', dest='multi', nargs=2, action='append',
-+                       metavar=('DO-OPERATION', 'JSON_TEXT'), type=str)
-+    group.add_argument('--dump', dest='dump', metavar='DUMP-OPERATION', type=str)
-+
-     parser.add_argument('--sleep', dest='sleep', type=int)
-     parser.add_argument('--subscribe', dest='ntf', type=str)
-     parser.add_argument('--replace', dest='flags', action='append_const',
-@@ -73,6 +88,10 @@ def main():
-         if args.dump:
-             reply = ynl.dump(args.dump, attrs)
-             output(reply)
-+        if args.multi:
-+            ops = [ (item[0], json.loads(item[1]), args.flags or []) for item in args.multi ]
-+            reply = ynl.do_multi(ops)
-+            output(reply)
-     except NlError as e:
-         print(e)
-         exit(1)
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 0ba5f6fb8747..939309b8e2af 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -940,16 +940,11 @@ class YnlFamily(SpecFamily):
- 
-       return op['do']['request']['attributes'].copy()
- 
--    def _op(self, method, vals, flags=None, dump=False):
--        op = self.ops[method]
--
-+    def _encode_message(self, op, vals, flags, req_seq):
-         nl_flags = Netlink.NLM_F_REQUEST | Netlink.NLM_F_ACK
-         for flag in flags or []:
-             nl_flags |= flag
--        if dump:
--            nl_flags |= Netlink.NLM_F_DUMP
- 
--        req_seq = random.randint(1024, 65535)
-         msg = self.nlproto.message(nl_flags, op.req_value, 1, req_seq)
-         if op.fixed_header:
-             msg += self._encode_struct(op.fixed_header, vals)
-@@ -957,18 +952,32 @@ class YnlFamily(SpecFamily):
-         for name, value in vals.items():
-             msg += self._add_attr(op.attr_set.name, name, value, search_attrs)
-         msg = _genl_msg_finalize(msg)
-+        return msg
-+
-+    def _ops(self, ops):
-+        reqs_by_seq = {}
-+        req_seq = random.randint(1024, 65535)
-+        payload = b''
-+        for (method, vals, flags) in ops:
-+            op = self.ops[method]
-+            msg = self._encode_message(op, vals, flags, req_seq)
-+            reqs_by_seq[req_seq] = (op, msg, flags)
-+            payload += msg
-+            req_seq += 1
- 
--        self.sock.send(msg, 0)
-+        self.sock.send(payload, 0)
- 
-         done = False
-         rsp = []
-+        op_rsp = []
-         while not done:
-             reply = self.sock.recv(self._recv_size)
-             nms = NlMsgs(reply, attr_space=op.attr_set)
-             self._recv_dbg_print(reply, nms)
-             for nl_msg in nms:
--                if nl_msg.extack:
--                    self._decode_extack(msg, op, nl_msg.extack)
-+                if nl_msg.extack and nl_msg.nl_seq in reqs_by_seq:
-+                    (req_op, req_msg, req_flags) = reqs_by_seq[nl_msg.nl_seq]
-+                    self._decode_extack(req_msg, req_op, nl_msg.extack)
- 
-                 if nl_msg.error:
-                     raise NlError(nl_msg)
-@@ -976,13 +985,25 @@ class YnlFamily(SpecFamily):
-                     if nl_msg.extack:
-                         print("Netlink warning:")
-                         print(nl_msg)
--                    done = True
-+
-+                    (_, _, req_flags) = reqs_by_seq[nl_msg.nl_seq]
-+                    if not op_rsp:
-+                        rsp.append(None)
-+                    elif not Netlink.NLM_F_DUMP in req_flags and len(op_rsp) == 1:
-+                        rsp.append(op_rsp[0])
-+                    else:
-+                        rsp.append(op_rsp)
-+                    op_rsp = []
-+
-+                    del reqs_by_seq[nl_msg.nl_seq]
-+                    done = len(reqs_by_seq) == 0
-                     break
- 
-                 decoded = self.nlproto.decode(self, nl_msg)
-+                rsp_op = self.rsp_by_value[decoded.cmd()]
- 
-                 # Check if this is a reply to our request
--                if nl_msg.nl_seq != req_seq or decoded.cmd() != op.rsp_value:
-+                if nl_msg.nl_seq not in reqs_by_seq or decoded.cmd() != rsp_op.rsp_value:
-                     if decoded.cmd() in self.async_msg_ids:
-                         self.handle_ntf(decoded)
-                         continue
-@@ -990,19 +1011,22 @@ class YnlFamily(SpecFamily):
-                         print('Unexpected message: ' + repr(decoded))
-                         continue
- 
--                rsp_msg = self._decode(decoded.raw_attrs, op.attr_set.name)
-+                rsp_msg = self._decode(decoded.raw_attrs, rsp_op.attr_set.name)
-                 if op.fixed_header:
--                    rsp_msg.update(self._decode_struct(decoded.raw, op.fixed_header))
--                rsp.append(rsp_msg)
-+                    rsp_msg.update(self._decode_struct(decoded.raw, rsp_op.fixed_header))
-+                op_rsp.append(rsp_msg)
- 
--        if not rsp:
--            return None
--        if not dump and len(rsp) == 1:
--            return rsp[0]
-         return rsp
- 
--    def do(self, method, vals, flags=None):
-+    def _op(self, method, vals, flags):
-+        ops = [(method, vals, flags)]
-+        return self._ops(ops)[0]
-+
-+    def do(self, method, vals, flags=[]):
-         return self._op(method, vals, flags)
- 
-     def dump(self, method, vals):
--        return self._op(method, vals, [], dump=True)
-+        return self._op(method, vals, [Netlink.NLM_F_DUMP])
-+
-+    def do_multi(self, ops):
-+        return self._ops(ops)
--- 
-2.43.0
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+
+
+> +				      sport, daddr, hnum, dif, sdif);
+> +		rescore = false;
+>  		if (score > badness) {
+>  			badness = score;
+>  
+> @@ -456,9 +459,14 @@ static struct sock *udp4_lib_lookup2(struct net *net,
+>  			if (IS_ERR(result))
+>  				continue;
+>  
+> -			badness = compute_score(result, net, saddr, sport,
+> -						daddr, hnum, dif, sdif);
+> -
+> +			/* compute_score is too long of a function to be
+> +			 * inlined, and calling it again here yields
+> +			 * measureable overhead for some
+> +			 * workloads. Work around it by jumping
+> +			 * backwards to rescore 'result'.
+> +			 */
+> +			rescore = true;
+> +			goto rescore;
+>  		}
+>  	}
+>  	return result;
+> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+> index 7c1e6469d091..7a55c050de2b 100644
+> --- a/net/ipv6/udp.c
+> +++ b/net/ipv6/udp.c
+> @@ -168,12 +168,15 @@ static struct sock *udp6_lib_lookup2(struct net *net,
+>  {
+>  	struct sock *sk, *result;
+>  	int score, badness;
+> +	bool rescore = false;
+>  
+>  	result = NULL;
+>  	badness = -1;
+>  	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
+> -		score = compute_score(sk, net, saddr, sport,
+> -				      daddr, hnum, dif, sdif);
+> +rescore:
+> +		score = compute_score((rescore ? result : sk), net, saddr,
+> +				      sport, daddr, hnum, dif, sdif);
+> +		rescore = false;
+>  		if (score > badness) {
+>  			badness = score;
+>  
+> @@ -197,8 +200,14 @@ static struct sock *udp6_lib_lookup2(struct net *net,
+>  			if (IS_ERR(result))
+>  				continue;
+>  
+> -			badness = compute_score(sk, net, saddr, sport,
+> -						daddr, hnum, dif, sdif);
+> +			/* compute_score is too long of a function to be
+> +			 * inlined, and calling it again here yields
+> +			 * measureable overhead for some
+> +			 * workloads. Work around it by jumping
+> +			 * backwards to rescore 'result'.
+> +			 */
+> +			rescore = true;
+> +			goto rescore;
+>  		}
+>  	}
+>  	return result;
+> -- 
+> 2.44.0
 
 
