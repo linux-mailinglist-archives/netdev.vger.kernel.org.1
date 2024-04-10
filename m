@@ -1,143 +1,122 @@
-Return-Path: <netdev+bounces-86401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A28E789E9BE
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:29:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0774289EA19
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:51:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C952285A07
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 05:29:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38AEA1C20936
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 05:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75C2B19BA6;
-	Wed, 10 Apr 2024 05:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D511A291;
+	Wed, 10 Apr 2024 05:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xql4mdAt"
+	dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b="jczkZAbk";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iVTyHwPI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from wfhigh5-smtp.messagingengine.com (wfhigh5-smtp.messagingengine.com [64.147.123.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B08D38F44
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 05:29:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE39B17745;
+	Wed, 10 Apr 2024 05:51:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712726963; cv=none; b=N8FHoY9BLNmSZIgMSpe77qrIQ11OYWjqzZN+0nBD8wHlrx1KzL/FlsOAggTBGygIeWxGbyP6pcdzLuFnxIw72pIOtrtKZ6y555soks1JcTBJ4fLasZ1rLh5M9TSr70z1pv8wMiup138MFElixK/kaEloJ10r/0FBykE18aBCrNU=
+	t=1712728270; cv=none; b=dtqrVXSI0s/5oYhOrflZUaRC5rAJO0ZvctQg7qzhCKFA8kBhR3u2VfeVsdu8Z0UnOOWD5Gy4pSltejei0Ma2CpZsFSts7DRNkI757qIoMuVrtCQfPVB2woY+eOdG1/7ikLFP4EuIZqzyMakfhWdyQcicsMFLXs5KrkxCaL62uk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712726963; c=relaxed/simple;
-	bh=Garsb0yrb09cyxnrIqAQEaABu4EXVm1wLQ8zJlWQFy0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=k4dk8adrY6SrEj2IFnYjEyUBU9y6aRJGm/03dpfWzU0hMHzB6SRKYnY6dNQJ+d9Blb7/57wbik0pMtXjRRFcULr3epwtlmTXj4J3JQGL3PgejhY1TZEirD804jGIuZB2PB8Rxuzvq9fMwWamV7fRGxUKvLRewNQ2/guAUDv8Hto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xql4mdAt; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712726959;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ALjg/ntug4MBk1XtNMajyyKljj175m906YvGN0uC3zY=;
-	b=Xql4mdAtwbksp+5q++cuZUU1PmsezbLmn8xXnX6RiRQlqaSgxWBJbzjlp51dUIROdtOmBv
-	rWK2pSacXRkEezcjy9lQEvTDxJrGh3tj8B0yWUOAVD+J/9pqvDQLRUUSbhD9EJTfaoCs4K
-	K1fDjPGGN+knMqp27NlVUoHhVFvUD4c=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-464-92SJjxe-MDaABCwWgT-w9g-1; Wed, 10 Apr 2024 01:29:18 -0400
-X-MC-Unique: 92SJjxe-MDaABCwWgT-w9g-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a51b97efbb8so409130766b.1
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 22:29:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712726957; x=1713331757;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ALjg/ntug4MBk1XtNMajyyKljj175m906YvGN0uC3zY=;
-        b=QIdOJdC8JTZRfPpjsZN8lYOAEdKC/lgMNZC/RoYDmkwbnEyl39edmptsEGIPPZaPjm
-         MdutucoRARjJGEQlJV4O9ERigfKa8FmokpA18PveldxmwozzR6U0MZHh+9XRRBVofCRa
-         midFvV7a23MacdA5qBbHlpm4gQEAV8H6nzKIOx7BXAkKtI01dqDV4hUdka6YbrITI/3A
-         xf4pzuYebUm5YP8tyH4OREjDsUNaRnJjV4JFm1/chbYIdw+fhNSYewxB/YawxRn1pzvY
-         PwtuXk75lSdwKqmKqWyTGFr8wGfuqkitTzrx5xOUPDiMiK+slpt7eM9GplEyQITrJqN+
-         Wj9w==
-X-Forwarded-Encrypted: i=1; AJvYcCWisWJU6DzGuB2MB6TFwDJBzwKdTi3lCiu+wHKFAoNPHkr5k+nTxfa+NU1uB0zLn+QW77BxsNuT/UAMVZ2gUlnFN20Tbcxf
-X-Gm-Message-State: AOJu0Yya/AVFMU+aOvqUi3TedcCQoK4287olkpV6652AMLlYkCagBcoc
-	Gv2xCDP/aebSae+ozJ72XJDP6GzMh6fNIDMWK/ndBly9jAK7fUskbqjaX7JbDi/gV9qJF04yVQW
-	bxFFBJ/t2IWI7OUulmGEYcAfHMI7CtcUebk2oqgUpeji5XtjyGn4D+8azv8TFGRL9/EP6teuSy8
-	zY4/KgeY1SAik5o8tNs8aYz+yaiLng
-X-Received: by 2002:a17:906:4899:b0:a51:b49e:473e with SMTP id v25-20020a170906489900b00a51b49e473emr1381817ejq.19.1712726957039;
-        Tue, 09 Apr 2024 22:29:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE9ro1TSS6P51R8HAGDNJrNtBNNdENLxX7oHAMyEfVHKQkSe40Ls/G0b/qqZdnwgw3ZDazI/7T4ggthUqEqHRk=
-X-Received: by 2002:a17:906:4899:b0:a51:b49e:473e with SMTP id
- v25-20020a170906489900b00a51b49e473emr1381809ejq.19.1712726956864; Tue, 09
- Apr 2024 22:29:16 -0700 (PDT)
+	s=arc-20240116; t=1712728270; c=relaxed/simple;
+	bh=5BdpXbBttgdr9xHrq7HGP6qq62gxDtv0CQ9h2KVbysM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QbP6G6tR7ODcKrxmgOsLCdkkRGoRd4VPlR16C9I7IKnVgXvG4kcvbHh8vUrKyZrCj4TALo2UnhD21KyQ0n1ke/uiwX7kRvV2NG5oPx3gMUyHqb19GGGVMudTvzRN1LLVT6CeaUsUXg6RL+IvFt3b9W4JB+rlZmXU3zO59glGzlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com; spf=pass smtp.mailfrom=kroah.com; dkim=pass (2048-bit key) header.d=kroah.com header.i=@kroah.com header.b=jczkZAbk; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iVTyHwPI; arc=none smtp.client-ip=64.147.123.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=kroah.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kroah.com
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfhigh.west.internal (Postfix) with ESMTP id BCC1F180012B;
+	Wed, 10 Apr 2024 01:51:03 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute5.internal (MEProxy); Wed, 10 Apr 2024 01:51:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm2; t=1712728263; x=1712814663; bh=jkV1acoxnY
+	ywWAbyLpFFbxibsnS9FadsdDiyYpzzDxk=; b=jczkZAbk92xGf0Xqh24S6UOXDx
+	6mWpFKM7iEtc3EmA/g2HgtYZdgqvcjp41BGt2/QuZtbfVz0H4yzz8Q4VqHCPyYXN
+	lJ0MM27ZHuSHiNT70Jpr1ZbzkS0mwv8jea2u0RbafaF2YBv+DNfupLIAdh4p6h6F
+	tw0HsfiLiXQdIRWxxu7KVwmsnCUr8G2p8bWBtkTQJv9K8QpzzkrqukznCIejj7cy
+	z1qXERSh4Z5udof+EkOkdRZWpL6exkZnw7Sf3N0uVb6IIENL2jjxvP8DIFlZ5aKN
+	Qk74h9JWe2goAP6r9lyge7R+MkrLz4YG2tJ8fPj0U+VSGCifjrYRuXLw0NUw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1712728263; x=1712814663; bh=jkV1acoxnYywWAbyLpFFbxibsnS9
+	FadsdDiyYpzzDxk=; b=iVTyHwPIwh0ly2XTO1+EF/KzMiRyC1a0dwayOi4VUWLz
+	GzV1Crd4p6w3URzwVce3c61l14IsHiJF/8pJ0t/Ay4xsbKsbnUwZm5f3nuvQkZ82
+	uj23sK7rV3C7Sr3qorfLp4c6Z08XR8PfoeM6Pu4NziZELbb2dpTaTtbtAmb+K0D9
+	m3ntlfnQSJUy8mp/IXbAyWkGV5ss9rkW++oO3ZtpaVutlmTGluhbuTvYKb+kqDnE
+	EqwBZjd3uS+SjFIXkXzs0Fan4rUYHyjYB/E3g7aEV10f3xZYAEIMcdYDTyaPSVUS
+	O0dwZ2cISrQHnJE8L/L0jMsJpx3PAoi5oSuVMxX/eg==
+X-ME-Sender: <xms:xigWZkQP8fQpUI9xVmDhPfhOQI8zA5xhQMDj6kjxR-7O1aaTEN8wQg>
+    <xme:xigWZhy0ADFA6_RYST46q3_04xGJ3fQm9g9CUpDTyBmGBZaGYRKTKjg0Ho7tPoM5Z
+    UR_ykvU5kvIaA>
+X-ME-Received: <xmr:xigWZh0wTsiGX9a37v3ALWH-cKZJ9OHLzUBP7j1Ti3JuQl5eOZENfVB0cB9G1EH2WwKKdKqHk0XlX9WMO57TWvfBbJln8xSoRRdueA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudehhedgleejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepifhrvghg
+    ucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepheegvd
+    evvdeljeeugfdtudduhfekledtiefhveejkeejuefhtdeufefhgfehkeetnecuvehluhhs
+    thgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorg
+    hhrdgtohhm
+X-ME-Proxy: <xmx:xigWZoD2I06NQv1BWObpTgk4vuMlFuZBAM9aYD6-A1DVKKadHLv_Xw>
+    <xmx:xigWZti4Cg9dVHHbFZfGHR7505wJraCFinfLaJ10-654I3XWEH25EQ>
+    <xmx:xigWZkpgqUEmoKeeTQ6DlkUrJj7vX0hzvGXpOaJaaCDTecdEUKg4AQ>
+    <xmx:xigWZggNdoQ7P-Y8i-IFkRli4LHSIDBwBGzv38xqAYqspUjS8Tvg8A>
+    <xmx:xygWZt4AfMhr7p7nNAaEa37w0qGSjEDWPRI68s4R3WeI7YIeVi0O3xw->
+Feedback-ID: i787e41f1:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 10 Apr 2024 01:51:01 -0400 (EDT)
+Date: Wed, 10 Apr 2024 07:50:59 +0200
+From: Greg KH <greg@kroah.com>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Networking <netdev@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: linux-next: duplicate patch in the usb.current tree
+Message-ID: <2024041043-sprain-stank-10af@gregkh>
+References: <20240410090500.4018b9a0@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240410043450.416752-1-lulu@redhat.com>
-In-Reply-To: <20240410043450.416752-1-lulu@redhat.com>
-From: Cindy Lu <lulu@redhat.com>
-Date: Wed, 10 Apr 2024 13:28:39 +0800
-Message-ID: <CACLfguW-o8ox5zmXdmr4Phm-8zSX3sWif8CtNDynW6kRH2fBoA@mail.gmail.com>
-Subject: Re: [PATCH v2 0/1] virtio-pci: Fix the crash that the vector was used
- after released
-To: lulu@redhat.com, mst@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240410090500.4018b9a0@canb.auug.org.au>
 
-Sorry, send to the wrong mail list, please ignore it
+On Wed, Apr 10, 2024 at 09:05:00AM +1000, Stephen Rothwell wrote:
+> Hi all,
+> 
+> The following commit is also in the net tree as a different commit
+> (but the same patch):
+> 
+>   fbdd90334a62 ("MAINTAINERS: Drop Li Yang as their email address stopped working")
+> 
+> This is commit
+> 
+>   eaac25d026a1 ("MAINTAINERS: Drop Li Yang as their email address stopped working")
+> 
+> in the net tree.
 
-On Wed, Apr 10, 2024 at 12:35=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
->
-> During the booting process of the Vyatta image, the behavior of the
-> called function in qemu is as follows:
->
-> 1. vhost_net_stop() was triggered by guest image . This will call the fun=
-ction
-> virtio_pci_set_guest_notifiers() with assgin=3D false, and
-> virtio_pci_set_guest_notifiers(=EF=BC=89 will release the irqfd for vecto=
-r 0
->
-> 2. virtio_reset() was called -->set configure vector to VIRTIO_NO_VECTOR
->
-> 3.vhost_net_start() was called (at this time, the configure vector is
-> still VIRTIO_NO_VECTOR) and call virtio_pci_set_guest_notifiers() with
-> assgin=3D true, so the irqfd for vector 0 is still not "init" during this=
- process
->
-> 4. The system continues to boot,set the vector back to 0, and msix_fire_v=
-ector_notifier() was triggered
->  unmask the vector 0 and then met the crash
-> [msix_fire_vector_notifier] 112 called vector 0 is_masked 1
-> [msix_fire_vector_notifier] 112 called vector 0 is_masked 0
->
-> To fix this, we need to call the function "kvm_virtio_pci_vector_use_one(=
-)"
-> when the vector changes back from VIRTIO_NO_VECTOR.
->
-> The reason that we don't need to call kvm_virtio_pci_vector_release_one w=
-hile the vector changes to
-> VIRTIO_NO_VECTOR is this function will called in vhost_net_stop(),
-> So this step will not lost during this process.
->
-> Change from V1
-> 1.add the check for if using irqfd
-> 2.remove the check for bool recovery, irqfd's user is enough to check sta=
-tus
->
-> Cindy Lu (1):
->   virtio-pci: Fix the crash that the vector was used after released.
->
->  hw/virtio/virtio-pci.c | 35 +++++++++++++++++++++++++++++++++++
->  1 file changed, 35 insertions(+)
->
-> --
-> 2.43.0
->
+That's fine, this should merge without an issue.
 
+thanks for letting us know.
+
+greg k-h
 
