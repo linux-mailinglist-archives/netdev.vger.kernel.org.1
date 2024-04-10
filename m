@@ -1,222 +1,375 @@
-Return-Path: <netdev+bounces-86600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C14789F434
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:27:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6765E89F45A
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:33:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 396431C23047
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 13:27:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2C761F217CD
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 13:33:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BCB515E7E3;
-	Wed, 10 Apr 2024 13:26:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47B6115ADBF;
+	Wed, 10 Apr 2024 13:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="H00M0j8v"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DfNxFypJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDF3415CD4B;
-	Wed, 10 Apr 2024 13:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 102F615B140
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 13:32:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712755566; cv=none; b=TXhlEegt6cHMPDj2hynE+dwOpE55Jxha7yxuXCLm2wbsjcN3R6AtZbo8T/07K5heyzKTNx49QM8mg/2xr/kEhB3nYLYFzJi6e94flB5CbUZ9ww/+QDJ9FEWAQoNrphrkXU7FQ+pMJ7HNGucNptbpDS4jo9ypjxoO55Xm/2HiWEk=
+	t=1712755980; cv=none; b=jqIO2WfuJ7bD7IxrB8EG7O3RNE1a3BTXznxNvSW3zKzIieI3h/MVzwmxft6SoS4n5GV/QA35jKxEMh9bitNiGBt2uKqolEclSX8Y5qMbQkVmgSSfhqIEklNH0A3+ip/8LS/PZOOFqsNhu9+gx4X89Oe9RazE7UCwbHS0vKtanFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712755566; c=relaxed/simple;
-	bh=brNg8ofcrj5O3U+cLXDIyxsMcvxFUyO1BEFHPk9RRMs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kH+X54ElsWnDD/l2WI0pJoW4I4CfZhJIpaA3MVSjKIN3NZpg7x2KFoqY+kvceVHlctBcVUoFquxWWGyDTPSX6ZtU5B1mRaCCZSIwQjMqVCMawwb709LmIDNKi+I/paFF+yejy6S+z7clwIfSzEGOt39Iz6pdxkzRwj/c6cmtk8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=H00M0j8v; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43A8XcJE022602;
-	Wed, 10 Apr 2024 06:25:44 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type; s=
-	pfpt0220; bh=RRkwBEE8Zpq+ymv4uQ9hqryhYJ2lfarH1FbeDd0cP4Y=; b=H00
-	M0j8vzo5xtYsPs3nYmDKOB/cKKRSmfY7Mb1I7Ihr3VLZq5HvNg1ySMFfcb08wduR
-	I7sll6XG4lURpxwwwCXeIcvJwSRGQZNJnTO15LrY2DdIvZakvGP20qBL81rgnSrg
-	FTM2hr/XLFgoGJV0KKA1XJUhDhtzaG907jZUGh0nzjobNGhmGMzYb4oLyiukewsb
-	qlYpU9YRt651TB07kde9DZmJR0J9Pif8WYPFXcsLUDwdg49BhA8jzsaEigj8pHy7
-	VAhWTHr4QbbwI5djeE9vxpy/UjG9ztdrU5LPgxc9j5068Hi16oaNL30w1WvDYPx4
-	1fw58ThkpkER6C2yWUg==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3xdqc2k184-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Apr 2024 06:25:44 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 10 Apr 2024 06:25:43 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 10 Apr 2024 06:25:43 -0700
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 5ED0E3F7081;
-	Wed, 10 Apr 2024 06:25:39 -0700 (PDT)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <jerinj@marvell.com>, <lcherian@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
-        <edumazet@google.com>, <pabeni@redhat.com>
-Subject: [net-next PatchV2] octeontx2-af: map management port always to first PF
-Date: Wed, 10 Apr 2024 18:55:38 +0530
-Message-ID: <20240410132538.20158-1-hkelam@marvell.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1712755980; c=relaxed/simple;
+	bh=bp14umFp5wIcfHcECiZ8yMelL8Bt3WZGGxjX/Ip+AZY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D8kXxgmTWxXwUEFkvpWlJH9FJInuxDy/IUY5ZCEu3kv2WJQOJ9zfY1eGg5mVWixMxP0uNfmMWqrYUlBxzrIhxSm5Qdd7zD8Ah3NHRke/HN1w4IWUJLbR/O5AERjZ1YMvgTidhpuC5Uw1SCUJg5ljFJ14F4fH6sDsxuiUBRp4eYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DfNxFypJ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712755976;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=v94gfPwisd6An8fRX0kscIjSM/ibORdquufHHAeWewo=;
+	b=DfNxFypJnlrhRDp3y2dlC3mXkZsNTTe1auK+P2U6pmaM4Dqo8rkSzdMEGIm+M0W7k+7n1x
+	GmbU8swujJ+O2SrC9SJflHyLNX2k7QZ2AEkx+d9gkfxsKYcdnb/kJMfQ1GF67V5wu+/zRy
+	YrpqTDokPEn6R99m2eXAysg0BaZZEdg=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-159-ruaf5Cq1PPWnou0vO-KC2Q-1; Wed, 10 Apr 2024 09:32:55 -0400
+X-MC-Unique: ruaf5Cq1PPWnou0vO-KC2Q-1
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-430cff75f9bso88316501cf.2
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 06:32:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712755974; x=1713360774;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=v94gfPwisd6An8fRX0kscIjSM/ibORdquufHHAeWewo=;
+        b=q3F88tttiwO4zbMJ8pzh8psX3JzZBXEBznis8KQhLKjvg4LVT0GPqORGOBRfc8yoQ8
+         YM5HRiJQ0sfrdV/ZorTFmhRaSVPVxiWBeZ6tyPf/sFUWjm1dPphBs6yG9ShWCZeho/wb
+         smKCOTvTu56nM+GCZIiaog395wH6U0ZLAe5bKWv8pNkEqk8wRv/NwcCrJNlwp1Aur7GL
+         Fpn4j3kF9G+pLu7QdLnMfAHQ6RQ5rbnewpLZDzrCTpHpSdQB2etnn70YV4yIhsExpcdQ
+         nZIWgxYJjCiKdxHYHxDcoSgazeuBOSr2luKutPCUUfWmMu9Ov68DkY7L+qs89prcB+Gl
+         et5A==
+X-Forwarded-Encrypted: i=1; AJvYcCU/AVO2JyJJsiBRd1JyjV2LrA77rMUOzGejZIYu+hrWUqa+T8LwhXxMUZH+KCCBmTTDvnQVkG1q7itKQAcFdz5t5X345CJb
+X-Gm-Message-State: AOJu0YzAbPvCTsBa4mAorlxqTgJyiIOI6z2jiZKQ4E9B2x852WJ1n1by
+	Vo/HUF2CGZGP4PBv2LhJx3AvV6j1U9CsOPIMorWdmv1luFUivXLI2wQp+u26GbRO4DLSNWdO1NU
+	Ua3uRyQ+Op6EUsCHOBC1BeUUXUF8YYDCnYymXwuEf19SR66pqCJ9aDg==
+X-Received: by 2002:a05:622a:1a9a:b0:434:8117:f36b with SMTP id s26-20020a05622a1a9a00b004348117f36bmr3558078qtc.21.1712755973722;
+        Wed, 10 Apr 2024 06:32:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEvY2vJwQQUkpMlvTHN5qJhxtNarIt+Cq+oXtFN5nm+fl0kKtkUswhZmCeX/ZTBmBf2C1HZCA==
+X-Received: by 2002:a05:622a:1a9a:b0:434:8117:f36b with SMTP id s26-20020a05622a1a9a00b004348117f36bmr3558053qtc.21.1712755973373;
+        Wed, 10 Apr 2024 06:32:53 -0700 (PDT)
+Received: from [192.168.1.132] ([193.177.208.51])
+        by smtp.gmail.com with ESMTPSA id e8-20020ac86708000000b0043496bcfc2esm3309582qtp.12.2024.04.10.06.32.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Apr 2024 06:32:52 -0700 (PDT)
+Message-ID: <143cf81c-d850-43c4-96b4-4fef840703b7@redhat.com>
+Date: Wed, 10 Apr 2024 15:32:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 3-vYbEfnWhOld4n8k9OKVI0paNsK8kjR
-X-Proofpoint-GUID: 3-vYbEfnWhOld4n8k9OKVI0paNsK8kjR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-10_04,2024-04-09_01,2023-05-22_02
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next v2 2/5] net: psample: add multicast filtering on
+ group_id
+To: Aaron Conole <aconole@redhat.com>
+Cc: Ilya Maximets <i.maximets@ovn.org>, netdev@vger.kernel.org,
+ jiri@resnulli.us, xiyou.wangcong@gmail.com, cmi@nvidia.com,
+ yotam.gi@gmail.com, echaudro@redhat.com, horms@kernel.org
+References: <20240408125753.470419-1-amorenoz@redhat.com>
+ <20240408125753.470419-3-amorenoz@redhat.com>
+ <2b79ebe9-4e83-418a-ae40-93024a3fb433@ovn.org>
+ <801ccf5c-5ac9-455f-8d9a-48517d7db614@redhat.com>
+ <f7til0qmwar.fsf@redhat.com>
+Content-Language: en-US
+From: Adrian Moreno <amorenoz@redhat.com>
+In-Reply-To: <f7til0qmwar.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The user can enable or disable any MAC block or a few ports of the
-block. The management port's interface name varies depending on the
-setup of the user if its not mapped to the first pf.
 
-The management port mapping is now configured to always connect to the
-first PF. This patch implements this change.
 
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
----
-v2 * Refactor code to avoid code duplication.
+On 4/9/24 16:43, Aaron Conole wrote:
+> Adrian Moreno <amorenoz@redhat.com> writes:
+> 
+>> On 4/8/24 15:18, Ilya Maximets wrote:
+>>> [copying my previous reply since this version actually has netdev@ in Cc]
+>>> On 4/8/24 14:57, Adrian Moreno wrote:
+>>>> Packet samples can come from several places (e.g: different tc sample
+>>>> actions), typically using the sample group (PSAMPLE_ATTR_SAMPLE_GROUP)
+>>>> to differentiate them.
+>>>>
+>>>> Likewise, sample consumers that listen on the multicast group may only
+>>>> be interested on a single group. However, they are currently forced to
+>>>> receive all samples and discard the ones that are not relevant, causing
+>>>> unnecessary overhead.
+>>>>
+>>>> Allow users to filter on the desired group_id by adding a new command
+>>>> SAMPLE_FILTER_SET that can be used to pass the desired group id.
+>>>> Store this filter on the per-socket private pointer and use it for
+>>>> filtering multicasted samples.
+>>>>
+>>>> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+>>>> ---
+>>>>    include/uapi/linux/psample.h |   1 +
+>>>>    net/psample/psample.c        | 127 +++++++++++++++++++++++++++++++++--
+>>>>    2 files changed, 122 insertions(+), 6 deletions(-)
+>>>>
+>>>> diff --git a/include/uapi/linux/psample.h b/include/uapi/linux/psample.h
+>>>> index e585db5bf2d2..5e0305b1520d 100644
+>>>> --- a/include/uapi/linux/psample.h
+>>>> +++ b/include/uapi/linux/psample.h
+>>>> @@ -28,6 +28,7 @@ enum psample_command {
+>>>>    	PSAMPLE_CMD_GET_GROUP,
+>>>>    	PSAMPLE_CMD_NEW_GROUP,
+>>>>    	PSAMPLE_CMD_DEL_GROUP,
+>>>> +	PSAMPLE_CMD_SAMPLE_FILTER_SET,
+>>> Other commands are names as PSAMPLE_CMD_VERB_NOUN, so this new one
+>>> should be PSAMPLE_CMD_SET_FILTER.  (The SAMPLE part seems unnecessary.)
+>>> Some functions/structures need to be renamed accordingly.
+>>>
+>>
+>> Sure, I'll rename it when I sent the next version.
+>>
+>>>>    };
+>>>>      enum psample_tunnel_key_attr {
+>>>> diff --git a/net/psample/psample.c b/net/psample/psample.c
+>>>> index a5d9b8446f77..a0cef63dfdec 100644
+>>>> --- a/net/psample/psample.c
+>>>> +++ b/net/psample/psample.c
+>>>> @@ -98,13 +98,84 @@ static int psample_nl_cmd_get_group_dumpit(struct sk_buff *msg,
+>>>>    	return msg->len;
+>>>>    }
+>>>>    -static const struct genl_small_ops psample_nl_ops[] = {
+>>>> +struct psample_obj_desc {
+>>>> +	struct rcu_head rcu;
+>>>> +	u32 group_num;
+>>>> +	bool group_num_valid;
+>>>> +};
+>>>> +
+>>>> +struct psample_nl_sock_priv {
+>>>> +	struct psample_obj_desc __rcu *flt;
+>>> Can we call it 'fileter' ?  I find it hard to read the code with
+>>> this unnecessary abbreviation.  Same for the lock below.
+>>>
+>>
+>> Sure.
+>>
+>>>> +	spinlock_t flt_lock; /* Protects flt. */
+>>>> +};
+>>>> +
+>>>> +static void psample_nl_sock_priv_init(void *priv)
+>>>> +{
+>>>> +	struct psample_nl_sock_priv *sk_priv = priv;
+>>>> +
+>>>> +	spin_lock_init(&sk_priv->flt_lock);
+>>>> +}
+>>>> +
+>>>> +static void psample_nl_sock_priv_destroy(void *priv)
+>>>> +{
+>>>> +	struct psample_nl_sock_priv *sk_priv = priv;
+>>>> +	struct psample_obj_desc *flt;
+>>>> +
+>>>> +	flt = rcu_dereference_protected(sk_priv->flt, true);
+>>>> +	kfree_rcu(flt, rcu);
+>>>> +}
+>>>> +
+>>>> +static int psample_nl_sample_filter_set_doit(struct sk_buff *skb,
+>>>> +					     struct genl_info *info)
+>>>> +{
+>>>> +	struct psample_nl_sock_priv *sk_priv;
+>>>> +	struct nlattr **attrs = info->attrs;
+>>>> +	struct psample_obj_desc *flt;
+>>>> +
+>>>> +	flt = kzalloc(sizeof(*flt), GFP_KERNEL);
+>>>> +
+>>>> +	if (attrs[PSAMPLE_ATTR_SAMPLE_GROUP]) {
+>>>> +		flt->group_num = nla_get_u32(attrs[PSAMPLE_ATTR_SAMPLE_GROUP]);
+>>>> +		flt->group_num_valid = true;
+>>>> +	}
+>>>> +
+>>>> +	if (!flt->group_num_valid) {
+>>>> +		kfree(flt);
+>>> Might be better to not allocate it in the first place.
+>>>
+>>
+>> Absolutely.
+>>
+>>>> +		flt = NULL;
+>>>> +	}
+>>>> +
+>>>> +	sk_priv = genl_sk_priv_get(&psample_nl_family, NETLINK_CB(skb).sk);
+>>>> +	if (IS_ERR(sk_priv)) {
+>>>> +		kfree(flt);
+>>>> +		return PTR_ERR(sk_priv);
+>>>> +	}
+>>>> +
+>>>> +	spin_lock(&sk_priv->flt_lock);
+>>>> +	flt = rcu_replace_pointer(sk_priv->flt, flt,
+>>>> +				  lockdep_is_held(&sk_priv->flt_lock));
+>>>> +	spin_unlock(&sk_priv->flt_lock);
+>>>> +	kfree_rcu(flt, rcu);
+>>>> +	return 0;
+>>>> +}
+>>>> +
+>>>> +static const struct nla_policy
+>>>> +	psample_sample_filter_set_policy[PSAMPLE_ATTR_SAMPLE_GROUP + 1] = {
+>>>> +	[PSAMPLE_ATTR_SAMPLE_GROUP] = { .type = NLA_U32, },
+>>> This indentation is confusing, though I'm not sure what's a better
+>>> way.
+>>>
+>>
+>> I now! I'll try to move it around see if it improves things.
+>>
+>>>> +};
+>>>> +
+>>>> +static const struct genl_ops psample_nl_ops[] = {
+>>>>    	{
+>>>>    		.cmd = PSAMPLE_CMD_GET_GROUP,
+>>>>    		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+>>>>    		.dumpit = psample_nl_cmd_get_group_dumpit,
+>>>>    		/* can be retrieved by unprivileged users */
+>>>> -	}
+>>>> +	},
+>>>> +	{
+>>>> +		.cmd		= PSAMPLE_CMD_SAMPLE_FILTER_SET,
+>>>> +		.doit		= psample_nl_sample_filter_set_doit,
+>>>> +		.policy		= psample_sample_filter_set_policy,
+>>>> +		.flags		= 0,
+>>>> +	},
+>>>>    };
+>>>>      static struct genl_family psample_nl_family __ro_after_init = {
+>>>> @@ -114,10 +185,13 @@ static struct genl_family psample_nl_family __ro_after_init = {
+>>>>    	.netnsok	= true,
+>>>>    	.module		= THIS_MODULE,
+>>>>    	.mcgrps		= psample_nl_mcgrps,
+>>>> -	.small_ops	= psample_nl_ops,
+>>>> -	.n_small_ops	= ARRAY_SIZE(psample_nl_ops),
+>>>> +	.ops		= psample_nl_ops,
+>>>> +	.n_ops		= ARRAY_SIZE(psample_nl_ops),
+>>>>    	.resv_start_op	= PSAMPLE_CMD_GET_GROUP + 1,
+>>>>    	.n_mcgrps	= ARRAY_SIZE(psample_nl_mcgrps),
+>>>> +	.sock_priv_size		= sizeof(struct psample_nl_sock_priv),
+>>>> +	.sock_priv_init		= psample_nl_sock_priv_init,
+>>>> +	.sock_priv_destroy	= psample_nl_sock_priv_destroy,
+>>>>    };
+>>>>      static void psample_group_notify(struct psample_group *group,
+>>>> @@ -360,6 +434,42 @@ static int psample_tunnel_meta_len(struct ip_tunnel_info *tun_info)
+>>>>    }
+>>>>    #endif
+>>>>    +static inline void psample_nl_obj_desc_init(struct
+>>>> psample_obj_desc *desc,
+>>>> +					    u32 group_num)
+>>>> +{
+>>>> +	memset(desc, 0, sizeof(*desc));
+>>>> +	desc->group_num = group_num;
+>>>> +	desc->group_num_valid = true;
+>>>> +}
+>>>> +
+>>>> +static bool psample_obj_desc_match(struct psample_obj_desc *desc,
+>>>> +				   struct psample_obj_desc *flt)
+>>>> +{
+>>>> +	if (desc->group_num_valid && flt->group_num_valid &&
+>>>> +	    desc->group_num != flt->group_num)
+>>>> +		return false;
+>>>> +	return true;
+>>> This fucntion returns 'true' if one of the arguments is not valid.
+>>> I'd not expect such behavior from a 'match' function.
+>>> I understand the intention that psample should sample everything
+>>> to sockets that do not request filters, but that should not be part
+>>> of the 'match' logic, or more appropriate function name should be
+>>> chosen.  Also, if the group is not initialized, but the filter is,
+>>> it should not match, logically.  The validity on filter and the
+>>> current sample is not symmetric.
+>>>
+>>
+>> The descriptor should always be initialized but I think double
+>> checking should be OK as in the context of this particular function,
+>> it might not be clear it is.
+>>
+>>> And I'm not really sure if the 'group_num_valid' is actually needed.
+>>> Can the NULL pointer be used as an indicator?  If so, then maybe
+>>> the whole psample_obj_desc structure is not needed as it will
+>>> contain a single field.
+>>
+>> If we only filter on group_id, then yes. However, as I was writing
+>> this, I thought maybe opening the door to filtering on more fields
+>> such as the protocol in/out interfaces, etc. Now that I read this I
+>> understand the current code is confusing: I should have left a comment
+>> or mention it in the commit message.
+> 
+> If you want to have such filtering options, does it make sense to
+> instead have the listening program send a set of bpf instructions for
+> filtering instead?  I think the data should be available at the point
+> where simple bpf is attached (SO_ATTACH_BPF to the psample socket, and
+> the filter should run as part of the broadcast message IIRC since it
+> populates the sk_filter field).
+> 
 
- .../net/ethernet/marvell/octeontx2/af/mbox.h  |  5 +-
- .../ethernet/marvell/octeontx2/af/rvu_cgx.c   | 84 +++++++++++++------
- 2 files changed, 63 insertions(+), 26 deletions(-)
+That's a good point. I hope parsing the netlink messages won't be too cumbersome.
+So let's limit it to group_ids. How about filtering on a number of group_ids? Is 
+that worth it?
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index 4a77f6fe2622..88cced83bf23 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -639,7 +639,10 @@ struct cgx_lmac_fwdata_s {
- 	/* Only applicable if SFP/QSFP slot is present */
- 	struct sfp_eeprom_s sfp_eeprom;
- 	struct phy_s phy;
--#define LMAC_FWDATA_RESERVED_MEM 1021
-+	u32 lmac_type;
-+	u32 portm_idx;
-+	u64 mgmt_port:1;
-+#define LMAC_FWDATA_RESERVED_MEM 1019
- 	u64 reserved[LMAC_FWDATA_RESERVED_MEM];
- };
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-index 266ecbc1b97a..8cc17d7e368d 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
-@@ -118,15 +118,67 @@ static void rvu_map_cgx_nix_block(struct rvu *rvu, int pf,
- 		pfvf->nix_blkaddr = BLKADDR_NIX1;
- }
+>>>
+>>>> +}
+>>>> +
+>>>> +static int psample_nl_sample_filter(struct sock *dsk, struct sk_buff *skb,
+>>>> +				    void *data)
+>>>> +{
+>>>> +	struct psample_obj_desc *desc = data;
+>>>> +	struct psample_nl_sock_priv *sk_priv;
+>>>> +	struct psample_obj_desc *flt;
+>>>> +	int ret = 0;
+>>>> +
+>>>> +	rcu_read_lock();
+>>>> +	sk_priv = __genl_sk_priv_get(&psample_nl_family, dsk);
+>>>> +	if (!IS_ERR_OR_NULL(sk_priv)) {
+>>>> +		flt = rcu_dereference(sk_priv->flt);
+>>>> +		if (flt)
+>>>> +			ret = !psample_obj_desc_match(desc, flt);
+>>>> +	}
+>>>> +	rcu_read_unlock();
+>>>> +	return ret;
+>>>> +}
+>>>> +
+>>>>    void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+>>>>    			   u32 sample_rate, const struct psample_metadata *md)
+>>>>    {
+>>>> @@ -370,6 +480,7 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+>>>>    #ifdef CONFIG_INET
+>>>>    	struct ip_tunnel_info *tun_info;
+>>>>    #endif
+>>>> +	struct psample_obj_desc desc;
+>>>>    	struct sk_buff *nl_skb;
+>>>>    	int data_len;
+>>>>    	int meta_len;
+>>>> @@ -487,8 +598,12 @@ void psample_sample_packet(struct psample_group *group, struct sk_buff *skb,
+>>>>    #endif
+>>>>      	genlmsg_end(nl_skb, data);
+>>>> -	genlmsg_multicast_netns(&psample_nl_family, group->net, nl_skb, 0,
+>>>> -				PSAMPLE_NL_MCGRP_SAMPLE, GFP_ATOMIC);
+>>>> +	psample_nl_obj_desc_init(&desc, group->group_num);
+>>>> +	genlmsg_multicast_netns_filtered(&psample_nl_family,
+>>>> +					 group->net, nl_skb, 0,
+>>>> +					 PSAMPLE_NL_MCGRP_SAMPLE,
+>>>> +					 GFP_ATOMIC, psample_nl_sample_filter,
+>>>> +					 &desc);
+>>>>      	return;
+>>>>    error:
+>>>
+> 
 
--static int rvu_map_cgx_lmac_pf(struct rvu *rvu)
-+static bool rvu_cgx_is_mgmt_port(struct rvu *rvu, int cgx_id, int lmac_id)
-+{
-+	struct cgx_lmac_fwdata_s *fwdata;
-+
-+	fwdata =  &rvu->fwdata->cgx_fw_data_usx[cgx_id][lmac_id];
-+	return !!fwdata->mgmt_port;
-+}
-+
-+static void __rvu_map_cgx_lmac_pf(struct rvu *rvu, unsigned int pf,
-+				  int cgx, int lmac)
- {
- 	struct npc_pkind *pkind = &rvu->hw->pkind;
--	int cgx_cnt_max = rvu->cgx_cnt_max;
--	int pf = PF_CGXMAP_BASE;
-+	int numvfs, hwvfs;
-+	int free_pkind;
-+
-+	rvu->pf2cgxlmac_map[pf] = cgxlmac_id_to_bmap(cgx, lmac);
-+	rvu->cgxlmac2pf_map[CGX_OFFSET(cgx) + lmac] = 1 << pf;
-+	free_pkind = rvu_alloc_rsrc(&pkind->rsrc);
-+	pkind->pfchan_map[free_pkind] = ((pf) & 0x3F) << 16;
-+	rvu_map_cgx_nix_block(rvu, pf, cgx, lmac);
-+	rvu->cgx_mapped_pfs++;
-+	rvu_get_pf_numvfs(rvu, pf, &numvfs, &hwvfs);
-+	rvu->cgx_mapped_vfs += numvfs;
-+}
-+
-+static void rvu_cgx_map_mgmt_port(struct rvu *rvu, int cgx_cnt_max,
-+				  unsigned int *pf, bool req_map_mgmt)
-+{
- 	unsigned long lmac_bmap;
--	int size, free_pkind;
- 	int cgx, lmac, iter;
--	int numvfs, hwvfs;
-+
-+	for (cgx = 0; cgx < cgx_cnt_max; cgx++) {
-+		if (!rvu_cgx_pdata(cgx, rvu))
-+			continue;
-+		lmac_bmap = cgx_get_lmac_bmap(rvu_cgx_pdata(cgx, rvu));
-+		for_each_set_bit(iter, &lmac_bmap, rvu->hw->lmac_per_cgx) {
-+			if (iter >= MAX_LMAC_COUNT)
-+				continue;
-+			lmac = cgx_get_lmacid(rvu_cgx_pdata(cgx, rvu), iter);
-+			/* Map management port always to first PF */
-+			if (req_map_mgmt &&
-+			    rvu_cgx_is_mgmt_port(rvu, cgx, lmac)) {
-+				__rvu_map_cgx_lmac_pf(rvu, *pf, cgx, lmac);
-+				(*pf)++;
-+				return;
-+			}
-+			/* Non management port mapping */
-+			if (!req_map_mgmt &&
-+			    !rvu_cgx_is_mgmt_port(rvu, cgx, lmac)) {
-+				__rvu_map_cgx_lmac_pf(rvu, *pf, cgx, lmac);
-+				(*pf)++;
-+			}
-+		}
-+	}
-+}
-+
-+static int rvu_map_cgx_lmac_pf(struct rvu *rvu)
-+{
-+	int cgx_cnt_max = rvu->cgx_cnt_max;
-+	unsigned int pf = PF_CGXMAP_BASE;
-+	int size;
-
- 	if (!cgx_cnt_max)
- 		return 0;
-@@ -155,26 +207,8 @@ static int rvu_map_cgx_lmac_pf(struct rvu *rvu)
- 		return -ENOMEM;
-
- 	rvu->cgx_mapped_pfs = 0;
--	for (cgx = 0; cgx < cgx_cnt_max; cgx++) {
--		if (!rvu_cgx_pdata(cgx, rvu))
--			continue;
--		lmac_bmap = cgx_get_lmac_bmap(rvu_cgx_pdata(cgx, rvu));
--		for_each_set_bit(iter, &lmac_bmap, rvu->hw->lmac_per_cgx) {
--			if (iter >= MAX_LMAC_COUNT)
--				continue;
--			lmac = cgx_get_lmacid(rvu_cgx_pdata(cgx, rvu),
--					      iter);
--			rvu->pf2cgxlmac_map[pf] = cgxlmac_id_to_bmap(cgx, lmac);
--			rvu->cgxlmac2pf_map[CGX_OFFSET(cgx) + lmac] = 1 << pf;
--			free_pkind = rvu_alloc_rsrc(&pkind->rsrc);
--			pkind->pfchan_map[free_pkind] = ((pf) & 0x3F) << 16;
--			rvu_map_cgx_nix_block(rvu, pf, cgx, lmac);
--			rvu->cgx_mapped_pfs++;
--			rvu_get_pf_numvfs(rvu, pf, &numvfs, &hwvfs);
--			rvu->cgx_mapped_vfs += numvfs;
--			pf++;
--		}
--	}
-+	rvu_cgx_map_mgmt_port(rvu, cgx_cnt_max, &pf, true);
-+	rvu_cgx_map_mgmt_port(rvu, cgx_cnt_max, &pf, false);
- 	return 0;
- }
-
---
-2.17.1
 
