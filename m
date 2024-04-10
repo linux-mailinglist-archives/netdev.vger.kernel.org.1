@@ -1,89 +1,126 @@
-Return-Path: <netdev+bounces-86369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5853289E7EA
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 03:46:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 922F889E7F1
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 03:48:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B723EB2167D
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 01:46:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C39C81C21186
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 01:48:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F334717FD;
-	Wed, 10 Apr 2024 01:46:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I/78VjWd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33F6138C;
+	Wed, 10 Apr 2024 01:48:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85D015A4;
-	Wed, 10 Apr 2024 01:46:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A51B01C2E
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 01:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712713587; cv=none; b=HtDsmNuBJIvdW0Y+Lhencar1OsY8m3YP3kaZ5lp0CL2h3iwXaFwpfCaZQvEOlVAuPohPlOp6UTohO4YMdp9/z/32EKhpKoo/nQYtEHzW5LHQ6toedp/R7qXvMW8LLvPXGx2LQwWC4z8U3Ws3aS7WbZkhtQIfJ6hbQj2To5MhGW8=
+	t=1712713729; cv=none; b=tEgu/fsoQHFss2qhwOwSSZ51KyiH3Jcio4cfxoCltR7mAtXcZg8MaDMb4s2vGcjrgk8oaQq9Gau/B7vIhujc2oJ1UWUgL/jVFJvkMMgwVQs/rkPvCyqCvKhb40cAf14Kii2kJo/DJdd1iCVxstTnDjKSCpLPhPoAK/W6iQS90MM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712713587; c=relaxed/simple;
-	bh=1YgFdUcBOKesTaua31ZEyD1c9Gpgvfr0heHVZed0Enk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FAbalXxZN1JpQBl13Anor0GjbmosIr42lIDoS9VaMG0iSzT1sbkVaG200g0tsj46N23w30h4d5CL3x1JkQnQuL5sEgobJUpGgTwwLQiuAeOHENnm9CMhT1khM2awZR8rmrtuiMlThjZsxqd7bucw32IVMah3cQ+irbzd8p46Apc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I/78VjWd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F0D42C433F1;
-	Wed, 10 Apr 2024 01:46:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712713587;
-	bh=1YgFdUcBOKesTaua31ZEyD1c9Gpgvfr0heHVZed0Enk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I/78VjWdo/c0F0Ap07gI5asrS7PrsOu2M02J+DbxVjLWDvzFOCQj0or2QN13AWozE
-	 I69cMnaM1ljMIhs/0Lp84+zGGrKjGK+/CXANY3BLrmNxLBhq4kaduZjuEReLaCWWCM
-	 rte8M4SlHEUagzJtAXFK0rggGoLFQZvYFbNsor1v1NzuoQK/a4YRotlvV3NLP6fos1
-	 5WsKk0K30sTsNVRZti9VcJ00BcNP1yTZV7kxZYXi4/yHOzNi43F1A9xC8vq4CFQg0l
-	 rwcAwaw4bJhCi9poeYvELIrMuEt8FcP5FKz1pc4TBZxdLGNQelNbfUOj7E91vbTg6q
-	 dEzc8Cp+Z0Vvg==
-Date: Tue, 9 Apr 2024 18:46:25 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: aleksander.lobakin@intel.com, davem@davemloft.net, pabeni@redhat.com,
- edumazet@google.com, elder@kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
- nbd@nbd.name, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
- lorenzo@kernel.org, taras.chornyi@plvision.eu, ath11k@lists.infradead.org,
- ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
- geomatsi@gmail.com, kvalo@kernel.org, quic_jjohnson@quicinc.com,
- leon@kernel.org, dennis.dalessandro@cornelisnetworks.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
- Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>
-Subject: Re: [PATCH net-next v4 1/9] net: free_netdev: exit earlier if dummy
-Message-ID: <20240409184625.301e4bc0@kernel.org>
-In-Reply-To: <20240409125738.1824983-2-leitao@debian.org>
-References: <20240409125738.1824983-1-leitao@debian.org>
-	<20240409125738.1824983-2-leitao@debian.org>
+	s=arc-20240116; t=1712713729; c=relaxed/simple;
+	bh=Yvfiqvd8YHfu/BKoKTGgFpO5hNj/nnaa8Q2DucEAzMI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qtenLe0j2asVfxc24tHKMjH7aZ13UM8eb7AheELOmXMK3Qh3U9ih1R3yy39bRGWONXNpAQRAFvF1l8w9glm/ctNyn2fFXg8K2bbEGhFL8jiX7FQEL9Ml1iIxIExuyUrsij/QHnY0+Wvyo7Ea5YTEP3yRznWKraosjDaYNIcU5Tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.109.80])
+	by gateway (Coremail) with SMTP id _____8Cx67r87xVm3AwlAA--.3884S3;
+	Wed, 10 Apr 2024 09:48:44 +0800 (CST)
+Received: from [192.168.100.126] (unknown [112.20.109.80])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Bx1xH27xVmCw53AA--.21591S3;
+	Wed, 10 Apr 2024 09:48:40 +0800 (CST)
+Message-ID: <0524fb13-6698-47d2-830e-277398f440cd@loongson.cn>
+Date: Wed, 10 Apr 2024 09:48:38 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v10 2/6] net: stmmac: Add multi-channel support
+To: Simon Horman <horms@kernel.org>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, fancer.lancer@gmail.com,
+ Jose.Abreu@synopsys.com, chenhuacai@kernel.org, linux@armlinux.org.uk,
+ guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com,
+ siyanteng01@gmail.com
+References: <cover.1712668711.git.siyanteng@loongson.cn>
+ <2c3fcab1f5bfa0afc7dc523cf5d8f2f7e3520e79.1712668711.git.siyanteng@loongson.cn>
+ <20240409185508.GM26556@kernel.org>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <20240409185508.GM26556@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Bx1xH27xVmCw53AA--.21591S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7KryfCr4fAr1kJw15Aw17XFc_yoW8Gw4rpw
+	4kZa4jk3WkJFnrXan7Xw4rZF98Kay3tFW293y7A34a9F4DC34aqr90qrWjkF1UZr13XFy3
+	tr4Dur1ru3Z8J3XCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
+	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcbAwUUUUU
 
-On Tue,  9 Apr 2024 05:57:15 -0700 Breno Leitao wrote:
-> For dummy devices, exit earlier at free_netdev() instead of executing
-> the whole function. This is necessary, because dummy devices are
-> special, and shouldn't have the second part of the function executed.
-> 
-> Otherwise reg_state, which is NETREG_DUMMY for dummy devices, will be
-> overwritten and there will be no way to identify that this is a dummy
-> device. Also, this device do not need the final put_device(), since
-> dummy devices are not registered (through register_netdevice()), where
-> the device reference is increased (at netdev_register_kobject() ->
-> device_add()).
 
-There's a small fuzz when applying due to the phy topo changes
-landing, please rebase, the CI didn't ingest it right.
--- 
-pw-bot: cr
+在 2024/4/10 02:55, Simon Horman 写道:
+> On Tue, Apr 09, 2024 at 10:00:02PM +0800, Yanteng Si wrote:
+>> DW GMAC v3.x multi-channels feature is implemented as multiple
+>> sets of the same CSRs. Here is only preliminary support, it will
+>> be useful for the driver further evolution and for the users
+>> having multi-channel DWGMAC v3.x devices.
+>>
+>> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+>> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> ...
+>
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+>> index e1537a57815f..e94faa72f30e 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+>> @@ -420,6 +420,12 @@ stmmac_ethtool_set_link_ksettings(struct net_device *dev,
+>>   		return 0;
+>>   	}
+>>   
+>> +	if (priv->plat->flags & STMMAC_FLAG_DISABLE_FORCE_1000) {
+> Hi Yanteng Si, Yanteng Si, all,
+>
+> STMMAC_FLAG_DISABLE_FORCE_1000 is used here but it is not defined
+> until PATCH 6/6. This breaks bisection.
+>
+> I expect this can be resolved by defining STMMAC_FLAG_DISABLE_FORCE_1000
+> as part of this patch.
+
+Sorry, this is to fix some LS2K2000 and some LS7A2000 bugs, in v11 I 
+will split
+
+them to 6/6.
+
+
+Thank you for your review.
+
+
+Thanks,
+
+Yanteng
+
+>
+>   
+
 
