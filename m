@@ -1,73 +1,86 @@
-Return-Path: <netdev+bounces-86384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B11A289E8F5
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 06:36:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3270489E90C
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 06:39:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09B01B23481
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 04:36:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 638101C20938
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 04:39:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAF80168C4;
-	Wed, 10 Apr 2024 04:35:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E0DC8DE;
+	Wed, 10 Apr 2024 04:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TErnlSW2"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="D25LaJJv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1CF9468
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 04:35:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 860068F44
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 04:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712723729; cv=none; b=e3tirDUatAQcVLuG/exHh154RsrMTWcl2yD6t+unlP/WA030fcMbLeIXA5TOaBTY++5rfX2rN/snzWen7igo2Un+uOYTgQ2mZo0KBefWsuwLJOucfV9j1x0fOVkOcGs35JxFQ7K2+Zkb93wKQyt4ckM1bW9VD9n5ZuKlF9wzJaM=
+	t=1712723985; cv=none; b=eRZsQ7TM56yl0G2k8odu8y07c5LKvIbB9oYkcz/mQXeEESe6IR1ivD4vnUHNdGalc5YFZ5A8StQd2e+NF9I1HgVDRG2FaSu2vL4fguDgTe2Mxxo4vr9IjMttn3dXYn6FDEkM/ais4Vo4tEm9lvgyaQMbs+FwYwwOFDtP+p3zT0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712723729; c=relaxed/simple;
-	bh=sDnn+yYCBm7ElRQy1ycc5UvcLwyRTYy3YNE8uqqDjiU=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=RGheVAqyUHeS3jKJ1LbPfxAhTCk/nulk3zLXAhYrK/k6+84m5b3RDlQQv5XZZV9WSfvQbtkFagWF9EGjEOhhPTmfpFijDYbIfp+P1YiPPDMTdJ/qqmZ/DX2zNI2qJHmtHRijrPHhLFbrlOCkgWlDyN6PMOEhsnsAMPeUDeXsKuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TErnlSW2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712723727;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5YBPkm0MVsrY4P8NrGpgwej+RiZZMRPoIxqpdijnhXw=;
-	b=TErnlSW2f0Oc9yiz/wnhFWoQ+8oi/FQAHZF5R+pB28ts9a+1PFGCKyza0MPwuVuxssIlxG
-	bzldCy+DsQY0UoSNisngTAtahu1cyTBMybNTFJ8up4TqZ35JrNgb9DdL30AMyEovR+GevK
-	eqJAL/T8dS6yNvN/hkzVoI/NOJGfnSY=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-588-X0r9GjBfMNO4VACzome34A-1; Wed,
- 10 Apr 2024 00:35:22 -0400
-X-MC-Unique: X0r9GjBfMNO4VACzome34A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 60CDF3C025C3;
-	Wed, 10 Apr 2024 04:35:22 +0000 (UTC)
-Received: from server.redhat.com (unknown [10.72.112.217])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6BF15490F9;
-	Wed, 10 Apr 2024 04:35:19 +0000 (UTC)
-From: Cindy Lu <lulu@redhat.com>
-To: lulu@redhat.com,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
+	s=arc-20240116; t=1712723985; c=relaxed/simple;
+	bh=DtdulvZeq18gg5nwhugKq6JgQxiYFWo/qLdw+2pmabM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dcWqUMxsYvA9XFk0pwf3dD+lZCuVFN8Nm5eJeCLjwmygamb0HVQgDj/l/dYG5x2Bw9y3bhdMP17orZd42u/vuza1blUpAea+q1OvUsa/teLA5rkUWO4yu5Cr+5ePPnJjeyqyovuAoPVef2bul5OFh+3B87SntciAD8Owpprm84Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=D25LaJJv; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2a475bdd4a6so3238700a91.2
+        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 21:39:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1712723983; x=1713328783; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FTBKn+X9fYIhUY+SfQqhA1p7Ow+PslkWyXYeQlLznYk=;
+        b=D25LaJJvAKSXYchN6l1DiUFXFFyJthF2928PYJkQVv4AfGh0hfZ1sc/e2aI7RJUHCy
+         cJpHgWuaWG2pPoG6tlUlkcOByTeZM2dfRBAemtGWqrgsLBcEq8YLxohiAG35RuvVelPU
+         edVqJ+IPaoAGev5jYka87Xgr1vukAITh4pgeg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712723983; x=1713328783;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FTBKn+X9fYIhUY+SfQqhA1p7Ow+PslkWyXYeQlLznYk=;
+        b=K+YS7HWXZ9LM7Zs/EqdHK8mdI8RyUallVGXnvdEY/ptmz3hXjFQD9JaU+jYjtbk2j3
+         6HcyYq5OvnBhW0c/sxasT4wm3XhFrhMbZ32dDoZRvvpJXrAJsDtW5JRW7sNz5gOCfKUi
+         XPpJkh6HQH4Ke7s5hRWbEmWn5p8YvzO+DcI8M/nE5zfqpFeFZRDZPmD1iZHFFXc0mtoZ
+         UiuLwlEWhuMGQohPxN32AVPFdKkkxqoJ+YSCNOEHCrnsp793glt7APeqn98tWXabaEJK
+         1bXQmyQMKlhWlY7wHuhWRuyzvyTyMKeW3TWk5LWUCtdm02SQI/zvXOCc6TDMoLxgrkJJ
+         rocA==
+X-Forwarded-Encrypted: i=1; AJvYcCWJFqgntSNvnOw2vGXlJgFudmVfyvAsmhddjTL4mYfN7TkfDjcM52yeFv9Ovof3KBY6+16vkfWvmaR/y+ZQUQ1bM3hWIPDt
+X-Gm-Message-State: AOJu0YwDrelJU5G/0RS1sqDjw4HQrTHbEZHq0Nftm3SEuHZGAEXIDXQ4
+	+03s6GdpqScUTXhrOoygIJoO8IDjsvPGHO1gEDmGHeyYgp1vTxKHwH/Weo8QqaHOWboBq3XAa2s
+	O
+X-Google-Smtp-Source: AGHT+IE6idq9nTJW2mID+KEBk2ciEgsbfXSMT5eLrh1uUoPhsGEPfHjous1/IHHuE4a4LZ+5SF/hIg==
+X-Received: by 2002:a17:90a:d505:b0:2a5:37cc:cc4e with SMTP id t5-20020a17090ad50500b002a537cccc4emr1550232pju.32.1712723982772;
+        Tue, 09 Apr 2024 21:39:42 -0700 (PDT)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id gn4-20020a17090ac78400b002a5d71d48e8sm260773pjb.39.2024.04.09.21.39.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Apr 2024 21:39:42 -0700 (PDT)
+From: Joe Damato <jdamato@fastly.com>
+To: linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/1] virtio-pci: Fix the crash that the vector was used after released.
-Date: Wed, 10 Apr 2024 12:33:15 +0800
-Message-ID: <20240410043450.416752-2-lulu@redhat.com>
-In-Reply-To: <20240410043450.416752-1-lulu@redhat.com>
-References: <20240410043450.416752-1-lulu@redhat.com>
+	intel-wired-lan@lists.osuosl.org
+Cc: sridhar.samudrala@intel.com,
+	amritha.nambiar@intel.com,
+	nalramli@fastly.com,
+	Joe Damato <jdamato@fastly.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [intel-next 0/2] i40e: Add support for netlink API
+Date: Wed, 10 Apr 2024 04:39:33 +0000
+Message-Id: <20240410043936.206169-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,142 +88,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-When the guest triggers vhost_stop and then virtio_reset, the vector will the
-IRQFD for this vector will be released and change to VIRTIO_NO_VECTOR.
-After that, the guest called vhost_net_start,  (at this time, the configure
-vector is still VIRTIO_NO_VECTOR),  vector 0 still was not "init".
-The guest system continued to boot, set the vector back to 0, and then met the crash.
+Greetings:
 
-To fix this, we need to call the function "kvm_virtio_pci_vector_use_one()"
-when the vector changes back from VIRTIO_NO_VECTOR
+This change adds support for the new netlink APIs to i40e which:
+  - link queues, NAPI IDs, and IRQs together
+  - export per-queue stats
 
-(gdb) bt
-0  __pthread_kill_implementation (threadid=<optimized out>, signo=signo@entry=6, no_tid=no_tid@entry=0)
-    at pthread_kill.c:44
-1  0x00007fc87148ec53 in __pthread_kill_internal (signo=6, threadid=<optimized out>) at pthread_kill.c:78
-2  0x00007fc87143e956 in __GI_raise (sig=sig@entry=6) at ../sysdeps/posix/raise.c:26
-3  0x00007fc8714287f4 in __GI_abort () at abort.c:79
-4  0x00007fc87142871b in __assert_fail_base
-    (fmt=0x7fc8715bbde0 "%s%s%s:%u: %s%sAssertion `%s' failed.\n%n", assertion=0x5606413efd53 "ret == 0", file=0x5606413ef87d "../accel/kvm/kvm-all.c", line=1837, function=<optimized out>) at assert.c:92
-5  0x00007fc871437536 in __GI___assert_fail
-    (assertion=0x5606413efd53 "ret == 0", file=0x5606413ef87d "../accel/kvm/kvm-all.c", line=1837, function=0x5606413f06f0 <__PRETTY_FUNCTION__.19> "kvm_irqchip_commit_routes") at assert.c:101
-6  0x0000560640f884b5 in kvm_irqchip_commit_routes (s=0x560642cae1f0) at ../accel/kvm/kvm-all.c:1837
-7  0x0000560640c98f8e in virtio_pci_one_vector_unmask
-    (proxy=0x560643c65f00, queue_no=4294967295, vector=0, msg=..., n=0x560643c6e4c8)
-    at ../hw/virtio/virtio-pci.c:1005
-8  0x0000560640c99201 in virtio_pci_vector_unmask (dev=0x560643c65f00, vector=0, msg=...)
-    at ../hw/virtio/virtio-pci.c:1070
-9  0x0000560640bc402e in msix_fire_vector_notifier (dev=0x560643c65f00, vector=0, is_masked=false)
-    at ../hw/pci/msix.c:120
-10 0x0000560640bc40f1 in msix_handle_mask_update (dev=0x560643c65f00, vector=0, was_masked=true)
-    at ../hw/pci/msix.c:140
-11 0x0000560640bc4503 in msix_table_mmio_write (opaque=0x560643c65f00, addr=12, val=0, size=4)
-    at ../hw/pci/msix.c:231
-12 0x0000560640f26d83 in memory_region_write_accessor
-    (mr=0x560643c66540, addr=12, value=0x7fc86b7bc628, size=4, shift=0, mask=4294967295, attrs=...)
-    at ../system/memory.c:497
-13 0x0000560640f270a6 in access_with_adjusted_size
+This change is inspired by a similar change made to the ice driver commit
+91fdbce7e8d6 ("ice: Add support in the driver for associating queue with
+napi").
 
-     (addr=12, value=0x7fc86b7bc628, size=4, access_size_min=1, access_size_max=4, access_fn=0x560640f26c8d <memory_region_write_accessor>, mr=0x560643c66540, attrs=...) at ../system/memory.c:573
-14 0x0000560640f2a2b5 in memory_region_dispatch_write (mr=0x560643c66540, addr=12, data=0, op=MO_32, attrs=...)
-    at ../system/memory.c:1521
-15 0x0000560640f37bac in flatview_write_continue
-    (fv=0x7fc65805e0b0, addr=4273803276, attrs=..., ptr=0x7fc871e9c028, len=4, addr1=12, l=4, mr=0x560643c66540)
-    at ../system/physmem.c:2714
-16 0x0000560640f37d0f in flatview_write
-    (fv=0x7fc65805e0b0, addr=4273803276, attrs=..., buf=0x7fc871e9c028, len=4) at ../system/physmem.c:2756
-17 0x0000560640f380bf in address_space_write
-    (as=0x560642161ae0 <address_space_memory>, addr=4273803276, attrs=..., buf=0x7fc871e9c028, len=4)
-    at ../system/physmem.c:2863
-18 0x0000560640f3812c in address_space_rw
-    (as=0x560642161ae0 <address_space_memory>, addr=4273803276, attrs=..., buf=0x7fc871e9c028, len=4, is_write=true) at ../system/physmem.c:2873
---Type <RET> for more, q to quit, c to continue without paging--
-19 0x0000560640f8aa55 in kvm_cpu_exec (cpu=0x560642f205e0) at ../accel/kvm/kvm-all.c:2915
-20 0x0000560640f8d731 in kvm_vcpu_thread_fn (arg=0x560642f205e0) at ../accel/kvm/kvm-accel-ops.c:51
-21 0x00005606411949f4 in qemu_thread_start (args=0x560642f292b0) at ../util/qemu-thread-posix.c:541
-22 0x00007fc87148cdcd in start_thread (arg=<optimized out>) at pthread_create.c:442
-23 0x00007fc871512630 in clone3 () at ../sysdeps/unix/sysv/linux/x86_64/clone3.S:81
-(gdb)
-Signed-off-by: Cindy Lu <lulu@redhat.com>
----
- hw/virtio/virtio-pci.c | 35 +++++++++++++++++++++++++++++++++++
- 1 file changed, 35 insertions(+)
+I attempted to replicate the rtnl locking added to the ice driver in commit
+080b0c8d6d26 ("ice: Fix ASSERT_RTNL() warning during certain scenarios") in
+patch 1/1, but there's certainly a good chance I missed a case; so I'd
+kindly ask reviewers to take a close look at, please.
 
-diff --git a/hw/virtio/virtio-pci.c b/hw/virtio/virtio-pci.c
-index 1a7039fb0c..344f4fb844 100644
---- a/hw/virtio/virtio-pci.c
-+++ b/hw/virtio/virtio-pci.c
-@@ -880,6 +880,7 @@ static int kvm_virtio_pci_vector_use_one(VirtIOPCIProxy *proxy, int queue_no)
-     int ret;
-     EventNotifier *n;
-     PCIDevice *dev = &proxy->pci_dev;
-+    VirtIOIRQFD *irqfd;
-     VirtIODevice *vdev = virtio_bus_get_device(&proxy->bus);
-     VirtioDeviceClass *k = VIRTIO_DEVICE_GET_CLASS(vdev);
- 
-@@ -890,10 +891,19 @@ static int kvm_virtio_pci_vector_use_one(VirtIOPCIProxy *proxy, int queue_no)
-     if (vector >= msix_nr_vectors_allocated(dev)) {
-         return 0;
-     }
-+    /*
-+     * if the irqfd still in use, means the irqfd was not
-+     * release before and don't need to set up
-+     */
-+    irqfd = &proxy->vector_irqfd[vector];
-+    if (irqfd->users != 0) {
-+        return 0;
-+    }
-     ret = kvm_virtio_pci_vq_vector_use(proxy, vector);
-     if (ret < 0) {
-         goto undo;
-     }
-+
-     /*
-      * If guest supports masking, set up irqfd now.
-      * Otherwise, delay until unmasked in the frontend.
-@@ -1570,7 +1580,19 @@ static void virtio_pci_common_write(void *opaque, hwaddr addr,
-         } else {
-             val = VIRTIO_NO_VECTOR;
-         }
-+        vector = vdev->config_vector;
-         vdev->config_vector = val;
-+        /*
-+         *if the val was change from NO_VECTOR, this means the vector maybe
-+         * release before, need to check if need to set up
-+         */
-+        if ((val != VIRTIO_NO_VECTOR) && (vector == VIRTIO_NO_VECTOR) &&
-+            (vdev->status & VIRTIO_CONFIG_S_DRIVER_OK)) {
-+            /* check if use irqfd*/
-+            if (msix_enabled(&proxy->pci_dev) && kvm_msi_via_irqfd_enabled()) {
-+                kvm_virtio_pci_vector_use_one(proxy, VIRTIO_CONFIG_IRQ_IDX);
-+            }
-+        }
-         break;
-     case VIRTIO_PCI_COMMON_STATUS:
-         if (!(val & VIRTIO_CONFIG_S_DRIVER_OK)) {
-@@ -1611,6 +1633,19 @@ static void virtio_pci_common_write(void *opaque, hwaddr addr,
-             val = VIRTIO_NO_VECTOR;
-         }
-         virtio_queue_set_vector(vdev, vdev->queue_sel, val);
-+
-+        /*
-+         *if the val was change from NO_VECTOR, this means the vector maybe
-+         * release before, need to check if need to set up
-+         */
-+
-+        if ((val != VIRTIO_NO_VECTOR) && (vector == VIRTIO_NO_VECTOR) &&
-+            (vdev->status & VIRTIO_CONFIG_S_DRIVER_OK)) {
-+            /* check if use irqfd*/
-+            if (msix_enabled(&proxy->pci_dev) && kvm_msi_via_irqfd_enabled()) {
-+                kvm_virtio_pci_vector_use_one(proxy, vdev->queue_sel);
-+            }
-+        }
-         break;
-     case VIRTIO_PCI_COMMON_Q_ENABLE:
-         if (val == 1) {
+Thanks,
+Joe
+
+Joe Damato (2):
+  net/i40e: link NAPI instances to queues and IRQs
+  net/i40e: add support for per queue netlink stats
+
+ drivers/net/ethernet/intel/i40e/i40e.h      |   2 +
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 160 ++++++++++++++++++++
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c |   4 +
+ 3 files changed, 166 insertions(+)
+
 -- 
-2.43.0
+2.25.1
 
 
