@@ -1,71 +1,61 @@
-Return-Path: <netdev+bounces-86366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1481A89E7D9
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 03:34:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80CA389E7E3
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 03:40:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8976E1C20FC7
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 01:34:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CB761C20C66
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 01:40:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA60D10F9;
-	Wed, 10 Apr 2024 01:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21B110F9;
+	Wed, 10 Apr 2024 01:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cGaVed5+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MRUkRKNw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CB7064A;
-	Wed, 10 Apr 2024 01:34:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C832710F1;
+	Wed, 10 Apr 2024 01:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712712848; cv=none; b=fzEqpqNP1N00DvpplO6091f5N6JuoPH8QODL+gPAAYLQtNd9diZk6G7NS6jldrQ1jdjLXdmK7uXh+UD1SbsL/SfLZ74Hv8veo4QxrR5i40/2e8d0Y/CiMCiGs4fmxhy+Sh+IeU1hLUfIIebImP1CZDW7kqpVTsa3pRNYu1U2Kjs=
+	t=1712713222; cv=none; b=ikLIZ6s66K7dGNR4/vp+UjxcUaPL6yDzmZh/IL/gNShJ+Ikg0dVrb3nhIl1FIWd8Qi228HtgZeWDwshG4QhQbrZstL0F/QaXxZuEOcCa0UFZueLcDjD12wNleZQRFlxzhcYd7wAadcgQiYa1aDse4oNy44AL7BpWdStsNug7KLI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712712848; c=relaxed/simple;
-	bh=DqEyzDB6gA9tY2cLBHY0HaJ2TcbP4Rj1/3pQs/AVjDY=;
+	s=arc-20240116; t=1712713222; c=relaxed/simple;
+	bh=cL1meAldF9lys+VQ+fiked9/RI+8Snr6xCIact96PqU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gVqx98oCzTf4VKpXoEscwvilUEko8VvxbFX9t3MSPFmhoY9MHRsWsjjySyULpVEJ0j/krIOGOa/B+2nm/jzxuNWJIrxg7NN9v2t+KFYhVoBTKAKnLBYlJorXptzo3I0Z2cjjcIfXa9KN24WBb9/Zkc7iF/etoI3MZhrd1pzuKq8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cGaVed5+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03DCFC433F1;
-	Wed, 10 Apr 2024 01:34:05 +0000 (UTC)
+	 MIME-Version:Content-Type; b=CrdbSWEuB5K145yT2vUMBCeVvQLl3iOj+TtNhkAQBGEu7NXwpSEc9IFN333PcXbH2qxchmJSxqx2M1DXnwwlGz9yhMRcClydcJXaL6EinBEJrHuLWiXfo07dvsAIq7h0kY9JFjLyJEQFOj7JrSZuE33zp182cIy+jB/0/fkmh2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MRUkRKNw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB0A8C433F1;
+	Wed, 10 Apr 2024 01:40:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712712847;
-	bh=DqEyzDB6gA9tY2cLBHY0HaJ2TcbP4Rj1/3pQs/AVjDY=;
+	s=k20201202; t=1712713222;
+	bh=cL1meAldF9lys+VQ+fiked9/RI+8Snr6xCIact96PqU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cGaVed5+yN7xmkmbHJVfElRpnFUDSFbABfqVWya2USmjMjKEmBJh5A+s0Sm5J5PVE
-	 7uuAeJ6v9qqvRo5Ac43XM2HQqpk7FaeJFsC3W4scazZHmI2OEfZBWeNoem+I5nWSNF
-	 9Pobqaw9ShSFnL2Bb7GbaXUjvJ9xbqJtjlls3NdHfj0PaqmoYu9ovNHemu8W4q8ICw
-	 zKymKoS8f5WjJphpOZFTZmqDgugBL9r4ggGRd17rn787M6se9cNEd3PW/NBzksRI5p
-	 IOWp3Sh3SvTViEXjsqiKPFiKe9XJBvC7CPm1anTc7uiC9Xva5F/ZPkT4wW+DSQuUiT
-	 k853Gh/qEOTAA==
-Date: Tue, 9 Apr 2024 18:34:04 -0700
+	b=MRUkRKNw25gvh5rP8IRcbq/JG7dw9Eam5R1mAJEbtzG2z564AFcH3FziPKU/2wRrP
+	 q5+lA+gRdcQuYtJxWrXMmMqxm/RtEYPeUBhNl9+lGd+gvggXWtAmD2GnAvPGPRNGkg
+	 5ilCeqfetgTMJKRvnAUqMpn3XxwbKCbJvu9zx7ttfueD6jtWrUH0s5uxKaxR8ZFcc+
+	 5oDEDwVCy1gPZ4NT4/0jcWXOzbmP2HFRYWIGjOVzYTKj/pEbKaAGgkEwn2E9T8+gRr
+	 XrVHVzRMmMUexjW2tSEwIJZZGD3lbvJBJyrd58d1quIZJWasJQa2XQYgdAu36ICs96
+	 t/K2+z1n9h62g==
+Date: Tue, 9 Apr 2024 18:40:20 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
- <robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Geert Uytterhoeven
- <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, Alexandre
- Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, Russell King
- <linux@armlinux.org.uk>, =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?=
- <clement.leger@bootlin.com>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, "Russell King (Oracle)"
- <rmk+kernel@armlinux.org.uk>, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v2 3/5] net: stmmac: dwmac-socfpga: use
- pcs_init/pcs_exit
-Message-ID: <20240409183404.7d3eb04f@kernel.org>
-In-Reply-To: <20240409-rzn1-gmac1-v2-3-79ca45f2fc79@bootlin.com>
-References: <20240409-rzn1-gmac1-v2-0-79ca45f2fc79@bootlin.com>
-	<20240409-rzn1-gmac1-v2-3-79ca45f2fc79@bootlin.com>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Ratheesh Kannoth <rkannoth@marvell.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v5 4/4] virtio-net: support dim profile
+ fine-tuning
+Message-ID: <20240409184020.648bc93c@kernel.org>
+In-Reply-To: <1712664204-83147-5-git-send-email-hengqi@linux.alibaba.com>
+References: <1712664204-83147-1-git-send-email-hengqi@linux.alibaba.com>
+	<1712664204-83147-5-git-send-email-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,17 +65,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 09 Apr 2024 11:21:46 +0200 Romain Gantois wrote:
-> +	struct regmap_config pcs_regmap_cfg = {
-> +		.reg_bits = 16,
-> +		.val_bits = 16,
-> +		.reg_shift = regmap_upshift(1),
+On Tue,  9 Apr 2024 20:03:24 +0800 Heng Qi wrote:
+> +	/* DIM profile list */
+> +	struct dim_cq_moder rx_eqe_conf[NET_DIM_PARAMS_NUM_PROFILES];
 
-This appears to displease the compiler:
+Can you please wrap this into a structure with other necessary
+information and add a pointer in struct net_device instead.
 
-drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c:389:16: error: call to undeclared function 'regmap_upshift'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-  389 |                 .reg_shift = regmap_upshift(1),
-      |                              ^
--- 
-pw-bot: cr
+What's the point of every single driver implementing the same
+boilerplate memcpy() in its get_coalesce / set_coalesce callbacks?
 
