@@ -1,191 +1,236 @@
-Return-Path: <netdev+bounces-86661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C275E89FBE3
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 17:42:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00A9C89FBF6
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 17:51:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36FA01F2212E
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:42:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 239A91C210AE
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9743316EC1F;
-	Wed, 10 Apr 2024 15:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC92416F0E1;
+	Wed, 10 Apr 2024 15:50:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QooDu5VM"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="oHsAoTPK";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="ECoKpZFI";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="a2AYrdSz";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="n+1c2hTh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC43816EC1D;
-	Wed, 10 Apr 2024 15:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABAD016F0D3;
+	Wed, 10 Apr 2024 15:50:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712763739; cv=none; b=TDLufEM0UAXOS8i6UtKOVJchMLPPTZBNELLS5T135xtIdCU/UrQNVwfzDVF/ZbBO99Xa8LhUneA+j90FeueVzJEi6SIwXf8x/+slmQEGwUkaVJesSGgFGA/YgPbZC7mU5P5DI1YBhc1+hPQS/KkyVSFSV50cd7IgP58vC7SR2kw=
+	t=1712764259; cv=none; b=dJda54f0LJvk/1AqNymVaMJbKhn0/aP15XlghW0w6bc8slsrwHB3Z/54l9BOoP5S1XRwJxZFvXWJIvkhqWnLpSCauuDap0bLYduozVfupzK2EIFahLAeusAs/O/b6oh/GHSwePX9yMwXH2GNOLGUjQ7jCqFBxmGw7UkFJS5nqQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712763739; c=relaxed/simple;
-	bh=bIYuIMobN4c7QVS8/DFCKFrNDf/uvx+QUbwB6/Ik8qs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=o4eyv+G0nDa6pUyA2uKvJgTcHju6bZZpZZgCBS0BC40bGZQ3q9iXQ/eCaZ8TElHpJUdBnhVOpqsdbGZ0mfCZwD/W/Vg4JVVGuNXC29xDSdNrlhKLEaNpzHaf7VcgVixKhAu2cUuEv45AAVnZsl3CK50Z9AsIwAr5hpKRnZkb71Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QooDu5VM; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-78d62c1e82bso261365385a.3;
-        Wed, 10 Apr 2024 08:42:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712763737; x=1713368537; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8zRUuA7h1m8dPrK2eFWYrvmvpUZ/gqDhSGLftQ4YK8M=;
-        b=QooDu5VM3QlNarMMplZotesJrGOPI4rIXkXlQsF7HJSK8IEEobT+NHGTt7bP2PL2AN
-         SMFBIMahgMEhy0EH+hrZYGs1pSmrH1uyQvPydtUq2/DZO1Xzo2O7vQH/26HBxZGb4PCY
-         CedXd8d2HdhFiOrMsB+Vbtouk2qHj6hpvVqBxCu17cp/BmfMUhkYcDRbrYPgZVyui5Zb
-         L47Gn6tWMoXgBwmFjjE0RpFaQg806vETNzM7E4HTvn7LPcqwbwafsXnaf2vNkrXmKZwA
-         ecUua4VvLZMj5VZzTY/67tC+A5pEKlg1UJ49nzvy4AmmRTEb3TUlxl204eJ8ilLa4aPP
-         Jbnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712763737; x=1713368537;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=8zRUuA7h1m8dPrK2eFWYrvmvpUZ/gqDhSGLftQ4YK8M=;
-        b=hn+fK/9NOj3W4Z61R8i8gsAWcuHP4bSzlvZjuff07/092nZhaksfv2fTtw/GTYWERB
-         BRYPxUhmvxG7RRubhF9swVWF/UBqBEOOOJYs9IzmRKd51q9mljJDhGn4CtE/e/Ybl8dz
-         Jb/rttX9tWCPsmZ1Moxx76bui3h5V+IpRP0bviGr12IlvtZUTrfQhZNDQm1CS7av78xu
-         dGULFu4zufEPcmukB2B903u7a2inKbz+dUFTgEsGn4JF8Etl6Kihm36B1rU/SYrTqxGh
-         /kDBQEXrMPnVSh/klMuSeJh1KNeNBxiVKRuGMyzcr9xfq0udx5CaaR2JLzMtMAmc0dAs
-         8QQA==
-X-Forwarded-Encrypted: i=1; AJvYcCWXBUzwNbbB7bNPVhiM8O2Z+jVcWzHMSYHbO5orID1b7x62nbtH29emu0OoubMf4yqTp9RKpBsngkkPKcrnUCw21Ldw3oQYCmP6+o1sdjltaS+jyPxDTP0PxvLl4ffJO1Ubrx49e+sEKRkZceY5zrug1zFav7/VE3GD
-X-Gm-Message-State: AOJu0YzU49awHomh0+/zp952N3Ygos56H7ADun9nFLwK06DJO5C1OGcA
-	8LNNZ7ZI4D5ucwcyDniN/O00SDypuzwMM+11sxH+SH86A3PrBjf9
-X-Google-Smtp-Source: AGHT+IEZhcmcOP0DfRYpnTQkbaXNlRT9QT3bt6hOGI8ZueLGbjAPe/HOaEXcim4f/379gTUyPzra7A==
-X-Received: by 2002:a05:620a:1035:b0:78b:c6c4:a6c8 with SMTP id a21-20020a05620a103500b0078bc6c4a6c8mr2699168qkk.5.1712763736648;
-        Wed, 10 Apr 2024 08:42:16 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id c19-20020a05620a135300b0078d5ef01b24sm4053408qkl.25.2024.04.10.08.42.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 08:42:16 -0700 (PDT)
-Date: Wed, 10 Apr 2024 11:42:16 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Andrew Halaney <ahalaney@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Martin KaFai Lau <martin.lau@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- bpf <bpf@vger.kernel.org>
-Cc: kernel@quicinc.com
-Message-ID: <6616b3587520_2a98a5294db@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240409210547.3815806-4-quic_abchauha@quicinc.com>
-References: <20240409210547.3815806-1-quic_abchauha@quicinc.com>
- <20240409210547.3815806-4-quic_abchauha@quicinc.com>
-Subject: Re: [RFC PATCH bpf-next v1 3/3] net: Add additional bit to support
- userspace timestamp type
+	s=arc-20240116; t=1712764259; c=relaxed/simple;
+	bh=zGQjLRmM45xekVuPgxU61HGT3IKhpvxhc6cgzcmWg8I=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Nv5gb1B9O9CYnz0cFeRRUPu4KnhClAotI4BO7Yup7Z2sm1D30qLSRTC30jkyTURq4+TULdgxDivVZnmGe1TJNw1kW5Tpfzyuueg9c+/uBQMVzMzSK7//QRDe6KQRoDZE1ciL+Zh83iDAwXLxCle6+86zoAAfGlR49HMZ2DJrAdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=oHsAoTPK; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=ECoKpZFI; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=a2AYrdSz; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=n+1c2hTh; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from samweis (unknown [10.149.211.110])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 5614C1FD5F;
+	Wed, 10 Apr 2024 15:50:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1712764255; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XtETN3PS+VSk6rdHRuNMQoI0cUP1QTlqtnnmWlmHTiY=;
+	b=oHsAoTPKc49GOLSh5MHgHbxSfL2JEvifAE4ja+JHBCes/WOCol74PUc9LFlfBpovICPrTa
+	ruo0vhlKqtlJoDRC6maz427mRLGZ43FGYi/kY3b3m9HBLyYzKHFx7zirQZwAgP2WKBWO40
+	Jpk4ovhgKWdM9cG2bTMO/Yd53QDd/Eo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1712764255;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XtETN3PS+VSk6rdHRuNMQoI0cUP1QTlqtnnmWlmHTiY=;
+	b=ECoKpZFIn2Bp6BR1ZCuL1JmE/DT9FeRbEwNL0t23nB43mH/Zc3Wpv+Bu7v+/+a5FaNNcuN
+	E42cFv2k96r7tWCw==
+Authentication-Results: smtp-out2.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1712764254; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XtETN3PS+VSk6rdHRuNMQoI0cUP1QTlqtnnmWlmHTiY=;
+	b=a2AYrdSzkmjxIgf1WZJEqRzc++ZK/p1UkDkls+3xmBYi6O3eU+aMoih0zKbwl1jtUie0Hf
+	5BOFnWHiTyj1cRfGxzVBgMuuDsFK2JvDs2oZP6UXDfoOrM2mtdPH1LlX8wtJjjPDWuSRjh
+	n+4PdbDsikW6p8x3X/zeu01nY+ilhW8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1712764254;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XtETN3PS+VSk6rdHRuNMQoI0cUP1QTlqtnnmWlmHTiY=;
+	b=n+1c2hThd42yPTShdw3o0csV7hK61V4DWeIhaRzklaNJYTvoF1r+Aq3z/BiF0Kf9f2Vq9e
+	7wiVAdO8VM5nz8AQ==
+Date: Wed, 10 Apr 2024 17:50:52 +0200
+From: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+To: Jay Vosburgh <jay.vosburgh@canonical.com>
+Cc: Andy Gospodarek <andy@greyhouse.net>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] bonding: 802.3ad: Avoid packet loss when switching
+ aggregator
+Message-ID: <20240410175052.25ac7638@samweis>
+In-Reply-To: <21529.1712592371@famine>
+References: <20240404114908.134034-1-tbogendoerfer@suse.de>
+	<21529.1712592371@famine>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.34; x86_64-suse-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Level: 
+X-Spamd-Result: default: False [-3.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	RCVD_COUNT_ZERO(0.00)[0];
+	ARC_NA(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[8];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[canonical.com:email,samweis:helo,suse.de:email]
+X-Spam-Score: -3.80
+X-Spam-Flag: NO
 
-Abhishek Chauhan wrote:
-> tstamp_type can be real, mono or userspace timestamp.
-> 
-> This commit adds userspace timestamp and sets it if there is
-> valid transmit_time available in socket coming from userspace.
-> 
-> To make the design scalable for future needs this commit bring in
-> the change to extend the tstamp_type:1 to tstamp_type:2 to support
-> userspace timestamp.
-> 
-> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
-> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
-> ---
->  include/linux/skbuff.h | 19 +++++++++++++++++--
->  net/ipv4/ip_output.c   |  2 +-
->  net/ipv4/raw.c         |  2 +-
->  net/ipv6/ip6_output.c  |  2 +-
->  net/ipv6/raw.c         |  2 +-
->  net/packet/af_packet.c |  6 +++---
->  6 files changed, 24 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 6160185f0fe0..2f91a8a2157a 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -705,6 +705,9 @@ typedef unsigned char *sk_buff_data_t;
->  enum skb_tstamp_type {
->  	SKB_TSTAMP_TYPE_RX_REAL = 0,    /* A RX (receive) time in real */
->  	SKB_TSTAMP_TYPE_TX_MONO = 1,    /* A TX (delivery) time in mono */
-> +	SKB_TSTAMP_TYPE_TX_USER = 2,    /* A TX (delivery) time and its clock
-> +									 * is in skb->sk->sk_clockid.
-> +									 */
+On Mon, 08 Apr 2024 09:06:11 -0700
+Jay Vosburgh <jay.vosburgh@canonical.com> wrote:
 
-Weird indentation?
+> Thomas Bogendoerfer <tbogendoerfer@suse.de> wrote:
+>=20
+> >If selection logic decides to switch to a new aggregator it disables
+> >all ports of the old aggregator, but doesn't enable ports on
+> >the new aggregator. These ports will eventually be enabled when
+> >the next LACPDU is received, which might take some time and without an
+> >active port transmitted frames are dropped. Avoid this by enabling
+> >already collected ports of the new aggregator immediately.
+> >
+> >Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+> >---
+> > drivers/net/bonding/bond_3ad.c | 7 +++++++
+> > 1 file changed, 7 insertions(+)
+> >
+> >diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3=
+ad.c
+> >index c6807e473ab7..529e2a7c51e2 100644
+> >--- a/drivers/net/bonding/bond_3ad.c
+> >+++ b/drivers/net/bonding/bond_3ad.c
+> >@@ -1876,6 +1876,13 @@ static void ad_agg_selection_logic(struct aggrega=
+tor *agg,
+> > 				__disable_port(port);
+> > 			}
+> > 		}
+> >+
+> >+		/* enable ports on new active aggregator */
+> >+		for (port =3D best->lag_ports; port;
+> >+			port =3D port->next_port_in_aggregator) {
+> >+			__enable_port(port);
+> >+		}
+> >+ =20
+>=20
+> 	I think this will do the wrong thing if the port in question is
+> not in a valid state to send or receive (i.e., it is not one of
+> COLLECTING_DISTRIBUTING, COLLECTING, or DISTRIBUTING).
+>=20
+>=20
+> 	As it happens, this situation, except for the case of individual
+> ports, is handled just below this code:
+>=20
+> 	/* if the selected aggregator is of join individuals
+> 	 * (partner_system is NULL), enable their ports
+> 	 */
+> 	active =3D __get_active_agg(origin);
+>=20
+> 	if (active) {
+> 		if (!__agg_has_partner(active)) {
+> 			for (port =3D active->lag_ports; port;
+> 			     port =3D port->next_port_in_aggregator) {
+> 				__enable_port(port);
+> 			}
+> 			*update_slave_arr =3D true;
+> 		}
+> 	}
+>=20
+> 	rcu_read_unlock();
+>=20
+> 	FWIW, looking at it, I'm not sure that "__agg_has_partner" is
+> the proper test for invididual-ness, but I'd have to do a bit of poking
+> to confirm that.  In any event, that's not what you want to change right
+> now.
+>=20
+> 	Instead of adding another block that does more or less the same
+> thing, I'd suggest updating this logic to include tests for C_D, C, or D
+> states, and enabling the ports if that is the case.  Probably something
+> like (I have not tested or compiled this at all):
+>=20
+> 	if (active) {
+> 		if (!__agg_has_partner(active)) {
+> 			[ ... the current !__agg_has_partner() stuff ]
+> 		} else {
 
-More fundamentally: instead of defining a type TX_USER, can we use a
-real clockid (e.g., CLOCK_TAI) based on skb->sk->sk_clockid? Rather
-than store an id that means "go look at sk_clockid".
+moving it here will run this part on every call of ad_agg_selection_logic(),
+but it would be only relevant, if there is a switch to a different aggregat=
+or.
 
->  };
->  
->  /**
-> @@ -830,6 +833,9 @@ enum skb_tstamp_type {
->   *		delivery_time in mono clock base (i.e. EDT).  Otherwise, the
->   *		skb->tstamp has the (rcv) timestamp at ingress and
->   *		delivery_time at egress.
-> + *		delivery_time in mono clock base (i.e., EDT) or a clock base chosen
-> + *		by SO_TXTIME. If zero, skb->tstamp has the (rcv) timestamp at
-> + *		ingress.
->   *	@napi_id: id of the NAPI struct this skb came from
->   *	@sender_cpu: (aka @napi_id) source CPU in XPS
->   *	@alloc_cpu: CPU which did the skb allocation.
-> @@ -960,7 +966,7 @@ struct sk_buff {
->  	/* private: */
->  	__u8			__mono_tc_offset[0];
->  	/* public: */
-> -	__u8			tstamp_type:1;	/* See SKB_MONO_DELIVERY_TIME_MASK */
-> +	__u8			tstamp_type:2;	/* See SKB_MONO_DELIVERY_TIME_MASK */
->  #ifdef CONFIG_NET_XGRESS
->  	__u8			tc_at_ingress:1;	/* See TC_AT_INGRESS_MASK */
->  	__u8			tc_skip_classify:1;
+> 			for (port =3D active->lag_ports; port;
+> 			     port =3D port->next_port_in_aggregator) {
+> 				switch (port->sm_mux_state) {
+> 				case AD_MUX_DISTRIBUTING:
+> 				case AD_MUX_COLLECTING_DISTRIBUTING:
+> 					ad_enable_collecting_distributing(port,
+> 							update_slave_arr);
+> 					port->ntt =3D true;
+> 					break;
+> 				case AD_MUX_COLLECTING:
+> 					ad_enable_collecting(port);
+> 					ad_disable_distributing(port, update_slave_arr);
+> 					port->ntt =3D true;
+> 					break;
+> 				default:
+> 					break;
+> 		}
 
-With pahole, does this have an effect on sk_buff layout?
+I've tried this in my test environment and it doesn't fixed the issue
+I'm seeing, because the port of the new aggregator is still in AD_MUX_WAITI=
+NG...
 
-> @@ -4274,7 +4280,16 @@ static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
->  					enum skb_tstamp_type tstamp_type)
->  {
->  	skb->tstamp = kt;
-> -	skb->tstamp_type = kt && tstamp_type;
-> +
-> +	if (skb->tstamp_type)
-> +		return;
-> +
+The issue is that after bringing the bond up it happens that the bond link
+is up, but no slave can transmit. This happens exactly when the aggregator
+is changed due to timing of the received lacpdu. So if enabling the port
+in AD_MUX_WAITING is wrong, what are other ways to fix this problem ?
 
-Why bail if a type is already set? And what if
-skb->tstamp_type != tstamp_type? Should skb->tstamp then not be
-written to (i.e., the test moved up), and perhaps a rate limited
-warning.
+Thomas.
 
-> +	if (kt && tstamp_type == SKB_TSTAMP_TYPE_TX_MONO)
-> +		skb->tstamp_type = SKB_TSTAMP_TYPE_TX_MONO;
-> +
-> +	if (kt && tstamp_type == SKB_TSTAMP_TYPE_TX_USER)
-> +		skb->tstamp_type = SKB_TSTAMP_TYPE_TX_USER;
-
-Simpler
-
-    if (kt)
-        skb->tstamp_type = tstamp_type;
+--=20
+SUSE Software Solutions Germany GmbH
+HRB 36809 (AG N=C3=BCrnberg)
+Gesch=C3=A4ftsf=C3=BChrer: Ivo Totev, Andrew McDonald, Werner Knoblich
 
