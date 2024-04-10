@@ -1,136 +1,164 @@
-Return-Path: <netdev+bounces-86782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36ED68A0400
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:26:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7B3F8A040D
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:32:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE1DE1F21A92
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:26:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93E1A283801
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:32:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1515A376FE;
-	Wed, 10 Apr 2024 23:26:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D1938F84;
+	Wed, 10 Apr 2024 23:32:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Va+Qlm+5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IGqugmpE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CDA29CFE
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 23:26:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 233251D558
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 23:32:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712791571; cv=none; b=rd9Msflfl4urvLtEM4+69vFlwOBHNVDAEWmr50xl3IcMrA4WsoL6IVg3wSzVDOF4yCdeZnFsPo69X9QPmbD6fK7z9uCfEdKxU9d4hBOwfwCegfMSjEmeITOWa+udq6DwU4v/sTo61/LE8fwcEq9dqu3II8kpzdbh29yXhh0KwSM=
+	t=1712791947; cv=none; b=fk7qZfcBWyDoXSCnGQz4uHmL0u2PkVQGENY/S2tOsdv+Tm1FSkVXkNzISReU81PY9zARgbbM8ejiz8GZJlIxYad2/fZtDjmZU5hFHrNYMumFMX8w3PGjPmt4OF2CAGxMue6VSueKR3ahQuRB7QVPHUdndCe2xpAmBMM1Qr60EMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712791571; c=relaxed/simple;
-	bh=6bECfZivveGXwjc0wz2UlMqxN5Fu6aMgKDLIjMEVkeI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NkmOBEk1BwB+/8BkTbarUHA3mlwnwvuMOcgp/P+V84s6o9HvGFPiocfHvUmfh+7VptCcAkzt2nQw1CvBNLDLW63IQ0YgiAKSebX+uCc2MvkdGTb4in5IyMXz22RljslkaByEOAA4M+XkH5MGmyuU26dnaHBR6r1OWb1FduCqMvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Va+Qlm+5; arc=none smtp.client-ip=95.215.58.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <fcdf6dc6-81ff-48b8-822b-80c097efc07d@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1712791564;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=tRA6/DFmK/DJmNTAFNW2xE1W38sOhbq7XMudIRt8ihs=;
-	b=Va+Qlm+515KjcFBzYljKyDI9a7OtxhslpQ7SCXUQrXWPNmJ2MeRhfsO4Y1YG9QWHJwkl5T
-	YjvrFFXb5n5JQj/wScwLuRr7vpe9OqGLs2TdrTzYZkxU5LECaqHEzoNuOqXIbjBjKdLFav
-	DnKEyl/TQyRlVIkVNoRbmSsz9FOINjM=
-Date: Wed, 10 Apr 2024 16:25:57 -0700
+	s=arc-20240116; t=1712791947; c=relaxed/simple;
+	bh=Fc2hLqX63xlbcdaJXOigdJMMNQstlz/z4zSiMSVrR0s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cM6hjE8MbivHgKqN4Cwe46H76Aod7ZmPIDy8h3RlMwgrJrfQEiz7/T14t4VCl7ayLEkiTK3RvXMD8YTFDOLptHoRwA05fSB+XZ7lG6ApqUh7X4CtmWDmUBee5d4E2y+zk3lvrSUQLKJIvMuV7oRXnTTGTtx4TY1lI2Waej3CLDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IGqugmpE; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-343d7ff2350so3982710f8f.0
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 16:32:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712791944; x=1713396744; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Nmv4cD/w/9Q5B/IjxZ5dwRtRn51HPLqgDxJVdTLPneA=;
+        b=IGqugmpEiXoMdcS76rwPRRrznjWTAiJtHkbVEgGHGjsKmOAl2oWn0x1xmFHhO+rYfY
+         WbaqShDCf/sPj5MOWjBqyFHuIVKCRa1rG1NxOH3zxoh68ZfUiK8KS8sml0mCWLJ244ee
+         lT+xwnD7eUhHJORK3/U4eRXoj8woFCyf8nwR156ArixM5UXeWZMAP/UeYk2gf3vbJq+i
+         jRgWU/qbFAB8mld9CRLZxbbSQVjTN02Y5uK/NfZl1CV+yQ7NYugWLi2B+V71q4ec6BZy
+         1eFHhbutuxwORjp3BW0JfQfvF4CQ7VF3dQZwrCu/qefRXUyQeddlfsxJYfLOsuy069gt
+         pyQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712791944; x=1713396744;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Nmv4cD/w/9Q5B/IjxZ5dwRtRn51HPLqgDxJVdTLPneA=;
+        b=p/vA9pZ3O99SM7EoNOjajXraUKaz+PYeC4IM1JBNWiFe89jtmPKdrOA+Ra/Izeoh+M
+         Pl+7UAWzRoPxCizQndv0J7apuz9XyEWzLrXhwsn6uxmvBwyMb8i9b4T57bmdNr4VVDas
+         kUiM1pQ3KjbVFkxTnxBoSBMxM3vc5tqKapTEwwxxnzE6FjcnG4EfOH9LdawrEzM8bW3p
+         Rv2HoCku5pjsqEzALEtKQaCDumae8FUr9FI3QlkDOZaAkhzag/URuC86yoD0c0HjsLl6
+         zaIwArsk5hiInGS0+jAM01l4+j0cJSNPXAgXnyiyT9oly1uzRbXwBIuosz1Xx5X1XOvy
+         gbNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXi8rg2/Ur5t4A5bHid0+FlZjDo+XZ2ADEi3/is88tZW1cmlY9akUQ5QBC9KiK0HA/LpDvbgnp6DMgtIAJVSQyuEr+j/nLT
+X-Gm-Message-State: AOJu0YzhFkjHZj1hitNb897d/w07E/6ooq4iiu86osVH/m2V8EWSb8aW
+	u1mGp58XOEL6JGcH+iGUGilVOIE8FJxjqnTF/FNg7U3pvdgHGx34
+X-Google-Smtp-Source: AGHT+IFybtOO2EQHlZTOCXt0BXDVd+iBXQ00knscVZ18qYaV0Q9OPsUKYcVY/NKNKp7LVnyeyweVZQ==
+X-Received: by 2002:adf:f703:0:b0:343:742c:6a57 with SMTP id r3-20020adff703000000b00343742c6a57mr3090398wrp.35.1712791944290;
+        Wed, 10 Apr 2024 16:32:24 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d201:1f00::b2c])
+        by smtp.gmail.com with ESMTPSA id fc18-20020a05600c525200b0041563096e15sm3771067wmb.5.2024.04.10.16.32.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 16:32:23 -0700 (PDT)
+Date: Thu, 11 Apr 2024 02:32:21 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Gregory Clement <gregory.clement@bootlin.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v4 4/8] net: Add helpers for netdev LEDs
+Message-ID: <20240410233221.ntpxm7hfjiwod32u@skbuf>
+References: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-0-eb97665e7f96@lunn.ch>
+ <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-4-eb97665e7f96@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH bpf-next v1 3/3] net: Add additional bit to support
- userspace timestamp type
-To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Andrew Halaney <ahalaney@redhat.com>,
- Martin KaFai Lau <martin.lau@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>,
- kernel@quicinc.com
-References: <20240409210547.3815806-1-quic_abchauha@quicinc.com>
- <20240409210547.3815806-4-quic_abchauha@quicinc.com>
- <6616b3587520_2a98a5294db@willemb.c.googlers.com.notmuch>
- <f28de1e7-4a9b-4a97-b4f9-723425725b58@quicinc.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <f28de1e7-4a9b-4a97-b4f9-723425725b58@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-4-eb97665e7f96@lunn.ch>
 
-On 4/10/24 1:25 PM, Abhishek Chauhan (ABC) wrote:
->>> @@ -830,6 +833,9 @@ enum skb_tstamp_type {
->>>    *		delivery_time in mono clock base (i.e. EDT).  Otherwise, the
->>>    *		skb->tstamp has the (rcv) timestamp at ingress and
->>>    *		delivery_time at egress.
->>> + *		delivery_time in mono clock base (i.e., EDT) or a clock base chosen
->>> + *		by SO_TXTIME. If zero, skb->tstamp has the (rcv) timestamp at
->>> + *		ingress.
->>>    *	@napi_id: id of the NAPI struct this skb came from
->>>    *	@sender_cpu: (aka @napi_id) source CPU in XPS
->>>    *	@alloc_cpu: CPU which did the skb allocation.
->>> @@ -960,7 +966,7 @@ struct sk_buff {
->>>   	/* private: */
->>>   	__u8			__mono_tc_offset[0];
->>>   	/* public: */
->>> -	__u8			tstamp_type:1;	/* See SKB_MONO_DELIVERY_TIME_MASK */
->>> +	__u8			tstamp_type:2;	/* See SKB_MONO_DELIVERY_TIME_MASK */
->>>   #ifdef CONFIG_NET_XGRESS
->>>   	__u8			tc_at_ingress:1;	/* See TC_AT_INGRESS_MASK */
+On Sat, Apr 06, 2024 at 03:13:31PM -0500, Andrew Lunn wrote:
+> +/**
+> + * netdev_leds_setup - Parse DT node and create LEDs for netdev
+> + *
+> + * @ndev: struct netdev for the MAC
+> + * @np: ethernet-node in device tree
+> + * @list: list to add LEDs to
+> + * @ops: structure of ops to manipulate the LED.
+> + * @max_leds: maximum number of LEDs support by netdev.
+> + *
+> + * Parse the device tree node, as described in
+> + * ethernet-controller.yaml, and find any LEDs. For each LED found,
+> + * ensure the reg value is less than max_leds, create an LED and
+> + * register it with the LED subsystem. The LED will be added to the
+> + * list, which should be unique to the netdev. The ops structure
+> + * contains the callbacks needed to control the LEDs.
+> + *
+> + * Return 0 in success, otherwise an negative error code.
+> + */
+> +int netdev_leds_setup(struct net_device *ndev, struct device_node *np,
+> +		      struct list_head *list, struct netdev_leds_ops *ops,
+> +		      int max_leds)
+> +{
+> +	struct device_node *leds, *led;
+> +	int err;
+> +
+> +	leds = of_get_child_by_name(np, "leds");
+> +	if (!leds)
+> +		return 0;
+> +
+> +	for_each_available_child_of_node(leds, led) {
+> +		err = netdev_led_setup(ndev, led, list, ops, max_leds);
+> +		if (err) {
+> +			of_node_put(leds);
+> +			of_node_put(led);
+> +			return err;
+> +		}
+> +	}
+> +	of_node_put(leds);
+> +
+> +	return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(netdev_leds_setup);
+> +
+> +/**
+> + * netdev_leds_teardown - Remove LEDs for a netdev
+> + *
+> + * @list: list to add LEDs to teardown
+> + *
+> + * Unregister all LEDs from the given list of LEDS, freeing up any
+> + * allocated memory.
+> + */
+> +void netdev_leds_teardown(struct list_head *list)
+> +{
+> +	struct netdev_led *netdev_led;
+> +	struct led_classdev *cdev;
+> +
+> +	list_for_each_entry(netdev_led, list, led_list) {
 
-The above "tstamp_type:2" change shifted the tc_at_ingress bit.
-TC_AT_INGRESS_MASK needs to be adjusted.
+list_for_each_entry_safe(), since there is a kfree() inside.
 
->>>   	__u8			tc_skip_classify:1;
->>
->> With pahole, does this have an effect on sk_buff layout?
->>
-> I think it does and it also impacts BPF testing. Hence in my cover letter i have mentioned that these
-> changes will impact BPF. My level of expertise is very limited to BPF hence the reason for RFC.
-> That being said i am actually trying to understand/learn BPF instructions to know things better.
-> I think we need to also change the offset SKB_MONO_DELIVERY_TIME_MASK and TC_AT_INGRESS_MASK
+> +		cdev = &netdev_led->led_cdev;
+> +		led_classdev_unregister(cdev);
+> +		kfree(netdev_led);
+> +	}
+> +}
+> +EXPORT_SYMBOL_GPL(netdev_leds_teardown);
 > 
+> -- 
+> 2.43.0
 > 
-> #ifdef __BIG_ENDIAN_BITFIELD
-> #define SKB_MONO_DELIVERY_TIME_MASK	(1 << 7) //Suspecting changes here too
-> #define TC_AT_INGRESS_MASK		(1 << 6) // and here
-> #else
-> #define SKB_MONO_DELIVERY_TIME_MASK	(1 << 0)
-> #define TC_AT_INGRESS_MASK		(1 << 1) (this might have to change to 1<<2 )
-
-This should be (1 << 2) now. Similar adjustment for the big endian.
-
-> #endif
-> #define SKB_BF_MONO_TC_OFFSET		offsetof(struct sk_buff, __mono_tc_offset)
-> 
-> Also i suspect i change in /selftests/bpf/prog_tests/ctx_rewrite.c
-
-ctx_rewrite.c tests the bpf ctx rewrite code. In this particular case, it tests
-the bpf_convert_tstamp_read() and bpf_convert_tstamp_write() generate the
-correct bpf instructions.
-e.g. "w11 &= 3;" is testing the following in bpf_convert_tstamp_read():
-		*insn++ = BPF_ALU32_IMM(BPF_AND, tmp_reg,
-	 				TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK);
-
-The existing "TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK" is 0x3
-and it should become 0x5 if my hand counts correctly.
-
-The patch set cannot be applied to the bpf-next:
-https://patchwork.kernel.org/project/netdevbpf/patch/20240409210547.3815806-4-quic_abchauha@quicinc.com/
-, so bpf CI cannot run to reproduce the issue.
-
 
