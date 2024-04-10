@@ -1,185 +1,118 @@
-Return-Path: <netdev+bounces-86413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43FD689EAEE
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:34:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ED2289EB14
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:42:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 759111C20FD3
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 06:34:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A370D1F251D6
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 06:42:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B54F820312;
-	Wed, 10 Apr 2024 06:34:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D0291773D;
+	Wed, 10 Apr 2024 06:42:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4F5A2030B
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 06:34:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE784282F0
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 06:42:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712730857; cv=none; b=VaTZ2CDQEpIWiCW96Uq0mNTDp/70Sig7NNoLH1hYKaE7+fUhcXjZNsnTfKH3Tiwks6tg8Vpq1sJvfyUvogEvf3mcKak6ytm8libYambOwZQiBEdFsqQePU91BBJL/EZ5s2XzjtY6FI1NEl+6M59O8JwGXTDpYB8TdfruB+SHwso=
+	t=1712731340; cv=none; b=GH+K5xz9M9db92ZD2gGiGsdOivCzthw83FCK/AEGN5a6vKjbzW+TqMAsmrOBylmDzrxvUZ0dZd1d/3zBkwOOtno3kdcROITLic7a/qOToq+vH3yqyfEsyu8GOdqnYvCa97e8Iv0PF9FguAUaDB1rlVMdLw+PH7CmYCpkZOKUcEk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712730857; c=relaxed/simple;
-	bh=L8qUFpUH7Renm5tiH9WqQL0bEhl/mJAzS7iP1fS8R1U=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=eT2V4yL22VSq3RWC61/vB5nxeJ7mtuorpHAMdgpQuYGkA4gdxHWHZd6Vo2EG/ALtm1bOeSBTHaNSNp1axhuXwUbpzmbvuGwqb3JrWORMJCffAQApNnyurYYcGuTNIJjCBJOVhtCp0CxAQAFrR1T3LRAoRHhZQpyw61dqUviTq1Q=
+	s=arc-20240116; t=1712731340; c=relaxed/simple;
+	bh=Cs3AN10fbloFb5LwNxDZICKSsWcJTWJYVX+QSmCObYM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NMEPQmX8jCC2QncevYIK+k5SiWWznQPU2xRxJE2oqEKS65uPzMsunCp0xBxmtMbDk0YdIE/IzPbot1bsiD5DTB7MWUdCqUmBzml9C8n2NuvwgTA9H8r6aEuudxEx6Ydw7XHh56iZ+npDj7I5d8hc0oR6eM7Wyw6pVBCjLv3JRoo=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
 Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
-	(envelope-from <s.hauer@pengutronix.de>)
-	id 1ruRX0-0001d0-MD; Wed, 10 Apr 2024 08:34:02 +0200
-Received: from [2a0a:edc0:0:1101:1d::28] (helo=dude02.red.stw.pengutronix.de)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1ruReq-0007RM-FZ; Wed, 10 Apr 2024 08:42:08 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
-	(envelope-from <s.hauer@pengutronix.de>)
-	id 1ruRWy-00BRRq-U5; Wed, 10 Apr 2024 08:34:00 +0200
-Received: from localhost ([::1] helo=dude02.red.stw.pengutronix.de)
-	by dude02.red.stw.pengutronix.de with esmtp (Exim 4.96)
-	(envelope-from <s.hauer@pengutronix.de>)
-	id 1ruRWy-0057ls-2k;
-	Wed, 10 Apr 2024 08:34:00 +0200
-From: Sascha Hauer <s.hauer@pengutronix.de>
-Date: Wed, 10 Apr 2024 08:33:07 +0200
-Subject: [PATCH] tls: defer close to kernel task
+	(envelope-from <ukl@pengutronix.de>)
+	id 1ruReo-00BRVQ-DH; Wed, 10 Apr 2024 08:42:06 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1ruReo-00HOKB-0z;
+	Wed, 10 Apr 2024 08:42:06 +0200
+Date: Wed, 10 Apr 2024 08:42:06 +0200
+From: Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	linux-usb@vger.kernel.org, Li Yang <leoyang.li@nxp.com>, Zhang Wei <zw@zh-kernel.org>, 
+	kernel@pengutronix.de, netdev@vger.kernel.org, Shawn Guo <shawnguo@kernel.org>, 
+	linuxppc-dev@lists.ozlabs.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH] MAINTAINERS: Drop Li Yang as their email address stopped
+ working
+Message-ID: <u4bhjzjr4jjx26r3r4jupqd5u273xsvuyfzq5ecv6binoyoqzq@5zib23vgtlsx>
+References: <20240405072042.697182-2-u.kleine-koenig@pengutronix.de>
+ <20240409144204.00cc76ce@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240410-ktls-defer-close-v1-1-b59e6626b8e4@pengutronix.de>
-X-B4-Tracking: v=1; b=H4sIAKIyFmYC/x3MwQpAQBCA4VfRnE2NtRSvIgfWLBOhHUlp393m+
- B3+/wXlIKzQZi8EvkXl2BOKPAO3DPvMKFMyGDKWbEG4XpvixJ4Duu1QRiLTlLaq7UgNpOwM7OX
- 5l10f4wdE1IL9YgAAAA==
-To: Boris Pismenny <borisp@nvidia.com>, 
- John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Pavel Begunkov <asml.silence@gmail.com>, Jens Axboe <axboe@kernel.dk>, 
- kernel@pengutronix.de, Sascha Hauer <s.hauer@pengutronix.de>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1712730840; l=3347;
- i=s.hauer@pengutronix.de; s=20230412; h=from:subject:message-id;
- bh=L8qUFpUH7Renm5tiH9WqQL0bEhl/mJAzS7iP1fS8R1U=;
- b=ZWLnNgSyiZsCAzmR7gR76h5X3Eps1/swO+Yn89chwI9IWznsIqLFQWRoWpJdGL+f3VBXgiTT7
- Jiq7fXS28WAALdd6n/HyKZbwulGDbeoLWiE3Hpq0R45tvv2Rk3niDcl
-X-Developer-Key: i=s.hauer@pengutronix.de; a=ed25519;
- pk=4kuc9ocmECiBJKWxYgqyhtZOHj5AWi7+d0n/UjhkwTg=
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="qezoggtwtmgqqqvk"
+Content-Disposition: inline
+In-Reply-To: <20240409144204.00cc76ce@kernel.org>
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: s.hauer@pengutronix.de
+X-SA-Exim-Mail-From: ukl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-proto->close is normally called from a userspace task which can be
-interrupted by signals. When asynchronous encryption is used then KTLS
-sends out the final data at close time. When a signal comes in during
-close then it can happen tcp_sendmsg_locked() is interrupted by that
-signal while waiting for memory in sk_stream_wait_memory() which then
-returns with -ERSTARTSYS. It is not possible to recover from this situation
-and the final transmit data is lost.
 
-With this patch we defer the close operation to a kernel task which
-doesn't get signals.
+--qezoggtwtmgqqqvk
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The described situation happens when KTLS is used in conjunction with
-io_uring, as io_uring uses task_work_add() to add work to the current
-userspace task.
+On Tue, Apr 09, 2024 at 02:42:04PM -0700, Jakub Kicinski wrote:
+> On Fri,  5 Apr 2024 09:20:41 +0200 Uwe Kleine-K=F6nig wrote:
+> > When sending a patch to (among others) Li Yang the nxp MTA replied that
+> > the address doesn't exist and so the mail couldn't be delivered. The
+> > error code was 550, so at least technically that's not a temporal issue.
+> >=20
+> > Signed-off-by: Uwe Kleine-K=F6nig <u.kleine-koenig@pengutronix.de>
+>=20
+> FWIW it's eaac25d026a1 in net, thanks!
 
-The problem is discussed in [1] and [2] and the solution implemented in
-this patch is suggested by Pavel Begunkov here [3]
+Greg also picked it up, it's fbdd90334a6205e8a99d0bc2dfc738ee438f00bc in
+https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-linus
+=2E Both are included in next-20240410. I guess that's not a big problem.
+(And please prevent that the patch is dropped from both trees as it's
+already included in the other :-)
 
-[1] https://lore.kernel.org/all/20231010141932.GD3114228@pengutronix.de/
-[2] https://lore.kernel.org/all/20240315100159.3898944-1-s.hauer@pengutronix.de/
-[3] https://lore.kernel.org/all/bfc6afa9-501f-40b6-929a-3aa8c0298265@gmail.com
+Best regards
+Uwe
 
-Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
----
+--=20
+Pengutronix e.K.                           | Uwe Kleine-K=F6nig            |
+Industrial Linux Solutions                 | https://www.pengutronix.de/ |
 
-Note I only need this asynchronous close for the
-ctx->tx_conf == TLS_SW case. I can refactor the patch to only go
-asynchronous when necessary if that's desired.
----
- net/tls/tls_main.c | 37 +++++++++++++++++++++++++++++++------
- 1 file changed, 31 insertions(+), 6 deletions(-)
+--qezoggtwtmgqqqvk
+Content-Type: application/pgp-signature; name="signature.asc"
 
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index b4674f03d71a9..b0b7e0d2f1145 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -365,16 +365,21 @@ static void tls_sk_proto_cleanup(struct sock *sk,
- 	}
- }
- 
--static void tls_sk_proto_close(struct sock *sk, long timeout)
-+struct tls_close_work {
-+	struct work_struct work;
-+	struct tls_context *ctx;
-+	long timeout;
-+};
-+
-+static void deferred_close(struct work_struct *work)
- {
-+	struct tls_close_work *cw = container_of(work, struct tls_close_work, work);
-+	struct tls_context *ctx = cw->ctx;
-+	struct sock *sk = ctx->sk;
- 	struct inet_connection_sock *icsk = inet_csk(sk);
--	struct tls_context *ctx = tls_get_ctx(sk);
- 	long timeo = sock_sndtimeo(sk, 0);
- 	bool free_ctx;
- 
--	if (ctx->tx_conf == TLS_SW)
--		tls_sw_cancel_work_tx(ctx);
--
- 	lock_sock(sk);
- 	free_ctx = ctx->tx_conf != TLS_HW && ctx->rx_conf != TLS_HW;
- 
-@@ -395,10 +400,30 @@ static void tls_sk_proto_close(struct sock *sk, long timeout)
- 		tls_sw_strparser_done(ctx);
- 	if (ctx->rx_conf == TLS_SW)
- 		tls_sw_free_ctx_rx(ctx);
--	ctx->sk_proto->close(sk, timeout);
-+	ctx->sk_proto->close(sk, cw->timeout);
- 
- 	if (free_ctx)
- 		tls_ctx_free(sk, ctx);
-+
-+	kfree(cw);
-+}
-+
-+static void tls_sk_proto_close(struct sock *sk, long timeout)
-+{
-+	struct tls_context *ctx = tls_get_ctx(sk);
-+	struct tls_close_work *cw;
-+
-+	if (ctx->tx_conf == TLS_SW)
-+		tls_sw_cancel_work_tx(ctx);
-+
-+	cw = kmalloc(sizeof(*cw), GFP_KERNEL);
-+	if (!cw)
-+		return;
-+
-+	INIT_WORK(&cw->work, deferred_close);
-+	cw->timeout = timeout;
-+	cw->ctx = ctx;
-+	queue_work(system_unbound_wq, &cw->work);
- }
- 
- static __poll_t tls_sk_poll(struct file *file, struct socket *sock,
+-----BEGIN PGP SIGNATURE-----
 
----
-base-commit: fec50db7033ea478773b159e0e2efb135270e3b7
-change-id: 20240410-ktls-defer-close-002934564b09
+iQEzBAABCgAdFiEEP4GsaTp6HlmJrf7Tj4D7WH0S/k4FAmYWNL0ACgkQj4D7WH0S
+/k5wNAf+MJDdbm33k3wubemVjjqKUK3f6FxXQe4t7lCMtz5sI0KpYVCrJhtHd0LK
+Ml2eGbqb9oiNe5Uzf+DtMLAfrEGD0nKi4ILU18nmZwIGgqDslReXcKGZgbHZ0VMU
+/HvqSZfEi+ePr+n7yZ4rF2bdpwzrUsJjRpqsUKqhB3OsZep3zgXjOeedd+g3vtXR
+RBMcHTVhin3cVtMV3HoXfL7IDqL2S9tvRLxovSxZGHnCYbnZwS2jEuk6oyx9AwXh
+ykjeo7C+PNBKzDUsLfwqk9GwKBzeMeRxsjCvhQpls8uzKJJEPUfEsmcuv8geHk4b
+BEKAyo3PsJjIffwle960ADMQG+Xqig==
+=bfVT
+-----END PGP SIGNATURE-----
 
-Best regards,
--- 
-Sascha Hauer <s.hauer@pengutronix.de>
-
+--qezoggtwtmgqqqvk--
 
