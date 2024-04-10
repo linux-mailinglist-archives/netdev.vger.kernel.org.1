@@ -1,149 +1,141 @@
-Return-Path: <netdev+bounces-86648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB06889FB80
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 17:27:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71F2189FB95
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 17:31:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4AE421F21A27
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:27:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26025281849
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28B9616E885;
-	Wed, 10 Apr 2024 15:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E4A16E86C;
+	Wed, 10 Apr 2024 15:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QMVx+iIj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eNyu4NcM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5979D1591E1;
-	Wed, 10 Apr 2024 15:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C86415ADB0;
+	Wed, 10 Apr 2024 15:30:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712762861; cv=none; b=NWidxYlPHSnMdJEFE7OeK2PNFYl7/bjiBIbg8zUdwkqsNe78KwQ0e/D97cOgl+McVAu06xN1wJ5f0pnYXIg38SmQUX2ALY9TCoqiM+IFCHIgH2tQ49756w7tkZFGxkW8etscol5zjjA9Z4jKu5PDm2HTCULw4nlkK9y+VS0z+5Q=
+	t=1712763058; cv=none; b=EwdvePX0uAJj3J3orchARYHCp1JbDITB4kHnPaskUzdK8Zm+mZhH6JYQXWSUzosaVEAhkLXs+4Zj5mdqnWKxNCvgC8NaeYEArC6kBVAHkflTYrLO2ptjHDx0Rdztp1WhZj8Pvq/PsM8RkYRzfSYop/mXm21z7Rh11HgW5/lDSho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712762861; c=relaxed/simple;
-	bh=yaqHM0962MfpM+OFdQda8fXPe0R1wO7c3AlNIHOVwdc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=cIDr9b+TXaDzq5eq0ksIiA5LVmLWXAL58VAPt8bPBT3w2Lp5ptcZt8K1cJEot2DdXJ3ZHUQemGHmuSecBTA7AXhXPlN0qm0PEMop62C+J9yTcBqnLuD/AvZI5AbjTIKRvXHuWID3lh/GmRj4O/5b3B4A1rcFzaHvSVRZEpjeZtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=QMVx+iIj; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43A8bUQZ020430;
-	Wed, 10 Apr 2024 15:27:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=SeKInDMchgVr+fW9WAo6YizzoIlylrKBtPkpDrYflGc=; b=QM
-	Vx+iIjNoBxgbQhbk47P1pSkvCBi6kiaSSZFteiH8PqXWUF0Y7UYSWrwJ3USY+xai
-	GpMzaeDLZwM3AoGqxqUV9+ueya3RJGxE95WUHnvgCDFs5MzZP+Djd3mUZ8JzAwe0
-	6S2YEqGQJdphdetr8iOfJZaaPyjM5230lKtCzNV8IrViCObX5p7tH3axnILjKVCn
-	HrHWFKU22mBrjW0gJUsF1fI2uYWOU0hgzhaQSDLoYsE+Jpvut0geIRe/ud4DPPSJ
-	8fggfL5TrmQ7pfWvB/7hPSNjCQTZ3E7PVA4IghTfCh3TrgZ3LycX2IH7oruboSQa
-	QCfwL5e2a4lspc6371dA==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xdnqtjn3f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Apr 2024 15:27:09 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43AFR8Ts012315
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Apr 2024 15:27:08 GMT
-Received: from [10.110.37.144] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 10 Apr
- 2024 08:27:06 -0700
-Message-ID: <d440d38f-f805-4c85-96b3-ae0b5ad2bbdc@quicinc.com>
-Date: Wed, 10 Apr 2024 08:27:05 -0700
+	s=arc-20240116; t=1712763058; c=relaxed/simple;
+	bh=OmeHXoy2ncpoQhQGyEMX/xcVd8Rz4jLJzk0iOK1XF+w=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=isr25YgUk+Qw/CvrBkMT4rTRvop3twJsy99nL0y5Ohs+BLUDH2Q8riNR/Uj3S3Oruxq5DyZmf1nMv9wQyq4ax6qgt0xSeM2YwHW9/Z7u412bGeXaXTO92cw7IGHR7CgHeGa19bNDJWxpeXucC9LwnA6NYj5LEmiTTO67drz7a9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eNyu4NcM; arc=none smtp.client-ip=209.85.222.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-78d70890182so147319085a.0;
+        Wed, 10 Apr 2024 08:30:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712763056; x=1713367856; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xU1hy2U0mJLbOe7yjnAS91sF71BnTGdYJcXm1GozIKs=;
+        b=eNyu4NcMjqU3NSgFAwmiRI+fIsLMWLpcHQ8/HOhC5ez5ZHCFXblARQmb9ADbtwM/V4
+         utXpQsiyjg3khSonupaCbaiXXyVfT0xBs+7nyYBY8h+xO+DB5HV6UAVERYl1FrQNpfms
+         MMK06NHSH39I8CI242QoK+nxa0yHzspLwHy2sqLI2oFG6oXiuaRYpKkJzXxbRPLbYXyT
+         IWik5Jt0RnfJBySaC8mK/NK8J+F0XBKO22VltC1TEVLAUNSuyxp1hxkIr3ikWnW/n07Q
+         o6f1slrMTuxqwrJJ3s/W9uhF2rhHAASdq3/1OYNuCxE9gzqEjI6/TMET3N9r+cRoXOOI
+         9bVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712763056; x=1713367856;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=xU1hy2U0mJLbOe7yjnAS91sF71BnTGdYJcXm1GozIKs=;
+        b=XgNj3NhTsLVLsNOiK+93mLUU3ruI+qq7qw+s/nVXoWD13EsUFGgir5f03UohT5QJSC
+         IQEw6gqg/YjgA4wBD2Rfy0cuDVNDipKs4cCnKr9PEpjq3IrI13JXAAEHWP6mp/4SWrVW
+         ZGQ7RyCzQrYrsdQsASqPB7SOFQt/bvGJF4zdvfwoSKy2UUnnbPC+mNIpagmBy2M9AVAv
+         dxhPeACu/VGevz4qut/+9HwCCIpFL+6xgzeTmdoNI2E0YKUMLiRK2iH29HxoiqBjiObA
+         7YtTn6Vf8ghYfmzvji5RHdE9k/O1YgGdBWd8FksbdvGgiTi1BvFT1eyUr5KUsYpOOD2b
+         Y+7w==
+X-Forwarded-Encrypted: i=1; AJvYcCXyP9113+bTaSlJqd7uxzuDv/dwgRfT74ZhpTYNkT1e+BRoJ4Pfr5Zy5FAFNq0zNHzdzdQI3SV7EBV4H9Zat06kmJTkhUey+cbm6KgTjDFoT29vdUgPQmQeB9xnH6kH3zKhRl1E6z796f8mdK48DI9KGHMeNJc65rJO
+X-Gm-Message-State: AOJu0YyNWzieJfS0Uo/J9aSV2GgThDgai75XZAv/64jwz/jFaQETxKWX
+	V471waYkNrByXbJk/T+TfLsYH0ZZWYS/+35F61fc2zu0PCZPk0JhhKXZOdCO
+X-Google-Smtp-Source: AGHT+IFB+pgD8hxrIKgTzP3YjtD2OHAGa1mQ96FRMdZOBBQ0cIFvN5fLEXa221tsnI1J0I6dPOl+cA==
+X-Received: by 2002:a05:620a:e8b:b0:78b:d75c:f9f5 with SMTP id w11-20020a05620a0e8b00b0078bd75cf9f5mr4407896qkm.38.1712763055865;
+        Wed, 10 Apr 2024 08:30:55 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id d7-20020a05620a158700b0078d5f7b9a2dsm3952197qkk.15.2024.04.10.08.30.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 08:30:55 -0700 (PDT)
+Date: Wed, 10 Apr 2024 11:30:55 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Abhishek Chauhan <quic_abchauha@quicinc.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Andrew Halaney <ahalaney@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Martin KaFai Lau <martin.lau@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ bpf <bpf@vger.kernel.org>
+Cc: kernel@quicinc.com
+Message-ID: <6616b0af63eed_2a98a52947e@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240409210547.3815806-2-quic_abchauha@quicinc.com>
+References: <20240409210547.3815806-1-quic_abchauha@quicinc.com>
+ <20240409210547.3815806-2-quic_abchauha@quicinc.com>
+Subject: Re: [RFC PATCH bpf-next v1 1/3] net: Rename mono_delivery_time to
+ tstamp_type for scalabilty
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 05/16] dt-bindings: net: wireless: describe the ath12k
- PCI module
-Content-Language: en-US
-To: Bartosz Golaszewski <brgl@bgdev.pl>,
-        Marcel Holtmann
-	<marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David
- S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
-        Bjorn
- Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konrad.dybcio@linaro.org>,
-        Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
-        Catalin
- Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Bjorn
- Helgaas <bhelgaas@google.com>,
-        Saravana Kannan <saravanak@google.com>,
-        Geert
- Uytterhoeven <geert+renesas@glider.be>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Neil
- Armstrong <neil.armstrong@linaro.org>,
-        Marek Szyprowski
-	<m.szyprowski@samsung.com>,
-        Alex Elder <elder@linaro.org>,
-        Srini Kandagatla
-	<srinivas.kandagatla@linaro.org>,
-        Greg Kroah-Hartman
-	<gregkh@linuxfoundation.org>,
-        Abel Vesa <abel.vesa@linaro.org>,
-        Manivannan
- Sadhasivam <mani@kernel.org>,
-        Lukas Wunner <lukas@wunner.de>,
-        Dmitry
- Baryshkov <dmitry.baryshkov@linaro.org>,
-        Amit Pundir
-	<amit.pundir@linaro.org>, Xilin Wu <wuxilin123@gmail.com>
-CC: <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-wireless@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-pci@vger.kernel.org>,
-        <linux-pm@vger.kernel.org>,
-        Bartosz Golaszewski
-	<bartosz.golaszewski@linaro.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski@linaro.org>
-References: <20240410124628.171783-1-brgl@bgdev.pl>
- <20240410124628.171783-6-brgl@bgdev.pl>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <20240410124628.171783-6-brgl@bgdev.pl>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: Wx5pfsg1IEL3FNsbq-QxsVprddWodQtT
-X-Proofpoint-GUID: Wx5pfsg1IEL3FNsbq-QxsVprddWodQtT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-10_04,2024-04-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
- lowpriorityscore=0 mlxscore=0 adultscore=0 impostorscore=0 phishscore=0
- bulkscore=0 priorityscore=1501 malwarescore=0 spamscore=0 mlxlogscore=826
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2404010003
- definitions=main-2404100112
 
-On 4/10/2024 5:46 AM, Bartosz Golaszewski wrote:
-[...]
-> +description:
-> +  Qualcomm Technologies IEEE 802.11ax PCIe devices.
+Abhishek Chauhan wrote:
+> mono_delivery_time was added to check if skb->tstamp has delivery
+> time in mono clock base (i.e. EDT) otherwise skb->tstamp has
+> timestamp in ingress and delivery_time at egress.
+> 
+> Renaming the bitfield from mono_delivery_time to tstamp_type is for
+> extensibilty for other timestamps such as userspace timestamp
+> (i.e. SO_TXTIME) set via sock opts.
+> 
+> Bridge driver today has no support to forward the userspace timestamp
+> packets and ends up resetting the timestamp. ETF qdisc checks the
+> packet coming from userspace and encounters to be 0 thereby dropping
+> time sensitive packets. These changes will allow userspace timestamps
+> packets to be forwarded from the bridge to NIC drivers.
+> 
+> In future tstamp_type:1 can be extended to support userspace timestamp
+> by increasing the bitfield.
+> 
+> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
+> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
+> ---
+>  include/linux/skbuff.h                     | 18 +++++++++---------
+>  include/net/inet_frag.h                    |  4 ++--
+>  net/bridge/netfilter/nf_conntrack_bridge.c |  6 +++---
+>  net/core/dev.c                             |  2 +-
+>  net/core/filter.c                          |  8 ++++----
+>  net/ipv4/inet_fragment.c                   |  2 +-
+>  net/ipv4/ip_fragment.c                     |  2 +-
+>  net/ipv4/ip_output.c                       |  8 ++++----
+>  net/ipv6/ip6_output.c                      |  6 +++---
+>  net/ipv6/netfilter.c                       |  6 +++---
+>  net/ipv6/netfilter/nf_conntrack_reasm.c    |  2 +-
+>  net/ipv6/reassembly.c                      |  2 +-
+>  net/sched/act_bpf.c                        |  4 ++--
+>  net/sched/cls_bpf.c                        |  4 ++--
+>  14 files changed, 37 insertions(+), 37 deletions(-)
 
-if you respin, nit: s/11ax/11be/
-
+Since the next patch against touches many of the same lines, probably
+can just squash the two.
 
