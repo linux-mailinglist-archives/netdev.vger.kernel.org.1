@@ -1,92 +1,104 @@
-Return-Path: <netdev+bounces-86419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD9C489EBFF
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:30:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C0F089EC2E
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:35:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 962D9283517
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:30:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B22D21F2255F
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:35:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8DD13D256;
-	Wed, 10 Apr 2024 07:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YbL/KKXs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5528713D2B1;
+	Wed, 10 Apr 2024 07:35:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B4913CFA1
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 07:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D15713D2A0
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 07:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712734227; cv=none; b=LppSOzf1Id8BQ6bmj0MkchGw54FLF3s83zQQp+8Czsq/5FGa2IOFrBCVRek6csSE242TFGXaLVVSs6txaQzh/ubQTCYBl6aB3H2y3Jdnqx7qtkBmEiacX+xAGfNxdJ6DQxn8kgy1vFeHsTYBsHzckbG/SUKbftnDAZrQZhfw1OM=
+	t=1712734506; cv=none; b=p5M4BRHQbWs54G2SqevHKkSntvSo5A7Jw4sVU3ZcYSsuDCUbmuR/q0O9wr1DNZMmSXCS3CZ9ueXG74MTYEbCONzwTbpWou4Z9wamKpJFqLe1ZIBddMZ0+6qqZc1WIvOGAvyReksFyy0k9+DafVGTnfdmMwmZc0pTLrmO7me/5S8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712734227; c=relaxed/simple;
-	bh=ztxDn4fas7IPy5ph0fnOURmNjydalmi2bul+yxZwcQw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=B37gwoxXSWNjbxGWZF+qq4g3Vbsuf2b0qxUGDG5Yk6ZXTtZ6ogwMC+K9WE8vk7MkOD6YdSG4R6QBKemIznX5+hJYHZURGB7+ti1c9I9oZTVPSgsW8ZuJtShJBOFdmo+IVuc2IyIU/GpTuN12HlmN6rwhOSetPKYhS4xJa8YzhGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YbL/KKXs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4D763C43390;
-	Wed, 10 Apr 2024 07:30:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712734227;
-	bh=ztxDn4fas7IPy5ph0fnOURmNjydalmi2bul+yxZwcQw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YbL/KKXszW1wFoD+qdx20DP5DI9ETxGSudZdK/y0v3NeqRH20/rg3U+gvvkCQCQra
-	 eN+tBGX6xKCcFHZwDg6iEkyn+yvbU9gs2zVhcPHYQmrrXGn61nin32Wj45cNAnJq5F
-	 We6gmqHejYMoIJUhM6IMYkqncFTcmiN92JigGHimzHH+W74PYfFPtW0K7tbMY++MR/
-	 7CjnVlYLU0VNccD9wuLfJEyUouerdyAry0meZOUHJMOhoKTzpsobEg8R8Ce91X2Cxd
-	 KFW3MWuf8nf4G3n3iWwb/I/dzkfJZxm0w6g0Tyo93Zfflvyop2m/9jQzqr1fxwwg+E
-	 HKb+6lq/jmsaw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3724BD60312;
-	Wed, 10 Apr 2024 07:30:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1712734506; c=relaxed/simple;
+	bh=gROKBkMa0ThexFE+zSeTQYHlPSPQGkYJ0/VJWbgMt9I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sDnVlsrkrwZF/WrTiKjJA7fudlQN1URQn5B8tt/ncdvIcK9BpCJhoZV+324Ra5jyVUgMsD5Bm0D3D4i/8VgrEcawTPAIs426Wwt1vPw41AHt8XVUCpPWWq6hWwpV/UKTZd+AUSpz8K4VN4xbf5nZ3Y/Nufb2uCz8mPQQxTi8yDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1ruSU2-00041S-OD; Wed, 10 Apr 2024 09:35:02 +0200
+Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1ruSU2-00BS0z-13; Wed, 10 Apr 2024 09:35:02 +0200
+Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ukl@pengutronix.de>)
+	id 1ruSU1-00HQ6I-33;
+	Wed, 10 Apr 2024 09:35:01 +0200
+From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+To: Richard Cochran <richardcochran@gmail.com>
+Cc: netdev@vger.kernel.org,
+	kernel@pengutronix.de,
+	Yangbo Lu <yangbo.lu@nxp.com>
+Subject: [PATCH net-next 0/5] ptp: Convert to platform remove callback returning void
+Date: Wed, 10 Apr 2024 09:34:49 +0200
+Message-ID: <cover.1712734365.git.u.kleine-koenig@pengutronix.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1256; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=gROKBkMa0ThexFE+zSeTQYHlPSPQGkYJ0/VJWbgMt9I=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBmFkEa1OENiFx3nu3eIywrBneG2+nWTwfDrc5Qz SNKv/XkO2GJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZhZBGgAKCRCPgPtYfRL+ TmJiB/0WWoW2e67iiVO9cK3kw/sDxwxxlOpVKYnb2HMXlfqOYuNGDj9hf7HfPCD8M6iPnrhP5M7 MzZCn64Y1HJ52bsOH7zfEFgCZbaLLfRU7l8FMPRIdV07/9B/hzFzxWQOFz4RhLRhEn8LgRfkAYu o6zi8fKVnDTeIRV6pEYboILneMEVmpZ/jYR7EMwsA2tp+KtzNqNALEI24bP6EI3d6Hp215yoo8/ 41z2MpchYKLahBowqLoMN0GPysiSn1WDvnNbPu9iIPXF3spjFy+L7PGKEw8fQmus8MduP+gw0We 9zxHCEyWPhe3bVVp85daYU5ytNgWW1dBP1/SSrYP9QIFmklU
+X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: sched: cls_api: fix slab-use-after-free in
- fl_dump_key
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171273422722.9319.15926353601229442056.git-patchwork-notify@kernel.org>
-Date: Wed, 10 Apr 2024 07:30:27 +0000
-References: <20240408134817.35065-1-jianbol@nvidia.com>
-In-Reply-To: <20240408134817.35065-1-jianbol@nvidia.com>
-To: Jianbo Liu <jianbol@nvidia.com>
-Cc: netdev@vger.kernel.org, ast@fiberby.net, davem@davemloft.net,
- marcelo.leitner@gmail.com, horms@kernel.org, cratiu@nvidia.com
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ukl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hello:
+Hello,
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+this series converts all platform drivers below drivers/ptp/ to not use
+struct platform_device::remove() any more. See commit 5c5a7680e67b
+("platform: Provide a remove callback that returns no value") for an
+extended explanation and the eventual goal.
 
-On Mon, 8 Apr 2024 16:48:17 +0300 you wrote:
-> The filter counter is updated under the protection of cb_lock in the
-> cited commit. While waiting for the lock, it's possible the filter is
-> being deleted by other thread, and thus causes UAF when dump it.
-> 
-> Fix this issue by moving tcf_block_filter_cnt_update() after
-> tfilter_put().
-> 
-> [...]
+All conversations are trivial, because the driver's .remove() callbacks
+returned zero unconditionally.
 
-Here is the summary with links:
-  - [net-next] net: sched: cls_api: fix slab-use-after-free in fl_dump_key
-    https://git.kernel.org/netdev/net-next/c/2ecd487b670f
+There are no interdependencies between these patches, so they can be
+applied independently if needed. This is merge window material.
 
-You are awesome, thank you!
+Best regards
+Uwe
+
+Uwe Kleine-König (5):
+  ptp: ptp_clockmatrix: Convert to platform remove callback returning
+    void
+  ptp: ptp_dte: Convert to platform remove callback returning void
+  ptp: ptp_idt82p33: Convert to platform remove callback returning void
+  ptp: ptp_ines: Convert to platform remove callback returning void
+  ptp: ptp_qoriq: Convert to platform remove callback returning void
+
+ drivers/ptp/ptp_clockmatrix.c | 6 ++----
+ drivers/ptp/ptp_dte.c         | 6 ++----
+ drivers/ptp/ptp_idt82p33.c    | 6 ++----
+ drivers/ptp/ptp_ines.c        | 5 ++---
+ drivers/ptp/ptp_qoriq.c       | 5 ++---
+ 5 files changed, 10 insertions(+), 18 deletions(-)
+
+base-commit: 6ebf211bb11dfc004a2ff73a9de5386fa309c430
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
