@@ -1,164 +1,113 @@
-Return-Path: <netdev+bounces-86719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDEB28A009C
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:32:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD4568A00A8
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:32:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 50E6CB21728
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 19:32:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CB741F21810
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 19:32:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5146118131B;
-	Wed, 10 Apr 2024 19:31:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6518181BAB;
+	Wed, 10 Apr 2024 19:32:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f07Bjwb7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QUN9iV7j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B03DA172BBA;
-	Wed, 10 Apr 2024 19:31:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C04181B86;
+	Wed, 10 Apr 2024 19:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712777519; cv=none; b=jhDT5guajPadXGr6gvk91S6ZwAjHUUf4Hl1uuw+nteRKDyFHdHbFutehfI80vqEIGOlxKBmiMDzzxSxpbz8ETslHH06uIVsdCUuBQchtQ13BoJKZRLtl51gNyMg3zHAdRR43xihF21EkmPffuEAEJ+2+Q7bkkYJEJwbJ2GHdl0A=
+	t=1712777555; cv=none; b=ODU1o0RW9qEFaWeEDc59bgXgivnKjUgwdXCysRb6N0vhwxA4EziEnvPWrBRV/sDroxf9RY9sSMTA0SmzNZx4GIScuvKhIG8U522wSIDxYfFJ9Q1L68nm0V5d1Gj4pWUgL57OG0Tzd7+8I0r5d3nRHjJUMW98INgiSIqhZvb42FA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712777519; c=relaxed/simple;
-	bh=affGpGfenMt3WZroBCjBwcF6ti3VyPoji9ShXHx5Efo=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ipLmByWOCws7pcbw5qbu/DbSU5G6YbI5Ftl2IhTbcErpocoyBsUwcdaOmtHs4/xK/OYyul/nTUCTn7SyrN5hRvDpd/9WKguAOgl0eMDPEMq0AHSfKmQjX4rNHwonHaYd3g4Ub/HPfrfX62E1dbOohAp7kUhp/YR302GY5jugCMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f07Bjwb7; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-78ebc7e1586so17629685a.1;
-        Wed, 10 Apr 2024 12:31:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712777516; x=1713382316; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vRad0l69ZdTLBrwskwW40rKN+aCOPQ7/4HlpEGp2GHg=;
-        b=f07Bjwb7ZswT+UfGBv3blNim4B+DOGbOhfz7OotZZvVVmDKGeW+gA3lQ+4u9gQY74n
-         XmbTpVARwql4Nqv5YQMsqgl0wMUU7CHly/2poUCpll5mHaDILRhbvsacgMXQBEU0cBnd
-         U3FKdP9N5wrp7nSMtw/LuUasY7HEdOxSkodTsw1GgQHTZM48x9LHz2f4WBdOFwSZ5peA
-         fhfJnQu11m3M5qXw1ZZKBevqU+CLo53MdOODYyChhQ1FTCcvXs7BCkp5T9MxVrB7Qq5k
-         fvxeaEBrEwOfY3ZHfBH9odXrUnKzEg3u+TisQ2PbbV5mTsaihvOanVM3RMhBhbDxx8zC
-         jizA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712777516; x=1713382316;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=vRad0l69ZdTLBrwskwW40rKN+aCOPQ7/4HlpEGp2GHg=;
-        b=LoOELvQOyKRIgdPRApYDbUjdkIqasB8m1HsTWdBbx3n1prTZ0whXxe0ySlxMa7HLjz
-         IaD9wu7QwrRZqAjCvukROrpi3sOO8e6PmI4EcezN0gMUpJywuXkSaC1Dtbj2rrtqopRZ
-         t6+Sazwz+KoaIYfO/NpymdLZknhSA+tUmARs3uPf3tU5i0KIfZ4ufFlZReYWfPWGhUqO
-         dA0x3FXi2paq/CDqqWOs3s9k9BhYgtBB6NH0ImZvaudcUFQ5/3VQDtMaWRnKJQbWyeda
-         e/0tzA9EsiTqPmO4WdrYWlBf1RY+pthEGwhCvMpNIi1lHAqG590MEfc17SdLmLcxEXNF
-         rCJg==
-X-Forwarded-Encrypted: i=1; AJvYcCUynTieedC1MFNaRSOiIS4k290gifQNdQyCN43k01UvRjTrRldhuclV3hOJLj4UoFRZ9WfgaxrzUkjt0FkDwn1nG9uFuzcGRAyC7ItuHWoPu3iar+Hb5syaHfrtJ1lv/+gsMQ5O
-X-Gm-Message-State: AOJu0Yw+YUms5zkfc+QSRZDxn4xNe2oIIuio1/AezwxuBRpDD/kEy2d4
-	6B2wsM2nJqnPT1uRrLP9QQg01NFE0sEltajxYKlbzrPcVDUqHiw7
-X-Google-Smtp-Source: AGHT+IHokfeWRwBPEGPxbbrpu6y71Sgk54duSGrxuVrM5UgHwWMzilpw5lVpfZ5v/1RNSLy2qu0hfg==
-X-Received: by 2002:a05:6214:287:b0:699:2dc0:8561 with SMTP id l7-20020a056214028700b006992dc08561mr1107698qvv.20.1712777516518;
-        Wed, 10 Apr 2024 12:31:56 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id qh9-20020a0562144c0900b006969f5d3159sm5447445qvb.50.2024.04.10.12.31.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 12:31:56 -0700 (PDT)
-Date: Wed, 10 Apr 2024 15:31:56 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- John Fraker <jfraker@google.com>, 
- netdev@vger.kernel.org, 
- Praveen  Kaligineedi <pkaligineedi@google.com>, 
- Harshitha Ramamurthy <hramamurthy@google.com>, 
- Shailend Chand <shailend@google.com>, 
- Willem de  Bruijn <willemb@google.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Junfeng Guo <junfeng.guo@intel.com>, 
- Ziwei Xiao <ziweixiao@google.com>, 
- Jeroen de Borst <jeroendb@google.com>, 
- linux-kernel@vger.kernel.org, 
- kory.maincent@bootlin.com, 
- andrew@lunn.ch, 
- richardcochran@gmail.com
-Message-ID: <6616e92cbcca_2bfabf294c5@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240410061928.712ff9a3@kernel.org>
-References: <20240408180918.2773238-1-jfraker@google.com>
- <661550e348224_23a2b2294f7@willemb.c.googlers.com.notmuch>
- <20240409172838.247738f3@kernel.org>
- <87jzl5akh5.fsf@nvidia.com>
- <20240410061928.712ff9a3@kernel.org>
-Subject: Re: [PATCH net-next] gve: Correctly report software timestamping
- capabilities
+	s=arc-20240116; t=1712777555; c=relaxed/simple;
+	bh=W1pe4p0h/ujYmBzxMk5Ld9IBc7vdbm9CU60zRdoevJs=;
+	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
+	 Message-Id:Subject; b=N9OTPkv+LmrF6q19SQsENJIczxce3IGRPHnm8Xt9vBuWSErzLOv7Tg+3sEvoOKg1fu/jm0CEkGU3EbRD7zijVhIHrhHaB+1O0Y2xv2xKaEx76imGBP7iGL31PHoZKGx9oFDtsDbRsQTLXUqndGCftMWO1mT1NoHYn/+L6Dz7d8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QUN9iV7j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F294BC43390;
+	Wed, 10 Apr 2024 19:32:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712777555;
+	bh=W1pe4p0h/ujYmBzxMk5Ld9IBc7vdbm9CU60zRdoevJs=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=QUN9iV7j3hJdbVToMFjz25UtvJhH+Pc1R2x/Q1OIjFLOMNd94JMAD7yp/7b3Z8U1y
+	 lQaiFwONOFH4Wi5NnNQc78Adk0vKaRY3s/BlQ7bs7NRYtdNzOekErCHgjAf98IJEcO
+	 yNo4EgSvlOVdHo/uZ85QJHhUKqGHnBt/iyKNqogR7CwkXQyDIHivlsSDFsoapzRNqH
+	 Kh4md4TI5vef4sb+eXMV7W1IfLfSva3aJ1+Y1F2CQWDxZVa6b4p+bmjFCVu6r9oaGF
+	 QVeAl97FnGX8LVsvUo2R6uifLuRmv/l7R/uEHz3eW4zBRsgZfCDFdLreiOdQziC0yD
+	 MArqcIFTChYYA==
+Date: Wed, 10 Apr 2024 14:32:34 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+From: Rob Herring <robh@kernel.org>
+To: Min Li <lnimi@hotmail.com>
+Cc: richardcochran@gmail.com, linux-kernel@vger.kernel.org, 
+ robh+dt@kernel.org, conor+dt@kernel.org, Min Li <min.li.xe@renesas.com>, 
+ devicetree@vger.kernel.org, krzysztof.kozlowski+dt@linaro.org, 
+ netdev@vger.kernel.org
+In-Reply-To: 
+ <LV3P220MB1202BACF71E85F949FC09A29A0062@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
+References: 
+ <LV3P220MB1202BACF71E85F949FC09A29A0062@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
+Message-Id: <171277755055.1212793.1486171322736151590.robh@kernel.org>
+Subject: Re: [PATCH net-next 1/1] dt-bindings: ptp: Add device tree binding
+ for IDT FemtoClock
 
-Jakub Kicinski wrote:
-> On Tue, 09 Apr 2024 21:40:46 -0700 Rahul Rameshbabu wrote:
-> > > My gut tells me we force drivers to set the ethtool op because
-> > > while at it they will probably also implement tx stamping.  
-> > 
-> > I think the logic should be the other way (in terms of the
-> > relationship). A call to skb_tx_timestamp should throw a warning if the
-> > driver does not advertise its timestamping capabilities. This way, a
-> > naive netdev driver for some lightweight device does not need to worry
-> > about this. I agree that anyone implementing tx timestamping should have
-> > this operation defined. An skb does not contain any mechanism to
-> > reference the driver's ethtool callback. Maybe the right choice is to
-> > have a ts capability function registered for each netdev that can be
-> > used by the core stack and that powers the ethtool operation as well
-> > instead of the existing callback for ethtool?
+
+On Wed, 10 Apr 2024 14:41:47 -0400, Min Li wrote:
+> From: Min Li <min.li.xe@renesas.com>
 > 
-> Adding a check which only need to runs once in the lifetime of
-> the driver to the fastpath may be a little awkward. Another option
-> would be a sufficiently intelligent grep, which would understand
-> which files constitute a driver. At which point grepping for 
-> the ethtool op and skb_tx_timestamp would be trivial?
+> Add device tree binding doc for the IDT FemtoClock Frequency
+> Clock Synthesizers.
+> 
+> Signed-off-by: Min Li <min.li.xe@renesas.com>
+> ---
+>  .../devicetree/bindings/ptp/ptp-idtfc3.yaml   | 47 +++++++++++++++++++
+>  1 file changed, 47 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/ptp/ptp-idtfc3.yaml
+> 
 
-Many may not define the flags themselves, but defer this to
-ethtool_op_get_ts_info.
+My bot found errors running 'make dt_binding_check' on your patch:
 
-A not so much intelligent, but sufficiently ugly, grep indicates
-not a a massive amount of many missing entries among ethernet
-drivers. But this first attempt is definitely lossy.
+yamllint warnings/errors:
+./Documentation/devicetree/bindings/ptp/ptp-idtfc3.yaml:43:1: [error] syntax error: found character '\t' that cannot start any token (syntax)
 
-$ for symbol in skb_tx_timestamp get_ts_info SOF_TIMESTAMPING_TX_SOFTWARE ethtool_op_get_ts_info "(SOF_TIMESTAMPING_TX_SOFTWARE|ethtool_op_get_ts_info)"; do
-    echo -n "$symbol: ";
-    for i in `grep -nrIE "$symbol" drivers/net/ethernet/ | awk '{print $1}' | xargs dirname | uniq`; do echo $i; done | wc -l;
-  done
+dtschema/dtc warnings/errors:
+make[2]: *** Deleting file 'Documentation/devicetree/bindings/ptp/ptp-idtfc3.example.dts'
+Documentation/devicetree/bindings/ptp/ptp-idtfc3.yaml:43:1: found a tab character where an indentation space is expected
+make[2]: *** [Documentation/devicetree/bindings/Makefile:26: Documentation/devicetree/bindings/ptp/ptp-idtfc3.example.dts] Error 1
+make[2]: *** Waiting for unfinished jobs....
+./Documentation/devicetree/bindings/ptp/ptp-idtfc3.yaml:43:1: found a tab character where an indentation space is expected
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/ptp/ptp-idtfc3.yaml: ignoring, error parsing file
+make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1430: dt_binding_check] Error 2
+make: *** [Makefile:240: __sub-make] Error 2
 
-skb_tx_timestamp: 69
-get_ts_info: 66
-SOF_TIMESTAMPING_TX_SOFTWARE: 33
-ethtool_op_get_ts_info: 40
-(SOF_TIMESTAMPING_TX_SOFTWARE|ethtool_op_get_ts_info): 59
+doc reference errors (make refcheckdocs):
 
-This does not add up, but that's because some drivers share prefixes,
-and some drivers have different paths where one open codes and the
-other calls ethtool_op_get_ts_info. Marvell is a good example of both:
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/LV3P220MB1202BACF71E85F949FC09A29A0062@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM
 
-$ grep -nrIE '(SOF_TIMESTAMPING_TX_SOFTWARE|ethtool_op_get_ts_info)' drivers/net/ethernet
-/marvell
-drivers/net/ethernet/marvell/pxa168_eth.c:1367: .get_ts_info    = ethtool_op_get_ts_info,
-drivers/net/ethernet/marvell/mv643xx_eth.c:1756:        .get_ts_info            = ethtool_op_get_ts_info,
-drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c:5266:   info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE |
-drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c:962:          return ethtool_op_get_ts_info(netdev, info);
-drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c:964:  info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE |
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
 
-One more aside, no driver should have to advertise
-SOF_TIMESTAMPING_SOFTWARE or SOF_TIMESTAMPING_RAW_HARDWARE. Per
-Documentation/networking/timestamping.rst these are reporting flags,
-not recording flags. Devices only optionall record a timestamp.
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
