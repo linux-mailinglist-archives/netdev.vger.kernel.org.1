@@ -1,106 +1,118 @@
-Return-Path: <netdev+bounces-86672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DD9F89FCD7
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 18:30:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FECD89FD6F
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 18:52:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2C551F227B1
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 16:30:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50D671C215EB
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 16:52:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B5F53361;
-	Wed, 10 Apr 2024 16:30:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6146917B4F2;
+	Wed, 10 Apr 2024 16:52:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rqlhmRVi"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PaefrWIf"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF0120EB;
-	Wed, 10 Apr 2024 16:30:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D893153361;
+	Wed, 10 Apr 2024 16:52:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712766617; cv=none; b=t/bIE6HfcBGeYGbf9FOYfE7/DInKyHFwLmBOjv5wXb20XPoH4Y+G1HFVW7nRlkPb1CsJIliFrl7SapVuHij8yHITVA5LsiFJFnktIF/IwkyZROh3eOgzA/mdkXD+wbr7cyI8kz/eFkX8LB+NSJnz5B5LAjgOQGTqkIhmpIo1N94=
+	t=1712767949; cv=none; b=k9Qg8c8/iOthturJgm+VlQRC+mq1ZVvddVEEedyyUWR6e3RqdaN8waSg7xZsxpDWirYIOpIVUYWOjSmR1vWepCsskvHQ14bzuT8jT8NRFcjGGb8Jzuny8zHYOsk28qA6iXdjcyn3fefTMiWjLKo5twkZgXe8UAYFvsF4+/Ac8ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712766617; c=relaxed/simple;
-	bh=4fwJ6KkDxjO4trdDAwONSY3YMZiL7kj612sMt4+83Vs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eJoEk1UZ4yD3ZY7NtCVh0J0aNz1+FVnWbcwQUswFvm6CbMokJ2QzZMv1U0vIx3f2WSfOakXgxYhTArTGS60Wulh0kOG03Hp2KzDTDe4YDGkwnVZ1XTq/SMSPoGlCkwXd7vclzURwDQN6Qh7m2nDa72aXzMpurw+79G34y1A9NdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rqlhmRVi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A11EC43390;
-	Wed, 10 Apr 2024 16:30:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712766616;
-	bh=4fwJ6KkDxjO4trdDAwONSY3YMZiL7kj612sMt4+83Vs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rqlhmRViXnGlFqUg5NRsS0Kknq1jRbV6Aofmeu5H+J74MXeXGT/7pDeOQrOvmTYfC
-	 gTzuVc5XUr509nvQIPv9z+Orv//Xkk2WLgr0dggSmpdTyEXMROFYsGqlu73lOYsMly
-	 AG6grUomYHfN2UMjYyDUpVSXDZ/1eBEVejUhWonvt4RqQisT8KRAbXmDy1T5oYXwQD
-	 ALDbBBSFAFa8KH/iHtzAqu6kFnpLpzpE93HmMCz0rKdTshypFuwxtjbxYmz6JICCut
-	 M/XtmnIHBgaP+uiEJ5OxKlr/mguCn5lsqO84jYJJa++if+n+87w4xfxBo0i+VSrSgT
-	 gy387qJJE2zFw==
-Date: Wed, 10 Apr 2024 12:30:16 -0400
-From: Sasha Levin <sashal@kernel.org>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, gregkh@linuxfoundation.org,
-	xu <xu.xin.sc@gmail.com>, stable@vger.kernel.org,
-	vladimir.oltean@nxp.com, LinoSanfilippo@gmx.de, andrew@lunn.ch,
-	daniel.klauer@gin.de, davem@davemloft.net, f.fainelli@gmail.com,
-	kuba@kernel.org, netdev@vger.kernel.org, rafael.richter@gin.de,
-	vivien.didelot@gmail.com, xu.xin16@zte.com.cn
-Subject: Re: Some questions Re: [PATCH net] net: dsa: fix panic when DSA
- master device unbinds on shutdown
-Message-ID: <Zha-mMPa1PDnZvOE@sashalap>
-References: <20220209120433.1942242-1-vladimir.oltean@nxp.com>
- <20240410090644.130032-1-xu.xin16@zte.com.cn>
- <09f0fc793f5fe808341e034dadc958dbfe21be8c.camel@redhat.com>
- <20240410143419.ptupie3hyivjuzqf@skbuf>
+	s=arc-20240116; t=1712767949; c=relaxed/simple;
+	bh=PZ5Xd+5UAr5QCT79N09AiNz7T8/on2P/RvirmiBIQio=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=k/A3V1wTGKowy/1Vgiki8eAhD/LRhgho0WohsvoOaNUFlcLiSuhnaGvtGlSz59FmcooTYVSMKNBZF6JX/SnUPmfClPi1MWoCZ7taPSt4QrOqDNudWME66cnR+goFpdAWzIGQMryCfAvuEg4TZAKL6Q3thlC/T16wm+oW39ZecjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=PaefrWIf; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43ACJVCl015865;
+	Wed, 10 Apr 2024 16:52:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=PZ5Xd+5UAr5QCT79N09AiNz7T8/on2P/RvirmiBIQio=; b=Pa
+	efrWIfS+h+r+4XOBuFAiI5GuZhEuszSzCf490t7rPk6fA8sxaKNTK78NZ4EJuJed
+	5xVPTGTSQ6GHsWl46XYqWYFGD4D9/l2hqRTlFItdSnOXc1pkEn6lKXs8mz7wylh4
+	A+wsOSpBRyfqPkZgE7sVrNWvFqbIRRDQ6ym/ReTAiKc9oFLZEm7Igo6UUcd7sZzn
+	H1VzRzrjUoSGTdJlZcSSuTTOfFB/rgVnTQ5Pm32HseF8vgnNkYAS+pa1zGRAmc4q
+	zj7cqk4KgeoyIwp/1293M6acXLla5hiUJF80Lqyp4H0K3rPBDTiRUz8Mu4nkKrTZ
+	pC1/DlCa6VMQnnor8S6A==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xdrkp9t9c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Apr 2024 16:52:17 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43AGqGuP018813
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Apr 2024 16:52:16 GMT
+Received: from [10.110.37.144] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 10 Apr
+ 2024 09:52:15 -0700
+Message-ID: <3c9ea861-3964-4ae3-9c49-06760ef15406@quicinc.com>
+Date: Wed, 10 Apr 2024 09:52:14 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240410143419.ptupie3hyivjuzqf@skbuf>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/13] wifi: nl80211: send underlying multi-hardware
+ channel capabilities to user space
+Content-Language: en-US
+To: Johannes Berg <johannes@sipsolutions.net>,
+        Vasanthakumar Thiagarajan
+	<quic_vthiagar@quicinc.com>,
+        Karthikeyan Periyasamy
+	<quic_periyasa@quicinc.com>,
+        <ath12k@lists.infradead.org>
+CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
+        Jakub Kicinski
+	<kuba@kernel.org>
+References: <20240328072916.1164195-1-quic_periyasa@quicinc.com>
+ <20240328072916.1164195-3-quic_periyasa@quicinc.com>
+ <6d92d0ba4a8764cd91cc20c4bd35613bcc41dfcd.camel@sipsolutions.net>
+ <9d5c2f9f-19b5-af4d-8018-1eb97fac10d6@quicinc.com>
+ <9d0f309da45ae657cd2ce0bc11a93d66e856ef64.camel@sipsolutions.net>
+ <b455f267-9552-be3b-95b0-a036bfa8e14a@quicinc.com>
+ <902dd36fa5ab0503377e558b92505fe499f666fa.camel@sipsolutions.net>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <902dd36fa5ab0503377e558b92505fe499f666fa.camel@sipsolutions.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: e_vJnnS5KvkjJl3oh0dXumNhbB-g4bzS
+X-Proofpoint-ORIG-GUID: e_vJnnS5KvkjJl3oh0dXumNhbB-g4bzS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-10_04,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ bulkscore=0 lowpriorityscore=0 adultscore=0 spamscore=0 malwarescore=0
+ mlxscore=0 mlxlogscore=853 phishscore=0 priorityscore=1501 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2404010003
+ definitions=main-2404100123
 
-On Wed, Apr 10, 2024 at 05:34:19PM +0300, Vladimir Oltean wrote:
->On Wed, Apr 10, 2024 at 11:14:09AM +0200, Paolo Abeni wrote:
->> On Wed, 2024-04-10 at 09:06 +0000, xu wrote:
->> > Hi! Excuse me, I'm wondering why this patch was not merged into the 5.15 stable branch.
->>
->> Because it lacked the CC: stable tag?
->>
->> You can still ask (or do) an explicit backport, please have a look at:
->>
->> Documentation/process/stable-kernel-rules.rst
->>
->> Cheers,
->>
->> Paolo
->>
->
->My email records say that it was backported to 5.16:
->https://lore.kernel.org/lkml/20220214092515.419944498@linuxfoundation.org/
->On 5.15 I have no idea why not (no email).
+On 4/10/2024 12:59 AM, Johannes Berg wrote:
+> I found the code that needs it later, just that Karthikeyan was using
+> the wrong explanation for it ... I'd hoped he'd understand your own code
+> better ;-)
 
-Happy to answer why!
+Internally I'm stressing the need to provide sufficient information in these
+patches so that you (and I!) can understand the entire scope. Please continue
+to let us know when we are failing.
 
-It was proposed for 5.15, but dropped due to build failures:
+(bcc to our internal development list)
 
-	https://lore.kernel.org/all/202202131427.SK7CctaU-lkp@intel.com/
-
-The missing functions were later brought to the 5.15 tree via:
-
-	https://lore.kernel.org/all/20230601131937.674646135@linuxfoundation.org/
-
-At this point, Greg's current backport of the commit in question was
-successful.
-
--- 
-Thanks,
-Sasha
+/jeff
 
