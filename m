@@ -1,169 +1,148 @@
-Return-Path: <netdev+bounces-86711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79B5A8A0052
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:07:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DB8A8A0060
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:09:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E0231C22FDD
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 19:07:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE7EA1C21741
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 19:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13BB180A82;
-	Wed, 10 Apr 2024 19:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EC2F180A88;
+	Wed, 10 Apr 2024 19:09:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jCA39fUC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2+gvAbxm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA2B7460;
-	Wed, 10 Apr 2024 19:07:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABFA6180A7F
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 19:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712776066; cv=none; b=mxXBWdjsdeCZ2v8oFDzT5I6kZCCd0cjp7Il/2GrfSlTplErzlYK3AUZUlIoNB7k4CJnfEXny+88z/wzI5L2oDBKM00Onkq91pcS92Ko0mQCmZ2rsYUlk98Ul/ohMOMZVq7+L9LIqYIimx2qdBZj98uEVEQghU8d6B+llhR5cKr4=
+	t=1712776182; cv=none; b=TWSvAvYXJAiGLdNOnXeuTJB4nV5ak7EvcZNwCC+mFz2MgnPzh0B7EAB29KC0nU0W3tlEm58wzXHM+HkyOhvMto4frorurQx/DXetoLAL2VLIpDh8+RkXt/v6KAQkqipIllJoqBJ8HBYq74dm16uUuptdg4mUD9R7GoY/JYgEK3U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712776066; c=relaxed/simple;
-	bh=OVRSpBkIl1y9Opvj2OA7aXUnrKiMuWoC9L9r8cY7FaY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=otuDsTw3M2k1u7nuKImfN+Nc8Qa6bigeZCPVKlbj1/ETNdnHs19p+FsAeKpVP9JR3upVCK2Tsx4B1gFlBGaSamzyD2Ppo0nwsDLVklT8VCxVXxvve8h0xb2pcENS6A7Tc+nlLGNbzsEjfq3KD1fXvuExmjcfCKJP3X3IVu5XRZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jCA39fUC; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43AJ0HM6001428;
-	Wed, 10 Apr 2024 19:07:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=PZ/Jcg0UvM09pjZy5iffqsji//dpbDI69OcR0FigxVI=; b=jC
-	A39fUCDyc/iEuKH41z3JNWgMoKptUxVGXoAwY0wCfIYsQ5T7zLgvlLAYrP8gptPh
-	SG2GgBJ0qVeoKXZsbxxBWRuu2GPwV3c+amh+Ryc7oZpcHIz0wdEer8ABPQ1pMDj8
-	gq2RDCQPMUl7ZvuNqDmh7FMnCWbYcRgfCX27+CAaK5o3PRnXJEVWLb0I9yMW5ble
-	RjQ2x2T2vVIGyk+eUS/hs2vRTjcYGEptjX4nHMytDrFEKjp1+x4J/Rt5ln6cKL5o
-	uIculxhEwjz7eVmi2PxYxj9vFpF2Z/1A5wBIQ5yZQ2Dun6gd5Xj2LujYAb9gK98Q
-	OwCHuNlaiuCu5KEhR/YA==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xdpnfu0n1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Apr 2024 19:07:24 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43AJ7MOY020552
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Apr 2024 19:07:23 GMT
-Received: from [10.46.19.239] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 10 Apr
- 2024 12:07:19 -0700
-Message-ID: <fb705c02-0f4b-4879-8ae8-69048e14072f@quicinc.com>
-Date: Wed, 10 Apr 2024 12:07:18 -0700
+	s=arc-20240116; t=1712776182; c=relaxed/simple;
+	bh=3vpVF4t7apopDMRyVXzObK4S1vRFFr2BvTpMBTZ17jw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=meU2Gvv2LbXVBfokjhRDgrD2Ah+brCi2zdUP4gtPl81TWYgop/CuRRcpBNzbGpK0LVcAdrVQyNOns2zyGwZ5f1QBMqSxWK7/4/qBivkS4sfGGy6uYQdEwKvlawYuxLb0MnpE1ZN04wb9yWuzhRkLWaIr4R9aacJ0T2933bM9p00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2+gvAbxm; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-516d4d80d00so6828201e87.0
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 12:09:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712776179; x=1713380979; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bIo2EVourWrLaohp5j6QNkkQsISAFdO4wMswAJKmsJ4=;
+        b=2+gvAbxmmzzAKUt5ZFXEgjLwBBIoYd/znXmBjZyRqa6rG60mYcFviZ5Tqm3sU8QCAq
+         s8KIOnyM6wewe++PgEuS2J0X1Df8ZrFzX7VOmtUSp5dBjBkrIm533TaoVrFh1ISIWlSe
+         sKd/B0npqipRnNgpjLz3JiTogQqXippRTpOVO6DHRgr2JCG3YxGjVd3MapjSSPCSMT7C
+         dcymDAylEUkb2Cg31D9rZHY+az0xM4/IrdPCfy3d9es/HUxT8dLXdeyFWGd/bEKWa7qu
+         pp4qp3+/u8XJbv4wXDlFAteHHqTxe/ZqlC38A8TuekES/xj5DwLxHRmS/V0EQgp/ye3u
+         SDvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712776179; x=1713380979;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bIo2EVourWrLaohp5j6QNkkQsISAFdO4wMswAJKmsJ4=;
+        b=aEUNdnG0G10zEZexD1Q/j9iPH5sTgajXlr+NMJkpZmIG18nBT9N/kWBJQULOh0dqNP
+         7NlVkk9+Xxv6IPWE5Cq3R5cAqmJpWc+HvlHkMzfSbFEeICJLtVuyh5PygmZ9JMQF7VH/
+         Y3O3Z06Lc8556Rs4xBCbqb8GbQyIGT18ZJQiuuZzZZHSix6xG8bT53Av/Xa+69iRNhGa
+         NDNDp0/uN+pXCGBKyAvgVIB3iyFKFGDOLPB77ScAV8ERU2sjORTQSYIWoQtUjMWqUnZO
+         U+Bm6dV3JYbIJ83sJzEshBv5efq4ASWFeqSQ7jG5fhhrGkhw/zYGGPEVTPJ/Q4VJjpNK
+         a6VA==
+X-Gm-Message-State: AOJu0YzKFn+gj5e3cPeX9c7Z2yHibuGmrX/VIZxI8ajtE3ULKLRxp8E7
+	ZlgxQcGQ+b8b8TV8M8xNescKKR4A16rWMAR/d5z7kZerDb3LqIwiknx9gdnqDvlkYuf4+xkXoR6
+	gEAi7GT+F0jQZfJJcLwgmLCc2lfc8MYI2zb+i
+X-Google-Smtp-Source: AGHT+IH5P3MBCNgnfVNKHRh/3p0kXImGKWwPLqhR8qXKbY22t/CU4Q5cuxfS1hEk4O6f0dElkgcrJEVfk3FCIRv4BiY=
+X-Received: by 2002:a05:6512:33cb:b0:517:854e:2c91 with SMTP id
+ d11-20020a05651233cb00b00517854e2c91mr925647lfg.64.1712776178375; Wed, 10 Apr
+ 2024 12:09:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH bpf-next v1 2/3] net: assign enum to skb->tstamp_type
- to distinguish between tstamp
-Content-Language: en-US
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
-        "Martin
- KaFai Lau" <martin.lau@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>
-CC: <kernel@quicinc.com>
-References: <20240409210547.3815806-1-quic_abchauha@quicinc.com>
- <20240409210547.3815806-3-quic_abchauha@quicinc.com>
- <6616b1ceeecad_2a98a529472@willemb.c.googlers.com.notmuch>
-From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-In-Reply-To: <6616b1ceeecad_2a98a529472@willemb.c.googlers.com.notmuch>
+References: <20240408153000.2152844-1-almasrymina@google.com>
+ <20240408153000.2152844-3-almasrymina@google.com> <20240409182301.227c9ff7@kernel.org>
+In-Reply-To: <20240409182301.227c9ff7@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 10 Apr 2024 12:09:26 -0700
+Message-ID: <CAHS8izM+S=j1DLsb6JdKFFUurotcw3eArGDOz9NBvksDoh=11Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 2/3] net: mirror skb frag ref/unref helpers
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Ayush Sawal <ayush.sawal@chelsio.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	David Ahern <dsahern@kernel.org>, Boris Pismenny <borisp@nvidia.com>, 
+	John Fastabend <john.fastabend@gmail.com>, Dragos Tatulea <dtatulea@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: ann3hOHn-a19bKj71aC3r0m1mYg9OdAd
-X-Proofpoint-ORIG-GUID: ann3hOHn-a19bKj71aC3r0m1mYg9OdAd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-10_04,2024-04-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
- mlxlogscore=999 malwarescore=0 clxscore=1015 spamscore=0 adultscore=0
- lowpriorityscore=0 bulkscore=0 priorityscore=1501 impostorscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2404010003 definitions=main-2404100140
+Content-Transfer-Encoding: quoted-printable
+
+On Tue, Apr 9, 2024 at 6:23=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Mon,  8 Apr 2024 08:29:57 -0700 Mina Almasry wrote:
+> > +#ifdef CONFIG_PAGE_POOL
+> > +static inline bool is_pp_page(struct page *page)
+> > +{
+> > +     return (page->pp_magic & ~0x3UL) =3D=3D PP_SIGNATURE;
+> > +}
+> > +
+> > +/* page_pool_unref_page() lives in net/page_pool/helpers.h */
+> > +static inline void page_pool_ref_page(struct page *page)
+> > +{
+> > +     atomic_long_inc(&page->pp_ref_count);
+> > +}
+> > +
+> > +static inline bool napi_pp_get_page(struct page *page)
+> > +{
+> > +     page =3D compound_head(page);
+> > +
+> > +     if (!is_pp_page(page))
+> > +             return false;
+> > +
+> > +     page_pool_ref_page(page);
+> > +     return true;
+> > +}
+> > +#endif
+> > +
+> > +static inline void skb_page_ref(struct page *page, bool recycle)
+> > +{
+> > +#ifdef CONFIG_PAGE_POOL
+> > +     if (recycle && napi_pp_get_page(page))
+> > +             return;
+> > +#endif
+> > +     get_page(page);
+> > +}
+>
+> Shifting of all this code from pp to skbuff catches the eye.
+> There aren't that many callers to these, can we start a new header?
+
+I am not 100% sure what the new header should be named and what
+exactly you wanted moved to the new header, but made a guess and
+uploaded v6 with this change. Let me know if it's not what you had in
+mind. I added a new linux/skbuff_ref.h header file, moved all the ref
+functions there, and included page pool headers in that without worry.
+
+v6: https://patchwork.kernel.org/project/netdevbpf/list/?series=3D843380
+
+> We can then include page pool headers in the without worry.
+>
+> I'll apply the other patches, they look independent.
 
 
 
-On 4/10/2024 8:35 AM, Willem de Bruijn wrote:
-> Abhishek Chauhan wrote:
->> As we are renaming the mono_delivery_time to tstamp_type, it makes
->> sense to start assigning tstamp_type based out if enum defined as
->> part of this commit
->>
->> Earlier we used bool arg flag to check if the tstamp is mono in
->> function skb_set_delivery_time, Now the signature of the functions
->> accepts enum to distinguish between mono and real time.
->>
->> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
->> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
->> ---
->>  include/linux/skbuff.h                     | 13 +++++++++----
->>  net/bridge/netfilter/nf_conntrack_bridge.c |  2 +-
->>  net/core/dev.c                             |  2 +-
->>  net/core/filter.c                          |  4 ++--
->>  net/ipv4/ip_output.c                       |  2 +-
->>  net/ipv4/tcp_output.c                      | 14 +++++++-------
->>  net/ipv6/ip6_output.c                      |  2 +-
->>  net/ipv6/tcp_ipv6.c                        |  2 +-
->>  net/sched/act_bpf.c                        |  2 +-
->>  net/sched/cls_bpf.c                        |  2 +-
->>  10 files changed, 25 insertions(+), 20 deletions(-)
->>
->> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
->> index 8210d699d8e9..6160185f0fe0 100644
->> --- a/include/linux/skbuff.h
->> +++ b/include/linux/skbuff.h
->> @@ -701,6 +701,11 @@ typedef unsigned int sk_buff_data_t;
->>  #else
->>  typedef unsigned char *sk_buff_data_t;
->>  #endif
->> +
->>
->>
->> +enum skb_tstamp_type {
->> +	SKB_TSTAMP_TYPE_RX_REAL = 0,    /* A RX (receive) time in real */
->> +	SKB_TSTAMP_TYPE_TX_MONO = 1,    /* A TX (delivery) time in mono */
->> +};
-> 
-> I'd drop the RX_/TX_. This is just a version of clockid_t, compressed
-> to minimize space taken in sk_buff. Simpler to keep to the CLOCK_..
-> types. Where a clock was set (TX vs RX) is not relevant to the code
-> that later references skb->tstamp.
-> 
-Make sense. tstamp can be either mono, real , tai ... etc . Directionality doesnt matter
-Let me check this and update. 
-
->>  static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
->> -					 bool mono)
->> +					enum skb_tstamp_type tstamp_type)
->>  {
->>  	skb->tstamp = kt;
->> -	skb->tstamp_type = kt && mono;
->> +	skb->tstamp_type = kt && tstamp_type;
-> 
-> Already introduce a switch here?
-> 
-I will introduce a switch here based on tstamp_type passed. 
-
-> 
+--=20
+Thanks,
+Mina
 
