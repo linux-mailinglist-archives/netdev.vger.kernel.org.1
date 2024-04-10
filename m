@@ -1,75 +1,63 @@
-Return-Path: <netdev+bounces-86459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91B1489EDBF
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:37:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A447389EDE2
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 10:44:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C6892839A4
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:37:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DFBF1F21B5B
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:44:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CB8114F113;
-	Wed, 10 Apr 2024 08:37:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2793A15530C;
+	Wed, 10 Apr 2024 08:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="FoYyOSdp"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="uvVfbqTx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87E6913D607
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 08:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2A5F1552E0;
+	Wed, 10 Apr 2024 08:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712738253; cv=none; b=gMMztzApfSIlMrjr4fTLaDv/hlA6L9zq2Ak27Npcn3QMSy4Sinava9nI4fvB8l7ZEhpzSwASOLC4jNqFib/5sjBz8doSib29dVDTe9nKxSU6BilDCmyxbA86nLZsWes2oC0ATtc/Rxhu5ae6vXnoSVWhSE4rGzBrCel3W5oN0Yo=
+	t=1712738573; cv=none; b=DKtXRxUMugU9MOzFeRPvoxGwxLsEAZ3hshf6JTLVl4KEMpaqTcJIvvlV9m9pPdxuVba5DwFsn4BjUs0ox1Sc4x45Drge+4LOf04if2mEJXugzmU0bgrv3Blb/Q+FwT4umd6nBYv2PSoC3VHKOHFiFEXXKtXKnvxOP9wVbmqc8bk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712738253; c=relaxed/simple;
-	bh=FYAo2/dIeQdn2ZanZzlG930Vpz+rf/Q5KdpGZ7ZWSb0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kjDg5noDuzuRjbpRdkaAoho68UjfpR3WkVD9HcHVunlu6vOsOcBLQ8UKSNTRhHvgh1zHjmVT+x7zm04w3HOQMhKH6jJB2pqKRCGnmGuykHTexbURLtdLXn3HwGiJ4UPUAyhAwiK4v8zOI4WyDWQtgSPDPLbhXs6y+lr7A75qoAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=FoYyOSdp; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-416b66163a9so13130265e9.2
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 01:37:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1712738250; x=1713343050; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=99G2ssJEZsbhsIji5LLAb7rBxLp1dxN5cU7ZF7Ofo2E=;
-        b=FoYyOSdpSJIs0ooXFh3CJNPeiZc8cTIgsIcxWjkUJXz9F8pXPZi7b6wN4ltC31IzbA
-         wHGsCHsv4zbyoNx9q4ZEkO3D91SiEO3EMAQJnmroeOTmkQriAwHdQvXXvtxNRqIwwQOk
-         g9BzTaylN01no0/hg3FnNCxOcbfzAGCVzuEKpW/lA2swYU2aJsrZ04L9yPvkafauDpVl
-         8M2OzkcQxwtjIXhmDBU3yhc+hD2lrqhjMeTvvNBUkUaIsM0ystymregtPgiA4ADr9dPe
-         pjW7/koslOjT+3nl7mueSFtoZyR179vEMzC71Vwyv9mJbH6BECI0jeKUP0yx/Z0R+Gef
-         WNrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712738250; x=1713343050;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=99G2ssJEZsbhsIji5LLAb7rBxLp1dxN5cU7ZF7Ofo2E=;
-        b=G9K0CZXhI7WTkA1Nn4wNZfB/B19tQkdkur/jZ+IKuS/T7dst4Jq/6tm2153pfR5wSo
-         0R5D8P/PwnvYv7CJ8GDGzpdgsj9XWmr9+eQy1P//conUYXcmP18nyDvqXR84Sbw6Wzk0
-         H0zQlyDxGf3OLt8NsOq89zHRjgHyXRsCdVpUQcOhBU5UoSkIN0CPg3z9VbYXyOZfNm/9
-         8SedT3CVWoGZcKS4c5WiBQXi5aaQvU3NDWLZP4FP2gDPlEIrCTat4OIfjI/FVsddn08z
-         uCkcyNEV3C97ZJ/dwGEnwGEO65g5Y2TkP2xzJb5SNFzZykWJDL6DTYoA5h326p/xiejR
-         vQ+g==
-X-Forwarded-Encrypted: i=1; AJvYcCWB/DcOKP/tJuY4RTxbiP43GqKq936kl8WHLyoublbjg88QeKfbDSQWZ2xQtnGW4OS/c3rZQmj2MxZLpDhVFHOipCkw0rRl
-X-Gm-Message-State: AOJu0YyERrN05ViFuvj1DpOQY+aIFbsVtQ58SzL8WxmS4slaHX5rnSqC
-	280qGItVSebLL/knYLyTS0YyHgWfeBDbSQ9pyNdx7iBNs2jvqePtOWIto74U6eM=
-X-Google-Smtp-Source: AGHT+IFKUvThV9mqYvSlZmF7R8A0q41osKTYthm4fPbWcaDCaOMpjuEkcaIpFo3COzoaVkCbC/eMDA==
-X-Received: by 2002:a05:600c:1d83:b0:417:240e:9ac3 with SMTP id p3-20020a05600c1d8300b00417240e9ac3mr928977wms.2.1712738249833;
-        Wed, 10 Apr 2024 01:37:29 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:51b5:9a7a:d2c:9ae? ([2a01:e0a:b41:c160:51b5:9a7a:d2c:9ae])
-        by smtp.gmail.com with ESMTPSA id v13-20020a05600c444d00b0041663450a4asm1560021wmn.45.2024.04.10.01.37.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Apr 2024 01:37:28 -0700 (PDT)
-Message-ID: <1909116d-15e1-48ac-ab55-21bce409fe64@6wind.com>
-Date: Wed, 10 Apr 2024 10:37:27 +0200
+	s=arc-20240116; t=1712738573; c=relaxed/simple;
+	bh=7k0geQtKctDRHUCAeNxKnmtqw7tTLtM5JqO5OR0ecVM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=P4rpDGsipguDTFBlE30QBaAREduQfBEg/ax2DTUbnF9XBVX+EUeFsZJGUnUn/72ruX0YqNS4GQlVuNfsISMsUA2IDrPN3sW1r+kk3aDH1VOzpEkD+dDKXoQyUxWdIHrrl5LZVYKV5KtRwZ91LgZcuaY+n1+qqqSXNBz99Xc7eeI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=uvVfbqTx; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43A8gNUL041435;
+	Wed, 10 Apr 2024 03:42:23 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1712738543;
+	bh=swUSXL7PVIUJc7GOlNkYC+/+3PmSDVyctkmAasa7e3w=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=uvVfbqTxMB6C7tidhT/angdvB1LljKC8xOvMMhROV3iULd8fdTg4P5+LkBh8+a1pg
+	 CjSbMYwyuD5L0iGhxfNNgTGmXcsqksSRqrBwIRB2mK47jQijFJZHxo4o0oGd+Z1eka
+	 XkjImJ2b0aRYuYhNvPcONtGPK4vy461Gj8g0zjhY=
+Received: from DFLE104.ent.ti.com (dfle104.ent.ti.com [10.64.6.25])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43A8gNMG018789
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 10 Apr 2024 03:42:23 -0500
+Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 10
+ Apr 2024 03:42:22 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 10 Apr 2024 03:42:22 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43A8gF3u011914;
+	Wed, 10 Apr 2024 03:42:17 -0500
+Message-ID: <ff567495-d966-42c9-9015-ba0ba0dbe011@ti.com>
+Date: Wed, 10 Apr 2024 14:12:15 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,31 +65,157 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH ipsec-next v9] xfrm: Add Direction to the SA in or out
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: antony.antony@secunet.com, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, devel@linux-ipsec.org,
- Leon Romanovsky <leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>
-References: <bb191b37cd631341552ee87eb349f0525b90f14f.1712685187.git.antony.antony@secunet.com>
- <0a51d41e-124e-479e-afd7-50246e3b0520@6wind.com> <ZhY_EE8miFAgZkkC@hog>
- <f2c52a01-925c-4e3a-8a42-aeb809364cc9@6wind.com> <ZhZLHNS41G2AJpE_@hog>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add support for
+ ICSSG switch firmware
 Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <ZhZLHNS41G2AJpE_@hog>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Diogo Ivo <diogo.ivo@siemens.com>, Rob Herring <robh@kernel.org>,
+        Dan
+ Carpenter <dan.carpenter@linaro.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>, Simon Horman <horms@kernel.org>,
+        Wolfram Sang
+	<wsa+renesas@sang-engineering.com>,
+        Arnd Bergmann <arnd@arndb.de>, Vignesh
+ Raghavendra <vigneshr@ti.com>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub
+ Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
+References: <20240327114054.1907278-1-danishanwar@ti.com>
+ <20240327114054.1907278-4-danishanwar@ti.com>
+ <27d960ed-8e67-431b-a910-e6b2fc12e292@lunn.ch>
+ <c94815f8-798a-4167-8f69-359b9b28b7ce@ti.com>
+ <cca25c3d-a352-4531-a8ae-5a0fb7de44df@lunn.ch>
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <cca25c3d-a352-4531-a8ae-5a0fb7de44df@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Le 10/04/2024 à 10:17, Sabrina Dubroca a écrit :
-[snip]
->> Why isn't it possible to restrict the use of an input SA to the input path and
->> output SA to xmit path?
+Hi Andrew,
+
+On 28/03/24 6:09 pm, Andrew Lunn wrote:
+> On Thu, Mar 28, 2024 at 11:39:33AM +0530, MD Danish Anwar wrote:
+>> Hi Andrew,
+>>
+>> On 27/03/24 6:05 pm, Andrew Lunn wrote:
+>>> On Wed, Mar 27, 2024 at 05:10:54PM +0530, MD Danish Anwar wrote:
+>>>> Add support for ICSSG switch firmware using existing Dual EMAC driver
+>>>> with switchdev.
+>>>>
+>>>> Limitations:
+>>>> VLAN offloading is limited to 0-256 IDs.
+>>>> MDB/FDB static entries are limited to 511 entries and different FDBs can
+>>>> hash to same bucket and thus may not completely offloaded
+>>>>
+>>>> Switch mode requires loading of new firmware into ICSSG cores. This
+>>>> means interfaces have to taken down and then reconfigured to switch
+>>>> mode.
+>>>
+>>> Patch 0/3 does not say this. It just shows the interfaces being added
+>>
+>> I will modify the cover letter to state that.
+>>
+>>> to the bridge. There should not be any need to down the interfaces.
+>>>
+>>
+>> The interfaces needs to be turned down for switching between dual emac
+>> and switch mode.
+>>
+>> Dual Emac mode runs with ICSSG Dual Emac firmware where as Switch mode
+>> works with ICSSG Switch firmware. These firmware are running on the
+>> dedicated PRU RPROC cores (pru0, rtu0, txpru0). When switch mode is
+>> enabled, these pru cores need to be stopped and then Switch firmware is
+>> loaded on these cores and then the cores are started again.
+>>
+>> We stop the cores when interfaces are down and start the cores when
+>> interfaces are up.
+>>
+>> In short, Dual EMAC firmware runs on pru cores, we put down the
+>> interface, stop pru cores, load switch firmware on the cores, bring the
+>> interface up and start the pru cores and now Switch mode is enabled.
 > 
-> Because nobody has written a patch for it yet :)
+> This is not the Linux model. Try it, add an interface to a software
+> bridge. It does not care if it is admin up or down.
 > 
-For me, it should be done in this patch/series ;-)
+> You need to hide this difference in your driver.
+> 
+
+I have been working on this and have found a way to change firmwares
+without bringing the interfaces up / down.
+
+By default the interfaces are in MAC mode and the ICSSG EMAC firmwares
+are running on pru cores. To enable switch mode we will need to stop the
+cores and reload them with the ICSSG Switch firmwares. We can do this
+without bringing the interfaces up / down.
+
+When first interface is added to bridge it will still run emac
+firmwares. The moment second interface gets added to bridge, we will
+disable the ports and stop the pru cores. Load the switch firmwares on
+to the cores, start the cores and enable the ports. All of this is done
+from the driver.
+
+The user need not to bring the interfaces up / down. Loading / Reloading
+of firmwares will be handled inside the driver only. But we do need to
+stop the cores for changing firmwares. For stopping the cores we will
+change the port state to disable by sending r30 command to firmware.
+
+As we are not restarting the interfaces, the DRAM, SMEM and MSMC RAM
+doesn't get cleared. As a result with this approach all configurations
+will be saved.
+
+Please let me know if this approach looks ok to you.
+
+Below will be the commands to enable switch mode now,
+
+     ip link add name br0 type bridge
+     ip link set dev eth1 master br0
+     ip link set dev eth2 master br0 (At this point we will stop the
+cores, reload switch firmware, start the cores)
+     ip link set dev br0 up
+     bridge vlan add dev br0 vid 1 pvid untagged
+
+
+>>> I keep asking this, so it would be good to explain it in the commit
+>>> message. What configuration is preserved over a firmware reload, and
+>>> what is lost?
+>>>
+>>> Can i add VLAN in duel MAC mode and then swap into the switch firmware
+>>> and all the VLANs are preserved? Can i add fdb entries to a port in
+>>> dual MAC mode, and then swap into the swtich firmware and the FDB
+>>> table is preserved? What about STP port state? What about ... ?
+>>>
+>>
+>> When ports are brought up (firmware reload) we do a full cleaning of all
+>> the shared memories i.e. SMEM (shared RAM). [1]
+>>
+>> Vlan table and FDB table are stored in SMEM so all the configuration
+>> done to VLAN / FDB tables will be lost.
+>>
+>> We don't clear DRAM. DRAM is used for sending r30 commands [see
+>> emac_r30_cmd_init()], configure half duplex [see
+>> icssg_config_half_duplex()] and configure link speed [see
+>> icssg_config_set_speed()]. r30 commands are used to set port state (stp).
+>>
+>> Now when the interfaces are brought up (firmware reload) r30 command is
+>> reconfigured as a result any changes done to port state (stp) will be
+>> lost. But the duplex and speed settings will be preserved.
+>>
+>> To summarize,
+>> VLAN table / FDB table and port states are lost during a firmware reload.
+> 
+> So you also need to work around this in your driver. I think it is
+> possible to get the network stack to enumerate the configuration. Take
+> a look at the Mellanox driver. If i remember it does something like
+> this, but i don't remember the details.
+> 
+>       Andrew
+
+-- 
+Thanks and Regards,
+Danish
 
