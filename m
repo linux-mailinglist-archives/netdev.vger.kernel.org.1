@@ -1,124 +1,102 @@
-Return-Path: <netdev+bounces-86417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5202D89EBDE
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:26:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C728C89EBE5
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:27:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7B47B22144
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:26:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 044831C218A6
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:27:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4766C40BE0;
-	Wed, 10 Apr 2024 07:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="pFOFv+Yl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BA8413C9A5;
+	Wed, 10 Apr 2024 07:27:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D769ADDC1
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 07:26:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71CDB13CFAC
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 07:27:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712734008; cv=none; b=Ib+sgeplUbPX+aKpUwCKDoCboIEn2up5ed0kggwiwn+RZU+p8y9AUl9oVlBYysdWALVnFsNlpnEXJcRiTrSb4u+I1lGxx6GxdJqQSaHaicXU7KkdttUG7mtfZ87ReuL/snSzhozNns+WqY8dvG9jmlkL/3B/WqLuU6fbkatrpgw=
+	t=1712734039; cv=none; b=rx6AcNLgcOpReV4BbHUCOPK8GGwAOZYD4uJcgvfvCIugSv0c0C0mEVgz8MV67Bdzd0B8pzquTU+amGWbIUUO2+r/B5Po0GgKkhdMKbEWzOPFuHzS+liJBykOVbvWRhu/ygHneD8Hq6dgmE81EIDm9WTw+iHh5EZ7AnjLHeT48nE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712734008; c=relaxed/simple;
-	bh=e+AG6V8H2fl37BdYmx2ZT0nlt0YzNk8468xEWI+ainw=;
+	s=arc-20240116; t=1712734039; c=relaxed/simple;
+	bh=Axk5w7oiky9Hhs0dRsLltIaPpNCc3SGBAiYSkJ5A8KI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XR6vXyjSEVhVJgPTKTbYoekpKlkyvP8hozQpYHEIFmOeWYzlq8gwSWLb5wQdO5V1Wc5cOvJAmWCjkHnw3IfL+Hqlomv3lg6RQdjDirLUAZXEmbbbx8wKK7dO3hy+RjU6KtJIR0LmBgkSFCsGDfNSPp6Y46Anzm2s5Ebr3O3xjG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=pFOFv+Yl; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-56fd7df9ea9so228712a12.0
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 00:26:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712734004; x=1713338804; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fdIZZrzqz4wA4YPQi7Rwfe/E1DAX6qVZQwZpQlcq71k=;
-        b=pFOFv+Yl7UbrOKHeYeziR/g0T1IMG4f8HfFDZMVh+bchvwpTAREVqHiI2XzdxLu5XE
-         bVTmfxSxvhQT8+cVh4GGUAtkvpd6xXVFA9l0FGOXl+PIG90lfASODAlJfkwOStvL67I1
-         QGYVOwX5+0V+E9k7+pCuqZOKyAlycLByQS2tbv7va3MNI3NWGkNI4KKpsG6rrjEaZeTV
-         vJLN94JJe8yOFcIgNA071LXbPNJb/1mQMP9xDdFh3z7JaLNi2hjA4TGJQ6LUlOeIZnM+
-         DZ0yf9rMc+x4bc/GcvcKouqXdqcG3vTsb3DgRXKd179XUEa0/qn2jOIbHN1sTy+ytpSW
-         Badg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712734004; x=1713338804;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fdIZZrzqz4wA4YPQi7Rwfe/E1DAX6qVZQwZpQlcq71k=;
-        b=V9zV1mSZy0kLbRdqJiluT8JHGL+SYUC7/RVmLkMRIVOVI9HMLkAwezY3LLw13A/2Bi
-         43O8HhsKFrWnX1Vx83BUl8vzG6ABdY0SthuTcOf2SROhF5mkSOotO3pRbbZqPG//N6Sk
-         gU6/tJnuoxLeaU6AFZu8H7n023qShCj2lKdIkg8aJloLzTWuK6lseG4pnvdDoUaK36nS
-         KJuwAcXJYL0xcTlJSBwS5gAR26nEth6XI4PBIePVztV2mneESEVD3R69X31tShsvzaYQ
-         H4UHJnmsGAzhkWtiLKhKBPhdkPBq9+LNbrzcuc8b8M8g2N4qjKJdIrV7H20Zyt3f3mPQ
-         cH3A==
-X-Forwarded-Encrypted: i=1; AJvYcCUKlQC0jNSESK3IMFLckOpvAcEB3Io3dxTwhyfNiZ+Ne/MZgGk+mDxEs+X4jRaIuO9jFRPAFdnsSasu8BeAXoNsTQSfT5E+
-X-Gm-Message-State: AOJu0YybuxP3AIkh5OtEJW8wPuOfUfre1Ws/oKZU6CNcqI8DsQsZ3w6D
-	2aMprOtDQBFnhl0R9J9zoUEK98oyfcpSCIXSmAPpsvM5V7YGQI5ug7bk0j/tZH8=
-X-Google-Smtp-Source: AGHT+IH+W/F1+BSpIHz7mLcAWnXTu1H33OQo8F2Q1DXesJ7VREDNOAHOswXumxvf0957EQQLCH3DJw==
-X-Received: by 2002:a17:906:b2d8:b0:a4e:a7a:84e0 with SMTP id cf24-20020a170906b2d800b00a4e0a7a84e0mr995649ejb.34.1712734003817;
-        Wed, 10 Apr 2024 00:26:43 -0700 (PDT)
-Received: from localhost (78-80-106-99.customers.tmcz.cz. [78.80.106.99])
-        by smtp.gmail.com with ESMTPSA id v17-20020a170906b01100b00a46aba003eesm6633313ejy.215.2024.04.10.00.26.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 00:26:43 -0700 (PDT)
-Date: Wed, 10 Apr 2024 09:26:41 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, pabeni@redhat.com,
-	John Fastabend <john.fastabend@gmail.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Edward Cree <ecree.xilinx@gmail.com>,
-	Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
-	bhelgaas@google.com, linux-pci@vger.kernel.org,
-	Alexander Duyck <alexanderduyck@fb.com>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-Message-ID: <ZhY_MVfBMMlGAuK5@nanopsycho>
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <20240409135142.692ed5d9@kernel.org>
- <6615adbde1430_249cf52944@willemb.c.googlers.com.notmuch>
+	 In-Reply-To:Content-Type:Content-Disposition; b=QyTkBeNJU/xxUScjwbpfzGh+40y+S3ZIglMiZO4V6qzB7PE+/fr8NKZkyUQJM8bNIvnXVMAMmyc9P6SOMLFZphNwjEfXyLAA8G5CYME+CsWO7Omyy1hg9B91KT+h83UhpzTEPU0FVLpXPzJr+wX8TDAn8pzqZkPWg8BXsDFAqgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-604-7cVesN8YPdi5fwCdLxmTDw-1; Wed,
+ 10 Apr 2024 03:27:14 -0400
+X-MC-Unique: 7cVesN8YPdi5fwCdLxmTDw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 218783800096;
+	Wed, 10 Apr 2024 07:27:14 +0000 (UTC)
+Received: from hog (unknown [10.39.192.7])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9FF0240B4983;
+	Wed, 10 Apr 2024 07:27:12 +0000 (UTC)
+Date: Wed, 10 Apr 2024 09:26:51 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Cc: Antony Antony <antony@phenome.org>,
+	Antony Antony <antony.antony@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	devel@linux-ipsec.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [devel-ipsec] [PATCH ipsec-next v6] xfrm: Add Direction to the
+ SA in or out
+Message-ID: <ZhY_O_6w1Yz_R6aS@hog>
+References: <a53333717022906933e9113980304fa4717118e9.1712320696.git.antony.antony@secunet.com>
+ <ZhBzcMrpBCNXXVBV@hog>
+ <ZhJX-Rn50RxteJam@Antony2201.local>
+ <ZhPq542VY18zl6z3@hog>
+ <658b4081-bc8a-4958-ae62-7d805fcacdcd@6wind.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <658b4081-bc8a-4958-ae62-7d805fcacdcd@6wind.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
 Content-Disposition: inline
-In-Reply-To: <6615adbde1430_249cf52944@willemb.c.googlers.com.notmuch>
+Content-Transfer-Encoding: quoted-printable
 
-Tue, Apr 09, 2024 at 11:06:05PM CEST, willemdebruijn.kernel@gmail.com wrote:
->Jakub Kicinski wrote:
->> On Wed, 03 Apr 2024 13:08:24 -0700 Alexander Duyck wrote:
+2024-04-10, 08:27:49 +0200, Nicolas Dichtel wrote:
+> Le 08/04/2024 =C3=A0 15:02, Sabrina Dubroca a =C3=A9crit=C2=A0:
+> [snip]
+> > Nicolas, since you were objecting to the informational nature of the
+> > attribute in v5: would you still object to the new attribute (and not
+> > just limited to offload cases) if it properly restricted attributes
+> > that don't match the direction?
+> It's a good step, sure. Does this prevent an 'input' SA to be used in the=
+ output
+> path? This is the case I'm objecting.
 
-[...]
+Not in the latest version, what we were discussing here was only
+checking attributes that don't match the direction of the SA.
 
->
->2. whether new device features can be supported without at least
->   two available devices supporting it.
->
+Adding checks on the input and output patch to only look up and use
+SAs with the correct direction (or no direction set) should be doable,
+and probably has a negligible impact on performance. If we do this, we
+should maybe add a counter for direction mismatch
+(Xfrm{In,Out}StateDirMismatch?) to help admins.
 
-[...]
+I agree that it would make more sense.
 
->
->2 is out of scope for this series. But I would always want to hear
->about potential new features that an organization finds valuable
->enough to implement. Rather than a blanket rule against them.
+--=20
+Sabrina
 
-This appears out of the nowhere. In the past, I would say wast majority
-of the features was merged with single device implementation. Often, it
-is the only device out there at a time that supports the feature.
-This limitation would put break for feature additions. I can put a long
-list of features that would not be here ever (like 50% of mlxsw driver).
-
->
->
 
