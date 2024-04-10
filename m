@@ -1,160 +1,137 @@
-Return-Path: <netdev+bounces-86432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A97C789EC81
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:43:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1CA589ECDE
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 09:59:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C38461C20D92
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:43:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FE041F21805
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:59:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D93A013D2A0;
-	Wed, 10 Apr 2024 07:42:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DEB013D26E;
+	Wed, 10 Apr 2024 07:59:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="CaCJ8AJc"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Oc9E48YY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1204713C9CE
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 07:42:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34DD713C901;
+	Wed, 10 Apr 2024 07:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712734939; cv=none; b=YVW2BcEcM3AQxk5mLxcRUZHNjlwubBI0Zrjg9xVDZo7tl+8rQm/4ujaqIHf4NWZi/xrv42is4OOxViGc6z9pnwV0wXz3DuMFznVBqZzMX75rJFCNQ3WlpEmSG0oyfKnSbl1ROjyDbIpEMaSd4kNgQIf/rPKmZ7Djc6CgtFu625k=
+	t=1712735949; cv=none; b=QSnl9UBKyqmZZesLgO3QWUzoeT+03FCOuYbeMQUYgtNlpcrm+XBHNhq7Hqh+N3gT71WVBS2O5fXUub9uqFko8VOtLaj+NVKFBu6u7pcJg0HNUXL6SGQrf23vXnzVgKDWBlyovVxgKyd+KlAIH7UHTxfvUnsItRRGnVLbcD5fswg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712734939; c=relaxed/simple;
-	bh=kztqXTJAoSz+e/mj1kuKESJlzUgr1+yO6Mcuo2khv80=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bTRH9T0O2lhi1q6cDzzgPzERnFG1KwrCLEEgeLdlU1qZBVWJRmMidRwhDfyXxrZ526SNdH5+m61aYqfiL4AnXjvka2nykj8ooZPRgChIVFnUFelsS/hoGkHRtOP7/g+eumuDt8nBWO3xaOxlGnE8kkW5vYRLDARKTj5t3hMZKtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=CaCJ8AJc; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a51b5633c9cso511616966b.2
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 00:42:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712734936; x=1713339736; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y//drBcHk8K2aIKsW3skZ7g4m243pzURRAAm6EHv+Vo=;
-        b=CaCJ8AJcInWzOxvJwxd5KYv0dkEtACSAMPcTnk07OUkHfQIPsr8G5zcbroZWQ08bFD
-         TGj3F7zGEBkzZ07w8IXejXfGNp1duJdFSpfzCUVcsTvJp1xBai+in52Yi0tnWFP3SQcT
-         2A5qXb0zxCwha9kjBQH5J+Alky7VeC4cELgHIW92XM4+Mn3a4tr6ZS+RmtU6zCFsziay
-         3jGlxy/hIK/98ltMNsR4FwSC+ULIrBpLkLlRQfrhM4zJSz7ejk6BRXb8gC/mhAbIACN4
-         6thdLOnmKjNCNk2sQKpmeM08WZir5F1vYJIl3YVRkWhPs3P/WdyiGCQoWyUEiivMaDk0
-         m0OQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712734936; x=1713339736;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y//drBcHk8K2aIKsW3skZ7g4m243pzURRAAm6EHv+Vo=;
-        b=iV79iQpkLWsx6qWS7rwr8LCS+lbxYkEncWDUpK2OAnfSt7YALcjXUkJNJs7UC7iqtB
-         YZEfQw2y5WJpBxDJ4KtdERqttD4kno2Av7TYbtW8Q/4WjmwVS7kdbjgmDxp0cjUbP+uV
-         5E2jyLyzO2G2QPuFH5+JO/GpP5lAwb1aN9ofWJO6rTMK8xP2z5TmIXib3k+a2nEDaYvg
-         FkAgVRGOkYqlkbXAEN7j0sdWvy9qyDsd6qKgQ3awdi/TCWDeCOHUBz7+WRr44xlHM4tN
-         z9Kp4AZXyGv//CHQCrKc8wxM/JSNoP0pIWVaiU6YDK/xDrw3F4gY4HoxjTH1S+Pzwhvy
-         jpnA==
-X-Forwarded-Encrypted: i=1; AJvYcCUXDpav16x/R5cpl6k+78zRFjURvJ7q2Xe/GN2ySf38+kr+y1f+ka4PNJzwvOi20DT41mQpUDxyt98GKMuJIHDA8DTWWkqg
-X-Gm-Message-State: AOJu0YxUgpsc+KdaPmjnz2mFFn4cEH/uBWuPbIwSai78XrbfyzEnnAeJ
-	m4akvykUuxoXDQr0JzRTIqzW9XFCpBYEA3yNvWAujAKAbr8Oa1+bS28/heWhjDo=
-X-Google-Smtp-Source: AGHT+IGfZsCjrYN8kp3I8JH38RfST/SpsvUGrNp8ERPfOLl+fqXHnm7ZKPgfclYor4Uat0DIcfMB1g==
-X-Received: by 2002:a17:906:6d51:b0:a51:a10c:cc3 with SMTP id a17-20020a1709066d5100b00a51a10c0cc3mr1087478ejt.17.1712734936215;
-        Wed, 10 Apr 2024 00:42:16 -0700 (PDT)
-Received: from localhost (78-80-106-99.customers.tmcz.cz. [78.80.106.99])
-        by smtp.gmail.com with ESMTPSA id k12-20020a17090646cc00b00a4e3fda23f5sm6588972ejs.165.2024.04.10.00.42.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 00:42:15 -0700 (PDT)
-Date: Wed, 10 Apr 2024 09:42:14 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: pabeni@redhat.com, John Fastabend <john.fastabend@gmail.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Edward Cree <ecree.xilinx@gmail.com>,
-	Alexander Duyck <alexander.duyck@gmail.com>, netdev@vger.kernel.org,
-	bhelgaas@google.com, linux-pci@vger.kernel.org,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-Message-ID: <ZhZC1kKMCKRvgIhd@nanopsycho>
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <20240409135142.692ed5d9@kernel.org>
+	s=arc-20240116; t=1712735949; c=relaxed/simple;
+	bh=AqHcHzCtayvBZM24ONCW4wGNrQrcIpD/e+IDvuE88IU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=aCAzE15nwOOcRNkn/IUaowxktHyDxx8rJ8pWLc5JtptP4hqK6vyxGLU4TDy3eyzPGxcvzfyBZ5fLyJAAJjw3Jy1tD0qEDPn0CS+lkQdH2Bzrr5XpDzGI4Tnk2LC/8H5xNPcaMWUXAvTmyK8CUwhOAbICzzo0o8JV3Uf8ckw35gM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Oc9E48YY; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=8yJzNJsbUcZyMZ+JVyPnDvNkzO3Jhk9AuCTJ1rgbO+o=;
+	t=1712735947; x=1713945547; b=Oc9E48YYT/XL6SyREC+jjB8NpUwrljBx1DO2JxiU0Cl8Oze
+	BHBdsADSjhPy2aDixnLqNW86PAQgfw686M4tF3JjSiKx0M6+Kyu1/ckuRjKOlWLxl9G/TbaV+c0QU
+	ExVsZJJKw6cQCmdT6nvE8DIqeTRceXHQFn6nMpp4tMQyGywloCvLF3TrDmMAmmNMCBbs5HGaDpqI6
+	cyDNE8lQDaJBAAJdowtCda0/bnB9+CZzyzVCl1cAf85R4cfWJbh83YVt5DymayST8o2XbA3KlhkBQ
+	uxWX1u0vfO9dpMVi5dLn5UPFvum/kjovRzcfyl3mtKYzNM14PjkWjVSLTHLBnsOQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1ruSrH-00000001EoS-3zUt;
+	Wed, 10 Apr 2024 09:59:04 +0200
+Message-ID: <902dd36fa5ab0503377e558b92505fe499f666fa.camel@sipsolutions.net>
+Subject: Re: [PATCH 02/13] wifi: nl80211: send underlying multi-hardware
+ channel capabilities to user space
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Vasanthakumar Thiagarajan <quic_vthiagar@quicinc.com>, Karthikeyan
+	Periyasamy <quic_periyasa@quicinc.com>, ath12k@lists.infradead.org
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org, Jakub Kicinski
+	 <kuba@kernel.org>
+Date: Wed, 10 Apr 2024 09:59:02 +0200
+In-Reply-To: <b455f267-9552-be3b-95b0-a036bfa8e14a@quicinc.com>
+References: <20240328072916.1164195-1-quic_periyasa@quicinc.com>
+	 <20240328072916.1164195-3-quic_periyasa@quicinc.com>
+	 <6d92d0ba4a8764cd91cc20c4bd35613bcc41dfcd.camel@sipsolutions.net>
+	 <9d5c2f9f-19b5-af4d-8018-1eb97fac10d6@quicinc.com>
+	 <9d0f309da45ae657cd2ce0bc11a93d66e856ef64.camel@sipsolutions.net>
+	 <b455f267-9552-be3b-95b0-a036bfa8e14a@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240409135142.692ed5d9@kernel.org>
+X-malware-bazaar: not-scanned
 
-Tue, Apr 09, 2024 at 10:51:42PM CEST, kuba@kernel.org wrote:
->On Wed, 03 Apr 2024 13:08:24 -0700 Alexander Duyck wrote:
->> This patch set includes the necessary patches to enable basic Tx and Rx
->> over the Meta Platforms Host Network Interface. To do this we introduce a
->> new driver and driver and directories in the form of
->> "drivers/net/ethernet/meta/fbnic".
->
->Let me try to restate some takeaways and ask for further clarification
->on the main question...
->
->First, I think there's broad support for merging the driver itself.
->
->IIUC there is also broad support to raise the expectations from
->maintainers of drivers for private devices, specifically that they will:
-> - receive weaker "no regression" guarantees
-> - help with refactoring / adapting their drivers more actively
+On Fri, 2024-03-29 at 19:51 +0530, Vasanthakumar Thiagarajan wrote:
+>=20
+> On 3/28/2024 5:31 PM, Johannes Berg wrote:
+> > On Thu, 2024-03-28 at 15:48 +0530, Karthikeyan Periyasamy wrote:
+> > > On 3/28/2024 1:19 PM, Johannes Berg wrote:
+> > > > On Thu, 2024-03-28 at 12:59 +0530, Karthikeyan Periyasamy wrote:
+> > > > > +/**
+> > > > > + * nl80211_multi_hw_attrs - multi-hw attributes
+> > > > > + *
+> > > > > + * @NL80211_MULTI_HW_ATTR_INVALID: invalid
+> > > > > + * @NL80211_MULTI_HW_ATTR_IDX: (u8) multi-HW index to refer the =
+underlying HW
+> > > > > + *	for which the supported channel list is advertised. Internall=
+y refer
+> > > > > + *	the index of the wiphy's @hw_chans array.
+> > > > Is there a good reason to expose this? Seems pretty internal to me,=
+ and
+> > > > not sure what userspace would do with it?
+> > >=20
+> > > Hostapd use this hw index for the channel switch cmd.
+> >=20
+> > What, where? I don't see that in this patchset? And why??
+> >=20
+> > In any case, unless I just missed it and you're going to tell me to loo=
+k
+> > at patch N, we don't need it here, and then I'd prefer to keep it an
+> > internal detail until it's needed.
+> >=20
+> > > The hw index used as a sanity check to identify whether the user
+> > > requested channel fall under the different hw or not.
+> >=20
+> > You mean within hostapd itself? That doesn't make sense, it can derive
+> > that information differently.
+> >=20
+> > > In split-phy hardware, 5GHz band supported by two physical hardware's=
+.
+> > > First supports 5GHz Low band and second supports 5GHz High band.
+> >=20
+> > In your hardware design anyway, but yeah, I get it.
+> >=20
+> > > In this case, user space cannot use band vise check here to identify
+> > > given channel or freq supported in the given hardware.
+> >=20
+> > No, but it also doesn't need an index assigned by the kernel for that.
+> >=20
+>=20
+> The only purpose of hw index is to link hw_chans to per-hardware=20
+> interface combination capability so that each hardware can be
+> identified during interface combination checks capability vs
+> current state. Thinking if we can embed the channel list also
+> into per-hardware interface combination signaling by giving the
+> pointer?
 
-:)
+Maybe? It might mean more allocations where the use is concerned since
+it can't be "static const" that way.
 
+I found the code that needs it later, just that Karthikeyan was using
+the wrong explanation for it ... I'd hoped he'd understand your own code
+better ;-)
 
-> - not get upset when we delete those drivers if they stop participating
-
-Sorry for being pain, but I would still like to see some sumarization of
-what is actually the gain for the community to merge this unused driver.
-So far, I don't recall to read anything solid.
-
-btw:
-Kconfig description should contain:
- Say N here, you can't ever see this device in real world.
-
-
->
->If you think that the drivers should be merged *without* setting these
->expectations, please speak up.
->
->Nobody picked me up on the suggestion to use the CI as a proactive
->check whether the maintainer / owner is still paying attention, 
->but okay :(
->
->
->What is less clear to me is what do we do about uAPI / core changes.
->Of those who touched on the subject - few people seem to be curious /
->welcoming to any reasonable features coming out for private devices
->(John, Olek, Florian)? Others are more cautious focusing on blast
->radius and referring to the "two driver rule" (Daniel, Paolo)?
->Whether that means outright ban on touching common code or uAPI
->in ways which aren't exercised by commercial NICs, is unclear. 
-
-For these kind of unused drivers, I think it would be legit to
-disallow any internal/external api changes. Just do that for some
-normal driver, then benefit from the changes in the unused driver.
-
-Now the question is, how to distinguish these 2 driver kinds? Maybe to
-put them under some directory so it is clear?
-drivers/net/unused/ethernet/meta/fbnic/
-
-
->Andrew and Ed did not address the question directly AFAICT.
->
->Is my reading correct? Does anyone have an opinion on whether we should
->try to dig more into this question prior to merging the driver, and
->set some ground rules? Or proceed and learn by doing?
->
+johannes
 
