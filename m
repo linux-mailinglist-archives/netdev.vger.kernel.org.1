@@ -1,62 +1,58 @@
-Return-Path: <netdev+bounces-86360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 450B189E7BA
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 03:23:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 872A889E7C2
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 03:25:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A457AB214D5
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 01:23:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41539284334
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 01:25:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3036765C;
-	Wed, 10 Apr 2024 01:23:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60DF65C;
+	Wed, 10 Apr 2024 01:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FzKneyhx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mbvLlPSj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06D13623;
-	Wed, 10 Apr 2024 01:23:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2A6522E;
+	Wed, 10 Apr 2024 01:25:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712712184; cv=none; b=U9xRYlQGYSHJAr1TdL031wKGNn15S9xYxuA4Yy1jQVVgCOwmEzF1iBDvsxvF9bfL12hZDBBFFYjfgIlmkn2POcraEB+dP2P2KN+XCvik9W4FhV5jAolsHQshRC46TPdL4keZ50PZ6cYZ0bXkGBOOMKbf/sGvtK3Cv8eN0WcQcdE=
+	t=1712712337; cv=none; b=sZxeRu0LFs92JDAfuVUi/cXe8ONYAP0lGUmJBkGoVE7DVC6x6rBDrTn4uPYZsWcNBzdb7Yn/0OOlhsTM3pA9MUloUNXejn1pafp8lZM8wTJ/4SM1ffGq5vnVv92JY8r2LN4o2/E7XCZWMm8pJ9fki3rZt0b21i6fgFAthtW8QI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712712184; c=relaxed/simple;
-	bh=gGDtkr3EW72+N26cNWxqd4eoTm7khCsAlYGmZPzNCeI=;
+	s=arc-20240116; t=1712712337; c=relaxed/simple;
+	bh=s+LuOnS4/HijsF6NC3UfnnbYdve8rq2hI2x3j2ZD8U4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BYZdH58fWti/3x6b0L4XHzDaVjpVCRhSe6OEiSBhVQSZ0L6NHrJaES1ADvRmEX8HBcyIoShg/thW64jvmavgMVt/rQrbGfoRU+Nm0eTaIVT8daiP/f1aDD7vZxsWg26YEj5zg4fBfcdlT33eKUK5ao2HpTExeU5VBA5eEdtXxyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FzKneyhx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D4AC6C433F1;
-	Wed, 10 Apr 2024 01:23:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=LwtAVLBoqoUR4j9PxhovzFKivAV1nUNSFME8V1JpdJ9OsAN3nKuvgADMguBXy5vj8E5dg9W3+FAeehYQgBX5yYIjGdNGlpGS1Ai6c75W3XlxZ9MYpEgEeT56Oi3qpW6azjYeiOg3u6OsUyQ52pNrUkCbL20ZRoTl3YLCbUwDGs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mbvLlPSj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A680C433C7;
+	Wed, 10 Apr 2024 01:25:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712712183;
-	bh=gGDtkr3EW72+N26cNWxqd4eoTm7khCsAlYGmZPzNCeI=;
+	s=k20201202; t=1712712337;
+	bh=s+LuOnS4/HijsF6NC3UfnnbYdve8rq2hI2x3j2ZD8U4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FzKneyhxcyzOmFRbLdpgjbFHy0DfjwXGlpN/ZgB+FwK6RmhTEl6QFZ/QX0I8tSHpB
-	 LX/oX8n0bPWeR7+1aJAhuF61fGuDRmemIdOJ9maF8fWJ5ZIKiFHY8Ed7eAXxVrVHyT
-	 5Htac4d/0cySawF05grv2j19SsrmJPcFII0QZk8Eg2nwA1DelJnULbiOxAH2R9fVQx
-	 h5wrqbaCi9qgW/MxgeWPgcr79/dqYef8zKwtca/i2JXaXUdBXDRHyUlWLldsO0kYDE
-	 AODhm+DjGUtxaBi+lze0h3iokjAMWbElebTt7f2pQ0rma2Ad8m2vn6hFTDUfNhpoAx
-	 EpmskHieSvB4w==
-Date: Tue, 9 Apr 2024 18:23:01 -0700
+	b=mbvLlPSjzyBvrum7jzCUAgdnJSD17T36+mVtJ+clnXie3CeKuCMiRxz+KsStF/AcQ
+	 z5YQ+YLQXMRrGhTgnZiqQ3hGAjF4ks3oEVbQbES+/U6Rlbok/lG1T11Uw9kRz6/cof
+	 h1ndlEfx+ELsxC23ZR5y+JM1qVfIJ/btq6JpMGb5KVFcdOzVNvxYiv7aTV4Ooebicf
+	 /YxrGRK3A54fxndsRS+B6/4NP6koejFVwmERJsIAh5qxOhdew7sA0xjz9jesXKUetp
+	 BclC6auHZKosViaWkQPdW6ZLJQOFapNYxFKMyWuo985lzDTPy3IyzDbOEM8DCW58GB
+	 VJwzu4ULy8vbA==
+Date: Tue, 9 Apr 2024 18:25:35 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Ayush Sawal
- <ayush.sawal@chelsio.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- David Ahern <dsahern@kernel.org>, Boris Pismenny <borisp@nvidia.com>, John
- Fastabend <john.fastabend@gmail.com>, Dragos Tatulea <dtatulea@nvidia.com>
-Subject: Re: [PATCH net-next v5 2/3] net: mirror skb frag ref/unref helpers
-Message-ID: <20240409182301.227c9ff7@kernel.org>
-In-Reply-To: <20240408153000.2152844-3-almasrymina@google.com>
-References: <20240408153000.2152844-1-almasrymina@google.com>
-	<20240408153000.2152844-3-almasrymina@google.com>
+To: Lei Chen <lei.chen@smartx.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jason Wang
+ <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] net:tun: limit printing rate when illegal packet
+ received by tun dev
+Message-ID: <20240409182535.166cda7c@kernel.org>
+In-Reply-To: <20240409062407.1952728-1-lei.chen@smartx.com>
+References: <20240409062407.1952728-1-lei.chen@smartx.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,43 +62,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon,  8 Apr 2024 08:29:57 -0700 Mina Almasry wrote:
-> +#ifdef CONFIG_PAGE_POOL
-> +static inline bool is_pp_page(struct page *page)
-> +{
-> +	return (page->pp_magic & ~0x3UL) == PP_SIGNATURE;
-> +}
-> +
-> +/* page_pool_unref_page() lives in net/page_pool/helpers.h */
-> +static inline void page_pool_ref_page(struct page *page)
-> +{
-> +	atomic_long_inc(&page->pp_ref_count);
-> +}
-> +
-> +static inline bool napi_pp_get_page(struct page *page)
-> +{
-> +	page = compound_head(page);
-> +
-> +	if (!is_pp_page(page))
-> +		return false;
-> +
-> +	page_pool_ref_page(page);
-> +	return true;
-> +}
-> +#endif
-> +
-> +static inline void skb_page_ref(struct page *page, bool recycle)
-> +{
-> +#ifdef CONFIG_PAGE_POOL
-> +	if (recycle && napi_pp_get_page(page))
-> +		return;
-> +#endif
-> +	get_page(page);
-> +}
+On Tue,  9 Apr 2024 02:24:05 -0400 Lei Chen wrote:
+> --- <NMI exception stack> ---
 
-Shifting of all this code from pp to skbuff catches the eye.
-There aren't that many callers to these, can we start a new header?
-We can then include page pool headers in the without worry.
-
-I'll apply the other patches, they look independent.
+You need to indent this line with a space, otherwise
+git am will cut off the commit message here.
+-- 
+pw-bot: cr
 
