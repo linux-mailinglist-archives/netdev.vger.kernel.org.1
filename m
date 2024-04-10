@@ -1,134 +1,149 @@
-Return-Path: <netdev+bounces-86647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFA3D89FB6A
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 17:23:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB06889FB80
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 17:27:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4945285212
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:23:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4AE421F21A27
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:27:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E89C316F0CE;
-	Wed, 10 Apr 2024 15:23:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28B9616E885;
+	Wed, 10 Apr 2024 15:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IO/8lLbB"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="QMVx+iIj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B773616EC18
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 15:23:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5979D1591E1;
+	Wed, 10 Apr 2024 15:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712762598; cv=none; b=QP+D0E30FufdHBZUMEo+vCgGWuk9Ms7cqW4M8SoNA2DDDRtylnHOzzwUp9EmxOK2reQ38De/uuac7/IjPtAZmCVyq0Et2F/j62XTlcHxtFUZvZkX2VsMYPL/PyrdCy7H7NtG+bjQEOdq/vRz5b2nNEXiMZIN0xF6aPl+x5bIhi0=
+	t=1712762861; cv=none; b=NWidxYlPHSnMdJEFE7OeK2PNFYl7/bjiBIbg8zUdwkqsNe78KwQ0e/D97cOgl+McVAu06xN1wJ5f0pnYXIg38SmQUX2ALY9TCoqiM+IFCHIgH2tQ49756w7tkZFGxkW8etscol5zjjA9Z4jKu5PDm2HTCULw4nlkK9y+VS0z+5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712762598; c=relaxed/simple;
-	bh=VQ/GfqrL5AkxSHgXkurKnOzHHPNc6m9XV9Z986Z9VD8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IRnFw1iuSzfGwRpkGzn7en1uIzWFFIVwx21eiEb+++BSWOZzKmyAqs+PQndyUd9AInD2v7Z7EYCKcYa6aiUWpsJ1doeynlsB0aaAvgQb121DL+100pjNRuA9i7sAiHdzlNdPorUe5FlJKuEstcm8sjsy+6rZF/DuW87IuM9TpMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IO/8lLbB; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712762597; x=1744298597;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VQ/GfqrL5AkxSHgXkurKnOzHHPNc6m9XV9Z986Z9VD8=;
-  b=IO/8lLbBdZR0E0jJSgdtPjzoXk1+SAuLG7TbPsAL/67bNk9BIdFFkOOM
-   p/8wHUOiQFw9SpOlDb7ru5URyF4YVUAx66EUBTbHIuX2Vx0lg+9pHNFMk
-   wy+vXoStE5swd9TATg8KOzesocgFYURvOxzOMwcTeM9okX+7J9IxFX1Ll
-   h/7Fm24bYc6XeXzCaYcPRAkhLYOqW6uM43lXsZzmXt6iDpN6GnzK+SlZB
-   hltgm09sTYTfLYT1O29oNQ5zwvwZXJLKFozF/4q3abHKmxOxspA0BNAB/
-   qXMmLUfqWJi7m9R0FV31Apt3+h+WIjYCPypFwRQZn71zL149VWkBXlpxm
-   Q==;
-X-CSE-ConnectionGUID: gfP63ZerSm60DeNvRj7q2w==
-X-CSE-MsgGUID: yPqbqHwkQJe9PG2WkKMyww==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="19559866"
-X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="19559866"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 08:23:17 -0700
-X-CSE-ConnectionGUID: 2uwP0iojTkqWn19aDX7hDw==
-X-CSE-MsgGUID: to1heVCeToGWFx305hCQGg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="43852820"
-Received: from lkp-server01.sh.intel.com (HELO e61807b1d151) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 10 Apr 2024 08:23:13 -0700
-Received: from kbuild by e61807b1d151 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1ruZn5-0007WS-2A;
-	Wed, 10 Apr 2024 15:23:11 +0000
-Date: Wed, 10 Apr 2024 23:22:14 +0800
-From: kernel test robot <lkp@intel.com>
-To: zijianzhang@bytedance.com, netdev@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, edumazet@google.com,
-	willemdebruijn.kernel@gmail.com, davem@davemloft.net,
-	kuba@kernel.org, cong.wang@bytedance.com, xiaochun.lu@bytedance.com,
-	Zijian Zhang <zijianzhang@bytedance.com>
-Subject: Re: [PATCH net-next 1/3] sock: add MSG_ZEROCOPY_UARG
-Message-ID: <202404102247.qzN9N0Il-lkp@intel.com>
-References: <20240409205300.1346681-2-zijianzhang@bytedance.com>
+	s=arc-20240116; t=1712762861; c=relaxed/simple;
+	bh=yaqHM0962MfpM+OFdQda8fXPe0R1wO7c3AlNIHOVwdc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=cIDr9b+TXaDzq5eq0ksIiA5LVmLWXAL58VAPt8bPBT3w2Lp5ptcZt8K1cJEot2DdXJ3ZHUQemGHmuSecBTA7AXhXPlN0qm0PEMop62C+J9yTcBqnLuD/AvZI5AbjTIKRvXHuWID3lh/GmRj4O/5b3B4A1rcFzaHvSVRZEpjeZtg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=QMVx+iIj; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43A8bUQZ020430;
+	Wed, 10 Apr 2024 15:27:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=SeKInDMchgVr+fW9WAo6YizzoIlylrKBtPkpDrYflGc=; b=QM
+	Vx+iIjNoBxgbQhbk47P1pSkvCBi6kiaSSZFteiH8PqXWUF0Y7UYSWrwJ3USY+xai
+	GpMzaeDLZwM3AoGqxqUV9+ueya3RJGxE95WUHnvgCDFs5MzZP+Djd3mUZ8JzAwe0
+	6S2YEqGQJdphdetr8iOfJZaaPyjM5230lKtCzNV8IrViCObX5p7tH3axnILjKVCn
+	HrHWFKU22mBrjW0gJUsF1fI2uYWOU0hgzhaQSDLoYsE+Jpvut0geIRe/ud4DPPSJ
+	8fggfL5TrmQ7pfWvB/7hPSNjCQTZ3E7PVA4IghTfCh3TrgZ3LycX2IH7oruboSQa
+	QCfwL5e2a4lspc6371dA==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xdnqtjn3f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Apr 2024 15:27:09 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43AFR8Ts012315
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 10 Apr 2024 15:27:08 GMT
+Received: from [10.110.37.144] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 10 Apr
+ 2024 08:27:06 -0700
+Message-ID: <d440d38f-f805-4c85-96b3-ae0b5ad2bbdc@quicinc.com>
+Date: Wed, 10 Apr 2024 08:27:05 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240409205300.1346681-2-zijianzhang@bytedance.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 05/16] dt-bindings: net: wireless: describe the ath12k
+ PCI module
+Content-Language: en-US
+To: Bartosz Golaszewski <brgl@bgdev.pl>,
+        Marcel Holtmann
+	<marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David
+ S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+        Bjorn
+ Andersson <andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+        Catalin
+ Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Bjorn
+ Helgaas <bhelgaas@google.com>,
+        Saravana Kannan <saravanak@google.com>,
+        Geert
+ Uytterhoeven <geert+renesas@glider.be>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Neil
+ Armstrong <neil.armstrong@linaro.org>,
+        Marek Szyprowski
+	<m.szyprowski@samsung.com>,
+        Alex Elder <elder@linaro.org>,
+        Srini Kandagatla
+	<srinivas.kandagatla@linaro.org>,
+        Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>,
+        Abel Vesa <abel.vesa@linaro.org>,
+        Manivannan
+ Sadhasivam <mani@kernel.org>,
+        Lukas Wunner <lukas@wunner.de>,
+        Dmitry
+ Baryshkov <dmitry.baryshkov@linaro.org>,
+        Amit Pundir
+	<amit.pundir@linaro.org>, Xilin Wu <wuxilin123@gmail.com>
+CC: <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-wireless@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-pci@vger.kernel.org>,
+        <linux-pm@vger.kernel.org>,
+        Bartosz Golaszewski
+	<bartosz.golaszewski@linaro.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>
+References: <20240410124628.171783-1-brgl@bgdev.pl>
+ <20240410124628.171783-6-brgl@bgdev.pl>
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <20240410124628.171783-6-brgl@bgdev.pl>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: Wx5pfsg1IEL3FNsbq-QxsVprddWodQtT
+X-Proofpoint-GUID: Wx5pfsg1IEL3FNsbq-QxsVprddWodQtT
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-10_04,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 suspectscore=0
+ lowpriorityscore=0 mlxscore=0 adultscore=0 impostorscore=0 phishscore=0
+ bulkscore=0 priorityscore=1501 malwarescore=0 spamscore=0 mlxlogscore=826
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2404010003
+ definitions=main-2404100112
 
-Hi,
+On 4/10/2024 5:46 AM, Bartosz Golaszewski wrote:
+[...]
+> +description:
+> +  Qualcomm Technologies IEEE 802.11ax PCIe devices.
 
-kernel test robot noticed the following build errors:
+if you respin, nit: s/11ax/11be/
 
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/zijianzhang-bytedance-com/sock-add-MSG_ZEROCOPY_UARG/20240410-045616
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240409205300.1346681-2-zijianzhang%40bytedance.com
-patch subject: [PATCH net-next 1/3] sock: add MSG_ZEROCOPY_UARG
-config: x86_64-randconfig-r081-20240410 (https://download.01.org/0day-ci/archive/20240410/202404102247.qzN9N0Il-lkp@intel.com/config)
-compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240410/202404102247.qzN9N0Il-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202404102247.qzN9N0Il-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from <built-in>:1:
-   In file included from ./usr/include/linux/un.h:5:
->> usr/include/linux/socket.h:45:2: error: unknown type name '__u32'
-      45 |         __u32 lo;
-         |         ^
-   usr/include/linux/socket.h:46:2: error: unknown type name '__u32'
-      46 |         __u32 hi;
-         |         ^
->> usr/include/linux/socket.h:47:2: error: unknown type name '__u8'
-      47 |         __u8 zerocopy;
-         |         ^
-   3 errors generated.
---
-   In file included from <built-in>:1:
->> ./usr/include/linux/socket.h:45:2: error: unknown type name '__u32'
-      45 |         __u32 lo;
-         |         ^
-   ./usr/include/linux/socket.h:46:2: error: unknown type name '__u32'
-      46 |         __u32 hi;
-         |         ^
->> ./usr/include/linux/socket.h:47:2: error: unknown type name '__u8'
-      47 |         __u8 zerocopy;
-         |         ^
-   3 errors generated.
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
