@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-86394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B65889E95F
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:04:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB32889E962
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 07:04:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7544628553B
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 05:03:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EEFA2854C5
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 05:04:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 155641118A;
-	Wed, 10 Apr 2024 05:03:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B8C10A28;
+	Wed, 10 Apr 2024 05:03:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="adcAbEUD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BsP76GA2"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A81134DE
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 05:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA317134DE
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 05:03:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712725431; cv=none; b=WoTFxLIZ6rhX6IrWXBTqLlKZyfoa8NCkhzsedkLvekOHvMpXSoDBSdwqnMSRwcB57F8BTkyjSjVj5M097p/0YIlZ+uY+uckb0swRIJtCxZ4vMyPHdQr4C77g2IaO3YZHaHDcFzSg4sHfIQtaQEbdFDZzuoXOok/bxg/03Szpv9Y=
+	t=1712725434; cv=none; b=o15ssV1BRqqklnFtqnxsxmltPxhaEeTfOjS23u0txu1wpiFZgULTtvj7xGT3qmcrWekH1LQ/pz46R9c4Mm+eny7Ik+C7yd4sYpXt+7kfgJeXjxlO+u61horz8jMagQA/ScJbZcWW/9ZCct2QsNuAMHr/cLWfmQJ5MBsXS0bEOSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712725431; c=relaxed/simple;
-	bh=kU37RqVA5ZC5WiwKyz3KMASVtgrfC+i9kaWytKz3GUI=;
+	s=arc-20240116; t=1712725434; c=relaxed/simple;
+	bh=6TtZmV7UoAolFFGK1QrDXQlHjrknEdu460CRKqaU8/M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ep0yBj5bmEZVZCqCPOqqG2U9Vpn85GWVNdvL3Hv27V5ESEx4M71PPp+hBbus3iGBao6SLGVZDpLwmbovhPPtckBaTTQ7eqRk1UqNMPzofWm+ANqyjwoagZPxSpkfpQq8I+CS6vxEd/PJv8qyZv+SEAOmA1MoMf4jYyEdBGXAGag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=adcAbEUD; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=gvOFX9aPBiZtcG3qyyiliJl4M2W57dxJlHHU1uICy/u/xhEhgNS3VNoV8x6rahsO3b54XeinZbwTIbpjoLLuxsXbxy4JEIW5WUmJNdtfFHwgIUDArYqKwmXeQza3uhlTeB6pajm+kLpHcdXifukpRxY9B3Pfd7f5AgZtJSoWnWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BsP76GA2; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712725429; x=1744261429;
+  t=1712725433; x=1744261433;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=kU37RqVA5ZC5WiwKyz3KMASVtgrfC+i9kaWytKz3GUI=;
-  b=adcAbEUD44mY7JXLn5roT673EF/fQQi7TKnB2xPmQaTRU5Pv/SOeJuPh
-   YrvwvyYpaaRdvKSoyLwc5GTj9cEf+thOO35aarEUMhjFbqnvA5QB1OQjX
-   AdaUfit9LzrU6p1Wbijae5caDSFuMWUzrn0IQOsEsOvmiM+1wAvzDdIEJ
-   YKFoa2m4JCwXx0msWqDyCSn7NaiSKkBWk/WC4yjoukncf224yZ2MNR2pc
-   LyXg1B0kMal8tMk6A7t5kOcRlQ3TxDfT6l6LFHx8jbELE0mywHEnyAMjt
-   ZYpDxtuwa3KPaowTHIXpM0mVHRqkdsTD8ML49p25/QbHlJ6zf+e/a3cbg
-   Q==;
-X-CSE-ConnectionGUID: WWqKQSemQba8+pmbt9haHA==
-X-CSE-MsgGUID: gMsY1VaRQ7GAYXBB3ojoUA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="19456217"
+  bh=6TtZmV7UoAolFFGK1QrDXQlHjrknEdu460CRKqaU8/M=;
+  b=BsP76GA2CxXHii4KIrRoMEZO/ICTBUkZ80hnjphKbkjBEBf72U9WSzZy
+   VJ9Fhf2JPXS+4HWXHq+uwlxW3iur0pP0ikXHBxnF9rEneoH3TNuhjuHgz
+   W4+Cypos5/ftkBbTv4Q3N3q+/vTbNceOgitqwB0aYMxGgK15Bgv0CH5A/
+   zS5V2tKnZof2QlcN2RcGLt+hDN2xkTAvv5IOREP7gTRSpzh1Bzd7ZWNiS
+   JbEXvuZRNnIJpRvCQobJjiUVq0Rx0cUO/mSyhBZrmWpF6ZKR+1ngWOYAx
+   9i3VDI99syngMZk9PryJq2HR87HjS1tC+KhP4EVl5UMBbAbYHyntmL22u
+   g==;
+X-CSE-ConnectionGUID: dWlIvAj7S36g4Xft++3hEA==
+X-CSE-MsgGUID: WK/+BbnAQryswg9s6rER9g==
+X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="19456225"
 X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="19456217"
+   d="scan'208";a="19456225"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 22:03:49 -0700
-X-CSE-ConnectionGUID: UZ1Rgv4bRk6vf7m7IE/C9A==
-X-CSE-MsgGUID: Xm9BxspGTJOT2a5OWD+paA==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Apr 2024 22:03:52 -0700
+X-CSE-ConnectionGUID: eg+hAUAHTCuYx5HFlo2sZA==
+X-CSE-MsgGUID: geCn7JMVQDqazFzMd1kFTw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,190,1708416000"; 
-   d="scan'208";a="57876006"
+   d="scan'208";a="57876017"
 Received: from wasp.igk.intel.com (HELO GK3153-DR2-R750-36946.localdomain.com) ([10.102.20.192])
-  by orviesa001.jf.intel.com with ESMTP; 09 Apr 2024 22:03:46 -0700
+  by orviesa001.jf.intel.com with ESMTP; 09 Apr 2024 22:03:50 -0700
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -73,9 +73,9 @@ Cc: netdev@vger.kernel.org,
 	mateusz.polchlopek@intel.com,
 	Piotr Raczynski <piotr.raczynski@intel.com>,
 	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: [iwl-next v2 4/7] ice: allocate devlink for subfunction
-Date: Wed, 10 Apr 2024 07:08:06 +0200
-Message-ID: <20240410050809.125043-5-michal.swiatkowski@linux.intel.com>
+Subject: [iwl-next v2 5/7] ice: base subfunction aux driver
+Date: Wed, 10 Apr 2024 07:08:07 +0200
+Message-ID: <20240410050809.125043-6-michal.swiatkowski@linux.intel.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240410050809.125043-1-michal.swiatkowski@linux.intel.com>
 References: <20240410050809.125043-1-michal.swiatkowski@linux.intel.com>
@@ -89,194 +89,244 @@ Content-Transfer-Encoding: 8bit
 
 From: Piotr Raczynski <piotr.raczynski@intel.com>
 
-Make devlink allocation function generic to use it for PF and for SF.
+Implement subfunction driver. It is probe when subfunction port is
+activated.
 
-Add function for SF devlink port creation. It will be used in next
-patch.
+VSI is already created. During the probe VSI is being configured.
+MAC unicast and broadcast filter is added to allow traffic to pass.
 
 Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
 Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 ---
- .../net/ethernet/intel/ice/devlink/devlink.c  | 41 ++++++++++++---
- .../net/ethernet/intel/ice/devlink/devlink.h  |  1 +
- .../ethernet/intel/ice/devlink/devlink_port.c | 51 +++++++++++++++++++
- .../ethernet/intel/ice/devlink/devlink_port.h |  3 ++
- 4 files changed, 90 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/intel/ice/Makefile     |   1 +
+ drivers/net/ethernet/intel/ice/ice_main.c   |  10 ++
+ drivers/net/ethernet/intel/ice/ice_sf_eth.c | 130 ++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_sf_eth.h |  30 +++++
+ 4 files changed, 171 insertions(+)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.h
 
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-index 661af04c8eef..8eceb48afbb8 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-@@ -10,6 +10,7 @@
- #include "ice_eswitch.h"
- #include "ice_fw_update.h"
- #include "ice_dcb_lib.h"
+diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
+index 03500e28ac99..4d987f5dcdc1 100644
+--- a/drivers/net/ethernet/intel/ice/Makefile
++++ b/drivers/net/ethernet/intel/ice/Makefile
+@@ -31,6 +31,7 @@ ice-y := ice_main.o	\
+ 	 ice_idc.o	\
+ 	 devlink/devlink.o	\
+ 	 devlink/devlink_port.o \
++	 ice_sf_eth.o	\
+ 	 ice_ddp.o	\
+ 	 ice_fw_update.o \
+ 	 ice_lag.o	\
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 29552598ddb6..f55e3340b608 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -15,6 +15,7 @@
+ #include "ice_dcb_nl.h"
+ #include "devlink/devlink.h"
+ #include "devlink/devlink_port.h"
 +#include "ice_sf_eth.h"
+ #include "ice_hwmon.h"
+ /* Including ice_trace.h with CREATE_TRACE_POINTS defined will generate the
+  * ice tracepoint functions. This must be done exactly once across the
+@@ -5857,8 +5858,16 @@ static int __init ice_module_init(void)
+ 		goto err_dest_lag_wq;
+ 	}
  
- /* context for devlink info version reporting */
- struct ice_info_ctx {
-@@ -1286,6 +1287,8 @@ static const struct devlink_ops ice_devlink_ops = {
- 	.port_new = ice_devlink_port_new,
- };
- 
-+static const struct devlink_ops ice_sf_devlink_ops;
++	status = ice_sf_driver_register();
++	if (status) {
++		pr_err("Failed to register SF driver, err %d\n", status);
++		goto err_sf_driver;
++	}
 +
- static int
- ice_devlink_enable_roce_get(struct devlink *devlink, u32 id,
- 			    struct devlink_param_gset_ctx *ctx)
-@@ -1417,18 +1420,21 @@ static void ice_devlink_free(void *devlink_ptr)
- }
+ 	return 0;
  
- /**
-- * ice_allocate_pf - Allocate devlink and return PF structure pointer
-+ * ice_devlink_alloc - Allocate devlink and return devlink priv pointer
-  * @dev: the device to allocate for
-+ * @priv_size: size of the priv memory
-+ * @ops: pointer to devlink ops for this device
-  *
-- * Allocate a devlink instance for this device and return the private area as
-- * the PF structure. The devlink memory is kept track of through devres by
-- * adding an action to remove it when unwinding.
-+ * Allocate a devlink instance for this device and return the private pointer
-+ * The devlink memory is kept track of through devres by adding an action to
-+ * remove it when unwinding.
++err_sf_driver:
++	pci_unregister_driver(&ice_driver);
+ err_dest_lag_wq:
+ 	destroy_workqueue(ice_lag_wq);
+ 	ice_debugfs_exit();
+@@ -5876,6 +5885,7 @@ module_init(ice_module_init);
   */
--struct ice_pf *ice_allocate_pf(struct device *dev)
-+static void *ice_devlink_alloc(struct device *dev, size_t priv_size,
-+			       const struct devlink_ops *ops)
+ static void __exit ice_module_exit(void)
  {
- 	struct devlink *devlink;
- 
--	devlink = devlink_alloc(&ice_devlink_ops, sizeof(struct ice_pf), dev);
-+	devlink = devlink_alloc(ops, priv_size, dev);
- 	if (!devlink)
- 		return NULL;
- 
-@@ -1439,6 +1445,29 @@ struct ice_pf *ice_allocate_pf(struct device *dev)
- 	return devlink_priv(devlink);
- }
- 
-+/**
-+ * ice_allocate_pf - Allocate devlink and return PF structure pointer
-+ * @dev: the device to allocate for
-+ *
-+ * Allocate a devlink instance for PF.
-+ */
-+struct ice_pf *ice_allocate_pf(struct device *dev)
-+{
-+	return ice_devlink_alloc(dev, sizeof(struct ice_pf), &ice_devlink_ops);
-+}
++	ice_sf_driver_unregister();
+ 	pci_unregister_driver(&ice_driver);
+ 	ice_debugfs_exit();
+ 	destroy_workqueue(ice_wq);
+diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.c b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
+new file mode 100644
+index 000000000000..70f7cbe6c609
+--- /dev/null
++++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
+@@ -0,0 +1,130 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) 2024, Intel Corporation. */
++#include "ice.h"
++#include "ice_lib.h"
++#include "ice_fltr.h"
++#include "ice_sf_eth.h"
++#include "devlink/devlink_port.h"
++#include "devlink/devlink.h"
 +
 +/**
-+ * ice_allocate_sf - Allocate devlink and return SF structure pointer
-+ * @dev: the device to allocate for
++ * ice_sf_dev_probe - subfunction driver probe function
++ * @adev: pointer to the auxiliary device
++ * @id: pointer to the auxiliary_device id
 + *
-+ * Allocate a devlink instance for SF.
-+ */
-+struct ice_sf_priv *ice_allocate_sf(struct device *dev)
-+{
-+	return ice_devlink_alloc(dev, sizeof(struct ice_sf_priv),
-+				 &ice_sf_devlink_ops);
-+}
-+
- /**
-  * ice_devlink_register - Register devlink interface for this PF
-  * @pf: the PF to register the devlink for.
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.h b/drivers/net/ethernet/intel/ice/devlink/devlink.h
-index d291c0e2e17b..1b2a5980d5e8 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink.h
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.h
-@@ -5,6 +5,7 @@
- #define _ICE_DEVLINK_H_
- 
- struct ice_pf *ice_allocate_pf(struct device *dev);
-+struct ice_sf_priv *ice_allocate_sf(struct device *dev);
- 
- void ice_devlink_register(struct ice_pf *pf);
- void ice_devlink_unregister(struct ice_pf *pf);
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
-index f5e305a71bd0..1b933083f551 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
-@@ -432,6 +432,57 @@ void ice_devlink_destroy_vf_port(struct ice_vf *vf)
- 	devlink_port_unregister(&vf->devlink_port);
- }
- 
-+/**
-+ * ice_devlink_create_sf_dev_port - Register virtual port for a subfunction
-+ * @sf_dev: the subfunction device to create a devlink port for
-+ *
-+ * Register virtual flavour devlink port for the subfunction auxiliary device
-+ * created after activating a dynamically added devlink port.
++ * Configure VSI and netdev resources for the subfunction device.
 + *
 + * Return: zero on success or an error code on failure.
 + */
-+int ice_devlink_create_sf_dev_port(struct ice_sf_dev *sf_dev)
++static int ice_sf_dev_probe(struct auxiliary_device *adev,
++			    const struct auxiliary_device_id *id)
 +{
-+	struct devlink_port_attrs attrs = {};
-+	struct devlink_port *devlink_port;
-+	struct ice_dynamic_port *dyn_port;
-+	struct devlink *devlink;
-+	struct ice_vsi *vsi;
-+	struct device *dev;
-+	struct ice_pf *pf;
++	struct ice_sf_dev *sf_dev = ice_adev_to_sf_dev(adev);
++	struct ice_dynamic_port *dyn_port = sf_dev->dyn_port;
++	struct ice_vsi_cfg_params params = {};
++	struct ice_vsi *vsi = dyn_port->vsi;
++	struct ice_pf *pf = dyn_port->pf;
++	struct device *dev = &adev->dev;
++	struct ice_sf_priv *priv;
 +	int err;
 +
-+	dyn_port = sf_dev->dyn_port;
-+	vsi = dyn_port->vsi;
-+	pf = dyn_port->pf;
-+	dev = ice_pf_to_dev(pf);
++	params.type = ICE_VSI_SF;
++	params.pi = pf->hw.port_info;
++	params.flags = ICE_VSI_FLAG_INIT;
 +
-+	devlink_port = &sf_dev->priv->devlink_port;
++	priv = ice_allocate_sf(&adev->dev);
++	if (!priv) {
++		dev_err(dev, "Subfunction devlink alloc failed");
++		return -ENOMEM;
++	}
 +
-+	attrs.flavour = DEVLINK_PORT_FLAVOUR_VIRTUAL;
++	priv->dev = sf_dev;
++	sf_dev->priv = priv;
 +
-+	devlink_port_attrs_set(devlink_port, &attrs);
-+	devlink = priv_to_devlink(sf_dev->priv);
++	devlink_register(priv_to_devlink(priv));
 +
-+	err = devl_port_register(devlink, devlink_port, vsi->idx);
-+	if (err)
-+		dev_err(dev, "Failed to create virtual devlink port for auxiliary subfunction device %d",
-+			vsi->idx);
++	err = ice_vsi_cfg(vsi, &params);
++	if (err) {
++		dev_err(dev, "Subfunction vsi config failed");
++		return err;
++	}
 +
++	err = ice_devlink_create_sf_dev_port(sf_dev);
++	if (err) {
++		dev_err(dev, "Cannot add ice virtual devlink port for subfunction");
++		goto err_vsi_decfg;
++	}
++
++	err = ice_fltr_add_mac_and_broadcast(vsi, vsi->netdev->dev_addr,
++					     ICE_FWD_TO_VSI);
++	if (err) {
++		dev_err(dev, "can't add MAC filters %pM for VSI %d\n",
++			vsi->netdev->dev_addr, vsi->idx);
++		goto err_devlink_destroy;
++	}
++
++	ice_napi_add(vsi);
++
++	return err;
++
++err_devlink_destroy:
++	ice_devlink_destroy_sf_dev_port(sf_dev);
++err_vsi_decfg:
++	ice_vsi_decfg(vsi);
 +	return err;
 +}
 +
 +/**
-+ * ice_devlink_destroy_sf_dev_port - Destroy virtual port for a subfunction
-+ * @sf_dev: the subfunction device to create a devlink port for
++ * ice_sf_dev_remove - subfunction driver remove function
++ * @adev: pointer to the auxiliary device
 + *
-+ * Unregisters the virtual port associated with this subfunction.
++ * Deinitalize VSI and netdev resources for the subfunction device.
 + */
-+void ice_devlink_destroy_sf_dev_port(struct ice_sf_dev *sf_dev)
++static void ice_sf_dev_remove(struct auxiliary_device *adev)
 +{
-+	devl_port_unregister(&sf_dev->priv->devlink_port);
++	struct ice_sf_dev *sf_dev = ice_adev_to_sf_dev(adev);
++	struct devlink *devlink = priv_to_devlink(sf_dev->priv);
++	struct ice_dynamic_port *dyn_port = sf_dev->dyn_port;
++	struct ice_vsi *vsi = dyn_port->vsi;
++
++	ice_vsi_close(vsi);
++
++	ice_devlink_destroy_sf_dev_port(sf_dev);
++	devlink_unregister(devlink);
++	devlink_free(devlink);
++	ice_vsi_decfg(vsi);
 +}
 +
- /**
-  * ice_activate_dynamic_port - Activate a dynamic port
-  * @dyn_port: dynamic port instance to activate
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-index 30146fef64b9..1f66705e0261 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
-@@ -5,6 +5,7 @@
- #define _DEVLINK_PORT_H_
- 
- #include "../ice.h"
-+#include "ice_sf_eth.h"
- 
- /**
-  * struct ice_dynamic_port - Track dynamically added devlink port instance
-@@ -30,6 +31,8 @@ int ice_devlink_create_pf_port(struct ice_pf *pf);
- void ice_devlink_destroy_pf_port(struct ice_pf *pf);
- int ice_devlink_create_vf_port(struct ice_vf *vf);
- void ice_devlink_destroy_vf_port(struct ice_vf *vf);
-+int ice_devlink_create_sf_dev_port(struct ice_sf_dev *sf_dev);
-+void ice_devlink_destroy_sf_dev_port(struct ice_sf_dev *sf_dev);
- 
- #define ice_devlink_port_to_dyn(p) \
- 	container_of(port, struct ice_dynamic_port, devlink_port)
++static const struct auxiliary_device_id ice_sf_dev_id_table[] = {
++	{ .name = "ice.sf", },
++	{ },
++};
++
++MODULE_DEVICE_TABLE(auxiliary, ice_sf_dev_id_table);
++
++static struct auxiliary_driver ice_sf_driver = {
++	.name = "sf",
++	.probe = ice_sf_dev_probe,
++	.remove = ice_sf_dev_remove,
++	.id_table = ice_sf_dev_id_table
++};
++
++/**
++ * ice_sf_driver_register - Register new auxiliary subfunction driver
++ *
++ * Return: zero on success or an error code on failure.
++ */
++int ice_sf_driver_register(void)
++{
++	return auxiliary_driver_register(&ice_sf_driver);
++}
++
++/**
++ * ice_sf_driver_unregister - Unregister new auxiliary subfunction driver
++ *
++ * Return: zero on success or an error code on failure.
++ */
++void ice_sf_driver_unregister(void)
++{
++	auxiliary_driver_unregister(&ice_sf_driver);
++}
+diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.h b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
+new file mode 100644
+index 000000000000..e972c50f96c9
+--- /dev/null
++++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
+@@ -0,0 +1,30 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/* Copyright (c) 2024, Intel Corporation. */
++
++#ifndef _ICE_SF_ETH_H_
++#define _ICE_SF_ETH_H_
++
++#include <linux/auxiliary_bus.h>
++#include "ice.h"
++
++struct ice_sf_dev {
++	struct auxiliary_device adev;
++	struct ice_dynamic_port *dyn_port;
++	struct ice_sf_priv *priv;
++};
++
++struct ice_sf_priv {
++	struct ice_sf_dev *dev;
++	struct devlink_port devlink_port;
++};
++
++static inline struct
++ice_sf_dev *ice_adev_to_sf_dev(struct auxiliary_device *adev)
++{
++	return container_of(adev, struct ice_sf_dev, adev);
++}
++
++int ice_sf_driver_register(void);
++void ice_sf_driver_unregister(void);
++
++#endif /* _ICE_SF_ETH_H_ */
 -- 
 2.42.0
 
