@@ -1,122 +1,112 @@
-Return-Path: <netdev+bounces-86752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 558A38A027D
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:57:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38DBE8A024F
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:42:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87A9C1C21E69
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:57:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2A371F21BF3
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 21:42:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 835CE184111;
-	Wed, 10 Apr 2024 21:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4C3E1836F3;
+	Wed, 10 Apr 2024 21:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="M+Otz7iD";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="BNRsZNUG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E16D7184107
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 21:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3298E15EFAD;
+	Wed, 10 Apr 2024 21:42:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712786258; cv=none; b=OU/2znZFAJL0JsVb5lrV94EKv4OiLYmvsriLF659N+qp8m31B04L0rpewYBL2qDW+Tcl54A9dpJOPbXnOQZMXHn1AnEf9JuBAAfbs729RkHkxKjdo1ovDGx6mxxFP+kDE+ReyVCpN6TAQrBDgBJuZ0BdSpGZjxzvpkSbe81XeC8=
+	t=1712785371; cv=none; b=dtT0yv7YP87zjYlnzf+uRZTXS6fNZlDRg7gMjpVinh+3oW5InKGlMTO3IcspqnNdsOTOLVlEv+kaurF0ugYLjWAhZXA4u+m+BFbdV90i6Pf5yxsH7y4mOvZHWzg8e4sgKzSdvevGu2Ghi3fm79Jj89r411/pGlNPyOpCO9ZBh0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712786258; c=relaxed/simple;
-	bh=po7pDch0GS5NrwjKsdOySP/T9aR3iE/Iqcy0JyURtL0=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=XbV/7OJKWKfKDBXwxFwPgXCgNkTTFsfVpJctg38wFWMxPZ22ehg9HvBH3OmigYKQ56QpoBwLNf/qKtFAeLqQMYpA0s+gPvaJLkjGvL55FkgaOL41qPC67X2zyMEjS12VlCDAg48qU7H3WRxKlnXXzgGD+xPDq8nDP4vGF9Odfnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from ja.int.chopps.org.chopps.org (172-222-091-149.res.spectrum.com [172.222.91.149])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id BF6047D011;
-	Wed, 10 Apr 2024 21:57:28 +0000 (UTC)
-References: <a53333717022906933e9113980304fa4717118e9.1712320696.git.antony.antony@secunet.com>
- <ZhBzcMrpBCNXXVBV@hog> <ZhJX-Rn50RxteJam@Antony2201.local>
- <ZhPq542VY18zl6z3@hog> <ZhV5eG2pkrsX0uIV@Antony2201.local>
- <ZhZUQoOuvNz8RVg8@hog> <ZhbFVGc8p9u0xQcv@Antony2201.local>
-User-agent: mu4e 1.8.14; emacs 28.2
-From: Christian Hopps <chopps@chopps.org>
-To: Antony Antony <antony@phenome.org>
-Cc: Sabrina Dubroca <sd@queasysnail.net>, Nicolas Dichtel
- <nicolas.dichtel@6wind.com>, Antony Antony <antony.antony@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- devel@linux-ipsec.org
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v6] xfrm: Add Direction to the
- SA in or out
-Date: Wed, 10 Apr 2024 17:41:54 -0400
-In-reply-to: <ZhbFVGc8p9u0xQcv@Antony2201.local>
-Message-ID: <m2frvskhiz.fsf@ja.int.chopps.org>
+	s=arc-20240116; t=1712785371; c=relaxed/simple;
+	bh=RhSkWePUyKhvvxTu7bk/aMeNpx4MhLnzvc0rmPl5cUk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=bYY0EfQcrUv9/nAApN2hECMYErdykr7SiUDJxEFnPKsWQsAcOgHh0CY+wt5Q4phTPs6qfP/Qc8hJvWbPTN1gqtDbtuUISrOJYUraJ7J1f6TEd89hUUT3+FOTPPnJTstnkBrSE39TQ9I2gdJsHRpm6meIDr0IQdSScEo+FInriDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=M+Otz7iD; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=BNRsZNUG; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1712785368;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rdQoqdQaX1sN8iPEH6WMX2czg/lasITlEbkoOin2hhU=;
+	b=M+Otz7iD2X7C7p2fY68ZTuik9R515LqrBKtqAZe6YCNUOZtN/nHgE7pYjhpf3qmDe6hDFw
+	lbC792tw2Fw1wnHsCNbBwhqrTkIKTstTt0wZOWCZKueTtpaXQMPtHo3hzhpp9PdpK5/ShU
+	37Wxw53BaVttssXwZ84yEo86NTI3R5FM+UytgoGXGfdGyPOBN3877MF0hzkFknridrK62J
+	fEtKH1uG/GdsdioeORAfX3cAgfiXSGDRJzJYMiKFx5oKsZ++HiN5tUvooCVFF6cmkQazqT
+	xPdcxkMqKv487i45rSFGLy8mF3bKj+iQcqLc8R66tyljSjI6byoJh07ylE1vHg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1712785368;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rdQoqdQaX1sN8iPEH6WMX2czg/lasITlEbkoOin2hhU=;
+	b=BNRsZNUG+yDoiRPlzWN5GV3sdRog8UFLhJTyU3KDRjgQQqg0buZ1FDEKyc7FWZDvPBQdhi
+	1ljTRyGix0KZ1vAw==
+To: lakshmi.sowjanya.d@intel.com, jstultz@google.com, giometti@enneenne.com,
+ corbet@lwn.net, linux-kernel@vger.kernel.org
+Cc: x86@kernel.org, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, andriy.shevchenko@linux.intel.com,
+ eddie.dong@intel.com, christopher.s.hall@intel.com,
+ jesse.brandeburg@intel.com, davem@davemloft.net,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ mcoquelin.stm32@gmail.com, perex@perex.cz, linux-sound@vger.kernel.org,
+ anthony.l.nguyen@intel.com, peter.hilber@opensynergy.com,
+ pandith.n@intel.com, subramanian.mohan@intel.com,
+ thejesh.reddy.t.r@intel.com, lakshmi.sowjanya.d@intel.com
+Subject: Re: [PATCH v6 02/11] e1000e: remove convert_art_to_tsc()
+In-Reply-To: <20240410114828.25581-3-lakshmi.sowjanya.d@intel.com>
+References: <20240410114828.25581-1-lakshmi.sowjanya.d@intel.com>
+ <20240410114828.25581-3-lakshmi.sowjanya.d@intel.com>
+Date: Wed, 10 Apr 2024 23:42:47 +0200
+Message-ID: <87a5m03ne0.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain
 
---=-=-=
-Content-Type: text/plain; format=flowed
-
-
-Antony Antony via Devel <devel@linux-ipsec.org> writes:
-
-> On Wed, Apr 10, 2024 at 10:56:34AM +0200, Sabrina Dubroca wrote:
->> 2024-04-09, 19:23:04 +0200, Antony Antony wrote:
->> > On Mon, Apr 08, 2024 at 03:02:31PM +0200, Sabrina Dubroca wrote:
->> > > 2024-04-07, 10:23:21 +0200, Antony Antony wrote:
->> > > I think it would also make sense to only accept this attribute in
->> > > xfrm_add_sa, and not for any of the other message types. Sharing
->> >
->> > > xfrma_policy is convenient but not all attributes are valid for all
->> > > requests. Old attributes can't be changed, but we should try to be
->> > > more strict when we introduce new attributes.
->> >
->> > To clarify your feedback, are you suggesting the API should not permit
->> > XFRMA_SA_DIR for methods like XFRM_MSG_DELSA, and only allow it for
->> > XFRM_MSG_NEWSA and XFRM_MSG_UPDSA? I added XFRM_MSG_UPDSA, as it's used
->> > equivalently to XFRM_MSG_NEWSA by *swan.
->>
->> Not just DELSA, also all the *POLICY, ALLOCSPI, FLUSHSA, etc. NEWSA
->> and UPDSA should accept it, but I'm thinking none of the other
->> operations should. It's a property of SAs, not of other xfrm objects.
+On Wed, Apr 10 2024 at 17:18, lakshmi.sowjanya.d@intel.com wrote:
+> From: Thomas Gleixner <tglx@linutronix.de>
 >
-> For instance, there isn't a validation for unused XFRMA_SA_EXTRA_FLAGS in
-> DELSA; if set, it's simply ignored. Similarly, if XFRMA_SA_DIR were set in
-> DELSA, it would also be disregarded. Attempting to introduce validations for
-> DELSA and other methods seems like an extensive cleanup task. Do we consider
-> this level of validation within the scope of our current patch? It feels
-> like we are going too far.
+> Remove convert_art_to_tsc() function call, Pass system clock cycles and
+> clocksource ID as input to get_device_system_crosststamp().
 
-I think a general clean up feels like a distinct patch to me.
+This is wrong as this does not pass anything as input. The function is
+called from get_device_system_crosststamp() and the data is passed back
+via the system_counterval pointer. It also lacks context.
+
+. Something like this:
+
+   "The core code provides a mechanism to convert the ART base clock to
+    the corresponding TSC value without requiring an architecture
+    specific function.
+
+    All what is required is to store the ART clocksoure ID and the
+    cycles value in the provided system_counterval structure.
+
+    Replace the direct conversion via convert_art_to_tsc() by filling in
+    the required data.
+
+    No functional change intended."
+
+Hmm?
 
 Thanks,
-Chris.
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+        tglx
 
------BEGIN PGP SIGNATURE-----
 
-iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmYXC0USHGNob3Bwc0Bj
-aG9wcHMub3JnAAoJEC4dgw7XuDAlpfEP/2bZP3/mjBuS9YiKwARwLL2iPaMldv7p
-i6WLHeNGlFtEJqsxLFdDiqc9d2PBUPzs6uvnsxWGIVd86jeYJUvT3mLAJw8rVpvo
-5SedYOof0kXIUe/fl2X/KjOoFsQv+BnB2HAI7NX8RpzrpFrKESsj17/hLQ7mfj8f
-IP8nA4IpwFo4znr4HMFG0wnilyyepr4uqz4Ao2ACadyY+d8xYHEGGIVAzHpoge2z
-ovVW9r+CQSK6EWZm5BAxdnhhaJBZd/t5nYP4HAJ1rHELaknFB9fhFIzF+1C+oGwZ
-viT/9vJzMzbnYsEWDJAF+d/azlMvCFub83oOLQ16Spv0FioqNf6j73QMSJsla5KQ
-EmaJL0LHXBfaIjWRGgw/HpIVHW+FCeUJ/LRqmp+WrGDjBBXoQlAw6mtlippvWILs
-3FcygKKtwxDzl8LI/WEBKsLF8nFSfWwC1ET7k4eL1m6dLujYN3M63JTZ2Mbu3K4D
-8/8AVq4FR0n4eMLdDh3T0LXG0K0kkWQGXKF3IlHbAdXyDvwIaYBVpTwIEyRDRQws
-mSLJKXYvT2MrmjvYSoglQmDp6mq0dAwxglqI2wkzHtXHvSuPiWAZwJ/bf7lxmPGF
-/PjxhsNPy+3Y2RNMmVZTErk4Ktwj2VhEFQQqrL27yiiAt1PtRdvDHfvodnbPErY5
-5wbnOvPS8hxT
-=Fca2
------END PGP SIGNATURE-----
---=-=-=--
+ 
 
