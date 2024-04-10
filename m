@@ -1,107 +1,152 @@
-Return-Path: <netdev+bounces-86409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAF5A89EAD6
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:28:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 460BE89EAE3
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 08:31:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78D3AB21E4C
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 06:27:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6991C1C21063
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 06:31:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74BD2837A;
-	Wed, 10 Apr 2024 06:27:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E436129CFE;
+	Wed, 10 Apr 2024 06:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="BgCYLRFj"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="l6O/XGyV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2134.outbound.protection.outlook.com [40.107.94.134])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F39212837B
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 06:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712730474; cv=none; b=hCSUIQGWeNbvOjZZlU3xKOc3Z8N4FRU+6cUtCvDI4cDb2xv4Lv2STDb1kLrXJP2WDm/9l3W2+XZNhPDPYWbNux1zhhD0rHMrT7X5Vmkv8H4N78Q2wgHuDIJmJPdgHMEVA7vfjRhcuZnj5qU4MO8U7zq2U05n327jsoROl4NkJ3o=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712730474; c=relaxed/simple;
-	bh=hAXJxZM1x3WiYIOu9xsVhDqLuyCnxGQALe3CZ+U1CQE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sbtFO/+GcGssQ2sYBN+d2DgKyAu29BB9fPVn+NX4JY3vjeJEL6/KksHluKbKOkQQFw/0Qy1JsLsY0MpMLrTZs0wKLD5k9D7eLZFtTZdjtInlpE2+n+WCfVrNRW/54OoAdWzoXdwgCdzYJreb9paRzFFWcC0ucWSF85JinMA8JUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=BgCYLRFj; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-344047ac7e4so2309588f8f.0
-        for <netdev@vger.kernel.org>; Tue, 09 Apr 2024 23:27:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1712730471; x=1713335271; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=hAXJxZM1x3WiYIOu9xsVhDqLuyCnxGQALe3CZ+U1CQE=;
-        b=BgCYLRFj7TtYQ/EXzIN3t3ck1FlNMOV3YdFJe21TgxvtN23crGAKm7fL4vrNzh+x+7
-         I3AtfKxonwDLtqaashiUbhle5fpqMtG243JSeop7lC+b+5LwFAGtdaOnCOcAhH2eMg4n
-         3eVaaSG+wqpBXshsiObfvzE7n7mOL4V4MHh5jqR7O63c1HOjsYB2loN7/S0TDl7bom1H
-         mXkPcLJFcdnNArltgZWHS6EdgNmVOOeYeug/YFGP3wnQGMFRwISL8yhTIvVIQS6lomPq
-         izg388uxXFOYysJeV2IuYb0fBrJ8d+lz1CsTRB7mv9WXeEqwhLnJXe7QILbw1g+v8tA1
-         tyxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712730471; x=1713335271;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hAXJxZM1x3WiYIOu9xsVhDqLuyCnxGQALe3CZ+U1CQE=;
-        b=cHHS2n5CPTY7Zu7vxUjiS1B99rnZEVEGyKlG75x80ZScdRa1AMHpklDsmtj5l/t94m
-         x68sw+uWcTk62xHjSqUdGUc0zo9VqgUDKsCOABKWi3nZmLmI3235yH/xhfSgpd1krNMN
-         hTEp7C71z9YuUfJ++TXhLx/iXXVlqlEDYg6v9Fl0spKpr7NLPIVGGxoSweCp+6qVha68
-         6gL1WIrOYy1QnkYUQsQEjsMx/kysKi20RB5jD+65c7TisRykPniZITTcIPf3daSdIDOg
-         AypJSG9TpY6AJHQ3iWKkn6jUiAazlwLWbhmBgea06rr4VndYDZW9oLMZvmj9p91F0xvZ
-         HhpA==
-X-Forwarded-Encrypted: i=1; AJvYcCVwK80QIEMX36pcBdLW30zIkA7BQLgzZUsI4bUgpgixLjkM9NaSe/ERLdFWCr0uKxcWhuE/t947jwAu+eIHiNRVeIRCwGUz
-X-Gm-Message-State: AOJu0YyU/Pp7N3dUEnN1FEwGG0a82NgsHzygYFQljHTC5Gf1mjcysKcN
-	y/whu1rxRF0TOP6Q0vctdQfg4yZ3kwPS2ZbVQnvhKbRF4083vNYzkgcw0xy1Kzc=
-X-Google-Smtp-Source: AGHT+IG9W+d/dWFhQG5S2b0O1VzeyrXiNNmwa8NkMFx7uUxPOdLU1rs/XCb/m4I22F/7jda40eis/A==
-X-Received: by 2002:adf:a4c6:0:b0:346:81e3:5887 with SMTP id h6-20020adfa4c6000000b0034681e35887mr199284wrb.24.1712730471335;
-        Tue, 09 Apr 2024 23:27:51 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:ea6e:5384:4ff9:abac? ([2a01:e0a:b41:c160:ea6e:5384:4ff9:abac])
-        by smtp.gmail.com with ESMTPSA id i11-20020adfe48b000000b0034330c9eccasm13152723wrm.79.2024.04.09.23.27.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Apr 2024 23:27:50 -0700 (PDT)
-Message-ID: <658b4081-bc8a-4958-ae62-7d805fcacdcd@6wind.com>
-Date: Wed, 10 Apr 2024 08:27:49 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB3328370
+	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 06:31:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.134
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712730668; cv=fail; b=VkaGdJIINiCi2FPjwPAMaR6FdVx72pOcYOACgtwaQ0WpfYoraFM7M2ouiMHAgBTwiFxT1v9EQ4LmAex++7xNUkvbVGkknIHHZI1WKS50N9gF1T0wWBC0YupscAaUyKWfJNagWqHEcZaHgwUI0yG3p29RJL2Flfw7w2zSaZ9Q7Zo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712730668; c=relaxed/simple;
+	bh=3T0tFNf2cpTB1ks9j87C9XXSi0Y22XV2QiuJ/numiJE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=V563edNGU+xp5thefg7j5erZdypxwh69SW/vAXVrnObzqR+SxKTxpgmsX8PNAXEHZlrigKOm0xse66QcMGKlsHKI+QnZAR/m0POGxwQvgkyyDSr4frCiWRWL1sGGq1fKs1hzV4whcs045GyIP/Lr3BoZgrtU/psmV4BBPVnmvD8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=l6O/XGyV; arc=fail smtp.client-ip=40.107.94.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DxP+d5ZJa+aPIUqlCnUNrhkPuI2yXymYQs0w2JZgQSk1/+1WVZ5htAzo5sg2ZkHdjeHfbgoVachKHoX/w+GB30jSI4fMtgv9GP0TaX7ZGhN9A/z3iFZ1ZrVx+n8Ydv+SDH/mENsIobEo65TD76XHU4TBTXbIuZIL18tFOKdYkS2hEGczdeydCZek6IHKBxz37KE1eWT/l4L1I0StdUF70FFjJLVOXt68tHsOEqi2IIKFSd8W6bY1lxXbvYZr/nRWQZvPtBeASjXEcK/JjId9fcRBM9J5uGcvm7qb6SJDXvjBobGCL0Mc+UJRzOD5unWBbFY3+CJeta6rReqNCxBVPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3T0tFNf2cpTB1ks9j87C9XXSi0Y22XV2QiuJ/numiJE=;
+ b=JfpYbo1rbWQN5jZFyX5zxGGcKZe/IomBr2ndm/Rbpi3sll4gfJzvXGNdZD3Tyu7AiE5MAURIVFboUB2CRirU6iHTOsQJrn3VLcVUvmHMm92NZmbdBRf5dx5QbTggqmf5bk4tndt8HhCM5A66yvXLhKh/JHQngkECGAOQa3VWmQn6kFmpSxSvjtHXVW8Vm7G0IePJh2/idzdPEPcV98iLDv2tl7i8+56iN19bMhuo/1vy8rRJX7gd/JoVc09G6xrpxZrNvq2BcxmbYksnGwya6oIFVHiZC0UKCqT8j1dY6bE8DpT9qCxOvYNjIQnOYiSjBVAaLU+6+xhu3lkZykBBIg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3T0tFNf2cpTB1ks9j87C9XXSi0Y22XV2QiuJ/numiJE=;
+ b=l6O/XGyVk7XAjun/3u8RYuxhDPvyIm923lgH8byu0lInNoOalcLsOoPn0lDNftyKjPeCmrVJ4d7/Xm8+QJQOCu0OFUP1klt6imIPPQ3ltikHRedCcpCKUAm1yZwX5MTFz+Wb/jbzUEWtO+V12ETLXLkXp44Oi7kuROH0OU6QXPsXCMED0IJpDu+ZYZ7qhDVPxDb1X3TaIQ6wG763MKz14yXc7ykUMnpndbLJbaugK/TaAux8jqsGj2d87TBaxBBOB/je5Cfb7+tfjOh/gVzuMwoMMRIuGna4hOmGk6AZxEzk/AakHnqFdUnJL28KT5Cvqm6R3oYx8XSYW4UzwbNwyA==
+Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
+ by SJ2PR12MB7896.namprd12.prod.outlook.com (2603:10b6:a03:4c6::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Wed, 10 Apr
+ 2024 06:31:04 +0000
+Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
+ ([fe80::aa05:b8a0:7d5:b463]) by SJ1PR12MB6075.namprd12.prod.outlook.com
+ ([fe80::aa05:b8a0:7d5:b463%3]) with mapi id 15.20.7409.042; Wed, 10 Apr 2024
+ 06:31:04 +0000
+From: Aurelien Aptel <aaptel@nvidia.com>
+To: Sagi Grimberg <sagi@grimberg.me>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "hch@lst.de" <hch@lst.de>, "kbusch@kernel.org"
+	<kbusch@kernel.org>, "axboe@fb.com" <axboe@fb.com>, Chaitanya Kulkarni
+	<chaitanyak@nvidia.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"kuba@kernel.org" <kuba@kernel.org>
+CC: Boris Pismenny <borisp@nvidia.com>, "aurelien.aptel@gmail.com"
+	<aurelien.aptel@gmail.com>, Shai Malin <smalin@nvidia.com>,
+	"malin1024@gmail.com" <malin1024@gmail.com>, Or Gerlitz
+	<ogerlitz@nvidia.com>, Yoray Zack <yorayz@nvidia.com>, Gal Shalom
+	<galshalom@nvidia.com>, Max Gurtovoy <mgurtovoy@nvidia.com>
+Subject: RE: [PATCH v24 06/20] nvme-tcp: Add DDP data-path
+Thread-Topic: [PATCH v24 06/20] nvme-tcp: Add DDP data-path
+Thread-Index: AQHahozr1CSHzxR3ZUO2E0aMrm+r7rFdYxQAgAOw87A=
+Date: Wed, 10 Apr 2024 06:31:03 +0000
+Message-ID:
+ <SJ1PR12MB6075F997ED346A333A86D763A5062@SJ1PR12MB6075.namprd12.prod.outlook.com>
+References: <20240404123717.11857-1-aaptel@nvidia.com>
+ <20240404123717.11857-7-aaptel@nvidia.com>
+ <a307cd8b-510d-4bb0-9e5d-68fdbd8a362c@grimberg.me>
+In-Reply-To: <a307cd8b-510d-4bb0-9e5d-68fdbd8a362c@grimberg.me>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ1PR12MB6075:EE_|SJ2PR12MB7896:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ Z98yYrECeOidF3xPjZL7KEv09V+v9Xdiv8gW3QS1C2QdAcXHWaBeUSHsUIEwzTBZybjppTuyRW8BG1WOIrbm1ujDkeDJErMw4TJxgdG7U+j/FOP1Jptz5rkor3Y8lN3pktiyJ7F9dcrC7duAb6+tSnkU8flpNNuMN8kvvv2a9hBSxJGFMTpmbkBkziCqYdrA9SoetOBKLchzk/09Wa9/7nZ5ZzRI3b0dfHtGb6xRWioMCi6vaKrA7QTvPqsD/3ttp38WMag3YS00Ppd5Ycqv1paolSS8PHP4+tMEzLnTcnZBze9qy9EmdpilUIJb1y4qKBwi8dAGIDsJneEzAjOb3llXI0cMSNyxe7gH2PP24Cv93Y1Mt6DiT+5pAXIpGjZZMQFrBTYCBGOEZKUpOLPf/Q==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(7416005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?M1FzempPOE1maVdDeDFoOStCTTZIbldPWUhmeUJMMGF4U2lRdVlGM0JSbTE2?=
+ =?utf-8?B?WjBucU9PbjFQa2hSY3E1SHhLVFFHalkwRDlQVC9PSUxZa0w5Y25Dd2ZvT29H?=
+ =?utf-8?B?WFJ0Sk9ZSVJSN2pyMGRieW9qaW5oR2tHUS9mOWd3dm5hTEljTlFLWEFjdEw3?=
+ =?utf-8?B?amRVVUdvb0pOZFVBM0FvdTI1Unh1VUVBZE81QzNEZEVsK2UyL3lFdXE4WTBH?=
+ =?utf-8?B?MmtCU2h0QzZEQkdQVXEwQTYzbk5rYnduUHRENE16ay9nVkNydHBUY0hWTjVq?=
+ =?utf-8?B?cDFtQ0V4R2lSbkY2bXVubkFNaUw4YUNzdkhQc2k5U0JtMkJMa1llMmx0Wmh5?=
+ =?utf-8?B?SGtQc1RDcEpSWFVxcW1GaFF0WDBOMmhvZUlrczVsb2gwL3R5R0NCT2ZhUS9r?=
+ =?utf-8?B?SXZ4aHpjNTJuOXA4d0lzMmlQQTF1VVR6SDQwNUI4UjVtQjlMR01TTTdlVUps?=
+ =?utf-8?B?MzI1M3NDV3FUb0czOEFBUGsyNEk4S1NhSVg5cnJXQTNSYVYvTWdZSFVHVGtV?=
+ =?utf-8?B?a3lUMit1UEdpNnBtM3FNdmxOVUlmbHdzWlpUMVdrTStIY0tIMW8vR1FtZE5K?=
+ =?utf-8?B?cFdNN1FuME1VVDRpWVZkWEMzcWdvaHJSNXNlMHN5UzBTZUFKUWx6N0tLUS92?=
+ =?utf-8?B?Q09lN0paZ1BZN1hQY24yMXJyMUVLNGR3WTZTMncyakY3VUg0NjU2eUxMZ1Zi?=
+ =?utf-8?B?R3lJMnUvcDB3SmVRK1NTSWJub1NkK2dnNWFhT0U5VWwxZkVkblljN21IRkY2?=
+ =?utf-8?B?eXovZmFXeVRra3lCWXFtcHZ3dlgyMkJVL3V2bUNEb2ZKd2lSTVhHUGNwWk5v?=
+ =?utf-8?B?SW5neERyQXY0TThzb0dsR2QzTUs1Vk9LNzBtSlg1dXJtOS9OTWVLREF5Vk1i?=
+ =?utf-8?B?QU9iRTdVb3l4a1MwVGdVQWpIQUdSOU0xTXJrSU03S1JKc25XK0p0Y3Y1REJn?=
+ =?utf-8?B?S2FOa0RBKzAxcFFDOTMzNXk1MU5aeFJublg5NEwxckRTb1pNMktzR2dhb0Ri?=
+ =?utf-8?B?WlhuWVlySWZxQkx5b2ttQ29HYWx2L0cyemh0d1Vjc3cxbzhRY2NrOGhxa1No?=
+ =?utf-8?B?WnlubjB6VEtjbHRPbEdnN2VFY3RaQzhUc0tkMU9mOGZLekVSQWRIdExGenVk?=
+ =?utf-8?B?ZEl2TnJYdFhyYk5xQjUrY00yU1IrZDBPN01kUkhOTE1RMXZVWGdzcnlGckx0?=
+ =?utf-8?B?eHlMOHh2ZFU3aE5jMFNRSlVvTVhTRnRJYnFNdTlGdVAvUng5d0NYNWJmUlJX?=
+ =?utf-8?B?RjNMQVpJSXpzN1VGdWRQRHYzNzFsNFczeVUwbkx0TzB1UlVEUWtmWjlFQUxk?=
+ =?utf-8?B?dHdERlE4UTFRdGd2ZndDUTB1RmxGbFE2SnpodXM1MnNLRlQ4b2VOd1VkU25j?=
+ =?utf-8?B?OFhndktISE93UUFvY0lLbWg5UU92MXB3TFBlRUNwMi8yZUZvalVOcytEM2Zi?=
+ =?utf-8?B?QWMxSERzb3ZEa0VrSHRPM2hoK29XS25PZEF5N01odGZvVlZ2QXh1VXFieHJy?=
+ =?utf-8?B?Zkh3aG9iTkVNUjFwUjlOcTl1S1ZTaFVjOEx3dHlTYjZmbjJsUU1KQWFuU1k0?=
+ =?utf-8?B?cEhac2haVmpSNHZTQXJyQ05ndzd2STNMRFJVUnBtZDJHSllFY2hxREpjamJK?=
+ =?utf-8?B?eXFZd21wdEpncFAySkxMV0pPaHl0cnF5ZWRBOEhxeTRuSjBmVnQyTldOUzRU?=
+ =?utf-8?B?Q2c5YSs0YjlXU2RwbmZBRFYyV2x6YWd0dDhpS3dzWEFSM1NIL1JtbHZjRUp0?=
+ =?utf-8?B?bVhOWmEvQ3NKUFNwZ2NRcENFNWRrNE1xR0VtUlRzM3M3RUpGSEJGMTJUSkEx?=
+ =?utf-8?B?TTkxZ3o3NW1GUjlTZm9abThyeXdYWmtoeDEzNXR3OWZQT0JIbnBLNVlqTlBH?=
+ =?utf-8?B?QVlkSzJSa21uMVZIUWxVT1Nvd0lNZzZuSnJnVUcwMFNnRnM2UGpFUEdtQW9W?=
+ =?utf-8?B?UFlOOVJwOXphWlJBMVdERkthaXNCYy81K01WbDNNaWpEMkl1Mnl3cXVTWnZE?=
+ =?utf-8?B?Z3MyNmM2OGlyVDJBSkNmVktVRG1ZQ2lDcGVIWkY3UEtXTm9GeWN4S0pKcTd6?=
+ =?utf-8?B?eFd0VUlqSm9QamUyTWFOa1RaQnNYcTVVM1ZaNXFFRWdNSDc5WHkzd0NRYWdr?=
+ =?utf-8?Q?0zdM=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v6] xfrm: Add Direction to the SA
- in or out
-To: Sabrina Dubroca <sd@queasysnail.net>, Antony Antony <antony@phenome.org>
-Cc: Antony Antony <antony.antony@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
- devel@linux-ipsec.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>
-References: <a53333717022906933e9113980304fa4717118e9.1712320696.git.antony.antony@secunet.com>
- <ZhBzcMrpBCNXXVBV@hog> <ZhJX-Rn50RxteJam@Antony2201.local>
- <ZhPq542VY18zl6z3@hog>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <ZhPq542VY18zl6z3@hog>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3db52e7f-b274-4471-fc31-08dc5927cbe0
+X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Apr 2024 06:31:03.8261
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: gLNcuLaUVbLl1E07yv2LkjQC+ECVswHzrRzZ97vc/S3qPsg3V5UT4AzrE6vSElxUf2x9Ha7zyn20ENtipTnqXQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7896
 
-Le 08/04/2024 à 15:02, Sabrina Dubroca a écrit :
-[snip]
-> Nicolas, since you were objecting to the informational nature of the
-> attribute in v5: would you still object to the new attribute (and not
-> just limited to offload cases) if it properly restricted attributes
-> that don't match the direction?
-It's a good step, sure. Does this prevent an 'input' SA to be used in the output
-path? This is the case I'm objecting.
+VGhhbmtzIQ0K
 
