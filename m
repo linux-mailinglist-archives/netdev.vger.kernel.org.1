@@ -1,277 +1,158 @@
-Return-Path: <netdev+bounces-86659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9004489FBEB
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 17:44:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FCEE89FBE8
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 17:44:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00FF5B2FB58
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:38:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 198D6B2B8E4
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 15:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E73178CD3;
-	Wed, 10 Apr 2024 15:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8ED7516F28E;
+	Wed, 10 Apr 2024 15:35:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jpSIBqsa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AAKuFDPy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08C4B1779AF;
-	Wed, 10 Apr 2024 15:35:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED43C17557C;
+	Wed, 10 Apr 2024 15:35:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712763356; cv=none; b=YAriZSDLwIFUjngVWyNxzx4of6NWW0skYi/lRawDBWIzVRtsNoYvu0cFDKMUS9FbbH+sHBgr1abOSeAzI0q9QbdaKd0Y3qNwbazHIofcyhZ6+fvQKGMtRiMIv2+xwFC9B6M1jLbnl/s4XsBbfYuTjC3pvgRzVMPXPF0c1udfK44=
+	t=1712763346; cv=none; b=TYGgyU8c1XBAIWVaIOQllysR11N50q0QQe5nsT7fq/UOS+EsP6amp6suXFu7bWHxfda/q0H385hLZujqETJFTDezhIUjxM6vOHwwjjUh5RwJyxj4tVj+4pDIwBPyps3fPpVY6ohGXi2X144+tGRqAXd3c57ayR7279bk1BQkkAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712763356; c=relaxed/simple;
-	bh=9Zp8iPX0jQlUJwfcjhF0I+ShRBkh39BZ3ToTtQd5BH0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Qoo4NL8cqQ9fajX5LdWb2A+0Wg60Ibqostq6/N+I6RlyIkANx0m4jfCGKGWlUkkukPCXHJjK2NlNbM8rmPZA49QKc/HPrgTsUuZWjZt3vUrEE4Z2n2IgzaHDtbmKFZQ8yrZz6cO/byGwXAv+i5se/mOpcSZyD3ZOU7GUbRF9RKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jpSIBqsa; arc=none smtp.client-ip=209.85.128.54
+	s=arc-20240116; t=1712763346; c=relaxed/simple;
+	bh=nQU/EW6RN6xfr3NljZXvjKCH5hp48r1P1JR1902wK0o=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=YohXIlUjbLlVL89LwtcTwozrTIqsRQDbZFfyw+RPsnqXp/TB5W2uSHQCZhO6PVS1GT7q3Cg/vrg7lIdrR6vmw7CywsuIuZ47aY1FBVs7RhSJKs7/Ok9K/dCinHQ8gAk1m1ICC+dqsHz6vBV4a9S/eRyn4alX/ASPfjGsMSVtFOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AAKuFDPy; arc=none smtp.client-ip=209.85.222.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4173f9e5e05so4191605e9.3;
-        Wed, 10 Apr 2024 08:35:54 -0700 (PDT)
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-78d57bd577dso325162685a.2;
+        Wed, 10 Apr 2024 08:35:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712763353; x=1713368153; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1712763344; x=1713368144; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=79Cy7Ko+UcnCG7nOcHmA1+y+Nd7j5NW8NL0jgsxVudM=;
-        b=jpSIBqsavTd1UU/pZoN4MFO0LNOjtr0/HA1RvdLM9i95jmuP9qPGBdsvarQBRGqA1M
-         jowBKl/iZrp/e7pHUJ/INK4CgRDEIiLPDSOSWRU/YxWTQrMUtI11rUcsYBWRGqGddeQF
-         Du2eazTLMWgNIGvQSEWdtYlYdNB6fw3nCMAYdp5LJZfPoqcvMvDLbI+FuSpfYRgVSiwG
-         56Iwxa1wIsrzo/uoP6eUL4ivwYnJoSowGfp3cgTziG1LxbUkbF85LmRmTyccmB1bPG1R
-         vxMqb2BG6YPO/C5r0QwvPNK9NApyPI61V04glqmbchK8rDMS+QnQe1pqm539Q6yop3MT
-         Q3wQ==
+        bh=FZzk1CbrJpsoJwc1KhYCyX8ST/kypCtDUY7G+Mt0LwQ=;
+        b=AAKuFDPy94YBHZcr+b2HDxj1nlzT957uN4U6JTv5yEZPhs8amQvT30SzghQASa8mPS
+         KXs+yytMbytFdG1vKFzUGbpzShAwye2Uyw6VZsvb6xr7G71hf3GLr6R8b0bd4hxbuFxq
+         y46qYCssnvCjsYDbR31QpzhnUn4OuXSJCEZjPefzXAAfeQZGMoT5SQyICW3xNOIHBiXW
+         X4eTP3A6JaCD/qINRqZiuUqHe35g2ZHHoVVI5T9T73mL6Pymvbr4g5q4Sl5U1ppNUKRi
+         TEaa2PqdFODExvwFRNoxw6OlFEKCR/yzG4fLVML/y+epHN/OYhUHqU33MDSgWaD0l4LE
+         8j1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712763353; x=1713368153;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=79Cy7Ko+UcnCG7nOcHmA1+y+Nd7j5NW8NL0jgsxVudM=;
-        b=JoqBDmdJBHI9nejRtslmBCfyUSJfrSjfRMuqZ9aUNvRyUAplOrBWsjWD4fEmp5crzT
-         7jEW4fUUJhxAi8Wtyi/tJdRtcNCMzvvqvcyXO4KuXIS6sWCquuByWvxD1bMDicyJsg3V
-         0ltjYtLzUYCpyKsZfCXDeYcALISG4rRn4Uk/a5t4blnLKA6APMR0gbpZVLy1F8B1KVCL
-         UF6LkXq5YJZDUgX+L5+GAnX2ohq0H9hfXf7jK/hR1CvCinY585tf3pvxgkSoLqeh8oBt
-         9N9k/fo1HueRp6GoK3laqWQDZWBqpNtglsBDYXvypvIwtNn2P7CGLfLZVdr8p3dDEh1h
-         rRoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWpA46TZOilwCEYUUlfwstAprGTQQI5gCugUAnmeSkXuVbh19B2958nRgl/GNc2gOFGyYImlvON/iKHRDR0WA6VG3Hh5Vy42O4fg0ANnAU7TL+u1uFX7uuaWv2DYCebNBGxEUbH2UQ97b2DpyR6PSl4pkPf8r6kUsOm96BQxD0O5jm4Yo++
-X-Gm-Message-State: AOJu0YwCk3z0c3U6ah4j4HOAXYVABdgY79Zp3Gsna8qP/QcZ/gLakCNg
-	L9bJag8HH4bVWFfs8SIswp6B+trODKM+mDfes86i6MC/MFX0EgN72wpIz+cp
-X-Google-Smtp-Source: AGHT+IHwUOss4eOPGbcTTFqRl4GRlRAHFdSjwFWuxW5e7ZrqVh7llGW9PJ8P0Ig6TNN1rErwomDyBg==
-X-Received: by 2002:a05:600c:4446:b0:417:36c5:7c64 with SMTP id v6-20020a05600c444600b0041736c57c64mr1374948wmn.21.1712763353353;
-        Wed, 10 Apr 2024 08:35:53 -0700 (PDT)
-Received: from localhost ([146.70.204.204])
-        by smtp.gmail.com with ESMTPSA id bg25-20020a05600c3c9900b004162d06768bsm2631946wmb.21.2024.04.10.08.35.51
+        d=1e100.net; s=20230601; t=1712763344; x=1713368144;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=FZzk1CbrJpsoJwc1KhYCyX8ST/kypCtDUY7G+Mt0LwQ=;
+        b=sBAp+Cl8v56J/tpDiGkuFnyggX3eMoRD/efT2bD1aYipitzMUpV2cI8APIi5Av0NT9
+         vt9NPlG1+FmZMDkTX+Qei6/gQ159w4JhPicG6YtKLcJWhH4SBzAmEHUsKTm05+PDb3CD
+         /Q92kdEqrdwfqNM5Kk1HolSZWFfSfW+0BP6e++ca5NgmwybTPQmtct8teC6/yK4LFenH
+         ZlFrfVZa2uMUKyvqZFvZSJMsatC8bOAKdP3W3NCPR6s2JYP65cU6Nbr23C2gYXFt9tzt
+         /F7kTN+hw3+llcVIrFcdgJYV9YgWtB+6DjvmFDR+YP/84I76Ddoogt6bmvLRvz/q9FR/
+         muTg==
+X-Forwarded-Encrypted: i=1; AJvYcCXOqNDca3LTe375gNa7ghNwA7cEukVa91u0qhpx/XJsVMeXYgKwBt1gEIJhnQUolPOQwjjvU71BVXE9+qpOpLU9V3aAQJJsQuzwdUEvDyRjoz0vh9BmoWKLwJxAzh2JjXK9BzAStT9G7+QKumKR8SJ1693wVhVUnYvn
+X-Gm-Message-State: AOJu0Yw8W8q5l+paifq9PgQ+77Kuyjbj7TIeaUwicPJFhnWwzaqjOS8+
+	yu39OeAl6UPpjKVPA6TZSU71EW7PkGQi6b5RfBe+NXKZkFxE4YGJ
+X-Google-Smtp-Source: AGHT+IF4g21EZhMDy0RUgZgR2yA7BgTgDfggYa84U5aEPdrO1Rt7qPokIgxGiAhqsrp75GIxm7hU+Q==
+X-Received: by 2002:a05:620a:27cd:b0:78e:b9ab:c823 with SMTP id i13-20020a05620a27cd00b0078eb9abc823mr1676656qkp.34.1712763343752;
+        Wed, 10 Apr 2024 08:35:43 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id i5-20020a05620a248500b0078d66d66d82sm3070614qkn.30.2024.04.10.08.35.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 08:35:53 -0700 (PDT)
-From: Richard Gobert <richardbgobert@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	willemdebruijn.kernel@gmail.com,
-	shuah@kernel.org,
-	dsahern@kernel.org,
-	aduyck@mirantis.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: Richard Gobert <richardbgobert@gmail.com>
-Subject: [PATCH net-next v6 6/6] selftests/net: add flush id selftests
-Date: Wed, 10 Apr 2024 17:34:23 +0200
-Message-Id: <20240410153423.107381-7-richardbgobert@gmail.com>
-In-Reply-To: <20240410153423.107381-1-richardbgobert@gmail.com>
-References: <20240410153423.107381-1-richardbgobert@gmail.com>
+        Wed, 10 Apr 2024 08:35:43 -0700 (PDT)
+Date: Wed, 10 Apr 2024 11:35:42 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Abhishek Chauhan <quic_abchauha@quicinc.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Andrew Halaney <ahalaney@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Martin KaFai Lau <martin.lau@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ bpf <bpf@vger.kernel.org>
+Cc: kernel@quicinc.com
+Message-ID: <6616b1ceeecad_2a98a529472@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240409210547.3815806-3-quic_abchauha@quicinc.com>
+References: <20240409210547.3815806-1-quic_abchauha@quicinc.com>
+ <20240409210547.3815806-3-quic_abchauha@quicinc.com>
+Subject: Re: [RFC PATCH bpf-next v1 2/3] net: assign enum to skb->tstamp_type
+ to distinguish between tstamp
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Added flush id selftests to test different cases where DF flag is set or
-unset and id value changes in the following packets. All cases where the
-packets should coalesce or should not coalesce are tested.
+Abhishek Chauhan wrote:
+> As we are renaming the mono_delivery_time to tstamp_type, it makes
+> sense to start assigning tstamp_type based out if enum defined as
+> part of this commit
+> 
+> Earlier we used bool arg flag to check if the tstamp is mono in
+> function skb_set_delivery_time, Now the signature of the functions
+> accepts enum to distinguish between mono and real time.
+> 
+> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
+> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
+> ---
+>  include/linux/skbuff.h                     | 13 +++++++++----
+>  net/bridge/netfilter/nf_conntrack_bridge.c |  2 +-
+>  net/core/dev.c                             |  2 +-
+>  net/core/filter.c                          |  4 ++--
+>  net/ipv4/ip_output.c                       |  2 +-
+>  net/ipv4/tcp_output.c                      | 14 +++++++-------
+>  net/ipv6/ip6_output.c                      |  2 +-
+>  net/ipv6/tcp_ipv6.c                        |  2 +-
+>  net/sched/act_bpf.c                        |  2 +-
+>  net/sched/cls_bpf.c                        |  2 +-
+>  10 files changed, 25 insertions(+), 20 deletions(-)
+> 
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index 8210d699d8e9..6160185f0fe0 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -701,6 +701,11 @@ typedef unsigned int sk_buff_data_t;
+>  #else
+>  typedef unsigned char *sk_buff_data_t;
+>  #endif
+> +
+> 
+> 
+> +enum skb_tstamp_type {
+> +	SKB_TSTAMP_TYPE_RX_REAL = 0,    /* A RX (receive) time in real */
+> +	SKB_TSTAMP_TYPE_TX_MONO = 1,    /* A TX (delivery) time in mono */
+> +};
 
-Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
----
- tools/testing/selftests/net/gro.c | 144 ++++++++++++++++++++++++++++++
- 1 file changed, 144 insertions(+)
+I'd drop the RX_/TX_. This is just a version of clockid_t, compressed
+to minimize space taken in sk_buff. Simpler to keep to the CLOCK_..
+types. Where a clock was set (TX vs RX) is not relevant to the code
+that later references skb->tstamp.
 
-diff --git a/tools/testing/selftests/net/gro.c b/tools/testing/selftests/net/gro.c
-index 353e1e867fbb..74ab06953c38 100644
---- a/tools/testing/selftests/net/gro.c
-+++ b/tools/testing/selftests/net/gro.c
-@@ -617,6 +617,120 @@ static void add_ipv6_exthdr(void *buf, void *optpkt, __u8 exthdr_type, char *ext
- 	iph->payload_len = htons(ntohs(iph->payload_len) + MIN_EXTHDR_SIZE);
- }
- 
-+static void fix_ip4_checksum(struct iphdr *iph)
-+{
-+	iph->check = 0;
-+	iph->check = checksum_fold(iph, sizeof(struct iphdr), 0);
-+}
-+
-+static void send_flush_id_case(int fd, struct sockaddr_ll *daddr, int tcase)
-+{
-+	bool send_three = false;
-+	static char buf1[MAX_HDR_LEN + PAYLOAD_LEN];
-+	static char buf2[MAX_HDR_LEN + PAYLOAD_LEN];
-+	static char buf3[MAX_HDR_LEN + PAYLOAD_LEN];
-+
-+	create_packet(buf1, 0, 0, PAYLOAD_LEN, 0);
-+	create_packet(buf2, PAYLOAD_LEN, 0, PAYLOAD_LEN, 0);
-+	create_packet(buf3, PAYLOAD_LEN * 2, 0, PAYLOAD_LEN, 0);
-+
-+	struct iphdr *iph1 = (struct iphdr *)(buf1 + ETH_HLEN);
-+	struct iphdr *iph2 = (struct iphdr *)(buf2 + ETH_HLEN);
-+	struct iphdr *iph3 = (struct iphdr *)(buf3 + ETH_HLEN);
-+
-+	switch (tcase) {
-+	case 0: /* DF=1, Incrementing - should coalesce */
-+		iph1->frag_off |= htons(IP_DF);
-+		iph1->id = htons(8);
-+		fix_ip4_checksum(iph1);
-+
-+		iph2->frag_off |= htons(IP_DF);
-+		iph2->id = htons(9);
-+		fix_ip4_checksum(iph2);
-+		break;
-+
-+	case 1: /* DF=1, Fixed - should coalesce */
-+		iph1->frag_off |= htons(IP_DF);
-+		iph1->id = htons(8);
-+		fix_ip4_checksum(iph1);
-+
-+		iph2->frag_off |= htons(IP_DF);
-+		iph2->id = htons(8);
-+		fix_ip4_checksum(iph2);
-+		break;
-+
-+	case 2: /* DF=0, Incrementing - should coalesce */
-+		iph1->frag_off &= ~htons(IP_DF);
-+		iph1->id = htons(8);
-+		fix_ip4_checksum(iph1);
-+
-+		iph2->frag_off &= ~htons(IP_DF);
-+		iph2->id = htons(9);
-+		fix_ip4_checksum(iph2);
-+		break;
-+
-+	case 3: /* DF=0, Fixed - should not coalesce */
-+		iph1->frag_off &= ~htons(IP_DF);
-+		iph1->id = htons(8);
-+		fix_ip4_checksum(iph1);
-+
-+		iph2->frag_off &= ~htons(IP_DF);
-+		iph2->id = htons(8);
-+		fix_ip4_checksum(iph2);
-+		break;
-+
-+	case 4: /* DF=1, two packets incrementing, and one fixed - should
-+		 * coalesce only the first two packets
-+		 */
-+		iph1->frag_off |= htons(IP_DF);
-+		iph1->id = htons(8);
-+		fix_ip4_checksum(iph1);
-+
-+		iph2->frag_off |= htons(IP_DF);
-+		iph2->id = htons(9);
-+		fix_ip4_checksum(iph2);
-+
-+		iph3->frag_off |= htons(IP_DF);
-+		iph3->id = htons(9);
-+		fix_ip4_checksum(iph3);
-+		send_three = true;
-+		break;
-+
-+	case 5: /* DF=1, two packets fixed, and one incrementing - should
-+		 * coalesce only the first two packets
-+		 */
-+		iph1->frag_off |= htons(IP_DF);
-+		iph1->id = htons(8);
-+		fix_ip4_checksum(iph1);
-+
-+		iph2->frag_off |= htons(IP_DF);
-+		iph2->id = htons(8);
-+		fix_ip4_checksum(iph2);
-+
-+		iph3->frag_off |= htons(IP_DF);
-+		iph3->id = htons(9);
-+		fix_ip4_checksum(iph3);
-+		send_three = true;
-+		break;
-+	}
-+
-+	write_packet(fd, buf1, total_hdr_len + PAYLOAD_LEN, daddr);
-+	write_packet(fd, buf2, total_hdr_len + PAYLOAD_LEN, daddr);
-+
-+	if (send_three)
-+		write_packet(fd, buf3, total_hdr_len + PAYLOAD_LEN, daddr);
-+}
-+
-+static void test_flush_id(int fd, struct sockaddr_ll *daddr, char *fin_pkt)
-+{
-+	for (int i = 0; i < 6; i++) {
-+		sleep(1);
-+		send_flush_id_case(fd, daddr, i);
-+		sleep(1);
-+		write_packet(fd, fin_pkt, total_hdr_len, daddr);
-+	}
-+}
-+
- static void send_ipv6_exthdr(int fd, struct sockaddr_ll *daddr, char *ext_data1, char *ext_data2)
- {
- 	static char buf[MAX_HDR_LEN + PAYLOAD_LEN];
-@@ -935,6 +1049,8 @@ static void gro_sender(void)
- 			send_fragment4(txfd, &daddr);
- 			sleep(1);
- 			write_packet(txfd, fin_pkt, total_hdr_len, &daddr);
-+
-+			test_flush_id(txfd, &daddr, fin_pkt);
- 		} else if (proto == PF_INET6) {
- 			sleep(1);
- 			send_fragment6(txfd, &daddr);
-@@ -1061,6 +1177,34 @@ static void gro_receiver(void)
- 
- 			printf("fragmented ip4 doesn't coalesce: ");
- 			check_recv_pkts(rxfd, correct_payload, 2);
-+
-+			/* is_atomic checks */
-+			printf("DF=1, Incrementing - should coalesce: ");
-+			correct_payload[0] = PAYLOAD_LEN * 2;
-+			check_recv_pkts(rxfd, correct_payload, 1);
-+
-+			printf("DF=1, Fixed - should coalesce: ");
-+			correct_payload[0] = PAYLOAD_LEN * 2;
-+			check_recv_pkts(rxfd, correct_payload, 1);
-+
-+			printf("DF=0, Incrementing - should coalesce: ");
-+			correct_payload[0] = PAYLOAD_LEN * 2;
-+			check_recv_pkts(rxfd, correct_payload, 1);
-+
-+			printf("DF=0, Fixed - should not coalesce: ");
-+			correct_payload[0] = PAYLOAD_LEN;
-+			correct_payload[1] = PAYLOAD_LEN;
-+			check_recv_pkts(rxfd, correct_payload, 2);
-+
-+			printf("DF=1, 2 Incrementing and one fixed - should coalesce only first 2 packets: ");
-+			correct_payload[0] = PAYLOAD_LEN * 2;
-+			correct_payload[1] = PAYLOAD_LEN;
-+			check_recv_pkts(rxfd, correct_payload, 2);
-+
-+			printf("DF=1, 2 Fixed and one incrementing - should coalesce only first 2 packets: ");
-+			correct_payload[0] = PAYLOAD_LEN * 2;
-+			correct_payload[1] = PAYLOAD_LEN;
-+			check_recv_pkts(rxfd, correct_payload, 2);
- 		} else if (proto == PF_INET6) {
- 			/* GRO doesn't check for ipv6 hop limit when flushing.
- 			 * Hence no corresponding test to the ipv4 case.
--- 
-2.36.1
+>  static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
+> -					 bool mono)
+> +					enum skb_tstamp_type tstamp_type)
+>  {
+>  	skb->tstamp = kt;
+> -	skb->tstamp_type = kt && mono;
+> +	skb->tstamp_type = kt && tstamp_type;
+
+Already introduce a switch here?
+
 
 
