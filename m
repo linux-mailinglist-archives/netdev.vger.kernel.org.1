@@ -1,143 +1,195 @@
-Return-Path: <netdev+bounces-86698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BD6989FFEF
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 20:39:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4D5489FFF0
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 20:42:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D0B81C2588A
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 18:39:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65B0C284F90
+	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 18:42:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ECCD38DCC;
-	Wed, 10 Apr 2024 18:39:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B9C1CD25;
+	Wed, 10 Apr 2024 18:42:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="V9DtGi4I"
+	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="jB8+wCc5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12olkn2034.outbound.protection.outlook.com [40.92.22.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B065D63E
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 18:39:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712774375; cv=none; b=AgkNv9R4lqBmFpllG1j2u7JqojYWb8TP6ZvQN3/kU/F50rNUnESm72lkE0c0JptPh6k4ABTj1Agj9G0uLUcWFoVHUeNwA57pouxQ8fW3leQuLWITf2jZYp4c7FznuVX5poVztfN7LTDtwu5DBV1+thvOkEssUgtZDZi5y45GO/c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712774375; c=relaxed/simple;
-	bh=Sfe5GMqaxptis3nA0tBRPzdKqkivUwlx4u4s3ESpY/w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=F7VOiRdypUhq+yzxaHrFAutYN3CMJ5Fg5Iki2KL9EAYEHpWn+t+cDIROm8SDzkgVyUmz2fjXJYwqD1XbGPgBECirCiyyWAhdLm2HoMghQEkBgG3V9auDlKj/Kwd6cCCk5nq2LDFpS7q1psSFdwedcTE9ztAzlubPeWLWXtkWeOg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=V9DtGi4I; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43AIVNsG020832;
-	Wed, 10 Apr 2024 18:39:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=1g8qLSFDaRoHD+tgx2RPRGRGSlyFA9/OVNoNoq1R4f8=;
- b=V9DtGi4IKYDdFUKPOIiq2HBl1qTR8QNuTr/nOPmvnkaU2vZxuDnk4u/Avw3tzIx9W9pd
- iU/gV7WWLLrM/Bh8cA/gwDuDxKJOWmi73VlGOX8MwG7tDugrbUy0Y2dGm9XJvvmRMbWJ
- BAgDMm0q+ayIRZTJn6FZZjYuzF0SltUPssjd+eULzXkGKrK/ucz8nms+ApKZUxuhik/q
- CaW6aXVSFaQXrHhwP+/KlYa0hiLtNqxFMG5pDBQlCkEaE1ezqG2eb3NNXIv5rrvgp9Zw
- gbIovrorEtNWnFsVgGRKcJM0KGs5NW6W11UqWpOdqwjZJMeHyQa/RtKj9/PjbtyDRjQ4 4A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xdy8g85ja-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Apr 2024 18:39:24 +0000
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43AIdNrl003137;
-	Wed, 10 Apr 2024 18:39:23 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xdy8g85j8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Apr 2024 18:39:23 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43AGPEjm019089;
-	Wed, 10 Apr 2024 18:39:22 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xbh40ervp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 10 Apr 2024 18:39:22 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43AIdKmB14156402
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 10 Apr 2024 18:39:22 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1F1515804E;
-	Wed, 10 Apr 2024 18:39:20 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 42D005803F;
-	Wed, 10 Apr 2024 18:39:17 +0000 (GMT)
-Received: from [9.43.101.208] (unknown [9.43.101.208])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 10 Apr 2024 18:39:16 +0000 (GMT)
-Message-ID: <f3804927-5a66-4469-9b12-b11790db30c1@linux.vnet.ibm.com>
-Date: Thu, 11 Apr 2024 00:09:15 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724DB38C;
+	Wed, 10 Apr 2024 18:42:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.22.34
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712774524; cv=fail; b=PnEc5ZCljlYNazSvTBfZVlLZ/F29UJ/xbS/HR+l31PcyUq1h6eOaGv5mGbgKg89hn+aZ3K1f+4zTbYIbJFbn9wweXI5yGYnHFWsMSpRgRP190qYV38i6LHGdVsaBhrTy7AGf4qThBaOHtbK4kYAieaef3vBjNjTIW8OjO4wViQE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712774524; c=relaxed/simple;
+	bh=HAbeLXMkX3+4HWx72imWBtkMMrXsz5QGFsmD2dbdem4=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=EDACnTKcl30tDmJ0zQT0YINDtuDoTtndVV9E+Mb0aenyAHz+62vcpMbAIN3N8+vnThjvg2RevRyijP7vXnCb5mEaBNf0nr9TYrQrvUqGo23T21XSaOXR5/wJyfq7bodbHBacmdqU/Rn50o7jJR7J9VnjY6wKn4jDpOG8J6o8t40=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=hotmail.com; dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b=jB8+wCc5; arc=fail smtp.client-ip=40.92.22.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YGCR/NrGrHo5k3HDrsdRmjWq2m3FrNbsKdC8F8T5DhMnUzdbrhbPHIb/XCGU0Wx5n6OiE+zg5L6gPCbyWla0fd5TEl/efh5fpvEpGvKy43dhHPqD7RVVAUlZf6ugilNMGJaRAUBBmlrkH7PUNWgdP1xmoBopsuuEsD/Vr27uTE9Zsi/9iXbPm1vClEV8FMBRN9yfGjOy8/bf3r1m440LmdfQ8Fc8CwFrohYPaBSa3jSJWFuz/NQ2oxfPW3E39XyIOJstnmgCJeM/ODQeD1P/YDFOVqpwHvu50yri4QevX8pCt+4nnwyrb6HiK4B0uU7LLag5A+Dn5X05nLZLBKGMtQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EM3KnVoF9WUB5POV8hQrO/3X5SbXhx5IYhJGcSM+hTE=;
+ b=naceJRUH18h/eZNLG6XN5zirdiXy8U9hFT0aRolg0/Dh7ZVtUX6NjSdMViRBMFOLuPJsCHBYb5tZuR+HrHBvvVjuBcydh2GfV5fbfw6fyTZO7NxEZob4lmZ8Wy4LAeMk7akZrXwi8ISzt0vWkB7jMlYbwwydmOrfwtTh/VOT51QhXLD6lO8yA6mkm69hTFlef0Ku9D1elsyCdZKnZGTCDtD/fy2ZwLn9gSova2wKEx9cFXO7r/a+3x2WiyfL56taN4wTHtFaP0ibX0pGT0QpnBCw/Sywlq5uwEe8LStywPTz50Gtc+tJcRHF5dmMLzeKyERGbM7IY7c/wOp8q3obVw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EM3KnVoF9WUB5POV8hQrO/3X5SbXhx5IYhJGcSM+hTE=;
+ b=jB8+wCc5MWgyA19NtI6DGIejkBTbnHqdCh0/npA0uizsMRrFmPlBTHh+oHoZYu5UyXKmAk+DxuRdq7lSn3TcWdi51fE3XhgYCUFkGbaCVcIbhI4L2y8gOgO4qd0Hy6WzPVF4S8V6RuL7URINUqdV9txuJi9nv8xKGT3kxkCrAL3sRM6F3ImErtRgmTKTYT/w0h5i7BNBcJM7agTirgEebPJx4U14dPc7YjBtgtoFJvpsZU+j4nN/gnpWBSzYBpNAX/lOIW/JjIPk7X7woWymOE/dLIeOciVYQdiQz+MEzdf2u5ZyxLZwEaY7URmuhAU4qVjrVHeBJzwuqIqiqCSamA==
+Received: from LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM (2603:10b6:408:1ac::6)
+ by SJ2P220MB1885.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:58f::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Wed, 10 Apr
+ 2024 18:42:00 +0000
+Received: from LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM
+ ([fe80::57aa:102b:db4b:e05]) by LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM
+ ([fe80::57aa:102b:db4b:e05%7]) with mapi id 15.20.7409.042; Wed, 10 Apr 2024
+ 18:42:00 +0000
+From: Min Li <lnimi@hotmail.com>
+To: richardcochran@gmail.com,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org
+Cc: devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Min Li <min.li.xe@renesas.com>
+Subject: [PATCH net-next 1/1] dt-bindings: ptp: Add device tree binding for IDT FemtoClock
+Date: Wed, 10 Apr 2024 14:41:47 -0400
+Message-ID:
+ <LV3P220MB1202BACF71E85F949FC09A29A0062@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.39.2
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [9LZ6inDMdX0qLuTgKpk317BetMqb755g]
+X-ClientProxiedBy: YQBP288CA0013.CANP288.PROD.OUTLOOK.COM
+ (2603:10b6:c01:6a::9) To LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:408:1ac::6)
+X-Microsoft-Original-Message-ID: <20240410184147.13754-1-lnimi@hotmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] r8169: add missing conditional compiling for call to
- r8169_remove_leds
-To: Heiner Kallweit <hkallweit1@gmail.com>,
-        Realtek linux nic maintainers <nic_swsd@realtek.com>,
-        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <d080038c-eb6b-45ac-9237-b8c1cdd7870f@gmail.com>
-Content-Language: en-GB
-From: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
-In-Reply-To: <d080038c-eb6b-45ac-9237-b8c1cdd7870f@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: HS9aiVhfvcPLNu_teARObfXjRcTLKf-3
-X-Proofpoint-GUID: TEB4W2TkK4HMO8Ap5esVYjqgBKNKLZLJ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-10_04,2024-04-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 clxscore=1011
- impostorscore=0 mlxlogscore=999 malwarescore=0 adultscore=0 suspectscore=0
- priorityscore=1501 mlxscore=0 spamscore=0 lowpriorityscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
- definitions=main-2404100136
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV3P220MB1202:EE_|SJ2P220MB1885:EE_
+X-MS-Office365-Filtering-Correlation-Id: 321bd6e6-f8cf-4623-b819-08dc598de7ea
+X-MS-Exchange-SLBlob-MailProps:
+	Om8TgR6f4EDVTZ10Twz0uhXXzrVM1yK2/ToeeANZlvpx2MsF6MwSb9IJ+O8bjDnp7/fN5jOSRY8dDKiBm1Vb1uzNaLrpOiqXywSa/EFrxlBjlXBQRNcEmv/+SMbJHUqJ5K1e9BZKCPE1Du8sw2CDMnL15scTwtvTcZue9Xc/SiEdmrhjJQyW4lTVh5kvm4vwsKj3HGnLdOE5STpB/Zvf98rBHvyP/Zn93MlWAF0w73jzLOGiUtoO8LIYZo2CgyY9mtNQ9DFBsnUr0PpRK1mvk5N5zPUsf8R4zLepXTRnQBBbaHyfJQwlm/bMqUvCbf2Wd5UXCniLi+gZUbfqhxB4mnuiA/2Uqk0ohekGBkev9F7F6KXvlAjHcgB4kflN/ix0eOOunil32/8R0bN8LneOAKlEq9xToS5OkMkWJDnc6c9X5YZslw3ks7KAzDrJNL2T1+CqSZAYsNMNHeh/s5rXpl/AGkyoyw8JSra7dhnYyMczAhvsZ7MBxovZZoaziwaEjFDbW1Y3Ve1lKj5Fk3tRQlom9YmZ6Fa7BIK1sOR2VHj3W3tv6J3saTUrYkuomCDJwFhqVuiLuQon0Ly/JaGPyGRaOemK047Dhme1eavOvXZe12c/24sa5qeufp/0Qv8j22jQB6QqrpJ/yFoGDMyvKvcMseRh36b8/Hk08rgAK16yPgUiTsrccH8ju7764dYSItFjiwqxfLM3JJNuXoFeCXEYjKUqayG4qGuTxjgGOI2BrJVdoyaHBcIuTi5ORzMjRv53Y9nE3vyEPJaTMQwZGxMmLMgZMLAKUe0kt0dw7hw6XfaTXEz3Yx5ukxK6m8fLB13UgOzBPFwS2AqMFu+I+Xeyw6rB+XMw
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	TLBntaTEcgbIVqTez2kge8rCeq9UGw/Km6IR9rQZtRzw9NRUvTgSaYr0cR7tdx1qiNygog9hWXHiCmypUncXsZm2jKDz6zkm2rtOheoZMO7PRkW/stJ1rQbhKllePpSKUQLEUlmlaUOkdJnm+VJFIQSDGtfOMvyq2IiVIYt7/1riaA+vHgC8Ri3ILMwr8SEXlN6FqrA5Qk8TUKF30qmrlErSwKwYWD2Na1dxX15yATWbO5quh5Oje4nrkDVD8NKvL1HbfKgwh5ghDHVZ3SvWopxCAXfKXf6z6yuw3bl7N7jKUhn8tsPKZmCoIJaPgolxybvwbX0Ibpz1B8UChJUVhud5kF1BCg5zjanW8BSAb4vFUWE5DuSWE9CQFNpe/t6tQSRB7pDcypiFrEGInCbofR3eDHAKUOZO41RhXABfdh3QfxaZ1X70d+XgeMQ9IVIRyNUC35JIyEHwvkvGyx0rKCbhLbHsvkS8dMOh4qR6A8KBU50SRwniegJKUGVE2PsFzq5jKop+PtNPrTiLCQ90athSJVnrzAnhk+dwgOU++HbIi0EnS/NDZa7myiypfwQBiOmEiG9LOJbW4x/jwC3PCsxGtKFarSMWrRf73ZQTzx5j3B2EX8tacMgNJT6WM/om1HrzWyaFNjTQrXuNhCSLxMsjpC9cohFadpevQGAk6fU=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?g0PMpqG5klsnQBMJGk4zTyrEuM/S4zLdIfAvMyORPjSzHZ2MGLwj17aMLSf0?=
+ =?us-ascii?Q?TdV1OprZiM1knUFJKj0DXAP/UcvYR79GJNFAgTNWZtsrVdbHalHVeY4cUgGJ?=
+ =?us-ascii?Q?otJG/yH8f41ifWFU9yMPQYLKKQW9904m0H1jno8tAPZBqq0oeRi7nTjvFuJx?=
+ =?us-ascii?Q?K2LIhk3rG1+B2yMfB4wqSnZMXiqwG9gHFmtlUTujatSmeAKTB2uV0VptX4QB?=
+ =?us-ascii?Q?oMIQlC9WIp8RjFQDsdG4VBucV+Vxxc84AwIfJ+NOs4LrzT0IfqVcuwSrbufJ?=
+ =?us-ascii?Q?DA1N5Uui2sd3ooG9HyrN4T3QWF0WX79rBWttwN51WBPp6LMiHSHkfW4SHJyW?=
+ =?us-ascii?Q?0dkVKJD/MeFhAmS6tIZXULCBH4hMeCD4mwjJx9X3qyRW9tJ7efODhWfu5udB?=
+ =?us-ascii?Q?WLztyFMNxx/q9hfjEWVpXkuhgo98nX+y3dNteoz3fjzELwLUn4tZT22XJ8Li?=
+ =?us-ascii?Q?OP1CjQmAaLaFXHDOHr2vJqKRkwzvRO4I8ReI0o2cBUjp6XNgAWBp+7cnJBHt?=
+ =?us-ascii?Q?mWxHC0aw2TLDj+sE/S0LSPQu9VC1iJG/MIg9291ZYLznp6QPMrmXiZqC18+G?=
+ =?us-ascii?Q?dbAEQuE9MMTHj7zQeh2kTwl41VJILgjgE+2HdzZqTZxdzv4R0dpWKI1JpA8B?=
+ =?us-ascii?Q?hY2kr4NkQv5mRE1np67X0lxbrqUSsuqJcLqjs17eEWEn12Lxrijts0uZyQvg?=
+ =?us-ascii?Q?HJMiiOOSkZeApUoNlZmGXgB69jE3RDIfZivRN4TNUlW23TL2ayFwW6UmAGAw?=
+ =?us-ascii?Q?6LoolJtNCIvrIOFJ/8dx4MGM0A7qYuhPFrx8o0FsafoNRj9GglP96YPkaKID?=
+ =?us-ascii?Q?+Cslr3NFu4UgEAYcxsHm0+Y2zS4jSZjlz2itpScG1CrIYyb3a1s3IDryq5o0?=
+ =?us-ascii?Q?IDdHkeI+FoVdWH1xyAkNNE4KbzaI2AziMZ8DF5etJTh97Y9KqTz3sD8H9vrR?=
+ =?us-ascii?Q?j9wYL0RohcrGVKwZ6m3zZcX9CUQoL5Ijm2HhpN6DHJajFxr/m8Y9N4Sfjugj?=
+ =?us-ascii?Q?Uwo7a5w0bBDsV4x6q1ACOlbbbQdDyj/ghjZYsYtU5M4OO3V9VT7aqfNXuPyY?=
+ =?us-ascii?Q?5vQtaUSq50fsaSEKrpHweGhfHlXbz2ngfuUimP0FNRk6H3wUe4e8KlPVmBQu?=
+ =?us-ascii?Q?EKC02acZ1NSlqnDW7DOWaiu6/bwuiXJEKcVZUs9gEkpNJWDhvClVsqlCbEnf?=
+ =?us-ascii?Q?nu/p8OdZiWVRGQFjpGnzaLXTMyujTRkt4uCy0Rg9uJrPD9TgxlrCmrunfK4?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-3458f.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 321bd6e6-f8cf-4623-b819-08dc598de7ea
+X-MS-Exchange-CrossTenant-AuthSource: LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Apr 2024 18:42:00.0331
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2P220MB1885
 
-Applied the patch and verified the reported issue.
+From: Min Li <min.li.xe@renesas.com>
 
-Kernel compilation is successful on PowerPC with this patch.
+Add device tree binding doc for the IDT FemtoClock Frequency
+Clock Synthesizers.
 
+Signed-off-by: Min Li <min.li.xe@renesas.com>
+---
+ .../devicetree/bindings/ptp/ptp-idtfc3.yaml   | 47 +++++++++++++++++++
+ 1 file changed, 47 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/ptp/ptp-idtfc3.yaml
 
-Tested-By: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
+diff --git a/Documentation/devicetree/bindings/ptp/ptp-idtfc3.yaml b/Documentation/devicetree/bindings/ptp/ptp-idtfc3.yaml
+new file mode 100644
+index 000000000000..3e1c3135df5a
+--- /dev/null
++++ b/Documentation/devicetree/bindings/ptp/ptp-idtfc3.yaml
+@@ -0,0 +1,47 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/ptp/ptp-idtfc3.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: RENESAS FemtoClock (TM) Frequency Clock Synthesizers
++
++maintainers:
++  - Min Li <min.li.xe@renesas.com>
++
++properties:
++  compatible:
++    enum:
++      # For System Synchronizer
++      - idt,rc38xxx0
++      - idt,rc38xxx1
++      - idt,rc38xxx2
++      - idt,rc38xxx3
++      - idt,rc38xxx4
++      - idt,rc38xxx5
++      - idt,rc38xxx6
++      - idt,rc38xxx7
++      - idt,rc38xxx8
++      - idt,rc38xxx9
++
++  reg:
++    maxItems: 1
++    description:
++      I2C slave address of the device.
++
++required:
++  - compatible
++  - reg
++
++additionalProperties: false
++
++examples:
++  - |
++    i2c {
++        #address-cells = <1>;
++        #size-cells = <0>;
++	phc@9 { /* FemtoClock3 */
++		compatible = "idt,rc38xxx0";
++		reg = <0x9>;
++	};
++    };
+-- 
+2.39.2
 
-On 10/04/24 6:41 pm, Heiner Kallweit wrote:
-> Add missing dependency on CONFIG_R8169_LEDS. As-is a link error occurs
-> if config option CONFIG_R8169_LEDS isn't enabled.
->
-> Fixes: 19fa4f2a85d7 ("r8169: fix LED-related deadlock on module removal")
-> Reported-by: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->   drivers/net/ethernet/realtek/r8169_main.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 06631a0d6..746ef4f34 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -5046,7 +5046,8 @@ static void rtl_remove_one(struct pci_dev *pdev)
->
->   	cancel_work_sync(&tp->wk.work);
->
-> -	r8169_remove_leds(tp->leds);
-> +	if (IS_ENABLED(CONFIG_R8169_LEDS))
-> +		r8169_remove_leds(tp->leds);
->
->   	unregister_netdev(tp->dev);
->
 
