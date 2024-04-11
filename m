@@ -1,136 +1,121 @@
-Return-Path: <netdev+bounces-86890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E3388A0A66
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:46:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E42408A0A68
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:46:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5C81B2ACC1
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 07:46:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21D111C21265
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 07:46:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 135EA13E412;
-	Thu, 11 Apr 2024 07:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73FD713F004;
+	Thu, 11 Apr 2024 07:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="WJIeMfdS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF8013E04A;
-	Thu, 11 Apr 2024 07:45:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D83A213EFF6;
+	Thu, 11 Apr 2024 07:46:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712821543; cv=none; b=j4Wpn99/9SobHdR0k5oAu3jehOOhZSRYYheKaqS2yW+9WTeGtS1rRk1kHI0Ep9Jyi1g3T39RV6xt1QjZtgvOORB5A+BDHyksRZUEv8I766Y6dFSM8uakHVYhvgr5Qe7w7Wo+6UPoP0ausPw3UuFjj5d38Eicfpkg7l04/xN483o=
+	t=1712821564; cv=none; b=pKHiscbpafONn2rh4rH5w2Ejip/56f89ApOHl2pjlxdJy7BuqDRMRv/upeMM1KMz2u78AOXVjErw0zTsTVpJuFp5+hJ3Ns/w1mMXCOFNG11dKupGR/XS/h2lNZZyE6Q10u7BFCrWWvEUMyJbTQe+wsj7qCesNbVEEjJf+gzelTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712821543; c=relaxed/simple;
-	bh=r+uHfO6nhURoV/pkGignKxKYOu+ttuewlNGxARe0TkE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y6VOOQebcHmAXwsLeLOrW2VypTo+HdJ9iGl1XJsktEWzrCsjnMJp2r4NBGFeU7AtNCJx2acWHLzN8VfyOXoNZ/0iXJxDPOWXJAGOTbY2+0l9tiYCnl9EIZd2Rn5mosOu6HnTRzuBfqvKzurSXV8I2PprC+gOKzrZiYycrtA8V7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-6154a1812ffso80578817b3.1;
-        Thu, 11 Apr 2024 00:45:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712821540; x=1713426340;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TLCbqACAEmw1RFUJ3MP/4fcprBXm3Vbx6jGa7VJAGWQ=;
-        b=OdBrqMC8rgyGSRr1LOisp9C30R/Zv14t4gB3XDE1ukbQePjv1EH1l4rZeKsQ9VzK25
-         Bgv+lYObqDSHXccnpaM/BlcRO9HOK8exXzcSAroSrHZXiAB52uDC86v0GHUw1XlePn3g
-         I0ib0nLy3FkHlPRQtnV03/ZD5cGNg0aLz8kuN846Yb66lmvlA41n+GxP8VoheSxOX1aw
-         rXOyxUOjmMnKjEibmxzGwqEIKkW/LAmKs5vUM31cTsbR6PvrEEpCdliQj27MiXJnxuFz
-         HjRqAgSPs4YS+3VJLcfZBk1QmDjbe5gciRXAABPQ8LXmJahUZ4na5Ps9dED9C+6GoPd6
-         dw5w==
-X-Forwarded-Encrypted: i=1; AJvYcCVKQnDNZ9feocadqAyDBtrkJYdFTMoIzxkcyIUDoOijN8H3DyiclH45UrALlgud/vhYQXTQ+yPl+biCcvuBav0RR/9cZmcKU5ybsY7gzWgAqD7uwLUA8cfUABqITzxwcHvcLtRPtYMVxSGfvToj8l5OBCieJm/u0CggIgxuV+wEck+PvHTT6nH06q1s4QRVIsmD8Ea332HMICWp25cmCTFvGRBZ
-X-Gm-Message-State: AOJu0Yy/Msn/+5Q2gxOUmxYlsZjXOC5Ykew2/VCYP0wmPWG9rfHVZCA7
-	wqz+hcSb79pcULm81rZdt4twCdEpXr4QcJfEwICxTblqcaNeCv+22O5UEBqU
-X-Google-Smtp-Source: AGHT+IGKOjCRJkfXoOUxCfYnLsPI278dml6c6tmCPCYSOIZxVLfSUYlod+COy7K/iibLYcAICafx8A==
-X-Received: by 2002:a25:ed0b:0:b0:dc7:6f13:61e2 with SMTP id k11-20020a25ed0b000000b00dc76f1361e2mr4843231ybh.58.1712821539691;
-        Thu, 11 Apr 2024 00:45:39 -0700 (PDT)
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com. [209.85.219.174])
-        by smtp.gmail.com with ESMTPSA id g36-20020a25ae64000000b00dcd2c2e7550sm184862ybe.21.2024.04.11.00.45.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Apr 2024 00:45:39 -0700 (PDT)
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-dcbef31a9dbso4969494276.1;
-        Thu, 11 Apr 2024 00:45:39 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUHYsRRfFzE46a8v1BVVF/E4cXEeVYYKzbi/2Q81Ll0wfIS6aXURBHTjdWmWggumJ9cT1ETJWOZjVr/QrfcJy7oj0ZaZNzD7L+sg6tV2ZkD8BbPF0A6ei+npHBs4w2U5oYHovw6gLvRdv+9BLjfqOAXz8kEwO9BwazYUbtYZjaQHUSDv9mNQzMpHbN8653Q9CIxe22sHcf9mwnOLP64d9WFCMUa
-X-Received: by 2002:a25:bac9:0:b0:dda:abbd:7395 with SMTP id
- a9-20020a25bac9000000b00ddaabbd7395mr4287330ybk.51.1712821539199; Thu, 11 Apr
- 2024 00:45:39 -0700 (PDT)
+	s=arc-20240116; t=1712821564; c=relaxed/simple;
+	bh=ZwLPH/UOcOFhWCSF3mwT9KX212oLhnTdEXSZz3Y9JAk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ko0l6kT/16mOPneW1vsPk5bR6QH2tl8RwvoXNKkLjdJQdKQZpsNh0k2M7D6MMn1k17UtI+1Qrbxlt4b6/m/au28ry1UZxy5jBLnQ9NtrTRtWlXVDFmEFjOjiUjsaIvfQ/1yu1h7RCckclB/sJxTes4zG3ZSzIFGBEqgDGCbWa/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=WJIeMfdS; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1712821554; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=RuejJJ0cVW5wmtXibI9GDaEHnBr5czrBIGaDfgbbXis=;
+	b=WJIeMfdSJuiU0MAW2remApcJOvCaXxGxT0xbX+vOeoysqQXxIM6C6Ph+b+BrTjWRJLc/fJamgjWu2ilVzKA4mOjEtfr8f/F1+YxMJ1tQfQ7VBTuEt3YNjTQxRxiPE2OcsKa+mORwuG1mgZ+2pObZzx2sISKyNoRBqYEVQ/gFRaY=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R811e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0W4KbRbP_1712821552;
+Received: from 30.221.130.208(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W4KbRbP_1712821552)
+          by smtp.aliyun-inc.com;
+          Thu, 11 Apr 2024 15:45:53 +0800
+Message-ID: <fc274220-cb6e-43be-aa76-69e37449e535@linux.alibaba.com>
+Date: Thu, 11 Apr 2024 15:45:50 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240409-rzn1-gmac1-v2-0-79ca45f2fc79@bootlin.com>
- <20240409-rzn1-gmac1-v2-4-79ca45f2fc79@bootlin.com> <CAMuHMdX-F8LXWx=Ras4f+Dt_r485HKjRDLydDXZsnZBW8HJzxw@mail.gmail.com>
- <9bd8eee4-952d-d5b2-c462-45c1466c54d6@bootlin.com>
-In-Reply-To: <9bd8eee4-952d-d5b2-c462-45c1466c54d6@bootlin.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 11 Apr 2024 09:45:27 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdVAB8CuSkrnp+b7-+s3v0eHLr0Lvm1=MveGMVRW3T9T-A@mail.gmail.com>
-Message-ID: <CAMuHMdVAB8CuSkrnp+b7-+s3v0eHLr0Lvm1=MveGMVRW3T9T-A@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 4/5] net: stmmac: add support for RZ/N1 GMAC
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	=?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, 
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next v5 00/11] net/smc: SMC intra-OS shortcut with
+ loopback-ism
+To: Gerd Bayer <gbayer@linux.ibm.com>, wenjia@linux.ibm.com,
+ jaka@linux.ibm.com
+Cc: wintera@linux.ibm.com, twinkler@linux.ibm.com, hca@linux.ibm.com,
+ gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+ tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org
+References: <20240324135522.108564-1-guwen@linux.alibaba.com>
+ <ae3ea4bc-4a9c-416e-a593-2885fea96ae5@linux.alibaba.com>
+ <27deaa5dbb30c467fcdaa0667ef39da86bcee03f.camel@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <27deaa5dbb30c467fcdaa0667ef39da86bcee03f.camel@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hi Romain,
 
-On Wed, Apr 10, 2024 at 2:24=E2=80=AFPM Romain Gantois
-<romain.gantois@bootlin.com> wrote:
-> On Tue, 9 Apr 2024, Geert Uytterhoeven wrote:
-> > > +config DWMAC_RZN1
-> > > +       tristate "Renesas RZ/N1 dwmac support"
-> > > +       default ARCH_RZN1
-> >
-> > Why default to enabled?
-> >
-> > > +       depends on OF && (ARCH_RZN1 || COMPILE_TEST)
->
-> The kernel doc states this as one of the possible cases where setting def=
-ault
-> y/m makes sense:
->
-> ```
-> Sub-driver behavior or similar options for a driver that is =E2=80=9Cdefa=
-ult n=E2=80=9D. This
-> allows you to provide sane defaults.
-> ```
->
-> In the case of DWMAC_RZN1, it is a suboption of stmmac which is "default =
-n", and
-> I think it makes sense to enable the RZN1 ethernet controller driver if b=
-oth the
-> stmmac driver and the RZN1 architecture were explicitely selected.
 
-Thanks for your answer, that makes perfect sense!
+On 2024/4/3 19:10, Gerd Bayer wrote:
+> On Wed, 2024-04-03 at 14:35 +0800, Wen Gu wrote:
+>>
+>>
+>> On 2024/3/24 21:55, Wen Gu wrote:
+>>> This patch set acts as the second part of the new version of [1]
+>>> (The first
+>>> part can be referred from [2]), the updated things of this version
+>>> are listed
+>>> at the end.
+>>
+>>> Change log:
+>>>
+>>> RFC v5->RFC v4:
+>>> - Patch #2: minor changes in description of config SMC_LO and
+>>> comments.
+>>> - Patch #10: minor changes in comments and
+>>> if(smc_ism_support_dmb_nocopy())
+>>>     check in smcd_cdc_msg_send().
+>>> - Patch #3: change smc_lo_generate_id() to smc_lo_generate_ids()
+>>> and SMC_LO_CHID
+>>>     to SMC_LO_RESERVED_CHID.
+>>> - Patch #5: memcpy while holding the ldev->dmb_ht_lock.
+>>> - Some expression changes in commit logs.
+>>>
+>>
+>> Hi, Jan. Do you have any comments on this version and should I post a
+>> new patch series without 'RFC'? Thank you.
+> 
+> Hi Wen,
+> 
+> Jan has been out sick for a little while now, and Wenjia is expected
+> back from a longer vacation tomorrow. So if you could hold off until
+> begin of next week, Wenjia might have some more feedback.
+> 
+> In the meantime, I'm looking at your patchset...
+> 
+> Thank you, Gerd
+> 
 
-Gr{oetje,eeting}s,
+Hi Gerd, is there any further information? I am wondering if I
+should wait for more feedback from SMC maintainers. Thanks!
 
-                        Geert
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+Hi Wenjia, when it's convenient for you, could you please confirm
+if [1] and [2] need to be included in the next version? Thanks!
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+[1] https://lore.kernel.org/netdev/7291dd1b2d16fd9bbd90988ac5bcc3a46d17e3f4.camel@linux.ibm.com/
+[2] https://lore.kernel.org/netdev/60b4aec0b4bf4474d651b653c86c280dafc4518a.camel@linux.ibm.com/
 
