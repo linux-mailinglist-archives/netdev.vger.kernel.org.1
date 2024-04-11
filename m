@@ -1,458 +1,378 @@
-Return-Path: <netdev+bounces-86857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 086008A07EC
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 07:53:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 311D08A0815
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 08:09:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 876611F21D0A
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 05:53:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CD3E1F227AA
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 06:09:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E62613C9DB;
-	Thu, 11 Apr 2024 05:53:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EC0E13CA9A;
+	Thu, 11 Apr 2024 06:09:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TxV5tIkh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AvayFjih"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB8813CA80
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 05:53:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98C913CA81
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 06:09:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712814834; cv=none; b=J4Sz4FXPzZs4tzfkbnMWbjsrbcAKu1JFZMmGLS/bi0WYCdMvUp0xrAy7u8BGIdoTwDHavRYtgS+IIrcBABo1C9NeGpbtwr2fID630pN6q4IbG8pChe7KMqaCVWu+e4p/aBx/nAK3hs8+mJU1K3dykmEceXsgS94fOnljY+SPqco=
+	t=1712815786; cv=none; b=LjLS2tdEWGlIyUGOaciSQM6qCzfxWb44jZfvlSiRjmZr7BQNpiIGQ9rFLkVYGgEUVP0Xl7gzHHfsEyOTQUF59pn7xmk3OOqPLetAZ5tiwwdZNiH0U36hXR63ZDeVXkTxZ+AcVRkfuGxdWVgQPIGQWKIgm4HaVdT8iEivm6kdHwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712814834; c=relaxed/simple;
-	bh=uozESKa9CUFmuj15Ki14M/ZLdz96CT6W8MpP/JVNyLc=;
+	s=arc-20240116; t=1712815786; c=relaxed/simple;
+	bh=bqgPaNi5Sl55CDHc491bvtSz92fRovu1JYWxQ+edQu8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ta+rfOC/O3Fc4mOfft+K1vHN8QwfzYbd4zqhuXycWnd87yf6Ynue9fn9op/c5mjssVG4bKkkivZmHy++AipOBSOFZKONEgshw+b/1QRKoPR5dYtGH0g/55fycdxQUQO7pVddonqR6+j+5nbI8B/6FT5KmgmQU+5eAQaPiuDnkn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TxV5tIkh; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=Urg07icpQSEiyCGBWlq/ERKspt/m2JltQFPsdtGFWGM0qozxSC6D+BKKm0RWkxbo5ecoGeydgLLbBAsCV6hp191VHSJwTzeyfYZ1rC3FLuC65M/wSxTaKnA5LZ1DgrDkjShoJSq67gmkUO7V3CAzIImgDPLvbLxfOUw9S42FjsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AvayFjih; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712814830;
+	s=mimecast20190719; t=1712815781;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HoX9dwIm60z8Qhhc7/oFFbYvoBIKCPU9G3xWy+tyAoA=;
-	b=TxV5tIkhIiNsIhx25u8QE6+DF/0WMT3JQtw2oQhrTIX0ewDedGVl2J8zXntSMZjyh+mXUo
-	LhSnuq+KT1U8jdZKa+Xia6DhOs4JsFLFBvFxzHSkyxstY9uT0cPZY1oFzDIJFX7hMRgkbj
-	8SjMJm1ZI0DJvqDRkW/nEdlEEC6jJbI=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=QIFdKQqYsA3zYt8ykZHRA8xZ5gGnHgk5nMJ4jMinf0s=;
+	b=AvayFjihqIihhdRYlV4hbUsB36rfD9T+m0JNsfZ5TmFxj4X4hwct7FxE5t7OyEeAJ9QDQb
+	iFmxgEgloE2VcDFjbZ7ua/+EsB/8iYe9Ae4L9vft4HDNqleCYwY8XecUHRfvwrGUNvxP7P
+	dlCZW2f8Bc55JB0gYCSZtrvDp+re6IE=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-31-130vIue1OZe9_oMMNRsVzA-1; Thu, 11 Apr 2024 01:53:46 -0400
-X-MC-Unique: 130vIue1OZe9_oMMNRsVzA-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2a4a2cace80so4355309a91.3
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 22:53:46 -0700 (PDT)
+ us-mta-99-a5S4JVPPPvy3pBeYjUPNSA-1; Thu, 11 Apr 2024 02:09:38 -0400
+X-MC-Unique: a5S4JVPPPvy3pBeYjUPNSA-1
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1e45e04bb40so33462225ad.2
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 23:09:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712814824; x=1713419624;
+        d=1e100.net; s=20230601; t=1712815776; x=1713420576;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HoX9dwIm60z8Qhhc7/oFFbYvoBIKCPU9G3xWy+tyAoA=;
-        b=nV663s6fnHTlxx67lP0ljphP8tWGZpem1PSDuXYp7TT6aMss2BqRsdcEphRrnptaJL
-         vmrGzZkCf3g2dBp7tQEq9SFgUZNo2PieHDrTjlW3lbeifVEc3FccgNfcJMe5dncv6xn5
-         hGvXDvd7H6DpqxVt08gscfoMDXuvbYJYrFPdXhSzb5fSTYQSbYnM+gW/coNfenK9ot9C
-         5Gk4uq7vf2D+uWjSfn8PzKpkDmJIf30EH8uZIvhjxkA2Wcc4gLTNatOD6pjJZGO64p5P
-         HLWYX6DblEoTH0poyU7Bp/oKqlz8qYA4JMWa4OS6j1gAdZr4A1xBkguQmw7A3J7xmmVk
-         FCaw==
-X-Forwarded-Encrypted: i=1; AJvYcCWTVJp9aOB1hz8m1ZqIXhwGBwQo2Tibm12+uKCoyGqffGIZ+Nhz+v8ZYaE6H1KXfFIlHCUwLvbO4uowk0tIm3leN7FhNAQP
-X-Gm-Message-State: AOJu0YxcG+aZxuEkGnSXCajv6SpT4us6aLwkCfUBF7tjDakWcUrNtL3F
-	Ck8/qTItFDZYRLY3P/9PpbVGp1GokCZfEWGwGXnZiyExNEsVOoWNufpKyej2Uc40swR2juY0j0t
-	ElEBlqADO1Mww80wzFp0zSxdTNX0KXVoaG0fVuplum3BSBeFAfyBjY/CE970aJgmTO0rX6QZ5AU
-	C1KRE9pNhMCuAjCb/MGk3RHdAwcAs3gqtSTJS2ZbOEBw==
-X-Received: by 2002:a17:90a:ea8f:b0:2a4:9183:c8fd with SMTP id h15-20020a17090aea8f00b002a49183c8fdmr4814424pjz.18.1712814824387;
-        Wed, 10 Apr 2024 22:53:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH6OfhkYEcpTLzIvkQdEYBsLINuR/Mfv41gg+H4NWX1cDGpUPRtr1v+JBkenjMqOyp0wwBIyYX6BNlJR+NVelQ=
-X-Received: by 2002:a17:90a:ea8f:b0:2a4:9183:c8fd with SMTP id
- h15-20020a17090aea8f00b002a49183c8fdmr4814410pjz.18.1712814823999; Wed, 10
- Apr 2024 22:53:43 -0700 (PDT)
+        bh=QIFdKQqYsA3zYt8ykZHRA8xZ5gGnHgk5nMJ4jMinf0s=;
+        b=P8rAukJBXgKZ8SiM7pRCsBgffEMDL1G05B4h7FQsA3oY1JNr5RsE/kgrStzw6frJn6
+         p0j5E0RlevrdOoYX+KNxQWrPil/vPvT/u3BYGa8My5//khEOSp7OquBM7sa6ugoIuLbK
+         i6D7ztJGRvo1Jpg/fY3OCtid3BhNyaGpjM7v1jQJkk5Shn7a2l9MhafY+wdjMRdHqgbx
+         dgy3qHCW+T/AdFKKH5IPS5EfwhDEAM0LkTYVOaD/eDr8nL9qMJ6jv5+2a92UwMLCP1PC
+         S8ifhlkzIs5Fc239F/X6DTT0NphBKWk6ZpNQozNggdtgDmp/FhZva/oxfo5sAHpv9Zg3
+         Wqhw==
+X-Gm-Message-State: AOJu0YzB8ytWDfDYS4+uH9lVR1MKkqJCmok90m/pY6TkpjNQw4+KN5Pd
+	BRUICOEc6KX1br9KlhJjpvfmzACTt+9qVYpZAyrElcqpnPo6y4XwV9KHz4AWkfHbRLj/5U+qq7m
+	tMvzWKKgpJpaMJvU1ecoEJvKaO8PlW+MtX00yPMXdnDz44Wqy+MXbtTKCrBGmas+MlkAkbRJ+P/
+	DYn4qbK0F8+sgYefgHI2uGhioqY8xH
+X-Received: by 2002:a17:902:8ec6:b0:1dd:7059:a714 with SMTP id x6-20020a1709028ec600b001dd7059a714mr4314306plo.30.1712815776566;
+        Wed, 10 Apr 2024 23:09:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH0JSbHWeN69zUwICw7dBc+Q8GJhjE2SWRhqrCXw+igoLINgWAwDSeXCuko7f7QQzQ/hcdA8WOexww/r9cmQps=
+X-Received: by 2002:a17:902:8ec6:b0:1dd:7059:a714 with SMTP id
+ x6-20020a1709028ec600b001dd7059a714mr4314287plo.30.1712815776234; Wed, 10 Apr
+ 2024 23:09:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240406185029.93335-1-yuri.benditovich@daynix.com>
- <CACGkMEvKwh6GdkPzVyUDxODyCJQwHKFNJnOwCCRXurjUR=6aFQ@mail.gmail.com>
- <CAOEp5OdvTAzi830Kp1JiUbdDiq77oN3-5tD-hZXAaai4EUDTcQ@mail.gmail.com>
- <CACGkMEtKnu4MmPvdrxktygFB8B5Abn7rTkNcmU-cO-3MRkZgNg@mail.gmail.com>
- <CAOEp5OdhBJabrTTAZLxTgBvkJkQ3wKDGG-CYrimXd1dY9qqdkA@mail.gmail.com>
- <CACGkMEuEsCuRKUiAoUmb1LBL9pygGwEhXaivyx3m_sp9KqU27A@mail.gmail.com>
- <CAOEp5OeRvZny1fJY=T=Gc82Spux=fEeHsdfNVMje6Fr-dPXXVA@mail.gmail.com>
- <CACGkMEtSFEOKhhewvv6_pyw0RHvs0QqfAjrpjmfPxVK8RGm3JA@mail.gmail.com> <CAOEp5OepdfMhuh5rcKhadb4FBaxe4uEsxb_KFvEFW3q6Rj1MDA@mail.gmail.com>
-In-Reply-To: <CAOEp5OepdfMhuh5rcKhadb4FBaxe4uEsxb_KFvEFW3q6Rj1MDA@mail.gmail.com>
+References: <20240318110602.37166-1-xuanzhuo@linux.alibaba.com>
+ <20240318110602.37166-5-xuanzhuo@linux.alibaba.com> <CACGkMEujuYh+Ups9jx5jEwe7bydtgCyurG5bPLe3X8jpSJhqvA@mail.gmail.com>
+ <1712746366.8053942-2-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1712746366.8053942-2-xuanzhuo@linux.alibaba.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 11 Apr 2024 13:53:32 +0800
-Message-ID: <CACGkMEsmZAQhN-c+PR270vx2MFWjT8mZKe9KDL0xO5tiCPpqfQ@mail.gmail.com>
-Subject: Re: [PATCH net] net: change maximum number of UDP segments to 128
-To: Yuri Benditovich <yuri.benditovich@daynix.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, yan@daynix.com, 
-	andrew@daynix.com, netdev <netdev@vger.kernel.org>
+Date: Thu, 11 Apr 2024 14:09:24 +0800
+Message-ID: <CACGkMEsvAUyk+h3e5SO5T4L8HuSGcViKj2WM2J33JOb7KTKjUw@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 4/9] virtio_net: support device stats
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Stanislav Fomichev <sdf@google.com>, Amritha Nambiar <amritha.nambiar@intel.com>, 
+	Larysa Zaremba <larysa.zaremba@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, virtualization@lists.linux.dev, 
+	bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 11, 2024 at 1:32=E2=80=AFPM Yuri Benditovich
-<yuri.benditovich@daynix.com> wrote:
->
-> On Thu, Apr 11, 2024 at 7:04=E2=80=AFAM Jason Wang <jasowang@redhat.com> =
-wrote:
-> >
-> > On Wed, Apr 10, 2024 at 4:28=E2=80=AFPM Yuri Benditovich
-> > <yuri.benditovich@daynix.com> wrote:
-> > >
-> > > On Wed, Apr 10, 2024 at 9:07=E2=80=AFAM Jason Wang <jasowang@redhat.c=
+On Wed, Apr 10, 2024 at 6:55=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
 om> wrote:
-> > > >
-> > > > On Tue, Apr 9, 2024 at 1:48=E2=80=AFPM Yuri Benditovich
-> > > > <yuri.benditovich@daynix.com> wrote:
-> > > > >
-> > > > >
-> > > > >
-> > > > > On Tue, Apr 9, 2024 at 6:53=E2=80=AFAM Jason Wang <jasowang@redha=
-t.com> wrote:
-> > > > >>
-> > > > >> On Mon, Apr 8, 2024 at 3:24=E2=80=AFPM Yuri Benditovich
-> > > > >> <yuri.benditovich@daynix.com> wrote:
-> > > > >> >
-> > > > >> > On Mon, Apr 8, 2024 at 9:27=E2=80=AFAM Jason Wang <jasowang@re=
-dhat.com> wrote:
-> > > > >> > >
-> > > > >> > > On Sun, Apr 7, 2024 at 2:50=E2=80=AFAM Yuri Benditovich
-> > > > >> > > <yuri.benditovich@daynix.com> wrote:
-> > > > >> > > >
-> > > > >> > > > Fixes: fc8b2a619469378 ("net: more strict VIRTIO_NET_HDR_G=
-SO_UDP_L4 validation")
-> > > > >> > > >
-> > > > >> > > > The mentioned above commit adds check of potential number
-> > > > >> > > > of UDP segments vs UDP_MAX_SEGMENTS in linux/virtio_net.h.
-> > > > >> > > > After this change certification test of USO guest-to-guest
-> > > > >> > > > transmit on Windows driver for virtio-net device fails,
-> > > > >> > > > for example with packet size of ~64K and mss of 536 bytes.
-> > > > >> > > > In general the USO should not be more restrictive than TSO=
+>
+> On Wed, 10 Apr 2024 14:09:23 +0800, Jason Wang <jasowang@redhat.com> wrot=
+e:
+> > On Mon, Mar 18, 2024 at 7:06=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
+ba.com> wrote:
+> > >
+> > > As the spec https://github.com/oasis-tcs/virtio-spec/commit/42f389989=
+823039724f95bbbd243291ab0064f82
+> > >
+> > > make virtio-net support getting the stats from the device by ethtool =
+-S
+> > > <eth0>.
+> > >
+> > > Due to the numerous descriptors stats, an organization method is
+> > > required. For this purpose, I have introduced the "virtnet_stats_map"=
 .
-> > > > >> > > > Indeed, in case of unreasonably small mss a lot of segment=
-s
-> > > > >> > > > can cause queue overflow and packet loss on the destinatio=
-n.
-> > > > >> > > > Limit of 128 segments is good for any practical purpose,
-> > > > >> > > > with minimal meaningful mss of 536 the maximal UDP packet =
-will
-> > > > >> > > > be divided to ~120 segments.
-> > > > >> > >
-> > > > >> > > Assuming different OS guests could run on top of KVM. I wond=
-er if a
-> > > > >> > > better fix is to relax the following check:
-> > > > >> > >
-> > > > >> > > =3D>                      if (skb->len - p_off > gso_size * =
-UDP_MAX_SEGMENTS)
-> > > > >> > >                                 return -EINVAL;
-> > > > >> > There are also checks vs UDP_MAX_SEGMENTS in udp.c (in ipv4 an=
-d ipv6),
-> > > > >> > they do not prevent guest-to-guest from passing but cause pack=
-et dropping in
-> > > > >> > other cases..
-> > > > >> > >
-> > > > >> > > Changing UDP_MAX_SEGMENTS may have side effects. For example=
-, a new
-> > > > >> > > Linux guest run on top of a old Linux and other.
-> > > > >> > IMO, in the worst case _in specific setups_ the communication =
-will behave like
-> > > > >> > it does now in all the setups.
-> > > > >>
-> > > > >> I meant if the guest limit is 128 but host limit is 64.
-> > > > >
-> > > > >
-> > > > > If the guest limit is (128 or 64) and host limit is 64:
-> > > > > If we send a UDP packet  with USO (length 64K, mss 600) - it is d=
-ropped.
-> > > > > setsockopt does not limit us to use <=3D64 packets, neither in wi=
-ndows nor in Linux,
-> > > >
-> > > > Just to make sure we are on the same page:
-> > > >
-> > > > Before fc8b2a619469378,
-> > > >
-> > > > 1) Windows guest works on Linux Host since we don't check against
-> > > > UDP_MAX_SEGMENTS on the host
+> > > Utilizing this array simplifies coding tasks such as generating field
+> > > names, calculating buffer sizes for requests and responses, and parsi=
+ng
+> > > replies from the device. By iterating over the "virtnet_stats_map,"
+> > > these operations become more streamlined and efficient.
 > > >
+> > > NIC statistics:
+> > >      rx0_packets: 582951
+> > >      rx0_bytes: 155307077
+> > >      rx0_drops: 0
+> > >      rx0_xdp_packets: 0
+> > >      rx0_xdp_tx: 0
+> > >      rx0_xdp_redirects: 0
+> > >      rx0_xdp_drops: 0
+> > >      rx0_kicks: 17007
+> > >      rx0_hw_packets: 2179409
+> > >      rx0_hw_bytes: 510015040
+> > >      rx0_hw_notifications: 0
+> > >      rx0_hw_interrupts: 0
+> > >      rx0_hw_drops: 12964
+> > >      rx0_hw_drop_overruns: 0
+> > >      rx0_hw_csum_valid: 2179409
+> > >      rx0_hw_csum_none: 0
+> > >      rx0_hw_csum_bad: 0
+> > >      rx0_hw_needs_csum: 2179409
+> > >      rx0_hw_ratelimit_packets: 0
+> > >      rx0_hw_ratelimit_bytes: 0
+> > >      tx0_packets: 15361
+> > >      tx0_bytes: 1918970
+> > >      tx0_xdp_tx: 0
+> > >      tx0_xdp_tx_drops: 0
+> > >      tx0_kicks: 15361
+> > >      tx0_timeouts: 0
+> > >      tx0_hw_packets: 32272
+> > >      tx0_hw_bytes: 4311698
+> > >      tx0_hw_notifications: 0
+> > >      tx0_hw_interrupts: 0
+> > >      tx0_hw_drops: 0
+> > >      tx0_hw_drop_malformed: 0
+> > >      tx0_hw_csum_none: 0
+> > >      tx0_hw_needs_csum: 32272
+> > >      tx0_hw_ratelimit_packets: 0
+> > >      tx0_hw_ratelimit_bytes: 0
 > > >
-> > > Windows guest-to-guest works since there  is no check for
-> > > UDP_MAX_SEGMENTS in virtio_net.h
-> > > Windows guest to Linux host suffers with size=3D64K mss=3D536 (as an =
-example)
+> > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > ---
+> > >  drivers/net/virtio_net.c | 401 +++++++++++++++++++++++++++++++++++++=
++-
+> > >  1 file changed, 397 insertions(+), 4 deletions(-)
 > > >
-> > > > 2) Linux guest works on Linux Host, since it will always send packe=
-t
-> > > > with less than UDP_MAX_SEGMENTS
+> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > index 8cb5bdd7ad91..70c1d4e850e0 100644
+> > > --- a/drivers/net/virtio_net.c
+> > > +++ b/drivers/net/virtio_net.c
+> > > @@ -128,6 +128,129 @@ static const struct virtnet_stat_desc virtnet_r=
+q_stats_desc[] =3D {
+> > >  #define VIRTNET_SQ_STATS_LEN   ARRAY_SIZE(virtnet_sq_stats_desc)
+> > >  #define VIRTNET_RQ_STATS_LEN   ARRAY_SIZE(virtnet_rq_stats_desc)
 > > >
-> > >
-> > > Not exactly.
-> > > If you use "selftest" (udpgso*) _as is_, it will work as it has
-> > > _internal_ define of 64 and never tries to do more than that.
-> > > But (sorry for repeating that) there is no setsockopt() limitation an=
-d
-> > > you're free to modify the test code
-> > > to use more segments (as an example) and this will not work.
+> > > +#define VIRTNET_STATS_DESC_CQ(name) \
+> > > +       {#name, offsetof(struct virtio_net_stats_cvq, name)}
+> > > +
+> > > +#define VIRTNET_STATS_DESC_RX(class, name) \
+> > > +       {#name, offsetof(struct virtio_net_stats_rx_ ## class, rx_ ##=
+ name)}
+> > > +
+> > > +#define VIRTNET_STATS_DESC_TX(class, name) \
+> > > +       {#name, offsetof(struct virtio_net_stats_tx_ ## class, tx_ ##=
+ name)}
+> > > +
+> > > +static const struct virtnet_stat_desc virtnet_stats_cvq_desc[] =3D {
+> > > +       VIRTNET_STATS_DESC_CQ(command_num),
+> > > +       VIRTNET_STATS_DESC_CQ(ok_num),
+> > > +};
+> > > +
+> > > +static const struct virtnet_stat_desc virtnet_stats_rx_basic_desc[] =
+=3D {
+> > > +       VIRTNET_STATS_DESC_RX(basic, packets),
+> > > +       VIRTNET_STATS_DESC_RX(basic, bytes),
+> > > +
+> > > +       VIRTNET_STATS_DESC_RX(basic, notifications),
+> > > +       VIRTNET_STATS_DESC_RX(basic, interrupts),
+> > > +
+> > > +       VIRTNET_STATS_DESC_RX(basic, drops),
+> > > +       VIRTNET_STATS_DESC_RX(basic, drop_overruns),
+> > > +};
+> > > +
+> > > +static const struct virtnet_stat_desc virtnet_stats_tx_basic_desc[] =
+=3D {
+> > > +       VIRTNET_STATS_DESC_TX(basic, packets),
+> > > +       VIRTNET_STATS_DESC_TX(basic, bytes),
+> > > +
+> > > +       VIRTNET_STATS_DESC_TX(basic, notifications),
+> > > +       VIRTNET_STATS_DESC_TX(basic, interrupts),
+> > > +
+> > > +       VIRTNET_STATS_DESC_TX(basic, drops),
+> > > +       VIRTNET_STATS_DESC_TX(basic, drop_malformed),
+> > > +};
+> > > +
+> > > +static const struct virtnet_stat_desc virtnet_stats_rx_csum_desc[] =
+=3D {
+> > > +       VIRTNET_STATS_DESC_RX(csum, csum_valid),
+> > > +       VIRTNET_STATS_DESC_RX(csum, needs_csum),
+> > > +
+> > > +       VIRTNET_STATS_DESC_RX(csum, csum_none),
+> > > +       VIRTNET_STATS_DESC_RX(csum, csum_bad),
+> > > +};
+> > > +
+> > > +static const struct virtnet_stat_desc virtnet_stats_tx_csum_desc[] =
+=3D {
+> > > +       VIRTNET_STATS_DESC_TX(csum, needs_csum),
+> > > +       VIRTNET_STATS_DESC_TX(csum, csum_none),
+> > > +};
+> > > +
+> > > +static const struct virtnet_stat_desc virtnet_stats_rx_gso_desc[] =
+=3D {
+> > > +       VIRTNET_STATS_DESC_RX(gso, gso_packets),
+> > > +       VIRTNET_STATS_DESC_RX(gso, gso_bytes),
+> > > +       VIRTNET_STATS_DESC_RX(gso, gso_packets_coalesced),
+> > > +       VIRTNET_STATS_DESC_RX(gso, gso_bytes_coalesced),
+> > > +};
+> > > +
+> > > +static const struct virtnet_stat_desc virtnet_stats_tx_gso_desc[] =
+=3D {
+> > > +       VIRTNET_STATS_DESC_TX(gso, gso_packets),
+> > > +       VIRTNET_STATS_DESC_TX(gso, gso_bytes),
+> > > +       VIRTNET_STATS_DESC_TX(gso, gso_segments),
+> > > +       VIRTNET_STATS_DESC_TX(gso, gso_segments_bytes),
+> > > +       VIRTNET_STATS_DESC_TX(gso, gso_packets_noseg),
+> > > +       VIRTNET_STATS_DESC_TX(gso, gso_bytes_noseg),
+> > > +};
+> > > +
+> > > +static const struct virtnet_stat_desc virtnet_stats_rx_speed_desc[] =
+=3D {
+> > > +       VIRTNET_STATS_DESC_RX(speed, ratelimit_packets),
+> > > +       VIRTNET_STATS_DESC_RX(speed, ratelimit_bytes),
+> > > +};
+> > > +
+> > > +static const struct virtnet_stat_desc virtnet_stats_tx_speed_desc[] =
+=3D {
+> > > +       VIRTNET_STATS_DESC_TX(speed, ratelimit_packets),
+> > > +       VIRTNET_STATS_DESC_TX(speed, ratelimit_bytes),
+> > > +};
+> > > +
+> > > +#define VIRTNET_Q_TYPE_RX 0
+> > > +#define VIRTNET_Q_TYPE_TX 1
+> > > +#define VIRTNET_Q_TYPE_CQ 2
+> > > +
+> > > +struct virtnet_stats_map {
+> > > +       /* The stat type in bitmap. */
+> > > +       u64 stat_type;
+> > > +
+> > > +       /* The bytes of the response for the stat. */
+> > > +       u32 len;
+> > > +
+> > > +       /* The num of the response fields for the stat. */
+> > > +       u32 num;
+> > > +
+> > > +       /* The type of queue corresponding to the statistics. (cq, rq=
+, sq) */
+> > > +       u32 queue_type;
+> > > +
+> > > +       /* The reply type of the stat. */
+> > > +       u8 reply_type;
+> > > +
+> > > +       /* Describe the name and the offset in the response. */
+> > > +       const struct virtnet_stat_desc *desc;
+> > > +};
+> > > +
+> > > +#define VIRTNET_DEVICE_STATS_MAP_ITEM(TYPE, type, queue_type)  \
+> > > +       {                                                       \
+> > > +               VIRTIO_NET_STATS_TYPE_##TYPE,                   \
+> > > +               sizeof(struct virtio_net_stats_ ## type),       \
+> > > +               ARRAY_SIZE(virtnet_stats_ ## type ##_desc),     \
+> > > +               VIRTNET_Q_TYPE_##queue_type,                    \
+> > > +               VIRTIO_NET_STATS_TYPE_REPLY_##TYPE,             \
+> > > +               &virtnet_stats_##type##_desc[0]                 \
+> > > +       }
+> > > +
+> > > +static struct virtnet_stats_map virtio_net_stats_map[] =3D {
+> > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(CVQ, cvq, CQ),
+> > > +
+> > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_BASIC, rx_basic, RX),
+> > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_CSUM,  rx_csum,  RX),
+> > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_GSO,   rx_gso,   RX),
+> > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_SPEED, rx_speed, RX),
+> > > +
+> > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_BASIC, tx_basic, TX),
+> > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_CSUM,  tx_csum,  TX),
+> > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_GSO,   tx_gso,   TX),
+> > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_SPEED, tx_speed, TX),
+> > > +};
 > >
-> > I meant this part in udp_send_skb()
-> >
-> > =3D>              if (datalen > cork->gso_size * UDP_MAX_SEGMENTS) {
-> >                         kfree_skb(skb);
-> >                         return -EINVAL;
-> >                 }
-> >
-> > >
-> > > >
-> > > >
-> > > > This is the behaviour that we need to stick to, otherwise we break =
-the
-> > > > guests as you've noticed.
-> > >
-> > > We can stick to the behavior I've described above if we change only d=
-efine
-> > > UDP_MAX_SEGMENTS 64->128 in udp.h but leave untouched
-> > > UDP_MAX_SEGMENTS=3D64 in udpgso (test code)
-> > > (IMO does not make too much sense but possible)
-> > >
-> > > Actually, all this discussion happens because the initial code of USO
-> > > in the kernel was delivered with define of 64 without any special
-> > > reason, just because this looked enough then.
-> >
-> > Right, but it's too late to "fix", the only thing we can do now is to
-> > make sure to not break the application that worked in the past.
-> >
-> > >
-> > > >
-> > > > If we fix it by increasing the UDP_MAX_SEGMENTS, it fixes for 1) bu=
-t
-> > > > not necessarily for 2). If we don't check against UDP_MAX_SEGMENTS,=
- it
-> > > > works for 2) as well.
-> > >
-> >
-> > So what I want to say is that having a check for UDP_MAX_SEGMENTS
-> > seems to be problematic. And increasing it to 128 complicates the
-> > problem furtherly.
-> >
-> > > There are following cases:
-> > > - guest-to-guest (win-to-win, lin-to-lin,win-to-lin, lin-to-win)
-> >
-> > If we don't have the check for UDP_MAX_SEGMENTS, everything should be f=
-ine.
-> >
-> > If the sender can produces 128 and 64 is checked in the middle of the
-> > datapath in either tun or virtio-net, the packet will be dropped.
-> >
-> > > -guest-to-host (guest=3Dlin, guest=3Dwin)
-> >
-> > Same as above.
-> >
-> > > -host-to-host
-> >
-> > I don't see any issue in this part.
+> > I think the reason you did this is to ease the future extensions but
+> > multiple levels of nested macros makes the code hard to review. Any
+> > way to eliminate this?
 >
-> The issue is that host-to-host UDP packets with more than 64 segments
-> are dropped due to check vs  UDP_MAX_SEGMENTS is udp.c (v4 and v6)
+>
+> NOT only for the future extensions.
+>
+> When we parse the reply from the device, we need to check the reply stats
+> one by one, we need the stats info to help parse the stats.
 
-Yes, but if they fail since the introduction of UDP gso if I was not wrong.
+Yes, but I meant for example any reason why it can't be done by
+extending virtnet_stat_desc ?
 
 >
+>         static void virtnet_fill_stats(struct virtnet_info *vi, u32 qid,
+>                                       struct virtnet_stats_ctx *ctx,
+>                                       const u8 *base, u8 type)
+>         {
+>                u32 queue_type, num_rx, num_tx, num_cq;
+>                struct virtnet_stats_map *m;
+>                u64 offset, bitmap;
+>                const __le64 *v;
+>                int i, j;
 >
-> >
-> > > -host-to-guest (guest=3Dlin, guest=3Dwin)
-> >
-> > Same as guest-to-guest.
-> >
-> > >
-> > > Resulting table of results is much more complicated than you describe=
-d.
-> > > We can't use the udpgso code as the only indicator of go/nogo.
-> >
-> > We should not break userspace. If there's a setup that udpgso can work
-> > in the past but not after a patch is applied, we should avoid such
-> > cases.
-> >
-> > That's why I think avoiding checking UDP_MAX_SEGMENTS and doing other
-> > hardening might be better (for example as Eric suggested).
+>                num_rx =3D VIRTNET_RQ_STATS_LEN + ctx->desc_num[VIRTNET_Q_=
+TYPE_RX];
+>                num_tx =3D VIRTNET_SQ_STATS_LEN + ctx->desc_num[VIRTNET_Q_=
+TYPE_TX];
+>                num_cq =3D ctx->desc_num[VIRTNET_Q_TYPE_CQ];
 >
-> I've checked all this thread and I did not find any Eric's suggestion reg=
-arding
-> other hardening. Which suggestion have you mentioned?
-
-Quoted from Eric email (btw, for some reason the discussion is not
-reached to the list, adding list here)
-
-"""
-
-> Assuming different OS guests could run on top of KVM. I wonder if a
-> better fix is to relax the following check:
+>                queue_type =3D vq_type(vi, qid);
+>                bitmap =3D ctx->bitmap[queue_type];
+>                offset =3D 0;
 >
-> =3D>                      if (skb->len - p_off > gso_size * UDP_MAX_SEGME=
-NTS)
->                                 return -EINVAL;
+>                if (queue_type =3D=3D VIRTNET_Q_TYPE_TX) {
+>                        offset =3D num_cq + num_rx * vi->curr_queue_pairs =
++ num_tx * (qid / 2);
+>                        offset +=3D VIRTNET_SQ_STATS_LEN;
+>                } else if (queue_type =3D=3D VIRTNET_Q_TYPE_RX) {
+>                        offset =3D num_cq + num_rx * (qid / 2) + VIRTNET_R=
+Q_STATS_LEN;
+>                }
 >
-> Changing UDP_MAX_SEGMENTS may have side effects. For example, a new
-> Linux guest run on top of a old Linux and other.
+>                for (i =3D 0; i < ARRAY_SIZE(virtio_net_stats_map); ++i) {
+>                        m =3D &virtio_net_stats_map[i];
+>
+> ->                     if (m->stat_type & bitmap)
+>                                offset +=3D m->num;
+>
+> ->                     if (type !=3D m->reply_type)
+>                                continue;
+>
+>                        for (j =3D 0; j < m->num; ++j) {
+>                                v =3D (const __le64 *)(base + m->desc[j].o=
+ffset);
+>                                ctx->data[offset + j] =3D le64_to_cpu(*v);
+>                        }
+>
+>                        break;
+>                }
+>         }
+>
+> Thanks.
 
-Typical qdisc packet limit is 1000.
-
-I think a limit prevents abuses, like gso_size =3D=3D 1, and skb->len =3D 6=
-5000
-
-"""
-
-The actual value needs more thought, for example 65K may block the
-implementation of jumbogram in the future.
+Btw, just a reminder, there are other comments for this patch.
 
 Thanks
-
->
-> > >
-> > > >
-> > > > >
-> > > > >>
-> > > > >>
-> > > > >> > Note that this limit (UDP_MAX_SEGMENTS) is set
-> > > > >> > in internal kernel define, it is not based on any RFC, not vis=
-ible via
-> > > > >> > ethtool etc.
-> > > > >>
-> > > > >> In the future, it needs to be advertised to the guest via virtio=
- spec.
-> > > > >> Otherwise it might have compatibility issues.
-> > > > >
-> > > > >
-> > > > > The spec targets 2 areas - hardware solutions and software soluti=
-ons.
-> > > > > For hardware solutions everything is clear - there are no declare=
-d limits and if the hardware will limit the number of segments to anything =
-- it is a bug.
-> > > > > So the advertising makes sense only for hypervisors and for examp=
-le, qemu will need to obtain this magic number from the kernel.
-> > > >
-> > > > Right.
-> > > >
-> > > > > If/when we'll start adding this to the spec we'll face a reasonab=
-le question - why do we need to add something that is not mentioned in any =
-RFC, why not add such a thing for TCP also?
-> > > >
-> > > > So the kernel has gso_max_segs for netdevice. We probably need it f=
-or
-> > > > virtio-net as well, and it might be useful for jumbograms as well.
-> > > >
-> > > virtio-net is "limited" by common "#define GSO_MAX_SEGS        65535u=
-"
-> >
-> > This works since the host will do software segmentation as a fallback
-> > which will be very slow.
-> >
-> > >
-> > > >
-> > > > >
-> > > > > Next, let's say we advertise this number over virtio capabilities=
- - does this solve something?
-> > > >
-> > > > For example, doing software segmentation by kernel?
-> > > >
-> > > > > The driver can't communicate this capability up. The setsockopt w=
-ill not limit this parameter.
-> > > > >
-> > > > >>
-> > > > >> For example, migrate from 64 to 128.
-> > > > >>
-> > > > > Yes, but the migration from higher kernel to lower one looks like=
- an immortal problem.
-> > > >
-> > > > This is not rare. For example, the patch for 128 is applied on the
-> > > > source but not destination.
-> > >
-> > > I agree that such migration can happen and _theoretically_ may cause
-> > > some misunderstanding
-> > > I'm almost sure that practically this can't cause any.misunderstandin=
-g
-> > > and we can discuss this specific problem in depth.
-> > > (I just need some time for some tests)
-> >
-> > Thanks
-> >
-> > >
-> > >
-> > > >
-> > > > Thanks
-> > > >
-> > > > >
-> > > > >>
-> > > > >> > The same on Windows - the adapter does not have such a capabil=
-ity as maximal
-> > > > >> > number of UDP segments, so the upper layers are unaware of any=
- limitation.
-> > > > >>
-> > > > >> Right, that might be problematic.
-> > > > >>
-> > > > >> The checking of UDP_MAX_SEGMENTS implies an agreement of guest a=
-nd
-> > > > >> host.  But such implications are not true  .
-> > > > >>
-> > > > >> Thanks
-> > > > >>
-> > > > >>
-> > > > >>
-> > > > >> > >
-> > > > >> > > Thanks
-> > > > >> > >
-> > > > >> > > >
-> > > > >> > > > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.c=
-om>
-> > > > >> > > > ---
-> > > > >> > > >  include/linux/udp.h                  | 2 +-
-> > > > >> > > >  tools/testing/selftests/net/udpgso.c | 2 +-
-> > > > >> > > >  2 files changed, 2 insertions(+), 2 deletions(-)
-> > > > >> > > >
-> > > > >> > > > diff --git a/include/linux/udp.h b/include/linux/udp.h
-> > > > >> > > > index 3748e82b627b..7e75ccdf25fe 100644
-> > > > >> > > > --- a/include/linux/udp.h
-> > > > >> > > > +++ b/include/linux/udp.h
-> > > > >> > > > @@ -108,7 +108,7 @@ struct udp_sock {
-> > > > >> > > >  #define udp_assign_bit(nr, sk, val)            \
-> > > > >> > > >         assign_bit(UDP_FLAGS_##nr, &udp_sk(sk)->udp_flags,=
- val)
-> > > > >> > > >
-> > > > >> > > > -#define UDP_MAX_SEGMENTS       (1 << 6UL)
-> > > > >> > > > +#define UDP_MAX_SEGMENTS       (1 << 7UL)
-> > > > >> > > >
-> > > > >> > > >  #define udp_sk(ptr) container_of_const(ptr, struct udp_so=
-ck, inet.sk)
-> > > > >> > > >
-> > > > >> > > > diff --git a/tools/testing/selftests/net/udpgso.c b/tools/=
-testing/selftests/net/udpgso.c
-> > > > >> > > > index 1d975bf52af3..85b3baa3f7f3 100644
-> > > > >> > > > --- a/tools/testing/selftests/net/udpgso.c
-> > > > >> > > > +++ b/tools/testing/selftests/net/udpgso.c
-> > > > >> > > > @@ -34,7 +34,7 @@
-> > > > >> > > >  #endif
-> > > > >> > > >
-> > > > >> > > >  #ifndef UDP_MAX_SEGMENTS
-> > > > >> > > > -#define UDP_MAX_SEGMENTS       (1 << 6UL)
-> > > > >> > > > +#define UDP_MAX_SEGMENTS       (1 << 7UL)
-> > > > >> > > >  #endif
-> > > > >> > > >
-> > > > >> > > >  #define CONST_MTU_TEST 1500
-> > > > >> > > > --
-> > > > >> > > > 2.34.3
-> > > > >> > > >
-> > > > >> > >
-> > > > >> >
-> > > > >>
-> > > >
-> > >
-> >
->
 
 
