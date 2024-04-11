@@ -1,221 +1,474 @@
-Return-Path: <netdev+bounces-87103-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B3668A1C19
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:39:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 912C28A1C55
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:45:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C6BF1C22842
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 17:39:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EBE81F28957
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 17:45:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB29153506;
-	Thu, 11 Apr 2024 16:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F9B16C86B;
+	Thu, 11 Apr 2024 16:18:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TL2o0iLb"
+	dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="FQVrBt1L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from mail-40132.protonmail.ch (mail-40132.protonmail.ch [185.70.40.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44AF9153504
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 16:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712851826; cv=fail; b=cltJc6W3PWaPqb6a1M4JgAM/Vmo90r3EmRGGSm2HGcwOxB10ZC+C0I9qJhhPQAJDxMEDNkx6cCJ6JGv4n73at10xhZxmLp+rJy4fknbqCnTKPMb7kH35P+rgPfUOkLwuVf+kJf13T2P04CyTTTPEjwzEk1d7RujVgQIATbwJnhw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712851826; c=relaxed/simple;
-	bh=qPyv59hueTQY94A+JqTWywDOCU3lfjlhmGD79fgooyI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=oO/AffLF1SDZeTx8ftvbJzCi2DSZJpP8csdxQuvG1SgW1RypNfuUfFnUSXEyoGUw/27uq9EjTI0A4leyMb/RvSK2Dl+RuZ35YiSnnwyXnbYViEIytBXYiivSCAeMqOTk82nSYgybYnXA+AJQO0/ESRNkRZKktmhAj9twncDk1DM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TL2o0iLb; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712851825; x=1744387825;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=qPyv59hueTQY94A+JqTWywDOCU3lfjlhmGD79fgooyI=;
-  b=TL2o0iLbXg9MJCoMFOUEMUiQHvpIj5SOwB+X7WVkLs4MK3HR69XWuHfh
-   gNr+UOnYCkQavMKMWJh919UBCvppZRKuuYkgQ9VxQBABNC8bIaBdqTE48
-   H5BzMtciMQgWss1a+GL+X8ysBcDpAwqBazgNUmjd6JcKVTX6P6vYIxS3H
-   Rx+fSCol5lytGGkqZ5XbUgjUBaVTSalBq3VC4SwbLTehvf03dKCSKm/wM
-   S/m1xhyq+ont9l+6e0Exyb2KD1V1jQIA5xgsoxZSVC45N2JoMm8xHeF+C
-   BL8v6vryR9dKXH4WQ4Q91owgv1Q8muEAV7GmVO0eXb2TqvFxa6V43yF7h
-   A==;
-X-CSE-ConnectionGUID: fgQkrrhjROO4Ci2paHZOvQ==
-X-CSE-MsgGUID: DvSuwXxKSm6wY+UxACcO2Q==
-X-IronPort-AV: E=McAfee;i="6600,9927,11041"; a="18832583"
-X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
-   d="scan'208";a="18832583"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 09:10:24 -0700
-X-CSE-ConnectionGUID: gwuNBxk0SLuDu13+13INJg==
-X-CSE-MsgGUID: ezgykjl0SEyJKVX7rx+CsQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
-   d="scan'208";a="25730690"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Apr 2024 09:10:22 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 11 Apr 2024 09:10:22 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 11 Apr 2024 09:10:22 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 11 Apr 2024 09:10:21 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=T7J8Hb2EHYo/FNAjCmsMRO95KJjepWTB9Yv9QUhqlCVhRB01WHgKAOIf3Z01DAo1WXpnFVpJvAq1dl440/iLFHlF1SE/eBOsZ8z606e0nLtxw26CpJemJydTvzmEIUbDDIB0iFj8b1/LEBZgFMDpeiW8GvxrfLvlTTLm2if/BozeCy/1q621yK3YFZYMaVAKSq9DOw8xDPIwx0nhR1kIgisqjG1Qk02INhmS9wgvdoH/kI5rc75lI9KOgvCCJo3IOsEeHudKXogFJirCuviA5LAg85yfkQ8s1rE/8Krmfp4HN04vG8gtnpc9JS9LGBME/J1R/e+RWCblE8WW/5kCtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=EMrv0A4AgJt5+F7RcSCxXx2+SX9DsvRMqmLVgJfOPd8=;
- b=aKIbAw2lNW5UAfypVthtG8nlDFsPn7StAv7i5zdduErT+pzjejYjVALEhUwHQ7widCqBBKWxc3RpgQuY7NdqrLvTCaczXxuXjzYnxu3EfLGLhIwhxrWH6A/OsN3gBksUWb4nOrBsBtFh69RkWhE52Phiam1TMrLNS1/6X/ax88LGfnF1oGfq/YW8tN4Y6DE1iyE3bVbTIEKdtzbdh7Y9TClNQCM1n+ObcvEiUtvjtsZpUeIuxj45WzUZ5Ymt/J1Rtm5SVi7Fw9x8cMUg39Sg/aooVgylwDhrPnazB6ACFuvVrFEkkOaSb8kePMnYqzGUhDhWzS/jfpcPIP0w8gUesg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by IA1PR11MB6324.namprd11.prod.outlook.com (2603:10b6:208:388::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.25; Thu, 11 Apr
- 2024 16:10:19 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::b383:e86d:874:245a]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::b383:e86d:874:245a%5]) with mapi id 15.20.7452.019; Thu, 11 Apr 2024
- 16:10:19 +0000
-From: "Keller, Jacob E" <jacob.e.keller@intel.com>
-To: Louis Peens <louis.peens@corigine.com>
-CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Fei Qin
-	<fei.qin@corigine.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"oss-drivers@corigine.com" <oss-drivers@corigine.com>
-Subject: RE: [PATCH net-next v5 2/2] nfp: update devlink device info output
-Thread-Topic: [PATCH net-next v5 2/2] nfp: update devlink device info output
-Thread-Index: AQHaizqIVNYpOCRLX0mDCxkPR1oW6LFiFg0AgACDtQCAAKUKMA==
-Date: Thu, 11 Apr 2024 16:10:19 +0000
-Message-ID: <CO1PR11MB508971B64D360D27424F9E3DD6052@CO1PR11MB5089.namprd11.prod.outlook.com>
-References: <20240410112636.18905-1-louis.peens@corigine.com>
- <20240410112636.18905-3-louis.peens@corigine.com>
- <fdfecdb3-2070-40d9-8129-01df41d4232f@intel.com> <ZheAxsfnbF0lBK9Q@LouisNoVo>
-In-Reply-To: <ZheAxsfnbF0lBK9Q@LouisNoVo>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CO1PR11MB5089:EE_|IA1PR11MB6324:EE_
-x-ms-office365-filtering-correlation-id: df1b58b3-864f-46d6-4316-08dc5a41e25b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Rt616qEkOsGGrBHhRNMIdxPPnJsErjSWrYD6xMB9cm3ZTcXiEE2+9ej7HcOm4/SQWXHv1ivTlwo0QrQkOJuIB28M8hWy3rYCYYcfk1NwHgUMODxZ3GbpRVAX3Zcs+3tinElqWjNtDC69h8a15DFgVyqzGslErtMILeGNBgoiGsAN8uPEMmRtEp70E6b2clVPlNXN/NTwcOKL9MPS6j7pNBr/ePfYOWIk0B99Ulxeido1x2MVqo4SwkDOQdqHQFvIMeWCqpjLxQ19Gmju+0UQbqL7myN73vPAeVqYvd0oFZziBXAhh4/hVOLPlpidUCHB8wi9x0npSpVXTL+zJcw007LeshFU8gJdX+6+kRHx0WR9A0PQk0rUAIbDuBakypmsqo520sAocVwL7T6Wh98KWcbNXDg42neiDHftCF2VV2X/wlzGAiv9Okgm0Vzuy4EIeFU8nQ/Ip/zPn3oRRYSyRAokdVETFelwTOr98Dab6+uM7eIEj+fTJ3hI6/3ApO0IdjY/n24++6yGGH2efcG5JNTUj9Fwct45Seu+WBOTul/rGBSa79wswoRz1NKWG2aDwzdv5uWhLu68A9Oh1vIbM8jmSycHKkWD0fZB1fD1uz6D4j6Sxlfp6ebqm94UA3uQIpXdLzPmlXGrnWL0KF74Lo49TPEUsR+Ilx3+mimZ9lir7IlBpfZ1psqMfwKo5tlufQ+5rk2l0LbZ5OrcJ1Ict5CFEMiEbwg6HALno+CslOQ=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?+C8EMlikQqJiaWonhMkSRcTJAknpASNXvR3oSRzKYbP787yT+GwtL8Pq8H0V?=
- =?us-ascii?Q?P38Tn4+4ZRoiZlsuLGxpFBahl8RqoH18+xKAqsPck21h+tcE1pNmGpayiuT+?=
- =?us-ascii?Q?0zj4TWuZTnh4m3CPe3B852w92yoG3vU67paUqkojOC+pPDNiFUsKrfWNOhdl?=
- =?us-ascii?Q?2BC63jYHYt82ILA62o5ifayEU7zhbEZjoELEzSuylTFAwfEmalY3duGFSygH?=
- =?us-ascii?Q?eMNc+hIqDjqtYOh+BmOw/ptzCUZytrGKvA9g771Qnmcdqzr8mfgfRf5W6uO7?=
- =?us-ascii?Q?HHRJor1fei6k7Axq4Ifj42zfn+e2n+isXqEmnz5jYze3dFL0h+FLAARxmKcI?=
- =?us-ascii?Q?I7JOzfuNiha7c+JzrlepKIuzYyuVq2bp+1191dzQb3xeoNZHsVbLhK4qAc9B?=
- =?us-ascii?Q?YD5Nq0VKNhqSppBhHl7rTFPKlIylxmClzJ/xgHeRXBHq4f4mHBpvRlsycGu6?=
- =?us-ascii?Q?PpvpCz+KEAJVHYzVZt/djEByayJR7V7x5mTQ/qQJ++0TcwQ51/UMTsC0VXLA?=
- =?us-ascii?Q?Rt5o6j+MKGoeMNZNBZvnHvucR9zAMHVC8aO1UIeVUt/F4jBtH+ifg4/t68KG?=
- =?us-ascii?Q?QZwklJsymyBg3R9USkPbl0J/jdriOUDlwCjhaIuNSXChlmb7OvpJT4PbTA78?=
- =?us-ascii?Q?3v+ngNs8UVJ14u/mHjWf7ft20yWwO5dM3zoEE5/jDrS8k05j2hBUGR+s/G6N?=
- =?us-ascii?Q?uWV2hl0Dx8Gqu0k2N3mGnN13Djed0O8rNEaGQyXzB9ckzmpdal2rqKh0/812?=
- =?us-ascii?Q?yMQnCnYHWkcXd1RH/GgbEjy3raCMTivUnDWrHCWvSLcGa/NlnKcRbSHe0PGh?=
- =?us-ascii?Q?kCE5gS36wMCfPYo0hCE4Hc5GE/oVbU0vsDUcyZudZz1OYDDkMCnoOt4QdZbl?=
- =?us-ascii?Q?aTR6D5vqyfkzhkLzeen/dDV3m5XRx8lw7qQRH44/Cuj2lERwr0wyj7dBJ0d3?=
- =?us-ascii?Q?2RLoKzBdkNqKe8qU7MCbBPVgXhLnGjLCc3iDelccg0BwTFa/SwL2XG0/AUCT?=
- =?us-ascii?Q?yfozSucMelP1HmfQIV30ir3pDYRKPo2jev7jxdvYEGMtM0wdCXtafklnhswC?=
- =?us-ascii?Q?AdcC5Qw7hv86FUulA3EB50+wuMH/PX2Xp2Qccxl3CcpsVGB/e/+Kj2LGEgPX?=
- =?us-ascii?Q?cClwBCQQ0PGGI9hn/G92+OAKCMbioakS872XKPFs+Ojqcrz1QGQ4CjgdU6/v?=
- =?us-ascii?Q?iamLKG3vptF2ay3/yIaZ5o4cGs3glsYWKaGpYEijksQFU7o9HedoMxmwGgxE?=
- =?us-ascii?Q?+/LzYa1XEvVQiFTydHZjIkQKScC4z11tgRcjWZ4FzpWnc9BZ3pXowzUwLdFe?=
- =?us-ascii?Q?HRi1QLK50Iig2XkGp0dPNg0iT4eBdcd38+eJ3FU8fgIbhKMiJqqlwgRWcTKm?=
- =?us-ascii?Q?S/wkttT/RSzUm4mpqQfuFkt6UxJal9fxjD9F+Hqj6uDTvUIvJGdafFOq/exd?=
- =?us-ascii?Q?HfFDUO2OAyeRRCM9On4reemzYlqjWnHPs31ySjf0DPPYS4orNcyDTirybIC5?=
- =?us-ascii?Q?VLkndg2/fUyymzo8887IGJWBb9C1oXfo+kaxtGEKhP/1H85BJuHUc7Gx/XUb?=
- =?us-ascii?Q?CMzlQ8wS9KpQswkM4r3Yg2eJYV80xVTbRGBwdB08b8WvXnW+F+daHzDkW97O?=
- =?us-ascii?Q?sw=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BC2B161311
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 16:18:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.132
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712852299; cv=none; b=Q5BwgfYt5GsKWzefoQadZPXd2GIr45BXbl1NRwrwO4hYMMMnhc48hC0RcCg4XKKjP44CVRVftDSJ3TQOa9Mx3Ux6BPX2FN9vsm89KJQ3tVkQb6saYoruxOD8gq4DBIRnEoH6d+0ZO1Q9rswHM3EedBcMNOMbz+zjFdFm2Ps71PE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712852299; c=relaxed/simple;
+	bh=tDxeBacMW2aRJEqgfDymIFF6NGEgSKfxUfLkNd0hwsU=;
+	h=Date:To:From:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=I97kyz4YnV6M9ukVtRLxXhc3bQDOa83vPT7ziK75n2jzMImb0lkNqz+RqeoCEb85vZS0SPI7zo6NIpwQbcmmWjGh3eJdHhkQjEISBszyDEN0XoWu39NdKbES2o1FoGBDdfjbzmasK8PvABgYbfGtJw2SZulHaMF3O0J890ylaNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com; spf=pass smtp.mailfrom=protonmail.com; dkim=pass (2048-bit key) header.d=protonmail.com header.i=@protonmail.com header.b=FQVrBt1L; arc=none smtp.client-ip=185.70.40.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=protonmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=protonmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+	s=protonmail3; t=1712852289; x=1713111489;
+	bh=LDwEE3J7o+FzBfaW4LNZVR58GR8itFvAZ5W3JW2Qlv4=;
+	h=Date:To:From:Cc:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector;
+	b=FQVrBt1LLq9ab0gAv5hW8A+7k8URr3GQZVlaqM89nqQn+I11d9cVSWErKEbmpt9eF
+	 Cb+VXWfQaPY0qcdQGN5oaxwsIUFK5WmBJCeyE5PYwcjbe2EFMqsKTstYTB5tew5bcr
+	 kfY2vaDnytjtHE3TK+qdM9SqwD6h6XvbDLGjvw3/+qbuJG4wiTaKHlFmxb0kMLNamo
+	 ZT6Q5bfnbUn6iPUuc/2k5W7sEc3XiKvkdQBSoGaPe1V6C1i5ywC5wxzYKuJyZ62jRu
+	 U5QDUo2ZGJQMMXxVwTKLP2lHge60a74B0q/2TvJwH6o32E1SM/rv7yMiKEEqDC7rH4
+	 G9QXvDvzGPyUQ==
+Date: Thu, 11 Apr 2024 16:17:53 +0000
+To: Linux Networking <netdev@vger.kernel.org>
+From: Turritopsis Dohrnii Teo En Ming <teo.en.ming@protonmail.com>
+Cc: "ceo@teo-en-ming-corp.com" <ceo@teo-en-ming-corp.com>
+Subject: Teo En Ming's Notes on Upgrading Firmware on HPE MSR954 Router and Enabling Web Interface - Version 1
+Message-ID: <XmSiEMIKAgEaZGzNRPPPlW26owlkxz1y0tt15kV0BuhS6R6T9aCaIm15u18hFsK000GqKC7mR038HF1d7YzLhOvl2AM9u4AbozRo_ni623M=@protonmail.com>
+Feedback-ID: 39510961:user:proton
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: df1b58b3-864f-46d6-4316-08dc5a41e25b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Apr 2024 16:10:19.6425
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BduUh1OPQtZPrmbFMlC8eYlsmBzFx6McBUmtXV+nB4E//rWz9XurLARSCp2h4DBofACGpnRu8lByRlhB4/GbqwfS5YC9fuEMZHxUpy3Wjfc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6324
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+
+Subject: Teo En Ming's Notes on Upgrading Firmware on HPE MSR954 Router and=
+ Enabling Web Interface - Version 1
+
+Author: Mr. Turritopsis Dohrnii Teo En Ming
+Country: Singapore
+Date of Action: 11 Apr 2024 Thursday
+Time: 8.30 PM to 11.00 PM
+
+Step 1: Configuring IP address on router port GE1 to prepare for TFTP opera=
+tion
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+
+Startup configuration file does not exist.
+Performing automatic configuration... Press CTRL_D to break.
+
+Automatic configuration attempt: 1.
+Not ready for automatic configuration: no interface available.
+Waiting for the next...
+
+Automatic configuration attempt: 2.
+Interface used: Vlan-interface1.
+Enable DHCP client on Vlan-interface1.
+Vlan-interface1 failed to obtain IP address.
+Waiting for the next...
+Automatic configuration is aborted.
+Line con0 is available.
+
+
+Press ENTER to get started.
+
+<HPE>system-view
+
+[HPE]interface Vlan-interface 1
+
+[HPE-Vlan-interface1]ip address 192.168.1.1 255.255.255.0
+
+[HPE-Vlan-interface1]end
+
+<HPE>show ip int br
+*down: administratively down
+(s): spoofing  (l): loopback
+Interface                Physical Protocol IP Address      Description
+GE0/0                    down     down     --              --
+GE0/5                    down     down     --              --
+Vlan1                    up       up       192.168.1.1     --
+
+Step 2: Download and install Open TFTP Server and Configure Management Work=
+station
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+Download Open TFTP Server from https://sourceforge.net/projects/tftp-server=
+/
+
+Install Open TFTP Server Installer.
+
+Configure IP address of management workstation as 192.168.1.2/24
+
+Copy LATEST firmware image file MSR954-CMW710-R6728P27.ipe to C:\OpenTFTPSe=
+rver
+
+Double click RunStandAloneMT.bat
+
+Turn off GlassWire firewall.
+
+Turn off Windows Defender firewall.
+
+Step 3: TFTP Operation for the firmware
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+<HPE>tftp 192.168.1.2 get MSR954-CMW710-R6728P27.ipe
+
+The following attempt at installing the latest firmware failed because of i=
+nsufficient space on the flash memory.
+
+<HPE>boot-loader file flash:/MSR954-CMW710-R6728P27.ipe main
+Verifying the file flash:/MSR954-CMW710-R6728P27.ipe on the device.......Do=
+ne.
+HPE MSR954 images in IPE:
+  msr954-cmw710-boot-r6728p27.bin
+  msr954-cmw710-system-r6728p27.bin
+  msr954-cmw710-wifidog-r6728p27.bin
+  msr954-cmw710-wwd-r6728p27.bin
+  msr954-cmw710-security-r6728p27.bin
+  msr954-cmw710-voice-r6728p27.bin
+  msr954-cmw710-data-r6728p27.bin
+This command will set the main startup software images. Continue? [Y/N]:y
+Add images to the device.
+No sufficient storage space on the device.
+
+Step 4: Delete unnecessary files on the flash memory to free up space=20
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+<HPE>delete flash:/msr954*.bin
+Delete flash:/msr954-cmw710-boot-r0306p30.bin? [Y/N]:y
+Deleting file flash:/msr954-cmw710-boot-r0306p30.bin... Done.
+Delete flash:/msr954-cmw710-data-r0306p30.bin? [Y/N]:y
+Deleting file flash:/msr954-cmw710-data-r0306p30.bin... Done.
+Delete flash:/msr954-cmw710-security-r0306p30.bin? [Y/N]:y
+Deleting file flash:/msr954-cmw710-security-r0306p30.bin... Done.
+Delete flash:/msr954-cmw710-system-r0306p30.bin? [Y/N]:y
+Deleting file flash:/msr954-cmw710-system-r0306p30.bin... Done.
+Delete flash:/msr954-cmw710-voice-r0306p30.bin? [Y/N]:y
+Deleting file flash:/msr954-cmw710-voice-r0306p30.bin... Done.
+Delete flash:/msr954-cmw710-wifidog-r0306p30.bin? [Y/N]:y
+Deleting file flash:/msr954-cmw710-wifidog-r0306p30.bin... Done.
+
+
+<HPE>delete flash:/logfile/*
+Delete flash:/logfile/logfile1.log.gz? [Y/N]:y
+Deleting file flash:/logfile/logfile1.log.gz... Done.
+Delete flash:/logfile/logfile10.log.gz? [Y/N]:y
+Deleting file flash:/logfile/logfile10.log.gz... Done.
+Delete flash:/logfile/logfile2.log? [Y/N]:y
+Deleting file flash:/logfile/logfile2.log... Done.
+Delete flash:/logfile/logfile2.log.gz? [Y/N]:y
+Deleting file flash:/logfile/logfile2.log.gz... Done.
+Delete flash:/logfile/logfile3.log? [Y/N]:y
+Deleting file flash:/logfile/logfile3.log... Done.
+Delete flash:/logfile/logfile4.log.gz? [Y/N]:y
+Deleting file flash:/logfile/logfile4.log.gz... Done.
+Delete flash:/logfile/logfile5.log.gz? [Y/N]:y
+Deleting file flash:/logfile/logfile5.log.gz... Done.
+Delete flash:/logfile/logfile6.log.gz? [Y/N]:y
+Deleting file flash:/logfile/logfile6.log.gz... Done.
+Delete flash:/logfile/logfile7.log.gz? [Y/N]:y
+Deleting file flash:/logfile/logfile7.log.gz... Done.
+Delete flash:/logfile/logfile8.log.gz? [Y/N]:y
+Deleting file flash:/logfile/logfile8.log.gz... Done.
+Delete flash:/logfile/logfile9.log.gz? [Y/N]:y
+Deleting file flash:/logfile/logfile9.log.gz... Done.
+
+<HPE>dir flash:/
+Directory of flash:
+   0 -rw-    93636608 Jan 01 2011 00:29:51   MSR954-CMW710-R6728P27.ipe
+   1 drw-           - Jan 01 2011 00:00:10   diagfile
+   2 -rw-         735 Jan 01 2011 00:07:25   hostkey
+   3 -rw-         228 Jan 01 2011 00:12:54   ifindex.dat
+   4 drw-           - Jan 01 2011 00:00:10   license
+   5 drw-           - Jan 01 2011 00:36:14   logfile
+   6 drw-           - Jan 01 2011 00:00:10   seclog
+   7 -rw-         591 Jan 01 2011 00:07:25   serverkey
+   8 -rw-        5735 Jan 01 2011 00:12:55   startup.cfg
+   9 -rw-       61417 Jan 01 2011 00:12:55   startup.mdb
+
+251904 KB total (86996 KB free)
+
+<HPE>delete flash:/startup.mdb
+Delete flash:/startup.mdb? [Y/N]:y
+Deleting file flash:/startup.mdb... Done.
+
+
+<HPE>dir /all
+Directory of flash:
+   0 -rw-    93636608 Jan 01 2011 00:29:51   MSR954-CMW710-R6728P27.ipe
+   1 drw-           - Jan 01 2011 00:00:10   diagfile
+   2 -rw-         735 Jan 01 2011 00:07:25   hostkey
+   3 -rw-         228 Jan 01 2011 00:12:54   ifindex.dat
+   4 drw-           - Jan 01 2011 00:00:10   license
+   5 drw-           - Jan 01 2011 00:36:14   logfile
+   6 drw-           - Jan 01 2011 00:00:10   seclog
+   7 -rw-         591 Jan 01 2011 00:07:25   serverkey
+   8 -rw-        5735 Jan 01 2011 00:12:55   startup.cfg
+   9 drwh           - Jan 01 2011 00:45:44   .trash
+
+
+<HPE>rmdir flash:/.trash
+Remove directory flash:/.trash and the files in the recycle-bin under this =
+directory will be deleted permanently. Continue? [Y/N]:y
+Failed to remove the directory because it is not empty.
+
+<HPE>dir flash:/.trash/
+Directory of flash:/.trash
+   0 -rw-      362875 Jun 24 2011 11:12:32   logfile1.log.gz_0001
+   1 -rw-      307359 Jan 07 2011 13:01:22   logfile10.log.gz_0001
+   2 -rw-      332922 Jan 07 2011 11:11:52   logfile2.log.gz_0001
+   3 -rw-     3633086 Jan 07 2011 20:06:45   logfile2.log_0001
+   4 -rw-     5216633 Jul 19 2011 10:45:11   logfile3.log_0001
+   5 -rw-      370150 Jul 02 2011 19:51:51   logfile4.log.gz_0001
+   6 -rw-      356413 Jun 27 2011 21:30:47   logfile5.log.gz_0001
+   7 -rw-      355667 Jul 05 2011 10:05:21   logfile6.log.gz_0001
+   8 -rw-      363096 Jul 11 2011 10:40:24   logfile7.log.gz_0001
+   9 -rw-      371726 Jul 17 2011 06:21:00   logfile8.log.gz_0001
+  10 -rw-      354088 Jul 08 2011 19:24:06   logfile9.log.gz_0001
+  11 -rw-     6972416 Jan 01 2013 00:00:00   msr954-cmw710-boot-r0306p30.bi=
+n_0001
+  12 -rw-     2955264 Jan 01 2013 00:00:00   msr954-cmw710-data-r0306p30.bi=
+n_0001
+  13 -rw-      387072 Jan 01 2013 00:00:00   msr954-cmw710-security-r0306p3=
+0.bin_0001
+  14 -rw-    51291136 Jan 01 2013 00:00:00   msr954-cmw710-system-r0306p30.=
+bin_0001
+  15 -rw-       12288 Jan 01 2013 00:00:00   msr954-cmw710-voice-r0306p30.b=
+in_0001
+  16 -rw-      116736 Jan 01 2013 00:00:00   msr954-cmw710-wifidog-r0306p30=
+.bin_0001
+  17 -rw-       61417 Jan 01 2011 00:12:55   startup.mdb_0001
+
+251904 KB total (86996 KB free)
+
+<HPE>delete flash:/.trash/msr954-cmw710-boot-r0306p30.bin_0001
+The file cannot be restored. Delete flash:/.trash/msr954-cmw710-boot-r0306p=
+30.bin_0001? [Y/N]:y
+Deleting the file permanently will take a long time. Please wait...
+Deleting file flash:/.trash/msr954-cmw710-boot-r0306p30.bin_0001... Done.
+
+<HPE>delete flash:/.trash/msr954-cmw710-data-r0306p30.bin_0001
+The file cannot be restored. Delete flash:/.trash/msr954-cmw710-data-r0306p=
+30.bin_0001? [Y/N]:y
+Deleting the file permanently will take a long time. Please wait...
+Deleting file flash:/.trash/msr954-cmw710-data-r0306p30.bin_0001... Done.
+
+<HPE>delete flash:/.trash/msr954-cmw710-security-r0306p30.bin_0001
+The file cannot be restored. Delete flash:/.trash/msr954-cmw710-security-r0=
+306p30.bin_0001? [Y/N]:y
+Deleting the file permanently will take a long time. Please wait...
+Deleting file flash:/.trash/msr954-cmw710-security-r0306p30.bin_0001... Don=
+e.
+
+<HPE>delete flash:/.trash/msr954-cmw710-system-r0306p30.bin_0001
+The file cannot be restored. Delete flash:/.trash/msr954-cmw710-system-r030=
+6p30.bin_0001? [Y/N]:y
+Deleting the file permanently will take a long time. Please wait...
+Deleting file flash:/.trash/msr954-cmw710-system-r0306p30.bin_0001... Done.
+
+<HPE>delete flash:/.trash/msr954-cmw710-voice-r0306p30.bin_0001
+The file cannot be restored. Delete flash:/.trash/msr954-cmw710-voice-r0306=
+p30.bin_0001? [Y/N]:y
+Deleting the file permanently will take a long time. Please wait...
+Deleting file flash:/.trash/msr954-cmw710-voice-r0306p30.bin_0001... Done.
+
+<HPE>delete flash:/.trash/msr954-cmw710-wifidog-r0306p30.bin_0001
+The file cannot be restored. Delete flash:/.trash/msr954-cmw710-wifidog-r03=
+06p30.bin_0001? [Y/N]:y
+Deleting the file permanently will take a long time. Please wait...
+Deleting file flash:/.trash/msr954-cmw710-wifidog-r0306p30.bin_0001... Done=
+.
+
+
+<HPE>dir flash:/.trash/
+Directory of flash:/.trash
+   0 -rw-      362875 Jun 24 2011 11:12:32   logfile1.log.gz_0001
+   1 -rw-      307359 Jan 07 2011 13:01:22   logfile10.log.gz_0001
+   2 -rw-      332922 Jan 07 2011 11:11:52   logfile2.log.gz_0001
+   3 -rw-     3633086 Jan 07 2011 20:06:45   logfile2.log_0001
+   4 -rw-     5216633 Jul 19 2011 10:45:11   logfile3.log_0001
+   5 -rw-      370150 Jul 02 2011 19:51:51   logfile4.log.gz_0001
+   6 -rw-      356413 Jun 27 2011 21:30:47   logfile5.log.gz_0001
+   7 -rw-      355667 Jul 05 2011 10:05:21   logfile6.log.gz_0001
+   8 -rw-      363096 Jul 11 2011 10:40:24   logfile7.log.gz_0001
+   9 -rw-      371726 Jul 17 2011 06:21:00   logfile8.log.gz_0001
+  10 -rw-      354088 Jul 08 2011 19:24:06   logfile9.log.gz_0001
+  11 -rw-       61417 Jan 01 2011 00:12:55   startup.mdb_0001
+
+251904 KB total (147428 KB free)
+
+Step 5: Installing the LATEST firmware on the HPE MSR954 router
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+<HPE>boot-loader file flash:/MSR954-CMW710-R6728P27.ipe main
+Verifying the file flash:/MSR954-CMW710-R6728P27.ipe on the device.......Do=
+ne.
+HPE MSR954 images in IPE:
+  msr954-cmw710-boot-r6728p27.bin
+  msr954-cmw710-system-r6728p27.bin
+  msr954-cmw710-wifidog-r6728p27.bin
+  msr954-cmw710-wwd-r6728p27.bin
+  msr954-cmw710-security-r6728p27.bin
+  msr954-cmw710-voice-r6728p27.bin
+  msr954-cmw710-data-r6728p27.bin
+This command will set the main startup software images. Continue? [Y/N]:y
+Add images to the device.
+Decompressing file msr954-cmw710-wwd-r6728p27.bin to flash:/msr954-cmw710-w=
+wd-r6728p27.bin...Done.
+Decompressing file msr954-cmw710-wifidog-r6728p27.bin to flash:/msr954-cmw7=
+10-wifidog-r6728p27.bin...Done.
+Decompressing file msr954-cmw710-data-r6728p27.bin to flash:/msr954-cmw710-=
+data-r6728p27.bin...Done.
+Decompressing file msr954-cmw710-voice-r6728p27.bin to flash:/msr954-cmw710=
+-voice-r6728p27.bin...Done.
+Decompressing file msr954-cmw710-security-r6728p27.bin to flash:/msr954-cmw=
+710-security-r6728p27.bin...Done.
+Decompressing file msr954-cmw710-system-r6728p27.bin to flash:/msr954-cmw71=
+0-system-r6728p27.bin........................................Done.
+Decompressing file msr954-cmw710-boot-r6728p27.bin to flash:/msr954-cmw710-=
+boot-r6728p27.bin.....Done.
+The images that have passed all examinations will be used as the main start=
+up software images at the next reboot on the device.
+
+Verifying that the latest firmware has been installed.
+
+<HPE>display boot-loader
+Software images on the device:
+Current software images:
+  flash:/msr954-cmw710-boot-r0306p30.bin
+  flash:/msr954-cmw710-system-r0306p30.bin
+  flash:/msr954-cmw710-wifidog-r0306p30.bin
+  flash:/msr954-cmw710-security-r0306p30.bin
+  flash:/msr954-cmw710-voice-r0306p30.bin
+  flash:/msr954-cmw710-data-r0306p30.bin
+Main startup software images:
+  flash:/msr954-cmw710-boot-r6728p27.bin
+  flash:/msr954-cmw710-system-r6728p27.bin
+  flash:/msr954-cmw710-wifidog-r6728p27.bin
+  flash:/msr954-cmw710-wwd-r6728p27.bin
+  flash:/msr954-cmw710-security-r6728p27.bin
+  flash:/msr954-cmw710-voice-r6728p27.bin
+  flash:/msr954-cmw710-data-r6728p27.bin
+Backup startup software images:
+  None
+
+Rebooting the HPE MSR954 router.
+
+<HPE>reboot
+Start to check configuration with next startup configuration file, please w=
+ait.........DONE!
+Current configuration may be lost after the reboot, save current configurat=
+ion? [Y/N]:n
+This command will reboot the device. Continue? [Y/N]:y
+Now rebooting, please wait...
+%Jan  1 01:00:07:296 2011 HPE DEV/5/SYSTEM_REBOOT: System is rebooting now.
+
+Step 6: Enabling Web Interface on the HPE MSR954 Router
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D
+
+Startup configuration file doesn't exist or is invalid.
+Performing automatic configuration... Press CTRL_C or CTRL_D to break.
+
+Automatic configuration attempt: 1.
+Not ready for automatic configuration: no interface available.
+Waiting for the next...
+
+Automatic configuration attempt: 2.
+Interface used: Vlan-interface1.
+Enable DHCP client on Vlan-interface1.
+Vlan-interface1 failed to obtain IP address.
+Waiting for the next...
+Automatic configuration is aborted.
 
 
 
-> -----Original Message-----
-> From: Louis Peens <louis.peens@corigine.com>
-> Sent: Wednesday, April 10, 2024 11:19 PM
-> To: Keller, Jacob E <jacob.e.keller@intel.com>
-> Cc: David Miller <davem@davemloft.net>; Jakub Kicinski <kuba@kernel.org>;
-> Paolo Abeni <pabeni@redhat.com>; Jiri Pirko <jiri@resnulli.us>; Fei Qin
-> <fei.qin@corigine.com>; netdev@vger.kernel.org; oss-drivers@corigine.com
-> Subject: Re: [PATCH net-next v5 2/2] nfp: update devlink device info outp=
-ut
->=20
-> On Wed, Apr 10, 2024 at 03:27:22PM -0700, Jacob Keller wrote:
-> >
-> >
-> > On 4/10/2024 4:26 AM, Louis Peens wrote:
-> > > From: Fei Qin <fei.qin@corigine.com>
-> > >
-> > > Newer NIC will introduce a new part number, now add it
-> > > into devlink device info.
-> > >
-> > > This patch also updates the information of "board.id" in
-> > > nfp.rst to match the devlink-info.rst.
-> > >
-> >
-> > I was a bit confused since you didn't update the board.id to reference
-> > something else. I am guessing in newer images, the "assembly.partno"
-> > would be different from "pn"?
->=20
-> Hi - yes, they would be two different things, approximate example for
-> new images:
->     board.id ~ AMDA2001-1003
->     board.part_number ~ CGX11-A2PSNM
->=20
-> Old images will just have board.id. The field naming we get from the
-> hardware is indeed slightly confusing, but since they are used
-> differently we could not just update board.id.
->=20
-> I hope this clears things up.
->=20
+<HPE>system-view
+[HPE]interface Vlan-interface 1
+[HPE-Vlan-interface1]ip address 192.168.1.1 255.255.255.0
 
-Yes, thanks! It might be helpful to include examples of actual values in th=
-e doc.
+[HPE]ip https enable
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+You can now browse the web interface using https://192.168.1.1/
 
-> Regards
-> Louis
-> >
-> > Thanks,
-> > Jake
+Google Chrome doesn't display the web interface properly. You need to use M=
+icrosoft Edge.
+
+But I don't know the default username and password, need to check it out la=
+ter.
+
+Step 7: Remember to save the router configuration before shutting down
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+[HPE]save
+The current configuration will be written to the device. Are you sure? [Y/N=
+]:y
+Please input the file name(*.cfg)[flash:/startup.cfg]
+(To leave the existing filename unchanged, press the enter key):
+flash:/startup.cfg exists, overwrite? [Y/N]:y
+Validating file. Please wait...
+Configuration is saved to device successfully.
+
+Reference Guides
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+
+[1] 07-Software upgrade configuration
+
+Link: https://www.h3c.com/en/d_201905/1178175_294551_0.htm
+
+[2] Router HPE MSR954 Web interface
+
+Link: https://community.hpe.com/t5/comware-based/router-hpe-msr954-web-inte=
+rface/td-p/6940091
+
+[3] dir
+
+Link: https://techhub.hpe.com/eginfolib/networking/docs/switches/5700/5998-=
+5600r_fund_cr/content/447037782.htm
+
+
+
+
+Regards,
+
+Mr. Turritopsis Dohrnii Teo En Ming
+Targeted Individual in Singapore
+Blogs:
+https://tdtemcerts.blogspot.com
+https://tdtemcerts.wordpress.com
+GIMP also stands for Government-Induced Medical Problems
+
+
+
+
+
 
