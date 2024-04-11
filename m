@@ -1,131 +1,166 @@
-Return-Path: <netdev+bounces-87112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6539F8A1D15
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:02:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 652178A1CBF
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:55:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E2C3BB36054
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 17:55:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8778D1C22B38
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 17:55:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9875D12C49A;
-	Thu, 11 Apr 2024 16:37:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0666E12C482;
+	Thu, 11 Apr 2024 16:37:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57E03D556;
-	Thu, 11 Apr 2024 16:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A3D41C6D
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 16:37:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712853479; cv=none; b=YC9oHBIs4u1x1lBOH7bfUgiS+pi4Hn7q3+SMzJSmhik7FygM5HEiGj9Lli8HwHKrBlTeXgV8ji7BtC60NPWIUnFOvIvyoWO8opNWYTV+BYVmIHZZIN/g7RxV/6+M58l6v0HDuUjHHCEQUY+NKTFXfNJe5afCuNMgWPFPLyXHI8E=
+	t=1712853463; cv=none; b=PEXkFiQrxHSCEtcMkR/v0abuCFEy/wBLvRY33r8LM8bNqtcZXQBA4ctRVvAcmyE4Fdtd2W6tnHFiGniUMGV1w/orxibdGMS2Ri2hVI3LGlkXpgNGaraqvAKEDX1GzFC0O738fIHehV3IUDCUkVgaFUMMxrBUQnQ+lYfPJ3tiB+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712853479; c=relaxed/simple;
-	bh=i8WjgJLurDb8Kln+Wggv/7WyFRxJfZDM6BejyA8W21s=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=baWu/aj6BraBfgt0xFMFV5TBBzJAl7NOh221PO/VATBG48+rL3p5iOw4bDThEQ+WA2M0Ivuuxm5GcvL9g4eCb8n3k3Hxh15P5fvbv4BYf5dIMTWSnUU76lirQL3fssmFPtp5mQsER/CnrL3P7ECfW9ePK9zRv+aBjwnSQlMDgao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.74.224) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 11 Apr
- 2024 19:37:51 +0300
-Subject: Re: [PATCH net 2/4] net: ravb: Allow RX loop to move past DMA mapping
- errors
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	=?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20240411114434.26186-1-paul.barker.ct@bp.renesas.com>
- <20240411114434.26186-3-paul.barker.ct@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <e7fea01d-d549-cd8c-8d7f-ed403ca980fa@omp.ru>
-Date: Thu, 11 Apr 2024 19:37:50 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1712853463; c=relaxed/simple;
+	bh=6TTkMX3U5IwpbALaS/Z+SlE8qWxYEGfzGC96BFsSrhY=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=OxDX3ifvtYXXl/skksQtTdFEfbQxSlMQb/5qSKlk6JZ7i7hkn4jkTFsB0j315TbBB7pCNR83OdyFDhP2tyAyWVcggBX6QxmSHVZ9A5nc95KFb6ZWSxFWASrZjHf8ghhFLN1+SdCmH1QDxAgDK5rkV9jHIeF8YR2YcPPoR9I6BNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9C275E0004;
+	Thu, 11 Apr 2024 16:37:36 +0000 (UTC)
+Message-ID: <6a561c3b-02dd-485a-aff0-04f1e347adf0@ovn.org>
+Date: Thu, 11 Apr 2024 18:38:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240411114434.26186-3-paul.barker.ct@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Cc: i.maximets@ovn.org, Eric Dumazet <edumazet@google.com>,
+ Stefano Brivio <sbrivio@redhat.com>, davem@davemloft.net,
+ netdev@vger.kernel.org, pabeni@redhat.com, jiri@resnulli.us,
+ idosch@idosch.org, johannes@sipsolutions.net, fw@strlen.de,
+ pablo@netfilter.org, Martin Pitt <mpitt@redhat.com>,
+ Paul Holzinger <pholzing@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH net-next v2 3/3] genetlink: fit NLMSG_DONE into same
+ read() as families
+To: Jakub Kicinski <kuba@kernel.org>
+References: <20240303052408.310064-1-kuba@kernel.org>
+ <20240303052408.310064-4-kuba@kernel.org> <20240315124808.033ff58d@elisabeth>
+ <20240319085545.76445a1e@kernel.org>
+ <CANn89i+afBvqP564v6TuL3OGeRxfDNMuwe=EdH_3N4UuHsvfuA@mail.gmail.com>
+ <20240319104046.203df045@kernel.org>
+ <02b50aae-f0e9-47a4-8365-a977a85975d3@ovn.org>
+ <20240411081610.71818cfc@kernel.org>
+ <b2e7f22c-6da3-4f48-9940-f3cc1aea2af2@ovn.org>
+ <20240411085206.1d127414@kernel.org>
 Content-Language: en-US
+From: Ilya Maximets <i.maximets@ovn.org>
+Autocrypt: addr=i.maximets@ovn.org; keydata=
+ xsFNBF77bOMBEADVZQ4iajIECGfH3hpQMQjhIQlyKX4hIB3OccKl5XvB/JqVPJWuZQRuqNQG
+ /B70MP6km95KnWLZ4H1/5YOJK2l7VN7nO+tyF+I+srcKq8Ai6S3vyiP9zPCrZkYvhqChNOCF
+ pNqdWBEmTvLZeVPmfdrjmzCLXVLi5De9HpIZQFg/Ztgj1AZENNQjYjtDdObMHuJQNJ6ubPIW
+ cvOOn4WBr8NsP4a2OuHSTdVyAJwcDhu+WrS/Bj3KlQXIdPv3Zm5x9u/56NmCn1tSkLrEgi0i
+ /nJNeH5QhPdYGtNzPixKgPmCKz54/LDxU61AmBvyRve+U80ukS+5vWk8zvnCGvL0ms7kx5sA
+ tETpbKEV3d7CB3sQEym8B8gl0Ux9KzGp5lbhxxO995KWzZWWokVUcevGBKsAx4a/C0wTVOpP
+ FbQsq6xEpTKBZwlCpxyJi3/PbZQJ95T8Uw6tlJkPmNx8CasiqNy2872gD1nN/WOP8m+cIQNu
+ o6NOiz6VzNcowhEihE8Nkw9V+zfCxC8SzSBuYCiVX6FpgKzY/Tx+v2uO4f/8FoZj2trzXdLk
+ BaIiyqnE0mtmTQE8jRa29qdh+s5DNArYAchJdeKuLQYnxy+9U1SMMzJoNUX5uRy6/3KrMoC/
+ 7zhn44x77gSoe7XVM6mr/mK+ViVB7v9JfqlZuiHDkJnS3yxKPwARAQABzSJJbHlhIE1heGlt
+ ZXRzIDxpLm1heGltZXRzQG92bi5vcmc+wsGUBBMBCAA+AhsDBQsJCAcCBhUKCQgLAgQWAgMB
+ Ah4BAheAFiEEh+ma1RKWrHCY821auffsd8gpv5YFAmP+Y/MFCQjFXhAACgkQuffsd8gpv5Yg
+ OA//eEakvE7xTHNIMdLW5r3XnWSEY44dFDEWTLnS7FbZLLHxPNFXN0GSAA8ZsJ3fE26O5Pxe
+ EEFTf7R/W6hHcSXNK4c6S8wR4CkTJC3XOFJchXCdgSc7xS040fLZwGBuO55WT2ZhQvZj1PzT
+ 8Fco8QKvUXr07saHUaYk2Lv2mRhEPP9zsyy7C2T9zUzG04a3SGdP55tB5Adi0r/Ea+6VJoLI
+ ctN8OaF6BwXpag8s76WAyDx8uCCNBF3cnNkQrCsfKrSE2jrvrJBmvlR3/lJ0OYv6bbzfkKvo
+ 0W383EdxevzAO6OBaI2w+wxBK92SMKQB3R0ZI8/gqCokrAFKI7gtnyPGEKz6jtvLgS3PeOtf
+ 5D7PTz+76F/X6rJGTOxR3bup+w1bP/TPHEPa2s7RyJISC07XDe24n9ZUlpG5ijRvfjbCCHb6
+ pOEijIj2evcIsniTKER2pL+nkYtx0bp7dZEK1trbcfglzte31ZSOsfme74u5HDxq8/rUHT01
+ 51k/vvUAZ1KOdkPrVEl56AYUEsFLlwF1/j9mkd7rUyY3ZV6oyqxV1NKQw4qnO83XiaiVjQus
+ K96X5Ea+XoNEjV4RdxTxOXdDcXqXtDJBC6fmNPzj4QcxxyzxQUVHJv67kJOkF4E+tJza+dNs
+ 8SF0LHnPfHaSPBFrc7yQI9vpk1XBxQWhw6oJgy3OwU0EXvts4wEQANCXyDOic0j2QKeyj/ga
+ OD1oKl44JQfOgcyLVDZGYyEnyl6b/tV1mNb57y/YQYr33fwMS1hMj9eqY6tlMTNz+ciGZZWV
+ YkPNHA+aFuPTzCLrapLiz829M5LctB2448bsgxFq0TPrr5KYx6AkuWzOVq/X5wYEM6djbWLc
+ VWgJ3o0QBOI4/uB89xTf7mgcIcbwEf6yb/86Cs+jaHcUtJcLsVuzW5RVMVf9F+Sf/b98Lzrr
+ 2/mIB7clOXZJSgtV79Alxym4H0cEZabwiXnigjjsLsp4ojhGgakgCwftLkhAnQT3oBLH/6ix
+ 87ahawG3qlyIB8ZZKHsvTxbWte6c6xE5dmmLIDN44SajAdmjt1i7SbAwFIFjuFJGpsnfdQv1
+ OiIVzJ44kdRJG8kQWPPua/k+AtwJt/gjCxv5p8sKVXTNtIP/sd3EMs2xwbF8McebLE9JCDQ1
+ RXVHceAmPWVCq3WrFuX9dSlgf3RWTqNiWZC0a8Hn6fNDp26TzLbdo9mnxbU4I/3BbcAJZI9p
+ 9ELaE9rw3LU8esKqRIfaZqPtrdm1C+e5gZa2gkmEzG+WEsS0MKtJyOFnuglGl1ZBxR1uFvbU
+ VXhewCNoviXxkkPk/DanIgYB1nUtkPC+BHkJJYCyf9Kfl33s/bai34aaxkGXqpKv+CInARg3
+ fCikcHzYYWKaXS6HABEBAAHCwXwEGAEIACYCGwwWIQSH6ZrVEpascJjzbVq59+x3yCm/lgUC
+ Y/5kJAUJCMVeQQAKCRC59+x3yCm/lpF7D/9Lolx00uxqXz2vt/u9flvQvLsOWa+UBmWPGX9u
+ oWhQ26GjtbVvIf6SECcnNWlu/y+MHhmYkz+h2VLhWYVGJ0q03XkktFCNwUvHp3bTXG3IcPIC
+ eDJUVMMIHXFp7TcuRJhrGqnlzqKverlY6+2CqtCpGMEmPVahMDGunwqFfG65QubZySCHVYvX
+ T9SNga0Ay/L71+eVwcuGChGyxEWhVkpMVK5cSWVzZe7C+gb6N1aTNrhu2dhpgcwe1Xsg4dYv
+ dYzTNu19FRpfc+nVRdVnOto8won1SHGgYSVJA+QPv1x8lMYqKESOHAFE/DJJKU8MRkCeSfqs
+ izFVqTxTk3VXOCMUR4t2cbZ9E7Qb/ZZigmmSgilSrOPgDO5TtT811SzheAN0PvgT+L1Gsztc
+ Q3BvfofFv3OLF778JyVfpXRHsn9rFqxG/QYWMqJWi+vdPJ5RhDl1QUEFyH7ok/ZY60/85FW3
+ o9OQwoMf2+pKNG3J+EMuU4g4ZHGzxI0isyww7PpEHx6sxFEvMhsOp7qnjPsQUcnGIIiqKlTj
+ H7i86580VndsKrRK99zJrm4s9Tg/7OFP1SpVvNvSM4TRXSzVF25WVfLgeloN1yHC5Wsqk33X
+ XNtNovqA0TLFjhfyyetBsIOgpGakgBNieC9GnY7tC3AG+BqG5jnVuGqSTO+iM/d+lsoa+w==
+In-Reply-To: <20240411085206.1d127414@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 04/11/2024 16:21:58
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 184677 [Apr 11 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 16 0.3.16
- 6e64c33514fcbd07e515710c86ba61de7f56194e
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.74.224
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 04/11/2024 16:25:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 4/11/2024 10:51:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-GND-Sasl: i.maximets@ovn.org
 
-On 4/11/24 2:44 PM, Paul Barker wrote:
-
-> The RX loops in ravb_rx_gbeth() and ravb_rx_rcar() skip to the next loop
-> interation if a zero-length descriptor is seen (indicating a DMA mapping
-
-   Iteration. :-)
-
-> error). However, the current rx descriptor index `priv->cur_rx[q]` was
-
-   RX?
-
-> incremented at the end of the loop and so would not be incremented when
-> we skip to the next loop iteration. This would cause the loop to keep
-> seeing the same zero-length descriptor instead of moving on to the next
-> descriptor.
+On 4/11/24 17:52, Jakub Kicinski wrote:
+> On Thu, 11 Apr 2024 17:39:20 +0200 Ilya Maximets wrote:
+>> nlmsg_type=0x1a /* NLMSG_??? */  --> RTM_GETROUTE
+>> nlmsg_flags=NLM_F_REQUEST|0x300  --> NLM_F_REQUEST|NLM_F_DUMP
 > 
-> As the loop counter `i` still increments, the loop would eventually
-> terminate so there is no risk of being stuck here forever - but we
-> should still fix this to avoid wasting cycles.
+> Thanks!
 > 
-> To fix this, the rx descriptor index is incremented at the top of the
-
-   RX?
-
-> loop, in the for statement itself. The assignments of `entry` and `desc`
-> are brought into the loop to avoid the need for duplication.
+> Also:
 > 
-> Fixes: d8b48911fd24 ("ravb: fix ring memory allocation")
-> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+> "\x02\x20\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x08\x00\x01\x00\x0a\x01\x01\x02"
+>  ^^^^
+> 
+> So it's dumping AF_INET. I'm guessing its also going to dump v6,
+> separately?
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+AFAICT, it dumps the family according to the tunnel configuration.
+If ipsec is set up for IPv4, then it dumps IPv4, if v6 - v6.
 
-[...]
+> To fix v4 I think something like this would do (untested):
+> 
+> diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
+> index 48741352a88a..749baa74eee7 100644
+> --- a/net/ipv4/fib_frontend.c
+> +++ b/net/ipv4/fib_frontend.c
+> @@ -1050,6 +1050,11 @@ static int inet_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
+>  			e++;
+>  		}
+>  	}
+> +
+> +	/* Don't let NLM_DONE coalesce into a message, even if it could.
+> +	 * Some user space expects NLM_DONE in a separate recv().
+> +	 */
+> +	err = skb->len;
+>  out:
+>  
+>  	cb->args[1] = e;
 
-MBR, Sergey
+I tried that and IPv4 tests with Libreswan are passing with this change
+on latest net-next/main.
+
+IPv6 tests are stuck in the same way as IPv4 did before.  The sendto
+as captured by strace is following:
+
+sendto(7, [
+  {
+    nlmsg_len=48, nlmsg_type=0x1a /* NLMSG_??? */,
+    nlmsg_flags=NLM_F_REQUEST|0x300, nlmsg_seq=0, nlmsg_pid=17084
+  },
+  "\x0a\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14\x00\x01\x00\xfd\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x02"], 48, 0, NULL, 0) = 48
+
+NLMSG_DONE is part of the first recvfrom and the process is stuck
+waiting for something from the second one.
+
+Best regards, Ilya Maximets.
 
