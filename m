@@ -1,113 +1,153 @@
-Return-Path: <netdev+bounces-87128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCEBC8A1D24
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:03:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 059248A1D8C
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:13:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 776C32848E2
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 18:03:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8FF26B37ADA
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 18:04:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33EF81CAE8E;
-	Thu, 11 Apr 2024 16:48:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nadCtn/V"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6FCE45BFC;
+	Thu, 11 Apr 2024 16:50:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D048C446A2
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 16:48:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EF6847A40;
+	Thu, 11 Apr 2024 16:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712854122; cv=none; b=ZkB8GV7BG28RtNk/SftZn3gblsxP4kxvTmoZnJrams7iaWnhl+QQjsOtJKHw/k/7VArlNfP3u2uISgbrmJ4WyTKscJ8ZBzfPesxBOIWZ3lY0iSSfDI+TxY2lQi/82R69XSn12pZaSH0oxpsHf3XEr5aOzKitqyY4ZQ8R/0A3YzA=
+	t=1712854233; cv=none; b=JqxAfIEPJAsSXTnSBLJdAMbtpHbI8DpPtSZWloIKrSFDScgdY5on+BVCbivnxdXX5BSCDymhC0iaxkyN9daDNsgFDJrwS1fOGfYOqvBhFiJ2XK2/ssPLsxbWcciOdGe3ONhSwKqkW7bDZdmKHHgJZpHuqwPWXtdXC/rUIIne01M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712854122; c=relaxed/simple;
-	bh=2u8/BVLR0+6SADxB8m5uoRKPBtfkno7FHbjqUZr8zCM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=omKF59h+3gGGbciHYfvX3N2zWLcIWP0Ruj5EjKJJ/qDMC7Szltf0tQ8E6Ef/wSBGZY2GwEsOvOjWN8YDOP/Vd5hFNJYLjOQuPFZGeX9lzx7JbHaYqusFf/INa2n5JD/z42BhCp2139mhMhe9BsKy+85nGP+na9IDvRTZDhgfE5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nadCtn/V; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6ed2dbf3c92so46336b3a.2
-        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 09:48:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712854120; x=1713458920; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=hbUZVB9qFkHUH+TrArd+qSwKs0Y6WGXbLzrLWrHSOWY=;
-        b=nadCtn/Vn5ThmZq38foo0X2eUNc18fnReG3t3oG3gHSlq0PSeumdH0SrPOLwPfRCHo
-         gqYK8h0IXJyhZMZU5ugjyffJ9QHjd86nMOFxGv5lsd6dEtiJthl36tyf4nS6JJCAHZ70
-         oBYK2rLQ+Ncjqtw5tnUaxhq93y4qB4OgQKzOoMo8Xiu+kYDNab8xW6i+JwbV3uMLXGbG
-         nXzPNJ62GbgrpFBWGpcPeEYXyF+4RCKLE6fArkHpNMMv5b1EzZDpwAAaZz5A3dGzRwao
-         mKZD6+6fYoYvpCWepG0u7oLU2aoCL3rwJMdJtzih1TVo2szeTsRz8oVyVSQQ3XEo79eQ
-         hARw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712854120; x=1713458920;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hbUZVB9qFkHUH+TrArd+qSwKs0Y6WGXbLzrLWrHSOWY=;
-        b=WAPgI4rDbufdFKSswNz6uMTd6qq/xdFb/I8AySe04MFataYTUjhqOBtCh3DXwgZOBj
-         lP9lPWqfVSjXBnUQU6Kdj38xjl4GS8rWiIUrJ1YN3oFr3/kU73XQFM65rbhB3s/KzA4x
-         mZpAbJJqzWIhgWhOriy2BxRSLIohJfn1tyRs84QTQD0QZeEfyzxC01dNl1qjX4g30gHL
-         5vUM2ZoC0CEZ3Tv1YoCt30Pa52UK1N20CfAtPAvNirJhBCT5CHSmakowlpNIsPejLY8O
-         qeq1MqOOfNdmB+DQSd6hCjf3PF2wDxG44XVzsHiogh56M03TB43t/8o4aCHPlP4YcCFB
-         e6Pw==
-X-Gm-Message-State: AOJu0Ywp3uO4cemNsKkIs8OKVIfG5Hbcv7DSjcGSUxlOnG16tabJQlY6
-	kLaJb9lHUVZTnOw89fdL0yQbl3znsX0LGpAFbgxcqMI1ssLm0o0C7Y1i0qCBGBjR/CTgug1tSFV
-	ORSttfarfTjQ5fpk2jHkrgDKkOpkIS+4z
-X-Google-Smtp-Source: AGHT+IHfOGLkiHAPnqr/WU+w/dWL5LsEYTkbqPit6GBkF7wMRFR9VnVO4hHoaEKaWzXEfy3T2mWXCZT3u/34QojNDVE=
-X-Received: by 2002:a05:6a21:9997:b0:1a7:a86a:1132 with SMTP id
- ve23-20020a056a21999700b001a7a86a1132mr483689pzb.13.1712854120012; Thu, 11
- Apr 2024 09:48:40 -0700 (PDT)
+	s=arc-20240116; t=1712854233; c=relaxed/simple;
+	bh=nrMuPIFuCVO7sj/iecEjqXTHll+3KKDW+NZvU4wMcGU=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=UxdPmQkGQvL49U2vvzpqcv+nOgSLsaIzOb+5KFew2Mkd7HJOJwFHiOXTGr3L+12j/nlk6xdzxIsh4RR4/Pgq1ErQ8YriZ5SL6kSPh7mPos6X1H9q9fti87SLPHzchiBFDoyrmsPD/G3ii5TMDQQY26dnSJ94QeIzS988G2IRS5c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (178.176.74.224) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 11 Apr
+ 2024 19:50:25 +0300
+Subject: Re: [PATCH net 3/4] net: ravb: Fix GbEth jumbo packet RX checksum
+ handling
+To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Geert Uytterhoeven <geert+renesas@glider.be>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20240411114434.26186-1-paul.barker.ct@bp.renesas.com>
+ <20240411114434.26186-4-paul.barker.ct@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <c9c624c0-cd26-bceb-e011-7debce338493@omp.ru>
+Date: Thu, 11 Apr 2024 19:50:24 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240325064745.62cd38b3@kernel.org> <CAJwJo6ZQAEb6v4S_BgPqZv8W5W0hizvxyzv0K_M7domgOwTEJg@mail.gmail.com>
- <20240411083629.3eb2fc22@kernel.org>
-In-Reply-To: <20240411083629.3eb2fc22@kernel.org>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Date: Thu, 11 Apr 2024 17:48:28 +0100
-Message-ID: <CAJwJo6YzsQemFCKyK0mmniv5ygGDLWJ_UrE9Aak40SYMTojXsQ@mail.gmail.com>
-Subject: Re: [TEST] TCP-AO got a bit more flaky
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20240411114434.26186-4-paul.barker.ct@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 04/11/2024 16:32:17
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 184677 [Apr 11 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.4
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 16 0.3.16
+ 6e64c33514fcbd07e515710c86ba61de7f56194e
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.74.224
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 04/11/2024 16:36:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 4/11/2024 10:51:00 AM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Thu, 11 Apr 2024 at 16:36, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Mon, 25 Mar 2024 14:16:04 +0000 Dmitry Safonov wrote:
-> > > the changes in the timer subsystem Linus pulled for 6.9 made some of
-> > > the TCP AO tests significantly more flaky.
-> > >
-> > > We pulled them in on March 12th, the failures prior to that are legit:
-> > > https://netdev.bots.linux.dev/flakes.html?br-cnt=184&min-flip=0&pw-n=n&tn-needle=tcp-ao
-> > >
-> > > PTAL whenever you have some spare cycles.
-> >
-> > Certainly, will do this week, thanks for pinging!
->
-> Hi Dmitry! Do you have any spare cycles to spend on this?
-> It's the main source of noise for us. It's not a huge deal
-> but if you're busy I'd like to disable the rst-ipv* tests, at least.
+On 4/11/24 2:44 PM, Paul Barker wrote:
 
-Hi Jakub, thanks for pinging.
+> Sending a 7kB ping packet to the RZ/G2L in Linux v6.9-rc2 causes the
+> following backtrace:
+> 
+> 	WARNING: CPU: 0 PID: 0 at include/linux/skbuff.h:3127 skb_trim+0x30/0x38
+> 	Modules linked in:
+> 	CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W          6.9.0-rc1-00222-gde11614025b1 #3
+> 	Hardware name: Renesas SMARC EVK based on r9a07g044l2 (DT)
+> 	pstate: 20400005 (nzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+> 	pc : skb_trim+0x30/0x38
+> 	lr : ravb_rx_csum_gbeth+0x40/0x90
+> 	sp : ffff800080003d40
+> 	x29: ffff800080003d40 x28: 0000000000000400 x27: ffff00000d0f0000
+> 	x26: 0000000000000001 x25: ffff800080003e84 x24: 0000000000000e52
+> 	x23: 0000000000000000 x22: ffff00000d0f0960 x21: 000000000000ffff
+> 	x20: 000000000000f6ff x19: ffff00000cf4cb00 x18: 0000000000000000
+> 	x17: ffff7ffffdd4f000 x16: ffff800080000000 x15: e7e6e5e4e3e2e1e0
+> 	x14: dfdedddcdbdad9d8 x13: 0000131211100f0e x12: 0d0c0b0a09080706
+> 	x11: 0000000013121110 x10: 0000000000000000 x9 : 0000000000000001
+> 	x8 : ffff800080003cf0 x7 : 0000000000000000 x6 : ffff00007faf4590
+> 	x5 : 000000000010000b x4 : a1a8362deecb53ea x3 : 0000000000000080
+> 	x2 : 00000000ffff0000 x1 : 000000000cf4ccfc x0 : ffff00000cf4cb00
+> 	Call trace:
+> 	 skb_trim+0x30/0x38
+> 	 ravb_rx_gbeth+0x56c/0x5cc
+> 	 ravb_poll+0xa0/0x204
+> 	 __napi_poll+0x38/0x17c
+> 	 net_rx_action+0x124/0x268
+> 	 __do_softirq+0x100/0x26c
+> 	 ____do_softirq+0x10/0x1c
+> 	 call_on_irq_stack+0x24/0x4c
+> 	 do_softirq_own_stack+0x1c/0x2c
+> 	 irq_exit_rcu+0xbc/0xd8
+> 	 el1_interrupt+0x38/0x68
+> 	 el1h_64_irq_handler+0x18/0x24
+> 	 el1h_64_irq+0x64/0x68
+> 	 default_idle_call+0x28/0x3c
+> 	 do_idle+0x204/0x25c
+> 	 cpu_startup_entry+0x38/0x3c
+> 	 kernel_init+0x0/0x1d8
+> 	 start_kernel+0x504/0x5f0
+> 	 __primary_switched+0x80/0x88
+> 	---[ end trace 0000000000000000 ]---
+> 
+> This is caused by ravb_rx_gbeth() calling ravb_rx_csum_gbeth() with the
+> wrong skb for a packet which spans multiple descriptors. To fix this,
+> use the correct skb.
+> 
+> Fixes: c2da9408579d ("ravb: Add Rx checksum offload support for GbEth")
+> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
 
-I have a patch that addresses one of the issues I saw on these tests
-and currently working on another patch. I suggest we disable rst-ipv*
-tests on Monday if I don't finish the patch set by Monday.
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-Thanks and excuses for the delay: my work laptop was running linux
-and that was not fitting into corporate policy of having enterprise
-spy software. So, I had to urgently find a new machine for
-contributing and sending patches.
+[...]
 
--- 
-             Dmitry
+MBR, Sergey
 
