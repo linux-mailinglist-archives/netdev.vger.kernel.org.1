@@ -1,160 +1,195 @@
-Return-Path: <netdev+bounces-86926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35F9C8A0CE3
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:57:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECF488A0D26
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:00:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA1911F22CAE
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:57:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C5A61C212DB
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C9614535A;
-	Thu, 11 Apr 2024 09:56:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7498145323;
+	Thu, 11 Apr 2024 10:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CVVvhwES"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZlB7w+A0"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 848E11422C4;
-	Thu, 11 Apr 2024 09:56:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2FFE2EAE5
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 10:00:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712829414; cv=none; b=TW33NRQJi1EinsRF/B6EaT4Q/1iVG7vHOLK65TTeFjxm9vBdWyuapuep4TJzAd4nO5HPOhA44Kj6uS56va2BCJiCgTfhFo5p17qdhQQxnC0KJFkQgCiynsmXJoXULDCYTLFY2x1vlBwHIq1b0k6kw66x+UUjVJsw/RfYkN4QfzY=
+	t=1712829650; cv=none; b=eYrvPotdc84Nq2Xl9F50yVaMp/L2pfC61iNSdFB1ppvSEuAXX2rG2ODbWg3xm3vU76v/i7BT/HzkD9lYwHggADD8k5hChEqLbTrk81u2cxVPgsqExXD6cTwP/H30ovOeI8dZR6Gd2enjVF+plkAwbiy1SjaQ3ak5gA0PrCsyGBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712829414; c=relaxed/simple;
-	bh=JisuNm5PdnQhqJTAX4I/4V5ER0EyXTdv9Mbeyuz+wzs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MRRcGn+7KxCKfaq38Myd1FKUtXPdeVCAZYr0Kd94mip4E9NrOwGKiG7IyUBLFhL1luPZMVhMXzpv9hg4uoM6nDegEGZ3b8EszdyYu17Nck4/K2adp7q7o8uK0gWuu+tHCH6qasyw/uolgCAQ4Jc5YYmryf5jPu1vmUg2Ssh8mT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CVVvhwES; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1712829408; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=vFOgTq/QwRApttd5rEXmIKzcIIfmxDlVKZH9cKLJh2c=;
-	b=CVVvhwESLa/fTADWCYVzrZtFcIG/CVK02VPgsv0U2oPu//XKfNFJ8cvFnCUoTbFyrVMsH7FiNF5Uz2q2tmf+u6wHJV2CPPrTIBkvsoQigfiLrqUmtrhVjidzrD05+8r/ldyTP8Zo95E/Xiudzwr9APOckAZ3VKdxV3PSfwj0UqM=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R831e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0W4KqBTo_1712829406;
-Received: from 30.221.130.208(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W4KqBTo_1712829406)
-          by smtp.aliyun-inc.com;
-          Thu, 11 Apr 2024 17:56:47 +0800
-Message-ID: <71fd5cae-b4d0-42c5-b03f-bf4e35301ebb@linux.alibaba.com>
-Date: Thu, 11 Apr 2024 17:56:45 +0800
+	s=arc-20240116; t=1712829650; c=relaxed/simple;
+	bh=3EmwNd2x+X34BSWGzOFdFW4U4J1q0hSXrmCHKXd9PRo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=kRtFCVwLqaUMKIap2zc84nte7Gw1oAMsu7B+s8h/tikYODAbmGY814ePVyr14bUe01R9LH7FCHT71GQ3vpjWqnNhNQf8p1OMLRD0cYPuaq/+wGfw7T3v9b5xIByD7V4qq4qnPDpJ/FVXM0lW44aOf9XSkt/EsBke+S4QsROCjNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZlB7w+A0; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-56e37503115so5806623a12.1
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 03:00:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712829647; x=1713434447; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GOdB4x8afbnVlYVCM2wbaCRzbxId+WgzI5n5to5Qn6M=;
+        b=ZlB7w+A0r9tdNCuZIHqyMsiP3IMsk7LmGzbmmfA7pwcV42vNeybPSdKK/nikFnI8PF
+         CesjvJkviK2/bOWJZIveBqaKTv0TV2eVUeoNr4yWPqwIu+QzhwvBs0haQwB9oirmMtYI
+         1GQ9Zfwv8SYwO9jihxH00BSeH3XX9bhZ+BEsd/h/ox1dQi5NS1Q13dh365U1v/r1MOlf
+         HkZurIKFZqDvXruttGh0mPNMBfM2tKnPtqNvyOunr5twHhoIWRxwJR23+KlgjYgvBxSd
+         7pG8CDDMJ/Hwx3PLqyln7dWAsMwTmLYmM2jz40MxzP/Zp5fGj+WV/+Y4XTFFRXt0D/mI
+         RwVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712829647; x=1713434447;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GOdB4x8afbnVlYVCM2wbaCRzbxId+WgzI5n5to5Qn6M=;
+        b=XWBdWmIrmLxM0nDgYd+Pfg+q585J5IshN5rlhPxAxNwsjhGN11VI+kqYPz3ysbqxwl
+         zB+NWObbppVe1nB8QynvN/EnAIiTszhuCG4hXEjRKtdkW1BOTkmSxXN71mS38pZ8zMKb
+         BY7ZQwtd3dHsqTYPco69mNLenccjg8tDB/HZEGs3VRc7MBULMvA/c9t1Sq8rwHaSlmKI
+         1b627bpUyFbdj0eIoyHMwluOV+63w/5CJkEa8M24McvPk3UWRhz8hAvdlIrZ7F0oTqnl
+         7/jwyXKa1GN44WC/HRlGVpJUaCOiTyfXJSs+e8bGeoZDtZa/xRlrYgFgCixy7RhH+JMN
+         5wDw==
+X-Forwarded-Encrypted: i=1; AJvYcCWbgxh6SvqiO/HIwxFAW7t3sBI4mCVrX+y9Kt9LADVAoXqO7l1efBVPSlv1FlMuQJD8FoDL/odyoKMld15yoPZOjLvEGHAD
+X-Gm-Message-State: AOJu0YyYTwF0hJjUeEDBxKQH60Q+UrEwFoAeeMlvxt54xir8BVyKe4EW
+	yPtIZ3GMXiVN8d0fvgqbuDXmy0JWsa1sjp1HFKS98Z0Ll1e9hg0gQqcMI1xZpi5ZqjSxnzG+A8K
+	EVwEh9xh3cFWWG6h1PN1Ye5tJ3ME=
+X-Google-Smtp-Source: AGHT+IGN5e1TtN3ujvsVdXPCw6YArdN4+GZpOAb428Jybeitg709LBNMDGHxcwQh6V07m3mXIDQ6gbTYbhMAmYbe0EQ=
+X-Received: by 2002:a17:906:b2d8:b0:a4e:a7a:84e0 with SMTP id
+ cf24-20020a170906b2d800b00a4e0a7a84e0mr3018903ejb.34.1712829646940; Thu, 11
+ Apr 2024 03:00:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v5 00/11] net/smc: SMC intra-OS shortcut with
- loopback-ism
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
- jaka@linux.ibm.com
-Cc: wintera@linux.ibm.com, twinkler@linux.ibm.com, hca@linux.ibm.com,
- gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
- tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org
-References: <20240324135522.108564-1-guwen@linux.alibaba.com>
- <ae3ea4bc-4a9c-416e-a593-2885fea96ae5@linux.alibaba.com>
- <27deaa5dbb30c467fcdaa0667ef39da86bcee03f.camel@linux.ibm.com>
- <fc274220-cb6e-43be-aa76-69e37449e535@linux.alibaba.com>
- <ddd181fc-307f-4c2f-bc9b-6941a17f16d9@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <ddd181fc-307f-4c2f-bc9b-6941a17f16d9@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240411032450.51649-1-kerneljasonxing@gmail.com>
+ <CANn89i+2XdNxYHFNwC5LHupT3je1EaZXMxMJG9343ZO9vCzAsg@mail.gmail.com>
+ <CAL+tcoC2FW2_xp==NKATKi_QW2N2ZTB1UVPadUyECgYxV9jXRQ@mail.gmail.com>
+ <CANn89i+6gWXDpnwM9aFtP_d_oTfQRDJdu+VMoDtvVcDrzBM_JA@mail.gmail.com>
+ <CAL+tcoAZYeFsoPEFvWSFUTezofpkvwzggJd9zp81yTAy4PVOpw@mail.gmail.com> <fe6f2325-7454-413e-acba-b3c5f3313dfe@intel.com>
+In-Reply-To: <fe6f2325-7454-413e-acba-b3c5f3313dfe@intel.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 11 Apr 2024 18:00:09 +0800
+Message-ID: <CAL+tcoAf1FyqEsM-u-shGaE2FUQO_di6e63md_DYmFLWxXe3ew@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: save some cycles when doing skb_attempt_defer_free()
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Eric Dumazet <edumazet@google.com>, pablo@netfilter.org, kuba@kernel.org, 
+	pabeni@redhat.com, davem@davemloft.net, horms@kernel.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Apr 11, 2024 at 5:13=E2=80=AFPM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> From: Jason Xing <kerneljasonxing@gmail.com>
+> Date: Thu, 11 Apr 2024 15:31:23 +0800
+>
+> > On Thu, Apr 11, 2024 at 3:12=E2=80=AFPM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> >>
+> >> On Thu, Apr 11, 2024 at 8:33=E2=80=AFAM Jason Xing <kerneljasonxing@gm=
+ail.com> wrote:
+> >>>
+> >>> On Thu, Apr 11, 2024 at 1:27=E2=80=AFPM Eric Dumazet <edumazet@google=
+.com> wrote:
+> >>>>
+> >>>> On Thu, Apr 11, 2024 at 5:25=E2=80=AFAM Jason Xing <kerneljasonxing@=
+gmail.com> wrote:
+> >>>>>
+> >>>>> From: Jason Xing <kernelxing@tencent.com>
+> >>>>>
+> >>>>> Normally, we don't face these two exceptions very often meanwhile
+> >>>>> we have some chance to meet the condition where the current cpu id
+> >>>>> is the same as skb->alloc_cpu.
+> >>>>>
+> >>>>> One simple test that can help us see the frequency of this statemen=
+t
+> >>>>> 'cpu =3D=3D raw_smp_processor_id()':
+> >>>>> 1. running iperf -s and iperf -c [ip] -P [MAX CPU]
+> >>>>> 2. using BPF to capture skb_attempt_defer_free()
+> >>>>>
+> >>>>> I can see around 4% chance that happens to satisfy the statement.
+> >>>>> So moving this statement at the beginning can save some cycles in
+> >>>>> most cases.
+> >>>>>
+> >>>>> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> >>>>> ---
+> >>>>>  net/core/skbuff.c | 4 ++--
+> >>>>>  1 file changed, 2 insertions(+), 2 deletions(-)
+> >>>>>
+> >>>>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> >>>>> index ab970ded8a7b..b4f252dc91fb 100644
+> >>>>> --- a/net/core/skbuff.c
+> >>>>> +++ b/net/core/skbuff.c
+> >>>>> @@ -7002,9 +7002,9 @@ void skb_attempt_defer_free(struct sk_buff *s=
+kb)
+> >>>>>         unsigned int defer_max;
+> >>>>>         bool kick;
+> >>>>>
+> >>>>> -       if (WARN_ON_ONCE(cpu >=3D nr_cpu_ids) ||
+> >>>>> +       if (cpu =3D=3D raw_smp_processor_id() ||
+> >>>>>             !cpu_online(cpu) ||
+> >>>>> -           cpu =3D=3D raw_smp_processor_id()) {
+> >>>>> +           WARN_ON_ONCE(cpu >=3D nr_cpu_ids)) {
+> >>>>>  nodefer:       kfree_skb_napi_cache(skb);
+> >>>>>                 return;
+> >>>>>         }
+> >>>>
+> >>>> Wrong patch.
+> >>>>
+> >>>> cpu_online(X) is undefined and might crash if X is out of bounds on =
+CONFIG_SMP=3Dy
+> >>>
+> >>> Even if skb->alloc_cpu is larger than nr_cpu_ids, I don't know why th=
+e
+> >>> integer test statement could cause crashing the kernel. It's just a
+> >>> simple comparison. And if the statement is true,
+> >>> raw_smp_processor_id() can guarantee the validation, right?
+> >>
+> >> Please read again the code you wrote, or run it with skb->alloc_cpu
+> >> being set to 45000 on a full DEBUG kernel.
+> >>
+> >> You are focusing on skb->alloc_cpu =3D=3D raw_smp_processor_id(), I am
+> >> focusing on what happens
+> >> when this condition is not true.
+> >
+> > Sorry. My bad. I put the wrong order of '!cpu_online(cpu)' and 'cpu >=
+=3D
+> > nr_cpu_ids'. I didn't consider the out-of-bound issue. I should have
+> > done more checks :(
+> >
+> > The correct patch should be:
+> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > index ab970ded8a7b..6dc577a3ea6a 100644
+> > --- a/net/core/skbuff.c
+> > +++ b/net/core/skbuff.c
+> > @@ -7002,9 +7002,9 @@ void skb_attempt_defer_free(struct sk_buff *skb)
+> >         unsigned int defer_max;
+> >         bool kick;
+> >
+> > -       if (WARN_ON_ONCE(cpu >=3D nr_cpu_ids) ||
+> > -           !cpu_online(cpu) ||
+> > -           cpu =3D=3D raw_smp_processor_id()) {
+> > +       if (cpu =3D=3D raw_smp_processor_id() ||
+> > +           WARN_ON_ONCE(cpu >=3D nr_cpu_ids) ||
+> > +           !cpu_online(cpu)) {
+>
+> This one looks good to me.
+> Feel free to add
+>
+> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+>
+> To your v2 before sending.
 
-
-On 2024/4/11 17:32, Wenjia Zhang wrote:
-> 
-> 
-> On 11.04.24 09:45, Wen Gu wrote:
->>
->>
->> On 2024/4/3 19:10, Gerd Bayer wrote:
->>> On Wed, 2024-04-03 at 14:35 +0800, Wen Gu wrote:
->>>>
->>>>
->>>> On 2024/3/24 21:55, Wen Gu wrote:
->>>>> This patch set acts as the second part of the new version of [1]
->>>>> (The first
->>>>> part can be referred from [2]), the updated things of this version
->>>>> are listed
->>>>> at the end.
->>>>
->>>>> Change log:
->>>>>
->>>>> RFC v5->RFC v4:
->>>>> - Patch #2: minor changes in description of config SMC_LO and
->>>>> comments.
->>>>> - Patch #10: minor changes in comments and
->>>>> if(smc_ism_support_dmb_nocopy())
->>>>>     check in smcd_cdc_msg_send().
->>>>> - Patch #3: change smc_lo_generate_id() to smc_lo_generate_ids()
->>>>> and SMC_LO_CHID
->>>>>     to SMC_LO_RESERVED_CHID.
->>>>> - Patch #5: memcpy while holding the ldev->dmb_ht_lock.
->>>>> - Some expression changes in commit logs.
->>>>>
->>>>
->>>> Hi, Jan. Do you have any comments on this version and should I post a
->>>> new patch series without 'RFC'? Thank you.
->>>
->>> Hi Wen,
->>>
->>> Jan has been out sick for a little while now, and Wenjia is expected
->>> back from a longer vacation tomorrow. So if you could hold off until
->>> begin of next week, Wenjia might have some more feedback.
->>>
->>> In the meantime, I'm looking at your patchset...
->>>
->>> Thank you, Gerd
->>>
->>
->> Hi Gerd, is there any further information? I am wondering if I
->> should wait for more feedback from SMC maintainers. Thanks!
->>
->>
->> Hi Wenjia, when it's convenient for you, could you please confirm
->> if [1] and [2] need to be included in the next version? Thanks!
->>
->> [1] https://lore.kernel.org/netdev/7291dd1b2d16fd9bbd90988ac5bcc3a46d17e3f4.camel@linux.ibm.com/
->> [2] https://lore.kernel.org/netdev/60b4aec0b4bf4474d651b653c86c280dafc4518a.camel@linux.ibm.com/
->>
-> 
-> Hi Wen,
-> 
-> I'm just back, thank you for the patience!
-> 
-> Firstly I want to thank Gerd and Niklas for review and bringing up these points!
-> 
-> Here are some of my options on that:
-> 
-> To [1]:
-> I agree to document the ops as otional if it must not be supported. Since I don't really have any ideas, the 
-> classification souds reasonable to me. Going to the details, what about to take following options as mandatory:
-> 
-> * query_remote_gid()
-> * register_dmb()/unregister_dmb()
-> * move_data() : I do see the necessary here.
-> * get_local_gid()
-> * get_chid()
-> * get_dev()
-> 
-> To [2]:
-> I also agree to keep the ism-loopback at the very beginning of the List. That acting is also what I imaged previously. 
-> Thank you, gerd, again for testing it and find it out!
-> 
-> Thanks,
-> Wenjia
-
-Hi Wenjia, welcome back! :)
-
-OK, then I will take these in my next version. Thank you all!
+Thanks! I will:)
 
