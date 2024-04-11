@@ -1,268 +1,446 @@
-Return-Path: <netdev+bounces-86983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 869B48A138E
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 13:49:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 529268A1398
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 13:52:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F0BE282547
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:49:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0749D281A12
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 765F7146A72;
-	Thu, 11 Apr 2024 11:49:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05ED61482E7;
+	Thu, 11 Apr 2024 11:52:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H9JxlSQb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c9jzayBD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE541147C9D;
-	Thu, 11 Apr 2024 11:49:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712836162; cv=fail; b=pfOYQbWV868o7JBOok96IDqW1vgftEHEWYKlcMAIk/0KoHMxaY6ua7rzwXsQqqY/CFkiDlk+Ejw9K63ncS4LwwNkoHWB5WmLm+p8kCm367gbyThHbCms+MdkyrE9K7CLWjoF5SuDuSHAV8f+NQEG0qNDgPyj8GQ0ZBlb5Nt4ioM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712836162; c=relaxed/simple;
-	bh=WsGEYFc/TsB1FjBvMuyJlS7pBFt/W4/WvV5oRTC95YY=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=hPRWcLIfYGjs+zp8hzvPxhQ+N/fAZR1Kakb6H2Xt6UhWKn79n+oQaBPJOCgM5mVhlVwvrIQ5tjU/DHhmK33t0BPlkHSLoetTV5jdFslluqCgStKM+HkSJFyaR4Li6eLBR6WIFD2DOgHwukF6bClYxPWboLmJGtD3AZJd08MKpYs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H9JxlSQb; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712836161; x=1744372161;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=WsGEYFc/TsB1FjBvMuyJlS7pBFt/W4/WvV5oRTC95YY=;
-  b=H9JxlSQbCoQ9k4nKwAsriksg3bQ0Cz1CtBWSCMnQPG+MkO4hoSBfWAwE
-   MLjk++d/GB3hrdPeiTIv70P6iQ3YwOX78HTiS61VKw8vWFOApLGGMt53R
-   SJ7pT09WJsA1Up04/Z0XF7UQ225g2Kmv9YaaWRPjAA++wp5skUfyR+1Ra
-   oUbG5UVqIJOPxgYw93xXwOBYDVaJsdwnHKr6miFWevEb32sllLv7ul+SK
-   kOx1meAUBsCECLNG2+GOjC8zUPE84Xtc046vb6NTeCmip1XfuUUpVpOm8
-   QNkKyyV8p7qymeuiyPrzRenFhzdq60y9yU6FqV4NwmbQVoqcgGQ36t4Pu
-   Q==;
-X-CSE-ConnectionGUID: 612A3UZST+CfxlKYb7hsMQ==
-X-CSE-MsgGUID: O2jQ/dK7Qhqo+l1c1+nHsQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="33638922"
-X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
-   d="scan'208";a="33638922"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 04:49:14 -0700
-X-CSE-ConnectionGUID: wi4jbjJrRsyMx8XrwW0vaQ==
-X-CSE-MsgGUID: l14mFjt2T+e6xemIVj0jFw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
-   d="scan'208";a="20923559"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Apr 2024 04:49:10 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 11 Apr 2024 04:49:10 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 11 Apr 2024 04:49:09 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 11 Apr 2024 04:49:09 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.168)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 11 Apr 2024 04:49:09 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GMfPMZHRP7bv8YRB38GNENYa/O1kZBXjXGXQiNUILkurt54sg9meQOxxSUxUXHFJvHh4RZk1+I/vEa+7TzNeSjsn0x0hhm4ulIDCXQFjeYDUwy/q9LP5NO6ruSQ6brjWzP/J8+N67LZcMTRWjzZPFAs/fgYk/5oUb+696By7BungxIQRZJVomAluxJjNIcQXqCfIVY2M45XW1iV8kdvaj8hkbWNAsZxyU5DyDbbBb6geUgrUSlGc22F4H64NJ8UzQU/8NKmkS09MQK6jae4rmrj8TL8N15fxP7tttS3TkEm3UIXr9l+teD7CNM6vd5d2tAu1vvZqPmwijvQAaWKjeQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=59tTlb6bQ5YX67R+99b1MsEu/4aVcLEvgdxTNK7jvsI=;
- b=m+Z5wwGyZYOSehS/aUW+fO7qs99bxwWKBgrwGhdNih8g1qNmoTRwDJcMDqckjfG9Y/Qw186UHFsbcvUvw5u5TekyCVUNXnOfUyeSXO58jFWyosBl7nm9qXK1OKEDkZhoLJwxZpj33S5/z4XsOxKnVXO++/unZ6q0s70A3z3T10ykdZ9x4w7dds6FV2LM/YqTXZ2ok2z9at8L24UoZFC6x/KCbce5j6+BoSLrwGTiVYsZxM7q6WGU83Dpentgj3iAL0JBaLAWVC0loq5896t2rcVjueTx7U9k/J3L88f0/rtLkeQph59dlYVuOmSyWfQV3hMekJVA/Y9hms/TPMXQ0Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by CH3PR11MB7841.namprd11.prod.outlook.com (2603:10b6:610:121::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7430.46; Thu, 11 Apr
- 2024 11:49:01 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::5c8:d560:c544:d9cf]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::5c8:d560:c544:d9cf%5]) with mapi id 15.20.7430.045; Thu, 11 Apr 2024
- 11:48:57 +0000
-Message-ID: <316aba6b-2384-4867-b634-89f9c07f03ca@intel.com>
-Date: Thu, 11 Apr 2024 13:48:52 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] kernel-doc: fix struct_group_tagged() parsing
-Content-Language: en-US
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-CC: Jonathan Corbet <corbet@lwn.net>, Kees Cook <keescook@chromium.org>, Jakub
- Kicinski <kuba@kernel.org>, Dan Williams <dan.j.williams@intel.com>, "Gustavo
- A. R. Silva" <gustavoars@kernel.org>, Keith Packard <keithp@keithp.com>,
-	<nex.sw.ncis.osdt.itp.upstreaming@intel.com>, <linux-doc@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240411093208.2483580-1-aleksander.lobakin@intel.com>
- <b9804c32-9ba2-493b-bfb8-a6ac4f108175@intel.com>
- <80d765f5-1436-4799-95fe-ba05c0681d5c@intel.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <80d765f5-1436-4799-95fe-ba05c0681d5c@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: DUZPR01CA0350.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b8::22) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5ACB149C75;
+	Thu, 11 Apr 2024 11:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712836325; cv=none; b=mTv5FUdD18CvwDOCJLVUFgEsP5aEhwGCU9WpnF62eUzzdS88Bl7mkik288bCRot4O0h/ffjLQ/Qf57e4yuDnGUmHiyH4rTQMlugU2SYUrGoUOrnEjZw0r8j0BP33Q0AIHZhv7ciBO7FusffWKyPd4wppIgumGoafJUKpCCtlWl4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712836325; c=relaxed/simple;
+	bh=xW+C0nLGdF1fVGE2nxaH6HMCF/ySvZeEiDwNGzVSC88=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m7lUdYWeL03xnxovykAw85v2d9N58rvV8mqdEuH5w1s5yiE5QKcNLNKH+kPEzq6ma0g673YyQgMVXXujySAEeOPUQ378jYTGy1PHZRW32QGGjswecZeS4j1voJ1HAmbVlclrsHhEnZypymOQXGAsqFGeK1R+xgmlUdnYhMHJdmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c9jzayBD; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-343bccc0b2cso5511783f8f.1;
+        Thu, 11 Apr 2024 04:52:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712836322; x=1713441122; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=eVVZ1nJPbPp+vosTyb5RL8BqBGaUyiZ4311MXvuW50s=;
+        b=c9jzayBD77PrcuqJVdsNZnS3OynhcmSvkIbLlr7AAIegcHlNpx90AkvX7BecNrliUt
+         W7ZxUzshKUCUhPLNBIQeNhSeuViBrHVDeShXY5UUTHH0ZBVNQhogkFFClrIKE8JOvzYZ
+         m6e9ApnNqTLTyDRt3CofHa4xMkLKVwVCKkcQUcAfnOSRLSRjk0d1m9mrJcwl6j12n42j
+         AQJKUOlU+K1uuVemb8jveK4b9wXBDdkM3kqiXQbChV4vzgoUy2Fl1o4EHPk3uqDRYAZR
+         y+tkjTR3LF3+OFrGeonuI32HT9r75oNYfGtT3+mEVYdP1JuBBXbigUxqCcIZt4AmqHi0
+         1Kiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712836322; x=1713441122;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eVVZ1nJPbPp+vosTyb5RL8BqBGaUyiZ4311MXvuW50s=;
+        b=nn88q5GqZm3hSalFQS8DB0d7G98m1QWDKHR9zDw27GdLsDATRrQBqN+AOQp+7W1c38
+         JGdOgqG0yQ0u/HDWyW3EsVvzJlSPgLnaBXBnmfmqH1/PqUWovMgdm83eVZ9t6CZxi3ap
+         rgrN9ILd8mk/PuqJS61kCZJRS5lLn49lvu6xvoKrl6VwFqRujN6ep6MkfN7tp+uktsVF
+         VA97JNxw4yYWrOYLoF2Ux8PdzmUdQFllwcJe0G9FUPq3yuyUW3YDWAq9j+oaPO+QbeWA
+         IGj8uuZ9iYGGLdVN9ti/mU/QrfOF1IOn8kb1eMVxsqBUOvRExhh+i0B3AAOhbpVxHjDk
+         HFSA==
+X-Forwarded-Encrypted: i=1; AJvYcCVgaJg05KOR8MtHrba9tywiYyQv1/Z+xvosUmAj0nTwxS/UtPH7yMn93rU+kSIJYcO/Yj5ufK6HsERebZm4NqdEMXwDDll1DRBwHYU6MOmxPBkFWDruAR5UoB+YL8jr34MZOgkd
+X-Gm-Message-State: AOJu0Yw2nTxhQLAfO9/rUU+FztrbesdKba6//D4gseWYs45LtonfJ8tY
+	5uyzDZGMs6USX2We+LkRgjf4S/55gIt9BpNhHMjyD1RDgsM/LTpk
+X-Google-Smtp-Source: AGHT+IHCtjjN+UKNA7X+7raKMOxDPzARjrUaq5ESZh+KWpurNxlVHTyNOmKd1RKW2iW6fSLPGzDR6g==
+X-Received: by 2002:adf:e488:0:b0:33e:bc7e:cadb with SMTP id i8-20020adfe488000000b0033ebc7ecadbmr3685433wrm.41.1712836321836;
+        Thu, 11 Apr 2024 04:52:01 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d201:1f00::b2c])
+        by smtp.gmail.com with ESMTPSA id ea15-20020a0560000ecf00b003438cc1d2b4sm1604472wrb.59.2024.04.11.04.52.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Apr 2024 04:52:01 -0700 (PDT)
+Date: Thu, 11 Apr 2024 14:51:58 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	UNGLinuxDriver@microchip.com, David Ahern <dsahern@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	=?utf-8?B?U8O4cmVu?= Andersen <san@skov.dk>
+Subject: Re: [PATCH net-next v6 3/9] net: add IEEE 802.1q specific helpers
+Message-ID: <20240411115158.5yxug7u3gtyvyuxh@skbuf>
+References: <20240410080556.1241048-1-o.rempel@pengutronix.de>
+ <20240410080556.1241048-1-o.rempel@pengutronix.de>
+ <20240410080556.1241048-4-o.rempel@pengutronix.de>
+ <20240410080556.1241048-4-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|CH3PR11MB7841:EE_
-X-MS-Office365-Filtering-Correlation-Id: 993930b7-203f-407d-79d9-08dc5a1d5f06
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 5uImcFCSbhx7zvaLTTIGRQ+ooFr/Ip0i+pT3zf4qv9ASbfTQHWxECUyf1ZGqtzyPPfcsbE5MhfAWQ4uvqCNXJDNtN0L7wG3PFK42X3N5W/4sFKMtwNW7ggQMyaZV/566/jrWLN/VQ1euufxfMgLLOqMuhtK9J1NCV7ahN78eO7kincXX2dc7PLbmqXr0488B0RWkE09lh9swBW2Jlnvpo3JifwuSb/nwTuKAhm16XdAvF8Law8LJl1AaecXLb2aXRWvm586AEtUKD92man+nfVne8mxXgB48YXy4ASR6WCJEJj6DCzmGqe3+S1eTjJOyPzkfxWDQAMIjDh985xPsPQQHiYzexsWc0sGFXRAXNs3W/ZEvBDMBs1VKpaNn0NQCbKAvsxY4yQk2bJh07SrUeoGBphxY33OEd8P8sKjaxdo6dzUE7xoR3PXJAknCFGAEquM8d+5XeEg6SQcD/yCqJibi8oHx5Jo0hDehB0py6+NZuNn3MslG12tWyWgHAP4afftPSDwKehjknEOIgfXyuA/5uOHaOgW2bQZBi/TgQTFIFuidpIhxPoFzKDpYu3dq2zAIoKyl5g6Q7V+wo3zUcOdXuuSq5RSxhkiPAoU55B9DtI8QONMbMqaFKENq788jiLmdts+tJqU7YTj6P3Tw2IGLxDIklG96wspY8O8jxFE=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UktuL3NmVHRwa2dXL09xOGFKRndLTUx4UGpsbUp6UXMzaGV5d3FidFh4ckp6?=
- =?utf-8?B?M0o5N015aDg1VU1hTCtSVGhLYlRsYWt4WTd6K0JUZGs0eVkrQ3hhVGxOWVJr?=
- =?utf-8?B?WnZEOGtJQklBdXlPaG8xZlpXK0phekI1RHpRQjlLTFdncVJYaGhubFB4eXVn?=
- =?utf-8?B?czNqd3RMRVhYTjUvaGg3TmhqVEdQdklxZE9yb2EyTVBwejlPaXpnTUFnbkZo?=
- =?utf-8?B?L2NEbDhBSjVFNXVyeFhXZGRvczlhV1hQek1kREV2M0tSODlUSFpSWk5tQ09i?=
- =?utf-8?B?YkxSTU1BQkdUSSs5WWpwQlpnWnVsQklTcGhCaCtnT1gwd3RrcHh0Yk1BWUdz?=
- =?utf-8?B?NWVVRjhIeXcwdHNidmVTZHhwWHI2YTU5MWVjVmZGWlNnSmxVNm9IYWMwbW1N?=
- =?utf-8?B?QWhwTHVjdVRLL3dlbTNkMXZqTzlHN2I0Tk5XeEh5Q2IyNGFDWU1kZ0dzSkFL?=
- =?utf-8?B?Yi9MYjMxbCtvc0JtbFlTTmZ4QlNZMHRYTUEvTTlrYURnZHY4a2R4c09lRE9D?=
- =?utf-8?B?WVppS0VmT1pPYXZLUnVuQ3gyNm9nTEdiNWlxK3dNRXJ4UGhnRzd1d1l1RC9S?=
- =?utf-8?B?aEw3NUw2LzVRb2E2U1BiRThoRkNKMmltY25YQjllSGR1K0hpYk91cXRTWEdh?=
- =?utf-8?B?STVua1hoaWtDM21kbUxlM2pvVDdPL3pjOFExMGtIZ3FNZVJpVGRaeU5uM1JN?=
- =?utf-8?B?OXVSNmR4NjRtTXgxZ2psWXl1SjY3RlpqcWhCQ0swMm5CSmt0aUN0d1ZWWWkw?=
- =?utf-8?B?MlVzOG1YQU9GcGhreDRROXV4cDM1bERBU3Q4SkdMTDF2N003R0Izd0xNb1hM?=
- =?utf-8?B?WE1EdDdHTDhxL09yQUMrbit0ZldrV0pNU2JhL1JKVGpuR1dxbjR0RzVYZmNC?=
- =?utf-8?B?NzhXQ1RUa3NRWWtsQVBwQWg4aklMSzdhaSt5VU5HTFFOTk51Qm1hNlBRZ3ds?=
- =?utf-8?B?NE93ckFoWVVKcnV2ZXpKRGFJN1pEZ1RQejJwVHRYNjM4ai9ZSzVYdkhJNkk4?=
- =?utf-8?B?bHdnVjByZjNJZ000b1NMK3dWWDRqTU9Dam5JT1l3andjTjYyOFpHZG1mT3pZ?=
- =?utf-8?B?VERCQWlQRG4rV1VDbC9uK2trNEs0eWYyZ0JHdFNWdTBYUnl2SzJMbjE5NFJD?=
- =?utf-8?B?cjAwdVNmVzJ6aGo3cExuWW1iejdUbmNwZHVpQWdoYXF4d3ZoeTFmZmRyS1po?=
- =?utf-8?B?Ry81bjI4c3BRN2gvbVEzaC95UWVHc0tOV0tvQ1NkNU0zR3Z4WC9La014bzNL?=
- =?utf-8?B?aUZZM2V6OTMvSnppdjZzK0VtaHRwQTAvV2I2ZDQvYTd5aG1ITmY0UGhaeS92?=
- =?utf-8?B?RFdmTXhLTWVBN1k0NVdXSVBNMVNhR3ljQTBxaWtydm9ldk5ESW9QRko0dENy?=
- =?utf-8?B?cXJpdDNEMXhtR2wyNDhNdGhTTXEycThSb3hjTkNxUkdPT0hMZTZjTG1zTWRk?=
- =?utf-8?B?KzBieGtHdDlxcC8zc2lpdVc2dzYwWUZVcVNvM1F0TEp0dkpMQ0szMThNNFVC?=
- =?utf-8?B?VFZqeURmUWRxbmpvN3QvdzlySEFReGxTMDU4UjJKZ3huVGZ6L3FUdFA3U0Qv?=
- =?utf-8?B?VWo3bGxtbTZCUGFRUFR6aTkrT1BoOWVIbFQxbFBsckt5a1dUYXE2ZWxUWUxD?=
- =?utf-8?B?azg2WE5CTkFyd1h5MWxNSWU5aTRTYktxcVI1QUIxMkMwRU5KQTdJVW0wY1g2?=
- =?utf-8?B?LzVSZ3BlSXNNTGUwNDBVUFUvMEVHL2RacDB6N08ycSsxWjVWYWNIb3Nra2NY?=
- =?utf-8?B?VjJsZ214TEppaTJQWi9TQitWV3kzRGRoSmI4OWdpUDllVEp5NHVSL01zRGlB?=
- =?utf-8?B?cXpRUWI2Rk5sUVNDWmpOWWhNOEZLRmpsRzVaNGF1WXlIaVVZczRrY1ZXMDZs?=
- =?utf-8?B?VFMvSjhEZDhubWRMS0RIRHBQVkxmVjNyQTdvQmdXMm5mcHFqLzBqTnF1eVEv?=
- =?utf-8?B?WFVpbXdUSXZCVGdYSjVyQnRFYWhRT1B0aFdMSlpjMEczU2ZqTEZFZTI2eExL?=
- =?utf-8?B?ZTRNZXBoeUs3c01LQjVERVM1dVhvMVI4REdtdkJPZnBUS3FGMW1mV1MxRm0r?=
- =?utf-8?B?WERlK2QxZks3VGF5SFo1czRrV2F2QWJteWVyT2RoekNPUTJlRHl5WTlBOUZD?=
- =?utf-8?B?bGdDQWdlYVVLM21Edkl3OWV3cGhvaG94WHUwQnNPeXo4VWdrU29vaXdoeGNI?=
- =?utf-8?Q?k7i9YOvZDaKfvdD6XsEGd48=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 993930b7-203f-407d-79d9-08dc5a1d5f06
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2024 11:48:57.6122
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: icqVYj6bJgTbEdc80+2i/tLLrJBedsq1lFo4ozO9FNYA4EzLYykO8rTEXER/eBSXCdsmccrp5yK9v8xEXxIuTjqT8aDq2Omi4h97fd8gf9g=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7841
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240410080556.1241048-4-o.rempel@pengutronix.de>
+ <20240410080556.1241048-4-o.rempel@pengutronix.de>
 
-On 4/11/24 13:14, Alexander Lobakin wrote:
-> From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Date: Thu, 11 Apr 2024 13:14:20 +0200
+I have the following comments already written; sending the email mainly
+to close the window. All of these comments are guarded by a big:
+"I'm not sure if this really belongs in the kernel." Anyway, here goes.
+
+On Wed, Apr 10, 2024 at 10:05:50AM +0200, Oleksij Rempel wrote:
+> IEEE 802.1q specification provides recommendation and examples which can
+> be used as good default values for different drivers.
 > 
->> On 4/11/24 11:32, Alexander Lobakin wrote:
->>> From: Kees Cook <keescook@chromium.org>
->>>
->>> kernel-doc emits a warning on struct_group_tagged() if you describe your
->>> struct group member:
->>>
->>> include/net/libeth/rx.h:69: warning: Excess struct member 'fp'
->>> description in 'libeth_fq'
->>>
->>> The code:
->>>
->>> /**
->>>    * struct libeth_fq - structure representing a buffer queue
->>>    * @fp: hotpath part of the structure
->>>    * @pp: &page_pool for buffer management
->>> [...]
->>>    */
->>> struct libeth_fq {
->>>      struct_group_tagged(libeth_fq_fp, fp,
->>>          struct page_pool    *pp;
->>> [...]
->>>      );
->>>
->>> When a struct_group_tagged() is encountered, we need to build a
->>> `struct TAG NAME;` from it, so that it will be treated as a valid
->>> embedded struct.
->>> Decouple the regex and do the replacement there. As far as I can see,
->>> this doesn't produce any new warnings on the current mainline tree.
->>>
->>> Reported-by: Jakub Kicinski <kuba@kernel.org>
->>> Closes: https://lore.kernel.org/netdev/20240405212513.0d189968@kernel.org
->>> Fixes: 50d7bd38c3aa ("stddef: Introduce struct_group() helper macro")
->>> Signed-off-by: Kees Cook <keescook@chromium.org>
->>> Co-developed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
->>> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
->>> ---
->>>    scripts/kernel-doc | 3 ++-
->>>    1 file changed, 2 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/scripts/kernel-doc b/scripts/kernel-doc
->>> index 43a30f2de513..01ac8f794b30 100755
->>> --- a/scripts/kernel-doc
->>> +++ b/scripts/kernel-doc
->>> @@ -1152,7 +1152,8 @@ sub dump_struct($$) {
->>>            # - first eat non-declaration parameters and rewrite for
->>> final match
->>>            # - then remove macro, outer parens, and trailing semicolon
->>>            $members =~ s/\bstruct_group\s*\(([^,]*,)/STRUCT_GROUP(/gos;
->>> -        $members =~
->>> s/\bstruct_group_(attr|tagged)\s*\(([^,]*,){2}/STRUCT_GROUP(/gos;
->>> +        $members =~
->>> s/\bstruct_group_attr\s*\(([^,]*,){2}/STRUCT_GROUP(/gos;
->>> +        $members =~
->>> s/\bstruct_group_tagged\s*\(([^,]*),([^,]*),/struct $1 $2;
->>> STRUCT_GROUP(/gos;
->>>            $members =~
->>> s/\b__struct_group\s*\(([^,]*,){3}/STRUCT_GROUP(/gos;
->>>            $members =~
->>> s/\bSTRUCT_GROUP(\(((?:(?>[^)(]+)|(?1))*)\))[^;]*;/$2/gos;
->>>    
->>
->> I would complain on code that matches `[^,]*` part with 0 characters,
->> meaning no tag for struct_group_tagged(), or no attrs for
->> struct_group_attrs(). In such cases simpler struct_group() call should
->> be suggested. However, that issue was presented prior to your patch.
+> This patch implements mapping examples documented in IEEE 802.1Q-2022 in
+> Annex I "I.3 Traffic type to traffic class mapping" and IETF DSCP naming
+> and mapping DSCP to Traffic Type inspired by RFC8325.
 > 
-> Rather a subject for checkpatch, not kernel-doc?
-
-Good point.
-
-But that reminds me that getting patches accepted into checkpatch is not
-possible for mere mortals :/ (exaggerating here, but just a little)
-
+> This helpers will be used in followup patches for dsa/microchip DCB
+> implementation.
 > 
->>
->> This is clearly an improvement, so:
->> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> 
-> Thanks!
-> Olek
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
+> diff --git a/include/net/ieee8021q.h b/include/net/ieee8021q.h
+> new file mode 100644
+> index 0000000000000..3bec7ec951362
+> --- /dev/null
+> +++ b/include/net/ieee8021q.h
+> @@ -0,0 +1,55 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* Copyright (c) 2024 Pengutronix, Oleksij Rempel <kernel@pengutronix.de> */
+> +
+> +#ifndef _NET_IEEE8021Q_H
+> +#define _NET_IEEE8021Q_H
+> +
+> +#include <linux/errno.h>
+> +
+> +/**
+> + * enum ieee8021q_traffic_type - 802.1Q traffic type priority values (802.1Q-2022)
+> + *
+> + * @IEEE8021Q_TT_BK: Background
+> + * @IEEE8021Q_TT_BE: Best Effort (default). According to 802.1Q-2022, BE is 0
+> + * but has higher priority than BK which is 1.
+> + * @IEEE8021Q_TT_EE: Excellent Effort
+> + * @IEEE8021Q_TT_CA: Critical Applications
+> + * @IEEE8021Q_TT_VI: Video, < 100 ms latency and jitter
+> + * @IEEE8021Q_TT_VO: Voice, < 10 ms latency and jitter
+> + * @IEEE8021Q_TT_IC: Internetwork Control
+> + * @IEEE8021Q_TT_NC: Network Control
 
+We get kernel-doc warnings about IEEE8021Q_TT_MAX not being documented.
+Simon also suggested to make it private, which I guess will work.
+
+> + */
+> +enum ieee8021q_traffic_type {
+> +	IEEE8021Q_TT_BK = 0,
+> +	IEEE8021Q_TT_BE = 1,
+> +	IEEE8021Q_TT_EE = 2,
+> +	IEEE8021Q_TT_CA = 3,
+> +	IEEE8021Q_TT_VI = 4,
+> +	IEEE8021Q_TT_VO = 5,
+> +	IEEE8021Q_TT_IC = 6,
+> +	IEEE8021Q_TT_NC = 7,
+> +
+> +	IEEE8021Q_TT_MAX,
+> +};
+> +
+> +#define SIMPLE_IETF_DSCP_TO_IEEE8021Q_TT(dscp)		((dscp >> 3) & 0x7)
+> +
+> +#if IS_ENABLED(CONFIG_NET_IEEE8021Q_HELPERS)
+> +
+> +int ietf_dscp_to_ieee8021q_tt(u8 dscp);
+> +int ieee8021q_tt_to_tc(unsigned int tt, unsigned int num_queues);
+> +
+> +#else
+> +
+> +static inline int ietf_dscp_to_ieee8021q_tt(int dscp)
+
+Function prototype differs when CONFIG_NET_IEEE8021Q_HELPERS is disabled
+and when it is enabled (u8 dscp vs int dscp).
+
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +static inline int ieee8021q_tt_to_tc(int tt, int num_queues)
+
+Same here (unsigned int tt vs int tt).
+
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+> +#endif
+> +#endif /* _NET_IEEE8021Q_H */
+> diff --git a/net/Kconfig b/net/Kconfig
+> index d5ab791f7afa2..f0a8692496ffa 100644
+> --- a/net/Kconfig
+> +++ b/net/Kconfig
+> @@ -452,6 +452,9 @@ config GRO_CELLS
+>  config SOCK_VALIDATE_XMIT
+>  	bool
+>  
+> +config NET_IEEE8021Q_HELPERS
+> +	bool
+> +
+>  config NET_SELFTESTS
+>  	def_tristate PHYLIB
+>  	depends on PHYLIB && INET
+> diff --git a/net/core/Makefile b/net/core/Makefile
+> index 21d6fbc7e884c..62be9aef25285 100644
+> --- a/net/core/Makefile
+> +++ b/net/core/Makefile
+> @@ -26,6 +26,7 @@ obj-$(CONFIG_NETPOLL) += netpoll.o
+>  obj-$(CONFIG_FIB_RULES) += fib_rules.o
+>  obj-$(CONFIG_TRACEPOINTS) += net-traces.o
+>  obj-$(CONFIG_NET_DROP_MONITOR) += drop_monitor.o
+> +obj-$(CONFIG_NET_IEEE8021Q_HELPERS) += ieee8021q_helpers.o
+>  obj-$(CONFIG_NET_SELFTESTS) += selftests.o
+>  obj-$(CONFIG_NETWORK_PHY_TIMESTAMPING) += timestamping.o
+>  obj-$(CONFIG_NET_PTP_CLASSIFY) += ptp_classifier.o
+> diff --git a/net/core/ieee8021q_helpers.c b/net/core/ieee8021q_helpers.c
+> new file mode 100644
+> index 0000000000000..74b42334746da
+> --- /dev/null
+> +++ b/net/core/ieee8021q_helpers.c
+> @@ -0,0 +1,208 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +// Copyright (c) 2024 Pengutronix, Oleksij Rempel <kernel@pengutronix.de>
+> +
+> +#include <linux/array_size.h>
+> +#include <linux/printk.h>
+> +#include <linux/types.h>
+> +#include <net/dscp.h>
+> +#include <net/ieee8021q.h>
+> +
+> +/* The following arrays map Traffic Types (TT) to traffic classes (TC) for
+> + * different number of queues as shown in the example provided by
+> + * IEEE 802.1Q-2022 in Annex I "I.3 Traffic type to traffic class mapping" and
+> + * Table I-1 "Traffic type to traffic class mapping".
+> + */
+> +static const u8 ieee8021q_8queue_tt_tc_map[] = {
+> +	[IEEE8021Q_TT_BK] = 0,
+> +	[IEEE8021Q_TT_BE] = 1,
+> +	[IEEE8021Q_TT_EE] = 2,
+> +	[IEEE8021Q_TT_CA] = 3,
+> +	[IEEE8021Q_TT_VI] = 4,
+> +	[IEEE8021Q_TT_VO] = 5,
+> +	[IEEE8021Q_TT_IC] = 6,
+> +	[IEEE8021Q_TT_NC] = 7,
+> +};
+> +
+> +static const u8 ieee8021q_7queue_tt_tc_map[] = {
+> +	[IEEE8021Q_TT_BK] = 0,
+> +	[IEEE8021Q_TT_BE] = 1,
+> +	[IEEE8021Q_TT_EE] = 2,
+> +	[IEEE8021Q_TT_CA] = 3,
+> +	[IEEE8021Q_TT_VI] = 4,	[IEEE8021Q_TT_VO] = 4,
+> +	[IEEE8021Q_TT_IC] = 5,
+> +	[IEEE8021Q_TT_NC] = 6,
+> +};
+> +
+> +static const u8 ieee8021q_6queue_tt_tc_map[] = {
+> +	[IEEE8021Q_TT_BK] = 0,
+> +	[IEEE8021Q_TT_BE] = 1,
+> +	[IEEE8021Q_TT_EE] = 2,	[IEEE8021Q_TT_CA] = 2,
+> +	[IEEE8021Q_TT_VI] = 3,	[IEEE8021Q_TT_VO] = 3,
+> +	[IEEE8021Q_TT_IC] = 4,
+> +	[IEEE8021Q_TT_NC] = 5,
+> +};
+> +
+> +static const u8 ieee8021q_5queue_tt_tc_map[] = {
+> +	[IEEE8021Q_TT_BK] = 0, [IEEE8021Q_TT_BE] = 0,
+> +	[IEEE8021Q_TT_EE] = 1, [IEEE8021Q_TT_CA] = 1,
+> +	[IEEE8021Q_TT_VI] = 2, [IEEE8021Q_TT_VO] = 2,
+> +	[IEEE8021Q_TT_IC] = 3,
+> +	[IEEE8021Q_TT_NC] = 4,
+> +};
+> +
+> +static const u8 ieee8021q_4queue_tt_tc_map[] = {
+> +	[IEEE8021Q_TT_BK] = 0, [IEEE8021Q_TT_BE] = 0,
+> +	[IEEE8021Q_TT_EE] = 1, [IEEE8021Q_TT_CA] = 1,
+> +	[IEEE8021Q_TT_VI] = 2, [IEEE8021Q_TT_VO] = 2,
+> +	[IEEE8021Q_TT_IC] = 3, [IEEE8021Q_TT_NC] = 3,
+> +};
+> +
+> +static const u8 ieee8021q_3queue_tt_tc_map[] = {
+> +	[IEEE8021Q_TT_BK] = 0, [IEEE8021Q_TT_BE] = 0,
+> +	[IEEE8021Q_TT_EE] = 0, [IEEE8021Q_TT_CA] = 0,
+> +	[IEEE8021Q_TT_VI] = 1, [IEEE8021Q_TT_VO] = 1,
+> +	[IEEE8021Q_TT_IC] = 2, [IEEE8021Q_TT_NC] = 2,
+> +};
+> +
+> +static const u8 ieee8021q_2queue_tt_tc_map[] = {
+> +	[IEEE8021Q_TT_BK] = 0, [IEEE8021Q_TT_BE] = 0,
+> +	[IEEE8021Q_TT_EE] = 0, [IEEE8021Q_TT_CA] = 0,
+> +	[IEEE8021Q_TT_VI] = 1, [IEEE8021Q_TT_VO] = 1,
+> +	[IEEE8021Q_TT_IC] = 1, [IEEE8021Q_TT_NC] = 1,
+> +};
+> +
+> +static const u8 ieee8021q_1queue_tt_tc_map[] = {
+> +	[IEEE8021Q_TT_BK] = 0, [IEEE8021Q_TT_BE] = 0,
+> +	[IEEE8021Q_TT_EE] = 0, [IEEE8021Q_TT_CA] = 0,
+> +	[IEEE8021Q_TT_VI] = 0, [IEEE8021Q_TT_VO] = 0,
+> +	[IEEE8021Q_TT_IC] = 0, [IEEE8021Q_TT_NC] = 0,
+> +};
+> +
+> +/**
+> + * ieee8021q_tt_to_tc - Map IEEE 802.1Q Traffic Type to Traffic Class
+> + * @tt: IEEE 802.1Q Traffic Type
+> + * @num_queues: Number of queues
+> + *
+> + * This function maps an IEEE 802.1Q Traffic Type to a Traffic Class (TC) based
+> + * on the number of queues configured on the switch. The mapping is based on the
+
+s/switch/NIC/, ideally it should be useful beyond switches :)
+
+> + * example provided by IEEE 802.1Q-2022 in Annex I "I.3 Traffic type to traffic
+> + * class mapping" and Table I-1 "Traffic type to traffic class mapping".
+> + *
+> + * Return: Traffic Class corresponding to the given Traffic Type or -EINVAL if
+> + * the number of queues is not supported. -EINVAL is used to differentiate from
+
+Needs to also describe the other error case, or be less specific.
+
+> + * -EOPNOTSUPP which is used to indicate that this library function is not
+> + * compiled in.
+> + */
+> +int ieee8021q_tt_to_tc(unsigned int tt, unsigned int num_queues)
+
+Can the enum ieee8021q_traffic_type be used instead of unsigned int?
+
+> +{
+> +	if (tt >= IEEE8021Q_TT_MAX) {
+> +		pr_err("Requested Traffic Type (%d) is out of range (%d)\n", tt,
+> +		       IEEE8021Q_TT_MAX);
+> +		return -EINVAL;
+> +	}
+> +
+> +	switch (num_queues) {
+> +	case 8:
+> +		compiletime_assert(ARRAY_SIZE(ieee8021q_8queue_tt_tc_map) !=
+> +				   IEEE8021Q_TT_MAX - 1,
+> +				   "ieee8021q_8queue_tt_tc_map != max - 1");
+> +		return ieee8021q_8queue_tt_tc_map[tt];
+> +	case 7:
+> +		compiletime_assert(ARRAY_SIZE(ieee8021q_7queue_tt_tc_map) !=
+> +				   IEEE8021Q_TT_MAX - 1,
+> +				   "ieee8021q_7queue_tt_tc_map != max - 1");
+> +
+> +		return ieee8021q_7queue_tt_tc_map[tt];
+> +	case 6:
+> +		compiletime_assert(ARRAY_SIZE(ieee8021q_6queue_tt_tc_map) !=
+> +				   IEEE8021Q_TT_MAX - 1,
+> +				   "ieee8021q_6queue_tt_tc_map != max - 1");
+> +
+> +		return ieee8021q_6queue_tt_tc_map[tt];
+> +	case 5:
+> +		compiletime_assert(ARRAY_SIZE(ieee8021q_5queue_tt_tc_map) !=
+> +				   IEEE8021Q_TT_MAX - 1,
+> +				   "ieee8021q_5queue_tt_tc_map != max - 1");
+> +
+> +		return ieee8021q_5queue_tt_tc_map[tt];
+> +	case 4:
+> +		compiletime_assert(ARRAY_SIZE(ieee8021q_4queue_tt_tc_map) !=
+> +				   IEEE8021Q_TT_MAX - 1,
+> +				   "ieee8021q_4queue_tt_tc_map != max - 1");
+> +
+> +		return ieee8021q_4queue_tt_tc_map[tt];
+> +	case 3:
+> +		compiletime_assert(ARRAY_SIZE(ieee8021q_3queue_tt_tc_map) !=
+> +				   IEEE8021Q_TT_MAX - 1,
+> +				   "ieee8021q_3queue_tt_tc_map != max - 1");
+> +
+> +		return ieee8021q_3queue_tt_tc_map[tt];
+> +	case 2:
+> +		compiletime_assert(ARRAY_SIZE(ieee8021q_2queue_tt_tc_map) !=
+> +				   IEEE8021Q_TT_MAX - 1,
+> +				   "ieee8021q_2queue_tt_tc_map != max - 1");
+> +
+> +		return ieee8021q_2queue_tt_tc_map[tt];
+> +	case 1:
+> +		compiletime_assert(ARRAY_SIZE(ieee8021q_1queue_tt_tc_map) !=
+> +				   IEEE8021Q_TT_MAX - 1,
+> +				   "ieee8021q_1queue_tt_tc_map != max - 1");
+> +
+> +		return ieee8021q_1queue_tt_tc_map[tt];
+> +	}
+> +
+> +	pr_err("Invalid number of queues %d\n", num_queues);
+> +
+> +	return -EINVAL;
+> +}
+> +EXPORT_SYMBOL_GPL(ieee8021q_tt_to_tc);
+> +
+> +/**
+> + * ietf_dscp_to_ieee8021q_tt - Map IETF DSCP to IEEE 802.1Q Traffic Type
+> + * @dscp: IETF DSCP value
+> + *
+> + * This function maps an IETF DSCP value to an IEEE 802.1Q Traffic Type (TT).
+> + * Since there is no corresponding mapping between DSCP and IEEE 802.1Q Traffic
+> + * Type, this function is inspired by the RFC8325 documentation which describe
+> + * the mapping between DSCP and 802.11 User Priority (UP) values.
+> + *
+> + * Return: IEEE 802.1Q Traffic Type corresponding to the given DSCP value
+> + */
+> +int ietf_dscp_to_ieee8021q_tt(u8 dscp)
+> +{
+> +	switch (dscp) {
+> +	case DSCP_CS0:
+> +	case DSCP_AF11:
+> +	case DSCP_AF12:
+> +	case DSCP_AF13:
+
+Is it correct for AF11, AF12, AF13 to be classified together with CS0
+rather than with CS1? It looks strange when their upper 3 bits are the
+same as CS1.
+
+> +		return IEEE8021Q_TT_BE;
+> +	case DSCP_CS1:
+> +		return IEEE8021Q_TT_BK;
+> +	case DSCP_CS2:
+> +	case DSCP_AF21:
+> +	case DSCP_AF22:
+> +	case DSCP_AF23:
+> +		return IEEE8021Q_TT_EE;
+> +	case DSCP_CS3:
+> +	case DSCP_AF31:
+> +	case DSCP_AF32:
+> +	case DSCP_AF33:
+> +		return IEEE8021Q_TT_CA;
+> +	case DSCP_CS4:
+> +	case DSCP_AF41:
+> +	case DSCP_AF42:
+> +	case DSCP_AF43:
+> +		return IEEE8021Q_TT_VI;
+> +	case DSCP_CS5:
+> +	case DSCP_EF:
+> +	case DSCP_VOICE_ADMIT:
+> +		return IEEE8021Q_TT_VO;
+> +	case DSCP_CS6:
+> +		return IEEE8021Q_TT_IC;
+> +	case DSCP_CS7:
+> +		return IEEE8021Q_TT_NC;
+> +	}
+> +
+> +	return SIMPLE_IETF_DSCP_TO_IEEE8021Q_TT(dscp);
+> +}
+> +EXPORT_SYMBOL_GPL(ietf_dscp_to_ieee8021q_tt);
+> -- 
+> 2.39.2
+> 
 
