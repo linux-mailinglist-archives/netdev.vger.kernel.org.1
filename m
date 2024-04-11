@@ -1,114 +1,231 @@
-Return-Path: <netdev+bounces-86839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86840-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12C6A8A066B
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 05:01:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1BA78A066E
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 05:01:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A35561F25E12
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 03:01:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 053D5B21173
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 03:01:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8CDA13B7A3;
-	Thu, 11 Apr 2024 03:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1105813B5AC;
+	Thu, 11 Apr 2024 03:00:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fI43lIFG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XBuO32Tg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BC413B794
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 03:00:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9AD13B5A7;
+	Thu, 11 Apr 2024 03:00:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712804432; cv=none; b=DWMSOEtWqAYjaF4mXWKTvIzZknCdm7LXCmtOsh/5L+aOzUfTLsaluoHLkpzoGr/ec5KlWavu70W3OROtYZ0pH2mTyssKMcKrUkAc5UY6JgJrTtUZJiYaNnv8PDTm/mmiUj1nB5Qx7qATgoHvcOWm1L28dtmcwLEVqOY7N445mTI=
+	t=1712804457; cv=none; b=sDR9gt4hpk05kBExhj48yGoEqjW/VeDlHA1wUha6ylisn71qQ7Afzddi0zp0X9Qeto/g2dOrDBwajyNHxK+rgojr4CR+Ljk0WR7XROD2eB7aVzEJDRAT6mubBoQVfpeyd7uKBhZdKTAxQSryI5tTAYk0ROjz8iI4LemZ8W2N46k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712804432; c=relaxed/simple;
-	bh=GiiAz4EkNSEhzVXF8w7OkUIXU9rxQtdhS3M8FlqLgBU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=KdmmkDctM54VaXrrZ4sWGTlXIyar/14Mxsk5HU64fu7qr25CX03KuAKxaR4HDZlmpQYfNUyIV52VSpyYPzgh/JBxJPKRjmxyqoPUAgL0gOj8Px4QIPmhkdFihB1flshlwTfRrIdUh/oMat58BoBqEhXbVqIcGF3UcryOGUfH8Ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fI43lIFG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4B163C43394;
-	Thu, 11 Apr 2024 03:00:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712804432;
-	bh=GiiAz4EkNSEhzVXF8w7OkUIXU9rxQtdhS3M8FlqLgBU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fI43lIFGmlintbwx6KpveZRnv+lgDDjoPgfIhWnU0dOMSB84ct1ityXQQpitSs0an
-	 6vRdno0rIimnY0MhF5lvc9ueM4qvTshNBxKQPge6HeqX5QJT5KP0sBwHkdbftRglHj
-	 F9GfOxp73UkRtT219yqX446t2eWoW46PnTV/1nVFBNufIxexLos3hricnyXVxsO99W
-	 kYC5F7SR1ZjyhFDJ1LW2ivINMpOUVKB0rw7qFjss/pl+JocRLF8W0UtUYXn8x5MkS0
-	 HFnghiPaMy6TZWb2b2wZnQctP6JQl1qAXLsmox+Lf8EdY397jNTDI7kNM+6j3sKh05
-	 SD6IIj1klQXuw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 41770C395F6;
-	Thu, 11 Apr 2024 03:00:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1712804457; c=relaxed/simple;
+	bh=JHPfVU2SbhevASOUuCl9jIR7oh3kyRirjd2zOQml7Hs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=DxPmI07B3bpjpgtpznubK4OkJ75uvMgBr8zMPAsyeHdEHdgd1uoZCSl08pIcoAxth3DDv6vn81zNT6m2xRjyG56yPwlgHdL8HURTaq4XRrS69YGJ1bmKbyH0qqQ+gsCRJnoC3bFqRy4Okyxnk3m/TM3hVhgcCue1eS/SiDsX8zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XBuO32Tg; arc=none smtp.client-ip=209.85.217.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-47a0bebeacaso1408978137.0;
+        Wed, 10 Apr 2024 20:00:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712804454; x=1713409254; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0EwanpfmN8Wfp66ZF7BNbhmU8e95IyJQR7hcqQHi9SE=;
+        b=XBuO32Tg752fagbeXHtwp1MHJTRkF2QL42BqrUqUhDHTXN8DhfxYkIX608O/QgKEt2
+         v2Zmbik50uAV0obQ6XZZCFf+6mYP+LOK/LjIZ4s92/TrhaAjB9X9xfU9nJunA4oPjYYh
+         SOz73LFpU5fOgkKBtWyo3NgQY9jei6kT2a315sXCJ5VKPOb/+7ouuYPch6AEleCTip7C
+         Xt+q923rn0BBStMk6P98O5g7cKg1pVF6y2ZwvdmmdLtoIRybacOcixAIn52m2x3M3Foq
+         LfD8MijxxKGf8detMWzHhuG+U2QwyAHPt8AH9W1m8NmvQIOtFbuIT1O4eWXe8HaCKNq9
+         aIQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712804454; x=1713409254;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=0EwanpfmN8Wfp66ZF7BNbhmU8e95IyJQR7hcqQHi9SE=;
+        b=GE5wrbtQ2gWfI6nYeRBHR1NiaIHy7aSWPryyWdwyJ429CVv2+FwfFmBM5lj9HL2a9W
+         KCZckTohZmoBOORSmTeNIYKbgk02klWnAyP3avpM7HPtAPEv2eXzLd84FMIsnyRBEU4V
+         YGzFYCdU8rzw6ekvpuNlHtrHs9nrsDXT+GBTfK9sQKphr0T41bFICTGW97W5IcsMDpy5
+         FJysQqZ0viI+60zHAoydjHT+QWCbXjVVsazHC4YCUIFhz/HngmF6Rq4Wiq9veJAMpGl5
+         Zb/vDicvwq06j0Uu/CIVcE+zGD61XF65Zfcxk8Fl3sKSqt870sOSeZTD3HCcbtYZUaOo
+         qexA==
+X-Forwarded-Encrypted: i=1; AJvYcCVTNYR2pNhWyWed+WoUScbJmkmX//UTCMP0ACkivm8kCjbqIqNsUBxiwWhBNvedJc/4bOfZUZ1nJy2JXvSNL6L3s5O9JPPyZs7Hl05cADAa/ntOmku5fnq5wnrvr3nfdmiZdjUu4cfkiEjCt+NSUOUZX4g8R2EjPQ8n+QKP8KJQ
+X-Gm-Message-State: AOJu0YyUho9rPEEsNlZJ712hByc8NogVf8qokxCpt5XiB+b/jVVuhHO0
+	BHeVWOUbByB1L8yM6tptKGfqNsC3kLoIgcwh+rbX8Z3WKAxgjAdL
+X-Google-Smtp-Source: AGHT+IF0n8eerAqlwySj3arpU4ymiZD5M8Xwc5+6Pmjoc1p7/OStmssdMR0jQeZb02m9Ymt0t5OAUQ==
+X-Received: by 2002:a05:6102:955:b0:47a:317f:eff7 with SMTP id a21-20020a056102095500b0047a317feff7mr1918245vsi.0.1712804454115;
+        Wed, 10 Apr 2024 20:00:54 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id e7-20020a0cf747000000b0069943d0e5a3sm358899qvo.93.2024.04.10.20.00.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 20:00:53 -0700 (PDT)
+Date: Wed, 10 Apr 2024 23:00:53 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Kory Maincent <kory.maincent@bootlin.com>, 
+ Florian Fainelli <florian.fainelli@broadcom.com>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+ Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Radu Pirea <radu-nicolae.pirea@oss.nxp.com>, 
+ Jay Vosburgh <j.vosburgh@gmail.com>, 
+ Andy Gospodarek <andy@greyhouse.net>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Horatiu Vultur <horatiu.vultur@microchip.com>, 
+ UNGLinuxDriver@microchip.com, 
+ Simon Horman <horms@kernel.org>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
+ Kory Maincent <kory.maincent@bootlin.com>
+Message-ID: <66175265992c8_2d6bc6294d8@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240409-feature_ptp_netnext-v10-8-0fa2ea5c89a9@bootlin.com>
+References: <20240409-feature_ptp_netnext-v10-0-0fa2ea5c89a9@bootlin.com>
+ <20240409-feature_ptp_netnext-v10-8-0fa2ea5c89a9@bootlin.com>
+Subject: Re: [PATCH net-next v10 08/13] ptp: Add phc source and helpers to
+ register specific PTP clock or get information
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net V2 00/12] mlx5 misc fixes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171280443226.1698.7858481474022694709.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Apr 2024 03:00:32 +0000
-References: <20240409190820.227554-1-tariqt@nvidia.com>
-In-Reply-To: <20240409190820.227554-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, saeedm@nvidia.com,
- gal@nvidia.com, leonro@nvidia.com
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 9 Apr 2024 22:08:08 +0300 you wrote:
-> Hi,
+Kory Maincent wrote:
+> Prepare for future hardware timestamp selection by adding source and
+> corresponding pointers to ptp_clock structure. Additionally, introduce
+> helpers for registering specific phydev or netdev PTP clocks, retrieving
+> PTP clock information such as hwtstamp source or phydev/netdev pointers,
+> and obtaining the ptp_clock structure from the phc index.
 > 
-> This patchset provides bug fixes to mlx5 driver.
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
 > 
-> This is V2 of the series previously submitted as PR by Saeed:
-> https://lore.kernel.org/netdev/20240326144646.2078893-1-saeed@kernel.org/T/
+> Change in v8:
+> - New patch.
 > 
-> [...]
+> Change in v10:
+> - Add get and put function to avoid unregistering a ptp clock object used.
+> - Fix kdoc issues.
+> ---
+>  drivers/ptp/ptp_clock.c          | 114 +++++++++++++++++++++++++++++++++++++++
+>  drivers/ptp/ptp_private.h        |   5 ++
+>  include/linux/ptp_clock_kernel.h | 104 +++++++++++++++++++++++++++++++++++
+>  3 files changed, 223 insertions(+)
+> 
+> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+> index c56cd0f63909..f962f460ec9d 100644
+> --- a/drivers/ptp/ptp_clock.c
+> +++ b/drivers/ptp/ptp_clock.c
+> @@ -512,6 +512,120 @@ void ptp_cancel_worker_sync(struct ptp_clock *ptp)
+>  }
+>  EXPORT_SYMBOL(ptp_cancel_worker_sync);
+>  
+> +struct ptp_clock *netdev_ptp_clock_register(struct ptp_clock_info *info,
+> +					    struct net_device *dev)
+> +{
+> +	struct ptp_clock *ptp;
+> +
+> +	ptp = ptp_clock_register(info, &dev->dev);
+> +	if (IS_ERR(ptp))
+> +		return ptp;
+> +
+> +	ptp->phc_source = HWTSTAMP_SOURCE_NETDEV;
+> +	ptp->netdev = dev;
+> +
+> +	return ptp;
+> +}
+> +EXPORT_SYMBOL(netdev_ptp_clock_register);
+> +
+> +struct ptp_clock *phydev_ptp_clock_register(struct ptp_clock_info *info,
+> +					    struct phy_device *phydev)
+> +{
+> +	struct ptp_clock *ptp;
+> +
+> +	ptp = ptp_clock_register(info, &phydev->mdio.dev);
+> +	if (IS_ERR(ptp))
+> +		return ptp;
+> +
+> +	ptp->phc_source = HWTSTAMP_SOURCE_PHYLIB;
+> +	ptp->phydev = phydev;
+> +
+> +	return ptp;
+> +}
+> +EXPORT_SYMBOL(phydev_ptp_clock_register);
+> +
+> +bool ptp_clock_from_phylib(struct ptp_clock *ptp)
+> +{
+> +	return ptp->phc_source == HWTSTAMP_SOURCE_PHYLIB;
+> +}
+> +EXPORT_SYMBOL(ptp_clock_from_phylib);
+> +
+> +bool ptp_clock_from_netdev(struct ptp_clock *ptp)
+> +{
+> +	return ptp->phc_source == HWTSTAMP_SOURCE_NETDEV;
+> +}
+> +EXPORT_SYMBOL(ptp_clock_from_netdev);
+> +
+> +struct net_device *ptp_clock_netdev(struct ptp_clock *ptp)
+> +{
+> +	if (ptp->phc_source != HWTSTAMP_SOURCE_NETDEV)
+> +		return NULL;
+> +
+> +	return ptp->netdev;
+> +}
+> +EXPORT_SYMBOL(ptp_clock_netdev);
+> +
+> +struct phy_device *ptp_clock_phydev(struct ptp_clock *ptp)
+> +{
+> +	if (ptp->phc_source != HWTSTAMP_SOURCE_PHYLIB)
+> +		return NULL;
+> +
+> +	return ptp->phydev;
+> +}
+> +EXPORT_SYMBOL(ptp_clock_phydev);
 
-Here is the summary with links:
-  - [net,V2,01/12] net/mlx5: E-switch, store eswitch pointer before registering devlink_param
-    https://git.kernel.org/netdev/net/c/0553e753ea9e
-  - [net,V2,02/12] net/mlx5: Register devlink first under devlink lock
-    https://git.kernel.org/netdev/net/c/c6e77aa9dd82
-  - [net,V2,03/12] net/mlx5: offset comp irq index in name by one
-    https://git.kernel.org/netdev/net/c/9f7e8fbb91f8
-  - [net,V2,04/12] net/mlx5: Properly link new fs rules into the tree
-    https://git.kernel.org/netdev/net/c/7c6782ad4911
-  - [net,V2,05/12] net/mlx5: Correctly compare pkt reformat ids
-    https://git.kernel.org/netdev/net/c/9eca93f4d5ab
-  - [net,V2,06/12] net/mlx5e: RSS, Block changing channels number when RXFH is configured
-    https://git.kernel.org/netdev/net/c/ee3572409f74
-  - [net,V2,07/12] net/mlx5e: Fix mlx5e_priv_init() cleanup flow
-    https://git.kernel.org/netdev/net/c/ecb829459a84
-  - [net,V2,08/12] net/mlx5e: HTB, Fix inconsistencies with QoS SQs number
-    https://git.kernel.org/netdev/net/c/2f436f186977
-  - [net,V2,09/12] net/mlx5e: Do not produce metadata freelist entries in Tx port ts WQE xmit
-    https://git.kernel.org/netdev/net/c/86b0ca5b118d
-  - [net,V2,10/12] net/mlx5e: RSS, Block XOR hash with over 128 channels
-    https://git.kernel.org/netdev/net/c/49e6c9387051
-  - [net,V2,11/12] net/mlx5: Disallow SRIOV switchdev mode when in multi-PF netdev
-    https://git.kernel.org/netdev/net/c/7772dc7460e8
-  - [net,V2,12/12] net/mlx5: SD, Handle possible devcom ERR_PTR
-    (no matching commit)
+IMHO these four helpers just add a layer of indirection without much
+benefit.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Do we ever expect more than two sources? Else, the phc_source could be
+embedded as the least significant bit of the pointer in the union. In
+that case we would need helpers to return the pointer without that LSB.
+But space in struct ptp_clock is probably not so valuable that we need
+to play such games.
 
+> +/**
+> + * netdev_ptp_clock_register() - register a PTP hardware clock driver for
+> + *				 a net device
+> + *
+> + * @info: Structure describing the new clock.
+> + * @dev:  Pointer of the net device
+> + */
+> +
+> +extern struct ptp_clock *
+> +netdev_ptp_clock_register(struct ptp_clock_info *info,
+> +			  struct net_device *dev);
 
+No need for explicit extern?
 
