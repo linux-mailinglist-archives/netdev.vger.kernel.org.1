@@ -1,80 +1,79 @@
-Return-Path: <netdev+bounces-86869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2D3E8A0885
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 08:34:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9514A8A089C
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 08:39:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24B19B2333A
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 06:34:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23489B20E99
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 06:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F3BF13CAB3;
-	Thu, 11 Apr 2024 06:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E07013D60A;
+	Thu, 11 Apr 2024 06:39:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="1YzeAQVF"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="DA7PbQm0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0DA13B5BA
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 06:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E10213CA9C
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 06:39:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712817279; cv=none; b=dR5MdlHoe/QMD6/RRJ2Tbr+AMRIJ6zAJhacx+i4DB+e2RJsnQo2zIHu+L4aBnbQvHs9EpP3ppbWBz2XjOUMYyNyHUeMyRRrTAZ2DKCiSE8rwHi+wSns0/s50QQtZmg2J936nHaEF1MGi/Ja/X1P5YXO9+UA9eOCupm5VMvOlhHA=
+	t=1712817581; cv=none; b=ebspb0LXFU5kIzpWdSct+JYVHEGShCO0SO6VPjiIYJuX760MpFaRyA6/NBEzLRk7xPlD7fScSPOgtTR/SUE9DjeGQoZl2D3lJgbzWyBForolR5qujtmcLwirNRHAwK+S9GB2bdiSaBE3mII40EYXyXeq0UDun2ZkOeML0gPZ3m0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712817279; c=relaxed/simple;
-	bh=ObuoOQmCK8gUlvTP5nscYhRAbR5j9i/hAuLi+p4+QuY=;
+	s=arc-20240116; t=1712817581; c=relaxed/simple;
+	bh=npWe+bs1tluTxELJVg4uRxupj2EbfLou25t2yt6eHGY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lpq5YYvAkBbRsgkvG+iTb8NJ5BhnJ6n263LHhAVqwHurMquMye8jasAryqtgaLDqG7/gHzZpQF/Wvf/kCsmMu0HafiTDCUeuziM17WWvLg7/PGxlqFZJktzcb/T6jDQ/rPbP2u5Q/oUk8WoCIDn9vIxO6yhdYosYE3CQSe0mvoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=1YzeAQVF; arc=none smtp.client-ip=209.85.218.53
+	 Content-Type:Content-Disposition:In-Reply-To; b=VKg1fZzBrZWzDm9xfMzFyMPRvC2s1MDxk3vLPS2ocSzgcvxaVfiC0/4NX1usNnkSZ8OnX6KD9S95htK0bc60o7RqfclQuGRdurCTSSnI7DkiVuihB7aD1XacjKI5lq/ZAL/mwSac+vCXH3WQb2sWfIMBFqmhX6prQiOr2JQof0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=DA7PbQm0; arc=none smtp.client-ip=209.85.218.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a519e1b0e2dso797158166b.2
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 23:34:37 -0700 (PDT)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a52140ea1b5so154825666b.1
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 23:39:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712817276; x=1713422076; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712817577; x=1713422377; darn=vger.kernel.org;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=gACNAQK/3KMTgTHdAXSuj1n/QGKhg5qwwF8BZdwnAbY=;
-        b=1YzeAQVFljvQKLvX2zgrY4Qv63OfrGVfOjcB2TQPxMJHo0jpDsp9qR5flTPhjn1QfJ
-         vFCp6Bso+IYrlAGulqydEx1wF2++jkT/Q7Gj2qTl3TCi4xdGQ02j0FFMACrHcRHkExLB
-         MRs1g4i3KAj1IJ/MpMKRAkC9vK/V+umIEodYz8c/q0LGOOCLWGxZpkSc0CBuRI0iXU+m
-         GnJB/JgLmOCiqQhDFJoJsHE18XEzyFscBJIaSZCQ8W1cnB7gFFO+vFF1ZA/wmUqgR3f+
-         SLeVcj4aI5bt7t7xiKMjwMD5mRFrPz4evihJ/+J6Z0KmtVrCV6tOY3d/fLbKuOmdBndZ
-         jDpQ==
+        bh=CLEhKjTBYYSzqpvs3oidNdffm+PATdvhj+mdGT9W/00=;
+        b=DA7PbQm0eEgFZlLH0ZorgTwv5OTidbP1NoHCou2FLmtzSjo565BsewakMGLKszNFwE
+         amQSgUVDS7HGUuEfwhpXbfktNkb7xH7jth5dN3mQYv1LtufSjeIPHqFXinp4x45BU25S
+         7FhpOU3pZYCNAkHPtWDWWWxTRegslke7h5pqqwXxG+855P3jiROCkPVqZNmzBau3GnHP
+         rLjwQ9K4QFAPufWIevfA/M7ISWbE7GsUfQ+WJQs6z/31vKpNnCXCstH8WDZyIejaiX9Y
+         uvcE67YaiWLM79lHMP5Qn4IqV6+WLBPU9gPSqQJOFKXpvranOibPvxzDRnAnKI6V4bz4
+         AMYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712817276; x=1713422076;
+        d=1e100.net; s=20230601; t=1712817577; x=1713422377;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gACNAQK/3KMTgTHdAXSuj1n/QGKhg5qwwF8BZdwnAbY=;
-        b=rT66OvZzhaZX9lQlFXgB/b5OqgK3AyxyCde371JEoJ25EUqM8Bi8XA3vpKOKXuMAGV
-         NhRjGVXtue+5BxkT6eEbDuw9Np8ACB909KfEC8rsdBvS8CUUS4zpCwt+YDHbu3AkxkLp
-         DJ9TAzOrSuX1lJkzuR7knLApQPtIRF6QW++yXvDUHkamik9qHDbD5ZZ/FBA4yfz57bLh
-         ZmPTrzthReaphzX1wdyVpj/rCcmD7Mv6v9UT1pha2llGjdjyQYvfKbYqG6m3RVHOuHJa
-         B59VU3MEzsDLf5ZZsbqEfhRUStg+YkHdOtpCQ11czSd9tlHFE6hdWKlr4tLB1ufILDd3
-         nn5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUn8epF8n23rXbF27VqhiEyAppGnsuqWOyIaEoL2kuPV4ApQ8n10p/PHhDSoU2M41qUUhJha25AwLszckjsjkfWfwAzmlrn
-X-Gm-Message-State: AOJu0Yydsk7p/diaSA4zbQYwM8rGuWtsniHNyZ+YoCm2ij9fKlnJfuIy
-	5yugY6ZTg+ejlZrtQWIvnm5yP37sYC3ZyiNgKpFHXJyiblMtW3nZZNFI0TBesbE=
-X-Google-Smtp-Source: AGHT+IHsOeiG9iP7Zif3ocJyJINoKkP8etLHrDqisAkt+e8GRUFWs1wEHdC5HgQCYtdQmH59yR/upQ==
-X-Received: by 2002:a17:906:2554:b0:a51:adac:e1dd with SMTP id j20-20020a170906255400b00a51adace1ddmr3369527ejb.26.1712817275732;
-        Wed, 10 Apr 2024 23:34:35 -0700 (PDT)
+        bh=CLEhKjTBYYSzqpvs3oidNdffm+PATdvhj+mdGT9W/00=;
+        b=xLKvTAb+0QJE0Xw2oIhBM9krSDZok4cGvXpd7Gmhz/L5z9gfIDS4DJP0Edrzx58qOd
+         oubaHw4u+TVufmUW9BzVipZrQo3oRNlKeCd1YYX6uQW+UsGjUDbkxpw4I4HvbJ3NEAok
+         cEjFI4vp5r8HEu8+uxb6FLtIvoAVZcqEkIO0UnLU0AYLpGhcpsKiOqLMw+adFO6AW+R/
+         MdhAra292few1mDGg2HQ4DunhivJK/su1n118zS87VnbgGxtHVTydsGyF5YO1IZd46TI
+         VcvD0wVMA4xV/One/uvtxXtU5kfR/57tOh2yBIPwXr1O+t1E8kZwzCUV5QlKxTMpCmOU
+         9/VA==
+X-Forwarded-Encrypted: i=1; AJvYcCXNgqA70avc9uflgYmCBeFDIQm1eQr0vh2pnEgp3zLh7KIBJy5oOI9baJ4SIkV/wSlVK/eGGAn3rJ0eK3TCnTRDG0NpRKJi
+X-Gm-Message-State: AOJu0YwxGmXpA+aMVcIwoDQHTbH1KnZoK6bqYPlc88AbVk+0wkR0/n9c
+	KmfhL0MPzS6OAd7wZXnKB4xnIcMRhWnP7A/aJVnGHAJsXB6C1AMp6IoQ0Lp5kSo=
+X-Google-Smtp-Source: AGHT+IFpYvKPdJnGf0YpmT4OSVh4n8gdmu1Sex6/8w5++RlibDPjjob7o/e9BQmj6XILXtNewiFV0g==
+X-Received: by 2002:a17:906:509:b0:a4e:679b:8437 with SMTP id j9-20020a170906050900b00a4e679b8437mr2213954eja.59.1712817577532;
+        Wed, 10 Apr 2024 23:39:37 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id hg20-20020a1709072cd400b00a5225c87f65sm122045ejc.56.2024.04.10.23.34.34
+        by smtp.gmail.com with ESMTPSA id jy3-20020a170907762300b00a521603e14csm441715ejc.138.2024.04.10.23.39.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 23:34:35 -0700 (PDT)
-Date: Thu, 11 Apr 2024 08:34:33 +0200
+        Wed, 10 Apr 2024 23:39:37 -0700 (PDT)
+Date: Thu, 11 Apr 2024 08:39:35 +0200
 From: Jiri Pirko <jiri@resnulli.us>
 To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>, pabeni@redhat.com,
-	John Fastabend <john.fastabend@gmail.com>,
+Cc: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+	pabeni@redhat.com, John Fastabend <john.fastabend@gmail.com>,
 	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
 	Daniel Borkmann <daniel@iogearbox.net>,
 	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org,
 	bhelgaas@google.com, linux-pci@vger.kernel.org,
@@ -82,16 +81,13 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
  Platforms Host Network Interface
-Message-ID: <ZheEeT-Gajp0rl3H@nanopsycho>
+Message-ID: <ZheFp_Sf66DpaFFm@nanopsycho>
 References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
  <20240409135142.692ed5d9@kernel.org>
- <ZhZC1kKMCKRvgIhd@nanopsycho>
- <20240410064611.553c22e9@kernel.org>
- <ZhasUvIMdewdM3KI@nanopsycho>
- <20240410103531.46437def@kernel.org>
- <c0f643ee-2dee-428c-ac5f-2fd59b142c0e@gmail.com>
- <20240410105619.3c19d189@kernel.org>
- <CAKgT0UepNfYJN73J9LRWwAGqQ7YPwQUNTXff3PTN26DpwWix8Q@mail.gmail.com>
+ <44093329-f90e-41a6-a610-0f9dd88254eb@lunn.ch>
+ <CAKgT0UcVnhgmXNU2FGcy6hbzUQZwNBZw0EKbFF3DsKDc8r452A@mail.gmail.com>
+ <c820695d-bda7-4452-a563-170700baf958@lunn.ch>
+ <CAKgT0Uf4i_MN-Wkvpk29YevwsgFrQ3TeQ5-ogLrF-QyMSjtiug@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,60 +97,65 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKgT0UepNfYJN73J9LRWwAGqQ7YPwQUNTXff3PTN26DpwWix8Q@mail.gmail.com>
+In-Reply-To: <CAKgT0Uf4i_MN-Wkvpk29YevwsgFrQ3TeQ5-ogLrF-QyMSjtiug@mail.gmail.com>
 
-Wed, Apr 10, 2024 at 08:01:44PM CEST, alexander.duyck@gmail.com wrote:
->On Wed, Apr 10, 2024 at 10:56 AM Jakub Kicinski <kuba@kernel.org> wrote:
+Wed, Apr 10, 2024 at 11:07:02PM CEST, alexander.duyck@gmail.com wrote:
+>On Wed, Apr 10, 2024 at 1:01 PM Andrew Lunn <andrew@lunn.ch> wrote:
 >>
->> On Wed, 10 Apr 2024 10:39:11 -0700 Florian Fainelli wrote:
->> > > Hm, we currently group by vendor but the fact it's a private device
->> > > is probably more important indeed. For example if Google submits
->> > > a driver for a private device it may be confusing what's public
->> > > cloud (which I think/hope GVE is) and what's fully private.
+>> On Wed, Apr 10, 2024 at 08:56:31AM -0700, Alexander Duyck wrote:
+>> > On Tue, Apr 9, 2024 at 4:42 PM Andrew Lunn <andrew@lunn.ch> wrote:
 >> > >
->> > > So we could categorize by the characteristic rather than vendor:
+>> > > > What is less clear to me is what do we do about uAPI / core changes.
 >> > >
->> > > drivers/net/ethernet/${term}/fbnic/
->> > >
->> > > I'm afraid it may be hard for us to agree on an accurate term, tho.
->> > > "Unused" sounds.. odd, we don't keep unused code, "private"
->> > > sounds like we granted someone special right not took some away,
->> > > maybe "exclusive"? Or "besteffort"? Or "staging" :D  IDK.
+>> > > I would differentiate between core change and core additions. If there
+>> > > is very limited firmware on this device, i assume Linux is managing
+>> > > the SFP cage, and to some extend the PCS. Extending the core to handle
+>> > > these at higher speeds than currently supported would be one such core
+>> > > addition. I've no problem with this. And i doubt it will be a single
+>> > > NIC using such additions for too long. It looks like ClearFog CX LX2
+>> > > could make use of such extensions as well, and there are probably
+>> > > other boards and devices, maybe the Zynq 7000?
 >> >
->> > Do we really need that categorization at the directory/filesystem level?
->> > cannot we just document it clearly in the Kconfig help text and under
->> > Documentation/networking/?
+>> > The driver on this device doesn't have full access over the PHY.
+>> > Basically we control everything from the PCS north, and the firmware
+>> > controls everything from the PMA south as the physical connection is
+>> > MUXed between 4 slices. So this means the firmware also controls all
+>> > the I2C and the QSFP and EEPROM. The main reason for this is that
+>> > those blocks are shared resources between the slices, as such the
+>> > firmware acts as the arbitrator for 4 slices and the BMC.
 >>
->> From the reviewer perspective I think we will just remember.
->> If some newcomer tries to do refactoring they may benefit from seeing
->> this is a special device and more help is offered. Dunno if a newcomer
->> would look at the right docs.
+>> Ah, shame. You took what is probably the least valuable intellectual
+>> property, and most shareable with the community and locked it up in
+>> firmware where nobody can use it.
 >>
->> Whether it's more "paperwork" than we'll actually gain, I have no idea.
->> I may not be the best person to comment.
+>> You should probably stop saying there is not much firmware with this
+>> device, and that Linux controls it. It clearly does not...
+>>
+>>         Andrew
 >
->Are we going to go through and retro-actively move some of the drivers
->that are already there that are exclusive to specific companies? That
->is the bigger issue as I see it. It has already been brought up that
-
-Why is it an issue? Very easy to move drivers to this new directory.
-
-
->idpf is exclusive. In addition several other people have reached out
->to me about other devices that are exclusive to other organizations.
+>Well I was referring more to the data path level more than the phy
+>configuration. I suspect different people have different levels of
+>expectations on what minimal firmware is. With this hardware we at
+>least don't need to use firmware commands to enable or disable queues,
+>get the device stats, or update a MAC address.
 >
->I don't see any value in it as it would just encourage people to lie
->in order to avoid being put in what would essentially become a
->blacklisted directory.
+>When it comes to multi-host NICs I am not sure there are going to be
+>any solutions that don't have some level of firmware due to the fact
 
-You are thinking all or nothing. I'd say that if we have 80% of such
-drivers in the correct place/directory, it's a win. The rest will lie.
-Shame for them when it is discovered.
+A small linux host on the nic that controls the eswitch perhaps? I mean,
+the multi pf nic without a host in charge of the physical port and
+swithing between it and pf is simply broken design. And yeah you would
+probably now want to argue others are doing it already in the same way :)
+True that.
 
 
+>that the cable is physically shared with multiple slots.
 >
->If we are going to be trying to come up with some special status maybe
->it makes sense to have some status in the MAINTAINERS file that would
->indicate that this driver is exclusive to some organization and not
->publicly available so any maintenance would have to be proprietary.
+>I am assuming we still want to do the PCS driver. So I will still see
+>what I can do to get that setup.
+>
+>Thanks,
+>
+>- Alex
+>
 
