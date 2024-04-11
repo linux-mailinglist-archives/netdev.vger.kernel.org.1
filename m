@@ -1,176 +1,450 @@
-Return-Path: <netdev+bounces-86952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66D938A1279
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 13:04:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9979A8A1284
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 13:08:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C22A11F22A88
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:04:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5021E2822EA
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:08:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDF421474B4;
-	Thu, 11 Apr 2024 11:04:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF681474CB;
+	Thu, 11 Apr 2024 11:08:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dektech.com.au header.i=@dektech.com.au header.b="QHlu4TAR"
+	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="NJZMC215"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2093.outbound.protection.outlook.com [40.107.22.93])
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B558E13D258;
-	Thu, 11 Apr 2024 11:04:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.93
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712833464; cv=fail; b=O4jq3JAqk4fuIuqM61lgPAoAtdyHTo8+0DyhhZLV+ZwjA5IUt/h0D1h23L+DhN9di1Ox+BY+c0QM0uCkZ7f9zP6eJrAHuv9dok5De/rTsXCdooLhiXBQE+zQfs1LJYIyLyAQfvcsLBwk93Nbw9niR75+Yyv5p4u2PnzCMPZ/hL4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712833464; c=relaxed/simple;
-	bh=bcpcsdRA5iFaNBCck6NjqpB70CBiklb7/ZZdaAX3aCk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=bi2WqFi3V7+8W1jSPOoqnyRglA+kbowhbjCwfPINwM5c90n8lTzJvw5TFu/f7eMr0WbYIjhIQtONu01SRu2ZTtH5Sk1a66Cg3CwcRmrWFHhISvM+gUbb9J9/9b97PQJRL9uJrM2FfZkF6gtYj3ykNA3m51FQzpuv51PsgHlaruc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=dektech.com.au; spf=pass smtp.mailfrom=dektech.com.au; dkim=pass (2048-bit key) header.d=dektech.com.au header.i=@dektech.com.au header.b=QHlu4TAR; arc=fail smtp.client-ip=40.107.22.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=dektech.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dektech.com.au
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ElxnxpzqL5b2OvFSPc3dWGRlKj9dHkxyFl3KD+zzmI2Ce4f8Z+8ax/5JONaL1lMD2ei8/XhAf21luElDi97y+SMvhDo0RYHcWz27/CgOZwqGA46gYUnzy/tJn/0J4eyfrcU+x1D0s2Q9IfSVyzOdACsnqtUVXzodcKIzji+THkKdFnrzX4oq7Nrq8g/vzV+TyfBibYfmbmvvCDAJHY+Ufj8+UBwPU2rhNEMrQezC/c5rcruHaDd4zLp25/8UaE4w6Y0wEY+zW5oInk7zOXfYcE9xj2IFftedrvuGyy99S010rpvlaX9BAPwU6QHYBVm76RrWCYKS2s8zBKnX1pn61A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bcpcsdRA5iFaNBCck6NjqpB70CBiklb7/ZZdaAX3aCk=;
- b=fxpHjM0s6Z70Sqd2sl1v+4mBcI5Sk9wKu6kF8VQAk3Jdnh+fuseCHbUdCfFqzQcNXrYuhR5xTPOnsZ2/kh9Et7AOMYeNedk7bLIBShpYwYdOBM5tau0/JP5rqijX3ifYV0esVVPNcB4yn1HUZ9kifIXtJk1GwkZPGJGGWY//FFqIoqK/saAGXdjL1xZQN2gB6fTONSM/cNyFe+HrxSRWByWSt4tPTGOS36VMQBXmpd9N9oL1nsiaW50ftMmEc5lDg4LFILp6fDdWDMAQVOGHWJ+ihv/zn2goPIaE4pMh9/YpJAzfVDdDJgmHGprxjqBJNbFw/sCmLzqrGriF/T3MkQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=dektech.com.au; dmarc=pass action=none
- header.from=dektech.com.au; dkim=pass header.d=dektech.com.au; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dektech.com.au;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bcpcsdRA5iFaNBCck6NjqpB70CBiklb7/ZZdaAX3aCk=;
- b=QHlu4TARKTJgozjYoHfr8St1W61ghrm97JRxVGr6aJCLH/7TKmbkAmOWT+TYd12m7ozhIO6Eaw60EJnEBLkj4eHbTsoN0N2dIDGeFlr8h2qzg0eSaEiG38ZRCBkxedKd8Xllwd3PNp/56HXDyUKAv0HDXzTU1akBtOR22c7JB7YgDTL29EcnisuxLAtpDVqXdmUJM89OzF4kNuwxsZvnfJ2afwaIdhloWmRWNXv07Ws3K1HwBNQjmaQQ4KuptCYicv6DX0vi0pbX9mH61NulViFVaN5hCokxc0E62WHz+KDsaMdn159Jx1CulGS/UO8GfIxRucSdZabPpKlL6aH8uA==
-Received: from AS4PR05MB9647.eurprd05.prod.outlook.com (2603:10a6:20b:4ce::15)
- by AS2PR05MB9909.eurprd05.prod.outlook.com (2603:10a6:20b:5e6::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Thu, 11 Apr
- 2024 11:04:16 +0000
-Received: from AS4PR05MB9647.eurprd05.prod.outlook.com
- ([fe80::8e06:8f6c:4364:7266]) by AS4PR05MB9647.eurprd05.prod.outlook.com
- ([fe80::8e06:8f6c:4364:7266%6]) with mapi id 15.20.7409.042; Thu, 11 Apr 2024
- 11:04:16 +0000
-From: Tung Quang Nguyen <tung.q.nguyen@dektech.com.au>
-To: "Colin King (gmail)" <colin.i.king@gmail.com>, Dan Carpenter
-	<dan.carpenter@linaro.org>
-CC: Jon Maloy <jmaloy@redhat.com>, Ying Xue <ying.xue@windriver.com>, "David S
- . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"tipc-discussion@lists.sourceforge.net"
-	<tipc-discussion@lists.sourceforge.net>, "kernel-janitors@vger.kernel.org"
-	<kernel-janitors@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH][next] tipc: remove redundant assignment to ret, simplify
- code
-Thread-Topic: [PATCH][next] tipc: remove redundant assignment to ret, simplify
- code
-Thread-Index: AQHai/ET8yH2w4BKm0CIExMIZvn7kbFi08+AgAALIwCAAANvgIAAA9WQ
-Date: Thu, 11 Apr 2024 11:04:15 +0000
-Message-ID:
- <AS4PR05MB9647FC45E89AECEDC01068C388052@AS4PR05MB9647.eurprd05.prod.outlook.com>
-References: <20240411091704.306752-1-colin.i.king@gmail.com>
- <AS4PR05MB96479D9B6F9EC765371AA8A588052@AS4PR05MB9647.eurprd05.prod.outlook.com>
- <ce0a63fc-1985-4e25-a08b-c0045ae095f4@moroto.mountain>
- <3011ca26-08d4-4b4e-847e-d68c0751f98d@gmail.com>
-In-Reply-To: <3011ca26-08d4-4b4e-847e-d68c0751f98d@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=dektech.com.au;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AS4PR05MB9647:EE_|AS2PR05MB9909:EE_
-x-ms-office365-filtering-correlation-id: 969e1d1b-4ab9-4ad0-f264-08dc5a1720c3
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- +0f3NDOb2JsJkESE0qaVepW6thcjqRavBlpjCh+S4Q1DFTDu8EcfFDVrmJ0o5E5y9HROjjnfUvVJoJNToHbgBgVOOHPhJAWn1ahfGEa9awvmTX8daN3f55qtKK26L1bq9DT9djnFvYvl/XRpGY58A32/ouPYEhmf2enaSKGy3xBdJz7O6SY99EbX21gNjmoScNvPUNCuoY408SoagqOgUCNnSuQadngCS7bUY0Fs0g8klukizHTU8dJwVio0GJB40OFCb1ZN+jsAhmf0oI+VlMQAO9Mwp7URLnGGP3N9/P8RI7E9vF5w0Pkr1iTsGaQZks9x7weNH3Az2P6JUd5m6XtxEABdcAfcUX3D2vNG/kjWKq8glN2rUqG2wOyIZkgwW7D5J7tGhc+TzxOsEJv6a0RTAGSJIsJpIlMbU6+YEDoi2ZiVYfon232iDEHKN4GIhQ3875b0OlLzPav6I6UR9OzuN62jaH3uzFhpUe6XukA10pCtPTV+teL2PmGzB6VtXQIBpoNrQeJffUE7aBJTuhQfmJHjW4mFgAWgDhtus9Wgc2pE0KZlCxtBMlXckA6ZBu7eP88/8DWjW8eY+ZFH7Qa8QIMkRav9rE4aGzARhWqhuT/IWr4Tm5ylTURb9jccsTZvnqhUbX0QU4Y6tSNkJEzsoB3SUdR7kNlCXYu9aYxROvWoXwPoE+GfN6J9sX4F317GUR4lgFhE2LDYwj18Dtq/4/m3okHP0DMH5+4NlxI=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR05MB9647.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(7416005)(366007)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?M1ZPTTE5YWx5TktQUTNOR1N1U2dUaldUQ09YL2txSnltRWFVOXdBQnQwdFJS?=
- =?utf-8?B?VkJwZWJrVERhRWhvS1JGZm1HZjQ0UmR4UnJReVRFNHpNK043djNzcFpLa1lP?=
- =?utf-8?B?QUVvMWhGTURrNjM1MDN2a3FHT3FpVGVHRjNwdS9pZGtUa25yVjBzVXBMMXVF?=
- =?utf-8?B?bThObWlwSUxDa2pmdDVGSk1RNUNOZkg1RnYwT0JlY0VGdGJUa1RQT3FBNDcz?=
- =?utf-8?B?MncwRkQ5Y2ljc0VJWWQ5M3NvOEVKNUc0eVIzNWNwc1Y4Ukd2ZHV1RmpNZ2FB?=
- =?utf-8?B?V3hNakpIa0hwNzAwQTZuaG9EMnlReVZxd0cvT2QvLzN0TC9OWHE1ZmZrQzVh?=
- =?utf-8?B?NUE1OXViSVI1RXRNMkhBS1J0aUFDdEdXVytmbStPQ0M3K3psRXNsaVJ3Ri92?=
- =?utf-8?B?ZWw0eGRrQ0RCYTcva3d4dndWVnBydnJHZmFLa0Urd0w4Sm5HZlZqTlpIMmNa?=
- =?utf-8?B?UlRjaVpRaTk0RGh2b1V4ak9rWGYyY2w4dU43TGY5TSsyRnZKRUxBSVc3aUp5?=
- =?utf-8?B?V1VWTElQMUlTajd4Q01SZXNzSC90QzVHOXhpdDczYW9EUnQwd1dTNXpLZkVR?=
- =?utf-8?B?anNZN0FoU3pPQjZmZTloc0Rja2hsaGdoUnhkZkVGZDMzK1Irb0FpQ2VZRmhM?=
- =?utf-8?B?RHhnMkVxRnh3cFVUaUs4VkVKd0p5bXU0ckgxbTk5TkRTWkJLbVBtUHNCNVNq?=
- =?utf-8?B?QXJGWEZ6a2VqcWIxaVhKZWpOY0Z5TXNiR01mUVdkTmtmSWxWdk5acWNERHN0?=
- =?utf-8?B?UHVxVHh2QzVkL0pxTmNRNjBETDRmZ0ZRRDNLY2FraC9OZXpFeXhpWFVnbEpx?=
- =?utf-8?B?RGRnQWFOZHpoKzhSemFWUU9XNmx0UXlDeTNEb0o1K3J0TWRrV2hTcU04UGNF?=
- =?utf-8?B?ZHRwN1dEZW5DM2NOMjdEaEppdndkWGQyNGNWdEFRemFUWjFkU05aQTcrUGNx?=
- =?utf-8?B?ZFpuaVA3TVFHTkcvL3E1aDhMd2J5Vi83cjNhMGNIc1VSRHEwdUR1Y2I4R0gx?=
- =?utf-8?B?RDI3UnVucGdaUkZxbWRaUUdrZ3QyRFRDanlpQnN5K0ZrZC9LUUU3d2FzWUt5?=
- =?utf-8?B?a25EanNmRVdSTUpqM0tsR09Na2tXamZkN0NINjFMaWp1MFlyTUwzR1NxdjVy?=
- =?utf-8?B?MDlRM3ZuSUhNSzFwbEo1SFRHTTYwRUlWOEpvWk5XR2tpVWNVSER5aXdpZklY?=
- =?utf-8?B?YzRndExvSEtkekF6aTE2QVV1RFJ6d25NVzdSeDk5MW9aOU9JL1g1UlcwVVJa?=
- =?utf-8?B?azd3SEJyVWlWbVpwMHJzbFF3YkU2VXdwMksvRzgxOUVIRmwwSU1ReUVHTU9R?=
- =?utf-8?B?Y25ObUp3dXRxRGlzY0ZoL1B3cEZSdDkwQjJwQXluU2lOYXduQWNhOHdTZTdI?=
- =?utf-8?B?SHFzTktHY08zOHQ1dXVBazE1YUVSQ2ZCT1hoQ2JYUzJvZlgzTHJKNFNXQmdI?=
- =?utf-8?B?WWRMNGNKaUI2RFdUOHFQRHAwRGdvSzJMcjBadFRaZ2xtN3Y3aXJ4ODVFeUh0?=
- =?utf-8?B?TXRETEtBNGhEWmhvL1VBZHN5NlRKR0FVY1JFN1REbXFzNURRZWhPam9BVFdm?=
- =?utf-8?B?U0pSNUdxR2JYZS90UlBGUEVDd1Z3a3BVT0RDenQxRHY4Q3RyM0FIdFpvakV5?=
- =?utf-8?B?azBiR3FQUktEdU9GdmpnbXBzeXZib3hxT21BaE9GcFZIUFd0ZGViUjFWWWJI?=
- =?utf-8?B?TXYwZk1pZGxkRlkrd25HZ245c0NZNWlGU1EzRlZsMHF6elBsUVJXQXZzQ04w?=
- =?utf-8?B?a1JrQ0xMK3BYZWZ6OVhQZkt6TTVzNEg5YS92VkZLd3RoYjM5cVYvanVUblFm?=
- =?utf-8?B?ZVhBeE9GYUdESkZUSUY4YUhBRWkzb1czdkFPbXZtVFVKdHA4TlN0Z1M5c0FH?=
- =?utf-8?B?d3FRUzRNQzlXOVdJZUJYbXFQSU1XMDliREdnaUJRR0kwc0QzTVQxTDRFK3VM?=
- =?utf-8?B?MlJJRHpnMEdrKzE0NTkrYmsyazkrNlkwRHRHYTBxc3lTTDRoVkppcG83V0pn?=
- =?utf-8?B?NndBZlRCYkFQbC9HNGZLVjJuZ3BCYndYM3pycnZiNTQrYlNNS2VKSGFxalNx?=
- =?utf-8?B?RkdwREtMV2h1REZaUE9uWjNWQkdSNklrdEV1cjYxU2p0aks2WkY3WUZ2ZWlO?=
- =?utf-8?B?MFBqZWltWDB2V0ZUVituV0I3byttZElvK3oxcG9XTGZUVWxCeXY5bi9BVjRy?=
- =?utf-8?B?UEE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA5D1474BE
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 11:08:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712833686; cv=none; b=caTr3eLD6FZ80dOgZpKLvuSBWiPEcUYV7/3sLRJzn+LRay20Sa8nZai9M8cti4NqYh13YHeG5qL6D3pBYGFrbxDaaWIeUtE8ckV66HPB6by8unC9afpZsk4pIMsD0stqcwcXkUg2caJ/gKUPyGvLcuOk1p1ievrf7GiTqyEM3cg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712833686; c=relaxed/simple;
+	bh=RuMYFYuBb5XxiaIP3H6TNLBzHa9P8K0nb+lCeDfw/Zc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LrYKX+k2MBOX8qiAi4fXSHsrfoZWybtDL9MXjkNaX772YchBwnM4GmoopPrESRnF1D9t2e2iNrZVS+hx8fQ4ODBtCpK83ojDNDZvpyL2Hng7xd/Ww/Jm8ZUWo5fzlJtgBn2LtuVhjIvFoIeEAFRxMhEmt7CRzf1l/fRJckjzmvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org; spf=none smtp.mailfrom=phenome.org; dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b=NJZMC215; arc=none smtp.client-ip=195.121.94.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=phenome.org
+X-KPN-MessageId: 9fd4cbc6-f7f3-11ee-bfb8-005056ab378f
+Received: from smtp.kpnmail.nl (unknown [10.31.155.37])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 9fd4cbc6-f7f3-11ee-bfb8-005056ab378f;
+	Thu, 11 Apr 2024 13:07:02 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=kpnmail.nl; s=kpnmail01;
+	h=content-type:mime-version:message-id:subject:to:from:date;
+	bh=YTv4ze7VDLCa+fODBZq8DBRIDcfym44N2nDgJzDzdlw=;
+	b=NJZMC215NXJKNNqMTRbvl3fQPobmjo7upMcbn9kj27b9rkyGI9iPjuZ2wCXUfT6ZG2riKF5JCcFv4
+	 LMuTsVCjHHurIdUMVHV6dtIfuJhuzps7ZwZKFuziR+9npv2iPjiy1mNn6NZcSzouyRZl4Bqpm7hiuZ
+	 vhjoiu7ax+b6Qf7w=
+X-KPN-MID: 33|T5ZSsD42tOgVakfVNbQ4YUAPhqgickUhnu5z84TsAzl8OAASNbbP8gtGnKyHWXZ
+ dVZ3mO9LPvJC4fTFFIfzIKQlhfMeD1l3CGCRSywOtOfY=
+X-KPN-VerifiedSender: No
+X-CMASSUN: 33|z32Kub4s6KAsHf0At9Q+plLy+HfI1hzNc85/q22ABOPk/W7jJxS/kkOLCP/Cz1e
+ WhgWHWXjiCq8haG/FlJYaEA==
+Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id bd6a6e01-f7f3-11ee-a211-005056ab1411;
+	Thu, 11 Apr 2024 13:07:53 +0200 (CEST)
+Date: Thu, 11 Apr 2024 13:07:52 +0200
+From: Antony Antony <antony@phenome.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: antony.antony@secunet.com,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	devel@linux-ipsec.org, Eyal Birger <eyal.birger@gmail.com>,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+	Sabrina Dubroca <sd@queasysnail.net>
+Subject: [PATCH ipsec-next v8] xfrm: Add Direction to the SA in or out
+Message-ID: <ZhfEiIamqwROzkUd@Antony2201.local>
+References: <9e2ddbac8c3625b460fa21a3bfc8ebc4db53bd00.1712684076.git.antony.antony@secunet.com>
+ <20240411103740.GM4195@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: dektech.com.au
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AS4PR05MB9647.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 969e1d1b-4ab9-4ad0-f264-08dc5a1720c3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Apr 2024 11:04:16.0033
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 1957ea50-0dd8-4360-8db0-c9530df996b2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 2QOQZ2GtarLUGqh1g8tbk1sVqLllmy0iySc3iLIyJ22r0CdufbraVZAZgONs9Ip+PQD1cDf5jvFAB8+UZhaG3aHmS2TYlMegk/jaTVsiSAU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS2PR05MB9909
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240411103740.GM4195@unreal>
 
-PlN1YmplY3Q6IFJlOiBbUEFUQ0hdW25leHRdIHRpcGM6IHJlbW92ZSByZWR1bmRhbnQgYXNzaWdu
-bWVudCB0byByZXQsIHNpbXBsaWZ5IGNvZGUNCj4NCj5PbiAxMS8wNC8yMDI0IDExOjMxLCBEYW4g
-Q2FycGVudGVyIHdyb3RlOg0KPj4gT24gVGh1LCBBcHIgMTEsIDIwMjQgYXQgMTA6MDQ6MTBBTSAr
-MDAwMCwgVHVuZyBRdWFuZyBOZ3V5ZW4gd3JvdGU6DQo+Pj4+DQo+Pj4gSSBzdWdnZXN0IHRoYXQg
-ZXJyIHZhcmlhYmxlIHNob3VsZCBiZSBjb21wbGV0ZWx5IHJlbW92ZWQuIENvdWxkIHlvdQ0KPj4+
-IHBsZWFzZSBhbHNvIGRvIHRoZSBzYW1lIHRoaW5nIGZvciB0aGlzIGNvZGUgPw0KPj4+ICINCj4+
-PiAuLi4NCj4+PiBlcnIgPSBza2JfaGFuZGxlcihza2IsIGNiLCB0c2spOw0KPj4+IGlmIChlcnIp
-IHsNCj4+DQo+PiBJZiB3ZSB3cml0ZSB0aGUgY29kZSBhczoNCj4+DQo+PiAJaWYgKHNvbWVfZnVu
-Y3Rpb24ocGFyYW1ldGVycykpIHsNCj4+DQo+PiB0aGVuIGF0IGZpcnN0IHRoYXQgbG9va3MgbGlr
-ZSBhIGJvb2xlYW4uICBQZW9wbGUgcHJvYmFibHkgdGhpbmsgdGhlDQo+PiBmdW5jdGlvbiByZXR1
-cm5zIHRydWUvZmFsc2UuICBCdXQgaWYgd2UgbGVhdmUgaXQgYXMtaXM6DQo+Pg0KPj4gCWVyciA9
-IHNvbWVfZnVuY3Rpb24ocGFyYW1ldGVycyk7DQo+PiAJaWYgKGVycikgew0KPj4NCj4+IFRoZW4g
-dGhhdCBsb29rcyBsaWtlIGVycm9yIGhhbmRsaW5nLg0KPj4NCj4+IFNvIGl0J3MgYmV0dGVyIGFu
-ZCBtb3JlIHJlYWRhYmxlIHRvIGxlYXZlIGl0IGFzLWlzLg0KPj4NCj4+IHJlZ2FyZHMsDQo+PiBk
-YW4gY2FycGVudGVyDQo+DQo+SSBjb25jdXIgd2l0aCBEYW4ncyBjb21tZW50cy4NCj4NCj5Db2xp
-bg0KSSBoYXZlIGEgZGlmZmVyZW50IHZpZXcuDQpJdCBkb2VzIG5vdCBtYWtlIHNlbnNlIHRvIG1l
-IHRvIHVzZSBzdGFjayB2YXJpYWJsZSAnZXJyJyBqdXN0IGZvciBjaGVja2luZyByZXR1cm4gY29k
-ZSBvZiB0aGUgZnVuY3Rpb25zIChfX3RpcGNfbmxfYWRkX3NrLyBfX3RpcGNfYWRkX3NvY2tfZGlh
-ZykgdGhhdCB3ZSBrbm93IGFsd2F5cyByZXR1cm4gdHJ1ZSBvbiBlcnJvci4NCg0K
+On Thu, Apr 11, 2024 at 01:37:40PM +0300, Leon Romanovsky via Devel wrote:
+> On Tue, Apr 09, 2024 at 07:37:20PM +0200, Antony Antony via Devel wrote:
+> > This patch introduces the 'dir' attribute, 'in' or 'out', to the
+> > xfrm_state, SA, enhancing usability by delineating the scope of values
+> > based on direction. An input SA will now exclusively encompass values
+> > pertinent to input, effectively segregating them from output-related
+> > values. This change aims to streamline the configuration process and
+> > improve the overall clarity of SA attributes.
+> > 
+> > This feature sets the groundwork for future patches, including
+> > the upcoming IP-TFS patch.
+> > 
+> > v7->v8:
+> >  - add extra validation check on replay window and seq
+> >  - XFRM_MSG_UPDSA old and new SA should match "dir"
+> 
+> Why? Update is add and delete operation, and one can update any field
+> he/she wants, including direction.
+
+Update operations are not strictly necessary without IKEv2. However, during
+IKEv2 negotiation, updating "in" SA becomes essential.
+
+Here's what I figured out. initially getting confused watching "ip xfrm 
+monitor". During the IKE negotiation, specifically at the IKE_AUTH
+exchange, userspace calls ALLOCSPI for the "in" SA. The kernel creates an
+xfrm_state with the allocated SPI but without cryptographic parameters, as
+user space hasn't added any SAs, either "in" or "out", at this point. Also,
+userspace hasn't derived crypto and other parameters for the SAs. The 
+negotiation then proceeds. Upon successful negotiation, the "in" SA can only be
+updated, which is why *swan will send an xfrm update for the "in" SA and
+add_sa for the "out" SA.
+
+Also, as I understand it, ALLOCSPI states are with:
+km.state = XFRM_STATE_VOID
+
+So you won't see it in "ip xfrm state" or in "ip xfrm monitor", just see he 
+Update message.  The km.state for ALLOCSPI state can also be XFRM_STATE_ACQ.  
+I haven't seen this exactly in operation. Note in v10 of this patch set I 
+fixed ALLOCSPI to work with DIR and UPDSA.
+
+> 
+> > 
+> > v6->v7:
+> >  - add replay-window check non-esn 0 and ESN 1.
+> >  - remove :XFRMA_SA_DIR only allowed with HW OFFLOAD
+> > 
+> > v5->v6:
+> >  - XFRMA_SA_DIR only allowed with HW OFFLOAD
+> > 
+> > v4->v5:
+> >  - add details to commit message
+> > 
+> > v3->v4:
+> >  - improve HW OFFLOAD DIR check add the other direction
+> > 
+> > v2->v3:
+> >  - delete redundant XFRM_SA_DIR_USE
+> >  - use u8 for "dir"
+> >  - fix HW OFFLOAD DIR check
+> > 
+> > v1->v2:
+> >  - use .strict_start_type in struct nla_policy xfrma_policy
+> >  - delete redundant XFRM_SA_DIR_MAX enum
+> 
+> Please put changelog after --- trailer.
+
+ack! I will be more carefull.
+
+thanks,
+-antony
+
+> > 
+> > Signed-off-by: Antony Antony <antony.antony@secunet.com>
+> > ---
+> >  include/net/xfrm.h        |  1 +
+> >  include/uapi/linux/xfrm.h |  6 +++
+> >  net/xfrm/xfrm_compat.c    |  7 +++-
+> >  net/xfrm/xfrm_device.c    |  6 +++
+> >  net/xfrm/xfrm_state.c     |  4 ++
+> >  net/xfrm/xfrm_user.c      | 85 +++++++++++++++++++++++++++++++++++++--
+> >  6 files changed, 103 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+> > index 57c743b7e4fe..7c9be06f8302 100644
+> > --- a/include/net/xfrm.h
+> > +++ b/include/net/xfrm.h
+> > @@ -291,6 +291,7 @@ struct xfrm_state {
+> >  	/* Private data of this transformer, format is opaque,
+> >  	 * interpreted by xfrm_type methods. */
+> >  	void			*data;
+> > +	u8			dir;
+> >
+> };
+> >  
+> >  static inline struct net *xs_net(struct xfrm_state *x)
+> > diff --git a/include/uapi/linux/xfrm.h b/include/uapi/linux/xfrm.h
+> > index 6a77328be114..18ceaba8486e 100644
+> > --- a/include/uapi/linux/xfrm.h
+> > +++ b/include/uapi/linux/xfrm.h
+> > @@ -141,6 +141,11 @@ enum {
+> >  	XFRM_POLICY_MAX	= 3
+> >  };
+> >  
+> > +enum xfrm_sa_dir {
+> > +	XFRM_SA_DIR_IN	= 1,
+> > +	XFRM_SA_DIR_OUT = 2
+> > +};
+> > +
+> >  enum {
+> >  	XFRM_SHARE_ANY,		/* No limitations */
+> >  	XFRM_SHARE_SESSION,	/* For this session only */
+> > @@ -315,6 +320,7 @@ enum xfrm_attr_type_t {
+> >  	XFRMA_SET_MARK_MASK,	/* __u32 */
+> >  	XFRMA_IF_ID,		/* __u32 */
+> >  	XFRMA_MTIMER_THRESH,	/* __u32 in seconds for input SA */
+> > +	XFRMA_SA_DIR,		/* __u8 */
+> >  	__XFRMA_MAX
+> >  
+> >  #define XFRMA_OUTPUT_MARK XFRMA_SET_MARK	/* Compatibility */
+> > diff --git a/net/xfrm/xfrm_compat.c b/net/xfrm/xfrm_compat.c
+> > index 655fe4ff8621..007dee03b1bc 100644
+> > --- a/net/xfrm/xfrm_compat.c
+> > +++ b/net/xfrm/xfrm_compat.c
+> > @@ -98,6 +98,7 @@ static const int compat_msg_min[XFRM_NR_MSGTYPES] = {
+> >  };
+> >  
+> >  static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
+> > +	[XFRMA_UNSPEC]          = { .strict_start_type = XFRMA_SA_DIR },
+> >  	[XFRMA_SA]		= { .len = XMSGSIZE(compat_xfrm_usersa_info)},
+> >  	[XFRMA_POLICY]		= { .len = XMSGSIZE(compat_xfrm_userpolicy_info)},
+> >  	[XFRMA_LASTUSED]	= { .type = NLA_U64},
+> > @@ -129,6 +130,7 @@ static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
+> >  	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
+> >  	[XFRMA_IF_ID]		= { .type = NLA_U32 },
+> >  	[XFRMA_MTIMER_THRESH]	= { .type = NLA_U32 },
+> > +	[XFRMA_SA_DIR]          = { .type = NLA_U8}
+> >  };
+> >  
+> >  static struct nlmsghdr *xfrm_nlmsg_put_compat(struct sk_buff *skb,
+> > @@ -277,9 +279,10 @@ static int xfrm_xlate64_attr(struct sk_buff *dst, const struct nlattr *src)
+> >  	case XFRMA_SET_MARK_MASK:
+> >  	case XFRMA_IF_ID:
+> >  	case XFRMA_MTIMER_THRESH:
+> > +	case XFRMA_SA_DIR:
+> >  		return xfrm_nla_cpy(dst, src, nla_len(src));
+> >  	default:
+> > -		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
+> > +		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
+> >  		pr_warn_once("unsupported nla_type %d\n", src->nla_type);
+> >  		return -EOPNOTSUPP;
+> >  	}
+> > @@ -434,7 +437,7 @@ static int xfrm_xlate32_attr(void *dst, const struct nlattr *nla,
+> >  	int err;
+> >  
+> >  	if (type > XFRMA_MAX) {
+> > -		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
+> > +		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
+> >  		NL_SET_ERR_MSG(extack, "Bad attribute");
+> >  		return -EOPNOTSUPP;
+> >  	}
+> > diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+> > index 6346690d5c69..2455a76a1cff 100644
+> > --- a/net/xfrm/xfrm_device.c
+> > +++ b/net/xfrm/xfrm_device.c
+> > @@ -253,6 +253,12 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
+> >  		return -EINVAL;
+> >  	}
+> >  
+> > +	if ((xuo->flags & XFRM_OFFLOAD_INBOUND && x->dir == XFRM_SA_DIR_OUT) ||
+> > +	    (!(xuo->flags & XFRM_OFFLOAD_INBOUND) && x->dir == XFRM_SA_DIR_IN)) {
+> > +		NL_SET_ERR_MSG(extack, "Mismatched SA and offload direction");
+> > +		return -EINVAL;
+> > +	}
+> > +
+> >  	is_packet_offload = xuo->flags & XFRM_OFFLOAD_PACKET;
+> >  
+> >  	/* We don't yet support UDP encapsulation and TFC padding. */
+> > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> > index 0c306473a79d..f7771a69ae2e 100644
+> > --- a/net/xfrm/xfrm_state.c
+> > +++ b/net/xfrm/xfrm_state.c
+> > @@ -1744,6 +1744,7 @@ static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig,
+> >  	x->lastused = orig->lastused;
+> >  	x->new_mapping = 0;
+> >  	x->new_mapping_sport = 0;
+> > +	x->dir = orig->dir;
+> >  
+> >  	return x;
+> >  
+> > @@ -1857,6 +1858,9 @@ int xfrm_state_update(struct xfrm_state *x)
+> >  	if (!x1)
+> >  		goto out;
+> >  
+> > +	if (x1->dir != x->dir)
+> > +		goto out;
+> > +
+> >  	if (xfrm_state_kern(x1)) {
+> >  		to_put = x1;
+> >  		err = -EEXIST;
+> > diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+> > index 810b520493f3..4e5256155c73 100644
+> > --- a/net/xfrm/xfrm_user.c
+> > +++ b/net/xfrm/xfrm_user.c
+> > @@ -360,6 +360,55 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
+> >  		}
+> >  	}
+> >  
+> > +	if (attrs[XFRMA_SA_DIR]) {
+> > +		u8 sa_dir = nla_get_u8(attrs[XFRMA_SA_DIR]);
+> > +
+> > +		if (sa_dir != XFRM_SA_DIR_IN && sa_dir != XFRM_SA_DIR_OUT)  {
+> > +			NL_SET_ERR_MSG(extack, "XFRMA_SA_DIR attribute is out of range");
+> > +			err = -EINVAL;
+> > +			goto out;
+> > +		}
+> > +
+> > +		if (sa_dir == XFRM_SA_DIR_OUT)  {
+> > +			if (p->replay_window > 0) {
+> > +				NL_SET_ERR_MSG(extack, "Replay window should not be set for OUT SA");
+> > +				err = -EINVAL;
+> > +				goto out;
+> > +			}
+> > +
+> > +			if (attrs[XFRMA_REPLAY_VAL]) {
+> > +				struct xfrm_replay_state *rp;
+> > +
+> > +				rp = nla_data(attrs[XFRMA_REPLAY_VAL]);
+> > +				if (rp->oseq ||  rp->seq || rp->bitmap) {
+> > +					NL_SET_ERR_MSG(extack,
+> > +						       "Replay seq, oseq, or bitmap should not be set for OUT SA with ESN");
+> > +					err = -EINVAL;
+> > +					goto out;
+> > +				}
+> > +			}
+> > +
+> > +			if (attrs[XFRMA_REPLAY_ESN_VAL]) {
+> > +				struct xfrm_replay_state_esn *esn;
+> > +
+> > +				esn = nla_data(attrs[XFRMA_REPLAY_ESN_VAL]);
+> > +				if (esn->replay_window > 1) {
+> > +					NL_SET_ERR_MSG(extack,
+> > +						       "Replay window should be 1 for  OUT SA with ESN");
+> > +					err = -EINVAL;
+> > +					goto out;
+> > +				}
+> > +
+> > +				if (esn->seq || esn->seq_hi || esn->bmp_len) {
+> > +					NL_SET_ERR_MSG(extack,
+> > +						       "Replay seq, seq_hi, bmp_len should not be set for OUT SA with ESN");
+> > +					err = -EINVAL;
+> > +					goto out;
+> > +				}
+> > +			}
+> > +		}
+> > +	}
+> > +
+> >  out:
+> >  	return err;
+> >  }
+> > @@ -627,6 +676,7 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
+> >  	struct nlattr *et = attrs[XFRMA_ETIMER_THRESH];
+> >  	struct nlattr *rt = attrs[XFRMA_REPLAY_THRESH];
+> >  	struct nlattr *mt = attrs[XFRMA_MTIMER_THRESH];
+> > +	struct nlattr *dir = attrs[XFRMA_SA_DIR];
+> >  
+> >  	if (re && x->replay_esn && x->preplay_esn) {
+> >  		struct xfrm_replay_state_esn *replay_esn;
+> > @@ -661,6 +711,9 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
+> >  
+> >  	if (mt)
+> >  		x->mapping_maxage = nla_get_u32(mt);
+> > +
+> > +	if (dir)
+> > +		x->dir = nla_get_u8(dir);
+> >  }
+> >  
+> >  static void xfrm_smark_init(struct nlattr **attrs, struct xfrm_mark *m)
+> > @@ -1182,8 +1235,13 @@ static int copy_to_user_state_extra(struct xfrm_state *x,
+> >  		if (ret)
+> >  			goto out;
+> >  	}
+> > -	if (x->mapping_maxage)
+> > +	if (x->mapping_maxage) {
+> >  		ret = nla_put_u32(skb, XFRMA_MTIMER_THRESH, x->mapping_maxage);
+> > +		if (ret)
+> > +			goto out;
+> > +	}
+> > +	if (x->dir)
+> > +		ret = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
+> >  out:
+> >  	return ret;
+> >  }
+> > @@ -2402,7 +2460,8 @@ static inline unsigned int xfrm_aevent_msgsize(struct xfrm_state *x)
+> >  	       + nla_total_size_64bit(sizeof(struct xfrm_lifetime_cur))
+> >  	       + nla_total_size(sizeof(struct xfrm_mark))
+> >  	       + nla_total_size(4) /* XFRM_AE_RTHR */
+> > -	       + nla_total_size(4); /* XFRM_AE_ETHR */
+> > +	       + nla_total_size(4) /* XFRM_AE_ETHR */
+> > +	       + nla_total_size(sizeof(x->dir)); /* XFRMA_SA_DIR */
+> >  }
+> >  
+> >  static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
+> > @@ -2459,6 +2518,12 @@ static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct
+> >  	if (err)
+> >  		goto out_cancel;
+> >  
+> > +	if (x->dir) {
+> > +		err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
+> > +		if (err)
+> > +			goto out_cancel;
+> > +	}
+> > +
+> >  	nlmsg_end(skb, nlh);
+> >  	return 0;
+> >  
+> > @@ -3018,6 +3083,7 @@ EXPORT_SYMBOL_GPL(xfrm_msg_min);
+> >  #undef XMSGSIZE
+> >  
+> >  const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
+> > +	[XFRMA_UNSPEC]		= { .strict_start_type = XFRMA_SA_DIR },
+> >  	[XFRMA_SA]		= { .len = sizeof(struct xfrm_usersa_info)},
+> >  	[XFRMA_POLICY]		= { .len = sizeof(struct xfrm_userpolicy_info)},
+> >  	[XFRMA_LASTUSED]	= { .type = NLA_U64},
+> > @@ -3049,6 +3115,7 @@ const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
+> >  	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
+> >  	[XFRMA_IF_ID]		= { .type = NLA_U32 },
+> >  	[XFRMA_MTIMER_THRESH]   = { .type = NLA_U32 },
+> > +	[XFRMA_SA_DIR]          = { .type = NLA_U8 }
+> >  };
+> >  EXPORT_SYMBOL_GPL(xfrma_policy);
+> >  
+> > @@ -3189,8 +3256,9 @@ static void xfrm_netlink_rcv(struct sk_buff *skb)
+> >  
+> >  static inline unsigned int xfrm_expire_msgsize(void)
+> >  {
+> > -	return NLMSG_ALIGN(sizeof(struct xfrm_user_expire))
+> > -	       + nla_total_size(sizeof(struct xfrm_mark));
+> > +	return NLMSG_ALIGN(sizeof(struct xfrm_user_expire)) +
+> > +	       nla_total_size(sizeof(struct xfrm_mark)) +
+> > +	       nla_total_size(sizeof_field(struct xfrm_state, dir));
+> >  }
+> >  
+> >  static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
+> > @@ -3217,6 +3285,12 @@ static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct
+> >  	if (err)
+> >  		return err;
+> >  
+> > +	if (x->dir) {
+> > +		err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
+> > +		if (err)
+> > +			return err;
+> > +	}
+> > +
+> >  	nlmsg_end(skb, nlh);
+> >  	return 0;
+> >  }
+> > @@ -3324,6 +3398,9 @@ static inline unsigned int xfrm_sa_len(struct xfrm_state *x)
+> >  	if (x->mapping_maxage)
+> >  		l += nla_total_size(sizeof(x->mapping_maxage));
+> >  
+> > +	if (x->dir)
+> > +		l += nla_total_size(sizeof(x->dir));
+> > +
+> >  	return l;
+> >  }
+> >  
+> > -- 
+> > 2.30.2
+> > 
 
