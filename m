@@ -1,153 +1,127 @@
-Return-Path: <netdev+bounces-86896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 373D98A0B2B
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:30:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1129D8A0B6F
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:38:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8301AB26DA3
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 08:30:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434ED1C21210
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 08:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB265140365;
-	Thu, 11 Apr 2024 08:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC3BD13FD85;
+	Thu, 11 Apr 2024 08:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EOPPhkJj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NAFuS0Pp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E62913D8BD
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 08:29:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A39D6FB5;
+	Thu, 11 Apr 2024 08:38:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712824201; cv=none; b=Ikzub+kbxyzJEVp1Az6nNOJ2bSkWEmYO8d7XKlIiNpu0TOH843kgpGCxX67F3hYH3+z86A6qOBbjhgK8GMZvALfpWfPnv44EkEq0Ts+yfjpJENsuVqFzwZFYoOwyXHxSGmzm43OL2BogHaAS6kkL4jPi9sTGHMOICvR4WjYFgqs=
+	t=1712824733; cv=none; b=WAU8+UrvJlBH79s0Ux0mG9uMpsluLQsDBAM4tuSpLBAiMRVkLa6d7KutT+HBT9Enyw8hJ4RTLOi9nqyqyGeii/5SpwZxzUOsjZnLWDWK2T7R4yDcg3qMMYp1UsOA5Xj9Uh8zrr41Fd4XP3hVcPfdjavfYdZEzGycrN7X1aVJEKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712824201; c=relaxed/simple;
-	bh=vo0iSDp1GT2jGs2GGotK34NJkuhKeT5kSx5SYklbTmE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=A5SOCku2w3Ve2zDZPPcHWkPPHMfXFJhAWFp+wPoyasMzXjTmNHLej5KNtAAehDJZP2CAysvpBfy6pOtraZCrRVZr2EZotjSDE7sucks720O2VV0DZ/Gk0tg37+XMB5g+l9vsUKI43EzV/lhQih+r0cBT8sT8xSsQVTpbB894PU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EOPPhkJj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712824199;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=UWJr1U/EB988q2izFRjBXn0rjFXLneZuCZ+38kBWSdI=;
-	b=EOPPhkJjRFqetPKWKNVrYhhvXOfGANJQghWZditPR+u7G/uHx02izXqO0l987N68Mlom47
-	OSmgtR5FIRD/EFaTRDCoD9oBcYtpvzsAIN15S1sV5IYP1hVCRwH31YikVlXwDS2E6faoBs
-	uwyFfoGu9Qnw8GZlWqYqJ6VcUF6lbWA=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-157--SR4kc0ANfOOCf28mJ4LwQ-1; Thu, 11 Apr 2024 04:29:57 -0400
-X-MC-Unique: -SR4kc0ANfOOCf28mJ4LwQ-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-343edd4ac01so1377334f8f.0
-        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 01:29:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712824196; x=1713428996;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UWJr1U/EB988q2izFRjBXn0rjFXLneZuCZ+38kBWSdI=;
-        b=jWEGqSPZWOLco3qQFc3MNBFtnYIpCl+Z8pmbwwdrV4kSLr4VyGg3g8+Yo7BcMEcUyf
-         u+1wf2+C3/fkE95pFeEYd2fozfOi1FK/83T3TFzy8vTaK5s8yyRHm33enoEznzQEoy4m
-         J28FOBcP26CUY39B10MqPLIcwe8gMSo/8BJ7meNU6m7he8CausN4EeDFTvtsropSs4cr
-         WipnV7R28gYusPc1eFT1ENUoiSzZ34VB/mGLYixc8BgjqGtMxGiWzyvz10xiyU2PsFVs
-         vlF/z62bQD/JF6H7sZ5nsnkVJn40zeRCD3JhYGS9aNxWFZJcSkR+purt3Iqj5HwWwTt9
-         bc7g==
-X-Gm-Message-State: AOJu0YxNQ2BRnA91FULbE2HOz0xxI+Rfx/0OovPr6puMmGaQFujk/2V6
-	hmbJc8WdTEK8dwuNZPRVYoyWcylH7VRU/z2XVtW1+5Bji/XUkWRAD79shVcxHs37tX5t6K7Ei2h
-	Dew4JT8NaJShBNFab5X+57fWPIfyLt9seZ5YrYyzuPAgtxIHNjzDFbQ==
-X-Received: by 2002:a05:6000:23a:b0:343:bbec:aef8 with SMTP id l26-20020a056000023a00b00343bbecaef8mr2940096wrz.7.1712824196016;
-        Thu, 11 Apr 2024 01:29:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHOM36ybn5Chc07WnwWslEmEdxEt16BEzIrlyYL/G6FAIO+VJ0TLcg+pSAJc39UhyjU94YXzQ==
-X-Received: by 2002:a05:6000:23a:b0:343:bbec:aef8 with SMTP id l26-20020a056000023a00b00343bbecaef8mr2940088wrz.7.1712824195664;
-        Thu, 11 Apr 2024 01:29:55 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-235-217.dyn.eolo.it. [146.241.235.217])
-        by smtp.gmail.com with ESMTPSA id q10-20020adffeca000000b0033dd2a7167fsm1215360wrs.29.2024.04.11.01.29.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Apr 2024 01:29:55 -0700 (PDT)
-Message-ID: <9e0884e2a101215d3376f2ef9a7a68ca86599f0f.camel@redhat.com>
-Subject: Re: [PATCH v2] net:tun: limit printing rate when illegal packet
- received by tun dev
-From: Paolo Abeni <pabeni@redhat.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jason Wang
-	 <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Lei Chen
- <lei.chen@smartx.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Date: Thu, 11 Apr 2024 10:29:53 +0200
-In-Reply-To: <20240410042245.2044516-1-lei.chen@smartx.com>
-References: <20240410042245.2044516-1-lei.chen@smartx.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
- 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
- iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
- sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1712824733; c=relaxed/simple;
+	bh=hFPKYBGIMfpUrwovYlZJbiVjlexhjRbaRyeGHPPWlns=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=PZDVh09OIyfbRjQrmoxCvCYtOJ0Vefuba3jn/iqO672NUspGP9cDOpx9E59ZH6AEfFEaDq/O0/civXIAMRqAObJAK4BznaecBvm93OuqJcb77RnkLVi2WXEZJCkOPZf+D9ixfArc3EjvfX4CZ7Y2JUl/8itvdl0hJ9H9Yzrl+kM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NAFuS0Pp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BF14C433F1;
+	Thu, 11 Apr 2024 08:38:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712824733;
+	bh=hFPKYBGIMfpUrwovYlZJbiVjlexhjRbaRyeGHPPWlns=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=NAFuS0Ppx0+PkVXSEJz4rvVpoClDsOe3OP/22UTvK7TVNvqysCmc8ya7CP2kXYKvq
+	 MEzj40HuEA/CIdTXGdMDf4FVp2dQlSbFqLoCRy35QUEqVmt8aFV8jgAtdGQoqiZq6b
+	 BcfQG6FtYZhS9tDybY8gp5mq07k1BpKuWR7Te7A3rCLgTY2AW/t69iINWHG4b/X7GT
+	 4vOoFym4qjz6G+QWNyugZh3HemWLtgqsvwx0eVo+r65d63JWxk7GFJXZAY+IE1RxEt
+	 Du5oakGX1TS7W6YWY6MWkYSCOM8v+fPCQQ03DzRgwDh08cEfH0rlwvp3CzAPwRwrjf
+	 MW64XnTh5rKaQ==
+From: Kalle Valo <kvalo@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: aleksander.lobakin@intel.com,  kuba@kernel.org,  davem@davemloft.net,
+  pabeni@redhat.com,  edumazet@google.com,  elder@kernel.org,
+  linux-arm-kernel@lists.infradead.org,
+  linux-mediatek@lists.infradead.org,  nbd@nbd.name,
+  sean.wang@mediatek.com,  Mark-MC.Lee@mediatek.com,  lorenzo@kernel.org,
+  taras.chornyi@plvision.eu,  ath11k@lists.infradead.org,
+  ath10k@lists.infradead.org,  linux-wireless@vger.kernel.org,
+  geomatsi@gmail.com,  Matthias Brugger <matthias.bgg@gmail.com>,
+  AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+  quic_jjohnson@quicinc.com,  leon@kernel.org,
+  dennis.dalessandro@cornelisnetworks.com,  linux-kernel@vger.kernel.org,
+  netdev@vger.kernel.org,  bpf@vger.kernel.org,  idosch@idosch.org
+Subject: Re: [PATCH net-next v5 00/10] allocate dummy device dynamically
+References: <20240410131407.3897251-1-leitao@debian.org>
+Date: Thu, 11 Apr 2024 11:38:45 +0300
+In-Reply-To: <20240410131407.3897251-1-leitao@debian.org> (Breno Leitao's
+	message of "Wed, 10 Apr 2024 06:13:41 -0700")
+Message-ID: <87frvsz42y.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
 
-On Wed, 2024-04-10 at 00:22 -0400, Lei Chen wrote:
-> vhost_worker will call tun call backs to receive packets. If too many
-> illegal packets arrives, tun_do_read will keep dumping packet contents.
-> When console is enabled, it will costs much more cpu time to dump
-> packet and soft lockup will be detected.
->=20
-> net_ratelimit mechanism can be used to limit the dumping rate.
->=20
-> PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980"
->  #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
->  #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
->  #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
->  #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
->  #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
->     [exception RIP: io_serial_in+20]
->     RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
->     RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 0000000000000000
->     RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428a0
->     RBP: 0000000000002710   R8: 0000000000000004   R9: 000000000000000f
->     R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 0000000000000020
->     R13: ffffffff8acbf698  R14: 0000000000000058  R15: 0000000000000000
->     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
->  #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
->  #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
->  #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
->  #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
->  #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
->  #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
->  #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
->  #12 [ffffa65531497b68] printk at ffffffff89318306
->  #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
->  #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
->  #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
->  #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
->  #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
->  #18 [ffffa65531497f10] kthread at ffffffff892d2e72
->  #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
->=20
-> Signed-off-by: Lei Chen <lei.chen@smartx.com>
+Breno Leitao <leitao@debian.org> writes:
 
-This change is IMHO best suited for 'net': the possible soft sookup
-looks nasty.
+> struct net_device shouldn't be embedded into any structure, instead,
+> the owner should use the private space to embed their state into
+> net_device.
+>
+> But, in some cases the net_device is embedded inside the private
+> structure, which blocks the usage of zero-length arrays inside
+> net_device.
+>
+> Create a helper to allocate a dummy device at dynamically runtime, and
+> move the Ethernet devices to use it, instead of embedding the dummy
+> device inside the private structure.
+>
+> This fixes all the network cases plus some wireless drivers.
+>
+> PS: Due to lack of hardware, unfortunately most these patches are
+> compiled tested only, except ath11k that was kindly tested by Kalle Valo.
+>
+> ---
+> Changelog:
+>
+> v1:
+> 	* https://lore.kernel.org/all/20240327200809.512867-1-leitao@debian.org/
+>
+> v2:
+> 	* Patch 1: Use a pre-defined name ("dummy#") for the dummy
+> 	  net_devices.
+> 	* Patch 2-5: Added users for the new helper.
+> v3:
+> 	* Use free_netdev() instead of kfree() as suggested by Jakub.
+> 	* Change the free_netdev() place in ipa driver, as suggested by
+> 	  Alex Elder.
+> 	* Set err in the error path in the Marvell driver, as suggested
+> 	  by Simon Horman.
+> v4:
+> 	* Added a new patch to add dummy device at free_netdev(), as suggested
+> 	  by Jakub.
+> 	* Added support for some wireless driver.
+> 	* Added some Acked-by and Reviewed-by.
+> v5:
+> 	* Added a new patch to fix some typos in the previous code,
+> 	  suggested by Ido.
+> 	* Rebased to net-net/main
 
-@Willem, @Jason, any strong opinion against the above?
+I'm nitpicking here but I prefer to have the changelog in reverse order,
+that is v5 first and v1 last. I'm most interested about the changes in
+v5, I don't care about v1 at this point. Though I don't know if net
+folks have a different prefence, just wanted to mention this.
 
-Otherwise, @Lei Chen, please repost with a suitable fixes tag and
-adding the target tree into the subj prefix.
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
 
-Thanks,
-
-Paolo
-
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
