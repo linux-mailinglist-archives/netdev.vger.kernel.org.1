@@ -1,167 +1,141 @@
-Return-Path: <netdev+bounces-87185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A38C8A2051
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 22:37:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC13C8A204C
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 22:35:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CAD91C21BE2
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:37:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D10F1F22213
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:35:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00BC725575;
-	Thu, 11 Apr 2024 20:37:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4832B29417;
+	Thu, 11 Apr 2024 20:34:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=rjmcmahon.com header.i=@rjmcmahon.com header.b="UXbrraKz"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QupZcvgs"
 X-Original-To: netdev@vger.kernel.org
-Received: from bobcat.rjmcmahon.com (bobcat.rjmcmahon.com [45.33.58.123])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2A11863F
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 20:37:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.33.58.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE9829425
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 20:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712867822; cv=none; b=Px5vO9IZsP+imTkSEZJ1QVlgfex29HH2nLY3DrVRlUudpyQ5sULGCxXkvWxEg0pOPoaVxPDUU1RabPG1Sl67xlcaSNk/g8vw1NqGha8kQWLlVxbtxvCZmaI4ltW7m9hCLb7xv+NnOPOMUwdGV9UlYzuA35/1vUX8vYcJD1rBftQ=
+	t=1712867697; cv=none; b=FaDn39M8GKWbCPKOp1n7zj4jSZisAOh9u/bq2MwD1YApSC247OAOEvXX1qhZTd9eWjM2vrQdE5BWl+976YgXL+ifW9/udarMLmXCZzYqtdQJWK75zpt9enP9Ps59/msBvR5ofd70+7uTXSnr/Jj2ghU4nOdREzb22XN6n6+4zXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712867822; c=relaxed/simple;
-	bh=gDADatflrjmCh/O4yH6EZDoOj9fn0cVSbC5L1vnM84Y=;
-	h=MIME-Version:Date:From:To:Subject:Message-ID:Content-Type; b=M1HdtJjM6Burbs0M4owaM0Btaf2xndGkI3g9wCU2BUUWyP5WEeg7+CKA/wv0W1b6qSV1DPkvGNlHjFS8XkyJ21GuYOHg78nYOlYM7tN86gMolPmDN1o0sIrTUbEs4ApIFEvVIc8vISKhLQ4/fbu3OOlJnuFCPwMyWflKsV+suNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rjmcmahon.com; spf=pass smtp.mailfrom=rjmcmahon.com; dkim=pass (1024-bit key) header.d=rjmcmahon.com header.i=@rjmcmahon.com header.b=UXbrraKz; arc=none smtp.client-ip=45.33.58.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=rjmcmahon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rjmcmahon.com
-Received: from mail.rjmcmahon.com (bobcat.rjmcmahon.com [45.33.58.123])
-	by bobcat.rjmcmahon.com (Postfix) with ESMTPA id E7EEF1B27D
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 13:28:57 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 bobcat.rjmcmahon.com E7EEF1B27D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rjmcmahon.com;
-	s=bobcat; t=1712867337;
-	bh=8ORLJqqiahWmq7VLaRVIl6jJGGjCqc/+jaxtsZAzKLI=;
-	h=Date:From:To:Subject:From;
-	b=UXbrraKzfBdUSmSpCF3DQzFeUm6M5ltFR62ojSBef0j1bPB+A/Mbyor2z1LIa0EQR
-	 ltn74SXFkGh01SR0S3DgfI/TC8W7Rup79FhtSdHmzCOrFvcH6hiNn/eEBBBZBCRYJS
-	 37GWeypkTogTrsUZJti9GoaclKYqb2FBSOMvplUA=
+	s=arc-20240116; t=1712867697; c=relaxed/simple;
+	bh=vOKY0q5eSsDwDgkkwlZIO5+DlS/iarqDbWDJMkKHzas=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qpiAnN1ULZoVUSzQAUg/+B/wgbDuJdWwWK4chRM7YVBQJDhI729zDtjdISy9uMjgHlUCbX+C/7XC9PjEu0fldWiiU+vfvrLkguXFhJsoBQFgHruI+y8cbBhor/SSLzY+VHWExHO0bUjL+cpDyRZCwjJhFccyaYWOQoRGsruPfBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QupZcvgs; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43BJSTrI011690
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 20:34:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=14XH7WXYfha/I0/6ANApvyuqYdl3RJrK+5miWXJWz+k=;
+ b=QupZcvgsszhtLaZerlIKJbvdOJ/4CYLOmksR2uF4GqpnQMnEFeDT+VvpUvV7J+CEDGnH
+ zPTwQpaqnwYnVPvYb3kDKv08WYaudMhRgM1ECu7xuAXpCZ/Y46Sp6IaCoasfATez8TUL
+ 28iZtgT1IWRr4khFUKq8jaWLCEKie0j/oSHxtZn31V54zCKrip0H9DHy0qiEUJHEQtE+
+ Xpvh5Z8JUPDgvj4i4gyKJfO9K47AkBldmlDj1AuVHjj38C7e3u/mdtJ5MKMVA1nOWgBN
+ O95odCym6t+rkT0rGOLV9szZ+ED4FvHlXbpkHkpfOrux7Hwt7WkeptNx8pnZa/CXyUgg sg== 
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xep1r04tt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 20:34:52 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43BJxq3X016982
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 20:34:52 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xbke2w6xk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 20:34:52 +0000
+Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43BKYjk026542686
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 11 Apr 2024 20:34:48 GMT
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D6F935805D;
+	Thu, 11 Apr 2024 20:34:45 +0000 (GMT)
+Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A820A58057;
+	Thu, 11 Apr 2024 20:34:45 +0000 (GMT)
+Received: from tinkpad.austin.ibm.com (unknown [9.24.5.26])
+	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 11 Apr 2024 20:34:45 +0000 (GMT)
+From: Nick Child <nnac123@linux.ibm.com>
+To: netdev@vger.kernel.org
+Cc: haren@linux.ibm.com, ricklind@us.ibm.com, mmc@linux.ibm.com,
+        Nick Child <nnac123@linux.ibm.com>
+Subject: [PATCH net-next] ibmvnic: Return error code on TX scrq flush fail
+Date: Thu, 11 Apr 2024 15:34:35 -0500
+Message-Id: <20240411203435.228559-1-nnac123@linux.ibm.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Thu, 11 Apr 2024 13:28:57 -0700
-From: rjmcmahon <rjmcmahon@rjmcmahon.com>
-To: netdev@vger.kernel.org
-Subject: iperf 2.2.0 release
-Message-ID: <dad9030c7a57d93220503ef4411af89b@rjmcmahon.com>
-X-Sender: rjmcmahon@rjmcmahon.com
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 9YODJEpKScIzej0P7M-L4sYDMQJHwnVj
+X-Proofpoint-ORIG-GUID: 9YODJEpKScIzej0P7M-L4sYDMQJHwnVj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-11_10,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ suspectscore=0 phishscore=0 spamscore=0 impostorscore=0 bulkscore=0
+ mlxscore=0 clxscore=1011 priorityscore=1501 adultscore=0 malwarescore=0
+ mlxlogscore=986 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404110149
 
-Hi All,
+In ibmvnic_xmit() if ibmvnic_tx_scrq_flush() returns H_CLOSED then
+it will inform upper level networking functions to disable tx
+queues. H_CLOSED signals that the connection with the vnic server is
+down and a transport event is expected to recover the device.
 
-iperf 2.2.0 has been released. Lots of features & bug fixes and 
-hopefully on a few regressions. Big focus around latency and buffer 
-depths, .e.g support for inflight on the client and in progress (per 
-Little's Law) on the server.
+Previously, ibmvnic_tx_scrq_flush() was hard-coded to return success.
+Therefore, the queues would remain active until ibmvnic_cleanup() is
+called within do_reset().
 
-See sourceforge for the README and more: 
-https://sourceforge.net/projects/iperf2/
+The problem is that do_reset() depends on the RTNL lock. If several
+ibmvnic devices are resetting then there can be a long wait time until
+the last device can grab the lock. During this time the tx/rx queues
+still appear active to upper level functions.
 
-Man page is here: https://iperf2.sourceforge.io/iperf-manpage.html
+FYI, we do make a call to netif_carrier_off() outside the RTNL lock but
+its calls to dev_deactivate() are also dependent on the RTNL lock.
 
-Example use over a Wi-Fi link with -e (or --enhanced) & --trip-times 
-follows. Note: Clock sync needs to be done ahead of using --trip-times, 
-e.g. with pulse per second or PTP (IEEE-1588).
+As a result, large amounts of retransmissions were observed in a short
+period of time, eventually leading to ETIMEOUT. This was specifically
+seen with HNV devices, likely because of even more RTNL dependencies.
 
-Feel free to email me with any issues or comments.
+Therefore, ensure the return code of ibmvnic_tx_scrq_flush() is
+propagated to the xmit function to allow for an earlier (and lock-less)
+response to a transport event.
 
+Signed-off-by: Nick Child <nnac123@linux.ibm.com>
+---
+ drivers/net/ethernet/ibm/ibmvnic.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-[root@ctrl1fc35 iperf-2.2.0]# iperf -c 192.168.1.232 -i 1 -e 
---trip-times
-------------------------------------------------------------
-Client connecting to 192.168.1.232, TCP port 5001 with pid 2808134 (1/0 
-flows/load)
-Write buffer size: 131072 Byte
-TCP congestion control using reno
-TOS defaults to 0x0 (dscp=0,ecn=0) (Nagle on)
-TCP window size: 16.0 KByte (default)
-Event based writes (pending queue watermark at 16384 bytes)
-------------------------------------------------------------
-[  1] local 192.168.1.15%enp2s0 port 44778 connected with 192.168.1.232 
-port 5001 (prefetch=16384) (trip-times) (sock=3) 
-(icwnd/mss/irtt=14/1448/6300) (ct=6.37 ms) on 2024-04-11 11:47:11.432 
-(PDT)
-[ ID] Interval        Transfer    Bandwidth       Write/Err  Rtry     
-InF(pkts)/Cwnd(pkts)/RTT(var)        NetPwr
-[  1] 0.00-1.00 sec   197 MBytes  1.65 Gbits/sec  1574/0         0      
-658K(466)/5664K(4006)/7632(1329) us  27032
-[  1] 1.00-2.00 sec   209 MBytes  1.76 Gbits/sec  1674/0         0      
-702K(497)/5664K(4006)/7907(2023) us  27749
-[  1] 2.00-3.00 sec   208 MBytes  1.74 Gbits/sec  1663/0         0     
-1924K(1361)/5664K(4006)/7689(1454) us  28349
-[  1] 3.00-4.00 sec   204 MBytes  1.71 Gbits/sec  1630/0         0      
-767K(543)/5664K(4006)/9323(3084) us  22916
-[  1] 4.00-5.00 sec   209 MBytes  1.75 Gbits/sec  1672/0         0     
-2306K(1631)/5664K(4006)/7586(1930) us  28889
-[  1] 5.00-6.00 sec   203 MBytes  1.71 Gbits/sec  1627/0         0      
-644K(456)/5664K(4006)/7498(2578) us  28441
-[  1] 6.00-7.00 sec   205 MBytes  1.72 Gbits/sec  1639/0         0      
-453K(321)/5664K(4006)/8996(1837) us  23880
-[  1] 7.00-8.00 sec   205 MBytes  1.72 Gbits/sec  1642/0         0     
-1214K(859)/5664K(4006)/9549(2058) us  22539
-[  1] 8.00-9.00 sec   206 MBytes  1.72 Gbits/sec  1645/0         0      
-554K(392)/5664K(4006)/7606(1142) us  28348
-[  1] 9.00-10.00 sec   208 MBytes  1.74 Gbits/sec  1663/0         0      
-390K(276)/5664K(4006)/9105(484) us  23940
-[  1] 0.00-10.02 sec  2.01 GBytes  1.72 Gbits/sec  16430/0         0     
-    0K(0)/5664K(4006)/10840(3545) us  19825
+diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
+index 30c47b8470ad..f5177f370354 100644
+--- a/drivers/net/ethernet/ibm/ibmvnic.c
++++ b/drivers/net/ethernet/ibm/ibmvnic.c
+@@ -2371,7 +2371,7 @@ static int ibmvnic_tx_scrq_flush(struct ibmvnic_adapter *adapter,
+ 		ibmvnic_tx_scrq_clean_buffer(adapter, tx_scrq);
+ 	else
+ 		ind_bufp->index = 0;
+-	return 0;
++	return rc;
+ }
+ 
+ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
+-- 
+2.39.3
 
-[root@fedora iperf-2.2.0]# iperf -s -i 1 -e -B 192.168.1.232%eth1
-------------------------------------------------------------
-Server listening on TCP port 5001 with pid 1012228
-Binding to local address 192.168.1.232 and iface eth1
-Read buffer size:  128 KByte (Dist bin width=16.0 KByte)
-TCP congestion control default reno
-TCP window size:  128 KByte (default)
-------------------------------------------------------------
-[  1] local 192.168.1.232%eth1 port 5001 connected with 192.168.1.15 
-port 44778 (trip-times) (sock=4) (peer 2.2.0) 
-(icwnd/mss/irtt=14/1448/6008) on 2024-04-11 11:47:11.443 (PDT)
-[ ID] Interval        Transfer    Bandwidth    Burst Latency 
-avg/min/max/stdev (cnt/size) inP NetPwr  Reads=Dist
-[  1] 0.00-1.00 sec   196 MBytes  1.65 Gbits/sec  
-5.943/1.431/23.584/2.449 ms (1571/131125) 1.18 MByte 34661  
-3190=741:212:241:640:334:152:96:774
-[  1] 1.00-2.00 sec   208 MBytes  1.74 Gbits/sec  
-5.846/1.520/13.633/2.320 ms (1664/131063) 1.22 MByte 37309  
-3400=792:233:259:685:337:168:129:797
-[  1] 2.00-3.00 sec   208 MBytes  1.74 Gbits/sec  
-5.812/1.644/12.749/2.292 ms (1662/131055) 1.21 MByte 37476  
-3442=816:236:272:686:347:176:125:784
-[  1] 3.00-4.00 sec   204 MBytes  1.71 Gbits/sec  
-6.326/1.475/15.828/2.552 ms (1634/131054) 1.30 MByte 33854  
-3491=841:234:263:829:363:134:106:721
-[  1] 4.00-5.00 sec   209 MBytes  1.75 Gbits/sec  
-5.744/1.398/14.738/2.371 ms (1669/131075) 1.19 MByte 38089  
-3400=748:279:266:657:353:169:143:785
-[  1] 5.00-6.00 sec   204 MBytes  1.71 Gbits/sec  
-6.023/1.469/16.495/2.461 ms (1634/131129) 1.23 MByte 35573  
-3280=734:228:226:662:335:176:128:791
-[  1] 6.00-7.00 sec   204 MBytes  1.71 Gbits/sec  
-5.840/1.506/14.574/2.345 ms (1635/131013) 1.19 MByte 36677  
-3292=731:244:249:647:338:162:127:794
-[  1] 7.00-8.00 sec   205 MBytes  1.72 Gbits/sec  
-5.862/1.459/14.374/2.413 ms (1637/131059) 1.20 MByte 36600  
-3303=724:245:274:623:349:171:135:782
-[  1] 8.00-9.00 sec   207 MBytes  1.73 Gbits/sec  
-5.747/1.531/13.705/2.322 ms (1653/131127) 1.19 MByte 37718  
-3281=690:260:263:599:349:171:138:811
-[  1] 9.00-10.00 sec   208 MBytes  1.75 Gbits/sec  
-5.926/1.300/17.368/2.525 ms (1665/131019) 1.24 MByte 36810  
-3263=669:259:253:585:360:171:145:821
-[  1] 0.00-10.01 sec  2.01 GBytes  1.72 Gbits/sec  
-5.907/1.300/23.584/2.411 ms (16430/131072)  477 KByte 36434  
-33354=7488:2430:2569:6614:3466:1653:1272:7862
-
-Bob
 
