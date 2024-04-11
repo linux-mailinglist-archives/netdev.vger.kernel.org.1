@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-87051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69DC38A1712
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 16:23:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB9B58A1755
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 16:35:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89310B2AEE7
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:21:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB5E91C20C22
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:35:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E584214D43D;
-	Thu, 11 Apr 2024 14:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1272310F7;
+	Thu, 11 Apr 2024 14:35:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rnDBtNWs"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="aP6taUqV"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A502D14D708;
-	Thu, 11 Apr 2024 14:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3311C2E
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 14:35:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712845268; cv=none; b=NAC4bG8Q9evXEDf/663xTABHGq8dwPjVBbNtDFgiwGKpgfyDJZUeSqu/h8QpqvTBTg3ZAe24YbDbz4/GjFaCN6iHOGPvAdL7fw4WhiC3x1SDKLbK5N7peaDMPAm6lhNoyJEeBMFWqyR/3x4HhPXt2jKwwFyAM/0NaDXzgx88uHA=
+	t=1712846116; cv=none; b=BV8dFROSVBTMiJ0kCo61y8RuT7I14iHyq+UDLRvGzAs7k3Of6jtWMKo6+pOkWUsmMC0sxTeIJkMh//NsiyYw4D+Ggiu1Z95KBNR7fgJGW6wXwIz6Nm2no47XaT/UBVr8pT1ZvL2MjX1dLX0hoJz6spCQ7s9VvN4OVrXM1OG3jeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712845268; c=relaxed/simple;
-	bh=l7j7GLxWdevX8j9nxH2gEq+1VH4ij6kA0ZV6FEUWLa8=;
+	s=arc-20240116; t=1712846116; c=relaxed/simple;
+	bh=cZ5YUlRRUoMKXrKTwST2RLraGsw6fJnPUABSQM5CzGg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sZBnf37170TR/ypWHHJen/ERAza/WP+9SIO8tKGjMAp/YuIvPpglwUDYBbdPTXSVdT2mzcjW/n4hJtJlGeN178OXEoO7DDryIcFafTFtr31l6bZCv9vaYMx8ya+LuAET9Da85F5757/ZRj1kk3dPfaaXmGet8rdTA+O7CCT+jZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rnDBtNWs; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=U3KL+9xHYvkhbaBXaFoFK5cOWtsSG9v6DbLUXZmiZkTYMpu7mI7HtKHmQLXIp4YybPxznSlZSJzwyIoyX0LVhNYOOYATGAAeIxDVLJmgtjgnyWzqpds9zr/MMXaPK6F2K3UAjP2LhymXMoKt7iBPdsE1WFimFGMB+Rjq/2eeDoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=aP6taUqV; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,29 +36,29 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Q/oJU7Vy/d+vtAVhKgDsRx9ErkPhiN/5itGbIlcfFwo=; b=rnDBtNWsysuvAwGzBDHwwnBkXg
-	n5T7i19Z9E2zXsQ1lOP2+QwHBzLlA2kBNCCPHXPjxcGby5m53CvpLxeJTDMiVY38gdYoRumxPnNl8
-	NbzHpZj26dxhQwA+VSLyPMvPXJhsqzLW6AZ+Nc4ohMmGpr9Kv3XJfxBIB4t1QWIcj3k0=;
+	bh=EYVDdYeh04okbdMI/eWdfGqzvMINUwe8OiPw454oS+o=; b=aP6taUqVnTAmjsQf8LZY+DGFc7
+	UGh3P9xu34c8NtdTJ0ecntYP/4ZUH9maN1330IZjeh04MVBu0BUYipGxj0vh2f42+mLtjxMbtoM9M
+	pX3moxDpjrQGftpL91Zw50FwMkQNrKFm3SPSVnG20392paM+KE12hVnLw3zdYU3KUDDY=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1ruvIJ-00CmSb-42; Thu, 11 Apr 2024 16:20:51 +0200
-Date: Thu, 11 Apr 2024 16:20:51 +0200
+	id 1ruvW4-00CmWx-Q5; Thu, 11 Apr 2024 16:35:04 +0200
+Date: Thu, 11 Apr 2024 16:35:04 +0200
 From: Andrew Lunn <andrew@lunn.ch>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Doug Berger <opendmb@gmail.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 7/7] netdev_features: convert
- NETIF_F_FCOE_MTU to IFF_FCOE_MTU
-Message-ID: <a9a45958-fac1-4523-96f7-19cf0b375395@lunn.ch>
-References: <20240405133731.1010128-1-aleksander.lobakin@intel.com>
- <20240405133731.1010128-8-aleksander.lobakin@intel.com>
- <20240408193806.18e227c8@kernel.org>
- <1f14cb75-ee6b-4a7d-9041-23a8cfcd8476@intel.com>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: genet: Fixup EEE
+Message-ID: <843316df-162f-4551-97ec-8e30dc054b41@lunn.ch>
+References: <20240408-stmmac-eee-v1-1-3d65d671c06b@lunn.ch>
+ <4826747e-0dd5-4ab9-af02-9d17a1ab7358@broadcom.com>
+ <67c0777f-f66e-4293-af8b-08e0c4ab0acc@lunn.ch>
+ <c2a16e3c-374c-4fd1-9ca7-bf0aeb5ed941@broadcom.com>
+ <ZhdycHAooDITV1a3@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,21 +67,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1f14cb75-ee6b-4a7d-9041-23a8cfcd8476@intel.com>
+In-Reply-To: <ZhdycHAooDITV1a3@pengutronix.de>
 
-> >> @@ -47,7 +47,6 @@ const char netdev_features_strings[NETDEV_FEATURE_COUNT][ETH_GSTRING_LEN] = {
-> >>  
-> >>  	[NETIF_F_FCOE_CRC_BIT] =         "tx-checksum-fcoe-crc",
-> >>  	[NETIF_F_SCTP_CRC_BIT] =        "tx-checksum-sctp",
-> >> -	[NETIF_F_FCOE_MTU_BIT] =         "fcoe-mtu",
-> > 
-> > 
-> > But this definitely _is_ a uAPI change, right?
+On Thu, Apr 11, 2024 at 07:17:36AM +0200, Oleksij Rempel wrote:
+> Hi Florian,
 > 
-> Why?
+> On Wed, Apr 10, 2024 at 10:48:26AM -0700, Florian Fainelli wrote:
+> 
+> > I am seeing a functional difference with and without your patch however, and
+> > also, there appears to be something wrong within the bcmgenet driver after
+> > PHYLIB having absorbed the EEE configuration. Both cases we start on boot
+> > with:
+> > 
+> > # ethtool --show-eee eth0
+> > EEE settings for eth0:
+> >         EEE status: disabled
+> >         Tx LPI: disabled
+> >         Supported EEE link modes:  100baseT/Full
+> >                                    1000baseT/Full
+> >         Advertised EEE link modes:  100baseT/Full
+> >                                     1000baseT/Full
+> >         Link partner advertised EEE link modes:  100baseT/Full
+> >                                                  1000baseT/Full
+> > 
+> > I would expect the EEE status to be enabled, that's how I remember it
+> > before.
+> 
+> Yes, current default kernel implementation is to use EEE if available.
 
-That it is not obvious why this is not a uAPI change makes it clear
-this needs explaining in the commit message.
+We do however seem to be inconsistent in this example. EEE seems to be
+disabled, yet it is advertising? Or is it showing what we would
+advertise, when EEE is enabled?
 
-     Andrew
+> > Now, with your patch, once I turn on EEE with:
+> > 
+> > # ethtool --set-eee eth0 eee on
+> > # ethtool --show-eee eth0
+> > EEE settings for eth0:
+> >         EEE status: enabled - active
+> >         Tx LPI: disabled
+> >         Supported EEE link modes:  100baseT/Full
+> >                                    1000baseT/Full
+> >         Advertised EEE link modes:  100baseT/Full
+> >                                     1000baseT/Full
+> >         Link partner advertised EEE link modes:  100baseT/Full
+> >                                                  1000baseT/Full
+> > #
+> > 
+> > there is no change to the EEE_CTRL register to set the EEE_EN, this only
+> > happens when doing:
+> > 
+> > # ethtool --set-eee eth0 eee on tx-lpi on
+> > 
+> > which is consistent with the patch, but I don't think this is quite correct
+> > as I remembered that "eee on" meant enable EEE for the RX path, and "tx-lpi
+> > on" meant enable EEE for the TX path?
+> 
+> Yes. More precisely, with "eee on" we allow the PHY to advertise EEE
+> link modes. On link_up, if both sides are agreed to use EEE, MAC is
+> configured to process LPI opcodes from the PHY and send LPI opcodes to
+> the PHY if "tx-lpi on" was configured too. tx-lpi will not be enabled in
+> case of "eee off".
+
+Florian seems to be suggesting the RX and TX path could have different
+configurations? RX EEE could be enabled but TX EEE disabled? That i
+don't understand, in terms of auto-neg. auto-neg is for the link as a
+whole, it does not appear to allow different results for each
+direction. Does tx-lpi only make sense when EEE is forced, not
+auto-neg'ed?
+
+	Andrew
+
 
