@@ -1,244 +1,193 @@
-Return-Path: <netdev+bounces-86930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DB998A0E13
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:10:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B39748A0E4C
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:13:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF55F1F2180C
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:10:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69EDD2867A2
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:13:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3FF414600E;
-	Thu, 11 Apr 2024 10:10:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19AE6145FF0;
+	Thu, 11 Apr 2024 10:13:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BMaDXjL2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [58.251.27.85])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5A8145B26;
-	Thu, 11 Apr 2024 10:10:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=58.251.27.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6111DDE9;
+	Thu, 11 Apr 2024 10:13:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712830243; cv=none; b=CwuwJT5mM+RI0UfZ0lplnBwHb7vUvJnRJSKHFhAb36H0igR75x4HGbzGFclcOUUTE8vVZrGOBDD2I08KC3+Ikmg4BOfz/O+MzgA2lJOWZoPyxVly6ebeGoqyi/cdR+AvwG7EP0/wzjdh5mbF8ZIoGFtPp+igOlNDqSQc/aodc9M=
+	t=1712830401; cv=none; b=WjC6OCPixfKRzmu0B4kKa6C+rI1RnruLKvjHLEXr4UwqDbPG1uX9HQiGXwa97Aag1a3uQJReRxQIl5uQgcQVFJ6Gn83vP1fLHyhKIV0KVJyP2R8q6aX5UgMjp8jlj7kdtlC4HJUg8VpqkX89+CuxoJ3IHD/qPVu2J62IatBNS+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712830243; c=relaxed/simple;
-	bh=lFToQwuD0CN2lHHGhV5ThRLUedjbbjOz8kojfzH5ZY8=;
-	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=RMr9OqfNpu/uLgS+wZJrbRPe6qV0lkEqwZiE7YJWFR5wgDx6UAaNw1CopavCGUNxOpUDhygsjmIKf1QecrPjzyP0ZcgSg1grLslJOI+gI1ejqqKhnNXH15RnSxbh732c0IOVABxNdFAHlkjwVGbLxaZKKKhcIUHngesWYvqwQYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=58.251.27.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mxde.zte.com.cn (unknown [10.35.20.165])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mxct.zte.com.cn (FangMail) with ESMTPS id 4VFZxL1t7mzBmrW;
-	Thu, 11 Apr 2024 18:02:14 +0800 (CST)
-Received: from mxhk.zte.com.cn (unknown [192.168.250.138])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mxde.zte.com.cn (FangMail) with ESMTPS id 4VFZxF0sXYz63t5D;
-	Thu, 11 Apr 2024 18:02:09 +0800 (CST)
-Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4VFZx42y5Nz6G42d;
-	Thu, 11 Apr 2024 18:02:00 +0800 (CST)
-Received: from xaxapp03.zte.com.cn ([10.88.97.17])
-	by mse-fl2.zte.com.cn with SMTP id 43BA1qk5093269;
-	Thu, 11 Apr 2024 18:01:52 +0800 (+08)
-	(envelope-from xu.xin16@zte.com.cn)
-Received: from mapi (xaxapp02[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Thu, 11 Apr 2024 18:01:54 +0800 (CST)
-Date: Thu, 11 Apr 2024 18:01:54 +0800 (CST)
-X-Zmail-TransId: 2afa6617b512ffffffffdde-7c4e3
-X-Mailer: Zmail v1.0
-Message-ID: <20240411180154691lpBFKqpsU4tf1vugPPIqq@zte.com.cn>
+	s=arc-20240116; t=1712830401; c=relaxed/simple;
+	bh=qh9ariit9ohYCJG4JOSwfVQlUeKW1q7q8JcLdwOMkIU=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=ZXgypPQwIim+5gEDnjRGRR4AwXnxw6ZMg/f4JAOJQ6JZfHmvtnWYP+PKrAGkWGn8qGo5Hw6s67tzSXBerddgB5WeVARuVC386JUU1AjoNgszWqdOuD/u52A4vP8cWf9Kz0lSWuFIGUEAFbDo9ZV2w703Zpn43I2tE3LU2DdYWNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BMaDXjL2; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-417c5aa361cso6919235e9.1;
+        Thu, 11 Apr 2024 03:13:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712830397; x=1713435197; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2sU3rRH5BVBAh1x64QnT6cUy78LH1e54WKfL3SRJD7Q=;
+        b=BMaDXjL2vKyLcoN/9Ohow1DmyZlthIkZkDu/7UEmBZOYX1GPO2NHcv/6QWo+9nx2Dr
+         kTCBOpD/AI78ORJobdX9tSYxvj3vlp+WJ2CAk3taUQ9pjg1FGLPDJcw2CugJrUZA+cPQ
+         /RkNYLs0dITh3uThCjAuQXjOzVwpREkMwTMrnXZTT+1SRK35bIDdWimbbvNEGaIXXzci
+         UFK7Y8uCE4cWa0WsgEGjuT1YZMaKdi/rR3UnqoBqJ3LK6uIX175hXKdBeE6EetTv65Yz
+         DPM33jDVknykUIoILYamo1njewxwPw+Mvr1RFurpN7kIk0aLXnnWsEvxtGw0wOFtBz1V
+         wYQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712830397; x=1713435197;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2sU3rRH5BVBAh1x64QnT6cUy78LH1e54WKfL3SRJD7Q=;
+        b=CqaGU3WSXlMj1j+sE4syuwojFeeYLz/iL/7/9nwENBlHCxmRXUm7SDwzKOzopor0+e
+         EyU56tEjpGTYLQ3ULaBqGnN1TvRJNQhuzh0zK8+1yfkLJwYVbqzySMBb9yj/d9YEMzEi
+         DuRMS463VfaU+YYREQIwwu++M/Q13OYjWIt6bOOrJIwGhU+onft48ERPKfaFhFnybLY0
+         Zsxu1gscz5jK6AeaExMI28qtPQA8nAyfKuQkOHaNkdpXhOCeuXH04qA4NgqURBnKRA2i
+         cp3CLUPKIDNy10udeTuCKEFlX8ZVulQq8aujIlNN430QeIUpQd+UxK/2CXfX/f7Uz4UH
+         OK8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVbwN1Ly241VIpQetR41pYdSnllhTk98tLUTedaSmWLz+TQ6uVtMvtZTOWhkiy23cECsXvOUmYUHG3Ut4YuKxDZzUBi8a+GRjhx6MN76rs4
+X-Gm-Message-State: AOJu0YyyeVcQ6HyZTpUG7GxpyU8dAg01UF2rgDunZiKtmew/ajGmm/3A
+	6ew7eqja/PbjKBTBdBJXLHqmWqK7/XLBkOjl06FO4RV7vTrylZFz
+X-Google-Smtp-Source: AGHT+IEm1BzYISqHDYJg6ON8yjk+jj6q4uIe/Rs1HQMCgRYXjPJ3Ei7T/6nvUaQNXbbFYFM5MXAfAw==
+X-Received: by 2002:a05:600c:46ce:b0:416:a4e8:715b with SMTP id q14-20020a05600c46ce00b00416a4e8715bmr4163414wmo.35.1712830397420;
+        Thu, 11 Apr 2024 03:13:17 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:9995:9b8b:815b:e336])
+        by smtp.gmail.com with ESMTPSA id gw7-20020a05600c850700b004146e58cc35sm5123500wmb.46.2024.04.11.03.13.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Apr 2024 03:13:16 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netdev@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,  "David S.
+ Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Paolo
+ Abeni <pabeni@redhat.com>,  Jiri Pirko <jiri@resnulli.us>,  Jacob Keller
+ <jacob.e.keller@intel.com>,  Jozsef Kadlecsik <kadlec@netfilter.org>,
+  netfilter-devel@vger.kernel.org,  coreteam@netfilter.org,
+  donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v2 2/3] netfilter: nfnetlink: Handle ACK flags
+ for batch messages
+In-Reply-To: <ZhcdCUA2yJ56xdbj@calendula> (Pablo Neira Ayuso's message of
+	"Thu, 11 Apr 2024 01:13:13 +0200")
+Date: Thu, 11 Apr 2024 11:03:18 +0100
+Message-ID: <m28r1ki5cp.fsf@gmail.com>
+References: <20240410221108.37414-1-donald.hunter@gmail.com>
+	<20240410221108.37414-3-donald.hunter@gmail.com>
+	<ZhcdCUA2yJ56xdbj@calendula>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <xu.xin16@zte.com.cn>
-To: <edumazet@google.com>, <davem@davemloft.net>, <kuba@kernel.org>
-Cc: <rostedt@goodmis.org>, <mhiramat@kernel.org>, <dsahern@kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <yang.yang29@zte.com.cn>,
-        <xu.xin16@zte.com.cn>, <he.peilin@zte.com.cn>, <liu.chun2@zte.com.cn>,
-        <jiang.xuexin@zte.com.cn>, <zhang.yunkai@zte.com.cn>,
-        <kerneljasonxing@gmail.com>, <fan.yu9@zte.com.cn>,
-        <qiu.yutan@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIG5ldC1uZXh0IHY1XSBuZXQvaXB2NDogYWRkIHRyYWNlcG9pbnQgZm9yIGljbXBfc2VuZA==?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl2.zte.com.cn 43BA1qk5093269
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 6617B525.000/4VFZxL1t7mzBmrW
+MIME-Version: 1.0
+Content-Type: text/plain
 
-From: hepeilin <he.peilin@zte.com.cn>
-Introduce a tracepoint for icmp_send, which can help users to get more
-detail information conveniently when icmp abnormal events happen.
+Pablo Neira Ayuso <pablo@netfilter.org> writes:
 
-1. Giving an usecase example:
-=============================
-When an application experiences packet loss due to an unreachable UDP
-destination port, the kernel will send an exception message through the
-icmp_send function. By adding a trace point for icmp_send, developers or
-system administrators can obtain detailed information about the UDP
-packet loss, including the type, code, source address, destination address,
-source port, and destination port. This facilitates the trouble-shooting
-of UDP packet loss issues especially for those network-service
-applications.
+> On Wed, Apr 10, 2024 at 11:11:07PM +0100, Donald Hunter wrote:
+>> The NLM_F_ACK flag is not processed for nfnetlink batch messages.
+>
+> Let me clarify: It is not processed for the begin and end marker
+> netlink message, but it is processed for command messages.
 
-2. Operation Instructions:
-==========================
-Switch to the tracing directory.
-        cd /sys/kernel/tracing
-Filter for destination port unreachable.
-        echo "type==3 && code==3" > events/icmp/icmp_send/filter
-Enable trace event.
-        echo 1 > events/icmp/icmp_send/enable
+That's a good point - my apologies for not making it clear in my
+description that it is only the batch begin and end messages where
+NLM_F_ACK is ignored. All the command messages between the begin and end
+messages do indeed give ack responses when requested. I will reword the
+commit message to make this clear.
 
-3. Result View:
-================
- udp_client_erro-11370   [002] ...s.12   124.728002:
- icmp_send: icmp_send: type=3, code=3.
- From 127.0.0.1:41895 to 127.0.0.1:6666 ulen=23
- skbaddr=00000000589b167a
+>> This is a problem for ynl which wants to receive an ack for every
+>> message it sends. Add processing for ACK and provide responses when
+>> requested.
+>
+> NLM_F_ACK is regarded for the specific command messages that are
+> contained in the batch, that is:
+>
+> batch begin
+> command
+> command
+> ...
+> command
+> batch end
+>
+> Thus, NLM_F_ACK can be set on for the command messages and it is not
+> ignore in that case.
+>
+> May I ask why do you need this? Is it to make your userspace tool happy?
 
-v4->v5:
-Some fixes according to
-https://lore.kernel.org/all/CAL+tcoDeXXh+zcRk4PHnUk8ELnx=CE2pcCqs7sFm0y9aK-Eehg@mail.gmail.com/
-1.Adjust the position of trace_icmp_send() to before icmp_push_reply().
+Yes, as I mentioned this is a problem for ynl and it would also be a
+problem for any user space tool that is ynl spec driven, i.e. not
+hard-coded with special cases for a given netlink family.
 
-v3->v4:
-Some fixes according to
-https://lore.kernel.org/all/CANn89i+EFEr7VHXNdOi59Ba_R1nFKSBJzBzkJFVgCTdXBx=YBg@mail.gmail.com/
-1.Add legality check for UDP header in SKB.
-2.Target this patch for net-next.
+Previous conversation:
 
-Changelog
-========
-v2->v3:
-Some fixes according to
-https://lore.kernel.org/all/20240319102549.7f7f6f53@gandalf.local.home/
-1. Change the tracking directory to/sys/kernel/tracking.
-2. Adjust the layout of the TP-STRUCT_entry parameter structure.
+https://lore.kernel.org/netdev/20240329144639.0b42dc19@kernel.org/
 
-v1->v2:
-Some fixes according to
-https://lore.kernel.org/all/CANn89iL-y9e_VFpdw=sZtRnKRu_tnUwqHuFQTJvJsv-nz1xPDw@mail.gmail.com/
-1. adjust the trace_icmp_send() to more protocols than UDP.
-2. move the calling of trace_icmp_send after sanity checks
-in __icmp_send().
+>> I have checked that iproute2, pyroute2 and systemd are unaffected by
+>> this change since none of them use NLM_F_ACK for batch begin/end.
+>> I also ran a search on github and did not spot any usage that would
+>> break.
+>> 
+>> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+>> ---
+>>  net/netfilter/nfnetlink.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>> 
+>> diff --git a/net/netfilter/nfnetlink.c b/net/netfilter/nfnetlink.c
+>> index c9fbe0f707b5..37762941c288 100644
+>> --- a/net/netfilter/nfnetlink.c
+>> +++ b/net/netfilter/nfnetlink.c
+>> @@ -427,6 +427,9 @@ static void nfnetlink_rcv_batch(struct sk_buff *skb, struct nlmsghdr *nlh,
+>>  
+>>  	nfnl_unlock(subsys_id);
+>>  
+>> +	if (nlh->nlmsg_flags & NLM_F_ACK)
+>> +		nfnl_err_add(&err_list, nlh, 0, &extack);
+>> +
+>>  	while (skb->len >= nlmsg_total_size(0)) {
+>>  		int msglen, type;
+>>  
+>> @@ -463,6 +466,8 @@ static void nfnetlink_rcv_batch(struct sk_buff *skb, struct nlmsghdr *nlh,
+>>  			goto done;
+>>  		} else if (type == NFNL_MSG_BATCH_END) {
+>>  			status |= NFNL_BATCH_DONE;
+>> +			if (nlh->nlmsg_flags & NLM_F_ACK)
+>> +				nfnl_err_add(&err_list, nlh, 0, &extack);
+>
+> if (status == NFNL_BATCH_DONE) should probably be a better place for
+> this. I would like to have userspace that uses this, I don't have a
+> usecase at this moment for this new code.
 
-Signed-off-by: Peilin He<he.peilin@zte.com.cn>
-Reviewed-by: xu xin <xu.xin16@zte.com.cn>
-Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
-Cc: Yang Yang <yang.yang29@zte.com.cn>
-Cc: Liu Chun <liu.chun2@zte.com.cn>
-Cc: Xuexin Jiang <jiang.xuexin@zte.com.cn>
----
- include/trace/events/icmp.h | 65 +++++++++++++++++++++++++++++++++++++
- net/ipv4/icmp.c             |  4 +++
- 2 files changed, 69 insertions(+)
- create mode 100644 include/trace/events/icmp.h
+I looked at putting it there but when the code reaches the 'done'
+processing, it is not obvious that nlh still refers to the correct
+message header in the skb. It seemed more natural to process all acks
+with nfnl_err_add() at the point where each message gets processed. I
+can take another look at moving it there if you prefer.
 
-diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
-new file mode 100644
-index 000000000..7d5190f48
---- /dev/null
-+++ b/include/trace/events/icmp.h
-@@ -0,0 +1,65 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM icmp
-+
-+#if !defined(_TRACE_ICMP_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_ICMP_H
-+
-+#include <linux/icmp.h>
-+#include <linux/tracepoint.h>
-+
-+TRACE_EVENT(icmp_send,
-+
-+		TP_PROTO(const struct sk_buff *skb, int type, int code),
-+
-+		TP_ARGS(skb, type, code),
-+
-+		TP_STRUCT__entry(
-+			__field(const void *, skbaddr)
-+			__field(int, type)
-+			__field(int, code)
-+			__array(__u8, saddr, 4)
-+			__array(__u8, daddr, 4)
-+			__field(__u16, sport)
-+			__field(__u16, dport)
-+			__field(unsigned short, ulen)
-+		),
-+
-+		TP_fast_assign(
-+			struct iphdr *iph = ip_hdr(skb);
-+			int proto_4 = iph->protocol;
-+			__be32 *p32;
-+
-+			__entry->skbaddr = skb;
-+			__entry->type = type;
-+			__entry->code = code;
-+
-+			struct udphdr *uh = udp_hdr(skb);
-+			if (proto_4 != IPPROTO_UDP || (u8 *)uh < skb->head ||
-+				(u8 *)uh + sizeof(struct udphdr) > skb_tail_pointer(skb)) {
-+				__entry->sport = 0;
-+				__entry->dport = 0;
-+				__entry->ulen = 0;
-+			} else {
-+				__entry->sport = ntohs(uh->source);
-+				__entry->dport = ntohs(uh->dest);
-+				__entry->ulen = ntohs(uh->len);
-+			}
-+
-+			p32 = (__be32 *) __entry->saddr;
-+			*p32 = iph->saddr;
-+
-+			p32 = (__be32 *) __entry->daddr;
-+			*p32 = iph->daddr;
-+		),
-+
-+		TP_printk("icmp_send: type=%d, code=%d. From %pI4:%u to %pI4:%u ulen=%d skbaddr=%p",
-+			__entry->type, __entry->code,
-+			__entry->saddr, __entry->sport, __entry->daddr,
-+			__entry->dport, __entry->ulen, __entry->skbaddr)
-+);
-+
-+#endif /* _TRACE_ICMP_H */
-+
-+/* This part must be outside protection */
-+#include <trace/define_trace.h>
-\ No newline at end of file
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index b71b836cc..2081fee18 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -92,6 +92,8 @@
- #include <net/inet_common.h>
- #include <net/ip_fib.h>
- #include <net/l3mdev.h>
-+#define CREATE_TRACE_POINTS
-+#include <trace/events/icmp.h>
+The userspace that uses this is the ynl tool with the nftables spec and
+--multi patch that is included in this patchset. I included an example
+of how to use it in the cover letter:
 
- /*
-  *	Build xmit assembly blocks
-@@ -766,6 +768,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
- 	if (!fl4.saddr)
- 		fl4.saddr = htonl(INADDR_DUMMY);
+https://lore.kernel.org/netdev/20240410221108.37414-1-donald.hunter@gmail.com/T/
 
-+	trace_icmp_send(skb_in, type, code);
-+
- 	icmp_push_reply(&icmp_param, &fl4, &ipc, &rt);
- ende:
- 	ip_rt_put(rt);
--- 
-2.17.1
+Here's the example:
+
+./tools/net/ynl/cli.py \
+ --spec Documentation/netlink/specs/nftables.yaml \
+ --multi batch-begin '{"res-id": 10}' \
+ --multi newtable '{"name": "test", "nfgen-family": 1}' \
+ --multi newchain '{"name": "chain", "table": "test", "nfgen-family": 1}' \
+ --multi batch-end '{"res-id": 10}'
+
+Thanks!
 
