@@ -1,194 +1,193 @@
-Return-Path: <netdev+bounces-86936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFF2B8A1038
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:33:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF6318A101B
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:31:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E81BB22DDA
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:33:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D35CB1C22FDB
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:31:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45011147C9D;
-	Thu, 11 Apr 2024 10:31:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0529C1482FC;
+	Thu, 11 Apr 2024 10:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ALpXl2UD"
+	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="fjH9UUUv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE40A1474CF;
-	Thu, 11 Apr 2024 10:31:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712831488; cv=fail; b=KsHfUOEu8vlE70vy35ckTrReyA7Nk9RBzoqAIrVe2N6IPqFh0Lql9dieumSbty9c5bIVuQoHauQr3uKPGk5Mzf3+Nt6HCX/AjT0EcnV9ifKpA9EN8Moyc3YQ0HgF3COuZ6xjvjan4mOWXAfCOZrioHiNxJIMXcPNakkqxlEO98I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712831488; c=relaxed/simple;
-	bh=CXwZ+kHuAIzf8UvVNiYFpyeFw7hkMcZ6gRol7mTTdlY=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=kPZENFmyahfWP9wI53HQtr0kPpv4SAjCcXK1SAAZvmUnrHy9BAP5GGzxDm+psTw472nHAnQ6+FQR4WWLfAYhBnukdmw1pAjDbMHB9FPt67R2/z5PqJn/Y2seckS7a7N5o1N3DOI0XAw2Pb36Z0QN6VhcBuquzK5Wk25IdYZ/TvE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ALpXl2UD; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712831487; x=1744367487;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=CXwZ+kHuAIzf8UvVNiYFpyeFw7hkMcZ6gRol7mTTdlY=;
-  b=ALpXl2UDYLMRhlLaBRogfzQJV2Wc8lVj+71WsE2WTtmbSnoK7t1qrqI4
-   ZsSfD8CnA/dx2d5lxTWtw3SiNBJhq9r2KVoS84VD4E9YZuRuSwb0UJC3j
-   hJhnFtfoXT4ypqXlHhg3K2xYUW1/lljHD7sb5qNlBYxJ6Tyk7Q3Nv2Ba2
-   /DOOtAO7ko2FmMoY7aC87Ij4C9MqRFkZ7I76NsRLn1grewfWji5VkBcUa
-   NQ7b6iDRMrR6QOVqzW+qIY8K7+pQZcH8t+GAF9egDc9PZbND2UhanFIZT
-   JiLe0+e59ZwUD2L4wmmxkBm4HuNnBNg163IdP2E4MrperUbrae89chMzo
-   w==;
-X-CSE-ConnectionGUID: MDupAyZMT3uleFNH1WYkFg==
-X-CSE-MsgGUID: RGmcUvF3RQe0rxaSigWVWw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="8453383"
-X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
-   d="scan'208";a="8453383"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 03:31:25 -0700
-X-CSE-ConnectionGUID: Vjaje6l0SHKKJ4CZE7JP5g==
-X-CSE-MsgGUID: WZY8fkhGQ+OpaHZAHBgrEA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
-   d="scan'208";a="25513583"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Apr 2024 03:31:26 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 11 Apr 2024 03:31:24 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 11 Apr 2024 03:31:24 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 11 Apr 2024 03:31:24 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.101)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 11 Apr 2024 03:31:23 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DQ3sEzpwkUhJCYmTh/kVG4zfnalz989lMwGbKTHdFKAQWptldUMDKy0DEVDIs27u0j40oFNhzPTCLx8YUCN0JcA9demujDkps6G1KZJZIHDEbTj8Mz3xfmQSyAchenmnE1uDlYjldOcdMCZjTVKZfAu6O2Mu9ihhCC6zJwRdnyFL+wxN2AT5lcVCb/+ngSvxzy4Q+ZAQ8uOcCNzpdmwlCg9WDJxL8sdrHQgK6mSCNk+ktoL8SkfEmam5NPQ7Ow2vOwiW3/yYkuAusTE0LQ9KswLltn+I/+02V0WZlhr7CyeOK4onyQWOJIqlKyuEzOGHcgH6UnTPx0YdHzt/ln+ajA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Q4Cn5oJ98//LvVkj4skmB5afVFpSDSRqYHdwYMAxhGw=;
- b=T68kMZr+XmZSSpRi0rhwkWP6v0wdqdLjWMbsp0j2W48eQmdzXlMjy/N60mKCjZQ5EXTCpnavRY/EDu5zmgCreulRk0ve4t1UUba3PDMUy6gBs8aW+zEFEIaOZntLnZPDaQqeQxYwOVEcMRNzMKqXiWRsNEChYTi/rhweqYEN+pSBu5aDmaljgD72CGpvi4gUUD3aYRnRlCqP1xo4yt0Hgk6qjUv7j+nXVInm9ffhHWdiioQd+kyBb+3VRGcsy2+U0TFLWaYgznZG2vySTUcADQT3G4Ezh+Y4hvftjZAqyX/3CzTmYh1C7fPWZUWZaMyZ8euSE4sfHR8Xax0CTJE6Xg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by PH0PR11MB5128.namprd11.prod.outlook.com (2603:10b6:510:39::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7430.46; Thu, 11 Apr
- 2024 10:31:22 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::654c:d66a:ec8e:45e9]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::654c:d66a:ec8e:45e9%6]) with mapi id 15.20.7452.019; Thu, 11 Apr 2024
- 10:31:22 +0000
-Message-ID: <1627f034-7748-4e10-8110-5156a90ced5a@intel.com>
-Date: Thu, 11 Apr 2024 12:29:05 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC net-next 3/7] netdevice: introduce IFF_LOGICAL as
- (IFF_NO_QUEUE | IFF_LLTX)
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, David Ahern
-	<dsahern@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Andrew Lunn
-	<andrew@lunn.ch>, <nex.sw.ncis.osdt.itp.upstreaming@intel.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240405133731.1010128-1-aleksander.lobakin@intel.com>
- <20240405133731.1010128-4-aleksander.lobakin@intel.com>
- <20240408193214.20df8d40@kernel.org>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <20240408193214.20df8d40@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: ZR0P278CA0182.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:44::15) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E261474BB
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 10:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712831430; cv=none; b=kRLroC8WL/AexPAUWtiJPMQXdoTYWc0uL6GF4adDFCXcFmzY2nBGE1FzkDpF38pYkJvgoBHGUcGG/Xg+kRsv9W05WVeTzbaVq/PMtjYpyQrLtUdqceklFXpUzTPE8drS+UKhovb5BZSmsUlTMDHYzFiCSANJ7kOJtr7Qs0j2BQ0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712831430; c=relaxed/simple;
+	bh=50uxhrWSQLt8YR5X0zgVM0tqAIGHTy5nv3Z8FfXt19I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SdEII8AwKcu9hUHrdjnIHR9DD8QiFxffRFm5pP21Kx3UKGvRpg2vU1XctbA6q7APbwweLCOiV00MBzfhEhNhhvih9wZrYWU2WZJhyl4DbRogL10Uf9phCMOSPSvFfY/KWhAKthffwEPBvz2JG3EFE+3dPELr+i0iLyj8uNnm3tc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=fjH9UUUv; arc=none smtp.client-ip=209.85.128.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-6114c9b4d83so66665117b3.3
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 03:30:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1712831427; x=1713436227; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N2A2qtHjer/NwHLO+R/j6J4SvBNvk66wxcNgM9Na8jo=;
+        b=fjH9UUUvGwB7ffUplXKEX8fHliizAaUU61YD76+0eg2Y/RH5D57GwCXIPBlZhQ4aOV
+         LyV+9nxJIHiw6sjF/Iin0t9apeCQRuImaX6dCjyBBoMH3o6hckEmSSo4yl7y3IdJTizD
+         ggpG0cMSJI0SeSUdJ0MmjG3c9n9EKbflCUtnibAsBpma4C0MMGMaeoOVtvQJbd/LtHJp
+         cr/fReCYgNW3ur3RtnHUAB32vsJPQznsXufpo4mlT0YhET0uLu04dFBdifNKqk4iaVLq
+         HGdNToLdP8RGBfKkORKfM6gSGsOqs3RerkFQ5BtXyUeAbYDojLDJL/07Bp7Pfh5y93Qx
+         23Qw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712831427; x=1713436227;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N2A2qtHjer/NwHLO+R/j6J4SvBNvk66wxcNgM9Na8jo=;
+        b=Zcr6HyFRa6pdOkfFUrnjoeYY9fg+nd7KVJJGcxRd3C7m1A735uG5dvQ8vppFhuGMJF
+         BO1XMvXx09cvVn15716Wysvu4ln0tdbVUkE6jgjdfIly6FA49KVuvm97/JANQJMOJSH1
+         mx2dB9I3ijb0NLjUE/Mh7lYLalGxdMxoVl7HuEPls9Z2cZwAhA8FuKhZJft8EQYePHIc
+         nY5WUjToACdKla9pk6kTHLj6eTUqPTeH9ZeYgFyUgNhaK9OO8xU0esSS83jsVDE8d4sN
+         s/KuWmX1QIsmJLdGSlC2yhlpJzx5Le8lZHNhoTxtzmp07FJtGxMNJsuLy1iOn6yXixj6
+         5E/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVzafyZq+BcsWUOni49dFlLrlX7WM7v8iz5liki+dvNwAkU053HxMIZYJ3nGo0YmPpkf87n8xMkiDiGBD6eZbNXrOl6qFya
+X-Gm-Message-State: AOJu0YztEjzgGsCJeQRa139PrQDb9nUzcAII1DlPgOn4Q0c8atNZD/kw
+	MtKPBlqcQG4cEw2aoLlo9tkdbKip6w8AtFUmK/uOTvKERpT7xp7a4ktZgL58kECmq/nDAVLPHDn
+	6qq0BkSROV+i6+lUzlhU18Oqnt7UBHNuR9StShA==
+X-Google-Smtp-Source: AGHT+IHb0GZNvwMcbZzb2flBPEIMO1uB/CHJs2V2e/2fw1ihcJnOo0o3gXVwUEL9e79yPEvJFoZHl1TVQUUFrP373Bg=
+X-Received: by 2002:a0d:d80f:0:b0:615:35e1:e512 with SMTP id
+ a15-20020a0dd80f000000b0061535e1e512mr5524397ywe.0.1712831425508; Thu, 11 Apr
+ 2024 03:30:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|PH0PR11MB5128:EE_
-X-MS-Office365-Filtering-Correlation-Id: e39b88e5-bd37-43c5-c682-08dc5a12882e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ENbsS6oAxh2L+69RvvtTr9mHgiie6ekitI+qj3CRHjwR8RX5BawbfHEO6NIksF+eIqO9Z1wbeyYX6ybscXa1Gpf+O75wo045LEB5krHYzhIY295C4ik9jJVucOEe0vn4eAUEgsNFdk6T4wMO7f4vlt/M7HPwQsXKsUEVJQzeDI7vDexv/bxwplTsf5dgY2Wnpdyf3ims90QzVFsDmSi2LAUxlQsaAukwp3DlM4yCY3ImeRKMZqZ1Xnbysas69WApQ9Iwwm4aKzDgmXLVzjzPbJzPBk8qyp8RDYpPKl4kCY+uAXMteTAOaRnPUKdDJ4hxpOGeAZIrZx+o4dVrgRxOUjiC/wuVpPyXEaR1bPsGfEpw5hcRsKeTm4WEHQTaTfxh+GrBtm3sIHxZ29/MQPEjs2WhLOuiM+8a/k3jgmR0jQmQlnsiQNgUQwOZ3DCAfJzDmZ2Xs0Kob//539ThTijeQ2nhJLpB1jG0jQywXiVpwHkIL3g/gx8d1h9wOVnklKOVdVadM99WsUwreRB2pqQqMel0XsPEeBWWMJCDFbx+TfgdjVpfwcQSp05cYxPhsUAALU/cFafN5fXUPDcUTkkzafKIB14Dsvz8Z/YKCkGJyW5ejMhKFqd8h84Fqs1jRgFZFAd1+GkZEcPO2IOxGPHBurP+F5SyQTQZrgfWCzPF1TU=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Z2FnSGpkdkRQTWJJTGhlaXp2OWtyZHZBOWpGK0JsV2t1ZkFYREtUTlpPdVVU?=
- =?utf-8?B?REYrNG1MQWZHaENXbEl5Lzk3MlJhVloyZXdHNTB0dlMrbTV6RStoSHRHR3pV?=
- =?utf-8?B?VEszcU55YWprWXlxMTNJeVQvTFVyVHUralJtaVgvSlc5YjlDRytNS2dNempM?=
- =?utf-8?B?ekpkWEhBa1BtVjB0RTFjOVljeVp6K0Z5ZmM5TzllS1U0OXRMRjZEaW53Y0c4?=
- =?utf-8?B?Q2ZUT3paZU1oc3M2YTlsaGMrNVpzM1NEV2hrSHZzWE5OQ2VQRHFxOUthcGk4?=
- =?utf-8?B?USt4WXIveXVsWnFNNWIvWS9lUFJVeS9NcjNPTmRScVhJTHdISHRReW01M1A1?=
- =?utf-8?B?WTQ3b0NNUW1EeG1vaG9iMWV1cmpWOTI4QXpEMHpLZlZ0WWhaUm15RmlWekJD?=
- =?utf-8?B?S3ovcHBRclZ1aEJKT091V2JvbUVCMVVRdjgxdHdYbGlrQ3BQV2pLS0VjUlFh?=
- =?utf-8?B?STFuUFQrU3JNSTJnMUs0d3EvV3BST1ZaQW9TdE5pTWUrY2hXNng2ZFRIWjh2?=
- =?utf-8?B?UTBjbUgwalBUcWF2eDNPbUxRZUtPajdNRHZ2U0JJWHJib2JaQUhzbDNlQ25k?=
- =?utf-8?B?b0EycEkxSk9QeGxYVk9qTzNtUHpSRkFFVDRTMWVubGdSTjMzYVdGTXBmZGlP?=
- =?utf-8?B?eVk5N2FnWi94WjFzaFJFRThUMkR6cFFCLzhUZTlBWFJ6N2ZjU2Y0UlBlMDU2?=
- =?utf-8?B?QVN2eWlaTFV2MmM1eDdDbElZK1VMdEtFN2oyUEp2REdmMXZDT09xZWFNRkty?=
- =?utf-8?B?Tk5MTnJsU3d6bHRWNzVJdjBZZXdraWtuRXIvQ2VGWU9HOW9ZZEtHcCtLazRR?=
- =?utf-8?B?RkJkSWNVTGF4RU5CSmQ0M3A2dDRkVHBwTVVvWGRnWlVMc01odkRmRjdMQUhZ?=
- =?utf-8?B?V2ZYWWxUL1dTUUV2d0RKY2x5ZldYY2FsK1ZuMS9TVVJRTS85cXBKUm1PNmM2?=
- =?utf-8?B?WDdVVnkwWnVpdWhVYS9Xd3JPWWNzdjlDZTA3bDQxLzlCc1RKT1RQZXU3UGFW?=
- =?utf-8?B?MjhjaUVDNW52WGFOb1pYT2hMcnY0OWhrd1N0cVlXa0ZSZmRnZG05MWZLSlRo?=
- =?utf-8?B?anQ3MlJkYzJ3ekVsQnl1Q2V3WTYvZWZjYTYreE1MQzYyTklQaGNPOStLc3hm?=
- =?utf-8?B?QVdtZ1VEZ2EwRnNZcitvWEpWOVB0aGUzQTNnMWIrQWM0S0dPWHhGQUxXbFV0?=
- =?utf-8?B?Vk9wa0hPdXd0eWJZMktLSnRrM05hK01maTgyUEZ6bDhISVhEbDVEa1NocUFY?=
- =?utf-8?B?VHpnUTlNL2hSVjhWUTJoT1pJd214ZytQeTNZUlpPelpPY3lQVERsbXR2ejBS?=
- =?utf-8?B?YjBOcjJ6ekFteGNZVDZYek1BQXZlY1IyTzlIWXo5Zkc2ZmJQcVY3Myt0Vlhq?=
- =?utf-8?B?cUZmdVhaSlVQMjlFOXFZUm5BVEJwUGdKTzRoQlE3L0RZcFhiMi9uZDNJV2Z0?=
- =?utf-8?B?L2wyU0dZWDEzZHJ0OWJnOGl1SjV1WUVyU01kRnp1RjNqUVZBZVEzWmN4YVZX?=
- =?utf-8?B?RTRkSy9iYWxYZnNRd3hrVktQek1vWmpwTHkxaGVyZFdZUUVtaFR6OTNWdUpi?=
- =?utf-8?B?L2x0SWxYMGYxRE1uVG9OeXZISjdQZXZkb1NrdWtQWUhnSVREUDdkSHg1QW5s?=
- =?utf-8?B?aU84d09lMzBiOEFJRDM0NGRHZHQ3eGE0Q2VKK2hJUE9pRi9hQ0R1Smd5YUYz?=
- =?utf-8?B?blJteFFzMmVVK1pIK21pUVdKYkJjNld6QUtiUnlXcmhtZXo4TG90K0VmUXVq?=
- =?utf-8?B?OTE2dGYxU2dWcWYyUXB0RDR4QUdSWEZOSE5uOUx2aTVUbmJSa2paeTNwSUtH?=
- =?utf-8?B?bkdJcVF0RDU0eDZ4bFo2VERVSmpBSVM5RjJvdnFTY1dHcjF4UmJBTXlqa2lm?=
- =?utf-8?B?T1JHQVhoRGdKTG1FQ05Zc3dkWkoyWHJjcHdLT1QxSUZYeG52UHk4OGxyS2l0?=
- =?utf-8?B?Z1dnTVdGVFNTWkRsQmJqcVNJMnZRdmp4a2N6c1luSTJtZGhwM0lYbHp5cFBn?=
- =?utf-8?B?TzBWaWRVaXpRdnhCbWZ4d1QzMnQxSDJqNHNlUFR4b0QvZVY3ZEZzRnhJN3pw?=
- =?utf-8?B?ZlR0S2xXZjFpL2t5b2t4UXdxOWdpOTNmR2R1QXNUOVA2d0c3MUV4UHlZK2NM?=
- =?utf-8?B?eFJiMXA4clI1T094OExDWFI3NTE1VzluaEpERWY5MWJaNmJ6QnBJL0JWbUpP?=
- =?utf-8?B?RWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e39b88e5-bd37-43c5-c682-08dc5a12882e
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2024 10:31:22.3145
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: K3yPxZ0XmAvaeOWMv0CvDcncmaTgZHdDm0AolmuI00bUyfUoTjCzX21GiAZB3g5prGFS+vLjUUO63pSrxG8Su2j0ZxIgRdeOVWZmUjrQFFU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5128
-X-OriginatorOrg: intel.com
+References: <20240410042245.2044516-1-lei.chen@smartx.com> <6616ac464484f_2a98a52941f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6616ac464484f_2a98a52941f@willemb.c.googlers.com.notmuch>
+From: Lei Chen <lei.chen@smartx.com>
+Date: Thu, 11 Apr 2024 18:30:13 +0800
+Message-ID: <CAKcXpBxd9uu=eH9AsupqwQXiedBjTtOm_Uts-cHqXfstCv-YUg@mail.gmail.com>
+Subject: Re: [PATCH v2] net:tun: limit printing rate when illegal packet
+ received by tun dev
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Mon, 8 Apr 2024 19:32:14 -0700
-
-> On Fri,  5 Apr 2024 15:37:27 +0200 Alexander Lobakin wrote:
->> + * @IFF_LOGICAL: combines @IFF_NO_QUEUE and @IFF_LLTX, used by logical
->> + *	interfaces to avoid overhead from locking and Qdisc.
-> 
-> 🤷️🤷️🤷️
-
-¯\_(ツ)_/¯
+On Wed, Apr 10, 2024 at 11:12=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> For a next patch, include the target branch: [PATCH net-next v2]
+>
+> Lei Chen wrote:
+> > vhost_worker will call tun call backs to receive packets. If too many
+> > illegal packets arrives, tun_do_read will keep dumping packet contents.
+> > When console is enabled, it will costs much more cpu time to dump
+> > packet and soft lockup will be detected.
+> >
+> > net_ratelimit mechanism can be used to limit the dumping rate.
+> >
+> > PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980"
+> >  #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
+> >  #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
+> >  #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
+> >  #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
+> >  #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
+> >     [exception RIP: io_serial_in+20]
+> >     RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
+> >     RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 0000000000000000
+> >     RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428a0
+> >     RBP: 0000000000002710   R8: 0000000000000004   R9: 000000000000000f
+> >     R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 0000000000000020
+> >     R13: ffffffff8acbf698  R14: 0000000000000058  R15: 0000000000000000
+> >     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+> >  #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
+> >  #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
+> >  #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
+> >  #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
+> >  #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
+> >  #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
+> >  #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
+> >  #12 [ffffa65531497b68] printk at ffffffff89318306
+> >  #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
+> >  #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
+> >  #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
+> >  #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
+> >  #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
+> >  #18 [ffffa65531497f10] kthread at ffffffff892d2e72
+> >  #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
+> >
+> > Signed-off-by: Lei Chen <lei.chen@smartx.com>
+>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> >
+> > ---
+> > Changes from v1:
+> > https://lore.kernel.org/all/20240409062407.1952728-1-lei.chen@smartx.co=
+m/
+> >  1. Use net_ratelimit instead of raw __ratelimit.
+> >  2. Use netdev_err instead of pr_err to print more info abort net dev.
+> >  3. Adjust git commit message to make git am happy.
+> >
+> >  drivers/net/tun.c | 18 ++++++++++--------
+> >  1 file changed, 10 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> > index 0b3f21cba552..ca9b4bc89de7 100644
+> > --- a/drivers/net/tun.c
+> > +++ b/drivers/net/tun.c
+> > @@ -2125,14 +2125,16 @@ static ssize_t tun_put_user(struct tun_struct *=
+tun,
+> >                                           tun_is_little_endian(tun), tr=
+ue,
+> >                                           vlan_hlen)) {
+> >                       struct skb_shared_info *sinfo =3D skb_shinfo(skb)=
+;
+> > -                     pr_err("unexpected GSO type: "
+> > -                            "0x%x, gso_size %d, hdr_len %d\n",
+> > -                            sinfo->gso_type, tun16_to_cpu(tun, gso.gso=
+_size),
+> > -                            tun16_to_cpu(tun, gso.hdr_len));
+> > -                     print_hex_dump(KERN_ERR, "tun: ",
+> > -                                    DUMP_PREFIX_NONE,
+> > -                                    16, 1, skb->head,
+> > -                                    min((int)tun16_to_cpu(tun, gso.hdr=
+_len), 64), true);
+> > +
+> > +                     if (net_ratelimit()) {
+> > +                             netdev_err(tun->dev, "unexpected GSO type=
+: 0x%x, gso_size %d, hdr_len %d\n",
+> > +                                    sinfo->gso_type, tun16_to_cpu(tun,=
+ gso.gso_size),
+> > +                                    tun16_to_cpu(tun, gso.hdr_len));
+> > +                             print_hex_dump(KERN_ERR, "tun: ",
+> > +                                            DUMP_PREFIX_NONE,
+> > +                                            16, 1, skb->head,
+> > +                                            min((int)tun16_to_cpu(tun,=
+ gso.hdr_len), 64), true);
+> > +                     }
+> >                       WARN_ON_ONCE(1);
+> >                       return -EINVAL;
+> >               }
+> >
+> > base-commit: fec50db7033ea478773b159e0e2efb135270e3b7
+> > prerequisite-patch-id: 8952e320c0272899e153c953db09446879ed0d87
+> > prerequisite-patch-id: 2f1e3234a4ac0bf421df2061505612538f128672
+>
+> Where does this footer come from? Should not be present.
+>
+Thanks for your review. This footer comes from "git format-patch --base=3Da=
+uto",
+I will remake the patch with "--base" options removed.
 
