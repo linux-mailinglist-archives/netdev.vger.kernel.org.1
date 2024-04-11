@@ -1,190 +1,189 @@
-Return-Path: <netdev+bounces-86862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C1DF8A085D
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 08:20:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D2058A0865
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 08:23:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12CE11F21632
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 06:20:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8CB401F232E4
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 06:23:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31ACC13CF82;
-	Thu, 11 Apr 2024 06:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D4E13CAAB;
+	Thu, 11 Apr 2024 06:23:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cJNS5Xvh"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="hdisWQP0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f193.google.com (mail-pg1-f193.google.com [209.85.215.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753DB13C806
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 06:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ACA913CAAC;
+	Thu, 11 Apr 2024 06:23:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712816431; cv=none; b=SCUqmNhTJGlRNtQ115ugUHAFBMXpYBOJwxHH1wGiOnBCijGuzEWORyUocY1eqaRld6zyk6z238Z1Bu44lTAO/XHi7EKvMmiXnMtGpFFBDYfeSacMmpZeJGsCc/GHyp9lNxJkAKubDyfgHzvyRViv+bYlpOLBD99pL6Ze3Kb6AUU=
+	t=1712816621; cv=none; b=k3DvflMovpfb3hTiMgYvK/Gxzn/EZ0RkrqM4bT2n69W2QgIJ9HlVrHmraKg9feN2uqjSMOQma9I1B/oYEXqD0PSHsPataYIQ/cgy0VSC5jFd4CMxWDfiuJWfa7g/C6fLfGvfmBaWJXRnlyxsQMwmRd1uOt4mSuA5jvviHvG9mXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712816431; c=relaxed/simple;
-	bh=3QrXsH4rkf8GAhPmF0phCe/NHT9Nq5V7cv+MZiPf1H0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sZVl6kqab6Dl22S/DcEiVGK928pLwwc22iJekDG3Q8min6vbfhLSO9oa17ND/mtWdDLUr55AeFbjK3oB1Bb+E8/wACIoo0BROOcv1M2I2PkCSFrcjhtQZzvvgNVwYIbhfhPUYvuXvSSOkT0+v8RaUpixvzOrOR6GEwwd8DdFOm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cJNS5Xvh; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712816428;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=dV21BWGe2ufgawa50AocOZVeA8TiHinbeJSrkanC5Ds=;
-	b=cJNS5XvhMAzctMMH+i9sLDV7LICmQTA+bSraAHtcD1K1y+HPvg8iKs79l9WxkgOUkYy4hC
-	swAZMRhqY/T4zhxv7Qnk0jj94h0pIAXPiWs31pB/vF217kxA9tATtRHzHBHfP+QpFcn+yy
-	TtnnYYUjvYRMUh83C/BShu0QbwQw2EE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-687-Z2WvzlTDPkGIvKbxPBfV4w-1; Thu, 11 Apr 2024 02:20:26 -0400
-X-MC-Unique: Z2WvzlTDPkGIvKbxPBfV4w-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-346b68157cdso126958f8f.0
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 23:20:26 -0700 (PDT)
+	s=arc-20240116; t=1712816621; c=relaxed/simple;
+	bh=PI/yoly0ja/wD+mrJaF2beuTcjYkBhuye/nuL5dosq0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Disposition; b=hpbX3mwbh9DQdT2AtHf8WgVuDVZib15lclEsT7B5Bt3ru4B+nmqwy5kVcCXk4x+xOaunTiMTTwwyhpxfcV6/EVhrTHBcG/0yLRAs9Q4Vtd4h30NV8PmDjKtXb1V3yn+zPpyRvJuqgspSf3s7+efOlTP/IGa2xYdCVMhpQ/H6iH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=fail (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=hdisWQP0 reason="signature verification failed"; arc=none smtp.client-ip=209.85.215.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f193.google.com with SMTP id 41be03b00d2f7-5ce6b5e3c4eso4319853a12.2;
+        Wed, 10 Apr 2024 23:23:39 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712816425; x=1713421225;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
+        d=1e100.net; s=20230601; t=1712816619; x=1713421419;
+        h=content-transfer-encoding:list-id:precedence:user-agent
+         :content-disposition:mime-version:dkim-signature:dkim-filter
+         :references:in-reply-to:message-id:date:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dV21BWGe2ufgawa50AocOZVeA8TiHinbeJSrkanC5Ds=;
-        b=n2jaZOc7AuLbNF4OGh7/6lL4mLgXsILwoXfAO1giCZ4GphkznmXRFS1cXimDS3FwGX
-         lVVmsCZfDDNuYrGxaXDw0elF7FNfAxhjnZGVrhlL4NLoxJq2FjFCbhYnrucRA6fF1svJ
-         y613NW2o0lxai/MPA/m2JPyeGoKXTGc6ku47gUVHVnhuZ8T4zXB2xw1CYQwDln4aA1eN
-         Tgw+E1GPudr1vdlez9kXIZcnLzi2m8YWzeFJXfmD3bR3My9T8f+NAEuW92ISD7RebViH
-         u0fCgoA9pSrW723OLJCaBoWFBr69cy8Lp0LZ+IAtjBDb/MS8zLk++edgdw/xSZGDNytJ
-         4XIA==
-X-Forwarded-Encrypted: i=1; AJvYcCX+2flVBIz5/S8/7CDj3f1itwRkJ3q7ufvCmtFgpfpUJCKXQ0apqYaeG5qS8eO44HFep7UvxCJp8YDoaeAmW0kyDUbsPzR9
-X-Gm-Message-State: AOJu0YyraQiBJdxTzWSMg2o+Ekh7uZvfcl8aGGE3DuoroRhP/eGvBvMM
-	GpIezFT+vEmnyEjUTPTmX4Zf8C+S7dYG6Tu0BDX70XQmO4Bz+Cq3XcX9zymywczddMjUaTpFaa3
-	BK41oaXwGx/Y6yGEaP3JYZ0Lmh0zxwKoD78aGa/Z5Dawui2StuvGxkwg/IxnXBw==
-X-Received: by 2002:a05:600c:1c01:b0:416:5339:d114 with SMTP id j1-20020a05600c1c0100b004165339d114mr3213783wms.1.1712816425379;
-        Wed, 10 Apr 2024 23:20:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEFy4+7x8xF0IjYiUokCgfKSlSJfkYngQ7+CirLRMXiCIgHUo6eBMLJhw2QhWeXYlVeYM4/fQ==
-X-Received: by 2002:a05:600c:1c01:b0:416:5339:d114 with SMTP id j1-20020a05600c1c0100b004165339d114mr3213765wms.1.1712816424906;
-        Wed, 10 Apr 2024 23:20:24 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-235-217.dyn.eolo.it. [146.241.235.217])
-        by smtp.gmail.com with ESMTPSA id ay21-20020a05600c1e1500b00417da7db6b8sm738907wmb.31.2024.04.10.23.20.23
+        bh=3FitmIA2UZfLX12w+GgNlpA8LypqXtGt2xvta/9soZ4=;
+        b=f1atEv6UClB/rz9d4HGixRsbaO+djrTgeOHXuKIw91qigtl4xDkKJtvQtIDcgnrgaO
+         yxPae+qxtqfN+GHEuqw9r0NIuXczRhIJV0CSMHBpYhsdDcyxCAe58fSMIE2l3hLHMbAc
+         +ioDtLCE2TKCL2CUjD70YsKz8gn57aXPj97NE/lxO5T5laad6hU+t6dXfUCx9yBNwNSc
+         eOfR6pUMkYZAh5wZUK5xV9UJZ7PPjdMbVT99LMRJFoYMw4PZerdRkudiP8SBfNecf9K7
+         ym6W8d677VAd1/n10oS0vp2konSoVQuXxTRYuRLFIbq5D0A2vJXJkkbbtkuRy9FvX8P2
+         lRqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV/YKfWfxw+Y6grFqAJ6oNjghiXcnFoG7ECiJStPcez/AmJG3C2xAWtnmsxIaukzS0JCJm4CKTmSdrmYLbdcBB3xS31TxnxUZ2E2XjPiquncdnL1FGAb2LMasNc5UKwawxViRQ0
+X-Gm-Message-State: AOJu0YwNWlwtS4/pUKSKjFWhrvvDgmV1gIPb4kq3NrC4P2q12wFsuOy7
+	cLXrpo0RDlFtkdy9yYGP0LTf96LRWtVsF/zAMqEgtj2n953X9ukr
+X-Google-Smtp-Source: AGHT+IE2eVIH19guaxz2Hz8Fmdd9CEks2//rtuIXdj1sjEU2s+j0olymAQfdw69z/Mjvv5vn3Z9xsg==
+X-Received: by 2002:a05:6a21:8805:b0:1a3:648e:dacf with SMTP id ta5-20020a056a21880500b001a3648edacfmr5878496pzc.35.1712816618691;
+        Wed, 10 Apr 2024 23:23:38 -0700 (PDT)
+Received: from localhost.localdomain ([240e:604:203:6020:615f:9a36:c815:b2d5])
+        by smtp.gmail.com with ESMTPSA id z13-20020a170903018d00b001e22860c32asm525758plg.143.2024.04.10.23.23.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 23:20:24 -0700 (PDT)
-Message-ID: <504f49cd5322d14d7c0d23d90f1cd7cc41721cf8.camel@redhat.com>
-Subject: Re: [PATCH net] crypto: chtls: Fix possible null pointer
- dereferences
-From: Paolo Abeni <pabeni@redhat.com>
-To: Aleksandr Mishin <amishin@t-argos.ru>, Atul Gupta
- <atul.gupta@chelsio.com>
-Cc: Ayush Sawal <ayush.sawal@chelsio.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, David Ahern <dsahern@kernel.org>, Michael Werner
- <werner@chelsio.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-  lvc-project@linuxtesting.org
-Date: Thu, 11 Apr 2024 08:20:23 +0200
-In-Reply-To: <20240409090507.21441-1-amishin@t-argos.ru>
-References: <20240409090507.21441-1-amishin@t-argos.ru>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        Wed, 10 Apr 2024 23:23:38 -0700 (PDT)
+From: dracoding <dracodingfly@gmail.com>
+To: eric.dumazet@gmail.com
+Cc: edumazet@google.com,
+	herbert@gondor.apana.org.au,
+	jpiotrowski@linux.microsoft.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	seh@panix.com
+Subject: Re: kernel BUG at net/core/skbuff.c:4219
+Date: Thu, 11 Apr 2024 14:23:21 +0800
+Message-Id: <20221021100022.GA31916@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+X-Mailer: git-send-email 2.32.1 (Apple Git-133)
+In-Reply-To: <194f6b02-8ee7-b5d7-58f3-6a83b5ff275d@gmail.com>
+References: <20221011165611.GA8735@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net> <194f6b02-8ee7-b5d7-58f3-6a83b5ff275d@gmail.com>
+Received: from vger.kernel.org (vger.kernel.org [23.128.96.18]) by smtp.lore.kernel.org (Postfix) with ESMTP id 01ADEC433FE for <netdev@archiver.kernel.org>; Fri, 21 Oct 2022 10:00:26 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand id S230090AbiJUKAZ (ORCPT <rfc822;netdev@archiver.kernel.org>); Fri, 21 Oct 2022 06:00:25 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182]) by lindbergh.monkeyblade.net (Postfix) with ESMTP id C0D35108243; Fri, 21 Oct 2022 03:00:22 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1112) id 8718020FEB47; Fri, 21 Oct 2022 03:00:22 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 8718020FEB47
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com; s=default; t=1666346422; bh=cYIKrJC5k/BBGSDjkeleD8TAE2cOUtwAK2AhJ6I3N70=; h=Date:From:To:Cc:Subject:References:In-Reply-To:From; b=hdisWQP0XbRm7V//OZw98Klj2Eptp2S5qfDXKyYQnxfJI5B8/vRPoF9cO8Hfj+f87 b3mxQXv2+IFnljFKLraeHSY7JBrEaJoF5pzCGPtFa0Urct+UD6tp3RbcwqnJmeQZK+ szLD6Gn/ErNJVla2zTQVr2cJfGQFx5VsM4DhYrZw=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.21 (2010-09-15)
+Precedence: bulk
+Content-Transfer-Encoding: 8bit
 
-On Tue, 2024-04-09 at 12:05 +0300, Aleksandr Mishin wrote:
-> In chtls_pass_accept_rpl() and chtls_select_mss() __sk_dst_get() may
-> return NULL which is later dereferenced. Fix this bug by adding NULL chec=
-k.
->=20
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+From: Jeremi Piotrowski <jpiotrowski@linux.microsoft.com>
 
-Indeed a more describing changelog would be better given the patch
-needs to go much fourther then adding a missing check.
+> On Tue, Oct 11, 2022 at 10:57:05AM -0700, Eric Dumazet wrote:
+> > 
+> > On 10/11/22 09:56, Jeremi Piotrowski wrote:
+> > >Hi,
+> > >
+> > >One of our Flatcar users has been hitting the kernel BUG in the subject line
+> > >for the past year (https://github.com/flatcar/Flatcar/issues/378). This was
+> > >first reported when on 5.10.25, but has been happening across kernel updates,
+> > >most recently with 5.15.63. The nodes where this happens are AWS EC2 instances,
+> > >using ENA and calico networking in eBPF mode with VXLAN encapsulation. When
+> > >GRO/GSO is enabled, the host hits this bug and prints the following stacktrace:
+> > 
+> > 
+> > I suspect eBPF code lowers gso_size ?
+> > 
+> > gso stack is not able to arbitrarily segment a GRO packet after
+> > gso_size being changed.
+> > 
+> > 
+> 
+> This was a good hint, see Tomas' response for some more observations.
+> 
+> This appears to still be happening with Calico v3.23 which started passing
+> BPF_F_ADJ_ROOM_FIXED_GSO to bpf_skb_adjust_room() on the decap (rx) path.
+> BPF_F_ADJ_ROOM_FIXED_GSO is not passed on the encap (tx) path. It is enough to
+> disable GRO to stop the BUG from being hit though, so there must be more going
+> on here ? (since the rx path does not change gso_size any longer).
+>
 
-> Fixes: cc35c88ae4db ("crypto : chtls - CPL handler definition")
-> Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
-> ---
->  .../chelsio/inline_crypto/chtls/chtls_cm.c    | 24 +++++++++++++------
->  1 file changed, 17 insertions(+), 7 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c =
-b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c
-> index 6f6525983130..6d88cbc9fbb0 100644
-> --- a/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c
-> +++ b/drivers/net/ethernet/chelsio/inline_crypto/chtls/chtls_cm.c
-> @@ -939,15 +939,15 @@ static void chtls_accept_rpl_arp_failure(void *hand=
-le,
->  	sock_put(sk);
->  }
-> =20
-> -static unsigned int chtls_select_mss(const struct chtls_sock *csk,
-> +static bool chtls_select_mss(const struct chtls_sock *csk,
->  				     unsigned int pmtu,
-> -				     struct cpl_pass_accept_req *req)
-> +				     struct cpl_pass_accept_req *req,
-> +					 unsigned int *mtu_idx)
+Hi,
 
-Bad indentation above.
+I encountered a similar error. The calico version is v3.24.5.
+It was crash at BUG_ON(skb_headlen(list_skb) > len) with the following stacktrace.
+But i don't konw how to reproduce it.
 
-More importantly, what about returning a negative value on failure and
-avoid the additional parameter? It should also generate a smaller
-diffstat.
+    [exception RIP: skb_segment+3016]
+    RIP: ffffffffb97df2a8  RSP: ffffa3f2cce08728  RFLAGS: 00010293
+    RAX: 000000000000007d  RBX: 00000000fffff7b3  RCX: 0000000000000011
+    RDX: 0000000000000000  RSI: ffff895ea32c76c0  RDI: 00000000000008c1
+    RBP: ffffa3f2cce087f8   R8: 000000000000088f   R9: 0000000000000011
+    R10: 000000000000090c  R11: ffff895e47e68000  R12: ffff895eb2022f00
+    R13: 000000000000004b  R14: ffff895ecdaf2000  R15: ffff895eb2023f00
+    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+ #9 [ffffa3f2cce08720] skb_segment at ffffffffb97ded63
+#10 [ffffa3f2cce08800] tcp_gso_segment at ffffffffb98d0320
+#11 [ffffa3f2cce08860] tcp4_gso_segment at ffffffffb98d07a3
+#12 [ffffa3f2cce08880] inet_gso_segment at ffffffffb98e6de0
+#13 [ffffa3f2cce088e0] skb_mac_gso_segment at ffffffffb97f3741
+#14 [ffffa3f2cce08918] skb_udp_tunnel_segment at ffffffffb98daa59
+#15 [ffffa3f2cce08980] udp4_ufo_fragment at ffffffffb98db471
+#16 [ffffa3f2cce089b0] inet_gso_segment at ffffffffb98e6de0
+#17 [ffffa3f2cce08a10] skb_mac_gso_segment at ffffffffb97f3741
+#18 [ffffa3f2cce08a48] __skb_gso_segment at ffffffffb97f388e
+#19 [ffffa3f2cce08a78] validate_xmit_skb at ffffffffb97f3d6e
+#20 [ffffa3f2cce08ab8] __dev_queue_xmit at ffffffffb97f4614
+#21 [ffffa3f2cce08b50] dev_queue_xmit at ffffffffb97f5030
+#22 [ffffa3f2cce08b60] __bpf_redirect at ffffffffb98199a8
+#23 [ffffa3f2cce08b88] skb_do_redirect at ffffffffb98205cd
+#24 [ffffa3f2cce08bb8] __netif_receive_skb_core at ffffffffb97f6585
+#25 [ffffa3f2cce08c68] __netif_receive_skb_list_core at ffffffffb97f6c0a
+#26 [ffffa3f2cce08ce8] netif_receive_skb_list_internal at ffffffffb97f6f6a
+#27 [ffffa3f2cce08d60] gro_normal_list at ffffffffb97f717e
+#28 [ffffa3f2cce08d80] gro_normal_one at ffffffffb97f721c
+#29 [ffffa3f2cce08db8] napi_gro_complete at ffffffffb97f72ac
+#30 [ffffa3f2cce08de0] napi_gro_flush at ffffffffb97f73c1
+#31 [ffffa3f2cce08e30] napi_complete_done at ffffffffb97f7d1e
+#32 [ffffa3f2cce08e60] ice_napi_poll at ffffffffc0477dd6 [ice]
+#33 [ffffa3f2cce08ec0] __napi_poll at ffffffffb97f823e
+#34 [ffffa3f2cce08ef0] net_rx_action at ffffffffb97f86f1
+#35 [ffffa3f2cce08f70] __softirqentry_text_start at ffffffffb9e000dd
+#36 [ffffa3f2cce08fd8] irq_exit_rcu at ffffffffb9096074
+#37 [ffffa3f2cce08ff0] common_interrupt at ffffffffb9a3272a
 
->  {
->  	struct chtls_dev *cdev;
->  	struct dst_entry *dst;
->  	unsigned int tcpoptsz;
->  	unsigned int iphdrsz;
-> -	unsigned int mtu_idx;
->  	struct tcp_sock *tp;
->  	unsigned int mss;
->  	struct sock *sk;
-> @@ -955,6 +955,9 @@ static unsigned int chtls_select_mss(const struct cht=
-ls_sock *csk,
->  	mss =3D ntohs(req->tcpopt.mss);
->  	sk =3D csk->sk;
->  	dst =3D __sk_dst_get(sk);
-> +	if (!dst)
-> +		return false;
-> +
->  	cdev =3D csk->cdev;
->  	tp =3D tcp_sk(sk);
->  	tcpoptsz =3D 0;
+the gso_size is 75 which may subtract 50(the vxlan head length) by bpf_skb_adjust_room?。
+the frag_list has one element which head_frag is 1. the skb_shared_info struct is as following.
 
-[...]
+struct skb_shared_info {
+    nr_frags = 17 '\021', 
+    gso_size = 75, 
+    gso_segs = 0, 
+    frag_list = 0xffff895eb2022f00, 
+    gso_type = 1035, 
+    destructor_arg = 0x2d656c6261747372, 
+    frags = {{
+        bv_page = 0xfffff80e86d4d180, 
+        bv_len = 125, 
+        bv_offset = 2306
+      },
+    ....
+    }
+}
 
->  static unsigned int select_rcv_wscale(int space, int wscale_ok, int win_=
-clamp)
-> @@ -1016,8 +1019,13 @@ static void chtls_pass_accept_rpl(struct sk_buff *=
-skb,
->  	struct sock *sk;
->  	u32 opt2, hlen;
->  	u64 opt0;
-> +	struct dst_entry *dst;
+If anyone has any suggestions excepth disabling GRO/GSO. The BPF_F_ADJ_ROOM_FIXED_GSO flag 
+can be enabled on the encap path? I‘d love to provide more information if you need.
 
-Please respect the reverst x-mass tree order.
-
->  	sk =3D skb->sk;
-> +	dst =3D __sk_dst_get(sk);
-> +	if (!dst)
-> +		return;
-> +
->  	tp =3D tcp_sk(sk);
->  	csk =3D sk->sk_user_data;
->  	csk->tid =3D tid;
-
-Thanks,
-
-Paolo
-
+fred
 
