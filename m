@@ -1,61 +1,68 @@
-Return-Path: <netdev+bounces-86791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A8B88A04E6
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 02:49:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15B7C8A04F3
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 02:54:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CDCAB237E2
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 00:49:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46DAB1C215F3
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 00:54:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F100A1C01;
-	Thu, 11 Apr 2024 00:49:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BEC28F6D;
+	Thu, 11 Apr 2024 00:54:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t3JuuYOl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CXSraXtO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1CA2C80
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 00:49:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119E58C15;
+	Thu, 11 Apr 2024 00:54:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712796581; cv=none; b=P+k+2p1X15i/uD34GbDWb4fkRAd1ZkfQ59u/8tqJ95Pe/cEGeD9pcmgC95KxwyiW/u26JJQjVLBAw5eHtpUxTWo5nip9aCOaF8qJesbqSVjs4G8WBmsSKH0N4BRNLY/4XMcK2IyD179YHHpJ0VPEVF99eTCV0YX9nz5Df6n5yyI=
+	t=1712796867; cv=none; b=Ql095zvWbJ7E6SMhqQCGzYgq8AFC+jg6c5PQ5T/nALUhZi2NrvoIOKvljLzpdsubL35fOC2rwSSuCvJ6u48kYvQi2KLG4uqZ2ppag0UFYz6ubkRp5fnGHezaTgLh44+Nd+4utKyNFoPR7mg0yW6OdVRMcOvu8LXnKmQAmr/04ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712796581; c=relaxed/simple;
-	bh=uBvl+V48Ip1bx6RPlfDKU6fhpzEDYqZ+Px/zO5ASnWM=;
+	s=arc-20240116; t=1712796867; c=relaxed/simple;
+	bh=SYtRUZQ8HVrb2vo/aMPFNkrKw9nzziCur41M5OjRIFQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fdV1F6RfdUZV4kAaCjo1KLtCtJwwlNcK7XKDrjg1uenoTLAixmdkSNkbcaB8/UsGRSMDqB6cFLE0e92auTGTrMvVutNOkPPmyk8ZNgrPaSsvJkLysLsSZdlabLzwNMqsdqMgNjuwueIZ4giY2SidBIj9lQ5Zc0D4pT5uipzZrlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t3JuuYOl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4803C433F1;
-	Thu, 11 Apr 2024 00:49:40 +0000 (UTC)
+	 MIME-Version:Content-Type; b=cHyntyJWg2danNM0/zbrORmny8reu4lpp6pAy/pK+12lfj4KmCAEKhxrESP3IHjPOHncIrZ54CJlVcKKxBvT0EJGuXhVAnJ53y4aTfjNz3myP4GjL5h49XvQ9PA+1g2sH9B54/7jvMP4Y7r4VU/e13jANNa29A6AWJnshhlsR8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CXSraXtO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DC26EC433F1;
+	Thu, 11 Apr 2024 00:54:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712796581;
-	bh=uBvl+V48Ip1bx6RPlfDKU6fhpzEDYqZ+Px/zO5ASnWM=;
+	s=k20201202; t=1712796866;
+	bh=SYtRUZQ8HVrb2vo/aMPFNkrKw9nzziCur41M5OjRIFQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=t3JuuYOl8dKciiSv/7r8AzmyfNRBiVVtFg385l1za40aXoqT/1w5p9phBPBsanl8l
-	 8yhF1pSYrwoUeicP3NXbUqGDZKNNCuDR1K8VsC7jh9wEb4Lzd7PQHoj1Bsg9Z+PMlr
-	 NvZEjlsUKTs0VhfcWCRmSf43fo0k9xPnnuGbjDgNir7s0Wqx+ivAgc3E/uuTMZVR1y
-	 3imx9NQr9owFronxClMTSim8xR8sEa76/E8LlYtnV11SrlNg3SdYDuunwkw9d3uROT
-	 dTPuxRlMTrqVhxSWE9PnTbRFH46eDOCnVUwgBY17tme1M2+5ulLQB4l4mO2xvQtQN8
-	 umosOJKawU1ZQ==
-Date: Wed, 10 Apr 2024 17:49:40 -0700
+	b=CXSraXtOqsvQyZSd+AXa1otcaR5MSenMo/pQdW9z1SWim6a4vAur8xk1G9sgteJMN
+	 QMLR+LUbOcryrmQHb+e//ScxPe0N4U8/buGO6/iUHBmZOa7KhwLhZGGbCZEE0ZuOXK
+	 mScvtDuAU0GmXYOZQQe09vweUbLFkqhNp7wrwDMWwoQdivrNM4JTrOXTZddkAdbcNQ
+	 lMpVE1u+ZA0hVHf4ClkF1E+arwFfHBRsr8ZTnI0IAJlKKQ9tJVa5AVRq2m/wXvsyAX
+	 GBiUBncqqa6zuHbu//H47sRq+289Lz5dnuOga9tzZ7HLF/K6a0DGwNar5A0Qlp+YO5
+	 x/rL7420g7omA==
+Date: Wed, 10 Apr 2024 17:54:24 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Antony Antony <antony.antony@secunet.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>, "David S. Miller"
- <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
- <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>,
- <netdev@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
- <devel@linux-ipsec.org>, Tobias Brunner <tobias@strongswan.org>
-Subject: Re: 14141
-Message-ID: <20240410174940.14739138@kernel.org>
-In-Reply-To: <ZhbQ/qteBv7Up1lE@moon.secunet.de>
-References: <cover.1712226175.git.antony.antony@secunet.com>
-	<20ea2ab0472ecf2d1625dadb7ca0df39cf4fe0f5.1712226175.git.antony.antony@secunet.com>
-	<20240408191534.2dd7892d@kernel.org>
-	<ZhbQ/qteBv7Up1lE@moon.secunet.de>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Kees Cook <keescook@chromium.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Alexander Duyck <alexanderduyck@fb.com>, Yunsheng Lin
+ <linyunsheng@huawei.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
+ Apalodimas" <ilias.apalodimas@linaro.org>, Christoph Lameter
+ <cl@linux.com>, Vlastimil Babka <vbabka@suse.cz>, Andrew Morton
+ <akpm@linux-foundation.org>, <nex.sw.ncis.osdt.itp.upstreaming@intel.com>,
+ <netdev@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+ <linux-mm@kvack.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v9 7/9] libeth: add Rx buffer management
+Message-ID: <20240410175424.7567d32d@kernel.org>
+In-Reply-To: <91486cf6-c496-4459-8379-257383d031a1@intel.com>
+References: <20240404154402.3581254-1-aleksander.lobakin@intel.com>
+	<20240404154402.3581254-8-aleksander.lobakin@intel.com>
+	<20240405212513.0d189968@kernel.org>
+	<1dda8fd5-233b-4b26-95cc-f4eb339a7f88@intel.com>
+	<755c17b2-0ec2-49dd-9352-63e5d2f1ba4c@intel.com>
+	<202404090909.51BAC81A6@keescook>
+	<91486cf6-c496-4459-8379-257383d031a1@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,21 +72,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 10 Apr 2024 19:48:46 +0200 Antony Antony wrote:
-> > Could you turn this into a selftest?  
-> 
-> I thought about it, and I didn't find any selftest file that match this
-> test. This test need a topology with 4, ideally 5, namespaces connected in a line, and ip xfrm.
-> 
-> git/linux/tools/testing/selftests/net/pmtu.sh  is probably the easiest I
-> can think off.
-> 
-> git/linux/tools/testing/selftests/net/xfrm_policy.sh seems to be a bit
-> more complex to a extra tests to.
-> 
-> Do you have any preference? which file to add?
+On Wed, 10 Apr 2024 15:36:13 +0200 Alexander Lobakin wrote:
+> Which tree this should go through? Should I include this patch to this
+> series with libeth or it's better to push this through kees/linux and
+> then pull to net-next?
 
-Whatever's easiest, I don't have much experience with either of those.
-You can also create a new file, it's perfectly fine, just make sure
-you add it to the makefile so kselftest knows about it
+I think doc tree is a strong candidate, or at least we should not
+merge without consulting Jon. Please post and we'll figure it out.
+
+The question someone may ask, however, is whether it causes new
+warnings to appear?
 
