@@ -1,187 +1,302 @@
-Return-Path: <netdev+bounces-86849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 300E18A06E2
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 05:44:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E64488A0764
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 06:57:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAB3A2842A9
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 03:44:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 156A01C2336B
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 04:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D9B413BAEA;
-	Thu, 11 Apr 2024 03:44:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89E9013C3D7;
+	Thu, 11 Apr 2024 04:57:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UtM/QZBe"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ClPTM1jB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70B252629C;
-	Thu, 11 Apr 2024 03:44:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
+Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.219])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECCEF2EAE5;
+	Thu, 11 Apr 2024 04:57:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712807080; cv=none; b=r3/hmYInA7FIPjJaYL1dReTZSvaCVIYPZQ5u5C0qKegULH7cVMYaFe4qCEFmFnMUiF60yYblzRf+hfTI4O0+kPAkUrHevREeM7L+PsUwML1hCBPLwJdZS+cRzCQgAWxpRB6gDLeBu5hwST+7GlZs94YrmweqKx/LqQSPykLVZug=
+	t=1712811459; cv=none; b=K2W4B54eIxuqfIgZ5MEkzpinuQ7PTnd4wI3kCbw0nwJn7JrukvL5YHB7z6hdgsqQ441DptoD8u0bhHmWYW4LlewWArq+zViQHIF/SokQmFtXaLF6ZRW9fKEj58UWVWa9VKsRkCubVEncCH/IvrX2h7qEQC4tvwBPQKiGk5ANBAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712807080; c=relaxed/simple;
-	bh=4EdgFjnPVt0AqnOMX6obmaUYeHbpAimK73X4vdQVn54=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=HsZQ5+mk8eGvPNaYH6u6FkID2BO7SnKI1T9CUmGpGU+Fg6Pvx+sJo6VOAV1dTDLE/kl52F0+9ogkkttOoyjrB/7WrV2X1szdyP6f35IYCcrMhFKvuFbgC4zFCHrP1vHkuHPzWHU1LSSvi9oq5Vw9EzlY/X0jaogawmqWRRXogyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UtM/QZBe; arc=none smtp.client-ip=209.85.217.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-479cbfc62e9so2203491137.0;
-        Wed, 10 Apr 2024 20:44:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712807078; x=1713411878; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s4mBwnW823TZuDVksWLosgM7erJBTdnXQcLXGCSz0Ak=;
-        b=UtM/QZBe85Zg76PdH1bbWd5kkC8K7QFToyPbtR8kkUBPbSldJuZUpc078tZdiVekjQ
-         vPI0/YrfX793QR7ZSdRqMfZxhm32jShSidIYFmfaYqm3jhwbtth6nR9aUF7V6/WE1WYG
-         7YLMM9rxUtQc5mOmBF+lScZi63uI9ECjOnaOKnsj4boDUskNPUIym9ntFf1tERne+7Xy
-         NWmS5juSjiH4flQpWWYqLJa4AnxeCol0xtCF0j9VaIdSbKFpZROW+lOH1TnREqiCetNV
-         KPeQz7YH0XdyRWdWnYC1MvtS1WsQLCprSiUzqXbSEBU1YScZiF3pEewccwHqSh+3Bhvs
-         3UFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712807078; x=1713411878;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=s4mBwnW823TZuDVksWLosgM7erJBTdnXQcLXGCSz0Ak=;
-        b=vSZB7I5XK3AbcECdIKHHKdeXTo/4Ms/SEHsrQnqB3ybl1IOpgdDEVaeb7tDNqJCysm
-         E0RabrcdqQGLVuTZQGRJc1Y8zZ9Im7Ah2yu3mZ/gJ+NjZzSE/yGilzCxxqgqUvRbUT5E
-         fYbrRr/zvvCfKrmCBJjYz2w2ooiNm/LHlrwGVVhPDmqX1nI34Iy0LH1l8eeubRkaWsg1
-         fzAmAA9b/jvKM3j2Sr0s9PoADawj4tPNkdtKm8eG0SxSsJURWsg2KAFZYUm8MtLJjdri
-         MXKkdemRstTj7WD5s85IDcFMuwuU00fyy5Y/wrlDjVnDziBEFvzNoVQIwXDVHioB5Iyr
-         mECw==
-X-Forwarded-Encrypted: i=1; AJvYcCV2Xrbhol6o6Wsq3IbREajWyjkA3HePMhqxQPvCak374YW9gQ1L7MtQPPoahX/QVW8VymbjaEKjTlpaYpiDP4POqalrZ8bASDmKYWetOsrnZC9tu0R+c1KdETM6/ocDvbTSL3Sj19nmOk6166YiMUhhKwXm92gCdFMCMX8gAQg6ocVMUvCh
-X-Gm-Message-State: AOJu0Yx17zMRY1l0hcn/FlN30y7XzvOiQTvdQWSyv2DywlB5VVeD1N3t
-	d9iH/enTPNRwVesgAo0vsv2fraT8tkFFmc5mO/UuFVrdpfDDKNWw
-X-Google-Smtp-Source: AGHT+IFckMWU8asZlpol2UkeUkPVYl0ylGfdLJFoqv0bxQpg0yfK0SJxv39TvrGZFaeIgXQKUTVw+w==
-X-Received: by 2002:a05:6102:4746:b0:479:fd28:6d37 with SMTP id ej6-20020a056102474600b00479fd286d37mr4211250vsb.20.1712807078365;
-        Wed, 10 Apr 2024 20:44:38 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id p1-20020a05620a22e100b0078d752367e9sm450364qki.79.2024.04.10.20.44.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 20:44:38 -0700 (PDT)
-Date: Wed, 10 Apr 2024 23:44:37 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Richard Gobert <richardbgobert@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- willemdebruijn.kernel@gmail.com, 
- shuah@kernel.org, 
- dsahern@kernel.org, 
- aduyck@mirantis.com, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org
-Cc: Richard Gobert <richardbgobert@gmail.com>
-Message-ID: <66175ca5e3621_2dde6a2947c@willemb.c.googlers.com.notmuch>
-In-Reply-To: <6617493095ee1_2d6bc6294fc@willemb.c.googlers.com.notmuch>
-References: <20240410153423.107381-1-richardbgobert@gmail.com>
- <20240410153423.107381-3-richardbgobert@gmail.com>
- <6617493095ee1_2d6bc6294fc@willemb.c.googlers.com.notmuch>
-Subject: Re: [PATCH net-next v6 2/6] net: gro: add p_off param in
- *_gro_complete
+	s=arc-20240116; t=1712811459; c=relaxed/simple;
+	bh=S3k+GmJil8vwX93KLj5TAdiSdBsXB/I6ep//dNM+fIM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=ZWK4xXPTvNKmi8rmsCWpMa2p+lVMDOSPTrYQMmJ5lrDwzXYOtoVNJmY937FXxU+uT5DTKdVVhlqpz8Jcfu7275OeaN1btwhbSIzwmrrMbnrum6xMeqar0svdJ2+G2LbykTAuJ4+U+C8nnWBWBV3EOXU7jx0q6N2Qr00K/5AVzOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ClPTM1jB; arc=none smtp.client-ip=45.254.50.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=1RbLm
+	gwD1B4tCv6XTyrCYvTpHa58n5yQd2G/f7STIAg=; b=ClPTM1jB68CenfOct14Ch
+	zk/w22caOT3YUq+xY2Q0tQzpgOxzja0Lv4xP6H30reT7QIstRaW6ph2J1ehwH2eF
+	WfKxqi1RH0Mi+HRlm3oMi2WKyaozuXageGLJrTzLIayI6yBMOym2CCTo0SSEG7mE
+	eRfBBEYoh6h1oOrcEOcc6M=
+Received: from localhost.localdomain (unknown [193.203.214.57])
+	by gzga-smtp-mta-g0-0 (Coremail) with SMTP id _____wD3HzSTbRdmQfMZAw--.2190S2;
+	Thu, 11 Apr 2024 12:56:52 +0800 (CST)
+From: Peilin He <peilinhe2020@163.com>
+To: kerneljasonxing@gmail.com
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	fan.yu9@zte.com.cn,
+	he.peilin@zte.com.cn,
+	jiang.xuexin@zte.com.cn,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	liu.chun2@zte.com.cn,
+	mhiramat@kernel.org,
+	netdev@vger.kernel.org,
+	peilinhe2020@163.com,
+	qiu.yutan@zte.com.cn,
+	rostedt@goodmis.org,
+	xu.xin16@zte.com.cn,
+	yang.yang29@zte.com.cn,
+	zhang.yunkai@zte.com.cn
+Subject: Re: Re: Re: Subject: [PATCH net-next v4] net/ipv4: add tracepoint for icmp_send
+Date: Thu, 11 Apr 2024 04:56:50 +0000
+Message-Id: <20240411045650.139192-1-peilinhe2020@163.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <CAL+tcoDS6yGAP0UqN9YCSzB2zSUz5b7Vmh+M7Gk-k3SZdmfj1Q@mail.gmail.com>
+References: <CAL+tcoDS6yGAP0UqN9YCSzB2zSUz5b7Vmh+M7Gk-k3SZdmfj1Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3HzSTbRdmQfMZAw--.2190S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3ArWUXFW5WF1kGrWrWr47CFg_yoW3ur43pF
+	yUCF15Cr4DJr4UAr1I9w12qFnIqrW8JryUWr17W34akr1qqr17tFW8tr1YkrykArs8K34a
+	qF1Ut343CF15JrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pR7rcsUUUUU=
+X-CM-SenderInfo: xshlzxhqkhjiisq6il2tof0z/1tbiZRa9sWXAlFeNKQAAs9
 
-Willem de Bruijn wrote:
-> Richard Gobert wrote:
-> > Commits a602456 ("udp: Add GRO functions to UDP socket") and 57c67ff ("udp:
-> > additional GRO support") introduce incorrect usage of {ip,ipv6}_hdr in the
-> > complete phase of gro. The functions always return skb->network_header,
-> > which in the case of encapsulated packets at the gro complete phase, is
-> > always set to the innermost L3 of the packet. That means that calling
-> > {ip,ipv6}_hdr for skbs which completed the GRO receive phase (both in
-> > gro_list and *_gro_complete) when parsing an encapsulated packet's _outer_
-> > L3/L4 may return an unexpected value.
-> > 
-> > This incorrect usage leads to a bug in GRO's UDP socket lookup.
-> > udp{4,6}_lib_lookup_skb functions use ip_hdr/ipv6_hdr respectively. These
-> > *_hdr functions return network_header which will point to the innermost L3,
-> > resulting in the wrong offset being used in __udp{4,6}_lib_lookup with
-> > encapsulated packets.
-> > 
-> > To fix this issue p_off param is used in *_gro_complete to pass off the
-> > offset of the previous layer.
-> 
-> What exactly does this mean?
-> 
-> This patch changes the definition of gro_complete to add a thoff
-> alongside the existing "nhoff"..
-> 
->     > -     int                     (*gro_complete)(struct sk_buff *skb, int nhoff);
->     > +     int                     (*gro_complete)(struct sk_buff *skb, int nhoff,
->     > +                                             int thoff);
-> 
-> .. but also fixes up implementations to interpret the existing
-> argument as a thoff
-> 
->     > -INDIRECT_CALLABLE_SCOPE int tcp4_gro_complete(struct sk_buff *skb, int thoff)
->     > +INDIRECT_CALLABLE_SCOPE int tcp4_gro_complete(struct sk_buff *skb, int nhoff,
->     > +                                           int thoff)
->     >  {
->     > -     const struct iphdr *iph = ip_hdr(skb);
->     > -     struct tcphdr *th = tcp_hdr(skb);
->     > +     const struct iphdr *iph = (const struct iphdr *)(skb->data + nhoff);
->     > +     struct tcphdr *th = (struct tcphdr *)(skb->data + thoff);
-> 
-> But in some cases the new argument is not nhoff but p_off, e.g.,
-> 
->     >  static int geneve_gro_complete(struct sock *sk, struct sk_buff *skb,
->     > -                            int nhoff)
->     > +                            int p_off, int nhoff)
-> 
-> Really, the argument is the start of the next header, each callback
-> just casts to its expected header (ethhdr, tcphdr, etc.)
-> 
-> The only place where we need to pass an extra argument is in udp,
-> because that needs a pointer to the network header right before the
-> transport header pointed to by nhoff.
-> 
-> And only due to possible IPv4 options or IPv6 extension headers, we
-> cannot just do
-> 
-> +        struct udphdr *iph = (struct iphdr *)(skb->data + nhoff - sizeof(*iph));
->          struct udphdr *uh = (struct udphdr *)(skb->data + nhoff);
-> 
-> I also do not immediately see an a way to avoid all the boilerplate
-> of a new argument in every callback. Aside from a per_cpu var -- but
-> that is excessive.
-> 
-> But it can just be left zero in all callsites, except for
-> inet_gro_complete/ipv6_gro_complete, which pass in nhoff.
+>> >[...]
+>> >> >I think my understanding based on what Eric depicted differs from you:
+>> >> >we're supposed to filter out those many invalid cases and only trace
+>> >> >the valid action of sending a icmp, so where to add a new tracepoint
+>> >> >is important instead of adding more checks in the tracepoint itself.
+>> >> >Please refer to what trace_tcp_retransmit_skb() does :)
+>> >> >
+>> >> >Thanks,
+>> >> >Jason
+>> >> Okay, thank you for your suggestion. In order to avoid filtering out
+>> >> those many invalid cases and only tracing the valid action of sending
+>> >> a icmp, the next patch will add udd_fail_no_port trancepoint to the
+>> >> include/trace/events/udp.h. This will solve the problem you mentioned
+>> >> very well. At this point, only UDP protocol exceptions will be tracked,
+>> >> without the need to track them in icmp_send.
+>> >
+>> >I'm not against what you did (tracing all the icmp_send() for UDP) in
+>> >your original patch. I was suggesting that you could put
+>> >trace_icmp_send() in the right place, then you don't have to check the
+>> >possible error condition (like if the skb->head is valid or not, ...)
+>> >in your trace function.
+>> >
+>> >One example that can avoid various checks existing in the
+>> >__icmp_send() function:
+>> >diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+>> >index e63a3bf99617..2c9f7364de45 100644
+>> >--- a/net/ipv4/icmp.c
+>> >+++ b/net/ipv4/icmp.c
+>> >@@ -767,6 +767,7 @@ void __icmp_send(struct sk_buff *skb_in, int type,
+>> >int code, __be32 info,
+>> >        if (!fl4.saddr)
+>> >                fl4.saddr = htonl(INADDR_DUMMY);
+>> >
+>> >+       trace_icmp_send(skb_in, type, code);
+>> >        icmp_push_reply(sk, &icmp_param, &fl4, &ipc, &rt);
+>> > ende
+>> >        ip_rt_put(rt);
+>> >
+>> >If we go here, it means we are ready to send the ICMP skb because
+>> >we're done extracting the right information in the 'struct sk_buff
+>> >skb_in'. Simpler and easier, right?
+>> >
+>> >Thanks,
+>> >Jason
+>>
+>> I may not fully agree with this viewpoint. When trace_icmp_send is placed
+>> in this position, it cannot guarantee that all skbs in icmp are UDP protocols
+>> (UDP needs to be distinguished based on the proto_4!=IPPROTO_UDP condition),
+>> nor can it guarantee the legitimacy of udphdr (*uh legitimacy check is required).
+>
+>Of course, the UDP test statement is absolutely needed! Eric
+>previously pointed this out in the V1 patch thread. I'm not referring
+>to this one but like skb->head check something like this which exists
+>in __icmp_send() function. You can see there are so many checks in it
+>before sending.
+>
+>So only keeping the UDP check is enough, I think.
 
-Actually, we can avoid the boilerplate changes that add an extra arg.
+The __icmp_send function only checks the IP header, but does not check
+the UDP header, as shown in the following code snippet:
 
-By changing the contract between network layer callbacks
-(inet_gro_complete/ipv6_gro_complete) and transport layer callbacks
-(tcp4_gro_complete et al).
+if ((u8 *)iph < skb_in->head ||
+	    (skb_network_header(skb_in) + sizeof(*iph)) >
+	    skb_tail_pointer(skb_in))
+		goto out;
 
-If the first pass their own unmodified offset, nhoff:
+There is no problem with the IP header check, which does not mean that
+the UDP header is correct. Therefore, I believe that it is essential to
+include a legitimacy judgment for the UDP header.
+ 
+Here is an explanation of this code:
+Firstly, the UDP header (*uh) is extracted from the skb.
+Then, if the current protocol of the skb is not UDP, or if the address of
+uh is outside the range of the skb, the source port and destination port
+will not be resolved, and 0 will be filled in directly.Otherwise,
+the source port and destination port of the UDP header will be resolved.
 
-        err = INDIRECT_CALL_2(ops->callbacks.gro_complete,
-                              tcp4_gro_complete, udp4_gro_complete,
--                             skb, nhoff + sizeof(*iph));
-+                             skb, nhoff);
++	struct udphdr *uh = udp_hdr(skb);
++	if (proto_4 != IPPROTO_UDP || (u8 *)uh < skb->head ||
++	    (u8 *)uh + sizeof(struct udphdr) > skb_tail_pointer(skb)) {
 
-And the latter parse the network header for total_len/payload_len, to
-find their original offset.
+With best wishes
+Peilin He
 
-It's also a bit of a hack. But a lot smaller patch, probably.
+>Thanks,
+>Jason
+>
+>>
+>> With best wishes
+>> Peilin He
+>>
+>> >>
+>> >> >> 2.Target this patch for net-next.
+>> >> >>
+>> >> >> v2->v3:
+>> >> >> Some fixes according to
+>> >> >> https://lore.kernel.org/all/20240319102549.7f7f6f53@gandalf.local.home/
+>> >> >> 1. Change the tracking directory to/sys/kernel/tracking.
+>> >> >> 2. Adjust the layout of the TP-STRUCT_entry parameter structure.
+>> >> >>
+>> >> >> v1->v2:
+>> >> >> Some fixes according to
+>> >> >> https://lore.kernel.org/all/CANn89iL-y9e_VFpdw=3DsZtRnKRu_tnUwqHuFQTJvJsv=
+>> >> >-nz1xPDw@mail.gmail.com/
+>> >> >> 1. adjust the trace_icmp_send() to more protocols than UDP.
+>> >> >> 2. move the calling of trace_icmp_send after sanity checks
+>> >> >> in __icmp_send().
+>> >> >>
+>> >> >> Signed-off-by: Peilin He<he.peilin@zte.com.cn>
+>> >> >> Reviewed-by: xu xin <xu.xin16@zte.com.cn>
+>> >> >> Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
+>> >> >> Cc: Yang Yang <yang.yang29@zte.com.cn>
+>> >> >> Cc: Liu Chun <liu.chun2@zte.com.cn>
+>> >> >> Cc: Xuexin Jiang <jiang.xuexin@zte.com.cn>
+>> >> >> ---
+>> >> >>  include/trace/events/icmp.h | 65 +++++++++++++++++++++++++++++++++++++
+>> >> >>  net/ipv4/icmp.c             |  4 +++
+>> >> >>  2 files changed, 69 insertions(+)
+>> >> >>  create mode 100644 include/trace/events/icmp.h
+>> >> >>
+>> >> >> diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
+>> >> >> new file mode 100644
+>> >> >> index 000000000000..7d5190f48a28
+>> >> >> --- /dev/null
+>> >> >> +++ b/include/trace/events/icmp.h
+>> >> >> @@ -0,0 +1,65 @@
+>> >> >> +/* SPDX-License-Identifier: GPL-2.0 */
+>> >> >> +#undef TRACE_SYSTEM
+>> >> >> +#define TRACE_SYSTEM icmp
+>> >> >> +
+>> >> >> +#if !defined(_TRACE_ICMP_H) || defined(TRACE_HEADER_MULTI_READ)
+>> >> >> +#define _TRACE_ICMP_H
+>> >> >> +
+>> >> >> +#include <linux/icmp.h>
+>> >> >> +#include <linux/tracepoint.h>
+>> >> >> +
+>> >> >> +TRACE_EVENT(icmp_send,
+>> >> >> +
+>> >> >> +               TP_PROTO(const struct sk_buff *skb, int type, int code),
+>> >> >> +
+>> >> >> +               TP_ARGS(skb, type, code),
+>> >> >> +
+>> >> >> +               TP_STRUCT__entry(
+>> >> >> +                       __field(const void *, skbaddr)
+>> >> >> +                       __field(int, type)
+>> >> >> +                       __field(int, code)
+>> >> >> +                       __array(__u8, saddr, 4)
+>> >> >> +                       __array(__u8, daddr, 4)
+>> >> >> +                       __field(__u16, sport)
+>> >> >> +                       __field(__u16, dport)
+>> >> >> +                       __field(unsigned short, ulen)
+>> >> >> +               ),
+>> >> >> +
+>> >> >> +               TP_fast_assign(
+>> >> >> +                       struct iphdr *iph =3D ip_hdr(skb);
+>> >> >> +                       int proto_4 =3D iph->protocol;
+>> >> >> +                       __be32 *p32;
+>> >> >> +
+>> >> >> +                       __entry->skbaddr =3D skb;
+>> >> >> +                       __entry->type =3D type;
+>> >> >> +                       __entry->code =3D code;
+>> >> >> +
+>> >> >> +                       struct udphdr *uh =3D udp_hdr(skb);
+>> >> >> +                       if (proto_4 !=3D IPPROTO_UDP || (u8 *)uh < skb->h=
+>> >> >ead ||
+>> >> >> +                               (u8 *)uh + sizeof(struct udphdr) > skb_ta=
+>> >> >il_pointer(skb)) {
+>> >> >> +                               __entry->sport =3D 0;
+>> >> >> +                               __entry->dport =3D 0;
+>> >> >> +                               __entry->ulen =3D 0;
+>> >> >> +                       } else {
+>> >> >> +                               __entry->sport =3D ntohs(uh->source);
+>> >> >> +                               __entry->dport =3D ntohs(uh->dest);
+>> >> >> +                               __entry->ulen =3D ntohs(uh->len);
+>> >> >> +                       }
+>> >> >> +
+>> >> >> +                       p32 =3D (__be32 *) __entry->saddr;
+>> >> >> +                       *p32 =3D iph->saddr;
+>> >> >> +
+>> >> >> +                       p32 =3D (__be32 *) __entry->daddr;
+>> >> >> +                       *p32 =3D iph->daddr;
+>> >> >> +               ),
+>> >> >> +
+>> >> >> +               TP_printk("icmp_send: type=3D%d, code=3D%d. From %pI4:%u =
+>> >> >to %pI4:%u ulen=3D%d skbaddr=3D%p",
+>> >> >> +                       __entry->type, __entry->code,
+>> >> >> +                       __entry->saddr, __entry->sport, __entry->daddr,
+>> >> >> +                       __entry->dport, __entry->ulen, __entry->skbaddr)
+>> >> >> +);
+>> >> >> +
+>> >> >> +#endif /* _TRACE_ICMP_H */
+>> >> >> +
+>> >> >> +/* This part must be outside protection */
+>> >> >> +#include <trace/define_trace.h>
+>> >> >> \ No newline at end of file
+>> >> >> diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+>> >> >> index 8cebb476b3ab..224551d75c02 100644
+>> >> >> --- a/net/ipv4/icmp.c
+>> >> >> +++ b/net/ipv4/icmp.c
+>> >> >> @@ -92,6 +92,8 @@
+>> >> >>  #include <net/inet_common.h>
+>> >> >>  #include <net/ip_fib.h>
+>> >> >>  #include <net/l3mdev.h>
+>> >> >> +#define CREATE_TRACE_POINTS
+>> >> >> +#include <trace/events/icmp.h>
+>> >> >>
+>> >> >>  /*
+>> >> >>   *     Build xmit assembly blocks
+>> >> >> @@ -672,6 +674,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, in=
+>> >> >t code, __be32 info,
+>> >> >>                 }
+>> >> >>         }
+>> >> >>
+>> >> >> +       trace_icmp_send(skb_in, type, code);
+>> >> >> +
+>> >> >>         /* Needed by both icmp_global_allow and icmp_xmit_lock */
+>> >> >>         local_bh_disable();
+>> >> >>
+>> >> >> --
+>> >> >> 2.25.1
+
 
