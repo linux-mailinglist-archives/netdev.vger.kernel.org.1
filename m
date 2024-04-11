@@ -1,69 +1,50 @@
-Return-Path: <netdev+bounces-86818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C1288A05DC
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 04:34:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C58628A060D
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 04:40:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8B3FB2481B
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 02:34:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 075A128893C
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 02:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01BFB13AD23;
-	Thu, 11 Apr 2024 02:34:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1438A13B28D;
+	Thu, 11 Apr 2024 02:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="OpaP7yaP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YjyIevUz"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6377353E22;
-	Thu, 11 Apr 2024 02:33:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2E7113AD2E
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 02:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712802842; cv=none; b=kKZEEvXVZH0fPc+rS1tk8mQ4OzS0mMzgaUbblb3babq8A03ejJ1wK2wT+Of3xs6+UCKtHEM2mfCqOPZiDVAoOC902pwDbLqy61BlZTc3kY4Ej/IffY6RcXGNvceIeBj7xoL1qDxmEpTTFuI8+GsnVef25LEA2AxV4uNf+vQxO7k=
+	t=1712803229; cv=none; b=bBttslOOBXSIP7Jdy5+iNGDeWlMqzgzBtyMH8PdtpgFwp1Qx8FNqRgQdja/yi8vrVLwuYw2zzZkS68sRFh4MPEYFCBB9hSDN6i+VVO1GunG/yFtwRtFmqCaOdL3qpbRGhjLsVdlgybRU2COlSe4zE3CCNBJGe/PwzT1PvYnCiPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712802842; c=relaxed/simple;
-	bh=lNif+lKEoqBkvswjoiZ8yhsUzffxXtJV4yw8YqoSU7c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SlLNDCxIgLtK7wcvjh1JBKz8F0m3nbq41k5NHjPmKFF76i8dLhAa+HE3zZonw2Qs/q8Xl/tA07IupKxdhNRoksv7rDe0Y+e9djMlrygeuXU/GlkPlCRAKFoYSRx1WVINYnsJaxU0Dm6poHytH9+ZjZOB8rrAEB24eo3cv+nsl1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=OpaP7yaP; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=166/9
-	c+ZR3QEyTBHtTV+6dvgcOnbYCqdPwSXzWFrUQI=; b=OpaP7yaPtYlKaj1rmHB+G
-	MfR1LCHY/JT13BB3Jg6V8d5/rYUlQWoCl1My9tXQLDAZwX3lyw2ON95+bEu725pQ
-	jsPtevyiS1HIiuwncSuPXEvKoTRWcJn1wm+TreFIgalLGzG6tT8x15RMBsrwhdxF
-	rZEI65drrvUvuXnt6/Swj8=
-Received: from localhost.localdomain (unknown [193.203.214.57])
-	by gzga-smtp-mta-g3-3 (Coremail) with SMTP id _____wD3P67sSxdmgI5MAA--.7719S2;
-	Thu, 11 Apr 2024 10:33:18 +0800 (CST)
-From: Peilin He <peilinhe2020@163.com>
-To: kerneljasonxing@gmail.com
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	fan.yu9@zte.com.cn,
-	he.peilin@zte.com.cn,
-	jiang.xuexin@zte.com.cn,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	liu.chun2@zte.com.cn,
-	mhiramat@kernel.org,
-	netdev@vger.kernel.org,
-	peilinhe2020@163.com,
-	qiu.yutan@zte.com.cn,
-	rostedt@goodmis.org,
-	xu.xin16@zte.com.cn,
-	yang.yang29@zte.com.cn,
-	zhang.yunkai@zte.com.cn
-Subject: Re: Re: Re: Subject: [PATCH net-next v4] net/ipv4: add tracepoint for icmp_send
-Date: Thu, 11 Apr 2024 02:33:16 +0000
-Message-Id: <20240411023316.137800-1-peilinhe2020@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CAL+tcoC0wRbXfFziaXzvP9wuw4Qe6tZj5QRxbUhAcW5Np6kEgw@mail.gmail.com>
-References: <CAL+tcoC0wRbXfFziaXzvP9wuw4Qe6tZj5QRxbUhAcW5Np6kEgw@mail.gmail.com>
+	s=arc-20240116; t=1712803229; c=relaxed/simple;
+	bh=htHZobzgQrABzTvQj5oc7mqO/Zo3cwe5LQqXSU7qrIo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MjyTOzzBcJs6ansWF3IundjcxyUlwrCNee//UVU1vbKeYPVy6+Pm6kwmPniJ+kYrTtxFlMCYokA3cFlFJnjfpVk13EznDtwxnwUsP5LdP98Ezj43cXkoUEMDpdB/l5hh2B+r0SXZBmqF/cgnKlezf8+8QL8g5AchknnMlXvotu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YjyIevUz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6E844C43390;
+	Thu, 11 Apr 2024 02:40:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712803228;
+	bh=htHZobzgQrABzTvQj5oc7mqO/Zo3cwe5LQqXSU7qrIo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YjyIevUzK/62cRqF24SWpSzqwWOaJNpPS6HajHgDSteo8fy18izCAk9wjQ9qbsnnx
+	 Kxkb/boLCL9ICz93UCScHekQ6bEX/43bgRbIXsmAiw02IYIaz4swZ18VR7EX1RuZoI
+	 QXiOd1fQbVYdRC5BBeTMgqszMUaxSvz7aHJziaQqb5P8y06fDfoqBxMeboJFNiiUp/
+	 urSbxfqSY2IGltnWDbL+S0njz5Lv3MJLfEVjtn3QtgzsVcOKr/aMfnrBdH5WbwNQrD
+	 h5KiObVIT5Jb/Om1LxkBD3Em9ABZqz4o0cEKmMlpzzEs2kw8IbJeB2gCwEQA2+so6g
+	 gsxrCS7Y07niw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5BA7CC395F6;
+	Thu, 11 Apr 2024 02:40:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,194 +52,69 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3P67sSxdmgI5MAA--.7719S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3ArWUXFWruFy5Kw48WFyxGrg_yoWxXrykpF
-	yjyFnYkr4DJr47CryI93ySqFnav3y8Wryjgr17Ww1akw1qqr17JFZ2qr1YkrykArs8Krya
-	vF1jy343Ca45ZrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRFtCwUUUUU=
-X-CM-SenderInfo: xshlzxhqkhjiisq6il2tof0z/1tbiZRS9sWXAlFS6fgAAsc
+Subject: Re: [PATCH net-next] doc/netlink/specs: Add bond support to rt_link.yaml
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171280322836.23404.15227352661794271179.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Apr 2024 02:40:28 +0000
+References: <20240409083504.3900877-1-liuhangbin@gmail.com>
+In-Reply-To: <20240409083504.3900877-1-liuhangbin@gmail.com>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, donald.hunter@gmail.com,
+ jiri@resnulli.us, jacob.e.keller@intel.com, sdf@google.com,
+ jay.vosburgh@canonical.com
 
->[...]
->> >I think my understanding based on what Eric depicted differs from you:
->> >we're supposed to filter out those many invalid cases and only trace
->> >the valid action of sending a icmp, so where to add a new tracepoint
->> >is important instead of adding more checks in the tracepoint itself.
->> >Please refer to what trace_tcp_retransmit_skb() does :)
->> >
->> >Thanks,
->> >Jason
->> Okay, thank you for your suggestion. In order to avoid filtering out
->> those many invalid cases and only tracing the valid action of sending
->> a icmp, the next patch will add udd_fail_no_port trancepoint to the
->> include/trace/events/udp.h. This will solve the problem you mentioned
->> very well. At this point, only UDP protocol exceptions will be tracked,
->> without the need to track them in icmp_send.
->
->I'm not against what you did (tracing all the icmp_send() for UDP) in
->your original patch. I was suggesting that you could put
->trace_icmp_send() in the right place, then you don't have to check the
->possible error condition (like if the skb->head is valid or not, ...)
->in your trace function.
->
->One example that can avoid various checks existing in the
->__icmp_send() function:
->diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
->index e63a3bf99617..2c9f7364de45 100644
->--- a/net/ipv4/icmp.c
->+++ b/net/ipv4/icmp.c
->@@ -767,6 +767,7 @@ void __icmp_send(struct sk_buff *skb_in, int type,
->int code, __be32 info,
->        if (!fl4.saddr)
->                fl4.saddr = htonl(INADDR_DUMMY);
->
->+       trace_icmp_send(skb_in, type, code);
->        icmp_push_reply(sk, &icmp_param, &fl4, &ipc, &rt);
-> ende:
->        ip_rt_put(rt);
->
->If we go here, it means we are ready to send the ICMP skb because
->we're done extracting the right information in the 'struct sk_buff
->skb_in'. Simpler and easier, right?
->
->Thanks,
->Jason
+Hello:
 
-I may not fully agree with this viewpoint. When trace_icmp_send is placed
-in this position, it cannot guarantee that all skbs in icmp are UDP protocols
-(UDP needs to be distinguished based on the proto_4!=IPPROTO_UDP condition),
-nor can it guarantee the legitimacy of udphdr (*uh legitimacy check is required).
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-With best wishes
-Peilin He
+On Tue,  9 Apr 2024 16:35:04 +0800 you wrote:
+> Add bond support to rt_link.yaml. Here is an example output:
+> 
+>  $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/rt_link.yaml \
+>    --do getlink --json '{"ifname": "bond0"}' --output-json | jq '.linkinfo'
+>  {
+>    "kind": "bond",
+>    "data": {
+>      "mode": 4,
+>      "miimon": 100,
+>      ...
+>      "arp-interval": 0,
+>      "arp-ip-target": [
+>        "192.168.1.1",
+>        "192.168.1.2"
+>      ],
+>      "arp-validate": 0,
+>      "arp-all-targets": 0,
+>      "ns-ip6-target": [
+>        "2001::1",
+>        "2001::2"
+>      ],
+>      "primary-reselect": 0,
+>      ...
+>      "missed-max": 2,
+>      "ad-info": {
+>        "aggregator": 1,
+>        "num-ports": 1,
+>        "actor-key": 0,
+>        "partner-key": 1,
+>        "partner-mac": "00:00:00:00:00:00"
+>      }
+>    }
+>  }
+> 
+> [...]
 
->>
->> >> 2.Target this patch for net-next.
->> >>
->> >> v2->v3:
->> >> Some fixes according to
->> >> https://lore.kernel.org/all/20240319102549.7f7f6f53@gandalf.local.home/
->> >> 1. Change the tracking directory to/sys/kernel/tracking.
->> >> 2. Adjust the layout of the TP-STRUCT_entry parameter structure.
->> >>
->> >> v1->v2:
->> >> Some fixes according to
->> >> https://lore.kernel.org/all/CANn89iL-y9e_VFpdw=3DsZtRnKRu_tnUwqHuFQTJvJsv=
->> >-nz1xPDw@mail.gmail.com/
->> >> 1. adjust the trace_icmp_send() to more protocols than UDP.
->> >> 2. move the calling of trace_icmp_send after sanity checks
->> >> in __icmp_send().
->> >>
->> >> Signed-off-by: Peilin He<he.peilin@zte.com.cn>
->> >> Reviewed-by: xu xin <xu.xin16@zte.com.cn>
->> >> Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
->> >> Cc: Yang Yang <yang.yang29@zte.com.cn>
->> >> Cc: Liu Chun <liu.chun2@zte.com.cn>
->> >> Cc: Xuexin Jiang <jiang.xuexin@zte.com.cn>
->> >> ---
->> >>  include/trace/events/icmp.h | 65 +++++++++++++++++++++++++++++++++++++
->> >>  net/ipv4/icmp.c             |  4 +++
->> >>  2 files changed, 69 insertions(+)
->> >>  create mode 100644 include/trace/events/icmp.h
->> >>
->> >> diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
->> >> new file mode 100644
->> >> index 000000000000..7d5190f48a28
->> >> --- /dev/null
->> >> +++ b/include/trace/events/icmp.h
->> >> @@ -0,0 +1,65 @@
->> >> +/* SPDX-License-Identifier: GPL-2.0 */
->> >> +#undef TRACE_SYSTEM
->> >> +#define TRACE_SYSTEM icmp
->> >> +
->> >> +#if !defined(_TRACE_ICMP_H) || defined(TRACE_HEADER_MULTI_READ)
->> >> +#define _TRACE_ICMP_H
->> >> +
->> >> +#include <linux/icmp.h>
->> >> +#include <linux/tracepoint.h>
->> >> +
->> >> +TRACE_EVENT(icmp_send,
->> >> +
->> >> +               TP_PROTO(const struct sk_buff *skb, int type, int code),
->> >> +
->> >> +               TP_ARGS(skb, type, code),
->> >> +
->> >> +               TP_STRUCT__entry(
->> >> +                       __field(const void *, skbaddr)
->> >> +                       __field(int, type)
->> >> +                       __field(int, code)
->> >> +                       __array(__u8, saddr, 4)
->> >> +                       __array(__u8, daddr, 4)
->> >> +                       __field(__u16, sport)
->> >> +                       __field(__u16, dport)
->> >> +                       __field(unsigned short, ulen)
->> >> +               ),
->> >> +
->> >> +               TP_fast_assign(
->> >> +                       struct iphdr *iph =3D ip_hdr(skb);
->> >> +                       int proto_4 =3D iph->protocol;
->> >> +                       __be32 *p32;
->> >> +
->> >> +                       __entry->skbaddr =3D skb;
->> >> +                       __entry->type =3D type;
->> >> +                       __entry->code =3D code;
->> >> +
->> >> +                       struct udphdr *uh =3D udp_hdr(skb);
->> >> +                       if (proto_4 !=3D IPPROTO_UDP || (u8 *)uh < skb->h=
->> >ead ||
->> >> +                               (u8 *)uh + sizeof(struct udphdr) > skb_ta=
->> >il_pointer(skb)) {
->> >> +                               __entry->sport =3D 0;
->> >> +                               __entry->dport =3D 0;
->> >> +                               __entry->ulen =3D 0;
->> >> +                       } else {
->> >> +                               __entry->sport =3D ntohs(uh->source);
->> >> +                               __entry->dport =3D ntohs(uh->dest);
->> >> +                               __entry->ulen =3D ntohs(uh->len);
->> >> +                       }
->> >> +
->> >> +                       p32 =3D (__be32 *) __entry->saddr;
->> >> +                       *p32 =3D iph->saddr;
->> >> +
->> >> +                       p32 =3D (__be32 *) __entry->daddr;
->> >> +                       *p32 =3D iph->daddr;
->> >> +               ),
->> >> +
->> >> +               TP_printk("icmp_send: type=3D%d, code=3D%d. From %pI4:%u =
->> >to %pI4:%u ulen=3D%d skbaddr=3D%p",
->> >> +                       __entry->type, __entry->code,
->> >> +                       __entry->saddr, __entry->sport, __entry->daddr,
->> >> +                       __entry->dport, __entry->ulen, __entry->skbaddr)
->> >> +);
->> >> +
->> >> +#endif /* _TRACE_ICMP_H */
->> >> +
->> >> +/* This part must be outside protection */
->> >> +#include <trace/define_trace.h>
->> >> \ No newline at end of file
->> >> diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
->> >> index 8cebb476b3ab..224551d75c02 100644
->> >> --- a/net/ipv4/icmp.c
->> >> +++ b/net/ipv4/icmp.c
->> >> @@ -92,6 +92,8 @@
->> >>  #include <net/inet_common.h>
->> >>  #include <net/ip_fib.h>
->> >>  #include <net/l3mdev.h>
->> >> +#define CREATE_TRACE_POINTS
->> >> +#include <trace/events/icmp.h>
->> >>
->> >>  /*
->> >>   *     Build xmit assembly blocks
->> >> @@ -672,6 +674,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, in=
->> >t code, __be32 info,
->> >>                 }
->> >>         }
->> >>
->> >> +       trace_icmp_send(skb_in, type, code);
->> >> +
->> >>         /* Needed by both icmp_global_allow and icmp_xmit_lock */
->> >>         local_bh_disable();
->> >>
->> >> --
->> >> 2.25.1
+Here is the summary with links:
+  - [net-next] doc/netlink/specs: Add bond support to rt_link.yaml
+    https://git.kernel.org/netdev/net-next/c/4ede457542a6
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
