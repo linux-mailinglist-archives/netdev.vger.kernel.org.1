@@ -1,140 +1,153 @@
-Return-Path: <netdev+bounces-86895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 058388A0B1C
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:25:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 373D98A0B2B
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:30:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADD4B1F22330
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 08:25:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8301AB26DA3
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 08:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97ABB13BC35;
-	Thu, 11 Apr 2024 08:25:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB265140365;
+	Thu, 11 Apr 2024 08:30:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LgtPFucr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EOPPhkJj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A9026ACC
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 08:25:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E62913D8BD
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 08:29:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712823934; cv=none; b=ncWZHAFP5IUp1cHXFExy3UeKbco0kNJkGn7VpSsSctphyHHv59RS7vL8WSIjmnwF03Di4OghPr3o3/lroT9pc0LB8dZwmsrk/QAKUbHfNmN2mdIl6mUMCboOQqFzLG/dHyvCQ7mgdnfCyqOj5jEvdOpS8zfAAegf026vq8BLqMU=
+	t=1712824201; cv=none; b=Ikzub+kbxyzJEVp1Az6nNOJ2bSkWEmYO8d7XKlIiNpu0TOH843kgpGCxX67F3hYH3+z86A6qOBbjhgK8GMZvALfpWfPnv44EkEq0Ts+yfjpJENsuVqFzwZFYoOwyXHxSGmzm43OL2BogHaAS6kkL4jPi9sTGHMOICvR4WjYFgqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712823934; c=relaxed/simple;
-	bh=WS/JyUAt9W3sGXMbireDpkEvp9F3pzJjbSbBUGOCU/M=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Pdm1i0rZyOAC/57mjPoKWU/6RhVxpGCsnANOtlD2O7Ol1ngHK1fR2mmDvi50h4U+5203S+4i4/KUjwcH+aLo6UwiMUxUqfisQMnXOEOfwdv6ksuFoFEybyMIUILrCMMrgJQVVaJSCuPcPAbeD24s+ROudAZxj0Q1cjfYXdkW0MI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LgtPFucr; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-618596c23b4so16776877b3.0
-        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 01:25:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712823932; x=1713428732; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=xbCTb+A7Xqyd6NusDGrG+IA5K7wN9VOqDMdQwhoVsFA=;
-        b=LgtPFucrbgveRuNagrHGVItn6GpLS8aO7enxhJjGljwOFgWxtxybYxmBllI8St1VyW
-         hSrlbbLpCEkH7Q7BMPqvsW0ZqX8r2fHAXMJ4xk6h6EUcTcI/Zqdwyuh2QZeB0uatJSN1
-         0ccg6mlznHXHzqL0kfGvPReegwktsOwgp0wkM90ix5m4eDQTATF+NL/SDbA2pIBoUxkC
-         Ye6mdIh96iIf4DaJxa94wOS/xrczDzpHiTofxAMpmnAZTo9X/ECPrK02n7HOYZEkAVwM
-         KnUqz4Xf9IiD+j72OIGEfO/IMCa7S273qnvl/LOr03XAr3wNLtEE/iEVdWHcd5CluIPe
-         LK7A==
+	s=arc-20240116; t=1712824201; c=relaxed/simple;
+	bh=vo0iSDp1GT2jGs2GGotK34NJkuhKeT5kSx5SYklbTmE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=A5SOCku2w3Ve2zDZPPcHWkPPHMfXFJhAWFp+wPoyasMzXjTmNHLej5KNtAAehDJZP2CAysvpBfy6pOtraZCrRVZr2EZotjSDE7sucks720O2VV0DZ/Gk0tg37+XMB5g+l9vsUKI43EzV/lhQih+r0cBT8sT8xSsQVTpbB894PU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EOPPhkJj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712824199;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=UWJr1U/EB988q2izFRjBXn0rjFXLneZuCZ+38kBWSdI=;
+	b=EOPPhkJjRFqetPKWKNVrYhhvXOfGANJQghWZditPR+u7G/uHx02izXqO0l987N68Mlom47
+	OSmgtR5FIRD/EFaTRDCoD9oBcYtpvzsAIN15S1sV5IYP1hVCRwH31YikVlXwDS2E6faoBs
+	uwyFfoGu9Qnw8GZlWqYqJ6VcUF6lbWA=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-157--SR4kc0ANfOOCf28mJ4LwQ-1; Thu, 11 Apr 2024 04:29:57 -0400
+X-MC-Unique: -SR4kc0ANfOOCf28mJ4LwQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-343edd4ac01so1377334f8f.0
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 01:29:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712823932; x=1713428732;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=xbCTb+A7Xqyd6NusDGrG+IA5K7wN9VOqDMdQwhoVsFA=;
-        b=t4yUJdbspkRl9TRi96JjYJMpE62/B8Rkn8EolpzrrfsxyjrIogrBR30fBmh2uKGDR/
-         Sv3aMkcFjmiGzl7xrw/i4RhWrlQBY2+dmHQd+y6MUW2ztWpWqeXBn0zkaGnmQmcglq/K
-         NZS1mOeWBWR4pnA8sbAXJQVBZ8i2WUhbYoJhjLLTU8YuQz6glARypxSQtECb0wfOh+6+
-         41WcgZuBkrlJhSGwBUb11ULfreYScOVbV9rprQ/ZLWbl5lsHx/n/xRRB3RBft3UKiZ2o
-         r/KXFbzs2NNZyDKmDotYqbaKhbVNh90s3BPgAomuHlDQzhIfcY6CnWdoVHdcgDXOoFSJ
-         z0rQ==
-X-Gm-Message-State: AOJu0YzSYunEx+ut3Jan6oLnbwjxm/fstEwMhmoYrFaMgyzJ2RD5milW
-	kpnP51Dg6GWzNGvsELeN0LeLLX/36aMnQC69le+l1lAwwZddfjqM4Xq5qqpYgdlxQgFB06T+CJT
-	5w7dbxiRCXQ==
-X-Google-Smtp-Source: AGHT+IGWKrFgHFhMTGaMyVeni9E3X0jdwLZ8kLhJJ9al8Nbg3ZG+4TJweWA84otPMZzY0ycMl/MUslkrSAyScQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:72b:b0:dcd:59a5:7545 with SMTP
- id l11-20020a056902072b00b00dcd59a57545mr422658ybt.10.1712823931767; Thu, 11
- Apr 2024 01:25:31 -0700 (PDT)
-Date: Thu, 11 Apr 2024 08:25:29 +0000
+        d=1e100.net; s=20230601; t=1712824196; x=1713428996;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UWJr1U/EB988q2izFRjBXn0rjFXLneZuCZ+38kBWSdI=;
+        b=jWEGqSPZWOLco3qQFc3MNBFtnYIpCl+Z8pmbwwdrV4kSLr4VyGg3g8+Yo7BcMEcUyf
+         u+1wf2+C3/fkE95pFeEYd2fozfOi1FK/83T3TFzy8vTaK5s8yyRHm33enoEznzQEoy4m
+         J28FOBcP26CUY39B10MqPLIcwe8gMSo/8BJ7meNU6m7he8CausN4EeDFTvtsropSs4cr
+         WipnV7R28gYusPc1eFT1ENUoiSzZ34VB/mGLYixc8BgjqGtMxGiWzyvz10xiyU2PsFVs
+         vlF/z62bQD/JF6H7sZ5nsnkVJn40zeRCD3JhYGS9aNxWFZJcSkR+purt3Iqj5HwWwTt9
+         bc7g==
+X-Gm-Message-State: AOJu0YxNQ2BRnA91FULbE2HOz0xxI+Rfx/0OovPr6puMmGaQFujk/2V6
+	hmbJc8WdTEK8dwuNZPRVYoyWcylH7VRU/z2XVtW1+5Bji/XUkWRAD79shVcxHs37tX5t6K7Ei2h
+	Dew4JT8NaJShBNFab5X+57fWPIfyLt9seZ5YrYyzuPAgtxIHNjzDFbQ==
+X-Received: by 2002:a05:6000:23a:b0:343:bbec:aef8 with SMTP id l26-20020a056000023a00b00343bbecaef8mr2940096wrz.7.1712824196016;
+        Thu, 11 Apr 2024 01:29:56 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHOM36ybn5Chc07WnwWslEmEdxEt16BEzIrlyYL/G6FAIO+VJ0TLcg+pSAJc39UhyjU94YXzQ==
+X-Received: by 2002:a05:6000:23a:b0:343:bbec:aef8 with SMTP id l26-20020a056000023a00b00343bbecaef8mr2940088wrz.7.1712824195664;
+        Thu, 11 Apr 2024 01:29:55 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-235-217.dyn.eolo.it. [146.241.235.217])
+        by smtp.gmail.com with ESMTPSA id q10-20020adffeca000000b0033dd2a7167fsm1215360wrs.29.2024.04.11.01.29.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Apr 2024 01:29:55 -0700 (PDT)
+Message-ID: <9e0884e2a101215d3376f2ef9a7a68ca86599f0f.camel@redhat.com>
+Subject: Re: [PATCH v2] net:tun: limit printing rate when illegal packet
+ received by tun dev
+From: Paolo Abeni <pabeni@redhat.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jason Wang
+	 <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Lei Chen
+ <lei.chen@smartx.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+Date: Thu, 11 Apr 2024 10:29:53 +0200
+In-Reply-To: <20240410042245.2044516-1-lei.chen@smartx.com>
+References: <20240410042245.2044516-1-lei.chen@smartx.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240411082530.907113-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp: small optimization when TCP_TW_SYN is processed
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 
-When TCP_TW_SYN is processed, we perform a lookup to find
-a listener and jump back in tcp_v6_rcv() and tcp_v4_rcv()
+On Wed, 2024-04-10 at 00:22 -0400, Lei Chen wrote:
+> vhost_worker will call tun call backs to receive packets. If too many
+> illegal packets arrives, tun_do_read will keep dumping packet contents.
+> When console is enabled, it will costs much more cpu time to dump
+> packet and soft lockup will be detected.
+>=20
+> net_ratelimit mechanism can be used to limit the dumping rate.
+>=20
+> PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980"
+>  #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
+>  #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
+>  #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
+>  #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
+>  #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
+>     [exception RIP: io_serial_in+20]
+>     RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
+>     RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 0000000000000000
+>     RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428a0
+>     RBP: 0000000000002710   R8: 0000000000000004   R9: 000000000000000f
+>     R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 0000000000000020
+>     R13: ffffffff8acbf698  R14: 0000000000000058  R15: 0000000000000000
+>     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+>  #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
+>  #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
+>  #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
+>  #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
+>  #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
+>  #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
+>  #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
+>  #12 [ffffa65531497b68] printk at ffffffff89318306
+>  #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
+>  #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
+>  #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
+>  #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
+>  #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
+>  #18 [ffffa65531497f10] kthread at ffffffff892d2e72
+>  #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
+>=20
+> Signed-off-by: Lei Chen <lei.chen@smartx.com>
 
-Paolo suggested that we do not have to check if the
-found socket is a TIME_WAIT or NEW_SYN_RECV one.
+This change is IMHO best suited for 'net': the possible soft sookup
+looks nasty.
 
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Link: https://lore.kernel.org/netdev/68085c8a84538cacaac991415e4ccc72f45e76c2.camel@redhat.com/
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Neal Cardwell <ncardwell@google.com>
----
- net/ipv4/tcp_ipv4.c | 2 +-
- net/ipv6/tcp_ipv6.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+@Willem, @Jason, any strong opinion against the above?
 
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 1e650ec71d2fe5198b9dad9e6ea9c5eaf868277f..88c83ac4212957f19efad0f967952d2502bdbc7f 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -2205,7 +2205,6 @@ int tcp_v4_rcv(struct sk_buff *skb)
- 	if (!sk)
- 		goto no_tcp_socket;
- 
--process:
- 	if (sk->sk_state == TCP_TIME_WAIT)
- 		goto do_time_wait;
- 
-@@ -2285,6 +2284,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
- 		}
- 	}
- 
-+process:
- 	if (static_branch_unlikely(&ip4_min_ttl)) {
- 		/* min_ttl can be changed concurrently from do_ip_setsockopt() */
- 		if (unlikely(iph->ttl < READ_ONCE(inet_sk(sk)->min_ttl))) {
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 3aa9da5c9a669d2754b421cfb704ad28def5a748..bb7c3caf4f8536dabdcb3dbe7c90aff9c8985c90 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1794,7 +1794,6 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- 	if (!sk)
- 		goto no_tcp_socket;
- 
--process:
- 	if (sk->sk_state == TCP_TIME_WAIT)
- 		goto do_time_wait;
- 
-@@ -1871,6 +1870,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- 		}
- 	}
- 
-+process:
- 	if (static_branch_unlikely(&ip6_min_hopcount)) {
- 		/* min_hopcount can be changed concurrently from do_ipv6_setsockopt() */
- 		if (unlikely(hdr->hop_limit < READ_ONCE(tcp_inet6_sk(sk)->min_hopcount))) {
--- 
-2.44.0.478.gd926399ef9-goog
+Otherwise, @Lei Chen, please repost with a suitable fixes tag and
+adding the target tree into the subj prefix.
+
+Thanks,
+
+Paolo
 
 
