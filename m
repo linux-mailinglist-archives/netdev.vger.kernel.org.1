@@ -1,165 +1,101 @@
-Return-Path: <netdev+bounces-86872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B72268A08C3
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 08:48:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B9288A08C7
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 08:49:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A28F1F27052
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 06:48:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACBE61C20DCA
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 06:49:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D246413D63C;
-	Thu, 11 Apr 2024 06:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38FAF13D89C;
+	Thu, 11 Apr 2024 06:48:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="UI85FZoB"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF748657AD
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 06:48:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0C0413D61D;
+	Thu, 11 Apr 2024 06:48:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712818097; cv=none; b=SY0O4MHxigmMAOQytUckA6N6U+7KJEv9+6nh16F/nah4gIjQqbcqkkjQdYdKB4YDsO9988lU1wkq4peZOLlN0ZpEqa41YZWfY0gFBmXQoYm4Ozc78lyXkQ8QG8ooC4LXtKXOyGYKBDpxSOe77xm2+jhWZSHv+s9SJD2WpBjjn2o=
+	t=1712818133; cv=none; b=KOWi1MCLtcOELiOvSemioGoD2t6ge9jmR2eURbQWlc0tEsL19EL77RZXAM9i8dV8eKXqcEMT+b35Mzm+TC2e2SMD7gmb1XE6YQyUN6aK9+Tb8HA7JT0tTvtIqCizDVmxBnufg0M1X2joKbH4r5zgIO0jwRhziBI9IDIE+eRywG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712818097; c=relaxed/simple;
-	bh=SjfQmFCe8KGFg78GshUQPaGgkawI/DnASuuduYQmQ8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IKvgn/aq08P72DF77A2Vo3nAdsueAAslIjNEfNHPMQ6RZrC2GSmr9HU2CTeoMRhlB+/S/C33Fkqv34VrlWHYi9UVS0x9764W5B2qSqRJylmtifnFUvGCeAyvjlWw3YrxHkpiNvPdyYpk+aIub/PdRfD6epAwF+5o7rsOJr7bnYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ruoEA-00074u-0x; Thu, 11 Apr 2024 08:48:06 +0200
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ruoE8-00BdUI-5L; Thu, 11 Apr 2024 08:48:04 +0200
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1ruoE8-007cj5-0B;
-	Thu, 11 Apr 2024 08:48:04 +0200
-Date: Thu, 11 Apr 2024 08:48:04 +0200
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	David Ahern <dsahern@kernel.org>, linux-kernel@vger.kernel.org,
-	UNGLinuxDriver@microchip.com, Eric Dumazet <edumazet@google.com>,
-	Willem de Bruijn <willemb@google.com>, kernel@pengutronix.de,
-	=?utf-8?B?U8O4cmVu?= Andersen <san@skov.dk>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH net-next v6 5/9] net: dsa: microchip: add support for
- different DCB app configurations
-Message-ID: <ZheHpK7egVvszSQF@pengutronix.de>
-References: <20240410080556.1241048-1-o.rempel@pengutronix.de>
- <20240410080556.1241048-1-o.rempel@pengutronix.de>
- <20240410080556.1241048-6-o.rempel@pengutronix.de>
- <20240410080556.1241048-6-o.rempel@pengutronix.de>
- <20240410231251.macw4i46jfi57wtc@skbuf>
+	s=arc-20240116; t=1712818133; c=relaxed/simple;
+	bh=LxDnqQD/Ynf2v6X4vOkgAXNsM8jplzr/Ybx4tashRDc=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=CNf+G6Qqb5X7z7A3lFxFKF/jbPxd1AI3zOqqLIJh1oB9i+yaYCY8+9IO5LYcWNUP6GpTZhHLHmXJrvdYTn6EezRgr3vPBVK2qsj8BmLS3p6qhXIzcsit0dKMavM7rGMLLAInmDJhVmbgC72QCby4tX93RdE6MUptlbw2g5TV57A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UI85FZoB; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 5AFD7FF803;
+	Thu, 11 Apr 2024 06:48:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1712818127;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ht4yL7p2G9syjEPhGbbLFmsLSUE4MFaHnCtOBwa2f0U=;
+	b=UI85FZoBJxkSr5IRNhTf81V9ubkj+rBrOmYUQdxIB2xHindV3eFcedgof+/ctlJxTgJOKo
+	WWAG8oOTy3wWc4njjvvtTLHkCMKpX3hM+k+qbYOe+sSPR67i6fq59mJt9PhzNqIJIbQcek
+	kyti06DfTIHAM100jdTvgfA9aLu9vH/ZrWmsQUOnZKUd6t0n7WeNkKXagnBBY+47Nj7cKh
+	6K4zEMvfn7S/cnrx+cFY8zurNZ7nwHP1KLCay/Y4NLHj7TGO1vnK6x6J/51VDC7UruHRcW
+	ShkAGAVDIpNFHpiPmN34kIMkB6KZwEGPe4fmQyo1KK7V/sv0JW3vOiVJnqBshg==
+Date: Thu, 11 Apr 2024 08:49:22 +0200 (CEST)
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+cc: Jakub Kicinski <kuba@kernel.org>, 
+    Romain Gantois <romain.gantois@bootlin.com>, 
+    "David S. Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+    Rob Herring <robh@kernel.org>, 
+    Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+    Conor Dooley <conor+dt@kernel.org>, 
+    Geert Uytterhoeven <geert+renesas@glider.be>, 
+    Magnus Damm <magnus.damm@gmail.com>, 
+    Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+    Jose Abreu <joabreu@synopsys.com>, 
+    Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+    =?ISO-8859-15?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>, 
+    Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+    devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+    linux-renesas-soc@vger.kernel.org, 
+    linux-stm32@st-md-mailman.stormreply.com, 
+    linux-arm-kernel@lists.infradead.org, 
+    Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v2 3/5] net: stmmac: dwmac-socfpga: use
+ pcs_init/pcs_exit
+In-Reply-To: <ZhbmVVXgu27ZZaNf@shell.armlinux.org.uk>
+Message-ID: <5efb5cb1-92ad-0e94-9431-f525c837b98a@bootlin.com>
+References: <20240409-rzn1-gmac1-v2-0-79ca45f2fc79@bootlin.com> <20240409-rzn1-gmac1-v2-3-79ca45f2fc79@bootlin.com> <20240409183404.7d3eb04f@kernel.org> <ZhbmVVXgu27ZZaNf@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240410231251.macw4i46jfi57wtc@skbuf>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+X-GND-Sasl: romain.gantois@bootlin.com
 
-Hi Vladimir,
+Hello Russell,
 
-On Thu, Apr 11, 2024 at 02:12:51AM +0300, Vladimir Oltean wrote:
-> > +/**
-> > + * ksz_dcb_init - Initializes the DCB configuration for a KSZ switch
-> > + * @dev: Pointer to the KSZ switch device structure
-> > + *
-> > + * This function initializes the DCB configuration for a KSZ switch. The global
-> > + * DSCP-to-priority mapping table is initialized.
-> > + *
-> > + * Return: 0 on success, or a negative error code on failure
-> > + */
-> > +int ksz_dcb_init(struct ksz_device *dev)
-> > +{
-> > +	int ret;
-> > +
-> > +	ret = ksz_init_global_dscp_map(dev);
-> > +	if (ret)
-> > +		return ret;
-> > +
-> > +	return 0;
-> > +}
-> 
-> Sorry for not responding to your previous question about this:
-> https://lore.kernel.org/netdev/ZfmJ-O8XMT8oO-TS@pengutronix.de/
-> Simply put, I had a period with not a lot of free time, even for reading
-> emails.
+On Wed, 10 Apr 2024, Russell King (Oracle) wrote:
 
-No problem. I'm in continues similar state permanently DoSed by my
-children, parents, etc... :) 
+> patch as a theoretical solution to Romain. After build-testing it locally
+> I did notice it. I would've thought that Romain would've build-tested
+> before sending out his patch set and would've fixed it up... I didn't
+> have time to properly fix up my patch (essentially would've ment
 
-> I'm on the fence on whether your solution to the "global DSCP-to-prio
-> mapping rather than per-port" problem is the right one.
-> 
-> We try to avoid baking policies into the kernel, no matter how well
-> intended the 802.1Q and IETF RFC8325 recommendations are. They are still
-> just recommendations and examples, and a particular use case may want to
-> configure things completely differently (or as hinted in the Wi-Fi specific
-> RFC8325: maybe the administrator doesn't want to assign the higher
-> traffic classes, for network control protocols, by using IP DSCP, and
-> doesn't want user flows to request DSCP values that would get access to
-> these traffic classes. It can indeed be seen as a security concern).
->
-> I empathize with the incovenience of having to map the per-netdev dcbnl
-> application priority table API with a piece of hardware where that table
-> is shared across all ports. But yet, I don't think it is a strong enough
-> justification for us to make an exception and say: "yeah, ok, let's not
-> even implement .port_set_dscp_prio() to make the thing configurable, but
-> let's bake into the kernel a fixed policy that's good for everyone".
->
-> No, I think we _need_ the thing to be configurable, and not try so hard
-> with the ieee8021q helpers to hardcode things just right in the kernel.
+I build-tested the patches but didn't realize that CONFIG_DWMAC_SOCFPGA was not 
+enabled in my configuration. So that's my bad, sorry.
 
-Yes, I agree with you.
+Best Regards,
 
-ieee8021q helpers are not the attempt to avoid the work needed to
-implement global DSCP configuration. The interface is still needed and
-we need to agree on how it should be implemented.
-
-The problem which I try to address with ieee8021q helpers are initial
-defaults. KSZ8 and KSZ9 families of switches have different initial
-defaults. So, if i need to align defaults for this driver, why not to
-provide default which are reusable for every one?
-
-> Have you tried the obvious: "every time there is a change to the global
-> DSCP mapping table, push the change into the dcbnl app table of all user
-> netdevs, so that the user becomes aware of what happens"? Kernel drivers
-> can do that, through direct calls to dcb_ieee_setapp(). DSA does it too,
-> to probe the initial QoS configuration of the ports and push it to the
-> application priority tables.
-
-Hm... what interface should be used for the global DSCP mapping table?
-
-Regards,
-Oleksij
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Romain Gantois, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
