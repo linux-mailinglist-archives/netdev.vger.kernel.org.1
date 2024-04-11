@@ -1,117 +1,117 @@
-Return-Path: <netdev+bounces-87164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8808D8A1F5E
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 21:21:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 853058A1F65
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 21:23:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26CDB1F23D3A
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:21:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40297284F74
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:23:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82A2E12E5D;
-	Thu, 11 Apr 2024 19:21:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bfado203"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 575C2134A6;
+	Thu, 11 Apr 2024 19:23:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A92314AB4
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 19:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B8571798E;
+	Thu, 11 Apr 2024 19:23:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712863289; cv=none; b=X44rFaYlQhL//G9bZzdJKvwR1wyKUogA++afPLLGzvvvRsjPvZO/hXOn1N/DBSbxd81PN5qSs+0Fln2USdEpkCpWHiYkNuhK4v1AocYw2LEyyEUy1rqEHsboeDmew9GR0mALQQDf6Pc5FWydGtUGBBlwcdX5qmjA+mgxUPsdOI8=
+	t=1712863397; cv=none; b=N31QlApxwAjqdLKZWej1aGf2QWhFIBP2BL0rxio/IFzW90kZPUr8dZTsWtESnXk/9aJXUQGXcXvYNSgBdV2gMOE0XCQFhUUnyHxR7QsEJK2hoG6QS2Rfp0/RZ8H9AUl0Gwf/79+F7j3RCmmwWm14+n8yjaj0C++fTcXtBjtHaL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712863289; c=relaxed/simple;
-	bh=Ik+5avN+F3onRNtV1PB619O8pLeIV7AzjthBG+4V4qg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hupFVnWasve/7JKn8rQ6PdB+KeCvvwXvCVE6Ho5CDccH8gz1DHzBdBDnJEJ8pi+mqiGKv4kvOlQApkErMNtNnK4yDPzP/n2xLFp5Ffrbn3wcFqBdBd6hpy7Is/MdXefNrnLPZhrGaClsys5ZIkyykDr4OeuYyw2iMf/SvmYMJIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bfado203; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1712863397; c=relaxed/simple;
+	bh=TI1GSDhfKjhAQ+1D3J9jkicNBNjV6XsaqUxxT18ZyJ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tFM2gMk4zTye4k7qhSdXBN+lv4V/HsUnxtYo2RyAmk1NHJ15A7+6rwY0vT3NjmAdg566ajFUTJvTOdHO2X2ebE6EwLNBS2vQKHbb4uGAyTc8PJgE4vrJBCZAG+7e2+EE4kAd36s00ib1BkS+FEnJkRJ29ghi93gPgpZAyqnA31s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-436433a44bcso678701cf.1
-        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 12:21:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712863287; x=1713468087; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=UM2zuMgd2tTJ9l2V10ApEN63oRSs92Yz7I6KOrw/UzQ=;
-        b=Bfado203S/AohII9moQyCKBRMwi2fzN4BzIkdtcbqIcdxPwKqMLuWabB1P0NRRz9XH
-         rvGTSn/zP9d1FlCPWoq5OI8f4cWCi1aYMwRWgPo80Mw19LbPw/yOwsSUXpX8UjOKciaY
-         sJ8100pcziw3N7WG2eQGJiPq72D8qP8eiwHaRy15HoW9nA0fdQTCfU42KdyUXkJfWvcE
-         +/f5YDx82eQU+oXPNDcd7DOqWPn4wuzzBd8BcUhEQZH/X4YNANtsFoR2c66KIMUKZ6/l
-         Md0uwH80ydBPKZ24WcVr9/8ZIArVPKgGZZk0kXVYyPkAkQNXUh/thABafQtSCBoIaQRX
-         7Edw==
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d82713f473so1924211fa.3;
+        Thu, 11 Apr 2024 12:23:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712863287; x=1713468087;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UM2zuMgd2tTJ9l2V10ApEN63oRSs92Yz7I6KOrw/UzQ=;
-        b=EZOAPSCZ04a90ORu9uUbyVHJDqfco+D9mzjWVn+Ux9WRPgyOQT9zXMxNPI2tZuVI06
-         avoZHV+41OMO/E0DKtVd01Y0W0i/x/4N3abaOgEocM9lBaxMyuUX/Pq0enzQPjT0oIHQ
-         DH/8wdlfzphFar34qah+GBWwQo67MlS9k+kTtqeFrxF4sN90oQoYfY04J3iKHC+7MrXR
-         YN4rvHiKlAPTQ9yZ0ytyUFN1HQ2canF1snAu5jmLzitScA0HACeBTAlzDhq6LoV0mGri
-         IKxXVPEwvhH2RdVX+s44nNnmj22oIsEJRfLY7Fw7WloaDAYrGwZiomkt3PeaNrmyw+S0
-         XenQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWpUDtWq2qUP6t5BiL/ag+T/Wz3BDJ5ut5iD9pst+aKq0OttwBUk7AvXvifv/6MEJoJMSIEQ8T33v/7xulCeA4WQmQFVcVK
-X-Gm-Message-State: AOJu0YwcKbAKRpMIgEgBz5m/bSZ71Ck/W/l9ApgEt+H42d55KxOweabF
-	eziH9zfARzZFiffHsf8WVrZEut0VJCNhA+plW8AQwThEKD3YtL1i
-X-Google-Smtp-Source: AGHT+IGvHxA54aKOClekMdzRkSKoQQavDjhgxAQk3dRTaypFZBWOKdo0kFNXxP05O1GXsQzB8/QW1Q==
-X-Received: by 2002:ac8:67d7:0:b0:436:8736:f0c1 with SMTP id r23-20020ac867d7000000b004368736f0c1mr150864qtp.47.1712863286926;
-        Thu, 11 Apr 2024 12:21:26 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id p26-20020ac8741a000000b0043123c8b6a6sm1274004qtq.4.2024.04.11.12.21.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Apr 2024 12:21:26 -0700 (PDT)
-Message-ID: <a59e2164-7159-445e-9f87-fcf6cb4b57d6@gmail.com>
-Date: Thu, 11 Apr 2024 12:21:22 -0700
+        d=1e100.net; s=20230601; t=1712863394; x=1713468194;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qIBXaQpWGDZLuod73VoHOj9O9W3K2JcAK0KSYOPcVaQ=;
+        b=Iwmq8EtglV3xjWL8QawG2znIS5Putzew9DI1upEvDpeF1bjrp+v9MXieIbbi9G5v7h
+         asrrM+GGMb3rqdV1E4U7rmjwnOddIfmMrgyE93ekiBCsVjH8iJsxBxuTBwSkMmWJem/j
+         lIAhYkr+HGeNv4WfRbc2UQVxhe0f/XBxbHYy68EWyuSHMWIenTRCGlynfjI3JtaRcm1t
+         qloJgswBqRLn9wOCqTvRwh4bHDJt/vVPkoGZ+0uh2IfpaZCW6hupCmLK/wYYExjPz5M0
+         YykH8uZtWRVmPA4N9DuKSk8aG7kD4lHYfSI4SQdbpgKoAKfZ10mKslq3EiH5ueeidJ67
+         8GbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWUAGssXj8CuTkBv/mslP2jfWwOCCe9IVb678Nawh3Negok+E9AcY2oJ/0sa1Q3XDbnZe3QFiNtTOpgcmJr/UBsjNPs78nc
+X-Gm-Message-State: AOJu0YxbEtEmNhExHUJnIgWHQfFa281ISOzdM7l+FtFCMwz5c3kEG7Q2
+	R3WhL18RMY6cnIvwrxMdBOvwHPgStSh2D6uhi9CuLyHZYI/0M5yp
+X-Google-Smtp-Source: AGHT+IEt7RbiKpbYhIe9xJ71P9L1Z5U6C0nSsv1vHmYIfX0j8xDQZwFKW9WvmOYy3SPWHCY4MCN07Q==
+X-Received: by 2002:a2e:b00e:0:b0:2d8:36f9:67af with SMTP id y14-20020a2eb00e000000b002d836f967afmr353683ljk.44.1712863393363;
+        Thu, 11 Apr 2024 12:23:13 -0700 (PDT)
+Received: from localhost (fwdproxy-lla-117.fbsv.net. [2a03:2880:30ff:75::face:b00c])
+        by smtp.gmail.com with ESMTPSA id q5-20020a170906360500b00a51da296f66sm1016692ejb.41.2024.04.11.12.23.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Apr 2024 12:23:12 -0700 (PDT)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next v3 0/4] net: dqs: optimize if stall threshold is not set
+Date: Thu, 11 Apr 2024 12:22:28 -0700
+Message-ID: <20240411192241.2498631-1-leitao@debian.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next:main 26/50] net/ipv4/tcp.c:4673:2: error: call to
- '__compiletime_assert_1030' declared with 'error' attribute: BUILD_BUG_ON
- failed: offsetof(struct tcp_sock, __cacheline_group_end__tcp_sock_write_txrx)
- - offsetofend(struct tcp_sock, __cacheline_group_begin__tcp_sock_...
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, kernel test robot <lkp@intel.com>,
- llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
-References: <202404082207.HCEdQhUO-lkp@intel.com>
- <20240408230632.5ml3amaztr5soyfs@skbuf>
- <CANn89iJ8EcqiF8YCPhDxcp5t79J1RLzTh6GHHgAxbTXbC+etRA@mail.gmail.com>
- <db4d4a48-b581-4060-b611-996543336cd2@gmail.com>
- <CANn89iJMirOe=TqMZ=J8mFLNQLDV=wzL4jOf9==Zkv7L2U5jcQ@mail.gmail.com>
- <20240410183636.202fd78f@kernel.org>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20240410183636.202fd78f@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 4/10/24 18:36, Jakub Kicinski wrote:
-> On Wed, 10 Apr 2024 19:33:54 +0200 Eric Dumazet wrote:
->>> Jakub, I do not see a 32-bit build in the various checks being run for a
->>> patch, could you add one, if nothing else a i386 build and a
->>> multi_v7_defconfig build would get us a good build coverage.
->>
->> i386 build was just fine for me.
-> 
-> Yes, we test i386 too, FWIW.
-> 
-> Florian, does arm32 break a lot? I may not be paying sufficient
-> attention. We can add more build tests but the CPU time we have
-> is unfortunately finite :(
+Here are four patches aimed at enhancing the Dynamic Queue Limit (DQL)
+subsystem within the networking stack.
 
-Yes, that is why I mentioned multi_v7_defconfig, you an see the build 
-failure with that configuration. Of course Eric fixed it now, thanks!
+The first two commits involve code refactoring, while the third patch
+introduces the actual change. The fourth patch just improves the cache
+locality.
+
+Typically, when DQL is enabled, stall information is always populated
+through dql_queue_stall(). However, this information is only necessary
+if a stall threshold is set, which is stored in struct dql->stall_thrs.
+
+Although dql_queue_stall() is relatively inexpensive, it is not entirely
+free due to memory barriers and similar overheads.
+
+To optimize performance, refrain from calling dql_queue_stall() when no
+stall threshold is set, thus avoiding the processing of unnecessary
+information.
+
+Changelog:
+
+v3:
+	* Read stall_thrs earlier, at dql_completed(), to avoid any
+	  performance penalty, as suggested by Jakub.
+v2:
+	* Moved the stall_thrs to the very first cache line, as a new
+	  patch. Suggested by Eric Dumazet.
+v1:
+	* https://lore.kernel.org/all/20240404145939.3601097-1-leitao@debian.org/
+
+
+Breno Leitao (4):
+  net: dql: Avoid calling BUG() when WARN() is enough
+  net: dql: Separate queue function responsibilities
+  net: dql: Optimize stall information population
+  net: dqs: make struct dql more cache efficient
+
+ include/linux/dynamic_queue_limits.h | 50 +++++++++++++++++-----------
+ lib/dynamic_queue_limits.c           | 13 +++++---
+ 2 files changed, 39 insertions(+), 24 deletions(-)
+
 -- 
-Florian
+2.43.0
 
 
