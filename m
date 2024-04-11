@@ -1,450 +1,224 @@
-Return-Path: <netdev+bounces-86953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9979A8A1284
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 13:08:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E4368A12AB
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 13:12:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5021E2822EA
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:08:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 824331C21176
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:12:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF681474CB;
-	Thu, 11 Apr 2024 11:08:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 430BE147C77;
+	Thu, 11 Apr 2024 11:12:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="NJZMC215"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QWJFcBlU"
 X-Original-To: netdev@vger.kernel.org
-Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.170])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AA5D1474BE
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 11:08:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CECB1474BA;
+	Thu, 11 Apr 2024 11:12:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712833686; cv=none; b=caTr3eLD6FZ80dOgZpKLvuSBWiPEcUYV7/3sLRJzn+LRay20Sa8nZai9M8cti4NqYh13YHeG5qL6D3pBYGFrbxDaaWIeUtE8ckV66HPB6by8unC9afpZsk4pIMsD0stqcwcXkUg2caJ/gKUPyGvLcuOk1p1ievrf7GiTqyEM3cg=
+	t=1712833959; cv=none; b=BQbBrcGB8NkcQ3IIkaptcUrxDXV/TjfspaNGTQZcVbmSi01us56+CqIEXsJ4iNhnJ8/7i0Zr1CJcimJH4NyyLDpWliepBE2wCqdWsspJdp/m2yUsrkRVyduT0Unv+nmp6t1T9UghmhdxwDXRwaDKSaXWQdwDXRkIGXJoBKioejY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712833686; c=relaxed/simple;
-	bh=RuMYFYuBb5XxiaIP3H6TNLBzHa9P8K0nb+lCeDfw/Zc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LrYKX+k2MBOX8qiAi4fXSHsrfoZWybtDL9MXjkNaX772YchBwnM4GmoopPrESRnF1D9t2e2iNrZVS+hx8fQ4ODBtCpK83ojDNDZvpyL2Hng7xd/Ww/Jm8ZUWo5fzlJtgBn2LtuVhjIvFoIeEAFRxMhEmt7CRzf1l/fRJckjzmvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org; spf=none smtp.mailfrom=phenome.org; dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b=NJZMC215; arc=none smtp.client-ip=195.121.94.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=phenome.org
-X-KPN-MessageId: 9fd4cbc6-f7f3-11ee-bfb8-005056ab378f
-Received: from smtp.kpnmail.nl (unknown [10.31.155.37])
-	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
-	id 9fd4cbc6-f7f3-11ee-bfb8-005056ab378f;
-	Thu, 11 Apr 2024 13:07:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=kpnmail.nl; s=kpnmail01;
-	h=content-type:mime-version:message-id:subject:to:from:date;
-	bh=YTv4ze7VDLCa+fODBZq8DBRIDcfym44N2nDgJzDzdlw=;
-	b=NJZMC215NXJKNNqMTRbvl3fQPobmjo7upMcbn9kj27b9rkyGI9iPjuZ2wCXUfT6ZG2riKF5JCcFv4
-	 LMuTsVCjHHurIdUMVHV6dtIfuJhuzps7ZwZKFuziR+9npv2iPjiy1mNn6NZcSzouyRZl4Bqpm7hiuZ
-	 vhjoiu7ax+b6Qf7w=
-X-KPN-MID: 33|T5ZSsD42tOgVakfVNbQ4YUAPhqgickUhnu5z84TsAzl8OAASNbbP8gtGnKyHWXZ
- dVZ3mO9LPvJC4fTFFIfzIKQlhfMeD1l3CGCRSywOtOfY=
-X-KPN-VerifiedSender: No
-X-CMASSUN: 33|z32Kub4s6KAsHf0At9Q+plLy+HfI1hzNc85/q22ABOPk/W7jJxS/kkOLCP/Cz1e
- WhgWHWXjiCq8haG/FlJYaEA==
-Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
-	by smtp.xs4all.nl (Halon) with ESMTPSA
-	id bd6a6e01-f7f3-11ee-a211-005056ab1411;
-	Thu, 11 Apr 2024 13:07:53 +0200 (CEST)
-Date: Thu, 11 Apr 2024 13:07:52 +0200
-From: Antony Antony <antony@phenome.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: antony.antony@secunet.com,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	devel@linux-ipsec.org, Eyal Birger <eyal.birger@gmail.com>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	Sabrina Dubroca <sd@queasysnail.net>
-Subject: [PATCH ipsec-next v8] xfrm: Add Direction to the SA in or out
-Message-ID: <ZhfEiIamqwROzkUd@Antony2201.local>
-References: <9e2ddbac8c3625b460fa21a3bfc8ebc4db53bd00.1712684076.git.antony.antony@secunet.com>
- <20240411103740.GM4195@unreal>
+	s=arc-20240116; t=1712833959; c=relaxed/simple;
+	bh=XWXUyl1Nz91NBxdPg+48EdN2ElgiJkR3ew64Yn5yz/Q=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=d5MAWuXLPLtdseCGh2x0VPQ6dTQ8NKUaD1ta/1H/BcYAjTgu6C38injBLZDtSfSscxxXV4oJfugCkCE7cy1wesIL1a+xqjh0fsnWJ+6+IznBqoLQnjjTxbPh+GPKiRhIL1m3F7hMBi6ZcUCWcV5/ma8lfNJ4B5leSNNLIum+Er4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QWJFcBlU; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43BAW5lC027333;
+	Thu, 11 Apr 2024 11:12:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=uhcvB6tpxrkxE/KaZ+ck3RH3SA1Z9JkugprvYlNNlwk=;
+ b=QWJFcBlUByKAlYtOaYGkA8IRTEAbJODcZ945EbsZLdKxBHI6hiwSjqRFPPLUxTVp9CD4
+ oaKs+pMb16VK8nL0CDf56CyosGxXQvpaGbcASX6138cUXuDR/rThAZd+W0UMZ1wUJ19d
+ P+U24VUJZOzf4DI/a/GSnIlrgB8wUVk/OdE1ZAB9yzooD2hIO6NW6cDr30UjkJLMMI3f
+ AZVxi/mRtfLWszRCVMwOwFJiQctqXCm7V+nP25ljgyVFgHnc6NuaYzVQ6DwP9LPDJi87
+ D72LROOzInxQ1M6JAf0aEe13fZ2YlKIyF4JUfTsKPFHGgcS1drvAwg4O+XaVMB4el8JI eA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xebfy8eda-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Apr 2024 11:12:30 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43BBCT3h021006;
+	Thu, 11 Apr 2024 11:12:29 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xebfy8ed6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Apr 2024 11:12:29 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43B8ZDpV013544;
+	Thu, 11 Apr 2024 11:12:29 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xbgqtu1qt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Apr 2024 11:12:28 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43BBCNUX16974168
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 11 Apr 2024 11:12:25 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AC8CE2004B;
+	Thu, 11 Apr 2024 11:12:23 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5D04A20043;
+	Thu, 11 Apr 2024 11:12:23 +0000 (GMT)
+Received: from [9.152.224.141] (unknown [9.152.224.141])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 11 Apr 2024 11:12:23 +0000 (GMT)
+Message-ID: <12ae995f-4af4-4c6b-9130-04672d157293@linux.ibm.com>
+Date: Thu, 11 Apr 2024 13:12:23 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next v5 04/11] net/smc: implement some unsupported
+ operations of loopback-ism
+To: Wen Gu <guwen@linux.alibaba.com>,
+        Niklas Schnelle
+ <schnelle@linux.ibm.com>,
+        Gerd Bayer <gbayer@linux.ibm.com>, twinkler@linux.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, wenjia@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org
+References: <20240324135522.108564-1-guwen@linux.alibaba.com>
+ <20240324135522.108564-5-guwen@linux.alibaba.com>
+ <3122eece5b484abcf8d23f85d6c18c36f0b939ff.camel@linux.ibm.com>
+ <1db6ccab-b49f-45d2-a93c-05b0f79371a3@linux.alibaba.com>
+ <3b3ff37643e9030ec1246e67720683a2cf5660e5.camel@linux.ibm.com>
+ <7a0fc481-658e-4c99-add7-ccbd5f9dce1e@linux.alibaba.com>
+ <7291dd1b2d16fd9bbd90988ac5bcc3a46d17e3f4.camel@linux.ibm.com>
+ <46e8e227-8058-4062-a9db-6b9c774f63cc@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <46e8e227-8058-4062-a9db-6b9c774f63cc@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: lH8IiSDzd6CHB4tJ3S8jUQABn86FFQBx
+X-Proofpoint-ORIG-GUID: Dn9t7sHizOmtClU9DfBA8utLe4LTNm47
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240411103740.GM4195@unreal>
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-11_04,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 suspectscore=0
+ spamscore=0 lowpriorityscore=0 impostorscore=0 mlxlogscore=999 mlxscore=0
+ bulkscore=0 adultscore=0 phishscore=0 malwarescore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
+ definitions=main-2404110081
 
-On Thu, Apr 11, 2024 at 01:37:40PM +0300, Leon Romanovsky via Devel wrote:
-> On Tue, Apr 09, 2024 at 07:37:20PM +0200, Antony Antony via Devel wrote:
-> > This patch introduces the 'dir' attribute, 'in' or 'out', to the
-> > xfrm_state, SA, enhancing usability by delineating the scope of values
-> > based on direction. An input SA will now exclusively encompass values
-> > pertinent to input, effectively segregating them from output-related
-> > values. This change aims to streamline the configuration process and
-> > improve the overall clarity of SA attributes.
-> > 
-> > This feature sets the groundwork for future patches, including
-> > the upcoming IP-TFS patch.
-> > 
-> > v7->v8:
-> >  - add extra validation check on replay window and seq
-> >  - XFRM_MSG_UPDSA old and new SA should match "dir"
+
+
+On 09.04.24 03:44, Wen Gu wrote:
 > 
-> Why? Update is add and delete operation, and one can update any field
-> he/she wants, including direction.
-
-Update operations are not strictly necessary without IKEv2. However, during
-IKEv2 negotiation, updating "in" SA becomes essential.
-
-Here's what I figured out. initially getting confused watching "ip xfrm 
-monitor". During the IKE negotiation, specifically at the IKE_AUTH
-exchange, userspace calls ALLOCSPI for the "in" SA. The kernel creates an
-xfrm_state with the allocated SPI but without cryptographic parameters, as
-user space hasn't added any SAs, either "in" or "out", at this point. Also,
-userspace hasn't derived crypto and other parameters for the SAs. The 
-negotiation then proceeds. Upon successful negotiation, the "in" SA can only be
-updated, which is why *swan will send an xfrm update for the "in" SA and
-add_sa for the "out" SA.
-
-Also, as I understand it, ALLOCSPI states are with:
-km.state = XFRM_STATE_VOID
-
-So you won't see it in "ip xfrm state" or in "ip xfrm monitor", just see he 
-Update message.  The km.state for ALLOCSPI state can also be XFRM_STATE_ACQ.  
-I haven't seen this exactly in operation. Note in v10 of this patch set I 
-fixed ALLOCSPI to work with DIR and UPDSA.
-
 > 
-> > 
-> > v6->v7:
-> >  - add replay-window check non-esn 0 and ESN 1.
-> >  - remove :XFRMA_SA_DIR only allowed with HW OFFLOAD
-> > 
-> > v5->v6:
-> >  - XFRMA_SA_DIR only allowed with HW OFFLOAD
-> > 
-> > v4->v5:
-> >  - add details to commit message
-> > 
-> > v3->v4:
-> >  - improve HW OFFLOAD DIR check add the other direction
-> > 
-> > v2->v3:
-> >  - delete redundant XFRM_SA_DIR_USE
-> >  - use u8 for "dir"
-> >  - fix HW OFFLOAD DIR check
-> > 
-> > v1->v2:
-> >  - use .strict_start_type in struct nla_policy xfrma_policy
-> >  - delete redundant XFRM_SA_DIR_MAX enum
+> On 2024/4/4 23:15, Niklas Schnelle wrote:
+>> On Thu, 2024-04-04 at 21:12 +0800, Wen Gu wrote:
+>>>
+>>> On 2024/4/4 19:42, Niklas Schnelle wrote:
+>>>> On Thu, 2024-04-04 at 17:32 +0800, Wen Gu wrote:
+>>>>>
+>>>>> On 2024/4/4 00:25, Gerd Bayer wrote:
+>>>>>> On Sun, 2024-03-24 at 21:55 +0800, Wen Gu wrote:
+>>>>>>> This implements some operations that loopback-ism does not support
+>>>>>>> currently:
+>>>>>>>     - vlan operations, since there is no strong use-case for it.
+>>>>>>>     - signal_event operations, since there is no event to be processed
+>>>>>>> by the loopback-ism device.
+>>>>>>
+>>>>>> Hi Wen,
+>>>>>>
+>>>>>> I wonder if the these operations that are not supported by loopback-ism
+>>>>>> should rather be marked "optional" in the struct smcd_ops, and the
+>>>>>> calling code should call these only when they are implemented.
+>>>>>>
+>>>>>> Of course this would mean more changes to net/smc/smc_core.c - but
+>>>>>> loopback-ism could omit these "boiler-plate" functions.
+>>>>>>
+>>>>>
+>>>>> Hi Gerd.
+>>>>>
+>>>>> Thank you for the thoughts! I agree that checks like 'if(smcd->ops->xxx)'
+>>>>> can avoid the device driver from implementing unsupported operations. But I
+>>>>> am afraid that which operations need to be defined as 'optional' may differ
+>>>>> from different device perspectives (e.g. for loopback-ism they are vlan-related
+>>>>> opts and signal_event). So I perfer to simply let the smc protocol assume
+>>>>> that all operations have been implemented, and let drivers to decide which
+>>>>> ones are unsupported in implementation. What do you think?
+>>>>>
+>>>>> Thanks!
+>>>>>
+>>>>
+>>>> I agree with Gerd, in my opinion it is better to document ops as
+>>>> optional and then allow their function pointers to be NULL and check
+>>>> for that. Acting like they are supported and then they turn out to be
+>>>> nops to me seems to contradict the principle of least surprises. I also
+>>>> think we can find a subset of mandatory ops without which SMC-D is
+>>>> impossible and then everything else should be optional.
+>>>
+>>> I see. If we all agree to classify smcd_ops into mandatory and optional ones,
+>>> I'll add a patch to mark the optional ops and check if they are implemented.
+>>
+>> Keep in mind I don't speak for the SMC maintainers but that does sound
+>> reasonable to me.
+>>
 > 
-> Please put changelog after --- trailer.
+> Hi Wenjia and Jan, do you have any comments on this and [1]? Thanks!
+> 
+> [1] https://lore.kernel.org/netdev/60b4aec0b4bf4474d651b653c86c280dafc4518a.camel@linux.ibm.com/
+> 
+>>>
+>>>>
+>>>> As a first guess I think the following options may be mandatory:
+>>>>
+>>>> * query_remote_gid()
+>>>> * register_dmb()/unregister_dmb()
+>>>> * move_data()
+>>>>     For this one could argue that either move_data() or
+>>>>     attach_dmb()/detach_dmb() is required though personally I would
+>>>>     prefer to always have move_data() as a fallback and simple API
+>>>> * supports_v2()
+>>>> * get_local_gid()
+>>>> * get_chid()
+>>>> * get_dev()
+>>> I agree with this classification. Just one point, maybe we can take
+>>> supports_v2() as an optional ops, like support_dmb_nocopy()? e.g. if
+>>> it is not implemented, we treat it as an ISMv1.
+>>>
+>>> Thanks!
+>>
+>> Interpreting a NULL supports_v2() as not supporting v2 sounds
+>> reasonable to me.
+> 
 
-ack! I will be more carefull.
+Let me add my thoughts to the discussion:
+For the vlan operations and signal_event operations that loopback-ism does
+not support:
+I like the idea to set the ops to NULL and make sure the caller checks that
+and can live with it. That is readable and efficient.
 
-thanks,
--antony
+I don't think there is a need to discuss a strategy now, which ops could be
+optional in the future. This is all inside the kernel. loopback-ism is even 
+inside the smc module. Such comments in the code get outdated very easily.
 
-> > 
-> > Signed-off-by: Antony Antony <antony.antony@secunet.com>
-> > ---
-> >  include/net/xfrm.h        |  1 +
-> >  include/uapi/linux/xfrm.h |  6 +++
-> >  net/xfrm/xfrm_compat.c    |  7 +++-
-> >  net/xfrm/xfrm_device.c    |  6 +++
-> >  net/xfrm/xfrm_state.c     |  4 ++
-> >  net/xfrm/xfrm_user.c      | 85 +++++++++++++++++++++++++++++++++++++--
-> >  6 files changed, 103 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-> > index 57c743b7e4fe..7c9be06f8302 100644
-> > --- a/include/net/xfrm.h
-> > +++ b/include/net/xfrm.h
-> > @@ -291,6 +291,7 @@ struct xfrm_state {
-> >  	/* Private data of this transformer, format is opaque,
-> >  	 * interpreted by xfrm_type methods. */
-> >  	void			*data;
-> > +	u8			dir;
-> >
-> };
-> >  
-> >  static inline struct net *xs_net(struct xfrm_state *x)
-> > diff --git a/include/uapi/linux/xfrm.h b/include/uapi/linux/xfrm.h
-> > index 6a77328be114..18ceaba8486e 100644
-> > --- a/include/uapi/linux/xfrm.h
-> > +++ b/include/uapi/linux/xfrm.h
-> > @@ -141,6 +141,11 @@ enum {
-> >  	XFRM_POLICY_MAX	= 3
-> >  };
-> >  
-> > +enum xfrm_sa_dir {
-> > +	XFRM_SA_DIR_IN	= 1,
-> > +	XFRM_SA_DIR_OUT = 2
-> > +};
-> > +
-> >  enum {
-> >  	XFRM_SHARE_ANY,		/* No limitations */
-> >  	XFRM_SHARE_SESSION,	/* For this session only */
-> > @@ -315,6 +320,7 @@ enum xfrm_attr_type_t {
-> >  	XFRMA_SET_MARK_MASK,	/* __u32 */
-> >  	XFRMA_IF_ID,		/* __u32 */
-> >  	XFRMA_MTIMER_THRESH,	/* __u32 in seconds for input SA */
-> > +	XFRMA_SA_DIR,		/* __u8 */
-> >  	__XFRMA_MAX
-> >  
-> >  #define XFRMA_OUTPUT_MARK XFRMA_SET_MARK	/* Compatibility */
-> > diff --git a/net/xfrm/xfrm_compat.c b/net/xfrm/xfrm_compat.c
-> > index 655fe4ff8621..007dee03b1bc 100644
-> > --- a/net/xfrm/xfrm_compat.c
-> > +++ b/net/xfrm/xfrm_compat.c
-> > @@ -98,6 +98,7 @@ static const int compat_msg_min[XFRM_NR_MSGTYPES] = {
-> >  };
-> >  
-> >  static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
-> > +	[XFRMA_UNSPEC]          = { .strict_start_type = XFRMA_SA_DIR },
-> >  	[XFRMA_SA]		= { .len = XMSGSIZE(compat_xfrm_usersa_info)},
-> >  	[XFRMA_POLICY]		= { .len = XMSGSIZE(compat_xfrm_userpolicy_info)},
-> >  	[XFRMA_LASTUSED]	= { .type = NLA_U64},
-> > @@ -129,6 +130,7 @@ static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
-> >  	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
-> >  	[XFRMA_IF_ID]		= { .type = NLA_U32 },
-> >  	[XFRMA_MTIMER_THRESH]	= { .type = NLA_U32 },
-> > +	[XFRMA_SA_DIR]          = { .type = NLA_U8}
-> >  };
-> >  
-> >  static struct nlmsghdr *xfrm_nlmsg_put_compat(struct sk_buff *skb,
-> > @@ -277,9 +279,10 @@ static int xfrm_xlate64_attr(struct sk_buff *dst, const struct nlattr *src)
-> >  	case XFRMA_SET_MARK_MASK:
-> >  	case XFRMA_IF_ID:
-> >  	case XFRMA_MTIMER_THRESH:
-> > +	case XFRMA_SA_DIR:
-> >  		return xfrm_nla_cpy(dst, src, nla_len(src));
-> >  	default:
-> > -		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
-> > +		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
-> >  		pr_warn_once("unsupported nla_type %d\n", src->nla_type);
-> >  		return -EOPNOTSUPP;
-> >  	}
-> > @@ -434,7 +437,7 @@ static int xfrm_xlate32_attr(void *dst, const struct nlattr *nla,
-> >  	int err;
-> >  
-> >  	if (type > XFRMA_MAX) {
-> > -		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
-> > +		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
-> >  		NL_SET_ERR_MSG(extack, "Bad attribute");
-> >  		return -EOPNOTSUPP;
-> >  	}
-> > diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-> > index 6346690d5c69..2455a76a1cff 100644
-> > --- a/net/xfrm/xfrm_device.c
-> > +++ b/net/xfrm/xfrm_device.c
-> > @@ -253,6 +253,12 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
-> >  		return -EINVAL;
-> >  	}
-> >  
-> > +	if ((xuo->flags & XFRM_OFFLOAD_INBOUND && x->dir == XFRM_SA_DIR_OUT) ||
-> > +	    (!(xuo->flags & XFRM_OFFLOAD_INBOUND) && x->dir == XFRM_SA_DIR_IN)) {
-> > +		NL_SET_ERR_MSG(extack, "Mismatched SA and offload direction");
-> > +		return -EINVAL;
-> > +	}
-> > +
-> >  	is_packet_offload = xuo->flags & XFRM_OFFLOAD_PACKET;
-> >  
-> >  	/* We don't yet support UDP encapsulation and TFC padding. */
-> > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> > index 0c306473a79d..f7771a69ae2e 100644
-> > --- a/net/xfrm/xfrm_state.c
-> > +++ b/net/xfrm/xfrm_state.c
-> > @@ -1744,6 +1744,7 @@ static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig,
-> >  	x->lastused = orig->lastused;
-> >  	x->new_mapping = 0;
-> >  	x->new_mapping_sport = 0;
-> > +	x->dir = orig->dir;
-> >  
-> >  	return x;
-> >  
-> > @@ -1857,6 +1858,9 @@ int xfrm_state_update(struct xfrm_state *x)
-> >  	if (!x1)
-> >  		goto out;
-> >  
-> > +	if (x1->dir != x->dir)
-> > +		goto out;
-> > +
-> >  	if (xfrm_state_kern(x1)) {
-> >  		to_put = x1;
-> >  		err = -EEXIST;
-> > diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-> > index 810b520493f3..4e5256155c73 100644
-> > --- a/net/xfrm/xfrm_user.c
-> > +++ b/net/xfrm/xfrm_user.c
-> > @@ -360,6 +360,55 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
-> >  		}
-> >  	}
-> >  
-> > +	if (attrs[XFRMA_SA_DIR]) {
-> > +		u8 sa_dir = nla_get_u8(attrs[XFRMA_SA_DIR]);
-> > +
-> > +		if (sa_dir != XFRM_SA_DIR_IN && sa_dir != XFRM_SA_DIR_OUT)  {
-> > +			NL_SET_ERR_MSG(extack, "XFRMA_SA_DIR attribute is out of range");
-> > +			err = -EINVAL;
-> > +			goto out;
-> > +		}
-> > +
-> > +		if (sa_dir == XFRM_SA_DIR_OUT)  {
-> > +			if (p->replay_window > 0) {
-> > +				NL_SET_ERR_MSG(extack, "Replay window should not be set for OUT SA");
-> > +				err = -EINVAL;
-> > +				goto out;
-> > +			}
-> > +
-> > +			if (attrs[XFRMA_REPLAY_VAL]) {
-> > +				struct xfrm_replay_state *rp;
-> > +
-> > +				rp = nla_data(attrs[XFRMA_REPLAY_VAL]);
-> > +				if (rp->oseq ||  rp->seq || rp->bitmap) {
-> > +					NL_SET_ERR_MSG(extack,
-> > +						       "Replay seq, oseq, or bitmap should not be set for OUT SA with ESN");
-> > +					err = -EINVAL;
-> > +					goto out;
-> > +				}
-> > +			}
-> > +
-> > +			if (attrs[XFRMA_REPLAY_ESN_VAL]) {
-> > +				struct xfrm_replay_state_esn *esn;
-> > +
-> > +				esn = nla_data(attrs[XFRMA_REPLAY_ESN_VAL]);
-> > +				if (esn->replay_window > 1) {
-> > +					NL_SET_ERR_MSG(extack,
-> > +						       "Replay window should be 1 for  OUT SA with ESN");
-> > +					err = -EINVAL;
-> > +					goto out;
-> > +				}
-> > +
-> > +				if (esn->seq || esn->seq_hi || esn->bmp_len) {
-> > +					NL_SET_ERR_MSG(extack,
-> > +						       "Replay seq, seq_hi, bmp_len should not be set for OUT SA with ESN");
-> > +					err = -EINVAL;
-> > +					goto out;
-> > +				}
-> > +			}
-> > +		}
-> > +	}
-> > +
-> >  out:
-> >  	return err;
-> >  }
-> > @@ -627,6 +676,7 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
-> >  	struct nlattr *et = attrs[XFRMA_ETIMER_THRESH];
-> >  	struct nlattr *rt = attrs[XFRMA_REPLAY_THRESH];
-> >  	struct nlattr *mt = attrs[XFRMA_MTIMER_THRESH];
-> > +	struct nlattr *dir = attrs[XFRMA_SA_DIR];
-> >  
-> >  	if (re && x->replay_esn && x->preplay_esn) {
-> >  		struct xfrm_replay_state_esn *replay_esn;
-> > @@ -661,6 +711,9 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
-> >  
-> >  	if (mt)
-> >  		x->mapping_maxage = nla_get_u32(mt);
-> > +
-> > +	if (dir)
-> > +		x->dir = nla_get_u8(dir);
-> >  }
-> >  
-> >  static void xfrm_smark_init(struct nlattr **attrs, struct xfrm_mark *m)
-> > @@ -1182,8 +1235,13 @@ static int copy_to_user_state_extra(struct xfrm_state *x,
-> >  		if (ret)
-> >  			goto out;
-> >  	}
-> > -	if (x->mapping_maxage)
-> > +	if (x->mapping_maxage) {
-> >  		ret = nla_put_u32(skb, XFRMA_MTIMER_THRESH, x->mapping_maxage);
-> > +		if (ret)
-> > +			goto out;
-> > +	}
-> > +	if (x->dir)
-> > +		ret = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
-> >  out:
-> >  	return ret;
-> >  }
-> > @@ -2402,7 +2460,8 @@ static inline unsigned int xfrm_aevent_msgsize(struct xfrm_state *x)
-> >  	       + nla_total_size_64bit(sizeof(struct xfrm_lifetime_cur))
-> >  	       + nla_total_size(sizeof(struct xfrm_mark))
-> >  	       + nla_total_size(4) /* XFRM_AE_RTHR */
-> > -	       + nla_total_size(4); /* XFRM_AE_ETHR */
-> > +	       + nla_total_size(4) /* XFRM_AE_ETHR */
-> > +	       + nla_total_size(sizeof(x->dir)); /* XFRMA_SA_DIR */
-> >  }
-> >  
-> >  static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
-> > @@ -2459,6 +2518,12 @@ static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct
-> >  	if (err)
-> >  		goto out_cancel;
-> >  
-> > +	if (x->dir) {
-> > +		err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
-> > +		if (err)
-> > +			goto out_cancel;
-> > +	}
-> > +
-> >  	nlmsg_end(skb, nlh);
-> >  	return 0;
-> >  
-> > @@ -3018,6 +3083,7 @@ EXPORT_SYMBOL_GPL(xfrm_msg_min);
-> >  #undef XMSGSIZE
-> >  
-> >  const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
-> > +	[XFRMA_UNSPEC]		= { .strict_start_type = XFRMA_SA_DIR },
-> >  	[XFRMA_SA]		= { .len = sizeof(struct xfrm_usersa_info)},
-> >  	[XFRMA_POLICY]		= { .len = sizeof(struct xfrm_userpolicy_info)},
-> >  	[XFRMA_LASTUSED]	= { .type = NLA_U64},
-> > @@ -3049,6 +3115,7 @@ const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
-> >  	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
-> >  	[XFRMA_IF_ID]		= { .type = NLA_U32 },
-> >  	[XFRMA_MTIMER_THRESH]   = { .type = NLA_U32 },
-> > +	[XFRMA_SA_DIR]          = { .type = NLA_U8 }
-> >  };
-> >  EXPORT_SYMBOL_GPL(xfrma_policy);
-> >  
-> > @@ -3189,8 +3256,9 @@ static void xfrm_netlink_rcv(struct sk_buff *skb)
-> >  
-> >  static inline unsigned int xfrm_expire_msgsize(void)
-> >  {
-> > -	return NLMSG_ALIGN(sizeof(struct xfrm_user_expire))
-> > -	       + nla_total_size(sizeof(struct xfrm_mark));
-> > +	return NLMSG_ALIGN(sizeof(struct xfrm_user_expire)) +
-> > +	       nla_total_size(sizeof(struct xfrm_mark)) +
-> > +	       nla_total_size(sizeof_field(struct xfrm_state, dir));
-> >  }
-> >  
-> >  static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
-> > @@ -3217,6 +3285,12 @@ static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct
-> >  	if (err)
-> >  		return err;
-> >  
-> > +	if (x->dir) {
-> > +		err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
-> > +		if (err)
-> > +			return err;
-> > +	}
-> > +
-> >  	nlmsg_end(skb, nlh);
-> >  	return 0;
-> >  }
-> > @@ -3324,6 +3398,9 @@ static inline unsigned int xfrm_sa_len(struct xfrm_state *x)
-> >  	if (x->mapping_maxage)
-> >  		l += nla_total_size(sizeof(x->mapping_maxage));
-> >  
-> > +	if (x->dir)
-> > +		l += nla_total_size(sizeof(x->dir));
-> > +
-> >  	return l;
-> >  }
-> >  
-> > -- 
-> > 2.30.2
-> > 
+I would propose to mark those as optional struct smcd_ops, where all callers can 
+handle a NULL pointer and still be productive.
+Future support of other devices for SMC-D can update that.
+
+
+
 
