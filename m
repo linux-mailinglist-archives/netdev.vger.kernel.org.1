@@ -1,466 +1,113 @@
-Return-Path: <netdev+bounces-87127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4C7F8A1D20
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:03:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCEBC8A1D24
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:03:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3BD01F24130
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 18:03:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 776C32848E2
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 18:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C776B1CAE65;
-	Thu, 11 Apr 2024 16:48:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33EF81CAE8E;
+	Thu, 11 Apr 2024 16:48:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ekIeCrz4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nadCtn/V"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FF771C9ED6;
-	Thu, 11 Apr 2024 16:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D048C446A2
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 16:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712854091; cv=none; b=K4bbfj0aYiOfLrHJutoup4HCbszBVBSxKHjKJm1tGSjIKh7pzLmwC6FZVK9AZAp3VaKQxovsA45jQI5XxqCSe2fLbO78dlYLqloLdMKoOob2XvCZoJ9iQQdw3r2/39QVQfV+NFUuhrLB8O5YsTsxkbEm6JAvMj9dWZdGkf1+5nk=
+	t=1712854122; cv=none; b=ZkB8GV7BG28RtNk/SftZn3gblsxP4kxvTmoZnJrams7iaWnhl+QQjsOtJKHw/k/7VArlNfP3u2uISgbrmJ4WyTKscJ8ZBzfPesxBOIWZ3lY0iSSfDI+TxY2lQi/82R69XSn12pZaSH0oxpsHf3XEr5aOzKitqyY4ZQ8R/0A3YzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712854091; c=relaxed/simple;
-	bh=u/ipy1Tv7BtnE+bkldWfP6d9+N4j1z+dyZC5kC47fpc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tS7Dln4+JzF2fkRjEUcUr1xdQC1irbM01lCc9MTXQWKPYMf6nT4VNu9SAABlLIS1B23UWSo/xMX5jkAvqyWTNDWfVjclz75t5xWvLkYFI6iivhPZPqMjFYS0uLvgH1XnmOLkUDXM1T/B1Swe6HwO7GmI4yJD/9HkJZD018FLmOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ekIeCrz4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D33AFC072AA;
-	Thu, 11 Apr 2024 16:48:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712854091;
-	bh=u/ipy1Tv7BtnE+bkldWfP6d9+N4j1z+dyZC5kC47fpc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ekIeCrz4A61A4Hwfx4lzg73WTatEMnvrDCxDt7gVAByr+vGhyRL3vJgScfwGBFai5
-	 2KTNCQ6q/LNMy9Ya6c3knQ4an6R/N59mJxr/fNkeZdqJfNqmPSP+CuyIhbYT3H25yA
-	 dX4ajm1He485xfl0Qh5clL0k0L5vdeTq+sqbZo7v9Ti6GfsPgq+aLyTOtO5JiUeEGx
-	 jBb/xdA7qMR9b+2C8G6U/VDMTVWsPS4CLucuho2kYle9KGQhFHMm9jFhnw6SfbFhWQ
-	 GY1rmxMMUicQZtVnq17w8BkwGllHE5zoEVMRASN4lFwRyV/VYY+mYND1CIvsCHhBAL
-	 s1ShpqWEgga/A==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: linux-nfs@vger.kernel.org
-Cc: lorenzo.bianconi@redhat.com,
-	chuck.lever@oracle.com,
-	jlayton@kernel.org,
-	neilb@suse.de,
-	netdev@vger.kernel.org,
-	kuba@kernel.org
-Subject: [PATCH v7 5/5] NFSD: add listener-{set,get} netlink command
-Date: Thu, 11 Apr 2024 18:47:28 +0200
-Message-ID: <b11df42eba3d7b0304747dc78e78541ea86e0f05.1712853394.git.lorenzo@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <cover.1712853393.git.lorenzo@kernel.org>
-References: <cover.1712853393.git.lorenzo@kernel.org>
+	s=arc-20240116; t=1712854122; c=relaxed/simple;
+	bh=2u8/BVLR0+6SADxB8m5uoRKPBtfkno7FHbjqUZr8zCM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=omKF59h+3gGGbciHYfvX3N2zWLcIWP0Ruj5EjKJJ/qDMC7Szltf0tQ8E6Ef/wSBGZY2GwEsOvOjWN8YDOP/Vd5hFNJYLjOQuPFZGeX9lzx7JbHaYqusFf/INa2n5JD/z42BhCp2139mhMhe9BsKy+85nGP+na9IDvRTZDhgfE5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nadCtn/V; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6ed2dbf3c92so46336b3a.2
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 09:48:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712854120; x=1713458920; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=hbUZVB9qFkHUH+TrArd+qSwKs0Y6WGXbLzrLWrHSOWY=;
+        b=nadCtn/Vn5ThmZq38foo0X2eUNc18fnReG3t3oG3gHSlq0PSeumdH0SrPOLwPfRCHo
+         gqYK8h0IXJyhZMZU5ugjyffJ9QHjd86nMOFxGv5lsd6dEtiJthl36tyf4nS6JJCAHZ70
+         oBYK2rLQ+Ncjqtw5tnUaxhq93y4qB4OgQKzOoMo8Xiu+kYDNab8xW6i+JwbV3uMLXGbG
+         nXzPNJ62GbgrpFBWGpcPeEYXyF+4RCKLE6fArkHpNMMv5b1EzZDpwAAaZz5A3dGzRwao
+         mKZD6+6fYoYvpCWepG0u7oLU2aoCL3rwJMdJtzih1TVo2szeTsRz8oVyVSQQ3XEo79eQ
+         hARw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712854120; x=1713458920;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hbUZVB9qFkHUH+TrArd+qSwKs0Y6WGXbLzrLWrHSOWY=;
+        b=WAPgI4rDbufdFKSswNz6uMTd6qq/xdFb/I8AySe04MFataYTUjhqOBtCh3DXwgZOBj
+         lP9lPWqfVSjXBnUQU6Kdj38xjl4GS8rWiIUrJ1YN3oFr3/kU73XQFM65rbhB3s/KzA4x
+         mZpAbJJqzWIhgWhOriy2BxRSLIohJfn1tyRs84QTQD0QZeEfyzxC01dNl1qjX4g30gHL
+         5vUM2ZoC0CEZ3Tv1YoCt30Pa52UK1N20CfAtPAvNirJhBCT5CHSmakowlpNIsPejLY8O
+         qeq1MqOOfNdmB+DQSd6hCjf3PF2wDxG44XVzsHiogh56M03TB43t/8o4aCHPlP4YcCFB
+         e6Pw==
+X-Gm-Message-State: AOJu0Ywp3uO4cemNsKkIs8OKVIfG5Hbcv7DSjcGSUxlOnG16tabJQlY6
+	kLaJb9lHUVZTnOw89fdL0yQbl3znsX0LGpAFbgxcqMI1ssLm0o0C7Y1i0qCBGBjR/CTgug1tSFV
+	ORSttfarfTjQ5fpk2jHkrgDKkOpkIS+4z
+X-Google-Smtp-Source: AGHT+IHfOGLkiHAPnqr/WU+w/dWL5LsEYTkbqPit6GBkF7wMRFR9VnVO4hHoaEKaWzXEfy3T2mWXCZT3u/34QojNDVE=
+X-Received: by 2002:a05:6a21:9997:b0:1a7:a86a:1132 with SMTP id
+ ve23-20020a056a21999700b001a7a86a1132mr483689pzb.13.1712854120012; Thu, 11
+ Apr 2024 09:48:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240325064745.62cd38b3@kernel.org> <CAJwJo6ZQAEb6v4S_BgPqZv8W5W0hizvxyzv0K_M7domgOwTEJg@mail.gmail.com>
+ <20240411083629.3eb2fc22@kernel.org>
+In-Reply-To: <20240411083629.3eb2fc22@kernel.org>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Thu, 11 Apr 2024 17:48:28 +0100
+Message-ID: <CAJwJo6YzsQemFCKyK0mmniv5ygGDLWJ_UrE9Aak40SYMTojXsQ@mail.gmail.com>
+Subject: Re: [TEST] TCP-AO got a bit more flaky
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Introduce write_ports netlink command. For listener-set, userspace is
-expected to provide a NFS listeners list it wants enabled. All other
-sockets will be closed.
+On Thu, 11 Apr 2024 at 16:36, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Mon, 25 Mar 2024 14:16:04 +0000 Dmitry Safonov wrote:
+> > > the changes in the timer subsystem Linus pulled for 6.9 made some of
+> > > the TCP AO tests significantly more flaky.
+> > >
+> > > We pulled them in on March 12th, the failures prior to that are legit:
+> > > https://netdev.bots.linux.dev/flakes.html?br-cnt=184&min-flip=0&pw-n=n&tn-needle=tcp-ao
+> > >
+> > > PTAL whenever you have some spare cycles.
+> >
+> > Certainly, will do this week, thanks for pinging!
+>
+> Hi Dmitry! Do you have any spare cycles to spend on this?
+> It's the main source of noise for us. It's not a huge deal
+> but if you're busy I'd like to disable the rst-ipv* tests, at least.
 
-Co-developed-by: Jeff Layton <jlayton@kernel.org>
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- Documentation/netlink/specs/nfsd.yaml |  34 ++++
- fs/nfsd/netlink.c                     |  22 +++
- fs/nfsd/netlink.h                     |   3 +
- fs/nfsd/nfsctl.c                      | 220 ++++++++++++++++++++++++++
- include/uapi/linux/nfsd_netlink.h     |  17 ++
- 5 files changed, 296 insertions(+)
+Hi Jakub, thanks for pinging.
 
-diff --git a/Documentation/netlink/specs/nfsd.yaml b/Documentation/netlink/specs/nfsd.yaml
-index cb93e3e37119..5b8645abb007 100644
---- a/Documentation/netlink/specs/nfsd.yaml
-+++ b/Documentation/netlink/specs/nfsd.yaml
-@@ -88,6 +88,23 @@ attribute-sets:
-         type: nest
-         nested-attributes: version
-         multi-attr: true
-+  -
-+    name: sock
-+    attributes:
-+      -
-+        name: addr
-+        type: binary
-+      -
-+        name: transport-name
-+        type: string
-+  -
-+    name: server-sock
-+    attributes:
-+      -
-+        name: addr
-+        type: nest
-+        nested-attributes: sock
-+        multi-attr: true
- 
- operations:
-   list:
-@@ -147,3 +164,20 @@ operations:
-         reply:
-           attributes:
-             - version
-+    -
-+      name: listener-set
-+      doc: set nfs running sockets
-+      attribute-set: server-sock
-+      flags: [ admin-perm ]
-+      do:
-+        request:
-+          attributes:
-+            - addr
-+    -
-+      name: listener-get
-+      doc: get nfs running listeners
-+      attribute-set: server-sock
-+      do:
-+        reply:
-+          attributes:
-+            - addr
-diff --git a/fs/nfsd/netlink.c b/fs/nfsd/netlink.c
-index 75f609b57ceb..51863043552e 100644
---- a/fs/nfsd/netlink.c
-+++ b/fs/nfsd/netlink.c
-@@ -11,6 +11,11 @@
- #include <uapi/linux/nfsd_netlink.h>
- 
- /* Common nested types */
-+const struct nla_policy nfsd_sock_nl_policy[NFSD_A_SOCK_TRANSPORT_NAME + 1] = {
-+	[NFSD_A_SOCK_ADDR] = { .type = NLA_BINARY, },
-+	[NFSD_A_SOCK_TRANSPORT_NAME] = { .type = NLA_NUL_STRING, },
-+};
-+
- const struct nla_policy nfsd_version_nl_policy[NFSD_A_VERSION_ENABLED + 1] = {
- 	[NFSD_A_VERSION_MAJOR] = { .type = NLA_U32, },
- 	[NFSD_A_VERSION_MINOR] = { .type = NLA_U32, },
-@@ -27,6 +32,11 @@ static const struct nla_policy nfsd_version_set_nl_policy[NFSD_A_SERVER_PROTO_VE
- 	[NFSD_A_SERVER_PROTO_VERSION] = NLA_POLICY_NESTED(nfsd_version_nl_policy),
- };
- 
-+/* NFSD_CMD_LISTENER_SET - do */
-+static const struct nla_policy nfsd_listener_set_nl_policy[NFSD_A_SERVER_SOCK_ADDR + 1] = {
-+	[NFSD_A_SERVER_SOCK_ADDR] = NLA_POLICY_NESTED(nfsd_sock_nl_policy),
-+};
-+
- /* Ops table for nfsd */
- static const struct genl_split_ops nfsd_nl_ops[] = {
- 	{
-@@ -60,6 +70,18 @@ static const struct genl_split_ops nfsd_nl_ops[] = {
- 		.doit	= nfsd_nl_version_get_doit,
- 		.flags	= GENL_CMD_CAP_DO,
- 	},
-+	{
-+		.cmd		= NFSD_CMD_LISTENER_SET,
-+		.doit		= nfsd_nl_listener_set_doit,
-+		.policy		= nfsd_listener_set_nl_policy,
-+		.maxattr	= NFSD_A_SERVER_SOCK_ADDR,
-+		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
-+	},
-+	{
-+		.cmd	= NFSD_CMD_LISTENER_GET,
-+		.doit	= nfsd_nl_listener_get_doit,
-+		.flags	= GENL_CMD_CAP_DO,
-+	},
- };
- 
- struct genl_family nfsd_nl_family __ro_after_init = {
-diff --git a/fs/nfsd/netlink.h b/fs/nfsd/netlink.h
-index c7c0da275481..e3724637d64d 100644
---- a/fs/nfsd/netlink.h
-+++ b/fs/nfsd/netlink.h
-@@ -12,6 +12,7 @@
- #include <uapi/linux/nfsd_netlink.h>
- 
- /* Common nested types */
-+extern const struct nla_policy nfsd_sock_nl_policy[NFSD_A_SOCK_TRANSPORT_NAME + 1];
- extern const struct nla_policy nfsd_version_nl_policy[NFSD_A_VERSION_ENABLED + 1];
- 
- int nfsd_nl_rpc_status_get_start(struct netlink_callback *cb);
-@@ -23,6 +24,8 @@ int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info *info);
- int nfsd_nl_threads_get_doit(struct sk_buff *skb, struct genl_info *info);
- int nfsd_nl_version_set_doit(struct sk_buff *skb, struct genl_info *info);
- int nfsd_nl_version_get_doit(struct sk_buff *skb, struct genl_info *info);
-+int nfsd_nl_listener_set_doit(struct sk_buff *skb, struct genl_info *info);
-+int nfsd_nl_listener_get_doit(struct sk_buff *skb, struct genl_info *info);
- 
- extern struct genl_family nfsd_nl_family;
- 
-diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
-index 341efab4eaa7..5ccdfe9a10a5 100644
---- a/fs/nfsd/nfsctl.c
-+++ b/fs/nfsd/nfsctl.c
-@@ -1864,6 +1864,226 @@ int nfsd_nl_version_get_doit(struct sk_buff *skb, struct genl_info *info)
- 	return err;
- }
- 
-+/**
-+ * nfsd_nl_listener_set_doit - set the nfs running sockets
-+ * @skb: reply buffer
-+ * @info: netlink metadata and command arguments
-+ *
-+ * Return 0 on success or a negative errno.
-+ */
-+int nfsd_nl_listener_set_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct net *net = genl_info_net(info);
-+	struct svc_xprt *xprt, *tmp;
-+	const struct nlattr *attr;
-+	struct svc_serv *serv;
-+	LIST_HEAD(permsocks);
-+	struct nfsd_net *nn;
-+	int err, rem;
-+
-+	mutex_lock(&nfsd_mutex);
-+
-+	err = nfsd_create_serv(net);
-+	if (err) {
-+		mutex_unlock(&nfsd_mutex);
-+		return err;
-+	}
-+
-+	nn = net_generic(net, nfsd_net_id);
-+	serv = nn->nfsd_serv;
-+
-+	spin_lock_bh(&serv->sv_lock);
-+
-+	/* Move all of the old listener sockets to a temp list */
-+	list_splice_init(&serv->sv_permsocks, &permsocks);
-+
-+	/*
-+	 * Walk the list of server_socks from userland and move any that match
-+	 * back to sv_permsocks
-+	 */
-+	nlmsg_for_each_attr(attr, info->nlhdr, GENL_HDRLEN, rem) {
-+		struct nlattr *tb[NFSD_A_SOCK_MAX + 1];
-+		const char *xcl_name;
-+		struct sockaddr *sa;
-+
-+		if (nla_type(attr) != NFSD_A_SERVER_SOCK_ADDR)
-+			continue;
-+
-+		if (nla_parse_nested(tb, NFSD_A_SOCK_MAX, attr,
-+				     nfsd_sock_nl_policy, info->extack) < 0)
-+			continue;
-+
-+		if (!tb[NFSD_A_SOCK_ADDR] || !tb[NFSD_A_SOCK_TRANSPORT_NAME])
-+			continue;
-+
-+		if (nla_len(tb[NFSD_A_SOCK_ADDR]) < sizeof(*sa))
-+			continue;
-+
-+		xcl_name = nla_data(tb[NFSD_A_SOCK_TRANSPORT_NAME]);
-+		sa = nla_data(tb[NFSD_A_SOCK_ADDR]);
-+
-+		/* Put back any matching sockets */
-+		list_for_each_entry_safe(xprt, tmp, &permsocks, xpt_list) {
-+			/* This shouldn't be possible */
-+			if (WARN_ON_ONCE(xprt->xpt_net != net)) {
-+				list_move(&xprt->xpt_list, &serv->sv_permsocks);
-+				continue;
-+			}
-+
-+			/* If everything matches, put it back */
-+			if (!strcmp(xprt->xpt_class->xcl_name, xcl_name) &&
-+			    rpc_cmp_addr_port(sa, (struct sockaddr *)&xprt->xpt_local)) {
-+				list_move(&xprt->xpt_list, &serv->sv_permsocks);
-+				break;
-+			}
-+		}
-+	}
-+
-+	/* For now, no removing old sockets while server is running */
-+	if (serv->sv_nrthreads && !list_empty(&permsocks)) {
-+		list_splice_init(&permsocks, &serv->sv_permsocks);
-+		spin_unlock_bh(&serv->sv_lock);
-+		err = -EBUSY;
-+		goto out_unlock_mtx;
-+	}
-+
-+	/* Close the remaining sockets on the permsocks list */
-+	while (!list_empty(&permsocks)) {
-+		xprt = list_first_entry(&permsocks, struct svc_xprt, xpt_list);
-+		list_move(&xprt->xpt_list, &serv->sv_permsocks);
-+
-+		/*
-+		 * Newly-created sockets are born with the BUSY bit set. Clear
-+		 * it if there are no threads, since nothing can pick it up
-+		 * in that case.
-+		 */
-+		if (!serv->sv_nrthreads)
-+			clear_bit(XPT_BUSY, &xprt->xpt_flags);
-+
-+		set_bit(XPT_CLOSE, &xprt->xpt_flags);
-+		spin_unlock_bh(&serv->sv_lock);
-+		svc_xprt_close(xprt);
-+		spin_lock_bh(&serv->sv_lock);
-+	}
-+
-+	spin_unlock_bh(&serv->sv_lock);
-+
-+	/* walk list of addrs again, open any that still don't exist */
-+	nlmsg_for_each_attr(attr, info->nlhdr, GENL_HDRLEN, rem) {
-+		struct nlattr *tb[NFSD_A_SOCK_MAX + 1];
-+		const char *xcl_name;
-+		struct sockaddr *sa;
-+		int ret;
-+
-+		if (nla_type(attr) != NFSD_A_SERVER_SOCK_ADDR)
-+			continue;
-+
-+		if (nla_parse_nested(tb, NFSD_A_SOCK_MAX, attr,
-+				     nfsd_sock_nl_policy, info->extack) < 0)
-+			continue;
-+
-+		if (!tb[NFSD_A_SOCK_ADDR] || !tb[NFSD_A_SOCK_TRANSPORT_NAME])
-+			continue;
-+
-+		if (nla_len(tb[NFSD_A_SOCK_ADDR]) < sizeof(*sa))
-+			continue;
-+
-+		xcl_name = nla_data(tb[NFSD_A_SOCK_TRANSPORT_NAME]);
-+		sa = nla_data(tb[NFSD_A_SOCK_ADDR]);
-+
-+		xprt = svc_find_listener(serv, xcl_name, net, sa);
-+		if (xprt) {
-+			svc_xprt_put(xprt);
-+			continue;
-+		}
-+
-+		ret = svc_xprt_create_from_sa(serv, xcl_name, net, sa,
-+					      SVC_SOCK_ANONYMOUS,
-+					      get_current_cred());
-+		/* always save the latest error */
-+		if (ret < 0)
-+			err = ret;
-+	}
-+
-+	if (!serv->sv_nrthreads && list_empty(&nn->nfsd_serv->sv_permsocks))
-+		nfsd_destroy_serv(net);
-+
-+out_unlock_mtx:
-+	mutex_unlock(&nfsd_mutex);
-+
-+	return err;
-+}
-+
-+/**
-+ * nfsd_nl_listener_get_doit - get the nfs running listeners
-+ * @skb: reply buffer
-+ * @info: netlink metadata and command arguments
-+ *
-+ * Return 0 on success or a negative errno.
-+ */
-+int nfsd_nl_listener_get_doit(struct sk_buff *skb, struct genl_info *info)
-+{
-+	struct svc_xprt *xprt;
-+	struct svc_serv *serv;
-+	struct nfsd_net *nn;
-+	void *hdr;
-+	int err;
-+
-+	skb = genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
-+	if (!skb)
-+		return -ENOMEM;
-+
-+	hdr = genlmsg_iput(skb, info);
-+	if (!hdr) {
-+		err = -EMSGSIZE;
-+		goto err_free_msg;
-+	}
-+
-+	mutex_lock(&nfsd_mutex);
-+	nn = net_generic(genl_info_net(info), nfsd_net_id);
-+
-+	/* no nfs server? Just send empty socket list */
-+	if (!nn->nfsd_serv)
-+		goto out_unlock_mtx;
-+
-+	serv = nn->nfsd_serv;
-+	spin_lock_bh(&serv->sv_lock);
-+	list_for_each_entry(xprt, &serv->sv_permsocks, xpt_list) {
-+		struct nlattr *attr;
-+
-+		attr = nla_nest_start_noflag(skb, NFSD_A_SERVER_SOCK_ADDR);
-+		if (!attr) {
-+			err = -EINVAL;
-+			goto err_serv_unlock;
-+		}
-+
-+		if (nla_put_string(skb, NFSD_A_SOCK_TRANSPORT_NAME,
-+				   xprt->xpt_class->xcl_name) ||
-+		    nla_put(skb, NFSD_A_SOCK_ADDR,
-+			    sizeof(struct sockaddr_storage),
-+			    &xprt->xpt_local)) {
-+			err = -EINVAL;
-+			goto err_serv_unlock;
-+		}
-+
-+		nla_nest_end(skb, attr);
-+	}
-+	spin_unlock_bh(&serv->sv_lock);
-+out_unlock_mtx:
-+	mutex_unlock(&nfsd_mutex);
-+	genlmsg_end(skb, hdr);
-+
-+	return genlmsg_reply(skb, info);
-+
-+err_serv_unlock:
-+	spin_unlock_bh(&serv->sv_lock);
-+	mutex_unlock(&nfsd_mutex);
-+err_free_msg:
-+	nlmsg_free(skb);
-+
-+	return err;
-+}
-+
- /**
-  * nfsd_net_init - Prepare the nfsd_net portion of a new net namespace
-  * @net: a freshly-created network namespace
-diff --git a/include/uapi/linux/nfsd_netlink.h b/include/uapi/linux/nfsd_netlink.h
-index ccf3e15fe160..5253039aeb4d 100644
---- a/include/uapi/linux/nfsd_netlink.h
-+++ b/include/uapi/linux/nfsd_netlink.h
-@@ -52,12 +52,29 @@ enum {
- 	NFSD_A_SERVER_PROTO_MAX = (__NFSD_A_SERVER_PROTO_MAX - 1)
- };
- 
-+enum {
-+	NFSD_A_SOCK_ADDR = 1,
-+	NFSD_A_SOCK_TRANSPORT_NAME,
-+
-+	__NFSD_A_SOCK_MAX,
-+	NFSD_A_SOCK_MAX = (__NFSD_A_SOCK_MAX - 1)
-+};
-+
-+enum {
-+	NFSD_A_SERVER_SOCK_ADDR = 1,
-+
-+	__NFSD_A_SERVER_SOCK_MAX,
-+	NFSD_A_SERVER_SOCK_MAX = (__NFSD_A_SERVER_SOCK_MAX - 1)
-+};
-+
- enum {
- 	NFSD_CMD_RPC_STATUS_GET = 1,
- 	NFSD_CMD_THREADS_SET,
- 	NFSD_CMD_THREADS_GET,
- 	NFSD_CMD_VERSION_SET,
- 	NFSD_CMD_VERSION_GET,
-+	NFSD_CMD_LISTENER_SET,
-+	NFSD_CMD_LISTENER_GET,
- 
- 	__NFSD_CMD_MAX,
- 	NFSD_CMD_MAX = (__NFSD_CMD_MAX - 1)
+I have a patch that addresses one of the issues I saw on these tests
+and currently working on another patch. I suggest we disable rst-ipv*
+tests on Monday if I don't finish the patch set by Monday.
+
+Thanks and excuses for the delay: my work laptop was running linux
+and that was not fitting into corporate policy of having enterprise
+spy software. So, I had to urgently find a new machine for
+contributing and sending patches.
+
 -- 
-2.44.0
-
+             Dmitry
 
