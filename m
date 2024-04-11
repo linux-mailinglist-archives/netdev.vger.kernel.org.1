@@ -1,150 +1,126 @@
-Return-Path: <netdev+bounces-86907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86908-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31BAA8A0C07
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:14:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEA8B8A0C1C
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:17:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1FC128203C
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:14:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C9C11F23FB1
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:17:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02FA143898;
-	Thu, 11 Apr 2024 09:14:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF4671448F3;
+	Thu, 11 Apr 2024 09:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="JqHdBxVz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jWkNwXT1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C2F6140396;
-	Thu, 11 Apr 2024 09:14:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6B8A143C51;
+	Thu, 11 Apr 2024 09:17:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712826853; cv=none; b=HEG/3be5BbVdfvQlyDS+4qm9XnaHAMT9VIwYeB0zxRz52vFqdMM8O59wVBts+qf7/pT1ncIii5C0XrhwG3Vc8SM8G4fHDHBMrhycyCJ+6X3HVYFspqF80LV8Qm0XYs6JkuA1DJmhT3Jy0ENdMoq1FoNjgEuxjmZPE6a9p2O5gYc=
+	t=1712827029; cv=none; b=MhbBQ2RFfywttCpCL0h/3+JtxcH8OxbE3TvrmmxpzlQNE9B5HTeHWIkb5Rii97QxzjC/jpPB+6XG64co554c+n6nVSSkWFBnC5eUoTnmCPjHZePCfGa2Q/bwhSkIr5nl3sWw42EpxHi26O54HKem2q050XWMzKjLUXeaDk7GoJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712826853; c=relaxed/simple;
-	bh=Fcu3SvfG7idtKalMhr0vRQ6Y7onjhyyIlZchn+ArnvI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=L/chtOeOMs3KjTE6kDaWU7lWDbyHzV61wcF11pwx3ubg7dhsdS/ctBb6huxZuSpwRL6hXRTbiaSa/p3to8Zqh5+DQbCKdV4cxjQBoQ2VY/VCvxf+AH+ss62Klo8qCUw0QbOmAJ6K0PWsZTszQ3nt4Oymaj+hdvR4i7BDJHH+YPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=JqHdBxVz; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43B82eOP032404;
-	Thu, 11 Apr 2024 09:14:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=Fcu3SvfG7idtKalMhr0vRQ6Y7onjhyyIlZchn+ArnvI=;
- b=JqHdBxVzKpjrABJsRq3gEBF/uuolMahcNKbnbpsEWB5KLnb5CKUd+byPd8Um+tRKmYdV
- 6/Y73NtszAGF9qorSYZBJ789lVaij+rz2pOq9cFGHQIEhbEkkoKHZDdwpaLlVLtbkHiS
- Nm0it0DWTri1f4b0THzKt1Wf6/gX4ZLBkIZJJEeHkvLk6l86sE8HtgAYXYz7s0HKlc1u
- Qz0Behw717A4LHKrnbbs7qE7OdcQ0B+UMHyKrDupPzPvVaZDSwov50v4gcqbD+eRGn4+
- s6v0SUrC6DnsPWQbZS16N7pT34LAQfMo7e6KKvgf4ErYWeG7yMs1V7Gb/hcEwFTivdbD iA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xec0hg5cb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Apr 2024 09:14:01 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43B9DrK1005866;
-	Thu, 11 Apr 2024 09:14:01 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xec0hg5c8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Apr 2024 09:14:01 +0000
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43B8YYwB019108;
-	Thu, 11 Apr 2024 09:14:00 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xbh40jf2r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Apr 2024 09:14:00 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43B9DsDc54526304
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 11 Apr 2024 09:13:56 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8C0F32004B;
-	Thu, 11 Apr 2024 09:13:54 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BF48D20043;
-	Thu, 11 Apr 2024 09:13:53 +0000 (GMT)
-Received: from [9.171.74.197] (unknown [9.171.74.197])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 11 Apr 2024 09:13:53 +0000 (GMT)
-Message-ID: <60455a55f6595b9ac0fe8922a162b5727556d85a.camel@linux.ibm.com>
-Subject: Re: [PATCH net] Revert "s390/ism: fix receive message buffer
- allocation"
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Paolo Abeni <pabeni@redhat.com>, Heiko Carstens <hca@linux.ibm.com>,
-        Christoph Hellwig
-	 <hch@lst.de>, Jakub Kicinski <kuba@kernel.org>,
-        "David S . Miller"
-	 <davem@davemloft.net>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        Alexandra Winter
- <wintera@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Vasily
- Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle
- <svens@linux.ibm.com>, pasic@linux.ibm.com,
-        schnelle@linux.ibm.com
-Date: Thu, 11 Apr 2024 11:13:53 +0200
-In-Reply-To: <facf085f326813ec12566b3458650746e0267aca.camel@redhat.com>
-References: <20240409113753.2181368-1-gbayer@linux.ibm.com>
-	 <facf085f326813ec12566b3458650746e0267aca.camel@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-2.fc39app4) 
+	s=arc-20240116; t=1712827029; c=relaxed/simple;
+	bh=2syYPClYSp9LRVX4/oUCM4ZbsrvXWU1ybAOzeY9Qd2E=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=VbzfSiThQmMkl4x4VP0tPjH3TCY/n7qsdlxVAxH+u3nVOZMV8ql6e6S1k4E5+4DXHMv6GEoGSh8GspJTlki56iWzYKWUE7JMPREzpWxsZZaOy63DzAp4YDX65CDZavifdsLsH5MqZtEfJbNGR5ybUe8eXiMLQIWvuseNWnqmrJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jWkNwXT1; arc=none smtp.client-ip=209.85.167.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-516d727074eso7414064e87.0;
+        Thu, 11 Apr 2024 02:17:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712827026; x=1713431826; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FzBEVk0HW76GLGB3lVYaqyPSlW2zjUkEkvFNmqFhr9w=;
+        b=jWkNwXT1vnYE37l0WVNMwK82XLpuHZ/vzpG5+D3W22+/miO7uPEciT8x+g5VMe7lkv
+         o2FOCcVeWvh9D5Exto5aZKr625rHz3M5ysqbHpiXDQlr1Fz/KDV/0I/MrMdMckQN3DSo
+         QeXbzj51TP6vXQWzAAX94fSmx3jvY9/fbgsnYBilOgaZbpwFmr2ECbVIRRX0ENW/wToz
+         1+Y0O6QJuXSvjwRygE14A/6NE6MkmgFPFfL39ZlKmJuonw72OQ3vh23yMJoNjTKc3ui8
+         PTTkpFTTlPVg6YZpCWewIKcXboB/laDto0Nt5dpNcL07AoTWT6CK1IPoOvEpxd/xL41I
+         BIxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712827026; x=1713431826;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FzBEVk0HW76GLGB3lVYaqyPSlW2zjUkEkvFNmqFhr9w=;
+        b=wTiIQZ6Zrr8SJUs9AGZTQSPWqMz3OIkgINAq59uCpHlIUMvhO24kqn9kPh6gQdBL9n
+         CsGeQV2ikGPEks4TArpVg8s0VmYq9XYyJrNllmi3pHkExlo6tgm7xEnCiZ12seih6Ef/
+         3Ggti2EvCcOvtr7u4sNUD/hIlyu4psA3g2a7ALLhI0ART2BsU66anKlUFtuaBFGOEWgn
+         udQbhAsZrxJs1pNTG6u5akLGLPLgTFrG+bN16aJV1XzWBt5c+D6A4BkPHHRdlNh5XwCS
+         V9ww13BN/HimAof418e/S2CVZK9xeDuHAD4Qv772XPrrjgQ9aZuY2yJz8fFtvzHZmmSs
+         T8rg==
+X-Forwarded-Encrypted: i=1; AJvYcCVDwoxvcXMtWpDYAB5CpaCPT4yrSN+1G2LcsKvAIoGgLcsEQonFTBb7/IRi/wH1I2VKuoUuvHPlSHvZkD4496KdevHS+2zJmYwAi2LR+ldgyI/YKEJLluviTe8EcRyz1J8X3ZpA
+X-Gm-Message-State: AOJu0YwLv9MvPrTvrEAIQxQbmy5HpMKAlsRbAV5eysFGu1U4qaIn+4ga
+	aXkTE21RAwIjejMfLIQX7afiRo94GiINKL5BndmASpyxxIf8mZvYi0jRnF8b
+X-Google-Smtp-Source: AGHT+IFquHk0icIe7gA89smDZQv78rcQ3Av1zWeYeS+HxuiU9dGbqT1wEiIRM8hbwuVmU+uAto584g==
+X-Received: by 2002:a05:6512:3c89:b0:518:6ea2:a2a3 with SMTP id h9-20020a0565123c8900b005186ea2a2a3mr16840lfv.54.1712827025767;
+        Thu, 11 Apr 2024 02:17:05 -0700 (PDT)
+Received: from localhost (craw-09-b2-v4wan-169726-cust2117.vm24.cable.virginm.net. [92.238.24.70])
+        by smtp.gmail.com with ESMTPSA id p5-20020a05600c1d8500b00417e227f40bsm596853wms.3.2024.04.11.02.17.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Apr 2024 02:17:05 -0700 (PDT)
+From: Colin Ian King <colin.i.king@gmail.com>
+To: Jon Maloy <jmaloy@redhat.com>,
+	Ying Xue <ying.xue@windriver.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net
+Cc: kernel-janitors@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH][next] tipc: remove redundant assignment to ret, simplify code
+Date: Thu, 11 Apr 2024 10:17:04 +0100
+Message-Id: <20240411091704.306752-1-colin.i.king@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: MZGELUC8CYGF8UPhGzRpCQuo9XMaFMgN
-X-Proofpoint-ORIG-GUID: RHswPLLcPovRa8-hRjZaeTETyqYP_MT4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-11_03,2024-04-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- mlxlogscore=842 mlxscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
- priorityscore=1501 clxscore=1015 phishscore=0 malwarescore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
- definitions=main-2404110065
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2024-04-11 at 09:16 +0200, Paolo Abeni wrote:
-> Hi,
->=20
-> On Tue, 2024-04-09 at 13:37 +0200, Gerd Bayer wrote:
-> > This reverts commit 58effa3476536215530c9ec4910ffc981613b413.
-> > Review was not finished on this patch. So it's not ready for
-> > upstreaming.
-> >=20
-> > Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
->=20
-> It's not a big deal (no need to repost), but should the need arise
-> again in the future it would be better explicitly marking the
-> reverted commit in the tag area as 'Fixes'. The full hash in the
-> commit message will likely save the day to stable teams, but better
-> safe then sorry!
+Variable err is being assigned a zero value and it is never read
+afterwards in either the break path or continue path, the assignment
+is redundant and can be removed. With it removed, the if statement
+can also be simplified.
 
-Thanks Paolo for the explanation. I was not even sure if the commit
-hash of the erroneous commit will remain stable when this tree will be
-merged upstream. In my (naive?) view this could be "autosquashed" into
-nothing at the time of the merge.
+Cleans up clang scan warning:
+net/tipc/socket.c:3570:5: warning: Value stored to 'err' is never
+read [deadcode.DeadStores]
 
-But since there appears to be time for the next pull request to
-upstream, I'll send a new version of the original patch with all the
-review comments addressed.
+Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+---
+ net/tipc/socket.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-Thanks again,
-Gerd
+diff --git a/net/tipc/socket.c b/net/tipc/socket.c
+index 7e4135db5816..798397b6811e 100644
+--- a/net/tipc/socket.c
++++ b/net/tipc/socket.c
+@@ -3565,11 +3565,8 @@ int tipc_nl_sk_walk(struct sk_buff *skb, struct netlink_callback *cb,
+ 	rhashtable_walk_start(iter);
+ 	while ((tsk = rhashtable_walk_next(iter)) != NULL) {
+ 		if (IS_ERR(tsk)) {
+-			err = PTR_ERR(tsk);
+-			if (err == -EAGAIN) {
+-				err = 0;
++			if (PTR_ERR(tsk) == -EAGAIN)
+ 				continue;
+-			}
+ 			break;
+ 		}
+ 
+-- 
+2.39.2
+
 
