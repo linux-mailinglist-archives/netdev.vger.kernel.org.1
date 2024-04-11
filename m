@@ -1,166 +1,198 @@
-Return-Path: <netdev+bounces-86899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A2998A0B95
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:47:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B9058A0BA6
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:53:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 103A328161F
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 08:47:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5FE5281538
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 08:53:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD9C140396;
-	Thu, 11 Apr 2024 08:47:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B0861411FE;
+	Thu, 11 Apr 2024 08:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KUOhp1sr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fWj0pMDT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FA52140367
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 08:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98D31419A6;
+	Thu, 11 Apr 2024 08:53:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712825266; cv=none; b=lndItoufcu6z8dRtW9QlEF28P27n+Psk5S895EJiPAndjimePZ2S37Oj0P98VSOJ+gPhUsjW6tP3hWFYMMPy2ysuCH9UW6PRRO9QgMeAjzpm6aQXn4X42Z0ylkwqE5yRijkORky8Uk73GVlFK6fgf9Z2z349Y+DVBjJQN97wptI=
+	t=1712825587; cv=none; b=Ids8cFcSlwsYb4BvGXNOBTJpfPFLTU1ueEVcCf7LkPr/q4OOL0kf58j2m3Zek1kXcCt3o11Mj15rToH4ekcatJAcU5QpSGRIihi9dkGZRSihTkraDvbr5Y1m9+bEZjuvueGCwn9ZkHMIrYwCYdZjBxB6tvbeKo3PB+Czt0CVNLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712825266; c=relaxed/simple;
-	bh=XogImJrUwJH3MFfJezd+om3eXHJumAKFWdjjf/eYD3w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gGcuac+KKN7Lk46L0ixRVGndcYNvrD6Au3bn+OQiqyvyCR2kOtG6KxR+20iC/TUUFpt791zfSE9kn1tkjF+eyu8cw7Iw3KcT5FVrZJp58qajVgQZZRUZOeUxpKFiXGac9x2xPmB0evWVLly81eBR8KqYDKCAnKeReDzoERY+PVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KUOhp1sr; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712825263;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OHtTFVdGrPf71TfXVy4j7Zndl+6LgKqo0p4DXFjFlkU=;
-	b=KUOhp1sraUpUQiKL3E6zajBPY4JdVQl3oGhD8qbPwJWeqcZrYAOrb+JI5e32F/aQcT+PuK
-	CMfOqMo6o/IUbQaSdgozCHVEMlW7unHKUbijxw7Q64O9xXAhC60NyB5hxEaPzxYRplht7a
-	YlBojAH3/vRJfPPrzpNflKvo/4PVjMc=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-63-geJec4wdPxmWnbLUHOjDwg-1; Thu, 11 Apr 2024 04:47:42 -0400
-X-MC-Unique: geJec4wdPxmWnbLUHOjDwg-1
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2a4a1065dc4so5202997a91.3
-        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 01:47:42 -0700 (PDT)
+	s=arc-20240116; t=1712825587; c=relaxed/simple;
+	bh=io9LKvvXimYbev4Iml4NKxNJy86/qa8clb83Jlhvc2M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PPScXYq9FBHQ37ZJCue6DrB8vIyKEY8Db0rTRQtfmyimRLyZXNMJOaDPkP+RvONgi6NzfgKZJ3mJsbslpZpYbRj9NzPqaowQlZvKRUqEeI448EwoQDnzp/MkfC0uLgpJaaSJFcO9hfMnYHF4YbcbN4gU+Oe4yYW74dE9q4rPsYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fWj0pMDT; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2a58209b159so1725595a91.3;
+        Thu, 11 Apr 2024 01:53:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712825584; x=1713430384; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ya5I5hvjUcaAqlpM5swpRYtJfi5w+dWzk4Fz+t660Ec=;
+        b=fWj0pMDTjAdkUv5+DmM2PHtR6UEWwt8i8e7QDTipFO6q1Dtcp5h9ESC9VA45otWWSS
+         squiWcue9Ok8HBVCbb7vEvDUlqzlARPBj0ZTfxuYerq93t+BQnE3ExCD6JhOJ9SgSw52
+         nDWjFaDjZnd5wSeVFM3SXIqJJHYSjNFaLRdbgL/leStTsr5RdBhQULO89yVcKfYZkT1i
+         TZFBV/G1Oh7Hdw4mSKu59NDte0J42wtieItOBmjYuOGF7w6CXp6KbY5/UAxK5HVUV9BZ
+         ddRyybjEQgqDAoHG0iepsD4a0r9o9/Jx4HFaitRfJOKEJblsoZiAh5ha4aWwKac7HzPX
+         Bj/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712825261; x=1713430061;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OHtTFVdGrPf71TfXVy4j7Zndl+6LgKqo0p4DXFjFlkU=;
-        b=RPx5vkUFCJk4wU9LUBWo2ooo4oHGGPjeLuLN9bDzfpwl5quQBF478dEmSMWBZ/wFgi
-         Ei/g4TwxU6DUzmh7bUv/cDrroCs1tY6vEW1MCdChSn/9zsFil/DIIHbYAf8MKl9Ku+Ah
-         VHtb/4VZH0p576AOP6dkIdbhNGkCdC6C9EAcOSt+JxClTXqIOhPqZD6/5PrElHl+XUYj
-         ePwOy1diiJOzHm6XmjLBZHqEjZ1SH9/KsDd8W/Bl5gacL9t4+4Ey9EIWp2IpW3qPai+6
-         X7pOg6Mzkl7pvDY0aKI7SIVUv/ecFuoli3v96W8bNsVU157NhdINtHai4t8MDk2jIK4u
-         nO3g==
-X-Forwarded-Encrypted: i=1; AJvYcCXroBo4IlTVRQY4JAlCOCw/XFweb0JwfDGNxpdJhvBL7ymZTZTO+VJZNZkurzOF9OsZ7zgtwG87UMF8K0trcZEE6Po83vqR
-X-Gm-Message-State: AOJu0YySUq7FYOT7j0gPytdVM5m5CAyf57T2drSj7VHbXewYg88z6cmE
-	PQeX6nx3O+6uw6HfwwMG55n3ZHIro+t1S5Cv1fcLuL7WutiYrMFp31hgid7LWySTUICthCw7St6
-	RajpI1n3iznCYu1JIzyPMdSMO2H+xASECciiPofKnrsqDizO4rtvEgLKfqTSrjQeBN9bebkyeUQ
-	RAjdmd+Zn35+EhZYRJC8ap0gljRBfS
-X-Received: by 2002:a17:90b:1105:b0:2a6:db3:1aa5 with SMTP id gi5-20020a17090b110500b002a60db31aa5mr2508894pjb.18.1712825261126;
-        Thu, 11 Apr 2024 01:47:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHULqDkAnmSkiGeO1ktymjHTUooHgAi06FSR4Xw2JS39YqUY1l2CbE924DdxcuAQso++xFTHXCMKloNBQ6guFk=
-X-Received: by 2002:a17:90b:1105:b0:2a6:db3:1aa5 with SMTP id
- gi5-20020a17090b110500b002a60db31aa5mr2508880pjb.18.1712825260798; Thu, 11
- Apr 2024 01:47:40 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712825584; x=1713430384;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ya5I5hvjUcaAqlpM5swpRYtJfi5w+dWzk4Fz+t660Ec=;
+        b=CXQM4lI0PaTAiM8JlryLLLZEPm4VnqnH51kMGcWGA8SuI2xmJuxClS/sqDHN+6zJoU
+         PIlCzS5QdxvTWRj+Rm1lBKF/X8b2nghsXnHZH6SHm2IfbJX1igRcDFRgzS1M/gXxcUop
+         vZQsyZ+Tr1i7lmPtOpcyqiq+ZhSb0fohGTd94eQnbNGFlmqY1Rq1yA04HG2HJHkgxtHN
+         q0ZBVynRuP/TpBeJORTbM0zPLkEZLWDXcOqbxXjOzexK/Oi6IIClXS0RbpyBBItNcUA1
+         ZC81wr0MYIMnT2d8BCmfufqZEF39Qaxx38Qo9YeBQPmWDcj0DQl9EDc5MSHdHuikl9pU
+         kKGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUre2sFRjTIWkytZsCzKg9MmIpz2XiKM/0qWNqnlGBva/mMmVIfW8Tqpfma92aVJQ1uUNv/88/Isg2dKZl/ez+PebI1TrQSgDpi6FdG5cJ3G13hggOwmWb5pBliaV4EgPs1
+X-Gm-Message-State: AOJu0YxBnHOOlGcjz4wOIvOFWOlaybJw1XCatJDx7/DwyOpTEVKWqTCa
+	1V2A/lFoLhUIWCJRUvnIqIm3/dBKPiThZOBp+PBnX52ZdIzzxzLj
+X-Google-Smtp-Source: AGHT+IG0RZWIYvC1TAdiHu4GiCufqpdvQrAKxYmpsyvNmU5fmkX4L1O0eJJwfz5elYuwUFstobv+qw==
+X-Received: by 2002:a17:90a:f40b:b0:2a5:d5b1:b99b with SMTP id ch11-20020a17090af40b00b002a5d5b1b99bmr3708871pjb.38.1712825584034;
+        Thu, 11 Apr 2024 01:53:04 -0700 (PDT)
+Received: from dell.. ([111.196.36.81])
+        by smtp.googlemail.com with ESMTPSA id y12-20020a17090a154c00b002a52c2d82f0sm4534844pja.1.2024.04.11.01.52.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Apr 2024 01:53:02 -0700 (PDT)
+From: Liang Chen <liangchen.linux@gmail.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	hengqi@linux.alibaba.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	john.fastabend@gmail.com,
+	hawk@kernel.org,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	liangchen.linux@gmail.com
+Subject: [PATCH net-next v6] virtio_net: Support RX hash XDP hint
+Date: Thu, 11 Apr 2024 16:52:16 +0800
+Message-Id: <20240411085216.361662-1-liangchen.linux@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240410042245.2044516-1-lei.chen@smartx.com> <9e0884e2a101215d3376f2ef9a7a68ca86599f0f.camel@redhat.com>
-In-Reply-To: <9e0884e2a101215d3376f2ef9a7a68ca86599f0f.camel@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 11 Apr 2024 16:47:29 +0800
-Message-ID: <CACGkMEsjTD7Q26BqLuRMh7QmRZYeWZuTbQSDrb7O=uny5oknTg@mail.gmail.com>
-Subject: Re: [PATCH v2] net:tun: limit printing rate when illegal packet
- received by tun dev
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Lei Chen <lei.chen@smartx.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 11, 2024 at 4:30=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On Wed, 2024-04-10 at 00:22 -0400, Lei Chen wrote:
-> > vhost_worker will call tun call backs to receive packets. If too many
-> > illegal packets arrives, tun_do_read will keep dumping packet contents.
-> > When console is enabled, it will costs much more cpu time to dump
-> > packet and soft lockup will be detected.
-> >
-> > net_ratelimit mechanism can be used to limit the dumping rate.
-> >
-> > PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980"
-> >  #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
-> >  #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
-> >  #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
-> >  #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
-> >  #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
-> >     [exception RIP: io_serial_in+20]
-> >     RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
-> >     RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 0000000000000000
-> >     RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428a0
-> >     RBP: 0000000000002710   R8: 0000000000000004   R9: 000000000000000f
-> >     R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 0000000000000020
-> >     R13: ffffffff8acbf698  R14: 0000000000000058  R15: 0000000000000000
-> >     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
-> >  #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
-> >  #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
-> >  #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
-> >  #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
-> >  #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
-> >  #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
-> >  #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
-> >  #12 [ffffa65531497b68] printk at ffffffff89318306
-> >  #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
-> >  #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
-> >  #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
-> >  #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
-> >  #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
-> >  #18 [ffffa65531497f10] kthread at ffffffff892d2e72
-> >  #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
-> >
-> > Signed-off-by: Lei Chen <lei.chen@smartx.com>
->
-> This change is IMHO best suited for 'net': the possible soft sookup
-> looks nasty.
->
-> @Willem, @Jason, any strong opinion against the above?
->
-> Otherwise, @Lei Chen, please repost with a suitable fixes tag and
-> adding the target tree into the subj prefix.
+The RSS hash report is a feature that's part of the virtio specification.
+Currently, virtio backends like qemu, vdpa (mlx5), and potentially vhost
+(still a work in progress as per [1]) support this feature. While the
+capability to obtain the RSS hash has been enabled in the normal path,
+it's currently missing in the XDP path. Therefore, we are introducing
+XDP hints through kfuncs to allow XDP programs to access the RSS hash.
 
-I think the fix should be
+1.
+https://lore.kernel.org/all/20231015141644.260646-1-akihiko.odaki@daynix.com/#r
 
-ef3db4a59542 ("tun: avoid BUG, dump packet on GSO errors")
+Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+---
+  Changes from v5:
+- Preservation of the hash value has been dropped, following the conclusion
+  from discussions in V3 reviews. The virtio_net driver doesn't
+  accessing/using the virtio_net_hdr after the XDP program execution, so
+  nothing tragic should happen. As to the xdp program, if it smashes the
+  entry in virtio header, it is likely buggy anyways. Additionally, looking
+  up the Intel IGC driver,  it also does not bother with this particular
+  aspect.
+---
+ drivers/net/virtio_net.c | 55 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
 
-The target should be net.
-
-And it needs to address Williem's concern about patch format.
-
-With those fixed.
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-
-Thanks
-
->
-> Thanks,
->
-> Paolo
->
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index c22d1118a133..abd07d479508 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -4621,6 +4621,60 @@ static void virtnet_set_big_packets(struct virtnet_info *vi, const int mtu)
+ 	}
+ }
+ 
++static int virtnet_xdp_rx_hash(const struct xdp_md *_ctx, u32 *hash,
++			   enum xdp_rss_hash_type *rss_type)
++{
++	const struct xdp_buff *xdp = (void *)_ctx;
++	struct virtio_net_hdr_v1_hash *hdr_hash;
++	struct virtnet_info *vi;
++
++	if (!(xdp->rxq->dev->features & NETIF_F_RXHASH))
++		return -ENODATA;
++
++	vi = netdev_priv(xdp->rxq->dev);
++	hdr_hash = (struct virtio_net_hdr_v1_hash *)(xdp->data - vi->hdr_len);
++
++	switch (__le16_to_cpu(hdr_hash->hash_report)) {
++		case VIRTIO_NET_HASH_REPORT_TCPv4:
++			*rss_type = XDP_RSS_TYPE_L4_IPV4_TCP;
++			break;
++		case VIRTIO_NET_HASH_REPORT_UDPv4:
++			*rss_type = XDP_RSS_TYPE_L4_IPV4_UDP;
++			break;
++		case VIRTIO_NET_HASH_REPORT_TCPv6:
++			*rss_type = XDP_RSS_TYPE_L4_IPV6_TCP;
++			break;
++		case VIRTIO_NET_HASH_REPORT_UDPv6:
++			*rss_type = XDP_RSS_TYPE_L4_IPV6_UDP;
++			break;
++		case VIRTIO_NET_HASH_REPORT_TCPv6_EX:
++			*rss_type = XDP_RSS_TYPE_L4_IPV6_TCP_EX;
++			break;
++		case VIRTIO_NET_HASH_REPORT_UDPv6_EX:
++			*rss_type = XDP_RSS_TYPE_L4_IPV6_UDP_EX;
++			break;
++		case VIRTIO_NET_HASH_REPORT_IPv4:
++			*rss_type = XDP_RSS_TYPE_L3_IPV4;
++			break;
++		case VIRTIO_NET_HASH_REPORT_IPv6:
++			*rss_type = XDP_RSS_TYPE_L3_IPV6;
++			break;
++		case VIRTIO_NET_HASH_REPORT_IPv6_EX:
++			*rss_type = XDP_RSS_TYPE_L3_IPV6_EX;
++			break;
++		case VIRTIO_NET_HASH_REPORT_NONE:
++		default:
++			*rss_type = XDP_RSS_TYPE_NONE;
++	}
++
++	*hash = __le32_to_cpu(hdr_hash->hash_value);
++	return 0;
++}
++
++static const struct xdp_metadata_ops virtnet_xdp_metadata_ops = {
++	.xmo_rx_hash			= virtnet_xdp_rx_hash,
++};
++
+ static int virtnet_probe(struct virtio_device *vdev)
+ {
+ 	int i, err = -ENOMEM;
+@@ -4747,6 +4801,7 @@ static int virtnet_probe(struct virtio_device *vdev)
+ 				  VIRTIO_NET_RSS_HASH_TYPE_UDP_EX);
+ 
+ 		dev->hw_features |= NETIF_F_RXHASH;
++		dev->xdp_metadata_ops = &virtnet_xdp_metadata_ops;
+ 	}
+ 
+ 	if (vi->has_rss_hash_report)
+-- 
+2.40.1
 
 
