@@ -1,85 +1,95 @@
-Return-Path: <netdev+bounces-87137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47F108A1DB0
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:16:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B73668A1DDD
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:20:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA4541C24389
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 18:16:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E77A01C24BFE
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 18:20:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F84F29417;
-	Thu, 11 Apr 2024 17:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8DA69945;
+	Thu, 11 Apr 2024 17:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aBPzxW8R"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S7+fhPxI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91D5EAF0;
-	Thu, 11 Apr 2024 17:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB22459160;
+	Thu, 11 Apr 2024 17:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712856324; cv=none; b=Iy1uBA1TDPNmX6PiV4dPCYXRv/JMzq15p4Rcpe6hBKMcihfeujf2MiRsrBzqWhWe0RQ5d93JNgpLu7pxqGLSwquQI8WEbfpEMXGfygfYtK1LpiJKeW1em4KAj2JmMTxNX3ITsDXLpOFXD0Zr9oQJKnATOLKttjFWHQQy/qGqpTg=
+	t=1712856629; cv=none; b=oybJ6zz8UbhZPVuWwsOxRQEKcxBq6VN4pgFF8j2zQ74vsPnkqzWV0ZjkxhP1XwTvBO8jHRT9jTn9Fo5hNk94SOTHxzep6Fu0+E7514fDbstBr318QhLPx9JHun/4ZYuvdaAgXSVxYr2VwJcNNrEu2YY4PbxP8yvJmMo4De6SsNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712856324; c=relaxed/simple;
-	bh=Vu4l4gq+Uj6NZrcR0MxuZif/Yjg5fqlGOgpolYqt8wY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kI9uREYBzJ5CbGJ5jWEFW/DVqa1EW/93z8T81pNWquBjJ9SODzIb2oDjGIqLDtmPut6dpc3XPgq5swDL2+M0mAQ7J6ABn5+dTPOnCKKq6U7phDm2wfygOsYGkc7XiDAc/7nZ3QHDYn52LIJ6gLdyeGhmFYGLWVzilXozOva37AE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aBPzxW8R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB383C113CE;
-	Thu, 11 Apr 2024 17:25:22 +0000 (UTC)
+	s=arc-20240116; t=1712856629; c=relaxed/simple;
+	bh=vUH25OsPFa4RcBBeVz7wpTctxBONPQTL7NjwQVVnSok=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ZRoYESYMBD681EWJoZKGxPCWk1w0QUshttAxbUtf8jivBm9MJx+blKSr4WVb+NcXak53T58cgAVIT483+2tvVbbKrerBOKBtIAbXVH/q0qxbVkdVhasiN65Vc9/8tZe1UHeQJwZqcLTm/qoEPXTk1NwErOnazQDbPzo5aRS42wU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S7+fhPxI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3610AC113CD;
+	Thu, 11 Apr 2024 17:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712856323;
-	bh=Vu4l4gq+Uj6NZrcR0MxuZif/Yjg5fqlGOgpolYqt8wY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aBPzxW8RYwskZAyNvRjR2NfC/vapRFujbvL/Cm8aOcVWhTUwSB7uu8kjSP7ZhnHtm
-	 UqGyu7BcN8mMcHFsPAbJ67zUYLXu0+xAR3MA8S+Jbi86lkoX7LwexMt5q8Wu7wt3uZ
-	 FXCtN4F6SzTNQgHeOi+nuoxA2GaZynN84sF8s0i+s/6y5yYaUXUcTKduKbJzHEtTHS
-	 LfKug8TiSP88f27MQsd/WP9nm8gT44CiQZzUr4xgmUQq1DVpbFTrR0tgvS+K/dtCuv
-	 nskd+48KmCMt9FO3kGglnUtkhp6ckK/4GdGI4ZbQ3m+91i96YnP8R1D4EtdSRknW3C
-	 afQeEtC28xLMA==
-Date: Thu, 11 Apr 2024 10:25:22 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
- <jiri@resnulli.us>, Jacob Keller <jacob.e.keller@intel.com>, Pablo Neira
- Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v2 3/3] tools/net/ynl: Add multi message
- support to ynl
-Message-ID: <20240411102522.4eceedb9@kernel.org>
-In-Reply-To: <20240410221108.37414-4-donald.hunter@gmail.com>
-References: <20240410221108.37414-1-donald.hunter@gmail.com>
-	<20240410221108.37414-4-donald.hunter@gmail.com>
+	s=k20201202; t=1712856629;
+	bh=vUH25OsPFa4RcBBeVz7wpTctxBONPQTL7NjwQVVnSok=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=S7+fhPxIcy/4bgIhutbfJAdv2uH+nG0YuAJ4cbhJE+9zmSQBN4S7CXL96Ey1cqxU9
+	 6GABvx0BvzB4nO3yy/T/b6D8rQvqDgD/PfLGbQl3gpTMsK7RCENnDeZ7CFfZKucceJ
+	 4iLIUnOi/J2C5kLoCAuPKCX4U77qcwWLtp91zP37ox/B4q+adLzcLdniNGuhWisXR3
+	 DELm+S40U+5OdUTDChm6JLs35XzGJAjjDPdnZql7CMRYIeyRCTVL5mgmPMFmM2AL5j
+	 IH3X1ISXrEtjqYkrmB+/5HWqXbtuBEV1hksqZYTyulP/4Ov58B/LJBqFTbSRT/RmyD
+	 0y2K2aHcjPAug==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 20662C433F2;
+	Thu, 11 Apr 2024 17:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/2] mptcp: add last time fields in mptcp_info
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171285662912.10890.774534823632472407.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Apr 2024 17:30:29 +0000
+References: <20240410-upstream-net-next-20240405-mptcp-last-time-info-v2-0-f95bd6b33e51@kernel.org>
+In-Reply-To: <20240410-upstream-net-next-20240405-mptcp-last-time-info-v2-0-f95bd6b33e51@kernel.org>
+To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ shuah@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, tanggeliang@kylinos.cn
 
-On Wed, 10 Apr 2024 23:11:08 +0100 Donald Hunter wrote:
-> -    def do(self, method, vals, flags=None):
-> +    def _op(self, method, vals, flags):
-> +        ops = [(method, vals, flags)]
-> +        return self._ops(ops)[0]
-> +
-> +    def do(self, method, vals, flags=[]):
->          return self._op(method, vals, flags)
+Hello:
 
-Commenting here instead of on my own series but there are already tests
-using dump=True in net-next:
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-tools/testing/selftests/drivers/net/stats.py:    stats = netfam.qstats_get({}, dump=True)
-tools/testing/selftests/net/nl_netdev.py:        devs = nf.dev_get({}, dump=True)
+On Wed, 10 Apr 2024 11:48:23 +0200 you wrote:
+> These patches from Geliang add support for the "last time" field in
+> MPTCP Info, and verify that the counters look valid.
+> 
+> Patch 1 adds these counters: last_data_sent, last_data_recv and
+> last_ack_recv. They are available in the MPTCP Info, so exposed via
+> getsockopt(MPTCP_INFO) and the Netlink Diag interface.
+> 
+> [...]
 
-"flags=[Netlink.NLM_F_DUMP]" is going to be a lot less convenient 
-to write :( Maybe we can keep support for both?
+Here is the summary with links:
+  - [net-next,v2,1/2] mptcp: add last time fields in mptcp_info
+    https://git.kernel.org/netdev/net-next/c/18d82cde7432
+  - [net-next,v2,2/2] selftests: mptcp: test last time mptcp_info
+    https://git.kernel.org/netdev/net-next/c/22724c89892f
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
