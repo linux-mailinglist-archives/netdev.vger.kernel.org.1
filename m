@@ -1,127 +1,86 @@
-Return-Path: <netdev+bounces-87063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15CD38A17A2
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 16:42:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9605B8A17B1
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 16:44:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3A802832FD
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:42:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DA21B26248
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:41:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D432017BCA;
-	Thu, 11 Apr 2024 14:40:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD6DE13AEE;
+	Thu, 11 Apr 2024 14:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="PudlQIRv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BOnEcr4i"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3601C2C18D;
-	Thu, 11 Apr 2024 14:40:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B4413FE7;
+	Thu, 11 Apr 2024 14:40:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712846421; cv=none; b=oDgRyveTFXhxfAURexHPX6nU3le1qeUBlxcLaGt87JMIueTCs8PKPJu+e3hQr/x+G3uz6eCVxM2YIdvDJ4bFF382cCxHc4Z5VALLIg4J8obounPfA+Z39kW+vUVV4RKFGqP2qD/4vFRck4fIo8ZK/gJb1H2SUPAlkydBzl1JZAk=
+	t=1712846410; cv=none; b=fsGBAuRXYL9rg2KNCSm5skYlGtBN1nKF9GzITAvKtXjE8dkZvwse/DklpCVqmpS4o1b04/sgC4xDaJOOZOaNm4Lk/GxdhFFHQTdg2aMZOGZm/PnVioYUaqe1AcwY4UV2GU8wOOHb6PD4DKdliQCZqyRcAXnxiQpByvINaTa+gM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712846421; c=relaxed/simple;
-	bh=Go1h6GbxB+by0U4JdQ0bJayFPJ6ZBOT6IRmjL6xR1X4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=n4omKPIUU8mwkq8dUpQwnkCp1jmKDc9zx++wGivJdYHSZ6AzhCXzVirIpkv0HVbasKGJXxHzFP2tEqV4yYLXcHN22nrYtzlBSQz0SsWejcQWnVN5ojuz2pp7GuFelw/fX6k/R2IAfQqWvnlrp/jP4CF4PfrvrCdbYEyOd+uYBRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=PudlQIRv; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0369458.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43BBtfmB009772;
-	Thu, 11 Apr 2024 16:40:02 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	selector1; bh=leLPZiLCktPIospyQ9FP6+cf6VRekIBzP4HKYwDuK9M=; b=Pu
-	dlQIRvk31aoz1QOjb3sWqYlLINa5UTgJirJht7kHEYE+lsRuSGp5Lvnc9my0UIRj
-	FDPkAlmgCOJE/F8DAaMcE9NIxJGJgDxbKVlXCaoRb1c7gi2fcv8TvIHOl0eq9mg4
-	LbNpKgGehgRkgHo0Axd3NVonPmRQ5RvHbzqNUxtyuve+fadEVg62X1z22uOYI2Wm
-	Ene5waDN1lD2GCarShdIc6dvsLi/NDBB7/gCBoHq2i5/C+qlU4b9mOixFkbIt7GU
-	LP62BvKUfrrfdBLarn+Fr8TmH0AbdJPLV4NuqhS1nqhYGQGz49QChv3ITbygg/0M
-	DTDSLtSYuDfabUGRPQMw==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3xbfy13r2b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Apr 2024 16:40:02 +0200 (MEST)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id 00DC940044;
-	Thu, 11 Apr 2024 16:39:58 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 6D6DD21BF42;
-	Thu, 11 Apr 2024 16:39:50 +0200 (CEST)
-Received: from localhost (10.48.86.106) by SHFDAG1NODE2.st.com (10.75.129.70)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 11 Apr
- 2024 16:39:50 +0200
-From: Christophe Roullier <christophe.roullier@foss.st.com>
-To: "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
-        Mark
- Brown <broonie@kernel.org>,
-        Christophe Roullier
-	<christophe.roullier@foss.st.com>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH 11/11] ARM: multi_v7_defconfig: Add MCP23S08 pinctrl support
-Date: Thu, 11 Apr 2024 16:36:58 +0200
-Message-ID: <20240411143658.1049706-12-christophe.roullier@foss.st.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240411143658.1049706-1-christophe.roullier@foss.st.com>
-References: <20240411143658.1049706-1-christophe.roullier@foss.st.com>
+	s=arc-20240116; t=1712846410; c=relaxed/simple;
+	bh=v7xu8aHGMOmzRWDzQT1VMpjnmvWW56s5ws8lgB6X6WE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=b5wtLVMHsVymroJW0mpQ0FkCInBoN36WBuwctgQqgKppSATyDl6f6ei5bSGJLK7yU986jEJNRoO3yo4XHJqIxq8nvg9XZS96KDyhqQR7r4Nyk/5eB6HxOTY0RXcYZdQIJIFr6xxFXh4Si53Hti+3SkGj7SJM6AtBCKnkN8jA/dI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BOnEcr4i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15BE6C113CD;
+	Thu, 11 Apr 2024 14:40:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712846409;
+	bh=v7xu8aHGMOmzRWDzQT1VMpjnmvWW56s5ws8lgB6X6WE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BOnEcr4iT+QDMBY0YeWzqFDyryz6nD2Z1ucfJpB2TjsEROXQPYOXb388WYt+UCB0m
+	 798x9sdpFXwX9/ve1lF/arewiTUFI9uv1o3gw0CBxYRKcQxqIEH1KtytlSRAfF4kFJ
+	 OA7uyt9Y3vmqSfKz1TZ7PltzJdRiy+T0pAGKcTVa/Hj10bhQA5lzOSecH881a1oUkh
+	 tf7e2Nd3GjBMsAD++i8poGtmjA4eFfNXMUFZzoDaWZiR2eIHqti9iVxdHKnmITQu6O
+	 wHA+ext4FodQQelluMAns0wYpaX5wldxV7jcCBxPES6QZi43IIdXaERylFo6FVBayq
+	 vcyDKPpVld0ZQ==
+Date: Thu, 11 Apr 2024 07:40:07 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Edward Cree <ecree.xilinx@gmail.com>, Erick Archer
+ <erick.archer@outlook.com>, Long Li <longli@microsoft.com>, Ajay Sharma
+ <sharmaajay@microsoft.com>, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang
+ Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Kees Cook
+ <keescook@chromium.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
+ <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
+ <justinstitt@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, Shradha Gupta
+ <shradhagupta@linux.microsoft.com>, Konstantin Taranov
+ <kotaranov@microsoft.com>, linux-rdma@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ llvm@lists.linux.dev
+Subject: Re: [PATCH v3 0/3] RDMA/mana_ib: Add flex array to struct
+ mana_cfg_rx_steer_req_v2
+Message-ID: <20240411074007.3f4d2b2f@kernel.org>
+In-Reply-To: <20240411105839.GN4195@unreal>
+References: <AS8PR02MB72374BD1B23728F2E3C3B1A18B022@AS8PR02MB7237.eurprd02.prod.outlook.com>
+	<20240408110730.GE8764@unreal>
+	<20240408183657.7fb6cc35@kernel.org>
+	<ca8a0df8-b178-31ff-026f-b2d298f3aa84@gmail.com>
+	<20240409144419.6dc12ebb@kernel.org>
+	<20240411105839.GN4195@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-11_08,2024-04-09_01,2023-05-22_02
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Need to enable MCP23S08 I/O expanders to manage Ethernet phy
-reset in STM32MP135F-DK board
-STMMAC driver defer is not silent, need to put this config in
-built-in to avoid huge of Ethernet messages
+On Thu, 11 Apr 2024 13:58:39 +0300 Leon Romanovsky wrote:
+> I prepared mana-ib-flex branch https://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma.git/log/?h=mana-ib-flex
+> and merge ti to our wip branch https://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma.git/commit/?h=wip/leon-for-next&id=e537deecda03e0911e9406095ccd48bd42f328c7
 
-Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
----
- arch/arm/configs/multi_v7_defconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/arm/configs/multi_v7_defconfig b/arch/arm/configs/multi_v7_defconfig
-index b2955dcb5a53b..0abbe00372dff 100644
---- a/arch/arm/configs/multi_v7_defconfig
-+++ b/arch/arm/configs/multi_v7_defconfig
-@@ -469,6 +469,7 @@ CONFIG_SPI_XILINX=y
- CONFIG_SPI_SPIDEV=y
- CONFIG_SPMI=y
- CONFIG_PINCTRL_AS3722=y
-+CONFIG_PINCTRL_MCP23S08=y
- CONFIG_PINCTRL_MICROCHIP_SGPIO=y
- CONFIG_PINCTRL_OCELOT=y
- CONFIG_PINCTRL_PALMAS=y
--- 
-2.25.1
-
+Thanks!
 
