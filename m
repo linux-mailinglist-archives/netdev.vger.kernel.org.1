@@ -1,222 +1,87 @@
-Return-Path: <netdev+bounces-87050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 067238A16E4
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 16:14:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69DC38A1712
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 16:23:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B37B5285082
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:14:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89310B2AEE7
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:21:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2051F14F12D;
-	Thu, 11 Apr 2024 14:14:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E584214D43D;
+	Thu, 11 Apr 2024 14:21:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PDjsckt+"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rnDBtNWs"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E66914EC60
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 14:13:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A502D14D708;
+	Thu, 11 Apr 2024 14:21:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712844840; cv=none; b=gOI0xqWPnjKHPez6e5CG8ohzTh6TLeksQrQK9MgfK1VKtzkGd5uVnKcm3HwejkOdbV7HhggO4JKdD9Cq543u8JlePl2jAYry5b1yRfoSYzajMwOf9FBKLEWZIN6PhEi41w4qKW8CkQgxJWWBJe4SBjZz/lVms1ydxbkdawHnn1E=
+	t=1712845268; cv=none; b=NAC4bG8Q9evXEDf/663xTABHGq8dwPjVBbNtDFgiwGKpgfyDJZUeSqu/h8QpqvTBTg3ZAe24YbDbz4/GjFaCN6iHOGPvAdL7fw4WhiC3x1SDKLbK5N7peaDMPAm6lhNoyJEeBMFWqyR/3x4HhPXt2jKwwFyAM/0NaDXzgx88uHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712844840; c=relaxed/simple;
-	bh=ZKjoPK47HPZ88qNjU4k8VQeBRqBflU0Xkr4d5E1KjnA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dDgHRrb2eXQly/ndw01A6ImrLEKNk47+UDpfdGEVqEJGVNe6pVrxqzvqG2NyDoIVskGhX4XpN99DdC0zp/qAb/nXXae1AF1jmVmsjuKpnBpzCqwWWc5v5D+/phcOFjkPLu1U/j3IdP3ZKmh4M+cqzRZwRIZiSGx6UeiEk+GBIEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PDjsckt+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712844837;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=DOvPYxaUmnQKPfRePtldMfMMAqFsGZP0acaQbC8GKVo=;
-	b=PDjsckt+NseP4JEs/8gtButpRCsNUhDPqanlWOspXLXaYHmHS4zGAqIdqs5QMbg6EROPaG
-	3TmYwxBGK9YkFb7WpqRgjIL726MZbvQX++njhDVY1YVBqch/n+P8Q8kBrz2pRZKDRDYTyr
-	vJ21YSmq4luHedKfeYzLPyv2me/tq+Q=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-590-htQfkpbZPjeQSbBdoDXfqg-1; Thu,
- 11 Apr 2024 10:13:53 -0400
-X-MC-Unique: htQfkpbZPjeQSbBdoDXfqg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1F50928B6AA1;
-	Thu, 11 Apr 2024 14:13:53 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.22.16.207])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E0F51492BC7;
-	Thu, 11 Apr 2024 14:13:50 +0000 (UTC)
-From: Wander Lairson Costa <wander@redhat.com>
-To: Neil Horman <nhorman@tuxdriver.com>,
+	s=arc-20240116; t=1712845268; c=relaxed/simple;
+	bh=l7j7GLxWdevX8j9nxH2gEq+1VH4ij6kA0ZV6FEUWLa8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sZBnf37170TR/ypWHHJen/ERAza/WP+9SIO8tKGjMAp/YuIvPpglwUDYBbdPTXSVdT2mzcjW/n4hJtJlGeN178OXEoO7DDryIcFafTFtr31l6bZCv9vaYMx8ya+LuAET9Da85F5757/ZRj1kk3dPfaaXmGet8rdTA+O7CCT+jZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rnDBtNWs; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Q/oJU7Vy/d+vtAVhKgDsRx9ErkPhiN/5itGbIlcfFwo=; b=rnDBtNWsysuvAwGzBDHwwnBkXg
+	n5T7i19Z9E2zXsQ1lOP2+QwHBzLlA2kBNCCPHXPjxcGby5m53CvpLxeJTDMiVY38gdYoRumxPnNl8
+	NbzHpZj26dxhQwA+VSLyPMvPXJhsqzLW6AZ+Nc4ohMmGpr9Kv3XJfxBIB4t1QWIcj3k0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ruvIJ-00CmSb-42; Thu, 11 Apr 2024 16:20:51 +0200
+Date: Thu, 11 Apr 2024 16:20:51 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org (open list:NETWORK DROP MONITOR),
-	linux-kernel@vger.kernel.org (open list)
-Cc: Wander Lairson Costa <wander@redhat.com>,
-	Hu Chunyu <chuhu@redhat.com>
-Subject: [PATCH] drop_monitor: replace spin_lock by raw_spin_lock
-Date: Thu, 11 Apr 2024 11:13:46 -0300
-Message-ID: <20240411141347.15224-1-wander@redhat.com>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	David Ahern <dsahern@kernel.org>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 7/7] netdev_features: convert
+ NETIF_F_FCOE_MTU to IFF_FCOE_MTU
+Message-ID: <a9a45958-fac1-4523-96f7-19cf0b375395@lunn.ch>
+References: <20240405133731.1010128-1-aleksander.lobakin@intel.com>
+ <20240405133731.1010128-8-aleksander.lobakin@intel.com>
+ <20240408193806.18e227c8@kernel.org>
+ <1f14cb75-ee6b-4a7d-9041-23a8cfcd8476@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1f14cb75-ee6b-4a7d-9041-23a8cfcd8476@intel.com>
 
-trace_drop_common() is called with preemption disabled, and it acquires
-a spin_lock. This is problematic for RT kernels because spin_locks are
-sleeping locks in this configuration, which causes the following splat:
+> >> @@ -47,7 +47,6 @@ const char netdev_features_strings[NETDEV_FEATURE_COUNT][ETH_GSTRING_LEN] = {
+> >>  
+> >>  	[NETIF_F_FCOE_CRC_BIT] =         "tx-checksum-fcoe-crc",
+> >>  	[NETIF_F_SCTP_CRC_BIT] =        "tx-checksum-sctp",
+> >> -	[NETIF_F_FCOE_MTU_BIT] =         "fcoe-mtu",
+> > 
+> > 
+> > But this definitely _is_ a uAPI change, right?
+> 
+> Why?
 
-BUG: sleeping function called from invalid context at kernel/locking/spinlock_rt.c:48
-in_atomic(): 1, irqs_disabled(): 1, non_block: 0, pid: 449, name: rcuc/47
-preempt_count: 1, expected: 0
-RCU nest depth: 2, expected: 2
-5 locks held by rcuc/47/449:
- #0: ff1100086ec30a60 ((softirq_ctrl.lock)){+.+.}-{2:2}, at: __local_bh_disable_ip+0x105/0x210
- #1: ffffffffb394a280 (rcu_read_lock){....}-{1:2}, at: rt_spin_lock+0xbf/0x130
- #2: ffffffffb394a280 (rcu_read_lock){....}-{1:2}, at: __local_bh_disable_ip+0x11c/0x210
- #3: ffffffffb394a160 (rcu_callback){....}-{0:0}, at: rcu_do_batch+0x360/0xc70
- #4: ff1100086ee07520 (&data->lock){+.+.}-{2:2}, at: trace_drop_common.constprop.0+0xb5/0x290
-irq event stamp: 139909
-hardirqs last  enabled at (139908): [<ffffffffb1df2b33>] _raw_spin_unlock_irqrestore+0x63/0x80
-hardirqs last disabled at (139909): [<ffffffffb19bd03d>] trace_drop_common.constprop.0+0x26d/0x290
-softirqs last  enabled at (139892): [<ffffffffb07a1083>] __local_bh_enable_ip+0x103/0x170
-softirqs last disabled at (139898): [<ffffffffb0909b33>] rcu_cpu_kthread+0x93/0x1f0
-Preemption disabled at:
-[<ffffffffb1de786b>] rt_mutex_slowunlock+0xab/0x2e0
-CPU: 47 PID: 449 Comm: rcuc/47 Not tainted 6.9.0-rc2-rt1+ #7
-Hardware name: Dell Inc. PowerEdge R650/0Y2G81, BIOS 1.6.5 04/15/2022
-Call Trace:
- <TASK>
- dump_stack_lvl+0x8c/0xd0
- dump_stack+0x14/0x20
- __might_resched+0x21e/0x2f0
- rt_spin_lock+0x5e/0x130
- ? trace_drop_common.constprop.0+0xb5/0x290
- ? skb_queue_purge_reason.part.0+0x1bf/0x230
- trace_drop_common.constprop.0+0xb5/0x290
- ? preempt_count_sub+0x1c/0xd0
- ? _raw_spin_unlock_irqrestore+0x4a/0x80
- ? __pfx_trace_drop_common.constprop.0+0x10/0x10
- ? rt_mutex_slowunlock+0x26a/0x2e0
- ? skb_queue_purge_reason.part.0+0x1bf/0x230
- ? __pfx_rt_mutex_slowunlock+0x10/0x10
- ? skb_queue_purge_reason.part.0+0x1bf/0x230
- trace_kfree_skb_hit+0x15/0x20
- trace_kfree_skb+0xe9/0x150
- kfree_skb_reason+0x7b/0x110
- skb_queue_purge_reason.part.0+0x1bf/0x230
- ? __pfx_skb_queue_purge_reason.part.0+0x10/0x10
- ? mark_lock.part.0+0x8a/0x520
-...
+That it is not obvious why this is not a uAPI change makes it clear
+this needs explaining in the commit message.
 
-trace_drop_common() also disables interrupts, but this is a minor issue
-because we could easily replace it with a local_lock.
-
-Replace the spin_lock with raw_spin_lock to avoid sleeping in atomic
-context.
-
-Signed-off-by: Wander Lairson Costa <wander@redhat.com>
-Reported-by: Hu Chunyu <chuhu@redhat.com>
----
- net/core/drop_monitor.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
-
-diff --git a/net/core/drop_monitor.c b/net/core/drop_monitor.c
-index b0f221d658be..430ed18f8584 100644
---- a/net/core/drop_monitor.c
-+++ b/net/core/drop_monitor.c
-@@ -74,7 +74,7 @@ struct net_dm_hw_entries {
- };
- 
- struct per_cpu_dm_data {
--	spinlock_t		lock;	/* Protects 'skb', 'hw_entries' and
-+	raw_spinlock_t		lock;	/* Protects 'skb', 'hw_entries' and
- 					 * 'send_timer'
- 					 */
- 	union {
-@@ -168,9 +168,9 @@ static struct sk_buff *reset_per_cpu_data(struct per_cpu_dm_data *data)
- err:
- 	mod_timer(&data->send_timer, jiffies + HZ / 10);
- out:
--	spin_lock_irqsave(&data->lock, flags);
-+	raw_spin_lock_irqsave(&data->lock, flags);
- 	swap(data->skb, skb);
--	spin_unlock_irqrestore(&data->lock, flags);
-+	raw_spin_unlock_irqrestore(&data->lock, flags);
- 
- 	if (skb) {
- 		struct nlmsghdr *nlh = (struct nlmsghdr *)skb->data;
-@@ -225,7 +225,7 @@ static void trace_drop_common(struct sk_buff *skb, void *location)
- 
- 	local_irq_save(flags);
- 	data = this_cpu_ptr(&dm_cpu_data);
--	spin_lock(&data->lock);
-+	raw_spin_lock(&data->lock);
- 	dskb = data->skb;
- 
- 	if (!dskb)
-@@ -259,7 +259,7 @@ static void trace_drop_common(struct sk_buff *skb, void *location)
- 	}
- 
- out:
--	spin_unlock_irqrestore(&data->lock, flags);
-+	raw_spin_unlock_irqrestore(&data->lock, flags);
- }
- 
- static void trace_kfree_skb_hit(void *ignore, struct sk_buff *skb,
-@@ -314,9 +314,9 @@ net_dm_hw_reset_per_cpu_data(struct per_cpu_dm_data *hw_data)
- 		mod_timer(&hw_data->send_timer, jiffies + HZ / 10);
- 	}
- 
--	spin_lock_irqsave(&hw_data->lock, flags);
-+	raw_spin_lock_irqsave(&hw_data->lock, flags);
- 	swap(hw_data->hw_entries, hw_entries);
--	spin_unlock_irqrestore(&hw_data->lock, flags);
-+	raw_spin_unlock_irqrestore(&hw_data->lock, flags);
- 
- 	return hw_entries;
- }
-@@ -448,7 +448,7 @@ net_dm_hw_trap_summary_probe(void *ignore, const struct devlink *devlink,
- 		return;
- 
- 	hw_data = this_cpu_ptr(&dm_hw_cpu_data);
--	spin_lock_irqsave(&hw_data->lock, flags);
-+	raw_spin_lock_irqsave(&hw_data->lock, flags);
- 	hw_entries = hw_data->hw_entries;
- 
- 	if (!hw_entries)
-@@ -477,7 +477,7 @@ net_dm_hw_trap_summary_probe(void *ignore, const struct devlink *devlink,
- 	}
- 
- out:
--	spin_unlock_irqrestore(&hw_data->lock, flags);
-+	raw_spin_unlock_irqrestore(&hw_data->lock, flags);
- }
- 
- static const struct net_dm_alert_ops net_dm_alert_summary_ops = {
-@@ -1673,7 +1673,7 @@ static struct notifier_block dropmon_net_notifier = {
- 
- static void __net_dm_cpu_data_init(struct per_cpu_dm_data *data)
- {
--	spin_lock_init(&data->lock);
-+	raw_spin_lock_init(&data->lock);
- 	skb_queue_head_init(&data->drop_queue);
- 	u64_stats_init(&data->stats.syncp);
- }
--- 
-2.44.0
-
+     Andrew
 
