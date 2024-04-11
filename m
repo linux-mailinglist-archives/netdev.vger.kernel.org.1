@@ -1,300 +1,218 @@
-Return-Path: <netdev+bounces-87022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB1538A1490
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:26:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A51F8A14E5
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:46:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17D9AB2254D
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:26:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6C7C28778C
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:45:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D23B214F9E6;
-	Thu, 11 Apr 2024 12:24:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 080F93D556;
+	Thu, 11 Apr 2024 12:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="g7tOCxun"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8556D14C58E;
-	Thu, 11 Apr 2024 12:24:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712838294; cv=none; b=Oah5AM9iBkOJkUjieSLbtuA40KTCoeiRUBxdrt+EG/y0Hb1Y9ix2bNllurLR5Sxs8uTQcdsI+aQ1+/fW5yDfQTBg7e53BFSSgxVUUCINXvs2qq1TkVigS6f91OI7xlMNTWDc5/xecmncxANXR3u6MtqfmdU2e1t+3KHC4OeqmPQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712838294; c=relaxed/simple;
-	bh=7wRPyiijTTGAood9GVZT6zaerpy6Jchgb4iGjZRVSao=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=oGiN2UT8SKh3qaTgqmGKfj4Yw5n9Hs1wS3hzo2IpJAhlTKFw4yOqXMvML7OGIZTjy68h/s2ufoRsKfvhe7TusQ/MTIKPfhEpyR2i8IX9lVt4zOvcGnBEPi4N1zUuhBdBKk9sgIdMgJO0bLUDm7eWt5NxirJf/geGch+TPv21Mbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4VFf5h1h4Cz4f3kjW;
-	Thu, 11 Apr 2024 20:24:40 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 1BE6D1A0568;
-	Thu, 11 Apr 2024 20:24:47 +0800 (CST)
-Received: from k01.huawei.com (unknown [10.67.174.197])
-	by APP4 (Coremail) with SMTP id gCh0CgA3h2mJ1hdmZ5R_Jw--.23051S13;
-	Thu, 11 Apr 2024 20:24:46 +0800 (CST)
-From: Xu Kuohai <xukuohai@huaweicloud.com>
-To: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kselftest@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Matt Bobrowski <mattbobrowski@google.com>,
-	Brendan Jackman <jackmanb@chromium.org>,
-	Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E . Hallyn" <serge@hallyn.com>,
-	Khadija Kamran <kamrankhadijadj@gmail.com>,
-	Casey Schaufler <casey@schaufler-ca.com>,
-	Ondrej Mosnacek <omosnace@redhat.com>,
-	Kees Cook <keescook@chromium.org>,
-	John Johansen <john.johansen@canonical.com>,
-	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
-	Roberto Sassu <roberto.sassu@huawei.com>,
-	Shung-Hsi Yu <shung-hsi.yu@suse.com>
-Subject: [PATCH bpf-next v3 11/11] selftests/bpf: Add verifier tests for bpf lsm
-Date: Thu, 11 Apr 2024 20:27:52 +0800
-Message-Id: <20240411122752.2873562-12-xukuohai@huaweicloud.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240411122752.2873562-1-xukuohai@huaweicloud.com>
-References: <20240411122752.2873562-1-xukuohai@huaweicloud.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 356371EF1E;
+	Thu, 11 Apr 2024 12:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.148.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712839553; cv=fail; b=eM3/tMyjomwSLsuG1FEJcpSI7N1sx+e9KntMs7JvxADLBPMADxpUkQZHK46xRhjob0Y1xkWUjcszIql7FDZt/WeRtLANqpWDh421wq8ocJJSYPY5nwjXo/HLx8bxyp4TrW0IMsieb72XvA+t5Zn1xTY4kgWPY294lHTDQyyWpGQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712839553; c=relaxed/simple;
+	bh=ZBsbXmEMVyI4778S6FfQnpji3+hp90u8b8Ai8QRw3To=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=CBovBmBx1XqrgAjhW2+UXo17e3fpB9RaqphHfsmQCiFuxsMYymf91mgQx+qj8fdFb1ecI+yIO85ySHnUtuHg36IgGEE6JVGhH6UlCjow4/+0MGGJ3EgadpPnyWLLmGvoMJ3SsBg2JDF+mIPU7rliF4yW1VhYFmZHbzRD1alD5HQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=g7tOCxun; arc=fail smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43B5uXDF031981;
+	Thu, 11 Apr 2024 05:45:38 -0700
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2040.outbound.protection.outlook.com [104.47.66.40])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3xea5f3pq9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Apr 2024 05:45:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bzphuzgiTqbl3QTQcq3rMG3yUqNzeBj2WM1Bsb0NbPYRpJwkBb3lMnzmyDY9HXYaTpINSfeVuF0FyWt1tIh9WcqX03T8+I9cBxWXyQADkVHPoUlmlXBmjKNCUY+3q+wKD/9mvoCyBMvdkFLPAtc9kKfYMgQENodyuAeX35U687AFhpse3tTm1F9qJHCgVGe+bEQF1ol0T9LUCL5ZP+3O3zw/Wk6wDzKEFSVHsjihHXNf3C3ct1geihTJduyj5mwMLPYhLKeAfCt2OSlNuEgBgM5Nb0VPjfbHcBxvNSE2A3noGyQnKlHcJI1D8kU3LtfaDr7TNviELb2zuMfdWDvUqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZBsbXmEMVyI4778S6FfQnpji3+hp90u8b8Ai8QRw3To=;
+ b=ZGRn4cn6GqbL7NbQnHvveIXaFTSpbh0eCbMNReVMT7frHw8xqsVq/qEakIVwfmSY7rrsP20x1tpxah+7PPhEUR5T7TkOROg8Q9ERaLAg7FGCuJHcrP9VSSNEOpEKCIOeTElP2z/+lvX0em4Lal6b3BwcfQkMMgeVUNnoDsyxjVrg7w9SYgqLIJR+/5KvSbG4JulD20fw53jaYH/SAJRwhHi/5ab9fYJ2eunZZ1xoBa7ino9J9I4BXKdDi6kQhKu8ckiEqdpTubAkrEI6Z6mwwSjG8fVnoamNHbAN6GWxUcXw0mY0wlrzpWSI/WRh99joNmc8hCLhW+s0CNQB0tzrpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZBsbXmEMVyI4778S6FfQnpji3+hp90u8b8Ai8QRw3To=;
+ b=g7tOCxunDvqf7ekgKtYQgFF9v12tu0b+RXG868ziBSyQlvyT92zgTQ/FFBqmI+vlXHrgrMVojJ+jud0sMru9EmOjC2rqjov0B0RBidv/PfDLq4BPQj52wcnkVpKZPhNxCU04uZJAAU38j/6YkP1jvzGe00RtHuCJszCeDcYMTJI=
+Received: from CH0PR18MB4339.namprd18.prod.outlook.com (2603:10b6:610:d2::17)
+ by CO6PR18MB4417.namprd18.prod.outlook.com (2603:10b6:5:354::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.54; Thu, 11 Apr
+ 2024 12:45:34 +0000
+Received: from CH0PR18MB4339.namprd18.prod.outlook.com
+ ([fe80::61a0:b58d:907c:16af]) by CH0PR18MB4339.namprd18.prod.outlook.com
+ ([fe80::61a0:b58d:907c:16af%5]) with mapi id 15.20.7409.049; Thu, 11 Apr 2024
+ 12:45:33 +0000
+From: Geethasowjanya Akula <gakula@marvell.com>
+To: Paolo Abeni <pabeni@redhat.com>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        Sunil
+ Kovvuri Goutham <sgoutham@marvell.com>,
+        Subbaraya Sundeep Bhatta
+	<sbhatta@marvell.com>,
+        Hariprasad Kelam <hkelam@marvell.com>
+Subject: RE: [EXTERNAL] Re: [net-next PATCH] octeontx2-pf: Add support for
+ offload tc with skbedit mark action
+Thread-Topic: [EXTERNAL] Re: [net-next PATCH] octeontx2-pf: Add support for
+ offload tc with skbedit mark action
+Thread-Index: AQHaiYYdopsytK77a0qkTSyQTUeNQLFf2cyAgAMuvwA=
+Date: Thu, 11 Apr 2024 12:45:33 +0000
+Message-ID: 
+ <CH0PR18MB43390D633115E7843BB781AACD052@CH0PR18MB4339.namprd18.prod.outlook.com>
+References: <20240408072638.26674-1-gakula@marvell.com>
+ <d9fde608268413dda70bb6ef328b8d823d568f74.camel@redhat.com>
+In-Reply-To: <d9fde608268413dda70bb6ef328b8d823d568f74.camel@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CH0PR18MB4339:EE_|CO6PR18MB4417:EE_
+x-ms-office365-filtering-correlation-id: d0a84d97-e16d-4a9f-8b5a-08dc5a254778
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ FIV6/hG6hkuji1xmCdiukfcrzVpOw52C4CTBt9W5NkCdPX51O3SoQ+wAMv23en+ClRlIjmc1zBAxPzBU5+gKgK1YUSyM3fd+i0a3uALT7yvV/w+X//5Wcji+8GpfZSclxjotvgg3CGL2Nni4j0f+kDbvC4r5ptAboakdE3oTOT4Op5vfLQFhKOswRUjrpI9yNU7LnPdNcJkoybXNwdKkf6M5x7Kq4vGfbEWzLSi+fixQiPcFIcUbTNTXNiTQnpVME3UHwisLvwjel+EZDDc63dGtlSzvSMLAOdBOHTYB9JfU9oZ4rOeV3cocbdnaD20ZzUzc2pI6swe7FqpHwH4V/4Kg5q8AAfUznqWtC9boE3v7PYdxAPUAkaHKqxu/B2zXNt/j5E+6N2gDaxHJho1Bap2RwZSde3Y88gfgv6ur/kS2kL6PbsRb2K3hHDRDBLdMH/qyQ7B25DsERfwgFHAih5HRyByVE+o/y/+FI+4im4ii71mnAAGJX3sd9XF040ZYGkWGwbW9GoaTZIhNvqI73a934w6CvuJ3Vpkr+s0R+l4AS7Jto3kqd1J96VDmonXBJ+waSyNlMXH+lENCenDkcuKTIPgHdrVMkR9kC3HL7WGyJgO/Aigcztm+YhCBXzF9ibCVlmw3mLlykamaU4SxdErjOr6tKzTTdiHWql+BUCMVGt2Ojq5O9geCgjKu7BBV16PwY1D0hsIn8EDuIiXLeahYGyDykAI7FDMhug2j0OY=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR18MB4339.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?utf-8?B?TGdrOFVROTAwNU5UOEk3MjQwc0FRSFZuekZnZXVObTIyNFZ5KzEvREx4cXRi?=
+ =?utf-8?B?MDVFZWtCcHRCbUt6MXBWZFZCU0NhbW1zMk9yRTBEdmdBb2hMY2hEbjhiZkdM?=
+ =?utf-8?B?Ti84ekxWV3hJQTNpMk5SNWZ4RGlSS0NMck5saHpyUmtVMTRYd0svUkFpWDFk?=
+ =?utf-8?B?Y2lITGRRSGJ4SVBNZUVEWlBzNFF1ZmJENnZ5eUp1Mi8zVDkrRUp2Z243NWFq?=
+ =?utf-8?B?MllCSUprK3pTazBTRmZ4RVgwSjhXZGxzSHZGL1ZCTFRJcXIzUWpvTHhjUUVo?=
+ =?utf-8?B?bVdqM1p5bVJraEc0WG45QURoOXZENlEvcDdkbDZxelJLSFdxSkJsMml6YkZG?=
+ =?utf-8?B?Zk4zeVhCWlcrd3BCUjZqZkU3eGpIMWUzNi8zVDdHMVVvbWZobWRUSmdaVVov?=
+ =?utf-8?B?MjNIK0VTSXhBUkYwc0FGZmMyZkRKVU1RSXVPbms4QzQxNzZBL1lpcXgreGN2?=
+ =?utf-8?B?MVcvNkkwTTJ2dFJ2TjIrUEdPWHJQa2pQYnpuYlp2QTRDQUdwcUFsQWRFUE5w?=
+ =?utf-8?B?NlNlTkEvSU13MDB2S3lxM1NDUlppWEtkY1ExKzM5UncxRDhTSlFTa1hjSlZq?=
+ =?utf-8?B?czY4SEhncElSYTlkMlU0MkZHUzZMU2tMeUdMT3hhWUVBaDVieGxtTnRlMU1z?=
+ =?utf-8?B?eTRGKzJHbDZ0Ti9pVVpIQmJ3bkFVU28wKzRScTZwODE5RVhRWVp4cjhBbGNh?=
+ =?utf-8?B?REVHY3hyTzM1S1doT1JjajZpWDdsTUZ4VzVOZ0Uxa054WXZMNGhsUUE1ci9G?=
+ =?utf-8?B?VE1tMWNRVXpWQmYrRmo3emtNdUp3djFBME45c3dqRGdscnhQUHBEaElPVGpz?=
+ =?utf-8?B?VVB0N0RlNWc5TmhNUlYzZTJOZVRPMFBjZTA4WnlheXB3TVFlVXZmSzY2OXAx?=
+ =?utf-8?B?RjliWlVvaHN1L0JUQjQ2VEFYbXhkL0Ewa0hXdkwycnYwT3ZmN0k2Y3RGbzQr?=
+ =?utf-8?B?akRUZ1BSZGJZTWdkcjl0VVZYVXBnRExXK2lKbXQ1dWszb2Fnemw2dVNLelI0?=
+ =?utf-8?B?WHVmeDlkaGdUTE56MFVDUUhxeVZQcFF1ak81MGFpWER1eXpYTWFJai80aGxJ?=
+ =?utf-8?B?Q3E2VXVrWUtQNWhTeHNEaWsvVlFOd1NlMUJEQjlmYVNsQmJaZHdmWDd1NEly?=
+ =?utf-8?B?ZnBINWZDcG5mSG5ySWR5aDNrRWhGWk1YMXJmY1puN1c3aVdPMTR6a2NaN2dP?=
+ =?utf-8?B?S29Ja3ZMajhUOGMvRlB3dXdndk5wdDZEbWVVUzY3dmMraFMzMmVmUWhWTDU1?=
+ =?utf-8?B?ZFZrQm5SMHBhdUQwWXQxcHg3OTE3RkQ4cEx3M2NRdFBkb0U2Y3BPQ0h6RFlx?=
+ =?utf-8?B?dWFXU1JNQUZYVC9LZUVHamhaVWg1MHBSYW14dldQODBFK3ROeDFOdjFMV3RO?=
+ =?utf-8?B?WkwyU1UyaUtyZ00zSDRGOGp2TjFBSnFPOW9SYnY1Uld0YWNXREtwMlBuY2Zl?=
+ =?utf-8?B?bWxaQVRKTHFjTW91cHN0ejU0Tzl1UVJkVmI0aEJCaFVERHl0MStuVDdYYnAy?=
+ =?utf-8?B?SFV4UkkzTWQzRm5xY0Y2SnVGdy9VaHBtL1JrL3R1ek9ENXhjY1lpV2x2ZGty?=
+ =?utf-8?B?Z2ovb2JudDc0K3hJQ0NGcjlpaENaUm1mSGlibU1zZFlNK3BKVTJXVzdNV212?=
+ =?utf-8?B?QXFRQ3BHcmhEclUvaWFWVnVFUHpZbzRwaHB1UXJpcDdCQ2sxNGxFck9QdmIw?=
+ =?utf-8?B?Q3JLMVZVZnhrNUlyN25NNzdJWG9NRUc2U2d5NE5vaW54blN6YUs3UStBNEZT?=
+ =?utf-8?B?SUJJZHZpK1hjbDJSamc3SHRZbFJDZEJtM093Z0pLMG93dlRobW9HVmQzVnhN?=
+ =?utf-8?B?bG0xMWliaUJwTkRic2I3TGIzOHFtVEg3ZGNONmU3UkZ2N0d4UHA4bjJHL1hm?=
+ =?utf-8?B?YiswcVhqNXNxT1NkSm50QnZsajJMMlJYbnBKWVdLRmsyOW5IbHJwRXdwTzRC?=
+ =?utf-8?B?SGNMNjY2TThXa01mTittSnVNMjB0aXY2UCtvRjZZUWVqUkhRMml4Q2Y5bXQz?=
+ =?utf-8?B?dFV1d21QYllDdytBeEt5MVVvK1RpTDdkNkJoaWh6SDdOL2xBVzVDeWk3a3kx?=
+ =?utf-8?B?NHY1a2ZPMjNKS1o3dlRzQTVZa24wQ2NRWUszeFhsd01BcEVJalVWM3pUMUNl?=
+ =?utf-8?Q?5LdQ=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgA3h2mJ1hdmZ5R_Jw--.23051S13
-X-Coremail-Antispam: 1UD129KBjvJXoW3JFy8ZryxZF13Gry3Jry3XFb_yoW7Ar45pr
-	97K3s7uF9Yyr9Igr1xCFWUuFyfGFs2qryrXF4Fvr15AF4xJrnrGrZ7Ww1UXrn3Jan3uwn0
-	va12yay3ur1UA3JanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUBSb4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUAV
-	Cq3wA2048vs2IY020Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0
-	rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x0267
-	AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I0E
-	14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7
-	xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x0Y
-	z7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2
-	Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
-	6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0x
-	vE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1lIxAI
-	cVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2js
-	IEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyTuYvjxUFgAwUUUUU
-X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR18MB4339.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d0a84d97-e16d-4a9f-8b5a-08dc5a254778
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Apr 2024 12:45:33.8594
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: iAZPus2BWXKNMI3oAlOd6FGhvuTa+iq0p8m9ZkuFqeJ6bN57N0YEmKYhZPZPI4qZlJRjppacaUcXDMpDm5n01g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO6PR18MB4417
+X-Proofpoint-GUID: KVJppL3B7AhceN0kiSCH_DpN1_uw6nyJ
+X-Proofpoint-ORIG-GUID: KVJppL3B7AhceN0kiSCH_DpN1_uw6nyJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-11_06,2024-04-09_01,2023-05-22_02
 
-From: Xu Kuohai <xukuohai@huawei.com>
-
-Add verifier tests to check bpf lsm return values and disabled hooks.
-
-Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
----
- .../selftests/bpf/prog_tests/verifier.c       |   3 +-
- .../selftests/bpf/progs/verifier_lsm.c        | 155 ++++++++++++++++++
- 2 files changed, 157 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/bpf/progs/verifier_lsm.c
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/verifier.c b/tools/testing/selftests/bpf/prog_tests/verifier.c
-index c4f9f306646e..07398846085c 100644
---- a/tools/testing/selftests/bpf/prog_tests/verifier.c
-+++ b/tools/testing/selftests/bpf/prog_tests/verifier.c
-@@ -84,6 +84,7 @@
- #include "verifier_xadd.skel.h"
- #include "verifier_xdp.skel.h"
- #include "verifier_xdp_direct_packet_access.skel.h"
-+#include "verifier_lsm.skel.h"
- 
- #define MAX_ENTRIES 11
- 
-@@ -196,8 +197,8 @@ void test_verifier_value_illegal_alu(void)    { RUN(verifier_value_illegal_alu);
- void test_verifier_value_or_null(void)        { RUN(verifier_value_or_null); }
- void test_verifier_var_off(void)              { RUN(verifier_var_off); }
- void test_verifier_xadd(void)                 { RUN(verifier_xadd); }
--void test_verifier_xdp(void)                  { RUN(verifier_xdp); }
- void test_verifier_xdp_direct_packet_access(void) { RUN(verifier_xdp_direct_packet_access); }
-+void test_verifier_lsm(void)                  { RUN(verifier_lsm); }
- 
- static int init_test_val_map(struct bpf_object *obj, char *map_name)
- {
-diff --git a/tools/testing/selftests/bpf/progs/verifier_lsm.c b/tools/testing/selftests/bpf/progs/verifier_lsm.c
-new file mode 100644
-index 000000000000..005f28eebf71
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/verifier_lsm.c
-@@ -0,0 +1,155 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <linux/bpf.h>
-+#include <bpf/bpf_helpers.h>
-+#include "bpf_misc.h"
-+
-+SEC("lsm/file_alloc_security")
-+__description("lsm bpf prog exit with valid return code. test 1")
-+__success
-+__naked int return_code_vaild_test1(void)
-+{
-+	asm volatile ("					\
-+	r0 = 0;						\
-+	exit;						\
-+"	::: __clobber_all);
-+}
-+
-+SEC("lsm/file_alloc_security")
-+__description("lsm bpf prog exit with valid return code. test 2")
-+__success
-+__naked int return_code_vaild_test2(void)
-+{
-+	asm volatile ("					\
-+	r0 = -4095;					\
-+	exit;						\
-+"	::: __clobber_all);
-+}
-+
-+SEC("lsm/file_alloc_security")
-+__description("lsm bpf prog exit with valid return code. test 3")
-+__success
-+__naked int return_code_vaild_test3(void)
-+{
-+	asm volatile ("                                 \
-+	call %[bpf_get_prandom_u32];                    \
-+	r0 <<= 63;                                      \
-+	r0 s>>= 63;                                     \
-+	r0 &= -13;                                      \
-+	exit;                                           \
-+	"      :
-+	: __imm(bpf_get_prandom_u32)
-+	: __clobber_all);
-+}
-+
-+SEC("lsm/vm_enough_memory")
-+__description("lsm bpf prog exit with valid return code. test 4")
-+__success
-+__naked int return_code_vaild_test4(void)
-+{
-+	asm volatile ("					\
-+	r0 = 0;						\
-+	exit;						\
-+"	::: __clobber_all);
-+}
-+
-+SEC("lsm/vm_enough_memory")
-+__description("lsm bpf prog exit with valid return code. test 5")
-+__success
-+__naked int return_code_vaild_test5(void)
-+{
-+	asm volatile ("					\
-+	r0 = -4096;					\
-+	exit;						\
-+"	::: __clobber_all);
-+}
-+
-+SEC("lsm/vm_enough_memory")
-+__description("lsm bpf prog exit with valid return code. test 6")
-+__success
-+__naked int return_code_vaild_test6(void)
-+{
-+	asm volatile ("					\
-+	r0 = 4096;					\
-+	exit;						\
-+"	::: __clobber_all);
-+}
-+
-+SEC("lsm/file_free_security")
-+__description("lsm bpf prog exit with valid return code. test 7")
-+__success
-+__naked void return_code_vaild_test7(void)
-+{
-+	asm volatile ("					\
-+	r0 = -4096;					\
-+	exit;						\
-+"	::: __clobber_all);
-+}
-+
-+SEC("lsm/file_free_security")
-+__description("lsm bpf prog exit with valid return code. test 8")
-+__success
-+__naked void return_code_vaild_test8(void)
-+{
-+	asm volatile ("					\
-+	r0 = 4096;					\
-+	exit;						\
-+"	::: __clobber_all);
-+}
-+
-+SEC("lsm/file_alloc_security")
-+__description("lsm bpf prog exit with invalid return code. test 1")
-+__failure __msg("R0 has smin=1 smax=1 should have been in [-4095, 0]")
-+__naked int return_code_invalid_test1(void)
-+{
-+	asm volatile ("					\
-+	r0 = 1;						\
-+	exit;						\
-+"	::: __clobber_all);
-+}
-+
-+SEC("lsm/file_alloc_security")
-+__description("lsm bpf prog exit with invalid return code. test 2")
-+__failure __msg("R0 has smin=-4096 smax=-4096 should have been in [-4095, 0]")
-+__naked int return_code_invalid_test2(void)
-+{
-+	asm volatile ("					\
-+	r0 = -4096;					\
-+	exit;						\
-+"	::: __clobber_all);
-+}
-+
-+SEC("lsm/getprocattr")
-+__description("lsm disabled hook: getprocattr")
-+__failure __msg("points to disabled bpf lsm hook")
-+__naked int disabled_hook_test1(void)
-+{
-+	asm volatile ("					\
-+	r0 = 0;						\
-+	exit;						\
-+"	::: __clobber_all);
-+}
-+
-+SEC("lsm/setprocattr")
-+__description("lsm disabled hook: setprocattr")
-+__failure __msg("points to disabled bpf lsm hook")
-+__naked int disabled_hook_test2(void)
-+{
-+	asm volatile ("					\
-+	r0 = 0;						\
-+	exit;						\
-+"	::: __clobber_all);
-+}
-+
-+SEC("lsm/ismaclabel")
-+__description("lsm disabled hook: ismaclabel")
-+__failure __msg("points to disabled bpf lsm hook")
-+__naked int disabled_hook_test3(void)
-+{
-+	asm volatile ("					\
-+	r0 = 0;						\
-+	exit;						\
-+"	::: __clobber_all);
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.30.2
-
+SGkgUGFvbG8sDQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGFvbG8g
+QWJlbmkgPHBhYmVuaUByZWRoYXQuY29tPg0KPiBTZW50OiBUdWVzZGF5LCBBcHJpbCA5LCAyMDI0
+IDU6MzcgUE0NCj4gVG86IEdlZXRoYXNvd2phbnlhIEFrdWxhIDxnYWt1bGFAbWFydmVsbC5jb20+
+OyBuZXRkZXZAdmdlci5rZXJuZWwub3JnOw0KPiBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3Jn
+DQo+IENjOiBrdWJhQGtlcm5lbC5vcmc7IGRhdmVtQGRhdmVtbG9mdC5uZXQ7IGVkdW1hemV0QGdv
+b2dsZS5jb207IFN1bmlsDQo+IEtvdnZ1cmkgR291dGhhbSA8c2dvdXRoYW1AbWFydmVsbC5jb20+
+OyBTdWJiYXJheWEgU3VuZGVlcCBCaGF0dGENCj4gPHNiaGF0dGFAbWFydmVsbC5jb20+OyBIYXJp
+cHJhc2FkIEtlbGFtIDxoa2VsYW1AbWFydmVsbC5jb20+DQo+IFN1YmplY3Q6IFtFWFRFUk5BTF0g
+UmU6IFtuZXQtbmV4dCBQQVRDSF0gb2N0ZW9udHgyLXBmOiBBZGQgc3VwcG9ydCBmb3INCj4gb2Zm
+bG9hZCB0YyB3aXRoIHNrYmVkaXQgbWFyayBhY3Rpb24NCj4gLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiBPbiBN
+b24sIDIwMjQtMDQtMDggYXQgMTI6NTYgKzA1MzAsIEdlZXRoYSBzb3dqYW55YSB3cm90ZToNCj4g
+PiBTdXBwb3J0IG9mZmxvYWRpbmcgb2Ygc2tiZWRpdCBtYXJrIGFjdGlvbi4NCj4gPg0KPiA+IEZv
+ciBleGFtcGxlLCB0byBtYXJrIHdpdGggMHgwMDA4LCB3aXRoIGRlc3QgaXAgNjAuNjAuNjAuMiBv
+biBldGgyDQo+ID4gaW50ZXJmYWNlOg0KPiA+DQo+ID4gICMgdGMgcWRpc2MgYWRkIGRldiBldGgy
+IGluZ3Jlc3MNCj4gPiAgIyB0YyBmaWx0ZXIgYWRkIGRldiBldGgyIGluZ3Jlc3MgcHJvdG9jb2wg
+aXAgZmxvd2VyIFwNCj4gPiAgICAgICBkc3RfaXAgNjAuNjAuNjAuMiBhY3Rpb24gc2tiZWRpdCBt
+YXJrIDB4MDAwOCBza2lwX3N3DQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBHZWV0aGEgc293amFu
+eWEgPGdha3VsYUBtYXJ2ZWxsLmNvbT4NCj4gPiAtLS0NCj4gPiAgLi4uL25ldC9ldGhlcm5ldC9t
+YXJ2ZWxsL29jdGVvbnR4Mi9hZi9ydnVfbnBjX2ZzLmMgIHwgIDIgKysNCj4gPiAgLi4uL2V0aGVy
+bmV0L21hcnZlbGwvb2N0ZW9udHgyL25pYy9vdHgyX2NvbW1vbi5oICAgIHwgIDIgKysNCj4gPiAg
+Li4uL25ldC9ldGhlcm5ldC9tYXJ2ZWxsL29jdGVvbnR4Mi9uaWMvb3R4Ml90Yy5jICAgIHwgMTMg
+KysrKysrKysrKysrKw0KPiA+ICAuLi4vbmV0L2V0aGVybmV0L21hcnZlbGwvb2N0ZW9udHgyL25p
+Yy9vdHgyX3R4cnguYyAgfCAgMyArKysNCj4gPiAuLi4vbmV0L2V0aGVybmV0L21hcnZlbGwvb2N0
+ZW9udHgyL25pYy9vdHgyX3R4cnguaCAgfCAgMyArKysNCj4gPiAgNSBmaWxlcyBjaGFuZ2VkLCAy
+MyBpbnNlcnRpb25zKCspDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvZXRoZXJu
+ZXQvbWFydmVsbC9vY3Rlb250eDIvYWYvcnZ1X25wY19mcy5jDQo+ID4gYi9kcml2ZXJzL25ldC9l
+dGhlcm5ldC9tYXJ2ZWxsL29jdGVvbnR4Mi9hZi9ydnVfbnBjX2ZzLmMNCj4gPiBpbmRleCBjNzU2
+NjljOGZkZTcuLjYxODg5MjFlOWEyMCAxMDA2NDQNCj4gPiAtLS0gYS9kcml2ZXJzL25ldC9ldGhl
+cm5ldC9tYXJ2ZWxsL29jdGVvbnR4Mi9hZi9ydnVfbnBjX2ZzLmMNCj4gPiArKysgYi9kcml2ZXJz
+L25ldC9ldGhlcm5ldC9tYXJ2ZWxsL29jdGVvbnR4Mi9hZi9ydnVfbnBjX2ZzLmMNCj4gPiBAQCAt
+MTE4Myw2ICsxMTgzLDggQEAgc3RhdGljIGludCBucGNfdXBkYXRlX3J4X2VudHJ5KHN0cnVjdCBy
+dnUgKnJ2dSwNCj4gc3RydWN0IHJ2dV9wZnZmICpwZnZmLA0KPiA+ICAJCQlhY3Rpb24ucGZfZnVu
+YyA9IHRhcmdldDsNCj4gPiAgCQkJYWN0aW9uLm9wID0gTklYX1JYX0FDVElPTk9QX1VDQVNUOw0K
+PiA+ICAJCX0NCj4gPiArCQlpZiAocmVxLT5tYXRjaF9pZCkNCj4gPiArCQkJYWN0aW9uLm1hdGNo
+X2lkID0gcmVxLT5tYXRjaF9pZDsNCj4gPiAgCX0NCj4gPg0KPiA+ICAJZW50cnktPmFjdGlvbiA9
+ICoodTY0ICopJmFjdGlvbjsNCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvZXRoZXJuZXQv
+bWFydmVsbC9vY3Rlb250eDIvbmljL290eDJfY29tbW9uLmgNCj4gPiBiL2RyaXZlcnMvbmV0L2V0
+aGVybmV0L21hcnZlbGwvb2N0ZW9udHgyL25pYy9vdHgyX2NvbW1vbi5oDQo+ID4gaW5kZXggMDY5
+MTAzMDcwODVlLi44MTVhZTEzYzM3MWMgMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9uZXQvZXRo
+ZXJuZXQvbWFydmVsbC9vY3Rlb250eDIvbmljL290eDJfY29tbW9uLmgNCj4gPiArKysgYi9kcml2
+ZXJzL25ldC9ldGhlcm5ldC9tYXJ2ZWxsL29jdGVvbnR4Mi9uaWMvb3R4Ml9jb21tb24uaA0KPiA+
+IEBAIC0zNjMsNiArMzYzLDcgQEAgc3RydWN0IG90eDJfZmxvd19jb25maWcgew0KPiA+ICAJc3Ry
+dWN0IGxpc3RfaGVhZAlmbG93X2xpc3Q7DQo+ID4gIAl1MzIJCQlkbWFjZmx0X21heF9mbG93czsN
+Cj4gPiAgCXUxNiAgICAgICAgICAgICAgICAgICAgIG1heF9mbG93czsNCj4gPiArCXUxNgkJCW1h
+cmtfZmxvd3M7DQo+IA0KPiBTaW5jZSB0aGUgYWJvdmUgZmllbGRzIGlzIHVzZWQgYXMgKHJlZmVy
+ZW5jZSkgY291bnRlciBmb3IgdGhlDQo+IE9UWDJfRkxBR19UQ19NQVJLX0VOQUJMRUQgYml0LCB3
+aGF0IGFib3V0IHVzaW5nIGEgcmVmY291bnRfdCwgc28geW91DQo+IGdhaW4gc2FuaXR5IGNoZWNr
+cyBmb3IgZnJlZT8NCj4gDQpPaywgd2lsbCBzdWJtaXQgdjIgd2l0aCBzdWdnZXN0ZWQgY2hhbmdl
+Lg0KDQpUaGFuayB5b3UuDQpHZWV0aGEuDQoNCj4gVGhhbmtzIQ0KPiANCj4gUGFvbG8NCg0K
 
