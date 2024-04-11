@@ -1,151 +1,157 @@
-Return-Path: <netdev+bounces-87181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C0118A1FF4
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 22:14:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 027E78A200D
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 22:24:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 382F7283312
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:14:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 241CD1C220F0
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:24:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED7CC17C6A;
-	Thu, 11 Apr 2024 20:14:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B48117C9E;
+	Thu, 11 Apr 2024 20:24:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="JjAOYQGN";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IwnCRI67"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+Received: from wfout5-smtp.messagingengine.com (wfout5-smtp.messagingengine.com [64.147.123.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0405B17584
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 20:14:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B37591754B;
+	Thu, 11 Apr 2024 20:24:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712866484; cv=none; b=HEkwj1MiBJrCa6lkUgWNguDDxpw3ZsX/k1l1ISDDWGEs/q5f3xJ0t5hhwK2xosw/zYTC0u5L3VygEDrw1myE9ubvKMOMJLEt1vU3UNIKZ2TI/ljWDWciqQrVyP/kMmSXXTRMTrcMzHKMiXYFqpUrMAIep46LBuwwgAC3JLQ0GJQ=
+	t=1712867044; cv=none; b=JHSmEn5wwU/2UW/QU79hwmpt2QHfmlDHzcuusKuAD9l9l+x8XkCsHm3RZl8a/hX76yLemaOsY/ZyRmo/uTiXk1/OQaERWlo9HsaXmqMZG1+Mip+3ArqUzhl4p0wnwbDr+Ihn3A/1188a0DcPGoJO5EobiXQQBjvjFKzR73SOyy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712866484; c=relaxed/simple;
-	bh=2QSLdNV095NUp1T3pQnS1ty2QqIzyqQu7DCwWuGVGNk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=eRLsH3AymCYXrpwi5BXbBKRN59MHA9J9XVELU8BvCrtA1rXP6Ir07CKfojo2oHkyhC+5n6dudPFm03ckRVTndu7/Tri+x/svbc/DKVkXOpNb9AtUgcc3/UoxZF7oADzjT27BEWhXyb+Z2pAwJkDjKRzpEt2YpPSlqR58JM3gC58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-518-dLMzB0njNF2KG_0f51kAKw-1; Thu, 11 Apr 2024 16:14:36 -0400
-X-MC-Unique: dLMzB0njNF2KG_0f51kAKw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A2D4D806604;
-	Thu, 11 Apr 2024 20:14:35 +0000 (UTC)
-Received: from hog (unknown [10.39.192.7])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id E799910E47;
-	Thu, 11 Apr 2024 20:14:33 +0000 (UTC)
-Date: Thu, 11 Apr 2024 22:14:28 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antony Antony <antony@phenome.org>
-Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	Antony Antony <antony.antony@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	devel@linux-ipsec.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v6] xfrm: Add Direction to the
- SA in or out
-Message-ID: <ZhhEpNPyKPDohQoH@hog>
-References: <a53333717022906933e9113980304fa4717118e9.1712320696.git.antony.antony@secunet.com>
- <ZhBzcMrpBCNXXVBV@hog>
- <ZhJX-Rn50RxteJam@Antony2201.local>
- <ZhPq542VY18zl6z3@hog>
- <ZhV5eG2pkrsX0uIV@Antony2201.local>
- <ZhZUQoOuvNz8RVg8@hog>
- <ZhbFVGc8p9u0xQcv@Antony2201.local>
- <ZhesNtc8tdTfuvRd@hog>
- <Zhe9LB97ik37hM3q@Antony2201.local>
+	s=arc-20240116; t=1712867044; c=relaxed/simple;
+	bh=v0h2YnKyvi/FUjQO8wsyr2ccrwSEozzRKJqDGzOluPs=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=g4VgdwGYCLXrdVli98wvuNamaYVc7yCB0tZcuge+V5gFccM7mpUYnMx6WiZEjNnk0h5eQH8FRg35024ZnqboanKz9BfYOb7o/zmEyzGOKBMuxrbKCC4yRn1GnoRlBFxi5vf0Z4tTnSsXHaE+6gs0+9R4Ax1i89yFmVJFSHA6Upg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=JjAOYQGN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=IwnCRI67; arc=none smtp.client-ip=64.147.123.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfout.west.internal (Postfix) with ESMTP id 833041C0009F;
+	Thu, 11 Apr 2024 16:23:57 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Thu, 11 Apr 2024 16:24:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:subject
+	:subject:to:to; s=fm2; t=1712867037; x=1712953437; bh=JsuFLbAEjN
+	o6Pvyug1LI/IFqLsqKGpq5+U0wO0rRgwo=; b=JjAOYQGN8yunrqafnwxnDSFe0+
+	qnm7WuRckh2f2/1Bx7vcudDdDW5T54MJjqnrutUlFmoipuXXq45pWV1Ew9Xeb2Xm
+	hcVC++M9Bxyi+rQPO8tsnd2khrxLZJkxxgnppP5zbhAyGGGe31y6huY3AI8PDScZ
+	ElBBOoKc8MbFtjwtmP8TjjEC+F9y8lQ+fwD1LOlNRIegmNEtRwIMzQdGkvqCk04+
+	/hk/EUPNNkNo167Ckqnk6UUHLAXQ6vQkg7TyCZA3+oJZ6+lNbvSafwf1IgYgniKx
+	0ldCOL9J2tmeGHT4FhnANgmn2h8d55nAHGVXTpinWHYlSxdN5ZljpqK8ycDw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+	fm2; t=1712867037; x=1712953437; bh=JsuFLbAEjNo6Pvyug1LI/IFqLsqK
+	Gpq5+U0wO0rRgwo=; b=IwnCRI67E37UT8PkBtjjJj+JwAaXfB/yQT4bnTtdSTaP
+	CsJC3lnLCLkGvn2s5saYs8We3/MqwkgRMgX+EQl5n8lLKyuiDYQyeAwNNPY1wLQJ
+	WCUPgyUfrKqISshpgzozDcwkmzdVK9jUeP1EdvYV0xIF357LlY2t39i9O70hv+mM
+	mBnbZv7+5NKYMaeEx/zdKEhUWHHiEkUplMKftFsjipJhfAUppsLEXBctrHym9e2w
+	lCNt+kWm7tEAWNFfcj1KV8G2hOAAlk3BIoD91K3rWRzcT445WkP2g9Pov+0XZ96Y
+	bE0Wh2Hk1sdzBPnqpKzckGkLdrKkhSvB54kMgO/x8A==
+X-ME-Sender: <xms:20YYZoJn7WvT9eEOBU1G7N1hW30AmgGyJTc_zR1IXlgBvEW-WXMEog>
+    <xme:20YYZoL64a6bw_KYLQbmSp6OwjSBsDEb4qQgH6PVEhJH56g77l2Asqp_sY7aJYkgc
+    yx00ArKdbb-SMlQvnQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudehkedgudeglecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
+    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
+    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdet
+    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
+    htthgvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedt
+    keetffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpe
+    grrhhnugesrghrnhgusgdruggv
+X-ME-Proxy: <xmx:20YYZovNgCBdVmC_1lDcA-pVqVwbaXw9dYUzLcCaX-1CCAx_57zrJA>
+    <xmx:20YYZlbSidqnph_CUwPU7Mja2KL8a5KeRzznPHmqTeGZDUUPp02KoA>
+    <xmx:20YYZvaWM5ek40gIgg9rhjY0DZynwI-SnzVNg7jigfADzt9IeBErzQ>
+    <xmx:20YYZhDnRroG2_xxOda4OTO_V0Muhq9jmgCY607oUyxnXQlOscqa5A>
+    <xmx:3UYYZojPUsAS9W0ge6yR4cip9kLqz_forzx3auM_rJv3vr53AcZl0bs2>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id A8515B6008D; Thu, 11 Apr 2024 16:23:55 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-379-gabd37849b7-fm-20240408.001-gabd37849
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Zhe9LB97ik37hM3q@Antony2201.local>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Message-Id: <65a7d714-1004-4ba3-9c03-7c691f3c3dc7@app.fastmail.com>
+In-Reply-To: <3-v3-1893cd8b9369+1925-mlx5_arm_wc_jgg@nvidia.com>
+References: <3-v3-1893cd8b9369+1925-mlx5_arm_wc_jgg@nvidia.com>
+Date: Thu, 11 Apr 2024 22:23:34 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Jason Gunthorpe" <jgg@nvidia.com>,
+ "Alexander Gordeev" <agordeev@linux.ibm.com>,
+ "Andrew Morton" <akpm@linux-foundation.org>,
+ "Christian Borntraeger" <borntraeger@linux.ibm.com>,
+ "Borislav Petkov" <bp@alien8.de>,
+ "Dave Hansen" <dave.hansen@linux.intel.com>,
+ "David S . Miller" <davem@davemloft.net>,
+ "Eric Dumazet" <edumazet@google.com>,
+ "Gerald Schaefer" <gerald.schaefer@linux.ibm.com>,
+ "Vasily Gorbik" <gor@linux.ibm.com>,
+ "Heiko Carstens" <hca@linux.ibm.com>, "H. Peter Anvin" <hpa@zytor.com>,
+ "Justin Stitt" <justinstitt@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Leon Romanovsky" <leon@kernel.org>,
+ linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+ llvm@lists.linux.dev, "Ingo Molnar" <mingo@redhat.com>,
+ "Bill Wendling" <morbo@google.com>,
+ "Nathan Chancellor" <nathan@kernel.org>,
+ "Nick Desaulniers" <ndesaulniers@google.com>,
+ Netdev <netdev@vger.kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
+ "Salil Mehta" <salil.mehta@huawei.com>,
+ "Sven Schnelle" <svens@linux.ibm.com>,
+ "Thomas Gleixner" <tglx@linutronix.de>, x86@kernel.org,
+ "Yisen Zhuang" <yisen.zhuang@huawei.com>
+Cc: "Catalin Marinas" <catalin.marinas@arm.com>,
+ "Leon Romanovsky" <leonro@mellanox.com>,
+ Linux-Arch <linux-arch@vger.kernel.org>,
+ linux-arm-kernel@lists.infradead.org, "Mark Rutland" <mark.rutland@arm.com>,
+ "Michael Guralnik" <michaelgur@mellanox.com>, patches@lists.linux.dev,
+ "Niklas Schnelle" <schnelle@linux.ibm.com>,
+ "Jijie Shao" <shaojijie@huawei.com>, "Will Deacon" <will@kernel.org>
+Subject: Re: [PATCH v3 3/6] s390: Stop using weak symbols for __iowrite64_copy()
+Content-Type: text/plain
 
-2024-04-11, 12:36:28 +0200, Antony Antony wrote:
-> On Thu, Apr 11, 2024 at 11:24:06AM +0200, Sabrina Dubroca wrote:
-> > 2024-04-10, 18:59:00 +0200, Antony Antony wrote:
-> > > On Wed, Apr 10, 2024 at 10:56:34AM +0200, Sabrina Dubroca wrote:
-> > > > 2024-04-09, 19:23:04 +0200, Antony Antony wrote:
-> > > > > > xfrma_policy is convenient but not all attributes are valid for=
- all
-> > > > > > requests. Old attributes can't be changed, but we should try to=
- be
-> > > > > > more strict when we introduce new attributes.
-> > > > >=20
-> > > > > To clarify your feedback, are you suggesting the API should not p=
-ermit=20
-> > > > > XFRMA_SA_DIR for methods like XFRM_MSG_DELSA, and only allow it f=
-or=20
-> > > > > XFRM_MSG_NEWSA and XFRM_MSG_UPDSA? I added XFRM_MSG_UPDSA, as it'=
-s used=20
-> > > > > equivalently to XFRM_MSG_NEWSA by *swan.
-> > > >=20
-> > > > Not just DELSA, also all the *POLICY, ALLOCSPI, FLUSHSA, etc. NEWSA
-> > > > and UPDSA should accept it, but I'm thinking none of the other
-> > > > operations should. It's a property of SAs, not of other xfrm object=
-s.
-> > >=20
-> > > For instance, there isn't a validation for unused XFRMA_SA_EXTRA_FLAG=
-S in=20
-> > > DELSA; if set, it's simply ignored. Similarly, if XFRMA_SA_DIR were s=
-et in=20
-> > > DELSA, it would also be disregarded. Attempting to introduce validati=
-ons for=20
-> > > DELSA and other methods seems like an extensive cleanup task. Do we c=
-onsider=20
-> > > this level of validation within the scope of our current patch? It fe=
-els=20
-> > > like we are going too far.
-> >=20
-> > No, I wouldn't introduce validation of other attributes. It doesn't
-> > belong in this patch(set), and I'm not sure we can add it now as it
-> > might break userspace (I don't see why userspace would pass
-> > XFRMA_ALG_AEAD etc on a DELSA request, but if we never rejected it,
-> > they could).=20
-> >=20
-> > But rejecting this new attribute from messages that don't handle it
-> > would be good, and should be done in this patch/series.
->=20
-> Definitely see the value in such feature in general, but it seems ambitio=
-us=20
-> for this patch set.
+On Thu, Apr 11, 2024, at 18:46, Jason Gunthorpe wrote:
+> Complete switching the __iowriteXX_copy() routines over to use #define and
+> arch provided inline/macro functions instead of weak symbols.
+>
+> S390 has an implementation that simply calls another memcpy
+> function. Inline this so the callers don't have to do two jumps.
+>
+> Acked-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> ---
+>  arch/s390/include/asm/io.h | 7 +++++++
+>  arch/s390/pci/pci.c        | 6 ------
+>  include/linux/io.h         | 3 +++
+>  lib/iomap_copy.c           | 7 +++----
+>  4 files changed, 13 insertions(+), 10 deletions(-)
 
-I'm only talking about the new attribute here. Introducing validation
-for all other attributes, yes, that's a completely separate thing (and
-we can't do that immediately, we need to work toward it, see Paul's
-suggestion).
+For the common code bits:
 
-> Currently, only NEWSA, UPDSA, and ALLOCSPI need=20
-> XFRMA_SA_DIR. I am wondering how to reject this atrribute in remaining 20=
--22=20
-> messages.  Is there a precedent or example in xfrm_user.c for this kind o=
-f=20
-> validation, or maybe a Netlink feature that lets us restrict NL attribute=
-s=20
-> for a specific messages like DELSA.
+Acked-by: Arnd Bergmann <arnd@arndb.de>
 
-I don't think there is, xfrm_user doesn't do that kind of validation yet.
-There's an example in rtnl_valid_dump_net_req and
-rtnl_net_valid_getid_req, where some attributes are rejected.
+> -void __attribute__((weak)) __iowrite64_copy(void __iomem *to,
+> -					    const void *from,
+> -					    size_t count)
+> +#ifndef __iowrite64_copy
+> +void __iowrite64_copy(void __iomem *to, const void *from, size_t count)
+>  {
 
---=20
-Sabrina
+I'm always happy to see __weak functions get cleaned up.
 
+      Arnd
 
