@@ -1,99 +1,93 @@
-Return-Path: <netdev+bounces-86809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 297A08A05AD
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 03:54:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEE008A05B5
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 04:00:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2BEE2883B0
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:54:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E34E1C21E94
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 02:00:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1454363102;
-	Thu, 11 Apr 2024 01:54:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B41B6217D;
+	Thu, 11 Apr 2024 02:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gJ5x3K4S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V5qbTEN6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF5E8629E6;
-	Thu, 11 Apr 2024 01:54:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2541079DC
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 02:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712800485; cv=none; b=YWppFhQgd1a9Dos661XODXPABeARODmDf9AQ3/fkWtbrmYs8s+ZZ+/DZW9p8/9Syf9f9GaG/NtuoCNgJ0tVgp4Cvw7xCtco/CS3VLEHfUJ1eKI8D5VsTWgUvZVI0anZEBoVnpl9YxC1zqthvyzRtIB7ekWjtD1qvNg2Zifio+Jw=
+	t=1712800836; cv=none; b=HSeVsLhOEREKdJ81RDCsRsRHO+UU1WiED5+BESPSokeJaeG26VYsck94MD9kOSRw0SmPQLsopKN9YDagB6f1YdOylp0ZB1E+DUK7MUtscloRNvNQsyDWBuMOxKuhbn17bsQIZA3bXHu3wesnuOF8HgG1o7yPctuZwFVEb07k8Ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712800485; c=relaxed/simple;
-	bh=AtfV+JHLU8oQZvTzDg2yxUrd2XeuBceS8icQY4Tvmng=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D+crOQIcU1yFC+VsTrsy0Xi7JbWvpHKuJgmsIpAx5Va/WbMhiE0JvXAhWa6B/T8mi6dKC/V8Aj8b7D5m0cCsQNOiTZsZbY2SwUrTeUfNFN3eLaZaz+C7y4NmwzQwhwyyiyjaRBZ8CSFpprywBa9cAw1KFCQ75B/iZ/Rg4IJwseU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gJ5x3K4S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9006C433F1;
-	Thu, 11 Apr 2024 01:54:43 +0000 (UTC)
+	s=arc-20240116; t=1712800836; c=relaxed/simple;
+	bh=+fqOuazy+UGg2Y3lYTOUH+TSsMLI9bZUXZGxa77ou7I=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Q9R7wzjhDDgE7IimDEH2OC5+lz2c0tl2MrPDkLsYftI93m+EcQc4/BMqWblrzlYRprQWE2SdFOER9GKctK5qLkS75k3u7yiJg/ni/o4QMILWsLIycLyb240DqGSmd6bX6zEGk/PVlSQ2gj3wdhmjw5eyxfxJw7zAUlX09XrJWDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V5qbTEN6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6935EC43390;
+	Thu, 11 Apr 2024 02:00:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712800484;
-	bh=AtfV+JHLU8oQZvTzDg2yxUrd2XeuBceS8icQY4Tvmng=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gJ5x3K4SmUkkXdhOSFzPOUSPlnY+xVhLkLrbZd16d1qgs5wqN3ZVmOyG06MThaNHj
-	 E2ERagnK/cEAnKZQR9TNPO2Vh7fyCZx/F4SQZsQdQ9qppMzCNTpWEeo5d5ID2132pt
-	 qmbGPy+/PeewsuykeqYn0OUj9rqMWVdHoeWfjzKCpn5wS6zD0KB1Vwhy4vymWxXSon
-	 TkN2gURTE8Ve3DPjeYKPGCXy4VrD4friUeNEsnLOPPhx+JdEgRbdnohSgs7Nm+Wt35
-	 0qXBbmQsQf1vCKDOHGZUR+/CaIYM6Cv9FKUFqTHkq0N0VNbXa1GKn3wqZe5SuHx/rq
-	 KHmih7TdvipuA==
-Date: Wed, 10 Apr 2024 18:54:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Ratheesh Kannoth <rkannoth@marvell.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v5 4/4] virtio-net: support dim profile
- fine-tuning
-Message-ID: <20240410185442.7ff17c47@kernel.org>
-In-Reply-To: <1cd6cd7d-5cf2-4f86-b084-6e88b0cbf229@linux.alibaba.com>
-References: <1712664204-83147-1-git-send-email-hengqi@linux.alibaba.com>
-	<1712664204-83147-5-git-send-email-hengqi@linux.alibaba.com>
-	<20240409184020.648bc93c@kernel.org>
-	<1cd6cd7d-5cf2-4f86-b084-6e88b0cbf229@linux.alibaba.com>
+	s=k20201202; t=1712800835;
+	bh=+fqOuazy+UGg2Y3lYTOUH+TSsMLI9bZUXZGxa77ou7I=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=V5qbTEN6LLUCIcDMZFQJXOyihTWsyBdGwbVFxDNUocNszFX5UBT5D6m1p/BYGohyD
+	 qHnOjHBB7wvteWfZE5ATnrt1gF+Pz2yuFvli1fa2IdUvVKQ8ycbfj1i3TVyTgRP9US
+	 dhCvZMW3QruXBwfCz5H2ZmhuZjqWCMUr0itpD0f+to5Fi1L1I/JYVqN9qEa9gcFou7
+	 CPBBTnIvBYRoq9WhTIFtK+7mNKn3Q20yQe2UWBJ5IBXTKPIRQLsTrpks5tEa39rTTV
+	 dK/EtXjNZpp6hESfQliW4eEhIhTNYT6TIJLGWI/4/z+klpy80UiIzSJ7IPliyqiidd
+	 a+fVyxCh2xZBg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5574BC395F6;
+	Thu, 11 Apr 2024 02:00:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] r8169: add missing conditional compiling for call to
+ r8169_remove_leds
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171280083534.2701.11819073106768813081.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Apr 2024 02:00:35 +0000
+References: <d080038c-eb6b-45ac-9237-b8c1cdd7870f@gmail.com>
+In-Reply-To: <d080038c-eb6b-45ac-9237-b8c1cdd7870f@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com, edumazet@google.com, pabeni@redhat.com,
+ kuba@kernel.org, davem@davemloft.net, venkat88@linux.vnet.ibm.com,
+ netdev@vger.kernel.org
 
-On Wed, 10 Apr 2024 11:09:16 +0800 Heng Qi wrote:
-> The point is that the driver may check whether the user has set 
-> parameters that it does not want.
-> For example, virtio may not want the modification of comps, and ice/idpf 
-> may not want the modification
-> of comps and pkts.
+Hello:
 
-If it's simply about the fields, not the range of values, flags of
-what's supported would suffice. If we need more complicated checks
-you can treat the driver callback as a validation callback, and
-when driver returns success - copy in the core.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> But you inspired me to think from another perspective. If parameters are 
-> placed in netdevice, the
-> goal of user modification is to modify the profile of netdevice, and the 
-> driver can obtain its own
-> target parameters from it as needed. Do you like this?
+On Wed, 10 Apr 2024 15:11:28 +0200 you wrote:
+> Add missing dependency on CONFIG_R8169_LEDS. As-is a link error occurs
+> if config option CONFIG_R8169_LEDS isn't enabled.
+> 
+> Fixes: 19fa4f2a85d7 ("r8169: fix LED-related deadlock on module removal")
+> Reported-by: Venkat Rao Bagalkote <venkat88@linux.vnet.ibm.com>
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> 
+> [...]
 
-Yes, IIUC.
+Here is the summary with links:
+  - [net] r8169: add missing conditional compiling for call to r8169_remove_leds
+    https://git.kernel.org/netdev/net/c/97e176fcbbf3
 
-> In addition, if the netdevice way is preferred, I would like to confirm 
-> whether we still continue the
-> "ethtool -C" way, that is, complete the modification of netdevice 
-> profile in __ethnl_set_coalesce()?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-That'd be great. If the driver validation is complex we can keep some
-form of the SET callback. But we definitely don't need to extend the
-GET callback since core will have the values, and can return them to
-the user.
+
 
