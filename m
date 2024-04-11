@@ -1,121 +1,98 @@
-Return-Path: <netdev+bounces-86884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B9FA8A0996
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:23:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22C898A09AE
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:26:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46D371F247C6
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 07:23:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53C7E1C21A85
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 07:26:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD6F813DDC3;
-	Thu, 11 Apr 2024 07:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F5013E8AB;
+	Thu, 11 Apr 2024 07:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="Pko3hFCJ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="XW1MO6zJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C56213DDAA
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 07:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F6A13E04A
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 07:25:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712820194; cv=none; b=PE7DIVoka2yTz2uBUJPqfe04XbgToJ/OorzII1UyT9tg0KFnUBTRFOnqF99OxjL5XBJ3y9G8dgnKql1iTcvB38mM2T6UbJo7A3s600zqYQ0tfjKQCNOpfIALixZuzpnhy5rKiB2cWf16aNFGI/tIJ8FqTEdL2oeyMyYrM8b69oY=
+	t=1712820333; cv=none; b=MM1RkQVtu1sxeRf3iJ5itCh+OdRkerE8h7fVrTOlUCHyphKULXw3IxS4sk41ajA8slx0l+8v/hfH4GRs0YmMgk4AzKdTu6M3w+5jxzfQtZ+353RwKqqaVi54dax6f+NB3Am86AFHpuzp8ovVxNCizbkXeYF5L2jZb6+6a+I281M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712820194; c=relaxed/simple;
-	bh=bu5ueB/OqVkoznllksN9WHiX3HdkUBXBkE/BByxANyQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hZHf9coS7pqNKeoU/mN8Bue1xUlbfBbrX+tB3mXmClkZZToBSvs1g5e5TMARc+bsDzEuXb8RcNF9TgwLJEVOelGeW6EW0L0UHfTZra9PR+9pem7+G68H1ub/3ydqj9SvOCLLcp1ADEgu8dhlfuP2g43bJW2CUKodqhwxp+dZH1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=Pko3hFCJ; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id DB98B20847;
-	Thu, 11 Apr 2024 09:23:10 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id soAW0YES-Dgh; Thu, 11 Apr 2024 09:23:10 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 5C9E8205ED;
-	Thu, 11 Apr 2024 09:23:10 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 5C9E8205ED
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1712820190;
-	bh=oajVEcDL6H6/fHpIk5w0oQrqJceE4ypu2bkIizHo5mk=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=Pko3hFCJshoLVGJdv/XBUDGBH8/NM8VSMKDPqdtLY8K4wFrmyz+MuxT9Oucss+dwp
-	 qEqbsgw6BV3mKcaBGh717xfZ5WMiv4/RWUeVxknZRWJOqlSmlexk65OEPM4cHW/cCJ
-	 AWYxDEdr5lek1qv6wjCtGze7XVx8Sq7YMYSS6WaX1wE4neaYGoZbdupcnBVC6mu5Dh
-	 U3Dax3D8DrdvcwobVuUCPUhcvj/RPt7+sli4SGSwsIsqhyC9/WvAqn0OqryF4b6PoL
-	 BwwxcD+dk0uFl8CByf1JucoUOfpPiEwe83mQz+1DWojlbQ6iRDRHdFAOpyFu6JLuCh
-	 kpRyNrYW1uoQg==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 4F5F780004A;
-	Thu, 11 Apr 2024 09:23:10 +0200 (CEST)
-Received: from mbx-essen-01.secunet.de (10.53.40.197) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 11 Apr 2024 09:23:10 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
- (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Thu, 11 Apr
- 2024 09:23:09 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 90D323184014; Thu, 11 Apr 2024 09:23:09 +0200 (CEST)
-Date: Thu, 11 Apr 2024 09:23:09 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Paul Wouters <paul@nohats.ca>
-CC: Sabrina Dubroca <sd@queasysnail.net>, Nicolas Dichtel
-	<nicolas.dichtel@6wind.com>, <antony.antony@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, <devel@linux-ipsec.org>,
-	Leon Romanovsky <leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v9] xfrm: Add Direction to the
- SA in or out
-Message-ID: <ZheP3faYW214zYpB@gauss3.secunet.de>
-References: <bb191b37cd631341552ee87eb349f0525b90f14f.1712685187.git.antony.antony@secunet.com>
- <0a51d41e-124e-479e-afd7-50246e3b0520@6wind.com>
- <ZhY_EE8miFAgZkkC@hog>
- <f2c52a01-925c-4e3a-8a42-aeb809364cc9@6wind.com>
- <ZhZLHNS41G2AJpE_@hog>
- <1909116d-15e1-48ac-ab55-21bce409fe64@6wind.com>
- <ZhZUcNKD8viY6Y3W@hog>
- <8b27d067-d401-88b9-f784-4589b27f8e32@nohats.ca>
+	s=arc-20240116; t=1712820333; c=relaxed/simple;
+	bh=ADi7AIJR4AKcuBOk6kdeYdOkglNNdFD7S4RXiaOzzMo=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=kQGCp4PP+yazd3ideIIAJoTTs7yh23VkLw/N8iQv9MAmvj5ZZLngM+t8VcieZBxM/mgeM1BmupjQZqQWQOOLrorXXLUDcdY6FSb9Phr9u8yCUdljtj37p787AdNOoZmP+I3KwWuh6QovZzuKvu7gXY+KcH7v4MKQIhkeUoqLGyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=XW1MO6zJ; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 327761C000A;
+	Thu, 11 Apr 2024 07:25:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1712820328;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sdzc9AsfgZ9Ovhl+3KsoJesmE9lkARyzNmBu+Gx88PY=;
+	b=XW1MO6zJgx/cbAvJgjb0cN2A5LEDW9HHdhT2pc+nzAnxBOFwSP3bUJsdh+F9/bmzkn+Drs
+	98nEsSkM6v/ocTDW0nMXrPfVsJdxa6XLzpWSyox8lQDrD3sZ3pByXXjJXOlw9bEky/HkXz
+	SiCNscmq+hKwJ2G4LCqeCJvSBXuw4baDFTE6kUbg0xBSdVrxx8yR6keam6Ced4ARAST1bx
+	VBpe2N5FPlJSffAnwJhBF3JQZIxfGGTmziQKPr+e2/NZe3kBnvQMY8k46O0lpFwh3heYzt
+	qQ+W2bFuOu2DhmIn7k2MF+UvR1aUa7g2DwVp+ulYByEww6PR6CAB4YulHpqb6Q==
+Date: Thu, 11 Apr 2024 09:26:04 +0200 (CEST)
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+    alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
+    fancer.lancer@gmail.com, Jose.Abreu@synopsys.com, chenhuacai@loongson.cn, 
+    linux@armlinux.org.uk, guyinggang@loongson.cn, netdev@vger.kernel.org, 
+    chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+Subject: Re: [PATCH net-next v9 1/6] net: stmmac: Add multi-channel support
+In-Reply-To: <e293a30532ef3e567e6236f6b643430036ea7e09.1712407009.git.siyanteng@loongson.cn>
+Message-ID: <6fd50d0f-862f-5aa1-700c-a2a4fe01854f@bootlin.com>
+References: <cover.1712407009.git.siyanteng@loongson.cn> <e293a30532ef3e567e6236f6b643430036ea7e09.1712407009.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8b27d067-d401-88b9-f784-4589b27f8e32@nohats.ca>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-01.secunet.de (10.53.40.197)
+Content-Type: text/plain; charset=US-ASCII
+X-GND-Sasl: romain.gantois@bootlin.com
 
-On Wed, Apr 10, 2024 at 09:52:36AM -0400, Paul Wouters wrote:
-> On Wed, 10 Apr 2024, Sabrina Dubroca via Devel wrote:
-> 
-> > 2024-04-10, 10:37:27 +0200, Nicolas Dichtel wrote:
-> > > Le 10/04/2024 à 10:17, Sabrina Dubroca a écrit :
-> > > [snip]
-> > > >> Why isn't it possible to restrict the use of an input SA to the input path and
-> > > >> output SA to xmit path?
-> > > > > Because nobody has written a patch for it yet :)
-> > > > For me, it should be done in this patch/series ;-)
-> > 
-> > Sounds good to me.
-> 
-> If this is not the case currently, what happens when our own generated
-> SPI clashes with a peer generated SPI? Could it be we end up using the
-> wrong SA state?
+Hello Yanteng,
 
-No, the kernel will reject to insert a second identical SPI.
+On Sat, 6 Apr 2024, Yanteng Si wrote:
+
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> index e1537a57815f..e94faa72f30e 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+> @@ -420,6 +420,12 @@ stmmac_ethtool_set_link_ksettings(struct net_device *dev,
+>  		return 0;
+>  	}
+>  
+> +	if (priv->plat->flags & STMMAC_FLAG_DISABLE_FORCE_1000) {
+> +		if (cmd->base.speed == SPEED_1000 &&
+> +		    cmd->base.autoneg != AUTONEG_ENABLE)
+> +			return -EOPNOTSUPP;
+> +	}
+> +
+>  	return phylink_ethtool_ksettings_set(priv->phylink, cmd);
+>  }
+
+This doesn't seem like it belongs with the rest of the changes in this patch. 
+Maybe you could move it to a separate patch?
+
+Best Regards,
+
+-- 
+Romain Gantois, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
