@@ -1,40 +1,76 @@
-Return-Path: <netdev+bounces-86901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8622F8A0BB7
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:00:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 027A98A0BBF
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:01:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFC841C21569
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:00:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6BC11B22DAC
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E628513FD8E;
-	Thu, 11 Apr 2024 09:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72CB6140396;
+	Thu, 11 Apr 2024 09:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="g2AKEd9M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F08862EAE5
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 09:00:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE0D62144
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 09:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712826021; cv=none; b=OMtVFZ7rgnzgk82j7z6WpG7nrC28K+bDCeLFKgXZ4xdU6pfU4y7opFLzSmvXzWGCfcd8laCxC63Rx7erHTYRs+I/mWW5ckHggTggmN4YN3KcrcfGPDXkTZMVZYjyvEIEeiloxKs+XKDlCpqYp1D7ZGL1tkBe45LknxnwWMwS8Jo=
+	t=1712826098; cv=none; b=H4IVQPeFH8HefmgMxIqKM1VAe4ZWPfsBAg/JfCIghzaCOV+kqSrXB6/JQMdi5KRoE9Lxko8yHqcJu4oNMTe3wsHXFOMdwiW08KJDR0xhW2YRcG1BigJj0N3d5OJKIG0L+ZJt57uiCCz2eM9k3odOX17JfbHCKecfmhV80L8i5/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712826021; c=relaxed/simple;
-	bh=eDKSLQfrGq/KzEcmmIPthyEiFr6qBL20kJan7RqxxfU=;
+	s=arc-20240116; t=1712826098; c=relaxed/simple;
+	bh=GSoQQEhObTZqKNbNTjbmw2Pu8jRd277ESfN2R35ml/k=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=trVzjNfjYE5m0PVsDogM4Pvve9++nTnFcnwKAbCaoGolLvzCNVn0d5C7B7BmYukJ565ojmaufuz+24tD1EHnX3ZmsYgcTY74KjVmL6VFmhCVZXD5sp9PNKb8xqk7D5AHK0pIwus0d8SJEjUeEKc5ya8XdCi3Hsri6Bif3iUvGuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.109.80])
-	by gateway (Coremail) with SMTP id _____8Cx2uidphdmr8IlAA--.1296S3;
-	Thu, 11 Apr 2024 17:00:13 +0800 (CST)
-Received: from [192.168.100.8] (unknown [112.20.109.80])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxSRKYphdmqfN3AA--.23071S3;
-	Thu, 11 Apr 2024 17:00:09 +0800 (CST)
-Message-ID: <0f83f238-d52a-4304-9b57-d76b07bd8767@loongson.cn>
-Date: Thu, 11 Apr 2024 17:00:08 +0800
+	 In-Reply-To:Content-Type; b=p3ZOtBjrXFTzpJvHW1Q7P1bv6ixBkUPiGYj2pqyEWXjwsvZbABFTLwS/m4FrcYbZNWYabuU0WDYig+i7EkLpR0Ir4Iu/qQyxs27xPINV04Rq+eNEDsI65regBdoZydJvImLNFMHy61ULUaSyxiT1FOyFb3U31YFGymDRGgSEztw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=g2AKEd9M; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-516f2e0edb7so5463181e87.1
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 02:01:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1712826094; x=1713430894; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=qR2uulpByHN+MqCDRk2ZfluHjqnd6wrT47zQr7TwNYo=;
+        b=g2AKEd9MenVKAh9xdRJjSG0+s0aLRXfXzJkknWQRmIxa/jMDcdlr9Is68l1o33dYf1
+         DoyyYgb7enaRQbmghE0sapCLdiPUohIy880gammON+zbvXcDQlc8nbKysvpgcXd+sc0a
+         eA5b4SQo6Ay7EtzUyEJJJ9P71BxQh1LTJ9vbUofffklJG88tYCLv9A1881RN1sAfn0St
+         1O2H8X8EvAxp7hmpvQNbp4q8e6GLiludL27Lm7Y7sxiAvDM8V8SHhilC9m7EqwztxuHP
+         hIf7B3aNSfW0e+bGbJwDvmVSn1qFDzbif3ExA20ZcXf2Eco9e/0FHO7c/Ohrl8KToG+n
+         65EA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712826094; x=1713430894;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qR2uulpByHN+MqCDRk2ZfluHjqnd6wrT47zQr7TwNYo=;
+        b=UYqxGSmEirPocLzcp8wxbeoDFEAPCkuAw9Rdw3nXlvpy/q8NDPlDstGRoC1Z0+PdLa
+         uC718iuZgBSIOW+GaKDpgoCX2kOEVDwgvLYecBgMsmg1Fb/FAxyXZ7kNkhGr598NyZAy
+         QcZdKZXGnnvEmgBSGX3SApCEip12Eg6nXxsXMZ/jGo3wVUfE9lw7irWmSRlrU8BcwGjY
+         jfGxIrbCnNYAWYt3WI8cMD+wWZ+XoPALlwASIyAfts27wUyibdZ5ZoSAF7vO6T5Y5YRE
+         PfqsZBxBGmEmthSv25IhNnuOvchddA9VLKLXkxFM3Ju7UndHh+9X/EMqqvJ1L4sKFe1e
+         atNw==
+X-Forwarded-Encrypted: i=1; AJvYcCVC4zaHWTRziOycErv/ayQVu7XgmJyY1KWrODO5UE6r4ilk0FA1n/vYlxBW1M5Uq8An6uZkMnmk5Ix0/qVUG3OJiF1GPvFl
+X-Gm-Message-State: AOJu0YxWOYjkEhVMwpixYnW9uzKo82PqmXGY5ZpYp5r54JAD6c0n+lj/
+	9Cpx44jZmJDeGPHZf66ICfyPRqm2PpRRQNCmCdxKQzAaBF5gVmUViFTOtgHb5nwDaamLsuVs3Qo
+	o
+X-Google-Smtp-Source: AGHT+IHac3n4GzsYEA88zxdddbyTLvCZAug3Gr+tyla+TbnsbArQx1Ad7HL+/ha+JGZQ5dJc2yCFtw==
+X-Received: by 2002:a05:6512:4021:b0:516:a6ff:2467 with SMTP id br33-20020a056512402100b00516a6ff2467mr4600228lfb.0.1712826094400;
+        Thu, 11 Apr 2024 02:01:34 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:b41:c160:99b5:2ce4:3a1:b126? ([2a01:e0a:b41:c160:99b5:2ce4:3a1:b126])
+        by smtp.gmail.com with ESMTPSA id q3-20020adfb183000000b00343cad2a4d3sm1287937wra.18.2024.04.11.02.01.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Apr 2024 02:01:33 -0700 (PDT)
+Message-ID: <39ed70fe-ee5d-4e9c-8fba-d3b2dd290cde@6wind.com>
+Date: Thu, 11 Apr 2024 11:01:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -42,77 +78,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 1/6] net: stmmac: Add multi-channel support
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, fancer.lancer@gmail.com,
- Jose.Abreu@synopsys.com, chenhuacai@loongson.cn, linux@armlinux.org.uk,
- guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com,
- siyanteng01@gmail.com
-References: <cover.1712407009.git.siyanteng@loongson.cn>
- <e293a30532ef3e567e6236f6b643430036ea7e09.1712407009.git.siyanteng@loongson.cn>
- <6fd50d0f-862f-5aa1-700c-a2a4fe01854f@bootlin.com>
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH ipsec-next v9] xfrm: Add Direction to the SA in or out
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: antony.antony@secunet.com, Herbert Xu <herbert@gondor.apana.org.au>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, devel@linux-ipsec.org,
+ Leon Romanovsky <leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>,
+ Sabrina Dubroca <sd@queasysnail.net>
+References: <bb191b37cd631341552ee87eb349f0525b90f14f.1712685187.git.antony.antony@secunet.com>
+ <0a51d41e-124e-479e-afd7-50246e3b0520@6wind.com>
+ <ZheNx5AYKzmRjrys@gauss3.secunet.de>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
 Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <6fd50d0f-862f-5aa1-700c-a2a4fe01854f@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Organization: 6WIND
+In-Reply-To: <ZheNx5AYKzmRjrys@gauss3.secunet.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8AxSRKYphdmqfN3AA--.23071S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj9xXoW7Jr15CF1rAr43tryrXw4fJFc_yoWkWFX_Kw
-	42vr13A3WDJa15tr45K3y5Zr9Y9a4Du3sYqr18Kr909a1xWr95XrZ8Wr92yFy8G34rXFWD
-	Cr1xAa1Sy34IqosvyTuYvTs0mTUanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvT
-	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-	cSsGvfJTRUUUbfkYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
-	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	WUJVW8JwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r12
-	6r1DMcIj6I8E87Iv67AKxVWxJVW8Jr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
-	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU7pnQUUUUU
 
 
-在 2024/4/11 15:26, Romain Gantois 写道:
-> Hello Yanteng,
->
-> On Sat, 6 Apr 2024, Yanteng Si wrote:
->
->> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
->> index e1537a57815f..e94faa72f30e 100644
->> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
->> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
->> @@ -420,6 +420,12 @@ stmmac_ethtool_set_link_ksettings(struct net_device *dev,
->>   		return 0;
->>   	}
->>   
->> +	if (priv->plat->flags & STMMAC_FLAG_DISABLE_FORCE_1000) {
->> +		if (cmd->base.speed == SPEED_1000 &&
->> +		    cmd->base.autoneg != AUTONEG_ENABLE)
->> +			return -EOPNOTSUPP;
->> +	}
->> +
->>   	return phylink_ethtool_ksettings_set(priv->phylink, cmd);
->>   }
-> This doesn't seem like it belongs with the rest of the changes in this patch.
-> Maybe you could move it to a separate patch?
->
-Yeah, I will move it to patch 6/6, because it is a bug fix for some gnet.
 
+Le 11/04/2024 à 09:14, Steffen Klassert a écrit :
+> On Wed, Apr 10, 2024 at 08:32:20AM +0200, Nicolas Dichtel wrote:
+>> Le 09/04/2024 à 19:56, Antony Antony a écrit :
+>>> This patch introduces the 'dir' attribute, 'in' or 'out', to the
+>>> xfrm_state, SA, enhancing usability by delineating the scope of values
+>>> based on direction. An input SA will now exclusively encompass values
+>>> pertinent to input, effectively segregating them from output-related
+>>> values. This change aims to streamline the configuration process and
+>>> improve the overall clarity of SA attributes.
+>>>
+>>> This feature sets the groundwork for future patches, including
+>>> the upcoming IP-TFS patch.
+>>>
+>>> Signed-off-by: Antony Antony <antony.antony@secunet.com>
+>>> ---
+>>> v8->v9:
+>>>  - add validation XFRM_STATE_ICMP not allowed on OUT SA.
+>>>
+>>> v7->v8:
+>>>  - add extra validation check on replay window and seq
+>>>  - XFRM_MSG_UPDSA old and new SA should match "dir"
+>>>
+>>> v6->v7:
+>>>  - add replay-window check non-esn 0 and ESN 1.
+>>>  - remove :XFRMA_SA_DIR only allowed with HW OFFLOAD
+>> Why? I still think that having an 'input' SA used in the output path is wrong
+>> and confusing.
+> 
+> I don't think this can happen. This patch does not change the
+> state lookups, so we should match the correct state as it was
+> before that patch.
+This is the point. The user can set whatever direction in the SA, there is no
+check. He can set the dir to 'output' even if the SA is used in input.
 
-BTW, The issue was also discussed in v10, I will send v11 today, let us 
-continue to review in v11, thank you.
-
-
-Thanks,
-
-Yanteng
-
->
-
+> 
+> On the long run, we should make the direction a lookup key.
+> That should have happened with the initial implemenatation
+> already, now ~25 years later we would have to maintain the
+> old input/output combined SADB and two new ones where input
+> and output states are separated. 
+> 
 
