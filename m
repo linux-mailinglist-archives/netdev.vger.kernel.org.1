@@ -1,146 +1,102 @@
-Return-Path: <netdev+bounces-87175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01CFE8A1FB1
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 21:46:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 112468A1FB4
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 21:47:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06ACC1C23DA2
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:46:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4239C1C233A3
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:47:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D01117741;
-	Thu, 11 Apr 2024 19:45:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C863D14F65;
+	Thu, 11 Apr 2024 19:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kr7/mO5+"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="JDa0Wbtq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC98F1773D
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 19:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D6C01757D
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 19:47:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712864745; cv=none; b=uJGBvxwZZXQgYTE4kFdeEkWh7Yc0Lf5grQFhugBiZo/2bLSdVEIRc8RZvMPvyPmBXdiKWSy7BdgnaKHK4rtjvSXg+yTI7b6w81DtrW1r6mhSGIZCKjQTIALrJ6K/ZB2ss3fBKgmrztYOKUunZAqUzE/kQ/F+UsrOEdpp+deBWKc=
+	t=1712864838; cv=none; b=kMcfuUdQoiRa/xtNbAAn9BSKqr2gZiwqcJFSEWN4uTxsM2U2usxTBTL4cRwBl8ZInSbYKwQgRE/+QU54ifMpruoOtJtEbMEYrmhGfZKFYAk2toF5dcHeROChQ5opUsJzmucMBtJWXugD9VsSmVUVjV4y2+xqKPKLy96e0q1DUS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712864745; c=relaxed/simple;
-	bh=qu6ATuBQ5RJ+YNXVcT3r3GYo/IDRB1BLTVbuieK7UKg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HBS8U5Nc0paN+UrTk2b1JDFU+xhCMm7wocBIbsDy2MZW7yRgG7sMIvH+sLc60c3GISUdPvyD0Q6AnB4PUslPqZs2Em5Rgr9e161E0T4L5jqTKWz2GtMHDCqMQ2D1BlgPkxeyPk9bsM0kZUMTtSRxuAmhdoSWNQnl3+MAg/mFiGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kr7/mO5+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F3F5C2BD10;
-	Thu, 11 Apr 2024 19:45:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712864744;
-	bh=qu6ATuBQ5RJ+YNXVcT3r3GYo/IDRB1BLTVbuieK7UKg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=kr7/mO5+UO3MFJ1SMERDUt3f5DoSyDI8K9ht7PHw4VP+SPG7ZDaPrGA1uLE/PXaAV
-	 QAcD0nlDyRNRHS8y78TrxzJb9OVha4oPzlUUf7ntEtmbDOrbMGeNTNcY3rnPXzB8U1
-	 E9nJe+h4R0zsBVwUgF1KKBE4s2G4UEZ2PygxMNicIovUEA/lssD89xYNdLWfjHAWzW
-	 TAREh4lxYTAZLqY7rbYBNIk8DlYqgByII8Xpgx340Rb1t6atUlZ63zU7cszkhPKVzt
-	 nkOcKWyeSjv9DQJS0WrJognrcZMq9K7h7BrI1X1fwsE3PScyCjtTBNZbTYQXtC+51G
-	 AwjnB9kBraacA==
-Message-ID: <b4e24c74-0613-48be-9056-a931f7d9a772@kernel.org>
-Date: Thu, 11 Apr 2024 13:45:42 -0600
+	s=arc-20240116; t=1712864838; c=relaxed/simple;
+	bh=RJ411NQukGvGANF1CFRduL37FP2qka08J+w82lPEm7U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=vCUilWA7OeYIeUU/8HOtuQE0ZsL+6xjMygg1aHTL21IeciUXkdzCmkJqAYqwqwQuwktkEcmkSvJ0hNdKZOTo5aYWG/rXwQ9f0gAPu7BogZG2nvqBNGlnSRiyeTzevFeKNs/Fy7XDOAKhoU1fLZIZQeSx8kc1A5nUD45UwOVZglo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=JDa0Wbtq; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6184acc1ef3so1371777b3.0
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 12:47:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1712864836; x=1713469636; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JFv4I7anGu3gsDIp81FsGte3DwjJSu9Sw0xRvjxNuzU=;
+        b=JDa0Wbtq06k+Qcdq2QlXWGWl4Dr81EUwzZqEGaZ1c/54/SlHMswCiAWa6xFnbU8C9s
+         vfnU6mCWNRvJxY8Vcfq8TcEUIOsccdTBE8BIVzBZ/CVWLqt1A9VyU80iXJiY4lpyOx0Z
+         ucMbu2I0n5YmDwWE5LVc5hcxwTgs/oeU0h7bv+oIBjOQlrWNmriqsG2Zv013zH5Mith4
+         WzKGPXcuJ3Lq/HBek5b8jY3Fvl+8u2GKAc89KJtAx+Ylzeu0ycjqQcq4nEEI+rRtjz4S
+         ZZqzRMC01uaC9GsrM7VbUp02KKtgxwkj8QYiplkPH7mt/Dze+WvuUZ7XDLMHXEqYBdzw
+         pEJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712864836; x=1713469636;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JFv4I7anGu3gsDIp81FsGte3DwjJSu9Sw0xRvjxNuzU=;
+        b=nfIc8xZqfJ+NWsvichdoRFQ3N/fAkL0HByfYIzhgB2zOvdwKR31n6g9W7XW8nJAWUP
+         63U9Iv/2anxyR3zpjPEDaqRnsxVUyYsITiLtxwG6EEvlpi/TsYXlEAymWApK5UUr79fv
+         OAnxYPV/n45Iflh0tYKnINXAINg2Ml7NtCMaHYmSEIP5eb5j1jq3zqIo5OAq4XG+mg05
+         Sq60RTf+mEJeG/syfAy0HIbCDcyA4jaRp3IK0rVEzN5ERnX6hRNjyt8D/ahMRondZvJB
+         qQSy01Sp1FzfJKmqoid8LRaKdkNFpZkG36ogU84W9gMGr2Ovr5gfleoOMBW/WHbgnWAu
+         +1QQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV6GS7WNm7pJaJBrNMzVdyq6M1hpzSY5afiyC+EjJSEUL30m7zhE/dL9rVsinVAoUBEvArCFBS7P85g3o1SK1Il3pRFv9GX
+X-Gm-Message-State: AOJu0YyGRHs0JU7PQeSRPpV93CYs/MmgeAR0c+MhN8fURq1VwKzD8jlr
+	vEjysA9arwj4kvhUeMn4ucHEdsKwHa1S71e/8MXqKuKzp4AN/OOtYlL6kCRhMfhfgo1g30LU2b3
+	OjclcIGYhKiZvBl8LC1YxHZop1kG3iCghg0Jb
+X-Google-Smtp-Source: AGHT+IHdCoVifKEcMOd98tKe1uOMwazi7j5Yu3mssA3gOw4eknclIkt19uODSH1i1svghuYQLd8Dk21HNeZio7FiLUM=
+X-Received: by 2002:a0d:e64a:0:b0:618:2975:36c with SMTP id
+ p71-20020a0de64a000000b006182975036cmr444653ywe.36.1712864836376; Thu, 11 Apr
+ 2024 12:47:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] inet: bring NLM_DONE out to a separate recv() again
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- Stefano Brivio <sbrivio@redhat.com>, Ilya Maximets <i.maximets@ovn.org>,
- donald.hunter@gmail.com
-References: <20240411180202.399246-1-kuba@kernel.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240411180202.399246-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <d1d6a20f5090829629df76809fc5d25d055be49a.1712849802.git.dcaratti@redhat.com>
+ <CANn89iLyMv2JjEGRoAWb51TpxuMb5iCPb8dvTAmdJoZvx4=2LA@mail.gmail.com> <a76d497c-5d87-4d00-a0f4-147b3f747bf5@schaufler-ca.com>
+In-Reply-To: <a76d497c-5d87-4d00-a0f4-147b3f747bf5@schaufler-ca.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Thu, 11 Apr 2024 15:47:05 -0400
+Message-ID: <CAHC9VhSPb11cEgneKM1vbqjiuqLgvV+y933vhuhqHinWHtD_fg@mail.gmail.com>
+Subject: Re: [PATCH net] netlabel: fix RCU annotation for IPv4 options on
+ socket creation
+To: Casey Schaufler <casey@schaufler-ca.com>
+Cc: Eric Dumazet <edumazet@google.com>, Davide Caratti <dcaratti@redhat.com>, xmu@redhat.com, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-security-module@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/11/24 12:02 PM, Jakub Kicinski wrote:
-> Commit under Fixes optimized the number of recv() calls
-> needed during RTM_GETROUTE dumps, but we got multiple
-> reports of applications hanging on recv() calls.
-> Applications expect that a route dump will be terminated
-> with a recv() reading an individual NLM_DONE message.
-> 
-> Coalescing NLM_DONE is perfectly legal in netlink,
-> but even tho reporters fixed the code in respective
-> projects, chances are it will take time for those
-> applications to get updated. So revert to old behavior
-> (for now)?
-> 
-> Old kernel (5.19):
-> 
->  $ ./cli.py --dbg-small-recv 4096 --spec netlink/specs/rt_route.yaml \
->             --dump getroute --json '{"rtm-family": 2}'
->  Recv: read 692 bytes, 11 messages
->    nl_len = 68 (52) nl_flags = 0x22 nl_type = 24
->  ...
->    nl_len = 60 (44) nl_flags = 0x22 nl_type = 24
->  Recv: read 20 bytes, 1 messages
->    nl_len = 20 (4) nl_flags = 0x2 nl_type = 3
-> 
-> Before (6.9-rc2):
-> 
->  $ ./cli.py --dbg-small-recv 4096 --spec netlink/specs/rt_route.yaml \
->             --dump getroute --json '{"rtm-family": 2}'
->  Recv: read 712 bytes, 12 messages
->    nl_len = 68 (52) nl_flags = 0x22 nl_type = 24
->  ...
->    nl_len = 60 (44) nl_flags = 0x22 nl_type = 24
->    nl_len = 20 (4) nl_flags = 0x2 nl_type = 3
-> 
-> After:
-> 
->  $ ./cli.py --dbg-small-recv 4096 --spec netlink/specs/rt_route.yaml \
->             --dump getroute --json '{"rtm-family": 2}'
->  Recv: read 692 bytes, 11 messages
->    nl_len = 68 (52) nl_flags = 0x22 nl_type = 24
->  ...
->    nl_len = 60 (44) nl_flags = 0x22 nl_type = 24
->  Recv: read 20 bytes, 1 messages
->    nl_len = 20 (4) nl_flags = 0x2 nl_type = 3
-> 
-> Reported-by: Stefano Brivio <sbrivio@redhat.com>
-> Link: https://lore.kernel.org/all/20240315124808.033ff58d@elisabeth
-> Reported-by: Ilya Maximets <i.maximets@ovn.org>
-> Link: https://lore.kernel.org/all/02b50aae-f0e9-47a4-8365-a977a85975d3@ovn.org
-> Fixes: 4ce5dc9316de ("inet: switch inet_dump_fib() to RCU protection")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: dsahern@kernel.org
-> CC: donald.hunter@gmail.com
-> ---
->  net/ipv4/fib_frontend.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
-> index 48741352a88a..c484b1c0fc00 100644
-> --- a/net/ipv4/fib_frontend.c
-> +++ b/net/ipv4/fib_frontend.c
-> @@ -1050,6 +1050,11 @@ static int inet_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
->  			e++;
->  		}
->  	}
-> +
-> +	/* Don't let NLM_DONE coalesce into a message, even if it could.
-> +	 * Some user space expects NLM_DONE in a separate recv().
+On Thu, Apr 11, 2024 at 1:41=E2=80=AFPM Casey Schaufler <casey@schaufler-ca=
+.com> wrote:
+>
+> Please be sure to verify that this is appropriate for all users of netlab=
+el.
+> SELinux is not the only user of netlabel.
 
-that's unfortunate
+Adding my support to Casey's comment above.  If you go the boolean
+route, please work with Casey to ensure that the Smack usage is
+properly handled.
 
-> +	 */
-> +	err = skb->len;
->  out:
->  
->  	cb->args[1] = e;
-
-
-Reviewed-by: David Ahern <dsahern@kernel.org>
-
+--=20
+paul-moore.com
 
