@@ -1,109 +1,121 @@
-Return-Path: <netdev+bounces-87043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF31A8A16AD
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 16:06:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25E628A16B9
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 16:08:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6967028ABC0
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:06:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 993A9B25578
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D97814EC45;
-	Thu, 11 Apr 2024 14:05:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5B2E14D712;
+	Thu, 11 Apr 2024 14:07:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c3rbUQDF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HI16myGX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2286214E2C4
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 14:05:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2946614D45D
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 14:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712844334; cv=none; b=VZYs6vALmqLb4usKNrKy+MLNxcKs8oIoaQEr9N45/XpmB8YJTrJzi+yfzdj4ld9NXP+WAPC9Cv8RwVQqT5RqmvlC1kpIb3qfQ2u150qmBLfPtjPYgMW146xQMZqUp7sqejjxykC9RwVmXpt4kkNdyYN1GDeyeUMp1BZ5pR9SVpE=
+	t=1712844464; cv=none; b=RjmsExctkU0Tm/bQFTEvm9Zdhq4HJVwRFJg2dK3J4aXETqTuc2fbWD/lG9BIut8/U5UCZ0scKbPFE20KbgPaJKCIq7wp2y5YuTg6KDjif8KX01MHnRWRcrsFfUglBhw0UmuZSYWGNr4iDfYyzoDERBW4mEeM0wqtVuvDS5TgERc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712844334; c=relaxed/simple;
-	bh=sO/k1VyPKOnENEgajkskPj9+oQuq1K/3Wv/9ylX49AY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MOQdQsgxKxaGn+VduwuBsCZwK5OxEUp3HBPt3E5w9QN2pxGpWH6JXeKbxWoSfw0adRNwXS3MBiQ9YsFHeGY1tSVmFnL0o4ye/1Wl3JdRrTbtLF3KEW7SRbftBKS7oNAq/ys+O7u4Lv7CQjnsL2iJAa4s/jx1xH5jzrp8Y/zpluY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c3rbUQDF; arc=none smtp.client-ip=209.85.128.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-61871eaf3c1so682007b3.1
-        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 07:05:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712844332; x=1713449132; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ISI+xkivGoH4G8u7U1qLHZI0IRvd5fA/fqQTszejiu4=;
-        b=c3rbUQDFY6SCxBj70NwdMBD9r1eKZS4EMDMBSGhwIGwep5o2DwwZJ6WGdL7ciT6tnd
-         +eLfYPsgrauWWg7Qg5fuJ2Sqy6MFpN2dZB2jrZi+VYp62O2HaQDGgJHHBbaMFwVg8bv9
-         CUilXXAcTU5XeGId63ayxW5Sagv/L55A3XN3xoUBfHtYIVuRIbQye9aobMtl1TGwQtKL
-         0VuedUMxeKd6bQRSgOQZWRNO68le2rf1I/ZtCS6k9I6bFsaEHm+HVSfpbmwkF0h1Ma6j
-         zQn3DOUoEIm2vuBLoE2COiZXdItcAsAboLYnZQuKVp+pFGHXvDfB0q/+BaT5nRnRiM8s
-         DI5g==
+	s=arc-20240116; t=1712844464; c=relaxed/simple;
+	bh=/p0kaDsFnXm3FyunvqOjb7AA5Mj+vx4qvrekvtyoWgU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=h5dH4DFJaOGaXEGzygL/981ifhFqC0OdLzWiZfA/Zml+rWAt0pjalWfbPwSYNeZ2AsnsHptkfFTtU8p9JYF7Naa/7INQhDOYr68Ae+B6t9mhamOUqT7pYue+FLJ3ImoucWNj5OPcWNrPl2TiV1Vq/ip3zFZ7+/0eYxp6ZEWfRJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HI16myGX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712844462;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=/p0kaDsFnXm3FyunvqOjb7AA5Mj+vx4qvrekvtyoWgU=;
+	b=HI16myGXKmymGbVA9dGa5HogqljZkXq2aeCF3edSSf4Ir8XkGYRHcixH2HBjbXdxfh80r7
+	QPREUdvNBRAD/fVeVtUsV6epFykBiqJ2HPFzN71afiBNcEEVJ/4mhwYzfv8+w0Xk+kuKKE
+	f7FoqMGDLpSX4I9bt301sxtmWAVLre4=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-487-g7YjJ5fINZa7DGymYkdVcA-1; Thu, 11 Apr 2024 10:07:40 -0400
+X-MC-Unique: g7YjJ5fINZa7DGymYkdVcA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-343eb7d0e0eso1901524f8f.1
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 07:07:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712844332; x=1713449132;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1712844459; x=1713449259;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ISI+xkivGoH4G8u7U1qLHZI0IRvd5fA/fqQTszejiu4=;
-        b=AQDxzESD5iVVUWZXedE1P3JeJuMdTwYLAtDLe2MzS5qU93jum28hWF7eO/9FpeK53l
-         BMWP+8c+5x047JcCzx+LAKmvnbatHg0epotQdyHHRN7mWi2YVeZVfH0YifHwJ9L+YOfz
-         9inftenUzk2HQ3tcMoA6bO9qGMRA/cA3FlPRTbkOFYKE3nf5MR4hMCOcJ8/SGEVZec2q
-         zsgoETEIm4pb8h+/qeKH/rHo7/y9QWSnyOdV15Na22oQsmZBxpURWwSnOztxSYKzk1J7
-         0mV4hqqA9jNi+YNAcrtZKqR6pfFEjkELXy+sGIXrS8jPfrDwO04LEa7qN3Gp0RG35Y9u
-         99rQ==
-X-Gm-Message-State: AOJu0YypUMqNITWp96JTqmyToyIsjDSprmIPL3U5H9NEATqA6wW3MFxf
-	aA7UHOXEFMFzd2ZoXnIcWo7s0dH/QI9kh9g/6gMXqCj+N/tju5fi
-X-Google-Smtp-Source: AGHT+IE4/g5B9+n0jLctyKrzyUcTGABg2j8m0u27PyyKaMJIGc6ptNlcyk1bQUj7sHjCgnpE88qAkQ==
-X-Received: by 2002:a81:d40d:0:b0:60a:55b7:8e6b with SMTP id z13-20020a81d40d000000b0060a55b78e6bmr4584886ywi.1.1712844332026;
-        Thu, 11 Apr 2024 07:05:32 -0700 (PDT)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id y138-20020a0dd690000000b0061248f16528sm321262ywd.66.2024.04.11.07.05.30
+        bh=/p0kaDsFnXm3FyunvqOjb7AA5Mj+vx4qvrekvtyoWgU=;
+        b=wqd628EtNx5QrUfKsUyf7Y1muhJ0b4aJKRSEfjl/oBkg/8kcuU1XsmPr9EFBz7060n
+         mc/LOf4rqGI1ZUL55o8pw8+TbZ55xhWDaAQSm3q0AnS0n6Fu5vHhE6c4U1G2/anwxsIC
+         6l2indtl/NhpSx76QCcI85WlCa+5+IDytV42dZDqDfFsl5ySODFZuB8rrbC0QCJJkPR/
+         AJDZuXbXIIQxowqwwwH5ZO+ZLwc4jCs4mSENG27FV6+8AWZdql92razJvEf8toMK1Mn7
+         oCbtjeMK+AInrGTAzT7PAYUDcjJ34yrWvzrK+wy8Pj2qXee9eAc6qMvx4vBFiA+vWrDe
+         qqrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUIFg8zTCU8ZaFa6lj3FufKyRE7EYaxC4fQRUACSgv8Ve+NnsryviCjxTCiAW2gulTsLSC54AIN0jPrcR/EckMSj3oCVrm5
+X-Gm-Message-State: AOJu0Yw8zbT6y4k1AC3I1oOiP5aRu14cpHRtnmLviMYNIpVOS98O8tUK
+	g9VXI9NqwL2R0Xv+qwPzk8HxidxQCx5AmuJaypsjPNpzdIIzMYD38SYlG3jjlMUo0rdxE/RPXQ4
+	ylMQ/13lo/KQUbp0R16kl+k7o/mQAUUi5z9eLeRrSjAw4O83nt2Jsaw==
+X-Received: by 2002:adf:eac8:0:b0:346:b531:dbb9 with SMTP id o8-20020adfeac8000000b00346b531dbb9mr1502048wrn.1.1712844459599;
+        Thu, 11 Apr 2024 07:07:39 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEK7RvBvBVBVp/CZHiBk89+evBxS6xjG2NUBls7q8SYIpex6Pe/KFsq3nflPT9D1B5PSvXl3Q==
+X-Received: by 2002:adf:eac8:0:b0:346:b531:dbb9 with SMTP id o8-20020adfeac8000000b00346b531dbb9mr1502013wrn.1.1712844459231;
+        Thu, 11 Apr 2024 07:07:39 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-235-217.dyn.eolo.it. [146.241.235.217])
+        by smtp.gmail.com with ESMTPSA id z11-20020a5d44cb000000b00345920fcb45sm1875479wrr.13.2024.04.11.07.07.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Apr 2024 07:05:31 -0700 (PDT)
-Date: Thu, 11 Apr 2024 07:05:28 -0700
-From: Richard Cochran <richardcochran@gmail.com>
-To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
-Cc: netdev@vger.kernel.org, kernel@pengutronix.de,
-	Yangbo Lu <yangbo.lu@nxp.com>
-Subject: Re: [PATCH net-next 0/5] ptp: Convert to platform remove callback
- returning void
-Message-ID: <ZhfuKDc0Oiiwgpjm@hoboy.vegasvil.org>
-References: <cover.1712734365.git.u.kleine-koenig@pengutronix.de>
+        Thu, 11 Apr 2024 07:07:38 -0700 (PDT)
+Message-ID: <41736ea4e81666e911fee5b880d9430ffffa9a58.camel@redhat.com>
+Subject: Re: [PATCH net-next v16  00/15] Introducing P4TC (series 1)
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org
+Cc: deb.chatterjee@intel.com, anjali.singhai@intel.com, 
+ namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
+ Mahesh.Shirshyad@amd.com, tomasz.osinski@intel.com, jiri@resnulli.us, 
+ xiyou.wangcong@gmail.com, davem@davemloft.net, edumazet@google.com, 
+ kuba@kernel.org, vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com, 
+ toke@redhat.com, victor@mojatatu.com, pctammela@mojatatu.com,
+ Vipin.Jain@amd.com,  dan.daly@intel.com, andy.fingerhut@gmail.com,
+ chris.sommers@keysight.com,  mattyk@nvidia.com, bpf@vger.kernel.org
+Date: Thu, 11 Apr 2024 16:07:36 +0200
+In-Reply-To: <20240410140141.495384-1-jhs@mojatatu.com>
+References: <20240410140141.495384-1-jhs@mojatatu.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cover.1712734365.git.u.kleine-koenig@pengutronix.de>
 
-On Wed, Apr 10, 2024 at 09:34:49AM +0200, Uwe Kleine-König wrote:
-> Hello,
-> 
-> this series converts all platform drivers below drivers/ptp/ to not use
-> struct platform_device::remove() any more. See commit 5c5a7680e67b
-> ("platform: Provide a remove callback that returns no value") for an
-> extended explanation and the eventual goal.
-> 
-> All conversations are trivial, because the driver's .remove() callbacks
-> returned zero unconditionally.
-> 
-> There are no interdependencies between these patches, so they can be
-> applied independently if needed. This is merge window material.
-> 
-> Best regards
-> Uwe
+On Wed, 2024-04-10 at 10:01 -0400, Jamal Hadi Salim wrote:
+> The only change that v16 makes is to add a nack to patch 14 on kfuncs
+> from Daniel and John. We strongly disagree with the nack; unfortunately I
+> have to rehash whats already in the cover letter and has been discussed o=
+ver
+> and over and over again:
 
-For the series:
+I feel bad asking, but I have to, since all options I have here are
+IMHO quite sub-optimal.
 
-Acked-by: Richard Cochran <richardcochran@gmail.com>
+How bad would be dropping patch 14 and reworking the rest with
+alternative s/w datapath? (I guess restoring it from oldest revision of
+this series).
+
+Paolo
+
 
