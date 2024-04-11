@@ -1,121 +1,166 @@
-Return-Path: <netdev+bounces-86937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4D248A103E
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:33:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 810138A106E
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:35:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D682D1C212F7
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:33:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 377F028AA26
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:35:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F3E414B07F;
-	Thu, 11 Apr 2024 10:31:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B96149C70;
+	Thu, 11 Apr 2024 10:33:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X9pcmQrL"
+	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="nAOP2DQa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52AF914B076
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 10:31:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA9C148316
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 10:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712831498; cv=none; b=Vp3JLS218UJybmtFVLSdMJYuntcyIj401GApAAEwe+dUwu+8JgqcgrBQuetYO9lZGSt9HovUqwEpi4OpHMRnWfJdBN7DL15AU4BKMnYfmsKfHkNOH2xiqWulAXs0q1G42qECysvs4GBAVrTh2yj7MjWK3vU+rBgGVmqeAS75mYE=
+	t=1712831601; cv=none; b=rDWMbmRdPStB9nyk2F/DO99KqDhKy0JSZSCX/GLALgiPmtNfbKfzWefCqusvSgReN5DscTJLwVnX0RnFdH3i4qIgvAs/voOZdGN0jl9s/QjiL8Jiz1gOQZvK+VgAn2h5MkRxx6uv/ZlmCP/7fCkncH6XCSa1KNp1W8Jm5s55QVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712831498; c=relaxed/simple;
-	bh=WaXysxKJe+vS1i8j5oNGaoke2Hd03sYBfChSAqV5DuU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eTjGM1LZt7/O0gG+3PiuLkfpNvCSfP+Xpax0Tt/G1DRblHwNm/S9MnHPHZtBjb+m/4/5NdsJQLPR+qz5OEHO3lsyI4K/6nH/6Hb3dSlY3wiQxCJ9uPy6FlnlvaDx329UJ8p6BxZ59nv8W84aCs/QJRixGdwmL3e2sPrMIIgQBtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=X9pcmQrL; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a51ddc783e3so516889566b.0
-        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 03:31:36 -0700 (PDT)
+	s=arc-20240116; t=1712831601; c=relaxed/simple;
+	bh=v3UI5RIQH7te7LWmFRWP4LgzcL8cQKLtThZe3AOeO0Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S7RXs9QtWgJ4V7iR7SbdV6sl2NIaZMNUT0rtmeK0LP5GbkXjdZJnpdk/1R0A4rQ/hGPT35/EsjOBjVWOWQTz0akcN1FrGQhS/N4y+9qj77f1lo/9xRnIhMGKjCXZNem547lT6OhTXF3O89XGbuEktVpH5aiNbCUxI5B2seRwJn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=nAOP2DQa; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-615826815c2so90173657b3.1
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 03:33:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1712831494; x=1713436294; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gcnjoJrjLylLXAH3rtU2vKqJq2FaC8fgwxIrZFCTV4c=;
-        b=X9pcmQrLIlBOqIqdWBYOi6BbTZyrOy0WDTlLlM9aR2rZy00a11AVoM1d/I5vuXgz4y
-         hlBZwSoXZy1Z+xLOzRINP2sAlNRtKZr/wVCLADfIreAK704WxjhVNCMmqaSjacX9f5O9
-         wI93CZGmvdcNNXstf1e/fLKBARp/1ieP87oCNbTJMDSU6ExdSH+gkmXNtY+TYe4WazsV
-         t9r86dzKsM/BaHAsP3VwguoABsO6ogtzeK0bZ9u0iXlijJl/dmlPGpdds127ABt3nSJn
-         JEHG65cU38v4HGuLa13ttkRkLeD5jeyZnyeUm+eQMDK2P/SxFHMlV+W/w4RINc0Hmbk5
-         93qA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712831494; x=1713436294;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1712831599; x=1713436399; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=gcnjoJrjLylLXAH3rtU2vKqJq2FaC8fgwxIrZFCTV4c=;
-        b=Hu0+gFJt725l35X73IwANOWyCMhsM8wJES2RtW+65hDy+Y2TSaXFPGmFe2cw6pb9Ka
-         bF+8S/QuKz57SoM0VTgJXJ6gUfwSwZ7AYPvo+YVEQQesd91Vypmcao6xD+ekIJLoTeYf
-         Kjd8TIrohceLlzaw9O8R7LaWtft1Jn3tEkjz7+mDZlIWFBsMJ62mD8OzR9V3zsPRd3/C
-         EQ+Q4aGU0S4yhb4iGAp6uzNlsAxkSKaZ5lk1zf2bpaO3Ed/p8WEe1NFjMFij5Y2HeZaj
-         ZT8FqxVXLT7p4I7M2kvXvc0btx3yXZZPLRxzopuUY13Wq6ucV54IURWiTLONP8thSGHU
-         Rhmg==
-X-Forwarded-Encrypted: i=1; AJvYcCU0SNUMGL0JO5iwyZEV3SWxWhtd+3rXwH+IKt4WOLo+Av/lK/zAyPaFpLXcGUctCuxT7ZAoOmXjCcfd5QCmISTMEGqIqMpK
-X-Gm-Message-State: AOJu0YzmftO1Efty/XCTvQqgqf1RjdODRDX8/83jEf+gksAgnWtbz1yX
-	70IkA6JqJUV8d1/tMCy6nmlB3Ze/4F+mN33iX82iH/XQodhOLn7/r2h1kMqlp5s=
-X-Google-Smtp-Source: AGHT+IH4wZBnbCaLwIvzN1RatSpqcPKcnXIaR8FNtF23Nq7ZPqPfkqzwLsjxIbox0YwuhK0SFzIL1g==
-X-Received: by 2002:a17:907:9302:b0:a52:1466:4d1b with SMTP id bu2-20020a170907930200b00a5214664d1bmr3301095ejc.17.1712831494384;
-        Thu, 11 Apr 2024 03:31:34 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id kk7-20020a170907766700b00a51def4861bsm618040ejc.91.2024.04.11.03.31.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Apr 2024 03:31:34 -0700 (PDT)
-Date: Thu, 11 Apr 2024 13:31:30 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Tung Quang Nguyen <tung.q.nguyen@dektech.com.au>
-Cc: Colin Ian King <colin.i.king@gmail.com>, Jon Maloy <jmaloy@redhat.com>,
-	Ying Xue <ying.xue@windriver.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"tipc-discussion@lists.sourceforge.net" <tipc-discussion@lists.sourceforge.net>,
-	"kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH][next] tipc: remove redundant assignment to ret, simplify
- code
-Message-ID: <ce0a63fc-1985-4e25-a08b-c0045ae095f4@moroto.mountain>
-References: <20240411091704.306752-1-colin.i.king@gmail.com>
- <AS4PR05MB96479D9B6F9EC765371AA8A588052@AS4PR05MB9647.eurprd05.prod.outlook.com>
+        bh=sIzn5JxfDVqeHPR8BBB6h2bxYLXCwdl4F5nMpLuCxqE=;
+        b=nAOP2DQaNI9g4amwHVbo28P91cGmlMQQ37SqWiQrR21M4SRLeoMtV6wvprUncM6eAY
+         F0sfaemgtW5EpBR77rAKMS8sDZiEBmYC35lzSuXhBIxg1tblTEYTaKy/CPas2hpE9feC
+         2jaAiZUv3Ntc0aTQ8fmaL+l/JE0JFZ5pC2/7pvNQjBmdZjUzmbjMmvJArW47D5DbtuVl
+         qhiIAKYrVj6hZPkR6Uz86muk007xI6ElkfNM5r+oE1m8xpdVXDzz1nireJIVPdE+C7tn
+         QXViWX9K0xPNq564dwpSDWgatUus3ferQkKLEuJqQwzNZAvUqu/Yfruv/Mxo2BqDRyt7
+         nPwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712831599; x=1713436399;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sIzn5JxfDVqeHPR8BBB6h2bxYLXCwdl4F5nMpLuCxqE=;
+        b=cqCdRwPq1xFoa6mnuxsNaFhWriGiZ/BQHHCm1fcW418yy9rJyaAw55WPiFbnK1lBn7
+         L7BDfANiO50BRjJeaYMQCJ3j07PBGBHcOnybHiD69D9fCZsu4lVEXWltRtCYqRnDABwo
+         MUtkTaOf/2ZmpDD5mLaYO6AI24bS00VyEMA6EwL/0mW8owqo/afNQTU0gFe1R27lQIPj
+         6GcyNLgO/cZ16R22S2BgRJVA89A7nm9DIt4DtD0grN98pMKgy9RqpClp2OWG02vB773M
+         Q8uHE3P36Yn7XzuFtdYH0Y0R2A4E6/1gHBU5m7WOxwfJiqT8uHQOP+8r2FrgnBHnak5V
+         yD7A==
+X-Forwarded-Encrypted: i=1; AJvYcCVyY4jB2UI3AUvTGPBZ3/hT/1jX/w0PKKjmvrQ8ZoI6x+i9xJtxWD7JrR62P9EqZTyA1usM06qYrIbxrwv0W7IqU4KvLhvs
+X-Gm-Message-State: AOJu0Yw6JETwbUjp7mCz3J/F8WPXpJs9yQg0ZYyP159y4XVHHgp9Fp7Y
+	C1e7p6rSB3tq43rCL1X7oSAFzEkU9vl8rnmZqN+bI8PTv4uzQDxFNpN7aAvi3FqSidAkbC+0f/N
+	4chhrD492YXi9JjXio2WSGNWjFag2M86/A/ETyw==
+X-Google-Smtp-Source: AGHT+IHjYblqeN/83EZv0nceP91YlUEmxfdXzxyjeGJ3vXN9tOSNGqZr+qgrXFxAWFWULr/A5HFAyUbdbME3tgB3PGY=
+X-Received: by 2002:a0d:dd14:0:b0:614:c76:26f1 with SMTP id
+ g20-20020a0ddd14000000b006140c7626f1mr6198370ywe.21.1712831597884; Thu, 11
+ Apr 2024 03:33:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AS4PR05MB96479D9B6F9EC765371AA8A588052@AS4PR05MB9647.eurprd05.prod.outlook.com>
+References: <20240410042245.2044516-1-lei.chen@smartx.com> <9e0884e2a101215d3376f2ef9a7a68ca86599f0f.camel@redhat.com>
+ <CACGkMEsjTD7Q26BqLuRMh7QmRZYeWZuTbQSDrb7O=uny5oknTg@mail.gmail.com>
+In-Reply-To: <CACGkMEsjTD7Q26BqLuRMh7QmRZYeWZuTbQSDrb7O=uny5oknTg@mail.gmail.com>
+From: Lei Chen <lei.chen@smartx.com>
+Date: Thu, 11 Apr 2024 18:33:06 +0800
+Message-ID: <CAKcXpBwr9v-z0zVQ-KiucAfPLbE7AB4JMM+Ems5iW0nijuPKug@mail.gmail.com>
+Subject: Re: [PATCH v2] net:tun: limit printing rate when illegal packet
+ received by tun dev
+To: Jason Wang <jasowang@redhat.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 11, 2024 at 10:04:10AM +0000, Tung Quang Nguyen wrote:
+On Thu, Apr 11, 2024 at 4:47=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
+ote:
+>
+> On Thu, Apr 11, 2024 at 4:30=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
+rote:
 > >
-> I suggest that err variable should be completely removed. Could you
-> please also do the same thing for this code ?
-> "
-> ...
-> err = skb_handler(skb, cb, tsk);
-> if (err) {
+> > On Wed, 2024-04-10 at 00:22 -0400, Lei Chen wrote:
+> > > vhost_worker will call tun call backs to receive packets. If too many
+> > > illegal packets arrives, tun_do_read will keep dumping packet content=
+s.
+> > > When console is enabled, it will costs much more cpu time to dump
+> > > packet and soft lockup will be detected.
+> > >
+> > > net_ratelimit mechanism can be used to limit the dumping rate.
+> > >
+> > > PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980=
+"
+> > >  #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
+> > >  #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
+> > >  #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
+> > >  #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
+> > >  #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
+> > >     [exception RIP: io_serial_in+20]
+> > >     RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
+> > >     RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 00000000000000=
+00
+> > >     RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428=
+a0
+> > >     RBP: 0000000000002710   R8: 0000000000000004   R9: 00000000000000=
+0f
+> > >     R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 00000000000000=
+20
+> > >     R13: ffffffff8acbf698  R14: 0000000000000058  R15: 00000000000000=
+00
+> > >     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+> > >  #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
+> > >  #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
+> > >  #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
+> > >  #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
+> > >  #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
+> > >  #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
+> > >  #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
+> > >  #12 [ffffa65531497b68] printk at ffffffff89318306
+> > >  #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
+> > >  #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
+> > >  #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
+> > >  #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
+> > >  #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
+> > >  #18 [ffffa65531497f10] kthread at ffffffff892d2e72
+> > >  #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
+> > >
+> > > Signed-off-by: Lei Chen <lei.chen@smartx.com>
+> >
+> > This change is IMHO best suited for 'net': the possible soft sookup
+> > looks nasty.
+> >
+> > @Willem, @Jason, any strong opinion against the above?
+> >
+> > Otherwise, @Lei Chen, please repost with a suitable fixes tag and
+> > adding the target tree into the subj prefix.
+>
+> I think the fix should be
+>
+> ef3db4a59542 ("tun: avoid BUG, dump packet on GSO errors")
+>
+> The target should be net.
+>
+> And it needs to address Williem's concern about patch format.
+>
+> With those fixed.
+>
+> Acked-by: Jason Wang <jasowang@redhat.com>
 
-If we write the code as:
-
-	if (some_function(parameters)) {
-
-then at first that looks like a boolean.  People probably think the
-function returns true/false.  But if we leave it as-is:
-
-	err = some_function(parameters);
-	if (err) {
-
-Then that looks like error handling.
-
-So it's better and more readable to leave it as-is.
-
-regards,
-dan carpenter
+Thanks for your help.
+I will remake the patch with subject-prefix "PATCH net-next v3"  and
+fix tag ef3db4a59542"
 
