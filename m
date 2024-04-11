@@ -1,224 +1,109 @@
-Return-Path: <netdev+bounces-87042-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A684E8A168F
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 16:04:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF31A8A16AD
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 16:06:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CABE81C21CC5
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:04:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6967028ABC0
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:06:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23B67156F37;
-	Thu, 11 Apr 2024 14:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D97814EC45;
+	Thu, 11 Apr 2024 14:05:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c3rbUQDF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE5A14C5BE;
-	Thu, 11 Apr 2024 14:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2286214E2C4
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 14:05:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712844045; cv=none; b=qwxTmx+2eND4uOmv0IkcOyjaLWEOXXydVeiRx4C6ZI6fPu3mQKE9HLnhpARH8sa01IVt6gyoRMGq+6JIg2xMOOknJ4X/a5J8mf+aLLBin+F1gWuwnP12sIGwC9V8UGEKaFMITxCD71t1WRlmHnaIL8zQyUL0vgKE9ZRlfix3slw=
+	t=1712844334; cv=none; b=VZYs6vALmqLb4usKNrKy+MLNxcKs8oIoaQEr9N45/XpmB8YJTrJzi+yfzdj4ld9NXP+WAPC9Cv8RwVQqT5RqmvlC1kpIb3qfQ2u150qmBLfPtjPYgMW146xQMZqUp7sqejjxykC9RwVmXpt4kkNdyYN1GDeyeUMp1BZ5pR9SVpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712844045; c=relaxed/simple;
-	bh=C2/enydAC2YCsBNnm5NUTUC6WvB4CkjpCpQsFsdVyag=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cr8hveX1litAB+SkTDOh/te2+jP4rKqkovl/XOzWIz0c8EQkAr3oXwfF/7vOZFToMM8v59CeR6jVjJjaF9fiYhoRlFfJcKa3YpEp1S8+D6n9U2lc1FPzedIMhls4PkpWHg1Hif88GO4ss707Lok1szEGzI97SHhbf9UpiL1jnEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1712844334; c=relaxed/simple;
+	bh=sO/k1VyPKOnENEgajkskPj9+oQuq1K/3Wv/9ylX49AY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MOQdQsgxKxaGn+VduwuBsCZwK5OxEUp3HBPt3E5w9QN2pxGpWH6JXeKbxWoSfw0adRNwXS3MBiQ9YsFHeGY1tSVmFnL0o4ye/1Wl3JdRrTbtLF3KEW7SRbftBKS7oNAq/ys+O7u4Lv7CQjnsL2iJAa4s/jx1xH5jzrp8Y/zpluY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c3rbUQDF; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a51a7d4466bso788729166b.2;
-        Thu, 11 Apr 2024 07:00:43 -0700 (PDT)
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-61871eaf3c1so682007b3.1
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 07:05:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712844332; x=1713449132; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=ISI+xkivGoH4G8u7U1qLHZI0IRvd5fA/fqQTszejiu4=;
+        b=c3rbUQDFY6SCxBj70NwdMBD9r1eKZS4EMDMBSGhwIGwep5o2DwwZJ6WGdL7ciT6tnd
+         +eLfYPsgrauWWg7Qg5fuJ2Sqy6MFpN2dZB2jrZi+VYp62O2HaQDGgJHHBbaMFwVg8bv9
+         CUilXXAcTU5XeGId63ayxW5Sagv/L55A3XN3xoUBfHtYIVuRIbQye9aobMtl1TGwQtKL
+         0VuedUMxeKd6bQRSgOQZWRNO68le2rf1I/ZtCS6k9I6bFsaEHm+HVSfpbmwkF0h1Ma6j
+         zQn3DOUoEIm2vuBLoE2COiZXdItcAsAboLYnZQuKVp+pFGHXvDfB0q/+BaT5nRnRiM8s
+         DI5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712844042; x=1713448842;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xrYnp1tDsZ0sxZFnn5u9gBZrt+Gb2bRXco5M67sATos=;
-        b=Dq281TTlzkBsGh9adJHenMuBxsyBDePlba/lltBL87hI1tdka61vUMm/N3xwhXRwpi
-         NpHIXStoVNObBWCuxCtxrG6F7KnyIdgPJfvIs+M+e9KWL6SWPN03OH7RhgRZN7befnwK
-         omKMINTJjbPpsyCjJmYPoowDZ+A3mMELrKosp81diMky5+adRp0hoXb5gR/OIH1r/uid
-         HAuktFIer6kMgTMpMTZM4/Y2D6XuMUD2Uf4Pz2ZUnZNUbfl+6q4kpi0EcY6GdyIHfOsN
-         xz3nV7U8XMTsaNTQ42+VZGcYWly/JvVUyHmD57s7wyL5hDy1SsMWAToQah3zOOSKUX8J
-         Yuzg==
-X-Forwarded-Encrypted: i=1; AJvYcCU/1dl7x1Ll8KYx2PNA6hbWUWxsknAZey+3I0Wg4RBL0osM329QhRfoJJub3Oiv3Q+AIe5js8PuixC/ynUvLUv+wm+Gah/XbAdXoco0EEzazyKxMV74ODkzhryOYX8X8TlLkpZdAqaMA9qeksFFWWi/Fn2ANclA80l2OLww/r9oPciod/MB9OlbGdmPZth5YdiVME2VF34MuQc=
-X-Gm-Message-State: AOJu0YwjHxSk2lLVf/oqtW3WFe6+8+PFoZT7BdRci8N0b2An6MnyPAIQ
-	B796WyPFJaix9S3qHjhs4e48LNvjwuuI7sa065J5Vl1/RQH/AoSi
-X-Google-Smtp-Source: AGHT+IFZGP/scO0ubNJmt0aoTujRGQZJOvjmWlRs+FjC+tWdWZmrmvYWjoweGZeS25kI0JSSKLCy0w==
-X-Received: by 2002:a17:906:e95:b0:a51:b00b:45a5 with SMTP id p21-20020a1709060e9500b00a51b00b45a5mr2923428ejf.74.1712844041681;
-        Thu, 11 Apr 2024 07:00:41 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-001.fbsv.net. [2a03:2880:30ff:1::face:b00c])
-        by smtp.gmail.com with ESMTPSA id ox2-20020a170907100200b00a522bef9f06sm212031ejb.181.2024.04.11.07.00.40
+        d=1e100.net; s=20230601; t=1712844332; x=1713449132;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ISI+xkivGoH4G8u7U1qLHZI0IRvd5fA/fqQTszejiu4=;
+        b=AQDxzESD5iVVUWZXedE1P3JeJuMdTwYLAtDLe2MzS5qU93jum28hWF7eO/9FpeK53l
+         BMWP+8c+5x047JcCzx+LAKmvnbatHg0epotQdyHHRN7mWi2YVeZVfH0YifHwJ9L+YOfz
+         9inftenUzk2HQ3tcMoA6bO9qGMRA/cA3FlPRTbkOFYKE3nf5MR4hMCOcJ8/SGEVZec2q
+         zsgoETEIm4pb8h+/qeKH/rHo7/y9QWSnyOdV15Na22oQsmZBxpURWwSnOztxSYKzk1J7
+         0mV4hqqA9jNi+YNAcrtZKqR6pfFEjkELXy+sGIXrS8jPfrDwO04LEa7qN3Gp0RG35Y9u
+         99rQ==
+X-Gm-Message-State: AOJu0YypUMqNITWp96JTqmyToyIsjDSprmIPL3U5H9NEATqA6wW3MFxf
+	aA7UHOXEFMFzd2ZoXnIcWo7s0dH/QI9kh9g/6gMXqCj+N/tju5fi
+X-Google-Smtp-Source: AGHT+IE4/g5B9+n0jLctyKrzyUcTGABg2j8m0u27PyyKaMJIGc6ptNlcyk1bQUj7sHjCgnpE88qAkQ==
+X-Received: by 2002:a81:d40d:0:b0:60a:55b7:8e6b with SMTP id z13-20020a81d40d000000b0060a55b78e6bmr4584886ywi.1.1712844332026;
+        Thu, 11 Apr 2024 07:05:32 -0700 (PDT)
+Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
+        by smtp.gmail.com with ESMTPSA id y138-20020a0dd690000000b0061248f16528sm321262ywd.66.2024.04.11.07.05.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Apr 2024 07:00:41 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: aleksander.lobakin@intel.com,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	elder@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	nbd@nbd.name,
-	sean.wang@mediatek.com,
-	Mark-MC.Lee@mediatek.com,
-	lorenzo@kernel.org,
-	taras.chornyi@plvision.eu,
-	ath11k@lists.infradead.org,
-	ath10k@lists.infradead.org,
-	linux-wireless@vger.kernel.org,
-	geomatsi@gmail.com,
-	kvalo@kernel.org,
-	Jeff Johnson <jjohnson@kernel.org>
-Cc: quic_jjohnson@quicinc.com,
-	leon@kernel.org,
-	dennis.dalessandro@cornelisnetworks.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	idosch@idosch.org,
-	leitao@debian.org
-Subject: [PATCH net-next v6 10/10] wifi: ath11k: allocate dummy net_device dynamically
-Date: Thu, 11 Apr 2024 06:59:34 -0700
-Message-ID: <20240411135952.1096696-11-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240411135952.1096696-1-leitao@debian.org>
-References: <20240411135952.1096696-1-leitao@debian.org>
+        Thu, 11 Apr 2024 07:05:31 -0700 (PDT)
+Date: Thu, 11 Apr 2024 07:05:28 -0700
+From: Richard Cochran <richardcochran@gmail.com>
+To: Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>
+Cc: netdev@vger.kernel.org, kernel@pengutronix.de,
+	Yangbo Lu <yangbo.lu@nxp.com>
+Subject: Re: [PATCH net-next 0/5] ptp: Convert to platform remove callback
+ returning void
+Message-ID: <ZhfuKDc0Oiiwgpjm@hoboy.vegasvil.org>
+References: <cover.1712734365.git.u.kleine-koenig@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <cover.1712734365.git.u.kleine-koenig@pengutronix.de>
 
-Embedding net_device into structures prohibits the usage of flexible
-arrays in the net_device structure. For more details, see the discussion
-at [1].
+On Wed, Apr 10, 2024 at 09:34:49AM +0200, Uwe Kleine-König wrote:
+> Hello,
+> 
+> this series converts all platform drivers below drivers/ptp/ to not use
+> struct platform_device::remove() any more. See commit 5c5a7680e67b
+> ("platform: Provide a remove callback that returns no value") for an
+> extended explanation and the eventual goal.
+> 
+> All conversations are trivial, because the driver's .remove() callbacks
+> returned zero unconditionally.
+> 
+> There are no interdependencies between these patches, so they can be
+> applied independently if needed. This is merge window material.
+> 
+> Best regards
+> Uwe
 
-Un-embed the net_device from struct ath11k_ext_irq_grp by converting it
-into a pointer. Then use the leverage alloc_netdev() to allocate the
-net_device object at ath11k_ahb_config_ext_irq() for ahb, and
-ath11k_pcic_ext_irq_config() for pcic.
+For the series:
 
-The free of the device occurs at ath11k_ahb_free_ext_irq() for the ahb
-case, and ath11k_pcic_free_ext_irq() for the pcic case.
-
-[1] https://lore.kernel.org/all/20240229225910.79e224cf@kernel.org/
-
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Tested-by: Kalle Valo <kvalo@kernel.org>
----
- drivers/net/wireless/ath/ath11k/ahb.c  |  9 +++++++--
- drivers/net/wireless/ath/ath11k/core.h |  2 +-
- drivers/net/wireless/ath/ath11k/pcic.c | 21 +++++++++++++++++----
- 3 files changed, 25 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/wireless/ath/ath11k/ahb.c b/drivers/net/wireless/ath/ath11k/ahb.c
-index 7c0a23517949..7f3f6479d553 100644
---- a/drivers/net/wireless/ath/ath11k/ahb.c
-+++ b/drivers/net/wireless/ath/ath11k/ahb.c
-@@ -442,6 +442,7 @@ static void ath11k_ahb_free_ext_irq(struct ath11k_base *ab)
- 			free_irq(ab->irq_num[irq_grp->irqs[j]], irq_grp);
- 
- 		netif_napi_del(&irq_grp->napi);
-+		free_netdev(irq_grp->napi_ndev);
- 	}
- }
- 
-@@ -533,8 +534,12 @@ static int ath11k_ahb_config_ext_irq(struct ath11k_base *ab)
- 
- 		irq_grp->ab = ab;
- 		irq_grp->grp_id = i;
--		init_dummy_netdev(&irq_grp->napi_ndev);
--		netif_napi_add(&irq_grp->napi_ndev, &irq_grp->napi,
-+
-+		irq_grp->napi_ndev = alloc_netdev_dummy(0);
-+		if (!irq_grp->napi_ndev)
-+			return -ENOMEM;
-+
-+		netif_napi_add(irq_grp->napi_ndev, &irq_grp->napi,
- 			       ath11k_ahb_ext_grp_napi_poll);
- 
- 		for (j = 0; j < ATH11K_EXT_IRQ_NUM_MAX; j++) {
-diff --git a/drivers/net/wireless/ath/ath11k/core.h b/drivers/net/wireless/ath/ath11k/core.h
-index b3fb74a226fb..590307ca7a11 100644
---- a/drivers/net/wireless/ath/ath11k/core.h
-+++ b/drivers/net/wireless/ath/ath11k/core.h
-@@ -174,7 +174,7 @@ struct ath11k_ext_irq_grp {
- 	u64 timestamp;
- 	bool napi_enabled;
- 	struct napi_struct napi;
--	struct net_device napi_ndev;
-+	struct net_device *napi_ndev;
- };
- 
- enum ath11k_smbios_cc_type {
-diff --git a/drivers/net/wireless/ath/ath11k/pcic.c b/drivers/net/wireless/ath/ath11k/pcic.c
-index add4db4c50bc..79eb3f9c902f 100644
---- a/drivers/net/wireless/ath/ath11k/pcic.c
-+++ b/drivers/net/wireless/ath/ath11k/pcic.c
-@@ -316,6 +316,7 @@ static void ath11k_pcic_free_ext_irq(struct ath11k_base *ab)
- 			free_irq(ab->irq_num[irq_grp->irqs[j]], irq_grp);
- 
- 		netif_napi_del(&irq_grp->napi);
-+		free_netdev(irq_grp->napi_ndev);
- 	}
- }
- 
-@@ -558,7 +559,7 @@ ath11k_pcic_get_msi_irq(struct ath11k_base *ab, unsigned int vector)
- 
- static int ath11k_pcic_ext_irq_config(struct ath11k_base *ab)
- {
--	int i, j, ret, num_vectors = 0;
-+	int i, j, n, ret, num_vectors = 0;
- 	u32 user_base_data = 0, base_vector = 0;
- 	unsigned long irq_flags;
- 
-@@ -578,8 +579,11 @@ static int ath11k_pcic_ext_irq_config(struct ath11k_base *ab)
- 
- 		irq_grp->ab = ab;
- 		irq_grp->grp_id = i;
--		init_dummy_netdev(&irq_grp->napi_ndev);
--		netif_napi_add(&irq_grp->napi_ndev, &irq_grp->napi,
-+		irq_grp->napi_ndev = alloc_netdev_dummy(0);
-+		if (!irq_grp->napi_ndev)
-+			return -ENOMEM;
-+
-+		netif_napi_add(irq_grp->napi_ndev, &irq_grp->napi,
- 			       ath11k_pcic_ext_grp_napi_poll);
- 
- 		if (ab->hw_params.ring_mask->tx[i] ||
-@@ -601,8 +605,13 @@ static int ath11k_pcic_ext_irq_config(struct ath11k_base *ab)
- 			int vector = (i % num_vectors) + base_vector;
- 			int irq = ath11k_pcic_get_msi_irq(ab, vector);
- 
--			if (irq < 0)
-+			if (irq < 0) {
-+				for (n = 0; n <= i; n++) {
-+					irq_grp = &ab->ext_irq_grp[n];
-+					free_netdev(irq_grp->napi_ndev);
-+				}
- 				return irq;
-+			}
- 
- 			ab->irq_num[irq_idx] = irq;
- 
-@@ -615,6 +624,10 @@ static int ath11k_pcic_ext_irq_config(struct ath11k_base *ab)
- 			if (ret) {
- 				ath11k_err(ab, "failed request irq %d: %d\n",
- 					   vector, ret);
-+				for (n = 0; n <= i; n++) {
-+					irq_grp = &ab->ext_irq_grp[n];
-+					free_netdev(irq_grp->napi_ndev);
-+				}
- 				return ret;
- 			}
- 		}
--- 
-2.43.0
-
+Acked-by: Richard Cochran <richardcochran@gmail.com>
 
