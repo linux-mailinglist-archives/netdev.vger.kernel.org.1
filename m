@@ -1,416 +1,131 @@
-Return-Path: <netdev+bounces-86941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FC5D8A10D2
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:38:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6628E8A116B
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:43:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 281191F2CF0E
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:38:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 977311C219AB
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:43:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7C88146D47;
-	Thu, 11 Apr 2024 10:37:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF7D14600E;
+	Thu, 11 Apr 2024 10:43:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pq8lWcm1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cUPod8+r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46F9146A93
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 10:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8041664CC0;
+	Thu, 11 Apr 2024 10:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712831865; cv=none; b=ALlH/ddnB+QmX70yHccbnQzQaUF4bSQnt3U6BVFr6ChyYWhD8f9oTWS8AU8D3M9xrNvclXVsikWUsh6S2k293lkjhGtvyFuzx86kOAvUSQLOX7qMvgPKBtxUsjPpIs7QtMHaJUEVCN5ekqCoisndHq/12l1zAgElEReOYl+B6ag=
+	t=1712832234; cv=none; b=oDK5/IHfUaHXw3nv6Q2jHy+azmR1RJ9rTugeC1sxIMuTZc7b68woLsNGcKEzrjJejlx2q1Sgmr82m2ptiwguyPAVHs5gWM0iePrahyLWcRujPB77OS5WF+xuMWgcBxUN8mba83P9rQoqdl7SptGf6fDbyJ6e+2u3l2scXHklIuc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712831865; c=relaxed/simple;
-	bh=DIgfF0XSLan0Hyagog1/panIjD9kCCu1ZjBvpnZnyDA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OlMWANYGCMbWNG4p//zQRNBy9CZyToNyAFq59/PILhGHE5qbXrJrUurxKTi1t6diDyRyk7rOMfEXkJ4jeW5O+Ui0OGgbvKTLbX7ZXJo1kVTVV0F5GgZqR05D/sKi3YwnIYmJlEAQp6gizVHSq4NW0Q4SVJuaWfJaGRzpZzRR8i4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pq8lWcm1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDBD7C433F1;
-	Thu, 11 Apr 2024 10:37:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712831865;
-	bh=DIgfF0XSLan0Hyagog1/panIjD9kCCu1ZjBvpnZnyDA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pq8lWcm1Addoi4B+XfwzmOO6R+qosjiyt/bIakHj0ZGwcjklp7gBtbajp/k2uU1/D
-	 cQ386zKFdN7nyNtdpZL911VUhDtLhIiZBhi1FmHxXxH0lghzRA2xxeYTN7nOidAgJE
-	 FVhDxysWtRph7W/p/+IsDRNS3NESkEufu4mFg/dcGkMVPj9VdrpbWpvi7miY+GKL14
-	 VFuAkyXVG3drcLt6yA3FAeJVngYK32qgYiwLXNmplwy7HmVlpzQXjHPgJEXyT/xM+s
-	 dTkPzbWqylilSPPJBe5Pqy6sr69pDcXKA5UiVkKG45T3Eqk97FFkW7h/RrxrfnT+Kg
-	 KR5Jmlw0fw5MA==
-Date: Thu, 11 Apr 2024 13:37:40 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: antony.antony@secunet.com
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	devel@linux-ipsec.org, Eyal Birger <eyal.birger@gmail.com>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	Sabrina Dubroca <sd@queasysnail.net>
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v8] xfrm: Add Direction to the
- SA in or out
-Message-ID: <20240411103740.GM4195@unreal>
-References: <9e2ddbac8c3625b460fa21a3bfc8ebc4db53bd00.1712684076.git.antony.antony@secunet.com>
+	s=arc-20240116; t=1712832234; c=relaxed/simple;
+	bh=sF1QdEzB4+79Ul3csFZ7HCaZU7ZqVllCaS9cSmm1YRs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MyXjO9kACWBRDD/e8HkldH55oGrf6+yxnv2bnMyMBVoZfIvOsfL2pifVbADHvZZqAlQWZf2nrOGgh5PfDo5rOTKFV0FIZ209anbLqkHNojRNwYE9/tAuFWdoA2qbCiSC/62+vFFFDORHLxP9ssSu9sI58TpDWjIMMW6QiepCvXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cUPod8+r; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-417d029bee7so5102905e9.1;
+        Thu, 11 Apr 2024 03:43:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712832231; x=1713437031; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lZnfyjtIT3oMZRJBF5vD8DE1B6KGKzMNst0HGwqZHrY=;
+        b=cUPod8+ruEDTQ7q+NwU3FgU87/E6tqxJGEaOZRPvI/IApCBKNdINUHueDx4394WA9t
+         WAdYKfMYZtt9+4qAS5Bt5AgGb51ARHC8SleCkuEGzxFdUKW9dY51n8YnSDS018OTgfOp
+         NoNbsb0Em/Bg0ZvEmuWXZL5Sul+x9gJ28YvEtcfFjvUO6IEtgphirNb9/sMQzk6kZLv7
+         gWKxAdzn8NqvB9Bqe0qYgHC+MO15poAU9lxKSJgW9RjeGR8w+EIDM/oDFf7A/3uNQlJv
+         u82IEkqmnT9WqLD7caMeFyNGqrdlTm7jsoogZ8KIf7z5cMbo+c81AK34uTnuw64MwAy+
+         59jQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712832231; x=1713437031;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=lZnfyjtIT3oMZRJBF5vD8DE1B6KGKzMNst0HGwqZHrY=;
+        b=kiE5hzBe65l+ZndNk6EGOPPnMBDHFSlXBARtypb11fsaiLGgsRJGKYywzA7G4CA1Pn
+         QJOnVvrtRDZnjhOOQLQCbH+y/6TmNsMn3kieb1v29t2si1Ey88x2RJM7emFcJYIn1szP
+         sbhZB+ULt0npIIo4k6zcmYoSNDmkYBOrpYf6ifEUQTN/dw83rapk/KdtOBcG9AE2oEtu
+         l7d9ARgkAP1AM0FtZFXoMoxmUZwkoESPTEblo8IAroFiE4Zyd/VR/Lx+mn5BfBsaFZSM
+         hp5aTvyj1CA2aBzU6Z5PLqXQ1qZrnWWmBAGP67bKC9mxu/PfohTPZ3S8ZvQxxs/QveYb
+         qzgg==
+X-Forwarded-Encrypted: i=1; AJvYcCW+ADnEkqTDTTZjDyGtAgR6QkbE7oFktScAzhiAc3Ymo6zrkj02n5M1jq+iKXFf9dh9okkj6MndcLwxLzdyhZ+iI66WAw08VlXNc/Rc71Tuoj1MGAIVMSqBjbVQl140G0vbogoe8hVymvL6HMhsRp+VbRXIBPH+PshHjeTDQsPdZgkTZuko
+X-Gm-Message-State: AOJu0YyARpCSbZ/SoH4joX4yf+NF9dUTFHnNZ2jhbB/2FNUvs9wbLVGm
+	BGSYxrlKAlK5pLqCArpQUXDEx7TxDncCLJdjEJBA6tDKWsBcIkjQ
+X-Google-Smtp-Source: AGHT+IGN2GMFqd9FOV0kra1xu4P5IN/AfV9m1iCLs3mIOn4B1HgTRjbh1WA09kLOCmvFxVKFpmmvQw==
+X-Received: by 2002:a05:600c:4ec8:b0:417:d624:d009 with SMTP id g8-20020a05600c4ec800b00417d624d009mr1056093wmq.5.1712832230565;
+        Thu, 11 Apr 2024 03:43:50 -0700 (PDT)
+Received: from [192.168.0.101] (craw-09-b2-v4wan-169726-cust2117.vm24.cable.virginm.net. [92.238.24.70])
+        by smtp.googlemail.com with ESMTPSA id g16-20020a05600c311000b00417e31724c3sm706829wmo.13.2024.04.11.03.43.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Apr 2024 03:43:50 -0700 (PDT)
+Message-ID: <3011ca26-08d4-4b4e-847e-d68c0751f98d@gmail.com>
+Date: Thu, 11 Apr 2024 11:43:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9e2ddbac8c3625b460fa21a3bfc8ebc4db53bd00.1712684076.git.antony.antony@secunet.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH][next] tipc: remove redundant assignment to ret, simplify
+ code
+To: Dan Carpenter <dan.carpenter@linaro.org>,
+ Tung Quang Nguyen <tung.q.nguyen@dektech.com.au>
+Cc: Jon Maloy <jmaloy@redhat.com>, Ying Xue <ying.xue@windriver.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "tipc-discussion@lists.sourceforge.net"
+ <tipc-discussion@lists.sourceforge.net>,
+ "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20240411091704.306752-1-colin.i.king@gmail.com>
+ <AS4PR05MB96479D9B6F9EC765371AA8A588052@AS4PR05MB9647.eurprd05.prod.outlook.com>
+ <ce0a63fc-1985-4e25-a08b-c0045ae095f4@moroto.mountain>
+Content-Language: en-US
+From: "Colin King (gmail)" <colin.i.king@gmail.com>
+In-Reply-To: <ce0a63fc-1985-4e25-a08b-c0045ae095f4@moroto.mountain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 09, 2024 at 07:37:20PM +0200, Antony Antony via Devel wrote:
-> This patch introduces the 'dir' attribute, 'in' or 'out', to the
-> xfrm_state, SA, enhancing usability by delineating the scope of values
-> based on direction. An input SA will now exclusively encompass values
-> pertinent to input, effectively segregating them from output-related
-> values. This change aims to streamline the configuration process and
-> improve the overall clarity of SA attributes.
+On 11/04/2024 11:31, Dan Carpenter wrote:
+> On Thu, Apr 11, 2024 at 10:04:10AM +0000, Tung Quang Nguyen wrote:
+>>>
+>> I suggest that err variable should be completely removed. Could you
+>> please also do the same thing for this code ?
+>> "
+>> ...
+>> err = skb_handler(skb, cb, tsk);
+>> if (err) {
 > 
-> This feature sets the groundwork for future patches, including
-> the upcoming IP-TFS patch.
+> If we write the code as:
 > 
-> v7->v8:
->  - add extra validation check on replay window and seq
->  - XFRM_MSG_UPDSA old and new SA should match "dir"
+> 	if (some_function(parameters)) {
+> 
+> then at first that looks like a boolean.  People probably think the
+> function returns true/false.  But if we leave it as-is:
+> 
+> 	err = some_function(parameters);
+> 	if (err) {
+> 
+> Then that looks like error handling.
+> 
+> So it's better and more readable to leave it as-is.
+> 
+> regards,
+> dan carpenter
 
-Why? Update is add and delete operation, and one can update any field
-he/she wants, including direction.
+I concur with Dan's comments.
 
-> 
-> v6->v7:
->  - add replay-window check non-esn 0 and ESN 1.
->  - remove :XFRMA_SA_DIR only allowed with HW OFFLOAD
-> 
-> v5->v6:
->  - XFRMA_SA_DIR only allowed with HW OFFLOAD
-> 
-> v4->v5:
->  - add details to commit message
-> 
-> v3->v4:
->  - improve HW OFFLOAD DIR check add the other direction
-> 
-> v2->v3:
->  - delete redundant XFRM_SA_DIR_USE
->  - use u8 for "dir"
->  - fix HW OFFLOAD DIR check
-> 
-> v1->v2:
->  - use .strict_start_type in struct nla_policy xfrma_policy
->  - delete redundant XFRM_SA_DIR_MAX enum
-
-Please put changelog after --- trailer.
-
-Thanks
-
-> 
-> Signed-off-by: Antony Antony <antony.antony@secunet.com>
-> ---
->  include/net/xfrm.h        |  1 +
->  include/uapi/linux/xfrm.h |  6 +++
->  net/xfrm/xfrm_compat.c    |  7 +++-
->  net/xfrm/xfrm_device.c    |  6 +++
->  net/xfrm/xfrm_state.c     |  4 ++
->  net/xfrm/xfrm_user.c      | 85 +++++++++++++++++++++++++++++++++++++--
->  6 files changed, 103 insertions(+), 6 deletions(-)
-> 
-> diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-> index 57c743b7e4fe..7c9be06f8302 100644
-> --- a/include/net/xfrm.h
-> +++ b/include/net/xfrm.h
-> @@ -291,6 +291,7 @@ struct xfrm_state {
->  	/* Private data of this transformer, format is opaque,
->  	 * interpreted by xfrm_type methods. */
->  	void			*data;
-> +	u8			dir;
->
-};
->  
->  static inline struct net *xs_net(struct xfrm_state *x)
-> diff --git a/include/uapi/linux/xfrm.h b/include/uapi/linux/xfrm.h
-> index 6a77328be114..18ceaba8486e 100644
-> --- a/include/uapi/linux/xfrm.h
-> +++ b/include/uapi/linux/xfrm.h
-> @@ -141,6 +141,11 @@ enum {
->  	XFRM_POLICY_MAX	= 3
->  };
->  
-> +enum xfrm_sa_dir {
-> +	XFRM_SA_DIR_IN	= 1,
-> +	XFRM_SA_DIR_OUT = 2
-> +};
-> +
->  enum {
->  	XFRM_SHARE_ANY,		/* No limitations */
->  	XFRM_SHARE_SESSION,	/* For this session only */
-> @@ -315,6 +320,7 @@ enum xfrm_attr_type_t {
->  	XFRMA_SET_MARK_MASK,	/* __u32 */
->  	XFRMA_IF_ID,		/* __u32 */
->  	XFRMA_MTIMER_THRESH,	/* __u32 in seconds for input SA */
-> +	XFRMA_SA_DIR,		/* __u8 */
->  	__XFRMA_MAX
->  
->  #define XFRMA_OUTPUT_MARK XFRMA_SET_MARK	/* Compatibility */
-> diff --git a/net/xfrm/xfrm_compat.c b/net/xfrm/xfrm_compat.c
-> index 655fe4ff8621..007dee03b1bc 100644
-> --- a/net/xfrm/xfrm_compat.c
-> +++ b/net/xfrm/xfrm_compat.c
-> @@ -98,6 +98,7 @@ static const int compat_msg_min[XFRM_NR_MSGTYPES] = {
->  };
->  
->  static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
-> +	[XFRMA_UNSPEC]          = { .strict_start_type = XFRMA_SA_DIR },
->  	[XFRMA_SA]		= { .len = XMSGSIZE(compat_xfrm_usersa_info)},
->  	[XFRMA_POLICY]		= { .len = XMSGSIZE(compat_xfrm_userpolicy_info)},
->  	[XFRMA_LASTUSED]	= { .type = NLA_U64},
-> @@ -129,6 +130,7 @@ static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
->  	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
->  	[XFRMA_IF_ID]		= { .type = NLA_U32 },
->  	[XFRMA_MTIMER_THRESH]	= { .type = NLA_U32 },
-> +	[XFRMA_SA_DIR]          = { .type = NLA_U8}
->  };
->  
->  static struct nlmsghdr *xfrm_nlmsg_put_compat(struct sk_buff *skb,
-> @@ -277,9 +279,10 @@ static int xfrm_xlate64_attr(struct sk_buff *dst, const struct nlattr *src)
->  	case XFRMA_SET_MARK_MASK:
->  	case XFRMA_IF_ID:
->  	case XFRMA_MTIMER_THRESH:
-> +	case XFRMA_SA_DIR:
->  		return xfrm_nla_cpy(dst, src, nla_len(src));
->  	default:
-> -		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
-> +		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
->  		pr_warn_once("unsupported nla_type %d\n", src->nla_type);
->  		return -EOPNOTSUPP;
->  	}
-> @@ -434,7 +437,7 @@ static int xfrm_xlate32_attr(void *dst, const struct nlattr *nla,
->  	int err;
->  
->  	if (type > XFRMA_MAX) {
-> -		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
-> +		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
->  		NL_SET_ERR_MSG(extack, "Bad attribute");
->  		return -EOPNOTSUPP;
->  	}
-> diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-> index 6346690d5c69..2455a76a1cff 100644
-> --- a/net/xfrm/xfrm_device.c
-> +++ b/net/xfrm/xfrm_device.c
-> @@ -253,6 +253,12 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
->  		return -EINVAL;
->  	}
->  
-> +	if ((xuo->flags & XFRM_OFFLOAD_INBOUND && x->dir == XFRM_SA_DIR_OUT) ||
-> +	    (!(xuo->flags & XFRM_OFFLOAD_INBOUND) && x->dir == XFRM_SA_DIR_IN)) {
-> +		NL_SET_ERR_MSG(extack, "Mismatched SA and offload direction");
-> +		return -EINVAL;
-> +	}
-> +
->  	is_packet_offload = xuo->flags & XFRM_OFFLOAD_PACKET;
->  
->  	/* We don't yet support UDP encapsulation and TFC padding. */
-> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> index 0c306473a79d..f7771a69ae2e 100644
-> --- a/net/xfrm/xfrm_state.c
-> +++ b/net/xfrm/xfrm_state.c
-> @@ -1744,6 +1744,7 @@ static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig,
->  	x->lastused = orig->lastused;
->  	x->new_mapping = 0;
->  	x->new_mapping_sport = 0;
-> +	x->dir = orig->dir;
->  
->  	return x;
->  
-> @@ -1857,6 +1858,9 @@ int xfrm_state_update(struct xfrm_state *x)
->  	if (!x1)
->  		goto out;
->  
-> +	if (x1->dir != x->dir)
-> +		goto out;
-> +
->  	if (xfrm_state_kern(x1)) {
->  		to_put = x1;
->  		err = -EEXIST;
-> diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-> index 810b520493f3..4e5256155c73 100644
-> --- a/net/xfrm/xfrm_user.c
-> +++ b/net/xfrm/xfrm_user.c
-> @@ -360,6 +360,55 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
->  		}
->  	}
->  
-> +	if (attrs[XFRMA_SA_DIR]) {
-> +		u8 sa_dir = nla_get_u8(attrs[XFRMA_SA_DIR]);
-> +
-> +		if (sa_dir != XFRM_SA_DIR_IN && sa_dir != XFRM_SA_DIR_OUT)  {
-> +			NL_SET_ERR_MSG(extack, "XFRMA_SA_DIR attribute is out of range");
-> +			err = -EINVAL;
-> +			goto out;
-> +		}
-> +
-> +		if (sa_dir == XFRM_SA_DIR_OUT)  {
-> +			if (p->replay_window > 0) {
-> +				NL_SET_ERR_MSG(extack, "Replay window should not be set for OUT SA");
-> +				err = -EINVAL;
-> +				goto out;
-> +			}
-> +
-> +			if (attrs[XFRMA_REPLAY_VAL]) {
-> +				struct xfrm_replay_state *rp;
-> +
-> +				rp = nla_data(attrs[XFRMA_REPLAY_VAL]);
-> +				if (rp->oseq ||  rp->seq || rp->bitmap) {
-> +					NL_SET_ERR_MSG(extack,
-> +						       "Replay seq, oseq, or bitmap should not be set for OUT SA with ESN");
-> +					err = -EINVAL;
-> +					goto out;
-> +				}
-> +			}
-> +
-> +			if (attrs[XFRMA_REPLAY_ESN_VAL]) {
-> +				struct xfrm_replay_state_esn *esn;
-> +
-> +				esn = nla_data(attrs[XFRMA_REPLAY_ESN_VAL]);
-> +				if (esn->replay_window > 1) {
-> +					NL_SET_ERR_MSG(extack,
-> +						       "Replay window should be 1 for  OUT SA with ESN");
-> +					err = -EINVAL;
-> +					goto out;
-> +				}
-> +
-> +				if (esn->seq || esn->seq_hi || esn->bmp_len) {
-> +					NL_SET_ERR_MSG(extack,
-> +						       "Replay seq, seq_hi, bmp_len should not be set for OUT SA with ESN");
-> +					err = -EINVAL;
-> +					goto out;
-> +				}
-> +			}
-> +		}
-> +	}
-> +
->  out:
->  	return err;
->  }
-> @@ -627,6 +676,7 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
->  	struct nlattr *et = attrs[XFRMA_ETIMER_THRESH];
->  	struct nlattr *rt = attrs[XFRMA_REPLAY_THRESH];
->  	struct nlattr *mt = attrs[XFRMA_MTIMER_THRESH];
-> +	struct nlattr *dir = attrs[XFRMA_SA_DIR];
->  
->  	if (re && x->replay_esn && x->preplay_esn) {
->  		struct xfrm_replay_state_esn *replay_esn;
-> @@ -661,6 +711,9 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
->  
->  	if (mt)
->  		x->mapping_maxage = nla_get_u32(mt);
-> +
-> +	if (dir)
-> +		x->dir = nla_get_u8(dir);
->  }
->  
->  static void xfrm_smark_init(struct nlattr **attrs, struct xfrm_mark *m)
-> @@ -1182,8 +1235,13 @@ static int copy_to_user_state_extra(struct xfrm_state *x,
->  		if (ret)
->  			goto out;
->  	}
-> -	if (x->mapping_maxage)
-> +	if (x->mapping_maxage) {
->  		ret = nla_put_u32(skb, XFRMA_MTIMER_THRESH, x->mapping_maxage);
-> +		if (ret)
-> +			goto out;
-> +	}
-> +	if (x->dir)
-> +		ret = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
->  out:
->  	return ret;
->  }
-> @@ -2402,7 +2460,8 @@ static inline unsigned int xfrm_aevent_msgsize(struct xfrm_state *x)
->  	       + nla_total_size_64bit(sizeof(struct xfrm_lifetime_cur))
->  	       + nla_total_size(sizeof(struct xfrm_mark))
->  	       + nla_total_size(4) /* XFRM_AE_RTHR */
-> -	       + nla_total_size(4); /* XFRM_AE_ETHR */
-> +	       + nla_total_size(4) /* XFRM_AE_ETHR */
-> +	       + nla_total_size(sizeof(x->dir)); /* XFRMA_SA_DIR */
->  }
->  
->  static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
-> @@ -2459,6 +2518,12 @@ static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct
->  	if (err)
->  		goto out_cancel;
->  
-> +	if (x->dir) {
-> +		err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
-> +		if (err)
-> +			goto out_cancel;
-> +	}
-> +
->  	nlmsg_end(skb, nlh);
->  	return 0;
->  
-> @@ -3018,6 +3083,7 @@ EXPORT_SYMBOL_GPL(xfrm_msg_min);
->  #undef XMSGSIZE
->  
->  const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
-> +	[XFRMA_UNSPEC]		= { .strict_start_type = XFRMA_SA_DIR },
->  	[XFRMA_SA]		= { .len = sizeof(struct xfrm_usersa_info)},
->  	[XFRMA_POLICY]		= { .len = sizeof(struct xfrm_userpolicy_info)},
->  	[XFRMA_LASTUSED]	= { .type = NLA_U64},
-> @@ -3049,6 +3115,7 @@ const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
->  	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
->  	[XFRMA_IF_ID]		= { .type = NLA_U32 },
->  	[XFRMA_MTIMER_THRESH]   = { .type = NLA_U32 },
-> +	[XFRMA_SA_DIR]          = { .type = NLA_U8 }
->  };
->  EXPORT_SYMBOL_GPL(xfrma_policy);
->  
-> @@ -3189,8 +3256,9 @@ static void xfrm_netlink_rcv(struct sk_buff *skb)
->  
->  static inline unsigned int xfrm_expire_msgsize(void)
->  {
-> -	return NLMSG_ALIGN(sizeof(struct xfrm_user_expire))
-> -	       + nla_total_size(sizeof(struct xfrm_mark));
-> +	return NLMSG_ALIGN(sizeof(struct xfrm_user_expire)) +
-> +	       nla_total_size(sizeof(struct xfrm_mark)) +
-> +	       nla_total_size(sizeof_field(struct xfrm_state, dir));
->  }
->  
->  static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
-> @@ -3217,6 +3285,12 @@ static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct
->  	if (err)
->  		return err;
->  
-> +	if (x->dir) {
-> +		err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
-> +		if (err)
-> +			return err;
-> +	}
-> +
->  	nlmsg_end(skb, nlh);
->  	return 0;
->  }
-> @@ -3324,6 +3398,9 @@ static inline unsigned int xfrm_sa_len(struct xfrm_state *x)
->  	if (x->mapping_maxage)
->  		l += nla_total_size(sizeof(x->mapping_maxage));
->  
-> +	if (x->dir)
-> +		l += nla_total_size(sizeof(x->dir));
-> +
->  	return l;
->  }
->  
-> -- 
-> 2.30.2
-> 
-> -- 
-> Devel mailing list
-> Devel@linux-ipsec.org
-> https://linux-ipsec.org/mailman/listinfo/devel
+Colin
 
