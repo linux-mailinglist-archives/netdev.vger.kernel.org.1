@@ -1,297 +1,207 @@
-Return-Path: <netdev+bounces-87200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D7868A2210
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 01:05:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2588A8A2221
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 01:13:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 401B71C22131
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 23:05:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF5A2288158
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 23:12:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8230C481A2;
-	Thu, 11 Apr 2024 23:05:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 063EC47A79;
+	Thu, 11 Apr 2024 23:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Pt67OJre"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DtjkXQXB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 908CC224FA;
-	Thu, 11 Apr 2024 23:05:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF2D3FE54;
+	Thu, 11 Apr 2024 23:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712876733; cv=none; b=mxrFVPKDDrk25gkwUVfK96Zf4YF8IAXQiFiFHATRK3Z7iPnknzC+9hnhjXz/1CvvBavs29KYHJApmGbsdy5318SIbKKSXgRvcUcy+NyrQqlZPXhPOS2+YCWnI6WYqCkadr+Nbhp8NzYwTKxYF58yBfJLBrI3C3wnef1lOFre8Q8=
+	t=1712877174; cv=none; b=CC0CYb02wIH9ycPpUlDB8jcqdjbkkhcEwu5vKDwOd7jCnMcIFvAaZ1reMHEVdwno5en2v1zp5uWZGh+yDL9qUonAnLDCm+wR6v1zwCsQO8RAPXqBmzXeG0abydok4zphGT4HGsMOHgavcldsac/HZUnYhEB/9Us4sQ4+J6NuCLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712876733; c=relaxed/simple;
-	bh=owgIR5FFMOUQQzS71LELcpwlIX6dqy8tOshNH6lF74w=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pfrZb4yks48KXZSNiHPyCpIbMEkbu1M0uNR0N3xj0hYorw/JcVHT8/6w6EMAfS15pPAB2B9WbY2NdAdPoBFyYIU/GZW4IB9CYBED4JEC+0YXSQ1DXVpOFwelIcVYTP08r5Dt/sg/rInvJaa155V327C27jvu7bg56BYLEk4vAZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Pt67OJre; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43BJv1OI015510;
-	Thu, 11 Apr 2024 23:05:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding; s=qcppdkim1; bh=c9gBWCz
-	hHphn6UZmqNQ4Ox7oiNUHdih3QZZpFoOrG7U=; b=Pt67OJreSG6Fv0xvzgE2ecY
-	gTWpn1wK15SyUC+jmDsf2T1nVP6NA79CtPBjjrZto4CjO2cKq4LofYStNsj7vXqi
-	/7kCMEbZ1c3Bqgu91EpUiC76FsvT1Td8ge/LO9g4cQe+UnB1L/VP3tFk/uqwPcPi
-	Mgg4jJEBh3NkrbVCHDVKvDWmI4Ze2vqKanRcpMgCjqPaE47ly2YPTdAX/5SXTFhi
-	KaPJSkbQadMN5ZViegjYoIRNNt/55nbQn6Aq2Gg9w2GFnF/j0v1Tx4q3hHbujw7g
-	ScOBgrUJ8IhLxSPyQOAob/eYG/2SoCHyR1cme/YzGGqAxxOADBHaMVj5qSie1mA=
-	=
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xec6vtc40-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Apr 2024 23:05:10 +0000 (GMT)
-Received: from pps.filterd (NALASPPMTA03.qualcomm.com [127.0.0.1])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 43BN58jP028696;
-	Thu, 11 Apr 2024 23:05:08 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 3xayfnby7u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Apr 2024 23:05:08 +0000
-Received: from NALASPPMTA03.qualcomm.com (NALASPPMTA03.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43BN57dm028689;
-	Thu, 11 Apr 2024 23:05:07 GMT
-Received: from hu-devc-lv-u20-a-new.qualcomm.com (hu-abchauha-lv.qualcomm.com [10.81.25.35])
-	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 43BN57Rw028683
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 11 Apr 2024 23:05:07 +0000
-Received: by hu-devc-lv-u20-a-new.qualcomm.com (Postfix, from userid 214165)
-	id B992E220D9; Thu, 11 Apr 2024 16:05:06 -0700 (PDT)
-From: Abhishek Chauhan <quic_abchauha@quicinc.com>
-To: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        Martin KaFai Lau <martin.lau@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>
-Cc: kernel@quicinc.com
-Subject: [RFC PATCH bpf-next v2] net: Add additional bit to support userspace timestamp type
-Date: Thu, 11 Apr 2024 16:05:06 -0700
-Message-Id: <20240411230506.1115174-3-quic_abchauha@quicinc.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240411230506.1115174-1-quic_abchauha@quicinc.com>
-References: <20240411230506.1115174-1-quic_abchauha@quicinc.com>
+	s=arc-20240116; t=1712877174; c=relaxed/simple;
+	bh=hdeI8NrGkvT/Vd5qwYRruu3DRd4Jdrbcc1kftFqabYU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=COnWDMMfzgLhxWsDJFrz6e5PvObuOpOJM6OznlBiL/OlHB6AFdryozKAQlfKIFRoRu46HQ6LnptMkixJoSIrIfAGV9zOEYDrOxpOAEduh0rjoQyyD7ndwRHJU/9w1SHR5CZe3ML5orwNr10EF6p9tPAQdbuj0EdV+kBuN/V9sPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DtjkXQXB; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-343c2f5b50fso227663f8f.2;
+        Thu, 11 Apr 2024 16:12:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712877171; x=1713481971; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hdeI8NrGkvT/Vd5qwYRruu3DRd4Jdrbcc1kftFqabYU=;
+        b=DtjkXQXBXdaBtot7rd0PABEy21Ig8AYRdFL3vM87ykPEHNujYmTT036bH60/zntbI7
+         +qF6Q00Z3cGyxE4sRVDoQTJmXwNZVHkRo9apqR0FTFgGvdwFj7Iir/REeRBd4QjQ9XIQ
+         AeEwx4qeYdy20QtVmi6L21qxI/9wOrTM1P47/ZEXaFdOymbGnRmSAEHX+ymt76wQAqjv
+         wv8gFVqOBRgigrW/wKgwH+IKN5quuTUTVuez57b2MN7Ru/Lvf28G9QsVpiWTL9Hx1MbM
+         gFXhQIR6yo2BAdpzTUCKeRhkFS3XLo+ILTII7JcrtDh4YlfgMOOam2sd/HKfHOLP+RuO
+         wDGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712877171; x=1713481971;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hdeI8NrGkvT/Vd5qwYRruu3DRd4Jdrbcc1kftFqabYU=;
+        b=HkrGTq8TYOfhWs5ujY73QxuL6QNPTOW99k65erCU01tApkqRlZ0vIE7uHoajUVwcEv
+         beuSldJ/ZXFgZXJIB20LsdzmHhkjGRZwq8/19x54VvxSRyS8CC3kpYx3dF9AqX1vCHqo
+         UEtRRqDZAGdNroIQElLpwDxpRRZpfYSw3bfAjfxCV8muMntAiPvCrASS7UUJjAxDMfJx
+         fWX19mXkSLud3zsYjp5W1RZZXdd7Z31k1F5S+bv0GoWYyDiKoKbyrhu6YZMp+KOonCgl
+         r5yi7sMRHStWQbZp31MEMaZWieZBdlqusf44TP7lxjHpJfHU5OxqN8+shscw6aMF28jM
+         7X8A==
+X-Forwarded-Encrypted: i=1; AJvYcCX3hCC6NZRxJ6PNlwolTMbQ4RhtrLqWYpAJ5E3ZTpKhDbVGruAWtqHSW7ygHlRZuraYIq4Opdaij6sSYgEPvBMjaZ6VxvgeY94bWd0E+IaKToAflz6OlwEO96impcvQ2+47
+X-Gm-Message-State: AOJu0YwdYjZkUA+aUwBZlkBfwOARcBvQEb8MWBcCNMO8je/KqVnHg4jV
+	7TQzJC7ogNRSCx6/k7/3d1W0aXymqjHGX3XStwCBMGP3vrmu57oXvmVlHvNfUjo1/kMdK3mVcUv
+	4CAo8eIlEjUHfTEFJINZRJrbe0PI=
+X-Google-Smtp-Source: AGHT+IFZq07WBeCr7eODrDno1cPdCotcTL9CZaAHN6yhjQv2O0MUoTiCAdW8paIMAjf5e/zqFKaK/p379IZYSw9rpLg=
+X-Received: by 2002:adf:f1c6:0:b0:341:ca5c:93da with SMTP id
+ z6-20020adff1c6000000b00341ca5c93damr584076wro.1.1712877171316; Thu, 11 Apr
+ 2024 16:12:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: WELdZSZ_-cLFhkoqayt2bzzDi8nihUsW
-X-Proofpoint-GUID: WELdZSZ_-cLFhkoqayt2bzzDi8nihUsW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-11_11,2024-04-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- priorityscore=1501 mlxscore=0 clxscore=1015 adultscore=0
- lowpriorityscore=0 malwarescore=0 suspectscore=0 spamscore=0
- mlxlogscore=999 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2404010003 definitions=main-2404110165
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <20240409135142.692ed5d9@kernel.org> <44093329-f90e-41a6-a610-0f9dd88254eb@lunn.ch>
+ <CAKgT0UcVnhgmXNU2FGcy6hbzUQZwNBZw0EKbFF3DsKDc8r452A@mail.gmail.com>
+ <c820695d-bda7-4452-a563-170700baf958@lunn.ch> <CAKgT0Uf4i_MN-Wkvpk29YevwsgFrQ3TeQ5-ogLrF-QyMSjtiug@mail.gmail.com>
+ <c437cf8e-57d5-44d3-a71d-c95ea84838fd@lunn.ch> <CAKgT0UcO-=dg2g0uFSMt2UnyzF7y2W8RVFDp15RZhy=Vb4g61Q@mail.gmail.com>
+ <70bccb10-cc76-4eec-b2cf-975ed422c443@lunn.ch>
+In-Reply-To: <70bccb10-cc76-4eec-b2cf-975ed422c443@lunn.ch>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Thu, 11 Apr 2024 16:12:14 -0700
+Message-ID: <CAKgT0UfY3MQumrSpLL_tP-xCLjYThsrfH7vFW810f5FsWWJskA@mail.gmail.com>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>, pabeni@redhat.com, 
+	John Fastabend <john.fastabend@gmail.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org, bhelgaas@google.com, 
+	linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-tstamp_type can be real, mono or userspace timestamp.
+On Thu, Apr 11, 2024 at 10:32=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote=
+:
+>
+> On Thu, Apr 11, 2024 at 09:00:17AM -0700, Alexander Duyck wrote:
+> > On Wed, Apr 10, 2024 at 3:37=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wr=
+ote:
+> > >
+> > > > Well I was referring more to the data path level more than the phy
+> > > > configuration. I suspect different people have different levels of
+> > > > expectations on what minimal firmware is. With this hardware we at
+> > > > least don't need to use firmware commands to enable or disable queu=
+es,
+> > > > get the device stats, or update a MAC address.
+> > > >
+> > > > When it comes to multi-host NICs I am not sure there are going to b=
+e
+> > > > any solutions that don't have some level of firmware due to the fac=
+t
+> > > > that the cable is physically shared with multiple slots.
+> > >
+> > > This is something Russell King at least considered. I don't really
+> > > know enough to know why its impossible for Linux to deal with multipl=
+e
+> > > slots.
+> >
+> > It mostly has to do with the arbitration between them. It is a matter
+> > of having to pass a TON of info to the individual slice and then the
+> > problem is it would have to do things correctly and not manage to take
+> > out it's neighbor or the BMC.
+>
+> How much is specific to your device? How much is just following 802.3
+> and the CMIS standards? I assume anything which is just following
+> 802.3 and CMIS could actually be re-used? And you have some glue to
+> combine them in a way that is specific to your device?
+>
+> > > > I am assuming we still want to do the PCS driver. So I will still s=
+ee
+> > > > what I can do to get that setup.
+> > >
+> > > You should look at the API offered by drivers in drivers/net/pcs. It
+> > > is designed to be used with drivers which actually drive the hardware=
+,
+> > > and use phylink. Who is responsible for configuring and looking at th=
+e
+> > > results of auto negotiation? Who is responsible for putting the PCS
+> > > into the correct mode depending on the SFP modules capabilities?
+> > > Because you seemed to of split the PCS into two, and hidden some of i=
+t
+> > > away, i don't know if it makes sense to try to shoehorn what is left
+> > > into a Linux driver.
+> >
+> > We have control of the auto negotiation as that is north of the PMA
+> > and is configured per host. We should support clause 73 autoneg.
+> > Although we haven't done much with it as most of our use cases are
+> > just fixed speed setups to the switch over either 25G-CR1, 50G-CR2,
+> > 50G-CR1, or 100G-CR2. So odds are we aren't going to be doing anything
+> > too terribly exciting.
+>
+> Maybe not, but you might of gained from the community here, if others
+> could of adopted this code for their devices. You might not need
+> clause 73, but phylink provides helpers to implement it, so it is
+> pretty easy to add. Maybe your initial PCS driver does not support it,
+> but later adopters who also licence this PCS might add it, and you get
+> the feature for free. The corrected/uncorrected counters i asked
+> about, are something you might not export in your current code via
+> ethtool. But again, this is something which somebody else could add a
+> helper for, and you would get it nearly for free.
 
-This commit adds userspace timestamp and sets it if there is
-valid transmit_time available in socket coming from userspace.
+You don't have to sell me on the reuse advantages of open source. I
+will probably look at adding autoneg at some point in the future, but
+for our main use case it wasn't needed. If nothing else I will
+probably hand it off to one of the new hires on the team when I get
+some time.
 
-To make the design scalable for future needs this commit bring in
-the change to extend the tstamp_type:1 to tstamp_type:2 to support
-userspace timestamp.
+The counters are exported. Just haven't gotten far enough to show the
+ethtool patches yet.. :-)
 
-Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
-Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
----
-Changes since v1 
-- identified additional changes in BPF framework.
-- Bit shift in SKB_MONO_DELIVERY_TIME_MASK and TC_AT_INGRESS_MASK.
-- Made changes in skb_set_delivery_time to keep changes similar to 
-  previous code for mono_delivery_time and just setting tstamp_type
-  bit 1 for userspace timestamp.
+> > As far as the QSFP setup the FW is responsible for any communication
+> > with it. I suspect that the expectation is that we aren't going to
+> > need much in the way of config since we are just using direct attach
+> > cables.
+>
+> Another place you might of got features for free. The Linux SFP driver
+> exports HWMON values for temperature, power, received power, etc, but
+> for 1G. The QSFP+ standard Versatile Diagnostics Monitoring is
+> different, but i could see somebody adding a generic implementation in
+> the Linux SFP driver, so that the HWMON support is just free. Same
+> goes for the error performance statics. Parts of power management
+> could easily be generic. It might be possible to use Linux regulators
+> to describe what your board is capable if, and the SFP core could then
+> implement the ethtool ops, checking with the regulator to see if the
+> power is actually available, and then talking to the SFP to tell it to
+> change its power class?
 
- include/linux/skbuff.h                        | 19 +++++++++++++++----
- net/ipv4/ip_output.c                          |  2 +-
- net/ipv4/raw.c                                |  2 +-
- net/ipv6/ip6_output.c                         |  2 +-
- net/ipv6/raw.c                                |  2 +-
- net/packet/af_packet.c                        |  7 +++----
- .../selftests/bpf/prog_tests/ctx_rewrite.c    |  8 ++++----
- 7 files changed, 26 insertions(+), 16 deletions(-)
+Again, for us it ends up not having much value adding additional QSFP
+logic because we aren't using anything fancy. It is all just direct
+attach cables.
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index a83a2120b57f..b6346c21c3d4 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -827,7 +827,8 @@ enum skb_tstamp_type {
-  *	@tstamp_type: When set, skb->tstamp has the
-  *		delivery_time in mono clock base (i.e. EDT).  Otherwise, the
-  *		skb->tstamp has the (rcv) timestamp at ingress and
-- *		delivery_time at egress.
-+ *		delivery_time at egress or skb->tstamp defined by skb->sk->sk_clockid
-+ *		coming from userspace
-  *	@napi_id: id of the NAPI struct this skb came from
-  *	@sender_cpu: (aka @napi_id) source CPU in XPS
-  *	@alloc_cpu: CPU which did the skb allocation.
-@@ -955,7 +956,7 @@ struct sk_buff {
- 	/* private: */
- 	__u8			__mono_tc_offset[0];
- 	/* public: */
--	__u8			tstamp_type:1;	/* See SKB_MONO_DELIVERY_TIME_MASK */
-+	__u8			tstamp_type:2;	/* See SKB_MONO_DELIVERY_TIME_MASK */
- #ifdef CONFIG_NET_XGRESS
- 	__u8			tc_at_ingress:1;	/* See TC_AT_INGRESS_MASK */
- 	__u8			tc_skip_classify:1;
-@@ -1090,10 +1091,10 @@ struct sk_buff {
-  */
- #ifdef __BIG_ENDIAN_BITFIELD
- #define SKB_MONO_DELIVERY_TIME_MASK	(1 << 7)
--#define TC_AT_INGRESS_MASK		(1 << 6)
-+#define TC_AT_INGRESS_MASK		(1 << 5)
- #else
- #define SKB_MONO_DELIVERY_TIME_MASK	(1 << 0)
--#define TC_AT_INGRESS_MASK		(1 << 1)
-+#define TC_AT_INGRESS_MASK		(1 << 2)
- #endif
- #define SKB_BF_MONO_TC_OFFSET		offsetof(struct sk_buff, __mono_tc_offset)
- 
-@@ -4262,6 +4263,16 @@ static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
- 	case CLOCK_MONO:
- 		skb->tstamp_type = kt && tstamp_type;
- 		break;
-+	/* if any other time base, must be from userspace
-+	 * so set userspace tstamp_type bit
-+	 * See skbuff tstamp_type:2
-+	 * 0x0 => real timestamp_type
-+	 * 0x1 => mono timestamp_type
-+	 * 0x2 => timestamp_type set from userspace
-+	 */
-+	default:
-+		if (kt && tstamp_type)
-+			skb->tstamp_type = 0x2;
- 	}
- }
- 
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 62e457f7c02c..c9317d4addce 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -1457,7 +1457,7 @@ struct sk_buff *__ip_make_skb(struct sock *sk,
- 
- 	skb->priority = (cork->tos != -1) ? cork->priority: READ_ONCE(sk->sk_priority);
- 	skb->mark = cork->mark;
--	skb->tstamp = cork->transmit_time;
-+	skb_set_delivery_time(skb, cork->transmit_time, sk->sk_clockid);
- 	/*
- 	 * Steal rt from cork.dst to avoid a pair of atomic_inc/atomic_dec
- 	 * on dst refcount
-diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
-index dcb11f22cbf2..a7d84fc0e530 100644
---- a/net/ipv4/raw.c
-+++ b/net/ipv4/raw.c
-@@ -360,7 +360,7 @@ static int raw_send_hdrinc(struct sock *sk, struct flowi4 *fl4,
- 	skb->protocol = htons(ETH_P_IP);
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = sockc->mark;
--	skb->tstamp = sockc->transmit_time;
-+	skb_set_delivery_time(skb, sockc->transmit_time, sk->sk_clockid);
- 	skb_dst_set(skb, &rt->dst);
- 	*rtp = NULL;
- 
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index a9e819115622..0b8193bdd98f 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -1924,7 +1924,7 @@ struct sk_buff *__ip6_make_skb(struct sock *sk,
- 
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = cork->base.mark;
--	skb->tstamp = cork->base.transmit_time;
-+	skb_set_delivery_time(skb, cork->base.transmit_time, sk->sk_clockid);
- 
- 	ip6_cork_steal_dst(skb, cork);
- 	IP6_INC_STATS(net, rt->rt6i_idev, IPSTATS_MIB_OUTREQUESTS);
-diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
-index 0d896ca7b589..625f3a917e50 100644
---- a/net/ipv6/raw.c
-+++ b/net/ipv6/raw.c
-@@ -621,7 +621,7 @@ static int rawv6_send_hdrinc(struct sock *sk, struct msghdr *msg, int length,
- 	skb->protocol = htons(ETH_P_IPV6);
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = sockc->mark;
--	skb->tstamp = sockc->transmit_time;
-+	skb_set_delivery_time(skb, sockc->transmit_time, sk->sk_clockid);
- 
- 	skb_put(skb, length);
- 	skb_reset_network_header(skb);
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index 8c6d3fbb4ed8..356c96f23370 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -2056,8 +2056,7 @@ static int packet_sendmsg_spkt(struct socket *sock, struct msghdr *msg,
- 	skb->dev = dev;
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = READ_ONCE(sk->sk_mark);
--	skb->tstamp = sockc.transmit_time;
--
-+	skb_set_delivery_time(skb, sockc.transmit_time, sk->sk_clockid);
- 	skb_setup_tx_timestamp(skb, sockc.tsflags);
- 
- 	if (unlikely(extra_len == 4))
-@@ -2585,7 +2584,7 @@ static int tpacket_fill_skb(struct packet_sock *po, struct sk_buff *skb,
- 	skb->dev = dev;
- 	skb->priority = READ_ONCE(po->sk.sk_priority);
- 	skb->mark = READ_ONCE(po->sk.sk_mark);
--	skb->tstamp = sockc->transmit_time;
-+	skb_set_delivery_time(skb, sockc->transmit_time, po->sk.sk_clockid);
- 	skb_setup_tx_timestamp(skb, sockc->tsflags);
- 	skb_zcopy_set_nouarg(skb, ph.raw);
- 
-@@ -3063,7 +3062,7 @@ static int packet_snd(struct socket *sock, struct msghdr *msg, size_t len)
- 	skb->dev = dev;
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = sockc.mark;
--	skb->tstamp = sockc.transmit_time;
-+	skb_set_delivery_time(skb, sockc.transmit_time, sk->sk_clockid);
- 
- 	if (unlikely(extra_len == 4))
- 		skb->no_fcs = 1;
-diff --git a/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c b/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
-index 3b7c57fe55a5..d7f58d9671f7 100644
---- a/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
-+++ b/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
-@@ -69,15 +69,15 @@ static struct test_case test_cases[] = {
- 	{
- 		N(SCHED_CLS, struct __sk_buff, tstamp),
- 		.read  = "r11 = *(u8 *)($ctx + sk_buff::__mono_tc_offset);"
--			 "w11 &= 3;"
--			 "if w11 != 0x3 goto pc+2;"
-+			 "w11 &= 5;"
-+			 "if w11 != 0x5 goto pc+2;"
- 			 "$dst = 0;"
- 			 "goto pc+1;"
- 			 "$dst = *(u64 *)($ctx + sk_buff::tstamp);",
- 		.write = "r11 = *(u8 *)($ctx + sk_buff::__mono_tc_offset);"
--			 "if w11 & 0x2 goto pc+1;"
-+			 "if w11 & 0x4 goto pc+1;"
- 			 "goto pc+2;"
--			 "w11 &= -2;"
-+			 "w11 &= -4;"
- 			 "*(u8 *)($ctx + sk_buff::__mono_tc_offset) = r11;"
- 			 "*(u64 *)($ctx + sk_buff::tstamp) = $src;",
- 	},
--- 
-2.25.1
+> Florian posted some interesting statistics, that vendors tend to
+> maintain their own drivers, and don't get much support from the
+> community. However I suspect it is a different story for shared
+> infrastructure like PCS drivers, PHY drivers, SFP drivers. That is
+> where you get the most community support and the most stuff for free.
+> But you actually have to use it to benefit from it.
 
+I'll probably get started on the PCS drivers for this next week. I
+will follow up with questions if I run into any issues.
+
+Thanks,
+
+- Alex
 
