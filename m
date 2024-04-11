@@ -1,156 +1,147 @@
-Return-Path: <netdev+bounces-86852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73DF58A077A
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 07:12:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A3478A0788
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 07:17:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A63D21C2390B
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 05:12:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B8E71C22A6A
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 05:17:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6839E13C83B;
-	Thu, 11 Apr 2024 05:11:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="1rREFgdx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D4A13C687;
+	Thu, 11 Apr 2024 05:17:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B849A13C676
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 05:11:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40ACE13C676
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 05:17:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712812306; cv=none; b=RTvPXGuavHwcM80BgqFEduhb/kQ4sxkXAFQlcFmtBRqIKMrBOLrz86LwGPNx4+mtprpXx2MlPwx9e4ya2VL2fne/xXy/ZDHwsJSNOfFuUdCM8Jg7ptF0KF63sJ4s3yfrdI9OFRbC7CDfTXsUFFVrUI9Mo6oJRXmF1Lih2+eIZc8=
+	t=1712812670; cv=none; b=BZ4osdCDt0I7Th+GrGuQGBzSzLtDWRHesP59hk5sgGw/Sxj0LqDwowl+eetAf1z2nq6/y9Qqk6F+j2ex5KiUT8Zus9aVUMpDlDgISUXKFN5u2J07uQhG/3u0OpKDyolLd3VfQsbEM+eSa2w4XJpYT7FKnbWM1UD1/vMP10I+PLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712812306; c=relaxed/simple;
-	bh=INBV2mahBvEZ0pXdVK6kq2mH2wTkMLEIS7chTpd0RqM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PhC2/xCr2oQPwRAk9vce7lcfrwtAZWRpbi9uglFac1jn0ZjivbYbblpvK8Lr1i8Wdrhw7qHB2tVGVMNa7Im21YMupErdXP4tG7AV0cOw8ay6n3CvV1J7dOJ+RnuY2M1M//tuzWoBD4ubtNYWlDXixtPHpaAwgOJyHkgm925m9Ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=1rREFgdx; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-416c4767b07so11360375e9.0
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 22:11:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1712812302; x=1713417102; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Q5ZhdZB/gpv+gPuYKJ564BUXU+lbyNInoIF4+Wr2Rh0=;
-        b=1rREFgdxuOv6VjInu1xg2LvxbOS8XD7UhKZKErRRxBQ0SdUqQEQijrWbGgM9Mr1keg
-         QbxwcbWj2SrTcOCN1sa9dZVeqTh5puO3OcOFcYcibeWhTgPBNdIkVLoAPh5DvQMZOyml
-         nS5Q+EL3L98TYqXX37OKaD7by940WZyy4859rAKOJMuJCCUvOM74HROcIid2rPrtYrtj
-         JW7M2oeY+4EgDYmGhG2r0pbZPa2iiKsEWOflVbRwMAWIe/lVsTHTtZ+C288rJp31D2gD
-         xa8BUbyu9JubRbeGpplNw64vLW53Y7G5aqmnQutbMl7bB3HjcOAAnWoxa5UiAVny44j9
-         39/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712812302; x=1713417102;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Q5ZhdZB/gpv+gPuYKJ564BUXU+lbyNInoIF4+Wr2Rh0=;
-        b=jNWYI9vDJrs+hoVJJayANVDOQlXN1/hG+tgdag006jkrJCmj8TlJOn5CnL8rrq7eU3
-         ub5PUQrwQiufRCmF79bSEKpfinH2XJBmNKDKEhs3JV0x8Yhi8LoN2RZU5RFdpanQ22qH
-         Q21RSza1KsH+vL14rmH8S7dVXFK7f8bp8mp/JFeoPt+UUyr65NFXPrIJT3VtDy5c6XMH
-         H2wx/8p74c57VzfEfM4IpQNx7Z+x8iFSDlZNN9T66IRAzkFNE1dtbtQgN1X+Y3+rSAxm
-         7vwiXXh3blVPyh9/1GUY1AdQuCNAlTYznbaYAD9LZisn469D0Zt6DJCXaaJLHo9JwBBq
-         uFTg==
-X-Forwarded-Encrypted: i=1; AJvYcCV8fVneiBxlC+Of9dfzrfd16Kd0qrd9unG68imuY3KEb4Dx02MKtbPzzbsGsqczgWfcj8F5dQBBM6TOXznvjJpBiGcLJCa2
-X-Gm-Message-State: AOJu0Yzjs1cdwXMfexz4lRXtFf4ShKNVEqoufIblHWUUsAEHu/KIfU8y
-	r5eN/sotraSfL1vgAfzl87S2Z9HCKtyFX4DfI/5UFfD3aoID4rAT9P/YXlp9QPU=
-X-Google-Smtp-Source: AGHT+IGFSs4+lFkJzhv15sz2leal19RrvvnFEMmW5D28SvBfMhGgBRbh9EdRGJYs/wX7rh2P3//G9g==
-X-Received: by 2002:a05:600c:45ca:b0:417:4ff3:3872 with SMTP id s10-20020a05600c45ca00b004174ff33872mr2551640wmo.25.1712812302165;
-        Wed, 10 Apr 2024 22:11:42 -0700 (PDT)
-Received: from localhost.localdomain ([2a06:c701:46c7:8900:15f8:24e1:258e:dbd5])
-        by smtp.gmail.com with ESMTPSA id t7-20020a05600c198700b0041622c88852sm4370190wmq.16.2024.04.10.22.11.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 22:11:41 -0700 (PDT)
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1712812670; c=relaxed/simple;
+	bh=O8cNffn1F0GkrSIOlZErxFbrd6pL1SqVq3VeCR3fAD8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FDE6d/twrxnhgIgxwZeoLVfry9AqBQpvt+J0re2xy6FcveEyvQEz/s5Ukvwt/bQJPWoye32vjqj5BcJXeAIiqMTpkFf3/IepIgpGuCFGAF41UCUeqPYaRWhYqiwVSHRKLspO45ZdTGI6S+nAK8JPuyIeJSfh78p6No2PilO0B/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rumod-00011d-ET; Thu, 11 Apr 2024 07:17:39 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rumob-00Bcta-2P; Thu, 11 Apr 2024 07:17:37 +0200
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rumoa-007bwP-3B;
+	Thu, 11 Apr 2024 07:17:36 +0200
+Date: Thu, 11 Apr 2024 07:17:36 +0200
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Doug Berger <opendmb@gmail.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Jason Wang <jasowang@redhat.com>
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	yan@daynix.com,
-	andrew@daynix.com
-Subject: [PATCH net v2 1/1] net: change maximum number of UDP segments to 128
-Date: Thu, 11 Apr 2024 08:11:24 +0300
-Message-Id: <20240411051124.386817-2-yuri.benditovich@daynix.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240411051124.386817-1-yuri.benditovich@daynix.com>
-References: <20240411051124.386817-1-yuri.benditovich@daynix.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: genet: Fixup EEE
+Message-ID: <ZhdycHAooDITV1a3@pengutronix.de>
+References: <20240408-stmmac-eee-v1-1-3d65d671c06b@lunn.ch>
+ <4826747e-0dd5-4ab9-af02-9d17a1ab7358@broadcom.com>
+ <67c0777f-f66e-4293-af8b-08e0c4ab0acc@lunn.ch>
+ <c2a16e3c-374c-4fd1-9ca7-bf0aeb5ed941@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <c2a16e3c-374c-4fd1-9ca7-bf0aeb5ed941@broadcom.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-The commit fc8b2a619469
-("net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation")
-adds check of potential number of UDP segments vs
-UDP_MAX_SEGMENTS in linux/virtio_net.h.
-After this change certification test of USO guest-to-guest
-transmit on Windows driver for virtio-net device fails,
-for example with packet size of ~64K and mss of 536 bytes.
-In general the USO should not be more restrictive than TSO.
-Indeed, in case of unreasonably small mss a lot of segments
-can cause queue overflow and packet loss on the destination.
-Limit of 128 segments is good for any practical purpose,
-with minimal meaningful mss of 536 the maximal UDP packet will
-be divided to ~120 segments.
-The number of segments for UDP packets is validated vs
-UDP_MAX_SEGMENTS also in udp.c (v4,v6), this does not affect
-quest-to-guest path but does affect packets sent to host, for
-example.
-It is important to mention that UDP_MAX_SEGMENTS is kernel-only
-define and not available to user mode socket applications.
-In order to request MSS smaller than MTU the applications
-just uses setsockopt with SOL_UDP and UDP_SEGMENT and there is
-no limitations on socket API level.
+Hi Florian,
 
-Fixes: fc8b2a619469 ("net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation")
-Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
----
- include/linux/udp.h                  | 2 +-
- tools/testing/selftests/net/udpgso.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+On Wed, Apr 10, 2024 at 10:48:26AM -0700, Florian Fainelli wrote:
 
-diff --git a/include/linux/udp.h b/include/linux/udp.h
-index 3748e82b627b..7e75ccdf25fe 100644
---- a/include/linux/udp.h
-+++ b/include/linux/udp.h
-@@ -108,7 +108,7 @@ struct udp_sock {
- #define udp_assign_bit(nr, sk, val)		\
- 	assign_bit(UDP_FLAGS_##nr, &udp_sk(sk)->udp_flags, val)
- 
--#define UDP_MAX_SEGMENTS	(1 << 6UL)
-+#define UDP_MAX_SEGMENTS	(1 << 7UL)
- 
- #define udp_sk(ptr) container_of_const(ptr, struct udp_sock, inet.sk)
- 
-diff --git a/tools/testing/selftests/net/udpgso.c b/tools/testing/selftests/net/udpgso.c
-index 1d975bf52af3..85b3baa3f7f3 100644
---- a/tools/testing/selftests/net/udpgso.c
-+++ b/tools/testing/selftests/net/udpgso.c
-@@ -34,7 +34,7 @@
- #endif
- 
- #ifndef UDP_MAX_SEGMENTS
--#define UDP_MAX_SEGMENTS	(1 << 6UL)
-+#define UDP_MAX_SEGMENTS	(1 << 7UL)
- #endif
- 
- #define CONST_MTU_TEST	1500
--- 
-2.40.1
+> I am seeing a functional difference with and without your patch however, =
+and
+> also, there appears to be something wrong within the bcmgenet driver after
+> PHYLIB having absorbed the EEE configuration. Both cases we start on boot
+> with:
+>=20
+> # ethtool --show-eee eth0
+> EEE settings for eth0:
+>         EEE status: disabled
+>         Tx LPI: disabled
+>         Supported EEE link modes:  100baseT/Full
+>                                    1000baseT/Full
+>         Advertised EEE link modes:  100baseT/Full
+>                                     1000baseT/Full
+>         Link partner advertised EEE link modes:  100baseT/Full
+>                                                  1000baseT/Full
+>=20
+> I would expect the EEE status to be enabled, that's how I remember it
+> before.
 
+Yes, current default kernel implementation is to use EEE if available.
+
+> Now, with your patch, once I turn on EEE with:
+>=20
+> # ethtool --set-eee eth0 eee on
+> # ethtool --show-eee eth0
+> EEE settings for eth0:
+>         EEE status: enabled - active
+>         Tx LPI: disabled
+>         Supported EEE link modes:  100baseT/Full
+>                                    1000baseT/Full
+>         Advertised EEE link modes:  100baseT/Full
+>                                     1000baseT/Full
+>         Link partner advertised EEE link modes:  100baseT/Full
+>                                                  1000baseT/Full
+> #
+>=20
+> there is no change to the EEE_CTRL register to set the EEE_EN, this only
+> happens when doing:
+>=20
+> # ethtool --set-eee eth0 eee on tx-lpi on
+>=20
+> which is consistent with the patch, but I don't think this is quite corre=
+ct
+> as I remembered that "eee on" meant enable EEE for the RX path, and "tx-l=
+pi
+> on" meant enable EEE for the TX path?
+
+Yes. More precisely, with "eee on" we allow the PHY to advertise EEE
+link modes. On link_up, if both sides are agreed to use EEE, MAC is
+configured to process LPI opcodes from the PHY and send LPI opcodes to
+the PHY if "tx-lpi on" was configured too. tx-lpi will not be enabled in
+case of "eee off".
+
+What is exact meaning of EEE_EN on this chip?
+
+Regards,
+Oleksij
+--=20
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
