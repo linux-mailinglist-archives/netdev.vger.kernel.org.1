@@ -1,179 +1,122 @@
-Return-Path: <netdev+bounces-87170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0A378A1F8C
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 21:34:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12D588A1F90
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 21:37:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AFEB286119
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:34:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A41141F25B61
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:37:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2654014286;
-	Thu, 11 Apr 2024 19:34:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7595415E89;
+	Thu, 11 Apr 2024 19:37:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GkXdMT0y"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA1A17BB6
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 19:34:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A95216419
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 19:37:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712864087; cv=none; b=CqouY0ctP1UFJsSPattlvP43co+KnraIB2X3lqwjf5tQKOIaSc+7xbZoyI997/n0Qhi3ax46z5C/fq8s4jg8f1RUP5htJ69jH8q+JoK5hfbFkxd9/Ekff2zfgxbiaDMIt8PR1ArSCm1wbOBlOWuXUSBriNQZoddWoOZKBknQPvU=
+	t=1712864245; cv=none; b=mU/3J5Boug6t2uqfha++x2Qc7mtVnnDoIrVo6vV3duu6TK+UgvfnPkcF8WWd/DeMPgdtfXJevvmZRqK5WVFTIPu/x8o3JzW0gD+9sp4iqE3cF5jG1eBj7oXEW2oFE7buwhRU5fOSRELdguzTt5E4/piaTq8cVh5l9cg78gWM60Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712864087; c=relaxed/simple;
-	bh=01fHhXgwQN2aTJ3a+itVgYQdpHM/2C4417f7GUbjYEA=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=dy1Bg0uJW0DT2KNt93pCWkK2UVLPxKqWyrf/lyzQqez39un9xUbqcFodhvosIBcNtm1tt9mDHxo2qYQB6YtjGITVp2miBXy1dsJq5KsahSigFRjT1GLhy2sjU8YdUfiOvyos9I0iYw2cle99fhSwD9fpBlU6nPrCCI2cu8xIWoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=ovn.org; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ovn.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CD57E1C0003;
-	Thu, 11 Apr 2024 19:34:40 +0000 (UTC)
-Message-ID: <a25fa200-090f-456e-9885-fe25701dbd94@ovn.org>
-Date: Thu, 11 Apr 2024 21:35:23 +0200
+	s=arc-20240116; t=1712864245; c=relaxed/simple;
+	bh=Gl8eUkD08CMPCn17a5LUCFQwsdrr+BTJp82u/LJ464E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fogO81BAjIAlTmvh38v48c2KBaLu7ipx9achO2G/FHpR+N8RwCpx+MlFioh37DEvoDJVHRnCQ31ihH0gUnN6H2feKqf1XmJSxMiDofKsRolwtpZmqveOYa6QEnIjSoKgNgkJrMOrMnihHGZNL0Z6KhKQFquL7RpQysCKKW6YliU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GkXdMT0y; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-696609f5cf2so1187586d6.3
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 12:37:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712864243; x=1713469043; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7gaZ8PNPW8x1uU3bx7SgotAf3Gi9LIM4a4uzTn6Vt2w=;
+        b=GkXdMT0yPgfIZdOMrvvyM2Yk42tja2P6tBgQigKhubso6S/gOlDFUZq8IdJz8GYdWZ
+         KnvveHtPrhdKdwqB+DVDlAAXKaj5UvAS3dxzToB4L6HSoRcDscY2XxpPsc5+HSJutfxK
+         LS3dbhoZogsApJAWOKfWKpsVWcyC2z0K8wxw1rk9ZVSLs9zsoRTkVlmGPZo8OjL+UNUh
+         oFUTO7Lup1W05prPGRSDNI9bFE4m10M5t1w6/p2qXOnp8VyuBaBLAObSaIuRfUQxyN8T
+         ksQqMWQBp897v5dy427z/YdubVW2yKg2gTf8It0perft6oQkOVNUyjuZX9AQ6GqIhCat
+         0IpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712864243; x=1713469043;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7gaZ8PNPW8x1uU3bx7SgotAf3Gi9LIM4a4uzTn6Vt2w=;
+        b=Es8x4MLAn1GDU4t9t9CWzWjkuSSYyWXhJbk5pIA5AEqgeaB5QoJjgRztEf9mSdijHK
+         a2vYPH9Fl+iLXN+BSFCqolINPyvvaMjtKzbHiudaMyUD6bQuJXn25uBnY7gC3uCUpia8
+         T1lzofelqcSG7Qp4WrRzvgOZ1yzfUOwgzBiqLdQkbunyTRu4WV4gL74OVxXzlPnPk4Hs
+         2dso8XUHC16+Fu/QCO9bgVwWt8Bj7z6jeiProHpFMIjIFWaSmE9XXuXYjjtBcdIw6VBf
+         cBnJC2oVbeg7sHTzcsTfUgNgMZiDI9j/KxNtLq0ZTKGaCm6ik67FipwMTcqnNDr3PTgQ
+         LdXw==
+X-Forwarded-Encrypted: i=1; AJvYcCV/gAxxMbAJQJDgqk9vCUUwve1nD24pO0z1Vuor/53Heg21uuOOdtj4Z7jzYHGGwyAeKh8oPVKwcsngBS60p85tO6vWxFA/
+X-Gm-Message-State: AOJu0YxSoG9GTWtJrB3j4yE8u2YPf9CnqBkA95Hq5ETDEyhlo/C/xriY
+	S+3nOmAEoogf22rT/PTsvYIn8DOTsmNCo/vgbWzq4pYQzjvqcRxsc/fSMYzZnLGtrM0XpeF38fG
+	9/ARsNsMJoSeRqpdg9f72PfepPW9W+tIKfWbCgc9E4yY/8vCadg==
+X-Google-Smtp-Source: AGHT+IHrTNsTajLfM6vlDskL/RW7t8LKDaCP9DtOscLyK8RqjJnIqxBEqvIo/4H4Zc/+wNBbw0jAa1TTD0veOmsdSPM=
+X-Received: by 2002:a05:6214:1933:b0:69b:1e64:413d with SMTP id
+ es19-20020a056214193300b0069b1e64413dmr734971qvb.52.1712864242836; Thu, 11
+ Apr 2024 12:37:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: i.maximets@ovn.org, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, Stefano Brivio <sbrivio@redhat.com>, dsahern@kernel.org,
- donald.hunter@gmail.com
-Subject: Re: [PATCH net] inet: bring NLM_DONE out to a separate recv() again
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-References: <20240411180202.399246-1-kuba@kernel.org>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <20240411180202.399246-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: i.maximets@ovn.org
+References: <20240408180918.2773238-1-jfraker@google.com> <20240409172602.3284f1c6@kernel.org>
+ <66175758bab7c_2dcc3c294a@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66175758bab7c_2dcc3c294a@willemb.c.googlers.com.notmuch>
+From: John Fraker <jfraker@google.com>
+Date: Thu, 11 Apr 2024 12:37:11 -0700
+Message-ID: <CAGH0z2Hn-D1_wEZEN-Y9+hO1c+Ddn3dsO5_XCG6qQ8KioeGeGg@mail.gmail.com>
+Subject: Re: [PATCH net-next] gve: Correctly report software timestamping capabilities
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
+	Shailend Chand <shailend@google.com>, Willem de Bruijn <willemb@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Junfeng Guo <junfeng.guo@intel.com>, 
+	Ziwei Xiao <ziweixiao@google.com>, Jeroen de Borst <jeroendb@google.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/11/24 20:02, Jakub Kicinski wrote:
-> Commit under Fixes optimized the number of recv() calls
-> needed during RTM_GETROUTE dumps, but we got multiple
-> reports of applications hanging on recv() calls.
-> Applications expect that a route dump will be terminated
-> with a recv() reading an individual NLM_DONE message.
-> 
-> Coalescing NLM_DONE is perfectly legal in netlink,
-> but even tho reporters fixed the code in respective
-> projects, chances are it will take time for those
-> applications to get updated. So revert to old behavior
-> (for now)?
-> 
-> Old kernel (5.19):
-> 
->  $ ./cli.py --dbg-small-recv 4096 --spec netlink/specs/rt_route.yaml \
->             --dump getroute --json '{"rtm-family": 2}'
->  Recv: read 692 bytes, 11 messages
->    nl_len = 68 (52) nl_flags = 0x22 nl_type = 24
->  ...
->    nl_len = 60 (44) nl_flags = 0x22 nl_type = 24
->  Recv: read 20 bytes, 1 messages
->    nl_len = 20 (4) nl_flags = 0x2 nl_type = 3
-> 
-> Before (6.9-rc2):
-> 
->  $ ./cli.py --dbg-small-recv 4096 --spec netlink/specs/rt_route.yaml \
->             --dump getroute --json '{"rtm-family": 2}'
->  Recv: read 712 bytes, 12 messages
->    nl_len = 68 (52) nl_flags = 0x22 nl_type = 24
->  ...
->    nl_len = 60 (44) nl_flags = 0x22 nl_type = 24
->    nl_len = 20 (4) nl_flags = 0x2 nl_type = 3
-> 
-> After:
-> 
->  $ ./cli.py --dbg-small-recv 4096 --spec netlink/specs/rt_route.yaml \
->             --dump getroute --json '{"rtm-family": 2}'
->  Recv: read 692 bytes, 11 messages
->    nl_len = 68 (52) nl_flags = 0x22 nl_type = 24
->  ...
->    nl_len = 60 (44) nl_flags = 0x22 nl_type = 24
->  Recv: read 20 bytes, 1 messages
->    nl_len = 20 (4) nl_flags = 0x2 nl_type = 3
-> 
-> Reported-by: Stefano Brivio <sbrivio@redhat.com>
-> Link: https://lore.kernel.org/all/20240315124808.033ff58d@elisabeth
-> Reported-by: Ilya Maximets <i.maximets@ovn.org>
-> Link: https://lore.kernel.org/all/02b50aae-f0e9-47a4-8365-a977a85975d3@ovn.org
-> Fixes: 4ce5dc9316de ("inet: switch inet_dump_fib() to RCU protection")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: dsahern@kernel.org
-> CC: donald.hunter@gmail.com
-> ---
->  net/ipv4/fib_frontend.c | 5 +++++
->  1 file changed, 5 insertions(+)
-> 
-> diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
-> index 48741352a88a..c484b1c0fc00 100644
-> --- a/net/ipv4/fib_frontend.c
-> +++ b/net/ipv4/fib_frontend.c
-> @@ -1050,6 +1050,11 @@ static int inet_dump_fib(struct sk_buff *skb, struct netlink_callback *cb)
->  			e++;
->  		}
->  	}
-> +
-> +	/* Don't let NLM_DONE coalesce into a message, even if it could.
-> +	 * Some user space expects NLM_DONE in a separate recv().
-> +	 */
-> +	err = skb->len;
->  out:
->  
->  	cb->args[1] = e;
+On Wed, Apr 10, 2024 at 8:22=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jakub Kicinski wrote:
+> > On Mon,  8 Apr 2024 11:09:01 -0700 John Fraker wrote:
+> > > gve has supported software timestamp generation since its inception,
+> > > but has not advertised that support via ethtool. This patch correctly
+> > > advertises that support.
+> > >
+> > > Reviewed-by: Praveen Kaligineedi <pkaligineedi@google.com>
+> > > Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+> > > Signed-off-by: John Fraker <jfraker@google.com>
+> >
+> > I think it should be a single line diff:
+> >
+> > +     .get_ts_info =3D ethtool_op_get_ts_info,
+> >
+> > right?
+>
+> If inserted above .get_link_ksettings that works. The current
+> ordering is not based on actual struct layout anyway.
+>
+> Probably all statements should just end in a comma, including a
+> trailing comma. To avoid these two line changes on each subsequent
+> change.
 
-FWIW, on current net-next this fixes the issue with Libreswan and IPv4
-(IPv6 issue remains, obviously).  I also did a round of other OVS system
-tests and they worked fine.
+Thanks all!
 
-Tested-by: Ilya Maximets <i.maximets@ovn.org>
+I'll send the one-line v2.
+
+> The rest of the discussion in this thread is actually quite
+> unrelated to this patch. Didn't meant to sidetrack that.
 
