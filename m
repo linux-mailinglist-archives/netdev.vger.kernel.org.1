@@ -1,155 +1,342 @@
-Return-Path: <netdev+bounces-87026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87F858A1599
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 15:33:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6341E8A15F5
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 15:42:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 277421F237B7
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 13:33:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8696F1C22199
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 13:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C295714F9DC;
-	Thu, 11 Apr 2024 13:33:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37DED153BE1;
+	Thu, 11 Apr 2024 13:39:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iQOfo/wJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e1R5VjJt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F3014F13C
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 13:33:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E390415350C
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 13:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712842424; cv=none; b=DJE/Ki4ylR5y4A4VAqjMnLdfvmqC5bSzX/iRxEXTNVGNYH0Zng/um5IWWyAchdGrNkyLQ8owtj0ZlIJHRfg5p5ASkewENHaMMeC7KQ7FY17nd1ZDW0fyZxvoAo/TXaxc9MVZVYKENg/awDdiO7U/H4nGDxOo0fmMG7Vj6zlvd7g=
+	t=1712842754; cv=none; b=HgDqI3iI1mZ9BoiW+chpUGlKmym9MRVCh/OB0/a/6ifVyAhNepottKSzu4o+IqmRXyZe+zymDb2onlCBvRDEPwgaKStynOo7f9JROT3xZzlviwiVDKKFoiqWL1eRXtJVgyckB1DqObFsZJ4j5XxyGAcPrgQeqGeoNnrtTP/ts90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712842424; c=relaxed/simple;
-	bh=DQ6Qf5EwwILmRze6B/d5l88LGl7W1rvlFzle6fNTeh8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=RzF/4d0VlXWHK3BkDZLCFxhX6rzeJYgV13sHSCBtrFR6M7v5m7y0X7lp0Ds4V7LJFxcJKtg3Uo0y4xMWBlTpHRsX9OMqTSkU3t0CTEJ2uX97FyBaIyMkmZ4tKZp2AcjF1HizbkI3z/PcGwjEMpTH2wBC7CZNxBVM+wkemgcCWXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iQOfo/wJ; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-ddaf2f115f2so10460095276.3
-        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 06:33:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712842422; x=1713447222; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vmYVEheapt1fOA+JO7PC34b2pVFmxJR1f/N7nO6pXig=;
-        b=iQOfo/wJfGRmgQxBI+qK9oR6V5V7XUUmQIsVutyYxD7+i5AjpgATzqCGMwUKPA9WaG
-         xRhRUBQgkW0FlWNFMyGPPvHjoUuTarRph4qyjx8ULGwqtWV6hEznFBrN+46rOak9php9
-         nOXi64Hr1nPyHqppj4Lf+iaRLxf9iohEKWEIAv9WPqMuPLVP+/E7ScVX+D72gugzsW6G
-         BUc6deKcHeyJNaP9Rg16kSKy4gXov+GAZnfax7lSFlsh+B2GUy3xx0/Y6Ap1vYZWKvQC
-         RmhvcuV70SISSDYla5Qn47sPgyASuSSlFWfKbBzAmw40rnryLHOwDLe/F75y9mdeVGlS
-         w6ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712842422; x=1713447222;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vmYVEheapt1fOA+JO7PC34b2pVFmxJR1f/N7nO6pXig=;
-        b=hQnuXzArvkyMANLzZ6G7K9H9qJus0pnvcSaEku3lWrCygagSmNodcqdZA+QPQdtjmo
-         2R2YACp/1JDVyeGzaZ2arUit/EMpNofMIRrlzz9vuWZbg9wPRCsLQJuol8PX2FKkLeMU
-         NomwjruUiRxlkXE2YrjJCMJHo+B+mpS8ZIY/dJv/3fEqGAIF0oZLlZmOE1moA6fXnxf+
-         U8NqxBBNtLc1pN3h+SZVXJbwy+5Qk9raEraZtoBofud4acPeHRSuEo3X++FtbSlvH/b+
-         sQCPlTCQENiEf4o8dEZ2kZ9CyYjA3zujuLw+qQ7vsQ1jOrJUa/3lzoAmEko06QGF+tFw
-         Ohww==
-X-Gm-Message-State: AOJu0YzA4QDZmWdbM22K8aJZmS4jPkJjI2QgPn+plDcQv5wcZQtge/hL
-	cFIJKMpqM4/fIsH0yeWJtj3KHeqpierTw7L2GexVq9yTX2hCdA5BZQjU8PhZGgHUZA5sjub1N6Z
-	q0lNtYgMaYQ==
-X-Google-Smtp-Source: AGHT+IGa83UFxAU8A0T4eg6mbDaquPntDl6S1jiVXTl6oWY7BlhHHqNt3xLMfZ6+9jW2Gkx4af5tCHxvzU+Psg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:70a:b0:dc6:dfd9:d423 with SMTP
- id k10-20020a056902070a00b00dc6dfd9d423mr544540ybt.3.1712842421636; Thu, 11
- Apr 2024 06:33:41 -0700 (PDT)
-Date: Thu, 11 Apr 2024 13:33:40 +0000
+	s=arc-20240116; t=1712842754; c=relaxed/simple;
+	bh=gl/TZqKhNlPxbhhYj+dqKK2EeNBanNdavqsbonWFKfY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=baO4SPo0OGm/3R/rdMQ7pByjXKA1SxFsL8ciK2b1tadk9ju8cDgm1Dssgi3RY4ZoU/Wa6jxrezPuWhWil60qFk245pcD3BnqIhtDCUoe3PsK231JfVwA3Y+LNzqp2jzAoOMSbhO0fURxjimCx1Sn+IrumDo1hRGd5KbWtHyPqfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e1R5VjJt; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712842749;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=41m65qlnX/Xth1Xt2o246aE/MD66qa6i29VrrYDMYZI=;
+	b=e1R5VjJtU2ImPrqbtRcaHkKCLMyYbWNfEyUEyiTPDnUNe10OOSQ/r+9nVrkpJ4dPMowDqt
+	KgfoXme2S2l3CBOnuYGNPokoydw58eRuiBG7se+5gXnqH0ohFe0QlfUHrpS7nnPQwGdQFQ
+	KXU5YqZEuZRql1jAdGolg7Xk1FNW6fw=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-262-JYx1QNnMOEyX9ixn4l7YIg-1; Thu, 11 Apr 2024 09:39:06 -0400
+X-MC-Unique: JYx1QNnMOEyX9ixn4l7YIg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4878410499A2;
+	Thu, 11 Apr 2024 13:39:05 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.193])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E40753C21;
+	Thu, 11 Apr 2024 13:39:03 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for v6.9-rc4
+Date: Thu, 11 Apr 2024 15:38:37 +0200
+Message-ID: <20240411133837.86880-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.478.gd926399ef9-goog
-Message-ID: <20240411133340.1332796-1-edumazet@google.com>
-Subject: [PATCH net-next] fib: rules: no longer hold RTNL in fib_nl_dumprule()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-- fib rules are already RCU protected, RTNL is not needed
-  to get them.
+Hi Linus!
 
-- Fix return value at the end of a dump,
-  so that NLMSG_DONE can be appended to current skb,
-  saving one recvmsg() system call.
+The following changes since commit c88b9b4cde17aec34fb9bfaf69f9f72a1c44f511:
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/core/fib_rules.c | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+  Merge tag 'net-6.9-rc3' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-04-04 14:49:10 -0700)
 
-diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
-index 3f933ffcefc3732ede48669cf0ab9e94fed46aac..6ebffbc632368168b621a3ee888ee558e88e2d4f 100644
---- a/net/core/fib_rules.c
-+++ b/net/core/fib_rules.c
-@@ -1142,10 +1142,10 @@ static int fib_nl_dumprule(struct sk_buff *skb, struct netlink_callback *cb)
- 	const struct nlmsghdr *nlh = cb->nlh;
- 	struct net *net = sock_net(skb->sk);
- 	struct fib_rules_ops *ops;
--	int idx = 0, family;
-+	int err, idx = 0, family;
- 
- 	if (cb->strict_check) {
--		int err = fib_valid_dumprule_req(nlh, cb->extack);
-+		err = fib_valid_dumprule_req(nlh, cb->extack);
- 
- 		if (err < 0)
- 			return err;
-@@ -1158,17 +1158,17 @@ static int fib_nl_dumprule(struct sk_buff *skb, struct netlink_callback *cb)
- 		if (ops == NULL)
- 			return -EAFNOSUPPORT;
- 
--		dump_rules(skb, cb, ops);
--
--		return skb->len;
-+		return dump_rules(skb, cb, ops);
- 	}
- 
-+	err = 0;
- 	rcu_read_lock();
- 	list_for_each_entry_rcu(ops, &net->rules_ops, list) {
- 		if (idx < cb->args[0] || !try_module_get(ops->owner))
- 			goto skip;
- 
--		if (dump_rules(skb, cb, ops) < 0)
-+		err = dump_rules(skb, cb, ops);
-+		if (err < 0)
- 			break;
- 
- 		cb->args[1] = 0;
-@@ -1178,7 +1178,7 @@ static int fib_nl_dumprule(struct sk_buff *skb, struct netlink_callback *cb)
- 	rcu_read_unlock();
- 	cb->args[0] = idx;
- 
--	return skb->len;
-+	return err;
- }
- 
- static void notify_rule_change(int event, struct fib_rule *rule,
-@@ -1293,7 +1293,8 @@ static int __init fib_rules_init(void)
- 	int err;
- 	rtnl_register(PF_UNSPEC, RTM_NEWRULE, fib_nl_newrule, NULL, 0);
- 	rtnl_register(PF_UNSPEC, RTM_DELRULE, fib_nl_delrule, NULL, 0);
--	rtnl_register(PF_UNSPEC, RTM_GETRULE, NULL, fib_nl_dumprule, 0);
-+	rtnl_register(PF_UNSPEC, RTM_GETRULE, NULL, fib_nl_dumprule,
-+		      RTNL_FLAG_DUMP_UNLOCKED);
- 
- 	err = register_pernet_subsys(&fib_rules_net_ops);
- 	if (err < 0)
--- 
-2.44.0.478.gd926399ef9-goog
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.9-rc4
+
+for you to fetch changes up to 4e1ad31ce3205d9400816e08cf14b7c96295d22e:
+
+  Merge branch 'ena-driver-bug-fixes' (2024-04-11 11:21:05 +0200)
+
+----------------------------------------------------------------
+Including fixes from bluetooth.
+
+Current release - new code bugs:
+
+  - netfilter: complete validation of user input
+
+  - mlx5: disallow SRIOV switchdev mode when in multi-PF netdev
+
+Previous releases - regressions:
+
+  - core: fix u64_stats_init() for lockdep when used repeatedly in one file
+
+  - ipv6: fix race condition between ipv6_get_ifaddr and ipv6_del_addr
+
+  - bluetooth: fix memory leak in hci_req_sync_complete()
+
+  - batman-adv: avoid infinite loop trying to resize local TT
+
+  - drv: geneve: fix header validation in geneve[6]_xmit_skb
+
+  - drv: bnxt_en: fix possible memory leak in bnxt_rdma_aux_device_init()
+
+  - drv: mlx5: offset comp irq index in name by one
+
+  - drv: ena: avoid double-free clearing stale tx_info->xdpf value
+
+  - drv: pds_core: fix pdsc_check_pci_health deadlock
+
+Previous releases - always broken:
+
+  - xsk: validate user input for XDP_{UMEM|COMPLETION}_FILL_RING
+
+  - bluetooth: fix setsockopt not validating user input
+
+  - af_unix: clear stale u->oob_skb.
+
+  - nfc: llcp: fix nfc_llcp_setsockopt() unsafe copies
+
+  - drv: virtio_net: fix guest hangup on invalid RSS update
+
+  - drv: mlx5e: Fix mlx5e_priv_init() cleanup flow
+
+  - dsa: mt7530: trap link-local frames regardless of ST Port State
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+----------------------------------------------------------------
+Archie Pusaka (1):
+      Bluetooth: l2cap: Don't double set the HCI_CONN_MGMT_CONNECTED bit
+
+Arnd Bergmann (4):
+      lib: checksum: hide unused expected_csum_ipv6_magic[]
+      ipv6: fib: hide unused 'pn' variable
+      ipv4/route: avoid unused-but-set-variable warning
+      net/mlx5: fix possible stack overflows
+
+Arınç ÜNAL (2):
+      net: dsa: mt7530: fix enabling EEE on MT7531 switch on all boards
+      net: dsa: mt7530: trap link-local frames regardless of ST Port State
+
+Breno Leitao (1):
+      virtio_net: Do not send RSS key if it is not supported
+
+Brett Creeley (1):
+      pds_core: Fix pdsc_check_pci_health function to use work thread
+
+Carolina Jubran (4):
+      net/mlx5e: RSS, Block changing channels number when RXFH is configured
+      net/mlx5e: Fix mlx5e_priv_init() cleanup flow
+      net/mlx5e: HTB, Fix inconsistencies with QoS SQs number
+      net/mlx5e: RSS, Block XOR hash with over 128 channels
+
+Cosmin Ratiu (2):
+      net/mlx5: Properly link new fs rules into the tree
+      net/mlx5: Correctly compare pkt reformat ids
+
+Daniel Machon (1):
+      net: sparx5: fix wrong config being used when reconfiguring PCS
+
+David Arinzon (4):
+      net: ena: Fix potential sign extension issue
+      net: ena: Wrong missing IO completions check order
+      net: ena: Fix incorrect descriptor free behavior
+      net: ena: Set tx_info->xdpf value to NULL
+
+David S. Miller (3):
+      Merge tag 'batadv-net-pullrequest-20240405' of git://git.open-mesh.org/linux-merge
+      Merge branch 'bnxt_en-fixes'
+      Merge branch 'stmmac-missing-stats-DW-GMAC'
+
+Dmitry Antipov (1):
+      Bluetooth: Fix memory leak in hci_req_sync_complete()
+
+Eric Dumazet (6):
+      xsk: validate user input for XDP_{UMEM|COMPLETION}_FILL_RING
+      geneve: fix header validation in geneve[6]_xmit_skb
+      net: add copy_safe_from_sockptr() helper
+      mISDN: fix MISDN_TIME_STAMP handling
+      nfc: llcp: fix nfc_llcp_setsockopt() unsafe copies
+      netfilter: complete validation of user input
+
+Geetha sowjanya (1):
+      octeontx2-af: Fix NIX SQ mode and BP config
+
+Gerd Bayer (2):
+      s390/ism: fix receive message buffer allocation
+      Revert "s390/ism: fix receive message buffer allocation"
+
+Hariprasad Kelam (1):
+      octeontx2-pf: Fix transmit scheduler resource leak
+
+Heiner Kallweit (2):
+      r8169: fix LED-related deadlock on module removal
+      r8169: add missing conditional compiling for call to r8169_remove_leds
+
+Ilya Maximets (1):
+      net: openvswitch: fix unwanted error log on timeout policy probing
+
+Jakub Kicinski (2):
+      Merge branch 'net-start-to-replace-copy_from_sockptr'
+      Merge branch 'mlx5-misc-fixes'
+
+Jiri Benc (1):
+      ipv6: fix race condition between ipv6_get_ifaddr and ipv6_del_addr
+
+Kuniyuki Iwashima (1):
+      af_unix: Clear stale u->oob_skb.
+
+Luiz Augusto von Dentz (7):
+      Bluetooth: ISO: Don't reject BT_ISO_QOS if parameters are unset
+      Bluetooth: hci_sync: Fix using the same interval and window for Coded PHY
+      Bluetooth: SCO: Fix not validating setsockopt user input
+      Bluetooth: RFCOMM: Fix not validating setsockopt user input
+      Bluetooth: L2CAP: Fix not validating setsockopt user input
+      Bluetooth: ISO: Fix not validating setsockopt user input
+      Bluetooth: hci_sock: Fix not validating setsockopt user input
+
+Marek Vasut (2):
+      net: ks8851: Inline ks8851_rx_skb()
+      net: ks8851: Handle softirqs at the end of IRQ thread to fix hang
+
+Michael Liang (1):
+      net/mlx5: offset comp irq index in name by one
+
+Michal Luczaj (1):
+      af_unix: Fix garbage collector racing against connect()
+
+Minda Chen (2):
+      net: stmmac: mmc_core: Add GMAC LPI statistics
+      net: stmmac: mmc_core: Add GMAC mmc tx/rx missing statistics
+
+Paolo Abeni (2):
+      Merge tag 'for-net-2024-04-10' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth
+      Merge branch 'ena-driver-bug-fixes'
+
+Pavan Chebbi (1):
+      bnxt_en: Reset PTP tx_avail after possible firmware reset
+
+Petr Tesarik (1):
+      u64_stats: fix u64_stats_init() for lockdep when used repeatedly in one file
+
+Rahul Rameshbabu (1):
+      net/mlx5e: Do not produce metadata freelist entries in Tx port ts WQE xmit
+
+Shay Drory (2):
+      net/mlx5: E-switch, store eswitch pointer before registering devlink_param
+      net/mlx5: Register devlink first under devlink lock
+
+Sven Eckelmann (1):
+      batman-adv: Avoid infinite loop trying to resize local TT
+
+Tariq Toukan (1):
+      net/mlx5: Disallow SRIOV switchdev mode when in multi-PF netdev
+
+Uwe Kleine-König (1):
+      MAINTAINERS: Drop Li Yang as their email address stopped working
+
+Vikas Gupta (2):
+      bnxt_en: Fix possible memory leak in bnxt_rdma_aux_device_init()
+      bnxt_en: Fix error recovery for RoCE ulp client
+
+ MAINTAINERS                                        |  11 +-
+ drivers/isdn/mISDN/socket.c                        |  10 +-
+ drivers/net/dsa/mt7530.c                           | 246 +++++++++++++++++----
+ drivers/net/dsa/mt7530.h                           |   6 +
+ drivers/net/ethernet/amazon/ena/ena_com.c          |   2 +-
+ drivers/net/ethernet/amazon/ena/ena_netdev.c       |  35 ++-
+ drivers/net/ethernet/amazon/ena/ena_xdp.c          |   4 +-
+ drivers/net/ethernet/amd/pds_core/core.c           |  13 +-
+ drivers/net/ethernet/amd/pds_core/core.h           |   2 +
+ drivers/net/ethernet/amd/pds_core/dev.c            |   3 +
+ drivers/net/ethernet/amd/pds_core/main.c           |   1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c          |   2 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c      |   6 +-
+ .../net/ethernet/marvell/octeontx2/af/rvu_nix.c    |  20 +-
+ drivers/net/ethernet/marvell/octeontx2/nic/qos.c   |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/en/ptp.h   |   8 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en/qos.c   |  33 +--
+ drivers/net/ethernet/mellanox/mlx5/core/en/rqt.c   |   7 +
+ drivers/net/ethernet/mellanox/mlx5/core/en/rqt.h   |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/en/selq.c  |   2 +
+ .../net/ethernet/mellanox/mlx5/core/en_ethtool.c   |  45 +++-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |   2 -
+ drivers/net/ethernet/mellanox/mlx5/core/en_tx.c    |   7 +-
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch.c  |   9 +-
+ .../ethernet/mellanox/mlx5/core/eswitch_offloads.c |  11 +
+ drivers/net/ethernet/mellanox/mlx5/core/fs_core.c  |  17 +-
+ drivers/net/ethernet/mellanox/mlx5/core/main.c     |  37 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c  |   4 +-
+ .../ethernet/mellanox/mlx5/core/sf/dev/driver.c    |   1 -
+ .../ethernet/mellanox/mlx5/core/steering/dr_dbg.c  |  82 +++----
+ drivers/net/ethernet/micrel/ks8851.h               |   3 -
+ drivers/net/ethernet/micrel/ks8851_common.c        |  16 +-
+ drivers/net/ethernet/micrel/ks8851_par.c           |  11 -
+ drivers/net/ethernet/micrel/ks8851_spi.c           |  11 -
+ .../net/ethernet/microchip/sparx5/sparx5_port.c    |   4 +-
+ drivers/net/ethernet/realtek/r8169.h               |   6 +-
+ drivers/net/ethernet/realtek/r8169_leds.c          |  35 ++-
+ drivers/net/ethernet/realtek/r8169_main.c          |   9 +-
+ drivers/net/ethernet/stmicro/stmmac/mmc.h          |   2 +
+ drivers/net/ethernet/stmicro/stmmac/mmc_core.c     |  15 ++
+ .../net/ethernet/stmicro/stmmac/stmmac_ethtool.c   |   2 +
+ drivers/net/geneve.c                               |   4 +-
+ drivers/net/virtio_net.c                           |  26 ++-
+ include/linux/sockptr.h                            |  25 +++
+ include/linux/u64_stats_sync.h                     |   9 +-
+ include/net/addrconf.h                             |   4 +
+ include/net/bluetooth/bluetooth.h                  |   9 +
+ include/net/ip_tunnels.h                           |  33 +++
+ lib/checksum_kunit.c                               |   5 +-
+ net/batman-adv/translation-table.c                 |   2 +-
+ net/bluetooth/hci_request.c                        |   4 +-
+ net/bluetooth/hci_sock.c                           |  21 +-
+ net/bluetooth/hci_sync.c                           |   6 +-
+ net/bluetooth/iso.c                                |  46 ++--
+ net/bluetooth/l2cap_core.c                         |   3 +-
+ net/bluetooth/l2cap_sock.c                         |  52 ++---
+ net/bluetooth/rfcomm/sock.c                        |  14 +-
+ net/bluetooth/sco.c                                |  23 +-
+ net/ipv4/netfilter/arp_tables.c                    |   4 +
+ net/ipv4/netfilter/ip_tables.c                     |   4 +
+ net/ipv4/route.c                                   |   4 +-
+ net/ipv6/addrconf.c                                |   7 +-
+ net/ipv6/ip6_fib.c                                 |   7 +-
+ net/ipv6/netfilter/ip6_tables.c                    |   4 +
+ net/nfc/llcp_sock.c                                |  12 +-
+ net/openvswitch/conntrack.c                        |   5 +-
+ net/unix/af_unix.c                                 |   4 +-
+ net/unix/garbage.c                                 |  18 +-
+ net/xdp/xsk.c                                      |   2 +
+ 69 files changed, 743 insertions(+), 356 deletions(-)
 
 
