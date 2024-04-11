@@ -1,54 +1,52 @@
-Return-Path: <netdev+bounces-86910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65E418A0C3C
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:23:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 627768A0C3D
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:24:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 208752851EB
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:23:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 936331C2196E
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:24:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86D91448E2;
-	Thu, 11 Apr 2024 09:23:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF5613FD76;
+	Thu, 11 Apr 2024 09:24:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CCFA1428FA
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 09:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4FC62144
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 09:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712827437; cv=none; b=BlBjmm6jjiT+WW76EgS7t2XJsj1fkGciFlsGHOhgzOZLWmyc+nX9GGepBcZYS5SnhzrcyGzMFdNOXthaRo354DuFJrBewgvuBP2r+Vy2gA9RbG34HrN5ZqEqcVwwOM501FyC/HbxI78aSEVdecfEegI14hLcna2zgFDMhMAfWWk=
+	t=1712827460; cv=none; b=DYGCxqqPY559d42PPPn+jbzxQXnt5dWklX773gW/f4/Y668ZXYjuBrs6+0KfVJEPUXNbIfq+LJB1Md0I768LdxUOZjx/nOS06DmVfrNnUys6+tYd07ejUrEdlAftPeBPaQg0QybevN+H/UINnMoxOYE9h56c86FU/dT+9X/FIbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712827437; c=relaxed/simple;
-	bh=DYCUQxyGNKtTnNnxXntoj2lUHiLBF6HgV/vhZK0E35g=;
+	s=arc-20240116; t=1712827460; c=relaxed/simple;
+	bh=YTxoBNxpVIJz/OqqIbQTQzSgr/pnXnoRp3diNSa7Hr8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=Zu8JqS4agGPY9vy9+ya6E7KmvfBPEaREjcbcsqCcq3lqQzJDqeScMEzVb5fNdotC213l1G1CeVppcjEzf4D9tl+KTUDH3HDpepH70g+0eDdSSdqnwEczuDmMJy+QtezCqMzjhJkeYtaKhYyhhjF4HKU03QxYrYNlWmvIyaFyywo=
+	 In-Reply-To:Content-Type:Content-Disposition; b=ICUWWPMt6ATlgKXuexY1L7x3ynom5S7QT7IJboLxYG9akqlhswfe1NsvF2SIFNAytWmVOvnba0Xf7krHVHActDzq7DZI5ZEMykkUKUiVERE9OAMkF5ZJFakl/aYroqS2q3F1YcYwnF/3bE84xZfUykj+i/plSeKxzs17qOGSMUk=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-467-eTqzzde7NIi43v-KrynQpQ-1; Thu, 11 Apr 2024 05:23:44 -0400
-X-MC-Unique: eTqzzde7NIi43v-KrynQpQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-61-fAwpQPziMAGmeHJ_hhUO4A-1; Thu,
+ 11 Apr 2024 05:24:13 -0400
+X-MC-Unique: fAwpQPziMAGmeHJ_hhUO4A-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F3AAE1802A04;
-	Thu, 11 Apr 2024 09:23:43 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CC85F3810B33;
+	Thu, 11 Apr 2024 09:24:12 +0000 (UTC)
 Received: from hog (unknown [10.39.192.7])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EAB80112131D;
-	Thu, 11 Apr 2024 09:23:41 +0000 (UTC)
-Date: Thu, 11 Apr 2024 11:23:36 +0200
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 79ABA492BC6;
+	Thu, 11 Apr 2024 09:24:11 +0000 (UTC)
+Date: Thu, 11 Apr 2024 11:24:06 +0200
 From: Sabrina Dubroca <sd@queasysnail.net>
-To: Paul Wouters <paul@nohats.ca>,
-	Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Antony Antony <antony@phenome.org>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+To: Antony Antony <antony@phenome.org>
+Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>,
 	Antony Antony <antony.antony@secunet.com>,
 	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
 	devel@linux-ipsec.org, Eric Dumazet <edumazet@google.com>,
@@ -56,7 +54,7 @@ Cc: Antony Antony <antony@phenome.org>,
 	"David S. Miller" <davem@davemloft.net>
 Subject: Re: [devel-ipsec] [PATCH ipsec-next v6] xfrm: Add Direction to the
  SA in or out
-Message-ID: <ZhesGJtMXk-PPtzz@hog>
+Message-ID: <ZhesNtc8tdTfuvRd@hog>
 References: <a53333717022906933e9113980304fa4717118e9.1712320696.git.antony.antony@secunet.com>
  <ZhBzcMrpBCNXXVBV@hog>
  <ZhJX-Rn50RxteJam@Antony2201.local>
@@ -64,82 +62,81 @@ References: <a53333717022906933e9113980304fa4717118e9.1712320696.git.antony.anto
  <ZhV5eG2pkrsX0uIV@Antony2201.local>
  <ZhZUQoOuvNz8RVg8@hog>
  <ZhbFVGc8p9u0xQcv@Antony2201.local>
- <81b4f75c-5c43-8357-55ad-0ec28291d399@nohats.ca>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <81b4f75c-5c43-8357-55ad-0ec28291d399@nohats.ca>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+In-Reply-To: <ZhbFVGc8p9u0xQcv@Antony2201.local>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: queasysnail.net
 Content-Type: text/plain; charset=UTF-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-2024-04-10, 20:58:33 -0400, Paul Wouters wrote:
-> On Wed, 10 Apr 2024, Antony Antony via Devel wrote:
-> > > > Though supporting 0 is higly desired
-> > > > feature and probably a hard to implement feature in xfrm code.
-> > >=20
-> > > Why would it be hard for outgoing SAs? The replay window should never
-> > > be used on those. And xfrm_replay_check_esn and xfrm_replay_check_bmp
-> > > already have checks for 0-sized replay window.
+2024-04-10, 18:59:00 +0200, Antony Antony wrote:
+> On Wed, Apr 10, 2024 at 10:56:34AM +0200, Sabrina Dubroca wrote:
+> > 2024-04-09, 19:23:04 +0200, Antony Antony wrote:
+> > > Good point. I will add  {seq,seq_hi} validation. I don't think we add=
+ a for=20
+> > > {oseq,oseq_hi} as it might be used by strongSwan with: ESN  replay-wi=
+ndow 1,=20
+> > > and migrating an SA.
 > >=20
-> > That information comes from hall way talks with Steffen. I can't explai=
-n
-> > it:) May be he can elaborate why 0 is not allowed with ESN.
+> > I'm not at all familiar with that. Can you explain the problem?
 >=20
-> With ESN, you use a 64 bit number but only send a 32 bit number over the
-> wire. So you need to "track" the parts not being sent to do the proper
-> packet authentication that uses the full 64bit number. The
-> authentication bit is needed for encrypting and decrypting, so on both
-> the incoming and outgoing SA.
->=20
-> AFAIK, this 64 bit number tracking is done using the replay-window code.
-> That is why replay-window cannot be 0 when ESN is enabled in either
-> direction of the SA.
+> strongSwan sets ESN and replay-window 1 on "out" SA. Then to migrgate, wh=
+en=20
+> IKEv2  mobike exchange succeds, it use GETSA read {oseq,oseq_hi} and the=
+=20
+> attributes, delete this SA.  Then create a new SA, with a different end=
+=20
+> point, and with old SA's {oseq,oseq_hi} and other parameters(curlft..). =
+=20
+> While Libreswan and Android use XFRM_MSG_MIGRATE.
 
-It's in the replay-window code, but AFAICT it doesn't use the
-replay_window variable at all (xfrm_output calls into the
-xfrm_replay_overflow_* functions which only look at oseq, xfrm_input
-calls the *check and *advance functions of xfrm_replay.c). So I think
-we could accept an unset replay_window for an output SA.
+Ok, thanks. But that's still an output SA. Setting {oseq,oseq_hi} on
+an input SA is bogus I would think?
 
-> I have already poked Steffen it would be good to decouple ESN code from
-> replay-window code, as often people want to benchmark highspeed links
-> by disabling replay protection completely, but then they are also
-> unwittingly disabling ESN and causing needing a rekey ever 2 minutes
-> or so on a modern 100gbps ipsec link.
->=20
-> > strongSwan sets ESN and replay-window 1 on "out" SA.
->=20
-> It has to set a replay-window of non-zero or else ESN won't work.
-> It is not related to migration AFAIK.
->=20
-> > For instance, there isn't a validation for unused XFRMA_SA_EXTRA_FLAGS =
-in
-> > DELSA; if set, it's simply ignored. Similarly, if XFRMA_SA_DIR were set=
- in
-> > DELSA, it would also be disregarded. Attempting to introduce validation=
-s for
-> > DELSA and other methods seems like an extensive cleanup task. Do we con=
-sider
-> > this level of validation within the scope of our current patch? It feel=
-s
-> > like we are going too far.
->=20
-> Is there a way where rate limited logging can be introduced, so that
-> userlands will clean up their use and after a few years change the API
-> to not allow setting bogus values?
 
-Yes, this is doable. Steffen, does that seem reasonable? (for example,
-when XFRMA_REPLAY_THRESH is passed to NEWSA, or XFRMA_ALG_AEAD to
-DELSA, etc)
+> > > > xfrma_policy is convenient but not all attributes are valid for all
+> > > > requests. Old attributes can't be changed, but we should try to be
+> > > > more strict when we introduce new attributes.
+> > >=20
+> > > To clarify your feedback, are you suggesting the API should not permi=
+t=20
+> > > XFRMA_SA_DIR for methods like XFRM_MSG_DELSA, and only allow it for=
+=20
+> > > XFRM_MSG_NEWSA and XFRM_MSG_UPDSA? I added XFRM_MSG_UPDSA, as it's us=
+ed=20
+> > > equivalently to XFRM_MSG_NEWSA by *swan.
+> >=20
+> > Not just DELSA, also all the *POLICY, ALLOCSPI, FLUSHSA, etc. NEWSA
+> > and UPDSA should accept it, but I'm thinking none of the other
+> > operations should. It's a property of SAs, not of other xfrm objects.
+>=20
+> For instance, there isn't a validation for unused XFRMA_SA_EXTRA_FLAGS in=
+=20
+> DELSA; if set, it's simply ignored. Similarly, if XFRMA_SA_DIR were set i=
+n=20
+> DELSA, it would also be disregarded. Attempting to introduce validations =
+for=20
+> DELSA and other methods seems like an extensive cleanup task. Do we consi=
+der=20
+> this level of validation within the scope of our current patch? It feels=
+=20
+> like we are going too far.
 
-(as part of a separate patchset of course)
+No, I wouldn't introduce validation of other attributes. It doesn't
+belong in this patch(set), and I'm not sure we can add it now as it
+might break userspace (I don't see why userspace would pass
+XFRMA_ALG_AEAD etc on a DELSA request, but if we never rejected it,
+they could).
+
+But rejecting this new attribute from messages that don't handle it
+would be good, and should be done in this patch/series.
 
 --=20
 Sabrina
