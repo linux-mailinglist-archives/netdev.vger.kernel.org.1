@@ -1,166 +1,145 @@
-Return-Path: <netdev+bounces-86938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 810138A106E
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:35:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 180BE8A10BA
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:38:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 377F028AA26
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:35:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BCD31F2CC85
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:38:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B96149C70;
-	Thu, 11 Apr 2024 10:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82A29149C61;
+	Thu, 11 Apr 2024 10:36:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="nAOP2DQa"
+	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="Pu84yJMQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABA9C148316
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 10:33:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D857313D258
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 10:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712831601; cv=none; b=rDWMbmRdPStB9nyk2F/DO99KqDhKy0JSZSCX/GLALgiPmtNfbKfzWefCqusvSgReN5DscTJLwVnX0RnFdH3i4qIgvAs/voOZdGN0jl9s/QjiL8Jiz1gOQZvK+VgAn2h5MkRxx6uv/ZlmCP/7fCkncH6XCSa1KNp1W8Jm5s55QVM=
+	t=1712831802; cv=none; b=sbRgajicpA3vQJBCczY5g6ZmNTAVpoIqk1K/lA0AUhoBC7053z0LSd88YdX/84G/Lhy0QPXPAIOwKCiaJjF88hCFRqzIb+kOhwZoAjIKLFRHsR4geUeb70nSrlQg/dpscmkgqZN8EbK/SzRvF1iCkaKE3+t+9s8uJv59inHKPss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712831601; c=relaxed/simple;
-	bh=v3UI5RIQH7te7LWmFRWP4LgzcL8cQKLtThZe3AOeO0Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S7RXs9QtWgJ4V7iR7SbdV6sl2NIaZMNUT0rtmeK0LP5GbkXjdZJnpdk/1R0A4rQ/hGPT35/EsjOBjVWOWQTz0akcN1FrGQhS/N4y+9qj77f1lo/9xRnIhMGKjCXZNem547lT6OhTXF3O89XGbuEktVpH5aiNbCUxI5B2seRwJn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=nAOP2DQa; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-615826815c2so90173657b3.1
-        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 03:33:19 -0700 (PDT)
+	s=arc-20240116; t=1712831802; c=relaxed/simple;
+	bh=reHmEwElj4tvZol91A+rJsafa4ep732TOWew7uulUW0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SpDFAgYNRUx4C6eJA6ByoeoXgAWtLoCfUklSN9e6AOAsXRSlIQ0O7jEzjoK0WDc5kFDZn3JBhxguscgKXRkDyoRhqbduhNaD6lO7s5s7nWU9QEvS+fr2QfexUlyWIHV8HAnwDMfCVoHVEp3PZ2tqWaDBCKu1q0cgZql6iDzuXH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org; spf=none smtp.mailfrom=phenome.org; dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b=Pu84yJMQ; arc=none smtp.client-ip=195.121.94.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=phenome.org
+X-KPN-MessageId: 3e1be364-f7ef-11ee-bbc8-005056abad63
+Received: from smtp.kpnmail.nl (unknown [10.31.155.37])
+	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
+	id 3e1be364-f7ef-11ee-bbc8-005056abad63;
+	Thu, 11 Apr 2024 12:35:40 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1712831599; x=1713436399; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sIzn5JxfDVqeHPR8BBB6h2bxYLXCwdl4F5nMpLuCxqE=;
-        b=nAOP2DQaNI9g4amwHVbo28P91cGmlMQQ37SqWiQrR21M4SRLeoMtV6wvprUncM6eAY
-         F0sfaemgtW5EpBR77rAKMS8sDZiEBmYC35lzSuXhBIxg1tblTEYTaKy/CPas2hpE9feC
-         2jaAiZUv3Ntc0aTQ8fmaL+l/JE0JFZ5pC2/7pvNQjBmdZjUzmbjMmvJArW47D5DbtuVl
-         qhiIAKYrVj6hZPkR6Uz86muk007xI6ElkfNM5r+oE1m8xpdVXDzz1nireJIVPdE+C7tn
-         QXViWX9K0xPNq564dwpSDWgatUus3ferQkKLEuJqQwzNZAvUqu/Yfruv/Mxo2BqDRyt7
-         nPwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712831599; x=1713436399;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sIzn5JxfDVqeHPR8BBB6h2bxYLXCwdl4F5nMpLuCxqE=;
-        b=cqCdRwPq1xFoa6mnuxsNaFhWriGiZ/BQHHCm1fcW418yy9rJyaAw55WPiFbnK1lBn7
-         L7BDfANiO50BRjJeaYMQCJ3j07PBGBHcOnybHiD69D9fCZsu4lVEXWltRtCYqRnDABwo
-         MUtkTaOf/2ZmpDD5mLaYO6AI24bS00VyEMA6EwL/0mW8owqo/afNQTU0gFe1R27lQIPj
-         6GcyNLgO/cZ16R22S2BgRJVA89A7nm9DIt4DtD0grN98pMKgy9RqpClp2OWG02vB773M
-         Q8uHE3P36Yn7XzuFtdYH0Y0R2A4E6/1gHBU5m7WOxwfJiqT8uHQOP+8r2FrgnBHnak5V
-         yD7A==
-X-Forwarded-Encrypted: i=1; AJvYcCVyY4jB2UI3AUvTGPBZ3/hT/1jX/w0PKKjmvrQ8ZoI6x+i9xJtxWD7JrR62P9EqZTyA1usM06qYrIbxrwv0W7IqU4KvLhvs
-X-Gm-Message-State: AOJu0Yw6JETwbUjp7mCz3J/F8WPXpJs9yQg0ZYyP159y4XVHHgp9Fp7Y
-	C1e7p6rSB3tq43rCL1X7oSAFzEkU9vl8rnmZqN+bI8PTv4uzQDxFNpN7aAvi3FqSidAkbC+0f/N
-	4chhrD492YXi9JjXio2WSGNWjFag2M86/A/ETyw==
-X-Google-Smtp-Source: AGHT+IHjYblqeN/83EZv0nceP91YlUEmxfdXzxyjeGJ3vXN9tOSNGqZr+qgrXFxAWFWULr/A5HFAyUbdbME3tgB3PGY=
-X-Received: by 2002:a0d:dd14:0:b0:614:c76:26f1 with SMTP id
- g20-20020a0ddd14000000b006140c7626f1mr6198370ywe.21.1712831597884; Thu, 11
- Apr 2024 03:33:17 -0700 (PDT)
+	d=kpnmail.nl; s=kpnmail01;
+	h=content-type:mime-version:message-id:subject:to:from:date;
+	bh=y/sGibiyC5Cu2JjV7T+h2eZcqZoexvNCioKaD4hSCMo=;
+	b=Pu84yJMQZVzyZTSShC3FT9nMhXCJ52TA5FDjgj7N0CSe/gNzHHsfQJ+K6cLHNBAYKALOj9YDmScN5
+	 YNHcnZ1YFzIZNJLfkSA5DHOzzKrtxXiQ8gpovzzZ7RcagfEaU19MHoTGenpULFVdFht3bfAXFJ0Lk+
+	 KHAKH6aAP3v1XtqY=
+X-KPN-MID: 33|DVvwAIfaAxYemf5ReAsdXLMlJnpb2/yz+fCXtOQwz5LBRnbkRvcBmLCZIawgFbO
+ broaq2mCJIF4rtF/+iq3r6MzZ9q7ZqXyPCmv0/mEtbyw=
+X-KPN-VerifiedSender: No
+X-CMASSUN: 33|/o5T6EF3yX/WzKrMqjNVi1HqGgzMqC3Fpyip+9L6nM5AnSgVUTabr2QJVT0MyUb
+ 7nMnoVksIoNW24VLE1bShfA==
+Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
+	by smtp.xs4all.nl (Halon) with ESMTPSA
+	id 5aa162d3-f7ef-11ee-a211-005056ab1411;
+	Thu, 11 Apr 2024 12:36:29 +0200 (CEST)
+Date: Thu, 11 Apr 2024 12:36:28 +0200
+From: Antony Antony <antony@phenome.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Antony Antony <antony@phenome.org>,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
+	Antony Antony <antony.antony@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	devel@linux-ipsec.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [devel-ipsec] [PATCH ipsec-next v6] xfrm: Add Direction to the
+ SA in or out
+Message-ID: <Zhe9LB97ik37hM3q@Antony2201.local>
+References: <a53333717022906933e9113980304fa4717118e9.1712320696.git.antony.antony@secunet.com>
+ <ZhBzcMrpBCNXXVBV@hog>
+ <ZhJX-Rn50RxteJam@Antony2201.local>
+ <ZhPq542VY18zl6z3@hog>
+ <ZhV5eG2pkrsX0uIV@Antony2201.local>
+ <ZhZUQoOuvNz8RVg8@hog>
+ <ZhbFVGc8p9u0xQcv@Antony2201.local>
+ <ZhesNtc8tdTfuvRd@hog>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240410042245.2044516-1-lei.chen@smartx.com> <9e0884e2a101215d3376f2ef9a7a68ca86599f0f.camel@redhat.com>
- <CACGkMEsjTD7Q26BqLuRMh7QmRZYeWZuTbQSDrb7O=uny5oknTg@mail.gmail.com>
-In-Reply-To: <CACGkMEsjTD7Q26BqLuRMh7QmRZYeWZuTbQSDrb7O=uny5oknTg@mail.gmail.com>
-From: Lei Chen <lei.chen@smartx.com>
-Date: Thu, 11 Apr 2024 18:33:06 +0800
-Message-ID: <CAKcXpBwr9v-z0zVQ-KiucAfPLbE7AB4JMM+Ems5iW0nijuPKug@mail.gmail.com>
-Subject: Re: [PATCH v2] net:tun: limit printing rate when illegal packet
- received by tun dev
-To: Jason Wang <jasowang@redhat.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZhesNtc8tdTfuvRd@hog>
 
-On Thu, Apr 11, 2024 at 4:47=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> On Thu, Apr 11, 2024 at 4:30=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
-rote:
-> >
-> > On Wed, 2024-04-10 at 00:22 -0400, Lei Chen wrote:
-> > > vhost_worker will call tun call backs to receive packets. If too many
-> > > illegal packets arrives, tun_do_read will keep dumping packet content=
-s.
-> > > When console is enabled, it will costs much more cpu time to dump
-> > > packet and soft lockup will be detected.
-> > >
-> > > net_ratelimit mechanism can be used to limit the dumping rate.
-> > >
-> > > PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980=
-"
-> > >  #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
-> > >  #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
-> > >  #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
-> > >  #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
-> > >  #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
-> > >     [exception RIP: io_serial_in+20]
-> > >     RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
-> > >     RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 00000000000000=
-00
-> > >     RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428=
-a0
-> > >     RBP: 0000000000002710   R8: 0000000000000004   R9: 00000000000000=
-0f
-> > >     R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 00000000000000=
-20
-> > >     R13: ffffffff8acbf698  R14: 0000000000000058  R15: 00000000000000=
-00
-> > >     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
-> > >  #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
-> > >  #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
-> > >  #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
-> > >  #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
-> > >  #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
-> > >  #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
-> > >  #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
-> > >  #12 [ffffa65531497b68] printk at ffffffff89318306
-> > >  #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
-> > >  #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
-> > >  #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
-> > >  #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
-> > >  #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
-> > >  #18 [ffffa65531497f10] kthread at ffffffff892d2e72
-> > >  #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
-> > >
-> > > Signed-off-by: Lei Chen <lei.chen@smartx.com>
-> >
-> > This change is IMHO best suited for 'net': the possible soft sookup
-> > looks nasty.
-> >
-> > @Willem, @Jason, any strong opinion against the above?
-> >
-> > Otherwise, @Lei Chen, please repost with a suitable fixes tag and
-> > adding the target tree into the subj prefix.
->
-> I think the fix should be
->
-> ef3db4a59542 ("tun: avoid BUG, dump packet on GSO errors")
->
-> The target should be net.
->
-> And it needs to address Williem's concern about patch format.
->
-> With those fixed.
->
-> Acked-by: Jason Wang <jasowang@redhat.com>
+On Thu, Apr 11, 2024 at 11:24:06AM +0200, Sabrina Dubroca wrote:
+> 2024-04-10, 18:59:00 +0200, Antony Antony wrote:
+> > On Wed, Apr 10, 2024 at 10:56:34AM +0200, Sabrina Dubroca wrote:
+> > > 2024-04-09, 19:23:04 +0200, Antony Antony wrote:
+> > > > Good point. I will add  {seq,seq_hi} validation. I don't think we add a for 
+> > > > {oseq,oseq_hi} as it might be used by strongSwan with: ESN  replay-window 1, 
+> > > > and migrating an SA.
+> > > 
+> > > I'm not at all familiar with that. Can you explain the problem?
+> > 
+> > strongSwan sets ESN and replay-window 1 on "out" SA. Then to migrgate, when 
+> > IKEv2  mobike exchange succeds, it use GETSA read {oseq,oseq_hi} and the 
+> > attributes, delete this SA.  Then create a new SA, with a different end 
+> > point, and with old SA's {oseq,oseq_hi} and other parameters(curlft..).  
+> > While Libreswan and Android use XFRM_MSG_MIGRATE.
+> 
+> Ok, thanks. But that's still an output SA. Setting {oseq,oseq_hi} on
+> an input SA is bogus I would think?
 
-Thanks for your help.
-I will remake the patch with subject-prefix "PATCH net-next v3"  and
-fix tag ef3db4a59542"
+Corrrect, It is not allowed in v10.
+
+> 
+> > > > > xfrma_policy is convenient but not all attributes are valid for all
+> > > > > requests. Old attributes can't be changed, but we should try to be
+> > > > > more strict when we introduce new attributes.
+> > > > 
+> > > > To clarify your feedback, are you suggesting the API should not permit 
+> > > > XFRMA_SA_DIR for methods like XFRM_MSG_DELSA, and only allow it for 
+> > > > XFRM_MSG_NEWSA and XFRM_MSG_UPDSA? I added XFRM_MSG_UPDSA, as it's used 
+> > > > equivalently to XFRM_MSG_NEWSA by *swan.
+> > > 
+> > > Not just DELSA, also all the *POLICY, ALLOCSPI, FLUSHSA, etc. NEWSA
+> > > and UPDSA should accept it, but I'm thinking none of the other
+> > > operations should. It's a property of SAs, not of other xfrm objects.
+> > 
+> > For instance, there isn't a validation for unused XFRMA_SA_EXTRA_FLAGS in 
+> > DELSA; if set, it's simply ignored. Similarly, if XFRMA_SA_DIR were set in 
+> > DELSA, it would also be disregarded. Attempting to introduce validations for 
+> > DELSA and other methods seems like an extensive cleanup task. Do we consider 
+> > this level of validation within the scope of our current patch? It feels 
+> > like we are going too far.
+> 
+> No, I wouldn't introduce validation of other attributes. It doesn't
+> belong in this patch(set), and I'm not sure we can add it now as it
+> might break userspace (I don't see why userspace would pass
+> XFRMA_ALG_AEAD etc on a DELSA request, but if we never rejected it,
+> they could). 
+> 
+> But rejecting this new attribute from messages that don't handle it
+> would be good, and should be done in this patch/series.
+
+Definitely see the value in such feature in general, but it seems ambitious 
+for this patch set. Currently, only NEWSA, UPDSA, and ALLOCSPI need 
+XFRMA_SA_DIR. I am wondering how to reject this atrribute in remaining 20-22 
+messages.  Is there a precedent or example in xfrm_user.c for this kind of 
+validation, or maybe a Netlink feature that lets us restrict NL attributes 
+for a specific messages like DELSA.
+
+If not, it feels like a  seperate patch set for general API cleanup.
 
