@@ -1,122 +1,85 @@
-Return-Path: <netdev+bounces-86790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2E8C8A04D2
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 02:32:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F8D58A0524
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 03:00:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FF4C1C232ED
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 00:32:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 324B81C211F1
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 042D117F3;
-	Thu, 11 Apr 2024 00:31:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EEB08F44;
+	Thu, 11 Apr 2024 01:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MO1kGFb5"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="peabpPHl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2129.outbound.protection.outlook.com [40.107.102.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05140A48;
-	Thu, 11 Apr 2024 00:31:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F48D8BF6;
+	Thu, 11 Apr 2024 01:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.129
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712795517; cv=fail; b=DLIMCf3+Zdggfh6OqopVZAgmTdMiV3wZyt6mhsvbbwPrY1ixBjc0jnuXxi3/PfZHOMG16w4PS+5Iu1A4EjQvsIHiXd09on0EhkJHnSX6S1t7M3jPfRppZo+7I9LMY9wuzqX10oD91YtdUmuWISV3r5bo0M1w/y52+VjYUggJ+AQ=
+	t=1712797222; cv=fail; b=p/peYtDjj7OGINL9+h5g5sTjYA29V0cKB9RlBzym3NignXC6Fac4++xMq583YB7pecaRr2Ly8/dbLU3Rf4rC64B0UEzeIvjwFeGFX2kEg3+TViw0ZXzP8S14kzYh6xzdPiQOsWlBOPv3cmJSpRy9ea5JeUkbLmrh5hNb1ZyNvxQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712795517; c=relaxed/simple;
-	bh=x5wuhtquJcxCkMdGlYscdxhOFW1RG4pRtxvRVVTfCoo=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=UL+BNwzTX9EGnJndAMOx959DgnRiAuUR9itDlc7c+bGjbsdKowXHkjairy5zAHaJtlzNkT7g8JoAvFOUukFwiqd/dhSHORGrTuCE77PGJdvDL6uYOr0UuWMFnfpXP3vjxsUk5t/hnsklPiy65VxfG3HRGi1t6pbsHQpWTR3b1AE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MO1kGFb5; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712795516; x=1744331516;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=x5wuhtquJcxCkMdGlYscdxhOFW1RG4pRtxvRVVTfCoo=;
-  b=MO1kGFb5qMem+g8M6tBA0zS8n2/zTI8x5582nccY5LmVyhDiuIEhMlKK
-   s4h2tquKH2cXNDu/eLj26tWN8GyAaiPNynSup4tyGBRbHfrHGwNdqloKm
-   LrwqDYjT8367ZAQGEw+5/m9jDKDrD4T4/DLEpnxphJQVmiPx16Fm150aC
-   UqS9Y7UsKHlbd2fwoCsP9PUsRuI1mf44AbzsslAL4KyFKBYOXEO6YuEOh
-   KVpSI0uJlxeNZN638IR0l09JIlfSTwgp7qLKNi+MP5zV5/ATxNU3QNVEs
-   87FnRnWKGAVmGvGiXkOTBp1gxMaMAx5e16RuYdwH4qmZyMuzjDnpgMi2g
-   w==;
-X-CSE-ConnectionGUID: BQ1DyhZAQEy79u1FbCv5yw==
-X-CSE-MsgGUID: XfQ9xf3/RdaoKg5oLO5GTg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="8043675"
-X-IronPort-AV: E=Sophos;i="6.07,191,1708416000"; 
-   d="scan'208";a="8043675"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 17:31:55 -0700
-X-CSE-ConnectionGUID: zm5e09awSluMpV+ZOKvadA==
-X-CSE-MsgGUID: 4ndKYWu7QcOcHVL2fDZnaw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,191,1708416000"; 
-   d="scan'208";a="20734063"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Apr 2024 17:31:55 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 10 Apr 2024 17:31:54 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 10 Apr 2024 17:31:54 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 10 Apr 2024 17:31:54 -0700
+	s=arc-20240116; t=1712797222; c=relaxed/simple;
+	bh=Emx64ixwGCiRuuwJ04gBQaBIj+GHjV60TxZ70JfPSIs=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 Content-Type:MIME-Version; b=H6vCa3U9xVcRQaRKzcptLZkmIVxokQyWyGsbPFhF7QzzmkCWXUS0wdE7BVBPv/OifAPj9/UFWIHnc+2gpXsEwvE3fapHMstMdAgJ0ct7LpwOFsOWAxUtrDMizlXXy8EMeLmVAH9cR/UepvZNZNBmsvsco/xkjaVx9eGxBvP/hr0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=peabpPHl; arc=fail smtp.client-ip=40.107.102.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aMoLXGh5mNNcNM3wEapbE7SGRg+Ma6X9wf7EACG/cnBSNwVfum1EEd1HETPcT/lGxsHDEyZJnDYmg9QzscTBBri1WiECrwwjIk6FCghvwNGAcwWOh9ZLAaKWLQO9GwqsvLanByei+GBEZ65Ta3EDsjOyt4Gaqf55KUKe7IQSFxw4puz6Gy7DpcBEgfP0X31w9y+ByMiQKrhGqhh0wUW4oBAC3ULbW7ugtmAB8hKWCOUJS6E7/Frirxan7d5XQNHFWCix35Yl0PageTkpKYemXZJt6nIS65BIUfjZzAN0enC72mGoZcaFD6BusdmQAp0Z6KZ+PWbwzO2U4D6Hxuc0Tg==
+ b=FNKJI9aChawXk+ykBg8cpdLAAgwijG3kocAtJwDK+0pRMK/aJkCjHYLKnq25p/Whl0g7beZWIk+D+UCE8HbvrRJ47uWz+g4o2SEizhDMIBYkrBkndjv79tKUMEAhIYufTsfLjUmHGzj9N2ukwtkBN5Mau4V5lOep7JLNAZxAVCqauBAuUiQhk5grM0XFR3i2TnUjyY58c0UeVQcR0bYHeHCIK41r6pvu3y2s1g48up6ZT+z0B2CC+Batxva7oSeVP9r+Jj0a0ksxOXzvG5ttHUhfHaIu/G9RQA7yQLW6JKsfq4EHNOgcPNSvmyOGCcGd/4VMHS+OYyjKixVd0YkAqg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SGM3WIFPYEKJrKI+00eblX7QlamtfnJ72iCxQEGgd0s=;
- b=Ijf4QYf6GLBHzdByVsswg6QulCmWuXBIQB6PpIybUcfuvD3aXl84hNZrlI3yFNwVqfjGNK+4KGB5SF47ypSKXWcfhzNOGTtx2FIvz1MWMQhJEjdc+QsYbn+Y2Gfu8OCGpX/sa7NSBDLiTqUNSyB53zvyrik0Q2MHBn8SppmnG/GcafRHjaDwqFYUwVr1m14AAdnRLjLtf5rW14xxZ1oXzJG9+AWib5drmnpgXWJKzNxIRFRLyhxXFlbm/bm42r0X8rJsMTSSwWbLw8o2bEPxkDDEtazXKY95ja1SXHnN6r14EY0h+zc6YnCoXptW1O+rjfLyn3ijVuX2cIzjG66mkg==
+ bh=wm5g7Wm0ecvor+ttug2L2l1+D/P+B59Es6JrXNeYxdY=;
+ b=Jch//PJvU65vFsKivp2Uih5XmAqqHbbDORLY1Xb8XygsbRcU2JW9HjgrA0wGv1UP66cBck6qua3kOyHpGOP1dWgcbyD3YcDETyR238ja31Wa/fyeoHFz0mpOHsl3VWu0VUPT1hlbcWoTW66bu1hR/n45CJp27hTYj2Y5DgHpaPf2UoPdC+AtdoQoxb3IUl483oX9hQ3TdfOvNh/8S55GDp/pNIfNqYistr0kMBOKeXGuqlGmrpRCGUG2hXfcVSBelZfV/sME2Djq8knfbs3iiT4WC6JFmYL5xaJornl7AdSkCybWo+7nmgjuW4IJfWhtQ8pKKjX97OJtrz0eiX7M2w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by DM4PR11MB6334.namprd11.prod.outlook.com (2603:10b6:8:b5::18) with
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wm5g7Wm0ecvor+ttug2L2l1+D/P+B59Es6JrXNeYxdY=;
+ b=peabpPHloekI7vJQum+g1umqywsTCKfA1J6yr6Ywq05tbk4eF5xXsT91CzjYB+8yZt+qrvGyGHrOKGi3dxuVfFG79suJsWAaDNIRXflqAfsNP7wQTiS0s5+URUgd99zUls7YrCWFS9qWRMtd7BpZcPUTb3zizhNk2/ltnMcuv4WJn5CYnugf5saDXiUiXZSI4WfLVtqb+sXtjoFaY+z+WpcDn2goJunj1yML6ryo1By1FGbKAgvQy9SQquqAx7CgE8HItbtfUElcJOaBkdwMAIcERTu8gGVWWtp+Ru7fHPWtg2Hju6KPLFWB/vZPiTfjJlCwJBNg6E1EpLaLV/pmwQ==
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+ by BL3PR12MB9050.namprd12.prod.outlook.com (2603:10b6:208:3b9::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26; Thu, 11 Apr
- 2024 00:31:52 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::b383:e86d:874:245a]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::b383:e86d:874:245a%5]) with mapi id 15.20.7452.019; Thu, 11 Apr 2024
- 00:31:52 +0000
-Message-ID: <06e02e6e-71a1-4966-8fd2-0151e358e465@intel.com>
-Date: Wed, 10 Apr 2024 17:31:50 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Jiri Pirko <jiri@resnulli.us>, Willem de Bruijn
-	<willemdebruijn.kernel@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
-	<pabeni@redhat.com>, John Fastabend <john.fastabend@gmail.com>, "Alexander
- Lobakin" <aleksander.lobakin@intel.com>, Florian Fainelli
-	<f.fainelli@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, Edward Cree
-	<ecree.xilinx@gmail.com>, Alexander Duyck <alexander.duyck@gmail.com>,
-	<netdev@vger.kernel.org>, <bhelgaas@google.com>, <linux-pci@vger.kernel.org>,
-	Alexander Duyck <alexanderduyck@fb.com>
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <20240409135142.692ed5d9@kernel.org>
- <6615adbde1430_249cf52944@willemb.c.googlers.com.notmuch>
- <ZhY_MVfBMMlGAuK5@nanopsycho>
- <885f0615-81e8-4f1f-9e97-b82f4d9509d3@intel.com>
- <6a775533-bd50-4f57-85f7-125c107bd77a@lunn.ch>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <6a775533-bd50-4f57-85f7-125c107bd77a@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0182.namprd04.prod.outlook.com
- (2603:10b6:303:86::7) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Thu, 11 Apr
+ 2024 01:00:16 +0000
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::459b:b6fe:a74c:5fbf]) by BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::459b:b6fe:a74c:5fbf%6]) with mapi id 15.20.7409.042; Thu, 11 Apr 2024
+ 01:00:16 +0000
+References: <20240408180918.2773238-1-jfraker@google.com>
+ <661550e348224_23a2b2294f7@willemb.c.googlers.com.notmuch>
+ <20240409172838.247738f3@kernel.org> <87jzl5akh5.fsf@nvidia.com>
+ <20240410061928.712ff9a3@kernel.org>
+ <6616e92cbcca_2bfabf294c5@willemb.c.googlers.com.notmuch>
+User-agent: mu4e 1.10.8; emacs 28.2
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, John Fraker <jfraker@google.com>,
+ netdev@vger.kernel.org, Praveen  Kaligineedi <pkaligineedi@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>, Shailend Chand
+ <shailend@google.com>, Willem de  Bruijn <willemb@google.com>, "David S.
+ Miller" <davem@davemloft.net>, Junfeng Guo <junfeng.guo@intel.com>, Ziwei
+ Xiao <ziweixiao@google.com>, Jeroen de Borst <jeroendb@google.com>,
+ linux-kernel@vger.kernel.org, kory.maincent@bootlin.com, andrew@lunn.ch,
+ richardcochran@gmail.com
+Subject: Re: [PATCH net-next] gve: Correctly report software timestamping
+ capabilities
+Date: Wed, 10 Apr 2024 17:40:53 -0700
+In-reply-to: <6616e92cbcca_2bfabf294c5@willemb.c.googlers.com.notmuch>
+Message-ID: <874jc8ww68.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: BYAPR05CA0100.namprd05.prod.outlook.com
+ (2603:10b6:a03:e0::41) To BYAPR12MB2743.namprd12.prod.outlook.com
+ (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -124,85 +87,149 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DM4PR11MB6334:EE_
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|BL3PR12MB9050:EE_
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: uIoWE8MaHZvM53gBnHFZJ/8Sgx3mmrJGSA7kcJf4T6MW/tCmRQLU4aCItJ6JNk6QBdJS5wdzseZ6hezGASJ2J3rO5s33sdXEMrl1+yckYXygH0eLIz+PsdntPhLTqLZ7g4ZupXB+M8HQdxp+Si2FyIueJAHfU6dxeEqbKqR42OHcVTCHVeM1OBLKal+2MM443b+bHp+p/Z68YiCZZbGqcdLstaxPTB0lj5TrGyND0szaVT1gbosox3EjaXAiIskVCovEp+ngi3aKPhAf2Zg75MBgnbbUWxxi6xQFCsl2U7pSV1ZzKoblQeZ1xZYxaDVC5WS0jZjoI/GHi2lwV/PuPn0kavMVo05fG/+FWt2U5Bqr4qCrK/9G6qkjQtJp8C/IgVEuQ59d0Jbjrxat1ASVMsB/xb3tZ/iXTRfl4mzLiyegwujz7f7brOJ0v1x0b7/bEpbBA0I518oJ9sOZtzFe39Gj/N+GN0iX/ciGdXLm3bqV85OdMeKCmxh+x4cF5e5yGlgkZUw7mqgslMnVO4HlUi2hWk3H0voIJ/GA26cSnkOwoUtEZrfdqgLLvZOqzgrsMjmbt5pCZ4zWeADFSiAjyscYdtbadLanBjAN7k1WqLTIFQnxr588f1m2TK3mhTiPewH6M3UMmAZlwBKTntAQR1PljfPp9RuafMG+OYTgVX4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(7416005);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info:
+	92R+NhYy0v/OpgxOpb0mG04zpEvrVY8jVxslGC8+g116vnnbjfRv/d2DbnahC8ZTSnlM5Ic9MBvtZfv8ZB2krw/1KRoyQiMVri08TnJvgY/1jgZYv6DcWJ2bd0bdTHl4w4VlCmPCf9iW95sFqr/moEIqYRjaYknw6PpsTRyKLNXAz4HdQa3gHo/j5rprc6OLd5fhjNslvQa4ZUwf3dcVSOOT99rrXyj0DjRAoSqq2wfjZZS8ElcOYilIkiw5ePxmOlAY8eXwjHc9BfALJzF3SZfRVkTRGdYsS6WNEW5NNhtyh5jKRS8m8KsRFC0YIVXfW+at/KkXN1CmdiRwxaw2Y72c0ffReCvv2OgA/yjrwHL55YHt/xKPrOUtvfMO6ffVBQ024meq2r4RxFAEs1rFic0q/TEKOFlPcdcIa1FS6qfF+9kvLWZsDrlam0i1ltnxln28W51CbtnkFfjLEeOmaKh8tpmUyU/ABq5bB160klP/y+YotO4tObm1IbMDxS/mzc7aYaPNQo3s6Lr0pVtVqgjPA4jLKj2hunwpOK1wAFTWRJuZG6ODeKuznADxbewAhS8fv4u1bdqXYs2wJscD+Ub1SHIKLI2iFfnbI/pcQVGm9LIDJ8+C+9Xb9rM8qta9+36KfZf8mJNBfXoriAUo73A8Dza5+BRvHMQtaMp33x4=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015)(366007);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?L0NrbVZucVZFVmI5a2dTL2NZQ2xERnJzQ3BQOTJJVkxzTVljYndEMDJCRnpZ?=
- =?utf-8?B?VUwzcHZZR255WnIydzFQc0M3a3NQenZGL3lNeHBvb0VDWDMrZWtrSGVReUtY?=
- =?utf-8?B?Vnd0SVJqNml2SXpuOEZHZVZVWkY3YmZjSjVOWk1pN2lURW9uVEZIRzdrUUJF?=
- =?utf-8?B?Y3Ztc094ZmhSVkVDRURuMythQ0xCSE9KcTJqdkZrUGU5dXYrdXZzSWNMdXhF?=
- =?utf-8?B?UnpXTVRLODFJMVpvSWRidStEVFJ0aU0yZzVIS0p5MGJ4czhyYk1odlVXWDRR?=
- =?utf-8?B?bzhraW5tN0d6R2xmcklxMzgweXhWK1F4R2kxZGR4eUw2OFk3UFV6ZTIvVFhP?=
- =?utf-8?B?NWRISUVHZlQ2ak9lbkU5ZHlaSjJyVzhJQWtvU2N0TVgrWjdJaGZrTElSMUZ5?=
- =?utf-8?B?TXBCanprMWtTckpqM0Q5YlA1dTdFaS9sRXMwTEpIaXVldG4xa2gvREJKK21a?=
- =?utf-8?B?cWZSMkxvaVFEeW0wdDAza21mUHVUeVVaQVd2VkNIakVNQkswa3MvT3A4Yjk1?=
- =?utf-8?B?QlpPMlN4VHhibmthdmt3QldSU29iamZjUzVWTXV2bWJCRlFvNWxEVnh5YzV6?=
- =?utf-8?B?SG1pdHVQWU5TcjUvR2lHS3NNUVViSjRzalZXMjlPNWlCNGw1anU0WVhRRzhH?=
- =?utf-8?B?dEZWemdpSSt4YXpWRFBzZlVibkdQS3ltS0YrVnduam1INitlQmdWQlFXQVBI?=
- =?utf-8?B?anZBN0ZOVGZscFF5bjh4cUUyeGFYcGp3ZDBhRks1Q0tKS09Gb1h3c0xLcXY2?=
- =?utf-8?B?a0tKT3pRbUtoQVlVNythZ0ZBUUlKMEoyUWVvZ3NkbkVhd0xsTnRzQlJYcnBC?=
- =?utf-8?B?TitjVUM2dkk3czJ3emhTdEwzZmo5amVhejlQNGJlL0tvZTBjVC9lSU5qdW1T?=
- =?utf-8?B?Q1hKZHFZbWJBRlRVdHVsaEdTLzREZHlxdTRvME1SMFppeEtJTzVMY3lSN3hi?=
- =?utf-8?B?elpYMzdLa25yTjdjRnVvaHZZQUwvU1JqYTZLdFpsZ1k3NVJwVGVUOGlHMkdo?=
- =?utf-8?B?YVgzRXdMenJFTDhucW5GOGtLZU9mQWRDTGYvL2NnVWRGRit5RllsbHl0SEg1?=
- =?utf-8?B?UjFXSDRIMVBOYkF5Rm1VWktHOGt2dFg5bHZpdnhwNk9pa0VpQnFSNFFtUnFX?=
- =?utf-8?B?dTU0aTNXdTdpZzZ2cHBVZmRNdkdRZnU1QUNhNXNsQ0hId3Z4ZEdsMVF1TytN?=
- =?utf-8?B?dGVwSXVrMzRtM3pOdkVSTzRLY0dIbENjY1B1Y0I5czk0c2JmaFVxMVlyWWs2?=
- =?utf-8?B?STFsaTVMQWZpYWw0bWFyV2gxMUhsN1pUaExod2NOanNvVExqdUJ4VWJ5S1Mw?=
- =?utf-8?B?Z2EzOWQ0UWtibmZhZjhKNnJHZnVsdlBpQlpsQlNILzRETUNMNzBYOXNHUlY3?=
- =?utf-8?B?RUhmbEExcU9ucWpiUmczVmNHVERFNkxFRENBVHlzWVRhWDhSSVJuZjR2ZnFi?=
- =?utf-8?B?VU1QYlU0LzZ3YThxdXVLUHpwaWZTQXlIQ2M3OG5WTGtCZlpVcGMzTW1WR0lW?=
- =?utf-8?B?Z3hmNUZTWnpSaHZZdmlJS2hFMjRzMjJwc3h4UFpUY0tjZlltS21McVRXSXBK?=
- =?utf-8?B?UlBYZzQ4Mkc2Z1Z3NzJVYTQ5WSthV05aeWVyZlUxWlBxcU1pUVF5YXdRejF3?=
- =?utf-8?B?d3J0UlhjYjBHQ01VRGU0bDhFeVpZL0QwaUgrMk53UEtYRDBzRktHWHZ6NXhE?=
- =?utf-8?B?VENGNkZITUJZMFo2cXpRTmRQeEU4UkE0dlZTOWFBU1dTUzI0Q2JURkwyU3Yy?=
- =?utf-8?B?R1dxWEg0NVlzcGdjaitDTFlQNGdLWFQ1Q1JTdm1GSGJEa2JUSE1zc1RqYW9G?=
- =?utf-8?B?SnB1SVZPcXBIbGVFVjlyY0pRd1RPMTZ2aEEvNkozc01ub1ExVm9JYWRrTDlv?=
- =?utf-8?B?WGRGLzcycE5USW9wa0tIbnF3dHpxM2YwY2ttMFBkbytralgzc3A2OHI1Zk45?=
- =?utf-8?B?R1FOcnQ3OThIZXYxVm14U1dwZytvRHh6c2pxZDM5SGV0QldRMHhXOXdYUGEz?=
- =?utf-8?B?RzVOSFFGOHVuS0ZSWGhLRDZoczdqMFMzTUZBeWRDdFppT0ZCTFR4QWNONHdk?=
- =?utf-8?B?WlI0M1RrVHRydmhscVNMOG80Z1VqbHVtbHFSMlFNOFdMMHA3dk9ZNngvRTkr?=
- =?utf-8?B?V1FsaWVIRUZwaW5JS3JCdWEyajdZQzMwMytrcG5uYWx6UnJGeHF5c3c3ZlJk?=
- =?utf-8?B?eFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 13871f7a-d6d8-41ed-18f1-08dc59bec86e
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?86OAbILx2asy8Dphc0hNp9MjsLF3R+j6OWW5XZB4Gke7H7zhwSh6KD5F3hdR?=
+ =?us-ascii?Q?Juikn/Lqv+xHjIz+/5BPoc9OaB9oUt4z4ttTxsRB3ACCF4BFhFVZGSf8d79U?=
+ =?us-ascii?Q?v6Wr2qRJsCAD3jPYNliHE0gxnW8frZzzK+V1XUhPi6ePHgsSy2v1STiUNBJh?=
+ =?us-ascii?Q?hBDs/TFw2P7x0ztGfGfhraC0VZGU7A3nWMuNCEWqvcksulLayjB6S6rabQC2?=
+ =?us-ascii?Q?LEkik9gLl5ohDmVFDBllA+Y6YZ4UvfHHhlFzlyvUdkMG9P4UoihVvFR6fm5a?=
+ =?us-ascii?Q?gL9AHJSpf4cywSaEoQ/XFt2CYHf8TXe4dLcxm5MVpk9pOP17zqYA4NdigVEh?=
+ =?us-ascii?Q?TSvx9/ldDu5C3VLnEgkTqaUDprVt6GAh5WHFRLcphuqg5n0OcAvgtgLbs/IF?=
+ =?us-ascii?Q?cmUFZlz67i6rc+5wSnh0BBtNp1xRnQVd5uKi+Us4CZ3fugI9/IAN+6m4Ay9A?=
+ =?us-ascii?Q?ITZx4mCUm+jBsi3RA8Bytd+emB57WvoZXN5R+pm9hyqpyQVPR2V6g6LCPRv/?=
+ =?us-ascii?Q?3Sc00BbmuqFrNQRYGtnj4t3giMKkUYCx0zqZaiqUlopIfOUnHd0ghL9IO/49?=
+ =?us-ascii?Q?bCrciOCdb9q6shH4bBSWJGCpMDJuy07vp6DDyaPtz7IGslAZEOV51Z2gfnAh?=
+ =?us-ascii?Q?HHGS6ZSLw6bRBJitaMk7KGbuVEKo6Zkdl9k2REDNcwt0lOxYLZeI5TArHHB3?=
+ =?us-ascii?Q?Nu3rtRreI9X8ioAmGUgpivo3gRP2NyfG8idFGYML7GhEnEiWfMv8IdvGjto6?=
+ =?us-ascii?Q?cgcPcqw4YxL7Qv1wyIMl6OgBm4nPOf9eXWbxPuzDyjRKRx5wyT3ydFBDTfge?=
+ =?us-ascii?Q?ajQYSg3VX3gAMCHCR4OXPHyONreSoebeBSc6ELa2zg9v3bvjyRcR40lBKHaw?=
+ =?us-ascii?Q?xF0lvwQs9UuMhmGftXnlNPx6Y3YFIbIvTn8aT1iK+KsCqM8O6Ta9xxTtjimT?=
+ =?us-ascii?Q?KigfkzQAZMixBtfYCBewFhBAaFrsBjwKouDbb+jrlU7kicJHDGUVEbGrD1Y+?=
+ =?us-ascii?Q?9vi3s3b1HidkFFzN2/P3fmnIVMdLl6R+N8DUH/uhBKsoSaepu2VDjbifjjfw?=
+ =?us-ascii?Q?16yz+6BwxOV1zToKqkCMDOMg+kPiZb5w3CTaq8Uf1vMsD3ofv9YKe8ceo8EC?=
+ =?us-ascii?Q?DuvOJMlh9Cy5x4k6EhVydLuqhWoxKBpS099g0mOz7SBnLkgmOUmAuu+X31Z7?=
+ =?us-ascii?Q?ZFEChqk5NZOyCGUgiwyHtpWVv66bsJvPrXG5pNc8axvmxLNUkW2L3/r46iWC?=
+ =?us-ascii?Q?DzkMG1aB7dzRxt1dJQzc4EUUlUG0HXk9P8+to+FtHIBYTQUikLaAOShGfb0S?=
+ =?us-ascii?Q?2TG8TVmEm/T2JIbH3rkjjHljsiHqET3sjRSQ9vnHXk+wQ/9C/AlLh3hVXW5u?=
+ =?us-ascii?Q?9QyBAD9oOwzljrjjRCh1Sfq6eOQwK7SUSNFTzSztpqjmEvi7tZNrNfIITHre?=
+ =?us-ascii?Q?BOWTlja8ieZ8AVUdOVDiWMidKLPe4Di7YrvT0epvYq8V3l3tJqMsVJuSjhrN?=
+ =?us-ascii?Q?mVZU2EYwA4NLT0z6DKgqdvkmrm952fxQEUgxtZ5PpHUkdAZvnvQk2fCsPnME?=
+ =?us-ascii?Q?uWtOBZHij9VuudffK6//xZHobqyw9yNSFz6bGK74fGAS+d1rJfE2idwMp6GD?=
+ =?us-ascii?Q?YQ=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e5ef9641-a051-49a9-8a6c-08dc59c2c023
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2024 00:31:52.2455
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2024 01:00:16.3320
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: HthbnrQn7ffqPn9XLlarNIuDOkncBHYA3B2eKDMKAaUIEru9XgrYUKbpO8XQ9R9kS+IU4Q5EsXCRLzxrO9mz3DJBbV+xUsUN8cyCy9ywP5c=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6334
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-UserPrincipalName: JXOHOaytbE/4qKgMlVRQABUe/xD6P7hXtDh59g1TfeX0llPhkHDQVzrHjLNeRYSsrgUcxa1DoyObHBX61p+usA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB9050
 
 
+On Wed, 10 Apr, 2024 15:31:56 -0400 Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
+> Jakub Kicinski wrote:
+>> On Tue, 09 Apr 2024 21:40:46 -0700 Rahul Rameshbabu wrote:
+>> > > My gut tells me we force drivers to set the ethtool op because
+>> > > while at it they will probably also implement tx stamping.  
+>> > 
+>> > I think the logic should be the other way (in terms of the
+>> > relationship). A call to skb_tx_timestamp should throw a warning if the
+>> > driver does not advertise its timestamping capabilities. This way, a
+>> > naive netdev driver for some lightweight device does not need to worry
+>> > about this. I agree that anyone implementing tx timestamping should have
+>> > this operation defined. An skb does not contain any mechanism to
+>> > reference the driver's ethtool callback. Maybe the right choice is to
+>> > have a ts capability function registered for each netdev that can be
+>> > used by the core stack and that powers the ethtool operation as well
+>> > instead of the existing callback for ethtool?
+>> 
+>> Adding a check which only need to runs once in the lifetime of
+>> the driver to the fastpath may be a little awkward. Another option
+>> would be a sufficiently intelligent grep, which would understand
+>> which files constitute a driver. At which point grepping for 
+>> the ethtool op and skb_tx_timestamp would be trivial?
+>
+> Many may not define the flags themselves, but defer this to
+> ethtool_op_get_ts_info.
+>
+> A not so much intelligent, but sufficiently ugly, grep indicates
+> not a a massive amount of many missing entries among ethernet
+> drivers. But this first attempt is definitely lossy.
+>
+> $ for symbol in skb_tx_timestamp get_ts_info SOF_TIMESTAMPING_TX_SOFTWARE ethtool_op_get_ts_info "(SOF_TIMESTAMPING_TX_SOFTWARE|ethtool_op_get_ts_info)"; do
+>     echo -n "$symbol: ";
+>     for i in `grep -nrIE "$symbol" drivers/net/ethernet/ | awk '{print $1}' | xargs dirname | uniq`; do echo $i; done | wc -l;
+>   done
+>
+> skb_tx_timestamp: 69
+> get_ts_info: 66
+> SOF_TIMESTAMPING_TX_SOFTWARE: 33
+> ethtool_op_get_ts_info: 40
+> (SOF_TIMESTAMPING_TX_SOFTWARE|ethtool_op_get_ts_info): 59
+>
+> This does not add up, but that's because some drivers share prefixes,
+> and some drivers have different paths where one open codes and the
+> other calls ethtool_op_get_ts_info. Marvell is a good example of both:
+>
+> $ grep -nrIE '(SOF_TIMESTAMPING_TX_SOFTWARE|ethtool_op_get_ts_info)' drivers/net/ethernet
+> /marvell
+> drivers/net/ethernet/marvell/pxa168_eth.c:1367: .get_ts_info    = ethtool_op_get_ts_info,
+> drivers/net/ethernet/marvell/mv643xx_eth.c:1756:        .get_ts_info            = ethtool_op_get_ts_info,
+> drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c:5266:   info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE |
+> drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c:962:          return ethtool_op_get_ts_info(netdev, info);
+> drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c:964:  info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE |
 
-On 4/10/2024 3:19 PM, Andrew Lunn wrote:
->> I think its good practice to ensure multiple vendors/drivers can use
->> whatever common uAPI or kernel API exists. It can be frustrating when
->> some new API gets introduced but then can't be used by another device..
->> In most cases thats on the vendors for being slow to respond or work
->> with each other when developing the new API.
-> 
-> I tend to agree with the last part. Vendors tend not to reviewer other
-> vendors patches, and so often don't notice a new API being added which
-> they could use, if it was a little bit more generic. Also vendors
-> often seem to focus on their devices/firmware requirements, not an
-> abstract device, and so end up with something not generic.
-> 
-> As a reviewer, i try to take more notice of new APIs than most other
-> things, and ideally it is something we should all do.
-> 
-> 	 Andrew
-> 
-> 
-> 
+If there is a desire to enforce all drivers need to implement
+.get_is_info, would the following make sense? My biggest objection to
+this idea was mainly my concern that the drivers would miss setting
+info->so_timestamping with SOF_TIMESTAMPING_RX_SOFTWARE |
+SOF_TIMESTAMPING_SOFTWARE, which I do not think should be a
+responsibility of the driver author since this is happening in the core
+stack.
 
-Agreed. It can be challenging when you're in the vendor space though, as
-you get handed priorities.
+So maybe something like this (taking Willem's proposal for
+__ethtool_get_ts_info and modifying it a bit)?
+
+        int err = 0;
+
+        ...
+
+        info->phc_index = -1;
+
+        if (phy_has_tsinfo(phydev))
+                err = phy_ts_info(phydev, info);
+        else
+                err = ops->get_ts_info(dev, info);
+
+        info->so_timestamping |= SOF_TIMESTAMPING_RX_SOFTWARE |
+                                 SOF_TIMESTAMPING_SOFTWARE;
+
+        return err;
+
+>
+> One more aside, no driver should have to advertise
+> SOF_TIMESTAMPING_SOFTWARE or SOF_TIMESTAMPING_RAW_HARDWARE. Per
+> Documentation/networking/timestamping.rst these are reporting flags,
+> not recording flags. Devices only optionall record a timestamp.
+
+I think this view aligns with my opinion above (though good point about
+timestamping reporting bits in general should be deduced based on the
+timestamp generation bits set rather than needing to be set as well).
+
+--
+Thanks,
+
+Rahul Rameshbabu
 
