@@ -1,215 +1,79 @@
-Return-Path: <netdev+bounces-87162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 060918A1F13
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 21:05:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B4408A1F30
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 21:10:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84B062873C7
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:05:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B3C61C238BF
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:10:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF311205E30;
-	Thu, 11 Apr 2024 19:05:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DE11E488;
+	Thu, 11 Apr 2024 19:09:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tZGYLFH3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W8b4IHqw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9654017584;
-	Thu, 11 Apr 2024 19:05:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A0961C287;
+	Thu, 11 Apr 2024 19:09:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712862339; cv=none; b=lqk3AZWdeGQN+1FoU30WSf7t1nrLvkQbrW6hrbMR9Evzpp49Oa+s6pwql6TLUgYfzjTnqPUSjOF+/GisYTa68sekhdv2+xd8MNLMfn1XJAcrnJhcwUPC/KWHPQRMdKD7KyUpA/cKBJZIpKZ8AbAaUONyskD7/CRqN+o4P3lYl3k=
+	t=1712862564; cv=none; b=DCXW9JBo6QC9m3Gm2sxAvDVUQeot0O+ltxh2nkJEQoDGKmbrgaZQWoFLVzco/oBeClzhfgq9tE/dSO9gQPQGg3H+StFzG5alyp9EzlRR/ki9c/k5742ofq1X2Xs5dT+Dqbt31S/YaRbczQmLrPEFAcaRQG7q2Mt2meI7hLWQPDg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712862339; c=relaxed/simple;
-	bh=fVQl7RCtOg4AqxawSMWY3ZrEfOU3fHC6NAhZRb8dlLE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JUoeeICm9F2NjXIgg1Omc66z7JIezMwzyGSSAwBtu+9cF5CBjWcX7iEN8HM2ojrWNQ9txk2r/pUCRsj4Si8SA5hT0A3uYH9RsUZxCqKYtLDoLJ03BCkn4GnywxvlhkztKOXuVeBsEjS+B9hYMLb9euDVboQH/Hj5I/jcKl2cJtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tZGYLFH3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 272C7C072AA;
-	Thu, 11 Apr 2024 19:05:38 +0000 (UTC)
+	s=arc-20240116; t=1712862564; c=relaxed/simple;
+	bh=usRNEJqWbMeIqe+6FvaB/rbolOBWygZpy9jfuMMXtUg=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=lcBuxL2lBKr5QdmxNVFLaX+9Me8BNpKs8ff+KaTn+nSzKyp8sWLTY9EYqkLy6XBv3MA84RdXmlAA36fiHF6ffRBppS6H3Klo9ZNrLi/wwz/GBpacSiS1gMS8hr80/e3GbBDWSXTuO6Mir+4Opbcn+7jLdXoAwrO9zytd6fdRN4U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W8b4IHqw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0976AC32786;
+	Thu, 11 Apr 2024 19:09:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712862339;
-	bh=fVQl7RCtOg4AqxawSMWY3ZrEfOU3fHC6NAhZRb8dlLE=;
-	h=From:To:Cc:Subject:Date:From;
-	b=tZGYLFH3+un2LnOtwMq36Ug9++Qbs4WH4Ak+di9V71wmQ+EhwQ5Oc5Sj+J1HMaLov
-	 w0dbyIkhAviXl/Wt6Mxt/ncH/KVQ0+le/8rBGPxebqqPccS5jXmf46vECERs4bH4Fa
-	 cW+v6QjAbDY8IOGmBr93wEmfzCFTyP51vR/sy+mgqHLItnULvFfBddE44mI0KGCFzg
-	 ROUH6xrANvOXSqjl7puANuoKS8ZdraEuUf9QAzEu8m+jHzBpjPQpetLvvGNBZUA0aL
-	 U4OBHorixX4pykuMG6tQJrJWW5+E7tXslyN0t9VKJB2aPvVWFXne/EgP6fk5dsQ2Q/
-	 Y4Z1NzEd0V2cg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: shuah@kernel.org
-Cc: netdev@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	mykolal@fb.com,
-	nathan@kernel.org,
-	ndesaulniers@google.com,
-	morbo@google.com,
-	justinstitt@google.com,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	llvm@lists.linux.dev
-Subject: [PATCH] selftests: adopt BPF's approach to quieter builds
-Date: Thu, 11 Apr 2024 12:05:34 -0700
-Message-ID: <20240411190534.444918-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.44.0
+	s=k20201202; t=1712862564;
+	bh=usRNEJqWbMeIqe+6FvaB/rbolOBWygZpy9jfuMMXtUg=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=W8b4IHqwm8oco9APHltRTXMd6NdTqKStT3Sde/42wKAZLZaLHGHigPIgJnPKPhVqz
+	 d1XLYwwc6tJ29cxqF/E7Ir6Ovy0QCpWwX1f/EFB9Hbx02KqfglUjqdxz4FV+CmCEbI
+	 tcNJtl7f7IHUxn8s/l/gAQmlBDhJDEkmbY3s3n9BZfqcf7VKLdxf0PqCaXsZWOZGb2
+	 IF6jzATyhacU39x3GaFW9VrarEuqA0mJF70NgblMEZN69FUei7WSDmeRI+ndy0GWCC
+	 xEw0iaHRte3mQR6wRynPTQLsuudVJSOZ/ifzUUluvMSKzZheKSxXYoSfrzChwODvnW
+	 cdaQfbChTgQtQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F1617C433E9;
+	Thu, 11 Apr 2024 19:09:23 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.9-rc4
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240411133837.86880-1-pabeni@redhat.com>
+References: <20240411133837.86880-1-pabeni@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240411133837.86880-1-pabeni@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.9-rc4
+X-PR-Tracked-Commit-Id: 4e1ad31ce3205d9400816e08cf14b7c96295d22e
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 2ae9a8972ce04046957f8af214509cebfd3bfb9c
+Message-Id: <171286256398.2172.12561033857678072673.pr-tracker-bot@kernel.org>
+Date: Thu, 11 Apr 2024 19:09:23 +0000
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-selftest build is fairly noisy, it's easy to miss warnings.
-It's standard practice to add alternative messages in
-the Makefile. I was grepping for existing solutions,
-and found that bpf already has the right knobs.
+The pull request you sent on Thu, 11 Apr 2024 15:38:37 +0200:
 
-Move them to lib.mk and adopt in net.
-Convert the basic rules in lib.mk.
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.9-rc4
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-If this is okay with everyone, can we possibly apply it to net-next?
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/2ae9a8972ce04046957f8af214509cebfd3bfb9c
 
-CC: ast@kernel.org
-CC: daniel@iogearbox.net
-CC: andrii@kernel.org
-CC: martin.lau@linux.dev
-CC: eddyz87@gmail.com
-CC: song@kernel.org
-CC: yonghong.song@linux.dev
-CC: john.fastabend@gmail.com
-CC: kpsingh@kernel.org
-CC: sdf@google.com
-CC: haoluo@google.com
-CC: jolsa@kernel.org
-CC: mykolal@fb.com
-CC: shuah@kernel.org
-CC: nathan@kernel.org
-CC: ndesaulniers@google.com
-CC: morbo@google.com
-CC: justinstitt@google.com
-CC: bpf@vger.kernel.org
-CC: linux-kselftest@vger.kernel.org
-CC: llvm@lists.linux.dev
----
- tools/testing/selftests/bpf/Makefile | 13 +------------
- tools/testing/selftests/lib.mk       | 17 ++++++++++++++++-
- tools/testing/selftests/net/Makefile |  9 ++++++---
- 3 files changed, 23 insertions(+), 16 deletions(-)
+Thank you!
 
-diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-index b0be07f29dde..f06c527eee34 100644
---- a/tools/testing/selftests/bpf/Makefile
-+++ b/tools/testing/selftests/bpf/Makefile
-@@ -135,18 +135,7 @@ TEST_GEN_PROGS_EXTENDED = test_sock_addr test_skb_cgroup_id_user \
- 
- TEST_GEN_FILES += liburandom_read.so urandom_read sign-file uprobe_multi
- 
--# Emit succinct information message describing current building step
--# $1 - generic step name (e.g., CC, LINK, etc);
--# $2 - optional "flavor" specifier; if provided, will be emitted as [flavor];
--# $3 - target (assumed to be file); only file name will be emitted;
--# $4 - optional extra arg, emitted as-is, if provided.
--ifeq ($(V),1)
--Q =
--msg =
--else
--Q = @
--msg = @printf '  %-8s%s %s%s\n' "$(1)" "$(if $(2), [$(2)])" "$(notdir $(3))" "$(if $(4), $(4))";
--MAKEFLAGS += --no-print-directory
-+ifneq ($(V),1)
- submake_extras := feature_display=0
- endif
- 
-diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
-index da2cade3bab0..aeeac5f83492 100644
---- a/tools/testing/selftests/lib.mk
-+++ b/tools/testing/selftests/lib.mk
-@@ -44,6 +44,20 @@ endif
- selfdir = $(realpath $(dir $(filter %/lib.mk,$(MAKEFILE_LIST))))
- top_srcdir = $(selfdir)/../../..
- 
-+# msg: emit succinct information message describing current building step
-+# $1 - generic step name (e.g., CC, LINK, etc);
-+# $2 - optional "flavor" specifier; if provided, will be emitted as [flavor];
-+# $3 - target (assumed to be file); only file name will be emitted;
-+# $4 - optional extra arg, emitted as-is, if provided.
-+ifeq ($(V),1)
-+Q =
-+msg =
-+else
-+Q = @
-+msg = @printf '  %-8s%s %s%s\n' "$(1)" "$(if $(2), [$(2)])" "$(notdir $(3))" "$(if $(4), $(4))";
-+MAKEFLAGS += --no-print-directory
-+endif
-+
- ifeq ($(KHDR_INCLUDES),)
- KHDR_INCLUDES := -isystem $(top_srcdir)/usr/include
- endif
-@@ -176,7 +190,8 @@ endif
- ifeq ($(OVERRIDE_TARGETS),)
- LOCAL_HDRS += $(selfdir)/kselftest_harness.h $(selfdir)/kselftest.h
- $(OUTPUT)/%:%.c $(LOCAL_HDRS)
--	$(LINK.c) $(filter-out $(LOCAL_HDRS),$^) $(LDLIBS) -o $@
-+	$(call msg,CC,,$@)
-+	$(Q)$(LINK.c) $(filter-out $(LOCAL_HDRS),$^) $(LDLIBS) -o $@
- 
- $(OUTPUT)/%.o:%.S
- 	$(COMPILE.S) $^ -o $@
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index a3c781cb8367..7e7f243d0ab2 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -125,7 +125,8 @@ BPFOBJ := $(BUILD_DIR)/libbpf/libbpf.a
- 
- MAKE_DIRS := $(BUILD_DIR)/libbpf
- $(MAKE_DIRS):
--	mkdir -p $@
-+	$(call msg,MKDIR,,$@)
-+	$(Q)mkdir -p $@
- 
- # Get Clang's default includes on this system, as opposed to those seen by
- # '--target=bpf'. This fixes "missing" files on some architectures/distros,
-@@ -149,13 +150,15 @@ BPF_PROG_OBJS := $(OUTPUT)/nat6to4.o $(OUTPUT)/xdp_dummy.o \
- 	$(OUTPUT)/sample_map_ret0.bpf.o $(OUTPUT)/sample_ret0.bpf.o
- 
- $(BPF_PROG_OBJS): $(OUTPUT)/%.o : %.c $(BPFOBJ) | $(MAKE_DIRS)
--	$(CLANG) -O2 -g --target=bpf $(CCINCLUDE) $(CLANG_SYS_INCLUDES) \
-+	$(call msg,BPF_PROG,,$@)
-+	$(Q)$(CLANG) -O2 -g --target=bpf $(CCINCLUDE) $(CLANG_SYS_INCLUDES) \
- 	-c $< -o $@
- 
- $(BPFOBJ): $(wildcard $(BPFDIR)/*.[ch] $(BPFDIR)/Makefile)		       \
- 	   $(APIDIR)/linux/bpf.h					       \
- 	   | $(BUILD_DIR)/libbpf
--	$(MAKE) $(submake_extras) -C $(BPFDIR) OUTPUT=$(BUILD_DIR)/libbpf/     \
-+	$(call msg,MAKE,,$@)
-+	$(Q)$(MAKE) $(submake_extras) -C $(BPFDIR) OUTPUT=$(BUILD_DIR)/libbpf/ \
- 		    EXTRA_CFLAGS='-g -O0'				       \
- 		    DESTDIR=$(SCRATCH_DIR) prefix= all install_headers
- 
 -- 
-2.44.0
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
