@@ -1,54 +1,50 @@
-Return-Path: <netdev+bounces-86845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 336D88A068E
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 05:12:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12C6A8A066B
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 05:01:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4D84B22138
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 03:11:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A35561F25E12
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 03:01:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 598A013B5B4;
-	Thu, 11 Apr 2024 03:11:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8CDA13B7A3;
+	Thu, 11 Apr 2024 03:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fI43lIFG"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3E113B58A
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 03:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4BC413B794
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 03:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712805115; cv=none; b=FyuVOIFCPK1VkrO/HUJYYN4egx+AOMWsxUB1Po1yodhZrmRg7r6ncAQH1UznpCH5liAUDma3Pjo+UwufMwBsws3wT5BcGYP/Prbr3aHoc3ak/iqVQKC92cqVLX6DzuMKqgI6mdAk5HimUGI+hZl6eDJwTmPH/fznhEbpIvBIvaE=
+	t=1712804432; cv=none; b=DWMSOEtWqAYjaF4mXWKTvIzZknCdm7LXCmtOsh/5L+aOzUfTLsaluoHLkpzoGr/ec5KlWavu70W3OROtYZ0pH2mTyssKMcKrUkAc5UY6JgJrTtUZJiYaNnv8PDTm/mmiUj1nB5Qx7qATgoHvcOWm1L28dtmcwLEVqOY7N445mTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712805115; c=relaxed/simple;
-	bh=LIh0oE42GjGAlqoitfFkivY6PWVrC6QJAaXkgN0ZYmg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pLV+5r8SVrGWt2qeMwMZWOd2Fys99Ce8SGmQVlC7zmEw/GBeTVPe9EB3mr+HWuKluh3IxZ2pTbTCNsoq0ljIZ5zS5hJJ1+uu0K8IqrVZuBAO5B0ZqZymf7qp5xEt3zglw9ie9VKC0hgeAqZOT5Nv8IUovj45qcE49LAalkNoo9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4VFPpv3vjfz1GGg0;
-	Thu, 11 Apr 2024 11:11:03 +0800 (CST)
-Received: from dggpemd100005.china.huawei.com (unknown [7.185.36.102])
-	by mail.maildlp.com (Postfix) with ESMTPS id 6005E18001A;
-	Thu, 11 Apr 2024 11:11:50 +0800 (CST)
-Received: from localhost.huawei.com (10.137.16.203) by
- dggpemd100005.china.huawei.com (7.185.36.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 11 Apr 2024 11:11:49 +0800
-From: renmingshuai <renmingshuai@huawei.com>
-To: <dsahern@gmail.com>
-CC: <liaichun@huawei.com>, <netdev@vger.kernel.org>,
-	<renmingshuai@huawei.com>, <stephen@networkplumber.org>, <yanan@huawei.com>
-Subject: Re: [PATCH] ip: Support filter links with no VF info
-Date: Thu, 11 Apr 2024 10:57:56 +0800
-Message-ID: <20240411025756.59008-1-renmingshuai@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <0bc56a4f-ff48-43c8-87b3-8d5d23a30997@gmail.com>
-References: <0bc56a4f-ff48-43c8-87b3-8d5d23a30997@gmail.com>
+	s=arc-20240116; t=1712804432; c=relaxed/simple;
+	bh=GiiAz4EkNSEhzVXF8w7OkUIXU9rxQtdhS3M8FlqLgBU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=KdmmkDctM54VaXrrZ4sWGTlXIyar/14Mxsk5HU64fu7qr25CX03KuAKxaR4HDZlmpQYfNUyIV52VSpyYPzgh/JBxJPKRjmxyqoPUAgL0gOj8Px4QIPmhkdFihB1flshlwTfRrIdUh/oMat58BoBqEhXbVqIcGF3UcryOGUfH8Ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fI43lIFG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4B163C43394;
+	Thu, 11 Apr 2024 03:00:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712804432;
+	bh=GiiAz4EkNSEhzVXF8w7OkUIXU9rxQtdhS3M8FlqLgBU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fI43lIFGmlintbwx6KpveZRnv+lgDDjoPgfIhWnU0dOMSB84ct1ityXQQpitSs0an
+	 6vRdno0rIimnY0MhF5lvc9ueM4qvTshNBxKQPge6HeqX5QJT5KP0sBwHkdbftRglHj
+	 F9GfOxp73UkRtT219yqX446t2eWoW46PnTV/1nVFBNufIxexLos3hricnyXVxsO99W
+	 kYC5F7SR1ZjyhFDJ1LW2ivINMpOUVKB0rw7qFjss/pl+JocRLF8W0UtUYXn8x5MkS0
+	 HFnghiPaMy6TZWb2b2wZnQctP6JQl1qAXLsmox+Lf8EdY397jNTDI7kNM+6j3sKh05
+	 SD6IIj1klQXuw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 41770C395F6;
+	Thu, 11 Apr 2024 03:00:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,31 +52,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemd100005.china.huawei.com (7.185.36.102)
+Subject: Re: [PATCH net V2 00/12] mlx5 misc fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171280443226.1698.7858481474022694709.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Apr 2024 03:00:32 +0000
+References: <20240409190820.227554-1-tariqt@nvidia.com>
+In-Reply-To: <20240409190820.227554-1-tariqt@nvidia.com>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, saeedm@nvidia.com,
+ gal@nvidia.com, leonro@nvidia.com
 
-> > @@ -2139,6 +2141,7 @@ static int ipaddr_list_flush_or_save(int argc, char **argv, int action)
-> >  	ipaddr_reset_filter(oneline, 0);
-> >  	filter.showqueue = 1;
-> >  	filter.family = preferred_family;
-> > +	filter.vfinfo = 0;
-> >  
-> >  	if (action == IPADD_FLUSH) {
-> >  		if (argc <= 0) {
-> > @@ -2221,6 +2224,8 @@ static int ipaddr_list_flush_or_save(int argc, char **argv, int action)
-> >  				invarg("\"proto\" value is invalid\n", *argv);
-> >  			filter.have_proto = true;
-> >  			filter.proto = proto;
-> > +		} else if (strcmp(*argv, "novf") == 0) {
-> > +			filter.vfinfo = -1;
-> >  		} else {
-> >  			if (strcmp(*argv, "dev") == 0)
-> >  				NEXT_ARG();
+Hello:
+
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 9 Apr 2024 22:08:08 +0300 you wrote:
+> Hi,
 > 
-> The reverse logic is how other filters work. Meaning vfinfo is set, add
-> the RTEXT_FILTER_VF flag (default for backwards compatibility). From
-> there, "novf" set vfinfo to 0 and flag is not added.
+> This patchset provides bug fixes to mlx5 driver.
+> 
+> This is V2 of the series previously submitted as PR by Saeed:
+> https://lore.kernel.org/netdev/20240326144646.2078893-1-saeed@kernel.org/T/
+> 
+> [...]
 
-As you suggested, I've modified it and submitted a new patch.
+Here is the summary with links:
+  - [net,V2,01/12] net/mlx5: E-switch, store eswitch pointer before registering devlink_param
+    https://git.kernel.org/netdev/net/c/0553e753ea9e
+  - [net,V2,02/12] net/mlx5: Register devlink first under devlink lock
+    https://git.kernel.org/netdev/net/c/c6e77aa9dd82
+  - [net,V2,03/12] net/mlx5: offset comp irq index in name by one
+    https://git.kernel.org/netdev/net/c/9f7e8fbb91f8
+  - [net,V2,04/12] net/mlx5: Properly link new fs rules into the tree
+    https://git.kernel.org/netdev/net/c/7c6782ad4911
+  - [net,V2,05/12] net/mlx5: Correctly compare pkt reformat ids
+    https://git.kernel.org/netdev/net/c/9eca93f4d5ab
+  - [net,V2,06/12] net/mlx5e: RSS, Block changing channels number when RXFH is configured
+    https://git.kernel.org/netdev/net/c/ee3572409f74
+  - [net,V2,07/12] net/mlx5e: Fix mlx5e_priv_init() cleanup flow
+    https://git.kernel.org/netdev/net/c/ecb829459a84
+  - [net,V2,08/12] net/mlx5e: HTB, Fix inconsistencies with QoS SQs number
+    https://git.kernel.org/netdev/net/c/2f436f186977
+  - [net,V2,09/12] net/mlx5e: Do not produce metadata freelist entries in Tx port ts WQE xmit
+    https://git.kernel.org/netdev/net/c/86b0ca5b118d
+  - [net,V2,10/12] net/mlx5e: RSS, Block XOR hash with over 128 channels
+    https://git.kernel.org/netdev/net/c/49e6c9387051
+  - [net,V2,11/12] net/mlx5: Disallow SRIOV switchdev mode when in multi-PF netdev
+    https://git.kernel.org/netdev/net/c/7772dc7460e8
+  - [net,V2,12/12] net/mlx5: SD, Handle possible devcom ERR_PTR
+    (no matching commit)
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
