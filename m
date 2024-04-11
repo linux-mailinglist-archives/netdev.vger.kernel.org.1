@@ -1,288 +1,124 @@
-Return-Path: <netdev+bounces-87177-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87178-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EB038A1FC9
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 21:53:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C459E8A1FD6
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 22:00:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0DC91C21BE5
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:53:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BCB628B1D0
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C55C21802B;
-	Thu, 11 Apr 2024 19:53:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xd0ya5Lg";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="EZEzZhp9";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="xd0ya5Lg";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="EZEzZhp9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 083FC179BC;
+	Thu, 11 Apr 2024 20:00:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6444F1773D
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 19:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42EAF17584
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 20:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712865217; cv=none; b=JrH+lPcadzRu7+g2kPfi0wV9+kEh8A7y+7PHvJC7+foaQHviz6xis5OpXm/nY/7662VQUu5adxG1IStUN//yaC+dj2glAS6+py7AFm0anx3dpGc9aVbqNSIt7DyBrtJbyM/yzAiPWNMZWK8aLX2UNcvHU7wmToTFJQMdIOrrKXY=
+	t=1712865645; cv=none; b=k2egUo42hX0gDO38v2C1h8s0sQJCLHXEEVQjaB1T4wQ+aMlYjjuLm052biYCjQSauX83iXOcxqN7ZTc0Q0wVLxXrzeqcBjVWnz4L3z4poIUTwF/eLY0t8uq3G0y9o3uJLqKX2U8+fuyOTIkNfap8Av5HRS4yMSeQzjPiBW1MN3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712865217; c=relaxed/simple;
-	bh=Ev3UzVIn8vDwzjHYgic1U5P7VfQpNp2IqaMlwjFWYhw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=MLvPlfKKjzn9ldLEmFURPUxeqKVM9N6frN1TiCRqQELvsuWCsgX61IVxsD/pwOfKXXU1ktroSR9ef2c/UL4OfH0tbuHdUPXUdipP8Lm/7lRDBHPXlihsT0dLC/q2U0D1LQM3kT1kclGe4BYd+ASneOm0ntGR8kGg5XH0OpHzX2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xd0ya5Lg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=EZEzZhp9; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=xd0ya5Lg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=EZEzZhp9; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	s=arc-20240116; t=1712865645; c=relaxed/simple;
+	bh=9xLZNm8GpdxtlwGFii/Cw5SkGRrBLNYY8VGMoLIqIto=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=ms9OPGROAdpqC7lDo1/DMAC4UbHuhC6Bas4p/wo67IxJQ13jPSY1YkRQeI4A6tp74oK1HB4dF+LDskcN3s3c4seTw6CSIcpmmfypDs7zVliR/xuITM9bLbRYBrQfR4kgIZ+Sbv7LZtHek5erHXylmfry6/C/v70Hn3e0LEWwTYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-340-LiwWZNBFNv6R5SMoIp0Cag-1; Thu, 11 Apr 2024 16:00:33 -0400
+X-MC-Unique: LiwWZNBFNv6R5SMoIp0Cag-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 4B836378CE;
-	Thu, 11 Apr 2024 19:53:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1712865213; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h7Av/XccXAxpRKrhQTdpeUr87rOmAAqnpSXGYWhH7Rw=;
-	b=xd0ya5LgfzHD6hk2msNoPbItKcV0FNY6ZsQccsi1laR79L/BM9Bw19iPhKg4WOmb/7oOqq
-	zD+e1nsIAwZiNmivT4zlWloVulJ15egly+gxaAVk4snL1yCoSwRuskennrt8rN09YtUXt1
-	7pI1TTiY1uCRScp3dIqx3RRM+RW1mVs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1712865213;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h7Av/XccXAxpRKrhQTdpeUr87rOmAAqnpSXGYWhH7Rw=;
-	b=EZEzZhp9NgQRF2mMwuS8g9gnJXYCHWgVH0rtxLGvYp8tvRWW+Zl5C3DG/UOIMgLgcVMuSE
-	2CO+iEXUGgeFkcDQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1712865213; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h7Av/XccXAxpRKrhQTdpeUr87rOmAAqnpSXGYWhH7Rw=;
-	b=xd0ya5LgfzHD6hk2msNoPbItKcV0FNY6ZsQccsi1laR79L/BM9Bw19iPhKg4WOmb/7oOqq
-	zD+e1nsIAwZiNmivT4zlWloVulJ15egly+gxaAVk4snL1yCoSwRuskennrt8rN09YtUXt1
-	7pI1TTiY1uCRScp3dIqx3RRM+RW1mVs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1712865213;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h7Av/XccXAxpRKrhQTdpeUr87rOmAAqnpSXGYWhH7Rw=;
-	b=EZEzZhp9NgQRF2mMwuS8g9gnJXYCHWgVH0rtxLGvYp8tvRWW+Zl5C3DG/UOIMgLgcVMuSE
-	2CO+iEXUGgeFkcDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EDB631368B;
-	Thu, 11 Apr 2024 19:53:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 0D/ULbw/GGbGLQAAD6G6ig
-	(envelope-from <krisman@suse.de>); Thu, 11 Apr 2024 19:53:32 +0000
-From: Gabriel Krisman Bertazi <krisman@suse.de>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: <davem@davemloft.net>,  <lmb@isovalent.com>,  <martin.lau@kernel.org>,
-  <netdev@vger.kernel.org>,  <willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH v2] udp: Avoid call to compute_score on multiple sites
-In-Reply-To: <20240411022121.65702-1-kuniyu@amazon.com> (Kuniyuki Iwashima's
-	message of "Wed, 10 Apr 2024 19:21:21 -0700")
-References: <87a5m08y09.fsf@mailhost.krisman.be>
-	<20240411022121.65702-1-kuniyu@amazon.com>
-Date: Thu, 11 Apr 2024 15:53:31 -0400
-Message-ID: <871q7b8ymc.fsf@mailhost.krisman.be>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ABB24801701;
+	Thu, 11 Apr 2024 20:00:31 +0000 (UTC)
+Received: from hog (unknown [10.39.192.7])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 14A9640B4984;
+	Thu, 11 Apr 2024 20:00:28 +0000 (UTC)
+Date: Thu, 11 Apr 2024 22:00:07 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Antony Antony <antony@phenome.org>, antony.antony@secunet.com,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	devel@linux-ipsec.org, Eyal Birger <eyal.birger@gmail.com>,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: Re: [devel-ipsec] [PATCH ipsec-next v8] xfrm: Add Direction to the
+ SA in or out
+Message-ID: <ZhhBR5wTeDAHms1A@hog>
+References: <9e2ddbac8c3625b460fa21a3bfc8ebc4db53bd00.1712684076.git.antony.antony@secunet.com>
+ <20240411103740.GM4195@unreal>
+ <ZhfEiIamqwROzkUd@Antony2201.local>
+ <20240411115557.GP4195@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Flag: NO
-X-Spam-Score: -2.80
-X-Spam-Level: 
-X-Spamd-Result: default: False [-2.80 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	SUSPICIOUS_RECIPS(1.50)[];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	RCVD_TLS_ALL(0.00)[];
-	TAGGED_RCPT(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[davemloft.net,isovalent.com,kernel.org,vger.kernel.org,gmail.com];
-	RCPT_COUNT_FIVE(0.00)[6];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
+In-Reply-To: <20240411115557.GP4195@unreal>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Kuniyuki Iwashima <kuniyu@amazon.com> writes:
+2024-04-11, 14:55:57 +0300, Leon Romanovsky wrote:
+> On Thu, Apr 11, 2024 at 01:07:52PM +0200, Antony Antony via Devel wrote:
+> > On Thu, Apr 11, 2024 at 01:37:40PM +0300, Leon Romanovsky via Devel wro=
+te:
+> > > On Tue, Apr 09, 2024 at 07:37:20PM +0200, Antony Antony via Devel wro=
+te:
+> > > > This patch introduces the 'dir' attribute, 'in' or 'out', to the
+> > > > xfrm_state, SA, enhancing usability by delineating the scope of val=
+ues
+> > > > based on direction. An input SA will now exclusively encompass valu=
+es
+> > > > pertinent to input, effectively segregating them from output-relate=
+d
+> > > > values. This change aims to streamline the configuration process an=
+d
+> > > > improve the overall clarity of SA attributes.
+> > > >=20
+> > > > This feature sets the groundwork for future patches, including
+> > > > the upcoming IP-TFS patch.
+> > > >=20
+> > > > v7->v8:
+> > > >  - add extra validation check on replay window and seq
+> > > >  - XFRM_MSG_UPDSA old and new SA should match "dir"
+> > >=20
+> > > Why? Update is add and delete operation, and one can update any field
+> > > he/she wants, including direction.
+> >=20
+> > Update operations are not strictly necessary without IKEv2. However, du=
+ring
+> > IKEv2 negotiation, updating "in" SA becomes essential.
+>=20
+> The thing is if you want to limit update routine to fit IKEv2 only, or
+> continue to allow users to do whatever they want with netlink and their
+> own applications without *swan.
+>=20
+> I don't have knowledge about such users, just remember seeking tons of
+> guides how to setup IPsec tunnel with iproute2 and scripts, one of them
+> can be potentially broken by this change.
 
-> From: Gabriel Krisman Bertazi <krisman@suse.de>
-> Date: Wed, 10 Apr 2024 21:54:30 -0400
->> Willem de Bruijn <willemdebruijn.kernel@gmail.com> writes:
->> 
->> > Kuniyuki Iwashima wrote:
->> >> From: Gabriel Krisman Bertazi <krisman@suse.de>
->> >> Date: Wed, 10 Apr 2024 17:50:47 -0400
->> >> > We've observed a 7-12% performance regression in iperf3 UDP ipv4 and
->> >> > ipv6 tests with multiple sockets on Zen3 cpus, which we traced back to
->> >> > commit f0ea27e7bfe1 ("udp: re-score reuseport groups when connected
->> >> > sockets are present").  The failing tests were those that would spawn
->> >> > UDP sockets per-cpu on systems that have a high number of cpus.
->> >> > 
->> >> > Unsurprisingly, it is not caused by the extra re-scoring of the reused
->> >> > socket, but due to the compiler no longer inlining compute_score, once
->> >> > it has the extra call site in udp4_lib_lookup2.  This is augmented by
->> >> > the "Safe RET" mitigation for SRSO, needed in our Zen3 cpus.
->> >> > 
->> >> > We could just explicitly inline it, but compute_score() is quite a large
->> >> > function, around 300b.  Inlining in two sites would almost double
->> >> > udp4_lib_lookup2, which is a silly thing to do just to workaround a
->> >> > mitigation.  Instead, this patch shuffles the code a bit to avoid the
->> >> > multiple calls to compute_score.  Since it is a static function used in
->> >> > one spot, the compiler can safely fold it in, as it did before, without
->> >> > increasing the text size.
->> >> > 
->> >> > With this patch applied I ran my original iperf3 testcases.  The failing
->> >> > cases all looked like this (ipv4):
->> >> > 	iperf3 -c 127.0.0.1 --udp -4 -f K -b $R -l 8920 -t 30 -i 5 -P 64 -O 2
->> >> > 
->> >> > where $R is either 1G/10G/0 (max, unlimited).  I ran 3 times each.
->> >> > baseline is 6.9.0-rc1-g962490525cff, just a recent checkout of Linus
->> >> > tree. harmean == harmonic mean; CV == coefficient of variation.
->> >> > 
->> >> > ipv4:
->> >> >                  1G                10G                  MAX
->> >> > 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
->> >> > baseline 1730488.20(0.0050) 1639269.91(0.0795) 1436340.05(0.0954)
->> >> > patched  1980936.14(0.0020) 1933614.06(0.0866) 1784184.51(0.0961)
->> >> > 
->> >> > ipv6:
->> >> >                  1G                10G                  MAX
->> >> > 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
->> >> > baseline  1679016.07(0.0053) 1697504.56(0.0064) 1481432.74(0.0840)
->> >> > patched   1924003.38(0.0153) 1852277.31(0.0457) 1690991.46(0.1848)
->> >> > 
->> >> > This restores the performance we had before the change above with this
->> >> > benchmark.  We obviously don't expect any real impact when mitigations
->> >> > are disabled, but just to be sure it also doesn't regresses:
->> >> > 
->> >> > mitigations=off ipv4:
->> >> >                  1G                10G                  MAX
->> >> > 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
->> >> > baseline 3230279.97(0.0066) 3229320.91(0.0060) 2605693.19(0.0697)
->> >> > patched  3242802.36(0.0073) 3239310.71(0.0035) 2502427.19(0.0882)
->> >> > 
->> >> > Cc: Lorenz Bauer <lmb@isovalent.com>
->> >> > Fixes: f0ea27e7bfe1 ("udp: re-score reuseport groups when connected sockets are present")
->> >> > Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
->> >> > 
->> >> > ---
->> >> > Changes since v1:
->> >> > (me)
->> >> >   - recollected performance data after changes below only for the
->> >> >   mitigations enabled case.
->> >> > (suggested by Willem de Bruijn)
->> >> >   - Drop __always_inline in compute_score
->> >> >   - Simplify logic by replacing third struct sock pointer with bool
->> >> >   - Fix typo in commit message
->> >> >   - Don't explicitly break out of loop after rescore
->> >> > ---
->> >> >  net/ipv4/udp.c | 18 +++++++++++++-----
->> >> >  net/ipv6/udp.c | 17 +++++++++++++----
->> >> >  2 files changed, 26 insertions(+), 9 deletions(-)
->> >> > 
->> >> > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
->> >> > index 661d0e0d273f..a13ef8e06093 100644
->> >> > --- a/net/ipv4/udp.c
->> >> > +++ b/net/ipv4/udp.c
->> >> > @@ -427,12 +427,15 @@ static struct sock *udp4_lib_lookup2(struct net *net,
->> >> >  {
->> >> >  	struct sock *sk, *result;
->> >> >  	int score, badness;
->> >> > +	bool rescore = false;
->> >> 
->> >> nit: Keep reverse xmax tree order.
->> >> https://docs.kernel.org/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
->> >> 
->> >> >  
->> >> >  	result = NULL;
->> >> >  	badness = 0;
->> >> >  	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
->> >> > -		score = compute_score(sk, net, saddr, sport,
->> >> > -				      daddr, hnum, dif, sdif);
->> >> > +rescore:
->> >> > +		score = compute_score((rescore ? result : sk), net, saddr,
->> >> 
->> >> I guess () is not needed around rescore ?
->> >> 
->> >> Both same for IPv6.
->> >> 
->> >> Otherwise, looks good to me.
->> >> 
->> >> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
->> >
->> > Can we avoid using the same name for the label and boolean?
->> >
->> > And since if looping result will have state TCP_ESTABLISHED, can it
->> > just be
->> >
->> >     sk = result;
->> >     goto rescore;
->> 
->> This would be much simpler, sure.  I actually didn't want to do it
->> because sk is the iteration cursor, and I couldn't prove to myself it is
->> safe to skip through part of the list (assuming result isn't the
->> immediate next socket in the list).
->
-> Good point, this is not safe actually.
->
-> Let's say sockets on the same port are placed in these order in the list:
->
->   1. TCP_CLOSE sk w/ SO_INCOMING_CPU _not_ matching the current CPU
->   2. TCP_ESTABLISHED sk matching 4-tuple
->   3. TCP_CLOSE sk w/ SO_INCOMING_CPU matching the current CPU
->
-> When we check the first socket, we'll get the 3rd socket as it matches
-> the current CPU ID and TCP_ESTABLISHED cannot be selected without BPF,
-> and `sk = result;` skips the 2nd socket, which should have been
-> selected.
+Nothing is going to break with this change. Old scripts and old
+userspace software are not providing XFRMA_SA_DIR, so none of the new
+checks apply.
 
-k. Considering this, what I get from the discussion is:
+--=20
+Sabrina
 
-since we need to preserve the sk pointer, we are keeping the
-condition (rescore ?  result:sk) in the compute_score call and
-maintaining the reset of rescore in the hotpath to prevent scoring the
-wrong thing on further loops. It is ugly, but it is a single instruction
-over a in-register value, so it hardly matters.
-
-If so, I'll do the style changes (parenthesis, sort of stack variables)
-and add the early continue to resume the loop right after the rescore,
-similar to what I had in V1, that Willem suggested:
-
-            badness = score;
-
-+            if (rescore)
-+                    continue;
-
-Please, let me know if I misunderstood, so I don't send a bogus v3.  I
-will take some hours to run the tests, so I should send a v3 by
-tomorrow.
-
--- 
-Gabriel Krisman Bertazi
 
