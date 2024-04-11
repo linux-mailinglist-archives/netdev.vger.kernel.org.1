@@ -1,193 +1,121 @@
-Return-Path: <netdev+bounces-86935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF6318A101B
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:31:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A4D248A103E
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:33:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D35CB1C22FDB
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:31:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D682D1C212F7
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:33:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0529C1482FC;
-	Thu, 11 Apr 2024 10:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F3E414B07F;
+	Thu, 11 Apr 2024 10:31:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="fjH9UUUv"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X9pcmQrL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f181.google.com (mail-yw1-f181.google.com [209.85.128.181])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08E261474BB
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 10:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52AF914B076
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 10:31:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712831430; cv=none; b=kRLroC8WL/AexPAUWtiJPMQXdoTYWc0uL6GF4adDFCXcFmzY2nBGE1FzkDpF38pYkJvgoBHGUcGG/Xg+kRsv9W05WVeTzbaVq/PMtjYpyQrLtUdqceklFXpUzTPE8drS+UKhovb5BZSmsUlTMDHYzFiCSANJ7kOJtr7Qs0j2BQ0=
+	t=1712831498; cv=none; b=Vp3JLS218UJybmtFVLSdMJYuntcyIj401GApAAEwe+dUwu+8JgqcgrBQuetYO9lZGSt9HovUqwEpi4OpHMRnWfJdBN7DL15AU4BKMnYfmsKfHkNOH2xiqWulAXs0q1G42qECysvs4GBAVrTh2yj7MjWK3vU+rBgGVmqeAS75mYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712831430; c=relaxed/simple;
-	bh=50uxhrWSQLt8YR5X0zgVM0tqAIGHTy5nv3Z8FfXt19I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SdEII8AwKcu9hUHrdjnIHR9DD8QiFxffRFm5pP21Kx3UKGvRpg2vU1XctbA6q7APbwweLCOiV00MBzfhEhNhhvih9wZrYWU2WZJhyl4DbRogL10Uf9phCMOSPSvFfY/KWhAKthffwEPBvz2JG3EFE+3dPELr+i0iLyj8uNnm3tc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=fjH9UUUv; arc=none smtp.client-ip=209.85.128.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-6114c9b4d83so66665117b3.3
-        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 03:30:27 -0700 (PDT)
+	s=arc-20240116; t=1712831498; c=relaxed/simple;
+	bh=WaXysxKJe+vS1i8j5oNGaoke2Hd03sYBfChSAqV5DuU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eTjGM1LZt7/O0gG+3PiuLkfpNvCSfP+Xpax0Tt/G1DRblHwNm/S9MnHPHZtBjb+m/4/5NdsJQLPR+qz5OEHO3lsyI4K/6nH/6Hb3dSlY3wiQxCJ9uPy6FlnlvaDx329UJ8p6BxZ59nv8W84aCs/QJRixGdwmL3e2sPrMIIgQBtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=X9pcmQrL; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a51ddc783e3so516889566b.0
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 03:31:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1712831427; x=1713436227; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N2A2qtHjer/NwHLO+R/j6J4SvBNvk66wxcNgM9Na8jo=;
-        b=fjH9UUUvGwB7ffUplXKEX8fHliizAaUU61YD76+0eg2Y/RH5D57GwCXIPBlZhQ4aOV
-         LyV+9nxJIHiw6sjF/Iin0t9apeCQRuImaX6dCjyBBoMH3o6hckEmSSo4yl7y3IdJTizD
-         ggpG0cMSJI0SeSUdJ0MmjG3c9n9EKbflCUtnibAsBpma4C0MMGMaeoOVtvQJbd/LtHJp
-         cr/fReCYgNW3ur3RtnHUAB32vsJPQznsXufpo4mlT0YhET0uLu04dFBdifNKqk4iaVLq
-         HGdNToLdP8RGBfKkORKfM6gSGsOqs3RerkFQ5BtXyUeAbYDojLDJL/07Bp7Pfh5y93Qx
-         23Qw==
+        d=linaro.org; s=google; t=1712831494; x=1713436294; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gcnjoJrjLylLXAH3rtU2vKqJq2FaC8fgwxIrZFCTV4c=;
+        b=X9pcmQrLIlBOqIqdWBYOi6BbTZyrOy0WDTlLlM9aR2rZy00a11AVoM1d/I5vuXgz4y
+         hlBZwSoXZy1Z+xLOzRINP2sAlNRtKZr/wVCLADfIreAK704WxjhVNCMmqaSjacX9f5O9
+         wI93CZGmvdcNNXstf1e/fLKBARp/1ieP87oCNbTJMDSU6ExdSH+gkmXNtY+TYe4WazsV
+         t9r86dzKsM/BaHAsP3VwguoABsO6ogtzeK0bZ9u0iXlijJl/dmlPGpdds127ABt3nSJn
+         JEHG65cU38v4HGuLa13ttkRkLeD5jeyZnyeUm+eQMDK2P/SxFHMlV+W/w4RINc0Hmbk5
+         93qA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712831427; x=1713436227;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N2A2qtHjer/NwHLO+R/j6J4SvBNvk66wxcNgM9Na8jo=;
-        b=Zcr6HyFRa6pdOkfFUrnjoeYY9fg+nd7KVJJGcxRd3C7m1A735uG5dvQ8vppFhuGMJF
-         BO1XMvXx09cvVn15716Wysvu4ln0tdbVUkE6jgjdfIly6FA49KVuvm97/JANQJMOJSH1
-         mx2dB9I3ijb0NLjUE/Mh7lYLalGxdMxoVl7HuEPls9Z2cZwAhA8FuKhZJft8EQYePHIc
-         nY5WUjToACdKla9pk6kTHLj6eTUqPTeH9ZeYgFyUgNhaK9OO8xU0esSS83jsVDE8d4sN
-         s/KuWmX1QIsmJLdGSlC2yhlpJzx5Le8lZHNhoTxtzmp07FJtGxMNJsuLy1iOn6yXixj6
-         5E/A==
-X-Forwarded-Encrypted: i=1; AJvYcCVzafyZq+BcsWUOni49dFlLrlX7WM7v8iz5liki+dvNwAkU053HxMIZYJ3nGo0YmPpkf87n8xMkiDiGBD6eZbNXrOl6qFya
-X-Gm-Message-State: AOJu0YztEjzgGsCJeQRa139PrQDb9nUzcAII1DlPgOn4Q0c8atNZD/kw
-	MtKPBlqcQG4cEw2aoLlo9tkdbKip6w8AtFUmK/uOTvKERpT7xp7a4ktZgL58kECmq/nDAVLPHDn
-	6qq0BkSROV+i6+lUzlhU18Oqnt7UBHNuR9StShA==
-X-Google-Smtp-Source: AGHT+IHb0GZNvwMcbZzb2flBPEIMO1uB/CHJs2V2e/2fw1ihcJnOo0o3gXVwUEL9e79yPEvJFoZHl1TVQUUFrP373Bg=
-X-Received: by 2002:a0d:d80f:0:b0:615:35e1:e512 with SMTP id
- a15-20020a0dd80f000000b0061535e1e512mr5524397ywe.0.1712831425508; Thu, 11 Apr
- 2024 03:30:25 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1712831494; x=1713436294;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gcnjoJrjLylLXAH3rtU2vKqJq2FaC8fgwxIrZFCTV4c=;
+        b=Hu0+gFJt725l35X73IwANOWyCMhsM8wJES2RtW+65hDy+Y2TSaXFPGmFe2cw6pb9Ka
+         bF+8S/QuKz57SoM0VTgJXJ6gUfwSwZ7AYPvo+YVEQQesd91Vypmcao6xD+ekIJLoTeYf
+         Kjd8TIrohceLlzaw9O8R7LaWtft1Jn3tEkjz7+mDZlIWFBsMJ62mD8OzR9V3zsPRd3/C
+         EQ+Q4aGU0S4yhb4iGAp6uzNlsAxkSKaZ5lk1zf2bpaO3Ed/p8WEe1NFjMFij5Y2HeZaj
+         ZT8FqxVXLT7p4I7M2kvXvc0btx3yXZZPLRxzopuUY13Wq6ucV54IURWiTLONP8thSGHU
+         Rhmg==
+X-Forwarded-Encrypted: i=1; AJvYcCU0SNUMGL0JO5iwyZEV3SWxWhtd+3rXwH+IKt4WOLo+Av/lK/zAyPaFpLXcGUctCuxT7ZAoOmXjCcfd5QCmISTMEGqIqMpK
+X-Gm-Message-State: AOJu0YzmftO1Efty/XCTvQqgqf1RjdODRDX8/83jEf+gksAgnWtbz1yX
+	70IkA6JqJUV8d1/tMCy6nmlB3Ze/4F+mN33iX82iH/XQodhOLn7/r2h1kMqlp5s=
+X-Google-Smtp-Source: AGHT+IH4wZBnbCaLwIvzN1RatSpqcPKcnXIaR8FNtF23Nq7ZPqPfkqzwLsjxIbox0YwuhK0SFzIL1g==
+X-Received: by 2002:a17:907:9302:b0:a52:1466:4d1b with SMTP id bu2-20020a170907930200b00a5214664d1bmr3301095ejc.17.1712831494384;
+        Thu, 11 Apr 2024 03:31:34 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id kk7-20020a170907766700b00a51def4861bsm618040ejc.91.2024.04.11.03.31.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Apr 2024 03:31:34 -0700 (PDT)
+Date: Thu, 11 Apr 2024 13:31:30 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Tung Quang Nguyen <tung.q.nguyen@dektech.com.au>
+Cc: Colin Ian King <colin.i.king@gmail.com>, Jon Maloy <jmaloy@redhat.com>,
+	Ying Xue <ying.xue@windriver.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"tipc-discussion@lists.sourceforge.net" <tipc-discussion@lists.sourceforge.net>,
+	"kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH][next] tipc: remove redundant assignment to ret, simplify
+ code
+Message-ID: <ce0a63fc-1985-4e25-a08b-c0045ae095f4@moroto.mountain>
+References: <20240411091704.306752-1-colin.i.king@gmail.com>
+ <AS4PR05MB96479D9B6F9EC765371AA8A588052@AS4PR05MB9647.eurprd05.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240410042245.2044516-1-lei.chen@smartx.com> <6616ac464484f_2a98a52941f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <6616ac464484f_2a98a52941f@willemb.c.googlers.com.notmuch>
-From: Lei Chen <lei.chen@smartx.com>
-Date: Thu, 11 Apr 2024 18:30:13 +0800
-Message-ID: <CAKcXpBxd9uu=eH9AsupqwQXiedBjTtOm_Uts-cHqXfstCv-YUg@mail.gmail.com>
-Subject: Re: [PATCH v2] net:tun: limit printing rate when illegal packet
- received by tun dev
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AS4PR05MB96479D9B6F9EC765371AA8A588052@AS4PR05MB9647.eurprd05.prod.outlook.com>
 
-On Wed, Apr 10, 2024 at 11:12=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> For a next patch, include the target branch: [PATCH net-next v2]
->
-> Lei Chen wrote:
-> > vhost_worker will call tun call backs to receive packets. If too many
-> > illegal packets arrives, tun_do_read will keep dumping packet contents.
-> > When console is enabled, it will costs much more cpu time to dump
-> > packet and soft lockup will be detected.
+On Thu, Apr 11, 2024 at 10:04:10AM +0000, Tung Quang Nguyen wrote:
 > >
-> > net_ratelimit mechanism can be used to limit the dumping rate.
-> >
-> > PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980"
-> >  #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
-> >  #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
-> >  #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
-> >  #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
-> >  #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
-> >     [exception RIP: io_serial_in+20]
-> >     RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
-> >     RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 0000000000000000
-> >     RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428a0
-> >     RBP: 0000000000002710   R8: 0000000000000004   R9: 000000000000000f
-> >     R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 0000000000000020
-> >     R13: ffffffff8acbf698  R14: 0000000000000058  R15: 0000000000000000
-> >     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
-> >  #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
-> >  #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
-> >  #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
-> >  #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
-> >  #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
-> >  #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
-> >  #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
-> >  #12 [ffffa65531497b68] printk at ffffffff89318306
-> >  #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
-> >  #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
-> >  #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
-> >  #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
-> >  #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
-> >  #18 [ffffa65531497f10] kthread at ffffffff892d2e72
-> >  #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
-> >
-> > Signed-off-by: Lei Chen <lei.chen@smartx.com>
->
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> >
-> > ---
-> > Changes from v1:
-> > https://lore.kernel.org/all/20240409062407.1952728-1-lei.chen@smartx.co=
-m/
-> >  1. Use net_ratelimit instead of raw __ratelimit.
-> >  2. Use netdev_err instead of pr_err to print more info abort net dev.
-> >  3. Adjust git commit message to make git am happy.
-> >
-> >  drivers/net/tun.c | 18 ++++++++++--------
-> >  1 file changed, 10 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> > index 0b3f21cba552..ca9b4bc89de7 100644
-> > --- a/drivers/net/tun.c
-> > +++ b/drivers/net/tun.c
-> > @@ -2125,14 +2125,16 @@ static ssize_t tun_put_user(struct tun_struct *=
-tun,
-> >                                           tun_is_little_endian(tun), tr=
-ue,
-> >                                           vlan_hlen)) {
-> >                       struct skb_shared_info *sinfo =3D skb_shinfo(skb)=
-;
-> > -                     pr_err("unexpected GSO type: "
-> > -                            "0x%x, gso_size %d, hdr_len %d\n",
-> > -                            sinfo->gso_type, tun16_to_cpu(tun, gso.gso=
-_size),
-> > -                            tun16_to_cpu(tun, gso.hdr_len));
-> > -                     print_hex_dump(KERN_ERR, "tun: ",
-> > -                                    DUMP_PREFIX_NONE,
-> > -                                    16, 1, skb->head,
-> > -                                    min((int)tun16_to_cpu(tun, gso.hdr=
-_len), 64), true);
-> > +
-> > +                     if (net_ratelimit()) {
-> > +                             netdev_err(tun->dev, "unexpected GSO type=
-: 0x%x, gso_size %d, hdr_len %d\n",
-> > +                                    sinfo->gso_type, tun16_to_cpu(tun,=
- gso.gso_size),
-> > +                                    tun16_to_cpu(tun, gso.hdr_len));
-> > +                             print_hex_dump(KERN_ERR, "tun: ",
-> > +                                            DUMP_PREFIX_NONE,
-> > +                                            16, 1, skb->head,
-> > +                                            min((int)tun16_to_cpu(tun,=
- gso.hdr_len), 64), true);
-> > +                     }
-> >                       WARN_ON_ONCE(1);
-> >                       return -EINVAL;
-> >               }
-> >
-> > base-commit: fec50db7033ea478773b159e0e2efb135270e3b7
-> > prerequisite-patch-id: 8952e320c0272899e153c953db09446879ed0d87
-> > prerequisite-patch-id: 2f1e3234a4ac0bf421df2061505612538f128672
->
-> Where does this footer come from? Should not be present.
->
-Thanks for your review. This footer comes from "git format-patch --base=3Da=
-uto",
-I will remake the patch with "--base" options removed.
+> I suggest that err variable should be completely removed. Could you
+> please also do the same thing for this code ?
+> "
+> ...
+> err = skb_handler(skb, cb, tsk);
+> if (err) {
+
+If we write the code as:
+
+	if (some_function(parameters)) {
+
+then at first that looks like a boolean.  People probably think the
+function returns true/false.  But if we leave it as-is:
+
+	err = some_function(parameters);
+	if (err) {
+
+Then that looks like error handling.
+
+So it's better and more readable to leave it as-is.
+
+regards,
+dan carpenter
 
