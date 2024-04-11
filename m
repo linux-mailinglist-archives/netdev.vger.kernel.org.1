@@ -1,219 +1,221 @@
-Return-Path: <netdev+bounces-87010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B67BE8A142B
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:14:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 686B48A146B
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:25:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E8B0282F71
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:14:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FC51286CB2
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:25:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A1114B075;
-	Thu, 11 Apr 2024 12:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="SO4jUSgu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD2714D435;
+	Thu, 11 Apr 2024 12:24:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4F81487E4
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 12:14:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712837688; cv=fail; b=pES+j0UGpdkuB7fZPwHVznVUaKEntyYo6QyRa902XTHy/Xmadup60b9aJPqXZsfdh4U5mAejra85kO5tnrb5wRmF5Eshv081bWq3orjVCUVMJ50EL13LWza1ZtNcWwgG0ipEDeWY9aFnvDhJrlDISmiUJw3DyQccnMyR/pSgDvg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712837688; c=relaxed/simple;
-	bh=8eD9ryo4/ZOUVCzRWeLMHKQIAUXRBUDjc1BfibzAA0w=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=F93+qTckUTyQKM/nTOz1iwDMdpemk/3RBsUH1WpIGmsLmqE9QZeTJxG5OpUwL4UbWk1H78FSxSpIviE45txF7+6mJKg4Va3Lgqt7+sOkSWkVHlNybI48BvrSyoLb6pNo7j5Ilo8mJh+wHQ14mmXYAHszfuYxmTekNPCm4WlY5hA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=SO4jUSgu; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712837687; x=1744373687;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=8eD9ryo4/ZOUVCzRWeLMHKQIAUXRBUDjc1BfibzAA0w=;
-  b=SO4jUSgubeBo2CnAlwuCSLbsMIXwZSlfxIuI61/89/kjoLQU7WrqBGYZ
-   yObkhd6SydrAdFqa/gF4uf+oqiLNwJJgWOKyg81JiZBMybLp78KY0D/9f
-   fBEQ03MxaqOgqzxeFcG8/TXVdJfWRLfVk9bgbG2IOm+xM33LM9dEm94CW
-   O0fhZJjecUXTSRkVZSMgeltEjfKEC/89f/zQRCMBAXfS98xhpXbi10WSQ
-   aKAM0lA5z7Uo0KwQkZgBrFN2yqGs0VCKPKHzVh/EOCzYdEqtbJgnKWdwM
-   112to1nIn5dpiWIcQ15lPCgozLxfFFQuHVvSYALZCHQMmqq6IfQzReh6i
-   A==;
-X-CSE-ConnectionGUID: dYB+ujPXTiKOfPgy3e6Qpg==
-X-CSE-MsgGUID: OpLL7mBYTnKIbYCoAIntkg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="8802488"
-X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
-   d="scan'208";a="8802488"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 05:14:46 -0700
-X-CSE-ConnectionGUID: UUJldluvTyOlrjpk1v2Ftg==
-X-CSE-MsgGUID: k3MfkGf8SH2izWvDcgCbGQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
-   d="scan'208";a="58303676"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Apr 2024 05:14:46 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 11 Apr 2024 05:14:45 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 11 Apr 2024 05:14:45 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 11 Apr 2024 05:14:45 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.41) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 11 Apr 2024 05:14:45 -0700
-Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
- by DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26; Thu, 11 Apr
- 2024 12:14:42 +0000
-Received: from CYYPR11MB8429.namprd11.prod.outlook.com
- ([fe80::4434:a739:7bae:39a9]) by CYYPR11MB8429.namprd11.prod.outlook.com
- ([fe80::4434:a739:7bae:39a9%2]) with mapi id 15.20.7452.019; Thu, 11 Apr 2024
- 12:14:42 +0000
-From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-To: "Polchlopek, Mateusz" <mateusz.polchlopek@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "andrew@lunn.ch" <andrew@lunn.ch>, "jiri@resnulli.us" <jiri@resnulli.us>,
-	"Wilczynski, Michal" <michal.wilczynski@intel.com>, "Polchlopek, Mateusz"
-	<mateusz.polchlopek@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Czapnik, Lukasz" <lukasz.czapnik@intel.com>, "Raj,
- Victor" <victor.raj@intel.com>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "horms@kernel.org" <horms@kernel.org>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>, "kuba@kernel.org"
-	<kuba@kernel.org>
-Subject: RE: [Intel-wired-lan] [PATCH net-next v9 4/6] ice: Enable switching
- default Tx scheduler topology
-Thread-Topic: [Intel-wired-lan] [PATCH net-next v9 4/6] ice: Enable switching
- default Tx scheduler topology
-Thread-Index: AQHahZ08AKzgTqI0f0GCc1Ist0sVwLFjBvuA
-Date: Thu, 11 Apr 2024 12:14:42 +0000
-Message-ID: <CYYPR11MB84296B30E863B1CE12E05046BD052@CYYPR11MB8429.namprd11.prod.outlook.com>
-References: <20240403074112.7758-1-mateusz.polchlopek@intel.com>
- <20240403074112.7758-5-mateusz.polchlopek@intel.com>
-In-Reply-To: <20240403074112.7758-5-mateusz.polchlopek@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|DM6PR11MB4657:EE_
-x-ms-office365-filtering-correlation-id: 850c206f-8ccb-4814-0407-08dc5a20f80c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: kPX4rECqLLRjvNHBdZYYztHUYOG8gDgfTu37DKTXc06SB/aj5qurJfHKbx9igxyzauWaxyWW5s1/e1QNwqbRfmCkluEEJnLRMzxwaCsMMadqU0CpPuTk7QaZ1moTslMYDlZ0W3dIZ2qzqPhAFBkvG57Sf2fuZEls99jp/f3/e8vUtfq9h9xHLD2qN1LYbVXc61RTfu0iMYF6aC2i1QS2TGxDs9ESlJwy1DW6SpZ0fhwc1NLvwuNl7/IVrGLj005xtMYVIjAwcRrGUyNJ+o/eTV44MVpG4RP8ttuMLx4X2AktGFQDRz9W0T4562Ah4LRqcleTbdyUF2ZWZTPcvitZXpddsFeC7PVp1e+OC75XTNz84lBp8koD3iwoxXjWEJoCnH20aCb5OiU26JN3tQv7aEv8mDQGkdhF4YmXn31wyxCZv0PzFNjz8C7z1xRnWbHjGQD8fVgJT+nWrla0Fe7cyngbgYsNL1pRpvW07GtNgIDpXSorx/Sr8aDfywkRMduD1ePUhc57iQPa3R3FHxkDpp5BTYYvyTd07IwRUZMqniaAp7SzPzD8ax1UwXnfhleZCcknLkblMmgJJp+gXXkilANiupSNIkIFtXpPv54Bv21kXijIgL236qLwTFWYBwc7h8jXGSSO/246RoEfmjUfUuf8BULnE4GZchOOZRGDxt9RAeXangWI00xoyAPtiiGESce3sM14Nsd2RrQkKKYtR8+NKbNE80ztbEYKbOF+fzk=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(366007)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?CSYiKwFo5gr7bX4xF8b5CTFYwhg+XYnFxC8ruZLaQAx2T5ZVHmUmfOPan/Xb?=
- =?us-ascii?Q?omg0JeMPkw9SsK0kyJfvqMn2uZvyJRnT6vBA6lN1v/Yk2TSfe/sYK+FxNwYg?=
- =?us-ascii?Q?QUOimYEDOmEmEyRn7N3aIn+vq9zQFWP7wu9moq11XtBtj09TJ8tvtAPhTTAV?=
- =?us-ascii?Q?q/U1ixsm/iBKC9BLXOFmjdbX4bcl7zQ4wcRJMbCniFMGVmMkRxMTd4PO7CJm?=
- =?us-ascii?Q?k5MVP/Kz5lCVvsFxar9ETlnwPaOtCcH/mQr2QmMceqfkgK8lEG+rm1I0Hu2x?=
- =?us-ascii?Q?6eJ2J+oSDRGIxGhXhKZyiftrlIfecWrig97D3FTJDigqmtO2pZctXcv6bDm0?=
- =?us-ascii?Q?yrNF5oLPiukNf24nk2kTFvwjbMkvKx/copdVrF6PKN7x4hY+ddkz8VTthy25?=
- =?us-ascii?Q?UBolk6/Wjj9/NNa5l8Mig318aiXXBG2W680Vs0FEccf0wCytMEZuB3SEiXzX?=
- =?us-ascii?Q?C1BNz8YZhte7bkZL91tw/OTlUWIlkiw7uLptmkjLBEkbXaznn1N3LbmttKXR?=
- =?us-ascii?Q?Dv2ay9jXsvB6M/mVzlkc8cRs2Yzqp7s0kBj3x63ICl2sv5+IotwjbS0s8Lap?=
- =?us-ascii?Q?BSkLsOeJia4hG6SRW2Ehf87c8699q1EeNGkb0ejWubQX7mCrOGSKUlUOKKRF?=
- =?us-ascii?Q?7jvxkfddAc7E9utakycAfQ9NMUfmP6y2AErKzGsH/4JxPThXDtXfyyBoQp+0?=
- =?us-ascii?Q?42O1ELD9BitoF540OhO9/zlYrjmQtwbLaDYFdxYO/FIq4cEaDsa5DSbeMwD0?=
- =?us-ascii?Q?fQ+lSvdO+5ujW06jMI5vgbu1g5mltlTIzTs9eq9bUJzAEGDkFqM7WQCM9GAh?=
- =?us-ascii?Q?nTKw35RETQm4vf7Cc7Ds4IdXa85wddomwEooU6JSQEnphc6Lbmg8n5Gu47bE?=
- =?us-ascii?Q?BbHVQkNDIIcYAEbeKCmokxibhG7S+a++XIE5w6k0dn0rbeTaKDdDzSWe0sFp?=
- =?us-ascii?Q?ocUy7ViieKXioGOyvh4iiVyCWe/OAUQkzx3MJpe5J9xK7n4ZQ363d07c5cna?=
- =?us-ascii?Q?uDoE5V3TVBxzcrY6R/r3SX6ISQSfg/gt5Aux/07FyqnMxV0nxnsVEJSMKyuF?=
- =?us-ascii?Q?dFLBkQBbJ8Vq+U/KAD4Hj8Xph1028p7rz11DSIykDs0eAygvgj+20hHMyjOv?=
- =?us-ascii?Q?LomCHPc5v2D+CSKxEilu4lyHy5FoyEwGZuhpIBXz++cAw88cYkSkoHVk69kT?=
- =?us-ascii?Q?gJ72dwFCIoP1u8UckUtqIeaXTv0mHKhRl93Fk88jsnYmKik0Z+SsGjHz2ihw?=
- =?us-ascii?Q?v5gmvZmooJ/DGnaoz3XbDWohQQPTBrAux293ak8axn5/V2YZsBeJetKeDGXz?=
- =?us-ascii?Q?HyxrFj7EreijvDaz+pjNY4lk3Z2nJ83r8ciQ6VDK6t4ba6sYw7/cWNFSpRgg?=
- =?us-ascii?Q?HunEoorl97yWCYdCwfc0N8m3ZSh6gQ342bbVbu1sh1n8qD0SlRNwOgz2wEMy?=
- =?us-ascii?Q?teuDxAkraSIJxDSlKJbYcA+xFWG4eUVAbhCi8Tet3ElIHM2itxluUMlxj7fB?=
- =?us-ascii?Q?TUZIdzcBo6lPzS3BhMajS/fFdH/tecLXtcIK2DpJQuz5bVAdQiYWhOQeLHoJ?=
- =?us-ascii?Q?B0lkTlBElCVKrXUD80YGdChd812I6HAjta2rq3XBVmL7oNusiy7bWDBT+aOw?=
- =?us-ascii?Q?jg=3D=3D?=
-arc-seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ABKtZq43T6WxNMyLcI5I3apTS6nc3EhwZLm7z6S9lggoI67lqbr18eI2UC2nBoDkQzq/eKwkqoCb1c3UMpszKUXhVEvuNo/tL9PdBduZ4UrCywCizypnPvTmw+Ts+gTrnP5yH4K9pWgOA6tG0KnowypbA1SzF/syJT2RJbKNK+7ASV4lJjLxPbf8HdRNVucqIw2xrzUq0EY2WuC+S9hW8QhVxPmCbBfNj5V3OuWY2amkWZhOG8dvj4RnqNv4tFNHbMtOnFIyTjqR+zQIzYSVto548Exl0W+OeiX/gtHr6JshdHYK+kFOBIEmqVQOPvnnRuaPg3LWCxmtT61urNq5ew==
-arc-message-signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2V/1R8jiMxiY3yaWeNQM3DWAIgnZfP0iUjVfP52pIiA=;
- b=lq1UtJl0gXdtYeBZFL+HW+SdBwxQ8d6in3DlbcU8Xsvt3sSHEjXl+0KyZKHEvwy/MGjaUGf0EozCyjfxoldxXuVxA4zzQosPTlFl2xBsCw55MSyzsvcv7RNAGlq8nnIbRwPYz7LpA3KQZ8usSiOlJ/E0m5fSjEMGiU69Nxy8iT242NVHIEyBJQ9LVntupi5QNKJtb8FqSqYbGlgx1nulc531W2Twd5fAxnrSus4SK8SufW33xszQb3kteSV9/mvPVConGgs20lG1VFD1puX7q/OoEk0e5+woZCwghOthdD0zUXBMnIdsoUbe9oeGIZ/lIGFN7/v1Wmsd23u4brQp0g==
-arc-authentication-results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-x-ms-exchange-crosstenant-authas: Internal
-x-ms-exchange-crosstenant-authsource: CYYPR11MB8429.namprd11.prod.outlook.com
-x-ms-exchange-crosstenant-network-message-id: 850c206f-8ccb-4814-0407-08dc5a20f80c
-x-ms-exchange-crosstenant-originalarrivaltime: 11 Apr 2024 12:14:42.6577 (UTC)
-x-ms-exchange-crosstenant-fromentityheader: Hosted
-x-ms-exchange-crosstenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-x-ms-exchange-crosstenant-mailboxtype: HOSTED
-x-ms-exchange-crosstenant-userprincipalname: KrJYJwaDZIcyHxrE4IYtGro45Tf1F/iDxH++PbaP2isGYUlDLknztVXTn9Or4yeHGsJ5ctrLmI0zh7DaHDnC26YxjBj9lEnWmmZsknyKnPskUY+31g5jrENQ81TUFd8m
-x-ms-exchange-transport-crosstenantheadersstamped: DM6PR11MB4657
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A6014B093;
+	Thu, 11 Apr 2024 12:24:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712838292; cv=none; b=ZyJsCVwDJ+X4C9Qt1/MbGKu2uOlRQbUWK0RbJ7g1pJLfuahlwfH8cguAq5nQSxaBfTDViajVvVnHx/yl2mu3ZgDFioVcNwk/VRy1rrrXsh5iWjRx9IKdpQ+cEcA2m1taAgEVnQiJ3Cgqy7r3rqG/PEnbirtqFLWbaqzybhijaTs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712838292; c=relaxed/simple;
+	bh=eOJ9su9B/d4b1D3MZvqjUPuVn2n3++RBtNVHTh0Ffq0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=prKQigG7xiRk+ngxRWqAJ/nwlhtQgnRNUIRiMbJ/RUfOYevGZFnukTpPWu7vUiZVn422mcJTYzheVHV9wgSGt4HfaQGV4coPljUJRg7Buwx4gaWOZB8XKf/XXmdQxEYwoVpQpudQuVqvySaJ0oxz4Zd1Hc+gBsLKkKDuR5Sobg8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.216])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4VFf5c6HFrz4f3mJ1;
+	Thu, 11 Apr 2024 20:24:36 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.128])
+	by mail.maildlp.com (Postfix) with ESMTP id 8C8E31A01A7;
+	Thu, 11 Apr 2024 20:24:45 +0800 (CST)
+Received: from k01.huawei.com (unknown [10.67.174.197])
+	by APP4 (Coremail) with SMTP id gCh0CgA3h2mJ1hdmZ5R_Jw--.23051S2;
+	Thu, 11 Apr 2024 20:24:42 +0800 (CST)
+From: Xu Kuohai <xukuohai@huaweicloud.com>
+To: bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Matt Bobrowski <mattbobrowski@google.com>,
+	Brendan Jackman <jackmanb@chromium.org>,
+	Paul Moore <paul@paul-moore.com>,
+	James Morris <jmorris@namei.org>,
+	"Serge E . Hallyn" <serge@hallyn.com>,
+	Khadija Kamran <kamrankhadijadj@gmail.com>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Ondrej Mosnacek <omosnace@redhat.com>,
+	Kees Cook <keescook@chromium.org>,
+	John Johansen <john.johansen@canonical.com>,
+	Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+	Roberto Sassu <roberto.sassu@huawei.com>,
+	Shung-Hsi Yu <shung-hsi.yu@suse.com>
+Subject: [PATCH bpf-next v3 00/11] Add check for bpf lsm return value
+Date: Thu, 11 Apr 2024 20:27:41 +0800
+Message-Id: <20240411122752.2873562-1-xukuohai@huaweicloud.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:gCh0CgA3h2mJ1hdmZ5R_Jw--.23051S2
+X-Coremail-Antispam: 1UD129KBjvJXoW3GF4xArWkWFWxCFyrtr1kXwb_yoW7tF17pr
+	4YqF18Kr4IqF4UJF1xCF4UGr1fJFZ7A3WUXryxJr95AF15Gr1DXr1xGr4jqrnxJr4Uur1a
+	vF9Fqan5t348XaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUk2b4IE77IF4wAFF20E14v26rWj6s0DM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcxkI7VAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28I
+	cxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2
+	IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVW8ZVWrXwCIc40Y0x0EwIxGrwCI
+	42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42
+	IY6xAIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E
+	87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUFYFCUUUUU
+X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of M=
-ateusz Polchlopek
-> Sent: Wednesday, April 3, 2024 1:11 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: andrew@lunn.ch; jiri@resnulli.us; Wilczynski, Michal <michal.wilczyns=
-ki@intel.com>; Polchlopek, Mateusz <mateusz.polchlopek@intel.com>; netdev@v=
-ger.kernel.org; Czapnik, Lukasz <lukasz.czapnik@intel.com>; Raj, Victor <vi=
-ctor.raj@intel.com>; Nguyen, Anthony L <anthony.l.nguyen@intel.com>; horms@=
-kernel.org; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; kuba@kernel=
-.org
-> Subject: [Intel-wired-lan] [PATCH net-next v9 4/6] ice: Enable switching =
-default Tx scheduler topology
->
-> From: Michal Wilczynski <michal.wilczynski@intel.com>
->
-> Introduce support for Tx scheduler topology change, based on user selecti=
-on, from default 9-layer to 5-layer.
-> Change requires NVM (version 3.20 or newer) and DDP package (OS Package
-> 1.3.30 or newer - available for over a year in linux-firmware, since comm=
-it aed71f296637 in linux-firmware ("ice: Update package to 1.3.30.0"))
-> https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.g=
-it/commit/?id=3Daed71f296637
->
-> Enable 5-layer topology switch in init path of the driver. To accomplish =
-that upload of the DDP package needs to be delayed, until change in Tx topo=
-logy is finished. To trigger the Tx change user selection should be changed=
- in NVM using devlink. Then the platform should be rebooted.
->
-> Signed-off-by: Michal Wilczynski <michal.wilczynski@intel.com>
-> Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_main.c | 102 ++++++++++++++++++----
->  1 file changed, 83 insertions(+), 19 deletions(-)
->
+From: Xu Kuohai <xukuohai@huawei.com>
 
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
-ntingent worker at Intel)
+A bpf prog returning positive number attached to file_alloc_security hook
+will make kernel panic.
+
+Here is a panic log:
+
+[  441.235774] BUG: kernel NULL pointer dereference, address: 00000000000009
+[  441.236748] #PF: supervisor write access in kernel mode
+[  441.237429] #PF: error_code(0x0002) - not-present page
+[  441.238119] PGD 800000000b02f067 P4D 800000000b02f067 PUD b031067 PMD 0
+[  441.238990] Oops: 0002 [#1] PREEMPT SMP PTI
+[  441.239546] CPU: 0 PID: 347 Comm: loader Not tainted 6.8.0-rc6-gafe0cbf23373 #22
+[  441.240496] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.15.0-0-g2dd4b4
+[  441.241933] RIP: 0010:alloc_file+0x4b/0x190
+[  441.242485] Code: 8b 04 25 c0 3c 1f 00 48 8b b0 30 0c 00 00 e8 9c fe ff ff 48 3d 00 f0 ff fb
+[  441.244820] RSP: 0018:ffffc90000c67c40 EFLAGS: 00010203
+[  441.245484] RAX: ffff888006a891a0 RBX: ffffffff8223bd00 RCX: 0000000035b08000
+[  441.246391] RDX: ffff88800b95f7b0 RSI: 00000000001fc110 RDI: f089cd0b8088ffff
+[  441.247294] RBP: ffffc90000c67c58 R08: 0000000000000001 R09: 0000000000000001
+[  441.248209] R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000001
+[  441.249108] R13: ffffc90000c67c78 R14: ffffffff8223bd00 R15: fffffffffffffff4
+[  441.250007] FS:  00000000005f3300(0000) GS:ffff88803ec00000(0000) knlGS:0000000000000000
+[  441.251053] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  441.251788] CR2: 00000000000001a9 CR3: 000000000bdc4003 CR4: 0000000000170ef0
+[  441.252688] Call Trace:
+[  441.253011]  <TASK>
+[  441.253296]  ? __die+0x24/0x70
+[  441.253702]  ? page_fault_oops+0x15b/0x480
+[  441.254236]  ? fixup_exception+0x26/0x330
+[  441.254750]  ? exc_page_fault+0x6d/0x1c0
+[  441.255257]  ? asm_exc_page_fault+0x26/0x30
+[  441.255792]  ? alloc_file+0x4b/0x190
+[  441.256257]  alloc_file_pseudo+0x9f/0xf0
+[  441.256760]  __anon_inode_getfile+0x87/0x190
+[  441.257311]  ? lock_release+0x14e/0x3f0
+[  441.257808]  bpf_link_prime+0xe8/0x1d0
+[  441.258315]  bpf_tracing_prog_attach+0x311/0x570
+[  441.258916]  ? __pfx_bpf_lsm_file_alloc_security+0x10/0x10
+[  441.259605]  __sys_bpf+0x1bb7/0x2dc0
+[  441.260070]  __x64_sys_bpf+0x20/0x30
+[  441.260533]  do_syscall_64+0x72/0x140
+[  441.261004]  entry_SYSCALL_64_after_hwframe+0x6e/0x76
+[  441.261643] RIP: 0033:0x4b0349
+[  441.262045] Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 88
+[  441.264355] RSP: 002b:00007fff74daee38 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+[  441.265293] RAX: ffffffffffffffda RBX: 00007fff74daef30 RCX: 00000000004b0349
+[  441.266187] RDX: 0000000000000040 RSI: 00007fff74daee50 RDI: 000000000000001c
+[  441.267114] RBP: 000000000000001b R08: 00000000005ef820 R09: 0000000000000000
+[  441.268018] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000004
+[  441.268907] R13: 0000000000000004 R14: 00000000005ef018 R15: 00000000004004e8
+
+The reason is that the positive number returned by bpf prog is not a
+valid errno, and could not be filtered out with IS_ERR which is used by
+the file system to check errors. As a result, the filesystem mistakenly
+uses this random positive number as file pointer, causing panic.
+
+To fix this issue, there are two schemes:
+
+1. Modify the calling sites of file_alloc_security to take positive
+   return values as zero.
+
+2. Make the bpf verifier to ensure no unpredicted value returned by
+   lsm bpf prog.
+
+Considering that hook file_alloc_security never returned positive number
+before bpf lsm was introduced, and other lsm hooks may have the same
+problem, scheme 2 is more reasonable.
+
+So this series adds lsm return value check in verifier to fix it.
+
+v3:
+1. Fix incorrect lsm hook return value ranges, and add disabled hook
+   list for bpf lsm, and merge two LSM_RET_INT patches. (KP Singh)
+2. Avoid bpf lsm progs attached to different hooks to call each other
+   with tail call
+3. Fix a CI failure caused by false rejection of AND operation
+4. Add tests
+
+v2: https://lore.kernel.org/bpf/20240325095653.1720123-1-xukuohai@huaweicloud.com/
+fix bpf ci failure
+
+v1: https://lore.kernel.org/bpf/20240316122359.1073787-1-xukuohai@huaweicloud.com/
+
+Xu Kuohai (11):
+  bpf, lsm: Annotate lsm hook return value range
+  bpf, lsm: Add helper to read lsm hook return value range
+  bpf, lsm: Check bpf lsm hook return values in verifier
+  bpf, lsm: Add bpf lsm disabled hook list
+  bpf: Avoid progs for different hooks calling each other with tail call
+  bpf: Fix compare error in function retval_range_within
+  bpf: Fix a false rejection caused by AND operation
+  selftests/bpf: Avoid load failure for token_lsm.c
+  selftests/bpf: Add return value checks for failed tests
+  selftests/bpf: Add test for lsm tail call
+  selftests/bpf: Add verifier tests for bpf lsm
+
+ include/linux/bpf.h                           |   2 +
+ include/linux/bpf_lsm.h                       |   8 +
+ include/linux/lsm_hook_defs.h                 | 591 +++++++++---------
+ include/linux/lsm_hooks.h                     |   6 -
+ kernel/bpf/bpf_lsm.c                          |  84 ++-
+ kernel/bpf/btf.c                              |   5 +-
+ kernel/bpf/core.c                             |  22 +-
+ kernel/bpf/verifier.c                         |  82 ++-
+ security/security.c                           |   1 +
+ .../selftests/bpf/prog_tests/test_lsm.c       |  46 +-
+ .../selftests/bpf/prog_tests/verifier.c       |   3 +-
+ tools/testing/selftests/bpf/progs/err.h       |  10 +
+ .../selftests/bpf/progs/lsm_tailcall.c        |  34 +
+ .../selftests/bpf/progs/test_sig_in_xattr.c   |   4 +
+ .../bpf/progs/test_verify_pkcs7_sig.c         |   8 +-
+ tools/testing/selftests/bpf/progs/token_lsm.c |   4 +-
+ .../bpf/progs/verifier_global_subprogs.c      |   7 +-
+ .../selftests/bpf/progs/verifier_lsm.c        | 155 +++++
+ 18 files changed, 754 insertions(+), 318 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/lsm_tailcall.c
+ create mode 100644 tools/testing/selftests/bpf/progs/verifier_lsm.c
+
+-- 
+2.30.2
 
 
