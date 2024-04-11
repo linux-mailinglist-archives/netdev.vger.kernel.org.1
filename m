@@ -1,106 +1,148 @@
-Return-Path: <netdev+bounces-87081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19CBB8A1B4D
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:27:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18D5D8A1B51
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:28:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8BDF287453
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 17:27:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3ABEA1C21940
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 17:28:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CCE77EEE0;
-	Thu, 11 Apr 2024 16:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE49C7F7ED;
+	Thu, 11 Apr 2024 16:00:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSI5jQzd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AVxuE2g4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3E779B8E;
-	Thu, 11 Apr 2024 16:00:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB9B7FBA2;
+	Thu, 11 Apr 2024 16:00:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712851224; cv=none; b=Ij4+sQT1lUejkATpQ/qdEfyeH0eM34O7rVW2z5LlmK6QtP7mZRMOo6vrQGTtSoD6pV4ZjpU3gDETT02aHlmfx0OLDb6REymN/e/iIwgQiK03H5xqKktrSUnn4nGcqgnH6WGXEt4qFFlYdYQ7gLphsguW+yyrVPEIkyxV7xoTVjY=
+	t=1712851258; cv=none; b=kVutbDWy3ryqdF51sHEtrZiB63vYzaubs7b6MyUMFmcwRKuiEvOyPcMaF1TCS+W6P2wyDBUVozQppfuyPpKPXeuUvaJT/k3+joqQZZjBa+cfq3Eu0tKNjYxzuGYxPaeuykBAbkHzMu/FF8MvQBugu8CdzS6gtU7KQZxySVsJD4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712851224; c=relaxed/simple;
-	bh=dXhrltalRw62K7XvGlgrj47pm8KOrn1wcWLhzBP8JSs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=JqPNADFIapYNEOtg7zKGGhYFocDTNvhiaj10koS2eDyJMXgfWYwu8oG4UxFrAwIyQp86EEsKwOOr8cRRIP+vZ8jq4V8kafIAzrlVLtAcsLo/cmlNLNpBTqdUfH4lN41PGC+TphtTSCAvdw4146CNAAfkBSPzkx8p+AwRBWj8SOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nSI5jQzd; arc=none smtp.client-ip=209.85.128.42
+	s=arc-20240116; t=1712851258; c=relaxed/simple;
+	bh=4rLA/HSwGcqOerjQJOn9pYbVTF4v9Q606DpK3OhBHoc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UF18dG08x9DvfgrGvaOFQd4eqzJQhxXBThOYQRHkB2mDmPb/iWiOySoqolXYFszpfO17SbGIg/g302r2kvEamjtIgR5po+jt8WHuLPBFXy7GmJ4qfZ7zNKFk7buunyR79tvMe3G76xNnI4rWBv50YMIIOr+QmT7X8T7eIXyIpvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AVxuE2g4; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-41550858cabso64835e9.2;
-        Thu, 11 Apr 2024 09:00:22 -0700 (PDT)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-417d02ab780so61455e9.3;
+        Thu, 11 Apr 2024 09:00:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712851221; x=1713456021; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=r/wAtQmcm7RjskxIystx0q8y3lFVg7bjExxCxdXSxHg=;
-        b=nSI5jQzdCqfxGS3rY5UuN8r//n9iAMAoRTHWQ/i+tqQiJMatmnlGXakGZ+WprZdJWK
-         YsclRU/EkzeO0Rd+x4P90Z0ZaGqMC4u+3h6Gpb1ok8i7Rro4+Vj/oLghC/HcAlYPftNZ
-         d1Byxjqd5n886srUQE9lr5yYpjwt6r5tVJZ/X4XUy6+FG1+RisnaCX8A9rcYjJnZRvTv
-         dAHFl9QNgiOQBwCN7ssMnUrsCyVCj4JStQZvvUcRbJt/bqoDdyi8icKYekRqMcXlwSnq
-         Nlvt7+6cWrhjVSY1ScgACP1iIU8tjTE9BshnKg5w4d93ASRoIy3F+6ucoufsTxeay8/v
-         uiqw==
+        d=gmail.com; s=20230601; t=1712851255; x=1713456055; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4rLA/HSwGcqOerjQJOn9pYbVTF4v9Q606DpK3OhBHoc=;
+        b=AVxuE2g4W+sc839sbVflVa+/ykG+J+ISl+XslLK2xwuRtOxtR8yL4vSnR9bFNtQgdF
+         Ax5vr8ZT7GSIdFm5SKGjpFEqU2JyANnL7U3WE/9SDDXXGnTFHLkcm5djjQwgFwxqiiR3
+         C8pMf5ICIHSpOXaSHt3TIKINgBJ+mwlSxfQAa9SGNCGU9t4YLJWKcXEGu/coIQzoTbEi
+         q/Z3ev5M+BXriaGmEAi2HYOvix2lKcaMCei4XnQaYmyHKRN3usa5SDmbIQK3hUrCI3iE
+         ImTDjrkjwF/otLc00lhkVElP/DIbp+7CaLbKWmfec3Nn/CAY6jvFa01xFDUYesVKIwD2
+         qFuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712851221; x=1713456021;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=r/wAtQmcm7RjskxIystx0q8y3lFVg7bjExxCxdXSxHg=;
-        b=CwTXj/Kt4R39n7W1hDF+0jsZFAElYgHUlVo8SSJ7C81I9n2pe3v21pQHZk2L431mWn
-         bnhTS2bEKoSWk61h6r/8QjiexI/Z1CFr8R8Qgok5lMEXtKhPETyv2FYm12Sd7l5Qe+Zr
-         MtXh5v8pl2VEw/skyqE/XX2FOi3/tZKwHrJ5UMSRmhiiSPfLe1FeUNjiETxEWlYiU8vT
-         w8kIbitbLDlUi14DWJaia5NgT9m4lWyu+PD3tJmS68Mfs5cvLU37V3b0VIGl3gp5JwyM
-         P9PkLUnU892AjLskQ8+dDrBlb+GLGn5Z/k0V9v5SIILaeSn+TTASFkvxuECEJeo9wD0h
-         IGeg==
-X-Forwarded-Encrypted: i=1; AJvYcCWV24P/Qz3KuSlm+T7rS0gZFf4Yu52oUYLMEQV6/CWXRL/4ccvyqnU7LzpS3Zu07Iu5our7SsKLieMqHojnWdDLZ8vF48/1kIs0sK1luefzsB0YpWkWgjjH0rbTkxM6V8fxJfax7gTrTXlfeEGm9KSGGOEu2CyH/xKFfx//WdA/FRpzKk3j
-X-Gm-Message-State: AOJu0YzjnRLoCwrNA9YlxoSOCSFeXgg2ZjpQDE+/jEp1qDg1KQztNdEt
-	xpmyLt/Tafv+1KmSo2fj4Lp04g0/Fm52VauwGIn3Ab07x9wISTtS
-X-Google-Smtp-Source: AGHT+IFIjozN+0Eh4skdyHP+pEB59g2kchQ0I/iku7FlI9TW9cy6qsLMFPLp/jU7nMA54TAA3FxFBQ==
-X-Received: by 2002:a05:600c:45cc:b0:417:bc16:b8f1 with SMTP id s12-20020a05600c45cc00b00417bc16b8f1mr173706wmo.12.1712851221167;
-        Thu, 11 Apr 2024 09:00:21 -0700 (PDT)
-Received: from debian ([146.70.204.204])
-        by smtp.gmail.com with ESMTPSA id p5-20020a05600c1d8500b00417e227f40bsm1603248wms.3.2024.04.11.09.00.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Apr 2024 09:00:20 -0700 (PDT)
-Message-ID: <6c363e03-23e4-4ab2-b66a-aeb179cbacff@gmail.com>
-Date: Thu, 11 Apr 2024 18:00:09 +0200
+        d=1e100.net; s=20230601; t=1712851255; x=1713456055;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4rLA/HSwGcqOerjQJOn9pYbVTF4v9Q606DpK3OhBHoc=;
+        b=ut88uQBLP8W9VO8QjgEwsnAwbADOsziFFSDCEn0DS17NvQFdfboS13FEnYB1bECLco
+         QP/IuPvXR2o/XIXauikxB691V9bxlAPlvureO/6iwDl9cTMqRrJIymO3sHWqgqptDV3Z
+         6Iw6UtYi6AiW4+sMYCjk437ZdMN0XjH8ZAHimN9xKeWRNAug+Gm+QkBqH8VaqT8TApc7
+         OITF3RzBjLCDxLVYmVz+JZZaDzbwyzNGg2cZhGjZ9s9u6oeJ8DnH0eHkxzbEW3+IQ6zl
+         K6AFXtHUQfZJXhA0foRCe9GEE2PB5e8eZk1M1RpLJAjBhmrxrvAfNTk21cDCSl9i9hXs
+         HssA==
+X-Forwarded-Encrypted: i=1; AJvYcCWviqTYAJpL7F2b7LzCDoK5nyaIDtrfYFfV68WZyL9gkhzgqxahMsA/AGmNr8yaRxMSMxBnyyBcQbQNhTpv8JBnAWMIW9U9XDFCSm7pXjhcQWkpYo87+8TPpTYfRwAdTlXT
+X-Gm-Message-State: AOJu0YxLst+g3ES0cPK3C4ZAR395olI0pieAS6/UKx4hE76hmWzWLo1X
+	DqPjWWKWVtwNS5jRoaYeXZdEP5WZXwJVAfAZNjTq4qkzyAolKVAoAeBojyWZF6wKcx0AiX9qe03
+	64zIKDa94mfnG8bqvbeKZ3B8Misg=
+X-Google-Smtp-Source: AGHT+IEv6SkaFO9TkhvK08UGmkS4usIr4ciEBe+v3bRUvwWKFX99Y5TXj+YL4XTvo1UgCMBYbiii2Ktw4EdqDTu8F5A=
+X-Received: by 2002:a05:600c:1d1e:b0:416:644d:6dba with SMTP id
+ l30-20020a05600c1d1e00b00416644d6dbamr177103wms.4.1712851255217; Thu, 11 Apr
+ 2024 09:00:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v6 2/6] net: gro: add p_off param in
- *_gro_complete
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
- dsahern@kernel.org, aduyck@mirantis.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20240410153423.107381-1-richardbgobert@gmail.com>
- <20240410153423.107381-3-richardbgobert@gmail.com>
- <6617493095ee1_2d6bc6294fc@willemb.c.googlers.com.notmuch>
- <66175ca5e3621_2dde6a2947c@willemb.c.googlers.com.notmuch>
-From: Richard Gobert <richardbgobert@gmail.com>
-In-Reply-To: <66175ca5e3621_2dde6a2947c@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <20240409135142.692ed5d9@kernel.org> <44093329-f90e-41a6-a610-0f9dd88254eb@lunn.ch>
+ <CAKgT0UcVnhgmXNU2FGcy6hbzUQZwNBZw0EKbFF3DsKDc8r452A@mail.gmail.com>
+ <c820695d-bda7-4452-a563-170700baf958@lunn.ch> <CAKgT0Uf4i_MN-Wkvpk29YevwsgFrQ3TeQ5-ogLrF-QyMSjtiug@mail.gmail.com>
+ <c437cf8e-57d5-44d3-a71d-c95ea84838fd@lunn.ch>
+In-Reply-To: <c437cf8e-57d5-44d3-a71d-c95ea84838fd@lunn.ch>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Thu, 11 Apr 2024 09:00:17 -0700
+Message-ID: <CAKgT0UcO-=dg2g0uFSMt2UnyzF7y2W8RVFDp15RZhy=Vb4g61Q@mail.gmail.com>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jakub Kicinski <kuba@kernel.org>, pabeni@redhat.com, 
+	John Fastabend <john.fastabend@gmail.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org, bhelgaas@google.com, 
+	linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Willem de Bruijn wrote:
-> And the latter parse the network header for total_len/payload_len, to
-> find their original offset.
-> 
-> It's also a bit of a hack. But a lot smaller patch, probably.
+On Wed, Apr 10, 2024 at 3:37=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > Well I was referring more to the data path level more than the phy
+> > configuration. I suspect different people have different levels of
+> > expectations on what minimal firmware is. With this hardware we at
+> > least don't need to use firmware commands to enable or disable queues,
+> > get the device stats, or update a MAC address.
+> >
+> > When it comes to multi-host NICs I am not sure there are going to be
+> > any solutions that don't have some level of firmware due to the fact
+> > that the cable is physically shared with multiple slots.
+>
+> This is something Russell King at least considered. I don't really
+> know enough to know why its impossible for Linux to deal with multiple
+> slots.
 
+It mostly has to do with the arbitration between them. It is a matter
+of having to pass a TON of info to the individual slice and then the
+problem is it would have to do things correctly and not manage to take
+out it's neighbor or the BMC.
 
-While producing a smaller change - this is a bit of a hacky code change.
-My initial idea was to use network_offset added to the CB in the 4th commit
-- making a very small change. (https://lore.kernel.org/netdev/446695cb-50b8-4187-bf11-63aedb6e9aed@gmail.com/)
+> > I am assuming we still want to do the PCS driver. So I will still see
+> > what I can do to get that setup.
+>
+> You should look at the API offered by drivers in drivers/net/pcs. It
+> is designed to be used with drivers which actually drive the hardware,
+> and use phylink. Who is responsible for configuring and looking at the
+> results of auto negotiation? Who is responsible for putting the PCS
+> into the correct mode depending on the SFP modules capabilities?
+> Because you seemed to of split the PCS into two, and hidden some of it
+> away, i don't know if it makes sense to try to shoehorn what is left
+> into a Linux driver.
 
-Eric suggested it'd make more sense to pass it off as a parameter
-throughout the complete chain.
+We have control of the auto negotiation as that is north of the PMA
+and is configured per host. We should support clause 73 autoneg.
+Although we haven't done much with it as most of our use cases are
+just fixed speed setups to the switch over either 25G-CR1, 50G-CR2,
+50G-CR1, or 100G-CR2. So odds are we aren't going to be doing anything
+too terribly exciting.
+
+As far as the QSFP setup the FW is responsible for any communication
+with it. I suspect that the expectation is that we aren't going to
+need much in the way of config since we are just using direct attach
+cables. So we are the only one driving the PCS assuming we aren't
+talking about power-on init where the FW is setting up for the BMC to
+have access.
+
+We will have to see. The PCS drivers in that directory mostly make
+sense to me and don't look like too much of a departure from my
+current code. It will just be a matter of splitting up the fbnic_mac.c
+file and adding the PCS logic as a separate block, or at least I hope
+that is all that is mostly involved. Probably take me a week or two to
+get it coded up and push out the v2.
 
