@@ -1,94 +1,199 @@
-Return-Path: <netdev+bounces-87192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F28F8A20F5
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 23:35:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E55C8A20F8
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 23:35:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B551AB2262A
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 21:35:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E29D2866F3
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 21:35:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F38622BD18;
-	Thu, 11 Apr 2024 21:35:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD746381B1;
+	Thu, 11 Apr 2024 21:35:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="cNLVywUz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hY0KhRdA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F3139AC3
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 21:35:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB5C12E6C;
+	Thu, 11 Apr 2024 21:35:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712871302; cv=none; b=YjIOySiF88YQi3msPxQBYZNCbx3h4eqhogNZC7BFUe5B7zsVIXS5zPtDmXDdkPkCNMB/reAZFh8vla1roVOgXwh8l+pCcrVFC5GhXK+VJCCXAQfD//Y2hrDfA5kgj3zgHHsvAQEhWcTcWd+sdkKneUZTSveQomflUY1Px6yBxGE=
+	t=1712871314; cv=none; b=UeoqVOtb6Fy6N4pN9lfHp4KLklGH9+ZrNvFbqbeT5BInnlxO4tpEd0xjx/0RrF9IjT3oAmPQcKsbwvTEM668wz4Mn/mUlGilt0mEMXk4E2XG456yL0jwYwRcutVt/Nbx9mxXbTttgYjS+LHVDpuW9TZuULNbI1lsbQCZwqnbEaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712871302; c=relaxed/simple;
-	bh=9kv3nA9dBJfgVtxfxbnvD3z3ZW7eh2XUIGHkV6V9Zos=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nS2Ongbzmoppxu6G83Kqef19yGEYGp4TrKysCXDQm835s5Q77CMQ3e+qzSot73e9xW1Do7EEbqrxHnits6Iwy4sZChdubsa/S2PNYfauDyiaYhgzpxVKmQO54NcrIi6sY0QbBoh30eq6raDJbzIB1XQ3Equ+POftvWbFfx1nR9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=cNLVywUz; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1712871314; c=relaxed/simple;
+	bh=PI/v7zf9imTyUebgJBxjgjFvglA8DKk7b3zyb8bg0zA=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=ZTu+Vo1af/oo8ZL/Jey2qCm2rKNDxAtBwllvGIqC+l8AfRHJo7BXtDx4HitIpyIqAMLpRJ4EgymQUbnT9l6gVzIc5WAtDR/8HiDCKVEM7uKskqm0FF0wRa5JgA04NuL4tKvg5QYneU2MBL879acOf5stzsOcce7l4i1+a+HaF24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hY0KhRdA; arc=none smtp.client-ip=209.85.210.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-6ea09b6c826so116841a34.0;
+        Thu, 11 Apr 2024 14:35:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1712871301; x=1744407301;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=XaR6izayf+bApbTlJcGRGbGWwmngR8CsVYhKssBMUnM=;
-  b=cNLVywUz0FDeJlT4So52zq1cx34zPrR24ZUp3edIDu9qf2hAaQ9AD9Cj
-   QukIw1owb1sZYPWBaWD8AhhWtFYpMGjM7qy7JCuuA4J95ZJwinr8Lb9n5
-   6aCH5ZDQ0alKEsSgbalJZqzZ1omb5a41oUMGRqi/EH1tb4XUY3i3SCP9l
-   4=;
-X-IronPort-AV: E=Sophos;i="6.07,194,1708387200"; 
-   d="scan'208";a="389127089"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 21:34:58 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:41639]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.20.81:2525] with esmtp (Farcaster)
- id 2ee7c676-b9f7-456e-bac3-10cf2a0831cb; Thu, 11 Apr 2024 21:34:58 +0000 (UTC)
-X-Farcaster-Flow-ID: 2ee7c676-b9f7-456e-bac3-10cf2a0831cb
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 11 Apr 2024 21:34:57 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.24) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 11 Apr 2024 21:34:55 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuniyu@amazon.com>,
-	<mhal@rbox.co>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net v2] af_unix: Fix garbage collector racing against connect()
-Date: Thu, 11 Apr 2024 14:34:46 -0700
-Message-ID: <20240411213446.94787-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240411143035.737d2d33@kernel.org>
-References: <20240411143035.737d2d33@kernel.org>
+        d=gmail.com; s=20230601; t=1712871312; x=1713476112; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5GZWFnKLGg7a3pKfMnIks+tuuAhpazBSCLZ0rJ/5h14=;
+        b=hY0KhRdA2sufJT+SvloV2MLviTO/Yw0AOvLsFdhOXZBoVNnJU9LuNwLIDLI85hu9ow
+         S7jzr+uxIAwfcJd3hXvPUhfJNaJkfchoGDCVfxD/WyhBr7aEu+eosvAKha3NFbonTbmR
+         +pooynTW4rRGG0oz2BsbqHBh6w4GNj1B/ubK91ab9S2ZYWoZYbO4FaAy83L4eixZBXic
+         oq8FIcRumAZiDC6V+Wd5if/8ZHptC2NoUNqR8JBHFAac7E8pQQhZAxXzuGAHLcfGV9wX
+         ncQs8iKRCj0zs/Ykxu0X0R4wk1DCKqo8Z0nvOQv6mHUfSuXFIQv8rrhfMWkaKhzqrCoT
+         6saA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712871312; x=1713476112;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5GZWFnKLGg7a3pKfMnIks+tuuAhpazBSCLZ0rJ/5h14=;
+        b=Zp8xjwjMggGxsjfu8H5MXjB0PgOBVMSxxUgpOfTiJG0cZ4/dNcRCC5y2OTFWYkvgbJ
+         yRWRTWRuyPjLCWPDgjtOLLSSwrL5ej98sszEpK0sGmiR5UMEiTAuKkxbYj+VnzxRAb4V
+         qHXEAZLzOuLx3cdsENt+0gncghiCzskXM8/PnlszrbHLGQayz1EgTuY5h6o9Gdhe3qQK
+         cD7jsxEqBnrX9g/lRACYBShJ+mq5OEMdYDz+T0NQKTfcCLyKyMzHmiUGVazrG15k7k13
+         XfibF8GEx2DMWEqolmFyHZ0QV5AoCVlkzeSV8BvKU4pzfjyHa19klRpZ3wyJb3Cxf7es
+         RBMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW2x9htW0XJopaka4YgUDct+aRyhNIUaZaHkxyJR4NEYibshh1NZQpawvnUhE0QYO2ZZqY0uAgFR0sf/shQzUc497qva1m21vwhVODSqjH75wvpOPH7bQE8XNfaFprF2pSmCdCyiBSZW0bCGXIr6j+9eVi99MLNPEBthaMRONgSI03adQyb
+X-Gm-Message-State: AOJu0Yzlvs70+k4FrNLCySUNIm57dpkaX8pedeNjuZMZ7LJn9XB7bLYa
+	PMD1xojwEjkmaXDvWSnz5Wrl8Cg+UzIY9QTF4sfbg/2KinRc9Nq4
+X-Google-Smtp-Source: AGHT+IGBrsgvGLTizvk744f8oyIMHrJWHSIqgTxKQfaqnLIiNH0J/w7yGGl2xFsjVWo8ezLtQIgZbg==
+X-Received: by 2002:a9d:7c89:0:b0:6ea:1fbc:459f with SMTP id q9-20020a9d7c89000000b006ea1fbc459fmr1057772otn.0.1712871312264;
+        Thu, 11 Apr 2024 14:35:12 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id bp37-20020a05620a45a500b0078ec8690764sm537078qkb.87.2024.04.11.14.35.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Apr 2024 14:35:11 -0700 (PDT)
+Date: Thu, 11 Apr 2024 17:35:11 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ shuah@kernel.org, 
+ dsahern@kernel.org, 
+ aduyck@mirantis.com, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <6618578fc34fa_36e52529429@willemb.c.googlers.com.notmuch>
+In-Reply-To: <24daf0f8-1e81-4bdb-81f3-0f95bf4392f4@gmail.com>
+References: <20240410153423.107381-1-richardbgobert@gmail.com>
+ <20240410153423.107381-6-richardbgobert@gmail.com>
+ <66174ec5bbd29_2d6bc629481@willemb.c.googlers.com.notmuch>
+ <24daf0f8-1e81-4bdb-81f3-0f95bf4392f4@gmail.com>
+Subject: Re: [PATCH net-next v6 5/6] net: gro: move L3 flush checks to
+ tcp_gro_receive and udp_gro_receive_segment
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA004.ant.amazon.com (10.13.139.76) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Thu, 11 Apr 2024 14:30:35 -0700
-> On Tue, 9 Apr 2024 16:26:59 -0700 Kuniyuki Iwashima wrote:
-> > > Fixes: 1fd05ba5a2f2 ("[AF_UNIX]: Rewrite garbage collector, fixes race.")
-> > > Signed-off-by: Michal Luczaj <mhal@rbox.co>  
+Richard Gobert wrote:
+> Willem de Bruijn wrote:
+> > Richard Gobert wrote:
+> >> {inet,ipv6}_gro_receive functions perform flush checks (ttl, flags,
+> >> iph->id, ...) against all packets in a loop. These flush checks are used
+> >> currently only in tcp flows in GRO.
+> >>
+> >> These checks need to be done only once in tcp_gro_receive and only against
+> >> the found p skb, since they only affect flush and not same_flow.
 > > 
-> > Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > I don't quite understand where the performance improvements arise.
+> > As inet_gro_receive will skip any p that does not match:
+> > 
+> >       if (!NAPI_GRO_CB(p)->same_flow)
+> >               continue;
+> > 
+> >       iph2 = (struct iphdr *)(p->data + off);
+> >       /* The above works because, with the exception of the top
+> >        * (inner most) layer, we only aggregate pkts with the same
+> >        * hdr length so all the hdrs we'll need to verify will start
+> >        * at the same offset.
+> >        */
+> >       if ((iph->protocol ^ iph2->protocol) |
+> >           ((__force u32)iph->saddr ^ (__force u32)iph2->saddr) |
+> >           ((__force u32)iph->daddr ^ (__force u32)iph2->daddr)) {
+> >               NAPI_GRO_CB(p)->same_flow = 0;
+> >               continue;
+> >       }
+> > 
+> > So these checks are already only performed against a p that matches.
+> >  
 > 
-> Hi Kuniyuki! This problem goes away with your GC rework in net-next,
-> right? I should keep the net-next code when merging?
+> 
+> Thanks for the review!
+> 
+> flush/flush_id is calculated for all other p with same_flow = 1 (which is
+> not always determined to be 0 before inet_gro_receive) and same src/dst
+> addr in the bucket. Moving it to udp_gro_receive_segment/tcp_gro_receive
+> will make it run only once when a matching p is found.
 
-Hi Jakub!  Yes, the issue doesn't exist in the new GC, so this change
-should be removed when merging net-next.
+So this optimization is for flows that are the same up to having the
+same saddr/daddr. Aside from stress tests, it seems rare to have many
+concurrent flows between the same pair of machines?
+
+> 
+> In addition, UDP flows where skb_gro_receive_list is called -
+> flush/flush_id is not relevant and does not need to be calculated. 
+
+That makes sense
+
+> In these
+> cases total CPU time in GRO should drop. I could post perf numbers for
+> this flow as well.
+> 
+> 
+> >> Leveraging the previous commit in the series, in which correct network
+> >> header offsets are saved for both outer and inner network headers -
+> >> allowing these checks to be done only once, in tcp_gro_receive. As a
+> > 
+> > Comments should be updated to reflect both TCP and L4 UDP. Can
+> > generalize to transport callbacks.
+> > 
+> >> result, NAPI_GRO_CB(p)->flush is not used at all. In addition, flush_id
+> >> checks are more declarative and contained in inet_gro_flush, thus removing
+> >> the need for flush_id in napi_gro_cb.
+> >>
+> >> This results in less parsing code for UDP flows and non-loop flush tests
+> >> for TCP flows.
+> > 
+> > This moves network layer tests out of the network layer callbacks into
+> > helpers called from the transport layer callback. And then the helper
+> > has to look up the network layer header and demultiplex the protocol
+> > again:
+> > 
+> >     +		if (((struct iphdr *)nh)->version == 6)
+> >     +			flush |= ipv6_gro_flush(nh, nh2);
+> >     +		else
+> >     +			flush |= inet_gro_flush(nh, nh2, p, i != encap_mark);
+> > 
+> > That just seems a bit roundabout.
+> 
+> IMO this commit could be a part of a larger change, where all
+> loops in gro_list_prepare, inet_gro_receive and ipv6_gro_receive can be
+> removed, and the logic for finding a matching p will be moved to L4.  This
+> means that when p is found, the rest of the gro_list would not need to be
+> traversed and thus would not even dirty cache lines at all. I can provide a
+> code snippet which would explain it better.
+
+These loops are exactly the mechanism to find a matching p. Though
+with all the callbacks perhaps not the most efficient model. The
+hashtable should have solved much of that.
+
+Yes, please share a snippet to understand how you would replace this.
+
+In the meantime, I do suggest sending the first two patches to net,
+as they have Fixes tags. And then follow up with this for net-next
+separately.
 
