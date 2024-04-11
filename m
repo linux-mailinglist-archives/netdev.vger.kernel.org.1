@@ -1,296 +1,208 @@
-Return-Path: <netdev+bounces-86789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EDF58A04C9
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 02:28:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F2E8C8A04D2
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 02:32:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71AAC1C218DA
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 00:28:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FF4C1C232ED
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 00:32:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8BBC7F9;
-	Thu, 11 Apr 2024 00:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 042D117F3;
+	Thu, 11 Apr 2024 00:31:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="TNdumgyL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MO1kGFb5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D8BA20
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 00:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712795324; cv=none; b=vBnhRsjiNS1Ts5lseT2CMbbut7Riei1sVegxzmFsOop6Yeo65TMPBY2uEmJtqG6eqtD/fQ9+LXqlbR20LC6KKnJJCiPjvgYIBBZzxQwA8WpQJeQNWMfOxTRTrvbaRfqDEUH7rjwdikkU+4s/OSBE69spJ2gm/GCbYMwtdgvfLYM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712795324; c=relaxed/simple;
-	bh=4hqN+wS2thh+oGDjzTUJI/gyJVxBKcWtbr9FZ40RT0I=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=BibxkR08lk0oA1QIFAEmzpYMRgBCxHgqAf7bApsF8R4ZargI59yvfgc61BkqEFFk1L8NSobFayypgcWOcg10LqiKJr9JYX7d5BWoZ6n5QchlbvBfRu2BcaHYRJxqmHPLVclNmvHZ0mCPPzOw+W9XwWyMqLhFRcHO1+7awBPJNW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=TNdumgyL; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id EE7A540039
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 00:28:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1712795312;
-	bh=F4VCBnCYotDktB/zEPCYvW6FsCRcPbgq+XcEQsCePQo=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=TNdumgyLp/MwevBAQBd1f09PC31XRoafc53TChHj/dD6VdXdP/J3cRsY0CfY/dRix
-	 ZOk80jxiDNkK/8QF23tA2xStc/Y2KQ21GO46L9G30E5106Yjik9CjIbD/ExsTHrBu8
-	 FjebtT21eUbf0RUWvpfRbyyH/ymk1L9ds/jXqlAngJ0HfWJXjCQdBF6t7izKXBACqx
-	 F05MKXZTN1y55bC8rT6JgoYqEXZpSc07zeZRwg182brsb+8uvlfubhlAzyvGUu1f+G
-	 4FGjZfW78cRbEfwII8CqULjeS0pNpt528t7OmNEcsARIBu6dpMNbhBHgL0KLUVw4bE
-	 RX8BLBDxddP6Q==
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-6ecbb44ddc7so6917256b3a.2
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 17:28:32 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712795311; x=1713400111;
-        h=message-id:date:content-transfer-encoding:content-id:mime-version
-         :comments:references:in-reply-to:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=F4VCBnCYotDktB/zEPCYvW6FsCRcPbgq+XcEQsCePQo=;
-        b=ttSPFRpB1uZI9PKEZ0Gw/XMzl+pP2TLuFGRtk8H1yskFnxen//GInXPaqKj8nHd6X8
-         1wvOf83z79KVrzvb2zqOv/RcQp1HouRJ3K7TLjsiM9Cac7atEvO2AC1I0YBXCUtwKd+J
-         985JlMFG12WA84BN+bjlMgN1H8ia5S8VyG1i6sRlRzGJJ1Bn+unsVDgIMsMq5Fdbq3T3
-         8ze7ByNy6pAZcEQ2m3ZVLN9zKxtZjKJOjFzkggcgBzEu1UocHahQtYHijhIPi7rzui3j
-         z4IeTeRElkuredes3PW+QG52otl0YObIaznr5gGIGReVzPdxvrfijuK0Fjj/QIgtVVmH
-         7RrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUtzf/ZgXp+Dg+wUuensBZ6vDzDhNYK0tq171SZYYhCVrxwvUR6uahPLMUqFe8hyw9YNVvcRgOzti8M1n+xDUtVJOmxwbUB
-X-Gm-Message-State: AOJu0Yz1n5P7YBChruxqQBnJTVRV1XgjXyLZCkI0SlCmH/yaEJNAkYFY
-	xIq9cZPoJnxPLLmVaCiNW5OUEj4/MmGGs5epEewzCGtJA2a+85wb8Jezpaz6ikGVbo2LF2aliK7
-	upwqOGugGRKBQApSJm0e+FuZd5GKoF2I4fr0f5GQT9RP+6CyLlE4Aq205CXUs3zuBLuwdlw==
-X-Received: by 2002:a05:6a00:4f90:b0:6ed:21b2:cb17 with SMTP id ld16-20020a056a004f9000b006ed21b2cb17mr4674258pfb.4.1712795311284;
-        Wed, 10 Apr 2024 17:28:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH5/L/uzH+//yIu6fr0UBU0ImWdwTakYCbJxf+PxSkmDm78mD23xQ7PVneRCe4oDKvciIAC+Q==
-X-Received: by 2002:a05:6a00:4f90:b0:6ed:21b2:cb17 with SMTP id ld16-20020a056a004f9000b006ed21b2cb17mr4674238pfb.4.1712795310662;
-        Wed, 10 Apr 2024 17:28:30 -0700 (PDT)
-Received: from famine.localdomain ([50.125.80.253])
-        by smtp.gmail.com with ESMTPSA id p13-20020aa79e8d000000b006ecfd0bf326sm238533pfq.99.2024.04.10.17.28.30
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 10 Apr 2024 17:28:30 -0700 (PDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id DB5BE604B6; Wed, 10 Apr 2024 17:28:29 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id D518C9FA74;
-	Wed, 10 Apr 2024 17:28:29 -0700 (PDT)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-cc: Andy Gospodarek <andy@greyhouse.net>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] bonding: 802.3ad: Avoid packet loss when switching aggregator
-In-reply-to: <20240410175052.25ac7638@samweis>
-References: <20240404114908.134034-1-tbogendoerfer@suse.de> <21529.1712592371@famine> <20240410175052.25ac7638@samweis>
-Comments: In-reply-to Thomas Bogendoerfer <tbogendoerfer@suse.de>
-   message dated "Wed, 10 Apr 2024 17:50:52 +0200."
-X-Mailer: MH-E 8.6+git; nmh 1.6; Emacs 29.0.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05140A48;
+	Thu, 11 Apr 2024 00:31:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712795517; cv=fail; b=DLIMCf3+Zdggfh6OqopVZAgmTdMiV3wZyt6mhsvbbwPrY1ixBjc0jnuXxi3/PfZHOMG16w4PS+5Iu1A4EjQvsIHiXd09on0EhkJHnSX6S1t7M3jPfRppZo+7I9LMY9wuzqX10oD91YtdUmuWISV3r5bo0M1w/y52+VjYUggJ+AQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712795517; c=relaxed/simple;
+	bh=x5wuhtquJcxCkMdGlYscdxhOFW1RG4pRtxvRVVTfCoo=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=UL+BNwzTX9EGnJndAMOx959DgnRiAuUR9itDlc7c+bGjbsdKowXHkjairy5zAHaJtlzNkT7g8JoAvFOUukFwiqd/dhSHORGrTuCE77PGJdvDL6uYOr0UuWMFnfpXP3vjxsUk5t/hnsklPiy65VxfG3HRGi1t6pbsHQpWTR3b1AE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MO1kGFb5; arc=fail smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712795516; x=1744331516;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=x5wuhtquJcxCkMdGlYscdxhOFW1RG4pRtxvRVVTfCoo=;
+  b=MO1kGFb5qMem+g8M6tBA0zS8n2/zTI8x5582nccY5LmVyhDiuIEhMlKK
+   s4h2tquKH2cXNDu/eLj26tWN8GyAaiPNynSup4tyGBRbHfrHGwNdqloKm
+   LrwqDYjT8367ZAQGEw+5/m9jDKDrD4T4/DLEpnxphJQVmiPx16Fm150aC
+   UqS9Y7UsKHlbd2fwoCsP9PUsRuI1mf44AbzsslAL4KyFKBYOXEO6YuEOh
+   KVpSI0uJlxeNZN638IR0l09JIlfSTwgp7qLKNi+MP5zV5/ATxNU3QNVEs
+   87FnRnWKGAVmGvGiXkOTBp1gxMaMAx5e16RuYdwH4qmZyMuzjDnpgMi2g
+   w==;
+X-CSE-ConnectionGUID: BQ1DyhZAQEy79u1FbCv5yw==
+X-CSE-MsgGUID: XfQ9xf3/RdaoKg5oLO5GTg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11039"; a="8043675"
+X-IronPort-AV: E=Sophos;i="6.07,191,1708416000"; 
+   d="scan'208";a="8043675"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Apr 2024 17:31:55 -0700
+X-CSE-ConnectionGUID: zm5e09awSluMpV+ZOKvadA==
+X-CSE-MsgGUID: 4ndKYWu7QcOcHVL2fDZnaw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,191,1708416000"; 
+   d="scan'208";a="20734063"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Apr 2024 17:31:55 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 10 Apr 2024 17:31:54 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 10 Apr 2024 17:31:54 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 10 Apr 2024 17:31:54 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aMoLXGh5mNNcNM3wEapbE7SGRg+Ma6X9wf7EACG/cnBSNwVfum1EEd1HETPcT/lGxsHDEyZJnDYmg9QzscTBBri1WiECrwwjIk6FCghvwNGAcwWOh9ZLAaKWLQO9GwqsvLanByei+GBEZ65Ta3EDsjOyt4Gaqf55KUKe7IQSFxw4puz6Gy7DpcBEgfP0X31w9y+ByMiQKrhGqhh0wUW4oBAC3ULbW7ugtmAB8hKWCOUJS6E7/Frirxan7d5XQNHFWCix35Yl0PageTkpKYemXZJt6nIS65BIUfjZzAN0enC72mGoZcaFD6BusdmQAp0Z6KZ+PWbwzO2U4D6Hxuc0Tg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SGM3WIFPYEKJrKI+00eblX7QlamtfnJ72iCxQEGgd0s=;
+ b=Ijf4QYf6GLBHzdByVsswg6QulCmWuXBIQB6PpIybUcfuvD3aXl84hNZrlI3yFNwVqfjGNK+4KGB5SF47ypSKXWcfhzNOGTtx2FIvz1MWMQhJEjdc+QsYbn+Y2Gfu8OCGpX/sa7NSBDLiTqUNSyB53zvyrik0Q2MHBn8SppmnG/GcafRHjaDwqFYUwVr1m14AAdnRLjLtf5rW14xxZ1oXzJG9+AWib5drmnpgXWJKzNxIRFRLyhxXFlbm/bm42r0X8rJsMTSSwWbLw8o2bEPxkDDEtazXKY95ja1SXHnN6r14EY0h+zc6YnCoXptW1O+rjfLyn3ijVuX2cIzjG66mkg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by DM4PR11MB6334.namprd11.prod.outlook.com (2603:10b6:8:b5::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26; Thu, 11 Apr
+ 2024 00:31:52 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::b383:e86d:874:245a]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::b383:e86d:874:245a%5]) with mapi id 15.20.7452.019; Thu, 11 Apr 2024
+ 00:31:52 +0000
+Message-ID: <06e02e6e-71a1-4966-8fd2-0151e358e465@intel.com>
+Date: Wed, 10 Apr 2024 17:31:50 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Jiri Pirko <jiri@resnulli.us>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+	<pabeni@redhat.com>, John Fastabend <john.fastabend@gmail.com>, "Alexander
+ Lobakin" <aleksander.lobakin@intel.com>, Florian Fainelli
+	<f.fainelli@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, Edward Cree
+	<ecree.xilinx@gmail.com>, Alexander Duyck <alexander.duyck@gmail.com>,
+	<netdev@vger.kernel.org>, <bhelgaas@google.com>, <linux-pci@vger.kernel.org>,
+	Alexander Duyck <alexanderduyck@fb.com>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <20240409135142.692ed5d9@kernel.org>
+ <6615adbde1430_249cf52944@willemb.c.googlers.com.notmuch>
+ <ZhY_MVfBMMlGAuK5@nanopsycho>
+ <885f0615-81e8-4f1f-9e97-b82f4d9509d3@intel.com>
+ <6a775533-bd50-4f57-85f7-125c107bd77a@lunn.ch>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <6a775533-bd50-4f57-85f7-125c107bd77a@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR04CA0182.namprd04.prod.outlook.com
+ (2603:10b6:303:86::7) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <20446.1712795309.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 10 Apr 2024 17:28:29 -0700
-Message-ID: <20447.1712795309@famine>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DM4PR11MB6334:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: uIoWE8MaHZvM53gBnHFZJ/8Sgx3mmrJGSA7kcJf4T6MW/tCmRQLU4aCItJ6JNk6QBdJS5wdzseZ6hezGASJ2J3rO5s33sdXEMrl1+yckYXygH0eLIz+PsdntPhLTqLZ7g4ZupXB+M8HQdxp+Si2FyIueJAHfU6dxeEqbKqR42OHcVTCHVeM1OBLKal+2MM443b+bHp+p/Z68YiCZZbGqcdLstaxPTB0lj5TrGyND0szaVT1gbosox3EjaXAiIskVCovEp+ngi3aKPhAf2Zg75MBgnbbUWxxi6xQFCsl2U7pSV1ZzKoblQeZ1xZYxaDVC5WS0jZjoI/GHi2lwV/PuPn0kavMVo05fG/+FWt2U5Bqr4qCrK/9G6qkjQtJp8C/IgVEuQ59d0Jbjrxat1ASVMsB/xb3tZ/iXTRfl4mzLiyegwujz7f7brOJ0v1x0b7/bEpbBA0I518oJ9sOZtzFe39Gj/N+GN0iX/ciGdXLm3bqV85OdMeKCmxh+x4cF5e5yGlgkZUw7mqgslMnVO4HlUi2hWk3H0voIJ/GA26cSnkOwoUtEZrfdqgLLvZOqzgrsMjmbt5pCZ4zWeADFSiAjyscYdtbadLanBjAN7k1WqLTIFQnxr588f1m2TK3mhTiPewH6M3UMmAZlwBKTntAQR1PljfPp9RuafMG+OYTgVX4=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(7416005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?L0NrbVZucVZFVmI5a2dTL2NZQ2xERnJzQ3BQOTJJVkxzTVljYndEMDJCRnpZ?=
+ =?utf-8?B?VUwzcHZZR255WnIydzFQc0M3a3NQenZGL3lNeHBvb0VDWDMrZWtrSGVReUtY?=
+ =?utf-8?B?Vnd0SVJqNml2SXpuOEZHZVZVWkY3YmZjSjVOWk1pN2lURW9uVEZIRzdrUUJF?=
+ =?utf-8?B?Y3Ztc094ZmhSVkVDRURuMythQ0xCSE9KcTJqdkZrUGU5dXYrdXZzSWNMdXhF?=
+ =?utf-8?B?UnpXTVRLODFJMVpvSWRidStEVFJ0aU0yZzVIS0p5MGJ4czhyYk1odlVXWDRR?=
+ =?utf-8?B?bzhraW5tN0d6R2xmcklxMzgweXhWK1F4R2kxZGR4eUw2OFk3UFV6ZTIvVFhP?=
+ =?utf-8?B?NWRISUVHZlQ2ak9lbkU5ZHlaSjJyVzhJQWtvU2N0TVgrWjdJaGZrTElSMUZ5?=
+ =?utf-8?B?TXBCanprMWtTckpqM0Q5YlA1dTdFaS9sRXMwTEpIaXVldG4xa2gvREJKK21a?=
+ =?utf-8?B?cWZSMkxvaVFEeW0wdDAza21mUHVUeVVaQVd2VkNIakVNQkswa3MvT3A4Yjk1?=
+ =?utf-8?B?QlpPMlN4VHhibmthdmt3QldSU29iamZjUzVWTXV2bWJCRlFvNWxEVnh5YzV6?=
+ =?utf-8?B?SG1pdHVQWU5TcjUvR2lHS3NNUVViSjRzalZXMjlPNWlCNGw1anU0WVhRRzhH?=
+ =?utf-8?B?dEZWemdpSSt4YXpWRFBzZlVibkdQS3ltS0YrVnduam1INitlQmdWQlFXQVBI?=
+ =?utf-8?B?anZBN0ZOVGZscFF5bjh4cUUyeGFYcGp3ZDBhRks1Q0tKS09Gb1h3c0xLcXY2?=
+ =?utf-8?B?a0tKT3pRbUtoQVlVNythZ0ZBUUlKMEoyUWVvZ3NkbkVhd0xsTnRzQlJYcnBC?=
+ =?utf-8?B?TitjVUM2dkk3czJ3emhTdEwzZmo5amVhejlQNGJlL0tvZTBjVC9lSU5qdW1T?=
+ =?utf-8?B?Q1hKZHFZbWJBRlRVdHVsaEdTLzREZHlxdTRvME1SMFppeEtJTzVMY3lSN3hi?=
+ =?utf-8?B?elpYMzdLa25yTjdjRnVvaHZZQUwvU1JqYTZLdFpsZ1k3NVJwVGVUOGlHMkdo?=
+ =?utf-8?B?YVgzRXdMenJFTDhucW5GOGtLZU9mQWRDTGYvL2NnVWRGRit5RllsbHl0SEg1?=
+ =?utf-8?B?UjFXSDRIMVBOYkF5Rm1VWktHOGt2dFg5bHZpdnhwNk9pa0VpQnFSNFFtUnFX?=
+ =?utf-8?B?dTU0aTNXdTdpZzZ2cHBVZmRNdkdRZnU1QUNhNXNsQ0hId3Z4ZEdsMVF1TytN?=
+ =?utf-8?B?dGVwSXVrMzRtM3pOdkVSTzRLY0dIbENjY1B1Y0I5czk0c2JmaFVxMVlyWWs2?=
+ =?utf-8?B?STFsaTVMQWZpYWw0bWFyV2gxMUhsN1pUaExod2NOanNvVExqdUJ4VWJ5S1Mw?=
+ =?utf-8?B?Z2EzOWQ0UWtibmZhZjhKNnJHZnVsdlBpQlpsQlNILzRETUNMNzBYOXNHUlY3?=
+ =?utf-8?B?RUhmbEExcU9ucWpiUmczVmNHVERFNkxFRENBVHlzWVRhWDhSSVJuZjR2ZnFi?=
+ =?utf-8?B?VU1QYlU0LzZ3YThxdXVLUHpwaWZTQXlIQ2M3OG5WTGtCZlpVcGMzTW1WR0lW?=
+ =?utf-8?B?Z3hmNUZTWnpSaHZZdmlJS2hFMjRzMjJwc3h4UFpUY0tjZlltS21McVRXSXBK?=
+ =?utf-8?B?UlBYZzQ4Mkc2Z1Z3NzJVYTQ5WSthV05aeWVyZlUxWlBxcU1pUVF5YXdRejF3?=
+ =?utf-8?B?d3J0UlhjYjBHQ01VRGU0bDhFeVpZL0QwaUgrMk53UEtYRDBzRktHWHZ6NXhE?=
+ =?utf-8?B?VENGNkZITUJZMFo2cXpRTmRQeEU4UkE0dlZTOWFBU1dTUzI0Q2JURkwyU3Yy?=
+ =?utf-8?B?R1dxWEg0NVlzcGdjaitDTFlQNGdLWFQ1Q1JTdm1GSGJEa2JUSE1zc1RqYW9G?=
+ =?utf-8?B?SnB1SVZPcXBIbGVFVjlyY0pRd1RPMTZ2aEEvNkozc01ub1ExVm9JYWRrTDlv?=
+ =?utf-8?B?WGRGLzcycE5USW9wa0tIbnF3dHpxM2YwY2ttMFBkbytralgzc3A2OHI1Zk45?=
+ =?utf-8?B?R1FOcnQ3OThIZXYxVm14U1dwZytvRHh6c2pxZDM5SGV0QldRMHhXOXdYUGEz?=
+ =?utf-8?B?RzVOSFFGOHVuS0ZSWGhLRDZoczdqMFMzTUZBeWRDdFppT0ZCTFR4QWNONHdk?=
+ =?utf-8?B?WlI0M1RrVHRydmhscVNMOG80Z1VqbHVtbHFSMlFNOFdMMHA3dk9ZNngvRTkr?=
+ =?utf-8?B?V1FsaWVIRUZwaW5JS3JCdWEyajdZQzMwMytrcG5uYWx6UnJGeHF5c3c3ZlJk?=
+ =?utf-8?B?eFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 13871f7a-d6d8-41ed-18f1-08dc59bec86e
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Apr 2024 00:31:52.2455
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: HthbnrQn7ffqPn9XLlarNIuDOkncBHYA3B2eKDMKAaUIEru9XgrYUKbpO8XQ9R9kS+IU4Q5EsXCRLzxrO9mz3DJBbV+xUsUN8cyCy9ywP5c=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6334
+X-OriginatorOrg: intel.com
 
-Thomas Bogendoerfer <tbogendoerfer@suse.de> wrote:
 
->On Mon, 08 Apr 2024 09:06:11 -0700
->Jay Vosburgh <jay.vosburgh@canonical.com> wrote:
->
->> Thomas Bogendoerfer <tbogendoerfer@suse.de> wrote:
->> =
 
->> >If selection logic decides to switch to a new aggregator it disables
->> >all ports of the old aggregator, but doesn't enable ports on
->> >the new aggregator. These ports will eventually be enabled when
->> >the next LACPDU is received, which might take some time and without an
->> >active port transmitted frames are dropped. Avoid this by enabling
->> >already collected ports of the new aggregator immediately.
->> >
->> >Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
->> >---
->> > drivers/net/bonding/bond_3ad.c | 7 +++++++
->> > 1 file changed, 7 insertions(+)
->> >
->> >diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond=
-_3ad.c
->> >index c6807e473ab7..529e2a7c51e2 100644
->> >--- a/drivers/net/bonding/bond_3ad.c
->> >+++ b/drivers/net/bonding/bond_3ad.c
->> >@@ -1876,6 +1876,13 @@ static void ad_agg_selection_logic(struct aggre=
-gator *agg,
->> > 				__disable_port(port);
->> > 			}
->> > 		}
->> >+
->> >+		/* enable ports on new active aggregator */
->> >+		for (port =3D best->lag_ports; port;
->> >+			port =3D port->next_port_in_aggregator) {
->> >+			__enable_port(port);
->> >+		}
->> >+  =
+On 4/10/2024 3:19 PM, Andrew Lunn wrote:
+>> I think its good practice to ensure multiple vendors/drivers can use
+>> whatever common uAPI or kernel API exists. It can be frustrating when
+>> some new API gets introduced but then can't be used by another device..
+>> In most cases thats on the vendors for being slow to respond or work
+>> with each other when developing the new API.
+> 
+> I tend to agree with the last part. Vendors tend not to reviewer other
+> vendors patches, and so often don't notice a new API being added which
+> they could use, if it was a little bit more generic. Also vendors
+> often seem to focus on their devices/firmware requirements, not an
+> abstract device, and so end up with something not generic.
+> 
+> As a reviewer, i try to take more notice of new APIs than most other
+> things, and ideally it is something we should all do.
+> 
+> 	 Andrew
+> 
+> 
+> 
 
->> =
-
->> 	I think this will do the wrong thing if the port in question is
->> not in a valid state to send or receive (i.e., it is not one of
->> COLLECTING_DISTRIBUTING, COLLECTING, or DISTRIBUTING).
->> =
-
->> =
-
->> 	As it happens, this situation, except for the case of individual
->> ports, is handled just below this code:
->> =
-
->> 	/* if the selected aggregator is of join individuals
->> 	 * (partner_system is NULL), enable their ports
->> 	 */
->> 	active =3D __get_active_agg(origin);
->> =
-
->> 	if (active) {
->> 		if (!__agg_has_partner(active)) {
->> 			for (port =3D active->lag_ports; port;
->> 			     port =3D port->next_port_in_aggregator) {
->> 				__enable_port(port);
->> 			}
->> 			*update_slave_arr =3D true;
->> 		}
->> 	}
->> =
-
->> 	rcu_read_unlock();
->> =
-
->> 	FWIW, looking at it, I'm not sure that "__agg_has_partner" is
->> the proper test for invididual-ness, but I'd have to do a bit of poking
->> to confirm that.  In any event, that's not what you want to change righ=
-t
->> now.
->> =
-
->> 	Instead of adding another block that does more or less the same
->> thing, I'd suggest updating this logic to include tests for C_D, C, or =
-D
->> states, and enabling the ports if that is the case.  Probably something
->> like (I have not tested or compiled this at all):
->> =
-
->> 	if (active) {
->> 		if (!__agg_has_partner(active)) {
->> 			[ ... the current !__agg_has_partner() stuff ]
->> 		} else {
->
->moving it here will run this part on every call of ad_agg_selection_logic=
-(),
->but it would be only relevant, if there is a switch to a different aggreg=
-ator.
-
-	True; that could be tested for, though, as the original
-aggregator is stored in the variable "origin".  This is probably moot in
-light of my comments below.
-
->> 			for (port =3D active->lag_ports; port;
->> 			     port =3D port->next_port_in_aggregator) {
->> 				switch (port->sm_mux_state) {
->> 				case AD_MUX_DISTRIBUTING:
->> 				case AD_MUX_COLLECTING_DISTRIBUTING:
->> 					ad_enable_collecting_distributing(port,
->> 							update_slave_arr);
->> 					port->ntt =3D true;
->> 					break;
->> 				case AD_MUX_COLLECTING:
->> 					ad_enable_collecting(port);
->> 					ad_disable_distributing(port, update_slave_arr);
->> 					port->ntt =3D true;
->> 					break;
->> 				default:
->> 					break;
->> 		}
->
->I've tried this in my test environment and it doesn't fixed the issue
->I'm seeing, because the port of the new aggregator is still in AD_MUX_WAI=
-TING...
->
->The issue is that after bringing the bond up it happens that the bond lin=
-k
->is up, but no slave can transmit. This happens exactly when the aggregato=
-r
->is changed due to timing of the received lacpdu. So if enabling the port
->in AD_MUX_WAITING is wrong, what are other ways to fix this problem ?
-
-	Ok, I've looked through the code a bit more and I understand at
-least some of what's going on.  I recall testing this some years ago to
-insure that failover between aggregators functions correctly, although I
-don't recall looking into loss rates during the failover.
-
-	First, I'm not sure why your port is in WAITING state, unless
-it's simply that your test is happening very quickly after the port is
-added to the bond.  The standard (IEEE 802.1AX-2014 6.4.15) requires
-ports to remain in WAITING state for 2 seconds when transitioning from
-DETACHED to ATTACHED state (to limit thrashing when multiple ports are
-added in a short span of time).
-
-	You mention the issue happens when the aggregator changes; do
-you have a detailed sequence of events that describe how the issue is
-induced?
-
-	I also see a potential issue in the handling of READY_N and
-READY, although I'd need your test case to determine if it's an actual
-problem or just something that looks odd but behaves correctly.
-
-	As for the rest, if your issue revolves around failover between
-aggregators in an established bond, then I'd expect the ports to remain
-in ATTACHED state when their aggregator is not the active aggregator, as
-the state machine logic in ad_mux_machine() won't advance beyond
-ATTACHED state in this case, e.g.,
-
-static void ad_mux_machine(struct port *port, bool *update_slave_arr)
-{
-[...]
-		case AD_MUX_ATTACHED:
-[...]
-				if (port->aggregator->is_active) {
-					int state =3D AD_MUX_COLLECTING_DISTRIBUTING;
-
-	When an aggregator's ports move to COLLECTING, DISTRIBUTING or
-COLLECTING_DISTRIBUTING state, the link partner will logically expect
-that it may send and receive traffic across the ports in the aggregator.
-The standard permits an arbitrary number of aggregators to be active
-simultaneously, but bonding isn't able to operate more than one
-aggregator at a time within the context of a single bonding interface.
-
-	If this is the crux of the problem, we could potentially change
-the state machine logic to run the complete state machine on all ports.
-This would need to insure that the "inactive" flag logic works correctly
-if ports of an inactive aggregator are in C, D or C_D state.  This
-should operate similarly to how the inactive bond interfaces are treated
-in active-backup mode.  The LACPDU packets should already be passed
-through by bond_handle_frame(), so the question would really be whether
-ordinary traffic is handled correctly on the inactive aggregators.
-
-	I think the main code change would largely be removing most or
-all of the tests (like the sample above) against aggregator->is_active
-in ad_mux_machine(), ad_enable_collecting(), and
-ad_enable_collecting_distributing().  I haven't tested this at all, this
-is just my speculation from looking at the code.
-
-	-J
-
----
-	-Jay Vosburgh, jay.vosburgh@canonical.com
+Agreed. It can be challenging when you're in the vendor space though, as
+you get handed priorities.
 
