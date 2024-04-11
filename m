@@ -1,195 +1,244 @@
-Return-Path: <netdev+bounces-86927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECF488A0D26
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:00:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DB998A0E13
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:10:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C5A61C212DB
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:00:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF55F1F2180C
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 10:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7498145323;
-	Thu, 11 Apr 2024 10:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZlB7w+A0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3FF414600E;
+	Thu, 11 Apr 2024 10:10:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mxct.zte.com.cn (mxct.zte.com.cn [58.251.27.85])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2FFE2EAE5
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 10:00:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5A8145B26;
+	Thu, 11 Apr 2024 10:10:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=58.251.27.85
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712829650; cv=none; b=eYrvPotdc84Nq2Xl9F50yVaMp/L2pfC61iNSdFB1ppvSEuAXX2rG2ODbWg3xm3vU76v/i7BT/HzkD9lYwHggADD8k5hChEqLbTrk81u2cxVPgsqExXD6cTwP/H30ovOeI8dZR6Gd2enjVF+plkAwbiy1SjaQ3ak5gA0PrCsyGBw=
+	t=1712830243; cv=none; b=CwuwJT5mM+RI0UfZ0lplnBwHb7vUvJnRJSKHFhAb36H0igR75x4HGbzGFclcOUUTE8vVZrGOBDD2I08KC3+Ikmg4BOfz/O+MzgA2lJOWZoPyxVly6ebeGoqyi/cdR+AvwG7EP0/wzjdh5mbF8ZIoGFtPp+igOlNDqSQc/aodc9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712829650; c=relaxed/simple;
-	bh=3EmwNd2x+X34BSWGzOFdFW4U4J1q0hSXrmCHKXd9PRo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kRtFCVwLqaUMKIap2zc84nte7Gw1oAMsu7B+s8h/tikYODAbmGY814ePVyr14bUe01R9LH7FCHT71GQ3vpjWqnNhNQf8p1OMLRD0cYPuaq/+wGfw7T3v9b5xIByD7V4qq4qnPDpJ/FVXM0lW44aOf9XSkt/EsBke+S4QsROCjNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZlB7w+A0; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-56e37503115so5806623a12.1
-        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 03:00:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712829647; x=1713434447; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GOdB4x8afbnVlYVCM2wbaCRzbxId+WgzI5n5to5Qn6M=;
-        b=ZlB7w+A0r9tdNCuZIHqyMsiP3IMsk7LmGzbmmfA7pwcV42vNeybPSdKK/nikFnI8PF
-         CesjvJkviK2/bOWJZIveBqaKTv0TV2eVUeoNr4yWPqwIu+QzhwvBs0haQwB9oirmMtYI
-         1GQ9Zfwv8SYwO9jihxH00BSeH3XX9bhZ+BEsd/h/ox1dQi5NS1Q13dh365U1v/r1MOlf
-         HkZurIKFZqDvXruttGh0mPNMBfM2tKnPtqNvyOunr5twHhoIWRxwJR23+KlgjYgvBxSd
-         7pG8CDDMJ/Hwx3PLqyln7dWAsMwTmLYmM2jz40MxzP/Zp5fGj+WV/+Y4XTFFRXt0D/mI
-         RwVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712829647; x=1713434447;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GOdB4x8afbnVlYVCM2wbaCRzbxId+WgzI5n5to5Qn6M=;
-        b=XWBdWmIrmLxM0nDgYd+Pfg+q585J5IshN5rlhPxAxNwsjhGN11VI+kqYPz3ysbqxwl
-         zB+NWObbppVe1nB8QynvN/EnAIiTszhuCG4hXEjRKtdkW1BOTkmSxXN71mS38pZ8zMKb
-         BY7ZQwtd3dHsqTYPco69mNLenccjg8tDB/HZEGs3VRc7MBULMvA/c9t1Sq8rwHaSlmKI
-         1b627bpUyFbdj0eIoyHMwluOV+63w/5CJkEa8M24McvPk3UWRhz8hAvdlIrZ7F0oTqnl
-         7/jwyXKa1GN44WC/HRlGVpJUaCOiTyfXJSs+e8bGeoZDtZa/xRlrYgFgCixy7RhH+JMN
-         5wDw==
-X-Forwarded-Encrypted: i=1; AJvYcCWbgxh6SvqiO/HIwxFAW7t3sBI4mCVrX+y9Kt9LADVAoXqO7l1efBVPSlv1FlMuQJD8FoDL/odyoKMld15yoPZOjLvEGHAD
-X-Gm-Message-State: AOJu0YyYTwF0hJjUeEDBxKQH60Q+UrEwFoAeeMlvxt54xir8BVyKe4EW
-	yPtIZ3GMXiVN8d0fvgqbuDXmy0JWsa1sjp1HFKS98Z0Ll1e9hg0gQqcMI1xZpi5ZqjSxnzG+A8K
-	EVwEh9xh3cFWWG6h1PN1Ye5tJ3ME=
-X-Google-Smtp-Source: AGHT+IGN5e1TtN3ujvsVdXPCw6YArdN4+GZpOAb428Jybeitg709LBNMDGHxcwQh6V07m3mXIDQ6gbTYbhMAmYbe0EQ=
-X-Received: by 2002:a17:906:b2d8:b0:a4e:a7a:84e0 with SMTP id
- cf24-20020a170906b2d800b00a4e0a7a84e0mr3018903ejb.34.1712829646940; Thu, 11
- Apr 2024 03:00:46 -0700 (PDT)
+	s=arc-20240116; t=1712830243; c=relaxed/simple;
+	bh=lFToQwuD0CN2lHHGhV5ThRLUedjbbjOz8kojfzH5ZY8=;
+	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=RMr9OqfNpu/uLgS+wZJrbRPe6qV0lkEqwZiE7YJWFR5wgDx6UAaNw1CopavCGUNxOpUDhygsjmIKf1QecrPjzyP0ZcgSg1grLslJOI+gI1ejqqKhnNXH15RnSxbh732c0IOVABxNdFAHlkjwVGbLxaZKKKhcIUHngesWYvqwQYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=58.251.27.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
+Received: from mxde.zte.com.cn (unknown [10.35.20.165])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mxct.zte.com.cn (FangMail) with ESMTPS id 4VFZxL1t7mzBmrW;
+	Thu, 11 Apr 2024 18:02:14 +0800 (CST)
+Received: from mxhk.zte.com.cn (unknown [192.168.250.138])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mxde.zte.com.cn (FangMail) with ESMTPS id 4VFZxF0sXYz63t5D;
+	Thu, 11 Apr 2024 18:02:09 +0800 (CST)
+Received: from mse-fl2.zte.com.cn (unknown [10.5.228.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4VFZx42y5Nz6G42d;
+	Thu, 11 Apr 2024 18:02:00 +0800 (CST)
+Received: from xaxapp03.zte.com.cn ([10.88.97.17])
+	by mse-fl2.zte.com.cn with SMTP id 43BA1qk5093269;
+	Thu, 11 Apr 2024 18:01:52 +0800 (+08)
+	(envelope-from xu.xin16@zte.com.cn)
+Received: from mapi (xaxapp02[null])
+	by mapi (Zmail) with MAPI id mid32;
+	Thu, 11 Apr 2024 18:01:54 +0800 (CST)
+Date: Thu, 11 Apr 2024 18:01:54 +0800 (CST)
+X-Zmail-TransId: 2afa6617b512ffffffffdde-7c4e3
+X-Mailer: Zmail v1.0
+Message-ID: <20240411180154691lpBFKqpsU4tf1vugPPIqq@zte.com.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240411032450.51649-1-kerneljasonxing@gmail.com>
- <CANn89i+2XdNxYHFNwC5LHupT3je1EaZXMxMJG9343ZO9vCzAsg@mail.gmail.com>
- <CAL+tcoC2FW2_xp==NKATKi_QW2N2ZTB1UVPadUyECgYxV9jXRQ@mail.gmail.com>
- <CANn89i+6gWXDpnwM9aFtP_d_oTfQRDJdu+VMoDtvVcDrzBM_JA@mail.gmail.com>
- <CAL+tcoAZYeFsoPEFvWSFUTezofpkvwzggJd9zp81yTAy4PVOpw@mail.gmail.com> <fe6f2325-7454-413e-acba-b3c5f3313dfe@intel.com>
-In-Reply-To: <fe6f2325-7454-413e-acba-b3c5f3313dfe@intel.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 11 Apr 2024 18:00:09 +0800
-Message-ID: <CAL+tcoAf1FyqEsM-u-shGaE2FUQO_di6e63md_DYmFLWxXe3ew@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: save some cycles when doing skb_attempt_defer_free()
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Eric Dumazet <edumazet@google.com>, pablo@netfilter.org, kuba@kernel.org, 
-	pabeni@redhat.com, davem@davemloft.net, horms@kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+From: <xu.xin16@zte.com.cn>
+To: <edumazet@google.com>, <davem@davemloft.net>, <kuba@kernel.org>
+Cc: <rostedt@goodmis.org>, <mhiramat@kernel.org>, <dsahern@kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <yang.yang29@zte.com.cn>,
+        <xu.xin16@zte.com.cn>, <he.peilin@zte.com.cn>, <liu.chun2@zte.com.cn>,
+        <jiang.xuexin@zte.com.cn>, <zhang.yunkai@zte.com.cn>,
+        <kerneljasonxing@gmail.com>, <fan.yu9@zte.com.cn>,
+        <qiu.yutan@zte.com.cn>
+Subject: =?UTF-8?B?W1BBVENIIG5ldC1uZXh0IHY1XSBuZXQvaXB2NDogYWRkIHRyYWNlcG9pbnQgZm9yIGljbXBfc2VuZA==?=
+Content-Type: text/plain;
+	charset="UTF-8"
+X-MAIL:mse-fl2.zte.com.cn 43BA1qk5093269
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 6617B525.000/4VFZxL1t7mzBmrW
 
-On Thu, Apr 11, 2024 at 5:13=E2=80=AFPM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> From: Jason Xing <kerneljasonxing@gmail.com>
-> Date: Thu, 11 Apr 2024 15:31:23 +0800
->
-> > On Thu, Apr 11, 2024 at 3:12=E2=80=AFPM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> >>
-> >> On Thu, Apr 11, 2024 at 8:33=E2=80=AFAM Jason Xing <kerneljasonxing@gm=
-ail.com> wrote:
-> >>>
-> >>> On Thu, Apr 11, 2024 at 1:27=E2=80=AFPM Eric Dumazet <edumazet@google=
-.com> wrote:
-> >>>>
-> >>>> On Thu, Apr 11, 2024 at 5:25=E2=80=AFAM Jason Xing <kerneljasonxing@=
-gmail.com> wrote:
-> >>>>>
-> >>>>> From: Jason Xing <kernelxing@tencent.com>
-> >>>>>
-> >>>>> Normally, we don't face these two exceptions very often meanwhile
-> >>>>> we have some chance to meet the condition where the current cpu id
-> >>>>> is the same as skb->alloc_cpu.
-> >>>>>
-> >>>>> One simple test that can help us see the frequency of this statemen=
-t
-> >>>>> 'cpu =3D=3D raw_smp_processor_id()':
-> >>>>> 1. running iperf -s and iperf -c [ip] -P [MAX CPU]
-> >>>>> 2. using BPF to capture skb_attempt_defer_free()
-> >>>>>
-> >>>>> I can see around 4% chance that happens to satisfy the statement.
-> >>>>> So moving this statement at the beginning can save some cycles in
-> >>>>> most cases.
-> >>>>>
-> >>>>> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> >>>>> ---
-> >>>>>  net/core/skbuff.c | 4 ++--
-> >>>>>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>>>>
-> >>>>> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> >>>>> index ab970ded8a7b..b4f252dc91fb 100644
-> >>>>> --- a/net/core/skbuff.c
-> >>>>> +++ b/net/core/skbuff.c
-> >>>>> @@ -7002,9 +7002,9 @@ void skb_attempt_defer_free(struct sk_buff *s=
-kb)
-> >>>>>         unsigned int defer_max;
-> >>>>>         bool kick;
-> >>>>>
-> >>>>> -       if (WARN_ON_ONCE(cpu >=3D nr_cpu_ids) ||
-> >>>>> +       if (cpu =3D=3D raw_smp_processor_id() ||
-> >>>>>             !cpu_online(cpu) ||
-> >>>>> -           cpu =3D=3D raw_smp_processor_id()) {
-> >>>>> +           WARN_ON_ONCE(cpu >=3D nr_cpu_ids)) {
-> >>>>>  nodefer:       kfree_skb_napi_cache(skb);
-> >>>>>                 return;
-> >>>>>         }
-> >>>>
-> >>>> Wrong patch.
-> >>>>
-> >>>> cpu_online(X) is undefined and might crash if X is out of bounds on =
-CONFIG_SMP=3Dy
-> >>>
-> >>> Even if skb->alloc_cpu is larger than nr_cpu_ids, I don't know why th=
-e
-> >>> integer test statement could cause crashing the kernel. It's just a
-> >>> simple comparison. And if the statement is true,
-> >>> raw_smp_processor_id() can guarantee the validation, right?
-> >>
-> >> Please read again the code you wrote, or run it with skb->alloc_cpu
-> >> being set to 45000 on a full DEBUG kernel.
-> >>
-> >> You are focusing on skb->alloc_cpu =3D=3D raw_smp_processor_id(), I am
-> >> focusing on what happens
-> >> when this condition is not true.
-> >
-> > Sorry. My bad. I put the wrong order of '!cpu_online(cpu)' and 'cpu >=
-=3D
-> > nr_cpu_ids'. I didn't consider the out-of-bound issue. I should have
-> > done more checks :(
-> >
-> > The correct patch should be:
-> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > index ab970ded8a7b..6dc577a3ea6a 100644
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -7002,9 +7002,9 @@ void skb_attempt_defer_free(struct sk_buff *skb)
-> >         unsigned int defer_max;
-> >         bool kick;
-> >
-> > -       if (WARN_ON_ONCE(cpu >=3D nr_cpu_ids) ||
-> > -           !cpu_online(cpu) ||
-> > -           cpu =3D=3D raw_smp_processor_id()) {
-> > +       if (cpu =3D=3D raw_smp_processor_id() ||
-> > +           WARN_ON_ONCE(cpu >=3D nr_cpu_ids) ||
-> > +           !cpu_online(cpu)) {
->
-> This one looks good to me.
-> Feel free to add
->
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
->
-> To your v2 before sending.
+From: hepeilin <he.peilin@zte.com.cn>
+Introduce a tracepoint for icmp_send, which can help users to get more
+detail information conveniently when icmp abnormal events happen.
 
-Thanks! I will:)
+1. Giving an usecase example:
+=============================
+When an application experiences packet loss due to an unreachable UDP
+destination port, the kernel will send an exception message through the
+icmp_send function. By adding a trace point for icmp_send, developers or
+system administrators can obtain detailed information about the UDP
+packet loss, including the type, code, source address, destination address,
+source port, and destination port. This facilitates the trouble-shooting
+of UDP packet loss issues especially for those network-service
+applications.
+
+2. Operation Instructions:
+==========================
+Switch to the tracing directory.
+        cd /sys/kernel/tracing
+Filter for destination port unreachable.
+        echo "type==3 && code==3" > events/icmp/icmp_send/filter
+Enable trace event.
+        echo 1 > events/icmp/icmp_send/enable
+
+3. Result View:
+================
+ udp_client_erro-11370   [002] ...s.12   124.728002:
+ icmp_send: icmp_send: type=3, code=3.
+ From 127.0.0.1:41895 to 127.0.0.1:6666 ulen=23
+ skbaddr=00000000589b167a
+
+v4->v5:
+Some fixes according to
+https://lore.kernel.org/all/CAL+tcoDeXXh+zcRk4PHnUk8ELnx=CE2pcCqs7sFm0y9aK-Eehg@mail.gmail.com/
+1.Adjust the position of trace_icmp_send() to before icmp_push_reply().
+
+v3->v4:
+Some fixes according to
+https://lore.kernel.org/all/CANn89i+EFEr7VHXNdOi59Ba_R1nFKSBJzBzkJFVgCTdXBx=YBg@mail.gmail.com/
+1.Add legality check for UDP header in SKB.
+2.Target this patch for net-next.
+
+Changelog
+========
+v2->v3:
+Some fixes according to
+https://lore.kernel.org/all/20240319102549.7f7f6f53@gandalf.local.home/
+1. Change the tracking directory to/sys/kernel/tracking.
+2. Adjust the layout of the TP-STRUCT_entry parameter structure.
+
+v1->v2:
+Some fixes according to
+https://lore.kernel.org/all/CANn89iL-y9e_VFpdw=sZtRnKRu_tnUwqHuFQTJvJsv-nz1xPDw@mail.gmail.com/
+1. adjust the trace_icmp_send() to more protocols than UDP.
+2. move the calling of trace_icmp_send after sanity checks
+in __icmp_send().
+
+Signed-off-by: Peilin He<he.peilin@zte.com.cn>
+Reviewed-by: xu xin <xu.xin16@zte.com.cn>
+Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
+Cc: Yang Yang <yang.yang29@zte.com.cn>
+Cc: Liu Chun <liu.chun2@zte.com.cn>
+Cc: Xuexin Jiang <jiang.xuexin@zte.com.cn>
+---
+ include/trace/events/icmp.h | 65 +++++++++++++++++++++++++++++++++++++
+ net/ipv4/icmp.c             |  4 +++
+ 2 files changed, 69 insertions(+)
+ create mode 100644 include/trace/events/icmp.h
+
+diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
+new file mode 100644
+index 000000000..7d5190f48
+--- /dev/null
++++ b/include/trace/events/icmp.h
+@@ -0,0 +1,65 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#undef TRACE_SYSTEM
++#define TRACE_SYSTEM icmp
++
++#if !defined(_TRACE_ICMP_H) || defined(TRACE_HEADER_MULTI_READ)
++#define _TRACE_ICMP_H
++
++#include <linux/icmp.h>
++#include <linux/tracepoint.h>
++
++TRACE_EVENT(icmp_send,
++
++		TP_PROTO(const struct sk_buff *skb, int type, int code),
++
++		TP_ARGS(skb, type, code),
++
++		TP_STRUCT__entry(
++			__field(const void *, skbaddr)
++			__field(int, type)
++			__field(int, code)
++			__array(__u8, saddr, 4)
++			__array(__u8, daddr, 4)
++			__field(__u16, sport)
++			__field(__u16, dport)
++			__field(unsigned short, ulen)
++		),
++
++		TP_fast_assign(
++			struct iphdr *iph = ip_hdr(skb);
++			int proto_4 = iph->protocol;
++			__be32 *p32;
++
++			__entry->skbaddr = skb;
++			__entry->type = type;
++			__entry->code = code;
++
++			struct udphdr *uh = udp_hdr(skb);
++			if (proto_4 != IPPROTO_UDP || (u8 *)uh < skb->head ||
++				(u8 *)uh + sizeof(struct udphdr) > skb_tail_pointer(skb)) {
++				__entry->sport = 0;
++				__entry->dport = 0;
++				__entry->ulen = 0;
++			} else {
++				__entry->sport = ntohs(uh->source);
++				__entry->dport = ntohs(uh->dest);
++				__entry->ulen = ntohs(uh->len);
++			}
++
++			p32 = (__be32 *) __entry->saddr;
++			*p32 = iph->saddr;
++
++			p32 = (__be32 *) __entry->daddr;
++			*p32 = iph->daddr;
++		),
++
++		TP_printk("icmp_send: type=%d, code=%d. From %pI4:%u to %pI4:%u ulen=%d skbaddr=%p",
++			__entry->type, __entry->code,
++			__entry->saddr, __entry->sport, __entry->daddr,
++			__entry->dport, __entry->ulen, __entry->skbaddr)
++);
++
++#endif /* _TRACE_ICMP_H */
++
++/* This part must be outside protection */
++#include <trace/define_trace.h>
+\ No newline at end of file
+diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+index b71b836cc..2081fee18 100644
+--- a/net/ipv4/icmp.c
++++ b/net/ipv4/icmp.c
+@@ -92,6 +92,8 @@
+ #include <net/inet_common.h>
+ #include <net/ip_fib.h>
+ #include <net/l3mdev.h>
++#define CREATE_TRACE_POINTS
++#include <trace/events/icmp.h>
+
+ /*
+  *	Build xmit assembly blocks
+@@ -766,6 +768,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
+ 	if (!fl4.saddr)
+ 		fl4.saddr = htonl(INADDR_DUMMY);
+
++	trace_icmp_send(skb_in, type, code);
++
+ 	icmp_push_reply(&icmp_param, &fl4, &ipc, &rt);
+ ende:
+ 	ip_rt_put(rt);
+-- 
+2.17.1
 
