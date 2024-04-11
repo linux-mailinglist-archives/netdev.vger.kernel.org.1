@@ -1,113 +1,85 @@
-Return-Path: <netdev+bounces-86795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D28BD8A054E
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 03:06:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93D7E8A0581
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 03:29:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55E97B21C33
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:06:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49E3D1F22869
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:29:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25AF860B95;
-	Thu, 11 Apr 2024 01:06:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 013A8664C6;
+	Thu, 11 Apr 2024 01:28:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OdlbkEb1"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC8460DCF;
-	Thu, 11 Apr 2024 01:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2D369950;
+	Thu, 11 Apr 2024 01:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712797560; cv=none; b=UWHfVtO0a6w52IYKzqnZJpuJud710/B07cwWF0S6YRBkKKw8AZpoGLqV+qut3e284PFW7XwNSFQ2e85E3I65tbk4t1ID0R16OIOix3hX2rvQgOPGwr0uGmSqDB3C4bgzU5pXjNdeJhMUOcgxdVdOSx63yOea0DZsUqfkXOJ/LNo=
+	t=1712798920; cv=none; b=fzWk0f0aqJ3rZ9ycSiP7l591nIOlVKWCYRJ9E9GKVQum3tjyEh8zHq9848oXaSNPjnf6LvSOmKaMkAkFmCgXhl1aM/p0GcBLLboiZApPnh5Q7p1wN3Pql3EhbwuceU7i+exn0YmTdkyjh39OlgwCRUllZsvlIAAGt+j7x5sLQJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712797560; c=relaxed/simple;
-	bh=SKcWXd9G9NkbxA74hLki2oajbTrX9Hro54JIkBOU/Cg=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=GQ70bsfzx2EoMmsqZeG1+zrwH8BdmUnUB4dRPCAV73ljRkB6ZhlwP3V5wGRl/m3IQUKw4QVt2mWygkry21ljqHaBceUGNixeDeP5qkxCvKjAxV6aGqWt4KuMy4CpZ0pkldWP9IZlh+XdHfbzlHoDZerounajuiipwtQsvlODg0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4VFLzM003Yz1R5Sd;
-	Thu, 11 Apr 2024 09:03:10 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 0B244140414;
-	Thu, 11 Apr 2024 09:05:55 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 11 Apr 2024 09:05:54 +0800
-Message-ID: <16347737-f0ac-4710-85ee-189abed59d6b@huawei.com>
-Date: Thu, 11 Apr 2024 09:05:53 +0800
+	s=arc-20240116; t=1712798920; c=relaxed/simple;
+	bh=YcYZX2ebMw4YLzD98CZfGkw/K5GmlBY8ZPZW0UaeBvg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Hmdw9nBn4ydw2GgoS6ez9yXA4eY+71o/6R/7vB/w6LpoqTufT22+hwtI3ZYpJEOxoWhe6xm8wcrtG+aGeMXSIsxyVTZASCLD93h8434eb/86UBbBe8/oFIItjBEv8xBodlkTHewRsayYp4rY3x3dQSleaYaJWra+1FyXaXFS0aU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OdlbkEb1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 011BAC433C7;
+	Thu, 11 Apr 2024 01:28:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712798920;
+	bh=YcYZX2ebMw4YLzD98CZfGkw/K5GmlBY8ZPZW0UaeBvg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=OdlbkEb1B/DcMnAeTF5tNC6webryZ7sREOifEUQ+HQhEBlw0Y8FRa3feClE1Ml3CQ
+	 YiljRyGcvN8RKx/gswb+935mx70IJpz5qyq+Cs5AJAeeX5ekMmRhw3N5RM0y2QPbXX
+	 eeJdXjxujkBYfWekFFr+LV5NU3Ssk77IF+8AgUb+xy6hJuGp13u3U/ixvlHB4HAKog
+	 Z8Ins18Ocj6XfQtg7DIknnfZ011DxlVHmhcAHW6m7gLdwHupfmOUJWROryEdN67gmu
+	 cpad0q18zE/kJanDL7YOiVXH6qoSnNXrYMYfysXvJTj8jueY/l/nURu093/alw995w
+	 8DdTCBEtCpu3w==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	petrm@nvidia.com,
+	linux-kselftest@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 0/6] selftests: net: exercise page pool reporting via netlink
+Date: Wed, 10 Apr 2024 18:28:09 -0700
+Message-ID: <20240411012815.174400-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
-	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
-	<rkannoth@marvell.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V7 net-next 4/4] net: hns3: add support to query scc
- version by devlink info
-To: Jiri Pirko <jiri@resnulli.us>
-References: <20240410125354.2177067-1-shaojijie@huawei.com>
- <20240410125354.2177067-5-shaojijie@huawei.com> <ZhapUja4xXiJe4Q2@nanopsycho>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <ZhapUja4xXiJe4Q2@nanopsycho>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Transfer-Encoding: 8bit
 
+Add a basic test for page pool netlink reporting.
 
-on 2024/4/10 22:59, Jiri Pirko wrote:
-> Wed, Apr 10, 2024 at 02:53:54PM CEST, shaojijie@huawei.com wrote:
->> From: Hao Chen <chenhao418@huawei.com>
->>
->> Add support to query scc version by devlink info for device V3.
->>
->> Signed-off-by: Hao Chen <chenhao418@huawei.com>
->> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
->> ---
->> Documentation/networking/devlink/hns3.rst     |  3 ++
->> drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  9 ++++
->> .../hns3/hns3_common/hclge_comm_cmd.h         |  8 ++++
->> .../hisilicon/hns3/hns3pf/hclge_devlink.c     | 44 +++++++++++++++++--
->> .../hisilicon/hns3/hns3pf/hclge_devlink.h     |  2 +
->> .../hisilicon/hns3/hns3pf/hclge_main.c        | 18 ++++++++
->> .../hisilicon/hns3/hns3pf/hclge_main.h        |  1 +
->> 7 files changed, 82 insertions(+), 3 deletions(-)
->>
->> diff --git a/Documentation/networking/devlink/hns3.rst b/Documentation/networking/devlink/hns3.rst
->> index 4562a6e4782f..e19dea8ef924 100644
->> --- a/Documentation/networking/devlink/hns3.rst
->> +++ b/Documentation/networking/devlink/hns3.rst
->> @@ -23,3 +23,6 @@ The ``hns3`` driver reports the following versions
->>     * - ``fw``
->>       - running
->>       - Used to represent the firmware version.
->> +   * - ``fw.scc``
-> What's scc? I don't see it described anywhere.
+Jakub Kicinski (6):
+  net: netdevsim: add some fake page pool use
+  tools: ynl: don't return None for dumps
+  selftests: net: print report check location in python tests
+  selftests: net: print full exception on failure
+  selftests: net: support use of NetdevSimDev under "with" in python
+  selftests: net: exercise page pool reporting via netlink
 
-diff --git a/Documentation/networking/devlink/hns3.rst b/Documentation/networking/devlink/hns3.rst
-index 4562a6e4782f..e19dea8ef924 100644
---- a/Documentation/networking/devlink/hns3.rst
-+++ b/Documentation/networking/devlink/hns3.rst
-@@ -23,3 +23,6 @@ The ``hns3`` driver reports the following versions
-     * - ``fw``
-       - running
-       - Used to represent the firmware version.
-+   * - ``fw.scc``
-+     - running
-+     - Used to represent the soft congestion control firmware version.
+ drivers/net/netdevsim/netdev.c             | 93 ++++++++++++++++++++++
+ drivers/net/netdevsim/netdevsim.h          |  4 +
+ tools/net/ynl/lib/ynl.py                   |  4 +-
+ tools/testing/selftests/net/lib/py/ksft.py | 29 ++++---
+ tools/testing/selftests/net/lib/py/nsim.py | 22 ++++-
+ tools/testing/selftests/net/nl_netdev.py   | 79 +++++++++++++++++-
+ 6 files changed, 215 insertions(+), 16 deletions(-)
 
-scc means "soft congestion control"
+-- 
+2.44.0
 
 
