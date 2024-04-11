@@ -1,130 +1,139 @@
-Return-Path: <netdev+bounces-86867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C95B88A087E
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 08:31:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1CA68A0882
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 08:33:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 684391F21295
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 06:31:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE21C1C2161C
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 06:33:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C034713D63C;
-	Thu, 11 Apr 2024 06:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDCB513CA86;
+	Thu, 11 Apr 2024 06:33:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="fM+Ni03i"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SJKPqLMY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA31113C3FC
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 06:31:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C8413BAD2
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 06:33:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712817101; cv=none; b=Q8wDIDhoE2ovDV4/riE4rNtN/gzwb53wS+mMSqJqN0/FarzdYJMd0t72E9WoV8OQ+2tN7zG08AFrpbSpLP32UGQ5se7yBbBeOiZEet2BKl2wJ+M/BuIP8i/GbetKkSMN8k8IOnSKKSde6rQyuQFFB+NcKvhC6sOmPkVYC4kQMQY=
+	t=1712817192; cv=none; b=MGQyEUcAyyo4+/X7c/y//u9odFwA/CrITrq3ZU+9un+wdLBwfUDCVxLbZfFgpVz9For7D1qWfmSkTQiauEIEmvIGat/mCZAdlkkfrLnzh18ySTF0rGnJyrx4oLkXnj1d5JfOe3vxrXD+8Ff6CdBNeifCI9hNsyx88sq/xUxJXQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712817101; c=relaxed/simple;
-	bh=NHx5XeHZAZ/9NbPe72pkNPdyNGbgu3+xBWUs35f7cDY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rIbZVIxpvUfo9yljxI0aRfRZMlex8Os63DoZOmLtIHIuXZx4TFqA5qlAxFtIFIUvsZBjbRgNZ2sVzx5C9LlaAVZZzRV9DnDXLeSY1bz0MOx7hjFbIiWRrbZQBbW0BtsJnp7A7xuHHMt78kNzY2GzhGY9WBaGSSP44B2DDb4JfgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=fM+Ni03i; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-56e48d0a632so8122144a12.2
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 23:31:39 -0700 (PDT)
+	s=arc-20240116; t=1712817192; c=relaxed/simple;
+	bh=XFPOkJ8h/JEvZAfh3iEzz8etisfLujSN6U0T6wb9H5k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uDZbZzEpx3LvIc4Tf2aZQWCGkxse8FrArod6WBx6GllKv2iPW5/hiDP7sBQeVgcFOA0bmbbBJomPSddEmM6Mx7WuGOz/Fvh+plPXoKPZLVQxt9kGZo/75lamOud3arTHunvttI7xmuUR/YBnmAazLLJhd0DrzEa6vJZVP9RjN0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SJKPqLMY; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a51a7d4466bso740349166b.2
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 23:33:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712817098; x=1713421898; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=316jZ3HKhdB/ZZPBrGBRDD5OyP3QLeoYzLEaFs5avdk=;
-        b=fM+Ni03iyNlTve+oS5KxEXEYdTKWppqmPMZIXn6qliXI3a+ceezQp2KkVP4WlnUC5T
-         SOm9HWY0QZu3aB0kEo+CPlqXhjehCMrHVIldXejhvkyrLVvKrfierHUecTC9vyI0b//A
-         P9BrfylQHAtXVhZt39HgawigSAkXBLxclZXj87Y5sMNrzEAXdUW+AxaYxt5Pyp+v2f8Q
-         2EPWx0RTHNGdTNEvh0V13OX8X3Gyqrg/HNW20Gph0APUC+1g7GVV6+F8/c0Q/poxxhxX
-         YNiIfdg/euuwrlYvcrSe6EgKX1dVgR3VcmfiqOsrDoXVj3+Puc10qzkXmM3fyf+VzY//
-         CuTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712817098; x=1713421898;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1712817189; x=1713421989; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=316jZ3HKhdB/ZZPBrGBRDD5OyP3QLeoYzLEaFs5avdk=;
-        b=XTIR7PlapUDk6wnkbZM93lXbJ8GB45Ila3wIo09dPIzEGU8cRa3FwXiX8iPyDzZcm/
-         c1jSdc4EWHslex6zA3uBC2mJGr8j1zk3WdVYyi6RQVHreiv/U2daipeFbkJOD1N8Ygu4
-         czUYarmrJGY/f4Q7T4jbrjANfzswfnB+DuKWq6NT13xBL+cBs+u3jM/zSJMaiHXZFok1
-         jAPxzSj2k3qhxavvPNOv6URqiZjTyNL4xsRpU5qMzF5IS1YeQZwdIzqv4ftVmQT/8AB1
-         TiGHaFH2RyixOfyhXgprYRLceKDFLLKgJFhWYwfSaJJny3pzTM69G4Ctf4T6Tuj2hHAl
-         w6YQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVQ97/BGWP9Cw6sFliTxvYRRGayuA8hrKr0bNYPdq4yDn6xo8R8rpMruFZXsdncvyscmDwqyIsBruVRLLIR2hjo3QK3WrIj
-X-Gm-Message-State: AOJu0YyQb3E1nOPlnJ8Yhm2WQ3y/TQbV2tnXf3Hqq7JgeB21ciraUJR5
-	836G95sKwRcK4Vd4BjDeP5y1TGeESmJYanvyglkMd4oyRvXJeRbPftIp7T8lOhc=
-X-Google-Smtp-Source: AGHT+IEo1+ZhW0NMdQx2Wuc+yTwbVQs7AB9yZ9+xqYZ4jpJ8BtrvbfKhIrQpT2FMjA8ZtMJSImDdxA==
-X-Received: by 2002:a17:906:4a55:b0:a46:da28:992e with SMTP id a21-20020a1709064a5500b00a46da28992emr3025514ejv.71.1712817098089;
-        Wed, 10 Apr 2024 23:31:38 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id r17-20020a1709060d5100b00a46da83f7fdsm435382ejh.145.2024.04.10.23.31.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 23:31:37 -0700 (PDT)
-Date: Thu, 11 Apr 2024 08:31:36 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Alexander Duyck <alexander.duyck@gmail.com>, pabeni@redhat.com,
-	John Fastabend <john.fastabend@gmail.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org,
-	bhelgaas@google.com, linux-pci@vger.kernel.org,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-Message-ID: <ZheDyIRWPggbSB_r@nanopsycho>
-References: <ZhZC1kKMCKRvgIhd@nanopsycho>
- <20240410064611.553c22e9@kernel.org>
- <ZhasUvIMdewdM3KI@nanopsycho>
- <20240410103531.46437def@kernel.org>
- <c0f643ee-2dee-428c-ac5f-2fd59b142c0e@gmail.com>
- <20240410105619.3c19d189@kernel.org>
- <CAKgT0UepNfYJN73J9LRWwAGqQ7YPwQUNTXff3PTN26DpwWix8Q@mail.gmail.com>
- <21c3855b-69e7-44a2-9622-b35f218fecbf@gmail.com>
- <20240410125802.2a1a1aeb@kernel.org>
- <7dcdd0ba-e7f8-4aa8-a551-8c0ab4c51cd9@intel.com>
+        bh=JI3WMljeid2oTzriCscLyDPt27vX4GiAF0jSUBUV1aY=;
+        b=SJKPqLMYulsGHlzSHTcjqY2sLmzJYROfwMeo8bMeey6U7NUfPPC1tguqi4Jtu8bv4v
+         o90drdO6ou76Zf/pTUtVs4rKBXhh7kas25uwqosGKwow9c9y7+jo1fGN9MQAnFnIFs4q
+         sSq8HPnKboewNHqmPY3wrtZKMMaOI0wY1qCELTAT8LppixAAYpH9Dz9RvzApBWQ6iRs4
+         GaG7NEptsRRypfyxmG0Ul+g7NL+8QLrEcxhI20xNJj/FtTkN7N8pO9LA/MBcJvXSi9sC
+         Zp3LY/ceQubV9NCXVrRRrOdCMwHqi11jY40AZ2M5vS9iEiiQQZCSnmjCl7LIgwP2R2gD
+         4Bpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712817189; x=1713421989;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=JI3WMljeid2oTzriCscLyDPt27vX4GiAF0jSUBUV1aY=;
+        b=Y0aERUXP04V67nvDFWSgxuzTwZnFfaaTxeZwuP1PKb5zd7fAggjMYb7Q588b/cca2r
+         YBf4IXe1WFS/1GUdo3w7lF5Pcjd+GJ2fCCuI3MYF2fYWnwbGqcs8dDV+UvdxPZCe32pC
+         7BcEZIhkwW8x/nv1F/z7EfubqbqDmCMbnSVqztML7YkbZdEAcxCVQVvwnJDHU3abZmOu
+         HQepX/xkVK8nszNM01Xpv2b7nUQRa7P1pnrxVzRmTC1wWzLn2TM75xbE1W7mLkWHY5I3
+         TQWsRvS6drxpP4hTEzlYTFx8sAn2dWEIARWX0eZkTbdIkVQ6Se4F986hEx4YooGIJb9B
+         LYuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUoGDDz57HXsWuyUpfUG3N3csBMRyK8KXYspmIhnq0RMT8ewSwdLERV/ykBDiBgFrQer+FLoDLuWcjpjRQ1n56ieQKnxNJv
+X-Gm-Message-State: AOJu0YwSMa+WvKQ80ykDh/bCfObY0/y9oGAJnf8WJ5DY0dUZOREy4MU8
+	W8ep1GgG36wyaaAOCM7uFjKj5fOGxOd8jPTxr6AwsjybjxC+aZrVrNhrLBJ8sllECklbwCoJ2JH
+	/3S788hHes0YO7/tsS3WUUXp5qZw=
+X-Google-Smtp-Source: AGHT+IEajuJywyI4Y10xZu+Exry6CeGchqVtPt+IbNRVnp0SFNv3m2Pf6udmf/UDzHRQ2GCXl0v0ZCcfefaKWRsyJAA=
+X-Received: by 2002:a17:906:1513:b0:a51:9438:af01 with SMTP id
+ b19-20020a170906151300b00a519438af01mr2969159ejd.76.1712817189329; Wed, 10
+ Apr 2024 23:33:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7dcdd0ba-e7f8-4aa8-a551-8c0ab4c51cd9@intel.com>
+References: <20240411032450.51649-1-kerneljasonxing@gmail.com> <CANn89i+2XdNxYHFNwC5LHupT3je1EaZXMxMJG9343ZO9vCzAsg@mail.gmail.com>
+In-Reply-To: <CANn89i+2XdNxYHFNwC5LHupT3je1EaZXMxMJG9343ZO9vCzAsg@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 11 Apr 2024 14:32:32 +0800
+Message-ID: <CAL+tcoC2FW2_xp==NKATKi_QW2N2ZTB1UVPadUyECgYxV9jXRQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: save some cycles when doing skb_attempt_defer_free()
+To: Eric Dumazet <edumazet@google.com>
+Cc: pablo@netfilter.org, kuba@kernel.org, pabeni@redhat.com, 
+	davem@davemloft.net, horms@kernel.org, aleksander.lobakin@intel.com, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Thu, Apr 11, 2024 at 12:03:54AM CEST, jacob.e.keller@intel.com wrote:
+On Thu, Apr 11, 2024 at 1:27=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
 >
+> On Thu, Apr 11, 2024 at 5:25=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Normally, we don't face these two exceptions very often meanwhile
+> > we have some chance to meet the condition where the current cpu id
+> > is the same as skb->alloc_cpu.
+> >
+> > One simple test that can help us see the frequency of this statement
+> > 'cpu =3D=3D raw_smp_processor_id()':
+> > 1. running iperf -s and iperf -c [ip] -P [MAX CPU]
+> > 2. using BPF to capture skb_attempt_defer_free()
+> >
+> > I can see around 4% chance that happens to satisfy the statement.
+> > So moving this statement at the beginning can save some cycles in
+> > most cases.
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> >  net/core/skbuff.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > index ab970ded8a7b..b4f252dc91fb 100644
+> > --- a/net/core/skbuff.c
+> > +++ b/net/core/skbuff.c
+> > @@ -7002,9 +7002,9 @@ void skb_attempt_defer_free(struct sk_buff *skb)
+> >         unsigned int defer_max;
+> >         bool kick;
+> >
+> > -       if (WARN_ON_ONCE(cpu >=3D nr_cpu_ids) ||
+> > +       if (cpu =3D=3D raw_smp_processor_id() ||
+> >             !cpu_online(cpu) ||
+> > -           cpu =3D=3D raw_smp_processor_id()) {
+> > +           WARN_ON_ONCE(cpu >=3D nr_cpu_ids)) {
+> >  nodefer:       kfree_skb_napi_cache(skb);
+> >                 return;
+> >         }
 >
->On 4/10/2024 12:58 PM, Jakub Kicinski wrote:
->> On Wed, 10 Apr 2024 11:29:57 -0700 Florian Fainelli wrote:
->>>> If we are going to be trying to come up with some special status maybe
->>>> it makes sense to have some status in the MAINTAINERS file that would
->>>> indicate that this driver is exclusive to some organization and not
->>>> publicly available so any maintenance would have to be proprietary.  
->>>
->>> I like that idea.
->> 
->> +1, also first idea that came to mind but I was too afraid 
->> of bike shedding to mention it :) Fingers crossed? :)
->> 
+> Wrong patch.
 >
->+1, I think putting it in MAINTAINERS makes a lot of sense.
+> cpu_online(X) is undefined and might crash if X is out of bounds on CONFI=
+G_SMP=3Dy
 
-Well, how exactly you imagine to do this? I have no problem using
-MAINTAINERS for this, I was thinking about that too, but I could not
-figure out the way it would work. Having driver directory is much more
-obvious, person cooking up a patch sees that immediatelly. Do you look
-at MAINTAINTERS file when you do some driver API changing patch/ any
-patch? I certainly don't (not counting get_maintainers sctipt).
+Even if skb->alloc_cpu is larger than nr_cpu_ids, I don't know why the
+integer test statement could cause crashing the kernel. It's just a
+simple comparison. And if the statement is true,
+raw_smp_processor_id() can guarantee the validation, right?
 
