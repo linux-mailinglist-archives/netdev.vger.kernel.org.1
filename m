@@ -1,100 +1,127 @@
-Return-Path: <netdev+bounces-86973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1A398A133F
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 13:41:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC3AD8A1341
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 13:42:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC6061C20F5F
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:41:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6727F28592B
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:42:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71041149C46;
-	Thu, 11 Apr 2024 11:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K1zSjNBV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 279CC149C73;
+	Thu, 11 Apr 2024 11:42:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4581487E4
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 11:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C5EA1482EF;
+	Thu, 11 Apr 2024 11:42:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712835697; cv=none; b=F5iuu0QZ0izM90i98oEQ6V8q9W9DtcwedbQedbWxKoeo5xp2Cs77jeG0t4lYc/2I/eAk0ym3l/y03aZRm7bjdPDaktjQXtMgJXdTyYWMMYrcS3YwxyxFZnBK3vD8hUxt4b2gAh1RElCU1lz+hOEJDB083Dv0eqNTi7TMRk2kCIE=
+	t=1712835729; cv=none; b=fbEItWLjlLVttgrcxWBE5Hi1NyV8CupVQkHQP6yX9pDRm69XXoL60brHkpt9D1PocStnCpp6FCKb/GSh9NruKS4Xtufus3ErWenKVrNdFxQJHLdLP3mV8o5fLtZ1B97zbveM5R3biOhwW1XDb4TYMqIahTK0Q4p+Dmn3alm1UFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712835697; c=relaxed/simple;
-	bh=53a90e5Qmt0Zp2T40BfQnYP6dAc7ADyIAlcLVAxAsUo=;
+	s=arc-20240116; t=1712835729; c=relaxed/simple;
+	bh=qv5/nqApeUagH5c4hcryAgPZtj+y4u64oBEWvK0rcgI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GOSmE53pq8dyjrQOL3WQtpPA3ZsqAgpO3g0h1BSs2c0PInhmEJtvLhjSGhg4aIymNeVRaRFgoDXwZW8gJOyxKPj7NqkV9Uxzh36PYLcMGrBbgOjnl7SnIxQ+g0VYs69CwHB610+mG5yCRJ9nVzUuzRITQy7LZ+SuSqQvJovopWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K1zSjNBV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50966C433C7;
-	Thu, 11 Apr 2024 11:41:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712835696;
-	bh=53a90e5Qmt0Zp2T40BfQnYP6dAc7ADyIAlcLVAxAsUo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=K1zSjNBVVIFQkkg+cETOdIkQ4gWzi+oYd1McNdXAJfeVe/GpiuU7Zm8hjC6uZYf+Q
-	 AYFHktgUTqHRUqS0BtMtp04nX50zJK7smvRDuo5rsrfPzmRSeDZzF5p6ah9+lCpgGU
-	 boivveYmDD/50qusGXPBXKiOPXUGWyg3HC4GF07pWGw52Z4KklMYi3BazolGzjPsGN
-	 PCdIvyh30NooB87Gbhk56OlyTTwQ4hNLQoHjNnFFPe/kuRIZffE5Lq/jnvt3TLpVvH
-	 eyBFHcYdY0id9NWnUxWUEDiN0YTRZvHRn0pBEngbwegCq3Ug4wznw2yxH2+johJMus
-	 orV3VOsImU3FA==
-Date: Thu, 11 Apr 2024 14:41:32 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Antony Antony <antony.antony@secunet.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	devel@linux-ipsec.org, Eyal Birger <eyal.birger@gmail.com>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	Sabrina Dubroca <sd@queasysnail.net>
-Subject: Re: [PATCH ipsec-next v10 1/3] xfrm: Add Direction to the SA in or
- out
-Message-ID: <20240411114132.GO4195@unreal>
-References: <0e0d997e634261fcdf16cf9f07c97d97af7370b6.1712828282.git.antony.antony@secunet.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=N2a8ApbtYEvcXrL1vYYSmz+YrLM/87CREGJpWSnGtCNwqqahr5IKfwpUBCc9snBZTRw+bKx54m4csAjfnmzxSTy5NhvxQ19w5EE1SjoQkbH0tyvjKztL5NhpyzYeSq7pjOuDKx6LiZOlHgpk3PG+KPESVdbqxhSscqWICjofNIY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Date: Thu, 11 Apr 2024 13:42:03 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+	netdev@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
+	fw@strlen.de
+Subject: Re: [PATCH net 0/7] Netfilter fixes for net
+Message-ID: <ZhfMi7hL3TW0qmj7@calendula>
+References: <20240411112900.129414-1-pablo@netfilter.org>
+ <07f609433f7248412abb184d826976a766cea2e8.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <0e0d997e634261fcdf16cf9f07c97d97af7370b6.1712828282.git.antony.antony@secunet.com>
+In-Reply-To: <07f609433f7248412abb184d826976a766cea2e8.camel@redhat.com>
 
-On Thu, Apr 11, 2024 at 11:40:59AM +0200, Antony Antony wrote:
-> This patch introduces the 'dir' attribute, 'in' or 'out', to the
-> xfrm_state, SA, enhancing usability by delineating the scope of values
-> based on direction. An input SA will now exclusively encompass values
-> pertinent to input, effectively segregating them from output-related
-> values. This change aims to streamline the configuration process and
-> improve the overall clarity of SA attributes.
+On Thu, Apr 11, 2024 at 01:39:30PM +0200, Paolo Abeni wrote:
+> On Thu, 2024-04-11 at 13:28 +0200, Pablo Neira Ayuso wrote:
+> > Hi,
+> > 
+> > The following patchset contains Netfilter fixes for net:
+> > 
+> > Patches #1 and #2 add missing rcu read side lock when iterating over
+> > expression and object type list which could race with module removal.
+> > 
+> > Patch #3 prevents promisc packet from visiting the bridge/input hook
+> > 	 to amend a recent fix to address conntrack confirmation race
+> > 	 in br_netfilter and nf_conntrack_bridge.
+> > 
+> > Patch #4 adds and uses iterate decorator type to fetch the current
+> > 	 pipapo set backend datastructure view when netlink dumps the
+> > 	 set elements.
+> > 
+> > Patch #5 fixes removal of duplicate elements in the pipapo set backend.
+> > 
+> > Patch #6 flowtable validates pppoe header before accessing it.
+> > 
+> > Patch #7 fixes flowtable datapath for pppoe packets, otherwise lookup
+> >          fails and pppoe packets follow classic path.
+> > 
+> > Please, pull these changes from:
+> > 
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-04-11
+> > 
+> > Thanks.
+> > 
+> > ----------------------------------------------------------------
+> > 
+> > The following changes since commit 19fa4f2a85d777a8052e869c1b892a2f7556569d:
+> > 
+> >   r8169: fix LED-related deadlock on module removal (2024-04-10 10:44:29 +0100)
+> > 
+> > are available in the Git repository at:
+> > 
+> >   git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-24-04-11
+> > 
+> > for you to fetch changes up to 6db5dc7b351b9569940cd1cf445e237c42cd6d27:
+> > 
+> >   netfilter: flowtable: incorrect pppoe tuple (2024-04-11 12:14:10 +0200)
+> > 
+> > ----------------------------------------------------------------
+> > netfilter pull request 24-04-11
+> > 
+> > ----------------------------------------------------------------
+> > Florian Westphal (1):
+> >       netfilter: nft_set_pipapo: do not free live element
+> > 
+> > Pablo Neira Ayuso (4):
+> >       netfilter: br_netfilter: skip conntrack input hook for promisc packets
+> >       netfilter: nft_set_pipapo: walk over current view on netlink dump
+> >       netfilter: flowtable: validate pppoe header
+> >       netfilter: flowtable: incorrect pppoe tuple
+> > 
+> > Ziyang Xuan (2):
+> >       netfilter: nf_tables: Fix potential data-race in __nft_expr_type_get()
+> >       netfilter: nf_tables: Fix potential data-race in __nft_obj_type_get()
+> > 
+> >  include/net/netfilter/nf_flow_table.h      | 12 +++++++++++-
+> >  include/net/netfilter/nf_tables.h          | 14 ++++++++++++++
+> >  net/bridge/br_input.c                      | 15 +++++++++++----
+> >  net/bridge/br_netfilter_hooks.c            |  6 ++++++
+> >  net/bridge/br_private.h                    |  1 +
+> >  net/bridge/netfilter/nf_conntrack_bridge.c | 14 ++++++++++----
+> >  net/netfilter/nf_flow_table_inet.c         |  3 ++-
+> >  net/netfilter/nf_flow_table_ip.c           | 10 ++++++----
+> >  net/netfilter/nf_tables_api.c              | 22 ++++++++++++++++++----
+> >  net/netfilter/nft_set_pipapo.c             | 19 ++++++++++++-------
+> >  10 files changed, 91 insertions(+), 25 deletions(-)
 > 
-> This feature sets the groundwork for future patches, including
-> the upcoming IP-TFS patch.
-> 
-> Signed-off-by: Antony Antony <antony.antony@secunet.com>
-> ---
-> v9->v10:
->  - add more direction specific validations
-> 	XFRM_STATE_NOPMTUDISC, XFRM_SA_XFLAG_DONT_ENCAP_DSCP
-> 	XFRMA_MTIMER_THRESH
->  - refactor validations into a fuction.
->  - add dir to ALLOCSPI to support strongSwan updating SPI for "in" state
-> v8->v9:
->  - add validation XFRM_STATE_ICMP not allowed on OUT SA.
-> 
-> v7->v8:
->  - add extra validation check on replay window and seq
->  - XFRM_MSG_UPDSA old and new SA should match "dir"
+> Whoops, I'm finishing testing right now todays PR, I hope it's not a
+> big issue if this lands later?
 
-I asked it on one of the previous versions, but why do we need this limitation?
-Update SA is actually add and delete, so if user wants to update
-direction, it should be allowed.
-
-Thanks
+Apologies, I am working at full steam here, I could not deliver any sooner.
 
