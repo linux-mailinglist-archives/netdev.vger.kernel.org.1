@@ -1,211 +1,80 @@
-Return-Path: <netdev+bounces-87024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 771C18A153A
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 15:06:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 981F18A154F
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 15:09:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B15B1C20F69
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 13:06:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9A011C20F69
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 13:09:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF560146D55;
-	Thu, 11 Apr 2024 13:06:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0767914AD35;
+	Thu, 11 Apr 2024 13:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="beT4DTQy";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="iHB5ETUr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bTAamx34"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout8-smtp.messagingengine.com (fout8-smtp.messagingengine.com [103.168.172.151])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36FE438DD2;
-	Thu, 11 Apr 2024 13:06:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58AD3AC16;
+	Thu, 11 Apr 2024 13:09:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712840767; cv=none; b=MWc34QbYBQ+88rxCac3ML72XFT6zqGSPXMITLjzf8s9JPNQjaj9YgO4ePbMRpvJr1vPdlWCDCsE4LTpm8vc8oSBWN7q/gOrMFj7WlUE31mRjbqAgpFQy2aau4prT2R68e5dn2OXOfoDLH6Uld3/2vFtgHOPB95b/OlOcrqmvTK4=
+	t=1712840969; cv=none; b=mzAdWTt81pUfNOubNuQTw8FKosTyjOQ5k+Y9R+Dm4JZG2n2oXlSHBl9GwG9NoYiqZkxxPa0mJEo8iTQ/dlwaATqQOmgJjMjUak2k1eDAkhascSSYqq2xJuAF/CS8d9/xisE6IByuqBU+c8sRIEIM+q4gD89PUckJr4gc9p3G/lg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712840767; c=relaxed/simple;
-	bh=ykvqByV4lzjo0vKPgy3+JXNnx6WoNf2+XWOiGQ7HCJY=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=q2Tvh+3DePddCzaEFBFRE33CW69tR4uI8p3frJkYHPOJxh8eIxu7QxcCWvw11xmllDMQVjFAXth+ncAPes8YdJ2GREuQsnwpZEVuW3SdMMVOYCtjkYJzhf6HXMvmjueGpznxaWwSnITrHI0BUEfpxzaxz5LdTyM5UzFyS63rte0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=beT4DTQy; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=iHB5ETUr; arc=none smtp.client-ip=103.168.172.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfout.nyi.internal (Postfix) with ESMTP id 276C0138025B;
-	Thu, 11 Apr 2024 09:06:04 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Thu, 11 Apr 2024 09:06:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1712840764;
-	 x=1712927164; bh=yj3L41BBACRzg4qgbnEqB1wd5tAnTER3vhd4irRjfD0=; b=
-	beT4DTQyVXapX9VjkjPwhPXdHURnM/ZCCDls9VSQvZ8jnWlZeo/nciiuyV20/Kt5
-	QSIvDXPNpWMfdNCSMEZlAg2qvGK4qSrETVZkcVNW/Rzqn9sPNV2RmNKthjLnBElO
-	PSdTY8BOa2uIzcj3cNr97247hhrF5OgHkvr6e3ID3MrM82S+YN+F+ki9pH7RlaD7
-	srA3Xh0N0ptDWxMRt+vxYwjHkoqjsbei9U6aDHj44C1fxYygKrdo50pNnz1vpHo3
-	Gg6bTlsUiFzO70iavY0+M7qfca3ERWSO1riSHIQFgdjRIMNjUsJeC+kyips3x6zc
-	gvG38wCdhwIAIuSNrQE+0w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1712840764; x=
-	1712927164; bh=yj3L41BBACRzg4qgbnEqB1wd5tAnTER3vhd4irRjfD0=; b=i
-	HB5ETUr01AhS0wBRoP6D0jH8qNl/9c1nhUBdv0B3Dfnjh8qTr4/n0JGzsSz6Fod0
-	j9JXff6yOtVRy3nmLrZt3I7ma7Dc6chD41WCFXvBGhmNow+Ctl/l/KRAf9tFUgRD
-	Tep0m4+npFqHts87z7IKjSYAoR03rB2Hid0ThQ7Bs4ydXomNaxn2+48F06h+Ai2S
-	8J/zdRPmKRLFOmmzvud7mcZLWBRJCdXEh/32+CnBm3vE+MQ8uH7eXLkEpBGh3CcL
-	K17eDgvryQL8tDfImuaGcdv1yGumwv6nduafJtsjsuKMu+ocN9M/80ih/l3G9GRy
-	PuGYHXYva62LWR1AMv3Pw==
-X-ME-Sender: <xms:OuAXZpDP_dsT5ECfjNFjYbmlgwtgrsce17kShjG5fbvlQvgcU3ROoA>
-    <xme:OuAXZnjcQjSF1HhAnOcj1qasYyVXOTegxXbe8Lz9NB8Jhh7zI2iHahWL8pS3dF7zN
-    XaQp5szmEk_rOTvkxk>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudehkedgieduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
-    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
-    htthgvrhhnpefgkeeuleegieeghfduudeltdekfeffjeeuleehleefudettddtgfevueef
-    feeigeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivg
-    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:OuAXZkkHjJhpq-znzUOIFXxPGrOSG_RbON5nK9ERCI0vIUyXSOqJ9A>
-    <xmx:OuAXZjwcWgyyKd_sj3c4YoF3pahZKhxPOvFXD3pJsmp1fD988lFPnQ>
-    <xmx:OuAXZuSxT4Mnc3kr-8fJgSJZipdpvdg4-mCmtR-iyMbzGtIhnSahog>
-    <xmx:OuAXZmYy2Lk0FzuBtsseotdcsoHsPYFt-UOdp44tiHza0Yj3qVEt2A>
-    <xmx:POAXZsnqYF5uSSbA0rka_l_foY-XGEg88Thvb2s23eW3mc1zKwaoEKRW>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 5E9FFB6008F; Thu, 11 Apr 2024 09:06:02 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-379-gabd37849b7-fm-20240408.001-gabd37849
+	s=arc-20240116; t=1712840969; c=relaxed/simple;
+	bh=8jloMJYR3hI592a7bjdaurZGTF8DZUtzFZslxyASiCw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DB38nak/bnt0A4PwUgrv749baejkdz7KWlgE6oXIT5M6yriHSOh3m0uL+VWLAgHodZgYoufZLNxEIk244cUfRJk2KO72wogrgAtiMsl7o0J2wLKVf5VbxrLSPhygs+mjZlLBZF18c1QwzaebB7etKdhv5wmCnXFaJk7/mHxyl/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bTAamx34; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15BE1C433F1;
+	Thu, 11 Apr 2024 13:09:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712840969;
+	bh=8jloMJYR3hI592a7bjdaurZGTF8DZUtzFZslxyASiCw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bTAamx34aXT0c7Dh0yldr3GLqQzV9IzdoRpbQHFtNRfItKvSV300oarDb7loQj0Db
+	 nRfkoxxjnz9tSITwwxA3S3R++Th5BRDwHiy/ceBrv1hqDHDqRJhGCW1VuDm77tbvXj
+	 sYF0lmSkNDM4sLi9I7SYA9CxCWtr8xgDLIJ8pvoFZns2rW3Hlm+PbN79aR13Zve2Jc
+	 yKCiaqvumONCNAg1kYgPV+4UsdpCK8RYPlqHwgbszTVNkDUDxSiiLeHovaY2EzHZxI
+	 tUFT3DR9oTRec7cO/yCDK54isJiPslGyjV/kl8GNT5n7CVWLJpcB+11xU7fbNibyU2
+	 NojDEfZDJvLqg==
+Date: Thu, 11 Apr 2024 06:09:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: aleksander.lobakin@intel.com, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, elder@kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ nbd@nbd.name, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+ lorenzo@kernel.org, taras.chornyi@plvision.eu, ath11k@lists.infradead.org,
+ ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
+ geomatsi@gmail.com, kvalo@kernel.org, Matthias Brugger
+ <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, quic_jjohnson@quicinc.com,
+ leon@kernel.org, dennis.dalessandro@cornelisnetworks.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ idosch@idosch.org
+Subject: Re: [PATCH net-next v5 00/10] allocate dummy device dynamically
+Message-ID: <20240411060926.308788bf@kernel.org>
+In-Reply-To: <20240410131407.3897251-1-leitao@debian.org>
+References: <20240410131407.3897251-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <cc62b891-d636-4d70-8792-eebcb5c7c5d5@app.fastmail.com>
-In-Reply-To: <e0e1518c-9319-4af9-9b7d-3eb985f2e6da@csgroup.eu>
-References: <20240215162327.3663092-1-sean.anderson@seco.com>
- <20240219153016.ntltc76bphwrv6hn@skbuf>
- <e0e1518c-9319-4af9-9b7d-3eb985f2e6da@csgroup.eu>
-Date: Thu, 11 Apr 2024 15:05:41 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Christophe Leroy" <christophe.leroy@csgroup.eu>,
- "Vladimir Oltean" <vladimir.oltean@nxp.com>,
- "Qiang Zhao" <qiang.zhao@nxp.com>, "Shawn Guo" <shawnguo@kernel.org>,
- "Herve Codina" <herve.codina@bootlin.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, Netdev <netdev@vger.kernel.org>,
- "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
- "Steffen Trumtrar" <s.trumtrar@pengutronix.de>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
- "Roy Pledge" <roy.pledge@nxp.com>, "Camelia Groza" <camelia.groza@nxp.com>,
- "Claudiu Manoil" <claudiu.manoil@nxp.com>, "Scott Wood" <oss@buserror.net>,
- "stable@vger.kernel.org" <stable@vger.kernel.org>,
- "Sean Anderson" <sean.anderson@seco.com>
-Subject: Re: [RESEND PATCH net v4 1/2] soc: fsl: qbman: Always disable interrupts when
- taking cgr_lock
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 10, 2024, at 06:54, Christophe Leroy wrote:
-> Le 19/02/2024 =C3=A0 16:30, Vladimir Oltean a =C3=A9crit=C2=A0:
->> On Thu, Feb 15, 2024 at 11:23:26AM -0500, Sean Anderson wrote:
->>> smp_call_function_single disables IRQs when executing the callback. =
-To
->>> prevent deadlocks, we must disable IRQs when taking cgr_lock elsewhe=
-re.
->>> This is already done by qman_update_cgr and qman_delete_cgr; fix the
->>> other lockers.
->>>
->>> Fixes: 96f413f47677 ("soc/fsl/qbman: fix issue in qman_delete_cgr_sa=
-fe()")
->>> CC: stable@vger.kernel.org
->>> Signed-off-by: Sean Anderson <sean.anderson@seco.com>
->>> Reviewed-by: Camelia Groza <camelia.groza@nxp.com>
->>> Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
->>> ---
->>> I got no response the first time I sent this, so I am resending to n=
-et.
->>> This issue was introduced in a series which went through net, so I h=
-ope
->>> it makes sense to take it via net.
->>>
->>> [1] https://lore.kernel.org/linux-arm-kernel/20240108161904.2865093-=
-1-sean.anderson@seco.com/
->>>
->>> (no changes since v3)
->>>
->>> Changes in v3:
->>> - Change blamed commit to something more appropriate
->>>
->>> Changes in v2:
->>> - Fix one additional call to spin_unlock
->>=20
->> Leo Li (Li Yang) is no longer with NXP. Until we figure out within NXP
->> how to continue with the maintainership of drivers/soc/fsl/, yes, ple=
-ase
->> continue to submit this series to 'net'. I would also like to point
->> out to Arnd that this is the case.
->>=20
->> Arnd, a large portion of drivers/soc/fsl/ is networking-related
->> (dpio, qbman). Would it make sense to transfer the maintainership
->> of these under the respective networking drivers, to simplify the
->> procedures?
+On Wed, 10 Apr 2024 06:13:41 -0700 Breno Leitao wrote:
+>   wifi: ath11k: allocate dummy net_device dynamically
 
-If there are parts that are only used by networking, I'm definitely
-fine with moving those out of drivers/soc into the respective users,
-but as far as I can tell, all the code there is shared by multiple
-subsystems (crypto, dma, usb, ...), so that would likely require
-at least a reorganization.
-
-> I see FREESCALE QUICC ENGINE LIBRARY (drivers/soc/fsl/qe/) is maintain=
-ed=20
-> by Qiang Zhao <qiang.zhao@nxp.com> but I can't find any mail from him =
-in=20
-> the past 4 years in linuxppc-dev list, and everytime I wanted to submi=
-t=20
-> something I only got responses from Leo Ly.
->
-> The last commit he reviewed is 661ea25e5319 ("soc: fsl: qe: Replace=20
-> one-element array and use struct_size() helper"), it was in May 2020.
->
-> Is he still working at NXP and actively maintaining that library ?=20
-> Keeping this part maintained is vital for me as this SOC is embedded i=
-n=20
-> the two powerpc platform I maintain (8xx and 83xx).
->
-> If Qiang Zhao is not able to activaly maintain that SOC anymore, I=20
-> volonteer to maintain it.
-
-Thanks, much appreciated. The QE driver is also used on
-arm64/ls1043a, but I have not seen any email or pull requests
-from Qiang Zhao for that driver either.
-
-The previous setup was that Li Yang picked up patches for
-anything under drivers/soc/fsl/ and forwarded them to
-soc@kernel.org for me to pick up.
-
-I would very much like to get back to the state of having
-one or two maintainers for all of drivers/soc/fsl/ and
-not have to worry about individual drivers under it when
-they are all maintained by different people.
-
-Shawn Guo is already maintaining the arm64 side of
-Layerscape in addition to the i.MX code. Herve Codina in
-turn has taken responsibility for qe/qmc.c and qe/tsa.c.
-
-Maybe you can pick one more more maintainers for
-drivers/soc/fsl/ between the three of you to collect
-patches into a git branch and send pull requests to
-soc@kernel.org?
-
-      Arnd
+Sorry Breno, I didn't notice earlier, patch 10 didn't make it
+to the list. The series wasn't ingested by CI and tested because 
+of this. Could you repost?
+-- 
+pw-bot: cr
 
