@@ -1,106 +1,115 @@
-Return-Path: <netdev+bounces-87134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09F9C8A1D6F
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:11:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31BD08A1F00
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:58:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9987288BD2
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 18:11:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46810B2C590
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 18:17:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E41641DDD23;
-	Thu, 11 Apr 2024 17:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F3885491B;
+	Thu, 11 Apr 2024 17:26:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TTqmeeN8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CDyejZbC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A3FD1DB559
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 17:07:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C430D535D9;
+	Thu, 11 Apr 2024 17:26:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712855257; cv=none; b=J47BJT4aHfbTLOWvoBF0TePMaJ3vkiHepqMsW6lCwuaeRKK8BHAgxnJ0MCpAJnW1F47L8IYhs8wCFk9o0N9BWpGzA6g9qX+v52wOQ8lWUSaIKRzGiw6rVMR/0ajypSEjkisilQHORH0jSlPaAca1eM7ZKzKghDm9EYXrCR6a4Nw=
+	t=1712856405; cv=none; b=AQRza/lm69jZWxgKExSoo6iuqAPv7rffxRomty9ZDNjzybj+n+/jM9FM1v5Hytdgj1nhlxovfHSGCjNoLEqLxUgUgX5SLKPQ89PlOaKsRnKMyxaUzwGRYLAVknlWKMhEVW/fuIcB1Umx2g7jdg7EVSiyHFrnmI78aNL5TEIGdeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712855257; c=relaxed/simple;
-	bh=WCobET+iO7e9O4Y/HP7uF3jpuqt/5PQ3jfkBK5rURmY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=teH66JOa+SVOIg0tYFgUZvfGElXjt2bbRng5GqbwFhmdpKfm64ED2MjeGmplXrHyqtxPglLbuN2Abgm0HPv3Patp9N5CRRmKtzg0f7HmLmFR9iBDEAG67sko3WSOHhkh4AUreo22dycQFCvk4qnGIP53uKuAri/9G+zWlxKEXWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TTqmeeN8; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6ecf8ebff50so35328b3a.1
-        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 10:07:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712855256; x=1713460056; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=e6YJ5Qu/Hcgbqp2fIXC519Y2ehC9xWP82cayt/Bbwtc=;
-        b=TTqmeeN8og7CNnFxVqiiCgYsICVsmNZ+rgPQEXVDEokY0jJjihqCGJ6tXLeiJMu9H6
-         +msN/wbc86pPx4CkxU6L2Ym1lYvikHSrLX4XAnvPVpO5HUPwqGPz/l/Rk/uSzOkagM43
-         OyJPNbbkEiYkrrzyfgyx8xqcBYsjUX8l+EEiplAlITBjuqWx687WOY8qykRZ/rwvbMy8
-         Jhjz3mNahvBS6G/AiJGI0KAcZ1EV788KyNYzBdLhFzUE9nVeC8dr3eLOd0Oz+2BOZJ7v
-         /mBetl2cDqsZAXNER+UmHE2oZ1RyFELwrC3ktpj3J1AUGdqLUBXVBXrrj3cdCTO3V3VQ
-         /3zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712855256; x=1713460056;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e6YJ5Qu/Hcgbqp2fIXC519Y2ehC9xWP82cayt/Bbwtc=;
-        b=S7W/H//VFxO7SgKR7fdrisIMW91C5BEjB+pmgLF6IvYWBzhmGbQ6dvWK0H7JMaD4aN
-         4TnaeSqisjk3FsuhgN+tlu8OHNtO6sPhb2XGNfNwDCmM7QmKAjxt3A86GBUSVe6p7KUp
-         LOZqne+Lx+owlE+RXQVUl0RLf7QaZoFdaB1ZSHawVIBPk7825oXlq1MuobadhlZR+fOw
-         ZKvjka6g+yPSyZsFXFEa3EHrlRYjTd4q7+1+2mCJMeGKCLqbk6B4uE0kSXY+E1APyY8+
-         uxFuRr9qxRJpcdeq3SbdIGiHhIVqPP2jP4ML+G2JywgHva7Bcozme+oPYm/8RSq7JdxJ
-         mGUA==
-X-Forwarded-Encrypted: i=1; AJvYcCVNmMFJbcwdVMf7JR+uZX+Gm2DdoPhJdXSLspWMTN8iioNdgYNXhTmn3ollydFmklehmNTTIKGKWKj4eJiWefrsBDhlyqnA
-X-Gm-Message-State: AOJu0Yyt6nw/N6knSWSiS/XKfbMSerrpzxwtZApZoMeyjv03D6Qz4BoX
-	D8ZyWfgT+PAARaar9wjJPWG49db0A0AeoFsIgzf14mCrxujcB6Df
-X-Google-Smtp-Source: AGHT+IF/Dqh9UvnbVK8/U9/idKq9c1dFyPx2YbkAtMNXY8acxz4aSOhFXR+SPdNoxIjN5OAuOAiynQ==
-X-Received: by 2002:a05:6a20:dda4:b0:1a7:8071:94d with SMTP id kw36-20020a056a20dda400b001a78071094dmr3966088pzb.25.1712855255993;
-        Thu, 11 Apr 2024 10:07:35 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id g10-20020a63374a000000b005e4666261besm1307968pgn.50.2024.04.11.10.07.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 11 Apr 2024 10:07:35 -0700 (PDT)
-Message-ID: <00598141-ca3b-47db-8f31-2f2a663d8f81@gmail.com>
-Date: Thu, 11 Apr 2024 10:07:33 -0700
+	s=arc-20240116; t=1712856405; c=relaxed/simple;
+	bh=rb4Rwfv5xHnQdtI+SSu0ajaicwDU38E72wab/KYC78w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KR2qB5EJF5GQZ+PFzKn+U8I6yLQAbgIWyGCTAMVQA/Q7YUqqz8dIf8po0EFUhhGe+/Y7gHBGvGlu89JwJqgRTuwZs2ZxPnJGzqjbd6k1s3GsdS65pTGmz1LoGJIcy2q34jYxsIZF7/AtNb8GrrE2dBOMkvpYYLJhU8tjXJPL3Po=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CDyejZbC; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712856404; x=1744392404;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=rb4Rwfv5xHnQdtI+SSu0ajaicwDU38E72wab/KYC78w=;
+  b=CDyejZbCvLFiFmOLVt9/RkTrbxuYqiJP72FFAZ2zOGCogQv076JnnPNg
+   1L9Z7KrjtLv5i1zGmm1EsRLwOzE3lZ29yPClI1qMqzRMSH7YhO4TPeIDh
+   I3SKhTQuk2J6lRg48rOmUyH7GN+MMOLxDV1ZIKgTeAVzB1waXqvo31Hgi
+   Sqy5zuwXsH+7jxNK0mIN0ODQu9eqX9ZLOFu1MzDqSRKv7vryuLxJNdU3P
+   5/8++PXiXtkWWKrMCG3RSs3/FCPA3Tuxh14G3pxBuo27sgZQDGDNH9FiG
+   /z/peF8fiVH904gBUXKS2cx7qyFfUQBilHKdA9Te6prFbNncHAWPqNuge
+   A==;
+X-CSE-ConnectionGUID: mQTJ7LqGRnCJl1C1YPR7xg==
+X-CSE-MsgGUID: 3AhjIcm2SzKPeD+XY0VtGA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11041"; a="18845025"
+X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
+   d="scan'208";a="18845025"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 10:26:40 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,11041"; a="937097278"
+X-IronPort-AV: E=Sophos;i="6.07,193,1708416000"; 
+   d="scan'208";a="937097278"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by fmsmga001.fm.intel.com with ESMTP; 11 Apr 2024 10:26:35 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+	id E99FC194; Thu, 11 Apr 2024 20:26:33 +0300 (EEST)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	David Thompson <davthompson@nvidia.com>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Patrick Rudolph <patrick.rudolph@9elements.com>,
+	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
+	linux-gpio@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-acpi@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Bartosz Golaszewski <brgl@bgdev.pl>,
+	Mika Westerberg <mika.westerberg@linux.intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Len Brown <lenb@kernel.org>
+Subject: [PATCH v1 0/4] gpiolib: acpi: Use con_id in acpi_dev_gpio_irq_get_by()
+Date: Thu, 11 Apr 2024 20:22:28 +0300
+Message-ID: <20240411172540.4122581-2-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.43.0.rc1.1336.g36b5255a03ac
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 3/3] net: dsa: mv88e6xxx: provide own phylink
- MAC operations
-Content-Language: en-US
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
-References: <ZhbrbM+d5UfgafGp@shell.armlinux.org.uk>
- <E1rudqK-006K9N-HY@rmk-PC.armlinux.org.uk>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <E1rudqK-006K9N-HY@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 4/10/24 12:42, Russell King (Oracle) wrote:
-> Convert mv88e6xxx to provide its own phylink MAC operations, thus
-> avoiding the shim layer in DSA's port.c
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Use con_id instead of property in the acpi_dev_gpio_irq_get_by().
+It will be aligned with other GPIO library functions.
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Assumed to go via my GPIO ACPI library tree follwoed by GPIO subsystem.
+
+Andy Shevchenko (4):
+  gpiolib: acpi: Extract __acpi_find_gpio() helper
+  gpiolib: acpi: Simplify error handling in __acpi_find_gpio()
+  gpiolib: acpi: Move acpi_can_fallback_to_crs() out of
+    __acpi_find_gpio()
+  gpiolib: acpi: Pass con_id instead of property into
+    acpi_dev_gpio_irq_get_by()
+
+ drivers/gpio/gpio-pca953x.c                   |  2 +-
+ drivers/gpio/gpiolib-acpi.c                   | 52 +++++++++++--------
+ .../mellanox/mlxbf_gige/mlxbf_gige_main.c     |  2 +-
+ drivers/pinctrl/pinctrl-cy8c95x0.c            |  2 +-
+ include/linux/acpi.h                          |  8 +--
+ 5 files changed, 37 insertions(+), 29 deletions(-)
+
 -- 
-Florian
+2.43.0.rc1.1336.g36b5255a03ac
 
 
