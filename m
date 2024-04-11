@@ -1,95 +1,161 @@
-Return-Path: <netdev+bounces-87143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B73668A1DDD
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:20:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FBA68A1DE9
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:21:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E77A01C24BFE
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 18:20:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C930A28D402
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 18:21:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8DA69945;
-	Thu, 11 Apr 2024 17:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 540A37A15B;
+	Thu, 11 Apr 2024 17:32:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S7+fhPxI"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lxhUXvHh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB22459160;
-	Thu, 11 Apr 2024 17:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 833E62C695;
+	Thu, 11 Apr 2024 17:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712856629; cv=none; b=oybJ6zz8UbhZPVuWwsOxRQEKcxBq6VN4pgFF8j2zQ74vsPnkqzWV0ZjkxhP1XwTvBO8jHRT9jTn9Fo5hNk94SOTHxzep6Fu0+E7514fDbstBr318QhLPx9JHun/4ZYuvdaAgXSVxYr2VwJcNNrEu2YY4PbxP8yvJmMo4De6SsNM=
+	t=1712856739; cv=none; b=sQJOeO3MnnYytYMxWEmsWr3hMaBED0DAwJab01HBZZftb6IftwQd5+GudaYdDUxTkAglLH2Pa/cpnFt2HZvxc7qmieBebwcN3ufCe/TreeTcCnCyKiLFY/lmsQ9d7ZlaPLYVtF/clltmboVPaMih4sIGsNKDWmzxPC46Ym6EWWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712856629; c=relaxed/simple;
-	bh=vUH25OsPFa4RcBBeVz7wpTctxBONPQTL7NjwQVVnSok=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZRoYESYMBD681EWJoZKGxPCWk1w0QUshttAxbUtf8jivBm9MJx+blKSr4WVb+NcXak53T58cgAVIT483+2tvVbbKrerBOKBtIAbXVH/q0qxbVkdVhasiN65Vc9/8tZe1UHeQJwZqcLTm/qoEPXTk1NwErOnazQDbPzo5aRS42wU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S7+fhPxI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3610AC113CD;
-	Thu, 11 Apr 2024 17:30:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712856629;
-	bh=vUH25OsPFa4RcBBeVz7wpTctxBONPQTL7NjwQVVnSok=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=S7+fhPxIcy/4bgIhutbfJAdv2uH+nG0YuAJ4cbhJE+9zmSQBN4S7CXL96Ey1cqxU9
-	 6GABvx0BvzB4nO3yy/T/b6D8rQvqDgD/PfLGbQl3gpTMsK7RCENnDeZ7CFfZKucceJ
-	 4iLIUnOi/J2C5kLoCAuPKCX4U77qcwWLtp91zP37ox/B4q+adLzcLdniNGuhWisXR3
-	 DELm+S40U+5OdUTDChm6JLs35XzGJAjjDPdnZql7CMRYIeyRCTVL5mgmPMFmM2AL5j
-	 IH3X1ISXrEtjqYkrmB+/5HWqXbtuBEV1hksqZYTyulP/4Ov58B/LJBqFTbSRT/RmyD
-	 0y2K2aHcjPAug==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 20662C433F2;
-	Thu, 11 Apr 2024 17:30:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1712856739; c=relaxed/simple;
+	bh=2QoTSWKTLiVnlEWmF0KLVApI58WuOPTJLa7pr5wJxy4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C4S3jouDD6noCujyho5/YGqGyVAwEwzEbB57da8XcmEjzU7yO43LU7V0yEcQ3PNhU2tViSO+GhwMyGybkqmEE3zQZMCc3sPCIu46T0dzp18JuH0/s1iHogE28j5wCoOfOWLv6YPcH7Tkz/kwlh5YhV8T11wK0E9UaAZFA9rZwMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lxhUXvHh; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=zyBM0tQ9CQLcuJaCn3dHHUyOfoZlcsgu0yaD/od/bRY=; b=lx
+	hUXvHhsNuiINwLWXfo8vLxhAPoHLh1UB611yWqZqvyaed7nyLCpNYohnbMI3vaNjCChfiXhntYzFb
+	mP6QdxViVT8/Gkv7IbKuMaZdXmp1vIrKBs0hF18cpMpOr/zv2PPPO/HGPQWlPatylVDM0VTbuHiJ5
+	0sYb++KgwRWqQd8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ruyHM-00CnOv-IH; Thu, 11 Apr 2024 19:32:04 +0200
+Date: Thu, 11 Apr 2024 19:32:04 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, pabeni@redhat.com,
+	John Fastabend <john.fastabend@gmail.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org,
+	bhelgaas@google.com, linux-pci@vger.kernel.org,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
+ Platforms Host Network Interface
+Message-ID: <70bccb10-cc76-4eec-b2cf-975ed422c443@lunn.ch>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <20240409135142.692ed5d9@kernel.org>
+ <44093329-f90e-41a6-a610-0f9dd88254eb@lunn.ch>
+ <CAKgT0UcVnhgmXNU2FGcy6hbzUQZwNBZw0EKbFF3DsKDc8r452A@mail.gmail.com>
+ <c820695d-bda7-4452-a563-170700baf958@lunn.ch>
+ <CAKgT0Uf4i_MN-Wkvpk29YevwsgFrQ3TeQ5-ogLrF-QyMSjtiug@mail.gmail.com>
+ <c437cf8e-57d5-44d3-a71d-c95ea84838fd@lunn.ch>
+ <CAKgT0UcO-=dg2g0uFSMt2UnyzF7y2W8RVFDp15RZhy=Vb4g61Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/2] mptcp: add last time fields in mptcp_info
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171285662912.10890.774534823632472407.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Apr 2024 17:30:29 +0000
-References: <20240410-upstream-net-next-20240405-mptcp-last-time-info-v2-0-f95bd6b33e51@kernel.org>
-In-Reply-To: <20240410-upstream-net-next-20240405-mptcp-last-time-info-v2-0-f95bd6b33e51@kernel.org>
-To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- shuah@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, tanggeliang@kylinos.cn
+In-Reply-To: <CAKgT0UcO-=dg2g0uFSMt2UnyzF7y2W8RVFDp15RZhy=Vb4g61Q@mail.gmail.com>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Wed, 10 Apr 2024 11:48:23 +0200 you wrote:
-> These patches from Geliang add support for the "last time" field in
-> MPTCP Info, and verify that the counters look valid.
+On Thu, Apr 11, 2024 at 09:00:17AM -0700, Alexander Duyck wrote:
+> On Wed, Apr 10, 2024 at 3:37 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > > Well I was referring more to the data path level more than the phy
+> > > configuration. I suspect different people have different levels of
+> > > expectations on what minimal firmware is. With this hardware we at
+> > > least don't need to use firmware commands to enable or disable queues,
+> > > get the device stats, or update a MAC address.
+> > >
+> > > When it comes to multi-host NICs I am not sure there are going to be
+> > > any solutions that don't have some level of firmware due to the fact
+> > > that the cable is physically shared with multiple slots.
+> >
+> > This is something Russell King at least considered. I don't really
+> > know enough to know why its impossible for Linux to deal with multiple
+> > slots.
 > 
-> Patch 1 adds these counters: last_data_sent, last_data_recv and
-> last_ack_recv. They are available in the MPTCP Info, so exposed via
-> getsockopt(MPTCP_INFO) and the Netlink Diag interface.
+> It mostly has to do with the arbitration between them. It is a matter
+> of having to pass a TON of info to the individual slice and then the
+> problem is it would have to do things correctly and not manage to take
+> out it's neighbor or the BMC.
+
+How much is specific to your device? How much is just following 802.3
+and the CMIS standards? I assume anything which is just following
+802.3 and CMIS could actually be re-used? And you have some glue to
+combine them in a way that is specific to your device?
+ 
+> > > I am assuming we still want to do the PCS driver. So I will still see
+> > > what I can do to get that setup.
+> >
+> > You should look at the API offered by drivers in drivers/net/pcs. It
+> > is designed to be used with drivers which actually drive the hardware,
+> > and use phylink. Who is responsible for configuring and looking at the
+> > results of auto negotiation? Who is responsible for putting the PCS
+> > into the correct mode depending on the SFP modules capabilities?
+> > Because you seemed to of split the PCS into two, and hidden some of it
+> > away, i don't know if it makes sense to try to shoehorn what is left
+> > into a Linux driver.
 > 
-> [...]
+> We have control of the auto negotiation as that is north of the PMA
+> and is configured per host. We should support clause 73 autoneg.
+> Although we haven't done much with it as most of our use cases are
+> just fixed speed setups to the switch over either 25G-CR1, 50G-CR2,
+> 50G-CR1, or 100G-CR2. So odds are we aren't going to be doing anything
+> too terribly exciting.
 
-Here is the summary with links:
-  - [net-next,v2,1/2] mptcp: add last time fields in mptcp_info
-    https://git.kernel.org/netdev/net-next/c/18d82cde7432
-  - [net-next,v2,2/2] selftests: mptcp: test last time mptcp_info
-    https://git.kernel.org/netdev/net-next/c/22724c89892f
+Maybe not, but you might of gained from the community here, if others
+could of adopted this code for their devices. You might not need
+clause 73, but phylink provides helpers to implement it, so it is
+pretty easy to add. Maybe your initial PCS driver does not support it,
+but later adopters who also licence this PCS might add it, and you get
+the feature for free. The corrected/uncorrected counters i asked
+about, are something you might not export in your current code via
+ethtool. But again, this is something which somebody else could add a
+helper for, and you would get it nearly for free.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> As far as the QSFP setup the FW is responsible for any communication
+> with it. I suspect that the expectation is that we aren't going to
+> need much in the way of config since we are just using direct attach
+> cables.
 
+Another place you might of got features for free. The Linux SFP driver
+exports HWMON values for temperature, power, received power, etc, but
+for 1G. The QSFP+ standard Versatile Diagnostics Monitoring is
+different, but i could see somebody adding a generic implementation in
+the Linux SFP driver, so that the HWMON support is just free. Same
+goes for the error performance statics. Parts of power management
+could easily be generic. It might be possible to use Linux regulators
+to describe what your board is capable if, and the SFP core could then
+implement the ethtool ops, checking with the regulator to see if the
+power is actually available, and then talking to the SFP to tell it to
+change its power class?
 
+Florian posted some interesting statistics, that vendors tend to
+maintain their own drivers, and don't get much support from the
+community. However i suspect it is a different story for shared
+infrastructure like PCS drivers, PHY drivers, SFP drivers. That is
+where you get the most community support and the most stuff for free.
+But you actually have to use it to benefit from it.
+
+	Andrew
 
