@@ -1,207 +1,396 @@
-Return-Path: <netdev+bounces-87202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2588A8A2221
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 01:13:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A6478A223F
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 01:24:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF5A2288158
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 23:12:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B13C628AA30
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 23:24:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 063EC47A79;
-	Thu, 11 Apr 2024 23:12:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D3747F59;
+	Thu, 11 Apr 2024 23:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DtjkXQXB"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GWxyn7sh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EF2D3FE54;
-	Thu, 11 Apr 2024 23:12:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A45524C
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 23:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712877174; cv=none; b=CC0CYb02wIH9ycPpUlDB8jcqdjbkkhcEwu5vKDwOd7jCnMcIFvAaZ1reMHEVdwno5en2v1zp5uWZGh+yDL9qUonAnLDCm+wR6v1zwCsQO8RAPXqBmzXeG0abydok4zphGT4HGsMOHgavcldsac/HZUnYhEB/9Us4sQ4+J6NuCLs=
+	t=1712877843; cv=none; b=EABe6unUiUXlOiuaGFxPCDnPc/ZpgakcopmE2WKxEZYHdRDMmbo4/z7F4mmZRTJ4ZzJSCVJRzV976ltc+3j5EXI3yRcWmpwijfNBPRmIo75NeYtXkcYrF3YWccu1rghIkho+tVKWSlOqVFTi+vlR2WIpVsEJIid0BEvX32Irk0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712877174; c=relaxed/simple;
-	bh=hdeI8NrGkvT/Vd5qwYRruu3DRd4Jdrbcc1kftFqabYU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=COnWDMMfzgLhxWsDJFrz6e5PvObuOpOJM6OznlBiL/OlHB6AFdryozKAQlfKIFRoRu46HQ6LnptMkixJoSIrIfAGV9zOEYDrOxpOAEduh0rjoQyyD7ndwRHJU/9w1SHR5CZe3ML5orwNr10EF6p9tPAQdbuj0EdV+kBuN/V9sPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DtjkXQXB; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-343c2f5b50fso227663f8f.2;
-        Thu, 11 Apr 2024 16:12:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712877171; x=1713481971; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hdeI8NrGkvT/Vd5qwYRruu3DRd4Jdrbcc1kftFqabYU=;
-        b=DtjkXQXBXdaBtot7rd0PABEy21Ig8AYRdFL3vM87ykPEHNujYmTT036bH60/zntbI7
-         +qF6Q00Z3cGyxE4sRVDoQTJmXwNZVHkRo9apqR0FTFgGvdwFj7Iir/REeRBd4QjQ9XIQ
-         AeEwx4qeYdy20QtVmi6L21qxI/9wOrTM1P47/ZEXaFdOymbGnRmSAEHX+ymt76wQAqjv
-         wv8gFVqOBRgigrW/wKgwH+IKN5quuTUTVuez57b2MN7Ru/Lvf28G9QsVpiWTL9Hx1MbM
-         gFXhQIR6yo2BAdpzTUCKeRhkFS3XLo+ILTII7JcrtDh4YlfgMOOam2sd/HKfHOLP+RuO
-         wDGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712877171; x=1713481971;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hdeI8NrGkvT/Vd5qwYRruu3DRd4Jdrbcc1kftFqabYU=;
-        b=HkrGTq8TYOfhWs5ujY73QxuL6QNPTOW99k65erCU01tApkqRlZ0vIE7uHoajUVwcEv
-         beuSldJ/ZXFgZXJIB20LsdzmHhkjGRZwq8/19x54VvxSRyS8CC3kpYx3dF9AqX1vCHqo
-         UEtRRqDZAGdNroIQElLpwDxpRRZpfYSw3bfAjfxCV8muMntAiPvCrASS7UUJjAxDMfJx
-         fWX19mXkSLud3zsYjp5W1RZZXdd7Z31k1F5S+bv0GoWYyDiKoKbyrhu6YZMp+KOonCgl
-         r5yi7sMRHStWQbZp31MEMaZWieZBdlqusf44TP7lxjHpJfHU5OxqN8+shscw6aMF28jM
-         7X8A==
-X-Forwarded-Encrypted: i=1; AJvYcCX3hCC6NZRxJ6PNlwolTMbQ4RhtrLqWYpAJ5E3ZTpKhDbVGruAWtqHSW7ygHlRZuraYIq4Opdaij6sSYgEPvBMjaZ6VxvgeY94bWd0E+IaKToAflz6OlwEO96impcvQ2+47
-X-Gm-Message-State: AOJu0YwdYjZkUA+aUwBZlkBfwOARcBvQEb8MWBcCNMO8je/KqVnHg4jV
-	7TQzJC7ogNRSCx6/k7/3d1W0aXymqjHGX3XStwCBMGP3vrmu57oXvmVlHvNfUjo1/kMdK3mVcUv
-	4CAo8eIlEjUHfTEFJINZRJrbe0PI=
-X-Google-Smtp-Source: AGHT+IFZq07WBeCr7eODrDno1cPdCotcTL9CZaAHN6yhjQv2O0MUoTiCAdW8paIMAjf5e/zqFKaK/p379IZYSw9rpLg=
-X-Received: by 2002:adf:f1c6:0:b0:341:ca5c:93da with SMTP id
- z6-20020adff1c6000000b00341ca5c93damr584076wro.1.1712877171316; Thu, 11 Apr
- 2024 16:12:51 -0700 (PDT)
+	s=arc-20240116; t=1712877843; c=relaxed/simple;
+	bh=G7tNbr/pyOlZ4/hL1mcrTmWV4w+ePVYtzpFLZe0MG5k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HJWY1GBLPv9MpG8sChGcCbcWpPo80aL52ek4iPbmNqQEUtF3lRk2yJJhzVbzjyhSyevjhSuhjOrXBcVCkZ66nNHJKfnhHhaJ6VfTxqZULqZ7JxGwE1TWIT93UEIF09UlfezPX0x/Z6DNBzE3a4MLvGdIaTNVpY3EjLrRWiNvkzk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GWxyn7sh; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712877841; x=1744413841;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=G7tNbr/pyOlZ4/hL1mcrTmWV4w+ePVYtzpFLZe0MG5k=;
+  b=GWxyn7shjCyrIBqKVOX1TtLgYZLRjX/iT6qMvhrh/L+1Pei3VJ0HN6eK
+   22P694/zhaU6bfisSu9CSWBch7vKQo06TjN2HJbfMzeONVpG7rfV9Gj7i
+   uRYxzub9UygywRULUuSR/vTVkf+ugOxVPwnYYlkHcXzsUOvN9FzvbuvcH
+   0EE57nmb3txzCHDa+PvO0BVvV5z6YAN6NY3RVYbCPTFSfsAC7jFGfy3nt
+   XwtWVv6vj2ce6/enaNYy1Seh/c/NmF9EJ2cFg3V9TWxuASbzgKzhmslBP
+   lME57y3Xr1v09XM92PPhMnT7+wE/sqlIJCV6EuZvI3q1jezt/1Qbr9XXt
+   A==;
+X-CSE-ConnectionGUID: itPruR4gTbS9DTI70tTgFw==
+X-CSE-MsgGUID: 9feUJ8dLTNeiRS4qfOVkOw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11041"; a="33718230"
+X-IronPort-AV: E=Sophos;i="6.07,194,1708416000"; 
+   d="scan'208";a="33718230"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 16:24:00 -0700
+X-CSE-ConnectionGUID: QMh1Uu/hT9K6z1I2m6JpxQ==
+X-CSE-MsgGUID: 0wbBKrQRQ8qHlYEwzObFPQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,194,1708416000"; 
+   d="scan'208";a="21104175"
+Received: from lkp-server01.sh.intel.com (HELO e61807b1d151) ([10.239.97.150])
+  by fmviesa006.fm.intel.com with ESMTP; 11 Apr 2024 16:23:58 -0700
+Received: from kbuild by e61807b1d151 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rv3lr-00095X-0o;
+	Thu, 11 Apr 2024 23:23:55 +0000
+Date: Fri, 12 Apr 2024 07:23:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: Karol Kolacinski <karol.kolacinski@intel.com>,
+	intel-wired-lan@lists.osuosl.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, anthony.l.nguyen@intel.com,
+	jesse.brandeburg@intel.com,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: Re: [PATCH v7 iwl-next 05/12] ice: Move CGU block
+Message-ID: <202404120744.ROMZFi55-lkp@intel.com>
+References: <20240408111814.404583-19-karol.kolacinski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <20240409135142.692ed5d9@kernel.org> <44093329-f90e-41a6-a610-0f9dd88254eb@lunn.ch>
- <CAKgT0UcVnhgmXNU2FGcy6hbzUQZwNBZw0EKbFF3DsKDc8r452A@mail.gmail.com>
- <c820695d-bda7-4452-a563-170700baf958@lunn.ch> <CAKgT0Uf4i_MN-Wkvpk29YevwsgFrQ3TeQ5-ogLrF-QyMSjtiug@mail.gmail.com>
- <c437cf8e-57d5-44d3-a71d-c95ea84838fd@lunn.ch> <CAKgT0UcO-=dg2g0uFSMt2UnyzF7y2W8RVFDp15RZhy=Vb4g61Q@mail.gmail.com>
- <70bccb10-cc76-4eec-b2cf-975ed422c443@lunn.ch>
-In-Reply-To: <70bccb10-cc76-4eec-b2cf-975ed422c443@lunn.ch>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Thu, 11 Apr 2024 16:12:14 -0700
-Message-ID: <CAKgT0UfY3MQumrSpLL_tP-xCLjYThsrfH7vFW810f5FsWWJskA@mail.gmail.com>
-Subject: Re: [net-next PATCH 00/15] eth: fbnic: Add network driver for Meta
- Platforms Host Network Interface
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, pabeni@redhat.com, 
-	John Fastabend <john.fastabend@gmail.com>, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org, bhelgaas@google.com, 
-	linux-pci@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240408111814.404583-19-karol.kolacinski@intel.com>
 
-On Thu, Apr 11, 2024 at 10:32=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote=
-:
->
-> On Thu, Apr 11, 2024 at 09:00:17AM -0700, Alexander Duyck wrote:
-> > On Wed, Apr 10, 2024 at 3:37=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wr=
-ote:
-> > >
-> > > > Well I was referring more to the data path level more than the phy
-> > > > configuration. I suspect different people have different levels of
-> > > > expectations on what minimal firmware is. With this hardware we at
-> > > > least don't need to use firmware commands to enable or disable queu=
-es,
-> > > > get the device stats, or update a MAC address.
-> > > >
-> > > > When it comes to multi-host NICs I am not sure there are going to b=
-e
-> > > > any solutions that don't have some level of firmware due to the fac=
-t
-> > > > that the cable is physically shared with multiple slots.
-> > >
-> > > This is something Russell King at least considered. I don't really
-> > > know enough to know why its impossible for Linux to deal with multipl=
-e
-> > > slots.
-> >
-> > It mostly has to do with the arbitration between them. It is a matter
-> > of having to pass a TON of info to the individual slice and then the
-> > problem is it would have to do things correctly and not manage to take
-> > out it's neighbor or the BMC.
->
-> How much is specific to your device? How much is just following 802.3
-> and the CMIS standards? I assume anything which is just following
-> 802.3 and CMIS could actually be re-used? And you have some glue to
-> combine them in a way that is specific to your device?
->
-> > > > I am assuming we still want to do the PCS driver. So I will still s=
-ee
-> > > > what I can do to get that setup.
-> > >
-> > > You should look at the API offered by drivers in drivers/net/pcs. It
-> > > is designed to be used with drivers which actually drive the hardware=
-,
-> > > and use phylink. Who is responsible for configuring and looking at th=
-e
-> > > results of auto negotiation? Who is responsible for putting the PCS
-> > > into the correct mode depending on the SFP modules capabilities?
-> > > Because you seemed to of split the PCS into two, and hidden some of i=
-t
-> > > away, i don't know if it makes sense to try to shoehorn what is left
-> > > into a Linux driver.
-> >
-> > We have control of the auto negotiation as that is north of the PMA
-> > and is configured per host. We should support clause 73 autoneg.
-> > Although we haven't done much with it as most of our use cases are
-> > just fixed speed setups to the switch over either 25G-CR1, 50G-CR2,
-> > 50G-CR1, or 100G-CR2. So odds are we aren't going to be doing anything
-> > too terribly exciting.
->
-> Maybe not, but you might of gained from the community here, if others
-> could of adopted this code for their devices. You might not need
-> clause 73, but phylink provides helpers to implement it, so it is
-> pretty easy to add. Maybe your initial PCS driver does not support it,
-> but later adopters who also licence this PCS might add it, and you get
-> the feature for free. The corrected/uncorrected counters i asked
-> about, are something you might not export in your current code via
-> ethtool. But again, this is something which somebody else could add a
-> helper for, and you would get it nearly for free.
+Hi Karol,
 
-You don't have to sell me on the reuse advantages of open source. I
-will probably look at adding autoneg at some point in the future, but
-for our main use case it wasn't needed. If nothing else I will
-probably hand it off to one of the new hires on the team when I get
-some time.
+kernel test robot noticed the following build warnings:
 
-The counters are exported. Just haven't gotten far enough to show the
-ethtool patches yet.. :-)
+[auto build test WARNING on c6f2492cda380a8bce00f61c3a4272401fbb9043]
 
-> > As far as the QSFP setup the FW is responsible for any communication
-> > with it. I suspect that the expectation is that we aren't going to
-> > need much in the way of config since we are just using direct attach
-> > cables.
->
-> Another place you might of got features for free. The Linux SFP driver
-> exports HWMON values for temperature, power, received power, etc, but
-> for 1G. The QSFP+ standard Versatile Diagnostics Monitoring is
-> different, but i could see somebody adding a generic implementation in
-> the Linux SFP driver, so that the HWMON support is just free. Same
-> goes for the error performance statics. Parts of power management
-> could easily be generic. It might be possible to use Linux regulators
-> to describe what your board is capable if, and the SFP core could then
-> implement the ethtool ops, checking with the regulator to see if the
-> power is actually available, and then talking to the SFP to tell it to
-> change its power class?
+url:    https://github.com/intel-lab-lkp/linux/commits/Karol-Kolacinski/ice-Introduce-ice_ptp_hw-struct/20240408-192129
+base:   c6f2492cda380a8bce00f61c3a4272401fbb9043
+patch link:    https://lore.kernel.org/r/20240408111814.404583-19-karol.kolacinski%40intel.com
+patch subject: [PATCH v7 iwl-next 05/12] ice: Move CGU block
+config: arm-randconfig-002-20240412 (https://download.01.org/0day-ci/archive/20240412/202404120744.ROMZFi55-lkp@intel.com/config)
+compiler: clang version 16.0.4 (https://github.com/llvm/llvm-project.git ae42196bc493ffe877a7e3dff8be32035dea4d07)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240412/202404120744.ROMZFi55-lkp@intel.com/reproduce)
 
-Again, for us it ends up not having much value adding additional QSFP
-logic because we aren't using anything fancy. It is all just direct
-attach cables.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202404120744.ROMZFi55-lkp@intel.com/
 
-> Florian posted some interesting statistics, that vendors tend to
-> maintain their own drivers, and don't get much support from the
-> community. However I suspect it is a different story for shared
-> infrastructure like PCS drivers, PHY drivers, SFP drivers. That is
-> where you get the most community support and the most stuff for free.
-> But you actually have to use it to benefit from it.
+All warnings (new ones prefixed by >>):
 
-I'll probably get started on the PCS drivers for this next week. I
-will follow up with questions if I run into any issues.
+>> drivers/net/ethernet/intel/ice/ice_ptp_hw.c:902:19: warning: shift count is negative [-Wshift-count-negative]
+           high = FIELD_GET(P_REG_40B_HIGH_M, val);
+                  ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.h:381:27: note: expanded from macro 'P_REG_40B_HIGH_M'
+   #define P_REG_40B_HIGH_M                GENMASK(39, 8)
+                                           ^
+   include/linux/bits.h:35:31: note: expanded from macro 'GENMASK'
+           (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+                                        ^
+   include/uapi/linux/bits.h:9:19: note: expanded from macro '__GENMASK'
+            (~_UL(0) >> (__BITS_PER_LONG - 1 - (h))))
+                     ^
+   note: (skipping 3 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+   include/linux/compiler_types.h:460:22: note: expanded from macro 'compiletime_assert'
+           _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+           ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:448:23: note: expanded from macro '_compiletime_assert'
+           __compiletime_assert(condition, msg, prefix, suffix)
+           ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:440:9: note: expanded from macro '__compiletime_assert'
+                   if (!(condition))                                       \
+                         ^~~~~~~~~
+>> drivers/net/ethernet/intel/ice/ice_ptp_hw.c:902:19: warning: shift count is negative [-Wshift-count-negative]
+           high = FIELD_GET(P_REG_40B_HIGH_M, val);
+                  ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.h:381:27: note: expanded from macro 'P_REG_40B_HIGH_M'
+   #define P_REG_40B_HIGH_M                GENMASK(39, 8)
+                                           ^
+   include/linux/bits.h:35:31: note: expanded from macro 'GENMASK'
+           (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+                                        ^
+   include/uapi/linux/bits.h:9:19: note: expanded from macro '__GENMASK'
+            (~_UL(0) >> (__BITS_PER_LONG - 1 - (h))))
+                     ^
+   note: (skipping 3 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+   include/linux/compiler_types.h:460:22: note: expanded from macro 'compiletime_assert'
+           _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+           ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:448:23: note: expanded from macro '_compiletime_assert'
+           __compiletime_assert(condition, msg, prefix, suffix)
+           ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:440:9: note: expanded from macro '__compiletime_assert'
+                   if (!(condition))                                       \
+                         ^~~~~~~~~
+>> drivers/net/ethernet/intel/ice/ice_ptp_hw.c:902:19: warning: shift count is negative [-Wshift-count-negative]
+           high = FIELD_GET(P_REG_40B_HIGH_M, val);
+                  ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.h:381:27: note: expanded from macro 'P_REG_40B_HIGH_M'
+   #define P_REG_40B_HIGH_M                GENMASK(39, 8)
+                                           ^
+   include/linux/bits.h:35:31: note: expanded from macro 'GENMASK'
+           (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+                                        ^
+   include/uapi/linux/bits.h:9:19: note: expanded from macro '__GENMASK'
+            (~_UL(0) >> (__BITS_PER_LONG - 1 - (h))))
+                     ^
+   note: (skipping 3 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+   include/linux/compiler_types.h:460:22: note: expanded from macro 'compiletime_assert'
+           _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+           ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:448:23: note: expanded from macro '_compiletime_assert'
+           __compiletime_assert(condition, msg, prefix, suffix)
+           ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:440:9: note: expanded from macro '__compiletime_assert'
+                   if (!(condition))                                       \
+                         ^~~~~~~~~
+>> drivers/net/ethernet/intel/ice/ice_ptp_hw.c:902:19: warning: shift count is negative [-Wshift-count-negative]
+           high = FIELD_GET(P_REG_40B_HIGH_M, val);
+                  ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.h:381:27: note: expanded from macro 'P_REG_40B_HIGH_M'
+   #define P_REG_40B_HIGH_M                GENMASK(39, 8)
+                                           ^
+   include/linux/bits.h:35:31: note: expanded from macro 'GENMASK'
+           (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+                                        ^
+   include/uapi/linux/bits.h:9:19: note: expanded from macro '__GENMASK'
+            (~_UL(0) >> (__BITS_PER_LONG - 1 - (h))))
+                     ^
+   note: (skipping 4 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+   include/linux/compiler_types.h:460:22: note: expanded from macro 'compiletime_assert'
+           _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+           ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:448:23: note: expanded from macro '_compiletime_assert'
+           __compiletime_assert(condition, msg, prefix, suffix)
+           ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:440:9: note: expanded from macro '__compiletime_assert'
+                   if (!(condition))                                       \
+                         ^~~~~~~~~
+>> drivers/net/ethernet/intel/ice/ice_ptp_hw.c:902:19: warning: shift count is negative [-Wshift-count-negative]
+           high = FIELD_GET(P_REG_40B_HIGH_M, val);
+                  ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.h:381:27: note: expanded from macro 'P_REG_40B_HIGH_M'
+   #define P_REG_40B_HIGH_M                GENMASK(39, 8)
+                                           ^
+   include/linux/bits.h:35:31: note: expanded from macro 'GENMASK'
+           (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+                                        ^
+   include/uapi/linux/bits.h:9:19: note: expanded from macro '__GENMASK'
+            (~_UL(0) >> (__BITS_PER_LONG - 1 - (h))))
+                     ^
+   note: (skipping 4 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+   include/linux/compiler_types.h:460:22: note: expanded from macro 'compiletime_assert'
+           _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+           ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:448:23: note: expanded from macro '_compiletime_assert'
+           __compiletime_assert(condition, msg, prefix, suffix)
+           ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:440:9: note: expanded from macro '__compiletime_assert'
+                   if (!(condition))                                       \
+                         ^~~~~~~~~
+>> drivers/net/ethernet/intel/ice/ice_ptp_hw.c:902:19: warning: shift count is negative [-Wshift-count-negative]
+           high = FIELD_GET(P_REG_40B_HIGH_M, val);
+                  ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.h:381:27: note: expanded from macro 'P_REG_40B_HIGH_M'
+   #define P_REG_40B_HIGH_M                GENMASK(39, 8)
+                                           ^
+   include/linux/bits.h:35:31: note: expanded from macro 'GENMASK'
+           (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+                                        ^
+   include/uapi/linux/bits.h:9:19: note: expanded from macro '__GENMASK'
+            (~_UL(0) >> (__BITS_PER_LONG - 1 - (h))))
+                     ^
+   note: (skipping 5 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+   include/linux/compiler_types.h:460:22: note: expanded from macro 'compiletime_assert'
+           _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+           ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:448:23: note: expanded from macro '_compiletime_assert'
+           __compiletime_assert(condition, msg, prefix, suffix)
+           ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:440:9: note: expanded from macro '__compiletime_assert'
+                   if (!(condition))                                       \
+                         ^~~~~~~~~
+>> drivers/net/ethernet/intel/ice/ice_ptp_hw.c:902:19: warning: shift count is negative [-Wshift-count-negative]
+           high = FIELD_GET(P_REG_40B_HIGH_M, val);
+                  ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.h:381:27: note: expanded from macro 'P_REG_40B_HIGH_M'
+   #define P_REG_40B_HIGH_M                GENMASK(39, 8)
+                                           ^
+   include/linux/bits.h:35:31: note: expanded from macro 'GENMASK'
+           (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+                                        ^
+   include/uapi/linux/bits.h:9:19: note: expanded from macro '__GENMASK'
+            (~_UL(0) >> (__BITS_PER_LONG - 1 - (h))))
+                     ^
+   note: (skipping 6 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+   include/linux/compiler_types.h:460:22: note: expanded from macro 'compiletime_assert'
+           _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+           ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:448:23: note: expanded from macro '_compiletime_assert'
+           __compiletime_assert(condition, msg, prefix, suffix)
+           ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:440:9: note: expanded from macro '__compiletime_assert'
+                   if (!(condition))                                       \
+                         ^~~~~~~~~
+>> drivers/net/ethernet/intel/ice/ice_ptp_hw.c:902:19: warning: shift count is negative [-Wshift-count-negative]
+           high = FIELD_GET(P_REG_40B_HIGH_M, val);
+                  ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.h:381:27: note: expanded from macro 'P_REG_40B_HIGH_M'
+   #define P_REG_40B_HIGH_M                GENMASK(39, 8)
+                                           ^
+   include/linux/bits.h:35:31: note: expanded from macro 'GENMASK'
+           (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+                                        ^
+   include/uapi/linux/bits.h:9:19: note: expanded from macro '__GENMASK'
+            (~_UL(0) >> (__BITS_PER_LONG - 1 - (h))))
+                     ^
+   note: (skipping 5 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+   include/linux/compiler_types.h:460:22: note: expanded from macro 'compiletime_assert'
+           _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+           ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:448:23: note: expanded from macro '_compiletime_assert'
+           __compiletime_assert(condition, msg, prefix, suffix)
+           ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:440:9: note: expanded from macro '__compiletime_assert'
+                   if (!(condition))                                       \
+                         ^~~~~~~~~
+>> drivers/net/ethernet/intel/ice/ice_ptp_hw.c:902:19: warning: shift count is negative [-Wshift-count-negative]
+           high = FIELD_GET(P_REG_40B_HIGH_M, val);
+                  ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.h:381:27: note: expanded from macro 'P_REG_40B_HIGH_M'
+   #define P_REG_40B_HIGH_M                GENMASK(39, 8)
+                                           ^
+   include/linux/bits.h:35:31: note: expanded from macro 'GENMASK'
+           (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+                                        ^
+   include/uapi/linux/bits.h:9:19: note: expanded from macro '__GENMASK'
+            (~_UL(0) >> (__BITS_PER_LONG - 1 - (h))))
+                     ^
+   note: (skipping 6 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+   include/linux/compiler_types.h:460:22: note: expanded from macro 'compiletime_assert'
+           _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+           ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:448:23: note: expanded from macro '_compiletime_assert'
+           __compiletime_assert(condition, msg, prefix, suffix)
+           ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/compiler_types.h:440:9: note: expanded from macro '__compiletime_assert'
+                   if (!(condition))                                       \
+                         ^~~~~~~~~
+>> drivers/net/ethernet/intel/ice/ice_ptp_hw.c:902:19: warning: shift count is negative [-Wshift-count-negative]
+           high = FIELD_GET(P_REG_40B_HIGH_M, val);
+                  ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.h:381:27: note: expanded from macro 'P_REG_40B_HIGH_M'
+   #define P_REG_40B_HIGH_M                GENMASK(39, 8)
+                                           ^
+   include/linux/bits.h:35:31: note: expanded from macro 'GENMASK'
+           (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+                                        ^
+   include/uapi/linux/bits.h:9:19: note: expanded from macro '__GENMASK'
+            (~_UL(0) >> (__BITS_PER_LONG - 1 - (h))))
+                     ^
+   include/linux/bitfield.h:156:30: note: expanded from macro 'FIELD_GET'
+                   (typeof(_mask))(((_reg) & (_mask)) >> __bf_shf(_mask)); \
+                                              ^~~~~
+>> drivers/net/ethernet/intel/ice/ice_ptp_hw.c:902:19: warning: shift count is negative [-Wshift-count-negative]
+           high = FIELD_GET(P_REG_40B_HIGH_M, val);
+                  ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/ethernet/intel/ice/ice_ptp_hw.h:381:27: note: expanded from macro 'P_REG_40B_HIGH_M'
+   #define P_REG_40B_HIGH_M                GENMASK(39, 8)
+                                           ^
+   include/linux/bits.h:35:31: note: expanded from macro 'GENMASK'
+           (GENMASK_INPUT_CHECK(h, l) + __GENMASK(h, l))
+                                        ^
+   include/uapi/linux/bits.h:9:19: note: expanded from macro '__GENMASK'
+            (~_UL(0) >> (__BITS_PER_LONG - 1 - (h))))
+                     ^
+   include/linux/bitfield.h:156:50: note: expanded from macro 'FIELD_GET'
+                   (typeof(_mask))(((_reg) & (_mask)) >> __bf_shf(_mask)); \
+                                                         ~~~~~~~~~^~~~~~
+   include/linux/bitfield.h:45:38: note: expanded from macro '__bf_shf'
+   #define __bf_shf(x) (__builtin_ffsll(x) - 1)
+                                        ^
+   11 warnings generated.
 
-Thanks,
 
-- Alex
+vim +902 drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+
+   875	
+   876	/**
+   877	 * ice_write_40b_phy_reg_e82x - Write a 40b value to the PHY
+   878	 * @hw: pointer to the HW struct
+   879	 * @port: port to write to
+   880	 * @low_addr: offset of the low register
+   881	 * @val: 40b value to write
+   882	 *
+   883	 * Write the provided 40b value to the two associated registers by splitting
+   884	 * it up into two chunks, the lower 8 bits and the upper 32 bits.
+   885	 */
+   886	static int
+   887	ice_write_40b_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 low_addr, u64 val)
+   888	{
+   889		u32 low, high;
+   890		u16 high_addr;
+   891		int err;
+   892	
+   893		/* Only operate on registers known to be split into a lower 8 bit
+   894		 * register and an upper 32 bit register.
+   895		 */
+   896		if (!ice_is_40b_phy_reg_e82x(low_addr, &high_addr)) {
+   897			ice_debug(hw, ICE_DBG_PTP, "Invalid 40b register addr 0x%08x\n",
+   898				  low_addr);
+   899			return -EINVAL;
+   900		}
+   901		low = FIELD_GET(P_REG_40B_LOW_M, val);
+ > 902		high = FIELD_GET(P_REG_40B_HIGH_M, val);
+   903	
+   904		err = ice_write_phy_reg_e82x(hw, port, low_addr, low);
+   905		if (err) {
+   906			ice_debug(hw, ICE_DBG_PTP, "Failed to write to low register 0x%08x\n, err %d",
+   907				  low_addr, err);
+   908			return err;
+   909		}
+   910	
+   911		err = ice_write_phy_reg_e82x(hw, port, high_addr, high);
+   912		if (err) {
+   913			ice_debug(hw, ICE_DBG_PTP, "Failed to write to high register 0x%08x\n, err %d",
+   914				  high_addr, err);
+   915			return err;
+   916		}
+   917	
+   918		return 0;
+   919	}
+   920	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
