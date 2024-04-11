@@ -1,301 +1,413 @@
-Return-Path: <netdev+bounces-87005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3C3F8A13FA
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:06:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADD0F8A1411
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:12:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04BC3B26084
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:06:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 067C7B24B6D
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:12:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 851C914C5BE;
-	Thu, 11 Apr 2024 12:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42E6D14C5BF;
+	Thu, 11 Apr 2024 12:12:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JyhIwjMs"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="L204BLKH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2682314AD31
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 12:05:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5123E14AD35
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 12:11:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712837162; cv=none; b=NHl2ka1xGNvV3YlB6Q4h38HtnQ0/pQxukJMAkNKyrx6tyIX2Dg7fXZfjdiUpGpIPN1ApsiNj4gzIJldt2SvIsuQPych248n7Vj1qz9mq7crIsMUDjwX3Nv1EzNxPidgw2299iiZ1i9ETZAGI7tUOxvJ71bLFa7RwDUw2EFBxIL8=
+	t=1712837523; cv=none; b=b0DH73Y9hfIWhIHvjgYGs1Fpgz0KH7BZVyVo5IUSm6ACYfT/I0sMOahzFDqiJ6iaFmUy5kO8WhMBqEjZ2mtEeTZxRLeBKAyBK7kdaKf0KYrZzzzLfqu/ckbMJmKZn+4kPxgpDBd295cTf/tKNevWBIdeYQHp555Anobjswb7mh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712837162; c=relaxed/simple;
-	bh=1n6AN7Q5Il74SuNVVp1/svnYM1kvpkv78nxj/4n246Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bP75QvaMl5driq28NO12XwT3iKMr4QICc3QTxAdem+oLRvKBUsIu/Aoks9oGhb4n9aDU755ZQ+bla8c82h8pJ/PUw8qU9XgAAywsjsh2Hx3lkle+lAwPkJbUxGvTfeojM3Fo4Ipm6Y4gPLVHD/LgqvSd8xIhkG5Wos+i7/PLuak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JyhIwjMs; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1712837159;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bmyM13XQc++st4qxhkILSiS+m45D3ZcUOfWUkckugQ0=;
-	b=JyhIwjMs5BFPtdJVJ3QhipXzTieyth7YkuTOEVhAwyRGYqFh5G1PGfCRl4VaIYH/xhW0lV
-	3RKrJlvx8A3czohWRkCgf5+iyhKMiwQl9cygWR+r8lXFxHuyxTlA1wP5ENb9yMsBdZkSU3
-	MHPTEyD4OUiiYmLNTITZ9P/ei3d+9Gc=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-316-6cEXLY47NHarPR6SmSzKWw-1; Thu,
- 11 Apr 2024 08:05:56 -0400
-X-MC-Unique: 6cEXLY47NHarPR6SmSzKWw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7ACDE293248B;
-	Thu, 11 Apr 2024 12:05:55 +0000 (UTC)
-Received: from vschneid-thinkpadt14sgen2i.remote.csb (unknown [10.39.193.36])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 246831C060D0;
-	Thu, 11 Apr 2024 12:05:53 +0000 (UTC)
-From: Valentin Schneider <vschneid@redhat.com>
-To: dccp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rt-users@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	mleitner@redhat.com,
-	David Ahern <dsahern@kernel.org>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Tomas Glozar <tglozar@redhat.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Thomas Gleixner <tglx@linutronix.de>
-Subject: [PATCH v4 1/1] tcp/dcpp: Un-pin tw_timer
-Date: Thu, 11 Apr 2024 14:05:35 +0200
-Message-ID: <20240411120535.2494067-2-vschneid@redhat.com>
-In-Reply-To: <20240411120535.2494067-1-vschneid@redhat.com>
-References: <20240411120535.2494067-1-vschneid@redhat.com>
+	s=arc-20240116; t=1712837523; c=relaxed/simple;
+	bh=bdW1R4xwvLxfM4kN6Db7+AiZayuS+rX9KhotHqqG9vk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A3+bxlBeJ3Ga+Beb0NszEsEVSODTmJt1czGhi2uGUSRwXK2bwPcF8Rh4Cpq3f7hKiDy1nShvIL/VzLxn4i0Gv8+N3aIUyQOhIaiG8eYnzOxIQJf3KIam4T1POcR9hJnptmj1mu6MuxYsC/+anbMNhJYGTMiO5q2czzPisYM7h/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=L204BLKH; arc=none smtp.client-ip=209.85.210.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6ea2ac4607aso1454789a34.3
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 05:11:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1712837509; x=1713442309; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GLYhl9aLVMgoCJUAO7RaLP5tWB+goHCagjk+G8s5TTA=;
+        b=L204BLKHC9PbcYSeKPq6Ej7ylc/ycLT7ZymhGUC4beVcwinosb6rm+eilemyuxPuOS
+         F1npcHLLZT1N1WrF7D38cmYkYXwPiPnP0wmfsOTsukHuP+aPxB5mNkC5IuYPemzupWgt
+         ak7SsLyaE+dBKx/0z+xqjemAeiOPc8AaUyeNStkuO7ZB2cqwWUkAVBZVyNX2JHS86heP
+         ojMpQE+eA1UB//f5X4cihUOwX4rv0d2E09OEECT6axfFAFISp8i8eomVVsA/sXKLBB6T
+         SiuNlP6RggrijuLNyPLAGTDfRxiHvTKs37NCbx0L1EiDyi/Y0w32d4YOoSr8qEcMcUgL
+         BqmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712837509; x=1713442309;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GLYhl9aLVMgoCJUAO7RaLP5tWB+goHCagjk+G8s5TTA=;
+        b=N4YAQ569/VR+3XP2HPD8ZrGWa3lOWzN0y8RFdWohBNBFWjndg4Rs7F3Vs7tuBHd6L9
+         3AqcynI68T0xR3N3kIo38/zuS32IUkMIyM0AJcC0EqLKws1xWnEMgmLiB61k+tY5dkJS
+         F6Z6nQOwJhjVFIGQ3dy1pjzQbILi6OvzPx5Ibq8az/KkoegZgi6jeAox0kNXpFIJ7JYZ
+         NSDd71o3qrm0pBPS68CG1nkgDrwRG5ue7ja7OgbVBB0u1V1fxVQOHQy1GUzywwCSgGpD
+         ElXGaHABu9329TDqV5HlUhQPQWt6h9w1jL2J0YcYir1lOWbTjbjd4x/zq8gsPauTKJJ/
+         0xWw==
+X-Forwarded-Encrypted: i=1; AJvYcCXh9XafpAhUo/ICqPV7uITLPMoCycbr7756Td+EDgSjtC0BN3+7eJ7fSFvcjx+hOoEySCBY4GwwRFVYSHXj6cpU+4giTjGG
+X-Gm-Message-State: AOJu0YwfFFbSXJkjJjoUgu/Px3U2jc0pbflW/x5jKHAb7NAITaP9vPRE
+	I+ixb8icemVgfC4IpnlOWEL0qBMVODXbujoBfuw4eitV05QHXvmuKrOQr4YTQ5+Nb0zSsELXq1D
+	mDz5QnHtVGGb9mqZGvnwira9m2X19o+qNdRyOMQ==
+X-Google-Smtp-Source: AGHT+IFneEVrDC9Hs5hmDIrt2suzLfWiMdMKqCnhxnGzrXLtLFtKY9zkCfRVnGtY59+YUoiERDHB5UdcQYbBs3v88xY=
+X-Received: by 2002:a05:6808:7cb:b0:3c5:fc14:8503 with SMTP id
+ f11-20020a05680807cb00b003c5fc148503mr4924639oij.25.1712837509222; Thu, 11
+ Apr 2024 05:11:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+References: <20240410124628.171783-1-brgl@bgdev.pl>
+In-Reply-To: <20240410124628.171783-1-brgl@bgdev.pl>
+From: Amit Pundir <amit.pundir@linaro.org>
+Date: Thu, 11 Apr 2024 17:41:13 +0530
+Message-ID: <CAMi1Hd1wc2W02G4SnMhthBgY6GGLW7ZuGzESmoqj5qY_kMkNWA@mail.gmail.com>
+Subject: Re: [PATCH v7 00/16] power: sequencing: implement the subsystem and
+ add first users
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Kalle Valo <kvalo@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Liam Girdwood <lgirdwood@gmail.com>, 
+	Mark Brown <broonie@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Saravana Kannan <saravanak@google.com>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
+	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, Xilin Wu <wuxilin123@gmail.com>, 
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
+	linux-pm@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 
-The TCP timewait timer is proving to be problematic for setups where scheduler
-CPU isolation is achieved at runtime via cpusets (as opposed to statically via
-isolcpus=domains).
+On Wed, 10 Apr 2024 at 18:16, Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+>
+> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>
+> Problem statement #1: Dynamic bus chicken-and-egg problem.
+>
+> Certain on-board PCI devices need to be powered up before they are can be
+> detected but their PCI drivers won't get bound until the device is
+> powered-up so enabling the relevant resources in the PCI device driver
+> itself is impossible.
+>
+> Problem statement #2: Sharing inter-dependent resources between devices.
+>
+> Certain devices that use separate drivers (often on different busses)
+> share resources (regulators, clocks, etc.). Typically these resources
+> are reference-counted but in some cases there are additional interactions
+> between them to consider, for example specific power-up sequence timings.
+>
+> ===
+>
+> The reason for tackling both of these problems in a single series is the
+> fact the the platform I'm working on - Qualcomm RB5 - deals with both and
+> both need to be addressed in order to enable WLAN and Bluetooth support
+> upstream.
+>
+> The on-board WLAN/BT package - QCA6391 - has a Power Management Unit that
+> takes inputs from the host and exposes LDO outputs consumed by the BT and
+> WLAN modules which can be powered-up and down independently. However
+> a delay of 100ms must be respected between enabling the BT- and
+> WLAN-enable GPIOs.
+>
+> A similar design with a discreet PMU is also employed in other models of
+> the WCN family of chips although we can often do without the delays. With
+> this series we add support for the WCN7850 as well.
+>
+> ===
+>
+> We introduce a new subsystem here - the power sequencing framework. The
+> qcom-wcn driver that we add is its first user. It implements the power-up
+> sequences for QCA6390 and WCN7850 chips. However - we only use it to
+> power-up the bluetooth module in the former. We use it to driver the WLAN
+> modules in both. The reason for this is that for WCN7850 we have
+> comprehensive bindings already upstream together with existing DT users.
+> Porting them to using the pwrseq subsystem can be done separately and in
+> an incremental manner once the subsystem itself is upstream. We will also
+> have to ensure backward DT compatibility. To avoid overcomplicating this
+> series, let's leave it out for now.
+>
+> ===
+>
+> This series is logically split into several sections. I'll go
+> patch-by-patch and explain each step.
+>
+> Patches 1/16-5/16:
+>
+> These contain all relevant DT bindings changes. We add new documents for
+> the QCA6390 & WCN7850 PMUs and ATH12K devices as well as extend the bindings
+> for the Qualcomm Bluetooth and ATH11K modules with regulators used by them
+> in QCA6390.
+>
+> Patches 6/16-8/16:
+>
+> These contain changes to device-tree sources for the three platforms we
+> work with in this series. We model the PMUs of the WLAN/BT chips as
+> top-level platform devices on the device tree. In order to limit the scope
+> of this series and not introduce an excessive amount of confusion with
+> deprecating DT bindings, we leave the Bluetooth nodes on sm8650 and sm8550
+> as is (meaning: they continue to consumer the GPIOs and power inputs from
+> the host). As the WCN7850 module doesn't require any specific timings, we can
+> incrementally change that later.
+>
+> In both cases we add WLAN nodes that consume the power outputs of the PMU.
+> For QCA6390 we also make the Bluetooth node of the RB5 consume the outputs
+> of the PMU - we can do it as the bindings for this chip did not define any
+> supply handles prior to this series meaning we are able to get this correct
+> right away.
+>
+> Patches 9/16-12/16:
+>
+> These contain the bulk of the PCI changes for this series. We introduce
+> a simple framework for powering up PCI devices before detecting them on
+> the bus.
+>
+> The general approach is as follows: PCI devices that need special
+> treatment before they can be powered up, scanned and bound to their PCI
+> drivers must be described on the device-tree as child nodes of the PCI
+> port node. These devices will be instantiated on the platform bus. They
+> will in fact be generic platform devices with the compatible of the form
+> used for PCI devices already upstream ("pci<vendor ID>,<device ID">). We
+> add a new directory under drivers/pci/pwrctl/ that contains PCI pwrctl
+> drivers. These drivers are platform drivers that will now be matched
+> against the devices instantiated from port children just like any other
+> platform pairs.
+>
+> Both the power control platform device *AND* the associated PCI device
+> reuse the same OF node and have access to the same properties. The goal
+> of the platform driver is to request and bring up any required resources
+> and let the pwrctl framework know that it's now OK to rescan the bus and
+> detect the devices. When the device is bound, we are notified about it
+> by the PCI bus notifier event and can establish a device link between the
+> power control device and the PCI device so that any future extension for
+> power-management will already be able to work with the correct hierachy.
+>
+> The reusing of the OF node is the reason for the small changes to the PCI
+> OF core: as the bootloader can possibly leave the relevant regulators on
+> before booting linux, the PCI device can be detected before its platform
+> abstraction is probed. In this case, we find that device first and mark
+> its OF node as reused. The pwrctl framework handles the opposite case
+> (when the PCI device is detected only after the platform driver
+> successfully enabled it).
+>
+> Patch 13/16 - 14/16:
+>
+> These add a relatively simple power sequencing subsystem and the first
+> driver using it: the pwrseq module for the PMUs on the WCN family of chips.
+>
+> I'm proposing to add a subsystem that allows different devices to use a shared
+> power sequence split into consumer-specific as well as common "units".
+>
+> A power sequence provider driver registers a set of units with pwrseq
+> core. Each unit can be enabled and disabled and contains an optional list
+> of other units which must be enabled before it itself can be. A unit
+> represents a discreet chunk of the power sequence.
+>
+> It also registers a list of targets: a target is an abstraction wrapping
+> a unit which allows consumers to tell pwrseq which unit they want to
+> reach. Real-life example is the driver we're adding here: there's a set
+> of common regulators, two PCIe-specific ones and two enable GPIOs: one
+> for Bluetooth and one for WLAN.
+>
+> The Bluetooth driver requests a descriptor to the power sequencer and
+> names the target it wants to reach:
+>
+>     pwrseq = devm_pwrseq_get(dev, "bluetooth");
+>
+> The pwrseq core then knows that when the driver calls:
+>
+>     pwrseq_power_on(pwrseq);
+>
+> It must enable the "bluetooth-enable" unit but it depends on the
+> "regulators-common" unit so this one is enabled first. The provider
+> driver is also in charge of assuring an appropriate delay between
+> enabling the BT and WLAN enable GPIOs. The WLAN-specific resources are
+> handled by the "wlan-enable" unit and so are not enabled until the WLAN
+> driver requests the "wlan" target to be powered on.
+>
+> Another thing worth discussing is the way we associate the consumer with
+> the relevant power sequencer. DT maintainers have expressed a discontent
+> with the existing mmc pwrseq bindings and have NAKed an earlier
+> initiative to introduce global pwrseq bindings to the kernel[1].
+>
+> In this approach, we model the existing regulators and GPIOs in DT but
+> the pwrseq subsystem requires each provider to provide a .match()
+> callback. Whenever a consumer requests a power sequencer handle, we
+> iterate over the list of pwrseq drivers and call .match() for each. It's
+> up to the driver to verify in a platform-specific way whether it deals
+> with its consumer and let the core pwrseq code know.
+>
+> The advantage of this over reusing the regulator or reset subsystem is
+> that it's more generalized and can handle resources of all kinds as well
+> as deal with any kind of power-on sequences: for instance, Qualcomm has
+> a PCI switch they want a driver for but this switch requires enabling
+> some resources first (PCI pwrctl) and then configuring the device over
+> I2C (which can be handled by the pwrseq provider).
+>
+> Patch 15:
+>
+> This patch makes the Qualcomm Bluetooth driver get and use the power
+> sequencer for QCA6390.
+>
+> Patch 16:
+>
+> While tiny, this patch is possibly the highlight of the entire series.
+> It uses the two abstraction layers we introduced before to create an
+> elegant power sequencing PCI power control driver and supports the ath11k
+> module on QCA6390 and ath12k on WCN7850.
+>
+> With this series we can now enable BT and WLAN on several new Qualcomm
+> boards upstream.
+>
+> Tested on RB5, sm8650-qrd and sm8550-qrd.
 
-What happens there is a CPU goes through tcp_time_wait(), arming the time_wait
-timer, then gets isolated. TCP_TIMEWAIT_LEN later, the timer fires, causing
-interference for the now-isolated CPU. This is conceptually similar to the issue
-described in
-  e02b93124855 ("workqueue: Unbind kworkers before sending them to exit()")
+Tested WiFi-BT on sm8550-hdk running AOSP with a DT patch similar to
+sm8550-qrd from this series.
 
-Move inet_twsk_schedule() to within inet_twsk_hashdance(), with the ehash
-lock held. Expand the lock's critical section from inet_twsk_kill() to
-inet_twsk_deschedule_put(), serializing the scheduling vs descheduling of
-the timer. IOW, this prevents the following race:
+Tested-by: Amit Pundir <amit.pundir@linaro.org>
 
-			     tcp_time_wait()
-			       inet_twsk_hashdance()
-  inet_twsk_deschedule_put()
-    del_timer_sync()
-			       inet_twsk_schedule()
+Regards,
+Amit Pundir
 
-This partially reverts
-  ec94c2696f0b ("tcp/dccp: avoid one atomic operation for timewait hashdance")
-
-This also reinstores a comment from
-  ec94c2696f0b ("tcp/dccp: avoid one atomic operation for timewait hashdance")
-as inet_twsk_hashdance() had a "Step 1" and "Step 3" comment, but the "Step
-2" had gone missing.
-
-Thanks to Paolo for suggesting to leverage the ehash lock.
-
-Link: https://lore.kernel.org/all/ZPhpfMjSiHVjQkTk@localhost.localdomain/
-Signed-off-by: Valentin Schneider <vschneid@redhat.com>
----
- include/net/inet_timewait_sock.h |  6 ++--
- net/dccp/minisocks.c             |  9 +++--
- net/ipv4/inet_timewait_sock.c    | 59 +++++++++++++++++++++++---------
- net/ipv4/tcp_minisocks.c         |  9 +++--
- 4 files changed, 55 insertions(+), 28 deletions(-)
-
-diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewait_sock.h
-index f28da08a37b4e..d696d10dc8aec 100644
---- a/include/net/inet_timewait_sock.h
-+++ b/include/net/inet_timewait_sock.h
-@@ -93,8 +93,10 @@ struct inet_timewait_sock *inet_twsk_alloc(const struct sock *sk,
- 					   struct inet_timewait_death_row *dr,
- 					   const int state);
- 
--void inet_twsk_hashdance(struct inet_timewait_sock *tw, struct sock *sk,
--			 struct inet_hashinfo *hashinfo);
-+void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
-+				  struct sock *sk,
-+				  struct inet_hashinfo *hashinfo,
-+				  int timeo);
- 
- void __inet_twsk_schedule(struct inet_timewait_sock *tw, int timeo,
- 			  bool rearm);
-diff --git a/net/dccp/minisocks.c b/net/dccp/minisocks.c
-index 64d805b27adde..dd0b09553f142 100644
---- a/net/dccp/minisocks.c
-+++ b/net/dccp/minisocks.c
-@@ -58,11 +58,10 @@ void dccp_time_wait(struct sock *sk, int state, int timeo)
- 		 * we complete the initialization.
- 		 */
- 		local_bh_disable();
--		inet_twsk_schedule(tw, timeo);
--		/* Linkage updates.
--		 * Note that access to tw after this point is illegal.
--		 */
--		inet_twsk_hashdance(tw, sk, &dccp_hashinfo);
-+		 /* Linkage updates. */
-+		inet_twsk_hashdance_schedule(tw, sk, &dccp_hashinfo, timeo);
-+		 /* Access to tw after this point is illegal. */
-+		inet_twsk_put(tw);
- 		local_bh_enable();
- 	} else {
- 		/* Sorry, if we're out of memory, just CLOSE this
-diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_sock.c
-index e8de45d34d56a..f3d349e6e373b 100644
---- a/net/ipv4/inet_timewait_sock.c
-+++ b/net/ipv4/inet_timewait_sock.c
-@@ -44,14 +44,14 @@ void inet_twsk_bind_unhash(struct inet_timewait_sock *tw,
- 	__sock_put((struct sock *)tw);
- }
- 
--/* Must be called with locally disabled BHs. */
--static void inet_twsk_kill(struct inet_timewait_sock *tw)
-+static void __inet_twsk_kill(struct inet_timewait_sock *tw, spinlock_t *lock)
-+__releases(lock)
- {
- 	struct inet_hashinfo *hashinfo = tw->tw_dr->hashinfo;
--	spinlock_t *lock = inet_ehash_lockp(hashinfo, tw->tw_hash);
- 	struct inet_bind_hashbucket *bhead, *bhead2;
- 
--	spin_lock(lock);
-+	lockdep_assert_held(lock);
-+
- 	sk_nulls_del_node_init_rcu((struct sock *)tw);
- 	spin_unlock(lock);
- 
-@@ -71,6 +71,16 @@ static void inet_twsk_kill(struct inet_timewait_sock *tw)
- 	inet_twsk_put(tw);
- }
- 
-+/* Must be called with locally disabled BHs. */
-+static void inet_twsk_kill(struct inet_timewait_sock *tw)
-+{
-+	struct inet_hashinfo *hashinfo = tw->tw_dr->hashinfo;
-+	spinlock_t *lock = inet_ehash_lockp(hashinfo, tw->tw_hash);
-+
-+	spin_lock(lock);
-+	__inet_twsk_kill(tw, lock);
-+}
-+
- void inet_twsk_free(struct inet_timewait_sock *tw)
- {
- 	struct module *owner = tw->tw_prot->owner;
-@@ -97,8 +107,10 @@ static void inet_twsk_add_node_rcu(struct inet_timewait_sock *tw,
-  * Essentially we whip up a timewait bucket, copy the relevant info into it
-  * from the SK, and mess with hash chains and list linkage.
-  */
--void inet_twsk_hashdance(struct inet_timewait_sock *tw, struct sock *sk,
--			   struct inet_hashinfo *hashinfo)
-+void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
-+				  struct sock *sk,
-+				  struct inet_hashinfo *hashinfo,
-+				  int timeo)
- {
- 	const struct inet_sock *inet = inet_sk(sk);
- 	const struct inet_connection_sock *icsk = inet_csk(sk);
-@@ -129,26 +141,33 @@ void inet_twsk_hashdance(struct inet_timewait_sock *tw, struct sock *sk,
- 
- 	spin_lock(lock);
- 
-+	/* Step 2: Hash TW into tcp ehash chain */
- 	inet_twsk_add_node_rcu(tw, &ehead->chain);
- 
- 	/* Step 3: Remove SK from hash chain */
- 	if (__sk_nulls_del_node_init_rcu(sk))
- 		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
- 
--	spin_unlock(lock);
- 
--	/* tw_refcnt is set to 3 because we have :
-+	/* Ensure above writes are committed into memory before updating the
-+	 * refcount.
-+	 * Provides ordering vs later refcount_inc().
-+	 */
-+	smp_wmb();
-+	/* tw_refcnt is set to 4 because we have :
- 	 * - one reference for bhash chain.
- 	 * - one reference for ehash chain.
- 	 * - one reference for timer.
--	 * We can use atomic_set() because prior spin_lock()/spin_unlock()
--	 * committed into memory all tw fields.
--	 * Also note that after this point, we lost our implicit reference
--	 * so we are not allowed to use tw anymore.
-+	 * - one reference for ourself (our caller will release it).
- 	 */
--	refcount_set(&tw->tw_refcnt, 3);
-+	refcount_set(&tw->tw_refcnt, 4);
-+
-+	inet_twsk_schedule(tw, timeo);
-+
-+	spin_unlock(lock);
-+
- }
--EXPORT_SYMBOL_GPL(inet_twsk_hashdance);
-+EXPORT_SYMBOL_GPL(inet_twsk_hashdance_schedule);
- 
- static void tw_timer_handler(struct timer_list *t)
- {
-@@ -217,8 +236,16 @@ EXPORT_SYMBOL_GPL(inet_twsk_alloc);
-  */
- void inet_twsk_deschedule_put(struct inet_timewait_sock *tw)
- {
--	if (del_timer_sync(&tw->tw_timer))
--		inet_twsk_kill(tw);
-+	struct inet_hashinfo *hashinfo = tw->tw_dr->hashinfo;
-+	spinlock_t *lock = inet_ehash_lockp(hashinfo, tw->tw_hash);
-+
-+	spin_lock(lock);
-+	if (timer_shutdown_sync(&tw->tw_timer)) {
-+		/* releases @lock */
-+		__inet_twsk_kill(tw, lock);
-+	} else {
-+		spin_unlock(lock);
-+	}
- 	inet_twsk_put(tw);
- }
- EXPORT_SYMBOL(inet_twsk_deschedule_put);
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index f0761f060a837..77e2515409e40 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -343,11 +343,10 @@ void tcp_time_wait(struct sock *sk, int state, int timeo)
- 		 * we complete the initialization.
- 		 */
- 		local_bh_disable();
--		inet_twsk_schedule(tw, timeo);
--		/* Linkage updates.
--		 * Note that access to tw after this point is illegal.
--		 */
--		inet_twsk_hashdance(tw, sk, net->ipv4.tcp_death_row.hashinfo);
-+		/* Linkage updates. */
-+		inet_twsk_hashdance_schedule(tw, sk, net->ipv4.tcp_death_row.hashinfo, timeo);
-+		 /* Access to tw after this point is illegal. */
-+		inet_twsk_put(tw);
- 		local_bh_enable();
- 	} else {
- 		/* Sorry, if we're out of memory, just CLOSE this
--- 
-2.43.0
-
+>
+> Changelog:
+>
+> Since v6:
+> - kernel doc fixes
+> - drop myself from the DT bindings maintainers list for ath12k
+> - wait until the PCI bridge device is fully added before creating the
+>   PCI pwrctl platform devices for its sub-nodes, otherwise we may see
+>   sysfs and procfs attribute failures (due to duplication, we're
+>   basically trying to probe the same device twice at the same time)
+> - I kept the regulators for QCA6390's ath11k as required as they only
+>   apply to this specific Qualcomm package
+>
+> Since v5:
+> - unify the approach to modelling the WCN WLAN/BT chips by always exposing
+>   the PMU node on the device tree and making the WLAN and BT nodes become
+>   consumers of its power outputs; this includes a major rework of the DT
+>   sources, bindings and driver code; there's no more a separate PCI
+>   pwrctl driver for WCN7850, instead its power-up sequence was moved
+>   into the pwrseq driver common for all WCN chips
+> - don't set load_uA from new regulator consumers
+> - fix reported kerneldoc issues
+> - drop voltage ranges for PMU outputs from DT
+> - many minor tweaks and reworks
+>
+> v1: Original RFC:
+>
+> https://lore.kernel.org/lkml/20240104130123.37115-1-brgl@bgdev.pl/T/
+>
+> v2: First real patch series (should have been PATCH v2) adding what I
+>     referred to back then as PCI power sequencing:
+>
+> https://lore.kernel.org/linux-arm-kernel/2024021413-grumbling-unlivable-c145@gregkh/T/
+>
+> v3: RFC for the DT representation of the PMU supplying the WLAN and BT
+>     modules inside the QCA6391 package (was largely separate from the
+>     series but probably should have been called PATCH or RFC v3):
+>
+> https://lore.kernel.org/all/CAMRc=Mc+GNoi57eTQg71DXkQKjdaoAmCpB=h2ndEpGnmdhVV-Q@mail.gmail.com/T/
+>
+> v4: Second attempt at the full series with changed scope (introduction of
+>     the pwrseq subsystem, should have been RFC v4)
+>
+> https://lore.kernel.org/lkml/20240201155532.49707-1-brgl@bgdev.pl/T/
+>
+> v5: Two different ways of handling QCA6390 and WCN7850:
+>
+> https://lore.kernel.org/lkml/20240216203215.40870-1-brgl@bgdev.pl/
+>
+> Bartosz Golaszewski (16):
+>   regulator: dt-bindings: describe the PMU module of the QCA6390 package
+>   regulator: dt-bindings: describe the PMU module of the WCN7850 package
+>   dt-bindings: net: bluetooth: qualcomm: describe regulators for QCA6390
+>   dt-bindings: net: wireless: qcom,ath11k: describe the ath11k on
+>     QCA6390
+>   dt-bindings: net: wireless: describe the ath12k PCI module
+>   arm64: dts: qcom: sm8550-qrd: add the Wifi node
+>   arm64: dts: qcom: sm8650-qrd: add the Wifi node
+>   arm64: dts: qcom: qrb5165-rb5: add the Wifi node
+>   PCI: hold the rescan mutex when scanning for the first time
+>   PCI/pwrctl: reuse the OF node for power controlled devices
+>   PCI/pwrctl: create platform devices for child OF nodes of the port
+>     node
+>   PCI/pwrctl: add PCI power control core code
+>   power: sequencing: implement the pwrseq core
+>   power: pwrseq: add a driver for the PMU module on the QCom WCN
+>     chipsets
+>   Bluetooth: qca: use the power sequencer for QCA6390
+>   PCI/pwrctl: add a PCI power control driver for power sequenced devices
+>
+>  .../net/bluetooth/qualcomm-bluetooth.yaml     |   17 +
+>  .../net/wireless/qcom,ath11k-pci.yaml         |   46 +
+>  .../bindings/net/wireless/qcom,ath12k.yaml    |   99 ++
+>  .../bindings/regulator/qcom,qca6390-pmu.yaml  |  185 +++
+>  MAINTAINERS                                   |    8 +
+>  arch/arm64/boot/dts/qcom/qrb5165-rb5.dts      |  103 +-
+>  arch/arm64/boot/dts/qcom/sm8250.dtsi          |   10 +
+>  arch/arm64/boot/dts/qcom/sm8550-qrd.dts       |   97 ++
+>  arch/arm64/boot/dts/qcom/sm8550.dtsi          |   10 +
+>  arch/arm64/boot/dts/qcom/sm8650-qrd.dts       |   89 ++
+>  arch/arm64/boot/dts/qcom/sm8650.dtsi          |   10 +
+>  drivers/bluetooth/hci_qca.c                   |   74 +-
+>  drivers/pci/Kconfig                           |    1 +
+>  drivers/pci/Makefile                          |    1 +
+>  drivers/pci/bus.c                             |    9 +
+>  drivers/pci/of.c                              |   14 +-
+>  drivers/pci/probe.c                           |    2 +
+>  drivers/pci/pwrctl/Kconfig                    |   17 +
+>  drivers/pci/pwrctl/Makefile                   |    6 +
+>  drivers/pci/pwrctl/core.c                     |  137 +++
+>  drivers/pci/pwrctl/pci-pwrctl-pwrseq.c        |   89 ++
+>  drivers/pci/remove.c                          |    2 +
+>  drivers/power/Kconfig                         |    1 +
+>  drivers/power/Makefile                        |    1 +
+>  drivers/power/sequencing/Kconfig              |   28 +
+>  drivers/power/sequencing/Makefile             |    6 +
+>  drivers/power/sequencing/core.c               | 1065 +++++++++++++++++
+>  drivers/power/sequencing/pwrseq-qcom-wcn.c    |  336 ++++++
+>  include/linux/pci-pwrctl.h                    |   51 +
+>  include/linux/pwrseq/consumer.h               |   56 +
+>  include/linux/pwrseq/provider.h               |   75 ++
+>  31 files changed, 2615 insertions(+), 30 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom,ath12k.yaml
+>  create mode 100644 Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
+>  create mode 100644 drivers/pci/pwrctl/Kconfig
+>  create mode 100644 drivers/pci/pwrctl/Makefile
+>  create mode 100644 drivers/pci/pwrctl/core.c
+>  create mode 100644 drivers/pci/pwrctl/pci-pwrctl-pwrseq.c
+>  create mode 100644 drivers/power/sequencing/Kconfig
+>  create mode 100644 drivers/power/sequencing/Makefile
+>  create mode 100644 drivers/power/sequencing/core.c
+>  create mode 100644 drivers/power/sequencing/pwrseq-qcom-wcn.c
+>  create mode 100644 include/linux/pci-pwrctl.h
+>  create mode 100644 include/linux/pwrseq/consumer.h
+>  create mode 100644 include/linux/pwrseq/provider.h
+>
+> --
+> 2.40.1
+>
 
