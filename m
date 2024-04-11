@@ -1,144 +1,139 @@
-Return-Path: <netdev+bounces-86911-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 627768A0C3D
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:24:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D04AA8A0C41
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 11:26:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 936331C2196E
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:24:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16F761C21E31
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:26:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF5613FD76;
-	Thu, 11 Apr 2024 09:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2838C1448F3;
+	Thu, 11 Apr 2024 09:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="heNt7qrS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4FC62144
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 09:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF27144303;
+	Thu, 11 Apr 2024 09:25:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712827460; cv=none; b=DYGCxqqPY559d42PPPn+jbzxQXnt5dWklX773gW/f4/Y668ZXYjuBrs6+0KfVJEPUXNbIfq+LJB1Md0I768LdxUOZjx/nOS06DmVfrNnUys6+tYd07ejUrEdlAftPeBPaQg0QybevN+H/UINnMoxOYE9h56c86FU/dT+9X/FIbA=
+	t=1712827557; cv=none; b=PX3aPkgBTCVT0vDxv8fj1qvLdKcPCbZiaf4WMUSbkoOYMM5+vqTB4dlL2wowpavSVp0j5+GUNVBi2i50GcnvrJIipc02EopkYalWu3ykUWUcV8rAe5/DZj58VmtJkznUOrSxun9NhPrVSuUZJ6wuoyaDrfR91PX4JECmHHBrr9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712827460; c=relaxed/simple;
-	bh=YTxoBNxpVIJz/OqqIbQTQzSgr/pnXnoRp3diNSa7Hr8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=ICUWWPMt6ATlgKXuexY1L7x3ynom5S7QT7IJboLxYG9akqlhswfe1NsvF2SIFNAytWmVOvnba0Xf7krHVHActDzq7DZI5ZEMykkUKUiVERE9OAMkF5ZJFakl/aYroqS2q3F1YcYwnF/3bE84xZfUykj+i/plSeKxzs17qOGSMUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-61-fAwpQPziMAGmeHJ_hhUO4A-1; Thu,
- 11 Apr 2024 05:24:13 -0400
-X-MC-Unique: fAwpQPziMAGmeHJ_hhUO4A-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CC85F3810B33;
-	Thu, 11 Apr 2024 09:24:12 +0000 (UTC)
-Received: from hog (unknown [10.39.192.7])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 79ABA492BC6;
-	Thu, 11 Apr 2024 09:24:11 +0000 (UTC)
-Date: Thu, 11 Apr 2024 11:24:06 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antony Antony <antony@phenome.org>
-Cc: Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	Antony Antony <antony.antony@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	devel@linux-ipsec.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v6] xfrm: Add Direction to the
- SA in or out
-Message-ID: <ZhesNtc8tdTfuvRd@hog>
-References: <a53333717022906933e9113980304fa4717118e9.1712320696.git.antony.antony@secunet.com>
- <ZhBzcMrpBCNXXVBV@hog>
- <ZhJX-Rn50RxteJam@Antony2201.local>
- <ZhPq542VY18zl6z3@hog>
- <ZhV5eG2pkrsX0uIV@Antony2201.local>
- <ZhZUQoOuvNz8RVg8@hog>
- <ZhbFVGc8p9u0xQcv@Antony2201.local>
+	s=arc-20240116; t=1712827557; c=relaxed/simple;
+	bh=dygA1WPRuBqMdxGGpCaKSAr2jCspXpnEIHOS+j+BVXs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZoRpJmV5Y8pAuFLXSwjQHl+pm4eWjqfh3wCLamlfxGzTttR6M15rmy1z4IGWQ4w6BdTu9S5E8aUP+NcCbvBza1e1sLofJAHi98olvU3yDzfcVqSAyOHHA3pSSBzGp9l1lnhaxseuOginmsohuTwDKShGDiTcUWfNEfvstH6itLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=heNt7qrS; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7ECF360003;
+	Thu, 11 Apr 2024 09:25:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1712827552;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vKjOj/t4Yd+gG7pDolrHBzRHmNw6eOFJQo600f52EaQ=;
+	b=heNt7qrSXRMC4rqLyIBOIMXpVD8SFG+udbziO2RYbryEobpgcdrsdl8Zera6ZTHjQdhOqG
+	5yHs1eci3vhT8x0di/FRMcpX5H9dHp0hEMxuwP9jshRIyuUlGeaTRokaFv+Ao094HNm6Bk
+	wnarmorhQDzH+EU55n/bsVVk1k2h+P+0+58GmQ7Vi3rwV+jZ2wUXUBY3DLH6en//GzkqHO
+	JgXjV+A2KkxuKNHW5qpBD2Mg71z9HjlA2cphOTqMcY6r0/cYzdfb0Z308Tk3igbKbpaHAt
+	5Y1XNSLddxw7Bg3/4pTa0Zig5M94uVSNTFsir+GzdhGRrFN8Bisr83TtE2rRMg==
+Date: Thu, 11 Apr 2024 11:25:48 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Jonathan Corbet <corbet@lwn.net>, Marek
+ =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>, Simon Horman
+ <horms@kernel.org>, mwojtas@chromium.org
+Subject: Re: [PATCH net-next v11 01/13] net: phy: Introduce ethernet link
+ topology representation
+Message-ID: <20240411112548.68ae868e@device-28.home>
+In-Reply-To: <20240410145358.GA2996695@dev-arch.thelio-3990X>
+References: <20240404093004.2552221-1-maxime.chevallier@bootlin.com>
+	<20240404093004.2552221-2-maxime.chevallier@bootlin.com>
+	<20240409201553.GA4124869@dev-arch.thelio-3990X>
+	<20240410101627.53bfdebf@device-28.home>
+	<20240410145358.GA2996695@dev-arch.thelio-3990X>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZhbFVGc8p9u0xQcv@Antony2201.local>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-2024-04-10, 18:59:00 +0200, Antony Antony wrote:
-> On Wed, Apr 10, 2024 at 10:56:34AM +0200, Sabrina Dubroca wrote:
-> > 2024-04-09, 19:23:04 +0200, Antony Antony wrote:
-> > > Good point. I will add  {seq,seq_hi} validation. I don't think we add=
- a for=20
-> > > {oseq,oseq_hi} as it might be used by strongSwan with: ESN  replay-wi=
-ndow 1,=20
-> > > and migrating an SA.
-> >=20
-> > I'm not at all familiar with that. Can you explain the problem?
->=20
-> strongSwan sets ESN and replay-window 1 on "out" SA. Then to migrgate, wh=
-en=20
-> IKEv2  mobike exchange succeds, it use GETSA read {oseq,oseq_hi} and the=
-=20
-> attributes, delete this SA.  Then create a new SA, with a different end=
-=20
-> point, and with old SA's {oseq,oseq_hi} and other parameters(curlft..). =
-=20
-> While Libreswan and Android use XFRM_MSG_MIGRATE.
+Hi,
 
-Ok, thanks. But that's still an output SA. Setting {oseq,oseq_hi} on
-an input SA is bogus I would think?
+On Wed, 10 Apr 2024 07:53:58 -0700
+Nathan Chancellor <nathan@kernel.org> wrote:
 
+> On Wed, Apr 10, 2024 at 10:16:27AM +0200, Maxime Chevallier wrote:
+> > On Tue, 9 Apr 2024 13:15:53 -0700
+> > Nathan Chancellor <nathan@kernel.org> wrote:  
+> > > On Thu, Apr 04, 2024 at 11:29:51AM +0200, Maxime Chevallier wrote:  
+> > 
+> > [...]
+> >   
+> > > I bisected a crash that I see on one of my test devices to this change
+> > > in -next as commit 6916e461e793 ("net: phy: Introduce ethernet link
+> > > topology representation"). Here is the stack trace passed through
+> > > scripts/decode_stacktrace.sh:  
+> > 
+> > [...]
+> >   
+> > > [    5.626535] ? phy_link_topo_add_phy (drivers/net/phy/phy_link_topology.c:46) libphy
+> > > [    5.627954] ? _raw_spin_lock (arch/x86/include/asm/atomic.h:115 (discriminator 4) include/linux/atomic/atomic-arch-fallback.h:2170 (discriminator 4) include/linux/atomic/atomic-instrumented.h:1302 (discriminator 4) include/asm-generic/qspinlock.h:111 (discriminator 4) include/linux/spinlock.h:187 (discriminator 4) include/linux/spinlock_api_smp.h:134 (discriminator 4) kernel/locking/spinlock.c:154 (discriminator 4)) 
+> > > [    5.627963] phy_link_topo_add_phy (include/linux/xarray.h:977 drivers/net/phy/phy_link_topology.c:80) libphy
+> > > [    5.629462] phy_attach_direct (drivers/net/phy/phy_device.c:1516) libphy
+> > > [    5.629504] phylink_connect_phy (drivers/net/phy/phylink.c:1983) phylink
+> > > [    5.631030] ax88772_bind (drivers/net/usb/asix_devices.c:710 drivers/net/usb/asix_devices.c:919) asix
+> > > [    5.631049] usbnet_probe (drivers/net/usb/usbnet.c:1745) usbnet  
+> > 
+> > I've run some tests on an arm64 board using an USB to Ethernet adapter
+> > that uses the same driver (It also goes through ax88772_bind() ) but I
+> > don't reproduce the error.
+> >   
+> > > If there is any additional information I can provide or patches I can
+> > > test, I am more than happy to do so.  
+> > 
+> > The next step for me would be to try on an x86_64 box to get closer to
+> > the config you used, however could you give me the .config that was used
+> > when the bug was triggered ? I'd like to make sure I didn't miss
+> > anything related to some of the parts being build as modules for
+> > example.  
+> 
+> Sure thing! It should be the one I have attached, it is basically just
+> Arch Linux's configuration:
+> 
+> https://gitlab.archlinux.org/archlinux/packaging/packages/linux/-/raw/main/config
 
-> > > > xfrma_policy is convenient but not all attributes are valid for all
-> > > > requests. Old attributes can't be changed, but we should try to be
-> > > > more strict when we introduce new attributes.
-> > >=20
-> > > To clarify your feedback, are you suggesting the API should not permi=
-t=20
-> > > XFRMA_SA_DIR for methods like XFRM_MSG_DELSA, and only allow it for=
-=20
-> > > XFRM_MSG_NEWSA and XFRM_MSG_UPDSA? I added XFRM_MSG_UPDSA, as it's us=
-ed=20
-> > > equivalently to XFRM_MSG_NEWSA by *swan.
-> >=20
-> > Not just DELSA, also all the *POLICY, ALLOCSPI, FLUSHSA, etc. NEWSA
-> > and UPDSA should accept it, but I'm thinking none of the other
-> > operations should. It's a property of SAs, not of other xfrm objects.
->=20
-> For instance, there isn't a validation for unused XFRMA_SA_EXTRA_FLAGS in=
-=20
-> DELSA; if set, it's simply ignored. Similarly, if XFRMA_SA_DIR were set i=
-n=20
-> DELSA, it would also be disregarded. Attempting to introduce validations =
-for=20
-> DELSA and other methods seems like an extensive cleanup task. Do we consi=
-der=20
-> this level of validation within the scope of our current patch? It feels=
-=20
-> like we are going too far.
+Thanks a lot. Let me try with that config and see if I can reproduce :)
 
-No, I wouldn't introduce validation of other attributes. It doesn't
-belong in this patch(set), and I'm not sure we can add it now as it
-might break userspace (I don't see why userspace would pass
-XFRMA_ALG_AEAD etc on a DELSA request, but if we never rejected it,
-they could).
+Maxime
 
-But rejecting this new attribute from messages that don't handle it
-would be good, and should be done in this patch/series.
-
---=20
-Sabrina
+> 
+> Cheers,
+> Nathan
 
 
