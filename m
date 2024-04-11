@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-87157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 438218A1E4C
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:32:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C38E58A1E4D
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:32:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2D88288052
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 18:32:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64A351F25697
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 18:32:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70C0D127E17;
-	Thu, 11 Apr 2024 18:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65D2E2556E;
+	Thu, 11 Apr 2024 18:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DyLOQ7JV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DP1Vk9rT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C6983BBC2
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 18:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 414B5D53C
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 18:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712858595; cv=none; b=kHcg6nS26msDegdZ58FAnC0uOxqhONSyzJoypoMgjLIYqJcxnB76ZZii7XvXNBl69exnBh6Q+SQ6Lu8TlwN3c5A3pab5xKb40GroYDQHf+8ypoaIu6CVFkIVToy3deN2HfhUDaxf1lkW7DdqR8yCTUutdqBSo3woaNiNyucClM8=
+	t=1712858651; cv=none; b=UFptWugveqSRwFwHsczQs0stVb2sR7kxbuHIRAjM0OG0SCSRfl3bIYoZkNBMc1iHTiPKDQz7Q/BZTVJe8u4G0smec1TV5QIAwjtJhf/q3PORQ+jEa4UNDUQy7QU7bsi9G5VOH5Tm4XGyZD+XmSsQNlFWEC9XRZ1zMz0SoE7sL7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712858595; c=relaxed/simple;
-	bh=ESyS+zpIk0ubNX7rAGt8jXV6WTbsdJ2HW3iDvtjetjs=;
+	s=arc-20240116; t=1712858651; c=relaxed/simple;
+	bh=5/EupfAGI2wAJbOcINHvdOeUOnovSqCHDoAi0fdeJZ4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H6ia7i5Mq0if2bB8piGXSff6iWY+WZlcGICxAC2JB4V5L5hubQwVepZvMl7UutKNLuG2FNoajjt0pkCH4VJz1V5HAng7zu3gbuzPHbCRYu0UEkZci/ftwGn1oml6TDM54x77gRDLvnm+wSd//7gm8rq/s0pYFB9ly3Nda+AdyrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DyLOQ7JV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86D91C072AA;
-	Thu, 11 Apr 2024 18:03:14 +0000 (UTC)
+	 MIME-Version:Content-Type; b=GX16WswSdZ3y8xPw6FJDbGRZ23SssGK4KssdNvVm+j/hWlbRZwrZ5p9p5LdHDyKVtrKPogE1O2JweKlYlakuFByat94BfT5t/VZcz1ChERNYNxeCpdhtnU22066GdbXitLainmXomqX2Pb764mzEQsZOZOTmWBtsxAGp2/epPnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DP1Vk9rT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A79DC072AA;
+	Thu, 11 Apr 2024 18:04:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712858595;
-	bh=ESyS+zpIk0ubNX7rAGt8jXV6WTbsdJ2HW3iDvtjetjs=;
+	s=k20201202; t=1712858650;
+	bh=5/EupfAGI2wAJbOcINHvdOeUOnovSqCHDoAi0fdeJZ4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DyLOQ7JVCn3m8e5ZRc89MCpqQSVxUDS4Wr5ELxS0RjJvFNUmvcmoMtUW8iTgKiyNf
-	 Peh49mY8WoiLI6FQY/+g5wZcBO9QiAjiDEQGOkFvDIgaQbGjH5n0FtLoTPDAMjXzyO
-	 n0K0hBgSW6xD/PoAWV58VNFB5ReamF1+E+kIFyehQp9DT+GcfxrTWFGEXL4kaEUINv
-	 W3dwXhUjoZ+ssrg5rYga96ySlp3eSttuf2gc+GnGnd0XjRBrLM+enTxGs5ikAfORt4
-	 RkBuN2BSO6RJsCX6Bq5HTqi0Gk9BDBfWWx2j12zc4U26FM9i/bemNgXZKgIB8QMRd+
-	 fWZ6S84q1LGbA==
-Date: Thu, 11 Apr 2024 11:03:13 -0700
+	b=DP1Vk9rThXotTVXWFTOh65esnp24HvjkcWzghmDIoU5HiJQrVa8na7WT/nUlAbS0Y
+	 3JBemCN8onUYk+PDXK22N6pLPMaKuQIlNcREWTRgN3uxkrF0sDVnpswBmOMVxKuxY2
+	 626WAuuM/BF5tKZVk7uTKi2xtWuu0Rpq6wSGwzMbRr5Iz9tgmKnsR+cDWULiFmo5ok
+	 Tr1U9hH9WRa16VmMJuoSWh0AxChM4vlwZrhk+Ld/crDpw2Vlq6BzQpYPTJu5Z+koKj
+	 LbvhloKeJQFJm8Gd3/ct0irLaMNYHH8/on9euDX4xLMLgjqgvTua3pNo5k/7aLy03k
+	 gVp7IT/SBWySA==
+Date: Thu, 11 Apr 2024 11:04:09 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Ilya Maximets <i.maximets@ovn.org>
 Cc: Eric Dumazet <edumazet@google.com>, Stefano Brivio <sbrivio@redhat.com>,
@@ -51,8 +51,8 @@ Cc: Eric Dumazet <edumazet@google.com>, Stefano Brivio <sbrivio@redhat.com>,
  Holzinger <pholzing@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
 Subject: Re: [PATCH net-next v2 3/3] genetlink: fit NLMSG_DONE into same
  read() as families
-Message-ID: <20240411110313.245b321c@kernel.org>
-In-Reply-To: <6a561c3b-02dd-485a-aff0-04f1e347adf0@ovn.org>
+Message-ID: <20240411110409.67d32aa2@kernel.org>
+In-Reply-To: <20240411110313.245b321c@kernel.org>
 References: <20240303052408.310064-1-kuba@kernel.org>
 	<20240303052408.310064-4-kuba@kernel.org>
 	<20240315124808.033ff58d@elisabeth>
@@ -64,6 +64,7 @@ References: <20240303052408.310064-1-kuba@kernel.org>
 	<b2e7f22c-6da3-4f48-9940-f3cc1aea2af2@ovn.org>
 	<20240411085206.1d127414@kernel.org>
 	<6a561c3b-02dd-485a-aff0-04f1e347adf0@ovn.org>
+	<20240411110313.245b321c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,24 +74,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 11 Apr 2024 18:38:19 +0200 Ilya Maximets wrote:
-> I tried that and IPv4 tests with Libreswan are passing with this change
-> on latest net-next/main.
+On Thu, 11 Apr 2024 11:03:13 -0700 Jakub Kicinski wrote:
+> > NLMSG_DONE is part of the first recvfrom and the process is stuck
+> > waiting for something from the second one.  
 > 
-> IPv6 tests are stuck in the same way as IPv4 did before.  The sendto
-> as captured by strace is following:
-> 
-> sendto(7, [
->   {
->     nlmsg_len=48, nlmsg_type=0x1a /* NLMSG_??? */,
->     nlmsg_flags=NLM_F_REQUEST|0x300, nlmsg_seq=0, nlmsg_pid=17084
->   },
->   "\x0a\x80\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x14\x00\x01\x00\xfd\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x01\x02"], 48, 0, NULL, 0) = 48
-> 
-> NLMSG_DONE is part of the first recvfrom and the process is stuck
-> waiting for something from the second one.
+> Perfect, thank you! I just sent the v4 fix,
+> just to be clear you were testing on -next right?
+> Because AFAICT the v6 change hasn't made it to Linus.
 
-Perfect, thank you! I just sent the v4 fix,
-just to be clear you were testing on -next right?
-Because AFAICT the v6 change hasn't made it to Linus.
+Oh, you said net-next/main earlier in your message, all makes sense.
 
