@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-87002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F64A8A13D0
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:02:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 522D98A13F3
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:05:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D023B289C8F
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:02:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D6FF282D2B
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 12:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C14D14AD0E;
-	Thu, 11 Apr 2024 12:02:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986A5145FEE;
+	Thu, 11 Apr 2024 12:05:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UXCYpM3b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L8M4zAQl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA6014A4E7
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 12:02:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16F1140E3C
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 12:05:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712836922; cv=none; b=SUOI6yovVuGd3Ubmm49i439OHePuwALbzmslpCqe7DNU6ScHxKZiJj/IGS/nB/4JnQhF2lhygbLWxgWAggB6ilb2Yoft6YVeTQYJet9xVAdWU+2vU7agG73VuaebTAs4p76aZbHFMFsJaUGjjstFGlAn8qC0sT7FBOUtdCvt3nE=
+	t=1712837134; cv=none; b=Kw0nI3x08WwUWfJ9yjtNgK0Dm3FL/ONPmdsqy28SX9NLpagJ1mQvvkoCzZcI1DVOBYi64JX06dWt+CuJtuQpU7S0ZCBg77wrEeUtATh+/odEecX71VQtlQcr5PFyB+oCEnyJYbz5XRquY/cbG7DFoAOJ16oBePv0RAId3Bbd1lU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712836922; c=relaxed/simple;
-	bh=WOGDS/jHodlCFSNuuovtPF2PmxHBMd2nyQscMq9vPEA=;
+	s=arc-20240116; t=1712837134; c=relaxed/simple;
+	bh=4ArnlgziUqMK060/CRd+B74qBs8mulubYuo1nQ/vk1c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fZISjC8bnGDF1uSPo5z0/3leLWYIf3NCvy2Tm5DqP9MTowykFYXm38mWeOITncMsCpm+fWT8kPBtd0QiS5hV7EoIzcfaLSfhVafFfBof3Kh/KTxUyG5lvkN9GbKYPqsaSfZwXHGz5iCH3s/SNCeW87ygY6JGLfCuVzW2H0+o/Sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UXCYpM3b; arc=none smtp.client-ip=209.85.128.42
+	 Content-Type:Content-Disposition:In-Reply-To; b=lnG4n+EOkfoRc8yM89EpJIlcHZfAzGGEkd5hcw6jTrDlSOlM2CYjvVQbdj3wwgyjBK7IvqE+05VGbJlvZ/7nfpqvKIlvTFOXZEx74fNmcwZqsLlJnX2pX5M/VwzRKIOPjo60GibWYXXiSs+Aeo48BcPDvlqLHN/ZJKVzvPpUM1w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L8M4zAQl; arc=none smtp.client-ip=209.85.221.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-417d08135b6so5640335e9.1
-        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 05:02:00 -0700 (PDT)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-33edbc5932bso5820319f8f.3
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 05:05:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712836919; x=1713441719; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712837131; x=1713441931; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GbL/THhnMZrowsbTGbZXiwbJYabCZWyizerlYGB5Zqc=;
-        b=UXCYpM3bv6egQtCoLY9wIEX5gni9h55rPlHF+QVzNnQmFm7T1vfIQHNcQS/CbUxWpo
-         hF5NaqnVgDhSDJEd2XvFRCdQoGxdq9zK+6ZS8qZGRWv5R/LjXED5lyT2lJvoTyiIkmzj
-         YOqloIuw6sRPpG7p7BT5HlcLA/Egz7TXxQgHJv8N8gIGN8kNn1D/kXL+sX+ToTIfYh+M
-         33PeBUUy5/XB1sxY5b0ZqxeJ/k+z7DF+sLS4rgxPxLR3LG84OpLkZ9+mEAOvElHdnP2V
-         5IIR9oF3RJb4vt+4KF9hmG7fNtGkYhQWuRk3rgeaOkD6ISelPLJJEqDGdg4NdUKateuC
-         uFDw==
+        bh=Xs2a28Cg6n+56tdQWFoWyaffNz8jOtKm5y8vlVD8fmE=;
+        b=L8M4zAQlTB3BPrEnMByQEvkWMuMmPxY5gZoBQULPFdXmQE18hJlh/BqvjNfPhcH98K
+         eCRyL6V5q9IVKlXh2vH79YrjNG570TQsPdUrbV2zbs1KYZD9kYgNaNIveKDU5TPaufI5
+         TVdMylR0D1kEcOK+QgQvoUMHs4mzMqj4204900A1n9cCSKJf2Sv1Fm+lyguV8oLJ8xd+
+         iwpd1XVF4F1R5LB6sAqbUo8EtjTO9PmVdBP9Uk5AkoDe2fnf8rW7k1Kf9Kl6tMjmiXYu
+         6i06gVziv3rsFgXgWI8esln8Yqv2AiVyNvnnXdRheYeHku3R+bPxiqqzo6/8Z7yLRKw7
+         MGtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712836919; x=1713441719;
+        d=1e100.net; s=20230601; t=1712837131; x=1713441931;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GbL/THhnMZrowsbTGbZXiwbJYabCZWyizerlYGB5Zqc=;
-        b=TWRGjyBCGCH7Ia9PENJsI1KE8o2ZiRjuaK4t3BMjTKS6P/VlvAJkIZE6pCRKXQeCIL
-         iQAeG1REUE3PBRBWMz/+iNUs+5gAryBT+gEF7CyjttDd+1tXwCwfNO9LYjR2Om2eb9b3
-         1Ma6kOSEalDsZlRjznumKApm6+Pvs+XO39WD+sAhelFH6mZvi1GrUv440TTxlZxxUg0w
-         w807cdKoQrup/ljfdmKPZ2Fc/qeIvzrU14prABDRmNodndbE+y2S+O7pPqZOLl3eEd7W
-         7j9MX8R1vQ6ZbD63T++odYWCkxTPlfsXmWlMtAhroQZNystrKPp2KpQ5VtK/0R9O6AL7
-         p9Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCWxOdvxzUZhZUQeewP5E/i3erRq0e6qE6OcJSm8MzbtXKDQHsPF0uHOgyPle6J41PsVMFMnC/+PwzwHVQKJ8Es+p7DG6MEW
-X-Gm-Message-State: AOJu0YyEgf5r1FTivGPFOTReOeBTC3W5LrDNW8Ws7hKzj6RL8uZDVdZJ
-	Rt0awMFNjrb8PMbqhawRqutDBb1/1X9cd2QpH2/1Yr/6zZSNZVCX1pvnUfGU
-X-Google-Smtp-Source: AGHT+IEqZDUbqsHmx+0d/mdK60hFJ2s2R4GPh77+dLgE4PYnsNfNN+gLmBjZr+n6bMrXxB5BhX8Kog==
-X-Received: by 2002:a05:600c:4511:b0:415:8651:9b8e with SMTP id t17-20020a05600c451100b0041586519b8emr4330475wmo.39.1712836918799;
-        Thu, 11 Apr 2024 05:01:58 -0700 (PDT)
+        bh=Xs2a28Cg6n+56tdQWFoWyaffNz8jOtKm5y8vlVD8fmE=;
+        b=IaLkJkg/sbw4NGnbEcuMBy3YJSKb3TB96GTUgustilRK2mdG5vGhNTxHJ0ScoMi4nJ
+         4Ibij0vIMFo/bb3TXKSOLyv549zPZ9yNBGvMBXEQ2yA8uwiMWsANcL4Bj/ljHFfaGEJ4
+         hG62QzLRaRK+NJPr/CqeuTXnCkkUvyHJE1omZPZkIr5vAiT6GXT+b0yy7HiW8Q7N7h3X
+         aoTcWQlMUlcNVzBhF8t5rELbTWBnBt3KKU5Tixv/MH+jHt6RrEN5yjF37IExLfIINhsV
+         DLOhYlac6FOmMx7HjkaNknKqncpnR62r/T+VskueLfhxpNdaHSLP86VG7e16cXNgpWca
+         SoLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXO+qF+3smUGlash3h3GmEGCO+6rObnyFnziBiyRbW6y1H8BjFVq3AZ/SAiwrerLxUgLzBYdi3Au2tO3w6eSXtzdqNUlxv7
+X-Gm-Message-State: AOJu0Yxyh/g9jcNkyh9LkfvDYMyAOMeg1SftBEdHCYu3/SPWzwJQVVIx
+	r2Ytn9sNKCAXUJ+2vrpe7QfufhK0yPuOtn0/UA4coHUBXSmu1Ioy
+X-Google-Smtp-Source: AGHT+IHlxeEm6M7fj2wjEnjVKK70YqjlRy3wKxtMk7kTRGIQsfvHk/caQUxLViHPzrd40kz29cBLvQ==
+X-Received: by 2002:a05:6000:1145:b0:33e:b719:8bec with SMTP id d5-20020a056000114500b0033eb7198becmr3333182wrx.24.1712837131073;
+        Thu, 11 Apr 2024 05:05:31 -0700 (PDT)
 Received: from skbuf ([2a02:2f04:d201:1f00::b2c])
-        by smtp.gmail.com with ESMTPSA id d9-20020a05600c3ac900b00417d8c16bdasm1694202wms.39.2024.04.11.05.01.57
+        by smtp.gmail.com with ESMTPSA id o9-20020a5d6709000000b00343956e8852sm1631310wru.42.2024.04.11.05.05.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Apr 2024 05:01:58 -0700 (PDT)
-Date: Thu, 11 Apr 2024 15:01:55 +0300
+        Thu, 11 Apr 2024 05:05:30 -0700 (PDT)
+Date: Thu, 11 Apr 2024 15:05:28 +0300
 From: Vladimir Oltean <olteanv@gmail.com>
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
@@ -74,11 +74,11 @@ Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
 	Florian Fainelli <f.fainelli@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v2 2/3] net: dsa: allow DSA switch drivers to
- provide their own phylink mac ops
-Message-ID: <20240411120155.uan4ej7eqhxm4psp@skbuf>
+Subject: Re: [PATCH net-next v2 3/3] net: dsa: mv88e6xxx: provide own phylink
+ MAC operations
+Message-ID: <20240411120528.4fswqnjnnvlkav6x@skbuf>
 References: <ZhbrbM+d5UfgafGp@shell.armlinux.org.uk>
- <E1rudqF-006K9H-Cc@rmk-PC.armlinux.org.uk>
+ <E1rudqK-006K9N-HY@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,16 +87,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1rudqF-006K9H-Cc@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1rudqK-006K9N-HY@rmk-PC.armlinux.org.uk>
 
-On Wed, Apr 10, 2024 at 08:42:43PM +0100, Russell King (Oracle) wrote:
-> Rather than having a shim for each and every phylink MAC operation,
-> allow DSA switch drivers to provide their own ops structure. When a
-> DSA driver provides the phylink MAC operations, the shimmed ops must
-> not be provided, so fail an attempt to register a switch with both
-> the phylink_mac_ops in struct dsa_switch and the phylink_mac_*
-> operations populated in dsa_switch_ops populated.
+On Wed, Apr 10, 2024 at 08:42:48PM +0100, Russell King (Oracle) wrote:
+> Convert mv88e6xxx to provide its own phylink MAC operations, thus
+> avoiding the shim layer in DSA's port.c
 > 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 > ---
 
