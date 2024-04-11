@@ -1,96 +1,110 @@
-Return-Path: <netdev+bounces-86892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB31E8A0A87
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:50:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF0D68A0A8E
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:51:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F7981F2401F
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 07:50:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A34D2830E1
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 07:51:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8281D13E8BA;
-	Thu, 11 Apr 2024 07:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C302D13F44E;
+	Thu, 11 Apr 2024 07:51:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mL7hmSRd"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="SePzh25c"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFA613E8B3
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 07:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48C9213E8B3;
+	Thu, 11 Apr 2024 07:50:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712821832; cv=none; b=k0+mROumS6ywSlh6rXXVkjEQsBFKG2pzBFMImKRaatrpqhMogGKF+vh9gMUPNkupd68zQ0K9rBOSKSlBvRLdUY0zo56lFRRKFScGa0L47rroM/2lYqSeLvgKLOSMfl5bZHkpp0SevUa6TWMSra0BQf3qE5GgG9Me4c0UNPKTQt4=
+	t=1712821863; cv=none; b=q6ohG3p/1HXxZEmcuX82DShpWNVz92AOMz3r8jaTNpjtr+a25Mvrui0F/G3lFk45aKTl9KU7AnHZrHMOz7wDISHq7lgngy/vVHoGpVg/8rCucYBon2ZbOREr8na1Dwsupa1w1QNvQBr8XMu5safvTMAFGbvIDXL1k8v+vPL4S34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712821832; c=relaxed/simple;
-	bh=jM/Ot6EuWtszlj5c4iHd2/h6hS5FUfVr/w+a2PvmQaw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FiZVDz4Iry7kbRuJcJ3BnBj9QT0tBPLerMbVVSteT4Y7oHWfzLfRmi0fb0u8CAgu70YP9xvl6KJAeYokTDf7gcfvtE0NHrtf0yP/UVecF7hpRR2TEIvprSJieDP0A06KowWBz9hpivjkQBtcYRf3HEylqQ3U3mFZqMFsOeXw2qY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mL7hmSRd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1E3C0C43394;
-	Thu, 11 Apr 2024 07:50:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712821831;
-	bh=jM/Ot6EuWtszlj5c4iHd2/h6hS5FUfVr/w+a2PvmQaw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mL7hmSRdxWFSawJNZqUMGRB1etLO69i3N8cRA4CmtfHbAv5xgf0xYNGeAlJfmPBpR
-	 55TASQ6cYh6WGf4XtLDzQJ/tJrejKVHNEXjwodh7ENufV8EV8NL/GMjfiIiMRY0ind
-	 Y+yLvJiL4IoxDznpA87hOJpKe02i1iLqifGASJSTx6Za6+RUw+tCd/Bjig9BMUugnb
-	 oA/jbOZyAogu+qjFnJUI4ix3bgFKm0mAKzrtLalpvO6dKduPyBUDt4HTVblN6Ypo05
-	 YctjZFhID3hT8In1r+AaXywNe271oPR8V7EHnOKVzUVcwJDyMroUiOj/1tO6J9gdoo
-	 MsRYrv6ZfYDkQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 127EFC54BD0;
-	Thu, 11 Apr 2024 07:50:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1712821863; c=relaxed/simple;
+	bh=ZsULZLEgGVKMZPgs6UyDGKb1w/4DNfFJZe2EIhoDmXU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lVYABDl4eN4/1DXKOBqRYVy0hWhQu1SW+RkhMXQuiqtoEXXfzcaVfKrRsoGrhUt1ORADRDJEFq6gNeUbH8XoHzmUWN/IfDSdXtueOoZcX7Rc4Y9Csk1Rt4dIrCH6H3HAnmE4LEKlVFguWB+aGCWpfYLmi//NVv9D3cMDAEL/u+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=SePzh25c; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1712821857;
+	bh=ZsULZLEgGVKMZPgs6UyDGKb1w/4DNfFJZe2EIhoDmXU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SePzh25c5fl5Kft4nT0FiQ5YDVtvVSvV7El9m1omlZPz06Sb75Hc/TrBQ7WykD+lx
+	 tA6Ub9JsUxd2RWdE4+vmdFrNcH9k+T2yDtwMyzUdPjcyKW0qryO2lMAKsNYTXxFgcq
+	 vjaqB/hbyWmCA+FJb6EzIp8IHTsrgw5HsbN6GBeIABsTQmaRgwaQjPQQGYBAdZp5yh
+	 +9v5RA94JgkvISNIAbLm+byHFka1GrsqP9ntCmR+k5jAVuom8ckkfDiu/iRjYZdfrW
+	 cg+ng16KWp30olpIYj3g5iZayAho4Lo8nCTqIJ1Rif77/GKljQk6UO3tyebjTu4e+j
+	 kNXYlIeaaZg5w==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VFX1r6452z4wc5;
+	Thu, 11 Apr 2024 17:50:56 +1000 (AEST)
+Date: Thu, 11 Apr 2024 17:50:46 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Eric Dumazet <edumazet@google.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>, Linux
+ Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build failure after merge of the net-next tree
+Message-ID: <20240411175046.689f91eb@canb.auug.org.au>
+In-Reply-To: <CANn89i+fZdLA_54GwsoY+UV+C=0KP-S6pF4hWmOQ8ajBKUC54Q@mail.gmail.com>
+References: <20240409114028.76ede66a@canb.auug.org.au>
+	<CANn89iJyXNKycL1kd_KP8NH-qU7siv8BGW5PGLexjmqaXXGciA@mail.gmail.com>
+	<20240411113835.713ccf11@canb.auug.org.au>
+	<CANn89i+fZdLA_54GwsoY+UV+C=0KP-S6pF4hWmOQ8ajBKUC54Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] af_unix: Fix garbage collector racing against
- connect()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171282183106.1471.16014082254968457229.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Apr 2024 07:50:31 +0000
-References: <20240409201047.1032217-1-mhal@rbox.co>
-In-Reply-To: <20240409201047.1032217-1-mhal@rbox.co>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, kuniyu@amazon.com
+Content-Type: multipart/signed; boundary="Sig_/o8cLahbTJCLLG8oEx=k=9tv";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Hello:
+--Sig_/o8cLahbTJCLLG8oEx=k=9tv
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Hi Eric,
 
-On Tue,  9 Apr 2024 22:09:39 +0200 you wrote:
-> Garbage collector does not take into account the risk of embryo getting
-> enqueued during the garbage collection. If such embryo has a peer that
-> carries SCM_RIGHTS, two consecutive passes of scan_children() may see a
-> different set of children. Leading to an incorrectly elevated inflight
-> count, and then a dangling pointer within the gc_inflight_list.
-> 
-> sockets are AF_UNIX/SOCK_STREAM
-> S is an unconnected socket
-> L is a listening in-flight socket bound to addr, not in fdtable
-> V's fd will be passed via sendmsg(), gets inflight count bumped
-> 
-> [...]
+On Thu, 11 Apr 2024 07:33:55 +0200 Eric Dumazet <edumazet@google.com> wrote:
+>
+> Do you have the fix in your tree ?
+>=20
+> 9b9fd45869e744bea7d32a94793736e3d9fd7d26 tcp: tweak
+> tcp_sock_write_txrx size assertion
 
-Here is the summary with links:
-  - [net,v2] af_unix: Fix garbage collector racing against connect()
-    https://git.kernel.org/netdev/net/c/47d8ac011fe1
+That commit has just turned up in the net-next tree after I merged it
+today, so this should be fixed tomorrow.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+--=20
+Cheers,
+Stephen Rothwell
 
+--Sig_/o8cLahbTJCLLG8oEx=k=9tv
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYXllYACgkQAVBC80lX
+0GwvFQgAoAaxNXlmyxleST/qMihIMvIUUd8QA4wh1iQmWfon/A9j7dQIN5tjDCwt
+hRMLhpPFU+5wJugLNk7OToH7WVYkSA1fda+kdCt72Fm+0KnC0hs8pdaDEgAW9uct
+Bm4uJh78MfoBOc8W0qBOSiEpXWx8sOytSJcbs/zSP4Z1GsSqIQ2r7Op8ZmGpKWpv
+0WimsL8C7BViC8UlAsBpaBHehKkqHtRYDPp0PKPtQ3zoMCORzUchq5ALFk8Nv7Jy
+Xw7uNFDtFcaZJaJUjHsrOyKXz681fQsTimbZ8MBfuuvpqKZClsZboo2qBRrTM60Y
+VuVBogCy1KimkhKY8lqgCcmCsFzj+w==
+=kven
+-----END PGP SIGNATURE-----
+
+--Sig_/o8cLahbTJCLLG8oEx=k=9tv--
 
