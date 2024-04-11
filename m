@@ -1,121 +1,96 @@
-Return-Path: <netdev+bounces-86891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E42408A0A68
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:46:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB31E8A0A87
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:50:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21D111C21265
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 07:46:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F7981F2401F
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 07:50:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73FD713F004;
-	Thu, 11 Apr 2024 07:46:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8281D13E8BA;
+	Thu, 11 Apr 2024 07:50:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="WJIeMfdS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mL7hmSRd"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D83A213EFF6;
-	Thu, 11 Apr 2024 07:46:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DFA613E8B3
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 07:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712821564; cv=none; b=pKHiscbpafONn2rh4rH5w2Ejip/56f89ApOHl2pjlxdJy7BuqDRMRv/upeMM1KMz2u78AOXVjErw0zTsTVpJuFp5+hJ3Ns/w1mMXCOFNG11dKupGR/XS/h2lNZZyE6Q10u7BFCrWWvEUMyJbTQe+wsj7qCesNbVEEjJf+gzelTI=
+	t=1712821832; cv=none; b=k0+mROumS6ywSlh6rXXVkjEQsBFKG2pzBFMImKRaatrpqhMogGKF+vh9gMUPNkupd68zQ0K9rBOSKSlBvRLdUY0zo56lFRRKFScGa0L47rroM/2lYqSeLvgKLOSMfl5bZHkpp0SevUa6TWMSra0BQf3qE5GgG9Me4c0UNPKTQt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712821564; c=relaxed/simple;
-	bh=ZwLPH/UOcOFhWCSF3mwT9KX212oLhnTdEXSZz3Y9JAk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ko0l6kT/16mOPneW1vsPk5bR6QH2tl8RwvoXNKkLjdJQdKQZpsNh0k2M7D6MMn1k17UtI+1Qrbxlt4b6/m/au28ry1UZxy5jBLnQ9NtrTRtWlXVDFmEFjOjiUjsaIvfQ/1yu1h7RCckclB/sJxTes4zG3ZSzIFGBEqgDGCbWa/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=WJIeMfdS; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1712821554; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=RuejJJ0cVW5wmtXibI9GDaEHnBr5czrBIGaDfgbbXis=;
-	b=WJIeMfdSJuiU0MAW2remApcJOvCaXxGxT0xbX+vOeoysqQXxIM6C6Ph+b+BrTjWRJLc/fJamgjWu2ilVzKA4mOjEtfr8f/F1+YxMJ1tQfQ7VBTuEt3YNjTQxRxiPE2OcsKa+mORwuG1mgZ+2pObZzx2sISKyNoRBqYEVQ/gFRaY=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R811e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0W4KbRbP_1712821552;
-Received: from 30.221.130.208(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W4KbRbP_1712821552)
-          by smtp.aliyun-inc.com;
-          Thu, 11 Apr 2024 15:45:53 +0800
-Message-ID: <fc274220-cb6e-43be-aa76-69e37449e535@linux.alibaba.com>
-Date: Thu, 11 Apr 2024 15:45:50 +0800
+	s=arc-20240116; t=1712821832; c=relaxed/simple;
+	bh=jM/Ot6EuWtszlj5c4iHd2/h6hS5FUfVr/w+a2PvmQaw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FiZVDz4Iry7kbRuJcJ3BnBj9QT0tBPLerMbVVSteT4Y7oHWfzLfRmi0fb0u8CAgu70YP9xvl6KJAeYokTDf7gcfvtE0NHrtf0yP/UVecF7hpRR2TEIvprSJieDP0A06KowWBz9hpivjkQBtcYRf3HEylqQ3U3mFZqMFsOeXw2qY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mL7hmSRd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1E3C0C43394;
+	Thu, 11 Apr 2024 07:50:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712821831;
+	bh=jM/Ot6EuWtszlj5c4iHd2/h6hS5FUfVr/w+a2PvmQaw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=mL7hmSRdxWFSawJNZqUMGRB1etLO69i3N8cRA4CmtfHbAv5xgf0xYNGeAlJfmPBpR
+	 55TASQ6cYh6WGf4XtLDzQJ/tJrejKVHNEXjwodh7ENufV8EV8NL/GMjfiIiMRY0ind
+	 Y+yLvJiL4IoxDznpA87hOJpKe02i1iLqifGASJSTx6Za6+RUw+tCd/Bjig9BMUugnb
+	 oA/jbOZyAogu+qjFnJUI4ix3bgFKm0mAKzrtLalpvO6dKduPyBUDt4HTVblN6Ypo05
+	 YctjZFhID3hT8In1r+AaXywNe271oPR8V7EHnOKVzUVcwJDyMroUiOj/1tO6J9gdoo
+	 MsRYrv6ZfYDkQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 127EFC54BD0;
+	Thu, 11 Apr 2024 07:50:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v5 00/11] net/smc: SMC intra-OS shortcut with
- loopback-ism
-To: Gerd Bayer <gbayer@linux.ibm.com>, wenjia@linux.ibm.com,
- jaka@linux.ibm.com
-Cc: wintera@linux.ibm.com, twinkler@linux.ibm.com, hca@linux.ibm.com,
- gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
- tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org
-References: <20240324135522.108564-1-guwen@linux.alibaba.com>
- <ae3ea4bc-4a9c-416e-a593-2885fea96ae5@linux.alibaba.com>
- <27deaa5dbb30c467fcdaa0667ef39da86bcee03f.camel@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <27deaa5dbb30c467fcdaa0667ef39da86bcee03f.camel@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] af_unix: Fix garbage collector racing against
+ connect()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171282183106.1471.16014082254968457229.git-patchwork-notify@kernel.org>
+Date: Thu, 11 Apr 2024 07:50:31 +0000
+References: <20240409201047.1032217-1-mhal@rbox.co>
+In-Reply-To: <20240409201047.1032217-1-mhal@rbox.co>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, kuniyu@amazon.com
 
+Hello:
 
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On 2024/4/3 19:10, Gerd Bayer wrote:
-> On Wed, 2024-04-03 at 14:35 +0800, Wen Gu wrote:
->>
->>
->> On 2024/3/24 21:55, Wen Gu wrote:
->>> This patch set acts as the second part of the new version of [1]
->>> (The first
->>> part can be referred from [2]), the updated things of this version
->>> are listed
->>> at the end.
->>
->>> Change log:
->>>
->>> RFC v5->RFC v4:
->>> - Patch #2: minor changes in description of config SMC_LO and
->>> comments.
->>> - Patch #10: minor changes in comments and
->>> if(smc_ism_support_dmb_nocopy())
->>>     check in smcd_cdc_msg_send().
->>> - Patch #3: change smc_lo_generate_id() to smc_lo_generate_ids()
->>> and SMC_LO_CHID
->>>     to SMC_LO_RESERVED_CHID.
->>> - Patch #5: memcpy while holding the ldev->dmb_ht_lock.
->>> - Some expression changes in commit logs.
->>>
->>
->> Hi, Jan. Do you have any comments on this version and should I post a
->> new patch series without 'RFC'? Thank you.
+On Tue,  9 Apr 2024 22:09:39 +0200 you wrote:
+> Garbage collector does not take into account the risk of embryo getting
+> enqueued during the garbage collection. If such embryo has a peer that
+> carries SCM_RIGHTS, two consecutive passes of scan_children() may see a
+> different set of children. Leading to an incorrectly elevated inflight
+> count, and then a dangling pointer within the gc_inflight_list.
 > 
-> Hi Wen,
+> sockets are AF_UNIX/SOCK_STREAM
+> S is an unconnected socket
+> L is a listening in-flight socket bound to addr, not in fdtable
+> V's fd will be passed via sendmsg(), gets inflight count bumped
 > 
-> Jan has been out sick for a little while now, and Wenjia is expected
-> back from a longer vacation tomorrow. So if you could hold off until
-> begin of next week, Wenjia might have some more feedback.
-> 
-> In the meantime, I'm looking at your patchset...
-> 
-> Thank you, Gerd
-> 
+> [...]
 
-Hi Gerd, is there any further information? I am wondering if I
-should wait for more feedback from SMC maintainers. Thanks!
+Here is the summary with links:
+  - [net,v2] af_unix: Fix garbage collector racing against connect()
+    https://git.kernel.org/netdev/net/c/47d8ac011fe1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Hi Wenjia, when it's convenient for you, could you please confirm
-if [1] and [2] need to be included in the next version? Thanks!
-
-[1] https://lore.kernel.org/netdev/7291dd1b2d16fd9bbd90988ac5bcc3a46d17e3f4.camel@linux.ibm.com/
-[2] https://lore.kernel.org/netdev/60b4aec0b4bf4474d651b653c86c280dafc4518a.camel@linux.ibm.com/
 
