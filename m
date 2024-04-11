@@ -1,79 +1,117 @@
-Return-Path: <netdev+bounces-87163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B4408A1F30
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 21:10:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8808D8A1F5E
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 21:21:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B3C61C238BF
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:10:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26CDB1F23D3A
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 19:21:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51DE11E488;
-	Thu, 11 Apr 2024 19:09:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82A2E12E5D;
+	Thu, 11 Apr 2024 19:21:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W8b4IHqw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bfado203"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A0961C287;
-	Thu, 11 Apr 2024 19:09:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A92314AB4
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 19:21:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712862564; cv=none; b=DCXW9JBo6QC9m3Gm2sxAvDVUQeot0O+ltxh2nkJEQoDGKmbrgaZQWoFLVzco/oBeClzhfgq9tE/dSO9gQPQGg3H+StFzG5alyp9EzlRR/ki9c/k5742ofq1X2Xs5dT+Dqbt31S/YaRbczQmLrPEFAcaRQG7q2Mt2meI7hLWQPDg=
+	t=1712863289; cv=none; b=X44rFaYlQhL//G9bZzdJKvwR1wyKUogA++afPLLGzvvvRsjPvZO/hXOn1N/DBSbxd81PN5qSs+0Fln2USdEpkCpWHiYkNuhK4v1AocYw2LEyyEUy1rqEHsboeDmew9GR0mALQQDf6Pc5FWydGtUGBBlwcdX5qmjA+mgxUPsdOI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712862564; c=relaxed/simple;
-	bh=usRNEJqWbMeIqe+6FvaB/rbolOBWygZpy9jfuMMXtUg=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=lcBuxL2lBKr5QdmxNVFLaX+9Me8BNpKs8ff+KaTn+nSzKyp8sWLTY9EYqkLy6XBv3MA84RdXmlAA36fiHF6ffRBppS6H3Klo9ZNrLi/wwz/GBpacSiS1gMS8hr80/e3GbBDWSXTuO6Mir+4Opbcn+7jLdXoAwrO9zytd6fdRN4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W8b4IHqw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0976AC32786;
-	Thu, 11 Apr 2024 19:09:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712862564;
-	bh=usRNEJqWbMeIqe+6FvaB/rbolOBWygZpy9jfuMMXtUg=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=W8b4IHqwm8oco9APHltRTXMd6NdTqKStT3Sde/42wKAZLZaLHGHigPIgJnPKPhVqz
-	 d1XLYwwc6tJ29cxqF/E7Ir6Ovy0QCpWwX1f/EFB9Hbx02KqfglUjqdxz4FV+CmCEbI
-	 tcNJtl7f7IHUxn8s/l/gAQmlBDhJDEkmbY3s3n9BZfqcf7VKLdxf0PqCaXsZWOZGb2
-	 IF6jzATyhacU39x3GaFW9VrarEuqA0mJF70NgblMEZN69FUei7WSDmeRI+ndy0GWCC
-	 xEw0iaHRte3mQR6wRynPTQLsuudVJSOZ/ifzUUluvMSKzZheKSxXYoSfrzChwODvnW
-	 cdaQfbChTgQtQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F1617C433E9;
-	Thu, 11 Apr 2024 19:09:23 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.9-rc4
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240411133837.86880-1-pabeni@redhat.com>
-References: <20240411133837.86880-1-pabeni@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240411133837.86880-1-pabeni@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.9-rc4
-X-PR-Tracked-Commit-Id: 4e1ad31ce3205d9400816e08cf14b7c96295d22e
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 2ae9a8972ce04046957f8af214509cebfd3bfb9c
-Message-Id: <171286256398.2172.12561033857678072673.pr-tracker-bot@kernel.org>
-Date: Thu, 11 Apr 2024 19:09:23 +0000
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+	s=arc-20240116; t=1712863289; c=relaxed/simple;
+	bh=Ik+5avN+F3onRNtV1PB619O8pLeIV7AzjthBG+4V4qg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hupFVnWasve/7JKn8rQ6PdB+KeCvvwXvCVE6Ho5CDccH8gz1DHzBdBDnJEJ8pi+mqiGKv4kvOlQApkErMNtNnK4yDPzP/n2xLFp5Ffrbn3wcFqBdBd6hpy7Is/MdXefNrnLPZhrGaClsys5ZIkyykDr4OeuYyw2iMf/SvmYMJIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bfado203; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-436433a44bcso678701cf.1
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 12:21:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712863287; x=1713468087; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UM2zuMgd2tTJ9l2V10ApEN63oRSs92Yz7I6KOrw/UzQ=;
+        b=Bfado203S/AohII9moQyCKBRMwi2fzN4BzIkdtcbqIcdxPwKqMLuWabB1P0NRRz9XH
+         rvGTSn/zP9d1FlCPWoq5OI8f4cWCi1aYMwRWgPo80Mw19LbPw/yOwsSUXpX8UjOKciaY
+         sJ8100pcziw3N7WG2eQGJiPq72D8qP8eiwHaRy15HoW9nA0fdQTCfU42KdyUXkJfWvcE
+         +/f5YDx82eQU+oXPNDcd7DOqWPn4wuzzBd8BcUhEQZH/X4YNANtsFoR2c66KIMUKZ6/l
+         Md0uwH80ydBPKZ24WcVr9/8ZIArVPKgGZZk0kXVYyPkAkQNXUh/thABafQtSCBoIaQRX
+         7Edw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712863287; x=1713468087;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UM2zuMgd2tTJ9l2V10ApEN63oRSs92Yz7I6KOrw/UzQ=;
+        b=EZOAPSCZ04a90ORu9uUbyVHJDqfco+D9mzjWVn+Ux9WRPgyOQT9zXMxNPI2tZuVI06
+         avoZHV+41OMO/E0DKtVd01Y0W0i/x/4N3abaOgEocM9lBaxMyuUX/Pq0enzQPjT0oIHQ
+         DH/8wdlfzphFar34qah+GBWwQo67MlS9k+kTtqeFrxF4sN90oQoYfY04J3iKHC+7MrXR
+         YN4rvHiKlAPTQ9yZ0ytyUFN1HQ2canF1snAu5jmLzitScA0HACeBTAlzDhq6LoV0mGri
+         IKxXVPEwvhH2RdVX+s44nNnmj22oIsEJRfLY7Fw7WloaDAYrGwZiomkt3PeaNrmyw+S0
+         XenQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWpUDtWq2qUP6t5BiL/ag+T/Wz3BDJ5ut5iD9pst+aKq0OttwBUk7AvXvifv/6MEJoJMSIEQ8T33v/7xulCeA4WQmQFVcVK
+X-Gm-Message-State: AOJu0YwcKbAKRpMIgEgBz5m/bSZ71Ck/W/l9ApgEt+H42d55KxOweabF
+	eziH9zfARzZFiffHsf8WVrZEut0VJCNhA+plW8AQwThEKD3YtL1i
+X-Google-Smtp-Source: AGHT+IGvHxA54aKOClekMdzRkSKoQQavDjhgxAQk3dRTaypFZBWOKdo0kFNXxP05O1GXsQzB8/QW1Q==
+X-Received: by 2002:ac8:67d7:0:b0:436:8736:f0c1 with SMTP id r23-20020ac867d7000000b004368736f0c1mr150864qtp.47.1712863286926;
+        Thu, 11 Apr 2024 12:21:26 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id p26-20020ac8741a000000b0043123c8b6a6sm1274004qtq.4.2024.04.11.12.21.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Apr 2024 12:21:26 -0700 (PDT)
+Message-ID: <a59e2164-7159-445e-9f87-fcf6cb4b57d6@gmail.com>
+Date: Thu, 11 Apr 2024 12:21:22 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net-next:main 26/50] net/ipv4/tcp.c:4673:2: error: call to
+ '__compiletime_assert_1030' declared with 'error' attribute: BUILD_BUG_ON
+ failed: offsetof(struct tcp_sock, __cacheline_group_end__tcp_sock_write_txrx)
+ - offsetofend(struct tcp_sock, __cacheline_group_begin__tcp_sock_...
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>
+Cc: Vladimir Oltean <olteanv@gmail.com>, kernel test robot <lkp@intel.com>,
+ llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
+References: <202404082207.HCEdQhUO-lkp@intel.com>
+ <20240408230632.5ml3amaztr5soyfs@skbuf>
+ <CANn89iJ8EcqiF8YCPhDxcp5t79J1RLzTh6GHHgAxbTXbC+etRA@mail.gmail.com>
+ <db4d4a48-b581-4060-b611-996543336cd2@gmail.com>
+ <CANn89iJMirOe=TqMZ=J8mFLNQLDV=wzL4jOf9==Zkv7L2U5jcQ@mail.gmail.com>
+ <20240410183636.202fd78f@kernel.org>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20240410183636.202fd78f@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The pull request you sent on Thu, 11 Apr 2024 15:38:37 +0200:
+On 4/10/24 18:36, Jakub Kicinski wrote:
+> On Wed, 10 Apr 2024 19:33:54 +0200 Eric Dumazet wrote:
+>>> Jakub, I do not see a 32-bit build in the various checks being run for a
+>>> patch, could you add one, if nothing else a i386 build and a
+>>> multi_v7_defconfig build would get us a good build coverage.
+>>
+>> i386 build was just fine for me.
+> 
+> Yes, we test i386 too, FWIW.
+> 
+> Florian, does arm32 break a lot? I may not be paying sufficient
+> attention. We can add more build tests but the CPU time we have
+> is unfortunately finite :(
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.9-rc4
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/2ae9a8972ce04046957f8af214509cebfd3bfb9c
-
-Thank you!
-
+Yes, that is why I mentioned multi_v7_defconfig, you an see the build 
+failure with that configuration. Of course Eric fixed it now, thanks!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Florian
+
 
