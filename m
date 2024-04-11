@@ -1,157 +1,458 @@
-Return-Path: <netdev+bounces-86856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86857-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EBAF8A07CC
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 07:36:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 086008A07EC
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 07:53:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 279602838DF
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 05:36:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 876611F21D0A
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 05:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6341913C9D0;
-	Thu, 11 Apr 2024 05:36:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E62613C9DB;
+	Thu, 11 Apr 2024 05:53:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="UVEA5coY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TxV5tIkh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B815713C9B9
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 05:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB8813CA80
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 05:53:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712813794; cv=none; b=E2KtXhMeXLRdyk1wob8T9ypK4YJjp81KiRdGtbZAEVHrSs72hTBhI0KZYU9u3ZfMpUHz0dMUXnHftXsPi48qEZ4n1oJ/YgDyLD0cIHrF97avaf0ee4T2SDoNg/1d6Ijo/gYPzy2HzibxP200Td7kO/rZJvaXzh5EN4+gjIkZPCc=
+	t=1712814834; cv=none; b=J4Sz4FXPzZs4tzfkbnMWbjsrbcAKu1JFZMmGLS/bi0WYCdMvUp0xrAy7u8BGIdoTwDHavRYtgS+IIrcBABo1C9NeGpbtwr2fID630pN6q4IbG8pChe7KMqaCVWu+e4p/aBx/nAK3hs8+mJU1K3dykmEceXsgS94fOnljY+SPqco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712813794; c=relaxed/simple;
-	bh=9Pa5OXbNJf9HL7UJhH3JcFa5n8z2BXnqXldXUMG2phA=;
+	s=arc-20240116; t=1712814834; c=relaxed/simple;
+	bh=uozESKa9CUFmuj15Ki14M/ZLdz96CT6W8MpP/JVNyLc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ti4czfckIipLfqa41dJ7BG9xAhlvtBBZ8Lk3ZU9Ox5T/bpNcrb70NuTxwByyZ2uICA1heKs8ANNQY5WUoVfJRtAaLbWPtxl5+Y4YqfmxfpVGtgpVkWZo42BDKx0XPSGKSeKBccKfX2I9SGDKiTDYmJYBDcrgzN2evRjc4gLqhdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=UVEA5coY; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-78d61a716ddso314178385a.3
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 22:36:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1712813790; x=1713418590; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5O5BYI4OdHldRtjTHclfiNrTCLX6On9bTqWbaBCK7vA=;
-        b=UVEA5coYYeRS8uJ/hQdFaOIXudpCoLobLBTccakXm0Jyi/CMcxJbV87hXhB+g288IO
-         nO1t0+AtE6NoMd7ULm8mDKJPUBZXvqwSqAoQhKL49YJ9qNJ4iS8UYX90YNH8RmLsGeG9
-         uiduuU9TNk/JEWgebJZFhmsYyXGobYyK7TynOxqkYXy0GmkTSIAzf4twCCQMTp7ewm1O
-         bGTSinl2jts3Rpw1r3D+9y29/a/mqzNqcj3eq+vdswTpfffeJc109bJRVnY2QqD+F99H
-         DGRDReEpKwQCihIaGfXHOjVN90Z7epVBaScEyer1BXHuG5fEAoTgpxjsASGC565C+eNb
-         EVsg==
+	 To:Cc:Content-Type; b=Ta+rfOC/O3Fc4mOfft+K1vHN8QwfzYbd4zqhuXycWnd87yf6Ynue9fn9op/c5mjssVG4bKkkivZmHy++AipOBSOFZKONEgshw+b/1QRKoPR5dYtGH0g/55fycdxQUQO7pVddonqR6+j+5nbI8B/6FT5KmgmQU+5eAQaPiuDnkn4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TxV5tIkh; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712814830;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HoX9dwIm60z8Qhhc7/oFFbYvoBIKCPU9G3xWy+tyAoA=;
+	b=TxV5tIkhIiNsIhx25u8QE6+DF/0WMT3JQtw2oQhrTIX0ewDedGVl2J8zXntSMZjyh+mXUo
+	LhSnuq+KT1U8jdZKa+Xia6DhOs4JsFLFBvFxzHSkyxstY9uT0cPZY1oFzDIJFX7hMRgkbj
+	8SjMJm1ZI0DJvqDRkW/nEdlEEC6jJbI=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-31-130vIue1OZe9_oMMNRsVzA-1; Thu, 11 Apr 2024 01:53:46 -0400
+X-MC-Unique: 130vIue1OZe9_oMMNRsVzA-1
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2a4a2cace80so4355309a91.3
+        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 22:53:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712813790; x=1713418590;
+        d=1e100.net; s=20230601; t=1712814824; x=1713419624;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5O5BYI4OdHldRtjTHclfiNrTCLX6On9bTqWbaBCK7vA=;
-        b=xUiy+so+jcVu7W1yeGmkAgRq7Rt2MhPDXTI9yh6FPHOi8CIUc25ea8n89uNTnh0h3M
-         LjE5DObD5nzHteb3TeFdy+mFJAtAkIMNoWmpiE4UTV/q9RZ31iXzDw3Tiyosy1/UpUvm
-         bAltC89dpCUn/9DcB23VSjtw2CwiBEx2D3BkBBxLOLMLTDocZbWmi6iWECTxqRywmg1c
-         yUndRKLilE5vd9kx17kk4c3hU5w3XeyXsCJnAPmBvV1IuSFvZtU5Rkhmrfln7gnXJBsf
-         9OilaIEl4zpmtoy4TIVXUpyXvKgi98FEy+pQPC7BwqayhC7yN/xosW3Wa3C/NNVTgPgE
-         Ro6A==
-X-Forwarded-Encrypted: i=1; AJvYcCVfK6F3vYVaW2LF0U02i3xumEZpfKmbdmPdm85GJydtGOWqbbZ/nPqNkjFkF0yE6zjiFVqacPoFCualA7ex6UfRrdNbU3fa
-X-Gm-Message-State: AOJu0YyoOVwhHVjTL+vZ52lLlyYpK9m6JWpTRLx6YYwN1auBwpDI3Z+y
-	LPlIc/Ix4sw1Hz3xcVSUaK814zScwf7l4nAtgwG252mzPyf9B3B3ruhyN7e1lRO3EbO/IZ15GnZ
-	9+P5cF6REkptJjoavjclEZbzM4YLmfPGUjPfY2A==
-X-Google-Smtp-Source: AGHT+IHXub++9CumsI9Ywnl2w4/5t7+EuZITPbvJVWOGFVEzJbCVmljtvqkv2l8ii4JKL3C+bb02heSSmwmSGs85R3Q=
-X-Received: by 2002:a05:622a:130f:b0:436:5951:6005 with SMTP id
- v15-20020a05622a130f00b0043659516005mr1527116qtk.22.1712813790711; Wed, 10
- Apr 2024 22:36:30 -0700 (PDT)
+        bh=HoX9dwIm60z8Qhhc7/oFFbYvoBIKCPU9G3xWy+tyAoA=;
+        b=nV663s6fnHTlxx67lP0ljphP8tWGZpem1PSDuXYp7TT6aMss2BqRsdcEphRrnptaJL
+         vmrGzZkCf3g2dBp7tQEq9SFgUZNo2PieHDrTjlW3lbeifVEc3FccgNfcJMe5dncv6xn5
+         hGvXDvd7H6DpqxVt08gscfoMDXuvbYJYrFPdXhSzb5fSTYQSbYnM+gW/coNfenK9ot9C
+         5Gk4uq7vf2D+uWjSfn8PzKpkDmJIf30EH8uZIvhjxkA2Wcc4gLTNatOD6pjJZGO64p5P
+         HLWYX6DblEoTH0poyU7Bp/oKqlz8qYA4JMWa4OS6j1gAdZr4A1xBkguQmw7A3J7xmmVk
+         FCaw==
+X-Forwarded-Encrypted: i=1; AJvYcCWTVJp9aOB1hz8m1ZqIXhwGBwQo2Tibm12+uKCoyGqffGIZ+Nhz+v8ZYaE6H1KXfFIlHCUwLvbO4uowk0tIm3leN7FhNAQP
+X-Gm-Message-State: AOJu0YxcG+aZxuEkGnSXCajv6SpT4us6aLwkCfUBF7tjDakWcUrNtL3F
+	Ck8/qTItFDZYRLY3P/9PpbVGp1GokCZfEWGwGXnZiyExNEsVOoWNufpKyej2Uc40swR2juY0j0t
+	ElEBlqADO1Mww80wzFp0zSxdTNX0KXVoaG0fVuplum3BSBeFAfyBjY/CE970aJgmTO0rX6QZ5AU
+	C1KRE9pNhMCuAjCb/MGk3RHdAwcAs3gqtSTJS2ZbOEBw==
+X-Received: by 2002:a17:90a:ea8f:b0:2a4:9183:c8fd with SMTP id h15-20020a17090aea8f00b002a49183c8fdmr4814424pjz.18.1712814824387;
+        Wed, 10 Apr 2024 22:53:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH6OfhkYEcpTLzIvkQdEYBsLINuR/Mfv41gg+H4NWX1cDGpUPRtr1v+JBkenjMqOyp0wwBIyYX6BNlJR+NVelQ=
+X-Received: by 2002:a17:90a:ea8f:b0:2a4:9183:c8fd with SMTP id
+ h15-20020a17090aea8f00b002a49183c8fdmr4814410pjz.18.1712814823999; Wed, 10
+ Apr 2024 22:53:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240411051124.386817-1-yuri.benditovich@daynix.com> <20240411051124.386817-2-yuri.benditovich@daynix.com>
-In-Reply-To: <20240411051124.386817-2-yuri.benditovich@daynix.com>
-From: Yuri Benditovich <yuri.benditovich@daynix.com>
-Date: Thu, 11 Apr 2024 08:36:19 +0300
-Message-ID: <CAOEp5OdiSW9ddv53JQHY57fCTwGc3eq-uWstSGcYFsMaW-FtOw@mail.gmail.com>
-Subject: Re: [PATCH net v2 1/1] net: change maximum number of UDP segments to 128
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Jason Wang <jasowang@redhat.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, yan@daynix.com, andrew@daynix.com
+References: <20240406185029.93335-1-yuri.benditovich@daynix.com>
+ <CACGkMEvKwh6GdkPzVyUDxODyCJQwHKFNJnOwCCRXurjUR=6aFQ@mail.gmail.com>
+ <CAOEp5OdvTAzi830Kp1JiUbdDiq77oN3-5tD-hZXAaai4EUDTcQ@mail.gmail.com>
+ <CACGkMEtKnu4MmPvdrxktygFB8B5Abn7rTkNcmU-cO-3MRkZgNg@mail.gmail.com>
+ <CAOEp5OdhBJabrTTAZLxTgBvkJkQ3wKDGG-CYrimXd1dY9qqdkA@mail.gmail.com>
+ <CACGkMEuEsCuRKUiAoUmb1LBL9pygGwEhXaivyx3m_sp9KqU27A@mail.gmail.com>
+ <CAOEp5OeRvZny1fJY=T=Gc82Spux=fEeHsdfNVMje6Fr-dPXXVA@mail.gmail.com>
+ <CACGkMEtSFEOKhhewvv6_pyw0RHvs0QqfAjrpjmfPxVK8RGm3JA@mail.gmail.com> <CAOEp5OepdfMhuh5rcKhadb4FBaxe4uEsxb_KFvEFW3q6Rj1MDA@mail.gmail.com>
+In-Reply-To: <CAOEp5OepdfMhuh5rcKhadb4FBaxe4uEsxb_KFvEFW3q6Rj1MDA@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 11 Apr 2024 13:53:32 +0800
+Message-ID: <CACGkMEsmZAQhN-c+PR270vx2MFWjT8mZKe9KDL0xO5tiCPpqfQ@mail.gmail.com>
+Subject: Re: [PATCH net] net: change maximum number of UDP segments to 128
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, yan@daynix.com, 
+	andrew@daynix.com, netdev <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-I've just fixed the 'Fixed:' line and extended the commit message.
-We can continue the discussion in the previous email thread or move it here=
-.
-
-On Thu, Apr 11, 2024 at 8:11=E2=80=AFAM Yuri Benditovich
+On Thu, Apr 11, 2024 at 1:32=E2=80=AFPM Yuri Benditovich
 <yuri.benditovich@daynix.com> wrote:
 >
-> The commit fc8b2a619469
-> ("net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validation")
-> adds check of potential number of UDP segments vs
-> UDP_MAX_SEGMENTS in linux/virtio_net.h.
-> After this change certification test of USO guest-to-guest
-> transmit on Windows driver for virtio-net device fails,
-> for example with packet size of ~64K and mss of 536 bytes.
-> In general the USO should not be more restrictive than TSO.
-> Indeed, in case of unreasonably small mss a lot of segments
-> can cause queue overflow and packet loss on the destination.
-> Limit of 128 segments is good for any practical purpose,
-> with minimal meaningful mss of 536 the maximal UDP packet will
-> be divided to ~120 segments.
-> The number of segments for UDP packets is validated vs
-> UDP_MAX_SEGMENTS also in udp.c (v4,v6), this does not affect
-> quest-to-guest path but does affect packets sent to host, for
-> example.
-> It is important to mention that UDP_MAX_SEGMENTS is kernel-only
-> define and not available to user mode socket applications.
-> In order to request MSS smaller than MTU the applications
-> just uses setsockopt with SOL_UDP and UDP_SEGMENT and there is
-> no limitations on socket API level.
+> On Thu, Apr 11, 2024 at 7:04=E2=80=AFAM Jason Wang <jasowang@redhat.com> =
+wrote:
+> >
+> > On Wed, Apr 10, 2024 at 4:28=E2=80=AFPM Yuri Benditovich
+> > <yuri.benditovich@daynix.com> wrote:
+> > >
+> > > On Wed, Apr 10, 2024 at 9:07=E2=80=AFAM Jason Wang <jasowang@redhat.c=
+om> wrote:
+> > > >
+> > > > On Tue, Apr 9, 2024 at 1:48=E2=80=AFPM Yuri Benditovich
+> > > > <yuri.benditovich@daynix.com> wrote:
+> > > > >
+> > > > >
+> > > > >
+> > > > > On Tue, Apr 9, 2024 at 6:53=E2=80=AFAM Jason Wang <jasowang@redha=
+t.com> wrote:
+> > > > >>
+> > > > >> On Mon, Apr 8, 2024 at 3:24=E2=80=AFPM Yuri Benditovich
+> > > > >> <yuri.benditovich@daynix.com> wrote:
+> > > > >> >
+> > > > >> > On Mon, Apr 8, 2024 at 9:27=E2=80=AFAM Jason Wang <jasowang@re=
+dhat.com> wrote:
+> > > > >> > >
+> > > > >> > > On Sun, Apr 7, 2024 at 2:50=E2=80=AFAM Yuri Benditovich
+> > > > >> > > <yuri.benditovich@daynix.com> wrote:
+> > > > >> > > >
+> > > > >> > > > Fixes: fc8b2a619469378 ("net: more strict VIRTIO_NET_HDR_G=
+SO_UDP_L4 validation")
+> > > > >> > > >
+> > > > >> > > > The mentioned above commit adds check of potential number
+> > > > >> > > > of UDP segments vs UDP_MAX_SEGMENTS in linux/virtio_net.h.
+> > > > >> > > > After this change certification test of USO guest-to-guest
+> > > > >> > > > transmit on Windows driver for virtio-net device fails,
+> > > > >> > > > for example with packet size of ~64K and mss of 536 bytes.
+> > > > >> > > > In general the USO should not be more restrictive than TSO=
+.
+> > > > >> > > > Indeed, in case of unreasonably small mss a lot of segment=
+s
+> > > > >> > > > can cause queue overflow and packet loss on the destinatio=
+n.
+> > > > >> > > > Limit of 128 segments is good for any practical purpose,
+> > > > >> > > > with minimal meaningful mss of 536 the maximal UDP packet =
+will
+> > > > >> > > > be divided to ~120 segments.
+> > > > >> > >
+> > > > >> > > Assuming different OS guests could run on top of KVM. I wond=
+er if a
+> > > > >> > > better fix is to relax the following check:
+> > > > >> > >
+> > > > >> > > =3D>                      if (skb->len - p_off > gso_size * =
+UDP_MAX_SEGMENTS)
+> > > > >> > >                                 return -EINVAL;
+> > > > >> > There are also checks vs UDP_MAX_SEGMENTS in udp.c (in ipv4 an=
+d ipv6),
+> > > > >> > they do not prevent guest-to-guest from passing but cause pack=
+et dropping in
+> > > > >> > other cases..
+> > > > >> > >
+> > > > >> > > Changing UDP_MAX_SEGMENTS may have side effects. For example=
+, a new
+> > > > >> > > Linux guest run on top of a old Linux and other.
+> > > > >> > IMO, in the worst case _in specific setups_ the communication =
+will behave like
+> > > > >> > it does now in all the setups.
+> > > > >>
+> > > > >> I meant if the guest limit is 128 but host limit is 64.
+> > > > >
+> > > > >
+> > > > > If the guest limit is (128 or 64) and host limit is 64:
+> > > > > If we send a UDP packet  with USO (length 64K, mss 600) - it is d=
+ropped.
+> > > > > setsockopt does not limit us to use <=3D64 packets, neither in wi=
+ndows nor in Linux,
+> > > >
+> > > > Just to make sure we are on the same page:
+> > > >
+> > > > Before fc8b2a619469378,
+> > > >
+> > > > 1) Windows guest works on Linux Host since we don't check against
+> > > > UDP_MAX_SEGMENTS on the host
+> > >
+> > >
+> > > Windows guest-to-guest works since there  is no check for
+> > > UDP_MAX_SEGMENTS in virtio_net.h
+> > > Windows guest to Linux host suffers with size=3D64K mss=3D536 (as an =
+example)
+> > >
+> > > > 2) Linux guest works on Linux Host, since it will always send packe=
+t
+> > > > with less than UDP_MAX_SEGMENTS
+> > >
+> > >
+> > > Not exactly.
+> > > If you use "selftest" (udpgso*) _as is_, it will work as it has
+> > > _internal_ define of 64 and never tries to do more than that.
+> > > But (sorry for repeating that) there is no setsockopt() limitation an=
+d
+> > > you're free to modify the test code
+> > > to use more segments (as an example) and this will not work.
+> >
+> > I meant this part in udp_send_skb()
+> >
+> > =3D>              if (datalen > cork->gso_size * UDP_MAX_SEGMENTS) {
+> >                         kfree_skb(skb);
+> >                         return -EINVAL;
+> >                 }
+> >
+> > >
+> > > >
+> > > >
+> > > > This is the behaviour that we need to stick to, otherwise we break =
+the
+> > > > guests as you've noticed.
+> > >
+> > > We can stick to the behavior I've described above if we change only d=
+efine
+> > > UDP_MAX_SEGMENTS 64->128 in udp.h but leave untouched
+> > > UDP_MAX_SEGMENTS=3D64 in udpgso (test code)
+> > > (IMO does not make too much sense but possible)
+> > >
+> > > Actually, all this discussion happens because the initial code of USO
+> > > in the kernel was delivered with define of 64 without any special
+> > > reason, just because this looked enough then.
+> >
+> > Right, but it's too late to "fix", the only thing we can do now is to
+> > make sure to not break the application that worked in the past.
+> >
+> > >
+> > > >
+> > > > If we fix it by increasing the UDP_MAX_SEGMENTS, it fixes for 1) bu=
+t
+> > > > not necessarily for 2). If we don't check against UDP_MAX_SEGMENTS,=
+ it
+> > > > works for 2) as well.
+> > >
+> >
+> > So what I want to say is that having a check for UDP_MAX_SEGMENTS
+> > seems to be problematic. And increasing it to 128 complicates the
+> > problem furtherly.
+> >
+> > > There are following cases:
+> > > - guest-to-guest (win-to-win, lin-to-lin,win-to-lin, lin-to-win)
+> >
+> > If we don't have the check for UDP_MAX_SEGMENTS, everything should be f=
+ine.
+> >
+> > If the sender can produces 128 and 64 is checked in the middle of the
+> > datapath in either tun or virtio-net, the packet will be dropped.
+> >
+> > > -guest-to-host (guest=3Dlin, guest=3Dwin)
+> >
+> > Same as above.
+> >
+> > > -host-to-host
+> >
+> > I don't see any issue in this part.
 >
-> Fixes: fc8b2a619469 ("net: more strict VIRTIO_NET_HDR_GSO_UDP_L4 validati=
-on")
-> Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.com>
-> ---
->  include/linux/udp.h                  | 2 +-
->  tools/testing/selftests/net/udpgso.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+> The issue is that host-to-host UDP packets with more than 64 segments
+> are dropped due to check vs  UDP_MAX_SEGMENTS is udp.c (v4 and v6)
+
+Yes, but if they fail since the introduction of UDP gso if I was not wrong.
+
 >
-> diff --git a/include/linux/udp.h b/include/linux/udp.h
-> index 3748e82b627b..7e75ccdf25fe 100644
-> --- a/include/linux/udp.h
-> +++ b/include/linux/udp.h
-> @@ -108,7 +108,7 @@ struct udp_sock {
->  #define udp_assign_bit(nr, sk, val)            \
->         assign_bit(UDP_FLAGS_##nr, &udp_sk(sk)->udp_flags, val)
 >
-> -#define UDP_MAX_SEGMENTS       (1 << 6UL)
-> +#define UDP_MAX_SEGMENTS       (1 << 7UL)
+> >
+> > > -host-to-guest (guest=3Dlin, guest=3Dwin)
+> >
+> > Same as guest-to-guest.
+> >
+> > >
+> > > Resulting table of results is much more complicated than you describe=
+d.
+> > > We can't use the udpgso code as the only indicator of go/nogo.
+> >
+> > We should not break userspace. If there's a setup that udpgso can work
+> > in the past but not after a patch is applied, we should avoid such
+> > cases.
+> >
+> > That's why I think avoiding checking UDP_MAX_SEGMENTS and doing other
+> > hardening might be better (for example as Eric suggested).
 >
->  #define udp_sk(ptr) container_of_const(ptr, struct udp_sock, inet.sk)
+> I've checked all this thread and I did not find any Eric's suggestion reg=
+arding
+> other hardening. Which suggestion have you mentioned?
+
+Quoted from Eric email (btw, for some reason the discussion is not
+reached to the list, adding list here)
+
+"""
+
+> Assuming different OS guests could run on top of KVM. I wonder if a
+> better fix is to relax the following check:
 >
-> diff --git a/tools/testing/selftests/net/udpgso.c b/tools/testing/selftes=
-ts/net/udpgso.c
-> index 1d975bf52af3..85b3baa3f7f3 100644
-> --- a/tools/testing/selftests/net/udpgso.c
-> +++ b/tools/testing/selftests/net/udpgso.c
-> @@ -34,7 +34,7 @@
->  #endif
+> =3D>                      if (skb->len - p_off > gso_size * UDP_MAX_SEGME=
+NTS)
+>                                 return -EINVAL;
 >
->  #ifndef UDP_MAX_SEGMENTS
-> -#define UDP_MAX_SEGMENTS       (1 << 6UL)
-> +#define UDP_MAX_SEGMENTS       (1 << 7UL)
->  #endif
+> Changing UDP_MAX_SEGMENTS may have side effects. For example, a new
+> Linux guest run on top of a old Linux and other.
+
+Typical qdisc packet limit is 1000.
+
+I think a limit prevents abuses, like gso_size =3D=3D 1, and skb->len =3D 6=
+5000
+
+"""
+
+The actual value needs more thought, for example 65K may block the
+implementation of jumbogram in the future.
+
+Thanks
+
 >
->  #define CONST_MTU_TEST 1500
-> --
-> 2.40.1
+> > >
+> > > >
+> > > > >
+> > > > >>
+> > > > >>
+> > > > >> > Note that this limit (UDP_MAX_SEGMENTS) is set
+> > > > >> > in internal kernel define, it is not based on any RFC, not vis=
+ible via
+> > > > >> > ethtool etc.
+> > > > >>
+> > > > >> In the future, it needs to be advertised to the guest via virtio=
+ spec.
+> > > > >> Otherwise it might have compatibility issues.
+> > > > >
+> > > > >
+> > > > > The spec targets 2 areas - hardware solutions and software soluti=
+ons.
+> > > > > For hardware solutions everything is clear - there are no declare=
+d limits and if the hardware will limit the number of segments to anything =
+- it is a bug.
+> > > > > So the advertising makes sense only for hypervisors and for examp=
+le, qemu will need to obtain this magic number from the kernel.
+> > > >
+> > > > Right.
+> > > >
+> > > > > If/when we'll start adding this to the spec we'll face a reasonab=
+le question - why do we need to add something that is not mentioned in any =
+RFC, why not add such a thing for TCP also?
+> > > >
+> > > > So the kernel has gso_max_segs for netdevice. We probably need it f=
+or
+> > > > virtio-net as well, and it might be useful for jumbograms as well.
+> > > >
+> > > virtio-net is "limited" by common "#define GSO_MAX_SEGS        65535u=
+"
+> >
+> > This works since the host will do software segmentation as a fallback
+> > which will be very slow.
+> >
+> > >
+> > > >
+> > > > >
+> > > > > Next, let's say we advertise this number over virtio capabilities=
+ - does this solve something?
+> > > >
+> > > > For example, doing software segmentation by kernel?
+> > > >
+> > > > > The driver can't communicate this capability up. The setsockopt w=
+ill not limit this parameter.
+> > > > >
+> > > > >>
+> > > > >> For example, migrate from 64 to 128.
+> > > > >>
+> > > > > Yes, but the migration from higher kernel to lower one looks like=
+ an immortal problem.
+> > > >
+> > > > This is not rare. For example, the patch for 128 is applied on the
+> > > > source but not destination.
+> > >
+> > > I agree that such migration can happen and _theoretically_ may cause
+> > > some misunderstanding
+> > > I'm almost sure that practically this can't cause any.misunderstandin=
+g
+> > > and we can discuss this specific problem in depth.
+> > > (I just need some time for some tests)
+> >
+> > Thanks
+> >
+> > >
+> > >
+> > > >
+> > > > Thanks
+> > > >
+> > > > >
+> > > > >>
+> > > > >> > The same on Windows - the adapter does not have such a capabil=
+ity as maximal
+> > > > >> > number of UDP segments, so the upper layers are unaware of any=
+ limitation.
+> > > > >>
+> > > > >> Right, that might be problematic.
+> > > > >>
+> > > > >> The checking of UDP_MAX_SEGMENTS implies an agreement of guest a=
+nd
+> > > > >> host.  But such implications are not true  .
+> > > > >>
+> > > > >> Thanks
+> > > > >>
+> > > > >>
+> > > > >>
+> > > > >> > >
+> > > > >> > > Thanks
+> > > > >> > >
+> > > > >> > > >
+> > > > >> > > > Signed-off-by: Yuri Benditovich <yuri.benditovich@daynix.c=
+om>
+> > > > >> > > > ---
+> > > > >> > > >  include/linux/udp.h                  | 2 +-
+> > > > >> > > >  tools/testing/selftests/net/udpgso.c | 2 +-
+> > > > >> > > >  2 files changed, 2 insertions(+), 2 deletions(-)
+> > > > >> > > >
+> > > > >> > > > diff --git a/include/linux/udp.h b/include/linux/udp.h
+> > > > >> > > > index 3748e82b627b..7e75ccdf25fe 100644
+> > > > >> > > > --- a/include/linux/udp.h
+> > > > >> > > > +++ b/include/linux/udp.h
+> > > > >> > > > @@ -108,7 +108,7 @@ struct udp_sock {
+> > > > >> > > >  #define udp_assign_bit(nr, sk, val)            \
+> > > > >> > > >         assign_bit(UDP_FLAGS_##nr, &udp_sk(sk)->udp_flags,=
+ val)
+> > > > >> > > >
+> > > > >> > > > -#define UDP_MAX_SEGMENTS       (1 << 6UL)
+> > > > >> > > > +#define UDP_MAX_SEGMENTS       (1 << 7UL)
+> > > > >> > > >
+> > > > >> > > >  #define udp_sk(ptr) container_of_const(ptr, struct udp_so=
+ck, inet.sk)
+> > > > >> > > >
+> > > > >> > > > diff --git a/tools/testing/selftests/net/udpgso.c b/tools/=
+testing/selftests/net/udpgso.c
+> > > > >> > > > index 1d975bf52af3..85b3baa3f7f3 100644
+> > > > >> > > > --- a/tools/testing/selftests/net/udpgso.c
+> > > > >> > > > +++ b/tools/testing/selftests/net/udpgso.c
+> > > > >> > > > @@ -34,7 +34,7 @@
+> > > > >> > > >  #endif
+> > > > >> > > >
+> > > > >> > > >  #ifndef UDP_MAX_SEGMENTS
+> > > > >> > > > -#define UDP_MAX_SEGMENTS       (1 << 6UL)
+> > > > >> > > > +#define UDP_MAX_SEGMENTS       (1 << 7UL)
+> > > > >> > > >  #endif
+> > > > >> > > >
+> > > > >> > > >  #define CONST_MTU_TEST 1500
+> > > > >> > > > --
+> > > > >> > > > 2.34.3
+> > > > >> > > >
+> > > > >> > >
+> > > > >> >
+> > > > >>
+> > > >
+> > >
+> >
 >
+
 
