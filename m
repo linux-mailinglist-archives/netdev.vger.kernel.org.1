@@ -1,203 +1,211 @@
-Return-Path: <netdev+bounces-86802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16C6B8A058D
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 03:30:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A77B8A0598
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 03:36:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABB8E1F2275B
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:30:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 25CD9B2105E
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:36:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E3A77F22;
-	Thu, 11 Apr 2024 01:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D712D60DEA;
+	Thu, 11 Apr 2024 01:36:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OahLLZf9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m1TH+013"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1185D73171;
-	Thu, 11 Apr 2024 01:28:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E360605CD;
+	Thu, 11 Apr 2024 01:36:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712798924; cv=none; b=fU3ozhB2FDeIYfeXnQQTPrVTcej1ekc5fYRSPO7i/AMXFlcUFMGKQLXdWUL2URcA1vEyfgJ5vIZstnnog9iFo6EjSlx+J23hVUxU0V5d+8Zgoz7uzRmR3CYR63Mx1bA0HdrS9xvVAzDumKD1XKz4hmTOVjt+4/MW8BXlpNNHTxs=
+	t=1712799388; cv=none; b=SW2Pgy2peTTT/6Opt4im2hBXM6W6hR/Q1kxwLF6+e32MO2p+9kBi3+oq3/YCl5A5CiMPq8aopigcC2tceweYvJkNILXzXKbqtl4ZnkwRurdMwdcxsAIP8HYyEqhfso6mf3H4qF3XH6J5zwYDiusSiWPT/VbHHXqVdPRQRVHCJ/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712798924; c=relaxed/simple;
-	bh=Dt+N9TSEXMGWfFEH27py4ZfTIinmlfGwSEEGHIQSoco=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Ca6QUUYCgZe0CiWgAOiOtoodCBuTr1Jft+84/d2ldo0cyBAXyzNeTVi0Yx79zfTmZ/HQETpZxUFj+63NTAKDv2pX2BNLS9yM4V9Qo3kMtDfSaAjXu5RxLFkVDQGlBSEzSqOGuBkisTGL996c+5N2qU4KSr9Ghp7Px8QFarg2s2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OahLLZf9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3DD33C43399;
-	Thu, 11 Apr 2024 01:28:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712798923;
-	bh=Dt+N9TSEXMGWfFEH27py4ZfTIinmlfGwSEEGHIQSoco=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=OahLLZf9vIOhO54V3vzzapGnETus+wNJxWrh0o6K9C/DD+j6CFQkiTeNtgSesU0ew
-	 Sp8mHBAKH9DIoGkaGLZiF5DiFrp2CDjT/D1ez8S+rv209hRf4qZNZi9ZuadGT3mxtB
-	 Z5siQ24JPWXU3CE+6ejbCLiN2JyK03rYTEAx1TGbaV90mY/9o3dvNXlbqIHzaTWCDL
-	 f9BOX4P46d7pMre2MASQUktBJ3/9RF19dwL9AH2uPBs+jdN6NeQBdT3zkSKNi6VlIW
-	 vPFYQuvebdxwbMMS9q2+K6FxO0syrRrt9pQVgA9buBVQa37zoIP+umbpEZFs1AknK2
-	 tUvd5V08ce1sQ==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	petrm@nvidia.com,
-	linux-kselftest@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 6/6] selftests: net: exercise page pool reporting via netlink
-Date: Wed, 10 Apr 2024 18:28:15 -0700
-Message-ID: <20240411012815.174400-7-kuba@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240411012815.174400-1-kuba@kernel.org>
-References: <20240411012815.174400-1-kuba@kernel.org>
+	s=arc-20240116; t=1712799388; c=relaxed/simple;
+	bh=Bv17sivQjVSRil5/m7NyguLXoC8iZa+4bbs4tHa3P+4=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=k2GM7mdvS4qPykwl8H1bQ5ceJaZk8Fzbg8iP7F20jkO6SJq0boRuZoSf9pn3jo74lV7x868ueFJOMVgxc8WOd8YH3X/jkIsnXQSc/lWJ5Z7aEzLx5Qfub4TjtH77Ol8ngoHI6M6tI1nfg3AKdDQqQCwbgSrLsIYjZU3PT3p488s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m1TH+013; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-78d57bd577dso364691285a.2;
+        Wed, 10 Apr 2024 18:36:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712799386; x=1713404186; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tbSovFXxhV1ZzfQY3zmzSZkZK0djY0/pPM92ABTCFDY=;
+        b=m1TH+013lFtunm8g8489gm7HbX3DfRTVXgAFquxUWnxtX43spZ9WA7g5AXo/QgQ8yz
+         53IyGIwQhJVecCfm2OcfsLDfqvbfhlLTsq8ruMddPqLQtWlv3fEcemCXZz6lIbdOYrt8
+         sMW0kh7+BhM+Y1kHHhjaeRlqIVGtDgj7P/mcQfwBYGFqtLCi1g3UwMg6XcfNtEcXODJP
+         l2gDuYgEzydcAQnEpzcHE92NgNnP1bmXO1wQ009Gk1HFQ0mFK7w5lLDXw68ww2vVLxUt
+         rGQ3zIs+OQIPle7BVAdxHXtwQM4wo9daoFwznplRId1F2S7t61zSuMeRZrZMGUl1friY
+         9Zrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712799386; x=1713404186;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=tbSovFXxhV1ZzfQY3zmzSZkZK0djY0/pPM92ABTCFDY=;
+        b=KiGJnhRYrm5cu7sO2nfSbV/X6UgB2lUoNVytnlHxT5TfmK5dwXI9zFFp8skxA+CtkN
+         wiNZJ2zAD/6McrffeWhn+58QY0/gUB+N9LcgITTEt7XIH3xbQ4OLUSS9ByPoW9tfjscb
+         hGPsTgU4cnZvrwz0jL434HsJO7AzzFZNqk+Cq95daZ/3C+MXI8UBO83CVMR6X/f/rxOb
+         DjGfMPNwxc6sToNoXm+iIhfiwUhRhQmijmvPneKEoLmcHA6308Krqe/mwRDwlDY1gYbP
+         cca7AfQuIOKQzbcpdq4/c0kzSrQQjs/Cp5to8i915JfCmAA4BH1M7YUjVi9MMT5sFh5S
+         e/Aw==
+X-Forwarded-Encrypted: i=1; AJvYcCW4Rv8bsnzEFVYDt0oK4Q3faycANoK49rFdMfH36pPj9RVYuGNxYSrPaH1bon8wkiPFTWTbxkEgrVHS89qyC6ZHVcUGf12vKCrmUAnjzRTLnu7AqxNRzENZ9o0XxyOoJ9H6zto9
+X-Gm-Message-State: AOJu0YwUXRGNaD716OfwNy0VizFa6VjMSnJb7hIevhNyYX2ghr3F2V+2
+	KlLkUbQou36fO2epmz2odgt1jV7gABgfvc1xV4knlIgUDwY8FzmM
+X-Google-Smtp-Source: AGHT+IE/blMsmh23x6zYnhsQngea6jAiJ2NdK39aQR7Qy6pMA6O44kVEKfUmCGuK9qqW0iH1NUUj1A==
+X-Received: by 2002:a05:620a:ec8:b0:78d:68de:e3ac with SMTP id x8-20020a05620a0ec800b0078d68dee3acmr3397684qkm.76.1712799385975;
+        Wed, 10 Apr 2024 18:36:25 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id l25-20020a05620a211900b0078d67d40c49sm334328qkl.70.2024.04.10.18.36.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Apr 2024 18:36:25 -0700 (PDT)
+Date: Wed, 10 Apr 2024 21:36:25 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+ John Fraker <jfraker@google.com>, 
+ netdev@vger.kernel.org, 
+ Praveen  Kaligineedi <pkaligineedi@google.com>, 
+ Harshitha Ramamurthy <hramamurthy@google.com>, 
+ Shailend Chand <shailend@google.com>, 
+ Willem de  Bruijn <willemb@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Junfeng Guo <junfeng.guo@intel.com>, 
+ Ziwei Xiao <ziweixiao@google.com>, 
+ Jeroen de Borst <jeroendb@google.com>, 
+ linux-kernel@vger.kernel.org, 
+ kory.maincent@bootlin.com, 
+ andrew@lunn.ch, 
+ richardcochran@gmail.com
+Message-ID: <66173e9972287_2d6bc6294d1@willemb.c.googlers.com.notmuch>
+In-Reply-To: <874jc8ww68.fsf@nvidia.com>
+References: <20240408180918.2773238-1-jfraker@google.com>
+ <661550e348224_23a2b2294f7@willemb.c.googlers.com.notmuch>
+ <20240409172838.247738f3@kernel.org>
+ <87jzl5akh5.fsf@nvidia.com>
+ <20240410061928.712ff9a3@kernel.org>
+ <6616e92cbcca_2bfabf294c5@willemb.c.googlers.com.notmuch>
+ <874jc8ww68.fsf@nvidia.com>
+Subject: Re: [PATCH net-next] gve: Correctly report software timestamping
+ capabilities
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Add a Python test for the basic ops.
+Rahul Rameshbabu wrote:
+> 
+> On Wed, 10 Apr, 2024 15:31:56 -0400 Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
+> > Jakub Kicinski wrote:
+> >> On Tue, 09 Apr 2024 21:40:46 -0700 Rahul Rameshbabu wrote:
+> >> > > My gut tells me we force drivers to set the ethtool op because
+> >> > > while at it they will probably also implement tx stamping.  
+> >> > 
+> >> > I think the logic should be the other way (in terms of the
+> >> > relationship). A call to skb_tx_timestamp should throw a warning if the
+> >> > driver does not advertise its timestamping capabilities. This way, a
+> >> > naive netdev driver for some lightweight device does not need to worry
+> >> > about this. I agree that anyone implementing tx timestamping should have
+> >> > this operation defined. An skb does not contain any mechanism to
+> >> > reference the driver's ethtool callback. Maybe the right choice is to
+> >> > have a ts capability function registered for each netdev that can be
+> >> > used by the core stack and that powers the ethtool operation as well
+> >> > instead of the existing callback for ethtool?
+> >> 
+> >> Adding a check which only need to runs once in the lifetime of
+> >> the driver to the fastpath may be a little awkward. Another option
+> >> would be a sufficiently intelligent grep, which would understand
+> >> which files constitute a driver. At which point grepping for 
+> >> the ethtool op and skb_tx_timestamp would be trivial?
+> >
+> > Many may not define the flags themselves, but defer this to
+> > ethtool_op_get_ts_info.
+> >
+> > A not so much intelligent, but sufficiently ugly, grep indicates
+> > not a a massive amount of many missing entries among ethernet
+> > drivers. But this first attempt is definitely lossy.
+> >
+> > $ for symbol in skb_tx_timestamp get_ts_info SOF_TIMESTAMPING_TX_SOFTWARE ethtool_op_get_ts_info "(SOF_TIMESTAMPING_TX_SOFTWARE|ethtool_op_get_ts_info)"; do
+> >     echo -n "$symbol: ";
+> >     for i in `grep -nrIE "$symbol" drivers/net/ethernet/ | awk '{print $1}' | xargs dirname | uniq`; do echo $i; done | wc -l;
+> >   done
+> >
+> > skb_tx_timestamp: 69
+> > get_ts_info: 66
+> > SOF_TIMESTAMPING_TX_SOFTWARE: 33
+> > ethtool_op_get_ts_info: 40
+> > (SOF_TIMESTAMPING_TX_SOFTWARE|ethtool_op_get_ts_info): 59
+> >
+> > This does not add up, but that's because some drivers share prefixes,
+> > and some drivers have different paths where one open codes and the
+> > other calls ethtool_op_get_ts_info. Marvell is a good example of both:
+> >
+> > $ grep -nrIE '(SOF_TIMESTAMPING_TX_SOFTWARE|ethtool_op_get_ts_info)' drivers/net/ethernet
+> > /marvell
+> > drivers/net/ethernet/marvell/pxa168_eth.c:1367: .get_ts_info    = ethtool_op_get_ts_info,
+> > drivers/net/ethernet/marvell/mv643xx_eth.c:1756:        .get_ts_info            = ethtool_op_get_ts_info,
+> > drivers/net/ethernet/marvell/mvpp2/mvpp2_main.c:5266:   info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE |
+> > drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c:962:          return ethtool_op_get_ts_info(netdev, info);
+> > drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c:964:  info->so_timestamping = SOF_TIMESTAMPING_TX_SOFTWARE |
+> 
+> If there is a desire to enforce all drivers need to implement
+> .get_is_info, would the following make sense?
 
-  # ./net/nl_netdev.py
-  KTAP version 1
-  1..3
-  ok 1 nl_netdev.empty_check
-  ok 2 nl_netdev.lo_check
-  ok 3 nl_netdev.page_pool_check
-  # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
+The only reason to enforce this is if we want to enforce them to also
+implement tx software timestamping. Generally, these features are opt
+in.
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/testing/selftests/net/lib/py/nsim.py |  7 ++
- tools/testing/selftests/net/nl_netdev.py   | 79 +++++++++++++++++++++-
- 2 files changed, 84 insertions(+), 2 deletions(-)
+> My biggest objection to
+> this idea was mainly my concern that the drivers would miss setting
+> info->so_timestamping with SOF_TIMESTAMPING_RX_SOFTWARE |
+> SOF_TIMESTAMPING_SOFTWARE, which I do not think should be a
+> responsibility of the driver author since this is happening in the core
+> stack.
+> 
+> So maybe something like this (taking Willem's proposal for
+> __ethtool_get_ts_info and modifying it a bit)?
+> 
+>         int err = 0;
+> 
+>         ...
+> 
+>         info->phc_index = -1;
+> 
+>         if (phy_has_tsinfo(phydev))
+>                 err = phy_ts_info(phydev, info);
+>         else
+>                 err = ops->get_ts_info(dev, info);
+> 
+>         info->so_timestamping |= SOF_TIMESTAMPING_RX_SOFTWARE |
+>                                  SOF_TIMESTAMPING_SOFTWARE;
+> 
+>         return err;
 
-diff --git a/tools/testing/selftests/net/lib/py/nsim.py b/tools/testing/selftests/net/lib/py/nsim.py
-index 94aa32f59fdb..1fd50a308408 100644
---- a/tools/testing/selftests/net/lib/py/nsim.py
-+++ b/tools/testing/selftests/net/lib/py/nsim.py
-@@ -28,6 +28,13 @@ from .utils import cmd, ip
-         self.dfs_dir = "%s/ports/%u/" % (nsimdev.dfs_dir, port_index)
-         ret = ip("-j link show dev %s" % ifname, ns=ns)
-         self.dev = json.loads(ret.stdout)[0]
-+        self.ifindex = self.dev["ifindex"]
-+
-+    def up(self):
-+        ip("link set dev {} up".format(self.ifname))
-+
-+    def down(self):
-+        ip("link set dev {} down".format(self.ifname))
- 
-     def dfs_write(self, path, val):
-         self.nsimdev.dfs_write(f'ports/{self.port_index}/' + path, val)
-diff --git a/tools/testing/selftests/net/nl_netdev.py b/tools/testing/selftests/net/nl_netdev.py
-index 2b8b488fb419..afc510c044ce 100755
---- a/tools/testing/selftests/net/nl_netdev.py
-+++ b/tools/testing/selftests/net/nl_netdev.py
-@@ -1,7 +1,8 @@
- #!/usr/bin/env python3
- # SPDX-License-Identifier: GPL-2.0
- 
--from lib.py import ksft_run, ksft_pr, ksft_eq, ksft_ge, NetdevFamily
-+import time
-+from lib.py import ksft_run, ksft_pr, ksft_eq, ksft_ge, NetdevFamily, NetdevSimDev, ip
- 
- 
- def empty_check(nf) -> None:
-@@ -15,9 +16,83 @@ from lib.py import ksft_run, ksft_pr, ksft_eq, ksft_ge, NetdevFamily
-     ksft_eq(len(lo_info['xdp-rx-metadata-features']), 0)
- 
- 
-+def page_pool_check(nf) -> None:
-+    with NetdevSimDev() as nsimdev:
-+        nsim = nsimdev.nsims[0]
-+
-+        # No page pools when down
-+        nsim.down()
-+        pp_list = nf.page_pool_get({}, dump=True)
-+        pp_list = [pp for pp in pp_list if pp.get("ifindex") == nsim.ifindex]
-+        ksft_eq(len(pp_list), 0)
-+
-+        # Up, empty page pool appears
-+        nsim.up()
-+        pp_list = nf.page_pool_get({}, dump=True)
-+        pp_list = [pp for pp in pp_list if pp.get("ifindex") == nsim.ifindex]
-+        ksft_ge(len(pp_list), 0)
-+        refs = sum([pp["inflight"] for pp in pp_list])
-+        ksft_eq(refs, 0)
-+
-+        # Down, it disappears, again
-+        nsim.down()
-+        pp_list = nf.page_pool_get({}, dump=True)
-+        pp_list = [pp for pp in pp_list if pp.get("ifindex") == nsim.ifindex]
-+        ksft_eq(len(pp_list), 0)
-+
-+        # Up, allocate a page
-+        nsim.up()
-+        nsim.dfs_write("pp_hold", "y")
-+        pp_list = nf.page_pool_get({}, dump=True)
-+        refs = sum([pp["inflight"] for pp in pp_list if pp.get("ifindex") == nsim.ifindex])
-+        ksft_ge(refs, 1)
-+
-+        # Now let's leak a page
-+        nsim.down()
-+        pp_list = nf.page_pool_get({}, dump=True)
-+        pp_list = [pp for pp in pp_list if pp.get("ifindex") == nsim.ifindex]
-+        ksft_eq(len(pp_list), 1)
-+        refs = sum([pp["inflight"] for pp in pp_list if pp.get("ifindex") == nsim.ifindex])
-+        ksft_eq(refs, 1)
-+        undetached = [pp for pp in pp_list if "detach-time" not in pp]
-+        ksft_eq(len(undetached), 0)
-+
-+        # New pp can get created, and we'll have two
-+        nsim.up()
-+        pp_list = nf.page_pool_get({}, dump=True)
-+        pp_list = [pp for pp in pp_list if pp.get("ifindex") == nsim.ifindex]
-+        attached = [pp for pp in pp_list if "detach-time" not in pp]
-+        undetached = [pp for pp in pp_list if "detach-time" in pp]
-+        ksft_eq(len(attached), 1)
-+        ksft_eq(len(undetached), 1)
-+
-+        # Free the old page and the old pp is gone
-+        nsim.dfs_write("pp_hold", "n")
-+        # Freeing check is once a second so we may need to retry
-+        for i in range(50):
-+            pp_list = nf.page_pool_get({}, dump=True)
-+            pp_list = [pp for pp in pp_list if pp.get("ifindex") == nsim.ifindex]
-+            if len(pp_list) == 1:
-+                break
-+            time.sleep(0.05)
-+        ksft_eq(len(pp_list), 1)
-+
-+        # And down...
-+        nsim.down()
-+        pp_list = nf.page_pool_get({}, dump=True)
-+        pp_list = [pp for pp in pp_list if pp.get("ifindex") == nsim.ifindex]
-+        ksft_eq(len(pp_list), 0)
-+
-+        # Last, leave the page hanging for destroy, nothing to check
-+        # we're trying to exercise the orphaning path in the kernel
-+        nsim.up()
-+        nsim.dfs_write("pp_hold", "y")
-+
-+
- def main() -> None:
-     nf = NetdevFamily()
--    ksft_run([empty_check, lo_check], args=(nf, ))
-+    ksft_run([empty_check, lo_check, page_pool_check],
-+             args=(nf, ))
- 
- 
- if __name__ == "__main__":
--- 
-2.44.0
+Yes, this is what I meant as well. (the code I showed was just copied
+verbatim from net-next as context, not a suggested change.)
+
+> >
+> > One more aside, no driver should have to advertise
+> > SOF_TIMESTAMPING_SOFTWARE or SOF_TIMESTAMPING_RAW_HARDWARE. Per
+> > Documentation/networking/timestamping.rst these are reporting flags,
+> > not recording flags. Devices only optionall record a timestamp.
+> 
+> I think this view aligns with my opinion above (though good point about
+> timestamping reporting bits in general should be deduced based on the
+> timestamp generation bits set rather than needing to be set as well).
 
 
