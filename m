@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-86811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1A008A05B6
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 04:00:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C5B18A05B7
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 04:00:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0910B1C21E57
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDEEB285520
 	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 02:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61AAD626DD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65FCD62818;
 	Thu, 11 Apr 2024 02:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i8bbmzux"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DGqllrxs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9886215F
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 02:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C94E61674;
+	Thu, 11 Apr 2024 02:00:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712800836; cv=none; b=clOy/8MZAUkITgwvoV0kfyCxt/CxWpdM3G3zobL+Mh5YiRp531IsZmt1RrsuDfuKeMvZaLugR2scm73Px1j8UB2KEZaDQknghp5xmXXMQ3gSH37h3PmGpDiZ9Jb6613NatLmln0HF3azr+sINGDxk7zi8jTSX0RCqZFn8TpbFFk=
+	t=1712800836; cv=none; b=fHMfKvnSUF1ebCUdXXsbDRvK6TX1PBqAmETpMKV6uhym/npmyOLyFOHqiAMshndagSfVibrpHnc1i4If3/GfWBtouCP7lSuE+u83SxmW7u1QMgw4D375AU3PtWaV/Emg8aEikIKVCmUgHRJ1ErNrTdyo3EcGVyQ9Gz7dsNTt9J4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712800836; c=relaxed/simple;
-	bh=6gnx++g1IleqIogVWlz5BB7v5zBarNdK0Vxh3WS43Mw=;
+	bh=6Cij9gk2+tshYEQ8bidf1LIXaouxOi54fCmkbe6echc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Uus7M4YJ83tU4hnKxD5+s28gjEPXccJ5TawR8hk2loX9BgtlOptNCkF2d/aMHnEkkn8qzt7AjdbD5OIv7tD8nweUXLGvJnqjLM2uJfmsxMFGJwAMHPK9zhYaRGWIlgyysYu2oCxGLnj5+lmfYP8s5HirLgMnOWwqRzILRHfE8OA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i8bbmzux; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AED3FC43399;
+	 In-Reply-To:To:Cc; b=H8jMGslu5rp0k6nsmwtER+HWOmv0PtSgnUGksHdlszKIPKW6p9X6FBwfmwqcH8/SUcPCfmUKEkuJuA5xxEkY0MQoMF5l7kuy3BLquM8HYj2hFr4wSE+wGyXKHVs9qb3jc+2lO5sZGm7Ryiqs7IuIU8Z6+q99bjBUUktPIckCDlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DGqllrxs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 83B07C43394;
 	Thu, 11 Apr 2024 02:00:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1712800835;
-	bh=6gnx++g1IleqIogVWlz5BB7v5zBarNdK0Vxh3WS43Mw=;
+	bh=6Cij9gk2+tshYEQ8bidf1LIXaouxOi54fCmkbe6echc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=i8bbmzuxj1F7OM2G6LOjY+hMIo31OR8p3OPW62saS7zdWBdDFHx/02eq6+UBhrXr3
-	 M0VJLUd9Z9zgkSB7TuYJ2UvaDq2oSiKNDUanJUk+1LB5Pvy3Q5ood2bvphqDyDqpPU
-	 kiZnHm5NdS93/nRZ/8YojOArk00VMiVGewuMU5ubq9iOEbq9OK7Fb0fZdPQEEe7hMT
-	 vWtzNNwUa0MqyQ6XrNx+bJTQ2vPXjSsZtVePqrn+pH1k7L8XN+tRpLmu94lLIPnPee
-	 nhcpwHusTjVJRmMOhZYacmgIPr4XjYEqc1VkaGMyYVWNqfQu2KQFirmd9047c3XZGL
-	 pVDam9bf/LCkA==
+	b=DGqllrxs7/KWcrtpvjksskac53m2Lh2RJ/0d8Vl+Pb7sx5QA1m4zFtZTz/ToiUZgd
+	 gTmKE7Ts7UcsStFbw9hdgyjFQnLq0JlBen6IPkzKWTpmm2IOkMjIsvTEyBDv7TEdPx
+	 HedYd0AhaAPPUg3Bb/bKz4C9Htct4kDspcxvccxhU7bxAqisUvjQdcmUGabKg5ETws
+	 u/d52OwiG+jYNZCBY+rQQj0OQ8I8G/SHn8+MYjjhaDd8NlgD/1fJwHr67+vNNgQiv9
+	 pt0AH6j5HOq8KNGhrviFYhto5PRpzi0BG6mesPeQYhDipEKQFy1KnaOquDJ7V3aEA6
+	 zEfYhJwf5ecew==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A4817C395F6;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 61167CF21C5;
 	Thu, 11 Apr 2024 02:00:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] tcp: tweak tcp_sock_write_txrx size assertion
+Subject: Re: [PATCH net v3] net: dsa: mt7530: fix enabling EEE on MT7531 switch
+ on all boards
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171280083567.2701.9901992509841799932.git-patchwork-notify@kernel.org>
+ <171280083539.2701.12891198240380123867.git-patchwork-notify@kernel.org>
 Date: Thu, 11 Apr 2024 02:00:35 +0000
-References: <20240409140914.4105429-1-edumazet@google.com>
-In-Reply-To: <20240409140914.4105429-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com, lkp@intel.com,
- vladimir.oltean@nxp.com
+References: <20240408-for-net-mt7530-fix-eee-for-mt7531-mt7988-v3-1-84fdef1f008b@arinc9.com>
+In-Reply-To: <20240408-for-net-mt7530-fix-eee-for-mt7531-mt7988-v3-1-84fdef1f008b@arinc9.com>
+To: =?utf-8?b?QXLEsW7DpyDDnE5BTCB2aWEgQjQgUmVsYXkgPGRldm51bGwrYXJpbmMudW5hbC5h?=@codeaurora.org,
+	=?utf-8?b?cmluYzkuY29tQGtlcm5lbC5vcmc+?=@codeaurora.org
+Cc: daniel@makrotopia.org, dqfext@gmail.com, sean.wang@mediatek.com,
+ andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ opensource@vdorst.com, linux@armlinux.org.uk, SkyLake.Huang@mediatek.com,
+ hkallweit1@gmail.com, bartel.eerdekens@constell8.be, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, florian.fainelli@broadcom.com,
+ arinc.unal@arinc9.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  9 Apr 2024 14:09:14 +0000 you wrote:
-> I forgot 32bit arches might have 64bit alignment for u64
-> fields.
+On Mon, 08 Apr 2024 10:08:53 +0300 you wrote:
+> From: Arınç ÜNAL <arinc.unal@arinc9.com>
 > 
-> tcp_sock_write_txrx group does not contain pointers,
-> but two u64 fields. It is possible that on 32bit kernel,
-> a 32bit hole is before tp->tcp_clock_cache.
+> The commit 40b5d2f15c09 ("net: dsa: mt7530: Add support for EEE features")
+> brought EEE support but did not enable EEE on MT7531 switch MACs. EEE is
+> enabled on MT7531 switch MACs by pulling the LAN2LED0 pin low on the board
+> (bootstrapping), unsetting the EEE_DIS bit on the trap register, or setting
+> the internal EEE switch bit on the CORE_PLL_GROUP4 register. Thanks to
+> SkyLake Huang (黃啟澤) from MediaTek for providing information on the
+> internal EEE switch bit.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] tcp: tweak tcp_sock_write_txrx size assertion
-    https://git.kernel.org/netdev/net-next/c/9b9fd45869e7
+  - [net,v3] net: dsa: mt7530: fix enabling EEE on MT7531 switch on all boards
+    https://git.kernel.org/netdev/net/c/06dfcd4098cf
 
 You are awesome, thank you!
 -- 
