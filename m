@@ -1,93 +1,77 @@
-Return-Path: <netdev+bounces-86822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFD898A060E
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 04:40:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E3308A0610
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 04:41:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04E151C22C1C
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 02:40:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFD3C1C22ACB
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 02:41:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C0D213B2A4;
-	Thu, 11 Apr 2024 02:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AA1013B28D;
+	Thu, 11 Apr 2024 02:40:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vIjaNh2Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CCLMROu9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1741B13B28F
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 02:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09BF313AD2E;
+	Thu, 11 Apr 2024 02:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712803229; cv=none; b=F61ddg5YGaO4hkHi1oqSdqf+0NTNnA72oFPwkY8phwTZbdpJoH1qY3WfcNhjNdpvTWCz/vc8PU150wYNT1b5wi0alUccoJgBe+GxCCxQUGhRWnx8VXUVP66Pq6IwjXpdkmQ2iMvchgXKnU8wA9la2jwtNQSqGMz9SzOsO+Qv+VE=
+	t=1712803258; cv=none; b=O2rvKMpldb3ThP7fgS9rzYC5PUdyy/HBbodb6Oa400U334C87IeORHdK80Y+/9FDb2HOSaP+ZsDk7ADi6r2xazA6+Ns1ThtX3APK1fqDQ6SPs38BZmcN0sgdOsYZjHVM+Z2pqjrvgCLILcpnn7kfXuMdSf0qt2CjWGKrwPERO7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712803229; c=relaxed/simple;
-	bh=E/EdgxdxQ3SvCmT29W+W2+haNHGTBWD4IXE7WVl7s9o=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qyg63eYBDlHcmcyUx28DFqYd+fVy/vkaXNylhpTiTZeUtbBIf2TpI0zz3Fq1gcHmiI/J3dAgWOsc7fTjK2QfyYrT5fr7A2Et/P+b52TGpSXA6gJiJ+UDqVefWLdQULRI9HmOA/IL1Z0RT7sxMd1wZzgljaxCeJpU9QA2hKT0P0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vIjaNh2Z; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8854AC433B2;
-	Thu, 11 Apr 2024 02:40:28 +0000 (UTC)
+	s=arc-20240116; t=1712803258; c=relaxed/simple;
+	bh=Nbl2is2U3WrrBfLIDYACMv1pv0cSrz85+RNvb8hYl/o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=c2QEkimqQ0Y0D2NTC+Cfg0tM/VewpJjBzTm8qNBKBV7CvkyBetzd31wCknPsHzGyMpR4Ius4pF7VeJVtpiYf7FQJODkIJjco9i685oJPUhsDVoMIfDZRElvzRHXnXrwLTL7cIU+m3AhWDO1DbvKdcDU6ysKXAd9oWXqjBVwvQoU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CCLMROu9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 016A7C433C7;
+	Thu, 11 Apr 2024 02:40:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712803228;
-	bh=E/EdgxdxQ3SvCmT29W+W2+haNHGTBWD4IXE7WVl7s9o=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=vIjaNh2Znqwq56VT3VQ0zJGE8o18MliCCpdxINwly6Wsv8hNVxJK8LtTieVFptXs1
-	 jOEonBU3Lp+U5XiTwmcObiWaImj0Rx8y7ytMJMg00SvlhQPfpcHzC9MGenZ4g8hshw
-	 GkTyThg0F0Y8EP1zKnznQQtcThEjny5fLYpm2gR3wKWL0C7OjlhqHmMhLMKdod5CNI
-	 V4DDivOkMZPILtG4Z7J0OEMnXCOAGLb7a6Cu+lpFznyQUA80bNcGKSvPZFLZaxlERt
-	 lNQM1C/gmRxN5AXACijzURWHW5RZ+HbfIZ1WV/NZMBTNbXWqHFEE4XJPa1lxaJJZWx
-	 3f2Mq02VGy67Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 77AF4CF21C5;
-	Thu, 11 Apr 2024 02:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1712803257;
+	bh=Nbl2is2U3WrrBfLIDYACMv1pv0cSrz85+RNvb8hYl/o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CCLMROu97ipfxoLZXQkdGz6B7+EJ7xDeHjXUwaIqE17/hhV4kMbO3XZDWi0TgMhUU
+	 yD8A7kqe2e35yzUKy/l+ZxEcq+TW/grmPx7yYPm2t9kPNnno2NGNLG7+kQiX4cCjSL
+	 051gyG5uhSHwHp1/8nXsWoVdOBEMqY8N2G8K9JgMuIrm/2feEMoWhD6zozZYH69KsF
+	 K4ov73CRpBrDBLGVsKdk3jX3a2rrTq1eVv0OTZ4rqXpRN0PH6ba5UXmHn2PJeJT2Dh
+	 xdy3CyqBcqGZNQ3YdFUFHASc3mLkH8ZZ8NWk18f/+pnXT1mFqZzUcbDnXr6RbciwOS
+	 JPYBy5CK3yW+w==
+Date: Wed, 10 Apr 2024 19:40:55 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Camelia Groza <camelia.groza@nxp.com>
+Cc: David Gouarin <dgouarin@gmail.com>, david.gouarin@thalesgroup.com,
+ Madalin Bucur <madalin.bucur@nxp.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net v4] dpaa_eth: fix XDP queue index
+Message-ID: <20240410194055.2bc89eeb@kernel.org>
+In-Reply-To: <20240409093047.5833-1-dgouarin@gmail.com>
+References: <8edda7aa8ff27cee1b3fa60421734e508d319481.camel@redhat.com>
+	<20240409093047.5833-1-dgouarin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1] ethtool: update tsinfo statistics attribute docs
- with correct type
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171280322848.23404.15524534174081611845.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Apr 2024 02:40:28 +0000
-References: <20240409232520.237613-2-rrameshbabu@nvidia.com>
-In-Reply-To: <20240409232520.237613-2-rrameshbabu@nvidia.com>
-To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
- davem@davemloft.net, pabeni@redhat.com, jacob.e.keller@intel.com,
- vadim.fedorenko@linux.dev
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue,  9 Apr 2024 11:30:46 +0200 David Gouarin wrote:
+> Make it possible to bind a XDP socket to a queue id.
+> The DPAA FQ Id was passed to the XDP program in the
+> xdp_rxq_info->queue_index instead of the Ethernet device queue number,
+> which made it unusable with bpf_map_redirect.
+> Instead of the DPAA FQ Id, initialise the XDP rx queue with the queue number.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue,  9 Apr 2024 16:25:16 -0700 you wrote:
-> nla_put_uint can either write a u32 or u64 netlink attribute value. The
-> size depends on whether the value can be represented with a u32 or requires
-> a u64. Use a uint annotation in various documentation to represent this.
-> 
-> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> ---
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v1] ethtool: update tsinfo statistics attribute docs with correct type
-    https://git.kernel.org/netdev/net-next/c/65f35aa76c0e
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Camelia, looks good?
 
