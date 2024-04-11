@@ -1,83 +1,155 @@
-Return-Path: <netdev+bounces-86804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 345A28A059A
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 03:36:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52A468A059C
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 03:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 662D41C219D6
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:36:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83B7F1C21660
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9853C60EF9;
-	Thu, 11 Apr 2024 01:36:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 114A45F870;
+	Thu, 11 Apr 2024 01:38:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rLCVPXFf"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="M0vq7m0X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675AC5F870;
-	Thu, 11 Apr 2024 01:36:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AA629CE6;
+	Thu, 11 Apr 2024 01:38:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712799398; cv=none; b=kYO7KOmLZt6iDlBnqf18h8MBhiskzl6NnY0FI4bJJbWTbl2YT72KVM00uYGhJdRzeD0w9hYVSQiyIecnkugFr5iUquC7aTIOLcpJ6p74nonPqG/9HuRalhde2hHni7TQ2DF4+L69e+NhCjSVcbL6j8ZjyImBLihuMKdPsJHrfEw=
+	t=1712799522; cv=none; b=q5QH0fOcJqVfJgI6Kq4GyHc6C41iUdVgcimQ6ukgsWU2Q+MRIb6+w5QspQ+zqqe+3xZs0pXjnpBa60LKpk4NrtNWx0ywfZQ2tE83bG7w7dtiLNFYcqK/ps4dNoQEoNAU2ABfxyIhtzc1rgWnUhskGzuns3rIL+gUNGrIoc326bs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712799398; c=relaxed/simple;
-	bh=MWTUkadnObVjMc8frEWWWyCvBCX6wsjc33gwzU1lmqs=;
+	s=arc-20240116; t=1712799522; c=relaxed/simple;
+	bh=jT6pUYF+gNcGo47vf9X95umMLPeSkId51q5nzxueMJM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hXXh0LZ2rc/Vg2o2JJeNV+iLVxIZM6r9sHk2m6OhA4KakGSn5h1Bg1M1PE7GWljBFBUsquUgmQvhZDd7RAfEGzZAZt8g3aOB6Erv+vtSc6bTofw2LXP48GwpFv4zQO7dQa3A/7vG969UnBqAJwLIAuXN2qAUT6F3d6ldUqj0SyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rLCVPXFf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADCCDC433C7;
-	Thu, 11 Apr 2024 01:36:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712799398;
-	bh=MWTUkadnObVjMc8frEWWWyCvBCX6wsjc33gwzU1lmqs=;
+	 MIME-Version:Content-Type; b=NZsW/+Tv9jYnRUtFVh1GqVVm47iwIU/LZjGnjxxLjuflJXDisaIqtrwXqUWgBiE4YqYC1wzh8e5Qs0uxmgb9bMZR2AEPqcnO5aKE7aP3Sk6yS+hrayiqysFms0zaezES6m3VKyv9gSCEsa0ZhzvSPiZR0UEsnrjbVJcNsJNVzdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=M0vq7m0X; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1712799517;
+	bh=zeub6wzGgYoN50TfkzxBwUllVnK72jWbC8vD4JoZgDA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rLCVPXFfBKMhygcc3c/PiSabC40ergjqMylxqFMbqJQgFxPoNEyo1INIR3JBXMxRH
-	 3pkuPZtv9CKSGL3SNLMUR1O6xXlRWpwcodiEItGct72/nmC37FJ2T4EZHxR83g+7eV
-	 +7npshUyURuv4YngCDywBcsFebv+61zXy/TfpTG5HmmvaXwFnFhhEaS+SfpSiUsPC6
-	 fBOYRYAYiV2QCQDefRMnxbqSCewH0LLLsdtVSrmnshii860QPc173K2VJXfeYIXOs7
-	 39LMAJ4hfzOyEtnlH+uoJpLYiufjVfc5zmSwDoJqe0wqpBI8Ot/iqsw3QjWX4lbtHv
-	 G0dI0jejlBlXQ==
-Date: Wed, 10 Apr 2024 18:36:36 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>, Florian Fainelli
- <f.fainelli@gmail.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, kernel test robot <lkp@intel.com>,
- llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [net-next:main 26/50] net/ipv4/tcp.c:4673:2: error: call to
- '__compiletime_assert_1030' declared with 'error' attribute: BUILD_BUG_ON
- failed: offsetof(struct tcp_sock,
- __cacheline_group_end__tcp_sock_write_txrx) - offsetofend(struct tcp_sock,
- __cacheline_group_begin__tcp_sock_...
-Message-ID: <20240410183636.202fd78f@kernel.org>
-In-Reply-To: <CANn89iJMirOe=TqMZ=J8mFLNQLDV=wzL4jOf9==Zkv7L2U5jcQ@mail.gmail.com>
-References: <202404082207.HCEdQhUO-lkp@intel.com>
-	<20240408230632.5ml3amaztr5soyfs@skbuf>
-	<CANn89iJ8EcqiF8YCPhDxcp5t79J1RLzTh6GHHgAxbTXbC+etRA@mail.gmail.com>
-	<db4d4a48-b581-4060-b611-996543336cd2@gmail.com>
-	<CANn89iJMirOe=TqMZ=J8mFLNQLDV=wzL4jOf9==Zkv7L2U5jcQ@mail.gmail.com>
+	b=M0vq7m0XQt85Xl44jMp1YvSljh8CBazhm/l9UwhMvQsustwRaodgHNxH2P06mpBQs
+	 8u1aRgPt7iWa/Ef5iWDjCohsWAFqpkBD/B5C4XnqB1XoNy/O1AdapwHBLB4Y763Wsk
+	 KrmGf5TDLSwr+rsujyQ/iobW76DJVbKESY0OjbEAoQ0vAgh1d2KTep0iDPz4XMynmU
+	 ABAKCrtOwyqBfmbWCAtazUBDzGwkLnHqQ448ElfjdzVWQOx3lEZi5brciP6ujsYOUC
+	 eJCLyn8C+nMKdniyb/y50vSS/wPbN/vmWLulo34PYtAHbA2JD8cMBdseqnSRyxuusn
+	 dle41iOUv0ZKA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VFMmD4h8Cz4wb2;
+	Thu, 11 Apr 2024 11:38:36 +1000 (AEST)
+Date: Thu, 11 Apr 2024 11:38:35 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: Re: linux-next: build failure after merge of the net-next tree
+Message-ID: <20240411113835.713ccf11@canb.auug.org.au>
+In-Reply-To: <CANn89iJyXNKycL1kd_KP8NH-qU7siv8BGW5PGLexjmqaXXGciA@mail.gmail.com>
+References: <20240409114028.76ede66a@canb.auug.org.au>
+	<CANn89iJyXNKycL1kd_KP8NH-qU7siv8BGW5PGLexjmqaXXGciA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="Sig_/X+hQJFyq5z7MEux5de__XW/";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Wed, 10 Apr 2024 19:33:54 +0200 Eric Dumazet wrote:
-> > Jakub, I do not see a 32-bit build in the various checks being run for a
-> > patch, could you add one, if nothing else a i386 build and a
-> > multi_v7_defconfig build would get us a good build coverage.  
-> 
-> i386 build was just fine for me.
+--Sig_/X+hQJFyq5z7MEux5de__XW/
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Yes, we test i386 too, FWIW.
+Hi all,
 
-Florian, does arm32 break a lot? I may not be paying sufficient
-attention. We can add more build tests but the CPU time we have 
-is unfortunately finite :(
+On Tue, 9 Apr 2024 07:10:40 +0200 Eric Dumazet <edumazet@google.com> wrote:
+>
+> On Tue, Apr 9, 2024 at 3:40=E2=80=AFAM Stephen Rothwell <sfr@canb.auug.or=
+g.au> wrote:
+> >
+> > After merging the net-next tree, today's linux-next build (arm
+> > multi_v7_defconfig) failed like this:
+> >
+> > In file included from <command-line>:
+> > In function 'tcp_struct_check',
+> >     inlined from 'tcp_init' at net/ipv4/tcp.c:4703:2:
+> > include/linux/compiler_types.h:460:45: error: call to '__compiletime_as=
+sert_940' declared with attribute error: BUILD_BUG_ON failed: offsetof(stru=
+ct tcp_sock, __cacheline_group_end__tcp_sock_write_txrx) - offsetofend(stru=
+ct tcp_sock, __cacheline_group_begin__tcp_sock_write_txrx) > 92
+> >   460 |         _compiletime_assert(condition, msg, __compiletime_asser=
+t_, __COUNTER__)
+> >       |                                             ^
+> > include/linux/compiler_types.h:441:25: note: in definition of macro '__=
+compiletime_assert'
+> >   441 |                         prefix ## suffix();                    =
+         \
+> >       |                         ^~~~~~
+> > include/linux/compiler_types.h:460:9: note: in expansion of macro '_com=
+piletime_assert'
+> >   460 |         _compiletime_assert(condition, msg, __compiletime_asser=
+t_, __COUNTER__)
+> >       |         ^~~~~~~~~~~~~~~~~~~
+> > include/linux/build_bug.h:39:37: note: in expansion of macro 'compileti=
+me_assert'
+> >    39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond),=
+ msg)
+> >       |                                     ^~~~~~~~~~~~~~~~~~
+> > include/linux/build_bug.h:50:9: note: in expansion of macro 'BUILD_BUG_=
+ON_MSG'
+> >    50 |         BUILD_BUG_ON_MSG(condition, "BUILD_BUG_ON failed: " #co=
+ndition)
+> >       |         ^~~~~~~~~~~~~~~~
+> > include/linux/cache.h:108:9: note: in expansion of macro 'BUILD_BUG_ON'
+> >   108 |         BUILD_BUG_ON(offsetof(TYPE, __cacheline_group_end__##GR=
+OUP) - \
+> >       |         ^~~~~~~~~~~~
+> > net/ipv4/tcp.c:4673:9: note: in expansion of macro 'CACHELINE_ASSERT_GR=
+OUP_SIZE'
+> >  4673 |         CACHELINE_ASSERT_GROUP_SIZE(struct tcp_sock, tcp_sock_w=
+rite_txrx, 92);
+> >       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+> >
+> > Presumably caused by commit
+> >
+> >   d2c3a7eb1afa ("tcp: more struct tcp_sock adjustments")
+> >
+> > I have reverted that commit for today. =20
+>=20
+> Yeah, a build bot gave us a warning yesterday, I will fix this today.
+
+I am still getting this build failure.
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/X+hQJFyq5z7MEux5de__XW/
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYXPxsACgkQAVBC80lX
+0GzuKwgAnkJD0uqw5ZtXjSDD8uCFvlBwEqSeumc2wsMbPKDqvz0f5SjYeKCfWrht
+efuN+i8DZg7rbw8OszvdWIgyPU8Cw0lOn1+Ojv+kgHt0d4Q6iW/xQH5TlNOY8oGs
+Zx2Ga9TB26Y2lHKAWrSx0TpvZS2hJNNdIdFuUkPBK0ukzOcppxl36b6jXm6V2qOW
+S4pxr6imP33SQRO81f0ceJ5avNiCm887k4iGenYFvAbAISFV8Ew3mmzJarHJCD2M
+y6dlqXr7bb1ev2E2BliTnCARHIqWHjn1fA+v5L5I1neShOTPt9BHCBzefolOm7mX
+nyPDdnAxMobBWeMHD+Ly8w/XUwpeFQ==
+=ZyYn
+-----END PGP SIGNATURE-----
+
+--Sig_/X+hQJFyq5z7MEux5de__XW/--
 
