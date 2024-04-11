@@ -1,155 +1,120 @@
-Return-Path: <netdev+bounces-86875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B0A18A090F
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:04:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 216368A0955
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 09:11:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E98A4282A9D
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 07:04:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0751283214
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 07:11:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9284D13DBB1;
-	Thu, 11 Apr 2024 07:04:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E45E13FD68;
+	Thu, 11 Apr 2024 07:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="w97xjmBZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ES6ttF9G"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17320523A;
-	Thu, 11 Apr 2024 07:04:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6679513E3FF
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 07:10:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712819088; cv=none; b=F8Uk7a/Rg5PObN7ekXuqMeJU5roPUST2dFYfNCdPtlNyYi0un28FUK9n8Sm46bRMg5VcCaA0HacRjor/ETmt5HiqLhThYgvXX0hAp0MOROkyMw6O3vyQq18Z2EykMeeqB6ubKXSfdk5C2awuehGOLxNiv1QlJqSNY8RM+9pwH48=
+	t=1712819406; cv=none; b=LkpGDPQh3aFbiAtgVpnKzpQ3JVO7ft2mZJnTybjb8oN6nhbAsRlIH3QRY9eK+rlg1IXTC3U/TIP7gAPj5wXkX9ytj+ePp43lvMstOWwHX6pougGomCMROT8cOthtPYtG9CKa7KjAaS1YU5aABkjPZwokdClRy2QftSlx7mxWi/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712819088; c=relaxed/simple;
-	bh=0OAlRLFkgYzXEC0BlyzffbfPcf/pRXaaT8I3u/trQ00=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t0PeYC2PKVHFwK4RElE3y9/eNAr71nyt/b7wesit6+iCblJZ3cPxcUEs57LPTa7x5rFWk05CJWguzqzP96kuAx1z+MPqEG1b93sNhLNmuH31LC5uEfNVv7wVqifiSSLrBNN7ntqKPhlaErqTIKLxh7bswn9uDbz7ZBtyZ+c53KQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=w97xjmBZ; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1712819086; x=1744355086;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=0OAlRLFkgYzXEC0BlyzffbfPcf/pRXaaT8I3u/trQ00=;
-  b=w97xjmBZPPIvpc0D3NNbuISVYnpLElJqBNfHvx+q6d6hLPyZ0Jd4nfXm
-   HZfMmGDAAfi4D/6fzxwI42lhNbHu2VBFBLUa7MFq+JDGXVFaDZ5TnZdxp
-   iMezS+DgnKZIVHQI1ngWzPkxAwExlkE7lliGwiPq+1iRHM/d0i80nTM0u
-   SIO8g09S3aA6Tr4pvlxCs1rbdmtRPIWS5LnkgaUb4rvJbgM38tbM2VZCE
-   g4lCjCExuLfyA2sUqQkoHWEb1FqWZ4AOZKJTk1TojCHl69rH3gWzhOwaq
-   LRO/tJaOl1xCzNmHc2Dnc1lj/jjEieK92YfFx77AqEkMDrgAgI7JSEBMC
-   g==;
-X-CSE-ConnectionGUID: umr+2rzeTmeMDSDDw69iGA==
-X-CSE-MsgGUID: tkV1ScQ/R72oUu+yKOdD7A==
-X-IronPort-AV: E=Sophos;i="6.07,192,1708412400"; 
-   d="scan'208";a="20531085"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 11 Apr 2024 00:04:39 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 11 Apr 2024 00:04:11 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex03.mchp-main.com
- (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Thu, 11 Apr 2024 00:04:08 -0700
-Date: Thu, 11 Apr 2024 07:04:08 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: =?utf-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-CC: <netdev@vger.kernel.org>, Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v2] net: sparx5: flower: fix fragment flags handling
-Message-ID: <20240411070408.jtic3ndd2zxngga6@DEN-DL-M70577>
-References: <20240410095224.6372-1-ast@fiberby.net>
+	s=arc-20240116; t=1712819406; c=relaxed/simple;
+	bh=wH6i3JfODjwBAUH9Z8++yMSzU4HiqQg5BInTQ+RTfj8=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=BzFDCBFMll03iGdI5kvDpEodEL+pIsvlpXMfYwp6Cvk2WAmnmZvoz0/n3jZAYus71FoVimvMGXQ8XnwPxf2UQcmo33wXZHemIWuWtkSrFGWgBgH0ZSjVl15Erh3APPIvRoCrNlcyTQKVfYzfgX2qU3DHUxhSTrXqTJ0nGsyNmok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ES6ttF9G; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712819403;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5NgjUa+lwKskPLBb4G2miG3MSH6bZPhgAN2v8MXqMrQ=;
+	b=ES6ttF9GJ89mFc6npcGUov5dP+3eseGXXI2w9e6TdT2vR3IrI6/o4pU6VoxnMMaJAZArHd
+	43tVd+isr98ZiXCftezKfaGWOnVwiCnxUZr4QhQ7XBVxjmtL7KYE4yhThhpwRYJMBWpS5w
+	VJTSCOq6EZF6MOWI9opcyt3pZIHu+g4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-19-Lr1cEV93NVGDpSocSvNLIw-1; Thu, 11 Apr 2024 03:09:56 -0400
+X-MC-Unique: Lr1cEV93NVGDpSocSvNLIw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CA3F310499A0;
+	Thu, 11 Apr 2024 07:09:54 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.146])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3F2182166B34;
+	Thu, 11 Apr 2024 07:09:51 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240410173815.GA514426@kernel.org>
+References: <20240410173815.GA514426@kernel.org> <20240401135351.GD26556@kernel.org> <20240328163424.2781320-1-dhowells@redhat.com> <20240328163424.2781320-27-dhowells@redhat.com> <3002686.1712046757@warthog.procyon.org.uk>
+To: Simon Horman <horms@kernel.org>
+Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
+    Jeff Layton <jlayton@kernel.org>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Matthew Wilcox <willy@infradead.org>,
+    Steve French <smfrench@gmail.com>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
+    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
+    ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
+    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
+    linux-mm@kvack.org, netdev@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 26/26] netfs, afs: Use writeback retry to deal with alternate keys
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240410095224.6372-1-ast@fiberby.net>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1780363.1712819386.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 11 Apr 2024 08:09:46 +0100
+Message-ID: <1780364.1712819386@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-Hi Asbjørn,
+Simon Horman <horms@kernel.org> wrote:
 
-I know I am nitpicking here, but could you please sneak in below
-changes.
+> On Tue, Apr 02, 2024 at 09:32:37AM +0100, David Howells wrote:
+> > Simon Horman <horms@kernel.org> wrote:
+> > =
 
->  static int
->  sparx5_tc_flower_es0_tpid(struct vcap_tc_flower_parse_usage *st)
->  {
-> @@ -145,29 +166,27 @@ sparx5_tc_flower_handler_control_usage(struct vcap_tc_flower_parse_usage *st)
->         flow_rule_match_control(st->frule, &mt);
-> 
->         if (mt.mask->flags) {
-> -               if (mt.mask->flags & FLOW_DIS_FIRST_FRAG) {
-> -                       if (mt.key->flags & FLOW_DIS_FIRST_FRAG) {
-> -                               value = 1; /* initial fragment */
-> -                               mask = 0x3;
-> -                       } else {
-> -                               if (mt.mask->flags & FLOW_DIS_IS_FRAGMENT) {
-> -                                       value = 3; /* follow up fragment */
-> -                                       mask = 0x3;
-> -                               } else {
-> -                                       value = 0; /* no fragment */
-> -                                       mask = 0x3;
-> -                               }
-> -                       }
-> -               } else {
-> -                       if (mt.mask->flags & FLOW_DIS_IS_FRAGMENT) {
-> -                               value = 3; /* follow up fragment */
-> -                               mask = 0x3;
-> -                       } else {
-> -                               value = 0; /* no fragment */
-> -                               mask = 0x3;
-> -                       }
-> +               u8 is_frag_key = !!(mt.key->flags & FLOW_DIS_IS_FRAGMENT);
-> +               u8 is_frag_mask = !!(mt.mask->flags & FLOW_DIS_IS_FRAGMENT);
-> +               u8 is_frag_idx = (is_frag_key << 1) | is_frag_mask;
-> +
-> +               u8 first_frag_key = !!(mt.key->flags & FLOW_DIS_FIRST_FRAG);
-> +               u8 first_frag_mask = !!(mt.mask->flags & FLOW_DIS_FIRST_FRAG);
-> +               u8 first_frag_idx = (first_frag_key << 1) | first_frag_mask;
-> +
-> +               /* lookup verdict based on the 2 + 2 input bits */
-> +               u8 vdt = sparx5_vcap_frag_map[is_frag_idx][first_frag_idx];
-> +
-> +               if (vdt == FRAG_INVAL) {
-> +                       NL_SET_ERR_MSG_MOD(st->fco->common.extack,
-> +                                          "match on invalid fragment flag combination");
+> > > > +	op->store.size		=3D len,
+> > > =
 
-Please start this NL msg with a capital letter. All (AFAICS) other
-places in this file do this - nice to stay consistent. As a matter of
-fact, also do this to the new comments introduced.
+> > > nit: this is probably more intuitively written using len;
+> > =
 
-> +                       return -EINVAL;
->                 }
-> 
-> +               /* extract VCAP fragment key and mask from verdict */
-> +               value = (vdt >> 4) & 0x3;
-> +               mask = vdt & 0x3;
-> +
->                 err = vcap_rule_add_key_u32(st->vrule,
->                                             VCAP_KF_L3_FRAGMENT_TYPE,
->                                             value, mask);
-> --
-> 2.43.0
-> 
+> > I'm not sure it makes a difference, but switching 'size' to 'len' in k=
+afs is a
+> > separate thing that doesn't need to be part of this patchset.
+> =
 
-Checkpatch is producing a warning about the placement of the version
-information of the patch. Might as well fix this while at it.
+> Sorry, I meant, using ';' rather than ',' at the end of the line.
 
-Thanks,
+Ah, yes.  That makes a lot more sense!
 
-/Daniel
+David
+
 
