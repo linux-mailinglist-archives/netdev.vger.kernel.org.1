@@ -1,74 +1,62 @@
-Return-Path: <netdev+bounces-87058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9605B8A17B1
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 16:44:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 456818A17C8
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 16:47:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DA21B26248
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:41:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 569E5B27D19
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 14:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD6DE13AEE;
-	Thu, 11 Apr 2024 14:40:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FBAED530;
+	Thu, 11 Apr 2024 14:47:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BOnEcr4i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VwecqAAY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B4413FE7;
-	Thu, 11 Apr 2024 14:40:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A40F9DA;
+	Thu, 11 Apr 2024 14:47:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712846410; cv=none; b=fsGBAuRXYL9rg2KNCSm5skYlGtBN1nKF9GzITAvKtXjE8dkZvwse/DklpCVqmpS4o1b04/sgC4xDaJOOZOaNm4Lk/GxdhFFHQTdg2aMZOGZm/PnVioYUaqe1AcwY4UV2GU8wOOHb6PD4DKdliQCZqyRcAXnxiQpByvINaTa+gM0=
+	t=1712846831; cv=none; b=nXFcNrIxfXQql1eINyjTbux5H75/mfscpHfmMK2++udwoU69VouiF25IsSs3Y8TQh1Wueo92jOxtSo1dmxdeop3GlPLe1FengiMD79x0xFPbNoSqw/Pmy9Dd+JD77IwxIqQ2TXsN+IPBYf3XJrnSBE7NglEUjgLogeYooKoGvb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712846410; c=relaxed/simple;
-	bh=v7xu8aHGMOmzRWDzQT1VMpjnmvWW56s5ws8lgB6X6WE=;
+	s=arc-20240116; t=1712846831; c=relaxed/simple;
+	bh=Zb0JBOe6YIm233S2t28Imn/lwnjsEqRahBqWBCo/pFM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=b5wtLVMHsVymroJW0mpQ0FkCInBoN36WBuwctgQqgKppSATyDl6f6ei5bSGJLK7yU986jEJNRoO3yo4XHJqIxq8nvg9XZS96KDyhqQR7r4Nyk/5eB6HxOTY0RXcYZdQIJIFr6xxFXh4Si53Hti+3SkGj7SJM6AtBCKnkN8jA/dI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BOnEcr4i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15BE6C113CD;
-	Thu, 11 Apr 2024 14:40:08 +0000 (UTC)
+	 MIME-Version:Content-Type; b=M5KVV4OkOiokw7w0LPoSExmu8w//ykUYzGPrAiD7WEW9OQoYSfJk00Q4AUpOyoJ9rK55kRBPd3c1ryU9ZMEMwohG7hiXpv4QqSq87i/LOEOxWy62oYYPSu9F0mkfy3PCxuVB9bsGYu4x7XF2hIrH1EYARlw6xQhHhQw6o2cLXDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VwecqAAY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53991C2BBFC;
+	Thu, 11 Apr 2024 14:47:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712846409;
-	bh=v7xu8aHGMOmzRWDzQT1VMpjnmvWW56s5ws8lgB6X6WE=;
+	s=k20201202; t=1712846830;
+	bh=Zb0JBOe6YIm233S2t28Imn/lwnjsEqRahBqWBCo/pFM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BOnEcr4iT+QDMBY0YeWzqFDyryz6nD2Z1ucfJpB2TjsEROXQPYOXb388WYt+UCB0m
-	 798x9sdpFXwX9/ve1lF/arewiTUFI9uv1o3gw0CBxYRKcQxqIEH1KtytlSRAfF4kFJ
-	 OA7uyt9Y3vmqSfKz1TZ7PltzJdRiy+T0pAGKcTVa/Hj10bhQA5lzOSecH881a1oUkh
-	 tf7e2Nd3GjBMsAD++i8poGtmjA4eFfNXMUFZzoDaWZiR2eIHqti9iVxdHKnmITQu6O
-	 wHA+ext4FodQQelluMAns0wYpaX5wldxV7jcCBxPES6QZi43IIdXaERylFo6FVBayq
-	 vcyDKPpVld0ZQ==
-Date: Thu, 11 Apr 2024 07:40:07 -0700
+	b=VwecqAAYJQb2m3omWvRV1wxYx9OmhDT/0SZSWCtForipxHiXD8ZBAkwXyJLZLZGg6
+	 LpW3kiObBAWoyx0jWpB4WoPFn6KyuORQEAGBxVGMD0E4gbU+4/SpJiqMjuXIwWlTln
+	 6WKY/FmlEJPuEwWATY/pazEv76+TtGuod9N0YauU5w2Jy1sZkxR5XMKRaaZVckDV+z
+	 4z849AXjgfersS2/RsoYoQGS8X0mcUR0cncW2Iva2AhZlxQWxN/5zs2mL9gq/J7pWJ
+	 xW1sT+ZXlX4VARq8mdopAzgAXi5pxbgSrwo0gJ0gtur2ihrM+pP2E2ZX/p+vywpqt3
+	 a2ASJzpF9/YSA==
+Date: Thu, 11 Apr 2024 07:47:09 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Edward Cree <ecree.xilinx@gmail.com>, Erick Archer
- <erick.archer@outlook.com>, Long Li <longli@microsoft.com>, Ajay Sharma
- <sharmaajay@microsoft.com>, "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang
- Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
- <decui@microsoft.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Kees Cook
- <keescook@chromium.org>, "Gustavo A. R. Silva" <gustavoars@kernel.org>,
- Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
- <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
- <justinstitt@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, Shradha Gupta
- <shradhagupta@linux.microsoft.com>, Konstantin Taranov
- <kotaranov@microsoft.com>, linux-rdma@vger.kernel.org,
- linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
- llvm@lists.linux.dev
-Subject: Re: [PATCH v3 0/3] RDMA/mana_ib: Add flex array to struct
- mana_cfg_rx_steer_req_v2
-Message-ID: <20240411074007.3f4d2b2f@kernel.org>
-In-Reply-To: <20240411105839.GN4195@unreal>
-References: <AS8PR02MB72374BD1B23728F2E3C3B1A18B022@AS8PR02MB7237.eurprd02.prod.outlook.com>
-	<20240408110730.GE8764@unreal>
-	<20240408183657.7fb6cc35@kernel.org>
-	<ca8a0df8-b178-31ff-026f-b2d298f3aa84@gmail.com>
-	<20240409144419.6dc12ebb@kernel.org>
-	<20240411105839.GN4195@unreal>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, David Ahern
+ <dsahern@kernel.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Andrew Lunn
+ <andrew@lunn.ch>, <nex.sw.ncis.osdt.itp.upstreaming@intel.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH RFC net-next 7/7] netdev_features: convert
+ NETIF_F_FCOE_MTU to IFF_FCOE_MTU
+Message-ID: <20240411074709.249b3482@kernel.org>
+In-Reply-To: <1f14cb75-ee6b-4a7d-9041-23a8cfcd8476@intel.com>
+References: <20240405133731.1010128-1-aleksander.lobakin@intel.com>
+	<20240405133731.1010128-8-aleksander.lobakin@intel.com>
+	<20240408193806.18e227c8@kernel.org>
+	<1f14cb75-ee6b-4a7d-9041-23a8cfcd8476@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,9 +66,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 11 Apr 2024 13:58:39 +0300 Leon Romanovsky wrote:
-> I prepared mana-ib-flex branch https://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma.git/log/?h=mana-ib-flex
-> and merge ti to our wip branch https://git.kernel.org/pub/scm/linux/kernel/git/rdma/rdma.git/commit/?h=wip/leon-for-next&id=e537deecda03e0911e9406095ccd48bd42f328c7
+On Thu, 11 Apr 2024 12:28:08 +0200 Alexander Lobakin wrote:
+> > Any reason not to make it a bitfield? I haven't looked at the longer
+> > patches but this one seems to be used like a basic bool.  
+> 
+> This whole enum could be made as bitfields, should we convert it? Would
+> be a big patch tho ._.
 
-Thanks!
+As always, I haven't investigated closely :) But my thinking was -
+we are at 34 bits in priv. We just need to convert 2 of them to
+a bitfield, pick two with fewest uses. Then we can downgrade 
+the field to u32 from ulonglong, and we can carry on adding bitfields?
+
+> > But this definitely _is_ a uAPI change, right?  
+> 
+> Why?
+
+It will be user visible, ethtool -k is losing a field.
+Whether that's actually going to break anything depends on how silly
+user space is.
+
+As Andrew pointed out, definitely something that should be called out
+in the commit message.
 
