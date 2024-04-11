@@ -1,50 +1,73 @@
-Return-Path: <netdev+bounces-86812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C5B18A05B7
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 04:00:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7A128A05CC
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 04:22:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDEEB285520
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 02:00:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 523621F244D4
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 02:22:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65FCD62818;
-	Thu, 11 Apr 2024 02:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EBB2633FE;
+	Thu, 11 Apr 2024 02:21:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DGqllrxs"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="T3lgB2EY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C94E61674;
-	Thu, 11 Apr 2024 02:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4799869314
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 02:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712800836; cv=none; b=fHMfKvnSUF1ebCUdXXsbDRvK6TX1PBqAmETpMKV6uhym/npmyOLyFOHqiAMshndagSfVibrpHnc1i4If3/GfWBtouCP7lSuE+u83SxmW7u1QMgw4D375AU3PtWaV/Emg8aEikIKVCmUgHRJ1ErNrTdyo3EcGVyQ9Gz7dsNTt9J4=
+	t=1712802105; cv=none; b=IwLS5GNF5CWbihwgpXbaQYOFAS3DxiFuIPm3IJa0oyIrEwfzuYB5zOox79pATFGUSw8JGOQCmHSIXpp+v5tZ1lG09UKpc+y3AV9w6l3x1vIKGorttRKJ39o0IysF8zUFMvk+lw7sDPRENEt1zmDyPOe7P4/Ndc4BmcfXfSCGy5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712800836; c=relaxed/simple;
-	bh=6Cij9gk2+tshYEQ8bidf1LIXaouxOi54fCmkbe6echc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=H8jMGslu5rp0k6nsmwtER+HWOmv0PtSgnUGksHdlszKIPKW6p9X6FBwfmwqcH8/SUcPCfmUKEkuJuA5xxEkY0MQoMF5l7kuy3BLquM8HYj2hFr4wSE+wGyXKHVs9qb3jc+2lO5sZGm7Ryiqs7IuIU8Z6+q99bjBUUktPIckCDlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DGqllrxs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 83B07C43394;
-	Thu, 11 Apr 2024 02:00:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712800835;
-	bh=6Cij9gk2+tshYEQ8bidf1LIXaouxOi54fCmkbe6echc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DGqllrxs7/KWcrtpvjksskac53m2Lh2RJ/0d8Vl+Pb7sx5QA1m4zFtZTz/ToiUZgd
-	 gTmKE7Ts7UcsStFbw9hdgyjFQnLq0JlBen6IPkzKWTpmm2IOkMjIsvTEyBDv7TEdPx
-	 HedYd0AhaAPPUg3Bb/bKz4C9Htct4kDspcxvccxhU7bxAqisUvjQdcmUGabKg5ETws
-	 u/d52OwiG+jYNZCBY+rQQj0OQ8I8G/SHn8+MYjjhaDd8NlgD/1fJwHr67+vNNgQiv9
-	 pt0AH6j5HOq8KNGhrviFYhto5PRpzi0BG6mesPeQYhDipEKQFy1KnaOquDJ7V3aEA6
-	 zEfYhJwf5ecew==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 61167CF21C5;
-	Thu, 11 Apr 2024 02:00:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1712802105; c=relaxed/simple;
+	bh=Xjao67PIQS+fm5W/r+VmvfQHG6JdUKGQ+SL7B52X7zs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TnbjfQ8w+Hbk3eAxZVQBUf1WPgpclZ0bkBssPT0UouIiMYabt8wPVSEq8N2qjv5hbpymTiCTOQT8cNOmuuI7ueRp1+auxolN0AwFoUOF6Xkz1yOgMSSuWwwXX7e8DPTLX39wAsfnOhAQNxOCuxPde6/bZeDa+xiPizExyZaISew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=T3lgB2EY; arc=none smtp.client-ip=207.171.188.204
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1712802103; x=1744338103;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=vD+d5KG7tzw9opDX/c+gQvOObH7Yof16pAM3qlyhhpU=;
+  b=T3lgB2EYdkh6h6a0PBGrYzwcf6K8ZdNOaXDzSY66xn54gkKXxWURiIg3
+   x6Lr2KtIslm7Jd03KbNxKsi0kW2nVUoc7E8VwaPcfafiZukgCwaIKvCIk
+   kVLXZkipC/j9mojLOKjKyjpaITHzR8Ztr22WxijQ4H+xdaztpCDl/fcd0
+   o=;
+X-IronPort-AV: E=Sophos;i="6.07,192,1708387200"; 
+   d="scan'208";a="718266346"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 02:21:37 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:15293]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.3.0:2525] with esmtp (Farcaster)
+ id 0090b3e7-d56d-44ee-982c-f8f43bb17346; Thu, 11 Apr 2024 02:21:36 +0000 (UTC)
+X-Farcaster-Flow-ID: 0090b3e7-d56d-44ee-982c-f8f43bb17346
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Thu, 11 Apr 2024 02:21:32 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.44) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Thu, 11 Apr 2024 02:21:30 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <krisman@suse.de>
+CC: <davem@davemloft.net>, <kuniyu@amazon.com>, <lmb@isovalent.com>,
+	<martin.lau@kernel.org>, <netdev@vger.kernel.org>,
+	<willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH v2] udp: Avoid call to compute_score on multiple sites
+Date: Wed, 10 Apr 2024 19:21:21 -0700
+Message-ID: <20240411022121.65702-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <87a5m08y09.fsf@mailhost.krisman.be>
+References: <87a5m08y09.fsf@mailhost.krisman.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,53 +75,137 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net: dsa: mt7530: fix enabling EEE on MT7531 switch
- on all boards
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171280083539.2701.12891198240380123867.git-patchwork-notify@kernel.org>
-Date: Thu, 11 Apr 2024 02:00:35 +0000
-References: <20240408-for-net-mt7530-fix-eee-for-mt7531-mt7988-v3-1-84fdef1f008b@arinc9.com>
-In-Reply-To: <20240408-for-net-mt7530-fix-eee-for-mt7531-mt7988-v3-1-84fdef1f008b@arinc9.com>
-To: =?utf-8?b?QXLEsW7DpyDDnE5BTCB2aWEgQjQgUmVsYXkgPGRldm51bGwrYXJpbmMudW5hbC5h?=@codeaurora.org,
-	=?utf-8?b?cmluYzkuY29tQGtlcm5lbC5vcmc+?=@codeaurora.org
-Cc: daniel@makrotopia.org, dqfext@gmail.com, sean.wang@mediatek.com,
- andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- opensource@vdorst.com, linux@armlinux.org.uk, SkyLake.Huang@mediatek.com,
- hkallweit1@gmail.com, bartel.eerdekens@constell8.be, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, florian.fainelli@broadcom.com,
- arinc.unal@arinc9.com
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWA002.ant.amazon.com (10.13.139.96) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 08 Apr 2024 10:08:53 +0300 you wrote:
-> From: Arınç ÜNAL <arinc.unal@arinc9.com>
+From: Gabriel Krisman Bertazi <krisman@suse.de>
+Date: Wed, 10 Apr 2024 21:54:30 -0400
+> Willem de Bruijn <willemdebruijn.kernel@gmail.com> writes:
 > 
-> The commit 40b5d2f15c09 ("net: dsa: mt7530: Add support for EEE features")
-> brought EEE support but did not enable EEE on MT7531 switch MACs. EEE is
-> enabled on MT7531 switch MACs by pulling the LAN2LED0 pin low on the board
-> (bootstrapping), unsetting the EEE_DIS bit on the trap register, or setting
-> the internal EEE switch bit on the CORE_PLL_GROUP4 register. Thanks to
-> SkyLake Huang (黃啟澤) from MediaTek for providing information on the
-> internal EEE switch bit.
+> > Kuniyuki Iwashima wrote:
+> >> From: Gabriel Krisman Bertazi <krisman@suse.de>
+> >> Date: Wed, 10 Apr 2024 17:50:47 -0400
+> >> > We've observed a 7-12% performance regression in iperf3 UDP ipv4 and
+> >> > ipv6 tests with multiple sockets on Zen3 cpus, which we traced back to
+> >> > commit f0ea27e7bfe1 ("udp: re-score reuseport groups when connected
+> >> > sockets are present").  The failing tests were those that would spawn
+> >> > UDP sockets per-cpu on systems that have a high number of cpus.
+> >> > 
+> >> > Unsurprisingly, it is not caused by the extra re-scoring of the reused
+> >> > socket, but due to the compiler no longer inlining compute_score, once
+> >> > it has the extra call site in udp4_lib_lookup2.  This is augmented by
+> >> > the "Safe RET" mitigation for SRSO, needed in our Zen3 cpus.
+> >> > 
+> >> > We could just explicitly inline it, but compute_score() is quite a large
+> >> > function, around 300b.  Inlining in two sites would almost double
+> >> > udp4_lib_lookup2, which is a silly thing to do just to workaround a
+> >> > mitigation.  Instead, this patch shuffles the code a bit to avoid the
+> >> > multiple calls to compute_score.  Since it is a static function used in
+> >> > one spot, the compiler can safely fold it in, as it did before, without
+> >> > increasing the text size.
+> >> > 
+> >> > With this patch applied I ran my original iperf3 testcases.  The failing
+> >> > cases all looked like this (ipv4):
+> >> > 	iperf3 -c 127.0.0.1 --udp -4 -f K -b $R -l 8920 -t 30 -i 5 -P 64 -O 2
+> >> > 
+> >> > where $R is either 1G/10G/0 (max, unlimited).  I ran 3 times each.
+> >> > baseline is 6.9.0-rc1-g962490525cff, just a recent checkout of Linus
+> >> > tree. harmean == harmonic mean; CV == coefficient of variation.
+> >> > 
+> >> > ipv4:
+> >> >                  1G                10G                  MAX
+> >> > 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
+> >> > baseline 1730488.20(0.0050) 1639269.91(0.0795) 1436340.05(0.0954)
+> >> > patched  1980936.14(0.0020) 1933614.06(0.0866) 1784184.51(0.0961)
+> >> > 
+> >> > ipv6:
+> >> >                  1G                10G                  MAX
+> >> > 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
+> >> > baseline  1679016.07(0.0053) 1697504.56(0.0064) 1481432.74(0.0840)
+> >> > patched   1924003.38(0.0153) 1852277.31(0.0457) 1690991.46(0.1848)
+> >> > 
+> >> > This restores the performance we had before the change above with this
+> >> > benchmark.  We obviously don't expect any real impact when mitigations
+> >> > are disabled, but just to be sure it also doesn't regresses:
+> >> > 
+> >> > mitigations=off ipv4:
+> >> >                  1G                10G                  MAX
+> >> > 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
+> >> > baseline 3230279.97(0.0066) 3229320.91(0.0060) 2605693.19(0.0697)
+> >> > patched  3242802.36(0.0073) 3239310.71(0.0035) 2502427.19(0.0882)
+> >> > 
+> >> > Cc: Lorenz Bauer <lmb@isovalent.com>
+> >> > Fixes: f0ea27e7bfe1 ("udp: re-score reuseport groups when connected sockets are present")
+> >> > Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
+> >> > 
+> >> > ---
+> >> > Changes since v1:
+> >> > (me)
+> >> >   - recollected performance data after changes below only for the
+> >> >   mitigations enabled case.
+> >> > (suggested by Willem de Bruijn)
+> >> >   - Drop __always_inline in compute_score
+> >> >   - Simplify logic by replacing third struct sock pointer with bool
+> >> >   - Fix typo in commit message
+> >> >   - Don't explicitly break out of loop after rescore
+> >> > ---
+> >> >  net/ipv4/udp.c | 18 +++++++++++++-----
+> >> >  net/ipv6/udp.c | 17 +++++++++++++----
+> >> >  2 files changed, 26 insertions(+), 9 deletions(-)
+> >> > 
+> >> > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> >> > index 661d0e0d273f..a13ef8e06093 100644
+> >> > --- a/net/ipv4/udp.c
+> >> > +++ b/net/ipv4/udp.c
+> >> > @@ -427,12 +427,15 @@ static struct sock *udp4_lib_lookup2(struct net *net,
+> >> >  {
+> >> >  	struct sock *sk, *result;
+> >> >  	int score, badness;
+> >> > +	bool rescore = false;
+> >> 
+> >> nit: Keep reverse xmax tree order.
+> >> https://docs.kernel.org/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
+> >> 
+> >> >  
+> >> >  	result = NULL;
+> >> >  	badness = 0;
+> >> >  	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
+> >> > -		score = compute_score(sk, net, saddr, sport,
+> >> > -				      daddr, hnum, dif, sdif);
+> >> > +rescore:
+> >> > +		score = compute_score((rescore ? result : sk), net, saddr,
+> >> 
+> >> I guess () is not needed around rescore ?
+> >> 
+> >> Both same for IPv6.
+> >> 
+> >> Otherwise, looks good to me.
+> >> 
+> >> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> >
+> > Can we avoid using the same name for the label and boolean?
+> >
+> > And since if looping result will have state TCP_ESTABLISHED, can it
+> > just be
+> >
+> >     sk = result;
+> >     goto rescore;
 > 
-> [...]
+> This would be much simpler, sure.  I actually didn't want to do it
+> because sk is the iteration cursor, and I couldn't prove to myself it is
+> safe to skip through part of the list (assuming result isn't the
+> immediate next socket in the list).
 
-Here is the summary with links:
-  - [net,v3] net: dsa: mt7530: fix enabling EEE on MT7531 switch on all boards
-    https://git.kernel.org/netdev/net/c/06dfcd4098cf
+Good point, this is not safe actually.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Let's say sockets on the same port are placed in these order in the list:
 
+  1. TCP_CLOSE sk w/ SO_INCOMING_CPU _not_ matching the current CPU
+  2. TCP_ESTABLISHED sk matching 4-tuple
+  3. TCP_CLOSE sk w/ SO_INCOMING_CPU matching the current CPU
 
+When we check the first socket, we'll get the 3rd socket as it matches
+the current CPU ID and TCP_ESTABLISHED cannot be selected without BPF,
+and `sk = result;` skips the 2nd socket, which should have been selected.
 
