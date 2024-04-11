@@ -1,207 +1,161 @@
-Return-Path: <netdev+bounces-87159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A43138A1EC4
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 20:43:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A10048A1F47
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 21:14:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6080328D864
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 18:43:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8530DB27E32
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 18:45:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3782817597;
-	Thu, 11 Apr 2024 18:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84AFF205E06;
+	Thu, 11 Apr 2024 18:43:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Asjv+L+x"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IDxPxtzO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 135EE1758D
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 18:32:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB41E205E27
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 18:43:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712860345; cv=none; b=Bzb9goJlDrfoDR05lijEYHuydtjxVc2WCJc9yACAt3Z4s9w9R3+gqjk+mIF7P3MftXdgyfukjXd6Xxx2kvZ0PCBw8QnXZkx1gI55k0ilPrHTeDGY67mAKjqMVUSK0Hp3aDv5ktzPbHfHWV4eR9ImuvfzlHHeF+pPjPA3v173Kfs=
+	t=1712860982; cv=none; b=Tet96JmDy6mJdII48SyTpDwxBEXDHqk63/XAQ0iTEfV4tudm4/7XD+Y7+f9yzTeEjfTNpu4bCPRZse96nMbDatC8tynrkx0cjT85yLz/kcgSAyuelXH/IbCs5S2l7psxS8i/Wjp5zuWr/9Z9K91tlAkclnM8ghBzrDSP6471lw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712860345; c=relaxed/simple;
-	bh=T3qLQumlI91qTfN+wcaGNiU1/b9+Emdt7k5SAqWC90g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CoS07UFV6tvyW2wW/a+iAjhIYkYM6gR4TO1Vv5fzT7EemHwZXu62sN+AAQxQ89LlqjNZe9Bz4DdYftiCVW6VY/nLrg3a0kjccBq0fnFBu4vq8lNMtM7p3or0crd/l8QppEGS1t/d8tr6bZkHWw7wa3FkClpVShiH//gJ8nEDyis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Asjv+L+x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C724C113CD;
-	Thu, 11 Apr 2024 18:32:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712860344;
-	bh=T3qLQumlI91qTfN+wcaGNiU1/b9+Emdt7k5SAqWC90g=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Asjv+L+xSIQ3GEDpADGNXKtZmNYVj5993d2R3H9bGeSlo4aOWo4jOILbg7Tc5/OEb
-	 ZD+UhVGLqszf7cXYkvHBTtvAlay08fjOkINxEeMjqR4q3N2UKJ4ey0pHnEknojWGeO
-	 YnW/1o9zlqmk8lfhAkm7C7JZHREZ6Cfen5FqeJKsGFZBpQ5GAj6wNh/ZWWQ7HP3FKR
-	 LGrljpG5K1kciwIHtaOcA6nRLzqZY+Hdq7JncpWUSJoArUpXmB3mcCC6W6kct5hM++
-	 eL06t//a1aipCIMQ/rJxYUakosPGhtV2meTkQpq8irYbt4tZjptyEKGyg8K/R6UK+q
-	 9P+y/9wbymhRg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux@roeck-us.net,
-	o.rempel@pengutronix.de
-Subject: [PATCH net-next] net: dev_addr_lists: move locking out of init/exit in kunit
-Date: Thu, 11 Apr 2024 11:32:22 -0700
-Message-ID: <20240411183222.433713-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1712860982; c=relaxed/simple;
+	bh=ArIABd9BX+7PFdbepq2utekmsL42kvVLqFs2aNsK2pE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t1vJS0UetOy/0BibXp8oiT8KRIknsz437IAuDm5Ivg2SBlat0KFtk7e8G6WwmNTgKv2UtjqhnVSXYp6lsQ4oTl5s60CR1LBJ+YPamjWflpgbFxxot0N28WvJwmMGnDixCKC7I98khJ+RltABHjykqeEqNJ2oDU5qiUv3ypQaQXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IDxPxtzO; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-56e5174ffc2so2510a12.1
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 11:43:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1712860979; x=1713465779; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AT0vQu6xinY4dZbH6WLGjdM2WJ42dXv/5AMUZHNaulo=;
+        b=IDxPxtzOpJBzjes4f7ZBhd0Fl+zH0EweC+IXd+Tq//KCj188DiVB6D0POBpm8frG/W
+         8Z0X673ZDZ017essnF6Ovupj2gw3gk2+1Mh9YpiKVp7J/8utfsfxk9aOT6pUt33Sxj6E
+         Hv64vOUcR391t6l0pglqfwQA299M+PHYk4/kwmrHYZAzepJHV+xdk9DXzIHNtW0CuVHn
+         NZuo3Nfk3GDybrNlkb93ehnzRIVZ2EeL51NTuzrhMUPsZXzaQm/L6uvDew0NVDRg5Rll
+         LBMufo6v63mNRFGf/KxUkNtH3jj+DgIvuVrGfSVPcc7xKoSPBt/6S4DxBDNcPtwbB6Ao
+         +oqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712860979; x=1713465779;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AT0vQu6xinY4dZbH6WLGjdM2WJ42dXv/5AMUZHNaulo=;
+        b=KSKHuE1FmND1QNgJnL0KBsrDqgqbEYoTvmLedgdPQEtD6BHw9oL1UgMVUt1cdCcOkD
+         3wSwI2qTrmJWRRLdYNjgUSZbhvtGD8jsAvgCWehxthUVNea2Iob7GNVw7+L+iobXeVeT
+         0mbx/QlIsVIovFcM9KgSH+pM2UMeb9bG+kiBGbgk6/PQjAZEL6EANeVfBApHXOrtiU/9
+         HZhyYwJjiYBfl7xMVI5kKmEQrEEXDyfX7ALIesN8we5u4fbveB6mhuqvoZa+rAusWS9F
+         rt04uL8AS6yOG7Zwvktt0Cc+uLwb4/fdM/4jtYkh8LbkadoUZanpkLciULuHi5LfqdbO
+         eUKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX8LJmF30Lah2LRq1Jk0ZXBzDKwGlzGSncWIYJWnFcBrHqWkoe8ePY7Y8bI3YzEap8DOOzb4q3RSrC9PF/jPWGymdn3Qztr
+X-Gm-Message-State: AOJu0YzU/UtjDA0xFuhGFsOePxr/pWoG8A+4NV8Vxz9vyVVnZaXC14ps
+	7DNXmBvNKFhpC/rYe62q3HJtqpITCo9JrXimfwgzQAc+QP+WdReRqDKWWthLT2aEK4x+mWTmmTy
+	znl9xQt2tc8J/tyWjojGHRrliFjbbQWCtnt27
+X-Google-Smtp-Source: AGHT+IF917+dN9zBiuOeEVDpEMfZIeL7JyE7V4ZwpA1Kg1dEGPkwIPmUhqii6NAO2kSAnpslKsTWdD118gXratRPVYo=
+X-Received: by 2002:aa7:d889:0:b0:56e:5681:ff3e with SMTP id
+ u9-20020aa7d889000000b0056e5681ff3emr17234edq.2.1712860978879; Thu, 11 Apr
+ 2024 11:42:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240411180202.399246-1-kuba@kernel.org>
+In-Reply-To: <20240411180202.399246-1-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 11 Apr 2024 20:42:45 +0200
+Message-ID: <CANn89iJne2+k+MJQzu1U7vO6eEbTLjD7QQxSG6hPgZ1i7+AutA@mail.gmail.com>
+Subject: Re: [PATCH net] inet: bring NLM_DONE out to a separate recv() again
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	Stefano Brivio <sbrivio@redhat.com>, Ilya Maximets <i.maximets@ovn.org>, dsahern@kernel.org, 
+	donald.hunter@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We lock and unlock rtnl in init/exit for convenience,
-but it started causing problems if the exit is handled
-by a different thread. To avoid having to futz with
-disabling locking assertions move the locking into
-the test cases. We don't use ASSERTs so it should
-be safe.
+On Thu, Apr 11, 2024 at 8:02=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Commit under Fixes optimized the number of recv() calls
+> needed during RTM_GETROUTE dumps, but we got multiple
+> reports of applications hanging on recv() calls.
+> Applications expect that a route dump will be terminated
+> with a recv() reading an individual NLM_DONE message.
+>
+> Coalescing NLM_DONE is perfectly legal in netlink,
+> but even tho reporters fixed the code in respective
+> projects, chances are it will take time for those
+> applications to get updated. So revert to old behavior
+> (for now)?
+>
+> Old kernel (5.19):
+>
 
-   ============= dev-addr-list-test (6 subtests) ==============
-   [PASSED] dev_addr_test_basic
-   [PASSED] dev_addr_test_sync_one
-   [PASSED] dev_addr_test_add_del
-   [PASSED] dev_addr_test_del_main
-   [PASSED] dev_addr_test_add_set
-   [PASSED] dev_addr_test_add_excl
-   =============== [PASSED] dev-addr-list-test ================
+> Reported-by: Stefano Brivio <sbrivio@redhat.com>
+> Link: https://lore.kernel.org/all/20240315124808.033ff58d@elisabeth
+> Reported-by: Ilya Maximets <i.maximets@ovn.org>
+> Link: https://lore.kernel.org/all/02b50aae-f0e9-47a4-8365-a977a85975d3@ov=
+n.org
+> Fixes: 4ce5dc9316de ("inet: switch inet_dump_fib() to RCU protection")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: dsahern@kernel.org
+> CC: donald.hunter@gmail.com
+> ---
+>  net/ipv4/fib_frontend.c | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/net/ipv4/fib_frontend.c b/net/ipv4/fib_frontend.c
+> index 48741352a88a..c484b1c0fc00 100644
+> --- a/net/ipv4/fib_frontend.c
+> +++ b/net/ipv4/fib_frontend.c
+> @@ -1050,6 +1050,11 @@ static int inet_dump_fib(struct sk_buff *skb, stru=
+ct netlink_callback *cb)
+>                         e++;
+>                 }
+>         }
+> +
+> +       /* Don't let NLM_DONE coalesce into a message, even if it could.
+> +        * Some user space expects NLM_DONE in a separate recv().
+> +        */
+> +       err =3D skb->len;
 
-Link: https://lore.kernel.org/all/20240403131936.787234-7-linux@roeck-us.net
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-CC: linux@roeck-us.net
-CC: o.rempel@pengutronix.de
----
- net/core/dev_addr_lists_test.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+My plan was to perform this generically from netlink_dump_done().
 
-diff --git a/net/core/dev_addr_lists_test.c b/net/core/dev_addr_lists_test.c
-index 4dbd0dc6aea2..8e1dba825e94 100644
---- a/net/core/dev_addr_lists_test.c
-+++ b/net/core/dev_addr_lists_test.c
-@@ -49,7 +49,6 @@ static int dev_addr_test_init(struct kunit *test)
- 		KUNIT_FAIL(test, "Can't register netdev %d", err);
- 	}
- 
--	rtnl_lock();
- 	return 0;
- }
- 
-@@ -57,7 +56,6 @@ static void dev_addr_test_exit(struct kunit *test)
- {
- 	struct net_device *netdev = test->priv;
- 
--	rtnl_unlock();
- 	unregister_netdev(netdev);
- 	free_netdev(netdev);
- }
-@@ -67,6 +65,7 @@ static void dev_addr_test_basic(struct kunit *test)
- 	struct net_device *netdev = test->priv;
- 	u8 addr[ETH_ALEN];
- 
-+	rtnl_lock();
- 	KUNIT_EXPECT_TRUE(test, !!netdev->dev_addr);
- 
- 	memset(addr, 2, sizeof(addr));
-@@ -76,6 +75,7 @@ static void dev_addr_test_basic(struct kunit *test)
- 	memset(addr, 3, sizeof(addr));
- 	dev_addr_set(netdev, addr);
- 	KUNIT_EXPECT_MEMEQ(test, netdev->dev_addr, addr, sizeof(addr));
-+	rtnl_unlock();
- }
- 
- static void dev_addr_test_sync_one(struct kunit *test)
-@@ -86,6 +86,7 @@ static void dev_addr_test_sync_one(struct kunit *test)
- 
- 	datp = netdev_priv(netdev);
- 
-+	rtnl_lock();
- 	memset(addr, 1, sizeof(addr));
- 	eth_hw_addr_set(netdev, addr);
- 
-@@ -103,6 +104,7 @@ static void dev_addr_test_sync_one(struct kunit *test)
- 	 * considered synced and we overwrite in place.
- 	 */
- 	KUNIT_EXPECT_EQ(test, 0, datp->addr_seen);
-+	rtnl_unlock();
- }
- 
- static void dev_addr_test_add_del(struct kunit *test)
-@@ -114,6 +116,7 @@ static void dev_addr_test_add_del(struct kunit *test)
- 
- 	datp = netdev_priv(netdev);
- 
-+	rtnl_lock();
- 	for (i = 1; i < 4; i++) {
- 		memset(addr, i, sizeof(addr));
- 		KUNIT_EXPECT_EQ(test, 0, dev_addr_add(netdev, addr,
-@@ -143,6 +146,7 @@ static void dev_addr_test_add_del(struct kunit *test)
- 	__hw_addr_sync_dev(&netdev->dev_addrs, netdev, dev_addr_test_sync,
- 			   dev_addr_test_unsync);
- 	KUNIT_EXPECT_EQ(test, 1, datp->addr_seen);
-+	rtnl_unlock();
- }
- 
- static void dev_addr_test_del_main(struct kunit *test)
-@@ -150,6 +154,7 @@ static void dev_addr_test_del_main(struct kunit *test)
- 	struct net_device *netdev = test->priv;
- 	u8 addr[ETH_ALEN];
- 
-+	rtnl_lock();
- 	memset(addr, 1, sizeof(addr));
- 	eth_hw_addr_set(netdev, addr);
- 
-@@ -161,6 +166,7 @@ static void dev_addr_test_del_main(struct kunit *test)
- 					      NETDEV_HW_ADDR_T_LAN));
- 	KUNIT_EXPECT_EQ(test, -ENOENT, dev_addr_del(netdev, addr,
- 						    NETDEV_HW_ADDR_T_LAN));
-+	rtnl_unlock();
- }
- 
- static void dev_addr_test_add_set(struct kunit *test)
-@@ -172,6 +178,7 @@ static void dev_addr_test_add_set(struct kunit *test)
- 
- 	datp = netdev_priv(netdev);
- 
-+	rtnl_lock();
- 	/* There is no external API like dev_addr_add_excl(),
- 	 * so shuffle the tree a little bit and exploit aliasing.
- 	 */
-@@ -191,6 +198,7 @@ static void dev_addr_test_add_set(struct kunit *test)
- 	__hw_addr_sync_dev(&netdev->dev_addrs, netdev, dev_addr_test_sync,
- 			   dev_addr_test_unsync);
- 	KUNIT_EXPECT_EQ(test, 0xffff, datp->addr_seen);
-+	rtnl_unlock();
- }
- 
- static void dev_addr_test_add_excl(struct kunit *test)
-@@ -199,6 +207,7 @@ static void dev_addr_test_add_excl(struct kunit *test)
- 	u8 addr[ETH_ALEN];
- 	int i;
- 
-+	rtnl_lock();
- 	for (i = 0; i < 10; i++) {
- 		memset(addr, i, sizeof(addr));
- 		KUNIT_EXPECT_EQ(test, 0, dev_uc_add_excl(netdev, addr));
-@@ -213,6 +222,7 @@ static void dev_addr_test_add_excl(struct kunit *test)
- 		memset(addr, i, sizeof(addr));
- 		KUNIT_EXPECT_EQ(test, -EEXIST, dev_uc_add_excl(netdev, addr));
- 	}
-+	rtnl_unlock();
- }
- 
- static struct kunit_case dev_addr_test_cases[] = {
--- 
-2.44.0
+This would still avoid calling a RTNL-enabled-dump() again if EOF has
+been met already.
 
+A sysctl could opt-in for the coalescing, if there is interest.
+
+diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+index dc8c3c01d51b709c132ff63a0c534c1cc286589a..cad1124393ac74f3d5bfa86556e=
+d9028f5ec8f65
+100644
+--- a/net/netlink/af_netlink.c
++++ b/net/netlink/af_netlink.c
+@@ -2282,7 +2282,12 @@ static int netlink_dump(struct sock *sk, bool lock_t=
+aken)
+                cb->extack =3D NULL;
+        }
+
++       /* Don't let NLM_DONE coalesce into a message, even if it could.
++        * Some user space expects NLM_DONE in a separate recv().
++        * Maybe opt-in this coalescing with a sysctl or socket option ?
++        */
+        if (nlk->dump_done_errno > 0 ||
++           skb->len ||
+            skb_tailroom(skb) <
+nlmsg_total_size(sizeof(nlk->dump_done_errno))) {
+                mutex_unlock(&nlk->nl_cb_mutex);
 
