@@ -1,115 +1,249 @@
-Return-Path: <netdev+bounces-86787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-86788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94F078A043B
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 01:51:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BC0E8A046A
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 02:10:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FE77B24F9F
-	for <lists+netdev@lfdr.de>; Wed, 10 Apr 2024 23:51:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE3271F2466A
+	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 00:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9E0381B1;
-	Wed, 10 Apr 2024 23:50:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52EF514F61;
+	Thu, 11 Apr 2024 00:08:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hJHVGoyh"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="VtcYsZ0F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F633F8F1
-	for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 23:50:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FCB134A0
+	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 00:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712793059; cv=none; b=gShVJj6AVxH60Qxf0lqWT9OOkwEe/Seli9nA8z4s1ZwSlZ5QFBkIBdvtoxff9z5TRWT8QA1CcRuxAoPqfAhlgO66oqJ/ZFm5abeHKspGR2CKWirLpeBXc0LVPoxgPpL5fdaVkK0E/E8s1Ym3kVtMfVWXOkw+D0Pj40fSqaBHak0=
+	t=1712794103; cv=none; b=nTvMevDmQ2hskDk0tXfXUXMlNz/ygvhcrNk9CqxDGZ3nrlpQrbVbFXIttmGaM1Y5Koo+1agU/RUEGQS0HDvl0S6vNCq6BFsQ2G0amy218AQ4q/hP6kY/MuuGFo0q88JZ3ZCjNriYxY9QocEip7lzXP5a7yCTv34u0y8VHmgYQpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712793059; c=relaxed/simple;
-	bh=R7GLHASk5lrra9DDaXvA4iPJFyp4IhEgQo/7mH1HBlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T6FYeCIwyn7bUh502MzNNP3kp3gSBz1naRwL3QhunS6WHvmgJuPAXO6fFCmpw9EDBTeQtENmFY1lJ0a1R1E6PjPuNkcNWkfWHhTg9KPlQ//o7kNk4lybJNYb/P0Dbe+OfGWVMuZ/sq6uoerfPxJ0sRxY1Pd1UuxT+VzPwffg9ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hJHVGoyh; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-417d73dedb6so772565e9.2
-        for <netdev@vger.kernel.org>; Wed, 10 Apr 2024 16:50:57 -0700 (PDT)
+	s=arc-20240116; t=1712794103; c=relaxed/simple;
+	bh=Jtf/SRwRgZHJEsWDGItVreVBVHeZvSgBW1nzd9NGSeA=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X/l7Q+3fkPzafp3lXh2wdb00ndxA05Da2FbJgwMHIM1U7pjz+bRMfcRBIlFmCSXanoBbzjIKOqC9jNqz4ME4sUaeM7d2vyN3YEgNt+P4YorlzuUH1xv4Ob7MWNUk3h4/YghfEtbiiXWSqf7YL9uxM571JqkXIue9mf7cf7HZoUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=VtcYsZ0F; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712793056; x=1713397856; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Es3XA4to4YejteRCMUbukyMW+UrEfmNKzT+xSe16LG4=;
-        b=hJHVGoyhgBcnG3wf7d1edNLFOLvjB2hFoCBHRABnbSUkhTJsSyGhy7pqk9j0wZHPy9
-         teYkHvyoJv7YF9qa1nn5z0Fa4VyFepQgDcSN1RojuGXQDIPi2FAh6CDNnkHUaBqiJfCm
-         qaW2qZQwEjv/cFSHzX/hhLj5r+G/MF0JN1FKEfiwv9MSVij6QbjF5mRQnFtH1NNtutYm
-         K3DINPBVP4pBtkvlbGGXQcqjoNttHvVlEPfDewsJKlxgk3bDWgzCRyC+0R2JeOTcZm3c
-         egz7AGDJtxvQrz12FIAKcnJG/vZgtonS8HkCBd3Hf1I80Qaux0tTMImgqPxigZC8Hs2k
-         OkBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712793056; x=1713397856;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Es3XA4to4YejteRCMUbukyMW+UrEfmNKzT+xSe16LG4=;
-        b=P+GXTvsHss/QGYYh28QwMZm/cHQ61ntZQKJatWlKHNbettr3YGHFYfSiz4WK1usSUV
-         oJTxI0vHSP70yfGQm6ST6iK83I7nILoJregql1oVG+LL5alHgBK9w8NZPF6c/yOEwapE
-         Syhslb7WRhQG1FG4FgzaSTYFdYaMLe74vD6WypsYKGd1K/NU8QlLHNvO341Kn+XD5KLK
-         rg5u5GXIaX8y6hkBeOozOVCtqisFfc2/X4whsvvgAIH60X9/o0SlAt153MRjbHGEvSL8
-         6+s4RUTa55xFlTRas99/3HrZviJY9lEhUchizP30/8wJ9oK9CqgzIbYWovea4es/7LOO
-         Dt7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWe9LpXoVuWwtHit0mXrNiy7xJfKBna+rAL35ofSuaP8eOURFUNJP0/lqMtS7PmfFO2WDRs8VamXFm7rMmo7P0CcF5YpTpa
-X-Gm-Message-State: AOJu0YwFXz3GiaV69u+2I2gkobRpp1MhIcWmcWXx+iJTRyE/DZOE4IC9
-	ce2BO3YmN3QCtODIqnHUzaS9DKcivUDm4idNljL4Nn6ddQLveTHN
-X-Google-Smtp-Source: AGHT+IFBd+sxzw42AM74xrecBf93O/8djx0rLTBaeFxvcZ0qs4ug7Twlu/NQN7MFvTxY6bv0jI6J6A==
-X-Received: by 2002:a05:600c:4ec8:b0:417:c34a:c42b with SMTP id g8-20020a05600c4ec800b00417c34ac42bmr1439893wmq.3.1712793055507;
-        Wed, 10 Apr 2024 16:50:55 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d201:1f00::b2c])
-        by smtp.gmail.com with ESMTPSA id m4-20020adffe44000000b00343e760c637sm376527wrs.84.2024.04.10.16.50.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Apr 2024 16:50:54 -0700 (PDT)
-Date: Thu, 11 Apr 2024 02:50:52 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Gregory Clement <gregory.clement@bootlin.com>,
-	netdev@vger.kernel.org, Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net-next v4 3/8] net: dsa: move call to driver port_setup
- after creation of netdev
-Message-ID: <20240410235052.utn6c2ryyfxgo4zq@skbuf>
-References: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-0-eb97665e7f96@lunn.ch>
- <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-3-eb97665e7f96@lunn.ch>
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1712794101; x=1744330101;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=il6MW0T5O18TQB4pM0G5LS+r84S3zHH03G4QSkKbLIQ=;
+  b=VtcYsZ0F+VAALn5x2I6UoVYaKqe4eUkOSQC1MUqlupPrlXhfDPI8Ckwo
+   NWpo5Xa4W65pAv8PA5g6R6O6kkauo+I5T2pFog7mPcI/nwCe47CHOEps6
+   U3/snV+PArVmNSucH0SoMQjDnx9Kant+GsgwPapRYECnucbpTAYDh1AVQ
+   A=;
+X-IronPort-AV: E=Sophos;i="6.07,191,1708387200"; 
+   d="scan'208";a="625734198"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 00:08:18 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:48752]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.55.49:2525] with esmtp (Farcaster)
+ id 8f080273-2903-45b7-9879-a3b2ee8a5e04; Thu, 11 Apr 2024 00:08:17 +0000 (UTC)
+X-Farcaster-Flow-ID: 8f080273-2903-45b7-9879-a3b2ee8a5e04
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Thu, 11 Apr 2024 00:08:17 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.44) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Thu, 11 Apr 2024 00:08:14 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <willemdebruijn.kernel@gmail.com>
+CC: <davem@davemloft.net>, <krisman@suse.de>, <kuniyu@amazon.com>,
+	<lmb@isovalent.com>, <martin.lau@kernel.org>, <netdev@vger.kernel.org>
+Subject: Re: [PATCH v2] udp: Avoid call to compute_score on multiple sites
+Date: Wed, 10 Apr 2024 17:08:07 -0700
+Message-ID: <20240411000807.55368-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <66171e3698462_2d249d29412@willemb.c.googlers.com.notmuch>
+References: <66171e3698462_2d249d29412@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240406-v6-8-0-net-next-mv88e6xxx-leds-v4-v4-3-eb97665e7f96@lunn.ch>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D039UWB002.ant.amazon.com (10.13.138.79) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Sat, Apr 06, 2024 at 03:13:30PM -0500, Andrew Lunn wrote:
-> From: Vladimir Oltean <vladimir.oltean@nxp.com>
-> 
-> The driver-facing method port_setup() is a good place to add the LEDs of
-> a port to the netdev representing the port. However, when port_setup()
-> is called in dsa_port_devlink_setup(), the netdev does not exist
-> yet. That only happens in dsa_user_create(), which is later in
-> dsa_port_setup().
-> 
-> Move the call to port_setup() out of dsa_port_devlink_setup() and to
-> the end of dsa_port_setup() where the netdev will exist. For the other
-> port types, the call to port_setup() and port_teardown() remains where
-> it was before (functionally speaking), but now it needs to be open-coded
-> in their respective setup/teardown logic.
-> 
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-> ---
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Date: Wed, 10 Apr 2024 19:18:14 -0400
+> Kuniyuki Iwashima wrote:
+> > From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> > Date: Wed, 10 Apr 2024 18:51:33 -0400
+> > > Kuniyuki Iwashima wrote:
+> > > > From: Gabriel Krisman Bertazi <krisman@suse.de>
+> > > > Date: Wed, 10 Apr 2024 17:50:47 -0400
+> > > > > We've observed a 7-12% performance regression in iperf3 UDP ipv4 and
+> > > > > ipv6 tests with multiple sockets on Zen3 cpus, which we traced back to
+> > > > > commit f0ea27e7bfe1 ("udp: re-score reuseport groups when connected
+> > > > > sockets are present").  The failing tests were those that would spawn
+> > > > > UDP sockets per-cpu on systems that have a high number of cpus.
+> > > > > 
+> > > > > Unsurprisingly, it is not caused by the extra re-scoring of the reused
+> > > > > socket, but due to the compiler no longer inlining compute_score, once
+> > > > > it has the extra call site in udp4_lib_lookup2.  This is augmented by
+> > > > > the "Safe RET" mitigation for SRSO, needed in our Zen3 cpus.
+> > > > > 
+> > > > > We could just explicitly inline it, but compute_score() is quite a large
+> > > > > function, around 300b.  Inlining in two sites would almost double
+> > > > > udp4_lib_lookup2, which is a silly thing to do just to workaround a
+> > > > > mitigation.  Instead, this patch shuffles the code a bit to avoid the
+> > > > > multiple calls to compute_score.  Since it is a static function used in
+> > > > > one spot, the compiler can safely fold it in, as it did before, without
+> > > > > increasing the text size.
+> > > > > 
+> > > > > With this patch applied I ran my original iperf3 testcases.  The failing
+> > > > > cases all looked like this (ipv4):
+> > > > > 	iperf3 -c 127.0.0.1 --udp -4 -f K -b $R -l 8920 -t 30 -i 5 -P 64 -O 2
+> > > > > 
+> > > > > where $R is either 1G/10G/0 (max, unlimited).  I ran 3 times each.
+> > > > > baseline is 6.9.0-rc1-g962490525cff, just a recent checkout of Linus
+> > > > > tree. harmean == harmonic mean; CV == coefficient of variation.
+> > > > > 
+> > > > > ipv4:
+> > > > >                  1G                10G                  MAX
+> > > > > 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
+> > > > > baseline 1730488.20(0.0050) 1639269.91(0.0795) 1436340.05(0.0954)
+> > > > > patched  1980936.14(0.0020) 1933614.06(0.0866) 1784184.51(0.0961)
+> > > > > 
+> > > > > ipv6:
+> > > > >                  1G                10G                  MAX
+> > > > > 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
+> > > > > baseline  1679016.07(0.0053) 1697504.56(0.0064) 1481432.74(0.0840)
+> > > > > patched   1924003.38(0.0153) 1852277.31(0.0457) 1690991.46(0.1848)
+> > > > > 
+> > > > > This restores the performance we had before the change above with this
+> > > > > benchmark.  We obviously don't expect any real impact when mitigations
+> > > > > are disabled, but just to be sure it also doesn't regresses:
+> > > > > 
+> > > > > mitigations=off ipv4:
+> > > > >                  1G                10G                  MAX
+> > > > > 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
+> > > > > baseline 3230279.97(0.0066) 3229320.91(0.0060) 2605693.19(0.0697)
+> > > > > patched  3242802.36(0.0073) 3239310.71(0.0035) 2502427.19(0.0882)
+> > > > > 
+> > > > > Cc: Lorenz Bauer <lmb@isovalent.com>
+> > > > > Fixes: f0ea27e7bfe1 ("udp: re-score reuseport groups when connected sockets are present")
+> > > > > Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
+> > > > > 
+> > > > > ---
+> > > > > Changes since v1:
+> > > > > (me)
+> > > > >   - recollected performance data after changes below only for the
+> > > > >   mitigations enabled case.
+> > > > > (suggested by Willem de Bruijn)
+> > > > >   - Drop __always_inline in compute_score
+> > > > >   - Simplify logic by replacing third struct sock pointer with bool
+> > > > >   - Fix typo in commit message
+> > > > >   - Don't explicitly break out of loop after rescore
+> > > > > ---
+> > > > >  net/ipv4/udp.c | 18 +++++++++++++-----
+> > > > >  net/ipv6/udp.c | 17 +++++++++++++----
+> > > > >  2 files changed, 26 insertions(+), 9 deletions(-)
+> > > > > 
+> > > > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > > > > index 661d0e0d273f..a13ef8e06093 100644
+> > > > > --- a/net/ipv4/udp.c
+> > > > > +++ b/net/ipv4/udp.c
+> > > > > @@ -427,12 +427,15 @@ static struct sock *udp4_lib_lookup2(struct net *net,
+> > > > >  {
+> > > > >  	struct sock *sk, *result;
+> > > > >  	int score, badness;
+> > > > > +	bool rescore = false;
+> > > > 
+> > > > nit: Keep reverse xmax tree order.
+> > > > https://docs.kernel.org/process/maintainer-netdev.html#local-variable-ordering-reverse-xmas-tree-rcs
+> > > > 
+> > > > >  
+> > > > >  	result = NULL;
+> > > > >  	badness = 0;
+> > > > >  	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
+> > > > > -		score = compute_score(sk, net, saddr, sport,
+> > > > > -				      daddr, hnum, dif, sdif);
+> > > > > +rescore:
+> > > > > +		score = compute_score((rescore ? result : sk), net, saddr,
+> > > > 
+> > > > I guess () is not needed around rescore ?
+> > > > 
+> > > > Both same for IPv6.
+> > > > 
+> > > > Otherwise, looks good to me.
+> > > > 
+> > > > Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > > 
+> > > Can we avoid using the same name for the label and boolean?
+> > > 
+> > > And since if looping result will have state TCP_ESTABLISHED, can it
+> > > just be
+> > > 
+> > >     sk = result;
+> > >     goto rescore;
+> > 
+> > TCP_ESTABLISHED never reaches the rescore jump as it's checked
 
-You can keep your author name and me as co-developer. If I changed your
-author information it was probably a mistake.
+Sorry I forgot about BPF.  I think BPF can select established one,
+so this part is not true.
+
+
+> > before calling inet_lookup_reuseport() and inet_lookup_reuseport()
+> > also does not select TCP_ESTABLISHED.
+> 
+> I was thinking of the second part, inet_lookup_reuseport returning
+> a connection from the group. I suppose this is assured not to be
+> the case due to
+> 
+>            /* Falleback to scoring if grnult;p has connections */
+>            if (!reuseport_has_conns(sk))
+>                    return result;
+> 
+> 
+> Is that what you mean?
+
+reuseport_has_conns() is for reuseport group mixed with TCP_CLOSE and
+TCP_ESTABLISHED, and here sk is usually (I mean without BPF) TCP_CLOSE
+so that we don't decide too early and can check TCP_ESTABLISHED socket
+placed later in the same hash chain.
+
+Also, reuseport_select_sock_by_hash() returns NULL If the reuseport group
+has only TCP_ESTABLISHED sockets when selecting, and then we continue with
+result = sk;
+
+
+> 
+> There are a lot of hidden assumptions then to make sure this
+> control flow is correct.
+> 
+> Should we instead just have
+> 
+>             badness = score;
+> 
+> +            if (rescore)
+> +                    continue;
+
+The 2nd compute_score() is added recently for a situation where
+inet_lookup_reuseport() returns sk with higher score to avoid
+calling inet_lookup_reuseport() again for the result.
+
+  f0ea27e7bfe1 ("udp: re-score reuseport groups when connected sockets are present")
+
+
+> 
+> Also, can the rescore = false in the datapath be avoided. The purpose
+> is to only jump once. It would be good if it is obvious that a
+> repeated (or infinite) loop is not possible, regardless of what
+> the callees return.
+> 
 
