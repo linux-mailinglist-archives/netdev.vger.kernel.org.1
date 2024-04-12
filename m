@@ -1,86 +1,62 @@
-Return-Path: <netdev+bounces-87309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7770D8A27E7
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 09:24:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 038328A27F2
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 09:26:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E091B1F227F1
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 07:24:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 191871C230D4
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 07:26:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9224D2C683;
-	Fri, 12 Apr 2024 07:24:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="S9DseIuD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF44B36AEF;
+	Fri, 12 Apr 2024 07:25:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7934F20A
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 07:24:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7EA4F5EA
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 07:25:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712906662; cv=none; b=uxm8UtuvVUbaObknXALqWZYz+vovb1ImU0uUOQJwezFd77Te7+tGn6yiDv6+s/4ufqT3v8txWKlYO36cmeRd21vnnJudfpRqaEEf25Y8StO8nL8s5XSfO/zc4WOGK2tWMKfe8M5EtVg2lfzY2O6w4bVkpWZkTxP4yD0LZswbnTM=
+	t=1712906747; cv=none; b=AcxfLFKpONWjQjph/PtiigAIF1/Fqm1VhOPBbkLJ9pejjWqmKY/GOxXdYIIeFwAu9QsFAncAPGxj3wZfQgVA8eG25wRXg/kVgB9iWJG/UYlEiw6m5cItdpOBSStlVeqsrnIdOhyRm97W53t3kPwwMubWaCqto3el53W7X8V1ycQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712906662; c=relaxed/simple;
-	bh=qE+iHkrJ4cug7JwM+Wk6XgOYjbIdKwAZ0hjywhGzv1g=;
+	s=arc-20240116; t=1712906747; c=relaxed/simple;
+	bh=Xg19eC67v3NTayc5Hy9RUTH6DfrUtRo1sUps2JiuTm8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QrcqUibpA5c6Fs4pbgHeWwM86IPYaVs500sz4+btIvmYExIl8caaBr5Ip+QIxF1KrKEu00JvJ/zRzauyw8fJo01Z/iwXKP4rLEw7UJIKk2AgGzMSaBGIGHbrkWSRrVI0vkcEvb4mx8GCwGZlYDg/oRj3yl3lcpGxCqbNUyM7sfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=S9DseIuD; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-516cbf3fe68so756175e87.0
-        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 00:24:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712906658; x=1713511458; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SY+RglWT+YID+oXmo0lkPgvJUJViZHPWsquouwr1PuA=;
-        b=S9DseIuDZMCN70Ae3IReu6TsTxNpciWQSQycVeCXWT1YOG3Rr4DlrVjkef4JR/lG5R
-         9eVU0PliKzeGMXtbNyMDRXLwdCstTPmh7dUvSxr2qXE0Hak1YdMQPqVX2Y+OsX9u53yQ
-         VM1601CN+a+e3juWJb8O4yq0iP4IFFYJsZ/tCoyZJ/7UeYXKf3IjvKDVSsmvDRt8Ogfw
-         P3UlYLI5dcFzlT652SpbkdRClNMr5hXGHSGOkDruh3eM9q2fN5GfQYYEL8owPhEB4L8r
-         xwRdGluZR9cU7GL9+nTMJuDEpGZeuB0Tfpn9p+BalBODDleBq9P+CfPYIWuIKN+Iy+WA
-         wSOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712906658; x=1713511458;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SY+RglWT+YID+oXmo0lkPgvJUJViZHPWsquouwr1PuA=;
-        b=dj4bMQ5s9zSlmKR9B2ObJ//SkgVPSj51zqUPbruO5mGBw9TBcZuMeNkF2M+JsUThQm
-         wI6fYi8IKNZ2e/qpshdURCERQK3LpDQDA7TWOpKjtEbo4rHHLPmcyYjtwOEImvhVL/at
-         eufk3INtCxxD3AtrTi2KuY6Vvll9VuL6BgSuScPqzlkwg9M1PEn6pCcz4hN1izpZ93vY
-         9L1fhE716ao0ZKxFmGFJtniRxMcVTjb163B9sxwdZyYxUA1kTasgBm///bSo6qGIb5Oi
-         5vAA3OqLAO4Iomea9wJ9+YL5h+wjabXZ20XqvegXOjcD/ak07Kc+qbmgH1PN6/kwCJpK
-         w4WQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXeNmc/9gqgb/v3IayWqaVbr33vUV8mQciSJZ+qefmeTWaoijQXGdMO8BAIgvvAIswAvQtjIOSVzw9KeRQ5mEt33kyxmHKl
-X-Gm-Message-State: AOJu0Yx3PkiFLFHrs8LtVg0+rTpI7PWj2DTnRw3pX9uyvUOHUkuZlZkr
-	EeGqhRc+AnJ1UGZcHUdoTI4UBHodkU3JRBKrphnSGN0In88Ks6OIftGEW7atzNE=
-X-Google-Smtp-Source: AGHT+IHRclCn1vg83Xrf5+37yH2sMECpNPMG8FcNv1MsYlBHrcADf67xDgvx7m+4fxyWD2FGeUKzFw==
-X-Received: by 2002:ac2:5f84:0:b0:516:d8e5:4e13 with SMTP id r4-20020ac25f84000000b00516d8e54e13mr1058548lfe.26.1712906658145;
-        Fri, 12 Apr 2024 00:24:18 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id j5-20020ac25505000000b00517374e92ecsm444602lfk.93.2024.04.12.00.24.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 00:24:17 -0700 (PDT)
-Date: Fri, 12 Apr 2024 09:24:15 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com, jiri@nvidia.com,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	mateusz.polchlopek@intel.com,
-	Piotr Raczynski <piotr.raczynski@intel.com>
-Subject: Re: [iwl-next v3 4/7] ice: allocate devlink for subfunction
-Message-ID: <Zhjhn2hu5ziVSq1h@nanopsycho>
-References: <20240412063053.339795-1-michal.swiatkowski@linux.intel.com>
- <20240412063053.339795-5-michal.swiatkowski@linux.intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=QZ1cm+k/Xsp7uTM7gmjA+PdCmw5HBEV6O8OQBsaYnJutZsEjoeA8Nh/Omfi4p5hXAFVAlT/etuvinKwTDZv8AIHJ0zY2aqzqn6IRpIIlzQc/ekFkggS2fsYpQF3Dyng5fDdbj4TO4sKDCRSy+vYiCn+wNlHbHF/u4n6mHtTTk1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <sha@pengutronix.de>)
+	id 1rvBI3-0000dd-3D; Fri, 12 Apr 2024 09:25:39 +0200
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <sha@pengutronix.de>)
+	id 1rvBI1-00BpnW-DU; Fri, 12 Apr 2024 09:25:37 +0200
+Received: from sha by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <sha@pengutronix.de>)
+	id 1rvBI1-009Hey-14;
+	Fri, 12 Apr 2024 09:25:37 +0200
+Date: Fri, 12 Apr 2024 09:25:37 +0200
+From: Sascha Hauer <s.hauer@pengutronix.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Boris Pismenny <borisp@nvidia.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Jens Axboe <axboe@kernel.dk>, kernel@pengutronix.de
+Subject: Re: [PATCH] tls: defer close to kernel task
+Message-ID: <Zhjh8f2_9EGv7I9W@pengutronix.de>
+References: <20240410-ktls-defer-close-v1-1-b59e6626b8e4@pengutronix.de>
+ <20240410061128.3b337185@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,247 +65,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240412063053.339795-5-michal.swiatkowski@linux.intel.com>
+In-Reply-To: <20240410061128.3b337185@kernel.org>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: sha@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Fri, Apr 12, 2024 at 08:30:50AM CEST, michal.swiatkowski@linux.intel.com wrote:
->From: Piotr Raczynski <piotr.raczynski@intel.com>
->
->Make devlink allocation function generic to use it for PF and for SF.
->
->Add function for SF devlink port creation. It will be used in next
->patch.
->
->Create header file for subfunction device. Define subfunction device
->structure there as it is needed for devlink allocation and port
->creation.
->
->Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
->Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
->---
-> .../net/ethernet/intel/ice/devlink/devlink.c  | 47 ++++++++++++++---
-> .../net/ethernet/intel/ice/devlink/devlink.h  |  1 +
-> .../ethernet/intel/ice/devlink/devlink_port.c | 51 +++++++++++++++++++
-> .../ethernet/intel/ice/devlink/devlink_port.h |  3 ++
-> drivers/net/ethernet/intel/ice/ice_sf_eth.h   | 21 ++++++++
-> 5 files changed, 117 insertions(+), 6 deletions(-)
-> create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.h
->
->diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
->index 661af04c8eef..5a78bf08e731 100644
->--- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
->+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
->@@ -10,6 +10,7 @@
-> #include "ice_eswitch.h"
-> #include "ice_fw_update.h"
-> #include "ice_dcb_lib.h"
->+#include "ice_sf_eth.h"
+On Wed, Apr 10, 2024 at 06:11:28AM -0700, Jakub Kicinski wrote:
+> On Wed, 10 Apr 2024 08:33:07 +0200 Sascha Hauer wrote:
+> > proto->close is normally called from a userspace task which can be
+> > interrupted by signals. When asynchronous encryption is used then KTLS
+> > sends out the final data at close time. When a signal comes in during
+> > close then it can happen tcp_sendmsg_locked() is interrupted by that
+> > signal while waiting for memory in sk_stream_wait_memory() which then
+> > returns with -ERSTARTSYS. It is not possible to recover from this situation
+> > and the final transmit data is lost.
+> > 
+> > With this patch we defer the close operation to a kernel task which
+> > doesn't get signals.
+> > 
+> > The described situation happens when KTLS is used in conjunction with
+> > io_uring, as io_uring uses task_work_add() to add work to the current
+> > userspace task.
+> > 
+> > The problem is discussed in [1] and [2] and the solution implemented in
+> > this patch is suggested by Pavel Begunkov here [3]
 > 
-> /* context for devlink info version reporting */
-> struct ice_info_ctx {
->@@ -1286,6 +1287,8 @@ static const struct devlink_ops ice_devlink_ops = {
-> 	.port_new = ice_devlink_port_new,
-> };
-> 
->+static const struct devlink_ops ice_sf_devlink_ops;
->+
-> static int
-> ice_devlink_enable_roce_get(struct devlink *devlink, u32 id,
-> 			    struct devlink_param_gset_ctx *ctx)
->@@ -1417,18 +1420,23 @@ static void ice_devlink_free(void *devlink_ptr)
-> }
-> 
-> /**
->- * ice_allocate_pf - Allocate devlink and return PF structure pointer
->+ * ice_devlink_alloc - Allocate devlink and return devlink priv pointer
->  * @dev: the device to allocate for
->+ * @priv_size: size of the priv memory
->+ * @ops: pointer to devlink ops for this device
->+ *
->+ * Allocate a devlink instance for this device and return the private pointer
->+ * The devlink memory is kept track of through devres by adding an action to
->+ * remove it when unwinding.
->  *
->- * Allocate a devlink instance for this device and return the private area as
->- * the PF structure. The devlink memory is kept track of through devres by
->- * adding an action to remove it when unwinding.
->+ * Return: void pointer to allocated memory
->  */
->-struct ice_pf *ice_allocate_pf(struct device *dev)
->+static void *ice_devlink_alloc(struct device *dev, size_t priv_size,
->+			       const struct devlink_ops *ops)
-> {
-> 	struct devlink *devlink;
-> 
->-	devlink = devlink_alloc(&ice_devlink_ops, sizeof(struct ice_pf), dev);
->+	devlink = devlink_alloc(ops, priv_size, dev);
-> 	if (!devlink)
-> 		return NULL;
-> 
->@@ -1439,6 +1447,33 @@ struct ice_pf *ice_allocate_pf(struct device *dev)
-> 	return devlink_priv(devlink);
-> }
-> 
->+/**
->+ * ice_allocate_pf - Allocate devlink and return PF structure pointer
->+ * @dev: the device to allocate for
->+ *
->+ * Allocate a devlink instance for PF.
->+ *
->+ * Return: void pointer to allocated memory
->+ */
->+struct ice_pf *ice_allocate_pf(struct device *dev)
->+{
->+	return ice_devlink_alloc(dev, sizeof(struct ice_pf), &ice_devlink_ops);
->+}
->+
->+/**
->+ * ice_allocate_sf - Allocate devlink and return SF structure pointer
->+ * @dev: the device to allocate for
->+ *
->+ * Allocate a devlink instance for SF.
->+ *
->+ * Return: void pointer to allocated memory
->+ */
->+struct ice_sf_priv *ice_allocate_sf(struct device *dev)
->+{
->+	return ice_devlink_alloc(dev, sizeof(struct ice_sf_priv),
->+				 &ice_sf_devlink_ops);
->+}
->+
-> /**
->  * ice_devlink_register - Register devlink interface for this PF
->  * @pf: the PF to register the devlink for.
->diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.h b/drivers/net/ethernet/intel/ice/devlink/devlink.h
->index d291c0e2e17b..1b2a5980d5e8 100644
->--- a/drivers/net/ethernet/intel/ice/devlink/devlink.h
->+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.h
->@@ -5,6 +5,7 @@
-> #define _ICE_DEVLINK_H_
-> 
-> struct ice_pf *ice_allocate_pf(struct device *dev);
->+struct ice_sf_priv *ice_allocate_sf(struct device *dev);
-> 
-> void ice_devlink_register(struct ice_pf *pf);
-> void ice_devlink_unregister(struct ice_pf *pf);
->diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
->index f5e305a71bd0..1b933083f551 100644
->--- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
->+++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
->@@ -432,6 +432,57 @@ void ice_devlink_destroy_vf_port(struct ice_vf *vf)
-> 	devlink_port_unregister(&vf->devlink_port);
-> }
-> 
->+/**
->+ * ice_devlink_create_sf_dev_port - Register virtual port for a subfunction
->+ * @sf_dev: the subfunction device to create a devlink port for
->+ *
->+ * Register virtual flavour devlink port for the subfunction auxiliary device
->+ * created after activating a dynamically added devlink port.
->+ *
->+ * Return: zero on success or an error code on failure.
->+ */
->+int ice_devlink_create_sf_dev_port(struct ice_sf_dev *sf_dev)
->+{
->+	struct devlink_port_attrs attrs = {};
->+	struct devlink_port *devlink_port;
->+	struct ice_dynamic_port *dyn_port;
->+	struct devlink *devlink;
->+	struct ice_vsi *vsi;
->+	struct device *dev;
->+	struct ice_pf *pf;
->+	int err;
->+
->+	dyn_port = sf_dev->dyn_port;
->+	vsi = dyn_port->vsi;
->+	pf = dyn_port->pf;
->+	dev = ice_pf_to_dev(pf);
->+
->+	devlink_port = &sf_dev->priv->devlink_port;
->+
->+	attrs.flavour = DEVLINK_PORT_FLAVOUR_VIRTUAL;
->+
->+	devlink_port_attrs_set(devlink_port, &attrs);
->+	devlink = priv_to_devlink(sf_dev->priv);
->+
->+	err = devl_port_register(devlink, devlink_port, vsi->idx);
->+	if (err)
->+		dev_err(dev, "Failed to create virtual devlink port for auxiliary subfunction device %d",
->+			vsi->idx);
+> Appears to crash reliably.
+> Please run the tls selftests with KASAN enabled.
 
-I wonder if the value of vsi->idx is any useful to the user. I guess
-he is not aware of it. Since this error happens upon user cmd active
-call, the identification is pointless. User know on which object he is
-working. Please remove.
+Oops, will run the tests and fix the fallout before resending.
 
+Sascha
 
->+
->+	return err;
->+}
->+
->+/**
->+ * ice_devlink_destroy_sf_dev_port - Destroy virtual port for a subfunction
->+ * @sf_dev: the subfunction device to create a devlink port for
->+ *
->+ * Unregisters the virtual port associated with this subfunction.
->+ */
->+void ice_devlink_destroy_sf_dev_port(struct ice_sf_dev *sf_dev)
->+{
->+	devl_port_unregister(&sf_dev->priv->devlink_port);
->+}
->+
-> /**
->  * ice_activate_dynamic_port - Activate a dynamic port
->  * @dyn_port: dynamic port instance to activate
->diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
->index 30146fef64b9..1f66705e0261 100644
->--- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
->+++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.h
->@@ -5,6 +5,7 @@
-> #define _DEVLINK_PORT_H_
-> 
-> #include "../ice.h"
->+#include "ice_sf_eth.h"
-> 
-> /**
->  * struct ice_dynamic_port - Track dynamically added devlink port instance
->@@ -30,6 +31,8 @@ int ice_devlink_create_pf_port(struct ice_pf *pf);
-> void ice_devlink_destroy_pf_port(struct ice_pf *pf);
-> int ice_devlink_create_vf_port(struct ice_vf *vf);
-> void ice_devlink_destroy_vf_port(struct ice_vf *vf);
->+int ice_devlink_create_sf_dev_port(struct ice_sf_dev *sf_dev);
->+void ice_devlink_destroy_sf_dev_port(struct ice_sf_dev *sf_dev);
-> 
-> #define ice_devlink_port_to_dyn(p) \
-> 	container_of(port, struct ice_dynamic_port, devlink_port)
->diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.h b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
->new file mode 100644
->index 000000000000..a08f8b2bceef
->--- /dev/null
->+++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
->@@ -0,0 +1,21 @@
->+/* SPDX-License-Identifier: GPL-2.0 */
->+/* Copyright (c) 2024, Intel Corporation. */
->+
->+#ifndef _ICE_SF_ETH_H_
->+#define _ICE_SF_ETH_H_
->+
->+#include <linux/auxiliary_bus.h>
->+#include "ice.h"
->+
->+struct ice_sf_dev {
->+	struct auxiliary_device adev;
->+	struct ice_dynamic_port *dyn_port;
->+	struct ice_sf_priv *priv;
->+};
->+
->+struct ice_sf_priv {
->+	struct ice_sf_dev *dev;
->+	struct devlink_port devlink_port;
->+};
->+
->+#endif /* _ICE_SF_ETH_H_ */
->-- 
->2.42.0
->
->
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
