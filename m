@@ -1,75 +1,74 @@
-Return-Path: <netdev+bounces-87406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6638B8A2FF3
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:55:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A8208A2FFA
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:56:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 922BC1C23E60
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:55:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 594D71C23E9B
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:56:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCDA183CDD;
-	Fri, 12 Apr 2024 13:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89F118593A;
+	Fri, 12 Apr 2024 13:56:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="MR/lIHgB"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="Jye/Sqvd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F20F85C52
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 13:54:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7615A55783
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 13:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712930096; cv=none; b=Vh7FrPZJsV7TifKJiy7KVS3wpik8D+wUYwaqzihhOU32a9BRY8UyA5RozVHA/m8jAAoHO1GShJaU8e5nLAWM8fV3xzvBafiFuSDuPZDEl0iSu8rrhDa+kXIzlrIHAJwR1zodIq4GBCin7xsCDwpV1mQFuqplqMdcCmK8K3WsYmw=
+	t=1712930206; cv=none; b=EjjEZhrDYZNEsF3HEDQ6OmD24SKqgH6Rg9S7xt83USIN4FOyCG4/fH9L7jZ11gsiu54AtiCpdLXSJXs+cRrHVhh9Dob5PW6sgWy+as0gPy0IFfX++//Ck3LwTCg5fuQA0oP7HUB9GRRXhZ9iasiAEa8e841g9AYRcDlrJIwORcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712930096; c=relaxed/simple;
-	bh=7sbPrtlgccNX5VLrftyI3NxeqI9zOjlHcD4cFbfQleo=;
+	s=arc-20240116; t=1712930206; c=relaxed/simple;
+	bh=zrjbXKaxgzuudx1KFjcy8ipDh+5BgoB+83OYFc6KOZE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NvSDfZK4XZa2+GhXowzvgMUems0OHkb5XLTs6SlcMue+f+s+xHtYIVvALKcIBci2evJMWgS3rDVb1BRSuaRyHdP0+lHQYHx8eeEypZohuaIlZjRyRsjztviA6RxojiPqnKTDls8cqi1i3Ty234aRATI426zNIMspO41pLh8gtMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=MR/lIHgB; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-418031b617bso3101815e9.0
-        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 06:54:54 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=VmzM07M94Cjl+IxUdK9EY3T2Emp3BgZwIgUR7acFS3KpLoo+fIcWqX506CyTpdfMIrsZrpC5z8SKZqmjCCzFOgTSiSlMuis9URoZm3R3yvSHx1A8inNdoJDjeg1z0QNItqKDC5+eI/tPApDOrKpCS0zIjGgyabcUoZlSGklOEvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=Jye/Sqvd; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-417db45fe01so6622415e9.1
+        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 06:56:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1712930093; x=1713534893; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=BRTJ151vm78v5ajnTv/XmBmg5FroaKqxcncoiaHZS14=;
-        b=MR/lIHgBoLukUxx/rC1n56u4nWDqJSSV4YQbuV1ea0Kf1YK5WV8damlG+UsYPm+yKW
-         ZSyzERMaRc8q3RrmTdi7Tgdcx60Afv+aWNaf96JlQjzc20byrdyRYW9opmu0jxzXkrdL
-         Gj5kD1AdRyOJgJ2QCyvw3txrJ2iIJ9xIlu6atZgYHedooWNvYjDsZdLP9xiggDaQDTUG
-         XDbR2QHB1ozTN1OgXuZ8Ddkg9puZWASVX1T+XVEW5w7i/qUQCFCv3eNN7PFAju+cCAuF
-         minzni+aivhcQC1Xw/OtNnf8PMgUgiJUX6DXD5s0JthY+EY2568+JDSn7e4ppL1oYHnN
-         kedw==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1712930203; x=1713535003; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=zrjbXKaxgzuudx1KFjcy8ipDh+5BgoB+83OYFc6KOZE=;
+        b=Jye/SqvdAti8lJ8hWIPIoz2IREEZww2n7o2Z3kp6pRt4krKrewvtwvkpmELg7xGel8
+         z+uZIHVPgjVoanuC67ajSp7XNB1MOh2HCZiP5d2sg3FUvP+k0aaSU5/Fi/u29SRY98sY
+         1nskMf/4VM97FDThILM0VIAsJ6xGhptwgu/ZHkmXv9W6domv9XfNNULpHe2gGkfrhU9T
+         A3pJfOM+Awb87wNDVB0Q37OYe30/Orxrnf+0uYrgfP6QMKyFYH3tWzWlXTq0ASyQLq1i
+         oV+eYYK+bzmux97Co4a5Lucc1Qh/TMfENF23ma9yiI08AChUd2vs1KM9mnD7MG8yxH/0
+         sLww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712930093; x=1713534893;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BRTJ151vm78v5ajnTv/XmBmg5FroaKqxcncoiaHZS14=;
-        b=HxyQoxGboiiyico8pF7DPB8bsNUDYbPBYf0REAiy41aqCDHr0556+BxPdiqUEP6PTQ
-         JQfmrwF7VgHUEhxOdGJjre/nqYkYbeyBADKOTmMnTIZWkJ6f4yhqzOX+9h12DQROwspA
-         OuuNi++59piqLeFGNKtWWxVnOcXygsgvHFVS7ytNvpTpCuaRckRWU0i+jsrjmzF7JQXX
-         L2v/he6gsh3V5tbVfa6W8xt4+7hkBrMeGRPGRPIQtq2e9yADv3cblILLM+bzh6Of+xQd
-         rMgVF24BFr3SO7ulFH4l34LpA8L34u4XtRypJKPJwE1jQI78s6QHWh8bChZDV+TINc6x
-         9Cpg==
-X-Forwarded-Encrypted: i=1; AJvYcCVNnk/wABLrsyHErm+SJkG3oLe+JvBReefvwuWVVjJId+skXJjNCQlyyXxvBrd4vs1MM6bLfEpogEvxmRB/7wRkVVkTsPNb
-X-Gm-Message-State: AOJu0YwcAQ/u5e72KspHa/xIo2xH96e5foFGilKTG+arMOn2e3bweVGV
-	2OdiIp5s3jmLDXA1FqwD21JS2jIPu356HhtpJXKdpzem9FZeMjCiBVGtKDEdP2Y=
-X-Google-Smtp-Source: AGHT+IEo2CM02HpshRdJI4lvrs/ktps538c4Gzr05lCk3RuMZ9+T3vAnZc1vw/+SqFdSpn6BtlYqGQ==
-X-Received: by 2002:a05:600c:4e91:b0:418:1083:d2a0 with SMTP id f17-20020a05600c4e9100b004181083d2a0mr455330wmq.21.1712930093471;
-        Fri, 12 Apr 2024 06:54:53 -0700 (PDT)
-Received: from ?IPV6:2a01:e0a:b41:c160:309f:895d:c00e:dad3? ([2a01:e0a:b41:c160:309f:895d:c00e:dad3])
-        by smtp.gmail.com with ESMTPSA id m11-20020a05600c4f4b00b0041816c3049csm5401wmq.11.2024.04.12.06.54.52
+        d=1e100.net; s=20230601; t=1712930203; x=1713535003;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zrjbXKaxgzuudx1KFjcy8ipDh+5BgoB+83OYFc6KOZE=;
+        b=eHolG14q3bUqTrxVj1HSJKHAvnRD9jTGMUW1txH2L3nroYnr7DpQ2SW+sbBHbMJZLV
+         dnWdumM/e7xma9if1GSzQc2Wp9wl9DBoBNNXqhRvce6ANgJWox1JdrSYp/9eEXqOBD2h
+         A6PmqY4r14WVSFhNvH0rFUfqI05fZ9r8zM+HwccofLZT4ZwPQmvTDclzJLfXukj9D9+w
+         do9G4SskcQdbDsH6NwdwLu/H7vYlFMvGeXBGy7kz3xD5VoxJCGIQzRSFYIDsD3OLxVp1
+         5VJbScvtyqEfs4RA6mlcetnhe19hdhmTMm22aAlrAHWl9JvzpC+c3gGHBq+hZESU9HOc
+         nwRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXtgS5eLzhiFbOZit/rvK+ZjOiF/qtLEpFjfgmSDUY9VygfBya2Ec53ZcEKwjWPex2SID78P3GK6XtuvncvRhKzsKoLYDsv
+X-Gm-Message-State: AOJu0YwVhztSEXr/MUcoNobMIAu++Nyrc3XhQZac0f4SN9LTikPGVs4C
+	gvPzljNZ4M+KwXagQPhMbvMF8R9Xm8efXEK4dCve+eVsgAaNEmCXX3rRu9L1F5o=
+X-Google-Smtp-Source: AGHT+IE1aY0YK7X0UJIUMl5mWoMpDtrMWQ0+qMn5m3POIXuadH+CZf6hfbFKu6ceJnAKhtbnKRpYGQ==
+X-Received: by 2002:a05:600c:3d0f:b0:417:e6e6:a314 with SMTP id bh15-20020a05600c3d0f00b00417e6e6a314mr2197591wmb.14.1712930202832;
+        Fri, 12 Apr 2024 06:56:42 -0700 (PDT)
+Received: from [192.168.1.70] ([84.102.31.74])
+        by smtp.gmail.com with ESMTPSA id p19-20020a05600c1d9300b00417fd9c2d01sm2183249wms.3.2024.04.12.06.56.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Apr 2024 06:54:52 -0700 (PDT)
-Message-ID: <424a52f9-df2f-4205-ab9d-cd943b8a7398@6wind.com>
-Date: Fri, 12 Apr 2024 15:54:51 +0200
+        Fri, 12 Apr 2024 06:56:42 -0700 (PDT)
+Message-ID: <16790d82-e134-4a3b-b67e-d56c041362c0@baylibre.com>
+Date: Fri, 12 Apr 2024 15:56:39 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,47 +76,52 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Reply-To: nicolas.dichtel@6wind.com
-Subject: Re: [PATCH ipsec-next v10 3/3] xfrm: Add dir validation to "in" data
- path lookup
-To: antony.antony@secunet.com, Steffen Klassert
- <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
- netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v8 3/3] net: ethernet: ti: am65-cpsw: Add minimal
+ XDP support
+To: Jakub Kicinski <kuba@kernel.org>
 Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, devel@linux-ipsec.org,
- Leon Romanovsky <leon@kernel.org>, Eyal Birger <eyal.birger@gmail.com>,
- Sabrina Dubroca <sd@queasysnail.net>
-References: <0e0d997e634261fcdf16cf9f07c97d97af7370b6.1712828282.git.antony.antony@secunet.com>
- <d5e2ad71471e2895b19cb60c9a989228cd9a5d96.1712828282.git.antony.antony@secunet.com>
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Ratheesh Kannoth <rkannoth@marvell.com>,
+ Naveen Mamindlapalli <naveenm@marvell.com>, danishanwar@ti.com,
+ yuehaibing@huawei.com, rogerq@kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org
+References: <20240223-am65-cpsw-xdp-basic-v8-0-f3421b58da09@baylibre.com>
+ <20240223-am65-cpsw-xdp-basic-v8-3-f3421b58da09@baylibre.com>
+ <20240409174928.58a7c3f0@kernel.org>
+ <9cb903df-3e83-409a-aa4b-218742804cc6@baylibre.com>
+ <20240410080225.2e024f7c@kernel.org>
 Content-Language: en-US
-Organization: 6WIND
-In-Reply-To: <d5e2ad71471e2895b19cb60c9a989228cd9a5d96.1712828282.git.antony.antony@secunet.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+From: Julien Panis <jpanis@baylibre.com>
+In-Reply-To: <20240410080225.2e024f7c@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Le 11/04/2024 à 11:42, Antony Antony a écrit :
-> grep -vw 0 /proc/net/xfrm_stat
-> XfrmInDirError          	3
-> 
-> Signed-off-by: Antony Antony <antony.antony@secunet.com>
-> ---
->  include/uapi/linux/snmp.h |  1 +
->  net/ipv6/xfrm6_input.c    |  7 +++++++
->  net/xfrm/xfrm_input.c     | 11 +++++++++++
->  net/xfrm/xfrm_proc.c      |  1 +
->  4 files changed, 20 insertions(+)
-> 
-> diff --git a/include/uapi/linux/snmp.h b/include/uapi/linux/snmp.h
-> index 00e179c382c0..da5714e9a311 100644
-> --- a/include/uapi/linux/snmp.h
-> +++ b/include/uapi/linux/snmp.h
-> @@ -338,6 +338,7 @@ enum
->  	LINUX_MIB_XFRMOUTSTATEINVALID,		/* XfrmOutStateInvalid */
->  	LINUX_MIB_XFRMACQUIREERROR,		/* XfrmAcquireError */
->  	LINUX_MIB_XFRMOUTDIRERROR,		/* XfrmOutDirError */
-> +	LINUX_MIB_XFRMINDIRERROR,		/* XfrmInDirError */
-Same here:
-LINUX_MIB_XFRMINSTATEDIRERROR / XfrmInStateDirError
+On 4/10/24 17:02, Jakub Kicinski wrote:
+> On Wed, 10 Apr 2024 16:02:00 +0200 Julien Panis wrote:
+>>> You shouldn't build the skb upfront any more. Give the page to the HW,
+>>> once HW sends you a completion - build the skbs. If build fails
+>>> (allocation failure) just give the page back to HW. If it succeeds,
+>>> however, you'll get a skb which is far more likely to be cache hot.
+>> Not sure I get this point.
+>>
+>> "Give the page to the HW" = Do you mean that I should dma_map_single()
+>> a full page (|PAGE_SIZE|) in am65_cpsw_nuss_rx_push() ?
+> Yes, I think so. I think that's what you effectively do now anyway,
+> you just limit the len and wrap it in an skb. But
+> am65_cpsw_nuss_rx_push() will effectively get that page back from
+> skb->data and map it.
+
+That's much better indeed, with the implementation you suggest: 600 Mbits/sec
+instead of 500. I did not expect such improvement.
+I'll send a new version when I finish retesting.
+
 
