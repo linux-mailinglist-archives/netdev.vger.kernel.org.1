@@ -1,227 +1,186 @@
-Return-Path: <netdev+bounces-87393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E93B8A2F4E
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:22:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 589D18A2F50
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:23:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C0C2B22C53
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:22:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC0041F21270
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C329B824B2;
-	Fri, 12 Apr 2024 13:21:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB7F7FBB4;
+	Fri, 12 Apr 2024 13:23:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kcKXy8Px"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ikugZ6Ho"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450E081ABB
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 13:21:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712928100; cv=fail; b=nCd+9zT1DxYm7ALsvuv2+rNLwyPmYLB33vcQMXZ8gPor8njpWLyg7pii6GmgPbQSHnmKcAT/Dw6nf+zlD3vTGB0pDw1qsJW7nCOB1Arrhg0zB10GO1czWKFJX8vpiFadeCW+BAk0daE8bXlhH0fNcUHMjqzW7mEBD8U+MAOKgJw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712928100; c=relaxed/simple;
-	bh=Hij4Pk55raLZBRX3v5XRaSu41Pp4ZX527h5uFkRxRJg=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=K68uS/qqtbVq5wJ2Wum/yD+9zZeHjdeAUdUTQZ6iWR6LFWHa+rfZCyxzDAunJrR8gREwpByMoG6h4unodtidzeqsPZNJDqHJS+zvMlZA4CAfUkW2jnyetzNRa1qlHZy5hGCQQyb35MY1pZtI8kZuHA209tjtMunhM5pKmQNZUS4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kcKXy8Px; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712928099; x=1744464099;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Hij4Pk55raLZBRX3v5XRaSu41Pp4ZX527h5uFkRxRJg=;
-  b=kcKXy8PxJ+5V4VNsCEr40wrLzbyIpuPyRojq9Rc59BfBo8ysT4Irbe6P
-   T5SCT3rD5U6YHj/t40B+HAsCFicSQv6V6gSaUknB9hf8kNRXuxKUrb/9N
-   hfXpyZl5rbgzGdWt2DLSGdMdq3ocbcLYflqPXPSzs/aU7z9HyCCzlbrx0
-   T58bj7rYuF4whlte5u5RomuK8nrLXNbu9qv26EwbgGxenk6lbCxv6xNtv
-   nyL40kHxhtu7OJP5xjVhHmfXR/XKX70wyw6byKPM9htvHyRRWyJvORGuC
-   lb4eaCqb7GunLp0ZGYMHUMSSxnJhWPEgqBPlDLL0EmBR+DRNYhSiN4adE
-   Q==;
-X-CSE-ConnectionGUID: tKJRdC+wSXWaBcR9DnQ2UA==
-X-CSE-MsgGUID: izi8z+riQ4+gbLVRWrAkNg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11041"; a="8227366"
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="8227366"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 06:21:38 -0700
-X-CSE-ConnectionGUID: ldKYwxUrSxWsgh0Wr8Kxlw==
-X-CSE-MsgGUID: 9bp72nkzRI653pHM9r+akg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="21655715"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Apr 2024 06:21:38 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 12 Apr 2024 06:21:37 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 12 Apr 2024 06:21:37 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 12 Apr 2024 06:21:37 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=L33q64DiaknU4CKcuxehmBlyBHXqeqv2D4DrAuc54VFpPmzJosfePrQp0MDSDI5Pn+vhydNztjGpwLR/GDuMjb6NuTCnf6eOvIU4/LdSM9adWFUztzxwf45lqDBQKQ5f1yUxZ+qwA87RQDZE/BRcK80k0nxG4BzD8t2qxrBkSY0AR67h8DwqS8UwFXRVPnaRhEu9mSm5wREMe3s+wuiSlcpEbl5nZq1VOtHqYLzRgWnQmlVAGuMOGBO4hFyGzqfuMVCI8WxKp9tOEP6PZEvuBHuv8ygnuSLYPWHTaK3L5xwfHUjXuBIIQjywDCLc3W1W90uLVQ0eNi8okq7T0ZNzcQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=j3sBWvW4h3FuHEorWr7LkynEnWzQPgoXRD1KwKqQqxQ=;
- b=h1c3IueqGD2l5zngOdAmxrSMmbDRp03syBWeQnArVKt1vj8ez5AjuVcDbmrINGnVy2spWnFgiDSCO+5uVv8JQrhd4JUO7DegUg2EfdpJeq5CKXsn8yYlOdXz+ouYF6X6LC0hFU8W7zlEEYOsgKONFRnoyXtfT3Au80ZrwJ5nMBZlwzQYWTuTA2DQjktOaXq3cYMIpPLXhMKtnQl2qN9HNAAW2m/dgFI/7RuIRKsuBl+5+dSUsr5CPf8gZ/0hhBq3kPvNji09qSyDkdUMV3iKOgyxSZyFVlfE7aubJH6RopiYJzepCb/JOWzRsCvukRvz0ncJ44lrI9xcm6OSG2yMIw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
- by CY8PR11MB7826.namprd11.prod.outlook.com (2603:10b6:930:76::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.26; Fri, 12 Apr
- 2024 13:21:30 +0000
-Received: from MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::2ac3:a242:4abe:a665]) by MW4PR11MB5776.namprd11.prod.outlook.com
- ([fe80::2ac3:a242:4abe:a665%4]) with mapi id 15.20.7452.019; Fri, 12 Apr 2024
- 13:21:30 +0000
-Message-ID: <fb1a53ea-d5cd-45a1-9073-450f6a753f87@intel.com>
-Date: Fri, 12 Apr 2024 15:21:24 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH net-next 0/3] ethtool: Max power support
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <pabeni@redhat.com>, <netdev@vger.kernel.org>, <edumazet@google.com>,
-	<marcin.szycik@linux.intel.com>, <anthony.l.nguyen@intel.com>,
-	<idosch@nvidia.com>, <kuba@kernel.org>, <intel-wired-lan@lists.osuosl.org>,
-	<przemyslaw.kitszel@intel.com>
-References: <20240329092321.16843-1-wojciech.drewek@intel.com>
- <38d874e3-f25b-4af2-8c1c-946ab74c1925@lunn.ch>
- <a3fd2b83-93af-4a59-a651-1ffe0dbddbe4@intel.com>
- <dc601a7c-7bb7-4857-8991-43357b15ed5a@lunn.ch>
- <ad026426-f6a4-4581-b090-31ab65fb4782@intel.com>
- <61a89488-e79a-4175-8868-3de36af7f62d@lunn.ch>
- <206686dc-c39b-4b52-a35c-914b93fe3f36@intel.com>
- <e4224da7-0a09-41b7-b652-bf651cfea0d0@lunn.ch>
- <cf30ce2e-ab70-4bbe-82ab-d687c2ea2efc@intel.com>
- <c6258afd-2631-4e5d-ab25-6b2b7e2f4df4@lunn.ch>
-Content-Language: en-US
-From: Wojciech Drewek <wojciech.drewek@intel.com>
-In-Reply-To: <c6258afd-2631-4e5d-ab25-6b2b7e2f4df4@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: WA2P291CA0002.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1e::22) To MW4PR11MB5776.namprd11.prod.outlook.com
- (2603:10b6:303:183::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852175E060;
+	Fri, 12 Apr 2024 13:23:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712928223; cv=none; b=JmzAOoaRlv19F6HcpxbN8yPMeHhDb8GPw+lEfI6cxgK/8Mf7oLKSYXx4W3SVoUYPDb32vYs72AcT46YinpzACjSxPAuOIC1fqFnnF6UU738wiUbg6KYN7Ju4FCWmyMNq1uNLlzNNM7KBl5Fmw37tn6MjNkoP//v5Q4sH59nxF9s=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712928223; c=relaxed/simple;
+	bh=dmgGyuZghQmrzidGRnKgMS8zsphHWSFLUQdNRumotfI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=DIqnQ4NPGwvJQVK1CKf7hH8soEvEwv1SlDcmAju3UzDlF8gmey/ZgH+MDXTXDUcysMS8H4V1nCujJbqYLNSz01h2HJOdHzUn4BVXuwEUdlQoe2FmLZfDcKWsmCweO5wGMgDlI9EciFCVAKLBcnYFc1ju5JGE8e71gbyTAADl5EI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ikugZ6Ho; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DA2C81BF206;
+	Fri, 12 Apr 2024 13:23:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1712928219;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=doyOEZSdANyC7Q7xeWp2ANWHCVWf4AoZkITCbrl7iqA=;
+	b=ikugZ6HoNQbESBI07T85V9qMBxbcLYaKJRD1WyY/ihTz+PEW9rGF5RGrCBhIaRXAv6iYLB
+	Z8PrxVx0kdLMi2vOCVx4Rf3LulE1cbmnQJKvT9reXFqVWF6iHa7v4IR5a7+0TcT1TfvPJW
+	WyxYeOGyxIicNVFQmQQPdT92FAUWRS8H/Zojd606yx40oeymugbro3x6h9U0egvGhGB7I5
+	K0cRvctTd7h277fRI2YtWpTxb9T+Q6Fc91xAyAd+3c98xszAHELw+MKguiInblE1Hpg50A
+	Shsqtzuo1YNl0w7pPc5HqvyXrtS4NQumui1rJThlHUtO+kB/2cH7hUJBPIcbTg==
+Date: Fri, 12 Apr 2024 15:23:35 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
+ <kory.maincent@bootlin.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
+ <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
+ =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>, Simon Horman
+ <horms@kernel.org>, mwojtas@chromium.org, Nathan Chancellor
+ <nathan@kernel.org>, Antoine Tenart <atenart@kernel.org>
+Subject: Re: [PATCH net-next] net: phy: phy_link_topology: Handle NULL
+ topologies
+Message-ID: <20240412152335.751a8dbb@device-28.home>
+In-Reply-To: <c37482d9-f97b-4f9a-8a2d-efde1a654514@gmail.com>
+References: <20240412104615.3779632-1-maxime.chevallier@bootlin.com>
+	<c37482d9-f97b-4f9a-8a2d-efde1a654514@gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|CY8PR11MB7826:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0df41ba4-5e09-4420-0fb7-08dc5af376bd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sNiHP46Sv3Rte1pBUOFO/EBEZY95381En+VQVHf6AHzUZk2c2ARiqT1p5uNyNKK3L2pkgIV0sXhIuov2sfJXpQDUu05s/0hVf1sgjohENq9w+Xh7PlKkOiNAJ3ZUBJYHwqlCFh6PhAsIgMPLmjJfM5U416gZDsdxxXjUsKGn4cBA4LR4ISZLY2a3ZTiwa0j4JvuDcohqCTn+xVoNqcj9Adb81dy3HIICx+vkzB8C+O6+8dS17wVHOz5J0oChJHJC5HzMiQ5fVa49C7+jSW9LXIOAZcpL0EdytnsqfU+LEloLxJdjDN4sb5MZAdSH/aXcDC7K1kx0h2pw/GoABYMsnuxFfK8YxlD1LHpH8i7bNwlgg3vII/jr3ZKtcrToK9ysJjzTbHr7cG5aidSaMNNx7zGp5VYqAGwn5JLAUWgwS7GfkpDpTjLwbP7boXagybu8zDHnbhwnOOWMkBjLqrH3U4QgTAYYAGH37DNeUwS3kUzNnQGkFkPt8tTHgJeN4IjTNlV2+oHYh9O2OMjZI8uvwZDIb2f04g8KFGiDbTSIv8EaBoxJzKCEJRulzZWoikjg4azsghYpVGGBPrYv/cz3ezf4yXvj7Xjt1ZNsPztEeb5f5gTFBcrlNs4jC/Z4DA2Soa5yDK+dR4fKYPmkhO7z0Yd9atfN02IFi0K7jHsKNnw=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UkhYdUliK0RKaEJmN2VmVVpqSmlSOGd4NFhBRUhJZEN6c3lnSjd2UFowTWZp?=
- =?utf-8?B?MklMZE9ueXNrZ3A4MGdYbUxGa2N2c0syaCs5eVgxNkdRcExxamd2ZmR3VGVW?=
- =?utf-8?B?TVRKUStpNUlMUTN6RW4xMGhETC85RDdrbVN5TXAvNVhDVEdzUDlKVnR2WlZh?=
- =?utf-8?B?WjdGQU90KzQ3aXJaOFBKbTNsY2c4bVNsalpiOVk2QkxJWnFxMDE0YWZXUHpP?=
- =?utf-8?B?RWxTcCsrVjRvc3J1VEhLQklCY0oyVG1JRVF5Sldic2NJSWZsVGowWGcycEVJ?=
- =?utf-8?B?MU1ZTnVoeVFLRDR6aS9hT2dOK1dyT0s1bkhkTGRsdkxFL1hPWndvdUNCVFR4?=
- =?utf-8?B?Y2JXWXZGR3Y4d1NPNk9QaDdVMElaL2hoS0V4N01yRlNmS284dmUzc0tFVTBs?=
- =?utf-8?B?ZmtWUnFOODgxallWaTc3RDFJVjJXNVlDWEoraFZQQ1RKd2FUeGpiSmZKMXlJ?=
- =?utf-8?B?RUJrM1Rad0MwUFVkUmpGUUpic21kdStvU3BaajhtS01hTWVuSzRwcFN0b3hW?=
- =?utf-8?B?cnpuOHNKNGtoNzBNMjRSSlhwZzVGZ2pNQVdBQTZyWGprZlVaWnlFYWp2eld3?=
- =?utf-8?B?MXJMTTRuRVJVeERRVk9RMkcxdExNL0o1aE9KM3lEVEUxYVQ5cW9kWXFTNnFO?=
- =?utf-8?B?TlNJN3RVME1ZR2lQeXh6WmF4RUZZM01XZ0xDaGFQSCtaeFdGdVhIRkkvUU9a?=
- =?utf-8?B?L3JuWnhsZk9ZZzBoREZ1RjFLc2dpN1g2cytpamdQa1Q2TmFmcUNKb3JUUzFB?=
- =?utf-8?B?dkYva3JEZjBrY0xtTCttS2t1TURWVmtXeGswcHlWNnNxNmxaS3llMERtRHBr?=
- =?utf-8?B?MG4yVHExZkl5a0dHamUrZ2NicVN5QXV0N2I1dWFUejBPSzhVZUo5Vy9MZ0cw?=
- =?utf-8?B?ZzFlK3N6Um1OMzFoUENKRTlkeG4wVUtONVQvU0Nrci9zZCtVTGo0Nk8rc0dY?=
- =?utf-8?B?RXNaV3o2c0RybE5UdEtaaHFnYUtMT2xFWE9DYU1wQ2d1MDNoUS90WHdEdk9O?=
- =?utf-8?B?TGJhd1ZpZ2l6UmQvTDRndldkc1NxSkJUMkxRbzdZQnhRRE5EVWRoMjEya2tt?=
- =?utf-8?B?Ni9Xam1RbFdOUEJKbW5wM2xub0JBQWFYOGlZVGY3cm5RamQzcjhkVHYwUG1R?=
- =?utf-8?B?VDJmWG5CL1pqQTlJclRUMlIvL3gxa2FVdXVvWHgzOHlqOGQrVDF1UmhLaFJl?=
- =?utf-8?B?d2MrZER6NjNOR3NsTnZPMXVWd3UrNXNzaG5hUWp6Mzh6dVdwQXlYME9VR1dX?=
- =?utf-8?B?NVlEK01PRStxV28wdms0YnE2TmJ1YWlhckFmOVI4N0pCeGFYRmhUMVZDQ1Vy?=
- =?utf-8?B?UmhiUDdrN2tMSXErUVBiV29Xa2dPNnVhcElBQnp3WmJBZmI5TDBPWGxXTThI?=
- =?utf-8?B?MEViaDJkYm1IblFva2lDUzBlZ05VbWFFZGg2ZkNCRGZjejNjd0NhQUh5cS9r?=
- =?utf-8?B?MFJodzU2YWcycW1QM0RZWU0zemQzVnlBOEdnSHlKUXZ3a3NwT2trWU1PY1RZ?=
- =?utf-8?B?WklIMlRCZWFyM0JIbGtvdVBoaFR0RGdkNWx0OU1HaEVUQ24xMGRCeHppM0VM?=
- =?utf-8?B?ZWpucFBDc0IzOVJ2S29Eam1Ed1BnVHZ0dmJZZk1xQlgxRVJZZDE5VTJRa01U?=
- =?utf-8?B?S1lNQktPNytPVlg2Vy8vZTAvRDNsMXBmai9QY3M5dmw2bEhCSkdKWGMwKzlZ?=
- =?utf-8?B?TU8xMGE4ZWRJR3ZJa0lIRTNiakZHcUt6RG1Hc0g3a01aN2F3bnVLOVJKdjJT?=
- =?utf-8?B?NEljekVWamhJZkU4RHozUnhXQ1ovRW5ZdkY5c0NuRjBEa0tkQkNXZWNHZ2sr?=
- =?utf-8?B?WHhWWjdYNGFrM092eER2RTRNbzVYZkZzVzkzT0pmY1YzeU1rcHRVZHZxcDc1?=
- =?utf-8?B?L3lHVEVTc0VZNjNoS2xZY0Q3MWF0UkovQ1MzN2JldzQvYkRWT2pjaGt6UE1l?=
- =?utf-8?B?azhPN3pwTEFDVGFBZzNhQlZiT2t1aVR3S0F0emV3NUZGTHBLR0FLMmpMVDN1?=
- =?utf-8?B?amR6V0V2bkJDek9YSkdodDJPMUxwa3V4c1JlUU1SV09NcER4Uks3OFBFL045?=
- =?utf-8?B?TmlXVnUyc0g0U0FyWW4zaGlmbzNzVFdUVFoyOFd6dHJKR1ZJR0swWDlTaFpq?=
- =?utf-8?B?RHlsenN0bktsbjdTV2lQQXV4MXJyV3NuWGtjNTFlNkZ1TDI0M0FkL0pkYUk4?=
- =?utf-8?B?cXc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0df41ba4-5e09-4420-0fb7-08dc5af376bd
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2024 13:21:29.9361
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xIxoNasMlu9BfedwxA5TFsi3u1hg6AKRUxCYgopQOpGqgYy87DqsvK4uzxmltK8zZlJ8p9jDZkt5js4Pm+aNlHEJc7n9KPwzENsL51cDkgA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7826
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
+Hello Heiner,
 
+On Fri, 12 Apr 2024 15:07:46 +0200
+Heiner Kallweit <hkallweit1@gmail.com> wrote:
 
-On 09.04.2024 15:39, Andrew Lunn wrote:
->> This is something my current design supports I think. Using
->> ETHTOOL_A_MODULE_MAX_POWER_SET user can get what cage supports
->> and change it.
->  
->> This could be done using ethtool_module_power_mode_policy I think.
+> On 12.04.2024 12:46, Maxime Chevallier wrote:
+> > In situations where phylib is a module, the topology can be NULL as it's
+> > not initialized at netdev creation.
+> >   
 > 
-> All these 'I think' don't give me a warm fuzzy feeling this is a well
-> thought out and designed uAPI.
+> What we see here is a bigger drawback of IS_REACHABLE(). For phylib it's
+> false from net core, but true from r8169 driver. So topo_create is a stub,
+> but topo_add is not. IS_REACHABLE() hides dependencies.
 > 
-> I assume you have ethtool patches for your new netlink attributes. So
-> show us the real usage. Start with an SFP in its default lower power
-> mode. Show us the commands to display the current status. Allocate it
-> more power, tell the module it can use more power, and then show us
-> the status after the change has been made.
+> topo_create et al don't really use something from phylib.
+> Therefore, could/should it be moved to net core?
 
-Ok, but do we really need an API to switch the module between high/low power mode?
-I'd assume this is done automatically e.g. when we lower max power in the cage below
-module's high power mode than it should imply that the module should go to low power mode.
-Same with the high power mode, if enough power is assigned to the cage than module
-should go to the high power mode.
+That's a valid point, and a better solution indeed.
 
-Regarding the current status and what module supports, there is -m option:
-$ ethtool -m ens801f0np0
-        Identifier                                : 0x0d (QSFP+)
-        Extended identifier                       : 0x00
-        Extended identifier description           : 1.5W max. Power consumption
-        Extended identifier description           : No CDR in TX, No CDR in RX
-        Extended identifier description           : High Power Class (> 3.5 W) not enabled
+> At least for topo_create this would resolve the dependency.
+> 
+> We could also add a config symbol and the PHY topology an optional
+> extension of net core.
+
+That could be a thing indeed. It could be selected by phylib then, I
+don't see it being a user-controlled option, as this would make it very
+confusing for users to only be able to see when there are mutiple PHYs
+on the link when the relevant option is enabled (but I might be wrong).
+
+Maxime
 
 > 
-> Then lower the power to that cage and assign the power to a different
-> cage.
+> > Allow passing a NULL topology pointer to phy_link_topo helpers.
+> > 
+> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> > Closes: https://lore.kernel.org/netdev/2e11b89d-100f-49e7-9c9a-834cc0b82f97@gmail.com/
+> > Closes: https://lore.kernel.org/netdev/20240409201553.GA4124869@dev-arch.thelio-3990X/
+> > ---
+> > 
+> > Hi,
+> > 
+> > This patch fixes a commit that is in net-next, hence the net-next tag and the
+> > lack of "Fixes" tag.
+> > 
+> > Nathan, Heiner, can you confirm this solves what you're seeing ?
+> > 
+> > I think we can improve on this solution by moving the topology init at
+> > the first PHY insertion and clearing it at netdev destruction.
+> > 
+> > Maxime
+> > 
+> >  drivers/net/phy/phy_link_topology.c | 10 +++++++++-
+> >  include/linux/phy_link_topology.h   |  7 ++++++-
+> >  2 files changed, 15 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
+> > index 985941c5c558..0f3973f07fac 100644
+> > --- a/drivers/net/phy/phy_link_topology.c
+> > +++ b/drivers/net/phy/phy_link_topology.c
+> > @@ -42,6 +42,9 @@ int phy_link_topo_add_phy(struct phy_link_topology *topo,
+> >  	struct phy_device_node *pdn;
+> >  	int ret;
+> >  
+> > +	if (!topo)
+> > +		return 0;
+> > +
+> >  	pdn = kzalloc(sizeof(*pdn), GFP_KERNEL);
+> >  	if (!pdn)
+> >  		return -ENOMEM;
+> > @@ -93,7 +96,12 @@ EXPORT_SYMBOL_GPL(phy_link_topo_add_phy);
+> >  void phy_link_topo_del_phy(struct phy_link_topology *topo,
+> >  			   struct phy_device *phy)
+> >  {
+> > -	struct phy_device_node *pdn = xa_erase(&topo->phys, phy->phyindex);
+> > +	struct phy_device_node *pdn;
+> > +
+> > +	if (!topo)
+> > +		return;
+> > +
+> > +	pdn = xa_erase(&topo->phys, phy->phyindex);
+> >  
+> >  	/* We delete the PHY from the topology, however we don't re-set the
+> >  	 * phy->phyindex field. If the PHY isn't gone, we can re-assign it the
+> > diff --git a/include/linux/phy_link_topology.h b/include/linux/phy_link_topology.h
+> > index 6b79feb607e7..21ca78127d0f 100644
+> > --- a/include/linux/phy_link_topology.h
+> > +++ b/include/linux/phy_link_topology.h
+> > @@ -40,7 +40,12 @@ struct phy_link_topology {
+> >  static inline struct phy_device *
+> >  phy_link_topo_get_phy(struct phy_link_topology *topo, u32 phyindex)
+> >  {
+> > -	struct phy_device_node *pdn = xa_load(&topo->phys, phyindex);
+> > +	struct phy_device_node *pdn;
+> > +
+> > +	if (!topo)
+> > +		return NULL;
+> > +
+> > +	pdn = xa_load(&topo->phys, phyindex);
+> >  
+> >  	if (pdn)
+> >  		return pdn->phy;  
 > 
-> This is something you can later reuse in the 0/X patch describing the
-> big picture of what the patchset does, and it will guide others who
-> want to implement the same API in the Linux SFP driver, or other MAC
-> drivers.
-> 
-> 	Andrew
+
 
