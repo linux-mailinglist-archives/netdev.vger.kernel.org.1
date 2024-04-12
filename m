@@ -1,63 +1,73 @@
-Return-Path: <netdev+bounces-87518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBF378A3609
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 20:53:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3AB18A3613
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 20:59:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49F3F1F22DF6
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 18:53:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11F011F237C1
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 18:59:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 014DF14F124;
-	Fri, 12 Apr 2024 18:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF1BF14EC60;
+	Fri, 12 Apr 2024 18:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="QZ1Z/NMC"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="en8Rn3yk"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32901373;
-	Fri, 12 Apr 2024 18:53:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A566A23778
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 18:59:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712947996; cv=none; b=HktXYVRnXpmnrOZYC4QJ+FcsDxDPktdVa1dBISwgeCiiuTymYjLB7SyZSBmUAI4/PoIKlfrU89buyj5hYHKtQeK4cH4rZBpFDa9KqPKg2p35LBb2Esa8auhBx2eOOBjYFvaqCHC+1syggx+RjjYP4lF1Ylk6dHXMT1x9HcjV9SE=
+	t=1712948383; cv=none; b=GJw1Wi0lo2nzg0cjrnGWhL2AE4NP9aMaTk44k1B3uzdJTT90y5hEh+k2DGcNANNmcFCIiM3ozjV0wMQ/IxNmMq4g/04Jep7v1YEPTTu1rRd2IZPRvCCQ4/GpyZpbCYto44mBXoYBd4lI8rd9VrOPK9vZ7e5ctjeBlAD/QBZOe8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712947996; c=relaxed/simple;
-	bh=rXg6nyoABh1agJGbUuVsVRFpG6ePTJbGO3v5BBmZy/M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=tieQz00N+DdPN4Aq0hB9BUOjAf5ulGJar/3Xl6NXk+I4UvTDD4GT6bMiRliplwBq11rRjifkcJmX0Kx7y+7kG0y7LnTuf35zyiDBLMZFKX2BoKMlW2vj2EkEDcefqG0VFSfowv7MsWEC+2SK+x37yJrUug60MoYBE1wZ91ykvjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=QZ1Z/NMC; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43CIqftD024370;
-	Fri, 12 Apr 2024 13:52:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1712947961;
-	bh=fkZrxZui6GejcFsraHF/1YZdntXULlwaQ+e3RTMRtys=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=QZ1Z/NMCV3MnNz3ZdzN9dJNs0bHTz06dSpNp1SrXmXNj5tM7f0C79gJGKx/jui2Kv
-	 o82OBfQ6UGuqIOgAL+jm+Lo2vgckSxIwUx0GnGoybvQumQnn/h7Hr9uyy5p2VUvPw8
-	 yEWLiwCiXr5usmrHJQYFKbVw04SUoO0yUUl3Ehis=
-Received: from DLEE111.ent.ti.com (dlee111.ent.ti.com [157.170.170.22])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43CIqfnl046972
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 12 Apr 2024 13:52:41 -0500
-Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE111.ent.ti.com
- (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 12
- Apr 2024 13:52:40 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 12 Apr 2024 13:52:40 -0500
-Received: from [10.249.42.149] ([10.249.42.149])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43CIqdDg041574;
-	Fri, 12 Apr 2024 13:52:39 -0500
-Message-ID: <cb13da4a-13c9-409a-a813-0ac852062163@ti.com>
-Date: Fri, 12 Apr 2024 13:52:39 -0500
+	s=arc-20240116; t=1712948383; c=relaxed/simple;
+	bh=XgMsC4RKRDE6R6g/ghDEHHySIhOTu+QETvWopYW/dBg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZfG9LdTzj7GnIP+63PmGBXl4tA46WV7tY2YITiTdv9jYqB7opSRRHIXLpqAJ9sOmvV/UoODn92ve61IxZsSFduESieKmeZTTh0B4kaU85I1baSfVsa57HATRyDZrtQhy1K/LNCnnfrbwxtaxcrXYubfdG7aneBDQzGpDz+R5voo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=en8Rn3yk; arc=none smtp.client-ip=209.85.161.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5a9ec68784cso670176eaf.2
+        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 11:59:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1712948381; x=1713553181; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=n8ObryqrhtjTQeSVSFRYZKDmL6GQ8TuuFlxTZALzzzU=;
+        b=en8Rn3ykAd2qRWTk65vF8d7nGY/aWajWG/SrIAHkkgIzrQ15Ay0iF9v+z4yNozkUXQ
+         MXnbEbo8cEX8xX9Gawwxdn3W34L8R6k8xIcGDnN07UBQ6BG/bqNo6ZbPvkXiyiA0lU3t
+         x/clWkkKxpWLC9FDW2IA6YKIZ/BHqYZPaexGVckbrn8luzkaHlu73DsTaiNfpkRjczUy
+         PwK1WZ13875XxIs8y/UgsgIeHCLGQqS0R5zjyYY1gGTxHd05Bv4FJMkRKzzwwfdgMs60
+         8tozE2PASOmwSaJzhezRlyGcNuOTOf9GCJjxzLuvo+knvX1kt5NymYMEmFjc2WMRJgpb
+         qLpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712948381; x=1713553181;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n8ObryqrhtjTQeSVSFRYZKDmL6GQ8TuuFlxTZALzzzU=;
+        b=pHf5Vud9LDSiulKH6I3AMaha4L+WbaKtCI67rtqIA29MME8bzJDhDohMpCsonKzv4Q
+         +54BplApvQ0RWVE60K7QNOi1AYhlBhvyttzsVKY6YXbmTV3P9xbeaApe+9w7r8rINLal
+         JbXjFpX/loUQe9MBgLZc5dhAApSqJapTUQ0+dTcNNpOS50/3MB0Qvfcb4EWDbMhIWfp2
+         sH69vIFXVhefGqpak6zqnIrwgWRzrkUhAtTeuIvyVr6ochBs2ISwjL2saE0xuWax+9jO
+         UpHK7CVtt0QRNdvsvIAQgu4oYOeYRH2KTokl6GMbh8gj+oQpRieTUlUv09ieGO1ZExTJ
+         gFng==
+X-Gm-Message-State: AOJu0YwcloO27Rs/KPBqwSwoF5JVQE6lgvCiFvxNdWjayK7Y+aphjMdL
+	FpHL3Uo6KyRlST1JoqHNS/Dsw7SupcT6rpvl6B5CryoZuZUPq0jpaahG1zRikgA=
+X-Google-Smtp-Source: AGHT+IGYBy+1bCocRcBusy9YSugPUHYa2Ne/gpb3LH1Wuz/de+Ht8PIjdJAWBJ7/Rt1QDDSYwHvlJQ==
+X-Received: by 2002:a05:6820:98a:b0:5aa:596c:52d0 with SMTP id cg10-20020a056820098a00b005aa596c52d0mr3733922oob.6.1712948380610;
+        Fri, 12 Apr 2024 11:59:40 -0700 (PDT)
+Received: from [10.73.215.90] ([208.184.112.130])
+        by smtp.gmail.com with ESMTPSA id bq6-20020a0568201a0600b005a22f8ae2dfsm875735oob.34.2024.04.12.11.59.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Apr 2024 11:59:40 -0700 (PDT)
+Message-ID: <13cdc078-770f-4083-826f-89d13b13140d@bytedance.com>
+Date: Fri, 12 Apr 2024 11:58:23 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,623 +75,233 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add support for
- ICSSG switch firmware
-To: MD Danish Anwar <danishanwar@ti.com>, Diogo Ivo <diogo.ivo@siemens.com>,
-        Rob Herring <robh@kernel.org>,
-        Dan Carpenter <dan.carpenter@linaro.org>,
-        Jan
- Kiszka <jan.kiszka@siemens.com>, Simon Horman <horms@kernel.org>,
-        Andrew Lunn
-	<andrew@lunn.ch>,
-        Wolfram Sang <wsa+renesas@sang-engineering.com>,
-        Arnd
- Bergmann <arnd@arndb.de>, Vignesh Raghavendra <vigneshr@ti.com>,
-        Vladimir
- Oltean <vladimir.oltean@nxp.com>,
-        Roger Quadros <rogerq@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
-	<edumazet@google.com>,
-        "David S. Miller" <davem@davemloft.net>
-CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
-References: <20240327114054.1907278-1-danishanwar@ti.com>
- <20240327114054.1907278-4-danishanwar@ti.com>
+Subject: Re: [External] Re: [PATCH net-next 2/3] selftests: fix OOM problem in
+ msg_zerocopy selftest
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ cong.wang@bytedance.com, xiaochun.lu@bytedance.com
+References: <20240409205300.1346681-1-zijianzhang@bytedance.com>
+ <20240409205300.1346681-3-zijianzhang@bytedance.com>
+ <6615b264894a0_24a51429432@willemb.c.googlers.com.notmuch>
+ <CANn89iLTiq-29ceiQHc2Mi4na+kRb9K-MA1hGMn=G0ek6-mfjQ@mail.gmail.com>
+ <0c6fc173-45c4-463f-bc0e-9fed8c3efc02@bytedance.com>
+ <66171b8b595b_2d123b29472@willemb.c.googlers.com.notmuch>
+ <0ac5752d-0b36-436a-9c37-13e262334dce@bytedance.com>
+ <661954fce5f33_38e2532949f@willemb.c.googlers.com.notmuch>
 Content-Language: en-US
-From: Andrew Davis <afd@ti.com>
-In-Reply-To: <20240327114054.1907278-4-danishanwar@ti.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From: Zijian Zhang <zijianzhang@bytedance.com>
+In-Reply-To: <661954fce5f33_38e2532949f@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On 3/27/24 6:40 AM, MD Danish Anwar wrote:
-> Add support for ICSSG switch firmware using existing Dual EMAC driver
-> with switchdev.
+On 4/12/24 8:36 AM, Willem de Bruijn wrote:
+> Zijian Zhang wrote:
+>> On 4/10/24 4:06 PM, Willem de Bruijn wrote:
+>>>>>>> In this case, for some reason, notifications do not
+>>>>>>> come in order now. We introduce "cfg_notification_order_check" to
+>>>>>>> possibly ignore the checking for order.
+>>>>>>
+>>>>>> Were you testing UDP?
+>>>>>>
+>>>>>> I don't think this is needed. I wonder what you were doing to see
+>>>>>> enough of these events to want to suppress the log output.
+>>>>
+>>>> I tested again on both TCP and UDP just now, and it happened to both of
+>>>> them. For tcp test, too many printfs will delay the sending and thus
+>>>> affect the throughput.
+>>>>
+>>>> ipv4 tcp -z -t 1
+>>>> gap: 277..277 does not append to 276
+>>>
+>>> There is something wrong here. 277 clearly appends to 276
+>>>
+>>
+>> ```
+>> if (lo != next_completion)
+>>       fprintf(stderr, "gap: %u..%u does not append to %u\n",
+>>           lo, hi, next_completion);
+>> ```
+>>
+>> According to the code, it expects the lo to be 276, but it's 277.
 > 
-> Limitations:
-> VLAN offloading is limited to 0-256 IDs.
-> MDB/FDB static entries are limited to 511 entries and different FDBs can
-> hash to same bucket and thus may not completely offloaded
+> Ack. I should have phrased that message better.
+>   
+>>> If you ran this on a kernel with a variety of changes, please repeat
+>>> this on a clean kernel with no other changes besides the
+>>> skb_orphan_frags_rx loopback change.
+>>>
+>>> It this is a real issue, I don't mind moving this behind cfg_verbose.
+>>> And prefer that approach over adding a new flag.
+>>>
+>>> But I have never seen this before, and this kind of reordering is rare
+>>> with UDP and should not happen with TCP except for really edge cases:
+>>> the uarg is released only when both the skb was delivered and the ACK
+>>> response was received to free the clone on the retransmit queue.
+>>
+>> I found the set up where I encountered the OOM problem in msg_zerocopy
+>> selftest. I did it on a clean kernel vm booted by qemu,
+>> dfa2f0483360("tcp: get rid of sysctl_tcp_adv_win_scale") with only
+>> skb_orphan_frags_rx change.
+>>
+>> Then, I do `make olddefconfig` and turn on some configurations for
+>> virtualization like VIRTIO_FS, VIRTIO_NET and some confs like 9P_FS
+>> to share folders. Let's call it config, here was the result I got,
+>> ```
+>> ./msg_zerocopy.sh
+>> ipv4 tcp -z -t 1
+>> ./msg_zerocopy: send: No buffer space available
+>> rx=564 (70 MB)
+>> ```
+>>
+>> Since the TCP socket is always writable, the do_poll always return True.
+>> There is no any chance for `do_recv_completions` to run.
+>> ```
+>> while (!do_poll(fd, POLLOUT)) {
+>>       if (cfg_zerocopy)
+>>           do_recv_completions(fd, domain);
+>>       }
+>> ```
+>> Finally, the size of sendmsg zerocopy notification skbs exceeds the
+>> opt_mem limit. I got "No buffer space available".
+>>
+>>
+>> However, if I change the config by
+>> ```
+>>    DEBUG_IRQFLAGS n -> y
+>>    DEBUG_LOCK_ALLOC n -> y
+>>    DEBUG_MUTEXES n -> y
+>>    DEBUG_RT_MUTEXES n -> y
+>>    DEBUG_RWSEMS n -> y
+>>    DEBUG_SPINLOCK n -> y
+>>    DEBUG_WW_MUTEX_SLOWPATH n -> y
+>>    PROVE_LOCKING n -> y
+>> +DEBUG_LOCKDEP y
+>> +LOCKDEP y
+>> +LOCKDEP_BITS 15
+>> +LOCKDEP_CHAINS_BITS 16
+>> +LOCKDEP_CIRCULAR_QUEUE_BITS 12
+>> +LOCKDEP_STACK_TRACE_BITS 19
+>> +LOCKDEP_STACK_TRACE_HASH_BITS 14
+>> +PREEMPTIRQ_TRACEPOINTS y
+>> +PROVE_RAW_LOCK_NESTING n
+>> +PROVE_RCU y
+>> +TRACE_IRQFLAGS y
+>> +TRACE_IRQFLAGS_NMI y
+>> ```
+>>
+>> Let's call it config-debug, the selftest works well with reordered
+>> notifications.
+>> ```
+>> ipv4 tcp -z -t 1
+>> gap: 2117..2117 does not append to 2115
+>> gap: 2115..2116 does not append to 2118
+>> gap: 2118..3144 does not append to 2117
+>> gap: 3146..3146 does not append to 3145
+>> gap: 3145..3145 does not append to 3147
+>> gap: 3147..3768 does not append to 3146
+>> ...
+>> gap: 34935..34935 does not append to 34937
+>> gap: 34938..36409 does not append to 34936
+>>
+>> rx=36097 (2272 MB)
+>> missing notifications: 36410 < 36412
+>> tx=36412 (2272 MB) txc=36410 zc=y
+>> ```
+>> For exact config to compile the kernel, please see
+>> https://github.com/Sm0ckingBird/config
 > 
-> Switch mode requires loading of new firmware into ICSSG cores. This
-> means interfaces have to taken down and then reconfigured to switch
-> mode.
-> 
-> Example assuming ETH1 and ETH2 as ICSSG2 interfaces:
-> 
-> Switch to ICSSG Switch mode:
->   ip link set dev eth1 down
->   ip link set dev eth2 down
->   ip link add name br0 type bridge
->   ip link set dev eth1 master br0
->   ip link set dev eth2 master br0
->   ip link set dev br0 up
->   ip link set dev eth1 up
->   ip link set dev eth2 up
->   bridge vlan add dev br0 vid 1 pvid untagged self
-> 
-> Going back to Dual EMAC mode:
-> 
->   ip link set dev br0 down
->   ip link set dev eth1 nomaster
->   ip link set dev eth2 nomaster
->   ip link set dev eth1 down
->   ip link set dev eth2 down
->   ip link del name br0 type bridge
->   ip link set dev eth1 up
->   ip link set dev eth2 up
-> 
-> By default, Dual EMAC firmware is loaded, and can be changed to switch
-> mode by above steps
+> Thanks for sharing the system configs. I'm quite surprised at these
+> reorderings *over loopback* with these debug settings, and no weird
+> qdiscs that would explain it. Can you see whether you see drops and
+> retransmits?
 > 
 
-This was asked before, maybe I missed the answer, but why do we
-default to Dual-EMAC firmware? I remember when I was working on
-the original ICSS-ETH driver, we started with the Dual-EMAC
-firmware as the switch firmware was not ready yet (and EMAC mode
-was easier). Now that we have both available, if we just use Switch
-firmwar by default, what would we lose? Seems that would solve
-the issues with re-loading firmware at runtime (configuration loss
-and dropping packets, etc..).
+No drops and retransmits are observed.
 
-Andrew
+```
+ip netns exec ns-djROUw1 netstat -s
 
-> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
-> ---
->   drivers/net/ethernet/ti/Kconfig              |   1 +
->   drivers/net/ethernet/ti/Makefile             |   3 +-
->   drivers/net/ethernet/ti/icssg/icssg_config.c | 136 +++++++++++--
->   drivers/net/ethernet/ti/icssg/icssg_config.h |   7 +
->   drivers/net/ethernet/ti/icssg/icssg_prueth.c | 198 ++++++++++++++++++-
->   5 files changed, 332 insertions(+), 13 deletions(-)
+Tcp:
+     1 active connection openings
+     0 passive connection openings
+     0 failed connection attempts
+     1 connection resets received
+     0 connections established
+     16158 segments received
+     32311 segments sent out
+     0 segments retransmitted
+     0 bad segments received
+     0 resets sent
+
+ip netns exec ns-djROUw1 ip -s link show veth0
+
+2: veth0@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 65535 qdisc noqueue 
+state UP mode DEFAULT group default qlen 1000
+     link/ether 02:02:02:02:02:02 brd ff:ff:ff:ff:ff:ff link-netns 
+ns-djROUw2
+     RX: bytes  packets  errors  dropped overrun mcast
+     1067646    16173    0       0       0       0
+     TX: bytes  packets  errors  dropped carrier collsns
+     2116207634 32325    0       0       0       0
+```
+
+>>
+>> I also did selftest on 63c8778d9149("Merge branch
+>> 'net-mana-fix-doorbell-access-for-receive-queues'"), the parent of
+>> dfa2f0483360("tcp: get rid of sysctl_tcp_adv_win_scale")
+>>
+>> with config, selftest works well.
+>> ```
+>> ipv4 tcp -z -t 1
+>> missing notifications: 223181 < 223188
+>> tx=223188 (13927 MB) txc=223181 zc=y
+>> rx=111592 (13927 MB)
+>> ```
+>>
+>> with config-debug, selftest works well with reordered notifications
+>> ```
+>> ipv4 tcp -z -t 1
+>> ...
+>> gap: 30397..30404 does not append to 30389
+>> gap: 30435..30442 does not append to 30427
+>> gap: 30427..30434 does not append to 30443
+>> gap: 30443..30450 does not append to 30435
+>> gap: 30473..30480 does not append to 30465
+>> gap: 30465..30472 does not append to 30481
+>> gap: 30481..30488 does not append to 30473
+>> tx=30491 (1902 MB) txc=30491 zc=y
+>> rx=15245 (1902 MB)
+>> ```
+>>
+>> Not sure about the exact reason for this OOM problem, and why
+>> turning on DEBUG_LOCKDEP and PROVE_RAW_LOCK_NESTING can solve
+>> the problem with reordered notifications...
 > 
-> diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
-> index 1530d13984d4..9b5f5f680b35 100644
-> --- a/drivers/net/ethernet/ti/Kconfig
-> +++ b/drivers/net/ethernet/ti/Kconfig
-> @@ -188,6 +188,7 @@ config TI_ICSSG_PRUETH
->   	select TI_ICSS_IEP
->   	select TI_K3_CPPI_DESC_POOL
->   	depends on PRU_REMOTEPROC
-> +	depends on NET_SWITCHDEV
->   	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
->   	depends on PTP_1588_CLOCK_OPTIONAL
->   	help
-> diff --git a/drivers/net/ethernet/ti/Makefile b/drivers/net/ethernet/ti/Makefile
-> index d8590304f3df..d295bded7a32 100644
-> --- a/drivers/net/ethernet/ti/Makefile
-> +++ b/drivers/net/ethernet/ti/Makefile
-> @@ -38,5 +38,6 @@ icssg-prueth-y := icssg/icssg_prueth.o \
->   		  icssg/icssg_config.o \
->   		  icssg/icssg_mii_cfg.o \
->   		  icssg/icssg_stats.o \
-> -		  icssg/icssg_ethtool.o
-> +		  icssg/icssg_ethtool.o \
-> +		  icssg/icssg_switchdev.o
->   obj-$(CONFIG_TI_ICSS_IEP) += icssg/icss_iep.o
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
-> index 970e6ef9ba64..5b2064d1b03b 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
-> @@ -105,28 +105,49 @@ static const struct map hwq_map[2][ICSSG_NUM_OTHER_QUEUES] = {
->   	},
->   };
->   
-> +static void icssg_config_mii_init_switch(struct prueth_emac *emac)
-> +{
-> +	struct prueth *prueth = emac->prueth;
-> +	int mii = prueth_emac_slice(emac);
-> +	u32 txcfg_reg, pcnt_reg, txcfg;
-> +	struct regmap *mii_rt;
-> +
-> +	mii_rt = prueth->mii_rt;
-> +
-> +	txcfg_reg = (mii == ICSS_MII0) ? PRUSS_MII_RT_TXCFG0 :
-> +				       PRUSS_MII_RT_TXCFG1;
-> +	pcnt_reg = (mii == ICSS_MII0) ? PRUSS_MII_RT_RX_PCNT0 :
-> +				       PRUSS_MII_RT_RX_PCNT1;
-> +
-> +	txcfg = PRUSS_MII_RT_TXCFG_TX_ENABLE |
-> +		PRUSS_MII_RT_TXCFG_TX_AUTO_PREAMBLE |
-> +		PRUSS_MII_RT_TXCFG_TX_IPG_WIRE_CLK_EN;
-> +
-> +	if (emac->phy_if == PHY_INTERFACE_MODE_MII && mii == ICSS_MII1)
-> +		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
-> +	else if (emac->phy_if != PHY_INTERFACE_MODE_MII && mii == ICSS_MII0)
-> +		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
-> +
-> +	regmap_write(mii_rt, txcfg_reg, txcfg);
-> +	regmap_write(mii_rt, pcnt_reg, 0x1);
-> +}
-> +
->   static void icssg_config_mii_init(struct prueth_emac *emac)
->   {
-> -	u32 rxcfg, txcfg, rxcfg_reg, txcfg_reg, pcnt_reg;
->   	struct prueth *prueth = emac->prueth;
->   	int slice = prueth_emac_slice(emac);
-> +	u32 txcfg, txcfg_reg, pcnt_reg;
->   	struct regmap *mii_rt;
->   
->   	mii_rt = prueth->mii_rt;
->   
-> -	rxcfg_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_RXCFG0 :
-> -				       PRUSS_MII_RT_RXCFG1;
->   	txcfg_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_TXCFG0 :
->   				       PRUSS_MII_RT_TXCFG1;
->   	pcnt_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_RX_PCNT0 :
->   				       PRUSS_MII_RT_RX_PCNT1;
->   
-> -	rxcfg = MII_RXCFG_DEFAULT;
->   	txcfg = MII_TXCFG_DEFAULT;
->   
-> -	if (slice == ICSS_MII1)
-> -		rxcfg |= PRUSS_MII_RT_RXCFG_RX_MUX_SEL;
-> -
->   	/* In MII mode TX lines swapped inside ICSSG, so TX_MUX_SEL cfg need
->   	 * to be swapped also comparing to RGMII mode.
->   	 */
-> @@ -135,7 +156,6 @@ static void icssg_config_mii_init(struct prueth_emac *emac)
->   	else if (emac->phy_if != PHY_INTERFACE_MODE_MII && slice == ICSS_MII1)
->   		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
->   
-> -	regmap_write(mii_rt, rxcfg_reg, rxcfg);
->   	regmap_write(mii_rt, txcfg_reg, txcfg);
->   	regmap_write(mii_rt, pcnt_reg, 0x1);
->   }
-> @@ -249,6 +269,66 @@ static int emac_r30_is_done(struct prueth_emac *emac)
->   	return 1;
->   }
->   
-> +static int prueth_switch_buffer_setup(struct prueth_emac *emac)
-> +{
-> +	struct icssg_buffer_pool_cfg __iomem *bpool_cfg;
-> +	struct icssg_rxq_ctx __iomem *rxq_ctx;
-> +	struct prueth *prueth = emac->prueth;
-> +	int slice = prueth_emac_slice(emac);
-> +	u32 addr;
-> +	int i;
-> +
-> +	addr = lower_32_bits(prueth->msmcram.pa);
-> +	if (slice)
-> +		addr += PRUETH_NUM_BUF_POOLS * PRUETH_EMAC_BUF_POOL_SIZE;
-> +
-> +	if (addr % SZ_64K) {
-> +		dev_warn(prueth->dev, "buffer pool needs to be 64KB aligned\n");
-> +		return -EINVAL;
-> +	}
-> +
-> +	bpool_cfg = emac->dram.va + BUFFER_POOL_0_ADDR_OFFSET;
-> +	/* workaround for f/w bug. bpool 0 needs to be initilalized */
-> +	for (i = 0; i <  PRUETH_NUM_BUF_POOLS; i++) {
-> +		writel(addr, &bpool_cfg[i].addr);
-> +		writel(PRUETH_EMAC_BUF_POOL_SIZE, &bpool_cfg[i].len);
-> +		addr += PRUETH_EMAC_BUF_POOL_SIZE;
-> +	}
-> +
-> +	if (!slice)
-> +		addr += PRUETH_NUM_BUF_POOLS * PRUETH_EMAC_BUF_POOL_SIZE;
-> +	else
-> +		addr += PRUETH_SW_NUM_BUF_POOLS_HOST * PRUETH_SW_BUF_POOL_SIZE_HOST;
-> +
-> +	for (i = PRUETH_NUM_BUF_POOLS;
-> +	     i < 2 * PRUETH_SW_NUM_BUF_POOLS_HOST + PRUETH_NUM_BUF_POOLS;
-> +	     i++) {
-> +		/* The driver only uses first 4 queues per PRU so only initialize them */
-> +		if (i % PRUETH_SW_NUM_BUF_POOLS_HOST < PRUETH_SW_NUM_BUF_POOLS_PER_PRU) {
-> +			writel(addr, &bpool_cfg[i].addr);
-> +			writel(PRUETH_SW_BUF_POOL_SIZE_HOST, &bpool_cfg[i].len);
-> +			addr += PRUETH_SW_BUF_POOL_SIZE_HOST;
-> +		} else {
-> +			writel(0, &bpool_cfg[i].addr);
-> +			writel(0, &bpool_cfg[i].len);
-> +		}
-> +	}
-> +
-> +	if (!slice)
-> +		addr += PRUETH_SW_NUM_BUF_POOLS_HOST * PRUETH_SW_BUF_POOL_SIZE_HOST;
-> +	else
-> +		addr += PRUETH_EMAC_RX_CTX_BUF_SIZE;
-> +
-> +	rxq_ctx = emac->dram.va + HOST_RX_Q_PRE_CONTEXT_OFFSET;
-> +	for (i = 0; i < 3; i++)
-> +		writel(addr, &rxq_ctx->start[i]);
-> +
-> +	addr += PRUETH_EMAC_RX_CTX_BUF_SIZE;
-> +	writel(addr - SZ_2K, &rxq_ctx->end);
-> +
-> +	return 0;
-> +}
-> +
->   static int prueth_emac_buffer_setup(struct prueth_emac *emac)
->   {
->   	struct icssg_buffer_pool_cfg __iomem *bpool_cfg;
-> @@ -325,13 +405,41 @@ static void icssg_init_emac_mode(struct prueth *prueth)
->   	icssg_class_set_host_mac_addr(prueth->miig_rt, mac);
->   }
->   
-> +static void icssg_init_switch_mode(struct prueth *prueth)
-> +{
-> +	u32 addr = prueth->shram.pa + EMAC_ICSSG_SWITCH_DEFAULT_VLAN_TABLE_OFFSET;
-> +	int i;
-> +
-> +	if (prueth->emacs_initialized)
-> +		return;
-> +
-> +	/* Set VLAN TABLE address base */
-> +	regmap_update_bits(prueth->miig_rt, FDB_GEN_CFG1, SMEM_VLAN_OFFSET_MASK,
-> +			   addr <<  SMEM_VLAN_OFFSET);
-> +	/* Set enable VLAN aware mode, and FDBs for all PRUs */
-> +	regmap_write(prueth->miig_rt, FDB_GEN_CFG2, FDB_EN_ALL);
-> +	prueth->vlan_tbl = (struct prueth_vlan_tbl __force *)(prueth->shram.va +
-> +			    EMAC_ICSSG_SWITCH_DEFAULT_VLAN_TABLE_OFFSET);
-> +	for (i = 0; i < SZ_4K - 1; i++) {
-> +		prueth->vlan_tbl[i].fid = i;
-> +		prueth->vlan_tbl[i].fid_c1 = 0;
-> +	}
-> +
-> +	if (prueth->hw_bridge_dev)
-> +		icssg_class_set_host_mac_addr(prueth->miig_rt, prueth->hw_bridge_dev->dev_addr);
-> +	icssg_set_pvid(prueth, prueth->default_vlan, PRUETH_PORT_HOST);
-> +}
-> +
->   int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
->   {
->   	void __iomem *config = emac->dram.va + ICSSG_CONFIG_OFFSET;
->   	struct icssg_flow_cfg __iomem *flow_cfg;
->   	int ret;
->   
-> -	icssg_init_emac_mode(prueth);
-> +	if (prueth->is_switch_mode)
-> +		icssg_init_switch_mode(prueth);
-> +	else
-> +		icssg_init_emac_mode(prueth);
->   
->   	memset_io(config, 0, TAS_GATE_MASK_LIST0);
->   	icssg_miig_queues_init(prueth, slice);
-> @@ -345,7 +453,10 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
->   	regmap_update_bits(prueth->miig_rt, ICSSG_CFG_OFFSET,
->   			   ICSSG_CFG_DEFAULT, ICSSG_CFG_DEFAULT);
->   	icssg_miig_set_interface_mode(prueth->miig_rt, slice, emac->phy_if);
-> -	icssg_config_mii_init(emac);
-> +	if (prueth->is_switch_mode)
-> +		icssg_config_mii_init_switch(emac);
-> +	else
-> +		icssg_config_mii_init(emac);
->   	icssg_config_ipg(emac);
->   	icssg_update_rgmii_cfg(prueth->miig_rt, emac);
->   
-> @@ -368,7 +479,10 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
->   	writeb(0, config + SPL_PKT_DEFAULT_PRIORITY);
->   	writeb(0, config + QUEUE_NUM_UNTAGGED);
->   
-> -	ret = prueth_emac_buffer_setup(emac);
-> +	if (prueth->is_switch_mode)
-> +		ret = prueth_switch_buffer_setup(emac);
-> +	else
-> +		ret = prueth_emac_buffer_setup(emac);
->   	if (ret)
->   		return ret;
->   
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.h b/drivers/net/ethernet/ti/icssg/icssg_config.h
-> index 0d5d5d253b7a..cc923f1d4387 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_config.h
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.h
-> @@ -35,6 +35,13 @@ struct icssg_flow_cfg {
->   	(2 * (PRUETH_EMAC_BUF_POOL_SIZE * PRUETH_NUM_BUF_POOLS + \
->   	 PRUETH_EMAC_RX_CTX_BUF_SIZE * 2))
->   
-> +#define PRUETH_SW_BUF_POOL_SIZE_HOST	SZ_4K
-> +#define PRUETH_SW_NUM_BUF_POOLS_HOST	8
-> +#define PRUETH_SW_NUM_BUF_POOLS_PER_PRU 4
-> +#define MSMC_RAM_SIZE_SWITCH_MODE \
-> +	(MSMC_RAM_SIZE + \
-> +	(2 * PRUETH_SW_BUF_POOL_SIZE_HOST * PRUETH_SW_NUM_BUF_POOLS_HOST))
-> +
->   #define PRUETH_SWITCH_FDB_MASK ((SIZE_OF_FDB / NUMBER_OF_FDB_BUCKET_ENTRIES) - 1)
->   
->   struct icssg_rxq_ctx {
-> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> index 9168ab3c4b9e..725b5de05e00 100644
-> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-> @@ -27,6 +27,7 @@
->   #include <linux/remoteproc/pruss.h>
->   #include <linux/regmap.h>
->   #include <linux/remoteproc.h>
-> +#include <net/switchdev.h>
->   
->   #include "icssg_prueth.h"
->   #include "icssg_mii_rt.h"
-> @@ -54,6 +55,10 @@
->   
->   #define prueth_napi_to_emac(napi) container_of(napi, struct prueth_emac, napi_rx)
->   
-> +#define DEFAULT_VID		1
-> +#define DEFAULT_PORT_MASK	1
-> +#define DEFAULT_UNTAG_MASK	1
-> +
->   /* CTRLMMR_ICSSG_RGMII_CTRL register bits */
->   #define ICSSG_CTRL_RGMII_ID_MODE                BIT(24)
->   
-> @@ -558,6 +563,8 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
->   	} else {
->   		/* send the filled skb up the n/w stack */
->   		skb_put(skb, pkt_len);
-> +		if (emac->prueth->is_switch_mode)
-> +			skb->offload_fwd_mark = emac->offload_fwd_mark;
->   		skb->protocol = eth_type_trans(skb, ndev);
->   		napi_gro_receive(&emac->napi_rx, skb);
->   		ndev->stats.rx_bytes += pkt_len;
-> @@ -890,6 +897,19 @@ struct icssg_firmwares {
->   	char *txpru;
->   };
->   
-> +static struct icssg_firmwares icssg_switch_firmwares[] = {
-> +	{
-> +		.pru = "ti-pruss/am65x-sr2-pru0-prusw-fw.elf",
-> +		.rtu = "ti-pruss/am65x-sr2-rtu0-prusw-fw.elf",
-> +		.txpru = "ti-pruss/am65x-sr2-txpru0-prusw-fw.elf",
-> +	},
-> +	{
-> +		.pru = "ti-pruss/am65x-sr2-pru1-prusw-fw.elf",
-> +		.rtu = "ti-pruss/am65x-sr2-rtu1-prusw-fw.elf",
-> +		.txpru = "ti-pruss/am65x-sr2-txpru1-prusw-fw.elf",
-> +	}
-> +};
-> +
->   static struct icssg_firmwares icssg_emac_firmwares[] = {
->   	{
->   		.pru = "ti-pruss/am65x-sr2-pru0-prueth-fw.elf",
-> @@ -909,7 +929,10 @@ static int prueth_emac_start(struct prueth *prueth, struct prueth_emac *emac)
->   	struct device *dev = prueth->dev;
->   	int slice, ret;
->   
-> -	firmwares = icssg_emac_firmwares;
-> +	if (prueth->is_switch_mode)
-> +		firmwares = icssg_switch_firmwares;
-> +	else
-> +		firmwares = icssg_emac_firmwares;
->   
->   	slice = prueth_emac_slice(emac);
->   	if (slice < 0) {
-> @@ -1411,6 +1434,21 @@ static int emac_ndo_open(struct net_device *ndev)
->   
->   	queue_work(system_long_wq, &emac->stats_work.work);
->   
-> +	if (prueth->is_switch_mode) {
-> +		icssg_fdb_add_del(emac, eth_stp_addr, prueth->default_vlan,
-> +				  ICSSG_FDB_ENTRY_P0_MEMBERSHIP |
-> +				  ICSSG_FDB_ENTRY_P1_MEMBERSHIP |
-> +				  ICSSG_FDB_ENTRY_P2_MEMBERSHIP |
-> +				  ICSSG_FDB_ENTRY_BLOCK,
-> +				  true);
-> +		icssg_vtbl_modify(emac, emac->port_vlan | DEFAULT_VID,
-> +				  BIT(emac->port_id) | DEFAULT_PORT_MASK,
-> +				  BIT(emac->port_id) | DEFAULT_UNTAG_MASK,
-> +				  true);
-> +		icssg_set_pvid(emac->prueth, emac->port_vlan, emac->port_id);
-> +		emac_set_port_state(emac, ICSSG_EMAC_PORT_VLAN_AWARE_ENABLE);
-> +	}
-> +
->   	return 0;
->   
->   reset_tx_chan:
-> @@ -1945,6 +1983,148 @@ static void prueth_put_cores(struct prueth *prueth, int slice)
->   		pru_rproc_put(prueth->pru[slice]);
->   }
->   
-> +static void prueth_offload_fwd_mark_update(struct prueth *prueth)
-> +{
-> +	int set_val = 0;
-> +	int i;
-> +
-> +	if (prueth->br_members == (PRUETH_PORT_MII0 | PRUETH_PORT_MII1))
-> +		set_val = 1;
-> +
-> +	dev_dbg(prueth->dev, "set offload_fwd_mark %d\n", set_val);
-> +
-> +	for (i = PRUETH_MAC0; i < PRUETH_NUM_MACS; i++) {
-> +		struct prueth_emac *emac = prueth->emac[i];
-> +
-> +		if (!emac || !emac->ndev)
-> +			continue;
-> +
-> +		emac->offload_fwd_mark = set_val;
-> +	}
-> +}
-> +
-> +bool prueth_dev_check(const struct net_device *ndev)
-> +{
-> +	if (ndev->netdev_ops == &emac_netdev_ops && netif_running(ndev)) {
-> +		struct prueth_emac *emac = netdev_priv(ndev);
-> +
-> +		return emac->prueth->is_switch_mode;
-> +	}
-> +
-> +	return false;
-> +}
-> +
-> +static int prueth_netdevice_port_link(struct net_device *ndev,
-> +				      struct net_device *br_ndev,
-> +				      struct netlink_ext_ack *extack)
-> +{
-> +	struct prueth_emac *emac = netdev_priv(ndev);
-> +	struct prueth *prueth = emac->prueth;
-> +	int err;
-> +
-> +	if (!prueth->br_members) {
-> +		prueth->hw_bridge_dev = br_ndev;
-> +	} else {
-> +		/* This is adding the port to a second bridge, this is
-> +		 * unsupported
-> +		 */
-> +		if (prueth->hw_bridge_dev != br_ndev)
-> +			return -EOPNOTSUPP;
-> +	}
-> +
-> +	err = switchdev_bridge_port_offload(br_ndev, ndev, emac,
-> +					    &prueth->prueth_switchdev_nb,
-> +					    &prueth->prueth_switchdev_bl_nb,
-> +					    false, extack);
-> +	if (err)
-> +		return err;
-> +
-> +	prueth->br_members |= BIT(emac->port_id);
-> +
-> +	if (prueth->br_members & BIT(PRUETH_PORT_MII0) &&
-> +	    prueth->br_members & BIT(PRUETH_PORT_MII1)) {
-> +		prueth->is_switch_mode = true;
-> +		prueth->default_vlan = 1;
-> +		emac->port_vlan = prueth->default_vlan;
-> +	}
-> +
-> +	prueth_offload_fwd_mark_update(prueth);
-> +
-> +	return NOTIFY_DONE;
-> +}
-> +
-> +static void prueth_netdevice_port_unlink(struct net_device *ndev)
-> +{
-> +	struct prueth_emac *emac = netdev_priv(ndev);
-> +	struct prueth *prueth = emac->prueth;
-> +
-> +	prueth->br_members &= ~BIT(emac->port_id);
-> +
-> +	prueth->is_switch_mode = false;
-> +	emac->port_vlan = 0;
-> +
-> +	prueth_offload_fwd_mark_update(prueth);
-> +
-> +	if (!prueth->br_members)
-> +		prueth->hw_bridge_dev = NULL;
-> +}
-> +
-> +/* netdev notifier */
-> +static int prueth_netdevice_event(struct notifier_block *unused,
-> +				  unsigned long event, void *ptr)
-> +{
-> +	struct netlink_ext_ack *extack = netdev_notifier_info_to_extack(ptr);
-> +	struct net_device *ndev = netdev_notifier_info_to_dev(ptr);
-> +	struct netdev_notifier_changeupper_info *info;
-> +	int ret = NOTIFY_DONE;
-> +
-> +	if (ndev->netdev_ops != &emac_netdev_ops)
-> +		return NOTIFY_DONE;
-> +
-> +	switch (event) {
-> +	case NETDEV_CHANGEUPPER:
-> +		info = ptr;
-> +
-> +		if (netif_is_bridge_master(info->upper_dev)) {
-> +			if (info->linking)
-> +				ret = prueth_netdevice_port_link(ndev, info->upper_dev, extack);
-> +			else
-> +				prueth_netdevice_port_unlink(ndev);
-> +		}
-> +		break;
-> +	default:
-> +		return NOTIFY_DONE;
-> +	}
-> +
-> +	return notifier_from_errno(ret);
-> +}
-> +
-> +static int prueth_register_notifiers(struct prueth *prueth)
-> +{
-> +	int ret = 0;
-> +
-> +	prueth->prueth_netdevice_nb.notifier_call = &prueth_netdevice_event;
-> +	ret = register_netdevice_notifier(&prueth->prueth_netdevice_nb);
-> +	if (ret) {
-> +		dev_err(prueth->dev, "can't register netdevice notifier\n");
-> +		return ret;
-> +	}
-> +
-> +	ret = prueth_switchdev_register_notifiers(prueth);
-> +	if (ret)
-> +		unregister_netdevice_notifier(&prueth->prueth_netdevice_nb);
-> +
-> +	return ret;
-> +}
-> +
-> +static void prueth_unregister_notifiers(struct prueth *prueth)
-> +{
-> +	prueth_switchdev_unregister_notifiers(prueth);
-> +	unregister_netdevice_notifier(&prueth->prueth_netdevice_nb);
-> +}
-> +
-> +static const struct of_device_id prueth_dt_match[];
-> +
->   static int prueth_probe(struct platform_device *pdev)
->   {
->   	struct device_node *eth_node, *eth_ports_node;
-> @@ -2072,6 +2252,10 @@ static int prueth_probe(struct platform_device *pdev)
->   	}
->   
->   	msmc_ram_size = MSMC_RAM_SIZE;
-> +	prueth->is_switchmode_supported = prueth->pdata.switch_mode;
-> +	if (prueth->is_switchmode_supported)
-> +		msmc_ram_size = MSMC_RAM_SIZE_SWITCH_MODE;
-> +
->   
->   	/* NOTE: FW bug needs buffer base to be 64KB aligned */
->   	prueth->msmcram.va =
-> @@ -2167,6 +2351,14 @@ static int prueth_probe(struct platform_device *pdev)
->   		phy_attached_info(prueth->emac[PRUETH_MAC1]->ndev->phydev);
->   	}
->   
-> +	if (prueth->is_switchmode_supported) {
-> +		ret = prueth_register_notifiers(prueth);
-> +		if (ret)
-> +			goto netdev_unregister;
-> +
-> +		sprintf(prueth->switch_id, "%s", dev_name(dev));
-> +	}
-> +
->   	dev_info(dev, "TI PRU ethernet driver initialized: %s EMAC mode\n",
->   		 (!eth0_node || !eth1_node) ? "single" : "dual");
->   
-> @@ -2236,6 +2428,8 @@ static void prueth_remove(struct platform_device *pdev)
->   	struct device_node *eth_node;
->   	int i;
->   
-> +	prueth_unregister_notifiers(prueth);
-> +
->   	for (i = 0; i < PRUETH_NUM_MACS; i++) {
->   		if (!prueth->registered_netdevs[i])
->   			continue;
-> @@ -2333,10 +2527,12 @@ static const struct dev_pm_ops prueth_dev_pm_ops = {
->   static const struct prueth_pdata am654_icssg_pdata = {
->   	.fdqring_mode = K3_RINGACC_RING_MODE_MESSAGE,
->   	.quirk_10m_link_issue = 1,
-> +	.switch_mode = 1,
->   };
->   
->   static const struct prueth_pdata am64x_icssg_pdata = {
->   	.fdqring_mode = K3_RINGACC_RING_MODE_RING,
-> +	.switch_mode = 1,
->   };
->   
->   static const struct of_device_id prueth_dt_match[] = {
+> The debug config causes the reordering notifications, right? But
+> solves the OOM.
+> 
+
+With config, OOM is introduced by dfa2f0483360("tcp: get rid of
+sysctl_tcp_adv_win_scale"). And, it can be solved by config-debug,
+but reordering notifications are observed.
+
+With config, there is no OOM in 63c8778d9149("Merge branch
+'net-mana-fix-doorbell-access-for-receive-queues'"), everything works
+well. But with config-debug, reordering notifications are observed.
+
+>> If you have any thoughts or
+>> comments, please feel free to share them with us.
+>>
+>> If the problem does exist, I guess we can force `do_recv_completions`
+>> after some number of sendmsgs and move "gap: ..." after cfg_verbose?
+> 
+> I do want to understand the issue better. But not sure when I'll find
+> the time.
+> 
+
+I also want to understand this, I will look into it when I find time :)
+
+> Both sound reasonable to me, yes.
+Thanks for the review and suggestions, I will update in the next iteration.
 
