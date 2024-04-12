@@ -1,262 +1,182 @@
-Return-Path: <netdev+bounces-87297-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE1958A2762
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 09:00:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 746338A2788
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 09:05:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFCBE1C2187A
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 07:00:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B63D28236A
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 07:05:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 612A254BDB;
-	Fri, 12 Apr 2024 06:58:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D872D46444;
+	Fri, 12 Apr 2024 07:00:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="N53HGuQv"
+	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="jUZwrqq+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FC7E502B8;
-	Fri, 12 Apr 2024 06:57:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1EEC4654E
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 07:00:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712905082; cv=none; b=Dt4ag8CflyO7hxNhtaBUjQUjxykvwEZ4VRH5eeZINWCSSjx4QH3GXrWUoKVkW9cuZnYI4XSn3YQz6vqm7cKsMo/MwEJ7qcjl3e9KRbyib1wHEvI5HWbc7J/BinkVjyMNNfN4MGWDYwLdbJF+HZdo+D1H7LoNaIyb+AWqhm1Skxo=
+	t=1712905220; cv=none; b=UsJnW/HJg4FSKD5OLS6SVWTEngWTSoHWF0Lt/el1K4Fva/twjc2Im6/bKR0NS6GMJ0horauHWnHnTewxQTPi8RXfNC0LtqpiBaZ8XF35m5N8TTage7okBgOSD52ltmNSvvKprs6mpgeJITOmMMh5lL0TvAcmetky7EzTb1FvUmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712905082; c=relaxed/simple;
-	bh=6NZSClo6H6e3G+90fKqbClcpzseP+wjt3nV7iazfOL4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OFeKcNoCy7EHJcNRMjE6KUJkMgN9q+431A++18/XADEzwU1T1l0N+bfv9MmQwU6q2YDWBeVsZGrin1KPNgyqVRbnfClw53L7qTFzOoBTC2vqh0mgWLZS3+SmTgsJYxx0IgMiqA3lPkUpAhJw5p4p6BhM6dwa4r28hPswckEP5R4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=N53HGuQv; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: f9ba49fcf89911eeb8927bc1f75efef4-20240412
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=cANxux1/htpGt52y+Aeho8J1w0VjkDggLi2Ws4XYndE=;
-	b=N53HGuQvVMK+LRhWwTTclNt75yZT2DWWbxmhYZ9/GfMJIMG7XK979gXNiWmS6TaCt6uXjSnjYcGqylaQIKvKMx9TfNJOMsP2lCt1tYa3KekGU97DxyCjNFT8qLGRC22m/D/t5RC/hZ7KIlJY/fKnvOxpV/p1v7JgAUo/eCWblM0=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.37,REQID:8c7f5101-f476-489b-b76b-a8faf39e4798,IP:0,U
-	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:-25
-X-CID-META: VersionHash:6f543d0,CLOUDID:8c9a7e91-e2c0-40b0-a8fe-7c7e47299109,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
-	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: f9ba49fcf89911eeb8927bc1f75efef4-20240412
-Received: from mtkmbs09n2.mediatek.inc [(172.21.101.94)] by mailgw01.mediatek.com
-	(envelope-from <yi-de.wu@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 213153288; Fri, 12 Apr 2024 14:57:49 +0800
-Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
- mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 12 Apr 2024 14:57:48 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
- mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Fri, 12 Apr 2024 14:57:48 +0800
-From: Yi-De Wu <yi-de.wu@mediatek.com>
-To: Yingshiuan Pan <yingshiuan.pan@mediatek.com>, Ze-Yu Wang
-	<ze-yu.wang@mediatek.com>, Yi-De Wu <yi-de.wu@mediatek.com>, Rob Herring
-	<robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
-	<conor+dt@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Catalin Marinas
-	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Richard Cochran
-	<richardcochran@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-CC: <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<netdev@vger.kernel.org>, <linux-mediatek@lists.infradead.org>, David Bradil
-	<dbrazdil@google.com>, Trilok Soni <quic_tsoni@quicinc.com>, My Chuang
-	<my.chuang@mediatek.com>, Shawn Hsiao <shawn.hsiao@mediatek.com>, PeiLun Suei
-	<peilun.suei@mediatek.com>, Liju Chen <liju-clr.chen@mediatek.com>, Willix
- Yeh <chi-shen.yeh@mediatek.com>, Kevenny Hsieh <kevenny.hsieh@mediatek.com>
-Subject: [PATCH v10 21/21] virt: geniezone: Enable PTP for synchronizing time between host and guest VMs
-Date: Fri, 12 Apr 2024 14:57:18 +0800
-Message-ID: <20240412065718.29105-22-yi-de.wu@mediatek.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20240412065718.29105-1-yi-de.wu@mediatek.com>
-References: <20240412065718.29105-1-yi-de.wu@mediatek.com>
+	s=arc-20240116; t=1712905220; c=relaxed/simple;
+	bh=W6lIJ87blDFQy40/MQCUjdNhysk/lUYI3a/UQNiuRTU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ElIzT3oV7JncUTKtRWUrM4PZxghmCbBW7Kn19Qr7ZCa+vkOv7GK2H7IhWk12x5V4GNBmRRChwvMQiiqx79xuzlbT88DZN0MEQCQkMrE6FZmJD0XEUvdMVSvzrOQIs9LoYjL+nErB6LCLMLW3cflkjYl/PktKvDLYwtOyK9DZIzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=jUZwrqq+; arc=none smtp.client-ip=209.85.216.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
+Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2a2da57ab3aso350009a91.3
+        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 00:00:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1712905210; x=1713510010; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7q5h9HaG/VUM+RDE7dhrzmPiovNSzJaDim+39mVuIWQ=;
+        b=jUZwrqq+7mkwImCjEQ6XBE9Xm4QzuoVaBzE558ccPUSdGiBeeKEzQJ7Yn3qJfoghxc
+         B8Pm8NMlIv1Nh/OgNkgwJtSVFRft8U2nDrRs+9jDgjO/IIqMuQmK6CXgz4g1oknfL194
+         TkvA4pCImcQ/e8YnLUHbvKOW7InCpVuCLiXhqfY1BteZ34QjjWEnk0j+UnEeuYirWX7X
+         znB8zucWocBA+0G00eDiYwFeRJ3NfSuxulIV1hEhIkAYI/LJ7Bne00kafETqwBvrVl9m
+         Ce3S4H9+kmUrA6euD/y2P0VeJxYkFArRUb3TqAU6py43y7STjHnpHa9KnA2p+aMx3lf4
+         tSSg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712905210; x=1713510010;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7q5h9HaG/VUM+RDE7dhrzmPiovNSzJaDim+39mVuIWQ=;
+        b=Qf5pmDqB+8Qb1m/QjnykN6rVKgY88JJWUK8l5JhsIE9Nn5A5c+6YX6JqqHnbObw8Vx
+         Yim1EAOv8eFf6zNCvUsd1tmYI/ZdKlDsFJ0QkBhqL5UHHHIM3tjNDivDgH7fyt9eqCx6
+         +VY7hcQbcolIIRxGoq7OUu4a/XGST5KCr53k2dAhygQdaBrQHYGxFjOEdc3iN9NwWedL
+         nxUAN0SQE0ygKxGvBANbp6KqBKdx2hi+ohj1JV1WHxvzWFFPzIuwFvxb4+wHEdox2ySw
+         dpca4ByuuRLLsofntTSR4keJeUViQpomTeVa2QwIjGxwAmCVdFkUZiB9nP7zLNuux5lc
+         qUoA==
+X-Forwarded-Encrypted: i=1; AJvYcCW+kyhKi0wARqZCsl0nnVZfC2vUG4k/M/M9E8DSdktO4ord5rI2tbY6LFu9EOw6F9C8F62JDeq5gLeCnP6CDyNwv2b4aQ0s
+X-Gm-Message-State: AOJu0YwAeM9QEid92DcJuJJSqal0EokV+JnVyPw6DVUM3qzqcqNxCH3u
+	Llhng8JWhFSvh4dZSdszBZJVefVUl+m8v7W+Q1IOewiVrlwrHGbsWxPfthph0ek=
+X-Google-Smtp-Source: AGHT+IFfdDdH61r019wJzHLaeIy7ZbF0voE9uBIuHh1wTgvCSppeDlW3ZpGOwHe3V43VZiGNPVDoWQ==
+X-Received: by 2002:a17:90a:ac10:b0:2a4:92a3:d9dc with SMTP id o16-20020a17090aac1000b002a492a3d9dcmr1589097pjq.22.1712905208687;
+        Fri, 12 Apr 2024 00:00:08 -0700 (PDT)
+Received: from localhost.localdomain ([8.210.91.195])
+        by smtp.googlemail.com with ESMTPSA id y1-20020a17090a1f4100b002a5e73ba87dsm2371147pjy.6.2024.04.12.00.00.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Apr 2024 00:00:08 -0700 (PDT)
+From: Lei Chen <lei.chen@smartx.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: Lei Chen <lei.chen@smartx.com>,
+	Willem de Bruijn <willemb@google.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3] net:tun: limit printing rate when illegal packet received by tun dev
+Date: Fri, 12 Apr 2024 02:58:39 -0400
+Message-ID: <20240412065841.2148691-1-lei.chen@smartx.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK: N
+Content-Transfer-Encoding: 8bit
 
-From: "Kevenny Hsieh" <kevenny.hsieh@mediatek.com>
+vhost_worker will call tun call backs to receive packets. If too many
+illegal packets arrives, tun_do_read will keep dumping packet contents.
+When console is enabled, it will costs much more cpu time to dump
+packet and soft lockup will be detected.
 
-Enabled Precision Time Protocol (PTP) for improved host-guest VM time
-synchronization, optimizing operations needing precise clock sync in
-virtual environment.
+net_ratelimit mechanism can be used to limit the dumping rate.
 
-Signed-off-by: Kevenny Hsieh <kevenny.hsieh@mediatek.com>
-Signed-off-by: Liju Chen <liju-clr.chen@mediatek.com>
-Signed-off-by: Yi-De Wu <yi-de.wu@mediatek.com>
+PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980"
+ #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
+ #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
+ #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
+ #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
+ #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
+    [exception RIP: io_serial_in+20]
+    RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
+    RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 0000000000000000
+    RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428a0
+    RBP: 0000000000002710   R8: 0000000000000004   R9: 000000000000000f
+    R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 0000000000000020
+    R13: ffffffff8acbf698  R14: 0000000000000058  R15: 0000000000000000
+    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+ #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
+ #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
+ #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
+ #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
+ #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
+ #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
+ #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
+ #12 [ffffa65531497b68] printk at ffffffff89318306
+ #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
+ #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
+ #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
+ #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
+ #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
+ #18 [ffffa65531497f10] kthread at ffffffff892d2e72
+ #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
+
+Fixes: ef3db4a59542 (\"tun: avoid BUG, dump packet on GSO errors\")
+Signed-off-by: Lei Chen <lei.chen@smartx.com>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Suggested-by: Paolo Abeni <pabeni@redhat.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+Changes from v2:
+https://lore.kernel.org/netdev/20240410042245.2044516-1-lei.chen@smartx.com/
+ 1. Add net-dev to patch subject-prefix.
+ 2. Add fix tag.
+
+Changes from v1:
+https://lore.kernel.org/all/20240409062407.1952728-1-lei.chen@smartx.com/
+ 1. Use net_ratelimit instead of raw __ratelimit.
+ 2. Use netdev_err instead of pr_err to print more info abort net dev.
+ 3. Adjust git commit message to make git am happy.
 ---
- arch/arm64/geniezone/Makefile           |  2 +-
- arch/arm64/geniezone/gzvm_arch_common.h |  3 +
- arch/arm64/geniezone/hvc.c              | 73 +++++++++++++++++++++++++
- drivers/virt/geniezone/gzvm_exception.c |  3 +-
- include/linux/soc/mediatek/gzvm_drv.h   |  1 +
- include/uapi/linux/gzvm.h               |  1 +
- 6 files changed, 80 insertions(+), 3 deletions(-)
- create mode 100644 arch/arm64/geniezone/hvc.c
+ drivers/net/tun.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/geniezone/Makefile b/arch/arm64/geniezone/Makefile
-index 0e4f1087f9de..553a64a926dc 100644
---- a/arch/arm64/geniezone/Makefile
-+++ b/arch/arm64/geniezone/Makefile
-@@ -4,6 +4,6 @@
- #
- include $(srctree)/drivers/virt/geniezone/Makefile
- 
--gzvm-y += vm.o vcpu.o vgic.o
-+gzvm-y += vm.o vcpu.o vgic.o hvc.o
- 
- obj-$(CONFIG_MTK_GZVM) += gzvm.o
-diff --git a/arch/arm64/geniezone/gzvm_arch_common.h b/arch/arm64/geniezone/gzvm_arch_common.h
-index 192d023722e5..8f5d8528ab96 100644
---- a/arch/arm64/geniezone/gzvm_arch_common.h
-+++ b/arch/arm64/geniezone/gzvm_arch_common.h
-@@ -83,6 +83,8 @@ int gzvm_hypcall_wrapper(unsigned long a0, unsigned long a1,
-  * @__pad: add an explicit '__u32 __pad;' in the middle to make it clear
-  *         what the actual layout is.
-  * @lr: The array of LRs(list registers).
-+ * @vtimer_offset: The offset maintained by hypervisor that is host cycle count
-+ *                 when guest VM startup.
-  *
-  * - Keep the same layout of hypervisor data struct.
-  * - Sync list registers back for acking virtual device interrupt status.
-@@ -91,6 +93,7 @@ struct gzvm_vcpu_hwstate {
- 	__le32 nr_lrs;
- 	__le32 __pad;
- 	__le64 lr[GIC_V3_NR_LRS];
-+	__le64 vtimer_offset;
- };
- 
- static inline unsigned int
-diff --git a/arch/arm64/geniezone/hvc.c b/arch/arm64/geniezone/hvc.c
-new file mode 100644
-index 000000000000..3d7f71f20dce
---- /dev/null
-+++ b/arch/arm64/geniezone/hvc.c
-@@ -0,0 +1,73 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (c) 2023 MediaTek Inc.
-+ */
-+#include <linux/clocksource.h>
-+#include <linux/kernel.h>
-+#include <linux/timekeeping.h>
-+#include <linux/soc/mediatek/gzvm_drv.h>
-+#include "gzvm_arch_common.h"
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 0b3f21cba552..ca9b4bc89de7 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -2125,14 +2125,16 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+ 					    tun_is_little_endian(tun), true,
+ 					    vlan_hlen)) {
+ 			struct skb_shared_info *sinfo = skb_shinfo(skb);
+-			pr_err("unexpected GSO type: "
+-			       "0x%x, gso_size %d, hdr_len %d\n",
+-			       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
+-			       tun16_to_cpu(tun, gso.hdr_len));
+-			print_hex_dump(KERN_ERR, "tun: ",
+-				       DUMP_PREFIX_NONE,
+-				       16, 1, skb->head,
+-				       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
 +
-+#define GZVM_PTP_VIRT_COUNTER 0
-+#define GZVM_PTP_PHYS_COUNTER 1
-+/**
-+ * gzvm_handle_ptp_time() - Sync time between host and guest VM
-+ * @vcpu: Pointer to struct gzvm_vcpu_run in userspace
-+ * @counter: Counter type from guest VM
-+ * Return: Always return 0 because there are no cases of failure
-+ *
-+ * The following register values will be passed to the guest VM
-+ * for time synchronization:
-+ * regs->x0 (upper 32 bits) wall clock time
-+ * regs->x1 (lower 32 bits) wall clock time
-+ * regs->x2 (upper 32 bits) cycles
-+ * regs->x3 (lower 32 bits) cycles
-+ */
-+static int gzvm_handle_ptp_time(struct gzvm_vcpu *vcpu, int counter)
-+{
-+	struct system_time_snapshot snapshot;
-+	u64 cycles = 0;
-+
-+	ktime_get_snapshot(&snapshot);
-+
-+	switch (counter) {
-+	case GZVM_PTP_VIRT_COUNTER:
-+		cycles = snapshot.cycles -
-+			 le64_to_cpu(vcpu->hwstate->vtimer_offset);
-+		break;
-+	case GZVM_PTP_PHYS_COUNTER:
-+		cycles = snapshot.cycles;
-+		break;
-+	default:
-+		break;
-+	}
-+
-+	vcpu->run->hypercall.args[0] = upper_32_bits(snapshot.real);
-+	vcpu->run->hypercall.args[1] = lower_32_bits(snapshot.real);
-+	vcpu->run->hypercall.args[2] = upper_32_bits(cycles);
-+	vcpu->run->hypercall.args[3] = lower_32_bits(cycles);
-+
-+	return 0;
-+}
-+
-+/**
-+ * gzvm_arch_handle_guest_hvc() - Handle architecture-related guest hvc
-+ * @vcpu: Pointer to struct gzvm_vcpu_run in userspace
-+ * Return:
-+ * * true - This hvc has been processed, no need to back to VMM.
-+ * * false - This hvc has not been processed, require userspace.
-+ */
-+bool gzvm_arch_handle_guest_hvc(struct gzvm_vcpu *vcpu)
-+{
-+	int ret, counter;
-+
-+	switch (vcpu->run->hypercall.args[0]) {
-+	case GZVM_HVC_PTP:
-+		counter = vcpu->run->hypercall.args[1];
-+		ret = gzvm_handle_ptp_time(vcpu, counter);
-+		return (ret == 0) ? true : false;
-+	default:
-+		break;
-+	}
-+	return false;
-+}
-diff --git a/drivers/virt/geniezone/gzvm_exception.c b/drivers/virt/geniezone/gzvm_exception.c
-index 07871ec74651..d824211f49a6 100644
---- a/drivers/virt/geniezone/gzvm_exception.c
-+++ b/drivers/virt/geniezone/gzvm_exception.c
-@@ -56,7 +56,6 @@ bool gzvm_handle_guest_hvc(struct gzvm_vcpu *vcpu)
- 		ret = gzvm_handle_relinquish(vcpu, ipa);
- 		return (ret == 0) ? true : false;
- 	default:
--		break;
-+		return gzvm_arch_handle_guest_hvc(vcpu);
- 	}
--	return false;
- }
-diff --git a/include/linux/soc/mediatek/gzvm_drv.h b/include/linux/soc/mediatek/gzvm_drv.h
-index e123787cd70d..f6b7acca37b8 100644
---- a/include/linux/soc/mediatek/gzvm_drv.h
-+++ b/include/linux/soc/mediatek/gzvm_drv.h
-@@ -223,6 +223,7 @@ int gzvm_handle_page_fault(struct gzvm_vcpu *vcpu);
- bool gzvm_handle_guest_exception(struct gzvm_vcpu *vcpu);
- int gzvm_handle_relinquish(struct gzvm_vcpu *vcpu, phys_addr_t ipa);
- bool gzvm_handle_guest_hvc(struct gzvm_vcpu *vcpu);
-+bool gzvm_arch_handle_guest_hvc(struct gzvm_vcpu *vcpu);
- 
- int gzvm_arch_create_device(u16 vm_id, struct gzvm_create_device *gzvm_dev);
- int gzvm_arch_inject_irq(struct gzvm *gzvm, unsigned int vcpu_idx,
-diff --git a/include/uapi/linux/gzvm.h b/include/uapi/linux/gzvm.h
-index 5411357ec05e..1cf89213a383 100644
---- a/include/uapi/linux/gzvm.h
-+++ b/include/uapi/linux/gzvm.h
-@@ -197,6 +197,7 @@ enum {
- 
- /* hypercall definitions of GZVM_EXIT_HYPERCALL */
- enum {
-+	GZVM_HVC_PTP = 0x86000001,
- 	GZVM_HVC_MEM_RELINQUISH = 0xc6000009,
- };
- 
++			if (net_ratelimit()) {
++				netdev_err(tun->dev, "unexpected GSO type: 0x%x, gso_size %d, hdr_len %d\n",
++				       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
++				       tun16_to_cpu(tun, gso.hdr_len));
++				print_hex_dump(KERN_ERR, "tun: ",
++					       DUMP_PREFIX_NONE,
++					       16, 1, skb->head,
++					       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
++			}
+ 			WARN_ON_ONCE(1);
+ 			return -EINVAL;
+ 		}
 -- 
-2.18.0
+2.44.0
 
 
