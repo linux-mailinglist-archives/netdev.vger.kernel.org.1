@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-87240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D8858A23E7
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 04:51:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 657618A23F6
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 04:55:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0FA5B23A81
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 02:51:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2137C281B2C
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 02:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F2710A3C;
-	Fri, 12 Apr 2024 02:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5293110A24;
+	Fri, 12 Apr 2024 02:55:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DR1JybLc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QocOlV19"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8660310A24;
-	Fri, 12 Apr 2024 02:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29778205E14;
+	Fri, 12 Apr 2024 02:55:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712890291; cv=none; b=cTdtLjies0HM1o7W065hzqwRNAroa9E8ighN8tL6rMw9r77tfdF4eON+fOLaWO1JyXdvpfm8ST9ccZwWjsr0EBVoB84pugvzT8npX/vwKFLf7eqjZ+BeWhYmK7GYcZ2h9s/D3lqXoHABJvNrxOQFfAJnR0uE4VmS3geQs2tIdyk=
+	t=1712890534; cv=none; b=i69cuyvIr5GSmpn+KBvhXeLEYAq8zXextVVDIybEP15xGHxeiSbgAf4zhnxIZDkDq1MnBu7eeRraMGCLwZ/4BT6qCsNa/Q0DLqt5VbtDov+AufOThz6YcdPA6FxgQiE1+rBJWslxzaz2lyz4X/2yaUr6knUL9Q10SWkrA5sPn0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712890291; c=relaxed/simple;
-	bh=JLSsFNuTS/XXGmjbgOU7MixG+Yt1/H2zmieyO7GGxMM=;
+	s=arc-20240116; t=1712890534; c=relaxed/simple;
+	bh=5zlXhp6vfxGZNNTcQ+FUjWCHBIH6LjVhONhbyat2Jww=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Vba3NiOkNuzxsOrp1MRPPtGHfNeHdfEcjsQctn/gRV+jjcFdj/4Xme3jf3de7VC43TnHvLnVDGalG+CNU9u30M/2S4QPoDBppFOQKuRDC1gPwmwLsENoA3mdmmSWoFrtugc0jaiRlWXv8n7ALFslfDYSbJXtalVm8ZLuLNkOTVE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DR1JybLc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CC69C072AA;
-	Fri, 12 Apr 2024 02:51:30 +0000 (UTC)
+	 MIME-Version:Content-Type; b=iA3WVtrl94RnVY1z7wqcyH7f8j67d4E45Ym8AMif3d9t26KEiHwqgyRkl3weSsmawvGG8fIQfD3U7FFGUXw1hk74LGnRdYr0I258lm8npiDR4l+lJfWdb8MTYe8ZlEiiWvVK8j6nOt2+SJVY/s3Tdi1uqLJu9DU4FOUhoH1KftE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QocOlV19; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24688C113CE;
+	Fri, 12 Apr 2024 02:55:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712890291;
-	bh=JLSsFNuTS/XXGmjbgOU7MixG+Yt1/H2zmieyO7GGxMM=;
+	s=k20201202; t=1712890533;
+	bh=5zlXhp6vfxGZNNTcQ+FUjWCHBIH6LjVhONhbyat2Jww=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DR1JybLcJI6E78CFpFQm2BDyx0OIXKm6fZPwjr/Nyu6Md+FqcBBemwL02ZZXqNM8+
-	 vgpDDW0pNaRRuMvuACSYt8A6NM+INoBUuZ3drApLMfJIY95lUdTzao7+ILFfmlA8IF
-	 dcLhGhwlkl4V9Cq6Cbya2+JdL0DaUQw7aL64oo24elKNDw43JvJC5a5fYz01EQpzut
-	 uouWdN0wfAYtRo8rUPxa8J420UVZFiaMeVn2hBZQ2HIybPqRsOH1WrvUhosiZ7oiXc
-	 cS69wqM+hR8W18Sm+FyH4irMAw+0I7ztNyXe/oC/ljPD45+/68E6LERrwJtyWnTiky
-	 gssoMX5k6Y5cw==
-Date: Thu, 11 Apr 2024 19:51:29 -0700
+	b=QocOlV19cicvKdlP1yCT9dyv+enm6JR0JqUY9Bk3cjLtIL3yJVRbXh9jKWvjDcyRy
+	 hd3n+7iEPSvrbP4M4s1ShaUOQPiBpRD0wicHdOCHvvMjI1sxSNVeLBlITLaXkktqVC
+	 boEsOAn1wAFb/VNrk+wCpByRR6l+4fcfBxmZJsbdyjf0q+Yf2PRHB/cnZlY0/QMePw
+	 pftYnr3J6L8wL96hpAqEMBzmr1AKtyC7QxY5hjqklrMgzfKHtH3QcgSx7tzbBQz1uq
+	 9O8rDJ0ytBVOsxnnLbdPQcsRnmidnAsAqsgyCnc0XYdyHeu4tnBinkq9f6aOSR6lEQ
+	 ZFToTCvkfjgXw==
+Date: Thu, 11 Apr 2024 19:55:32 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- linux-usb@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, stable@vger.kernel.org, Jarkko Palviainen
- <jarkko.palviainen@gmail.com>
-Subject: Re: [PATCH] net: usb: ax88179_178a: avoid writing the mac address
- before first reading
-Message-ID: <20240411195129.69ff2bac@kernel.org>
-In-Reply-To: <20240410095603.502566-1-jtornosm@redhat.com>
-References: <20240410095603.502566-1-jtornosm@redhat.com>
+To: Hariprasad Kelam <hkelam@marvell.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <davem@davemloft.net>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+ <jerinj@marvell.com>, <lcherian@marvell.com>, <sbhatta@marvell.com>,
+ <naveenm@marvell.com>, <edumazet@google.com>, <pabeni@redhat.com>
+Subject: Re: [net-next PatchV2] octeontx2-af: map management port always to
+ first PF
+Message-ID: <20240411195532.033e21fb@kernel.org>
+In-Reply-To: <20240410132538.20158-1-hkelam@marvell.com>
+References: <20240410132538.20158-1-hkelam@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,17 +62,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 10 Apr 2024 11:55:49 +0200 Jose Ignacio Tornos Martinez wrote:
-> After the commit d2689b6a86b9 ("net: usb: ax88179_178a: avoid two
-> consecutive device resets"), reset operation, in which the default mac
-> address from the device is read, is not executed from bind operation and
-> the random address, that is pregenerated just in case, is direclty written
-> the first time in the device, so the default one from the device is not
-> even read. This writing is not dangerous because is volatile and the
-> default mac address is not missed.
+On Wed, 10 Apr 2024 18:55:38 +0530 Hariprasad Kelam wrote:
+> The user can enable or disable any MAC block or a few ports of the
+> block. The management port's interface name varies depending on the
+> setup of the user if its not mapped to the first pf.
 
-AFAICT the reset is synchronous to resume, right?
-
-I think you can use netif_device_detach() and netif_device_attach()
-to prevent getting called while suspended.
+There is no concept of management port in Linux networking.
+I may be missing the point, but I'm unable to review this in 
+the context of the upstream Linux kernel.
 
