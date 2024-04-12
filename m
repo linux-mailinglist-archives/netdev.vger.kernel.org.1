@@ -1,186 +1,305 @@
-Return-Path: <netdev+bounces-87394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 589D18A2F50
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:23:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA59C8A2FA4
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:37:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC0041F21270
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:23:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD7E71C23BCA
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:37:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB7F7FBB4;
-	Fri, 12 Apr 2024 13:23:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB1383CCE;
+	Fri, 12 Apr 2024 13:37:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ikugZ6Ho"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c+z/AVyF"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852175E060;
-	Fri, 12 Apr 2024 13:23:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFF65E099
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 13:37:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712928223; cv=none; b=JmzAOoaRlv19F6HcpxbN8yPMeHhDb8GPw+lEfI6cxgK/8Mf7oLKSYXx4W3SVoUYPDb32vYs72AcT46YinpzACjSxPAuOIC1fqFnnF6UU738wiUbg6KYN7Ju4FCWmyMNq1uNLlzNNM7KBl5Fmw37tn6MjNkoP//v5Q4sH59nxF9s=
+	t=1712929067; cv=none; b=RzdynhjlH6fZeUO0FptGSx/shg+046JLuhRwVHTkcDWz8IDEzoBuiTA295aff31k1GwfhXov0Tpm+qV4VbohFFinx7v8OKDW9+lMo+HFfbbkrMdGluZpVj9vjXinfX6Fil7BB9VNWj806WZXlLZfy/UsJg7Vi3B18eakGjaqWIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712928223; c=relaxed/simple;
-	bh=dmgGyuZghQmrzidGRnKgMS8zsphHWSFLUQdNRumotfI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DIqnQ4NPGwvJQVK1CKf7hH8soEvEwv1SlDcmAju3UzDlF8gmey/ZgH+MDXTXDUcysMS8H4V1nCujJbqYLNSz01h2HJOdHzUn4BVXuwEUdlQoe2FmLZfDcKWsmCweO5wGMgDlI9EciFCVAKLBcnYFc1ju5JGE8e71gbyTAADl5EI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ikugZ6Ho; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id DA2C81BF206;
-	Fri, 12 Apr 2024 13:23:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1712928219;
+	s=arc-20240116; t=1712929067; c=relaxed/simple;
+	bh=VDyVRCe/uq6VBNLvUlxtlFW0SvZoHXXGJGkwc0DcR/Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c2VDs0na3k5FZvTzoPGdjddtSW9Vv4us7Dv8pKL8tezjPh4yPbvP95yS3XRnLC9uuf/bfofft4wRotyS5FZd0ERHsrGqBBdbzMjG3kOXdxFIjwAhqYpBl3O7rTTSbbiLNw2u8wS3mQqE4GbtAwKQPo8s825NYIN9Kr7Ll9omCqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=c+z/AVyF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1712929062;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=doyOEZSdANyC7Q7xeWp2ANWHCVWf4AoZkITCbrl7iqA=;
-	b=ikugZ6HoNQbESBI07T85V9qMBxbcLYaKJRD1WyY/ihTz+PEW9rGF5RGrCBhIaRXAv6iYLB
-	Z8PrxVx0kdLMi2vOCVx4Rf3LulE1cbmnQJKvT9reXFqVWF6iHa7v4IR5a7+0TcT1TfvPJW
-	WyxYeOGyxIicNVFQmQQPdT92FAUWRS8H/Zojd606yx40oeymugbro3x6h9U0egvGhGB7I5
-	K0cRvctTd7h277fRI2YtWpTxb9T+Q6Fc91xAyAd+3c98xszAHELw+MKguiInblE1Hpg50A
-	Shsqtzuo1YNl0w7pPc5HqvyXrtS4NQumui1rJThlHUtO+kB/2cH7hUJBPIcbTg==
-Date: Fri, 12 Apr 2024 15:23:35 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
- <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
- <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, =?UTF-8?B?S8O2cnk=?= Maincent
- <kory.maincent@bootlin.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Marek =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Piergiorgio Beruto
- <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?B?Tmljb2zDsg==?= Veronese <nicveronese@gmail.com>, Simon Horman
- <horms@kernel.org>, mwojtas@chromium.org, Nathan Chancellor
- <nathan@kernel.org>, Antoine Tenart <atenart@kernel.org>
-Subject: Re: [PATCH net-next] net: phy: phy_link_topology: Handle NULL
- topologies
-Message-ID: <20240412152335.751a8dbb@device-28.home>
-In-Reply-To: <c37482d9-f97b-4f9a-8a2d-efde1a654514@gmail.com>
-References: <20240412104615.3779632-1-maxime.chevallier@bootlin.com>
-	<c37482d9-f97b-4f9a-8a2d-efde1a654514@gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	bh=5rHpcjLvZNC8nCVYPO03eLBLBqWq4wfPGe99ZwWS4u0=;
+	b=c+z/AVyFco8wfNaDeOWvBX29d4VOlonJ2v92dPn/JVf/RJJ39ATwE6Xy7rdA+P3ewqR9Fe
+	qTwrbuEP3LrjRtcFqfom+foa8Rg/6v4oGO4tRTNlatMVfHiZaZYQp51yap6yV6dhcsmi2f
+	ZjTVRPXUdEudK37pdWzLRcwOaIi2GSM=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-652-i7B57qlqPiWDHCX2HTEWQQ-1; Fri, 12 Apr 2024 09:37:41 -0400
+X-MC-Unique: i7B57qlqPiWDHCX2HTEWQQ-1
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-43689e8045dso8883981cf.3
+        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 06:37:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712929061; x=1713533861;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5rHpcjLvZNC8nCVYPO03eLBLBqWq4wfPGe99ZwWS4u0=;
+        b=gTYf7AmN1U1vF9m6RMbT6/ndLtn1i2ke9XxOddFF8RfoG/86jcK2FjFVQoro4/u0mM
+         wzZRcytyif7O/rLHI6Op0jPXiGj7j/m3X+XxdtWyxBoHttMgzjdoJEtprA/F4sJb7jdO
+         9efQ51hMHiRWc0BzCnHPupzAAVD3HDa5bfCuywx4KmNKZ4FJ3VioQJ9bhfSoqEdpoqQL
+         9QIdV2CETf13wlgSu9zukJG7pbP8U2typoIgzF2wtrQVGmGV4OgSX1WPpiZSQ3xO2VLn
+         J7P5vMSe/jYrgJpVb50/qzLuPe9RGKIOOKuANTptfS+UezjxDvHLEMAo4jTiojd2LQWL
+         eF2A==
+X-Forwarded-Encrypted: i=1; AJvYcCXO6/AW0K9Cn9Lt1PYLxiQtR9VuSBeKujoSraQnzr5W0w4HMHNXfR7xeQy9MNjpengHkQ84Nr53Mlit/meNQKWnZYZ9CIp/
+X-Gm-Message-State: AOJu0Yxp/9HT32E+EAwG6MxD97gEVZdsx4pVYGbk/ZozqriUBj4v7AoR
+	+TkT24wNZwj0KYRnUThP4kSIo/cClhE+5GOo4OGZP2iGxBg1sGTUnWJmD20uq2rJlRW8pghkQOn
+	198NKVR9ou5V+ovEb+1rnrBfSCHfld7tBeNF555RGPThf6nqjChAYJg==
+X-Received: by 2002:a05:622a:4c7:b0:436:6369:f632 with SMTP id q7-20020a05622a04c700b004366369f632mr3245902qtx.20.1712929060628;
+        Fri, 12 Apr 2024 06:37:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFV41/RB0tU7gyeLSyYlHZ0e7Hqe9jhFRRXnqXjk82nF9BXSyCx1232TEUhuhbQ19Wa4jeeqQ==
+X-Received: by 2002:a05:622a:4c7:b0:436:6369:f632 with SMTP id q7-20020a05622a04c700b004366369f632mr3245866qtx.20.1712929060108;
+        Fri, 12 Apr 2024 06:37:40 -0700 (PDT)
+Received: from x1gen2nano ([2600:1700:1ff0:d0e0::33])
+        by smtp.gmail.com with ESMTPSA id r8-20020ac87948000000b00436714b18b1sm1741379qtt.30.2024.04.12.06.37.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Apr 2024 06:37:39 -0700 (PDT)
+Date: Fri, 12 Apr 2024 08:37:37 -0500
+From: Andrew Halaney <ahalaney@redhat.com>
+To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Martin KaFai Lau <martin.lau@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Daniel Borkmann <daniel@iogearbox.net>, 
+	bpf <bpf@vger.kernel.org>, kernel@quicinc.com
+Subject: Re: [RFC PATCH bpf-next v2] net: Add additional bit to support
+ userspace timestamp type
+Message-ID: <vap7jl4nvufr57cgu6wjmf2y2ijiuchlzchpdw5brdbouuqfg7@bjnec5hrxczk>
+References: <20240411230506.1115174-1-quic_abchauha@quicinc.com>
+ <20240411230506.1115174-3-quic_abchauha@quicinc.com>
+ <f2ff9603-6e04-480a-8c1b-683075017ade@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f2ff9603-6e04-480a-8c1b-683075017ade@quicinc.com>
 
-Hello Heiner,
-
-On Fri, 12 Apr 2024 15:07:46 +0200
-Heiner Kallweit <hkallweit1@gmail.com> wrote:
-
-> On 12.04.2024 12:46, Maxime Chevallier wrote:
-> > In situations where phylib is a module, the topology can be NULL as it's
-> > not initialized at netdev creation.
-> >   
+On Thu, Apr 11, 2024 at 04:45:57PM -0700, Abhishek Chauhan (ABC) wrote:
 > 
-> What we see here is a bigger drawback of IS_REACHABLE(). For phylib it's
-> false from net core, but true from r8169 driver. So topo_create is a stub,
-> but topo_add is not. IS_REACHABLE() hides dependencies.
-> 
-> topo_create et al don't really use something from phylib.
-> Therefore, could/should it be moved to net core?
+> I see one problem which i will fix it as part of next patch (considering 24h to upload next patch) 
+> is the subject does not show  [RFC PATCH bpf-next v2 (2/2)<== this is missing] 
 
-That's a valid point, and a better solution indeed.
+Just a tip, but I've been using b4 for patches lately, and it really is
+quite nice at handling these sorts of process bits (cover letters,
+versioning, any prefixes like RFC bpf-next, etc):
 
-> At least for topo_create this would resolve the dependency.
-> 
-> We could also add a config symbol and the PHY topology an optional
-> extension of net core.
+https://b4.docs.kernel.org/en/latest/contributor/prep.html
 
-That could be a thing indeed. It could be selected by phylib then, I
-don't see it being a user-controlled option, as this would make it very
-confusing for users to only be able to see when there are mutiple PHYs
-on the link when the relevant option is enabled (but I might be wrong).
-
-Maxime
 
 > 
-> > Allow passing a NULL topology pointer to phy_link_topo helpers.
+> On 4/11/2024 4:05 PM, Abhishek Chauhan wrote:
+> > tstamp_type can be real, mono or userspace timestamp.
 > > 
-> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > Closes: https://lore.kernel.org/netdev/2e11b89d-100f-49e7-9c9a-834cc0b82f97@gmail.com/
-> > Closes: https://lore.kernel.org/netdev/20240409201553.GA4124869@dev-arch.thelio-3990X/
+> > This commit adds userspace timestamp and sets it if there is
+> > valid transmit_time available in socket coming from userspace.
+> > 
+> > To make the design scalable for future needs this commit bring in
+> > the change to extend the tstamp_type:1 to tstamp_type:2 to support
+> > userspace timestamp.
+> > 
+> > Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
+> > Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
 > > ---
+> > Changes since v1 
+> > - identified additional changes in BPF framework.
+> > - Bit shift in SKB_MONO_DELIVERY_TIME_MASK and TC_AT_INGRESS_MASK.
+> > - Made changes in skb_set_delivery_time to keep changes similar to 
+> >   previous code for mono_delivery_time and just setting tstamp_type
+> >   bit 1 for userspace timestamp.
 > > 
-> > Hi,
+> >  include/linux/skbuff.h                        | 19 +++++++++++++++----
+> >  net/ipv4/ip_output.c                          |  2 +-
+> >  net/ipv4/raw.c                                |  2 +-
+> >  net/ipv6/ip6_output.c                         |  2 +-
+> >  net/ipv6/raw.c                                |  2 +-
+> >  net/packet/af_packet.c                        |  7 +++----
+> >  .../selftests/bpf/prog_tests/ctx_rewrite.c    |  8 ++++----
+> >  7 files changed, 26 insertions(+), 16 deletions(-)
 > > 
-> > This patch fixes a commit that is in net-next, hence the net-next tag and the
-> > lack of "Fixes" tag.
-> > 
-> > Nathan, Heiner, can you confirm this solves what you're seeing ?
-> > 
-> > I think we can improve on this solution by moving the topology init at
-> > the first PHY insertion and clearing it at netdev destruction.
-> > 
-> > Maxime
-> > 
-> >  drivers/net/phy/phy_link_topology.c | 10 +++++++++-
-> >  include/linux/phy_link_topology.h   |  7 ++++++-
-> >  2 files changed, 15 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
-> > index 985941c5c558..0f3973f07fac 100644
-> > --- a/drivers/net/phy/phy_link_topology.c
-> > +++ b/drivers/net/phy/phy_link_topology.c
-> > @@ -42,6 +42,9 @@ int phy_link_topo_add_phy(struct phy_link_topology *topo,
-> >  	struct phy_device_node *pdn;
-> >  	int ret;
+> > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> > index a83a2120b57f..b6346c21c3d4 100644
+> > --- a/include/linux/skbuff.h
+> > +++ b/include/linux/skbuff.h
+> > @@ -827,7 +827,8 @@ enum skb_tstamp_type {
+> >   *	@tstamp_type: When set, skb->tstamp has the
+> >   *		delivery_time in mono clock base (i.e. EDT).  Otherwise, the
+> >   *		skb->tstamp has the (rcv) timestamp at ingress and
+> > - *		delivery_time at egress.
+> > + *		delivery_time at egress or skb->tstamp defined by skb->sk->sk_clockid
+> > + *		coming from userspace
+> >   *	@napi_id: id of the NAPI struct this skb came from
+> >   *	@sender_cpu: (aka @napi_id) source CPU in XPS
+> >   *	@alloc_cpu: CPU which did the skb allocation.
+> > @@ -955,7 +956,7 @@ struct sk_buff {
+> >  	/* private: */
+> >  	__u8			__mono_tc_offset[0];
+> >  	/* public: */
+> > -	__u8			tstamp_type:1;	/* See SKB_MONO_DELIVERY_TIME_MASK */
+> > +	__u8			tstamp_type:2;	/* See SKB_MONO_DELIVERY_TIME_MASK */
+> >  #ifdef CONFIG_NET_XGRESS
+> >  	__u8			tc_at_ingress:1;	/* See TC_AT_INGRESS_MASK */
+> >  	__u8			tc_skip_classify:1;
+> > @@ -1090,10 +1091,10 @@ struct sk_buff {
+> >   */
+> >  #ifdef __BIG_ENDIAN_BITFIELD
+> >  #define SKB_MONO_DELIVERY_TIME_MASK	(1 << 7)
+> > -#define TC_AT_INGRESS_MASK		(1 << 6)
+> > +#define TC_AT_INGRESS_MASK		(1 << 5)
+> >  #else
+> >  #define SKB_MONO_DELIVERY_TIME_MASK	(1 << 0)
+> > -#define TC_AT_INGRESS_MASK		(1 << 1)
+> > +#define TC_AT_INGRESS_MASK		(1 << 2)
+> >  #endif
+> >  #define SKB_BF_MONO_TC_OFFSET		offsetof(struct sk_buff, __mono_tc_offset)
 > >  
-> > +	if (!topo)
-> > +		return 0;
-> > +
-> >  	pdn = kzalloc(sizeof(*pdn), GFP_KERNEL);
-> >  	if (!pdn)
-> >  		return -ENOMEM;
-> > @@ -93,7 +96,12 @@ EXPORT_SYMBOL_GPL(phy_link_topo_add_phy);
-> >  void phy_link_topo_del_phy(struct phy_link_topology *topo,
-> >  			   struct phy_device *phy)
-> >  {
-> > -	struct phy_device_node *pdn = xa_erase(&topo->phys, phy->phyindex);
-> > +	struct phy_device_node *pdn;
-> > +
-> > +	if (!topo)
-> > +		return;
-> > +
-> > +	pdn = xa_erase(&topo->phys, phy->phyindex);
+> > @@ -4262,6 +4263,16 @@ static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
+> >  	case CLOCK_MONO:
+> >  		skb->tstamp_type = kt && tstamp_type;
+> >  		break;
+> > +	/* if any other time base, must be from userspace
+> > +	 * so set userspace tstamp_type bit
+> > +	 * See skbuff tstamp_type:2
+> > +	 * 0x0 => real timestamp_type
+> > +	 * 0x1 => mono timestamp_type
+> > +	 * 0x2 => timestamp_type set from userspace
+> > +	 */
+> > +	default:
+> > +		if (kt && tstamp_type)
+> > +			skb->tstamp_type = 0x2;
+> >  	}
+> >  }
 > >  
-> >  	/* We delete the PHY from the topology, however we don't re-set the
-> >  	 * phy->phyindex field. If the PHY isn't gone, we can re-assign it the
-> > diff --git a/include/linux/phy_link_topology.h b/include/linux/phy_link_topology.h
-> > index 6b79feb607e7..21ca78127d0f 100644
-> > --- a/include/linux/phy_link_topology.h
-> > +++ b/include/linux/phy_link_topology.h
-> > @@ -40,7 +40,12 @@ struct phy_link_topology {
-> >  static inline struct phy_device *
-> >  phy_link_topo_get_phy(struct phy_link_topology *topo, u32 phyindex)
-> >  {
-> > -	struct phy_device_node *pdn = xa_load(&topo->phys, phyindex);
-> > +	struct phy_device_node *pdn;
-> > +
-> > +	if (!topo)
-> > +		return NULL;
-> > +
-> > +	pdn = xa_load(&topo->phys, phyindex);
+> > diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+> > index 62e457f7c02c..c9317d4addce 100644
+> > --- a/net/ipv4/ip_output.c
+> > +++ b/net/ipv4/ip_output.c
+> > @@ -1457,7 +1457,7 @@ struct sk_buff *__ip_make_skb(struct sock *sk,
 > >  
-> >  	if (pdn)
-> >  		return pdn->phy;  
+> >  	skb->priority = (cork->tos != -1) ? cork->priority: READ_ONCE(sk->sk_priority);
+> >  	skb->mark = cork->mark;
+> > -	skb->tstamp = cork->transmit_time;
+> > +	skb_set_delivery_time(skb, cork->transmit_time, sk->sk_clockid);
+> >  	/*
+> >  	 * Steal rt from cork.dst to avoid a pair of atomic_inc/atomic_dec
+> >  	 * on dst refcount
+> > diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
+> > index dcb11f22cbf2..a7d84fc0e530 100644
+> > --- a/net/ipv4/raw.c
+> > +++ b/net/ipv4/raw.c
+> > @@ -360,7 +360,7 @@ static int raw_send_hdrinc(struct sock *sk, struct flowi4 *fl4,
+> >  	skb->protocol = htons(ETH_P_IP);
+> >  	skb->priority = READ_ONCE(sk->sk_priority);
+> >  	skb->mark = sockc->mark;
+> > -	skb->tstamp = sockc->transmit_time;
+> > +	skb_set_delivery_time(skb, sockc->transmit_time, sk->sk_clockid);
+> >  	skb_dst_set(skb, &rt->dst);
+> >  	*rtp = NULL;
+> >  
+> > diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+> > index a9e819115622..0b8193bdd98f 100644
+> > --- a/net/ipv6/ip6_output.c
+> > +++ b/net/ipv6/ip6_output.c
+> > @@ -1924,7 +1924,7 @@ struct sk_buff *__ip6_make_skb(struct sock *sk,
+> >  
+> >  	skb->priority = READ_ONCE(sk->sk_priority);
+> >  	skb->mark = cork->base.mark;
+> > -	skb->tstamp = cork->base.transmit_time;
+> > +	skb_set_delivery_time(skb, cork->base.transmit_time, sk->sk_clockid);
+> >  
+> >  	ip6_cork_steal_dst(skb, cork);
+> >  	IP6_INC_STATS(net, rt->rt6i_idev, IPSTATS_MIB_OUTREQUESTS);
+> > diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
+> > index 0d896ca7b589..625f3a917e50 100644
+> > --- a/net/ipv6/raw.c
+> > +++ b/net/ipv6/raw.c
+> > @@ -621,7 +621,7 @@ static int rawv6_send_hdrinc(struct sock *sk, struct msghdr *msg, int length,
+> >  	skb->protocol = htons(ETH_P_IPV6);
+> >  	skb->priority = READ_ONCE(sk->sk_priority);
+> >  	skb->mark = sockc->mark;
+> > -	skb->tstamp = sockc->transmit_time;
+> > +	skb_set_delivery_time(skb, sockc->transmit_time, sk->sk_clockid);
+> >  
+> >  	skb_put(skb, length);
+> >  	skb_reset_network_header(skb);
+> > diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+> > index 8c6d3fbb4ed8..356c96f23370 100644
+> > --- a/net/packet/af_packet.c
+> > +++ b/net/packet/af_packet.c
+> > @@ -2056,8 +2056,7 @@ static int packet_sendmsg_spkt(struct socket *sock, struct msghdr *msg,
+> >  	skb->dev = dev;
+> >  	skb->priority = READ_ONCE(sk->sk_priority);
+> >  	skb->mark = READ_ONCE(sk->sk_mark);
+> > -	skb->tstamp = sockc.transmit_time;
+> > -
+> > +	skb_set_delivery_time(skb, sockc.transmit_time, sk->sk_clockid);
+> >  	skb_setup_tx_timestamp(skb, sockc.tsflags);
+> >  
+> >  	if (unlikely(extra_len == 4))
+> > @@ -2585,7 +2584,7 @@ static int tpacket_fill_skb(struct packet_sock *po, struct sk_buff *skb,
+> >  	skb->dev = dev;
+> >  	skb->priority = READ_ONCE(po->sk.sk_priority);
+> >  	skb->mark = READ_ONCE(po->sk.sk_mark);
+> > -	skb->tstamp = sockc->transmit_time;
+> > +	skb_set_delivery_time(skb, sockc->transmit_time, po->sk.sk_clockid);
+> >  	skb_setup_tx_timestamp(skb, sockc->tsflags);
+> >  	skb_zcopy_set_nouarg(skb, ph.raw);
+> >  
+> > @@ -3063,7 +3062,7 @@ static int packet_snd(struct socket *sock, struct msghdr *msg, size_t len)
+> >  	skb->dev = dev;
+> >  	skb->priority = READ_ONCE(sk->sk_priority);
+> >  	skb->mark = sockc.mark;
+> > -	skb->tstamp = sockc.transmit_time;
+> > +	skb_set_delivery_time(skb, sockc.transmit_time, sk->sk_clockid);
+> >  
+> >  	if (unlikely(extra_len == 4))
+> >  		skb->no_fcs = 1;
+> > diff --git a/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c b/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
+> > index 3b7c57fe55a5..d7f58d9671f7 100644
+> > --- a/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
+> > +++ b/tools/testing/selftests/bpf/prog_tests/ctx_rewrite.c
+> > @@ -69,15 +69,15 @@ static struct test_case test_cases[] = {
+> >  	{
+> >  		N(SCHED_CLS, struct __sk_buff, tstamp),
+> >  		.read  = "r11 = *(u8 *)($ctx + sk_buff::__mono_tc_offset);"
+> > -			 "w11 &= 3;"
+> > -			 "if w11 != 0x3 goto pc+2;"
+> > +			 "w11 &= 5;"
+> > +			 "if w11 != 0x5 goto pc+2;"
+> >  			 "$dst = 0;"
+> >  			 "goto pc+1;"
+> >  			 "$dst = *(u64 *)($ctx + sk_buff::tstamp);",
+> >  		.write = "r11 = *(u8 *)($ctx + sk_buff::__mono_tc_offset);"
+> > -			 "if w11 & 0x2 goto pc+1;"
+> > +			 "if w11 & 0x4 goto pc+1;"
+> >  			 "goto pc+2;"
+> > -			 "w11 &= -2;"
+> > +			 "w11 &= -4;"
+> >  			 "*(u8 *)($ctx + sk_buff::__mono_tc_offset) = r11;"
+> >  			 "*(u64 *)($ctx + sk_buff::tstamp) = $src;",
+> >  	},
 > 
 
 
