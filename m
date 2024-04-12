@@ -1,75 +1,48 @@
-Return-Path: <netdev+bounces-87520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D51B8A363E
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 21:15:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E8618A3653
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 21:26:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54B4B2875CE
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 19:15:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D21F21F24479
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 19:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A79014F135;
-	Fri, 12 Apr 2024 19:15:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A3D21509A5;
+	Fri, 12 Apr 2024 19:26:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YDMIMApr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ooKAcEhg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C52148313
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 19:15:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACF61509A0;
+	Fri, 12 Apr 2024 19:26:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712949302; cv=none; b=r5psjCy2+Oapakhi/EASJuTNFb5XuMpBuclHSJWITNEHH77SHhNOAjoc2K9UWqhVr2quILCvbobDBly0/DpYNUP+goicIRQdp6qcJ5IjM1G7BWtFXfNviPl5o9JAfr0TLnzWVehWPShEg8VA8Vr9HE42Q2KvQ7hCDewZKDK8qqk=
+	t=1712949981; cv=none; b=TIrbJivyUpHvRf7M3oKDNWuZGK9FKtH43ERqFzs2c8i66FZsZrD/zV2GsHKlvJANF25Toet12aqxqdB51FM6cuGMX5JJJh33xEP98qQVXziMvs5rnkMlql40X4bIyaXQ9ft1dE1oyor2tpn/pj45relJiU6yN89JH7dGSkhpS2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712949302; c=relaxed/simple;
-	bh=pqafSQ/pUMO89hdQchOjzmgCRrDtM8Pii5wIB+LMc2o=;
+	s=arc-20240116; t=1712949981; c=relaxed/simple;
+	bh=VYZYnuz55tg2RsFbxQ0z5NSOdwQiU1+mcxAMKYGkTjU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ujTZLxhgmcxalrNLt9ctIM6TVlTfs8moDRuPKdjM+lCFLOTyosh3BFe5r3DvKjU/Qb19Ly+jm/QxI5K6LeivaOcRUkylv/FY4gFUG0/vztyoS8663LJOaObu5k6b3QQM2k3tVsOHfd05KigzmaEZUTVlGR+nMC8o5vWU7fdQqVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YDMIMApr; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a51a80b190bso69728766b.3
-        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 12:15:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712949299; x=1713554099; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=fSILvxffpq5e9ruXIZsNeix7wzL0fUMenyurSYzRHIg=;
-        b=YDMIMAprJE1WUl5F9vstbwXP+SvnClZaQzJOc5k20W+f9I4O4g41mvKwXizNOv+xWw
-         UpN6EAPsIoN1iia8GRVbyiD/e2piWZTon3bQZi/iTj6lfiQ3XtdRF/qpLQ1jziCU+iUo
-         wyu20U8l7SlSPA8NoZcXaa/dfCmMx/sc+r1yMzKWI/4BHChEyjZcPQx4POuwDgWoy5Fa
-         Af5NNmD1QARrLbADL83EU9dEbBmQbS/w8spH+g8Bb1EalWva0EY2/0u+vXsOSKk6iWUE
-         prswPPaw0DsrpGjgwjyNX0MvOthIdFwmB5wjX/CK3w7m9gqiP0CCBIKfu0FemHtv7Kcl
-         D0DA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712949299; x=1713554099;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fSILvxffpq5e9ruXIZsNeix7wzL0fUMenyurSYzRHIg=;
-        b=dVM4uHw95hf4lVF8xKt+IN90m1rxmpD+y7QjRfvuzaAE89BTQUoHE4Q5Z2mLCzZjWi
-         ZVbvqRbVWuHzjGVZvyBirGUcRqGF/AxjKBc5Fbz28Z8A95rKEbKWbwyRkcuY2omgMUM5
-         pJh3v9+5C8oU8U/W1riDIGud9jdYagjfxml8PU10KqNnSEZ9dGuYCION0d2zQLyrO+ug
-         yF5/Q9UeSIsDWxjS4C35rFiELRVXtI9OV5SrqOs+2/hYR6YyKtdDFbJgBnkUBzsaeiMp
-         wjSNi7AZbgoe7yERIp4ahamQ1ngVK8l3FLt5NTKFK+LhC6U2Zv1ZOhSDS3qnwMnmC5gK
-         UqOA==
-X-Forwarded-Encrypted: i=1; AJvYcCWRslaXhSurAxmbFsNoFfkd2d75ey6h/H1u6cr52DaIrsh4Bc6Rh47nnsAeugRlVw+ZxQAlmIa/2QW73HK8Q/dUNPASiAmt
-X-Gm-Message-State: AOJu0YxUo6XRFk6WAgYZTjow5SFtOxqCphkB1GdOtYltm1zIyU+uZHwo
-	MacdQcJfueYi4ctdbDmz656PzrvsK1eVbeRLBLGvCft9+vp+jK2Y
-X-Google-Smtp-Source: AGHT+IGsl7QkP2LiQ5SaoBZOh1DBkoJHsNWpkhWT2E4BCzrC9Gc6CnH48QAFUQvI7FTLUhdWo+XfKw==
-X-Received: by 2002:a50:d599:0:b0:56e:57f9:8c83 with SMTP id v25-20020a50d599000000b0056e57f98c83mr3346442edi.19.1712949298973;
-        Fri, 12 Apr 2024 12:14:58 -0700 (PDT)
-Received: from ?IPV6:2a01:c22:7a91:3c00:98a7:a367:3d10:2fbb? (dynamic-2a01-0c22-7a91-3c00-98a7-a367-3d10-2fbb.c22.pool.telefonica.de. [2a01:c22:7a91:3c00:98a7:a367:3d10:2fbb])
-        by smtp.googlemail.com with ESMTPSA id en8-20020a056402528800b0056e2432d10bsm1955671edb.70.2024.04.12.12.14.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Apr 2024 12:14:58 -0700 (PDT)
-Message-ID: <97bb7495-7bf7-4511-8d30-ba9d47b6065e@gmail.com>
-Date: Fri, 12 Apr 2024 21:14:59 +0200
+	 In-Reply-To:Content-Type; b=C+ZR1kvTQHp2bd5CFynjDVAO+97tinCt65TMGkb+e4c+G40A7vP88ufZVHjX546sQJJotrDoX4EbmkAXz+2GBiySs0jXjRBNIY9rQ7U1ddteTEAyvMWxDjmiw++kA5570riXL8FPji8WQLG8DWMFUTrtL7KImzwKBGbXl/VPg7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ooKAcEhg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6BB6C113CD;
+	Fri, 12 Apr 2024 19:26:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712949980;
+	bh=VYZYnuz55tg2RsFbxQ0z5NSOdwQiU1+mcxAMKYGkTjU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ooKAcEhgbd41GOVm4UG6pBYmJ02yHakeXpy/jvZyyHrEFWF+7af8i3fFkilWTjTrF
+	 xnt6jOOSdFSsfj0CAS8fUlW0ccvSz0YAkyTfAaOo5Om/Wq+rspe3an3tOVT8rEGRTT
+	 wPDGdGbUckzW2E/bLZ1SR0vyPVubC0ZDkwwzupbArJN0wDgt6wqpNWTGI8GX7PO32m
+	 ZT9ZrLx9GaoyvohEGVZDrrCb1N1Z3Ld584MyLHLjLGUiz9CJo0OFiAa6XdTHHURJAW
+	 5ZmOvAMtp0pIzTnJnGD/AZhC8vYsFZED0WOiUnOzXWkuOGksv3tjnJw4Thu1Fi4VbT
+	 snopbX9LwHcNw==
+Message-ID: <75d837cc-4d33-44f6-bb0c-7558f0488d4e@kernel.org>
+Date: Fri, 12 Apr 2024 21:26:15 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,86 +50,218 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: constify net_class
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <1d59986e-8ac0-4b9c-9006-ad1f41784a08@gmail.com>
- <20240412093800.4d2521eb@hermes.local>
+Subject: Re: Advice on cgroup rstat lock
+To: Yosry Ahmed <yosryahmed@google.com>
+Cc: Waiman Long <longman@redhat.com>, Johannes Weiner <hannes@cmpxchg.org>,
+ Tejun Heo <tj@kernel.org>, Jesper Dangaard Brouer <jesper@cloudflare.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Shakeel Butt <shakeelb@google.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Daniel Bristot de Oliveira <bristot@redhat.com>,
+ kernel-team <kernel-team@cloudflare.com>, cgroups@vger.kernel.org,
+ Linux-MM <linux-mm@kvack.org>, Netdev <netdev@vger.kernel.org>,
+ bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
+ Ivan Babrou <ivan@cloudflare.com>
+References: <7cd05fac-9d93-45ca-aa15-afd1a34329c6@kernel.org>
+ <20240319154437.GA144716@cmpxchg.org>
+ <56556042-5269-4c7e-99ed-1a1ab21ac27f@kernel.org>
+ <CAJD7tkYbO7MdKUBsaOiSp6-qnDesdmVsTCiZApN_ncS3YkDqGQ@mail.gmail.com>
+ <bf94f850-fab4-4171-8dfe-b19ada22f3be@kernel.org>
+ <CAJD7tkbn-wFEbhnhGWTy0-UsFoosr=m7wiJ+P96XnDoFnSH7Zg@mail.gmail.com>
+ <ac4cf07f-52dd-454f-b897-2a4b3796a4d9@kernel.org>
+ <96728c6d-3863-48c7-986b-b0b37689849e@redhat.com>
+ <CAJD7tkZrVjhe5PPUZQNoAZ5oOO4a+MZe283MVTtQHghGSxAUnA@mail.gmail.com>
+ <4fd9106c-40a6-415a-9409-c346d7ab91ce@redhat.com>
+ <f72ab971-989e-4a1c-9246-9b8e57201b60@kernel.org>
+ <CAJD7tka=1AnBNFn=frp7AwfjGsZMGcDjw=xiWeqNygC5rPf6uQ@mail.gmail.com>
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
- sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
- MVE4yNwdS+UsPeCF/6CQQTzHc+n7DomE7fjJD5J1hOJjqz2XWe71fTvYXzxCFLwXXbBiqDC9
- dNqOe5odPsa4TsWZ09T33g5n2nzTJs4Zw8fCy8rLqix/raVsqr8fw5qM66MVtdmEljFaJ9N8
- /W56qGCp+H8Igk/F7CjlbWXiOlKHA25mPTmbVp7VlFsvsmMokr/imQr+0nXtmvYVaKEUwY2g
- 86IU6RAOuA8E0J5bD/BeyZdMyVEtX1kT404UJZekFytJZrDZetwxM/cAH+1fMx4z751WJmxQ
- J7mIXSPuDfeJhRDt9sGM6aRVfXbZt+wBogxyXepmnlv9K4A13z9DVLdKLrYUiu9/5QEl6fgI
- kPaXlAZmJsQfoKbmPqCHVRYj1lpQtDM/2/BO6gHASflWUHzwmBVZbS/XRs64uJO8CB3+V3fa
- cIivllReueGCMsHh6/8wgPAyopXOWOxbLsZ291fmZqIR0L5Y6b2HvdFN1Xhc+YrQ8TKK+Z4R
- mJRDh0wNQ8Gm89g92/YkHji4jIWlp2fwzCcx5+lZCQ1XdqAiHQARAQABzSZIZWluZXIgS2Fs
- bHdlaXQgPGhrYWxsd2VpdDFAZ21haWwuY29tPsLBjgQTAQgAOBYhBGxfqY/yOyXjyjJehXLe
- ig9U8DoMBQJf9GRVAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEHLeig9U8DoMSycQ
- AJbfg8HZEK0ljV4M8nvdaiNixWAufrcZ+SD8zhbxl8GispK4F3Yo+20Y3UoZ7FcIidJWUUJL
- axAOkpI/70YNhlqAPMsuudlAieeYZKjIv1WV5ucNZ3VJ7dC+dlVqQdAr1iD869FZXvy91KhJ
- wYulyCf+s4T9YgmLC6jLMBZghKIf1uhSd0NzjyCqYWbk2ZxByZHgunEShOhHPHswu3Am0ftt
- ePaYIHgZs+Vzwfjs8I7EuW/5/f5G9w1vibXxtGY/GXwgGGHRDjFM7RSprGOv4F5eMGh+NFUJ
- TU9N96PQYMwXVxnQfRXl8O6ffSVmFx4H9rovxWPKobLmqQL0WKLLVvA/aOHCcMKgfyKRcLah
- 57vGC50Ga8oT2K1g0AhKGkyJo7lGXkMu5yEs0m9O+btqAB261/E3DRxfI1P/tvDZpLJKtq35
- dXsj6sjvhgX7VxXhY1wE54uqLLHY3UZQlmH3QF5t80MS7/KhxB1pO1Cpcmkt9hgyzH8+5org
- +9wWxGUtJWNP7CppY+qvv3SZtKJMKsxqk5coBGwNkMms56z4qfJm2PUtJQGjA65XWdzQACib
- 2iaDQoBqGZfXRdPT0tC1H5kUJuOX4ll1hI/HBMEFCcO8++Bl2wcrUsAxLzGvhINVJX2DAQaF
- aNetToazkCnzubKfBOyiTqFJ0b63c5dqziAgzsFNBF/0ZFUBEADF8UEZmKDl1w/UxvjeyAeX
- kghYkY3bkK6gcIYXdLRfJw12GbvMioSguvVzASVHG8h7NbNjk1yur6AONfbUpXKSNZ0skV8V
- fG+ppbaY+zQofsSMoj5gP0amwbwvPzVqZCYJai81VobefTX2MZM2Mg/ThBVtGyzV3NeCpnBa
- 8AX3s9rrX2XUoCibYotbbxx9afZYUFyflOc7kEpc9uJXIdaxS2Z6MnYLHsyVjiU6tzKCiVOU
- KJevqvzPXJmy0xaOVf7mhFSNQyJTrZpLa+tvB1DQRS08CqYtIMxRrVtC0t0LFeQGly6bOngr
- ircurWJiJKbSXVstLHgWYiq3/GmCSx/82ObeLO3PftklpRj8d+kFbrvrqBgjWtMH4WtK5uN5
- 1WJ71hWJfNchKRlaJ3GWy8KolCAoGsQMovn/ZEXxrGs1ndafu47yXOpuDAozoHTBGvuSXSZo
- ythk/0EAuz5IkwkhYBT1MGIAvNSn9ivE5aRnBazugy0rTRkVggHvt3/7flFHlGVGpBHxFUwb
- /a4UjJBPtIwa4tWR8B1Ma36S8Jk456k2n1id7M0LQ+eqstmp6Y+UB+pt9NX6t0Slw1NCdYTW
- gJezWTVKF7pmTdXszXGxlc9kTrVUz04PqPjnYbv5UWuDd2eyzGjrrFOsJEi8OK2d2j4FfF++
- AzOMdW09JVqejQARAQABwsF2BBgBCAAgFiEEbF+pj/I7JePKMl6Fct6KD1TwOgwFAl/0ZFUC
- GwwACgkQct6KD1TwOgxUfg//eAoYc0Vm4NrxymfcY30UjHVD0LgSvU8kUmXxil3qhFPS7KA+
- y7tgcKLHOkZkXMX5MLFcS9+SmrAjSBBV8omKoHNo+kfFx/dUAtz0lot8wNGmWb+NcHeKM1eb
- nwUMOEa1uDdfZeKef/U/2uHBceY7Gc6zPZPWgXghEyQMTH2UhLgeam8yglyO+A6RXCh+s6ak
- Wje7Vo1wGK4eYxp6pwMPJXLMsI0ii/2k3YPEJPv+yJf90MbYyQSbkTwZhrsokjQEaIfjrIk3
- rQRjTve/J62WIO28IbY/mENuGgWehRlTAbhC4BLTZ5uYS0YMQCR7v9UGMWdNWXFyrOB6PjSu
- Trn9MsPoUc8qI72mVpxEXQDLlrd2ijEWm7Nrf52YMD7hL6rXXuis7R6zY8WnnBhW0uCfhajx
- q+KuARXC0sDLztcjaS3ayXonpoCPZep2Bd5xqE4Ln8/COCslP7E92W1uf1EcdXXIrx1acg21
- H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
- lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
- OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <20240412093800.4d2521eb@hermes.local>
-Content-Type: text/plain; charset=UTF-8
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <CAJD7tka=1AnBNFn=frp7AwfjGsZMGcDjw=xiWeqNygC5rPf6uQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 12.04.2024 18:38, Stephen Hemminger wrote:
-> On Fri, 12 Apr 2024 12:17:57 +0200
-> Heiner Kallweit <hkallweit1@gmail.com> wrote:
-> 
->> AFAICS all users of net_class take a const struct class * argument.
->> Therefore fully constify net_class.
+
+
+On 11/04/2024 19.22, Yosry Ahmed wrote:
+> [..]
+>>>>>>
+>>>>>> How far can we go... could cgroup_rstat_lock be converted to a mutex?
+>>   >>>
+>>>>> The cgroup_rstat_lock was originally a mutex. It was converted to a
+>>>>> spinlock in commit 0fa294fb1985 ("group: Replace cgroup_rstat_mutex with
+>>>>> a spinlock"). Irq was disabled to enable calling from atomic context.
+>>>>> Since commit 0a2dc6ac3329 ("cgroup: remove
+>>>>> cgroup_rstat_flush_atomic()"), the rstat API hadn't been called from
+>>>>> atomic context anymore. Theoretically, we could change it back to a
+>>>>> mutex or not disabling interrupt. That will require that the API cannot
+>>>>> be called from atomic context going forward.
+>>   >>>
+>>>> I think we should avoid flushing from atomic contexts going forward
+>>>> anyway tbh. It's just too much work to do with IRQs disabled, and we
+>>>> observed hard lockups before in worst case scenarios.
+>>>>
 >>
->> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
->> ---
+>> Appreciate the historic commits as documentation for how the code
+>> evolved.  Sounds like we agree that the IRQ-disable can be lifted,
+>> at-least between the three of us.
 > 
-> Acked-by: Stephen Hemminger <stephen@networkplumber.org>
+> It can be lifted, but whether it should be or not is a different
+> story. I tried keeping it as a spinlock without disabling IRQs before
+> and Tejun pointed out possible problems, see below.
 > 
-> PS: net_class_attr can be const as well?
 
-No, this results in warnings, because the const is at least discarded.
+IMHO it *MUST* be lifted, as disabling IRQs here is hurting other parts
+of the system and actual production systems.
 
-struct attribute_group {
-	const char		*name;
-	umode_t			(*is_visible)(struct kobject *,
-					      struct attribute *, int);
-	umode_t			(*is_bin_visible)(struct kobject *,
-						  struct bin_attribute *, int);
-	struct attribute	**attrs;
-	struct bin_attribute	**bin_attrs;
-};
+The "offending" IRQ-spin_lock commit (0fa294fb1985) is from 2018, and
+GitHub noticed in 2019 (via blog[1]) and at Red Hat I backported[2]
+patches (which I now understand) only mitigate the issues.  Our prod
+systems are on 6.1 and 6.6 where we still clearly see the issue
+occurring.  Also Daniel's "rtla timerlat" tool for catching systems
+latency issues have "cgroup_rstat_flush_locked" as the poster child [3][4].
 
+
+  [1] https://github.blog/2019-11-21-debugging-network-stalls-on-kubernetes/
+  [2] https://bugzilla.redhat.com/show_bug.cgi?id=1795049
+  [3] https://bristot.me/linux-scheduling-latency-debug-and-analysis/
+  [4] Documentation/tools/rtla/rtla-timerlat-top.rst
+
+>>
+>>>> I think one problem that was discussed before is that flushing is
+>>>> exercised from multiple contexts and could have very high concurrency
+>>>> (e.g. from reclaim when the system is under memory pressure). With a
+>>>> mutex, the flusher could sleep with the mutex held and block other
+>>>> threads for a while.
+>>>>
+>>
+>> Fair point, so in first iteration we keep the spin_lock but don't do the
+>> IRQ disable.
+> 
+> I tried doing that before, and Tejun had some objections:
+> https://lore.kernel.org/lkml/ZBz%2FV5a7%2F6PZeM7S@slm.duckdns.org/
+> 
+> My read of that thread is that Tejun would prefer we look into
+> converting cgroup_rsat_lock into a mutex again, or more aggressively
+> drop the lock on CPU boundaries. Perhaps we can unconditionally drop
+> the lock on each CPU boundary, but I am worried that contending the
+> lock too often may be an issue, which is why I suggested dropping the
+> lock if there are pending IRQs instead -- but I am not sure how to do
+> that :)
+> 
+
+Like Tejun, I share the concern that keeping this a spinlock will
+can increase the chance of several CPUs contend on this lock (which is
+also a production issue we see).  This is why I suggested to "exit" if
+(1) we see the lock have been taken by somebody else, or if (2) stats
+were flushed recently.
+
+For (2), memcg have a mem_cgroup_flush_stats_ratelimited() system
+combined with memcg_vmstats_needs_flush(), which limits the pressure on
+the global lock (cgroup_rstat_lock).
+*BUT* other users of cgroup_rstat_flush() like when reading io.stat
+(blk-cgroup.c) and cpu.stat, don't have such a system to limit pressure
+on global lock. Further more, userspace can easily trigger this via
+reading those stat files.  And normal userspace stats tools (like
+cadvisor, nomad, systemd) spawn threads reading io.stat, cpu.stat and
+memory.stat, likely without realizing that kernel side they share same
+global lock...
+
+I'm working on a code solution/proposal for "ratelimiting" global lock
+access when reading io.stat and cpu.stat.
+
+
+>> I already have a upstream devel kernel doing this in my
+>> testlab, but I need to test this in prod to see the effects.  Can you
+>> recommend a test I should run in my testlab?
+> 
+> I don't know of any existing test/benchmark. What I used to do is run
+> a synthetic test with a lot of concurrent reclaim activity (some in
+> the same cgroups, some in different ones) to stress in-kernel
+> flushers, and a synthetic test with a lot of concurrent userspace
+> reads.
+> 
+> I would mainly look into the time it took for concurrent reclaim
+> operations to complete and the userspace reads latency histograms. I
+> don't have the scripts I used now unfortunately, but I can help with
+> more details if needed.
+> 
+>>
+>> I'm also looking at adding some instrumentation, as my bpftrace
+>> script[2] need to be adjusted to every binary build.
+>> Still hoping ACME will give me an easier approach to measuring lock wait
+>> and hold time? (without having to instrument *all* lock in system).
+>>
+>>
+>>    [2]
+>> https://github.com/xdp-project/xdp-project/blob/master/areas/latency/cgroup_rstat_latency_steroids.bt
+>>
+>>
+>>>> I vaguely recall experimenting locally with changing that lock into a
+>>>> mutex and not liking the results, but I can't remember much more. I
+>>>> could be misremembering though.
+>>>>
+>>>> Currently, the lock is dropped in cgroup_rstat_flush_locked() between
+>>>> CPU iterations if rescheduling is needed or the lock is being
+>>>> contended (i.e. spin_needbreak() returns true). I had always wondered
+>>>> if it's possible to introduce a similar primitive for IRQs? We could
+>>>> also drop the lock (and re-enable IRQs) if IRQs are pending then.
+>>>
+>>> I am not sure if there is a way to check if a hardirq is pending, but we
+>>> do have a local_softirq_pending() helper.
+>>
+>> The local_softirq_pending() might work well for me, as this is our prod
+>> problem, that CPU local pending softirq's are getting starved.
+> 
+> If my understanding is correct, softirqs are usually scheduled by
+> IRQs, which means that local_softirq_pending() may return false if
+> there are pending IRQs (that will schedule softirqs). Is this correct?
+> 
+
+Yes, networking hard IRQ will raise softirq, but software often also
+raise softirq.
+I see where you are going with this... the cgroup_rstat_flush_locked()
+loop "play nice" check happens with IRQ lock held, so you speculate that
+IRQ handler will not be able to raise softirq, thus
+local_softirq_pending() will not work inside IRQ lock.
+
+
+>>
+>> In production another problematic (but rarely occurring issue) is when
+>> several CPUs contend on this lock.  Yosry's recent work/patches have
+>> already reduced the chances of this happening (thanks), BUT it still can
+>> and does happen.
+>> A simple solution to this, would be to do a spin_trylock() in
+>> cgroup_rstat_flush(), and exit if we cannot get the lock, because we
+>> know someone else will do the work.
+> 
+> I am not sure I understand what you mean specifically with the checks
+> below, but I generally don't like this (as you predicted :) ).
+> 
+> On the memcg side, we used to have similar logic when we used to
+> always flush the entire tree. This leaded to flushing being
+> indeterministic. You would occasionally get stale stats because of the
+> contention, which resulted in some inconsistencies (e.g. performing
+> proactive reclaim successfully then reading the stats that do not
+> reflect that).
+> 
+> Now that we dropped the logic to always flush the entire tree, it is
+> even more difficult because concurrent flushes could be in completely
+> irrelevant subtrees.
+> 
+> If we were to introduce some smart logic to figure out that the
+> subtree we are trying to flush is already being flushed, I think we
+> would need to wait for that ongoing flush to complete instead of just
+> returning (e.g. using completions). But I think such implementations
+> to find overlapping flushes and wait for them may be too compicated.
+> 
+
+We will see if you hate my current code approach ;-)
+
+>> I expect someone to complain here, as cgroup_rstat_flush() takes a
+>> cgroup argument, so I might starve updates on some other cgroup. I
+>> wonder if I can simply check if cgroup->rstat_flush_next is not NULL, to
+>> determine if this cgroup is the one currently being processed?
+
+--Jesper
 
