@@ -1,254 +1,299 @@
-Return-Path: <netdev+bounces-87462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 059438A32B4
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 17:40:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F08E8A32B8
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 17:41:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 276C31C20D66
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:40:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B19671C22244
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:41:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B318A85278;
-	Fri, 12 Apr 2024 15:40:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27AA6148301;
+	Fri, 12 Apr 2024 15:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L3wr6VdQ"
+	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="qpuJWG1p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp-42ae.mail.infomaniak.ch (smtp-42ae.mail.infomaniak.ch [84.16.66.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A081487D8
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 15:40:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712936414; cv=fail; b=rsxz5w3fFqJKqEceU1DHD9A9fsLSJU6dSKHiqnpYp7RuqLSJJusSKbhD1+42RTrXbH/KFxlXQ4byIeepf113FjTlNhrU8C240ygC8hUhS9mLK7uOQ8D7mYM+lVBg4f7Eg1YOFIqdsxN+3YHcQgnnVTgvZIzjqRThx0p55Pfwy14=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712936414; c=relaxed/simple;
-	bh=JDGlHU6c6Zvy1GsSf83krOBzA/TICM5/VKAlNRp022I=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=MwcfhxA+6xPzjFf1ikdOXoBYuygew4MISHFZScEhHJxs6oeT0Ryh+hCwOqzlpbzclgoW4WvJvdimP/+UKcGZOuqoRE7QS5IewRzO4xRK3z4smobMCT94B0K0uXrJlayyMRqAwDAp059ykCEUdRhr46Nkl/3XV2v3w/dQMZr2sB4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=L3wr6VdQ; arc=fail smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712936412; x=1744472412;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=JDGlHU6c6Zvy1GsSf83krOBzA/TICM5/VKAlNRp022I=;
-  b=L3wr6VdQxWF4nCEqwtJdxmZtGVyMNPDbtuXb2j6nuTbWS8FLi1BTBVHB
-   6lRJI46JU/70O6Hh3dXNELcA7quCTaCfYLE1T9K/xjk37FObyOe0rlNFh
-   LeRTcd558vSdJuQlB3dUC4BR1igWw6ae/5Gix5oPQ3d1do/F2o1yQptBY
-   iFiquBYArzylHecs6Sgcv8S44Cprz+O3dMSGaklknEihvqAl8WExHQbjB
-   djUrHKqftOhbj1m/9QNCLabeuxmgZ7Yh7vzg3BqAFZUJh2jbpwc2Nj1x9
-   RwDqgJHe1d/TrpqVN/Hx9Bjzi0XRg1lSqGGKY6FTWLKeifBjn9/usq7KN
-   w==;
-X-CSE-ConnectionGUID: TTvRJU2ARbq+pfHi9MYDxA==
-X-CSE-MsgGUID: B6OGbehhSAOOvuf28kP6xQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="19108215"
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="19108215"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 08:40:11 -0700
-X-CSE-ConnectionGUID: 0Qg02lrdQPSiCvzdyCEv3g==
-X-CSE-MsgGUID: XTNZ9DvAR0G2dODIHCbCWg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="25810933"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Apr 2024 08:40:11 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 12 Apr 2024 08:40:10 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 12 Apr 2024 08:40:09 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 12 Apr 2024 08:40:09 -0700
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.168)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 12 Apr 2024 08:40:09 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=egp58tAtLPUT0uzYNIqar/7DvgNFtjC0sv5UVHWYSzVSaD1LHV1C05nRPUUlwjjD9pHFEDwIXYbThljj+D2eMiYqNNiDVggTs+dDjYMJcp4Eu6mI7ch29hvVTTOLbkoD8xuA2PQTJL98jZUhQ62PlYUm0LY6ZRCaCU4ffO/cxoh+Cf9YTuNtm1cYCKcdhPnMy1/bWOEuk2nAHrTc9IvoH7K2kzqLopZzFNl6lt3GHtJU5gno1/4yFe7zK3eu4I9KqEgY7Q0bsWWVqmDcuIxZZLNpcx4gg1JVNDisgJY8KozRkQqBJjOc0P8tiPWojr3jSl69X5JUvDuAjW9gePZWXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kAEnHuaEjgB8Na1lRJym9ceJldsKSYwlMpo29tlh93g=;
- b=gVEicJX9kd72lBoS6jP5KIkFakxI/hzQZdM1Efqkv3nes8Ogk/lVZC6KWiZVc7eEYbr4XtMKR6i6nrE0YboNHT6VCQicTU6ejRnP5TpR/Q1RSQVXiUDMHdzmHnrSNXw/KFaWmdqkx9GEXNkkcHX1CdUGcjpxAQcBFeaGO72ILliz5zInXqm/UPeOmesKH5OyJ2/f+GGyFM0FRefKy5p3hgU4gpum4qCKh11vW+thgVpZRDiJa1ESURJwfu3/ogMRb3M9lYBTMuwyKqssCe4o1nxxrg2PlcPxwPdYIyvkrk6M5SeaOndkd39JVibALpaaxv3UtBDtccIHq/uZ1Z8xkg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
- by IA1PR11MB6394.namprd11.prod.outlook.com (2603:10b6:208:3ad::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.23; Fri, 12 Apr
- 2024 15:40:07 +0000
-Received: from BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::9c80:a200:48a2:b308]) by BL3PR11MB6435.namprd11.prod.outlook.com
- ([fe80::9c80:a200:48a2:b308%4]) with mapi id 15.20.7452.019; Fri, 12 Apr 2024
- 15:40:07 +0000
-Message-ID: <aaf6147a-26e7-2da9-4973-e7dbf4605029@intel.com>
-Date: Fri, 12 Apr 2024 08:40:04 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.1
-Subject: Re: [PATCH net-next 2/4] ice: Implement 'flow-type ether' rules
-To: "Plachno, Lukasz" <lukasz.plachno@intel.com>
-CC: <davem@davemloft.net>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<netdev@vger.kernel.org>, Jakub Buchocki <jakubx.buchocki@intel.com>, Mateusz
- Pacuszka <mateuszx.pacuszka@intel.com>, Przemek Kitszel
-	<przemyslaw.kitszel@intel.com>, Jacob Keller <jacob.e.keller@intel.com>,
-	Simon Horman <horms@kernel.org>, Pucha Himasekhar Reddy
-	<himasekharx.reddy.pucha@intel.com>, Jakub Kicinski <kuba@kernel.org>
-References: <20240411173846.157007-1-anthony.l.nguyen@intel.com>
- <20240411173846.157007-3-anthony.l.nguyen@intel.com>
- <20240411200608.2fcf7e36@kernel.org>
- <f0ed2d9e-99f2-4739-a2a7-62de488db35e@intel.com>
-Content-Language: en-US
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-In-Reply-To: <f0ed2d9e-99f2-4739-a2a7-62de488db35e@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MW4PR04CA0281.namprd04.prod.outlook.com
- (2603:10b6:303:89::16) To BL3PR11MB6435.namprd11.prod.outlook.com
- (2603:10b6:208:3bb::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B4D148313;
+	Fri, 12 Apr 2024 15:41:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712936511; cv=none; b=U6wQpiRM/B2uA1e5IRzBusljNfU+7bZ0dghemZauOz+AooSzzEoEhCgCptKhatL/7/UEEVsW5Eliyqj5Xq76xcQDXggtVPIm0rkwrLVPi6ennSv8pp6UcaK7eutR9dipEOjfIj6xu150KlZOZjKnc9HLnkzCBRjVo/alZirn9Bk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712936511; c=relaxed/simple;
+	bh=ltpldv20m8mKDyTh2QLhHxncVLR3ocLNjfeoAoBCP4M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PtoyYfeT3PDuyLepYNFfBCtJLw8YXHicOvpdMkHwIqWzh/Nn6tZlHhoEQgDIP+aJMvqTWKQhBcj8QSsIrTKaBcPMrw3a/JAcGDQOh6pw+X35qJEXbZlWnEaF/Q3p1fHU44CCKGoS4a7dFmRxRelfSsMAKzAfYYpkQ9+gecHzxEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=qpuJWG1p; arc=none smtp.client-ip=84.16.66.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
+Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4VGLQW2n4DzHmL;
+	Fri, 12 Apr 2024 17:41:39 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1712936499;
+	bh=ltpldv20m8mKDyTh2QLhHxncVLR3ocLNjfeoAoBCP4M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qpuJWG1pkRY9dDvX0IxIKZF+uILKHVp697FDqEsGjnBtWdby0B3rPNMngoQmMDFTp
+	 jjcDmnxCE2h72y/v+C+dutuuAjNBrfRy62OPxH2Q1pxbgYfKkRHVmV2w3Jvbx36dh0
+	 oV5DRTUdt+5VGU+GTC5pCxsTHTn6sbT8auNMYWOw=
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4VGLQV5zqkzsWV;
+	Fri, 12 Apr 2024 17:41:38 +0200 (CEST)
+Date: Fri, 12 Apr 2024 17:41:38 +0200
+From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+To: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
+Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, 
+	willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, linux-security-module@vger.kernel.org, 
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
+Subject: Re: [RFC PATCH v1 01/10] landlock: Support socket access-control
+Message-ID: <20240412.VeKuuY4ohG6e@digikod.net>
+References: <20240408093927.1759381-1-ivanov.mikhail1@huawei-partners.com>
+ <20240408093927.1759381-2-ivanov.mikhail1@huawei-partners.com>
+ <ZhRKOTmoAOuwkujB@google.com>
+ <a7e8f467-036c-a3e0-e26b-b5ba966b4e9e@huawei-partners.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|IA1PR11MB6394:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6c589412-7062-4fb7-439f-08dc5b06d4b6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ijdNDx/tWl1OV0oqdfCXxO6/C8uaA4HGKu9jSZI/WtYFZpGXQk6IrrQn09AzryIDQCaenLGMm7lfKF6olX3I8n0ekzvDg7Y6aPtE4pNvfyu2sQPIawyA4+SnaEJ9L4FpjTlXf5YQkQ+Dw4Q+HKBHI+XK473F/zOc8DKxJZFhJmmOs3te3UPIOYOzupt8ZJx4UqWhoHTWFt2djBWUMF1N2UDYJqocwEJVh3WksuWlhEUCu8i4uVp+BMFbkGAn6ynLDTwSMKZmz8fyJtbl4gK5bQ723E/8VbtEAG+zWWzMiD1vkuOjLjELG5k++BRLpFcnzZbleboAmsKOCVxXRV/D7Nbrm/qxtoS/UJZgPKObnOIZ8SsKEAS5TEJN/uzr0EMxXJA3xjewBHcG8NJObnvcH+TKulIJJSYezexF+7rUUI6XdqZyPpfgs+MWZCf56aFmfBX18ga54MtEnm46K+ETPIa4rmSk+OsY4PY8NOfYEd6mpiKVtVHK8fxDzxd2ygQt/yl5m2AG9c6Iq0Zh1OZe1G4kozqp2giQ7Hbbza8LjvnrSOUKVMV2R81wA4BXuIsPtTTctXZCz4qZNhsX7UoK9p7oNw6V1HKwL3fiWycgUZb1k3RJmb3Gf+rZ7Xj7/UUTkUbDMD+My6brWP2pRDFL8z3W7Bj/3cScqFOJuLb8mWQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bjF2d3A0Yks3UDFWR3JwVGJQSnZFSnRhWUVYcUlMZnJnQzhaZG5JMWlwWXBR?=
- =?utf-8?B?bUg2OUVTRlJHVSsxdzNzUUtudlVvSTFaK2kvckpya01wMUxUWVZkSlVDZmFB?=
- =?utf-8?B?NWZUTmxNUmgzYm0waGluTVpZYlBSUCtPdmNJL2VjNER1K1h2MnhsUHNrdVpE?=
- =?utf-8?B?RWxKakRJK2FCYzI2Qmk1MG1COCtXWmhOK01wUWlteW5aak94a0lRNldueFFB?=
- =?utf-8?B?Tk5hODFEZFZNbE9WRTd6RVNmbGFmM0xOc2VPOEVsOHhGWG5meGFIa3VjKzJo?=
- =?utf-8?B?RThSYVRpSlZFVDJnc0gxNFZ3cDQycWF6NGorekdqQTI4WDZkTkxWSzN0d1Yr?=
- =?utf-8?B?YzhvK2xDam10ZjVmM1ZxNGw3bkpmTVUxa2NqMWI2cVRTYWxRV2NZY0dERDJz?=
- =?utf-8?B?alFZKzRsMHUxTGZrSEFnUG9lanIwdHhnNkI2YmtxZmtxN2dVcHNHanYybnJj?=
- =?utf-8?B?UUZTelY5ekFrd0ExZkJDTkMxY24wWG1ITWVmOFFXam4vamVuREpVODh5UWhw?=
- =?utf-8?B?eHc3Q0JyYUVqKzhsUnE0R3g5VFhMb1VkcEZ0RkdTWWtsSDk2Q0ZrR2JxcXQ1?=
- =?utf-8?B?V3BVb3RQNkthVDJSWTNzemZOK2RVQm5JU2k5YitZV20vU2NOY3NYdUUyZEVa?=
- =?utf-8?B?Y1RYK2xCZWlocUNCR3RDN24wQ04vbWZhY3BNdW42ajBwek5pWFMycmFiY2NV?=
- =?utf-8?B?UWtIWm9hTUdqamhEd2xYQUxUZU9wWnZlakVuTUNuUXhpNlJCRXQ4SmxGRFVH?=
- =?utf-8?B?bkFyanZwQUVINXZLTDNoWFBXN2I2SElyTmVyL1hwRjZ4WTRENnJrQk9XZjNG?=
- =?utf-8?B?dXVsMWpPUENlMlBqek1penlQSkQvQmIxYU1zVnJpUGZYbXJPOS9oNFlhcnMr?=
- =?utf-8?B?VEtZYXNUYnNHejQrU0F0dXE0Qyt5U0NNY1JJQnFMWUZhY2JlcXIydW9IN0JN?=
- =?utf-8?B?QzNNZFhZb3pzY0NNcm5YMTQ4YzRPTFExbkFpWFVhakQ2SFI1T1QraTZGNGh5?=
- =?utf-8?B?MDE0dk9BQ0F5MkJWdW9xT3BwWFp4dTVwMmtGWnY3SlQzMWpoR0swcWlESFBF?=
- =?utf-8?B?cTFjdFpvempmM21acjk0cE5lMklKNVFtU2RtMmRyLy94elFoZWxqOFRCdjFw?=
- =?utf-8?B?MStZcjdnN2kwbE5MMmNJN2RobUVEMThVVnA5SjFZai9VSEhWZUhQTlNlc1l1?=
- =?utf-8?B?QWM2ZFB6MXh0VUhGL0Vxd2JaUWFyM2s2ZVBFRXJrMGtHME15NmRJNTJXanB3?=
- =?utf-8?B?N1hhQlFCY05Ja0tlT3pNMEMrVXZySE5TRDkrT3cvTkNyL1NmaUkvQkNRandR?=
- =?utf-8?B?Q0ZsNHhEeUF4emYwN1BXQVc1RUF2SnhCR3N5SVkwa0ljdTBGanFhSWt3ZkRV?=
- =?utf-8?B?SmtkT1UyN0tuNXNyeVR6UmFrOG1ScXRSeG5zUjhhN1pmNXM3RmEwNU4yTXpU?=
- =?utf-8?B?Q1BPQ3JoSjBzd2hlWHMzWHc2NmNwRDBFcy9NVEF4YzFHbzBzRklIYWEwSXVx?=
- =?utf-8?B?ZWhrSU5RRVlmNldPdXp2SmJaYUNwQWZ1TldGbjJEa2VwSmZVNk9BSzhVRzVv?=
- =?utf-8?B?T3kwbkg4UjYyNXVGVGpFUFhFWEFZdHRqNFVuLzlwLzFQam1BWmpuSHp3QUZi?=
- =?utf-8?B?UklGMy85c1RvVXJSVm5ZSGNhN1V1YitLQXBrWDFzZkxCUkovNEk3VWZidCtM?=
- =?utf-8?B?ZElkQkx1Q2VqVGlyamNZMVVDc25JTVgrRGJIZjlISGI5aHFsL1VrenZmRHFn?=
- =?utf-8?B?NlhwODBmZ2FKUEtSSEMvMStnMGFSMFRGY2M3M1ZLcGNKeXl4RC9OREVkMy92?=
- =?utf-8?B?aEsrM2NINU9rVDVVMjhjemJRU2dyTVc2ZFVYR1NSYytLNGJSUVlmc1NPOVYy?=
- =?utf-8?B?YkFaa0N5TE1JKzlqcER5bWNmbFR4KzEvMzFwVkNZZiszb01xZ2ZUUnNoMjZw?=
- =?utf-8?B?NThKRGw5WEJxREVqVzdGelVneU94ZXdFLzYxejBZMDNvL2tyNkVTT0pUR0o5?=
- =?utf-8?B?dUUxcFkxemZhNHlja3pQMEZ3aHJtR0N0aFg2aXlZa1dkNFJiWDJsaENCV3Vm?=
- =?utf-8?B?U0xITHMwQ2JZWjI1UmdvNTczbnNKMjlmR3NBVyt3ZCsrdTlpU29zby9zbzZY?=
- =?utf-8?B?VmtNUy9PUHVYbjhPa1JnRFFISmdBRG9DT21jVzA3QUkzZVRBd0pjWnd3OEg5?=
- =?utf-8?B?MVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c589412-7062-4fb7-439f-08dc5b06d4b6
-X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2024 15:40:07.8311
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wYSyv+BfUYupgnWrQAQgfWOgq6UjAdJpf/k7/mWujKpixI4pMnFx4f8NcxcYuu+nfhHy4yChcrStfq3Py61npk1xHpTl+CKILxjnLgWd0vQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB6394
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a7e8f467-036c-a3e0-e26b-b5ba966b4e9e@huawei-partners.com>
+X-Infomaniak-Routing: alpha
 
+Thanks Ivanov, this looks really good!  Let me some time to review the
+rest.
 
+You can add this tag to the commit message (as reference and
+documentation):
+Closes: https://github.com/landlock-lsm/linux/issues/6
 
-On 4/12/2024 2:41 AM, Plachno, Lukasz wrote:
-> On 4/12/2024 5:06 AM, Jakub Kicinski wrote:
->> On Thu, 11 Apr 2024 10:38:42 -0700 Tony Nguyen wrote:
->>> +/**
->>> + * ice_set_fdir_vlan_seg
->>> + * @seg: flow segment for programming
->>> + * @ext_masks: masks for additional RX flow fields
->>> + */
->>
->> kerne-doc is not on board (note that we started using the -Wall flag
->> when running the script):
-
-I'll add that in to my checks. Thanks!
-
->> drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c:1285: warning: 
->> missing initial short description on line:
->>   * ice_set_fdir_vlan_seg
->> drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c:1292: warning: No 
->> description found for return value of 'ice_set_fdir_vlan_seg'
+On Thu, Apr 11, 2024 at 06:16:31PM +0300, Ivanov Mikhail wrote:
+> Hello! Big thanks for your review and ideas :)
 > 
-> Tony,
+> P.S.: Sorry, previous mail was rejected by linux mailboxes
+> due to HTML formatting.
 > 
-> Change below fixes the kernel-doc warnings in case it is okay to amend 
-> the commit in your tree.
-> If you prefer I will send V9 with fixed comments to list.
+> 4/8/2024 10:49 PM, Günther Noack wrote:
+> > Hello!
+> > 
+> > Just zooming in on what I think are the most high level questions here,
+> > so that we get the more dramatic changes out of the way early, if needed.
+> > 
+> > On Mon, Apr 08, 2024 at 05:39:18PM +0800, Ivanov Mikhail wrote:
+> > > diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
+> > > index 25c8d7677..8551ade38 100644
+> > > --- a/include/uapi/linux/landlock.h
+> > > +++ b/include/uapi/linux/landlock.h
+> > > @@ -37,6 +37,13 @@ struct landlock_ruleset_attr {
+> > >   	 * rule explicitly allow them.
+> > >   	 */
+> > >   	__u64 handled_access_net;
+> > > +
+> > > +	/**
+> > > +	 * @handled_access_net: Bitmask of actions (cf. `Socket flags`_)
+> >                             ^^^
+> > 			   Typo
+> > 
+> 
+> Thanks, will be fixed.
+> 
+> > > +	 * that is handled by this ruleset and should then be forbidden if no
+> > > +	 * rule explicitly allow them.
+> > > +	 */
+> > > +	__u64 handled_access_socket;
+> > 
+> > What is your rationale for introducing and naming this additional field?
+> > 
+> > I am not convinced that "socket" is the right name to use in this field,
+> > but it is well possible that I'm missing some context.
+> > 
+> > * If we introduce this additional field in the landlock_ruleset_attr, which
+> >    other socket-related operations will go in the remaining 63 bits?  (I'm having
+> >    a hard time coming up with so many of them.)
+> 
+> If i understood correctly Mickaël suggested saving some space for
+> actions related not only to creating sockets, but also to sending
+> and receiving socket FDs from another processes, marking pre-sandboxed
+> sockets as allowed or denied after sandboxing [2]. This may be necessary
+> in order to achieve complete isolation of the sandbox, which will be
+> able to create, receive and send sockets of specific protocols.
+> 
+> In future this field may become more generic by including rules for
+> other entities with similar actions (e.g. files, pipes).
 
-I'll update the patch and re-send.
+I think it would make sense to have one field per file kind (not
+necessarily type) because not all actions would make sense.
 
-Thanks,
-Tony
+> 
+> I think it is good approach, but we should discuss this design before
+> generalizing the name. For now `handled_access_socket` can be a good
+> name for actions related to accessing specific sockets (protocols).
+> What do you think?
 
-> Thanks,
-> Łukasz
+I'm OK with this name for now unless someone has a better proposition.
+
 > 
-> ---
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c 
-> b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-> index ab3121aee412..e3cab8e98f52 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-> @@ -1228,7 +1228,7 @@ static bool ice_fdir_vlan_valid(struct device *dev,
->   }
+> [2]
+> https://lore.kernel.org/all/b8a2045a-e7e8-d141-7c01-bf47874c7930@digikod.net/
 > 
->   /**
-> - * ice_set_ether_flow_seg
-> + * ice_set_ether_flow_seg - set address and protocol segments for ether 
-> flow
->    * @dev: network interface device structure
->    * @seg: flow segment for programming
->    * @eth_spec: mask data from ethtool
-> @@ -1282,9 +1282,11 @@ static int ice_set_ether_flow_seg(struct device 
-> *dev,
->   }
+> > 
+> > * Should this have a more general name than "socket", so that other planned
+> >    features from the bug tracker [1] fit in?
 > 
->   /**
-> - * ice_set_fdir_vlan_seg
-> + * ice_set_fdir_vlan_seg - set vlan segments for ether flow
->    * @seg: flow segment for programming
->    * @ext_masks: masks for additional RX flow fields
-> + *
-> + * Return: 0 on success and errno in case of error.
->    */
->   static int
->   ice_set_fdir_vlan_seg(struct ice_flow_seg_info *seg,
-> -- 
-> 2.34.1
+> I have not found any similar features for our case. Do you have any in
+> mind?
+> 
+> > 
+> > The other alternative is of course to piggy back on the existing
+> > handled_access_net field, whose name already is pretty generic.
+
+handled_access_net is indeed quite generic, but the question is: would
+this new access right make sense for the net_port rule?  In the case of
+socket creation, this is not the case because we don't know at this time
+which port will be used.
+
+> > 
+> > For that, I believe we would need to clarify in struct landlock_net_port_attr
+> > which exact values are permitted there.
+
+Potentially anything that would be possible to check against a port.
+
+> > 
+> > I imagine you have considered this approach?  Are there more reasons why this
+> > was ruled out, which I am overlooking?
+> > 
+> > [1] https://github.com/orgs/landlock-lsm/projects/1/views/1
+> > 
+> > 
+> 
+> Currently `handled_access_net` stands for restricting actions for
+> specific network protocols by port values: LANDLOCK_ACCESS_NET_BIND_TCP,
+> LANDLOCK_ACCESS_NET_SEND_UDP (possibly will be added with UDP feature
+> [3]).
+> 
+> I dont think that complicating semantics with adding fields for
+> socket_create()-like actions would fit well here. Purpose of current
+> patch is to restrict usage of unwanted protocols, not to add logic
+> to restrict their actions. In addition, it is worth considering that we
+> want to restrict not only network protocols (e.g. Bluetooth).
+
+Correct.  It's worth it mentionning this rationale in the patch
+description.
+
+> 
+> [3] https://github.com/landlock-lsm/linux/issues/1
+> 
+> > > @@ -244,4 +277,20 @@ struct landlock_net_port_attr {
+> > >   #define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
+> > >   #define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
+> > >   /* clang-format on */
+> > > +
+> > > +/**
+> > > + * DOC: socket_acess
+> > > + *
+> > > + * Socket flags
+> > > + * ~~~~~~~~~~~~~~~~
+> > 
+> > Mega-Nit: This ~~~ underline should only be as long as the text above it ;-)
+> > You might want to fix it for the "Network Flags" headline as well.
+> > 
+> 
+> Ofc, thanks!
+> 
+> > > + *
+> > > + * These flags enable to restrict a sandboxed process to a set of
+> > > + * socket-related actions for specific protocols. This is supported
+> > > + * since the Landlock ABI version 5.
+> > > + *
+> > > + * - %LANDLOCK_ACCESS_SOCKET_CREATE: Create a socket
+> > > + */
+> > 
+> > 
+> > > diff --git a/security/landlock/ruleset.h b/security/landlock/ruleset.h
+> > > index c7f152678..f4213db09 100644
+> > > --- a/security/landlock/ruleset.h
+> > > +++ b/security/landlock/ruleset.h
+> > > @@ -92,6 +92,12 @@ enum landlock_key_type {
+> > >   	 * node keys.
+> > >   	 */
+> > >   	LANDLOCK_KEY_NET_PORT,
+> > > +
+> > > +	/**
+> > > +	 * @LANDLOCK_KEY_SOCKET: Type of &landlock_ruleset.root_socket's
+> > > +	 * node keys.
+> > > +	 */
+> > > +	LANDLOCK_KEY_SOCKET,
+> > >   };
+> > >   /**
+> > > @@ -177,6 +183,15 @@ struct landlock_ruleset {
+> > >   	struct rb_root root_net_port;
+> > >   #endif /* IS_ENABLED(CONFIG_INET) */
+> > > +	/**
+> > > +	 * @root_socket: Root of a red-black tree containing &struct
+> > > +	 * landlock_rule nodes with socket type, described by (domain, type)
+> > > +	 * pair (see socket(2)). Once a ruleset is tied to a
+> > > +	 * process (i.e. as a domain), this tree is immutable until @usage
+> > > +	 * reaches zero.
+> > > +	 */
+> > > +	struct rb_root root_socket;
+> > 
+> > The domain is a value between 0 and 45,
+> > and the socket type is one of 1, 2, 3, 4, 5, 6, 10.
+> > 
+> > The bounds of these are defined with AF_MAX (include/linux/socket.h) and
+> > SOCK_MAX (include/linux/net.h).
+> > 
+> > Why don't we just combine these two numbers into an index and create a big bit
+> > vector here, like this:
+> > 
+> >      socket_type_mask_t socket_domains[AF_MAX];
+> > 
+> > socket_type_mask_t would need to be typedef'd to u16 and ideally have a static
+> > check to test that it has more bits than SOCK_MAX.
+> > 
+> > Then you can look up whether a socket creation is permitted by checking:
+> > 
+> >      /* assuming appropriate bounds checks */
+> >      if (dom->socket_domains[domain] & (1 << type)) { /* permitted */ }
+> > 
+> > and merging the socket_domains of two domains would be a bitwise-AND.
+> > 
+> > (We can also cram socket_type_mask_t in a u8 but it would require mapping the
+> > existing socket types onto a different number space.)
+> > 
+> 
+> I chose rbtree based on the current storage implementation in fs,net and
+> decided to leave the implementation of better variants in a separate
+> patch, which should redesign the entire storage system in Landlock
+> (e.g. implementation of a hashtable for storing rules by FDs,
+> port values) [4].
+> 
+> Do you think that it is bad idea and more appropriate storage for socket
+> rules(e.g. what you suggested) should be implemented by current patch?
+
+Günther's suggestion would be a good optimization, but I agree that it
+should be part of another series.  We also need to keep in mind that the
+layer level should be known for audit and debugging reasons.
+
+> 
+> [4] https://github.com/landlock-lsm/linux/issues/1
+> 
+> > 
+> > As I said before, I am very excited to see this patch.
+> > 
+> > I think this will unlock a tremendous amount of use cases for many programs,
+> > especially for programs that do not use networking at all, which can now lock
+> > themselves down to guarantee that with a sandbox.
+> > 
+> > Thank you very much for looking into it!
+
+Same :)
 
