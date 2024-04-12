@@ -1,138 +1,118 @@
-Return-Path: <netdev+bounces-87223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E03F68A22FE
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 02:45:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E2BF48A2318
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 03:01:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8C07286DD9
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 00:45:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77AF3281CBE
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 01:01:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB241FA4;
-	Fri, 12 Apr 2024 00:45:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF8854414;
+	Fri, 12 Apr 2024 01:01:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="twapsL1J"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="WkCv44oB"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-170.mta0.migadu.com (out-170.mta0.migadu.com [91.218.175.170])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4438F17F5
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 00:45:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4529715B7;
+	Fri, 12 Apr 2024 01:01:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712882746; cv=none; b=J+JxUkA1Tkl82lVa/xKm9K9Rf0++PBvn0WtjW1eKtKOxYGOF6uK96aBMCRcSeMzkg16mYU8adqLoRtmFAilY4xLu9761yTKvZtJRw3dGsqrdh2Yrb5YoNULLMmXL2IjCZwSrwS6dytWmF9mjAkybwXJvrmpv6JgRLoAN2t4NAF0=
+	t=1712883705; cv=none; b=agNpGEfB2gGxWDMP1N+elgBfO/rrXjXhEq1JUDnWMmK+8y9bNKl/Pw5qE673eu4des2BsctrrVQtEklU9JsakcCZ5P48r4AO97uVSlJnhIBaBlnhPAieIEbPzC4NHv4Fge3nq0It/a2yuaQHDte5OxMsJ5Rx6HKkCvS5UrYP0rc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712882746; c=relaxed/simple;
-	bh=WICWHin3hX1DW3QNHTdvtD49sau2s6Cge+RHt79rDCM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UdMLvCizHs2MhxPx6Me6qvXxd89/1otFWyZC4k3AeY/u5hZu2pYx2hX13B/vA446XN3/uI1lH2jzk0KlEdBwsg+m92TL45CSNZ4QMhGHzmE4noGwjZdxzyFKTrFpTBlPxka8Hfn4IWA1NDABHYVArxOunAqDWvHZuHHqgTxqDOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=twapsL1J; arc=none smtp.client-ip=91.218.175.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <c0cef1f9-64db-49a2-8c64-3eb9e5092a0f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1712882741;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eDBXv8VvuEuihDknHFwM75wDdGn0/XWeRQX26GRUPxg=;
-	b=twapsL1Jjoj1zy7LLzzUeNWJTUK3ZtRc7x566xQXsm/N4mdhUHvG3hFcP0ET/NLLoK1kix
-	c7ZZaYGlddtYLxNu0rcVWlAJee7/64webEYd4CJek2WlmvwPMQXp/uVcKuS+b/9I3aUzsK
-	4OPw9iVDyzI+pJe8Uji4ZvbARif0RqU=
-Date: Thu, 11 Apr 2024 17:45:29 -0700
+	s=arc-20240116; t=1712883705; c=relaxed/simple;
+	bh=MmUZwWEGWD6oDx9BpRouhSb4sOyZ3qN1i1m8BxOXs14=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=tCOzYugxEjNkZw5GGI2wYPBNGavt8i/3DTF7PxiHPhq0+gduz7zvEIGRYepA+2WveFfPYeewGZcwNdijOvOunFZZvmcWuTr9g1CMOgUup3p/fdtZRoV43e5YgK5iGhodSxDvS2R84DhgLplt8LMiby9OQOle9GXHegbaasm9RLg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=WkCv44oB; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1712883693;
+	bh=suxFYouMG2I1qJZdWl0LtxMnhRDZN2VuG47izcE/4mk=;
+	h=Date:From:To:Cc:Subject:From;
+	b=WkCv44oBmBdBjOTyQvOfD995H1MoE7/LfIm2oMWI0ey5f9KwMw2m4QeHBj5d9Udh/
+	 YajfjSNI58AcxOGwVI9xDAmOhRKbfgTE8bHnr/rdcka3nV9rLmmQ6sOYojDP36Epb7
+	 owBP4FyLe0NjrFaTW2gyTEdHhGe8ZEBLdWKc7UATnSWhyLXAG/BNOjSgRXB/wxL6Jl
+	 UwafhgmAQ9VlpHBAuEmOpTXm2+0rZl8grxUint2W91azYTxCsuUyHo5K/7QytHWQ/P
+	 eTpDUMcIvCtHzWp3kkOvfNIwCNILsubuSqu3gQ/fnAMoTeStR7CIY/b+1Makukadb0
+	 4PQUY1GBgc6TA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VFytz71tXz4wnv;
+	Fri, 12 Apr 2024 11:01:31 +1000 (AEST)
+Date: Fri, 12 Apr 2024 11:01:28 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Chuck Lever <chuck.lever@oracle.com>
+Cc: Networking <netdev@vger.kernel.org>, Justin Stitt
+ <justinstitt@google.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, "Steven Rostedt (Google)"
+ <rostedt@goodmis.org>
+Subject: linux-next: manual merge of the net-next tree with the nfsd-fixes
+ tree
+Message-ID: <20240412110128.0fd442ec@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next] net: netfilter: Make ct zone id configurable for
- bpf ct helper functions
-To: Brad Cowie <brad@faucet.nz>
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- coreteam@netfilter.org, daniel@iogearbox.net, davem@davemloft.net,
- john.fastabend@gmail.com, jolsa@kernel.org, kuba@kernel.org,
- lorenzo@kernel.org, memxor@gmail.com, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org,
- sdf@google.com, song@kernel.org
-References: <29325462-d001-4cb3-909d-27f7243a5c05@linux.dev>
- <20240411022933.2946226-1-brad@faucet.nz>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20240411022933.2946226-1-brad@faucet.nz>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; boundary="Sig_/A96EXYk=1Clzx6IfsDayTaq";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On 4/10/24 7:29 PM, Brad Cowie wrote:
-> On Sat, 6 Apr 2024 at 09:01, Martin KaFai Lau <martin.lau@linux.dev> wrote:
->> How about the other fields (flags and dir) in the "struct nf_conntrack_zone" and
->> would it be useful to have values other than the default?
-> 
-> Good question, it would probably be useful to make these configurable
-> as well. My reason for only adding ct zone id was to avoid changing
-> the size of bpf_ct_opts (NF_BPF_CT_OPTS_SZ).
-> 
-> I would be interested in some opinions here on if it's acceptable to
-> increase the size of bpf_ct_opts, if so, should I also add back some
-> reserved options to the struct for future use?
+--Sig_/A96EXYk=1Clzx6IfsDayTaq
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-I think the reserved[2] was there for the padding reason.
+Hi all,
 
-It should be the first time there is a __sz increase. May be worth to explore 
-how it should work.
+Today's linux-next merge of the net-next tree got a conflict in:
 
-The opts_len check will need to check == old_size or == new_size. Only use the 
-new fields if it is new_size.
+  include/trace/events/rpcgss.h
 
-There is
+between commit:
 
-enum {
-         NF_BPF_CT_OPTS_SZ = 12,
-};
+  a4833e3abae1 ("SUNRPC: Fix rpcgss_context trace event acceptor field")
 
-This enum probably needs to update with the new size also. NF_BPF_CT_OPTS_SZ 
-should be under CO-RE and its enum value will be updated with the running kernel.
+from the nfsd-fixes tree and commit:
 
-The bpf prog has its own struct bpf_ct_opts during compilation (from vmlinux.h 
-or defined a local one), so may be the bpf prog can do something like this:
+  386f4a737964 ("trace: events: cleanup deprecated strncpy uses")
 
-#include "vmlinux.h"
+from the net-next tree.
 
-struct bpf_ct_opts___newer {
-	s32 netns_id;
-	s32 error;
-	u8 l4proto;
-	u8 dir;
-	u8 reserved[2];
-	u32 new_field; /* for example */
-} __attribute__((preserve_access_index));
+I fixed it up (I just used the former version (which replaced the strncpy
+with __assign_str) and can carry the fix as necessary. This is now fixed
+as far as linux-next is concerned, but any non trivial conflicts should
+be mentioned to your upstream maintainer when your tree is submitted for
+merging.  You may also want to consider cooperating with the maintainer
+of the conflicting tree to minimise any particularly complex conflicts.
 
-SEC("tc")
-int run_in_older_kernel(struct __sk_buff *ctx)
-{
-	struct bpf_ct_opts___newer opts = {};
+--=20
+Cheers,
+Stephen Rothwell
 
-	/* min of the running kernel opts size or the
-	 * local ___newer opts size
-	 */
-	bpf_skb_ct_lookup(ctx, &tup, sizeof(tup.ipv4), &opts,
-			  min(NF_BPF_CT_OPTS_SZ, sizeof(opts));
-}
+--Sig_/A96EXYk=1Clzx6IfsDayTaq
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
+-----BEGIN PGP SIGNATURE-----
 
-> 
->> Can it actually test an alloc and lookup of a non default zone id?
-> 
-> Yes, I have a test written now and will include this in my v2 submission.
-> 
->> Please also separate the selftest into another patch.
-> 
-> Will do.
-> 
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYYh+gACgkQAVBC80lX
+0GyNuwf/VypWRVNEyBW2fzBhyQjvmWIs55wXP1VhUUk4R0V1fIA1tzjwLzCQ3M81
+x5kINhQ5jPpUDBg+NJm+vlRCUsn8K0hSBgG24a7LQ4ll0CE7dHNonblhesBS8b8V
+4PJ5AJbSu+ocQOUILY4pjIQ98FjXoY29d5HvVgTvt6FkLSdqwPShNBzehFvkhxLs
+iTUfwbPp1y9Zit/SRoOZq49lOfKSUklF195cqe2R8jX06I/LiPCGUNYmteTcss5E
+99/fFUZeuHcsbdpscrDzuoGJpA1siPvefw0VY808yj+hR3/HeiVWHh6yjpy71X3h
+PMdWDDorF+5hD0ZHX0diJ0phBjGVmw==
+=3Zpy
+-----END PGP SIGNATURE-----
 
+--Sig_/A96EXYk=1Clzx6IfsDayTaq--
 
