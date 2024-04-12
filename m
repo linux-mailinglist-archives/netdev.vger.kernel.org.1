@@ -1,113 +1,117 @@
-Return-Path: <netdev+bounces-87427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B453A8A318C
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 16:52:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF7598A2C45
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 12:25:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E55141C2114A
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 14:52:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94ADAB215F4
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 10:25:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40EBA145B20;
-	Fri, 12 Apr 2024 14:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD12954670;
+	Fri, 12 Apr 2024 10:25:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PXAJs4g5"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="p/vnKPTa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83DB0145333;
-	Fri, 12 Apr 2024 14:52:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EE5E54650;
+	Fri, 12 Apr 2024 10:25:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712933572; cv=none; b=HO8JDTJZac0eU5OdyGs2XBy28cB9pzgHDPYM/60b0HEm0999nj9zCzR12ZCUBSfsN+bvKpQqhVYvxOE/sgOrupqcsCeqxZvQ/zjdJ+5rJ1Jfh/8AXJ5YmDII1aDRdlnwWPeOcW4pqo4OTvYGzSwBJJ6r5Xv/Vo94gdI+KE82wYA=
+	t=1712917541; cv=none; b=J8eI6hvb7AHhTNK4smCjfCRPUq7/vfADU3Evds3jL++qh6xTAaBa8+IVmEIznKs9iBfc8+O6bklRPoWo8GZ7zrpJLAA0/FhkSAL+pim5xlNmwJF38c4536IXBVuRjUPAT3kNHyOuXS5IEeEpGIb4jAfGLgE84NPoxAcm2TEZbHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712933572; c=relaxed/simple;
-	bh=3VJO+40pwSkL8WEP5XEs7367DXnCHzRW9AIbe65tr7w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h1ixzWl+R1yCRCu+dSqbLikH2KzgyrgVoftv+40dCgeodPe8SRDdKeafVr7xfeXpJt27Kx97nlj7sXb4bFSEn/hbh52hCAoPVMuTn/sOJYO0BiQunWGtq/sPZc/xGqyJe/TgMnuKYQNiMkKNu7jBq/y2ybS6lR4WuNOZxCihp+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PXAJs4g5; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712933571; x=1744469571;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3VJO+40pwSkL8WEP5XEs7367DXnCHzRW9AIbe65tr7w=;
-  b=PXAJs4g5wg3ErC1btReuQ0iiYUy8BKv8nVcclBwEa+cM9Un6mH4WcYAe
-   AFYgML7ccsQ2l+QtWUP97joyNtmOWHPsUsM/JP5YU9EIsBCTPDt8HzF+8
-   5ng6j6Ld0NeviflAFfc74eLzX1fP4DDESayIatu4IV/9gQdGD4+kBRUpc
-   eLT0iEp5cAeu3uDms74G0cMVOB92eWBfkBDX41qmpDtKLLtcyLIZzIGKa
-   HToSXqvb5MYCYKo18wb5YUfn/kLDPA/JBLEQkGck+6BnHISAaU0utNl6g
-   LCSs7IMsBDY5SQlSgDm4RH17WBtSJaFVJ/VxYHSSVTjkzOV3zpb+3fHSk
-   g==;
-X-CSE-ConnectionGUID: 7gGmLBNDSYCUN8qqGendhg==
-X-CSE-MsgGUID: 0E1ZN7QZRTSIaYuVw6rNUA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="8497359"
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="8497359"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 07:52:50 -0700
-X-CSE-ConnectionGUID: UR2HQIB/T9aOUxFJHHipNw==
-X-CSE-MsgGUID: IbdOgvKoQS2wVBiMBfp5dQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="25906271"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmviesa004.fm.intel.com with ESMTP; 12 Apr 2024 07:52:46 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1001)
-	id CCE371B02; Fri, 12 Apr 2024 13:19:44 +0300 (EEST)
-Date: Fri, 12 Apr 2024 13:19:44 +0300
-From: Mika Westerberg <mika.westerberg@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	David Thompson <davthompson@nvidia.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Patrick Rudolph <patrick.rudolph@9elements.com>,
-	"Rafael J. Wysocki" <rafael.j.wysocki@intel.com>,
-	linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-acpi@vger.kernel.org, netdev@vger.kernel.org,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Len Brown <lenb@kernel.org>
-Subject: Re: [PATCH v1 0/4] gpiolib: acpi: Use con_id in
- acpi_dev_gpio_irq_get_by()
-Message-ID: <20240412101944.GE112498@black.fi.intel.com>
-References: <20240411172540.4122581-2-andriy.shevchenko@linux.intel.com>
+	s=arc-20240116; t=1712917541; c=relaxed/simple;
+	bh=jTmsjeOHZ301XTyRNyKPCHgoOUQGTv0qyrMDlzlNzuA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ZHwnQBlkXlPzSoO3i3S1hF3Q4k8v/Jq9HiRlkwozSYG8tV4pX08ZjjwYdMELvdbr25I+lv4BRN7bRsa0Viz42ONCIZ0nOh98V72kAF6WF2MIrpeFdsWNktvLfCLo/nLmSrQHxuWs+qjCXxim6yWedSO380+2GBYLqJnD4OuvNeA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=p/vnKPTa; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 83E37600A2;
+	Fri, 12 Apr 2024 10:25:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1712917535;
+	bh=jTmsjeOHZ301XTyRNyKPCHgoOUQGTv0qyrMDlzlNzuA=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=p/vnKPTaneiS5E+gwOfvJspIFeBLgCjcr0ScVD/pvORMUguZzdyA4aFQBq2qBYsvc
+	 8M+VezCjM2I46cLugoXG/5udxKhcIfyNKbMwF6UAUg1t8uTorS1GNRSxZdTMTeKyA7
+	 4hBt8uOsgzc9Y3f3NM2UjbG8TPH+3yJ3AkHK7M+kyo4JdwZ+WX9tShEAfHh/GwBFPI
+	 8H3UvBRNgVlFaw+Ea6uSElC7im0gltt8mPtQgMRlr0j34uA7zFgFoVDg9TywpewkJd
+	 XETvw3Vymi2YU3IuwMnfmN97lS3fmHNDLlM4V9zPKKAVrCi/0P8C/SBEzA3aJX8xyh
+	 migEHFHEtBBtg==
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id EB6E2200B1B;
+	Fri, 12 Apr 2024 10:25:30 +0000 (UTC)
+Message-ID: <235918fc-9b9b-4efa-8258-69bd5c7d40d4@fiberby.net>
+Date: Fri, 12 Apr 2024 10:25:30 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240411172540.4122581-2-andriy.shevchenko@linux.intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] octeontx2-pf: fix FLOW_DIS_IS_FRAGMENT implementation
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+To: Suman Ghosh <sumang@marvell.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+ Geethasowjanya Akula <gakula@marvell.com>,
+ Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+ Hariprasad Kelam <hkelam@marvell.com>
+References: <20240410134303.21560-1-ast@fiberby.net>
+ <SJ0PR18MB5216D2276BA11D5C5E31D6A6DB042@SJ0PR18MB5216.namprd18.prod.outlook.com>
+ <27ac48c0-b19c-4104-8ec9-08232e3f42f6@fiberby.net>
+Content-Language: en-US
+In-Reply-To: <27ac48c0-b19c-4104-8ec9-08232e3f42f6@fiberby.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 11, 2024 at 08:22:28PM +0300, Andy Shevchenko wrote:
-> Use con_id instead of property in the acpi_dev_gpio_irq_get_by().
-> It will be aligned with other GPIO library functions.
-> 
-> Assumed to go via my GPIO ACPI library tree follwoed by GPIO subsystem.
-> 
-> Andy Shevchenko (4):
->   gpiolib: acpi: Extract __acpi_find_gpio() helper
->   gpiolib: acpi: Simplify error handling in __acpi_find_gpio()
->   gpiolib: acpi: Move acpi_can_fallback_to_crs() out of
->     __acpi_find_gpio()
->   gpiolib: acpi: Pass con_id instead of property into
->     acpi_dev_gpio_irq_get_by()
-> 
->  drivers/gpio/gpio-pca953x.c                   |  2 +-
->  drivers/gpio/gpiolib-acpi.c                   | 52 +++++++++++--------
+Hi again,
 
-For the gpiolib-acpi.c parts,
+On 4/12/24 9:01 AM, Asbjørn Sloth Tønnesen wrote:
+> There are therefore 3 possible cases:
+> 
+> - `tc flower ...` (no ip_flags frag or nofrag)
+>     (match.key->flags & FLOW_DIS_FIRST_FRAG)  is false
+>     (match.mask->flags & FLOW_DIS_FIRST_FRAG) is false
+> 
+> - `tc flower ... ip_flags nofrag`
+>     (match.key->flags & FLOW_DIS_FIRST_FRAG)  is false
+>     (match.mask->flags & FLOW_DIS_FIRST_FRAG) is true
+> 
+> - `tc flower ... ip_flags frag`
+>     (match.key->flags & FLOW_DIS_FIRST_FRAG)  is true
+>     (match.mask->flags & FLOW_DIS_FIRST_FRAG) is true
 
-Acked-by: Mika Westerberg <mika.westerberg@linux.intel.com>
+I was a bit a hurry, to get the reply in before a meeting,
+so: s/FLOW_DIS_FIRST_FRAG/FLOW_DIS_IS_FRAGMENT/g
+
+There are therefore 3 possible cases:
+
+- `tc flower ...` (no ip_flags frag or nofrag)
+    (match.key->flags & FLOW_DIS_IS_FRAGMENT)  is false
+    (match.mask->flags & FLOW_DIS_IS_FRAGMENT) is false
+
+- `tc flower ... ip_flags nofrag`
+    (match.key->flags & FLOW_DIS_IS_FRAGMENT)  is false
+    (match.mask->flags & FLOW_DIS_IS_FRAGMENT) is true
+
+- `tc flower ... ip_flags frag`
+    (match.key->flags & FLOW_DIS_IS_FRAGMENT)  is true
+    (match.mask->flags & FLOW_DIS_IS_FRAGMENT) is true
+
+-- 
+Best regards
+Asbjørn Sloth Tønnesen
+Network Engineer
+Fiberby - AS42541
 
