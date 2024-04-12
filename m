@@ -1,155 +1,106 @@
-Return-Path: <netdev+bounces-87326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CA708A2AB2
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 11:16:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 955E68A2AF5
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 11:21:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56E5F1C22490
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 09:16:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49A481F23121
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 09:21:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E820950277;
-	Fri, 12 Apr 2024 09:16:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22B125102B;
+	Fri, 12 Apr 2024 09:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OOfxs4gw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jSI/6lCL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC2138DD8;
-	Fri, 12 Apr 2024 09:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4A950A72
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 09:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712913377; cv=none; b=NGjY0MkPICJqk/pof9+n6eROPtux8P3oo4vkhsrc9cKqDZjV5cpyT7u2inrB5kjMgXf0wHTSxfwdiP3Bs+AVUEgIyNHlE+Tuh2l7KMywTkCzlbonoV2iUChrYhMbwKiGICrBDWEh+lwai70zycKHLIFMMtlUaSjjp37WyI7sNJQ=
+	t=1712913629; cv=none; b=cTMwnGYagvXt6EK2CPpB8fbV/wyOCh/hSy8uIjubuDiAizSXnmmyo4Qx8md/YQESIdArVlaqSIZ2k5NfawEnrblYG8RYoMacf1G9bCESryPw3mNhK0X7WXGj5f8ULYSjidExSbb2xg7gwLwePcmKAVwMSkUn5KJgbCSyHfgedzg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712913377; c=relaxed/simple;
-	bh=T/TL4P6RqoXnShkICgxGFcoEXV/L8guRkl+BR8oz3qQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ra6zP4ElDYTP0tsWtoX7uKraN2Fj4uGF707LCAB37cozdE29w55xB3xd0Zkby9UPN7Oxk8aI4me7VVNWYtCLWHY81VT6R6wmFuzna4JQkiyjs7UrcwtBGxUU1/s8fTQJDl39XoH8UbiIuUmOBH5IQfE0Rp1J+ShVeD6GTna4HPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OOfxs4gw; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-56c404da0ebso974821a12.0;
-        Fri, 12 Apr 2024 02:16:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712913374; x=1713518174; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1P5rS5dDZ6bz9RnNGWXjXGeZ5LSFZB2izV8TdsSyfhY=;
-        b=OOfxs4gwGdSJYF5Rg1YrEPMa7aeAv3TXdkArvWg7NxpuxZ+eQflhdOQQREts0AWpFH
-         OiCjfBQWQM0eYpv+b8QlzIkfhqgKkAdXKkJ8xIU8keCiO9qD/6L8dCADBbUJEVR7SxOq
-         DXe+RoOC2Be5trhfR+hNGmrVl3wkxSAYTZPs2i9bGawVCW7V86nVB/xqHRp8Fa9TCSWU
-         CandjXr5Bdh9jksVy37KzaU4YV58iY+HxPJIOPrgmqGt02QA+sL8Re56nvhddQ6DY2eF
-         UcnPl1y3nY7H8667oqVxZ4Ffu5M9GMM6NyAnNb1sjVlipM0fP8lSJYGo3BRU4KwtP3eZ
-         jpiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712913374; x=1713518174;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1P5rS5dDZ6bz9RnNGWXjXGeZ5LSFZB2izV8TdsSyfhY=;
-        b=Z7lqARcsm6CccpGbcjPISLnBHKJzfNk8pN08gMcCL2OD3v0oZ0/SMs2OiwRTOpBS66
-         UuLBr6pEQMRqfAx7osL/08VFpRekxub+LdF+7tLpgPE1dfMaxzkHqwcIMJG1mXJQMZ7t
-         9PZrwjuT2iCh6fEGmlxk3oK9HBfOz8FE/06p5wNK5Rbm9G+6HnSCTom7oNRXXoO0B4kW
-         TVdoS71chMLO1cCRDoJf2cSakvoeMGukwQlZhISe4S/n8EPmoIU26FIBaAwmqCjrzANI
-         UdmP9LJqNt651L/m/urQUZkIlfQN7nSD2+vN+G+K1eZPM5wp26fTLkGHNmB+OuCZYlh3
-         yN5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUPEX8P9Ow3xwnnn9l7E+J+ej1dDoB77dawHjEnNWSfOQaUpOd+hs4GzMVrq/1LnBkieU4uQ31wxq32CJDrxvg/NqZoY2COxkKJRSHIBcGxqutnoDFKDvsf+dw1f9PH8EyZbtjVbi52w7E8XZUUdZtC0xeQPm8U8qufFe7KeJU7eO+wSKqwXwRm4wM3VAjXQssJ6AkJcCoJO6qiq/5+QTDyWlS5CK0s6wL1s6NSakFqVgpyqhXT6Sm4rKSOLaKufjhtwXYCHqDlQYissNSY7xIv94C/p4Gm5aTYKBAZdNXF62AOWRe4iIDpA1IOYPqEpABUKjqzrwlTr1vJaJh34/BRBGBguHXOjst4+BeRiitNh9CakGpdgRUTdQGtW1u5lXxMKI6YpVUv/kIFuhg=
-X-Gm-Message-State: AOJu0YwKcgA7Q+Mgdg5hZnfBVwvIn/EJqMurxXosdswDTSCgg6jk3TYh
-	LcchT5B9Af7nZ+vSdVKRii+R89lIJIkMEZvMIvNwt/g3+6m/jGIU
-X-Google-Smtp-Source: AGHT+IF2JLt070H6U+NVwXUCGShMgUTVG3TFLf6L4pd2nPVSBBMwXn0qR7EXkAPf+SwG43RHlRZl8g==
-X-Received: by 2002:a50:f68d:0:b0:56e:4039:add5 with SMTP id d13-20020a50f68d000000b0056e4039add5mr1892328edn.22.1712913374186;
-        Fri, 12 Apr 2024 02:16:14 -0700 (PDT)
-Received: from gmail.com (1F2EF1A5.nat.pool.telekom.hu. [31.46.241.165])
-        by smtp.gmail.com with ESMTPSA id el9-20020a056402360900b0056fe755f1e6sm1454709edb.91.2024.04.12.02.16.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 02:16:13 -0700 (PDT)
-Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
-Date: Fri, 12 Apr 2024 11:16:10 +0200
-From: Ingo Molnar <mingo@kernel.org>
-To: Mike Rapoport <rppt@kernel.org>
-Cc: linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Donald Dutile <ddutile@redhat.com>,
-	Eric Chanudet <echanude@redhat.com>,
-	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Puranjay Mohan <puranjay12@gmail.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Russell King <linux@armlinux.org.uk>, Song Liu <song@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
-	bpf@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linux-mm@kvack.org, linux-modules@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
-	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v4 05/15] mm: introduce execmem_alloc() and execmem_free()
-Message-ID: <Zhj72l6uN9OFilxA@gmail.com>
-References: <20240411160051.2093261-1-rppt@kernel.org>
- <20240411160051.2093261-6-rppt@kernel.org>
+	s=arc-20240116; t=1712913629; c=relaxed/simple;
+	bh=AXP6wVikxCUXfX2ePVO4VpRYBAn5FA42GzvVKZc8cXo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=lkpsVbWzUJWgZtf1y5DNV8B0wc4eK1fLgPJhNEgaQkfY3BSj23IczxqIiRgaDx0KzPy2ERkQOc4eG6NPyT6PSvWEGMeXinmDd5zue9k6BKMA9mqJhG3cxI0T5Mh5vwkydXEF3qIyYoghmUPsOpBSgzg8oAF2xFrarPdAqfuHYiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jSI/6lCL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BCEF6C113CC;
+	Fri, 12 Apr 2024 09:20:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712913628;
+	bh=AXP6wVikxCUXfX2ePVO4VpRYBAn5FA42GzvVKZc8cXo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jSI/6lCLcnmgaNs6SWLonQJwhf8UCu4D3k387R/2YNGDYaXIM03Jsc3/4G7K/lQ7B
+	 tI5EWIXzVn01V5P0CK6TJEtIAmC8DooZLzTVQ9Y8bJXKVNNlahtJhMZhwVErC+DvK/
+	 l7Ev6YJ+zi2WfZcS6R/4YSiuimX9dB8z1YQe/RzFa0dxNgvWKOcirRtvGbfrjt3Na4
+	 JBjZOdr1hulZ2yjDExeKFggWzm+wTJ7fbMqzsRsNOV165cHVxd+bHdASgMaJ9rPIFg
+	 eQz3gV6bwGQaYn3oRNJXwbbVVC2i5lLfMaorwNtQpwS59czgFVzCgdtsvV/tVnl/Vd
+	 fs15NcxSdV5tg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AD5BBDF7855;
+	Fri, 12 Apr 2024 09:20:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240411160051.2093261-6-rppt@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4 net-next 0/6] rtl8226b/8221b add C45 instances and SerDes
+ switching
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171291362870.25479.143639528323659106.git-patchwork-notify@kernel.org>
+Date: Fri, 12 Apr 2024 09:20:28 +0000
+References: <20240409073016.367771-1-ericwouds@gmail.com>
+In-Reply-To: <20240409073016.367771-1-ericwouds@gmail.com>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ kabel@kernel.org, frank-w@public-files.de, daniel@makrotopia.org,
+ netdev@vger.kernel.org
+
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Tue,  9 Apr 2024 09:30:10 +0200 you wrote:
+> Based on the comments in [PATCH net-next]
+> "Realtek RTL822x PHY rework to c45 and SerDes interface switching"
+> 
+> Adds SerDes switching interface between 2500base-x and sgmii for
+> rtl8221b and rtl8226b.
+> 
+> Add get_rate_matching() for rtl8226b and rtl8221b, reading the serdes
+> mode from phy.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v4,net-next,1/6] net: phy: realtek: configure SerDes mode for rtl822xb PHYs
+    https://git.kernel.org/netdev/net-next/c/deb8af524350
+  - [v4,net-next,2/6] net: phy: realtek: add get_rate_matching() for rtl822xb PHYs
+    https://git.kernel.org/netdev/net-next/c/c189dbd73824
+  - [v4,net-next,3/6] net: phy: realtek: Add driver instances for rtl8221b via Clause 45
+    https://git.kernel.org/netdev/net-next/c/ad5ce743a6b0
+  - [v4,net-next,4/6] net: phy: realtek: Change rtlgen_get_speed() to rtlgen_decode_speed()
+    https://git.kernel.org/netdev/net-next/c/2e4ea707c7e0
+  - [v4,net-next,5/6] net: phy: realtek: add rtl822x_c45_get_features() to set supported port
+    https://git.kernel.org/netdev/net-next/c/2d9ce6486270
+  - [v4,net-next,6/6] net: sfp: add quirk for another multigig RollBall transceiver
+    https://git.kernel.org/netdev/net-next/c/1c77c721916a
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-* Mike Rapoport <rppt@kernel.org> wrote:
-
-> +/**
-> + * enum execmem_type - types of executable memory ranges
-> + *
-> + * There are several subsystems that allocate executable memory.
-> + * Architectures define different restrictions on placement,
-> + * permissions, alignment and other parameters for memory that can be used
-> + * by these subsystems.
-> + * Types in this enum identify subsystems that allocate executable memory
-> + * and let architectures define parameters for ranges suitable for
-> + * allocations by each subsystem.
-> + *
-> + * @EXECMEM_DEFAULT: default parameters that would be used for types that
-> + * are not explcitly defined.
-> + * @EXECMEM_MODULE_TEXT: parameters for module text sections
-> + * @EXECMEM_KPROBES: parameters for kprobes
-> + * @EXECMEM_FTRACE: parameters for ftrace
-> + * @EXECMEM_BPF: parameters for BPF
-> + * @EXECMEM_TYPE_MAX:
-> + */
-> +enum execmem_type {
-> +	EXECMEM_DEFAULT,
-> +	EXECMEM_MODULE_TEXT = EXECMEM_DEFAULT,
-> +	EXECMEM_KPROBES,
-> +	EXECMEM_FTRACE,
-> +	EXECMEM_BPF,
-> +	EXECMEM_TYPE_MAX,
-> +};
-
-s/explcitly
- /explicitly
-
-Thanks,
-
-	Ingo
 
