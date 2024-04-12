@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-87352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C6698A2D66
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:29:08 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E02F8A2D67
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:29:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 954E91C20D0B
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 11:29:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 923C21F222BF
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 11:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12086446BD;
-	Fri, 12 Apr 2024 11:29:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A53754F89;
+	Fri, 12 Apr 2024 11:29:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9E854918
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 11:29:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8198854BE8
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 11:29:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712921347; cv=none; b=ODNKjaMFrYNYdJgLrHYnepd28og9UE881TYdQ7P6gqLFj2wDrtx7kLZhxNDznbUCZIYDkhZM9e2nLwK3X7h67q2l8ZInxhNFF9kvyniuZ2aRrl8G0TbPsasvGwQsiM3VD+oxj0Zlfo1+7cMdsaFxkxcBXpGonK90VtwzZRjsiWg=
+	t=1712921349; cv=none; b=L/o0gnFgY7wo7yLJGRvJbwnm39jpuGKnI7N4xJWTUTl7RUVDuTnPdfRpeosbn5NS22K2W4JdQxtVmPGafgcbS2TE/PkApYMjEAnwHAWnSW9KniWbXKZosc7WwnyNHelWQNWDZmJX/fdqo2v6pDoYicXSIHtdUgej+IWjr5r5Zao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712921347; c=relaxed/simple;
-	bh=8KOE740/G1UO0yStlftprqZpJsQvOJIrdHS2pv0os4Y=;
+	s=arc-20240116; t=1712921349; c=relaxed/simple;
+	bh=OqHE0FuPSKs49+AusLIBDlvuz1W+ONiFvygk6qYTmOs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UJotQS0WjiGs80diPZYF8t8mCsmiyZm73FOvTtUeJV2tukwvEK/ysuGLkx97OqUKSR+oGAtQkWu6D9+jiC13l9zRRdjKqRKJeRdNktbax1wF09UFz5vTibdmH4+MfxxkY/FU5Z1GCfqE/dlx2UgFFlWXGp1Bp9Slg6lVSr1I+xc=
+	 MIME-Version; b=gYN3yQDS+wq14R20O4zYKq9q4vjQOkTFMDFW5WD95COEaEFGoegniWBh51KhLFC/n5XqS7ayKiQOHvE+5uCOibED8JVwu3iGigxlPdDQyv9gNRm1jCCvma460YCGwya6m9E+1To8n+nVhaaZ+D0zQzbYXrLUvUAIVyg7IfPLAj8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [112.20.112.218])
-	by gateway (Coremail) with SMTP id _____8Dxvrv_GhlmgF4mAA--.8065S3;
-	Fri, 12 Apr 2024 19:29:03 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8DxuroAGxlmiF4mAA--.6654S3;
+	Fri, 12 Apr 2024 19:29:04 +0800 (CST)
 Received: from localhost.localdomain (unknown [112.20.112.218])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxNBH9GhlmYrV4AA--.24375S2;
-	Fri, 12 Apr 2024 19:29:01 +0800 (CST)
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxNBH9GhlmYrV4AA--.24375S3;
+	Fri, 12 Apr 2024 19:29:03 +0800 (CST)
 From: Yanteng Si <siyanteng@loongson.cn>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -48,9 +48,9 @@ Cc: Yanteng Si <siyanteng@loongson.cn>,
 	netdev@vger.kernel.org,
 	chris.chenfeiyang@gmail.com,
 	siyanteng01@gmail.com
-Subject: [PATCH net-next v11 4/6] net: stmmac: dwmac-loongson: Introduce GMAC setup
-Date: Fri, 12 Apr 2024 19:28:49 +0800
-Message-Id: <6f0ac42c1b60db318b7d746254a9b310dd03aa32.1712917541.git.siyanteng@loongson.cn>
+Subject: [PATCH net-next v11 5/6] net: stmmac: dwmac-loongson: Add full PCI support
+Date: Fri, 12 Apr 2024 19:28:50 +0800
+Message-Id: <ae660c8872297b562ee4e62cd852ba96f307e079.1712917541.git.siyanteng@loongson.cn>
 X-Mailer: git-send-email 2.31.4
 In-Reply-To: <cover.1712917541.git.siyanteng@loongson.cn>
 References: <cover.1712917541.git.siyanteng@loongson.cn>
@@ -61,11 +61,11 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8DxNBH9GhlmYrV4AA--.24375S2
+X-CM-TRANSID:AQAAf8DxNBH9GhlmYrV4AA--.24375S3
 X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxCF1DXrWfJFWfur4UGFyDJwc_yoW5XFy5pr
-	ZxCasFgrWftF1xKan8Jr4DZF15AayYvryI9FWIk34fGFyqk3yjqw1rKFWjvan7JFWkuF13
-	ZF4jyr4xWF4qywbCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
+X-Coremail-Antispam: 1Uk129KBj93XoW3Jry7GFy8tw1DAw43AFykCrX_yoW7AFW7pa
+	yfAasxtrZ5Jry7Wan5XF4UX3WY9rW29348G3y2k3s3uayYvrWYqF1xKFyjyFyfAFZ5uw13
+	Wr1jqF48uF4DuFbCm3ZEXasCq-sJn29KB7ZKAUJUUUU3529EdanIXcx71UUUUU7KY7ZEXa
 	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
 	0xBIdaVrnRJUUUBSb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
 	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
@@ -77,91 +77,185 @@ X-Coremail-Antispam: 1Uk129KBj93XoWxCF1DXrWfJFWfur4UGFyDJwc_yoW5XFy5pr
 	0EwIxGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
 	bVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E74
 	80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
-	I7IYx2IY67AKxVW5JVW7JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42
+	I7IYx2IY67AKxVW7JVWDJwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42
 	xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF
 	7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUVWrXDUUUU
 
-Based on IP core classification, loongson has two types of network
-devices: GMAC and GNET. GMAC's ip_core id is 0x35/0x37, while GNET's
-ip_core id is 0x37/0x10.
+Current dwmac-loongson only support LS2K in the "probed with PCI and
+configured with DT" manner. Add LS7A support on which the devices are
+fully PCI (non-DT).
 
-Device tables:
-
-device    type    pci_id    ip_core
-ls2k1000  gmac    7a03      0x35/0x37
-ls7a1000  gmac    7a03      0x35/0x37
-ls2k2000  gnet    7a13      0x10
-ls7a2000  gnet    7a13      0x37
-
-The ref/ptp clock of gmac is 125000000. gmac device only
-has a MAC chip inside and needs an external PHY chip;
+Others:
+LS2K is a SoC and LS7A is a bridge chip. In the current driving state,
+they are both gmac and phy_interface is RGMII.
 
 Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
 Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
 Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
 ---
- .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 21 +++++++++++++------
- 1 file changed, 15 insertions(+), 6 deletions(-)
+ .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 103 +++++++++++-------
+ 1 file changed, 64 insertions(+), 39 deletions(-)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index 995c9bd144e0..ad19b4087974 100644
+index ad19b4087974..69078eb1f923 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -9,7 +9,8 @@
+@@ -9,9 +9,19 @@
  #include <linux/of_irq.h>
  #include "stmmac.h"
  
--static int loongson_default_data(struct plat_stmmacenet_data *plat)
-+static void loongson_default_data(struct pci_dev *pdev,
-+				  struct plat_stmmacenet_data *plat)
++#define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
++
++struct stmmac_pci_info {
++	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
++};
++
+ static void loongson_default_data(struct pci_dev *pdev,
+ 				  struct plat_stmmacenet_data *plat)
  {
++	/* Get bus_id, this can be overloaded later */
++	plat->bus_id = (pci_domain_nr(pdev->bus) << 16) |
++		       PCI_DEVID(pdev->bus->number, pdev->devfn);
++
  	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
  	plat->has_gmac = 1;
-@@ -24,16 +25,18 @@ static int loongson_default_data(struct plat_stmmacenet_data *plat)
- 	/* Set the maxmtu to a default of JUMBO_LEN */
- 	plat->maxmtu = JUMBO_LEN;
- 
--	/* Set default number of RX and TX queues to use */
--	plat->tx_queues_to_use = 1;
--	plat->rx_queues_to_use = 1;
--
- 	/* Disable Priority config by default */
- 	plat->tx_queues_cfg[0].use_prio = false;
- 	plat->rx_queues_cfg[0].use_prio = false;
- 
- 	/* Disable RX queues routing by default */
- 	plat->rx_queues_cfg[0].pkt_route = 0x0;
-+}
-+
-+static int loongson_gmac_data(struct pci_dev *pdev,
-+			      struct plat_stmmacenet_data *plat)
-+{
-+	loongson_default_data(pdev, plat);
+ 	plat->force_sf_dma_mode = 1;
+@@ -40,6 +50,7 @@ static int loongson_gmac_data(struct pci_dev *pdev,
  
  	/* Default to phy auto-detection */
  	plat->phy_addr = -1;
-@@ -42,6 +45,12 @@ static int loongson_default_data(struct plat_stmmacenet_data *plat)
- 	plat->dma_cfg->pblx8 = true;
++	plat->phy_interface = PHY_INTERFACE_MODE_RGMII_ID;
  
- 	plat->multicast_filter_bins = 256;
-+	plat->clk_ref_rate = 125000000;
-+	plat->clk_ptp_rate = 125000000;
-+
-+	plat->tx_queues_to_use = 1;
-+	plat->rx_queues_to_use = 1;
-+
+ 	plat->dma_cfg->pbl = 32;
+ 	plat->dma_cfg->pblx8 = true;
+@@ -54,19 +65,17 @@ static int loongson_gmac_data(struct pci_dev *pdev,
  	return 0;
  }
  
-@@ -114,7 +123,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
++static struct stmmac_pci_info loongson_gmac_pci_info = {
++	.setup = loongson_gmac_data,
++};
++
+ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ {
+ 	struct plat_stmmacenet_data *plat;
++	int ret, i, bus_id, phy_mode;
++	struct stmmac_pci_info *info;
+ 	struct stmmac_resources res;
+ 	struct device_node *np;
+-	int ret, i, phy_mode;
+-
+-	np = dev_of_node(&pdev->dev);
+-
+-	if (!np) {
+-		pr_info("dwmac_loongson_pci: No OF node\n");
+-		return -ENODEV;
+-	}
+ 
+ 	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+ 	if (!plat)
+@@ -78,12 +87,6 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+ 	if (!plat->mdio_bus_data)
+ 		return -ENOMEM;
+ 
+-	plat->mdio_node = of_get_child_by_name(np, "mdio");
+-	if (plat->mdio_node) {
+-		dev_info(&pdev->dev, "Found MDIO subnode\n");
+-		plat->mdio_bus_data->needs_reset = true;
+-	}
+-
+ 	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
+ 	if (!plat->dma_cfg) {
+ 		ret = -ENOMEM;
+@@ -107,10 +110,6 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+ 		break;
+ 	}
+ 
+-	plat->bus_id = of_alias_get_id(np, "ethernet");
+-	if (plat->bus_id < 0)
+-		plat->bus_id = pci_dev_id(pdev);
+-
+ 	phy_mode = device_get_phy_mode(&pdev->dev);
+ 	if (phy_mode < 0) {
+ 		dev_err(&pdev->dev, "phy_mode not found\n");
+@@ -123,30 +122,56 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
  
  	pci_set_master(pdev);
  
--	loongson_default_data(plat);
-+	loongson_gmac_data(pdev, plat);
- 	pci_enable_msi(pdev);
- 	memset(&res, 0, sizeof(res));
- 	res.addr = pcim_iomap_table(pdev)[0];
+-	loongson_gmac_data(pdev, plat);
+-	pci_enable_msi(pdev);
+-	memset(&res, 0, sizeof(res));
+-	res.addr = pcim_iomap_table(pdev)[0];
+-
+-	res.irq = of_irq_get_byname(np, "macirq");
+-	if (res.irq < 0) {
+-		dev_err(&pdev->dev, "IRQ macirq not found\n");
+-		ret = -ENODEV;
+-		goto err_disable_msi;
+-	}
++	info = (struct stmmac_pci_info *)id->driver_data;
++	ret = info->setup(pdev, plat);
++	if (ret)
++		goto err_disable_device;
+ 
+-	res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+-	if (res.wol_irq < 0) {
+-		dev_info(&pdev->dev, "IRQ eth_wake_irq not found, using macirq\n");
+-		res.wol_irq = res.irq;
++	if (np) {
++		plat->mdio_node = of_get_child_by_name(np, "mdio");
++		if (plat->mdio_node) {
++			dev_info(&pdev->dev, "Found MDIO subnode\n");
++			plat->mdio_bus_data->needs_reset = true;
++		}
++
++		bus_id = of_alias_get_id(np, "ethernet");
++		if (bus_id >= 0)
++			plat->bus_id = bus_id;
++
++		phy_mode = device_get_phy_mode(&pdev->dev);
++		if (phy_mode < 0) {
++			dev_err(&pdev->dev, "phy_mode not found\n");
++			ret = phy_mode;
++			goto err_disable_device;
++		}
++		plat->phy_interface = phy_mode;
++
++		res.irq = of_irq_get_byname(np, "macirq");
++		if (res.irq < 0) {
++			dev_err(&pdev->dev, "IRQ macirq not found\n");
++			ret = -ENODEV;
++			goto err_disable_msi;
++		}
++
++		res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
++		if (res.wol_irq < 0) {
++			dev_info(&pdev->dev, "IRQ eth_wake_irq not found, using macirq\n");
++			res.wol_irq = res.irq;
++		}
++
++		res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
++		if (res.lpi_irq < 0) {
++			dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
++			ret = -ENODEV;
++			goto err_disable_msi;
++		}
++	} else {
++		res.irq = pdev->irq;
+ 	}
+ 
+-	res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
+-	if (res.lpi_irq < 0) {
+-		dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+-		ret = -ENODEV;
+-		goto err_disable_msi;
+-	}
++	pci_enable_msi(pdev);
++	memset(&res, 0, sizeof(res));
++	res.addr = pcim_iomap_table(pdev)[0];
+ 
+ 	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+ 	if (ret)
 -- 
 2.31.4
 
