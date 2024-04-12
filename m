@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-87245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F6928A241A
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 05:00:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1B3C8A2419
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 05:00:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E43301F22E79
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 03:00:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 761541F22D3C
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 03:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA57134CE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64C9C12B79;
 	Fri, 12 Apr 2024 03:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RlrcimFQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XZh6B6xb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC9D134B2;
-	Fri, 12 Apr 2024 03:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EC7E134B1
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 03:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712890830; cv=none; b=R9Zsiik4ssI/Ik8vNdZat7mIt4rPPegcu7lW33GfxvRtP8qMuW72N9NLH93cbDEv4Y6sbgZJzerE5FXnBf6nN2VmXlgrA7OV4AphVMeOmlKqHb7PRZYrOzqz8EMlL5VRSBNMfuKOaXKKTp148ZeX3gERpFZRXfbGfcTmK1JouqU=
+	t=1712890830; cv=none; b=suKsbu9yd7+Jf+rj0yMi0V2sQ21/4netUrWPCNPvYRxPUsw12yeUYLx8KbPyaNEqnP9ZI7COymo/xfgfSSYhghmh9zkNl9+SBsHFD4SyXa5RZoXbneZ2C9NDftiDiX/apERbTp9y+g7ymFtW6lhjFAIBpcQwouxst2sxBIHYwqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712890830; c=relaxed/simple;
-	bh=xgQp/R0CH63gDutvRq7lxt37zWTokqFaNm+/NVS0NVY=;
+	bh=R62l3KyyiAHnk1Pg++D1XbAcIkMZWOOdq5n5Lj9WDVE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ix9rM/ttsebEJ7MTROMXvYRtQ8cpfL2No76zHLbJ0DSKqFwZsU8uWv+0TmnqRqiKpNTR01tIVAcwhAG2zwXsce9xK9D2waxhBLYgc3R/XVBlHVcFqs4vvuQx+Mxgvm/V8u0GAtiV0jqXgXnzsrYJT00ohmGqDUzBZC6uMZ2Xsq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RlrcimFQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D0753C113CE;
+	 In-Reply-To:To:Cc; b=kUxP8j/c1LcU7HcUe4sEWbfYSf4b/PWOqwi0MEYVv/Ivjqsq/2Kwje44KCtBINPf502H65IEvbQhZuf7qBES3xW+PxDz2PfXnTQxJ+dKZaa6a88ee6AWTDWPYrUswdaFWe8zijIxqJc4Wo5YSDdEa+pIoSLMCWWFhpVv828lbMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XZh6B6xb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DAF87C2BD10;
 	Fri, 12 Apr 2024 03:00:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1712890829;
-	bh=xgQp/R0CH63gDutvRq7lxt37zWTokqFaNm+/NVS0NVY=;
+	bh=R62l3KyyiAHnk1Pg++D1XbAcIkMZWOOdq5n5Lj9WDVE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RlrcimFQylvNQpfFXiWOhGYAhm6ZIeKw5VwC6Q33ypikmnxXIdFnzI6kSaRN448q4
-	 GAO9v/YLFK16yOCbygQhxellsj/JanrMgWAk3bLflPOFQHxMhkI7CkuMSJOk2ehW2+
-	 fg3aZU4L3cfyW6I60+s27F4Nf4ZpAO3hX5bAmosEeYeXpq4PRSywbwezN/kVrAWK3g
-	 pnUIAeeb54GmyMJtK6PYB0q4oDKMa3Qufwr+X3SZHA/QRaqgOFIFxrHBRd0mPg7sKj
-	 itH6Dv5fOPnKqNmPMxVyKCb+l6Bj9K8BcifesQQKF6IQUkElmscUhL8EkpmK1b2smJ
-	 RfZDitqe1hcOA==
+	b=XZh6B6xb9pGY0yUMQEx8bdFQyK2VAft0aTvi2YpyVG7Q/3Sj7ickqBBjQ8uKcz6tF
+	 qKwdstWj2a1L0QRL99GMujJuzzvIcK4pvTKshBuwUodWzWqaeIRv4hiSqE4Y25/aV1
+	 APB1enbYCvrKfzX3z3r1wcOkuQEwqNVu1XJZeYf5xODqR2Kt8xbTRNiRHsMEnhVFrw
+	 U0UpXLk+h16WhYE72Im44ieIEKxvqgQxM0iIriZDWRKAhd6kHZkrsW2AJke3vEMr1Q
+	 v5/Vz7zbZ5eogth0nhF+Y3Ui4+6FlMbNSqT6qT0jnM57eFGu+H3sJz335Ll4w6QARk
+	 8pmg+U6284W8A==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BDF23C4339F;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C6F64C433E9;
 	Fri, 12 Apr 2024 03:00:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,41 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/2] net: usb: qmi_wwan: Leverage core stats
- allocator
+Subject: Re: [net-next v4] tcp: add support for SO_PEEK_OFF socket option
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171289082977.20467.4450257396019552508.git-patchwork-notify@kernel.org>
+ <171289082981.20467.6186572911489073168.git-patchwork-notify@kernel.org>
 Date: Fri, 12 Apr 2024 03:00:29 +0000
-References: <20240409133307.2058099-1-leitao@debian.org>
-In-Reply-To: <20240409133307.2058099-1-leitao@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
- edumazet@google.com, bjorn@mork.no, oneukum@suse.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-usb@vger.kernel.org
+References: <20240409152805.913891-1-jmaloy@redhat.com>
+In-Reply-To: <20240409152805.913891-1-jmaloy@redhat.com>
+To: Jon Maloy <jmaloy@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ passt-dev@passt.top, sbrivio@redhat.com, lvivier@redhat.com,
+ dgibson@redhat.com, eric.dumazet@gmail.com, edumazet@google.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  9 Apr 2024 06:33:05 -0700 you wrote:
-> With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
-> convert veth & vrf"), stats allocation could be done on net core
-> instead of in this driver.
+On Tue,  9 Apr 2024 11:28:05 -0400 you wrote:
+> From: Jon Maloy <jmaloy@redhat.com>
 > 
-> With this new approach, the driver doesn't have to bother with error
-> handling (allocation failure checking, making sure free happens in the
-> right spot, etc). This is core responsibility now.
+> When reading received messages from a socket with MSG_PEEK, we may want
+> to read the contents with an offset, like we can do with pread/preadv()
+> when reading files. Currently, it is not possible to do that.
+> 
+> In this commit, we add support for the SO_PEEK_OFF socket option for TCP,
+> in a similar way it is done for Unix Domain sockets.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/2] net: usb: qmi_wwan: Leverage core stats allocator
-    https://git.kernel.org/netdev/net-next/c/8959bf2acfbc
-  - [net-next,2/2] net: usb: qmi_wwan: Remove generic .ndo_get_stats64
-    https://git.kernel.org/netdev/net-next/c/3cddfeca9f02
+  - [net-next,v4] tcp: add support for SO_PEEK_OFF socket option
+    https://git.kernel.org/netdev/net-next/c/05ea491641d3
 
 You are awesome, thank you!
 -- 
