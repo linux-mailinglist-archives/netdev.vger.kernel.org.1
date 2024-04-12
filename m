@@ -1,180 +1,116 @@
-Return-Path: <netdev+bounces-87453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2037E8A3253
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 17:24:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A09DD8A327B
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 17:31:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EABFB27021
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:24:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52AD11F218B8
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:31:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4B2149C55;
-	Fri, 12 Apr 2024 15:22:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 718E91474D9;
+	Fri, 12 Apr 2024 15:31:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vt8BzJ23"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A5hmx3Eu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f74.google.com (mail-ej1-f74.google.com [209.85.218.74])
+Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDB9148305
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 15:22:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13EDA127E00;
+	Fri, 12 Apr 2024 15:31:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712935373; cv=none; b=HZnJPZSfFKR5l2P7WxZguSIsg6gVrtqtOlNaVoY2/bs9K6i/tgotEQGjmK3NLtp5HVYCg/Jomf6TUivdLOB08ejB80pGPiHVCFflWRwmuDSCzILqM+ixYKS0isLSnX/3v5Fr1xXCwRTaPrO2s24IiFUBCzjJ6YLSfyNpZWO7SDc=
+	t=1712935877; cv=none; b=ZMdBREIOj/jvFNEUTAETHkD9iH4xRadc6gRpzmchzowFHm79e9Ygm8rj+wJdUt1Dx/gs1DBERERz1d8bdlFZ1gZ5lXG4egoBHSN22VpKo8To5OoK+PetXxlaOYYqGwceDByViLpVcKe1ClLGP/mJUb33NIJm1dhWQMmxYWqpd3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712935373; c=relaxed/simple;
-	bh=5X7kke06e3UeJqdGUk8D4h504dj+BHWPB2iGiT+tvew=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=W3l7IUnsHBtX7J0efIBgO6HxJL4mKpINl6WXxp4DebBj/+dQP2I/P4dgE8JEHPc8nPBnk0oVJIgIF3Bk/7j9L534JkX9uKfhVP21Dyj9gOJlROgDinuAQ1rCisEfeHwnjkO3q5zTAj6T1jkbgNghBbLnWtfBFMaMjrR3MnKjc5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vt8BzJ23; arc=none smtp.client-ip=209.85.218.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--gnoack.bounces.google.com
-Received: by mail-ej1-f74.google.com with SMTP id a640c23a62f3a-a52052809caso79320166b.2
-        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 08:22:51 -0700 (PDT)
+	s=arc-20240116; t=1712935877; c=relaxed/simple;
+	bh=RORODW2vJcgAPxDQ4n4yM8GRuED7G6Qf/vNl8SltkvQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=ESf3voEdM2CGwLdQrrNKZ30L5X4iFVlerozO9fGe5mfa+qkgGoo8iin9vCjtxkJJ37oMHEPrQtYPR9dKf6JUazDZeHhgEYine+UPwz4Ulfas/137BQnvZ974VEKSI5oV3e8WisG4/g1Uxly3HHTxsq/0MfGa4iCHX72mHHbA1x4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A5hmx3Eu; arc=none smtp.client-ip=209.85.219.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-699320fcbc1so6299686d6.3;
+        Fri, 12 Apr 2024 08:31:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712935370; x=1713540170; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=P8KCiuTa4eqpPfBICrGrSkbJNxoli6JH+bflrAm6zF4=;
-        b=vt8BzJ238VsU8az6Byh9RlypFt713AIPT19Oib7f2hAL85DyNvIBgozfU+XMLLdvpU
-         PSLjOa3GxDLqz8Atba7WAil/HWgcUFxsSSDMGNoTFkmoDWdNoOl6LrTVe7b1OvOY6aVQ
-         uQueMBRp8+okONujRF8LhWX2wGjsziYTfG5yRDuysOmQ5v52rK0WF3la2FaY/92HWoxN
-         0WpYxPpEZYcsjgZy+j0v3NsXhVn9u0c4QceWrVIQs2A+1EdNe30cM1xQQ0TO+dqyASd2
-         kIjbWe7xfoFXQkGkm8sI5foZ0+QrSt7oQJF1dsXisjep5t57vXPNV8w9cxR86q40v2aG
-         b4vQ==
+        d=gmail.com; s=20230601; t=1712935875; x=1713540675; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KTwyU2S5UHMgjSlvNflz7DIIhXgJNIRfm1/F1CcRC0o=;
+        b=A5hmx3EuGPWrqkIPKgFkWSJmquyZN0esU0C8L4KbhWuJSlpH/rrZatcIIBankRPshQ
+         dOOq9RM1B+Z04HNOkFSGlhJ0yT4lrnWBVtT8gVS1cSeao2J/wfxx1571nxBEzsKpYkEc
+         XzX3QNOQ6N4JUi1QvrE7yfXCqOiokEc5FoWgeC515oY4UkiOKL1eU+7LEjmmzNAt2vkY
+         aYBOYZyZuCmtUKkO9ZO+/MmxDFRoNPYXkc9caV1nOkwLTW1gf3RZUOvGY8tq2VTRaOhU
+         ve5DOMtb1BHyWEProL28oIwITmEWKT4c3pVa04OGyJzqebB0TYA7TYwCE1wyY898PuLG
+         Oxcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712935370; x=1713540170;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=P8KCiuTa4eqpPfBICrGrSkbJNxoli6JH+bflrAm6zF4=;
-        b=bESIipgm7xGq4oUo4bQXOQw7FFtV+1seIozeHLsnBnKk9zewy44Eujd4Tu9cizUwrC
-         TbnMHWwlHInFuNl4AUl8aqiUMDDsG/io64o3392CFZ81VQQe+poZMAqaxzFnh06Zks+1
-         BSOe5BAKzy274dWbVjJd9TIlYlVpI8qfjkcL26tWlsCoSZ2v1gNnfELjG/HAQTsSGBxR
-         x8ydlinFDpaKzvdV/jWp3NlDSxg2Doai2Q/eXFJFN0MOfj+cDEwQI8dLi5j8t1XsKGKu
-         gjaUlHWeGvYCxc2fu4UcEkZKrCsRA47djMbxcqN2YEes1EcuL1V7AGRx50tF4iERxmQ6
-         F3lw==
-X-Forwarded-Encrypted: i=1; AJvYcCXvhNWMBnlD+UvA3qtgHNc5rm5LWPynyIhFJ/deRWSg+E7rFmAWFgnXkjgcOYTBJINL/UZktGnU/GGIXtrNv9ixj2z6LbDO
-X-Gm-Message-State: AOJu0Yzhlz3503KT8+e46joTRAVkTUhgiKT26FModg4L7hGzCtHzZvaz
-	DC7zvrNxcCKwzVSDGGqcLYtX93OIrACsV1BGHt9JP2TnGhT8oUosE+0Ht3+aSFJhlB0YFzy1UuQ
-	SiQ==
-X-Google-Smtp-Source: AGHT+IFn6OTCBTX3jRnEItDINk05EZMP0OKiE6xd/OWCSVjBrlc+aKYZsDG6YOTcie1ufvccbBFlehXzPB8=
-X-Received: from swim.c.googlers.com ([fda3:e722:ac3:cc00:31:98fb:c0a8:1605])
- (user=gnoack job=sendgmr) by 2002:a05:6402:348b:b0:570:5e:5fce with SMTP id
- v11-20020a056402348b00b00570005e5fcemr1737edc.0.1712935370179; Fri, 12 Apr
- 2024 08:22:50 -0700 (PDT)
-Date: Fri, 12 Apr 2024 17:22:48 +0200
-In-Reply-To: <a7e8f467-036c-a3e0-e26b-b5ba966b4e9e@huawei-partners.com>
+        d=1e100.net; s=20230601; t=1712935875; x=1713540675;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=KTwyU2S5UHMgjSlvNflz7DIIhXgJNIRfm1/F1CcRC0o=;
+        b=ViQdVaa6XG06H2vbQCBfnUC8fp3zSjawYZteb/DIyEezVtjl0eGq5JgUNSODeHPleJ
+         h5PEywyD1qdk+lmBj0aOupK4TbVqgODRt7nZgWj3H1k2X15TQRAblg7/oOVMJoaVCiV2
+         v1BnTUrCBYjBHyicTiOn8Y4JBEa857IyzOJY0k5JeBRvDn5wp8P9CipFwKGBTqOYFtfE
+         ERbEsMYeVuC7WCmLa3vBIGSsiP9rES0nGeInAXMTIPHSxBmNVVyKBW00IQ0xWxvDFUH6
+         nRgLwcpNr7uavA68c2rxs1qySZ8ZHLqbKX/FlzvT3fR8fWkewKJsnJrob+Y/v/76Zfjj
+         ZVEA==
+X-Forwarded-Encrypted: i=1; AJvYcCUzs7v9+V95/7MgYLUywSFBjjhdrgA/O7bYtOQHO8t27Hc9J4YJBH09dzSI1uGAF8au74UbnG6OVUU7TaH++vGncHs+sWEiB9Rs7TR0hYdwK3syKOz73lhi+vcLgl0ifv60XHW4
+X-Gm-Message-State: AOJu0YwGMjO94ia00CQLyziS+uXz5WAY7GKU5n3MIg0VmPYYou0RJYrH
+	6nq2QEtVBdL+ykLuBDaLxhgVk0uS29qRcM+8U4GfyvmwlVYi3nN6
+X-Google-Smtp-Source: AGHT+IGpwl5BMjs4P4rDNpfocneVmf/IRgerGNtDikI537TPvh4ROvINwcgZFfzPQCFTDkPai1ibyg==
+X-Received: by 2002:ad4:4f23:0:b0:69b:5445:6ab0 with SMTP id fc3-20020ad44f23000000b0069b54456ab0mr3503022qvb.46.1712935875043;
+        Fri, 12 Apr 2024 08:31:15 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id i20-20020a0cf394000000b00698fa74199fsm2438981qvk.1.2024.04.12.08.31.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Apr 2024 08:31:14 -0700 (PDT)
+Date: Fri, 12 Apr 2024 11:31:14 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: John Fraker <jfraker@google.com>, 
+ netdev@vger.kernel.org
+Cc: John Fraker <jfraker@google.com>, 
+ Harshitha Ramamurthy <hramamurthy@google.com>, 
+ Shailend Chand <shailend@google.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Jeroen de Borst <jeroendb@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Junfeng Guo <junfeng.guo@intel.com>, 
+ linux-kernel@vger.kernel.org
+Message-ID: <661953c285139_38e2532941f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240412053245.3328123-1-jfraker@google.com>
+References: <20240412053245.3328123-1-jfraker@google.com>
+Subject: Re: [PATCH net-next 12] gve: Correctly report software timestamping
+ capabilities
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240408093927.1759381-1-ivanov.mikhail1@huawei-partners.com>
- <20240408093927.1759381-2-ivanov.mikhail1@huawei-partners.com>
- <ZhRKOTmoAOuwkujB@google.com> <a7e8f467-036c-a3e0-e26b-b5ba966b4e9e@huawei-partners.com>
-Message-ID: <ZhlRuC-1va6DPfgO@google.com>
-Subject: Re: [RFC PATCH v1 01/10] landlock: Support socket access-control
-From: "=?utf-8?Q?G=C3=BCnther?= Noack" <gnoack@google.com>
-To: Ivanov Mikhail <ivanov.mikhail1@huawei-partners.com>
-Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hello!
+John Fraker wrote:
+> gve has supported software timestamp generation since its inception,
+> but has not advertised that support via ethtool. This patch correctly
+> advertises that support.
+> 
+> Signed-off-by: John Fraker <jfraker@google.com>
+> Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
 
-On Thu, Apr 11, 2024 at 06:16:31PM +0300, Ivanov Mikhail wrote:
-> 4/8/2024 10:49 PM, G=C3=BCnther Noack wrote:
-> > On Mon, Apr 08, 2024 at 05:39:18PM +0800, Ivanov Mikhail wrote:
-> > > diff --git a/security/landlock/ruleset.h b/security/landlock/ruleset.=
-h
-> > > index c7f152678..f4213db09 100644
-> > > --- a/security/landlock/ruleset.h
-> > > +++ b/security/landlock/ruleset.h
-> > > @@ -92,6 +92,12 @@ enum landlock_key_type {
-> > >   	 * node keys.
-> > >   	 */
-> > >   	LANDLOCK_KEY_NET_PORT,
-> > > +
-> > > +	/**
-> > > +	 * @LANDLOCK_KEY_SOCKET: Type of &landlock_ruleset.root_socket's
-> > > +	 * node keys.
-> > > +	 */
-> > > +	LANDLOCK_KEY_SOCKET,
-> > >   };
-> > >   /**
-> > > @@ -177,6 +183,15 @@ struct landlock_ruleset {
-> > >   	struct rb_root root_net_port;
-> > >   #endif /* IS_ENABLED(CONFIG_INET) */
-> > > +	/**
-> > > +	 * @root_socket: Root of a red-black tree containing &struct
-> > > +	 * landlock_rule nodes with socket type, described by (domain, type=
-)
-> > > +	 * pair (see socket(2)). Once a ruleset is tied to a
-> > > +	 * process (i.e. as a domain), this tree is immutable until @usage
-> > > +	 * reaches zero.
-> > > +	 */
-> > > +	struct rb_root root_socket;
-> >=20
-> > The domain is a value between 0 and 45,
-> > and the socket type is one of 1, 2, 3, 4, 5, 6, 10.
-> >=20
-> > The bounds of these are defined with AF_MAX (include/linux/socket.h) an=
-d
-> > SOCK_MAX (include/linux/net.h).
-> >=20
-> > Why don't we just combine these two numbers into an index and create a =
-big bit
-> > vector here, like this:
-> >=20
-> >      socket_type_mask_t socket_domains[AF_MAX];
-> >=20
-> > socket_type_mask_t would need to be typedef'd to u16 and ideally have a=
- static
-> > check to test that it has more bits than SOCK_MAX.
-> >=20
-> > Then you can look up whether a socket creation is permitted by checking=
-:
-> >=20
-> >      /* assuming appropriate bounds checks */
-> >      if (dom->socket_domains[domain] & (1 << type)) { /* permitted */ }
-> >=20
-> > and merging the socket_domains of two domains would be a bitwise-AND.
-> >=20
-> > (We can also cram socket_type_mask_t in a u8 but it would require mappi=
-ng the
-> > existing socket types onto a different number space.)
-> >=20
->=20
-> I chose rbtree based on the current storage implementation in fs,net and
-> decided to leave the implementation of better variants in a separate
-> patch, which should redesign the entire storage system in Landlock
-> (e.g. implementation of a hashtable for storing rules by FDs,
-> port values) [4].
->=20
-> Do you think that it is bad idea and more appropriate storage for socket
-> rules(e.g. what you suggested) should be implemented by current patch?
->=20
-> [4] https://github.com/landlock-lsm/linux/issues/1
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
-I realized that my suggestion might be at odds with Micka=C3=ABl's Landlock=
- audit
-patch set [1].  IIRC, the goal there is to log the reasons for a denial,
-together with the Landlock ruleset on which this decision was based.
+> ---
+> v2: Used ethtool_op_get_ts_info instead of our own implementation, as
+>     suggested by Jakub
 
-[1] https://lore.kernel.org/all/20230921061641.273654-1-mic@digikod.net/
-
-I'd recommend to wait for Micka=C3=ABl to chime in on this one before spend=
-ing the
-time to reimplement that.
+FYI: the subject says "net-next 12", not "net-next v2"
+    
 
 
-=E2=80=94G=C3=BCnther
 
