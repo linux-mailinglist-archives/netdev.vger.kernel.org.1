@@ -1,74 +1,63 @@
-Return-Path: <netdev+bounces-87545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AB268A37B0
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 23:13:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D17FD8A37B7
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 23:15:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD2E8B249EC
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 21:13:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69DF41F227FE
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 21:15:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D5F15218B;
-	Fri, 12 Apr 2024 21:09:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E7E14EC4E;
+	Fri, 12 Apr 2024 21:15:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KAtQmbIR"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="BCfS9slo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B92C14EC53;
-	Fri, 12 Apr 2024 21:09:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31085249E8;
+	Fri, 12 Apr 2024 21:15:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712956179; cv=none; b=ogZtxx7yzr8B+7LoLVogcyN8vj4umRDiAyYuEh/w9at8u4TW6aux6a1VgHZY+qk3t3ukfe6Tdu672Cd+cQNzbIbxR5gJgFXDNeoRHf7lGj1FFVx199UrwsCQaV0TeQySzlBPF8KqAGsuXGj03CMbnM+BHnvRV9y5WUDx2VeDWKw=
+	t=1712956526; cv=none; b=ZJ9U9rbep7unGYRXdscUzXQoddavKkPsO1g4yPz7H878/D5Au7cKBArJ5vML1r1dnvFd7Aqry6lALcaOnnnHD7rFYZ7nAmQJ5AwnsEgOc4Q+y6Fenj2SmXZsi5K2IKJXjkEwXHqZvHgm/q6NyAGAfEF+mv/KSAvuKQ0mr7VO5po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712956179; c=relaxed/simple;
-	bh=rzHWCIbqi4sjL6QSVhQQP9hv8/lAhUyduMHxTP3Ob+Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iZwHUFRARD/RNERvp1XpMT63qxEN2fYY4+sSs62KBV3mZAM7GpDW5CIGWM/6gSZbT608EhtgENxOBt333a4PeJgg9pjx2++AFnyCx2Rkj1BHnfOb0nIGepRUi3lD5oYvq8xsbE55mkg2MYVM49cDcEPhLQ4AuKkjmVciVsPfH5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KAtQmbIR; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6ed267f2936so1119362b3a.3;
-        Fri, 12 Apr 2024 14:09:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712956177; x=1713560977; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0ZUh90Dyj5cgS/eWYY+eYS2MnnSGiUd+1OfcQIu3cf0=;
-        b=KAtQmbIRJKwoy2p5ItkhaozUOhvqOmT3uHO8YigWnKTAVjtISOpCmlXwroi/XwpcwI
-         6e5d0shQFpD1L76eFa/Us09BtYrRFmRXTT0dV5MVdL6L7RZrmw3mmPg/akNvHHrZx0vK
-         lJUAenv4kpetzBXNNUwENBEmLmfiJ8RyxI1hvsxvuwob9c4aPmpuxILMsZwHdUx//zpB
-         YcA81RSXWRVcL1QnH5B19qY7EMDDUwksybgQiNuc4HrdOwnAL4HotmnbTDakjx1JehIs
-         xpJZNiptGqX2/tz8vjMH6/qxOJZ85i6kxpXmlj4cf/x3ieREOcqYXUammJBzrR0fUt/Y
-         XBAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712956177; x=1713560977;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0ZUh90Dyj5cgS/eWYY+eYS2MnnSGiUd+1OfcQIu3cf0=;
-        b=T5pcLFFb+KNVyHgc/98oX/Dcn5YPEX358c4S7AUqxxWtutSgVSsD01wU3K7+O0Mtvf
-         bl5oTMek7i6vmGWhL0f3OWLf9TGLiqiH1z9h/gV5Xj2WHtVji5FmOzdE+8DdShOzVroh
-         5i6VNoUg9tAAB8Dnprl89bJabAOCATtHGXosaQKe710c4ClianM41ARovE6VFUVwfUF6
-         63ifSJAZzaEQhqxhRPA3o/FGMoat+8mwcAbnrHWFmHjpLfJGk58MwNffe6vkaL7dLy0U
-         G18ba7zlR5SVYhAa6C/LWCqi9/Sj0uWH/1CL30ZYkVQojjYq/1sgDZwbc/C7QDPpD6LB
-         VaYw==
-X-Forwarded-Encrypted: i=1; AJvYcCVfyYxlcevHuCKWvl10LlT1bDhy9bW1DvKZcct45cXDJPdp0/cGOqHiX9iV9SOXijpvruXUyhyYuBWFiEHsYZnvsvAw8m+5mqspFzc526URC2G9aIjixqE5w7gQVvCLZD7gn4ah
-X-Gm-Message-State: AOJu0Yyoygbd+hiQKr9t1law2TKy/lA8mm5iTbP+SPC1oad0wKhWLaRX
-	pTdC7i4RHaODEFMNymqgDc2lz5/Qtyi5SIpwib5bE9SjimAPpHeZ
-X-Google-Smtp-Source: AGHT+IFql085XmFCXINlD8eahD3OqMfgHE67+Jg7ozVjWl5Nt0N43ZZPfeydfN8/Hb+LCkQntMev5g==
-X-Received: by 2002:a17:902:db08:b0:1e1:a54:1fe8 with SMTP id m8-20020a170902db0800b001e10a541fe8mr4048740plx.53.1712956177068;
-        Fri, 12 Apr 2024 14:09:37 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id lh15-20020a170903290f00b001dd0c5d5227sm3429123plb.193.2024.04.12.14.09.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Apr 2024 14:09:36 -0700 (PDT)
-Message-ID: <cdb1f2e6-dbe0-4a19-b111-5dd8dbd5d44a@gmail.com>
-Date: Fri, 12 Apr 2024 14:09:34 -0700
+	s=arc-20240116; t=1712956526; c=relaxed/simple;
+	bh=HjTZA9cux1BkDiz0t8NTsvUvXMtenUhHKaPG79+snsM=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=MZ4FLvauhY3ffHHwUTpIHqNzd6cx/hCItrpjEDd2nf6Un9dFCPmwrHNISjDYzkl2YZRIZUlvBR6f72oiKWBZ1+ZOOWTVCkydw+YsQY+HnkQoT7VzFClMqVl3QlsrP8LP52OiMU7Ri7cws/XBldzvIFzeJ/9SpgAPWgG8QuXdHFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=BCfS9slo; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43CKef48005887;
+	Fri, 12 Apr 2024 21:14:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:from:to:cc:references
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=MdhezSHgd1h2H9jE2kPe/W4V4Gl6gWIHPcj0TElSSxU=; b=BC
+	fS9sloGqPmi0wpsWb1FIygWIiyj4fH47uVyYZOfzgr/c7VYH9D74hxuaX4cnw4VP
+	bQWLtfQdbLyuoRnwpwezG8YvfP3eDx1fdnynaFrg2I4N26KEwzGCxzvRauCyGmN+
+	gcZP49jSXBYfhVYjE7yBqxJwMeMVdC0/lLUUf3CnSiRWazVSK2TEdge6hV7YHnKE
+	zuwYd8v14aMynXzixP5npb2tYDQCnvywSTlYzMC2vFPdB8Rbzd60D7K+FDvwRUy+
+	qigI69/4vYkxXPqCfF0uo4Jctu7fSRtHqbLwetHOjmqlx1zHmFbm0PQGqzmAK5jn
+	4R/kTbSkWtBfCHiZlp/w==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xf6khs612-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 12 Apr 2024 21:14:57 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43CLEudS020045
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 12 Apr 2024 21:14:56 GMT
+Received: from [10.46.19.239] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 12 Apr
+ 2024 14:14:52 -0700
+Message-ID: <03581ae6-15a2-41a7-9619-74797ebec105@quicinc.com>
+Date: Fri, 12 Apr 2024 14:14:51 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,34 +65,141 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: bcmasp: fix memory leak when bringing down if
-To: Justin Chen <justin.chen@broadcom.com>, netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>,
- "open list:BROADCOM ASP 2.0 ETHERNET DRIVER"
- <bcm-kernel-feedback-list@broadcom.com>,
- open list <linux-kernel@vger.kernel.org>
-References: <20240412181631.3488324-1-justin.chen@broadcom.com>
+Subject: Re: [RFC PATCH bpf-next v1 3/3] net: Add additional bit to support
+ userspace timestamp type
 Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <20240412181631.3488324-1-justin.chen@broadcom.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>,
+        Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>
+CC: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
+        "Martin
+ KaFai Lau" <martin.lau@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>,
+        <kernel@quicinc.com>
+References: <20240409210547.3815806-1-quic_abchauha@quicinc.com>
+ <20240409210547.3815806-4-quic_abchauha@quicinc.com>
+ <6616b3587520_2a98a5294db@willemb.c.googlers.com.notmuch>
+ <f28de1e7-4a9b-4a97-b4f9-723425725b58@quicinc.com>
+ <fcdf6dc6-81ff-48b8-822b-80c097efc07d@linux.dev>
+ <ab91c5d7-d968-4d57-9412-e8684c9a4cc6@quicinc.com>
+In-Reply-To: <ab91c5d7-d968-4d57-9412-e8684c9a4cc6@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: 8vvQ081teDfzk6LN3uisyM6QpJZQM72C
+X-Proofpoint-GUID: 8vvQ081teDfzk6LN3uisyM6QpJZQM72C
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-12_17,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ priorityscore=1501 malwarescore=0 phishscore=0 lowpriorityscore=0
+ adultscore=0 mlxlogscore=999 bulkscore=0 clxscore=1015 impostorscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2404010003 definitions=main-2404120152
 
-On 4/12/24 11:16, Justin Chen wrote:
-> When bringing down the TX rings we flush the rings but forget to
-> reclaimed the flushed packets. This lead to a memory leak since we
-> do not free the dma mapped buffers. This also leads to tx control
-> block corruption when bringing down the interface for power
-> management.
+
+
+On 4/10/2024 4:39 PM, Abhishek Chauhan (ABC) wrote:
 > 
-> Fixes: 490cb412007d ("net: bcmasp: Add support for ASP2.0 Ethernet controller")
-> Signed-off-by: Justin Chen <justin.chen@broadcom.com>
+> 
+> On 4/10/2024 4:25 PM, Martin KaFai Lau wrote:
+>> On 4/10/24 1:25 PM, Abhishek Chauhan (ABC) wrote:
+>>>>> @@ -830,6 +833,9 @@ enum skb_tstamp_type {
+>>>>>    *        delivery_time in mono clock base (i.e. EDT).  Otherwise, the
+>>>>>    *        skb->tstamp has the (rcv) timestamp at ingress and
+>>>>>    *        delivery_time at egress.
+>>>>> + *        delivery_time in mono clock base (i.e., EDT) or a clock base chosen
+>>>>> + *        by SO_TXTIME. If zero, skb->tstamp has the (rcv) timestamp at
+>>>>> + *        ingress.
+>>>>>    *    @napi_id: id of the NAPI struct this skb came from
+>>>>>    *    @sender_cpu: (aka @napi_id) source CPU in XPS
+>>>>>    *    @alloc_cpu: CPU which did the skb allocation.
+>>>>> @@ -960,7 +966,7 @@ struct sk_buff {
+>>>>>       /* private: */
+>>>>>       __u8            __mono_tc_offset[0];
+>>>>>       /* public: */
+>>>>> -    __u8            tstamp_type:1;    /* See SKB_MONO_DELIVERY_TIME_MASK */
+>>>>> +    __u8            tstamp_type:2;    /* See SKB_MONO_DELIVERY_TIME_MASK */
+>>>>>   #ifdef CONFIG_NET_XGRESS
+>>>>>       __u8            tc_at_ingress:1;    /* See TC_AT_INGRESS_MASK */
+>>
+>> The above "tstamp_type:2" change shifted the tc_at_ingress bit.
+>> TC_AT_INGRESS_MASK needs to be adjusted.
+>>
+>>>>>       __u8            tc_skip_classify:1;
+>>>>
+>>>> With pahole, does this have an effect on sk_buff layout?
+>>>>
+>>> I think it does and it also impacts BPF testing. Hence in my cover letter i have mentioned that these
+>>> changes will impact BPF. My level of expertise is very limited to BPF hence the reason for RFC.
+>>> That being said i am actually trying to understand/learn BPF instructions to know things better.
+>>> I think we need to also change the offset SKB_MONO_DELIVERY_TIME_MASK and TC_AT_INGRESS_MASK
+>>>
+>>>
+>>> #ifdef __BIG_ENDIAN_BITFIELD
+>>> #define SKB_MONO_DELIVERY_TIME_MASK    (1 << 7) //Suspecting changes here too
+>>> #define TC_AT_INGRESS_MASK        (1 << 6) // and here
+>>> #else
+>>> #define SKB_MONO_DELIVERY_TIME_MASK    (1 << 0)
+>>> #define TC_AT_INGRESS_MASK        (1 << 1) (this might have to change to 1<<2 )
+>>
+>> This should be (1 << 2) now. Similar adjustment for the big endian.
+>>
+>>> #endif
+>>> #define SKB_BF_MONO_TC_OFFSET        offsetof(struct sk_buff, __mono_tc_offset)
+>>>
+>>> Also i suspect i change in /selftests/bpf/prog_tests/ctx_rewrite.c
+>>
+>> ctx_rewrite.c tests the bpf ctx rewrite code. In this particular case, it tests
+>> the bpf_convert_tstamp_read() and bpf_convert_tstamp_write() generate the
+>> correct bpf instructions.
+>> e.g. "w11 &= 3;" is testing the following in bpf_convert_tstamp_read():
+>>         *insn++ = BPF_ALU32_IMM(BPF_AND, tmp_reg,
+>>                      TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK);
+>>
+>> The existing "TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK" is 0x3
+>> and it should become 0x5 if my hand counts correctly.
+>>
+> 
+> so the changes will be as follows (Martin correct me if am wrong)
+> 
+> 		//w11 is checked againt 0x5 (Binary = 101)
+> 		N(SCHED_CLS, struct __sk_buff, tstamp),
+> 		.read  = "r11 = *(u8 *)($ctx + sk_buff::__mono_tc_offset);"
+> 			 "w11 &= 5;" <== here 
+> 			 "if w11 != 0x5  goto pc+2;" <==here
+> 			 "$dst = 0;"
+> 			 "goto pc+1;"
+> 			 "$dst = *(u64 *)($ctx + sk_buff::tstamp);",
+> 
+> 		//w11 is checked againt 0x4 (100) 
+> 		.write = "r11 = *(u8 *)($ctx + sk_buff::__mono_tc_offset);"
+> 			 "if w11 & 0x4 goto pc+1;" <== here
+> 			 "goto pc+2;"
+> 			 "w11 &= -4;" <==here
+> 			 "*(u8 *)($ctx + sk_buff::__mono_tc_offset) = r11;"
+> 			 "*(u64 *)($ctx + sk_buff::tstamp) = $src;",
+> 
+>
+Martin and Willem,
+After the above changes, patchset v3 of these changes passed BPF test cases . Looks like we are good to go with final review now. If you have any further comments
+Thank you for all the comments and design discussion that we had as part of this patch set series. 
 
-Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
-
+Testing :- 
+1. https://patchwork.kernel.org/project/netdevbpf/patch/20240412210125.1780574-2-quic_abchauha@quicinc.com/
+2. https://patchwork.kernel.org/project/netdevbpf/patch/20240412210125.1780574-3-quic_abchauha@quicinc.com/
+ 
+>> The patch set cannot be applied to the bpf-next:
+>> https://patchwork.kernel.org/project/netdevbpf/patch/20240409210547.3815806-4-quic_abchauha@quicinc.com/
+>> , so bpf CI cannot run to reproduce the issue.
+>>
 
