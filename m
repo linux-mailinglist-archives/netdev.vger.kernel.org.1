@@ -1,94 +1,78 @@
-Return-Path: <netdev+bounces-87236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B94A8A23DE
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 04:50:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D8858A23E7
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 04:51:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BEFA1C21FEE
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 02:50:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0FA5B23A81
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 02:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 942E314006;
-	Fri, 12 Apr 2024 02:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F2710A3C;
+	Fri, 12 Apr 2024 02:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t97wcuWK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DR1JybLc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FEA3134B6
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 02:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8660310A24;
+	Fri, 12 Apr 2024 02:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712890231; cv=none; b=QAjbikjeLWj6ff3Yi2EjZXjrqX+sBEc2cQBHJ5mXdH8YyR37Kt5VIUXQ5GEW3mOWbMWcnXDU91Tzhx0uqGBMiQXHZnilN4cdq/bAc+2Jgu+uf3asJ1OOWDCDbUUK1HoFzMxvHPNlrxDbMFnFqgLJ9sqzTyWLMPZIgGrrtDidHEA=
+	t=1712890291; cv=none; b=cTdtLjies0HM1o7W065hzqwRNAroa9E8ighN8tL6rMw9r77tfdF4eON+fOLaWO1JyXdvpfm8ST9ccZwWjsr0EBVoB84pugvzT8npX/vwKFLf7eqjZ+BeWhYmK7GYcZ2h9s/D3lqXoHABJvNrxOQFfAJnR0uE4VmS3geQs2tIdyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712890231; c=relaxed/simple;
-	bh=EAuFEjXf5dNYv5WrwYA5rr39KXJofN2Le4hqggF2Dm8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=UL+vGyir6LW6rPqEAF7gGqXnvB/pAav1LzWZUMsqSPKOXrN+3PvJmVzNxRL23ekUXjH9kJqZ+TrTGBptj7D8WiLBzjNEFyDYCVXAAy74937+871S1iyK5ipT7bfL0mD1ZyClx7TdeY0movgPUItnMUH0ieJv4al/yuZ3eJ9QhP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t97wcuWK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DE7D5C2BD11;
-	Fri, 12 Apr 2024 02:50:30 +0000 (UTC)
+	s=arc-20240116; t=1712890291; c=relaxed/simple;
+	bh=JLSsFNuTS/XXGmjbgOU7MixG+Yt1/H2zmieyO7GGxMM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Vba3NiOkNuzxsOrp1MRPPtGHfNeHdfEcjsQctn/gRV+jjcFdj/4Xme3jf3de7VC43TnHvLnVDGalG+CNU9u30M/2S4QPoDBppFOQKuRDC1gPwmwLsENoA3mdmmSWoFrtugc0jaiRlWXv8n7ALFslfDYSbJXtalVm8ZLuLNkOTVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DR1JybLc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CC69C072AA;
+	Fri, 12 Apr 2024 02:51:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712890230;
-	bh=EAuFEjXf5dNYv5WrwYA5rr39KXJofN2Le4hqggF2Dm8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=t97wcuWK/R1pgpRHwBfk1gstMDBuUY7N+K6mZ5nHZmQ8+aQF7BjIvIUL5bmjdL7et
-	 hJAqlaKwpZ10o1HswbNtkaTqAnEwXsQL26bXy95s6p/nMLKfnjGet5BgqCWoFTStWF
-	 wzBieFpFU7VvIvu7CYks6DCJIvidyv6k0SMPinfeZZ7IcTqoI6/+FCSPLfeibQU0yz
-	 TV+f+rQSnah+I3MZiZkzZsUEr4lx0ePiGKcz0AiIfIUAxrrMGP+37spSvro/5d/Fhh
-	 +1JgJk4xLRZ7xXbXRJ50HC4fEdm3WGP0J49ecsnNlraYsMmC7iJ85fml8Sxsz/tI8s
-	 Yg0Ob2udYjoPg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CC3DAC4339F;
-	Fri, 12 Apr 2024 02:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1712890291;
+	bh=JLSsFNuTS/XXGmjbgOU7MixG+Yt1/H2zmieyO7GGxMM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DR1JybLcJI6E78CFpFQm2BDyx0OIXKm6fZPwjr/Nyu6Md+FqcBBemwL02ZZXqNM8+
+	 vgpDDW0pNaRRuMvuACSYt8A6NM+INoBUuZ3drApLMfJIY95lUdTzao7+ILFfmlA8IF
+	 dcLhGhwlkl4V9Cq6Cbya2+JdL0DaUQw7aL64oo24elKNDw43JvJC5a5fYz01EQpzut
+	 uouWdN0wfAYtRo8rUPxa8J420UVZFiaMeVn2hBZQ2HIybPqRsOH1WrvUhosiZ7oiXc
+	 cS69wqM+hR8W18Sm+FyH4irMAw+0I7ztNyXe/oC/ljPD45+/68E6LERrwJtyWnTiky
+	 gssoMX5k6Y5cw==
+Date: Thu, 11 Apr 2024 19:51:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org, Jarkko Palviainen
+ <jarkko.palviainen@gmail.com>
+Subject: Re: [PATCH] net: usb: ax88179_178a: avoid writing the mac address
+ before first reading
+Message-ID: <20240411195129.69ff2bac@kernel.org>
+In-Reply-To: <20240410095603.502566-1-jtornosm@redhat.com>
+References: <20240410095603.502566-1-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] mpls: no longer hold RTNL in
- mpls_netconf_dump_devconf()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171289023083.15367.14083081896314123722.git-patchwork-notify@kernel.org>
-Date: Fri, 12 Apr 2024 02:50:30 +0000
-References: <20240410111951.2673193-1-edumazet@google.com>
-In-Reply-To: <20240410111951.2673193-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 10 Apr 2024 11:55:49 +0200 Jose Ignacio Tornos Martinez wrote:
+> After the commit d2689b6a86b9 ("net: usb: ax88179_178a: avoid two
+> consecutive device resets"), reset operation, in which the default mac
+> address from the device is read, is not executed from bind operation and
+> the random address, that is pregenerated just in case, is direclty written
+> the first time in the device, so the default one from the device is not
+> even read. This writing is not dangerous because is volatile and the
+> default mac address is not missed.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+AFAICT the reset is synchronous to resume, right?
 
-On Wed, 10 Apr 2024 11:19:50 +0000 you wrote:
-> - Use for_each_netdev_dump() to no longer rely
->   on net->dev_index_head hash table.
-> 
-> - No longer care of net->dev_base_seq
-> 
-> - Fix return value at the end of a dump,
->   so that NLMSG_DONE can be appended to current skb,
->   saving one recvmsg() system call.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] mpls: no longer hold RTNL in mpls_netconf_dump_devconf()
-    https://git.kernel.org/netdev/net-next/c/e0f89d2864b0
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I think you can use netif_device_detach() and netif_device_attach()
+to prevent getting called while suspended.
 
