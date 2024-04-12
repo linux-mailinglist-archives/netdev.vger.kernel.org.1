@@ -1,182 +1,127 @@
-Return-Path: <netdev+bounces-87304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 746338A2788
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 09:05:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6DE68A27B8
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 09:12:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B63D28236A
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 07:05:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AB151F22CF6
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 07:12:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D872D46444;
-	Fri, 12 Apr 2024 07:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="jUZwrqq+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31EA46426;
+	Fri, 12 Apr 2024 07:12:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1EEC4654E
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 07:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9729633997;
+	Fri, 12 Apr 2024 07:12:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712905220; cv=none; b=UsJnW/HJg4FSKD5OLS6SVWTEngWTSoHWF0Lt/el1K4Fva/twjc2Im6/bKR0NS6GMJ0horauHWnHnTewxQTPi8RXfNC0LtqpiBaZ8XF35m5N8TTage7okBgOSD52ltmNSvvKprs6mpgeJITOmMMh5lL0TvAcmetky7EzTb1FvUmI=
+	t=1712905946; cv=none; b=QSZAb2ykXR6QE+IDFEM5ewKLrkwB1S3Q+65oup38//AgKNPL2wE4Lq+HwCcTbV00mzxHC+o4QEngfe01gXnsT9kFS8w0QMLNnTip6MsLgq7XCkRAXMCLwRxu4e/Vvn4jr6sX322iCs82ZUZc/F77Wn++inb9nIAghgN8/zrkX14=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712905220; c=relaxed/simple;
-	bh=W6lIJ87blDFQy40/MQCUjdNhysk/lUYI3a/UQNiuRTU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ElIzT3oV7JncUTKtRWUrM4PZxghmCbBW7Kn19Qr7ZCa+vkOv7GK2H7IhWk12x5V4GNBmRRChwvMQiiqx79xuzlbT88DZN0MEQCQkMrE6FZmJD0XEUvdMVSvzrOQIs9LoYjL+nErB6LCLMLW3cflkjYl/PktKvDLYwtOyK9DZIzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=jUZwrqq+; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2a2da57ab3aso350009a91.3
-        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 00:00:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1712905210; x=1713510010; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7q5h9HaG/VUM+RDE7dhrzmPiovNSzJaDim+39mVuIWQ=;
-        b=jUZwrqq+7mkwImCjEQ6XBE9Xm4QzuoVaBzE558ccPUSdGiBeeKEzQJ7Yn3qJfoghxc
-         B8Pm8NMlIv1Nh/OgNkgwJtSVFRft8U2nDrRs+9jDgjO/IIqMuQmK6CXgz4g1oknfL194
-         TkvA4pCImcQ/e8YnLUHbvKOW7InCpVuCLiXhqfY1BteZ34QjjWEnk0j+UnEeuYirWX7X
-         znB8zucWocBA+0G00eDiYwFeRJ3NfSuxulIV1hEhIkAYI/LJ7Bne00kafETqwBvrVl9m
-         Ce3S4H9+kmUrA6euD/y2P0VeJxYkFArRUb3TqAU6py43y7STjHnpHa9KnA2p+aMx3lf4
-         tSSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712905210; x=1713510010;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7q5h9HaG/VUM+RDE7dhrzmPiovNSzJaDim+39mVuIWQ=;
-        b=Qf5pmDqB+8Qb1m/QjnykN6rVKgY88JJWUK8l5JhsIE9Nn5A5c+6YX6JqqHnbObw8Vx
-         Yim1EAOv8eFf6zNCvUsd1tmYI/ZdKlDsFJ0QkBhqL5UHHHIM3tjNDivDgH7fyt9eqCx6
-         +VY7hcQbcolIIRxGoq7OUu4a/XGST5KCr53k2dAhygQdaBrQHYGxFjOEdc3iN9NwWedL
-         nxUAN0SQE0ygKxGvBANbp6KqBKdx2hi+ohj1JV1WHxvzWFFPzIuwFvxb4+wHEdox2ySw
-         dpca4ByuuRLLsofntTSR4keJeUViQpomTeVa2QwIjGxwAmCVdFkUZiB9nP7zLNuux5lc
-         qUoA==
-X-Forwarded-Encrypted: i=1; AJvYcCW+kyhKi0wARqZCsl0nnVZfC2vUG4k/M/M9E8DSdktO4ord5rI2tbY6LFu9EOw6F9C8F62JDeq5gLeCnP6CDyNwv2b4aQ0s
-X-Gm-Message-State: AOJu0YwAeM9QEid92DcJuJJSqal0EokV+JnVyPw6DVUM3qzqcqNxCH3u
-	Llhng8JWhFSvh4dZSdszBZJVefVUl+m8v7W+Q1IOewiVrlwrHGbsWxPfthph0ek=
-X-Google-Smtp-Source: AGHT+IFfdDdH61r019wJzHLaeIy7ZbF0voE9uBIuHh1wTgvCSppeDlW3ZpGOwHe3V43VZiGNPVDoWQ==
-X-Received: by 2002:a17:90a:ac10:b0:2a4:92a3:d9dc with SMTP id o16-20020a17090aac1000b002a492a3d9dcmr1589097pjq.22.1712905208687;
-        Fri, 12 Apr 2024 00:00:08 -0700 (PDT)
-Received: from localhost.localdomain ([8.210.91.195])
-        by smtp.googlemail.com with ESMTPSA id y1-20020a17090a1f4100b002a5e73ba87dsm2371147pjy.6.2024.04.12.00.00.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 00:00:08 -0700 (PDT)
-From: Lei Chen <lei.chen@smartx.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>
-Cc: Lei Chen <lei.chen@smartx.com>,
-	Willem de Bruijn <willemb@google.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3] net:tun: limit printing rate when illegal packet received by tun dev
-Date: Fri, 12 Apr 2024 02:58:39 -0400
-Message-ID: <20240412065841.2148691-1-lei.chen@smartx.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1712905946; c=relaxed/simple;
+	bh=mgfUy8S85yOwuUy3mNJ61fEIgLxYugY92FiHdSZiToA=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=jrDlEWhb8o7Yf3oKfyKS0smSkQqo4MSGyTaO9sxAfRDRvFDPbRQyH6+v92apvbblMZ6hiRk10zLTAbycPockbQgNFtT+F0BfK66Z5Q3M6C76+AxnSOd1roBvZy5SeFERyecLrxlQPb0lPr7ixfpWeu8vcqP4kWdYABwV+WzxKe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4VG7383z7xzTmPZ;
+	Fri, 12 Apr 2024 15:09:08 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 92DD9180073;
+	Fri, 12 Apr 2024 15:12:19 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 12 Apr 2024 15:12:18 +0800
+Message-ID: <5e9abc23-96c8-4a37-abae-f6c208aacda2@huawei.com>
+Date: Fri, 12 Apr 2024 15:12:17 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
+	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<rkannoth@marvell.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+	<liuyonglong@huawei.com>, <chenhao418@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V7 net-next 4/4] net: hns3: add support to query scc
+ version by devlink info
+To: Jiri Pirko <jiri@resnulli.us>
+References: <20240410125354.2177067-1-shaojijie@huawei.com>
+ <20240410125354.2177067-5-shaojijie@huawei.com> <ZhapUja4xXiJe4Q2@nanopsycho>
+ <16347737-f0ac-4710-85ee-189abed59d6b@huawei.com>
+ <ZheB58bjmkFzIEbG@nanopsycho>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <ZheB58bjmkFzIEbG@nanopsycho>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-vhost_worker will call tun call backs to receive packets. If too many
-illegal packets arrives, tun_do_read will keep dumping packet contents.
-When console is enabled, it will costs much more cpu time to dump
-packet and soft lockup will be detected.
 
-net_ratelimit mechanism can be used to limit the dumping rate.
+on 2024/4/11 14:23, Jiri Pirko wrote:
+> Thu, Apr 11, 2024 at 03:05:53AM CEST, shaojijie@huawei.com wrote:
+>> on 2024/4/10 22:59, Jiri Pirko wrote:
+>>> Wed, Apr 10, 2024 at 02:53:54PM CEST, shaojijie@huawei.com wrote:
+>>>> From: Hao Chen <chenhao418@huawei.com>
+>>>>
+>>>> Add support to query scc version by devlink info for device V3.
+>>>>
+>>>> Signed-off-by: Hao Chen <chenhao418@huawei.com>
+>>>> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+>>>> ---
+>>>> Documentation/networking/devlink/hns3.rst     |  3 ++
+>>>> drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  9 ++++
+>>>> .../hns3/hns3_common/hclge_comm_cmd.h         |  8 ++++
+>>>> .../hisilicon/hns3/hns3pf/hclge_devlink.c     | 44 +++++++++++++++++--
+>>>> .../hisilicon/hns3/hns3pf/hclge_devlink.h     |  2 +
+>>>> .../hisilicon/hns3/hns3pf/hclge_main.c        | 18 ++++++++
+>>>> .../hisilicon/hns3/hns3pf/hclge_main.h        |  1 +
+>>>> 7 files changed, 82 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/Documentation/networking/devlink/hns3.rst b/Documentation/networking/devlink/hns3.rst
+>>>> index 4562a6e4782f..e19dea8ef924 100644
+>>>> --- a/Documentation/networking/devlink/hns3.rst
+>>>> +++ b/Documentation/networking/devlink/hns3.rst
+>>>> @@ -23,3 +23,6 @@ The ``hns3`` driver reports the following versions
+>>>>      * - ``fw``
+>>>>        - running
+>>>>        - Used to represent the firmware version.
+>>>> +   * - ``fw.scc``
+>>> What's scc? I don't see it described anywhere.
+>> diff --git a/Documentation/networking/devlink/hns3.rst b/Documentation/networking/devlink/hns3.rst
+>> index 4562a6e4782f..e19dea8ef924 100644
+>> --- a/Documentation/networking/devlink/hns3.rst
+>> +++ b/Documentation/networking/devlink/hns3.rst
+>> @@ -23,3 +23,6 @@ The ``hns3`` driver reports the following versions
+>>     * - ``fw``
+>>       - running
+>>       - Used to represent the firmware version.
+>> +   * - ``fw.scc``
+>> +     - running
+>> +     - Used to represent the soft congestion control firmware version.
+>>
+>> scc means "soft congestion control"
+> I guess this is something specific to your device, isn't it? Can't you
+> please extend the description a bit more?
+>
+> Thanks!
+>
+SCC is a firmware which provides multiple congestion control algorithms, including dcqcn.
+Congestion control is a mechanism that controls the entry of rdma packets into the network,
+enabling a better use of a shared network infrastructure and avoiding congestive collapse.
 
-PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980"
- #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
- #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
- #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
- #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
- #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
-    [exception RIP: io_serial_in+20]
-    RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
-    RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 0000000000000000
-    RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428a0
-    RBP: 0000000000002710   R8: 0000000000000004   R9: 000000000000000f
-    R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 0000000000000020
-    R13: ffffffff8acbf698  R14: 0000000000000058  R15: 0000000000000000
-    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
- #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
- #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
- #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
- #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
- #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
- #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
- #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
- #12 [ffffa65531497b68] printk at ffffffff89318306
- #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
- #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
- #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
- #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
- #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
- #18 [ffffa65531497f10] kthread at ffffffff892d2e72
- #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
 
-Fixes: ef3db4a59542 (\"tun: avoid BUG, dump packet on GSO errors\")
-Signed-off-by: Lei Chen <lei.chen@smartx.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
-
-Changes from v2:
-https://lore.kernel.org/netdev/20240410042245.2044516-1-lei.chen@smartx.com/
- 1. Add net-dev to patch subject-prefix.
- 2. Add fix tag.
-
-Changes from v1:
-https://lore.kernel.org/all/20240409062407.1952728-1-lei.chen@smartx.com/
- 1. Use net_ratelimit instead of raw __ratelimit.
- 2. Use netdev_err instead of pr_err to print more info abort net dev.
- 3. Adjust git commit message to make git am happy.
----
- drivers/net/tun.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 0b3f21cba552..ca9b4bc89de7 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -2125,14 +2125,16 @@ static ssize_t tun_put_user(struct tun_struct *tun,
- 					    tun_is_little_endian(tun), true,
- 					    vlan_hlen)) {
- 			struct skb_shared_info *sinfo = skb_shinfo(skb);
--			pr_err("unexpected GSO type: "
--			       "0x%x, gso_size %d, hdr_len %d\n",
--			       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
--			       tun16_to_cpu(tun, gso.hdr_len));
--			print_hex_dump(KERN_ERR, "tun: ",
--				       DUMP_PREFIX_NONE,
--				       16, 1, skb->head,
--				       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
-+
-+			if (net_ratelimit()) {
-+				netdev_err(tun->dev, "unexpected GSO type: 0x%x, gso_size %d, hdr_len %d\n",
-+				       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
-+				       tun16_to_cpu(tun, gso.hdr_len));
-+				print_hex_dump(KERN_ERR, "tun: ",
-+					       DUMP_PREFIX_NONE,
-+					       16, 1, skb->head,
-+					       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
-+			}
- 			WARN_ON_ONCE(1);
- 			return -EINVAL;
- 		}
--- 
-2.44.0
+Jijie Shao
 
 
