@@ -1,167 +1,147 @@
-Return-Path: <netdev+bounces-87316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD1AD8A28A7
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 10:02:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 150B28A28E2
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 10:07:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EABC01C20D82
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 08:02:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63A04B21A5B
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 08:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 101704D9F4;
-	Fri, 12 Apr 2024 08:02:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E2D4E1DD;
+	Fri, 12 Apr 2024 08:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="lut6OKEf"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="c6CbHdnF"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2057.outbound.protection.outlook.com [40.107.94.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44017487A9;
-	Fri, 12 Apr 2024 08:02:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712908963; cv=none; b=aePQ1c9336eXRoPCy5FH98JcNYeFu2RiIEII5DHCK382Q8Y7732HbmSHSJoDMSEs6fGK4Df9ju5GzxIofLQ5+4tekNnnT8Ix4fNE3NzzuSNMpR1LDp5kSMRkt7agxtmGg460URJljXZNgy2Am4IHgZo/v8e03zVIJt4BpJkl8SU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712908963; c=relaxed/simple;
-	bh=HypH+HFfZe7sG9jT4MifVrW0ikey/sQI93jaxO2O35g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=NCgFUik+d4/ecNtWw5KaXPZKFs5Ghx5GcrMarARM6SKXpnRMQMkRMYXzufUnOcOIcOKoTdL55ynCqIgyWYliXEem02SCT0Cm7qkzaU4nFdsKwX7h5lPX3A3fs6NJ28vBa//dX/zX1pcBwtLlM5nAQODX4iCvrWjYexMviC4w580=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=lut6OKEf; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43C81s5s124910;
-	Fri, 12 Apr 2024 03:01:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1712908914;
-	bh=VX0Xcvc7mqlW39h0bWx5qdbe1UgbFfhzdFxCTgi5tYs=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=lut6OKEfEAifrJR0p1WxIxVaFKsg/KVIlAAEdNX55Nx2WeGQbqPMSQHQ+3CGzqc/a
-	 dj/0kzRP71mPFk8fT+WWjxsvyRxkRO/ZU8/3bfUy+PWCFPDESChQPeDCwQ7DXuIyz/
-	 Uge4C9c/GOJBFuO1A6nXkgblmxcIlwG5zCRRFAqE=
-Received: from DFLE114.ent.ti.com (dfle114.ent.ti.com [10.64.6.35])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43C81sa4079143
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 12 Apr 2024 03:01:54 -0500
-Received: from DFLE108.ent.ti.com (10.64.6.29) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 12
- Apr 2024 03:01:54 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 12 Apr 2024 03:01:54 -0500
-Received: from [10.249.135.225] ([10.249.135.225])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43C81j69086571;
-	Fri, 12 Apr 2024 03:01:47 -0500
-Message-ID: <cae18a4a-0085-493d-93a1-1e3127a0bd64@ti.com>
-Date: Fri, 12 Apr 2024 13:31:44 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C07A4D9F4;
+	Fri, 12 Apr 2024 08:07:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712909239; cv=fail; b=mLWS7gmC+kSYPXW+1AVKDPlT7bL8IwXZLOVNHmJtlmg/NeSLQwniBwRbMLCKmDeajffAHeHyAj7qwuMtkqO3LycdY0IJj5oc9X9oJCR8EVGcczftZHwXAsZlPj5Zwx8cIRyH4W1wg5tYrmw9MpVhJqQ1WTJWvvAq603KcC7Tx7g=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712909239; c=relaxed/simple;
+	bh=a29Xlt3ldqwiCIxLDA5XJV1GDaiTCXwDkEhg60x1Pn4=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=lKLW/iu1bvEwvkuZCXkFsg1Ux9jmIQKbUievu3xlzHmFpCJI3HIUsWW+jC74HTrpGWNGIaO1zWTBTeuOSpsO/eHr6n2WCGNc6URNW024G261Wg7oV96UFZZnWqde7WEcHjC9UB7k7Zq2UN4jish+2QRPmhSwg45ooqT3L2diAG4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=c6CbHdnF; arc=fail smtp.client-ip=40.107.94.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QwjQ/rAMNsW32sbrOkuPXcT2MBmC7hAXyBjK2UoJZ0BIx1XDtuzPJctQxj84U5oAXLHhCszvNKXej3kYXw32zhQ7/MdwNDmtcKqM4v2UOUdTPsyV/8Ei2d8uJ73wh6C9WD/cyRjSuIMTnaL1x/qwltLiJJ74DhqVg6J7TdXtG1BxzF8PIz45fhfzw1vXAo81UjK9LiXspfm0gGMFkIfLYoJvRuQq9h8bcT31wgkHavmMYc6mykk7vAvIIqZ8qvE7bsnOMaQPbK0iwk/to28Gvnh9cXt9tZwCCdZEukIxTiCzJwFBTEY21FuzZYGg3W2R3MN/sw1TIblPT71m/BupXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=P9fVnoREoprIGQ53rR40qfY/ptUpi3WXh8DgonCVeJ0=;
+ b=IeeY42zaWgYKOwtP1bp2uRTqHHligQLOp/T1CZ/9lGtvxDML2mn1LEHfp2ZV/23GLz5uvaSm9z3PifYaCny232H32WbVeRckP++ZuDZep1+mIVd3eyNBxilOdnST7rt/WSjOx4wc8hwGuxnfqNRZNbFmD62t+7T9TNY7I5fy422mDhUaWnYgp+uDL9T1hZAVu2wN1InZ2PAfHVQLQA9FvyS3iTmFINaJuPen6RSbGOE2i9FVFa3vxW4fIldY5PZQE2I6TdAtCuVeyNR3wK44piFg/I3i2+g80fYcTNxP1v7A8fOKn7Dix3N/uQ0iyTGQNnF2cU0Pz3RWkxdmD5EoPQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=P9fVnoREoprIGQ53rR40qfY/ptUpi3WXh8DgonCVeJ0=;
+ b=c6CbHdnF/RuerF1AIGOqqtKmT8Thw3q+CjPH9WKgUawpbZC7t6DM58maEu1znycNTcHIfE7kJ+aHQKmI9We1wVhj64LvhsNLB2Rtxny9OTudeXPlq9w5YwnxlyxBdiyk1GgAuBVfTPClzBnnsjJKZgQRLlDjlhZe1e8lQ8yB+K237CuGoyLSDhuar5d66EHHJ5PdqdNe8zlMkntqVPHn/Jx7r0xYZCGTqFmfr2OPfLYO62ZlRizHipCdXW852juuCk0AGDrYKYiTB7OAFEGgBJpw0u8LLOLsPxjnvAUDZoWCA9P5elDppav6SjhP44m+2dhoCzi1ila3my0HMGFSkQ==
+Received: from MN2PR05CA0002.namprd05.prod.outlook.com (2603:10b6:208:c0::15)
+ by SA1PR12MB7319.namprd12.prod.outlook.com (2603:10b6:806:2b5::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Fri, 12 Apr
+ 2024 08:07:16 +0000
+Received: from BL02EPF0001A0FE.namprd03.prod.outlook.com
+ (2603:10b6:208:c0:cafe::c5) by MN2PR05CA0002.outlook.office365.com
+ (2603:10b6:208:c0::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.12 via Frontend
+ Transport; Fri, 12 Apr 2024 08:07:15 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BL02EPF0001A0FE.mail.protection.outlook.com (10.167.242.105) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.22 via Frontend Transport; Fri, 12 Apr 2024 08:07:15 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 12 Apr
+ 2024 01:06:59 -0700
+Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Fri, 12 Apr
+ 2024 01:06:55 -0700
+References: <20240411012815.174400-1-kuba@kernel.org>
+ <20240411012815.174400-5-kuba@kernel.org>
+User-agent: mu4e 1.8.11; emacs 28.3
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <shuah@kernel.org>, <petrm@nvidia.com>,
+	<linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next 4/6] selftests: net: print full exception on
+ failure
+Date: Fri, 12 Apr 2024 10:02:57 +0200
+In-Reply-To: <20240411012815.174400-5-kuba@kernel.org>
+Message-ID: <87cyqvf1ic.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add support for
- ICSSG switch firmware
-To: Andrew Lunn <andrew@lunn.ch>, MD Danish Anwar <danishanwar@ti.com>
-CC: Diogo Ivo <diogo.ivo@siemens.com>, Rob Herring <robh@kernel.org>,
-        Dan
- Carpenter <dan.carpenter@linaro.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>, Simon Horman <horms@kernel.org>,
-        Wolfram Sang
-	<wsa+renesas@sang-engineering.com>,
-        Arnd Bergmann <arnd@arndb.de>, Vignesh
- Raghavendra <vigneshr@ti.com>,
-        Vladimir Oltean <vladimir.oltean@nxp.com>,
-        Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub
- Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
-References: <20240327114054.1907278-1-danishanwar@ti.com>
- <20240327114054.1907278-4-danishanwar@ti.com>
- <27d960ed-8e67-431b-a910-e6b2fc12e292@lunn.ch>
- <c94815f8-798a-4167-8f69-359b9b28b7ce@ti.com>
- <cca25c3d-a352-4531-a8ae-5a0fb7de44df@lunn.ch>
- <ff567495-d966-42c9-9015-ba0ba0dbe011@ti.com>
- <0039b9d9-9dc5-4b88-99f0-92f275b0b4d3@lunn.ch>
-Content-Language: en-US
-From: "Anwar, Md Danish" <a0501179@ti.com>
-In-Reply-To: <0039b9d9-9dc5-4b88-99f0-92f275b0b4d3@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A0FE:EE_|SA1PR12MB7319:EE_
+X-MS-Office365-Filtering-Correlation-Id: a14736ac-947b-41ff-5415-08dc5ac79104
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	UPCpZY6mBTK4crhnJrM3OYdC0AM6rVKNkjbU3gmkXyHuUGK2adH2cbI00Ceves2B1KCX5vNVLDWaJyfk8wST5pux9WHXk4CSsY8pdxPmwDTGwhWnhnT2Vnz7x8BKFI2jvb9qlBngKUOS4I231oNjCi1TgAvUEdDwuufcRrzZoftiEN/mR747dwbsv6jrsR98KVlvsbVcnQzR0XDMMEDabOq+cOkQrOwbHRmFDsGSu+IaucF6bwZZcKeecbblizI3fdlbBChf0QWzqP6lROY//YfrKnChIF6o/TJqEql5DY1GsTvHLqZxnSt/+VOxBnAC2qdjVWjSwh+x0UcBJbI7VXSvTEOD5vEDZjqsIy2f35Blu0LIBW4Sd9iSQ4EAesn3OiOXxjxgOOo0HLcRPeuwYeLG6Y1xQxh/quE/98kM7ca89w8dRmeq4Kmg0fVo6eGZbsd2lmGx9ZuVfbvtls4fkOBib5+dsO2LSH63oWCx4QSwO0SiFgLwmqqOkbc64rQCi/7eWhcQ6LHmeqh5MHhxyqDVmHihQMQ5ZSN9sTAn+thfv+aG2TxrQ2Bw+fUqg6YE/hWVuCsv/a2JKNelT7q29Gz8DFdrRlIyIOFWbncPXy14VTNcqq1JVLBEICA3PPn6fYc2qTSiqDahFBydlAxquVvbvzwdGJkz+nuL2PQICqZzsXHOcizQxQiIr8ufLobl29IASiKKOk+xRQ/zTCEG5bhhhP069SerMyu3+lI8/MwYoUbZ8GxW1L8IaOYPy+iL
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(36860700004)(82310400014)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2024 08:07:15.5552
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a14736ac-947b-41ff-5415-08dc5ac79104
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF0001A0FE.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7319
 
 
+Jakub Kicinski <kuba@kernel.org> writes:
 
-On 4/10/2024 6:12 PM, Andrew Lunn wrote:
->> I have been working on this and have found a way to change firmwares
->> without bringing the interfaces up / down.
->>
->> By default the interfaces are in MAC mode and the ICSSG EMAC firmwares
->> are running on pru cores. To enable switch mode we will need to stop the
->> cores and reload them with the ICSSG Switch firmwares. We can do this
->> without bringing the interfaces up / down.
->>
->> When first interface is added to bridge it will still run emac
->> firmwares. The moment second interface gets added to bridge, we will
->> disable the ports and stop the pru cores. Load the switch firmwares on
->> to the cores, start the cores and enable the ports. All of this is done
->> from the driver.
->>
->> The user need not to bring the interfaces up / down. Loading / Reloading
->> of firmwares will be handled inside the driver only. But we do need to
->> stop the cores for changing firmwares. For stopping the cores we will
->> change the port state to disable by sending r30 command to firmware.
->>
->> As we are not restarting the interfaces, the DRAM, SMEM and MSMC RAM
->> doesn't get cleared. As a result with this approach all configurations
->> will be saved.
->>
->> Please let me know if this approach looks ok to you.
->>
->> Below will be the commands to enable switch mode now,
->>
->>      ip link add name br0 type bridge
->>      ip link set dev eth1 master br0
->>      ip link set dev eth2 master br0 (At this point we will stop the
->> cores, reload switch firmware, start the cores)
->>      ip link set dev br0 up
->>      bridge vlan add dev br0 vid 1 pvid untagged
-> 
-> This sounds a lot better.
-> 
-> Note that the bridge interface br0 might already be up when the
-> interfaces are added. So that is a different order to what you showed
-> here.
-> 
+> Instead of a summary line print the full exception.
+> This makes debugging Python tests much easier.
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Hi Andrew, I have tested with that sequence as well and forwarding
-works. Even if the second interface is added to bridge after bridge is
-up, the forwarding works fine.
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 
-> There will be some packet losses when you swap firmware, but it
-> probably is not that bad. When interfaces are added to a bridge
-> packets are dropped anywhere while spanning tree determines the
-> network topology. It will just appear your device is slow at doing
-> that.
-> 
+> @@ -85,7 +86,8 @@ KSFT_RESULT = None
+>              totals['xfail'] += 1
+>              continue
+>          except Exception as e:
+> -            for line in str(e).split('\n'):
+> +            tb = traceback.format_exc()
+> +            for line in tb.strip().split('\n'):
 
-Yes there will be packet losses for a slight amount of time but that's
-something we can't avoid.
+(The strip is necessary to get rid of trailing newlines.)
 
-I will post the next revision with these changes soon. Thanks for the
-review.
+>                  ksft_pr("Exception|", line)
+>              ktap_result(False, cnt, case)
+>              totals['fail'] += 1
 
-> 	Andrew
-
--- 
-Thanks and Regards,
-Md Danish Anwar
 
