@@ -1,78 +1,50 @@
-Return-Path: <netdev+bounces-87344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBBBE8A2CC8
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 12:46:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 006F88A2CDF
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 12:50:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77AD328B60E
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 10:46:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABA2B1F231B7
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 10:50:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8983FBAC;
-	Fri, 12 Apr 2024 10:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5CD342069;
+	Fri, 12 Apr 2024 10:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DbjrBSH8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Swj0jPyr"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5323620310;
-	Fri, 12 Apr 2024 10:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80D7830673
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 10:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712918784; cv=none; b=Jh8rNeHPUfbNwfyNePksHWbA1yom/YErxWaibCvH2SXgPjt6IWrwnY4o5xbOMi1rXh/fmiKSNWs4zFa/HRTpwSUmxiVO8X31ZZCzaCelDxgPs+oOF2xkkD9xCuHOhAaTxT79YTdr2N7jp+SNMOc0TkrATZ95sCqOpQQMUAXaNX4=
+	t=1712919031; cv=none; b=jZWA+qMCpI5FZeVIxx+yv11BBZ9Y4/3zyD8v8Gom3zrXFinoBOElfjBBDhllsyGFacd+82jfaXi9gGGAqczKs0sRkAzsodMlfasKX+tQZrxkfczP/t51753eP5U8yYmou5xDumC+hPpzwKiFVtwEzR5qcYNIpTK/6iNzFGFSe2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712918784; c=relaxed/simple;
-	bh=Cu3HN4Jc80J7VKYfW/r+tTVJEg6eOmO7O5fflj7dDWw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oNEp3Y2i72cotwxeZfOxwgkdiC49zaNlLqhVDfxXTENtNUpoarb+X56fM2fLEotdDyeCGxpUnetWG3QyxXmdwA74rTEFlVMYVuHG8ApqmT2TRMnR2TLVihIhRYHu60+y5wDxsbPcO1UbKIFEjyPn/DPD2A3j/2QOZATPBnOIfsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DbjrBSH8; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 855802000B;
-	Fri, 12 Apr 2024 10:46:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1712918779;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=YNgRIU2UT5K1UZWit6Bh8EiB5voBR6xsuvaO369sMeo=;
-	b=DbjrBSH8H+gABaWjk9e+ChddzEQq2eNtOK+JGnuOpIS/mozJBZLVctgS9BA/LBnkCL+OZR
-	pI5qZRzOWugtFgNLXMkMUGVk0Qg1JP9fbt3z7s2fwTCL1qjTbbLy2OiePMZ2Nl3Q8m2hYi
-	aZ9WAoT2DmEw1S/4OaRrcPuTm7fypSsA81FrQebKftryQdjOd1OLeboWXsTGA4Cpw5IBE+
-	QEIninHkS3+Aa4fE65wVZrX76Pg68NeuhNoeL2726ljbk4vr17Do17x+C27icNZgWb/zQj
-	r/eCdmkuRb5bfQz6+wsKkcCJdoWF6tIYk4of3BDJ4o/RbtFxHRAOKgYRctek1A==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	mwojtas@chromium.org,
-	Nathan Chancellor <nathan@kernel.org>
-Subject: [PATCH net-next] net: phy: phy_link_topology: Handle NULL topologies
-Date: Fri, 12 Apr 2024 12:46:14 +0200
-Message-ID: <20240412104615.3779632-1-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1712919031; c=relaxed/simple;
+	bh=iOkEOC4bd/9HgFj965hLOhgi11Zf6Duh0WtkUtlIll8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=GngFphtYA/UNsCMlnTAmn1rcmLkS7tG5XCBQV5oJHofkQi9pcztu4D2QsSXOi/Hgn0UFoxQFVhJpP3pw6haM7EczlNfLHQ3rVfpW4FQ5qv2uTCOCUikxNsW4Y/hHVRdpUzi6Zb3atSBGwlomBQLsz9qi2jy+qaDJiogNcezVb84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Swj0jPyr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 49E53C113CD;
+	Fri, 12 Apr 2024 10:50:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712919030;
+	bh=iOkEOC4bd/9HgFj965hLOhgi11Zf6Duh0WtkUtlIll8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Swj0jPyr2LCeF8h1IYOJhCw19izSIBLca/INN6ZiUz7p2BoYrNqHd9/QUbCbKGuO9
+	 XcCqXRex62iZ7J/Gmn5IYVwULHjPfXAMqtMWOZpnfM02kW/KB/mL6KvRd1WVPAKxBM
+	 Yba7SHuB6afCZehZudCwHtgJSpP4BanlqJjJvihiNjAHrw+G8Xek3DXvyg0r+hH28M
+	 yyeSJzAsfHjn94RWSB/oCQq7QWA1gwHIKZkHh3456QqQCfkWe3vdkPShZPCCZDosu5
+	 JQJrHOEZSAdmMIvH4agO9+1ZoMqh2MiPzSBYQzJNDSDNu2+7Nn6APBcvFxQ007JYjW
+	 BzK+3eZoqizPw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 365D6DF7856;
+	Fri, 12 Apr 2024 10:50:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,81 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Subject: Re: [PATCH net-next v5 0/2]  nfp: series of minor driver improvements
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171291903021.14580.4622607080457516471.git-patchwork-notify@kernel.org>
+Date: Fri, 12 Apr 2024 10:50:30 +0000
+References: <20240410112636.18905-1-louis.peens@corigine.com>
+In-Reply-To: <20240410112636.18905-1-louis.peens@corigine.com>
+To: Louis Peens <louis.peens@corigine.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us,
+ fei.qin@corigine.com, netdev@vger.kernel.org, oss-drivers@corigine.com
 
-In situations where phylib is a module, the topology can be NULL as it's
-not initialized at netdev creation.
+Hello:
 
-Allow passing a NULL topology pointer to phy_link_topo helpers.
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Closes: https://lore.kernel.org/netdev/2e11b89d-100f-49e7-9c9a-834cc0b82f97@gmail.com/
-Closes: https://lore.kernel.org/netdev/20240409201553.GA4124869@dev-arch.thelio-3990X/
----
+On Wed, 10 Apr 2024 13:26:34 +0200 you wrote:
+> This short series bundles now only includes a small update to add a
+> board part number to devlink. Previously some dim patches also formed
+> part of this series, these were dropped in v5.
+> 
+> Patch1: Add new define for devlink string "board.part_number"
+> Patch2: Make use of this field in the nfp driver
+> 
+> [...]
 
-Hi,
+Here is the summary with links:
+  - [net-next,v5,1/2] devlink: add a new info version tag
+    https://git.kernel.org/netdev/net-next/c/3bb946c9d323
+  - [net-next,v5,2/2] nfp: update devlink device info output
+    https://git.kernel.org/netdev/net-next/c/8910f93b9570
 
-This patch fixes a commit that is in net-next, hence the net-next tag and the
-lack of "Fixes" tag.
-
-Nathan, Heiner, can you confirm this solves what you're seeing ?
-
-I think we can improve on this solution by moving the topology init at
-the first PHY insertion and clearing it at netdev destruction.
-
-Maxime
-
- drivers/net/phy/phy_link_topology.c | 10 +++++++++-
- include/linux/phy_link_topology.h   |  7 ++++++-
- 2 files changed, 15 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
-index 985941c5c558..0f3973f07fac 100644
---- a/drivers/net/phy/phy_link_topology.c
-+++ b/drivers/net/phy/phy_link_topology.c
-@@ -42,6 +42,9 @@ int phy_link_topo_add_phy(struct phy_link_topology *topo,
- 	struct phy_device_node *pdn;
- 	int ret;
- 
-+	if (!topo)
-+		return 0;
-+
- 	pdn = kzalloc(sizeof(*pdn), GFP_KERNEL);
- 	if (!pdn)
- 		return -ENOMEM;
-@@ -93,7 +96,12 @@ EXPORT_SYMBOL_GPL(phy_link_topo_add_phy);
- void phy_link_topo_del_phy(struct phy_link_topology *topo,
- 			   struct phy_device *phy)
- {
--	struct phy_device_node *pdn = xa_erase(&topo->phys, phy->phyindex);
-+	struct phy_device_node *pdn;
-+
-+	if (!topo)
-+		return;
-+
-+	pdn = xa_erase(&topo->phys, phy->phyindex);
- 
- 	/* We delete the PHY from the topology, however we don't re-set the
- 	 * phy->phyindex field. If the PHY isn't gone, we can re-assign it the
-diff --git a/include/linux/phy_link_topology.h b/include/linux/phy_link_topology.h
-index 6b79feb607e7..21ca78127d0f 100644
---- a/include/linux/phy_link_topology.h
-+++ b/include/linux/phy_link_topology.h
-@@ -40,7 +40,12 @@ struct phy_link_topology {
- static inline struct phy_device *
- phy_link_topo_get_phy(struct phy_link_topology *topo, u32 phyindex)
- {
--	struct phy_device_node *pdn = xa_load(&topo->phys, phyindex);
-+	struct phy_device_node *pdn;
-+
-+	if (!topo)
-+		return NULL;
-+
-+	pdn = xa_load(&topo->phys, phyindex);
- 
- 	if (pdn)
- 		return pdn->phy;
+You are awesome, thank you!
 -- 
-2.44.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
