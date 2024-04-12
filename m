@@ -1,121 +1,132 @@
-Return-Path: <netdev+bounces-87366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B42058A2E2A
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 14:26:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EA2A8A2EA0
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 14:55:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 658241F22E02
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 12:26:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A23F4283BAB
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 12:55:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8849156457;
-	Fri, 12 Apr 2024 12:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B32258AD6;
+	Fri, 12 Apr 2024 12:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ka5gH5tD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l3TdVzDi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28DAB3F9D5;
-	Fri, 12 Apr 2024 12:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5E955C3B;
+	Fri, 12 Apr 2024 12:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712924792; cv=none; b=lrlVkeHm3oVJEYEWC7dofX5kGvWbAwtisnQl/kSGwKfMwOArd0nC8p/r9E/lDhRtDrtb9MkOWdCwesBd/j7jug5bJVFoZ/0SNt4eZmtl5bmOY2RVYvA/8AA6x27ZlkJ14TjQqchLTMoIzqOR3zaIYLlcoIddnATEcDq2Br7Ct0Y=
+	t=1712926536; cv=none; b=uzt1arPMkEARv1Rhn4r8m0pgK1SVpowBpFfBYKDgZU/ZnFo/FAe09pUEyWj0AFG+Bh5sRFjof9e3HAyxNhXXRXIXAlx5PlWSx8FcQSaRDlOYdIpRQ1rKPGj8FMy2ls4Ccvil5D6+NWKgIhzC8VnsiQuqCcFnI3MRGnnQuyD/eDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712924792; c=relaxed/simple;
-	bh=LluHyhjKemLvziSLq4mu73Bj2Ez4L1mtMOYpKAIdpW8=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=mePL6wILh3YeOD39PH9tR5n4u2C7fg056cz240Qs7IIONJBZ4Bxz4BQAGpA+vm73/PmHTr1kPRZOzGLzK65FLEUUelUKyeeLsa6XKMx8QehY2sRTksFhoyAg0lnN7FvYCAr2dLmOVSLIO37u/FBAW3prZ/uI38nJC3+ipNU5E9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ka5gH5tD; arc=none smtp.client-ip=209.85.210.178
+	s=arc-20240116; t=1712926536; c=relaxed/simple;
+	bh=p2okjA2/g7vmiU48jZj+UlbVjl0tEs82O0QdWeoQ7is=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pY0lTWCn6UOVL0GHk8AWV01h/f/cn/8Ajp0BWOfHzRKsl3RevXc8cQxI4NRvEf93zqwK1lNSlOfIaay5QqwpNf8kKBfnVtfbgSaN4GM/Z76wSccTjd/IQTgsmGEozad8ybPk3w5lHKceM4Xt3YTb/dUqdcuigL72z5x5RVaVHiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l3TdVzDi; arc=none smtp.client-ip=209.85.218.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6ecff85b21cso88431b3a.1;
-        Fri, 12 Apr 2024 05:26:30 -0700 (PDT)
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a450bedffdfso112949766b.3;
+        Fri, 12 Apr 2024 05:55:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712924790; x=1713529590; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NJV6iNofzvP9/1KByDDXNTrF5EbVufMaGdHaNE1qGbU=;
-        b=Ka5gH5tDrs8vTkH+U0jjIFPaD8xtJQ2qFcn/MqYeJHoFoXcuVwmdbdOOKbVm0Q598g
-         WRH/o3+IBBFvmxupLUw63OTnEAGY3U84h8P9xaXIiTMl7nJdrkX0/2frXslxfEz9gHyl
-         6JsmLcnYSpbpGx3n91mAfS0i5M3tDA1eT8siXjrRZo5Bo8nWLtO9e6+n6akxYY+JE2yT
-         cxzMjrr2AEG01chc2hr+OsqvY2xIwpI8nkycNKwdfV2fonWlpxaftByQnbSJGkCfNxDr
-         C26hXGhEV8GzyX30U00F3NmyOIYdJYRnhkq8S1375KqUrR6gjqpVfIeHLV1KXdc6aEr2
-         mXFw==
+        d=gmail.com; s=20230601; t=1712926533; x=1713531333; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=bDPMCbsH8/SO37RrvlFkYjYFSAU01e5TAcsYj3b81KY=;
+        b=l3TdVzDiT3z2zmQH0fEEaYRXU5Pv/6V59xs2p6LdjegDKBJi5IUihl9/CCK6ltO2WS
+         8tIZzmwKcQEjlO6cnzaRwcJnME2iqYsI7xNiwIxrt9PbFydLpZv4Od78vUte5bpBfc49
+         TQ1cXJXJvRreBL3dusO+PUgTlLqXsvyAGTBUuHxprDB7jbn8v8e4nR3dV1HY2fV7DoRl
+         V4n0z01LRHg8DZq/St830qR0C9K4yf2WR4HECWr5xzrtT1/uKursmUXx2R/+sCKcKUrD
+         bU1WPfz8X6qFD09adu+hPCFLlqhSrR/Qy13OKAAJSbKtt3ld9z8INiBSNcw2M6Rq8DPH
+         sTgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712924790; x=1713529590;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NJV6iNofzvP9/1KByDDXNTrF5EbVufMaGdHaNE1qGbU=;
-        b=InsoCPnS8zO7e0WgMmPiPJ5mtGzP3Do9XKGreSZn6njwGH8Vl1nwnL0cY9C+CCkcY8
-         /1AB+ykVP3O5ftuTGBr1Azbd5KIGIGxvocS2WRBqhTSucFBEBz+zwjuOOCSkihMx//h0
-         cBn/XLX71WRQ4m1QDhDaKBEx9amSF5kdKQQ9XxnDsjtOAEhY14BiDzYB+WSgjaqAzKKw
-         rY2wlqmx1Er+g+BjcUKoWqLGTH7AsN2tPLJeepPWU9YNrBsKc4hSbhkqw46fDaRJJrzr
-         dpXbyDlz0vu86qDx/KbJEQgDN2UV5w4lWAeoc5qO+gRfWpRUPk4YEuaN5SnIXTYbCZz7
-         hWcw==
-X-Forwarded-Encrypted: i=1; AJvYcCVp2yrdmKTk/+uLhAUK1i/xWOj7f/6qrH5Ajz6AnUY3u7UBjV7rqnHNF7h7xHmmapimr2pTL9RFvRD+iQhkCStLeUQ0
-X-Gm-Message-State: AOJu0YyCUP7y6dyvyAzLclVJDyOqbwzKYMUZ9lfubvdUU60MBmzMx5Df
-	pktFdcZvam/SW5UJaunU6T8550PdiNsfo0bvYX3A10VSemEz7qIIkc0i+6YdeZ8=
-X-Google-Smtp-Source: AGHT+IGZHHvRCgK27soLLdHJCNMYJTCQVRGU/ljmn6V9QITXfATdyIL2zTmz2wVBYGPm5SebJ1Hg+g==
-X-Received: by 2002:a05:6a21:99a0:b0:1a7:a3cb:7909 with SMTP id ve32-20020a056a2199a000b001a7a3cb7909mr3027724pzb.3.1712924789977;
-        Fri, 12 Apr 2024 05:26:29 -0700 (PDT)
-Received: from localhost.localdomain ([111.194.45.84])
-        by smtp.gmail.com with ESMTPSA id h5-20020a170902704500b001e3c972c83bsm2865885plt.76.2024.04.12.05.26.26
+        d=1e100.net; s=20230601; t=1712926533; x=1713531333;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bDPMCbsH8/SO37RrvlFkYjYFSAU01e5TAcsYj3b81KY=;
+        b=BH9yew4WlNDnhGX/jGK8v80ni0FXrJk5rv0/cRr+XDmFU5hT9NlKqHHRq8pI2fGA5q
+         ShSjsA4hUbXoWqziJtznKQIqjscJd11wLvfzZIgvDJp96U2S80wFHSBpYBh8Qj64S2W8
+         xyQu9NKYxyKDql01oyDfo1/ri2nNdCieAer9LEn3cLg+HGk91vy9CZOS3Kjt1c3enBlz
+         TaFzoE3Gej1Cjd2prViJVs787XI67kAC1CAIi8La1DS3GXisxQjKMFwkyLPCEDVygh50
+         aDl+CnqIZ2+MlHK03YU3JewJ+M0YAi4dL0MWtDjt001ukiRRVBYqKCjd6aXzmum3gcRr
+         v1rA==
+X-Forwarded-Encrypted: i=1; AJvYcCWDjTfnh3K0m7C93zzC3mpWL4psxpthIJx3SEcyL75tUBmG16RfSBAVPnoZ1V9X0pY4ouOf7ABT4DAoU4r15ZdoUjw+d8mk
+X-Gm-Message-State: AOJu0Yz/gYueGCoff24sjA5i7bh20vjZlfR9kf+rq/NBC5uG7K1z2Mcw
+	HO5biyhN2ZemunmLzaQf5GYNJ/XMvWA8Upy6Iw6ZBfFugrJ2luihs7OY3g==
+X-Google-Smtp-Source: AGHT+IF27AMxS0uh8gRLuQ0xyyvrA9eBlLImA3Cl0mZ4yM/q1gGDrh4+Trfgok2Gy9+zGVHnIyEFUQ==
+X-Received: by 2002:a17:906:4c5a:b0:a51:82e1:ef52 with SMTP id d26-20020a1709064c5a00b00a5182e1ef52mr1534839ejw.11.1712926532524;
+        Fri, 12 Apr 2024 05:55:32 -0700 (PDT)
+Received: from 127.0.0.1localhost ([163.114.131.193])
+        by smtp.gmail.com with ESMTPSA id qw17-20020a1709066a1100b00a473774b027sm1790903ejc.207.2024.04.12.05.55.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 05:26:29 -0700 (PDT)
-From: Zheng Li <lizheng043@gmail.com>
-To: netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	kuba@kernel.org,
-	davem@davemloft.net,
-	jmorris@namei.org
-Cc: James.Z.Li@Dell.com
-Subject: [PATCH] neighbour: guarantee the localhost connections be established successfully even the ARP table is full
-Date: Fri, 12 Apr 2024 20:25:38 +0800
-Message-Id: <20240412122538.51-1-lizheng043@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        Fri, 12 Apr 2024 05:55:32 -0700 (PDT)
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: io-uring@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	asml.silence@gmail.com,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Subject: [RFC 0/6] implement io_uring notification (ubuf_info) stacking
+Date: Fri, 12 Apr 2024 13:55:21 +0100
+Message-ID: <cover.1712923998.git.asml.silence@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: Zheng Li <James.Z.Li@Dell.com>
+io_uring allocates a ubuf_info per zerocopy send request, it's convenient
+for the userspace but with how things are it means that every time the 
+TCP stack has to allocate a new skb instead of amending into a previous
+one. Unless sends are big enough, there will be lots of small skbs
+straining the stack and dipping performance.
 
-Inter-process communication on localhost should be established successfully even the ARP table is full,
-many processes on server machine use the localhost to communicate such as command-line interface (CLI),
-servers hope all CLI commands can be executed successfully even the arp table is full.
-Right now CLI commands got timeout when the arp table is full.
-Set the parameter of exempt_from_gc to be true for LOOPBACK net device to
-keep localhost neigh in arp table, not removed by gc.
+The patchset implements notification, i.e. an io_uring's ubuf_info
+extension, stacking. It tries to link ubuf_info's into a list, and
+the entire link will be put down together once all references are
+gone.
 
-the steps of reproduced:
-server with "gc_thresh3 = 1024" setting, ping server from more than 1024 IPv4 addresses,
-run "ssh localhost" on console interface, then the command will get timeout.
+Testing with liburing/examples/send-zerocopy and another custom made
+tool, with 4K bytes per send it improves performance ~6 times and
+levels it with MSG_ZEROCOPY. Without the patchset it requires much
+larger sends to utilise all potential.
 
-Signed-off-by: Zheng Li <James.Z.Li@Dell.com>
----
- net/core/neighbour.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+bytes  | before | after (Kqps)  
+100    | 283    | 936
+1200   | 195    | 1023
+4000   | 193    | 1386
+8000   | 154    | 1058
 
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 552719c3bbc3..d96dee3d4af6 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -734,7 +734,10 @@ ___neigh_create(struct neigh_table *tbl, const void *pkey,
- struct neighbour *__neigh_create(struct neigh_table *tbl, const void *pkey,
- 				 struct net_device *dev, bool want_ref)
- {
--	return ___neigh_create(tbl, pkey, dev, 0, false, want_ref);
-+	if (dev->flags & IFF_LOOPBACK)
-+		return ___neigh_create(tbl, pkey, dev, 0, true, want_ref);
-+	else
-+		return ___neigh_create(tbl, pkey, dev, 0, false, want_ref);
- }
- EXPORT_SYMBOL(__neigh_create);
- 
+Pavel Begunkov (6):
+  net: extend ubuf_info callback to ops structure
+  net: add callback for setting a ubuf_info to skb
+  io_uring/notif: refactor io_tx_ubuf_complete()
+  io_uring/notif: remove ctx var from io_notif_tw_complete
+  io_uring/notif: simplify io_notif_flush()
+  io_uring/notif: implement notification stacking
+
+ drivers/net/tap.c      |  2 +-
+ drivers/net/tun.c      |  2 +-
+ drivers/vhost/net.c    |  8 +++-
+ include/linux/skbuff.h | 21 ++++++----
+ io_uring/notif.c       | 91 +++++++++++++++++++++++++++++++++++-------
+ io_uring/notif.h       | 13 +++---
+ net/core/skbuff.c      | 37 +++++++++++------
+ 7 files changed, 129 insertions(+), 45 deletions(-)
+
 -- 
-2.17.1
+2.44.0
 
 
