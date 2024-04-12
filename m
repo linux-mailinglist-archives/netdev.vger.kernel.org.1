@@ -1,241 +1,107 @@
-Return-Path: <netdev+bounces-87373-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A39908A2EAD
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 14:56:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A39368A2EBB
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:03:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6A1D1C226F1
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 12:56:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C081281F24
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:03:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B30859B4D;
-	Fri, 12 Apr 2024 12:55:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D65B25B02B;
+	Fri, 12 Apr 2024 13:03:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VEFTQt27"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="awI6En4B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63235C61A;
-	Fri, 12 Apr 2024 12:55:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB8A4436E;
+	Fri, 12 Apr 2024 13:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712926544; cv=none; b=AABxc1E/y3WNc0IX3UHzcdCRh41b9XbW6NMQoI+hwUjOEW4z48i0dNbp+x2cSP0YY1jLAPlwliQOWQYhrVwNmLSxvavmGM2n4lxXr95CVXTxBZ+ouNa2kyh56KhU7iTTTm3kR6ICGTOGezzBU9Aod+G8jFIzCyFtMmjsNOAIl7I=
+	t=1712926993; cv=none; b=C9VAmy6FvwVm8cpFMuCwCuriCSJ4NryI11XT7/HDCBCU3vhj6lluze7G35Ggb3WrW/KLXL/4i/wgHZztY5SaIHif3ivbZxMbWpJvqP1IAYWh1MzTtX5CZ2FNgGVJFtwJYTLpswO7KKiCYoH7Rnx8aI9ey39iDyK7cV1rnKzR6Lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712926544; c=relaxed/simple;
-	bh=rr1yCQeGebZn9uchHo/5phlmbfa/+1Hr89YHFY9SqYQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fb4OroNDENglymqDUBATieeLD0JWNkI8JpyLM5CQyEMaQUxuIee/I8A3AxGLMAzjeLkH7zW52utpwE4kHbdmFQ8irQyK1tk5wm99tnvEdzYf8RL6WixtczceGazQcpktw7vhZ6rNK9gsyJOQmXWFlR35kw5vTEfQrUnVBagm7HU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VEFTQt27; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a51a7d4466bso104907866b.2;
-        Fri, 12 Apr 2024 05:55:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712926540; x=1713531340; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zRv+s3gr19+ls832LKX6BTVWxWU26v5TpvDr6QThETk=;
-        b=VEFTQt27vJ8kKR+Yx58dFtHD94ewZTiKKCISY/x/nDE6VM5MDqsMQjMEsXiY1QWEyi
-         9ibjvcgUw7kMlx4aS299kof9AUmUcyvVSsGR6gg/lyYEoYoV2UHQh2KzQncaFDRZuzfb
-         IHPLOz51qOHTdN9ow/ygNZyIm+mqA+hnEejEYESzLt0uIh2n+Ig5wW/aGwQkk/KkIlef
-         kadD1MNNBi7ID93gOwfHHW1AbDDX+DPBJARgZ0nqfusQYitGdUisWZ1DsiozOCVW9arJ
-         2p9dc3Siqg/FT5Nu6SCPl/trrgTb+nYkuz70fFRUBv/NrGjclx9IZl23DIReL/WgClz6
-         p+6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712926540; x=1713531340;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zRv+s3gr19+ls832LKX6BTVWxWU26v5TpvDr6QThETk=;
-        b=mbYRRxCu2g7IXCP6fQiVuu5tJWDBIIEIwbBoZRNGSbYkc9feSGV+YXnboBoL8EO2Nt
-         TpHi8poN9m8ja0pQKiqe7ovCR6cyOJ0A6NFKdyFoZzgWP+AgDfOfZb7okymzV8FTmRE4
-         8g5nd9+1afhBlUY8LAw/9v7RDSUWRR53Exg7gs51Iqz5X5CaZxSWmiijRe7shupfW3gp
-         HfcyEZomvxdfX7i1GHixM47wvgZfWWMSDD+KmNBY4k9AK2izrBWWQ0S4d0OYpcwwQN+D
-         iPw3/IKCGd0KcqAiInKvhYB8dtt9gBtoOs9OARjUuHmV7VyCk/tnSgkFCN7YcW43Y/aa
-         HOMw==
-X-Forwarded-Encrypted: i=1; AJvYcCXb2zfhu89MhzuaRWxqasrbcPt7UT3VBqyqPv9GYzAzgClOKgo9f0WMi8O6lLa4wBpfEOBJzlCGtVyWo7USbJWyV7TpH0Rt
-X-Gm-Message-State: AOJu0Yw6wC3UNKmqV3B7w06Dt0Ne837texBJ4Bu/jvaiRLF2wc2g/kSs
-	lD+iYkCpe9R4uEEDyfSkgGny7g2yclsJBnqs42otvF3qu2nJTqDo+kr32Q==
-X-Google-Smtp-Source: AGHT+IGU1Cj2Qd4ICEikKVxaLwMb3o/vkuQOcLgb/6LyzlNUnruzZMmMfXmI+cimfdm3M3GRFXP42A==
-X-Received: by 2002:a17:906:5a90:b0:a52:24d6:3024 with SMTP id l16-20020a1709065a9000b00a5224d63024mr1533334ejq.12.1712926540369;
-        Fri, 12 Apr 2024 05:55:40 -0700 (PDT)
-Received: from 127.0.0.1localhost ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id qw17-20020a1709066a1100b00a473774b027sm1790903ejc.207.2024.04.12.05.55.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 05:55:39 -0700 (PDT)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: io-uring@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	asml.silence@gmail.com,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: [RFC 6/6] io_uring/notif: implement notification stacking
-Date: Fri, 12 Apr 2024 13:55:27 +0100
-Message-ID: <3e2ef5f6d39c4631f5bae86b503a5397d6707563.1712923998.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <cover.1712923998.git.asml.silence@gmail.com>
-References: <cover.1712923998.git.asml.silence@gmail.com>
+	s=arc-20240116; t=1712926993; c=relaxed/simple;
+	bh=8wdevPfrdtepk0PCtS0tbraBxnU6ILXWXbU+kfU/aQ0=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=l1uMaRBBcHxF8F2RhQbnr0z7H5s841xvQDjmhX+gnzLuLTZl9ovO6eJlTxDxdhqiv8JZU8hOjQ4Q3PVA999QXi18ZhM+cJQqWseXM64Firk0hJZ16WSOj6KsxJW5pqatFdrfij0R2H4Kd/LB9/hi5QSi/RvXxkJM+66IRVUa+Ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=awI6En4B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F856C113CC;
+	Fri, 12 Apr 2024 13:03:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712926993;
+	bh=8wdevPfrdtepk0PCtS0tbraBxnU6ILXWXbU+kfU/aQ0=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=awI6En4BnoNZRKhvZawTzXVzsV/D37RfCZWVwb0jDF/U9AMWf1YFeiczSz5Lh/Zl5
+	 V3fWdznlkQSyZeB8AvsmqDewwWXIISMDenlbET0aoLX2zzeWeA1PfTKYh6lcdb/JYi
+	 G4UpelDztrOemmvQ+mbH/FjKboE/JfPRBfECavtTL38QibxOLqZMQ40NGUJosK3A8h
+	 1Yy4pXxHAZB9xUayJCyeomyRO8ibLsjrfF2zljJAzqbgAmLDNym2vqjZKxkWBDA0dq
+	 f4rmv3QdM/IFJc2wY++J8r+a2bMBhMAcOhnCfLOBzxSvC2R5XTneHc9YLqLNS7XoQO
+	 akY2/Eo0aHpRg==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240412104615.3779632-1-maxime.chevallier@bootlin.com>
+References: <20240412104615.3779632-1-maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next] net: phy: phy_link_topology: Handle NULL topologies
+From: Antoine Tenart <atenart@kernel.org>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, =?utf-8?q?K=C3=B6ry?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>, Marek =?utf-8?q?Beh=C3=BAn?= <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>, =?utf-8?q?Nicol=C3=B2?= Veronese <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>, mwojtas@chromium.org, Nathan Chancellor <nathan@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net
+Date: Fri, 12 Apr 2024 15:03:10 +0200
+Message-ID: <171292699033.4917.4025686054785818967@kwain>
 
-The network stack allows only one ubuf_info per skb, and unlike
-MSG_ZEROCOPY, each io_uring zerocopy send will carry a separate
-ubuf_info. That means that send requests can't reuse a previosly
-allocated skb and need to get one more or more of new ones. That's fine
-for large sends, but otherwise it would spam the stack with lots of skbs
-carrying just a little data each.
+Hi Maxime,
 
-To help with that implement linking notification (i.e. an io_uring wrapper
-around ubuf_info) into a list. Each is refcounted by skbs and the stack
-as usual. additionally all non head entries keep a reference to the
-head, which they put down when their refcount hits 0. When the head have
-no more users, it'll efficiently put all notifications in a batch.
+Quoting Maxime Chevallier (2024-04-12 12:46:14)
+>=20
+> This patch fixes a commit that is in net-next, hence the net-next tag and=
+ the
+> lack of "Fixes" tag.
 
-As mentioned previously about ->io_link_skb, the callback implementation
-always allows to bind to an skb without a ubuf_info.
+You can use Fixes: on net-next, that still helps to identify which
+commit is being fixed (eg. for reviews, while looking at the history,
+etc).
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- io_uring/notif.c | 71 +++++++++++++++++++++++++++++++++++++++++++-----
- io_uring/notif.h |  4 +++
- 2 files changed, 68 insertions(+), 7 deletions(-)
+> diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_li=
+nk_topology.c
+> index 985941c5c558..0f3973f07fac 100644
+> --- a/drivers/net/phy/phy_link_topology.c
+> +++ b/drivers/net/phy/phy_link_topology.c
+> @@ -42,6 +42,9 @@ int phy_link_topo_add_phy(struct phy_link_topology *top=
+o,
+>         struct phy_device_node *pdn;
+>         int ret;
+> =20
+> +       if (!topo)
+> +               return 0;
+> +
 
-diff --git a/io_uring/notif.c b/io_uring/notif.c
-index 26680176335f..d58cdc01e691 100644
---- a/io_uring/notif.c
-+++ b/io_uring/notif.c
-@@ -9,18 +9,28 @@
- #include "notif.h"
- #include "rsrc.h"
- 
-+static const struct ubuf_info_ops io_ubuf_ops;
-+
- static void io_notif_tw_complete(struct io_kiocb *notif, struct io_tw_state *ts)
- {
- 	struct io_notif_data *nd = io_notif_to_data(notif);
- 
--	if (unlikely(nd->zc_report) && (nd->zc_copied || !nd->zc_used))
--		notif->cqe.res |= IORING_NOTIF_USAGE_ZC_COPIED;
-+	do {
-+		notif = cmd_to_io_kiocb(nd);
- 
--	if (nd->account_pages && notif->ctx->user) {
--		__io_unaccount_mem(notif->ctx->user, nd->account_pages);
--		nd->account_pages = 0;
--	}
--	io_req_task_complete(notif, ts);
-+		lockdep_assert(refcount_read(&nd->uarg.refcnt) == 0);
-+
-+		if (unlikely(nd->zc_report) && (nd->zc_copied || !nd->zc_used))
-+			notif->cqe.res |= IORING_NOTIF_USAGE_ZC_COPIED;
-+
-+		if (nd->account_pages && notif->ctx->user) {
-+			__io_unaccount_mem(notif->ctx->user, nd->account_pages);
-+			nd->account_pages = 0;
-+		}
-+
-+		nd = nd->next;
-+		io_req_task_complete(notif, ts);
-+	} while (nd);
- }
- 
- void io_tx_ubuf_complete(struct sk_buff *skb, struct ubuf_info *uarg,
-@@ -39,12 +49,56 @@ void io_tx_ubuf_complete(struct sk_buff *skb, struct ubuf_info *uarg,
- 	if (!refcount_dec_and_test(&uarg->refcnt))
- 		return;
- 
-+	if (nd->head != nd) {
-+		io_tx_ubuf_complete(skb, &nd->head->uarg, success);
-+		return;
-+	}
- 	notif->io_task_work.func = io_notif_tw_complete;
- 	__io_req_task_work_add(notif, IOU_F_TWQ_LAZY_WAKE);
- }
- 
-+static int io_link_skb(struct sk_buff *skb, struct ubuf_info *uarg)
-+{
-+	struct io_notif_data *nd, *prev_nd;
-+	struct io_kiocb *prev_notif, *notif;
-+	struct ubuf_info *prev_uarg = skb_zcopy(skb);
-+
-+	nd = container_of(uarg, struct io_notif_data, uarg);
-+	notif = cmd_to_io_kiocb(nd);
-+
-+	if (!prev_uarg) {
-+		net_zcopy_get(&nd->uarg);
-+		skb_zcopy_init(skb, &nd->uarg);
-+		return 0;
-+	}
-+	/* handle it separately as we can't link a notif to itself */
-+	if (unlikely(prev_uarg == &nd->uarg))
-+		return 0;
-+	/* we can't join two links together, just request a fresh skb */
-+	if (unlikely(nd->head != nd || nd->next))
-+		return -EEXIST;
-+	/* don't mix zc providers */
-+	if (unlikely(prev_uarg->ops != &io_ubuf_ops))
-+		return -EEXIST;
-+
-+	prev_nd = container_of(prev_uarg, struct io_notif_data, uarg);
-+	prev_notif = cmd_to_io_kiocb(nd);
-+
-+	/* make sure all noifications can be finished in the same task_work */
-+	if (unlikely(notif->ctx != prev_notif->ctx ||
-+		     notif->task != prev_notif->task))
-+		return -EEXIST;
-+
-+	nd->head = prev_nd->head;
-+	nd->next = prev_nd->next;
-+	prev_nd->next = nd;
-+	net_zcopy_get(&nd->head->uarg);
-+	return 0;
-+}
-+
- static const struct ubuf_info_ops io_ubuf_ops = {
- 	.complete = io_tx_ubuf_complete,
-+	.link_skb = io_link_skb,
- };
- 
- struct io_kiocb *io_alloc_notif(struct io_ring_ctx *ctx)
-@@ -65,6 +119,9 @@ struct io_kiocb *io_alloc_notif(struct io_ring_ctx *ctx)
- 	nd = io_notif_to_data(notif);
- 	nd->zc_report = false;
- 	nd->account_pages = 0;
-+	nd->next = NULL;
-+	nd->head = nd;
-+
- 	nd->uarg.flags = IO_NOTIF_UBUF_FLAGS;
- 	nd->uarg.ops = &io_ubuf_ops;
- 	refcount_set(&nd->uarg.refcnt, 1);
-diff --git a/io_uring/notif.h b/io_uring/notif.h
-index 394e1d33daa6..6d2e8b674b43 100644
---- a/io_uring/notif.h
-+++ b/io_uring/notif.h
-@@ -14,6 +14,10 @@ struct io_notif_data {
- 	struct file		*file;
- 	struct ubuf_info	uarg;
- 	unsigned long		account_pages;
-+
-+	struct io_notif_data	*next;
-+	struct io_notif_data	*head;
-+
- 	bool			zc_report;
- 	bool			zc_used;
- 	bool			zc_copied;
--- 
-2.44.0
+With that phy_sfp_connect_phy does not need to check the topo validity
+before calling phy_link_topo_add_phy. The other way around is fine too.
 
+> @@ -93,7 +96,12 @@ EXPORT_SYMBOL_GPL(phy_link_topo_add_phy);
+>  void phy_link_topo_del_phy(struct phy_link_topology *topo,
+>                            struct phy_device *phy)
+>  {
+> -       struct phy_device_node *pdn =3D xa_erase(&topo->phys, phy->phyind=
+ex);
+> +       struct phy_device_node *pdn;
+> +
+> +       if (!topo)
+> +               return;
+> +
+> +       pdn =3D xa_erase(&topo->phys, phy->phyindex);
+
+Same here with phy_sfp_disconnect_phy.
+
+Thanks!
+Antoine
 
