@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-87515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF78E8A3602
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 20:51:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 991558A3604
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 20:52:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2E2D1C23110
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 18:51:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACB35B24198
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 18:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5923714F13B;
-	Fri, 12 Apr 2024 18:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF00114F124;
+	Fri, 12 Apr 2024 18:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Li1JZPqt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QCOcRMLB"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A4114F121
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 18:51:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B72814F138
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 18:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712947905; cv=none; b=BUUWliTQ/cy27QenaUUQPiguTWsVIP/LQE00SIbvY8hXixEePxNPmLa5NVh3Ey/mdgZO/74gIPkqZv1uvSOxgs9d3rt9SJAC3CAj2TJNp73w5GieG2uy5P1qR/z7N++XaJigJE2KzVlffYRcu9V1TcpzohBvD8hwCEVaXX1HPww=
+	t=1712947906; cv=none; b=pQSfZsQ4aFiBbmo2FG3vAvmmviE6JIFciommx2RrzQNWVm+2hSBXrMEE07469Mg7/T8QWr35ueXwn2tLq0H0aSpfmFqHt3bA/B+4i4pbJb+Bh+uTOLtQ/V9oHr9rUHG3i3oolhvK2ePKmEVe0nHni8mHOw6Hzo29UmWAXTbVNvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712947905; c=relaxed/simple;
-	bh=UGrrzESXFdVU6HU0ropLoIBmhQ1ab0JRNLvWXqSch1k=;
+	s=arc-20240116; t=1712947906; c=relaxed/simple;
+	bh=J2WNJ7Hq23BZAjlIqN40SdX+OMk9qInbm80Tg1CUr8w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=el9k02b3T75PJ78zJtwglMuTHNC8QFVDFTCU/iEVutaD0TEG92AOrZkFqFEim45zCW4VxwemJWhSuTc1E/v8dKbKSXBi0MALsMlbWpfua8hN2V5r4cqeuwradZz7AuBS+MW73d/5whRgxzmIy+Cf8VTAjnZYZOPmGaDzOCt3gL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Li1JZPqt; arc=none smtp.client-ip=198.175.65.21
+	 MIME-Version; b=iC+Q0fblExAdFrEaAemwO48Nwim4reihGPF9UZac+EzVMI/Cx9NZcSCYMPyy3Ym8qChd/OQIzOCjU1BGbORdhG+DXA8CftAbbX7oq5cO1AeCukH6Nrf+TdNCHADW1qhAidD80fdNyvnaDu2HUb5S1ik5RTlwgkORubfYAx3ahj0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QCOcRMLB; arc=none smtp.client-ip=198.175.65.21
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712947904; x=1744483904;
+  t=1712947905; x=1744483905;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=UGrrzESXFdVU6HU0ropLoIBmhQ1ab0JRNLvWXqSch1k=;
-  b=Li1JZPqtTd6h8gBsQZvMUr7UlQSURyEjmbZF1flUIeTWvBt64YvSo+oc
-   qrwdihZw1YPAjdD+Ej0P/2G4z8pE8klTyWAv+X9eoxuCNW+rdpHu62CME
-   HvvJCYCG9p54BsgGNdDPhTSK/Re29Wsw2NyC1tDTP6kdx+IzbnwUY4NIy
-   QCAZ3q00/1apYfceAATyO3dPEVEDPhWqzwpOrdy0QXTWsG7dW9Uq+Qx9z
-   gg8S1SZYAAm/t/e3pmPvwqjIji02ZBiTNBoBo0iGum8UEDS4C9LlWWdSM
-   ekfTtyBlRyP2CbwfzyzMPtq2gWy9CdHVTvi8mED+SvXCzgCRznNsTxZUA
-   w==;
-X-CSE-ConnectionGUID: 2M8ta3F5Q+id0Fp68+962A==
-X-CSE-MsgGUID: yu0csNYXTuCBCjV5e6Bvzg==
-X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="8333637"
+  bh=J2WNJ7Hq23BZAjlIqN40SdX+OMk9qInbm80Tg1CUr8w=;
+  b=QCOcRMLBmlIh6PDIxoVFl6oIxgUL1vIhi0BRCbbqz0tTGqNio5pw6JYF
+   UOyBuxt2K2QZ8O/3JftNlIZtMOpfi4zusMsX0bRibdYmp15iOeT9hHPa8
+   GcBVWMLOo2lMSNBOWnBqyp1ONeD8O67hxV7/X7Eur/yjO0bN/FO6b38SI
+   Ci+yZOIoBnXJYUBfG0s2mRVi+fFmZTf0Dr22QFWdp0nDAhLxtVKCinuqn
+   czHNF0U4SqJg/NBbLLA3x8hab5aQdra9C+zLmvgfYSkKhLHzZ3tS1ZS67
+   7MwIH3/kS14LU9wfd5vobBzw5Pkc56d8NxNNyg3EC639fFcyaiDKZ764B
+   Q==;
+X-CSE-ConnectionGUID: zMIzPt1pTP6m4qdZh+EjKg==
+X-CSE-MsgGUID: 8StdzXULS2WeztU3ZPtyag==
+X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="8333640"
 X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="8333637"
+   d="scan'208";a="8333640"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 11:51:41 -0700
-X-CSE-ConnectionGUID: NA692j7bTM2eXIhUxiAP8Q==
-X-CSE-MsgGUID: PGfwW/dpQ7GlO3XZWD1NHg==
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 11:51:42 -0700
+X-CSE-ConnectionGUID: /9aQLv6aSJ2oDkypHFdkAQ==
+X-CSE-MsgGUID: HnGHpt8zSTKiQvGMoKPQJg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="26108561"
+   d="scan'208";a="26108564"
 Received: from c3-1-server.sj.intel.com ([10.232.18.246])
   by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 11:51:42 -0700
 From: Anil Samal <anil.samal@intel.com>
@@ -67,9 +67,9 @@ Cc: netdev@vger.kernel.org,
 	przemyslaw.kitszel@intel.com,
 	lukasz.czapnik@intel.com,
 	Anil Samal <anil.samal@intel.com>
-Subject: [PATCH iwl-next 2/4] ice: Extend Sideband Queue command to support dynamic  flag
-Date: Fri, 12 Apr 2024 11:49:18 -0700
-Message-ID: <20240412185135.297368-3-anil.samal@intel.com>
+Subject: [PATCH iwl-next 3/4] ice: Implement driver functionality to dump fec  statistics
+Date: Fri, 12 Apr 2024 11:49:19 -0700
+Message-ID: <20240412185135.297368-4-anil.samal@intel.com>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240412185135.297368-1-anil.samal@intel.com>
 References: <20240412185135.297368-1-anil.samal@intel.com>
@@ -81,133 +81,263 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Current driver implementation for Sideband Queue supports
-a fixed flag (ICE_AQ_FLAG_RD). To retrieve FEC statistics from firmware
-Sideband Queue command is used with a different flag.
+To debug link issues in the field, it is paramount to
+dump fec corrected/uncorrected block counts from firmware.
 
-Extend API for Sideband Queue command to use 'flag' as input argument.
+Extend ethtool option '--show-fec' to support fec statistics.
+The IEEE standard mandates two sets of counters:
+ - 30.5.1.1.17 aFECCorrectedBlocks
+ - 30.5.1.1.18 aFECUncorrectableBlocks
+
+Standard defines above statistics per lane but current
+implementation supports total FEC statistics per port
+i.e. sum of all lane per port. Find sample output below
+
+ # ethtool -I --show-fec ens21f0np0
+FEC parameters for ens21f0np0:
+Supported/Configured FEC encodings: Auto RS BaseR
+Active FEC encoding: RS
+Statistics:
+  corrected_blocks: 0
+  uncorrectable_blocks: 0
 
 Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
 Signed-off-by: Anil Samal <anil.samal@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_common.c |  5 +++--
- drivers/net/ethernet/intel/ice/ice_common.h |  2 +-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 16 ++++++++--------
- 3 files changed, 12 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_common.c  | 54 +++++++++++++
+ drivers/net/ethernet/intel/ice/ice_common.h  | 24 ++++++
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 84 ++++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_type.h    |  8 ++
+ 4 files changed, 170 insertions(+)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 5649b257e631..9a0a533613ff 100644
+index 9a0a533613ff..1a00efb1e51d 100644
 --- a/drivers/net/ethernet/intel/ice/ice_common.c
 +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -1473,8 +1473,9 @@ ice_sbq_send_cmd(struct ice_hw *hw, struct ice_sbq_cmd_desc *desc,
-  * ice_sbq_rw_reg - Fill Sideband Queue command
-  * @hw: pointer to the HW struct
-  * @in: message info to be filled in descriptor
-+ * @flag: flag to fill desc structure
-  */
--int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in)
-+int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in, u16 flag)
- {
- 	struct ice_sbq_cmd_desc desc = {0};
- 	struct ice_sbq_msg_req msg = {0};
-@@ -1498,7 +1499,7 @@ int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in)
- 		 */
- 		msg_len -= sizeof(msg.data);
+@@ -3299,6 +3299,60 @@ int ice_update_link_info(struct ice_port_info *pi)
+ 	return status;
+ }
  
--	desc.flags = cpu_to_le16(ICE_AQ_FLAG_RD);
-+	desc.flags = cpu_to_le16(flag);
- 	desc.opcode = cpu_to_le16(ice_sbq_opc_neigh_dev_req);
- 	desc.param0.cmd_len = cpu_to_le16(msg_len);
- 	status = ice_sbq_send_cmd(hw, &desc, &msg, msg_len, NULL);
++#define FEC_REG_PORT(port) {	\
++	FEC_CORR_LOW_REG_PORT##port,		\
++	FEC_CORR_HIGH_REG_PORT##port,	\
++	FEC_UNCORR_LOW_REG_PORT##port,	\
++	FEC_UNCORR_HIGH_REG_PORT##port,	\
++}
++
++static const u32 fec_reg[][ICE_FEC_MAX] = {
++	FEC_REG_PORT(0),
++	FEC_REG_PORT(1),
++	FEC_REG_PORT(2),
++	FEC_REG_PORT(3)
++};
++
++/**
++ * ice_aq_get_fec_stats - reads fec stats from phy
++ * @hw: pointer to the HW struct
++ * @pcs_quad: represents pcsquad of user input serdes
++ * @pcs_port: represents the pcs port number part of above pcs quad
++ * @fec_type: represents FEC stats type
++ * @output: pointer to the caller-supplied buffer to return requested fec stats
++ *
++ * Returns non-zero status on error and 0 on success.
++ */
++int ice_aq_get_fec_stats(struct ice_hw *hw, u16 pcs_quad, u16 pcs_port,
++			 enum ice_fec_stats_types fec_type, u32 *output)
++{
++	u16 flag = (ICE_AQ_FLAG_RD | ICE_AQ_FLAG_BUF | ICE_AQ_FLAG_SI);
++	struct ice_sbq_msg_input msg = {};
++	u32 receiver_id, reg_offset;
++	int err = 0;
++
++	if (pcs_port > 3)
++		return -EINVAL;
++	reg_offset = fec_reg[pcs_port][fec_type];
++	if (pcs_quad == 0)
++		receiver_id = FEC_RECEIVER_ID_PCS0;
++	else if (pcs_quad == 1)
++		receiver_id = FEC_RECEIVER_ID_PCS1;
++	else
++		return -EINVAL;
++
++	msg.msg_addr_low = lower_16_bits(reg_offset);
++	msg.msg_addr_high = receiver_id;
++	msg.opcode = ice_sbq_msg_rd;
++	msg.dest_dev = rmn_0;
++	err = ice_sbq_rw_reg(hw, &msg, flag);
++	if (err)
++		return err;
++
++	*output = msg.data;
++	return 0;
++}
++
+ /**
+  * ice_cache_phy_user_req
+  * @pi: port information structure
 diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index ffb22c7ce28b..42cda1bbbaab 100644
+index 42cda1bbbaab..6b888efce593 100644
 --- a/drivers/net/ethernet/intel/ice/ice_common.h
 +++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -201,7 +201,7 @@ int ice_replay_vsi(struct ice_hw *hw, u16 vsi_handle);
- void ice_replay_post(struct ice_hw *hw);
- struct ice_q_ctx *
- ice_get_lan_q_ctx(struct ice_hw *hw, u16 vsi_handle, u8 tc, u16 q_handle);
--int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in);
-+int ice_sbq_rw_reg(struct ice_hw *hw, struct ice_sbq_msg_input *in, u16 flag);
- int
- ice_aq_get_cgu_abilities(struct ice_hw *hw,
- 			 struct ice_aqc_get_cgu_abilities *abilities);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 2b9423a173bb..e97b73d1b0f4 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -433,7 +433,7 @@ ice_read_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 offset, u32 *val)
- 	ice_fill_phy_msg_e82x(&msg, port, offset);
- 	msg.opcode = ice_sbq_msg_rd;
+@@ -17,6 +17,27 @@
+ #define ICE_SQ_SEND_DELAY_TIME_MS	10
+ #define ICE_SQ_SEND_MAX_EXECUTE		3
  
--	err = ice_sbq_rw_reg(hw, &msg);
-+	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
- 			  err);
-@@ -511,7 +511,7 @@ ice_write_phy_reg_e82x(struct ice_hw *hw, u8 port, u16 offset, u32 val)
- 	msg.opcode = ice_sbq_msg_wr;
- 	msg.data = val;
++#define FEC_REG_SHIFT 2
++#define FEC_RECV_ID_SHIFT 4
++#define FEC_CORR_LOW_REG_PORT0 (0x02 << FEC_REG_SHIFT)
++#define FEC_CORR_HIGH_REG_PORT0 (0x03 << FEC_REG_SHIFT)
++#define FEC_UNCORR_LOW_REG_PORT0 (0x04 << FEC_REG_SHIFT)
++#define FEC_UNCORR_HIGH_REG_PORT0 (0x05 << FEC_REG_SHIFT)
++#define FEC_CORR_LOW_REG_PORT1 (0x42 << FEC_REG_SHIFT)
++#define FEC_CORR_HIGH_REG_PORT1 (0x43 << FEC_REG_SHIFT)
++#define FEC_UNCORR_LOW_REG_PORT1 (0x44 << FEC_REG_SHIFT)
++#define FEC_UNCORR_HIGH_REG_PORT1 (0x45 << FEC_REG_SHIFT)
++#define FEC_CORR_LOW_REG_PORT2 (0x4A << FEC_REG_SHIFT)
++#define FEC_CORR_HIGH_REG_PORT2 (0x4B << FEC_REG_SHIFT)
++#define FEC_UNCORR_LOW_REG_PORT2 (0x4C << FEC_REG_SHIFT)
++#define FEC_UNCORR_HIGH_REG_PORT2 (0x4D << FEC_REG_SHIFT)
++#define FEC_CORR_LOW_REG_PORT3 (0x52 << FEC_REG_SHIFT)
++#define FEC_CORR_HIGH_REG_PORT3 (0x53 << FEC_REG_SHIFT)
++#define FEC_UNCORR_LOW_REG_PORT3 (0x54 << FEC_REG_SHIFT)
++#define FEC_UNCORR_HIGH_REG_PORT3 (0x55 << FEC_REG_SHIFT)
++#define FEC_RECEIVER_ID_PCS0 (0x33 << FEC_RECV_ID_SHIFT)
++#define FEC_RECEIVER_ID_PCS1 (0x34 << FEC_RECV_ID_SHIFT)
++
+ int ice_init_hw(struct ice_hw *hw);
+ void ice_deinit_hw(struct ice_hw *hw);
+ int ice_check_reset(struct ice_hw *hw);
+@@ -121,6 +142,9 @@ int
+ ice_get_link_default_override(struct ice_link_default_override_tlv *ldo,
+ 			      struct ice_port_info *pi);
+ bool ice_is_phy_caps_an_enabled(struct ice_aqc_get_phy_caps_data *caps);
++int
++ice_aq_get_fec_stats(struct ice_hw *hw, u16 pcs_quad, u16 pcs_port,
++		     enum ice_fec_stats_types fec_type, u32 *output);
  
--	err = ice_sbq_rw_reg(hw, &msg);
-+	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
- 			  err);
-@@ -667,7 +667,7 @@ ice_read_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 *val)
+ enum ice_fc_mode ice_caps_to_fc_mode(u8 caps);
+ enum ice_fec_mode ice_caps_to_fec_mode(u8 caps, u8 fec_options);
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index 6884b45c3b0a..732e402ed419 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -4562,6 +4562,89 @@ ice_get_module_eeprom(struct net_device *netdev,
+ 	return 0;
+ }
  
- 	msg.opcode = ice_sbq_msg_rd;
++/**
++ * ice_get_port_fec_stats - returns FEC correctable, uncorrectable stats per
++ *                          pcsquad, pcsport
++ * @hw: pointer to the HW struct
++ * @pcs_quad: pcsquad for input port
++ * @pcs_port: pcsport for input port
++ * @fec_stats: buffer to hold FEC statistics for given port
++ *
++ * Returns FEC stats
++ */
++static int ice_get_port_fec_stats(struct ice_hw *hw, u16 pcs_quad, u16 pcs_port,
++				  struct ethtool_fec_stats *fec_stats)
++{
++	u32 fec_uncorr_low_val = 0, fec_uncorr_high_val = 0;
++	u32 fec_corr_low_val = 0, fec_corr_high_val = 0;
++	int err;
++
++	if (pcs_quad > 1 || pcs_port > 3)
++		return -EINVAL;
++
++	err = ice_aq_get_fec_stats(hw, pcs_quad, pcs_port, ICE_FEC_CORR_LOW,
++				   &fec_corr_low_val);
++	if (err)
++		return err;
++	err = ice_aq_get_fec_stats(hw, pcs_quad, pcs_port, ICE_FEC_CORR_HIGH,
++				   &fec_corr_high_val);
++	if (err)
++		return err;
++	err = ice_aq_get_fec_stats(hw, pcs_quad, pcs_port,
++				   ICE_FEC_UNCORR_LOW,
++				   &fec_uncorr_low_val);
++	if (err)
++		return err;
++	err = ice_aq_get_fec_stats(hw, pcs_quad, pcs_port,
++				   ICE_FEC_UNCORR_HIGH,
++				   &fec_uncorr_high_val);
++	if (err)
++		return err;
++
++	fec_stats->uncorrectable_blocks.total = (fec_corr_high_val << 16) +
++						 fec_corr_low_val;
++	fec_stats->corrected_blocks.total = (fec_uncorr_high_val << 16) +
++					     fec_uncorr_low_val;
++	return 0;
++}
++
++static void ice_get_fec_stats(struct net_device *netdev,
++			      struct ethtool_fec_stats *fec_stats)
++{
++	struct ice_netdev_priv *np = netdev_priv(netdev);
++	struct ice_port_topology port_topology;
++	struct ice_port_info *pi;
++	struct ice_pf *pf;
++	struct ice_hw *hw;
++	int err;
++
++	pf = np->vsi->back;
++	hw = &pf->hw;
++	pi = np->vsi->port_info;
++
++	if (!pi)
++		return;
++
++	/* Serdes parameters are not supported if not the PF VSI */
++	if (np->vsi->type != ICE_VSI_PF)
++		return;
++
++	err = ice_get_port_topology(hw, pi->lport, &port_topology);
++	if (err) {
++		netdev_info(netdev, "Extended register dump failed Lport %d\n",
++			    pi->lport);
++		return;
++	}
++
++	/* Get FEC correctable, uncorrectable counter */
++	err = ice_get_port_fec_stats(hw, port_topology.pcs_quad_select,
++				     port_topology.pcs_port, fec_stats);
++	if (err) {
++		netdev_info(netdev, "FEC stats get failed Lport %d Err %d\n",
++			    pi->lport, err);
++	}
++}
++
+ static const struct ethtool_ops ice_ethtool_ops = {
+ 	.cap_rss_ctx_supported  = true,
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_USECS |
+@@ -4570,6 +4653,7 @@ static const struct ethtool_ops ice_ethtool_ops = {
+ 	.cap_rss_sym_xor_supported = true,
+ 	.get_link_ksettings	= ice_get_link_ksettings,
+ 	.set_link_ksettings	= ice_set_link_ksettings,
++	.get_fec_stats		= ice_get_fec_stats,
+ 	.get_drvinfo		= ice_get_drvinfo,
+ 	.get_regs_len		= ice_get_regs_len,
+ 	.get_regs		= ice_get_regs,
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index f0796a93f428..0aa17105dbdf 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -71,6 +71,14 @@ enum ice_aq_res_ids {
+ 	ICE_GLOBAL_CFG_LOCK_RES_ID
+ };
  
--	err = ice_sbq_rw_reg(hw, &msg);
-+	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
- 			  err);
-@@ -702,7 +702,7 @@ ice_write_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 val)
- 	msg.opcode = ice_sbq_msg_wr;
- 	msg.data = val;
- 
--	err = ice_sbq_rw_reg(hw, &msg);
-+	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
- 			  err);
-@@ -840,7 +840,7 @@ ice_read_cgu_reg_e82x(struct ice_hw *hw, u32 addr, u32 *val)
- 	cgu_msg.msg_addr_low = addr;
- 	cgu_msg.msg_addr_high = 0x0;
- 
--	err = ice_sbq_rw_reg(hw, &cgu_msg);
-+	err = ice_sbq_rw_reg(hw, &cgu_msg, ICE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to read CGU register 0x%04x, err %d\n",
- 			  addr, err);
-@@ -873,7 +873,7 @@ ice_write_cgu_reg_e82x(struct ice_hw *hw, u32 addr, u32 val)
- 	cgu_msg.msg_addr_high = 0x0;
- 	cgu_msg.data = val;
- 
--	err = ice_sbq_rw_reg(hw, &cgu_msg);
-+	err = ice_sbq_rw_reg(hw, &cgu_msg, ICE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to write CGU register 0x%04x, err %d\n",
- 			  addr, err);
-@@ -2660,7 +2660,7 @@ static int ice_read_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 *val)
- 	msg.opcode = ice_sbq_msg_rd;
- 	msg.dest_dev = rmn_0;
- 
--	err = ice_sbq_rw_reg(hw, &msg);
-+	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
- 			  err);
-@@ -2691,7 +2691,7 @@ static int ice_write_phy_reg_e810(struct ice_hw *hw, u32 addr, u32 val)
- 	msg.dest_dev = rmn_0;
- 	msg.data = val;
- 
--	err = ice_sbq_rw_reg(hw, &msg);
-+	err = ice_sbq_rw_reg(hw, &msg, ICE_AQ_FLAG_RD);
- 	if (err) {
- 		ice_debug(hw, ICE_DBG_PTP, "Failed to send message to PHY, err %d\n",
- 			  err);
++enum ice_fec_stats_types {
++	ICE_FEC_CORR_LOW,
++	ICE_FEC_CORR_HIGH,
++	ICE_FEC_UNCORR_LOW,
++	ICE_FEC_UNCORR_HIGH,
++	ICE_FEC_MAX
++};
++
+ /* FW update timeout definitions are in milliseconds */
+ #define ICE_NVM_TIMEOUT			180000
+ #define ICE_CHANGE_LOCK_TIMEOUT		1000
 -- 
 2.44.0
 
