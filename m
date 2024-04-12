@@ -1,107 +1,146 @@
-Return-Path: <netdev+bounces-87374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A39368A2EBB
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:03:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 087088A2EF6
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:11:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C081281F24
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:03:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B791C28319E
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:11:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D65B25B02B;
-	Fri, 12 Apr 2024 13:03:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A89725915A;
+	Fri, 12 Apr 2024 13:11:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="awI6En4B"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fqdh8ztz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEB8A4436E;
-	Fri, 12 Apr 2024 13:03:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954943EA83
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 13:11:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712926993; cv=none; b=C9VAmy6FvwVm8cpFMuCwCuriCSJ4NryI11XT7/HDCBCU3vhj6lluze7G35Ggb3WrW/KLXL/4i/wgHZztY5SaIHif3ivbZxMbWpJvqP1IAYWh1MzTtX5CZ2FNgGVJFtwJYTLpswO7KKiCYoH7Rnx8aI9ey39iDyK7cV1rnKzR6Lo=
+	t=1712927474; cv=none; b=ekQEUSp+CdEaju3iDi0qxRyRVb5BfnyYs66Ko7vYmZY3cxb6ez2dvtE1wDca2DXHn3f7o98wIjlG7CIwUJbzTXLef3/mtVwbrkb/vHIxIyYt/EW6I2U3UE4P33GDUordxDyHyoRle12A1BVyVSkfTAFYK/U0XYVktjb8lK7hv/Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712926993; c=relaxed/simple;
-	bh=8wdevPfrdtepk0PCtS0tbraBxnU6ILXWXbU+kfU/aQ0=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
-	 To:Date:Message-ID; b=l1uMaRBBcHxF8F2RhQbnr0z7H5s841xvQDjmhX+gnzLuLTZl9ovO6eJlTxDxdhqiv8JZU8hOjQ4Q3PVA999QXi18ZhM+cJQqWseXM64Firk0hJZ16WSOj6KsxJW5pqatFdrfij0R2H4Kd/LB9/hi5QSi/RvXxkJM+66IRVUa+Ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=awI6En4B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F856C113CC;
-	Fri, 12 Apr 2024 13:03:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712926993;
-	bh=8wdevPfrdtepk0PCtS0tbraBxnU6ILXWXbU+kfU/aQ0=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=awI6En4BnoNZRKhvZawTzXVzsV/D37RfCZWVwb0jDF/U9AMWf1YFeiczSz5Lh/Zl5
-	 V3fWdznlkQSyZeB8AvsmqDewwWXIISMDenlbET0aoLX2zzeWeA1PfTKYh6lcdb/JYi
-	 G4UpelDztrOemmvQ+mbH/FjKboE/JfPRBfECavtTL38QibxOLqZMQ40NGUJosK3A8h
-	 1Yy4pXxHAZB9xUayJCyeomyRO8ibLsjrfF2zljJAzqbgAmLDNym2vqjZKxkWBDA0dq
-	 f4rmv3QdM/IFJc2wY++J8r+a2bMBhMAcOhnCfLOBzxSvC2R5XTneHc9YLqLNS7XoQO
-	 akY2/Eo0aHpRg==
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1712927474; c=relaxed/simple;
+	bh=5uEalmKLGaEC3QKjKv+lpkHjtZVbWIXGtcDrsB4bDkw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SLnsj8LD78Y5S81uVP7vQtkSYXUPo6NruGeyXImcbA3Sr+Wpsreexgk+Dt7g6YGs+2MS1u8HWFCeIYBdHYxrCsqPvx+uZjJjNIxQcKP4NZv+oyvgFuMrNR0p3vUEePE43KneOLPdQnbYVveur42Ol5npo5RpTacif7oNho/DsbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fqdh8ztz; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1712927472; x=1744463472;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=5uEalmKLGaEC3QKjKv+lpkHjtZVbWIXGtcDrsB4bDkw=;
+  b=fqdh8ztzdsvQ5VM1cjARap/pgN4O5jlk7Q4G3U//JOqLTwZMIs3mNof+
+   bE8EOxsC2I2hktm6si9Is7njA8i5XhfsSLliYVs0fpKqpfVcxH+pUwAy2
+   FmCQtnm9rTP6n/UazTw1pbOdGqqGhq9GbL3Yi/lCsHYRPOISs7jBEpzP/
+   FtTsiTaiwGuvP2IPTFWhIJnlUco4HmQmEVkaedxN4daPr4RUx7Y7ucYsR
+   r2x9lTrsosjOpsNz0PjwbiVZzhEvCjV8XXsG51/NgYQqCbviaDVTSF5BM
+   q5fxRqa6kLnuBeifYdBSLrc20Gx0x6M71W606bSbZa2PgeQqMBEHIHTm1
+   A==;
+X-CSE-ConnectionGUID: t4hXl82vSVKuC81rs16AAw==
+X-CSE-MsgGUID: AbHG4RRGQ4GsDGHHl1bO5w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11041"; a="12230954"
+X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
+   d="scan'208";a="12230954"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 06:11:11 -0700
+X-CSE-ConnectionGUID: oB/MuTJbRQKx66ZebZTTzA==
+X-CSE-MsgGUID: M8z4ZsS0TdulTJR0eQX1CQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
+   d="scan'208";a="52384837"
+Received: from kkolacin-desk1.igk.intel.com ([10.102.102.152])
+  by fmviesa001.fm.intel.com with ESMTP; 12 Apr 2024 06:11:08 -0700
+From: Karol Kolacinski <karol.kolacinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	jesse.brandeburg@intel.com,
+	Karol Kolacinski <karol.kolacinski@intel.com>
+Subject: [PATCH v8 iwl-next 00/12] Introduce ETH56G PHY model for E825C products
+Date: Fri, 12 Apr 2024 15:06:43 +0200
+Message-ID: <20240412131104.322851-14-karol.kolacinski@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240412104615.3779632-1-maxime.chevallier@bootlin.com>
-References: <20240412104615.3779632-1-maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next] net: phy: phy_link_topology: Handle NULL topologies
-From: Antoine Tenart <atenart@kernel.org>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe Leroy <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, =?utf-8?q?K=C3=B6ry?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>, Marek =?utf-8?q?Beh=C3=BAn?= <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>, Oleksij Rempel <o.rempel@pengutronix.de>, =?utf-8?q?Nicol=C3=B2?= Veronese <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>, mwojtas@chromium.org, Nathan Chancellor <nathan@kernel.org>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net
-Date: Fri, 12 Apr 2024 15:03:10 +0200
-Message-ID: <171292699033.4917.4025686054785818967@kwain>
+Content-Transfer-Encoding: 8bit
 
-Hi Maxime,
+E825C products have a different PHY model than E822, E823 and E810 products.
+This PHY is ETH56G and its support is necessary to have functional PTP stack
+for E825C products.
 
-Quoting Maxime Chevallier (2024-04-12 12:46:14)
->=20
-> This patch fixes a commit that is in net-next, hence the net-next tag and=
- the
-> lack of "Fixes" tag.
+Grzegorz Nitka (2):
+  ice: Add NAC Topology device capability parser
+  ice: Adjust PTP init for 2x50G E825C devices
 
-You can use Fixes: on net-next, that still helps to identify which
-commit is being fixed (eg. for reviews, while looking at the history,
-etc).
+Jacob Keller (2):
+  ice: Introduce helper to get tmr_cmd_reg values
+  ice: Introduce ice_get_base_incval() helper
 
-> diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_li=
-nk_topology.c
-> index 985941c5c558..0f3973f07fac 100644
-> --- a/drivers/net/phy/phy_link_topology.c
-> +++ b/drivers/net/phy/phy_link_topology.c
-> @@ -42,6 +42,9 @@ int phy_link_topo_add_phy(struct phy_link_topology *top=
-o,
->         struct phy_device_node *pdn;
->         int ret;
-> =20
-> +       if (!topo)
-> +               return 0;
-> +
+Karol Kolacinski (4):
+  ice: Introduce ice_ptp_hw struct
+  ice: Add PHY OFFSET_READY register clearing
+  ice: Change CGU regs struct to anonymous
+  ice: Support 2XNAC configuration using auxbus
 
-With that phy_sfp_connect_phy does not need to check the topo validity
-before calling phy_link_topo_add_phy. The other way around is fine too.
+Michal Michalik (1):
+  ice: Add support for E825-C TS PLL handling
 
-> @@ -93,7 +96,12 @@ EXPORT_SYMBOL_GPL(phy_link_topo_add_phy);
->  void phy_link_topo_del_phy(struct phy_link_topology *topo,
->                            struct phy_device *phy)
->  {
-> -       struct phy_device_node *pdn =3D xa_erase(&topo->phys, phy->phyind=
-ex);
-> +       struct phy_device_node *pdn;
-> +
-> +       if (!topo)
-> +               return;
-> +
-> +       pdn =3D xa_erase(&topo->phys, phy->phyindex);
+Sergey Temerkhanov (3):
+  ice: Implement Tx interrupt enablement functions
+  ice: Move CGU block
+  ice: Introduce ETH56G PHY model for E825C products
 
-Same here with phy_sfp_disconnect_phy.
+V5 -> V6: Changes in:
+          - ice: Move CGU block
+          - ice: Introduce ETH56G PHY model for E825C products
 
-Thanks!
-Antoine
+V5 -> V6: Changes in:
+          - ice: Move CGU block
+
+V5 -> V6: Changes in:
+          - ice: Implement Tx interrupt enablement functions
+          - ice: Move CGU block
+
+V4 -> V5: Changes in:
+          - ice: Introduce ice_ptp_hw struct
+          - ice: Introduce helper to get tmr_cmd_reg values
+          - ice: Introduce ice_get_base_incval() helper
+          - ice: Introduce ETH56G PHY model for E825C products
+          - ice: Add support for E825-C TS PLL handling
+          - ice: Adjust PTP init for 2x50G E825C devices
+
+V1 -> V4: Changes in:
+          - ice: Introduce ETH56G PHY model for E825C products
+
+ drivers/net/ethernet/intel/ice/ice.h          |   23 +-
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |    1 +
+ drivers/net/ethernet/intel/ice/ice_cgu_regs.h |   77 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   |   58 +-
+ drivers/net/ethernet/intel/ice/ice_common.h   |    2 +
+ .../net/ethernet/intel/ice/ice_hw_autogen.h   |    4 +
+ drivers/net/ethernet/intel/ice/ice_ptp.c      |  265 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |    1 +
+ .../net/ethernet/intel/ice/ice_ptp_consts.h   |  402 ++
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 3592 +++++++++++++----
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  288 +-
+ drivers/net/ethernet/intel/ice/ice_sbq_cmd.h  |   10 +-
+ drivers/net/ethernet/intel/ice/ice_type.h     |   60 +-
+ 13 files changed, 3871 insertions(+), 912 deletions(-)
+
+
+base-commit: df238859a090c8e9eae88eb58b4cb267304f7988
+-- 
+2.43.0
+
 
