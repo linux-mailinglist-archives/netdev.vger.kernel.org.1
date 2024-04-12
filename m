@@ -1,122 +1,155 @@
-Return-Path: <netdev+bounces-87325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 276158A2A50
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 11:07:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CA708A2AB2
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 11:16:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 802D31F217A4
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 09:07:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56E5F1C22490
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 09:16:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8923C612E1;
-	Fri, 12 Apr 2024 09:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E820950277;
+	Fri, 12 Apr 2024 09:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="F+glp38T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OOfxs4gw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D70D4BAA6;
-	Fri, 12 Apr 2024 09:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC2138DD8;
+	Fri, 12 Apr 2024 09:16:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712912488; cv=none; b=LpDfKOW5dVyhRVpwTOJdD7IijQZ4l854UXkwsNQPK8Q6U5c+34NneH5wVZRncYo3sZecyUtPmqdm5LSz+VWRs3sqeBJkOO2lPXjf3BCHr/yWfhBmVzcTN+fBENtmp3f+RPgMVv6+7IiF3zauoL45cuDPwm1EMCmo/lL+I9RzUUQ=
+	t=1712913377; cv=none; b=NGjY0MkPICJqk/pof9+n6eROPtux8P3oo4vkhsrc9cKqDZjV5cpyT7u2inrB5kjMgXf0wHTSxfwdiP3Bs+AVUEgIyNHlE+Tuh2l7KMywTkCzlbonoV2iUChrYhMbwKiGICrBDWEh+lwai70zycKHLIFMMtlUaSjjp37WyI7sNJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712912488; c=relaxed/simple;
-	bh=oSQzEuk4s9AcL1UwAAfxZUSg769yULNpTsVoPBjtjoE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D5yTel4B5ElHD4prO4KBG+BAgXhuU4jbFjZ+qw2x1Sb64qFas/Q9ySco5afAPboR3kr6Ry4AHbCANrr7rCVRG6sHBPlJeG5b/E3huaPQbcD+iHmf4C9iv2tlqETeRdtsU71EN3DtT/4lJAIVEflaSqJSLdvekMB15eXAWn7x2jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=F+glp38T; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 21D74600A2;
-	Fri, 12 Apr 2024 09:01:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1712912481;
-	bh=oSQzEuk4s9AcL1UwAAfxZUSg769yULNpTsVoPBjtjoE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=F+glp38Ty9t0DUIWXuiuaz6SGhlmthGyyeaQYCDgtMa8MYCNAWUDOiWp5p+oXP7Ne
-	 a80/By8NgXRiOsDo5jwa9xC5HNKR3kKG6DCm0f0voMGjRW2t1a1gZdsbloSmf5y0Rn
-	 By7DaBomBGd3A59qrajodySq9zuwSf+zEig1qJCMu1MWm+3vZ+dy/Ux+hoQ9+zK68a
-	 jx61gVEw4uhMn2A0VnGhivurPJMG3SmS0kOWUFgPw+2x33i5n483BAwxE0+l+xyYBH
-	 GH9ug9V2sp6FDosEkNIwPDkrmnUVWReLQA/do2oyFUPCEjYBWlCftIntH0Vs9XGoUU
-	 BnpGx5I9jF0sA==
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id E146C200B1B;
-	Fri, 12 Apr 2024 09:01:15 +0000 (UTC)
-Message-ID: <27ac48c0-b19c-4104-8ec9-08232e3f42f6@fiberby.net>
-Date: Fri, 12 Apr 2024 09:01:15 +0000
+	s=arc-20240116; t=1712913377; c=relaxed/simple;
+	bh=T/TL4P6RqoXnShkICgxGFcoEXV/L8guRkl+BR8oz3qQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ra6zP4ElDYTP0tsWtoX7uKraN2Fj4uGF707LCAB37cozdE29w55xB3xd0Zkby9UPN7Oxk8aI4me7VVNWYtCLWHY81VT6R6wmFuzna4JQkiyjs7UrcwtBGxUU1/s8fTQJDl39XoH8UbiIuUmOBH5IQfE0Rp1J+ShVeD6GTna4HPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OOfxs4gw; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-56c404da0ebso974821a12.0;
+        Fri, 12 Apr 2024 02:16:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712913374; x=1713518174; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1P5rS5dDZ6bz9RnNGWXjXGeZ5LSFZB2izV8TdsSyfhY=;
+        b=OOfxs4gwGdSJYF5Rg1YrEPMa7aeAv3TXdkArvWg7NxpuxZ+eQflhdOQQREts0AWpFH
+         OiCjfBQWQM0eYpv+b8QlzIkfhqgKkAdXKkJ8xIU8keCiO9qD/6L8dCADBbUJEVR7SxOq
+         DXe+RoOC2Be5trhfR+hNGmrVl3wkxSAYTZPs2i9bGawVCW7V86nVB/xqHRp8Fa9TCSWU
+         CandjXr5Bdh9jksVy37KzaU4YV58iY+HxPJIOPrgmqGt02QA+sL8Re56nvhddQ6DY2eF
+         UcnPl1y3nY7H8667oqVxZ4Ffu5M9GMM6NyAnNb1sjVlipM0fP8lSJYGo3BRU4KwtP3eZ
+         jpiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712913374; x=1713518174;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1P5rS5dDZ6bz9RnNGWXjXGeZ5LSFZB2izV8TdsSyfhY=;
+        b=Z7lqARcsm6CccpGbcjPISLnBHKJzfNk8pN08gMcCL2OD3v0oZ0/SMs2OiwRTOpBS66
+         UuLBr6pEQMRqfAx7osL/08VFpRekxub+LdF+7tLpgPE1dfMaxzkHqwcIMJG1mXJQMZ7t
+         9PZrwjuT2iCh6fEGmlxk3oK9HBfOz8FE/06p5wNK5Rbm9G+6HnSCTom7oNRXXoO0B4kW
+         TVdoS71chMLO1cCRDoJf2cSakvoeMGukwQlZhISe4S/n8EPmoIU26FIBaAwmqCjrzANI
+         UdmP9LJqNt651L/m/urQUZkIlfQN7nSD2+vN+G+K1eZPM5wp26fTLkGHNmB+OuCZYlh3
+         yN5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUPEX8P9Ow3xwnnn9l7E+J+ej1dDoB77dawHjEnNWSfOQaUpOd+hs4GzMVrq/1LnBkieU4uQ31wxq32CJDrxvg/NqZoY2COxkKJRSHIBcGxqutnoDFKDvsf+dw1f9PH8EyZbtjVbi52w7E8XZUUdZtC0xeQPm8U8qufFe7KeJU7eO+wSKqwXwRm4wM3VAjXQssJ6AkJcCoJO6qiq/5+QTDyWlS5CK0s6wL1s6NSakFqVgpyqhXT6Sm4rKSOLaKufjhtwXYCHqDlQYissNSY7xIv94C/p4Gm5aTYKBAZdNXF62AOWRe4iIDpA1IOYPqEpABUKjqzrwlTr1vJaJh34/BRBGBguHXOjst4+BeRiitNh9CakGpdgRUTdQGtW1u5lXxMKI6YpVUv/kIFuhg=
+X-Gm-Message-State: AOJu0YwKcgA7Q+Mgdg5hZnfBVwvIn/EJqMurxXosdswDTSCgg6jk3TYh
+	LcchT5B9Af7nZ+vSdVKRii+R89lIJIkMEZvMIvNwt/g3+6m/jGIU
+X-Google-Smtp-Source: AGHT+IF2JLt070H6U+NVwXUCGShMgUTVG3TFLf6L4pd2nPVSBBMwXn0qR7EXkAPf+SwG43RHlRZl8g==
+X-Received: by 2002:a50:f68d:0:b0:56e:4039:add5 with SMTP id d13-20020a50f68d000000b0056e4039add5mr1892328edn.22.1712913374186;
+        Fri, 12 Apr 2024 02:16:14 -0700 (PDT)
+Received: from gmail.com (1F2EF1A5.nat.pool.telekom.hu. [31.46.241.165])
+        by smtp.gmail.com with ESMTPSA id el9-20020a056402360900b0056fe755f1e6sm1454709edb.91.2024.04.12.02.16.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Apr 2024 02:16:13 -0700 (PDT)
+Sender: Ingo Molnar <mingo.kernel.org@gmail.com>
+Date: Fri, 12 Apr 2024 11:16:10 +0200
+From: Ingo Molnar <mingo@kernel.org>
+To: Mike Rapoport <rppt@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Donald Dutile <ddutile@redhat.com>,
+	Eric Chanudet <echanude@redhat.com>,
+	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Puranjay Mohan <puranjay12@gmail.com>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Russell King <linux@armlinux.org.uk>, Song Liu <song@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+	bpf@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-mm@kvack.org, linux-modules@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
+	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v4 05/15] mm: introduce execmem_alloc() and execmem_free()
+Message-ID: <Zhj72l6uN9OFilxA@gmail.com>
+References: <20240411160051.2093261-1-rppt@kernel.org>
+ <20240411160051.2093261-6-rppt@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] octeontx2-pf: fix FLOW_DIS_IS_FRAGMENT implementation
-To: Suman Ghosh <sumang@marvell.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Sunil Kovvuri Goutham <sgoutham@marvell.com>,
- Geethasowjanya Akula <gakula@marvell.com>,
- Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
- Hariprasad Kelam <hkelam@marvell.com>
-References: <20240410134303.21560-1-ast@fiberby.net>
- <SJ0PR18MB5216D2276BA11D5C5E31D6A6DB042@SJ0PR18MB5216.namprd18.prod.outlook.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <SJ0PR18MB5216D2276BA11D5C5E31D6A6DB042@SJ0PR18MB5216.namprd18.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-
-Hi Suman,
-
-On 4/12/24 5:34 AM, Suman Ghosh wrote:
->> 		if (match.mask->flags & FLOW_DIS_IS_FRAGMENT) {
->> +			val = match.key->flags & FLOW_DIS_IS_FRAGMENT;
->> 			if (ntohs(flow_spec->etype) == ETH_P_IP) {
->> -				flow_spec->ip_flag = IPV4_FLAG_MORE;
->> +				flow_spec->ip_flag = val ? IPV4_FLAG_MORE : 0;
-> [Suman] Do we need this? If user provide the command "tc filter add .... ip_flags nofrags" then the above if check should not be hit right? If we are inside the check then we always want to set IPV4_FLAG_MORE right?
-
-In iproute2, the "frag"/"nofrag" is parsed in flower_parse_matching_flags(),
-it sets TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT in TCA_FLOWER_KEY_FLAGS and
-TCA_FLOWER_KEY_FLAGS_MASK.
-
-Back in the kernel, in fl_set_key_flags() (net/sched/cls_flower.c) then,
-directly translates TCA_FLOWER_KEY_FLAGS_IS_FRAGMENT into FLOW_DIS_IS_FRAGMENT,
-while only setting the key bit, if the mask bit is being set.
-
-There are therefore 3 possible cases:
-
-- `tc flower ...` (no ip_flags frag or nofrag)
-    (match.key->flags & FLOW_DIS_FIRST_FRAG)  is false
-    (match.mask->flags & FLOW_DIS_FIRST_FRAG) is false
-
-- `tc flower ... ip_flags nofrag`
-    (match.key->flags & FLOW_DIS_FIRST_FRAG)  is false
-    (match.mask->flags & FLOW_DIS_FIRST_FRAG) is true
-
-- `tc flower ... ip_flags frag`
-    (match.key->flags & FLOW_DIS_FIRST_FRAG)  is true
-    (match.mask->flags & FLOW_DIS_FIRST_FRAG) is true
-
-The `nofrag` case will still have the mask bit set, and hence pass the entry condition.
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240411160051.2093261-6-rppt@kernel.org>
 
 
- >> 				flow_mask->ip_flag = IPV4_FLAG_MORE;
+* Mike Rapoport <rppt@kernel.org> wrote:
 
-Yes, you should always set IPV4_FLAG_MORE in flow_mask, but not always in flow_spec.
+> +/**
+> + * enum execmem_type - types of executable memory ranges
+> + *
+> + * There are several subsystems that allocate executable memory.
+> + * Architectures define different restrictions on placement,
+> + * permissions, alignment and other parameters for memory that can be used
+> + * by these subsystems.
+> + * Types in this enum identify subsystems that allocate executable memory
+> + * and let architectures define parameters for ranges suitable for
+> + * allocations by each subsystem.
+> + *
+> + * @EXECMEM_DEFAULT: default parameters that would be used for types that
+> + * are not explcitly defined.
+> + * @EXECMEM_MODULE_TEXT: parameters for module text sections
+> + * @EXECMEM_KPROBES: parameters for kprobes
+> + * @EXECMEM_FTRACE: parameters for ftrace
+> + * @EXECMEM_BPF: parameters for BPF
+> + * @EXECMEM_TYPE_MAX:
+> + */
+> +enum execmem_type {
+> +	EXECMEM_DEFAULT,
+> +	EXECMEM_MODULE_TEXT = EXECMEM_DEFAULT,
+> +	EXECMEM_KPROBES,
+> +	EXECMEM_FTRACE,
+> +	EXECMEM_BPF,
+> +	EXECMEM_TYPE_MAX,
+> +};
 
+s/explcitly
+ /explicitly
 
--- 
-Best regards
-Asbjørn Sloth Tønnesen
-Network Engineer
-Fiberby - AS42541
+Thanks,
+
+	Ingo
 
