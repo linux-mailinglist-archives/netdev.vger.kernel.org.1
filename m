@@ -1,432 +1,268 @@
-Return-Path: <netdev+bounces-87221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEBDE8A229E
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 01:51:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42A9F8A22F7
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 02:26:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33DBC1F2327D
-	for <lists+netdev@lfdr.de>; Thu, 11 Apr 2024 23:51:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6004288DF5
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 00:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B46B4AED1;
-	Thu, 11 Apr 2024 23:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22205360;
+	Fri, 12 Apr 2024 00:26:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FcAumvKT"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="D5zLuyKv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261DB487BE
-	for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 23:51:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BEFD195
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 00:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712879511; cv=none; b=l1/ey12hQ7jOKlLXTLPKYt2rI2Ab763kIdi1GpSUQI5xQFSDlftaYR4HT/TZDC0irL8Dtl+TOTa/cynEa8YoRZthr3vqfxNbvMlfDMuE/CQWgJFSuPzzcIalcT8U+t/UBEdUyhyTYFRU2AHbt9mG+rAtB3+HVP1XaO49zX/1GAE=
+	t=1712881572; cv=none; b=cxyBRVcsw6/1sBHpLHpOKknnN2qGDXrcZMAMsL31P/dLeZfFejruARcWAqzyLR0/c7P1nbhlbD9IoG6oqJZRrwFJnJ8BwEOX35LEPa4G48lYI4XRy9+yitRWAFkDjW1IXxxVGn8qEWHpSL3tt4f35Kw/xyZXQ4iCavsq8eDC3Dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712879511; c=relaxed/simple;
-	bh=kElu9bJKH5GeZaRtSgjAzA2mHOEMvBifzw42DjLyAFY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=BnqA9ObwhUAVtsynCh8rLAO1qoY+DGl9AToLkzdYDGlQSK3BdGC5BEGFONlffk6fph0ZMjQ2jOlHMPgNJr3IVkT2kXhMutmERyOkkBE25ak2vziT4mrS+uOhm8yupAK09KElhUkP/JoJgnaGv/RUFPb9RuKEAFLqK3Q2/Kyb+PY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FcAumvKT; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712879510; x=1744415510;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version:content-transfer-encoding;
-  bh=kElu9bJKH5GeZaRtSgjAzA2mHOEMvBifzw42DjLyAFY=;
-  b=FcAumvKT2Grqj4YzigVZqi2fOpfoNgc489vNUOupP/o0Ewln9JVxKmg4
-   /KKb0cgamT+H707NNQk0E/paU87nC3zmJ40tpqrOdyOd8Egq4QXmpAid3
-   ZdyUQM4DLKTS88eRX9eCFW9iVgxhLlOQOcZC6q74+Vc9coxKPRoA8ms+7
-   kBlYbkz1tUwnDbfWmSaL90YsMWaSCAaPeZeeIB04ic5ZaC590iUIXeN/8
-   0/Gl7G3/BTae/Gkd1o1Ii0BPBcF0XBE0TDxKjmiDLaVrbZitL+bifBBF0
-   Gr1U56NkSzMmnSyzxB/2Ho7bGeT0YVgDo6VWwc7yYWwWbiOhK9GeLug7l
-   g==;
-X-CSE-ConnectionGUID: WBFtb8pLSz2PCn4mqQO/oQ==
-X-CSE-MsgGUID: xKuqnk1sQUGJwbjek7Mx4g==
-X-IronPort-AV: E=McAfee;i="6600,9927,11041"; a="19474731"
-X-IronPort-AV: E=Sophos;i="6.07,194,1708416000"; 
-   d="scan'208";a="19474731"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 16:51:49 -0700
-X-CSE-ConnectionGUID: S0NO4/1URI+u1q9uSlD9Xw==
-X-CSE-MsgGUID: 4eHKlmeBR5ab1NE/aJDAnA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,194,1708416000"; 
-   d="scan'208";a="25847163"
-Received: from vcostago-mobl3.jf.intel.com (HELO vcostago-mobl3) ([10.241.228.254])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2024 16:51:47 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>, Madhu
- Chittim <madhu.chittim@intel.com>, Sridhar Samudrala
- <sridhar.samudrala@intel.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [RFC] HW TX Rate Limiting Driver API
-In-Reply-To: <20240405102313.GA310894@kernel.org>
-References: <20240405102313.GA310894@kernel.org>
-Date: Thu, 11 Apr 2024 16:51:45 -0700
-Message-ID: <87a5lzihke.fsf@intel.com>
+	s=arc-20240116; t=1712881572; c=relaxed/simple;
+	bh=6t5oKGgd72X+8yCxr6UXxdWJXM7jQ4DJY/zZP9ekd5s=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=i0duSlfAbUqKcdu9QPJgMJ/XyQvmQpPmxV9cTRqoFgEblvNo41e9o65yHUvWhck7B3MKHF0MvZdfghKhTyYCiX3+WA7inuB2GZD1KffEUhnhpDLw+MOLsnpRe2q+yzkrjhDjzXKpPHYnKdg+LKiuATDKwm4oEuzYEe8ljXL3Ld0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=D5zLuyKv; arc=none smtp.client-ip=209.85.161.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5aa25e99414so272829eaf.3
+        for <netdev@vger.kernel.org>; Thu, 11 Apr 2024 17:26:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1712881568; x=1713486368; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=reTf0+DHsDK7dcQvol/MU7kiUECvdoLTRe9igBGf5Iw=;
+        b=D5zLuyKvIWCzarnH18+xf37o3dXozmv2xxJeW33mVLAiTZbgKUUmSGWmchC1/bfDcs
+         1YJY2RDOslc8IiLsh1laUcM6zGSsc0wkaMugq3y22zsbky3k+Co8HmntLjyKCXhrGDzl
+         4CLM5JFEIbrcP600NHNiIc1JEy7Mk/dIMs3/CDOfyDOyirwnyKdofZ2SuUzDaF4CA7ga
+         MB8n7z4gj74Xnw9t8qokBMNHiKHIGYth1lyOxzI/p6PzbhiWoc9zpYyZU9ktfH7F98Cy
+         FXpAhlveNG4afvsEuZRSFfzZttEjyWXCTRbViZBEBIeJDD4CH/FsCpkuh9kEddEQYg/B
+         +npw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712881568; x=1713486368;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=reTf0+DHsDK7dcQvol/MU7kiUECvdoLTRe9igBGf5Iw=;
+        b=RPdwWwchoW+X/dKtYNoRliTACjBI6Y623Qecq4BpY9NmeHm1jW4XcrSalktTrKcHwz
+         CPeOI8VoZuad8wp633FqQEiI9TNvLRmPFyuyWuPh5OPKGak8rLowkxFCosGOtT2vFw/9
+         hnqtLoMeFjL+6AHljPpKJZH6hg8Vnw4KD+KPFSQuFTztUA4XAuc0aJi8fp9wT+PxZf4Z
+         3pxLigRhL2bGtpl9PQ59FQ/YbFZYPRNwWRWqdmencdZyAMgXXFSovXZXasRpNGdDNLUM
+         sj++0CIHcRr2l0ea0yE5/o5VofOGvY0zudqf6N5JK8GXu/ibJ4rQw2f4uTgRm8/o6Tzk
+         GYWw==
+X-Gm-Message-State: AOJu0YxfRGQHb86QKD3YnbHqFLutcSK/M0MJCk4kPbzC1GgmOtFd1xje
+	//wjBlqWXXshobW5D0WwT/ZAZ1J14hKXCenhF5FSfa8rLUubMrDnPlXhFnLdkUAZuIlj6+mAqiF
+	H
+X-Google-Smtp-Source: AGHT+IEBVxREWfPHt8nakKoCNpKRBFiQXt7a9w0XzzWjLKR871xxXHiJPQDT9bjaY2rD5B4s30OPxw==
+X-Received: by 2002:a05:6870:214e:b0:22e:a686:a943 with SMTP id g14-20020a056870214e00b0022ea686a943mr1026342oae.31.1712881567728;
+        Thu, 11 Apr 2024 17:26:07 -0700 (PDT)
+Received: from [10.73.215.90] ([208.184.112.130])
+        by smtp.gmail.com with ESMTPSA id hj14-20020a056870c90e00b00233a6abb24dsm191547oab.1.2024.04.11.17.26.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Apr 2024 17:26:07 -0700 (PDT)
+Message-ID: <0ac5752d-0b36-436a-9c37-13e262334dce@bytedance.com>
+Date: Thu, 11 Apr 2024 17:26:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+From: Zijian Zhang <zijianzhang@bytedance.com>
+Subject: Re: [External] Re: [PATCH net-next 2/3] selftests: fix OOM problem in
+ msg_zerocopy selftest
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ cong.wang@bytedance.com, xiaochun.lu@bytedance.com
+References: <20240409205300.1346681-1-zijianzhang@bytedance.com>
+ <20240409205300.1346681-3-zijianzhang@bytedance.com>
+ <6615b264894a0_24a51429432@willemb.c.googlers.com.notmuch>
+ <CANn89iLTiq-29ceiQHc2Mi4na+kRb9K-MA1hGMn=G0ek6-mfjQ@mail.gmail.com>
+ <0c6fc173-45c4-463f-bc0e-9fed8c3efc02@bytedance.com>
+ <66171b8b595b_2d123b29472@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+In-Reply-To: <66171b8b595b_2d123b29472@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi,
+On 4/10/24 4:06 PM, Willem de Bruijn wrote:
+>>>>> In this case, for some reason, notifications do not
+>>>>> come in order now. We introduce "cfg_notification_order_check" to
+>>>>> possibly ignore the checking for order.
+>>>>
+>>>> Were you testing UDP?
+>>>>
+>>>> I don't think this is needed. I wonder what you were doing to see
+>>>> enough of these events to want to suppress the log output.
+>>
+>> I tested again on both TCP and UDP just now, and it happened to both of
+>> them. For tcp test, too many printfs will delay the sending and thus
+>> affect the throughput.
+>>
+>> ipv4 tcp -z -t 1
+>> gap: 277..277 does not append to 276
+> 
+> There is something wrong here. 277 clearly appends to 276
+> 
 
-Simon Horman <horms@kernel.org> writes:
+```
+if (lo != next_completion)
+     fprintf(stderr, "gap: %u..%u does not append to %u\n",
+         lo, hi, next_completion);
+```
 
-> Hi,
->
-> This is follow-up to the ongoing discussion started by Intel to extend the
-> support for TX shaping H/W offload [1].
->
-> The goal is allowing the user-space to configure TX shaping offload on a
-> per-queue basis with min guaranteed B/W, max B/W limit and burst size on a
-> VF device.
->
+According to the code, it expects the lo to be 276, but it's 277.
 
-What about non-VF cases? Would it be out of scope?
+>> gap: 276..276 does not append to 278
+> 
+> This would be an actual reordering. But the above line already
+> indicates that 276 is the next expected value.
+> 
+>> gap: 278..1112 does not append to 277
+>> gap: 1114..1114 does not append to 1113
+>> gap: 1113..1113 does not append to 1115
+>> gap: 1115..2330 does not append to 1114
+>> gap: 2332..2332 does not append to 2331
+>> gap: 2331..2331 does not append to 2333
+>> gap: 2333..2559 does not append to 2332
+>> gap: 2562..2562 does not append to 2560
+>> ...
+>> gap: 25841..25841 does not append to 25843
+>> gap: 25843..25997 does not append to 25842
+>>
+>> ...
+>>
+>> ipv6 udp -z -t 1
+>> gap: 11632..11687 does not append to 11625
+>> gap: 11625..11631 does not append to 11688
+>> gap: 11688..54662 does not append to 11632
+> 
+> If you ran this on a kernel with a variety of changes, please repeat
+> this on a clean kernel with no other changes besides the
+> skb_orphan_frags_rx loopback change.
+> 
+> It this is a real issue, I don't mind moving this behind cfg_verbose.
+> And prefer that approach over adding a new flag.
+> 
+> But I have never seen this before, and this kind of reordering is rare
+> with UDP and should not happen with TCP except for really edge cases:
+> the uarg is released only when both the skb was delivered and the ACK
+> response was received to free the clone on the retransmit queue.
 
->
-> In the past few months several different solutions were attempted and
-> discussed, without finding a perfect fit:
->
-> - devlink_rate APIs are not appropriate for to control TX shaping on netd=
-evs
-> - No existing TC qdisc offload covers the required feature set
-> - HTB does not allow direct queue configuration
-> - MQPRIO imposes constraint on the maximum number of TX queues
-> - TBF does not support max B/W limit
-> - ndo_set_tx_maxrate() only controls the max B/W limit
->
+I found the set up where I encountered the OOM problem in msg_zerocopy
+selftest. I did it on a clean kernel vm booted by qemu, 
+dfa2f0483360("tcp: get rid of sysctl_tcp_adv_win_scale") with only
+skb_orphan_frags_rx change.
 
-Another questions: is how "to plug" different shaper algorithms? for
-example, the TSN world defines the Credit Based Shaper (IEEE 802.1Q-2018
-Annex L gives a good overview), which tries to be accurate over sub
-milisecond intervals.
+Then, I do `make olddefconfig` and turn on some configurations for
+virtualization like VIRTIO_FS, VIRTIO_NET and some confs like 9P_FS
+to share folders. Let's call it config, here was the result I got,
+```
+./msg_zerocopy.sh
+ipv4 tcp -z -t 1
+./msg_zerocopy: send: No buffer space available
+rx=564 (70 MB)
+```
 
-(sooner or later, some NIC with lots of queues will appear with TSN
-features, and I guess some people would like to know that they are using
-the expected shaper)
+Since the TCP socket is always writable, the do_poll always return True.
+There is no any chance for `do_recv_completions` to run.
+```
+while (!do_poll(fd, POLLOUT)) {
+     if (cfg_zerocopy)
+         do_recv_completions(fd, domain);
+     }
+```
+Finally, the size of sendmsg zerocopy notification skbs exceeds the 
+opt_mem limit. I got "No buffer space available".
 
-> A new H/W offload API is needed, but offload API proliferation should be
-> avoided.
->
-> The following proposal intends to cover the above specified requirement a=
-nd
-> provide a possible base to unify all the shaping offload APIs mentioned a=
-bove.
->
-> The following only defines the in-kernel interface between the core and
-> drivers. The intention is to expose the feature to user-space via Netlink.
-> Hopefully the latter part should be straight-forward after agreement
-> on the in-kernel interface.
->
 
-Another thing that MQPRIO (indirectly) gives is the ability to userspace
-applications to have some amount of control in which queue their packets
-will end up, via skb->priority.
+However, if I change the config by
+```
+  DEBUG_IRQFLAGS n -> y
+  DEBUG_LOCK_ALLOC n -> y
+  DEBUG_MUTEXES n -> y
+  DEBUG_RT_MUTEXES n -> y
+  DEBUG_RWSEMS n -> y
+  DEBUG_SPINLOCK n -> y
+  DEBUG_WW_MUTEX_SLOWPATH n -> y
+  PROVE_LOCKING n -> y
++DEBUG_LOCKDEP y
++LOCKDEP y
++LOCKDEP_BITS 15
++LOCKDEP_CHAINS_BITS 16
++LOCKDEP_CIRCULAR_QUEUE_BITS 12
++LOCKDEP_STACK_TRACE_BITS 19
++LOCKDEP_STACK_TRACE_HASH_BITS 14
++PREEMPTIRQ_TRACEPOINTS y
++PROVE_RAW_LOCK_NESTING n
++PROVE_RCU y
++TRACE_IRQFLAGS y
++TRACE_IRQFLAGS_NMI y
+```
 
-Would this new shaper hierarchy have something that would fill this
-role? (if this is for VF-only use cases, then the answer would be "no" I
-guess)
+Let's call it config-debug, the selftest works well with reordered
+notifications.
+```
+ipv4 tcp -z -t 1
+gap: 2117..2117 does not append to 2115
+gap: 2115..2116 does not append to 2118
+gap: 2118..3144 does not append to 2117
+gap: 3146..3146 does not append to 3145
+gap: 3145..3145 does not append to 3147
+gap: 3147..3768 does not append to 3146
+...
+gap: 34935..34935 does not append to 34937
+gap: 34938..36409 does not append to 34936
 
-(I tried to read the whole thread, sorry if I missed something)
+rx=36097 (2272 MB)
+missing notifications: 36410 < 36412
+tx=36412 (2272 MB) txc=36410 zc=y
+```
+For exact config to compile the kernel, please see
+https://github.com/Sm0ckingBird/config
 
-> All feedback and comment is more then welcome!
->
-> [1] https://lore.kernel.org/netdev/20230808015734.1060525-1-wenjun1.wu@in=
-tel.com/
->
-> Regards,
-> Simon with much assistance from Paolo
->
-> ---=20
-> /* SPDX-License-Identifier: GPL-2.0-or-later */
->
-> #ifndef _NET_SHAPER_H_
-> #define _NET_SHAPER_H_
->
-> /**
->  * enum shaper_metric - the metric of the shaper
->  * @SHAPER_METRIC_PPS: Shaper operates on a packets per second basis
->  * @SHAPER_METRIC_BPS: Shaper operates on a bits per second basis
->  */
-> enum shaper_metric {
-> 	SHAPER_METRIC_PPS;
-> 	SHAPER_METRIC_BPS;
-> };
->
-> #define SHAPER_ROOT_ID 0
-> #define SHAPER_NONE_ID UINT_MAX
->
-> /**
->  * struct shaper_info - represent a node of the shaper hierarchy
->  * @id: Unique identifier inside the shaper tree.
->  * @parent_id: ID of parent shaper, or SHAPER_NONE_ID if the shaper has
->  *             no parent. Only the root shaper has no parent.
->  * @metric: Specify if the bw limits refers to PPS or BPS
->  * @bw_min: Minimum guaranteed rate for this shaper
->  * @bw_max: Maximum peak bw allowed for this shaper
->  * @burst: Maximum burst for the peek rate of this shaper
->  * @priority: Scheduling priority for this shaper
->  * @weight: Scheduling weight for this shaper
->  *
->  * The full shaper hierarchy is maintained only by the
->  * NIC driver (or firmware), possibly in a NIC-specific format
->  * and/or in H/W tables.
->  * The kernel uses this representation and the shaper_ops to
->  * access, traverse, and update it.
->  */
-> struct shaper_info {
-> 	/* The following fields allow the full traversal of the whole
-> 	 * hierarchy.
-> 	 */
-> 	u32 id;
-> 	u32 parent_id;
->
-> 	/* The following fields define the behavior of the shaper. */
-> 	enum shaper_metric metric;
-> 	u64 bw_min;
-> 	u64 bw_max;
-> 	u32 burst;
-> 	u32 priority;
-> 	u32 weight;
-> };
->
-> /**
->  * enum shaper_lookup_mode - Lookup method used to access a shaper
->  * @SHAPER_LOOKUP_BY_PORT: The root shaper for the whole H/W, @id is unus=
-ed
->  * @SHAPER_LOOKUP_BY_NETDEV: The main shaper for the given network device,
->  *                           @id is unused
->  * @SHAPER_LOOKUP_BY_VF: @id is a virtual function number.
->  * @SHAPER_LOOKUP_BY_QUEUE: @id is a queue identifier.
->  * @SHAPER_LOOKUP_BY_TREE_ID: @id is the unique shaper identifier inside =
-the
->  *                            shaper hierarchy as in shaper_info.id
->  *
->  * SHAPER_LOOKUP_BY_PORT and SHAPER_LOOKUP_BY_VF, SHAPER_LOOKUP_BY_TREE_I=
-D are
->  * only available on PF devices, usually inside the host/hypervisor.
->  * SHAPER_LOOKUP_BY_NETDEV is available on both PFs and VFs devices, but
->  * only if the latter are privileged ones.
->  * The same shaper can be reached with different lookup mode/id pairs,
->  * mapping network visible objects (devices, VFs, queues) to the scheduler
->  * hierarchy and vice-versa.
->  */
-> enum shaper_lookup_mode {
->     SHAPER_LOOKUP_BY_PORT,
->     SHAPER_LOOKUP_BY_NETDEV,
->     SHAPER_LOOKUP_BY_VF,
->     SHAPER_LOOKUP_BY_QUEUE,
->     SHAPER_LOOKUP_BY_TREE_ID,
-> };
->
->
-> /**
->  * struct shaper_ops - Operations on shaper hierarchy
->  * @get: Access the specified shaper.
->  * @set: Modify the specifier shaper.
->  * @move: Move the specifier shaper inside the hierarchy.
->  * @add: Add a shaper inside the shaper hierarchy.
->  * @delete: Delete the specified shaper .
->  *
->  * The netdevice exposes a pointer to these ops.
->  *
->  * It=E2=80=99s up to the driver or firmware to create the default shaper=
-s hierarchy,
->  * according to the H/W capabilities.
->  */
-> struct shaper_ops {
-> 	/* get - Fetch the specified shaper, if it exists
-> 	 * @dev: Netdevice to operate on.
-> 	 * @lookup_mode: How to perform the shaper lookup
-> 	 * @id: ID of the specified shaper,
-> 	 *      relative to the specified @lookup_mode.
-> 	 * @shaper: Object to return shaper.
-> 	 * @extack: Netlink extended ACK for reporting errors.
-> 	 *
-> 	 * Multiple placement domain/id pairs can refer to the same shaper.
-> 	 * And multiple entities (e.g. VF and PF) can try to access the same
-> 	 * shaper concurrently.
-> 	 *
-> 	 * Values of @id depend on the @access_type:
-> 	 * * If @access_type is SHAPER_LOOKUP_BY_PORT or
-> 	 *   SHAPER_LOOKUP_BY_NETDEV, then @placement_id is unused.
-> 	 * * If @access_type is SHAPER_LOOKUP_BY_VF,
-> 	 *   then @id is a virtual function number, relative to @dev
-> 	 *   which should be phisical function
-> 	 * * If @access_type is SHAPER_LOOKUP_BY_QUEUE,
-> 	 *   Then @id represents the queue number, relative to @dev
-> 	 * * If @access_type is SHAPER_LOOKUP_BY_TREE_ID,
-> 	 *   then @id is a @shaper_info.id and any shaper inside the
-> 	 *   hierarcy can be accessed directly.
-> 	 *
-> 	 * Return:
-> 	 * * %0 - Success
-> 	 * * %-EOPNOTSUPP - Operation is not supported by hardware, driver,
-> 	 *		    or core for any reason. @extack should be set
-> 	 *		    to text describing the reason.
-> 	 * * Other negative error value on failure.
-> 	 */
-> 	int (*get)(struct net_device *dev,
-> 		   enum shaper_lookup_mode lookup_mode, u32 id,
->                    struct shaper_info *shaper, struct netlink_ext_ack *ex=
-tack);
->
-> 	/* set - Update the specified shaper, if it exists
-> 	 * @dev: Netdevice to operate on.
-> 	 * @lookup_mode: How to perform the shaper lookup
-> 	 * @id: ID of the specified shaper,
-> 	 *      relative to the specified @access_type.
-> 	 * @shaper: Configuration of shaper.
-> 	 * @extack: Netlink extended ACK for reporting errors.
-> 	 *
-> 	 * Configure the parameters of @shaper according to values supplied
-> 	 * in the following fields:
-> 	 * * @shaper.metric
-> 	 * * @shaper.bw_min
-> 	 * * @shaper.bw_max
-> 	 * * @shaper.burst
-> 	 * * @shaper.priority
-> 	 * * @shaper.weight
-> 	 * Values supplied in other fields of @shaper must be zero and,
-> 	 * other than verifying that, are ignored.
-> 	 *
-> 	 * Return:
-> 	 * * %0 - Success
-> 	 * * %-EOPNOTSUPP - Operation is not supported by hardware, driver,
-> 	 *		    or core for any reason. @extack should be set
-> 	 *		    to text describing the reason.
-> 	 * * Other negative error values on failure.
-> 	 */
-> 	int (*set)(struct net_device *dev,
-> 		   enum shaper_lookup_mode lookup_mode, u32 id,
-> 		   const struct shaper_info *shaper,
-> 		   struct netlink_ext_ack *extack);
->
-> 	/* Move - change the parent id of the specified shaper
-> 	 * @dev: netdevice to operate on.
-> 	 * @lookup_mode: how to perform the shaper lookup
-> 	 * @id: ID of the specified shaper,
-> 	 *                      relative to the specified @access_mode.
-> 	 * @new_parent_id: new ID of the parent shapers,
-> 	 *                      always relative to the SHAPER_LOOKUP_BY_TREE_ID
-> 	 *                      lookup mode
-> 	 * @extack: Netlink extended ACK for reporting errors.
-> 	 *
-> 	 * Move the specified shaper in the hierarchy replacing its
-> 	 * current parent shaper with @new_parent_id
-> 	 *
-> 	 * Return:
-> 	 * * %0 - Success
-> 	 * * %-EOPNOTSUPP - Operation is not supported by hardware, driver,
-> 	 *		    or core for any reason. @extack should be set
-> 	 *		    to text describing the reason.
-> 	 * * Other negative error values on failure.
-> 	 */
-> 	int (*move)(struct net_device *dev,
-> 		    enum shaper_lookup_mode lookup_mode, u32 id,
-> 		    u32 new_parent_id, struct netlink_ext_ack *extack);
->
-> 	/* add - Add a shaper inside the shaper hierarchy
-> 	 * @dev: netdevice to operate on.
-> 	 * @shaper: configuration of shaper.
-> 	 * @extack: Netlink extended ACK for reporting errors.
-> 	 *
-> 	 * @shaper.id must be set to SHAPER_NONE_ID as
-> 	 * the id for the shaper will be automatically allocated.
-> 	 * @shaper.parent_id determines where inside the shaper's tree
-> 	 * this node is inserted.
-> 	 *
-> 	 * Return:
-> 	 * * non-negative shaper id on success
-> 	 * * %-EOPNOTSUPP - Operation is not supported by hardware, driver,
-> 	 *		    or core for any reason. @extack should be set
-> 	 *		    to text describing the reason.
-> 	 * * Other negative error values on failure.
-> 	 *
-> 	 * Examples or reasons this operation may fail include:
-> 	 * * H/W resources limits.
-> 	 * * The parent is a =E2=80=98leaf=E2=80=99 node - attached to a queue.
-> 	 * * Can=E2=80=99t respect the requested bw limits.
-> 	 */
-> 	int (*add)(struct net_device *dev, const struct shaper_info *shaper,
-> 		   struct netlink_ext_ack *extack);
->
-> 	/* delete - Add a shaper inside the shaper hierarchy
-> 	 * @dev: netdevice to operate on.
-> 	 * @lookup_mode: how to perform the shaper lookup
-> 	 * @id: ID of the specified shaper,
-> 	 *                      relative to the specified @access_type.
-> 	 * @shaper: Object to return the deleted shaper configuration.
-> 	 *              Ignored if NULL.
-> 	 * @extack: Netlink extended ACK for reporting errors.
-> 	 *
-> 	 * Return:
-> 	 * * %0 - Success
-> 	 * * %-EOPNOTSUPP - Operation is not supported by hardware, driver,
-> 	 *		    or core for any reason. @extack should be set
-> 	 *		    to text describing the reason.
-> 	 * * Other negative error values on failure.
-> 	 */
-> 	int (*delete)(struct net_device *dev,
-> 		      enum shaper_lookup_mode lookup_mode,
-> 		      u32 id, struct shaper_info *shaper,
-> 		      struct netlink_ext_ack *extack);
-> };
->
-> /*
->  * Examples:
->  * - set shaping on a given queue
->  *   struct shaper_info info =3D { // fill this };
->  *   dev->shaper_ops->set(dev, SHAPER_LOOKUP_BY_QUEUE, queue_id, &info, N=
-ULL);
->  *
->  * - create a queue group with a queue group shaping limits.
->  *   Assuming the following topology already exists:
->  *                    < netdev shaper >
->  *                      /           \
->  *         <queue 0 shaper> . . .  <queue N shaper>
->  *
->  *   struct shaper_info pinfo, ginfo;
->  *   dev->shaper_ops->get(dev, SHAPER_LOOKUP_BY_NETDEV, 0, &pinfo);
->  *
->  *   ginfo.parent_id =3D pinfo.id;
->  *   // fill-in other shaper params...
->  *   new_node_id =3D dev->shaper_ops->add(dev, &ginfo);
->  *
->  *   // now topology is:
->  *   //                  <    netdev shaper    >
->  *   //                  /            |        \
->  *   //                 /             |        <newly created shaper>
->  *   //                /              |
->  *   // <queue 0 shaper> . . . <queue N shaper>
->  *
->  *   // move a shapers for queues 3..n out of such queue group
->  *   for (i =3D 0; i <=3D 2; ++i)
->  *           dev->shaper_ops->move(dev, SHAPER_LOOKUP_BY_QUEUE, i, new_no=
-de_id);
->  *
->  *   // now topology is:
->  *   //                   < netdev shaper >
->  *   //                   /              \
->  *   //        <newly created shaper>   <queue 3 shaper> ... <queue n sha=
-per>
->  *   //         /                   \
->  *   // <queue 0 shaper> ... <queue 2 shaper>
->  */
-> #endif
->
->
 
---=20
-Vinicius
+I also did selftest on 63c8778d9149("Merge branch 
+'net-mana-fix-doorbell-access-for-receive-queues'"), the parent of 
+dfa2f0483360("tcp: get rid of sysctl_tcp_adv_win_scale")
+
+with config, selftest works well.
+```
+ipv4 tcp -z -t 1
+missing notifications: 223181 < 223188
+tx=223188 (13927 MB) txc=223181 zc=y
+rx=111592 (13927 MB)
+```
+
+with config-debug, selftest works well with reordered notifications
+```
+ipv4 tcp -z -t 1
+...
+gap: 30397..30404 does not append to 30389
+gap: 30435..30442 does not append to 30427
+gap: 30427..30434 does not append to 30443
+gap: 30443..30450 does not append to 30435
+gap: 30473..30480 does not append to 30465
+gap: 30465..30472 does not append to 30481
+gap: 30481..30488 does not append to 30473
+tx=30491 (1902 MB) txc=30491 zc=y
+rx=15245 (1902 MB)
+```
+
+Not sure about the exact reason for this OOM problem, and why
+turning on DEBUG_LOCKDEP and PROVE_RAW_LOCK_NESTING can solve
+the problem with reordered notifications... If you have any thoughts or
+comments, please feel free to share them with us.
+
+If the problem does exist, I guess we can force `do_recv_completions`
+after some number of sendmsgs and move "gap: ..." after cfg_verbose?
 
