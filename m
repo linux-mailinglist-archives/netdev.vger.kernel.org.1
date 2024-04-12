@@ -1,95 +1,104 @@
-Return-Path: <netdev+bounces-87440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC89D8A320E
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 17:18:04 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1981C8A3222
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 17:19:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18A681C2106B
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:18:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F8CBB23352
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:19:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B11941482E3;
-	Fri, 12 Apr 2024 15:14:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C57149DF7;
+	Fri, 12 Apr 2024 15:15:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="QUXuvZ8k"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gdK6tgxm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E628143899
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 15:14:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E40149C6C
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 15:15:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712934853; cv=none; b=JADHlJS8O8xwh0zJmzyWW9ZxyNFkY1QkiZl84pjfn32BPxB/Ljl8ePDvOKg/Tbb41wt/KUk/lGoy+HIIJJnUdYxRo+XWyaBJ5hQWQImuupbKqKL9Kvw0AwaV7haMJCjU4M395PcNk5sn0ZCEi52Pd1i55KZQ1u/bLwHrJoTATGI=
+	t=1712934920; cv=none; b=evkyIc48dUyDS5i6esrr3c6REeVNodane6vjJQJGVW2mzQJc9B9u+4E9P+xXeOZyFEzXDOfmZhr6v8Grz3bE9rpODTpislYY45YkFH/1EciKXfzPw6EuSTQ3ZUjCSL889RV7qg1+N+FuFgeBvNWbguOL1cdy0XNj8OrylEydcrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712934853; c=relaxed/simple;
-	bh=fvTrRH4DLn5mnkphu1F/WSdXeIOZNYO5jK6aFD3PDrU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LJ+h3oKD3coLWffzG54C7K2Crb8KMol0bCF8itd55Htax//oh30ZV9LnLJhM3jwf3pMZkWmU9ned4Jom2xRM81O5FtxYx1RrqivIaGgAsQB02kJefoAKFJQAv/1ESi0jkPaaY6pC+spjj3ILgfZOzJ5GnZAdL9dUXX3YNQVJOYE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=QUXuvZ8k; arc=none smtp.client-ip=209.85.208.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2d82713f473so16082551fa.3
-        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 08:14:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1712934850; x=1713539650; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fvTrRH4DLn5mnkphu1F/WSdXeIOZNYO5jK6aFD3PDrU=;
-        b=QUXuvZ8kZh0ndcw1nIPREwn+oeBbiCtzFF2p3hxJqV3T6VSpHszSfVx4khfyQA3Fy1
-         b9LW7CrCDftAsXQvFptPTPnRMSHeFW0Yq3jRpsoBhV+OCzjRtVat3xgHYm9mLUPdFGOo
-         wDEveaZFdNTZGok6Q9Mhe2UzE48+9rv/EBeuX8j8uvEh7hTrG/SvHJk3eCZTNylr1/n6
-         ++EVIC/meIM7vmPkYNgmqLrue3Eb1ezTpwwJCNmel2s5U5STscnPUWdGtxLfVmAk3bk3
-         fMnHtjC6ZjFUUxFYf1ZuOF4Ikk/3XKOsIMIhWGjdifV2OjQXJYRz3wN+blFQgtJweq7x
-         rBnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712934850; x=1713539650;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fvTrRH4DLn5mnkphu1F/WSdXeIOZNYO5jK6aFD3PDrU=;
-        b=aKSyqn/NQzijE5e1vNouODXJ5/P55P4v8rDjzAVFi1zEIvrD82DzMStwck0Ej1P2yv
-         Ikaq1Qd1XqhvSBkVAwj8CIIxL8DsFj/hetyGRuUFalcqFqhQu7FPcERoCV2/TxpBC+/+
-         O1dgehgvH9FDwf0kVNAnyy5hzWdmVqynnDkGqlpUchBkrZSvD1v6ShCJyv2PvxqNPI7c
-         sds/SQIP1G0Nx1/cz4CyaKTyUOw4170S0fak+vvrJ/OfdgXrZefOigUePwC2KkVreGdF
-         bs6UhmPw5E1h95bGIy32qv8bGGbqTTant6W530plrKlMThs3OrwCVR60EfkMlYq93/aR
-         aolQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUvZv44iwjYp7hU5BTjaxz0tXzyy7U0AhtUu0qmhqqzhtgqL3vV3tg4mU2Ap96VHqKj98iWKXBr91WPxcWL73Dvihhrqhll
-X-Gm-Message-State: AOJu0Yyl01IBBigObB4PApMH2umzek2xgcSZoj2QQNK2M4/ClL9r+mqs
-	ck3RdXc//6q1nlahBwS6+pDFBhTD20vJLWZzYserZ+hYYMune0UGASyaHdo1sn4=
-X-Google-Smtp-Source: AGHT+IHPT/AKg/d/ITeSjzS7RN63iEvKvshdq8COmNXww3i51Ic+ylC4bbdmh16DhAGtcTBWhnP/FA==
-X-Received: by 2002:a2e:a0c3:0:b0:2d6:a609:9a33 with SMTP id f3-20020a2ea0c3000000b002d6a6099a33mr2054630ljm.0.1712934850280;
-        Fri, 12 Apr 2024 08:14:10 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id r2-20020a2e80c2000000b002d6daf3b41fsm513237ljg.101.2024.04.12.08.14.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 08:14:09 -0700 (PDT)
-Date: Fri, 12 Apr 2024 17:14:07 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Dariusz Aftanski <dariusz.aftanski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: Re: [iwl-next v1] ice: Remove ndo_get_phys_port_name
-Message-ID: <ZhlPvx8YF3TR3yOV@nanopsycho>
-References: <20240308105842.141723-1-dariusz.aftanski@linux.intel.com>
+	s=arc-20240116; t=1712934920; c=relaxed/simple;
+	bh=fmEorI9pfcxlJrK9k/mi2zbeS1fZ02gd22peJrdyEaA=;
+	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
+	 Message-Id:Date; b=qRBARU4/QcuyWToqK0vkIqPphZrm17HrFI20ZjQZevzVP0ejOSCear5rDSuiNxNLx8o8ztWsTI6OH8dWIccYhloL4htHfX/u9ExRnUrI/ZQO32x1JWljsIb1SiKEuqcg+LraTFh3BVjwLa5BUPdm5W5bnsylvutZDMlY5Wuiuwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gdK6tgxm; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
+	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
+	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=UJXPHShpCAbGPQKd0Y1p+AscoZJeLsEs/+RFxrl9k3I=; b=gdK6tgxmKl2GQoGs0Dm/ilnzfq
+	+TlYSydfbHvofywQzsNFzTFu7dVV8J2kzFY7lh0Q+ckm67/UBjDp7eYjbqwf3EPr0iNhtsg/rrKnG
+	gPutx14Q0oonKOCJNE+X3JDaW7M2BJxik8VR2IDr7SeZYJ5ImbPGuSA+BUBXwmvR8e1QaLIb2gY0H
+	g9qlElZU84m8tji7wDPUQnjRPglJq8J1B0DRWSh5waEaGhRuHgnuXK4dIoZkPZAGkj5N8ktSoqECc
+	E9wYGmz+QeKEDZyj5l80Z11l189i6Jrh9jCMe1ao5/+luG+ktcgD1BriZ2CXw0ZrvJZvK1iIsAM1E
+	3WM/DBgA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42492 helo=rmk-PC.armlinux.org.uk)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1rvIcI-0002bi-2M;
+	Fri, 12 Apr 2024 16:15:02 +0100
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1rvIcJ-006bQK-Hh; Fri, 12 Apr 2024 16:15:03 +0100
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	 Vladimir Oltean <olteanv@gmail.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next] net: dsa: convert dsa_user_phylink_fixed_state() to
+ use dsa_phylink_to_port()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240308105842.141723-1-dariusz.aftanski@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1rvIcJ-006bQK-Hh@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Fri, 12 Apr 2024 16:15:03 +0100
 
-Fri, Mar 08, 2024 at 11:58:42AM CET, dariusz.aftanski@linux.intel.com wrote:
->ndo_get_phys_port_name is never actually used, as in switchdev
->devklink is always being created.
->
->Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
->Signed-off-by: Dariusz Aftanski <dariusz.aftanski@linux.intel.com>
+Convert dsa_user_phylink_fixed_state() to use the newly introduced
+dsa_phylink_to_port() helper.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Suggested-by: Vladimir Oltean <olteanv@gmail.com>
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ net/dsa/user.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/dsa/user.c b/net/dsa/user.c
+index 16d395bb1a1f..c94b868855aa 100644
+--- a/net/dsa/user.c
++++ b/net/dsa/user.c
+@@ -2445,7 +2445,7 @@ EXPORT_SYMBOL_GPL(dsa_port_phylink_mac_change);
+ static void dsa_user_phylink_fixed_state(struct phylink_config *config,
+ 					 struct phylink_link_state *state)
+ {
+-	struct dsa_port *dp = container_of(config, struct dsa_port, pl_config);
++	struct dsa_port *dp = dsa_phylink_to_port(config);
+ 	struct dsa_switch *ds = dp->ds;
+ 
+ 	/* No need to check that this operation is valid, the callback would
+-- 
+2.30.2
+
 
