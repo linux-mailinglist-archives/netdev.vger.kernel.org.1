@@ -1,235 +1,140 @@
-Return-Path: <netdev+bounces-87375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF4918A2EDD
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:08:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B72F8A2F28
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:17:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43D07B22CB4
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:08:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56F34284F48
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:17:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 805E25CDEE;
-	Fri, 12 Apr 2024 13:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC85567A14;
+	Fri, 12 Apr 2024 13:16:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U93WBI7m"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="lT+dK4IB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E66460DDC;
-	Fri, 12 Apr 2024 13:07:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC67666B57;
+	Fri, 12 Apr 2024 13:16:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712927274; cv=none; b=umWwgQCj+bRpIbFTOw7P+QF4KUj7hSCpc6UZ6ayg9fPczSJ+c0xUCNwRSvVPemy0/1H1QAkIi7BYik8Y0JXY2hWOmDKe5liMtjtwB1wywO2SHtdKJHd/9+2NMkBx3MkGvOHnxsWn7FjNHIhCehHJfD3HrPNSBD811lC24BiFVm0=
+	t=1712927815; cv=none; b=mBBMR6Lq5zVpv5aviejGaKEhnAGiYhJ2JD3PeamEi5j3+CpyR5P9nM/nbXrh32YRKuvVWxQfJ7LEFvMKZxo4NDfNuZ/+0Wmj50i3epfMKlgAAYoCYemfNOUl/Y7VlJZzccbzlEbI258J1WgKxMrnW6u/Tms1B7gqvuN9QEXceWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712927274; c=relaxed/simple;
-	bh=yrqKrLmM3Q4f6JFITmelRkHTdb26DS6Td14OmBR76YQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=skXd6oHn9FjGYE6K6OWTRreMZnu+8k6kh8XeNFuX9s8lJa1kaU942aJHnCNFbcefNrfiMyGA0fYsS0v2jmSyIpSJWDj7OW1UrrSSfn8sT518QwdGpZCYC/cHDe4Ns4b4XeoSuJsyaZsscO1G5eorTaMi6i6qP96mTR8UvYcNG58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U93WBI7m; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a4715991c32so111338066b.1;
-        Fri, 12 Apr 2024 06:07:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712927269; x=1713532069; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=9rn/zc6s/zD/8BUl/7+phShce3NbGsIX6yyn+LNAZyA=;
-        b=U93WBI7mNRbjELWYGbT4wNSk+pOz7gOQX1pDnvJ0hT8FXm3QXT2M5nrnQYh05FNP3w
-         rbHjzoz0lTXWEX3304bgtXeOymN/OOOKtm0syU/Sm7oh2D3IKzFJzj2Q4JKlseqjp7tA
-         t6nMH+zXzlNe5agI1ADlBxgRhtqaF6gizswQu4wgI6bLnkkH7HsE5dqt1y3dh3s9di99
-         obdcSJH22rDULwgqyjoZyE2Y8QSUDaCDTG5h7TvdVXxPRuxKJj71rsX0Jg5KVAWK6lQL
-         cKcVU3pdJXBYzTEeph2JT9cmiMsYSuTXb5BvZu23C1yNLVu6S4hlEVkCT0GNhDlC+19W
-         OCYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712927269; x=1713532069;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9rn/zc6s/zD/8BUl/7+phShce3NbGsIX6yyn+LNAZyA=;
-        b=PXBBZERuPXvj6McOHAQtwIyFzIpghN5iollQjqV9+KdA6u0VssPuXo9wKyD+iroGaE
-         L5TquS7YT5x4t+S4IokxWn3HCII1x/fhKX7dotC5x/K+P78Prmt7kxQs941TspncPDq5
-         y3eNMMD11JrubBWsKKqqyjnuSP1yJ2geuLnHVVAo3j6ODekJPHvCXDndWGDEITh3XFRt
-         Gy9f3fNQJYOEeSTRDOK9MvTmeQ5IUbZDkYPIZlVTFqQm4DbuGZCR5I+AYzeVPRayDyjm
-         938ZuTL+0+6NXRzrwNbI/J8yMwqv5N1ysUdwLBkCSOPU6eBqp29/murrgjhmM7mp8DFc
-         unZA==
-X-Forwarded-Encrypted: i=1; AJvYcCWm+HhYAQRFtGWVM2ajyHH/owv4ufpXio2YYOr4N+8wraxUMcn2El1nyI6xwnIedyUCPo+Xc2zkUqeFGqzhdBF1jamLHfa6PDTTbQzL
-X-Gm-Message-State: AOJu0YxzE0mGhI5asnryV1aFrXMEMfM2UPWy4DnFA1XR4Jkl95Eh5I3o
-	1ie2Xvec5XX6L/FxoVScBljfF8BrEOyjVbJyGRKoTs7ZVApGzWmD
-X-Google-Smtp-Source: AGHT+IGfx5jSsh2DJtk5KqWm8cuRSCRSzcnIOqq1OfH9R7AjpPhkp/E/ljE6HxuOMN00Ckeivw9tfA==
-X-Received: by 2002:a17:906:3a85:b0:a51:fa56:4fc7 with SMTP id y5-20020a1709063a8500b00a51fa564fc7mr1614361ejd.21.1712927269211;
-        Fri, 12 Apr 2024 06:07:49 -0700 (PDT)
-Received: from ?IPV6:2a01:c22:7a91:3c00:8c19:da9e:a091:c46c? (dynamic-2a01-0c22-7a91-3c00-8c19-da9e-a091-c46c.c22.pool.telefonica.de. [2a01:c22:7a91:3c00:8c19:da9e:a091:c46c])
-        by smtp.googlemail.com with ESMTPSA id ga31-20020a1709070c1f00b00a4e24d259edsm1786441ejc.167.2024.04.12.06.07.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Apr 2024 06:07:48 -0700 (PDT)
-Message-ID: <c37482d9-f97b-4f9a-8a2d-efde1a654514@gmail.com>
-Date: Fri, 12 Apr 2024 15:07:46 +0200
+	s=arc-20240116; t=1712927815; c=relaxed/simple;
+	bh=USOM0XCZ0/wu4cKnQkzgmul4MrjCVr2FMP7oVZE2duc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BK0Mk5x2Qnob7xE4loO3u0djxEo6/5O6YMIT77ltKc7vW0Nxc8q2dg9FTQdeKM9Xc0qIW8WbbctNrhrJgQnaVZOIAggDV6db5nTVUD0+ecobObvOsOJlLnq0KBec3DA5Z7EpRPLb7JknN7XTmR/vb2zMsTXpqXd9WQTVTl+5sm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=lT+dK4IB; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C3A03240004;
+	Fri, 12 Apr 2024 13:16:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1712927811;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O5+3+rElzUNybXHG/ZwL7fFM6Iw46bn7txCnEsQ1q2w=;
+	b=lT+dK4IBl81ohQ/NsUOa/zq3G805EZLYGAN0wFqWK2ljT7vjQaRpWC3Qc03ndnkG3TgUpm
+	y5JxQB8JVB0AWSxNHLhB5+9J4mEX3PQHvJKATw9N02+A1o6CzbVSlRScL+Vvw4fEzSikpl
+	Ar+zsj31zbD3D8pmx1BOjkGhR27phYPcPmg5VPaBym1oM8z2jNl5tRBaCzSEBBKeFseFry
+	cllGgnhW1ZjimKFdazfcL24xB0XWJE/p0ext0rfJE3JAPM06bwiaJOyBbVXewadjWe/xwk
+	pCmfiIrcTavpUHqLfiguFM7YV/WI8W9/qJe/FGcWsa2fYLeJkyaFrnrc8r+T2w==
+Date: Fri, 12 Apr 2024 15:16:48 +0200
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Antoine Tenart <atenart@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
+ <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
+ <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, Herve Codina
+ <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+ =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Marek =?UTF-8?B?QmVow7pu?=
+ <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
+ Oleksij Rempel <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
+ <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
+ mwojtas@chromium.org, Nathan Chancellor <nathan@kernel.org>
+Subject: Re: [PATCH net-next] net: phy: phy_link_topology: Handle NULL
+ topologies
+Message-ID: <20240412151648.653d41be@device-28.home>
+In-Reply-To: <171292699033.4917.4025686054785818967@kwain>
+References: <20240412104615.3779632-1-maxime.chevallier@bootlin.com>
+	<171292699033.4917.4025686054785818967@kwain>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: phy: phy_link_topology: Handle NULL
- topologies
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?Q?K=C3=B6ry_Maincent?= <kory.maincent@bootlin.com>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
- <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>,
- =?UTF-8?Q?Nicol=C3=B2_Veronese?= <nicveronese@gmail.com>,
- Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
- Nathan Chancellor <nathan@kernel.org>
-References: <20240412104615.3779632-1-maxime.chevallier@bootlin.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <20240412104615.3779632-1-maxime.chevallier@bootlin.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-On 12.04.2024 12:46, Maxime Chevallier wrote:
-> In situations where phylib is a module, the topology can be NULL as it's
-> not initialized at netdev creation.
-> 
+Hi Antoine,
 
-What we see here is a bigger drawback of IS_REACHABLE(). For phylib it's
-false from net core, but true from r8169 driver. So topo_create is a stub,
-but topo_add is not. IS_REACHABLE() hides dependencies.
+On Fri, 12 Apr 2024 15:03:10 +0200
+Antoine Tenart <atenart@kernel.org> wrote:
 
-topo_create et al don't really use something from phylib.
-Therefore, could/should it be moved to net core?
-At least for topo_create this would resolve the dependency.
+> Hi Maxime,
+> 
+> Quoting Maxime Chevallier (2024-04-12 12:46:14)
+> > 
+> > This patch fixes a commit that is in net-next, hence the net-next tag and the
+> > lack of "Fixes" tag.  
+> 
+> You can use Fixes: on net-next, that still helps to identify which
+> commit is being fixed (eg. for reviews, while looking at the history,
+> etc).
 
-We could also add a config symbol and the PHY topology an optional
-extension of net core.
+Won't the tag become invalid when the commit gets merged into an -rc
+release then ?
 
-> Allow passing a NULL topology pointer to phy_link_topo helpers.
 > 
-> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> Closes: https://lore.kernel.org/netdev/2e11b89d-100f-49e7-9c9a-834cc0b82f97@gmail.com/
-> Closes: https://lore.kernel.org/netdev/20240409201553.GA4124869@dev-arch.thelio-3990X/
-> ---
+> > diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
+> > index 985941c5c558..0f3973f07fac 100644
+> > --- a/drivers/net/phy/phy_link_topology.c
+> > +++ b/drivers/net/phy/phy_link_topology.c
+> > @@ -42,6 +42,9 @@ int phy_link_topo_add_phy(struct phy_link_topology *topo,
+> >         struct phy_device_node *pdn;
+> >         int ret;
+> >  
+> > +       if (!topo)
+> > +               return 0;
+> > +  
 > 
-> Hi,
+> With that phy_sfp_connect_phy does not need to check the topo validity
+> before calling phy_link_topo_add_phy. The other way around is fine too.
 > 
-> This patch fixes a commit that is in net-next, hence the net-next tag and the
-> lack of "Fixes" tag.
+> > @@ -93,7 +96,12 @@ EXPORT_SYMBOL_GPL(phy_link_topo_add_phy);
+> >  void phy_link_topo_del_phy(struct phy_link_topology *topo,
+> >                            struct phy_device *phy)
+> >  {
+> > -       struct phy_device_node *pdn = xa_erase(&topo->phys, phy->phyindex);
+> > +       struct phy_device_node *pdn;
+> > +
+> > +       if (!topo)
+> > +               return;
+> > +
+> > +       pdn = xa_erase(&topo->phys, phy->phyindex);  
 > 
-> Nathan, Heiner, can you confirm this solves what you're seeing ?
+> Same here with phy_sfp_disconnect_phy.
+
+Ah right, well spotted, thanks !
+
+Maxime
+
 > 
-> I think we can improve on this solution by moving the topology init at
-> the first PHY insertion and clearing it at netdev destruction.
-> 
-> Maxime
-> 
->  drivers/net/phy/phy_link_topology.c | 10 +++++++++-
->  include/linux/phy_link_topology.h   |  7 ++++++-
->  2 files changed, 15 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/phy/phy_link_topology.c b/drivers/net/phy/phy_link_topology.c
-> index 985941c5c558..0f3973f07fac 100644
-> --- a/drivers/net/phy/phy_link_topology.c
-> +++ b/drivers/net/phy/phy_link_topology.c
-> @@ -42,6 +42,9 @@ int phy_link_topo_add_phy(struct phy_link_topology *topo,
->  	struct phy_device_node *pdn;
->  	int ret;
->  
-> +	if (!topo)
-> +		return 0;
-> +
->  	pdn = kzalloc(sizeof(*pdn), GFP_KERNEL);
->  	if (!pdn)
->  		return -ENOMEM;
-> @@ -93,7 +96,12 @@ EXPORT_SYMBOL_GPL(phy_link_topo_add_phy);
->  void phy_link_topo_del_phy(struct phy_link_topology *topo,
->  			   struct phy_device *phy)
->  {
-> -	struct phy_device_node *pdn = xa_erase(&topo->phys, phy->phyindex);
-> +	struct phy_device_node *pdn;
-> +
-> +	if (!topo)
-> +		return;
-> +
-> +	pdn = xa_erase(&topo->phys, phy->phyindex);
->  
->  	/* We delete the PHY from the topology, however we don't re-set the
->  	 * phy->phyindex field. If the PHY isn't gone, we can re-assign it the
-> diff --git a/include/linux/phy_link_topology.h b/include/linux/phy_link_topology.h
-> index 6b79feb607e7..21ca78127d0f 100644
-> --- a/include/linux/phy_link_topology.h
-> +++ b/include/linux/phy_link_topology.h
-> @@ -40,7 +40,12 @@ struct phy_link_topology {
->  static inline struct phy_device *
->  phy_link_topo_get_phy(struct phy_link_topology *topo, u32 phyindex)
->  {
-> -	struct phy_device_node *pdn = xa_load(&topo->phys, phyindex);
-> +	struct phy_device_node *pdn;
-> +
-> +	if (!topo)
-> +		return NULL;
-> +
-> +	pdn = xa_load(&topo->phys, phyindex);
->  
->  	if (pdn)
->  		return pdn->phy;
+> Thanks!
+> Antoine
 
 
