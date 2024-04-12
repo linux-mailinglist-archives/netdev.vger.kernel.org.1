@@ -1,265 +1,315 @@
-Return-Path: <netdev+bounces-87456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D56498A3293
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 17:36:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0805F8A3297
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 17:37:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 639091F25AA9
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:36:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE9F8283A3E
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:37:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FF2D1482F0;
-	Fri, 12 Apr 2024 15:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42A1F1487C9;
+	Fri, 12 Apr 2024 15:37:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CqG4KtYz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gBaBKL4M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937B61487E4
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 15:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613C2148313;
+	Fri, 12 Apr 2024 15:37:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712936192; cv=none; b=Z8PT/mC+BUMJW354ML7Mit7QyKXVQd7UBetbHaTULDiPviTAQV4z6pPTt/6yi4936bZu5c4M4jkRb7nVqRLwW9rAjXfZTMsJQAJPilqIK4j6i1UIxv9j1nTzL3F/CgxqiQffq8Iq10/DWqvDLLs/gn21Ap0ZeMJtZd4HHWi0JkY=
+	t=1712936254; cv=none; b=n5Z6nIhnOqToQlIKZBzDBKaPXY/WulqOp0BCjpRh2wWh/6DqF39TIm8QdogjecBIBJ1rZKOdN05hJOzMW8/pTS1IgsgJq3jUkqzZ1Rn5ds597GS7A33EQGDP9Uj4tTJ7dlM7K7SZ9UDcm2c68NoAbh/TZqN4kG2hCLxxGijpcV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712936192; c=relaxed/simple;
-	bh=p/g0mPRsHl0wBu7q1bDxx1/4gIIYZYrG29KsauoNnQU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=FlwrQu5MmVaEeu5xAHQTO4wfmVNWjC72lhm+6LEJPgaAtMplFv0k+r89XKZ7tq+MlA2deh5fyyrEr5KRhXLdxKTcg28XNjoHhSuuobVVs6O+JhgZTmP/cvBDU1qjhTBrAbvvswgO9iu5mrXHAXRDcnOi52LqADO5235y5qEx6r0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CqG4KtYz; arc=none smtp.client-ip=209.85.222.180
+	s=arc-20240116; t=1712936254; c=relaxed/simple;
+	bh=+7fKYNlmPI9WeSK+ldwp0Cz+Dd4sgTRgXiJcDst6jp4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=P3etTUvAeJOh0k24FmSFzEpDg4YzMGrO/Eyb0KYIDmWpWg7+je+lCRUFyJSdYrEeq5QaNcxYUzqpS6xMNuxXPY9pz/ayd4b7DL4cdqAGMz7PDpEBU5WL2nlznkxp8uxOabjbp3B9QkDoobS0nXqBgnBbE4cAgw9aMEr6IQfzvPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gBaBKL4M; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-78d61a716ddso65634085a.3
-        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 08:36:30 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-41551639550so7040715e9.2;
+        Fri, 12 Apr 2024 08:37:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712936189; x=1713540989; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4KssNzYoh6yejpI5S71OKxgR3WEkceco+D11r0+S34A=;
-        b=CqG4KtYzL65/PBlAwwQTpv1yCyrhuCSaSZNh9u4+3YYXL7KK+vgk64IJA+7sfyHHrc
-         JOnJeCOYZ/zSoYFpaIk5fOWQRDQVNY2T+dpLFwj0EJtv5AG8IAt5PRqaaO2dz3S8KaR3
-         0aduCfbOT7RxHTrBXsDF40tNyi7qqZqW613SpJdo0CEeI7fIZfQZ7SIif7NWVk1HDKMB
-         B9pQAHPwNLwytAFtgQcIrJZjhrUuivNlhJveL9OGSbs6j4ygToR9QyFQyNUiUO+rATTy
-         8RcEOx0Q96cjH4G2m/+kANA5GcJ2L/vXhUYTzXGUPAG2uxBCiGsG3/o840M3+Dvo/oJe
-         A6Yg==
+        d=gmail.com; s=20230601; t=1712936251; x=1713541051; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to:subject
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/mSTJukRV5R6k9ti3FdjI+Mbv4tcOvhs2ESXqRNG4Ew=;
+        b=gBaBKL4MTLq5RjTSzt/99o7XsVDO4RM94YNsF82o7jngeh5dtc5V2FH/cLr7ujS3nN
+         lcxGVV4eavXosTeGORql6wxt6CShmhRKeU+3AJFXwOX/1X++whq0GCMOoPsk7YS46Szb
+         /F8a5QLlv7RN06+PjD0kOPcLb7etmZNpz+cpjeIjKChBbiLoy5bJv86MUTZzaXB/bcxb
+         nr3hIDIVHQmoRu6bn3+QA18U/08m+Xv0tyUs4bfgX0bRPNP/QxO7kVzxZcjbRr0CIKPu
+         QG6MLmlE9axWgF6lKYJIWVJct7+IIi2sRswZ5tofQX7tYrb3uMucxXfJ1D52bPxhRkeP
+         X2lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712936189; x=1713540989;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=4KssNzYoh6yejpI5S71OKxgR3WEkceco+D11r0+S34A=;
-        b=G5/D1H+sB3C1Jjr9a/NYDuYerRxNFVBvgu5KIjsDHiQxY0YneBKMhFEN+Ly2yAcl2M
-         aISISsfILmDjA7y+svB6CgkZwwtsww/U8hffwFOwMbdRPj00piNiATtiQvC9YQJzZzIB
-         of5DuJElodV6N2OahTRGB0ErL8e5qBEZoGSZeD1EU7aibp/u8MMWoZBnNcnEMl3uqWUn
-         gePWmRFUN2+yabj+GPaXlbORYwkiDo15W3pj8/e3LMvtlUgWgvi6nrMMxxJ+4nFUA7o/
-         evqXFNtUKyJh2wMsX7x6z3zotBpfy/7fD881utY1oM/Kbg96coQmUybE7F5NbBm1VrUx
-         YB0A==
-X-Gm-Message-State: AOJu0Yzwnx36YWKGWLM99nniNbU7F+xodmSa8FC++OWTsjpgi98fzj19
-	TOTiCwOdCv924hsuFU9hdXm5pndol+O9XMi0E6UaAfP3vCUm0sMr
-X-Google-Smtp-Source: AGHT+IF7gNeVPUl3XqXQ/3nsiRcv4d8DoKPJm1sBLcv1ZOcUf8XOkojqBkJj3hebxUT3GyGtZr2m+g==
-X-Received: by 2002:a05:620a:1710:b0:78c:c56b:f63a with SMTP id az16-20020a05620a171000b0078cc56bf63amr3666103qkb.13.1712936189474;
-        Fri, 12 Apr 2024 08:36:29 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id vv10-20020a05620a562a00b0078d6c4b0b3bsm2534976qkn.26.2024.04.12.08.36.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 08:36:29 -0700 (PDT)
-Date: Fri, 12 Apr 2024 11:36:28 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Zijian Zhang <zijianzhang@bytedance.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- cong.wang@bytedance.com, 
- xiaochun.lu@bytedance.com
-Message-ID: <661954fce5f33_38e2532949f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <0ac5752d-0b36-436a-9c37-13e262334dce@bytedance.com>
-References: <20240409205300.1346681-1-zijianzhang@bytedance.com>
- <20240409205300.1346681-3-zijianzhang@bytedance.com>
- <6615b264894a0_24a51429432@willemb.c.googlers.com.notmuch>
- <CANn89iLTiq-29ceiQHc2Mi4na+kRb9K-MA1hGMn=G0ek6-mfjQ@mail.gmail.com>
- <0c6fc173-45c4-463f-bc0e-9fed8c3efc02@bytedance.com>
- <66171b8b595b_2d123b29472@willemb.c.googlers.com.notmuch>
- <0ac5752d-0b36-436a-9c37-13e262334dce@bytedance.com>
-Subject: Re: [External] Re: [PATCH net-next 2/3] selftests: fix OOM problem in
- msg_zerocopy selftest
+        d=1e100.net; s=20230601; t=1712936251; x=1713541051;
+        h=content-transfer-encoding:in-reply-to:from:references:to:subject
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/mSTJukRV5R6k9ti3FdjI+Mbv4tcOvhs2ESXqRNG4Ew=;
+        b=o5Lw82O2ThwyG0ApiGUCFaKIRDED3sMlCihbJDxBDGBrAoS6NmKLp1ZdIDwxbmiLNP
+         CBQydAH519u3OtsnBDt4UzgFFZONjgqem3Rk+v2fWUsoUS1V7Z7H2bKnkawIg14XN3cX
+         E4PRMZmlzjm5l7A07ec0LTVQK0AREdJnOBFoisqqm0E/oRnsB0qT1v2VnfVt6VA6CzXt
+         uZDHVHsFaXzY+ZVVWWaCANJcrt55bx6Lsc3LoEBsOb0XrqRH9mwQEd0Xgs1etKeXzkUd
+         AJTlSOj1GECvNL0K8iRCOvOf57++IoNzzJa0LCY+1dbC5w+UXcimVScewbW5poRPMw5/
+         4msw==
+X-Forwarded-Encrypted: i=1; AJvYcCXDJ+h0mCBSZ3VRPpiYPynWY3Wuzo1VSfM8ePuppkOXhogjtmldc38vfySzZxwT+CbTE7pyHsYdSigw3r8ED30aagi0Fb5nGUx1BocdfgDsJ8wzQP1RTNDMBt+SS/KaqfmFQLLAqVz9ftCvtGhnEblFnmVLz0WWXOH4KV926gQP/dEFGGub
+X-Gm-Message-State: AOJu0YwUJJTnvgX0yoN244HLqIJMZr/V9j1D2VLJMlCjEltIOlihPAxW
+	V3zqYz2pXOy6ffYcyvnE+pViiNMnZgkrgaywJNouFjZmPuRVuA5e
+X-Google-Smtp-Source: AGHT+IHfsW2Il9Sg+5tGryzaRwgxRLoX8Bbx+QxmPWEescPaU3kWBH9MgIk1GmjYzz6y/1nbCnVO2Q==
+X-Received: by 2002:a05:600c:468a:b0:414:90c3:f5be with SMTP id p10-20020a05600c468a00b0041490c3f5bemr2337530wmo.36.1712936250533;
+        Fri, 12 Apr 2024 08:37:30 -0700 (PDT)
+Received: from debian ([146.70.204.204])
+        by smtp.gmail.com with ESMTPSA id j7-20020a05600c190700b00416b035c2d8sm9301955wmq.3.2024.04.12.08.37.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Apr 2024 08:37:30 -0700 (PDT)
+Message-ID: <e07ddcbb-2a4e-4f0e-80c0-b9baa2a4c80d@gmail.com>
+Date: Fri, 12 Apr 2024 17:37:16 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Subject: Re: [PATCH net-next v6 5/6] net: gro: move L3 flush checks to
+ tcp_gro_receive and udp_gro_receive_segment
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
+ dsahern@kernel.org, aduyck@mirantis.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20240410153423.107381-1-richardbgobert@gmail.com>
+ <20240410153423.107381-6-richardbgobert@gmail.com>
+ <66174ec5bbd29_2d6bc629481@willemb.c.googlers.com.notmuch>
+ <24daf0f8-1e81-4bdb-81f3-0f95bf4392f4@gmail.com>
+ <6618578fc34fa_36e52529429@willemb.c.googlers.com.notmuch>
+From: Richard Gobert <richardbgobert@gmail.com>
+In-Reply-To: <6618578fc34fa_36e52529429@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Zijian Zhang wrote:
-> On 4/10/24 4:06 PM, Willem de Bruijn wrote:
-> >>>>> In this case, for some reason, notifications do not
-> >>>>> come in order now. We introduce "cfg_notification_order_check" to
-> >>>>> possibly ignore the checking for order.
-> >>>>
-> >>>> Were you testing UDP?
-> >>>>
-> >>>> I don't think this is needed. I wonder what you were doing to see
-> >>>> enough of these events to want to suppress the log output.
-> >>
-> >> I tested again on both TCP and UDP just now, and it happened to both of
-> >> them. For tcp test, too many printfs will delay the sending and thus
-> >> affect the throughput.
-> >>
-> >> ipv4 tcp -z -t 1
-> >> gap: 277..277 does not append to 276
-> > 
-> > There is something wrong here. 277 clearly appends to 276
-> > 
+Willem de Bruijn wrote:
+> Richard Gobert wrote:
+>> Willem de Bruijn wrote:
+>>> Richard Gobert wrote:
+>>>> {inet,ipv6}_gro_receive functions perform flush checks (ttl, flags,
+>>>> iph->id, ...) against all packets in a loop. These flush checks are used
+>>>> currently only in tcp flows in GRO.
+>>>>
+>>>> These checks need to be done only once in tcp_gro_receive and only against
+>>>> the found p skb, since they only affect flush and not same_flow.
+>>>
+>>> I don't quite understand where the performance improvements arise.
+>>> As inet_gro_receive will skip any p that does not match:
+>>>
+>>>       if (!NAPI_GRO_CB(p)->same_flow)
+>>>               continue;
+>>>
+>>>       iph2 = (struct iphdr *)(p->data + off);
+>>>       /* The above works because, with the exception of the top
+>>>        * (inner most) layer, we only aggregate pkts with the same
+>>>        * hdr length so all the hdrs we'll need to verify will start
+>>>        * at the same offset.
+>>>        */
+>>>       if ((iph->protocol ^ iph2->protocol) |
+>>>           ((__force u32)iph->saddr ^ (__force u32)iph2->saddr) |
+>>>           ((__force u32)iph->daddr ^ (__force u32)iph2->daddr)) {
+>>>               NAPI_GRO_CB(p)->same_flow = 0;
+>>>               continue;
+>>>       }
+>>>
+>>> So these checks are already only performed against a p that matches.
+>>>  
+>>
+>>
+>> Thanks for the review!
+>>
+>> flush/flush_id is calculated for all other p with same_flow = 1 (which is
+>> not always determined to be 0 before inet_gro_receive) and same src/dst
+>> addr in the bucket. Moving it to udp_gro_receive_segment/tcp_gro_receive
+>> will make it run only once when a matching p is found.
 > 
-> ```
-> if (lo != next_completion)
->      fprintf(stderr, "gap: %u..%u does not append to %u\n",
->          lo, hi, next_completion);
-> ```
+> So this optimization is for flows that are the same up to having the
+> same saddr/daddr. Aside from stress tests, it seems rare to have many
+> concurrent flows between the same pair of machines?
 > 
-> According to the code, it expects the lo to be 276, but it's 277.
 
-Ack. I should have phrased that message better.
+Yes exactly, sorry if I wasn't clear enough earlier. Multiple connections
+with the same srcaddr+dstaddr are not necessarily rare (e.g. devices behind
+a large NAT network all connecting to the same servers, thus sharing the
+same IP srcaddr).
+
+>>
+>> In addition, UDP flows where skb_gro_receive_list is called -
+>> flush/flush_id is not relevant and does not need to be calculated. 
+> 
+> That makes sense
+> 
+
+I ran a UDP forwarding benchmark similar to how I did in the commit
+message. GRO's flush/flush_id values were not relevant as all packets
+reached skb_gro_receive_list instead of skb_gro_receive.
+
+These numbers show CPU utilization under the same load (64 concurrent
+IP/UDP connections):
+
+net-next:
+        3.03%  [kernel]  [k] inet_gro_receive
+
+patch applied:
+        2.78%  [kernel]  [k] inet_gro_receive
+
+And under encapsulated load, 64 concurrent IP/IP/UDP connections:
+net-next:
+        10.50%  [kernel]  [k] inet_gro_receive
+
+patch applied:
+        8.19%  [kernel]  [k] inet_gro_receive
+
+Total time spent in GRO reduced significantly due to fewer opcodes and
+branches in inet_gro_receive :)
+
+>> In these
+>> cases total CPU time in GRO should drop. I could post perf numbers for
+>> this flow as well.
+>>
+>>
+>>>> Leveraging the previous commit in the series, in which correct network
+>>>> header offsets are saved for both outer and inner network headers -
+>>>> allowing these checks to be done only once, in tcp_gro_receive. As a
+>>>
+>>> Comments should be updated to reflect both TCP and L4 UDP. Can
+>>> generalize to transport callbacks.
+>>>
+>>>> result, NAPI_GRO_CB(p)->flush is not used at all. In addition, flush_id
+>>>> checks are more declarative and contained in inet_gro_flush, thus removing
+>>>> the need for flush_id in napi_gro_cb.
+>>>>
+>>>> This results in less parsing code for UDP flows and non-loop flush tests
+>>>> for TCP flows.
+>>>
+>>> This moves network layer tests out of the network layer callbacks into
+>>> helpers called from the transport layer callback. And then the helper
+>>> has to look up the network layer header and demultiplex the protocol
+>>> again:
+>>>
+>>>     +		if (((struct iphdr *)nh)->version == 6)
+>>>     +			flush |= ipv6_gro_flush(nh, nh2);
+>>>     +		else
+>>>     +			flush |= inet_gro_flush(nh, nh2, p, i != encap_mark);
+>>>
+>>> That just seems a bit roundabout.
+>>
+>> IMO this commit could be a part of a larger change, where all
+>> loops in gro_list_prepare, inet_gro_receive and ipv6_gro_receive can be
+>> removed, and the logic for finding a matching p will be moved to L4.  This
+>> means that when p is found, the rest of the gro_list would not need to be
+>> traversed and thus would not even dirty cache lines at all. I can provide a
+>> code snippet which would explain it better.
+> 
+> These loops are exactly the mechanism to find a matching p. Though
+> with all the callbacks perhaps not the most efficient model. The
+> hashtable should have solved much of that.
+> 
+> Yes, please share a snippet to understand how you would replace this.
+> 
+
+This is still a rough idea, and I still think the current patch is
+significant by itself due to its performance gains and more readable code.
+
+The idea is that an skb from gro_list will be loaded to cache only when GRO
+is trying to find out if it matches the current skb, avoiding the current
+multiple list traversals design in GRO for IP-TCP.
+
+For a simple IP-TCP packet, gro_list_prapare will not be called from
+dev_gro_receive anymore:
+
+@@ -450,8 +489,6 @@ static enum gro_result dev_gro_receive(struct napi_struct *napi, struct sk_buff
+        if (netif_elide_gro(skb->dev))
+                goto normal;
  
-> > If you ran this on a kernel with a variety of changes, please repeat
-> > this on a clean kernel with no other changes besides the
-> > skb_orphan_frags_rx loopback change.
-> > 
-> > It this is a real issue, I don't mind moving this behind cfg_verbose.
-> > And prefer that approach over adding a new flag.
-> > 
-> > But I have never seen this before, and this kind of reordering is rare
-> > with UDP and should not happen with TCP except for really edge cases:
-> > the uarg is released only when both the skb was delivered and the ACK
-> > response was received to free the clone on the retransmit queue.
-> 
-> I found the set up where I encountered the OOM problem in msg_zerocopy
-> selftest. I did it on a clean kernel vm booted by qemu, 
-> dfa2f0483360("tcp: get rid of sysctl_tcp_adv_win_scale") with only
-> skb_orphan_frags_rx change.
-> 
-> Then, I do `make olddefconfig` and turn on some configurations for
-> virtualization like VIRTIO_FS, VIRTIO_NET and some confs like 9P_FS
-> to share folders. Let's call it config, here was the result I got,
-> ```
-> ./msg_zerocopy.sh
-> ipv4 tcp -z -t 1
-> ./msg_zerocopy: send: No buffer space available
-> rx=564 (70 MB)
-> ```
-> 
-> Since the TCP socket is always writable, the do_poll always return True.
-> There is no any chance for `do_recv_completions` to run.
-> ```
-> while (!do_poll(fd, POLLOUT)) {
->      if (cfg_zerocopy)
->          do_recv_completions(fd, domain);
->      }
-> ```
-> Finally, the size of sendmsg zerocopy notification skbs exceeds the 
-> opt_mem limit. I got "No buffer space available".
-> 
-> 
-> However, if I change the config by
-> ```
->   DEBUG_IRQFLAGS n -> y
->   DEBUG_LOCK_ALLOC n -> y
->   DEBUG_MUTEXES n -> y
->   DEBUG_RT_MUTEXES n -> y
->   DEBUG_RWSEMS n -> y
->   DEBUG_SPINLOCK n -> y
->   DEBUG_WW_MUTEX_SLOWPATH n -> y
->   PROVE_LOCKING n -> y
-> +DEBUG_LOCKDEP y
-> +LOCKDEP y
-> +LOCKDEP_BITS 15
-> +LOCKDEP_CHAINS_BITS 16
-> +LOCKDEP_CIRCULAR_QUEUE_BITS 12
-> +LOCKDEP_STACK_TRACE_BITS 19
-> +LOCKDEP_STACK_TRACE_HASH_BITS 14
-> +PREEMPTIRQ_TRACEPOINTS y
-> +PROVE_RAW_LOCK_NESTING n
-> +PROVE_RCU y
-> +TRACE_IRQFLAGS y
-> +TRACE_IRQFLAGS_NMI y
-> ```
-> 
-> Let's call it config-debug, the selftest works well with reordered
-> notifications.
-> ```
-> ipv4 tcp -z -t 1
-> gap: 2117..2117 does not append to 2115
-> gap: 2115..2116 does not append to 2118
-> gap: 2118..3144 does not append to 2117
-> gap: 3146..3146 does not append to 3145
-> gap: 3145..3145 does not append to 3147
-> gap: 3147..3768 does not append to 3146
-> ...
-> gap: 34935..34935 does not append to 34937
-> gap: 34938..36409 does not append to 34936
-> 
-> rx=36097 (2272 MB)
-> missing notifications: 36410 < 36412
-> tx=36412 (2272 MB) txc=36410 zc=y
-> ```
-> For exact config to compile the kernel, please see
-> https://github.com/Sm0ckingBird/config
+-       gro_list_prepare(&gro_list->list, skb);
 
-Thanks for sharing the system configs. I'm quite surprised at these
-reorderings *over loopback* with these debug settings, and no weird
-qdiscs that would explain it. Can you see whether you see drops and
-retransmits?
+The matching loop from inet_gro_receive is removed as well:
 
-> 
-> I also did selftest on 63c8778d9149("Merge branch 
-> 'net-mana-fix-doorbell-access-for-receive-queues'"), the parent of 
-> dfa2f0483360("tcp: get rid of sysctl_tcp_adv_win_scale")
-> 
-> with config, selftest works well.
-> ```
-> ipv4 tcp -z -t 1
-> missing notifications: 223181 < 223188
-> tx=223188 (13927 MB) txc=223181 zc=y
-> rx=111592 (13927 MB)
-> ```
-> 
-> with config-debug, selftest works well with reordered notifications
-> ```
-> ipv4 tcp -z -t 1
-> ...
-> gap: 30397..30404 does not append to 30389
-> gap: 30435..30442 does not append to 30427
-> gap: 30427..30434 does not append to 30443
-> gap: 30443..30450 does not append to 30435
-> gap: 30473..30480 does not append to 30465
-> gap: 30465..30472 does not append to 30481
-> gap: 30481..30488 does not append to 30473
-> tx=30491 (1902 MB) txc=30491 zc=y
-> rx=15245 (1902 MB)
-> ```
-> 
-> Not sure about the exact reason for this OOM problem, and why
-> turning on DEBUG_LOCKDEP and PROVE_RAW_LOCK_NESTING can solve
-> the problem with reordered notifications...
+@@ -1507,27 +1506,6 @@ struct sk_buff *inet_gro_receive(struct list_head *head, struct sk_buff *skb)
+ 
+        NAPI_GRO_CB(skb)->proto = proto;
+        flush = (u16)((ntohl(*(__be32 *)iph) ^ skb_gro_len(skb)) | (ntohl(*(__be32 *)&iph->id) & ~IP_DF));
+-
+-       list_for_each_entry(p, head, list) {
+-               struct iphdr *iph2;
+-
+-               if (!NAPI_GRO_CB(p)->same_flow)
+-                       continue;
+-
+-               iph2 = (struct iphdr *)(p->data + off);
+-               /* The above works because, with the exception of the top
+-                * (inner most) layer, we only aggregate pkts with the same
+-                * hdr length so all the hdrs we'll need to verify will start
+-                * at the same offset.
+-                */
+-               if ((iph->protocol ^ iph2->protocol) |
+-                   ((__force u32)iph->saddr ^ (__force u32)iph2->saddr) |
+-                   ((__force u32)iph->daddr ^ (__force u32)iph2->daddr)) {
+-                       NAPI_GRO_CB(p)->same_flow = 0;
+-                       continue;
+-               }
+-       }
+-
 
-The debug config causes the reordering notifications, right? But
-solves the OOM.
+and change tcp_gro_receive such that p is retrieved from gro_list using a new function:
 
-> If you have any thoughts or
-> comments, please feel free to share them with us.
-> 
-> If the problem does exist, I guess we can force `do_recv_completions`
-> after some number of sendmsgs and move "gap: ..." after cfg_verbose?
+--- a/net/ipv4/tcp_offload.c
++++ b/net/ipv4/tcp_offload.c
+@@ -215,24 +215,12 @@ struct sk_buff *tcp_gro_receive(struct list_head *head, struct sk_buff *skb)
+        len = skb_gro_len(skb);
+        flags = tcp_flag_word(th);
+ 
+-       list_for_each_entry(p, head, list) {
+-               if (!NAPI_GRO_CB(p)->same_flow)
+-                       continue;
+-
+-               th2 = tcp_hdr(p);
+-
+-               if (*(u32 *)&th->source ^ *(u32 *)&th2->source) {
+-                       NAPI_GRO_CB(p)->same_flow = 0;
+-                       continue;
+-               }
++       if (!(p = gro_list_find(head, skb, &flush)))
++               goto out_check_final;
+ 
+-               goto found;
+-       }
+-       p = NULL;
+-       goto out_check_final;
++       th2 = tcp_hdr(p);
+ 
+-found:
+-       flush = (__force int)(flags & TCP_FLAG_CWR);
++       flush |= (__force int)(flags & TCP_FLAG_CWR);
+        flush |= (__force int)((flags ^ tcp_flag_word(th2)) &
+                  ~(TCP_FLAG_CWR | TCP_FLAG_FIN | TCP_FLAG_PSH));
+        flush |= (__force int)(th->ack_seq ^ th2->ack_seq);
 
-I do want to understand the issue better. But not sure when I'll find
-the time.
 
-Both sound reasonable to me, yes.
+The first time gro_list is traversed is in tcp_gro_receive.  gro_list_find
+is very similar to gro_list_prepare - but it also matches L3 & L4 (UDP and
+TCP port offsets are identical), and it returns L3 flush value as well.
+
+The main difference between the current design and what I propose is that
+once a matched p is found - there's no need to keep traversing the rest of
+gro_list (as opposed to gro_list_prepare and inet_gro_receive for example),
+and that's why certain checks are saved especially under load.  This way
+less data is loaded to cache overall for every skb entering dev_gro_receive.
+
+> In the meantime, I do suggest sending the first two patches to net,
+> as they have Fixes tags. And then follow up with this for net-next
+> separately.
+
+Just submitted the first two commits to net.
+Thanks.
 
