@@ -1,469 +1,687 @@
-Return-Path: <netdev+bounces-87517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7A928A3603
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 20:52:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBF378A3609
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 20:53:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E7FD282D99
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 18:52:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49F3F1F22DF6
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 18:53:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D2DB14F9E8;
-	Fri, 12 Apr 2024 18:51:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 014DF14F124;
+	Fri, 12 Apr 2024 18:53:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mefzGNWD"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="QZ1Z/NMC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAAE14F119
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 18:51:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A32901373;
+	Fri, 12 Apr 2024 18:53:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712947907; cv=none; b=GaPNsGIrBSzlzb0Ae5y6nuWUjL0RU/sxDHwRnzXwWRt/evmnbagwg1R0fjL3QskcHoKdUwzL5eEnBFcR1gQO9malacL1N6XnYUG5kHTeQt95y2WGsKIlWaDu3trJeXFbxYBhAWj599wgJsV2X3oYA9STsRNhETaSwrhrQ1+MYG0=
+	t=1712947996; cv=none; b=HktXYVRnXpmnrOZYC4QJ+FcsDxDPktdVa1dBISwgeCiiuTymYjLB7SyZSBmUAI4/PoIKlfrU89buyj5hYHKtQeK4cH4rZBpFDa9KqPKg2p35LBb2Esa8auhBx2eOOBjYFvaqCHC+1syggx+RjjYP4lF1Ylk6dHXMT1x9HcjV9SE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712947907; c=relaxed/simple;
-	bh=IjzF9EddhClC6e0fFw59kdNwCknxPdY3D4BtyEFNaCQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nzGL0kBDsIzHsJpe4Poptek2jlIuv5dDxmc1RUhjOWOtNRkDyYRwmlKIQk4yyCmH3wK8/OsXo3IbdIH3OyL1ar0cauzoZjy0PEc2dhh6wsLFZGVWllwmEwu1jvNeECiEHHmHtAqGMg7+M+FQmMa3ECOoP8wq1pIv83Ywgo9Rros=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mefzGNWD; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712947905; x=1744483905;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=IjzF9EddhClC6e0fFw59kdNwCknxPdY3D4BtyEFNaCQ=;
-  b=mefzGNWDB7dH+oMJd1Dh4hIhRF0nADNu+RPl8LIekUePOAiPY81aQvan
-   b48tk/v5+rty8takDM4Owxy8RwJrmXwAN8XSMgI5YI40cxrLjPOP/DHvZ
-   AUVOUJnNKRMTTxnX+Or97N8XBIjZjYOoFcRTk20xiN9cOGwKaV6lkd0xk
-   hrycdnWVVwqYCxYHluEzJoldaQwZ4+n9ERVXM9TD4GExECsONbX2Rtf4V
-   DZZZm8jMrRNKJnL/hD1E5StJpt3zVLDakQAn6pkHgsag33yw3LUy8OI6X
-   IE1ZkTIZGhOOis0MLkTr2z6ViP5fyJJTFz1PTDKyTUSoixQhtKzgMWM7B
-   g==;
-X-CSE-ConnectionGUID: dNNhKa31RoqheVx9EiDk9g==
-X-CSE-MsgGUID: gZbFxk5uTLqyaskrZoWo4g==
-X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="8333643"
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="8333643"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 11:51:42 -0700
-X-CSE-ConnectionGUID: JFZTiI5+RpmSTkicVcc9VA==
-X-CSE-MsgGUID: wwTOxkRXR0CEafvreEPL3Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="26108567"
-Received: from c3-1-server.sj.intel.com ([10.232.18.246])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 11:51:42 -0700
-From: Anil Samal <anil.samal@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	jesse.brandeburg@intel.com,
-	leszek.pepiak@intel.com,
-	jacob.e.keller@intel.com,
-	przemyslaw.kitszel@intel.com,
-	lukasz.czapnik@intel.com,
-	Anil Samal <anil.samal@intel.com>
-Subject: [PATCH iwl-next 4/4] ice: Implement driver functionality to dump serdes  equalizer values
-Date: Fri, 12 Apr 2024 11:49:20 -0700
-Message-ID: <20240412185135.297368-5-anil.samal@intel.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240412185135.297368-1-anil.samal@intel.com>
-References: <20240412185135.297368-1-anil.samal@intel.com>
+	s=arc-20240116; t=1712947996; c=relaxed/simple;
+	bh=rXg6nyoABh1agJGbUuVsVRFpG6ePTJbGO3v5BBmZy/M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=tieQz00N+DdPN4Aq0hB9BUOjAf5ulGJar/3Xl6NXk+I4UvTDD4GT6bMiRliplwBq11rRjifkcJmX0Kx7y+7kG0y7LnTuf35zyiDBLMZFKX2BoKMlW2vj2EkEDcefqG0VFSfowv7MsWEC+2SK+x37yJrUug60MoYBE1wZ91ykvjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=QZ1Z/NMC; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43CIqftD024370;
+	Fri, 12 Apr 2024 13:52:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1712947961;
+	bh=fkZrxZui6GejcFsraHF/1YZdntXULlwaQ+e3RTMRtys=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=QZ1Z/NMCV3MnNz3ZdzN9dJNs0bHTz06dSpNp1SrXmXNj5tM7f0C79gJGKx/jui2Kv
+	 o82OBfQ6UGuqIOgAL+jm+Lo2vgckSxIwUx0GnGoybvQumQnn/h7Hr9uyy5p2VUvPw8
+	 yEWLiwCiXr5usmrHJQYFKbVw04SUoO0yUUl3Ehis=
+Received: from DLEE111.ent.ti.com (dlee111.ent.ti.com [157.170.170.22])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43CIqfnl046972
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 12 Apr 2024 13:52:41 -0500
+Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE111.ent.ti.com
+ (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 12
+ Apr 2024 13:52:40 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 12 Apr 2024 13:52:40 -0500
+Received: from [10.249.42.149] ([10.249.42.149])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43CIqdDg041574;
+	Fri, 12 Apr 2024 13:52:39 -0500
+Message-ID: <cb13da4a-13c9-409a-a813-0ac852062163@ti.com>
+Date: Fri, 12 Apr 2024 13:52:39 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add support for
+ ICSSG switch firmware
+To: MD Danish Anwar <danishanwar@ti.com>, Diogo Ivo <diogo.ivo@siemens.com>,
+        Rob Herring <robh@kernel.org>,
+        Dan Carpenter <dan.carpenter@linaro.org>,
+        Jan
+ Kiszka <jan.kiszka@siemens.com>, Simon Horman <horms@kernel.org>,
+        Andrew Lunn
+	<andrew@lunn.ch>,
+        Wolfram Sang <wsa+renesas@sang-engineering.com>,
+        Arnd
+ Bergmann <arnd@arndb.de>, Vignesh Raghavendra <vigneshr@ti.com>,
+        Vladimir
+ Oltean <vladimir.oltean@nxp.com>,
+        Roger Quadros <rogerq@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>,
+        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
+	<edumazet@google.com>,
+        "David S. Miller" <davem@davemloft.net>
+CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
+References: <20240327114054.1907278-1-danishanwar@ti.com>
+ <20240327114054.1907278-4-danishanwar@ti.com>
+Content-Language: en-US
+From: Andrew Davis <afd@ti.com>
+In-Reply-To: <20240327114054.1907278-4-danishanwar@ti.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-To debug link issues in the field, serdes Tx/Rx equalizer values
-help to determine the health of serdes lane.
+On 3/27/24 6:40 AM, MD Danish Anwar wrote:
+> Add support for ICSSG switch firmware using existing Dual EMAC driver
+> with switchdev.
+> 
+> Limitations:
+> VLAN offloading is limited to 0-256 IDs.
+> MDB/FDB static entries are limited to 511 entries and different FDBs can
+> hash to same bucket and thus may not completely offloaded
+> 
+> Switch mode requires loading of new firmware into ICSSG cores. This
+> means interfaces have to taken down and then reconfigured to switch
+> mode.
+> 
+> Example assuming ETH1 and ETH2 as ICSSG2 interfaces:
+> 
+> Switch to ICSSG Switch mode:
+>   ip link set dev eth1 down
+>   ip link set dev eth2 down
+>   ip link add name br0 type bridge
+>   ip link set dev eth1 master br0
+>   ip link set dev eth2 master br0
+>   ip link set dev br0 up
+>   ip link set dev eth1 up
+>   ip link set dev eth2 up
+>   bridge vlan add dev br0 vid 1 pvid untagged self
+> 
+> Going back to Dual EMAC mode:
+> 
+>   ip link set dev br0 down
+>   ip link set dev eth1 nomaster
+>   ip link set dev eth2 nomaster
+>   ip link set dev eth1 down
+>   ip link set dev eth2 down
+>   ip link del name br0 type bridge
+>   ip link set dev eth1 up
+>   ip link set dev eth2 up
+> 
+> By default, Dual EMAC firmware is loaded, and can be changed to switch
+> mode by above steps
+> 
 
-Extend 'ethtool -d' option to dump serdes Tx/Rx equalizer.
-The following list of equalizer param is supported
-a. rx_equalization_pre2
-b. rx_equalization_pre1
-c. rx_equalization_post1
-d. rx_equalization_bflf
-e. rx_equalization_bfhf
-f. rx_equalization_drate
-g. tx_equalization_pre1
-h. tx_equalization_pre3
-i. tx_equalization_atten
-j. tx_equalization_post1
-k. tx_equalization_pre2
+This was asked before, maybe I missed the answer, but why do we
+default to Dual-EMAC firmware? I remember when I was working on
+the original ICSS-ETH driver, we started with the Dual-EMAC
+firmware as the switch firmware was not ready yet (and EMAC mode
+was easier). Now that we have both available, if we just use Switch
+firmwar by default, what would we lose? Seems that would solve
+the issues with re-loading firmware at runtime (configuration loss
+and dropping packets, etc..).
 
-Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Signed-off-by: Anil Samal <anil.samal@intel.com>
----
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  51 ++++++
- drivers/net/ethernet/intel/ice/ice_common.c   |  40 +++++
- drivers/net/ethernet/intel/ice/ice_common.h   |   2 +
- drivers/net/ethernet/intel/ice/ice_ethtool.c  | 157 +++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_ethtool.h  |  19 +++
- 5 files changed, 267 insertions(+), 2 deletions(-)
+Andrew
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index e76c388b9905..92d96c85d924 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -1460,6 +1460,55 @@ struct ice_aqc_get_sensor_reading_resp {
- 	} data;
- };
- 
-+/* DNL call command (indirect 0x0682)
-+ * Struct is used for both command and response
-+ */
-+struct ice_aqc_dnl_call_command {
-+	u8 ctx; /* Used in command, reserved in response */
-+	u8 reserved;
-+	__le16 activity_id;
-+#define ICE_AQC_ACT_ID_DNL 0x1129
-+	__le32 reserved1;
-+	__le32 addr_high;
-+	__le32 addr_low;
-+};
-+
-+struct ice_aqc_dnl_equa_param {
-+	__le16 data_in;
-+#define ICE_AQC_RX_EQU_SHIFT 8
-+#define ICE_AQC_RX_EQU_PRE2 (0x10 << ICE_AQC_RX_EQU_SHIFT)
-+#define ICE_AQC_RX_EQU_PRE1 (0x11 << ICE_AQC_RX_EQU_SHIFT)
-+#define ICE_AQC_RX_EQU_POST1 (0x12 << ICE_AQC_RX_EQU_SHIFT)
-+#define ICE_AQC_RX_EQU_BFLF (0x13 << ICE_AQC_RX_EQU_SHIFT)
-+#define ICE_AQC_RX_EQU_BFHF (0x14 << ICE_AQC_RX_EQU_SHIFT)
-+#define ICE_AQC_RX_EQU_DRATE (0x15 << ICE_AQC_RX_EQU_SHIFT)
-+#define ICE_AQC_TX_EQU_PRE1 0x0
-+#define ICE_AQC_TX_EQU_PRE3 0x3
-+#define ICE_AQC_TX_EQU_ATTEN 0x4
-+#define ICE_AQC_TX_EQU_POST1 0x8
-+#define ICE_AQC_TX_EQU_PRE2 0xC
-+	__le16 op_code_serdes_sel;
-+#define ICE_AQC_OP_CODE_SHIFT 4
-+#define ICE_AQC_OP_CODE_RX_EQU (0x9 << ICE_AQC_OP_CODE_SHIFT)
-+#define ICE_AQC_OP_CODE_TX_EQU (0x10 << ICE_AQC_OP_CODE_SHIFT)
-+	__le32 reserved[3];
-+};
-+
-+struct ice_aqc_dnl_equa_respon {
-+	/* Equalization value can be negative */
-+	int val;
-+	__le32 reserved[3];
-+};
-+
-+/* DNL call command/response buffer (indirect 0x0682) */
-+struct ice_aqc_dnl_call {
-+	union {
-+		struct ice_aqc_dnl_equa_param txrx_equa_reqs;
-+		__le32 stores[4];
-+		struct ice_aqc_dnl_equa_respon txrx_equa_resp;
-+	} sto;
-+};
-+
- struct ice_aqc_link_topo_params {
- 	u8 lport_num;
- 	u8 lport_num_valid;
-@@ -2563,6 +2612,7 @@ struct ice_aq_desc {
- 		struct ice_aqc_get_link_status get_link_status;
- 		struct ice_aqc_event_lan_overflow lan_overflow;
- 		struct ice_aqc_get_link_topo get_link_topo;
-+		struct ice_aqc_dnl_call_command dnl_call;
- 		struct ice_aqc_i2c read_write_i2c;
- 		struct ice_aqc_read_i2c_resp read_i2c_resp;
- 		struct ice_aqc_get_set_tx_topo get_set_tx_topo;
-@@ -2687,6 +2737,7 @@ enum ice_adminq_opc {
- 	ice_aqc_opc_set_phy_rec_clk_out			= 0x0630,
- 	ice_aqc_opc_get_phy_rec_clk_out			= 0x0631,
- 	ice_aqc_opc_get_sensor_reading			= 0x0632,
-+	ice_aqc_opc_dnl_call                            = 0x0682,
- 	ice_aqc_opc_get_link_topo			= 0x06E0,
- 	ice_aqc_opc_read_i2c				= 0x06E2,
- 	ice_aqc_opc_write_i2c				= 0x06E3,
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index 1a00efb1e51d..c361470b9009 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -3299,6 +3299,46 @@ int ice_update_link_info(struct ice_port_info *pi)
- 	return status;
- }
- 
-+/**
-+ * ice_aq_get_phy_equalization - function to read serdes equaliser
-+ * value from firmware using admin queue command.
-+ * @hw: pointer to the HW struct
-+ * @data_in: represents the serdes equalization parameter requested
-+ * @op_code: represents the serdes number and flag to represent tx or rx
-+ * @serdes_num: represents the serdes number
-+ * @output: pointer to the caller-supplied buffer to return serdes equaliser
-+ *
-+ * Returns non-zero status on error and 0 on success.
-+ */
-+int ice_aq_get_phy_equalization(struct ice_hw *hw, u16 data_in, u16 op_code,
-+				u8 serdes_num, int *output)
-+{
-+	struct ice_aqc_dnl_call_command *cmd;
-+	struct ice_aqc_dnl_call buf = {};
-+	struct ice_aq_desc desc;
-+	int err = 0;
-+
-+	if (!hw || !output)
-+		return -EINVAL;
-+
-+	buf.sto.txrx_equa_reqs.data_in = cpu_to_le16(data_in);
-+	buf.sto.txrx_equa_reqs.op_code_serdes_sel =
-+		cpu_to_le16(op_code | (serdes_num & 0xF));
-+	cmd = &desc.params.dnl_call;
-+	ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_dnl_call);
-+	desc.flags |= cpu_to_le16(ICE_AQ_FLAG_BUF |
-+				  ICE_AQ_FLAG_RD |
-+				  ICE_AQ_FLAG_SI);
-+	desc.datalen = cpu_to_le16(sizeof(struct ice_aqc_dnl_call));
-+	cmd->activity_id = cpu_to_le16(ICE_AQC_ACT_ID_DNL);
-+
-+	err = ice_aq_send_cmd(hw, &desc, &buf, sizeof(struct ice_aqc_dnl_call),
-+			      NULL);
-+	*output = err ? 0 : buf.sto.txrx_equa_resp.val;
-+
-+	return err;
-+}
-+
- #define FEC_REG_PORT(port) {	\
- 	FEC_CORR_LOW_REG_PORT##port,		\
- 	FEC_CORR_HIGH_REG_PORT##port,	\
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index 6b888efce593..f4cff37e895a 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.h
-+++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -142,6 +142,8 @@ int
- ice_get_link_default_override(struct ice_link_default_override_tlv *ldo,
- 			      struct ice_port_info *pi);
- bool ice_is_phy_caps_an_enabled(struct ice_aqc_get_phy_caps_data *caps);
-+int ice_aq_get_phy_equalization(struct ice_hw *hw, u16 data_in, u16 op_code,
-+				u8 serdes_num, int *output);
- int
- ice_aq_get_fec_stats(struct ice_hw *hw, u16 pcs_quad, u16 pcs_port,
- 		     enum ice_fec_stats_types fec_type, u32 *output);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index 732e402ed419..bdfe105f26e3 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -463,7 +463,8 @@ ice_get_drvinfo(struct net_device *netdev, struct ethtool_drvinfo *drvinfo)
- 
- static int ice_get_regs_len(struct net_device __always_unused *netdev)
- {
--	return sizeof(ice_regs_dump_list);
-+	return (sizeof(ice_regs_dump_list) +
-+		sizeof(struct ice_regdump_to_ethtool));
- }
- 
- /**
-@@ -731,6 +732,156 @@ static int ice_get_port_topology(struct ice_hw *hw, u8 lport,
- 	return 0;
- }
- 
-+/**
-+ * ice_get_tx_rx_equa - read serdes tx rx equaliser param
-+ * @hw: pointer to the HW struct
-+ * @serdes_num: represents the serdes number
-+ * @ptr: structure to read all serdes parameter for given serdes
-+ * returns all serdes equalization parameter supported per serdes number
-+ */
-+static int ice_get_tx_rx_equa(struct ice_hw *hw, u8 serdes_num,
-+			      struct ice_serdes_equalization_to_ethtool *ptr)
-+{
-+	int err;
-+
-+	if (!ptr)
-+		return -EOPNOTSUPP;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_TX_EQU_PRE1,
-+					  ICE_AQC_OP_CODE_TX_EQU, serdes_num,
-+					  &ptr->tx_equalization_pre1);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_TX_EQU_PRE3,
-+					  ICE_AQC_OP_CODE_TX_EQU, serdes_num,
-+					  &ptr->tx_equalization_pre3);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_TX_EQU_ATTEN,
-+					  ICE_AQC_OP_CODE_TX_EQU, serdes_num,
-+					  &ptr->tx_equalization_atten);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_TX_EQU_POST1,
-+					  ICE_AQC_OP_CODE_TX_EQU, serdes_num,
-+					  &ptr->tx_equalization_post1);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_TX_EQU_PRE2,
-+					  ICE_AQC_OP_CODE_TX_EQU, serdes_num,
-+					  &ptr->tx_equalization_pre2);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_PRE2,
-+					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
-+					  &ptr->rx_equalization_pre2);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_PRE1,
-+					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
-+					  &ptr->rx_equalization_pre1);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_POST1,
-+					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
-+					  &ptr->rx_equalization_post1);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_BFLF,
-+					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
-+					  &ptr->rx_equalization_bflf);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_BFHF,
-+					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
-+					  &ptr->rx_equalization_bfhf);
-+	if (err)
-+		return err;
-+
-+	err = ice_aq_get_phy_equalization(hw, ICE_AQC_RX_EQU_DRATE,
-+					  ICE_AQC_OP_CODE_RX_EQU, serdes_num,
-+					  &ptr->rx_equalization_drate);
-+	if (err)
-+		return err;
-+
-+	return 0;
-+}
-+
-+/**
-+ * ice_get_extended_regs - returns FEC correctable, uncorrectable stats per
-+ *                         pcsquad, pcsport
-+ * @netdev: pointer to net device structure
-+ * @p: output buffer to fill requested register dump
-+ *
-+ * Returns error/success
-+ */
-+static int ice_get_extended_regs(struct net_device *netdev, void *p)
-+{
-+	struct ice_regdump_to_ethtool *ice_prv_regs_buf;
-+	struct ice_netdev_priv *np = netdev_priv(netdev);
-+	struct ice_port_topology port_topology = {};
-+	struct ice_port_info *pi;
-+	struct ice_pf *pf;
-+	struct ice_hw *hw;
-+	unsigned int i;
-+	int err;
-+
-+	pf = np->vsi->back;
-+	hw = &pf->hw;
-+	pi = np->vsi->port_info;
-+
-+	if (!pi) {
-+		netdev_info(netdev, "Port info structure is null\n");
-+		return -EINVAL;
-+	}
-+
-+	/* Serdes parameters are not supported if not the PF VSI */
-+	if (np->vsi->type != ICE_VSI_PF) {
-+		netdev_info(netdev, "Supported VSI type PF : failed\n");
-+		return -EINVAL;
-+	}
-+
-+	err = ice_get_port_topology(hw, pi->lport, &port_topology);
-+	if (err) {
-+		netdev_info(netdev, "Extended register dump failed Lport %d\n",
-+			    pi->lport);
-+		return -EINVAL;
-+	}
-+
-+	if (port_topology.serdes_lane_count > 4) {
-+		netdev_info(netdev, "Extended register dump failed:  Lport %d Serdes count %d\n",
-+			    pi->lport, port_topology.serdes_lane_count);
-+		return -EINVAL;
-+	}
-+
-+	ice_prv_regs_buf = p;
-+
-+	/* Get serdes equalization parameter for available serdes */
-+	for (i = 0; i < port_topology.serdes_lane_count; i++) {
-+		u8 serdes_num = 0;
-+
-+		serdes_num = port_topology.primary_serdes_lane + i;
-+		err = ice_get_tx_rx_equa(hw, serdes_num,
-+					 &ice_prv_regs_buf->equalization[i]);
-+		if (err) {
-+			netdev_info(netdev, "Lport:Serd %d:%d equa get err:%d",
-+				    pi->lport, serdes_num, err);
-+			return -EINVAL;
-+		}
-+	}
-+
-+	return 0;
-+}
-+
- static void
- ice_get_regs(struct net_device *netdev, struct ethtool_regs *regs, void *p)
- {
-@@ -740,10 +891,12 @@ ice_get_regs(struct net_device *netdev, struct ethtool_regs *regs, void *p)
- 	u32 *regs_buf = (u32 *)p;
- 	unsigned int i;
- 
--	regs->version = 1;
-+	regs->version = 2;
- 
- 	for (i = 0; i < ARRAY_SIZE(ice_regs_dump_list); ++i)
- 		regs_buf[i] = rd32(hw, ice_regs_dump_list[i]);
-+
-+	ice_get_extended_regs(netdev, (void *)&regs_buf[i]);
- }
- 
- static u32 ice_get_msglevel(struct net_device *netdev)
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.h b/drivers/net/ethernet/intel/ice/ice_ethtool.h
-index ffc8ad180e61..9acccae38625 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.h
-@@ -9,6 +9,25 @@ struct ice_phy_type_to_ethtool {
- 	u8 link_mode;
- };
- 
-+struct ice_serdes_equalization_to_ethtool {
-+	int rx_equalization_pre2;
-+	int rx_equalization_pre1;
-+	int rx_equalization_post1;
-+	int rx_equalization_bflf;
-+	int rx_equalization_bfhf;
-+	int rx_equalization_drate;
-+	int tx_equalization_pre1;
-+	int tx_equalization_pre3;
-+	int tx_equalization_atten;
-+	int tx_equalization_post1;
-+	int tx_equalization_pre2;
-+};
-+
-+struct ice_regdump_to_ethtool {
-+	/* A multilane port can have max 4 serdes */
-+	struct ice_serdes_equalization_to_ethtool equalization[4];
-+};
-+
- /* Port topology from lport i.e.
-  * serdes mapping, pcsquad, macport, cage etc...
-  */
--- 
-2.44.0
-
+> Signed-off-by: MD Danish Anwar <danishanwar@ti.com>
+> ---
+>   drivers/net/ethernet/ti/Kconfig              |   1 +
+>   drivers/net/ethernet/ti/Makefile             |   3 +-
+>   drivers/net/ethernet/ti/icssg/icssg_config.c | 136 +++++++++++--
+>   drivers/net/ethernet/ti/icssg/icssg_config.h |   7 +
+>   drivers/net/ethernet/ti/icssg/icssg_prueth.c | 198 ++++++++++++++++++-
+>   5 files changed, 332 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
+> index 1530d13984d4..9b5f5f680b35 100644
+> --- a/drivers/net/ethernet/ti/Kconfig
+> +++ b/drivers/net/ethernet/ti/Kconfig
+> @@ -188,6 +188,7 @@ config TI_ICSSG_PRUETH
+>   	select TI_ICSS_IEP
+>   	select TI_K3_CPPI_DESC_POOL
+>   	depends on PRU_REMOTEPROC
+> +	depends on NET_SWITCHDEV
+>   	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
+>   	depends on PTP_1588_CLOCK_OPTIONAL
+>   	help
+> diff --git a/drivers/net/ethernet/ti/Makefile b/drivers/net/ethernet/ti/Makefile
+> index d8590304f3df..d295bded7a32 100644
+> --- a/drivers/net/ethernet/ti/Makefile
+> +++ b/drivers/net/ethernet/ti/Makefile
+> @@ -38,5 +38,6 @@ icssg-prueth-y := icssg/icssg_prueth.o \
+>   		  icssg/icssg_config.o \
+>   		  icssg/icssg_mii_cfg.o \
+>   		  icssg/icssg_stats.o \
+> -		  icssg/icssg_ethtool.o
+> +		  icssg/icssg_ethtool.o \
+> +		  icssg/icssg_switchdev.o
+>   obj-$(CONFIG_TI_ICSS_IEP) += icssg/icss_iep.o
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.c b/drivers/net/ethernet/ti/icssg/icssg_config.c
+> index 970e6ef9ba64..5b2064d1b03b 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_config.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.c
+> @@ -105,28 +105,49 @@ static const struct map hwq_map[2][ICSSG_NUM_OTHER_QUEUES] = {
+>   	},
+>   };
+>   
+> +static void icssg_config_mii_init_switch(struct prueth_emac *emac)
+> +{
+> +	struct prueth *prueth = emac->prueth;
+> +	int mii = prueth_emac_slice(emac);
+> +	u32 txcfg_reg, pcnt_reg, txcfg;
+> +	struct regmap *mii_rt;
+> +
+> +	mii_rt = prueth->mii_rt;
+> +
+> +	txcfg_reg = (mii == ICSS_MII0) ? PRUSS_MII_RT_TXCFG0 :
+> +				       PRUSS_MII_RT_TXCFG1;
+> +	pcnt_reg = (mii == ICSS_MII0) ? PRUSS_MII_RT_RX_PCNT0 :
+> +				       PRUSS_MII_RT_RX_PCNT1;
+> +
+> +	txcfg = PRUSS_MII_RT_TXCFG_TX_ENABLE |
+> +		PRUSS_MII_RT_TXCFG_TX_AUTO_PREAMBLE |
+> +		PRUSS_MII_RT_TXCFG_TX_IPG_WIRE_CLK_EN;
+> +
+> +	if (emac->phy_if == PHY_INTERFACE_MODE_MII && mii == ICSS_MII1)
+> +		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
+> +	else if (emac->phy_if != PHY_INTERFACE_MODE_MII && mii == ICSS_MII0)
+> +		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
+> +
+> +	regmap_write(mii_rt, txcfg_reg, txcfg);
+> +	regmap_write(mii_rt, pcnt_reg, 0x1);
+> +}
+> +
+>   static void icssg_config_mii_init(struct prueth_emac *emac)
+>   {
+> -	u32 rxcfg, txcfg, rxcfg_reg, txcfg_reg, pcnt_reg;
+>   	struct prueth *prueth = emac->prueth;
+>   	int slice = prueth_emac_slice(emac);
+> +	u32 txcfg, txcfg_reg, pcnt_reg;
+>   	struct regmap *mii_rt;
+>   
+>   	mii_rt = prueth->mii_rt;
+>   
+> -	rxcfg_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_RXCFG0 :
+> -				       PRUSS_MII_RT_RXCFG1;
+>   	txcfg_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_TXCFG0 :
+>   				       PRUSS_MII_RT_TXCFG1;
+>   	pcnt_reg = (slice == ICSS_MII0) ? PRUSS_MII_RT_RX_PCNT0 :
+>   				       PRUSS_MII_RT_RX_PCNT1;
+>   
+> -	rxcfg = MII_RXCFG_DEFAULT;
+>   	txcfg = MII_TXCFG_DEFAULT;
+>   
+> -	if (slice == ICSS_MII1)
+> -		rxcfg |= PRUSS_MII_RT_RXCFG_RX_MUX_SEL;
+> -
+>   	/* In MII mode TX lines swapped inside ICSSG, so TX_MUX_SEL cfg need
+>   	 * to be swapped also comparing to RGMII mode.
+>   	 */
+> @@ -135,7 +156,6 @@ static void icssg_config_mii_init(struct prueth_emac *emac)
+>   	else if (emac->phy_if != PHY_INTERFACE_MODE_MII && slice == ICSS_MII1)
+>   		txcfg |= PRUSS_MII_RT_TXCFG_TX_MUX_SEL;
+>   
+> -	regmap_write(mii_rt, rxcfg_reg, rxcfg);
+>   	regmap_write(mii_rt, txcfg_reg, txcfg);
+>   	regmap_write(mii_rt, pcnt_reg, 0x1);
+>   }
+> @@ -249,6 +269,66 @@ static int emac_r30_is_done(struct prueth_emac *emac)
+>   	return 1;
+>   }
+>   
+> +static int prueth_switch_buffer_setup(struct prueth_emac *emac)
+> +{
+> +	struct icssg_buffer_pool_cfg __iomem *bpool_cfg;
+> +	struct icssg_rxq_ctx __iomem *rxq_ctx;
+> +	struct prueth *prueth = emac->prueth;
+> +	int slice = prueth_emac_slice(emac);
+> +	u32 addr;
+> +	int i;
+> +
+> +	addr = lower_32_bits(prueth->msmcram.pa);
+> +	if (slice)
+> +		addr += PRUETH_NUM_BUF_POOLS * PRUETH_EMAC_BUF_POOL_SIZE;
+> +
+> +	if (addr % SZ_64K) {
+> +		dev_warn(prueth->dev, "buffer pool needs to be 64KB aligned\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	bpool_cfg = emac->dram.va + BUFFER_POOL_0_ADDR_OFFSET;
+> +	/* workaround for f/w bug. bpool 0 needs to be initilalized */
+> +	for (i = 0; i <  PRUETH_NUM_BUF_POOLS; i++) {
+> +		writel(addr, &bpool_cfg[i].addr);
+> +		writel(PRUETH_EMAC_BUF_POOL_SIZE, &bpool_cfg[i].len);
+> +		addr += PRUETH_EMAC_BUF_POOL_SIZE;
+> +	}
+> +
+> +	if (!slice)
+> +		addr += PRUETH_NUM_BUF_POOLS * PRUETH_EMAC_BUF_POOL_SIZE;
+> +	else
+> +		addr += PRUETH_SW_NUM_BUF_POOLS_HOST * PRUETH_SW_BUF_POOL_SIZE_HOST;
+> +
+> +	for (i = PRUETH_NUM_BUF_POOLS;
+> +	     i < 2 * PRUETH_SW_NUM_BUF_POOLS_HOST + PRUETH_NUM_BUF_POOLS;
+> +	     i++) {
+> +		/* The driver only uses first 4 queues per PRU so only initialize them */
+> +		if (i % PRUETH_SW_NUM_BUF_POOLS_HOST < PRUETH_SW_NUM_BUF_POOLS_PER_PRU) {
+> +			writel(addr, &bpool_cfg[i].addr);
+> +			writel(PRUETH_SW_BUF_POOL_SIZE_HOST, &bpool_cfg[i].len);
+> +			addr += PRUETH_SW_BUF_POOL_SIZE_HOST;
+> +		} else {
+> +			writel(0, &bpool_cfg[i].addr);
+> +			writel(0, &bpool_cfg[i].len);
+> +		}
+> +	}
+> +
+> +	if (!slice)
+> +		addr += PRUETH_SW_NUM_BUF_POOLS_HOST * PRUETH_SW_BUF_POOL_SIZE_HOST;
+> +	else
+> +		addr += PRUETH_EMAC_RX_CTX_BUF_SIZE;
+> +
+> +	rxq_ctx = emac->dram.va + HOST_RX_Q_PRE_CONTEXT_OFFSET;
+> +	for (i = 0; i < 3; i++)
+> +		writel(addr, &rxq_ctx->start[i]);
+> +
+> +	addr += PRUETH_EMAC_RX_CTX_BUF_SIZE;
+> +	writel(addr - SZ_2K, &rxq_ctx->end);
+> +
+> +	return 0;
+> +}
+> +
+>   static int prueth_emac_buffer_setup(struct prueth_emac *emac)
+>   {
+>   	struct icssg_buffer_pool_cfg __iomem *bpool_cfg;
+> @@ -325,13 +405,41 @@ static void icssg_init_emac_mode(struct prueth *prueth)
+>   	icssg_class_set_host_mac_addr(prueth->miig_rt, mac);
+>   }
+>   
+> +static void icssg_init_switch_mode(struct prueth *prueth)
+> +{
+> +	u32 addr = prueth->shram.pa + EMAC_ICSSG_SWITCH_DEFAULT_VLAN_TABLE_OFFSET;
+> +	int i;
+> +
+> +	if (prueth->emacs_initialized)
+> +		return;
+> +
+> +	/* Set VLAN TABLE address base */
+> +	regmap_update_bits(prueth->miig_rt, FDB_GEN_CFG1, SMEM_VLAN_OFFSET_MASK,
+> +			   addr <<  SMEM_VLAN_OFFSET);
+> +	/* Set enable VLAN aware mode, and FDBs for all PRUs */
+> +	regmap_write(prueth->miig_rt, FDB_GEN_CFG2, FDB_EN_ALL);
+> +	prueth->vlan_tbl = (struct prueth_vlan_tbl __force *)(prueth->shram.va +
+> +			    EMAC_ICSSG_SWITCH_DEFAULT_VLAN_TABLE_OFFSET);
+> +	for (i = 0; i < SZ_4K - 1; i++) {
+> +		prueth->vlan_tbl[i].fid = i;
+> +		prueth->vlan_tbl[i].fid_c1 = 0;
+> +	}
+> +
+> +	if (prueth->hw_bridge_dev)
+> +		icssg_class_set_host_mac_addr(prueth->miig_rt, prueth->hw_bridge_dev->dev_addr);
+> +	icssg_set_pvid(prueth, prueth->default_vlan, PRUETH_PORT_HOST);
+> +}
+> +
+>   int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
+>   {
+>   	void __iomem *config = emac->dram.va + ICSSG_CONFIG_OFFSET;
+>   	struct icssg_flow_cfg __iomem *flow_cfg;
+>   	int ret;
+>   
+> -	icssg_init_emac_mode(prueth);
+> +	if (prueth->is_switch_mode)
+> +		icssg_init_switch_mode(prueth);
+> +	else
+> +		icssg_init_emac_mode(prueth);
+>   
+>   	memset_io(config, 0, TAS_GATE_MASK_LIST0);
+>   	icssg_miig_queues_init(prueth, slice);
+> @@ -345,7 +453,10 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
+>   	regmap_update_bits(prueth->miig_rt, ICSSG_CFG_OFFSET,
+>   			   ICSSG_CFG_DEFAULT, ICSSG_CFG_DEFAULT);
+>   	icssg_miig_set_interface_mode(prueth->miig_rt, slice, emac->phy_if);
+> -	icssg_config_mii_init(emac);
+> +	if (prueth->is_switch_mode)
+> +		icssg_config_mii_init_switch(emac);
+> +	else
+> +		icssg_config_mii_init(emac);
+>   	icssg_config_ipg(emac);
+>   	icssg_update_rgmii_cfg(prueth->miig_rt, emac);
+>   
+> @@ -368,7 +479,10 @@ int icssg_config(struct prueth *prueth, struct prueth_emac *emac, int slice)
+>   	writeb(0, config + SPL_PKT_DEFAULT_PRIORITY);
+>   	writeb(0, config + QUEUE_NUM_UNTAGGED);
+>   
+> -	ret = prueth_emac_buffer_setup(emac);
+> +	if (prueth->is_switch_mode)
+> +		ret = prueth_switch_buffer_setup(emac);
+> +	else
+> +		ret = prueth_emac_buffer_setup(emac);
+>   	if (ret)
+>   		return ret;
+>   
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_config.h b/drivers/net/ethernet/ti/icssg/icssg_config.h
+> index 0d5d5d253b7a..cc923f1d4387 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_config.h
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_config.h
+> @@ -35,6 +35,13 @@ struct icssg_flow_cfg {
+>   	(2 * (PRUETH_EMAC_BUF_POOL_SIZE * PRUETH_NUM_BUF_POOLS + \
+>   	 PRUETH_EMAC_RX_CTX_BUF_SIZE * 2))
+>   
+> +#define PRUETH_SW_BUF_POOL_SIZE_HOST	SZ_4K
+> +#define PRUETH_SW_NUM_BUF_POOLS_HOST	8
+> +#define PRUETH_SW_NUM_BUF_POOLS_PER_PRU 4
+> +#define MSMC_RAM_SIZE_SWITCH_MODE \
+> +	(MSMC_RAM_SIZE + \
+> +	(2 * PRUETH_SW_BUF_POOL_SIZE_HOST * PRUETH_SW_NUM_BUF_POOLS_HOST))
+> +
+>   #define PRUETH_SWITCH_FDB_MASK ((SIZE_OF_FDB / NUMBER_OF_FDB_BUCKET_ENTRIES) - 1)
+>   
+>   struct icssg_rxq_ctx {
+> diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> index 9168ab3c4b9e..725b5de05e00 100644
+> --- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> +++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
+> @@ -27,6 +27,7 @@
+>   #include <linux/remoteproc/pruss.h>
+>   #include <linux/regmap.h>
+>   #include <linux/remoteproc.h>
+> +#include <net/switchdev.h>
+>   
+>   #include "icssg_prueth.h"
+>   #include "icssg_mii_rt.h"
+> @@ -54,6 +55,10 @@
+>   
+>   #define prueth_napi_to_emac(napi) container_of(napi, struct prueth_emac, napi_rx)
+>   
+> +#define DEFAULT_VID		1
+> +#define DEFAULT_PORT_MASK	1
+> +#define DEFAULT_UNTAG_MASK	1
+> +
+>   /* CTRLMMR_ICSSG_RGMII_CTRL register bits */
+>   #define ICSSG_CTRL_RGMII_ID_MODE                BIT(24)
+>   
+> @@ -558,6 +563,8 @@ static int emac_rx_packet(struct prueth_emac *emac, u32 flow_id)
+>   	} else {
+>   		/* send the filled skb up the n/w stack */
+>   		skb_put(skb, pkt_len);
+> +		if (emac->prueth->is_switch_mode)
+> +			skb->offload_fwd_mark = emac->offload_fwd_mark;
+>   		skb->protocol = eth_type_trans(skb, ndev);
+>   		napi_gro_receive(&emac->napi_rx, skb);
+>   		ndev->stats.rx_bytes += pkt_len;
+> @@ -890,6 +897,19 @@ struct icssg_firmwares {
+>   	char *txpru;
+>   };
+>   
+> +static struct icssg_firmwares icssg_switch_firmwares[] = {
+> +	{
+> +		.pru = "ti-pruss/am65x-sr2-pru0-prusw-fw.elf",
+> +		.rtu = "ti-pruss/am65x-sr2-rtu0-prusw-fw.elf",
+> +		.txpru = "ti-pruss/am65x-sr2-txpru0-prusw-fw.elf",
+> +	},
+> +	{
+> +		.pru = "ti-pruss/am65x-sr2-pru1-prusw-fw.elf",
+> +		.rtu = "ti-pruss/am65x-sr2-rtu1-prusw-fw.elf",
+> +		.txpru = "ti-pruss/am65x-sr2-txpru1-prusw-fw.elf",
+> +	}
+> +};
+> +
+>   static struct icssg_firmwares icssg_emac_firmwares[] = {
+>   	{
+>   		.pru = "ti-pruss/am65x-sr2-pru0-prueth-fw.elf",
+> @@ -909,7 +929,10 @@ static int prueth_emac_start(struct prueth *prueth, struct prueth_emac *emac)
+>   	struct device *dev = prueth->dev;
+>   	int slice, ret;
+>   
+> -	firmwares = icssg_emac_firmwares;
+> +	if (prueth->is_switch_mode)
+> +		firmwares = icssg_switch_firmwares;
+> +	else
+> +		firmwares = icssg_emac_firmwares;
+>   
+>   	slice = prueth_emac_slice(emac);
+>   	if (slice < 0) {
+> @@ -1411,6 +1434,21 @@ static int emac_ndo_open(struct net_device *ndev)
+>   
+>   	queue_work(system_long_wq, &emac->stats_work.work);
+>   
+> +	if (prueth->is_switch_mode) {
+> +		icssg_fdb_add_del(emac, eth_stp_addr, prueth->default_vlan,
+> +				  ICSSG_FDB_ENTRY_P0_MEMBERSHIP |
+> +				  ICSSG_FDB_ENTRY_P1_MEMBERSHIP |
+> +				  ICSSG_FDB_ENTRY_P2_MEMBERSHIP |
+> +				  ICSSG_FDB_ENTRY_BLOCK,
+> +				  true);
+> +		icssg_vtbl_modify(emac, emac->port_vlan | DEFAULT_VID,
+> +				  BIT(emac->port_id) | DEFAULT_PORT_MASK,
+> +				  BIT(emac->port_id) | DEFAULT_UNTAG_MASK,
+> +				  true);
+> +		icssg_set_pvid(emac->prueth, emac->port_vlan, emac->port_id);
+> +		emac_set_port_state(emac, ICSSG_EMAC_PORT_VLAN_AWARE_ENABLE);
+> +	}
+> +
+>   	return 0;
+>   
+>   reset_tx_chan:
+> @@ -1945,6 +1983,148 @@ static void prueth_put_cores(struct prueth *prueth, int slice)
+>   		pru_rproc_put(prueth->pru[slice]);
+>   }
+>   
+> +static void prueth_offload_fwd_mark_update(struct prueth *prueth)
+> +{
+> +	int set_val = 0;
+> +	int i;
+> +
+> +	if (prueth->br_members == (PRUETH_PORT_MII0 | PRUETH_PORT_MII1))
+> +		set_val = 1;
+> +
+> +	dev_dbg(prueth->dev, "set offload_fwd_mark %d\n", set_val);
+> +
+> +	for (i = PRUETH_MAC0; i < PRUETH_NUM_MACS; i++) {
+> +		struct prueth_emac *emac = prueth->emac[i];
+> +
+> +		if (!emac || !emac->ndev)
+> +			continue;
+> +
+> +		emac->offload_fwd_mark = set_val;
+> +	}
+> +}
+> +
+> +bool prueth_dev_check(const struct net_device *ndev)
+> +{
+> +	if (ndev->netdev_ops == &emac_netdev_ops && netif_running(ndev)) {
+> +		struct prueth_emac *emac = netdev_priv(ndev);
+> +
+> +		return emac->prueth->is_switch_mode;
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +static int prueth_netdevice_port_link(struct net_device *ndev,
+> +				      struct net_device *br_ndev,
+> +				      struct netlink_ext_ack *extack)
+> +{
+> +	struct prueth_emac *emac = netdev_priv(ndev);
+> +	struct prueth *prueth = emac->prueth;
+> +	int err;
+> +
+> +	if (!prueth->br_members) {
+> +		prueth->hw_bridge_dev = br_ndev;
+> +	} else {
+> +		/* This is adding the port to a second bridge, this is
+> +		 * unsupported
+> +		 */
+> +		if (prueth->hw_bridge_dev != br_ndev)
+> +			return -EOPNOTSUPP;
+> +	}
+> +
+> +	err = switchdev_bridge_port_offload(br_ndev, ndev, emac,
+> +					    &prueth->prueth_switchdev_nb,
+> +					    &prueth->prueth_switchdev_bl_nb,
+> +					    false, extack);
+> +	if (err)
+> +		return err;
+> +
+> +	prueth->br_members |= BIT(emac->port_id);
+> +
+> +	if (prueth->br_members & BIT(PRUETH_PORT_MII0) &&
+> +	    prueth->br_members & BIT(PRUETH_PORT_MII1)) {
+> +		prueth->is_switch_mode = true;
+> +		prueth->default_vlan = 1;
+> +		emac->port_vlan = prueth->default_vlan;
+> +	}
+> +
+> +	prueth_offload_fwd_mark_update(prueth);
+> +
+> +	return NOTIFY_DONE;
+> +}
+> +
+> +static void prueth_netdevice_port_unlink(struct net_device *ndev)
+> +{
+> +	struct prueth_emac *emac = netdev_priv(ndev);
+> +	struct prueth *prueth = emac->prueth;
+> +
+> +	prueth->br_members &= ~BIT(emac->port_id);
+> +
+> +	prueth->is_switch_mode = false;
+> +	emac->port_vlan = 0;
+> +
+> +	prueth_offload_fwd_mark_update(prueth);
+> +
+> +	if (!prueth->br_members)
+> +		prueth->hw_bridge_dev = NULL;
+> +}
+> +
+> +/* netdev notifier */
+> +static int prueth_netdevice_event(struct notifier_block *unused,
+> +				  unsigned long event, void *ptr)
+> +{
+> +	struct netlink_ext_ack *extack = netdev_notifier_info_to_extack(ptr);
+> +	struct net_device *ndev = netdev_notifier_info_to_dev(ptr);
+> +	struct netdev_notifier_changeupper_info *info;
+> +	int ret = NOTIFY_DONE;
+> +
+> +	if (ndev->netdev_ops != &emac_netdev_ops)
+> +		return NOTIFY_DONE;
+> +
+> +	switch (event) {
+> +	case NETDEV_CHANGEUPPER:
+> +		info = ptr;
+> +
+> +		if (netif_is_bridge_master(info->upper_dev)) {
+> +			if (info->linking)
+> +				ret = prueth_netdevice_port_link(ndev, info->upper_dev, extack);
+> +			else
+> +				prueth_netdevice_port_unlink(ndev);
+> +		}
+> +		break;
+> +	default:
+> +		return NOTIFY_DONE;
+> +	}
+> +
+> +	return notifier_from_errno(ret);
+> +}
+> +
+> +static int prueth_register_notifiers(struct prueth *prueth)
+> +{
+> +	int ret = 0;
+> +
+> +	prueth->prueth_netdevice_nb.notifier_call = &prueth_netdevice_event;
+> +	ret = register_netdevice_notifier(&prueth->prueth_netdevice_nb);
+> +	if (ret) {
+> +		dev_err(prueth->dev, "can't register netdevice notifier\n");
+> +		return ret;
+> +	}
+> +
+> +	ret = prueth_switchdev_register_notifiers(prueth);
+> +	if (ret)
+> +		unregister_netdevice_notifier(&prueth->prueth_netdevice_nb);
+> +
+> +	return ret;
+> +}
+> +
+> +static void prueth_unregister_notifiers(struct prueth *prueth)
+> +{
+> +	prueth_switchdev_unregister_notifiers(prueth);
+> +	unregister_netdevice_notifier(&prueth->prueth_netdevice_nb);
+> +}
+> +
+> +static const struct of_device_id prueth_dt_match[];
+> +
+>   static int prueth_probe(struct platform_device *pdev)
+>   {
+>   	struct device_node *eth_node, *eth_ports_node;
+> @@ -2072,6 +2252,10 @@ static int prueth_probe(struct platform_device *pdev)
+>   	}
+>   
+>   	msmc_ram_size = MSMC_RAM_SIZE;
+> +	prueth->is_switchmode_supported = prueth->pdata.switch_mode;
+> +	if (prueth->is_switchmode_supported)
+> +		msmc_ram_size = MSMC_RAM_SIZE_SWITCH_MODE;
+> +
+>   
+>   	/* NOTE: FW bug needs buffer base to be 64KB aligned */
+>   	prueth->msmcram.va =
+> @@ -2167,6 +2351,14 @@ static int prueth_probe(struct platform_device *pdev)
+>   		phy_attached_info(prueth->emac[PRUETH_MAC1]->ndev->phydev);
+>   	}
+>   
+> +	if (prueth->is_switchmode_supported) {
+> +		ret = prueth_register_notifiers(prueth);
+> +		if (ret)
+> +			goto netdev_unregister;
+> +
+> +		sprintf(prueth->switch_id, "%s", dev_name(dev));
+> +	}
+> +
+>   	dev_info(dev, "TI PRU ethernet driver initialized: %s EMAC mode\n",
+>   		 (!eth0_node || !eth1_node) ? "single" : "dual");
+>   
+> @@ -2236,6 +2428,8 @@ static void prueth_remove(struct platform_device *pdev)
+>   	struct device_node *eth_node;
+>   	int i;
+>   
+> +	prueth_unregister_notifiers(prueth);
+> +
+>   	for (i = 0; i < PRUETH_NUM_MACS; i++) {
+>   		if (!prueth->registered_netdevs[i])
+>   			continue;
+> @@ -2333,10 +2527,12 @@ static const struct dev_pm_ops prueth_dev_pm_ops = {
+>   static const struct prueth_pdata am654_icssg_pdata = {
+>   	.fdqring_mode = K3_RINGACC_RING_MODE_MESSAGE,
+>   	.quirk_10m_link_issue = 1,
+> +	.switch_mode = 1,
+>   };
+>   
+>   static const struct prueth_pdata am64x_icssg_pdata = {
+>   	.fdqring_mode = K3_RINGACC_RING_MODE_RING,
+> +	.switch_mode = 1,
+>   };
+>   
+>   static const struct of_device_id prueth_dt_match[] = {
 
