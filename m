@@ -1,105 +1,86 @@
-Return-Path: <netdev+bounces-87425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 410568A3189
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 16:52:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8A8C8A318A
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 16:52:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7249E1C20EE0
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 14:52:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D867B1C20E80
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 14:52:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07BAA1448E3;
-	Fri, 12 Apr 2024 14:52:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A57F1448E3;
+	Fri, 12 Apr 2024 14:52:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="ABEjoOUi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UamirxC0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4C08615F
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 14:52:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1A58615F
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 14:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712933525; cv=none; b=MvvuF1fzF8/sNRQIHqPWg/zkX23oVauGNys2nyeoIbyg4qCEy8FjzmhbDOA9jI6HewGui9ZgZaWwyLUUKZYomDTfhLSfFyjSyIEwHyTmWCko++U2oif28waj3Gj9CAsER/jW5275OQf3rqgHrMKcoDTTnoKIKyWWBad4EucO3VY=
+	t=1712933541; cv=none; b=tU+nudzgCl9/hTSWVMK+QSA2xj7it5jDSITSA7dUBVkfgo7BsvQOgCw/XzMag8noFK8EAbhPx6ehntAl59WsWUuVVWIneDDx748IB5ics3R42lG78uMevhRv0AxR4fyLuWBdp8BitPsPhgslps7yNvZYMMwcQCPsSHQ15heyTNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712933525; c=relaxed/simple;
-	bh=tC4whiuUBgU0tgUJ07orp7mDp8lk79L9JcinxNXeTkY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bPRNKksCjq/soiky2ogeVtv52O/hGBP96IiCJl/fEgaeMp+PmKccZXW2L+vvICT8UIoJf8LllpQxGc0GeGl70q7ukjXT1LHiO8WkFrlvn9GJ+Z4KV1oUrlMleaWhorgBJXg2zRHdtohPtx1noOMCjTnphHIuKdsDHTSqCm6oCT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=ABEjoOUi; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-36a29832cbdso1444685ab.1
-        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 07:52:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1712933522; x=1713538322; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=s9qBhQRjLa3OV5PgQj8QLd5DVc7ylCIA4CAy8SLusss=;
-        b=ABEjoOUiUIFFDmDL+A9G5GvI1+yER9Mp3Ne9M+902+JAR9hHZbxcVADxsVGEkx1cAx
-         +UaxnBH1Pesr7AA1gTGoYmo1+K2jn7Ni2uhXJFnu2P9z/tdx5r7jcfYI9hSfNAEVyc83
-         3sKoWNGyE6CPTHc5S+CcisQJcvGosrGKMHPlBg/FcOcYtrWZwNMyQvbT71gN9ZvQzphY
-         NE7T4yu0L92TOcqE67sEEM33tWWl7Fhr+k9Sw+z5Q1J9OdFHUSjk+9CAJ1q7Y3IGf2/Z
-         mofPIhFRCZGPE2BHAeeeBTWoCDnn5+mI2u/KUDR9x3x6RSsm+0qqPraFMsOOCOl0CDnE
-         yjoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712933522; x=1713538322;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=s9qBhQRjLa3OV5PgQj8QLd5DVc7ylCIA4CAy8SLusss=;
-        b=LXychCyIvL2xQh9R50NQvws/Y8n4rsgGiq02KhNd/lGuR+M0g8ejyGC4S1k3Q8KRuq
-         UXKzTPUIAbRdtKPOwHcCSDxwjToQOuHz139TPJQujGbzprEwYn5uLZ3xvtghKe4xuKRO
-         9rq8gYMYqydKq9VCkxRqx/uO/DP/MgRouUSUSMzRRpx4rcEitae/c7enaSzrB/VZxJY/
-         NBSATVCV2QiN4zTYiKbifqQwpEyFuKnQUMglApOEpBJSaUvc3P8m48xUnWVXttbAKevc
-         dJHNNPHaRyhpiIFDQ85gecHo0Y3kM9zjE0ZLmoehJ2Aa9sjTxlgUBIDeNDAfojE7uFiA
-         8GCg==
-X-Forwarded-Encrypted: i=1; AJvYcCV5NcA9494+TY7YD2csKgcRcQthuWSWRNKwLpPWGYVQwPOQzYJBYZiYkeLWE8TMWE33seRFLef8s544F53KyFP5f9Ie52CZ
-X-Gm-Message-State: AOJu0YxrWZmeYOFEzYNgE0kiDt0MZfIinSL2uwXwYW+yiQ40+ZCYFx5I
-	Vjnlx+Z6COfeQse8MxTTCupjbhL4tsGGqMH7hcB4v03OI8GqvQaUUVltRJqBskc=
-X-Google-Smtp-Source: AGHT+IHv7DmKcH3TmaX4OpLVohoHfoWGiH79kmDJuc8CsQfWLlOU2k3e6Ksflt+dUU4ChOMbmYIEZw==
-X-Received: by 2002:a92:db46:0:b0:368:974b:f7c7 with SMTP id w6-20020a92db46000000b00368974bf7c7mr2927250ilq.0.1712933522433;
-        Fri, 12 Apr 2024 07:52:02 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id p11-20020a92d28b000000b0036a20dbcb17sm1029237ilp.16.2024.04.12.07.52.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Apr 2024 07:52:01 -0700 (PDT)
-Message-ID: <9b172e19-1292-480f-a72f-6860c2084430@kernel.dk>
-Date: Fri, 12 Apr 2024 08:52:01 -0600
+	s=arc-20240116; t=1712933541; c=relaxed/simple;
+	bh=isE3EC46/XaI3gj53jYxOc4GGgMM47Z+EhFSuza1LVk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m+9rS9FesQSeiCiKENMkrSU8GS+Rg9aqpJLqiM9dZMtXLpgQbYBQAZdsMPm4hDvHW++5Q+PoqU+su2ilh6YoebUCtNQut9SGT8/RkDoFbOZJf/+8WnBQ8zCmIwDuw2x9CVn1ww/xYMEAFuHZg93AQgy6f1osU+VydMU7zcdLbS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UamirxC0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39D30C113CC;
+	Fri, 12 Apr 2024 14:52:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1712933541;
+	bh=isE3EC46/XaI3gj53jYxOc4GGgMM47Z+EhFSuza1LVk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UamirxC0iJy4iFYf+o01I4sAeSYlsLjAbtbCmrdQ4RYlJ1xys0uavSfuRQ6Aj9bsP
+	 k4JU1HMcVzSdk4+7NL6AJFeSZ329NzGgpfNrttdz1vPzU+TXf4TBSFda5keX1Ee4pE
+	 kLi3whsL6wgQsYDS5bUvyyuogdv19NSWUpPO45XLsJqe0Zmc1y4fo0vb0LArpDeeKc
+	 ISIkLglUe2bnzj9voiNLS46ozcsvej5OJfdr/KOhIg6G4BeS7ViW1MixD/UF0Djlz5
+	 Ir9lRqse83u/wo6e1W3tO44Z/hDl3yZUYmfmI1s67BgyTFYJUAOVyhMZE0awHqMtT5
+	 511IZCs+q/T+Q==
+Date: Fri, 12 Apr 2024 07:52:20 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Marek Vasut <marex@denx.de>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Uwe
+ =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?= <u.kleine-koenig@pengutronix.de>, Dmitry
+ Torokhov <dmitry.torokhov@gmail.com>, Eric Dumazet <edumazet@google.com>,
+ Mark Brown <broonie@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Ratheesh
+ Kannoth <rkannoth@marvell.com>, Ronald Wahl <ronald.wahl@raritan.com>,
+ Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net v2 2/2] net: ks8851: Handle softirqs at the end of
+ IRQ thread to fix hang
+Message-ID: <20240412075220.17943537@kernel.org>
+In-Reply-To: <a8e28385-5b92-4149-be0c-cfce6394fbc2@denx.de>
+References: <20240405203204.82062-1-marex@denx.de>
+	<20240405203204.82062-2-marex@denx.de>
+	<ZhQEqizpGMrxe_wT@smile.fi.intel.com>
+	<a8e28385-5b92-4149-be0c-cfce6394fbc2@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 0/6] implement io_uring notification (ubuf_info) stacking
-Content-Language: en-US
-To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-References: <cover.1712923998.git.asml.silence@gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <cover.1712923998.git.asml.silence@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Reviewed the patch set, and I think this is nice and clean and the right
-fix. For the series:
+On Fri, 12 Apr 2024 13:29:04 +0200 Marek Vasut wrote:
+> >> irq_thread_fn from irq_thread
+> >> irq_thread from kthread
+> >> kthread from ret_from_fork  
+> > 
+> > These lines are unneeded (in case you need a new version, you can drop them).  
+> 
+> I just got back and going through a mountain of email, I see Jakub 
+> already picked the V2, so, noted for next time. Thank you !
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
-
-If the net people agree, we'll have to coordinate staging of the first
-two patches.
-
--- 
-Jens Axboe
-
-
+Whether the stack trace is for a hard IRQ or threaded IRQ is the first
+thing I looked for when reviewing. Change is about the calling context. 
+So I figured while not strictly necessary, in this particular case,
+these lines may be helpful for people eyeballing the change...
+In general, yes, trimming the bottom of the stack is good hygiene.
 
