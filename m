@@ -1,409 +1,328 @@
-Return-Path: <netdev+bounces-87358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 305738A2DBB
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:45:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 496258A2DC3
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:51:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46BBA1C2124F
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 11:44:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D44061F238D5
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 11:51:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C0054918;
-	Fri, 12 Apr 2024 11:44:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B27E454FB1;
+	Fri, 12 Apr 2024 11:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HD+bHe43"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="dLEdHmsI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA2C5466B
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 11:44:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712922296; cv=fail; b=ZtBeUzJ3zaly/ZsKLG6BNYxKPVnMa4vdRSVrwEUgPmVFRHAqGUYtO6pD4qv2pwBi14U8Bh6zgiVzNx4gFRTUtG5Dgn9qCgPrzDL+Wc5AY9Mr2vKc2rgAHCq9S2GQV96mighyXhbcIh1F+ljWBe3k9V+8NHNLBSnlQhfkqtZunAM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712922296; c=relaxed/simple;
-	bh=687+ELtQ7t8ynchUe35smfgwoZxHHIAq2YLVd9JFJXI=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=EzIOSptWEFAxLQr+sJnaMWH7RuRtJjaW7C9iFxxU8WXhmFY+MdT47uDCXFJZzcHr+o1RIQJsG6WL56bMa4POar/5+FI3FA0/ZOaL/mb4QI8jRKBim+d3m9xqbcNCmHuGTgwFxoBJqDZ0B1FKqa82hcl2EuJSPYUpjUFI8LEOHR4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HD+bHe43; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712922294; x=1744458294;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=687+ELtQ7t8ynchUe35smfgwoZxHHIAq2YLVd9JFJXI=;
-  b=HD+bHe43qEK6Zwm0YwHiGmX/WY+vYVFQ4Cg4aJzbFnrffdo50wcxv7ra
-   bEwsJDd5W7weAVECrj0gq4MsXaa2i17Trnp7LZZAf54aWeSfaGHyGi8Al
-   q8nrwbnINVvHzWVsMe0IMkOuTayMR9d81aIP8FWU+d7tid26T2wWhIgSU
-   ++LXmhvdTKJOJWsdswI8s7x15k4eEVLS1IZlyqWwnZ4N+DBHLP+ZPSOTT
-   bLKkbpBO3s8ynCJ1uyfi7MTMejDNzvUcBFJzEOyTGBxLFhcIMWu9q0Raz
-   fVMddl7TVrh4Q+LndnTXQAL7lVhKEPEWIxWBbv28A4MDoPpCne87OOTBX
-   w==;
-X-CSE-ConnectionGUID: qNZzhkzuTUOwCGevzeyvWA==
-X-CSE-MsgGUID: mZZDQv/tS3qb8mtJJV3nBw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11041"; a="8291143"
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="8291143"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 04:44:54 -0700
-X-CSE-ConnectionGUID: pp0eKf1qRGy/TrBq/4fzOA==
-X-CSE-MsgGUID: hZFHzl2+RrqJiYuWoxrsQA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="25993740"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 12 Apr 2024 04:44:54 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B4D4087B
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 11:50:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712922657; cv=none; b=WnLDAD46oOK4Fbk6hotDslYVNbmMg7hXn0xTnb3ZwQxDQhwerlGciYu7pw99A+TC0h0rLqCvNI/gf2kk4rEbKCv9/o9lGisL/+IaCvbERAxegRn6m0miLfEHkAgSUqM+J2MYRT0n4TGCIeXK+la7j73q51hWRS7vMlcdALySJOI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712922657; c=relaxed/simple;
+	bh=9EkQQgJmWM5iMG4nyOXCIyhi7eNOjJpk0HyG4+5AUEk=;
+	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ILw5cJrtXh734L2ZcfqbPFkCjH4IaDP/W1SQIZeF6tc8FT+d9VUuUkp7SpEMGFR0Trv6gsXoTacxvap2MXdfpmAb/ruy/TDPG1sGTAs8aDYKu4xHzMj7aFNtSXlKAXj8CoNAOAVEilJfx//O3GdYkkQ4/dZeg1nZoJ9YThAqGEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=dLEdHmsI; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 93E82207D8;
+	Fri, 12 Apr 2024 13:50:52 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id nQ37cCZxeNAG; Fri, 12 Apr 2024 13:50:51 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 5246F207BB;
+	Fri, 12 Apr 2024 13:50:51 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 5246F207BB
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1712922651;
+	bh=FI5bfP2GfZduPjl2hhMVgofbes9JlkwNEj4CO47p4V8=;
+	h=Date:From:To:CC:Subject:Reply-To:From;
+	b=dLEdHmsIt306PIY1nl6i8PNKJAttJvUVTeDMdpAvjXb1o3NrZDeXWdLhYShD/2VPH
+	 uSR3Ho6EtRPDzWR0d26H/BoTiPmcMOXkTMCWjvRRqFywEONyJQRc4jWKZDXj+H+xE5
+	 iHWNJBdzjVCX9GyGokVfvIAMnANgSyA5ZfVG1+9bXqXw4IRW/mYct1JREVz9IbAEkG
+	 hvbnFTtqsDzY+1/twoCmO3gNo1U0Kb9/2ufmBX1LtqIOlq/4jwMQw2uypF/l+z37Df
+	 TOrLNuPgJvdYozmf+Wu/kvH8TFdARg3+rbnDzcpcsZe8ANGJG56wahRt0WqHTS8hVm
+	 XTJgNR+ZFFxsw==
+Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
+	by mailout1.secunet.com (Postfix) with ESMTP id 44B5880004A;
+	Fri, 12 Apr 2024 13:50:51 +0200 (CEST)
+Received: from mbx-essen-01.secunet.de (10.53.40.197) by
+ cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 12 Apr 2024 04:44:52 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 12 Apr 2024 04:44:52 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Fri, 12 Apr 2024 04:44:52 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 12 Apr 2024 04:44:52 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CwYtCePSLWytzGXeLZHkIdvMPK2JUC1xNdG1VfKy42QkWTGjmH/6OT7YxIqzgtGfizINkRvRUEkZ8w0btteahPVD2Vu7Uz3mX8grHBn9/QnePu3ePE1lJKnN7godBTk8uaygzrxa/V4HiDRGC96JRlanAWWr4Q3VgmFew9dxZYlR+XfLksJrEowAwwvFco6WD+YUO3HN9Q/HsK+ulycXZE00N1/Jhmot2kPL/LfQTI7P9CGp26p0S5QMsMso0vc6MIzvM949G9MX3Uov7tP2vN3ef3hdOxCzWo0XnT+ZVbsQ1qwG5yUmwu3ALqI7Z3a26Zmnp2XqIXZSUx4o4Eck+g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ROEUWvCx7L3MrZkl3Dc9kmuvP1Yyy2N0JAYh76eCLOU=;
- b=J5N2UE05l086u++27uscPVJReFuRYcL6dkcCiV7b6g61LYa/3RUCYPMGZEKGqT3HZtxgy4mPvDU9XqXyNREgPnRWXzrocGijhSPU25cTI1FVjB22rKo//Nr8LTvD9TPwWW/tTuC3JbYp2eR4QZ01bi5fDuJiI7pj5/4r1ou4MguonbQzfc+njABeg2TFghVuR2PxrYlBFrM3DU0wogaHyhIUo3JiIXCxycry7L5fi8P9FyhWoNqLrPZBPP1GPDivWdHT1oIEJgZ9vnVJrOUdFCDRSx5RLKUDNI6Z29NFGIEwUlbpU2/CRpdyvZB31H44+Fyf9Ybw3n4YEQlDNUaPYg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by CYYPR11MB8307.namprd11.prod.outlook.com (2603:10b6:930:ba::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.24; Fri, 12 Apr
- 2024 11:44:50 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::5c8:d560:c544:d9cf]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::5c8:d560:c544:d9cf%5]) with mapi id 15.20.7430.045; Fri, 12 Apr 2024
- 11:44:50 +0000
-Message-ID: <da5f3048-e90b-4e34-be23-602c8a9edeb2@intel.com>
-Date: Fri, 12 Apr 2024 13:44:45 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [iwl-next v3 5/7] ice: base subfunction aux driver
-Content-Language: en-US
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	<intel-wired-lan@lists.osuosl.org>
-CC: <netdev@vger.kernel.org>, <jacob.e.keller@intel.com>,
-	<michal.kubiak@intel.com>, <maciej.fijalkowski@intel.com>,
-	<sridhar.samudrala@intel.com>, <wojciech.drewek@intel.com>,
-	<pio.raczynski@gmail.com>, <jiri@nvidia.com>,
-	<nex.sw.ncis.osdt.itp.upstreaming@intel.com>, <mateusz.polchlopek@intel.com>,
-	Piotr Raczynski <piotr.raczynski@intel.com>
-References: <20240412063053.339795-1-michal.swiatkowski@linux.intel.com>
- <20240412063053.339795-6-michal.swiatkowski@linux.intel.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20240412063053.339795-6-michal.swiatkowski@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MI1P293CA0002.ITAP293.PROD.OUTLOOK.COM (2603:10a6:290:2::9)
- To MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ 15.1.2507.35; Fri, 12 Apr 2024 13:50:51 +0200
+Received: from moon.secunet.de (172.18.149.1) by mbx-essen-01.secunet.de
+ (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Fri, 12 Apr
+ 2024 13:50:50 +0200
+Date: Fri, 12 Apr 2024 13:50:44 +0200
+From: Antony Antony <antony.antony@secunet.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, <netdev@vger.kernel.org>
+CC: Florian Westphal <fw@strlen.de>, Willem de Bruijn
+	<willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Andreas Gruenbacher <agruenba@redhat.com>,
+	<devel@linux-ipsec.org>, Eric Dumazet <edumazet@google.com>, Antony Antony
+	<antony.antony@secunet.com>
+Subject: [PATCH ipsec-next v3] udpencap: Remove Obsolete
+ UDP_ENCAP_ESPINUDP_NON_IKE Support
+Message-ID: <ZhkgFE93hIGF1gxM@moon.secunet.de>
+Reply-To: <antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|CYYPR11MB8307:EE_
-X-MS-Office365-Filtering-Correlation-Id: 885803be-d72a-48f1-a49c-08dc5ae5f604
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Zv/dAlSxp+LiGJTIB6KSMYiroTHa7alr8ab6kYqwghKTnP0dRVpa33FEaRHzOM5wtbnTNMWpq0/t2I0o0Rhjx9dObfeo30iYZx6HLn38JykQT78oswrIN4usJzSdIank5hdtpcvMo3MPpc3M40eJ+scueJGGiR39KIDyntmlL6KzJTSdc5ACTF7LrHgtddvYXoU2YW3eNu7Uzfsa/cZ6deK3QObINERbWKDSNRMQny/RvysC8HoMm0n+E8wU/5d4CBoqkuHtbr4jHc7z0Fx5aKO/dYACRK2U9Pqw4LhM/grGIMJjxB0ObBpp4kqv8AYAbhpIElwBu6dQ2IlNvm+BNnvTTu7XOJCOl9ygI38r8IcxmRt0sQX012lt/6yIGHVVY9FeBaHvA90A89CK3zjCQ+EvkswdgYS/jm0Q+lz8fPqu6CEyCRVMv90LiLTO1bbsYOkOnaDEgvEMEB5LF7z5dq3bRZn+KA8esmH/ihIBfV8s+Bt/iC20WTgpZM2WIxl+A8Io6ICpGfeE7ht5ZnUe29Lg/Q3UX87PUnUApV85vWtVP2KOXlF8178TCPTTPmAfHLDDavSWz1PfhOjWVAxzckDkaODUf3fSitCLY3Z6KEv3PD+BHuqoA39gk8CNOH2gThzD/7jmw8wymQz8GtLF394nm0E2YeQnXxuATuAX8PQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?YVFtcDRZK0lRVE9TWjBiN0JrM2NCZ2M1d1lDNEQyUEJnNWs4eWtrcUJBYlZO?=
- =?utf-8?B?UThNYzlmdWFYNW5pS1d3NUdWZlBvd2Jxd3NINFBtR1N3VkFQQXMvNlZub2VX?=
- =?utf-8?B?Tis1SWdhUUx1VlZ0dmpUZEhTeTRYWG9yZllrTDRUS1JYVDNaRDI4aitBWkI0?=
- =?utf-8?B?NDNBOVVkUlpMZldVa1hTdEVlV081T2JsRGZacUpqNzRHaHpyZllYUVYxQjhR?=
- =?utf-8?B?cFdXcytvbDdCNmtlcWNXbk1wODhtdnVjcTFuMHJXeU41Nlh0MkVkK2xFNGk5?=
- =?utf-8?B?NTdWU0NkTGdiOHlXVk9ITlp3ZUFPaGpYb0QzcHFCV045dVRMNmFlVGZ2Mk9J?=
- =?utf-8?B?UmlReElQNUFnaFJNRzFsQ0NvMlRyNEVxY2lJbUc0NlQ5MVRubmhoai9aaFFi?=
- =?utf-8?B?VEVXRmpOeFZhT3B4aDdjaUtReXJuZDBpMitrNVBYQUJzZmw0QWdEWW56N1VN?=
- =?utf-8?B?eTRyZHFXVVpQa0pFOUJnb2FjemlwTnR5bWNpemRtZmU5eXNQdmRsQ0lzZURB?=
- =?utf-8?B?N1czV3psNDgyNHV4VUFLU2NUVldleTVMSUluTitKZFBYT1lTaThENFIzTlV4?=
- =?utf-8?B?NTZoZVQ3ZnQvaWNZMVYzK1JhNmQ2YVhuUEM3Rm1xZ050L2Rta3NuRDMyU2Ex?=
- =?utf-8?B?OTlmNUR3TkVoTnFQUFRlanpKMXpoQ2NkS09jdCtTYjJ6QWh1b1BZUVJta1lF?=
- =?utf-8?B?NmVmaW9KcTU0anBWcnptTjB2UkhjTnFybHJONk5LVXNuUUFiYWdBTHdua0pV?=
- =?utf-8?B?OU1uTlZjQVpjb2lrQVc4SUpraVpWYVI4d21KL2NnQU1sUmtGb0FHYVg2L2lT?=
- =?utf-8?B?M2tVQU1obG5WSFVJQS84TnpENW9KOU9WK2VtYjBqektVVHVhaVFuTVNDR2lr?=
- =?utf-8?B?dkVFRzM5VkJSUzV0RkhkeG5OS2t6MjUydFJXZmk5TG1ZemhhcncrUmpnV0pW?=
- =?utf-8?B?WHhJbE9WZEczWmNOQjlsbHZlMUJkMkI5NXRCS0hwUjgrbythemFjVXZ6bVd1?=
- =?utf-8?B?VHpDYmJlaGh4UUcyU3M1YmlrbWVYR1VsUGZMSVJQSmJubmRLWjgrMFRlZitZ?=
- =?utf-8?B?R0pXS3NmdzRYWEszTVVyUmVpZGlnSDd6K3hDcitlc3N0MExOQjJ5OFZoa0RN?=
- =?utf-8?B?YW1rdWZkSWo2TStXYyt4MWloZDFrYzFQa3Z5MTZLbGhiVjhGaXBJWlNnbisw?=
- =?utf-8?B?Mkc0WDZzNDI1d2ZsUDE5WUsveWdId0tRMHBza1VjY2FwaHZXUVUrMjJHcGw5?=
- =?utf-8?B?bnBRbWNmK2EybGtVRS94RDM0cndvY0doRG5wSC9Ubmh2aXo1ZXpSNVhLNFAv?=
- =?utf-8?B?dko4SmJmZjVpdnZrTVVKaWtOR3ZFNENxS3k1M09kL05oOVpZMG5IY213NEht?=
- =?utf-8?B?NWxwVytnWUFrZG5mUEpDMDJiU3FwM29ES05hbW9TMkh1NDZWamdXcVVPNnJa?=
- =?utf-8?B?Um9uNkZuSlJvSHEyQ1Q1eThaUmlLVk5mOVRTbWltcnZCNmdIbzQ5OWllVlFN?=
- =?utf-8?B?bVczWmt6bzB6VDFyNFNvY2QyaWJuS2hKTnN6WUZibUFCTWJYWlVtZnh5ODBs?=
- =?utf-8?B?OEZsSmxnRnNZYjZXMHkySVRDUlhOMUowQi9hTTVrTTk3YTBqTXNodWRRL3Qw?=
- =?utf-8?B?NjRNWmh2MTJHcW96Q2p2QW5Hb3FQU3NJOTJZcTlWRk9GcXNlTzJVY3E3SXJR?=
- =?utf-8?B?RHRqaWdYWlRMMlNYYUNKNnFnTmxvQSsxa1VJVmkzS1lhUnRFT2psRTBSZC8v?=
- =?utf-8?B?aGErNXNia2pmK1AwVVliOU83UklydVNUM2dOVkdmTDVQQmRrY1BvL1laNnIv?=
- =?utf-8?B?Zi8wcWsrQlVHYnQ4ODZqL0tyKzdHT2o4bGpWUG5zeVd6VHFjZkhCMUk1UWho?=
- =?utf-8?B?Zkg4OFlJZ1c1eWszZEk4dFpzMklabVlUZUZHVmJLRW9LZFpCNHFONVJuNEpr?=
- =?utf-8?B?OU1hVE5jYjBHOEVmMW1pcEVVUWM1UzhRQlFRVlNxM05YdUphL3ppQlZESWJx?=
- =?utf-8?B?TFB1RDZOblgvczlDM2NvTE1YMVYxaWF5WitMQ2MrZ2pZRjB5eTQ5QmdpYXlk?=
- =?utf-8?B?Rm9lZG4rYnZpUk1WY3RnVHQ3dVpTRDBlcG1rTkNkQ2J1L05KLytNeTNGZWYz?=
- =?utf-8?B?clFBVjBpZ0EyeURZd2FSZ0VVYVhEc2w4U05rcDNTTitiaDk2bXlZWVczNVFQ?=
- =?utf-8?B?WVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 885803be-d72a-48f1-a49c-08dc5ae5f604
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2024 11:44:50.2507
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Q0u7gjQ1rC4kOUR3UAW0N15nr0YqopdN2yR9oF00SEjk57P0qI/Sgu5y5y1AXlSZfnIMdnhgsrmHrvWuJqq13hDqUIyqxX9sGtUWZ2pE5ho=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8307
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+Precedence: first-class
+Priority: normal
+Organization: secunet
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-01.secunet.de (10.53.40.197)
 
-On 4/12/24 08:30, Michal Swiatkowski wrote:
-> From: Piotr Raczynski <piotr.raczynski@intel.com>
-> 
-> Implement subfunction driver. It is probe when subfunction port is
-> activated.
-> 
-> VSI is already created. During the probe VSI is being configured.
-> MAC unicast and broadcast filter is added to allow traffic to pass.
-> 
-> Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> ---
->   drivers/net/ethernet/intel/ice/Makefile     |   1 +
->   drivers/net/ethernet/intel/ice/ice_main.c   |  10 ++
->   drivers/net/ethernet/intel/ice/ice_sf_eth.c | 130 ++++++++++++++++++++
->   drivers/net/ethernet/intel/ice/ice_sf_eth.h |   9 ++
->   4 files changed, 150 insertions(+)
->   create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.c
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/Makefile b/drivers/net/ethernet/intel/ice/Makefile
-> index 03500e28ac99..4d987f5dcdc1 100644
-> --- a/drivers/net/ethernet/intel/ice/Makefile
-> +++ b/drivers/net/ethernet/intel/ice/Makefile
-> @@ -31,6 +31,7 @@ ice-y := ice_main.o	\
->   	 ice_idc.o	\
->   	 devlink/devlink.o	\
->   	 devlink/devlink_port.o \
-> +	 ice_sf_eth.o	\
->   	 ice_ddp.o	\
->   	 ice_fw_update.o \
->   	 ice_lag.o	\
-> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-> index 29552598ddb6..f55e3340b608 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_main.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-> @@ -15,6 +15,7 @@
->   #include "ice_dcb_nl.h"
->   #include "devlink/devlink.h"
->   #include "devlink/devlink_port.h"
-> +#include "ice_sf_eth.h"
->   #include "ice_hwmon.h"
->   /* Including ice_trace.h with CREATE_TRACE_POINTS defined will generate the
->    * ice tracepoint functions. This must be done exactly once across the
-> @@ -5857,8 +5858,16 @@ static int __init ice_module_init(void)
->   		goto err_dest_lag_wq;
->   	}
->   
-> +	status = ice_sf_driver_register();
-> +	if (status) {
-> +		pr_err("Failed to register SF driver, err %d\n", status);
-> +		goto err_sf_driver;
-> +	}
-> +
->   	return 0;
->   
-> +err_sf_driver:
-> +	pci_unregister_driver(&ice_driver);
->   err_dest_lag_wq:
->   	destroy_workqueue(ice_lag_wq);
->   	ice_debugfs_exit();
-> @@ -5876,6 +5885,7 @@ module_init(ice_module_init);
->    */
->   static void __exit ice_module_exit(void)
->   {
-> +	ice_sf_driver_unregister();
->   	pci_unregister_driver(&ice_driver);
->   	ice_debugfs_exit();
->   	destroy_workqueue(ice_wq);
-> diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.c b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-> new file mode 100644
-> index 000000000000..70f7cbe6c609
-> --- /dev/null
-> +++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-> @@ -0,0 +1,130 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/* Copyright (c) 2024, Intel Corporation. */
-> +#include "ice.h"
-> +#include "ice_lib.h"
-> +#include "ice_fltr.h"
-> +#include "ice_sf_eth.h"
-> +#include "devlink/devlink_port.h"
-> +#include "devlink/devlink.h"
-> +
-> +/**
-> + * ice_sf_dev_probe - subfunction driver probe function
-> + * @adev: pointer to the auxiliary device
-> + * @id: pointer to the auxiliary_device id
-> + *
-> + * Configure VSI and netdev resources for the subfunction device.
-> + *
-> + * Return: zero on success or an error code on failure.
-> + */
-> +static int ice_sf_dev_probe(struct auxiliary_device *adev,
-> +			    const struct auxiliary_device_id *id)
-> +{
-> +	struct ice_sf_dev *sf_dev = ice_adev_to_sf_dev(adev);
-> +	struct ice_dynamic_port *dyn_port = sf_dev->dyn_port;
-> +	struct ice_vsi_cfg_params params = {};
-> +	struct ice_vsi *vsi = dyn_port->vsi;
-> +	struct ice_pf *pf = dyn_port->pf;
-> +	struct device *dev = &adev->dev;
-> +	struct ice_sf_priv *priv;
-> +	int err;
-> +
-> +	params.type = ICE_VSI_SF;
-> +	params.pi = pf->hw.port_info;
-> +	params.flags = ICE_VSI_FLAG_INIT;
-> +
-> +	priv = ice_allocate_sf(&adev->dev);
-> +	if (!priv) {
-> +		dev_err(dev, "Subfunction devlink alloc failed");
-> +		return -ENOMEM;
-> +	}
-> +
-> +	priv->dev = sf_dev;
-> +	sf_dev->priv = priv;
-> +
-> +	devlink_register(priv_to_devlink(priv));
-> +
-> +	err = ice_vsi_cfg(vsi, &params);
-> +	if (err) {
-> +		dev_err(dev, "Subfunction vsi config failed");
-> +		return err;
-> +	}
-> +
-> +	err = ice_devlink_create_sf_dev_port(sf_dev);
-> +	if (err) {
-> +		dev_err(dev, "Cannot add ice virtual devlink port for subfunction");
-> +		goto err_vsi_decfg;
-> +	}
-> +
-> +	err = ice_fltr_add_mac_and_broadcast(vsi, vsi->netdev->dev_addr,
-> +					     ICE_FWD_TO_VSI);
-> +	if (err) {
-> +		dev_err(dev, "can't add MAC filters %pM for VSI %d\n",
-> +			vsi->netdev->dev_addr, vsi->idx);
-> +		goto err_devlink_destroy;
-> +	}
-> +
-> +	ice_napi_add(vsi);
-> +
-> +	return err;
-> +
-> +err_devlink_destroy:
-> +	ice_devlink_destroy_sf_dev_port(sf_dev);
-> +err_vsi_decfg:
-> +	ice_vsi_decfg(vsi);
-> +	return err;
-> +}
-> +
-> +/**
-> + * ice_sf_dev_remove - subfunction driver remove function
-> + * @adev: pointer to the auxiliary device
-> + *
-> + * Deinitalize VSI and netdev resources for the subfunction device.
-> + */
-> +static void ice_sf_dev_remove(struct auxiliary_device *adev)
-> +{
-> +	struct ice_sf_dev *sf_dev = ice_adev_to_sf_dev(adev);
-> +	struct devlink *devlink = priv_to_devlink(sf_dev->priv);
+The UDP_ENCAP_ESPINUDP_NON_IKE mode, introduced into the Linux kernel
+in 2004 [2], has remained inactive and obsolete for an extended period.
 
-RCT
+This mode was originally defined in an early version of an IETF draft
+[1] from 2001. By the time it was integrated into the kernel in 2004 [2],
+it had already been replaced by UDP_ENCAP_ESPINUDP [3] in later
+versions of draft-ietf-ipsec-udp-encaps, particularly in version 06.
 
-> +	struct ice_dynamic_port *dyn_port = sf_dev->dyn_port;
-> +	struct ice_vsi *vsi = dyn_port->vsi;
-> +
-> +	ice_vsi_close(vsi);
-> +
-> +	ice_devlink_destroy_sf_dev_port(sf_dev);
-> +	devlink_unregister(devlink);
-> +	devlink_free(devlink);
-> +	ice_vsi_decfg(vsi);
-> +}
-> +
-> +static const struct auxiliary_device_id ice_sf_dev_id_table[] = {
-> +	{ .name = "ice.sf", },
-> +	{ },
-> +};
-> +
-> +MODULE_DEVICE_TABLE(auxiliary, ice_sf_dev_id_table);
-> +
-> +static struct auxiliary_driver ice_sf_driver = {
-> +	.name = "sf",
-> +	.probe = ice_sf_dev_probe,
-> +	.remove = ice_sf_dev_remove,
-> +	.id_table = ice_sf_dev_id_table
-> +};
-> +
-> +/**
-> + * ice_sf_driver_register - Register new auxiliary subfunction driver
-> + *
-> + * Return: zero on success or an error code on failure.
-> + */
-> +int ice_sf_driver_register(void)
-> +{
-> +	return auxiliary_driver_register(&ice_sf_driver);
-> +}
-> +
-> +/**
-> + * ice_sf_driver_unregister - Unregister new auxiliary subfunction driver
-> + *
-> + * Return: zero on success or an error code on failure.
-> + */
-> +void ice_sf_driver_unregister(void)
-> +{
-> +	auxiliary_driver_unregister(&ice_sf_driver);
-> +}
-> diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.h b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
-> index a08f8b2bceef..e972c50f96c9 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_sf_eth.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
-> @@ -18,4 +18,13 @@ struct ice_sf_priv {
->   	struct devlink_port devlink_port;
->   };
->   
-> +static inline struct
-> +ice_sf_dev *ice_adev_to_sf_dev(struct auxiliary_device *adev)
-> +{
-> +	return container_of(adev, struct ice_sf_dev, adev);
-> +}
-> +
-> +int ice_sf_driver_register(void);
-> +void ice_sf_driver_unregister(void);
-> +
->   #endif /* _ICE_SF_ETH_H_ */
+Over time, UDP_ENCAP_ESPINUDP_NON_IKE has lost its relevance, with no
+known use cases.
+
+With this commit, we remove support for UDP_ENCAP_ESPINUDP_NON_IKE,
+simplifying the codebase and eliminating unnecessary complexity.
+Kernel will return an error -ENOPROTOOPT if the userspace tries to set
+this option.
+
+References:
+[1] https://datatracker.ietf.org/doc/html/draft-ietf-ipsec-udp-encaps-00.txt
+
+[2] Commit that added UDP_ENCAP_ESPINUDP_NON_IKE to the Linux historic
+    repository.
+
+    Author: Andreas Gruenbacher <agruen@suse.de>
+    Date: Fri Apr 9 01:47:47 2004 -0700
+
+   [IPSEC]: Support draft-ietf-ipsec-udp-encaps-00/01, some ipec impls need it.
+
+[3] Commit that added UDP_ENCAP_ESPINUDP to the Linux historic
+    repository.
+
+    Author: Derek Atkins <derek@ihtfp.com>
+    Date: Wed Apr 2 13:21:02 2003 -0800
+
+    [IPSEC]: Implement UDP Encapsulation framework.
+
+Signed-off-by: Antony Antony <antony.antony@secunet.com>
+---
+v2-> v3
+ - leave the define, add commet /* unused */
+v1 -> v2
+- removed defination wrapped in #ifndef __KERNEL__ It would falsly let
+  userspace appliction build and break when running.
+RFC -> v1
+- keep removed defination wrapped in #ifndef __KERNEL__
+---
+ include/uapi/linux/udp.h |  2 +-
+ net/ipv4/esp4.c          | 12 ------------
+ net/ipv4/udp.c           |  2 --
+ net/ipv4/xfrm4_input.c   | 13 -------------
+ net/ipv6/esp6.c          | 12 ------------
+ net/ipv6/xfrm6_input.c   | 13 -------------
+ 6 files changed, 1 insertion(+), 53 deletions(-)
+
+diff --git a/include/uapi/linux/udp.h b/include/uapi/linux/udp.h
+index 4828794efcf8..1a0fe8b151fb 100644
+--- a/include/uapi/linux/udp.h
++++ b/include/uapi/linux/udp.h
+@@ -36,7 +36,7 @@ struct udphdr {
+ #define UDP_GRO		104	/* This socket can receive UDP GRO packets */
+
+ /* UDP encapsulation types */
+-#define UDP_ENCAP_ESPINUDP_NON_IKE	1 /* draft-ietf-ipsec-nat-t-ike-00/01 */
++#define UDP_ENCAP_ESPINUDP_NON_IKE	1 /* unused  draft-ietf-ipsec-nat-t-ike-00/01 */
+ #define UDP_ENCAP_ESPINUDP	2 /* draft-ietf-ipsec-udp-encaps-06 */
+ #define UDP_ENCAP_L2TPINUDP	3 /* rfc2661 */
+ #define UDP_ENCAP_GTP0		4 /* GSM TS 09.60 */
+diff --git a/net/ipv4/esp4.c b/net/ipv4/esp4.c
+index 3d647c9a7a21..7d38ddd64115 100644
+--- a/net/ipv4/esp4.c
++++ b/net/ipv4/esp4.c
+@@ -347,7 +347,6 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
+ 					       __be16 dport)
+ {
+ 	struct udphdr *uh;
+-	__be32 *udpdata32;
+ 	unsigned int len;
+
+ 	len = skb->len + esp->tailen - skb_transport_offset(skb);
+@@ -362,12 +361,6 @@ static struct ip_esp_hdr *esp_output_udp_encap(struct sk_buff *skb,
+
+ 	*skb_mac_header(skb) = IPPROTO_UDP;
+
+-	if (encap_type == UDP_ENCAP_ESPINUDP_NON_IKE) {
+-		udpdata32 = (__be32 *)(uh + 1);
+-		udpdata32[0] = udpdata32[1] = 0;
+-		return (struct ip_esp_hdr *)(udpdata32 + 2);
+-	}
+-
+ 	return (struct ip_esp_hdr *)(uh + 1);
+ }
+
+@@ -423,7 +416,6 @@ static int esp_output_encap(struct xfrm_state *x, struct sk_buff *skb,
+ 	switch (encap_type) {
+ 	default:
+ 	case UDP_ENCAP_ESPINUDP:
+-	case UDP_ENCAP_ESPINUDP_NON_IKE:
+ 		esph = esp_output_udp_encap(skb, encap_type, esp, sport, dport);
+ 		break;
+ 	case TCP_ENCAP_ESPINTCP:
+@@ -775,7 +767,6 @@ int esp_input_done2(struct sk_buff *skb, int err)
+ 			source = th->source;
+ 			break;
+ 		case UDP_ENCAP_ESPINUDP:
+-		case UDP_ENCAP_ESPINUDP_NON_IKE:
+ 			source = uh->source;
+ 			break;
+ 		default:
+@@ -1179,9 +1170,6 @@ static int esp_init_state(struct xfrm_state *x, struct netlink_ext_ack *extack)
+ 		case UDP_ENCAP_ESPINUDP:
+ 			x->props.header_len += sizeof(struct udphdr);
+ 			break;
+-		case UDP_ENCAP_ESPINUDP_NON_IKE:
+-			x->props.header_len += sizeof(struct udphdr) + 2 * sizeof(u32);
+-			break;
+ #ifdef CONFIG_INET_ESPINTCP
+ 		case TCP_ENCAP_ESPINTCP:
+ 			/* only the length field, TCP encap is done by
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 7613daa339b0..4ca781065a07 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -2699,8 +2699,6 @@ int udp_lib_setsockopt(struct sock *sk, int level, int optname,
+ #ifdef CONFIG_XFRM
+ 		case UDP_ENCAP_ESPINUDP:
+ 			set_xfrm_gro_udp_encap_rcv(val, sk->sk_family, sk);
+-			fallthrough;
+-		case UDP_ENCAP_ESPINUDP_NON_IKE:
+ #if IS_ENABLED(CONFIG_IPV6)
+ 			if (sk->sk_family == AF_INET6)
+ 				WRITE_ONCE(up->encap_rcv,
+diff --git a/net/ipv4/xfrm4_input.c b/net/ipv4/xfrm4_input.c
+index dae35101d189..0918b0682174 100644
+--- a/net/ipv4/xfrm4_input.c
++++ b/net/ipv4/xfrm4_input.c
+@@ -113,19 +113,6 @@ static int __xfrm4_udp_encap_rcv(struct sock *sk, struct sk_buff *skb, bool pull
+ 			/* Must be an IKE packet.. pass it through */
+ 			return 1;
+ 		break;
+-	case UDP_ENCAP_ESPINUDP_NON_IKE:
+-		/* Check if this is a keepalive packet.  If so, eat it. */
+-		if (len == 1 && udpdata[0] == 0xff) {
+-			return -EINVAL;
+-		} else if (len > 2 * sizeof(u32) + sizeof(struct ip_esp_hdr) &&
+-			   udpdata32[0] == 0 && udpdata32[1] == 0) {
+-
+-			/* ESP Packet with Non-IKE marker */
+-			len = sizeof(struct udphdr) + 2 * sizeof(u32);
+-		} else
+-			/* Must be an IKE packet.. pass it through */
+-			return 1;
+-		break;
+ 	}
+
+ 	/* At this point we are sure that this is an ESPinUDP packet,
+diff --git a/net/ipv6/esp6.c b/net/ipv6/esp6.c
+index fe8d53f5a5ee..27df148530a6 100644
+--- a/net/ipv6/esp6.c
++++ b/net/ipv6/esp6.c
+@@ -383,7 +383,6 @@ static struct ip_esp_hdr *esp6_output_udp_encap(struct sk_buff *skb,
+ 					       __be16 dport)
+ {
+ 	struct udphdr *uh;
+-	__be32 *udpdata32;
+ 	unsigned int len;
+
+ 	len = skb->len + esp->tailen - skb_transport_offset(skb);
+@@ -398,12 +397,6 @@ static struct ip_esp_hdr *esp6_output_udp_encap(struct sk_buff *skb,
+
+ 	*skb_mac_header(skb) = IPPROTO_UDP;
+
+-	if (encap_type == UDP_ENCAP_ESPINUDP_NON_IKE) {
+-		udpdata32 = (__be32 *)(uh + 1);
+-		udpdata32[0] = udpdata32[1] = 0;
+-		return (struct ip_esp_hdr *)(udpdata32 + 2);
+-	}
+-
+ 	return (struct ip_esp_hdr *)(uh + 1);
+ }
+
+@@ -459,7 +452,6 @@ static int esp6_output_encap(struct xfrm_state *x, struct sk_buff *skb,
+ 	switch (encap_type) {
+ 	default:
+ 	case UDP_ENCAP_ESPINUDP:
+-	case UDP_ENCAP_ESPINUDP_NON_IKE:
+ 		esph = esp6_output_udp_encap(skb, encap_type, esp, sport, dport);
+ 		break;
+ 	case TCP_ENCAP_ESPINTCP:
+@@ -822,7 +814,6 @@ int esp6_input_done2(struct sk_buff *skb, int err)
+ 			source = th->source;
+ 			break;
+ 		case UDP_ENCAP_ESPINUDP:
+-		case UDP_ENCAP_ESPINUDP_NON_IKE:
+ 			source = uh->source;
+ 			break;
+ 		default:
+@@ -1232,9 +1223,6 @@ static int esp6_init_state(struct xfrm_state *x, struct netlink_ext_ack *extack)
+ 		case UDP_ENCAP_ESPINUDP:
+ 			x->props.header_len += sizeof(struct udphdr);
+ 			break;
+-		case UDP_ENCAP_ESPINUDP_NON_IKE:
+-			x->props.header_len += sizeof(struct udphdr) + 2 * sizeof(u32);
+-			break;
+ #ifdef CONFIG_INET6_ESPINTCP
+ 		case TCP_ENCAP_ESPINTCP:
+ 			/* only the length field, TCP encap is done by
+diff --git a/net/ipv6/xfrm6_input.c b/net/ipv6/xfrm6_input.c
+index a17d783dc7c0..2c6aeb090b7a 100644
+--- a/net/ipv6/xfrm6_input.c
++++ b/net/ipv6/xfrm6_input.c
+@@ -109,19 +109,6 @@ static int __xfrm6_udp_encap_rcv(struct sock *sk, struct sk_buff *skb, bool pull
+ 			/* Must be an IKE packet.. pass it through */
+ 			return 1;
+ 		break;
+-	case UDP_ENCAP_ESPINUDP_NON_IKE:
+-		/* Check if this is a keepalive packet.  If so, eat it. */
+-		if (len == 1 && udpdata[0] == 0xff) {
+-			return -EINVAL;
+-		} else if (len > 2 * sizeof(u32) + sizeof(struct ip_esp_hdr) &&
+-			   udpdata32[0] == 0 && udpdata32[1] == 0) {
+-
+-			/* ESP Packet with Non-IKE marker */
+-			len = sizeof(struct udphdr) + 2 * sizeof(u32);
+-		} else
+-			/* Must be an IKE packet.. pass it through */
+-			return 1;
+-		break;
+ 	}
+
+ 	/* At this point we are sure that this is an ESPinUDP packet,
+--
+2.30.2
 
 
