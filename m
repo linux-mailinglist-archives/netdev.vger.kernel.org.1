@@ -1,236 +1,166 @@
-Return-Path: <netdev+bounces-87502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D44E8A3510
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 19:44:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9926D8A354B
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 20:04:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4092E1C21434
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 17:44:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F27CFB219F8
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 18:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426D714B08C;
-	Fri, 12 Apr 2024 17:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5868714E2ED;
+	Fri, 12 Apr 2024 18:04:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dTiDXDmQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C9fBnjYO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2101614D457
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 17:44:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A688F14D2B7;
+	Fri, 12 Apr 2024 18:04:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712943865; cv=none; b=FZsXIhaYLEaSB5ClQPw5TihJqP/62v+Ua/MkTLssqdgGozZhmBw9JCyvlHsjt8RWHIeOLolFsI3xZGsdSWeRTG4jmrRwAZ7JfxOPehgH764NHRZSeaLwkj7CTNP2HuMx98V/Paq6PELR48MJ9L99ezHP4aw0JxjPJuXEcEOdIJc=
+	t=1712945045; cv=none; b=In3WIEv9jX0N3lRqMYsc3ih+DKnU9TYDvQ/lX6//sEug+qU/WaUGsAfjhUG/bLjQY+BXn8b9mvMMBqiCfk4c9AiFsvw4D0BHB+czPd3wgbeKE13XQj1LAmqEmlR7eC+ylzx7ZWICx1CJ5TVQvqJpSitURHsEt55cQQeHrKOjKkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712943865; c=relaxed/simple;
-	bh=cU9Zld5y/dB0PlW8Dnjr2/jnvo4ka3aIv5MoEQUiuz8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eNQzuJQU5ww2SbitRN8vFaw7rF2BXd+QTanPFQgiYfO6oe85B7cq+PljSx9yV0rjhn/Bl/9MDIswSJz06DulwcE5iXtmj25WLIpe7BENvh7vaXW7dyQYhXXtaoL5NNWXDu6Bq6qHZuoKC62zBhoA0auCpiXmsDac7uW/7g8TldQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dTiDXDmQ; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1712943863; x=1744479863;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=cU9Zld5y/dB0PlW8Dnjr2/jnvo4ka3aIv5MoEQUiuz8=;
-  b=dTiDXDmQSJyYjIYE1i8cfweScOtDT8JeZ5gQAHs1qTtQFLdM0HxPCp6L
-   Gz+iyU+vwq6qbAHhg50BN/5GRSqwuqfHwE5R5v3PeN1iqL644gfRBfWwE
-   EHPO+pMdVkq3dyj+Uw3fxsFj71VRGF7RfmPDNJTQMXnXld6jZg9BfzNlw
-   8S1MXv+LWvZG+NNfEzjWw3/AfquYhyRmCkaivgr+CWlByQw8IGfECfsNr
-   YjxAi/rfN5w8/gVjgmqVcKcdnoo9ncp6gQkswVsJiXhQkp7wUkyKaU1Vj
-   iovYBEUagJAaeei/VwzwgP4XwfniuqKUCrfrIUUVbdtIMkNqKqJTZMdal
-   g==;
-X-CSE-ConnectionGUID: bH5l3IyEScW6qR63uXikXg==
-X-CSE-MsgGUID: lue6wKMWTVuXas+tjw8AsA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11042"; a="18967213"
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="18967213"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2024 10:44:22 -0700
-X-CSE-ConnectionGUID: 7+/W9m2zR/aGaDs07cu5sw==
-X-CSE-MsgGUID: cV7k5dlHRxeOm70S4pAnZQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,196,1708416000"; 
-   d="scan'208";a="21209324"
-Received: from unknown (HELO 23c141fc0fd8) ([10.239.97.151])
-  by orviesa010.jf.intel.com with ESMTP; 12 Apr 2024 10:44:19 -0700
-Received: from kbuild by 23c141fc0fd8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rvKwi-0000Pg-2s;
-	Fri, 12 Apr 2024 17:44:16 +0000
-Date: Sat, 13 Apr 2024 01:44:00 +0800
-From: kernel test robot <lkp@intel.com>
-To: Heng Qi <hengqi@linux.alibaba.com>, netdev@vger.kernel.org,
-	virtualization@lists.linux.dev
-Cc: oe-kbuild-all@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Ratheesh Kannoth <rkannoth@marvell.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v6 2/4] ethtool: provide customized dim profile
- management
-Message-ID: <202404130138.7jOMaraz-lkp@intel.com>
-References: <1712844751-53514-3-git-send-email-hengqi@linux.alibaba.com>
+	s=arc-20240116; t=1712945045; c=relaxed/simple;
+	bh=pL8DEPrlq502m1lqM9mSVBGYPc5Ax5zq2wRmPF1el9E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mvZownwZqhohE8TIfYUhrD53RFKyOot5CSdz55vS5Q8QV3dBjgZA/ZlqBmtX62PauEUo4EvzUPddXseyhWLlR9dwj7Yag3gZz2qSi10r0Vhuua2jzNw+zsSrwDQHe2biG3quSle1Ll2QaEGGhGtrC6bZzZJKycwJ0rfY2+BoPa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C9fBnjYO; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-518a3e0d2e4so44470e87.0;
+        Fri, 12 Apr 2024 11:04:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712945042; x=1713549842; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CocCrXTkILxb+H292FlYFL20d7nBS8XixYwTUqYokkU=;
+        b=C9fBnjYO7Y9Z6XQnUKLVTG5VEbr4FZw8kf7lqt5NMtTgKRBiaDyt86kECrHhwfmNmM
+         6c5iNJUK7v8WH566u9Nyfo7L/mwHi1BBpaN3HkJGxNfyKKHf+aMDCj4fMSW0iJMTmbyR
+         1wK9Tft1GpMJmROclHY3yUY1ehWrkMvq3ucJWSR7nAMxc+vv1n6gZmFGstGJPRuWVy71
+         1FFESmfbBAArhJMdALDNDimKiCgnKo+v8ozR30KPxMX8xcvfqehvpm8iOOvkqhgWxup9
+         rZVB9QmVq6MosUWMdS31lBrQWoK9/ioFUIqOQMF64M0H4p2DCpJVpaznxQJ3EzmJP05T
+         jFdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712945042; x=1713549842;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CocCrXTkILxb+H292FlYFL20d7nBS8XixYwTUqYokkU=;
+        b=F1XWe/9kfdtKbDWiMeH3fGyw1STg+cS6IPi2YJev9JQzZz4i1NcjCUi9bfZ8pQz1Na
+         RvKt2CWr/grVE7xquqF/fgVMX3lp/JEu9z2MxR8V1z5OSWWtIzZeJqNoHvD0g6+FlOuA
+         LWrXJ6w7Gt3Hy0Z2ubG4hzYEd+MTb7/p/YEKD4IZIln7dojSMyKVG8xV/PUWy/+21+Pf
+         XHGEyZnxvzcQ1d22hMWprQjUBJErFBbvZAU/M8UgGs3OeX9XdFn03F9DEJjQvfIm2v/d
+         V7/9/eZrqq0sR50n1/SowRob51Yol0duCMIHW+l7AbGpnMwNjBxcU6hi+F2qxYG8wpFU
+         9SeA==
+X-Forwarded-Encrypted: i=1; AJvYcCUaG2H/qLnF7Myk2S4zqbxHIWvUFElp/ueQUUFh189cBBxqpcPlxuo8znJBCkwVkhwTuXS3ornjqhJmUK11iwIB/VPggQCIe5YG/q8ytgliZd9uHOeH/W83XrtzAH5PkEuNMeDn
+X-Gm-Message-State: AOJu0YwjxyOcFyAy6ATEeos0/tFlXm/kbl14um37KxOSDlb5pvommryX
+	/xWmTktqd0zky0GDxJbGTJqAy6KAaatJUbrQXNlXf8PI+CL7iTeg
+X-Google-Smtp-Source: AGHT+IE+YdnghDsV0obcJRUikyE+vRG7Z625VF2VfIjNL7bgReRC31FSjtwU16I1XuF0ATXWLD1vaw==
+X-Received: by 2002:ac2:52a9:0:b0:515:c0cb:3ca2 with SMTP id r9-20020ac252a9000000b00515c0cb3ca2mr1979670lfm.16.1712945041542;
+        Fri, 12 Apr 2024 11:04:01 -0700 (PDT)
+Received: from localhost ([95.79.241.172])
+        by smtp.gmail.com with ESMTPSA id s23-20020a197717000000b00516a25e9ce1sm576691lfc.294.2024.04.12.11.04.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Apr 2024 11:04:01 -0700 (PDT)
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Yanteng Si <siyanteng@loongson.cn>
+Cc: Serge Semin <fancer.lancer@gmail.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-sunxi@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net 0/4] net: stmmac: Fix MAC-capabilities procedure
+Date: Fri, 12 Apr 2024 21:03:13 +0300
+Message-ID: <20240412180340.7965-1-fancer.lancer@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1712844751-53514-3-git-send-email-hengqi@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Heng,
+The series got born as a result of the discussions around the recent
+Yanteng' series adding the Loongson LS7A1000, LS2K1000, LS7A2000, LS2K2000
+MACs support:
+Link: https://lore.kernel.org/netdev/fu3f6uoakylnb6eijllakeu5i4okcyqq7sfafhp5efaocbsrwe@w74xe7gb6x7p
 
-kernel test robot noticed the following build errors:
+In particular the Yanteng' patchset needed to implement the Loongson
+MAC-specific constraints applied to the link speed and link duplex mode.
+As a result of the discussion with Russel the next preliminary patch was
+born:
+Link: https://lore.kernel.org/netdev/df31e8bcf74b3b4ddb7ddf5a1c371390f16a2ad5.1712917541.git.siyanteng@loongson.cn
 
-[auto build test ERROR on net-next/main]
+The patch above was a temporal solution utilized by Yanteng for further
+developments and to move on with the on-going review. This patchset is a
+refactored version of that single patch with formatting required for the
+fixes patches.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Heng-Qi/linux-dim-move-useful-macros-to-h-file/20240411-221400
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/1712844751-53514-3-git-send-email-hengqi%40linux.alibaba.com
-patch subject: [PATCH net-next v6 2/4] ethtool: provide customized dim profile management
-config: openrisc-defconfig (https://download.01.org/0day-ci/archive/20240413/202404130138.7jOMaraz-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240413/202404130138.7jOMaraz-lkp@intel.com/reproduce)
+In particular the series starts with fixing the half-duplex-less
+constraint currently applied for all IP-cores. In fact it's specific for
+the DW QoS Eth only (DW GMAC v4.x/v5.x).
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202404130138.7jOMaraz-lkp@intel.com/
+The next patch fixes the MAC-capabilities setting up during the active
+Tx/Rx queues re-initialization procedure. Particularly the procedure
+missed the max-speed limit thus possibly activating speeds prohibited on
+the respective platforms.
 
-All errors (new ones prefixed by >>):
+Third patch fixes the incorrect MAC-capabilities initialization for DW
+MAC100, DW XGMAC and DW XLGMAC devices by moving the correct
+initialization to the IP-core specific setup() methods.
 
-   net/core/dev.c: In function 'dev_dim_profile_init':
->> net/core/dev.c:10235:63: error: 'struct net_device' has no member named 'rx_eqe_profile'
-   10235 |         int length = NET_DIM_PARAMS_NUM_PROFILES * sizeof(*dev->rx_eqe_profile);
-         |                                                               ^~
-   net/core/dev.c:10242:20: error: 'struct net_device' has no member named 'rx_eqe_profile'
-   10242 |                 dev->rx_eqe_profile = kzalloc(length, GFP_KERNEL);
-         |                    ^~
-   net/core/dev.c:10243:25: error: 'struct net_device' has no member named 'rx_eqe_profile'
-   10243 |                 if (!dev->rx_eqe_profile)
-         |                         ^~
-   net/core/dev.c:10245:27: error: 'struct net_device' has no member named 'rx_eqe_profile'
-   10245 |                 memcpy(dev->rx_eqe_profile, rx_profile[0], length);
-         |                           ^~
->> net/core/dev.c:10248:20: error: 'struct net_device' has no member named 'rx_cqe_profile'
-   10248 |                 dev->rx_cqe_profile = kzalloc(length, GFP_KERNEL);
-         |                    ^~
-   net/core/dev.c:10249:25: error: 'struct net_device' has no member named 'rx_cqe_profile'
-   10249 |                 if (!dev->rx_cqe_profile)
-         |                         ^~
-   net/core/dev.c:10251:27: error: 'struct net_device' has no member named 'rx_cqe_profile'
-   10251 |                 memcpy(dev->rx_cqe_profile, rx_profile[1], length);
-         |                           ^~
->> net/core/dev.c:10254:20: error: 'struct net_device' has no member named 'tx_eqe_profile'
-   10254 |                 dev->tx_eqe_profile = kzalloc(length, GFP_KERNEL);
-         |                    ^~
-   net/core/dev.c:10255:25: error: 'struct net_device' has no member named 'tx_eqe_profile'
-   10255 |                 if (!dev->tx_eqe_profile)
-         |                         ^~
-   net/core/dev.c:10257:27: error: 'struct net_device' has no member named 'tx_eqe_profile'
-   10257 |                 memcpy(dev->tx_eqe_profile, tx_profile[0], length);
-         |                           ^~
->> net/core/dev.c:10260:20: error: 'struct net_device' has no member named 'tx_cqe_profile'
-   10260 |                 dev->tx_cqe_profile = kzalloc(length, GFP_KERNEL);
-         |                    ^~
-   net/core/dev.c:10261:25: error: 'struct net_device' has no member named 'tx_cqe_profile'
-   10261 |                 if (!dev->tx_cqe_profile)
-         |                         ^~
-   net/core/dev.c:10263:27: error: 'struct net_device' has no member named 'tx_cqe_profile'
-   10263 |                 memcpy(dev->tx_cqe_profile, tx_profile[1], length);
-         |                           ^~
-   net/core/dev.c: In function 'netif_free_profile':
-   net/core/dev.c:11063:26: error: 'struct net_device' has no member named 'rx_eqe_profile'
-   11063 |                 kfree(dev->rx_eqe_profile);
-         |                          ^~
-   net/core/dev.c:11066:26: error: 'struct net_device' has no member named 'rx_cqe_profile'
-   11066 |                 kfree(dev->rx_cqe_profile);
-         |                          ^~
-   net/core/dev.c:11069:26: error: 'struct net_device' has no member named 'tx_eqe_profile'
-   11069 |                 kfree(dev->tx_eqe_profile);
-         |                          ^~
-   net/core/dev.c:11072:26: error: 'struct net_device' has no member named 'tx_cqe_profile'
-   11072 |                 kfree(dev->tx_cqe_profile);
-         |                          ^~
---
-   net/ethtool/coalesce.c: In function 'coalesce_fill_reply':
->> net/ethtool/coalesce.c:268:37: error: 'struct net_device' has no member named 'rx_eqe_profile'
-     268 |                                  dev->rx_eqe_profile, supported) ||
-         |                                     ^~
->> net/ethtool/coalesce.c:270:37: error: 'struct net_device' has no member named 'rx_cqe_profile'
-     270 |                                  dev->rx_cqe_profile, supported) ||
-         |                                     ^~
->> net/ethtool/coalesce.c:272:37: error: 'struct net_device' has no member named 'tx_eqe_profile'
-     272 |                                  dev->tx_eqe_profile, supported) ||
-         |                                     ^~
->> net/ethtool/coalesce.c:274:37: error: 'struct net_device' has no member named 'tx_cqe_profile'
-     274 |                                  dev->tx_cqe_profile, supported))
-         |                                     ^~
-   net/ethtool/coalesce.c: In function '__ethnl_set_coalesce':
-   net/ethtool/coalesce.c:479:44: error: 'struct net_device' has no member named 'rx_eqe_profile'
-     479 |         ret = ethnl_update_profile(dev, dev->rx_eqe_profile,
-         |                                            ^~
-   net/ethtool/coalesce.c:484:44: error: 'struct net_device' has no member named 'rx_cqe_profile'
-     484 |         ret = ethnl_update_profile(dev, dev->rx_cqe_profile,
-         |                                            ^~
-   net/ethtool/coalesce.c:489:44: error: 'struct net_device' has no member named 'tx_eqe_profile'
-     489 |         ret = ethnl_update_profile(dev, dev->tx_eqe_profile,
-         |                                            ^~
-   net/ethtool/coalesce.c:494:44: error: 'struct net_device' has no member named 'tx_cqe_profile'
-     494 |         ret = ethnl_update_profile(dev, dev->tx_cqe_profile,
-         |                                            ^~
+Final patch is just a cleanup moving the MAC-capabilities init/re-init to
+the phylink MAC-capabilities getter.
 
+That's it for now. Thanks for review and testing in advance.
 
-vim +10235 net/core/dev.c
+Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>
+Cc: Simon Horman <horms@kernel.org>
+Cc: Huacai Chen <chenhuacai@kernel.org>
+Cc: Chen-Yu Tsai <wens@csie.org>
+Cc: Jernej Skrabec <jernej.skrabec@gmail.com>
+Cc: Samuel Holland <samuel@sholland.org>
+Cc: netdev@vger.kernel.org
+Cc: linux-stm32@st-md-mailman.stormreply.com
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-sunxi@lists.linux.dev
+Cc: linux-kernel@vger.kernel.org
 
- 10232	
- 10233	static int dev_dim_profile_init(struct net_device *dev)
- 10234	{
- 10235		int length = NET_DIM_PARAMS_NUM_PROFILES * sizeof(*dev->rx_eqe_profile);
- 10236		u32 supported = dev->ethtool_ops->supported_coalesce_params;
- 10237	
- 10238		if (!(dev->priv_flags & (IFF_PROFILE_USEC | IFF_PROFILE_PKTS | IFF_PROFILE_COMPS)))
- 10239			return 0;
- 10240	
- 10241		if (supported & ETHTOOL_COALESCE_RX_EQE_PROFILE) {
- 10242			dev->rx_eqe_profile = kzalloc(length, GFP_KERNEL);
- 10243			if (!dev->rx_eqe_profile)
- 10244				return -ENOMEM;
- 10245			memcpy(dev->rx_eqe_profile, rx_profile[0], length);
- 10246		}
- 10247		if (supported & ETHTOOL_COALESCE_RX_CQE_PROFILE) {
- 10248			dev->rx_cqe_profile = kzalloc(length, GFP_KERNEL);
- 10249			if (!dev->rx_cqe_profile)
- 10250				return -ENOMEM;
- 10251			memcpy(dev->rx_cqe_profile, rx_profile[1], length);
- 10252		}
- 10253		if (supported & ETHTOOL_COALESCE_TX_EQE_PROFILE) {
- 10254			dev->tx_eqe_profile = kzalloc(length, GFP_KERNEL);
- 10255			if (!dev->tx_eqe_profile)
- 10256				return -ENOMEM;
- 10257			memcpy(dev->tx_eqe_profile, tx_profile[0], length);
- 10258		}
- 10259		if (supported & ETHTOOL_COALESCE_TX_CQE_PROFILE) {
- 10260			dev->tx_cqe_profile = kzalloc(length, GFP_KERNEL);
- 10261			if (!dev->tx_cqe_profile)
- 10262				return -ENOMEM;
- 10263			memcpy(dev->tx_cqe_profile, tx_profile[1], length);
- 10264		}
- 10265	
- 10266		return 0;
- 10267	}
- 10268	
+Serge Semin (4):
+  net: stmmac: Apply half-duplex-less constraint for DW QoS Eth only
+  net: stmmac: Fix max-speed being ignored on queue re-init
+  net: stmmac: Fix IP-cores specific MAC capabilities
+  net: stmmac: Move MAC caps init to phylink MAC caps getter
+
+ drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
+ .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  2 +
+ .../ethernet/stmicro/stmmac/dwmac1000_core.c  |  2 +
+ .../ethernet/stmicro/stmmac/dwmac100_core.c   |  2 +
+ .../net/ethernet/stmicro/stmmac/dwmac4_core.c |  7 ++-
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 18 ++++----
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 43 ++++++++-----------
+ 7 files changed, 38 insertions(+), 37 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.43.0
+
 
