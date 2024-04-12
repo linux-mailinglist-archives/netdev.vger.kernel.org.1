@@ -1,50 +1,54 @@
-Return-Path: <netdev+bounces-87346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BFC88A2D22
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:16:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BC0B8A2D28
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:19:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD9A61C21153
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 11:16:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B094F1F22E06
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 11:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F58C5336D;
-	Fri, 12 Apr 2024 11:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC8E53804;
+	Fri, 12 Apr 2024 11:19:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="I+mcjpmX"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="eQ5UPlU0"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A92DF6FCC
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 11:16:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FC3C3D3B1;
+	Fri, 12 Apr 2024 11:19:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712920610; cv=none; b=QMQ50Cuytmqy8RpSAkfsPpn6V3KZVFZxRCZBg3QJZg9FVX80lSlK2CEtD0BilRX0pX+NPAqbXofiwGjk8UbuKnIhAxDdBY/xrAzJRWu8q+ItpeMVa1BRb8gOO6bt2IzmWK0jQMOmL0kaiyyUAiMz9Y4u+/aTa1cMi+tLzU9dNOw=
+	t=1712920758; cv=none; b=jgov2BuN8ZPP4Kj4oM3x7xDk7TBlWErb2dX4ABCnvOSWxxmzgZZspCo7CB4xRTGGqD7J61klwiKBScrRWMmOdh86AmdZd9cDl+1uqmGZEk6zUKq5DjbQr6zZ5XKdgONJFBJYSZULoJnnfOCR0auUoivFXtSZYZsvHHsnKZTmGQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712920610; c=relaxed/simple;
-	bh=Ebr7Q+vNeTMePzT5VXDtKO5QQQWysLYOGPkwxJSciWE=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=h61hmrp42govx0yCyXe4Hp59C2fkcNYGUWAUnaSarvbIPlp/fB0ohF6WnbBI9G+TGdj0+7rZ/vShm81Eef0otCRv9CUbpe0z/CIxnrcV2Rr5fcGuqrq3O8z9oInYNeeXYF015gmRT6FAttGtw9uCBtIhzlLH4nGiFAbDz8CdfRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=I+mcjpmX; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id F36AC240002;
-	Fri, 12 Apr 2024 11:16:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1712920600;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Ebr7Q+vNeTMePzT5VXDtKO5QQQWysLYOGPkwxJSciWE=;
-	b=I+mcjpmXwqfkSrzhm/0R6PVLlgou7q+VRMEW5Fw56Fdx2Nb7RTdg9C6k/9bwJKLNShIRye
-	FUglv7Mvl0QpffWwTW4EqPzd2i9XamqD8dnLf8Ena4sMlHvZ+5zHQ0ORbzBPw2q/zI2Zvw
-	vL4HTIwzXjmqqrxjs2JowG6QRXpNd4m3+BgHKmQK34hXBv8VLoAn/3aR3Lcjfiry2ags48
-	nj/t9+kR1OuOicNDaulE+3XM93mnqCAQfYJqj4Iopx8KjxCIT2/Dxdho4sEGwwDPQn2P3w
-	YsIPyefCFGjWlRdRdIxP0p+2FeiKipoCcAP3qEgvdimVWwTkb2A+R3ta+PlPMQ==
-Message-ID: <fce3c587-eca3-402f-a31f-5473fd2cd6eb@arinc9.com>
-Date: Fri, 12 Apr 2024 14:16:31 +0300
+	s=arc-20240116; t=1712920758; c=relaxed/simple;
+	bh=8/SKetfBZBy2Kh39R7Wd6mztgC+n9WBxP1ZOYm7Roz4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=vGbEwEumwi0kASCvL5FWm0z85i/48I5YMo9EFudHYO1YU5k/3Yb/R0Ycj0iIPB4uttb7j8RHpae81gakpmO/FBQSfa8kin523Uy4u9AepJNdhOcY+fAllQDnHtuJ/HOmor5SdW2yTl0TCpSe0duHzB9ssKjs01cvQnFKXMZvypY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=eQ5UPlU0; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 4D8FC600A2;
+	Fri, 12 Apr 2024 11:19:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1712920747;
+	bh=8/SKetfBZBy2Kh39R7Wd6mztgC+n9WBxP1ZOYm7Roz4=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=eQ5UPlU0Il6iUiB9lA5UENtj+dwdRTE/O0z9PasN3FZrzEAn2nMd7Q0SIM0W8/aQ8
+	 jqcI4bdEm1dSfagbMh1rjAvhVmWpErHcW3JP7pxa2UM2I7IuC699JrkXOlynPP4lyj
+	 xoUwOeL7in/J+GKlDIr+4EbgsvhmPvziZTqh9jaPy8wFcfBBC9Jqu43SCy2BTf9YJl
+	 KvSecv/IU+n9XY/S/rr1rd5JJsQ362fxXcUs6bbqRphun3oGWWfSfM4xwXEM+uIDDC
+	 ccRoFVz7V/tR0ChVYf0PMa/x49KA1LKZPFOj8thumXZ6DSIehuSae8dXginPsdjZv/
+	 nkVgVSEZES+1Q==
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id F196120106A;
+	Fri, 12 Apr 2024 11:18:59 +0000 (UTC)
+Message-ID: <5fb7638c-e70a-49ea-94d5-6b7f3e953255@fiberby.net>
+Date: Fri, 12 Apr 2024 11:18:59 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,63 +56,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] octeontx2-pf: fix FLOW_DIS_IS_FRAGMENT implementation
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+To: "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+ Geethasowjanya Akula <gakula@marvell.com>,
+ Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+ Hariprasad Kelam <hkelam@marvell.com>, Suman Ghosh <sumang@marvell.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20240410134303.21560-1-ast@fiberby.net>
+ <SJ0PR18MB5216D2276BA11D5C5E31D6A6DB042@SJ0PR18MB5216.namprd18.prod.outlook.com>
+ <27ac48c0-b19c-4104-8ec9-08232e3f42f6@fiberby.net>
+ <235918fc-9b9b-4efa-8258-69bd5c7d40d4@fiberby.net>
 Content-Language: en-US
-To: netdev <netdev@vger.kernel.org>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Subject: DSA doesn't account for egress port mirroring by PRIO qdisc
+In-Reply-To: <235918fc-9b9b-4efa-8258-69bd5c7d40d4@fiberby.net>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: arinc.unal@arinc9.com
+Content-Transfer-Encoding: 8bit
 
-Hello.
+Hi maintainers,
 
-I've been attempting to use the port mirroring feature implemented on the
-MT7530 DSA subdriver. I've learned that this feature is utilised by using
-the tc program and the matchall filter.
+On 4/12/24 10:25 AM, Asbjørn Sloth Tønnesen wrote:
+> On 4/12/24 9:01 AM, Asbjørn Sloth Tønnesen wrote:
+> I was a bit in a hurry, to get the reply in before a meeting,
+> so: s/FLOW_DIS_FIRST_FRAG/FLOW_DIS_IS_FRAGMENT/g
 
-The examples section of tc-matchall(8) [1] shows how to create ingress
-mirroring and egress mirroring:
+It was just a fix for my reply to Suman, so I am a bit confused
+why the patch itself got marked as "Changes Requested" in patchwork [1].
 
-tc qdisc add dev lan0 handle ffff: ingress
+I can spin a v2, but the only change would currently be Jacob Keller's Reviewed-by.
 
-tc filter add dev lan0 parent ffff: matchall skip_sw \
-action mirred egress mirror dev lan1
+[1] https://patchwork.kernel.org/project/netdevbpf/patch/20240410134303.21560-1-ast@fiberby.net/
 
-tc qdisc add dev lan0 handle 1: root prio
-
-tc filter add dev lan0 parent 1: matchall skip_sw \
-action mirred egress mirror dev lan1
-
-Creation of egress mirroring fails:
-
-RTNETLINK answers: Operation not supported
-We have an error talking to the kernel
-
-After studying the code path, I see that in dsa_user_setup_tc_block() of
-net/dsa/user.c, binder_type of the flow_block_offload structure is checked
-to distinguish ingress and egress. As the PRIO qdisc does not assign
-FLOW_BLOCK_BINDER_TYPE_CLSACT_EGRESS to binder_type, DSA returns
--EOPNOTSUPP.
-
-After some digging, I've found this commit 1f211a1b929c ("net, sched: add
-clsact qdisc"). With the examples given on the patch log, I was able to
-create ingress and egress mirroring:
-
-tc qdisc add dev lan0 clsact
-
-tc filter add dev lan0 ingress matchall skip_sw \
-action mirred egress mirror dev lan1
-
-tc filter add dev lan0 egress matchall skip_sw \
-action mirred egress mirror dev lan1
-
-DSA should either somehow allow egress mirroring by the PRIO qdisc or the
-examples on tc-matchall(8) and tc-mirred(8) man page should be replaced to
-use the clsact qdisc.
-
-[1] https://www.man7.org/linux/man-pages/man8/tc-matchall.8.html#EXAMPLES
+-- 
+Best regards
+Asbjørn Sloth Tønnesen
+Network Engineer
+Fiberby - AS42541
 
