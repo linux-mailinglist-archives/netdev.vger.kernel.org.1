@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-87443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 575688A322A
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11B5F8A3229
 	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 17:20:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 486061C22FD6
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5D081F25169
 	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E17F01509AB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E07541509A9;
 	Fri, 12 Apr 2024 15:15:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="UMrH5UJb"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="uUFjUxj0"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00D1149C72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0112149C74
 	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 15:15:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712934921; cv=none; b=M65cGWk0DrP6aB6fKzLpO56LwzslL67lU9sF4BvFwA7rJU76dnrPINOnoTU5TQFf3n81s5Fi29/F9wNCrOWAYmH27SdOb6SS3ijSkue/mECVIQEcElywDMjl54tQOPqAq1NmWvckzIwmqvBnIEqJbAizvGfMfCI6oWXL9n7LumA=
+	t=1712934921; cv=none; b=Vr1oPny6U++rIdVIyj5lFoRABB2XqthsnlyVGywwZT3bNioXQRv2NMSgnQFvMC1HoNGP0OYFg2nflSornjn7yprmxd/QdZ6JWCYUdjrGYNToL7y824nUkDNZ9aS6ZxXGgIz2iMjpzI12zZnDFtmtEuVV/Kp+GLdKMBHT13OiFng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1712934921; c=relaxed/simple;
-	bh=Ordgrzm0jr4wWTX4n3QGcT5xOoan8HBMWL4B7PF+juQ=;
+	bh=5J6XS6AtLClqmvZU6PvLp/2UVtoyIbJCP3F2YGOHQ7I=;
 	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=tHws3C4O/+8ndKoPN0zNnBAoJRfV3fyOt4KaaWPmmqMFk12BDmNyPo9P0uVM+ZbB76hZVhihYJEJQTz6WU68fXnaox8Wtlrv01nk8NiVBM/qEze7h9uoAsF1tqKpg+D6PqlQcURHBPSN9ODUCWlyMi0QWyLNCLektz5rUvxmwgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=UMrH5UJb; arc=none smtp.client-ip=78.32.30.218
+	 Message-Id:Date; b=mz59mo0pNYVxoD/mhh/RN+9936gM3kB96acPv8xuzJ3FQyGsHrks4J4bGqd8qzJE7JltUQCgBlAFoxeh0oFBiPnFcRI2N6riU+dAvsBo9+4EaSzAOlgPtrcywVRE9VWuNUK+Gzk7Zij3s4oIW/BG37oA6c4l+G107vDet8UJMAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=uUFjUxj0; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,36 +37,32 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
 	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=kYzIyB/TOmufMv9vsv2N+sl8g4N8xwfM/tUDF6xFAyk=; b=UMrH5UJbPwiJ7H+bif3g7oNnnl
-	6QrHx8abkqVT13O+IDxey79IemEFH6W7OiyhT0w6KRa1o+cX8nxMFSec9GfmLeu9Gc1AEAp/hFz+G
-	3OrTiw2YLLDMkJwPa4OI0RWDnyEfFAtmhx3ODDrgfw7Ld2dgQ55YeiOvRBVU1WpwmEvUGqsht+RWG
-	oHzkMSw3Ok3Cn0AcXn7SIG2dAUpERefFo4MQfmeLZmowBFTAWDJkWryENsVy68i2fak52qt9xiA6k
-	mj93WWqA3vw20ZnnMpfv0EjyOoT0VCgAwfJfzlkoH0BpTdP7cO9jY/g8Ee9ACIL0xmClB41DkN0OY
-	dCChonyw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42496 helo=rmk-PC.armlinux.org.uk)
+	bh=1IowwP+4BB9KyZXRDwt0GxdiJvt1JE+G76huQb8NJRU=; b=uUFjUxj0awD/O3woBMq+84Pj57
+	onUGXmkcXkf9zfl6pfHAeJ+owO7VPrdfttNBQPFlSjWhS88clv39y6Y4aSqzbC8Pncv1F8kC86aaK
+	CE0nxq9DTnl+pYmqYdNo6FAnWjwSiAA/LxIzaSxKfgc0DdNVpHLZKGNj2PRMp/t9npiUVFm4+Hfkt
+	nlRI32ZLtojmqY7+BSD0O5yW8DOER5MZJWvQMH2iG3w1FR9gu6k+N3D92U32WbrhFtvnAj1jfXVFt
+	ZXucobu8R7HtVIYwoyuaGiSzbgoUOZ1jiAq8ce8eQ620XEFXzMm6HgIvRhA2jYrg393n1OW7ona+/
+	kHK0gqgQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:47780 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1rvIcN-0002bs-32;
-	Fri, 12 Apr 2024 16:15:08 +0100
+	id 1rvIcT-0002c6-06;
+	Fri, 12 Apr 2024 16:15:13 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1rvIcO-006bQQ-Md; Fri, 12 Apr 2024 16:15:08 +0100
+	id 1rvIcT-006bQW-S3; Fri, 12 Apr 2024 16:15:13 +0100
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 To: Andrew Lunn <andrew@lunn.ch>,
 	 Vladimir Oltean <olteanv@gmail.com>
-Cc: Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Colin Foster <colin.foster@in-advantage.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next] net: dsa: felix: provide own phylink MAC operations
+Subject: [PATCH net-next] net: dsa: sja1105: provide own phylink MAC
+ operations
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,155 +72,106 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1rvIcO-006bQQ-Md@rmk-PC.armlinux.org.uk>
+Message-Id: <E1rvIcT-006bQW-S3@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 12 Apr 2024 16:15:08 +0100
+Date: Fri, 12 Apr 2024 16:15:13 +0100
 
-Convert felix to provide its own phylink MAC operations, thus
-avoiding the shim layer in DSA's port.c.
+Convert sja1105 to provide its own phylink MAC operations, thus
+avoiding the shim layer in DSA's port.c
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/dsa/ocelot/felix.c      | 54 +++++++++++++++++++----------
- drivers/net/dsa/ocelot/felix.h      |  1 +
- drivers/net/dsa/ocelot/ocelot_ext.c |  1 +
- 3 files changed, 38 insertions(+), 18 deletions(-)
+ drivers/net/dsa/sja1105/sja1105_main.c | 38 ++++++++++++++++++--------
+ 1 file changed, 27 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
-index 61e95487732d..3aa66bf9eafc 100644
---- a/drivers/net/dsa/ocelot/felix.c
-+++ b/drivers/net/dsa/ocelot/felix.c
-@@ -1050,24 +1050,32 @@ static void felix_phylink_get_caps(struct dsa_switch *ds, int port,
- 		  config->supported_interfaces);
+diff --git a/drivers/net/dsa/sja1105/sja1105_main.c b/drivers/net/dsa/sja1105/sja1105_main.c
+index fc262348a134..ee0fb1c343f1 100644
+--- a/drivers/net/dsa/sja1105/sja1105_main.c
++++ b/drivers/net/dsa/sja1105/sja1105_main.c
+@@ -1358,10 +1358,11 @@ static int sja1105_adjust_port_config(struct sja1105_private *priv, int port,
  }
  
--static void felix_phylink_mac_config(struct dsa_switch *ds, int port,
-+static void felix_phylink_mac_config(struct phylink_config *config,
- 				     unsigned int mode,
- 				     const struct phylink_link_state *state)
+ static struct phylink_pcs *
+-sja1105_mac_select_pcs(struct dsa_switch *ds, int port, phy_interface_t iface)
++sja1105_mac_select_pcs(struct phylink_config *config, phy_interface_t iface)
  {
--	struct ocelot *ocelot = ds->priv;
--	struct felix *felix = ocelot_to_felix(ocelot);
+-	struct sja1105_private *priv = ds->priv;
+-	struct dw_xpcs *xpcs = priv->xpcs[port];
 +	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct ocelot *ocelot = dp->ds->priv;
-+	int port = dp->index;
-+	struct felix *felix;
++	struct sja1105_private *priv = dp->ds->priv;
++	struct dw_xpcs *xpcs = priv->xpcs[dp->index];
+ 
+ 	if (xpcs)
+ 		return &xpcs->pcs;
+@@ -1369,21 +1370,31 @@ sja1105_mac_select_pcs(struct dsa_switch *ds, int port, phy_interface_t iface)
+ 	return NULL;
+ }
+ 
+-static void sja1105_mac_link_down(struct dsa_switch *ds, int port,
++static void sja1105_mac_config(struct phylink_config *config,
++			       unsigned int mode,
++			       const struct phylink_link_state *state)
++{
++}
 +
-+	felix = ocelot_to_felix(ocelot);
- 
- 	if (felix->info->phylink_mac_config)
- 		felix->info->phylink_mac_config(ocelot, port, mode, state);
- }
- 
--static struct phylink_pcs *felix_phylink_mac_select_pcs(struct dsa_switch *ds,
--							int port,
--							phy_interface_t iface)
-+static struct phylink_pcs *
-+felix_phylink_mac_select_pcs(struct phylink_config *config,
-+			     phy_interface_t iface)
++static void sja1105_mac_link_down(struct phylink_config *config,
+ 				  unsigned int mode,
+ 				  phy_interface_t interface)
  {
--	struct ocelot *ocelot = ds->priv;
--	struct felix *felix = ocelot_to_felix(ocelot);
+-	sja1105_inhibit_tx(ds->priv, BIT(port), true);
 +	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct ocelot *ocelot = dp->ds->priv;
- 	struct phylink_pcs *pcs = NULL;
-+	int port = dp->index;
-+	struct felix *felix;
 +
-+	felix = ocelot_to_felix(ocelot);
- 
- 	if (felix->pcs && felix->pcs[port])
- 		pcs = felix->pcs[port];
-@@ -1075,11 +1083,13 @@ static struct phylink_pcs *felix_phylink_mac_select_pcs(struct dsa_switch *ds,
- 	return pcs;
++	sja1105_inhibit_tx(dp->ds->priv, BIT(dp->index), true);
  }
  
--static void felix_phylink_mac_link_down(struct dsa_switch *ds, int port,
-+static void felix_phylink_mac_link_down(struct phylink_config *config,
- 					unsigned int link_an_mode,
- 					phy_interface_t interface)
+-static void sja1105_mac_link_up(struct dsa_switch *ds, int port,
++static void sja1105_mac_link_up(struct phylink_config *config,
++				struct phy_device *phydev,
+ 				unsigned int mode,
+ 				phy_interface_t interface,
+-				struct phy_device *phydev,
+ 				int speed, int duplex,
+ 				bool tx_pause, bool rx_pause)
  {
--	struct ocelot *ocelot = ds->priv;
+-	struct sja1105_private *priv = ds->priv;
 +	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct ocelot *ocelot = dp->ds->priv;
++	struct sja1105_private *priv = dp->ds->priv;
 +	int port = dp->index;
- 	struct felix *felix;
  
- 	felix = ocelot_to_felix(ocelot);
-@@ -1088,15 +1098,19 @@ static void felix_phylink_mac_link_down(struct dsa_switch *ds, int port,
- 				     felix->info->quirks);
+ 	sja1105_adjust_port_config(priv, port, speed);
+ 
+@@ -3198,6 +3209,13 @@ static void sja1105_teardown(struct dsa_switch *ds)
+ 	sja1105_static_config_free(&priv->static_config);
  }
  
--static void felix_phylink_mac_link_up(struct dsa_switch *ds, int port,
-+static void felix_phylink_mac_link_up(struct phylink_config *config,
-+				      struct phy_device *phydev,
- 				      unsigned int link_an_mode,
- 				      phy_interface_t interface,
--				      struct phy_device *phydev,
- 				      int speed, int duplex,
- 				      bool tx_pause, bool rx_pause)
- {
--	struct ocelot *ocelot = ds->priv;
--	struct felix *felix = ocelot_to_felix(ocelot);
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct ocelot *ocelot = dp->ds->priv;
-+	int port = dp->index;
-+	struct felix *felix;
-+
-+	felix = ocelot_to_felix(ocelot);
- 
- 	ocelot_phylink_mac_link_up(ocelot, port, phydev, link_an_mode,
- 				   interface, speed, duplex, tx_pause, rx_pause,
-@@ -2083,6 +2097,14 @@ static void felix_get_mm_stats(struct dsa_switch *ds, int port,
- 	ocelot_port_get_mm_stats(ocelot, port, stats);
- }
- 
-+const struct phylink_mac_ops felix_phylink_mac_ops = {
-+	.mac_select_pcs		= felix_phylink_mac_select_pcs,
-+	.mac_config		= felix_phylink_mac_config,
-+	.mac_link_down		= felix_phylink_mac_link_down,
-+	.mac_link_up		= felix_phylink_mac_link_up,
++static const struct phylink_mac_ops sja1105_phylink_mac_ops = {
++	.mac_select_pcs	= sja1105_mac_select_pcs,
++	.mac_config	= sja1105_mac_config,
++	.mac_link_up	= sja1105_mac_link_up,
++	.mac_link_down	= sja1105_mac_link_down,
 +};
-+EXPORT_SYMBOL_GPL(felix_phylink_mac_ops);
 +
- const struct dsa_switch_ops felix_switch_ops = {
- 	.get_tag_protocol		= felix_get_tag_protocol,
- 	.change_tag_protocol		= felix_change_tag_protocol,
-@@ -2104,10 +2126,6 @@ const struct dsa_switch_ops felix_switch_ops = {
- 	.get_sset_count			= felix_get_sset_count,
- 	.get_ts_info			= felix_get_ts_info,
- 	.phylink_get_caps		= felix_phylink_get_caps,
--	.phylink_mac_config		= felix_phylink_mac_config,
--	.phylink_mac_select_pcs		= felix_phylink_mac_select_pcs,
--	.phylink_mac_link_down		= felix_phylink_mac_link_down,
--	.phylink_mac_link_up		= felix_phylink_mac_link_up,
- 	.port_enable			= felix_port_enable,
- 	.port_fast_age			= felix_port_fast_age,
- 	.port_fdb_dump			= felix_fdb_dump,
-diff --git a/drivers/net/dsa/ocelot/felix.h b/drivers/net/dsa/ocelot/felix.h
-index dbf5872fe367..4d3489aaa659 100644
---- a/drivers/net/dsa/ocelot/felix.h
-+++ b/drivers/net/dsa/ocelot/felix.h
-@@ -82,6 +82,7 @@ struct felix_tag_proto_ops {
- 			      struct netlink_ext_ack *extack);
- };
+ static const struct dsa_switch_ops sja1105_switch_ops = {
+ 	.get_tag_protocol	= sja1105_get_tag_protocol,
+ 	.connect_tag_protocol	= sja1105_connect_tag_protocol,
+@@ -3207,9 +3225,6 @@ static const struct dsa_switch_ops sja1105_switch_ops = {
+ 	.port_change_mtu	= sja1105_change_mtu,
+ 	.port_max_mtu		= sja1105_get_max_mtu,
+ 	.phylink_get_caps	= sja1105_phylink_get_caps,
+-	.phylink_mac_select_pcs	= sja1105_mac_select_pcs,
+-	.phylink_mac_link_up	= sja1105_mac_link_up,
+-	.phylink_mac_link_down	= sja1105_mac_link_down,
+ 	.get_strings		= sja1105_get_strings,
+ 	.get_ethtool_stats	= sja1105_get_ethtool_stats,
+ 	.get_sset_count		= sja1105_get_sset_count,
+@@ -3375,6 +3390,7 @@ static int sja1105_probe(struct spi_device *spi)
+ 	ds->dev = dev;
+ 	ds->num_ports = priv->info->num_ports;
+ 	ds->ops = &sja1105_switch_ops;
++	ds->phylink_mac_ops = &sja1105_phylink_mac_ops;
+ 	ds->priv = priv;
+ 	priv->ds = ds;
  
-+extern const struct phylink_mac_ops felix_phylink_mac_ops;
- extern const struct dsa_switch_ops felix_switch_ops;
- 
- /* DSA glue / front-end for struct ocelot */
-diff --git a/drivers/net/dsa/ocelot/ocelot_ext.c b/drivers/net/dsa/ocelot/ocelot_ext.c
-index 22187d831c4b..a8927dc7aca4 100644
---- a/drivers/net/dsa/ocelot/ocelot_ext.c
-+++ b/drivers/net/dsa/ocelot/ocelot_ext.c
-@@ -96,6 +96,7 @@ static int ocelot_ext_probe(struct platform_device *pdev)
- 	ds->num_tx_queues = felix->info->num_tx_queues;
- 
- 	ds->ops = &felix_switch_ops;
-+	ds->phylink_mac_ops = &felix_phylink_mac_ops;
- 	ds->priv = ocelot;
- 	felix->ds = ds;
- 	felix->tag_proto = DSA_TAG_PROTO_OCELOT;
 -- 
 2.30.2
 
