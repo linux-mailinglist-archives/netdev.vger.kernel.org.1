@@ -1,73 +1,84 @@
-Return-Path: <netdev+bounces-87449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEA808A3240
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 17:22:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 545B08A3245
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 17:23:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 254451C22F4A
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:22:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D342281B56
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:23:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C0B11494BF;
-	Fri, 12 Apr 2024 15:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A904A145B36;
+	Fri, 12 Apr 2024 15:22:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fo3/czKE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95CC2148FF9;
-	Fri, 12 Apr 2024 15:19:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0928484A37;
+	Fri, 12 Apr 2024 15:22:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712935187; cv=none; b=ETuhd2T67qHHiX2nlMlE8tp7uBqQI+pryZNg2qU1vdS44yzLrlpLNIihkfimDsoxiYv7K+Tw6Pluegzf457J7onA0if/ynbVteWcURsEBkcwXTdsZtZr36iKxkXiKmh221H6j64mMqslC9bdyD0oDSNXTv+bwKZVVQrS3zVMcrs=
+	t=1712935327; cv=none; b=YFJQUbu9cwu8Xef2MXa7MW9WePmWz+VSArhzTRIn9LWT/zX2w9b19h1prb7MJoDs1LWBxu6tEwWyC0Js8NBctIPer1sBeAN4gbR4Veyil+pZphc9RWYTkXU4BNkmVApbemsr5ytOIvnqdGFLorl70/l6vyvMAAO8Cjwp+N0Bri0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712935187; c=relaxed/simple;
-	bh=1I9KctD9v8HDw1TZ54buI8FQkI+tMCN3Y5eq63v1xj4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ke45mNOr5T3Ab5XYVxC92qLd+WN8Pr29kRwGtxI/FdJ2d2bXqZwUPZZfebm5p1k+bs/gBZhPpnrz1oIfA9eA1X75ksNXdfm96CaaYsxTAsaXYlW9GbGqOUtYALl4dbw0oLpeFncNpJaVCaKnCoDGio4wg54s8aYsOuQJOqM0m4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1712935327; c=relaxed/simple;
+	bh=mLJgP3qYygteSDbYdScbwbMfDV+pZa7zvSt+jGFVBxs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RpdYsE+9sTKjvzsDf80J75w375fzNwQim+CcdOliPXpUFzqF1CjkWe72GnvBurymd/o7D+SdDDuhenMVuiPHCYHo0XxU601TfBiOM/w3rvA4hQs1+H531sN8G8tic3nvk1tcK6HKl7c1m/eqPWzRSMWzTKcJzFD2u+DiYEx3IvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fo3/czKE; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-563cb3ba9daso1031960a12.3;
-        Fri, 12 Apr 2024 08:19:45 -0700 (PDT)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-34665dd7610so432420f8f.3;
+        Fri, 12 Apr 2024 08:22:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712935324; x=1713540124; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BKUpk57F2e+NylpttQMpo0uer78NWTYRijCbu0kAq8A=;
+        b=Fo3/czKE1i6bpEwszhMDZwNOLWAENGQ3PEzpxT7A6CYK04FElDpqgFRlq3Axy1B2wy
+         DQP+Rik3Shu5wvRXsx2nxwl20rn7IEZ1nyvUlTMW9tRLSAq8jVhXzp0rnLOEqCibj+A1
+         1L5mN3dVN2ziw40qx9uVICY0PYJrf+VROJgfcAjbzP0e2A2k18S2wIVLDqmt0ScSYkP0
+         ywghq1UoigGMo39xorOs/X+YtZlzVI5a9ZdsH38T/Ap/gW1s3tlii+bkaTdoir1ZGe1H
+         TglTR0ZLzSQ/GY4E14eRNSrZHXRvbEZ05YVz1snrstdAu8x0wrd9yd1HMjtof1r2spaE
+         nM1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712935184; x=1713539984;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IsgwtMpEymBii2Q07PG7fDKinM7HRQw2ddeFPhLPyuo=;
-        b=pgKPMxLIg13rIrNKEIzv+ESrGHLRaGJV/Cu8x7IYmhomlwFPRpe1b+0Cu9//2DrX3b
-         DoGWmeyee5Nowj3xa+VnBnYH218qkUi0KDiKYLeMUILPPWBwpt2tjjfAGJ7KbEk5lvob
-         IyGI6nZEZt/j5rTITuNo5VFOTNqGj80OxGqoY4QYi04swrmxoWdRBMNC5U9b9NzWJzTp
-         eGEmbo17mrrhk7bjBUANmp3CkgyojERj7dvC2cvP1s1pNdxIE6GBHSEX5myaUEtPqxEX
-         18m816OIlcN1zKaGWdc196PtuEwtPL/McitBaLgbI8MHvYS5rWIgsxXd0xMDQKfnNMuF
-         YVlA==
-X-Forwarded-Encrypted: i=1; AJvYcCXANeTrWaztdVrlvxKONGd6RB0r29uLg+dx0bC+YN5/Ae6uInFiEcKL1HNtxwUbX7JaGV7bMI1rGCKYRvoPyThWdw95DVyxj4adE5Nd
-X-Gm-Message-State: AOJu0YzO7L+wP3JH5lBiN10TSzIgO4rMtMvR2diRkZqZ6DG6+U2K9kH3
-	tm6BCRw+1+8V//mm7Psfqt09xU4x/eBrkLAQsoiwt942KI6Ns8JN
-X-Google-Smtp-Source: AGHT+IHcKXe2KUB58A9HTpVzlHxQLHgjlX1xlkgMV5RezWAayQTuhjhD97HaygRb+Uiurq7avvTuTQ==
-X-Received: by 2002:a17:906:f0ce:b0:a52:4363:b028 with SMTP id dk14-20020a170906f0ce00b00a524363b028mr25080ejb.29.1712935183722;
-        Fri, 12 Apr 2024 08:19:43 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-006.fbsv.net. [2a03:2880:30ff:6::face:b00c])
-        by smtp.gmail.com with ESMTPSA id og50-20020a1709071df200b00a51ba0be887sm1942278ejc.192.2024.04.12.08.19.43
+        d=1e100.net; s=20230601; t=1712935324; x=1713540124;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BKUpk57F2e+NylpttQMpo0uer78NWTYRijCbu0kAq8A=;
+        b=kjji3JScNMtm9MUJh7D1qHluHSP17UKjuTJ6dBudGPz3Xi2Bqz3a6qF9WEkA8+aAx3
+         NryFtkNP1VnoWoEGDBF2o7jL2k5U7WB6nr1W3sDNdOnYAgTLAJQsRxWQzQtNmTlpGfhz
+         WM862QNulBNWSZtOUPMFaKRyKz3NyeKWwhbdfE3DJI4zIpfosnl7WcYPVcdES90bYucH
+         biWEPoRntPcEjYwHc0R0yRfN3dsYapdGev2qYVdDzsoLf37busPVyh7hjnOgRpA+MGj+
+         CXO1M96Q3lRvUDnVLkc0/BniT+DfgDPt7uEXfn4bItXumQN6aFGiwScjXd+3CqidIbZz
+         UWVw==
+X-Forwarded-Encrypted: i=1; AJvYcCWRlkzSw8hjLvyzsofwZqZG0tL3pxTwBaVM/gj3C1BDQQdk7B9EtQINk48V1OJiGpAfEl1nDQ0QexzMKwfrmRMTbgKC+z2asiQq0+U7gqSBYRa4GcQF65zDKefmHrpLWN9BEldR
+X-Gm-Message-State: AOJu0YwcIlpPxTl4OCwoaRXhuTWPVALd4uyfzhKLJEpCqhd8M0visWl2
+	0XMlOpNLlfL5NYZsVFDWyf5algckkbBrNddLUNbaNUEzN5NYWuTV
+X-Google-Smtp-Source: AGHT+IGQImkLmCY7VdyKoOUu0Hnb7lsqT99IXd21vmwG4wcHO9BKu5oHk5B4dbcecaH8k8TajcpQxA==
+X-Received: by 2002:adf:fa8b:0:b0:343:b686:89a0 with SMTP id h11-20020adffa8b000000b00343b68689a0mr1939576wrr.13.1712935324028;
+        Fri, 12 Apr 2024 08:22:04 -0700 (PDT)
+Received: from localhost ([146.70.204.204])
+        by smtp.gmail.com with ESMTPSA id h5-20020adff4c5000000b003437a76565asm4486798wrp.25.2024.04.12.08.22.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 08:19:43 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	horms@kernel.org
-Subject: [PATCH net-next 2/2] net: ip6_gre: Remove generic .ndo_get_stats64
-Date: Fri, 12 Apr 2024 08:19:26 -0700
-Message-ID: <20240412151928.2895993-2-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240412151928.2895993-1-leitao@debian.org>
-References: <20240412151928.2895993-1-leitao@debian.org>
+        Fri, 12 Apr 2024 08:22:03 -0700 (PDT)
+From: Richard Gobert <richardbgobert@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	willemdebruijn.kernel@gmail.com,
+	dsahern@kernel.org,
+	aleksander.lobakin@intel.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Richard Gobert <richardbgobert@gmail.com>
+Subject: [PATCH net v1 0/2] net: gro: add flush/flush_id checks and fix wrong offset in udp
+Date: Fri, 12 Apr 2024 17:21:18 +0200
+Message-Id: <20240412152120.115067-1-richardbgobert@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,49 +87,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit 3e2f544dd8a33 ("net: get stats64 if device if driver is
-configured") moved the callback to dev_get_tstats64() to net core, so,
-unless the driver is doing some custom stats collection, it does not
-need to set .ndo_get_stats64.
+This series fixes a bug in the complete phase of UDP in GRO, in which
+socket lookup fails due to using network_header when parsing encapsulated
+packets. The fix is to pass p_off (previous offset, offset to the start of
+the previous layer) parameter in *_gro_complete.
 
-Since this driver is now relying in NETDEV_PCPU_STAT_TSTATS, then, it
-doesn't need to set the dev_get_tstats64() generic .ndo_get_stats64
-function pointer.
+The original series includes a change to a vxlan test which adds the local
+parameter to prevent similar future bugs. I plan to submit it separately
+to net-next.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- net/ipv6/ip6_gre.c | 3 ---
- 1 file changed, 3 deletions(-)
+In addition p->flush/flush_id should be checked in relevant UDP flows. Same
+logic from tcp_gro_receive is applied for the relevant flows in
+udp_gro_receive_segment.
 
-diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
-index b5b417902c0a..3942bd2ade78 100644
---- a/net/ipv6/ip6_gre.c
-+++ b/net/ipv6/ip6_gre.c
-@@ -1434,7 +1434,6 @@ static const struct net_device_ops ip6gre_netdev_ops = {
- 	.ndo_start_xmit		= ip6gre_tunnel_xmit,
- 	.ndo_siocdevprivate	= ip6gre_tunnel_siocdevprivate,
- 	.ndo_change_mtu		= ip6_tnl_change_mtu,
--	.ndo_get_stats64	= dev_get_tstats64,
- 	.ndo_get_iflink		= ip6_tnl_get_iflink,
- };
- 
-@@ -1857,7 +1856,6 @@ static const struct net_device_ops ip6gre_tap_netdev_ops = {
- 	.ndo_set_mac_address = eth_mac_addr,
- 	.ndo_validate_addr = eth_validate_addr,
- 	.ndo_change_mtu = ip6_tnl_change_mtu,
--	.ndo_get_stats64 = dev_get_tstats64,
- 	.ndo_get_iflink = ip6_tnl_get_iflink,
- };
- 
-@@ -1920,7 +1918,6 @@ static const struct net_device_ops ip6erspan_netdev_ops = {
- 	.ndo_set_mac_address =	eth_mac_addr,
- 	.ndo_validate_addr =	eth_validate_addr,
- 	.ndo_change_mtu =	ip6_tnl_change_mtu,
--	.ndo_get_stats64 =	dev_get_tstats64,
- 	.ndo_get_iflink =	ip6_tnl_get_iflink,
- };
- 
+This series is part of a previously submitted series to net-next:
+https://lore.kernel.org/all/20240410153423.107381-1-richardbgobert@gmail.com/
+
+Richard Gobert (2):
+  net: gro: add flush check in udp_gro_receive_segment
+  net: gro: add p_off param in *_gro_complete
+
+ drivers/net/geneve.c           |  7 +++---
+ drivers/net/vxlan/vxlan_core.c | 11 ++++++----
+ include/linux/etherdevice.h    |  2 +-
+ include/linux/netdevice.h      |  3 ++-
+ include/linux/udp.h            |  2 +-
+ include/net/gro.h              | 11 +++++-----
+ include/net/inet_common.h      |  2 +-
+ include/net/tcp.h              |  6 ++++--
+ include/net/udp.h              |  8 +++----
+ include/net/udp_tunnel.h       |  2 +-
+ net/8021q/vlan_core.c          |  4 ++--
+ net/core/gro.c                 |  2 +-
+ net/ethernet/eth.c             |  4 ++--
+ net/ipv4/af_inet.c             |  8 +++----
+ net/ipv4/fou_core.c            |  9 ++++----
+ net/ipv4/gre_offload.c         |  5 +++--
+ net/ipv4/tcp_offload.c         |  7 +++---
+ net/ipv4/udp.c                 |  3 ++-
+ net/ipv4/udp_offload.c         | 39 ++++++++++++++++++++++------------
+ net/ipv6/ip6_offload.c         | 22 ++++++++++---------
+ net/ipv6/tcpv6_offload.c       |  7 +++---
+ net/ipv6/udp.c                 |  3 ++-
+ net/ipv6/udp_offload.c         | 13 ++++++------
+ 23 files changed, 105 insertions(+), 75 deletions(-)
+
 -- 
-2.43.0
+2.36.1
 
 
