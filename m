@@ -1,104 +1,103 @@
-Return-Path: <netdev+bounces-87472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 297208A337A
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 18:16:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41C868A3392
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 18:20:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D40B41F24592
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 16:16:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F10FD2821CF
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 16:20:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D97A01494CB;
-	Fri, 12 Apr 2024 16:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0899149E1D;
+	Fri, 12 Apr 2024 16:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MolebbcD"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="gvijH1f7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5F9D84A4F;
-	Fri, 12 Apr 2024 16:15:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1566D1487E4;
+	Fri, 12 Apr 2024 16:18:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712938556; cv=none; b=kD6BZIJstCTWleEWdsA1SicUaY+jht0bnnE2aFKSSlYoRzxAdRWczPXPtg3MJGZmcfLKtmLO2sBNYTRCphsHOuX7OQDoXMuUg1ZHxQlwTIPwJiUO/IB5e20Sz16+xozIigZvE96Ms+YnDLPHTBuMaOWKUqiE9pzN38JjlySBSM0=
+	t=1712938708; cv=none; b=KFI0tC9Wtr8a+oDKhhRgDv4P0ACtErw02pHdhlGno6uerv8C9WjiQ3BzpC3ToKxjzg9LUxpsjvQjHcMoWg2XFdLLZ8U/8tS4wWqXDJwtARlIoW1k01NFpScxG4Zq+RghsEBQrMPBV50YdTbFHQRIA5+G/YYcQTnKYNGt2qdksl8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712938556; c=relaxed/simple;
-	bh=OGemIX+8j/SNPZ6+9iiBSfvBSY+CSmmHswHoWL2kVOI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dmEyQ2cG4NQV6ONsGxnYSpDOStwG5cElml8pE36o1pcQQ6W/Vs6ls56PJa+Jx9c3JslqEEddOr4/AyDTZsIZsli/dVrtM64ke9UWAVAKWJl9gZ2DU46VUVNfGYcjsQ3ZnKEGfOmKA7kA3ihucg+N7HVydyV2pETjORYK97O0NPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MolebbcD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04972C113CC;
-	Fri, 12 Apr 2024 16:15:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712938556;
-	bh=OGemIX+8j/SNPZ6+9iiBSfvBSY+CSmmHswHoWL2kVOI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=MolebbcDZ5evosjdFYXSEiJYVEIgZrNBKZZK3dkxLS/4oJUUc8OUhWxTZ7BlqdJuW
-	 OrP5ALCDNDHu+gonENkJaoMP3/IzdN5btztrEt2mV9lvCXfGRSNGU8pZiBZgvDvtzv
-	 YVQ8Y65MuVVbB/wP5NFy5tce1FdzECQzavYHOg3Ua5MBo/j7O+3pH6USMVy9WCqFVv
-	 ocALK9bb8w5NHoGyw7lDrV64k488p0X3m8/+nuFVfCHu1FV8Smy8tU7NK+EQDkRxQl
-	 x9u+2GHsfMvHHhRunejv+GZWXp0BDYvgJ26kqQ0dM51Npz9xItiqVSHXLN1VKWAGnk
-	 G1Dw1MIOexwGA==
-Date: Fri, 12 Apr 2024 11:15:53 -0500
-From: Rob Herring <robh@kernel.org>
-To: Christophe Roullier <christophe.roullier@foss.st.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 02/11] dt-bindings: net: add phy-supply property for stm32
-Message-ID: <20240412161553.GA3051386-robh@kernel.org>
-References: <20240411143658.1049706-1-christophe.roullier@foss.st.com>
- <20240411143658.1049706-3-christophe.roullier@foss.st.com>
+	s=arc-20240116; t=1712938708; c=relaxed/simple;
+	bh=H1fM5qZarUTqTbPcEiWO1kQWJYXX9Yqz5xJmMTOWlBo=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=XFEd2UeiSkqD/43zt/MwZml01FTmY9pGTuWN8yQ8f8V8ePbPf7qjoohB0B0iQ3zPaGoQRlaNV9YXyWsx1qGqVv/1uBf8rGpguXYDnUDIaNnba0GrC2CT6TbUkOXzrGWr/5qSk+hZZcpyBGMNsi5ZJ3JGXQvr9dHIfs63RFcB26M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=gvijH1f7; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=bA1H0J9aZpfqPqx5MnEP2Av7FJoToVyToQ8NSU4NpeQ=; b=gvijH1f72SJdDDxXvBlhF6M4ze
+	9Z1Z/qnRzbjNaRnt7P5IkGiwYQYTVCQHtwaOtbDeIEBYC4SQauR93sMOeCQDvPRFmxU57lys1YqxQ
+	JrQWJ+hVMuJ9zptkpp21DphWLnW7EXvRO6sr1ONKkZMJNg9m1E/32fdH/TmBX0HAn/y/aU+aMCEFw
+	584GfxI9CFbfjtkN6a2F1+ZQwNxxxMLOczHzdaBbFJBUc7StYAjC8GYaw9GFut2Q5hObW7YWIwvOj
+	jWTqngA3cVXClJLEKjYk7SXUOuH80h0ujw811hHQBPCptc7oFJCG6wGlqGJ4ZzzBarAgTIij/whL1
+	PRmsY6rQ==;
+Received: from sslproxy05.your-server.de ([78.46.172.2])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rvJbU-0001jL-93; Fri, 12 Apr 2024 18:18:16 +0200
+Received: from [178.197.249.56] (helo=linux.home)
+	by sslproxy05.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rvJbS-00HALU-2d;
+	Fri, 12 Apr 2024 18:18:14 +0200
+Subject: Re: [PATCH] selftests: adopt BPF's approach to quieter builds
+To: Jakub Kicinski <kuba@kernel.org>, shuah@kernel.org
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, mykolal@fb.com, nathan@kernel.org,
+ ndesaulniers@google.com, morbo@google.com, justinstitt@google.com,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, llvm@lists.linux.dev
+References: <20240411190534.444918-1-kuba@kernel.org>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <da485e3b-7b35-f701-45b4-9c3914ea6456@iogearbox.net>
+Date: Fri, 12 Apr 2024 18:16:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240411143658.1049706-3-christophe.roullier@foss.st.com>
+In-Reply-To: <20240411190534.444918-1-kuba@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27243/Fri Apr 12 10:26:33 2024)
 
-On Thu, Apr 11, 2024 at 04:36:49PM +0200, Christophe Roullier wrote:
-> Phandle to a regulator that provides power to the PHY. This
-> regulator will be managed during the PHY power on/off sequence.
+On 4/11/24 9:05 PM, Jakub Kicinski wrote:
+> selftest build is fairly noisy, it's easy to miss warnings.
+> It's standard practice to add alternative messages in
+> the Makefile. I was grepping for existing solutions,
+> and found that bpf already has the right knobs.
 > 
-> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
+> Move them to lib.mk and adopt in net.
+> Convert the basic rules in lib.mk.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
->  Documentation/devicetree/bindings/net/stm32-dwmac.yaml | 3 +++
->  1 file changed, 3 insertions(+)
+> If this is okay with everyone, can we possibly apply it to net-next?
 
-Missing Krzysztof's ack or reason it was not added.
+Yeap, looks good!
 
-> 
-> diff --git a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> index 20f58eff6e6f9..34650cd9d6702 100644
-> --- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
-> @@ -91,6 +91,9 @@ properties:
->        RCC clock instead of ETH_CLK125.
->      type: boolean
->  
-> +  phy-supply:
-> +    description: PHY regulator
-> +
->    st,eth-clk-sel:
->      description:
->        set this property in RGMII PHY when you want to select RCC clock instead of ETH_CLK125.
-> -- 
-> 2.25.1
-> 
+Acked-by: Daniel Borkmann <daniel@iogearbox.net>
+
+Cheers,
+Daniel
 
