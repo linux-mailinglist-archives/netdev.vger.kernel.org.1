@@ -1,73 +1,75 @@
-Return-Path: <netdev+bounces-87519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3AB18A3613
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 20:59:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D51B8A363E
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 21:15:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11F011F237C1
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 18:59:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54B4B2875CE
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 19:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF1BF14EC60;
-	Fri, 12 Apr 2024 18:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A79014F135;
+	Fri, 12 Apr 2024 19:15:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="en8Rn3yk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YDMIMApr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f52.google.com (mail-oo1-f52.google.com [209.85.161.52])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A566A23778
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 18:59:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8C52148313
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 19:15:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712948383; cv=none; b=GJw1Wi0lo2nzg0cjrnGWhL2AE4NP9aMaTk44k1B3uzdJTT90y5hEh+k2DGcNANNmcFCIiM3ozjV0wMQ/IxNmMq4g/04Jep7v1YEPTTu1rRd2IZPRvCCQ4/GpyZpbCYto44mBXoYBd4lI8rd9VrOPK9vZ7e5ctjeBlAD/QBZOe8o=
+	t=1712949302; cv=none; b=r5psjCy2+Oapakhi/EASJuTNFb5XuMpBuclHSJWITNEHH77SHhNOAjoc2K9UWqhVr2quILCvbobDBly0/DpYNUP+goicIRQdp6qcJ5IjM1G7BWtFXfNviPl5o9JAfr0TLnzWVehWPShEg8VA8Vr9HE42Q2KvQ7hCDewZKDK8qqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712948383; c=relaxed/simple;
-	bh=XgMsC4RKRDE6R6g/ghDEHHySIhOTu+QETvWopYW/dBg=;
+	s=arc-20240116; t=1712949302; c=relaxed/simple;
+	bh=pqafSQ/pUMO89hdQchOjzmgCRrDtM8Pii5wIB+LMc2o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZfG9LdTzj7GnIP+63PmGBXl4tA46WV7tY2YITiTdv9jYqB7opSRRHIXLpqAJ9sOmvV/UoODn92ve61IxZsSFduESieKmeZTTh0B4kaU85I1baSfVsa57HATRyDZrtQhy1K/LNCnnfrbwxtaxcrXYubfdG7aneBDQzGpDz+R5voo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=en8Rn3yk; arc=none smtp.client-ip=209.85.161.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5a9ec68784cso670176eaf.2
-        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 11:59:41 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=ujTZLxhgmcxalrNLt9ctIM6TVlTfs8moDRuPKdjM+lCFLOTyosh3BFe5r3DvKjU/Qb19Ly+jm/QxI5K6LeivaOcRUkylv/FY4gFUG0/vztyoS8663LJOaObu5k6b3QQM2k3tVsOHfd05KigzmaEZUTVlGR+nMC8o5vWU7fdQqVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YDMIMApr; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a51a80b190bso69728766b.3
+        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 12:15:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1712948381; x=1713553181; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=n8ObryqrhtjTQeSVSFRYZKDmL6GQ8TuuFlxTZALzzzU=;
-        b=en8Rn3ykAd2qRWTk65vF8d7nGY/aWajWG/SrIAHkkgIzrQ15Ay0iF9v+z4yNozkUXQ
-         MXnbEbo8cEX8xX9Gawwxdn3W34L8R6k8xIcGDnN07UBQ6BG/bqNo6ZbPvkXiyiA0lU3t
-         x/clWkkKxpWLC9FDW2IA6YKIZ/BHqYZPaexGVckbrn8luzkaHlu73DsTaiNfpkRjczUy
-         PwK1WZ13875XxIs8y/UgsgIeHCLGQqS0R5zjyYY1gGTxHd05Bv4FJMkRKzzwwfdgMs60
-         8tozE2PASOmwSaJzhezRlyGcNuOTOf9GCJjxzLuvo+knvX1kt5NymYMEmFjc2WMRJgpb
-         qLpw==
+        d=gmail.com; s=20230601; t=1712949299; x=1713554099; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=fSILvxffpq5e9ruXIZsNeix7wzL0fUMenyurSYzRHIg=;
+        b=YDMIMAprJE1WUl5F9vstbwXP+SvnClZaQzJOc5k20W+f9I4O4g41mvKwXizNOv+xWw
+         UpN6EAPsIoN1iia8GRVbyiD/e2piWZTon3bQZi/iTj6lfiQ3XtdRF/qpLQ1jziCU+iUo
+         wyu20U8l7SlSPA8NoZcXaa/dfCmMx/sc+r1yMzKWI/4BHChEyjZcPQx4POuwDgWoy5Fa
+         Af5NNmD1QARrLbADL83EU9dEbBmQbS/w8spH+g8Bb1EalWva0EY2/0u+vXsOSKk6iWUE
+         prswPPaw0DsrpGjgwjyNX0MvOthIdFwmB5wjX/CK3w7m9gqiP0CCBIKfu0FemHtv7Kcl
+         D0DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712948381; x=1713553181;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n8ObryqrhtjTQeSVSFRYZKDmL6GQ8TuuFlxTZALzzzU=;
-        b=pHf5Vud9LDSiulKH6I3AMaha4L+WbaKtCI67rtqIA29MME8bzJDhDohMpCsonKzv4Q
-         +54BplApvQ0RWVE60K7QNOi1AYhlBhvyttzsVKY6YXbmTV3P9xbeaApe+9w7r8rINLal
-         JbXjFpX/loUQe9MBgLZc5dhAApSqJapTUQ0+dTcNNpOS50/3MB0Qvfcb4EWDbMhIWfp2
-         sH69vIFXVhefGqpak6zqnIrwgWRzrkUhAtTeuIvyVr6ochBs2ISwjL2saE0xuWax+9jO
-         UpHK7CVtt0QRNdvsvIAQgu4oYOeYRH2KTokl6GMbh8gj+oQpRieTUlUv09ieGO1ZExTJ
-         gFng==
-X-Gm-Message-State: AOJu0YwcloO27Rs/KPBqwSwoF5JVQE6lgvCiFvxNdWjayK7Y+aphjMdL
-	FpHL3Uo6KyRlST1JoqHNS/Dsw7SupcT6rpvl6B5CryoZuZUPq0jpaahG1zRikgA=
-X-Google-Smtp-Source: AGHT+IGYBy+1bCocRcBusy9YSugPUHYa2Ne/gpb3LH1Wuz/de+Ht8PIjdJAWBJ7/Rt1QDDSYwHvlJQ==
-X-Received: by 2002:a05:6820:98a:b0:5aa:596c:52d0 with SMTP id cg10-20020a056820098a00b005aa596c52d0mr3733922oob.6.1712948380610;
-        Fri, 12 Apr 2024 11:59:40 -0700 (PDT)
-Received: from [10.73.215.90] ([208.184.112.130])
-        by smtp.gmail.com with ESMTPSA id bq6-20020a0568201a0600b005a22f8ae2dfsm875735oob.34.2024.04.12.11.59.39
+        d=1e100.net; s=20230601; t=1712949299; x=1713554099;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fSILvxffpq5e9ruXIZsNeix7wzL0fUMenyurSYzRHIg=;
+        b=dVM4uHw95hf4lVF8xKt+IN90m1rxmpD+y7QjRfvuzaAE89BTQUoHE4Q5Z2mLCzZjWi
+         ZVbvqRbVWuHzjGVZvyBirGUcRqGF/AxjKBc5Fbz28Z8A95rKEbKWbwyRkcuY2omgMUM5
+         pJh3v9+5C8oU8U/W1riDIGud9jdYagjfxml8PU10KqNnSEZ9dGuYCION0d2zQLyrO+ug
+         yF5/Q9UeSIsDWxjS4C35rFiELRVXtI9OV5SrqOs+2/hYR6YyKtdDFbJgBnkUBzsaeiMp
+         wjSNi7AZbgoe7yERIp4ahamQ1ngVK8l3FLt5NTKFK+LhC6U2Zv1ZOhSDS3qnwMnmC5gK
+         UqOA==
+X-Forwarded-Encrypted: i=1; AJvYcCWRslaXhSurAxmbFsNoFfkd2d75ey6h/H1u6cr52DaIrsh4Bc6Rh47nnsAeugRlVw+ZxQAlmIa/2QW73HK8Q/dUNPASiAmt
+X-Gm-Message-State: AOJu0YxUo6XRFk6WAgYZTjow5SFtOxqCphkB1GdOtYltm1zIyU+uZHwo
+	MacdQcJfueYi4ctdbDmz656PzrvsK1eVbeRLBLGvCft9+vp+jK2Y
+X-Google-Smtp-Source: AGHT+IGsl7QkP2LiQ5SaoBZOh1DBkoJHsNWpkhWT2E4BCzrC9Gc6CnH48QAFUQvI7FTLUhdWo+XfKw==
+X-Received: by 2002:a50:d599:0:b0:56e:57f9:8c83 with SMTP id v25-20020a50d599000000b0056e57f98c83mr3346442edi.19.1712949298973;
+        Fri, 12 Apr 2024 12:14:58 -0700 (PDT)
+Received: from ?IPV6:2a01:c22:7a91:3c00:98a7:a367:3d10:2fbb? (dynamic-2a01-0c22-7a91-3c00-98a7-a367-3d10-2fbb.c22.pool.telefonica.de. [2a01:c22:7a91:3c00:98a7:a367:3d10:2fbb])
+        by smtp.googlemail.com with ESMTPSA id en8-20020a056402528800b0056e2432d10bsm1955671edb.70.2024.04.12.12.14.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Apr 2024 11:59:40 -0700 (PDT)
-Message-ID: <13cdc078-770f-4083-826f-89d13b13140d@bytedance.com>
-Date: Fri, 12 Apr 2024 11:58:23 -0700
+        Fri, 12 Apr 2024 12:14:58 -0700 (PDT)
+Message-ID: <97bb7495-7bf7-4511-8d30-ba9d47b6065e@gmail.com>
+Date: Fri, 12 Apr 2024 21:14:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,233 +77,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [External] Re: [PATCH net-next 2/3] selftests: fix OOM problem in
- msg_zerocopy selftest
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- cong.wang@bytedance.com, xiaochun.lu@bytedance.com
-References: <20240409205300.1346681-1-zijianzhang@bytedance.com>
- <20240409205300.1346681-3-zijianzhang@bytedance.com>
- <6615b264894a0_24a51429432@willemb.c.googlers.com.notmuch>
- <CANn89iLTiq-29ceiQHc2Mi4na+kRb9K-MA1hGMn=G0ek6-mfjQ@mail.gmail.com>
- <0c6fc173-45c4-463f-bc0e-9fed8c3efc02@bytedance.com>
- <66171b8b595b_2d123b29472@willemb.c.googlers.com.notmuch>
- <0ac5752d-0b36-436a-9c37-13e262334dce@bytedance.com>
- <661954fce5f33_38e2532949f@willemb.c.googlers.com.notmuch>
+Subject: Re: [PATCH net-next] net: constify net_class
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <1d59986e-8ac0-4b9c-9006-ad1f41784a08@gmail.com>
+ <20240412093800.4d2521eb@hermes.local>
 Content-Language: en-US
-From: Zijian Zhang <zijianzhang@bytedance.com>
-In-Reply-To: <661954fce5f33_38e2532949f@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20240412093800.4d2521eb@hermes.local>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 4/12/24 8:36 AM, Willem de Bruijn wrote:
-> Zijian Zhang wrote:
->> On 4/10/24 4:06 PM, Willem de Bruijn wrote:
->>>>>>> In this case, for some reason, notifications do not
->>>>>>> come in order now. We introduce "cfg_notification_order_check" to
->>>>>>> possibly ignore the checking for order.
->>>>>>
->>>>>> Were you testing UDP?
->>>>>>
->>>>>> I don't think this is needed. I wonder what you were doing to see
->>>>>> enough of these events to want to suppress the log output.
->>>>
->>>> I tested again on both TCP and UDP just now, and it happened to both of
->>>> them. For tcp test, too many printfs will delay the sending and thus
->>>> affect the throughput.
->>>>
->>>> ipv4 tcp -z -t 1
->>>> gap: 277..277 does not append to 276
->>>
->>> There is something wrong here. 277 clearly appends to 276
->>>
->>
->> ```
->> if (lo != next_completion)
->>       fprintf(stderr, "gap: %u..%u does not append to %u\n",
->>           lo, hi, next_completion);
->> ```
->>
->> According to the code, it expects the lo to be 276, but it's 277.
+On 12.04.2024 18:38, Stephen Hemminger wrote:
+> On Fri, 12 Apr 2024 12:17:57 +0200
+> Heiner Kallweit <hkallweit1@gmail.com> wrote:
 > 
-> Ack. I should have phrased that message better.
->   
->>> If you ran this on a kernel with a variety of changes, please repeat
->>> this on a clean kernel with no other changes besides the
->>> skb_orphan_frags_rx loopback change.
->>>
->>> It this is a real issue, I don't mind moving this behind cfg_verbose.
->>> And prefer that approach over adding a new flag.
->>>
->>> But I have never seen this before, and this kind of reordering is rare
->>> with UDP and should not happen with TCP except for really edge cases:
->>> the uarg is released only when both the skb was delivered and the ACK
->>> response was received to free the clone on the retransmit queue.
+>> AFAICS all users of net_class take a const struct class * argument.
+>> Therefore fully constify net_class.
 >>
->> I found the set up where I encountered the OOM problem in msg_zerocopy
->> selftest. I did it on a clean kernel vm booted by qemu,
->> dfa2f0483360("tcp: get rid of sysctl_tcp_adv_win_scale") with only
->> skb_orphan_frags_rx change.
->>
->> Then, I do `make olddefconfig` and turn on some configurations for
->> virtualization like VIRTIO_FS, VIRTIO_NET and some confs like 9P_FS
->> to share folders. Let's call it config, here was the result I got,
->> ```
->> ./msg_zerocopy.sh
->> ipv4 tcp -z -t 1
->> ./msg_zerocopy: send: No buffer space available
->> rx=564 (70 MB)
->> ```
->>
->> Since the TCP socket is always writable, the do_poll always return True.
->> There is no any chance for `do_recv_completions` to run.
->> ```
->> while (!do_poll(fd, POLLOUT)) {
->>       if (cfg_zerocopy)
->>           do_recv_completions(fd, domain);
->>       }
->> ```
->> Finally, the size of sendmsg zerocopy notification skbs exceeds the
->> opt_mem limit. I got "No buffer space available".
->>
->>
->> However, if I change the config by
->> ```
->>    DEBUG_IRQFLAGS n -> y
->>    DEBUG_LOCK_ALLOC n -> y
->>    DEBUG_MUTEXES n -> y
->>    DEBUG_RT_MUTEXES n -> y
->>    DEBUG_RWSEMS n -> y
->>    DEBUG_SPINLOCK n -> y
->>    DEBUG_WW_MUTEX_SLOWPATH n -> y
->>    PROVE_LOCKING n -> y
->> +DEBUG_LOCKDEP y
->> +LOCKDEP y
->> +LOCKDEP_BITS 15
->> +LOCKDEP_CHAINS_BITS 16
->> +LOCKDEP_CIRCULAR_QUEUE_BITS 12
->> +LOCKDEP_STACK_TRACE_BITS 19
->> +LOCKDEP_STACK_TRACE_HASH_BITS 14
->> +PREEMPTIRQ_TRACEPOINTS y
->> +PROVE_RAW_LOCK_NESTING n
->> +PROVE_RCU y
->> +TRACE_IRQFLAGS y
->> +TRACE_IRQFLAGS_NMI y
->> ```
->>
->> Let's call it config-debug, the selftest works well with reordered
->> notifications.
->> ```
->> ipv4 tcp -z -t 1
->> gap: 2117..2117 does not append to 2115
->> gap: 2115..2116 does not append to 2118
->> gap: 2118..3144 does not append to 2117
->> gap: 3146..3146 does not append to 3145
->> gap: 3145..3145 does not append to 3147
->> gap: 3147..3768 does not append to 3146
->> ...
->> gap: 34935..34935 does not append to 34937
->> gap: 34938..36409 does not append to 34936
->>
->> rx=36097 (2272 MB)
->> missing notifications: 36410 < 36412
->> tx=36412 (2272 MB) txc=36410 zc=y
->> ```
->> For exact config to compile the kernel, please see
->> https://github.com/Sm0ckingBird/config
+>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+>> ---
 > 
-> Thanks for sharing the system configs. I'm quite surprised at these
-> reorderings *over loopback* with these debug settings, and no weird
-> qdiscs that would explain it. Can you see whether you see drops and
-> retransmits?
+> Acked-by: Stephen Hemminger <stephen@networkplumber.org>
 > 
+> PS: net_class_attr can be const as well?
 
-No drops and retransmits are observed.
+No, this results in warnings, because the const is at least discarded.
 
-```
-ip netns exec ns-djROUw1 netstat -s
+struct attribute_group {
+	const char		*name;
+	umode_t			(*is_visible)(struct kobject *,
+					      struct attribute *, int);
+	umode_t			(*is_bin_visible)(struct kobject *,
+						  struct bin_attribute *, int);
+	struct attribute	**attrs;
+	struct bin_attribute	**bin_attrs;
+};
 
-Tcp:
-     1 active connection openings
-     0 passive connection openings
-     0 failed connection attempts
-     1 connection resets received
-     0 connections established
-     16158 segments received
-     32311 segments sent out
-     0 segments retransmitted
-     0 bad segments received
-     0 resets sent
-
-ip netns exec ns-djROUw1 ip -s link show veth0
-
-2: veth0@if2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 65535 qdisc noqueue 
-state UP mode DEFAULT group default qlen 1000
-     link/ether 02:02:02:02:02:02 brd ff:ff:ff:ff:ff:ff link-netns 
-ns-djROUw2
-     RX: bytes  packets  errors  dropped overrun mcast
-     1067646    16173    0       0       0       0
-     TX: bytes  packets  errors  dropped carrier collsns
-     2116207634 32325    0       0       0       0
-```
-
->>
->> I also did selftest on 63c8778d9149("Merge branch
->> 'net-mana-fix-doorbell-access-for-receive-queues'"), the parent of
->> dfa2f0483360("tcp: get rid of sysctl_tcp_adv_win_scale")
->>
->> with config, selftest works well.
->> ```
->> ipv4 tcp -z -t 1
->> missing notifications: 223181 < 223188
->> tx=223188 (13927 MB) txc=223181 zc=y
->> rx=111592 (13927 MB)
->> ```
->>
->> with config-debug, selftest works well with reordered notifications
->> ```
->> ipv4 tcp -z -t 1
->> ...
->> gap: 30397..30404 does not append to 30389
->> gap: 30435..30442 does not append to 30427
->> gap: 30427..30434 does not append to 30443
->> gap: 30443..30450 does not append to 30435
->> gap: 30473..30480 does not append to 30465
->> gap: 30465..30472 does not append to 30481
->> gap: 30481..30488 does not append to 30473
->> tx=30491 (1902 MB) txc=30491 zc=y
->> rx=15245 (1902 MB)
->> ```
->>
->> Not sure about the exact reason for this OOM problem, and why
->> turning on DEBUG_LOCKDEP and PROVE_RAW_LOCK_NESTING can solve
->> the problem with reordered notifications...
-> 
-> The debug config causes the reordering notifications, right? But
-> solves the OOM.
-> 
-
-With config, OOM is introduced by dfa2f0483360("tcp: get rid of
-sysctl_tcp_adv_win_scale"). And, it can be solved by config-debug,
-but reordering notifications are observed.
-
-With config, there is no OOM in 63c8778d9149("Merge branch
-'net-mana-fix-doorbell-access-for-receive-queues'"), everything works
-well. But with config-debug, reordering notifications are observed.
-
->> If you have any thoughts or
->> comments, please feel free to share them with us.
->>
->> If the problem does exist, I guess we can force `do_recv_completions`
->> after some number of sendmsgs and move "gap: ..." after cfg_verbose?
-> 
-> I do want to understand the issue better. But not sure when I'll find
-> the time.
-> 
-
-I also want to understand this, I will look into it when I find time :)
-
-> Both sound reasonable to me, yes.
-Thanks for the review and suggestions, I will update in the next iteration.
 
