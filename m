@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-87426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8A8C8A318A
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 16:52:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 548D88A3197
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 16:54:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D867B1C20E80
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 14:52:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95630283EA9
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 14:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A57F1448E3;
-	Fri, 12 Apr 2024 14:52:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7B6C1465BD;
+	Fri, 12 Apr 2024 14:54:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UamirxC0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OE4j/rDt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB1A58615F
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 14:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80CB21465A5
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 14:54:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712933541; cv=none; b=tU+nudzgCl9/hTSWVMK+QSA2xj7it5jDSITSA7dUBVkfgo7BsvQOgCw/XzMag8noFK8EAbhPx6ehntAl59WsWUuVVWIneDDx748IB5ics3R42lG78uMevhRv0AxR4fyLuWBdp8BitPsPhgslps7yNvZYMMwcQCPsSHQ15heyTNM=
+	t=1712933656; cv=none; b=YssKptWuRPCOjq44xojVOHwsxPhVoD7dpZwbb3zC7xZhBPtelvEIfsZ4b8iNPnEze73Fduhcbq+JqQvomq53iCl6UkwheLaqbq1mmrVlEmROuMHG8OloErufb8WQ+/0ykc985v6vJjlnyFH/d1FyP+NA1sFkovgSzY2OsE3WYrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712933541; c=relaxed/simple;
-	bh=isE3EC46/XaI3gj53jYxOc4GGgMM47Z+EhFSuza1LVk=;
+	s=arc-20240116; t=1712933656; c=relaxed/simple;
+	bh=fE6GJCaL1Z+SA9wmZ/6YIs0xrdm1oYZQE3iRw9EwLbc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m+9rS9FesQSeiCiKENMkrSU8GS+Rg9aqpJLqiM9dZMtXLpgQbYBQAZdsMPm4hDvHW++5Q+PoqU+su2ilh6YoebUCtNQut9SGT8/RkDoFbOZJf/+8WnBQ8zCmIwDuw2x9CVn1ww/xYMEAFuHZg93AQgy6f1osU+VydMU7zcdLbS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UamirxC0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39D30C113CC;
-	Fri, 12 Apr 2024 14:52:21 +0000 (UTC)
+	 MIME-Version:Content-Type; b=UFG12GXvtBH7cyJcc2/AbIVmTkWD2z5cIfI+5k7prLytlcCb93zAHGfezo28n6aHZSo1jY8DkaVM5mrUdaQYaK3MFfuw4Grh4NAddicvOhAmJQf18mhxsKrKoa25smDcMuz5m3fkEk6aVBmYNbRVVZh8RxlQRoX6Eqkq0HAkpQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OE4j/rDt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64F33C32781;
+	Fri, 12 Apr 2024 14:54:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712933541;
-	bh=isE3EC46/XaI3gj53jYxOc4GGgMM47Z+EhFSuza1LVk=;
+	s=k20201202; t=1712933656;
+	bh=fE6GJCaL1Z+SA9wmZ/6YIs0xrdm1oYZQE3iRw9EwLbc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UamirxC0iJy4iFYf+o01I4sAeSYlsLjAbtbCmrdQ4RYlJ1xys0uavSfuRQ6Aj9bsP
-	 k4JU1HMcVzSdk4+7NL6AJFeSZ329NzGgpfNrttdz1vPzU+TXf4TBSFda5keX1Ee4pE
-	 kLi3whsL6wgQsYDS5bUvyyuogdv19NSWUpPO45XLsJqe0Zmc1y4fo0vb0LArpDeeKc
-	 ISIkLglUe2bnzj9voiNLS46ozcsvej5OJfdr/KOhIg6G4BeS7ViW1MixD/UF0Djlz5
-	 Ir9lRqse83u/wo6e1W3tO44Z/hDl3yZUYmfmI1s67BgyTFYJUAOVyhMZE0awHqMtT5
-	 511IZCs+q/T+Q==
-Date: Fri, 12 Apr 2024 07:52:20 -0700
+	b=OE4j/rDt7T5tJt1WnCMDsix7rqq/qY1f5n0HbAiExJdfDKOxYuRW+ERDSews7Jjxb
+	 mE6pals/XlvcgFsZsBjrGlkTDLo4nI76s74wGEDYMdxW+atX63bjZYCWBrG8sA3ehv
+	 wQ8k7F/AdsVkeqWmUHPJKp/8buziwATP+vpYlRDD2lmPz3bBkJnilJIkwPtu6bXV++
+	 YUx2DaM68JLgKm82USS83Eq8fjDrHXcYL+lhdZF3+KwGLcBI8k4EXocHAYStwgdKa9
+	 augSZhPiAK3RqiJcJiR5W8HFgGyk46zlhmjegkcgxD6GqJCm15tO9eNcE358SGy3QH
+	 EuMHaWrPoJOuA==
+Date: Fri, 12 Apr 2024 07:54:14 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Marek Vasut <marex@denx.de>
 Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
@@ -53,12 +53,13 @@ Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
  Simon Horman <horms@kernel.org>
 Subject: Re: [PATCH net v2 2/2] net: ks8851: Handle softirqs at the end of
  IRQ thread to fix hang
-Message-ID: <20240412075220.17943537@kernel.org>
-In-Reply-To: <a8e28385-5b92-4149-be0c-cfce6394fbc2@denx.de>
+Message-ID: <20240412075414.4509b75c@kernel.org>
+In-Reply-To: <20240412075220.17943537@kernel.org>
 References: <20240405203204.82062-1-marex@denx.de>
 	<20240405203204.82062-2-marex@denx.de>
 	<ZhQEqizpGMrxe_wT@smile.fi.intel.com>
 	<a8e28385-5b92-4149-be0c-cfce6394fbc2@denx.de>
+	<20240412075220.17943537@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,19 +69,9 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 12 Apr 2024 13:29:04 +0200 Marek Vasut wrote:
-> >> irq_thread_fn from irq_thread
-> >> irq_thread from kthread
-> >> kthread from ret_from_fork  
-> > 
-> > These lines are unneeded (in case you need a new version, you can drop them).  
-> 
-> I just got back and going through a mountain of email, I see Jakub 
-> already picked the V2, so, noted for next time. Thank you !
+On Fri, 12 Apr 2024 07:52:20 -0700 Jakub Kicinski wrote:
+> In general, yes, trimming the bottom of the stack is good hygiene.
 
-Whether the stack trace is for a hard IRQ or threaded IRQ is the first
-thing I looked for when reviewing. Change is about the calling context. 
-So I figured while not strictly necessary, in this particular case,
-these lines may be helpful for people eyeballing the change...
-In general, yes, trimming the bottom of the stack is good hygiene.
+That sentence puts the words "bottom" and "hygiene" uncomfortably close
+together. Oh, well, it's Friday..
 
