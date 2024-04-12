@@ -1,97 +1,117 @@
-Return-Path: <netdev+bounces-88669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A05878A82AD
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 14:00:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2D378A8373
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 14:52:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 59DC9287513
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 12:00:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 301B01C21D6D
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 12:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C543413CFBC;
-	Wed, 17 Apr 2024 12:00:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 460E513D265;
+	Wed, 17 Apr 2024 12:52:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RMrpGDtT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yz+FmA7O"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD0B13CFAF;
-	Wed, 17 Apr 2024 12:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD79513C3E0;
+	Wed, 17 Apr 2024 12:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713355228; cv=none; b=gorbCn5zLVMBsprtLkqrVuQqReDxVjBHgUkDWmJ7AkqT5Kd4G8MHlnNm7sB2qwr54aOSEzsJr2fKK0Ddxm4uQFPyc5rBdFc94oR08/1mVA0h54bBePbbVA2Pfu1hwezlZYf5ACv/OjXxIm4PtTMvWKnddbnUdYBhrD9FlRzz0lw=
+	t=1713358343; cv=none; b=XnfZemMLD9JFnagHVEtvJczs3c3EnrMyu4WLN8Kj3OiUrJE5OwkOUtXTxpzYEr8tJQ4z4XhCwKobpFPwqs6UsUB/33b6VoubdTRBh+eIbR62OiTfO9cr7CLc41RNJ/kl81AJVzRZcWgN4XkXh16U0Vv9d+5YPA9A/0nZXDottUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713355228; c=relaxed/simple;
-	bh=s/iFbCV9rIybHPFZJdbUwB5clC746c5zJyRTz59Ty90=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=NGPuHihH6pEBt3yd3pZtEYcsTU6Nql4LPuouilWP1wLRyq6G+Hwhtuas5PoQCLWRo5R1oWPz+MRygczuxpL29UdhSsbS4YdhBrMuGG8VVFL2xadori8hAbfUJSHTO0/DXWxzi1CPS93QWhdqrWoc82geqw4gfhSpkFcxNILZ8fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RMrpGDtT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2AA67C32783;
-	Wed, 17 Apr 2024 12:00:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713355228;
-	bh=s/iFbCV9rIybHPFZJdbUwB5clC746c5zJyRTz59Ty90=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RMrpGDtTPr3Jp3bi0ly8dvnR2F9Pg2aIHepdtewC7CcsB/2p6qBD/T6lwWaQrhpxj
-	 lU4Ix2OnFsmeEqjkBr4X1frzidHJCjKR4Xpah5NZSAsEE/qQ4fQKpavMHRsxqM/+UM
-	 VRy6hZcVGcKA+N6UUXut91YsVS5JRT3d1Fqz8qCXT0qAJZCCV8UDIZmcEF8uVIRLgL
-	 V8lg0RwHEZh1WryoJB4/n4Dbt7GBAPRP2cZNg4bbYeYyQwbCSaKb1Iggg23XTV9l99
-	 11fU8HEAxHGxQ4C5HK6CvvK/t9KcezFsaL1f8XqYPJj5F9IT32xC978NEVnCrSHf8t
-	 4eHZJd6TirfPg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1C802C54BB3;
-	Wed, 17 Apr 2024 12:00:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1713358343; c=relaxed/simple;
+	bh=GKwwC0OJ8qTLZqlAyHGWZALDR76oktdMPcYkUMRED8E=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=ejDKXXeWYrywJXKBWTK4L9Jwf5iIDj+krnHh/1JWOfOUMSScQRk58DN0MYgt0Kh/Gm7VuBVvDHsExzdWWzeIuwG2uGxazipF7p/3HHd5q0Eh1Jj8QJdm+Dg47xdA8cs//ar2CcrxQ1Nr7Gxq+Sk33Z28G8UTjNm6LyMj2MK5x90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yz+FmA7O; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-78f04924a96so24288185a.0;
+        Wed, 17 Apr 2024 05:52:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713358341; x=1713963141; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EuBc5E44cBkpe2s8uTRcWQCylcIMSOJ9KujKuoAaf8c=;
+        b=Yz+FmA7OIzi+nO+DF2CY/3tGI5HNm0nkKMJQynHAsMOBSefcFC/qbm/ERCm7c+YR9f
+         7s9oKGLtG4xDDfyG/qO6ETZ9N1VEzIC2xMQYAUwMgh/+G6ubJI5J1eUIQQSLEaCDTpfo
+         D9iojA6J+Gm0apekpk9ihG7okC1YQmRzkHkIcyL4BmWrw14e0qKwFB16Ym7CFuad8b8/
+         HOYdLHky9+o5ul1uUO+7ojzxFE6X8xxwNi1BPfAVZYhm6oZebN287MGdd1OmAMGIsc+e
+         r/KaKJnrqYfd/ca/EkDp4QKG9mFPK1Lf2yIXkUma0lExai65ScbuBrWKfO+cAmrNaeaG
+         Wv9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713358341; x=1713963141;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EuBc5E44cBkpe2s8uTRcWQCylcIMSOJ9KujKuoAaf8c=;
+        b=gftgBHudmojWCYiAxsoBWW4jJ7ilbVgJSIqQV7c2pSEwa/rw5NakKdHFCccI+kpd04
+         ZX8lfYOSMiw/6FlXekPigoeezfPlvNfNteqJKOpSKk7tyPVAU5sL+FNer5792ZRlBbeB
+         2QB30qaQFps4bAbNJb+OsBrhW5+FEHQD6DUPUvP/AGO8WLwBqfOdtDrt9OZKHTtgzylB
+         bmJ1mAaS8GD3TVo27owiLjPm09BM6wiHzeg1+hbtfFRGz6wRT65KnB9Wfne0tvq/ZEP0
+         1DP/lmK5CnzxYs3XoKHIhu891VaCNu23YKSC8H9uearXjN5mzUaD/ZJMGccuGQdZ1I0Y
+         Wtzw==
+X-Forwarded-Encrypted: i=1; AJvYcCUGibQceb1Nkv/jGgM8ZxiKNJI765l52A6MudZKa0tM/x13Qc7oFYyfxsWzjfp2qwkXAPuk1TqyDKKv17nJX8KfrTvMRv4f80nMlt51KUPF
+X-Gm-Message-State: AOJu0Yyxcj0iyZy+Z0Lv9v7fY8vN3YEGEfWKCwFrTcz+XBo92E776h53
+	Wl9V7hRN0TN7XKmlWa3dnfmJWzx06EsLF2O5WlVA/Z/cCrRB749G
+X-Google-Smtp-Source: AGHT+IFuFjOChlyrCu41ENDj5+wqqR3go1+czOgkWcys0ry5WI4/gVhKVbXToQn760THaQDnWneGDA==
+X-Received: by 2002:a05:6214:528f:b0:69b:695f:ad20 with SMTP id kj15-20020a056214528f00b0069b695fad20mr13634790qvb.16.1713358340809;
+        Wed, 17 Apr 2024 05:52:20 -0700 (PDT)
+Received: from imac ([88.97.103.74])
+        by smtp.gmail.com with ESMTPSA id v7-20020a0ccd87000000b00699413a7386sm8204953qvm.114.2024.04.17.05.52.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Apr 2024 05:52:20 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Jiri
+ Pirko <jiri@resnulli.us>,  Jacob Keller <jacob.e.keller@intel.com>,  Pablo
+ Neira Ayuso <pablo@netfilter.org>,  Jozsef Kadlecsik
+ <kadlec@netfilter.org>,  netfilter-devel@vger.kernel.org,
+  coreteam@netfilter.org,  donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v2 3/3] tools/net/ynl: Add multi message
+ support to ynl
+In-Reply-To: <20240411102522.4eceedb9@kernel.org> (Jakub Kicinski's message of
+	"Thu, 11 Apr 2024 10:25:22 -0700")
+Date: Fri, 12 Apr 2024 10:53:43 +0100
+Message-ID: <m2r0fahpp4.fsf@gmail.com>
+References: <20240410221108.37414-1-donald.hunter@gmail.com>
+	<20240410221108.37414-4-donald.hunter@gmail.com>
+	<20240411102522.4eceedb9@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] s390/ism: Properly fix receive message buffer allocation
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171335522811.25671.11363979683780241618.git-patchwork-notify@kernel.org>
-Date: Wed, 17 Apr 2024 12:00:28 +0000
-References: <20240415131507.156931-1-gbayer@linux.ibm.com>
-In-Reply-To: <20240415131507.156931-1-gbayer@linux.ibm.com>
-To: Gerd Bayer <gbayer@linux.ibm.com>
-Cc: wintera@linux.ibm.com, twinkler@linux.ibm.com, hca@linux.ibm.com,
- pabeni@redhat.com, hch@lst.de, schnelle@linux.ibm.com, kuba@kernel.org,
- davem@davemloft.net, wenjia@linux.ibm.com, guwen@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org, gor@linux.ibm.com,
- agordeev@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com,
- pasic@linux.ibm.com
+Content-Type: text/plain
 
-Hello:
+Jakub Kicinski <kuba@kernel.org> writes:
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+> On Wed, 10 Apr 2024 23:11:08 +0100 Donald Hunter wrote:
+>> -    def do(self, method, vals, flags=None):
+>> +    def _op(self, method, vals, flags):
+>> +        ops = [(method, vals, flags)]
+>> +        return self._ops(ops)[0]
+>> +
+>> +    def do(self, method, vals, flags=[]):
+>>          return self._op(method, vals, flags)
+>
+> Commenting here instead of on my own series but there are already tests
+> using dump=True in net-next:
+>
+> tools/testing/selftests/drivers/net/stats.py:    stats = netfam.qstats_get({}, dump=True)
+> tools/testing/selftests/net/nl_netdev.py:        devs = nf.dev_get({}, dump=True)
+>
+> "flags=[Netlink.NLM_F_DUMP]" is going to be a lot less convenient 
+> to write :( Maybe we can keep support for both?
 
-On Mon, 15 Apr 2024 15:15:07 +0200 you wrote:
-> Since [1], dma_alloc_coherent() does not accept requests for GFP_COMP
-> anymore, even on archs that may be able to fulfill this. Functionality that
-> relied on the receive buffer being a compound page broke at that point:
-> The SMC-D protocol, that utilizes the ism device driver, passes receive
-> buffers to the splice processor in a struct splice_pipe_desc with a
-> single entry list of struct pages. As the buffer is no longer a compound
-> page, the splice processor now rejects requests to handle more than a
-> page worth of data.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net] s390/ism: Properly fix receive message buffer allocation
-    https://git.kernel.org/netdev/net/c/83781384a96b
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Good catch, I overlooked the generated methods. I'll make sure to add it
+back in.
 
