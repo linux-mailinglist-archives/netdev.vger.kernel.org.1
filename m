@@ -1,147 +1,153 @@
-Return-Path: <netdev+bounces-87339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB35A8A2C11
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 12:15:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CF0E8A2C1D
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 12:18:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66999281B82
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 10:15:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01307B212C9
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 10:18:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A523453393;
-	Fri, 12 Apr 2024 10:15:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9445339E;
+	Fri, 12 Apr 2024 10:18:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="m5g54edo"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VbjvkM0V"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCB934E1D5
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 10:15:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3DD444369
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 10:18:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712916911; cv=none; b=cJ3Z4G9aMqOZYXnEhBIPYsoY0VniU6GdVSzH7uVFh9eI00R9uOYKSLc2z52kUg2GaLUFI9bmLlWvE1FRmWupaBqu+zDoKdKBnwX++XayoZiUfuuKo0wpbOq2QGUnVxBuTD6JR7AB7nUtELN/oR5mWYt00Q2YeGRlXR6JEh7AMV4=
+	t=1712917082; cv=none; b=szOL8gq2JVVNSHHAfYZG8jv0eNaqB51tnCu1bZH2Se0/hpBZv9UUsv+tEZlJ4h6duG82lQtEa3ZDng9gE1kr3CwLc6A07maczeG9dYIO79PK7YWZUtcJkvnj/dYFDNnNpelfs0jxAr372HTYUZpRTwc3IV71FWai9ISQfzfSmZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712916911; c=relaxed/simple;
-	bh=yV7JHWmIoNj536WE04uKOD03moCU5VJCGc0rLBN/mhU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QKIbnhQIp5aR35+YF770DcWwDgqQcR6B+qDrG9Tp9H9hd1RUIKHPeFJgeEiJIuVUgL6/wZAftrZT2YxtAEyT/4ZWer8vCSsiTJ/dAbaOIdZVOf4SHZps63LY++NbWOAs7fjm30koviLe7/ILe3FV7owgIiHg1H/FRDV6U18bhdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=m5g54edo; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E2B2B1BF20A;
-	Fri, 12 Apr 2024 10:15:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1712916901;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2/WBBV/OgKQCU1mPjDsK9QBfMHYu7OJA9p/mz4Oeesw=;
-	b=m5g54edojVfOFd9fua/fQhtqItRMjdtjFOF3rb4aSFPAURcpWAnQW+PTOkbhmG8hDOEqKl
-	spQVyhaCwILe3DsJ256icdYygcHBWqmu2BNkv8jC8zx3hBt4RLKFWu0luIgkjvQ/mGH4uf
-	c0Ql7z0oRkMPxqbZthSmcedYrZph6aGuC1uB79LpKqDb9MWbWf7U1cwEx8WbUG0+ejxWKP
-	2vQEwFzj3CeVX8tWQsmfdjGSKwgEWe7dA06B9IwufncjkwfII8sg/mJTw5+ks5VdtkMoWr
-	66Vy0jk4C8QucJmWwbSG0dSPU94FP3qwdfDSEvMK4qLF8X1dbm3pIT/Xv4HKVw==
-Date: Fri, 12 Apr 2024 12:15:00 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Russell King - ARM Linux
- <linux@armlinux.org.uk>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: Crash in new PHY link topology extension
-Message-ID: <20240412121500.2c57e6eb@device-28.home>
-In-Reply-To: <a4a6df3b-550e-4868-973b-5218462bab1d@gmail.com>
-References: <2e11b89d-100f-49e7-9c9a-834cc0b82f97@gmail.com>
-	<a4a6df3b-550e-4868-973b-5218462bab1d@gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1712917082; c=relaxed/simple;
+	bh=elC88KHAYs6OlHneMVtPz3fHA/cjHJaENdsIKhzgYic=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=T2dPZ18Ys+n12qewWpuLYviPWkrfVWp8YhHv14KzNmUOh/DccJ4wAHMK2EP65wQNhw+hTCCZsRZ9M3IcomZ7w5h2a6RjHLU/Sd55U8JuYDh0SupOvJ+NXYnZkNX9j8oJveCMwJEvtKX6AvHnlFm0MPbLqA3pQsbWdmt/suzKUNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VbjvkM0V; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56fe7dc7f58so566588a12.2
+        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 03:18:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712917079; x=1713521879; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+Z2BBwn6SlDQ4S/HPahNdeKASrWcoVdBnMsqhnKIrZU=;
+        b=VbjvkM0VK7GGTrnzjnzQSVMb07fexIM/6WR4ubtfJWahelsEzF7HUqoNk09jcGYwmT
+         OPA8nZp9t4cL6BOGsF/Pheeo8Q6zhu+pG2flF5F3Cw+JZk/YqKL1Pfrb52qgu+pPm+aw
+         Pni9L+WX2Iq9E1ODPr/xAhPO46NyA9DloK2cT5onsdrkFoVUoQONwbMvCK8pt+R7A1yG
+         Q+RZKNdv4fn6a6/qgR1Q1oC13FcK9SBIKCv+d1Dl43TfOtqwpp4lbEtJBvwjxoRPqrAi
+         NtUtU//3c+Bjau9+PM+Oyd7CH2VjEYZ+B1LNpF5YqGN2HcNwovQOo+tr/6cFGl8vn15H
+         hrOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712917079; x=1713521879;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+Z2BBwn6SlDQ4S/HPahNdeKASrWcoVdBnMsqhnKIrZU=;
+        b=aWrP3Z+naskS2QLhS/73tnqnMJILUzOu4MsDgo7317ErVTXujrLRcH9cemxsaJCNvs
+         zwgg7lbIB/2Vt+541jSvj63APctnNCW+04R+r2rmhHgKYstRx3udO/Zs947A8ecxhaSe
+         dZR4BwEf5lLxqp3TyVtH6Ph8nwXuOVXFKouezW+H1JiCgz67jSSm5BCBV8Tf0xpgsJF+
+         uQd6JZ22JGS0buRT7JHGnzUm4x2OO4nye193+6O2lVdL7Are8v08K97tpgyLCiZQ4pU8
+         fxxVc+d0DJiwO62n7HTNj1DaO12gvW/H45spUs0Il3k0fyxP/RPwCvNt9jAGe6e31SRJ
+         sX2w==
+X-Gm-Message-State: AOJu0YyZPZiArIUUSOdQNgaWiO7OrBvv3YxJss48sZocLAsYCzRKevTE
+	5POSMVYv/TqEqDV9nKudfZ6huUiJDEgSvj/7FPHJsKr3U3OuwgN+
+X-Google-Smtp-Source: AGHT+IEBHPVQzXP4EhXD+4xWdQCUCIy/YxukW9+rxsECOau/FFyfDMChLsUULP0ar+80ZANL1tHz6g==
+X-Received: by 2002:a50:d716:0:b0:56e:63d3:cb3e with SMTP id t22-20020a50d716000000b0056e63d3cb3emr1514939edi.41.1712917078862;
+        Fri, 12 Apr 2024 03:17:58 -0700 (PDT)
+Received: from ?IPV6:2a01:c22:7a91:3c00:7438:ddfe:2573:311f? (dynamic-2a01-0c22-7a91-3c00-7438-ddfe-2573-311f.c22.pool.telefonica.de. [2a01:c22:7a91:3c00:7438:ddfe:2573:311f])
+        by smtp.googlemail.com with ESMTPSA id x7-20020a056402414700b0056feb6315easm1292471eda.1.2024.04.12.03.17.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Apr 2024 03:17:58 -0700 (PDT)
+Message-ID: <1d59986e-8ac0-4b9c-9006-ad1f41784a08@gmail.com>
+Date: Fri, 12 Apr 2024 12:17:57 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] net: constify net_class
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello Heiner,
+AFAICS all users of net_class take a const struct class * argument.
+Therefore fully constify net_class.
 
-On Fri, 12 Apr 2024 12:03:35 +0200
-Heiner Kallweit <hkallweit1@gmail.com> wrote:
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ net/core/net-sysfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-> On 12.04.2024 12:00, Heiner Kallweit wrote:
-> > On today's linux-next I get the following.
-> > 
-> > Apr 12 11:36:03 zotac kernel: BUG: kernel NULL pointer dereference, address: 0000000000000018
-> > Apr 12 11:36:03 zotac kernel: #PF: supervisor read access in kernel mode
-> > Apr 12 11:36:03 zotac kernel: #PF: error_code(0x0000) - not-present page
-> > Apr 12 11:36:03 zotac kernel: PGD 0 P4D 0
-> > Apr 12 11:36:03 zotac kernel: Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
-> > Apr 12 11:36:03 zotac kernel: CPU: 1 PID: 219 Comm: systemd-network Not tainted 6.9.0-rc3-next-20240412+ #2
-> > Apr 12 11:36:03 zotac kernel: Hardware name: Default string Default string/Default string, BIOS ADLN.M6.SODIMM.ZB.CY.015 08/08/2023
-> > Apr 12 11:36:03 zotac kernel: RIP: 0010:__lock_acquire+0x5d/0x2550
-> > Apr 12 11:36:03 zotac kernel: Code: 65 4c 8b 35 65 5d d1 7e 45 85 db 0f 84 bd 06 00 00 44 8b 15 f5 f8 14 01 45 89 c3 41 89 d7 45 89 c8 45 85
-> >  d2 0f 84 c5 02 00 00 <48> 81 3f 00 f3 8a 82 44 0f 44 d8 83 fe 01 0f 86 bd 02 00 00 31 d2
-> > Apr 12 11:36:03 zotac kernel: RSP: 0018:ffff9ca180e6f498 EFLAGS: 00010002
-> > Apr 12 11:36:03 zotac kernel: RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-> > Apr 12 11:36:03 zotac kernel: RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000018
-> > Apr 12 11:36:03 zotac kernel: RBP: ffff9ca180e6f510 R08: 0000000000000000 R09: 0000000000000000
-> > Apr 12 11:36:03 zotac kernel: R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000001
-> > Apr 12 11:36:03 zotac kernel: R13: 0000000000000000 R14: ffff98e7c5b38000 R15: 0000000000000000
-> > Apr 12 11:36:03 zotac kernel: FS:  00007f7e7440e0c0(0000) GS:ffff98e937a80000(0000) knlGS:0000000000000000
-> > Apr 12 11:36:03 zotac kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > Apr 12 11:36:03 zotac kernel: CR2: 0000000000000018 CR3: 00000001027c0000 CR4: 0000000000750ef0
-> > Apr 12 11:36:03 zotac kernel: PKRU: 55555554
-> > Apr 12 11:36:03 zotac kernel: Call Trace:
-> > Apr 12 11:36:03 zotac kernel:  <TASK>
-> > Apr 12 11:36:03 zotac kernel:  ? show_regs+0x5f/0x70
-> > Apr 12 11:36:03 zotac kernel:  ? __die+0x1f/0x70
-> > Apr 12 11:36:03 zotac kernel:  ? page_fault_oops+0x15a/0x450
-> > Apr 12 11:36:03 zotac kernel:  ? debug_smp_processor_id+0x17/0x20
-> > Apr 12 11:36:03 zotac kernel:  ? rcu_is_watching+0x11/0x50
-> > Apr 12 11:36:03 zotac kernel:  ? exc_page_fault+0x4cb/0x8d0
-> > Apr 12 11:36:03 zotac kernel:  ? asm_exc_page_fault+0x27/0x30
-> > Apr 12 11:36:03 zotac kernel:  ? __lock_acquire+0x5d/0x2550
-> > Apr 12 11:36:03 zotac kernel:  ? __lock_acquire+0x3f8/0x2550
-> > Apr 12 11:36:03 zotac kernel:  lock_acquire+0xc8/0x2f0
-> > Apr 12 11:36:03 zotac kernel:  ? phy_link_topo_add_phy+0x153/0x1a0 [libphy]
-> > Apr 12 11:36:03 zotac kernel:  _raw_spin_lock+0x2d/0x40
-> > Apr 12 11:36:03 zotac kernel:  ? phy_link_topo_add_phy+0x153/0x1a0 [libphy]
-> > Apr 12 11:36:03 zotac kernel:  phy_link_topo_add_phy+0x153/0x1a0 [libphy]
-> > Apr 12 11:36:03 zotac kernel:  phy_attach_direct+0xcd/0x410 [libphy]
-> > Apr 12 11:36:03 zotac kernel:  ? __pfx_r8169_phylink_handler+0x10/0x10 [r8169]
-> > Apr 12 11:36:03 zotac kernel:  phy_connect_direct+0x21/0x70 [libphy]
-> > Apr 12 11:36:03 zotac kernel:  rtl_open+0x30c/0x4f0 [r8169]
-> > Apr 12 11:36:03 zotac kernel:  __dev_open+0xe8/0x1a0
-> > Apr 12 11:36:03 zotac kernel:  __dev_change_flags+0x1c5/0x240
-> > Apr 12 11:36:03 zotac kernel:  dev_change_flags+0x22/0x70
-> > Apr 12 11:36:03 zotac kernel:  do_setlink+0xe9f/0x1290
-> > Apr 12 11:36:03 zotac kernel:  ? __nla_validate_parse+0x60/0xce0
-> > Apr 12 11:36:03 zotac kernel:  rtnl_setlink+0xff/0x190
-> > Apr 12 11:36:03 zotac kernel:  ? __this_cpu_preempt_check+0x13/0x20
-> > Apr 12 11:36:03 zotac kernel:  rtnetlink_rcv_msg+0x16e/0x660
-> > Apr 12 11:36:03 zotac kernel:  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
-> > Apr 12 11:36:03 zotac kernel:  netlink_rcv_skb+0x5a/0x110
-> > Apr 12 11:36:03 zotac kernel:  rtnetlink_rcv+0x10/0x20
-> > Apr 12 11:36:03 zotac kernel:  netlink_unicast+0x1a2/0x290
-> > Apr 12 11:36:03 zotac kernel:  netlink_sendmsg+0x1f9/0x420
-> > Apr 12 11:36:03 zotac kernel:  __sys_sendto+0x1d0/0x1e0
-> > Apr 12 11:36:03 zotac kernel:  ? __seccomp_filter+0x22e/0x3b0
-> > Apr 12 11:36:03 zotac kernel:  __x64_sys_sendto+0x1f/0x30
-> > Apr 12 11:36:03 zotac kernel:  do_syscall_64+0x6c/0x140
-> > Apr 12 11:36:03 zotac kernel:  entry_SYSCALL_64_after_hwframe+0x76/0x7e  
-
-I've had another similar report, I'll send a fix right-away.
-
-Thanks for the report,
-
-Maxime
-
-> 
-> Seems phy_link_topo_add_phy() can't deal with argument topo being NULL.
-> 
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index e3d7a8cfa..427185c24 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -2046,7 +2046,7 @@ static void net_get_ownership(const struct device *d, kuid_t *uid, kgid_t *gid)
+ 	net_ns_get_ownership(net, uid, gid);
+ }
+ 
+-static struct class net_class __ro_after_init = {
++static const struct class net_class = {
+ 	.name = "net",
+ 	.dev_release = netdev_release,
+ 	.dev_groups = net_class_groups,
+-- 
+2.44.0
 
 
