@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-87356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 664378A2D93
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:36:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C3EF8A2D98
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 13:37:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 978FA1C21BB0
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 11:36:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D35691F219CC
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 11:37:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1725D55E43;
-	Fri, 12 Apr 2024 11:36:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE51D56B65;
+	Fri, 12 Apr 2024 11:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BFBr7Ba1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AWpWX4Ke"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF64555C22;
-	Fri, 12 Apr 2024 11:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C17F51E531;
+	Fri, 12 Apr 2024 11:36:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712921763; cv=none; b=RBfh3oMbZkb/8saXykgGCxiZpXdL2GUTw4yYJClrG0ge2zpKafPwDcKCLED66U4jdLwmXHdM9XjpEOeFvsx4tmpKhw9r7URW0weT5WZUXfMxjzdMygaGxpr1+LleJ34zCXhiwUUVFjF1P3Qp1uyv6wwDj7mVgnErU+9SADJOGXk=
+	t=1712921776; cv=none; b=oZnMpw0uGXoqBQldL5GtGT00eO+ac/rI393ADa1oyOXv8dDR0S4rUjU9EuCGZd5S1HuZQjgz2t2BBu6+g9Y1KGKeaTuGYyvW1658hucoIEldHRVGFVrWn39vIF5xc+STiFnAeEmVQw8WJhb2gM0Bkuv2La8byaBxzUuyuGYbygQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712921763; c=relaxed/simple;
-	bh=45cFDE/PDUHtIcaaHwj8IYsNzYdpntdj2aCgK/pRFXs=;
+	s=arc-20240116; t=1712921776; c=relaxed/simple;
+	bh=5BQ14V4MwSIWKlfSozpghxE/dQxOXZmas/FIhoygFxI=;
 	h=From:To:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=tzciNaR9Wb+QqJEreGGC/ZnmC76RUV1HWpZE5UFqyg06xwdeSV6kBNr4yjacxVEF+KkJ1sx8BKSOZGswQd+V7w9lLX5hbS6Tkzbf9XLMuW+xI3uJJJvb5UU1/T0UPA7BkS6v3p3OwXDjecC4G0T3YE1RBdYasDkvahbaKvQSx0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BFBr7Ba1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA4EFC113CC;
-	Fri, 12 Apr 2024 11:35:54 +0000 (UTC)
+	 MIME-Version:Content-Type; b=nR9qDrTWVVBm/W80GGMBqOIKp+gxirpPzlzTS6CjexEA0aPAzzm8nDnNp5wE+oLKMRCxNqHiX6DNl8Jfc6SOLUVxl1bOIw3xbYQW7VRe+rSh7gvicIWOgfTkLwNEAeBknvhiNZHiI4Wxd1Oye+LpuUwamBPVJpQqe2hPOXmfLxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AWpWX4Ke; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5279C113CC;
+	Fri, 12 Apr 2024 11:36:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712921762;
-	bh=45cFDE/PDUHtIcaaHwj8IYsNzYdpntdj2aCgK/pRFXs=;
+	s=k20201202; t=1712921776;
+	bh=5BQ14V4MwSIWKlfSozpghxE/dQxOXZmas/FIhoygFxI=;
 	h=From:To:In-Reply-To:References:Subject:Date:From;
-	b=BFBr7Ba1JN9wm3zN/q42MzXb7lkG1Tjv67VUZoc5X7TxPXH3hGhtOPL+oDr47vi06
-	 PYHtlu2K9ePQpbT5GKyjlwUfUq6z2qcJB3djc05XmWyvBdIKWsp1mKY3XkH9aFeYVP
-	 EomH/3KWPfY5ZaqJx9UtaSxulfqCk7GVOszL5mE6xOFazlUaqmqNE8LuDfv0FDWUQS
-	 ueFpNmul0aKJXQpxmreVXZMNuXch9wEoq3EziFkVClRdsC9oYDnGQm/AXYkn2AJYsk
-	 GPrppQX0zjmwyANJ/TZoHEN8l/531YISlEmc6z40A0imi8VD5QYufedjZxund5HdDE
-	 2ZOEPVi/KGlYA==
+	b=AWpWX4KecPLDinQNtzsEukig5u9fLIEmD9bql4YmS4yCGoqoymU0Ec8riXMDGc2Kw
+	 mDZbX6G2+BXQYLh+QO1+hbac7ZLpkujAM6S63jGC46gumbiuE9fYWYxuzyCotphhBf
+	 Y1gJnbhYV8wyfXji6hpKFd2VjMDOUR4J5lZstFro1JDIxLxqpHXBHmoyLhLCGBsvXU
+	 oEKChHMkhBjZX8zZyYMUyAywc3XD0Yv7tiu4EQVH6G1K8hypBrlUovB+RO1+6FEyjI
+	 okhTGpOfR64FRpVyvpFCrmBXO3YVFT5l9umiwpKN9efS1MKboixziSgC97dX7C3ssH
+	 NLVQO8cCXcEUw==
 From: Vinod Koul <vkoul@kernel.org>
 To: Bc-bocun Chen <bc-bocun.chen@mediatek.com>, 
  Steven Liu <steven.liu@mediatek.com>, John Crispin <john@phrozen.org>, 
  Chunfeng Yun <chunfeng.yun@mediatek.com>, 
  Kishon Vijay Abraham I <kishon@kernel.org>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
  Conor Dooley <conor+dt@kernel.org>, 
  Matthias Brugger <matthias.bgg@gmail.com>, 
  AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
@@ -57,12 +57,12 @@ To: Bc-bocun Chen <bc-bocun.chen@mediatek.com>,
  linux-phy@lists.infradead.org, devicetree@vger.kernel.org, 
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
  Daniel Golle <daniel@makrotopia.org>
-In-Reply-To: <745f8b46f676e94c1a396df8c46aefe0e8b4771c.1707530671.git.daniel@makrotopia.org>
-References: <745f8b46f676e94c1a396df8c46aefe0e8b4771c.1707530671.git.daniel@makrotopia.org>
-Subject: Re: [PATCH v3 1/2] dt-bindings: phy: mediatek,mt7988-xfi-tphy: add
+In-Reply-To: <da5498096f71a40ca1eac4124b7bb601c82396fb.1712625857.git.daniel@makrotopia.org>
+References: <da5498096f71a40ca1eac4124b7bb601c82396fb.1712625857.git.daniel@makrotopia.org>
+Subject: Re: [PATCH v4 1/2] dt-bindings: phy: mediatek,mt7988-xfi-tphy: add
  new bindings
-Message-Id: <171292175438.599803.12725341666567867086.b4-ty@kernel.org>
-Date: Fri, 12 Apr 2024 17:05:54 +0530
+Message-Id: <171292176938.599803.1671196467939559140.b4-ty@kernel.org>
+Date: Fri, 12 Apr 2024 17:06:09 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,7 +74,7 @@ Content-Transfer-Encoding: 7bit
 X-Mailer: b4 0.12.3
 
 
-On Sat, 10 Feb 2024 02:10:08 +0000, Daniel Golle wrote:
+On Tue, 09 Apr 2024 03:23:54 +0100, Daniel Golle wrote:
 > Add bindings for the MediaTek XFI Ethernet SerDes T-PHY found in the
 > MediaTek MT7988 SoC which can operate at various interfaces modes:
 > 
