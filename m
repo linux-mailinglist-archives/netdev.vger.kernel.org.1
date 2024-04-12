@@ -1,659 +1,141 @@
-Return-Path: <netdev+bounces-87485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1DF08A3423
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 18:53:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E3F48A3440
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 19:02:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E54431C2304E
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 16:53:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8173285607
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 17:02:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEAC814BF8A;
-	Fri, 12 Apr 2024 16:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E952614B098;
+	Fri, 12 Apr 2024 17:02:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3GvI9g+h"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tva0J7jM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f74.google.com (mail-io1-f74.google.com [209.85.166.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2044.outbound.protection.outlook.com [40.107.96.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E304714D6FD
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 16:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.74
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712940777; cv=none; b=qqL9OHX+HaodWVT6o5x2RX7HgMFSRYjlJgaWwQPs/qmcYW02/RoDF7wV2lzIaCokw5gVcklufMSHQgZ4lvM8D4Eb+RHB6lfsbHxr70hQ64Tjy+0OYJIceLUwb76Iu1IJHIKVRE8o9tRkG/Gk1A2TC3buq52Ic/xixxmyAlnN+F8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712940777; c=relaxed/simple;
-	bh=+WVEUy1Ek4cdfvZCpbqwqbLnPDe5YHNpESVuBAyilzA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HAWlXl3nBWtcA6HoSd1jULyD1jVctDgu5HgqvMBcrOSWEM+QnuSQvpfWf9UYZ0JPiq2AHAcJTviAsfhU9VZka/2yTYGcdWZyeACUH0liVyLevnUYjNJB1rY3dD3pAOeB70jgRCiWYVvOsyF3RMhWoM8ZPG4G504U1dGBlE2LehM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3GvI9g+h; arc=none smtp.client-ip=209.85.166.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jrife.bounces.google.com
-Received: by mail-io1-f74.google.com with SMTP id ca18e2360f4ac-7d6c32ef13bso43678339f.0
-        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 09:52:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712940775; x=1713545575; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LckglVSYUWBQoiIhTCKOGb+dY61meuimDlAWaXqXllA=;
-        b=3GvI9g+hJTq3cgroT65XiRFiG5Sk8Z2o5+hcuMRHJi42tfjlVWEfdkxJwD1zVoo7Ju
-         +yJfS0sq4JLFTRzGqINxIhsvlgex/6jCj+uEpmOyB029tuXzARK1hD8EbG6itsryLVEg
-         960Ff+6vYqAyNFMUG+iY90YgF0tXQDw8/J/auL+ePvhfBoPtsn7jm+K7lLHDRs4W/8Kv
-         A/VuwwtT+GC+5MoQuQoY+KckbBG9EDaUvfl+dHkNR3jiYET7rogJcxJctPnsfIxafF2a
-         oGROid+0lVQlWrfoWfydsGSxSq5imO5CdzR9NR5GVyDZsOYoUbxc5aybQMj1OEe2Riyk
-         r/iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712940775; x=1713545575;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LckglVSYUWBQoiIhTCKOGb+dY61meuimDlAWaXqXllA=;
-        b=NAIVWvK6nb+E6FiLqRd9qOZ6tcY3QnuBrE6iKCf5+c45wtBvj+mhjInnvbaDphH/wf
-         cR/WKWg5O5GJfK0nvALu4eaRGTXOdReihi4RAqb1hxOF35998upH1up20rXJQY4HIPIv
-         e3wys3aAPVt1undHJ+QASn/S3HpYFjs5xk/aulTK3Py3BfpaCKMvywr5nrkoS6zpeO3W
-         VScCtvNZLb6XJAXAmLSePc95xK7qfIhn2cpnc5p8ADckSC/VewvChUoSTXH834w1bwP2
-         zrBgEn/ky8XUQxH0SZSDZ1PHgNDm9+VusHQAhfNpUUpuVCY3ynVqv3+J3Wr3qLF5BVIM
-         Qi4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUpjPaiu/v0WCo6NjIZW8R9MHQKugU6U0Z2qb8dwqDjnthRt4xsyNyNtUQonxLpMDNsoaL9+3ZgDz+1ywCoFzjwAm6Q3ZxL
-X-Gm-Message-State: AOJu0YyzacsAdpuVz3gXX3N+BY2riJ93Fk60XGMY3oujxLl4OeaHFKpw
-	N+XBBfcr+2TLRO/jl0GHRCjbFC4L6Fi5A3TAVTXGB/WjhZwk9e1QdznQ5yagdrNmGL34/zUROA=
-	=
-X-Google-Smtp-Source: AGHT+IET2OF46HhXVM6vaqhEKeDYnBxcTDgSbKRxM6NAnUzrnxPgJfqh2xUL8HpGsSa9JSQWPwMdXISvAQ==
-X-Received: from jrife.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:9f])
- (user=jrife job=sendgmr) by 2002:a05:6602:14d5:b0:7d6:680:4c27 with SMTP id
- b21-20020a05660214d500b007d606804c27mr107891iow.4.1712940775155; Fri, 12 Apr
- 2024 09:52:55 -0700 (PDT)
-Date: Fri, 12 Apr 2024 11:52:27 -0500
-In-Reply-To: <20240412165230.2009746-1-jrife@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ED38149E0C;
+	Fri, 12 Apr 2024 17:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1712941335; cv=fail; b=DQR+S+Q8yS1xQILa1jtwpaEndXcFt97gJTtDQhGmKjI+I/wjKekWrII8x7XHXn6Hsl4kXCQ8XOtnDaMg2AhhTdn9HU26hRYrODs0o6cghFoM7vDADWpQqFchUW6uOyk5QQvm+QhuxYKL8hGqAmJYGcSQqpH7X/iJRS6zfc7Cf+A=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1712941335; c=relaxed/simple;
+	bh=X63MV7kKQIUV/q6IF1ILoi4gB2my/EO8XIaoWfQoOzM=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=pa59zI65Hf16yycm/yS/I2aaHpVG3owI/fJidYe4lXAEWg2xwx70UwjFhGryHX9DH9Q0NiRm0rKPRMOlU5HMdW0UQKAQbVDl21GFyUbQkd/mGatk6GktVQVPRwzMG6ERl8VdglmKhEsssnNykAiLXB6m2s8PnM+MLUetogenTbA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tva0J7jM; arc=fail smtp.client-ip=40.107.96.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AM5dv6Ibd7VjzmEItbocDbSk3QVX8HCKNcqrACZaJMNUe/6OeqktY5qace6FVsiCWgNbqsiZDAUNqckwJJM8zO+Vwiy0ZDxWJmblzTSaY4C4ulEAFwCliuBmvObejStF2xoeIwGvhgcEsWusNphUWQVyquqofEC9YcDXnbNyIA0iZSRASO3eB7fVpzFh9u6o9XEF8Z259MNkQydjBelm4+5oSHk9GP1bgBvVa6Oo9HYwIkjv24PtQCcioX4JDSY5tf/MDgbr2U3Whthp5fRtv/Sbj0k1c4wIIyycT/4LohvxcmDZCdc1v61JR48cge6icCxXX/7hkxz+1b9A5bMovQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yqHs0Y9Im8tlN38O6Xz2Vd1wHyvypaBEzFnJZiB8Q6Q=;
+ b=HY+tNVBzPE3kHxfWAzYy3dC/GfatxmQVIMwF13H9X/Jr85B0udKRVlPLsLKGFM+R8hujXWBQlhIQpLAAmbKRSEZkc8AN8obbKrfZ3LfGyCpITDeWjR9oDFfgmzUm1ti0buRkcxYG3K/sd+AGW3njSLKVSGc3roV5FmdkDhySGfm57kcoW/xGKUcfJdsoA7DiXaNkI3+Iw5YjJe9lreSVZtK1/WLcmsiaYoDpbkRjrZZv5Ynkk0L0Zm9kzaipe0iPuQEZ9dGBG51XRbL/VU2hyWSNWSNKd7euG37OhqcK/Hc+ce4G96iJ2duHawIFEHB9WbFt4pviT2Z0+M+Yfgf3pg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yqHs0Y9Im8tlN38O6Xz2Vd1wHyvypaBEzFnJZiB8Q6Q=;
+ b=tva0J7jMjtx544wIUur/0nHrRypVYZkq8WA3/gPPv+bOQwerAOWBMMQ2iSL9k89XtaJ3i2fJfHvbVj4PgLztaX5ke1szIaGEVePapR9+WlxJZ2nPUC+Y+KFDExnn04Bc6vMjaWr1pKMHx4RSWDUtmbb+2OiItmTLgXfGP+YUBKPjpeMy2V3XRsj7w7DG2ZuLX30NCEP+oS0WGXDPRoY/MnJdMiHbmC8ukNPvUYDeZeqhLgF/jLUCsI/E2eIgUylv7wzE9q8xZG5oBaIYBJmwffUi0VmP1ZaCjIW9JowAXsa0AfF1tlsRwFL9KE6de6y7NhnPDsB3YHFyKK2uNOfGgw==
+Received: from PR1P264CA0124.FRAP264.PROD.OUTLOOK.COM (2603:10a6:102:2cd::18)
+ by PH0PR12MB5630.namprd12.prod.outlook.com (2603:10b6:510:146::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Fri, 12 Apr
+ 2024 17:02:11 +0000
+Received: from SN1PEPF0002BA4E.namprd03.prod.outlook.com
+ (2603:10a6:102:2cd:cafe::af) by PR1P264CA0124.outlook.office365.com
+ (2603:10a6:102:2cd::18) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.22 via Frontend
+ Transport; Fri, 12 Apr 2024 17:02:10 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SN1PEPF0002BA4E.mail.protection.outlook.com (10.167.242.71) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.22 via Frontend Transport; Fri, 12 Apr 2024 17:02:09 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Fri, 12 Apr
+ 2024 10:01:21 -0700
+Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Fri, 12 Apr
+ 2024 10:01:17 -0700
+References: <20240412141436.828666-1-kuba@kernel.org>
+ <20240412141436.828666-7-kuba@kernel.org>
+User-agent: mu4e 1.8.11; emacs 28.3
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <shuah@kernel.org>, <petrm@nvidia.com>,
+	<linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 6/6] selftests: net: exercise page pool
+ reporting via netlink
+Date: Fri, 12 Apr 2024 19:00:38 +0200
+In-Reply-To: <20240412141436.828666-7-kuba@kernel.org>
+Message-ID: <87zftyecrp.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240412165230.2009746-1-jrife@google.com>
-X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240412165230.2009746-7-jrife@google.com>
-Subject: [PATCH v2 bpf-next 6/6] selftests/bpf: Add kernel socket operation tests
-From: Jordan Rife <jrife@google.com>
-To: bpf@vger.kernel.org
-Cc: Jordan Rife <jrife@google.com>, linux-kselftest@vger.kernel.org, 
-	netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	Kui-Feng Lee <thinker.li@gmail.com>, Artem Savkov <asavkov@redhat.com>, 
-	Dave Marchevsky <davemarchevsky@fb.com>, Menglong Dong <imagedong@tencent.com>, Daniel Xu <dxu@dxuuu.xyz>, 
-	David Vernet <void@manifault.com>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA4E:EE_|PH0PR12MB5630:EE_
+X-MS-Office365-Filtering-Correlation-Id: f37913fb-5cb1-4408-7011-08dc5b124aa7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Qdxv6wY2dDUlh55VQQ3JKRXwpu23Q+u6aw4XHMqm7Jk5xRyBiQXqlAr84klyYNNvHu6cBmllxkzo9DnWU2Q2jLtqW6FZS24cNdR+sY5yeixJg+wZ0V3m1NMsa7CUujwhKghyIe67h9ElnQakWXi+Rg+cFIKwLreRWH/9OQlXrihDKK8+SrC9NuG0wHy0yqlOE1Y9x774dDfZPzGleeEC0qa11NR1L2QwU0wONAJ3R5T900WcKjXhxoiZo8y7IHTzG1oLDkInZqqEmVOrewWWzTrDTvwCeNZxgQ6XjClmSlnHwvEuo+I8t+5weYwyfSI1K3oiTD/OVIAWY44C1CSqBnyEYc/4Dt8vxo6pZq0/GBcf1WOtalVWOjsvLTMwDKN2tWkBwh+zfPsDxI7mjjNGS8UWBOkHpVWFKdvcGwP7C6dgHLzM1VZ0vCTB9+dC07zeO5hTI7qkLkkTe+6pGJPtn/KMoqUEKBPDk7lb1mgH2aspQaw/grTufnJ896rVrM1w86HTLQ5r4wa2RbfsWID8djYQu2eWeeUF22b2wEDKgx9UGTQ7itcsKOl7bESHoN+QHiQ7iQgkhzZMdn3x0Bs6cITCGnGGUbOZaKbk1umvptk7+s5urGUSgGWS0IsAOFUlUEuNeE8+AvG/qwDehTb3a5Z9IpO2nXvMbuu6FLqMJJC9eP9Ub7AeRJxfely/2zccm/BJnWm04lRO16oM1nRHLrOHL+DVOomi7jkb2zsFVCRBUOEqdpYpWdAdqBFuMtq4
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(36860700004)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Apr 2024 17:02:09.7293
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f37913fb-5cb1-4408-7011-08dc5b124aa7
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SN1PEPF0002BA4E.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB5630
 
-This patch creates two sets of sock_ops that call out to the SYSCALL
-hooks in the sock_addr_kern BPF program and uses them to construct
-test cases for the range of supported operations (kernel_connect(),
-kernel_bind(), kernel_sendms(), sock_sendmsg(), kernel_getsockname(),
-kenel_getpeername()). This ensures that these interact with BPF sockaddr
-hooks as intended.
 
-Beyond this it also ensures that these operations do not modify their
-address parameter, providing regression coverage for the issues
-addressed by this set of patches:
+Jakub Kicinski <kuba@kernel.org> writes:
 
-- commit 0bdf399342c5("net: Avoid address overwrite in kernel_connect")
-- commit 86a7e0b69bd5("net: prevent rewrite of msg_name in sock_sendmsg()")
-- commit c889a99a21bf("net: prevent address rewrite in kernel_bind()")
-- commit 01b2885d9415("net: Save and restore msg_namelen in sock_sendmsg")
+> Add a Python test for the basic ops.
+>
+>   # ./net/nl_netdev.py
+>   KTAP version 1
+>   1..3
+>   ok 1 nl_netdev.empty_check
+>   ok 2 nl_netdev.lo_check
+>   ok 3 nl_netdev.page_pool_check
+>   # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Signed-off-by: Jordan Rife <jrife@google.com>
----
- .../selftests/bpf/prog_tests/sock_addr.c      | 474 ++++++++++++++++++
- 1 file changed, 474 insertions(+)
+LGTM
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/sock_addr.c b/tools/testing/selftests/bpf/prog_tests/sock_addr.c
-index 78bcc147f09c4..621df9b593ec8 100644
---- a/tools/testing/selftests/bpf/prog_tests/sock_addr.c
-+++ b/tools/testing/selftests/bpf/prog_tests/sock_addr.c
-@@ -3,6 +3,7 @@
- 
- #include "test_progs.h"
- 
-+#include "sock_addr_kern.skel.h"
- #include "bind4_prog.skel.h"
- #include "bind6_prog.skel.h"
- #include "connect_unix_prog.skel.h"
-@@ -53,6 +54,218 @@ enum sock_addr_test_type {
- typedef void *(*load_fn)(int cgroup_fd);
- typedef void (*destroy_fn)(void *skel);
- 
-+static int cmp_addr(const struct sockaddr_storage *addr1, socklen_t addr1_len,
-+		    const struct sockaddr_storage *addr2, socklen_t addr2_len,
-+		    bool cmp_port);
-+
-+struct init_sock_args {
-+	int af;
-+	int type;
-+};
-+
-+struct addr_args {
-+	char addr[sizeof(struct sockaddr_storage)];
-+	int addrlen;
-+};
-+
-+struct sendmsg_args {
-+	struct addr_args addr;
-+	char msg[10];
-+	int msglen;
-+};
-+
-+static struct sock_addr_kern *skel;
-+
-+static int run_bpf_prog(const char *prog_name, void *ctx, int ctx_size)
-+{
-+	LIBBPF_OPTS(bpf_test_run_opts, topts);
-+	struct bpf_program *prog;
-+	int prog_fd, err;
-+
-+	topts.ctx_in = ctx;
-+	topts.ctx_size_in = ctx_size;
-+
-+	prog = bpf_object__find_program_by_name(skel->obj, prog_name);
-+	if (!ASSERT_OK_PTR(prog, "bpf_object__find_program_by_name"))
-+		goto err;
-+
-+	prog_fd = bpf_program__fd(prog);
-+	err = bpf_prog_test_run_opts(prog_fd, &topts);
-+	if (!ASSERT_OK(err, prog_name))
-+		goto err;
-+
-+	err = topts.retval;
-+	goto out;
-+err:
-+	err = -1;
-+out:
-+	return err;
-+}
-+
-+static int kernel_init_sock(int af, int type, int protocol)
-+{
-+	struct init_sock_args args = {
-+		.af = af,
-+		.type = type,
-+	};
-+
-+	return run_bpf_prog("init_sock", &args, sizeof(args));
-+}
-+
-+static int kernel_close_sock(int fd)
-+{
-+	return run_bpf_prog("close_sock", NULL, 0);
-+}
-+
-+static int sock_addr_op(const char *name, struct sockaddr *addr,
-+			socklen_t *addrlen, bool expect_change)
-+{
-+	struct addr_args args;
-+	int err;
-+
-+	if (addrlen)
-+		args.addrlen = *addrlen;
-+
-+	if (addr)
-+		memcpy(&args.addr, addr, *addrlen);
-+
-+	err = run_bpf_prog(name, &args, sizeof(args));
-+
-+	if (!expect_change && addr)
-+		if (!ASSERT_EQ(cmp_addr((struct sockaddr_storage *)addr,
-+					*addrlen,
-+					(struct sockaddr_storage *)&args.addr,
-+					args.addrlen, 1),
-+			       0, "address_param_modified"))
-+			return -1;
-+
-+	if (addrlen)
-+		*addrlen = args.addrlen;
-+
-+	if (addr)
-+		memcpy(addr, &args.addr, *addrlen);
-+
-+	return err;
-+}
-+
-+static int send_msg_op(const char *name, struct sockaddr *addr,
-+		       socklen_t addrlen, const char *msg, int msglen,
-+		       bool expect_change)
-+{
-+	struct sendmsg_args args;
-+	int err;
-+
-+	memset(&args, 0, sizeof(args));
-+	memcpy(&args.addr.addr, addr, addrlen);
-+	args.addr.addrlen = addrlen;
-+	memcpy(args.msg, msg, msglen);
-+	args.msglen = msglen;
-+
-+	err = run_bpf_prog(name, &args, sizeof(args));
-+
-+	if (!expect_change && addr)
-+		if (!ASSERT_EQ(cmp_addr((struct sockaddr_storage *)addr,
-+					addrlen,
-+					(struct sockaddr_storage *)&args.addr.addr,
-+					args.addr.addrlen, 1),
-+			       0, "address_param_modified"))
-+			return -1;
-+
-+	return err;
-+}
-+
-+static int kernel_connect(struct sockaddr *addr, socklen_t addrlen)
-+{
-+	return sock_addr_op("kernel_connect", addr, &addrlen, false);
-+}
-+
-+static int kernel_bind(int fd, struct sockaddr *addr, socklen_t addrlen)
-+{
-+	return sock_addr_op("kernel_bind", addr, &addrlen, false);
-+}
-+
-+static int kernel_listen(void)
-+{
-+	return sock_addr_op("kernel_listen", NULL, NULL, false);
-+}
-+
-+static int kernel_sendmsg(int fd, struct sockaddr *addr, socklen_t addrlen,
-+			  char *msg, int msglen)
-+{
-+	return send_msg_op("kernel_sendmsg", addr, addrlen, msg, msglen, false);
-+}
-+
-+static int sock_sendmsg(int fd, struct sockaddr *addr, socklen_t addrlen,
-+			char *msg, int msglen)
-+{
-+	return send_msg_op("sock_sendmsg", addr, addrlen, msg, msglen, false);
-+}
-+
-+static int kernel_getsockname(int fd, struct sockaddr *addr, socklen_t *addrlen)
-+{
-+	return sock_addr_op("kernel_getsockname", addr, addrlen, true);
-+}
-+
-+static int kernel_getpeername(int fd, struct sockaddr *addr, socklen_t *addrlen)
-+{
-+	return sock_addr_op("kernel_getpeername", addr, addrlen, true);
-+}
-+
-+int kernel_connect_to_addr(const struct sockaddr_storage *addr,
-+			   socklen_t addrlen, int type)
-+{
-+	int err;
-+
-+	if (!ASSERT_OK(kernel_init_sock(addr->ss_family, type, 0),
-+		       "kernel_init_sock"))
-+		goto err;
-+
-+	if (!ASSERT_OK(kernel_connect((struct sockaddr *)addr, addrlen),
-+		       "kernel_connect"))
-+		goto err;
-+
-+	/* Test code expects a "file descriptor" on success. */
-+	err = 1;
-+	goto out;
-+err:
-+	err = -1;
-+	ASSERT_OK(kernel_close_sock(0), "kernel_close_sock");
-+out:
-+	return err;
-+}
-+
-+int kernel_start_server(int family, int type, const char *addr_str, __u16 port,
-+			int timeout_ms)
-+{
-+	struct sockaddr_storage addr;
-+	socklen_t addrlen;
-+	int err;
-+
-+	if (!ASSERT_OK(kernel_init_sock(family, type, 0), "kernel_init_sock"))
-+		goto err;
-+
-+	if (make_sockaddr(family, addr_str, port, &addr, &addrlen))
-+		goto err;
-+
-+	if (!ASSERT_OK(kernel_bind(0, (struct sockaddr *)&addr, addrlen),
-+		       "kernel_bind"))
-+		goto err;
-+
-+	if (type == SOCK_STREAM) {
-+		if (!ASSERT_OK(kernel_listen(), "kernel_listen"))
-+			goto err;
-+	}
-+
-+	/* Test code expects a "file descriptor" on success. */
-+	err = 1;
-+	goto out;
-+err:
-+	err = -1;
-+	ASSERT_OK(kernel_close_sock(0), "kernel_close_sock");
-+out:
-+	return err;
-+}
-+
- struct sock_ops {
- 	int (*connect_to_addr)(const struct sockaddr_storage *addr,
- 			       socklen_t addrlen, int type);
-@@ -102,6 +315,28 @@ struct sock_ops user_ops = {
- 	.close = close,
- };
- 
-+struct sock_ops kern_ops_sock_sendmsg = {
-+	.connect_to_addr = kernel_connect_to_addr,
-+	.start_server = kernel_start_server,
-+	.socket = kernel_init_sock,
-+	.bind = kernel_bind,
-+	.getsockname = kernel_getsockname,
-+	.getpeername = kernel_getpeername,
-+	.sendmsg = sock_sendmsg,
-+	.close = kernel_close_sock,
-+};
-+
-+struct sock_ops kern_ops_kernel_sendmsg = {
-+	.connect_to_addr = kernel_connect_to_addr,
-+	.start_server = kernel_start_server,
-+	.socket = kernel_init_sock,
-+	.bind = kernel_bind,
-+	.getsockname = kernel_getsockname,
-+	.getpeername = kernel_getpeername,
-+	.sendmsg = kernel_sendmsg,
-+	.close = kernel_close_sock,
-+};
-+
- struct sock_addr_test {
- 	enum sock_addr_test_type type;
- 	const char *name;
-@@ -211,6 +446,60 @@ static struct sock_addr_test tests[] = {
- 		SERV6_REWRITE_PORT,
- 	},
- 
-+	/* bind - kernel calls */
-+	{
-+		SOCK_ADDR_TEST_BIND,
-+		"bind4: kernel_bind (stream)",
-+		bind4_prog_load,
-+		bind4_prog_destroy,
-+		&kern_ops_sock_sendmsg,
-+		AF_INET,
-+		SOCK_STREAM,
-+		SERV4_IP,
-+		SERV4_PORT,
-+		SERV4_REWRITE_IP,
-+		SERV4_REWRITE_PORT,
-+	},
-+	{
-+		SOCK_ADDR_TEST_BIND,
-+		"bind4: kernel_bind (dgram)",
-+		bind4_prog_load,
-+		bind4_prog_destroy,
-+		&kern_ops_sock_sendmsg,
-+		AF_INET,
-+		SOCK_DGRAM,
-+		SERV4_IP,
-+		SERV4_PORT,
-+		SERV4_REWRITE_IP,
-+		SERV4_REWRITE_PORT,
-+	},
-+	{
-+		SOCK_ADDR_TEST_BIND,
-+		"bind6: kernel_bind (stream)",
-+		bind6_prog_load,
-+		bind6_prog_destroy,
-+		&kern_ops_sock_sendmsg,
-+		AF_INET6,
-+		SOCK_STREAM,
-+		SERV6_IP,
-+		SERV6_PORT,
-+		SERV6_REWRITE_IP,
-+		SERV6_REWRITE_PORT,
-+	},
-+	{
-+		SOCK_ADDR_TEST_BIND,
-+		"bind6: kernel_bind (dgram)",
-+		bind6_prog_load,
-+		bind6_prog_destroy,
-+		&kern_ops_sock_sendmsg,
-+		AF_INET6,
-+		SOCK_DGRAM,
-+		SERV6_IP,
-+		SERV6_PORT,
-+		SERV6_REWRITE_IP,
-+		SERV6_REWRITE_PORT,
-+	},
-+
- 	/* connect - system calls */
- 	{
- 		SOCK_ADDR_TEST_CONNECT,
-@@ -283,6 +572,78 @@ static struct sock_addr_test tests[] = {
- 		NULL,
- 	},
- 
-+	/* connect - kernel calls */
-+	{
-+		SOCK_ADDR_TEST_CONNECT,
-+		"connect4: kernel_connect (stream)",
-+		connect4_prog_load,
-+		connect4_prog_destroy,
-+		&kern_ops_sock_sendmsg,
-+		AF_INET,
-+		SOCK_STREAM,
-+		SERV4_IP,
-+		SERV4_PORT,
-+		SERV4_REWRITE_IP,
-+		SERV4_REWRITE_PORT,
-+		SRC4_REWRITE_IP,
-+	},
-+	{
-+		SOCK_ADDR_TEST_CONNECT,
-+		"connect4: kernel_connect (dgram)",
-+		connect4_prog_load,
-+		connect4_prog_destroy,
-+		&kern_ops_sock_sendmsg,
-+		AF_INET,
-+		SOCK_DGRAM,
-+		SERV4_IP,
-+		SERV4_PORT,
-+		SERV4_REWRITE_IP,
-+		SERV4_REWRITE_PORT,
-+		SRC4_REWRITE_IP,
-+	},
-+	{
-+		SOCK_ADDR_TEST_CONNECT,
-+		"connect6: kernel_connect (stream)",
-+		connect6_prog_load,
-+		connect6_prog_destroy,
-+		&kern_ops_sock_sendmsg,
-+		AF_INET6,
-+		SOCK_STREAM,
-+		SERV6_IP,
-+		SERV6_PORT,
-+		SERV6_REWRITE_IP,
-+		SERV6_REWRITE_PORT,
-+		SRC6_REWRITE_IP,
-+	},
-+	{
-+		SOCK_ADDR_TEST_CONNECT,
-+		"connect6: kernel_connect (dgram)",
-+		connect6_prog_load,
-+		connect6_prog_destroy,
-+		&kern_ops_sock_sendmsg,
-+		AF_INET6,
-+		SOCK_DGRAM,
-+		SERV6_IP,
-+		SERV6_PORT,
-+		SERV6_REWRITE_IP,
-+		SERV6_REWRITE_PORT,
-+		SRC6_REWRITE_IP,
-+	},
-+	{
-+		SOCK_ADDR_TEST_CONNECT,
-+		"connect_unix: kernel_connect (dgram)",
-+		connect_unix_prog_load,
-+		connect_unix_prog_destroy,
-+		&kern_ops_sock_sendmsg,
-+		AF_UNIX,
-+		SOCK_STREAM,
-+		SERVUN_ADDRESS,
-+		0,
-+		SERVUN_REWRITE_ADDRESS,
-+		0,
-+		NULL,
-+	},
-+
- 	/* sendmsg - system calls */
- 	{
- 		SOCK_ADDR_TEST_SENDMSG,
-@@ -327,6 +688,94 @@ static struct sock_addr_test tests[] = {
- 		NULL,
- 	},
- 
-+	/* sendmsg - kernel calls (sock_sendmsg) */
-+	{
-+		SOCK_ADDR_TEST_SENDMSG,
-+		"sendmsg4: sock_sendmsg (dgram)",
-+		sendmsg4_prog_load,
-+		sendmsg4_prog_destroy,
-+		&kern_ops_sock_sendmsg,
-+		AF_INET,
-+		SOCK_DGRAM,
-+		SERV4_IP,
-+		SERV4_PORT,
-+		SERV4_REWRITE_IP,
-+		SERV4_REWRITE_PORT,
-+		SRC4_REWRITE_IP,
-+	},
-+	{
-+		SOCK_ADDR_TEST_SENDMSG,
-+		"sendmsg6: sock_sendmsg (dgram)",
-+		sendmsg6_prog_load,
-+		sendmsg6_prog_destroy,
-+		&kern_ops_sock_sendmsg,
-+		AF_INET6,
-+		SOCK_DGRAM,
-+		SERV6_IP,
-+		SERV6_PORT,
-+		SERV6_REWRITE_IP,
-+		SERV6_REWRITE_PORT,
-+		SRC6_REWRITE_IP,
-+	},
-+	{
-+		SOCK_ADDR_TEST_SENDMSG,
-+		"sendmsg_unix: sock_sendmsg (dgram)",
-+		sendmsg_unix_prog_load,
-+		sendmsg_unix_prog_destroy,
-+		&kern_ops_sock_sendmsg,
-+		AF_UNIX,
-+		SOCK_DGRAM,
-+		SERVUN_ADDRESS,
-+		0,
-+		SERVUN_REWRITE_ADDRESS,
-+		0,
-+		NULL,
-+	},
-+
-+	/* sendmsg - kernel calls (kernel_sendmsg) */
-+	{
-+		SOCK_ADDR_TEST_SENDMSG,
-+		"sendmsg4: kernel_sendmsg (dgram)",
-+		sendmsg4_prog_load,
-+		sendmsg4_prog_destroy,
-+		&kern_ops_kernel_sendmsg,
-+		AF_INET,
-+		SOCK_DGRAM,
-+		SERV4_IP,
-+		SERV4_PORT,
-+		SERV4_REWRITE_IP,
-+		SERV4_REWRITE_PORT,
-+		SRC4_REWRITE_IP,
-+	},
-+	{
-+		SOCK_ADDR_TEST_SENDMSG,
-+		"sendmsg6: kernel_sendmsg (dgram)",
-+		sendmsg6_prog_load,
-+		sendmsg6_prog_destroy,
-+		&kern_ops_kernel_sendmsg,
-+		AF_INET6,
-+		SOCK_DGRAM,
-+		SERV6_IP,
-+		SERV6_PORT,
-+		SERV6_REWRITE_IP,
-+		SERV6_REWRITE_PORT,
-+		SRC6_REWRITE_IP,
-+	},
-+	{
-+		SOCK_ADDR_TEST_SENDMSG,
-+		"sendmsg_unix: sock_sendmsg (dgram)",
-+		sendmsg_unix_prog_load,
-+		sendmsg_unix_prog_destroy,
-+		&kern_ops_kernel_sendmsg,
-+		AF_UNIX,
-+		SOCK_DGRAM,
-+		SERVUN_ADDRESS,
-+		0,
-+		SERVUN_REWRITE_ADDRESS,
-+		0,
-+		NULL,
-+	},
-+
- 	/* recvmsg - system calls */
- 	{
- 		SOCK_ADDR_TEST_RECVMSG,
-@@ -468,6 +917,27 @@ static int cmp_sock_addr(info_fn fn, int sock1,
- 	return cmp_addr(&addr1, len1, addr2, addr2_len, cmp_port);
- }
- 
-+static int load_sock_addr_kern(void)
-+{
-+	int err;
-+
-+	skel = sock_addr_kern__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "skel"))
-+		goto err;
-+
-+	err = 0;
-+	goto out;
-+err:
-+	err = -1;
-+out:
-+	return err;
-+}
-+
-+static void unload_sock_addr_kern(void)
-+{
-+	sock_addr_kern__destroy(skel);
-+}
-+
- static void test_bind(struct sock_addr_test *test)
- {
- 	struct sockaddr_storage expected_addr;
-@@ -766,6 +1236,9 @@ void test_sock_addr(void)
- 	if (!ASSERT_GE(cgroup_fd, 0, "join_cgroup"))
- 		goto cleanup;
- 
-+	if (!ASSERT_OK(load_sock_addr_kern(), "load_sock_addr_kern"))
-+		goto cleanup;
-+
- 	for (size_t i = 0; i < ARRAY_SIZE(tests); ++i) {
- 		struct sock_addr_test *test = &tests[i];
- 
-@@ -806,6 +1279,7 @@ void test_sock_addr(void)
- 	}
- 
- cleanup:
-+	unload_sock_addr_kern();
- 	if (cgroup_fd >= 0)
- 		close(cgroup_fd);
- 	cleanup_test_env();
--- 
-2.44.0.683.g7961c838ac-goog
-
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 
