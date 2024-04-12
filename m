@@ -1,135 +1,302 @@
-Return-Path: <netdev+bounces-87429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AB658A31AC
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 16:58:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 994308A31CA
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 17:05:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABD43B25734
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 14:58:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF1CEB20DD0
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 15:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52343146D5F;
-	Fri, 12 Apr 2024 14:58:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 016FE146D71;
+	Fri, 12 Apr 2024 15:05:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LIDvt4fj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FO6wswCS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E95713DDAC;
-	Fri, 12 Apr 2024 14:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9BF4146D68
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 15:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712933912; cv=none; b=W1xNGflScyd1aecYhE3MV4endm2nxAlk8LqqKfpciI+GpJ9gBZyurCr7UyzfVU3GO0J97SXy800IbyUX8g9IbO3NUmyW5jDhyZ9R7kLabb8or+xehyAbOq7VZHoWIsQt49TbCO/pBEOOyIOt8RyeNmHq/Dsr3jFk2WvZXQoCtyM=
+	t=1712934348; cv=none; b=aPnOB+WKg9llT47HB8zHFecOyRS1V+njAL/dQTQugsVhtIMswdNunpZZkO0S1TTryxCMiFnYlzIIxq69H8xNcivBNluLfXJXpoD5M3x5lm/Ke1GrlQshK+a/G9RHVNBw2GMipvzbV4rPI9tYCbtwb+EL6+kU4RzmzxOmiyLg+d4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712933912; c=relaxed/simple;
-	bh=GA0o7gpzd3wvUKxE11Lah5edZT9uClo0B+uRd5xaCeQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qFGtIFcDTXhS2rfqf3KlIxJ0dfp2lhwQ6tLFkWdUCgdyfm7aoE8oeAbSlGdi34VtRkLzz5wFEHl0Jgnn21h0fNVYqQ/08eEvbsxrDID7/KkocT1hj5UwJMaN/Jy3CXJBRxaNWaIxwZmPBtjDyF4rQDJYjYvtcqYmE/1JZ7/Hobc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LIDvt4fj; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43CEn4NX002717;
-	Fri, 12 Apr 2024 14:58:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=bi/bnV2Os8SIK1YMsjbl5v/VwVcUXqoVx0h3+nzBfZc=;
- b=LIDvt4fjsiHCbgCdaYypJ4UzonMDaJ+QkSlRfYyKOCdj/nU/3bqVRryfGKppRx9WojcH
- 5WcvqXiw3ga7OtZ/iT6nzvELqKrjkE3YGKrU5Y0XNFHriMDPftUMX/jm+fhcmLO1kJJQ
- VxASbSuQkrUcfpixdcMXHE8W9Q9tLPBz927RxcJ444M//a9n5f/PMoWmHkM9UMKb4Wou
- /30NTfQ1Yifw68Qr+EX925UIROmLkpXzS4oprHjWv6678Ac5f3DNJdFinD3UmcTVaZ3r
- b6/dQ6aOlg5+4rf+GlqYLRhDRTGyoDPigsnF06ldrtzj+7HkDPaJQMtE/X0URWhUD573 Sw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xf5gug7mm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Apr 2024 14:58:25 +0000
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43CEwPxM015202;
-	Fri, 12 Apr 2024 14:58:25 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xf5gug7mg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Apr 2024 14:58:25 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43CE6RWZ022560;
-	Fri, 12 Apr 2024 14:58:24 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xbhqpjf47-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 12 Apr 2024 14:58:24 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43CEwIZx50200924
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 12 Apr 2024 14:58:20 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B650D20043;
-	Fri, 12 Apr 2024 14:58:18 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C82CF20040;
-	Fri, 12 Apr 2024 14:58:17 +0000 (GMT)
-Received: from [9.171.46.42] (unknown [9.171.46.42])
-	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 12 Apr 2024 14:58:17 +0000 (GMT)
-Message-ID: <04ef8c91-0bbd-47e6-a248-7e37d7e314c5@linux.ibm.com>
-Date: Fri, 12 Apr 2024 16:58:17 +0200
+	s=arc-20240116; t=1712934348; c=relaxed/simple;
+	bh=mRqZqn8as8GUJmH8zKG2QteQL+8hStyZbIBan4rVFgc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OfOx5kz6qLwAKAoIMlHpZ3W6QnKFKB8Lq5iu85qQHkm302yQ59jRYOVwQHFV9rLxT5Kvh9TxvQoC70koOCaqFpTLRbwIGwPKseMQkyiclN0dUClB30Qx3RnEy0Rm4JVN9+vpdA0ndKEhbJLyNOm2nz8N4N5cYGKdk+DxbeS0hjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FO6wswCS; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-346f4266e59so743214f8f.3
+        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 08:05:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712934345; x=1713539145; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8mtujX/v2puiC5cyqQ+Y+nhs0gB4tbgQetr8KZghqpE=;
+        b=FO6wswCSmoU5vMPwjqjIdTqeC025Lb0WTxM3af15aZL8HMnQyU3wOGqCFSQPX+wWGa
+         Q4YrPBnVosjX5rzGRwbIHkbBXUpbOntzed+IQYnbNVfYZh+DRryqWPomnMGi4gNDiYs+
+         tPAbrTRYCv2Iq76VdzB1vE0zTC4uHSEd7ipdomQjsLGGr81zep5WQHnb4xXiy1uY3OML
+         sF/jl7r4pawcBz9VwZik3DuOxjnLZ+E6e6qqPu6QwQYfCDuOmXFt3IVi4vfbZJGKR8PI
+         LFPI2cssYjsw43o0yRhzQTPx4uwlcE0VUQQGAwAg8G2N0sNG2xkzgA+XWupa8le3YB6Y
+         VwtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712934345; x=1713539145;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8mtujX/v2puiC5cyqQ+Y+nhs0gB4tbgQetr8KZghqpE=;
+        b=oZZUzDE7HaLnjm461fadODXKkDBp+UWlBHWZ815LnebysVep5k0skSsK70P5+SX7Wy
+         ooKVs9bSypyzsmQEd/tpIjlY0L9GIvuDhGGkB2Rg8gAOdKUG00GSvB4d2GYq0Sd4HDyN
+         xePeRfysgSb5m0vUVaNPahT6eDARIHj4TB6Hbjhzshlp4Gz3sMT3VcGawvXZeVgo0iVT
+         qe1fiqgGWqOEpNApmmYOUxRIwX5Br/U0N5KZrSk6HbMyACDHEiKW1G9Ixe+skKsOx7yl
+         zfex7j4bxGKAFaK/UcDYWwphrNW/fCJFI9/SD04IIZQzroGsZQaPtVcvCvNFdP7VaAfo
+         Lpiw==
+X-Gm-Message-State: AOJu0YzGmYMIpsD/HM6Xm2KMqgNZs7tK/o3AdAZX1BoVKBIfFv/5AfWp
+	ABL4kmlRprbg7BC/V0XP8nh9Wo83dtNkjW7I3xP9k4WX+DVU22glO9zHC2RSBzrO05qbpKAMyQP
+	YlgsawFqgysjvYLenr8sg+cT8cYgDMw==
+X-Google-Smtp-Source: AGHT+IFjQRLwcjVq3pXrY51fjper6bLGiO9BRuc06VbO+RIJyeDHc/N9BLTFzJk4SFmDpGXZeMliL1cOkPjp5dCmz1U=
+X-Received: by 2002:a05:6000:1ac5:b0:343:6f87:fe33 with SMTP id
+ i5-20020a0560001ac500b003436f87fe33mr2203570wry.7.1712934344697; Fri, 12 Apr
+ 2024 08:05:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v5 04/11] net/smc: implement some unsupported
- operations of loopback-ism
-To: Wen Gu <guwen@linux.alibaba.com>,
-        Niklas Schnelle
- <schnelle@linux.ibm.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>, twinkler@linux.ibm.com,
-        hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, wenjia@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org
-References: <20240324135522.108564-1-guwen@linux.alibaba.com>
- <20240324135522.108564-5-guwen@linux.alibaba.com>
- <3122eece5b484abcf8d23f85d6c18c36f0b939ff.camel@linux.ibm.com>
- <1db6ccab-b49f-45d2-a93c-05b0f79371a3@linux.alibaba.com>
- <3b3ff37643e9030ec1246e67720683a2cf5660e5.camel@linux.ibm.com>
- <7a0fc481-658e-4c99-add7-ccbd5f9dce1e@linux.alibaba.com>
- <7291dd1b2d16fd9bbd90988ac5bcc3a46d17e3f4.camel@linux.ibm.com>
- <46e8e227-8058-4062-a9db-6b9c774f63cc@linux.alibaba.com>
- <12ae995f-4af4-4c6b-9130-04672d157293@linux.ibm.com>
- <44ea7d83-4fa7-427b-9d54-678f05fd09e9@linux.alibaba.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <44ea7d83-4fa7-427b-9d54-678f05fd09e9@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Awmtnr0ZrpAS94KMe3T7N5WSb1zk4VgV
-X-Proofpoint-ORIG-GUID: mF-7PiCVUnf7kBYQUpaUfbi5rPNRYOKh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-12_11,2024-04-09_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
- spamscore=0 mlxlogscore=864 bulkscore=0 phishscore=0 adultscore=0
- impostorscore=0 clxscore=1015 lowpriorityscore=0 priorityscore=1501
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404120108
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <171217496013.1598374.10126180029382922588.stgit@ahduyck-xeon-server.home.arpa>
+ <41a39896-480b-f08d-ba67-17e129e39c0f@huawei.com> <CAKgT0Uf6MdYX_1OuAFAXadh86zDX_w1a_cwpoPGMxpmC4hGyEA@mail.gmail.com>
+ <53b80db6-f2bc-d824-ea42-4b2ac64625f2@huawei.com> <CAKgT0UeQS5q=Y2j3mmu9AhWyUMbey-iFL+sKES1UrBtoAXMdzw@mail.gmail.com>
+ <0e5e3196-ca2f-b905-a6ba-7721e8586ed7@huawei.com>
+In-Reply-To: <0e5e3196-ca2f-b905-a6ba-7721e8586ed7@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Fri, 12 Apr 2024 08:05:07 -0700
+Message-ID: <CAKgT0UeRWsJ+NiniSKa7Z3Law=QrYZp3giLAigJf7EvuAbjkRA@mail.gmail.com>
+Subject: Re: [net-next PATCH 13/15] eth: fbnic: add basic Rx handling
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org, 
+	davem@davemloft.net, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Apr 12, 2024 at 1:43=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> On 2024/4/10 23:03, Alexander Duyck wrote:
+> > On Wed, Apr 10, 2024 at 4:54=E2=80=AFAM Yunsheng Lin <linyunsheng@huawe=
+i.com> wrote:
+> >>
+> >> On 2024/4/9 23:08, Alexander Duyck wrote:
+> >>> On Tue, Apr 9, 2024 at 4:47=E2=80=AFAM Yunsheng Lin <linyunsheng@huaw=
+ei.com> wrote:
+> >>>>
+> >>>> On 2024/4/4 4:09, Alexander Duyck wrote:
+> >>>>> From: Alexander Duyck <alexanderduyck@fb.com>
+> >>>
+> >>> [...]
+> >>>
+> >>>>> +     /* Unmap and free processed buffers */
+> >>>>> +     if (head0 >=3D 0)
+> >>>>> +             fbnic_clean_bdq(nv, budget, &qt->sub0, head0);
+> >>>>> +     fbnic_fill_bdq(nv, &qt->sub0);
+> >>>>> +
+> >>>>> +     if (head1 >=3D 0)
+> >>>>> +             fbnic_clean_bdq(nv, budget, &qt->sub1, head1);
+> >>>>> +     fbnic_fill_bdq(nv, &qt->sub1);
+> >>>>
+> >>>> I am not sure how complicated the rx handling will be for the advanc=
+ed
+> >>>> feature. For the current code, for each entry/desc in both qt->sub0 =
+and
+> >>>> qt->sub1 at least need one page, and the page seems to be only used =
+once
+> >>>> no matter however small the page is used?
+> >>>>
+> >>>> I am assuming you want to do 'tightly optimized' operation for this =
+by
+> >>>> calling page_pool_fragment_page(), but manipulating page->pp_ref_cou=
+nt
+> >>>> directly does not seems to add any value for the current code, but s=
+eem
+> >>>> to waste a lot of memory by not using the frag API, especially PAGE_=
+SIZE
+> >>>>> 4K?
+> >>>
+> >>> On this hardware both the header and payload buffers are fragmentable=
+.
+> >>> The hardware decides the partitioning and we just follow it. So for
+> >>> example it wouldn't be uncommon to have a jumbo frame split up such
+> >>> that the header is less than 128B plus SKB overhead while the actual
+> >>> data in the payload is just over 1400. So for us fragmenting the page=
+s
+> >>> is a very likely case especially with smaller packets.
+> >>
+> >> I understand that is what you are trying to do, but the code above doe=
+s
+> >> not seems to match the description, as the fbnic_clean_bdq() and
+> >> fbnic_fill_bdq() are called for qt->sub0 and qt->sub1, so the old page=
+s
+> >> of qt->sub0 and qt->sub1 just cleaned are drained and refill each sub
+> >> with new pages, which does not seems to have any fragmenting?
+> >
+> > That is because it is all taken care of by the completion queue. Take
+> > a look in fbnic_pkt_prepare. We are taking the buffer from the header
+> > descriptor and taking a slice out of it there via fbnic_page_pool_get.
+> > Basically we store the fragment count locally in the rx_buf and then
+> > subtract what is leftover when the device is done with it.
+>
+> The above seems look a lot like the prepare/commit API in [1], the prepar=
+e
+> is done in fbnic_fill_bdq() and commit is done by fbnic_page_pool_get() i=
+n
+> fbnic_pkt_prepare() and fbnic_add_rx_frag().
+>
+> If page_pool is able to provide a central place for pagecnt_bias of all t=
+he
+> fragmemts of the same page, we may provide a similar prepare/commit API f=
+or
+> frag API, I am not sure how to handle it for now.
+>
+> From the below macro, this hw seems to be only able to handle 4K memory f=
+or
+> each entry/desc in qt->sub0 and qt->sub1, so there seems to be a lot of m=
+emory
+> that is unused for PAGE_SIZE > 4K as it is allocating memory based on pag=
+e
+> granularity for each rx_buf in qt->sub0 and qt->sub1.
+>
+> +#define FBNIC_RCD_AL_BUFF_OFF_MASK             DESC_GENMASK(43, 32)
 
+The advantage of being a purpose built driver is that we aren't
+running on any architectures where the PAGE_SIZE > 4K. If it came to
+that we could probably look at splitting the pages within the
+descriptors by simply having a single page span multiple descriptors.
 
-On 12.04.24 04:02, Wen Gu wrote:
-> Hi Sandy, just to confirm if I understand you correctly.
-> 
-> You are proposing that don't draw a conclusion about the classification now,
-> but supplementally mark which one become a optional operation in struct smcd_ops
-> during the introduction of new devices for SMC-D.
+> It is still possible to reserve enough pagecnt_bias for each fragment, so=
+ that
+> the caller can still do its own fragmenting on fragment granularity as we
+> seems to have enough pagecnt_bias for each page.
+>
+> If we provide a proper frag API to reserve enough pagecnt_bias for caller=
+ to
+> do its own fragmenting, then the memory waste may be avoided for this hw =
+in
+> system with PAGE_SIZE > 4K.
+>
+> 1. https://lore.kernel.org/lkml/20240407130850.19625-10-linyunsheng@huawe=
+i.com/
 
-Yes.
+That isn't a concern for us as we are only using the device on x86
+systems at this time.
+
+> >
+> >> The fragmenting can only happen when there is continuous small packet
+> >> coming from wire so that hw can report the same pg_id for different
+> >> packet with pg_offset before fbnic_clean_bdq() and fbnic_fill_bdq()
+> >> is called? I am not sure how to ensure that considering that we might
+> >> break out of while loop in fbnic_clean_rcq() because of 'packets < bud=
+get'
+> >> checking.
+> >
+> > We don't free the page until we have moved one past it, or the
+> > hardware has indicated it will take no more slices via a PAGE_FIN bit
+> > in the descriptor.
+>
+>
+> I look more closely at it, I am not able to figure it out how it is done
+> yet, as the PAGE_FIN bit mentioned above seems to be only used to calcula=
+te
+> the hdr_pg_end and truesize in fbnic_pkt_prepare() and fbnic_add_rx_frag(=
+).
+>
+> For the below flow in fbnic_clean_rcq(), fbnic_clean_bdq() will be called
+> to drain the page in rx_buf just cleaned when head0/head1 >=3D 0, so I am=
+ not
+> sure how it do the fragmenting yet, am I missing something obvious here?
+>
+>         while (likely(packets < budget)) {
+>                 switch (FIELD_GET(FBNIC_RCD_TYPE_MASK, rcd)) {
+>                 case FBNIC_RCD_TYPE_HDR_AL:
+>                         head0 =3D FIELD_GET(FBNIC_RCD_AL_BUFF_ID_MASK, rc=
+d);
+>                         fbnic_pkt_prepare(nv, rcd, pkt, qt);
+>
+>                         break;
+>                 case FBNIC_RCD_TYPE_PAY_AL:
+>                         head1 =3D FIELD_GET(FBNIC_RCD_AL_BUFF_ID_MASK, rc=
+d);
+>                         fbnic_add_rx_frag(nv, rcd, pkt, qt);
+>
+>                         break;
+>
+>                 case FBNIC_RCD_TYPE_META:
+>                         if (likely(!fbnic_rcd_metadata_err(rcd)))
+>                                 skb =3D fbnic_build_skb(nv, pkt);
+>
+>                         /* populate skb and invalidate XDP */
+>                         if (!IS_ERR_OR_NULL(skb)) {
+>                                 fbnic_populate_skb_fields(nv, rcd, skb, q=
+t);
+>
+>                                 packets++;
+>
+>                                 napi_gro_receive(&nv->napi, skb);
+>                         }
+>
+>                         pkt->buff.data_hard_start =3D NULL;
+>
+>                         break;
+>                 }
+>
+>         /* Unmap and free processed buffers */
+>         if (head0 >=3D 0)
+>                 fbnic_clean_bdq(nv, budget, &qt->sub0, head0);
+>         fbnic_fill_bdq(nv, &qt->sub0);
+>
+>         if (head1 >=3D 0)
+>                 fbnic_clean_bdq(nv, budget, &qt->sub1, head1);
+>         fbnic_fill_bdq(nv, &qt->sub1);
+>
+>         }
+
+The cleanup logic cleans everything up to but not including the
+head0/head1 offsets. So the pages are left on the ring until they are
+fully consumed.
+
+> >
+> >>> It is better for us to optimize for the small packet scenario than
+> >>> optimize for the case where 4K slices are getting taken. That way whe=
+n
+> >>> we are CPU constrained handling small packets we are the most
+> >>> optimized whereas for the larger frames we can spare a few cycles to
+> >>> account for the extra overhead. The result should be a higher overall
+> >>> packets per second.
+> >>
+> >> The problem is that small packet means low utilization of the bandwidt=
+h
+> >> as more bandwidth is used to send header instead of payload that is us=
+eful
+> >> for the user, so the question seems to be how often the small packet i=
+s
+> >> seen in the wire?
+> >
+> > Very often. Especially when you are running something like servers
+> > where the flow usually consists of an incoming request which is often
+> > only a few hundred bytes, followed by us sending a response which then
+> > leads to a flow of control frames for it.
+>
+> I think this is depending on the use case, if it is video streaming serve=
+r,
+> I guess most of the packet is mtu-sized?
+
+For the transmit side, yes. For the server side no. A typical TCP flow
+has two sides two it. One sending SYN/ACK/FIN requests and the initial
+get request and the other basically sending the response data.
 
