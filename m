@@ -1,86 +1,81 @@
-Return-Path: <netdev+bounces-87511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B41668A35C2
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 20:33:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D93978A35CA
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 20:34:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BC8E1F24C13
-	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 18:33:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E0BF284B83
+	for <lists+netdev@lfdr.de>; Fri, 12 Apr 2024 18:34:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39892405FF;
-	Fri, 12 Apr 2024 18:32:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E1514EC53;
+	Fri, 12 Apr 2024 18:34:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CN7XNTAx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WRvWR28W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA8E84DE1
-	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 18:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B519E446BD
+	for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 18:34:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712946761; cv=none; b=Uzk27MjhWLQ96BqvRAHRGKAPxbwNmR2EfI+2up2eKWLxegXztpTYyLUbDXOaoJDAPnblH0NlpCPUkoA3UPPdAS0RJrX3gUAJFbsQtmG9ok+mXDWYkx0y3Sa2W/l3FEj7IsAdIgV8OuDq81JsvYR75l7N/jGa0f0g8dPzb0o9W1Q=
+	t=1712946866; cv=none; b=bShWCiPJP4OZSWY2Z6NA4VC8Jxg1xVaKo/EkDRpgMVjzSDpXfCHampdnqCk2r0y3e3i00L7NtDF2BSsZ3RoV5TagXx2f1I2aM0PJyXww9acfN+AHy7EbT8engRgNrPrYb54w+oYfiIt5MhUw5dqQ6rSPpR5VVi+3wRug3r8yZ1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712946761; c=relaxed/simple;
-	bh=OAEB8kU8i8uzSzBgzjlGsQ2DvqfH+knu9UH5U13lqBo=;
+	s=arc-20240116; t=1712946866; c=relaxed/simple;
+	bh=Be6sFMS56Fp0HKrbRIQDkHulRfJS1jDJD57C8H3knM4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lcitwZG6NsQqDqtIVryaWfOW+EYUYRsJNmKD9bLTda8p7zjgZZIebvJvEsUnQmBNaOHlbnVZqoeyjC8PILVUnv3cD8FPEGbqYJFKTll7jEgYeCe56DJORc7A2ThEUEmfH44yGq2rXa5RHR81JtQagDYocXIEVwbWi6uUsCZiEs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CN7XNTAx; arc=none smtp.client-ip=209.85.208.181
+	 Content-Type:Content-Disposition:In-Reply-To; b=YTs9GTrPQBsFsWK3eINibbQwV1gdOtLLGHm8Bf+ZGen/XnrzrIQCg6v9smA9LKXnPeqbUY4IGBGSdJohmMwlkc1qCF0L+wYDw1ro9Toix47PD8OkWOe2OA5jO4P+vYr8OXQRB3+OD+hZWe1bBoNrsxJWJtg1hi+5JiasKm9g2w4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WRvWR28W; arc=none smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2d872102372so15726041fa.0
-        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 11:32:38 -0700 (PDT)
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-518a56cdbceso42981e87.0
+        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 11:34:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1712946757; x=1713551557; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1712946863; x=1713551663; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YFryK/c9JodQkv5OZRI6xZrpjUmTkrGFj5/ezt2gBms=;
-        b=CN7XNTAxKNymt5wG30/IhVzI4IxmBqjytg98NF1v/uLXcW1lpkwOPLGvFfxvPJHAVK
-         SpbzY3csDGPPwdmxp4GxeYyOzU1H1cGRgQn3eP7uTrtYBjAwbpccEcdoaXB43aZxYXWC
-         ZL7OzhtsMvSVmxB8/UduG/GXQ2IaPxYoZWdTU2huHveCGTDD0OZ2m0Fb2CEgH4+09nUT
-         1EFprqqa4TQOlOU8iwrZyaohJ9QuRvoWcIWEAc0JqklpWq2js5hkVNGtoyQb41jb/PgW
-         ebZcmrB7+KgzHwFXkZNT7BLYe+BRqeRj6kwMTsYKtBPfTjCCuNlSdcBQQjUuBO/uSJXo
-         MDjg==
+        bh=pLuBKzTjKQD3m3pQsUI6lL8l+5eJekv5nVNHDDLAsT8=;
+        b=WRvWR28WKCZBTUK4fX+G2Tao0CbCLY0htak5hrmV/epFnaAm6NStcn7kr0O+fa7fCP
+         TOvjAbE3I45ZhtpK6OQP+YDGYqTcUtp4ugF/tt8SG7u8gRDRRK1IkpcV3a1GaZxakYCm
+         AKnbhmcgL2UNSs+VFnQC0YANZL0m849tYpQqzFe14gkXe8zOJQlqIdQlajA3K0lUslcA
+         cM/63cYI2QxVPtagLAPFmp6duKMBWrfm1x+fBX8LqZ8vZKENFWjU7WUeMRcJu+MQyJMk
+         sRnk6MOsO19di5lmPjXVU/7qVHd9rEoFTIQlyz2tBN8L3F0iE18hKo4y8kvapFF/TSGZ
+         xU2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712946757; x=1713551557;
+        d=1e100.net; s=20230601; t=1712946863; x=1713551663;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YFryK/c9JodQkv5OZRI6xZrpjUmTkrGFj5/ezt2gBms=;
-        b=dTUNIIiBaGEvUVWoqX4MwR/hHa9QrXswzuILd1v0hyk8v56hc2Hop3GeysZFF8AYB/
-         N7VpZ8hmwmkK1N6F2BxI9j0HEoLtK6PNeEw8+3RMQLOcvR8MCYaZT8tbrq5/MbgnvL6L
-         jjU7jcItPhkssRI5Dyq63HHqb+g1tB4J+1/lm7ZLFB+l4TsnWjA2HyujVgbhYGTFz80+
-         BESRNvF9ag+se66eJT23mvdounyVy3xEjxk1b4Xd/jPMamvOH7PLlh78zeHdBTPq8PqQ
-         rVzArCN0xSmzJkceJYMNEsodd7mPCvFLHs6GT4qGk8rbZ355rhHX6oXYVAhMUyqjA58w
-         sKPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVP/tA9RPxqgOHF2CzPyhGzIa+k9vV1L4sJ0I+1I9uCeSchvQLGkSiLR3LCgTujoCIiVgna7bOA3I9nJ/wcUg0YwqX5hCUd
-X-Gm-Message-State: AOJu0YzlS3MkF1IwSL/NxJQs8mqaYHs1gJfjdLxvgYs51vEU+lyerQrd
-	eBaSL70k41nblLUODO0pLLE0ZtmzlwBvdcZd+HKd0HNdynQiYmyQ
-X-Google-Smtp-Source: AGHT+IFPs2kx2Do44TBbX0WXIp/pTovSkwZ3sKJUOjwasSbuJ8IQrQ+wB791F8bbkYI3qYKkiiz49w==
-X-Received: by 2002:a2e:9e58:0:b0:2d8:49e8:3132 with SMTP id g24-20020a2e9e58000000b002d849e83132mr1053703ljk.0.1712946757051;
-        Fri, 12 Apr 2024 11:32:37 -0700 (PDT)
+        bh=pLuBKzTjKQD3m3pQsUI6lL8l+5eJekv5nVNHDDLAsT8=;
+        b=mRtFL5LbiXEnRao7LAjDqZELXp2qkcdhYbt8JbMKpno7o+R4h1nd+WGcPCK0PnvJwB
+         DZ89T0QxXYRdfMIsfqzyOW2TobWFyYVlL29M82U4udVlKMb38rMB+krg1Mt6s1Arwgk2
+         u+/+fGM2SgAFiwdvK+yvpAhdFjIVio93JAqcbT/rueABsQ61o1ZOslsyDpFrTxOToXiM
+         t1Hlcn79NEvlzG2GBdMowCM5GM0N1YOFL63lnOuQX2w7sNLonQJURP9tf20m+sLKCPBs
+         zaJhy/slKdMrlfrjF0ED2EIg7NDNjRy8k9ygx/QkF0JSRyyBjvr3ZCPJ/hTsqhACpoC7
+         vHvg==
+X-Forwarded-Encrypted: i=1; AJvYcCWRHp5Xa3k9aRLTMVr4qj0Ac5cFtofzhV40SuMEqQDuQ0PP+onBinyAhjqqMxJ+HV4MGrbsyMJ3sn7fpiQsW8qRGNBzAGfU
+X-Gm-Message-State: AOJu0Yx8jP58UhWxRAMeu6rzJtrE0cPJfKjnCDOY2fXNMpNCoRgk8g7g
+	qkMIuYAMEyVSlr0P7q27IJqiGuRyJOk8h9KAPkM5IbRslztR095u
+X-Google-Smtp-Source: AGHT+IFw1PVzMNH2XCv52J/EAKT00kTJuPu871O+1GeawLUqt9vw5GMdO6sZ3i8CvOexeEOBoY8FTg==
+X-Received: by 2002:a05:6512:3ca0:b0:516:c764:b3e7 with SMTP id h32-20020a0565123ca000b00516c764b3e7mr3154052lfv.9.1712946862660;
+        Fri, 12 Apr 2024 11:34:22 -0700 (PDT)
 Received: from mobilestation ([95.79.241.172])
-        by smtp.gmail.com with ESMTPSA id n15-20020a2e86cf000000b002d2e81c0f18sm557340ljj.45.2024.04.12.11.32.36
+        by smtp.gmail.com with ESMTPSA id m30-20020a19435e000000b005139b9f1162sm575406lfj.281.2024.04.12.11.34.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Apr 2024 11:32:36 -0700 (PDT)
-Date: Fri, 12 Apr 2024 21:32:34 +0300
+        Fri, 12 Apr 2024 11:34:22 -0700 (PDT)
+Date: Fri, 12 Apr 2024 21:34:20 +0300
 From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>, Andrew Lunn <andrew@lunn.ch>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
 	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
 	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
 	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
-Subject: Re: [PATCH net-next v11 1/6] net: stmmac: Move all PHYLINK MAC
- capabilities initializations to MAC-specific setup methods
-Message-ID: <zrrrivvodf7ovikm4lb7gcmkkff3umujjcrjfdlk5aglfnc6nf@vi7k5b4qjsv4>
+Subject: Re: [PATCH net-next v11 0/6] stmmac: Add Loongson platform support
+Message-ID: <dkwz2xigkqnly6twu6akseerb3huxet56jultptjlaoapwgdt2@2va3q7isbhne>
 References: <cover.1712917541.git.siyanteng@loongson.cn>
- <df31e8bcf74b3b4ddb7ddf5a1c371390f16a2ad5.1712917541.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,302 +84,234 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <df31e8bcf74b3b4ddb7ddf5a1c371390f16a2ad5.1712917541.git.siyanteng@loongson.cn>
+In-Reply-To: <cover.1712917541.git.siyanteng@loongson.cn>
 
 Hi Yanteng
 
-On Fri, Apr 12, 2024 at 07:28:06PM +0800, Yanteng Si wrote:
-> From: Serge Semin <fancer.lancer@gmail.com>
+On Fri, Apr 12, 2024 at 07:28:05PM +0800, Yanteng Si wrote:
+> v11:
+> * Break loongson_phylink_get_caps(), fix bad logic.
+> * Remove a unnecessary ";".
+> * Remove some unnecessary "{}".
+> * add a blank.
+> * Move the code of fix _force_1000 to patch 6/6.
 > 
-> Seeing the Tx-queues-based constraint is DW QoS Eth-specific there is
-> such reason. It might be better to move the selective Half-duplex
-> mode disabling to the MAC-specific callback.
+> The main changes occur in these two functions:
+> loongson_dwmac_probe();
+> loongson_dwmac_setup();
 > 
-> But there are a better option to implement the MAC capabilities
-> detection procedure. Let's see what MAC-capabilities can be currently
-> specified based on the DW MAC IP-core versions:
+> v10:
+> As Andrew's comment:
+> * Add a #define for the 0x37.
+> * Add a #define for Port Select.
 > 
-> DW MAC100: MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
-> 	   MAC_10 | MAC_100
+> others:
+> * Pick Serge's patch, This patch resulted from the process
+>   of reviewing our patch set.
+> * Based on Serge's patch, modify our loongson_phylink_get_caps().
+> * Drop patch 3/6, we need mac_interface.
+> * Adjusted the code layout of gnet patch.
+> * Corrected several errata in commit message.
+> * Move DISABLE_FORCE flag to loongson_gnet_data().
 > 
-> DW GMAC: MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
->          MAC_10 | MAC_100 | MAC_1000
+> v9:
+> We have not provided a detailed list of equipment for a long time,
+> and I apologize for this. During this period, I have collected some
+> information and now present it to you, hoping to alleviate the pressure
+> of review.
 > 
-> DW QoS Eth: MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
->             MAC_10 | MAC_100 | MAC_1000 | MAC_2500FD
-> but if the amount of the active Tx queues is > 1, then:
-> 	   MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
->            MAC_10FD | MAC_100FD | MAC_1000FD | MAC_2500FD
+> 1. IP core
+> We now have two types of IP cores, one is 0x37, similar to dwmac1000;
+> The other is 0x10.  Compared to 0x37, we split several DMA registers
+> from one to two, and it is not worth adding a new entry for this.
+> According to Serge's comment, we made these devices work by overwriting
+> priv->synopsys_id = 0x37 and mac->dma = <LS_dma_ops>.
 > 
-> DW XGMAC: MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
->           MAC_1000FD | MAC_2500FD | MAC_5000FD |
->           MAC_10000FD | MAC_25000FD |
->           MAC_40000FD | MAC_50000FD |
->           MAC_100000FD
+> 1.1.  Some more detailed information
+> The number of DMA channels for 0x37 is 1; The number of DMA channels
+> for 0x10 is 8.  Except for channel 0, otherchannels do not support
+> sending hardware checksums. Supported AV features are Qav, Qat, and Qas,
+> and the rest are consistent with 3.73.
 > 
-> As you can see there are only two common capabilities:
-> MAC_ASYM_PAUSE | MAC_SYM_PAUSE. Seeing the flow-control is implemented
-> as a callback for each MAC IP-core (see dwmac100_flow_ctrl(),
-> dwmac1000_flow_ctrl(), sun8i_dwmac_flow_ctrl(), etc) we can freely
-> move all the PHYLINK MAC capabilities initializations to the
-> MAC-specific setup methods.
+> 2. DEVICE
+> We have two types of devices,
+> one is GMAC, which only has a MAC chip inside and needs an external PHY
+> chip;
+> the other is GNET, which integrates both MAC and PHY chips inside.
 > 
-> After that the only IP-core which requires the capabilities update will
-> be DW QoS Eth. So the Tx-queue-based capabilities update can be moved
-> there and the rest of the xgmac_phylink_get_caps() callback can be
-> dropped.
+> 2.1.  Some more detailed information
+> GMAC device: LS7A1000, LS2K1000, these devices do not support any pause
+> mode.
+> gnet device: LS7A2000, LS2K2000, the chip connection between the mac and
+>              phy of these devices is not normal and requires two rounds of
+>              negotiation; LS7A2000 does not support half-duplex and
+> multi-channel;
+>              to enable multi-channel on LS2K2000, you need to turn off
+> hardware checksum.
+> **Note**: Only the LS2K2000's IP core is 0x10, while the IP cores of other
+> devices are 0x37.
 > 
-> We can go further. Instead of calling the
-> stmmac_set_half_duplex()/stmmac_set_mac_capabilties() methods on the
-> device init and queues reinit stages, we can move their bodies into
-> the phylink:mac_get_caps() callback.
+> 3. TABLE
 > 
-> Others see:
-> <https://lore.kernel.org/netdev/cover.1706601050.git.siyanteng@loong
-> son.cn/T/#m7d724d33faee34fed696e4458d9f6b09b0572e77>
+> device    type    pci_id    ip_core
+> ls7a1000  gmac    7a03      0x35/0x37
+> ls2k1000  gmac    7a03      0x35/0x37
+> ls7a2000  gnet    7a13      0x37
+> ls2k2000  gnet    7a13      0x10
+> -----------------------------------------------
+> Changes:
+> 
+> * passed the CI
+>   <https://github.com/linux-netdev/nipa/blob/main/tests/patch/checkpatch
+>   /checkpatch.sh>
+> * reverse xmas tree order.
+> * Silence build warning.
+> * Re-split the patch.
+> * Add more detailed commit message.
+> * Add more code comment.
+> * Reduce modification of generic code.
+> * using the GNET-specific prefix.
+> * define a new macro for the GNET MAC.
+> * Use an easier way to overwrite mac.
+> * Removed some useless printk.
+> 
 
-Just submitted the series with this patch being properly split up and
-described:
-https://lore.kernel.org/netdev/20240412180340.7965-1-fancer.lancer@gmail.com/
-
-You can drop this patch, copy my patchset into your repo and rebase
-your series onto it. Thus for the time being, until my series is
-reviewed and merged in, you'll be able to continue with your patchset
-developments/reviews, but submitting only your portion of the patches.
-
-Alternatively my series could be just merged into yours as a set of
-the preparation patches, for instance, after it's fully reviewed.
-
-Not sure which solution is better. Andrew? Russell? David? Eric?
-Jakub? Paolo?
+Thanks you very much for taking my notes into account and resubmitting
+the patchset. I'll get back to reviewing your series within 2-5 days.
 
 -Serge(y)
 
 > 
-> Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
-> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
->  .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  2 +
->  .../ethernet/stmicro/stmmac/dwmac1000_core.c  |  2 +
->  .../ethernet/stmicro/stmmac/dwmac100_core.c   |  2 +
->  .../net/ethernet/stmicro/stmmac/dwmac4_core.c |  8 +++-
->  .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 15 +++----
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 43 ++++++++-----------
->  7 files changed, 36 insertions(+), 37 deletions(-)
+> v8:
+> * The biggest change is according to Serge's comment in the previous
+>   edition:
+>    Seeing the patch in the current state would overcomplicate the generic
+>    code and the only functions you need to update are
+>    dwmac_dma_interrupt()
+>    dwmac1000_dma_init_channel()
+>    you can have these methods re-defined with all the Loongson GNET
+>    specifics in the low-level platform driver (dwmac-loongson.c). After
+>    that you can just override the mac_device_info.dma pointer with a
+>    fixed stmmac_dma_ops descriptor. Here is what should be done for that:
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-> index f55cf09f0783..9cd62b2110a1 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/common.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-> @@ -553,6 +553,7 @@ extern const struct stmmac_hwtimestamp stmmac_ptp;
->  extern const struct stmmac_mode_ops dwmac4_ring_mode_ops;
->  
->  struct mac_link {
-> +	u32 caps;
->  	u32 speed_mask;
->  	u32 speed10;
->  	u32 speed100;
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> index b21d99faa2d0..e1b761dcfa1d 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> @@ -1096,6 +1096,8 @@ static struct mac_device_info *sun8i_dwmac_setup(void *ppriv)
->  
->  	priv->dev->priv_flags |= IFF_UNICAST_FLT;
->  
-> +	mac->link.caps = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
-> +			 MAC_10 | MAC_100 | MAC_1000;
->  	/* The loopback bit seems to be re-set when link change
->  	 * Simply mask it each time
->  	 * Speed 10/100/1000 are set in BIT(2)/BIT(3)
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
-> index 3927609abc44..8555299443f4 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
-> @@ -539,6 +539,8 @@ int dwmac1000_setup(struct stmmac_priv *priv)
->  	if (mac->multicast_filter_bins)
->  		mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
->  
-> +	mac->link.caps = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
-> +			 MAC_10 | MAC_100 | MAC_1000;
->  	mac->link.duplex = GMAC_CONTROL_DM;
->  	mac->link.speed10 = GMAC_CONTROL_PS;
->  	mac->link.speed100 = GMAC_CONTROL_PS | GMAC_CONTROL_FES;
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac100_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac100_core.c
-> index a6e8d7bd9588..7667d103cd0e 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac100_core.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac100_core.c
-> @@ -175,6 +175,8 @@ int dwmac100_setup(struct stmmac_priv *priv)
->  	dev_info(priv->device, "\tDWMAC100\n");
->  
->  	mac->pcsr = priv->ioaddr;
-> +	mac->link.caps = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
-> +			 MAC_10 | MAC_100;
->  	mac->link.duplex = MAC_CONTROL_F;
->  	mac->link.speed10 = 0;
->  	mac->link.speed100 = 0;
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-> index cef25efbdff9..70a4ac16d3c8 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-> @@ -70,7 +70,11 @@ static void dwmac4_core_init(struct mac_device_info *hw,
->  
->  static void dwmac4_phylink_get_caps(struct stmmac_priv *priv)
->  {
-> -	priv->phylink_config.mac_capabilities |= MAC_2500FD;
-> +	/* Half-Duplex can only work with single tx queue */
-> +	if (priv->plat->tx_queues_to_use > 1)
-> +		priv->hw->link.caps &= ~(MAC_10HD | MAC_100HD | MAC_1000HD);
-> +	else
-> +		priv->hw->link.caps |= (MAC_10HD | MAC_100HD | MAC_1000HD);
->  }
->  
->  static void dwmac4_rx_queue_enable(struct mac_device_info *hw,
-> @@ -1378,6 +1382,8 @@ int dwmac4_setup(struct stmmac_priv *priv)
->  	if (mac->multicast_filter_bins)
->  		mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
->  
-> +	mac->link.caps = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
-> +			 MAC_10 | MAC_100 | MAC_1000 | MAC_2500FD;
->  	mac->link.duplex = GMAC_CONFIG_DM;
->  	mac->link.speed10 = GMAC_CONFIG_PS;
->  	mac->link.speed100 = GMAC_CONFIG_FES | GMAC_CONFIG_PS;
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> index e841e312077e..759b9b7a2f3f 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> @@ -47,14 +47,6 @@ static void dwxgmac2_core_init(struct mac_device_info *hw,
->  	writel(XGMAC_INT_DEFAULT_EN, ioaddr + XGMAC_INT_EN);
->  }
->  
-> -static void xgmac_phylink_get_caps(struct stmmac_priv *priv)
-> -{
-> -	priv->phylink_config.mac_capabilities |= MAC_2500FD | MAC_5000FD |
-> -						 MAC_10000FD | MAC_25000FD |
-> -						 MAC_40000FD | MAC_50000FD |
-> -						 MAC_100000FD;
-> -}
-> -
->  static void dwxgmac2_set_mac(void __iomem *ioaddr, bool enable)
->  {
->  	u32 tx = readl(ioaddr + XGMAC_TX_CONFIG);
-> @@ -1540,7 +1532,6 @@ static void dwxgmac3_fpe_configure(void __iomem *ioaddr, struct stmmac_fpe_cfg *
->  
->  const struct stmmac_ops dwxgmac210_ops = {
->  	.core_init = dwxgmac2_core_init,
-> -	.phylink_get_caps = xgmac_phylink_get_caps,
->  	.set_mac = dwxgmac2_set_mac,
->  	.rx_ipc = dwxgmac2_rx_ipc,
->  	.rx_queue_enable = dwxgmac2_rx_queue_enable,
-> @@ -1601,7 +1592,6 @@ static void dwxlgmac2_rx_queue_enable(struct mac_device_info *hw, u8 mode,
->  
->  const struct stmmac_ops dwxlgmac2_ops = {
->  	.core_init = dwxgmac2_core_init,
-> -	.phylink_get_caps = xgmac_phylink_get_caps,
->  	.set_mac = dwxgmac2_set_mac,
->  	.rx_ipc = dwxgmac2_rx_ipc,
->  	.rx_queue_enable = dwxlgmac2_rx_queue_enable,
-> @@ -1698,6 +1688,11 @@ int dwxlgmac2_setup(struct stmmac_priv *priv)
->  	if (mac->multicast_filter_bins)
->  		mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
->  
-> +	mac->link.caps = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
-> +			 MAC_1000FD | MAC_2500FD | MAC_5000FD |
-> +			 MAC_10000FD | MAC_25000FD |
-> +			 MAC_40000FD | MAC_50000FD |
-> +			 MAC_100000FD;
->  	mac->link.duplex = 0;
->  	mac->link.speed1000 = XLGMAC_CONFIG_SS_1000;
->  	mac->link.speed2500 = XLGMAC_CONFIG_SS_2500;
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index fe3498e86de9..af16efeedf4a 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -936,6 +936,22 @@ static void stmmac_mac_flow_ctrl(struct stmmac_priv *priv, u32 duplex)
->  			priv->pause, tx_cnt);
->  }
->  
-> +static unsigned long stmmac_mac_get_caps(struct phylink_config *config,
-> +					 phy_interface_t interface)
-> +{
-> +	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
-> +
-> +	/* Get the MAC-specific capabilities */
-> +	stmmac_mac_phylink_get_caps(priv);
-> +
-> +	config->mac_capabilities = priv->hw->link.caps;
-> +
-> +	if (priv->plat->max_speed)
-> +		phylink_limit_mac_speed(config, priv->plat->max_speed);
-> +
-> +	return config->mac_capabilities;
-> +}
-> +
->  static struct phylink_pcs *stmmac_mac_select_pcs(struct phylink_config *config,
->  						 phy_interface_t interface)
->  {
-> @@ -1102,6 +1118,7 @@ static void stmmac_mac_link_up(struct phylink_config *config,
->  }
->  
->  static const struct phylink_mac_ops stmmac_phylink_mac_ops = {
-> +	.mac_get_caps = stmmac_mac_get_caps,
->  	.mac_select_pcs = stmmac_mac_select_pcs,
->  	.mac_config = stmmac_mac_config,
->  	.mac_link_down = stmmac_mac_link_down,
-> @@ -1195,24 +1212,12 @@ static int stmmac_init_phy(struct net_device *dev)
->  	return ret;
->  }
->  
-> -static void stmmac_set_half_duplex(struct stmmac_priv *priv)
-> -{
-> -	/* Half-Duplex can only work with single tx queue */
-> -	if (priv->plat->tx_queues_to_use > 1)
-> -		priv->phylink_config.mac_capabilities &=
-> -			~(MAC_10HD | MAC_100HD | MAC_1000HD);
-> -	else
-> -		priv->phylink_config.mac_capabilities |=
-> -			(MAC_10HD | MAC_100HD | MAC_1000HD);
-> -}
-> -
->  static int stmmac_phy_setup(struct stmmac_priv *priv)
->  {
->  	struct stmmac_mdio_bus_data *mdio_bus_data;
->  	int mode = priv->plat->phy_interface;
->  	struct fwnode_handle *fwnode;
->  	struct phylink *phylink;
-> -	int max_speed;
->  
->  	priv->phylink_config.dev = &priv->dev->dev;
->  	priv->phylink_config.type = PHYLINK_NETDEV;
-> @@ -1236,19 +1241,6 @@ static int stmmac_phy_setup(struct stmmac_priv *priv)
->  		xpcs_get_interfaces(priv->hw->xpcs,
->  				    priv->phylink_config.supported_interfaces);
->  
-> -	priv->phylink_config.mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE |
-> -						MAC_10FD | MAC_100FD |
-> -						MAC_1000FD;
-> -
-> -	stmmac_set_half_duplex(priv);
-> -
-> -	/* Get the MAC specific capabilities */
-> -	stmmac_mac_phylink_get_caps(priv);
-> -
-> -	max_speed = priv->plat->max_speed;
-> -	if (max_speed)
-> -		phylink_limit_mac_speed(&priv->phylink_config, max_speed);
-> -
->  	fwnode = priv->plat->port_node;
->  	if (!fwnode)
->  		fwnode = dev_fwnode(priv->device);
-> @@ -7357,7 +7349,6 @@ int stmmac_reinit_queues(struct net_device *dev, u32 rx_cnt, u32 tx_cnt)
->  			priv->rss.table[i] = ethtool_rxfh_indir_default(i,
->  									rx_cnt);
->  
-> -	stmmac_set_half_duplex(priv);
->  	stmmac_napi_add(dev);
->  
->  	if (netif_running(dev))
+>    1. Keep the Patch 4/9 with my comments fixed. First it will be partly
+>    useful for your GNET device. Second in general it's a correct
+>    implementation of the normal DW GMAC v3.x multi-channels feature and
+>    will be useful for the DW GMACs with that feature enabled.
+> 
+>    2. Create the Loongson GNET-specific
+>    stmmac_dma_ops.dma_interrupt()
+>    stmmac_dma_ops.init_chan()
+>    methods in the dwmac-loongson.c driver. Don't forget to move all the
+>    Loongson-specific macros from dwmac_dma.h to dwmac-loongson.c.
+> 
+>    3. Create a Loongson GNET-specific platform setup method with the next
+>    semantics:
+>       + allocate stmmac_dma_ops instance and initialize it with
+>         dwmac1000_dma_ops.
+>       + override the stmmac_dma_ops.{dma_interrupt, init_chan} with
+>         the pointers to the methods defined in 2.
+>       + allocate mac_device_info instance and initialize the
+>         mac_device_info.dma field with a pointer to the new
+>         stmmac_dma_ops instance.
+>       + call dwmac1000_setup() or initialize mac_device_info in a way
+>         it's done in dwmac1000_setup() (the later might be better so you
+>         wouldn't need to export the dwmac1000_setup() function).
+>       + override stmmac_priv.synopsys_id with a correct value.
+> 
+>    4. Initialize plat_stmmacenet_data.setup() with the pointer to the
+>    method created in 3.
+> 
+> * Others:
+>   Re-split the patch.
+>   Passed checkpatch.pl test.
+> 
+> v7:
+> * Refer to andrew's suggestion:
+>   - Add DMA_INTR_ENA_NIE_RX and DMA_INTR_ENA_NIE_TX #define's, etc.
+> 
+> * Others:
+>   - Using --subject-prefix="PATCH net-next vN" to indicate that the
+>     patches are for the networking tree.
+>   - Rebase to the latest networking tree:
+>     <git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git>
+> 
+> 
+> v6:
+> 
+> * Refer to Serge's suggestion:
+>   - Add new platform feature flag:
+>     include/linux/stmmac.h:
+>     +#define STMMAC_FLAG_HAS_LGMAC			BIT(13)
+> 
+>   - Add the IRQs macros specific to the Loongson Multi-channels GMAC:
+>      drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h:
+>      +#define DMA_INTR_ENA_NIE_LOONGSON 0x00060000      /* ...*/
+>      #define DMA_INTR_ENA_NIE 0x00010000	/* Normal Summary */
+>      ...
+> 
+>   - Drop all of redundant changes that don't require the
+>     prototypes being converted to accepting the stmmac_priv
+>     pointer.
+> 
+> * Refer to andrew's suggestion:
+>   - Drop white space changes.
+>   - break patch up into lots of smaller parts.
+>      Some small patches have been put into another series as a preparation
+>      see <https://lore.kernel.org/loongarch/cover.1702289232.git.siyanteng@loongson.cn/T/#t>
+>      
+>      *note* : This series of patches relies on the three small patches above.
+> * others
+>   - Drop irq_flags changes.
+>   - Changed patch order.
+> 
+> 
+> v4 -> v5:
+> 
+> * Remove an ugly and useless patch (fix channel number).
+> * Remove the non-standard dma64 driver code, and also remove
+>   the HWIF entries, since the associated custom callbacks no
+>   longer exist.
+> * Refer to Serge's suggestion: Update the dwmac1000_dma.c to
+>   support the multi-DMA-channels controller setup.
+> 
+> See:
+> v4: <https://lore.kernel.org/loongarch/cover.1692696115.git.chenfeiyang@loongson.cn/>
+> v3: <https://lore.kernel.org/loongarch/cover.1691047285.git.chenfeiyang@loongson.cn/>
+> v2: <https://lore.kernel.org/loongarch/cover.1690439335.git.chenfeiyang@loongson.cn/>
+> v1: <https://lore.kernel.org/loongarch/cover.1689215889.git.chenfeiyang@loongson.cn/>
+> 
+> Serge Semin (1):
+>   net: stmmac: Move all PHYLINK MAC capabilities initializations to
+>     MAC-specific setup methods
+> 
+> Yanteng Si (5):
+>   net: stmmac: Add multi-channel support
+>   net: stmmac: dwmac-loongson: Use PCI_DEVICE_DATA() macro for device
+>     identification
+>   net: stmmac: dwmac-loongson: Introduce GMAC setup
+>   net: stmmac: dwmac-loongson: Add full PCI support
+>   net: stmmac: dwmac-loongson: Add Loongson GNET support
+> 
+>  drivers/net/ethernet/stmicro/stmmac/common.h  |   3 +
+>  .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 544 ++++++++++++++++--
+>  .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |   6 +-
+>  .../ethernet/stmicro/stmmac/dwmac1000_core.c  |   2 +
+>  .../ethernet/stmicro/stmmac/dwmac1000_dma.c   |  35 +-
+>  .../ethernet/stmicro/stmmac/dwmac100_core.c   |   2 +
+>  .../ethernet/stmicro/stmmac/dwmac100_dma.c    |   2 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac4_core.c |   8 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |   2 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac_dma.h   |  20 +-
+>  .../net/ethernet/stmicro/stmmac/dwmac_lib.c   |  32 +-
+>  .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |  15 +-
+>  .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |   2 +-
+>  drivers/net/ethernet/stmicro/stmmac/hwif.h    |   5 +-
+>  .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |   6 +
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c |  54 +-
+>  include/linux/stmmac.h                        |   2 +
+>  17 files changed, 599 insertions(+), 141 deletions(-)
+> 
 > -- 
 > 2.31.4
 > 
