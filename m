@@ -1,90 +1,94 @@
-Return-Path: <netdev+bounces-87631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 639C88A3E20
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 20:46:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8708B8A3E24
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 20:54:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9B721F2136A
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 18:46:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3C4F281F7E
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 18:54:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3505336A;
-	Sat, 13 Apr 2024 18:46:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51CA7537F8;
+	Sat, 13 Apr 2024 18:54:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GPGgfFZ0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FdhnGOq7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557F741C93;
-	Sat, 13 Apr 2024 18:46:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A67FA3FE55;
+	Sat, 13 Apr 2024 18:54:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713033963; cv=none; b=j2/v1bu9Almce8utWjqh5Y8guwwpwrjsHTw5jkb54W4sYcwFp79U5t6oCq3gM6J2BnS2vg402RlwSH9dYWxlHewEZ3xxaidIuZv28lGWuvVBRCQvioR9Uwqry6Ng9RNy/YyvCCM3xB4EdHDmn6XAbjtYrcW0IhIjgVE43cYN3KU=
+	t=1713034484; cv=none; b=dRDV1CJr1gSh4ayr79ZvZ9DW4dsauSfNDEabKBu8Fiu4ItveSrGGMTPj1f3XApFV2LbxGinL5H2fTCTVoKaZyYvraZgcJQV525tCu88QXY0TZJfGX/4mHXzBXeHocOQ9YqsqW8Dj0/JSkukOW/CQpVDlqGFHM6U6mn8Gqha2AGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713033963; c=relaxed/simple;
-	bh=hp+cZbOGUc/QMU9wD+lRPwoJU4H1B4EOsTLsjCzt2A4=;
+	s=arc-20240116; t=1713034484; c=relaxed/simple;
+	bh=oarggZnPDxO4zbBN7WQd6RHzcVQo6Bm6TwGHk1kdNr8=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=eysq3EdIt5XkPpKiqJJrpnZ7w29EN49yA2Nx2kL9wGvFtFtUgUuwJNSURcy8lLmQ6Hm8WntV6uM870hkFh1A2LSf5H1FuKRkBcowKeZuNFiykSJ7PwRBwyAqKHWiV4eiKExa5Z87sZShAUIes586yxBdevYVRYHeZQnVoOIBsHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GPGgfFZ0; arc=none smtp.client-ip=209.85.160.172
+	 Mime-Version:Content-Type; b=XLGyxy7aZTi7nqCYnvyQGa6V98LKWFbLp8juvv9hePp5fyrl1dH2VfOTQD9x/T0u0c93KgzDQlqraWdFyrYnvV7IcAGmISdiYbZvpCTj8g1qJXJbaMm853l/ggnt0kYgwj7uiEaxNPPve/oUgN4fsbokW0Om4/88hdA1n1a56O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FdhnGOq7; arc=none smtp.client-ip=209.85.222.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4365c1451d4so8392401cf.2;
-        Sat, 13 Apr 2024 11:46:02 -0700 (PDT)
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-78d743f3654so153378885a.0;
+        Sat, 13 Apr 2024 11:54:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713033961; x=1713638761; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1713034481; x=1713639281; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pW67T+qUQM50F+0toP2yI/LFVI197DGuTCoBQXe7TOE=;
-        b=GPGgfFZ0ElOYW+58plzOlS6MEArPoBcrVjToWWV3p7r2Xgc3OIEnUcphI7YGFAaWqm
-         MUvv8QIajPaMVia1wOg3Z3SJFjuLy2HlYGzzX40LMBLlmN+BXPG/FKoTDpi0g573Uzf3
-         d5LWsvi+nq7Aehy1cFqmGZBoSz1YyRNP9Y3p6d2U1OhoVzImucDFYGBwQ7W90hnwoqUY
-         k9j4O0vIifzd11k/GI0XjX2jI8cGbjPjdPY+Ul79tOklBRjAYdjkk2twAPPS+bYbDQeN
-         WjVoAYOa82cYyrfacwSRWxEY9L2OXkn+335BtPAeM/YDxSWY83SbjmhqvFpIW5+L8mww
-         45lQ==
+        bh=wzOGXim2vNdwdzX8IpzEzvZHcB/u0K5tNCKdVPMNuaQ=;
+        b=FdhnGOq71wAwPUts5XPPhEfiAf8O0bX9czV/KzzpIzNDX8ZXhQZYmg6DXZmmScIJjL
+         B6kYo4AjMw93PGnIIRXvZlGlAjR/rS/K1dDLmH0W/B6jjAy5xU6ZWsZRVQkO3iIQ4zum
+         +hOLVqZOYZGM41BfrtU3SemBaFyM7OWXeQAWqLUXonBbPUtXdS638inW7CXphrIJH2pu
+         8nJcy+f5zvr7wfHqjSlEQUS0i8332OONgWKmHUAGAjHwr2fHvzl2cLBZwKIEztta4YIS
+         5Gz5YOh8Kjbs4kkqnAy3T4PdMEqPs1z52LzSkngqSS9jAo10rBhQQ0cjDglJ7qlUZhj7
+         G88g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713033961; x=1713638761;
+        d=1e100.net; s=20230601; t=1713034481; x=1713639281;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=pW67T+qUQM50F+0toP2yI/LFVI197DGuTCoBQXe7TOE=;
-        b=m/Jv/sq4tqrFjyRbc8mA/q1qzBcWmUSXF2PoPRzrXZ/Dmpyj9hl02vhjWr+7/7pHAV
-         tKM+qoNiIPWox9f7uu4+ocpvtcWjkymk43LI4lQa7sKFPXr9a+TeEbDoir01aDoTBs0n
-         IYAkUkxjjCH0Y84rMdb1xMpiKVaozEQcuhHE6KecxFQQHwfcmS+gbernp1V2z+C0J+vD
-         g1dunngTOn3rlQ3UHPTkwmGTqmYr1jLakZql0mCVFcvHeHmfEfWshaB4jjyV0cMdIEm6
-         cEfwRm9OSJFAhj/5yc3Lcuebauy2QSa3XdBuVV9FvATHHQ2DaEZfeygOestbJpRYaZ0I
-         TGYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVeSM65vLmdfWVrtyp+pqbmJN5mMdEV0QHGpJ68BeDpZ2Pl5w3YwKjrIBZvvVKMIR0EEBNX/WMDTvvMsDHbvQaRxCX/Rs4wsR4snID9g1unI/FmM+tQkUXY/M8yB2CXlwn75uht
-X-Gm-Message-State: AOJu0Yxsnq8Vh5+QqmMJe8U3cPyUjA/UczjQ0868e1tU8flUtawlxZGp
-	X7ehQAXcbXNfStt/ZXYPMX/ra4QoHyq9x/3GKpblMQ9Ehiyo+FSX
-X-Google-Smtp-Source: AGHT+IFtFXbJOcTBu71b3myFnqKFQJFfdwoTCK40N6wDfMWAHYCxxued7XkKyrmGrWZwqTf1RRMKUg==
-X-Received: by 2002:a05:622a:138b:b0:432:e789:e0b0 with SMTP id o11-20020a05622a138b00b00432e789e0b0mr9227603qtk.38.1713033961275;
-        Sat, 13 Apr 2024 11:46:01 -0700 (PDT)
+        bh=wzOGXim2vNdwdzX8IpzEzvZHcB/u0K5tNCKdVPMNuaQ=;
+        b=t/mO3esRsXoGexzuB6E6Qe+FMmyF6gZIBuyjfVAOQ86RCFCiwxXjV/wKxxSXHQ9SRc
+         IDBa3ON0Yiac3Oeje4/PQKmRP2ynkmZqHtj/EuIhf9M9ojK+wQdGpMoXoIF+jN5cpky4
+         7hxu4dk98LCKd1UOzon7F9WstGYZqMUkvCGhxIpc7vTioM5hqHRVnD+CFPZG6o6OKtEw
+         F0O2+oSdVGzyME4+QUxHoAH5O3AqzEZm7lOzPiNGm3tDuWs1naa/NxnfGcn5t2/k/u31
+         w5aBJaKTFSfgECyb5Sqs3A3gbbi8vKntwM7sTquzxbZrpPimCtMCO6gbTWgE3JT1OLeL
+         31FA==
+X-Forwarded-Encrypted: i=1; AJvYcCV21wsTRSXcz7TXuz2m4qh/pBs3SM/EynUeki+Lvz5OWQT/iZ/tNDM1b9nk87AhrePm0dQTLxn2sxR8g2CRk4Zw9D2ToGb+qU3yWhcgJzDSrdq43QSiwTSjeOD7AkiPI3DrmPOq5q8InvANFyiEmvTDeSKENbhFIC/p
+X-Gm-Message-State: AOJu0YwxW6mRRUJ3Dyea7qO83ImMztC4D9FwY61oYaJr75G2HJOYK2Dn
+	TOPjsCthzTnkl/g13C12Bdzu3tyzEc5DOjXJ9uoxB7Ly5BnUrcZ0
+X-Google-Smtp-Source: AGHT+IFp9picPxyikN7qdvIX81Bd7aUswYq+ttiE7mTx+6CDs42ecgjVHphO6GC68hpJkPtn53WH7Q==
+X-Received: by 2002:a05:620a:2101:b0:78e:d731:d85d with SMTP id l1-20020a05620a210100b0078ed731d85dmr2528472qkl.48.1713034481524;
+        Sat, 13 Apr 2024 11:54:41 -0700 (PDT)
 Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id l12-20020ac8458c000000b00436c316b737sm934108qtn.78.2024.04.13.11.46.00
+        by smtp.gmail.com with ESMTPSA id n17-20020a05620a295100b0078d5ffa723asm4050417qkp.94.2024.04.13.11.54.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Apr 2024 11:46:00 -0700 (PDT)
-Date: Sat, 13 Apr 2024 14:46:00 -0400
+        Sat, 13 Apr 2024 11:54:41 -0700 (PDT)
+Date: Sat, 13 Apr 2024 14:54:40 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Richard Gobert <richardbgobert@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- willemdebruijn.kernel@gmail.com, 
- dsahern@kernel.org, 
- aleksander.lobakin@intel.com, 
+To: Abhishek Chauhan <quic_abchauha@quicinc.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
  netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Cc: Richard Gobert <richardbgobert@gmail.com>
-Message-ID: <661ad2e8a7e95_3be9a7294a5@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240412152120.115067-3-richardbgobert@gmail.com>
-References: <20240412152120.115067-1-richardbgobert@gmail.com>
- <20240412152120.115067-3-richardbgobert@gmail.com>
-Subject: Re: [PATCH net v1 2/2] net: gro: add p_off param in *_gro_complete
+ linux-kernel@vger.kernel.org, 
+ Andrew Halaney <ahalaney@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Martin KaFai Lau <martin.lau@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ bpf <bpf@vger.kernel.org>
+Cc: kernel@quicinc.com
+Message-ID: <661ad4f0e3766_3be9a7294a1@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240412210125.1780574-2-quic_abchauha@quicinc.com>
+References: <20240412210125.1780574-1-quic_abchauha@quicinc.com>
+ <20240412210125.1780574-2-quic_abchauha@quicinc.com>
+Subject: Re: [RFC PATCH bpf-next v3 1/2] net: Rename mono_delivery_time to
+ tstamp_type for scalabilty
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,118 +99,176 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Richard Gobert wrote:
-> Commits a602456 ("udp: Add GRO functions to UDP socket") and 57c67ff ("udp:
-> additional GRO support") introduce incorrect usage of {ip,ipv6}_hdr in the
-> complete phase of gro. The functions always return skb->network_header,
-> which in the case of encapsulated packets at the gro complete phase, is
-> always set to the innermost L3 of the packet. That means that calling
-> {ip,ipv6}_hdr for skbs which completed the GRO receive phase (both in
-> gro_list and *_gro_complete) when parsing an encapsulated packet's _outer_
-> L3/L4 may return an unexpected value.
+Abhishek Chauhan wrote:
+> mono_delivery_time was added to check if skb->tstamp has delivery
+> time in mono clock base (i.e. EDT) otherwise skb->tstamp has
+> timestamp in ingress and delivery_time at egress.
 > 
-> This incorrect usage leads to a bug in GRO's UDP socket lookup.
-> udp{4,6}_lib_lookup_skb functions use ip_hdr/ipv6_hdr respectively. These
-> *_hdr functions return network_header which will point to the innermost L3,
-> resulting in the wrong offset being used in __udp{4,6}_lib_lookup with
-> encapsulated packets.
+> Renaming the bitfield from mono_delivery_time to tstamp_type is for
+> extensibilty for other timestamps such as userspace timestamp
+> (i.e. SO_TXTIME) set via sock opts.
 > 
-> To fix this issue p_off param is used in *_gro_complete to pass off the
-> offset of the previous layer.
+> As we are renaming the mono_delivery_time to tstamp_type, it makes
+> sense to start assigning tstamp_type based out if enum defined as
+> part of this commit
 > 
-> Reproduction example:
+> Earlier we used bool arg flag to check if the tstamp is mono in
+> function skb_set_delivery_time, Now the signature of the functions
+> accepts enum to distinguish between mono and real time
 > 
-> Endpoint configuration example (fou + local address bind)
+> Bridge driver today has no support to forward the userspace timestamp
+> packets and ends up resetting the timestamp. ETF qdisc checks the
+> packet coming from userspace and encounters to be 0 thereby dropping
+> time sensitive packets. These changes will allow userspace timestamps
+> packets to be forwarded from the bridge to NIC drivers.
 > 
->     # ip fou add port 6666 ipproto 4
->     # ip link add name tun1 type ipip remote 2.2.2.1 local 2.2.2.2 encap fou encap-dport 5555 encap-sport 6666 mode ipip
->     # ip link set tun1 up
->     # ip a add 1.1.1.2/24 dev tun1
+> In future tstamp_type:1 can be extended to support userspace timestamp
+> by increasing the bitfield.
 > 
-> Netperf TCP_STREAM result on net-next before patch is applied:
+> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
+> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
+> ---
+> Changes since v2
+> - Minor changes to commit subject
 > 
-> net-next main, GRO enabled:
->     $ netperf -H 1.1.1.2 -t TCP_STREAM -l 5
->     Recv   Send    Send
->     Socket Socket  Message  Elapsed
->     Size   Size    Size     Time     Throughput
->     bytes  bytes   bytes    secs.    10^6bits/sec
+> Changes since v1
+> - Squashed the two commits into one as mentioned by Willem.
+> - Introduced switch in skb_set_delivery_time.
+> - Renamed and removed directionality aspects w.r.t tstamp_type 
+>   as mentioned by Willem.
 > 
->     131072  16384  16384    5.28        2.37
+>  include/linux/skbuff.h                     | 33 +++++++++++++++-------
+>  include/net/inet_frag.h                    |  4 +--
+>  net/bridge/netfilter/nf_conntrack_bridge.c |  6 ++--
+>  net/core/dev.c                             |  2 +-
+>  net/core/filter.c                          |  8 +++---
+>  net/ipv4/inet_fragment.c                   |  2 +-
+>  net/ipv4/ip_fragment.c                     |  2 +-
+>  net/ipv4/ip_output.c                       |  8 +++---
+>  net/ipv4/tcp_output.c                      | 14 ++++-----
+>  net/ipv6/ip6_output.c                      |  6 ++--
+>  net/ipv6/netfilter.c                       |  6 ++--
+>  net/ipv6/netfilter/nf_conntrack_reasm.c    |  2 +-
+>  net/ipv6/reassembly.c                      |  2 +-
+>  net/ipv6/tcp_ipv6.c                        |  2 +-
+>  net/sched/act_bpf.c                        |  4 +--
+>  net/sched/cls_bpf.c                        |  4 +--
+>  16 files changed, 59 insertions(+), 46 deletions(-)
 > 
-> net-next main, GRO disabled:
->     $ netperf -H 1.1.1.2 -t TCP_STREAM -l 5
->     Recv   Send    Send
->     Socket Socket  Message  Elapsed
->     Size   Size    Size     Time     Throughput
->     bytes  bytes   bytes    secs.    10^6bits/sec
-> 
->     131072  16384  16384    5.01     2745.06
-> 
-> patch applied, GRO enabled:
->     $ netperf -H 1.1.1.2 -t TCP_STREAM -l 5
->     Recv   Send    Send
->     Socket Socket  Message  Elapsed
->     Size   Size    Size     Time     Throughput
->     bytes  bytes   bytes    secs.    10^6bits/sec
-> 
->     131072  16384  16384    5.01     2877.38
-> 
-> Fixes: 57c67ff4bd92 ("udp: additional GRO support")
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index 7135a3e94afd..a83a2120b57f 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -702,6 +702,11 @@ typedef unsigned int sk_buff_data_t;
+>  typedef unsigned char *sk_buff_data_t;
+>  #endif
+>  
+> +enum skb_tstamp_type {
+> +	CLOCK_REAL = 0, /* Time base is realtime */
+> +	CLOCK_MONO = 1, /* Time base is Monotonic */
+> +};
 
-> diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-> index 163f94a5a58f..9c18a39b0d0c 100644
-> --- a/drivers/net/geneve.c
-> +++ b/drivers/net/geneve.c
-> @@ -555,7 +555,7 @@ static struct sk_buff *geneve_gro_receive(struct sock *sk,
+Minor: inconsistent capitalization
+
+> +
+>  /**
+>   * DOC: Basic sk_buff geometry
+>   *
+> @@ -819,7 +824,7 @@ typedef unsigned char *sk_buff_data_t;
+>   *	@dst_pending_confirm: need to confirm neighbour
+>   *	@decrypted: Decrypted SKB
+>   *	@slow_gro: state present at GRO time, slower prepare step required
+> - *	@mono_delivery_time: When set, skb->tstamp has the
+> + *	@tstamp_type: When set, skb->tstamp has the
+>   *		delivery_time in mono clock base (i.e. EDT).  Otherwise, the
+>   *		skb->tstamp has the (rcv) timestamp at ingress and
+>   *		delivery_time at egress.
+> @@ -950,7 +955,7 @@ struct sk_buff {
+>  	/* private: */
+>  	__u8			__mono_tc_offset[0];
+>  	/* public: */
+> -	__u8			mono_delivery_time:1;	/* See SKB_MONO_DELIVERY_TIME_MASK */
+> +	__u8			tstamp_type:1;	/* See SKB_MONO_DELIVERY_TIME_MASK */
+
+Also remove reference to MONO_DELIVERY_TIME_MASK, or instead refer to
+skb_tstamp_type.
+
+>  #ifdef CONFIG_NET_XGRESS
+>  	__u8			tc_at_ingress:1;	/* See TC_AT_INGRESS_MASK */
+>  	__u8			tc_skip_classify:1;
+> @@ -4237,7 +4242,7 @@ static inline void skb_get_new_timestampns(const struct sk_buff *skb,
+>  static inline void __net_timestamp(struct sk_buff *skb)
+>  {
+>  	skb->tstamp = ktime_get_real();
+> -	skb->mono_delivery_time = 0;
+> +	skb->tstamp_type = CLOCK_REAL;
 >  }
 >  
->  static int geneve_gro_complete(struct sock *sk, struct sk_buff *skb,
-> -			       int nhoff)
-> +			       int p_off, int nhoff)
->  {
->  	struct genevehdr *gh;
->  	struct packet_offload *ptype;
-> @@ -569,11 +569,12 @@ static int geneve_gro_complete(struct sock *sk, struct sk_buff *skb,
+>  static inline ktime_t net_timedelta(ktime_t t)
+> @@ -4246,10 +4251,18 @@ static inline ktime_t net_timedelta(ktime_t t)
+>  }
 >  
->  	/* since skb->encapsulation is set, eth_gro_complete() sets the inner mac header */
->  	if (likely(type == htons(ETH_P_TEB)))
-> -		return eth_gro_complete(skb, nhoff + gh_len);
-> +		return eth_gro_complete(skb, p_off, nhoff + gh_len);
-
-Since the new field to the callback is only used between IP and
-transport layer callback implementations, I think the others should
-just return zero, to make it clear that the value is unused.
-
-I still think that if the only issue is with udp, we can just special
-case those and pass the nhoff instead of thoff in the existing one
-available offset field, and compute the transport offset in the udp
-function. For much less code churn. But unless anyone else agrees you
-can ignore that suggestion.
-
-> -int inet_gro_complete(struct sk_buff *skb, int nhoff)
-> +int inet_gro_complete(struct sk_buff *skb, int prior_off, int nhoff)
+>  static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
+> -					 bool mono)
+> +					  u8 tstamp_type)
 >  {
->  	struct iphdr *iph = (struct iphdr *)(skb->data + nhoff);
->  	const struct net_offload *ops;
-> @@ -1667,17 +1667,17 @@ int inet_gro_complete(struct sk_buff *skb, int nhoff)
->  	 */
->  	err = INDIRECT_CALL_2(ops->callbacks.gro_complete,
->  			      tcp4_gro_complete, udp4_gro_complete,
-> -			      skb, nhoff + sizeof(*iph));
-> +				  skb, nhoff, nhoff + sizeof(*iph));
+>  	skb->tstamp = kt;
+> -	skb->mono_delivery_time = kt && mono;
+> +
+> +	switch (tstamp_type) {
+> +	case CLOCK_REAL:
+> +		skb->tstamp_type = CLOCK_REAL;
+> +		break;
+> +	case CLOCK_MONO:
+> +		skb->tstamp_type = kt && tstamp_type;
+> +		break;
+> +	}
 
-Identation change
-
->  struct sock *udp4_lib_lookup_skb(const struct sk_buff *skb,
-> +				 int nhoff,
->  				 __be16 sport, __be16 dport)
+Technically this leaves the tstamp_type undefined if (skb, 0, CLOCK_REAL)
+>  }
+>  
+>  DECLARE_STATIC_KEY_FALSE(netstamp_needed_key);
+> @@ -4259,8 +4272,8 @@ DECLARE_STATIC_KEY_FALSE(netstamp_needed_key);
+>   */
+>  static inline void skb_clear_delivery_time(struct sk_buff *skb)
 >  {
-> -	const struct iphdr *iph = ip_hdr(skb);
-> +	const struct iphdr *iph = (const struct iphdr *)(skb->data + nhoff);
+> -	if (skb->mono_delivery_time) {
+> -		skb->mono_delivery_time = 0;
+> +	if (skb->tstamp_type) {
+> +		skb->tstamp_type = CLOCK_REAL;
+>  		if (static_branch_unlikely(&netstamp_needed_key))
+>  			skb->tstamp = ktime_get_real();
+>  		else
+> @@ -4270,7 +4283,7 @@ static inline void skb_clear_delivery_time(struct sk_buff *skb)
+>  
+>  static inline void skb_clear_tstamp(struct sk_buff *skb)
+>  {
+> -	if (skb->mono_delivery_time)
+> +	if (skb->tstamp_type)
+>  		return;
+>  
+>  	skb->tstamp = 0;
+> @@ -4278,7 +4291,7 @@ static inline void skb_clear_tstamp(struct sk_buff *skb)
+>  
+>  static inline ktime_t skb_tstamp(const struct sk_buff *skb)
+>  {
+> -	if (skb->mono_delivery_time)
+> +	if (skb->tstamp_type == CLOCK_MONO)
+>  		return 0;
 
-How about instead just pass the saddr and daddr and leave the iph
-pointer to the caller (which also computes the udph pointer).
+Should this be if (skb->tstamp_type), in line with skb_clear_tstamp,
+right above?
+
+> @@ -1649,7 +1649,7 @@ void ip_send_unicast_reply(struct sock *sk, struct sk_buff *skb,
+>  			  arg->csumoffset) = csum_fold(csum_add(nskb->csum,
+>  								arg->csum));
+>  		nskb->ip_summed = CHECKSUM_NONE;
+> -		nskb->mono_delivery_time = !!transmit_time;
+> +		nskb->tstamp_type = !!transmit_time;
+
+In anticipation of more tstamp_types, explicitly set to CLOCK_MONO.
+
+>  		if (txhash)
+>  			skb_set_hash(nskb, txhash, PKT_HASH_TYPE_L4);
+>  		ip_push_pending_frames(sk, &fl4);
 
