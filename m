@@ -1,242 +1,518 @@
-Return-Path: <netdev+bounces-87633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 614CD8A3E2B
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 21:07:10 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A8248A3E36
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 21:24:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1E472818FB
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 19:07:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CEEE281AD6
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 19:24:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B4CD53802;
-	Sat, 13 Apr 2024 19:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB2253803;
+	Sat, 13 Apr 2024 19:24:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bgp2IiMW"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ru8VJJ66"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A56623BE;
-	Sat, 13 Apr 2024 19:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2EB1758B
+	for <netdev@vger.kernel.org>; Sat, 13 Apr 2024 19:24:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713035224; cv=none; b=jjLmx5mCkUN4sag/62BQ8adPrterfHy/MM74siOxx7xwCQ+/T7SQBRl+QZN+krm8UV/LumUaciMUbHVohKZeUuRf9rFdzWv82zqsDsey+HPPXq9/cbnGHdtRtBLUeOJ4AAm/KC1shpKYZLtTjdp5pFliBLozcy3pa5PVqjwICj0=
+	t=1713036273; cv=none; b=CdCmrM27asS4EO6vRxZRN2MIX5Lc16jcajWH9fQRNceriCoUfo/uyHNs33w1VXslLo3anoDY56K7+Inv8eAfx5jpYM3fP8O8gpmrHXTivgYDRBiYLakcm1jT/b8sfSIoBODqAVJO8nbQHh70UFMDOp+8igGVkuC5qsvAlHyNte8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713035224; c=relaxed/simple;
-	bh=DNhhbIc6L+IKpDdQxrC3Ktu1wDXXBPiMctnl9rg5itU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=bbhmYAUGQs15i3QWJP2qmXo1QweoGyw+ZI6M+rKbh+ujmXpWaA0wzsZFtLrG3O48bNYA2gzAXVZqo+DvTYXvEKEWHYr68EZ8AjC2o0agJlpAvEYDLY6R0NmgH9cgPvTdQuM60bJDnobRa8e68N/PNHCfj0eCKozO+ctynJEMYQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bgp2IiMW; arc=none smtp.client-ip=209.85.222.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-78d6021e2e3so130749685a.1;
-        Sat, 13 Apr 2024 12:07:02 -0700 (PDT)
+	s=arc-20240116; t=1713036273; c=relaxed/simple;
+	bh=0s5EG597TObH3SM1X1Vm5616HIMqG1Wi/nMhMkf22ek=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FVXQTigMCwrY96Rzw8ZUEvOzvn0utrQzKl5XGFBouSVoZ294jYb0xdON58DwfE46QyTl6LR3XZPtaunhhLRdN3p6vnt3QyBs77uouGGqygKKv9VA952IG1hanTfEqtA+G0JOD66h7UbIBh4K4v0VeMFtH+USjc/0ahdONSHTCGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ru8VJJ66; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-78ecacab93bso147387485a.3
+        for <netdev@vger.kernel.org>; Sat, 13 Apr 2024 12:24:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713035221; x=1713640021; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mqez31DaanVbX+mWuT0+GQUVsDTps4xeskVhFkNVA0E=;
-        b=bgp2IiMWy9pv7iE97o2GSEvd7NtZOnKe2vnDcKZJOC5VKr5UnWJVqGqLhtUi6XQNqd
-         iEK2qT0T8AZJIePnSInpPFjgmOU0opS6c7a9ncHWWvl2qxjtgtDl/29QBlKw/gcs/z0X
-         929IZ/aFNeNOj8Ei18sUNeRqV4VkHjs+Z5nBFDZIB5m/Mo8itjGyVMY8Ol3h5sbwmdIl
-         B+8p8Jn2dNXkI+1oRr63hehsy7lAsmDABgsJWaKaeuTkxcCTL9TpH+hfG4u6ZjozbnJy
-         XQOKFM8al90NYdsICzTzF/+K55vcfn0T8kheEEIVtgoo5hG27RgV++g5j4rWur8f7TFy
-         wawQ==
+        d=fastly.com; s=google; t=1713036269; x=1713641069; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=h6U5jQ7dp/zS0PtKBZkJYYIOAiBOYZXuvmBnqBTZVc0=;
+        b=ru8VJJ66prV/ABxI0DYwZ63WBcaaSf3BNytWw1A4L/6JyB1NYG2/joZ0LvTnKW6NZk
+         TTJh9oC0Sgo9vG0nA46LNRdo7biS/uuelwA6ESiqDNsDSasYp2I+RS/jXoqEACg5bXm1
+         pnmH/y7CMPQavcl81ECUUpq8tiA68OfmsmYu4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713035221; x=1713640021;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=mqez31DaanVbX+mWuT0+GQUVsDTps4xeskVhFkNVA0E=;
-        b=M7NsL1WhOuyKjDxi9zKN1WXlt5d0RDjM2Zk0Q7BqnhqN7XyVS2rrg5IRjtfUhgleNH
-         paMmvR8GibSDLKzr4QicFGg8AQsj2yWW7Is6k3u2JK9M7rMyH0z6c9FzGThiCmut1V4N
-         lACEQ+7FEw9Wy6qgiWEfzFEF4z7qLM+GflanIardRnf9qtJRoWGlBQ1JBCfFywLDeUlN
-         njfW216X5cKvfXiZF2G5/6ozKZeWFrfiq9m2X02uovbl8jbyHe5KOCq6Z5KOz2N5WIQ5
-         ZQIkvd+HlP/l/ZpPCifGJaGdKtxUzkXoescnnPYd/90tPDVQ6tyXJDinVZUvB89d52cy
-         eLqw==
-X-Forwarded-Encrypted: i=1; AJvYcCXVHaCi6R7Uxevuiw1laBKmpshXE8mwlY9d/lEslZcUFIkgidAukYe5rHGKd9OIm2V3idpsddJi0vFXXyZ6EfAy/Bt7f+AozottD/CP/CZEDzbYKfyaoTZcGW/nD0+YBjr9uSYkiNnQSWO88tY51uVfODH/H78ilA5H
-X-Gm-Message-State: AOJu0YzTpxn8+uGNlW58TloncRWN5bOOwq95W02+7Hd/HQOYk5nF/0IM
-	Qtmg3wAGBXJ+jfD8P/UFrxarhRfuZHnFb2M1l+naZOKoQKLEsDzn
-X-Google-Smtp-Source: AGHT+IHkdAuWAYDB6LpnIPHdJm0zAMcyvrrhUxT4H57RvsW70LQWs7ATZMLrXlZtE/wUpIh4GtNiyA==
-X-Received: by 2002:a05:620a:40cb:b0:78e:caa7:cd23 with SMTP id g11-20020a05620a40cb00b0078ecaa7cd23mr6967884qko.20.1713035221401;
-        Sat, 13 Apr 2024 12:07:01 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id b18-20020a05620a0cd200b0078d670115fcsm4044059qkj.51.2024.04.13.12.07.00
+        d=1e100.net; s=20230601; t=1713036269; x=1713641069;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h6U5jQ7dp/zS0PtKBZkJYYIOAiBOYZXuvmBnqBTZVc0=;
+        b=pSeqIYe6l0JzDmGYEHfY6uDtx4mtvJmgRiPSm7zTMi2ZTNNp+URorBfrQoE9E2mYY1
+         +w9ZOTQv3SEGNWEkZpwyRXDeELgc+qxonPYBdtvAjKLIL+oTb1anSBOFCGL1TOkN5DbJ
+         N9IOq904D+aMsqI0z4RTsW+Ms40JrPfEOBFMP62Lhkha+fLQ0JSdATKMBGCinSh14LRS
+         R7F8Gs6T75BN2M9vsG+E3XHRx716Gf+xt9A6UI8O9PXB+Z2Wc/33rcLGSBAJ61FKwkAl
+         XLq322omKZpQhlYo8vFfh70zwl46BMxDc1hGk8QXpgBCVP6U4/YNhvW4nJg0SomNvuoU
+         mMjA==
+X-Forwarded-Encrypted: i=1; AJvYcCVT117gi/dFCuz4z86FpkXALaC7uVGxt3/hC32Ke9Xo/h+/aTfRjWEXWEHZjk8FtuNXbx6Teq/9NSRpfcOA9KdS+S+ELB6x
+X-Gm-Message-State: AOJu0YwteODp0jkMYnfiFmzmi2CZEx62A1WqxqVaCevTh1omN0Aeezd/
+	UnLHGEKjTTn1R3H181LByGfVUkffPMNiBS/6r5Ws/2fTF/1NtpLnqrL5ynjj914=
+X-Google-Smtp-Source: AGHT+IHEXGY9Gr4cajSLUAHRJBa+Fcg2ioygYaR2ysVN6dcQS0NWWrf0Y8W3a/4jXLRAJ4FhFfXaHA==
+X-Received: by 2002:a05:620a:4091:b0:78e:d6b8:48d3 with SMTP id f17-20020a05620a409100b0078ed6b848d3mr3126712qko.5.1713036269443;
+        Sat, 13 Apr 2024 12:24:29 -0700 (PDT)
+Received: from LQ3V64L9R2 ([74.92.140.241])
+        by smtp.gmail.com with ESMTPSA id ou5-20020a05620a620500b0078d5b3b5b4asm4089248qkn.125.2024.04.13.12.24.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 13 Apr 2024 12:07:01 -0700 (PDT)
-Date: Sat, 13 Apr 2024 15:07:00 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Andrew Halaney <ahalaney@redhat.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Martin KaFai Lau <martin.lau@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- bpf <bpf@vger.kernel.org>
-Cc: kernel@quicinc.com
-Message-ID: <661ad7d4c65da_3be9a7294e@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240412210125.1780574-3-quic_abchauha@quicinc.com>
-References: <20240412210125.1780574-1-quic_abchauha@quicinc.com>
- <20240412210125.1780574-3-quic_abchauha@quicinc.com>
-Subject: Re: [RFC PATCH bpf-next v3 2/2] net: Add additional bit to support
- userspace timestamp type
+        Sat, 13 Apr 2024 12:24:28 -0700 (PDT)
+Date: Sat, 13 Apr 2024 15:24:26 -0400
+From: Joe Damato <jdamato@fastly.com>
+To: "Nambiar, Amritha" <amritha.nambiar@intel.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, sridhar.samudrala@intel.com,
+	nalramli@fastly.com, Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [intel-next 1/2] net/i40e: link NAPI instances to queues and IRQs
+Message-ID: <Zhrb6qJAoTYks2lK@LQ3V64L9R2>
+References: <20240410043936.206169-1-jdamato@fastly.com>
+ <20240410043936.206169-2-jdamato@fastly.com>
+ <bb0fbd29-c098-4a62-9217-c9fd1a450250@intel.com>
+ <ZhckCOFplMR0GMjr@LQ3V64L9R2>
+ <f6a3f010-8fb5-4494-9ef0-23501ea01f64@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f6a3f010-8fb5-4494-9ef0-23501ea01f64@intel.com>
 
-Abhishek Chauhan wrote:
-> tstamp_type can be real, mono or userspace timestamp.
+On Thu, Apr 11, 2024 at 04:02:37PM -0700, Nambiar, Amritha wrote:
+> On 4/10/2024 4:43 PM, Joe Damato wrote:
+> > On Wed, Apr 10, 2024 at 02:10:52AM -0700, Nambiar, Amritha wrote:
+> > > On 4/9/2024 9:39 PM, Joe Damato wrote:
+> > > > Make i40e compatible with the newly added netlink queue GET APIs.
+> > > > 
+> > > > $ ./cli.py --spec ../../../Documentation/netlink/specs/netdev.yaml \
+> > > >     --do queue-get --json '{"ifindex": 3, "id": 1, "type": "rx"}'
+> > > > 
+> > > > {'id': 1, 'ifindex': 3, 'napi-id': 162, 'type': 'rx'}
+> > > > 
+> > > > $ ./cli.py --spec ../../../Documentation/netlink/specs/netdev.yaml \
+> > > >     --do napi-get --json '{"id": 162}'
+> > > > 
+> > > > {'id': 162, 'ifindex': 3, 'irq': 136}
+> > > > 
+> > > > The above output suggests that irq 136 was allocated for queue 1, which has
+> > > > a NAPI ID of 162.
+> > > > 
+> > > > To double check this is correct, the IRQ to queue mapping can be verified
+> > > > by checking /proc/interrupts:
+> > > > 
+> > > > $ cat /proc/interrupts  | grep 136\: | \
+> > > >     awk '{print "irq: " $1 " name " $76}'
+> > > > 
+> > > > irq: 136: name i40e-vlan300-TxRx-1
+> > > > 
+> > > > Suggests that queue 1 has IRQ 136, as expected.
+> > > > 
+> > > > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > > > ---
+> > > >    drivers/net/ethernet/intel/i40e/i40e.h      |  2 +
+> > > >    drivers/net/ethernet/intel/i40e/i40e_main.c | 58 +++++++++++++++++++++
+> > > >    drivers/net/ethernet/intel/i40e/i40e_txrx.c |  4 ++
+> > > >    3 files changed, 64 insertions(+)
+> > > > 
+> > > > diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
+> > > > index 2fbabcdb5bb5..5900ed5c7170 100644
+> > > > --- a/drivers/net/ethernet/intel/i40e/i40e.h
+> > > > +++ b/drivers/net/ethernet/intel/i40e/i40e.h
+> > > > @@ -1267,6 +1267,8 @@ int i40e_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd);
+> > > >    int i40e_open(struct net_device *netdev);
+> > > >    int i40e_close(struct net_device *netdev);
+> > > >    int i40e_vsi_open(struct i40e_vsi *vsi);
+> > > > +void i40e_queue_set_napi(struct i40e_vsi *vsi, unsigned int queue_index,
+> > > > +			 enum netdev_queue_type type, struct napi_struct *napi);
+> > > >    void i40e_vlan_stripping_disable(struct i40e_vsi *vsi);
+> > > >    int i40e_add_vlan_all_mac(struct i40e_vsi *vsi, s16 vid);
+> > > >    int i40e_vsi_add_vlan(struct i40e_vsi *vsi, u16 vid);
+> > > > diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> > > > index 0bdcdea0be3e..6384a0c73a05 100644
+> > > > --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> > > > +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> > > > @@ -3448,6 +3448,58 @@ static struct xsk_buff_pool *i40e_xsk_pool(struct i40e_ring *ring)
+> > > >    	return xsk_get_pool_from_qid(ring->vsi->netdev, qid);
+> > > >    }
+> > > > +/**
+> > > > + * __i40e_queue_set_napi - Set the napi instance for the queue
+> > > > + * @dev: device to which NAPI and queue belong
+> > > > + * @queue_index: Index of queue
+> > > > + * @type: queue type as RX or TX
+> > > > + * @napi: NAPI context
+> > > > + * @locked: is the rtnl_lock already held
+> > > > + *
+> > > > + * Set the napi instance for the queue. Caller indicates the lock status.
+> > > > + */
+> > > > +static void
+> > > > +__i40e_queue_set_napi(struct net_device *dev, unsigned int queue_index,
+> > > > +		      enum netdev_queue_type type, struct napi_struct *napi,
+> > > > +		      bool locked)
+> > > > +{
+> > > > +	if (!locked)
+> > > > +		rtnl_lock();
+> > > > +	netif_queue_set_napi(dev, queue_index, type, napi);
+> > > > +	if (!locked)
+> > > > +		rtnl_unlock();
+> > > > +}
+> > > > +
+> > > > +/**
+> > > > + * i40e_queue_set_napi - Set the napi instance for the queue
+> > > > + * @vsi: VSI being configured
+> > > > + * @queue_index: Index of queue
+> > > > + * @type: queue type as RX or TX
+> > > > + * @napi: NAPI context
+> > > > + *
+> > > > + * Set the napi instance for the queue. The rtnl lock state is derived from the
+> > > > + * execution path.
+> > > > + */
+> > > > +void
+> > > > +i40e_queue_set_napi(struct i40e_vsi *vsi, unsigned int queue_index,
+> > > > +		    enum netdev_queue_type type, struct napi_struct *napi)
+> > > > +{
+> > > > +	struct i40e_pf *pf = vsi->back;
+> > > > +
+> > > > +	if (!vsi->netdev)
+> > > > +		return;
+> > > > +
+> > > > +	if (current_work() == &pf->service_task ||
+> > > > +	    test_bit(__I40E_PF_RESET_REQUESTED, pf->state) ||
+> > > 
+> > > I think we might need something like ICE_PREPARED_FOR_RESET which detects
+> > > all kinds of resets(PFR/CORE/GLOBR). __I40E_PF_RESET_REQUESTED handles PFR
+> > > only. So, this might assert for RTNL lock on CORER/GLOBR.
+> > 
+> > The i40e code is a bit tricky so I'm not sure about these cases. Here's
+> > what it looks like to me, but hopefully Intel can weigh-in here as well.
+> > 
+> > As some one who is not an expert in i40e, what follows is a guess that is
+> > likely wrong ;)
+> > 
+> > The __I40E_GLOBAL_RESET_REQUESTED case it looks to me (I could totally
+> > be wrong here) that the i40e_reset_subtask calls i40e_rebuild with
+> > lock_acquired = false. In this case, we want __i40e_queue_set_napi to
+> > pass locked = true (because i40e_rebuild will acquire the lock for us).
+> > 
+> > The __I40E_CORE_RESET_REQUESTED case appears to be the same as the
+> > __I40E_GLOBAL_RESET_REQUESTED case in that i40e_rebuild is called with
+> > lock_acquired = false meaning we also want __i40e_queue_set_napi to pass
+> > locked = true (because i40e_rebuild will acquire the lock for us).
+> > 
+> > __I40E_PF_RESET_REQUESTED is more complex.
+> > 
+> > It seems:
+> >            When the __I40E_PF_RESET_REQUESTED bit is set in:
+> >              - i40e_handle_lldp_event
+> >              - i40e_tx_timeout
+> >              - i40e_intr
+> >              - i40e_resume_port_tx
+> >              - i40e_suspend_port_tx
+> >              - i40e_hw_dcb_config
+> > 
+> >            then: i40e_service_event_schedule is called which queues
+> >            i40e_service_task, which calls i40e_reset_subtask, which
+> >            clears the __I40E_PF_RESET_REQUESTED bit and calls
+> >            i40e_do_reset passing lock_acquired = false. In the
+> >            __I40E_PF_RESET_REQUESTED case, i40e_reset_and_rebuild
+> > 	  called with lock_acquired = false again and passed through to
+> > 	  i40e_rebuild which will take rtnl on its own. This means
+> >            in these cases, __i40e_queue_set_napi can pass locked = true.
+> > 
+> >            However...
+> > 
+> >              - i40e_set_features
+> >              - i40e_ndo_bridge_setlink
+> >              - i40e_create_queue_channel
+> >              - i40e_configure_queue_channels
+> >              - Error case in i40e_vsi_open
+> > 
+> >            call i40e_do_reset directly and pass lock_acquired = true so
+> >            i40e_reset_and_rebuild will not take the RTNL.
+> > 
+> > 	  Important assumption: I assume that passing lock_acquired = true
+> > 	  means that the lock really was previously acquired (and not simply
+> > 	  unnecessary and not taken ?).
+> > 
+> > 	  If that is correct, then __i40e_queue_set_napi should also not take the rtnl (e.g.
+> >            locked = true).
+> > 
+> > Again, I could be totally off here, but it looks like when:
+> > 
+> >    (current_work() == &pf->service_task) && test_bit(__I40E_PF_RESET_REQUESTED, pf->state)
+> > 
+> > is true, we want to call __i40e_queue_set_napi with locked = true,
+> > 
+> > and also all the other cases we want __i40e_queue_set_napi with locked = true
+> > 
+> > > > +	    test_bit(__I40E_DOWN, pf->state) ||
+> > > > +	    test_bit(__I40E_SUSPENDED, pf->state))
+> > > > +		__i40e_queue_set_napi(vsi->netdev, queue_index, type, napi,
+> > > > +				      false);
+> > > > +	else
+> > > > +		__i40e_queue_set_napi(vsi->netdev, queue_index, type, napi,
+> > > > +				      true);
+> > 
+> > I *think* (but honestly... I have no idea) the correct if statement *might* be
+> > something like:
+> > 
+> >    /* __I40E_PF_RESET_REQUESTED via the service_task will
+> >     * call i40e_rebuild with lock_acquired = false, causing rtnl to be
+> >     * taken, meaning __i40e_queue_set_napi should *NOT* take the lock.
+> >     *
+> >     * __I40E_PF_RESET_REQUESTED when set directly and not via the
+> >     * service task, i40e_reset is called with lock_acquired = true,
+> >     * implying that the rtnl was already taken (and, more
+> >     * specifically, the lock was not simply unnecessary and skipped)
+> >     * and so __i40e_queue_set_napi should *NOT* take the lock.
+> >     *
+> >     * __I40E_GLOBAL_RESET_REQUESTED and __I40E_CORE_RESET_REQUESTED
+> >     * trigger the service_task (via i40e_intr) which will cause
+> >     * i40e_rebuild to acquire rtnl and so __i40e_queue_set_napi should
+> >     * not acquire it.
+> >     */
+> >    if (current_work() == &pf->service_task ||
+> >        test_bit(__I40E_PF_RESET_REQUESTED, pf->state) ||
+> >        test_bit(__I40E_GLOBAL_RESET_REQUESTED, pf->state) ||
+> >        test_bit(__I40E_CORE_RESET_REQUESTED, pf->state))
+> >            __i40e_queue_set_napi(vsi->netdev, queue_index, type, napi,
+> >                                  true);
+> >    else if (test_bit(__I40E_DOWN, pf->state) ||
+> >             test_bit(__I40E_SUSPENDED, pf->state))
+> >            __i40e_queue_set_napi(vsi->netdev, queue_index, type, napi,
+> >                                  false);
+> >    else
+> >            __i40e_queue_set_napi(vsi->netdev, queue_index, type, napi,
+> >                                  true);
+> > 
+> > I suppose to figure this out, I'd need to investigate all cases where
+> > i40e_rebuild is called with lock_acquired = true to ensure that the lock was
+> > actually acquired (and not just unnecessary).
+> > 
+> > Unless some one who knows about i40e can answer this question more
+> > definitively.
+> > 
 > 
-> This commit adds userspace timestamp and sets it if there is
-> valid transmit_time available in socket coming from userspace.
+> I'll wait for the i40e maintainers to chime in here.
 
-Comment is outdated: we now set the actual clockid_t (compressed
-into fewer bits), rather than an abstract "go see sk_clockid".
- 
-> To make the design scalable for future needs this commit bring in
-> the change to extend the tstamp_type:1 to tstamp_type:2 to support
-> userspace timestamp.
+Based on the findings of I40E_SUSPENDED below, the above if statement is
+still slightly incorrect, please see below.
+
+> > > > +}
+> > > > +
+> > > >    /**
+> > > >     * i40e_configure_tx_ring - Configure a transmit ring context and rest
+> > > >     * @ring: The Tx ring to configure
+> > > > @@ -3558,6 +3610,8 @@ static int i40e_configure_tx_ring(struct i40e_ring *ring)
+> > > >    	/* cache tail off for easier writes later */
+> > > >    	ring->tail = hw->hw_addr + I40E_QTX_TAIL(pf_q);
+> > > > +	i40e_queue_set_napi(vsi, ring->queue_index, NETDEV_QUEUE_TYPE_TX,
+> > > > +			    &ring->q_vector->napi);
+> > > 
+> > > I am not sure very sure of this, have you tested this for the reset/rebuild
+> > > path as well (example: ethtool -L and change queues). Just wondering if this
+> > > path is taken for first time VSI init or additionally for any VSI rebuilds
+> > > as well.
+> > 
+> > Can you explain more about what your concern is? I'm not sure I follow.
+> > Was the concern just that on rebuild this code path might not be
+> > executed because the driver might take a different path?
+> > 
+> > If so, I traced the code (and tested with ethtool):
+> > 
+> > When the device is probed:
+> > 
+> > i40e_probe
+> >    i40e_vsi_open
+> >      i40e_vsi_configure
+> >        i40e_vsi_configure_rx
+> >          i40e_configure_rx_ring
+> >        i40e_vsi_configure_tx
+> >          i40e_configure_tx_ring
+> > 
+> > When you use ethtool to change the channel count:
+> > 
+> > i40e_set_channels
+> >    i40e_reconfig_rss_queues
+> >      i40e_reset_and_rebuild
+> >        i40e_rebuild
+> >          i40e_pf_unquiesce_all_vsi
+> >            i40e_unquiesce_vsi
+> >              i40e_vsi_open
+> >                [.. the call stack above for i40e_vsi_open ..]
+> > 
+> > Are those the two paths you had in mind or were there other ones? FWIW, using
+> > ethtool to change the channel count followed by using the cli.py returns what
+> > appears to be correct data, so I think the ethtool -L case is covered.
+> > 
 > 
-> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
-> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
-> ---
-> Changes since v2
-> - Minor changes to commit subject
+> Yes, this is what I had mind. Good to know that it is covered.
+
+Thanks for the thorough review; I appreciate your insight. The more I look
+at the i40e code paths, the more I realize that it is much trickier than I
+originally thought.
+
+> > Let me know if I am missing any cases you had in mind or if this answers your
+> > question.
+> > 
 > 
-> Changes since v1 
-> - identified additional changes in BPF framework.
-> - Bit shift in SKB_MONO_DELIVERY_TIME_MASK and TC_AT_INGRESS_MASK.
-> - Made changes in skb_set_delivery_time to keep changes similar to 
->   previous code for mono_delivery_time and just setting tstamp_type
->   bit 1 for userspace timestamp.
-> 
-> 
->  include/linux/skbuff.h                        | 19 +++++++++++++++----
->  net/ipv4/ip_output.c                          |  2 +-
->  net/ipv4/raw.c                                |  2 +-
->  net/ipv6/ip6_output.c                         |  2 +-
->  net/ipv6/raw.c                                |  2 +-
->  net/packet/af_packet.c                        |  7 +++----
->  .../selftests/bpf/prog_tests/ctx_rewrite.c    |  8 ++++----
->  7 files changed, 26 insertions(+), 16 deletions(-)
-> 
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index a83a2120b57f..b6346c21c3d4 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -827,7 +827,8 @@ enum skb_tstamp_type {
->   *	@tstamp_type: When set, skb->tstamp has the
->   *		delivery_time in mono clock base (i.e. EDT).  Otherwise, the
->   *		skb->tstamp has the (rcv) timestamp at ingress and
-> - *		delivery_time at egress.
-> + *		delivery_time at egress or skb->tstamp defined by skb->sk->sk_clockid
-> + *		coming from userspace
->   *	@napi_id: id of the NAPI struct this skb came from
->   *	@sender_cpu: (aka @napi_id) source CPU in XPS
->   *	@alloc_cpu: CPU which did the skb allocation.
-> @@ -955,7 +956,7 @@ struct sk_buff {
->  	/* private: */
->  	__u8			__mono_tc_offset[0];
->  	/* public: */
-> -	__u8			tstamp_type:1;	/* See SKB_MONO_DELIVERY_TIME_MASK */
-> +	__u8			tstamp_type:2;	/* See SKB_MONO_DELIVERY_TIME_MASK */
->  #ifdef CONFIG_NET_XGRESS
->  	__u8			tc_at_ingress:1;	/* See TC_AT_INGRESS_MASK */
->  	__u8			tc_skip_classify:1;
+> One other case was the suspend/resume callback. This path involves remapping
+> vectors and rings (just like rebuild after changing channels), If this takes
+> the i40e_rebuild path like before, then we are covered, as your changes are
+> in i40e_vsi_configure. If not, we'll have to add it after re-initializing
+> interrupt scheme .
 
-A quick pahole for a fairly standard .config that I had laying around
-shows a hole after this list of bits, so no huge concerns there from
-adding a bit:
+Here's what I see in this path, namely that i40e_suspend does not call
+i40e_queue_set_napi but sets appropriate bits that can be checked.
 
-           __u8               slow_gro:1;           /*     3: 4  1 */
-           __u8               csum_not_inet:1;      /*     3: 5  1 */
+i40e_suspend:
+  __I40E_DOWN is set
+  __I40E_SUSPENDED is set
+  rtnl_lock
+    i40e_clear_interrupt_scheme
+      i40e_vsi_free_q_vectors
+        i40e_free_q_vector
+  rtnl_unlock
 
-           /* XXX 2 bits hole, try to pack */
+It seems in the suspend case the i40e_free_rx_resources and
+i40e_free_tx_resources are not called. This means I probably missed a case
+and need to call i40e_queue_set_napi to set the NAPI mapping to NULL
+somewhere in here without calling it twice. See further below for my
+thoughts on this.
 
-           __u16              tc_index;             /*     4     2 */
+Continuing with resume, though:
 
-> @@ -1090,10 +1091,10 @@ struct sk_buff {
->   */
->  #ifdef __BIG_ENDIAN_BITFIELD
->  #define SKB_MONO_DELIVERY_TIME_MASK	(1 << 7)
-> -#define TC_AT_INGRESS_MASK		(1 << 6)
-> +#define TC_AT_INGRESS_MASK		(1 << 5)
+i40e_resume:
+  rtnl_lock
+    i40e_restore_interrupt_scheme
+      i40e_vsi_alloc_q_vectors
+        i40e_vsi_alloc_q_vector
+    __I40E_DOWN is cleared
+    i40e_reset_and_rebuild (passes lock_acquired = true)
+      i40e_rebuild (passes locked_acquired = true)
+   rtnl_unlock
+   __I40E_SUSPENDED is cleared
 
-Have to be careful when adding a new 2 bit tstamp_type with both bits
-set, that this does not incorrectly get interpreted as MONO.
+So, in this case i40e_resume would want to to call __i40e_queue_set_napi
+with locked = true, to avoid rtnl since it's already been taken. I think to
+cover this case __I40E_SUSPENDED needs to be checked but true can be passed
+to the helper to avoid taking rtnl in the helper.
 
-I haven't looked closely at the BPF API, but hopefully it can be
-extensible to return the specific type. If it is hardcoded to return
-either MONO or not, then only 0x1 should match, not 0x3.
+This is an adjusted if statement, which is likely still incorrect in some
+cases (especially when considering my comments below on the
+i40e_free_[rt]x_resource paths), but maybe getting slightly closer:
 
->  #else
->  #define SKB_MONO_DELIVERY_TIME_MASK	(1 << 0)
-> -#define TC_AT_INGRESS_MASK		(1 << 1)
-> +#define TC_AT_INGRESS_MASK		(1 << 2)
->  #endif
->  #define SKB_BF_MONO_TC_OFFSET		offsetof(struct sk_buff, __mono_tc_offset)
->  
-> @@ -4262,6 +4263,16 @@ static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
->  	case CLOCK_MONO:
-
-Come to think of it, these CLOCK_* names are too generic and shadow
-existing ones like CLOCK_MONOTONIC.
-
-Instead, define SKB_CLOCK_.
-
->  		skb->tstamp_type = kt && tstamp_type;
->  		break;
-> +	/* if any other time base, must be from userspace
-> +	 * so set userspace tstamp_type bit
-> +	 * See skbuff tstamp_type:2
-> +	 * 0x0 => real timestamp_type
-> +	 * 0x1 => mono timestamp_type
-> +	 * 0x2 => timestamp_type set from userspace
-> +	 */
-> +	default:
-> +		if (kt && tstamp_type)
-> +			skb->tstamp_type = 0x2;
-
-Needs a constant.
-
-Plan is to add SKB_CLOCK_TAI, rather than SKB_CLOCK_USER that
-requires a further lookup to sk_clockid.
-
->  	}
->  }
->  
-> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-> index 62e457f7c02c..c9317d4addce 100644
-> --- a/net/ipv4/ip_output.c
-> +++ b/net/ipv4/ip_output.c
-> @@ -1457,7 +1457,7 @@ struct sk_buff *__ip_make_skb(struct sock *sk,
->  
->  	skb->priority = (cork->tos != -1) ? cork->priority: READ_ONCE(sk->sk_priority);
->  	skb->mark = cork->mark;
-> -	skb->tstamp = cork->transmit_time;
-> +	skb_set_delivery_time(skb, cork->transmit_time, sk->sk_clockid);
-
-If adding 1 or 2 specific clock types, like SKB_CLOCK_TAI, then
-skb_set_delivery_time will have to detect unsupported sk_clockid
-values and fail for those.
-
-The function does not return an error, so just fail to set the
-delivery time and WARN_ONCE.
+  /* __I40E_PF_RESET_REQUESTED via the service_task will
+   * call i40e_rebuild with lock_acquired = false, causing rtnl to be
+   * taken, meaning __i40e_queue_set_napi should *NOT* take the lock.
+   *
+   * __I40E_PF_RESET_REQUESTED when set directly and not via the
+   * service task, i40e_reset is called with lock_acquired = true,
+   * implying that the rtnl was already taken (and, more
+   * specifically, the lock was not simply unnecessary and skipped)
+   * and so __i40e_queue_set_napi should *NOT* take the lock.
+   *
+   * __I40E_GLOBAL_RESET_REQUESTED and __I40E_CORE_RESET_REQUESTED
+   * trigger the service_task (via i40e_intr) which will cause
+   * i40e_rebuild to acquire rtnl and so __i40e_queue_set_napi should
+   * not acquire it.
+   *
+   * __I40E_SUSPENDED is set in i40e_suspend and cleared in i40e_resume
+   * after rtnl_lock + i40_rebuild (with lock_acquired = true). In
+   * i40e_resume's call to i40e_rebuild, rtnl is held so
+   * __i40e_queue_set_napi should not take the lock, either.
+   *
+   * __I40E_IN_REMOVE is set in i40e_remove, and freeing the tx/rx
+   * resources will trigger this path. In this case, rtnl will not be held,
+   * so locked=false must be passed to the helper.
+   *
+   * __I40E_DOWN is set in a few places: i40e_probe, i40e_remove,
+   * i40e_shutdown, i40e_suspend. It is only cleared in i40e_probe after
+   * the vsi_open path is taken (in this case rtnl is needed) and it is
+   * cleared in i40e_resume, where RTNL is not needed, but the i40e_resume
+   * case is handled by checking __I40E_SUSPENDED in the first if block. 
+   */
+  if (current_work() == &pf->service_task ||
+      test_bit(__I40E_PF_RESET_REQUESTED, pf->state) ||
+      test_bit(__I40E_GLOBAL_RESET_REQUESTED, pf->state) ||
+      test_bit(__I40E_CORE_RESET_REQUESTED, pf->state) |
+      test_bit(__I40E_SUSPENDED, pf->state))
+          __i40e_queue_set_napi(vsi->netdev, queue_index, type, napi,
+                                true);
+  else if (test_bit(__I40E_IN_REMOVE, pf->state) ||
+           test_bit(__I40E_DOWN, pf->state))
+          __i40e_queue_set_napi(vsi->netdev, queue_index, type, napi,
+                                false);
+  else
+          __i40e_queue_set_napi(vsi->netdev, queue_index, type, napi,
+                                true);
 
 
+But please see below about i40e_free_q_vector.
+
+> > > >    	return 0;
+> > > >    }
+> > > > @@ -3716,6 +3770,8 @@ static int i40e_configure_rx_ring(struct i40e_ring *ring)
+> > > >    			 ring->queue_index, pf_q);
+> > > >    	}
+> > > > +	i40e_queue_set_napi(vsi, ring->queue_index, NETDEV_QUEUE_TYPE_RX,
+> > > > +			    &ring->q_vector->napi);
+> > > > 
+> > > Same as above.
+> > > 
+> > >    	return 0;
+> > > >    }
+> > > > @@ -4178,6 +4234,8 @@ static int i40e_vsi_request_irq_msix(struct i40e_vsi *vsi, char *basename)
+> > > >    		q_vector->affinity_notify.notify = i40e_irq_affinity_notify;
+> > > >    		q_vector->affinity_notify.release = i40e_irq_affinity_release;
+> > > >    		irq_set_affinity_notifier(irq_num, &q_vector->affinity_notify);
+> > > > +		netif_napi_set_irq(&q_vector->napi, q_vector->irq_num);
+> > > > +
+> > > >    		/* Spread affinity hints out across online CPUs.
+> > > >    		 *
+> > > >    		 * get_cpu_mask returns a static constant mask with
+> > > > diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+> > > > index 64d198ed166b..d380885ff26d 100644
+> > > > --- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+> > > > +++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+> > > > @@ -821,6 +821,8 @@ void i40e_clean_tx_ring(struct i40e_ring *tx_ring)
+> > > >    void i40e_free_tx_resources(struct i40e_ring *tx_ring)
+> > > >    {
+> > > >    	i40e_clean_tx_ring(tx_ring);
+> > > > +	i40e_queue_set_napi(tx_ring->vsi, tx_ring->queue_index,
+> > > > +			    NETDEV_QUEUE_TYPE_TX, NULL);
+> > > >    	kfree(tx_ring->tx_bi);
+> > > >    	tx_ring->tx_bi = NULL;
+> > > > @@ -1526,6 +1528,8 @@ void i40e_clean_rx_ring(struct i40e_ring *rx_ring)
+> > > >    void i40e_free_rx_resources(struct i40e_ring *rx_ring)
+> > > >    {
+> > > >    	i40e_clean_rx_ring(rx_ring);
+> > > > +	i40e_queue_set_napi(rx_ring->vsi, rx_ring->queue_index,
+> > > > +			    NETDEV_QUEUE_TYPE_RX, NULL);
+
+It appears to me that some cases may not end up calling
+i40e_free_tx_resources or i40e_free_rx_resources, but most (or all?) cases
+do call i40e_free_q_vector which is where the NAPI is deleted.
+
+It probably makes more sense to put the NULL setting where the NAPI delete
+happens, and then check those paths to see where rtnl is taken and make
+sure the bit checking in the if statement lines up properly.
+
+Before I go any deeper down this rabbit hole, I'll wait to see what the
+i40e maintainers say / think about this.
+
+> > > >    	if (rx_ring->vsi->type == I40E_VSI_MAIN)
+> > > >    		xdp_rxq_info_unreg(&rx_ring->xdp_rxq);
+> > > >    	rx_ring->xdp_prog = NULL;
 
