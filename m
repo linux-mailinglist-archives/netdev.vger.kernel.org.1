@@ -1,55 +1,92 @@
-Return-Path: <netdev+bounces-87599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5DE1F8A3AC7
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 05:46:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BDE48A3AF9
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 06:11:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13E24285B9F
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 03:46:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 099FA1F230E6
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 04:11:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E613519478;
-	Sat, 13 Apr 2024 03:45:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 327301BDE6;
+	Sat, 13 Apr 2024 04:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fsJy92Sd"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f53.google.com (mail-oa1-f53.google.com [209.85.160.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 711761CA8B;
-	Sat, 13 Apr 2024 03:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B18781BC3E;
+	Sat, 13 Apr 2024 04:11:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712979954; cv=none; b=G58SUkkYKVeV2m4UfCpztP+RYjfdaw3BqF7hyCvVVtotwyBDHJp5TQPPfp8I+HivKvhma5wjrrz7Zbx2Dh2WXwQadZTZhuQwr/EwTEAlbCN5HDGLNLqgMbczU6lmDxrr/hCfSvBPVhqNgISOM7MD2Q8MvGYXdKUFUDV8jgnpZbc=
+	t=1712981491; cv=none; b=Rwi23q90lPH/zN8eG5TL708WYNlmHiWTLJRKXf9GVms5K1pQ2rSViDBZ5A1wRFV2WAwI13Nr5a7ab4Nh96IK0TOoW+cJEFkFVxoRGMYP78Xoyctgp0gGQa0RjcNhIebdQl8rQXXjSDRswF7HmNwQNRCCiHuUEjfFXFAQTIeGHNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712979954; c=relaxed/simple;
-	bh=/ejGiVcUig8QB++zDGVUnFoHvRSF0CKBsYK5yhBULZ0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KplbIAwP7z5bVzLYgLdqzqiQnlz4YcPXy/VPLZo38uTP//w0R+ee4JW84UxofNl/6LIZIouL/2rR0lOohApR+kH1LgjwdNHhNx0Wiv7mixAIECtM5aD98/nCCvo2nVbPIfEpaLzTu1GvLLNEPH3qEyWfgz/2OC0U5TqZo7XYD84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4VGfRP3RQ4zNnqh;
-	Sat, 13 Apr 2024 11:43:29 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id 88E8C1403D3;
-	Sat, 13 Apr 2024 11:45:48 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
- (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Sat, 13 Apr
- 2024 11:45:47 +0800
-From: Zhengchao Shao <shaozhengchao@huawei.com>
-To: <linux-s390@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <wenjia@linux.ibm.com>, <jaka@linux.ibm.com>, <alibuda@linux.alibaba.com>,
-	<tonylu@linux.alibaba.com>, <guwen@linux.alibaba.com>,
-	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
-	<shaozhengchao@huawei.com>, <tangchengchang@huawei.com>
-Subject: [PATCH net] net/smc: fix potential sleeping issue in smc_switch_conns
-Date: Sat, 13 Apr 2024 11:51:50 +0800
-Message-ID: <20240413035150.3338977-1-shaozhengchao@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1712981491; c=relaxed/simple;
+	bh=AfPGdpoeXhVGR+SHbrTki7kqPG4xqSDp/j1KG2K2pxg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jfGPjEJICAs+Gzqw+6L3UwLntS7vGVVxVEt/QH6JyQeKP2y6fLDdbNVbTu0DQT1IRtI7RREYqlAv11MRzJqpelD9M2FE3jlqSs0/TKoSFZELuKuxEUdlh3k9KSj6PYHBUkA6DpHjoyAaIoVXhUM5O8J4OWvyxa7AIS/WqGwESkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fsJy92Sd; arc=none smtp.client-ip=209.85.160.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-23319017c4cso969751fac.2;
+        Fri, 12 Apr 2024 21:11:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712981489; x=1713586289; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EDhCSWEgnV+NzpnZC+839Wmob9VMoO2EjVmXGFw60QM=;
+        b=fsJy92SdASlRp4ceIXK8tDG7RmaqnR+JTDhucQXVIlwMMyKLJ2bI/RFLx83AkWLQZU
+         g0cqca1VsapH7j9WsoFqsg0W25tplq8axLI+BoD6dZ2SyCdQBJt/x2lZLzVDw9DZV/dd
+         Gu/dSjwvxcHORA1lEFkHJ/of5QVfnIsEd8Rwq20HqOqOaDou+aLEePJhmgoIQ4rer4Ep
+         75VE+bkfHV3lsUB45Pf8lfp/7LR4HyjIBJSdNrrsQBnOAco4BaJMUaqQxOafV9Eyenee
+         noOfqZV+8ziwUw4EUiiXIHB6UtfXE0NCeC9y+LETaSuryrhd9ZvkWMc7Q4BJgW+/Mh5s
+         HAhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712981489; x=1713586289;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EDhCSWEgnV+NzpnZC+839Wmob9VMoO2EjVmXGFw60QM=;
+        b=rmEYQEqZXHTcQk4W/BbkVwCFT+WBSk3Lg+V5mW0zO9Pe5f0thEJKHkWT8dylliQBlw
+         sm+hJnI6yPxvZL1tP1+CLRBppKTMObtkzI2M0BfFxt4nB4muF0paGDyY4Xp6NRXgXt4D
+         ZYYhz4pm6YrCtvgHsizPsuhXzk+vwTjz1LE0zxxSsTOJnErfOOBE5ig9h+BZVzElERgk
+         nIdScbyBBN/040rUoIthAe2Aaxiph97CrItZzunrb+wOpf8n4WglIwikSphps+RsThjw
+         K7nGNKuPS2QNhIpPMYbcHMn9Nt4B63C2yQ/Z1+0ah8QlEQelTb7/PoyUV015Uu7tX4en
+         Uhxg==
+X-Forwarded-Encrypted: i=1; AJvYcCUPbVL08yHQ6UFbnMPIyc4oLIbl+be6CqqsmuxfXsyIxFUOq16WRSQJcKYVCko9vezDz5/faVaN1f+Ty9QXaFzVmym5xbLbOahhrCOjSmCZ84InS2YTRqQOKFt/oNoFfSwd
+X-Gm-Message-State: AOJu0YyTPgqk0+018E2eEnVqEe2fHyvHwQkzrx8yvsgRedgDZVyYZJR0
+	nzpnFInFjmf7isLv82DOaAcWxfbsNfkS7SkmUrOcuEg1xJn61Mnx
+X-Google-Smtp-Source: AGHT+IE+nEAWcd0+Z2P4/AV17wHWyQPGohLUz5foVK2JC1p4PEX3jDqCCzVk0FB1zWXVp5Fn7Jr8DQ==
+X-Received: by 2002:a05:6870:5488:b0:22e:cbfa:678d with SMTP id f8-20020a056870548800b0022ecbfa678dmr4605735oan.57.1712981488680;
+        Fri, 12 Apr 2024 21:11:28 -0700 (PDT)
+Received: from localhost.localdomain ([123.116.201.21])
+        by smtp.gmail.com with ESMTPSA id y22-20020aa78556000000b006ea81423c65sm3722131pfn.148.2024.04.12.21.11.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Apr 2024 21:11:27 -0700 (PDT)
+From: Liang Chen <liangchen.linux@gmail.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	hengqi@linux.alibaba.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	john.fastabend@gmail.com,
+	hawk@kernel.org,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	liangchen.linux@gmail.com
+Subject: [PATCH net-next v7] virtio_net: Support RX hash XDP hint
+Date: Sat, 13 Apr 2024 12:10:35 +0800
+Message-Id: <20240413041035.7344-1-liangchen.linux@gmail.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,188 +94,107 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpeml500026.china.huawei.com (7.185.36.106)
 
-Potential sleeping issue exists in the following processes:
-smc_switch_conns
-  spin_lock_bh(&conn->send_lock)
-  smc_switch_link_and_count
-    smcr_link_put
-      __smcr_link_clear
-        smc_lgr_put
-          __smc_lgr_free
-            smc_lgr_free_bufs
-              __smc_lgr_free_bufs
-                smc_buf_free
-                  smcr_buf_free
-                    smcr_buf_unmap_link
-                      smc_ib_put_memory_region
-                        ib_dereg_mr
-                          ib_dereg_mr_user
-                            mr->device->ops.dereg_mr
-If scheduling exists when the IB driver implements .dereg_mr hook
-function, the bug "scheduling while atomic" will occur. For example,
-cxgb4 and efa driver. Use mutex lock instead of spin lock to fix it.
+The RSS hash report is a feature that's part of the virtio specification.
+Currently, virtio backends like qemu, vdpa (mlx5), and potentially vhost
+(still a work in progress as per [1]) support this feature. While the
+capability to obtain the RSS hash has been enabled in the normal path,
+it's currently missing in the XDP path. Therefore, we are introducing
+XDP hints through kfuncs to allow XDP programs to access the RSS hash.
 
-Fixes: 20c9398d3309 ("net/smc: Resolve the race between SMC-R link access and clear")
-Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+1.
+https://lore.kernel.org/all/20231015141644.260646-1-akihiko.odaki@daynix.com/#r
+
+Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
 ---
- net/smc/af_smc.c   |  2 +-
- net/smc/smc.h      |  2 +-
- net/smc/smc_cdc.c  | 14 +++++++-------
- net/smc/smc_core.c |  8 ++++----
- net/smc/smc_tx.c   |  8 ++++----
- 5 files changed, 17 insertions(+), 17 deletions(-)
+  Changes from v6:
+- fix a coding style issue
+  Changes from v5:
+- Preservation of the hash value has been dropped, following the conclusion
+  from discussions in V3 reviews. The virtio_net driver doesn't
+  accessing/using the virtio_net_hdr after the XDP program execution, so
+  nothing tragic should happen. As to the xdp program, if it smashes the
+  entry in virtio header, it is likely buggy anyways. Additionally, looking
+  up the Intel IGC driver,  it also does not bother with this particular
+  aspect.
+---
+ drivers/net/virtio_net.c | 55 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 55 insertions(+)
 
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index ad5bab6a44b6..c0a228def6da 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -386,7 +386,7 @@ static struct sock *smc_sock_alloc(struct net *net, struct socket *sock,
- 	INIT_DELAYED_WORK(&smc->conn.tx_work, smc_tx_work);
- 	INIT_LIST_HEAD(&smc->accept_q);
- 	spin_lock_init(&smc->accept_q_lock);
--	spin_lock_init(&smc->conn.send_lock);
-+	mutex_init(&smc->conn.send_lock);
- 	sk->sk_prot->hash(sk);
- 	mutex_init(&smc->clcsock_release_lock);
- 	smc_init_saved_callbacks(smc);
-diff --git a/net/smc/smc.h b/net/smc/smc.h
-index 18c8b7870198..ba8efed240e3 100644
---- a/net/smc/smc.h
-+++ b/net/smc/smc.h
-@@ -194,7 +194,7 @@ struct smc_connection {
- 	atomic_t		sndbuf_space;	/* remaining space in sndbuf */
- 	u16			tx_cdc_seq;	/* sequence # for CDC send */
- 	u16			tx_cdc_seq_fin;	/* sequence # - tx completed */
--	spinlock_t		send_lock;	/* protect wr_sends */
-+	struct mutex		send_lock;	/* protect wr_sends */
- 	atomic_t		cdc_pend_tx_wr; /* number of pending tx CDC wqe
- 						 * - inc when post wqe,
- 						 * - dec on polled tx cqe
-diff --git a/net/smc/smc_cdc.c b/net/smc/smc_cdc.c
-index 3c06625ceb20..f8ad0035905a 100644
---- a/net/smc/smc_cdc.c
-+++ b/net/smc/smc_cdc.c
-@@ -186,10 +186,10 @@ static int smcr_cdc_get_slot_and_msg_send(struct smc_connection *conn)
- 	if (rc)
- 		goto put_out;
- 
--	spin_lock_bh(&conn->send_lock);
-+	mutex_lock(&conn->send_lock);
- 	if (link != conn->lnk) {
- 		/* link of connection changed, try again one time*/
--		spin_unlock_bh(&conn->send_lock);
-+		mutex_unlock(&conn->send_lock);
- 		smc_wr_tx_put_slot(link,
- 				   (struct smc_wr_tx_pend_priv *)pend);
- 		smc_wr_tx_link_put(link);
-@@ -199,7 +199,7 @@ static int smcr_cdc_get_slot_and_msg_send(struct smc_connection *conn)
- 		goto again;
+diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+index c22d1118a133..2a1892b7b8d3 100644
+--- a/drivers/net/virtio_net.c
++++ b/drivers/net/virtio_net.c
+@@ -4621,6 +4621,60 @@ static void virtnet_set_big_packets(struct virtnet_info *vi, const int mtu)
  	}
- 	rc = smc_cdc_msg_send(conn, wr_buf, pend);
--	spin_unlock_bh(&conn->send_lock);
-+	mutex_unlock(&conn->send_lock);
- put_out:
- 	smc_wr_tx_link_put(link);
- 	return rc;
-@@ -214,9 +214,9 @@ int smc_cdc_get_slot_and_msg_send(struct smc_connection *conn)
- 		return -EPIPE;
- 
- 	if (conn->lgr->is_smcd) {
--		spin_lock_bh(&conn->send_lock);
-+		mutex_lock(&conn->send_lock);
- 		rc = smcd_cdc_msg_send(conn);
--		spin_unlock_bh(&conn->send_lock);
-+		mutex_unlock(&conn->send_lock);
- 	} else {
- 		rc = smcr_cdc_get_slot_and_msg_send(conn);
- 	}
-@@ -308,10 +308,10 @@ static void smc_cdc_msg_validate(struct smc_sock *smc, struct smc_cdc_msg *cdc,
- 	if (diff < 0) { /* diff larger than 0x7fff */
- 		/* drop connection */
- 		conn->out_of_sync = 1;	/* prevent any further receives */
--		spin_lock_bh(&conn->send_lock);
-+		mutex_lock(&conn->send_lock);
- 		conn->local_tx_ctrl.conn_state_flags.peer_conn_abort = 1;
- 		conn->lnk = link;
--		spin_unlock_bh(&conn->send_lock);
-+		mutex_unlock(&conn->send_lock);
- 		sock_hold(&smc->sk); /* sock_put in abort_work */
- 		if (!queue_work(smc_close_wq, &conn->abort_work))
- 			sock_put(&smc->sk);
-diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-index 9b84d5897aa5..21e0d95ab8c8 100644
---- a/net/smc/smc_core.c
-+++ b/net/smc/smc_core.c
-@@ -1083,9 +1083,9 @@ struct smc_link *smc_switch_conns(struct smc_link_group *lgr,
- 		    smc->sk.sk_state == SMC_PEERFINCLOSEWAIT ||
- 		    smc->sk.sk_state == SMC_PEERABORTWAIT ||
- 		    smc->sk.sk_state == SMC_PROCESSABORT) {
--			spin_lock_bh(&conn->send_lock);
-+			mutex_lock(&conn->send_lock);
- 			smc_switch_link_and_count(conn, to_lnk);
--			spin_unlock_bh(&conn->send_lock);
-+			mutex_unlock(&conn->send_lock);
- 			continue;
- 		}
- 		sock_hold(&smc->sk);
-@@ -1095,10 +1095,10 @@ struct smc_link *smc_switch_conns(struct smc_link_group *lgr,
- 		if (rc)
- 			goto err_out;
- 		/* avoid race with smcr_tx_sndbuf_nonempty() */
--		spin_lock_bh(&conn->send_lock);
-+		mutex_lock(&conn->send_lock);
- 		smc_switch_link_and_count(conn, to_lnk);
- 		rc = smc_switch_cursor(smc, pend, wr_buf);
--		spin_unlock_bh(&conn->send_lock);
-+		mutex_unlock(&conn->send_lock);
- 		sock_put(&smc->sk);
- 		if (rc)
- 			goto err_out;
-diff --git a/net/smc/smc_tx.c b/net/smc/smc_tx.c
-index 214ac3cbcf9a..b6790bd82b4e 100644
---- a/net/smc/smc_tx.c
-+++ b/net/smc/smc_tx.c
-@@ -573,7 +573,7 @@ static int smcr_tx_sndbuf_nonempty(struct smc_connection *conn)
- 		return rc;
- 	}
- 
--	spin_lock_bh(&conn->send_lock);
-+	mutex_lock(&conn->send_lock);
- 	if (link != conn->lnk) {
- 		/* link of connection changed, tx_work will restart */
- 		smc_wr_tx_put_slot(link,
-@@ -597,7 +597,7 @@ static int smcr_tx_sndbuf_nonempty(struct smc_connection *conn)
- 	}
- 
- out_unlock:
--	spin_unlock_bh(&conn->send_lock);
-+	mutex_unlock(&conn->send_lock);
- 	smc_wr_tx_link_put(link);
- 	return rc;
- }
-@@ -607,7 +607,7 @@ static int smcd_tx_sndbuf_nonempty(struct smc_connection *conn)
- 	struct smc_cdc_producer_flags *pflags = &conn->local_tx_ctrl.prod_flags;
- 	int rc = 0;
- 
--	spin_lock_bh(&conn->send_lock);
-+	mutex_lock(&conn->send_lock);
- 	if (!pflags->urg_data_present)
- 		rc = smc_tx_rdma_writes(conn, NULL);
- 	if (!rc)
-@@ -617,7 +617,7 @@ static int smcd_tx_sndbuf_nonempty(struct smc_connection *conn)
- 		pflags->urg_data_pending = 0;
- 		pflags->urg_data_present = 0;
- 	}
--	spin_unlock_bh(&conn->send_lock);
-+	mutex_unlock(&conn->send_lock);
- 	return rc;
  }
  
++static int virtnet_xdp_rx_hash(const struct xdp_md *_ctx, u32 *hash,
++			       enum xdp_rss_hash_type *rss_type)
++{
++	const struct xdp_buff *xdp = (void *)_ctx;
++	struct virtio_net_hdr_v1_hash *hdr_hash;
++	struct virtnet_info *vi;
++
++	if (!(xdp->rxq->dev->features & NETIF_F_RXHASH))
++		return -ENODATA;
++
++	vi = netdev_priv(xdp->rxq->dev);
++	hdr_hash = (struct virtio_net_hdr_v1_hash *)(xdp->data - vi->hdr_len);
++
++	switch (__le16_to_cpu(hdr_hash->hash_report)) {
++	case VIRTIO_NET_HASH_REPORT_TCPv4:
++		*rss_type = XDP_RSS_TYPE_L4_IPV4_TCP;
++		break;
++	case VIRTIO_NET_HASH_REPORT_UDPv4:
++		*rss_type = XDP_RSS_TYPE_L4_IPV4_UDP;
++		break;
++	case VIRTIO_NET_HASH_REPORT_TCPv6:
++		*rss_type = XDP_RSS_TYPE_L4_IPV6_TCP;
++		break;
++	case VIRTIO_NET_HASH_REPORT_UDPv6:
++		*rss_type = XDP_RSS_TYPE_L4_IPV6_UDP;
++		break;
++	case VIRTIO_NET_HASH_REPORT_TCPv6_EX:
++		*rss_type = XDP_RSS_TYPE_L4_IPV6_TCP_EX;
++		break;
++	case VIRTIO_NET_HASH_REPORT_UDPv6_EX:
++		*rss_type = XDP_RSS_TYPE_L4_IPV6_UDP_EX;
++		break;
++	case VIRTIO_NET_HASH_REPORT_IPv4:
++		*rss_type = XDP_RSS_TYPE_L3_IPV4;
++		break;
++	case VIRTIO_NET_HASH_REPORT_IPv6:
++		*rss_type = XDP_RSS_TYPE_L3_IPV6;
++		break;
++	case VIRTIO_NET_HASH_REPORT_IPv6_EX:
++		*rss_type = XDP_RSS_TYPE_L3_IPV6_EX;
++		break;
++	case VIRTIO_NET_HASH_REPORT_NONE:
++	default:
++		*rss_type = XDP_RSS_TYPE_NONE;
++	}
++
++	*hash = __le32_to_cpu(hdr_hash->hash_value);
++	return 0;
++}
++
++static const struct xdp_metadata_ops virtnet_xdp_metadata_ops = {
++	.xmo_rx_hash			= virtnet_xdp_rx_hash,
++};
++
+ static int virtnet_probe(struct virtio_device *vdev)
+ {
+ 	int i, err = -ENOMEM;
+@@ -4747,6 +4801,7 @@ static int virtnet_probe(struct virtio_device *vdev)
+ 				  VIRTIO_NET_RSS_HASH_TYPE_UDP_EX);
+ 
+ 		dev->hw_features |= NETIF_F_RXHASH;
++		dev->xdp_metadata_ops = &virtnet_xdp_metadata_ops;
+ 	}
+ 
+ 	if (vi->has_rss_hash_report)
 -- 
-2.34.1
+2.40.1
 
 
