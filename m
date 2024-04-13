@@ -1,262 +1,345 @@
-Return-Path: <netdev+bounces-87567-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87568-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8DFD8A3A18
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 03:26:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A1438A3A1B
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 03:26:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0BAFAB20EA6
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 01:26:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF8BDB221F2
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 01:26:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26D54A33;
-	Sat, 13 Apr 2024 01:25:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A7694C83;
+	Sat, 13 Apr 2024 01:26:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="A+VnxO1n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BoHyJJTt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5F017C68
-	for <netdev@vger.kernel.org>; Sat, 13 Apr 2024 01:25:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C58468E;
+	Sat, 13 Apr 2024 01:26:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712971557; cv=none; b=bKKPyqKdEO8gyDYxQpcwe9wEnvh6tOQ+etgMRCeFJ6ylCEpIEGvHZHOj5KabzHiLFYxDfvyPxB3vgZrcnVqb+JAoIev1P+/V1mjz6E+1SNPG1sNJWzV3srXIpVjfJBqkR9EA2W62VWWkhgVYYttK8xxmmra92xtYHeUznAM3EQ0=
+	t=1712971597; cv=none; b=qbe4IfiJi2n335s5AJG2TrZmWELzqwgOpaeLTe/5ZbQsi/U+ryzBm/hmJy/xc1nhFXcPYDhoqoZ50xfYrk5Jg9EJxxsEx8mj8gzc3CQKDvKdtfrZUM0dtFY6BqNzumrw/n8DOpaJ6245vXzr7Q7fN43IDDqvNcKozmX416Kvth4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712971557; c=relaxed/simple;
-	bh=nLEgaK4nVCnQWZVFmuVrMyyzF+oAJDNMKVwDrfL3fBQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RZfxskAZiA2d9cO+gFm4HG56IglogwyCQZzJ2LHkfhaooSQssUd6uHhvMMTA7SU51wz5PF6imQXni7bJM+PqkEtIZOMDV1j9ZMPH8SpIDQh5V7rAPULH9E6xn2Y1euUcw4GIVbkXKsfgBnWZVJjsi/n+b48sjTwn8PbR+RxAPGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=A+VnxO1n; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1712971597; c=relaxed/simple;
+	bh=Vm9DqjCjmTX6BXArJWwBkrWkiA7TbixehLaIIiclEsI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XucRZK0CcC5/3RIvlPhgWkiaunrjfTW0MUyXJFcgGY9EVz5/YxaWzBo0GDzLe4pNjUKfejyfty4hNcXSj52nokR8SkCz1FFw6AxNNZmTl5IuAZNtGeFkkX1MH3JNkhngNn7kYOZQwmmZZD9b/ztk2Z9isNCenxTZaS5VTP9OQPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BoHyJJTt; arc=none smtp.client-ip=209.85.161.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5a49261093cso774076eaf.3;
+        Fri, 12 Apr 2024 18:26:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1712971556; x=1744507556;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=rw/yxkM2MHnlmCxVNO4N010i4b27pLReASIUKGMRRBM=;
-  b=A+VnxO1nIrR7C7UUAhe3+xCyjckvFFgsrkMTd+gYNJXgChdtwFoCQ1I8
-   gDwF5bBBsa3LjJJSllpG62Mj0QzdG+n9CMJT0CO5Pl1I3NZVXRer/MkGx
-   AAvHTqPaYEPlaypQBCyBDjOWijOLfLNZxRHlL8LCJ0WNj/FJOQtj6a8U0
-   c=;
-X-IronPort-AV: E=Sophos;i="6.07,197,1708387200"; 
-   d="scan'208";a="626181665"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2024 01:25:53 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:15570]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.40:2525] with esmtp (Farcaster)
- id e956ca2d-0c18-4fa8-877b-d57dd6ed16da; Sat, 13 Apr 2024 01:25:52 +0000 (UTC)
-X-Farcaster-Flow-ID: e956ca2d-0c18-4fa8-877b-d57dd6ed16da
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Sat, 13 Apr 2024 01:25:51 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.23) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Sat, 13 Apr 2024 01:25:49 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <krisman@suse.de>
-CC: <davem@davemloft.net>, <kuniyu@amazon.com>, <lmb@isovalent.com>,
-	<martin.lau@kernel.org>, <netdev@vger.kernel.org>,
-	<willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH v3] udp: Avoid call to compute_score on multiple sites
-Date: Fri, 12 Apr 2024 18:25:39 -0700
-Message-ID: <20240413012539.16180-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240412212004.17181-1-krisman@suse.de>
-References: <20240412212004.17181-1-krisman@suse.de>
+        d=gmail.com; s=20230601; t=1712971595; x=1713576395; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=1JeXs1AA0JJFHBf8znYI013aMTNwp/ncBp3e1OQ2DT0=;
+        b=BoHyJJTtP8cirRQmYF5bI3Hg1vIfhKOpkGnB6Z0xNvfA9msRutaTbkB+8qwCMd3qQy
+         zDfz9R1bq2zbw+cbJkDEFzfXBf2AgNGu016liP5AH0JW4ppnwyo1+E2d4JqKndcml6pq
+         VXsGqkOcuQaLJbu215JtTfsw2EHjy3cHVjB2EjKrL3WULhaLrhMBr+M+532Ae3a7yjYq
+         SbagA5nGHy21ugUOh4ZQIDRvUjBhe/BjHswHJDKPnqqGf6mnlO5Dp/2waopYuX1zUZ9R
+         dOt37ifn4B+/ObNsokUlmY/YA4UM3jHOnEE9hYil4tJS7aAKd/TQNECvM4BBiMwv0wXk
+         3Y0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712971595; x=1713576395;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1JeXs1AA0JJFHBf8znYI013aMTNwp/ncBp3e1OQ2DT0=;
+        b=jYncKn4qN29IOYEp8z+lj+DcfKJv/6MX3KUJFQ9T+Hwkba1CIFHmdqzIynllMPCpN/
+         /OZDSgiofaZnjgQYpE7au44b4PKalXlD0MWSkWDk2D4wgKH5FF/5/6sYfTyWPRehFGIG
+         usY2kHkp7khSA7aNN/sRTJboktdpOpdiawz5CBborkk9gv377PhxBVW4a2aFJGOAnOsa
+         3stKAYbCI/ATpSaQdCz0jkJ4X/6ktQtOLiTho3udUruijTqtsUWif86BLCYdfmjUktQt
+         xwqLWgn0HWbIZ13/hyAV/wCmKZ9V5TzyntCpdDGyyuWCstyMsaqzAwrY4TzMywq/7G2T
+         AIXQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW7eIH9pI2ygVpkYf2lCEc4yL/kjo4UBG8Kq7m0n9muAEX/twFJDCo88p8kFatrm8t50ZzpXE+KlPl3eDDI0wnnn+ljEnR5sB7brZdgLzFmz/YdxubUQGdoiq75
+X-Gm-Message-State: AOJu0YwBXhf6QcYIawBLJH4FPYvkAtuffDVB4J8I4O/uDNc8uxtZyelh
+	a1Uh9zjJ/GDWdd9JBn99h7MQ9QdnQU8F2p5WIFJxFX9dMKANcAFo
+X-Google-Smtp-Source: AGHT+IHbgERyXUjCTNpNGn458G7MEcHoR52bQhLuU1xXm38vbdBRZxEYx9yIpn9ViMgTs+7MdgJnCg==
+X-Received: by 2002:a05:6808:6383:b0:3c5:f0c1:f35a with SMTP id ec3-20020a056808638300b003c5f0c1f35amr5168770oib.27.1712971594772;
+        Fri, 12 Apr 2024 18:26:34 -0700 (PDT)
+Received: from ?IPV6:2600:1700:6cf8:1240:a1a1:7d97:cada:fa46? ([2600:1700:6cf8:1240:a1a1:7d97:cada:fa46])
+        by smtp.gmail.com with ESMTPSA id n26-20020a0568080a1a00b003c6f8cdce92sm301717oij.13.2024.04.12.18.26.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Apr 2024 18:26:34 -0700 (PDT)
+Message-ID: <2f5b9a1f-ddbd-43c0-93e1-aca09552ef6b@gmail.com>
+Date: Fri, 12 Apr 2024 18:26:32 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWA003.ant.amazon.com (10.13.139.47) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 bpf-next 2/6] selftests/bpf: Implement socket kfuncs
+ for bpf_testmod
+To: Jordan Rife <jrife@google.com>, bpf@vger.kernel.org
+Cc: linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Shuah Khan <shuah@kernel.org>, Kui-Feng Lee <thinker.li@gmail.com>,
+ Artem Savkov <asavkov@redhat.com>, Dave Marchevsky <davemarchevsky@fb.com>,
+ Menglong Dong <imagedong@tencent.com>, Daniel Xu <dxu@dxuuu.xyz>,
+ David Vernet <void@manifault.com>, Daan De Meyer <daan.j.demeyer@gmail.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+References: <20240412165230.2009746-1-jrife@google.com>
+ <20240412165230.2009746-3-jrife@google.com>
+Content-Language: en-US
+From: Kui-Feng Lee <sinquersw@gmail.com>
+In-Reply-To: <20240412165230.2009746-3-jrife@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Gabriel Krisman Bertazi <krisman@suse.de>
-Date: Fri, 12 Apr 2024 17:20:04 -0400
-> We've observed a 7-12% performance regression in iperf3 UDP ipv4 and
-> ipv6 tests with multiple sockets on Zen3 cpus, which we traced back to
-> commit f0ea27e7bfe1 ("udp: re-score reuseport groups when connected
-> sockets are present").  The failing tests were those that would spawn
-> UDP sockets per-cpu on systems that have a high number of cpus.
-> 
-> Unsurprisingly, it is not caused by the extra re-scoring of the reused
-> socket, but due to the compiler no longer inlining compute_score, once
-> it has the extra call site in udp4_lib_lookup2.  This is augmented by
-> the "Safe RET" mitigation for SRSO, needed in our Zen3 cpus.
-> 
-> We could just explicitly inline it, but compute_score() is quite a large
-> function, around 300b.  Inlining in two sites would almost double
-> udp4_lib_lookup2, which is a silly thing to do just to workaround a
-> mitigation.  Instead, this patch shuffles the code a bit to avoid the
-> multiple calls to compute_score.  Since it is a static function used in
-> one spot, the compiler can safely fold it in, as it did before, without
-> increasing the text size.
-> 
-> With this patch applied I ran my original iperf3 testcases.  The failing
-> cases all looked like this (ipv4):
-> 	iperf3 -c 127.0.0.1 --udp -4 -f K -b $R -l 8920 -t 30 -i 5 -P 64 -O 2
-> 
-> where $R is either 1G/10G/0 (max, unlimited).  I ran 3 times each.
-> baseline is v6.9-rc3. harmean == harmonic mean; CV == coefficient of
-> variation.
-> 
-> ipv4:
->                  1G                10G                  MAX
-> 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
-> baseline 1743852.66(0.0208) 1725933.02(0.0167) 1705203.78(0.0386)
-> patched  1968727.61(0.0035) 1962283.22(0.0195) 1923853.50(0.0256)
-> 
-> ipv6:
->                  1G                10G                  MAX
-> 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
-> baseline 1729020.03(0.0028) 1691704.49(0.0243) 1692251.34(0.0083)
-> patched  1900422.19(0.0067) 1900968.01(0.0067) 1568532.72(0.1519)
-> 
-> This restores the performance we had before the change above with this
-> benchmark.  We obviously don't expect any real impact when mitigations
-> are disabled, but just to be sure it also doesn't regresses:
-> 
-> mitigations=off ipv4:
->                  1G                10G                  MAX
-> 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
-> baseline 3230279.97(0.0066) 3229320.91(0.0060) 2605693.19(0.0697)
-> patched  3242802.36(0.0073) 3239310.71(0.0035) 2502427.19(0.0882)
-> 
-> Cc: Lorenz Bauer <lmb@isovalent.com>
-> Fixes: f0ea27e7bfe1 ("udp: re-score reuseport groups when connected sockets are present")
-> Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Thanks!
-
+On 4/12/24 09:52, Jordan Rife wrote:
+> This patch adds a set of kfuncs to bpf_testmod that can be used to
+> manipulate a socket from kernel space.
 > 
+> Signed-off-by: Jordan Rife <jrife@google.com>
 > ---
-> Changes since v2:
-> (me)
->   - recollected performance data after changes below only for the
->   mitigations=auto case.
-> (suggested by Willem de Bruijn)
->   - Explicitly continue the loop after a rescore
->   - rename rescore variable to not clash with jump label
->   - disable rescore for new loop iteration
-> (suggested by Kuniyuki Iwashima)
->   - sort stack variables
->   - drop unneeded ()
+>   .../selftests/bpf/bpf_testmod/bpf_testmod.c   | 139 ++++++++++++++++++
+>   .../bpf/bpf_testmod/bpf_testmod_kfunc.h       |  27 ++++
+>   2 files changed, 166 insertions(+)
 > 
-> Changes since v1:
-> (me)
->   - recollected performance data after changes below only for the
->   mitigations enabled case.
-> (suggested by Willem de Bruijn)
->   - Drop __always_inline in compute_score
->   - Simplify logic by replacing third struct sock pointer with bool
->   - Fix typo in commit message
->   - Don't explicitly break out of loop after rescore
-> ---
->  net/ipv4/udp.c | 21 ++++++++++++++++-----
->  net/ipv6/udp.c | 20 ++++++++++++++++----
->  2 files changed, 32 insertions(+), 9 deletions(-)
-> 
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index c02bf011d4a6..4eff1e145c63 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -427,15 +427,21 @@ static struct sock *udp4_lib_lookup2(struct net *net,
->  {
->  	struct sock *sk, *result;
->  	int score, badness;
-> +	bool need_rescore;
->  
->  	result = NULL;
->  	badness = 0;
->  	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
-> -		score = compute_score(sk, net, saddr, sport,
-> -				      daddr, hnum, dif, sdif);
-> +		need_rescore = false;
-> +rescore:
-> +		score = compute_score(need_rescore ? result : sk, net, saddr,
-> +				      sport, daddr, hnum, dif, sdif);
->  		if (score > badness) {
->  			badness = score;
->  
-> +			if (need_rescore)
-> +				continue;
+> diff --git a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
+> index 39ad96a18123f..663df8148097e 100644
+> --- a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
+> +++ b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
+> @@ -10,18 +10,29 @@
+>   #include <linux/percpu-defs.h>
+>   #include <linux/sysfs.h>
+>   #include <linux/tracepoint.h>
+> +#include <linux/net.h>
+> +#include <linux/socket.h>
+> +#include <linux/nsproxy.h>
+> +#include <linux/inet.h>
+> +#include <linux/in.h>
+> +#include <linux/in6.h>
+> +#include <linux/un.h>
+> +#include <net/sock.h>
+>   #include "bpf_testmod.h"
+>   #include "bpf_testmod_kfunc.h"
+>   
+>   #define CREATE_TRACE_POINTS
+>   #include "bpf_testmod-events.h"
+>   
+> +#define CONNECT_TIMEOUT_SEC 1
 > +
->  			if (sk->sk_state == TCP_ESTABLISHED) {
->  				result = sk;
->  				continue;
-> @@ -456,9 +462,14 @@ static struct sock *udp4_lib_lookup2(struct net *net,
->  			if (IS_ERR(result))
->  				continue;
->  
-> -			badness = compute_score(result, net, saddr, sport,
-> -						daddr, hnum, dif, sdif);
-> -
-> +			/* compute_score is too long of a function to be
-> +			 * inlined, and calling it again here yields
-> +			 * measureable overhead for some
-> +			 * workloads. Work around it by jumping
-> +			 * backwards to rescore 'result'.
-> +			 */
-> +			need_rescore = true;
-> +			goto rescore;
->  		}
->  	}
->  	return result;
-> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-> index 8b1dd7f51249..e80e8b1d2000 100644
-> --- a/net/ipv6/udp.c
-> +++ b/net/ipv6/udp.c
-> @@ -168,15 +168,21 @@ static struct sock *udp6_lib_lookup2(struct net *net,
->  {
->  	struct sock *sk, *result;
->  	int score, badness;
-> +	bool need_rescore;
->  
->  	result = NULL;
->  	badness = -1;
->  	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
-> -		score = compute_score(sk, net, saddr, sport,
-> -				      daddr, hnum, dif, sdif);
-> +		need_rescore = false;
-> +rescore:
-> +		score = compute_score(need_rescore ? result : sk, net, saddr,
-> +				      sport, daddr, hnum, dif, sdif);
->  		if (score > badness) {
->  			badness = score;
->  
-> +			if (need_rescore)
-> +				continue;
+>   typedef int (*func_proto_typedef)(long);
+>   typedef int (*func_proto_typedef_nested1)(func_proto_typedef);
+>   typedef int (*func_proto_typedef_nested2)(func_proto_typedef_nested1);
+>   
+>   DEFINE_PER_CPU(int, bpf_testmod_ksym_percpu) = 123;
+>   long bpf_testmod_test_struct_arg_result;
+> +static struct socket *sock;
+>   
+>   struct bpf_testmod_struct_arg_1 {
+>   	int a;
+> @@ -494,6 +505,124 @@ __bpf_kfunc static u32 bpf_kfunc_call_test_static_unused_arg(u32 arg, u32 unused
+>   	return arg;
+>   }
+>   
+> +__bpf_kfunc int bpf_kfunc_init_sock(struct init_sock_args *args)
+> +{
+> +	int proto;
 > +
->  			if (sk->sk_state == TCP_ESTABLISHED) {
->  				result = sk;
->  				continue;
-> @@ -197,8 +203,14 @@ static struct sock *udp6_lib_lookup2(struct net *net,
->  			if (IS_ERR(result))
->  				continue;
->  
-> -			badness = compute_score(sk, net, saddr, sport,
-> -						daddr, hnum, dif, sdif);
-> +			/* compute_score is too long of a function to be
-> +			 * inlined, and calling it again here yields
-> +			 * measureable overhead for some
-> +			 * workloads. Work around it by jumping
-> +			 * backwards to rescore 'result'.
-> +			 */
-> +			need_rescore = true;
-> +			goto rescore;
->  		}
->  	}
->  	return result;
-> -- 
-> 2.44.0
+> +	if (sock)
+> +		pr_warn("%s called without releasing old sock", __func__);
+> +
+> +	switch (args->af) {
+> +	case AF_INET:
+> +	case AF_INET6:
+> +		proto = args->type == SOCK_STREAM ? IPPROTO_TCP : IPPROTO_UDP;
+> +		break;
+> +	case AF_UNIX:
+> +		proto = PF_UNIX;
+> +		break;
+> +	default:
+> +		pr_err("invalid address family %d\n", args->af);
+> +		return -EINVAL;
+> +	}
+> +
+> +	return sock_create_kern(&init_net, args->af, args->type, proto, &sock);
+> +}
+> +
+> +__bpf_kfunc void bpf_kfunc_close_sock(void)
+> +{
+> +	if (sock) {
+> +		sock_release(sock);
+> +		sock = NULL;
+> +	}
+> +}
+> +
+> +__bpf_kfunc int bpf_kfunc_call_kernel_connect(struct addr_args *args)
+> +{
+> +	/* Set timeout for call to kernel_connect() to prevent it from hanging,
+> +	 * and consider the connection attempt failed if it returns
+> +	 * -EINPROGRESS.
+> +	 */
+> +	sock->sk->sk_sndtimeo = CONNECT_TIMEOUT_SEC * HZ;
+> +
+> +	return kernel_connect(sock, (struct sockaddr *)&args->addr,
+> +			      args->addrlen, 0);
+> +}
+> +
+> +__bpf_kfunc int bpf_kfunc_call_kernel_bind(struct addr_args *args)
+> +{
+> +	return kernel_bind(sock, (struct sockaddr *)&args->addr, args->addrlen);
+> +}
+> +
+> +__bpf_kfunc int bpf_kfunc_call_kernel_listen(void)
+> +{
+> +	return kernel_listen(sock, 128);
+> +}
+> +
+> +__bpf_kfunc int bpf_kfunc_call_kernel_sendmsg(struct sendmsg_args *args)
+> +{
+> +	struct msghdr msg = {
+> +		.msg_name	= &args->addr.addr,
+> +		.msg_namelen	= args->addr.addrlen,
+> +	};
+> +	struct kvec iov;
+> +	int err;
+> +
+> +	iov.iov_base = args->msg;
+> +	iov.iov_len  = args->msglen;
+
+It would be better to check if args->msglen > sizeof(arg->msg) although
+this function is just for test cases. Same for args->addr.addrlen.
+
+> +
+> +	err = kernel_sendmsg(sock, &msg, &iov, 1, args->msglen);
+> +	args->addr.addrlen = msg.msg_namelen;
+> +
+> +	return err;
+> +}
+> +
+> +__bpf_kfunc int bpf_kfunc_call_sock_sendmsg(struct sendmsg_args *args)
+> +{
+> +	struct msghdr msg = {
+> +		.msg_name	= &args->addr.addr,
+> +		.msg_namelen	= args->addr.addrlen,
+> +	};
+> +	struct kvec iov;
+> +	int err;
+> +
+> +	iov.iov_base = args->msg;
+> +	iov.iov_len  = args->msglen;
+> +
+> +	iov_iter_kvec(&msg.msg_iter, ITER_SOURCE, &iov, 1, args->msglen);
+> +	err = sock_sendmsg(sock, &msg);
+> +	args->addr.addrlen = msg.msg_namelen;
+> +
+> +	return err;
+> +}
+> +
+> +__bpf_kfunc int bpf_kfunc_call_kernel_getsockname(struct addr_args *args)
+> +{
+> +	int err;
+> +
+> +	err = kernel_getsockname(sock, (struct sockaddr *)&args->addr);
+> +	if (err < 0)
+> +		goto out;
+> +
+> +	args->addrlen = err;
+> +	err = 0;
+> +out:
+> +	return err;
+> +}
+> +
+> +__bpf_kfunc int bpf_kfunc_call_kernel_getpeername(struct addr_args *args)
+> +{
+> +	int err;
+> +
+> +	err = kernel_getpeername(sock, (struct sockaddr *)&args->addr);
+> +	if (err < 0)
+> +		goto out;
+> +
+> +	args->addrlen = err;
+> +	err = 0;
+> +out:
+> +	return err;
+> +}
+> +
+>   BTF_KFUNCS_START(bpf_testmod_check_kfunc_ids)
+>   BTF_ID_FLAGS(func, bpf_testmod_test_mod_kfunc)
+>   BTF_ID_FLAGS(func, bpf_kfunc_call_test1)
+> @@ -520,6 +649,15 @@ BTF_ID_FLAGS(func, bpf_kfunc_call_test_ref, KF_TRUSTED_ARGS | KF_RCU)
+>   BTF_ID_FLAGS(func, bpf_kfunc_call_test_destructive, KF_DESTRUCTIVE)
+>   BTF_ID_FLAGS(func, bpf_kfunc_call_test_static_unused_arg)
+>   BTF_ID_FLAGS(func, bpf_kfunc_call_test_offset)
+> +BTF_ID_FLAGS(func, bpf_kfunc_init_sock)
+> +BTF_ID_FLAGS(func, bpf_kfunc_close_sock)
+> +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_connect)
+> +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_bind)
+> +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_listen)
+> +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_sendmsg)
+> +BTF_ID_FLAGS(func, bpf_kfunc_call_sock_sendmsg)
+> +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_getsockname)
+> +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_getpeername)
+>   BTF_KFUNCS_END(bpf_testmod_check_kfunc_ids)
+>   
+>   static int bpf_testmod_ops_init(struct btf *btf)
+> @@ -650,6 +788,7 @@ static int bpf_testmod_init(void)
+>   		return ret;
+>   	if (bpf_fentry_test1(0) < 0)
+>   		return -EINVAL;
+> +	sock = NULL;
+>   	return sysfs_create_bin_file(kernel_kobj, &bin_attr_bpf_testmod_file);
+>   }
+>   
+> diff --git a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod_kfunc.h b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod_kfunc.h
+> index 7c664dd610597..cdf7769a7d8ca 100644
+> --- a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod_kfunc.h
+> +++ b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod_kfunc.h
+> @@ -64,6 +64,22 @@ struct prog_test_fail3 {
+>   	char arr2[];
+>   };
+>   
+> +struct init_sock_args {
+> +	int af;
+> +	int type;
+> +};
+> +
+> +struct addr_args {
+> +	char addr[sizeof(struct __kernel_sockaddr_storage)];
+> +	int addrlen;
+> +};
+> +
+> +struct sendmsg_args {
+> +	struct addr_args addr;
+> +	char msg[10];
+> +	int msglen;
+> +};
+> +
+>   struct prog_test_ref_kfunc *
+>   bpf_kfunc_call_test_acquire(unsigned long *scalar_ptr) __ksym;
+>   void bpf_kfunc_call_test_release(struct prog_test_ref_kfunc *p) __ksym;
+> @@ -106,4 +122,15 @@ void bpf_kfunc_call_test_fail3(struct prog_test_fail3 *p);
+>   void bpf_kfunc_call_test_mem_len_fail1(void *mem, int len);
+>   
+>   void bpf_kfunc_common_test(void) __ksym;
+> +
+> +int bpf_kfunc_init_sock(struct init_sock_args *args) __ksym;
+> +void bpf_kfunc_close_sock(void) __ksym;
+> +int bpf_kfunc_call_kernel_connect(struct addr_args *args) __ksym;
+> +int bpf_kfunc_call_kernel_bind(struct addr_args *args) __ksym;
+> +int bpf_kfunc_call_kernel_listen(void) __ksym;
+> +int bpf_kfunc_call_kernel_sendmsg(struct sendmsg_args *args) __ksym;
+> +int bpf_kfunc_call_sock_sendmsg(struct sendmsg_args *args) __ksym;
+> +int bpf_kfunc_call_kernel_getsockname(struct addr_args *args) __ksym;
+> +int bpf_kfunc_call_kernel_getpeername(struct addr_args *args) __ksym;
+> +
+>   #endif /* _BPF_TESTMOD_KFUNC_H */
 
