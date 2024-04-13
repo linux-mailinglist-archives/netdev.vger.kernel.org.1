@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-87622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F9278A3DC5
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 18:51:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 000D18A3DEE
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 19:17:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A84BC1C20BCD
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 16:51:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22A251C209B2
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 17:17:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 142A11DFF8;
-	Sat, 13 Apr 2024 16:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B904501F;
+	Sat, 13 Apr 2024 17:17:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pBMg+Pqx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SARZIiPL"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6ECA50A68;
-	Sat, 13 Apr 2024 16:51:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F44446AC;
+	Sat, 13 Apr 2024 17:17:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713027072; cv=none; b=OJZH8DiRlUsCxecIgzWCUXgr1df3o1M6exNKmp+2NGDVZ+mSVALt01fYWp+GdJlM2hfky+gfCJxG28gwqu41bQHe7YbA5H8oO5NGfjCPVCb7aD2OzG6Hlw0qc7XICSBrOvtduKDAY34VE6DyirJ5sboa25czYDCjGnoIKaKHHfo=
+	t=1713028637; cv=none; b=RjOGicnV3+sLvakfOhLO83LRHqmG+/6oXm87JDDrCnyH3dRnKgCuTgPUFT1OotFrkyfakqnTkRwtA2unvUKfAOyvzwVfYmTySPb7SRVoeeOvf4I6qc3HpgWzhk36WSQkTjX6tIkm1ZP8PtQXFlv1glvQUHGEVhZfd8JD5KXffbg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713027072; c=relaxed/simple;
-	bh=TtxRo7Q+c98GYd03oJuFQLr9ap0mnMqoDm4SPFjN3uA=;
+	s=arc-20240116; t=1713028637; c=relaxed/simple;
+	bh=x3rE4wBNy+tWRgVeSEAx+Gvkv7OIBsARgmY369a4gMM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SdZ+EcK5uyrI4FaMi6rx4Lg192D3U0l/m8iRpeRjEGfz45HokVHJyZYVlhmU7mg7Z0KDA4WvDLSHsDXdYsdWOIDmnKRpc9ssfHo7VYZl54fWOrVfk7s637vKcjCvNcOU7mxyXR5/evvMu3+/y+qZ1fP+k2Ci8kNe5sFghbnok5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pBMg+Pqx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1B84C113CD;
-	Sat, 13 Apr 2024 16:51:10 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=onEWCAUNbGYIsWBoZMd1aZoZEGmrvUfPk5OCnu2oNYc01jHeejYbAFP59rwEgyJP0cVJxdDbFGH1P11aYYs0TWisbRGe2j0heEY2sSqWTDpdSpD+AACrvCLbU5lIP57uYQGKomGqA/PUBwgxpGf3bo2AmWG5bFi8YARp3QuHjnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SARZIiPL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB8DCC113CE;
+	Sat, 13 Apr 2024 17:17:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713027071;
-	bh=TtxRo7Q+c98GYd03oJuFQLr9ap0mnMqoDm4SPFjN3uA=;
+	s=k20201202; t=1713028637;
+	bh=x3rE4wBNy+tWRgVeSEAx+Gvkv7OIBsARgmY369a4gMM=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=pBMg+Pqx5tsyt349jaIfAwn8WtH3VGdbg1iLRMw8Mz16ogqQwggRbr4pU81vSA1dU
-	 /1MlXPT/6HAnl7cdVC4FbTrO73s+L5uJHxEXnMxGvPtD7e2GKQVk+djhvCAt6Kh81M
-	 sMIFZX7HUDoGN1Nqc9FCWZuG+wWMMDcI65/i6fWZnBviKhupZ3LIInl1FI5qP6B71k
-	 F6iaeZeAotnLyTGJ5FQPU4PUnda45kdii+y5nGOpoTDlzNu4P6eVbw7n5Sf9NUCadD
-	 9e/AswKue1Qw3XFZGt2eC7I4wOScQAcijxZarBnHWhGeBJGPzJP8sFZJ0EE9ViQlGk
-	 ygDTNbw7p6a+g==
-Message-ID: <d69cde16-a2ce-49e5-8ea6-ac6337b0b5ed@kernel.org>
-Date: Sat, 13 Apr 2024 10:51:10 -0600
+	b=SARZIiPL6uNSJHz+Rx/Zl83zr/D0WCfMysNwO2pIQXKa9U1s4ouEOPTF/QGVXxaMU
+	 58ch8FTyQIbC7OEkIVeavKt8bU4RB7wtZTRek7j2a/18OZIqvkfG5Tl/5YQuNI2qeO
+	 diam3XqdGIJSPl4p+WSGYcawmMMwFPSyRUBBpb8SKKJWLNF/9/VvdwJzv5vt12bSfm
+	 QJEfTpDsjYiHBeV7V06MolhbxGUEwVtdD3B+TgnCsvJdBCDys4bucdSHatBeke8xe+
+	 w09tbkfb7aeyX3ODlN+k6ot/zolNTId2nBS0AjVJmv66AFkbYmyxqa95Jkzbr6xnGs
+	 Y6T3GnWvkF2uw==
+Message-ID: <cdfee62d-32fe-4796-8265-d77f678c3d78@kernel.org>
+Date: Sat, 13 Apr 2024 11:17:15 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,37 +50,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: ip6_gre: Remove generic
- .ndo_get_stats64
+Subject: Re: [RFC 0/6] implement io_uring notification (ubuf_info) stacking
 Content-Language: en-US
-To: Breno Leitao <leitao@debian.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org
-References: <20240412151928.2895993-1-leitao@debian.org>
- <20240412151928.2895993-2-leitao@debian.org>
+To: Pavel Begunkov <asml.silence@gmail.com>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, "David S . Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+References: <cover.1712923998.git.asml.silence@gmail.com>
 From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240412151928.2895993-2-leitao@debian.org>
+In-Reply-To: <cover.1712923998.git.asml.silence@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 4/12/24 9:19 AM, Breno Leitao wrote:
-> Commit 3e2f544dd8a33 ("net: get stats64 if device if driver is
-> configured") moved the callback to dev_get_tstats64() to net core, so,
-> unless the driver is doing some custom stats collection, it does not
-> need to set .ndo_get_stats64.
-> 
-> Since this driver is now relying in NETDEV_PCPU_STAT_TSTATS, then, it
-> doesn't need to set the dev_get_tstats64() generic .ndo_get_stats64
-> function pointer.
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->  net/ipv6/ip6_gre.c | 3 ---
->  1 file changed, 3 deletions(-)
-> 
+On 4/12/24 6:55 AM, Pavel Begunkov wrote:
+> io_uring allocates a ubuf_info per zerocopy send request, it's convenient
+> for the userspace but with how things are it means that every time the 
+> TCP stack has to allocate a new skb instead of amending into a previous
+> one. Unless sends are big enough, there will be lots of small skbs
+> straining the stack and dipping performance.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+The ubuf_info forces TCP segmentation at less than MTU boundaries which
+kills performance with small message sizes as TCP is forced to send
+small packets. This is an interesting solution to allow the byte stream
+to flow yet maintain the segmentation boundaries for callbacks.
 
+> 
+> The patchset implements notification, i.e. an io_uring's ubuf_info
+> extension, stacking. It tries to link ubuf_info's into a list, and
+> the entire link will be put down together once all references are
+> gone.
+> 
+> Testing with liburing/examples/send-zerocopy and another custom made
+> tool, with 4K bytes per send it improves performance ~6 times and
+> levels it with MSG_ZEROCOPY. Without the patchset it requires much
+> larger sends to utilise all potential.
+> 
+> bytes  | before | after (Kqps)  
+> 100    | 283    | 936
+> 1200   | 195    | 1023
+> 4000   | 193    | 1386
+> 8000   | 154    | 1058
+> 
+> Pavel Begunkov (6):
+>   net: extend ubuf_info callback to ops structure
+>   net: add callback for setting a ubuf_info to skb
+>   io_uring/notif: refactor io_tx_ubuf_complete()
+>   io_uring/notif: remove ctx var from io_notif_tw_complete
+>   io_uring/notif: simplify io_notif_flush()
+>   io_uring/notif: implement notification stacking
+> 
+>  drivers/net/tap.c      |  2 +-
+>  drivers/net/tun.c      |  2 +-
+>  drivers/vhost/net.c    |  8 +++-
+>  include/linux/skbuff.h | 21 ++++++----
+>  io_uring/notif.c       | 91 +++++++++++++++++++++++++++++++++++-------
+>  io_uring/notif.h       | 13 +++---
+>  net/core/skbuff.c      | 37 +++++++++++------
+>  7 files changed, 129 insertions(+), 45 deletions(-)
+> 
 
 
