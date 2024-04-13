@@ -1,86 +1,118 @@
-Return-Path: <netdev+bounces-87575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BD6E8A3A39
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 03:44:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D28398A3A3B
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 03:49:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21B051F230E6
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 01:44:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60CD21F21C53
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 01:49:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB9B217736;
-	Sat, 13 Apr 2024 01:44:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6322A95B;
+	Sat, 13 Apr 2024 01:49:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q4qtFcMa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aokWUM5k"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 905E91758B;
-	Sat, 13 Apr 2024 01:44:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B3D2F32
+	for <netdev@vger.kernel.org>; Sat, 13 Apr 2024 01:49:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712972684; cv=none; b=WfX8Hd5e4XUD4gW5PbCPrrhFeOvHeldo+Y1mCSXq9upoiOmtDMwRlZWpes2CC7oZb9NbgMHZ7RbGgvdJj/jcXGs8Hbzdhtc91rwHFYU60flrIjOBtFbaWTKP2oOwxLdwt01yh55axM29CgNDgul1dj+kmVQaTvgVGEOOR03WnRU=
+	t=1712972981; cv=none; b=u+USLyGeIQZMKrfmh2RKNAVJ0dR6FO3P1tbeXMrT0edL8Avo/edkvVu9ouW44/eBuoS/dr0Y6v7CJqoR3EdpLvADA8cQm3rrerO4r984qlto2IwM9OB56D49tq12oMHMQ/aPONFkqUH0KlJ+UBYiIos7c3KPxrzy5Wh3BpdlBjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712972684; c=relaxed/simple;
-	bh=sGErZXyr/YdrYfCuD5psfBudy0tjfQVP+V5GzMrYuk8=;
+	s=arc-20240116; t=1712972981; c=relaxed/simple;
+	bh=zjiEwIGjJUYHWO7zNL0UZxudPeYSdpy2KGnIY81YnCU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u2+30cjSnD5FwPUmil4Cn/ci0XkLqvhuo4nLQlY438WXIJc9cqcOXE0wOiqtBOm65qyHrRs/W/yLiYWK/MmVhmlSGkT8WAy6QmKV9jRKgHX4O8HmvrTvFZamL55aWb5VEhE0pfCnwbY1sTXOqScxk0de2TqlTPpwwLGwMACUOZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q4qtFcMa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3191C113CC;
-	Sat, 13 Apr 2024 01:44:43 +0000 (UTC)
+	 MIME-Version:Content-Type; b=C9sUeK9YtcvaZ11pjCRGbWa41vv1p8x6gnk5EMq+WQ9tEuOnogPk9l071zdDjG23PwLG9Iic+P4SbeZwsDKFcV7PsIfx7zqPkcR9NixHIt9KS+paD8NuUkUH0JMn3XlX4HECBNxpRNhCvWoPcQpu8aBUesRWYU70blmdxxxoK1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aokWUM5k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86869C113CC;
+	Sat, 13 Apr 2024 01:49:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712972684;
-	bh=sGErZXyr/YdrYfCuD5psfBudy0tjfQVP+V5GzMrYuk8=;
+	s=k20201202; t=1712972981;
+	bh=zjiEwIGjJUYHWO7zNL0UZxudPeYSdpy2KGnIY81YnCU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q4qtFcMacjqD98Dkv4BFueEEQ1M5YqRHiDswvRgAkd7QUNYmC8SoKE+cVZzRl1g5+
-	 xLcULigzqPGMxkgHR++YfSH0PElXc2JrueYkeZPX8oH+Nz695Nx/IQH6IOR5tEEU+L
-	 kA7wmUIO2NKaCsS7ijiYPoz0kt1px2m4o1KpxhNro1ysrW0FOZd6RQrgP2KfwHQ9lO
-	 +BLKcclvEb71FjKFlgyHEy/nVcDT4gWF+HZblXn3pkgtwzeivbntFY76sX2+LYkRET
-	 4cqCjrWeGhUDEs0TccvElWYtZBDUNcs1ZZjSvs+WLdS7YyD8XJaDjoqzfg1rVffjOV
-	 iN/mzkpTo0kqg==
-Date: Fri, 12 Apr 2024 18:44:42 -0700
+	b=aokWUM5kCnrSDX0m9QgCmY1YEPV7sgD8bRQSpnljz+YhvZNxnh+dbDb41hRO6RjyR
+	 YW9TtfwlFIdpr10zDGjmk4jBD5dMOTG4vy2NFiuQiwi+G8AsaO8nr/kE62p/4iXXzH
+	 y9Ab7pojSdawO4SiNDJbXS2/C0xcM5/IOTTtJTaMLeE9tqqgLmFWA+XTJZpw9kIbvJ
+	 x9uYz++sI7Y4G5QtwORxCF036fewocnlFKtMVPRE+IbGBfOenHro+uVx9dNYQm7qtY
+	 jn21IUtY1d/GZVs5GZLpsKeSjcq1JgU304xBCk5MghHbdfF3Bm7xpZpv2g8klHP35C
+	 ED3L9s2+Q7Hnw==
+Date: Fri, 12 Apr 2024 18:49:39 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Sunil Kovvuri Goutham <sgoutham@marvell.com>
-Cc: Hariprasad Kelam <hkelam@marvell.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "davem@davemloft.net"
- <davem@davemloft.net>, Geethasowjanya Akula <gakula@marvell.com>, Jerin
- Jacob <jerinj@marvell.com>, Linu Cherian <lcherian@marvell.com>, Subbaraya
- Sundeep Bhatta <sbhatta@marvell.com>, Naveen Mamindlapalli
- <naveenm@marvell.com>, "edumazet@google.com" <edumazet@google.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>
-Subject: Re: [net-next PatchV2] octeontx2-af: map management port always to
- first PF
-Message-ID: <20240412184442.26417b54@kernel.org>
-In-Reply-To: <BY3PR18MB47373F66158D5E98147EDFCDC6042@BY3PR18MB4737.namprd18.prod.outlook.com>
-References: <20240410132538.20158-1-hkelam@marvell.com>
-	<20240411195532.033e21fb@kernel.org>
-	<BY3PR18MB47373F66158D5E98147EDFCDC6042@BY3PR18MB4737.namprd18.prod.outlook.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ fancer.lancer@gmail.com, Jose.Abreu@synopsys.com, chenhuacai@kernel.org,
+ linux@armlinux.org.uk, guyinggang@loongson.cn, netdev@vger.kernel.org,
+ chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+Subject: Re: [PATCH net-next v11 3/6] net: stmmac: dwmac-loongson: Use
+ PCI_DEVICE_DATA() macro for device identification
+Message-ID: <20240412184939.2b022d42@kernel.org>
+In-Reply-To: <b078687371ec7e740e3a630aedd3e76ecfdc1078.1712917541.git.siyanteng@loongson.cn>
+References: <cover.1712917541.git.siyanteng@loongson.cn>
+	<b078687371ec7e740e3a630aedd3e76ecfdc1078.1712917541.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 12 Apr 2024 12:07:40 +0000 Sunil Kovvuri Goutham wrote:
-> Agree, that there is no concept of management port in Linux.
-> From Octeon hardware pov, there are multiple MACs and each MAC (internally called RPM) is capable of supporting multiple interfaces (called LMACs).
-> Let's say there are two RPMs on the board and RPM0 is configured to 2x50G and RPM1 is configured as 4x10G.
-> When kernel boots with this config, let's say the interface names are eth0, eth1.. eth5.
-> If user is using 'eth3' for NFS, DHCP, SSH etc (ie for device management purposes) and then if user changes RPM0
-> config to 4x10G, then in the subsequent boot the same RPM1:LMAC0 could be named as 'eth5' now.
-> Customers have reported that their scripts are not working in these scenarios and they want some predictable naming.
-> 
-> What this patch does is that, RPM:LMAC0 which customer is using for management port is always mapped to 
-> same PCI device, so that interface naming remains unchanged irrespective of different RPM configurations.
+On Fri, 12 Apr 2024 19:28:08 +0800 Yanteng Si wrote:
+> Just use PCI_DEVICE_DATA() macro for device identification,
+> No changes to function functionality.
+>=20
+> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drive=
+rs/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> index 9e40c28d453a..995c9bd144e0 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> @@ -213,7 +213,7 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loong=
+son_dwmac_suspend,
+>  			 loongson_dwmac_resume);
+> =20
+>  static const struct pci_device_id loongson_dwmac_id_table[] =3D {
+> -	{ PCI_VDEVICE(LOONGSON, 0x7a03) },
+> +	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
+>  	{}
+>  };
+>  MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
 
-You should try to associate a devlink port with the netdev, that will
-give it appropriate predictable naming. (Failing that, just implement
-ndo_get_phys_port_name directly, but really devlink is much preferred).
+In file included from ../drivers/net/ethernet/stmicro/stmmac/dwmac-loongson=
+.c:6:
+../include/linux/pci.h:1061:51: error: =E2=80=98PCI_DEVICE_ID_LOONGSON_GMAC=
+=E2=80=99 undeclared here (not in a function); did you mean =E2=80=98PCI_DE=
+VICE_ID_LOONGSON_HDA=E2=80=99?
+ 1061 |         .vendor =3D PCI_VENDOR_ID_##vend, .device =3D PCI_DEVICE_ID=
+_##vend##_##dev, \
+      |                                                   ^~~~~~~~~~~~~~
+../drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:216:11: note: in ex=
+pansion of macro =E2=80=98PCI_DEVICE_DATA=E2=80=99
+  216 |         { PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) =
+},
+      |           ^~~~~~~~~~~~~~~
+../drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:216:44: error: =E2=
+=80=98loongson_gmac_pci_info=E2=80=99 undeclared here (not in a function)
+  216 |         { PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) =
+},
+      |                                            ^~~~~~~~~~~~~~~~~~~~~~
+../include/linux/pci.h:1063:41: note: in definition of macro =E2=80=98PCI_D=
+EVICE_DATA=E2=80=99
+ 1063 |         .driver_data =3D (kernel_ulong_t)(data)
+      |                                         ^~~~
+--=20
+pw-bot: cr
 
