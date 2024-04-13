@@ -1,120 +1,129 @@
-Return-Path: <netdev+bounces-87606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DCA78A3C2F
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 12:14:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C9718A3CA7
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 13:44:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D7991C20CD9
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 10:14:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AFBE1C20BF6
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 11:44:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C6C01F94C;
-	Sat, 13 Apr 2024 10:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 551883FB1E;
+	Sat, 13 Apr 2024 11:44:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Wky/w8tK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WPkbalI0"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD2523E468
-	for <netdev@vger.kernel.org>; Sat, 13 Apr 2024 10:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E87183839A;
+	Sat, 13 Apr 2024 11:44:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713003283; cv=none; b=BPisi3umL58PCjacsAcbu54Qo/1JF1zu54uW0XSIXXCi6OB1r6sRLFIErxerOrzpnEJC6gXjhvOQqQkSf5u/EGz3wUcQWijlIarTSZjePt6L7Gg7vn2oJyEE663g3Vh2c/fsu/ssonE749qfDeyBX9pp6GH8KmOr16+RbYCsVTg=
+	t=1713008658; cv=none; b=plQTZX+mZoqRE+xsxvBKvpQ3dHO44th1kPNntX4yn/8/uxvGQIwuDO+qyUsx4dnry4v8++sMbyy5PnCGWtwrfr70g0f3Iz2WBXIhK2trYwsZyea+HaoQf4s0hzcBTyoJH2jdZHpnCxiQSIPsrRx2a/0lDzznVfZJKfT6RYhc198=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713003283; c=relaxed/simple;
-	bh=eTJ1gfvX/QILdkNIQKUKa84lThtZZ9IC3aAceSvbG5E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o0LclYEdrfvMBI4BywPB+rhFoTFddb9BpAhWQaivdb0kXjjCF6HIq6zH0kEPSQjDUZLI+aFrjg9aq9yhENZpOCHfJfztRaXwPY+I8yzE3emri1HOD1yloPHdEuVolsxGp6mwI4bPfyqAKhCicFlrPU9zKxsUnC6lsStP04X+hxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Wky/w8tK; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1713003272; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=D2bsoSZVNVKdkcGk5UCSuE8H7BnzbJmApWRn2E3fRak=;
-	b=Wky/w8tKc5u2lEmWypLCeo5LFDbh3l6HPbXBYmSBwI3DLJIjNaEftafHE4U8L/iQf98MItVA2dggVzYg17H5yT0jL2IcxWk6URVCPZjZySG7CKzffG5W6qkNkwJM6ozVclfoKFbl2CsLe2kBN59TQNT7eygoubp2Ckx7QLbl2iM=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W4QLnpd_1713003271;
-Received: from 30.121.51.84(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W4QLnpd_1713003271)
-          by smtp.aliyun-inc.com;
-          Sat, 13 Apr 2024 18:14:32 +0800
-Message-ID: <a69d85f5-d11d-40e9-9c0b-1db210aaa359@linux.alibaba.com>
-Date: Sat, 13 Apr 2024 18:14:30 +0800
+	s=arc-20240116; t=1713008658; c=relaxed/simple;
+	bh=KnBXY5UF6YCzLXbhbJg6nmCpVhH7JaR+37AGQF+vy74=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=e0EcklGe0f3FUpQa0jR086bIrqKzVsF8CwdmqfryVE7vbf5qiErkT5G5D5kUCM7wMT+XJX2fHhAfNoEgiYL4M69JsDdWaFgctJBvAvy3bEAcXgPZwQX3zvfZL+ZNy3bRitmvPVdvHlfckMNb1bJFh3ArAgTxcATBG9nOqzd2GL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WPkbalI0; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56fffb1d14bso2238468a12.1;
+        Sat, 13 Apr 2024 04:44:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713008654; x=1713613454; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=KnBXY5UF6YCzLXbhbJg6nmCpVhH7JaR+37AGQF+vy74=;
+        b=WPkbalI03vkZzvYdbr1qDa0aa7q2ITj4lXALVSJ5nGwknE0WwswGsY7rCyYUV07xZe
+         +I5aeLdst6wWx/VVf/K0vpXUrpxbftmp2y/qV7PUUtKzTb3TLhkwe7zH4BBdSfRitQ25
+         tMBArMH4mOYSIVofe7YubY1xNTnDoVqbfmQd4cKW8CWxaxE1ASq7E4dKMeS9iXmdLcVb
+         Z9WKvcBn2eo1zc5xTtLtKXrDew26PzUfnxH9KulmlLWDEPyGtH7r/CInUmTr4enpYBMu
+         6iwvrKsiUJdt5jNUI+Zx4+ySqNWgDXAJ+TsC3iUGLQZPp0/mqu5c1O6OMcvumxHl+yxQ
+         RXuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713008654; x=1713613454;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KnBXY5UF6YCzLXbhbJg6nmCpVhH7JaR+37AGQF+vy74=;
+        b=PSjC2EPIhSPoc7bkdCZvjQqYkuM1ZkObVgxoAx7rHfVCTUEHObVpHyxe9WY8EVQmrs
+         2eKv0/OwCQeanjjRRLTtnZ19kkfsQ9Ygdb/qh8Ow5ER4IV4TxHZxXJhMZARl81yXu42G
+         OfBVIsTGcOjyNv628atqXJo24cM5hTVO8Yr+Zte/OTY19z3BmxuKb4YJpM3pu3EZUFSk
+         4Az6nNYOAz1Venmm2jSAMZbpWf67EZ51jaknykjsvaUQcJJ0aTHUxsx6o9e5zXYzHgQY
+         meoxsn05Li4cmjZGMktRR/RFqyBQU5/43B6ODqpy5GS1mXB8jVxQ0/XAZ91GowhaOiey
+         zycg==
+X-Forwarded-Encrypted: i=1; AJvYcCUwgCyKyNjyDt2xqrKYZUTgRiYkFjKa1GMg9B5KBatLfy1bV+phKJY2yqsx7PUNFxfqscPQreDFGGLrIYUy+e6a+eSoNy568uA5mh3mtvZ/W7YeBFO9V84RYzDf9pE5A9rjODEyGufHCHzTBWeh5SqiwkX0h5Ri9/A6Go+FpSs8YDOK30UD4y6DWnUQ09fc458OC0jxYnBpOtVhiOBq0MDohqwN
+X-Gm-Message-State: AOJu0Yz64cwcSgL03OzcAr6hBkGxJvra0HkCwemaHiuH49LlVvicLouj
+	nwwMhKo9eDh9PE81eskmXGlag8o+LOj9IYuWvag2aIJK3ivA+7mm
+X-Google-Smtp-Source: AGHT+IECMiHcf/+B/M0rCnj0C9WtMuHWj1fqjvS7fDAhsrEnWpxrFdy5FYVmH4hWp20oU69B2Ib3iw==
+X-Received: by 2002:a50:d78c:0:b0:570:392:aa1a with SMTP id w12-20020a50d78c000000b005700392aa1amr2449745edi.7.1713008653910;
+        Sat, 13 Apr 2024 04:44:13 -0700 (PDT)
+Received: from [192.168.100.206] ([89.28.99.140])
+        by smtp.gmail.com with ESMTPSA id t11-20020a056402240b00b0057010f76bf7sm529238eda.63.2024.04.13.04.44.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 13 Apr 2024 04:44:12 -0700 (PDT)
+Message-ID: <d9f79f367e3a5cdff691e586383e9ad6a831d53d.camel@gmail.com>
+Subject: Re: [PATCH bpf-next v3 03/11] bpf, lsm: Check bpf lsm hook return
+ values in verifier
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Xu Kuohai <xukuohai@huaweicloud.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko
+ <andrii@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,  Yonghong Song
+ <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski
+ <mattbobrowski@google.com>, Brendan Jackman <jackmanb@chromium.org>, Paul
+ Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, "Serge E .
+ Hallyn" <serge@hallyn.com>, Khadija Kamran <kamrankhadijadj@gmail.com>,
+ Casey Schaufler <casey@schaufler-ca.com>, Ondrej Mosnacek
+ <omosnace@redhat.com>, Kees Cook <keescook@chromium.org>, John Johansen
+ <john.johansen@canonical.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+ Roberto Sassu <roberto.sassu@huawei.com>, Shung-Hsi Yu
+ <shung-hsi.yu@suse.com>
+Date: Sat, 13 Apr 2024 14:44:09 +0300
+In-Reply-To: <20240411122752.2873562-4-xukuohai@huaweicloud.com>
+References: <20240411122752.2873562-1-xukuohai@huaweicloud.com>
+	 <20240411122752.2873562-4-xukuohai@huaweicloud.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 2/4] ethtool: provide customized dim profile
- management
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Ratheesh Kannoth <rkannoth@marvell.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-References: <1712844751-53514-1-git-send-email-hengqi@linux.alibaba.com>
- <1712844751-53514-3-git-send-email-hengqi@linux.alibaba.com>
- <20240412192645.2c0b745b@kernel.org>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <20240412192645.2c0b745b@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
+On Thu, 2024-04-11 at 20:27 +0800, Xu Kuohai wrote:
+> From: Xu Kuohai <xukuohai@huawei.com>
+>=20
+> A bpf prog returning positive number attached to file_alloc_security hook
+> will make kernel panic.
+>=20
+> The reason is that the positive number returned by bpf prog is not a
+> valid errno, and could not be filtered out with IS_ERR which is used by
+> the file system to check errors. As a result, the file system uses this
+> positive number as file pointer, causing panic.
+>=20
+> Considering that hook file_alloc_security never returned positive number
+> before bpf lsm was introduced, and other bpf lsm hooks may have the same
+> problem, this patch adds lsm return value check in bpf verifier to ensure
+> no unpredicted values will be returned by lsm bpf prog.
+>=20
+> Fixes: 520b7aa00d8c ("bpf: lsm: Initialize the BPF LSM hooks")
+> Reported-by: Xin Liu <liuxin350@huawei.com>
+> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
+> ---
 
+Acked-by: Eduard Zingerman <eddyz87@gmail.com>
 
-在 2024/4/13 上午10:26, Jakub Kicinski 写道:
-> On Thu, 11 Apr 2024 22:12:29 +0800 Heng Qi wrote:
->> +#include <linux/dim.h>
->>   #include <net/net_trackers.h>
->>   #include <net/net_debug.h>
->>   #include <net/dropreason-core.h>
->> @@ -1649,6 +1650,9 @@ struct net_device_ops {
->>    * @IFF_SEE_ALL_HWTSTAMP_REQUESTS: device wants to see calls to
->>    *	ndo_hwtstamp_set() for all timestamp requests regardless of source,
->>    *	even if those aren't HWTSTAMP_SOURCE_NETDEV.
->> + * @IFF_PROFILE_USEC: device supports adjusting the DIM profile's usec field
->> + * @IFF_PROFILE_PKTS: device supports adjusting the DIM profile's pkts field
->> + * @IFF_PROFILE_COMPS: device supports adjusting the DIM profile's comps field
->>    */
->>   enum netdev_priv_flags {
->>   	IFF_802_1Q_VLAN			= 1<<0,
->> @@ -1685,6 +1689,9 @@ enum netdev_priv_flags {
->>   	IFF_TX_SKB_NO_LINEAR		= BIT_ULL(31),
->>   	IFF_CHANGE_PROTO_DOWN		= BIT_ULL(32),
->>   	IFF_SEE_ALL_HWTSTAMP_REQUESTS	= BIT_ULL(33),
->> +	IFF_PROFILE_USEC		= BIT_ULL(34),
->> +	IFF_PROFILE_PKTS		= BIT_ULL(35),
->> +	IFF_PROFILE_COMPS		= BIT_ULL(36),
->>   };
->>   
->>   #define IFF_802_1Q_VLAN			IFF_802_1Q_VLAN
->> @@ -2400,6 +2407,14 @@ struct net_device {
->>   	/** @page_pools: page pools created for this netdevice */
->>   	struct hlist_head	page_pools;
->>   #endif
->> +
->> +#if IS_ENABLED(CONFIG_DIMLIB)
->> +	/* DIM profile lists for different dim cq modes */
->> +	struct dim_cq_moder *rx_eqe_profile;
->> +	struct dim_cq_moder *rx_cqe_profile;
->> +	struct dim_cq_moder *tx_eqe_profile;
->> +	struct dim_cq_moder *tx_cqe_profile;
->> +#endif
-> just one pointer to a new wrapper struct, put the pointers and a flag
-> field in there.
->
-> netdevice.h is included by thousands of files, please use a forward
-> declaration for the type and avoid including dim.h
-
-I will update this.
-
-Thanks for the constructive comments!
 
 
