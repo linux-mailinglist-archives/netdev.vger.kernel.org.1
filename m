@@ -1,101 +1,75 @@
-Return-Path: <netdev+bounces-87588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87590-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8E628A3A5E
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 04:10:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F1438A3A66
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 04:11:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5979C1F225D8
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 02:10:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AAD928436E
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 02:11:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 311F118EB1;
-	Sat, 13 Apr 2024 02:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC87A18B14;
+	Sat, 13 Apr 2024 02:11:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="blavqWR4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QJNKv5/N"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ACCC18C38;
-	Sat, 13 Apr 2024 02:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF031865C;
+	Sat, 13 Apr 2024 02:11:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712974232; cv=none; b=G66RFWY2DLrH+WUcxJ6USDuTaLAiz4K6TkQCy1JCHI+tnWWI7nunvAChikShsuQG1XJQbN6W7/r9EC89IGaXqjKMR+urAdeaNrGpPfPLo+1+xaY0sE7LkWfOACk7QIiyMN6lkoOCqu8fqHgcSkz5ThS/fpsQEJ+5t2owQsafW/0=
+	t=1712974288; cv=none; b=E/mSOAxpFg3T1pZDy8sdVRWMXdTjKKs4Htm9kmXmcXZW9jruBjIoLN81WtpdmLRf4igqKsrB7Kq5qyO4w6wxLV+iKTXYIbSxwoCeugzugNTQD3AIHsa1/8ZIh4Zjp5ngFsBpR3jEf4qXbGJ+JA0SsBoNxn7Q7ytnpohYjzm0oS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712974232; c=relaxed/simple;
-	bh=z0QTLasYOw60Do7zT+tf3ZpzHBZYI1f8M3gAENScRBU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GMjMA73mcdvdDfq+2+HGRwoXe6SH/BqtYhsOUXCOtP8IunoYmq9JatuFoLUP4oYBUCm9af0QqO6dx6ZLzpSEvRDI8Bsoa5N8JIcaPDpbaVpEucYqm+an/UW50HyZZ7goSyVI+Q5gZwmyaZ21wSkPDRA+0XNOCUlBy6d3ZWa0l9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=blavqWR4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 91EE7C4AF07;
-	Sat, 13 Apr 2024 02:10:31 +0000 (UTC)
+	s=arc-20240116; t=1712974288; c=relaxed/simple;
+	bh=K//9Hcjv/NtcL18GMBZ3/qLgmdN/uoN2Qy4xDwZxj8Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Z6KJy6ns36Li5Eb8jIo5sIDtUogvIe+KD3TWOqbq2tRp0Nsd1+S+J89ExiorQi/G4JOajM7yPJMKPvg4q2jJv2LJ/4BfBHVYIreaH3C3ZaYrBOLXAQAhlY3WVqx6jvFZQ8ZjUSgzLIui+qTAf1Uf9bI0pcr6vwS5Zcp6m9WBQyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QJNKv5/N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E078C113CC;
+	Sat, 13 Apr 2024 02:11:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712974231;
-	bh=z0QTLasYOw60Do7zT+tf3ZpzHBZYI1f8M3gAENScRBU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=blavqWR4JJxg2RTs+Edgd4i9BNqgZIrVMhgGSQRinnWEP/VnlaTR3zLOydfKRjSSs
-	 L+1iaJ4Kp6FxCYaI4YiG8RUoIUSm4FnIXi3zVJ02ynxIFUuJSFYX7mbxkhpqNxLgnJ
-	 h4h2FR5BTKEnXluwtVkFymv2VuPrs/BHvV4MU1oKF/z5APXEk3ntNorYYTAMJBeKD9
-	 kieWLgDLPoNiPYIdK5kxp9Ebpq4KRE5h1rcPmNAtUui/GPioLfZeLGjkakF93zMp1+
-	 BP2/0gRDgHhbW1ZA9oxMMf+PZl25b6Jgvu6C0muwuCy8/UDuXMvBzlehjnTMHIo47Y
-	 VYjyzHo2Lg6mg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 84DDAC32750;
-	Sat, 13 Apr 2024 02:10:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1712974288;
+	bh=K//9Hcjv/NtcL18GMBZ3/qLgmdN/uoN2Qy4xDwZxj8Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QJNKv5/NPFXO9KmDBnsbYQHUSdlBDyLfy3jyB6xvOT8nK+StDPFXS1YDHMlhEZJX8
+	 MYDidoTYasOB9hUVhAQZp57dRh64VEPxQysn+xfryfy/0qtNP0XBeQdhpNh+R9kQ37
+	 qZHi4Q6Yeo0pzRjq44hG3FPmx/zl0fayJHBBbShLqIALr6/US8q0mAKiU+0dtZc7kx
+	 ybjI1O9Uv0R96WZrLGJ2sU+F+zIimEKVOhX7KKIZqJzpJlMr7bjQFEgrQBO0H1AkPj
+	 SPaZYCidt8Nluu3PWadUJzQCJd3gPMLzKNFh4NnWJ1P9lE41fGLsJdevaBgO+K9f7d
+	 nSEiFAg7gt7XQ==
+Date: Fri, 12 Apr 2024 19:11:26 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Liang Chen <liangchen.linux@gmail.com>
+Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+ hengqi@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ john.fastabend@gmail.com, hawk@kernel.org, daniel@iogearbox.net,
+ ast@kernel.org
+Subject: Re: [PATCH net-next v6] virtio_net: Support RX hash XDP hint
+Message-ID: <20240412191126.1526ce85@kernel.org>
+In-Reply-To: <20240411085216.361662-1-liangchen.linux@gmail.com>
+References: <20240411085216.361662-1-liangchen.linux@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH V7 net-next 0/4] Support some features for the HNS3 ethernet
- driver
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171297423154.31124.11662297381851174991.git-patchwork-notify@kernel.org>
-Date: Sat, 13 Apr 2024 02:10:31 +0000
-References: <20240410125354.2177067-1-shaojijie@huawei.com>
-In-Reply-To: <20240410125354.2177067-1-shaojijie@huawei.com>
-To: Jijie Shao <shaojijie@huawei.com>
-Cc: yisen.zhuang@huawei.com, salil.mehta@huawei.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us,
- horms@kernel.org, rkannoth@marvell.com, shenjian15@huawei.com,
- wangjie125@huawei.com, liuyonglong@huawei.com, chenhao418@huawei.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 11 Apr 2024 16:52:16 +0800 Liang Chen wrote:
+> +	switch (__le16_to_cpu(hdr_hash->hash_report)) {
+> +		case VIRTIO_NET_HASH_REPORT_TCPv4:
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Please indent things according to the kernel coding style.
 
-On Wed, 10 Apr 2024 20:53:50 +0800 you wrote:
-> Currently, the hns3 driver does not have the trace
-> of the command queue. As a result, it is difficult to
-> locate the communication between the driver and firmware.
-> Therefore, the trace function of the command queue is
-> added in this patch set to facilitate the locating of
-> communication problems between the driver and firmware.
-> 
-> [...]
-
-Here is the summary with links:
-  - [V7,net-next,1/4] net: hns3: add command queue trace for hns3
-    https://git.kernel.org/netdev/net-next/c/2a1a1a7b5fd7
-  - [V7,net-next,2/4] net: hns3: move constants from hclge_debugfs.h to hclge_debugfs.c
-    https://git.kernel.org/netdev/net-next/c/b20250afcfb4
-  - [V7,net-next,3/4] net: hns3: dump more reg info based on ras mod
-    https://git.kernel.org/netdev/net-next/c/8a4bda8cb9e4
-  - [V7,net-next,4/4] net: hns3: add support to query scc version by devlink info
-    https://git.kernel.org/netdev/net-next/c/a1e5de0d07a3
-
-You are awesome, thank you!
+Checkpatch finds 2 problems in this change.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
