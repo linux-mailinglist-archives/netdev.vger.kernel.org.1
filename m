@@ -1,283 +1,262 @@
-Return-Path: <netdev+bounces-87566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9489E8A3A13
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 03:19:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8DFD8A3A18
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 03:26:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B267C1C2127D
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 01:19:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0BAFAB20EA6
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 01:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D06B4A33;
-	Sat, 13 Apr 2024 01:19:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26D54A33;
+	Sat, 13 Apr 2024 01:25:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bxWze/7m"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="A+VnxO1n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF73346BA
-	for <netdev@vger.kernel.org>; Sat, 13 Apr 2024 01:19:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5F017C68
+	for <netdev@vger.kernel.org>; Sat, 13 Apr 2024 01:25:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712971173; cv=none; b=l+VdMr45jjBJBw1JtfZFnHwroUPBui82tVq1CEvQqcqtwI7O7oDe8HM/6ecXPr0L4NZWWkxy/Q5u7mwG1VK/y76N8sfoabPYpQlIEbSbDKE1ZztvcYElIfdsouoMatsoNDBdf6DpIN9sLOBB7Clt0OHUgzb4QZVMizCxrQ0ngWs=
+	t=1712971557; cv=none; b=bKKPyqKdEO8gyDYxQpcwe9wEnvh6tOQ+etgMRCeFJ6ylCEpIEGvHZHOj5KabzHiLFYxDfvyPxB3vgZrcnVqb+JAoIev1P+/V1mjz6E+1SNPG1sNJWzV3srXIpVjfJBqkR9EA2W62VWWkhgVYYttK8xxmmra92xtYHeUznAM3EQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712971173; c=relaxed/simple;
-	bh=OEitvC2FrqL37rYWsuz+CrthG2vyZds3lU22hU23Ms4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DPNsJiFh2MoirAx2ga/8iUQPGrEv+mrQhNwL0O8f2dd2DJMBjVi9T4gYxuyTGMuxpuUobqr4C5ucsEhEwC6iZwxdKyeNi72+1ZqBcFOLywzkYiUNlmVeNtA6GzRGVQh1+MlimKu78qM6YwVn96X1575CPdIpRYvp+v6VJ1C2txc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bxWze/7m; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-417f5268b12so13406135e9.1
-        for <netdev@vger.kernel.org>; Fri, 12 Apr 2024 18:19:31 -0700 (PDT)
+	s=arc-20240116; t=1712971557; c=relaxed/simple;
+	bh=nLEgaK4nVCnQWZVFmuVrMyyzF+oAJDNMKVwDrfL3fBQ=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RZfxskAZiA2d9cO+gFm4HG56IglogwyCQZzJ2LHkfhaooSQssUd6uHhvMMTA7SU51wz5PF6imQXni7bJM+PqkEtIZOMDV1j9ZMPH8SpIDQh5V7rAPULH9E6xn2Y1euUcw4GIVbkXKsfgBnWZVJjsi/n+b48sjTwn8PbR+RxAPGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=A+VnxO1n; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1712971170; x=1713575970; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y/IhB4syrBzPuc+TLnwnm4IzK5ETGkVI6wWNl4QZk2s=;
-        b=bxWze/7m6siWbecVXETc1pg/2Dy6N3PO9pjPHAstRlpShiRr3GWzEkSe2racMzx4Cr
-         Gn1aYMrklca7zSChnla6h94q5WfD/5XL3txyXee8A330BycnaKVW8Qy3T2tpKwfroLmU
-         gagS3L/ORozeyMtWj5vSHVpl3rJG0UHaBxTqhfeh1cTizIzaymB+CZKs6q/1tE1eWOC6
-         lPTLFzYgLwb3ptR0uqfHIRbpWg6BFRr52LNB9eC9LJiW/lja8EjJxzD43yNstk7URawQ
-         /Ads/qk1REJuYswLsIswi8Om5wzm+xBez84x7X4IuxCzwIvVThimH6SJpSl1tVLKrH6J
-         ipnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1712971170; x=1713575970;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y/IhB4syrBzPuc+TLnwnm4IzK5ETGkVI6wWNl4QZk2s=;
-        b=PlBRDTBVAY7FTBwoo8t3NsOcUdhjgY9hD0Zj95wg1h8B7jhOdccTJWbgKjLac6zYPu
-         M0bPW4U8BSbLIYv+tFsE1j3qFBHCQ9TcgNLR3mEKjWH6QYp+NEd3ffvr7U6lNMgLzb1I
-         YRmNYYe1FkaJ/K5AdBbZ4CM/EQqDWdsRtsJKUUUK/q9HytCjRPkvJ8vQVTCsybNcUD7u
-         wko23VAc6R0pP477HIgl4PSvNVw8oY9alKsAVeK67VRovWzEoRImvlJ5rMD0hxkdMJdk
-         bYf4sxInzDowodjVrSeLsy90q89ueICyWZSGEzuuxuPlWv1+1zasrhaANn5FsFpZ5tVO
-         NvjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVMi5h+RZ/Smx/Fv40+v1cdocrDmlsDoQZfkgCASqrc1tACc3U6qdlMJ6zp1somuzTwrWAf3bk9FGAexsc1OgqJmLz6M5up
-X-Gm-Message-State: AOJu0Yw2DHokgO4rcmjlpR7OVTvz9TpGfLIgRSvRByPMnxdLKAy9xBJ1
-	Pxm/IABEDZvsYPoPzcLBAVPYcALe5NxInQrNku5w63tp59uY+wfLNX2qIFqRiAGyY9l7mjFtEFi
-	z7EJSZLybjNHPyvCvmkauXIyoB05uwO1D2W11
-X-Google-Smtp-Source: AGHT+IFnKkdFnoWRrMBZGPIoxmpCyWfWDTE+DS0TPVLkuuLCQ5+jSOiE5DiDiCDbW2avq0dbP0QTZL0VdQ8BUYD3+G8=
-X-Received: by 2002:a05:600c:3592:b0:416:2d39:bcc2 with SMTP id
- p18-20020a05600c359200b004162d39bcc2mr4788661wmq.29.1712971170172; Fri, 12
- Apr 2024 18:19:30 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1712971556; x=1744507556;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=rw/yxkM2MHnlmCxVNO4N010i4b27pLReASIUKGMRRBM=;
+  b=A+VnxO1nIrR7C7UUAhe3+xCyjckvFFgsrkMTd+gYNJXgChdtwFoCQ1I8
+   gDwF5bBBsa3LjJJSllpG62Mj0QzdG+n9CMJT0CO5Pl1I3NZVXRer/MkGx
+   AAvHTqPaYEPlaypQBCyBDjOWijOLfLNZxRHlL8LCJ0WNj/FJOQtj6a8U0
+   c=;
+X-IronPort-AV: E=Sophos;i="6.07,197,1708387200"; 
+   d="scan'208";a="626181665"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Apr 2024 01:25:53 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:15570]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.40:2525] with esmtp (Farcaster)
+ id e956ca2d-0c18-4fa8-877b-d57dd6ed16da; Sat, 13 Apr 2024 01:25:52 +0000 (UTC)
+X-Farcaster-Flow-ID: e956ca2d-0c18-4fa8-877b-d57dd6ed16da
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Sat, 13 Apr 2024 01:25:51 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.23) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Sat, 13 Apr 2024 01:25:49 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <krisman@suse.de>
+CC: <davem@davemloft.net>, <kuniyu@amazon.com>, <lmb@isovalent.com>,
+	<martin.lau@kernel.org>, <netdev@vger.kernel.org>,
+	<willemdebruijn.kernel@gmail.com>
+Subject: Re: [PATCH v3] udp: Avoid call to compute_score on multiple sites
+Date: Fri, 12 Apr 2024 18:25:39 -0700
+Message-ID: <20240413012539.16180-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240412212004.17181-1-krisman@suse.de>
+References: <20240412212004.17181-1-krisman@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240412165230.2009746-1-jrife@google.com> <20240412165230.2009746-2-jrife@google.com>
- <5ad9aac3-6170-47cb-87be-b77d4425e31a@gmail.com>
-In-Reply-To: <5ad9aac3-6170-47cb-87be-b77d4425e31a@gmail.com>
-From: Jordan Rife <jrife@google.com>
-Date: Fri, 12 Apr 2024 18:19:16 -0700
-Message-ID: <CADKFtnRrOjV3fPRWnkVyk2svxx1uMaHVAOOo_+sAmvozz9BH9Q@mail.gmail.com>
-Subject: Re: [PATCH v2 bpf-next 1/6] selftests/bpf: Fix bind program for big
- endian systems
-To: Kui-Feng Lee <sinquersw@gmail.com>
-Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	Kui-Feng Lee <thinker.li@gmail.com>, Artem Savkov <asavkov@redhat.com>, 
-	Dave Marchevsky <davemarchevsky@fb.com>, Menglong Dong <imagedong@tencent.com>, Daniel Xu <dxu@dxuuu.xyz>, 
-	David Vernet <void@manifault.com>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWA003.ant.amazon.com (10.13.139.47) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Kui-Feng,
+From: Gabriel Krisman Bertazi <krisman@suse.de>
+Date: Fri, 12 Apr 2024 17:20:04 -0400
+> We've observed a 7-12% performance regression in iperf3 UDP ipv4 and
+> ipv6 tests with multiple sockets on Zen3 cpus, which we traced back to
+> commit f0ea27e7bfe1 ("udp: re-score reuseport groups when connected
+> sockets are present").  The failing tests were those that would spawn
+> UDP sockets per-cpu on systems that have a high number of cpus.
+> 
+> Unsurprisingly, it is not caused by the extra re-scoring of the reused
+> socket, but due to the compiler no longer inlining compute_score, once
+> it has the extra call site in udp4_lib_lookup2.  This is augmented by
+> the "Safe RET" mitigation for SRSO, needed in our Zen3 cpus.
+> 
+> We could just explicitly inline it, but compute_score() is quite a large
+> function, around 300b.  Inlining in two sites would almost double
+> udp4_lib_lookup2, which is a silly thing to do just to workaround a
+> mitigation.  Instead, this patch shuffles the code a bit to avoid the
+> multiple calls to compute_score.  Since it is a static function used in
+> one spot, the compiler can safely fold it in, as it did before, without
+> increasing the text size.
+> 
+> With this patch applied I ran my original iperf3 testcases.  The failing
+> cases all looked like this (ipv4):
+> 	iperf3 -c 127.0.0.1 --udp -4 -f K -b $R -l 8920 -t 30 -i 5 -P 64 -O 2
+> 
+> where $R is either 1G/10G/0 (max, unlimited).  I ran 3 times each.
+> baseline is v6.9-rc3. harmean == harmonic mean; CV == coefficient of
+> variation.
+> 
+> ipv4:
+>                  1G                10G                  MAX
+> 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
+> baseline 1743852.66(0.0208) 1725933.02(0.0167) 1705203.78(0.0386)
+> patched  1968727.61(0.0035) 1962283.22(0.0195) 1923853.50(0.0256)
+> 
+> ipv6:
+>                  1G                10G                  MAX
+> 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
+> baseline 1729020.03(0.0028) 1691704.49(0.0243) 1692251.34(0.0083)
+> patched  1900422.19(0.0067) 1900968.01(0.0067) 1568532.72(0.1519)
+> 
+> This restores the performance we had before the change above with this
+> benchmark.  We obviously don't expect any real impact when mitigations
+> are disabled, but just to be sure it also doesn't regresses:
+> 
+> mitigations=off ipv4:
+>                  1G                10G                  MAX
+> 	    HARMEAN  (CV)      HARMEAN  (CV)    HARMEAN     (CV)
+> baseline 3230279.97(0.0066) 3229320.91(0.0060) 2605693.19(0.0697)
+> patched  3242802.36(0.0073) 3239310.71(0.0035) 2502427.19(0.0882)
+> 
+> Cc: Lorenz Bauer <lmb@isovalent.com>
+> Fixes: f0ea27e7bfe1 ("udp: re-score reuseport groups when connected sockets are present")
+> Signed-off-by: Gabriel Krisman Bertazi <krisman@suse.de>
 
-You are right. Maybe simply "load_word" and "load_byte" would be a
-better name here. WDYT?
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
--Jordan
+Thanks!
 
-
-On Fri, Apr 12, 2024 at 6:01=E2=80=AFPM Kui-Feng Lee <sinquersw@gmail.com> =
-wrote:
->
->
->
-> On 4/12/24 09:52, Jordan Rife wrote:
-> > Without this fix, the bind4 and bind6 programs will reject bind attempt=
-s
-> > on big endian systems. This patch ensures that CI tests pass for the
-> > s390x architecture.
-> >
-> > Signed-off-by: Jordan Rife <jrife@google.com>
-> > ---
-> >   .../testing/selftests/bpf/progs/bind4_prog.c  | 18 ++++++++++--------
-> >   .../testing/selftests/bpf/progs/bind6_prog.c  | 18 ++++++++++--------
-> >   tools/testing/selftests/bpf/progs/bind_prog.h | 19 ++++++++++++++++++=
-+
-> >   3 files changed, 39 insertions(+), 16 deletions(-)
-> >   create mode 100644 tools/testing/selftests/bpf/progs/bind_prog.h
-> >
-> > diff --git a/tools/testing/selftests/bpf/progs/bind4_prog.c b/tools/tes=
-ting/selftests/bpf/progs/bind4_prog.c
-> > index a487f60b73ac4..2bc052ecb6eef 100644
-> > --- a/tools/testing/selftests/bpf/progs/bind4_prog.c
-> > +++ b/tools/testing/selftests/bpf/progs/bind4_prog.c
-> > @@ -12,6 +12,8 @@
-> >   #include <bpf/bpf_helpers.h>
-> >   #include <bpf/bpf_endian.h>
-> >
-> > +#include "bind_prog.h"
-> > +
-> >   #define SERV4_IP            0xc0a801feU /* 192.168.1.254 */
-> >   #define SERV4_PORT          4040
-> >   #define SERV4_REWRITE_IP    0x7f000001U /* 127.0.0.1 */
-> > @@ -118,23 +120,23 @@ int bind_v4_prog(struct bpf_sock_addr *ctx)
-> >
-> >       // u8 narrow loads:
-> >       user_ip4 =3D 0;
-> > -     user_ip4 |=3D ((volatile __u8 *)&ctx->user_ip4)[0] << 0;
-> > -     user_ip4 |=3D ((volatile __u8 *)&ctx->user_ip4)[1] << 8;
-> > -     user_ip4 |=3D ((volatile __u8 *)&ctx->user_ip4)[2] << 16;
-> > -     user_ip4 |=3D ((volatile __u8 *)&ctx->user_ip4)[3] << 24;
-> > +     user_ip4 |=3D load_byte_ntoh(ctx->user_ip4, 0, sizeof(user_ip4));
-> > +     user_ip4 |=3D load_byte_ntoh(ctx->user_ip4, 1, sizeof(user_ip4));
-> > +     user_ip4 |=3D load_byte_ntoh(ctx->user_ip4, 2, sizeof(user_ip4));
-> > +     user_ip4 |=3D load_byte_ntoh(ctx->user_ip4, 3, sizeof(user_ip4));
-> >       if (ctx->user_ip4 !=3D user_ip4)
-> >               return 0;
-> >
-> >       user_port =3D 0;
-> > -     user_port |=3D ((volatile __u8 *)&ctx->user_port)[0] << 0;
-> > -     user_port |=3D ((volatile __u8 *)&ctx->user_port)[1] << 8;
-> > +     user_port |=3D load_byte_ntoh(ctx->user_port, 0, sizeof(user_port=
-));
-> > +     user_port |=3D load_byte_ntoh(ctx->user_port, 1, sizeof(user_port=
-));
-> >       if (ctx->user_port !=3D user_port)
-> >               return 0;
-> >
-> >       // u16 narrow loads:
-> >       user_ip4 =3D 0;
-> > -     user_ip4 |=3D ((volatile __u16 *)&ctx->user_ip4)[0] << 0;
-> > -     user_ip4 |=3D ((volatile __u16 *)&ctx->user_ip4)[1] << 16;
-> > +     user_ip4 |=3D load_word_ntoh(ctx->user_ip4, 0, sizeof(user_ip4));
-> > +     user_ip4 |=3D load_word_ntoh(ctx->user_ip4, 1, sizeof(user_ip4));
-> >       if (ctx->user_ip4 !=3D user_ip4)
-> >               return 0;
-> >
-> > diff --git a/tools/testing/selftests/bpf/progs/bind6_prog.c b/tools/tes=
-ting/selftests/bpf/progs/bind6_prog.c
-> > index d62cd9e9cf0ea..194583e3375bf 100644
-> > --- a/tools/testing/selftests/bpf/progs/bind6_prog.c
-> > +++ b/tools/testing/selftests/bpf/progs/bind6_prog.c
-> > @@ -12,6 +12,8 @@
-> >   #include <bpf/bpf_helpers.h>
-> >   #include <bpf/bpf_endian.h>
-> >
-> > +#include "bind_prog.h"
-> > +
-> >   #define SERV6_IP_0          0xfaceb00c /* face:b00c:1234:5678::abcd *=
-/
-> >   #define SERV6_IP_1          0x12345678
-> >   #define SERV6_IP_2          0x00000000
-> > @@ -129,25 +131,25 @@ int bind_v6_prog(struct bpf_sock_addr *ctx)
-> >       // u8 narrow loads:
-> >       for (i =3D 0; i < 4; i++) {
-> >               user_ip6 =3D 0;
-> > -             user_ip6 |=3D ((volatile __u8 *)&ctx->user_ip6[i])[0] << =
-0;
-> > -             user_ip6 |=3D ((volatile __u8 *)&ctx->user_ip6[i])[1] << =
-8;
-> > -             user_ip6 |=3D ((volatile __u8 *)&ctx->user_ip6[i])[2] << =
-16;
-> > -             user_ip6 |=3D ((volatile __u8 *)&ctx->user_ip6[i])[3] << =
-24;
-> > +             user_ip6 |=3D load_byte_ntoh(ctx->user_ip6[i], 0, sizeof(=
-user_ip6));
-> > +             user_ip6 |=3D load_byte_ntoh(ctx->user_ip6[i], 1, sizeof(=
-user_ip6));
-> > +             user_ip6 |=3D load_byte_ntoh(ctx->user_ip6[i], 2, sizeof(=
-user_ip6));
-> > +             user_ip6 |=3D load_byte_ntoh(ctx->user_ip6[i], 3, sizeof(=
-user_ip6));
-> >               if (ctx->user_ip6[i] !=3D user_ip6)
-> >                       return 0;
-> >       }
-> >
-> >       user_port =3D 0;
-> > -     user_port |=3D ((volatile __u8 *)&ctx->user_port)[0] << 0;
-> > -     user_port |=3D ((volatile __u8 *)&ctx->user_port)[1] << 8;
-> > +     user_port |=3D load_byte_ntoh(ctx->user_port, 0, sizeof(user_port=
-));
-> > +     user_port |=3D load_byte_ntoh(ctx->user_port, 1, sizeof(user_port=
-));
-> >       if (ctx->user_port !=3D user_port)
-> >               return 0;
-> >
-> >       // u16 narrow loads:
-> >       for (i =3D 0; i < 4; i++) {
-> >               user_ip6 =3D 0;
-> > -             user_ip6 |=3D ((volatile __u16 *)&ctx->user_ip6[i])[0] <<=
- 0;
-> > -             user_ip6 |=3D ((volatile __u16 *)&ctx->user_ip6[i])[1] <<=
- 16;
-> > +             user_ip6 |=3D load_word_ntoh(ctx->user_ip6[i], 0, sizeof(=
-user_ip6));
-> > +             user_ip6 |=3D load_word_ntoh(ctx->user_ip6[i], 1, sizeof(=
-user_ip6));
-> >               if (ctx->user_ip6[i] !=3D user_ip6)
-> >                       return 0;
-> >       }
-> > diff --git a/tools/testing/selftests/bpf/progs/bind_prog.h b/tools/test=
-ing/selftests/bpf/progs/bind_prog.h
-> > new file mode 100644
-> > index 0000000000000..0fdc466aec346
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/bpf/progs/bind_prog.h
-> > @@ -0,0 +1,19 @@
-> > +/* SPDX-License-Identifier: GPL-2.0 */
-> > +#ifndef __BIND_PROG_H__
-> > +#define __BIND_PROG_H__
-> > +
-> > +#if __BYTE_ORDER__ =3D=3D __ORDER_LITTLE_ENDIAN__
-> > +#define load_byte_ntoh(src, b, s) \
-> > +     (((volatile __u8 *)&(src))[b] << 8 * b)
-> > +#define load_word_ntoh(src, w, s) \
-> > +     (((volatile __u16 *)&(src))[w] << 16 * w)
-> > +#elif __BYTE_ORDER__ =3D=3D __ORDER_BIG_ENDIAN__
-> > +#define load_byte_ntoh(src, b, s) \
-> > +     (((volatile __u8 *)&(src))[(b) + (sizeof(src) - (s))] << 8 * ((s)=
- - (b) - 1))
-> > +#define load_word_ntoh(src, w, s) \
-> > +     (((volatile __u16 *)&(src))[w] << 16 * (((s) / 2) - (w) - 1))
-> These names, load_byte_ntoh() and load_word_ntoh(), are miss-leading.
->
-> They don't actually do byte-order conversion from network order to host
-> order. Network order is big endian. 0xdeadbeef in u32 should be stored
-> as the sequence of
->
->    0xde, 0xad, 0xbe, 0xef
->
-> The little endian implementation of load_word_ntoh() provided here will
-> return 0xadde and 0xefbe0000. However, a network order to host order
-> conversion should return 0xbeef and 0xdead0000 for little endian.
->
-> The little endian implementation of load_byte_ntoh() here returns 0xde,
-> 0xad00, 0xbe0000, and 0xef000000. However, a network to host order
-> conversion should return 0xef, 0xbe00, 0xad0000, and 0xde00000.
->
-> So, they just access raw data following the host byte order, not
-> providing any byte order conversion.
->
->
-> > +#else
-> > +# error "Fix your compiler's __BYTE_ORDER__?!"
-> > +#endif
-> > +
-> > +#endif
+> 
+> ---
+> Changes since v2:
+> (me)
+>   - recollected performance data after changes below only for the
+>   mitigations=auto case.
+> (suggested by Willem de Bruijn)
+>   - Explicitly continue the loop after a rescore
+>   - rename rescore variable to not clash with jump label
+>   - disable rescore for new loop iteration
+> (suggested by Kuniyuki Iwashima)
+>   - sort stack variables
+>   - drop unneeded ()
+> 
+> Changes since v1:
+> (me)
+>   - recollected performance data after changes below only for the
+>   mitigations enabled case.
+> (suggested by Willem de Bruijn)
+>   - Drop __always_inline in compute_score
+>   - Simplify logic by replacing third struct sock pointer with bool
+>   - Fix typo in commit message
+>   - Don't explicitly break out of loop after rescore
+> ---
+>  net/ipv4/udp.c | 21 ++++++++++++++++-----
+>  net/ipv6/udp.c | 20 ++++++++++++++++----
+>  2 files changed, 32 insertions(+), 9 deletions(-)
+> 
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index c02bf011d4a6..4eff1e145c63 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -427,15 +427,21 @@ static struct sock *udp4_lib_lookup2(struct net *net,
+>  {
+>  	struct sock *sk, *result;
+>  	int score, badness;
+> +	bool need_rescore;
+>  
+>  	result = NULL;
+>  	badness = 0;
+>  	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
+> -		score = compute_score(sk, net, saddr, sport,
+> -				      daddr, hnum, dif, sdif);
+> +		need_rescore = false;
+> +rescore:
+> +		score = compute_score(need_rescore ? result : sk, net, saddr,
+> +				      sport, daddr, hnum, dif, sdif);
+>  		if (score > badness) {
+>  			badness = score;
+>  
+> +			if (need_rescore)
+> +				continue;
+> +
+>  			if (sk->sk_state == TCP_ESTABLISHED) {
+>  				result = sk;
+>  				continue;
+> @@ -456,9 +462,14 @@ static struct sock *udp4_lib_lookup2(struct net *net,
+>  			if (IS_ERR(result))
+>  				continue;
+>  
+> -			badness = compute_score(result, net, saddr, sport,
+> -						daddr, hnum, dif, sdif);
+> -
+> +			/* compute_score is too long of a function to be
+> +			 * inlined, and calling it again here yields
+> +			 * measureable overhead for some
+> +			 * workloads. Work around it by jumping
+> +			 * backwards to rescore 'result'.
+> +			 */
+> +			need_rescore = true;
+> +			goto rescore;
+>  		}
+>  	}
+>  	return result;
+> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+> index 8b1dd7f51249..e80e8b1d2000 100644
+> --- a/net/ipv6/udp.c
+> +++ b/net/ipv6/udp.c
+> @@ -168,15 +168,21 @@ static struct sock *udp6_lib_lookup2(struct net *net,
+>  {
+>  	struct sock *sk, *result;
+>  	int score, badness;
+> +	bool need_rescore;
+>  
+>  	result = NULL;
+>  	badness = -1;
+>  	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
+> -		score = compute_score(sk, net, saddr, sport,
+> -				      daddr, hnum, dif, sdif);
+> +		need_rescore = false;
+> +rescore:
+> +		score = compute_score(need_rescore ? result : sk, net, saddr,
+> +				      sport, daddr, hnum, dif, sdif);
+>  		if (score > badness) {
+>  			badness = score;
+>  
+> +			if (need_rescore)
+> +				continue;
+> +
+>  			if (sk->sk_state == TCP_ESTABLISHED) {
+>  				result = sk;
+>  				continue;
+> @@ -197,8 +203,14 @@ static struct sock *udp6_lib_lookup2(struct net *net,
+>  			if (IS_ERR(result))
+>  				continue;
+>  
+> -			badness = compute_score(sk, net, saddr, sport,
+> -						daddr, hnum, dif, sdif);
+> +			/* compute_score is too long of a function to be
+> +			 * inlined, and calling it again here yields
+> +			 * measureable overhead for some
+> +			 * workloads. Work around it by jumping
+> +			 * backwards to rescore 'result'.
+> +			 */
+> +			need_rescore = true;
+> +			goto rescore;
+>  		}
+>  	}
+>  	return result;
+> -- 
+> 2.44.0
 
