@@ -1,118 +1,115 @@
-Return-Path: <netdev+bounces-87576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D28398A3A3B
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 03:49:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 163E78A3A3D
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 03:50:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60CD21F21C53
-	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 01:49:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C6F1B216C6
+	for <lists+netdev@lfdr.de>; Sat, 13 Apr 2024 01:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6322A95B;
-	Sat, 13 Apr 2024 01:49:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 450A8C125;
+	Sat, 13 Apr 2024 01:50:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aokWUM5k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fNrSaqOH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B3D2F32
-	for <netdev@vger.kernel.org>; Sat, 13 Apr 2024 01:49:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9DD546BA;
+	Sat, 13 Apr 2024 01:50:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1712972981; cv=none; b=u+USLyGeIQZMKrfmh2RKNAVJ0dR6FO3P1tbeXMrT0edL8Avo/edkvVu9ouW44/eBuoS/dr0Y6v7CJqoR3EdpLvADA8cQm3rrerO4r984qlto2IwM9OB56D49tq12oMHMQ/aPONFkqUH0KlJ+UBYiIos7c3KPxrzy5Wh3BpdlBjM=
+	t=1712973017; cv=none; b=KXVrmwZL+RR4l5UbDUImOmMu9uhNdrxv6vCSjcC31MSHUs7fE+7BDq9sXy71+7rHFNMcsWtpU9otlKVfWWZW8aZT8O3uYLfQk/rWXqkLwrGGKlk4H7cZFWyFJPX1Zn8FGn5COO01Qq3hZnMtGtpNTjPsLEGWi88BDsd4VM3qtow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1712972981; c=relaxed/simple;
-	bh=zjiEwIGjJUYHWO7zNL0UZxudPeYSdpy2KGnIY81YnCU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C9sUeK9YtcvaZ11pjCRGbWa41vv1p8x6gnk5EMq+WQ9tEuOnogPk9l071zdDjG23PwLG9Iic+P4SbeZwsDKFcV7PsIfx7zqPkcR9NixHIt9KS+paD8NuUkUH0JMn3XlX4HECBNxpRNhCvWoPcQpu8aBUesRWYU70blmdxxxoK1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aokWUM5k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86869C113CC;
-	Sat, 13 Apr 2024 01:49:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1712972981;
-	bh=zjiEwIGjJUYHWO7zNL0UZxudPeYSdpy2KGnIY81YnCU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aokWUM5kCnrSDX0m9QgCmY1YEPV7sgD8bRQSpnljz+YhvZNxnh+dbDb41hRO6RjyR
-	 YW9TtfwlFIdpr10zDGjmk4jBD5dMOTG4vy2NFiuQiwi+G8AsaO8nr/kE62p/4iXXzH
-	 y9Ab7pojSdawO4SiNDJbXS2/C0xcM5/IOTTtJTaMLeE9tqqgLmFWA+XTJZpw9kIbvJ
-	 x9uYz++sI7Y4G5QtwORxCF036fewocnlFKtMVPRE+IbGBfOenHro+uVx9dNYQm7qtY
-	 jn21IUtY1d/GZVs5GZLpsKeSjcq1JgU304xBCk5MghHbdfF3Bm7xpZpv2g8klHP35C
-	 ED3L9s2+Q7Hnw==
-Date: Fri, 12 Apr 2024 18:49:39 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- fancer.lancer@gmail.com, Jose.Abreu@synopsys.com, chenhuacai@kernel.org,
- linux@armlinux.org.uk, guyinggang@loongson.cn, netdev@vger.kernel.org,
- chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
-Subject: Re: [PATCH net-next v11 3/6] net: stmmac: dwmac-loongson: Use
- PCI_DEVICE_DATA() macro for device identification
-Message-ID: <20240412184939.2b022d42@kernel.org>
-In-Reply-To: <b078687371ec7e740e3a630aedd3e76ecfdc1078.1712917541.git.siyanteng@loongson.cn>
-References: <cover.1712917541.git.siyanteng@loongson.cn>
-	<b078687371ec7e740e3a630aedd3e76ecfdc1078.1712917541.git.siyanteng@loongson.cn>
+	s=arc-20240116; t=1712973017; c=relaxed/simple;
+	bh=nK7S4AX7MvARgqM6BBHBiwuYAnJjjYfTAUaMHXm0s7s=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=U2xrzWrmLvbFu6S7YoamNJgG24hdzIuz8Uxv9pD54RlnmzlwGyu9NpcvFhnL9FxI30t31x0LLuStMhaQCNnSc2I/V0uB8/e2z7df8eTOzZMrljFk+tA+SKcWcGz6Kb9mi8hg/K/JMHrNabMmMGu/h07lAU1nSQrz+BE863OTn9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fNrSaqOH; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2a2d0ca3c92so986493a91.0;
+        Fri, 12 Apr 2024 18:50:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1712973015; x=1713577815; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4GoxZ/DDCn693PM29RJyJPYwUobIu0pR6Xc9xkzx0qE=;
+        b=fNrSaqOHzM3eH+01xq9bOJj41HrL/gZ+mehDlcXFXKa5e1VGoCAYLXjb/3PJGxwPtC
+         Q54QYm90XtMzOQkwGS9+T8XOmnlDguCL4jFm8RmPAwv3EGPyzbh505QXTAivmI9slmdG
+         vIcp5ZY6FydAMNksZ0O+N1cm6cnQsNg6u5f1j8+bzVlAGO/2usosmlxXMGRIpMe8MJob
+         dvy9KOQemat+M+Ii3kyC7DDzKsY3kUNabCmsKYvp2nTjXdfnJlgPzrnvTNuxWw/abXqa
+         2790AeMb/Vhgrt1bidNo29EuTRDuEKXyRJYXhRRmf+q0/9DdmEj1L1v6H1AiA1nDOpRJ
+         SzBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1712973015; x=1713577815;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4GoxZ/DDCn693PM29RJyJPYwUobIu0pR6Xc9xkzx0qE=;
+        b=fuD2pBeQVB+nQD6sgfPTnK0wbD150HtcMJ+iL1VG3s1h6Z+mrjdV9WanzuxVem19+I
+         9H+UBASz5VVwgTwk7CFEusa7TYaYOyaTGnNDWH/VFs/cMdUI8IGVAKMigTVySDZwfEAp
+         ZSxe2LDbhtMrkKaSTZwG5JGWea8SiRX83sSdYM33+0dumaW4R4g/2iPIM+06ePB7yntH
+         MYN/2EtggHsPFMXXIWv0C/Nsrpp/YgKNX/uIfKeHQjYCLUZk1b8PJUgLWFNGPxMrgwpI
+         6vYeZJrntMzrwdcJF0ffyPAy0VyqKYWVbROBW/71Xbfccy0BOkPOg+Gv+9GFUzsrP4Je
+         0u0A==
+X-Forwarded-Encrypted: i=1; AJvYcCUxNLpc1aY7giA4IA0O1sicXLYUnKBeNfzC9Pnk/bB5IXJOP/RpQCZDnWl2NDEocXc6J/uSH2fZY5yOoqHd7xvgUdLCJDH1tV2nW5dQoxaKkZntyN68CDYihaQDbgxnAbyLKS1a4KU5pyEL36UQDSU58bPw+X1Mod+8/ka/gi49NWzB/J2Y
+X-Gm-Message-State: AOJu0Ywcs26gQ9iWqRuV9HrO7Vj0DxhWGMEAarPmUBJ9QnsPWi/FEpgp
+	Ne/HjsqfhPlQmc7tsrkTJPwflZS5GmCZ4FK2XrfVsh4RyAJwN4dKdlaXmsv66MZQGD1XnnliRsJ
+	gzrD+scO+3jT4pXdFMnsI/dSlD/0=
+X-Google-Smtp-Source: AGHT+IH6BUPdU+NoMidFc6+jlwGqlMb9lQWMamK9mVH+ehSf6Wk5SSCtqrn3kznnpDURD5OV1Dq7BRw/BiLOHFJ83j8=
+X-Received: by 2002:a17:90b:8cb:b0:2a5:3c66:25a8 with SMTP id
+ ds11-20020a17090b08cb00b002a53c6625a8mr10160280pjb.15.1712973015100; Fri, 12
+ Apr 2024 18:50:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20240413-tcp-ao-selftests-fixes-v1-0-f9c41c96949d@gmail.com> <20240413-tcp-ao-selftests-fixes-v1-3-f9c41c96949d@gmail.com>
+In-Reply-To: <20240413-tcp-ao-selftests-fixes-v1-3-f9c41c96949d@gmail.com>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Sat, 13 Apr 2024 02:50:03 +0100
+Message-ID: <CAJwJo6buDyTvL5Hh0Mhbrd-pzzom6m0D5==ujvKi3g5ejBURQg@mail.gmail.com>
+Subject: Re: [PATCH net 3/4] selftests/tcp_ao: Fix fscanf() call for format-security
+To: 0x7f454c46@gmail.com
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 12 Apr 2024 19:28:08 +0800 Yanteng Si wrote:
-> Just use PCI_DEVICE_DATA() macro for device identification,
-> No changes to function functionality.
->=20
-> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drive=
-rs/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> index 9e40c28d453a..995c9bd144e0 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> @@ -213,7 +213,7 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loong=
-son_dwmac_suspend,
->  			 loongson_dwmac_resume);
-> =20
->  static const struct pci_device_id loongson_dwmac_id_table[] =3D {
-> -	{ PCI_VDEVICE(LOONGSON, 0x7a03) },
-> +	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
->  	{}
->  };
->  MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
+On Sat, 13 Apr 2024 at 02:43, Dmitry Safonov via B4 Relay
+<devnull+0x7f454c46.gmail.com@kernel.org> wrote:
+>
+> From: Dmitry Safonov <0x7f454c46@gmail.com>
+>
+> On my new laptop with packages from nixos-unstable, gcc 12.3.0 produces:
+> > lib/proc.c: In function =E2=80=98netstat_read_type=E2=80=99:
+> > lib/proc.c:89:9: error: format not a string literal and no format argum=
+ents [-Werror=3Dformat-security]
+> >    89 |         if (fscanf(fnetstat, type->header_name) =3D=3D EOF)
+> >       |         ^~
+> > cc1: some warnings being treated as errors
+>
+> Here the selftests lib parses header name, while expectes non-space word
+> ending with a column.
+>
+> Fixes: cfbab37b3da0 ("selftests/net: Add TCP-AO library")
+> Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
 
-In file included from ../drivers/net/ethernet/stmicro/stmmac/dwmac-loongson=
-.c:6:
-../include/linux/pci.h:1061:51: error: =E2=80=98PCI_DEVICE_ID_LOONGSON_GMAC=
-=E2=80=99 undeclared here (not in a function); did you mean =E2=80=98PCI_DE=
-VICE_ID_LOONGSON_HDA=E2=80=99?
- 1061 |         .vendor =3D PCI_VENDOR_ID_##vend, .device =3D PCI_DEVICE_ID=
-_##vend##_##dev, \
-      |                                                   ^~~~~~~~~~~~~~
-../drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:216:11: note: in ex=
-pansion of macro =E2=80=98PCI_DEVICE_DATA=E2=80=99
-  216 |         { PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) =
-},
-      |           ^~~~~~~~~~~~~~~
-../drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:216:44: error: =E2=
-=80=98loongson_gmac_pci_info=E2=80=99 undeclared here (not in a function)
-  216 |         { PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) =
-},
-      |                                            ^~~~~~~~~~~~~~~~~~~~~~
-../include/linux/pci.h:1063:41: note: in definition of macro =E2=80=98PCI_D=
-EVICE_DATA=E2=80=99
- 1063 |         .driver_data =3D (kernel_ulong_t)(data)
-      |                                         ^~~~
+Actually, now I see that it was also reported, adding
+
+Reported-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+Link: https://lore.kernel.org/all/0c6d4f0d-2064-4444-986b-1d1ed782135f@coll=
+abora.com/
+
 --=20
-pw-bot: cr
+             Dmitry
 
