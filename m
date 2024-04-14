@@ -1,157 +1,150 @@
-Return-Path: <netdev+bounces-87688-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87689-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 047B48A416E
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 11:09:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CDB38A417B
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 11:15:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACDFA1F214A9
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 09:09:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B89E42815B9
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 09:15:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68AD225DD;
-	Sun, 14 Apr 2024 09:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877D221A0B;
+	Sun, 14 Apr 2024 09:15:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cTDvmFLu"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Oe9sEK6R";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="5IYxmnEF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E270225CE
-	for <netdev@vger.kernel.org>; Sun, 14 Apr 2024 09:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DB081C69D
+	for <netdev@vger.kernel.org>; Sun, 14 Apr 2024 09:15:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713085787; cv=none; b=e1kkOfKEi7N/s/jQ7KTljHUn/O9j//FnGqwqTWMHMlIBObvgxpiPIf946JCuqBOtUZSC1CEN7fLUOBaX7pDV0k6kmSNf1Oqfdb+w9O0GmMr2tJj+MvyGzThJLoQICI3Pa3EUkUOnIexTRgCLlm+n9Hq0aTdH6OPHyUH3IB7Spnc=
+	t=1713086132; cv=none; b=kEzDz8DqwuzxK2ze2UTSE/6MTVKG6Y0OOrQjA82uxF8qPZGHvgOvtJkV1+Uy5ws2xa8UfYzPEqFYRFjoFFLa+83lzEoebDeqlUQVvxDfPFZw/jwgvR4DgJR7hn22TE8E9RAT06z+CqQDqTve4u6ncBj5m9CHeIdtOnPRfy8DKy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713085787; c=relaxed/simple;
-	bh=mx81azu7WGqDtDaPoKpPXOlm5ztzVujTkyngWrhVR+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WKTMa4mg0PgQJUnmyH3clVyI4SV5cs+hVu3x+Z+PAYXU9DRssAjY3gqOumL8W/8GqaNe5lKA0e6/nHcz7XCjqnjQGxWoY8eFDgu0fv1+mMvRX8V8M53kDeFMt19MneRCVj/1ySlqm64rrMGxPnHA4kJd6zOHKNEdRYFGk/sdKQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cTDvmFLu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713085785;
+	s=arc-20240116; t=1713086132; c=relaxed/simple;
+	bh=vEin7Rc4tJrk64YbnlYlr2P9o0hfmQ/2JvKGBu1wJPQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=EDvlU6eGxlEXQV6lYhcSvL7R0v4D543eMhsyewvMTgtHk8hEbUE/wM6nbgUsRwFjU2plercVL4zg/Q2OoagvWiCHovhQ3t3zzzuNKTi3sELS2vpiPqotrL2ZthcDvcC/l1t928hNM+D3nrjb6d+h67Jjcxp6RdnhPAjeZKtFDyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Oe9sEK6R; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=5IYxmnEF; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1713086128;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KDn9p0oKJIowoxHQ+QZq8N5Xvgpd2J6FJtOvcnaAQTg=;
-	b=cTDvmFLucsv6BAwvVTWGcaWjPl7jBhSdEmsipvS2uuXlIf5lYiHgBWwHQn8kQwdS3DUZLo
-	SQkvspX7IXon7VqjeWXnL5pnImbG6VzQReMQY+IBpiHBe39OzwHNZyr0jzc0vwThgr5yf9
-	MTw+tbfvH/1ZYV27eOfeMcnrmiFOgGA=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-665-r2jQ7u3iMBmkLG19Q66fwQ-1; Sun, 14 Apr 2024 05:09:43 -0400
-X-MC-Unique: r2jQ7u3iMBmkLG19Q66fwQ-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2d6ef704b35so18304111fa.2
-        for <netdev@vger.kernel.org>; Sun, 14 Apr 2024 02:09:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713085782; x=1713690582;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KDn9p0oKJIowoxHQ+QZq8N5Xvgpd2J6FJtOvcnaAQTg=;
-        b=Cc9BidXGVqX672A58ngIGyoZrUOpRQxzGeSzmh51dSMOAtJOlxc73Hha1KJnlDthej
-         BmWSHCb1qVrIV2RABoaghEAffq2QYQt+1Rr7Wh0jzVganN8DMcXxXYgvqPasKVPO0UPq
-         hT6W+wbrCIGmGSiW9YIqmNkW4DS4vcBxpDcRTD0R1NHQiCtCRf7ijuadFVBUQHr9zmRd
-         0o8yCGRWwtxd3xd05r1xdoW8TEVuGlI5knF7mba1GQiusKA2a/M4buutNVHECRIVhz1h
-         j+MqV1vDl4cg08j0bJr/iDGYLl2sF3lXVC4vQ/db0wL343TBuFoQPe5kA8jw64rAvx5l
-         Tt5A==
-X-Forwarded-Encrypted: i=1; AJvYcCVY0dGeIr3wazyddb3onb7jFyt/CAOUttggD7XcGGSdRVkvEQgTWfu9qpeEl63sntngRFWObFWGiWsW64qSPBkk0VEJo6Rk
-X-Gm-Message-State: AOJu0Ywqm6Cb9i/e4q6KoyeYI9pv8ka2nUvUymhYgwL6HnMqKd5NNgrI
-	yOVtuSBIN8nYxWxr2aykdiJsLuTQGTKbqxRfdgbi8uObqkJFXMFBdqfJm90BeKInWT0DLkPlKz1
-	ylXEVBwXePprubibBbFDCiryIN+vo9Yu0cASjm4irc+2TWuLKTprL6A==
-X-Received: by 2002:a2e:3509:0:b0:2d9:ecc1:6d56 with SMTP id z9-20020a2e3509000000b002d9ecc16d56mr4549905ljz.11.1713085782019;
-        Sun, 14 Apr 2024 02:09:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFnvXuyxDizZiI5lyVmq1CswBaXk7vrRoCt8wmpz3FQXQtnkzsP0CH3Qy864TeyyCiCUv5HDg==
-X-Received: by 2002:a2e:3509:0:b0:2d9:ecc1:6d56 with SMTP id z9-20020a2e3509000000b002d9ecc16d56mr4549901ljz.11.1713085781463;
-        Sun, 14 Apr 2024 02:09:41 -0700 (PDT)
-Received: from redhat.com ([31.187.78.68])
-        by smtp.gmail.com with ESMTPSA id u2-20020a05600c4d0200b0041668053ca9sm10311768wmp.0.2024.04.14.02.09.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Apr 2024 02:09:40 -0700 (PDT)
-Date: Sun, 14 Apr 2024 05:09:38 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: Jason Wang <jasowang@redhat.com>, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: [PATCH] vhost-vdpa: Remove usage of the deprecated
- ida_simple_xx() API
-Message-ID: <20240414050922-mutt-send-email-mst@kernel.org>
-References: <bd27d4066f7749997a75cf4111fbf51e11d5898d.1705350942.git.christophe.jaillet@wanadoo.fr>
- <20240414043334-mutt-send-email-mst@kernel.org>
- <a7eceabf-12cb-41ff-8e2b-f3b21d789c17@wanadoo.fr>
+	bh=22LCWs6JU/zxgBjYTEA2rm5irDIXx8aJeQExD/3BR+A=;
+	b=Oe9sEK6Rd10dd0rlosxkYryx2N/7YAQTA8PO+pdHoU6IEnc3sqyPAVtq/hKpCrsVU/QrN1
+	Qrm6rWUA0YOs/u0UlKzoQ5a65SLekr4SDXws4ZFEz+YZU7T5bUJYSIsFsjX0eggr8LB8wy
+	86rohHnA/d/5iJgco4rVgVld1w6XenUftmEfmpd/IUAQDAE8mAMgJc7PHVz9nGFEilLZ3L
+	OcsoZnQRej3+wa9meGW11bHMNWfBJGtFS7KNeX2yZwJUzTvCqtWsWXdlLSB+WIa21BSUdd
+	XhQhcpjnPqJbBLMDqMxVCsfdqoNUCPsIttD6kRv2BaXZLW8zHjI14vByrKd/Jg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1713086128;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=22LCWs6JU/zxgBjYTEA2rm5irDIXx8aJeQExD/3BR+A=;
+	b=5IYxmnEFWUysnFHuwgw1UfVvvIrXJX317xHObbSrLE22Sf8nO/G+sSRjTCxbLkksRWUdW2
+	PN3L52ehQUgQohDA==
+To: Lukas Wunner <lukas@wunner.de>, Roman Lozko <lozko.roma@gmail.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Sasha
+ Neftin <sasha.neftin@intel.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-net] igc: Fix deadlock on module removal
+In-Reply-To: <Zhubjkscu9HPgUcA@wunner.de>
+References: <20240411-igc_led_deadlock-v1-1-0da98a3c68c5@linutronix.de>
+ <Zhubjkscu9HPgUcA@wunner.de>
+Date: Sun, 14 Apr 2024 11:15:26 +0200
+Message-ID: <877ch0b901.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a7eceabf-12cb-41ff-8e2b-f3b21d789c17@wanadoo.fr>
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-On Sun, Apr 14, 2024 at 10:59:06AM +0200, Christophe JAILLET wrote:
-> Le 14/04/2024 à 10:35, Michael S. Tsirkin a écrit :
-> > On Mon, Jan 15, 2024 at 09:35:50PM +0100, Christophe JAILLET wrote:
-> > > ida_alloc() and ida_free() should be preferred to the deprecated
-> > > ida_simple_get() and ida_simple_remove().
-> > > 
-> > > Note that the upper limit of ida_simple_get() is exclusive, buInputt the one of
-> > 
-> > What's buInputt? But?
-> 
-> Yes, sorry. It is "but".
-> 
-> Let me know if I should send a v2, or if it can be fixed when it is applied.
-> 
-> CJ
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Yes it's easier if you do. Thanks!
+Hi Lukas,
 
-> > 
-> > > ida_alloc_max() is inclusive. So a -1 has been added when needed.
-> > > 
-> > > Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> > 
-> > 
-> > Jason, wanna ack?
-> > 
-> > > ---
-> > >   drivers/vhost/vdpa.c | 6 +++---
-> > >   1 file changed, 3 insertions(+), 3 deletions(-)
-> > > 
-> > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > > index bc4a51e4638b..849b9d2dd51f 100644
-> > > --- a/drivers/vhost/vdpa.c
-> > > +++ b/drivers/vhost/vdpa.c
-> > > @@ -1534,7 +1534,7 @@ static void vhost_vdpa_release_dev(struct device *device)
-> > >   	struct vhost_vdpa *v =
-> > >   	       container_of(device, struct vhost_vdpa, dev);
-> > > -	ida_simple_remove(&vhost_vdpa_ida, v->minor);
-> > > +	ida_free(&vhost_vdpa_ida, v->minor);
-> > >   	kfree(v->vqs);
-> > >   	kfree(v);
-> > >   }
-> > > @@ -1557,8 +1557,8 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
-> > >   	if (!v)
-> > >   		return -ENOMEM;
-> > > -	minor = ida_simple_get(&vhost_vdpa_ida, 0,
-> > > -			       VHOST_VDPA_DEV_MAX, GFP_KERNEL);
-> > > +	minor = ida_alloc_max(&vhost_vdpa_ida, VHOST_VDPA_DEV_MAX - 1,
-> > > +			      GFP_KERNEL);
-> > >   	if (minor < 0) {
-> > >   		kfree(v);
-> > >   		return minor;
-> > > -- 
-> > > 2.43.0
-> > 
-> > 
-> > 
+On Sun Apr 14 2024, Lukas Wunner wrote:
+> [cc +=3D Roman Lozko who originally reported the issue]
+>
+> On Sun, Apr 14, 2024 at 09:44:10AM +0200, Kurt Kanzenbach wrote:
+>> unregister_netdev() acquires the RNTL lock and releases the LEDs bound
+>> to that netdevice. However, netdev_trig_deactivate() and later
+>> unregister_netdevice_notifier() try to acquire the RTNL lock again.
+>>=20
+>> Avoid this situation by not using the device-managed LED class
+>> functions.
+>>=20
+>> Suggested-by: Lukas Wunner <lukas@wunner.de>
+>> Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
+>> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+>
+> This patch is almost a 1:1 copy of the patch I submitted on April 5:
+>
+> https://lore.kernel.org/all/ZhBN9p1yOyciXkzw@wunner.de/
+>
+> I think it is mandatory that you include a Signed-off-by with my name
+> in that case.  Arguably the commit author ("From:") should also be me.
 
+I was a bit unsure how to proceed with that. See below.
+
+>
+> Moreover this is missing a Reported-by tag with Roman Lozko's name.
+>
+> AFAICS the only changes that you made are:
+> - rename igc_led_teardown() to igc_led_free()
+> - rename ret to err
+> - replace devm_kcalloc() with kcalloc()
+>   (and you introduced a memory leak while doing so, see below)
+>
+> Honestly I don't see how those small changes justify omitting a
+> Signed-off-by or assuming authorship.
+>
+> I would have been happy to submit a patch myself, I was waiting
+> for a Tested-by from Roman or you.
+
+Perfect. I was wondering why you are not submitting the patch
+yourself. Then, please go ahead and submit the patch. Feel free to add
+my Tested-by.
+
+Thanks,
+Kurt
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmYbnq8THGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgpWsEACe07fEP5jsHlnLQYv+N0UEBa0gqAlt
+Y17BtyVPOongY6Ge9rwriuFpRkVKe9hDU3DMtEDtElaERsGY5/q62QEHdSFz2Xph
+8swJ6gm3APXfuDHo/ojcRhiYZq72LtQC1BzpK1GmoubBxuCEClgD8CbLk796aSdC
+KGJ7ZHOlcncGQRBtXb3BGeO8OJ/3W4HxFxWxiuAaMyA0C/IJYEQHkf2tkEuRPlt4
+wRDSWwe1kiOCk/XNcfQyoGGgQLTRwxmNhMbsisXT2OWUOP79yqhEI5uEiBZvTDdN
+NeEkYLEn2RyFzVBgF4x4qdjkXWhEyXoK3xZ7widWaYv8OK9ApXyqrAe2ETpfm7Cl
+ZyysXawhtREtOEHi9Ngx+CFYqMPAZogsBCF+DJFCdJbGH36ltFiM04JCWRuxSnfA
+izD3Qe/jDutHQXUCVk7DOpDBLLzDq+aAusHMPCG+aGf3SPGMSiFPtSLCFD/A3O1O
+8t5/X49C2zgdKmVkunN4iLdwA9UrXb6ZikuMNT0D/1r2KRaYyY1OPSvCR5lU3HQ0
+E7ASKm7MmUoFmpVvNcrmfEXUyUyPHCa1I6E4GTJ4auivuPOv/JUeFxxvoM94mMWD
+O9/PljgDLwjg8O3kxkKKBlH6aiKiQ0UsocWh4oX9ZWHlGqKzkPNBLES/KmmhtxwS
+Dr0nzYMcgyF79g==
+=viC8
+-----END PGP SIGNATURE-----
+--=-=-=--
 
