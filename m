@@ -1,87 +1,65 @@
-Return-Path: <netdev+bounces-87695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F2B78A41E6
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 12:44:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D53978A41EA
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 12:45:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A1991C20AAE
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 10:44:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B3351F212FD
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 10:45:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC9D2E63B;
-	Sun, 14 Apr 2024 10:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 770A42E644;
+	Sun, 14 Apr 2024 10:45:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YLSq0jO5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FN1ErKEN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C9F1865;
-	Sun, 14 Apr 2024 10:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5220C21A1C
+	for <netdev@vger.kernel.org>; Sun, 14 Apr 2024 10:45:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713091465; cv=none; b=pIQ2eFj4GTisDFNS1P9jo7G1h8ZpfoqjsZByMOCK2PPzgQ6sYNuTYR727wvljc6R/rUkFiRmQA1+F6+XvnhHlN09mVN3RqN4oZlljHsGVwJ9I6fDZcSPy9Hrx11xhrQDL6Essa164L5O4UjjSKZedXlk3hEzlNHYSIzYjmrDSdw=
+	t=1713091505; cv=none; b=ceAHe9FQUMmxBbET1RfbmrzWRienxQkMdptWBbGA+GwIhbTKAeymsHnbqxvmxr8x59KV/dVni8b/cIerU9qD9nmW8oKBh1VqN4ruJQk0TmhsIeITqJfhxMn1y5QfcNIZsLLsTQSpVvavqM8ttiIw404fgDKka79kBq1foS17TR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713091465; c=relaxed/simple;
-	bh=jScTQYNuKSdQRN71THl1woAyTI/mIsL2raQkX/Y0bi0=;
+	s=arc-20240116; t=1713091505; c=relaxed/simple;
+	bh=+iPx7L3YADSjEsnMN8C4gLtm3meBO09BJJCj0YD1ZHc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nWLippfyOH72rHuyZPK44aii6cmLT7ApAAAFecYA+zvG+mTHPVPiSUih8pT4UUxM/conGxd8+FvCubp0JTV0qgPXel9nub0L4/yH8R5lIuZwpyhx02mim+lSKhSb49V4N3Iz7RBkjfvQYo4T+FckuB85ndVNdUi82Z2a6tgxM/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YLSq0jO5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CC6FC072AA;
-	Sun, 14 Apr 2024 10:44:16 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=IFybrTJoIIDtp0bnMBPnxUNWyqz9yGrezIMa/dJvH18UFJjGy4ItdMp2wOuOQm8/56YdaQjDB5/ylYys0Aeiebco9yy9KQzrwzdfpsizmpOsgBSnCSJ7miKZdSIluzSb/oF7QeByUEz9eZKorMRQOEBLpm7B8cpFjvcXVJsov+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FN1ErKEN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42296C3277B;
+	Sun, 14 Apr 2024 10:45:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713091465;
-	bh=jScTQYNuKSdQRN71THl1woAyTI/mIsL2raQkX/Y0bi0=;
+	s=k20201202; t=1713091504;
+	bh=+iPx7L3YADSjEsnMN8C4gLtm3meBO09BJJCj0YD1ZHc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YLSq0jO5BrG1cv9zv6kr3rQyeJsfGcqSJLz+Q7xeorHaa5lcEYIxKgLs8BydAqvJP
-	 q00VFElDlEjTcopyOUK1waF3ME2oKgyJyJuhNQ8v/L8qH/uHwBUxhuIj2eGfyki+TS
-	 cLaDO8XBRUmtvlQO17LNXikT/+ciPNG1G1mOLE6MzEOdH1OptnO0yOhbRwnIdnsFhS
-	 4KWPi5WnG8WA941iN29H2UDTT3MDtEtM6u0lugw1xKbrjNJbZqgMCGeunfLGAPErlS
-	 AiJgH3QgEOBt5HNed+WHbbgABU7V7RXOdFVKKS3RjTj/GAM8+Uc4/AZvtIHjdNwcLA
-	 sV8f64OIiMB0Q==
-Date: Sun, 14 Apr 2024 11:44:14 +0100
-From: Simon Horman <horms@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
+	b=FN1ErKENe6JzbK502/tvn8A86Zixlyt4NP6gfu0GEbkzTzbp4SgH7jUfsYsNpTCfJ
+	 2W9YEL43JmODrc7XAHpYfNrHPDwTueLf1zpIMLuar45HJXu6qDeOH587cFRG2UQR01
+	 EjVyDm4fR5UqDGBtTvZK/7j55PyRb4spF9pfT2aw0QafEU5ncodAs6zGm5whc3MOnb
+	 40LzQrNzxz2FzWKNuAR3+S66kM3k3YTie5w9KLaBvktUwM2gBxFL+sTO6tRMVXIodW
+	 adni3YbY/TXEvkG00kK6MeWjrXd46vHc79s93JPafLNhOHiRrzoyxD/nBEZIL+xItR
+	 bfkZ/7sNIluLw==
+Date: Sun, 14 Apr 2024 13:45:00 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Antony Antony <antony@phenome.org>, antony.antony@secunet.com,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
-	Saravana Kannan <saravanak@google.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Alex Elder <elder@linaro.org>,
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Abel Vesa <abel.vesa@linaro.org>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Lukas Wunner <lukas@wunner.de>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	Amit Pundir <amit.pundir@linaro.org>,
-	Xilin Wu <wuxilin123@gmail.com>, linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v7 14/16] power: pwrseq: add a driver for the PMU module
- on the QCom WCN chipsets
-Message-ID: <20240414104414.GC645060@kernel.org>
-References: <20240410124628.171783-1-brgl@bgdev.pl>
- <20240410124628.171783-15-brgl@bgdev.pl>
+	devel@linux-ipsec.org, Eyal Birger <eyal.birger@gmail.com>,
+	Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Subject: Re: [devel-ipsec] [PATCH ipsec-next v8] xfrm: Add Direction to the
+ SA in or out
+Message-ID: <20240414104500.GT4195@unreal>
+References: <9e2ddbac8c3625b460fa21a3bfc8ebc4db53bd00.1712684076.git.antony.antony@secunet.com>
+ <20240411103740.GM4195@unreal>
+ <ZhfEiIamqwROzkUd@Antony2201.local>
+ <20240411115557.GP4195@unreal>
+ <ZhhBR5wTeDAHms1A@hog>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,84 +68,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240410124628.171783-15-brgl@bgdev.pl>
+In-Reply-To: <ZhhBR5wTeDAHms1A@hog>
 
-On Wed, Apr 10, 2024 at 02:46:26PM +0200, Bartosz Golaszewski wrote:
+On Thu, Apr 11, 2024 at 10:00:07PM +0200, Sabrina Dubroca wrote:
+> 2024-04-11, 14:55:57 +0300, Leon Romanovsky wrote:
+> > On Thu, Apr 11, 2024 at 01:07:52PM +0200, Antony Antony via Devel wrote:
+> > > On Thu, Apr 11, 2024 at 01:37:40PM +0300, Leon Romanovsky via Devel wrote:
+> > > > On Tue, Apr 09, 2024 at 07:37:20PM +0200, Antony Antony via Devel wrote:
+> > > > > This patch introduces the 'dir' attribute, 'in' or 'out', to the
+> > > > > xfrm_state, SA, enhancing usability by delineating the scope of values
+> > > > > based on direction. An input SA will now exclusively encompass values
+> > > > > pertinent to input, effectively segregating them from output-related
+> > > > > values. This change aims to streamline the configuration process and
+> > > > > improve the overall clarity of SA attributes.
+> > > > > 
+> > > > > This feature sets the groundwork for future patches, including
+> > > > > the upcoming IP-TFS patch.
+> > > > > 
+> > > > > v7->v8:
+> > > > >  - add extra validation check on replay window and seq
+> > > > >  - XFRM_MSG_UPDSA old and new SA should match "dir"
+> > > > 
+> > > > Why? Update is add and delete operation, and one can update any field
+> > > > he/she wants, including direction.
+> > > 
+> > > Update operations are not strictly necessary without IKEv2. However, during
+> > > IKEv2 negotiation, updating "in" SA becomes essential.
+> > 
+> > The thing is if you want to limit update routine to fit IKEv2 only, or
+> > continue to allow users to do whatever they want with netlink and their
+> > own applications without *swan.
+> > 
+> > I don't have knowledge about such users, just remember seeking tons of
+> > guides how to setup IPsec tunnel with iproute2 and scripts, one of them
+> > can be potentially broken by this change.
+> 
+> Nothing is going to break with this change. Old scripts and old
+> userspace software are not providing XFRMA_SA_DIR, so none of the new
+> checks apply.
 
-...
+Right, but what about new iproute2, which eventually will users get
+after system update and old scripts?
 
-> +static int pwrseq_qcom_wcn_probe(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	struct pwrseq_qcom_wcn_ctx *ctx;
-> +	struct pwrseq_config config;
-> +	int i, ret;
-> +
-> +	ctx = devm_kzalloc(dev, sizeof(*ctx), GFP_KERNEL);
-> +	if (!ctx)
-> +		return -ENOMEM;
-> +
-> +	ctx->of_node = dev->of_node;
-> +
-> +	ctx->pdata = of_device_get_match_data(dev);
-> +	if (!ctx->pdata)
-> +		return dev_err_probe(dev, -ENODEV,
-> +				     "Failed to obtain platform data\n");
-> +
-> +	ctx->regs = devm_kcalloc(dev, ctx->pdata->num_vregs,
-> +				 sizeof(*ctx->regs), GFP_KERNEL);
-> +	if (!ctx->regs)
-> +		return -ENOMEM;
-> +
-> +	for (i = 0; i < ctx->pdata->num_vregs; i++)
-> +		ctx->regs[i].supply = ctx->pdata->vregs[i];
-> +
-> +	ret = devm_regulator_bulk_get(dev, ctx->pdata->num_vregs, ctx->regs);
-> +	if (ret < 0)
-> +		return dev_err_probe(dev, PTR_ERR(ctx->regs),
-> +				     "Failed to get all regulators\n");
+Thanks
 
-Hi Bartosz,
-
-It looks like ctx->regs is not an error pointer here,
-should this be:
-
-		return dev_err_probe(dev, ret, ...
-
-Flagged by Smatch.
-
-> +
-> +	ctx->bt_gpio = devm_gpiod_get_optional(dev, "bt-enable", GPIOD_OUT_LOW);
-> +	if (IS_ERR(ctx->bt_gpio))
-> +		return dev_err_probe(dev, PTR_ERR(ctx->bt_gpio),
-> +				     "Failed to get the Bluetooth enable GPIO\n");
-> +
-> +	ctx->wlan_gpio = devm_gpiod_get_optional(dev, "wlan-enable",
-> +						 GPIOD_OUT_LOW);
-> +	if (IS_ERR(ctx->wlan_gpio))
-> +		return dev_err_probe(dev, PTR_ERR(ctx->wlan_gpio),
-> +				     "Failed to get the WLAN enable GPIO\n");
-> +
-> +	ctx->clk = devm_clk_get_optional(dev, NULL);
-> +	if (IS_ERR(ctx->clk))
-> +		return dev_err_probe(dev, PTR_ERR(ctx->clk),
-> +				     "Failed to get the reference clock\n");
-> +
-> +	memset(&config, 0, sizeof(config));
-> +
-> +	config.parent = dev;
-> +	config.owner = THIS_MODULE;
-> +	config.drvdata = ctx;
-> +	config.match = pwrseq_qcom_wcn_match;
-> +	config.targets = pwrseq_qcom_wcn_targets;
-> +
-> +	ctx->pwrseq = devm_pwrseq_device_register(dev, &config);
-> +	if (IS_ERR(ctx->pwrseq))
-> +		return dev_err_probe(dev, PTR_ERR(ctx->pwrseq),
-> +				     "Failed to register the power sequencer\n");
-> +
-> +	return 0;
-> +}
-
-...
+> 
+> -- 
+> Sabrina
+> 
+> 
 
