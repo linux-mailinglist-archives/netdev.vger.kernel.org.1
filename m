@@ -1,62 +1,50 @@
-Return-Path: <netdev+bounces-87723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25E618A438F
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 17:49:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A82788A43B4
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 18:10:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE9841F216F1
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 15:49:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9CB91C21BC0
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 16:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48FA8134CE8;
-	Sun, 14 Apr 2024 15:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41329134CEF;
+	Sun, 14 Apr 2024 16:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dm00pbtN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l0pTNk6c"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EDA91946B;
-	Sun, 14 Apr 2024 15:49:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0774204F;
+	Sun, 14 Apr 2024 16:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713109777; cv=none; b=NaVAf99s8AEjCIeBz5pvB+VutF8ga03LapaOuAU56Pxusd+JxzxaCJ6qMTApjWiCoidqi9vKp0KanNXvoT3sX0ZZ2fslnRfm5sccB6cwZk5EC7YJ2JhIgr90jIN0G5TzSZ4CEpCqjO9or6gB21vqH6aogtJiiYxju2+fQj5sqaY=
+	t=1713111027; cv=none; b=eedKxIAOK79S5vLMQJIf7tIPqbMogxJSjMnXg2KeDJMbUMpeuUiAIZ2zpXoKkm3Fw0RLbEtw5TIQrBB6ipeqAJQYet3uy8Z8JSKwcdI0REyUTryFCObfcVlc+gQhniw6G8gRfx6+Qc2Wo9iBF3HktGi/1v6wKkLZk7BEGpG4x6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713109777; c=relaxed/simple;
-	bh=vCsq4zNZCgl5SrWAOnz2TdTN3i0qeRkTl74j/gYlBr8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=izDx9RUBBWUCgdPEsh9hNT+ZtIVNSu8IZDcZ5IG3Lal0gdwomzwFq5S1gsjH8C68rA0CAtWocv+xfsHJwRusLrdd2sin2p+UjzjiiQYigCsNtcM7p2+MG+pSPe7Hcik0jNfPNSLbi6Ws7duLRHuUiMSQjNaPNxlKvxZy/uYdyLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dm00pbtN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F668C072AA;
-	Sun, 14 Apr 2024 15:49:32 +0000 (UTC)
+	s=arc-20240116; t=1713111027; c=relaxed/simple;
+	bh=GQ91brGH7ot9MixWssd4TprxKrsg8x2E2K9LgthC60A=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bhWbRbs5OaRH5yZ9XjBoile1TuwlkxWlESTEUEUYj5E/CYybERVgTYSpZI2p9JbdEr1D7Jph5uIGj4Xium4Y2pdggit5QobodO8+tvVDPLeBZjc2QHqL6s1Az5WCZ3ytEStPUaOMvC4+7nlRtG4pZ1YR4mgAeMGrRp0KSEqG/H8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l0pTNk6c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 73B32C2BD11;
+	Sun, 14 Apr 2024 16:10:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713109776;
-	bh=vCsq4zNZCgl5SrWAOnz2TdTN3i0qeRkTl74j/gYlBr8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=dm00pbtNpET02QCofKXVDNb1EjWeep/pPqBUE3vEv0OZJr9KnNGIkKVIsB6K6kuCa
-	 /m2NmI0TsNeRsl/6OubN5LWhX5wBuLD3EQ3C+oYEzA8HukYrpShmQq5Azg8Jj7wf64
-	 m8Knk4USoLXGz0zrnRENM/JB9gOATzoP6U04p1yLdslt4zk/ZMnNAFxQg4uJN2YtPf
-	 GJpV6x6je8E7/5OpvenkINRqMCc5Qj/4qho0hsELYsBDdq6XyVBUqixem0DfmPXqOQ
-	 WVDK5KkExzCFgstS8kNzDZPqwN6TRn/NodDFFk7MURWkDSqWX/KGl/C70og9mwwd+j
-	 Cmy14+wymRdXA==
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Woojung Huh <woojung.huh@microchip.com>,
-	UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH net-next] net: dsa: microchip: drop unneeded MODULE_ALIAS
-Date: Sun, 14 Apr 2024 17:49:29 +0200
-Message-Id: <20240414154929.127045-1-krzk@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	s=k20201202; t=1713111026;
+	bh=GQ91brGH7ot9MixWssd4TprxKrsg8x2E2K9LgthC60A=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=l0pTNk6cS78Qen0Foka219q73WeB9WHPAPcFZr4c7CzeiaR1OABqbKkZGvUF35NkT
+	 9PoETL6kCQ4KGsqeup9WSJab2Y3b8uBqj2Prqzc5wZrHkHWHFP9UQNW+emSMt6HCZn
+	 KC86XEGDeUtpu0marwLsJJq0bDK2AlW8/l085iaL7VPrFOHKWy6fux1mirQYBowpK2
+	 9z/UDcrGBI8yVadtobpw1Pcw2HCzI2bqcNndilCQ7WYsRS9rUcFZEq/5sh6luq9Sy3
+	 R8ubmJkGl0jiRU7kQ8sbrc/+OS6CI1pNtLSMOgkwVlVr9GdZRVd88zsKc/hOcGWA/g
+	 ukhLa6d30DqIw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5D985C32750;
+	Sun, 14 Apr 2024 16:10:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,35 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2 0/1] net: change maximum number of UDP segments to 128
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171311102637.24550.17026723901858878369.git-patchwork-notify@kernel.org>
+Date: Sun, 14 Apr 2024 16:10:26 +0000
+References: <20240411051124.386817-1-yuri.benditovich@daynix.com>
+In-Reply-To: <20240411051124.386817-1-yuri.benditovich@daynix.com>
+To: Yuri Benditovich <yuri.benditovich@daynix.com>
+Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, jasowang@redhat.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, yan@daynix.com, andrew@daynix.com
 
-The ID table already has respective entry and MODULE_DEVICE_TABLE and
-creates proper alias for SPI driver.  Having another MODULE_ALIAS causes
-the alias to be duplicated.
+Hello:
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- drivers/net/dsa/microchip/ksz_spi.c | 7 -------
- 1 file changed, 7 deletions(-)
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-diff --git a/drivers/net/dsa/microchip/ksz_spi.c b/drivers/net/dsa/microchip/ksz_spi.c
-index c8166fb440ab..cdc4add5f5b5 100644
---- a/drivers/net/dsa/microchip/ksz_spi.c
-+++ b/drivers/net/dsa/microchip/ksz_spi.c
-@@ -233,13 +233,6 @@ static struct spi_driver ksz_spi_driver = {
- 
- module_spi_driver(ksz_spi_driver);
- 
--MODULE_ALIAS("spi:ksz9477");
--MODULE_ALIAS("spi:ksz9896");
--MODULE_ALIAS("spi:ksz9897");
--MODULE_ALIAS("spi:ksz9893");
--MODULE_ALIAS("spi:ksz9563");
--MODULE_ALIAS("spi:ksz8563");
--MODULE_ALIAS("spi:ksz9567");
- MODULE_ALIAS("spi:lan937x");
- MODULE_AUTHOR("Tristram Ha <Tristram.Ha@microchip.com>");
- MODULE_DESCRIPTION("Microchip ksz Series Switch SPI Driver");
+On Thu, 11 Apr 2024 08:11:23 +0300 you wrote:
+> v1->v2:
+> Fixed placement of 'Fixed:' line
+> Extended commit message
+> 
+> Yuri Benditovich (1):
+>   net: change maximum number of UDP segments to 128
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2,1/1] net: change maximum number of UDP segments to 128
+    https://git.kernel.org/netdev/net/c/1382e3b6a350
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
