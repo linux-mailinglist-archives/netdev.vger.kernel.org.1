@@ -1,54 +1,86 @@
-Return-Path: <netdev+bounces-87693-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87694-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0D468A41D0
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 12:23:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23D068A41DF
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 12:39:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 041711C20927
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 10:23:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3B60B210DA
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 10:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C692421D;
-	Sun, 14 Apr 2024 10:23:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 933B62E631;
+	Sun, 14 Apr 2024 10:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Stxe4gOX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ofepjH0w"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A0B2374C
-	for <netdev@vger.kernel.org>; Sun, 14 Apr 2024 10:23:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 469F41D537;
+	Sun, 14 Apr 2024 10:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713090222; cv=none; b=LXU2/Wsy415kIEgNl8p6SQkRnjZEyljQY5Zzm7TRbpGfgAgNqq9GD8tTHvaiinB7rqNlI7Ggv6AF9baIZPU0C1llRBO9k6XNZDKlELYQKb1tU2sbEFYKTYF2Z/QMvB1zvuVw47OWy8ru8KRQcnp4BxrUaeJytwCz8KOgnJH/W4Q=
+	t=1713091177; cv=none; b=tKnCSZOQDaPq8SEoz1xeCf8IQgRTNKthmHD0AwKDnWfI6qZhSOOQy7BmU+kq2+DPsVxG/SyiBZVp41SBtE/C/AZ3i/JbmXZv84asskmSavTt7/aRb/uUwn6Gd9lsVDpwx6Lzr9xzDWYsx6HU3orjfAiI2hwcvlwjveRbpcn3qaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713090222; c=relaxed/simple;
-	bh=5J8J24Fz3CGOJ2aTUHoGjLvyTOXGaJMxfYbRTUIb6tA=;
+	s=arc-20240116; t=1713091177; c=relaxed/simple;
+	bh=JbtOUWHVC7wNzadBF8bYSYuSrVY77oLf7wqjRB8KLZE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lONuESvllHj7+dmQI/zfB6ulaV+QZrDUuzZQSu3B/pgoE8FnuNq3+iErlTfgODkDZTZSViCpaiXfaOlASBsGy3r9UnoDSjRQN2OP8cWU1m4b0x4vW1Ku0PgkKVDCGuUKgEF0QluNXTeHqE8sTtlGCzE/Wx6Xdkvu1OeQoz6LHoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Stxe4gOX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5733CC072AA;
-	Sun, 14 Apr 2024 10:23:40 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=qfkWH7wfCOHXYxaCjGWiECTNRgjuy51xwlGT110PjwZz0Wre1mLfy5BSnpUanx3/p2hvrC/8m/kb2WO+jHPwAUlCeFfba3CSDy1vmdNRJCBlEpfNaytZ3IAFtzhxsagXnMsn1eF1qmIEl2kQozjF0qsg2oNb7toMmD5WpZvtNC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ofepjH0w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 963E6C072AA;
+	Sun, 14 Apr 2024 10:39:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713090221;
-	bh=5J8J24Fz3CGOJ2aTUHoGjLvyTOXGaJMxfYbRTUIb6tA=;
+	s=k20201202; t=1713091176;
+	bh=JbtOUWHVC7wNzadBF8bYSYuSrVY77oLf7wqjRB8KLZE=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Stxe4gOX+xRA7JIsYK6zCoc3gp2cbeGety3cxqAVTC4XrRWHuEQFgeZdd4u28X/G+
-	 1vv7askv5w705+Ke5qXTBJf57xVQScmmb9F0fk6cPPU5uYuRpycrRU/FS4Lof1Pt7r
-	 QrgqNswVYVJKtennOPOziADNwPqjthjYyraqk4XkexCtBJ3Us8UZlIgapV4El7yeek
-	 hhJ1/2Mdqnd+bqi76eaDYbSoOBdmGSGf+wG7QRo7vRFrAV5Unkqq6/9G/HzCy/rVkN
-	 IWfaAwYvPSeIrie6J5xrH2w8M04XeCYWXWlYDuTSqqAGX3MUtqHfy48xKU/bjeViL/
-	 WtkM9yNSVJ1HA==
-Date: Sun, 14 Apr 2024 11:23:37 +0100
+	b=ofepjH0wUf3Os10OXvzt5lHI9qsH/w9nNsvcYVyBhHvdV4m2cw1ohO/Vis0QJOZPT
+	 QNyIPOOSPN9/npG3/acx1bApWHvcRg4inaWGF7oI86g09jSvOtGs3JJuOQmxR5+DqK
+	 V/5DIXQc2ngSjOvui34lFC+GSfpozW/Y1/RcAEHh13yGpVo7SBlIDUUVXg8NY9TQw0
+	 pBiSrPRv47ciuhlJwVmwEsGvS1Jq7za0ry0lmYTjh0Gn3/rXYJWaXhUKZXdofrNYTe
+	 2JXfiqIDu/+DKNmMNI7krvG53xb65g67PP1mGaNc9TkDe1l4j5Xn0zP+PRvAt0VObl
+	 j1ne7+aCuG2ig==
+Date: Sun, 14 Apr 2024 11:39:26 +0100
 From: Simon Horman <horms@kernel.org>
-To: Nick Child <nnac123@linux.ibm.com>
-Cc: netdev@vger.kernel.org, haren@linux.ibm.com, ricklind@us.ibm.com,
-	mmc@linux.ibm.com
-Subject: Re: [PATCH net-next] ibmvnic: Return error code on TX scrq flush fail
-Message-ID: <20240414102337.GA645060@kernel.org>
-References: <20240411203435.228559-1-nnac123@linux.ibm.com>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+	Saravana Kannan <saravanak@google.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Abel Vesa <abel.vesa@linaro.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Lukas Wunner <lukas@wunner.de>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	Amit Pundir <amit.pundir@linaro.org>,
+	Xilin Wu <wuxilin123@gmail.com>, linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH v7 13/16] power: sequencing: implement the pwrseq core
+Message-ID: <20240414103926.GB645060@kernel.org>
+References: <20240410124628.171783-1-brgl@bgdev.pl>
+ <20240410124628.171783-14-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,56 +89,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240411203435.228559-1-nnac123@linux.ibm.com>
+In-Reply-To: <20240410124628.171783-14-brgl@bgdev.pl>
 
-On Thu, Apr 11, 2024 at 03:34:35PM -0500, Nick Child wrote:
-> In ibmvnic_xmit() if ibmvnic_tx_scrq_flush() returns H_CLOSED then
-> it will inform upper level networking functions to disable tx
-> queues. H_CLOSED signals that the connection with the vnic server is
-> down and a transport event is expected to recover the device.
-> 
-> Previously, ibmvnic_tx_scrq_flush() was hard-coded to return success.
-> Therefore, the queues would remain active until ibmvnic_cleanup() is
-> called within do_reset().
-> 
-> The problem is that do_reset() depends on the RTNL lock. If several
-> ibmvnic devices are resetting then there can be a long wait time until
-> the last device can grab the lock. During this time the tx/rx queues
-> still appear active to upper level functions.
-> 
-> FYI, we do make a call to netif_carrier_off() outside the RTNL lock but
-> its calls to dev_deactivate() are also dependent on the RTNL lock.
-> 
-> As a result, large amounts of retransmissions were observed in a short
-> period of time, eventually leading to ETIMEOUT. This was specifically
-> seen with HNV devices, likely because of even more RTNL dependencies.
-> 
-> Therefore, ensure the return code of ibmvnic_tx_scrq_flush() is
-> propagated to the xmit function to allow for an earlier (and lock-less)
-> response to a transport event.
-> 
-> Signed-off-by: Nick Child <nnac123@linux.ibm.com>
-> ---
->  drivers/net/ethernet/ibm/ibmvnic.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-> index 30c47b8470ad..f5177f370354 100644
-> --- a/drivers/net/ethernet/ibm/ibmvnic.c
-> +++ b/drivers/net/ethernet/ibm/ibmvnic.c
-> @@ -2371,7 +2371,7 @@ static int ibmvnic_tx_scrq_flush(struct ibmvnic_adapter *adapter,
->  		ibmvnic_tx_scrq_clean_buffer(adapter, tx_scrq);
->  	else
->  		ind_bufp->index = 0;
-> -	return 0;
-> +	return rc;
->  }
->  
->  static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
+On Wed, Apr 10, 2024 at 02:46:25PM +0200, Bartosz Golaszewski wrote:
 
-Hi Nick,
+...
 
-I notice that some, but not all, cases the return value of
-ibmvnic_tx_scrq_flush() is not checked. Should that also be
-addressed?
+> +/**
+> + * pwrseq_device_register() - Register a new power sequencer.
+> + * @config: Configuration of the new power sequencing device.
+> + *
+> + * The config structure is only used during the call and can be freed after
+> + * the function returns. The config structure *must* have the parent device
+> + * as well as the match() callback and at least one target set.
+> + *
+> + * Returns:
+> + * Returns the address of the new pwrseq device or ERR_PTR() on failure.
+> + */
+> +struct pwrseq_device *
+> +pwrseq_device_register(const struct pwrseq_config *config)
+> +{
+> +	struct pwrseq_device *pwrseq;
+> +	int ret;
+> +
+> +	if (!config->parent || !config->match || !config->targets ||
+> +	    !config->targets[0])
+> +		return ERR_PTR(-EINVAL);
+> +
+> +	pwrseq = kzalloc(sizeof(*pwrseq), GFP_KERNEL);
+> +	if (!pwrseq)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	pwrseq->dev.type = &pwrseq_device_type;
+> +	pwrseq->dev.bus = &pwrseq_bus;
+> +	pwrseq->dev.parent = config->parent;
+> +	device_set_node(&pwrseq->dev, dev_fwnode(config->parent));
+> +	dev_set_drvdata(&pwrseq->dev, config->drvdata);
+> +
+> +	pwrseq->id = ida_alloc(&pwrseq_ida, GFP_KERNEL);
+> +	if (pwrseq->id < 0) {
+> +		kfree(pwrseq);
+
+Hi Bartosz,
+
+pwrseq is freed on the line above,
+so it should not be dereferenced on the line below.
+
+Flagged by Smatch.
+
+> +		return ERR_PTR(pwrseq->id);
+> +	}
+
+...
 
