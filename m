@@ -1,120 +1,266 @@
-Return-Path: <netdev+bounces-87735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F5298A44F7
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 21:53:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 074478A4508
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 22:22:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B2EB1F21128
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 19:53:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7259F1F211B3
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 20:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45404136660;
-	Sun, 14 Apr 2024 19:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D52E913540C;
+	Sun, 14 Apr 2024 20:22:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B5zh40Zj"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="ZYVuZhhh";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="+nkF2OOL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E28E344384
-	for <netdev@vger.kernel.org>; Sun, 14 Apr 2024 19:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713124377; cv=none; b=RCTuYsuWAJ5vAl4etkQIFrud0mcBoRVqvq6iwJUg3iziPqcslPlJ3K/nC4UnqFTwiw6+myjnVY9ETDQqAUBRh0KQ6hJHmvqd9kErQBHQEmt0rydRwcnmm6H4OKQJHvQqrAsKAI2g+jbJSYrn29voyrh0s4KlvJHrhoKFJlIdVMk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713124377; c=relaxed/simple;
-	bh=QuRmtuyfolKt+vUhXl7x9sOGSnYKVciAbPW7hLrW1Xk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XISHYZltKh7oMeCsdrHdf+jANU8ejcN00Z9chZxBn7XSnSa+WPnXP6CkKUK37iMRP1u4mzlh6vfDcSC5qPfcXaQR8yZlKuU1asHf6bJx7m+tTyxTXvcUzLN6CfOVzA+puxj0WYQiapFttpeEy5j6CDa65ZYUPHS77uIfDoHFREs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B5zh40Zj; arc=none smtp.client-ip=209.85.216.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2a7e19c440dso496885a91.3
-        for <netdev@vger.kernel.org>; Sun, 14 Apr 2024 12:52:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713124375; x=1713729175; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Sr4FP5sZpVqL77IPYzDVBxqo9NC/TYNBhRfBFOwzmNs=;
-        b=B5zh40ZjYNhvE7IrHXqYlxkewf1JNmhMi6nlJuYNB+9FG48/PuNFTe6H6/HpJPy3q1
-         gOsEEGj6c8yWesHnaIVZuRRGYFz8r1Rnme1/YMGEzjC4hc9n5ip6q9VRpRcPTK/kLih9
-         yNml5aZBFD0YBYZgMr1vC9rZqAf8GUFVpjOfn6/pWF9OW0+CCbbtmjV94xX7siEEiEAC
-         NutmQSahdzf31rNwa2hNd00igUbjR3uLno2apCjSzMgl5zhmHE88eiUJjycflqt8Uq3N
-         8ylPaHn67ru6hXc3bSmP9cqYzSqjjQ2knphhRVD3MwrTM5hB6MEUaP8yJd2Yvij/5wcz
-         vhbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713124375; x=1713729175;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Sr4FP5sZpVqL77IPYzDVBxqo9NC/TYNBhRfBFOwzmNs=;
-        b=k19Y09iqR08un+DR5gjUeVf+3IuFESi3M8PEkExfpTwVhy37Ql4S8xAFteQxSDxMhL
-         nnQrRNy1s04p9oxi5DGTM9RII3zY2iHkLBeWu7U/2jaR0+i9VyrUOj4QStryJee6bXts
-         wgdR3pzDINWGpqvc9524KuuC0Ks1xoybY1MWBYUOKe4jMK3aMOIMeH+lfmhjLCW8TgHo
-         j/C/BLoP7JrnQdCIm7j3+5Gn6kLocrdUa5v/3UtEKZZGSRtpbDrc2pZlN1W9oxGnNlDF
-         HjCc6yzncxzqwoO4BB5qDl6eE1VCRlRme+4T6OKBAMD9d0LBLmcDKpN4nMBwGWtqJaBC
-         ivZA==
-X-Gm-Message-State: AOJu0YyAlgnviQfuEA41M1Ij+SOkGZLI1BKnZerjqKM/QScxv9eGXhmF
-	j4VJrSiu22DepdDGp1ILZBoo0NruAfUT0Q6Xz7plOzBIgINpI+n3Stytwqxnn7vIzw==
-X-Google-Smtp-Source: AGHT+IGdgR4UV3yvWSKC7XN27wSF3TSa5BndPBATRY7jV3VvvRJr9kKXJobDANT/A+ID9+7johna3g==
-X-Received: by 2002:a17:902:7616:b0:1dd:bf6a:2b97 with SMTP id k22-20020a170902761600b001ddbf6a2b97mr6531106pll.60.1713124375122;
-        Sun, 14 Apr 2024 12:52:55 -0700 (PDT)
-Received: from localhost.localdomain ([67.198.131.126])
-        by smtp.gmail.com with ESMTPSA id t15-20020a170902e84f00b001e2a0d33fbbsm6378445plg.219.2024.04.14.12.52.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Apr 2024 12:52:54 -0700 (PDT)
-From: Yick Xie <yick.xie@gmail.com>
-To: willemdebruijn.kernel@gmail.com,
-	willemb@google.com
-Cc: netdev@vger.kernel.org,
-	davem@davemloft.net
-Subject: [PATCH net] udp: don't be set unconnected if only UDP cmsg
-Date: Mon, 15 Apr 2024 03:52:13 +0800
-Message-Id: <20240414195213.106209-1-yick.xie@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8917B1D688;
+	Sun, 14 Apr 2024 20:22:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713126124; cv=pass; b=i30Crf8oSrQbu1fHPYyXTgaGgeR/keYvyWTtBBboZ617zCoV3QUUHtI87oSFiYFM00fVT4JLZgNxtfjvj/9DC2jjC3U1PsUlZ/nQNMH6J2ahu5vkl6ZREh+YXiBAOBX+ZrRqZ7BI7lHHpFYZ0KuzfOVrIa+3Hosi4O3qwzQH02Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713126124; c=relaxed/simple;
+	bh=vT8KOr3SvikJeMpg2ktjqGTrpiUSVOwI7Ulj4Tcu88w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=H3zbjxtA/MGrvUSA0NLEden4UD8HV86HD7s8G9kjlLXnDYiyNbumdvsnlwIS/2ULaOSKq0j5s0/Q4o4zMoCfBZz0/r2Eec1yEq4MCSJgmnptux8OQYD8E5wqnDLQzDrn48p/plwdmdYtw/WhvP7lHykwOaqB0/QJfAcWVpsgt1E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=ZYVuZhhh; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=+nkF2OOL; arc=pass smtp.client-ip=85.215.255.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1713126101; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=nKKe3KUJgcml3yIeSAfS56G8gn/M7whEEmw5a5WE7fzwLxRAf4YgS3U8NaGBzH7EKN
+    SN9kbiTMgjzC3HdfxggzC2C+pa4fZhoalOouQUD3kp8xr6IUKFkF0OIRTn5QwBqcV4Pz
+    8S8DH7Tu870sSA+WqA15kFbfl7DUOq6JHzQriOqIzRtxWujt4beS0BpV09ip0z2wRjD4
+    2lNLFsrTTA+rGiGp3ZEVgu0cc5jR91gw8YAViIx4OMUwaD+f1eiehji4TnYMkGUbs5xU
+    HihvqqwdMTAJquFHn2bK4XonjIZADOExmrzz8qT2Mas8F2DGZcQBG9V63UnCDENsXtUg
+    JW2w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1713126101;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=FFdZNeDIHKlI++tV+rJTXXExTAzAeIULgTQSTJmSCuU=;
+    b=d+2z78jmUpVbWERrzidNkDGiRCzxitPyZ2tpox3AwqsqC3JvEgUdNG5uCXBcM9wmAu
+    UgHUzNX1yYTKNUm+/tOcB9QZ/7LtSF/W5z7SUFj5GP3eqD/YyCpJslokiqq7on3KUfOj
+    JlX//bb2fygswKgToU5A0T8XcU9lxZwKOHCPaa0wiFT4i9rz1H3dXjcA8Ej0uRgbQwlv
+    axiISXyFHxFHb3rJUTirzl8MdzUSgItAVwS+6OQetwz8/2X5+Alo1VBaZCtH9kwu0dAs
+    vQIigU063HdD99I/JZdXaBnEod5JnJDh89QXyeOLAvv/yK3UjMO5R7rFp8+wjLghDKRK
+    lsuA==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1713126101;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=FFdZNeDIHKlI++tV+rJTXXExTAzAeIULgTQSTJmSCuU=;
+    b=ZYVuZhhhuTXsfiqLhsPEg9wlcG8eThmmC3SBleBWs6PUuvW9kKG088eYLZb0T7bZDv
+    Ak+c4F8bikqsCZa3SUQxA0mHIX1w6+NtSM27rgwtEdQolFnQc48REWOGpwzW7cWr8x/I
+    +gHUrQYOgNgcshVn0/TdM8YkzkTsjKTaw7YdfZ9SmhXpERFqvGLxS8fSlgaihG78ocqt
+    0z0Z7+lrsvciLpvsV0Kw4uGfTq7a9sB3WSEY+/wl5YEVO8OKtAP86Zc1gVSRIC20zCRt
+    hPTW9mKqxNXClgLUadI/iW2eiNl3z7KoE3ATGPMVT4dvC7MZqmjbw/keLiY6Ht954K/3
+    Hx8Q==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1713126101;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=FFdZNeDIHKlI++tV+rJTXXExTAzAeIULgTQSTJmSCuU=;
+    b=+nkF2OOLy0dmy4fcPZ9weFhIxlK4A9ibM3sS5vJCEe69AFulTfGJgtlCP8ET/+uzb2
+    YOxnle5qTxrA0hgL48Cg==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1o3TMaFqTEVR+J8xpzl0="
+Received: from [192.168.60.177]
+    by smtp.strato.de (RZmta 50.3.2 DYNA|AUTH)
+    with ESMTPSA id K701d603EKLfKo9
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Sun, 14 Apr 2024 22:21:41 +0200 (CEST)
+Message-ID: <64586257-3cf6-4c10-a30b-200b1ecc5e80@hartkopp.net>
+Date: Sun, 14 Apr 2024 22:21:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/1] Documentation: networking: document ISO
+ 15765-2:2016
+To: Vincent Mailhol <vincent.mailhol@gmail.com>
+Cc: Francesco Valla <valla.francesco@gmail.com>,
+ Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Simon Horman <horms@kernel.org>, Bagas Sanjaya <bagasdotme@gmail.com>,
+ fabio@redaril.me
+References: <20240329133458.323041-2-valla.francesco@gmail.com>
+ <20240329133458.323041-3-valla.francesco@gmail.com>
+ <CAMZ6RqKLaYb+8EaeoFMHofcaBT5G2-qdqSb4do73xrgMvWMZaA@mail.gmail.com>
+ <9f5ad308-f2a0-47be-85f3-d152bc98099a@hartkopp.net>
+ <CAMZ6RqKGKcYd4hAM8AVV72t78H-Kt92NXowx6Q+YCw=AuSxKuw@mail.gmail.com>
+Content-Language: en-US
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <CAMZ6RqKGKcYd4hAM8AVV72t78H-Kt92NXowx6Q+YCw=AuSxKuw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-If "udp_cmsg_send()" returned 0 (i.e. only UDP cmsg),
-"connected" should not be set to 0. Otherwise it stops
-the connected socket from using the cached route.
 
-Signed-off-by: Yick Xie <yick.xie@gmail.com>
----
- net/ipv4/udp.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index c02bf011d4a6..420905be5f30 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -1123,16 +1123,17 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 
- 	if (msg->msg_controllen) {
- 		err = udp_cmsg_send(sk, msg, &ipc.gso_size);
--		if (err > 0)
-+		if (err > 0) {
- 			err = ip_cmsg_send(sk, msg, &ipc,
- 					   sk->sk_family == AF_INET6);
-+			connected = 0;
-+		}
- 		if (unlikely(err < 0)) {
- 			kfree(ipc.opt);
- 			return err;
- 		}
- 		if (ipc.opt)
- 			free = 1;
--		connected = 0;
- 	}
- 	if (!ipc.opt) {
- 		struct ip_options_rcu *inet_opt;
--- 
-2.34.1
+On 14.04.24 06:03, Vincent Mailhol wrote:
 
+> 
+> This doesn't remove the fact that I think that this naming convention
+> is stupid because of the RAS syndrome, but I acknowledge that CAN CC
+> is now the official denomination and thus, that we should adopt it in
+> our documentation as well.
+> 
+
+;-)
+
+
+>>> Add a space between ISO and the number. Also, update the year:
+>>>
+>>>     ISO 15765-2:2024
+>>>
+>>
+>> Interesting! Didn't know there's already a new version.
+>>
+>> Will check this out whether we really support ISO 15765-2:2024 ...
+>>
+>> Do you have the standard at hand right now or should we leave this as
+>> ISO15765-2:2016 until we know?
+> 
+> I have access to the newer revisions. But I never really invested time
+> into reading that standard (neither the 2016 nor the 2024 versions).
+> 
+> Regardless, here is a verbatim extract from the Foreworld section of
+> ISO 15765-2:2024
+> 
+>    This fourth edition cancels and replaces the third edition (ISO
+>    15765-2:2016), which has been technically revised.
+> 
+>    The main changes are as follows:
+> 
+>      - restructured the document to achieve compatibility with OSI
+>        7-layers model;
+> 
+>      - introduced T_Data abstract service primitive interface to
+>        achieve compatibility with ISO 14229-2;
+> 
+>      - moved all transport layer protocol-related information to Clause 9;
+> 
+>      - clarification and editorial corrections
+> 
+
+Yes, I've checked the release notes on the ISO website too.
+This really looks like editorial stuff that has nothing to do with the 
+data protocol and its segmentation.
+
+>>>
+>>> Here, I would suggest the C99 designated field initialization:
+>>>
+>>>     struct sockaddr_can addr = {
+>>>             .can_family = AF_CAN;
+>>>             .can_ifindex = if_nametoindex("can0");
+>>>             .tp.tx_id = 0x18DA42F1 | CAN_EFF_FLAG;
+>>>             .tp.rx_id = 0x18DAF142 | CAN_EFF_FLAG;
+>>>     };
+> 
+> Typo in my previous message: the designated initializers are not
+> separated by colon ";" but by comma ",". So it should have been:
+> 
+>    struct sockaddr_can addr = {
+>          .can_family = AF_CAN,
+>          .can_ifindex = if_nametoindex("can0"),
+>          .tp.tx_id = 0x18DA42F1 | CAN_EFF_FLAG,
+>          .tp.rx_id = 0x18DAF142 | CAN_EFF_FLAG,
+>    };
+> 
+>>> Well, this is just a suggestion, feel free to reject it if you do not like it.
+>>
+>> At least I don't like it.
+>>
+>> These values are usually interactively given on the command line:
+>>
+>>   >            .can_ifindex = if_nametoindex("can0");
+>>   >            .tp.tx_id = 0x18DA42F1 | CAN_EFF_FLAG;
+>>   >            .tp.rx_id = 0x18DAF142 | CAN_EFF_FLAG;
+>>
+>> So have it in a static field initialization leads to a wrong path IMO.
+> 
+> There is no such limitation that C99 designated initializers should
+> only work with variables which have static storage duration. In my
+> suggested example, nothing is static.
+> 
+> I see this as the same thing as below example:
+> 
+>    int foo(void);
+> 
+>    int bar()
+>    {
+>            int i = foo();
+>    }
+> 
+>    int baz()
+>    {
+>            int i;
+> 
+>            i = foo();
+>    }
+> 
+> In bar(), the fact that the variable i is initialized at declaration
+> does not mean that it is static. In both examples, the variable i uses
+> automatic storage duration.
+> 
+> Here, my preference goes to bar(), but I recognize that baz() is also
+> perfectly fine. Replace the int type by the struct sockaddr_can type
+> and the scalar initialization by designated initializers and you
+> should see the connection.
+
+Oh, sorry. Maybe I expressed myself wrong.
+
+IMHO your way to work with an initializer is correct from the C standpoint.
+
+But I think this is pretty unusual for a code example when an 
+application programmer starts to work with ISO-TP.
+
+You usually get most of these values from the command line an fill the 
+struct _by hand_ - and not with a static initialization.
+
+That was my suggestion.
+
+> 
+> ** Different topic **
+> 
+> While replying on this, I encountered something which made me worry a bit:
+> 
+> The type of sockaddr_can.can_ifindex is a signed int:
+> 
+>    https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/can.h#L243
+> 
+> But if_nametoindex() returns an unsigned int:
+> 
+>     https://man7.org/linux/man-pages/man3/if_nametoindex.3.html
+> 
+> Shouldn't sockaddr_can.can_ifindex also be declared as an unsigned int?
+> 
+
+The if_index derives from struct netdevice.if_index
+
+https://elixir.bootlin.com/linux/v6.8.6/source/include/linux/netdevice.h#L2158
+
+which is an int.
+
+I don't think this would have an effect in real world to change 
+sockaddr_can.can_ifindex to an unsigned int.
+
+I wonder if it is more critical to existing user space code to change it 
+to unsigned int or to leave it as-is ...
+
+Best regards,
+Oliver
 
