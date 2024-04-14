@@ -1,55 +1,52 @@
-Return-Path: <netdev+bounces-87679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F9B28A411F
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 10:16:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 568E08A4122
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 10:18:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB5CA281940
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 08:16:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B5D7281B9F
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 08:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDDA8224F0;
-	Sun, 14 Apr 2024 08:16:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E296208A8;
+	Sun, 14 Apr 2024 08:18:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="ecIEWTgv"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="GW+EhPMw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-28.smtpout.orange.fr [80.12.242.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9249123741;
-	Sun, 14 Apr 2024 08:16:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFE12261D;
+	Sun, 14 Apr 2024 08:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713082586; cv=none; b=rc7lPOS/bG7JBmcO2Lv7ZHdO9uyuxokyn+P1cDvi9y0+TeY1YnTmr2Xq7IIlj7Ey5UFFOVKVPdV6wFBh+FrUEkvW6hy8Q8280a5KYy4Vpkf99eXEITaunYTLBQ0NX+5DSb9MJKJKDesZLiZ/0aM9eFIF5FoKuVPAQhmA6oPp3Fk=
+	t=1713082691; cv=none; b=GxliNWLcxXRFD5SNbgMbc4PtR8s8eUM407+RJfa4yH3jQbOUmH9MZiy7tZ6tGcK6/zc4Kk5ef5lIIWBE96E0ulOBFNHuk3AX8idQxIXczZCwNn273HOSP1avqv9KxqKL2+jDPeBW10VPru2l1SM+HQG4M7Fd8Hh00uveYf+RQe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713082586; c=relaxed/simple;
-	bh=xP/n9GO1x98CwspPsPSUsSQJUSI8U4FNwThGNr9CX0c=;
+	s=arc-20240116; t=1713082691; c=relaxed/simple;
+	bh=KB8qdh5o/GPwlry7+MlQQYfG88tTRD4vhTfEdFqOGMY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tnbb4kck1J1GtFYR2Ui6aPq/TbHZYeK29n2w2NG/AeA9OkMPqULeTYH/5F3i5oyawNv6y3QcqpmzdF7H7kAZwEp+r4Aw8ezb5kBSkwkS7koVnoj3Bu/zhz4ojnC0rlZ1TGv49B6hPf4jU+4H18fNrS9YuGrdEfm9utOpIQQq1pE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=ecIEWTgv; arc=none smtp.client-ip=80.12.242.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.18] ([86.243.17.157])
-	by smtp.orange.fr with ESMTPA
-	id vusxraUSs2kxovusxrWrdY; Sun, 14 Apr 2024 10:06:54 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1713082014;
-	bh=RqNeVXpCo0a2FuxgS0FBsXQeNAgyt63dNpBjp06s8g4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=ecIEWTgvlHyKrM4aCxe4CxwWY4N/umtZUc2i4EtdMOVJe8sJOlyDlXsVyoY3aBLZx
-	 PoBCEAaZvNT2sYVBc18j3+ZjzAwVs+3RZj3WfqdFd8t+/4ftfsdYrqqI4ZgZEh2+mx
-	 Cix0AjGZ3y6dUa1rBZVElJgC8hAIccScNvnKB9EuWh09UHPLH0VXkNbUb6UDa1y35k
-	 5hatGlnKICKCKsl39QglBi84en3X5xRlxRvk7/UgIBpCbmPpbyrguGoHwRF4OpOjWi
-	 6BYmY/NtLMvnTOQ3mN7XiV42zxMnF//qG3agRHXqHk9SKScEd1ZFt8H5I0cv2zCGAK
-	 G1xBC+25UWS+w==
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sun, 14 Apr 2024 10:06:54 +0200
-X-ME-IP: 86.243.17.157
-Message-ID: <6faf8008-3a64-4ed9-8d7e-52ff32862df9@wanadoo.fr>
-Date: Sun, 14 Apr 2024 10:06:42 +0200
+	 In-Reply-To:Content-Type; b=U59OuU3yrv38OZybcNAU33nswFxn539noUHTezt90gecvfUvkM6Dd3NvKx1HlNXGq+S3gfKzjE+Kiw0ACGhU1oV+prMlE2NoWIGJ8pJ+6TXuxuSEqQjwTX48svXikfQHQTg1jVqfrayOF81RxZOwCR9t360oqyexjmDeIWwr5xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=GW+EhPMw; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id F2402E0002;
+	Sun, 14 Apr 2024 08:18:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1713082686;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BfwBj4vjnnl0637/puHgd5sch6iAATiC8ktUrfFMQW0=;
+	b=GW+EhPMwCld/Lg8sXJgylZKh/8bNa61mqz3fV32It1OjNzlMzH+1ePtSWPCOoc8aDDDktC
+	2wMV5aFTlvpGX4M1CJRVqN0CHQ7kRT9kvdxkayIQzP+Q7ANptYf/IgGSHlvuDKB3SfH4vG
+	3JKnl+/s1t7emgiuviNuIQ3gR+1eQiuyZivtsgMmhitODgXclIp5NrN0zgbuHlF3Rc0yjG
+	4h1FJZhsa4/1ZAjhotlm4hsmmeJ2wFzDv6bXD4laysb7YtNlkEc664XznZ/NedoIUk/5n9
+	9uIV2ZAg/3BCFBYg8GANKB4qen0CY4FM3LrhNZNyACpBR/gkzrWHItFQPJqHRQ==
+Message-ID: <4ba57ce2-bd8a-43e8-93b4-155499d59db8@arinc9.com>
+Date: Sun, 14 Apr 2024 11:17:52 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,71 +54,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] net: dsa: mt7530-mdio: read PHY address of
- switch from device tree
-To: Daniel Golle <daniel@makrotopia.org>, arinc.unal@arinc9.com
-Cc: DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
+Subject: Re: [PATCH net-next v2 1/2] net: dsa: mt7530-mdio: read PHY address
+ of switch from device tree
+To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
  AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  linux-mediatek@lists.infradead.org
-References: <20240414-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v1-0-b08936df2770@arinc9.com>
- <20240414-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v1-1-b08936df2770@arinc9.com>
- <ZhtJGEdjeS3LfMWF@makrotopia.org>
-Content-Language: en-MW
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <ZhtJGEdjeS3LfMWF@makrotopia.org>
+References: <20240414-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v2-0-1a7649c4d3b6@arinc9.com>
+ <20240414-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v2-1-1a7649c4d3b6@arinc9.com>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20240414-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v2-1-1a7649c4d3b6@arinc9.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-Le 14/04/2024 à 05:10, Daniel Golle a écrit :
-> On Sun, Apr 14, 2024 at 01:08:19AM +0300, Arınç ÜNAL via B4 Relay wrote:
->> From: Arınç ÜNAL <arinc.unal@arinc9.com>
->>
->> Read the PHY address the switch listens on from the reg property of the
->> switch node on the device tree. This change brings support for MT7530
->> switches on boards with such bootstrapping configuration where the switch
->> listens on a different PHY address than the hardcoded PHY address on the
->> driver, 31.
->>
->> As described on the "MT7621 Programming Guide v0.4" document, the MT7530
->> switch and its PHYs can be configured to listen on the range of 7-12,
->> 15-20, 23-28, and 31 and 0-4 PHY addresses.
->>
->> There are operations where the switch PHY registers are used. For the PHY
->> address of the control PHY, transform the MT753X_CTRL_PHY_ADDR constant
->> into a macro and use it. The PHY address for the control PHY is 0 when the
->> switch listens on 31. In any other case, it is one greater than the PHY
->> address the switch listens on.
->>
->> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+On 14.04.2024 09:07, Arınç ÜNAL via B4 Relay wrote:
+> From: Arınç ÜNAL <arinc.unal@arinc9.com>
 > 
-> See minor nit inline below.
+> Read the PHY address the switch listens on from the reg property of the
+> switch node on the device tree. This change brings support for MT7530
+> switches on boards with such bootstrapping configuration where the switch
+> listens on a different PHY address than the hardcoded PHY address on the
+> driver, 31.
 > 
-
-...
-
->>   
->> -#define MT753X_CTRL_PHY_ADDR		0
->> +#define MT753X_CTRL_PHY_ADDR(phy_addr)	(phy_addr == 0x1f ? 0 : phy_addr + 1)
+> As described on the "MT7621 Programming Guide v0.4" document, the MT7530
+> switch and its PHYs can be configured to listen on the range of 7-12,
+> 15-20, 23-28, and 31 and 0-4 PHY addresses.
 > 
-> #define MT753X_CTRL_PHY_ADDR(phy_addr)	(phy_addr + 1 & 0x1f)
-
-Nit: maybe (even if certainly useless in this case):
-   #define MT753X_CTRL_PHY_ADDR(phy_addr)	((phy_addr) + 1 & 0x1f)
-
-?
-
+> There are operations where the switch PHY registers are used. For the PHY
+> address of the control PHY, transform the MT753X_CTRL_PHY_ADDR constant
+> into a macro and use it. The PHY address for the control PHY is 0 when the
+> switch listens on 31. In any other case, it is one greater than the PHY
+> address the switch listens on.
 > 
-> It's shorter, and works without conditional operator which is expensive.
+> Reviewed-by: Daniel Golle <daniel@makrotopia.org>
+> Tested-by: Daniel Golle <daniel@makrotopia.org>
+> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> ---
+>   drivers/net/dsa/mt7530-mdio.c | 28 ++++++++++++++--------------
+>   drivers/net/dsa/mt7530.c      | 35 ++++++++++++++++++++++-------------
+>   drivers/net/dsa/mt7530.h      |  4 +++-
+>   3 files changed, 39 insertions(+), 28 deletions(-)
 > 
+> diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
+> index 585db03c0548..dc48715f6534 100644
+> --- a/drivers/net/dsa/mt7530.h
+> +++ b/drivers/net/dsa/mt7530.h
+> @@ -625,7 +625,7 @@ enum mt7531_clk_skew {
+>   #define  MT7531_PHY_PLL_OFF		BIT(5)
+>   #define  MT7531_PHY_PLL_BYPASS_MODE	BIT(4)
+>   
+> -#define MT753X_CTRL_PHY_ADDR		0
+> +#define MT753X_CTRL_PHY_ADDR(phy_addr)	(phy_addr + 1 & 0x1f)
 
-Cj
+Whilst compiling, GCC suggests parentheses around ‘+’ in operand of ‘&’. I
+will send another version in the upcoming days.
 
+Arınç
 
