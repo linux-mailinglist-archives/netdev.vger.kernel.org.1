@@ -1,92 +1,110 @@
-Return-Path: <netdev+bounces-87726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86D928A43C8
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 18:26:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED6CD8A43CB
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 18:33:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0FECB21EAC
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 16:26:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BC9E282733
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 16:33:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D083134420;
-	Sun, 14 Apr 2024 16:26:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4141E5B1E9;
+	Sun, 14 Apr 2024 16:33:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UzBC/AUy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eGDJfIl9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9715B1E493;
-	Sun, 14 Apr 2024 16:26:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B2F1CF92;
+	Sun, 14 Apr 2024 16:33:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713111996; cv=none; b=tzqDnR8yUU4vIGKPJ/pNidSqpV1kNbq/Ms6TWY1UY6oUAYCAj3uhnGcEoYqH+xKAGWOjJzRlNlQRqA41lOitjV+MKePGWSnhlRLteuOaE+GQh2tjuU2pgaceaQEXpFMZ1JR4GkZTCenA5Kp7EcFM/ECfA8qydIaHE+bXdxYlR60=
+	t=1713112432; cv=none; b=VWof/1YswA0vfc8yNPjX5h7nWJNIDMH8UF9f4q7h/0kCmt/Co+NvpFN6ZESdxS7eRZ7Ko2Hg8Pucmy0Lx8Si2g1f6r+LmvOYVDY0WNAxFpR5CWE3pu/3DsmLqjklu271Q6hFQ0hq7Tn8p1CVsjlyMsIFT9ZOGj4x/dxOIKLoPKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713111996; c=relaxed/simple;
-	bh=X7Ay1dngUjs9o5Wo1TBSWBfNjtLII11epB+o6IEEeMQ=;
+	s=arc-20240116; t=1713112432; c=relaxed/simple;
+	bh=dyXqlvW9YjzLdAkkWuX++ClIqo70zTkGtGKhUa4LQpM=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ZqkTQ3ESmfJEEKvKS9fcGjfdm8ohVO//I2ljFqYb3kNRoDV48Bzr1igLIkm7GHO5yJ6xxzJ7WScytvLJ0Ai35GnAIEaDG3VRD/dMrM6nmLBjRy2USkFXPtTFXUbGOP1VJwlM2yXJx+cpKoVrYSu1hJW//pVUyYU9vrGtvo/bLUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UzBC/AUy; arc=none smtp.client-ip=209.85.219.44
+	 Mime-Version:Content-Type; b=enCwX7TfjoMyR0wObIwY4xUjOaprwfCuZycOUv24RV22q6Q9yvc78q7Q4IVjg47YMXKjSVbUiRHuucJhc5bOfAOd2hDZQAKkLb+rqqfxufm3FUS7j88ftLYTrzY8t8bAxf4VN2c/EagVVuB7Wgh92X142ntLemTJixWiKoUPGLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eGDJfIl9; arc=none smtp.client-ip=209.85.222.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f44.google.com with SMTP id 6a1803df08f44-69935d567a0so11468506d6.1;
-        Sun, 14 Apr 2024 09:26:34 -0700 (PDT)
+Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-78ec78c4fceso168077585a.0;
+        Sun, 14 Apr 2024 09:33:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713111993; x=1713716793; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1713112430; x=1713717230; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YxydSn1uWkfjxcuoBNp/4R/jm//blhzs50MovQ47n10=;
-        b=UzBC/AUys3g9k5YjRgxYSe/7Hszn6t3u+gNpI8MQg3rgFJeIWlHXB8F7j27xZnDlsd
-         3OO/Lf/o5i8f9Q65ZcWUVlGLdfdX/uWyJfkwQl5WEmz5/wm/9Y1oyg55E0dWAIItwU1U
-         f9cg6oldNKlO4nY3gGZMdumApwYIu0IM7OApepVLSqsDAPfYpEu8ur6vtivHRve/HnLA
-         dovKJ2kTvQYZbLXc+8yWoC5JrFAf5xvQ2WU20HjIHKR3p970+sKiwGqQNISnvl9I5ZuU
-         vjD7lYpxlQf/gpXy1cRXvc+ycN9DQ3z+acMIGZCOetNKmmAIAEISK7WioCoabg3gbUAc
-         tRRQ==
+        bh=eqL0WG5MvKc2cIq0z8Q5OhCeWqEk3epdhelny8K600w=;
+        b=eGDJfIl98CDRAq8WfVTN3Qx9tI2bVhkdRGExQy9y41Ji039X86T/4JByWDcOKWdCEH
+         KZhWUmb7ONMwJ3WOs+zy95Nx4l1u1OPanzdlTqrT5prKkM3Rtp9mmhd5i0U7bIdhdaAX
+         LxkHosc5Bja4tOBmHwsNPlD6qxkBOGqvEV/MEPixXVCwJNF1GzB1l8VqZ7qeVIvMw4+n
+         YiMo4HQBd3Ro8ye7M582H3Av7xidKvHrL2/N7eA7zbGI/wWj+SDq/8odlJWDQsbWr76K
+         wNzQtSm1kkxPwpxvfIxKyb2kcFH1mWsM53MeRLIqF29Od1R7jG5aLY4ajL9DEkyluC+2
+         mpyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713111993; x=1713716793;
+        d=1e100.net; s=20230601; t=1713112430; x=1713717230;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=YxydSn1uWkfjxcuoBNp/4R/jm//blhzs50MovQ47n10=;
-        b=Y2aFAJZAS/zIJTmn2vJRXuHpInpQm+mMNiVphre6BvY/BIxHgaSO15UQoRvo/e0T4X
-         hqO7yghPg7P1HG10RRtrkPCoudlU8dp9dAjhFHABtaSrue29BpW0kRLZ8KRI7qaH0mcC
-         vcyKj1fyChPWp2N7I0lK+84vLDYHBWZmw47nfyf7bgTzyMDSF7fitJ4S18FD29u1H8XA
-         dgyd1CGwvk1rwPyY+PV+hnv8qeC02g6Laz5Ns2Ku/LWVqfHaerNPzvHNU11wiztP2XE4
-         nNuDucJ4zHFjHnt5HaB+UlJ99lN6QcE0eJgVt5JSLAPR2VfjwBOddsRRbRPbZ2SCXrNL
-         DAeg==
-X-Forwarded-Encrypted: i=1; AJvYcCW2jlt/ocMjGKzMV7mtuyCkDG6l8MUwM+rNbt3VuXAd5Q2DKsWG3Zo5gQ46Xs9XYAAUBslajy60zZVnF5rKNdyv3nHznEr5/RuEK9UBaCBKepmzE7hTWaJILhjt15OXlAW4Yyrl
-X-Gm-Message-State: AOJu0Yzr2zXlpva2s0KBFsh2nEawnQYyYB/Tl+FHRrSKxZmwVDaPrVZZ
-	ffM32XI124VyYvd+IVM3JKxPiUB1OGUDN/27L2WEM4LVbWTsyGu9
-X-Google-Smtp-Source: AGHT+IFvQU+J/Y/pDu8XRR2w90ai85+h/cuVkxVC4wUE6qEKssGMmvrMlfo9m6TGQduE8IN0quS5sQ==
-X-Received: by 2002:a05:6214:bc3:b0:699:4a50:c5c0 with SMTP id ff3-20020a0562140bc300b006994a50c5c0mr7130461qvb.18.1713111993398;
-        Sun, 14 Apr 2024 09:26:33 -0700 (PDT)
+        bh=eqL0WG5MvKc2cIq0z8Q5OhCeWqEk3epdhelny8K600w=;
+        b=omvQEdKjl0RVnAwEhMpk++rX+sVJnSfE4OUQhH5ytDBdjX8J2E1/vkpWlucSsQbbmS
+         jPTFz0K2QiPdZ+A/+5HkR+Ibi6c6vX6LrQjt2EGtyIdc83kYRfUheQ8sMFCY8wdUsA/z
+         KU+mhWv6y/s06KXxdTjmffhYkpxT+F3xoB9gVojAWfAxKpuKZvRbYpT7gP8iK7YpPEnZ
+         f7M6utN7FZCLnIUQvN4We3JEOUhehiv41JLcbpG6d0TZZVdmxuOjtfym2c1H+Nymdjby
+         fm1gMY0gc9I4hrw/GZO/13iGRJGIn1ILJfxvdL6I3z3YwDS9Lstb4rwo05BS9GLA7NG4
+         XdZw==
+X-Forwarded-Encrypted: i=1; AJvYcCWb0KOhPL6SmzOI7m7/uGt9QXNRK7pY0Inbvl4QZygbz3sRm+P/2dCkJwS5vGxQNARr0d2WPogE92Yncu2s1eLzlRDfITvUNpoEitmxmLRjOPn/6Y3aEGd1fVZT9tf2C6JQFtU7RCEEnAMOz/S7WmFPEVQC0SkOLkxIMwA1JT5Z
+X-Gm-Message-State: AOJu0YxT6jHPR0AZp0C2Jmt00yk+ISU8AiHEU9rzVbOByOma9dfXdZSw
+	OFbiiKlkJSYK51pJy3+JSTyMR2F4rknw+llSN+pyPmwpehRlQAA6
+X-Google-Smtp-Source: AGHT+IHTOBVsxm4/lXrUUUQxQfSI05H0EVLBNy41Bu3n+HJQTCm8ENB7o0ZDxOkgCjw16yeeKdkeYQ==
+X-Received: by 2002:a05:620a:191d:b0:78e:13f1:3040 with SMTP id bj29-20020a05620a191d00b0078e13f13040mr14999873qkb.22.1713112429649;
+        Sun, 14 Apr 2024 09:33:49 -0700 (PDT)
 Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id h19-20020a0cab13000000b006913aa64629sm5124874qvb.22.2024.04.14.09.26.33
+        by smtp.gmail.com with ESMTPSA id m12-20020ae9e70c000000b007883184574esm5208818qka.98.2024.04.14.09.33.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Apr 2024 09:26:33 -0700 (PDT)
-Date: Sun, 14 Apr 2024 12:26:32 -0400
+        Sun, 14 Apr 2024 09:33:49 -0700 (PDT)
+Date: Sun, 14 Apr 2024 12:33:48 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Lei Chen <lei.chen@smartx.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Jason Wang <jasowang@redhat.com>, 
+To: Kory Maincent <kory.maincent@bootlin.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, 
+ Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+ Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
  "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>, 
- Herbert Xu <herbert@gondor.apana.org.au>, 
- "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Lei Chen <lei.chen@smartx.com>, 
- Willem de Bruijn <willemb@google.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Radu Pirea <radu-nicolae.pirea@oss.nxp.com>, 
+ Jay Vosburgh <j.vosburgh@gmail.com>, 
+ Andy Gospodarek <andy@greyhouse.net>, 
+ Nicolas Ferre <nicolas.ferre@microchip.com>, 
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Horatiu Vultur <horatiu.vultur@microchip.com>, 
+ UNGLinuxDriver@microchip.com, 
+ Simon Horman <horms@kernel.org>, 
+ Vladimir Oltean <vladimir.oltean@nxp.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
  netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <661c03b8c6cae_3e7732294f8@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240414081806.2173098-1-lei.chen@smartx.com>
-References: <20240414081806.2173098-1-lei.chen@smartx.com>
-Subject: Re: [PATCH net-next v4] tun: limit printing rate when illegal packet
- received by tun dev
+ linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Message-ID: <661c056cf26d6_3e7732294f3@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240414073315.5aa7adf0@kmaincent-XPS-13-7390>
+References: <20240409-feature_ptp_netnext-v10-0-0fa2ea5c89a9@bootlin.com>
+ <20240409-feature_ptp_netnext-v10-8-0fa2ea5c89a9@bootlin.com>
+ <66175265992c8_2d6bc6294d8@willemb.c.googlers.com.notmuch>
+ <20240414073315.5aa7adf0@kmaincent-XPS-13-7390>
+Subject: Re: [PATCH net-next v10 08/13] ptp: Add phc source and helpers to
+ register specific PTP clock or get information
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,103 +115,32 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Lei Chen wrote:
-> vhost_worker will call tun call backs to receive packets. If too many
-> illegal packets arrives, tun_do_read will keep dumping packet contents.
-> When console is enabled, it will costs much more cpu time to dump
-> packet and soft lockup will be detected.
+Kory Maincent wrote:
+> On Wed, 10 Apr 2024 23:00:53 -0400
+> Willem de Bruijn <willemdebruijn.kernel@gmail.com> wrote:
 > 
-> net_ratelimit mechanism can be used to limit the dumping rate.
+> > > +/**
+> > > + * netdev_ptp_clock_register() - register a PTP hardware clock driver for
+> > > + *				 a net device
+> > > + *
+> > > + * @info: Structure describing the new clock.
+> > > + * @dev:  Pointer of the net device
+> > > + */
+> > > +
+> > > +extern struct ptp_clock *
+> > > +netdev_ptp_clock_register(struct ptp_clock_info *info,
+> > > +			  struct net_device *dev);  
+> > 
+> > No need for explicit extern?
 > 
-> PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980"
->  #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
->  #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
->  #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
->  #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
->  #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
->     [exception RIP: io_serial_in+20]
->     RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
->     RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 0000000000000000
->     RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428a0
->     RBP: 0000000000002710   R8: 0000000000000004   R9: 000000000000000f
->     R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 0000000000000020
->     R13: ffffffff8acbf698  R14: 0000000000000058  R15: 0000000000000000
->     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
->  #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
->  #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
->  #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
->  #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
->  #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
->  #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
->  #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
->  #12 [ffffa65531497b68] printk at ffffffff89318306
->  #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
->  #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
->  #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
->  #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
->  #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
->  #18 [ffffa65531497f10] kthread at ffffffff892d2e72
->  #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
-> 
-> Fixes: ef3db4a59542 ("tun: avoid BUG, dump packet on GSO errors")
-> Signed-off-by: Lei Chen <lei.chen@smartx.com>
-> Reviewed-by: Willem de Bruijn <willemb@google.com>
-> Acked-by: Jason Wang <jasowang@redhat.com>
-> ---
-> Changes from v3:
-> https://lore.kernel.org/all/20240412065841.2148691-1-lei.chen@smartx.com/
->  1. Change patch target from net tun to tun.
->  2. Move change log below the seperator "---".
->  3. Remove escaped parentheses in the Fixes string.
-> 
-> Changes from v2:
-> https://lore.kernel.org/netdev/20240410042245.2044516-1-lei.chen@smartx.com/
->  1. Add net-dev to patch subject-prefix.
->  2. Add fix tag.
-> 
-> Changes from v1:
-> https://lore.kernel.org/all/20240409062407.1952728-1-lei.chen@smartx.com/
->  1. Use net_ratelimit instead of raw __ratelimit.
->  2. Use netdev_err instead of pr_err to print more info abort net dev.
->  3. Adjust git commit message to make git am happy.
->  drivers/net/tun.c | 18 ++++++++++--------
->  1 file changed, 10 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index 0b3f21cba552..ca9b4bc89de7 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -2125,14 +2125,16 @@ static ssize_t tun_put_user(struct tun_struct *tun,
->  					    tun_is_little_endian(tun), true,
->  					    vlan_hlen)) {
->  			struct skb_shared_info *sinfo = skb_shinfo(skb);
-> -			pr_err("unexpected GSO type: "
-> -			       "0x%x, gso_size %d, hdr_len %d\n",
-> -			       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
-> -			       tun16_to_cpu(tun, gso.hdr_len));
-> -			print_hex_dump(KERN_ERR, "tun: ",
-> -				       DUMP_PREFIX_NONE,
-> -				       16, 1, skb->head,
-> -				       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
-> +
-> +			if (net_ratelimit()) {
-> +				netdev_err(tun->dev, "unexpected GSO type: 0x%x, gso_size %d, hdr_len %d\n",
-> +				       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
-> +				       tun16_to_cpu(tun, gso.hdr_len));
+> Indeed I don't think it is needed.
+> I am wondering why few other functions uses it (ptp_clock_register,
+> ptp_clock_event, ptp_clock_index). Do you know?
 
-Indentation. checkpatch or patchwork will also show this.
+Perhaps it predates the coding style rule
 
-> +				print_hex_dump(KERN_ERR, "tun: ",
-> +					       DUMP_PREFIX_NONE,
-> +					       16, 1, skb->head,
-> +					       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
-> +			}
->  			WARN_ON_ONCE(1);
->  			return -EINVAL;
->  		}
-> -- 
-> 2.44.0
-> 
+    Do not use the ``extern`` keyword with function declarations as this makes
+    lines longer and isn't strictly necessary.
 
 
 
