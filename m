@@ -1,266 +1,101 @@
-Return-Path: <netdev+bounces-87736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 074478A4508
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 22:22:11 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85B0C8A460B
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 01:04:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7259F1F211B3
-	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 20:22:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 151B3B2128C
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 23:04:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D52E913540C;
-	Sun, 14 Apr 2024 20:22:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="ZYVuZhhh";
-	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="+nkF2OOL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1075822B;
+	Sun, 14 Apr 2024 23:04:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.54])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8917B1D688;
-	Sun, 14 Apr 2024 20:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=85.215.255.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713126124; cv=pass; b=i30Crf8oSrQbu1fHPYyXTgaGgeR/keYvyWTtBBboZ617zCoV3QUUHtI87oSFiYFM00fVT4JLZgNxtfjvj/9DC2jjC3U1PsUlZ/nQNMH6J2ahu5vkl6ZREh+YXiBAOBX+ZrRqZ7BI7lHHpFYZ0KuzfOVrIa+3Hosi4O3qwzQH02Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713126124; c=relaxed/simple;
-	bh=vT8KOr3SvikJeMpg2ktjqGTrpiUSVOwI7Ulj4Tcu88w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=H3zbjxtA/MGrvUSA0NLEden4UD8HV86HD7s8G9kjlLXnDYiyNbumdvsnlwIS/2ULaOSKq0j5s0/Q4o4zMoCfBZz0/r2Eec1yEq4MCSJgmnptux8OQYD8E5wqnDLQzDrn48p/plwdmdYtw/WhvP7lHykwOaqB0/QJfAcWVpsgt1E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=ZYVuZhhh; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=+nkF2OOL; arc=pass smtp.client-ip=85.215.255.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
-ARC-Seal: i=1; a=rsa-sha256; t=1713126101; cv=none;
-    d=strato.com; s=strato-dkim-0002;
-    b=nKKe3KUJgcml3yIeSAfS56G8gn/M7whEEmw5a5WE7fzwLxRAf4YgS3U8NaGBzH7EKN
-    SN9kbiTMgjzC3HdfxggzC2C+pa4fZhoalOouQUD3kp8xr6IUKFkF0OIRTn5QwBqcV4Pz
-    8S8DH7Tu870sSA+WqA15kFbfl7DUOq6JHzQriOqIzRtxWujt4beS0BpV09ip0z2wRjD4
-    2lNLFsrTTA+rGiGp3ZEVgu0cc5jR91gw8YAViIx4OMUwaD+f1eiehji4TnYMkGUbs5xU
-    HihvqqwdMTAJquFHn2bK4XonjIZADOExmrzz8qT2Mas8F2DGZcQBG9V63UnCDENsXtUg
-    JW2w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1713126101;
-    s=strato-dkim-0002; d=strato.com;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=FFdZNeDIHKlI++tV+rJTXXExTAzAeIULgTQSTJmSCuU=;
-    b=d+2z78jmUpVbWERrzidNkDGiRCzxitPyZ2tpox3AwqsqC3JvEgUdNG5uCXBcM9wmAu
-    UgHUzNX1yYTKNUm+/tOcB9QZ/7LtSF/W5z7SUFj5GP3eqD/YyCpJslokiqq7on3KUfOj
-    JlX//bb2fygswKgToU5A0T8XcU9lxZwKOHCPaa0wiFT4i9rz1H3dXjcA8Ej0uRgbQwlv
-    axiISXyFHxFHb3rJUTirzl8MdzUSgItAVwS+6OQetwz8/2X5+Alo1VBaZCtH9kwu0dAs
-    vQIigU063HdD99I/JZdXaBnEod5JnJDh89QXyeOLAvv/yK3UjMO5R7rFp8+wjLghDKRK
-    lsuA==
-ARC-Authentication-Results: i=1; strato.com;
-    arc=none;
-    dkim=none
-X-RZG-CLASS-ID: mo01
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1713126101;
-    s=strato-dkim-0002; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=FFdZNeDIHKlI++tV+rJTXXExTAzAeIULgTQSTJmSCuU=;
-    b=ZYVuZhhhuTXsfiqLhsPEg9wlcG8eThmmC3SBleBWs6PUuvW9kKG088eYLZb0T7bZDv
-    Ak+c4F8bikqsCZa3SUQxA0mHIX1w6+NtSM27rgwtEdQolFnQc48REWOGpwzW7cWr8x/I
-    +gHUrQYOgNgcshVn0/TdM8YkzkTsjKTaw7YdfZ9SmhXpERFqvGLxS8fSlgaihG78ocqt
-    0z0Z7+lrsvciLpvsV0Kw4uGfTq7a9sB3WSEY+/wl5YEVO8OKtAP86Zc1gVSRIC20zCRt
-    hPTW9mKqxNXClgLUadI/iW2eiNl3z7KoE3ATGPMVT4dvC7MZqmjbw/keLiY6Ht954K/3
-    Hx8Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1713126101;
-    s=strato-dkim-0003; d=hartkopp.net;
-    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
-    From:Subject:Sender;
-    bh=FFdZNeDIHKlI++tV+rJTXXExTAzAeIULgTQSTJmSCuU=;
-    b=+nkF2OOLy0dmy4fcPZ9weFhIxlK4A9ibM3sS5vJCEe69AFulTfGJgtlCP8ET/+uzb2
-    YOxnle5qTxrA0hgL48Cg==
-X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1o3TMaFqTEVR+J8xpzl0="
-Received: from [192.168.60.177]
-    by smtp.strato.de (RZmta 50.3.2 DYNA|AUTH)
-    with ESMTPSA id K701d603EKLfKo9
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-	(Client did not present a certificate);
-    Sun, 14 Apr 2024 22:21:41 +0200 (CEST)
-Message-ID: <64586257-3cf6-4c10-a30b-200b1ecc5e80@hartkopp.net>
-Date: Sun, 14 Apr 2024 22:21:33 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EA5A1DFF4;
+	Sun, 14 Apr 2024 23:04:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713135882; cv=none; b=NeSDLXL8vlikQCtEswg4VtG8BcsAvbPQeTtdSuK8IJSyI5t8RGlNFLWeRqtPfEkaVyUSQrNheNf0/ghydGYyJ4DvMYikb25VErj/p+5ItzklcdLc5nxJOJHBBUEOXhprZVVrhqsUzXgtNJsIb9ixWp0V2ddqLYyLypJoJRaBdTY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713135882; c=relaxed/simple;
+	bh=1F1CNbqCcjZGKSOs1VT/JdjiQmh/5cknyAOB2kLkCbI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CGgOGmsNgdSiscQCD4SWIIakq0MaqJd44dgoJNGpy79+ITRlPo3RntqkMmFc2kfxHEpJXyNT5jHXP11b1wXKNfFkYDZ+1le8/qsK+azhulTRSdrJdZAxyAvkfQRtXfbyBQglvdtzlgQW4r+7lB3M0xjgyV9ZS2nulcPdXMvL10U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1rw8tg-0002V9-8E; Mon, 15 Apr 2024 01:04:28 +0200
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	<netfilter-devel@vger.kernel.org>,
+	pablo@netfilter.org
+Subject: [PATCH net-next 00/12] selftests: netfilter: move to lib.sh infra
+Date: Mon, 15 Apr 2024 00:57:12 +0200
+Message-ID: <20240414225729.18451-1-fw@strlen.de>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 1/1] Documentation: networking: document ISO
- 15765-2:2016
-To: Vincent Mailhol <vincent.mailhol@gmail.com>
-Cc: Francesco Valla <valla.francesco@gmail.com>,
- Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Simon Horman <horms@kernel.org>, Bagas Sanjaya <bagasdotme@gmail.com>,
- fabio@redaril.me
-References: <20240329133458.323041-2-valla.francesco@gmail.com>
- <20240329133458.323041-3-valla.francesco@gmail.com>
- <CAMZ6RqKLaYb+8EaeoFMHofcaBT5G2-qdqSb4do73xrgMvWMZaA@mail.gmail.com>
- <9f5ad308-f2a0-47be-85f3-d152bc98099a@hartkopp.net>
- <CAMZ6RqKGKcYd4hAM8AVV72t78H-Kt92NXowx6Q+YCw=AuSxKuw@mail.gmail.com>
-Content-Language: en-US
-From: Oliver Hartkopp <socketcan@hartkopp.net>
-In-Reply-To: <CAMZ6RqKGKcYd4hAM8AVV72t78H-Kt92NXowx6Q+YCw=AuSxKuw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+This is the second batch of the netfilter selftest move.
 
+scripts are moved to lib.sh infra. This allows to use busywait helper
+and ditch various 'sleep 2' all over the place.
 
-On 14.04.24 06:03, Vincent Mailhol wrote:
+Last patch updates the makefile with the missing bits to make
+'kselftest-install' target work as intended again and adds more required
+config settings.
 
-> 
-> This doesn't remove the fact that I think that this naming convention
-> is stupid because of the RAS syndrome, but I acknowledge that CAN CC
-> is now the official denomination and thus, that we should adopt it in
-> our documentation as well.
-> 
+Missing/work in progress:
+1. nft_concat_range.sh: it runs for a very long time and also has
+a few remaining issues.
+2. some scripts still generate lots of warnings when fed to shellcheck.
 
-;-)
+Both issues work-in-progress, no point in waiting because its not
+essential and series should not grow too large.
 
+Florian Westphal (12):
+  selftests: netfilter: conntrack_icmp_related.sh: move to lib.sh infra
+  selftests: netfilter: conntrack_tcp_unreplied.sh: move to lib.sh infra
+  selftests: netfilter: nft_queue.sh: move to lib.sh infra
+  selftests: netfilter: nft_synproxy.sh: move to lib.sh infra
+  selftests: netfilter: nft_zones_many.sh: move to lib.sh infra
+  selftests: netfilter: xt_string.sh: move to lib.sh infra
+  selftests: netfilter: nft_nat_zones.sh: shellcheck cleanups
+  selftests: netfilter: nft_queue.sh: shellcheck cleanups
+  selftests: netfilter: conntrack_ipip_mtu.sh: shellcheck cleanups
+  selftests: netfilter: nft_fib.sh: shellcheck cleanups
+  selftests: netfilter: nft_audit.sh: skip if auditd is running
+  selftests: netfilter: update makefiles and kernel config
 
->>> Add a space between ISO and the number. Also, update the year:
->>>
->>>     ISO 15765-2:2024
->>>
->>
->> Interesting! Didn't know there's already a new version.
->>
->> Will check this out whether we really support ISO 15765-2:2024 ...
->>
->> Do you have the standard at hand right now or should we leave this as
->> ISO15765-2:2016 until we know?
-> 
-> I have access to the newer revisions. But I never really invested time
-> into reading that standard (neither the 2016 nor the 2024 versions).
-> 
-> Regardless, here is a verbatim extract from the Foreworld section of
-> ISO 15765-2:2024
-> 
->    This fourth edition cancels and replaces the third edition (ISO
->    15765-2:2016), which has been technically revised.
-> 
->    The main changes are as follows:
-> 
->      - restructured the document to achieve compatibility with OSI
->        7-layers model;
-> 
->      - introduced T_Data abstract service primitive interface to
->        achieve compatibility with ISO 14229-2;
-> 
->      - moved all transport layer protocol-related information to Clause 9;
-> 
->      - clarification and editorial corrections
-> 
+ tools/testing/selftests/Makefile              |   2 +-
+ .../testing/selftests/net/netfilter/Makefile  |   5 +
+ tools/testing/selftests/net/netfilter/config  |  42 ++-
+ .../net/netfilter/conntrack_ipip_mtu.sh       |  74 ++---
+ .../selftests/net/netfilter/nft_audit.sh      |  18 +-
+ .../selftests/net/netfilter/nft_fib.sh        | 128 ++++----
+ .../selftests/net/netfilter/nft_nat_zones.sh  | 193 +++++--------
+ .../selftests/net/netfilter/nft_queue.sh      | 273 ++++++++----------
+ .../selftests/net/netfilter/nft_synproxy.sh   |  77 ++---
+ .../selftests/net/netfilter/nft_zones_many.sh |  93 +++---
+ .../selftests/net/netfilter/xt_string.sh      |  55 ++--
+ 11 files changed, 458 insertions(+), 502 deletions(-)
 
-Yes, I've checked the release notes on the ISO website too.
-This really looks like editorial stuff that has nothing to do with the 
-data protocol and its segmentation.
+-- 
+2.43.2
 
->>>
->>> Here, I would suggest the C99 designated field initialization:
->>>
->>>     struct sockaddr_can addr = {
->>>             .can_family = AF_CAN;
->>>             .can_ifindex = if_nametoindex("can0");
->>>             .tp.tx_id = 0x18DA42F1 | CAN_EFF_FLAG;
->>>             .tp.rx_id = 0x18DAF142 | CAN_EFF_FLAG;
->>>     };
-> 
-> Typo in my previous message: the designated initializers are not
-> separated by colon ";" but by comma ",". So it should have been:
-> 
->    struct sockaddr_can addr = {
->          .can_family = AF_CAN,
->          .can_ifindex = if_nametoindex("can0"),
->          .tp.tx_id = 0x18DA42F1 | CAN_EFF_FLAG,
->          .tp.rx_id = 0x18DAF142 | CAN_EFF_FLAG,
->    };
-> 
->>> Well, this is just a suggestion, feel free to reject it if you do not like it.
->>
->> At least I don't like it.
->>
->> These values are usually interactively given on the command line:
->>
->>   >            .can_ifindex = if_nametoindex("can0");
->>   >            .tp.tx_id = 0x18DA42F1 | CAN_EFF_FLAG;
->>   >            .tp.rx_id = 0x18DAF142 | CAN_EFF_FLAG;
->>
->> So have it in a static field initialization leads to a wrong path IMO.
-> 
-> There is no such limitation that C99 designated initializers should
-> only work with variables which have static storage duration. In my
-> suggested example, nothing is static.
-> 
-> I see this as the same thing as below example:
-> 
->    int foo(void);
-> 
->    int bar()
->    {
->            int i = foo();
->    }
-> 
->    int baz()
->    {
->            int i;
-> 
->            i = foo();
->    }
-> 
-> In bar(), the fact that the variable i is initialized at declaration
-> does not mean that it is static. In both examples, the variable i uses
-> automatic storage duration.
-> 
-> Here, my preference goes to bar(), but I recognize that baz() is also
-> perfectly fine. Replace the int type by the struct sockaddr_can type
-> and the scalar initialization by designated initializers and you
-> should see the connection.
-
-Oh, sorry. Maybe I expressed myself wrong.
-
-IMHO your way to work with an initializer is correct from the C standpoint.
-
-But I think this is pretty unusual for a code example when an 
-application programmer starts to work with ISO-TP.
-
-You usually get most of these values from the command line an fill the 
-struct _by hand_ - and not with a static initialization.
-
-That was my suggestion.
-
-> 
-> ** Different topic **
-> 
-> While replying on this, I encountered something which made me worry a bit:
-> 
-> The type of sockaddr_can.can_ifindex is a signed int:
-> 
->    https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/can.h#L243
-> 
-> But if_nametoindex() returns an unsigned int:
-> 
->     https://man7.org/linux/man-pages/man3/if_nametoindex.3.html
-> 
-> Shouldn't sockaddr_can.can_ifindex also be declared as an unsigned int?
-> 
-
-The if_index derives from struct netdevice.if_index
-
-https://elixir.bootlin.com/linux/v6.8.6/source/include/linux/netdevice.h#L2158
-
-which is an int.
-
-I don't think this would have an effect in real world to change 
-sockaddr_can.can_ifindex to an unsigned int.
-
-I wonder if it is more critical to existing user space code to change it 
-to unsigned int or to leave it as-is ...
-
-Best regards,
-Oliver
 
