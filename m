@@ -1,242 +1,140 @@
-Return-Path: <netdev+bounces-87765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7AFF8A47F2
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 08:18:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 089148A4638
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 01:55:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C2941F22147
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 06:18:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14ABB1C21056
+	for <lists+netdev@lfdr.de>; Sun, 14 Apr 2024 23:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83C53101F2;
-	Mon, 15 Apr 2024 06:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DDA6136E37;
+	Sun, 14 Apr 2024 23:55:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="ERV9rHLV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k4UcOGeJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FFACF510;
-	Mon, 15 Apr 2024 06:18:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06A27134433;
+	Sun, 14 Apr 2024 23:55:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713161903; cv=none; b=I16CW9h7wkRbFiCuqc0p4APWJSA9clqFvaumbULOfgwaNRCJ6+7Fr5jHP8UTTLbxPjscuHmokAC38rNGN+aWgEPWqs3iPA0cnc1KyUo4nF1oVwe0Vo3QyWa4uZykAmOoWyOp2SsB78MkijlIdh8O/664L7kgHaapWahtMus0rDU=
+	t=1713138924; cv=none; b=sxcf62HADLGerUNq7LATdgPG40W8co1GE8/kvR9l8M0nXqRBCI27TBzdgU8nwjQ55eCtn9rLpEbVOgBWWVP97LHjC4g7b35jJhSCDe+Lvswf1vgx7pLR+J9BDPsZfOFBSZOBu9p7ilRbLaltaVpNZxYbyYl7IzpTchnRGhru4x8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713161903; c=relaxed/simple;
-	bh=dIpMorwvcjEcFIs7BXGPzjLGTI/qN5cCdG54c8G6u6I=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:References; b=dXdyFC65xycVxNm4i1KBRhqq6LI7pF9MVTHkP/8xxrOO5y/qCo91yIwIOKHb1N5oyw0Co/gNGy5TLVZl8jYSM8fSuMqFWjGHxVce0sSn5q0aRoJ575MfAxh8AgNMQClfQqSwODA91hPrn83fK+EC2HFpcbHhSbd2fUrFCo4+UgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=ERV9rHLV; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20240415061813euoutp02d4ab7dfe0773524854f6060b40e5a93d~GX6pDsjYh1490514905euoutp02V;
-	Mon, 15 Apr 2024 06:18:13 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20240415061813euoutp02d4ab7dfe0773524854f6060b40e5a93d~GX6pDsjYh1490514905euoutp02V
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1713161893;
-	bh=eNr2YGP1v+MnG9QRbYR4UIWo2Mx+qaBfAW2TIUf8pk0=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=ERV9rHLVBat+fo9IBDp/Hka1GmgTo99aqUCB3b7aSuMfh6S/it+2UV4yjvBgf4lpf
-	 sCSS7LNtj/zRpj4BcCJnY6/DDEOnS4upaH6HVM1jCYP5xuIOMZFxXzhY35xzKQQuPA
-	 O2ToMWZ4PXatstYZ1+Hh0nCb7mL3wREyYFmA84Zw=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20240415061812eucas1p1871a07d54e857a4d6203d9ae01643998~GX6osyF2F1247012470eucas1p1u;
-	Mon, 15 Apr 2024 06:18:12 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges3new.samsung.com (EUCPMTA) with SMTP id 21.D8.09620.4A6CC166; Mon, 15
-	Apr 2024 07:18:12 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240415061812eucas1p1ff6ae6b6eeb996525ffa4bb28090d076~GX6oE0yrW1022010220eucas1p19;
-	Mon, 15 Apr 2024 06:18:12 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240415061812eusmtrp10e4c6ec364e62bf73915fa567506d049~GX6oDR2uN2218222182eusmtrp1o;
-	Mon, 15 Apr 2024 06:18:12 +0000 (GMT)
-X-AuditID: cbfec7f5-d31ff70000002594-13-661cc6a4a5ba
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-	eusmgms2.samsung.com (EUCPMTA) with SMTP id 26.72.09010.3A6CC166; Mon, 15
-	Apr 2024 07:18:11 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-	20240415061811eusmtip119769eaa9d0d8bdf9c622f51ae1af21a~GX6ntJEyG0507205072eusmtip1Z;
-	Mon, 15 Apr 2024 06:18:11 +0000 (GMT)
-Received: from localhost (106.210.248.128) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Mon, 15 Apr 2024 07:18:11 +0100
-Date: Fri, 12 Apr 2024 16:50:00 +0200
-From: Joel Granados <j.granados@samsung.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-CC: <Dai.Ngo@oracle.com>, <alex.aring@gmail.com>,
-	<alibuda@linux.alibaba.com>, <allison.henderson@oracle.com>,
-	<anna@kernel.org>, <bridge@lists.linux.dev>, <chuck.lever@oracle.com>,
-	<coreteam@netfilter.org>, <courmisch@gmail.com>, <davem@davemloft.net>,
-	<dccp@vger.kernel.org>, <devnull+j.granados.samsung.com@kernel.org>,
-	<dhowells@redhat.com>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<fw@strlen.de>, <geliang@kernel.org>, <guwen@linux.alibaba.com>,
-	<herbert@gondor.apana.org.au>, <horms@verge.net.au>, <ja@ssi.bg>,
-	<jaka@linux.ibm.com>, <jlayton@kernel.org>, <jmaloy@redhat.com>,
-	<jreuter@yaina.de>, <kadlec@netfilter.org>, <keescook@chromium.org>,
-	<kolga@netapp.com>, <kuba@kernel.org>, <linux-afs@lists.infradead.org>,
-	<linux-hams@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-s390@vger.kernel.org>, <linux-sctp@vger.kernel.org>,
-	<linux-wpan@vger.kernel.org>, <linux-x25@vger.kernel.org>,
-	<lucien.xin@gmail.com>, <lvs-devel@vger.kernel.org>,
-	<marc.dionne@auristor.com>, <marcelo.leitner@gmail.com>,
-	<martineau@kernel.org>, <matttbe@kernel.org>, <mcgrof@kernel.org>,
-	<miquel.raynal@bootlin.com>, <mptcp@lists.linux.dev>, <ms@dev.tdt.de>,
-	<neilb@suse.de>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <pabeni@redhat.com>,
-	<pablo@netfilter.org>, <ralf@linux-mips.org>, <razor@blackwall.org>,
-	<rds-devel@oss.oracle.com>, <roopa@nvidia.com>, <stefan@datenfreihafen.org>,
-	<steffen.klassert@secunet.com>, <tipc-discussion@lists.sourceforge.net>,
-	<tom@talpey.com>, <tonylu@linux.alibaba.com>,
-	<trond.myklebust@hammerspace.com>, <wenjia@linux.ibm.com>,
-	<ying.xue@windriver.com>
-Subject: Re: [PATCH v2 4/4] ax.25: Remove the now superfluous sentinel
- elements from ctl_table array
-Message-ID: <20240412145000.4nrf5sufnwjltdl4@joelS2.panther.com>
+	s=arc-20240116; t=1713138924; c=relaxed/simple;
+	bh=x/ZaivhLVqGcYww6tuaww8ga6KDYPIEMngqcbFtdkNE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cJ9clkCGRrqg1UjqnJxEQ5OQttNFabDmJpQeB4HQSFRW54ACzIPTrmTSscq6oqt9UYJtZHDTwYhyYC+foxcVTtavoGr1mow3rq4Z4GdL8JDgr0pisbcn6vlOtXfnNGcutHdbvzGfbnSxffk4aHY1wkOKnV9D/jPjvi1lTZl+nok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k4UcOGeJ; arc=none smtp.client-ip=209.85.221.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-343eb6cc46bso1837653f8f.2;
+        Sun, 14 Apr 2024 16:55:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713138921; x=1713743721; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Qk0hsuz00TRW+haVYjAhBcrIuoH2nHlh3kbDkUGYqrg=;
+        b=k4UcOGeJe1MXBz5vFP78Y5TreHiGEKUcKm3IZ9bWj6Bjd4I0K0rli4iUKo58KfCncV
+         wkeap8gFC6N/zE7sv01OWnoWhEVdZO9TUqXr4fQRuTqlmVCHG/lk2XCYoy4VSLmBtceH
+         LIrlCzBmToB5lkvyYsvwyg8TemkqFdJwTKxEZxqS+lHwiHCW7pRkQctIJX92GZFStOVk
+         jMjrNmbsWqkeUXiJF2Q/rwYcDgvFQhNHhvWJtc8b+nnAVk9E+HzY3KstFygVbHOIDkAG
+         4S/E9j1UO66EMHWsNAnaWPdmisS9PtdFdriY5wVHcvs2NUE1k2Ee4jh15Q59k856MBmR
+         snaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713138921; x=1713743721;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qk0hsuz00TRW+haVYjAhBcrIuoH2nHlh3kbDkUGYqrg=;
+        b=nQzHJLVToWk8OheSzu1Hr7J7oJuo/m/oxEgD6vMoIONs+QWtR8ZKk9PyoTRNhfxl0u
+         xZEnazRR4YGk4cOFKOJqZSBddrJ1LKKgiBFL2JdYpt4q2q6VFGbPAKMrc3bLEMcJkner
+         YIFG9FNOK1AxWCDvBWWCQ+ooRIm94CbLuyHKrXxwqBpVuKEgLZHoy1EH5OyztmfQRnyI
+         srABQlV6V0LNk2sUspfK1QQ6ZqVXLu30jX+qE/IUgHyJpAVNGtbKEeagyjO9p1Bqqc+q
+         HcoDvlk4yOz1Hb9gXKFs82GHANOZ9aWVkbkNBUI8azStyeCB8Oh57nzZuwtsKSe0vgEz
+         e91g==
+X-Forwarded-Encrypted: i=1; AJvYcCUCSMiwGxhyO4IFDjSo3VY8vf1TddZJ3+W577BuvfJAUL3rop530nQIQY1Ee9vDE16nZeZpSwfpThMDQiD0dkxfWvTx78uhJGfoytIxVo/VEbBzbvXfGn0vWBqM6MDcUmo=
+X-Gm-Message-State: AOJu0YwbjCG0dQ+VHgmTophFqCFYq8W2Fa3D384Z5bvMlUFqQIlwcNNF
+	sWcPEdys/474QQwnxfByYDxReDYF7i1Dn2PCUYzR7b+9IsubTc8a1pi/hA==
+X-Google-Smtp-Source: AGHT+IFVHj266RMtsOlBEdxA7w27ArsH1N7+4IcEmm2RDrcVgkXpPeXxRs/ymlU2XPCXPXOyxCqcow==
+X-Received: by 2002:a5d:6d84:0:b0:343:6ca4:97e8 with SMTP id l4-20020a5d6d84000000b003436ca497e8mr6529644wrs.45.1713138921100;
+        Sun, 14 Apr 2024 16:55:21 -0700 (PDT)
+Received: from [192.168.42.114] ([85.255.232.172])
+        by smtp.gmail.com with ESMTPSA id u13-20020a5d434d000000b00346bda84bf9sm10154480wrr.78.2024.04.14.16.55.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 14 Apr 2024 16:55:20 -0700 (PDT)
+Message-ID: <e686d9ba-f5fc-48c7-9399-06fcbed6ebd5@gmail.com>
+Date: Mon, 15 Apr 2024 00:55:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="7o7lzmim7rza4zom"
-Content-Disposition: inline
-In-Reply-To: <20240405222658.3615-1-kuniyu@amazon.com>
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA2WTa0yTZxTH87y3FrTstRB85LYF1Divcy7bcZOp02Xvsi/L5rJFN7XKK6JS
-	TAuOTZdVCqJQHRcTZkGuppZWiwJWUBBWJ2gBwQsMCeBaijjAG8ilgHSUVzOTffud/zn/c3mS
-	R0xK08R+4gh5NK+Qy/YEM56UucbZuORUTcCOd4pvvQUW1Qdgq0iiQRV/iICEchcF5oJkAlwd
-	PQS8KE8kYdDWQ0NOfgkDWY3xFLz4K5mBOycdBDyOG6fAdCmBgO4auwjMR40IjHHtFFzsGWEg
-	uTcA1BeGEDh+s9NwV/eUAafOIIL7Q3YKnMdmwIkkNQH1yZFQ1uGgoMl8jAad5iwDKdbl0HKx
-	g4A7l7IYaKquo+GB5SgFKXlqErpz+2hoT9dRUF2Zg8Be9IQAdc4ACerBLhLG9LU03DzqIkFr
-	MpDQmtKN4GriFRrqi+JEMJx9nYTKHBUFNbm+kGKyUjBc148go7+ZhNsVc8H63EXAzZJBGgaz
-	FkC6vpSAy0dGRVDauAusY1YCukZ6GHC1rl7zCadvSqK5NvsQyT2+eQNx2Wf2c5mqWxQ35lzI
-	lRbeI7jkP3tJrlzbIeLM1fO43OIYbsJyXsQVG44w3LXCswRXblvJpeRXoy+DN3quCuP3ROzj
-	Fcs+3uq5c9jRTe8t9o1tadOSKnTQOwl5iDH7HtakOYkk5CmWsnqEGyqTKSF4jnDF42FGCAYR
-	Vp18Qb6yPCt2UW6WsqcRfvj7YoGnih71iwTDBYQt9YW0O0Gx83Bm9TjhZoZdjBv726cb+bBv
-	48MmDe02kGyJBGdkpCJ3wpvdgUc7u6dZwq7BqsSTIoFn4RsnHNOTSTYW379ydorFU+yPT0+K
-	3bIH+z4eqTW9XDQEx9lP0QL/gq2lbYTADTNx/tX9bitm1+Pb2dsE2Rv31paKBA7Adema6ZfA
-	bDrCVZNPRUJgRFh3cOhlo49w/F3HS8daXJU/goSmXrj10SxhTS+cZs4gBVmCDx+SCtXzsbGz
-	n0pBIdrXDtO+dpj2v8MEeTHOvTzA/E9ehHV5faTAodhkekLlIpEBzeZjlJHhvHKFnP9xqVIW
-	qYyRhy/dHhVZjKa+at1k7VAZ0vc+W2pBhBhZ0Nwps/2csQn5UfIoOR/sI2kJmrNDKgmT/fQz
-	r4jaoojZwystyF9MBc+WzAt7k5ey4bJofjfP7+UVr7KE2MNPRaxtu1ul9tBsKKAMQd6mtZvz
-	tF+v6/O6LLG6xgbOZdKZP1Rv6iOzmtvl34Z2XP+jbaLr3YlPmYLZK2rVSyoffthPhR9gNQud
-	m6IXbE/v/M62bE7tymvNw3idMrViK1Eylqr4xx6S0DX/9EBOB26f2eAbpaqTNSz6NXY8pCov
-	MKImQj+YWDS+O2Gybb7hG1PDrm2T1560Rtua4w6y9UGGLmPf3/vK7hhsx3U+1OflRs1QqaOI
-	+r5gy4PR0OceLOd0bnhj89aM6N0DZ+5tnDBViXGv7LNVLn9ZgyszQBt7oNd86bh0/YJb2V8E
-	rg618WR8mU/ajMLz+l1fVZT5BfpvkUTgq8GUcqds+UJSoZT9C4A/UzIlBQAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA2WTeUyTdxjH93uvFhjbSwF9xxBIhcyhVloFHqYy55i+u5hxcYs4p52WY9CW
-	teBQ59JwCHK4LiQyCkK9Oo5Z5bAcgqmonIZzCCzUhQoShckEFEGhA8oyk/33+X2f5/vNN7/k
-	4eK8Eo4LN0IWI1HIxFF8ypZomWswrT1X7xrqc/2qP9Sp/GGgJpUEVeJxDJKqLAQYzqVhYDEN
-	YzBblYzDxMAwCflnyyjIbUskYLYnjYKu04MYPIp/ToC+OgmDoXozBwwZxQiK4/sJqBieoiDt
-	oSskXHmCYPAnMwm/6/6mYFpXxIE/n5gJmD5pB9mpCRjcTpNCpWmQgHbDSRJ06RcpUDcL4U6F
-	CYOu6lwK2o0tJNyvyyBAfSYBhyHtCAn9mToCjLX5CMyXxjBIyB/HIWHiHg4zBQ0ktGZYcNDo
-	i3DoVQ8huJF8jYTbl+I58DSvEYfafBUB9dploNY3E/C0ZRRB1mg3Dp01ntA8acGgtWyChInc
-	VZBZUI7B1RPPOFDe9i00zzRjcG9qmAJL77tbtrIF7akk+4f5Cc4+am1CbN5vR9kcVQfBzkx7
-	s+WFfRibdvMhzlZpTBzWYPRitaWx7Iu6Eg5bWnSCYm8VXsTYqoEAVn3WiHbwQwSbFPLYGIlH
-	uFwZs5m/RwgigTAABKINAQLhev+974h8+esCNx2UREUckijWBe4XhPecPxJ9eVlc4biZUiEL
-	LxXZcBl6A/O41EKkIlsuj76AmL8aenHrwJUpmewmrezIvLiTSlmXHiNm8tRxzPq4gpjaQePi
-	FkF7MTnG59gCU/Qapm20fzHJiX6bSdGnkwsGnC6xZ6aTLywaHOlQ5tndIbTA9vQWRpV8mmNN
-	NSJG11mwNHBgmrIHiQXG6UOM2pI134M7z28yv85xF2Qb2o+ZatAv1V7JxJvPL9U+xkzM3kdq
-	5Kh5KUnzUpLmvySr7M30zj3A/ievZnRnRnArb2b0+jFCizhFyEkSq5SGSZUigVIsVcbKwgQH
-	5NJSNH8vhvrp8kpU+PCxoA5hXFSHPOed5svF7ciFkMllEr6T/R23N0J59gfFh49IFPJ9itgo
-	ibIO+c5/48+4i/MB+fzxyWL2Cf18fIUb/AJ8fAP81vOX238YnSLm0WHiGEmkRBItUfzrw7g2
-	Lirs45XDTl8PiRrLtt5z/sarUiqNWNvbtWNUduO9xJvun3zWsTuoyzHsvG/1se/41UeDPiqm
-	edFuG/nb13jwqxODtyjiCO+mwMN2haYQt73Z6a9GNYbd9GzMq0mqMHK4ts6rE1o+p9BXP8Zn
-	RWz/JUM79gXZ9oHaIX1Nd8BGSqgxRHUHzYqqLt/19M9b8bpNZEX093H05Hhch92evmCHsR7h
-	KxlsSX90iuDWD9X6iEx6eFde5G53uahtU2VMT4hml4njHLlz/yopyV2eFLwiDv/USXnp0Fsj
-	7p2nRvpale9nBT3ICY39Mr28lKT9HQ33u44MpOy5vjPJq6E/UyvdluaS57Ht2mt8QhkuFnrj
-	CqX4H55nv5fEBAAA
-X-CMS-MailID: 20240415061812eucas1p1ff6ae6b6eeb996525ffa4bb28090d076
-X-Msg-Generator: CA
-X-RootMTR: 20240405222730eucas1p16a0790be308342130a19a5b489ffae1e
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240405222730eucas1p16a0790be308342130a19a5b489ffae1e
-References: <20240405071531.fv6smp55znlfnul2@joelS2.panther.com>
-	<CGME20240405222730eucas1p16a0790be308342130a19a5b489ffae1e@eucas1p1.samsung.com>
-	<20240405222658.3615-1-kuniyu@amazon.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 6/6] io_uring/notif: implement notification stacking
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ io-uring@vger.kernel.org, netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, "David S . Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>
+References: <cover.1712923998.git.asml.silence@gmail.com>
+ <3e2ef5f6d39c4631f5bae86b503a5397d6707563.1712923998.git.asml.silence@gmail.com>
+ <661c0e083f05e_3e77322946e@willemb.c.googlers.com.notmuch>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <661c0e083f05e_3e77322946e@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---7o7lzmim7rza4zom
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 4/14/24 18:10, Willem de Bruijn wrote:
+> Pavel Begunkov wrote:
+>> The network stack allows only one ubuf_info per skb, and unlike
+>> MSG_ZEROCOPY, each io_uring zerocopy send will carry a separate
+>> ubuf_info. That means that send requests can't reuse a previosly
+>> allocated skb and need to get one more or more of new ones. That's fine
+>> for large sends, but otherwise it would spam the stack with lots of skbs
+>> carrying just a little data each.
+> 
+> Can you give a little context why each send request has to be a
+> separate ubuf_info?
+> 
+> This patch series aims to make that model more efficient. Would it be
+> possible to just change the model instead? I assume you tried that and
+> it proved unworkable, but is it easy to explain what the fundamental
+> blocker is?
 
-On Fri, Apr 05, 2024 at 03:26:58PM -0700, Kuniyuki Iwashima wrote:
-> From: Joel Granados <j.granados@samsung.com>
-> Date: Fri, 5 Apr 2024 09:15:31 +0200
-> > On Thu, Mar 28, 2024 at 12:49:34PM -0700, Kuniyuki Iwashima wrote:
-> > > From: Joel Granados via B4 Relay <devnull+j.granados.samsung.com@kern=
-el.org>
-> > > Date: Thu, 28 Mar 2024 16:40:05 +0100
-> > > > This commit comes at the tail end of a greater effort to remove the
-> > > > empty elements at the end of the ctl_table arrays (sentinels) which=
- will
-> > > > reduce the overall build time size of the kernel and run time memory
-> > > > bloat by ~64 bytes per sentinel (further information Link :
-> > > > https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.o=
-rg/)
-> > > >=20
-> > > > When we remove the sentinel from ax25_param_table a buffer overflow
-> > > > shows its ugly head. The sentinel's data element used to be changed=
- when
-> > > > CONFIG_AX25_DAMA_SLAVE was not defined.
-> > >=20
-> > > I think it's better to define the relation explicitly between the
-> > > enum and sysctl table by BUILD_BUG_ON() in ax25_register_dev_sysctl()
-> > >=20
-> > >   BUILD_BUG_ON(AX25_MAX_VALUES !=3D ARRAY_SIZE(ax25_param_table));
-> > >=20
-> > > and guard AX25_VALUES_DS_TIMEOUT with #ifdef CONFIG_AX25_DAMA_SLAVE
-> > > as done for other enum.
-> >=20
-> > When I remove AX25_VALUES_DS_TIMEOUT from the un-guarded build it
-> > complains in net/ax25/ax25_ds_timer.c (ax25_ds_set_timer). Here is the
-> > report https://lore.kernel.org/oe-kbuild-all/202404040301.qzKmVQGB-lkp@=
-intel.com/.
-> >=20
-> > How best to address this? Should we just guard the whole function and do
-> > nothing when not set? like this:
->=20
-> It seems fine to me.
->=20
-> ax25_ds_timeout() checks !ax25_dev->dama.slave_timeout, but it's
-> initialised by kzalloc() during dev setup, so it will be a noop.
+The uapi is so that you get a buffer completion (analogous to what you
+get with recv(MSG_ERRQUEUE)) for each send request. With that, for skb
+to serve multiple send requests it'd need to store a list of completions
+in some way. One could try to track sockets, have one "active" ubuf_info
+per socket which all sends would use, and then eventually flush the
+active ubuf so it can post completions and create a new one. but io_uring
+wouldn't know when it needs to "flush", whenever in the net stack it
+happens naturally when it pushes skbs from the queue. Not to mention
+that socket tracking has its own complications.
 
-Just sent v3 with this change.
+As for uapi, in early versions of io_uring's SEND_ZC, ubuf_info and
+requests weren't entangled, roughly speaking, the user could choose
+that this request should use this ubuf_info (I can elaborate if
+interesting). It wasn't too complex, but all feedback was pointing
+that it's much easier to use hot it is now, and honestly it does
+buy with simplicity.
 
+I'm not sure what a different model would give. We wouldn't win
+in efficiency comparing to this patch, I can go into details
+how there are no extra atomics/locks/kmalloc/etc., the only bit
+is waking up waiting tasks, but that still would need to happen.
+I can even optimise / ammortise ubuf refcounting if that would
+matter.
 
---=20
+> MSG_ZEROCOPY uses uarg->len to identify multiple consecutive send
+> operations that can be notified at once.
 
-Joel Granados
-
---7o7lzmim7rza4zom
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmYZShgACgkQupfNUreW
-QU+ckAv/ZCwg3conSwfw9FdBTIyF2Tr/m3ucbFQrfwVIpiZTkJxAeSTbI2tY6LyI
-C7kdP6J8fHU7V7HjjCfYKXahRksz5KiH4DQn0RuHOxJD22HRLHz0r6wS2Kh3E4i5
-MQGuMNR45oLJRShpLRXA8jGmtPTk8Y6xyUewumuNSArW9h69nfphXIhrbf2oEdXL
-xrZhKTUATlK1jQKrfU07h3iXfaaqClzMdyIPJ9T0nkD0L1njo2JtkIqA9YXTQOtb
-D9pYMA07IVXpjJfp8/Q49xxEam5P+LgGLN/0+wv9Wu9FZZcpHHF5fFtnAU40//YX
-/mfuYehx5eo3iStDmWqpwacOTVxOY2dKTEXmXlsNbaRNi+RmlExJ313YCjS/J1M/
-FW5v4W8JGMygK6IFZj1+sWUrryBc5V5KGErp9oldNUHsl6TY47ImmMN8gBU7okO/
-vKw2oVt3Zi5Pm9W373Qbrz05AnT/koa/h2w0tbvaHoWjkgqSqpuPXdLHCFxpqViz
-0PNrCcrH
-=YAL9
------END PGP SIGNATURE-----
-
---7o7lzmim7rza4zom--
+-- 
+Pavel Begunkov
 
