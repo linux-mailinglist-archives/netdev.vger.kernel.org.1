@@ -1,159 +1,118 @@
-Return-Path: <netdev+bounces-87867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA3F48A4D30
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:02:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C8CA8A4D33
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:03:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 816DF28637E
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:02:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DF771C21FF6
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:03:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02FC5D471;
-	Mon, 15 Apr 2024 11:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14F075CDF0;
+	Mon, 15 Apr 2024 11:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RFfs+TgB"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="YeAUzIja";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="JTYhWBoS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 751555CDF0;
-	Mon, 15 Apr 2024 11:02:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C065FDDB
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 11:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713178932; cv=none; b=G5iEio7BEQE4seF5eRbWhPd0xeH4bXlP+9BH3FrkkRe2BQBJBMFzgcqh6KtVtWQk2/m5jZ2kKFMBb/NyuprzwyPgKxBVzaeBeFXbdCXWu9HsC8jkK5745+JmgSKnUuLxYghUtmSH4pSXrJXWZgVLLNi0NNEIohSeQZKgKIba/3A=
+	t=1713178939; cv=none; b=JR6Qep0gz3K57WhE8HtS1SCNJDzch8Nt41hVP0Zvlm8cDaV0il/LJ4pEVyD1j+rknQSdx7brozcdT3xqCFR1oUdSGbqNYiT13ykGmd+i6s2zIgIy18hB/4M4Wi/6TPn8wFx0YQrS4mVE6MP/vuTZ9TtAG7IqBM/TV6g0hlsczNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713178932; c=relaxed/simple;
-	bh=8ZMNEysAxsax6oWuJx1vTmL34sekBHXDFfot8R/x5v8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Bu0CrzYl70Go3500Sr5Y9WSb98NtggQ5v8MoFx0QfEXINCPspLxBiiZe3KhjSEyXPLtZrvcSZoYdK5Q1q8X5hCSNf6aEZ9lNTLdFWo6iEMEWc3SDqmDrKMhsp3dAJijTLFyoj08P635eWIOIB3Z9zWXGicS5CIL3geoe5wXBe5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RFfs+TgB; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1e5aa82d1f6so15564435ad.0;
-        Mon, 15 Apr 2024 04:02:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713178931; x=1713783731; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CcN4AKapHK/Bm+Gc5NAgLadHVBnCwLZdg+FYzIUXJdg=;
-        b=RFfs+TgBEn/E2rg9gOs7KKX0Vv9hb5dIVV/zMZXSKr1uPAkYhjJYnUwe0gf75obS6U
-         b+6VKNiQAadGtk3yre7s2RhzFJ3MCtRnBTk5OEiu4/3+Un2v4s8zjaZEfxr8aD48xDff
-         AQ3X2rc4frD5yCjy88wNRzANpVb5scdrOcK47v/73EolrafsRgjWUBVpWy+8vL9zbb3A
-         vK9MrW7astZVRHmuLM41rNyfJR+6wrJpmNfeogL7lND1VVe8adHSKhnB7hWVxONEQm1h
-         ZQn4L7BZFbEw9n6Anr/B1emVStrQziFDSJ+68eacD9yPBBUqzhLivF0IbkeYCI97zG62
-         LuyA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713178931; x=1713783731;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CcN4AKapHK/Bm+Gc5NAgLadHVBnCwLZdg+FYzIUXJdg=;
-        b=oD2w+yBcH4TszH748yFtqWwMIZkd1Y3l43tqokuCVXuPzHVPx/a+vJEcPImP0dsFx1
-         I90JvXNBPBUeO4CiFSTwQPSQni6dBK/CR2v6ov9PpmgRp30Ef35DWNaXDkP80V9fEoiE
-         NG61OappPeM4iRWy3Q3fGhqgcoXvXIIZh6rashwfG/b6zV/gWBZ+xC5VMjunYN4XItox
-         8erCHcfxLy/RUX8ioRtKPh8CS5YROnEGcCYQVnoTP5Aqx8DuHyqlqdtL04tPvRbgDj8A
-         aN2NkyYB+dFVt5fr/S775jaWxQDQePwADvfdlAR2YWaDLqUPGYWLnSF3CStv/kG+R/3X
-         T46A==
-X-Forwarded-Encrypted: i=1; AJvYcCW/vbh7h4VlGTceMPHdZWrR/OQeE0hWDDYwtpXve2IodNVP0mhYBm6+wXkJZFjAOxNRV8iW8QZ1rh6cMR/hDL+SmfnRlrLh/z872jG9z/rySdrGedQBJKZ13bs2yDa6o8PqYeQL2lMysL9NTlNTE+Qewd003rtCLvmN8KWAvE2Pbw==
-X-Gm-Message-State: AOJu0Yw7zJ/vFQGbXVG1p8fEMgh2jSA67hvPCg4IpsZZAjo7V+C3ntBU
-	FO4VGmX4QYCHUyk16NQ/E9tMU6Rxw1Ft7k734efcAXbxi8ahbAm3
-X-Google-Smtp-Source: AGHT+IE3ckbGCuSfsI22n5u5jCD5c6cDaW+CuTvB0Rk5Rj9oiOJHzw6o2s4rWgOWZmnBn2A5boGPOg==
-X-Received: by 2002:a17:903:2303:b0:1e5:5c69:fcda with SMTP id d3-20020a170903230300b001e55c69fcdamr14875665plh.26.1713178930514;
-        Mon, 15 Apr 2024 04:02:10 -0700 (PDT)
-Received: from libra05 ([143.248.188.128])
-        by smtp.gmail.com with ESMTPSA id e15-20020a17090301cf00b001e2a4499352sm7603916plh.262.2024.04.15.04.02.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 04:02:10 -0700 (PDT)
-Date: Mon, 15 Apr 2024 20:02:05 +0900
-From: Yewon Choi <woni9911@gmail.com>
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: "Dae R. Jeong" <threeearcat@gmail.com>
-Subject: net/smc: Buggy reordering scenario in smc socket
-Message-ID: <Zh0JLYHtd0i416XO@libra05>
+	s=arc-20240116; t=1713178939; c=relaxed/simple;
+	bh=Iup/E2Z1WjEWPfxFDQcDvpZjGXHr6zId0gCi5u7ymqw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=iuCgrwSa+saixwmP4hbKJDvRjjePSgiLEQGAj0S1sSi0GrT1OjNHNJBJjKGxiIghiW89bPezgYWI5zyW/xlF6fn+RHocbW5jCeMwV/sLdrcBW8S9Sb08jPI4mtoTwgXbZALpHjswwMx+nzx4CBEmOJwq5pCt2Z30iFLWAXpF7vQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=YeAUzIja; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=JTYhWBoS; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1713178935;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Iup/E2Z1WjEWPfxFDQcDvpZjGXHr6zId0gCi5u7ymqw=;
+	b=YeAUzIjafFVlWbU1pQ9y8y+2P+9UB8Is9zbnnVTOS+U7e9uww22L5/mDdCGNZBYZC/LZqg
+	eb9zKRiAcJuSXfs7akEJRudSoFsUKbEQyn2T73zRTQJvQgON5B8m6Cs+foX+cIg9P13muZ
+	aXyuH8Tg7VqumsZcj4sNJvtv7YMbIkx4pxxAyflu6BolIHAoXMcfx/cwoo4Yo3QzDK2qkW
+	PfKN2Nx0KWkWO8W2FdTj69lq+gkRWOS3ysQC7GKUgIcyim5CnYVPcgJEY9uk+tL4agYeko
+	631VPRBf+6x8nBafPwK4sxnh4v5hhcyiSK4qDiZhhh23GbaWvEphnMThDHKmmw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1713178935;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Iup/E2Z1WjEWPfxFDQcDvpZjGXHr6zId0gCi5u7ymqw=;
+	b=JTYhWBoSpOWfwwzFaW5Sl9JOi1z+jl3L4JWydwgAzR4GuFjZAzfxsWXaIQt4Bpiq5puYAF
+	7BGSjlR1WORM5ADA==
+To: Lukas Wunner <lukas@wunner.de>, Roman Lozko <lozko.roma@gmail.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Sasha
+ Neftin <sasha.neftin@intel.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-net] igc: Fix deadlock on module removal
+In-Reply-To: <877ch0b901.fsf@kurt.kurt.home>
+References: <20240411-igc_led_deadlock-v1-1-0da98a3c68c5@linutronix.de>
+ <Zhubjkscu9HPgUcA@wunner.de> <877ch0b901.fsf@kurt.kurt.home>
+Date: Mon, 15 Apr 2024 13:02:14 +0200
+Message-ID: <87zftukhxl.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-Hello,
-we suspect some buggy scenario due to memory reordering in concurrent execution 
-of setsockopt() and sendmmsg().
+--=-=-=
+Content-Type: text/plain
 
-(CPU 1) setsockopt():
-    case TCP_FASTOPEN_NO_COOKIE:
-        ...
-        smc_switch_to_fallback():
-            clcsock->file = sk.sk_socket->file; // (1)
-            clcsock->file->private_data = clcsock; // (2)
+Lukas,
 
-(CPU 2) __sys_sendmmsg():
-    sockfd_lookup_light():
-        sock_from_file():
-            sock = file->private_data; // (3)
-    ...
-    fput_light(sock->file, fput_needed): // (4)
-        fput():
-            refcount_dec_and_test(sock->file->f_count) // null-ptr-deref
+>> I would have been happy to submit a patch myself, I was waiting
+>> for a Tested-by from Roman or you.
+>
+> Perfect. I was wondering why you are not submitting the patch
+> yourself. Then, please go ahead and submit the patch. Feel free to add
+> my Tested-by.
 
-There is no memory barrier between (1) and (2), so (1) might be reordered after 
-(2) is written to memory. Then, execution order can be (2)->(3)->(4)->(1) 
-and (4) will read uninitialized value which may cause system crash.
+Scratch that. I've sent v2 with your SoB. PTAL, because your original
+code snippet didn't have a SoB.
 
+https://lore.kernel.org/netdev/20240411-igc_led_deadlock-v2-1-b758c0c88b2b@linutronix.de/
 
-This kind of reordering may happen in smc_ulp_init():
+Thanks,
+Kurt
 
-(CPU 1) smc_ulp_init():
-    ...
-    smcsock->file = tcp->file; // (5)
-	smcsock->file->private_data = smcsock; // (6)
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Execution order can be (6)->(3)->(4)->(5), showing same symptom as above.
+-----BEGIN PGP SIGNATURE-----
 
-
-One possible solution seems to be adding release semantic in (2) and (6).
-
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index 4b52b3b159c0..37c23ef3e2d5 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -921,7 +921,7 @@ static int smc_switch_to_fallback(struct smc_sock *smc, int reason_code)
-        trace_smc_switch_to_fallback(smc, reason_code);
-        if (smc->sk.sk_socket && smc->sk.sk_socket->file) {
-                smc->clcsock->file = smc->sk.sk_socket->file;
--               smc->clcsock->file->private_data = smc->clcsock;
-+               smp_store_release(&smc->clcsock->file->private_data, smc->clcsock);
-                smc->clcsock->wq.fasync_list =
-                        smc->sk.sk_socket->wq.fasync_list;
-                smc->sk.sk_socket->wq.fasync_list = NULL;
-@@ -3410,7 +3410,7 @@ static int smc_ulp_init(struct sock *sk)
- 
-        /* replace tcp socket to smc */
-        smcsock->file = tcp->file;
--       smcsock->file->private_data = smcsock;
-+       smp_store_release(&smcsock->file->private_data, smcsock);
-        smcsock->file->f_inode = SOCK_INODE(smcsock); /* replace inode when sock_close */
-        smcsock->file->f_path.dentry->d_inode = SOCK_INODE(smcsock); /* dput() in __fput */
-        tcp->file = NULL;
-
-I think we don't need memory barrier between (3) and (4) because there are
-critical section between (3) and (4), so lock(lock_sock/release_sock) will do this.
-
-
-Could you check these? If confirmed to be a bug, we will send a patch.
-
-Best Regards,
-Yewon Choi
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmYdCTYTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgsf3EACno5JgtsdefQPawYHdXfivHhXfpDK6
+s7wTlGnEk1GOdVN5Z7RfiOu+82Fyyhw+fLoxCa9AsezeSHFWduGwJPR5BFG7FMP1
++mP4i5T/X1naOgi0RU/IO/Md2u9UO7CgeELbOTMwv3B9ETD6dyd7ZIDl/lSUzgr2
+dzRud16ri0O7pQvmwOEdO8C6utcVbKYZ+umDcCvRBKSeVJ/HnuPXmexFFtBy7wlI
+gseiIM38HJfUVZ1O1glf9FG9kt8Z8YJ4ETmTyGiu2nmC/zp3Jcd7Lc1LkZ1oQhMp
+cfAKgBAZQQ7bUVAtaiAR+xe6dm1tgOVYgwtB3lZmJ9j0XTtPBkAIvqmR4bOKx5PL
+OrqgzWgdtkbLJWb89MOinnN/EOQL00BAVn/nhhqUTsaaETTzXrLmyqsxjpU8uvzA
+CoJzUsf5Yt4nZwHsVDFqTUNPF5mwkSF2+Vr3fLwdPzmb5ZxgpyEIPo6lAKcinyKR
+8cxGW8Qy1ArGRuQR7y8MUOIYHFupXQDtJvhqFT28vEwm4fk8BfexWefgEdabO0FE
+PJyI2m2Y1gHzNn+fkmTCKxtBcZsixMgjRAomkcYtnYDUqJfO/boaVwAI0IiHTGK4
+WbJ+T5slDNT5CZgT/jfuqrSWCB6+4id8qkUP/ObLDRcyx1vuTJH77Gumljd6tdxy
+ILHI2R31Mdz10g==
+=394O
+-----END PGP SIGNATURE-----
+--=-=-=--
 
