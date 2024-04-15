@@ -1,161 +1,200 @@
-Return-Path: <netdev+bounces-87990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D14528A51FD
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:43:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D73B8A5223
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:49:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D4A92860C4
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:43:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EDA91C22129
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:49:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A7871758;
-	Mon, 15 Apr 2024 13:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fd1oVXr3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAA8371B44;
+	Mon, 15 Apr 2024 13:48:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE91D405CC
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 13:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF8871B3A
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 13:48:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713188511; cv=none; b=cQubJGlT9cdJGiq9Lzfrp1nerI2My9y7ltMIe89CxulnKnzHcPP/LdLHz35kU9cDW1BlyMIpHAwXZoEn4veqATsIAw2UWGGLOdSqvvY0idYtXy/b2tBw32bFh6mtcubCAwYW78E5K/3hjl5NYNiMaBrNBjy94/pmtwXFkDrLicQ=
+	t=1713188938; cv=none; b=good0OeQhd2SRkXSUTEnkMeKijsUIzttJcjYAYLtptZS26poJ+rHE8uhG17qY59PQ0lT3QlFhpLnMZyOYvUmN2Ieohynn4vkIGbgodvZ8xaNU+NtauLVQ9L+SfPoyEW6Hll5jZ9uCw8NVoKYX2ETpinpZShzTmLdRXVwlX85d/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713188511; c=relaxed/simple;
-	bh=8TTq7/7mxb6gkKwFLP2AmGeM/QjMw44POOLNWcWB1Vc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MUxJtFPwgfXXsad7D3nVnweZwMPUEkqBFeI8fHiDI3p32DH9m2SiVdM/CtlxTACWKT3MbuS7qMKmBJ6BK3JhROILQWjlbt6MoSBIJ4dY7iHFvRY1QuVum+jMH5zUzoEnoJVHK9xog6yFHJXW3bpVNulN6HO7TjqZsS+Zck3T45I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fd1oVXr3; arc=none smtp.client-ip=115.124.30.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1713188506; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=AJqKE5avGzGgJ1MYXjUupo8SIJnHoMpU521d9pfBahw=;
-	b=fd1oVXr3K0PtS1T8qex3l9SkxRy/ZEGUCah0TzORr04CNZ2J/gpAjIEBoCVaQKvFjCaAX9/XHVhs85TgSJvvhcvgCh5ALXQBXzryy5dj+2vdeDQTcwTzRs/FWqbC3uem81GnY28QhZo5UUU7ayiKAVJNB/6c9lVIsCuZse1IoAs=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W4ea8bU_1713188504;
-Received: from 30.221.148.177(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W4ea8bU_1713188504)
-          by smtp.aliyun-inc.com;
-          Mon, 15 Apr 2024 21:41:46 +0800
-Message-ID: <80934787-ea3c-4b6d-a236-5185430ac92b@linux.alibaba.com>
-Date: Mon, 15 Apr 2024 21:41:44 +0800
+	s=arc-20240116; t=1713188938; c=relaxed/simple;
+	bh=l5uZD7vmbA3xbQafpTW7t1P1/cDvjuVWwvr4KGLd8zA=;
+	h=Message-Id:From:Date:Subject:To:Cc; b=HpedSxCfcApB3CAZc/az4AhQ5x33Vs2/iv2PMjWORjHrcHe4XvdF8yB5FY6mPuaQxvrf/YW1PIcODtG82T8rPKjzr9eRrKYiFrp2joHVhs7BueID8yu+TQzOppUZ1oOYQvtSGEB5CAuoaB3xn15mX1tYG9SYihsxOWDitffpowA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=pass smtp.mailfrom=wunner.de; arc=none smtp.client-ip=83.223.78.240
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wunner.de
+Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout2.hostsharing.net (Postfix) with ESMTPS id ED4DC2800C7F2;
+	Mon, 15 Apr 2024 15:48:46 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id BFB0F17E52; Mon, 15 Apr 2024 15:48:46 +0200 (CEST)
+Message-Id: <2f1be6b1cf2b3346929b0049f2ac7d7d79acb5c9.1713188539.git.lukas@wunner.de>
+From: Lukas Wunner <lukas@wunner.de>
+Date: Mon, 15 Apr 2024 15:48:48 +0200
+Subject: [PATCH net] igc: Fix LED-related deadlock on driver unbind
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, Roman Lozko <lozko.roma@gmail.com>, Kurt Kanzenbach <kurt@linutronix.de>, Heiner Kallweit <hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Sasha Neftin <sasha.neftin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 5/6] virtio_net: Add a lock for per queue RX
- coalesce
-To: Daniel Jurgens <danielj@nvidia.com>, netdev@vger.kernel.org
-Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
- virtualization@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, jiri@nvidia.com
-References: <20240412195309.737781-1-danielj@nvidia.com>
- <20240412195309.737781-6-danielj@nvidia.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <20240412195309.737781-6-danielj@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
+Roman reports a deadlock on unplug of a Thunderbolt docking station
+containing an Intel I225 Ethernet adapter.
 
+The root cause is that led_classdev's for LEDs on the adapter are
+registered such that they're device-managed by the netdev.  That
+results in recursive acquisition of the rtnl_lock() mutex on unplug:
 
-在 2024/4/13 上午3:53, Daniel Jurgens 写道:
-> Once the RTNL locking around the control buffer is removed there can be
-> contention on the per queue RX interrupt coalescing data. Use a spin
-> lock per queue.
->
-> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
-> ---
->   drivers/net/virtio_net.c | 23 ++++++++++++++++-------
->   1 file changed, 16 insertions(+), 7 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index b3aa4d2a15e9..8724caa7c2ed 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -190,6 +190,7 @@ struct receive_queue {
->   	u32 packets_in_napi;
->   
->   	struct virtnet_interrupt_coalesce intr_coal;
-> +	spinlock_t intr_coal_lock;
->   
->   	/* Chain pages by the private ptr. */
->   	struct page *pages;
-> @@ -3087,11 +3088,13 @@ static int virtnet_set_ringparam(struct net_device *dev,
->   				return err;
->   
->   			/* The reason is same as the transmit virtqueue reset */
-> -			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, i,
-> -							       vi->intr_coal_rx.max_usecs,
-> -							       vi->intr_coal_rx.max_packets);
-> -			if (err)
-> -				return err;
-> +			scoped_guard(spinlock, &vi->rq[i].intr_coal_lock) {
-> +				err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, i,
-> +								       vi->intr_coal_rx.max_usecs,
-> +								       vi->intr_coal_rx.max_packets);
-> +				if (err)
-> +					return err;
-> +			}
->   		}
->   	}
->   
-> @@ -3510,8 +3513,10 @@ static int virtnet_send_rx_notf_coal_cmds(struct virtnet_info *vi,
->   	vi->intr_coal_rx.max_usecs = ec->rx_coalesce_usecs;
->   	vi->intr_coal_rx.max_packets = ec->rx_max_coalesced_frames;
->   	for (i = 0; i < vi->max_queue_pairs; i++) {
-> -		vi->rq[i].intr_coal.max_usecs = ec->rx_coalesce_usecs;
-> -		vi->rq[i].intr_coal.max_packets = ec->rx_max_coalesced_frames;
-> +		scoped_guard(spinlock, &vi->rq[i].intr_coal_lock) {
-> +			vi->rq[i].intr_coal.max_usecs = ec->rx_coalesce_usecs;
-> +			vi->rq[i].intr_coal.max_packets = ec->rx_max_coalesced_frames;
-> +		}
->   	}
->   
->   	return 0;
-> @@ -3542,6 +3547,7 @@ static int virtnet_send_rx_notf_coal_vq_cmds(struct virtnet_info *vi,
->   	u32 max_usecs, max_packets;
->   	int err;
->   
-> +	guard(spinlock)(&vi->rq[queue].intr_coal_lock);
->   	max_usecs = vi->rq[queue].intr_coal.max_usecs;
->   	max_packets = vi->rq[queue].intr_coal.max_packets;
->   
-> @@ -3606,6 +3612,7 @@ static void virtnet_rx_dim_work(struct work_struct *work)
->   	if (!rq->dim_enabled)
->   		goto out;
+When the driver calls unregister_netdev(), it acquires rtnl_lock(),
+then frees the device-managed resources.  Upon unregistering the LEDs,
+netdev_trig_deactivate() invokes unregister_netdevice_notifier(),
+which tries to acquire rtnl_lock() again.
 
-We should also protect rq->dim_enabled access, incorrect values may be 
-read in
-rx_dim_worker because it is modified in set_coalesce/set_per_queue_coalesce.
+Avoid by using non-device-managed LED registration.
 
-Thanks.
+Stack trace for posterity:
 
->   
-> +	guard(spinlock)(&rq->intr_coal_lock);
->   	update_moder = net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
->   	if (update_moder.usec != rq->intr_coal.max_usecs ||
->   	    update_moder.pkts != rq->intr_coal.max_packets) {
-> @@ -3756,6 +3763,7 @@ static int virtnet_get_per_queue_coalesce(struct net_device *dev,
->   		return -EINVAL;
->   
->   	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
-> +		guard(spinlock)(&vi->rq[queue].intr_coal_lock);
->   		ec->rx_coalesce_usecs = vi->rq[queue].intr_coal.max_usecs;
->   		ec->tx_coalesce_usecs = vi->sq[queue].intr_coal.max_usecs;
->   		ec->tx_max_coalesced_frames = vi->sq[queue].intr_coal.max_packets;
-> @@ -4501,6 +4509,7 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
->   
->   		u64_stats_init(&vi->rq[i].stats.syncp);
->   		u64_stats_init(&vi->sq[i].stats.syncp);
-> +		spin_lock_init(&vi->rq[i].intr_coal_lock);
->   	}
->   
->   	return 0;
+  schedule+0x6e/0xf0
+  schedule_preempt_disabled+0x15/0x20
+  __mutex_lock+0x2a0/0x750
+  unregister_netdevice_notifier+0x40/0x150
+  netdev_trig_deactivate+0x1f/0x60 [ledtrig_netdev]
+  led_trigger_set+0x102/0x330
+  led_classdev_unregister+0x4b/0x110
+  release_nodes+0x3d/0xb0
+  devres_release_all+0x8b/0xc0
+  device_del+0x34f/0x3c0
+  unregister_netdevice_many_notify+0x80b/0xaf0
+  unregister_netdev+0x7c/0xd0
+  igc_remove+0xd8/0x1e0 [igc]
+  pci_device_remove+0x3f/0xb0
+
+Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
+Reported-by: Roman Lozko <lozko.roma@gmail.com>
+Closes: https://lore.kernel.org/r/CAEhC_B=ksywxCG_+aQqXUrGEgKq+4mqnSV8EBHOKbC3-Obj9+Q@mail.gmail.com/
+Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+Signed-off-by: Lukas Wunner <lukas@wunner.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/ethernet/intel/igc/igc.h      |  2 ++
+ drivers/net/ethernet/intel/igc/igc_leds.c | 38 ++++++++++++++++++++++++-------
+ drivers/net/ethernet/intel/igc/igc_main.c |  3 +++
+ 3 files changed, 35 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+index 90316dc..6bc56c7 100644
+--- a/drivers/net/ethernet/intel/igc/igc.h
++++ b/drivers/net/ethernet/intel/igc/igc.h
+@@ -298,6 +298,7 @@ struct igc_adapter {
+ 
+ 	/* LEDs */
+ 	struct mutex led_mutex;
++	struct igc_led_classdev *leds;
+ };
+ 
+ void igc_up(struct igc_adapter *adapter);
+@@ -723,6 +724,7 @@ struct igc_nfc_rule *igc_get_nfc_rule(struct igc_adapter *adapter,
+ void igc_ptp_tx_tstamp_event(struct igc_adapter *adapter);
+ 
+ int igc_led_setup(struct igc_adapter *adapter);
++void igc_led_free(struct igc_adapter *adapter);
+ 
+ #define igc_rx_pg_size(_ring) (PAGE_SIZE << igc_rx_pg_order(_ring))
+ 
+diff --git a/drivers/net/ethernet/intel/igc/igc_leds.c b/drivers/net/ethernet/intel/igc/igc_leds.c
+index bf240c5..3929b25 100644
+--- a/drivers/net/ethernet/intel/igc/igc_leds.c
++++ b/drivers/net/ethernet/intel/igc/igc_leds.c
+@@ -236,8 +236,8 @@ static void igc_led_get_name(struct igc_adapter *adapter, int index, char *buf,
+ 		 pci_dev_id(adapter->pdev), index);
+ }
+ 
+-static void igc_setup_ldev(struct igc_led_classdev *ldev,
+-			   struct net_device *netdev, int index)
++static int igc_setup_ldev(struct igc_led_classdev *ldev,
++			  struct net_device *netdev, int index)
+ {
+ 	struct igc_adapter *adapter = netdev_priv(netdev);
+ 	struct led_classdev *led_cdev = &ldev->led;
+@@ -257,24 +257,46 @@ static void igc_setup_ldev(struct igc_led_classdev *ldev,
+ 	led_cdev->hw_control_get = igc_led_hw_control_get;
+ 	led_cdev->hw_control_get_device = igc_led_hw_control_get_device;
+ 
+-	devm_led_classdev_register(&netdev->dev, led_cdev);
++	return led_classdev_register(&netdev->dev, led_cdev);
+ }
+ 
+ int igc_led_setup(struct igc_adapter *adapter)
+ {
+ 	struct net_device *netdev = adapter->netdev;
+-	struct device *dev = &netdev->dev;
+ 	struct igc_led_classdev *leds;
+-	int i;
++	int i, err;
+ 
+ 	mutex_init(&adapter->led_mutex);
+ 
+-	leds = devm_kcalloc(dev, IGC_NUM_LEDS, sizeof(*leds), GFP_KERNEL);
++	leds = kcalloc(IGC_NUM_LEDS, sizeof(*leds), GFP_KERNEL);
+ 	if (!leds)
+ 		return -ENOMEM;
+ 
+-	for (i = 0; i < IGC_NUM_LEDS; i++)
+-		igc_setup_ldev(leds + i, netdev, i);
++	for (i = 0; i < IGC_NUM_LEDS; i++) {
++		err = igc_setup_ldev(leds + i, netdev, i);
++		if (err)
++			goto err;
++	}
++
++	adapter->leds = leds;
+ 
+ 	return 0;
++
++err:
++	for (i--; i >= 0; i--)
++		led_classdev_unregister(&((leds + i)->led));
++
++	kfree(leds);
++	return err;
++}
++
++void igc_led_free(struct igc_adapter *adapter)
++{
++	struct igc_led_classdev *leds = adapter->leds;
++	int i;
++
++	for (i = 0; i < IGC_NUM_LEDS; i++)
++		led_classdev_unregister(&((leds + i)->led));
++
++	kfree(leds);
+ }
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 35ad40a..4d975d6 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -7021,6 +7021,9 @@ static void igc_remove(struct pci_dev *pdev)
+ 	cancel_work_sync(&adapter->watchdog_task);
+ 	hrtimer_cancel(&adapter->hrtimer);
+ 
++	if (IS_ENABLED(CONFIG_IGC_LEDS))
++		igc_led_free(adapter);
++
+ 	/* Release control of h/w to f/w.  If f/w is AMT enabled, this
+ 	 * would have already happened in close and is redundant.
+ 	 */
+-- 
+2.43.0
 
 
