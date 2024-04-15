@@ -1,445 +1,196 @@
-Return-Path: <netdev+bounces-87785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC10A8A4A29
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 10:17:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3A8E8A4A1B
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 10:15:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1430C284C46
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 08:17:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17364B23114
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 08:15:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 493B0364AB;
-	Mon, 15 Apr 2024 08:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fqfiDL8H"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC652E852;
+	Mon, 15 Apr 2024 08:14:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18005374C4;
-	Mon, 15 Apr 2024 08:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70CBD2E83C
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 08:14:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713168940; cv=none; b=c5NsQbjNcQdXKlypBtXSesjrfxLXSqKQbVpQfGL5a/tz8vS+E1TX8ADVhibK9BwK/UPqgoPTLJrCIfgl6VidWleDZhCSZz5l7vUA+hlg+j7wnshuOKRleLuozSp/ZSUqYwqacPflh7ZltVjb5Uy0hKmY7UygyeUgieikUswsJ1A=
+	t=1713168864; cv=none; b=Qpuw+59lAKprHXZeMP6PgQXUSsDm08xqstrg9LMzrLN2wgVGeTYRs9js5jyT2FXr9ycTNRBBd/MNcWTQaOnTShylnDysdx0/ZJgEwwdUfTVi8iNRME6D/ovcRgcfiHln7hBu9CCJILgJIP9x52ENXM3A0iJOrYmjfVdIc+lZ1es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713168940; c=relaxed/simple;
-	bh=U+N2A4fckifPuPMSuSPmX2UR+SvjTKUjxxethsXrXys=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=VdeQWyIwfiI5TgYhEqg0OnAFZNGWR5hI1BIuz6JEfCIoEZVXPu5ZYiTVjPgGYx+ewABsMWsU42wggBrjwuNBl7qexpx8gUyCQZxrf09UilzFlSopEcFI8pAyHadGSrDmlMxv1xd/nhWNO7EeBPV/cyVhU8YpffshZNWXHMt9DcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fqfiDL8H; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1713168927; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=hRLr3M5wy1svG4vz4SFZ95X211Kr/428p7t6wCSr6vU=;
-	b=fqfiDL8HdruLrjV1amJrM1oHzmxyhn2/cBX+l7bEY50e4QWRy1K8bGvjaxPDs7Oo/wbx6h3EKRRvIjXZU9J10LopI1/WeQd41L2fsyvnOKl+RmMtZuzgZTU265jYI/tb4kfPM3C0+j0gw6d8+I2n2GjsbOaBaYWnHr4IKFh0r+s=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R511e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W4YQHTt_1713168925;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W4YQHTt_1713168925)
-          by smtp.aliyun-inc.com;
-          Mon, 15 Apr 2024 16:15:26 +0800
-Message-ID: <1713168679.2714498-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v5 4/9] virtio_net: support device stats
-Date: Mon, 15 Apr 2024 16:11:19 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@google.com>,
- Amritha Nambiar <amritha.nambiar@intel.com>,
- Larysa Zaremba <larysa.zaremba@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240318110602.37166-1-xuanzhuo@linux.alibaba.com>
- <20240318110602.37166-5-xuanzhuo@linux.alibaba.com>
- <CACGkMEujuYh+Ups9jx5jEwe7bydtgCyurG5bPLe3X8jpSJhqvA@mail.gmail.com>
- <1712746366.8053942-2-xuanzhuo@linux.alibaba.com>
- <CACGkMEsvAUyk+h3e5SO5T4L8HuSGcViKj2WM2J33JOb7KTKjUw@mail.gmail.com>
- <1713148927.6675713-2-xuanzhuo@linux.alibaba.com>
- <CACGkMEvbLvQUppO6nnp0DCxACco7S=2QLgge4ZhARo9Ov_fJKQ@mail.gmail.com>
-In-Reply-To: <CACGkMEvbLvQUppO6nnp0DCxACco7S=2QLgge4ZhARo9Ov_fJKQ@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1713168864; c=relaxed/simple;
+	bh=EXu1YamII0jBrmX1jolH50irNc885vfZZELz9VpEyBY=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=B2dNKmjKIH1SkbqN5pmmG00VdCTswdhg5cB68H3OMzXdg+MlL/kxZpWgZ28MtdQ906FDa7gqjC51rCpwqSE1dpzE/rCPd9jJbdac5eCG+jksekWyLSFU4xM5c/cHfVhgPOtsPpLw8DhQF2inf8lXXBvp+HA8iKXce28DdrN6SLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-36a14031548so30924205ab.2
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 01:14:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713168862; x=1713773662;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=unBRzWypSrJQ8YW71ur/h2ey7MzVUScJD83UCwpFu3U=;
+        b=JipYW/7Nc9sI3iG0xVC2Y7Cd7+eUpQ9Yojvt/qQOHXr9bP9f6lhelBfXwyigWk1o5W
+         330qh8S9RLY5enUYBEMDC7yDdPI1WeMfNutPuT5n3Uc7QPXpf3xCI61n9TWEyzXWdSuf
+         4GMg/+KHeJN7LNAyUqIGrMbIykNVMdPRQCTYwcsMrVrJmM++kyT8FXfVeL2ZYI0L3Lc2
+         ltnqeSMfwzS/iP05CHypt1WApfck3/XW7hDqcYQw7ipDud/1VUMYgCgJo/p5EaIL5Kni
+         +aOKv4m79aW9PQ605Mp2tir7j/j82DwV000LKQWHYDK7NZw3NYOZWDiUNTpgg2z48lpM
+         t+9w==
+X-Forwarded-Encrypted: i=1; AJvYcCUQvMyivNdhG7koRaf8E4VNAuLg7LPe3gz1Dr20qwGmvP6Jz8hehKoYN9/Mh/fW9zI3/mSm7ThmkAwXJYRFho6qGpU3xUXw
+X-Gm-Message-State: AOJu0YwcvUE/zlXsdQPGBIjF18hPBxEAu50AdeOoWKITu/kpNKTGz1jE
+	GfvEC2n5Oc/APA3NJfQbK61OEa7TRm9m1/7hWo+215TZn1PU/HlfVrBnzW+JJohrVF2N+xuu2lx
+	5zm4LhVXtnTQu9D8+1lEFT0VITm/BwH1QSHEVj12PSvr53xn43ledvFM=
+X-Google-Smtp-Source: AGHT+IEt3SFuLEiRKDlVYQ8lLq+THHzy+aJwZ3u9HCjYjg3DmzNFxh+OUklfjwvf4wh66nqlMGaGqBhqRJ4fnfghxa4APKwLygcH
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:1d8c:b0:368:c21e:3898 with SMTP id
+ h12-20020a056e021d8c00b00368c21e3898mr581433ila.3.1713168862732; Mon, 15 Apr
+ 2024 01:14:22 -0700 (PDT)
+Date: Mon, 15 Apr 2024 01:14:22 -0700
+In-Reply-To: <000000000000f94ee2061458a2e0@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000080f98606161e35c8@google.com>
+Subject: Re: [syzbot] [usb?] WARNING: ODEBUG bug in netdev_freemem (3)
+From: syzbot <syzbot+83845bb93916bb30c048@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
+	netdev@vger.kernel.org, oneukum@suse.com, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 15 Apr 2024 14:45:36 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Mon, Apr 15, 2024 at 10:51=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibab=
-a.com> wrote:
-> >
-> > On Thu, 11 Apr 2024 14:09:24 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > On Wed, Apr 10, 2024 at 6:55=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.ali=
-baba.com> wrote:
-> > > >
-> > > > On Wed, 10 Apr 2024 14:09:23 +0800, Jason Wang <jasowang@redhat.com=
-> wrote:
-> > > > > On Mon, Mar 18, 2024 at 7:06=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux=
-.alibaba.com> wrote:
-> > > > > >
-> > > > > > As the spec https://github.com/oasis-tcs/virtio-spec/commit/42f=
-389989823039724f95bbbd243291ab0064f82
-> > > > > >
-> > > > > > make virtio-net support getting the stats from the device by et=
-htool -S
-> > > > > > <eth0>.
-> > > > > >
-> > > > > > Due to the numerous descriptors stats, an organization method is
-> > > > > > required. For this purpose, I have introduced the "virtnet_stat=
-s_map".
-> > > > > > Utilizing this array simplifies coding tasks such as generating=
- field
-> > > > > > names, calculating buffer sizes for requests and responses, and=
- parsing
-> > > > > > replies from the device. By iterating over the "virtnet_stats_m=
-ap,"
-> > > > > > these operations become more streamlined and efficient.
-> > > > > >
-> > > > > > NIC statistics:
-> > > > > >      rx0_packets: 582951
-> > > > > >      rx0_bytes: 155307077
-> > > > > >      rx0_drops: 0
-> > > > > >      rx0_xdp_packets: 0
-> > > > > >      rx0_xdp_tx: 0
-> > > > > >      rx0_xdp_redirects: 0
-> > > > > >      rx0_xdp_drops: 0
-> > > > > >      rx0_kicks: 17007
-> > > > > >      rx0_hw_packets: 2179409
-> > > > > >      rx0_hw_bytes: 510015040
-> > > > > >      rx0_hw_notifications: 0
-> > > > > >      rx0_hw_interrupts: 0
-> > > > > >      rx0_hw_drops: 12964
-> > > > > >      rx0_hw_drop_overruns: 0
-> > > > > >      rx0_hw_csum_valid: 2179409
-> > > > > >      rx0_hw_csum_none: 0
-> > > > > >      rx0_hw_csum_bad: 0
-> > > > > >      rx0_hw_needs_csum: 2179409
-> > > > > >      rx0_hw_ratelimit_packets: 0
-> > > > > >      rx0_hw_ratelimit_bytes: 0
-> > > > > >      tx0_packets: 15361
-> > > > > >      tx0_bytes: 1918970
-> > > > > >      tx0_xdp_tx: 0
-> > > > > >      tx0_xdp_tx_drops: 0
-> > > > > >      tx0_kicks: 15361
-> > > > > >      tx0_timeouts: 0
-> > > > > >      tx0_hw_packets: 32272
-> > > > > >      tx0_hw_bytes: 4311698
-> > > > > >      tx0_hw_notifications: 0
-> > > > > >      tx0_hw_interrupts: 0
-> > > > > >      tx0_hw_drops: 0
-> > > > > >      tx0_hw_drop_malformed: 0
-> > > > > >      tx0_hw_csum_none: 0
-> > > > > >      tx0_hw_needs_csum: 32272
-> > > > > >      tx0_hw_ratelimit_packets: 0
-> > > > > >      tx0_hw_ratelimit_bytes: 0
-> > > > > >
-> > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > > > ---
-> > > > > >  drivers/net/virtio_net.c | 401 +++++++++++++++++++++++++++++++=
-+++++++-
-> > > > > >  1 file changed, 397 insertions(+), 4 deletions(-)
-> > > > > >
-> > > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > > > index 8cb5bdd7ad91..70c1d4e850e0 100644
-> > > > > > --- a/drivers/net/virtio_net.c
-> > > > > > +++ b/drivers/net/virtio_net.c
-> > > > > > @@ -128,6 +128,129 @@ static const struct virtnet_stat_desc vir=
-tnet_rq_stats_desc[] =3D {
-> > > > > >  #define VIRTNET_SQ_STATS_LEN   ARRAY_SIZE(virtnet_sq_stats_des=
-c)
-> > > > > >  #define VIRTNET_RQ_STATS_LEN   ARRAY_SIZE(virtnet_rq_stats_des=
-c)
-> > > > > >
-> > > > > > +#define VIRTNET_STATS_DESC_CQ(name) \
-> > > > > > +       {#name, offsetof(struct virtio_net_stats_cvq, name)}
-> > > > > > +
-> > > > > > +#define VIRTNET_STATS_DESC_RX(class, name) \
-> > > > > > +       {#name, offsetof(struct virtio_net_stats_rx_ ## class, =
-rx_ ## name)}
-> > > > > > +
-> > > > > > +#define VIRTNET_STATS_DESC_TX(class, name) \
-> > > > > > +       {#name, offsetof(struct virtio_net_stats_tx_ ## class, =
-tx_ ## name)}
-> > > > > > +
-> > > > > > +static const struct virtnet_stat_desc virtnet_stats_cvq_desc[]=
- =3D {
-> > > > > > +       VIRTNET_STATS_DESC_CQ(command_num),
-> > > > > > +       VIRTNET_STATS_DESC_CQ(ok_num),
-> > > > > > +};
-> > > > > > +
-> > > > > > +static const struct virtnet_stat_desc virtnet_stats_rx_basic_d=
-esc[] =3D {
-> > > > > > +       VIRTNET_STATS_DESC_RX(basic, packets),
-> > > > > > +       VIRTNET_STATS_DESC_RX(basic, bytes),
-> > > > > > +
-> > > > > > +       VIRTNET_STATS_DESC_RX(basic, notifications),
-> > > > > > +       VIRTNET_STATS_DESC_RX(basic, interrupts),
-> > > > > > +
-> > > > > > +       VIRTNET_STATS_DESC_RX(basic, drops),
-> > > > > > +       VIRTNET_STATS_DESC_RX(basic, drop_overruns),
-> > > > > > +};
-> > > > > > +
-> > > > > > +static const struct virtnet_stat_desc virtnet_stats_tx_basic_d=
-esc[] =3D {
-> > > > > > +       VIRTNET_STATS_DESC_TX(basic, packets),
-> > > > > > +       VIRTNET_STATS_DESC_TX(basic, bytes),
-> > > > > > +
-> > > > > > +       VIRTNET_STATS_DESC_TX(basic, notifications),
-> > > > > > +       VIRTNET_STATS_DESC_TX(basic, interrupts),
-> > > > > > +
-> > > > > > +       VIRTNET_STATS_DESC_TX(basic, drops),
-> > > > > > +       VIRTNET_STATS_DESC_TX(basic, drop_malformed),
-> > > > > > +};
-> > > > > > +
-> > > > > > +static const struct virtnet_stat_desc virtnet_stats_rx_csum_de=
-sc[] =3D {
-> > > > > > +       VIRTNET_STATS_DESC_RX(csum, csum_valid),
-> > > > > > +       VIRTNET_STATS_DESC_RX(csum, needs_csum),
-> > > > > > +
-> > > > > > +       VIRTNET_STATS_DESC_RX(csum, csum_none),
-> > > > > > +       VIRTNET_STATS_DESC_RX(csum, csum_bad),
-> > > > > > +};
-> > > > > > +
-> > > > > > +static const struct virtnet_stat_desc virtnet_stats_tx_csum_de=
-sc[] =3D {
-> > > > > > +       VIRTNET_STATS_DESC_TX(csum, needs_csum),
-> > > > > > +       VIRTNET_STATS_DESC_TX(csum, csum_none),
-> > > > > > +};
-> > > > > > +
-> > > > > > +static const struct virtnet_stat_desc virtnet_stats_rx_gso_des=
-c[] =3D {
-> > > > > > +       VIRTNET_STATS_DESC_RX(gso, gso_packets),
-> > > > > > +       VIRTNET_STATS_DESC_RX(gso, gso_bytes),
-> > > > > > +       VIRTNET_STATS_DESC_RX(gso, gso_packets_coalesced),
-> > > > > > +       VIRTNET_STATS_DESC_RX(gso, gso_bytes_coalesced),
-> > > > > > +};
-> > > > > > +
-> > > > > > +static const struct virtnet_stat_desc virtnet_stats_tx_gso_des=
-c[] =3D {
-> > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_packets),
-> > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_bytes),
-> > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_segments),
-> > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_segments_bytes),
-> > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_packets_noseg),
-> > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_bytes_noseg),
-> > > > > > +};
-> > > > > > +
-> > > > > > +static const struct virtnet_stat_desc virtnet_stats_rx_speed_d=
-esc[] =3D {
-> > > > > > +       VIRTNET_STATS_DESC_RX(speed, ratelimit_packets),
-> > > > > > +       VIRTNET_STATS_DESC_RX(speed, ratelimit_bytes),
-> > > > > > +};
-> > > > > > +
-> > > > > > +static const struct virtnet_stat_desc virtnet_stats_tx_speed_d=
-esc[] =3D {
-> > > > > > +       VIRTNET_STATS_DESC_TX(speed, ratelimit_packets),
-> > > > > > +       VIRTNET_STATS_DESC_TX(speed, ratelimit_bytes),
-> > > > > > +};
-> > > > > > +
-> > > > > > +#define VIRTNET_Q_TYPE_RX 0
-> > > > > > +#define VIRTNET_Q_TYPE_TX 1
-> > > > > > +#define VIRTNET_Q_TYPE_CQ 2
-> > > > > > +
-> > > > > > +struct virtnet_stats_map {
-> > > > > > +       /* The stat type in bitmap. */
-> > > > > > +       u64 stat_type;
-> > > > > > +
-> > > > > > +       /* The bytes of the response for the stat. */
-> > > > > > +       u32 len;
-> > > > > > +
-> > > > > > +       /* The num of the response fields for the stat. */
-> > > > > > +       u32 num;
-> > > > > > +
-> > > > > > +       /* The type of queue corresponding to the statistics. (=
-cq, rq, sq) */
-> > > > > > +       u32 queue_type;
-> > > > > > +
-> > > > > > +       /* The reply type of the stat. */
-> > > > > > +       u8 reply_type;
-> > > > > > +
-> > > > > > +       /* Describe the name and the offset in the response. */
-> > > > > > +       const struct virtnet_stat_desc *desc;
-> > > > > > +};
-> > > > > > +
-> > > > > > +#define VIRTNET_DEVICE_STATS_MAP_ITEM(TYPE, type, queue_type) =
- \
-> > > > > > +       {                                                      =
- \
-> > > > > > +               VIRTIO_NET_STATS_TYPE_##TYPE,                  =
- \
-> > > > > > +               sizeof(struct virtio_net_stats_ ## type),      =
- \
-> > > > > > +               ARRAY_SIZE(virtnet_stats_ ## type ##_desc),    =
- \
-> > > > > > +               VIRTNET_Q_TYPE_##queue_type,                   =
- \
-> > > > > > +               VIRTIO_NET_STATS_TYPE_REPLY_##TYPE,            =
- \
-> > > > > > +               &virtnet_stats_##type##_desc[0]                =
- \
-> > > > > > +       }
-> > > > > > +
-> > > > > > +static struct virtnet_stats_map virtio_net_stats_map[] =3D {
-> > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(CVQ, cvq, CQ),
-> > > > > > +
-> > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_BASIC, rx_basic, RX),
-> > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_CSUM,  rx_csum,  RX),
-> > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_GSO,   rx_gso,   RX),
-> > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_SPEED, rx_speed, RX),
-> > > > > > +
-> > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_BASIC, tx_basic, TX),
-> > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_CSUM,  tx_csum,  TX),
-> > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_GSO,   tx_gso,   TX),
-> > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_SPEED, tx_speed, TX),
-> > > > > > +};
-> > > > >
-> > > > > I think the reason you did this is to ease the future extensions =
-but
-> > > > > multiple levels of nested macros makes the code hard to review. A=
-ny
-> > > > > way to eliminate this?
-> > > >
-> > > >
-> > > > NOT only for the future extensions.
-> > > >
-> > > > When we parse the reply from the device, we need to check the reply=
- stats
-> > > > one by one, we need the stats info to help parse the stats.
-> > >
-> > > Yes, but I meant for example any reason why it can't be done by
-> > > extending virtnet_stat_desc ?
-> >
-> >
-> >
-> > You know, virtio_net_stats_map is way to organize the descs.
-> >
-> > This is used to avoid the big if-else when parsing the replys from the =
-device.
-> >
-> > If no this map, we will have a big if-else like:
-> >
-> >  if (reply.type =3D=3D rx_basic) {
-> >          /* do the same something */
-> >  }
-> >  if (reply.type =3D=3D tx_basic) {
-> >          /* do the same something */
-> >  }
-> >  if (reply.type =3D=3D rx_csum) {
-> >          /* do the same something */
-> >  }
-> >  if (reply.type =3D=3D tx_csum) {
-> >          /* do the same something */
-> >  }
-> >  if (reply.type =3D=3D rx_gso) {
-> >          /* do the same something */
-> >  }
-> >  if (reply.type =3D=3D tx_gso) {
-> >          /* do the same something */
-> >  }
-> >  if (reply.type =3D=3D rx_speed) {
-> >          /* do the same something */
-> >  }
-> >  if (reply.type =3D=3D tx_speed) {
-> >          /* do the same something */
-> >  }
-> >
-> > I want to avoid this, so introducing this map.
->
-> Could we have a function pointers array indexed by the type?
+syzbot has found a reproducer for the following issue on:
 
-Then these functions will be similar and mass.
+HEAD commit:    72374d71c315 Merge tag 'pull-sysfs-annotation-fix' of git:..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1391f7cb180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2881987c7d7b722d
+dashboard link: https://syzkaller.appspot.com/bug?extid=83845bb93916bb30c048
+compiler:       arm-linux-gnueabi-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=147d8f6d180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14fb0bf3180000
 
-Maybe we can start with the if-else or the function.
-That will be easy to review. We can optimize on that.
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/8ead8862021c/non_bootable_disk-72374d71.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/664d9f3a4812/vmlinux-72374d71.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/767ecc5e77ad/zImage-72374d71.xz
 
-Thanks.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+83845bb93916bb30c048@syzkaller.appspotmail.com
+
+cdc_ncm 1-1:1.0 usb0: register 'cdc_ncm' at usb-dummy_hcd.0-1, CDC NCM (NO ZLP), 42:42:42:42:42:42
+usb 1-1: USB disconnect, device number 10
+cdc_ncm 1-1:1.0 usb0: unregister 'cdc_ncm' usb-dummy_hcd.0-1, CDC NCM (NO ZLP)
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 45 at lib/debugobjects.c:514 debug_print_object+0xc4/0xd8 lib/debugobjects.c:514
+ODEBUG: free active (active state 0) object: 841377ac object type: work_struct hint: usbnet_deferred_kevent+0x0/0x388 drivers/net/usb/usbnet.c:630
+Modules linked in:
+Kernel panic - not syncing: kernel: panic_on_warn set ...
+CPU: 0 PID: 45 Comm: kworker/0:2 Not tainted 6.9.0-rc3-syzkaller #0
+Hardware name: ARM-Versatile Express
+Workqueue: usb_hub_wq hub_event
+Call trace: 
+[<818a18bc>] (dump_backtrace) from [<818a19b8>] (show_stack+0x18/0x1c arch/arm/kernel/traps.c:256)
+ r7:00000000 r6:82622e44 r5:00000000 r4:81fcea10
+[<818a19a0>] (show_stack) from [<818bf0e0>] (__dump_stack lib/dump_stack.c:88 [inline])
+[<818a19a0>] (show_stack) from [<818bf0e0>] (dump_stack_lvl+0x54/0x7c lib/dump_stack.c:114)
+[<818bf08c>] (dump_stack_lvl) from [<818bf120>] (dump_stack+0x18/0x1c lib/dump_stack.c:123)
+ r5:00000000 r4:8285ad18
+[<818bf108>] (dump_stack) from [<818a2460>] (panic+0x120/0x358 kernel/panic.c:348)
+[<818a2340>] (panic) from [<8024390c>] (check_panic_on_warn kernel/panic.c:241 [inline])
+[<818a2340>] (panic) from [<8024390c>] (print_tainted+0x0/0xa0 kernel/panic.c:236)
+ r3:8260c584 r2:00000001 r1:81fb773c r0:81fbf2e0
+ r7:8080a0d0
+[<80243898>] (check_panic_on_warn) from [<80243b00>] (__warn+0x7c/0x180 kernel/panic.c:694)
+[<80243a84>] (__warn) from [<80243dec>] (warn_slowpath_fmt+0x1e8/0x1f4 kernel/panic.c:727)
+ r8:00000009 r7:8201b320 r6:df919a7c r5:82fd3c00 r4:00000000
+[<80243c08>] (warn_slowpath_fmt) from [<8080a0d0>] (debug_print_object+0xc4/0xd8 lib/debugobjects.c:514)
+ r10:00000005 r9:84137000 r8:81a02b44 r7:82043274 r6:828be454 r5:df919b24
+ r4:8260ce18
+[<8080a00c>] (debug_print_object) from [<8080b968>] (__debug_check_no_obj_freed lib/debugobjects.c:989 [inline])
+[<8080a00c>] (debug_print_object) from [<8080b968>] (debug_check_no_obj_freed+0x254/0x2a0 lib/debugobjects.c:1019)
+ r8:84137800 r7:841377ac r6:00000100 r5:00000003 r4:00000000
+[<8080b714>] (debug_check_no_obj_freed) from [<804b2820>] (slab_free_hook mm/slub.c:2078 [inline])
+[<8080b714>] (debug_check_no_obj_freed) from [<804b2820>] (slab_free mm/slub.c:4280 [inline])
+[<8080b714>] (debug_check_no_obj_freed) from [<804b2820>] (kfree+0x1a0/0x334 mm/slub.c:4390)
+ r10:82775a28 r9:84534880 r8:84137000 r7:8045a920 r6:82c023c0 r5:dde8bac0
+ r4:84137000
+[<804b2680>] (kfree) from [<8045a920>] (kvfree+0x2c/0x30 mm/util.c:680)
+ r10:82775a28 r9:84534880 r8:84137000 r7:00000000 r6:844b9480 r5:84652200
+ r4:84137000
+[<8045a8f4>] (kvfree) from [<813dbb0c>] (netdev_freemem+0x1c/0x20 net/core/dev.c:10797)
+ r5:84652200 r4:84137000
+[<813dbaf0>] (netdev_freemem) from [<81416b74>] (netdev_release+0x2c/0x34 net/core/net-sysfs.c:2031)
+[<81416b48>] (netdev_release) from [<80a404e0>] (device_release+0x38/0xa8 drivers/base/core.c:2580)
+ r5:84652200 r4:841373b8
+[<80a404a8>] (device_release) from [<8187b820>] (kobject_cleanup lib/kobject.c:689 [inline])
+[<80a404a8>] (device_release) from [<8187b820>] (kobject_release lib/kobject.c:720 [inline])
+[<80a404a8>] (device_release) from [<8187b820>] (kref_put include/linux/kref.h:65 [inline])
+[<80a404a8>] (device_release) from [<8187b820>] (kobject_put+0xc8/0x1f8 lib/kobject.c:737)
+ r5:81b489c4 r4:841373b8
+[<8187b758>] (kobject_put) from [<80a40768>] (put_device+0x18/0x1c drivers/base/core.c:3828)
+ r7:84536800 r6:8413710c r5:84137000 r4:00000000
+[<80a40750>] (put_device) from [<813cce58>] (free_netdev+0x108/0x188 net/core/dev.c:10993)
+[<813ccd50>] (free_netdev) from [<80d10be0>] (usbnet_disconnect+0xac/0xf0 drivers/net/usb/usbnet.c:1636)
+ r6:84137774 r5:84137660 r4:00000000
+[<80d10b34>] (usbnet_disconnect) from [<80d6bcc4>] (usb_unbind_interface+0x84/0x2c4 drivers/usb/core/driver.c:461)
+ r8:00000044 r7:84536830 r6:82775a28 r5:00000000 r4:84536800
+[<80d6bc40>] (usb_unbind_interface) from [<80a485bc>] (device_remove drivers/base/dd.c:568 [inline])
+[<80d6bc40>] (usb_unbind_interface) from [<80a485bc>] (device_remove+0x64/0x6c drivers/base/dd.c:560)
+ r10:84534880 r9:828eed04 r8:00000044 r7:84536874 r6:82775a28 r5:00000000
+ r4:84536830
+[<80a48558>] (device_remove) from [<80a49ad4>] (__device_release_driver drivers/base/dd.c:1270 [inline])
+[<80a48558>] (device_remove) from [<80a49ad4>] (device_release_driver_internal+0x18c/0x200 drivers/base/dd.c:1293)
+ r5:00000000 r4:84536830
+[<80a49948>] (device_release_driver_internal) from [<80a49b60>] (device_release_driver+0x18/0x1c drivers/base/dd.c:1316)
+ r9:828eed04 r8:82f51a40 r7:82f51a38 r6:82f51a0c r5:84536830 r4:82f51a30
+[<80a49b48>] (device_release_driver) from [<80a47c60>] (bus_remove_device+0xcc/0x120 drivers/base/bus.c:574)
+[<80a47b94>] (bus_remove_device) from [<80a41ce4>] (device_del+0x15c/0x3bc drivers/base/core.c:3909)
+ r9:828eed04 r8:84536800 r7:82fd3c00 r6:843cc208 r5:04208060 r4:84536830
+[<80a41b88>] (device_del) from [<80d69720>] (usb_disable_device+0xdc/0x1f0 drivers/usb/core/message.c:1418)
+ r10:00000000 r9:00000000 r8:84536800 r7:84534800 r6:843cc208 r5:00000001
+ r4:00000038
+[<80d69644>] (usb_disable_device) from [<80d5e58c>] (usb_disconnect+0xec/0x29c drivers/usb/core/hub.c:2305)
+ r10:00000001 r9:8464e800 r8:845348c4 r7:83e1a400 r6:84534880 r5:84534800
+ r4:60000013
+[<80d5e4a0>] (usb_disconnect) from [<80d6113c>] (hub_port_connect drivers/usb/core/hub.c:5361 [inline])
+[<80d5e4a0>] (usb_disconnect) from [<80d6113c>] (hub_port_connect_change drivers/usb/core/hub.c:5661 [inline])
+[<80d5e4a0>] (usb_disconnect) from [<80d6113c>] (port_event drivers/usb/core/hub.c:5821 [inline])
+[<80d5e4a0>] (usb_disconnect) from [<80d6113c>] (hub_event+0xd78/0x194c drivers/usb/core/hub.c:5903)
+ r10:00000001 r9:00000101 r8:83c48b00 r7:84534800 r6:83e19c00 r5:83e1a610
+ r4:00000001
+[<80d603c4>] (hub_event) from [<8026660c>] (process_one_work+0x1b8/0x508 kernel/workqueue.c:3254)
+ r10:82e65805 r9:82fd3c00 r8:00000080 r7:dddd00c0 r6:82e65800 r5:83c48b00
+ r4:82f57a80
+[<80266454>] (process_one_work) from [<80267330>] (process_scheduled_works kernel/workqueue.c:3335 [inline])
+[<80266454>] (process_one_work) from [<80267330>] (worker_thread+0x1ec/0x418 kernel/workqueue.c:3416)
+ r10:82fd3c00 r9:82f57aac r8:61c88647 r7:dddd00e0 r6:82604d40 r5:dddd00c0
+ r4:82f57a80
+[<80267144>] (worker_thread) from [<80270044>] (kthread+0x104/0x134 kernel/kthread.c:388)
+ r10:00000000 r9:df839e90 r8:82f59740 r7:82f57a80 r6:80267144 r5:82fd3c00
+ r4:82f59540
+[<8026ff40>] (kthread) from [<80200104>] (ret_from_fork+0x14/0x30 arch/arm/kernel/entry-common.S:134)
+Exception stack(0xdf919fb0 to 0xdf919ff8)
+9fa0:                                     00000000 00000000 00000000 00000000
+9fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+9fe0: 00000000 00000000 00000000 00000000 00000013 00000000
+ r9:00000000 r8:00000000 r7:00000000 r6:00000000 r5:8026ff40 r4:82f59540
+Rebooting in 86400 seconds..
 
 
-
->
-> Thanks
->
-> >
-> > YES. I noticed other comments, but I think we should
-> > fix this problem firstly.
-> >
-> > Thanks.
-> >
-> >
-> > >
-> > > >
-> > > >         static void virtnet_fill_stats(struct virtnet_info *vi, u32=
- qid,
-> > > >                                       struct virtnet_stats_ctx *ctx,
-> > > >                                       const u8 *base, u8 type)
-> > > >         {
-> > > >                u32 queue_type, num_rx, num_tx, num_cq;
-> > > >                struct virtnet_stats_map *m;
-> > > >                u64 offset, bitmap;
-> > > >                const __le64 *v;
-> > > >                int i, j;
-> > > >
-> > > >                num_rx =3D VIRTNET_RQ_STATS_LEN + ctx->desc_num[VIRT=
-NET_Q_TYPE_RX];
-> > > >                num_tx =3D VIRTNET_SQ_STATS_LEN + ctx->desc_num[VIRT=
-NET_Q_TYPE_TX];
-> > > >                num_cq =3D ctx->desc_num[VIRTNET_Q_TYPE_CQ];
-> > > >
-> > > >                queue_type =3D vq_type(vi, qid);
-> > > >                bitmap =3D ctx->bitmap[queue_type];
-> > > >                offset =3D 0;
-> > > >
-> > > >                if (queue_type =3D=3D VIRTNET_Q_TYPE_TX) {
-> > > >                        offset =3D num_cq + num_rx * vi->curr_queue_=
-pairs + num_tx * (qid / 2);
-> > > >                        offset +=3D VIRTNET_SQ_STATS_LEN;
-> > > >                } else if (queue_type =3D=3D VIRTNET_Q_TYPE_RX) {
-> > > >                        offset =3D num_cq + num_rx * (qid / 2) + VIR=
-TNET_RQ_STATS_LEN;
-> > > >                }
-> > > >
-> > > >                for (i =3D 0; i < ARRAY_SIZE(virtio_net_stats_map); =
-++i) {
-> > > >                        m =3D &virtio_net_stats_map[i];
-> > > >
-> > > > ->                     if (m->stat_type & bitmap)
-> > > >                                offset +=3D m->num;
-> > > >
-> > > > ->                     if (type !=3D m->reply_type)
-> > > >                                continue;
-> > > >
-> > > >                        for (j =3D 0; j < m->num; ++j) {
-> > > >                                v =3D (const __le64 *)(base + m->des=
-c[j].offset);
-> > > >                                ctx->data[offset + j] =3D le64_to_cp=
-u(*v);
-> > > >                        }
-> > > >
-> > > >                        break;
-> > > >                }
-> > > >         }
-> > > >
-> > > > Thanks.
-> > >
-> > > Btw, just a reminder, there are other comments for this patch.
-> > >
-> > > Thanks
-> > >
-> >
->
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
