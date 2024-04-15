@@ -1,75 +1,51 @@
-Return-Path: <netdev+bounces-88012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2F6E8A53C0
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:30:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6F578A5419
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:34:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F39AB22D7C
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:30:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92FFF282A29
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1023E82876;
-	Mon, 15 Apr 2024 14:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PVoYqzxV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5AD78C97;
+	Mon, 15 Apr 2024 14:31:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC0478C75;
-	Mon, 15 Apr 2024 14:28:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7AC745D5;
+	Mon, 15 Apr 2024 14:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713191316; cv=none; b=oJRv9SFyfKP99PRrbmLMhXG6laYjVBmsdi8hGHJ2EDSpPub24eyzhDkIT5HLtnWrZGM0Sjcit+/0r6QKDM7uGYTfFw6Q3VbTqnEpYCjmZLkgmBqgY1r/byE+FTiJjf3onYvkegdgi/agnuLuKiqbAwBUfar2z7aSclaCi98xaIE=
+	t=1713191469; cv=none; b=HyHlLo8B5PTXjrcLIqyR80LxNZ4LJyy84mq9cRO0OkoDi19SJi04piAF6kzaRy1z0CkrKW3WkaVGJ/nK+9kS8SLwvAzFiqSOEG+hMJxFXRO90KhaL3JtKB0FVS/bLoKmvk1Ww4n9imu1boO13jEo9OsGYBRJXDlbEOKNSYTb4hQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713191316; c=relaxed/simple;
-	bh=apPf5YxAYqe7YNBX6Cyef/BfXebvMrMHj5etULK04HA=;
+	s=arc-20240116; t=1713191469; c=relaxed/simple;
+	bh=bW2Dw6kU+VfIMhwD/SgbJdX2R5Fl9uzx7u7DkFDENMs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MT2vHQbxjkU04u1UjZ+cuuI+Ot6C9JRQnJ1xF1ITRHZF4/MsG7K9/BX/YkDc1Gdo6nvEnCCiUocQDVO1DZmxZWg/c0EIhn2ylGudAuYwtM/tx+NKHXjo6UQ1pSlixwpfl+zVY8dF2dYrHeeRwwHMgqUlSdJwR8/r6Wop2fkgLrU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PVoYqzxV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66DAEC2BD11;
-	Mon, 15 Apr 2024 14:28:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713191315;
-	bh=apPf5YxAYqe7YNBX6Cyef/BfXebvMrMHj5etULK04HA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PVoYqzxV6FYz2QdGdPUrtfj/AviX3PbD+lIC58voYZbHaWIlbDiQtx/QSrLGh9Cxu
-	 fxtbAFLtLOAcIFaOofyfd/B88GcuceWzI3sgWI3yE1kraBv1gt4sapwjenC+87Z9XJ
-	 9hFGKoZvIZ79nhAd2P+8ut4HoqUxCA2LtFZHjenRtpzkbsR9SW5Zq33JaF1HL+mZ9+
-	 UQD3tLk1yOAu0n8Xgh1OssQookLWj2d2RW5zOmxwjkqUjHIt5Hi5mNJeOEtZCZbOCN
-	 d4jVOfgZ0kZYTKBL7pSx3JTCoMaxVzKVt+mGUPOlAxwf5160v3sVcSl6ealmyvOZ9E
-	 inKWtr9TQffoQ==
-Date: Mon, 15 Apr 2024 15:28:27 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yi-De Wu <yi-de.wu@mediatek.com>
-Cc: Yingshiuan Pan <yingshiuan.pan@mediatek.com>,
-	Ze-Yu Wang <ze-yu.wang@mediatek.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	David Bradil <dbrazdil@google.com>,
-	Trilok Soni <quic_tsoni@quicinc.com>,
-	My Chuang <my.chuang@mediatek.com>,
-	Shawn Hsiao <shawn.hsiao@mediatek.com>,
-	PeiLun Suei <peilun.suei@mediatek.com>,
-	Liju Chen <liju-clr.chen@mediatek.com>,
-	Willix Yeh <chi-shen.yeh@mediatek.com>,
-	Kevenny Hsieh <kevenny.hsieh@mediatek.com>
-Subject: Re: [PATCH v10 04/21] virt: geniezone: Add GenieZone hypervisor
- driver
-Message-ID: <20240415142827.GA2320920@kernel.org>
-References: <20240412065718.29105-1-yi-de.wu@mediatek.com>
- <20240412065718.29105-5-yi-de.wu@mediatek.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ETMAt1d6Rtwq9T3uatE/EkoDINI2Nip6iqFRcsTia6NgbqjL8u/wFyPNhIWgoEiaz31mYKOujIoQaHctB1P4aBAZixcxhKFlNvXJevRYQ0piVpp3Y4d0gXeQdUZvzKInG+97B2blFIva8YwFNMvJCASt640S1DPOzNCwOsyaDpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1rwNME-0007qJ-Aw; Mon, 15 Apr 2024 16:30:54 +0200
+Date: Mon, 15 Apr 2024 16:30:54 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, netfilter-devel@vger.kernel.org,
+	pablo@netfilter.org
+Subject: Re: [PATCH net-next 12/12] selftests: netfilter: update makefiles
+ and kernel config
+Message-ID: <20240415143054.GA27869@breakpoint.cc>
+References: <20240414225729.18451-1-fw@strlen.de>
+ <20240414225729.18451-13-fw@strlen.de>
+ <20240415070240.3d4b63c2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,56 +54,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240412065718.29105-5-yi-de.wu@mediatek.com>
+In-Reply-To: <20240415070240.3d4b63c2@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Fri, Apr 12, 2024 at 02:57:01PM +0800, Yi-De Wu wrote:
-> From: "Yingshiuan Pan" <yingshiuan.pan@mediatek.com>
+Jakub Kicinski <kuba@kernel.org> wrote:
+> On Mon, 15 Apr 2024 00:57:24 +0200 Florian Westphal wrote:
+> > --- a/tools/testing/selftests/net/netfilter/config
+> > +++ b/tools/testing/selftests/net/netfilter/config
 > 
-> GenieZone hypervisor(gzvm) is a type-1 hypervisor that supports various
-> virtual machine types and provides security features such as TEE-like
-> scenarios and secure boot. It can create guest VMs for security use
-> cases and has virtualization capabilities for both platform and
-> interrupt. Although the hypervisor can be booted independently, it
-> requires the assistance of GenieZone hypervisor kernel driver(gzvm-ko)
-> to leverage the ability of Linux kernel for vCPU scheduling, memory
-> management, inter-VM communication and virtio backend support.
+> Looks like we're still missing veth, and possibly more.
+> Here's more details on how we build:
 > 
-> Add the basic hypervisor driver. Subsequent patches will add more
-> supported features to this driver.
-> 
-> Signed-off-by: Yingshiuan Pan <yingshiuan.pan@mediatek.com>
-> Signed-off-by: Jerry Wang <ze-yu.wang@mediatek.com>
-> Signed-off-by: Liju Chen <liju-clr.chen@mediatek.com>
-> Signed-off-by: Yi-De Wu <yi-de.wu@mediatek.com>
+> https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
 
-...
+Thanks for the pointer, it will take me some time to catch up and
+make sure the generated build works.
 
-> +static struct platform_driver gzvm_driver = {
-> +	.probe = gzvm_drv_probe,
-> +	.remove = gzvm_drv_remove,
-> +	.driver = {
-> +		.name = KBUILD_MODNAME,
-> +		.owner = THIS_MODULE,
+You are right, at least VETH and NETFILTER_ADVANCED are missing.
 
-Hi Yi-De Wu,
+If you prefer you can apply the series without the last patch
+and then wait for v2 of that last one.
 
-A minor nit from my side:
-
-There is no need to set owner here as
-owner is set (overridden) by module_platform_driver().
-
-Flagged by Coccinelle.
-
-> +		.of_match_table = gzvm_of_match,
-> +	},
-> +};
-> +
-> +module_platform_driver(gzvm_driver);
-> +
-> +MODULE_DEVICE_TABLE(of, gzvm_of_match);
-> +MODULE_AUTHOR("MediaTek");
-> +MODULE_DESCRIPTION("GenieZone interface for VMM");
-> +MODULE_LICENSE("GPL");
-
-...
+Thanks!
 
