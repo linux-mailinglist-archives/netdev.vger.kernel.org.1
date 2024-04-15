@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-87826-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87827-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E8AE8A4BB8
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:40:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BABAD8A4BBA
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:40:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF7311C2261F
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:40:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A1951F22E40
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2F6141760;
-	Mon, 15 Apr 2024 09:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36F444594C;
+	Mon, 15 Apr 2024 09:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k6jGq/yx"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JkO1gVdE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF57640BFE
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 09:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4374436A;
+	Mon, 15 Apr 2024 09:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713174028; cv=none; b=bqVvwzO5EiE02FSwj175NgRgHWl5/3dQjq262MOHds5pPR0dWCXVJgz5LRl5zFZTKehxwEG9kAg2zjq0kFyzNEF/BEr2TWqJBL/zYCTZMCokB7c4/MMsggTCIpCiXoZ9QBkiHLAEePYPp+zxLfaOwSdSeI9kn1Pw6cQ201f8YbQ=
+	t=1713174029; cv=none; b=rkBgidS8exx6FG20EVnbX/hxM+1AWtX77v9NoRoxBXwg/nb1iRi+FY7yjF2BfR+KtleHhYWsiaATYD6HUjJRvBW0Qe0mLK4JDVukeRH3u1Y2mi68epjswVkFNZEoL88V1/ZQJEBKFXQyoNIxn4xhLoXTC3tFu5HaG7Gy/TyMEaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713174028; c=relaxed/simple;
-	bh=kxnI3fgiBuQaAxbOxdbM9uQsBv7Bk+fuqi6NBY5AX9A=;
+	s=arc-20240116; t=1713174029; c=relaxed/simple;
+	bh=GG2kc0t91PzR/wlZyWCy6sMZqQDZhqAVjrWNR1GlAPc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jqifyPiuBV2G7r2hCnqgCMYR5xHg/hoT//XswG5gb2zSHrcH2W1TFnZCUOvyfBOnVDCJPDB8b1AyyI8ZGMi9pM0tVYeK1u1Hi21glNsFgvmagH49rXLvVpTxCvwdHVjrd9844DvXr8SlRD0ipdEr9U2rwvWRq+xfYKRfqVR3294=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k6jGq/yx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A086DC113CC;
+	 In-Reply-To:To:Cc; b=gS98znlvyJh8KaLA43uqxDaygDtg2M0MhxUgYLAj5h8cYn3uBW27l9TjBJuQ29SYb64hhHH0SjH8tjl2QFjzie0/e/0iMGtA+JcAjdelDdf/s5KpYvx5O8Sr7MrYcfTKSdUZes/wPnDzMYVFHMVZLMXXvLENMZ8zO0CHnQA+FJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JkO1gVdE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 90A6EC32786;
 	Mon, 15 Apr 2024 09:40:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1713174028;
-	bh=kxnI3fgiBuQaAxbOxdbM9uQsBv7Bk+fuqi6NBY5AX9A=;
+	bh=GG2kc0t91PzR/wlZyWCy6sMZqQDZhqAVjrWNR1GlAPc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=k6jGq/yxEStGlezjz4ewClP5mwJiEuPQjhjKNV79xbsi8MvQBAw2a8jmX4NgZ5auE
-	 gYYbDZRleB699RROzKb0hJzGkH8N+rUprLBaUUxRZD8lEm2rp6vGZZKdxfi20aHpYl
-	 yz5C3CE0jUJOe7VkBFrXWmDX4znN38rOzSq/jNqHaMBBqozHfOOuWW01CGkLHP/Su8
-	 njETG1XZf9ofmhSEmr4lSxEKJdMzUZ1EPdH4YR6ALMehcsjL0oE4atM7vKx3CC7+OJ
-	 qitg1qqaj2BBFjiWHLvZlPzH0iHEbGYiJ8yq8l4FTQ24NtlNuge/m4zWZMmCcpDwam
-	 yvzLygqjol0/Q==
+	b=JkO1gVdEdG+n0JD0dsipDM8mF3O0fT9W/aaKJnFQj4gXpLZZXajKxVZFRrUatE61M
+	 Sa3gi4cFnpJRiQsfgpi7D30b/w7uaFLL5NbSWo74U7b5ITlYNDZ0YeP+2FSqdOucV1
+	 H8ePnoS3mA93x4cVMcp+I89Xl2F/zZyz9Z9rxe19SCg5St8f2MzorqEM/rPKfoXLhS
+	 QkuPN9WCvFttTFzx/G5pZ+4Pn45S0WrWuW5CsN/qAFLayG60xpbhbZOu+H936feyAz
+	 d+3AmMx7BtE6ZWQLicrSTyprkWVPQjxGvAOv85OCoXGCVDzV3K1TiaY/i57SDjhS8c
+	 j8q1RuWOaaCtg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8971DC54BB0;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7BD1EC54BB1;
 	Mon, 15 Apr 2024 09:40:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,41 +52,48 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: save some cycles when doing
- skb_attempt_defer_free()
+Subject: Re: [PATCH net-next v3 0/4] flower: validate control flags
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171317402855.10544.4488096610959172943.git-patchwork-notify@kernel.org>
+ <171317402850.10544.12420137481628257630.git-patchwork-notify@kernel.org>
 Date: Mon, 15 Apr 2024 09:40:28 +0000
-References: <20240412030718.68016-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20240412030718.68016-1-kerneljasonxing@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: edumazet@google.com, pablo@netfilter.org, kuba@kernel.org,
- pabeni@redhat.com, davem@davemloft.net, horms@kernel.org,
- aleksander.lobakin@intel.com, netdev@vger.kernel.org, kernelxing@tencent.com
+References: <20240411105302.112091-1-ast@fiberby.net>
+In-Reply-To: <20240411105302.112091-1-ast@fiberby.net>
+To: =?utf-8?b?QXNiasO4cm4gU2xvdGggVMO4bm5lc2VuIDxhc3RAZmliZXJieS5uZXQ+?=@codeaurora.org
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+ louis.peens@corigine.com, yanguo.li@corigine.com, oss-drivers@corigine.com,
+ taras.chornyi@plvision.eu, woojung.huh@microchip.com,
+ UNGLinuxDriver@microchip.com, andrew@lunn.ch, f.fainelli@gmail.com,
+ olteanv@gmail.com, ecree.xilinx@gmail.com, jhs@mojatatu.com,
+ xiyou.wangcong@gmail.com, jiri@resnulli.us
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri, 12 Apr 2024 11:07:18 +0800 you wrote:
-> From: Jason Xing <kernelxing@tencent.com>
+On Thu, 11 Apr 2024 10:52:53 +0000 you wrote:
+> I have reviewed the flower control flags code.
+> In all, but one (sfc), the flags field wasn't
+> checked properly for unsupported flags.
 > 
-> Normally, we don't face these two exceptions very often meanwhile
-> we have some chance to meet the condition where the current cpu id
-> is the same as skb->alloc_cpu.
-> 
-> One simple test that can help us see the frequency of this statement
-> 'cpu == raw_smp_processor_id()':
-> 1. running iperf -s and iperf -c [ip] -P [MAX CPU]
-> 2. using BPF to capture skb_attempt_defer_free()
+> In this series I have only included a single example
+> user for each helper function. Once the helpers are in,
+> I will submit patches for all other drivers implementing
+> flower.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] net: save some cycles when doing skb_attempt_defer_free()
-    https://git.kernel.org/netdev/net-next/c/4d0470b9ad73
+  - [net-next,v3,1/4] flow_offload: add control flag checking helpers
+    https://git.kernel.org/netdev/net-next/c/d11e63119432
+  - [net-next,v3,2/4] nfp: flower: fix check for unsupported control flags
+    https://git.kernel.org/netdev/net-next/c/e36245dacd2c
+  - [net-next,v3,3/4] net: prestera: flower: validate control flags
+    https://git.kernel.org/netdev/net-next/c/f8a5ea8c2a7f
+  - [net-next,v3,4/4] net: dsa: microchip: ksz9477: flower: validate control flags
+    https://git.kernel.org/netdev/net-next/c/d9a1249e715b
 
 You are awesome, thank you!
 -- 
