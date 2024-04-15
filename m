@@ -1,206 +1,115 @@
-Return-Path: <netdev+bounces-87755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72F5E8A46D3
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 04:11:54 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6C0B8A46DC
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 04:21:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0425282F41
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 02:11:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 34675B20BC8
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 02:21:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28381171C;
-	Mon, 15 Apr 2024 02:11:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="LGAzhJCO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F286AEEBB;
+	Mon, 15 Apr 2024 02:21:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E5DFF4FB
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 02:11:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CEA84A24
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 02:21:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713147109; cv=none; b=MiEPG7pmYAO2wH7IYUWG8uwL8TDwgHyH3QIOyH7hTMRKybr7G+KddJa2Ln0hpu0jeOkf2wRwxP89hKokqq5o1CPO7yKy4uGtnG3oAsbB67vRCGx7UxyvkD9eTvIs0B1R6PIlOJ71W1S86nYyVBLB6tBXeZvvKA3VEkn0m8G/Z90=
+	t=1713147709; cv=none; b=Tz4W6gdwFOxLPinLsKQwgLRhqmT9nC/TiaEhJ0vdqkElYZJjAFh6es0xcXh92kdrhXj0tek83R6Jo6QTkpbsxiKszpRMo17jOtVk00DguvyZqbEjsnvpAGmbwk6/OVcM1UNJt5kcxEc5vc2jR/UbFSbPNOYvTMFo6gFHD3QFqf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713147109; c=relaxed/simple;
-	bh=FNI2hbZQ6yRPcqMBiF73nsNUvU2wdZwTxHyMc7YirRs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MoicvqeJh25qLkfvPVcB5XSjjjFhM41iCtCuxsoWqxKGmOKO7yD77R50Q4WlHxBlCSl7+n50vzIe8/PpNSxfi91Mjt54pPf7yk79eFUYAlMU15StveG95J+Tu9AZaViBk2oj1ppqQO79XeORqPqMfvuplL92/W6sxP2f24IQCPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=LGAzhJCO; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-61587aa9f4cso27118507b3.3
-        for <netdev@vger.kernel.org>; Sun, 14 Apr 2024 19:11:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1713147107; x=1713751907; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FgP2Xak0QM5b9Kf4Rg1Xpla0bktktcV08KWV5hlHTuc=;
-        b=LGAzhJCORVvHIk11qcs5HmdzTnnNSnjkWR0tuWjN1YraXDuzQLSNlZdPAxH9Mv7bKV
-         DY5OBl3p/n9M23C7xrRbJS5YzugrSBNJyw+78m7BJOf5bwTho9f6+vY0PI6iT4wOt3Hh
-         x3r+FwUi90Vdkca+4ZOPk1oC2ZgidKXIgAK02uDyoNLom7f1Tw5ncS721byzS25BGgYM
-         9Ekl33kizVb7/ZagNEBMbJ7yY0cA77W+DWrRlFfNWTyPbY/k6lUBuZKHu+4nbMvy1i0J
-         i3pgF0jXTeHwhO8rDEZN2mrjT9/WqTumSUpZnTPSqJEl6F1FY/8O7x4x2KJYw5w61Ii9
-         3nNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713147107; x=1713751907;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FgP2Xak0QM5b9Kf4Rg1Xpla0bktktcV08KWV5hlHTuc=;
-        b=Bp0qntTjIv1i17aQYcuXwChOpSDgDYza2HP2YIHztwFYNxMSV0IGBqs6KXH5Omk5Dy
-         QiRK1CmXWu5JMr+3/x90OunFrx2IdJTw6qzkp2chl2csYgSVsJYlpp/Mxk/5oCwtK8tY
-         fyJrjMqcHHVT93QuAfTDjqvAvwGki7X+z6Cl1BYGTVo046iNzQ/mT6ueAUdUVUvQK1+/
-         ZcbY3GeBwfFw962KgsZjbU0AF/CHh0xtCWbIepUe5PjR+RlcJssvOypM5NQCfY5GcCph
-         Vocdm49DklQwljIl37eaFH6/r0hVDWMYHVYOmnArQSV1S16ekSscQqdPqGyA1cW0O9iY
-         q7Sg==
-X-Forwarded-Encrypted: i=1; AJvYcCUnXo+6IXHG9qmQdsReLTyei2cUtu2WieXSUi3Qmr2R2Aep/q9rnjEZDfvRaehnnmUAvkv4RbfxVmh4JzuOSiSCGrn3dnJw
-X-Gm-Message-State: AOJu0YzXL+/3qb72/H/SkBi7LsqGQmYFq1JBlFr2Kz/Mh1g5bkRrh3c5
-	DC61gK2CK1qp1HuYhKqRh2KKP6pFINEyVQJmxRcczfajk7yW6XsPOyttsNKkIZshQeiPhQfV2cI
-	ElhV7/thSo3J5sD+LJCAdG/TWiz0nxb7s/FRmtVmfLvUATjJ9QlC3r2Pm
-X-Google-Smtp-Source: AGHT+IHuZPGAYMGmK+xQck7BPRSsMQvuAbbxfYteFWh16Ru2myx792iHZagtWkO2ud0Lu46rEMVk1tapW6/J/6kT15A=
-X-Received: by 2002:a81:af06:0:b0:61a:bff8:2153 with SMTP id
- n6-20020a81af06000000b0061abff82153mr2337501ywh.7.1713147106378; Sun, 14 Apr
- 2024 19:11:46 -0700 (PDT)
+	s=arc-20240116; t=1713147709; c=relaxed/simple;
+	bh=o2qlqFm7bzP8WWTWOSXFfrzH0ty0EoPRYm3C5bN0Fp8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OwIhs0FA1R1EBwFhin1uMoaaxq1hO0WcGAoxAxR/jgu9ZEegS5by/X/k35O2OD1qAFSaGgatIZnoWFVRIzktGX/7n7gKGC5olME40lzBY5mitgUrbdIjEqF+lwxvKtitoki21moIvQW8p0VK/gJvHOhFd8gBnO5PeffrYt6UkrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.112.218])
+	by gateway (Coremail) with SMTP id _____8Axjus4jxxmqI0nAA--.23894S3;
+	Mon, 15 Apr 2024 10:21:44 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.112.218])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxxxE0jxxmMht7AA--.28255S3;
+	Mon, 15 Apr 2024 10:21:40 +0800 (CST)
+Message-ID: <0e8f4d9c-e3ef-49bd-ae8b-bbc5897d9e90@loongson.cn>
+Date: Mon, 15 Apr 2024 10:21:39 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240414081806.2173098-1-lei.chen@smartx.com> <661c03b8c6cae_3e7732294f8@willemb.c.googlers.com.notmuch>
-In-Reply-To: <661c03b8c6cae_3e7732294f8@willemb.c.googlers.com.notmuch>
-From: Lei Chen <lei.chen@smartx.com>
-Date: Mon, 15 Apr 2024 10:11:34 +0800
-Message-ID: <CAKcXpBwYjLi0xet0fCXkhFQmj5KesvdmgzdPH2dqhnb9oWF_qg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4] tun: limit printing rate when illegal packet
- received by tun dev
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Jason Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 3/6] net: stmmac: dwmac-loongson: Use
+ PCI_DEVICE_DATA() macro for device identification
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, fancer.lancer@gmail.com,
+ Jose.Abreu@synopsys.com, chenhuacai@kernel.org, linux@armlinux.org.uk,
+ guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com,
+ siyanteng01@gmail.com
+References: <cover.1712917541.git.siyanteng@loongson.cn>
+ <b078687371ec7e740e3a630aedd3e76ecfdc1078.1712917541.git.siyanteng@loongson.cn>
+ <20240412184939.2b022d42@kernel.org>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <20240412184939.2b022d42@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8AxxxE0jxxmMht7AA--.28255S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7tF4DJw17CrWDXr43XryruFX_yoW8AFWDpr
+	W3Aa4qgrZrtr48C3Z5tw1Dury5Zay3G34UuF4xJrsIgF9rC34jqr129F45Wr17Ar4jq3W2
+	vryDuFs7CFs8AwbCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUU9Eb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
+	6r4j6r4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0c
+	Ia020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JF0_
+	Jw1lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrw
+	CY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8
+	JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14
+	v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY
+	67AKxVWUCVW8JwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2
+	IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_
+	Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8Dl1DUUUUU==
 
-On Mon, Apr 15, 2024 at 12:26=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Lei Chen wrote:
-> > vhost_worker will call tun call backs to receive packets. If too many
-> > illegal packets arrives, tun_do_read will keep dumping packet contents.
-> > When console is enabled, it will costs much more cpu time to dump
-> > packet and soft lockup will be detected.
-> >
-> > net_ratelimit mechanism can be used to limit the dumping rate.
-> >
-> > PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980"
-> >  #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
-> >  #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
-> >  #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
-> >  #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
-> >  #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
-> >     [exception RIP: io_serial_in+20]
-> >     RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
-> >     RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 0000000000000000
-> >     RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428a0
-> >     RBP: 0000000000002710   R8: 0000000000000004   R9: 000000000000000f
-> >     R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 0000000000000020
-> >     R13: ffffffff8acbf698  R14: 0000000000000058  R15: 0000000000000000
-> >     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
-> >  #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
-> >  #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
-> >  #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
-> >  #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
-> >  #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
-> >  #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
-> >  #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
-> >  #12 [ffffa65531497b68] printk at ffffffff89318306
-> >  #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
-> >  #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
-> >  #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
-> >  #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
-> >  #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
-> >  #18 [ffffa65531497f10] kthread at ffffffff892d2e72
-> >  #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
-> >
-> > Fixes: ef3db4a59542 ("tun: avoid BUG, dump packet on GSO errors")
-> > Signed-off-by: Lei Chen <lei.chen@smartx.com>
-> > Reviewed-by: Willem de Bruijn <willemb@google.com>
-> > Acked-by: Jason Wang <jasowang@redhat.com>
-> > ---
-> > Changes from v3:
-> > https://lore.kernel.org/all/20240412065841.2148691-1-lei.chen@smartx.co=
-m/
-> >  1. Change patch target from net tun to tun.
-> >  2. Move change log below the seperator "---".
-> >  3. Remove escaped parentheses in the Fixes string.
-> >
-> > Changes from v2:
-> > https://lore.kernel.org/netdev/20240410042245.2044516-1-lei.chen@smartx=
-.com/
-> >  1. Add net-dev to patch subject-prefix.
-> >  2. Add fix tag.
-> >
-> > Changes from v1:
-> > https://lore.kernel.org/all/20240409062407.1952728-1-lei.chen@smartx.co=
-m/
-> >  1. Use net_ratelimit instead of raw __ratelimit.
-> >  2. Use netdev_err instead of pr_err to print more info abort net dev.
-> >  3. Adjust git commit message to make git am happy.
-> >  drivers/net/tun.c | 18 ++++++++++--------
-> >  1 file changed, 10 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> > index 0b3f21cba552..ca9b4bc89de7 100644
-> > --- a/drivers/net/tun.c
-> > +++ b/drivers/net/tun.c
-> > @@ -2125,14 +2125,16 @@ static ssize_t tun_put_user(struct tun_struct *=
-tun,
-> >                                           tun_is_little_endian(tun), tr=
-ue,
-> >                                           vlan_hlen)) {
-> >                       struct skb_shared_info *sinfo =3D skb_shinfo(skb)=
-;
-> > -                     pr_err("unexpected GSO type: "
-> > -                            "0x%x, gso_size %d, hdr_len %d\n",
-> > -                            sinfo->gso_type, tun16_to_cpu(tun, gso.gso=
-_size),
-> > -                            tun16_to_cpu(tun, gso.hdr_len));
-> > -                     print_hex_dump(KERN_ERR, "tun: ",
-> > -                                    DUMP_PREFIX_NONE,
-> > -                                    16, 1, skb->head,
-> > -                                    min((int)tun16_to_cpu(tun, gso.hdr=
-_len), 64), true);
-> > +
-> > +                     if (net_ratelimit()) {
-> > +                             netdev_err(tun->dev, "unexpected GSO type=
-: 0x%x, gso_size %d, hdr_len %d\n",
-> > +                                    sinfo->gso_type, tun16_to_cpu(tun,=
- gso.gso_size),
-> > +                                    tun16_to_cpu(tun, gso.hdr_len));
->
-> Indentation. checkpatch or patchwork will also show this.
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> index 9e40c28d453a..995c9bd144e0 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>> @@ -213,7 +213,7 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
+>>   			 loongson_dwmac_resume);
+>>   
+>>   static const struct pci_device_id loongson_dwmac_id_table[] = {
+>> -	{ PCI_VDEVICE(LOONGSON, 0x7a03) },
+>> +	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
+>>   	{}
+>>   };
+>>   MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
+> In file included from ../drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:6:
+> ../include/linux/pci.h:1061:51: error: ‘PCI_DEVICE_ID_LOONGSON_GMAC’ undeclared here (not in a function); did you mean ‘PCI_DEVICE_ID_LOONGSON_HDA’?
+>   1061 |         .vendor = PCI_VENDOR_ID_##vend, .device = PCI_DEVICE_ID_##vend##_##dev, \
+>        |                                                   ^~~~~~~~~~~~~~
+> ../drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:216:11: note: in expansion of macro ‘PCI_DEVICE_DATA’
+>    216 |         { PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
+>        |           ^~~~~~~~~~~~~~~
+> ../drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:216:44: error: ‘loongson_gmac_pci_info’ undeclared here (not in a function)
+>    216 |         { PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
+>        |                                            ^~~~~~~~~~~~~~~~~~~~~~
+> ../include/linux/pci.h:1063:41: note: in definition of macro ‘PCI_DEVICE_DATA’
+>   1063 |         .driver_data = (kernel_ulong_t)(data)
+>        |                                         ^~~~
 
-Thanks for your help, and sorry about that. A new patch has been sent.
+Will be fixed in v12.
 
 
->
-> > +                             print_hex_dump(KERN_ERR, "tun: ",
-> > +                                            DUMP_PREFIX_NONE,
-> > +                                            16, 1, skb->head,
-> > +                                            min((int)tun16_to_cpu(tun,=
- gso.hdr_len), 64), true);
-> > +                     }
-> >                       WARN_ON_ONCE(1);
-> >                       return -EINVAL;
-> >               }
-> > --
-> > 2.44.0
-> >
->
->
+Thanks,
+
+Yanteng
+
 
