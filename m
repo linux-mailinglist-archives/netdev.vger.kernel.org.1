@@ -1,147 +1,154 @@
-Return-Path: <netdev+bounces-88030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA6C98A5642
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:23:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50A0B8A5649
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:25:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2A181C20C0D
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:23:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3DE4B20C95
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:25:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B39D76F17;
-	Mon, 15 Apr 2024 15:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 557B977F22;
+	Mon, 15 Apr 2024 15:25:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZSbHdCYO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="D5zcEsLk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 020DD42047;
-	Mon, 15 Apr 2024 15:23:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C3042047
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 15:25:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713194606; cv=none; b=kjaU7+4VK5B421Gqxk+9cU1DwRNzMybdP8RYtza0KvxhA2+c4udhaE6x3k6UuOEumhK77HT9iiIOIajWn0vnvnsYd70COKVXH+RDaaeypwS7y60MJv+akulKkJqRGO+G6nDyIAQ4zhWkWMvDZ45iSF0+ZtRvDokCzbtWhYtEgv8=
+	t=1713194705; cv=none; b=nS2svwzc+0BVEVzlHuklNATTDwc+Kv0MK6sI306kGaF5XRXpzOSt20Q9PI0iMtPIosWFIqyp+Z4NVoEhCqdlq2kJacn10k1OjilG6JujXAi37FVkMljrSqejOzuDyUJ3a8NWA0Mg6gVMBXxOWUQ7yhwkCmYqASx+VpJWzTf7vaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713194606; c=relaxed/simple;
-	bh=/+oTadXQg/wcougv+ZALkoCYykeGX5ekKxZJ0VZOuq4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=BmTF2M44tbOr1eUz3Vh4wKUMj3PiGuDbXW9ykDpPVKlAMkqBHdvl1pi96gzbIWgLnMicTWtNEFNS+Eb3J+xRNrgohsEMHPrHXGiqqliCHW0FLj06ta1ZOaB+H5+M+G4004a2pkiRXjeWODGCJY4x66lMS++HM9EcN8xag0HKdhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZSbHdCYO; arc=none smtp.client-ip=209.85.222.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f175.google.com with SMTP id af79cd13be357-78edc3e7cd9so120219085a.1;
-        Mon, 15 Apr 2024 08:23:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713194604; x=1713799404; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=00+WKqcWxRVODtQrBSLLMAMkHkC+vdMV1Sj6f4X1gSU=;
-        b=ZSbHdCYOdJyyF9wrkWF9v7lNTTjY6in1YkebGN+3WQZ1UIIzXcIMpiU0wWYvvSeWMq
-         vHxWFrVbOP5DVLy1bt3Nbr/cXBE4X4fsp+iD+w5dANRAjK37WJWv5QlZwH9d9bg0QOKz
-         IHSJwTh5bDTMUgEWYEZFNxwDbQdEb5mN3by6LAr7G78vfVBRA4sPAH8sTLcIqJGWO4nX
-         1Z52G2RLom0IWJcRkvwgRvS5FFD3LR3uDG24cAtYC4NeQv/lJhZnuZd7BTaiFynov6KL
-         RXbCRZfuL8VbPte/LV1tsqR6PyDsp2DpA5AdLmtKs3HjAN0hfVh0Xu8P4uVNgBoCwvLQ
-         X7AQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713194604; x=1713799404;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=00+WKqcWxRVODtQrBSLLMAMkHkC+vdMV1Sj6f4X1gSU=;
-        b=Y/PbpKe2S6COBLNSvKfICfDbbjGAFKxt6sFcRAXx2xy47mDW/bIu6f187qFPN9ARsA
-         sjiVY3Phg3C1b4a8KUIS3BCEQUS7pNIVWPDGb3IFoec2IytT3m0VZjbvtpEm605MJA2p
-         fxHpWf0kJVbHBwg/SVdjfZu7Xw9R3Z+fV+NtObnapXTSmBJjVX1olSYUNANQAKN/EIrT
-         EKUNBqeZKUHAw7sC0o8dwqzP4WStBIvSAVliC0L/xQpow1ZSxdN/DRx3l11FvGqrlGQU
-         YKrjVS98rf3hSpY4Dae0+KldZSx2vZIoq1KKe4uqjb63TMwp5fVfuhzYr0/WU+FpSFcu
-         fbjw==
-X-Forwarded-Encrypted: i=1; AJvYcCXBmF84oQ4JEbiNAf7hfUDrOd7cyECDbkry4HISocmdijNfaI42cqQ0eja8jA33eHLoxhF3P96lyJCehh+0Ws8OBa7qKx5xnsUmGc7Zkh9nSU5ttLksB9JvSKIUDgyStw4OjwqTDl4w
-X-Gm-Message-State: AOJu0Yws9Iiyo5ZZMGbVu2FkCwDfMaNXegJr0/08ma5fzCcjJmMTwuGJ
-	WDCAX1BmUHvvTL6T2YZazeu0E8w73BRiWowPB0qRziX9VzY6ykDj5aDRnw==
-X-Google-Smtp-Source: AGHT+IHwieKmMqQzpF0d5qwkxZiJ0yZ1tr6e0f2uoDSlK/bp5Ah8N9HxZ7fDo8gtqGR4ClhHrdJQ7Q==
-X-Received: by 2002:a05:620a:2119:b0:78d:7588:c19b with SMTP id l25-20020a05620a211900b0078d7588c19bmr11290215qkl.40.1713194603992;
-        Mon, 15 Apr 2024 08:23:23 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id a19-20020a05620a439300b0078d6ef5fd07sm6398565qkp.50.2024.04.15.08.23.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 08:23:23 -0700 (PDT)
-Date: Mon, 15 Apr 2024 11:23:23 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, 
- netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- shuah@kernel.org, 
- petrm@nvidia.com, 
- linux-kselftest@vger.kernel.org, 
- willemb@google.com
-Message-ID: <661d466b7c11b_1073d29442@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240415071639.03c9cfd6@kernel.org>
-References: <20240412233705.1066444-1-kuba@kernel.org>
- <20240412233705.1066444-2-kuba@kernel.org>
- <661c0cae8110a_3e773229418@willemb.c.googlers.com.notmuch>
- <20240415071639.03c9cfd6@kernel.org>
-Subject: Re: [PATCH net-next 1/5] selftests: drv-net: define endpoint
- structures
+	s=arc-20240116; t=1713194705; c=relaxed/simple;
+	bh=oy8hFLDtjc/3z9TAtvaf7rSWLWM47Dw5jq8lO257EnE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lZesUzTys3YsFjBOu3HKgHEq/gH543lK4vmDu/K1ZWBIm7kFDZRuA2UU9VGw5XqqbMA6XCYWOpSbDRUahbv6maDa+91IdxxLlVBYJYJ8Fdb9+H7v0NvnFAoxhvGWVoDVrvc6GuT7U3euJ8DX+CIA6a7jSO7Bs1HEiHc13dZF5r0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=D5zcEsLk; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=avnNlYUft5UUF98sKyfEio6pBY/rOYcoq9LS2fNp3co=; b=D5zcEsLkNhhkqmLdeOHihfy5mU
+	hq8jm2zznGflGBBu+CNDQqZ7ttQHF+4eD5diP6mIyUuuikWFtVDqjmBYSLLzYVEQW4iExMdvj/q1m
+	yRJWwjcsJbkjhTSGjHAhGA9eryamAYFAluDAiCg5f55wIB6qxOXFclsTciaAd7Oe/39+O+OcIuSjG
+	pR7TGxB8XwqpOEvxigyy2ITutpz/KlUEW87v/OmYt9KXWfDBwsTSeanHTjarI4NSBmB4geBDlV5kw
+	l2Xq5gtU/8nmRd/+lLmjqAgebH2sYOLTJFJKCzL5sQMnVGUQyr2CNuY/MH4BE3p+wln1u6nzBGTR3
+	tqLeDZ1g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34150)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rwOCO-0006de-19;
+	Mon, 15 Apr 2024 16:24:48 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rwOCM-0002Ht-1J; Mon, 15 Apr 2024 16:24:46 +0100
+Date: Mon, 15 Apr 2024 16:24:45 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Colin Foster <colin.foster@in-advantage.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: felix: provide own phylink MAC
+ operations
+Message-ID: <Zh1GvcOTXqb7CpQt@shell.armlinux.org.uk>
+References: <E1rvIcO-006bQQ-Md@rmk-PC.armlinux.org.uk>
+ <E1rvIcO-006bQQ-Md@rmk-PC.armlinux.org.uk>
+ <20240415103453.drozvtf7tnwtpiht@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240415103453.drozvtf7tnwtpiht@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Jakub Kicinski wrote:
-> On Sun, 14 Apr 2024 13:04:46 -0400 Willem de Bruijn wrote:
-> > 1. Cleaning up remote state in all conditions, including timeout/kill.
+On Mon, Apr 15, 2024 at 01:34:53PM +0300, Vladimir Oltean wrote:
+> On Fri, Apr 12, 2024 at 04:15:08PM +0100, Russell King (Oracle) wrote:
+> > Convert felix to provide its own phylink MAC operations, thus
+> > avoiding the shim layer in DSA's port.c.
 > > 
-> >    Some tests require a setup phase before the test, and a matching
-> >    cleanup phase. If any of the configured state is variable (even
-> >    just a randomized filepath) this needs to be communicated to the
-> >    cleanup phase. The remote filepath is handled well here. But if
-> >    a test needs per-test setup? Say, change MTU or an Ethtool feature.
-> >    Multiple related tests may want to share a setup/cleanup.
-> > 
-> >    Related: some tests may need benefit from a lightweight stateless
-> >    check phase to detect preconditions before committing to any setup.
-> >    Again, say an Ethtool feature like rx-gro-hw, or AF_XDP metadata rx.
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > ---
+> > diff --git a/drivers/net/dsa/ocelot/ocelot_ext.c b/drivers/net/dsa/ocelot/ocelot_ext.c
+> > index 22187d831c4b..a8927dc7aca4 100644
+> > --- a/drivers/net/dsa/ocelot/ocelot_ext.c
+> > +++ b/drivers/net/dsa/ocelot/ocelot_ext.c
+> > @@ -96,6 +96,7 @@ static int ocelot_ext_probe(struct platform_device *pdev)
+> >  	ds->num_tx_queues = felix->info->num_tx_queues;
+> >  
+> >  	ds->ops = &felix_switch_ops;
+> > +	ds->phylink_mac_ops = &felix_phylink_mac_ops;
 > 
-> I think this falls into the "frameworking debate" we were having with
-> Petr. The consensus seems to be to keep things as simple as possible.
+> There are actually 2 more places which need this: felix_vsc9959.c,
+> seville_vsc9953.c.
 
-Makes sense. We can find the sticking points as we go along.
+Looking at these three, isn't there good reason to merge the allocation
+and initialisation of struct dsa_switch together in all three drivers?
+All three are basically doing the same thing:
 
-tools/testing/selftests/net already has a couple of hardware feature
-tests, that probably see little use now that they require manual
-testing (csum, gro, toeplitz, ..). Really excited to include them in
-this infra to hopefully see more regular testing across more hardware.
+felix_vsc9959.c:
+        ds->dev = &pdev->dev;
+        ds->num_ports = felix->info->num_ports;
+        ds->num_tx_queues = felix->info->num_tx_queues;
+        ds->ops = &felix_switch_ops;
+        ds->priv = ocelot;
+        felix->ds = ds;
 
-> If we see that tests are poorly written and would benefit from extra
-> structure we should try impose some, but every local custom is
-> something people will have to learn.
+ocelot_ext.c:
+        ds->dev = dev;
+        ds->num_ports = felix->info->num_ports;
+        ds->num_tx_queues = felix->info->num_tx_queues;
+        ds->ops = &felix_switch_ops;
+        ds->priv = ocelot;
+        felix->ds = ds;
 
-The above were just observations from embedding tests like those
-mentioned in our internal custom test framework. Especially with
-heterogenous hardware, a lot of it is "can we run this test on this
-platform", or "disable this feature as it interacts with the tested
-feature" (e.g., HW-GRO and csum.c).
+seville_vsc9953.c:
+        ds->dev = &pdev->dev;
+        ds->num_ports = felix->info->num_ports;
+        ds->ops = &felix_switch_ops;
+        ds->priv = ocelot;
+        felix->ds = ds;
 
-> timeout/kill is provided to us already by the kselftest harness.
-> 
-> > 2. Synchronizing peers. Often both peers need to be started at the
-> >    same time, but then the client may need to wait until the server
-> >    is listening. Paolo added a nice local script to detect a listening
-> >    socket with sockstat. Less of a problem with TCP tests than UDP or
-> >    raw packet tests.
-> 
-> Yes, definitely. We should probably add that with the first test that
-> needs it.
+Also, I note that felix->info->num_tx_queues on seville_vsc9953.c
+is set to OCELOT_NUM_TC, which is defined to be 8, and is the same
+value for ocelot_ext and felix_vsc9959. Presumably this unintentionally
+missing from seville_vsc9953.c... because why initialise a private
+struct member to a non-zero value and then not use it.
 
+An alternative would be to initialise .num_tx_queues in seville_vsc9953.c
+to zero.
 
+If we had common code doing this initialisation, then it wouldn't be
+missed... and neither would have _this_ addition of the phylink MAC
+ops missed the other two drivers - so I think that's something which
+should be done as a matter of course - and thus there will be no need
+to export these two data structures, just an initialisation (and
+destruction) function. I don't think we would even need the destruction
+function if we used devm_kzalloc().
+
+Good idea?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
