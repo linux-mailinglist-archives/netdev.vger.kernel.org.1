@@ -1,140 +1,153 @@
-Return-Path: <netdev+bounces-88092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D83718A5A3F
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 20:56:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 818918A5A43
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 21:01:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DFD9284C10
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:56:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05667B21267
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 19:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45178154C11;
-	Mon, 15 Apr 2024 18:56:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A5F155756;
+	Mon, 15 Apr 2024 19:01:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gyBwYu2T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pdr92ZYq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A182813B78F
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 18:56:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E30DF69DE4;
+	Mon, 15 Apr 2024 19:01:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713207378; cv=none; b=fuItNsGtPJONZF42Q1zqF5o7JT6xmwWfaKP7RuMNp9eYy2QAYdwN9P4LRMRAPutIFy2+OUMu/7VtdT1MEOPxz/NcKWvLBTRUGcrRIcYzlNIMxMyognUNXEOVEqy2btTCY/v2QMQQdHxe4ADk4Cn1W3b6Xh+bTTAslDQbrBW3HLU=
+	t=1713207699; cv=none; b=UFVmarAxKHoVkwgkq8/M0FYyqGVoDbINB0PPC9cwwbqKHxdStMDczmajpRGS3WUll2KjrPScU6Hk9wVW+/q903bkM6C4CxfSHB/trRRMctqqZ9prJfYPJfSySzk9OwaK19gYJmRt5EE4VXwPkiU99Avump4J9CrW+P1DBz56a6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713207378; c=relaxed/simple;
-	bh=FctM977lEAAwwANhWYYm9bvXkUV70k9ZmIKMwBZQv7g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eibF8w2mraxfGgeZn1yFkZD2P+ZC2NtIqa7x9Z2KfwgSKp+ojvpIaR2YH8H2e6tJRrEjSZvWV84jbBmECeATZH1rqX/vv87a+g4k/nP4P2humIEC1vTjy5rTi7O9iJq6KiRd3rQl9WDW89uTP0Xa6RbxFpuzeT5ZLcyyrJ2GVuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gyBwYu2T; arc=none smtp.client-ip=209.85.128.41
+	s=arc-20240116; t=1713207699; c=relaxed/simple;
+	bh=PnTuE1G9hxqpgJqSaRqkYDATur+oxuaAhti08z7Kc9o=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=ehfqO2i4ymp1CinBZ15y8AildFvJiqbepwRnP+e4IaAa7wMTF1yNsGOfftvVr9/KrWWcx+6YY1N2iQcLeyt3U4jD8weDOwPpeYr6wjSDuO9oh1vh4av83xArfS0o6LV7c50pCEtjOql+u91XkRYhobenhWfJYr4sWtMBQtI5k8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pdr92ZYq; arc=none smtp.client-ip=209.85.160.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-41884f8f35bso2738275e9.0
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 11:56:16 -0700 (PDT)
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-4349bba0ba3so22166291cf.3;
+        Mon, 15 Apr 2024 12:01:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713207375; x=1713812175; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1713207697; x=1713812497; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FctM977lEAAwwANhWYYm9bvXkUV70k9ZmIKMwBZQv7g=;
-        b=gyBwYu2TdrmXmpIeVF3En1fT+BIG6Zyh5SWKpEF0Z/GNs1bnOCAayIEtOA6TMtwUE4
-         aAbqmLAaa5P00/dia+kfo/V1fsWo0RvuCQvCYqlgC8Iu5u46gQ4/M5GnfbwT4Oyn27B+
-         FnX5Ybq8zUJZyut2I4gdAUdw4I4rUopBJdXToVOHkGG8Zc9FtKj2+iGRoE1hIZRYuHgS
-         FKnZ6uPOqzBcb94MpEix6QYPl5wCV0ERfMdnG954NC+/D1Y0s+fio0g5FQ7NIe0ekdYT
-         ezp6+oKE4kTwukPf8BoigHAo9Rl3nNW6dIuGmJSzfCJIZsmKMOrUGWVRbLQzwK4ltXjZ
-         8OqA==
+        bh=JFimitYBHhkcFusGF1JC0a1DtnqMlMykdYmZ+2Zs0AM=;
+        b=Pdr92ZYqhjSsEqP0ZJ7+bbHUYAfD7QUTFTcegqwH/HoGIHqijjMJYgs0OuNwn1/lIA
+         KvCWSaf+Vk6D5df6ohyHbsX/MqxkU/elo54DuYtIX/71u+WiUorG3iw5v1nYNJcTpS01
+         B3gWPCzlDfVXH/zVnL0xmSVg4CPHgi+FSAQoUIi0BdDSiAwjXvCxWF8Z4TQACHBizZab
+         IxEU5EE3qbJ9j+AMz7O1eNzB7tMjGpor28QPZ3oT10OQ/MD+WSGZI9pFsoUqaWBXEts9
+         HyaR08pg9TURbumuKAKiGPU/5euQktReQsOGH2+qVLEUQW2g8G9B7UTcGcxxco5rj9ov
+         xkgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713207375; x=1713812175;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FctM977lEAAwwANhWYYm9bvXkUV70k9ZmIKMwBZQv7g=;
-        b=s1k8DjcG4ar+P8vEfwLTvwrQTqbbZXsNg9LF9AvrABfOg1VCjq//VTQa/H786hN3U9
-         vWjkgubms7FRjJbj1c5g51HkuWgtUxsqGSJknm4Zf7NSw8Mh/xZIUVe3UGThiDn5GiU7
-         hbQXVaKSMDh6fNLu0kc5BvBMPwSZHIoL7Ym9JXdI40H0fA6dAbVrWVfa+OdYFAwnlPkC
-         iBRzOoyDp0d1ftJDIEUOCCscfErM1pLXqTZLZDUtDNif8n6/FIdDSn80SWJntk6jtZwE
-         0UlyaIbIRKOl9Oa7Wxl0HwK2coAeAF4i0v5RLIZcJ7fsYnRMoRMwa3OmVJFXQZ0DOOGm
-         15Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCWhVC8VtunphFAOdJO9L2MQsEWLu81NCEuNAcH9l+dL2gP2Y5HSJK2FFWnFWmx/JHYsBW2PgcQcj0U6E+WANhOjUAcHFjqa
-X-Gm-Message-State: AOJu0Yy+axPPvwTNlTFPNdu7eZfT+85PQRgf7s3uETRir6SKKSNCtXwk
-	lhKwmWFj6mme5qXdzx71P0QYBELA5XlNf3diyTQDEtIP4Euny4FnekD4dgTUxKUp0DYwdeBeJGv
-	Jy+xCyHb/Uoqn4XVoeErB5YZc+5I=
-X-Google-Smtp-Source: AGHT+IFOZmOgSvZHwbgU7f6VXIaKp8VxMqo1sjwuijMPc3HxP3jbPQTQJ1VHsSJZOpZ9+IKkhi5HpF0nZ7Q+r29bwWQ=
-X-Received: by 2002:a05:600c:314c:b0:414:1325:e8a8 with SMTP id
- h12-20020a05600c314c00b004141325e8a8mr8218935wmo.39.1713207374931; Mon, 15
- Apr 2024 11:56:14 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713207697; x=1713812497;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=JFimitYBHhkcFusGF1JC0a1DtnqMlMykdYmZ+2Zs0AM=;
+        b=tTLDfwbjSmfgmyNoXiEAhdsAMkGzK3wO4Zh7XzPWLyrBjhtD4d3O4s2hV6hOGD6Ri0
+         2rZ15Oz8ywYGVwRH2Wc0sTEr0fX0gaXwMe75YzuiHNcMiB0SbeWczcIlL01tS1ufToU8
+         BJzUPTMVnTeQb4ehcvkj2UqcQYqy4Xx67ZLqKia8uaE2OPYbObUqjDCeuuB8O1Bx8Z7E
+         Fq36L9KmL9hCUyN/QValQKYbYe8yiugvctpCTCiHzWtkwGuFNB0qj5L1Ht8FTE6MLSFq
+         G2W1QwB/y1N8WVYdCHKbJJjrgUaYtdhb+AoGn4tRbytWsvTnZmAejGfOM3cMVP1k6ufO
+         eZSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXhsuPLT2g9/bT4Cvqujsc8JlGqg+6EhIJTWI7qtrMrpQIS75ZyAzSkNw46Wh8qev3bT9o0uWzDiMpAdkPVS78FlVzte50NnvJ/ipuLdpcCp78TSy+hRDc+tZqeuLuwz/g=
+X-Gm-Message-State: AOJu0Yw/zdh2lI/QDRxmXYzhYAAz0gYMEGzVg9yDrcoPq/P7aPzRskuJ
+	z+z4scdSudxUqq1XqcKuooRVZRhR28dB3NyCGdouoRKnM/bTm4By
+X-Google-Smtp-Source: AGHT+IGNJpsqr6vydFcyFhqNVinfJVqrbmWixrnjCR+tSoFm3TRUYmPs6lW1+SiLftfboxS8dYm7cQ==
+X-Received: by 2002:ac8:4f07:0:b0:436:873a:5fc3 with SMTP id b7-20020ac84f07000000b00436873a5fc3mr10967099qte.42.1713207696626;
+        Mon, 15 Apr 2024 12:01:36 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id p13-20020ac8408d000000b00436eacea78fsm2464158qtl.65.2024.04.15.12.01.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 12:01:36 -0700 (PDT)
+Date: Mon, 15 Apr 2024 15:01:36 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Pavel Begunkov <asml.silence@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ io-uring@vger.kernel.org, 
+ netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ David Ahern <dsahern@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>
+Message-ID: <661d79901c9e_2ce362948f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <bc8eb305-84e0-46ab-86b1-907dcf864452@gmail.com>
+References: <cover.1712923998.git.asml.silence@gmail.com>
+ <62a4e09968a9a0f73780876dc6fb0f784bee5fae.1712923998.git.asml.silence@gmail.com>
+ <661c0d589f493_3e773229421@willemb.c.googlers.com.notmuch>
+ <8b329b39-f601-436b-8a17-6873b6e73f91@gmail.com>
+ <661d428c4c454_1073d2945f@willemb.c.googlers.com.notmuch>
+ <bc8eb305-84e0-46ab-86b1-907dcf864452@gmail.com>
+Subject: Re: [RFC 1/6] net: extend ubuf_info callback to ops structure
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <171217496013.1598374.10126180029382922588.stgit@ahduyck-xeon-server.home.arpa>
- <41a39896-480b-f08d-ba67-17e129e39c0f@huawei.com> <CAKgT0Uf6MdYX_1OuAFAXadh86zDX_w1a_cwpoPGMxpmC4hGyEA@mail.gmail.com>
- <53b80db6-f2bc-d824-ea42-4b2ac64625f2@huawei.com> <CAKgT0UeQS5q=Y2j3mmu9AhWyUMbey-iFL+sKES1UrBtoAXMdzw@mail.gmail.com>
- <0e5e3196-ca2f-b905-a6ba-7721e8586ed7@huawei.com> <CAKgT0UeRWsJ+NiniSKa7Z3Law=QrYZp3giLAigJf7EvuAbjkRA@mail.gmail.com>
- <bf070035-ba9c-d028-1b11-72af8651f979@huawei.com> <CAKgT0UccovDVS8-TPXxgGbrTAqpeVHRQuCwf7f2qkfcPaPOA-A@mail.gmail.com>
- <20240415101101.3dd207c4@kernel.org> <CAKgT0UcGN3-6R4pt8BQv2hD04oYk48GfFs1O_UGChvrrFT5eCw@mail.gmail.com>
- <20240415111918.340ebb98@kernel.org>
-In-Reply-To: <20240415111918.340ebb98@kernel.org>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Mon, 15 Apr 2024 11:55:37 -0700
-Message-ID: <CAKgT0Ud366SsaLftQ6Gd4hg+MW9VixOhG9nA9pa4VKh0maozBg@mail.gmail.com>
-Subject: Re: [net-next PATCH 13/15] eth: fbnic: add basic Rx handling
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>, netdev@vger.kernel.org, 
-	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 15, 2024 at 11:19=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Mon, 15 Apr 2024 11:03:13 -0700 Alexander Duyck wrote:
-> > This wasn't my full argument. You truncated the part where I
-> > specifically called out that it is hard to justify us pushing a
-> > proprietary API that is only used by our driver.
->
-> I see. Please be careful when making such arguments, tho.
->
-> > The "we know best" is more of an "I know best" as someone who has
-> > worked with page pool and the page fragment API since well before it
-> > existed. My push back is based on the fact that we don't want to
-> > allocate fragments, we want to allocate pages and fragment them
-> > ourselves after the fact. As such it doesn't make much sense to add an
-> > API that will have us trying to use the page fragment API which holds
-> > onto the page when the expectation is that we will take the whole
-> > thing and just fragment it ourselves.
->
-> To be clear I'm not arguing for the exact use of the API as suggested.
-> Or even that we should support this in the shared API. One would
-> probably have to take a stab at coding it up to find out what works
-> best. My first try FWIW would be to mask off the low bits of the
-> page index, eg. for 64k page making entries 0-15 all use rx_buf
-> index 0...
+Pavel Begunkov wrote:
+> On 4/15/24 16:06, Willem de Bruijn wrote:
+> > Pavel Begunkov wrote:
+> >> On 4/14/24 18:07, Willem de Bruijn wrote:
+> >>> Pavel Begunkov wrote:
+> >>>> We'll need to associate additional callbacks with ubuf_info, introduce
+> >>>> a structure holding ubuf_info callbacks. Apart from a more smarter
+> >>>> io_uring notification management introduced in next patches, it can be
+> >>>> used to generalise msg_zerocopy_put_abort() and also store
+> >>>> ->sg_from_iter, which is currently passed in struct msghdr.
+> >>>
+> >>> This adds an extra indirection for all other ubuf implementations.
+> >>> Can that be avoided?
+> >>
+> >> It could be fitted directly into ubuf_info, but that doesn't feel
+> >> right. It should be hot, so does it even matter?
+> > 
+> > That depends on the workload (working set size)?
+> >>> On the bright side,
+> >> with the patch I'll also ->sg_from_iter from msghdr into it, so it
+> >> doesn't have to be in the generic path.
+> > 
+> > I don't follow this: is this suggested future work?
+> 
+> Right, a small change I will add later. Without ops though
+> having 3 callback fields in uargs would be out of hands.
+> 
+> >> I think it's the right approach, but if you have a strong opinion
+> >> I can fit it as a new field in ubuf_info.
+> > 
+> > If there is a significant cost, I suppose we could use
+> > INDIRECT_CALL or go one step further and demultiplex
+> > based on the new ops
+> > 
+> >      if (uarg->ops == &msg_zerocopy_ubuf_ops)
+> >          msg_zerocopy_callback(..);
+> 
+> Let me note that the patch doesn't change the number of indirect
+> calls but only adds one extra deref to get the callback, i.e.
+> uarg->ops->callback() instead of uarg->callback().
 
-It would take a few more changes to make it all work. Basically we
-would need to map the page into every descriptor entry since the worst
-case scenario would be that somehow we end up with things getting so
-tight that the page is only partially mapped and we are working
-through it as a subset of 4K slices with some at the beginning being
-unmapped from the descriptor ring while some are still waiting to be
-assigned to a descriptor and used. What I would probably have to look
-at doing is adding some sort of cache on the ring to hold onto it
-while we dole it out 4K at a time to the descriptors. Either that or
-enforce a hard 16 descriptor limit where we have to assign a full page
-with every allocation meaning we are at a higher risk for starving the
-device for memory.
+Of course. Didn't mean to imply otherwise.
 
-The bigger issue would be how could we test it? This is an OCP NIC and
-as far as I am aware we don't have any systems available that would
-support a 64K page. I suppose I could rebuild the QEMU for an
-architecture that supports 64K pages and test it. It would just be
-painful to have to set up a virtual system to test code that would
-literally never be used again. I am not sure QEMU can generate enough
-stress to really test the page allocator and make sure all corner
-cases are covered.
+> Your snippet
+> goes an extra mile and removes the indirect call.
+>
+> Can I take it as that you're fine with the direction of the
+> patch? Or do you want me to change anything?
+
+It's fine. I want to avoid new paths slowing down existing code where
+possible. But if this extra deref would prove significant we have a
+workaround.
+
 
