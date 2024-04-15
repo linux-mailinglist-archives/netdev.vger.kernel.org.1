@@ -1,141 +1,136 @@
-Return-Path: <netdev+bounces-88064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC1BB8A583C
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:53:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FD868A584B
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:57:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67612282109
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:53:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E5C0B20C4D
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:57:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 542AE82490;
-	Mon, 15 Apr 2024 16:53:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF94E8249B;
+	Mon, 15 Apr 2024 16:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QaSYSZCO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MccKqy+j"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78796823B5;
-	Mon, 15 Apr 2024 16:53:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83ADE1E87C;
+	Mon, 15 Apr 2024 16:56:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713200010; cv=none; b=OXcNZvCc1YwXUhfleW2MnSiIxFP/mela2jYk3CrYMvEYaH9RmLbXlDSm5zga1uOrNp9twPPyBvn20lZ/LBaafAfh+wRu3DakgJE1R7uPF7MBgJKzmiTucwsJYPu2pusB3SlAt80kaQeQXOqLpY4N4w12TwtlemeQG+7HrBSFw+w=
+	t=1713200217; cv=none; b=ifxaveP4Li3OV0aRI1w2VHqPCQi0U4TB7P/2jw/nwe1qkmJET68nUxfNVYhEu6+TsMG7Of4ygdeqdl7YSQXiteRvvHINM91MlPCNekijV5fi7X/fFsbB04jgEgPghxuA/lJLhgvpWkOxP3GyKc2AJ7RcvKSQc5oOZpEZgk7f73U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713200010; c=relaxed/simple;
-	bh=Rh/r0/dCU0aySn8Z2qZpkchpRIy06trbHTQwkt6z/Bw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XJQI8cXVnMAvkaHUkZhxTpL87gDUzXcog6oOgARiJg79lg46muY5iOJNbb+Am4ymUlpUhKtH51AgnulNOLAJ6rKP5lQHs4qt00vCM3gSJDuiGBD5GkvUV+1C0Vca2XZklwhO4TFtfGT8tVONdK6yVwLv/pD2fTOdXpgykKAfSvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QaSYSZCO; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=IrIITJ6fXOHd05AgwEOvmTiGO5LrfxpkCtYVLEkHfT4=; b=QaSYSZCO+NvJ8GOK4I8biSuy9f
-	Gfb5k783cHIaX1pGMVxvx/E6Y3czFNqNhcXlxLHMk+1JUeJdu4ilRLbLlVO+ZH8n8xk4U+uNnYd7P
-	rKqbkS9byTPXU5citoFo40rw2Pr4dhEVBnxlG+K1U4qc4f9Ak+cH3cvhgDVb7OB2Mk9o=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rwPa9-00D3mx-Is; Mon, 15 Apr 2024 18:53:25 +0200
-Date: Mon, 15 Apr 2024 18:53:25 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	tmgross@umich.edu
-Subject: Re: [PATCH net-next v1 4/4] net: phy: add Applied Micro QT2025 PHY
- driver
-Message-ID: <adc1ba25-16f0-4cf4-a1f0-bac8820cec2e@lunn.ch>
-References: <20240415104701.4772-1-fujita.tomonori@gmail.com>
- <20240415104701.4772-5-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1713200217; c=relaxed/simple;
+	bh=23t1wc48Z7qjQUHxpMlFdirQHFa5WZ1akQpPogYgwdY=;
+	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
+	 Message-Id:Subject; b=kfbjbBIfZfrB3sNiMQM2sVlF2I5gPg8p67JCpI3YZuMFFir6nuk21/ECker07BHT2tL+Nt7SauzVJHbJpjAe9KTo5oS7JCTy/pRfm8g7kIxpix2elgx4vfR9Y/Nz4cPUeBwblGOgnxjtIac1GhPwQ9eVFUgkZ1esEpNe/HT127o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MccKqy+j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D98E6C113CC;
+	Mon, 15 Apr 2024 16:56:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713200217;
+	bh=23t1wc48Z7qjQUHxpMlFdirQHFa5WZ1akQpPogYgwdY=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=MccKqy+jcxO65ZEPHizfb5Mc96hbY4jAZG12g4jT1jFG0LEcycDbLg+MgwFLFWnDL
+	 /Ncsg9MFSrkB5HmunRJkncqZEk6X8fEu7lu7j8tR0QUHG0D8uhJXWMA8+xDERhlkRR
+	 9NjK9IoQmQgkfX2h39J9neHr1UALtTptyC0FYchJuHuEGfVqX2CWEUIYULXv4Vcd7s
+	 tmRXsqeY2pmaaxonCgtROnJF0DeESWve2rr17M1A/uXUkdfpwzdyjK3ivJOFa86Wjy
+	 ZIC7j+T8gBHzjDN0NHXpMZiFaNhpAGb0/U59q764Gxm93RwO0e2o9va4ZexYVk5Uhh
+	 wYEsnpGSnVE/g==
+Date: Mon, 15 Apr 2024 11:56:55 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240415104701.4772-5-fujita.tomonori@gmail.com>
+From: Rob Herring <robh@kernel.org>
+To: Christophe Roullier <christophe.roullier@foss.st.com>
+Cc: Rob Herring <robh+dt@kernel.org>, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com, 
+ Eric Dumazet <edumazet@google.com>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ Paolo Abeni <pabeni@redhat.com>, devicetree@vger.kernel.org, 
+ Jakub Kicinski <kuba@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+ Mark Brown <broonie@kernel.org>, Jose Abreu <joabreu@synopsys.com>, 
+ Liam Girdwood <lgirdwood@gmail.com>
+In-Reply-To: <20240411143658.1049706-1-christophe.roullier@foss.st.com>
+References: <20240411143658.1049706-1-christophe.roullier@foss.st.com>
+Message-Id: <171292930694.2308702.12108714635472172661.robh@kernel.org>
+Subject: Re: [PATCH 00/11] Series to deliver Ethernets for STM32MP13
 
-> +const MDIO_MMD_PMAPMD: u8 = uapi::MDIO_MMD_PMAPMD as u8;
-> +const MDIO_MMD_PCS: u8 = uapi::MDIO_MMD_PCS as u8;
-> +const MDIO_MMD_PHYXS: u8 = uapi::MDIO_MMD_PHYXS as u8;
 
-These probably belong somewhere else, where all Rust PHY drivers can
-use them.
+On Thu, 11 Apr 2024 16:36:47 +0200, Christophe Roullier wrote:
+> STM32MP13 is STM32 SOC with 2 GMACs instances
+> This board have 2 RMII phy:
+>   -Ethernet1: RMII with crystal
+>   -Ethernet2: RMII without crystal
+> Rework dwmac glue to simplify management for next stm32
+> Add support for PHY regulator
+> 
+> Christophe Roullier (11):
+>   dt-bindings: net: add STM32MP13 compatible in documentation for stm32
+>   dt-bindings: net: add phy-supply property for stm32
+>   net: ethernet: stmmac: rework glue to simplify management for next
+>     stm32
+>   net: ethernet: stmmac: add management of stm32mp13 for stm32
+>   net: ethernet: stmmac: stm32: update config management for phy wo
+>     cristal
+>   net: ethernet: stm32: clean the way to manage wol irqwake
+>   net: ethernet: stmmac: stm32: support the phy-supply regulator binding
+>   ARM: dts: stm32: add ethernet1 and ethernet2 support on stm32mp13
+>   ARM: dts: stm32: add ethernet1/2 RMII pins for STM32MP13F-DK board
+>   ARM: dts: stm32: add ethernet1 and ethernet2 for STM32MP135F-DK board
+>   ARM: multi_v7_defconfig: Add MCP23S08 pinctrl support
+> 
+>  .../devicetree/bindings/net/stm32-dwmac.yaml  |  83 ++++++-
+>  arch/arm/boot/dts/st/stm32mp13-pinctrl.dtsi   |  71 ++++++
+>  arch/arm/boot/dts/st/stm32mp131.dtsi          |  31 +++
+>  arch/arm/boot/dts/st/stm32mp133.dtsi          |  30 +++
+>  arch/arm/boot/dts/st/stm32mp135f-dk.dts       |  48 ++++
+>  arch/arm/configs/multi_v7_defconfig           |   1 +
+>  .../net/ethernet/stmicro/stmmac/dwmac-stm32.c | 235 ++++++++++++------
+>  7 files changed, 421 insertions(+), 78 deletions(-)
+> 
+> --
+> 2.25.1
+> 
+> 
+> 
 
-> +
-> +struct PhyQT2025;
-> +
-> +#[vtable]
-> +impl Driver for PhyQT2025 {
-> +    const NAME: &'static CStr = c_str!("QT2025 10Gpbs SFP+");
-> +    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x0043A400);
-> +
-> +    fn config_init(dev: &mut phy::Device) -> Result<()> {
-> +        let fw = Firmware::new(c_str!("qt2025-2.0.3.3.fw"), dev)?;
-> +
-> +        let phy_id = dev.c45_read(MDIO_MMD_PMAPMD, 0xd001)?;
-> +        if (phy_id >> 8) & 0xff != 0xb3 {
-> +            return Ok(());
-> +        }
 
-I'm guessing that is checking if the firmware has already been
-downloaded? It would be good to add a comment about this. I also
-wounder about the name phy_id? They are normally stored in registers
-0x2 and 0x3, not 0xd001. What sort of ID is this?
+My bot found new DTB warnings on the .dts files added or changed in this
+series.
 
-> +        dev.c45_write(MDIO_MMD_PMAPMD, 0xC300, 0x0000)?;
-> +        dev.c45_write(MDIO_MMD_PMAPMD, 0xC302, 0x4)?;
-> +        dev.c45_write(MDIO_MMD_PMAPMD, 0xC319, 0x0038)?;
-> +
-> +        dev.c45_write(MDIO_MMD_PMAPMD, 0xC31A, 0x0098)?;
-> +        dev.c45_write(MDIO_MMD_PCS, 0x0026, 0x0E00)?;
-> +
-> +        dev.c45_write(MDIO_MMD_PCS, 0x0027, 0x0893)?;
-> +
-> +        dev.c45_write(MDIO_MMD_PCS, 0x0028, 0xA528)?;
-> +        dev.c45_write(MDIO_MMD_PCS, 0x0029, 0x03)?;
-> +        dev.c45_write(MDIO_MMD_PMAPMD, 0xC30A, 0x06E1)?;
-> +        dev.c45_write(MDIO_MMD_PMAPMD, 0xC300, 0x0002)?;
-> +        dev.c45_write(MDIO_MMD_PCS, 0xE854, 0x00C0)?;
+Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
+are fixed by another series. Ultimately, it is up to the platform
+maintainer whether these warnings are acceptable or not. No need to reply
+unless the platform maintainer has comments.
 
-Some of these registers are partially documented in the
-datasheet. e854 controls where the 8051 executes code from. If bit 6
-is set, it executes from SRAM, if it is cleared, to runs the Boot
-ROM. Bit 7 is not defined, but i guess it halts the 8051 when
-set. Please add some const for these. C302 is setting the CPU clock
-speed, c30A is about TX clock rate. Please try to document what you
-can using information from the datasheet.
+If you already ran DT checks and didn't see these error(s), then
+make sure dt-schema is up to date:
 
-> +
-> +        let mut j = 0x8000;
-> +        let mut a = MDIO_MMD_PCS;
-> +        for (i, val) in fw.data().iter().enumerate() {
-> +            if i == 0x4000 {
+  pip3 install dtschema --upgrade
 
-Is this was C code, i would of said use SZ_16K, to give a hint this is
-about reading the first 16K of the firmware. The device actually has
-24K of SRAM, which gets mapped into two different C45 address spaces.
-You should also add a check that the firmware does not have a total
-size of > 24K. Never trust firmware blobs.
 
-> +                a = MDIO_MMD_PHYXS;
-> +                j = 0x8000;
-> +            }
-> +            dev.c45_write(a, j, (*val).into())?;
-> +
-> +            j += 1;
-> +        }
-> +        dev.c45_write(MDIO_MMD_PCS, 0xe854, 0x0040)?;
-> +
-> +        Ok(())
-> +    }
+New warnings running 'make CHECK_DTBS=y st/stm32mp135f-dk.dtb' for 20240411143658.1049706-1-christophe.roullier@foss.st.com:
 
-  Andrew
+arch/arm/boot/dts/st/stm32mp135f-dk.dtb: adc@48003000: 'ethernet@5800e000' does not match any of the regexes: '^adc@[0-9]+$', 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/iio/adc/st,stm32-adc.yaml#
+
+
+
+
+
 
