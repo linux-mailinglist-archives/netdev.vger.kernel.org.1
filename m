@@ -1,85 +1,89 @@
-Return-Path: <netdev+bounces-87779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BF218A4952
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:47:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 031818A4967
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:53:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB9C81C20EC8
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 07:47:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4939CB2135A
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 07:53:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F32528DA4;
-	Mon, 15 Apr 2024 07:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685902C6A3;
+	Mon, 15 Apr 2024 07:53:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PDnKY8DZ"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="q4YHS8Fj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11AFD1E4A9;
-	Mon, 15 Apr 2024 07:47:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAACF28DD0;
+	Mon, 15 Apr 2024 07:53:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713167248; cv=none; b=YFTtS9JKYTDZP/sdmslv/JCtlrkik3cldg2FVBr7Qs5axn3l08ZrdAPCqCXS9a4p8/083dqN0IrdRzpl+fU4htPc50yDNWOSqMLspE1vLxVjzfq7uPsLqele4/SctMBge8CeK1puLxRCMtHj2WYYbZQUzCf1Z9N0rU5Ucl8mXKg=
+	t=1713167605; cv=none; b=Bftrst38ohshy+gJwBFi/uBU3blaI4M2S60sb44IQdGDCqVjcipcxKwY8K5ykWYqaQFHMm4wiUVUPobRVTHkUFiRDdNetOIaq1sw/6Jlhr3mEL3JlgXpXnnI4u4FjbEFET3jGFYMZJqDJl3H6TmWitBYL2Nh7bjTF/ZSRPxntmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713167248; c=relaxed/simple;
-	bh=8QxPv3JG7HGnj3cDAkE5LdRRHUgT0c9A/iFhEMvBV8U=;
+	s=arc-20240116; t=1713167605; c=relaxed/simple;
+	bh=6C9NIzF+m8a2CDD8beqRxV+bOBsa2BmfOGJBAutgECA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qhb+w3QxUk8Isz95UEKDdWEzwvEfs90KVdX3msAMqBmjZuvhtCe6kaHEDpzJPaxpUF7I3AMO9CPJvXjM320YTq0PufhQf4HLjJ+/8Yh7x4vpb3vVpSRYj90BixmE15Q3c0JYL6GjZJ1zA22vxGEh84SH6th9HMQr237y2uUFjME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PDnKY8DZ; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6ed627829e6so3166448b3a.1;
-        Mon, 15 Apr 2024 00:47:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713167246; x=1713772046; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=AlkCfQMw/u13rTL1XdVx4Wz7lR+OUDdhUc7fwOhjdwg=;
-        b=PDnKY8DZYqY9QUzAxEciYe9Oktjqfqr66cI9zCn3OI62faZ1wpA3LUQ6m1jHUVJr4b
-         AzAPcjOfwlJRsQGsVKP8VW1ky7UrXQznjsw7DdGqoyrgkZLE9d/OnF5N1gLwvAlo5pBM
-         5W4p3a2JzvmLU+mKoXNSpRKzdHjr1KbC4/K+WYZ6xhqH7zoHqpiVyVRJptmWXJEIV2dB
-         D1Ott5xowY/8rry+5u97kV5EV+E5K5VelVICWzcC4ipABl2N2QdEMwJe7jj8ETPwB8hw
-         D8rbLpb2NeSZaBiUxMfUCWFXaCGfEZD9k2m659L7qmNQQrBaD6zRiGOB7AMUTV5+YpAb
-         l6Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713167246; x=1713772046;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=AlkCfQMw/u13rTL1XdVx4Wz7lR+OUDdhUc7fwOhjdwg=;
-        b=kKEsaNHbCc3atr2ikIIh19tHthPEOegFN4wO4waTzq/UI7gxJEDyvxY3uGX6f78OSI
-         sZ04igu2nhiKa9b36xUkcjzzERxjQk2UMVkbB/APEb2NHjxb7kgWljxJy97c8fQ+vpwZ
-         s8DdSGkdUXeUIFeEzRnpuPrwRq/QNTBFuYklWX3zToAc+FSPoLHPfbdVYQwmnOOP0Ylu
-         TeSsQH/WfGxJWCEsC2FNosEmgY4z6vnLqgS+z3yOY8YtrTBKM7tb+6lZ5P9/uttZLFm6
-         KBsdJTANrQY4iDzvMh6OHeLjA/0KHRuYSTb89JVKMwbN1aq8JtpybIZU+UAkSdxea/nE
-         VE+w==
-X-Forwarded-Encrypted: i=1; AJvYcCUJRUg0lyvGp8eQ9mFbj62YKy+Y0rNbSP59h5nWtGsuWEWKrcNi8umW/OyS5Qqa9uqZq39Iix64j/K0kFocgOJrX3HNDYw+cS6nbkSftc0YQe61wEsB+sQdS09teW1wf6onhEUgOEmX
-X-Gm-Message-State: AOJu0YzwE/YYoIZdTpHgh30q4qL2ggKuB1/XIIvJGqD/PYbUTJmP+noU
-	YAVO0QTn/EK+yZ+426SGwTmrEOnjDUnBA6i34qz1SVo0syv5pXDA
-X-Google-Smtp-Source: AGHT+IE1PisHkqG3t5l6roO4HHNA95vpYSZHCK4P3IN8cxjx/g0grYyc+N3mHbpFjw0ajlBpbf1i/g==
-X-Received: by 2002:a05:6a00:ad3:b0:6ec:ea14:b829 with SMTP id c19-20020a056a000ad300b006ecea14b829mr13673934pfl.28.1713167246346;
-        Mon, 15 Apr 2024 00:47:26 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id q2-20020a056a00084200b006ead124ff9fsm6650404pfk.136.2024.04.15.00.47.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 00:47:26 -0700 (PDT)
-Date: Mon, 15 Apr 2024 15:47:21 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	mlxsw@nvidia.com, Benjamin Poirier <bpoirier@nvidia.com>
-Subject: Re: [PATCH net-next 02/10] selftests: forwarding: lib.sh: Validate
- NETIFS
-Message-ID: <ZhzbidOT7t27Zdmu@Laptop-X1>
-References: <cover.1712940759.git.petrm@nvidia.com>
- <4a7602678782a1f526bdcc895de437bebc96a695.1712940759.git.petrm@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VILgSAG52SObUlkW+nJe+hDJyaNtFq5AAjYdhBAhVGFZD2hmXklM8c97JsqY5i5lWVyWkfpu7oyrh2njKjyNqjmTS/ZVuI2Zl0SU89uXuYWcW3pjsJ6fZOHzBCQ7wMSB/BGKUzqobfs2+RleM3gemxodNDEHIEZsXLrCEobTI7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=q4YHS8Fj; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=8YIeaNZhu2VwYrI498gRkCoUAUbEjZA2ART1G/gViK0=; b=q4YHS8FjBEAnMbuDl+TMKsEKGP
+	DM6iyFt6uA7Bo5adMws5/s0t1+j9HugdPjdNQD0yCOEfV7ZoW+QC17+eG/HZdmmEoyHPU8JoOx9XL
+	7Fx3fT7PsknHnmu65yuhapSgCRz6CXa3c6A/kM7Sga97giJ17RK2CcTur3HI5Bz9lkxAWJiegTEQD
+	TRBs7jlUSsh22rwhDKkQsCKrJadSsFPPtwcG8DzvOoayr4YqBfDfQ7mNeiHohXm2HpjY17hnCJFMz
+	Wnf5Q5krVNT8G7J3KzkDXMsJA5bvEb5NAjurd+XnOU9adVQGbZMEFeMoQqJ3YmHp5tNlP8wxE1yRv
+	RKdldQfQ==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rwH8s-0000000AT0A-1En1;
+	Mon, 15 Apr 2024 07:52:44 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id E025B30040C; Mon, 15 Apr 2024 09:52:41 +0200 (CEST)
+Date: Mon, 15 Apr 2024 09:52:41 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Mike Rapoport <rppt@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Donald Dutile <ddutile@redhat.com>,
+	Eric Chanudet <echanude@redhat.com>,
+	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Puranjay Mohan <puranjay12@gmail.com>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Russell King <linux@armlinux.org.uk>, Song Liu <song@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+	bpf@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-mm@kvack.org, linux-modules@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
+	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v4 05/15] mm: introduce execmem_alloc() and execmem_free()
+Message-ID: <20240415075241.GF40213@noisy.programming.kicks-ass.net>
+References: <20240411160051.2093261-1-rppt@kernel.org>
+ <20240411160051.2093261-6-rppt@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,61 +92,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4a7602678782a1f526bdcc895de437bebc96a695.1712940759.git.petrm@nvidia.com>
+In-Reply-To: <20240411160051.2093261-6-rppt@kernel.org>
 
-On Fri, Apr 12, 2024 at 07:03:05PM +0200, Petr Machata wrote:
-> The variable should contain at least NUM_NETIFS interfaces, stored
-> as keys named "p$i", for i in `seq $NUM_NETIFS`.
-> 
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
-> Reviewed-by: Benjamin Poirier <bpoirier@nvidia.com>
-> ---
->  tools/testing/selftests/net/forwarding/lib.sh | 22 ++++++++++++++-----
->  1 file changed, 17 insertions(+), 5 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-> index 658e4e7bf4b9..3cbbc2fd4d7d 100644
-> --- a/tools/testing/selftests/net/forwarding/lib.sh
-> +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> @@ -273,11 +273,6 @@ if [[ "$REQUIRE_MTOOLS" = "yes" ]]; then
->  	require_command mreceive
->  fi
->  
-> -if [[ ! -v NUM_NETIFS ]]; then
-> -	echo "SKIP: importer does not define \"NUM_NETIFS\""
-> -	exit $ksft_skip
-> -fi
-> -
->  ##############################################################################
->  # Command line options handling
->  
-> @@ -296,6 +291,23 @@ done
->  ##############################################################################
->  # Network interfaces configuration
->  
-> +if [[ ! -v NUM_NETIFS ]]; then
-> +	echo "SKIP: importer does not define \"NUM_NETIFS\""
-> +	exit $ksft_skip
-> +fi
-> +
-> +if (( NUM_NETIFS > ${#NETIFS[@]} )); then
-> +	echo "SKIP: Importer requires $NUM_NETIFS NETIFS, but only ${#NETIFS[@]} are defined (${NETIFS[@]})"
-> +	exit $ksft_skip
-> +fi
-> +
-> +for i in $(seq ${#NETIFS[@]}); do
-> +	if [[ ! ${NETIFS[p$i]} ]]; then
-> +		echo "SKIP: NETIFS[p$i] not given"
-> +		exit $ksft_skip
-> +	fi
-> +done
-> +
->  create_netif_veth()
->  {
->  	local i
-> -- 
-> 2.43.0
-> 
+On Thu, Apr 11, 2024 at 07:00:41PM +0300, Mike Rapoport wrote:
+> +/**
+> + * enum execmem_type - types of executable memory ranges
+> + *
+> + * There are several subsystems that allocate executable memory.
+> + * Architectures define different restrictions on placement,
+> + * permissions, alignment and other parameters for memory that can be used
+> + * by these subsystems.
+> + * Types in this enum identify subsystems that allocate executable memory
+> + * and let architectures define parameters for ranges suitable for
+> + * allocations by each subsystem.
+> + *
+> + * @EXECMEM_DEFAULT: default parameters that would be used for types that
+> + * are not explcitly defined.
+> + * @EXECMEM_MODULE_TEXT: parameters for module text sections
+> + * @EXECMEM_KPROBES: parameters for kprobes
+> + * @EXECMEM_FTRACE: parameters for ftrace
+> + * @EXECMEM_BPF: parameters for BPF
+> + * @EXECMEM_TYPE_MAX:
+> + */
+> +enum execmem_type {
+> +	EXECMEM_DEFAULT,
+> +	EXECMEM_MODULE_TEXT = EXECMEM_DEFAULT,
+> +	EXECMEM_KPROBES,
+> +	EXECMEM_FTRACE,
+> +	EXECMEM_BPF,
+> +	EXECMEM_TYPE_MAX,
+> +};
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+Can we please get a break-down of how all these types are actually
+different from one another?
+
+I'm thinking some platforms have a tiny immediate space (arm64 comes to
+mind) and has less strict placement constraints for some of them?
 
