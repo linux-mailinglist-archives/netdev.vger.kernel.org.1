@@ -1,45 +1,45 @@
-Return-Path: <netdev+bounces-87822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 666198A4B99
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:37:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D672C8A4BA1
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:37:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 969A21C220DB
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:37:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 141911C20EB8
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:37:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 181F04438A;
-	Mon, 15 Apr 2024 09:36:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08CF03FE55;
+	Mon, 15 Apr 2024 09:36:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="xUsnffDB"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="xOue0+nH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC0E3FBA5
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 09:36:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE984CB23
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 09:36:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713173809; cv=none; b=F0eKh/sesMQt9vSx7YfzFXVFdNz8mT6bjlG40E+WgIrB9POFKbu8RoknX23lJ01ds5p72s9sExoIFP4ej0F1+UkzZZ9UDlSSshavjAjaNnTRBQv3MlLXy8ryVSJAfZZZFGrn0vVaursHJ1d5eM7xHLV3zcBFWmzUZcTrp3OiF3E=
+	t=1713173814; cv=none; b=PFgvSzeeuw9WIESvu/jjnskOY4iybScK9ZKEUo6pcwJJorLdVqjd/hCGy4VI1k/k7BkMgT1Yg4pzsUpcDNoO9pz1JamGVZieABzwC2r2xxOXOwLtIQ7yIIiJMdkZKbPQ7hKWIZ2GFNVTy7Bo9SSw5Dd6IPqD1wb/Iw/WPdepLKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713173809; c=relaxed/simple;
-	bh=DRV6wXNRM1lNrVgDsF8iq2gUUMKQHbCiR9s5YRFKb5I=;
+	s=arc-20240116; t=1713173814; c=relaxed/simple;
+	bh=pifj9zvhf0NyoaQdk6oGKwNjHWeqgKuoVAkufW8Lz5Y=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Dssxr4k21ks/DbVrqCe139UZsxxkXsG1v9pAwmdH5swdAFBnl9+cS0hJC+PEx32SEtyaRQXdjIhlrBN3tXk6u62d1Eif8tySga80jB4K+muOaKuZHqJQdT7qtWT3zc+fne9HD6FOew3KRR+UidClisW3xEVPpMvnBLmcZdBEAg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=xUsnffDB; arc=none smtp.client-ip=115.124.30.133
+	 MIME-Version; b=FJodJh9J50JpSazSleutuYjArxIAHrYKTki/zhvPNsWRGm5KrJoVjsR3N6XWEnzjvuW9ZrIHxBHFxO5ZMfnbq6EafYHwhM3jLsJQySDPow8KUR5zI5fajC+divw9RCqqY8r7INJlp/RdlssYZTqpJN2DZv0BOPPWgQ0Vfigv4iI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=xOue0+nH; arc=none smtp.client-ip=115.124.30.132
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1713173803; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=lUJhBDWdgCHqmNJ+6H8gmi8bjqVhnK1FxycIphyKCaQ=;
-	b=xUsnffDBSSSxUqeDVtdvLDtVJMit5r1OVOqK4RdI3XqftcJJRe0DHJAYuzxKcSRk7vv0yoS3KfJpp+hSVVSgI7TF8Guk7cZDQ2GG8Fy/sDU+Ks8o6Wb3tEPfrN41oOHryWloyMAiAC12YvBiYprZKx2ZfPFJxty0D0mmNgObIvc=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W4aM2wU_1713173802;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W4aM2wU_1713173802)
+	t=1713173804; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=GrUJ4m+2Is21O/yU23bw1HcAP+yiVjU6m9CC3U+gc+s=;
+	b=xOue0+nHZxuuXAicwylcRvm/Ebpmvrp3xf5ibSfL4pmy/eB7vRr4Qps83hQnjQmW4VOeIwKjSVugmjfh9tdb8UBvRzySGTWtJYZn0L6Y/Ew23crukoddU23vNcEzqc9fovPcbEawFHsLrG4hE+MmEMVsToQVC22iuMDGZ7TR3Ko=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R631e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W4ZzP6h_1713173803;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W4ZzP6h_1713173803)
           by smtp.aliyun-inc.com;
-          Mon, 15 Apr 2024 17:36:43 +0800
+          Mon, 15 Apr 2024 17:36:44 +0800
 From: Heng Qi <hengqi@linux.alibaba.com>
 To: netdev@vger.kernel.org,
 	virtualization@lists.linux.dev
@@ -53,9 +53,9 @@ Cc: Jakub Kicinski <kuba@kernel.org>,
 	Ratheesh Kannoth <rkannoth@marvell.com>,
 	Alexander Lobakin <aleksander.lobakin@intel.com>,
 	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: [PATCH net-next v7 3/4] virtio-net: refactor dim initialization/destruction
-Date: Mon, 15 Apr 2024 17:36:37 +0800
-Message-Id: <20240415093638.123962-4-hengqi@linux.alibaba.com>
+Subject: [PATCH net-next v7 4/4] virtio-net: support dim profile fine-tuning
+Date: Mon, 15 Apr 2024 17:36:38 +0800
+Message-Id: <20240415093638.123962-5-hengqi@linux.alibaba.com>
 X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 In-Reply-To: <20240415093638.123962-1-hengqi@linux.alibaba.com>
 References: <20240415093638.123962-1-hengqi@linux.alibaba.com>
@@ -67,107 +67,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Extract the initialization and destruction actions
-of dim for use in the next patch.
+Virtio-net has different types of back-end device implementations.
+In order to effectively optimize the dim library's gains for
+different device implementations, let's use the new interface
+params to fine-tune the profile list.
+
+Since the profile now exists in netdevice, adding a function similar
+to net_dim_get_rx_moderation_dev() with netdevice as argument is
+nice, but this would be better along with cleaning up the rest of
+the drivers, which we can get to very soon after this set.
 
 Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
 ---
- drivers/net/virtio_net.c | 38 +++++++++++++++++++++++++++-----------
- 1 file changed, 27 insertions(+), 11 deletions(-)
+ drivers/net/virtio_net.c | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index c22d1118a133..e8fbee204bf0 100644
+index e8fbee204bf0..f31c27ad3f85 100644
 --- a/drivers/net/virtio_net.c
 +++ b/drivers/net/virtio_net.c
-@@ -2274,6 +2274,13 @@ static int virtnet_enable_queue_pair(struct virtnet_info *vi, int qp_index)
- 	return err;
- }
+@@ -3584,7 +3584,7 @@ static void virtnet_rx_dim_work(struct work_struct *work)
+ 		if (!rq->dim_enabled)
+ 			continue;
  
-+static void virtnet_dim_clean(struct virtnet_info *vi,
-+			      int start_qnum, int end_qnum)
-+{
-+	for (; start_qnum <= end_qnum; start_qnum++)
-+		cancel_work_sync(&vi->rq[start_qnum].dim.work);
-+}
-+
- static int virtnet_open(struct net_device *dev)
+-		update_moder = net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
++		update_moder = dev->moderation->rx_eqe_profile[dim->profile_ix];
+ 		if (update_moder.usec != rq->intr_coal.max_usecs ||
+ 		    update_moder.pkts != rq->intr_coal.max_packets) {
+ 			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, qnum,
+@@ -3868,7 +3868,8 @@ static int virtnet_set_rxnfc(struct net_device *dev, struct ethtool_rxnfc *info)
+ 
+ static const struct ethtool_ops virtnet_ethtool_ops = {
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_MAX_FRAMES |
+-		ETHTOOL_COALESCE_USECS | ETHTOOL_COALESCE_USE_ADAPTIVE_RX,
++		ETHTOOL_COALESCE_USECS | ETHTOOL_COALESCE_USE_ADAPTIVE_RX |
++		ETHTOOL_COALESCE_RX_EQE_PROFILE,
+ 	.get_drvinfo = virtnet_get_drvinfo,
+ 	.get_link = ethtool_op_get_link,
+ 	.get_ringparam = virtnet_get_ringparam,
+@@ -4424,6 +4425,7 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+ 
+ static void virtnet_dim_init(struct virtnet_info *vi)
  {
- 	struct virtnet_info *vi = netdev_priv(dev);
-@@ -2297,11 +2304,9 @@ static int virtnet_open(struct net_device *dev)
- err_enable_qp:
- 	disable_delayed_refill(vi);
- 	cancel_delayed_work_sync(&vi->refill);
--
--	for (i--; i >= 0; i--) {
-+	virtnet_dim_clean(vi, 0, i - 1);
-+	for (i--; i >= 0; i--)
- 		virtnet_disable_queue_pair(vi, i);
--		cancel_work_sync(&vi->rq[i].dim.work);
--	}
- 
- 	return err;
- }
-@@ -2466,7 +2471,7 @@ static int virtnet_rx_resize(struct virtnet_info *vi,
- 
- 	if (running) {
- 		napi_disable(&rq->napi);
--		cancel_work_sync(&rq->dim.work);
-+		virtnet_dim_clean(vi, qindex, qindex);
- 	}
- 
- 	err = virtqueue_resize(rq->vq, ring_num, virtnet_rq_unmap_free_buf);
-@@ -2716,10 +2721,9 @@ static int virtnet_close(struct net_device *dev)
- 	/* Make sure refill_work doesn't re-enable napi! */
- 	cancel_delayed_work_sync(&vi->refill);
- 
--	for (i = 0; i < vi->max_queue_pairs; i++) {
-+	virtnet_dim_clean(vi, 0, vi->max_queue_pairs - 1);
-+	for (i = 0; i < vi->max_queue_pairs; i++)
- 		virtnet_disable_queue_pair(vi, i);
--		cancel_work_sync(&vi->rq[i].dim.work);
--	}
- 
- 	return 0;
- }
-@@ -4418,6 +4422,19 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
- 	return ret;
- }
- 
-+static void virtnet_dim_init(struct virtnet_info *vi)
-+{
-+	int i;
-+
-+	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-+		return;
-+
-+	for (i = 0; i < vi->max_queue_pairs; i++) {
-+		INIT_WORK(&vi->rq[i].dim.work, virtnet_rx_dim_work);
-+		vi->rq[i].dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
-+	}
-+}
-+
- static int virtnet_alloc_queues(struct virtnet_info *vi)
- {
++	struct netdev_profile_moder *moder = vi->dev->moderation;
  	int i;
-@@ -4445,9 +4462,6 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
- 					 virtnet_poll_tx,
- 					 napi_tx ? napi_weight : 0);
  
--		INIT_WORK(&vi->rq[i].dim.work, virtnet_rx_dim_work);
--		vi->rq[i].dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
--
- 		sg_init_table(vi->rq[i].sg, ARRAY_SIZE(vi->rq[i].sg));
- 		ewma_pkt_len_init(&vi->rq[i].mrg_avg_pkt_len);
- 		sg_init_table(vi->sq[i].sg, ARRAY_SIZE(vi->sq[i].sg));
-@@ -4855,6 +4869,8 @@ static int virtnet_probe(struct virtio_device *vdev)
- 
- 	virtio_device_ready(vdev);
- 
-+	virtnet_dim_init(vi);
+ 	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
+@@ -4433,6 +4435,8 @@ static void virtnet_dim_init(struct virtnet_info *vi)
+ 		INIT_WORK(&vi->rq[i].dim.work, virtnet_rx_dim_work);
+ 		vi->rq[i].dim.mode = DIM_CQ_PERIOD_MODE_START_FROM_EQE;
+ 	}
 +
- 	_virtnet_set_queues(vi, vi->curr_queue_pairs);
++	moder->flags |= NETDEV_PROFILE_USEC | NETDEV_PROFILE_PKTS;
+ }
  
- 	/* a random MAC address has been assigned, notify the device.
+ static int virtnet_alloc_queues(struct virtnet_info *vi)
 -- 
 2.32.0.3.g01195cf9f
 
