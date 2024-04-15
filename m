@@ -1,80 +1,68 @@
-Return-Path: <netdev+bounces-88120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E6848A5D3D
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 23:52:49 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 972F68A5D91
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 00:01:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6A2FB22A75
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 21:52:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD5B9B21717
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 22:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C098157485;
-	Mon, 15 Apr 2024 21:52:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50396157469;
+	Mon, 15 Apr 2024 22:01:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Wjy4UwB3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aQqGKOIl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2093F157482
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 21:52:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D411EF1A
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 22:01:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713217965; cv=none; b=l+UlQzMDIM0i9BnVj41ANvc2ZGQT4Hb/Hx0oDGhIv/5Lpa3dCGZh3kEcEitY7PscYp+4kUydMrd2wW2BSuEDIPrE1hZ6cznQSTSTanBcIMAn1gUGboV6zjE5bLUxJT7w3BPPB1hZJH/FG3UrkgDjh9whAQXqQ0cd1mggVDdVL9g=
+	t=1713218498; cv=none; b=gWgfzQuEwYPuwMvENBJukioiwLBoHxiQvOtLES7IYDTURz7llUoTLmhMdsC1eUTo0Ly1UsmvpJ4Y8DqCeUEb5aQAE3L6HwkPs1Io4mppk6Mii9E/RFIi7C4dtQ9JJ/FP3/HnBdz9grdNmxh/4JMtUl5zAeGlmpm8ICxE/YtUXNA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713217965; c=relaxed/simple;
-	bh=s6S5vArFfLeA1n6AEe08Vc+YXvCyTe3w6saiJgf3DZA=;
+	s=arc-20240116; t=1713218498; c=relaxed/simple;
+	bh=bW9EzUyhI10jDFnEI2uldiJZ2Dvu5+J4hxKw5N3LNQw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V73IXLdCK0Ua4ChSTklRMFsJYy+daFyPeuEhKhr03G4IttY8g6RwlycYCy778SFqaCiyLfI5UwjtR8PoWo6ZLvgKBlGP606YP6iQek7UHwdpA/KmykvVg5J+QomXiOysT3ZxdwRbMEEUTZ7rsfKP3Y/YLncvtJRvsvs5EyMlmD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Wjy4UwB3; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1e3ca546d40so26206985ad.3
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 14:52:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1713217962; x=1713822762; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lLqM4sU5bpj7q4IRaybWHZrQDnGfSBFI/jBhVVNs2QY=;
-        b=Wjy4UwB3yoAZXnbX9umQZkHsTb9vwaoyeTa3zr/pe3JZj/wd77zg32KT2PmeZ9tGGW
-         Z/JdeIAXmZimXGOKse1+5k7wadRWVhe0xsFRiytgfIgZGDntWkv3CQojBK+rpUwaQzyS
-         ZVM+srL/CFZ7iahczIdlSciPSvy+MZeEpnEHq9QWXiIjkS5b0NPkdkmH1nMfJRVWHCST
-         /nPnK9j/78CWJKSM9MXj9czV2oINKdWA7iOkCNeCiQc8vFYTXV4ov9ichqaa+aEjL4UA
-         qJU9Oxfo4wcvY0PA1W299S/Jcf/geuyJ1Adst0QFoNMdTid0qhmy27/aVJB6vDjy+GyT
-         vxVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713217962; x=1713822762;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lLqM4sU5bpj7q4IRaybWHZrQDnGfSBFI/jBhVVNs2QY=;
-        b=U7m0juVVT3WzdZdJczGrFBSO14PD5Q15J5OhLjlgtE84AxttGG1IdIMyb8dtnnTEH+
-         GcLRvhRIOgBihvI5bhX0SfdKdsDJ0RTQr9DnDdaeBChyokx7VkPCBP/3lGs7Th38rTC9
-         nXmWOVdmPkT5YoKqOh6iia9UghL7tCW11Ov5Xi9rSLM7+nXWza4/MAQRi66Ej3tanIei
-         /PI1MiLEXBd51p7WZbtRx7e14U7L4Fi5ey34D5lYQLyrMphh3qgG1+qLCtK6RID0Ior5
-         r056ujYjDV+KdnlVvr5CJBHIA4W7NbewMK2hLBuE1q53iCHDtmGKcH2bk/dLBCFfSx3N
-         GcQw==
-X-Gm-Message-State: AOJu0YyHQ+TfP6vLYoHphBV6caOGBnDdAXy0Uciv8DTrrpZdA/6Y8luu
-	C1Flf6BYqZe7Ss5l+PRZfaIeK3Z77lus62iUXcGorQCLj9++X1MrUJyldPg52Mo=
-X-Google-Smtp-Source: AGHT+IEP7wv690ahr7S0tQIuoZ0yi7Bi2TZUHydZS1gVbuGe9tCCrfcchoh855wdh3BdNhwB+amKUA==
-X-Received: by 2002:a17:903:1cd:b0:1e3:dd66:58e1 with SMTP id e13-20020a17090301cd00b001e3dd6658e1mr14513622plh.44.1713217962279;
-        Mon, 15 Apr 2024 14:52:42 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id m7-20020a1709026bc700b001dd69aca213sm8378848plt.270.2024.04.15.14.52.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 14:52:42 -0700 (PDT)
-Date: Mon, 15 Apr 2024 14:52:38 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-Cc: netdev@vger.kernel.org, dsahern@gmail.com
-Subject: Re: [PATCH iproute2-next v2 2/2] f_flower: implement pfcp opts
-Message-ID: <20240415145238.0f5286a3@hermes.local>
-In-Reply-To: <20240415125000.12846-3-wojciech.drewek@intel.com>
-References: <20240415125000.12846-1-wojciech.drewek@intel.com>
-	<20240415125000.12846-3-wojciech.drewek@intel.com>
+	 MIME-Version:Content-Type; b=HEgqQFRNXtQo6pjUc/Aa+1wo4MHPZDOmqCmjOqKMlwc8iwwHoP9IRZ2os6Mn2jOGiH0R4ToURV7RqrEX696bhvXVYl6Wh+Vi7QrzWrwLiDW4laRj/2LJdR/8IU/TfqhLPTG+wj2eaWG6KuvEaYsZg/faKOSfY9pmIYg9T9FtC9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aQqGKOIl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 762C2C113CC;
+	Mon, 15 Apr 2024 22:01:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713218497;
+	bh=bW9EzUyhI10jDFnEI2uldiJZ2Dvu5+J4hxKw5N3LNQw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=aQqGKOIl/KyLK+lp1holmzO/cCNebY7/4D4zmxpOHQ4SWj4PDs54NZyOsLGdgB7AL
+	 h240PlywQSJF6hI/7PHMo2gClcLrVQ6szbBGHUnhQr56muNboatdgSQ3jHJ/Grk5ut
+	 lUpl6DymNp7HOadydJglYnzGSCi76pewsYcLjN09mvozxBkmHHULpCwsWidV5h5jAw
+	 paXXcNi/RzTO+wqxXVSmLcEiquApB8kY4Q84TH3giG7cQ6b9hVUoMQrbDHCQavC8LO
+	 8QmRhMfMhZmbNeXO2n1Wi2T7kzDOAl5A7rOwn9IxAYXMYVxJAef5C/eIy0svw3R6kU
+	 Dzoxk9vyxg9oQ==
+Date: Mon, 15 Apr 2024 15:01:36 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>, netdev@vger.kernel.org, Alexander
+ Duyck <alexanderduyck@fb.com>, davem@davemloft.net, pabeni@redhat.com
+Subject: Re: [net-next PATCH 13/15] eth: fbnic: add basic Rx handling
+Message-ID: <20240415150136.337ada44@kernel.org>
+In-Reply-To: <CAKgT0Ud366SsaLftQ6Gd4hg+MW9VixOhG9nA9pa4VKh0maozBg@mail.gmail.com>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+	<171217496013.1598374.10126180029382922588.stgit@ahduyck-xeon-server.home.arpa>
+	<41a39896-480b-f08d-ba67-17e129e39c0f@huawei.com>
+	<CAKgT0Uf6MdYX_1OuAFAXadh86zDX_w1a_cwpoPGMxpmC4hGyEA@mail.gmail.com>
+	<53b80db6-f2bc-d824-ea42-4b2ac64625f2@huawei.com>
+	<CAKgT0UeQS5q=Y2j3mmu9AhWyUMbey-iFL+sKES1UrBtoAXMdzw@mail.gmail.com>
+	<0e5e3196-ca2f-b905-a6ba-7721e8586ed7@huawei.com>
+	<CAKgT0UeRWsJ+NiniSKa7Z3Law=QrYZp3giLAigJf7EvuAbjkRA@mail.gmail.com>
+	<bf070035-ba9c-d028-1b11-72af8651f979@huawei.com>
+	<CAKgT0UccovDVS8-TPXxgGbrTAqpeVHRQuCwf7f2qkfcPaPOA-A@mail.gmail.com>
+	<20240415101101.3dd207c4@kernel.org>
+	<CAKgT0UcGN3-6R4pt8BQv2hD04oYk48GfFs1O_UGChvrrFT5eCw@mail.gmail.com>
+	<20240415111918.340ebb98@kernel.org>
+	<CAKgT0Ud366SsaLftQ6Gd4hg+MW9VixOhG9nA9pa4VKh0maozBg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,37 +72,50 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 15 Apr 2024 14:50:00 +0200
-Wojciech Drewek <wojciech.drewek@intel.com> wrote:
+On Mon, 15 Apr 2024 11:55:37 -0700 Alexander Duyck wrote:
+> It would take a few more changes to make it all work. Basically we
+> would need to map the page into every descriptor entry since the worst
+> case scenario would be that somehow we end up with things getting so
+> tight that the page is only partially mapped and we are working
+> through it as a subset of 4K slices with some at the beginning being
+> unmapped from the descriptor ring while some are still waiting to be
+> assigned to a descriptor and used. What I would probably have to look
+> at doing is adding some sort of cache on the ring to hold onto it
+> while we dole it out 4K at a time to the descriptors. Either that or
+> enforce a hard 16 descriptor limit where we have to assign a full page
+> with every allocation meaning we are at a higher risk for starving the
+> device for memory.
 
-> 	} else if (key_tb[TCA_FLOWER_KEY_ENC_OPTS_PFCP]) {
-> +		flower_print_pfcp_opts("pfcp_opt_key",
-> +				key_tb[TCA_FLOWER_KEY_ENC_OPTS_PFCP],
-> +				key, len);
-> +
-> +		if (msk_tb[TCA_FLOWER_KEY_ENC_OPTS_PFCP])
-> +			flower_print_pfcp_opts("pfcp_opt_mask",
-> +				msk_tb[TCA_FLOWER_KEY_ENC_OPTS_PFCP],
-> +				msk, len);
-> +
-> +		flower_print_enc_parts(name, "  pfcp_opts %s", attr, key,
-> +				       msk);
->  	}
+Hm, that would be more work, indeed, but potentially beneficial. I was
+thinking of separating the page allocation and draining logic a bit
+from the fragment handling logic.
 
-I find the output with pfcp_opt_key and pfcp_opt_mask encoded as hex,
-awkward when JSON.
+#define RXPAGE_IDX(idx)		((idx) >> PAGE_SHIFT - 12)
 
-The JSON output would be more logical as something like:
+in fbnic_clean_bdq():
 
-	"pfcp" : {
-		"mask": {
-			"type": 0x0000,
-			"seid": 0x1,
-		},
-		"key": {
-			"type": 0x10,
-			"seid": 0x11,
-		}
-	}
+	while (RXPAGE_IDX(head) != RXPAGE_IDX(hw_head))
 
+refer to rx_buf as:
+
+	struct fbnic_rx_buf *rx_buf = &ring->rx_buf[idx >> LOSE_BITS];
+
+Refill always works in batches of multiple of PAGE_SIZE / 4k.
+
+> The bigger issue would be how could we test it? This is an OCP NIC and
+> as far as I am aware we don't have any systems available that would
+> support a 64K page. I suppose I could rebuild the QEMU for an
+> architecture that supports 64K pages and test it. It would just be
+> painful to have to set up a virtual system to test code that would
+> literally never be used again. I am not sure QEMU can generate enough
+> stress to really test the page allocator and make sure all corner
+> cases are covered.
+
+The testing may be tricky. We could possibly test with hacking up the
+driver to use compound pages (say always allocate 16k) and making sure
+we don't refer to PAGE_SIZE directly in the test.
+
+BTW I have a spreadsheet of "promises", I'd be fine if we set a
+deadline for FBNIC to gain support for PAGE_SIZE != 4k and Kconfig 
+to x86-only for now..
 
