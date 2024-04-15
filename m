@@ -1,102 +1,342 @@
-Return-Path: <netdev+bounces-88069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4583A8A58DC
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 19:13:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1819A8A590C
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 19:23:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A54FB282430
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:13:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63FE4B21058
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:23:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1BE82862;
-	Mon, 15 Apr 2024 17:11:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10BE5839E0;
+	Mon, 15 Apr 2024 17:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eIasiNnX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bwFWhG1T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47CA7811EB
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 17:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48AE48289E
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 17:23:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713201063; cv=none; b=kNebsxpCsFl+fiziGWHLug++ztWxbONjf6KKG1EZgOoaeXReSzPYWRJyufx3Q8DsMkiE3WNkq1GgmrDNJrQw9Qn4+KKlgxZDGS3u5N6E16/Aqs39k3/V2ruyfqplAYs7xBkTeRyAVfaAX9URE8Iw4z10Lh+Asz55kV8o7LFYHA0=
+	t=1713201829; cv=none; b=tZQkjyYSpnXuWr2xjgSWnrbtg55roJ/AwoHYlKT+bda2Z62cXMF+za+VQ65xvAiXKnPyGie64SOkj+GxQGnKdzYWTZbsdWMwlh3kxKztjtnW3O/EAxS8KIJ4rAhpVsO3dw2UQjxj/j0qmyRMlDtWDa96LtXcj6pcVcDJKClUxSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713201063; c=relaxed/simple;
-	bh=rdemyd14lAu4jmBNfIfrIRGyaRWg60bezAiN0bweEQs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QD6Yd9OM4KiuQuqa066nypAEMolSy/yLyzej1SD8F5gThgAEn+zSyQGi2BjbwkYn1AmA01UhkWf9Dwf0K+wFoI2CNCIRRbl6ZSKDZoiAbJl6GVIA5+NTIYWheiA54AY/Q5jco1K9LeVE8VG2qxElGy+M8v4F6uMHU0/Zp4qyZO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eIasiNnX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95346C113CC;
-	Mon, 15 Apr 2024 17:11:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713201062;
-	bh=rdemyd14lAu4jmBNfIfrIRGyaRWg60bezAiN0bweEQs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eIasiNnXv1bl+oIxk2vR7h/qYa4jEs3HFcqCjy3M/RZkVAjrYYPyBBv+Leq57q95q
-	 Rbndpc4gyJXuhmxW5+y2CkFUCiSgk5IS9nD2W5wuZrEDVhPWIBkwExFRqp9pIBWbY2
-	 3F90y9VmDiz/6LGYjGqIS4Tc2dLhpC7TMlrAY4gSfPC+F89WOrSSuZ9trXULWk6+Fk
-	 10IgDdstNoAoibEXblV19+yo+MoFr0/0/SYnM3vspXmVpCn5CItnrvQtmeaoC1oAFv
-	 Q5LrsxmVwjB/ofzK2NS3f0IL93CSzuiWJIz3pORk4gtoHoNGfyFOSraPr+QyCKJr7I
-	 1Q7fMc4Wirr0g==
-Date: Mon, 15 Apr 2024 10:11:01 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>, netdev@vger.kernel.org, Alexander
- Duyck <alexanderduyck@fb.com>, davem@davemloft.net, pabeni@redhat.com
-Subject: Re: [net-next PATCH 13/15] eth: fbnic: add basic Rx handling
-Message-ID: <20240415101101.3dd207c4@kernel.org>
-In-Reply-To: <CAKgT0UccovDVS8-TPXxgGbrTAqpeVHRQuCwf7f2qkfcPaPOA-A@mail.gmail.com>
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
-	<171217496013.1598374.10126180029382922588.stgit@ahduyck-xeon-server.home.arpa>
-	<41a39896-480b-f08d-ba67-17e129e39c0f@huawei.com>
-	<CAKgT0Uf6MdYX_1OuAFAXadh86zDX_w1a_cwpoPGMxpmC4hGyEA@mail.gmail.com>
-	<53b80db6-f2bc-d824-ea42-4b2ac64625f2@huawei.com>
-	<CAKgT0UeQS5q=Y2j3mmu9AhWyUMbey-iFL+sKES1UrBtoAXMdzw@mail.gmail.com>
-	<0e5e3196-ca2f-b905-a6ba-7721e8586ed7@huawei.com>
-	<CAKgT0UeRWsJ+NiniSKa7Z3Law=QrYZp3giLAigJf7EvuAbjkRA@mail.gmail.com>
-	<bf070035-ba9c-d028-1b11-72af8651f979@huawei.com>
-	<CAKgT0UccovDVS8-TPXxgGbrTAqpeVHRQuCwf7f2qkfcPaPOA-A@mail.gmail.com>
+	s=arc-20240116; t=1713201829; c=relaxed/simple;
+	bh=j8Ejk7XlN8U0gLFQ+w52S6Yoi2F5YcV3bmne30m1U5Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tdW22kRGS72+yAI7BlfaRASui+152ZdAIKGgyqxuLk9S1PZ5SR2k12w6d2+Jt3Nx2Q9HOlnZTFq/UjwMEsOPfggKYqj/GD45HIzvwTqT0iByUsfxgePqAlXn2M9JmSfVAXU/ulxyDgtlCPRks1V84s4BGGcZXIC82AZnA1lTA3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bwFWhG1T; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-345b857d7adso2604503f8f.1
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 10:23:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713201826; x=1713806626; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jE1nSU8HKB2kPpF0hmGiIYOASbvx15IOwyQmsslpiPc=;
+        b=bwFWhG1TchWH8jyyyKykDA9PLI4eCsju12tUOX6igme5XAKUR4SmiDXa8jDwfXEjxw
+         nZEp2ozHki/c9GH1YxhgQLSl+vXmViJydy8VoJ0gaGJmFYh/vyhXYf1W+qCJjd1iww6p
+         ORafROfGVlULIkj1wv5hDk/n6RLcU1Nsc9EVpY6OOB2aK5dcFF+oPKoOHz7EoWk7WodT
+         CZ/O1ytgWnrVGXOLuY3CHeP5G8Hij9OPP14ip+qPIoQkdH8mul8BjvwlaLR+y7MEQGNo
+         jXFWWJIaWk7F957hI7N37p/CS3u0yv1XFQiwqzHRbdsDjDY8UivQ81/5yhwUwevhvoUW
+         5LzQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713201826; x=1713806626;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jE1nSU8HKB2kPpF0hmGiIYOASbvx15IOwyQmsslpiPc=;
+        b=YlnQEp9HQ18Zpssm4h39VPbKJ/yIl0vlW2Esjt9xPxW5TBeYlnzNUP8Aov81lp+UyJ
+         AoRkPFuOce+xEHgTK0NQVwwlVuY1corzYVU9y5gPzbCoGmBiLnGLu/OSc2G95TOnW+aF
+         kJN44SknXmTldOBtAbaZCI/8NB99razXfs40btpf9aebHuB6+HP02OPBSzrbThOovAG9
+         Razh6sO0YN4wK1Jg4W60rbeS4MXEa7GCjhcFSXtJG7TaRW8BtgpWncofUHzurtaBbKxT
+         jySHfROWmJSRhc2PgRXby83X4riSxnnuZmcmnxzyGNOargk+Ac/USC1yJpDIae5RAPBK
+         L+kQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX+IsuexaQLqvDbQ2UrslPTbw/rboiaPpe0giUD98QzwNTP6qQRJKt8e2dkK88sDaJdUxF9rJkfKZmrWQKGIfA0JLgic89U
+X-Gm-Message-State: AOJu0YzOaDrktBxmxjz42ter7uDEowafTzx6xw031Q5FN3CN8BgQ/AIf
+	rqYZxeGxTZb3GYqkGS+ess9ZwvMDyb0+vrmdJ4AmdL8g8QNgcMoSX/6DsSM9v0PfSL6X2hZCh88
+	f1lm8yr/E5T94s/sDqzTCpeHN49TLKlaEdLgk
+X-Google-Smtp-Source: AGHT+IFu1DphvQ5XdgKRE8jIoGSzGoHMBn4Thm2CBrA3RTBYwGVlKoK1XPZOMza9XiN0iD2wW3sl5UOWFegP9uT3qfU=
+X-Received: by 2002:a5d:58c2:0:b0:343:6704:93b7 with SMTP id
+ o2-20020a5d58c2000000b00343670493b7mr7716459wrf.59.1713201825453; Mon, 15 Apr
+ 2024 10:23:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <CAMuE1bHBky9NGP22PVHKdi2+WniwxiLSmMnwRM6wm36sU8W4jA@mail.gmail.com>
+ <878r29hjds.ffs@tglx> <CAMuE1bF9ioo39_08Eh26X4WOtnvJ1geJ=WRVt5DhU8gEbYJNdA@mail.gmail.com>
+ <87o7asdd65.ffs@tglx> <CAF2d9jjA8iM1AoPUhQPK62tdd7gPnCnt51f_NMhOAs546rU3dA@mail.gmail.com>
+ <87il10ce1g.ffs@tglx> <CAF2d9jj6km7aVSqgcOE-b-A-WDH2TJNGzGy-5MRyw5HrzbqhaA@mail.gmail.com>
+ <877chfcrx3.ffs@tglx> <CAF2d9jjg0PEgPorXdrBHVkvz-fmUV7UXUPqnpQGVEvgXTpHY0A@mail.gmail.com>
+ <871q7md0ak.ffs@tglx> <CAF2d9jikELOQa_9Kk+oF_=_7NZTn9DuAw=s9KQR6-EfWTiW5RQ@mail.gmail.com>
+ <CAMuE1bFkmj70DO66PfvBPjM1d_JDEwTkOyz6o6wO_C0uyJ_0zw@mail.gmail.com>
+ <CAF2d9jj-kwmP+LWBBmU41Yhpmc0zE1w9UAoRHj=j-wLBSOwU5Q@mail.gmail.com> <CAMuE1bFomKFTz+E9=4=F8r0DOoPdjZYt4ofubJgXGP0rpEjnqA@mail.gmail.com>
+In-Reply-To: <CAMuE1bFomKFTz+E9=4=F8r0DOoPdjZYt4ofubJgXGP0rpEjnqA@mail.gmail.com>
+From: =?UTF-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS14KS+4KSwKQ==?= <maheshb@google.com>
+Date: Mon, 15 Apr 2024 10:23:17 -0700
+Message-ID: <CAF2d9jg0X_HKSZbiwPTEXdmrhY49D1zfT3Q4xzNAqv1z+TYXtA@mail.gmail.com>
+Subject: Re: [PATCH v7] posix-timers: add clock_compare system call
+To: Sagi Maimon <maimon.sagi@gmail.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, richardcochran@gmail.com, luto@kernel.org, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, arnd@arndb.de, geert@linux-m68k.org, peterz@infradead.org, 
+	hannes@cmpxchg.org, sohil.mehta@intel.com, rick.p.edgecombe@intel.com, 
+	nphamcs@gmail.com, palmer@sifive.com, keescook@chromium.org, 
+	legion@kernel.org, mark.rutland@arm.com, mszeredi@redhat.com, 
+	casey@schaufler-ca.com, reibax@gmail.com, davem@davemloft.net, 
+	brauner@kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, 
+	linux-arch@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 15 Apr 2024 08:03:38 -0700 Alexander Duyck wrote:
-> > > The advantage of being a purpose built driver is that we aren't
-> > > running on any architectures where the PAGE_SIZE > 4K. If it came to  
+On Sun, Apr 14, 2024 at 5:22=E2=80=AFAM Sagi Maimon <maimon.sagi@gmail.com>=
+ wrote:
+>
+> On Thu, Apr 11, 2024 at 7:34=E2=80=AFPM Mahesh Bandewar (=E0=A4=AE=E0=A4=
+=B9=E0=A5=87=E0=A4=B6 =E0=A4=AC=E0=A4=82=E0=A4=A1=E0=A5=87=E0=A4=B5=E0=A4=
+=BE=E0=A4=B0)
+> <maheshb@google.com> wrote:
 > >
-> > I am not sure if 'being a purpose built driver' argument is strong enough
-> > here, at least the Kconfig does not seems to be suggesting it is a purpose
-> > built driver, perhaps add a 'depend on' to suggest that?  
-> 
-> I'm not sure if you have been following the other threads. One of the
-> general thoughts of pushback against this driver was that Meta is
-> currently the only company that will have possession of this NIC. As
-> such Meta will be deciding what systems it goes into and as a result
-> of that we aren't likely to be running it on systems with 64K pages.
+> > On Thu, Apr 11, 2024 at 12:11=E2=80=AFAM Sagi Maimon <maimon.sagi@gmail=
+.com> wrote:
+> > >
+> > > Hi Mahesh
+> > > What is the status of your patch?
+> > > if your patch is upstreamed , then it will have all I need.
+> > > But, If not , I will upstream my patch.
+> > > BR,
+> > >
+> > Hi Sagi,
+> >
+> > If you want to pursue the syscall option, then those are tangential
+> > and please go ahead. (I cannot stop you!)
+> > I'm interested in getting the "tight sandwich timestamps" that
+> > gettimex64() ioctl offers and I would want enhancements to
+> > gettimex64() done the way it was discussed in the later half of this
+> > thread. If you want to sign-up for that please let me know.
+> Hi Mahesh
+> I do need to modify the  PTP_SYS_OFFSET_EXTENDED ioctl for cases which
+> gettimex64
+> not supported by the driver (look at Thomas suggestion), but I need
+> your changes in ptp_read_system_prets.
+> I like to add my changes above your changes, so we won't do duplicate wor=
+k.
+> please show me your latest patch and the status of it
+> Once you have upstream yours , I will add my changes on the next patch.
 
-Didn't take long for this argument to float to the surface..
+OK, in that case let me post the patch since your changes would need
+pieces from it.
 
-We tried to write some rules with Paolo but haven't published them, yet.
-Here is one that may be relevant:
+thanks,
+--mahesh..
 
-  3. External contributions
-  -------------------------
-
-  Owners of drivers for private devices must not exhibit a stronger
-  sense of ownership or push back on accepting code changes from
-  members of the community. 3rd party contributions should be evaluated
-  and eventually accepted, or challenged only on technical arguments
-  based on the code itself. In particular, the argument that the owner
-  is the only user and therefore knows best should not be used.
-
-Not exactly a contribution, but we predicted the "we know best"
-tone of the argument :(
+> BR
+> Sagi
+>
+> >
+> > thanks,
+> > --mahesh..
+> >
+> >
+> > > On Thu, Apr 11, 2024 at 5:56=E2=80=AFAM Mahesh Bandewar (=E0=A4=AE=E0=
+=A4=B9=E0=A5=87=E0=A4=B6 =E0=A4=AC=E0=A4=82=E0=A4=A1=E0=A5=87=E0=A4=B5=E0=
+=A4=BE=E0=A4=B0)
+> > > <maheshb@google.com> wrote:
+> > > >
+> > > > On Wed, Apr 3, 2024 at 6:48=E2=80=AFAM Thomas Gleixner <tglx@linutr=
+onix.de> wrote:
+> > > > >
+> > > > > On Tue, Apr 02 2024 at 16:37, Mahesh Bandewar (=E0=A4=AE=E0=A4=B9=
+=E0=A5=87=E0=A4=B6 =E0=A4=AC=E0=A4=82=E0=A4=A1=E0=A5=87=E0=A4=B5=E0=A4=BE=
+=E0=A4=B0) wrote:
+> > > > > > On Tue, Apr 2, 2024 at 3:37=E2=80=AFPM Thomas Gleixner <tglx@li=
+nutronix.de> wrote:
+> > > > > > The modification that you have proposed (in a couple of posts b=
+ack)
+> > > > > > would work but it's still not ideal since the pre/post ts are n=
+ot
+> > > > > > close enough as they are currently  (properly implemented!)
+> > > > > > gettimex64() would have. The only way to do that would be to ha=
+ve
+> > > > > > another ioctl as I have proposed which is a superset of current
+> > > > > > gettimex64 and pre-post collection is the closest possible.
+> > > > >
+> > > > > Errm. What I posted as sketch _is_ using gettimex64() with the ex=
+tra
+> > > > > twist of the flag vs. a clockid (which is an implementation detai=
+l) and
+> > > > > the difference that I carry the information in ptp_system_timesta=
+mp
+> > > > > instead of needing a new argument clockid to all existing callbac=
+ks
+> > > > > because the modification to ptp_read_prets() and postts() will ju=
+st be
+> > > > > sufficient, no?
+> > > > >
+> > > > OK, that makes sense.
+> > > >
+> > > > > For the case where the driver does not provide gettimex64() then =
+the
+> > > > > extension of the original offset ioctl is still providing a bette=
+r
+> > > > > mechanism than the proposed syscall.
+> > > > >
+> > > > > I also clearly said that all drivers should be converted over to
+> > > > > gettimex64().
+> > > > >
+> > > > I agree. Honestly that should have been mandatory and
+> > > > ptp_register_clock() should fail otherwise! Probably should have be=
+en
+> > > > part of gettimex64 implementation :(
+> > > >
+> > > > I don't think we can do anything other than just hoping all driver
+> > > > implementations include gettimex64 implementation.
+> > > >
+> > > > > > Having said that, the 'flag' modification proposal is a good ba=
+ckup
+> > > > > > for the drivers that don't have good implementation (close enou=
+gh but
+> > > > > > not ideal). Also, you don't need a new ioctl-op. So if we reall=
+y want
+> > > > > > precision, I believe, we need a new ioctl op (with supporting
+> > > > > > implementation similar to the mlx4 code above). but we want to =
+save
+> > > > > > the new ioctl-op and have less precision then proposed modifica=
+tion
+> > > > > > would work fine.
+> > > > >
+> > > > > I disagree. The existing gettimex64() is good enough if the drive=
+r
+> > > > > implements it correctly today. If not then those drivers need to =
+be
+> > > > > fixed independent of this.
+> > > > >
+> > > > > So assumed that a driver does:
+> > > > >
+> > > > > gettimex64()
+> > > > >    ptp_prets(sts);
+> > > > >    read_clock();
+> > > > >    ptp_postts(sts);
+> > > > >
+> > > > > today then having:
+> > > > >
+> > > > > static inline void ptp_read_system_prets(struct ptp_system_timest=
+amp *sts)
+> > > > > {
+> > > > >         if (sts) {
+> > > > >                 if (sts->flags & PTP_SYS_OFFSET_MONO_RAW)
+> > > > >                         ktime_get_raw_ts64(&sts->pre_ts);
+> > > > >                 else
+> > > > >                         ktime_get_real_ts64(&sts->pre_ts);
+> > > > >         }
+> > > > > }
+> > > > >
+> > > > > static inline void ptp_read_system_postts(struct ptp_system_times=
+tamp *sts)
+> > > > > {
+> > > > >         if (sts) {
+> > > > >                 if (sts->flags & PTP_SYS_OFFSET_MONO_RAW)
+> > > > >                         ktime_get_raw_ts64(&sts->post_ts);
+> > > > >                 else
+> > > > >                         ktime_get_real_ts64(&sts->post_ts);
+> > > > >         }
+> > > > > }
+> > > > >
+> > > > > or
+> > > > >
+> > > > > static inline void ptp_read_system_prets(struct ptp_system_timest=
+amp *sts)
+> > > > > {
+> > > > >         if (sts) {
+> > > > >                 switch (sts->clockid) {
+> > > > >                 case CLOCK_MONOTONIC_RAW:
+> > > > >                         time_get_raw_ts64(&sts->pre_ts);
+> > > > >                         break;
+> > > > >                 case CLOCK_REALTIME:
+> > > > >                         ktime_get_real_ts64(&sts->pre_ts);
+> > > > >                         break;
+> > > > >                 }
+> > > > >         }
+> > > > > }
+> > > > >
+> > > > > static inline void ptp_read_system_postts(struct ptp_system_times=
+tamp *sts)
+> > > > > {
+> > > > >         if (sts) {
+> > > > >                 switch (sts->clockid) {
+> > > > >                 case CLOCK_MONOTONIC_RAW:
+> > > > >                         time_get_raw_ts64(&sts->post_ts);
+> > > > >                         break;
+> > > > >                 case CLOCK_REALTIME:
+> > > > >                         ktime_get_real_ts64(&sts->post_ts);
+> > > > >                         break;
+> > > > >                 }
+> > > > >         }
+> > > > > }
+> > > > >
+> > > > > is doing the exact same thing as your proposal but without touchi=
+ng any
+> > > > > driver which implements gettimex64() correctly at all.
+> > > > >
+> > > > I see. Yes, this makes sense.
+> > > >
+> > > > > While your proposal requires to touch every single driver for no =
+reason,
+> > > > > no?
+> > > > >
+> > > > > It is just an implementation detail whether you use a flag or a
+> > > > > clockid. You can carry the clockid for the clocks which actually =
+can be
+> > > > > read in that context in a reserved field of PTP_SYS_OFFSET_EXTEND=
+ED:
+> > > > >
+> > > > > struct ptp_sys_offset_extended {
+> > > > >         unsigned int    n_samples; /* Desired number of measureme=
+nts. */
+> > > > >         clockid_t       clockid;
+> > > > >         unsigned int    rsv[2];    /* Reserved for future use. */
+> > > > > };
+> > > > >
+> > > > > and in the IOCTL:
+> > > > >
+> > > > >         if (extoff->clockid !=3D CLOCK_MONOTONIC_RAW)
+> > > > >                 return -EINVAL;
+> > > > >
+> > > > >         sts.clockid =3D extoff->clockid;
+> > > > >
+> > > > > and it all just works, no?
+> > > > >
+> > > > Yes, this should work. However, I didn't check if struct
+> > > > ptp_system_timestamp is used in some other context.
+> > > >
+> > > > > I have no problem to decide that PTP_SYS_OFFSET will not get this
+> > > > > treatment and the drivers have to be converted over to
+> > > > > PTP_SYS_OFFSET_EXTENDED.
+> > > > >
+> > > > > But adding yet another callback just to carry a clockid as argume=
+nt is a
+> > > > > more than pointless exercise as I demonstrated.
+> > > > >
+> > > > Agreed. As I said, I thought we cannot change the gettimex64() with=
+out
+> > > > breaking the compatibility but the fact that CLOCK_REALTIME is "0"
+> > > > works well for the backward compatibility case.
+> > > >
+> > > > I can spin up an updated patch/series that updates gettimex64
+> > > > implementation instead of adding a new ioctl-op If you all agree.
+> > > >
+> > > > thanks,
+> > > > --mahesh..
+> > > >
+> > > > > Thanks,
+> > > > >
+> > > > >         tglx
 
