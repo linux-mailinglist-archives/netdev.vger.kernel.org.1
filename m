@@ -1,213 +1,166 @@
-Return-Path: <netdev+bounces-88135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB8CF8A5E2D
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 01:19:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F75B8A5E37
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 01:21:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 799831F22AD0
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 23:19:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6775EB21C4B
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 23:21:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87E2B1591F8;
-	Mon, 15 Apr 2024 23:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCDE9158D8B;
+	Mon, 15 Apr 2024 23:21:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Bp98jKkX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pp9syHKt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 023D61272B8;
-	Mon, 15 Apr 2024 23:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A5B156977
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 23:21:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713223163; cv=none; b=vCJWpovfmVWEPVlrmCxeEBDx9aFIfJMJxfM1+beCfXqDVM1Fk9SV9Xz5/078bIwyy8T6U1m5D27mMc5l//EsJJqES2gdNiLDW5KtWgYQGCcYwy6NEx6c/yQUaThseWbrruzpsONtO5oVlGsNrgpQGpV/xyfEoXB15rJikm2Vd0g=
+	t=1713223299; cv=none; b=S0KAY4wyY180pm5is7jFle5AgzGrku8mwrCmhaIRjNuvM80yryE5Ih4NTuEtKcAERHPq7lkcncdJgvEiQufq0OkwzljiUCsPQQQV/4SO1MMRBH3MZ2MLZYh+B2E5VO/X1C0IQh0huNX9hQTgPQahxaN3495Bw2B+k72Uf6aLwp0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713223163; c=relaxed/simple;
-	bh=O7IS3oPlp5+sm72VRPb5jKxSHrI+jlf1vy1OB12Yer0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DFNeXMq9GuW2nb6151JrQgcEJpQkBt3lhr/KIQFTJfJ8pcTEW/kqp38+urWP7CJDU2PvNndow8YiAhtN8AW+39D8ecBXhUkbcp3mHtrp8qk0t6yqnnmgAvH20LzCyuX+NT484DQTaHNPIREWAfasfbsAIXrOZf5P3A1whdeKfB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Bp98jKkX; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1713223299; c=relaxed/simple;
+	bh=aE7AAWJlZQUGn/v+AM46GE7UujvJFD0hmUG3Pnsseog=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mHkn1B4YyVSVVfl/uIcb5BOQfJbozuMTMthzkyso5QkjziUydiGTmmjylUIW2j2JzrqhnHNxICiOEBmTehbP8BtzfPlGidWuWDHbskVS7XATA6fFOs6zdK/tfDuHlQrwjkU8x4UfuGJ1KZ3Ib0UGnjdLnMMKkcVvXmltJ0Idqqw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pp9syHKt; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2a536b08d63so2240422a91.1
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 16:21:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1713223161; x=1744759161;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=nNllzdqzyM5Bz0YxRI8syNc99amIrBzYYq2sTSmZBPw=;
-  b=Bp98jKkXt+DWgJMJk/VnC2koZBCdXF3S9UfLHaXWlu2lOD/jHEkaJPiX
-   NqB29FKb+Zd+SEVzJ6uzAsCvZ/OEQA8szmWpggCFPh+qW6LgLBlyAc+Hl
-   PTSqDmJ6Sxwh9DzQzTiDVil4QvwPFl/KKS1zGzrkCyJ8MPHfLJoPeu923
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.07,204,1708387200"; 
-   d="scan'208";a="652012921"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 23:19:15 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:43163]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.42.38:2525] with esmtp (Farcaster)
- id b612ba95-1060-4583-9bf4-c255c8a740ec; Mon, 15 Apr 2024 23:19:15 +0000 (UTC)
-X-Farcaster-Flow-ID: b612ba95-1060-4583-9bf4-c255c8a740ec
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 15 Apr 2024 23:19:14 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.23) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 15 Apr 2024 23:19:03 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <devnull+j.granados.samsung.com@kernel.org>
-CC: <Dai.Ngo@oracle.com>, <alex.aring@gmail.com>, <alibuda@linux.alibaba.com>,
-	<allison.henderson@oracle.com>, <anna@kernel.org>, <bridge@lists.linux.dev>,
-	<chuck.lever@oracle.com>, <coreteam@netfilter.org>, <courmisch@gmail.com>,
-	<davem@davemloft.net>, <dccp@vger.kernel.org>, <dhowells@redhat.com>,
-	<dsahern@kernel.org>, <edumazet@google.com>, <fw@strlen.de>,
-	<geliang@kernel.org>, <guwen@linux.alibaba.com>,
-	<herbert@gondor.apana.org.au>, <horms@verge.net.au>,
-	<j.granados@samsung.com>, <ja@ssi.bg>, <jaka@linux.ibm.com>,
-	<jlayton@kernel.org>, <jmaloy@redhat.com>, <jreuter@yaina.de>,
-	<kadlec@netfilter.org>, <keescook@chromium.org>, <kolga@netapp.com>,
-	<kuba@kernel.org>, <linux-afs@lists.infradead.org>,
-	<linux-hams@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-s390@vger.kernel.org>, <linux-sctp@vger.kernel.org>,
-	<linux-wpan@vger.kernel.org>, <linux-x25@vger.kernel.org>,
-	<lucien.xin@gmail.com>, <lvs-devel@vger.kernel.org>,
-	<marc.dionne@auristor.com>, <marcelo.leitner@gmail.com>,
-	<martineau@kernel.org>, <matttbe@kernel.org>, <mcgrof@kernel.org>,
-	<miquel.raynal@bootlin.com>, <mptcp@lists.linux.dev>, <ms@dev.tdt.de>,
-	<neilb@suse.de>, <netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<pabeni@redhat.com>, <pablo@netfilter.org>, <ralf@linux-mips.org>,
-	<razor@blackwall.org>, <rds-devel@oss.oracle.com>, <roopa@nvidia.com>,
-	<stefan@datenfreihafen.org>, <steffen.klassert@secunet.com>,
-	<tipc-discussion@lists.sourceforge.net>, <tom@talpey.com>,
-	<tonylu@linux.alibaba.com>, <trond.myklebust@hammerspace.com>,
-	<wenjia@linux.ibm.com>, <ying.xue@windriver.com>, <kuniyu@amazon.com>
-Subject: Re: [PATCH v3 4/4] ax.25: Remove the now superfluous sentinel elements from ctl_table array
-Date: Mon, 15 Apr 2024 16:18:53 -0700
-Message-ID: <20240415231853.23060-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240412-jag-sysctl_remset_net-v3-4-11187d13c211@samsung.com>
-References: <20240412-jag-sysctl_remset_net-v3-4-11187d13c211@samsung.com>
+        d=gmail.com; s=20230601; t=1713223298; x=1713828098; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=zE/T7Yy9/aCC5Yw2JeJyn0Jy3nmwADwyeSftZnYhtBU=;
+        b=Pp9syHKtS8ykCSabv+10L3MRqLGH0JsKleck9lQu691hg4Qx/5rbHFRBkoOhIAPWIs
+         RDrA8AKLox6qO+EMFBLGjZkVlRc0HPFplGe1mJCjICZHBlV10Muwmm2q2TuMn2B4QmSN
+         mrAfTJ5w5+sRH3JL4yKSDaKtwB+eEc8Paa3E8ZUAlUSES3VZL3RNSKE/zInVpNUpiDvN
+         7qTGOrWq/z2JgAjkavYJFfKCHnnKNBkBXbJADNKquOtyIa/beWyvfH5c3ppLPmO8HAua
+         1a/ap6uO+f4wpIgHROhoX4aD7baGlNaJrhWe60ZK6ZzW1epNpRVLr2wCN0yK6AJHqJta
+         Cj9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713223298; x=1713828098;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zE/T7Yy9/aCC5Yw2JeJyn0Jy3nmwADwyeSftZnYhtBU=;
+        b=ubBd3/ZJsCkgG3Q3RtZMGIMCdcgrGH+5JqD7Bw+yGdtmJrfoo2++58erqvXgw6Yn1s
+         2+lW788o5P52Tn6Pla/yaeQVnGmkSEWYrN0PIp33FrizvVl+KmIsMX2DP5MdcKhJKwUo
+         VqwJW6Sc8MrfIwseFIfcyNNadrMZkq0rx1qNplhU0fTPoo7DEADtSyuPAl5SjbPMUMGY
+         gDATo/a+AbCoZry3O6gzTZ7f89HdpWPWw6bFMPnfUNcWeJJWAjPF88rc6zZuYXmq356M
+         27hamHlqvlfYF+GoRr8ET0bPuK1p+E/t+g8TooU94A4JCoZ1OCgHJxbd13CHTcwqfXDY
+         O3qA==
+X-Forwarded-Encrypted: i=1; AJvYcCV+RaT9UWyjUb5e0r+GM2BEGxS9DVcdG/UJk4Z4VphqAA99dJVSzE8xw/Ri1xDwVZZ0GT+lLTuuUFi9H6eFHK1nJF+T5cVO
+X-Gm-Message-State: AOJu0YyyRSeT2QciKRCkzjWaaYWg4FsNm6zPzAHxQeI6UwGe7dNRYcyw
+	l34lglOwE9WaJfV1eiyGwrmZGRM2aXBy24u09NX8+nztvyz0uMfbrdHf5A==
+X-Google-Smtp-Source: AGHT+IHm8aE/yXT36bMLVAr3G7+av/uAh4AH5jWaZBkTWI24yFFADXdEi/zIoQH/VN4OFfCbRH4TqQ==
+X-Received: by 2002:a17:90a:fd14:b0:2a2:ddc0:4bf8 with SMTP id cv20-20020a17090afd1400b002a2ddc04bf8mr9407730pjb.31.1713223297655;
+        Mon, 15 Apr 2024 16:21:37 -0700 (PDT)
+Received: from [10.230.29.214] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id s6-20020a17090a2f0600b00299101c1341sm8591472pjd.18.2024.04.15.16.21.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 15 Apr 2024 16:21:37 -0700 (PDT)
+Message-ID: <e9506345-8245-4b3c-83a1-9425e0b37136@gmail.com>
+Date: Mon, 15 Apr 2024 16:21:35 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 0/5] add ethernet driver for Tehuti Networks
+ TN40xx chips
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org
+Cc: andrew@lunn.ch
+References: <20240415104352.4685-1-fujita.tomonori@gmail.com>
+Content-Language: en-US
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ HGuUuzv+GKZ6nsysJw==
+In-Reply-To: <20240415104352.4685-1-fujita.tomonori@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Joel Granados via B4 Relay <devnull+j.granados.samsung.com@kernel.org>
-Date: Fri, 12 Apr 2024 16:48:32 +0200
-> From: Joel Granados <j.granados@samsung.com>
-> 
-> This commit comes at the tail end of a greater effort to remove the
-> empty elements at the end of the ctl_table arrays (sentinels) which will
-> reduce the overall build time size of the kernel and run time memory
-> bloat by ~64 bytes per sentinel (further information Link :
-> https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
-> 
-> Avoid a buffer overflow when traversing the ctl_table by ensuring that
-> AX25_MAX_VALUES is the same as the size of ax25_param_table. This is
-> done with a BUILD_BUG_ON where ax25_param_table is defined and a
-> CONFIG_AX25_DAMA_SLAVE guard in the unnamed enum definition as well as
-> in the ax25_dev_device_up and ax25_ds_set_timer functions.
-> 
-> The overflow happened when the sentinel was removed from
-> ax25_param_table. The sentinel's data element was changed when
-> CONFIG_AX25_DAMA_SLAVE was undefined. This had no adverse effects as it
-> still stopped on the sentinel's null procname but needed to be addressed
-> once the sentinel was removed.
-> 
-> Signed-off-by: Joel Granados <j.granados@samsung.com>
+Hi Fujita-san,
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-
-
-> ---
->  include/net/ax25.h         | 2 ++
->  net/ax25/ax25_dev.c        | 3 +++
->  net/ax25/ax25_ds_timer.c   | 4 ++++
->  net/ax25/sysctl_net_ax25.c | 3 +--
->  4 files changed, 10 insertions(+), 2 deletions(-)
+On 4/15/2024 3:43 AM, FUJITA Tomonori wrote:
+> This patchset adds a new 10G ethernet driver for Tehuti Networks
+> TN40xx chips. Note in mainline, there is a driver for Tehuti Networks
+> (drivers/net/ethernet/tehuti/tehuti.[hc]), which supports TN30xx
+> chips.
 > 
-> diff --git a/include/net/ax25.h b/include/net/ax25.h
-> index 0d939e5aee4e..eb9cee8252c8 100644
-> --- a/include/net/ax25.h
-> +++ b/include/net/ax25.h
-> @@ -139,7 +139,9 @@ enum {
->  	AX25_VALUES_N2,		/* Default N2 value */
->  	AX25_VALUES_PACLEN,	/* AX.25 MTU */
->  	AX25_VALUES_PROTOCOL,	/* Std AX.25, DAMA Slave, DAMA Master */
-> +#ifdef CONFIG_AX25_DAMA_SLAVE
->  	AX25_VALUES_DS_TIMEOUT,	/* DAMA Slave timeout */
-> +#endif
->  	AX25_MAX_VALUES		/* THIS MUST REMAIN THE LAST ENTRY OF THIS LIST */
->  };
->  
-> diff --git a/net/ax25/ax25_dev.c b/net/ax25/ax25_dev.c
-> index c5462486dbca..af547e185a94 100644
-> --- a/net/ax25/ax25_dev.c
-> +++ b/net/ax25/ax25_dev.c
-> @@ -78,7 +78,10 @@ void ax25_dev_device_up(struct net_device *dev)
->  	ax25_dev->values[AX25_VALUES_N2]        = AX25_DEF_N2;
->  	ax25_dev->values[AX25_VALUES_PACLEN]	= AX25_DEF_PACLEN;
->  	ax25_dev->values[AX25_VALUES_PROTOCOL]  = AX25_DEF_PROTOCOL;
-> +
-> +#ifdef CONFIG_AX25_DAMA_SLAVE
->  	ax25_dev->values[AX25_VALUES_DS_TIMEOUT]= AX25_DEF_DS_TIMEOUT;
-> +#endif
->  
->  #if defined(CONFIG_AX25_DAMA_SLAVE) || defined(CONFIG_AX25_DAMA_MASTER)
->  	ax25_ds_setup_timer(ax25_dev);
-> diff --git a/net/ax25/ax25_ds_timer.c b/net/ax25/ax25_ds_timer.c
-> index c4f8adbf8144..8f385d2a7628 100644
-> --- a/net/ax25/ax25_ds_timer.c
-> +++ b/net/ax25/ax25_ds_timer.c
-> @@ -49,12 +49,16 @@ void ax25_ds_del_timer(ax25_dev *ax25_dev)
->  
->  void ax25_ds_set_timer(ax25_dev *ax25_dev)
->  {
-> +#ifdef CONFIG_AX25_DAMA_SLAVE
->  	if (ax25_dev == NULL)		/* paranoia */
->  		return;
->  
->  	ax25_dev->dama.slave_timeout =
->  		msecs_to_jiffies(ax25_dev->values[AX25_VALUES_DS_TIMEOUT]) / 10;
->  	mod_timer(&ax25_dev->dama.slave_timer, jiffies + HZ);
-> +#else
-> +	return;
-> +#endif
->  }
->  
->  /*
-> diff --git a/net/ax25/sysctl_net_ax25.c b/net/ax25/sysctl_net_ax25.c
-> index db66e11e7fe8..fb9966926e90 100644
-> --- a/net/ax25/sysctl_net_ax25.c
-> +++ b/net/ax25/sysctl_net_ax25.c
-> @@ -141,8 +141,6 @@ static const struct ctl_table ax25_param_table[] = {
->  		.extra2		= &max_ds_timeout
->  	},
->  #endif
-> -
-> -	{ }	/* that's all, folks! */
->  };
->  
->  int ax25_register_dev_sysctl(ax25_dev *ax25_dev)
-> @@ -155,6 +153,7 @@ int ax25_register_dev_sysctl(ax25_dev *ax25_dev)
->  	if (!table)
->  		return -ENOMEM;
->  
-> +	BUILD_BUG_ON(AX25_MAX_VALUES != ARRAY_SIZE(ax25_param_table));
->  	for (k = 0; k < AX25_MAX_VALUES; k++)
->  		table[k].data = &ax25_dev->values[k];
->  
+> Multiple vendors (DLink, Asus, Edimax, QNAP, etc) developed adapters
+> based on TN40xx chips. Tehuti Networks went out of business but the
+> drivers are still distributed with some of the hardware (and also
+> available on some sites). With some changes, I try to upstream this
+> driver with a new PHY driver in Rust.
 > 
-> -- 
-> 2.43.0
+> The major change is replacing a PHY abstraction layer with
+> PHYLIB. TN40xx chips are used with various PHY hardware (AMCC QT2025,
+> TI TLK10232, Aqrate AQR105, and Marvell MV88X3120, MV88X3310, and
+> MV88E2010). So the original driver has the own PHY abstraction layer
+> to handle them.
+> 
+> I'll submit a new PHY driver for QT2025 in Rust shortly. For now, I
+> enable only adapters using QT2025 PHY in the PCI ID table of this
+> driver. I've tested this driver and the QT2025 PHY driver with Edimax
+> EN-9320 10G adapter. In mainline, there are PHY drivers for AQR105 and
+> Marvell PHYs, which could work for some TN40xx adapters with this
+> driver.
+> 
+> The other changes are replacing the embedded firmware in a header file
+> with the firmware APIs, handling dma mapping errors, removing many
+> ifdef, fixing lots of style issues, etc.
+> 
+> To make reviewing easier, this patchset has only basic functions. Once
+> merged, I'll submit features like ethtool support.
+
+Thanks a lot for attempting to upstream support for the TN40xx chips, 
+those are extremely popular 10GbE PCIe cards under USD 100. Last I 
+checked the vendor driver, it was not entirely clear however whether it 
+would be possible to get the various PHY firmwares included in 
+linux-firmware, that is the licensing was not very specific either way 
+(redistribution allowed or not).
+-- 
+Florian
 
