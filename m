@@ -1,190 +1,126 @@
-Return-Path: <netdev+bounces-88023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A0858A55D6
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:00:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F6EE8A55DB
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:01:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4B97282749
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:00:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0D6B1C223D2
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F03757FB;
-	Mon, 15 Apr 2024 15:00:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BECF4757FC;
+	Mon, 15 Apr 2024 15:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h+RGp9BL"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="AgrL/Ntf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E9A74E37;
-	Mon, 15 Apr 2024 15:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F7671B3B;
+	Mon, 15 Apr 2024 15:01:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713193238; cv=none; b=obebo+p1dueGKO3HyeJa+5UGcSsITfpf07BS9+O6ASeoXKn/tixdOWiIwJAna+yTdIIEYHqxhSJP8QD149s0cQrUpgT90j81lNvsKmX+bnJ1uAg69J6i53VDpk2MLzrfdWZw4ynmWgs6En0igLqpepzVxbcDcFYSCOaosPuKODE=
+	t=1713193297; cv=none; b=hYX1rPBQZ5AYpHPy9lnTYiGNghGDNW8TZQCJorZNZiPdU6yuZU1ZtOgMoqCX0qioKIJXlk5dAClpxBZqtqT7nrEMoqqSvprSX4IehrBo8//mNXJ7NrKVpbTP5cuXCQVu1HfkGG+Izt6xPF2Wzc3IEza5k/WHf/p3FTrdq6sdkFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713193238; c=relaxed/simple;
-	bh=OJhWkXaiZfR5vxgWccVDhgB7L5539O3TT+m0W3wEVJQ=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=kWkyHePVTFG4IVaCZ0ytViBqJB8WDUiFezQT1gaAOK0zvTwXLie8NNo5T9ZG7pxqRlRc4aeeI6pUqnNqBEl2iyXR4iDW0cyCB25r/flSR1UK65axGEAbSAi/+EV1FjJHzDzcegJTuCwA3w91UWR6seXWu0a+up4lSs1Hfdxcr6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h+RGp9BL; arc=none smtp.client-ip=209.85.221.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-4dac3cbc8fdso1306176e0c.0;
-        Mon, 15 Apr 2024 08:00:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713193235; x=1713798035; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WS6Pv+eMPVF9jwN1/da6sM3EbXPOKQ+l4+JLzAo2+5s=;
-        b=h+RGp9BLkdMOdq5GQBRNkfjRnIMkpwJnIO6R9Z4W+gTlWhHDa72XUfnH4Q9g82aydR
-         pWaP2mF137KxIPyNb0Y9/K767+g27Kr8/YNus/Z/GGjS1BfGh5luxSQDU2AnafaIYVzP
-         L1Dz/xXK/a8idBQfZ/hzePyFkfr6yLlazOboQSfrMp5fxU6YgLe2PRqvLZiTNtMJMdT6
-         mjoVH/W04Es46vm53+xXJ9OofNOJem3iOMWSEyvyAdRVToyktMGPx04flfFN7/QJMHD6
-         ObCxYiGLyLJ8ujnHJMeriPagjhZ0I9sHIj0W3IOwD6J6iLdPbPEpShXC7Oha2aouk/HT
-         7AUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713193235; x=1713798035;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=WS6Pv+eMPVF9jwN1/da6sM3EbXPOKQ+l4+JLzAo2+5s=;
-        b=a59QN9V5lOKyOGSG+VJcYlxdaHJdIXkvX4eqVhSuAHW/swxu6XoIHhXcn72+rP7qOw
-         o1Rph4e4LRNq/mrcMSKBMgfEDy9jLFYD42r/HBIQ7jlYsJ3MRAPvbjZSrbxzn5VFMBMT
-         A3MU/6HLSMcuSKZeu4J03Pkwjl3shxYrKTeI1/mVeLij3w8Nr/SXHLOK+lzfryKa5wNm
-         cPC+3K+dlG9IoktMHqx94Z2gjyjko0eo0TWeLE0y/yg6rdZReQBBNRrOCXIJCzCLEmWw
-         qmZ93yDyiKMs5TMWeFX7NamPlVkxAQksl24rUfMT6DFuGJMXRgta0AFDGlHkxJVtcEoz
-         iDhg==
-X-Forwarded-Encrypted: i=1; AJvYcCXVJe3NWGXyyZtYCtr5jw0zSyslno6YrZhd2vvsHxaqyXccZJYmTAx5NAdmeqXCAIOAB6XxCtQ9aqBeIsdjg1b8Z5SLOO4J/beGsuktncWMTPDZGjk2URW/jsIJCPDu8XL9MSVS
-X-Gm-Message-State: AOJu0Yxb0WIotI1BA5YCaYlnApje0tr9jXqTQUTAhtVb/4t1fqoC8bls
-	xoImD4DH5sMOkZPAyv2T0ul/ZN12HlNaoQVmCDS/KpyVmR3CxypA
-X-Google-Smtp-Source: AGHT+IGTheb8k3tpl64FvDV3BdvW1vuUvwO9iUTdUt2UdDwND0VjYngIDw7HpvBKpueW1xWnMDSlfA==
-X-Received: by 2002:a05:6122:209e:b0:4cd:b718:4b08 with SMTP id i30-20020a056122209e00b004cdb7184b08mr7269652vkd.11.1713193233032;
-        Mon, 15 Apr 2024 08:00:33 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id v13-20020a0cc60d000000b0069b75b8633dsm1963873qvi.67.2024.04.15.08.00.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 08:00:32 -0700 (PDT)
-Date: Mon, 15 Apr 2024 11:00:32 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Alexander Duyck <alexander.duyck@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Richard Gobert <richardbgobert@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- aleksander.lobakin@intel.com, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <661d41106f996_c0c829445@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAKgT0UfB+3DTjK7vq1uvG-2xtA53pw03ygJhwSG8j1bPtmYU8A@mail.gmail.com>
-References: <20240412152120.115067-1-richardbgobert@gmail.com>
- <20240412152120.115067-2-richardbgobert@gmail.com>
- <661ad1136bc10_3be9a7294c2@willemb.c.googlers.com.notmuch>
- <CAKgT0UfB+3DTjK7vq1uvG-2xtA53pw03ygJhwSG8j1bPtmYU8A@mail.gmail.com>
-Subject: Re: [PATCH net v1 1/2] net: gro: add flush check in
- udp_gro_receive_segment
+	s=arc-20240116; t=1713193297; c=relaxed/simple;
+	bh=fErZjILugyMaOlaCYv4Ry65eYxlQ4OnitIywRX/KQwI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LRKrzFPVDMhlb3pNzgwtJ7vRc9EO0L6h5yQ2Rw/rYCwWvNFI2LzHJImNmbpgXFLW4QNaDIlNG/7qAyD6Vw+fCGrdE9mFNq4+02iVUbwptouzpYr0HYDsU3iQQqvpUt1zxelcV632rglS2stXXiaN2C1uHB2mOcR9h3TBdRYJeTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=AgrL/Ntf; arc=none smtp.client-ip=210.61.82.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: 082ce976fb3911ee935d6952f98a51a9-20240415
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=j1iSowN/IF/xoWn4Ii/qXGL9p7lH6gAEsvUETuM3jJo=;
+	b=AgrL/Ntfy1roFyNxEtDzFgVEyxpwP3//o/CUr4u19qjrsIYUCTPIUBCEU8R/On1NVU8JTHraGw8lCkmAjfzXJu1qsg4/OoCnaLGwpIA4RlInTLdD5qy6XLPBmNmMp/i2y+tbK76QoNsXOTrKDSZ07YNveeiFZ0fb4ErhSBdvAGs=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.38,REQID:efe148e8-23a1-4272-bcb2-6b5585221064,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:82c5f88,CLOUDID:f15c3386-8d4f-477b-89d2-1e3bdbef96d1,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: 082ce976fb3911ee935d6952f98a51a9-20240415
+Received: from mtkmbs14n2.mediatek.inc [(172.21.101.76)] by mailgw02.mediatek.com
+	(envelope-from <shiming.cheng@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1519067544; Mon, 15 Apr 2024 23:01:26 +0800
+Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
+ mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Mon, 15 Apr 2024 23:01:25 +0800
+Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
+ mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Mon, 15 Apr 2024 23:01:24 +0800
+From: <shiming.cheng@mediatek.com>
+To: <edumazet@google.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <matthias.bgg@gmail.com>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<shiming.cheng@mediatek.com>, Lena Wang <lena.wang@mediatek.com>
+Subject: [PATCH net] udp: fix segmentation crash for GRO packet without fraglist
+Date: Mon, 15 Apr 2024 23:01:03 +0800
+Message-ID: <20240415150103.23316-1-shiming.cheng@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain
+X-MTK: N
 
-Alexander Duyck wrote:
-> On Sat, Apr 13, 2024 at 11:38=E2=80=AFAM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Richard Gobert wrote:
-> > > GRO-GSO path is supposed to be transparent and as such L3 flush che=
-cks are
-> > > relevant to all flows which call skb_gro_receive. This patch uses t=
-he same
-> > > logic and code from tcp_gro_receive but in the relevant flow path i=
-n
-> > > udp_gro_receive_segment.
-> > >
-> > > Fixes: 36707061d6ba ("udp: allow forwarding of plain (non-fragliste=
-d) UDP GRO packets")
-> > > Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
-> >
-> > Reviewed-by: Willem de Bruijn <willemb@google.com>
-> >
-> > > ---
-> > >  net/ipv4/udp_offload.c | 13 ++++++++++++-
-> > >  1 file changed, 12 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-> > > index 3498dd1d0694..1f4e08f43c4b 100644
-> > > --- a/net/ipv4/udp_offload.c
-> > > +++ b/net/ipv4/udp_offload.c
-> > > @@ -471,6 +471,7 @@ static struct sk_buff *udp_gro_receive_segment(=
-struct list_head *head,
-> > >       struct sk_buff *p;
-> > >       unsigned int ulen;
-> > >       int ret =3D 0;
-> > > +     int flush;
-> > >
-> > >       /* requires non zero csum, for symmetry with GSO */
-> > >       if (!uh->check) {
-> > > @@ -528,7 +529,17 @@ static struct sk_buff *udp_gro_receive_segment=
-(struct list_head *head,
-> > >                               skb_gro_postpull_rcsum(skb, uh,
-> > >                                                      sizeof(struct =
-udphdr));
-> > >
-> > > -                             ret =3D skb_gro_receive(p, skb);
-> > > +                             flush =3D NAPI_GRO_CB(p)->flush;
-> > > +
-> > > +                             if (NAPI_GRO_CB(p)->flush_id !=3D 1 |=
-|
-> > > +                                 NAPI_GRO_CB(p)->count !=3D 1 ||
-> > > +                                 !NAPI_GRO_CB(p)->is_atomic)
-> > > +                                     flush |=3D NAPI_GRO_CB(p)->fl=
-ush_id;
-> > > +                             else
-> > > +                                     NAPI_GRO_CB(p)->is_atomic =3D=
- false;
-> > > +
-> > > +                             if (flush || skb_gro_receive(p, skb))=
+From: Shiming Cheng <shiming.cheng@mediatek.com>
 
-> > > +                                     ret =3D 1;
-> >
-> > UDP_L4 does not have the SKB_GSO_TCP_FIXEDID that uses is_atomic as
-> > input.
-> >
-> > And I still don't fully internalize the flush_id logic after staring
-> > at it for more than one coffee.
-> =
+A GRO packet without fraglist is crashed and backtrace is as below:
+ [ 1100.812205][    C3] CPU: 3 PID: 0 Comm: swapper/3 Tainted:
+G        W  OE      6.6.17-android15-0-g380371ea9bf1 #1
+ [ 1100.812317][    C3]  __udp_gso_segment+0x298/0x4d4
+ [ 1100.812335][    C3]  __skb_gso_segment+0xc4/0x120
+ [ 1100.812339][    C3]  udp_rcv_segment+0x50/0x134
+ [ 1100.812344][    C3]  udp_queue_rcv_skb+0x74/0x114
+ [ 1100.812348][    C3]  udp_unicast_rcv_skb+0x94/0xac
+ [ 1100.812358][    C3]  udp_rcv+0x20/0x30
 
-> The flush_id field is there to indicate the difference between the
-> current IPv4 ID of the previous IP header. It is meant to be used in
-> conjunction with the is_atomic for the frame coalescing. Basically
-> after the second frame we can decide the pattern either incrementing
-> IPv4 ID or fixed, so on frames 3 or later we can decide to drop the
-> frame if it doesn't follow that pattern.
-> =
+The reason that the packet loses its fraglist is that in ingress bpf
+it makes a test pull with to make sure it can read packet headers
+via direct packet access: In bpf_progs/offload.c
+try_make_writable -> bpf_skb_pull_data -> pskb_may_pull ->
+__pskb_pull_tail  This operation pull the data in fraglist into linear
+and set the fraglist to null.
 
-> > But even ignoring those, the flush signal of NAPI_GRO_CB(p)->flush
-> > set the network layer must be followed, so ACK. Thanks for the fix.
-> =
+BPF needs to modify a proper length to do pull data. However kernel
+should also improve the flow to avoid crash from a bpf function call.
+As there is no split flow and app may not decode the merged UDP packet,
+we should drop the packet without fraglist in skb_segment_list here.
 
-> I'm not sure about the placement of this code though. That is the one
-> thing that seems off to me. Specifically this seems like it should be
-> done before we start the postpull, not after. It should be something
-> that can terminate the flow before we attempt to aggregate the UDP
-> headers.
+Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
+Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+Signed-off-by: Lena Wang <lena.wang@mediatek.com>
+---
+ net/core/skbuff.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-In principle agreed that we should conclude the flush checks before
-doing prep for coalescing.
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index b99127712e67..f68f2679b086 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -4504,6 +4504,9 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
+ 	if (err)
+ 		goto err_linearize;
+ 
++	if (!list_skb)
++		goto err_linearize;
++
+ 	skb_shinfo(skb)->frag_list = NULL;
+ 
+ 	while (list_skb) {
+-- 
+2.18.0
 
-In practice it does not matter? NAPI_GRO_CB(skb)->csum will be ignored
-if the packet gets flushed.=
 
