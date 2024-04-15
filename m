@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-87926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FAFE8A4FAE
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:52:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAF588A5001
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:58:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF2B1283A41
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 12:52:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76D612829E9
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 12:58:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 717997FBC5;
-	Mon, 15 Apr 2024 12:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD3F11292D8;
+	Mon, 15 Apr 2024 12:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PzFcslSU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N0acz5BB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45FD37FBB1;
-	Mon, 15 Apr 2024 12:49:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B141292D4;
+	Mon, 15 Apr 2024 12:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713185377; cv=none; b=Ujro41LOysGtLbO+gGE2pC2tMrwEFIW7PCfT14izYp1Vg5lHXKOxtrid1Y5VMTr7ICeliIvPEnDTV0g/FNm7X+MwShHvi41mhKS0xs6CQit+I4jq0d5fVEt2ctus+zSAzW4lquD/adMu95/7AwnNEWWKhFcX82gdrCt5RLOwMdY=
+	t=1713185416; cv=none; b=BUSTMhjjYlCcqX7bE5OnKnYhC/Rlz08ERJa8CQ8WASjji4H1LiWUcaMNab/QImqgfPVUKG4BJAvTzTW97LoJW3hyqucLgup+ndanrGrkOxkHqssxWON0IZhMvHNfz6v2OfFBRBtaL9etVJXAWKWaxtz8MdKRe4RIW9DaeXjpky0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713185377; c=relaxed/simple;
-	bh=WRvMdukuWEZ4azfjyEAI2ItEKDT0/LHddLwGlrN5QPU=;
+	s=arc-20240116; t=1713185416; c=relaxed/simple;
+	bh=ftxJqgX69soHvcqIvZXogCEx+JQf63AW2r5jUdaXeHs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SyyVz7Vu/tDRh05vFG1/3h1JTcWYHYPQn3NrH67IV5+2ONMk2/qgxtaPRVvaZQ7YAEQBxZd942kFx9wIpCBQ/oVOC7UwIODTFPToIMyqe7Z5o0TXUxTcS7CpUHFEEYjGx43Nrr5vReWV5mGY8ZfWVxY+V9n1r022/qGwU8DPl78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PzFcslSU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D3E2C32783;
-	Mon, 15 Apr 2024 12:49:35 +0000 (UTC)
+	 MIME-Version; b=VbCSRaZgkoEniXjZXe8pOsaKicVIUDx3e3UuofQl75bSUDpkTzhBBWY9RluobNerRR4OOszEfFnNex+hpBEF/4xtRlX8fziLMnj5doMoj32cdFmZ+/fIH90EjCI20ELCNHpxgHEeENp5IMdMx209E71kUB4HsPSGFCjiPFJM3mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N0acz5BB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE80BC4AF09;
+	Mon, 15 Apr 2024 12:50:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713185376;
-	bh=WRvMdukuWEZ4azfjyEAI2ItEKDT0/LHddLwGlrN5QPU=;
+	s=k20201202; t=1713185416;
+	bh=ftxJqgX69soHvcqIvZXogCEx+JQf63AW2r5jUdaXeHs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PzFcslSUI880sZbMzz25afSX3nGvJbXPzr0i9sIFyS8NKTC5JG9hAoLlD2O0HjSyZ
-	 5lm0CIZiL3TpfhrPRtfEpf0gWxOiU+CJZcBrwC4P+qb4DuAKTfyo1tkFpgi1m7mS3Q
-	 UlP+vvSe5iS7jeiyogTYPg4NGz/EvXjrNgVH8Fas169l1OlPK/b+Iz/KcHPridaC5P
-	 ZcGAgl4Xe9oXzy/aos2TYVa3h0wKTMNmD4/cE/+WDgxJd2hg2GC/VUl/m/jq8JiP4Z
-	 eI/H4vriLKqmV5x6q9lVsumUcCP+RPyQAhe7Z2ZlTqOJ9rDpSZb2fo36xMK6Kt3Yen
-	 BFInhgf2CXZDA==
+	b=N0acz5BB/ou6au8xVvHmKO5DFoSvImqODXgmv84wfpNKHEUGMkEvd4Xpi196w2ho4
+	 YegOGIwoT+w9XKbYrojoD8PuhDZ3BskVJT+iVO8EwIepxGWAyZ6Vdku+hJO7xN3c7A
+	 NIWMTm1ssyPprnst1Wio+8DJGffj8EQazPLZ1U9Jw6SWkp8qsW+VGTZM03TPFULqCR
+	 Kd3B6MYkRYN9i9PSbtKJAaSQ6CHgvlq01e8CxIJyx1KGpYO8RjXOE/pQyTbOxnRF4O
+	 v8ea0APoeM/6ZN2/N0q4umpdenZxQ37sgXCr6V4mmTkODssT86xn55cvKOTDp7BaHy
+	 KwueiyVAn5mfA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -54,12 +54,12 @@ Cc: Phil Elwell <phil@raspberrypi.com>,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.8 12/15] net: bcmgenet: Reset RBUF on first open
-Date: Mon, 15 Apr 2024 06:02:52 -0400
-Message-ID: <20240415100311.3126785-12-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.6 09/12] net: bcmgenet: Reset RBUF on first open
+Date: Mon, 15 Apr 2024 06:03:44 -0400
+Message-ID: <20240415100358.3127162-9-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240415100311.3126785-1-sashal@kernel.org>
-References: <20240415100311.3126785-1-sashal@kernel.org>
+In-Reply-To: <20240415100358.3127162-1-sashal@kernel.org>
+References: <20240415100358.3127162-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,7 +68,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.8.6
+X-stable-base: Linux 6.6.27
 Content-Transfer-Encoding: 8bit
 
 From: Phil Elwell <phil@raspberrypi.com>
@@ -99,10 +99,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 12 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index 2d7ae71287b14..855cbe349236b 100644
+index 89c8ddc6565ae..b91faa7973218 100644
 --- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
 +++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -3282,7 +3282,7 @@ static void bcmgenet_get_hw_addr(struct bcmgenet_priv *priv,
+@@ -3299,7 +3299,7 @@ static void bcmgenet_get_hw_addr(struct bcmgenet_priv *priv,
  }
  
  /* Returns a reusable dma control register value */
@@ -111,7 +111,7 @@ index 2d7ae71287b14..855cbe349236b 100644
  {
  	unsigned int i;
  	u32 reg;
-@@ -3307,6 +3307,14 @@ static u32 bcmgenet_dma_disable(struct bcmgenet_priv *priv)
+@@ -3324,6 +3324,14 @@ static u32 bcmgenet_dma_disable(struct bcmgenet_priv *priv)
  	udelay(10);
  	bcmgenet_umac_writel(priv, 0, UMAC_TX_FLUSH);
  
@@ -126,7 +126,7 @@ index 2d7ae71287b14..855cbe349236b 100644
  	return dma_ctrl;
  }
  
-@@ -3370,8 +3378,8 @@ static int bcmgenet_open(struct net_device *dev)
+@@ -3387,8 +3395,8 @@ static int bcmgenet_open(struct net_device *dev)
  
  	bcmgenet_set_hw_addr(priv, dev->dev_addr);
  
@@ -137,7 +137,7 @@ index 2d7ae71287b14..855cbe349236b 100644
  
  	/* Reinitialize TDMA and RDMA and SW housekeeping */
  	ret = bcmgenet_init_dma(priv);
-@@ -4237,7 +4245,7 @@ static int bcmgenet_resume(struct device *d)
+@@ -4259,7 +4267,7 @@ static int bcmgenet_resume(struct device *d)
  			bcmgenet_hfb_create_rxnfc_filter(priv, rule);
  
  	/* Disable RX/TX DMA and flush TX queues */
