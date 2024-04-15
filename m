@@ -1,133 +1,209 @@
-Return-Path: <netdev+bounces-88005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C3A48A52F8
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:20:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64FBB8A5314
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:24:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C176E1F22AC0
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:20:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A1CEB216B4
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:24:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 120D674422;
-	Mon, 15 Apr 2024 14:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDE4B76408;
+	Mon, 15 Apr 2024 14:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="DDdrXqdb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V+ifGiXp"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f65.google.com (mail-oo1-f65.google.com [209.85.161.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47BF9757E4;
-	Mon, 15 Apr 2024 14:20:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6099D76046;
+	Mon, 15 Apr 2024 14:24:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713190820; cv=none; b=XFPFNNTlUk/cQAHfgQcPsHxIpG3H+USreu4uwbSS66oBSZjo2BPKmfaPdfqb3iRGcs0OoMkXJYoB0nr+PC2PcfJ7UnC1PBAYneVVJJsYchzmZ/1whqdNd7A/t7dgUOm2L6tXl/I3PbvBs5bAGhUApLzguZo2ve80DB7b0spZk1s=
+	t=1713191057; cv=none; b=FqxXZO3T/4AcLot9S05+SqNHlKhTwl9w05HHWb1R26WCzejZMXb08XIxQxMoevGc8qftW1kBxwQQSuglZnnq07w6zVGo1dZMoT5Ff9e8ic2CuubjdjwsFQ83S6TT0sHPYjy5fgAiWZkdPelxnc3IIO0xfCqMjQ9Eb0pkHSoY62w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713190820; c=relaxed/simple;
-	bh=DB+wKIghJsG01+WF97RgjuS7cJliGqMTntLYVzdVb0o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jqdwmJXwhL50zupbu17y8bpr8aJlPkI+Aje5YjPtMXtSKdGCIqVGjog7naq+S2VPOnh0T/0jEky8lIrn3p9R7UhjTmKxjFvZ/oe4rWO1O6ivwBJqgTmFBandDO+WuZ7upVgRuF0IZi/1ZQAaem6rc/c5zK/a8/VZqBrQY4n6P3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=DDdrXqdb; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=lSbObex15wOwgO7da4ym39y3O/1y80iGBehBgnC+1gE=; b=DDdrXqdbwir/2TzR3+XlxaC6jl
-	W5sna3A77bv1WYPIRWO4Xyhudb/WMpNJYdHTo67yQG8lc0OxInV6zKwZ0RNpDFSqqxMDuzamzsMxR
-	sOybOq/moTbqsMuKNxrjXeBxYSizAhmWnhI7kVaUHvpYUXfdBcI9kWSfr9dQmE29lKbg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rwNBw-00D31b-2F; Mon, 15 Apr 2024 16:20:16 +0200
-Date: Mon, 15 Apr 2024 16:20:16 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	tmgross@umich.edu
-Subject: Re: [PATCH net-next v1 2/4] rust: net::phy support C45 helpers
-Message-ID: <e8a440c7-d0a6-4a5e-97ff-a8bcde662583@lunn.ch>
-References: <20240415104701.4772-1-fujita.tomonori@gmail.com>
- <20240415104701.4772-3-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1713191057; c=relaxed/simple;
+	bh=zADvG59klfrp3cGSIQm2FPnmTssHRT5Vs9SewETtI2s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=guQBTBVjRvjt6Iu0JD2yW1CLPE6syl1igCYz5/1th01OgnRtSn5buZMiwG6E4s9IBMYfhFHTP/W9XoEnwk34NpTfISwCR9Kcl4wryecpPBT6VkOyXoyJoJWRAIZVaadk+3a7oD1Sw2IL78wLUOUaMuHh1eXH3bTBzdkXQ03F8sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V+ifGiXp; arc=none smtp.client-ip=209.85.161.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f65.google.com with SMTP id 006d021491bc7-5acb737b508so288915eaf.0;
+        Mon, 15 Apr 2024 07:24:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713191055; x=1713795855; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=JYJRn17VfvdXQm/cdUplbrdfiV69VkeoD82gcqz7jGo=;
+        b=V+ifGiXpjLbwz3LkYB4ugHGIHgJLu2xCyLY/LIYxa/9Buf1dlNgQD9WadZFzFUXR/B
+         99frYQw6EqNnpkby9sZHMfjans5TETw8lqG1SEnK0KVnF2BWoBXhL2WoIAoluV/iP4V5
+         loWXyX35OPJNmsXy3hw7dBaMXXjQeZzxO9TlonXSc3Clj4i8eVsY7CF4deVV6spP4uu+
+         0y2xf+1Id97wKMbl1Ee1eQbj6eNNbbXCfxasFEzotPcK8tjiWe52P5jSBILoD6u3tYfz
+         U0wm2C7gsM2tFGDfBNGeV+EHWxFlx0FgvZapVc1vvbiQgdzoi1wXFU64raB6XdD9Nv1k
+         FMfw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713191055; x=1713795855;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JYJRn17VfvdXQm/cdUplbrdfiV69VkeoD82gcqz7jGo=;
+        b=QUwy6Hx0S9KZObwEFh/OYSghDmi5BZvF5mKq419U2kFWWihw93RGJXJjDg7AjD0I65
+         BMC0tQ4H/Vrzl46KMCHNlQb2q4QEXziZ3Mn6sqEY1YIwUSeDHWPOk2bjkJ2KjtsNo/aX
+         qWUl9yoLpa1bA83UFfJ0xR3eckfxRVHJcvQafzAqreWsNPGmUv3xD0wh4+kf1B4pUMwJ
+         TOzTYi/lNfI3YLW/q+iMXAkURUjmgY7J4TKL8a4KwH3og4dAU5t4x1ohO1USE2Eyf48K
+         2CRqw6nJWlhrOCflMwsMhrkSpRQOaCOv9NmfpkJLd2bHT+9goknwueG93c32LoTwm/Un
+         G5Dg==
+X-Forwarded-Encrypted: i=1; AJvYcCUVxADisHwQem1v8HyAwUtAdQ3iIthh0AIKLC3/fPixNQr26hVBgamZaXpiZ43hm7eww/vtRBCI6LexTdk7tlFZWMJX/s4mowp4d1UKC1vKTre/ZtKQr/mXTB+gSARn
+X-Gm-Message-State: AOJu0YzsAGw0pv80UFzpXGgYH9+hcMi06rebRK7Fva8qc1lp34MjqxVW
+	Luv5hdZ1F0wcOx+3COk1I0UUIyPDXif2YTptStE7hkbFdW3MLWael5bVW4VUOvXE1w==
+X-Google-Smtp-Source: AGHT+IF7KmqTdI563Kt82HQ0/HY/h0WtGBGuUGdLeaBGKqJNAH1kdpUy2yrBqmShs9z9WULibiwyIg==
+X-Received: by 2002:a05:6820:209:b0:5aa:5206:30aa with SMTP id bw9-20020a056820020900b005aa520630aamr11000195oob.7.1713191055161;
+        Mon, 15 Apr 2024 07:24:15 -0700 (PDT)
+Received: from localhost.localdomain ([2604:abc0:1234:22::2])
+        by smtp.gmail.com with ESMTPSA id j11-20020a4aab4b000000b005ac85267c13sm1141856oon.33.2024.04.15.07.24.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 07:24:14 -0700 (PDT)
+From: Coia Prant <coiaprant@gmail.com>
+To: linux-usb@vger.kernel.org
+Cc: Coia Prant <coiaprant@gmail.com>,
+	Lars Melin <larsm17@gmail.com>,
+	stable@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH 1/2 v2] USB: serial: option: add Lonsung U8300/U9300 product
+Date: Mon, 15 Apr 2024 07:23:42 -0700
+Message-Id: <20240415142342.1753810-1-coiaprant@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240415104701.4772-3-fujita.tomonori@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 15, 2024 at 07:46:59PM +0900, FUJITA Tomonori wrote:
-> This patch adds the following helper functions for Clause 45:
-> 
-> - mdiobus_c45_read
-> - mdiobus_c45_write
-> - genphy_c45_read_status
+Update the USB serial option driver to support Longsung U8300/U9300.
 
-We need to be very careful here, and try to avoid an issue we have in
-the phylib core, if possible. C45 is a mix of two different things:
+For U8300
 
-* The C45 MDIO bus protocol
-* The C45 registers
+Interface 4 is used by for QMI interface in stock firmware of U8300, the
+router which uses U8300 modem. Free the interface up, to rebind it to
+qmi_wwan driver.
+Interface 5 is used by for ADB interface in stock firmware of U8300, the
+router which uses U8300 modem. Free the interface up.
+The proper configuration is:
 
-You can access C45 registers using the C45 bus protocol. You can also
-access C45 registers using C45 over C22. So there are two access
-mechanisms to the C45 registers.
+Interface mapping is:
+0: unknown (Debug), 1: AT (Modem), 2: AT, 3: PPP (NDIS / Pipe), 4: QMI, 5: ADB
 
-A PHY driver just wants to access C45 registers. It should not care
-about what access mechanism is used, be it C45 bus protocol, or C45
-over C22.
+T:  Bus=05 Lev=01 Prnt=03 Port=02 Cnt=01 Dev#=  4 Spd=480 MxCh= 0
+D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1c9e ProdID=9b05 Rev=03.18
+S:  Manufacturer=Android
+S:  Product=Android
+C:  #Ifs= 6 Cfg#= 1 Atr=80 MxPwr=500mA
+I:  If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=option
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=00 Prot=00 Driver=option
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=83(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=00 Prot=00 Driver=option
+E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=84(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=85(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 3 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=00 Prot=00 Driver=option
+E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=86(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=87(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 4 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=qmi_wwan
+E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=88(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=89(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+I:  If#= 5 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=(none)
+E:  Ad=06(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=8a(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
 
-> +    /// Reads a given C45 PHY register.
-> +    /// This function reads a hardware register and updates the stats so takes `&mut self`.
-> +    pub fn c45_read(&mut self, devad: u8, regnum: u16) -> Result<u16> {
-> +        let phydev = self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
-> +        // So it's just an FFI call.
-> +        let ret = unsafe {
-> +            bindings::mdiobus_c45_read(
-> +                (*phydev).mdio.bus,
-> +                (*phydev).mdio.addr,
-> +                devad as i32,
-> +                regnum.into(),
-> +            )
+For U9300
 
-So you have wrapped the C function mdiobus_c45_read(). This is going
-to do a C45 bus protocol read. For this to work, the MDIO bus master
-needs to support C45 bus protocol, and the PHY also needs to support
-the C45 bus protocol. Not all MDIO bus masters and PHY devices
-do. Some will need to use C45 over C22.
+Interface 1 is used by for ADB interface in stock firmware of U9300, the
+router which uses U9300 modem. Free the interface up.
+Interface 4 is used by for QMI interface in stock firmware of U9300, the
+router which uses U9300 modem. Free the interface up, to rebind it to
+qmi_wwan driver.
+The proper configuration is:
 
-A PHY driver should know if a PHY device supports C45 bus protocol,
-and if it supports C45 over C22. However, i PHY driver has no idea
-what the bus master supports.
+Interface mapping is:
+0: ADB, 1: AT (Modem), 2: AT, 3: PPP (NDIS / Pipe), 4: QMI, 5: ADB
 
-In phylib, we have a poorly defined phydev->is_c45. Its current
-meaning is: "The device was found using the C45 bus protocol, not C22
-protocol". One of the things phylib core then uses is_c45 for it to
-direct the C functions phy_read_mmd() and phy_write_mmd() to perform a
-C45 bus protocol access if true. If it is false, C45 over C22 is
-performed instead. As a result, if a PHY is discovered using C22, C45
-register access is then performed using C45 over C22, even thought the
-PHY and bus might support C45 bus protocol. is_c45 is also used in
-other places, e.g. to trigger auto-negotiation using C45 registers,
-not C22 registers.
+Note: Interface 3 of some models of the U9300 series can send AT commands.
 
-In summary, the C API is a bit of a mess.
+T:  Bus=05 Lev=01 Prnt=05 Port=04 Cnt=01 Dev#=  6 Spd=480 MxCh= 0
+D:  Ver= 2.00 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=1c9e ProdID=9b3c Rev=03.18
+S:  Manufacturer=Android
+S:  Product=Android
+C:  #Ifs= 5 Cfg#= 1 Atr=80 MxPwr=500mA
+I:  If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=(none)
+E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=00 Prot=00 Driver=option
+E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=83(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=00 Prot=00 Driver=option
+E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=84(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=85(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 3 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=00 Prot=00 Driver=option
+E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=86(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=87(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 4 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=qmi_wwan
+E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=88(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+E:  Ad=89(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
 
-For the Rust API we have two sensible choices:
+Tested successfully using Modem Manager on U9300.
+Tested successfully AT commands using If=1, If=2 and If=3 on U9300.
 
-1) It is the same mess as the C API, so hopefully one day we will fix
-   both at the same time.
+Signed-off-by: Coia Prant <coiaprant@gmail.com>
+Reviewed-by: Lars Melin <larsm17@gmail.com>
+Cc: stable@vger.kernel.org
+Cc: netdev@vger.kernel.org
+---
+ drivers/usb/serial/option.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-2) We define a different API which correctly separate C45 bus access
-   from C45 registers.
+diff --git a/drivers/usb/serial/option.c b/drivers/usb/serial/option.c
+index 55a65d941ccb..27a116901459 100644
+--- a/drivers/usb/serial/option.c
++++ b/drivers/usb/serial/option.c
+@@ -412,6 +412,10 @@ static void option_instat_callback(struct urb *urb);
+  */
+ #define LONGCHEER_VENDOR_ID			0x1c9e
+ 
++/* Longsung products */
++#define LONGSUNG_U8300_PRODUCT_ID		0x9b05
++#define LONGSUNG_U9300_PRODUCT_ID		0x9b3c
++
+ /* 4G Systems products */
+ /* This one was sold as the VW and Skoda "Carstick LTE" */
+ #define FOUR_G_SYSTEMS_PRODUCT_CARSTICK_LTE	0x7605
+@@ -2054,6 +2058,10 @@ static const struct usb_device_id option_ids[] = {
+ 	  .driver_info = RSVD(4) },
+ 	{ USB_DEVICE(LONGCHEER_VENDOR_ID, ZOOM_PRODUCT_4597) },
+ 	{ USB_DEVICE(LONGCHEER_VENDOR_ID, IBALL_3_5G_CONNECT) },
++	{ USB_DEVICE(LONGCHEER_VENDOR_ID, LONGSUNG_U8300_PRODUCT_ID),
++	  .driver_info = RSVD(4) | RSVD(5) },
++	{ USB_DEVICE(LONGCHEER_VENDOR_ID, LONGSUNG_U9300_PRODUCT_ID),
++	  .driver_info = RSVD(0) | RSVD(4) },
+ 	{ USB_DEVICE(HAIER_VENDOR_ID, HAIER_PRODUCT_CE100) },
+ 	{ USB_DEVICE_AND_INTERFACE_INFO(HAIER_VENDOR_ID, HAIER_PRODUCT_CE81B, 0xff, 0xff, 0xff) },
+ 	/* Pirelli  */
+-- 
+2.39.2
 
-How you currently defined the Rust API is neither of these.
-
-       Andrew
 
