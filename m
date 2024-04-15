@@ -1,169 +1,190 @@
-Return-Path: <netdev+bounces-88022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0249D8A559D
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:53:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A0858A55D6
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:00:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 818B0B22D11
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:53:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4B97282749
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26F2C71B51;
-	Mon, 15 Apr 2024 14:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F03757FB;
+	Mon, 15 Apr 2024 15:00:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PWrs5fKI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h+RGp9BL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB853679E5;
-	Mon, 15 Apr 2024 14:52:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E9A74E37;
+	Mon, 15 Apr 2024 15:00:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713192777; cv=none; b=nfQsGIXZk/KcRzhHspHbElF6AeBCMLJ78zbuvexALqpuJMnIjLKlE95NvxWkrgom2dNX+Q7RVemoMzcai04bXAHsO7BhIYl1neZSXCgJ5jhXNBQrpELlmYxTMYBWK/N+A8GZ0ctLurRNZ2Qza/GbHXw/gQmcXMjJbZj6Y8e7p6U=
+	t=1713193238; cv=none; b=obebo+p1dueGKO3HyeJa+5UGcSsITfpf07BS9+O6ASeoXKn/tixdOWiIwJAna+yTdIIEYHqxhSJP8QD149s0cQrUpgT90j81lNvsKmX+bnJ1uAg69J6i53VDpk2MLzrfdWZw4ynmWgs6En0igLqpepzVxbcDcFYSCOaosPuKODE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713192777; c=relaxed/simple;
-	bh=NhbAtc6tAGccokWSTjoKOMtgLuAbLGDa8a3OfLwV230=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OLodLUgG5tV921jANIqjXwrZDqPDNMwnbtc448V9clnxuI5aV09SoRzAK/OxOvxDpzQLMJha6fGGYK89u9eWEbWCpydwXO/5Oqr23wiTNyRxvxKF3K/fFFBF8rDU8VOti+wLxyK2+syr3bfGEKnPervk9hUUQYUYli0HtEqL2wc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PWrs5fKI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 267E2C113CC;
-	Mon, 15 Apr 2024 14:52:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713192776;
-	bh=NhbAtc6tAGccokWSTjoKOMtgLuAbLGDa8a3OfLwV230=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PWrs5fKIlnzoyDAUHDWP4Y/Pvl09ehPKzlzipssc5llEgsM4XodZX0woW/NTST5B0
-	 B03GQhlkgJcyHjeYjkF3SyUa20g6XEuS8KiTh2nzLYc3Gze0gL4BErAp+FmCxJDLqi
-	 bvUg4CwKXnhE2lYPOVePRzcbQQ8MsTc1venCKXnd1OzvhSY+Hnj1xlWlPSkFUF+Jvi
-	 bUpSa71+FXCgHH2/wOsYHf8ByDStbIrmopHRqOwEf0qZSD6UPlNaOMa+5qLAXv2G6P
-	 0KWdSBJRQ3odCtfC+CFjNz5OBy/p8Co9ZLQ0bETvoKnFjr2C56WASlvyOKZAExb91o
-	 UjHI3ixedmu6Q==
-Date: Mon, 15 Apr 2024 15:52:48 +0100
-From: Simon Horman <horms@kernel.org>
-To: Yi-De Wu <yi-de.wu@mediatek.com>
-Cc: Yingshiuan Pan <yingshiuan.pan@mediatek.com>,
-	Ze-Yu Wang <ze-yu.wang@mediatek.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
-	David Bradil <dbrazdil@google.com>,
-	Trilok Soni <quic_tsoni@quicinc.com>,
-	My Chuang <my.chuang@mediatek.com>,
-	Shawn Hsiao <shawn.hsiao@mediatek.com>,
-	PeiLun Suei <peilun.suei@mediatek.com>,
-	Liju Chen <liju-clr.chen@mediatek.com>,
-	Willix Yeh <chi-shen.yeh@mediatek.com>,
-	Kevenny Hsieh <kevenny.hsieh@mediatek.com>
-Subject: Re: [PATCH v10 15/21] virt: geniezone: Add demand paging support
-Message-ID: <20240415145248.GD2320920@kernel.org>
-References: <20240412065718.29105-1-yi-de.wu@mediatek.com>
- <20240412065718.29105-16-yi-de.wu@mediatek.com>
+	s=arc-20240116; t=1713193238; c=relaxed/simple;
+	bh=OJhWkXaiZfR5vxgWccVDhgB7L5539O3TT+m0W3wEVJQ=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=kWkyHePVTFG4IVaCZ0ytViBqJB8WDUiFezQT1gaAOK0zvTwXLie8NNo5T9ZG7pxqRlRc4aeeI6pUqnNqBEl2iyXR4iDW0cyCB25r/flSR1UK65axGEAbSAi/+EV1FjJHzDzcegJTuCwA3w91UWR6seXWu0a+up4lSs1Hfdxcr6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h+RGp9BL; arc=none smtp.client-ip=209.85.221.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-4dac3cbc8fdso1306176e0c.0;
+        Mon, 15 Apr 2024 08:00:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713193235; x=1713798035; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WS6Pv+eMPVF9jwN1/da6sM3EbXPOKQ+l4+JLzAo2+5s=;
+        b=h+RGp9BLkdMOdq5GQBRNkfjRnIMkpwJnIO6R9Z4W+gTlWhHDa72XUfnH4Q9g82aydR
+         pWaP2mF137KxIPyNb0Y9/K767+g27Kr8/YNus/Z/GGjS1BfGh5luxSQDU2AnafaIYVzP
+         L1Dz/xXK/a8idBQfZ/hzePyFkfr6yLlazOboQSfrMp5fxU6YgLe2PRqvLZiTNtMJMdT6
+         mjoVH/W04Es46vm53+xXJ9OofNOJem3iOMWSEyvyAdRVToyktMGPx04flfFN7/QJMHD6
+         ObCxYiGLyLJ8ujnHJMeriPagjhZ0I9sHIj0W3IOwD6J6iLdPbPEpShXC7Oha2aouk/HT
+         7AUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713193235; x=1713798035;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=WS6Pv+eMPVF9jwN1/da6sM3EbXPOKQ+l4+JLzAo2+5s=;
+        b=a59QN9V5lOKyOGSG+VJcYlxdaHJdIXkvX4eqVhSuAHW/swxu6XoIHhXcn72+rP7qOw
+         o1Rph4e4LRNq/mrcMSKBMgfEDy9jLFYD42r/HBIQ7jlYsJ3MRAPvbjZSrbxzn5VFMBMT
+         A3MU/6HLSMcuSKZeu4J03Pkwjl3shxYrKTeI1/mVeLij3w8Nr/SXHLOK+lzfryKa5wNm
+         cPC+3K+dlG9IoktMHqx94Z2gjyjko0eo0TWeLE0y/yg6rdZReQBBNRrOCXIJCzCLEmWw
+         qmZ93yDyiKMs5TMWeFX7NamPlVkxAQksl24rUfMT6DFuGJMXRgta0AFDGlHkxJVtcEoz
+         iDhg==
+X-Forwarded-Encrypted: i=1; AJvYcCXVJe3NWGXyyZtYCtr5jw0zSyslno6YrZhd2vvsHxaqyXccZJYmTAx5NAdmeqXCAIOAB6XxCtQ9aqBeIsdjg1b8Z5SLOO4J/beGsuktncWMTPDZGjk2URW/jsIJCPDu8XL9MSVS
+X-Gm-Message-State: AOJu0Yxb0WIotI1BA5YCaYlnApje0tr9jXqTQUTAhtVb/4t1fqoC8bls
+	xoImD4DH5sMOkZPAyv2T0ul/ZN12HlNaoQVmCDS/KpyVmR3CxypA
+X-Google-Smtp-Source: AGHT+IGTheb8k3tpl64FvDV3BdvW1vuUvwO9iUTdUt2UdDwND0VjYngIDw7HpvBKpueW1xWnMDSlfA==
+X-Received: by 2002:a05:6122:209e:b0:4cd:b718:4b08 with SMTP id i30-20020a056122209e00b004cdb7184b08mr7269652vkd.11.1713193233032;
+        Mon, 15 Apr 2024 08:00:33 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id v13-20020a0cc60d000000b0069b75b8633dsm1963873qvi.67.2024.04.15.08.00.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 08:00:32 -0700 (PDT)
+Date: Mon, 15 Apr 2024 11:00:32 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Alexander Duyck <alexander.duyck@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Richard Gobert <richardbgobert@gmail.com>, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ aleksander.lobakin@intel.com, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Message-ID: <661d41106f996_c0c829445@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAKgT0UfB+3DTjK7vq1uvG-2xtA53pw03ygJhwSG8j1bPtmYU8A@mail.gmail.com>
+References: <20240412152120.115067-1-richardbgobert@gmail.com>
+ <20240412152120.115067-2-richardbgobert@gmail.com>
+ <661ad1136bc10_3be9a7294c2@willemb.c.googlers.com.notmuch>
+ <CAKgT0UfB+3DTjK7vq1uvG-2xtA53pw03ygJhwSG8j1bPtmYU8A@mail.gmail.com>
+Subject: Re: [PATCH net v1 1/2] net: gro: add flush check in
+ udp_gro_receive_segment
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240412065718.29105-16-yi-de.wu@mediatek.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 12, 2024 at 02:57:12PM +0800, Yi-De Wu wrote:
-> From: "Yingshiuan Pan" <yingshiuan.pan@mediatek.com>
-> 
-> This page fault handler helps GenieZone hypervisor to do demand paging.
-> On a lower level translation fault, GenieZone hypervisor will first
-> check the fault GPA (guest physical address or IPA in ARM) is valid
-> e.g. within the registered memory region, then it will setup the
-> vcpu_run->exit_reason with necessary information for returning to
-> gzvm driver.
-> 
-> With the fault information, the gzvm driver looks up the physical
-> address and call the MT_HVC_GZVM_MAP_GUEST to request the hypervisor
-> maps the found PA to the fault GPA (IPA).
-> 
-> There is one exception, for protected vm, we will populate full VM's
-> memory region in advance in order to improve performance.
-> 
-> Signed-off-by: Yingshiuan Pan <yingshiuan.pan@mediatek.com>
-> Signed-off-by: Jerry Wang <ze-yu.wang@mediatek.com>
-> Signed-off-by: kevenny hsieh <kevenny.hsieh@mediatek.com>
-> Signed-off-by: Liju Chen <liju-clr.chen@mediatek.com>
-> Signed-off-by: Yi-De Wu <yi-de.wu@mediatek.com>
+Alexander Duyck wrote:
+> On Sat, Apr 13, 2024 at 11:38=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Richard Gobert wrote:
+> > > GRO-GSO path is supposed to be transparent and as such L3 flush che=
+cks are
+> > > relevant to all flows which call skb_gro_receive. This patch uses t=
+he same
+> > > logic and code from tcp_gro_receive but in the relevant flow path i=
+n
+> > > udp_gro_receive_segment.
+> > >
+> > > Fixes: 36707061d6ba ("udp: allow forwarding of plain (non-fragliste=
+d) UDP GRO packets")
+> > > Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+> >
+> > Reviewed-by: Willem de Bruijn <willemb@google.com>
+> >
+> > > ---
+> > >  net/ipv4/udp_offload.c | 13 ++++++++++++-
+> > >  1 file changed, 12 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+> > > index 3498dd1d0694..1f4e08f43c4b 100644
+> > > --- a/net/ipv4/udp_offload.c
+> > > +++ b/net/ipv4/udp_offload.c
+> > > @@ -471,6 +471,7 @@ static struct sk_buff *udp_gro_receive_segment(=
+struct list_head *head,
+> > >       struct sk_buff *p;
+> > >       unsigned int ulen;
+> > >       int ret =3D 0;
+> > > +     int flush;
+> > >
+> > >       /* requires non zero csum, for symmetry with GSO */
+> > >       if (!uh->check) {
+> > > @@ -528,7 +529,17 @@ static struct sk_buff *udp_gro_receive_segment=
+(struct list_head *head,
+> > >                               skb_gro_postpull_rcsum(skb, uh,
+> > >                                                      sizeof(struct =
+udphdr));
+> > >
+> > > -                             ret =3D skb_gro_receive(p, skb);
+> > > +                             flush =3D NAPI_GRO_CB(p)->flush;
+> > > +
+> > > +                             if (NAPI_GRO_CB(p)->flush_id !=3D 1 |=
+|
+> > > +                                 NAPI_GRO_CB(p)->count !=3D 1 ||
+> > > +                                 !NAPI_GRO_CB(p)->is_atomic)
+> > > +                                     flush |=3D NAPI_GRO_CB(p)->fl=
+ush_id;
+> > > +                             else
+> > > +                                     NAPI_GRO_CB(p)->is_atomic =3D=
+ false;
+> > > +
+> > > +                             if (flush || skb_gro_receive(p, skb))=
 
-...
+> > > +                                     ret =3D 1;
+> >
+> > UDP_L4 does not have the SKB_GSO_TCP_FIXEDID that uses is_atomic as
+> > input.
+> >
+> > And I still don't fully internalize the flush_id logic after staring
+> > at it for more than one coffee.
+> =
 
-> diff --git a/drivers/virt/geniezone/gzvm_exception.c b/drivers/virt/geniezone/gzvm_exception.c
-> new file mode 100644
-> index 000000000000..475bc15b0689
-> --- /dev/null
-> +++ b/drivers/virt/geniezone/gzvm_exception.c
-> @@ -0,0 +1,39 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Copyright (c) 2023 MediaTek Inc.
-> + */
-> +
-> +#include <linux/device.h>
-> +#include <linux/soc/mediatek/gzvm_drv.h>
-> +
-> +/**
-> + * gzvm_handle_guest_exception() - Handle guest exception
-> + * @vcpu: Pointer to struct gzvm_vcpu_run in userspace
-> + * Return:
-> + * * true - This exception has been processed, no need to back to VMM.
-> + * * false - This exception has not been processed, require userspace.
-> + */
-> +bool gzvm_handle_guest_exception(struct gzvm_vcpu *vcpu)
+> The flush_id field is there to indicate the difference between the
+> current IPv4 ID of the previous IP header. It is meant to be used in
+> conjunction with the is_atomic for the frame coalescing. Basically
+> after the second frame we can decide the pattern either incrementing
+> IPv4 ID or fixed, so on frames 3 or later we can decide to drop the
+> frame if it doesn't follow that pattern.
+> =
 
-Hi Yi-De Wu,
+> > But even ignoring those, the flush signal of NAPI_GRO_CB(p)->flush
+> > set the network layer must be followed, so ACK. Thanks for the fix.
+> =
 
-The return type is bool, however the function actually
-returns either a bool or signed int.
+> I'm not sure about the placement of this code though. That is the one
+> thing that seems off to me. Specifically this seems like it should be
+> done before we start the postpull, not after. It should be something
+> that can terminate the flow before we attempt to aggregate the UDP
+> headers.
 
-I think that either:
+In principle agreed that we should conclude the flush checks before
+doing prep for coalescing.
 
-1. The return type should be changed to int,
-   and returning true and false should be updated.
-
-2. The function should always return true or false.
-
-Flagged by Smatch.
-
-> +{
-> +	int ret;
-> +
-> +	for (int i = 0; i < ARRAY_SIZE(vcpu->run->exception.reserved); i++) {
-> +		if (vcpu->run->exception.reserved[i])
-> +			return -EINVAL;
-> +	}
-> +
-> +	switch (vcpu->run->exception.exception) {
-> +	case GZVM_EXCEPTION_PAGE_FAULT:
-> +		ret = gzvm_handle_page_fault(vcpu);
-> +		break;
-> +	case GZVM_EXCEPTION_UNKNOWN:
-> +		fallthrough;
-> +	default:
-> +		ret = -EFAULT;
-> +	}
-> +
-> +	if (!ret)
-> +		return true;
-> +	else
-> +		return false;
-> +}
-
-...
+In practice it does not matter? NAPI_GRO_CB(skb)->csum will be ignored
+if the packet gets flushed.=
 
