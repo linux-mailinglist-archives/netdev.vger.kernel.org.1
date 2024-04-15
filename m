@@ -1,193 +1,1065 @@
-Return-Path: <netdev+bounces-87753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B30218A46B1
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 04:03:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1C348A46C8
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 04:07:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 611761F219B8
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 02:03:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D081B224B4
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 02:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA01D29E;
-	Mon, 15 Apr 2024 02:03:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5294613ACC;
+	Mon, 15 Apr 2024 02:07:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="KfhJzkf7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W1UykSgQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDEB16FCA
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 02:03:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AEB8BE4F
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 02:07:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713146588; cv=none; b=uXy9tnX9JEFWfqX4aqxS94qhUCFyUinYBiROLjgq8+Sb+3zgUBLln9mXlDl1bamstUydi5N3V+gSjtCArGrvKK2aytjGk9vk508yGebGYnLcssyuBbaGDEQX289dzS8OLH34taqQGr03UoXdP9Yi1E2gChJ8PpTPoKkk4vDeeSU=
+	t=1713146859; cv=none; b=KZ7OwgYnL2yYDIs9Xe4jwR9yfPHMRsaehjC9A9VDh36M7YVg7q0wJ4Hr6kn/+6TnBdfDtOZxau4PhqShz5vsn2h26R1tlP/y107JxWdqPXkSw5IJ0MyyIf5tR1dwdlHLiwE6Z8yndKb1xYBIf6ohOj0Jvsjcx1CTP6BVSJuyKxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713146588; c=relaxed/simple;
-	bh=LLUxWlLv0vqmiHJ1UIZeaRzH8/vNgpEkiTxlBMPS6dI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kCEZoIlvKhrcDza/fzw4Wnrwk7tcggO3A4PEv+I2waqqJk1sLsS6C6gH+alw05HELrLiCWiSJmPGieKyq5ANkVfB4R00c1ylVQtgqkdpKenGThIbhBNbc9BbDE9Xsrjjz6pNWh8A2UJnQ7c2ZnTEchv2fxMH2ZrGQ9feruLx36A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=KfhJzkf7; arc=none smtp.client-ip=209.85.214.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-1e411e339b8so21242995ad.3
-        for <netdev@vger.kernel.org>; Sun, 14 Apr 2024 19:03:06 -0700 (PDT)
+	s=arc-20240116; t=1713146859; c=relaxed/simple;
+	bh=gytlpqjCIvBOe7pMC/ZWsFbrMXv7y29h5m/WgA3Tz34=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=DngwKhdN9piBbGa6DrmCP43pqYWkq2tXShxHDHtpD6khbEYpvxuvqipcZHOPTkAokqWhQ4yGcqSwvFZtElVMx7U1o0XBrXiYZk/ma5QgVIl4ilL6DaBaKHFSBcHslt4Rm9RgtmpdvmuRJd9QlQYmgrShAVIqUFNYfn5Nptz0oCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--surenb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W1UykSgQ; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--surenb.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6dbdcfd39so5087246276.2
+        for <netdev@vger.kernel.org>; Sun, 14 Apr 2024 19:07:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1713146586; x=1713751386; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=VsiaKifJOZA0qRUVE1+neEb+M+HY5irGf4D2Q2Uktwo=;
-        b=KfhJzkf7E731gNDQgo8qvjwBCVC+V9vUgkem78VvHQVjPhFGQ6m04QyhAMvwwzKHoF
-         Iebi0fUIXQKmSCuD9tPttTodF5EYWQAehf4HX2Qjr81x1hokV9l4Dyo3qGzm5KR92AAk
-         +tmuFJUPdhD4cBxGgjgkHDS+U7gZW0upxBvwzJhqlQuTzu25bvzssI4mlLot+c8v4VmL
-         pAQaJBvtDOUFEUNNr5IMw715Cy9ey9tS7OmU4W6jkJ6QN+53tviQs0+B2SOjcX3gjXq0
-         ykwiwfiyEur8CmTdqpTWyaTS9Nvms3hK6j5t8tWjrHv4pi9xUchMBpdlKywUGAmXqxbC
-         fI+A==
+        d=google.com; s=20230601; t=1713146855; x=1713751655; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DPgPj0ctSd8dy3HVX7Jpya60KWwYcl18JFeDQNf2ERs=;
+        b=W1UykSgQ/8BXkZsjLKbyXLkw/KprucsJfV3yD7V2fG2zNAAOPlIKKudoUOlq/rtR24
+         jMpfAOhovRkfFECW2XHKScic9Oi29ofJCAHpoVaC7AYjlwH5parntKqvMhKtG3P3QGEJ
+         muvNIpWaNUPR3HOgqVADe+9tid3D1SqcssUvjnNbZhcLftrGLol/9YzJA0hhaofaq5DY
+         qmzJSSqPeOURYog8FIW+s13CIWvhNKnDeIVt80ApgSYY1KyG8A5kEkSO46vC/KaqdkkD
+         x9h5Sc11ojPIjkUFxcefplFVAV0f+KL4naObX215/APOEI5TsI2L18g7wEiQTX8MEjGr
+         q+ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713146586; x=1713751386;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=VsiaKifJOZA0qRUVE1+neEb+M+HY5irGf4D2Q2Uktwo=;
-        b=gOLapgtwYJhihUF4ftBH9RNxVsqPQq9jTQcL5Bo6gGAfT/BW9P07hjpwmxQ5aO7QGk
-         YBdGGhaiz3Bq9ynaXMPeLMn6J7r7hYaq9L+FVh0xPLdyA6qIpYTn5HLDhYTbIMFdo/Xi
-         GmrsDeevI+WOGevUYwPN48tqsAswj1XqmZlFnerwDVnlbSKo2KmpgDObGAb6CMGsVZMr
-         uDvDu0546Gd/iCQeWUqBYH2pQFg0e4+YnHx8c53WxdqCcFFV+CN9PDwunFGjr5D4rW24
-         9B1n+UxxRJDvFVFUu3usY+Es9NGfsCQSA1OqtkjvLSLli76pyYUS26ZRIPAbjbPb2bOH
-         ra/w==
-X-Forwarded-Encrypted: i=1; AJvYcCUyW/LyRmc38vuQ5eet1xogRy5UaWL30ia0Gt8hVEa8WmfwfZXe78ESos5dkzQGtl778CIFtQbtVOd9tQ9dC5vzh1kbSDCL
-X-Gm-Message-State: AOJu0YzqwvWO9+rztJac8712+uPbyKxrENCZEa0fQ2JN1+1NOP2visFy
-	cKF12mDS0MRxNtDe544pWy7ySkrt8Mpwe8r0JQHL/yKKl6wJztwchq7tT4mKWTY=
-X-Google-Smtp-Source: AGHT+IFh1gnp53lS1uAZMRwhtdRmABsUTOLGcITiE0+jq7U8vWTjdjGd9ie6v4eS5XIVfJrJ9KbAkQ==
-X-Received: by 2002:a17:902:db01:b0:1e2:bdfa:9c15 with SMTP id m1-20020a170902db0100b001e2bdfa9c15mr10660073plx.41.1713146585341;
-        Sun, 14 Apr 2024 19:03:05 -0700 (PDT)
-Received: from localhost.localdomain ([103.172.41.206])
-        by smtp.googlemail.com with ESMTPSA id y2-20020a17090264c200b001e205884ac6sm6897872pli.20.2024.04.14.19.03.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 14 Apr 2024 19:03:04 -0700 (PDT)
-From: Lei Chen <lei.chen@smartx.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"Michael S. Tsirkin" <mst@redhat.com>
-Cc: Lei Chen <lei.chen@smartx.com>,
-	Willem de Bruijn <willemb@google.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v5] tun: limit printing rate when illegal packet received by tun dev
-Date: Sun, 14 Apr 2024 22:02:46 -0400
-Message-ID: <20240415020247.2207781-1-lei.chen@smartx.com>
-X-Mailer: git-send-email 2.44.0
+        d=1e100.net; s=20230601; t=1713146855; x=1713751655;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DPgPj0ctSd8dy3HVX7Jpya60KWwYcl18JFeDQNf2ERs=;
+        b=NTF9OJ3qDV7dQaASLAaVpoCG0bx5R4ozzZGYl8PugjhUR1zbNRY47SOtNt2XWOC7Le
+         TVqrbqTZLL32jCOtFgbvOX5zqh6lZtW7BBTzrY0dAPOCYjKncf9ubsKCerisSVMkERx3
+         aKKI/QmDaL0ZjtF/Veev3oopncymlcvcZ/g2sPusR3jxrd9Zb87XFGrST7Ejf1pGkHUm
+         HRxR5OBjp8vQYcXu0Xf1Sd2AVbPfTVRlz620Tzv0tNpS0CDl/j5CM9O+n6BXU5SimieU
+         WDVe1nYCu4M/5CY/o0n//z0nsu7u6LyJU1rk9IwwGvL+9UUF4n3Yg2uaFcmCAEakcras
+         ddsA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/tK1SsmPwDadZMkVdThN1ppQ6hQ7IS4/MzRy83MZCH8VEdVmJPTrc6sTZMBvBnv5fSs5/yVyKKxeWu6B8jwGmTwpymhUK
+X-Gm-Message-State: AOJu0YwADdmcuG+qGQUYCZoVlRlUDGuli9af/rTe+g47qGIKhJYRE4nQ
+	DLM+/Kac3Zvxg3yiZSwmWNbn44biYW1XOE43JhiJTImDR7IBSCbGHuyds/3eN82GVCiGNXKt9Ok
+	2lA==
+X-Google-Smtp-Source: AGHT+IFfnmY6HrJsMgj7EOcxIhfkSBTtHxmdwN5ldQ/f2DU5ksvFYrxTHjHKRsl7OyqimWjF7YdEaV34gmE=
+X-Received: from surenb-desktop.mtv.corp.google.com ([2620:15c:211:201:4faf:b746:8f4e:5d6])
+ (user=surenb job=sendgmr) by 2002:a05:6902:1896:b0:ddd:7581:1237 with SMTP id
+ cj22-20020a056902189600b00ddd75811237mr2803599ybb.3.1713146855033; Sun, 14
+ Apr 2024 19:07:35 -0700 (PDT)
+Date: Sun, 14 Apr 2024 19:07:31 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
+Message-ID: <20240415020731.1152108-1-surenb@google.com>
+Subject: [PATCH v2 1/1] mm: change inlined allocation helpers to account at
+ the call site
+From: Suren Baghdasaryan <surenb@google.com>
+To: akpm@linux-foundation.org
+Cc: willy@infradead.org, jack@suse.cz, joro@8bytes.org, will@kernel.org, 
+	trond.myklebust@hammerspace.com, anna@kernel.org, arnd@arndb.de, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, jikos@kernel.org, 
+	benjamin.tissoires@redhat.com, tytso@mit.edu, jack@suse.com, 
+	dennis@kernel.org, tj@kernel.org, cl@linux.com, jakub@cloudflare.com, 
+	penberg@kernel.org, rientjes@google.com, iamjoonsoo.kim@lge.com, 
+	vbabka@suse.cz, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	iommu@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, linux-acpi@vger.kernel.org, 
+	acpica-devel@lists.linux.dev, linux-arch@vger.kernel.org, 
+	linux-crypto@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-input@vger.kernel.org, linux-ext4@vger.kernel.org, linux-mm@kvack.org, 
+	netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	kent.overstreet@linux.dev, surenb@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-vhost_worker will call tun call backs to receive packets. If too many
-illegal packets arrives, tun_do_read will keep dumping packet contents.
-When console is enabled, it will costs much more cpu time to dump
-packet and soft lockup will be detected.
+Main goal of memory allocation profiling patchset is to provide accounting
+that is cheap enough to run in production. To achieve that we inject
+counters using codetags at the allocation call sites to account every time
+allocation is made. This injection allows us to perform accounting
+efficiently because injected counters are immediately available as opposed
+to the alternative methods, such as using _RET_IP_, which would require
+counter lookup and appropriate locking that makes accounting much more
+expensive. This method requires all allocation functions to inject
+separate counters at their call sites so that their callers can be
+individually accounted. Counter injection is implemented by allocation
+hooks which should wrap all allocation functions.
 
-net_ratelimit mechanism can be used to limit the dumping rate.
+Inlined functions which perform allocations but do not use allocation
+hooks are directly charged for the allocations they perform. In most
+cases these functions are just specialized allocation wrappers used
+from multiple places to allocate objects of a specific type. It would
+be more useful to do the accounting at their call sites instead.
+Instrument these helpers to do accounting at the call site. Simple
+inlined allocation wrappers are converted directly into macros. More
+complex allocators or allocators with documentation are converted into
+_noprof versions and allocation hooks are added. This allows memory
+allocation profiling mechanism to charge allocations to the callers
+of these functions.
 
-PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980"
- #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
- #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
- #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
- #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
- #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
-    [exception RIP: io_serial_in+20]
-    RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
-    RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 0000000000000000
-    RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428a0
-    RBP: 0000000000002710   R8: 0000000000000004   R9: 000000000000000f
-    R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 0000000000000020
-    R13: ffffffff8acbf698  R14: 0000000000000058  R15: 0000000000000000
-    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
- #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
- #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
- #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
- #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
- #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
- #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
- #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
- #12 [ffffa65531497b68] printk at ffffffff89318306
- #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
- #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
- #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
- #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
- #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
- #18 [ffffa65531497f10] kthread at ffffffff892d2e72
- #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
-
-Fixes: ef3db4a59542 ("tun: avoid BUG, dump packet on GSO errors")
-Signed-off-by: Lei Chen <lei.chen@smartx.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
+Signed-off-by: Suren Baghdasaryan <surenb@google.com>
 ---
-Changes from v4:
-https://lore.kernel.org/all/20240414081806.2173098-1-lei.chen@smartx.com/
- 1. Adjust code indentation
+Changes since v1 [1]:
+- Added explicit type casts in macro replacements to force type checks,
+per Matthew Wilcox
+- Expanded the changelog to explain the reasons codetags are used and
+this change is neeed, per Jan Kara
 
-Changes from v3:
-https://lore.kernel.org/all/20240412065841.2148691-1-lei.chen@smartx.com/
- 1. Change patch target from net tun to tun.
- 2. Move change log below the seperator "---".
- 3. Remove escaped parentheses in the Fixes string.
+[1] https://lore.kernel.org/all/20240404165404.3805498-1-surenb@google.com/
 
-Changes from v2:
-https://lore.kernel.org/netdev/20240410042245.2044516-1-lei.chen@smartx.com/
- 1. Add net-dev to patch subject-prefix.
- 2. Add fix tag.
+ drivers/iommu/amd/amd_iommu.h           |  5 ++--
+ fs/nfs/iostat.h                         |  5 +---
+ include/acpi/platform/aclinuxex.h       | 19 +++++---------
+ include/asm-generic/pgalloc.h           | 35 +++++++++++++++----------
+ include/crypto/hash.h                   |  7 ++---
+ include/crypto/internal/acompress.h     |  5 ++--
+ include/crypto/skcipher.h               |  7 ++---
+ include/linux/bpf.h                     | 33 ++++++-----------------
+ include/linux/bpfptr.h                  |  5 ++--
+ include/linux/dma-fence-chain.h         |  6 ++---
+ include/linux/hid_bpf.h                 |  6 ++---
+ include/linux/jbd2.h                    | 12 +++------
+ include/linux/mm.h                      |  5 ++--
+ include/linux/mm_types.h                |  5 ++--
+ include/linux/percpu.h                  |  3 +++
+ include/linux/ptr_ring.h                | 28 +++++++++++---------
+ include/linux/skb_array.h               | 19 ++++++++------
+ include/linux/skbuff.h                  | 20 ++++++--------
+ include/linux/skmsg.h                   |  8 +++---
+ include/linux/slab.h                    |  5 ++++
+ include/linux/sockptr.h                 | 10 ++++---
+ include/net/netlabel.h                  | 16 ++++++-----
+ include/net/netlink.h                   |  5 ++--
+ include/net/request_sock.h              |  5 ++--
+ include/net/tcx.h                       |  5 ++--
+ net/sunrpc/auth_gss/auth_gss_internal.h |  6 +++--
+ 26 files changed, 142 insertions(+), 143 deletions(-)
 
-Changes from v1:
-https://lore.kernel.org/all/20240409062407.1952728-1-lei.chen@smartx.com/
- 1. Use net_ratelimit instead of raw __ratelimit.
- 2. Use netdev_err instead of pr_err to print more info abort net dev.
- 3. Adjust git commit message to make git am happy.
- drivers/net/tun.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
-
- drivers/net/tun.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index 0b3f21cba552..92da8c03d960 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -2125,14 +2125,16 @@ static ssize_t tun_put_user(struct tun_struct *tun,
- 					    tun_is_little_endian(tun), true,
- 					    vlan_hlen)) {
- 			struct skb_shared_info *sinfo = skb_shinfo(skb);
--			pr_err("unexpected GSO type: "
--			       "0x%x, gso_size %d, hdr_len %d\n",
--			       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
--			       tun16_to_cpu(tun, gso.hdr_len));
--			print_hex_dump(KERN_ERR, "tun: ",
--				       DUMP_PREFIX_NONE,
--				       16, 1, skb->head,
--				       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
+diff --git a/drivers/iommu/amd/amd_iommu.h b/drivers/iommu/amd/amd_iommu.h
+index f482aab420f7..52575ba9a141 100644
+--- a/drivers/iommu/amd/amd_iommu.h
++++ b/drivers/iommu/amd/amd_iommu.h
+@@ -134,13 +134,14 @@ static inline int get_pci_sbdf_id(struct pci_dev *pdev)
+ 	return PCI_SEG_DEVID_TO_SBDF(seg, devid);
+ }
+ 
+-static inline void *alloc_pgtable_page(int nid, gfp_t gfp)
++static inline void *alloc_pgtable_page_noprof(int nid, gfp_t gfp)
+ {
+ 	struct page *page;
+ 
+-	page = alloc_pages_node(nid, gfp | __GFP_ZERO, 0);
++	page = alloc_pages_node_noprof(nid, gfp | __GFP_ZERO, 0);
+ 	return page ? page_address(page) : NULL;
+ }
++#define alloc_pgtable_page(...)	alloc_hooks(alloc_pgtable_page_noprof(__VA_ARGS__))
+ 
+ /*
+  * This must be called after device probe completes. During probe
+diff --git a/fs/nfs/iostat.h b/fs/nfs/iostat.h
+index 5aa776b5a3e7..b17a9eb9b148 100644
+--- a/fs/nfs/iostat.h
++++ b/fs/nfs/iostat.h
+@@ -46,10 +46,7 @@ static inline void nfs_add_stats(const struct inode *inode,
+ 	nfs_add_server_stats(NFS_SERVER(inode), stat, addend);
+ }
+ 
+-static inline struct nfs_iostats __percpu *nfs_alloc_iostats(void)
+-{
+-	return alloc_percpu(struct nfs_iostats);
+-}
++#define nfs_alloc_iostats()	alloc_percpu(struct nfs_iostats)
+ 
+ static inline void nfs_free_iostats(struct nfs_iostats __percpu *stats)
+ {
+diff --git a/include/acpi/platform/aclinuxex.h b/include/acpi/platform/aclinuxex.h
+index 600d4e2641da..62cac266a1c8 100644
+--- a/include/acpi/platform/aclinuxex.h
++++ b/include/acpi/platform/aclinuxex.h
+@@ -47,26 +47,19 @@ acpi_status acpi_os_terminate(void);
+  * However, boot has  (system_state != SYSTEM_RUNNING)
+  * to quiet __might_sleep() in kmalloc() and resume does not.
+  */
+-static inline void *acpi_os_allocate(acpi_size size)
+-{
+-	return kmalloc(size, irqs_disabled()? GFP_ATOMIC : GFP_KERNEL);
+-}
++#define acpi_os_allocate(_size)	\
++		kmalloc(_size, irqs_disabled() ? GFP_ATOMIC : GFP_KERNEL)
+ 
+-static inline void *acpi_os_allocate_zeroed(acpi_size size)
+-{
+-	return kzalloc(size, irqs_disabled()? GFP_ATOMIC : GFP_KERNEL);
+-}
++#define acpi_os_allocate_zeroed(_size)	\
++		kzalloc(_size, irqs_disabled() ? GFP_ATOMIC : GFP_KERNEL)
+ 
+ static inline void acpi_os_free(void *memory)
+ {
+ 	kfree(memory);
+ }
+ 
+-static inline void *acpi_os_acquire_object(acpi_cache_t * cache)
+-{
+-	return kmem_cache_zalloc(cache,
+-				 irqs_disabled()? GFP_ATOMIC : GFP_KERNEL);
+-}
++#define acpi_os_acquire_object(_cache)	\
++		kmem_cache_zalloc(_cache, irqs_disabled() ? GFP_ATOMIC : GFP_KERNEL)
+ 
+ static inline acpi_thread_id acpi_os_get_thread_id(void)
+ {
+diff --git a/include/asm-generic/pgalloc.h b/include/asm-generic/pgalloc.h
+index 879e5f8aa5e9..7c48f5fbf8aa 100644
+--- a/include/asm-generic/pgalloc.h
++++ b/include/asm-generic/pgalloc.h
+@@ -16,15 +16,16 @@
+  *
+  * Return: pointer to the allocated memory or %NULL on error
+  */
+-static inline pte_t *__pte_alloc_one_kernel(struct mm_struct *mm)
++static inline pte_t *__pte_alloc_one_kernel_noprof(struct mm_struct *mm)
+ {
+-	struct ptdesc *ptdesc = pagetable_alloc(GFP_PGTABLE_KERNEL &
++	struct ptdesc *ptdesc = pagetable_alloc_noprof(GFP_PGTABLE_KERNEL &
+ 			~__GFP_HIGHMEM, 0);
+ 
+ 	if (!ptdesc)
+ 		return NULL;
+ 	return ptdesc_address(ptdesc);
+ }
++#define __pte_alloc_one_kernel(...)	alloc_hooks(__pte_alloc_one_kernel_noprof(__VA_ARGS__))
+ 
+ #ifndef __HAVE_ARCH_PTE_ALLOC_ONE_KERNEL
+ /**
+@@ -33,10 +34,11 @@ static inline pte_t *__pte_alloc_one_kernel(struct mm_struct *mm)
+  *
+  * Return: pointer to the allocated memory or %NULL on error
+  */
+-static inline pte_t *pte_alloc_one_kernel(struct mm_struct *mm)
++static inline pte_t *pte_alloc_one_kernel_noprof(struct mm_struct *mm)
+ {
+-	return __pte_alloc_one_kernel(mm);
++	return __pte_alloc_one_kernel_noprof(mm);
+ }
++#define pte_alloc_one_kernel(...)	alloc_hooks(pte_alloc_one_kernel_noprof(__VA_ARGS__))
+ #endif
+ 
+ /**
+@@ -61,11 +63,11 @@ static inline void pte_free_kernel(struct mm_struct *mm, pte_t *pte)
+  *
+  * Return: `struct page` referencing the ptdesc or %NULL on error
+  */
+-static inline pgtable_t __pte_alloc_one(struct mm_struct *mm, gfp_t gfp)
++static inline pgtable_t __pte_alloc_one_noprof(struct mm_struct *mm, gfp_t gfp)
+ {
+ 	struct ptdesc *ptdesc;
+ 
+-	ptdesc = pagetable_alloc(gfp, 0);
++	ptdesc = pagetable_alloc_noprof(gfp, 0);
+ 	if (!ptdesc)
+ 		return NULL;
+ 	if (!pagetable_pte_ctor(ptdesc)) {
+@@ -75,6 +77,7 @@ static inline pgtable_t __pte_alloc_one(struct mm_struct *mm, gfp_t gfp)
+ 
+ 	return ptdesc_page(ptdesc);
+ }
++#define __pte_alloc_one(...)	alloc_hooks(__pte_alloc_one_noprof(__VA_ARGS__))
+ 
+ #ifndef __HAVE_ARCH_PTE_ALLOC_ONE
+ /**
+@@ -85,10 +88,11 @@ static inline pgtable_t __pte_alloc_one(struct mm_struct *mm, gfp_t gfp)
+  *
+  * Return: `struct page` referencing the ptdesc or %NULL on error
+  */
+-static inline pgtable_t pte_alloc_one(struct mm_struct *mm)
++static inline pgtable_t pte_alloc_one_noprof(struct mm_struct *mm)
+ {
+-	return __pte_alloc_one(mm, GFP_PGTABLE_USER);
++	return __pte_alloc_one_noprof(mm, GFP_PGTABLE_USER);
+ }
++#define pte_alloc_one(...)	alloc_hooks(pte_alloc_one_noprof(__VA_ARGS__))
+ #endif
+ 
+ /*
+@@ -124,14 +128,14 @@ static inline void pte_free(struct mm_struct *mm, struct page *pte_page)
+  *
+  * Return: pointer to the allocated memory or %NULL on error
+  */
+-static inline pmd_t *pmd_alloc_one(struct mm_struct *mm, unsigned long addr)
++static inline pmd_t *pmd_alloc_one_noprof(struct mm_struct *mm, unsigned long addr)
+ {
+ 	struct ptdesc *ptdesc;
+ 	gfp_t gfp = GFP_PGTABLE_USER;
+ 
+ 	if (mm == &init_mm)
+ 		gfp = GFP_PGTABLE_KERNEL;
+-	ptdesc = pagetable_alloc(gfp, 0);
++	ptdesc = pagetable_alloc_noprof(gfp, 0);
+ 	if (!ptdesc)
+ 		return NULL;
+ 	if (!pagetable_pmd_ctor(ptdesc)) {
+@@ -140,6 +144,7 @@ static inline pmd_t *pmd_alloc_one(struct mm_struct *mm, unsigned long addr)
+ 	}
+ 	return ptdesc_address(ptdesc);
+ }
++#define pmd_alloc_one(...)	alloc_hooks(pmd_alloc_one_noprof(__VA_ARGS__))
+ #endif
+ 
+ #ifndef __HAVE_ARCH_PMD_FREE
+@@ -157,7 +162,7 @@ static inline void pmd_free(struct mm_struct *mm, pmd_t *pmd)
+ 
+ #if CONFIG_PGTABLE_LEVELS > 3
+ 
+-static inline pud_t *__pud_alloc_one(struct mm_struct *mm, unsigned long addr)
++static inline pud_t *__pud_alloc_one_noprof(struct mm_struct *mm, unsigned long addr)
+ {
+ 	gfp_t gfp = GFP_PGTABLE_USER;
+ 	struct ptdesc *ptdesc;
+@@ -166,13 +171,14 @@ static inline pud_t *__pud_alloc_one(struct mm_struct *mm, unsigned long addr)
+ 		gfp = GFP_PGTABLE_KERNEL;
+ 	gfp &= ~__GFP_HIGHMEM;
+ 
+-	ptdesc = pagetable_alloc(gfp, 0);
++	ptdesc = pagetable_alloc_noprof(gfp, 0);
+ 	if (!ptdesc)
+ 		return NULL;
+ 
+ 	pagetable_pud_ctor(ptdesc);
+ 	return ptdesc_address(ptdesc);
+ }
++#define __pud_alloc_one(...)	alloc_hooks(__pud_alloc_one_noprof(__VA_ARGS__))
+ 
+ #ifndef __HAVE_ARCH_PUD_ALLOC_ONE
+ /**
+@@ -184,10 +190,11 @@ static inline pud_t *__pud_alloc_one(struct mm_struct *mm, unsigned long addr)
+  *
+  * Return: pointer to the allocated memory or %NULL on error
+  */
+-static inline pud_t *pud_alloc_one(struct mm_struct *mm, unsigned long addr)
++static inline pud_t *pud_alloc_one_noprof(struct mm_struct *mm, unsigned long addr)
+ {
+-	return __pud_alloc_one(mm, addr);
++	return __pud_alloc_one_noprof(mm, addr);
+ }
++#define pud_alloc_one(...)	alloc_hooks(pud_alloc_one_noprof(__VA_ARGS__))
+ #endif
+ 
+ static inline void __pud_free(struct mm_struct *mm, pud_t *pud)
+diff --git a/include/crypto/hash.h b/include/crypto/hash.h
+index 5d61f576cfc8..e5181cc9b7c5 100644
+--- a/include/crypto/hash.h
++++ b/include/crypto/hash.h
+@@ -578,19 +578,20 @@ static inline void ahash_request_set_tfm(struct ahash_request *req,
+  *
+  * Return: allocated request handle in case of success, or NULL if out of memory
+  */
+-static inline struct ahash_request *ahash_request_alloc(
++static inline struct ahash_request *ahash_request_alloc_noprof(
+ 	struct crypto_ahash *tfm, gfp_t gfp)
+ {
+ 	struct ahash_request *req;
+ 
+-	req = kmalloc(sizeof(struct ahash_request) +
+-		      crypto_ahash_reqsize(tfm), gfp);
++	req = kmalloc_noprof(sizeof(struct ahash_request) +
++			     crypto_ahash_reqsize(tfm), gfp);
+ 
+ 	if (likely(req))
+ 		ahash_request_set_tfm(req, tfm);
+ 
+ 	return req;
+ }
++#define ahash_request_alloc(...)	alloc_hooks(ahash_request_alloc_noprof(__VA_ARGS__))
+ 
+ /**
+  * ahash_request_free() - zeroize and free the request data structure
+diff --git a/include/crypto/internal/acompress.h b/include/crypto/internal/acompress.h
+index 4ac46bafba9d..2a67793f52ad 100644
+--- a/include/crypto/internal/acompress.h
++++ b/include/crypto/internal/acompress.h
+@@ -69,15 +69,16 @@ static inline void acomp_request_complete(struct acomp_req *req,
+ 	crypto_request_complete(&req->base, err);
+ }
+ 
+-static inline struct acomp_req *__acomp_request_alloc(struct crypto_acomp *tfm)
++static inline struct acomp_req *__acomp_request_alloc_noprof(struct crypto_acomp *tfm)
+ {
+ 	struct acomp_req *req;
+ 
+-	req = kzalloc(sizeof(*req) + crypto_acomp_reqsize(tfm), GFP_KERNEL);
++	req = kzalloc_noprof(sizeof(*req) + crypto_acomp_reqsize(tfm), GFP_KERNEL);
+ 	if (likely(req))
+ 		acomp_request_set_tfm(req, tfm);
+ 	return req;
+ }
++#define __acomp_request_alloc(...)	alloc_hooks(__acomp_request_alloc_noprof(__VA_ARGS__))
+ 
+ static inline void __acomp_request_free(struct acomp_req *req)
+ {
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index c8857d7bdb37..6c5330e316b0 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -861,19 +861,20 @@ static inline struct skcipher_request *skcipher_request_cast(
+  *
+  * Return: allocated request handle in case of success, or NULL if out of memory
+  */
+-static inline struct skcipher_request *skcipher_request_alloc(
++static inline struct skcipher_request *skcipher_request_alloc_noprof(
+ 	struct crypto_skcipher *tfm, gfp_t gfp)
+ {
+ 	struct skcipher_request *req;
+ 
+-	req = kmalloc(sizeof(struct skcipher_request) +
+-		      crypto_skcipher_reqsize(tfm), gfp);
++	req = kmalloc_noprof(sizeof(struct skcipher_request) +
++			     crypto_skcipher_reqsize(tfm), gfp);
+ 
+ 	if (likely(req))
+ 		skcipher_request_set_tfm(req, tfm);
+ 
+ 	return req;
+ }
++#define skcipher_request_alloc(...)	alloc_hooks(skcipher_request_alloc_noprof(__VA_ARGS__))
+ 
+ /**
+  * skcipher_request_free() - zeroize and free request data structure
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index 4f20f62f9d63..a63fa48ab80d 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -2230,31 +2230,14 @@ void *bpf_map_kvcalloc(struct bpf_map *map, size_t n, size_t size,
+ void __percpu *bpf_map_alloc_percpu(const struct bpf_map *map, size_t size,
+ 				    size_t align, gfp_t flags);
+ #else
+-static inline void *
+-bpf_map_kmalloc_node(const struct bpf_map *map, size_t size, gfp_t flags,
+-		     int node)
+-{
+-	return kmalloc_node(size, flags, node);
+-}
+-
+-static inline void *
+-bpf_map_kzalloc(const struct bpf_map *map, size_t size, gfp_t flags)
+-{
+-	return kzalloc(size, flags);
+-}
+-
+-static inline void *
+-bpf_map_kvcalloc(struct bpf_map *map, size_t n, size_t size, gfp_t flags)
+-{
+-	return kvcalloc(n, size, flags);
+-}
+-
+-static inline void __percpu *
+-bpf_map_alloc_percpu(const struct bpf_map *map, size_t size, size_t align,
+-		     gfp_t flags)
+-{
+-	return __alloc_percpu_gfp(size, align, flags);
+-}
++#define bpf_map_kmalloc_node(_map, _size, _flags, _node)	\
++		kmalloc_node(_size, _flags, _node)
++#define bpf_map_kzalloc(_map, _size, _flags)			\
++		kzalloc(_size, _flags)
++#define bpf_map_kvcalloc(_map, _n, _size, _flags)		\
++		kvcalloc(_n, _size, _flags)
++#define bpf_map_alloc_percpu(_map, _size, _align, _flags)	\
++		__alloc_percpu_gfp(_size, _align, _flags)
+ #endif
+ 
+ static inline int
+diff --git a/include/linux/bpfptr.h b/include/linux/bpfptr.h
+index 79b2f78eec1a..1af241525a17 100644
+--- a/include/linux/bpfptr.h
++++ b/include/linux/bpfptr.h
+@@ -65,9 +65,9 @@ static inline int copy_to_bpfptr_offset(bpfptr_t dst, size_t offset,
+ 	return copy_to_sockptr_offset((sockptr_t) dst, offset, src, size);
+ }
+ 
+-static inline void *kvmemdup_bpfptr(bpfptr_t src, size_t len)
++static inline void *kvmemdup_bpfptr_noprof(bpfptr_t src, size_t len)
+ {
+-	void *p = kvmalloc(len, GFP_USER | __GFP_NOWARN);
++	void *p = kvmalloc_noprof(len, GFP_USER | __GFP_NOWARN);
+ 
+ 	if (!p)
+ 		return ERR_PTR(-ENOMEM);
+@@ -77,6 +77,7 @@ static inline void *kvmemdup_bpfptr(bpfptr_t src, size_t len)
+ 	}
+ 	return p;
+ }
++#define kvmemdup_bpfptr(...)	alloc_hooks(kvmemdup_bpfptr_noprof(__VA_ARGS__))
+ 
+ static inline long strncpy_from_bpfptr(char *dst, bpfptr_t src, size_t count)
+ {
+diff --git a/include/linux/dma-fence-chain.h b/include/linux/dma-fence-chain.h
+index 4bdf0b96da28..ad9e2506c2f4 100644
+--- a/include/linux/dma-fence-chain.h
++++ b/include/linux/dma-fence-chain.h
+@@ -86,10 +86,8 @@ dma_fence_chain_contained(struct dma_fence *fence)
+  *
+  * Returns a new struct dma_fence_chain object or NULL on failure.
+  */
+-static inline struct dma_fence_chain *dma_fence_chain_alloc(void)
+-{
+-	return kmalloc(sizeof(struct dma_fence_chain), GFP_KERNEL);
+-};
++#define dma_fence_chain_alloc()	\
++		((struct dma_fence_chain *)kmalloc(sizeof(struct dma_fence_chain), GFP_KERNEL))
+ 
+ /**
+  * dma_fence_chain_free
+diff --git a/include/linux/hid_bpf.h b/include/linux/hid_bpf.h
+index 7118ac28d468..ca70eeb6393e 100644
+--- a/include/linux/hid_bpf.h
++++ b/include/linux/hid_bpf.h
+@@ -149,10 +149,8 @@ static inline int hid_bpf_connect_device(struct hid_device *hdev) { return 0; }
+ static inline void hid_bpf_disconnect_device(struct hid_device *hdev) {}
+ static inline void hid_bpf_destroy_device(struct hid_device *hid) {}
+ static inline void hid_bpf_device_init(struct hid_device *hid) {}
+-static inline u8 *call_hid_bpf_rdesc_fixup(struct hid_device *hdev, u8 *rdesc, unsigned int *size)
+-{
+-	return kmemdup(rdesc, *size, GFP_KERNEL);
+-}
++#define call_hid_bpf_rdesc_fixup(_hdev, _rdesc, _size)	\
++		((u8 *)kmemdup(_rdesc, *(_size), GFP_KERNEL))
+ 
+ #endif /* CONFIG_HID_BPF */
+ 
+diff --git a/include/linux/jbd2.h b/include/linux/jbd2.h
+index 971f3e826e15..9512fe332668 100644
+--- a/include/linux/jbd2.h
++++ b/include/linux/jbd2.h
+@@ -1586,10 +1586,8 @@ void jbd2_journal_put_journal_head(struct journal_head *jh);
+  */
+ extern struct kmem_cache *jbd2_handle_cache;
+ 
+-static inline handle_t *jbd2_alloc_handle(gfp_t gfp_flags)
+-{
+-	return kmem_cache_zalloc(jbd2_handle_cache, gfp_flags);
+-}
++#define jbd2_alloc_handle(_gfp_flags)	\
++		((handle_t *)kmem_cache_zalloc(jbd2_handle_cache, _gfp_flags))
+ 
+ static inline void jbd2_free_handle(handle_t *handle)
+ {
+@@ -1602,10 +1600,8 @@ static inline void jbd2_free_handle(handle_t *handle)
+  */
+ extern struct kmem_cache *jbd2_inode_cache;
+ 
+-static inline struct jbd2_inode *jbd2_alloc_inode(gfp_t gfp_flags)
+-{
+-	return kmem_cache_alloc(jbd2_inode_cache, gfp_flags);
+-}
++#define jbd2_alloc_inode(_gfp_flags)	\
++		((struct jbd2_inode *)kmem_cache_alloc(jbd2_inode_cache, _gfp_flags))
+ 
+ static inline void jbd2_free_inode(struct jbd2_inode *jinode)
+ {
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 07c73451d42f..d261e45bb29b 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -2899,12 +2899,13 @@ static inline bool pagetable_is_reserved(struct ptdesc *pt)
+  *
+  * Return: The ptdesc describing the allocated page tables.
+  */
+-static inline struct ptdesc *pagetable_alloc(gfp_t gfp, unsigned int order)
++static inline struct ptdesc *pagetable_alloc_noprof(gfp_t gfp, unsigned int order)
+ {
+-	struct page *page = alloc_pages(gfp | __GFP_COMP, order);
++	struct page *page = alloc_pages_noprof(gfp | __GFP_COMP, order);
+ 
+ 	return page_ptdesc(page);
+ }
++#define pagetable_alloc(...)	alloc_hooks(pagetable_alloc_noprof(__VA_ARGS__))
+ 
+ /**
+  * pagetable_free - Free pagetables
+diff --git a/include/linux/mm_types.h b/include/linux/mm_types.h
+index c432add95913..db0adf5721cc 100644
+--- a/include/linux/mm_types.h
++++ b/include/linux/mm_types.h
+@@ -1167,14 +1167,15 @@ static inline void mm_init_cid(struct mm_struct *mm)
+ 	cpumask_clear(mm_cidmask(mm));
+ }
+ 
+-static inline int mm_alloc_cid(struct mm_struct *mm)
++static inline int mm_alloc_cid_noprof(struct mm_struct *mm)
+ {
+-	mm->pcpu_cid = alloc_percpu(struct mm_cid);
++	mm->pcpu_cid = alloc_percpu_noprof(struct mm_cid);
+ 	if (!mm->pcpu_cid)
+ 		return -ENOMEM;
+ 	mm_init_cid(mm);
+ 	return 0;
+ }
++#define mm_alloc_cid(...)	alloc_hooks(mm_alloc_cid_noprof(__VA_ARGS__))
+ 
+ static inline void mm_destroy_cid(struct mm_struct *mm)
+ {
+diff --git a/include/linux/percpu.h b/include/linux/percpu.h
+index 13a82f11e4fd..03053de557cf 100644
+--- a/include/linux/percpu.h
++++ b/include/linux/percpu.h
+@@ -151,6 +151,9 @@ extern size_t pcpu_alloc_size(void __percpu *__pdata);
+ #define alloc_percpu(type)						\
+ 	(typeof(type) __percpu *)__alloc_percpu(sizeof(type),		\
+ 						__alignof__(type))
++#define alloc_percpu_noprof(type)					\
++	((typeof(type) __percpu *)pcpu_alloc_noprof(sizeof(type),	\
++					__alignof__(type), false, GFP_KERNEL))
+ 
+ extern void free_percpu(void __percpu *__pdata);
+ 
+diff --git a/include/linux/ptr_ring.h b/include/linux/ptr_ring.h
+index 808f9d3ee546..fd037c127bb0 100644
+--- a/include/linux/ptr_ring.h
++++ b/include/linux/ptr_ring.h
+@@ -464,11 +464,11 @@ static inline int ptr_ring_consume_batched_bh(struct ptr_ring *r,
+ /* Not all gfp_t flags (besides GFP_KERNEL) are allowed. See
+  * documentation for vmalloc for which of them are legal.
+  */
+-static inline void **__ptr_ring_init_queue_alloc(unsigned int size, gfp_t gfp)
++static inline void **__ptr_ring_init_queue_alloc_noprof(unsigned int size, gfp_t gfp)
+ {
+ 	if (size > KMALLOC_MAX_SIZE / sizeof(void *))
+ 		return NULL;
+-	return kvmalloc_array(size, sizeof(void *), gfp | __GFP_ZERO);
++	return kvmalloc_array_noprof(size, sizeof(void *), gfp | __GFP_ZERO);
+ }
+ 
+ static inline void __ptr_ring_set_size(struct ptr_ring *r, int size)
+@@ -484,9 +484,9 @@ static inline void __ptr_ring_set_size(struct ptr_ring *r, int size)
+ 		r->batch = 1;
+ }
+ 
+-static inline int ptr_ring_init(struct ptr_ring *r, int size, gfp_t gfp)
++static inline int ptr_ring_init_noprof(struct ptr_ring *r, int size, gfp_t gfp)
+ {
+-	r->queue = __ptr_ring_init_queue_alloc(size, gfp);
++	r->queue = __ptr_ring_init_queue_alloc_noprof(size, gfp);
+ 	if (!r->queue)
+ 		return -ENOMEM;
+ 
+@@ -497,6 +497,7 @@ static inline int ptr_ring_init(struct ptr_ring *r, int size, gfp_t gfp)
+ 
+ 	return 0;
+ }
++#define ptr_ring_init(...)	alloc_hooks(ptr_ring_init_noprof(__VA_ARGS__))
+ 
+ /*
+  * Return entries into ring. Destroy entries that don't fit.
+@@ -587,11 +588,11 @@ static inline void **__ptr_ring_swap_queue(struct ptr_ring *r, void **queue,
+  * In particular if you consume ring in interrupt or BH context, you must
+  * disable interrupts/BH when doing so.
+  */
+-static inline int ptr_ring_resize(struct ptr_ring *r, int size, gfp_t gfp,
++static inline int ptr_ring_resize_noprof(struct ptr_ring *r, int size, gfp_t gfp,
+ 				  void (*destroy)(void *))
+ {
+ 	unsigned long flags;
+-	void **queue = __ptr_ring_init_queue_alloc(size, gfp);
++	void **queue = __ptr_ring_init_queue_alloc_noprof(size, gfp);
+ 	void **old;
+ 
+ 	if (!queue)
+@@ -609,6 +610,7 @@ static inline int ptr_ring_resize(struct ptr_ring *r, int size, gfp_t gfp,
+ 
+ 	return 0;
+ }
++#define ptr_ring_resize(...)	alloc_hooks(ptr_ring_resize_noprof(__VA_ARGS__))
+ 
+ /*
+  * Note: producer lock is nested within consumer lock, so if you
+@@ -616,21 +618,21 @@ static inline int ptr_ring_resize(struct ptr_ring *r, int size, gfp_t gfp,
+  * In particular if you consume ring in interrupt or BH context, you must
+  * disable interrupts/BH when doing so.
+  */
+-static inline int ptr_ring_resize_multiple(struct ptr_ring **rings,
+-					   unsigned int nrings,
+-					   int size,
+-					   gfp_t gfp, void (*destroy)(void *))
++static inline int ptr_ring_resize_multiple_noprof(struct ptr_ring **rings,
++						  unsigned int nrings,
++						  int size,
++						  gfp_t gfp, void (*destroy)(void *))
+ {
+ 	unsigned long flags;
+ 	void ***queues;
+ 	int i;
+ 
+-	queues = kmalloc_array(nrings, sizeof(*queues), gfp);
++	queues = kmalloc_array_noprof(nrings, sizeof(*queues), gfp);
+ 	if (!queues)
+ 		goto noqueues;
+ 
+ 	for (i = 0; i < nrings; ++i) {
+-		queues[i] = __ptr_ring_init_queue_alloc(size, gfp);
++		queues[i] = __ptr_ring_init_queue_alloc_noprof(size, gfp);
+ 		if (!queues[i])
+ 			goto nomem;
+ 	}
+@@ -660,6 +662,8 @@ static inline int ptr_ring_resize_multiple(struct ptr_ring **rings,
+ noqueues:
+ 	return -ENOMEM;
+ }
++#define ptr_ring_resize_multiple(...) \
++		alloc_hooks(ptr_ring_resize_multiple_noprof(__VA_ARGS__))
+ 
+ static inline void ptr_ring_cleanup(struct ptr_ring *r, void (*destroy)(void *))
+ {
+diff --git a/include/linux/skb_array.h b/include/linux/skb_array.h
+index e2d45b7cb619..926496c9cc9c 100644
+--- a/include/linux/skb_array.h
++++ b/include/linux/skb_array.h
+@@ -177,10 +177,11 @@ static inline int skb_array_peek_len_any(struct skb_array *a)
+ 	return PTR_RING_PEEK_CALL_ANY(&a->ring, __skb_array_len_with_tag);
+ }
+ 
+-static inline int skb_array_init(struct skb_array *a, int size, gfp_t gfp)
++static inline int skb_array_init_noprof(struct skb_array *a, int size, gfp_t gfp)
+ {
+-	return ptr_ring_init(&a->ring, size, gfp);
++	return ptr_ring_init_noprof(&a->ring, size, gfp);
+ }
++#define skb_array_init(...)	alloc_hooks(skb_array_init_noprof(__VA_ARGS__))
+ 
+ static void __skb_array_destroy_skb(void *ptr)
+ {
+@@ -198,15 +199,17 @@ static inline int skb_array_resize(struct skb_array *a, int size, gfp_t gfp)
+ 	return ptr_ring_resize(&a->ring, size, gfp, __skb_array_destroy_skb);
+ }
+ 
+-static inline int skb_array_resize_multiple(struct skb_array **rings,
+-					    int nrings, unsigned int size,
+-					    gfp_t gfp)
++static inline int skb_array_resize_multiple_noprof(struct skb_array **rings,
++						   int nrings, unsigned int size,
++						   gfp_t gfp)
+ {
+ 	BUILD_BUG_ON(offsetof(struct skb_array, ring));
+-	return ptr_ring_resize_multiple((struct ptr_ring **)rings,
+-					nrings, size, gfp,
+-					__skb_array_destroy_skb);
++	return ptr_ring_resize_multiple_noprof((struct ptr_ring **)rings,
++					       nrings, size, gfp,
++					       __skb_array_destroy_skb);
+ }
++#define skb_array_resize_multiple(...)	\
++		alloc_hooks(skb_array_resize_multiple_noprof(__VA_ARGS__))
+ 
+ static inline void skb_array_cleanup(struct skb_array *a)
+ {
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 9d24aec064e8..b72920c9887b 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -3371,7 +3371,7 @@ void __napi_kfree_skb(struct sk_buff *skb, enum skb_drop_reason reason);
+  *
+  * %NULL is returned if there is no free memory.
+ */
+-static inline struct page *__dev_alloc_pages(gfp_t gfp_mask,
++static inline struct page *__dev_alloc_pages_noprof(gfp_t gfp_mask,
+ 					     unsigned int order)
+ {
+ 	/* This piece of code contains several assumptions.
+@@ -3384,13 +3384,11 @@ static inline struct page *__dev_alloc_pages(gfp_t gfp_mask,
+ 	 */
+ 	gfp_mask |= __GFP_COMP | __GFP_MEMALLOC;
+ 
+-	return alloc_pages_node(NUMA_NO_NODE, gfp_mask, order);
++	return alloc_pages_node_noprof(NUMA_NO_NODE, gfp_mask, order);
+ }
++#define __dev_alloc_pages(...)	alloc_hooks(__dev_alloc_pages_noprof(__VA_ARGS__))
+ 
+-static inline struct page *dev_alloc_pages(unsigned int order)
+-{
+-	return __dev_alloc_pages(GFP_ATOMIC | __GFP_NOWARN, order);
+-}
++#define dev_alloc_pages(_order) __dev_alloc_pages(GFP_ATOMIC | __GFP_NOWARN, _order)
+ 
+ /**
+  * __dev_alloc_page - allocate a page for network Rx
+@@ -3400,15 +3398,13 @@ static inline struct page *dev_alloc_pages(unsigned int order)
+  *
+  * %NULL is returned if there is no free memory.
+  */
+-static inline struct page *__dev_alloc_page(gfp_t gfp_mask)
++static inline struct page *__dev_alloc_page_noprof(gfp_t gfp_mask)
+ {
+-	return __dev_alloc_pages(gfp_mask, 0);
++	return __dev_alloc_pages_noprof(gfp_mask, 0);
+ }
++#define __dev_alloc_page(...)	alloc_hooks(__dev_alloc_page_noprof(__VA_ARGS__))
+ 
+-static inline struct page *dev_alloc_page(void)
+-{
+-	return dev_alloc_pages(0);
+-}
++#define dev_alloc_page()	dev_alloc_pages(0)
+ 
+ /**
+  * dev_page_is_reusable - check whether a page can be reused for network Rx
+diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+index e65ec3fd2799..78efc5b20284 100644
+--- a/include/linux/skmsg.h
++++ b/include/linux/skmsg.h
+@@ -410,11 +410,9 @@ void sk_psock_stop_verdict(struct sock *sk, struct sk_psock *psock);
+ int sk_psock_msg_verdict(struct sock *sk, struct sk_psock *psock,
+ 			 struct sk_msg *msg);
+ 
+-static inline struct sk_psock_link *sk_psock_init_link(void)
+-{
+-	return kzalloc(sizeof(struct sk_psock_link),
+-		       GFP_ATOMIC | __GFP_NOWARN);
+-}
++#define sk_psock_init_link()	\
++		((struct sk_psock_link *)kzalloc(sizeof(struct sk_psock_link),	\
++						 GFP_ATOMIC | __GFP_NOWARN))
+ 
+ static inline void sk_psock_free_link(struct sk_psock_link *link)
+ {
+diff --git a/include/linux/slab.h b/include/linux/slab.h
+index c0be1cd03cf6..4cc37ef22aae 100644
+--- a/include/linux/slab.h
++++ b/include/linux/slab.h
+@@ -744,6 +744,9 @@ void *kmalloc_node_track_caller_noprof(size_t size, gfp_t flags, int node,
+  */
+ #define kmalloc_track_caller(...)		kmalloc_node_track_caller(__VA_ARGS__, NUMA_NO_NODE)
+ 
++#define kmalloc_track_caller_noprof(...)	\
++		kmalloc_node_track_caller_noprof(__VA_ARGS__, NUMA_NO_NODE, _RET_IP_)
 +
-+			if (net_ratelimit()) {
-+				netdev_err(tun->dev, "unexpected GSO type: 0x%x, gso_size %d, hdr_len %d\n",
-+					   sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
-+					   tun16_to_cpu(tun, gso.hdr_len));
-+				print_hex_dump(KERN_ERR, "tun: ",
-+					       DUMP_PREFIX_NONE,
-+					       16, 1, skb->head,
-+					       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
-+			}
- 			WARN_ON_ONCE(1);
- 			return -EINVAL;
- 		}
+ static inline __alloc_size(1, 2) void *kmalloc_array_node_noprof(size_t n, size_t size, gfp_t flags,
+ 							  int node)
+ {
+@@ -781,6 +784,7 @@ extern void *kvmalloc_node_noprof(size_t size, gfp_t flags, int node) __alloc_si
+ #define kvmalloc_node(...)			alloc_hooks(kvmalloc_node_noprof(__VA_ARGS__))
+ 
+ #define kvmalloc(_size, _flags)			kvmalloc_node(_size, _flags, NUMA_NO_NODE)
++#define kvmalloc_noprof(_size, _flags)		kvmalloc_node_noprof(_size, _flags, NUMA_NO_NODE)
+ #define kvzalloc(_size, _flags)			kvmalloc(_size, _flags|__GFP_ZERO)
+ 
+ #define kvzalloc_node(_size, _flags, _node)	kvmalloc_node(_size, _flags|__GFP_ZERO, _node)
+@@ -797,6 +801,7 @@ static inline __alloc_size(1, 2) void *kvmalloc_array_noprof(size_t n, size_t si
+ 
+ #define kvmalloc_array(...)			alloc_hooks(kvmalloc_array_noprof(__VA_ARGS__))
+ #define kvcalloc(_n, _size, _flags)		kvmalloc_array(_n, _size, _flags|__GFP_ZERO)
++#define kvcalloc_noprof(_n, _size, _flags)	kvmalloc_array_noprof(_n, _size, _flags|__GFP_ZERO)
+ 
+ extern void *kvrealloc_noprof(const void *p, size_t oldsize, size_t newsize, gfp_t flags)
+ 		      __realloc_size(3);
+diff --git a/include/linux/sockptr.h b/include/linux/sockptr.h
+index 307961b41541..ba703b22e7d8 100644
+--- a/include/linux/sockptr.h
++++ b/include/linux/sockptr.h
+@@ -92,9 +92,9 @@ static inline int copy_to_sockptr(sockptr_t dst, const void *src, size_t size)
+ 	return copy_to_sockptr_offset(dst, 0, src, size);
+ }
+ 
+-static inline void *memdup_sockptr(sockptr_t src, size_t len)
++static inline void *memdup_sockptr_noprof(sockptr_t src, size_t len)
+ {
+-	void *p = kmalloc_track_caller(len, GFP_USER | __GFP_NOWARN);
++	void *p = kmalloc_track_caller_noprof(len, GFP_USER | __GFP_NOWARN);
+ 
+ 	if (!p)
+ 		return ERR_PTR(-ENOMEM);
+@@ -104,10 +104,11 @@ static inline void *memdup_sockptr(sockptr_t src, size_t len)
+ 	}
+ 	return p;
+ }
++#define memdup_sockptr(...)	alloc_hooks(memdup_sockptr_noprof(__VA_ARGS__))
+ 
+-static inline void *memdup_sockptr_nul(sockptr_t src, size_t len)
++static inline void *memdup_sockptr_nul_noprof(sockptr_t src, size_t len)
+ {
+-	char *p = kmalloc_track_caller(len + 1, GFP_KERNEL);
++	char *p = kmalloc_track_caller_noprof(len + 1, GFP_KERNEL);
+ 
+ 	if (!p)
+ 		return ERR_PTR(-ENOMEM);
+@@ -118,6 +119,7 @@ static inline void *memdup_sockptr_nul(sockptr_t src, size_t len)
+ 	p[len] = '\0';
+ 	return p;
+ }
++#define memdup_sockptr_nul(...)	alloc_hooks(memdup_sockptr_nul_noprof(__VA_ARGS__))
+ 
+ static inline long strncpy_from_sockptr(char *dst, sockptr_t src, size_t count)
+ {
+diff --git a/include/net/netlabel.h b/include/net/netlabel.h
+index f3ab0b8a4b18..c31bd96dafdb 100644
+--- a/include/net/netlabel.h
++++ b/include/net/netlabel.h
+@@ -274,15 +274,17 @@ struct netlbl_calipso_ops {
+  * on success, NULL on failure.
+  *
+  */
+-static inline struct netlbl_lsm_cache *netlbl_secattr_cache_alloc(gfp_t flags)
++static inline struct netlbl_lsm_cache *netlbl_secattr_cache_alloc_noprof(gfp_t flags)
+ {
+ 	struct netlbl_lsm_cache *cache;
+ 
+-	cache = kzalloc(sizeof(*cache), flags);
++	cache = kzalloc_noprof(sizeof(*cache), flags);
+ 	if (cache)
+ 		refcount_set(&cache->refcount, 1);
+ 	return cache;
+ }
++#define netlbl_secattr_cache_alloc(...)	\
++		alloc_hooks(netlbl_secattr_cache_alloc_noprof(__VA_ARGS__))
+ 
+ /**
+  * netlbl_secattr_cache_free - Frees a netlbl_lsm_cache struct
+@@ -311,10 +313,11 @@ static inline void netlbl_secattr_cache_free(struct netlbl_lsm_cache *cache)
+  * on failure.
+  *
+  */
+-static inline struct netlbl_lsm_catmap *netlbl_catmap_alloc(gfp_t flags)
++static inline struct netlbl_lsm_catmap *netlbl_catmap_alloc_noprof(gfp_t flags)
+ {
+-	return kzalloc(sizeof(struct netlbl_lsm_catmap), flags);
++	return kzalloc_noprof(sizeof(struct netlbl_lsm_catmap), flags);
+ }
++#define netlbl_catmap_alloc(...)	alloc_hooks(netlbl_catmap_alloc_noprof(__VA_ARGS__))
+ 
+ /**
+  * netlbl_catmap_free - Free a LSM secattr catmap
+@@ -376,10 +379,11 @@ static inline void netlbl_secattr_destroy(struct netlbl_lsm_secattr *secattr)
+  * pointer on success, or NULL on failure.
+  *
+  */
+-static inline struct netlbl_lsm_secattr *netlbl_secattr_alloc(gfp_t flags)
++static inline struct netlbl_lsm_secattr *netlbl_secattr_alloc_noprof(gfp_t flags)
+ {
+-	return kzalloc(sizeof(struct netlbl_lsm_secattr), flags);
++	return kzalloc_noprof(sizeof(struct netlbl_lsm_secattr), flags);
+ }
++#define netlbl_secattr_alloc(...)	alloc_hooks(netlbl_secattr_alloc_noprof(__VA_ARGS__))
+ 
+ /**
+  * netlbl_secattr_free - Frees a netlbl_lsm_secattr struct
+diff --git a/include/net/netlink.h b/include/net/netlink.h
+index c19ff921b661..972b5484fa6f 100644
+--- a/include/net/netlink.h
++++ b/include/net/netlink.h
+@@ -1891,10 +1891,11 @@ static inline struct nla_bitfield32 nla_get_bitfield32(const struct nlattr *nla)
+  * @src: netlink attribute to duplicate from
+  * @gfp: GFP mask
+  */
+-static inline void *nla_memdup(const struct nlattr *src, gfp_t gfp)
++static inline void *nla_memdup_noprof(const struct nlattr *src, gfp_t gfp)
+ {
+-	return kmemdup(nla_data(src), nla_len(src), gfp);
++	return kmemdup_noprof(nla_data(src), nla_len(src), gfp);
+ }
++#define nla_memdup(...)	alloc_hooks(nla_memdup_noprof(__VA_ARGS__))
+ 
+ /**
+  * nla_nest_start_noflag - Start a new level of nested attributes
+diff --git a/include/net/request_sock.h b/include/net/request_sock.h
+index 004e651e6067..29495c331d20 100644
+--- a/include/net/request_sock.h
++++ b/include/net/request_sock.h
+@@ -127,12 +127,12 @@ static inline struct sock *skb_steal_sock(struct sk_buff *skb,
+ }
+ 
+ static inline struct request_sock *
+-reqsk_alloc(const struct request_sock_ops *ops, struct sock *sk_listener,
++reqsk_alloc_noprof(const struct request_sock_ops *ops, struct sock *sk_listener,
+ 	    bool attach_listener)
+ {
+ 	struct request_sock *req;
+ 
+-	req = kmem_cache_alloc(ops->slab, GFP_ATOMIC | __GFP_NOWARN);
++	req = kmem_cache_alloc_noprof(ops->slab, GFP_ATOMIC | __GFP_NOWARN);
+ 	if (!req)
+ 		return NULL;
+ 	req->rsk_listener = NULL;
+@@ -157,6 +157,7 @@ reqsk_alloc(const struct request_sock_ops *ops, struct sock *sk_listener,
+ 
+ 	return req;
+ }
++#define reqsk_alloc(...)	alloc_hooks(reqsk_alloc_noprof(__VA_ARGS__))
+ 
+ static inline void __reqsk_free(struct request_sock *req)
+ {
+diff --git a/include/net/tcx.h b/include/net/tcx.h
+index 04be9377785d..72a3e75e539f 100644
+--- a/include/net/tcx.h
++++ b/include/net/tcx.h
+@@ -75,9 +75,9 @@ tcx_entry_fetch(struct net_device *dev, bool ingress)
+ 		return rcu_dereference_rtnl(dev->tcx_egress);
+ }
+ 
+-static inline struct bpf_mprog_entry *tcx_entry_create(void)
++static inline struct bpf_mprog_entry *tcx_entry_create_noprof(void)
+ {
+-	struct tcx_entry *tcx = kzalloc(sizeof(*tcx), GFP_KERNEL);
++	struct tcx_entry *tcx = kzalloc_noprof(sizeof(*tcx), GFP_KERNEL);
+ 
+ 	if (tcx) {
+ 		bpf_mprog_bundle_init(&tcx->bundle);
+@@ -85,6 +85,7 @@ static inline struct bpf_mprog_entry *tcx_entry_create(void)
+ 	}
+ 	return NULL;
+ }
++#define tcx_entry_create(...)	alloc_hooks(tcx_entry_create_noprof(__VA_ARGS__))
+ 
+ static inline void tcx_entry_free(struct bpf_mprog_entry *entry)
+ {
+diff --git a/net/sunrpc/auth_gss/auth_gss_internal.h b/net/sunrpc/auth_gss/auth_gss_internal.h
+index c53b329092d4..4ebc1b7043d9 100644
+--- a/net/sunrpc/auth_gss/auth_gss_internal.h
++++ b/net/sunrpc/auth_gss/auth_gss_internal.h
+@@ -23,7 +23,7 @@ simple_get_bytes(const void *p, const void *end, void *res, size_t len)
+ }
+ 
+ static inline const void *
+-simple_get_netobj(const void *p, const void *end, struct xdr_netobj *dest)
++simple_get_netobj_noprof(const void *p, const void *end, struct xdr_netobj *dest)
+ {
+ 	const void *q;
+ 	unsigned int len;
+@@ -35,7 +35,7 @@ simple_get_netobj(const void *p, const void *end, struct xdr_netobj *dest)
+ 	if (unlikely(q > end || q < p))
+ 		return ERR_PTR(-EFAULT);
+ 	if (len) {
+-		dest->data = kmemdup(p, len, GFP_KERNEL);
++		dest->data = kmemdup_noprof(p, len, GFP_KERNEL);
+ 		if (unlikely(dest->data == NULL))
+ 			return ERR_PTR(-ENOMEM);
+ 	} else
+@@ -43,3 +43,5 @@ simple_get_netobj(const void *p, const void *end, struct xdr_netobj *dest)
+ 	dest->len = len;
+ 	return q;
+ }
++
++#define simple_get_netobj(...)	alloc_hooks(simple_get_netobj_noprof(__VA_ARGS__))
+
+base-commit: 3aec6b2b34e219898883d1e9ea7e911b4d3762a9
 -- 
-2.44.0
+2.44.0.683.g7961c838ac-goog
 
 
