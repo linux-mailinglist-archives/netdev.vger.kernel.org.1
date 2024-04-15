@@ -1,166 +1,137 @@
-Return-Path: <netdev+bounces-87894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 159A78A4E14
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:51:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 923FC8A4E25
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:54:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C52B0282BFD
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:51:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78ABB1C20363
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:54:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1B3464A90;
-	Mon, 15 Apr 2024 11:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19BA862147;
+	Mon, 15 Apr 2024 11:54:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="RbcNMVLx"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TNPr0a64"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6185FBA3;
-	Mon, 15 Apr 2024 11:51:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.244.183.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71BFC5A0E3
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 11:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713181866; cv=none; b=lO6e2zUEXKtcpDlVK2R4tsEjsfYbHFXy9scMCn0WjoGE8mFA8sVpJKLh4kcBi7K6t+DiZi2GhBFMyV2woIrgqCnl6tPgEV5E8lN1t/JcdVkFRbgd4SRIyOBMsB+llsjjAN+bOuZNWMcQC7AFdtS4iQVtRIZQ0VvwJMFX8r6GY7k=
+	t=1713182082; cv=none; b=CQRQC1Sz1W/6y9TT7zUndlmQvYtv1MDbLR57WfIGQ7Q1bcMhnI50RVDSw1IgADHe2VNmlQU56h03ekwG5ShJ3ghZzkhaJUw6ykiczsr6cbEJf1dtM5M9/tsLTEl4ItWQaOQRJHUWWKl0NZROVa3SjHGIuvP6OU3pn7dEedc61/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713181866; c=relaxed/simple;
-	bh=rKmkWc4e2EhEBiayogKPrTMTuUv8pY/OTgZiEvSpCqg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=su+d8TTtqBVRLl0+OP1Kr8BeiBz7t2cfjtS2KSbRoPROlMhTzZiADGu0Tdl2RlLOIqHNKn+CXCKqejS5816+cagB8MrhqltpDYPHob61V2drj4gmw01YJBHf84tavhe+/giFUv6SoeVEX7q87rDSmtSGMy7uGGY3uKk/AGFx1jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=RbcNMVLx; arc=none smtp.client-ip=91.244.183.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infotecs.ru
-Received: from mx0.infotecs-nt (localhost [127.0.0.1])
-	by mx0.infotecs.ru (Postfix) with ESMTP id 351C1108C941;
-	Mon, 15 Apr 2024 14:51:02 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru 351C1108C941
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
-	t=1713181862; bh=EUA97dIpRpSS5ssM3JPMExLE+bnjf2A0BRQL9P73M7M=;
-	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=RbcNMVLxg0wDzOnqRW/mWGVBiKHiywl+M846Jnaa8GbJ/wu2RdXn+120So474KIrP
-	 b39vvz2nD+tHmBO2oOVfME/cu5KMnyS2ubwdvHenwMv99nqDJKfOfRyuvVAZcwVnP4
-	 GXuSHpFk1uDsS0IrCT7nAGnZnkiw0oBmZGQ1Yxys=
-Received: from msk-exch-01.infotecs-nt (msk-exch-01.infotecs-nt [10.0.7.191])
-	by mx0.infotecs-nt (Postfix) with ESMTP id 3077F319A99E;
-	Mon, 15 Apr 2024 14:51:02 +0300 (MSK)
-From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-To: "stable@vger.kernel.org" <stable@vger.kernel.org>, Greg Kroah-Hartman
-	<gregkh@linuxfoundation.org>
-CC: Michal Ostrowski <mostrows@earthlink.net>, Guillaume Nault
-	<gnault@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
-	"syzbot+6bdfd184eac7709e5cc9@syzkaller.appspotmail.com"
-	<syzbot+6bdfd184eac7709e5cc9@syzkaller.appspotmail.com>
-Subject: [PATCH 6.6/6.1 1/1] pppoe: Fix memory leak in pppoe_sendmsg()
-Thread-Topic: [PATCH 6.6/6.1 1/1] pppoe: Fix memory leak in pppoe_sendmsg()
-Thread-Index: AQHajysw5WgBL16JkEKoSJihSXK1AA==
-Date: Mon, 15 Apr 2024 11:51:01 +0000
-Message-ID: <20240415115100.3914582-2-Ilia.Gavrilov@infotecs.ru>
-References: <20240415115100.3914582-1-Ilia.Gavrilov@infotecs.ru>
-In-Reply-To: <20240415115100.3914582-1-Ilia.Gavrilov@infotecs.ru>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1713182082; c=relaxed/simple;
+	bh=/Z02AgANFDohz8mDrVOYzvmjkxC00SQUD3x5OYbF/qU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RP6dY9qrSIqW+4gpV0KOWH8X+nFTWD+Wi7jEIt0oH2RHqD+C1pHcnhDq5o9mvj7XjN9AmKln09uziOzolWHHHvECYhDi+6Rn1fiWp0c+v57bpZItSlQv6whGaxmZUl6eooMT2/r7uzZxvqe5oPvamirIblF4EcLfHErUCRJCjdg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TNPr0a64; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-57020ad438fso1786055a12.0
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 04:54:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713182079; x=1713786879; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=H4NMafbmS9XRzkgS7ukH8dmsczZ2ZVwhRYwJTAIl3VM=;
+        b=TNPr0a64xLEtxIOuFrzbh07Py5ld5mip0sJrm0T1WlWG6E3EW5B1iwwisIj90/J0O8
+         F7HWAuRMI4cfZano2IPW8UjSIh4H4GmnxrDtyWO4kwpa5zSC2TQsHIcM0yzg1Gaqo1ih
+         dWd0jflSGRbcX3/fHQq8F8Odi9KMbn2+FDYZqW02wTtmdKiu2UXCiSHv365bY8L/2FZw
+         qD/WVXfX7UVPlrMjvc9l+9ZAhkI/mn5VcRUd9EIzhqxrSKSxUMgsP13MPfOWk8TLq8kd
+         t4JKvZqjC+LJBFmPWeBO7T23icdpIzsvZYxLkupv4fSOeTCH5kFahhM9dz5BEC5P/1Ah
+         ICew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713182079; x=1713786879;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=H4NMafbmS9XRzkgS7ukH8dmsczZ2ZVwhRYwJTAIl3VM=;
+        b=eS881X/rXZUW2S0Q5WzAMxG1E43izitlg3Q8JynnUymIo2IF1KOX1JETqZ72BKnbsJ
+         XDit02xxYf4+5jNgeWNzL+Yz1M5yF7G/huapQpxXrotbpDJBWOIcjLToAiPY8wULavPM
+         WF6effnmXI729Y3OHPi/pizqTK70CUJS50yAFYmnI3pbbBmZAJbrMAImYyaPXYvJsyKN
+         8d9O62VZ2p/YwGC7dpM6n7k7JLqQjTmafODXV9IvrHmTX+uF2XK0MVjZTClKiewMSRmc
+         hv2oU9RJxkuhmClaUl1UGsT/Rzpt4rCLZhaotASPML0Dcg4Nlv3sIJ8/MMu/T0qAVzUO
+         GJdA==
+X-Forwarded-Encrypted: i=1; AJvYcCUrWzOOp10k9jrKZHQh+Hk+GVyFUEc3dpmukQC0DVlPC5PvDiOz8K84qJuJ4uraI5oaLWArjHQ7727l9MHW+EXrgSlTR3VN
+X-Gm-Message-State: AOJu0YzP5kXbSLWjroh6yunAXQ74TY6gsnV/AdRMQm4ihHG+OBmGu0Dz
+	sRoNDMtiSRYZHGGdzmIa4vwvrLJgUGSkyaUI7kzzDTWJfjmvFhMC
+X-Google-Smtp-Source: AGHT+IGB+wtDmvHWo9tBgVxM56KsoV795bHQGbTYLqZc+sTd8lWpr4H+Pd4EKXjp1ySpcw6a/Zihsg==
+X-Received: by 2002:a05:6402:360e:b0:570:3490:c9d0 with SMTP id el14-20020a056402360e00b005703490c9d0mr603075edb.12.1713182078517;
+        Mon, 15 Apr 2024 04:54:38 -0700 (PDT)
+Received: from skbuf ([2a02:2f04:d108:9b00:f547:f722:ecdd:8689])
+        by smtp.gmail.com with ESMTPSA id c11-20020a056402100b00b005700024ca57sm3593404edu.4.2024.04.15.04.54.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 04:54:38 -0700 (PDT)
+Date: Mon, 15 Apr 2024 14:54:35 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: qca8k: provide own phylink MAC
+ operations
+Message-ID: <20240415115435.prmwrsuamlhk5tze@skbuf>
+References: <E1rvIce-006bQi-58@rmk-PC.armlinux.org.uk>
+ <E1rvIce-006bQi-58@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KLMS-Rule-ID: 5
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2024/04/15 08:48:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2024/04/15 09:42:00 #24801259
-X-KLMS-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1rvIce-006bQi-58@rmk-PC.armlinux.org.uk>
+ <E1rvIce-006bQi-58@rmk-PC.armlinux.org.uk>
 
-From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+On Fri, Apr 12, 2024 at 04:15:24PM +0100, Russell King (Oracle) wrote:
+> Convert qca8k to provide its own phylink MAC operations, thus
+> avoiding the shim layer in DSA's port.c.
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  static void
+> -qca8k_phylink_mac_link_up(struct dsa_switch *ds, int port, unsigned int mode,
+> -			  phy_interface_t interface, struct phy_device *phydev,
+> -			  int speed, int duplex, bool tx_pause, bool rx_pause)
+> +qca8k_phylink_mac_link_up(struct phylink_config *config,
+> +			  struct phy_device *phydev, unsigned int mode,
+> +			  phy_interface_t interface, int speed, int duplex,
+> +			  bool tx_pause, bool rx_pause)
+>  {
+> -	struct qca8k_priv *priv = ds->priv;
+> +	struct dsa_port *dp = dsa_phylink_to_port(config);
+> +	struct qca8k_priv *priv = dp->ds->priv;
+> +	int port = dp->index;
+>  	u32 reg;
+>  
+>  	if (phylink_autoneg_inband(mode)) {
+> @@ -1463,10 +1474,10 @@ qca8k_phylink_mac_link_up(struct dsa_switch *ds, int port, unsigned int mode,
+>  		if (duplex == DUPLEX_FULL)
+>  			reg |= QCA8K_PORT_STATUS_DUPLEX;
+>  
+> -		if (rx_pause || dsa_is_cpu_port(ds, port))
+> +		if (rx_pause || dsa_port_is_cpu(dp))
+>  			reg |= QCA8K_PORT_STATUS_RXFLOW;
+>  
+> -		if (tx_pause || dsa_is_cpu_port(ds, port))
+> +		if (tx_pause || dsa_port_is_cpu(dp))
+>  			reg |= QCA8K_PORT_STATUS_TXFLOW;
 
-commit dc34ebd5c018b0edf47f39d11083ad8312733034 upstream.
+Thanks for changing these from dsa_is_*_port() to dsa_port_is_*(), the
+latter operation is cheaper.
 
-syzbot reports a memory leak in pppoe_sendmsg [1].
+>  	}
+>  
+> @@ -1991,6 +2002,13 @@ qca8k_setup(struct dsa_switch *ds)
+>  	return 0;
+>  }
 
-The problem is in the pppoe_recvmsg() function that handles errors
-in the wrong order. For the skb_recv_datagram() function, check
-the pointer to skb for NULL first, and then check the 'error' variable,
-because the skb_recv_datagram() function can set 'error'
-to -EAGAIN in a loop but return a correct pointer to socket buffer
-after a number of attempts, though 'error' remains set to -EAGAIN.
-
-skb_recv_datagram
-      __skb_recv_datagram          // Loop. if (err =3D=3D -EAGAIN) then
-                                   // go to the next loop iteration
-          __skb_try_recv_datagram  // if (skb !=3D NULL) then return 'skb'
-                                   // else if a signal is received then
-                                   // return -EAGAIN
-
-Found by InfoTeCS on behalf of Linux Verification Center
-(linuxtesting.org) with Syzkaller.
-
-Link: https://syzkaller.appspot.com/bug?extid=3D6bdfd184eac7709e5cc9 [1]
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+6bdfd184eac7709e5cc9@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=3D6bdfd184eac7709e5cc9
-Signed-off-by: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
-Link: https://lore.kernel.org/r/20240214085814.3894917-1-Ilia.Gavrilov@info=
-tecs.ru
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- drivers/net/ppp/pppoe.c | 23 +++++++++--------------
- 1 file changed, 9 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
-index ba8b6bd8233c..96cca4ee470a 100644
---- a/drivers/net/ppp/pppoe.c
-+++ b/drivers/net/ppp/pppoe.c
-@@ -1007,26 +1007,21 @@ static int pppoe_recvmsg(struct socket *sock, struc=
-t msghdr *m,
- 	struct sk_buff *skb;
- 	int error =3D 0;
-=20
--	if (sk->sk_state & PPPOX_BOUND) {
--		error =3D -EIO;
--		goto end;
--	}
-+	if (sk->sk_state & PPPOX_BOUND)
-+		return -EIO;
-=20
- 	skb =3D skb_recv_datagram(sk, flags, &error);
--	if (error < 0)
--		goto end;
-+	if (!skb)
-+		return error;
-=20
--	if (skb) {
--		total_len =3D min_t(size_t, total_len, skb->len);
--		error =3D skb_copy_datagram_msg(skb, 0, m, total_len);
--		if (error =3D=3D 0) {
--			consume_skb(skb);
--			return total_len;
--		}
-+	total_len =3D min_t(size_t, total_len, skb->len);
-+	error =3D skb_copy_datagram_msg(skb, 0, m, total_len);
-+	if (error =3D=3D 0) {
-+		consume_skb(skb);
-+		return total_len;
- 	}
-=20
- 	kfree_skb(skb);
--end:
- 	return error;
- }
-=20
---=20
-2.39.2
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
