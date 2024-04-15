@@ -1,126 +1,137 @@
-Return-Path: <netdev+bounces-88024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F6EE8A55DB
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:01:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED9E68A55E6
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:04:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0D6B1C223D2
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:01:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DE3F1F21C3C
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:04:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BECF4757FC;
-	Mon, 15 Apr 2024 15:01:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D4374E37;
+	Mon, 15 Apr 2024 15:04:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="AgrL/Ntf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q3q7TmhH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F7671B3B;
-	Mon, 15 Apr 2024 15:01:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F0E74E11
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 15:04:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713193297; cv=none; b=hYX1rPBQZ5AYpHPy9lnTYiGNghGDNW8TZQCJorZNZiPdU6yuZU1ZtOgMoqCX0qioKIJXlk5dAClpxBZqtqT7nrEMoqqSvprSX4IehrBo8//mNXJ7NrKVpbTP5cuXCQVu1HfkGG+Izt6xPF2Wzc3IEza5k/WHf/p3FTrdq6sdkFY=
+	t=1713193460; cv=none; b=noBgdKL659YyDqe5YhbyDtnnras6kGICUwc42rQ4EOnM3QZL/p2ZvyY43Iuh5073aUZmw/P+DP/Id9kIUNNNHmME+6IiVO0X/rOkWR9L4mKYiikkraY5FWaHvwga8joQL+jtPTLLm7osR+HdXAbjvCQCnK8dNZkjt9IY0WtdITs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713193297; c=relaxed/simple;
-	bh=fErZjILugyMaOlaCYv4Ry65eYxlQ4OnitIywRX/KQwI=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LRKrzFPVDMhlb3pNzgwtJ7vRc9EO0L6h5yQ2Rw/rYCwWvNFI2LzHJImNmbpgXFLW4QNaDIlNG/7qAyD6Vw+fCGrdE9mFNq4+02iVUbwptouzpYr0HYDsU3iQQqvpUt1zxelcV632rglS2stXXiaN2C1uHB2mOcR9h3TBdRYJeTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=AgrL/Ntf; arc=none smtp.client-ip=210.61.82.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: 082ce976fb3911ee935d6952f98a51a9-20240415
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=j1iSowN/IF/xoWn4Ii/qXGL9p7lH6gAEsvUETuM3jJo=;
-	b=AgrL/Ntfy1roFyNxEtDzFgVEyxpwP3//o/CUr4u19qjrsIYUCTPIUBCEU8R/On1NVU8JTHraGw8lCkmAjfzXJu1qsg4/OoCnaLGwpIA4RlInTLdD5qy6XLPBmNmMp/i2y+tbK76QoNsXOTrKDSZ07YNveeiFZ0fb4ErhSBdvAGs=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.38,REQID:efe148e8-23a1-4272-bcb2-6b5585221064,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:82c5f88,CLOUDID:f15c3386-8d4f-477b-89d2-1e3bdbef96d1,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
-	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
-X-UUID: 082ce976fb3911ee935d6952f98a51a9-20240415
-Received: from mtkmbs14n2.mediatek.inc [(172.21.101.76)] by mailgw02.mediatek.com
-	(envelope-from <shiming.cheng@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1519067544; Mon, 15 Apr 2024 23:01:26 +0800
-Received: from mtkmbs13n1.mediatek.inc (172.21.101.193) by
- mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Mon, 15 Apr 2024 23:01:25 +0800
-Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
- mtkmbs13n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Mon, 15 Apr 2024 23:01:24 +0800
-From: <shiming.cheng@mediatek.com>
-To: <edumazet@google.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <matthias.bgg@gmail.com>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<shiming.cheng@mediatek.com>, Lena Wang <lena.wang@mediatek.com>
-Subject: [PATCH net] udp: fix segmentation crash for GRO packet without fraglist
-Date: Mon, 15 Apr 2024 23:01:03 +0800
-Message-ID: <20240415150103.23316-1-shiming.cheng@mediatek.com>
-X-Mailer: git-send-email 2.18.0
+	s=arc-20240116; t=1713193460; c=relaxed/simple;
+	bh=LYd98pn3PtdxSBhO8EuBiON0XmezL6SZW2cEu7gJQBc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=crmFtQ0qJvQOi11ObsH/CYFAZ6Trd7V9evcqEuY6dnLE73jqYyWFbnBMj6Dxmm4gcYu+Nh3Y7aGPLtRJ/8rSksTL1U7qwe4FWr47M0EUe3HV2a+do5SFYWfNXnRDk1+ZoYXrsn4ErDxdFt2TZoOPZ8nCcd8d0hUE6ABxopUQGTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q3q7TmhH; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-346b94fa7ecso3230192f8f.3
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 08:04:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713193455; x=1713798255; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=40pylgvxF23nEwl+KNR2yaTtWuwPDSSlPVOVODZEU48=;
+        b=Q3q7TmhHXj3sk7XnuS6Tr/XUU6oO0roW+YMjOCxvcH2XpsWZlh1XQfY0f8COkcRCxI
+         18KIU0AXOMzBZyrnA4+IG4kjEF2J5TbGQwEGgSWj//Naewd/JpYSCMHlqL4/sz4A6dDz
+         MWiimDaogYdcrEW34ZwOpFtgaKDZG7KRW1emX2JG4Z8/JjMJmOqDi1Tf5fwbMlJi3K7I
+         65zZuusPiQnbUXGFlU+D67CY4PuWaPw+4nrno8vSJTVK/MVpm9N9EPaa+Qox9oSnKuvl
+         VB8AIiSOTixiMQsurW4/iDSfJ35RK08NVXDDaeevGEbD+wGDB1egIxez9mseueTf8X+6
+         DcQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713193455; x=1713798255;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=40pylgvxF23nEwl+KNR2yaTtWuwPDSSlPVOVODZEU48=;
+        b=a6N6WI8JoySDeqE46EVfTGpfvLDLIOQnJgnDMa0lME45wluZmc0P/cIgf3xNeveM3A
+         nh8b96JmxrxbfupkT1vMdW60tUydb+XD0Gio/3OlL/5WRpD0DSf1/pur/10lkktKheVA
+         e4j3ZYLzsc+Sui6WDt/0m8tTfoIR5MUhhH6WGIMCnYgC611DajVqobJP8r2218q0mhSh
+         z2PYmGdmvM+04vo/tx5PbpDXcNLOnQL48wBLrKKrZdZUjr1+h0olO1acQLHOirAwgUwC
+         3xor0w3zS1eVmKIvTXBOXS+3WOkVh2vKVbC8PITgwxykCrdOXA37cBBtJd493ZYT/HtV
+         z//A==
+X-Gm-Message-State: AOJu0YyHZR0PAzrWyBzwtn7gop+WZGNzkJUPnsWfKLuK1bfY4XI9hPxb
+	HfsyXYa9qbCl/za0G9ioYQRx88/b2o+9lxuSkXCtfC45DSifCrOM7bX7SB9SLTEWD/j1LJeZfbS
+	xJlBJV3i6oD8ofNf4UAEyVQiGmZA=
+X-Google-Smtp-Source: AGHT+IGhw/8vB4HVhC2Km3IiQnXPD339dmoURt/Mg4hj4e8cG9kC1Vzqe6ubASYa0vXCHKVxvpJWpedmz6YZsmeSNZM=
+X-Received: by 2002:a05:6000:1d86:b0:347:e6ef:ea97 with SMTP id
+ bk6-20020a0560001d8600b00347e6efea97mr1720521wrb.24.1713193454978; Mon, 15
+ Apr 2024 08:04:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK: N
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <171217496013.1598374.10126180029382922588.stgit@ahduyck-xeon-server.home.arpa>
+ <41a39896-480b-f08d-ba67-17e129e39c0f@huawei.com> <CAKgT0Uf6MdYX_1OuAFAXadh86zDX_w1a_cwpoPGMxpmC4hGyEA@mail.gmail.com>
+ <53b80db6-f2bc-d824-ea42-4b2ac64625f2@huawei.com> <CAKgT0UeQS5q=Y2j3mmu9AhWyUMbey-iFL+sKES1UrBtoAXMdzw@mail.gmail.com>
+ <0e5e3196-ca2f-b905-a6ba-7721e8586ed7@huawei.com> <CAKgT0UeRWsJ+NiniSKa7Z3Law=QrYZp3giLAigJf7EvuAbjkRA@mail.gmail.com>
+ <bf070035-ba9c-d028-1b11-72af8651f979@huawei.com>
+In-Reply-To: <bf070035-ba9c-d028-1b11-72af8651f979@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Mon, 15 Apr 2024 08:03:38 -0700
+Message-ID: <CAKgT0UccovDVS8-TPXxgGbrTAqpeVHRQuCwf7f2qkfcPaPOA-A@mail.gmail.com>
+Subject: Re: [net-next PATCH 13/15] eth: fbnic: add basic Rx handling
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: netdev@vger.kernel.org, Alexander Duyck <alexanderduyck@fb.com>, kuba@kernel.org, 
+	davem@davemloft.net, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Shiming Cheng <shiming.cheng@mediatek.com>
+On Mon, Apr 15, 2024 at 6:19=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> On 2024/4/12 23:05, Alexander Duyck wrote:
+>
+> ...
+>
+> >>
+> >> From the below macro, this hw seems to be only able to handle 4K memor=
+y for
+> >> each entry/desc in qt->sub0 and qt->sub1, so there seems to be a lot o=
+f memory
+> >> that is unused for PAGE_SIZE > 4K as it is allocating memory based on =
+page
+> >> granularity for each rx_buf in qt->sub0 and qt->sub1.
+> >>
+> >> +#define FBNIC_RCD_AL_BUFF_OFF_MASK             DESC_GENMASK(43, 32)
+> >
+> > The advantage of being a purpose built driver is that we aren't
+> > running on any architectures where the PAGE_SIZE > 4K. If it came to
+>
+> I am not sure if 'being a purpose built driver' argument is strong enough
+> here, at least the Kconfig does not seems to be suggesting it is a purpos=
+e
+> built driver, perhaps add a 'depend on' to suggest that?
 
-A GRO packet without fraglist is crashed and backtrace is as below:
- [ 1100.812205][    C3] CPU: 3 PID: 0 Comm: swapper/3 Tainted:
-G        W  OE      6.6.17-android15-0-g380371ea9bf1 #1
- [ 1100.812317][    C3]  __udp_gso_segment+0x298/0x4d4
- [ 1100.812335][    C3]  __skb_gso_segment+0xc4/0x120
- [ 1100.812339][    C3]  udp_rcv_segment+0x50/0x134
- [ 1100.812344][    C3]  udp_queue_rcv_skb+0x74/0x114
- [ 1100.812348][    C3]  udp_unicast_rcv_skb+0x94/0xac
- [ 1100.812358][    C3]  udp_rcv+0x20/0x30
+I'm not sure if you have been following the other threads. One of the
+general thoughts of pushback against this driver was that Meta is
+currently the only company that will have possession of this NIC. As
+such Meta will be deciding what systems it goes into and as a result
+of that we aren't likely to be running it on systems with 64K pages.
 
-The reason that the packet loses its fraglist is that in ingress bpf
-it makes a test pull with to make sure it can read packet headers
-via direct packet access: In bpf_progs/offload.c
-try_make_writable -> bpf_skb_pull_data -> pskb_may_pull ->
-__pskb_pull_tail  This operation pull the data in fraglist into linear
-and set the fraglist to null.
+> > that we could probably look at splitting the pages within the
+> > descriptors by simply having a single page span multiple descriptors.
+>
+> My point is that we might be able to meet the above use case with a prope=
+r
+> API without driver manipulating the reference counting by calling
+> page_pool_fragment_page() directly.
 
-BPF needs to modify a proper length to do pull data. However kernel
-should also improve the flow to avoid crash from a bpf function call.
-As there is no split flow and app may not decode the merged UDP packet,
-we should drop the packet without fraglist in skb_segment_list here.
-
-Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
-Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
-Signed-off-by: Lena Wang <lena.wang@mediatek.com>
----
- net/core/skbuff.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index b99127712e67..f68f2679b086 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -4504,6 +4504,9 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
- 	if (err)
- 		goto err_linearize;
- 
-+	if (!list_skb)
-+		goto err_linearize;
-+
- 	skb_shinfo(skb)->frag_list = NULL;
- 
- 	while (list_skb) {
--- 
-2.18.0
-
+My suggestion would be to look at putting your proposed API together
+as something that can be used by another driver. Once we hit that I
+can then look at incorporating it into fbnic. One issue right now is
+that the current patch set is meant to make use of existing APIs
+instead of needing to rely on creating new ones as this isn't a device
+others will have access to so it will make it harder to test any
+proposed API based only on fbnic.
 
