@@ -1,407 +1,587 @@
-Return-Path: <netdev+bounces-87758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22E448A4719
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 04:51:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAFD38A472D
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 05:09:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BBB51C20C85
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 02:51:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6577A283087
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 03:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED88B1864C;
-	Mon, 15 Apr 2024 02:51:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2D6E18E11;
+	Mon, 15 Apr 2024 03:09:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="T1P7T00B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IVSz1k7m"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C90117547;
-	Mon, 15 Apr 2024 02:51:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2E101C11;
+	Mon, 15 Apr 2024 03:09:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713149466; cv=none; b=MuVlz9IQpcsi4P2fd3Uccyvjq5EEsCMzdYDd+meNOwCvmJXem+MHnPsqnp3l3AoiszH9msC0M7R1x5E0BXlvwfCaWrLBFcfiHtdcVdKrDJAUu9zkmrSxINMu5xuJPjtbcx4+2YBXktxC/7zykeL8840xZevRTd4LDNY1mpDD13U=
+	t=1713150581; cv=none; b=qSMaxL/4UoVhhNsLFl9B78ey+gpDDZfIf0y7S5q6fmgeS+nQQpXGmKfEztKuhX5bjkIBnyMOlaX+8OLCZalLhs6q371nSa+zQwwHVSlz0ciGG1N0mVy+G8IHR/ToK8YX9CnXTc/PZCQiQBFV+hTbOVIsU1yGmZjs8QmtZ5BOVHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713149466; c=relaxed/simple;
-	bh=AnUbokPSfRv2CeHynlB3bAHMef4pCkX0ByQhfIHX3MA=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=MSGIAWebWbDRr5mpLJbtU5+G4jLGfDz2ZZGL1w/6x8t79XoJUv060EEjDYE+8HJmm1e20fYoDgCLhkfWH10OMH0lODGQS7SUXQdKjgbszBTjqf44VTEowj31Ps7H2+6RvuwSj6o8PwSvqvWJehROcNe+OKAP+YtWq3r/4hl6LOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=T1P7T00B; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1713149460; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=Kp1V47EtSzBpQXTAdeXN7IifWk3QVeWas1stX/EYAvk=;
-	b=T1P7T00BRrvgcbA/kICWEpRMYbmIL88J6bk9Bl9SO2eq48Ela2tWNTJVK4Jp9E75/xBgZ+ZMutvsQgsVS9eQaHWJCRvK0bW8hYewM7zElKWy1okm9NI5kcBZCjBxOQW74xfLzZaSceZH2S8BIUgnXuTOUd9dq09Uq1LQxKkJjz8=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W4Tx4OM_1713149459;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W4Tx4OM_1713149459)
-          by smtp.aliyun-inc.com;
-          Mon, 15 Apr 2024 10:51:00 +0800
-Message-ID: <1713148927.6675713-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v5 4/9] virtio_net: support device stats
-Date: Mon, 15 Apr 2024 10:42:07 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@google.com>,
- Amritha Nambiar <amritha.nambiar@intel.com>,
- Larysa Zaremba <larysa.zaremba@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240318110602.37166-1-xuanzhuo@linux.alibaba.com>
- <20240318110602.37166-5-xuanzhuo@linux.alibaba.com>
- <CACGkMEujuYh+Ups9jx5jEwe7bydtgCyurG5bPLe3X8jpSJhqvA@mail.gmail.com>
- <1712746366.8053942-2-xuanzhuo@linux.alibaba.com>
- <CACGkMEsvAUyk+h3e5SO5T4L8HuSGcViKj2WM2J33JOb7KTKjUw@mail.gmail.com>
-In-Reply-To: <CACGkMEsvAUyk+h3e5SO5T4L8HuSGcViKj2WM2J33JOb7KTKjUw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1713150581; c=relaxed/simple;
+	bh=B5c45AMoL3wzqBDQ4ZBb+uVb54X4ZMoy753JGePZM74=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=snjCtORrOK2/t28TtwtF4Gqayxc403gfewmMMY8qj3MheqljFJCsn4J7NQzPCI0YLgeiiLeyoja9weoDbTr5jiM/dB06a5hUG5yu+u0uR5PdZwOzk7g2Fm97C+khix5H/UaiNTIAOwro+FIwtwVMEC0o8HYxAMPJ1gMXa3VYkCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IVSz1k7m; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1e40042c13eso18233525ad.2;
+        Sun, 14 Apr 2024 20:09:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713150579; x=1713755379; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=UPWqCrnI8CghjSXhegqZCjZ+hwAoK3/5Alf8rtEL158=;
+        b=IVSz1k7mw1mvXCB/cd/53I7WIe7nGDrh5wbXGyrh+jimkguwGgB/weDv+KjXlqrYA3
+         HvEZqO+ymoLwlJ5m/yr8LXxJnzAzuH2LRZjLWsmtETU1SbciE6dL5h8116KDsS6m6R0n
+         XOvrLSEDoLFtrANBMuhqnCRTBmoMi6d55LW+hsOFKMLaGNWHbE4i2kEq5Mh/SBvXyXK/
+         2MuAt+ruTZBok53pqMGx5j6BVVF91pUq3oXE73Hhi/b2Rj3w+q4AVUOfW/LGk8vUzd8Y
+         fY6hKpwh6wrwlT4iNm1qjL4RahSvMwxS21YIl1N8wJLyZufrUimL+ttAzx7QhzavsZ8q
+         gjUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713150579; x=1713755379;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UPWqCrnI8CghjSXhegqZCjZ+hwAoK3/5Alf8rtEL158=;
+        b=so8sFEn09+lhbVY6YlKysK5DDJuLUizhTZ84zGw98Bq/sqUXyPxXhMd/3ZpodM9Brx
+         kwVZ1Wb9b+zHQb96J83lCMrKCr6Di/6gjJ2sqvBiedqfubrv0eujcdK0CTYwD31mnjOK
+         C/yGBZD890TnN8/xe5X2nWoa5v4kI7raEHgq+6MdE3Hw6GI6FJvlbUzIZ9qyygbVWJBs
+         QTGMZI51W3XNzj8tahV1tgDT/HRb+tZQXvzVq1dDQi3JIian6ILfcww1Lgb1tVGMS9lU
+         A8AJ0WaJzBdQLAUPj2e6kRyi1hxsGr/4TWrR4Jp+SYbb5U2zRhadMKUxsqznciokuGe5
+         zovA==
+X-Forwarded-Encrypted: i=1; AJvYcCVWUOzI0otV6Qy+Abc/MqTfVL7RXLPFwUeRQ5R60gnCHin4XZPKu4OfKmLxz3aS0UVaZF+6gmoAPc9Sl94rY1exgwoCS8LrPYGFhgc2lhtSBws6jS8GhLahyRTYL1r9iztEIpT2WLNq
+X-Gm-Message-State: AOJu0YzzivSZwBKf4Nq5lXUr0FmlrOI4EjE9bZdVUTJ4bqwc/cL1F0ds
+	3NKyQ+Sa0oUyBaWqJnQw/3t4SuTeY6L5UcH6rxF8L/V0QuvlFdQIcuD1Lw==
+X-Google-Smtp-Source: AGHT+IG6tms+hwWgWQyxs7ksPXtrHMugpbRzHKUsNtWP2R77hJMhXyueqSeZ4f9UxLHfFb/9scWACg==
+X-Received: by 2002:a17:903:32d0:b0:1e3:f923:e257 with SMTP id i16-20020a17090332d000b001e3f923e257mr9447732plr.49.1713150578931;
+        Sun, 14 Apr 2024 20:09:38 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id j7-20020a170903024700b001e5572a99c3sm6638102plh.207.2024.04.14.20.09.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Apr 2024 20:09:38 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id 6E06D1850B725; Mon, 15 Apr 2024 10:09:35 +0700 (WIB)
+Date: Mon, 15 Apr 2024 10:09:35 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Francesco Valla <valla.francesco@gmail.com>,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Linux CAN <linux-can@vger.kernel.org>
+Cc: Linux Networking <netdev@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Simon Horman <horms@kernel.org>, fabio@redaril.me,
+	Mao Zhu <zhumao001@208suo.com>, Xiang wangx <wangxiang@cdjrlc.com>,
+	Shaomin Deng <dengshaomin@cdjrlc.com>,
+	Charles Han <hanchunchao@inspur.com>
+Subject: Re: [PATCH v2 1/1] Documentation: networking: document ISO
+ 15765-2:2016
+Message-ID: <Zhyabya8UyRG0ZY5@archie.me>
+References: <20240329133458.323041-2-valla.francesco@gmail.com>
+ <20240329133458.323041-3-valla.francesco@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="qSWMrSDOEZitIUIC"
+Content-Disposition: inline
+In-Reply-To: <20240329133458.323041-3-valla.francesco@gmail.com>
 
-On Thu, 11 Apr 2024 14:09:24 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Wed, Apr 10, 2024 at 6:55=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > On Wed, 10 Apr 2024 14:09:23 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > On Mon, Mar 18, 2024 at 7:06=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.ali=
-baba.com> wrote:
-> > > >
-> > > > As the spec https://github.com/oasis-tcs/virtio-spec/commit/42f3899=
-89823039724f95bbbd243291ab0064f82
-> > > >
-> > > > make virtio-net support getting the stats from the device by ethtoo=
-l -S
-> > > > <eth0>.
-> > > >
-> > > > Due to the numerous descriptors stats, an organization method is
-> > > > required. For this purpose, I have introduced the "virtnet_stats_ma=
-p".
-> > > > Utilizing this array simplifies coding tasks such as generating fie=
-ld
-> > > > names, calculating buffer sizes for requests and responses, and par=
+
+--qSWMrSDOEZitIUIC
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Mar 29, 2024 at 02:34:41PM +0100, Francesco Valla wrote:
+> diff --git a/Documentation/networking/iso15765-2.rst b/Documentation/netw=
+orking/iso15765-2.rst
+> new file mode 100644
+> index 000000000000..bbed4d2ef1a8
+> --- /dev/null
+> +++ b/Documentation/networking/iso15765-2.rst
+> @@ -0,0 +1,356 @@
+> +.. SPDX-License-Identifier: (GPL-2.0 OR BSD-3-Clause)
+> +
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+> +ISO 15765-2:2016 (ISO-TP)
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+> +
+> +Overview
+> +=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +ISO 15765-2:2016, also known as ISO-TP, is a transport protocol specific=
+ally
+> +defined for diagnostic communication on CAN. It is widely used in the au=
+tomotive
+> +industry, for example as the transport protocol for UDSonCAN (ISO 14229-=
+3) or
+> +emission-related diagnostic services (ISO 15031-5).
+> +
+> +ISO-TP can be used both on CAN CC (aka Classical CAN, CAN 2.0B) and CAN =
+FD (CAN
+> +with Flexible Datarate) based networks. It is also designed to be compat=
+ible
+> +with a CAN network using SAE J1939 as data link layer (however, this is =
+not a
+> +requirement).
+> +
+> +Specifications used
+> +-------------------
+> +
+> +* ISO 15765-2:2016 : Road vehicles - Diagnostic communication over Contr=
+oller
+> +  Area Network (DoCAN). Part 2: Transport protocol and network layer ser=
+vices.
+> +
+> +Addressing
+> +----------
+> +
+> +In its simplest form, ISO-TP is based on two kinds of addressing modes f=
+or the
+> +nodes connected to the same network:
+> +
+> +- physical addressing is implemented by two node-specific addresses (CAN
+> +  identifiers) and is used in 1-to-1 communication
+> +- functional addressing is implemented by one node-specific address (CAN
+> +  identifier) and is used in 1-to-N communication
+> +
+> +In a so-called "normal" addressing scenario, both these addresses are
+> +represented by a 29-bit CAN ID. However, in order to support larger netw=
+orks,
+> +an "extended" addressing scheme can be adopted: in this case, the first =
+byte of
+> +the data payload is used as an additional component of the address (both=
+ for
+> +the physical and functional cases); two different CAN IDs are still requ=
+ired.
+> +
+> +Transport protocol and associated frame types
+> +---------------------------------------------
+> +
+> +When transmitting data using the ISO-TP protocol, the payload can either=
+ fit
+> +inside one single CAN message or not, also considering the overhead the =
+protocol
+> +is generating and the optional extended addressing. In the first case, t=
+he data
+> +is transmitted at once using a so-called Single Frame (SF). In the secon=
+d case,
+> +ISO-TP defines a multi-frame protocol, in which the sender provides (thr=
+ough a
+> +First Frame - FF) the PDU length which is to be transmitted and also ask=
+s for a
+> +Flow Control (FC) frame, which provides the maximum supported size of a =
+macro
+> +data block (``blocksize``) and the minimum time between the single CAN m=
+essages
+> +composing such block (``stmin``). Once this information has been receive=
+d, the
+> +sender starts to send frames containing fragments of the data payload (c=
+alled
+> +Consecutive Frames - CF), stopping after every ``blocksize``-sized block=
+ to wait
+> +confirmation from the receiver (which should then send another Flow Cont=
+rol
+> +frame to inform the sender about its availability to receive more data).
+> +
+> +How to Use ISO-TP
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +As with others CAN protocols, the ISO-TP stack support is built into the
+> +Linux network subsystem for the CAN bus, aka. Linux-CAN or SocketCAN, and
+> +thus follows the same socket API.
+> +
+> +Creation and basic usage of an ISO-TP socket
+> +--------------------------------------------
+> +
+> +To use the ISO-TP stack, ``#include <linux/can/isotp.h>`` shall be used.=
+ A
+> +socket can then be created using the ``PF_CAN`` protocol family, the
+> +``SOCK_DGRAM`` type (as the underlying protocol is datagram-based by des=
+ign)
+> +and the ``CAN_ISOTP`` protocol:
+> +
+> +.. code-block:: C
+> +
+> +    s =3D socket(PF_CAN, SOCK_DGRAM, CAN_ISOTP);
+> +
+> +After the socket has been successfully created, ``bind(2)`` shall be cal=
+led to
+> +bind the socket to the desired CAN interface; to do so:
+> +
+> +* a TX CAN ID shall be specified as part of the sockaddr supplied to the=
+ call
+> +  itself, and
+> +* a RX CAN ID shall also specified, unless broadcast flags have been set
+> +  through socket option (explained below)
+> +
+> +Once bound to an interface, the socket can be read from and written to u=
 sing
-> > > > replies from the device. By iterating over the "virtnet_stats_map,"
-> > > > these operations become more streamlined and efficient.
-> > > >
-> > > > NIC statistics:
-> > > >      rx0_packets: 582951
-> > > >      rx0_bytes: 155307077
-> > > >      rx0_drops: 0
-> > > >      rx0_xdp_packets: 0
-> > > >      rx0_xdp_tx: 0
-> > > >      rx0_xdp_redirects: 0
-> > > >      rx0_xdp_drops: 0
-> > > >      rx0_kicks: 17007
-> > > >      rx0_hw_packets: 2179409
-> > > >      rx0_hw_bytes: 510015040
-> > > >      rx0_hw_notifications: 0
-> > > >      rx0_hw_interrupts: 0
-> > > >      rx0_hw_drops: 12964
-> > > >      rx0_hw_drop_overruns: 0
-> > > >      rx0_hw_csum_valid: 2179409
-> > > >      rx0_hw_csum_none: 0
-> > > >      rx0_hw_csum_bad: 0
-> > > >      rx0_hw_needs_csum: 2179409
-> > > >      rx0_hw_ratelimit_packets: 0
-> > > >      rx0_hw_ratelimit_bytes: 0
-> > > >      tx0_packets: 15361
-> > > >      tx0_bytes: 1918970
-> > > >      tx0_xdp_tx: 0
-> > > >      tx0_xdp_tx_drops: 0
-> > > >      tx0_kicks: 15361
-> > > >      tx0_timeouts: 0
-> > > >      tx0_hw_packets: 32272
-> > > >      tx0_hw_bytes: 4311698
-> > > >      tx0_hw_notifications: 0
-> > > >      tx0_hw_interrupts: 0
-> > > >      tx0_hw_drops: 0
-> > > >      tx0_hw_drop_malformed: 0
-> > > >      tx0_hw_csum_none: 0
-> > > >      tx0_hw_needs_csum: 32272
-> > > >      tx0_hw_ratelimit_packets: 0
-> > > >      tx0_hw_ratelimit_bytes: 0
-> > > >
-> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > ---
-> > > >  drivers/net/virtio_net.c | 401 +++++++++++++++++++++++++++++++++++=
-+++-
-> > > >  1 file changed, 397 insertions(+), 4 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > > index 8cb5bdd7ad91..70c1d4e850e0 100644
-> > > > --- a/drivers/net/virtio_net.c
-> > > > +++ b/drivers/net/virtio_net.c
-> > > > @@ -128,6 +128,129 @@ static const struct virtnet_stat_desc virtnet=
-_rq_stats_desc[] =3D {
-> > > >  #define VIRTNET_SQ_STATS_LEN   ARRAY_SIZE(virtnet_sq_stats_desc)
-> > > >  #define VIRTNET_RQ_STATS_LEN   ARRAY_SIZE(virtnet_rq_stats_desc)
-> > > >
-> > > > +#define VIRTNET_STATS_DESC_CQ(name) \
-> > > > +       {#name, offsetof(struct virtio_net_stats_cvq, name)}
-> > > > +
-> > > > +#define VIRTNET_STATS_DESC_RX(class, name) \
-> > > > +       {#name, offsetof(struct virtio_net_stats_rx_ ## class, rx_ =
-## name)}
-> > > > +
-> > > > +#define VIRTNET_STATS_DESC_TX(class, name) \
-> > > > +       {#name, offsetof(struct virtio_net_stats_tx_ ## class, tx_ =
-## name)}
-> > > > +
-> > > > +static const struct virtnet_stat_desc virtnet_stats_cvq_desc[] =3D=
- {
-> > > > +       VIRTNET_STATS_DESC_CQ(command_num),
-> > > > +       VIRTNET_STATS_DESC_CQ(ok_num),
-> > > > +};
-> > > > +
-> > > > +static const struct virtnet_stat_desc virtnet_stats_rx_basic_desc[=
-] =3D {
-> > > > +       VIRTNET_STATS_DESC_RX(basic, packets),
-> > > > +       VIRTNET_STATS_DESC_RX(basic, bytes),
-> > > > +
-> > > > +       VIRTNET_STATS_DESC_RX(basic, notifications),
-> > > > +       VIRTNET_STATS_DESC_RX(basic, interrupts),
-> > > > +
-> > > > +       VIRTNET_STATS_DESC_RX(basic, drops),
-> > > > +       VIRTNET_STATS_DESC_RX(basic, drop_overruns),
-> > > > +};
-> > > > +
-> > > > +static const struct virtnet_stat_desc virtnet_stats_tx_basic_desc[=
-] =3D {
-> > > > +       VIRTNET_STATS_DESC_TX(basic, packets),
-> > > > +       VIRTNET_STATS_DESC_TX(basic, bytes),
-> > > > +
-> > > > +       VIRTNET_STATS_DESC_TX(basic, notifications),
-> > > > +       VIRTNET_STATS_DESC_TX(basic, interrupts),
-> > > > +
-> > > > +       VIRTNET_STATS_DESC_TX(basic, drops),
-> > > > +       VIRTNET_STATS_DESC_TX(basic, drop_malformed),
-> > > > +};
-> > > > +
-> > > > +static const struct virtnet_stat_desc virtnet_stats_rx_csum_desc[]=
- =3D {
-> > > > +       VIRTNET_STATS_DESC_RX(csum, csum_valid),
-> > > > +       VIRTNET_STATS_DESC_RX(csum, needs_csum),
-> > > > +
-> > > > +       VIRTNET_STATS_DESC_RX(csum, csum_none),
-> > > > +       VIRTNET_STATS_DESC_RX(csum, csum_bad),
-> > > > +};
-> > > > +
-> > > > +static const struct virtnet_stat_desc virtnet_stats_tx_csum_desc[]=
- =3D {
-> > > > +       VIRTNET_STATS_DESC_TX(csum, needs_csum),
-> > > > +       VIRTNET_STATS_DESC_TX(csum, csum_none),
-> > > > +};
-> > > > +
-> > > > +static const struct virtnet_stat_desc virtnet_stats_rx_gso_desc[] =
-=3D {
-> > > > +       VIRTNET_STATS_DESC_RX(gso, gso_packets),
-> > > > +       VIRTNET_STATS_DESC_RX(gso, gso_bytes),
-> > > > +       VIRTNET_STATS_DESC_RX(gso, gso_packets_coalesced),
-> > > > +       VIRTNET_STATS_DESC_RX(gso, gso_bytes_coalesced),
-> > > > +};
-> > > > +
-> > > > +static const struct virtnet_stat_desc virtnet_stats_tx_gso_desc[] =
-=3D {
-> > > > +       VIRTNET_STATS_DESC_TX(gso, gso_packets),
-> > > > +       VIRTNET_STATS_DESC_TX(gso, gso_bytes),
-> > > > +       VIRTNET_STATS_DESC_TX(gso, gso_segments),
-> > > > +       VIRTNET_STATS_DESC_TX(gso, gso_segments_bytes),
-> > > > +       VIRTNET_STATS_DESC_TX(gso, gso_packets_noseg),
-> > > > +       VIRTNET_STATS_DESC_TX(gso, gso_bytes_noseg),
-> > > > +};
-> > > > +
-> > > > +static const struct virtnet_stat_desc virtnet_stats_rx_speed_desc[=
-] =3D {
-> > > > +       VIRTNET_STATS_DESC_RX(speed, ratelimit_packets),
-> > > > +       VIRTNET_STATS_DESC_RX(speed, ratelimit_bytes),
-> > > > +};
-> > > > +
-> > > > +static const struct virtnet_stat_desc virtnet_stats_tx_speed_desc[=
-] =3D {
-> > > > +       VIRTNET_STATS_DESC_TX(speed, ratelimit_packets),
-> > > > +       VIRTNET_STATS_DESC_TX(speed, ratelimit_bytes),
-> > > > +};
-> > > > +
-> > > > +#define VIRTNET_Q_TYPE_RX 0
-> > > > +#define VIRTNET_Q_TYPE_TX 1
-> > > > +#define VIRTNET_Q_TYPE_CQ 2
-> > > > +
-> > > > +struct virtnet_stats_map {
-> > > > +       /* The stat type in bitmap. */
-> > > > +       u64 stat_type;
-> > > > +
-> > > > +       /* The bytes of the response for the stat. */
-> > > > +       u32 len;
-> > > > +
-> > > > +       /* The num of the response fields for the stat. */
-> > > > +       u32 num;
-> > > > +
-> > > > +       /* The type of queue corresponding to the statistics. (cq, =
-rq, sq) */
-> > > > +       u32 queue_type;
-> > > > +
-> > > > +       /* The reply type of the stat. */
-> > > > +       u8 reply_type;
-> > > > +
-> > > > +       /* Describe the name and the offset in the response. */
-> > > > +       const struct virtnet_stat_desc *desc;
-> > > > +};
-> > > > +
-> > > > +#define VIRTNET_DEVICE_STATS_MAP_ITEM(TYPE, type, queue_type)  \
-> > > > +       {                                                       \
-> > > > +               VIRTIO_NET_STATS_TYPE_##TYPE,                   \
-> > > > +               sizeof(struct virtio_net_stats_ ## type),       \
-> > > > +               ARRAY_SIZE(virtnet_stats_ ## type ##_desc),     \
-> > > > +               VIRTNET_Q_TYPE_##queue_type,                    \
-> > > > +               VIRTIO_NET_STATS_TYPE_REPLY_##TYPE,             \
-> > > > +               &virtnet_stats_##type##_desc[0]                 \
-> > > > +       }
-> > > > +
-> > > > +static struct virtnet_stats_map virtio_net_stats_map[] =3D {
-> > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(CVQ, cvq, CQ),
-> > > > +
-> > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_BASIC, rx_basic, RX),
-> > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_CSUM,  rx_csum,  RX),
-> > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_GSO,   rx_gso,   RX),
-> > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_SPEED, rx_speed, RX),
-> > > > +
-> > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_BASIC, tx_basic, TX),
-> > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_CSUM,  tx_csum,  TX),
-> > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_GSO,   tx_gso,   TX),
-> > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_SPEED, tx_speed, TX),
-> > > > +};
-> > >
-> > > I think the reason you did this is to ease the future extensions but
-> > > multiple levels of nested macros makes the code hard to review. Any
-> > > way to eliminate this?
-> >
-> >
-> > NOT only for the future extensions.
-> >
-> > When we parse the reply from the device, we need to check the reply sta=
-ts
-> > one by one, we need the stats info to help parse the stats.
->
-> Yes, but I meant for example any reason why it can't be done by
-> extending virtnet_stat_desc ?
+> +the usual ``read(2)`` and ``write(2)`` system calls, as well as ``send(2=
+)``,
+> +``sendmsg(2)``, ``recv(2)`` and ``recvmsg(2)``.
+> +Unlike the CAN_RAW socket API, only the data payload shall be specified =
+in all
+> +these calls, as the CAN header is automatically filled by the ISO-TP sta=
+ck
+> +using information supplied during socket creation. In the same way, the =
+stack
+> +will use the transport mechanism when required (i.e., when the size of t=
+he data
+> +payload exceeds the MTU of the underlying CAN bus).
+> +
+> +The sockaddr structure used for SocketCAN has extensions for use with IS=
+O-TP,
+> +as specified below:
+> +
+> +.. code-block:: C
+> +
+> +    struct sockaddr_can {
+> +        sa_family_t can_family;
+> +        int         can_ifindex;
+> +        union {
+> +            struct { canid_t rx_id, tx_id; } tp;
+> +        ...
+> +        } can_addr;
+> +    }
+> +
+> +* ``can_family`` and ``can_ifindex`` serve the same purpose as for other
+> +  SocketCAN sockets.
+> +
+> +* ``can_addr.tp.rx_id`` specifies the receive (RX) CAN ID and will be us=
+ed as
+> +  a RX filter.
+> +
+> +* ``can_addr.tp.tx_id`` specifies the transmit (TX) CAN ID
+> +
+> +ISO-TP socket options
+> +---------------------
+> +
+> +When creating an ISO-TP socket, reasonable defaults are set. Some option=
+s can
+> +be modified with ``setsockopt(2)`` and/or read back with ``getsockopt(2)=
+``.
+> +
+> +General options
+> +~~~~~~~~~~~~~~~
+> +
+> +General socket options can be passed using the ``CAN_ISOTP_OPTS`` optnam=
+e:
+> +
+> +.. code-block:: C
+> +
+> +    struct can_isotp_options opts;
+> +    ret =3D setsockopt(s, SOL_CAN_ISOTP, CAN_ISOTP_OPTS, &opts, sizeof(o=
+pts))
+> +
+> +where the ``can_isotp_options`` structure has the following contents:
+> +
+> +.. code-block:: C
+> +
+> +    struct can_isotp_options {
+> +        u32 flags;
+> +        u32 frame_txtime;
+> +        u8  ext_address;
+> +        u8  txpad_content;
+> +        u8  rxpad_content;
+> +        u8  rx_ext_address;
+> +    };
+> +
+> +* ``flags``: modifiers to be applied to the default behaviour of the ISO=
+-TP
+> +  stack. Following flags are available:
+> +
+> +  - ``CAN_ISOTP_LISTEN_MODE``: listen only (do not send FC frames); norm=
+ally
+> +    used as a testing feature.
+> +  - ``CAN_ISOTP_EXTEND_ADDR``: enable extended addressing, using the byte
+> +    specified in ``ext_address`` as additional address byte.
+> +  - ``CAN_ISOTP_TX_PADDING``: enable padding for tranmsitted frames, usi=
+ng
+> +    ``txpad_content`` as value for the padding bytes.
+> +  - ``CAN_ISOTP_RX_PADDING``: enable padding for the received frames, us=
+ing
+> +    ``rxpad_content`` as value for the padding bytes.
+> +  - ``CAN_ISOTP_CHK_PAD_LEN``: check for correct padding length on the r=
+eceived
+> +    frames.
+> +  - ``CAN_ISOTP_CHK_PAD_DATA``: check padding bytes on the received fram=
+es
+> +    against ``rxpad_content``; if ``CAN_ISOTP_RX_PADDING`` is not specif=
+ied,
+> +    this flag is ignored.
+> +  - ``CAN_ISOTP_HALF_DUPLEX``: force ISO-TP socket in half duples mode
+> +    (that is, transport mechanism can only be incoming or outgoing at th=
+e same
+> +    time, not both).
+> +  - ``CAN_ISOTP_FORCE_TXSTMIN``: ignore stmin from received FC; normally
+> +    used as a testing feature.
+> +  - ``CAN_ISOTP_FORCE_RXSTMIN``: ignore CFs depending on rx stmin; norma=
+lly
+> +    used as a testing feature.
+> +  - ``CAN_ISOTP_RX_EXT_ADDR``: use ``rx_ext_address`` instead of ``ext_a=
+ddress``
+> +    as extended addressing byte on the reception path.
+> +  - ``CAN_ISOTP_WAIT_TX_DONE``: wait until the frame is sent before retu=
+rning
+> +    from ``write(2)`` and ``send(2)`` calls (i.e., blocking write operat=
+ions).
+> +  - ``CAN_ISOTP_SF_BROADCAST``: use 1-to-N functional addressing (cannot=
+ be
+> +    specified alongside ``CAN_ISOTP_CF_BROADCAST``).
+> +  - ``CAN_ISOTP_CF_BROADCAST``: use 1-to-N transmission without flow con=
+trol
+> +    (cannot be specified alongside ``CAN_ISOTP_SF_BROADCAST``).
+> +    NOTE: this is not covered by the ISO15765-2:2016 standard.
+> +  - ``CAN_ISOTP_DYN_FC_PARMS``: enable dynamic update of flow control
+> +    parameters.
+> +
+> +* ``frame_txtime``: frame transmission time (defined as N_As/N_Ar inside=
+ the
+> +  ISO standard); if ``0``, the default (or the last set value) is used.
+> +  To set the transmission time to ``0``, the ``CAN_ISOTP_FRAME_TXTIME_ZE=
+RO``
+> +  macro (equal to 0xFFFFFFFF) shall be used.
+> +
+> +* ``ext_address``: extended addressing byte, used if the
+> +  ``CAN_ISOTP_EXTEND_ADDR`` flag is specified.
+> +
+> +* ``txpad_content``: byte used as padding value for transmitted frames
+> +
+> +* ``rxpad_content``: byte used as padding value for received frames
+> +
+> +* ``rx_ext_address``: extended addressing byte for the reception path, u=
+sed if
+> +  the ``CAN_ISOTP_RX_EXT_ADDR`` flag is specified.
+> +
+> +Flow Control options
+> +~~~~~~~~~~~~~~~~~~~~
+> +
+> +Flow Control (FC) options can be passed using the ``CAN_ISOTP_RECV_FC`` =
+optname
+> +to provide the communication parameters for receiving ISO-TP PDUs.
+> +
+> +.. code-block:: C
+> +
+> +    struct can_isotp_fc_options fc_opts;
+> +    ret =3D setsockopt(s, SOL_CAN_ISOTP, CAN_ISOTP_RECV_FC, &fc_opts, si=
+zeof(fc_opts));
+> +
+> +where the ``can_isotp_fc_options`` structure has the following contents:
+> +
+> +.. code-block:: C
+> +
+> +    struct can_isotp_options {
+> +        u8 bs;
+> +        u8 stmin;
+> +        u8 wftmax;
+> +    };
+> +
+> +* ``bs``: blocksize provided in flow control frames.
+> +
+> +* ``stmin``: minimum separation time provided in flow control frames; can
+> +  have the following values (others are reserved):
+> +  - 0x00 - 0x7F : 0 - 127 ms
+> +  - 0xF1 - 0xF9 : 100 us - 900 us
+> +
+> +* ``wftmax``: maximum number of wait frames provided in flow control fra=
+mes.
+> +
+> +Link Layer options
+> +~~~~~~~~~~~~~~~~~~
+> +
+> +Link Layer (LL) options can be passed using the ``CAN_ISOTP_LL_OPTS`` op=
+tname:
+> +
+> +.. code-block:: C
+> +
+> +    struct can_isotp_ll_options ll_opts;
+> +    ret =3D setsockopt(s, SOL_CAN_ISOTP, CAN_ISOTP_LL_OPTS, &ll_opts, si=
+zeof(ll_opts));
+> +
+> +where the ``can_isotp_ll_options`` structure has the following contents:
+> +
+> +.. code-block:: C
+> +
+> +    struct can_isotp_ll_options {
+> +        u8 mtu;
+> +        u8 tx_dl;
+> +        u8 tx_flags;
+> +    };
+> +
+> +* ``mtu``: generated and accepted CAN frame type, can be equal to ``CAN_=
+MTU``
+> +  for classical CAN frames or ``CANFD_MTU`` for CAN FD frames.
+> +
+> +* ``tx_dl``: maximum payload length for transmitted frames, can have one=
+ value
+> +  among: 8, 12, 16, 20, 24, 32, 48, 64. Values above 8 only apply to CAN=
+ FD
+> +  traffic (i.e.: ``mtu =3D CANFD_MTU``).
+> +
+> +* ``tx_flags``: flags set into ``struct canfd_frame.flags`` at frame cre=
+ation.
+> +  Only applies to CAN FD traffic (i.e.: ``mtu =3D CANFD_MTU``).
+> +
+> +Transmission stmin
+> +~~~~~~~~~~~~~~~~~~
+> +
+> +The transmission minimum separaton time (stmin) can be forced using the
+> +``CAN_ISOTP_TX_STMIN`` optname and providing an stmin value in microseco=
+nds as
+> +a 32bit unsigned integer; this will overwrite the value sent by the rece=
+iver in
+> +flow control frames:
+> +
+> +.. code-block:: C
+> +
+> +    uint32_t stmin;
+> +    ret =3D setsockopt(s, SOL_CAN_ISOTP, CAN_ISOTP_TX_STMIN, &stmin, siz=
+eof(stmin));
+> +
+> +Reception stmin
+> +~~~~~~~~~~~~~~~
+> +
+> +The reception minimum separaton time (stmin) can be forced using the
+> +``CAN_ISOTP_RX_STMIN`` optname and providing an stmin value in microseco=
+nds as
+> +a 32bit unsigned integer; received Consecutive Frames (CF) which timesta=
+mps
+> +differ less than this value will be ignored:
+> +
+> +.. code-block:: C
+> +
+> +    uint32_t stmin;
+> +    ret =3D setsockopt(s, SOL_CAN_ISOTP, CAN_ISOTP_RX_STMIN, &stmin, siz=
+eof(stmin));
+> +
+> +Multi-frame transport support
+> +-----------------------------
+> +
+> +The ISO-TP stack contained inside the Linux kernel supports the multi-fr=
+ame
+> +transport mechanism defined by the standard, with the following constrai=
+nts:
+> +
+> +* the maximum size of a PDU is defined by a module parameter, with an ha=
+rd
+> +  limit imposed at build time
+> +* when a transmission is in progress, subsequent calls to ``write(2)`` w=
+ill
+> +  block, while calls to ``send(2)`` will either block or fail depending =
+on the
+> +  presence of the ``MSG_DONTWAIT`` flag
+> +* no support is present for sending "wait frames": whether a PDU can be =
+fully
+> +  received or not is decided when the First Frame is received
+> +
+> +Errors
+> +------
+> +
+> +Following errors are reported to userspace:
+> +
+> +RX path errors
+> +~~~~~~~~~~~~~~
+> +
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+> +-ETIMEDOUT   timeout of data reception
+> +-EILSEQ      sequence number mismatch during a multi-frame reception
+> +-EBADMSG     data reception with wrong padding
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+> +
+> +TX path errors
+> +~~~~~~~~~~~~~~
+> +
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+> +-ECOMM     flow control reception timeout
+> +-EMSGSIZE  flow control reception overflow
+> +-EBADMSG   flow control reception with wrong layout/padding
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+> +
+> +Examples
+> +=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +Basic node example
+> +------------------
+> +
+> +Following example implements a node using "normal" physical addressing, =
+with
+> +RX ID equal to 0x18DAF142 and a TX ID equal to 0x18DA42F1. All options a=
+re left
+> +to their default.
+> +
+> +.. code-block:: C
+> +
+> +  int s;
+> +  struct sockaddr_can addr;
+> +  int ret;
+> +
+> +  s =3D socket(PF_CAN, SOCK_DGRAM, CAN_ISOTP);
+> +  if (s < 0)
+> +      exit(1);
+> +
+> +  addr.can_family =3D AF_CAN;
+> +  addr.can_ifindex =3D if_nametoindex("can0");
+> +  addr.tp.tx_id =3D (0x18DA42F1 | CAN_EFF_FLAG);
+> +  addr.tp.rx_id =3D (0x18DAF142 | CAN_EFF_FLAG);
+> +
+> +  ret =3D bind(s, (struct sockaddr *)&addr, sizeof(addr));
+> +  if (ret < 0)
+> +      exit(1);
+> +
+> +  // Data can now be received using read(s, ...) and sent using write(s,=
+ ...)
+> +
+> +Additional examples
+> +-------------------
+> +
+> +More complete (and complex) examples can be found inside the ``isotp*`` =
+userland
+> +tools, distributed as part of the ``can-utils`` utilities at:
+> +https://github.com/linux-can/can-utils
 
+Other than the ongoing review comments, the doc LGTM (no htmldocs warnings).
+Thanks!
 
+Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
 
-You know, virtio_net_stats_map is way to organize the descs.
+--=20
+An old man doll... just what I always wanted! - Clara
 
-This is used to avoid the big if-else when parsing the replys from the devi=
-ce.
+--qSWMrSDOEZitIUIC
+Content-Type: application/pgp-signature; name="signature.asc"
 
-If no this map, we will have a big if-else like:
+-----BEGIN PGP SIGNATURE-----
 
- if (reply.type =3D=3D rx_basic) {
- 	 /* do the same something */
- }
- if (reply.type =3D=3D tx_basic) {
- 	 /* do the same something */
- }
- if (reply.type =3D=3D rx_csum) {
- 	 /* do the same something */
- }
- if (reply.type =3D=3D tx_csum) {
- 	 /* do the same something */
- }
- if (reply.type =3D=3D rx_gso) {
- 	 /* do the same something */
- }
- if (reply.type =3D=3D tx_gso) {
- 	 /* do the same something */
- }
- if (reply.type =3D=3D rx_speed) {
- 	 /* do the same something */
- }
- if (reply.type =3D=3D tx_speed) {
- 	 /* do the same something */
- }
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZhyaYwAKCRD2uYlJVVFO
+o7w4AP9/h/CFC1jxxuLbU6Cq4oODpPCwFLR9+5h4o2cXu4iUFAEAgwPt/DPSpG53
+gKCQ92aZYRpMv0ofA6Q5FwbNDlksHAc=
+=8BC7
+-----END PGP SIGNATURE-----
 
-I want to avoid this, so introducing this map.
-
-YES. I noticed other comments, but I think we should
-fix this problem firstly.
-
-Thanks.
-
-
->
-> >
-> >         static void virtnet_fill_stats(struct virtnet_info *vi, u32 qid,
-> >                                       struct virtnet_stats_ctx *ctx,
-> >                                       const u8 *base, u8 type)
-> >         {
-> >                u32 queue_type, num_rx, num_tx, num_cq;
-> >                struct virtnet_stats_map *m;
-> >                u64 offset, bitmap;
-> >                const __le64 *v;
-> >                int i, j;
-> >
-> >                num_rx =3D VIRTNET_RQ_STATS_LEN + ctx->desc_num[VIRTNET_=
-Q_TYPE_RX];
-> >                num_tx =3D VIRTNET_SQ_STATS_LEN + ctx->desc_num[VIRTNET_=
-Q_TYPE_TX];
-> >                num_cq =3D ctx->desc_num[VIRTNET_Q_TYPE_CQ];
-> >
-> >                queue_type =3D vq_type(vi, qid);
-> >                bitmap =3D ctx->bitmap[queue_type];
-> >                offset =3D 0;
-> >
-> >                if (queue_type =3D=3D VIRTNET_Q_TYPE_TX) {
-> >                        offset =3D num_cq + num_rx * vi->curr_queue_pair=
-s + num_tx * (qid / 2);
-> >                        offset +=3D VIRTNET_SQ_STATS_LEN;
-> >                } else if (queue_type =3D=3D VIRTNET_Q_TYPE_RX) {
-> >                        offset =3D num_cq + num_rx * (qid / 2) + VIRTNET=
-_RQ_STATS_LEN;
-> >                }
-> >
-> >                for (i =3D 0; i < ARRAY_SIZE(virtio_net_stats_map); ++i)=
- {
-> >                        m =3D &virtio_net_stats_map[i];
-> >
-> > ->                     if (m->stat_type & bitmap)
-> >                                offset +=3D m->num;
-> >
-> > ->                     if (type !=3D m->reply_type)
-> >                                continue;
-> >
-> >                        for (j =3D 0; j < m->num; ++j) {
-> >                                v =3D (const __le64 *)(base + m->desc[j]=
-.offset);
-> >                                ctx->data[offset + j] =3D le64_to_cpu(*v=
-);
-> >                        }
-> >
-> >                        break;
-> >                }
-> >         }
-> >
-> > Thanks.
->
-> Btw, just a reminder, there are other comments for this patch.
->
-> Thanks
->
+--qSWMrSDOEZitIUIC--
 
