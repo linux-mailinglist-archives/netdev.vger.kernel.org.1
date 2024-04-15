@@ -1,96 +1,111 @@
-Return-Path: <netdev+bounces-88002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2276D8A52DA
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:16:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BCDF8A52DD
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:17:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D256E282B56
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:16:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA290B20F62
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:17:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CED74C07;
-	Mon, 15 Apr 2024 14:16:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC898745ED;
+	Mon, 15 Apr 2024 14:17:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="daujlsoC"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="yvMcSKo3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C87274BE8;
-	Mon, 15 Apr 2024 14:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1563D0D9
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 14:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713190601; cv=none; b=EzLSZgnGh6V08hGpiu91izNMQ90bdKfC56iB/AvnFwIyU1+teErbYOJ8zumtg5uiolsiuLciFvhKAN8ipbRqnsXXbyW7bZM0yZ6PTgLJWuEZhPTwJHvvifO0Cy+wDLjAYQtyytZDW5L+OStd9+52jurYK6UJ/BLpLgRdz2qNrEo=
+	t=1713190636; cv=none; b=Lxk+8xeD7xBuDTsOXFUN/0FYzeTIeBhIo90BD+a8RWcmfnc/0edwbiQX8Wjxdd8ANtip9JCH9QDEU/Aq9LCIFJaSElCUmtpFT+fXVj/RcEKvjqtA55UsOO+V6wM+uBJkZUBFI7xk8eGL+Cq7FqxYdASMN2cBfuTVBj3fkf5bba8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713190601; c=relaxed/simple;
-	bh=AeJ3m6898L+idijR3UYOQMzSFryOOqfCPjG6iiSxUAs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BvkLiBWPHDpWdApTx1MfHqSQ30UXTCvU9Z5tfkUn2fdf+LyPUDiUJeefYRMTm5AoO0w/p70aY1cgjgOWm4XdtTJtVZspPZseNLGrw1egc2DfrzdS5+izJUnC5k8S3WEa9cQtjBWYTN2dvkYQOvDPO6tEGo0dAu+6o701JGz0dsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=daujlsoC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B30AC113CC;
-	Mon, 15 Apr 2024 14:16:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713190600;
-	bh=AeJ3m6898L+idijR3UYOQMzSFryOOqfCPjG6iiSxUAs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=daujlsoCN1J4h3/++vaT3923KATwGcRXjzVlQ0MovGpLv4pIbbEwafFgtJCkqf/Kh
-	 wpmo1HeuRf8QvK1kNRMoTAmtASAjW0t3cdqGTDKv2d8Qu2L5LVwsHNL0tciKlfa8q7
-	 3Etf7OBBD6PQrWW6NFZCdoym0zHjxAmdIKyA1DB0bdPewoEbZ7MuHBoboDuSJ+JI1E
-	 LGH/OJ4sRArdg0bnQuLN8SkAIQ6LhbGDD3KCyLC3FFHFvH1FWbWb1/m51DcFdbsiFn
-	 ixCEqoaa/9p8p1ul632t3kMCO08UM8+6VpKJgOlb9ZZznEdXnNBAEaMhMl0CAAUzEg
-	 LSQa05vAXmQ8g==
-Date: Mon, 15 Apr 2024 07:16:39 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, shuah@kernel.org, petrm@nvidia.com,
- linux-kselftest@vger.kernel.org, willemb@google.com
-Subject: Re: [PATCH net-next 1/5] selftests: drv-net: define endpoint
- structures
-Message-ID: <20240415071639.03c9cfd6@kernel.org>
-In-Reply-To: <661c0cae8110a_3e773229418@willemb.c.googlers.com.notmuch>
-References: <20240412233705.1066444-1-kuba@kernel.org>
-	<20240412233705.1066444-2-kuba@kernel.org>
-	<661c0cae8110a_3e773229418@willemb.c.googlers.com.notmuch>
+	s=arc-20240116; t=1713190636; c=relaxed/simple;
+	bh=/GzR4exSwJRZiPyKuCPjsTiU2SNACOfW6mSk9wj7agI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ebidw96V7KmpTsdStXkNO4Fh3umfFiWTFXlzxT0i9+3zgclPk+eX96ix6brS6I5jeaPGDbKFs/NqUC+wcIBRvbE0nzh//+1vDh2lqzr0J+cd1qaDjbOKlddIuAtOn7HtoqfGM/i88mtCE0vMuzRGg6EPHQpIZGmlTRprRCNZqJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=yvMcSKo3; arc=none smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-617e6c873f3so35042597b3.2
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 07:17:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1713190633; x=1713795433; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/GzR4exSwJRZiPyKuCPjsTiU2SNACOfW6mSk9wj7agI=;
+        b=yvMcSKo3llvYhijvifkwilZlngzTOyX2nT+uekjcMlZmfSz9kQDFMiCO2x1gXpINjC
+         VinqNn0OIP8mDxam3KgGn7EDnt0s245PMg1Ro64Rntkyf/Jg1YpIMCIt6fvpqrufZ/ta
+         P9VUNDBb84cljmjBYdMbBldxqPQITHE1P9zGnspnYw5Kfdv5G+g6raL32TNMzzX2DrgZ
+         jXlNDkZLjcvte7edJ+TqPYhh1JyVa8nR+0eUY5csnZ1/IybmxLO6XKqYCJKQxQTen4k0
+         WdpxoYVbe4dqrhaVbE+6lOCUXk2evRbaIkDSMMWJVTtKqMH1qIX3a+om/agGVwxfnlqw
+         qeog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713190633; x=1713795433;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/GzR4exSwJRZiPyKuCPjsTiU2SNACOfW6mSk9wj7agI=;
+        b=MXET681Tb3Jd4C/qYjEpSjfowDMTQzcZ96MMNTBqxDdGzMv4GRK+U08zhzdtzLC5Q3
+         80QQYbOvRFoMANbTqgsZB00lsN0WmG/PSYeG21xBM0Ztxe/SRqx60SxNqXptyqeyV4iN
+         HDtdSgm6QiXiADdGFdcNbRkRx6nmiYqlD/Vdu4xodIDBd7MCkXfbbvZAyPDIjfWff10P
+         cogZ59w4K/fR8ois33jFBM8pBKW0CaDtKksA/o2h2DGaB76l/TV4Dekuiw7sRo2BW6pY
+         UrSGCoK3GSttdyNibv1KlwFj9Vl0exZBAJ9lAK/hAZ4Qxijd2eiKvUYt5XtUEy2eoN5H
+         jTvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXCn/jOpm0/sFkkfMylD8HSxHzDxS3B4foF4M2/Lv30vOzulhlIno/SHi0+HcYynTi9BzlnnHZq2DCECYbsEW6yClXFTLp0
+X-Gm-Message-State: AOJu0Yw8IyDeiXfaW1w0xwpwTn0PuW+kkIYfabN26ASGIzUfuHJLaqMb
+	8N62xDLb4DjSxYPWrXm/sb0gaSnRraLXt3zIvEVnmL5CUIL1xEJhd2bHV1R2GPh67NaYcbDWZAr
+	pf4/QQONu8eL1wCTE+LlLCwiGIJIKMWrKYBv5
+X-Google-Smtp-Source: AGHT+IEzldycUoqUEuca8N0Wkzt/i3EjHxY5F3p9RestGMrOjvh2qVGmhs6xWe3CFkscSq/1KPnrcvh3oUTPRhz8Y40=
+X-Received: by 2002:a81:bc53:0:b0:61a:cd65:3010 with SMTP id
+ b19-20020a81bc53000000b0061acd653010mr2939138ywl.30.1713190632770; Mon, 15
+ Apr 2024 07:17:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240326230319.190117-1-jhs@mojatatu.com> <CANn89iLhd4iD-pDVJHzKqWbf16u9KyNtgV41X3sd=iy15jDQtQ@mail.gmail.com>
+ <CAM0EoMmQHsucU6n1O3XEd50zUB4TENkEH0+J-cZ=5Bbv9298mA@mail.gmail.com>
+ <CANn89iKaMKeY7pR7=RH1NMBpYiYFmBRfAWmbZ61PdJ2VYoUJ9g@mail.gmail.com>
+ <CAM0EoM=s_MvUa32kUyt=VfeiAwxOm2OUJ3H=i0ARO1xupM2_Xg@mail.gmail.com>
+ <CAM0EoMk33ga5dh12ViZz8QeFwjwNQBvykM53VQo1B3BdfAZtaQ@mail.gmail.com>
+ <CANn89iLmhaC8fuu4UpPdELOAapBzLv0+S50gr0Rs+J+=4+9j=g@mail.gmail.com>
+ <CAM0EoMm+cqkY9tQC6+jpvLJrRxw43Gzffgw85Q3Fe2tBgA7k2Q@mail.gmail.com>
+ <CAM0EoMmdp_ik6EA2q8vhr+gGh=OcxUkvBOsxPHFWjn1eDX_33Q@mail.gmail.com> <CANn89iLsV8sj1cJJ8VJmBwZvsD5PoV_NXfXYSCXTjaYCRm6gmA@mail.gmail.com>
+In-Reply-To: <CANn89iLsV8sj1cJJ8VJmBwZvsD5PoV_NXfXYSCXTjaYCRm6gmA@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 15 Apr 2024 10:17:01 -0400
+Message-ID: <CAM0EoMmcTgdWQ0z0b9Ne1JHyTUq-R3-za3vMH1PfNVVoYwmcUA@mail.gmail.com>
+Subject: Re: [PATCH RFC net 1/1] net/sched: Fix mirred to self recursion
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us, 
+	xiyou.wangcong@gmail.com, netdev@vger.kernel.org, renmingshuai@huawei.com, 
+	Victor Nogueira <victor@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, 14 Apr 2024 13:04:46 -0400 Willem de Bruijn wrote:
-> 1. Cleaning up remote state in all conditions, including timeout/kill.
-> 
->    Some tests require a setup phase before the test, and a matching
->    cleanup phase. If any of the configured state is variable (even
->    just a randomized filepath) this needs to be communicated to the
->    cleanup phase. The remote filepath is handled well here. But if
->    a test needs per-test setup? Say, change MTU or an Ethtool feature.
->    Multiple related tests may want to share a setup/cleanup.
-> 
->    Related: some tests may need benefit from a lightweight stateless
->    check phase to detect preconditions before committing to any setup.
->    Again, say an Ethtool feature like rx-gro-hw, or AF_XDP metadata rx.
+On Mon, Apr 15, 2024 at 10:11=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> On Mon, Apr 15, 2024 at 4:01=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.co=
+m> wrote:
+> >
+>
+> > Sorry - shows Victor's name but this is your patch, so feel free if
+> > you send to add your name as author.
+>
+> Sure go ahead, but I would rather put the sch->owner init in
+> qdisc_alloc() so that qdisc_create_dflt() is covered.
 
-I think this falls into the "frameworking debate" we were having with
-Petr. The consensus seems to be to keep things as simple as possible.
-If we see that tests are poorly written and would benefit from extra
-structure we should try impose some, but every local custom is
-something people will have to learn.
+ok, will do.
 
-timeout/kill is provided to us already by the kselftest harness.
-
-> 2. Synchronizing peers. Often both peers need to be started at the
->    same time, but then the client may need to wait until the server
->    is listening. Paolo added a nice local script to detect a listening
->    socket with sockstat. Less of a problem with TCP tests than UDP or
->    raw packet tests.
-
-Yes, definitely. We should probably add that with the first test that
-needs it.
+cheers,
+jamal
 
