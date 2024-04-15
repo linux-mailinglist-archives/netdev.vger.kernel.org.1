@@ -1,147 +1,193 @@
-Return-Path: <netdev+bounces-87752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6441C8A463F
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 02:09:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B30218A46B1
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 04:03:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D78F1F2178E
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 00:09:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 611761F219B8
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 02:03:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF17A817;
-	Mon, 15 Apr 2024 00:08:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADA01D29E;
+	Mon, 15 Apr 2024 02:03:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CejU6EOE"
+	dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b="KfhJzkf7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E73936B;
-	Mon, 15 Apr 2024 00:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDEB16FCA
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 02:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713139737; cv=none; b=Iv1mi45E9WJO+emCqYDyFCup7E8FM1yfrgGGjPkCNLUw/FpxVkjIu0snAAsvrzWXvQrOLZU50ksf1uleTbbtY9Ktyr8rqizccqRafGr+TOF2CxYMnC0AakKAKv7qtjRa7meTh7tucF/aIaeWJX8PkoXycdHC7GyHde2yhfoemCc=
+	t=1713146588; cv=none; b=uXy9tnX9JEFWfqX4aqxS94qhUCFyUinYBiROLjgq8+Sb+3zgUBLln9mXlDl1bamstUydi5N3V+gSjtCArGrvKK2aytjGk9vk508yGebGYnLcssyuBbaGDEQX289dzS8OLH34taqQGr03UoXdP9Yi1E2gChJ8PpTPoKkk4vDeeSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713139737; c=relaxed/simple;
-	bh=RAtrPn9LIJIjIRfdE99vo8j0a4jE5tS1h5TSS0lmAWU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m71goIHJP/LryCm1HBZaC09SHEsFuOBpYTXNobSnMwgj5qwaALghuk0FhimYrII05PFlRl2M/vP+oGyQjhUhaWhXCBERcMaNhNaBVzXeHrK8Dge6So3EqMwmC4U6ZhORQs38gS3s+dUpl2kA4vGNYfpgXZXRrDN6wGcKW3fIcJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CejU6EOE; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4186e93b9faso182185e9.0;
-        Sun, 14 Apr 2024 17:08:55 -0700 (PDT)
+	s=arc-20240116; t=1713146588; c=relaxed/simple;
+	bh=LLUxWlLv0vqmiHJ1UIZeaRzH8/vNgpEkiTxlBMPS6dI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kCEZoIlvKhrcDza/fzw4Wnrwk7tcggO3A4PEv+I2waqqJk1sLsS6C6gH+alw05HELrLiCWiSJmPGieKyq5ANkVfB4R00c1ylVQtgqkdpKenGThIbhBNbc9BbDE9Xsrjjz6pNWh8A2UJnQ7c2ZnTEchv2fxMH2ZrGQ9feruLx36A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com; spf=none smtp.mailfrom=smartx.com; dkim=pass (2048-bit key) header.d=smartx-com.20230601.gappssmtp.com header.i=@smartx-com.20230601.gappssmtp.com header.b=KfhJzkf7; arc=none smtp.client-ip=209.85.214.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=smartx.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=smartx.com
+Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-1e411e339b8so21242995ad.3
+        for <netdev@vger.kernel.org>; Sun, 14 Apr 2024 19:03:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713139734; x=1713744534; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ncthlo/v5qsu3DftyrtcPgP/aaTqW1pG0v6SXB9xGXU=;
-        b=CejU6EOE9oKe5qQpyMXTtkcdHsMEEQ5zi3ekVZQzK6g4i8OfagTOC1rSLzu8q0r3VL
-         AXj5XMKJIEKt//ZdqpXSjkmcWxGdQqqJFgAcg9/kSRpS1+tqmFJMYDJvyJnhsW7yD/SV
-         UaHzsD0Hy19Iqa4hvBOxjoV44z4fG/d7Cy1DlEUI+952niczUrz+ankOndQTIRCbWxnp
-         oC8ug0xHuNJIEIdgrXnGfdH9dkJlQo7oxZGCGnZcsg6ZJ6j26rFGzADe/tPpiIooVY9f
-         veWiVIWvQOvRO2cyBhqXBZlnFK637maIDl4rFuR8xkpg9WJrDkg3v34WMNLyRu0V5cgE
-         wISQ==
+        d=smartx-com.20230601.gappssmtp.com; s=20230601; t=1713146586; x=1713751386; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VsiaKifJOZA0qRUVE1+neEb+M+HY5irGf4D2Q2Uktwo=;
+        b=KfhJzkf7E731gNDQgo8qvjwBCVC+V9vUgkem78VvHQVjPhFGQ6m04QyhAMvwwzKHoF
+         Iebi0fUIXQKmSCuD9tPttTodF5EYWQAehf4HX2Qjr81x1hokV9l4Dyo3qGzm5KR92AAk
+         +tmuFJUPdhD4cBxGgjgkHDS+U7gZW0upxBvwzJhqlQuTzu25bvzssI4mlLot+c8v4VmL
+         pAQaJBvtDOUFEUNNr5IMw715Cy9ey9tS7OmU4W6jkJ6QN+53tviQs0+B2SOjcX3gjXq0
+         ykwiwfiyEur8CmTdqpTWyaTS9Nvms3hK6j5t8tWjrHv4pi9xUchMBpdlKywUGAmXqxbC
+         fI+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713139734; x=1713744534;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ncthlo/v5qsu3DftyrtcPgP/aaTqW1pG0v6SXB9xGXU=;
-        b=AYdmGublM9wBBBFCEhwvVsp2BAYIcyhC6yLIvfqB+RRHZW5Y4V5Idpl/mWI9p4s06i
-         WfPBCRsAndLw8+01VyCfZ06eTYSP4p3WIAvdI16803k1vmIN5JLqJyCAxGCRLcdDEMSC
-         jhWLItDPsKw4fab48V9fy8vNXTaprqIFf/dGgfH6nR6NiW/vcA837JDyHaGaAqJ4hnlU
-         aVjrzITshEAkJmL2Ds7s5PNIoLipxU+bdAxTjYI2Om8ps5asO7w4iH4lT6KtZYpjL9y6
-         m3QcPr+WvinY0TAdycqZa/f1NwpEl7MHG9R3Tf4qQsUHPE5NDAnvnlNrBNivIPMr6chF
-         naYA==
-X-Forwarded-Encrypted: i=1; AJvYcCUDc0pZNLZqWPhEh/kRz+uBJx+djrv5eDD4q1YsCL2I/OL5YZtOJ1U+M3OQlmcQkb4OmzXbTpQh1rRdxNvSKzfix79veGVNJwsIaxUqVGzN5mlG5enlZxU0DPPkn7wMZ1M=
-X-Gm-Message-State: AOJu0Yzy1q/0baJN3SXcrK/4/TtKhSLbro7o1cGlVRwgFvoSQjR2pOBG
-	I7KsXMOdEu9eBGyVzSZ/EBA+Sxz+RxhMb3VkyBcg9bCOyKTIS7af
-X-Google-Smtp-Source: AGHT+IHQvV6Ji7+8b/FdO6L6/tHmuw4m1Er8ZQrGENyxPmDQxz4bbW3E+xE6KszuhXz8jAzjTUOA5A==
-X-Received: by 2002:a05:600c:4fce:b0:415:8651:9b8e with SMTP id o14-20020a05600c4fce00b0041586519b8emr5879906wmq.39.1713139734397;
-        Sun, 14 Apr 2024 17:08:54 -0700 (PDT)
-Received: from [192.168.42.114] ([85.255.232.172])
-        by smtp.gmail.com with ESMTPSA id l23-20020a05600c1d1700b004163ee3922csm17113708wms.38.2024.04.14.17.08.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 14 Apr 2024 17:08:54 -0700 (PDT)
-Message-ID: <bbf9cb47-d022-4711-8d73-b035275519a7@gmail.com>
-Date: Mon, 15 Apr 2024 01:08:55 +0100
+        d=1e100.net; s=20230601; t=1713146586; x=1713751386;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VsiaKifJOZA0qRUVE1+neEb+M+HY5irGf4D2Q2Uktwo=;
+        b=gOLapgtwYJhihUF4ftBH9RNxVsqPQq9jTQcL5Bo6gGAfT/BW9P07hjpwmxQ5aO7QGk
+         YBdGGhaiz3Bq9ynaXMPeLMn6J7r7hYaq9L+FVh0xPLdyA6qIpYTn5HLDhYTbIMFdo/Xi
+         GmrsDeevI+WOGevUYwPN48tqsAswj1XqmZlFnerwDVnlbSKo2KmpgDObGAb6CMGsVZMr
+         uDvDu0546Gd/iCQeWUqBYH2pQFg0e4+YnHx8c53WxdqCcFFV+CN9PDwunFGjr5D4rW24
+         9B1n+UxxRJDvFVFUu3usY+Es9NGfsCQSA1OqtkjvLSLli76pyYUS26ZRIPAbjbPb2bOH
+         ra/w==
+X-Forwarded-Encrypted: i=1; AJvYcCUyW/LyRmc38vuQ5eet1xogRy5UaWL30ia0Gt8hVEa8WmfwfZXe78ESos5dkzQGtl778CIFtQbtVOd9tQ9dC5vzh1kbSDCL
+X-Gm-Message-State: AOJu0YzqwvWO9+rztJac8712+uPbyKxrENCZEa0fQ2JN1+1NOP2visFy
+	cKF12mDS0MRxNtDe544pWy7ySkrt8Mpwe8r0JQHL/yKKl6wJztwchq7tT4mKWTY=
+X-Google-Smtp-Source: AGHT+IFh1gnp53lS1uAZMRwhtdRmABsUTOLGcITiE0+jq7U8vWTjdjGd9ie6v4eS5XIVfJrJ9KbAkQ==
+X-Received: by 2002:a17:902:db01:b0:1e2:bdfa:9c15 with SMTP id m1-20020a170902db0100b001e2bdfa9c15mr10660073plx.41.1713146585341;
+        Sun, 14 Apr 2024 19:03:05 -0700 (PDT)
+Received: from localhost.localdomain ([103.172.41.206])
+        by smtp.googlemail.com with ESMTPSA id y2-20020a17090264c200b001e205884ac6sm6897872pli.20.2024.04.14.19.03.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Apr 2024 19:03:04 -0700 (PDT)
+From: Lei Chen <lei.chen@smartx.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"Michael S. Tsirkin" <mst@redhat.com>
+Cc: Lei Chen <lei.chen@smartx.com>,
+	Willem de Bruijn <willemb@google.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v5] tun: limit printing rate when illegal packet received by tun dev
+Date: Sun, 14 Apr 2024 22:02:46 -0400
+Message-ID: <20240415020247.2207781-1-lei.chen@smartx.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 0/6] implement io_uring notification (ubuf_info) stacking
-To: David Ahern <dsahern@kernel.org>, io-uring@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, "David S . Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-References: <cover.1712923998.git.asml.silence@gmail.com>
- <cdfee62d-32fe-4796-8265-d77f678c3d78@kernel.org>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <cdfee62d-32fe-4796-8265-d77f678c3d78@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 4/13/24 18:17, David Ahern wrote:
-> On 4/12/24 6:55 AM, Pavel Begunkov wrote:
->> io_uring allocates a ubuf_info per zerocopy send request, it's convenient
->> for the userspace but with how things are it means that every time the
->> TCP stack has to allocate a new skb instead of amending into a previous
->> one. Unless sends are big enough, there will be lots of small skbs
->> straining the stack and dipping performance.
-> 
-> The ubuf_info forces TCP segmentation at less than MTU boundaries which
-> kills performance with small message sizes as TCP is forced to send
-> small packets. This is an interesting solution to allow the byte stream
-> to flow yet maintain the segmentation boundaries for callbacks.
+vhost_worker will call tun call backs to receive packets. If too many
+illegal packets arrives, tun_do_read will keep dumping packet contents.
+When console is enabled, it will costs much more cpu time to dump
+packet and soft lockup will be detected.
 
-Thanks, I'll add your reviews if the patches survive in the
-current form!
+net_ratelimit mechanism can be used to limit the dumping rate.
 
+PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980"
+ #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
+ #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
+ #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
+ #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
+ #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
+    [exception RIP: io_serial_in+20]
+    RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
+    RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 0000000000000000
+    RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428a0
+    RBP: 0000000000002710   R8: 0000000000000004   R9: 000000000000000f
+    R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 0000000000000020
+    R13: ffffffff8acbf698  R14: 0000000000000058  R15: 0000000000000000
+    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+ #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
+ #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
+ #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
+ #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
+ #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
+ #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
+ #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
+ #12 [ffffa65531497b68] printk at ffffffff89318306
+ #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
+ #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
+ #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
+ #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
+ #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
+ #18 [ffffa65531497f10] kthread at ffffffff892d2e72
+ #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
 
->> The patchset implements notification, i.e. an io_uring's ubuf_info
->> extension, stacking. It tries to link ubuf_info's into a list, and
->> the entire link will be put down together once all references are
->> gone.
->>
->> Testing with liburing/examples/send-zerocopy and another custom made
->> tool, with 4K bytes per send it improves performance ~6 times and
->> levels it with MSG_ZEROCOPY. Without the patchset it requires much
->> larger sends to utilise all potential.
->>
->> bytes  | before | after (Kqps)
->> 100    | 283    | 936
->> 1200   | 195    | 1023
->> 4000   | 193    | 1386
->> 8000   | 154    | 1058
->>
->> Pavel Begunkov (6):
->>    net: extend ubuf_info callback to ops structure
->>    net: add callback for setting a ubuf_info to skb
->>    io_uring/notif: refactor io_tx_ubuf_complete()
->>    io_uring/notif: remove ctx var from io_notif_tw_complete
->>    io_uring/notif: simplify io_notif_flush()
->>    io_uring/notif: implement notification stacking
->>
->>   drivers/net/tap.c      |  2 +-
->>   drivers/net/tun.c      |  2 +-
->>   drivers/vhost/net.c    |  8 +++-
->>   include/linux/skbuff.h | 21 ++++++----
->>   io_uring/notif.c       | 91 +++++++++++++++++++++++++++++++++++-------
->>   io_uring/notif.h       | 13 +++---
->>   net/core/skbuff.c      | 37 +++++++++++------
->>   7 files changed, 129 insertions(+), 45 deletions(-)
->>
-> 
+Fixes: ef3db4a59542 ("tun: avoid BUG, dump packet on GSO errors")
+Signed-off-by: Lei Chen <lei.chen@smartx.com>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
+---
+Changes from v4:
+https://lore.kernel.org/all/20240414081806.2173098-1-lei.chen@smartx.com/
+ 1. Adjust code indentation
 
+Changes from v3:
+https://lore.kernel.org/all/20240412065841.2148691-1-lei.chen@smartx.com/
+ 1. Change patch target from net tun to tun.
+ 2. Move change log below the seperator "---".
+ 3. Remove escaped parentheses in the Fixes string.
+
+Changes from v2:
+https://lore.kernel.org/netdev/20240410042245.2044516-1-lei.chen@smartx.com/
+ 1. Add net-dev to patch subject-prefix.
+ 2. Add fix tag.
+
+Changes from v1:
+https://lore.kernel.org/all/20240409062407.1952728-1-lei.chen@smartx.com/
+ 1. Use net_ratelimit instead of raw __ratelimit.
+ 2. Use netdev_err instead of pr_err to print more info abort net dev.
+ 3. Adjust git commit message to make git am happy.
+ drivers/net/tun.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+ drivers/net/tun.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index 0b3f21cba552..92da8c03d960 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -2125,14 +2125,16 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+ 					    tun_is_little_endian(tun), true,
+ 					    vlan_hlen)) {
+ 			struct skb_shared_info *sinfo = skb_shinfo(skb);
+-			pr_err("unexpected GSO type: "
+-			       "0x%x, gso_size %d, hdr_len %d\n",
+-			       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
+-			       tun16_to_cpu(tun, gso.hdr_len));
+-			print_hex_dump(KERN_ERR, "tun: ",
+-				       DUMP_PREFIX_NONE,
+-				       16, 1, skb->head,
+-				       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
++
++			if (net_ratelimit()) {
++				netdev_err(tun->dev, "unexpected GSO type: 0x%x, gso_size %d, hdr_len %d\n",
++					   sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
++					   tun16_to_cpu(tun, gso.hdr_len));
++				print_hex_dump(KERN_ERR, "tun: ",
++					       DUMP_PREFIX_NONE,
++					       16, 1, skb->head,
++					       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
++			}
+ 			WARN_ON_ONCE(1);
+ 			return -EINVAL;
+ 		}
 -- 
-Pavel Begunkov
+2.44.0
+
 
