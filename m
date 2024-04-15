@@ -1,133 +1,128 @@
-Return-Path: <netdev+bounces-87851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BC738A4C6F
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 12:20:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C4188A4C60
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 12:18:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C5AAB22BE4
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 10:20:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD2B0283574
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 10:18:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64B354EB42;
-	Mon, 15 Apr 2024 10:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C7FF3BBF8;
+	Mon, 15 Apr 2024 10:18:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dCaqm7Xz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XBfd5CNX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B39D947F50;
-	Mon, 15 Apr 2024 10:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C015B4EB34
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 10:18:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713176430; cv=none; b=amCYB86JAhllEJi/B2GZUGz6TJZEonYae9ez/RVDNF1aCWijlTE9kxfysSjz0Kv9F1KW2PG55c/J7XOYEEEhiu/BQEOCvWYvHThNYkUrSrISG+QwtLw8dvj3wdtCm3hspmgWAEIQYw8D9lLoVQPVovEe0Jsa+IXOpC30X+009MQ=
+	t=1713176294; cv=none; b=scQ6bsqx+sup4UkSrV7EOYhgH88GNAlREabIDWhVSigrdH+F5LSYc0LU7HfFJYmawO6U5dS7fdNj9Szz64RrgWImjo4XBg7qKM+JrYBbPQJXbXWjjlPgLrV+mSYDrCyidOzSwib2pVMcpWK8SRWCSg8j9m0qUObKboqy5znE2YQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713176430; c=relaxed/simple;
-	bh=vIKidPQenfmOzPpfp62FETcxxyAg9ci26O70YTcR+E0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VgqDFzPRgSW9vFgPsnBQWfPH/jVw0qhPVZmYTqoQSSF3zfrq52jnYIzGTxGC6vpaRzTrCLWTxiTfTRY8LXfwTiOjDej2P7mzJV+4hV8xbsIFOSqP2AwqTjeqD6RoUsAhjrfcJMJMk5Hup8sHeByBxTeAP7YWDfT+EfrgqmNvtMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dCaqm7Xz; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d718ee7344so29693721fa.2;
-        Mon, 15 Apr 2024 03:20:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713176427; x=1713781227; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=B5eNuM2M/mJ6hFGK3SsN3a0/R6uO67DQxbTuQIItHfE=;
-        b=dCaqm7Xz/yvEk1Fj/61VcUVZIDUvlYp23HcvHdbJ1o7o0pN/SNch++K5qkKnxvDC3C
-         B9w194XrIFH54Jz8mHpQP7kdP2WaB9sUUR6TRq5BXyjDGA+FLH/mQKT8+gvM/OMvlGLq
-         Dlyh3cTzwN6TfvJb0HXZ2FW9XN3x+85GaR9mHKQCr5FnWbdSa3hjeS8VapEQndkD+eRW
-         0BwTcyAWfWKR2LhHtIAZRVWNytOx3qddsmWH/YPl3YtnMXHe5JVUJ8vFpic3UmPo5bPw
-         SHxDodWOlKFN5Uq8iHoxGaRZ7pQOihjNXhKyIUgbMnZiWYaVrF2dy04Tsviw7mGVAyBE
-         2bBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713176427; x=1713781227;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B5eNuM2M/mJ6hFGK3SsN3a0/R6uO67DQxbTuQIItHfE=;
-        b=G2I5tyaJ1+wV3WwUs6vF1qC/DjVluruAgJelG6+HHYRaNZoz3cT2Xaf9ag1NlXB3X9
-         RbcGqoFwoukHcFxt0jhRIVayfQ5hJ9Kf3+mtL5zlFoElZUiRfVxr+nEYXTOAap/Pr0Zg
-         7JVYltwtcgXW+ygzif5eUO4GcfcV6TnCCjsH/eyULO7GxJQxt5iG0mGDmle9hQnPeddZ
-         Oykii8x/p81c/jQyIfgBOs4fDD6RekMVN6hPR1JJEN6JNAFys2kuq8djc5v4/QJEI4eg
-         9qRHn87AE87QfwC+JT10wwk79mmo/x2ssbeoqWjFDCsElgl+fj60npKAqTXVbkXVUN6O
-         GcwQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUi5yoq8Y0+gXCvQ7CO+h2i1Uw+UiRq8xzYvLXkrNDwELtEB9YhGaK2dKqorpCm+ocjS8zAuTvBkjJGqp/XhOGcvcrbSVlE/JRpyIuzxcSiK1dA7GYTyubpzbpB+jJhZxtFLwL4
-X-Gm-Message-State: AOJu0YyjlXenIhiPietxTUn+J4INMRh5W/kHvakH5FCWIXRW/roUi5Jb
-	rAtS+x20Cdis01vkWSVf++t21hryYxeYTuIX6Jmy6Oquy0AbOXio
-X-Google-Smtp-Source: AGHT+IEYuIuzFDVDOLhg3dcojnVrUNk4IVc/mSwzpskHOfYngGgMwk1IHbL93IqzS9uP3jdhK75ZsA==
-X-Received: by 2002:a2e:900f:0:b0:2d5:6b1c:b180 with SMTP id h15-20020a2e900f000000b002d56b1cb180mr6076371ljg.8.1713176426540;
-        Mon, 15 Apr 2024 03:20:26 -0700 (PDT)
-Received: from skbuf ([2a02:2f04:d108:9b00:f547:f722:ecdd:8689])
-        by smtp.gmail.com with ESMTPSA id m18-20020a05600c3b1200b0041668162b45sm18909742wms.26.2024.04.15.03.20.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 03:20:25 -0700 (PDT)
-Date: Mon, 15 Apr 2024 13:20:23 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: microchip: drop unneeded MODULE_ALIAS
-Message-ID: <20240415102023.mmkkrvuh7sulelyn@skbuf>
-References: <20240414154929.127045-1-krzk@kernel.org>
+	s=arc-20240116; t=1713176294; c=relaxed/simple;
+	bh=AZS4DmOzGFIcN0PHic8w9urf/jdRAOlvQ3Vo+rfERxw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ieZimiD5GFAeilzApDABjMpj22+7LhGnM2kEsFdq5u4HQPqc/FkZiMY7a7OkYiMYbKW4M5Yco0rJSVD3QtvTJQ9LSvcipa9CCJRIElUUhmL6WlVrgcM7wwf7WNgOfwAgbTqAGE4CDyLUeJNnVLEa/Rgn+KlEm7uq77ST3eodSRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XBfd5CNX; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713176293; x=1744712293;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AZS4DmOzGFIcN0PHic8w9urf/jdRAOlvQ3Vo+rfERxw=;
+  b=XBfd5CNXoz8IeYwVV2j5wFVlZihuurYn1yX0U3KuvikChx6B0Ma4o4TP
+   ga1mI9O4JyBpnZE3KC6MOfERIsz0AUeQfRjQvw2SICPuhSO6+48R81aTc
+   mnjEIi/ZvnRcwXcgUaNwyMIUs/RvHwx6JsF9TcxQNA0EXAy7jEjCc2DXV
+   eaDz9pjtDZJA1WAKYWF5vALxkT8Oa3mMbSL8dNeRJBDXdAuPhdVY2j6XL
+   L9fqqauygCYnEsKhUNEgKA9EIz0TBm0QV8KdPbya8j4FSrEwDIr/MdaTP
+   FgX2pfOXBf0btWPprF+K85UEXGWtaZg3d9EZTPjdre4bI+JvhI/5BRq9v
+   Q==;
+X-CSE-ConnectionGUID: zVX3BL1QSMapD3t2nZbtug==
+X-CSE-MsgGUID: uGIdDC6+SyWy7RXqS9L0fA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11044"; a="26070186"
+X-IronPort-AV: E=Sophos;i="6.07,203,1708416000"; 
+   d="scan'208";a="26070186"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 03:18:12 -0700
+X-CSE-ConnectionGUID: C/eiN/JPRguQT3nK8OLRAQ==
+X-CSE-MsgGUID: c79uc+BTTseD7k6VHmWh/A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,203,1708416000"; 
+   d="scan'208";a="22295442"
+Received: from amlin-018-251.igk.intel.com (HELO localhost.localdomain) ([10.102.18.251])
+  by orviesa006.jf.intel.com with ESMTP; 15 Apr 2024 03:18:10 -0700
+From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	horms@kernel.org,
+	vinicius.gomes@intel.com,
+	Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+Subject: [PATCH iwl-next v2 0/5] ixgbe: Add support for Intel(R) E610 device
+Date: Mon, 15 Apr 2024 12:34:30 +0200
+Message-Id: <20240415103435.6674-1-piotr.kwapulinski@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240414154929.127045-1-krzk@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Apr 14, 2024 at 05:49:29PM +0200, Krzysztof Kozlowski wrote:
-> The ID table already has respective entry and MODULE_DEVICE_TABLE and
-> creates proper alias for SPI driver.  Having another MODULE_ALIAS causes
-> the alias to be duplicated.
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-> ---
->  drivers/net/dsa/microchip/ksz_spi.c | 7 -------
->  1 file changed, 7 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/microchip/ksz_spi.c b/drivers/net/dsa/microchip/ksz_spi.c
-> index c8166fb440ab..cdc4add5f5b5 100644
-> --- a/drivers/net/dsa/microchip/ksz_spi.c
-> +++ b/drivers/net/dsa/microchip/ksz_spi.c
-> @@ -233,13 +233,6 @@ static struct spi_driver ksz_spi_driver = {
->  
->  module_spi_driver(ksz_spi_driver);
->  
-> -MODULE_ALIAS("spi:ksz9477");
-> -MODULE_ALIAS("spi:ksz9896");
-> -MODULE_ALIAS("spi:ksz9897");
-> -MODULE_ALIAS("spi:ksz9893");
-> -MODULE_ALIAS("spi:ksz9563");
-> -MODULE_ALIAS("spi:ksz8563");
-> -MODULE_ALIAS("spi:ksz9567");
->  MODULE_ALIAS("spi:lan937x");
+Add initial support for Intel(R) E610 Series of network devices. The E610
+is based on X550 but adds firmware managed link, enhanced security
+capabilities and support for updated server manageability.
 
-The spi:lan937x alias is bogus, right? LAN937x switches are covered by
-these entries in ksz_spi_ids[]:
+This patch series adds low level support for the following features and
+enables link management.
 
-	{ "lan9370" },
-	{ "lan9371" },
-	{ "lan9372" },
-	{ "lan9373" },
-	{ "lan9374" },
+Piotr Kwapulinski (5):
+  ixgbe: Add support for E610 FW Admin Command Interface
+  ixgbe: Add support for E610 device capabilities detection
+  ixgbe: Add link management support for E610 device
+  ixgbe: Add support for NVM handling in E610 device
+  ixgbe: Enable link management in E610 device
 
->  MODULE_AUTHOR("Tristram Ha <Tristram.Ha@microchip.com>");
->  MODULE_DESCRIPTION("Microchip ksz Series Switch SPI Driver");
-> -- 
-> 2.34.1
-> 
+ drivers/net/ethernet/intel/ixgbe/Makefile     |    4 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe.h      |   15 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_82599.c    |    3 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_common.c   |   19 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_dcb_nl.c   |    3 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 2561 +++++++++++++++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h |   75 +
+ .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |    7 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c  |    3 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |  437 ++-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.c  |    4 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  |    5 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |   71 +-
+ .../ethernet/intel/ixgbe/ixgbe_type_e610.h    | 1064 +++++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c |   42 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.h |    7 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c |   29 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h |   20 +
+ 18 files changed, 4303 insertions(+), 66 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_e610.h
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
+ create mode 100644 drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h
+
+-- 
+V1 -> V2:
+  - fix for no previous prototypes for ixgbe_set_fw_drv_ver_x550,
+    ixgbe_set_ethertype_anti_spoofing_x550 and
+    ixgbe_set_source_address_pruning_x550
+  - fix variable type mismatch: u16, u32, u64
+  - fix inacurate doc for ixgbe_aci_desc
+  - remove extra buffer allocation in ixgbe_aci_send_cmd_execute
+  - replace custom loops with generic fls64 in ixgbe_get_media_type_e610
+
+2.31.1
+
 
