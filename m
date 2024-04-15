@@ -1,143 +1,96 @@
-Return-Path: <netdev+bounces-88001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB73C8A52C8
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:12:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2276D8A52DA
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:16:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 969B9282A59
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:12:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D256E282B56
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:16:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F9874BF2;
-	Mon, 15 Apr 2024 14:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84CED74C07;
+	Mon, 15 Apr 2024 14:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="daujlsoC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [207.211.30.44])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36D6574BE1
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 14:12:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.211.30.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C87274BE8;
+	Mon, 15 Apr 2024 14:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713190364; cv=none; b=flT5jQhNsqi7sYYtul1DTRg1WilUabyyci2JgbEyjHuwY9Brp+Bx90+eJ2F3jFyLs33+m7hDXC0DCYtg5NER8gsM0MGENKWkX+TZ32ev1VkDueNrxZ5xJCuQPhfFBWBwYTeQoKhkLYd3QMXXdwW87EFJS+gwO2vgf82LAbvsTjg=
+	t=1713190601; cv=none; b=EzLSZgnGh6V08hGpiu91izNMQ90bdKfC56iB/AvnFwIyU1+teErbYOJ8zumtg5uiolsiuLciFvhKAN8ipbRqnsXXbyW7bZM0yZ6PTgLJWuEZhPTwJHvvifO0Cy+wDLjAYQtyytZDW5L+OStd9+52jurYK6UJ/BLpLgRdz2qNrEo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713190364; c=relaxed/simple;
-	bh=O/I97LF3LnrtCTgfQUEnvmBh5yo+lBqlYwOF+4BTuS8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=k0IcKFEBHAIhmClnkfI2JZpV20ln7SxVwQIE52JTEUlGnoXW6S/qA5aAXbLlolQlrE5/bRFxLFa7SV8hAwzYJxwhg5IwqnYuY5Mu3TpZ6zOqoRhDAodvF5vHRg1Zi7fb71ZrDalGp7xc04/Rl1wZRK+ZGVuyzehuKf6YCK2ZoDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=207.211.30.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-251-ZHKRZ3-NMGKXRXLh0PdHHQ-1; Mon, 15 Apr 2024 10:12:37 -0400
-X-MC-Unique: ZHKRZ3-NMGKXRXLh0PdHHQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D9EF610499A6;
-	Mon, 15 Apr 2024 14:12:36 +0000 (UTC)
-Received: from hog (unknown [10.39.192.17])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9668C2166B32;
-	Mon, 15 Apr 2024 14:12:35 +0000 (UTC)
-Date: Mon, 15 Apr 2024 16:12:30 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: netdev@vger.kernel.org, devel@linux-ipsec.org,
-	Paul Wouters <paul@nohats.ca>,
-	Antony Antony <antony.antony@secunet.com>,
-	Tobias Brunner <tobias@strongswan.org>, Daniel Xu <dxu@dxuuu.xyz>
-Subject: Re: [PATCH ipsec-next 1/3] xfrm: Add support for per cpu xfrm state
- handling.
-Message-ID: <Zh01zlwo0H1BmMug@hog>
-References: <20240412060553.3483630-1-steffen.klassert@secunet.com>
- <20240412060553.3483630-2-steffen.klassert@secunet.com>
+	s=arc-20240116; t=1713190601; c=relaxed/simple;
+	bh=AeJ3m6898L+idijR3UYOQMzSFryOOqfCPjG6iiSxUAs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BvkLiBWPHDpWdApTx1MfHqSQ30UXTCvU9Z5tfkUn2fdf+LyPUDiUJeefYRMTm5AoO0w/p70aY1cgjgOWm4XdtTJtVZspPZseNLGrw1egc2DfrzdS5+izJUnC5k8S3WEa9cQtjBWYTN2dvkYQOvDPO6tEGo0dAu+6o701JGz0dsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=daujlsoC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B30AC113CC;
+	Mon, 15 Apr 2024 14:16:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713190600;
+	bh=AeJ3m6898L+idijR3UYOQMzSFryOOqfCPjG6iiSxUAs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=daujlsoCN1J4h3/++vaT3923KATwGcRXjzVlQ0MovGpLv4pIbbEwafFgtJCkqf/Kh
+	 wpmo1HeuRf8QvK1kNRMoTAmtASAjW0t3cdqGTDKv2d8Qu2L5LVwsHNL0tciKlfa8q7
+	 3Etf7OBBD6PQrWW6NFZCdoym0zHjxAmdIKyA1DB0bdPewoEbZ7MuHBoboDuSJ+JI1E
+	 LGH/OJ4sRArdg0bnQuLN8SkAIQ6LhbGDD3KCyLC3FFHFvH1FWbWb1/m51DcFdbsiFn
+	 ixCEqoaa/9p8p1ul632t3kMCO08UM8+6VpKJgOlb9ZZznEdXnNBAEaMhMl0CAAUzEg
+	 LSQa05vAXmQ8g==
+Date: Mon, 15 Apr 2024 07:16:39 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, petrm@nvidia.com,
+ linux-kselftest@vger.kernel.org, willemb@google.com
+Subject: Re: [PATCH net-next 1/5] selftests: drv-net: define endpoint
+ structures
+Message-ID: <20240415071639.03c9cfd6@kernel.org>
+In-Reply-To: <661c0cae8110a_3e773229418@willemb.c.googlers.com.notmuch>
+References: <20240412233705.1066444-1-kuba@kernel.org>
+	<20240412233705.1066444-2-kuba@kernel.org>
+	<661c0cae8110a_3e773229418@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240412060553.3483630-2-steffen.klassert@secunet.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-2024-04-12, 08:05:51 +0200, Steffen Klassert wrote:
-> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> index 0c306473a79d..b41b5dd72d8e 100644
-> --- a/net/xfrm/xfrm_state.c
-> +++ b/net/xfrm/xfrm_state.c
-[...]
-> @@ -1096,6 +1098,9 @@ static void xfrm_state_look_at(struct xfrm_policy *=
-pol, struct xfrm_state *x,
->  =09=09=09       struct xfrm_state **best, int *acq_in_progress,
->  =09=09=09       int *error)
->  {
-> +=09unsigned int pcpu_id =3D get_cpu();
-> +=09put_cpu();
+On Sun, 14 Apr 2024 13:04:46 -0400 Willem de Bruijn wrote:
+> 1. Cleaning up remote state in all conditions, including timeout/kill.
+> 
+>    Some tests require a setup phase before the test, and a matching
+>    cleanup phase. If any of the configured state is variable (even
+>    just a randomized filepath) this needs to be communicated to the
+>    cleanup phase. The remote filepath is handled well here. But if
+>    a test needs per-test setup? Say, change MTU or an Ethtool feature.
+>    Multiple related tests may want to share a setup/cleanup.
+> 
+>    Related: some tests may need benefit from a lightweight stateless
+>    check phase to detect preconditions before committing to any setup.
+>    Again, say an Ethtool feature like rx-gro-hw, or AF_XDP metadata rx.
 
-That looks really strange to me. Is it safe? If it is, I guess you
-could just use smp_processor_id(), since you don't get anything out of
-the extra preempt_disable/enable pair.
+I think this falls into the "frameworking debate" we were having with
+Petr. The consensus seems to be to keep things as simple as possible.
+If we see that tests are poorly written and would benefit from extra
+structure we should try impose some, but every local custom is
+something people will have to learn.
 
-(same in xfrm_state_find)
+timeout/kill is provided to us already by the kselftest harness.
 
+> 2. Synchronizing peers. Often both peers need to be started at the
+>    same time, but then the client may need to wait until the server
+>    is listening. Paolo added a nice local script to detect a listening
+>    socket with sockstat. Less of a problem with TCP tests than UDP or
+>    raw packet tests.
 
-[...]
-> @@ -2458,6 +2478,8 @@ static int build_aevent(struct sk_buff *skb, struct=
- xfrm_state *x, const struct
->  =09err =3D xfrm_if_id_put(skb, x->if_id);
->  =09if (err)
->  =09=09goto out_cancel;
-> +=09if (x->pcpu_num !=3D UINT_MAX)
-> +=09=09err =3D nla_put_u32(skb, XFRMA_SA_PCPU, x->pcpu_num);
-
-Missing the corresponding change to xfrm_aevent_msgsize?
-
-
-[...]
-> @@ -3049,6 +3078,7 @@ const struct nla_policy xfrma_policy[XFRMA_MAX+1] =
-=3D {
->  =09[XFRMA_SET_MARK_MASK]=09=3D { .type =3D NLA_U32 },
->  =09[XFRMA_IF_ID]=09=09=3D { .type =3D NLA_U32 },
->  =09[XFRMA_MTIMER_THRESH]   =3D { .type =3D NLA_U32 },
-> +=09[XFRMA_SA_PCPU]=09=09=3D { .type =3D NLA_U32 },
-
-What about xfrm_compat? Don't we need to add XFRMA_SA_PCPU to
-compat_policy, and then some changes to the translators?
-
-
-[...]
-> @@ -3216,6 +3246,11 @@ static int build_expire(struct sk_buff *skb, struc=
-t xfrm_state *x, const struct
->  =09err =3D xfrm_if_id_put(skb, x->if_id);
->  =09if (err)
->  =09=09return err;
-> +=09if (x->pcpu_num !=3D UINT_MAX) {
-> +=09=09err =3D nla_put_u32(skb, XFRMA_SA_PCPU, x->pcpu_num);
-
-Missing the corresponding change to xfrm_expire_msgsize?
-
-
-[...]
-> @@ -3453,6 +3490,8 @@ static int build_acquire(struct sk_buff *skb, struc=
-t xfrm_state *x,
->  =09=09err =3D xfrm_if_id_put(skb, xp->if_id);
->  =09if (!err && xp->xdo.dev)
->  =09=09err =3D copy_user_offload(&xp->xdo, skb);
-> +=09if (!err && x->pcpu_num !=3D UINT_MAX)
-> +=09=09err =3D nla_put_u32(skb, XFRMA_SA_PCPU, x->pcpu_num);
-
-Missing the corresponding change to xfrm_acquire_msgsize?
-
---=20
-Sabrina
-
+Yes, definitely. We should probably add that with the first test that
+needs it.
 
