@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-87948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BFB88A5144
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:27:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 832B48A5145
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:28:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBFCA1C221C5
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:27:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D526284380
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:28:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D4EF82885;
-	Mon, 15 Apr 2024 13:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70D8E8289E;
+	Mon, 15 Apr 2024 13:21:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K+Jbm2U5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i80ZAl2w"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 677E37602F
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 13:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C647B2B9CE
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 13:20:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713187260; cv=none; b=TmhZ97fKGo7ScXTMCKytgQGjwTfT1TmPPnJiMh4fm78npQHqlDYtGU2HqZA/8DUJRg3CpmbQDUdbKAAr/76laWaHiNFGCgQ5fXWdbHzCK88i/HqgxSnEj+Cq9AlfpaoWBtLtm9FQ4iBuQFfTCXCaujKkd4tnLZkcGxr8KnodRsI=
+	t=1713187261; cv=none; b=r1jPVeLJv3arBnGE/yfo6x3LKiVuwCA58+/61Y+CyjAyP7/7hgjX1SzScn7KwpMNNwJttXp5WC5Edz7TaHWjEnmRZRZd7Whw1n5DLzMIezdQPi1adpF6+fRen9Z6C+8/DNsWeXmSXpMd4eS+w/qSqivfRoi9ltH2EykbWwRF9Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713187260; c=relaxed/simple;
-	bh=1LrVvpHwl5Q0OP6teAGVGyCBH2+nTLW0svqDJN2z3ns=;
+	s=arc-20240116; t=1713187261; c=relaxed/simple;
+	bh=q6M6Ex39MfrFakJpmp5HooXS3YphEoOikGGulyXu9P0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kel8zXniZbl6UgioIPF/tGmtumkkt86+oyMoqepPuqEVLTgQPyNTYctNEPN6IvwGjh0Kt/vvFxvHbej/9fnfCT8c/mFkShufiMl2XZTsWZJvz1tu2oImo2r65Mf+AzGUraQz9+cdt+zNZT0kScbUEqSN/apsBZ9pXiPB2iNsVio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K+Jbm2U5; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=TT2rvF6zS0Pz/VjjTsNwbgcaUXBlKJkJfhU7YWxeNPV/r6r0aT9CKPkH5H332XmzXb/UVytK3mAstlan4MeXGVx5D4XUg351F+nmY/ipQpg7pIvkE+rIkdIV8WL33GX+e6BuwHBUuXSBZGO8+QxETDYRaahn1kzq1d2+J5I5pPc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i80ZAl2w; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dccc49ef73eso4561281276.2
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 06:20:58 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6b26783b4so3591407276.0
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 06:20:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713187257; x=1713792057; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1713187259; x=1713792059; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZY8WWl883t9Zpst/1rwsXwHEeahEKmKW1hgRm0oxIEg=;
-        b=K+Jbm2U59lkLiU2xlBZDSkrt9iqvK1NBIRoEm/lSF4znhvvMKXwUdAeaY77iAv7rOQ
-         yoKgWWtc8F1MbInM9M6PxaBjDspiNXd+moQr5WKaunRgXvm0gpzw8q8XSVjU9tUTKx+v
-         LZb3fXjSqCdVkbFzK5HvkSsQBDfCOQ3f+oVxgrvdHMnkXrur9FX49GsgZpbUB6WPCCCo
-         Dce2aVTmNaCnA5EzYu8WeUG7AYTYDVzjoaA+d8zxofm1rSJjqTBYTfVz1hOORrH6YWsw
-         RDuLkfocQUWdOhpL63KG9TKwvDu27LZhKOi7DMA0RCgD/UbqOzY1C9k2GZwEdJzLFAil
-         /eGw==
+        bh=EmIru7fcJ7rrvTGZ/l5sMATbKyH6SUanCIhRJqeORnQ=;
+        b=i80ZAl2wy9Dyl2BRsgPCqBwva3p9pZkX9mZe2n8RQBuLeUiiLAjTEc1JzpeSk2OjvL
+         EKFusy17im6YqLhm5HZcHBErmq8w+SL3klmzppFkSJUnxiBlSW7ulnDGaMcMLa2njFrf
+         E0p0YyR4t5d8856SsQofJoNmuXaFPLTopLKBYLwZ92ff0ePTVMgipMZwlJQGAgCVyDqv
+         LfYxLfoFqoMzB/dwA/K6F9gMDW508aSeTDEipv0O4fpsUeperghnZlA0oT9zOPAs6te/
+         e/sozRjBsy2ULyNur3vaX1Z5I7ec8zUbSZ9dG6KXyUwT7rVN0vI7QfRfskPPgYPuNIZf
+         3POw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713187257; x=1713792057;
+        d=1e100.net; s=20230601; t=1713187259; x=1713792059;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZY8WWl883t9Zpst/1rwsXwHEeahEKmKW1hgRm0oxIEg=;
-        b=HldmFpfN0QTt3MgD6mn6fLdL6K9wfPNn425SjkkFjTUmw7Gp+UTt+Q/86eOSN9r5K2
-         sOag5gGuzxY0sxRS6P5E5k1IoF2PgTH4Ij+qhecEfF1s517RiziiBCt41QJ3eDs0FMSr
-         G7NBn7YtjqPA44Dk109F5SZyfx4ZRjrOSuu3oSEm5bNSNiCAu0NE2J88uz6h1bDFxAhz
-         9tADKHwHb+EacnMTe+5/gVIx0HahkQq941DGIHYKo3f3tnF1O9t1peRtMWPdJpl0Kypg
-         U1KNeRtdLnJuoH6cYjboHV+sam87JTTVszGk18MFMJkWwJ584dVqrAjB5lgp5isJzhob
-         00CA==
-X-Forwarded-Encrypted: i=1; AJvYcCXuk1L558Vgmw3arUDtOg6dzwi+n1LRRXiRU/EaQYr99zWNmqj4DCYRoJGn8wLb7+0O0dHNKxjUfwGzYT5Nhqr2mCHMkl+R
-X-Gm-Message-State: AOJu0YyEHpBKAae8wK/v+fQn3PUxa/UL8tDIFT7n1846Nc5xdFWVmshn
-	3qx3uASEHb9Ut6IDHETgmr4IrFY7S7bqh+0GRPcKy56JEIkfiHiVpLZqYeCDMHULzmO24r/+zX3
-	R6JFFyS3QKQ==
-X-Google-Smtp-Source: AGHT+IG/7selW0iwrDbacMDjCw53546axoiRed8maGMXnhKDe1WA/x3C/hkTu52vHtUpR2uUGtDDR1npB/c/uQ==
+        bh=EmIru7fcJ7rrvTGZ/l5sMATbKyH6SUanCIhRJqeORnQ=;
+        b=nsrXMjhm3umvl/CzYVdGmSQr1tqw7LMG9w+8Bh9qAqeyQqSYVDvybVZoGEnGCZQ5z7
+         ylJltk+d/BmQmqOLv8NC8BNOLLH+LsMW0T38v082Zn/iMk9ep5OYQgPODeMA9TxCKbwa
+         5foGWv3YCWnwiuiClPGTD58JwK/bFwY94QygcZbEM3gY5PI/SDVGwmqU7NPd554DaK/K
+         J/n3tYLocLcF6OPdkBP4ibOK6puqVlFv7i4cUnZ86V3ITGSsjq0bX9MkV3+N1ujO4ZPl
+         7rwDdw4m5jd4lrOPrrSewOZWAjm1XijFcktJ8/tmJ51Z18P2b+QGdPLLneIxe9V9ZxAw
+         Kotg==
+X-Forwarded-Encrypted: i=1; AJvYcCU5bWlu/eIvokZsk8HuVrQ3eTmkW565uifnC0/QcpiPHOaivKJ3gKr4anyp7zhcTK49FyoQmnpbnzxPS1rwm4978qlG9zrE
+X-Gm-Message-State: AOJu0Yy+e/pYgmckQNjIrfPQrDaZH4AXPSMBZtT/PNKQMtHcy1IzmHBe
+	Kz0U1QV6DT7uLwg6sutwMpcn6l2hpWqsf6lsaglrftoZSABE5N1apS8UQr0Wq0H09QkcVv3GnXi
+	Gk6O1CpJAHA==
+X-Google-Smtp-Source: AGHT+IGr+yU9JbowwKBNsCn8b5MYWhgZ4gNvM1ySV8O0jtZ8a9u7FgLRzCvG9HbFC9kUiH8zFv9Sk2lzeChBfw==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:114c:b0:dcc:8be2:7cb0 with SMTP
- id p12-20020a056902114c00b00dcc8be27cb0mr1174214ybu.0.1713187257451; Mon, 15
- Apr 2024 06:20:57 -0700 (PDT)
-Date: Mon, 15 Apr 2024 13:20:41 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:102d:b0:dbe:387d:a8ef with SMTP
+ id x13-20020a056902102d00b00dbe387da8efmr599455ybt.1.1713187258823; Mon, 15
+ Apr 2024 06:20:58 -0700 (PDT)
+Date: Mon, 15 Apr 2024 13:20:42 +0000
 In-Reply-To: <20240415132054.3822230-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240415132054.3822230-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240415132054.3822230-2-edumazet@google.com>
-Subject: [PATCH net-next 01/14] net_sched: sch_fq: implement lockless fq_dump()
+Message-ID: <20240415132054.3822230-3-edumazet@google.com>
+Subject: [PATCH net-next 02/14] net_sched: cake: implement lockless cake_dump()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -84,225 +84,241 @@ Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Instead of relying on RTNL, fq_dump() can use READ_ONCE()
-annotations, paired with WRITE_ONCE() in fq_change()
+Instead of relying on RTNL, cake_dump() can use READ_ONCE()
+annotations, paired with WRITE_ONCE() ones in cake_change().
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/sched/sch_fq.c | 96 +++++++++++++++++++++++++++++-----------------
- 1 file changed, 60 insertions(+), 36 deletions(-)
+ net/sched/sch_cake.c | 98 +++++++++++++++++++++++++-------------------
+ 1 file changed, 55 insertions(+), 43 deletions(-)
 
-diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-index cdf23ff16f40bf244bb822e76016fde44e0c439b..934c220b3f4336dc2f70af74d7758218492b675d 100644
---- a/net/sched/sch_fq.c
-+++ b/net/sched/sch_fq.c
-@@ -888,7 +888,7 @@ static int fq_resize(struct Qdisc *sch, u32 log)
- 		fq_rehash(q, old_fq_root, q->fq_trees_log, array, log);
- 
- 	q->fq_root = array;
--	q->fq_trees_log = log;
-+	WRITE_ONCE(q->fq_trees_log, log);
- 
- 	sch_tree_unlock(sch);
- 
-@@ -931,7 +931,7 @@ static void fq_prio2band_compress_crumb(const u8 *in, u8 *out)
- 
- 	memset(out, 0, num_elems / 4);
- 	for (i = 0; i < num_elems; i++)
--		out[i / 4] |= in[i] << (2 * (i & 0x3));
-+		out[i / 4] |= READ_ONCE(in[i]) << (2 * (i & 0x3));
- }
- 
- static void fq_prio2band_decompress_crumb(const u8 *in, u8 *out)
-@@ -958,7 +958,7 @@ static int fq_load_weights(struct fq_sched_data *q,
- 		}
- 	}
- 	for (i = 0; i < FQ_BANDS; i++)
--		q->band_flows[i].quantum = weights[i];
-+		WRITE_ONCE(q->band_flows[i].quantum, weights[i]);
- 	return 0;
- }
- 
-@@ -1011,16 +1011,18 @@ static int fq_change(struct Qdisc *sch, struct nlattr *opt,
- 			err = -EINVAL;
- 	}
- 	if (tb[TCA_FQ_PLIMIT])
--		sch->limit = nla_get_u32(tb[TCA_FQ_PLIMIT]);
-+		WRITE_ONCE(sch->limit,
-+			   nla_get_u32(tb[TCA_FQ_PLIMIT]));
- 
- 	if (tb[TCA_FQ_FLOW_PLIMIT])
--		q->flow_plimit = nla_get_u32(tb[TCA_FQ_FLOW_PLIMIT]);
-+		WRITE_ONCE(q->flow_plimit,
-+			   nla_get_u32(tb[TCA_FQ_FLOW_PLIMIT]));
- 
- 	if (tb[TCA_FQ_QUANTUM]) {
- 		u32 quantum = nla_get_u32(tb[TCA_FQ_QUANTUM]);
- 
- 		if (quantum > 0 && quantum <= (1 << 20)) {
--			q->quantum = quantum;
-+			WRITE_ONCE(q->quantum, quantum);
- 		} else {
- 			NL_SET_ERR_MSG_MOD(extack, "invalid quantum");
- 			err = -EINVAL;
-@@ -1028,7 +1030,8 @@ static int fq_change(struct Qdisc *sch, struct nlattr *opt,
- 	}
- 
- 	if (tb[TCA_FQ_INITIAL_QUANTUM])
--		q->initial_quantum = nla_get_u32(tb[TCA_FQ_INITIAL_QUANTUM]);
-+		WRITE_ONCE(q->initial_quantum,
-+			   nla_get_u32(tb[TCA_FQ_INITIAL_QUANTUM]));
- 
- 	if (tb[TCA_FQ_FLOW_DEFAULT_RATE])
- 		pr_warn_ratelimited("sch_fq: defrate %u ignored.\n",
-@@ -1037,17 +1040,19 @@ static int fq_change(struct Qdisc *sch, struct nlattr *opt,
- 	if (tb[TCA_FQ_FLOW_MAX_RATE]) {
- 		u32 rate = nla_get_u32(tb[TCA_FQ_FLOW_MAX_RATE]);
- 
--		q->flow_max_rate = (rate == ~0U) ? ~0UL : rate;
-+		WRITE_ONCE(q->flow_max_rate,
-+			   (rate == ~0U) ? ~0UL : rate);
- 	}
- 	if (tb[TCA_FQ_LOW_RATE_THRESHOLD])
--		q->low_rate_threshold =
--			nla_get_u32(tb[TCA_FQ_LOW_RATE_THRESHOLD]);
-+		WRITE_ONCE(q->low_rate_threshold,
-+			   nla_get_u32(tb[TCA_FQ_LOW_RATE_THRESHOLD]));
- 
- 	if (tb[TCA_FQ_RATE_ENABLE]) {
- 		u32 enable = nla_get_u32(tb[TCA_FQ_RATE_ENABLE]);
- 
- 		if (enable <= 1)
--			q->rate_enable = enable;
-+			WRITE_ONCE(q->rate_enable,
-+				   enable);
- 		else
- 			err = -EINVAL;
- 	}
-@@ -1055,7 +1060,8 @@ static int fq_change(struct Qdisc *sch, struct nlattr *opt,
- 	if (tb[TCA_FQ_FLOW_REFILL_DELAY]) {
- 		u32 usecs_delay = nla_get_u32(tb[TCA_FQ_FLOW_REFILL_DELAY]) ;
- 
--		q->flow_refill_delay = usecs_to_jiffies(usecs_delay);
-+		WRITE_ONCE(q->flow_refill_delay,
-+			   usecs_to_jiffies(usecs_delay));
- 	}
- 
- 	if (!err && tb[TCA_FQ_PRIOMAP])
-@@ -1065,21 +1071,26 @@ static int fq_change(struct Qdisc *sch, struct nlattr *opt,
- 		err = fq_load_weights(q, tb[TCA_FQ_WEIGHTS], extack);
- 
- 	if (tb[TCA_FQ_ORPHAN_MASK])
--		q->orphan_mask = nla_get_u32(tb[TCA_FQ_ORPHAN_MASK]);
-+		WRITE_ONCE(q->orphan_mask,
-+			   nla_get_u32(tb[TCA_FQ_ORPHAN_MASK]));
- 
- 	if (tb[TCA_FQ_CE_THRESHOLD])
--		q->ce_threshold = (u64)NSEC_PER_USEC *
--				  nla_get_u32(tb[TCA_FQ_CE_THRESHOLD]);
-+		WRITE_ONCE(q->ce_threshold,
-+			   (u64)NSEC_PER_USEC *
-+			   nla_get_u32(tb[TCA_FQ_CE_THRESHOLD]));
- 
- 	if (tb[TCA_FQ_TIMER_SLACK])
--		q->timer_slack = nla_get_u32(tb[TCA_FQ_TIMER_SLACK]);
-+		WRITE_ONCE(q->timer_slack,
-+			   nla_get_u32(tb[TCA_FQ_TIMER_SLACK]));
- 
- 	if (tb[TCA_FQ_HORIZON])
--		q->horizon = (u64)NSEC_PER_USEC *
--				  nla_get_u32(tb[TCA_FQ_HORIZON]);
-+		WRITE_ONCE(q->horizon,
-+			   (u64)NSEC_PER_USEC *
-+			   nla_get_u32(tb[TCA_FQ_HORIZON]));
- 
- 	if (tb[TCA_FQ_HORIZON_DROP])
--		q->horizon_drop = nla_get_u8(tb[TCA_FQ_HORIZON_DROP]);
-+		WRITE_ONCE(q->horizon_drop,
-+			   nla_get_u8(tb[TCA_FQ_HORIZON_DROP]));
- 
- 	if (!err) {
- 
-@@ -1160,13 +1171,13 @@ static int fq_init(struct Qdisc *sch, struct nlattr *opt,
- static int fq_dump(struct Qdisc *sch, struct sk_buff *skb)
+diff --git a/net/sched/sch_cake.c b/net/sched/sch_cake.c
+index 2eabc4dc5b79a83ce423f73c9cccec86f14be7cf..bb37a0dedcc1e4b3418f6681d87108aad7ea066f 100644
+--- a/net/sched/sch_cake.c
++++ b/net/sched/sch_cake.c
+@@ -2572,6 +2572,7 @@ static int cake_change(struct Qdisc *sch, struct nlattr *opt,
  {
- 	struct fq_sched_data *q = qdisc_priv(sch);
--	u64 ce_threshold = q->ce_threshold;
- 	struct tc_prio_qopt prio = {
- 		.bands = FQ_BANDS,
- 	};
--	u64 horizon = q->horizon;
+ 	struct cake_sched_data *q = qdisc_priv(sch);
+ 	struct nlattr *tb[TCA_CAKE_MAX + 1];
++	u16 rate_flags;
+ 	int err;
+ 
+ 	err = nla_parse_nested_deprecated(tb, TCA_CAKE_MAX, opt, cake_policy,
+@@ -2592,16 +2593,19 @@ static int cake_change(struct Qdisc *sch, struct nlattr *opt,
+ 	}
+ 
+ 	if (tb[TCA_CAKE_BASE_RATE64])
+-		q->rate_bps = nla_get_u64(tb[TCA_CAKE_BASE_RATE64]);
++		WRITE_ONCE(q->rate_bps,
++			   nla_get_u64(tb[TCA_CAKE_BASE_RATE64]));
+ 
+ 	if (tb[TCA_CAKE_DIFFSERV_MODE])
+-		q->tin_mode = nla_get_u32(tb[TCA_CAKE_DIFFSERV_MODE]);
++		WRITE_ONCE(q->tin_mode,
++			   nla_get_u32(tb[TCA_CAKE_DIFFSERV_MODE]));
+ 
++	rate_flags = q->rate_flags;
+ 	if (tb[TCA_CAKE_WASH]) {
+ 		if (!!nla_get_u32(tb[TCA_CAKE_WASH]))
+-			q->rate_flags |= CAKE_FLAG_WASH;
++			rate_flags |= CAKE_FLAG_WASH;
+ 		else
+-			q->rate_flags &= ~CAKE_FLAG_WASH;
++			rate_flags &= ~CAKE_FLAG_WASH;
+ 	}
+ 
+ 	if (tb[TCA_CAKE_FLOW_MODE])
+@@ -2610,11 +2614,13 @@ static int cake_change(struct Qdisc *sch, struct nlattr *opt,
+ 					CAKE_FLOW_MASK));
+ 
+ 	if (tb[TCA_CAKE_ATM])
+-		q->atm_mode = nla_get_u32(tb[TCA_CAKE_ATM]);
++		WRITE_ONCE(q->atm_mode,
++			   nla_get_u32(tb[TCA_CAKE_ATM]));
+ 
+ 	if (tb[TCA_CAKE_OVERHEAD]) {
+-		q->rate_overhead = nla_get_s32(tb[TCA_CAKE_OVERHEAD]);
+-		q->rate_flags |= CAKE_FLAG_OVERHEAD;
++		WRITE_ONCE(q->rate_overhead,
++			   nla_get_s32(tb[TCA_CAKE_OVERHEAD]));
++		rate_flags |= CAKE_FLAG_OVERHEAD;
+ 
+ 		q->max_netlen = 0;
+ 		q->max_adjlen = 0;
+@@ -2623,7 +2629,7 @@ static int cake_change(struct Qdisc *sch, struct nlattr *opt,
+ 	}
+ 
+ 	if (tb[TCA_CAKE_RAW]) {
+-		q->rate_flags &= ~CAKE_FLAG_OVERHEAD;
++		rate_flags &= ~CAKE_FLAG_OVERHEAD;
+ 
+ 		q->max_netlen = 0;
+ 		q->max_adjlen = 0;
+@@ -2632,54 +2638,57 @@ static int cake_change(struct Qdisc *sch, struct nlattr *opt,
+ 	}
+ 
+ 	if (tb[TCA_CAKE_MPU])
+-		q->rate_mpu = nla_get_u32(tb[TCA_CAKE_MPU]);
++		WRITE_ONCE(q->rate_mpu,
++			   nla_get_u32(tb[TCA_CAKE_MPU]));
+ 
+ 	if (tb[TCA_CAKE_RTT]) {
+-		q->interval = nla_get_u32(tb[TCA_CAKE_RTT]);
++		u32 interval = nla_get_u32(tb[TCA_CAKE_RTT]);
+ 
+-		if (!q->interval)
+-			q->interval = 1;
++		WRITE_ONCE(q->interval, max(interval, 1U));
+ 	}
+ 
+ 	if (tb[TCA_CAKE_TARGET]) {
+-		q->target = nla_get_u32(tb[TCA_CAKE_TARGET]);
++		u32 target = nla_get_u32(tb[TCA_CAKE_TARGET]);
+ 
+-		if (!q->target)
+-			q->target = 1;
++		WRITE_ONCE(q->target, max(target, 1U));
+ 	}
+ 
+ 	if (tb[TCA_CAKE_AUTORATE]) {
+ 		if (!!nla_get_u32(tb[TCA_CAKE_AUTORATE]))
+-			q->rate_flags |= CAKE_FLAG_AUTORATE_INGRESS;
++			rate_flags |= CAKE_FLAG_AUTORATE_INGRESS;
+ 		else
+-			q->rate_flags &= ~CAKE_FLAG_AUTORATE_INGRESS;
++			rate_flags &= ~CAKE_FLAG_AUTORATE_INGRESS;
+ 	}
+ 
+ 	if (tb[TCA_CAKE_INGRESS]) {
+ 		if (!!nla_get_u32(tb[TCA_CAKE_INGRESS]))
+-			q->rate_flags |= CAKE_FLAG_INGRESS;
++			rate_flags |= CAKE_FLAG_INGRESS;
+ 		else
+-			q->rate_flags &= ~CAKE_FLAG_INGRESS;
++			rate_flags &= ~CAKE_FLAG_INGRESS;
+ 	}
+ 
+ 	if (tb[TCA_CAKE_ACK_FILTER])
+-		q->ack_filter = nla_get_u32(tb[TCA_CAKE_ACK_FILTER]);
++		WRITE_ONCE(q->ack_filter,
++			   nla_get_u32(tb[TCA_CAKE_ACK_FILTER]));
+ 
+ 	if (tb[TCA_CAKE_MEMORY])
+-		q->buffer_config_limit = nla_get_u32(tb[TCA_CAKE_MEMORY]);
++		WRITE_ONCE(q->buffer_config_limit,
++			   nla_get_u32(tb[TCA_CAKE_MEMORY]));
+ 
+ 	if (tb[TCA_CAKE_SPLIT_GSO]) {
+ 		if (!!nla_get_u32(tb[TCA_CAKE_SPLIT_GSO]))
+-			q->rate_flags |= CAKE_FLAG_SPLIT_GSO;
++			rate_flags |= CAKE_FLAG_SPLIT_GSO;
+ 		else
+-			q->rate_flags &= ~CAKE_FLAG_SPLIT_GSO;
++			rate_flags &= ~CAKE_FLAG_SPLIT_GSO;
+ 	}
+ 
+ 	if (tb[TCA_CAKE_FWMARK]) {
+-		q->fwmark_mask = nla_get_u32(tb[TCA_CAKE_FWMARK]);
+-		q->fwmark_shft = q->fwmark_mask ? __ffs(q->fwmark_mask) : 0;
++		WRITE_ONCE(q->fwmark_mask, nla_get_u32(tb[TCA_CAKE_FWMARK]));
++		WRITE_ONCE(q->fwmark_shft,
++			   q->fwmark_mask ? __ffs(q->fwmark_mask) : 0);
+ 	}
+ 
++	WRITE_ONCE(q->rate_flags, rate_flags);
+ 	if (q->tins) {
+ 		sch_tree_lock(sch);
+ 		cake_reconfigure(sch);
+@@ -2774,68 +2783,71 @@ static int cake_dump(struct Qdisc *sch, struct sk_buff *skb)
+ {
+ 	struct cake_sched_data *q = qdisc_priv(sch);
  	struct nlattr *opts;
-+	u64 ce_threshold;
- 	s32 weights[3];
-+	u64 horizon;
++	u16 rate_flags;
  
  	opts = nla_nest_start_noflag(skb, TCA_OPTIONS);
- 	if (opts == NULL)
-@@ -1174,35 +1185,48 @@ static int fq_dump(struct Qdisc *sch, struct sk_buff *skb)
- 
- 	/* TCA_FQ_FLOW_DEFAULT_RATE is not used anymore */
- 
-+	ce_threshold = READ_ONCE(q->ce_threshold);
- 	do_div(ce_threshold, NSEC_PER_USEC);
-+
-+	horizon = READ_ONCE(q->horizon);
- 	do_div(horizon, NSEC_PER_USEC);
- 
--	if (nla_put_u32(skb, TCA_FQ_PLIMIT, sch->limit) ||
--	    nla_put_u32(skb, TCA_FQ_FLOW_PLIMIT, q->flow_plimit) ||
--	    nla_put_u32(skb, TCA_FQ_QUANTUM, q->quantum) ||
--	    nla_put_u32(skb, TCA_FQ_INITIAL_QUANTUM, q->initial_quantum) ||
--	    nla_put_u32(skb, TCA_FQ_RATE_ENABLE, q->rate_enable) ||
-+	if (nla_put_u32(skb, TCA_FQ_PLIMIT,
-+			READ_ONCE(sch->limit)) ||
-+	    nla_put_u32(skb, TCA_FQ_FLOW_PLIMIT,
-+			READ_ONCE(q->flow_plimit)) ||
-+	    nla_put_u32(skb, TCA_FQ_QUANTUM,
-+			READ_ONCE(q->quantum)) ||
-+	    nla_put_u32(skb, TCA_FQ_INITIAL_QUANTUM,
-+			READ_ONCE(q->initial_quantum)) ||
-+	    nla_put_u32(skb, TCA_FQ_RATE_ENABLE,
-+			READ_ONCE(q->rate_enable)) ||
- 	    nla_put_u32(skb, TCA_FQ_FLOW_MAX_RATE,
--			min_t(unsigned long, q->flow_max_rate, ~0U)) ||
-+			min_t(unsigned long,
-+			      READ_ONCE(q->flow_max_rate), ~0U)) ||
- 	    nla_put_u32(skb, TCA_FQ_FLOW_REFILL_DELAY,
--			jiffies_to_usecs(q->flow_refill_delay)) ||
--	    nla_put_u32(skb, TCA_FQ_ORPHAN_MASK, q->orphan_mask) ||
-+			jiffies_to_usecs(READ_ONCE(q->flow_refill_delay))) ||
-+	    nla_put_u32(skb, TCA_FQ_ORPHAN_MASK,
-+			READ_ONCE(q->orphan_mask)) ||
- 	    nla_put_u32(skb, TCA_FQ_LOW_RATE_THRESHOLD,
--			q->low_rate_threshold) ||
-+			READ_ONCE(q->low_rate_threshold)) ||
- 	    nla_put_u32(skb, TCA_FQ_CE_THRESHOLD, (u32)ce_threshold) ||
--	    nla_put_u32(skb, TCA_FQ_BUCKETS_LOG, q->fq_trees_log) ||
--	    nla_put_u32(skb, TCA_FQ_TIMER_SLACK, q->timer_slack) ||
-+	    nla_put_u32(skb, TCA_FQ_BUCKETS_LOG,
-+			READ_ONCE(q->fq_trees_log)) ||
-+	    nla_put_u32(skb, TCA_FQ_TIMER_SLACK,
-+			READ_ONCE(q->timer_slack)) ||
- 	    nla_put_u32(skb, TCA_FQ_HORIZON, (u32)horizon) ||
--	    nla_put_u8(skb, TCA_FQ_HORIZON_DROP, q->horizon_drop))
-+	    nla_put_u8(skb, TCA_FQ_HORIZON_DROP,
-+		       READ_ONCE(q->horizon_drop)))
+ 	if (!opts)
  		goto nla_put_failure;
  
- 	fq_prio2band_decompress_crumb(q->prio2band, prio.priomap);
- 	if (nla_put(skb, TCA_FQ_PRIOMAP, sizeof(prio), &prio))
+-	if (nla_put_u64_64bit(skb, TCA_CAKE_BASE_RATE64, q->rate_bps,
+-			      TCA_CAKE_PAD))
++	if (nla_put_u64_64bit(skb, TCA_CAKE_BASE_RATE64,
++			      READ_ONCE(q->rate_bps), TCA_CAKE_PAD))
  		goto nla_put_failure;
  
--	weights[0] = q->band_flows[0].quantum;
--	weights[1] = q->band_flows[1].quantum;
--	weights[2] = q->band_flows[2].quantum;
-+	weights[0] = READ_ONCE(q->band_flows[0].quantum);
-+	weights[1] = READ_ONCE(q->band_flows[1].quantum);
-+	weights[2] = READ_ONCE(q->band_flows[2].quantum);
- 	if (nla_put(skb, TCA_FQ_WEIGHTS, sizeof(weights), &weights))
+ 	if (nla_put_u32(skb, TCA_CAKE_FLOW_MODE,
+-			q->flow_mode & CAKE_FLOW_MASK))
++			READ_ONCE(q->flow_mode) & CAKE_FLOW_MASK))
  		goto nla_put_failure;
  
+-	if (nla_put_u32(skb, TCA_CAKE_RTT, q->interval))
++	if (nla_put_u32(skb, TCA_CAKE_RTT, READ_ONCE(q->interval)))
+ 		goto nla_put_failure;
+ 
+-	if (nla_put_u32(skb, TCA_CAKE_TARGET, q->target))
++	if (nla_put_u32(skb, TCA_CAKE_TARGET, READ_ONCE(q->target)))
+ 		goto nla_put_failure;
+ 
+-	if (nla_put_u32(skb, TCA_CAKE_MEMORY, q->buffer_config_limit))
++	if (nla_put_u32(skb, TCA_CAKE_MEMORY,
++			READ_ONCE(q->buffer_config_limit)))
+ 		goto nla_put_failure;
+ 
++	rate_flags = READ_ONCE(q->rate_flags);
+ 	if (nla_put_u32(skb, TCA_CAKE_AUTORATE,
+-			!!(q->rate_flags & CAKE_FLAG_AUTORATE_INGRESS)))
++			!!(rate_flags & CAKE_FLAG_AUTORATE_INGRESS)))
+ 		goto nla_put_failure;
+ 
+ 	if (nla_put_u32(skb, TCA_CAKE_INGRESS,
+-			!!(q->rate_flags & CAKE_FLAG_INGRESS)))
++			!!(rate_flags & CAKE_FLAG_INGRESS)))
+ 		goto nla_put_failure;
+ 
+-	if (nla_put_u32(skb, TCA_CAKE_ACK_FILTER, q->ack_filter))
++	if (nla_put_u32(skb, TCA_CAKE_ACK_FILTER, READ_ONCE(q->ack_filter)))
+ 		goto nla_put_failure;
+ 
+ 	if (nla_put_u32(skb, TCA_CAKE_NAT,
+-			!!(q->flow_mode & CAKE_FLOW_NAT_FLAG)))
++			!!(READ_ONCE(q->flow_mode) & CAKE_FLOW_NAT_FLAG)))
+ 		goto nla_put_failure;
+ 
+-	if (nla_put_u32(skb, TCA_CAKE_DIFFSERV_MODE, q->tin_mode))
++	if (nla_put_u32(skb, TCA_CAKE_DIFFSERV_MODE, READ_ONCE(q->tin_mode)))
+ 		goto nla_put_failure;
+ 
+ 	if (nla_put_u32(skb, TCA_CAKE_WASH,
+-			!!(q->rate_flags & CAKE_FLAG_WASH)))
++			!!(rate_flags & CAKE_FLAG_WASH)))
+ 		goto nla_put_failure;
+ 
+-	if (nla_put_u32(skb, TCA_CAKE_OVERHEAD, q->rate_overhead))
++	if (nla_put_u32(skb, TCA_CAKE_OVERHEAD, READ_ONCE(q->rate_overhead)))
+ 		goto nla_put_failure;
+ 
+-	if (!(q->rate_flags & CAKE_FLAG_OVERHEAD))
++	if (!(rate_flags & CAKE_FLAG_OVERHEAD))
+ 		if (nla_put_u32(skb, TCA_CAKE_RAW, 0))
+ 			goto nla_put_failure;
+ 
+-	if (nla_put_u32(skb, TCA_CAKE_ATM, q->atm_mode))
++	if (nla_put_u32(skb, TCA_CAKE_ATM, READ_ONCE(q->atm_mode)))
+ 		goto nla_put_failure;
+ 
+-	if (nla_put_u32(skb, TCA_CAKE_MPU, q->rate_mpu))
++	if (nla_put_u32(skb, TCA_CAKE_MPU, READ_ONCE(q->rate_mpu)))
+ 		goto nla_put_failure;
+ 
+ 	if (nla_put_u32(skb, TCA_CAKE_SPLIT_GSO,
+-			!!(q->rate_flags & CAKE_FLAG_SPLIT_GSO)))
++			!!(rate_flags & CAKE_FLAG_SPLIT_GSO)))
+ 		goto nla_put_failure;
+ 
+-	if (nla_put_u32(skb, TCA_CAKE_FWMARK, q->fwmark_mask))
++	if (nla_put_u32(skb, TCA_CAKE_FWMARK, READ_ONCE(q->fwmark_mask)))
+ 		goto nla_put_failure;
+ 
+ 	return nla_nest_end(skb, opts);
 -- 
 2.44.0.683.g7961c838ac-goog
 
