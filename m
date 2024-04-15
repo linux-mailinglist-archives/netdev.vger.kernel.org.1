@@ -1,82 +1,80 @@
-Return-Path: <netdev+bounces-87864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A2D38A4CD7
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 12:47:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B83D58A4CD8
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 12:48:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AD0D1F227A9
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 10:47:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC754B23167
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 10:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF555D73C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B8D5FB92;
 	Mon, 15 Apr 2024 10:47:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iXwbB8+R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IrnIumQh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B87C757876;
-	Mon, 15 Apr 2024 10:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C0A55C902;
+	Mon, 15 Apr 2024 10:47:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713178046; cv=none; b=ecUWM36+6qNJJqiQMaINRA0PtVhgShgWpgj/Mlb+/t+Tr/VHKXe1QDHSfzpv7I1dm29gyaHTEjyeQ4LDe6Ld2omfG6VtWxtqXN7xn9usGtvz0jeMuO07UYnn8qgxs8QBnZu6GSCfrrOqc5lqzH6d+X7YsQLgBzVFBA8l7m6g3xg=
+	t=1713178046; cv=none; b=TglJpdvPm5xyDbvmBEOJYG3KoMASSzmCjo5KtnD7zF0N7Jc1rBCQ3LavHoqnQpf0vzq0cdUxOVV3MoHZSPLDX9GxAyrSJ08XQpcVncFp//rYpinSqm6YGn3fpouD37UuzUScW7jxIE1FBICCGQY9Jv7E3C78BS7cNDrcYy7rN7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713178046; c=relaxed/simple;
-	bh=ksei461v/kjUsGfd+wJGh9e0382A9W4NsZnA+JLB5gs=;
+	bh=YqKX4wriXAtnIM/JGv9nvIiRNMzJYkycaNwKhjTmUCQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cOy/SujTM09fyBwiNZ2qGUnGHNjM/ZuuSL3+pmYD6q2MWU8LiWyf4F8Bwlrs9RDXS0IauUxuEXtj/krg8ymhK7iA3TGJxAwtYWQaJc+OVsjHQz+79Mv63bsB4ys5Io6iIgnIjd9UmUNeMBWlZRPhciAY+rMx6DIVLxm7j+7uTvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iXwbB8+R; arc=none smtp.client-ip=209.85.214.179
+	 MIME-Version; b=ZByiZlPtk4gvVHL/s6bA3I21tvCn2Lt9LKKt6od7tEXRCLxAbaIfDRsm0tGAc8bRTHFNCtIAIffN9eoDVbRFXLN0U7I1/xPp0K1JYcfN+/nub6CNHo+Rr1lCDKDqH2ZGrz5la3bY23OvQZNUGeG/s+GkX3pNHgrzEWBBWlbeJnw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IrnIumQh; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1e45f339708so5334025ad.0;
-        Mon, 15 Apr 2024 03:47:23 -0700 (PDT)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1e45f339708so5334055ad.0;
+        Mon, 15 Apr 2024 03:47:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713178043; x=1713782843; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1713178044; x=1713782844; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=uaBlxvIjzhIk8Qt+IPbhIW9BsmPzQyIbQPUOYV6Usl8=;
-        b=iXwbB8+Ru1v2G9a+ELAz6TvfVdYpX88zDMhm8PIybi6L+6SJHVz4j/VdlicwQWCDLH
-         2eWXuwKMjtnW5xPp3V9ED/F6j7vC1PaA92DUMvIHDHeBUx4UyVDnT+l6NCyY4NqQt+Uh
-         A82DoB5PLGXJpobfk6MiE3KDCSYFvc0cfazhfuNJ6815dTjc5hWDIsVJ5U45aRGaWERC
-         Qwx7eyI/+52kWoDVd9VjPDzJiT1bV1/slZhBk7vPT8icdWHHtXAEd+MgZ0Aqf1aiQN4x
-         imlIv2CwSRKwZt0nWFxkZcGtY1MZYstuXhPXNyS0skrojxcTj33P7oZGgqOMuxcRZjSq
-         9ynA==
+        bh=KuGWEpVupawPMlvYk1r1Gqqq+H/sSkI0jwfxINnsGuc=;
+        b=IrnIumQhSgyrAF0KKL+etCs35zEVCWkEBURd4f2+h8aU577OTStWzCa83hyinovxkC
+         OX/qVzZA7wdTy6a/ntAlf1Y7mGZj7QddNMrBFBziId/w1+G/7lq+lZymT/T1S5Wwas6K
+         nhjQuWTLcnOH9borSlosTBGybumWV5jeU+37WIja4nGyBrIGmVYBTPGM/5HrM+IMNa6f
+         2M6jMhwKsPiXiskyaN5eIuQigITj7hZlBh2Q3XV1DOgw73zF8aOywOyumjl4dJzCigul
+         FK3tBsZ2o/LyGk9jVDpkTn5QVYv+TtGIRZC7cvI5yG5B1jIOMJD+QUKDRoFfIlQWHjSN
+         nNNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713178043; x=1713782843;
+        d=1e100.net; s=20230601; t=1713178044; x=1713782844;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=uaBlxvIjzhIk8Qt+IPbhIW9BsmPzQyIbQPUOYV6Usl8=;
-        b=kdmdBtnPA8k37+P6HpKRXRqj0lBCNVn/JdQdeEBa3zdF7fLxSrYxpAMUrHRlukeAF5
-         j7otJPw71s3ddBiX82qZ8qxa7NiWyAK12OaNtL/FpjXsESJ/whUfq+6DocjMdH95ORVB
-         iYpa9Se/Jez3u3FTA/LiobofFI+/SkoZiCPMMshJJ9hPHGUqX7f2PaDVIUZRQUNYJX8g
-         huyC1hQolBPub4JfBSjxCIYObH035ozH9snC6Ne7y/FOWdcMOL7UwqtHT3lMSkLZSN2B
-         RGYkvrF9HaHTuyXR9WBo5GB8djDJYF2h+GKn1BRd/7r8nPHpxCsX8J5ePPAET6dGhGnK
-         sNyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXw3jVDgobHRgb0kb/oTehCnWA/WQZPwzBpV4QktlYAmrQpcqNAG7ocz9XomN6tYlJjGJYH1DmNzEXCOO2nbMjlD4gDbdOEQDbAyegi8wg=
-X-Gm-Message-State: AOJu0YxEgMa2yB/ao4VPFnjg9OpGSf0+JLW73YSomFnpKtxlN8WhDcy8
-	X+YZjBgE4A0ThIKGCr0HQQJ6ovFwI8NX8cBAT+b6XvBdbUwEyzxFVve6gxiv
-X-Google-Smtp-Source: AGHT+IF0sPp1WW2BdNTKBq55dR2f88/opUxXD/GasCgBBnQYUbn8L9c2XhB0RcKgxvq0nSa3HjXBXg==
-X-Received: by 2002:a17:902:c94f:b0:1dc:c28e:2236 with SMTP id i15-20020a170902c94f00b001dcc28e2236mr12263179pla.2.1713178042845;
-        Mon, 15 Apr 2024 03:47:22 -0700 (PDT)
+        bh=KuGWEpVupawPMlvYk1r1Gqqq+H/sSkI0jwfxINnsGuc=;
+        b=MXNW7HKpwtRqeiOdwPe4afEktXlZyHfi2jj4qG2KOyL9UChI11ZbAuvqyQV6lVDTlN
+         JAahgwZYJrQVEfTBwt5KFZMjDOc+NycNX988qwgVmT3xAjBtgQSMS+j8vwEAZfySZwZm
+         knsUqQ9RLFpscLffG+N2o4NguGo1HEbM25V1IsfnpiHbR6EVW7oBKiqDOzmPHgdqD8pR
+         IOxEVUHoPIdagWMaatFHtd+Vd1BSZkdANykYBZM04C6l92RJc47vezEuwaZYTUjfXIFj
+         HFYchBbIRsnocO3GYaRjD+xMXOi7JplMKZf8JVWReyWwUZS3LyASNofU0cweXb4hE1aL
+         /L/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUMkwJd+LndjMtmDxqoxFix/u8lwRAIP5ZbB57xMgKvMvo+TDm98NSUwtccPrwN5Y6OCDI9t2tHInNn382m+u5qK+A0e6+1baCPLZ+HkTI=
+X-Gm-Message-State: AOJu0YwmFTKbRTtaFfHCnAlLqxOg4jiAuWEQ/iVfAIjVod0byveY2Uw9
+	2A4+rgrebMZC64rCOE61R8TgFA/1WHmH/kl2cQfG7b9TmIwRARwZ9y2UlA==
+X-Google-Smtp-Source: AGHT+IEZ9OSO247b6f+EAz1CmZ+duvAxD9xV+suTGWux3++UqlxWrmm8uT2YgTwrUHkRraRoHRQN9A==
+X-Received: by 2002:a17:902:e845:b0:1e0:c887:f93f with SMTP id t5-20020a170902e84500b001e0c887f93fmr12692959plg.1.1713178044490;
+        Mon, 15 Apr 2024 03:47:24 -0700 (PDT)
 Received: from rpi.. (p5315239-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.87.239])
-        by smtp.gmail.com with ESMTPSA id d7-20020a170902654700b001e20afa1038sm7807806pln.8.2024.04.15.03.47.21
+        by smtp.gmail.com with ESMTPSA id d7-20020a170902654700b001e20afa1038sm7807806pln.8.2024.04.15.03.47.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 03:47:22 -0700 (PDT)
+        Mon, 15 Apr 2024 03:47:24 -0700 (PDT)
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
 To: netdev@vger.kernel.org
 Cc: andrew@lunn.ch,
 	rust-for-linux@vger.kernel.org,
-	tmgross@umich.edu,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Russ Weight <russ.weight@linux.dev>
-Subject: [PATCH net-next v1 3/4] rust: net::phy support Firmware API
-Date: Mon, 15 Apr 2024 19:47:00 +0900
-Message-Id: <20240415104701.4772-4-fujita.tomonori@gmail.com>
+	tmgross@umich.edu
+Subject: [PATCH net-next v1 4/4] net: phy: add Applied Micro QT2025 PHY driver
+Date: Mon, 15 Apr 2024 19:47:01 +0900
+Message-Id: <20240415104701.4772-5-fujita.tomonori@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240415104701.4772-1-fujita.tomonori@gmail.com>
 References: <20240415104701.4772-1-fujita.tomonori@gmail.com>
@@ -88,100 +86,165 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This patch adds support to the following basic Firmware API:
+This driver supports Applied Micro Circuits Corporation QT2025 PHY,
+based on a driver for Tehuti Networks TN40xx chips.
 
-- request_firmware
-- release_firmware
+The original driver for TN40xx chips supports multiple PHY hardware
+(AMCC QT2025, TI TLK10232, Aqrate AQR105, and Marvell 88X3120,
+88X3310, and MV88E2010). This driver is extracted from the original
+driver and modified to a PHY driver in Rust.
+
+This has been tested with Edimax EN-9320SFP+ 10G network adapter.
 
 Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-CC: Luis Chamberlain <mcgrof@kernel.org>
-CC: Russ Weight <russ.weight@linux.dev>
 ---
- drivers/net/phy/Kconfig         |  1 +
- rust/bindings/bindings_helper.h |  1 +
- rust/kernel/net/phy.rs          | 45 +++++++++++++++++++++++++++++++++
- 3 files changed, 47 insertions(+)
+ MAINTAINERS               |  7 ++++
+ drivers/net/phy/Kconfig   |  6 ++++
+ drivers/net/phy/Makefile  |  1 +
+ drivers/net/phy/qt2025.rs | 75 +++++++++++++++++++++++++++++++++++++++
+ rust/uapi/uapi_helper.h   |  1 +
+ 5 files changed, 90 insertions(+)
+ create mode 100644 drivers/net/phy/qt2025.rs
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 5ba3fe6ac09c..f2d86e221ba3 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1540,6 +1540,13 @@ F:	Documentation/admin-guide/perf/xgene-pmu.rst
+ F:	Documentation/devicetree/bindings/perf/apm-xgene-pmu.txt
+ F:	drivers/perf/xgene_pmu.c
+ 
++APPLIED MICRO QT2025 PHY DRIVER
++M:	FUJITA Tomonori <fujita.tomonori@gmail.com>
++L:	netdev@vger.kernel.org
++L:	rust-for-linux@vger.kernel.org
++S:	Maintained
++F:	drivers/net/phy/qt2025.rs
++
+ APTINA CAMERA SENSOR PLL
+ M:	Laurent Pinchart <Laurent.pinchart@ideasonboard.com>
+ L:	linux-media@vger.kernel.org
 diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 7fddc8306d82..3ad04170aa4e 100644
+index 3ad04170aa4e..8293c3d14229 100644
 --- a/drivers/net/phy/Kconfig
 +++ b/drivers/net/phy/Kconfig
-@@ -64,6 +64,7 @@ config RUST_PHYLIB_ABSTRACTIONS
-         bool "Rust PHYLIB abstractions support"
-         depends on RUST
-         depends on PHYLIB=y
-+        depends on FW_LOADER=y
-         help
-           Adds support needed for PHY drivers written in Rust. It provides
-           a wrapper around the C phylib core.
-diff --git a/rust/bindings/bindings_helper.h b/rust/bindings/bindings_helper.h
-index 65b98831b975..556f95c55b7b 100644
---- a/rust/bindings/bindings_helper.h
-+++ b/rust/bindings/bindings_helper.h
-@@ -9,6 +9,7 @@
- #include <kunit/test.h>
- #include <linux/errname.h>
- #include <linux/ethtool.h>
-+#include <linux/firmware.h>
- #include <linux/jiffies.h>
- #include <linux/mdio.h>
- #include <linux/phy.h>
-diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-index 421a231421f5..095dc3ccc553 100644
---- a/rust/kernel/net/phy.rs
-+++ b/rust/kernel/net/phy.rs
-@@ -9,6 +9,51 @@
- use crate::{bindings, error::*, prelude::*, str::CStr, types::Opaque};
+@@ -110,6 +110,12 @@ config ADIN1100_PHY
+ 	  Currently supports the:
+ 	  - ADIN1100 - Robust,Industrial, Low Power 10BASE-T1L Ethernet PHY
  
- use core::marker::PhantomData;
-+use core::ptr::{self, NonNull};
++config AMCC_QT2025_PHY
++	tristate "AMCC QT2025 PHY"
++	depends on RUST_PHYLIB_ABSTRACTIONS
++	help
++	  Adds support for the Applied Micro Circuits Corporation QT2025 PHY.
 +
-+/// A pointer to the kernel's `struct firmware`.
-+///
-+/// # Invariants
-+///
-+/// The pointer points at a `struct firmware`, and has ownership over the object.
-+pub struct Firmware(NonNull<bindings::firmware>);
+ source "drivers/net/phy/aquantia/Kconfig"
+ 
+ config AX88796B_PHY
+diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
+index 1d8be374915f..75d0b07a392a 100644
+--- a/drivers/net/phy/Makefile
++++ b/drivers/net/phy/Makefile
+@@ -36,6 +36,7 @@ obj-$(CONFIG_ADIN_PHY)		+= adin.o
+ obj-$(CONFIG_ADIN1100_PHY)	+= adin1100.o
+ obj-$(CONFIG_AIR_EN8811H_PHY)   += air_en8811h.o
+ obj-$(CONFIG_AMD_PHY)		+= amd.o
++obj-$(CONFIG_AMCC_QT2025_PHY)	+= qt2025.o
+ obj-$(CONFIG_AQUANTIA_PHY)	+= aquantia/
+ ifdef CONFIG_AX88796B_RUST_PHY
+   obj-$(CONFIG_AX88796B_PHY)	+= ax88796b_rust.o
+diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
+new file mode 100644
+index 000000000000..e42b77753717
+--- /dev/null
++++ b/drivers/net/phy/qt2025.rs
+@@ -0,0 +1,75 @@
++// SPDX-License-Identifier: GPL-2.0
++// Copyright (C) Tehuti Networks Ltd.
++// Copyright (C) 2024 FUJITA Tomonori <fujita.tomonori@gmail.com>
 +
-+impl Firmware {
-+    /// Loads a firmware.
-+    pub fn new(name: &CStr, dev: &Device) -> Result<Firmware> {
-+        let phydev = dev.0.get();
-+        let mut ptr: *mut bindings::firmware = ptr::null_mut();
-+        let p_ptr: *mut *mut bindings::firmware = &mut ptr;
-+        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Device`.
-+        // So it's just an FFI call.
-+        let ret = unsafe {
-+            bindings::request_firmware(
-+                p_ptr as *mut *const bindings::firmware,
-+                name.as_char_ptr().cast(),
-+                &mut (*phydev).mdio.dev,
-+            )
-+        };
-+        let fw = NonNull::new(ptr).ok_or_else(|| Error::from_errno(ret))?;
-+        // INVARIANT: We checked that the firmware was successfully loaded.
-+        Ok(Firmware(fw))
-+    }
++//! Applied Micro Circuits Corporation QT2025 PHY driver
++use kernel::c_str;
++use kernel::net::phy::{self, DeviceId, Driver, Firmware};
++use kernel::prelude::*;
++use kernel::uapi;
 +
-+    /// Accesses the firmware contents.
-+    pub fn data(&self) -> &[u8] {
-+        // SAFETY: The type invariants guarantee that `self.0.as_ptr()` is valid.
-+        // They also guarantee that `self.0.as_ptr().data` pointers to
-+        // a valid memory region of size `self.0.as_ptr().size`.
-+        unsafe { core::slice::from_raw_parts((*self.0.as_ptr()).data, (*self.0.as_ptr()).size) }
-+    }
++kernel::module_phy_driver! {
++    drivers: [PhyQT2025],
++    device_table: [
++        DeviceId::new_with_driver::<PhyQT2025>(),
++    ],
++    name: "qt2025_phy",
++    author: "FUJITA Tomonori <fujita.tomonori@gmail.com>",
++    description: "AMCC QT2025 PHY driver",
++    license: "GPL",
 +}
 +
-+impl Drop for Firmware {
-+    fn drop(&mut self) {
-+        // SAFETY: By the type invariants, `self.0.as_ptr()` is valid and
-+        // we have ownership of the object so can free it.
-+        unsafe { bindings::release_firmware(self.0.as_ptr()) }
++const MDIO_MMD_PMAPMD: u8 = uapi::MDIO_MMD_PMAPMD as u8;
++const MDIO_MMD_PCS: u8 = uapi::MDIO_MMD_PCS as u8;
++const MDIO_MMD_PHYXS: u8 = uapi::MDIO_MMD_PHYXS as u8;
++
++struct PhyQT2025;
++
++#[vtable]
++impl Driver for PhyQT2025 {
++    const NAME: &'static CStr = c_str!("QT2025 10Gpbs SFP+");
++    const PHY_DEVICE_ID: phy::DeviceId = phy::DeviceId::new_with_exact_mask(0x0043A400);
++
++    fn config_init(dev: &mut phy::Device) -> Result<()> {
++        let fw = Firmware::new(c_str!("qt2025-2.0.3.3.fw"), dev)?;
++
++        let phy_id = dev.c45_read(MDIO_MMD_PMAPMD, 0xd001)?;
++        if (phy_id >> 8) & 0xff != 0xb3 {
++            return Ok(());
++        }
++
++        dev.c45_write(MDIO_MMD_PMAPMD, 0xC300, 0x0000)?;
++        dev.c45_write(MDIO_MMD_PMAPMD, 0xC302, 0x4)?;
++        dev.c45_write(MDIO_MMD_PMAPMD, 0xC319, 0x0038)?;
++
++        dev.c45_write(MDIO_MMD_PMAPMD, 0xC31A, 0x0098)?;
++        dev.c45_write(MDIO_MMD_PCS, 0x0026, 0x0E00)?;
++
++        dev.c45_write(MDIO_MMD_PCS, 0x0027, 0x0893)?;
++
++        dev.c45_write(MDIO_MMD_PCS, 0x0028, 0xA528)?;
++        dev.c45_write(MDIO_MMD_PCS, 0x0029, 0x03)?;
++        dev.c45_write(MDIO_MMD_PMAPMD, 0xC30A, 0x06E1)?;
++        dev.c45_write(MDIO_MMD_PMAPMD, 0xC300, 0x0002)?;
++        dev.c45_write(MDIO_MMD_PCS, 0xE854, 0x00C0)?;
++
++        let mut j = 0x8000;
++        let mut a = MDIO_MMD_PCS;
++        for (i, val) in fw.data().iter().enumerate() {
++            if i == 0x4000 {
++                a = MDIO_MMD_PHYXS;
++                j = 0x8000;
++            }
++            dev.c45_write(a, j, (*val).into())?;
++
++            j += 1;
++        }
++        dev.c45_write(MDIO_MMD_PCS, 0xe854, 0x0040)?;
++
++        Ok(())
++    }
++
++    fn read_status(dev: &mut phy::Device) -> Result<u16> {
++        dev.genphy_c45_read_status()
 +    }
 +}
+diff --git a/rust/uapi/uapi_helper.h b/rust/uapi/uapi_helper.h
+index 08f5e9334c9e..76d3f103e764 100644
+--- a/rust/uapi/uapi_helper.h
++++ b/rust/uapi/uapi_helper.h
+@@ -7,5 +7,6 @@
+  */
  
- /// PHY state machine states.
- ///
+ #include <uapi/asm-generic/ioctl.h>
++#include <uapi/linux/mdio.h>
+ #include <uapi/linux/mii.h>
+ #include <uapi/linux/ethtool.h>
 -- 
 2.34.1
 
