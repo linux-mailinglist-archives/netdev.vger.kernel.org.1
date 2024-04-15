@@ -1,160 +1,164 @@
-Return-Path: <netdev+bounces-87793-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E02A08A4A89
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 10:40:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 715878A4A95
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 10:42:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 399D9B21564
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 08:40:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86C111C2227D
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 08:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39E47381C2;
-	Mon, 15 Apr 2024 08:40:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9467539FE4;
+	Mon, 15 Apr 2024 08:41:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="qTsuYU89"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="L+D8zPfb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E4239FCF
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 08:40:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44FC23FE5D;
+	Mon, 15 Apr 2024 08:41:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713170448; cv=none; b=jkNN/aagQOQtHNB8B+Ys4GvDk6AK7HJpu112fpa1HooZnjdjN/TMirbhZKJsWuRQI/eM1blpw5Y+JszjchhA/pi/rDsBCeYLGlBhP2gVKmLzcy44yUZR4PWwptrFUK3IuLSLXEM9IpNvJkHJ3KJ8AUh7rncd/mH7sj2Ym8FQlSY=
+	t=1713170507; cv=none; b=hP1y2SnRI5FsI0PQaGy5AFqSroLMRXGhNZs5pCRG8t6idQa56KZ1QSoToYiqkKqBwHr38xpOrMdrNHikGrYNlnEIuSE8O/k/BZEAbIbG4gtuhx7mUM9UkB/2m3aIYm+HHoCNtm8E+Vsz1LcVCQdlBpJZOXU2ci9nVDn4R2FesV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713170448; c=relaxed/simple;
-	bh=7Qg+Cc85pc+w+f2K+Ou2xfL1RJ9qFFxcGgIDOESjcoI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FVcK1013EKgidR/6PcOhsM91zQrv6vxLz0j+NnkXlAfGw5kADZLgvgGm0xQ5BgmOTjGC6VldWh6HPUFX4Us4tONtks1To4Uv+ncUrOmQ3o7tnVoSKPZiVr/MLbfJvbp9HXAWRAHYcgTsa9odfomhmozeTBc/kAwYiUTHQ2LrC24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=qTsuYU89; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2da888330b2so8070561fa.2
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 01:40:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713170444; x=1713775244; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=giKkTelfq3BYsAFGZhixira6GIq9vSuoB3MA1iZ83Kk=;
-        b=qTsuYU89zCgh/hywO7mhtCHpUWtlPSetuYGZ+CooNjemaKniS5f6ZWeLMayOuZUCnH
-         CVydRTtDzx0UyQ2EL5W+LfKlRqQwNGLldU2yuvnRMkMNCBTh7frfutdU9hlIpOQoaB7u
-         41iMRcEsTAVnKRp3I8nEm/5+Yc757EmDXQcV0fBustkovLIwP6Re3Of6JdmR8CC3PUaE
-         r7jrcHJrcEkI6u8ido/8S2PyqjxtzLU5H2N38cb7lm1x6fRnQBJ4SP8OaH3fRCXHuw+G
-         hpw3/6hl37GdwM1MjADNddnRqz96zbCQDsTmK+aIGxaZ1QMZt6QN2Lkx/mUx0KYj/BLC
-         M9ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713170444; x=1713775244;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=giKkTelfq3BYsAFGZhixira6GIq9vSuoB3MA1iZ83Kk=;
-        b=pHhSop6ngLWvn1d8cfl7goUGOgAV7fkVNQ/+REQEXM6DVuwEDm6pHrRnlNNmQu0z5P
-         oAXgs4ML1UJE9lsX9kwVJ55/KXXgtOLhdTfG8wZcrcy/CQWddjpWU3y1Wgof68vEjO1a
-         98PuAE5CqSq8PqUZZdtwiz9M4yYyImr3nA61vSEFQ7zQ8N8p49/ZRyiarJJqkmIerkpi
-         X9bKoSDN5eSHXayRvWiX5Tmnt7HoPSkVikyLgQRr0y5ji2Y/Vy+ZJTdBzbdgVM7+RUMQ
-         0u58sjb63ZmFTxfvhzYwn1mPLls021PvQdhTm6gMZ3UM8d47YfHQllXs1QZ729IUhRWL
-         XaNg==
-X-Gm-Message-State: AOJu0Yyqz3IKc7Y9cr88Ke4jnbFXIrF+rBm0TV81NTj2fZrCuF/42XP6
-	bXKaAIfhsIdC6d6kNJcp3SfpT6rrbpVsE4qs4HjgmBF9XZGQCGkr3kHAiG3wAJs=
-X-Google-Smtp-Source: AGHT+IEouBsRvNsGw2BBII7zCSX4R6hyekzhRCRfz+XWQvsollf7R1Urp0JmU2pLaPzlOmGbrP8bKg==
-X-Received: by 2002:a05:6512:4014:b0:518:7df6:d9e1 with SMTP id br20-20020a056512401400b005187df6d9e1mr8528376lfb.10.1713170443564;
-        Mon, 15 Apr 2024 01:40:43 -0700 (PDT)
-Received: from localhost (37-48-2-146.nat.epc.tmcz.cz. [37.48.2.146])
-        by smtp.gmail.com with ESMTPSA id jw24-20020a170906e95800b00a51adace6ebsm5216634ejb.79.2024.04.15.01.40.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 01:40:43 -0700 (PDT)
-Date: Mon, 15 Apr 2024 10:40:39 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Benjamin Poirier <benjamin.poirier@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, edumazet@google.com, parav@nvidia.com,
-	mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
-	shuah@kernel.org, petrm@nvidia.com, liuhangbin@gmail.com,
-	vladimir.oltean@nxp.com, idosch@nvidia.com,
-	virtualization@lists.linux.dev
-Subject: Re: [patch net-next 3/6] selftests: forwarding: add ability to
- assemble NETIFS array by driver name
-Message-ID: <ZhzoB3x3cEAEyIXD@nanopsycho>
-References: <20240412151314.3365034-1-jiri@resnulli.us>
- <20240412151314.3365034-4-jiri@resnulli.us>
- <ZhmbxntSvXrsnEG1@f4>
- <ZhqIXZYnHA0MZT3L@nanopsycho>
- <ZhwvXgxEnHN8oJ5f@f4>
+	s=arc-20240116; t=1713170507; c=relaxed/simple;
+	bh=7SORiU4shsWpZ0cGSl/ZJwxVqtAvvRLpEiZ0sdTzGuo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NiFaIkvaktuaYNXMzKqNnoTQvbYOHB1xU+/suM8w4Lzb1gjX4cl0TOh7Q1aEp+sv8x0jXsG8lKXOHdNZWecGX7n1xBgTHkKsl+TFDdBLX9q9p3QVlBGU1hUhAI7nWkoteNHr12IJtICq/hJV9RsLZ8HJyiSDJs5vt3zxRIO4iAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=L+D8zPfb; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43F3PK4C023259;
+	Mon, 15 Apr 2024 08:41:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=egqo3iTg7vXMcfRfDBzI5al7YP7luBSca8DUzS4Mp8A=;
+ b=L+D8zPfb6fU46rTtaTkxZ4nCRlftT+hXJZxP3BSbsbzb+4ZSxLuHkbAyQdXO+neP5ZZU
+ nAvJBcuuRyxW49kAqJITqjdiMODmkpEVA6eGkI3mkdRROeyKPiDhUH//SH9k8kXMVCTZ
+ iz+1a6kKNKfshw8iZg8+jTA2gwf8E4IfDn12EPeAucpwxRnIvJcAfgsFBQhKdRQ2Omwv
+ BfOb8VHS9fOXVKjfDV5gVRzhIbSXr0Jrs1+/dtVbdbzbs7kNnV5/GBbk6A6bMeX4ZJva
+ GeCCfkuib38WlvklNCcvviEIqXQujm9cs8vox8WANjIbIARyjofMrnvX6/DuMeMM5snv iQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xfhsd3ees-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Apr 2024 08:41:40 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43F8feVX029314;
+	Mon, 15 Apr 2024 08:41:40 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xfhsd3eem-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Apr 2024 08:41:40 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43F7UxAT011111;
+	Mon, 15 Apr 2024 08:41:39 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xg7326cfr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Apr 2024 08:41:38 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43F8fXQF47907286
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 15 Apr 2024 08:41:35 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7376020043;
+	Mon, 15 Apr 2024 08:41:33 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 808C620040;
+	Mon, 15 Apr 2024 08:41:32 +0000 (GMT)
+Received: from [9.171.17.66] (unknown [9.171.17.66])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 15 Apr 2024 08:41:32 +0000 (GMT)
+Message-ID: <c7f6be91-6591-4b00-95c3-48417bf98ac1@linux.ibm.com>
+Date: Mon, 15 Apr 2024 10:41:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZhwvXgxEnHN8oJ5f@f4>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 01/11] net/smc: decouple ism_client from SMC-D
+ DMB registration
+To: Wen Gu <guwen@linux.alibaba.com>, twinkler@linux.ibm.com,
+        hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, wenjia@linux.ibm.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org
+References: <20240414040304.54255-1-guwen@linux.alibaba.com>
+ <20240414040304.54255-2-guwen@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20240414040304.54255-2-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: VyKdymiKN2yGTsfh4upxcjoyes97lM_-
+X-Proofpoint-ORIG-GUID: SoDffycIF7sHlVzV8EEaVAgQ31Cj4La0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-15_08,2024-04-09_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ clxscore=1015 mlxscore=0 spamscore=0 malwarescore=0 mlxlogscore=999
+ adultscore=0 phishscore=0 suspectscore=0 impostorscore=0
+ lowpriorityscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2404010000 definitions=main-2404150057
 
-Sun, Apr 14, 2024 at 09:32:46PM CEST, benjamin.poirier@gmail.com wrote:
->On 2024-04-13 15:27 +0200, Jiri Pirko wrote:
->> Fri, Apr 12, 2024 at 10:38:30PM CEST, benjamin.poirier@gmail.com wrote:
->> >On 2024-04-12 17:13 +0200, Jiri Pirko wrote:
->> >> From: Jiri Pirko <jiri@nvidia.com>
->> >> 
->> >> Allow driver tests to work without specifying the netdevice names.
->> >> Introduce a possibility to search for available netdevices according to
->> >> set driver name. Allow test to specify the name by setting
->> >> NETIF_FIND_DRIVER variable.
->> >> 
->> >> Note that user overrides this either by passing netdevice names on the
->> >> command line or by declaring NETIFS array in custom forwarding.config
->> >> configuration file.
->> >> 
->> >> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
->> >> ---
->> >>  tools/testing/selftests/net/forwarding/lib.sh | 39 +++++++++++++++++++
->> >>  1 file changed, 39 insertions(+)
->> >> 
->> >> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
->> >> index 6f6a0f13465f..06633518b3aa 100644
->> >> --- a/tools/testing/selftests/net/forwarding/lib.sh
->> >> +++ b/tools/testing/selftests/net/forwarding/lib.sh
->> >> @@ -55,6 +55,9 @@ declare -A NETIFS=(
->> >>  : "${NETIF_CREATE:=yes}"
->> >>  : "${NETIF_TYPE:=veth}"
->> >>  
->> >> +# Whether to find netdevice according to the specified driver.
->> >> +: "${NETIF_FIND_DRIVER:=}"
->> >> +
->> >
->> >This section of the file sets default values for variables that can be
->> >set by users in forwarding.config. NETIF_FIND_DRIVER is more like
->> >NUM_NETIFS, it is set by tests, so I don't think it should be listed
->> >there.
->> 
->> Well, currently there is a mixture of config variables and test
->> definitions/requirements. For example REQUIRE_JQ, REQUIRE_MZ, REQUIRE_MTOOLS
->> are not forwarding.config configurable (they are, they should not be ;))
->
->Yes, that's true. If you prefer to leave that statement there, go ahead.
->
->> Where do you suggest to move NETIF_FIND_DRIVER?
->
->I would make NETIF_FIND_DRIVER like NUM_NETIFS, ie. there's no statement
->setting a default value for it. And I would move the comment describing
->its purpose above this new part:
 
-Ok.
 
->
->> +
->> +if [[ ! -z $NETIF_FIND_DRIVER ]]; then
->> +	unset NETIFS
->> +	declare -A NETIFS
->> +	find_netif
->> +fi
->> +
->
->BTW, '! -z' can be removed from that test. It's equivalent to:
->if [[ $NETIF_FIND_DRIVER ]]; then
+On 14.04.24 06:02, Wen Gu wrote:
+> The struct 'ism_client' is specialized for s390 platform firmware ISM.
+> So replace it with 'void' to make SMCD DMB registration helper generic
+> for both Emulated-ISM and existing ISM.
+> 
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> ---
 
-Ok.
+Just a thought:
+The client concept is really specific to s390 platform firmware ISM.
+So wouldn't it be nice to do something like:
 
+diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+index 78cca4839a31..37dcdf2bc044 100644
+--- a/drivers/s390/net/ism_drv.c
++++ b/drivers/s390/net/ism_drv.c
+@@ -747,10 +747,9 @@ static int smcd_query_rgid(struct smcd_dev *smcd, struct smcd_gid *rgid,
+        return ism_query_rgid(smcd->priv, rgid->gid, vid_valid, vid);
+ }
+
+-static int smcd_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
+-                            struct ism_client *client)
++static int smcd_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
+ {
+-       return ism_register_dmb(smcd->priv, (struct ism_dmb *)dmb, client);
++       return ism_register_dmb(smcd->priv, (struct ism_dmb *)dmb, &smc_ism_client);
+ }
+
+ static int smcd_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
+
+--------------
+
+This is not a real patch, just a sketch, but I hope you
+get the idea.
+
+
+This may be a step in the direction of moving the ism_client concept from 
+net/smc/smc_ism.c to drivers/s390/net/ism*
+
+
+I know that there are several dependencies to consider. 
+And I haven't looked at the other patches in this series yet in detail, to see how you solve
+things like smcd_register_dev. Seems like smcd_register_dmb() is the only one of the smcd_ops
+that you need for loopback and uses ism_client.
+
+
+
+Wenjia, Gerd, and others what do you think?
 
