@@ -1,191 +1,568 @@
-Return-Path: <netdev+bounces-88115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 597DF8A5CBD
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 23:15:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E43C78A5CD4
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 23:20:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61E371C21255
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 21:15:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C3B3B214AA
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 21:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C7782D93;
-	Mon, 15 Apr 2024 21:15:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="joUIctqR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58B9B156C53;
+	Mon, 15 Apr 2024 21:20:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C173C70CDB
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 21:15:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C03A156974
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 21:20:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713215709; cv=none; b=XhXzygzkR/qir9ZIansiMVSU4rpAZUFP15kZ6ae2WUwhD1TgdXIF72apGz8ym/F260Wlwk3gYRN7aN56Pd0Va05CbKxWxDwx9pf4RKMHCX+E7xrjxU1qjalSd4aIhVi909CN0WszJUG7hAMfJx5r4x08RAYLSdaAx+PaetUzPUY=
+	t=1713216023; cv=none; b=aPammAGLYwz8u3dBWqendt/Gr2bQnR7Phe++j/r5DpzbVmIzymJbeMJzNYj/nv5Aj0JPyNL3DrMpK39YpsCZNNrwPZnbV3smMiss6ZfXFGfZJ7X4GCNX+IFIMcqEaBWZPhOxyN19ma6FuXWGiey/vvyIyYbnAcVyDTExwgPegfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713215709; c=relaxed/simple;
-	bh=JBU7CENdHjPyUIzJHGKwNf0KIGbYeqbb22smov3UWPE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PvrbUCf4KgXuJiX7onTsD0kLzTP0kEX9ksLtn98U45ujU5sPYXZVie0qQWt8AmnAKnUiq5vb0ur7hQjF584K5j8XO4c2uySTgQcF2S73H8PvvLexDlPWqszSl+pUWR1LSsK2h5V6WEDmy8qCthfi0Fh0W64q7tBeXwC6rPgEExw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=joUIctqR; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-61acfd3fd3fso16643297b3.1
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 14:15:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1713215707; x=1713820507; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zf2R2fsTNBlVuNbUwgugov4ABpOXp3LFN5BlqsrzAe8=;
-        b=joUIctqRS7JmneA6orwTmJqfjbjIlQo8YtB1Nyt1vwLH9ZLaPROm7ERjiYp5wB4peU
-         vJFV6GVp4Z5oxMaCiPo1foyGS6bOsTE+mCYtmwKBpOdC3oSdV4c4Wz8BpE/kSZvAPII3
-         GLAKAZSQ06ZmwBqcAcebDLcmdCX/cCNaCx9LnKIx4XwyfxdMSOEBAUtyKYs+sRs1y8p8
-         Iu1d/oBNvQAE1/uURSSS8St8kl8B7LIaulfKeIkuAhmSVDxJEwUkW6GzXV2zlUYSFSXp
-         UwU6H/odXIzCEST1s0F5fH6tdFxFb2yvU8PGhrAI7V707ZTLHSKIdu8V63kTRN4LRqzA
-         Tajg==
+	s=arc-20240116; t=1713216023; c=relaxed/simple;
+	bh=iq12rZ7Kqkas5B3bX2diMVWjH4npPy7iNQbcxGS7ulk=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=to8IRNFctrw5Zrq7LTallQK/v/oyN6X/FFZRLPbCk+sUTrNcJyoe96SsKyyxCkACpdJPrydRpK2m0DKA7PHbo/EelO/tUQkQXpB4wHUvWG8q9DWL8T3aXcM54PD+6U+YHFZHu3NDve8R9xbhvqsoJfNcUQE3BMJcNLF+nMhDehM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7cc7a6a043bso497459339f.0
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 14:20:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713215707; x=1713820507;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Zf2R2fsTNBlVuNbUwgugov4ABpOXp3LFN5BlqsrzAe8=;
-        b=RY6ZfxxPWErhFoqn+qPeJVoOOaKwOdyK1+2ZGm9nl/cTQOlpvV4PZrmnCplZHhsWM/
-         15/9aWPiLTjiWx0NrLEgTbdzsxRBdq3uw20mEbtU5AGULXoG/qXjZ7XrVml/zkTzHpDJ
-         CZ3UMigPF+8xVvNoe6FBUBF+e5xjfWlwHov4RJw0VM/78TrST3p9y/pblN7jr/HNC/1s
-         rQxplaMP+fhTVNQB+GK8AcwBOyDQ4poriG3wR4lMNlXBu0m2eb2pvLtIot46EMTGPKK7
-         G5fJVYwjw79VtJv/V3Bii11Dj9u+buEa0dq2xRjKM7HyjyRcORcZZeaN84jECsVCawIN
-         NRpg==
-X-Forwarded-Encrypted: i=1; AJvYcCWapHm7AXITelL1w0jxB4ljkK46Pi+/ExuKL5GpZoJs2ClaoPuwYOZW/yFjmS5Hcp5pt80OAyMREXVGjzuLlUpr93sI0n/c
-X-Gm-Message-State: AOJu0YwfJzs2lv4ZVMiKhM5vx1mWL7GeSTwPtpTDwwLwJT7br8Yt5swN
-	h6dxP+Xm9BqoAFyauIp4gMe7yZbahwHtMWqMM6QhVLmNdgUTIAj3up3X9NynkB7ps/6lw0gnHlL
-	hIC5AY/288PLqBFyPiRXsUqQ/3WlFnQxIne8q
-X-Google-Smtp-Source: AGHT+IFJJiH9a6rrsmcDjbp0G2BlBm/CyMLA9O5ZNeH79Lb9ftFFJl54j6lLWVxilBsVh9GK32vG8Y4uVXaZR72aRpk=
-X-Received: by 2002:a0d:c406:0:b0:61a:b7c8:ea05 with SMTP id
- g6-20020a0dc406000000b0061ab7c8ea05mr6033168ywd.35.1713215706660; Mon, 15 Apr
- 2024 14:15:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713216020; x=1713820820;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=K9fC8sMVBzWfsoqQnGxlfBwcb9vKWVeTN2TZHasQJnQ=;
+        b=ZvYWtfeB6YnWk8mxYB+x3yIS2JxDWFhBUn7thcbsK7hPBAUaAnnLnfo9C3KYXjM87D
+         OWQOdIVGjf8DrClaT+5FCD6OCOD3Zn7q4SMV0+ZemlphXuJwWuIy2Pzvf9kzV0saMRTS
+         GW/jqUuWPp4j/hwwdKUcWKeNXpRUW3KrMKErtNR/9g+vpBuUrIuOnwOnG9seBNWIO7Rk
+         gJLvbn7BahcIgF7wQRBzAxjtE8vwgPyZKJyfmPNoslyNzVU41w44OPEWPw2fesQ7vPH9
+         WxJwsABIZV7A0tNjBQDBpg1qqGcpRlNS3pc+m6DRu9GKOaoj26C47GZag+iwXI7UAmj9
+         mo9w==
+X-Forwarded-Encrypted: i=1; AJvYcCWrfWPJHT3XC8tC2z9540P7o7YRCkz9aEa9Qs9dtPkjPaDRVoR3om8Xz5nqGW5dEi6yOVilEUTtvZdPQmTxSeqSjpYtw3O7
+X-Gm-Message-State: AOJu0Ywpx0SgR9UNKyt9KlQIKrQwbB1HBYir5eQdfwE7ODE9AGPEyXLO
+	USnzZlofuw2ULzfo0CXfSsuTC/cjTkTzs0Y2LqyMUimujqGE58GwnZCJkcn/iYQT6opuUazCASv
+	rf9NHk2IaKUqPfAOMDn5h73lV6RybUQCcIlXnXDAjuOy+5BoV8hRoXfc=
+X-Google-Smtp-Source: AGHT+IGs4KbY2ovcC82mPCsirTZer4Zb/Be+sRtQ9uf4L4eYKFR5tfNxAPu3ZJj1c2nxukX/sIqElP1zLSgNg7u7HysxXQf2ibhD
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240326230319.190117-1-jhs@mojatatu.com> <CANn89iLhd4iD-pDVJHzKqWbf16u9KyNtgV41X3sd=iy15jDQtQ@mail.gmail.com>
- <CAM0EoMmQHsucU6n1O3XEd50zUB4TENkEH0+J-cZ=5Bbv9298mA@mail.gmail.com>
- <CANn89iKaMKeY7pR7=RH1NMBpYiYFmBRfAWmbZ61PdJ2VYoUJ9g@mail.gmail.com>
- <CAM0EoM=s_MvUa32kUyt=VfeiAwxOm2OUJ3H=i0ARO1xupM2_Xg@mail.gmail.com>
- <CAM0EoMk33ga5dh12ViZz8QeFwjwNQBvykM53VQo1B3BdfAZtaQ@mail.gmail.com>
- <CANn89iLmhaC8fuu4UpPdELOAapBzLv0+S50gr0Rs+J+=4+9j=g@mail.gmail.com>
- <CAM0EoMm+cqkY9tQC6+jpvLJrRxw43Gzffgw85Q3Fe2tBgA7k2Q@mail.gmail.com>
- <CAM0EoMmdp_ik6EA2q8vhr+gGh=OcxUkvBOsxPHFWjn1eDX_33Q@mail.gmail.com> <CANn89iLsV8sj1cJJ8VJmBwZvsD5PoV_NXfXYSCXTjaYCRm6gmA@mail.gmail.com>
-In-Reply-To: <CANn89iLsV8sj1cJJ8VJmBwZvsD5PoV_NXfXYSCXTjaYCRm6gmA@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Mon, 15 Apr 2024 17:14:55 -0400
-Message-ID: <CAM0EoMnKh67wGo5XV1vdUd8p8LhxrT5mtbioPOLr=sVprYNKjA@mail.gmail.com>
-Subject: Re: [PATCH RFC net 1/1] net/sched: Fix mirred to self recursion
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us, 
-	xiyou.wangcong@gmail.com, netdev@vger.kernel.org, renmingshuai@huawei.com, 
-	Victor Nogueira <victor@mojatatu.com>
-Content-Type: multipart/mixed; boundary="0000000000009eb0410616291d4d"
-
---0000000000009eb0410616291d4d
+X-Received: by 2002:a05:6638:2110:b0:482:cfdd:daeb with SMTP id
+ n16-20020a056638211000b00482cfdddaebmr675534jaj.5.1713216020285; Mon, 15 Apr
+ 2024 14:20:20 -0700 (PDT)
+Date: Mon, 15 Apr 2024 14:20:20 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000501d2906162930ae@google.com>
+Subject: [syzbot] [net?] [bpf?] possible deadlock in posix_timer_fn (2)
+From: syzbot <syzbot+8502ad1d389eef66d297@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	jakub@cloudflare.com, john.fastabend@gmail.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 15, 2024 at 10:11=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Mon, Apr 15, 2024 at 4:01=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.co=
-m> wrote:
-> >
->
-> > Sorry - shows Victor's name but this is your patch, so feel free if
-> > you send to add your name as author.
->
-> Sure go ahead, but I would rather put the sch->owner init in
-> qdisc_alloc() so that qdisc_create_dflt() is covered.
+Hello,
 
-Victor sent the patch. As i mentioned earlier, we found a lockdep
-false positive for the case of redirect from eth0->eth1->eth0
-(potential fix attached)
+syzbot found the following issue on:
 
-[   75.691724] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[   75.691964] WARNING: possible recursive locking detected
-[   75.691964] 6.9.0-rc3-00861-g0a7d3ab066ff #60 Not tainted
-[   75.691964] --------------------------------------------
-[   75.691964] ping/421 is trying to acquire lock:
-[   75.691964] ffff88800568e110 (&sch->q.lock){+.-.}-{3:3}, at:
-__dev_queue_xmit+0x1828/0x3580
-[   75.691964]
-[   75.691964] but task is already holding lock:
-[   75.691964] ffff88800bd2c110 (&sch->q.lock){+.-.}-{3:3}, at:
-__dev_queue_xmit+0x1828/0x3580
-[   75.691964]
-[   75.691964] other info that might help us debug this:
-[   75.691964]  Possible unsafe locking scenario:
-[   75.691964]
-[   75.691964]        CPU0
-[   75.691964]        ----
-[   75.691964]   lock(&sch->q.lock);
-[   75.691964]   lock(&sch->q.lock);
-[   75.691964]
-[   75.691964]  *** DEADLOCK ***
-[   75.691964]
-[   75.691964]  May be due to missing lock nesting notation
-[   75.691964]
-[   75.691964] 9 locks held by ping/421:
-[   75.691964]  #0: ffff888002564ff8 (sk_lock-AF_INET){+.+.}-{0:0},
-at: raw_sendmsg+0xa32/0x2d80
-[   75.691964]  #1: ffffffffa7233540 (rcu_read_lock){....}-{1:3}, at:
-ip_finish_output2+0x284/0x1f80
-[   75.691964]  #2: ffffffffa7233540 (rcu_read_lock){....}-{1:3}, at:
-process_backlog+0x210/0x660
-[   75.691964]  #3: ffffffffa7233540 (rcu_read_lock){....}-{1:3}, at:
-ip_local_deliver_finish+0x21e/0x4d0
-[   75.691964]  #4: ffff8880025648a8 (k-slock-AF_INET){+...}-{3:3},
-at: icmp_reply+0x2e6/0xa20
-[   75.691964]  #5: ffffffffa7233540 (rcu_read_lock){....}-{1:3}, at:
-ip_finish_output2+0x284/0x1f80
-[   75.691964]  #6: ffffffffa72334e0 (rcu_read_lock_bh){....}-{1:3},
-at: __dev_queue_xmit+0x224/0x3580
-[   75.691964]  #7: ffff88800bd2c110 (&sch->q.lock){+.-.}-{3:3}, at:
-__dev_queue_xmit+0x1828/0x3580
-[   75.691964]  #8: ffffffffa72334e0 (rcu_read_lock_bh){....}-{1:3},
-at: __dev_queue_xmit+0x224/0x3580
+HEAD commit:    fe46a7dd189e Merge tag 'sound-6.9-rc1' of git://git.kernel..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1445ef13180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=aef2a55903e5791c
+dashboard link: https://syzkaller.appspot.com/bug?extid=8502ad1d389eef66d297
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-cheers,
-jamal
+Unfortunately, I don't have any reproducer for this issue yet.
 
---0000000000009eb0410616291d4d
-Content-Type: text/x-patch; charset="US-ASCII"; name="lockdep-fix.patch"
-Content-Disposition: attachment; filename="lockdep-fix.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_lv1gbw3v0>
-X-Attachment-Id: f_lv1gbw3v0
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/089e25869df5/disk-fe46a7dd.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/423b1787914f/vmlinux-fe46a7dd.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/4c043e30c07d/bzImage-fe46a7dd.xz
 
-ZGlmZiAtLWdpdCBhL2luY2x1ZGUvbmV0L3NjaF9nZW5lcmljLmggYi9pbmNsdWRlL25ldC9zY2hf
-Z2VuZXJpYy5oCmluZGV4IGY1NjFkZmI3OTc0My4uNGRkYzQ2ZjEwNmI5IDEwMDY0NAotLS0gYS9p
-bmNsdWRlL25ldC9zY2hfZ2VuZXJpYy5oCisrKyBiL2luY2x1ZGUvbmV0L3NjaF9nZW5lcmljLmgK
-QEAgLTEyNiw2ICsxMjYsNyBAQCBzdHJ1Y3QgUWRpc2MgewogCXNwaW5sb2NrX3QJCWJ1c3lsb2Nr
-IF9fX19jYWNoZWxpbmVfYWxpZ25lZF9pbl9zbXA7CiAJc3BpbmxvY2tfdAkJc2VxbG9jazsKIAor
-CXN0cnVjdCBsb2NrX2NsYXNzX2tleSAgIHFkaXNjX3R4X3Jvb3Rsb2NrOwogCXN0cnVjdCByY3Vf
-aGVhZAkJcmN1OwogCW5ldGRldmljZV90cmFja2VyCWRldl90cmFja2VyOwogCS8qIHByaXZhdGUg
-ZGF0YSAqLwpkaWZmIC0tZ2l0IGEvbmV0L3NjaGVkL3NjaF9nZW5lcmljLmMgYi9uZXQvc2NoZWQv
-c2NoX2dlbmVyaWMuYwppbmRleCA0YTJjNzYzZTJkMTEuLjgwOWU5NzQyMDRmOCAxMDA2NDQKLS0t
-IGEvbmV0L3NjaGVkL3NjaF9nZW5lcmljLmMKKysrIGIvbmV0L3NjaGVkL3NjaF9nZW5lcmljLmMK
-QEAgLTk0NSw3ICs5NDUsOSBAQCBzdHJ1Y3QgUWRpc2MgKnFkaXNjX2FsbG9jKHN0cnVjdCBuZXRk
-ZXZfcXVldWUgKmRldl9xdWV1ZSwKIAlfX3NrYl9xdWV1ZV9oZWFkX2luaXQoJnNjaC0+Z3NvX3Nr
-Yik7CiAJX19za2JfcXVldWVfaGVhZF9pbml0KCZzY2gtPnNrYl9iYWRfdHhxKTsKIAlnbmV0X3N0
-YXRzX2Jhc2ljX3N5bmNfaW5pdCgmc2NoLT5ic3RhdHMpOworCWxvY2tkZXBfcmVnaXN0ZXJfa2V5
-KCZzY2gtPnFkaXNjX3R4X3Jvb3Rsb2NrKTsKIAlzcGluX2xvY2tfaW5pdCgmc2NoLT5xLmxvY2sp
-OworCWxvY2tkZXBfc2V0X2NsYXNzKCZzY2gtPnEubG9jaywgJnNjaC0+cWRpc2NfdHhfcm9vdGxv
-Y2spOwogCiAJaWYgKG9wcy0+c3RhdGljX2ZsYWdzICYgVENRX0ZfQ1BVU1RBVFMpIHsKIAkJc2No
-LT5jcHVfYnN0YXRzID0KQEAgLTEwNzAsNiArMTA3Miw3IEBAIHN0YXRpYyB2b2lkIF9fcWRpc2Nf
-ZGVzdHJveShzdHJ1Y3QgUWRpc2MgKnFkaXNjKQogCiAJbW9kdWxlX3B1dChvcHMtPm93bmVyKTsK
-IAluZXRkZXZfcHV0KGRldiwgJnFkaXNjLT5kZXZfdHJhY2tlcik7CisJbG9ja2RlcF91bnJlZ2lz
-dGVyX2tleSgmcWRpc2MtPnFkaXNjX3R4X3Jvb3Rsb2NrKTsKIAogCXRyYWNlX3FkaXNjX2Rlc3Ry
-b3kocWRpc2MpOwogCg==
---0000000000009eb0410616291d4d--
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8502ad1d389eef66d297@syzkaller.appspotmail.com
+
+=====================================================
+WARNING: HARDIRQ-safe -> HARDIRQ-unsafe lock order detected
+6.8.0-syzkaller-08951-gfe46a7dd189e #0 Not tainted
+-----------------------------------------------------
+syz-executor.1/6034 [HC0[0]:SC0[2]:HE0:SE0] is trying to acquire:
+ffff8880798ca200 (&stab->lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ffff8880798ca200 (&stab->lock){+.-.}-{2:2}, at: __sock_map_delete net/core/sock_map.c:414 [inline]
+ffff8880798ca200 (&stab->lock){+.-.}-{2:2}, at: sock_map_delete_elem+0xc8/0x150 net/core/sock_map.c:446
+
+and this task is already holding:
+ffff88801ef96038 (&new_timer->it_lock){-.-.}-{2:2}, at: __lock_timer+0x211/0x4c0 kernel/time/posix-timers.c:595
+which would create a new lock dependency:
+ (&new_timer->it_lock){-.-.}-{2:2} -> (&stab->lock){+.-.}-{2:2}
+
+but this new dependency connects a HARDIRQ-irq-safe lock:
+ (&new_timer->it_lock){-.-.}-{2:2}
+
+... which became HARDIRQ-irq-safe at:
+  lock_acquire kernel/locking/lockdep.c:5754 [inline]
+  lock_acquire+0x1b1/0x540 kernel/locking/lockdep.c:5719
+  __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+  _raw_spin_lock_irqsave+0x3a/0x60 kernel/locking/spinlock.c:162
+  posix_timer_fn+0x2d/0x3e0 kernel/time/posix-timers.c:318
+  __run_hrtimer kernel/time/hrtimer.c:1692 [inline]
+  __hrtimer_run_queues+0x20c/0xc20 kernel/time/hrtimer.c:1756
+  hrtimer_interrupt+0x31b/0x800 kernel/time/hrtimer.c:1818
+  local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
+  __sysvec_apic_timer_interrupt+0x10f/0x410 arch/x86/kernel/apic/apic.c:1049
+  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+  sysvec_apic_timer_interrupt+0x90/0xb0 arch/x86/kernel/apic/apic.c:1043
+  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+  check_kcov_mode kernel/kcov.c:175 [inline]
+  __sanitizer_cov_trace_pc+0x33/0x60 kernel/kcov.c:207
+  __orc_find+0x70/0x130 arch/x86/kernel/unwind_orc.c:99
+  orc_find arch/x86/kernel/unwind_orc.c:227 [inline]
+  unwind_next_frame+0x335/0x23a0 arch/x86/kernel/unwind_orc.c:494
+  arch_stack_walk+0x100/0x170 arch/x86/kernel/stacktrace.c:25
+  stack_trace_save+0x95/0xd0 kernel/stacktrace.c:122
+  kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+  kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+  kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:579
+  poison_slab_object mm/kasan/common.c:240 [inline]
+  __kasan_slab_free+0x11d/0x1a0 mm/kasan/common.c:256
+  kasan_slab_free include/linux/kasan.h:184 [inline]
+  slab_free_hook mm/slub.c:2106 [inline]
+  slab_free mm/slub.c:4280 [inline]
+  kfree+0x129/0x370 mm/slub.c:4390
+  kvfree+0x47/0x50 mm/util.c:680
+  translate_table+0xc10/0x17b0 net/ipv6/netfilter/ip6_tables.c:728
+  do_replace net/ipv6/netfilter/ip6_tables.c:1150 [inline]
+  do_ip6t_set_ctl+0x5a8/0xbf0 net/ipv6/netfilter/ip6_tables.c:1636
+  nf_setsockopt+0x8a/0xf0 net/netfilter/nf_sockopt.c:101
+  ipv6_setsockopt+0x133/0x1a0 net/ipv6/ipv6_sockglue.c:999
+  tcp_setsockopt+0xa4/0x100 net/ipv4/tcp.c:3735
+  do_sock_setsockopt+0x222/0x480 net/socket.c:2311
+  __sys_setsockopt+0x1a4/0x270 net/socket.c:2334
+  __do_sys_setsockopt net/socket.c:2343 [inline]
+  __se_sys_setsockopt net/socket.c:2340 [inline]
+  __x64_sys_setsockopt+0xbd/0x160 net/socket.c:2340
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xd2/0x260 arch/x86/entry/common.c:83
+  entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+to a HARDIRQ-irq-unsafe lock:
+ (&stab->lock){+.-.}-{2:2}
+
+... which became HARDIRQ-irq-unsafe at:
+...
+  lock_acquire kernel/locking/lockdep.c:5754 [inline]
+  lock_acquire+0x1b1/0x540 kernel/locking/lockdep.c:5719
+  __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+  _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
+  spin_lock_bh include/linux/spinlock.h:356 [inline]
+  sock_map_update_common+0x197/0x870 net/core/sock_map.c:490
+  sock_map_update_elem_sys+0x3bb/0x570 net/core/sock_map.c:579
+  bpf_map_update_value+0x36c/0x6c0 kernel/bpf/syscall.c:172
+  map_update_elem+0x623/0x910 kernel/bpf/syscall.c:1641
+  __sys_bpf+0xab9/0x4b40 kernel/bpf/syscall.c:5619
+  __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
+  __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
+  __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5736
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xd2/0x260 arch/x86/entry/common.c:83
+  entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+other info that might help us debug this:
+
+ Possible interrupt unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&stab->lock);
+                               local_irq_disable();
+                               lock(&new_timer->it_lock);
+                               lock(&stab->lock);
+  <Interrupt>
+    lock(&new_timer->it_lock);
+
+ *** DEADLOCK ***
+
+2 locks held by syz-executor.1/6034:
+ #0: ffff88801ef96038 (&new_timer->it_lock){-.-.}-{2:2}, at: __lock_timer+0x211/0x4c0 kernel/time/posix-timers.c:595
+ #1: ffffffff8d7b08e0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #1: ffffffff8d7b08e0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+ #1: ffffffff8d7b08e0 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2380 [inline]
+ #1: ffffffff8d7b08e0 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run3+0xf8/0x440 kernel/trace/bpf_trace.c:2421
+
+the dependencies between HARDIRQ-irq-safe lock and the holding lock:
+-> (&new_timer->it_lock){-.-.}-{2:2} {
+   IN-HARDIRQ-W at:
+                    lock_acquire kernel/locking/lockdep.c:5754 [inline]
+                    lock_acquire+0x1b1/0x540 kernel/locking/lockdep.c:5719
+                    __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+                    _raw_spin_lock_irqsave+0x3a/0x60 kernel/locking/spinlock.c:162
+                    posix_timer_fn+0x2d/0x3e0 kernel/time/posix-timers.c:318
+                    __run_hrtimer kernel/time/hrtimer.c:1692 [inline]
+                    __hrtimer_run_queues+0x20c/0xc20 kernel/time/hrtimer.c:1756
+                    hrtimer_interrupt+0x31b/0x800 kernel/time/hrtimer.c:1818
+                    local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
+                    __sysvec_apic_timer_interrupt+0x10f/0x410 arch/x86/kernel/apic/apic.c:1049
+                    instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+                    sysvec_apic_timer_interrupt+0x90/0xb0 arch/x86/kernel/apic/apic.c:1043
+                    asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+                    check_kcov_mode kernel/kcov.c:175 [inline]
+                    __sanitizer_cov_trace_pc+0x33/0x60 kernel/kcov.c:207
+                    __orc_find+0x70/0x130 arch/x86/kernel/unwind_orc.c:99
+                    orc_find arch/x86/kernel/unwind_orc.c:227 [inline]
+                    unwind_next_frame+0x335/0x23a0 arch/x86/kernel/unwind_orc.c:494
+                    arch_stack_walk+0x100/0x170 arch/x86/kernel/stacktrace.c:25
+                    stack_trace_save+0x95/0xd0 kernel/stacktrace.c:122
+                    kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
+                    kasan_save_track+0x14/0x30 mm/kasan/common.c:68
+                    kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:579
+                    poison_slab_object mm/kasan/common.c:240 [inline]
+                    __kasan_slab_free+0x11d/0x1a0 mm/kasan/common.c:256
+                    kasan_slab_free include/linux/kasan.h:184 [inline]
+                    slab_free_hook mm/slub.c:2106 [inline]
+                    slab_free mm/slub.c:4280 [inline]
+                    kfree+0x129/0x370 mm/slub.c:4390
+                    kvfree+0x47/0x50 mm/util.c:680
+                    translate_table+0xc10/0x17b0 net/ipv6/netfilter/ip6_tables.c:728
+                    do_replace net/ipv6/netfilter/ip6_tables.c:1150 [inline]
+                    do_ip6t_set_ctl+0x5a8/0xbf0 net/ipv6/netfilter/ip6_tables.c:1636
+                    nf_setsockopt+0x8a/0xf0 net/netfilter/nf_sockopt.c:101
+                    ipv6_setsockopt+0x133/0x1a0 net/ipv6/ipv6_sockglue.c:999
+                    tcp_setsockopt+0xa4/0x100 net/ipv4/tcp.c:3735
+                    do_sock_setsockopt+0x222/0x480 net/socket.c:2311
+                    __sys_setsockopt+0x1a4/0x270 net/socket.c:2334
+                    __do_sys_setsockopt net/socket.c:2343 [inline]
+                    __se_sys_setsockopt net/socket.c:2340 [inline]
+                    __x64_sys_setsockopt+0xbd/0x160 net/socket.c:2340
+                    do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+                    do_syscall_64+0xd2/0x260 arch/x86/entry/common.c:83
+                    entry_SYSCALL_64_after_hwframe+0x6d/0x75
+   IN-SOFTIRQ-W at:
+                    lock_acquire kernel/locking/lockdep.c:5754 [inline]
+                    lock_acquire+0x1b1/0x540 kernel/locking/lockdep.c:5719
+                    __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+                    _raw_spin_lock_irqsave+0x3a/0x60 kernel/locking/spinlock.c:162
+                    posix_timer_fn+0x2d/0x3e0 kernel/time/posix-timers.c:318
+                    __run_hrtimer kernel/time/hrtimer.c:1692 [inline]
+                    __hrtimer_run_queues+0x20c/0xc20 kernel/time/hrtimer.c:1756
+                    hrtimer_interrupt+0x31b/0x800 kernel/time/hrtimer.c:1818
+                    local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
+                    __sysvec_apic_timer_interrupt+0x10f/0x410 arch/x86/kernel/apic/apic.c:1049
+                    instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+                    sysvec_apic_timer_interrupt+0x43/0xb0 arch/x86/kernel/apic/apic.c:1043
+                    asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+                    check_kcov_mode kernel/kcov.c:173 [inline]
+                    __sanitizer_cov_trace_pc+0x1e/0x60 kernel/kcov.c:207
+                    u32_get_bits include/linux/bitfield.h:201 [inline]
+                    __kfree_skb_reason net/core/skbuff.c:1227 [inline]
+                    kfree_skb_reason+0x14a/0x210 net/core/skbuff.c:1251
+                    __netif_receive_skb_core.constprop.0+0x57a/0x4030 net/core/dev.c:5512
+                    __netif_receive_skb_one_core+0xb1/0x1e0 net/core/dev.c:5536
+                    __netif_receive_skb+0x1f/0x1b0 net/core/dev.c:5652
+                    process_backlog+0x12f/0x6f0 net/core/dev.c:5981
+                    __napi_poll.constprop.0+0xb7/0x550 net/core/dev.c:6632
+                    napi_poll net/core/dev.c:6701 [inline]
+                    net_rx_action+0x9ad/0xf10 net/core/dev.c:6813
+                    __do_softirq+0x218/0x8de kernel/softirq.c:554
+                    do_softirq kernel/softirq.c:455 [inline]
+                    do_softirq+0xb2/0xf0 kernel/softirq.c:442
+                    __local_bh_enable_ip+0x100/0x120 kernel/softirq.c:382
+                    local_bh_enable include/linux/bottom_half.h:33 [inline]
+                    rcu_read_unlock_bh include/linux/rcupdate.h:820 [inline]
+                    __dev_queue_xmit+0x879/0x3ef0 net/core/dev.c:4362
+                    dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+                    batadv_send_skb_packet+0x520/0x6b0 net/batman-adv/send.c:108
+                    batadv_iv_ogm_send_to_if net/batman-adv/bat_iv_ogm.c:392 [inline]
+                    batadv_iv_ogm_emit net/batman-adv/bat_iv_ogm.c:420 [inline]
+                    batadv_iv_send_outstanding_bat_ogm_packet+0x707/0x8c0 net/batman-adv/bat_iv_ogm.c:1700
+                    process_one_work+0x9a9/0x1a60 kernel/workqueue.c:3254
+                    process_scheduled_works kernel/workqueue.c:3335 [inline]
+                    worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
+                    kthread+0x2c1/0x3a0 kernel/kthread.c:388
+                    ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+                    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+   INITIAL USE at:
+                   lock_acquire kernel/locking/lockdep.c:5754 [inline]
+                   lock_acquire+0x1b1/0x540 kernel/locking/lockdep.c:5719
+                   __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+                   _raw_spin_lock_irqsave+0x3a/0x60 kernel/locking/spinlock.c:162
+                   __lock_timer+0x211/0x4c0 kernel/time/posix-timers.c:595
+                   do_timer_settime+0x197/0x2f0 kernel/time/posix-timers.c:916
+                   __do_sys_timer_settime kernel/time/posix-timers.c:954 [inline]
+                   __se_sys_timer_settime kernel/time/posix-timers.c:940 [inline]
+                   __x64_sys_timer_settime+0x26a/0x2c0 kernel/time/posix-timers.c:940
+                   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+                   do_syscall_64+0xd2/0x260 arch/x86/entry/common.c:83
+                   entry_SYSCALL_64_after_hwframe+0x6d/0x75
+ }
+ ... key      at: [<ffffffff94689260>] __key.0+0x0/0x40
+
+the dependencies between the lock to be acquired
+ and HARDIRQ-irq-unsafe lock:
+-> (&stab->lock){+.-.}-{2:2} {
+   HARDIRQ-ON-W at:
+                    lock_acquire kernel/locking/lockdep.c:5754 [inline]
+                    lock_acquire+0x1b1/0x540 kernel/locking/lockdep.c:5719
+                    __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+                    _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
+                    spin_lock_bh include/linux/spinlock.h:356 [inline]
+                    sock_map_update_common+0x197/0x870 net/core/sock_map.c:490
+                    sock_map_update_elem_sys+0x3bb/0x570 net/core/sock_map.c:579
+                    bpf_map_update_value+0x36c/0x6c0 kernel/bpf/syscall.c:172
+                    map_update_elem+0x623/0x910 kernel/bpf/syscall.c:1641
+                    __sys_bpf+0xab9/0x4b40 kernel/bpf/syscall.c:5619
+                    __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
+                    __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
+                    __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5736
+                    do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+                    do_syscall_64+0xd2/0x260 arch/x86/entry/common.c:83
+                    entry_SYSCALL_64_after_hwframe+0x6d/0x75
+   IN-SOFTIRQ-W at:
+                    lock_acquire kernel/locking/lockdep.c:5754 [inline]
+                    lock_acquire+0x1b1/0x540 kernel/locking/lockdep.c:5719
+                    __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+                    _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
+                    spin_lock_bh include/linux/spinlock.h:356 [inline]
+                    __sock_map_delete net/core/sock_map.c:414 [inline]
+                    sock_map_delete_elem+0xc8/0x150 net/core/sock_map.c:446
+                    ___bpf_prog_run+0x3e51/0xae80 kernel/bpf/core.c:1997
+                    __bpf_prog_run32+0xc1/0x100 kernel/bpf/core.c:2236
+                    bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
+                    __bpf_prog_run include/linux/filter.h:657 [inline]
+                    bpf_prog_run include/linux/filter.h:664 [inline]
+                    __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
+                    bpf_trace_run3+0x167/0x440 kernel/trace/bpf_trace.c:2421
+                    __bpf_trace_hrtimer_init+0x101/0x140 include/trace/events/timer.h:193
+                    trace_hrtimer_init include/trace/events/timer.h:193 [inline]
+                    debug_init kernel/time/hrtimer.c:472 [inline]
+                    hrtimer_init+0x17c/0x210 kernel/time/hrtimer.c:1599
+                    tcp_init_xmit_timers+0x40/0xc0 net/ipv4/tcp_timer.c:859
+                    tcp_create_openreq_child+0x688/0x18e0 net/ipv4/tcp_minisocks.c:561
+                    tcp_v6_syn_recv_sock+0x1d7/0x2670 net/ipv6/tcp_ipv6.c:1432
+                    tcp_check_req+0x997/0x1fa0 net/ipv4/tcp_minisocks.c:854
+                    tcp_v6_rcv+0x2423/0x35b0 net/ipv6/tcp_ipv6.c:1838
+                    ip6_protocol_deliver_rcu+0x188/0x1530 net/ipv6/ip6_input.c:438
+                    ip6_input_finish+0x14f/0x2f0 net/ipv6/ip6_input.c:483
+                    NF_HOOK include/linux/netfilter.h:314 [inline]
+                    NF_HOOK include/linux/netfilter.h:308 [inline]
+                    ip6_input+0xa1/0xd0 net/ipv6/ip6_input.c:492
+                    dst_input include/net/dst.h:460 [inline]
+                    ip6_rcv_finish net/ipv6/ip6_input.c:79 [inline]
+                    NF_HOOK include/linux/netfilter.h:314 [inline]
+                    NF_HOOK include/linux/netfilter.h:308 [inline]
+                    ipv6_rcv+0x265/0x680 net/ipv6/ip6_input.c:310
+                    __netif_receive_skb_one_core+0x12e/0x1e0 net/core/dev.c:5538
+                    __netif_receive_skb+0x1f/0x1b0 net/core/dev.c:5652
+                    process_backlog+0x12f/0x6f0 net/core/dev.c:5981
+                    __napi_poll.constprop.0+0xb7/0x550 net/core/dev.c:6632
+                    napi_poll net/core/dev.c:6701 [inline]
+                    net_rx_action+0x9ad/0xf10 net/core/dev.c:6813
+                    __do_softirq+0x218/0x8de kernel/softirq.c:554
+                    do_softirq kernel/softirq.c:455 [inline]
+                    do_softirq+0xb2/0xf0 kernel/softirq.c:442
+                    __local_bh_enable_ip+0x100/0x120 kernel/softirq.c:382
+                    local_bh_enable include/linux/bottom_half.h:33 [inline]
+                    rcu_read_unlock_bh include/linux/rcupdate.h:820 [inline]
+                    __dev_queue_xmit+0x879/0x3ef0 net/core/dev.c:4362
+                    dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+                    neigh_hh_output include/net/neighbour.h:526 [inline]
+                    neigh_output include/net/neighbour.h:540 [inline]
+                    ip6_finish_output2+0x1100/0x18b0 net/ipv6/ip6_output.c:137
+                    __ip6_finish_output net/ipv6/ip6_output.c:211 [inline]
+                    ip6_finish_output+0x3f9/0x1300 net/ipv6/ip6_output.c:222
+                    NF_HOOK_COND include/linux/netfilter.h:303 [inline]
+                    ip6_output+0x1eb/0x540 net/ipv6/ip6_output.c:243
+                    dst_output include/net/dst.h:450 [inline]
+                    NF_HOOK include/linux/netfilter.h:314 [inline]
+                    NF_HOOK include/linux/netfilter.h:308 [inline]
+                    ip6_xmit+0x125f/0x2030 net/ipv6/ip6_output.c:358
+                    inet6_csk_xmit+0x3ce/0x740 net/ipv6/inet6_connection_sock.c:135
+                    __tcp_transmit_skb+0x1adb/0x3dc0 net/ipv4/tcp_output.c:1462
+                    __tcp_send_ack.part.0+0x390/0x720 net/ipv4/tcp_output.c:4232
+                    __tcp_send_ack net/ipv4/tcp_output.c:4238 [inline]
+                    tcp_send_ack+0x82/0xa0 net/ipv4/tcp_output.c:4238
+                    tcp_rcv_synsent_state_process net/ipv4/tcp_input.c:6481 [inline]
+                    tcp_rcv_state_process+0x42c4/0x4ec0 net/ipv4/tcp_input.c:6668
+                    tcp_v6_do_rcv+0x42f/0x1680 net/ipv6/tcp_ipv6.c:1669
+                    sk_backlog_rcv include/net/sock.h:1106 [inline]
+                    __release_sock+0x14c/0x400 net/core/sock.c:2984
+                    release_sock+0x5a/0x220 net/core/sock.c:3550
+                    inet_wait_for_connect net/ipv4/af_inet.c:611 [inline]
+                    __inet_stream_connect+0x774/0x1020 net/ipv4/af_inet.c:705
+                    inet_stream_connect+0x57/0xa0 net/ipv4/af_inet.c:750
+                    __sys_connect_file+0x15f/0x1a0 net/socket.c:2048
+                    __sys_connect+0x149/0x170 net/socket.c:2065
+                    __do_sys_connect net/socket.c:2075 [inline]
+                    __se_sys_connect net/socket.c:2072 [inline]
+                    __x64_sys_connect+0x72/0xb0 net/socket.c:2072
+                    do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+                    do_syscall_64+0xd2/0x260 arch/x86/entry/common.c:83
+                    entry_SYSCALL_64_after_hwframe+0x6d/0x75
+   INITIAL USE at:
+                   lock_acquire kernel/locking/lockdep.c:5754 [inline]
+                   lock_acquire+0x1b1/0x540 kernel/locking/lockdep.c:5719
+                   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+                   _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
+                   spin_lock_bh include/linux/spinlock.h:356 [inline]
+                   sock_map_update_common+0x197/0x870 net/core/sock_map.c:490
+                   sock_map_update_elem_sys+0x3bb/0x570 net/core/sock_map.c:579
+                   bpf_map_update_value+0x36c/0x6c0 kernel/bpf/syscall.c:172
+                   map_update_elem+0x623/0x910 kernel/bpf/syscall.c:1641
+                   __sys_bpf+0xab9/0x4b40 kernel/bpf/syscall.c:5619
+                   __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
+                   __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
+                   __x64_sys_bpf+0x78/0xc0 kernel/bpf/syscall.c:5736
+                   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+                   do_syscall_64+0xd2/0x260 arch/x86/entry/common.c:83
+                   entry_SYSCALL_64_after_hwframe+0x6d/0x75
+ }
+ ... key      at: [<ffffffff949c6800>] __key.1+0x0/0x40
+ ... acquired at:
+   lock_acquire kernel/locking/lockdep.c:5754 [inline]
+   lock_acquire+0x1b1/0x540 kernel/locking/lockdep.c:5719
+   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+   _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
+   spin_lock_bh include/linux/spinlock.h:356 [inline]
+   __sock_map_delete net/core/sock_map.c:414 [inline]
+   sock_map_delete_elem+0xc8/0x150 net/core/sock_map.c:446
+   ___bpf_prog_run+0x3e51/0xae80 kernel/bpf/core.c:1997
+   __bpf_prog_run32+0xc1/0x100 kernel/bpf/core.c:2236
+   bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
+   __bpf_prog_run include/linux/filter.h:657 [inline]
+   bpf_prog_run include/linux/filter.h:664 [inline]
+   __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
+   bpf_trace_run3+0x167/0x440 kernel/trace/bpf_trace.c:2421
+   __bpf_trace_hrtimer_init+0x101/0x140 include/trace/events/timer.h:193
+   trace_hrtimer_init include/trace/events/timer.h:193 [inline]
+   debug_init kernel/time/hrtimer.c:472 [inline]
+   hrtimer_init+0x17c/0x210 kernel/time/hrtimer.c:1599
+   common_hrtimer_arm+0xd1/0x330 kernel/time/posix-timers.c:802
+   common_timer_set+0x375/0x5a0 kernel/time/posix-timers.c:895
+   do_timer_settime+0x1e8/0x2f0 kernel/time/posix-timers.c:925
+   __do_sys_timer_settime kernel/time/posix-timers.c:954 [inline]
+   __se_sys_timer_settime kernel/time/posix-timers.c:940 [inline]
+   __x64_sys_timer_settime+0x26a/0x2c0 kernel/time/posix-timers.c:940
+   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+   do_syscall_64+0xd2/0x260 arch/x86/entry/common.c:83
+   entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+
+stack backtrace:
+CPU: 1 PID: 6034 Comm: syz-executor.1 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:114
+ print_bad_irq_dependency kernel/locking/lockdep.c:2626 [inline]
+ check_irq_usage+0xe3c/0x1490 kernel/locking/lockdep.c:2865
+ check_prev_add kernel/locking/lockdep.c:3138 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+ validate_chain kernel/locking/lockdep.c:3869 [inline]
+ __lock_acquire+0x248e/0x3b30 kernel/locking/lockdep.c:5137
+ lock_acquire kernel/locking/lockdep.c:5754 [inline]
+ lock_acquire+0x1b1/0x540 kernel/locking/lockdep.c:5719
+ __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+ _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
+ spin_lock_bh include/linux/spinlock.h:356 [inline]
+ __sock_map_delete net/core/sock_map.c:414 [inline]
+ sock_map_delete_elem+0xc8/0x150 net/core/sock_map.c:446
+ ___bpf_prog_run+0x3e51/0xae80 kernel/bpf/core.c:1997
+ __bpf_prog_run32+0xc1/0x100 kernel/bpf/core.c:2236
+ bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
+ __bpf_prog_run include/linux/filter.h:657 [inline]
+ bpf_prog_run include/linux/filter.h:664 [inline]
+ __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
+ bpf_trace_run3+0x167/0x440 kernel/trace/bpf_trace.c:2421
+ __bpf_trace_hrtimer_init+0x101/0x140 include/trace/events/timer.h:193
+ trace_hrtimer_init include/trace/events/timer.h:193 [inline]
+ debug_init kernel/time/hrtimer.c:472 [inline]
+ hrtimer_init+0x17c/0x210 kernel/time/hrtimer.c:1599
+ common_hrtimer_arm+0xd1/0x330 kernel/time/posix-timers.c:802
+ common_timer_set+0x375/0x5a0 kernel/time/posix-timers.c:895
+ do_timer_settime+0x1e8/0x2f0 kernel/time/posix-timers.c:925
+ __do_sys_timer_settime kernel/time/posix-timers.c:954 [inline]
+ __se_sys_timer_settime kernel/time/posix-timers.c:940 [inline]
+ __x64_sys_timer_settime+0x26a/0x2c0 kernel/time/posix-timers.c:940
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xd2/0x260 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+RIP: 0033:0x7f36a507de69
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f36a5d840c8 EFLAGS: 00000246 ORIG_RAX: 00000000000000df
+RAX: ffffffffffffffda RBX: 00007f36a51abf80 RCX: 00007f36a507de69
+RDX: 0000000020000280 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 00007f36a50ca47a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f36a51abf80 R15: 00007ffd2556e708
+ </TASK>
+------------[ cut here ]------------
+raw_local_irq_restore() called with IRQs enabled
+WARNING: CPU: 1 PID: 6034 at kernel/locking/irqflag-debug.c:10 warn_bogus_irq_restore+0x29/0x30 kernel/locking/irqflag-debug.c:10
+Modules linked in:
+CPU: 1 PID: 6034 Comm: syz-executor.1 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+RIP: 0010:warn_bogus_irq_restore+0x29/0x30 kernel/locking/irqflag-debug.c:10
+Code: 90 f3 0f 1e fa 90 80 3d 72 d0 b5 04 00 74 06 90 c3 cc cc cc cc c6 05 63 d0 b5 04 01 90 48 c7 c7 c0 b1 0c 8b e8 78 6b 7d f6 90 <0f> 0b 90 90 eb df 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
+RSP: 0018:ffffc9000414fd58 EFLAGS: 00010282
+RAX: 0000000000000000 RBX: ffff88801ef96020 RCX: ffffc9000544b000
+RDX: 0000000000040000 RSI: ffffffff814faff6 RDI: 0000000000000001
+RBP: 0000000000000287 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000000
+R13: 1ffff92000829fb1 R14: ffffffff817c41b0 R15: dffffc0000000000
+FS:  00007f36a5d846c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000280 CR3: 000000007be48000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
+ _raw_spin_unlock_irqrestore+0x74/0x80 kernel/locking/spinlock.c:194
+ spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
+ unlock_timer kernel/time/posix-timers.c:128 [inline]
+ do_timer_settime+0x263/0x2f0 kernel/time/posix-timers.c:934
+ __do_sys_timer_settime kernel/time/posix-timers.c:954 [inline]
+ __se_sys_timer_settime kernel/time/posix-timers.c:940 [inline]
+ __x64_sys_timer_settime+0x26a/0x2c0 kernel/time/posix-timers.c:940
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xd2/0x260 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+RIP: 0033:0x7f36a507de69
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f36a5d840c8 EFLAGS: 00000246 ORIG_RAX: 00000000000000df
+RAX: ffffffffffffffda RBX: 00007f36a51abf80 RCX: 00007f36a507de69
+RDX: 0000000020000280 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 00007f36a50ca47a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f36a51abf80 R15: 00007ffd2556e708
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
