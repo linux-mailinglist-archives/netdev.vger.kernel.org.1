@@ -1,312 +1,190 @@
-Return-Path: <netdev+bounces-87772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BE7A8A48BD
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:12:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C08E8A48D9
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:21:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F35321F2347A
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 07:12:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71656B20F78
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 07:21:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34866208D0;
-	Mon, 15 Apr 2024 07:12:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C0A62206E;
+	Mon, 15 Apr 2024 07:21:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HrwHH+Yb"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 532BB1EB30;
-	Mon, 15 Apr 2024 07:12:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ADDB1F614;
+	Mon, 15 Apr 2024 07:21:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713165140; cv=none; b=CKeCv8zjoecjvI2m+DsBSc9CwrQY5AxDzc1xZuscSyxfbXhtkl3HQQ6KTeZ2JO4pJqfplJQ+Nd4HgUP/1qGzWCpKnDj8Ow9kfHYSKJZh3UTb4BkPLGwUagxO58fiblB++P7qWiR5V1DJzH4WeJsBoPJ3VLETbGluXrtMT+ZvPWI=
+	t=1713165674; cv=none; b=Y4NifN/1LJkP/c242yYE1vGppM/K7SwT8qIG7MqnNdPDOJPsGywn4pXuiS6nNLFwOJI+3I3PJrKhgW15SQWV/dY0Ng6G8NtEYyx/DkKpG4Tnkpr3n71RFcsp5LNoHyQbHTXTNYjyOaV50vhMwckRVbgKsXbbdBK6wYteY/8JXQ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713165140; c=relaxed/simple;
-	bh=MEgv07aPr6/Olwpa4+i/ZsU3BY52tL/1i7Hb+2G55W4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aBiJ9PqjUP6KHqo+SGxO+55KPxGkWV4GX/Q05evcZpKfYii+0cTKT8Mis2VGeoGEHlx3uH9ufuZDeg1eNEVJYdugVlYb81SMTrjAjQcIWOV+ChPFK2isaQ1UHDTzkZr8lUpOTRMNBarePVW9CLXQzKZYd8PPzYPnmqDu0xesB5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-X-IronPort-AV: E=Sophos;i="6.07,202,1708354800"; 
-   d="asc'?scan'208";a="201459648"
-Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
-  by relmlie5.idc.renesas.com with ESMTP; 15 Apr 2024 16:12:10 +0900
-Received: from [10.226.93.74] (unknown [10.226.93.74])
-	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 5325A4156C74;
-	Mon, 15 Apr 2024 16:12:07 +0900 (JST)
-Message-ID: <d1ec92db-eefe-465a-9eb5-3a57c22b86c3@bp.renesas.com>
-Date: Mon, 15 Apr 2024 08:12:06 +0100
+	s=arc-20240116; t=1713165674; c=relaxed/simple;
+	bh=VbBqtDwYH0uolRlSGs6w3s0f0N3BbyJC4yI5949TM+g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=a0a8lvDlNhuv0tAFNa56VicXjv5ubT/0fsoPK8ayLGjG3vqvlC/z6pxBPwbW/skeM60b3M7tat4klSKapSWn/BAJAJwAPVd8Tz80f6rksmTMY6utPZCcScEiJ/JKe8YGaHVk53ZQ+YJZzWWpU/OvfQ+BRsIF6z/wC8AEda8gHbA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HrwHH+Yb; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6ee12766586so1825974b3a.0;
+        Mon, 15 Apr 2024 00:21:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713165672; x=1713770472; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zSjWt43xrIQ4UPQsjgQPkSI4uu9dZcpjEC/70G7+qCk=;
+        b=HrwHH+YbepiS1NL6OCEcIbvJlxsLAtynNT/7KqqDOh7huvpTVpJgTY1oAf+DyWicqS
+         mJU8kfXxld7Zei6dES+eJv/mO0AIhNGYGph9yPwsgg+Y/gch7ec6tlGWgbwrfXKLR0Iw
+         p0NrAvCVNeqSuOQYkCn+ajlb+JDyJh9cjV6Mncq/RCz6ax/cbxnqz6AOHP/DnX7sEeMH
+         HzREsUwJahed4TWItwSed1N1mAyedSl0DaRICS/DbSF4EM4iA249McOYCl79UKzdmHGq
+         d4BWT6TTYgY9wSRzK1Wy8ewuqKdmTSGBuAo8MLFkTz6Ba8jb/3YrL32MyYmaB0+6a03g
+         xFvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713165672; x=1713770472;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zSjWt43xrIQ4UPQsjgQPkSI4uu9dZcpjEC/70G7+qCk=;
+        b=xP84iPVUuaV4a5h52BQRlLbDGvAwdYAIfT8kkPyfviLuGYleAK0ScddzFP8LQ/5YyC
+         BjBAcp8D3swykfiCtYadhWS0yEezY6aOg+RxPK1TZlNsyfRJ2Or5oTQpMfiHAfooYqmp
+         KXwGx3VZARj3nOdRJiwauYGaobAxTn8UjxMbhLg04wAKAHl03OGMqlsBbuNHkSKWQD5x
+         R0mA2++HSi6E8r1gbwGTon8NmE3gy5l6M/GONKh2nA+BUkJ1n1j0qwnZaMTB3oDYjZkQ
+         GhICpsLgbDm2/bZrBm8H0BfQ+RD24MfE92KGzFR5N995vdHDRIHMXydBlRwi9XkgAy7S
+         C9pQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXFrLFzq5PXKP8kl0xJ25dqKQYQ9z4d1bmYGmZO8RjMHO65QIYsYEEoFvzlM7ePt7OyvS4FtKSyyshfF5m+We9iS18Ep50t8EndPeYReHc3MI1Ew5i1ob7H/OF7bmKuoQSwp6aguxnk
+X-Gm-Message-State: AOJu0YxnYScCEWtLfNHrr038/wqIXngO+AN5Ctg0w63apVAvzlu73jf0
+	LJRLGaqILuyPxVpSzhdyFLo2kTXP7SDxFpENivir+HH63qPlZHbt
+X-Google-Smtp-Source: AGHT+IFMW+TSkniwUJ26r3p4R0gkuT4yVbTCCQdX2paWysXKhSKD28g/PYIsWKuWenIdoyO+eNIzfg==
+X-Received: by 2002:a05:6a00:3a1d:b0:6ed:4a97:10cc with SMTP id fj29-20020a056a003a1d00b006ed4a9710ccmr14514380pfb.3.1713165672167;
+        Mon, 15 Apr 2024 00:21:12 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id j16-20020a62b610000000b006ecceed26bfsm6560192pff.219.2024.04.15.00.21.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 00:21:11 -0700 (PDT)
+Date: Mon, 15 Apr 2024 15:21:06 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+	mlxsw@nvidia.com, Benjamin Poirier <bpoirier@nvidia.com>
+Subject: Re: [PATCH net-next 01/10] selftests: net: Unify code of busywait()
+ and slowwait()
+Message-ID: <ZhzVYgjBmELthSUX@Laptop-X1>
+References: <cover.1712940759.git.petrm@nvidia.com>
+ <db8b8885e254893bba61d824d7cf2a6774dcb336.1712940759.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/4] net: ravb: Allow RX loop to move past DMA mapping
- errors
-Content-Language: en-GB
-To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240411114434.26186-1-paul.barker.ct@bp.renesas.com>
- <20240411114434.26186-3-paul.barker.ct@bp.renesas.com>
- <20240414121719.GB2860391@ragnatech.se>
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-Organization: Renesas Electronics Corporation
-In-Reply-To: <20240414121719.GB2860391@ragnatech.se>
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="------------C3uv1LR80ijuoFSXv1F6YSxo"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <db8b8885e254893bba61d824d7cf2a6774dcb336.1712940759.git.petrm@nvidia.com>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------------C3uv1LR80ijuoFSXv1F6YSxo
-Content-Type: multipart/mixed; boundary="------------Lj0KIDovzsKqov1BU7JUg3JG";
- protected-headers="v1"
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Geert Uytterhoeven <geert+renesas@glider.be>, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
-Message-ID: <d1ec92db-eefe-465a-9eb5-3a57c22b86c3@bp.renesas.com>
-Subject: Re: [PATCH net 2/4] net: ravb: Allow RX loop to move past DMA mapping
- errors
-References: <20240411114434.26186-1-paul.barker.ct@bp.renesas.com>
- <20240411114434.26186-3-paul.barker.ct@bp.renesas.com>
- <20240414121719.GB2860391@ragnatech.se>
-In-Reply-To: <20240414121719.GB2860391@ragnatech.se>
+On Fri, Apr 12, 2024 at 07:03:04PM +0200, Petr Machata wrote:
+> Bodies of busywait() and slowwait() functions are almost identical. Extract
+> the common code into a helper, loopy_wait, and convert busywait() and
+> slowwait() into trivial wrappers.
+> 
+> Moreover, the fact that slowwait() uses seconds for units is really not
+> intuitive, and the comment does not help much. Instead make the unit part
+> of the name of the argument to further clarify what units are expected.
+> 
+> Cc: Hangbin Liu <liuhangbin@gmail.com>
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
+> Reviewed-by: Benjamin Poirier <bpoirier@nvidia.com>
+> ---
+>  tools/testing/selftests/net/forwarding/lib.sh | 22 ++-----------------
+>  tools/testing/selftests/net/lib.sh            | 16 +++++++++++---
+>  2 files changed, 15 insertions(+), 23 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+> index 4103ed7afcde..658e4e7bf4b9 100644
+> --- a/tools/testing/selftests/net/forwarding/lib.sh
+> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+> @@ -95,27 +95,9 @@ source "$net_forwarding_dir/../lib.sh"
+>  # timeout in seconds
+>  slowwait()
+>  {
+> -	local timeout=$1; shift
+> +	local timeout_sec=$1; shift
+>  
+> -	local start_time="$(date -u +%s)"
+> -	while true
+> -	do
+> -		local out
+> -		out=$("$@")
+> -		local ret=$?
+> -		if ((!ret)); then
+> -			echo -n "$out"
+> -			return 0
+> -		fi
+> -
+> -		local current_time="$(date -u +%s)"
+> -		if ((current_time - start_time > timeout)); then
+> -			echo -n "$out"
+> -			return 1
+> -		fi
+> -
+> -		sleep 0.1
+> -	done
+> +	loopy_wait "sleep 0.1" "$((timeout_sec * 1000))" "$@"
+>  }
+>  
+>  ##############################################################################
+> diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
+> index b7f7b8695165..c868c0aec121 100644
+> --- a/tools/testing/selftests/net/lib.sh
+> +++ b/tools/testing/selftests/net/lib.sh
+> @@ -58,9 +58,10 @@ ksft_exit_status_merge()
+>  		$ksft_xfail $ksft_pass $ksft_skip $ksft_fail
+>  }
+>  
+> -busywait()
+> +loopy_wait()
+>  {
+> -	local timeout=$1; shift
+> +	local sleep_cmd=$1; shift
+> +	local timeout_ms=$1; shift
+>  
+>  	local start_time="$(date -u +%s%3N)"
+>  	while true
+> @@ -74,13 +75,22 @@ busywait()
+>  		fi
+>  
+>  		local current_time="$(date -u +%s%3N)"
+> -		if ((current_time - start_time > timeout)); then
+> +		if ((current_time - start_time > timeout_ms)); then
+>  			echo -n "$out"
+>  			return 1
+>  		fi
+> +
+> +		$sleep_cmd
+>  	done
+>  }
+>  
+> +busywait()
+> +{
+> +	local timeout_ms=$1; shift
+> +
+> +	loopy_wait : "$timeout_ms" "$@"
+> +}
+> +
+>  cleanup_ns()
+>  {
+>  	local ns=""
+> -- 
+> 2.43.0
+> 
 
---------------Lj0KIDovzsKqov1BU7JUg3JG
-Content-Type: multipart/mixed; boundary="------------nZ6ZwuzGQLany2vGXAZuVnqa"
-
---------------nZ6ZwuzGQLany2vGXAZuVnqa
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-
-On 14/04/2024 13:17, Niklas S=C3=B6derlund wrote:
-> Hi Paul,
->=20
-> Thanks for your patch.
->=20
-> On 2024-04-11 12:44:31 +0100, Paul Barker wrote:
->> The RX loops in ravb_rx_gbeth() and ravb_rx_rcar() skip to the next lo=
-op
->> interation if a zero-length descriptor is seen (indicating a DMA mappi=
-ng
->> error). However, the current rx descriptor index `priv->cur_rx[q]` was=
-
->> incremented at the end of the loop and so would not be incremented whe=
-n
->> we skip to the next loop iteration. This would cause the loop to keep
->> seeing the same zero-length descriptor instead of moving on to the nex=
-t
->> descriptor.
->>
->> As the loop counter `i` still increments, the loop would eventually
->> terminate so there is no risk of being stuck here forever - but we
->> should still fix this to avoid wasting cycles.
->>
->> To fix this, the rx descriptor index is incremented at the top of the
->> loop, in the for statement itself. The assignments of `entry` and `des=
-c`
->> are brought into the loop to avoid the need for duplication.
->>
->> Fixes: d8b48911fd24 ("ravb: fix ring memory allocation")
->> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
->> ---
->>  drivers/net/ethernet/renesas/ravb_main.c | 25 ++++++++++++-----------=
--
->>  1 file changed, 13 insertions(+), 12 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/et=
-hernet/renesas/ravb_main.c
->> index 70f2900648d4..028ab5c6aaf7 100644
->> --- a/drivers/net/ethernet/renesas/ravb_main.c
->> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->> @@ -775,12 +775,15 @@ static bool ravb_rx_gbeth(struct net_device *nde=
-v, int *quota, int q)
->>  	int limit;
->>  	int i;
->> =20
->> -	entry =3D priv->cur_rx[q] % priv->num_rx_ring[q];
->>  	limit =3D priv->dirty_rx[q] + priv->num_rx_ring[q] - priv->cur_rx[q]=
-;
->>  	stats =3D &priv->stats[q];
->> =20
->> -	desc =3D &priv->rx_ring[q].desc[entry];
->> -	for (i =3D 0; i < limit && rx_packets < *quota && desc->die_dt !=3D =
-DT_FEMPTY; i++) {
->> +	for (i =3D 0; i < limit && rx_packets < *quota; i++, priv->cur_rx[q]=
-++) {
->> +		entry =3D priv->cur_rx[q] % priv->num_rx_ring[q];
->> +		desc =3D &priv->rx_ring[q].desc[entry];
->> +		if (desc->die_dt =3D=3D DT_FEMPTY)
->> +			break;
->> +
->>  		/* Descriptor type must be checked before all other reads */
->>  		dma_rmb();
->>  		desc_status =3D desc->msc;
->> @@ -848,9 +851,6 @@ static bool ravb_rx_gbeth(struct net_device *ndev,=
- int *quota, int q)
->>  				break;
->>  			}
->>  		}
->> -
->> -		entry =3D (++priv->cur_rx[q]) % priv->num_rx_ring[q];
->> -		desc =3D &priv->rx_ring[q].desc[entry];
->>  	}
->> =20
->>  	/* Refill the RX ring buffers. */
->> @@ -891,7 +891,6 @@ static bool ravb_rx_rcar(struct net_device *ndev, =
-int *quota, int q)
->>  {
->>  	struct ravb_private *priv =3D netdev_priv(ndev);
->>  	const struct ravb_hw_info *info =3D priv->info;
->> -	int entry =3D priv->cur_rx[q] % priv->num_rx_ring[q];
->>  	struct net_device_stats *stats =3D &priv->stats[q];
->>  	struct ravb_ex_rx_desc *desc;
->>  	struct sk_buff *skb;
->> @@ -900,12 +899,17 @@ static bool ravb_rx_rcar(struct net_device *ndev=
-, int *quota, int q)
->>  	int rx_packets =3D 0;
->>  	u8  desc_status;
->>  	u16 pkt_len;
->> +	int entry;
->>  	int limit;
->>  	int i;
->> =20
->>  	limit =3D priv->dirty_rx[q] + priv->num_rx_ring[q] - priv->cur_rx[q]=
-;
->> -	desc =3D &priv->rx_ring[q].ex_desc[entry];
->> -	for (i =3D 0; i < limit && rx_packets < *quota && desc->die_dt !=3D =
-DT_FEMPTY; i++) {
->> +	for (i =3D 0; i < limit && rx_packets < *quota; i++, priv->cur_rx[q]=
-++) {
->> +		entry =3D priv->cur_rx[q] % priv->num_rx_ring[q];
->> +		desc =3D &priv->rx_ring[q].ex_desc[entry];
->> +		if (desc->die_dt =3D=3D DT_FEMPTY)
->> +			break;
->=20
-> I really like moving the assignment of entry and desc to the top of the=
-=20
-> loop. But I don't like the loop limits as it's hard, at least for me, t=
-o=20
-> immediately see what's going on. How about,
->=20
->     limit =3D min(priv->dirty_rx[q] + priv->num_rx_ring[q] - priv->cur_=
-rx[q], *quota);
->=20
->     for (i =3D 0; i < limit; i++) {
->         entry =3D priv->cur_rx[q] % priv->num_rx_ring[q];
->         desc =3D &priv->rx_ring[q].ex_desc[entry];
->=20
->         /* There are no more valid descriptors after an empty one. */
->         if (desc->die_dt =3D=3D DT_FEMPTY)
->                 break;
->=20
->         ...
->     }
-
-We need to count received packets separately from the number of
-descriptors processed, as done in the previous commit in this series,
-so we can't just have a single check against limit.
-
-We also need to increment priv->cur_rx[q]. If we put `priv->cur_rx[q]++`
-at the end of the loop then we're back to having to worry about it when
-we have a continue statement.
-
-We could move the `rx_packets < *quota` check inside the loop itself,
-but I don't see that as any clearer myself.
-
-Thanks,
-
---=20
-Paul Barker
---------------nZ6ZwuzGQLany2vGXAZuVnqa
-Content-Type: application/pgp-keys; name="OpenPGP_0x27F4B3459F002257.asc"
-Content-Disposition: attachment; filename="OpenPGP_0x27F4B3459F002257.asc"
-Content-Description: OpenPGP public key
-Content-Transfer-Encoding: quoted-printable
-
------BEGIN PGP PUBLIC KEY BLOCK-----
-
-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3D
-=3DsIIN
------END PGP PUBLIC KEY BLOCK-----
-
---------------nZ6ZwuzGQLany2vGXAZuVnqa--
-
---------------Lj0KIDovzsKqov1BU7JUg3JG--
-
---------------C3uv1LR80ijuoFSXv1F6YSxo
-Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="OpenPGP_signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-wnsEABYIACMWIQSiu8gv1Xr0fIw/aoLbaV4Vf/JGvQUCZhzTRgUDAAAAAAAKCRDbaV4Vf/JGvSGC
-AP9/fQru+ck1Df4X+puju9/bEwPqSZ9dhN+T3BMS8C79gAEAk0G8GgkrXd/rT8qvqiprr97gJzB/
-pzhAipECYGwEDwg=
-=ESr7
------END PGP SIGNATURE-----
-
---------------C3uv1LR80ijuoFSXv1F6YSxo--
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
