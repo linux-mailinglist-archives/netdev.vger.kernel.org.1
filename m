@@ -1,75 +1,72 @@
-Return-Path: <netdev+bounces-87896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EDE78A4E27
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:55:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E0418A4E30
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:57:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0395EB21197
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:55:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96D3FB2300F
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:57:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33BB5FBA3;
-	Mon, 15 Apr 2024 11:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C898D66B50;
+	Mon, 15 Apr 2024 11:57:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e2rFr9hW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcZaZPak"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D5D66B5E
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 11:54:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19346605B6;
+	Mon, 15 Apr 2024 11:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713182096; cv=none; b=clbmW652GyeBwyUt7oZDppgToz/e5fHtHaev1DWzWsBKk/oItTBb7ZEq+9HaDtWnh7V2I7/y4WPAVsrBN/PeiVsICqMlRzwyAqLkMbez7q7+8m+k80Byr4oFe3ClN3qXxoxpm2oLbkT9aUPzRViHvJ1eElKo+egA6l1ifo9+gX0=
+	t=1713182245; cv=none; b=Ty/1KxMGPRxsZ3AwgcacEBUARuhUrMT4F4xwtey0JxtTa10tc9r1U2UIRfde9E2KdIOOmEgd8TyGlNkgG9c1SiUpj3Rkov5s4rStAo8hWxQxY+y2fbq6O6T7ysS5ua4Zjol/O1Qr0+z+ba2vAkIlz+N7so8B7pGRiop5L329vOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713182096; c=relaxed/simple;
-	bh=nmTq1IazWH0ggpIPNgor9AcBEtE+UG49sIOyfm6Pv+0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=s516oAfgv0blz59GXrxUmMwX5163UyRqhRuneP3eMSGqkemGR2WOo38fwvQkLn3qDpe9c848QuAtWGgsTvwIkAw5SwtkwcX2DY7lFaJeeqKseml1z6ZSL2VdcwBG1JjLOYJiFxWBnhFSxczjmzuYbVQHeOqOleielJB2Mzf6fhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e2rFr9hW; arc=none smtp.client-ip=209.85.208.52
+	s=arc-20240116; t=1713182245; c=relaxed/simple;
+	bh=xG7070IKtllLIE5Jx5TWiM3Jo+uZEnEHiu8qrG0JR64=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=Xoptb2iF6neYOY2dYd5iN4rZLWmNLEwsRZLMbtVV71iXHfUaEYppoRNrhm99+Y4UOpVT84NA6SYJ02Gzr1PvNgfjTqczPC9dj9g648YNZQQa5eLzvBOsuMf6X25r22KskJqGAbz1/B7WCbVkAtzEvdlLunz+escKkKzeEU3CMzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bcZaZPak; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-56e48d0a632so4969631a12.2
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 04:54:55 -0700 (PDT)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-56e69888a36so4265488a12.3;
+        Mon, 15 Apr 2024 04:57:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713182093; x=1713786893; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ifYOYwSOdGb3z3KqeSqQGutlC3a305b6oeNhEXrjZuU=;
-        b=e2rFr9hWdj0g3q9TVGxRdLKxTLiF1ssHZncb97XZK6o+edwqdntehJqeO23V+DK9GW
-         LesUj39vGHD3ylJC67rItq/TGtOPLeW8Q95lv4pdJBpvLrk2WNydPzUiYf55jhpzXQMQ
-         8i0aleLhls2oqZfYtnCdAKoD9Ts8ER5/xBV0alCmH3FFECFsB39NEPXze2snz5m3bUDZ
-         VBLEyZVoKfaBfCTxDJ+2526GSgbbX1ZVV7W4//Ib1dqBg6YMBm2T3Tz1d/xX5MBFzmjy
-         OtyFsSTG3BCaWOfqs6PgCTWsestJa4QRp9F+b9p9cNWaae6lpgFAyTZjVQQRwx4UQKaA
-         SN0w==
+        d=gmail.com; s=20230601; t=1713182242; x=1713787042; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=52DKIr5XjPxE0lxaaQl58l9lNteOOTdG5ZI5b4uihM0=;
+        b=bcZaZPakz8NgyMhZt2Hirgs3xd6zRLnWViW144qofF+i902oXVHIusb/wfGsONgwgy
+         a4fBedL3E9QKgm/HeHQ61krLsx3Gb2tl7l+epuLTG/w6KkLKlXRWrqyS0XxFqtbUapey
+         YliGasBOvEQYWTcMP5wieSot1ldK7tESM5vvqu9SDCxuDwVFaz0ukPe33ayx8zq53JN/
+         w9bTpFeG6gxls+oOc3GF+XsAonXEAaLUhc0yrR/sI6EpL5BZL6rZQMyIwiU7tfbd3vpp
+         rtla1u2vHBqIkIEN4otZL51c9dHAPoKrQasw/FAqenBcvGWiksFJgz0AOv/rW61tOsIt
+         X3RA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713182093; x=1713786893;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ifYOYwSOdGb3z3KqeSqQGutlC3a305b6oeNhEXrjZuU=;
-        b=HP9lbawomIAM/IeuKkWC7hq7sj0OikN6ps94SLlmVItRl2S2aLgJqF7OxQ4kDaTaz0
-         mlH1TgSsyL6wRZP+X4c9+Q+LlJYWK4V4q7cOQTWKXziZZCkpwyRRuynaMf6xY4m1/KNG
-         hKlyq/i9xB5baZ8HwqmD/8wg/wjST0qLNI2j0NJtYg3m6UJbaNSYqFV+JBgY5qgVbJGD
-         WipeE+7qXQBH1DNem1qYNQsuEhlSzv4dzAKzoBPcXExkWQJGIMb+Nohp5BbUh4RZutBw
-         8VkYbexEO5n8o5SFB43HFcpInvYrb2u535WmsF8wz54kV0xj4caskq6sYF9bKF0GTwDP
-         L07Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXOnW4D5qAiboKcb7HxUH0TmbYg9UhNBVhLVu9jNsbHl2TDPqt9Jd13crKEhcs65gjxBx1XQjuN9hww0W0btzy47fs3lXvj
-X-Gm-Message-State: AOJu0YyzLgQfViFzQseiGbm3dbf3cc9TTL1N8GYKyuBHjw5+U/DeD/w+
-	bg2xfxxdCW2EmlxgrG10j4qYucimMOyZke4B1qvqnfjUrHhef4Nrduyq2A==
-X-Google-Smtp-Source: AGHT+IH2DkBJWWOlkU8b6r039H3yJ6RmX5s+iMASKfPlA2IeKl911Bvr1mjjgTP4qk5Gig5sHFO4iA==
-X-Received: by 2002:a50:a41d:0:b0:568:9d31:2a75 with SMTP id u29-20020a50a41d000000b005689d312a75mr8021764edb.4.1713182093321;
-        Mon, 15 Apr 2024 04:54:53 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713182242; x=1713787042;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=52DKIr5XjPxE0lxaaQl58l9lNteOOTdG5ZI5b4uihM0=;
+        b=kMS+7BNiL2cBOo9opzrfJaCsZcnNNVjh+R5Vg411/W+SSTCuje0U31k2GHO/Tur91b
+         g1XZZ2oAm7tTwPoBguz833NONS3SZPbhOw5HlakJqi8Qiy6Ho8TYHw//9CQ/FaLNLT0m
+         Nq1v5DXTeXpRvMtsemElhdCjGXHnuDPbhUvs0hAMblIwAq9cEa2TNU8lqmP+J+KIWX+P
+         8ZPkrleJaTDZVnK0U2pvTNJTaxREa4irmxg45wTCyo35AYy+udfhb0PNeZwKcdcNwOyA
+         dUL1CFHaHOO82fcfSdn6uA5nz4TJJv5+2W/uBGCD0bkhtr1vgQsYTI0ViRG2k1lJdyIo
+         Y4qw==
+X-Gm-Message-State: AOJu0YwD1klB5gYECD9M3RYIlnLH6u9dF6FzaQKrJTP80I3QaGjOyHGR
+	ipGMCqbVl1ca+1359BqJgBdtmX+uw57ae5klbz4jPQGOZEdFzrY0bcNLHA==
+X-Google-Smtp-Source: AGHT+IGAaiEjAn4cxbXq8ujn9hnbq8IUB4YldWxH41kFI890qXPbI3eIOahSGaPEYsUlTZHDL8+sGA==
+X-Received: by 2002:a17:906:35ce:b0:a52:71af:405d with SMTP id p14-20020a17090635ce00b00a5271af405dmr1015020ejb.56.1713182236138;
+        Mon, 15 Apr 2024 04:57:16 -0700 (PDT)
 Received: from ?IPV6:2a01:c22:6fba:a100:9cae:aacf:9cd8:e36e? (dynamic-2a01-0c22-6fba-a100-9cae-aacf-9cd8-e36e.c22.pool.telefonica.de. [2a01:c22:6fba:a100:9cae:aacf:9cd8:e36e])
-        by smtp.googlemail.com with ESMTPSA id dc3-20020a056402310300b0056e672573e5sm4791240edb.88.2024.04.15.04.54.52
+        by smtp.googlemail.com with ESMTPSA id qb42-20020a1709077eaa00b00a5216df5d25sm5367008ejc.3.2024.04.15.04.57.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Apr 2024 04:54:52 -0700 (PDT)
-Message-ID: <bb0b2488-d5f7-4530-ad30-06b30f064fa7@gmail.com>
-Date: Mon, 15 Apr 2024 13:54:54 +0200
+        Mon, 15 Apr 2024 04:57:15 -0700 (PDT)
+Message-ID: <ded9d793-83f8-4f11-87d9-a218d10c2981@gmail.com>
+Date: Mon, 15 Apr 2024 13:57:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,15 +74,11 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] r8169: fix LED-related deadlock on module removal
-To: Lukas Wunner <lukas@wunner.de>
-Cc: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <6b6b07f5-250c-415e-bdc4-bd08ac69b24d@gmail.com>
- <ZhzqB9_xvEKSkMB7@wunner.de>
-Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net] r8169: fix LED-related deadlock on module removal
+To: "stable@vger.kernel.org" <stable@vger.kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Language: en-US
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
  sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
@@ -129,76 +122,126 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
  H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
  lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
  OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <ZhzqB9_xvEKSkMB7@wunner.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 15.04.2024 10:49, Lukas Wunner wrote:
-> On Mon, Apr 15, 2024 at 08:44:35AM +0200, Heiner Kallweit wrote:
->> Binding devm_led_classdev_register() to the netdev is problematic
->> because on module removal we get a RTNL-related deadlock.
-> 
-> More precisely the issue is triggered on driver unbind.
-> 
-> Module unload as well as device unplug imply driver unbinding.
-> 
-> 
->> The original change was introduced with 6.8, 6.9 added support for
->> LEDs on RTL8125. Therefore the first version of the fix applied on
->> 6.9-rc only. This is the modified version for 6.8.
-> 
-> I guess the recipient of this patch should have been the stable
-> maintainers then, not netdev maintainers.
-> 
-OK, seems this has changed over time. Following still mentioned
-that netdev is special.
-https://www.kernel.org/doc/html/v4.19/process/stable-kernel-rules.html
+Binding devm_led_classdev_register() to the netdev is problematic
+because on module removal we get a RTNL-related deadlock. Fix this
+by avoiding the device-managed LED functions.
 
-> 
->> --- a/drivers/net/ethernet/realtek/r8169.h
->> +++ b/drivers/net/ethernet/realtek/r8169.h
->> @@ -72,6 +72,7 @@ enum mac_version {
->>  };
->>  
->>  struct rtl8169_private;
->> +struct r8169_led_classdev;
-> 
-> Normally these forward declarations are not needed if you're just
-> referencing the struct name in a pointer.  Usage of the struct name
-> in a pointer implies a forward declaration.
-> 
-Even if technically not needed, it seems to be kernel best practice
-to use forward declarations, see e.g. device.h.
-However I'd be interested in hearing the maintainers position to
-consider this with the next submissions.
+Note: We can safely call led_classdev_unregister() for a LED even
+if registering it failed, because led_classdev_unregister() detects
+this and is a no-op in this case.
 
-> 
->> +struct r8169_led_classdev *rtl8168_init_leds(struct net_device *ndev)
->>  {
->> -	/* bind resource mgmt to netdev */
->> -	struct device *dev = &ndev->dev;
->>  	struct r8169_led_classdev *leds;
->>  	int i;
->>  
->> -	leds = devm_kcalloc(dev, RTL8168_NUM_LEDS, sizeof(*leds), GFP_KERNEL);
->> +	leds = kcalloc(RTL8168_NUM_LEDS + 1, sizeof(*leds), GFP_KERNEL);
->>  	if (!leds)
->> -		return;
->> +		return NULL;
->>  
->>  	for (i = 0; i < RTL8168_NUM_LEDS; i++)
->>  		rtl8168_setup_ldev(leds + i, ndev, i);
->> +
->> +	return leds;
->> +}
-> 
-> If registration of some LEDs fails, you seem to continue driver binding.
-> So the leds allocation may stick around even if it's not used at all.
-> Not a big deal, but not super pretty either.
-> 
-> Thanks,
-> 
-> Lukas
-> 
+Fixes: 18764b883e15 ("r8169: add support for LED's on RTL8168/RTL8101")
+Cc: <stable@vger.kernel.org> # 6.8.x
+Reported-by: Lukas Wunner <lukas@wunner.de>
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+The original change was introduced with 6.8, 6.9 added support for
+LEDs on RTL8125. Therefore the first version of the fix applied on
+6.9-rc only. This is the modified version for 6.8.
+Upstream commit: 19fa4f2a85d7
+---
+ drivers/net/ethernet/realtek/r8169.h      |  4 +++-
+ drivers/net/ethernet/realtek/r8169_leds.c | 23 +++++++++++++++++------
+ drivers/net/ethernet/realtek/r8169_main.c |  7 ++++++-
+ 3 files changed, 26 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
+index 81567fcf3..1ef399287 100644
+--- a/drivers/net/ethernet/realtek/r8169.h
++++ b/drivers/net/ethernet/realtek/r8169.h
+@@ -72,6 +72,7 @@ enum mac_version {
+ };
+ 
+ struct rtl8169_private;
++struct r8169_led_classdev;
+ 
+ void r8169_apply_firmware(struct rtl8169_private *tp);
+ u16 rtl8168h_2_get_adc_bias_ioffset(struct rtl8169_private *tp);
+@@ -83,4 +84,5 @@ void r8169_get_led_name(struct rtl8169_private *tp, int idx,
+ 			char *buf, int buf_len);
+ int rtl8168_get_led_mode(struct rtl8169_private *tp);
+ int rtl8168_led_mod_ctrl(struct rtl8169_private *tp, u16 mask, u16 val);
+-void rtl8168_init_leds(struct net_device *ndev);
++struct r8169_led_classdev *rtl8168_init_leds(struct net_device *ndev);
++void r8169_remove_leds(struct r8169_led_classdev *leds);
+diff --git a/drivers/net/ethernet/realtek/r8169_leds.c b/drivers/net/ethernet/realtek/r8169_leds.c
+index 007d077ed..1c97f3cca 100644
+--- a/drivers/net/ethernet/realtek/r8169_leds.c
++++ b/drivers/net/ethernet/realtek/r8169_leds.c
+@@ -138,20 +138,31 @@ static void rtl8168_setup_ldev(struct r8169_led_classdev *ldev,
+ 	led_cdev->hw_control_get_device = r8169_led_hw_control_get_device;
+ 
+ 	/* ignore errors */
+-	devm_led_classdev_register(&ndev->dev, led_cdev);
++	led_classdev_register(&ndev->dev, led_cdev);
+ }
+ 
+-void rtl8168_init_leds(struct net_device *ndev)
++struct r8169_led_classdev *rtl8168_init_leds(struct net_device *ndev)
+ {
+-	/* bind resource mgmt to netdev */
+-	struct device *dev = &ndev->dev;
+ 	struct r8169_led_classdev *leds;
+ 	int i;
+ 
+-	leds = devm_kcalloc(dev, RTL8168_NUM_LEDS, sizeof(*leds), GFP_KERNEL);
++	leds = kcalloc(RTL8168_NUM_LEDS + 1, sizeof(*leds), GFP_KERNEL);
+ 	if (!leds)
+-		return;
++		return NULL;
+ 
+ 	for (i = 0; i < RTL8168_NUM_LEDS; i++)
+ 		rtl8168_setup_ldev(leds + i, ndev, i);
++
++	return leds;
++}
++
++void r8169_remove_leds(struct r8169_led_classdev *leds)
++{
++	if (!leds)
++		return;
++
++	for (struct r8169_led_classdev *l = leds; l->ndev; l++)
++		led_classdev_unregister(&l->led);
++
++	kfree(leds);
+ }
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 4b6c28576..32b73f398 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -634,6 +634,8 @@ struct rtl8169_private {
+ 	const char *fw_name;
+ 	struct rtl_fw *rtl_fw;
+ 
++	struct r8169_led_classdev *leds;
++
+ 	u32 ocp_base;
+ };
+ 
+@@ -4930,6 +4932,9 @@ static void rtl_remove_one(struct pci_dev *pdev)
+ 
+ 	cancel_work_sync(&tp->wk.work);
+ 
++	if (IS_ENABLED(CONFIG_R8169_LEDS))
++		r8169_remove_leds(tp->leds);
++
+ 	unregister_netdev(tp->dev);
+ 
+ 	if (tp->dash_type != RTL_DASH_NONE)
+@@ -5391,7 +5396,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (IS_ENABLED(CONFIG_R8169_LEDS) &&
+ 	    tp->mac_version > RTL_GIGA_MAC_VER_06 &&
+ 	    tp->mac_version < RTL_GIGA_MAC_VER_61)
+-		rtl8168_init_leds(dev);
++		tp->leds = rtl8168_init_leds(dev);
+ 
+ 	netdev_info(dev, "%s, %pM, XID %03x, IRQ %d\n",
+ 		    rtl_chip_infos[chipset].name, dev->dev_addr, xid, tp->irq);
+-- 
+2.44.0
 
 
