@@ -1,263 +1,249 @@
-Return-Path: <netdev+bounces-87766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E22818A4847
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 08:43:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 153308A484A
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 08:44:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B1EF1C20A7A
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 06:43:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E11FB21ADD
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 06:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 138FB1CF8F;
-	Mon, 15 Apr 2024 06:43:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4332E1C68F;
+	Mon, 15 Apr 2024 06:44:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iOTW6ne2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dC85ccET"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E7721BF53
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 06:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F866FDC
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 06:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713163424; cv=none; b=PS/gj12fVdPakQGbvQOf5Z9lk2mrOC5zrJHVd9so232C1IKqboDaNTEFLzr0GQWecH5m8md5tq64NHlvQtJ6GU1ksyusjFu2zLP3XeWnu+1IX3XLhAXIWAKXPG/9FUvL03pJ4BrZ4thsIMop6om1V5JAIiSrt1xEyI2f6hI50cI=
+	t=1713163479; cv=none; b=r+N6NRP7v6H5v1oTWoGK+jAY4/248BMMQfQZ+0GKunSeHnszVIReDfpFUguRTlfQfU2iwVrj45USh8iY8G1u8QOFPYNbWzrjz5yzf3qXoR/KWL5c09JGzDrFjL3/0RYB3ZQ/R/OBqBuGnjrWrnwc4NAAY4hO5pSKWlRrWJs9g7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713163424; c=relaxed/simple;
-	bh=RdIcOgcyiT6r7xyimlOz033BkAjT325a724NR+BTJDg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=r8XxnRbS0MHGps+OFFs1vrAhBiaK1nT1Zse2NDJGPP/GBr/K+aqemGfpjbb33ZgQMDwbrKoecOrrEYRGlqpQZUfoMPKGxWfGDVpC8W8dOd0Ij1iEhei3CdwsasmBgpD7g+IS/3hOQN4ADn9eii/J5wLAHtoaXO7MfVig3YQSU+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iOTW6ne2; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713163420;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=y0FkEixV1SMoS6JyP0TAohi0iz3dd2viGE7qnjR2PVE=;
-	b=iOTW6ne2rCX1T3GE1+NnwdToxJP+044Y1Z5N58IYV9h1XcBdZr809/ecxj9Qre28zcvrnW
-	5sL+YXxYxpvrIQKtR/JgF2+NZURg6kJiQzjRS5yG0V91IqBn0d12yp2KUCr2TINmCPvSgf
-	lkDgvr7X0fh52mrGDXx2kyXsMImbaoE=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-637-p4zypMBsOcaPfDc-QXVU5w-1; Mon, 15 Apr 2024 02:43:37 -0400
-X-MC-Unique: p4zypMBsOcaPfDc-QXVU5w-1
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-5f44b50ed93so2606764a12.1
-        for <netdev@vger.kernel.org>; Sun, 14 Apr 2024 23:43:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713163416; x=1713768216;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+	s=arc-20240116; t=1713163479; c=relaxed/simple;
+	bh=muOnllSoZl6O23KKikGUk4TZrIG+t+Imlc6ljzCayLU=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=ISGUwPCwNo3uLQwHRSe0GrPWDVbGMwO3u+80MGIZRMwA6CZiQhc2UHrI8WUbQXbbCkNtwy085csB9fU8Aum4pM6h6YTe0hoWr3tLzOSMRDm6xNl9vPbm6o6Sebmb++BZbhTs0GESBeXWGqLRjndBmS3UCkrINOu/gZgCjHTMUJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dC85ccET; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-56e1baf0380so2855632a12.3
+        for <netdev@vger.kernel.org>; Sun, 14 Apr 2024 23:44:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713163476; x=1713768276; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=y0FkEixV1SMoS6JyP0TAohi0iz3dd2viGE7qnjR2PVE=;
-        b=gVxmrqR3hZRKuN0BtmHE+1kAgbVzNXIAZ1LcRu9fJBP13Da3FNvdqQfB8EwQUi34VI
-         vMcFePypA+vTsgKrFocQYA6vbtmCl4ofPpFeYSZZEJU+woexn9pq8XFGYDRgF/VDuTC6
-         7X/mG0gsgSxTeKVrCe4ZWtUnECsbLBLXt/7pv09NPP7iLmTXAg2od7u8Aigf41UybAe7
-         aGzHD9HAth5vyyA6Nz9TVrlMSlS9xvaS9R9GVWAjiDhmYfI9iBqFZXK5DMztk9THy43L
-         t7dtZ+657Z1qw0ZjphZdN/9qk/W3djNEComWTBCBEzhStXI7ggjZtMApdL5FkRVNXTOL
-         1TsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWts2JfKs5nmrV5vkoytw4E8RhCAahiTq86GHzxJwTr+H5uXA5HbujzYCUfGKWdi/7uuxkZNUbwJlRJ6pHEzXqfleIsLCsi
-X-Gm-Message-State: AOJu0YyHxn2TzgvrpyUjdRVmk6koCMcIkUM1hxJuJauSOo84k2mTIdvL
-	BHXm5ncpbfxiLvms/6q5CX7uIbch8ONU3wcwcPujOgO2/lqW7XMN9gvIvKbRCR4S8WnnhZKfokP
-	yAYLuWLiPsusPPBZa7bCneHn5Du9FS4ZO4StGvLntkxiFk8vI9Sn934OxDvT/bnB5pIMbRexaZ+
-	29RfMRFsQFLWadJGLkD5OFq8kWyR4c
-X-Received: by 2002:a05:6a21:3a48:b0:1a7:88c3:85ed with SMTP id zu8-20020a056a213a4800b001a788c385edmr14550806pzb.1.1713163416538;
-        Sun, 14 Apr 2024 23:43:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGUyo+zFu6fYAaRPwm/zOTfDzl7Vl14Ykftwb8RTn2Y4Y7aLacbTxtUkyTSDzmwFgYIej6ULDJqX0cFq2ZnkoE=
-X-Received: by 2002:a05:6a21:3a48:b0:1a7:88c3:85ed with SMTP id
- zu8-20020a056a213a4800b001a788c385edmr14550792pzb.1.1713163416259; Sun, 14
- Apr 2024 23:43:36 -0700 (PDT)
+        bh=nsKEef/8UVcHB23rhZt8X0XngLNk9bP7uWzT5MgiAgc=;
+        b=dC85ccET9yCF5aVDT1zzilMhVjmyFgvsjGyy5ACKRmRm1yOTagmbbLuR+QxHAmz5iw
+         zf7QyTPRevCm4EfF8ZxZfWIHj3pWF0abF93hcd2FyyD6EeZarcxHYccPkwVb8qUgPRAn
+         XG2gGeUke+5zQgvCb/Nq1TzkGnb5mJMCa+LOj1jPjaH6A8veCchb/RfZdcEvfaDM4kF0
+         tuhROj3zqJK3ZidlwJ1SWQuCEF2r3VgG8SrrAZrC4JtqgvBjF01KNr9eJa375BKMEZ1M
+         YTelBganXEEkghWWTkkeYJ8NaTCqOiOuDoKE2TKbxIcHFm5SsZea4qa5VvjFDDXCpKZX
+         acUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713163476; x=1713768276;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=nsKEef/8UVcHB23rhZt8X0XngLNk9bP7uWzT5MgiAgc=;
+        b=KgGEQXTIFKEE2uRMnMvOpUuYtahFlCcs1IARuNVo6e8vTFf+E5u/lLgOuXRqiEHw/w
+         mPXWCPERxWoSG9ESN3sqrDzKVxrycpkG5JIhKFuL3aT/X1ni8YmryZsYeCJJSs0n3lkg
+         tg6HikG0ZKd6MJm25FrWV+0O2o8NSYvdO+QkU8kbHCweLeUL38h9aG3knfkaMhwvIfpg
+         0M2EbrcDSdOUWWhO+qGPb9+ryksDpLwDX7GOmF17VnqgEu+f82FQxGnojbBKGeuupNLq
+         0J3Mg4fBERgpHoKyfz2GihGD1RKv6Zj9yE+y4EUnHheD45zldc7a105USdBHzLkCrub/
+         oo0A==
+X-Forwarded-Encrypted: i=1; AJvYcCUnY2RpPIyqXnZme1dv6s6uaZ5ileLNX0tvlOCGcCP8LP7STVGsx5b2G+ZKPJSh42ejvib+YmQmZ609mfLUQfUhKKmuliEP
+X-Gm-Message-State: AOJu0YzIgDIlIK4l0KmfAbH8lMS6VmhKdcK1QQEJVJ8+Pc0u6yIaOiCb
+	l4SV0pgSOTl4E5XhUSXhl47QBsLXH1iFg5JKpsqJ2gurQcEdomj5
+X-Google-Smtp-Source: AGHT+IH3SWqTeVUjKTg6vHBBveTjVIYYamRzvWXkX4ND75yenXCjPfDFx3W/8eqsJZA3U1xgPBkBAQ==
+X-Received: by 2002:a50:8d50:0:b0:570:3b4:53ff with SMTP id t16-20020a508d50000000b0057003b453ffmr4667313edt.6.1713163475518;
+        Sun, 14 Apr 2024 23:44:35 -0700 (PDT)
+Received: from ?IPV6:2a01:c22:6fba:a100:2db3:4802:9fc3:ac48? (dynamic-2a01-0c22-6fba-a100-2db3-4802-9fc3-ac48.c22.pool.telefonica.de. [2a01:c22:6fba:a100:2db3:4802:9fc3:ac48])
+        by smtp.googlemail.com with ESMTPSA id n22-20020aa7c796000000b0056feeb85ed0sm3939365eds.19.2024.04.14.23.44.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 14 Apr 2024 23:44:34 -0700 (PDT)
+Message-ID: <6b6b07f5-250c-415e-bdc4-bd08ac69b24d@gmail.com>
+Date: Mon, 15 Apr 2024 08:44:35 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240411025127.51945-1-xuanzhuo@linux.alibaba.com>
- <20240411025127.51945-4-xuanzhuo@linux.alibaba.com> <CACGkMEsC7AEi2SOmqNOo6KJDpx92raGWYwYzxZ_MVhmnco_LYQ@mail.gmail.com>
- <1712900153.3715405-1-xuanzhuo@linux.alibaba.com> <CACGkMEvKC6JpsznW57GgxFBMhmMSk4eCZPvESpew9j5qfp9=RA@mail.gmail.com>
- <1713146919.8867755-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1713146919.8867755-1-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 15 Apr 2024 14:43:24 +0800
-Message-ID: <CACGkMEvmaH9NE-5VDBPpZOpAAg4bX39Lf0-iGiYzxdV5JuZWww@mail.gmail.com>
-Subject: Re: [PATCH vhost 3/6] virtio_net: replace private by pp struct inside page
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>
+Cc: Lukas Wunner <lukas@wunner.de>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net] r8169: fix LED-related deadlock on module removal
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 15, 2024 at 10:35=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.=
-com> wrote:
->
-> On Fri, 12 Apr 2024 13:49:12 +0800, Jason Wang <jasowang@redhat.com> wrot=
-e:
-> > On Fri, Apr 12, 2024 at 1:39=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
-ba.com> wrote:
-> > >
-> > > On Fri, 12 Apr 2024 12:47:55 +0800, Jason Wang <jasowang@redhat.com> =
-wrote:
-> > > > On Thu, Apr 11, 2024 at 10:51=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.=
-alibaba.com> wrote:
-> > > > >
-> > > > > Now, we chain the pages of big mode by the page's private variabl=
-e.
-> > > > > But a subsequent patch aims to make the big mode to support
-> > > > > premapped mode. This requires additional space to store the dma a=
-ddr.
-> > > > >
-> > > > > Within the sub-struct that contains the 'private', there is no su=
-itable
-> > > > > variable for storing the DMA addr.
-> > > > >
-> > > > >                 struct {        /* Page cache and anonymous pages=
- */
-> > > > >                         /**
-> > > > >                          * @lru: Pageout list, eg. active_list pr=
-otected by
-> > > > >                          * lruvec->lru_lock.  Sometimes used as a=
- generic list
-> > > > >                          * by the page owner.
-> > > > >                          */
-> > > > >                         union {
-> > > > >                                 struct list_head lru;
-> > > > >
-> > > > >                                 /* Or, for the Unevictable "LRU l=
-ist" slot */
-> > > > >                                 struct {
-> > > > >                                         /* Always even, to negate=
- PageTail */
-> > > > >                                         void *__filler;
-> > > > >                                         /* Count page's or folio'=
-s mlocks */
-> > > > >                                         unsigned int mlock_count;
-> > > > >                                 };
-> > > > >
-> > > > >                                 /* Or, free page */
-> > > > >                                 struct list_head buddy_list;
-> > > > >                                 struct list_head pcp_list;
-> > > > >                         };
-> > > > >                         /* See page-flags.h for PAGE_MAPPING_FLAG=
-S */
-> > > > >                         struct address_space *mapping;
-> > > > >                         union {
-> > > > >                                 pgoff_t index;          /* Our of=
-fset within mapping. */
-> > > > >                                 unsigned long share;    /* share =
-count for fsdax */
-> > > > >                         };
-> > > > >                         /**
-> > > > >                          * @private: Mapping-private opaque data.
-> > > > >                          * Usually used for buffer_heads if PageP=
-rivate.
-> > > > >                          * Used for swp_entry_t if PageSwapCache.
-> > > > >                          * Indicates order in the buddy system if=
- PageBuddy.
-> > > > >                          */
-> > > > >                         unsigned long private;
-> > > > >                 };
-> > > > >
-> > > > > But within the page pool struct, we have a variable called
-> > > > > dma_addr that is appropriate for storing dma addr.
-> > > > > And that struct is used by netstack. That works to our advantage.
-> > > > >
-> > > > >                 struct {        /* page_pool used by netstack */
-> > > > >                         /**
-> > > > >                          * @pp_magic: magic value to avoid recycl=
-ing non
-> > > > >                          * page_pool allocated pages.
-> > > > >                          */
-> > > > >                         unsigned long pp_magic;
-> > > > >                         struct page_pool *pp;
-> > > > >                         unsigned long _pp_mapping_pad;
-> > > > >                         unsigned long dma_addr;
-> > > > >                         atomic_long_t pp_ref_count;
-> > > > >                 };
-> > > > >
-> > > > > On the other side, we should use variables from the same sub-stru=
-ct.
-> > > > > So this patch replaces the "private" with "pp".
-> > > > >
-> > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > > ---
-> > > >
-> > > > Instead of doing a customized version of page pool, can we simply
-> > > > switch to use page pool for big mode instead? Then we don't need to
-> > > > bother the dma stuffs.
-> > >
-> > >
-> > > The page pool needs to do the dma by the DMA APIs.
-> > > So we can not use the page pool directly.
-> >
-> > I found this:
-> >
-> > define PP_FLAG_DMA_MAP         BIT(0) /* Should page_pool do the DMA
-> >                                         * map/unmap
-> >
-> > It seems to work here?
->
->
-> I have studied the page pool mechanism and believe that we cannot use it
-> directly. We can make the page pool to bypass the DMA operations.
-> This allows us to handle DMA within virtio-net for pages allocated from t=
-he page
-> pool. Furthermore, we can utilize page pool helpers to associate the DMA =
-address
-> to the page.
->
-> However, the critical issue pertains to unmapping. Ideally, we want to re=
-turn
-> the mapped pages to the page pool and reuse them. In doing so, we can omi=
-t the
-> unmapping and remapping steps.
->
-> Currently, there's a caveat: when the page pool cache is full, it disconn=
-ects
-> and releases the pages. When the pool hits its capacity, pages are relinq=
-uished
-> without a chance for unmapping.
+Binding devm_led_classdev_register() to the netdev is problematic
+because on module removal we get a RTNL-related deadlock. Fix this
+by avoiding the device-managed LED functions.
 
-Technically, when ptr_ring is full there could be a fallback, but then
-it requires expensive synchronization between producer and consumer.
-For virtio-net, it might not be a problem because add/get has been
-synchronized. (It might be relaxed in the future, actually we've
-already seen a requirement in the past for virito-blk).
+Note: We can safely call led_classdev_unregister() for a LED even
+if registering it failed, because led_classdev_unregister() detects
+this and is a no-op in this case.
 
-> If we were to unmap pages each time before
-> returning them to the pool, we would negate the benefits of bypassing the
-> mapping and unmapping process altogether.
+Fixes: 18764b883e15 ("r8169: add support for LED's on RTL8168/RTL8101")
+Cc: <stable@vger.kernel.org> # 6.8.x
+Reported-by: Lukas Wunner <lukas@wunner.de>
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+The original change was introduced with 6.8, 6.9 added support for
+LEDs on RTL8125. Therefore the first version of the fix applied on
+6.9-rc only. This is the modified version for 6.8.
+---
+ drivers/net/ethernet/realtek/r8169.h      |  4 +++-
+ drivers/net/ethernet/realtek/r8169_leds.c | 23 +++++++++++++++++------
+ drivers/net/ethernet/realtek/r8169_main.c |  7 ++++++-
+ 3 files changed, 26 insertions(+), 8 deletions(-)
 
-Yes, but the problem in this approach is that it creates a corner
-exception where dma_addr is used outside the page pool.
-
-Maybe for big mode it doesn't matter too much if there's no
-performance improvement.
-
-Thanks
-
->
-> Thanks.
->
->
->
-> >
-> > Thanks
-> >
-> > >
-> > > Thanks.
-> > >
-> > >
-> > > >
-> > > > Thanks
-> > > >
-> > >
-> >
->
+diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
+index 81567fcf3..1ef399287 100644
+--- a/drivers/net/ethernet/realtek/r8169.h
++++ b/drivers/net/ethernet/realtek/r8169.h
+@@ -72,6 +72,7 @@ enum mac_version {
+ };
+ 
+ struct rtl8169_private;
++struct r8169_led_classdev;
+ 
+ void r8169_apply_firmware(struct rtl8169_private *tp);
+ u16 rtl8168h_2_get_adc_bias_ioffset(struct rtl8169_private *tp);
+@@ -83,4 +84,5 @@ void r8169_get_led_name(struct rtl8169_private *tp, int idx,
+ 			char *buf, int buf_len);
+ int rtl8168_get_led_mode(struct rtl8169_private *tp);
+ int rtl8168_led_mod_ctrl(struct rtl8169_private *tp, u16 mask, u16 val);
+-void rtl8168_init_leds(struct net_device *ndev);
++struct r8169_led_classdev *rtl8168_init_leds(struct net_device *ndev);
++void r8169_remove_leds(struct r8169_led_classdev *leds);
+diff --git a/drivers/net/ethernet/realtek/r8169_leds.c b/drivers/net/ethernet/realtek/r8169_leds.c
+index 007d077ed..1c97f3cca 100644
+--- a/drivers/net/ethernet/realtek/r8169_leds.c
++++ b/drivers/net/ethernet/realtek/r8169_leds.c
+@@ -138,20 +138,31 @@ static void rtl8168_setup_ldev(struct r8169_led_classdev *ldev,
+ 	led_cdev->hw_control_get_device = r8169_led_hw_control_get_device;
+ 
+ 	/* ignore errors */
+-	devm_led_classdev_register(&ndev->dev, led_cdev);
++	led_classdev_register(&ndev->dev, led_cdev);
+ }
+ 
+-void rtl8168_init_leds(struct net_device *ndev)
++struct r8169_led_classdev *rtl8168_init_leds(struct net_device *ndev)
+ {
+-	/* bind resource mgmt to netdev */
+-	struct device *dev = &ndev->dev;
+ 	struct r8169_led_classdev *leds;
+ 	int i;
+ 
+-	leds = devm_kcalloc(dev, RTL8168_NUM_LEDS, sizeof(*leds), GFP_KERNEL);
++	leds = kcalloc(RTL8168_NUM_LEDS + 1, sizeof(*leds), GFP_KERNEL);
+ 	if (!leds)
+-		return;
++		return NULL;
+ 
+ 	for (i = 0; i < RTL8168_NUM_LEDS; i++)
+ 		rtl8168_setup_ldev(leds + i, ndev, i);
++
++	return leds;
++}
++
++void r8169_remove_leds(struct r8169_led_classdev *leds)
++{
++	if (!leds)
++		return;
++
++	for (struct r8169_led_classdev *l = leds; l->ndev; l++)
++		led_classdev_unregister(&l->led);
++
++	kfree(leds);
+ }
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 4b6c28576..32b73f398 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -634,6 +634,8 @@ struct rtl8169_private {
+ 	const char *fw_name;
+ 	struct rtl_fw *rtl_fw;
+ 
++	struct r8169_led_classdev *leds;
++
+ 	u32 ocp_base;
+ };
+ 
+@@ -4930,6 +4932,9 @@ static void rtl_remove_one(struct pci_dev *pdev)
+ 
+ 	cancel_work_sync(&tp->wk.work);
+ 
++	if (IS_ENABLED(CONFIG_R8169_LEDS))
++		r8169_remove_leds(tp->leds);
++
+ 	unregister_netdev(tp->dev);
+ 
+ 	if (tp->dash_type != RTL_DASH_NONE)
+@@ -5391,7 +5396,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	if (IS_ENABLED(CONFIG_R8169_LEDS) &&
+ 	    tp->mac_version > RTL_GIGA_MAC_VER_06 &&
+ 	    tp->mac_version < RTL_GIGA_MAC_VER_61)
+-		rtl8168_init_leds(dev);
++		tp->leds = rtl8168_init_leds(dev);
+ 
+ 	netdev_info(dev, "%s, %pM, XID %03x, IRQ %d\n",
+ 		    rtl_chip_infos[chipset].name, dev->dev_addr, xid, tp->irq);
+-- 
+2.44.0
 
 
