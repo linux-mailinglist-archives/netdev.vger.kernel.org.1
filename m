@@ -1,67 +1,78 @@
-Return-Path: <netdev+bounces-88061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D347F8A5800
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:40:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B80918A581C
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:49:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3FF9EB2515A
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:40:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA18EB20B35
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:49:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 501B882C6C;
-	Mon, 15 Apr 2024 16:38:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0114F823BF;
+	Mon, 15 Apr 2024 16:49:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="IGdTDLf6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="H8aefQLd"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D0182485;
-	Mon, 15 Apr 2024 16:38:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6997E8062B
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 16:49:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713199121; cv=none; b=J3bxOEvG5/v+oVB8S5upB+VxY0VsruVlVGfNNldSCcv85oE5sgKDtXqfCCzNswKuoJmRpSqTEj5s1uERvrjRtOBmG67rIwqcV+jEmkRwPs6BA/l2XFIWBcSM3Mkv7+7SOauzcv0og1OLHeCVhPN2C5ICocEr85UAiUIXH1fjseA=
+	t=1713199759; cv=none; b=EmXgUqWy7O70wUXl1ORNMY3XEofbLox2bKuP3W26Bf22KwQkrURwB5Ti6dJu1rGnRVFMRzL0/6N21vi2Mff08iZLTaspMQFApl+FBY0pgaIBs+8SnkMXC4730dJcw+/FSrJcHumPdP3Ct07OVRQPDBeRIcWHyP6cdcMM/ofuk1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713199121; c=relaxed/simple;
-	bh=Iu3sKE+YRCqwKdiAB3om3hv5zVJb0LpbWJ23pVnz8Cg=;
+	s=arc-20240116; t=1713199759; c=relaxed/simple;
+	bh=HQsEQ4x8gLH8yJ4LsYcF3uXuTSqrpNMtkS9sHMjjyBg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nrBHxxGrvGPl277AJG5SuJlgmm99YKP0yUAifKdIUJ8RmLE4z8yYARfzl1NjspbH+tr1PVgEXckSL1Pyty8Wh+8HyilUuq2SpIwMpejQBu3ofwghyfHNoMzcDWAl4921cgswsY4LOtDu4AB9bOkJa7CENYRDCGIZ3olUDLaxShk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=IGdTDLf6; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1127)
-	id CFF9E20FC5F5; Mon, 15 Apr 2024 09:38:32 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com CFF9E20FC5F5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1713199112;
-	bh=LhdsE6efodYH8GQvxcpPZhNnPBH3tY5kGI4QxFJUD7A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IGdTDLf6NwimYdoARfgYLzKymBbs2nS+TCIfTqZBb1p/2QYvV1Jy2p9AcHrIVGbyx
-	 wWNZ/6STv4qrFKgJ8h9jsk3naDFVR9zZ+6BOndDZ0reksraiMZRhJMSdbWw5C5xs+i
-	 1qVsQkuqaNM6aI3DB4RwYnFb9zlWr/lKUQLRGxbg=
-Date: Mon, 15 Apr 2024 09:38:32 -0700
-From: Saurabh Singh Sengar <ssengar@linux.microsoft.com>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	 Content-Type:Content-Disposition:In-Reply-To; b=UyQG0UA9Ux0RbyRlkuX3kYQkVQ3qTCpAL94HZLYT5A9ql0c8ZnGAtuzZKDMh60q+Ck/IRsO/EUgFcJzkSERyY1VsEGFXToJJfT1k9sBPcSnGZIvHszmRDYaVG32nQx7/4YV1ZY0evdg286XppaeeRpuCcGoIPCcU+kRT9nkbqQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=H8aefQLd; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=iB8ajGMhWxfvOG8pC5ljb7uqZ3qeS8bW6gHpL/q825k=; b=H8aefQLdQnB24ZcmRgmjJ4tpkS
+	pXPnKgbCDJq5egAO/AMknlQEFPliBL1306HsQB3UbshILjKLW/WFo7QYNKq2yEz/GlJGs8jnKaw2p
+	TuIUBViKjmWZQZWU4ZsgGm2n1/QW61TKGcj6rBE5vZBw5yETLI/YyeMJPN8UJ5kYQMbs6pQDJHA4j
+	ZsQHOzdDZMGnECBIxQ0g+bWAdc1RtG61PQg1nXt3pZDicbsflRAbxal4qbRNWRTuhaskEXjOx/qka
+	KMwGd9NQ4XGbywsdeUIvLwgTHmZkUK4BalzNUpvt/xR1XoqOx65MYNVhCklwhoqLJvpZUHEVnvJbY
+	6XCCVPmA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55540)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rwPVw-0006qk-0F;
+	Mon, 15 Apr 2024 17:49:04 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rwPVt-0002L0-Or; Mon, 15 Apr 2024 17:49:01 +0100
+Date: Mon, 15 Apr 2024 17:49:01 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Michael Kelley <mikelley@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Subject: Re: [PATCH net-next] net: mana: Add new device attributes for mana
-Message-ID: <20240415163832.GA28558@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1713174589-29243-1-git-send-email-shradhagupta@linux.microsoft.com>
+	Colin Foster <colin.foster@in-advantage.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: felix: provide own phylink MAC
+ operations
+Message-ID: <Zh1afZNFnl0DObX0@shell.armlinux.org.uk>
+References: <E1rvIcO-006bQQ-Md@rmk-PC.armlinux.org.uk>
+ <E1rvIcO-006bQQ-Md@rmk-PC.armlinux.org.uk>
+ <20240415103453.drozvtf7tnwtpiht@skbuf>
+ <Zh1GvcOTXqb7CpQt@shell.armlinux.org.uk>
+ <20240415160150.yejcazpjqvn7vhxu@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,58 +81,101 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1713174589-29243-1-git-send-email-shradhagupta@linux.microsoft.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20240415160150.yejcazpjqvn7vhxu@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Apr 15, 2024 at 02:49:49AM -0700, Shradha Gupta wrote:
-> Add new device attributes to view multiport, msix, and adapter MTU
-> setting for MANA device.
+On Mon, Apr 15, 2024 at 07:01:50PM +0300, Vladimir Oltean wrote:
+> On Mon, Apr 15, 2024 at 04:24:45PM +0100, Russell King (Oracle) wrote:
+> > Looking at these three, isn't there good reason to merge the allocation
+> > and initialisation of struct dsa_switch together in all three drivers?
+> > All three are basically doing the same thing:
+> > 
+> > felix_vsc9959.c:
+> >         ds->dev = &pdev->dev;
+> >         ds->num_ports = felix->info->num_ports;
+> >         ds->num_tx_queues = felix->info->num_tx_queues;
+> >         ds->ops = &felix_switch_ops;
+> >         ds->priv = ocelot;
+> >         felix->ds = ds;
+> > 
+> > ocelot_ext.c:
+> >         ds->dev = dev;
+> >         ds->num_ports = felix->info->num_ports;
+> >         ds->num_tx_queues = felix->info->num_tx_queues;
+> >         ds->ops = &felix_switch_ops;
+> >         ds->priv = ocelot;
+> >         felix->ds = ds;
+> > 
+> > seville_vsc9953.c:
+> >         ds->dev = &pdev->dev;
+> >         ds->num_ports = felix->info->num_ports;
+> >         ds->ops = &felix_switch_ops;
+> >         ds->priv = ocelot;
+> >         felix->ds = ds;
 > 
-> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> ---
->  .../net/ethernet/microsoft/mana/gdma_main.c   | 74 +++++++++++++++++++
->  include/net/mana/gdma.h                       |  9 +++
->  2 files changed, 83 insertions(+)
+> Yes, there is :)
 > 
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> index 1332db9a08eb..6674a02cff06 100644
-> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> @@ -1471,6 +1471,65 @@ static bool mana_is_pf(unsigned short dev_id)
->  	return dev_id == MANA_PF_DEVICE_ID;
->  }
->  
-> +static ssize_t mana_attr_show(struct device *dev,
-> +			      struct device_attribute *attr, char *buf)
-> +{
-> +	struct pci_dev *pdev = to_pci_dev(dev);
-> +	struct gdma_context *gc = pci_get_drvdata(pdev);
-> +	struct mana_context *ac = gc->mana.driver_data;
-> +
-> +	if (strcmp(attr->attr.name, "mport") == 0)
-> +		return snprintf(buf, PAGE_SIZE, "%d\n", ac->num_ports);
-> +	else if (strcmp(attr->attr.name, "adapter_mtu") == 0)
-> +		return snprintf(buf, PAGE_SIZE, "%d\n", gc->adapter_mtu);
-> +	else if (strcmp(attr->attr.name, "msix") == 0)
-> +		return snprintf(buf, PAGE_SIZE, "%d\n", gc->max_num_msix);
-> +	else
-> +		return -EINVAL;
-> +}
-> +
-> +static int mana_gd_setup_sysfs(struct pci_dev *pdev)
-> +{
-> +	struct gdma_context *gc = pci_get_drvdata(pdev);
-> +	int retval = 0;
-> +
-> +	gc->mana_attributes.mana_mport_attr.attr.name = "mport";
-> +	gc->mana_attributes.mana_mport_attr.attr.mode = 0444;
-> +	gc->mana_attributes.mana_mport_attr.show = mana_attr_show;
-> +	sysfs_attr_init(&gc->mana_attributes.mana_mport_attr);
-> +	retval = device_create_file(&pdev->dev,
-> +				    &gc->mana_attributes.mana_mport_attr);
+> If dev_set_drvdata() were to be used instead of platform_set_drvdata()/
+> pci_set_drvdata(), there's room for even more common code.
+> 
+> > Also, I note that felix->info->num_tx_queues on seville_vsc9953.c
+> > is set to OCELOT_NUM_TC, which is defined to be 8, and is the same
+> > value for ocelot_ext and felix_vsc9959. Presumably this unintentionally
+> > missing from seville_vsc9953.c... because why initialise a private
+> > struct member to a non-zero value and then not use it.
+> > 
+> > An alternative would be to initialise .num_tx_queues in seville_vsc9953.c
+> > to zero.
+> 
+> It makes me wonder why felix->info->num_tx_queues even exists...
+> 
+> It was introduced by commit de143c0e274b ("net: dsa: felix: Configure
+> Time-Aware Scheduler via taprio offload") at a time when vsc9959
+> (LS1028A) was the only switch supported by the driver. It seems
+> unnecessary.
+> 
+> 8 traffic classes, and 1 queue per traffic class, is a common
+> architectural feature of all switches in the family. So they could all
+> just set OCELOT_NUM_TC in the common allocation function and be fine
+> (and remove felix->info->num_tx_queues).
+> 
+> When num_tx_queues=0, this is implicitly converted to 1 by dsa_user_create(),
+> and this is good enough for basic operation for a switch port. The tc
+> qdisc offload layer works with netdev TX queues, so for QoS offload we
+> need to pretend we have multiple TX queues. The VSC9953, like ocelot_ext,
+> doesn't export QoS offload, so it doesn't really matter. But we can
+> definitely set num_tx_queues=8 for all switches.
+> 
+> > If we had common code doing this initialisation, then it wouldn't be
+> > missed... and neither would have _this_ addition of the phylink MAC
+> > ops missed the other two drivers - so I think that's something which
+> > should be done as a matter of course - and thus there will be no need
+> > to export these two data structures, just an initialisation (and
+> > destruction) function. I don't think we would even need the destruction
+> > function if we used devm_kzalloc().
+> > 
+> > Good idea?
+> 
+> Looking again at the driver, I see it's not very consistent in its use of
+> devres... It is used elsewhere, including in felix_pci_probe() itself:
+> devm_request_threaded_irq().
+> 
+> Yes, I think the use of devres here would be an improvement.
+> 
+> Note that felix_pci_probe() will still have to call pci_disable_device()
+> on the error teardown path.
+> 
+> For even more consistency, it would be great if the error teardown
+> labels were called after what they do, rather than after the path that
+> triggered them. Example:
+> - goto err_pci_enable -> goto out
+> - goto err_alloc_felix -> goto out_pci_disable
 
-if you can use .dev_groups, sysfs creation and removal will be lot more
-simplified for the driver.
+Sounds like there's an opportunity to beneficially clean this driver
+up before I make this change, so I'll hold off this patch until that's
+happened. I probably don't have the spare cycles for that.
 
-- Saurabh
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
