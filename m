@@ -1,228 +1,320 @@
-Return-Path: <netdev+bounces-87814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4403C8A4B6C
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:28:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 181CA8A4B75
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:30:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 630411C20821
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:28:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 383091C2109A
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:30:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A4603CF6A;
-	Mon, 15 Apr 2024 09:28:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB863FE55;
+	Mon, 15 Apr 2024 09:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R1cQA0vJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bQxYtHwC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DED1BF2B
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 09:28:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E60733FB99
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 09:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713173298; cv=none; b=jJ6I57IeoNHzHpEY2cSFzr05JRSmdynwV8tyFuKK39ws2O4LOI8M7TmdjxxEqQkjmSVwigej1plFDClIDUfHxRv9AiwDHkhhAbRxA/UT5M0nEHWxCgvlBnrJUkGFpIQ7u8kcDSxSN7nuUmmvS34eFiPeerg97R1CASXxPsJ4l9M=
+	t=1713173405; cv=none; b=qDkoFFFIJa2sGnNmfDduZPOso2lHvdth7kNDD7+t/XPk7zTl0U+YpVmKSYjQrkV6ZeM7dUFnFhomI/VRiAh7Yd6SnTcrm0Ph6llH7nVQ2zdwlOTka2IWCC2M5kSkXJh0aLuCnYzhhHyLZz5QA342wxM46/3FObDLjXtTiA2/j3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713173298; c=relaxed/simple;
-	bh=Rtwf1LUZ0C5de0f4l9YxH+EU9vb5sTlrq63++U9G8qA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WIBtEyfxQRQuxAk01kycvS/cI+knZmaYTGJYG0CrpPTGIFPD678acauT3oS9qhXK4SYOEmP5/dS4cGSLJcFYn+PvqS1jFrIEX0exwnf7kiUGIAGuwvLGJLix40KEgZ5RyAW0Z0OD4yQumPfP+OxBD4DhjMjp/X0BtiZyqQAxGHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R1cQA0vJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713173296;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=h7bR2LedUATRVDf655y2bhnsuMbO0tp6N20IPGhI3FM=;
-	b=R1cQA0vJB8DIC5nSlA1KomT3VYva1qDMP1JOxdiN7UP0o8iOKPAecPI/gXS8c1yRdwqtj2
-	8Cv6PULNnbbNuAMOgLQ3iZGLSSVacHMYc6Z48PTTDUMvOkZbfpdIjv9Lk5qVQ3S7csREiX
-	ZJwJQjF90h/UvwHW3vcZksYlBdeSgTk=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-572-G21HE-PiOCulqaqVKiGcpg-1; Mon, 15 Apr 2024 05:28:14 -0400
-X-MC-Unique: G21HE-PiOCulqaqVKiGcpg-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-347744e151aso322199f8f.0
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 02:28:13 -0700 (PDT)
+	s=arc-20240116; t=1713173405; c=relaxed/simple;
+	bh=jgTcNN+S3ycEmYHulRrTUWpfdKBOBWs4500TU2VTpiY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=amzP0+Q9zb5A1mkeO6CqiPZFqnD5NXv/msNy5LNJwmJGepVgQ6xI0gTlGqUw431zC80YSbFKtxD/wkUNfdGkR7i+eMTayT/0o0NBh4EAzXvzbn3DrUdeeQE+O5JEELRmOsk3tWtTVN9fwxviOUlY/l7AA9I/852PiejNUL2zLVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bQxYtHwC; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5700ed3017fso11540a12.1
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 02:30:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713173402; x=1713778202; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jNj6qSBxPtBl3RQXTzkrjLin4rllOTR1hjVXVlg3sZw=;
+        b=bQxYtHwCebJtCosuAZHc9WPx4eGgJB09vVe1VUFXqjVLOd56QbkHoQNwKgXYWnWDGs
+         yioqOzt0r7qkC1AcRfYF474TQHO30196YRD4sgmtolNYTtuSIF9tnQbr/YJ2cklS8Pyo
+         gVcAUOEudEisZSBooadKYXdhjd7AGSMN48Ib1TAA0eckXJHrAt+jWotq2XUpsmCD3p6w
+         JN2+sjd3LkJY+5b7F43O9b/vbfma/3/8INx3CzGTTo1ZZe8zSxGNukJO3CwjUm0qD54Q
+         95QR6jpirJwXnCYwjWyNAu4QAJ9I6B/LExlREgCLcZgPUMrAD1meHcZznx5SOzBIOdrS
+         q3dQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713173293; x=1713778093;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h7bR2LedUATRVDf655y2bhnsuMbO0tp6N20IPGhI3FM=;
-        b=H7ztfi61otGXGUzaQpth7xwEYPiQ9//ksWGDutMZ8aqb4efPVz5/epsTVCVbUcoS8R
-         ekMdT+c2a3k8ONZ7cuy0CpnuGOuF8PIIm2LSNSuyYecuSbl0bpZ1q4YeioGGv090eMvi
-         bO+E7LTW6en7UxEafow4BiwzEYfkSCOhXmJXl/gbUkFU79o1mJepkZ+nXBKlpW8VlVec
-         kLBUV6eQRlxYKlPmeamA9RU5k0eoRijZNhumusTjgryD+ewLEMb8/f+Ji+OTLL8X8/4r
-         rAAkRz6CO+ljj3UPjlL5zWOFRPwAub47mFUKfbWOLNKF8dvvhQ6lRnLx+dYpuRJ2ekKM
-         +q9g==
-X-Gm-Message-State: AOJu0Yy4dC+YtM84XXzY+fPusRxYY1UxymlkE+18PwpZiROEtaUDzOk6
-	fkhQIZOesu0D+hUeCQ2vfdIA8tZ0itLROuoxz2g0nY7yTeDqq3L5OCg5/cPzs0yUg03EPJUhj1q
-	y9v3Cu4YjKfC8IcmI7zKyL2BkbvhK/iZ5CER2TqpXd3+w4pfv9Uui1A==
-X-Received: by 2002:a05:600c:5690:b0:418:73d1:94e9 with SMTP id jt16-20020a05600c569000b0041873d194e9mr547031wmb.4.1713173293020;
-        Mon, 15 Apr 2024 02:28:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IERNPGSp2Pz5tYD+hkyj8EJ0CMtIasjyE4g8O/XMwLQhUeF+ogNCEPyisj9rRe4tOleSXxBlw==
-X-Received: by 2002:a05:600c:5690:b0:418:73d1:94e9 with SMTP id jt16-20020a05600c569000b0041873d194e9mr547020wmb.4.1713173292653;
-        Mon, 15 Apr 2024 02:28:12 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-228-238.dyn.eolo.it. [146.241.228.238])
-        by smtp.gmail.com with ESMTPSA id h9-20020a05600c314900b004161bffa48csm15575915wmo.40.2024.04.15.02.28.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 02:28:12 -0700 (PDT)
-Message-ID: <65b3afd1a4adb8648561ea8b669c2e541cf34f9e.camel@redhat.com>
-Subject: Re: [PATCH net-next 4/5] selftests: drv-net: construct environment
- for running tests which require an endpoint
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, shuah@kernel.org, 
-	petrm@nvidia.com, linux-kselftest@vger.kernel.org, willemb@google.com
-Date: Mon, 15 Apr 2024 11:28:11 +0200
-In-Reply-To: <20240412233705.1066444-5-kuba@kernel.org>
-References: <20240412233705.1066444-1-kuba@kernel.org>
-	 <20240412233705.1066444-5-kuba@kernel.org>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        d=1e100.net; s=20230601; t=1713173402; x=1713778202;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jNj6qSBxPtBl3RQXTzkrjLin4rllOTR1hjVXVlg3sZw=;
+        b=QJA5THHZJSd1IyzrWsUh5zTeI7mvs+R0qz3rS6HtXtCj5jFqXsewLO/WkJz7z2bpqF
+         VGmEp69o+BIeU+rX4D7u7R0DFtqFxj+M/UN7LGbSCLpZfIpha7ebbwQ1yBzjsdymuNcS
+         twWL+Sjm1jHZ4FMv+XhaWM2AFuNTMRfSQtK15/JvsHxrhqHnL4AInMbJ2O3X6DvAs36F
+         RSbBMbhgvDv75GhNJuS5nY0jEjR0Dg5S2NbHSQbDgFPEdtVercIyggSdCZlscu6TRkkk
+         G+ldSq95OP/Jx+BsFREnRWK4Ci+WmMdPCCdhZO3cOZQ9AF+ObqJDN47+/cXc9gjAchwJ
+         1asA==
+X-Forwarded-Encrypted: i=1; AJvYcCXX4/11f5YOeeW1QxLiInzAiHDyLqAlG/G2VAJqcRhGWiWKgt5uz9btoUETZ63GF8N02D19Yr/PBZeiNDphrLo+jpZ6p1HW
+X-Gm-Message-State: AOJu0Yx9Lp/DssZu/s8vzjUoJnBy8TmSf70DBCHAUV2lvLhH5FyaQXsI
+	lpL/cbHLVka5WE4DzvvR9b+dr+s0BbtbF28R2mrez8ovcgtvHBUiG72E2RtfsFdWCvjgXUp35AS
+	g8UnPUtbCWFHdFQ6HS02RQC1+2IuN6c1w4ZNy
+X-Google-Smtp-Source: AGHT+IEezWUstpDtD8pP5gt5VdI+5txYFkHnZRciUxmqYUkyxi07xFi2DPXcDJdge/Qyohpa3kBzXXQWwdvOnkUhrLw=
+X-Received: by 2002:a05:6402:2062:b0:570:99f:6c2e with SMTP id
+ bd2-20020a056402206200b00570099f6c2emr216195edb.1.1713173401872; Mon, 15 Apr
+ 2024 02:30:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240326230319.190117-1-jhs@mojatatu.com> <CANn89iLhd4iD-pDVJHzKqWbf16u9KyNtgV41X3sd=iy15jDQtQ@mail.gmail.com>
+ <CAM0EoMmQHsucU6n1O3XEd50zUB4TENkEH0+J-cZ=5Bbv9298mA@mail.gmail.com>
+ <CANn89iKaMKeY7pR7=RH1NMBpYiYFmBRfAWmbZ61PdJ2VYoUJ9g@mail.gmail.com>
+ <CAM0EoM=s_MvUa32kUyt=VfeiAwxOm2OUJ3H=i0ARO1xupM2_Xg@mail.gmail.com>
+ <CAM0EoMk33ga5dh12ViZz8QeFwjwNQBvykM53VQo1B3BdfAZtaQ@mail.gmail.com> <CANn89iLmhaC8fuu4UpPdELOAapBzLv0+S50gr0Rs+J+=4+9j=g@mail.gmail.com>
+In-Reply-To: <CANn89iLmhaC8fuu4UpPdELOAapBzLv0+S50gr0Rs+J+=4+9j=g@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 15 Apr 2024 11:29:50 +0200
+Message-ID: <CANn89i+J=+2n4qsaHMNdPBUo36mvdzs1mV2GeK_ZNj=ruGvUSw@mail.gmail.com>
+Subject: Re: [PATCH RFC net 1/1] net/sched: Fix mirred to self recursion
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us, 
+	xiyou.wangcong@gmail.com, netdev@vger.kernel.org, renmingshuai@huawei.com, 
+	Victor Nogueira <victor@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2024-04-12 at 16:37 -0700, Jakub Kicinski wrote:
-> Nothing surprising here, hopefully. Wrap the variables from
-> the environment into a class or spawn a netdevsim based env
-> and pass it to the tests.
->=20
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  .../testing/selftests/drivers/net/README.rst  | 31 +++++++
->  .../selftests/drivers/net/lib/py/env.py       | 93 ++++++++++++++++++-
->  .../testing/selftests/net/lib/py/__init__.py  |  1 +
->  tools/testing/selftests/net/lib/py/netns.py   | 31 +++++++
->  4 files changed, 155 insertions(+), 1 deletion(-)
->  create mode 100644 tools/testing/selftests/net/lib/py/netns.py
->=20
-> diff --git a/tools/testing/selftests/drivers/net/README.rst b/tools/testi=
-ng/selftests/drivers/net/README.rst
-> index 5ef7c417d431..ffc15fe5d555 100644
-> --- a/tools/testing/selftests/drivers/net/README.rst
-> +++ b/tools/testing/selftests/drivers/net/README.rst
-> @@ -23,8 +23,39 @@ Variables can be set in the environment or by creating=
- a net.config
->    # Variable set in a file
->    NETIF=3Deth0
-> =20
-> +Please note that the config parser is very simple, if there are
-> +any non-alphanumeric characters in the value it needs to be in
-> +double quotes.
-> +
->  NETIF
->  ~~~~~
-> =20
->  Name of the netdevice against which the test should be executed.
->  When empty or not set software devices will be used.
-> +
-> +LOCAL_V4, LOCAL_V6, EP_V4, EP_V6
-> +~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> +
-> +Local and remote (endpoint) IP addresses.
-> +
-> +EP_TYPE
-> +~~~~~~~
-> +
-> +Communication method used to run commands on the endpoint.
-> +Test framework supports using ``netns`` and ``ssh`` channels.
-> +``netns`` assumes the "remote" interface is part of the same
-> +host, just moved to the specified netns.
-> +``ssh`` communicates with remote endpoint over ``ssh`` and ``scp``.
-> +
-> +Communication methods are defined by classes in ``lib/py/ep_{name}.py``.
-> +It should be possible to add a new method without modifying any of
-> +the framework, by simply adding an appropriately named file to ``lib/py`=
-`.
-> +
-> +EP_ARGS
-> +~~~~~~~
-> +
-> +Arguments used to construct the communication channel.
-> +Communication channel dependent::
-> +
-> +  for netns - name of the "remote" namespace
-> +  for ssh - name/address of the remote host
-> diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/te=
-sting/selftests/drivers/net/lib/py/env.py
-> index a081e168f3db..f63be0a72a53 100644
-> --- a/tools/testing/selftests/drivers/net/lib/py/env.py
-> +++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-> @@ -4,7 +4,8 @@ import os
->  import shlex
->  from pathlib import Path
->  from lib.py import ip
-> -from lib.py import NetdevSimDev
-> +from lib.py import NetNS, NetdevSimDev
-> +from .endpoint import Endpoint
-> =20
-> =20
->  def _load_env_file(src_path):
-> @@ -59,3 +60,93 @@ from lib.py import NetdevSimDev
->              self._ns =3D None
-> =20
-> =20
-> +class NetDrvEpEnv:
-> +    """
-> +    Class for an environment with a local device and "remote endpoint"
-> +    which can be used to send traffic in.
-> +
-> +    For local testing it creates two network namespaces and a pair
-> +    of netdevsim devices.
-> +    """
-> +    def __init__(self, src_path):
-> +
-> +        self.env =3D _load_env_file(src_path)
-> +
-> +        # Things we try to destroy
-> +        self.endpoint =3D None
-> +        # These are for local testing state
-> +        self._netns =3D None
-> +        self._ns =3D None
-> +        self._ns_peer =3D None
-> +
-> +        if "NETIF" in self.env:
-> +            self.dev =3D ip("link show dev " + self.env['NETIF'], json=
-=3DTrue)[0]
-> +
-> +            self.v4 =3D self.env.get("LOCAL_V4")
-> +            self.v6 =3D self.env.get("LOCAL_V6")
-> +            self.ep_v4 =3D self.env.get("EP_V4")
-> +            self.ep_v6 =3D self.env.get("EP_V6")
-> +            ep_type =3D self.env["EP_TYPE"]
-> +            ep_args =3D self.env["EP_ARGS"]
-> +        else:
-> +            self.create_local()
-> +
-> +            self.dev =3D self._ns.nsims[0].dev
-> +
-> +            self.v4 =3D "192.0.2.1"
-> +            self.v6 =3D"0100::1"
+On Mon, Apr 15, 2024 at 11:20=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> On Wed, Apr 10, 2024 at 10:30=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
+> >
+> > On Tue, Apr 2, 2024 at 1:35=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
+> > >
+> > > On Tue, Apr 2, 2024 at 12:47=E2=80=AFPM Eric Dumazet <edumazet@google=
+.com> wrote:
+> > > >
+> > > > On Wed, Mar 27, 2024 at 11:58=E2=80=AFPM Jamal Hadi Salim <jhs@moja=
+tatu.com> wrote:
+> > > > >
+> > > > > On Wed, Mar 27, 2024 at 9:23=E2=80=AFAM Eric Dumazet <edumazet@go=
+ogle.com> wrote:
+> > > > > >
+> > > > > > On Wed, Mar 27, 2024 at 12:03=E2=80=AFAM Jamal Hadi Salim <jhs@=
+mojatatu.com> wrote:
+> > > > > > >
+> > > > > > > When the mirred action is used on a classful egress qdisc and=
+ a packet is
+> > > > > > > mirrored or redirected to self we hit a qdisc lock deadlock.
+> > > > > > > See trace below.
+> > > > > > >
+> > > > > > > [..... other info removed for brevity....]
+> > > > > > > [   82.890906]
+> > > > > > > [   82.890906] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+> > > > > > > [   82.890906] WARNING: possible recursive locking detected
+> > > > > > > [   82.890906] 6.8.0-05205-g77fadd89fe2d-dirty #213 Tainted: =
+G        W
+> > > > > > > [   82.890906] --------------------------------------------
+> > > > > > > [   82.890906] ping/418 is trying to acquire lock:
+> > > > > > > [   82.890906] ffff888006994110 (&sch->q.lock){+.-.}-{3:3}, a=
+t:
+> > > > > > > __dev_queue_xmit+0x1778/0x3550
+> > > > > > > [   82.890906]
+> > > > > > > [   82.890906] but task is already holding lock:
+> > > > > > > [   82.890906] ffff888006994110 (&sch->q.lock){+.-.}-{3:3}, a=
+t:
+> > > > > > > __dev_queue_xmit+0x1778/0x3550
+> > > > > > > [   82.890906]
+> > > > > > > [   82.890906] other info that might help us debug this:
+> > > > > > > [   82.890906]  Possible unsafe locking scenario:
+> > > > > > > [   82.890906]
+> > > > > > > [   82.890906]        CPU0
+> > > > > > > [   82.890906]        ----
+> > > > > > > [   82.890906]   lock(&sch->q.lock);
+> > > > > > > [   82.890906]   lock(&sch->q.lock);
+> > > > > > > [   82.890906]
+> > > > > > > [   82.890906]  *** DEADLOCK ***
+> > > > > > > [   82.890906]
+> > > > > > > [..... other info removed for brevity....]
+> > > > > > >
+> > > > > > > Example setup (eth0->eth0) to recreate
+> > > > > > > tc qdisc add dev eth0 root handle 1: htb default 30
+> > > > > > > tc filter add dev eth0 handle 1: protocol ip prio 2 matchall =
+\
+> > > > > > >      action mirred egress redirect dev eth0
+> > > > > > >
+> > > > > > > Another example(eth0->eth1->eth0) to recreate
+> > > > > > > tc qdisc add dev eth0 root handle 1: htb default 30
+> > > > > > > tc filter add dev eth0 handle 1: protocol ip prio 2 matchall =
+\
+> > > > > > >      action mirred egress redirect dev eth1
+> > > > > > >
+> > > > > > > tc qdisc add dev eth1 root handle 1: htb default 30
+> > > > > > > tc filter add dev eth1 handle 1: protocol ip prio 2 matchall =
+\
+> > > > > > >      action mirred egress redirect dev eth0
+> > > > > > >
+> > > > > > > We fix this by adding a per-cpu, per-qdisc recursion counter =
+which is
+> > > > > > > incremented the first time a root qdisc is entered and on a s=
+econd attempt
+> > > > > > > enter the same root qdisc from the top, the packet is dropped=
+ to break the
+> > > > > > > loop.
+> > > > > > >
+> > > > > > > Reported-by: renmingshuai@huawei.com
+> > > > > > > Closes: https://lore.kernel.org/netdev/20240314111713.5979-1-=
+renmingshuai@huawei.com/
+> > > > > > > Fixes: 3bcb846ca4cf ("net: get rid of spin_trylock() in net_t=
+x_action()")
+> > > > > > > Fixes: e578d9c02587 ("net: sched: use counter to break reclas=
+sify loops")
+> > > > > > > Co-developed-by: Victor Nogueira <victor@mojatatu.com>
+> > > > > > > Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+> > > > > > > Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> > > > > > > ---
+> > > > > > >  include/net/sch_generic.h |  2 ++
+> > > > > > >  net/core/dev.c            |  9 +++++++++
+> > > > > > >  net/sched/sch_api.c       | 12 ++++++++++++
+> > > > > > >  net/sched/sch_generic.c   |  2 ++
+> > > > > > >  4 files changed, 25 insertions(+)
+> > > > > > >
+> > > > > > > diff --git a/include/net/sch_generic.h b/include/net/sch_gene=
+ric.h
+> > > > > > > index cefe0c4bdae3..f9f99df037ed 100644
+> > > > > > > --- a/include/net/sch_generic.h
+> > > > > > > +++ b/include/net/sch_generic.h
+> > > > > > > @@ -125,6 +125,8 @@ struct Qdisc {
+> > > > > > >         spinlock_t              busylock ____cacheline_aligne=
+d_in_smp;
+> > > > > > >         spinlock_t              seqlock;
+> > > > > > >
+> > > > > > > +       u16 __percpu            *xmit_recursion;
+> > > > > > > +
+> > > > > > >         struct rcu_head         rcu;
+> > > > > > >         netdevice_tracker       dev_tracker;
+> > > > > > >         /* private data */
+> > > > > > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > > > > > index 9a67003e49db..2b712388c06f 100644
+> > > > > > > --- a/net/core/dev.c
+> > > > > > > +++ b/net/core/dev.c
+> > > > > > > @@ -3789,6 +3789,13 @@ static inline int __dev_xmit_skb(struc=
+t sk_buff *skb, struct Qdisc *q,
+> > > > > > >         if (unlikely(contended))
+> > > > > > >                 spin_lock(&q->busylock);
+> > > > > >
+> > > > > > This could hang here (busylock)
+> > > > >
+> > > > > Notice the goto free_skb_list has an spin_unlock(&q->busylock);  =
+in
+> > > > > its code vicinity. Am I missing something?
+> > > >
+> > > > The hang would happen in above spin_lock(&q->busylock), before you =
+can
+> > > > get a chance...
+> > > >
+> > > > If you want to test your patch, add this debugging feature, pretend=
+ing
+> > > > the spinlock is contended.
+> > > >
+> > > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > > index 818699dea9d7040ee74532ccdebf01c4fd6887cc..b2fe3aa2716f0fe128e=
+f10f9d06c2431b3246933
+> > > > 100644
+> > > > --- a/net/core/dev.c
+> > > > +++ b/net/core/dev.c
+> > > > @@ -3816,7 +3816,7 @@ static inline int __dev_xmit_skb(struct sk_bu=
+ff
+> > > > *skb, struct Qdisc *q,
+> > > >          * sent after the qdisc owner is scheduled again. To preven=
+t this
+> > > >          * scenario the task always serialize on the lock.
+> > > >          */
+> > > > -       contended =3D qdisc_is_running(q) || IS_ENABLED(CONFIG_PREE=
+MPT_RT);
+> > > > +       contended =3D true; // DEBUG for Jamal
+> > > >         if (unlikely(contended))
+> > > >                 spin_lock(&q->busylock);
+> > >
+> > > Will do.
+> >
+> > Finally got time to look again. Probably being too clever, but moving
+> > the check before the contended check resolves it as well. The only
+> > strange thing is now with the latest net-next seems to be spitting
+> > some false positive lockdep splat for the test of A->B->A (i am sure
+> > it's fixable).
+> >
+> > See attached. Didnt try the other idea, see if you like this one.
+>
+> A spinlock can only be held by one cpu at a time, so recording the cpu
+> number of the lock owner should be
+> enough to avoid a deadlock.
+>
+> So I really do not understand your push for a per-cpu variable with
+> extra cache line misses.
+>
+> I think the following would work just fine ? What do you think ?
+>
+> diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+> index 76db6be1608315102495dd6372fc30e6c9d41a99..dcd92ed7f69fae00deaca2c88=
+fed248a559108ea
+> 100644
+> --- a/include/net/sch_generic.h
+> +++ b/include/net/sch_generic.h
+> @@ -117,6 +117,7 @@ struct Qdisc {
+>         struct qdisc_skb_head   q;
+>         struct gnet_stats_basic_sync bstats;
+>         struct gnet_stats_queue qstats;
+> +       int                     owner;
+>         unsigned long           state;
+>         unsigned long           state2; /* must be written under qdisc
+> spinlock */
+>         struct Qdisc            *next_sched;
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 854a3a28a8d85b335a9158378ae0cca6dfbf8b36..d77cac53df4b4af478548dd17=
+e7a3a7cfe4bd792
+> 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -3808,6 +3808,11 @@ static inline int __dev_xmit_skb(struct sk_buff
+> *skb, struct Qdisc *q,
+>                 return rc;
+>         }
+>
+> +       if (unlikely(READ_ONCE(q->owner) =3D=3D smp_processor_id())) {
+> +               /* add a specific drop_reason later in net-next */
+> +               kfree_skb_reason(skb, SKB_DROP_REASON_TC_RECLASSIFY_LOOP)=
+;
+> +               return NET_XMIT_DROP;
+> +       }
 
-Minor nit, what about using 2001:db8:, for more consistency with
-existing 'net' self-tests?
+Or even better this expensive check could be moved into tcf_mirred_forward(=
+) ?
 
-Also +1 on Willem suggestion to possibly have both endpoints remote.
+This would be done later in net-next, because this looks a bit more
+complex than this simple solution.
 
-(Very cool stuff, =C3=A7a va sans dire ;)
 
-Thanks,
-
-Paolo
-
+>         /*
+>          * Heuristic to force contended enqueues to serialize on a
+>          * separate lock before trying to get qdisc main lock.
+> @@ -3847,7 +3852,9 @@ static inline int __dev_xmit_skb(struct sk_buff
+> *skb, struct Qdisc *q,
+>                 qdisc_run_end(q);
+>                 rc =3D NET_XMIT_SUCCESS;
+>         } else {
+> +               WRITE_ONCE(q->owner, smp_processor_id());
+>                 rc =3D dev_qdisc_enqueue(skb, q, &to_free, txq);
+> +               WRITE_ONCE(q->owner, -1);
+>                 if (qdisc_run_begin(q)) {
+>                         if (unlikely(contended)) {
+>                                 spin_unlock(&q->busylock);
 
