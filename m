@@ -1,147 +1,175 @@
-Return-Path: <netdev+bounces-88050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF9BB8A575C
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:14:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6D398A57A6
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:25:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D03A1C22C46
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:14:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D86728289E
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:25:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D99D80635;
-	Mon, 15 Apr 2024 16:13:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD6957F7C1;
+	Mon, 15 Apr 2024 16:25:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="ZjKwUMqo"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="jnJwYqzz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24087FBBE
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 16:13:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8201E535
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 16:25:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713197590; cv=none; b=fLSfBxNzj5CyiosHIKS/0OGJAJZwArpX3Rx6S++98SWFPLnlwE/WLjgwX6Ad5i3lSyBrkcnxc7yRU1Y3Vyunbn7Ava1my6P8S/EgYg2NthCCH4XVhZGIcEHHOTUzL1Iz4h659lGMV5gk21b9T/6O8rKyZul+LZ0jexILAngwGCk=
+	t=1713198338; cv=none; b=SaZEQ0uDVy5JoD9+kjaWzafK9Wb4Zj05j4cV5O6GqjInhnBzPRuted+rVRRc1iNgU1CSZD4EyGatUkqEQWJsqIYXdcu+D2t9qJB/wDuiRwbFwADz+enY4W3HDM1445mX3Pcumv52jGp644WyTsVaqTZkJFdhUeAA95XquwPgnQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713197590; c=relaxed/simple;
-	bh=3txhU/uOLpNTBRjbxQmBVPq2bA1GUBYvBxcrijzixx8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ThMvX1X9pKswLA0t1Qnr9/H2NCj0bbOHQTh5mqa53awKemmn3nPUuTlkwFAnRfAiXtfG+MHd3QLhdU/eZnrzQ1WfNrBGasOhGUekP2ljHMKG1MlaRJEYdRNHL7qsy8YWhxoW+hd+L23poyguGD7xoweCoJ8wDuuvD9whRwxSa5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=ZjKwUMqo; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-4347e55066cso12629871cf.2
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 09:13:07 -0700 (PDT)
+	s=arc-20240116; t=1713198338; c=relaxed/simple;
+	bh=HrY+6R14sldOiILXyUI6rqVVYTPxkUH6QtJC9oVISG8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GEklve+YK2EH9X4yB1B5IApJtB23sZ2li/1/qD7/Y/nEnPxtts5Q3l/a3U8+pN4IEY3Xs5Iw6mfbZCP/gGTTEx4y1mmVBYDVeZ325Z9sSWmymXaMkQScT+VxbswhnUFRDFIFWWSlFpsQrcH5KomMKpuPwtbWS4AlYZryRVUXueQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=jnJwYqzz; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5176f217b7bso5899834e87.0
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 09:25:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1713197587; x=1713802387; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=on+iLChflz05Dr/oXUYjGxNpjkJObC3efkHZq3cR0H4=;
-        b=ZjKwUMqoA90oBHmVpe7Xx0DHnZ1fQROR9vxQKYtPJg84Ecb9bm/HjbOlMAZMyhSg1/
-         MvUIapL9MB4IEm0uNhhwEo8pAXK77x+AM/RgVUPPRd3BvKHYY05lt1zZoo2d1csm7h/b
-         9algl+2CpVYyPX9XM/b4q6MDtBCso6jMDLyMIyzZxlmJMROzJr29Myw9hqfk1xzk7PHb
-         Xku0zjkwFejkxprHeybOYuJDd8MEheW6/OAtkn9c2sMjJba+qQStYO71cdRx++2nct2s
-         twrfNNyyMCAuqb4dKNhLnd9PIXvXEpKiML+V8pt79S5Qls5XnxilPVE2N/jQGrbt1uzm
-         70bQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713198334; x=1713803134; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+w5L6fXt4Mw80dA9l9dnOlWTsYVxq476KcvcT8ApIw8=;
+        b=jnJwYqzzcrcpYnLoYaZeIPftDarnJz/OoNiLU0XK/8Hn1n7yK86oIXOIAM8fo5owze
+         H0l3rcgeMYoX3rnlk7rLjYhnjAVmpCksVaOmJeYpqH6RcbrpYRuxcc58JqUC2uR5Nf5R
+         6HZQegV9/cDD8WybnPJSKNOWykGyCqwbAWPQA2mCeYKnnXn9h+skoNMMJSY5Y8BAEifh
+         zRav4v5lqGMnjE0dbgb5jzB0FOiCADyPImYMyVulMsva5ggzsZvnTDKh3a2MRGT2pPXo
+         qNb1bs2qitAj5D2xOI9Pbvaqe2lZIAqaks2a8xE3hhJzDI49u+sqHhcd5mq9dQZjZivp
+         bG/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713197587; x=1713802387;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=on+iLChflz05Dr/oXUYjGxNpjkJObC3efkHZq3cR0H4=;
-        b=Fl8SgI/CdV4ya055P/vKIG17kCO+BNMD3GmSBeiP03XeOYOhA9Qx3Uwoj7SQiaG9eI
-         bk/bFQmrtqriWnVR5moWrASysmu47kdSGGH8RYbJLjozoTZ3aH+fAVjGE0tCvD05zEzL
-         gv7YLvXkQ0ZPBrym/rR+OtD5Nn8rQMONk9n4gsOAGixN2RYOwrngmqezId0oZcdJBiYj
-         5WABWlgEBRvmmbJObGz+ztOI7TQD0e57/OplMvJy4yRvvU5BF1n8AsTIeiWNzKp8lpOc
-         Fv5/nN3g4oyVDRRMudCfhto9U/b7SSwVg0Na1whJiiTMJ+ubKhumoG1VT7T/HPUpz8s2
-         VlAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCULFNThUqyXh2pedI0vAtQ8E2iZ6HRNwmLK9VGT/j97Z/8i2gVzSjHSM3bvMD9UmjU8SVmyGEPgNEbLGMVjvcpCf5mFg2p2
-X-Gm-Message-State: AOJu0Ywk2XBFdsQdHeiwRmrkMXvGvQH5Lcv5TSLBF2G0TZhgQuapxldP
-	hz6nWAyPQc+0a8JIz2M0UJnX2OzAfXS0dtbrBLDPEPFv4HNpQu7vt70miAl44mc=
-X-Google-Smtp-Source: AGHT+IHyzaUorlIitkHhSGZXmR2GMsZtGczdvew6u4b3tEs8jO7YUxIlFj/Hon53gMR9WnKJ7zNFWQ==
-X-Received: by 2002:ac8:5747:0:b0:434:9253:da0c with SMTP id 7-20020ac85747000000b004349253da0cmr12619578qtx.7.1713197586903;
-        Mon, 15 Apr 2024 09:13:06 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id fp17-20020a05622a509100b004343d021503sm6144270qtb.67.2024.04.15.09.13.06
+        d=1e100.net; s=20230601; t=1713198334; x=1713803134;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+w5L6fXt4Mw80dA9l9dnOlWTsYVxq476KcvcT8ApIw8=;
+        b=dNcqKSz4RfrVZjIhve6G/MqK3DjIlb3OrgvIBufYssXCfDDdHCOwTtue1qQfwpPaQl
+         GyD4dppVC4pOJhaZGk9iOnCt6jEvOEvVb6FQtvyWeu7O1NTJc/Grhs4BtzEDH/mDGXTl
+         huayXxoe3NjCLvNW3jBi022rDSRbnY73pKDzeOy/AErOnjKNjEtzObyTmwWkJ1AsK+2u
+         D1k6YTl4QSgzvrUxuNxV1Gbw0uYBajAzitQrrJ81x7Z4d16l8/MXbE+jnDUqRLX6cOMT
+         XypSFU8Zt7K6kwvKA4yP/B1miGfZud4eO1JFYWf2pbAjt6MgS8pxXCQj6sscCWTLZOds
+         dQiw==
+X-Gm-Message-State: AOJu0YwVnW0kdeN1TTlHeOb+m6mfVGrrPIil1zBrRqc/TXofbpwSBhue
+	G521CnBD0xWORCVHVbUQt9ZBTqmWT6MmaHlzlcupkdWpjHCovHeoQerOUiL+EiWjk/XPa3/ceU5
+	D
+X-Google-Smtp-Source: AGHT+IGQILVfb1rNV8SkbAhFTmCq5jbu6EYEDdqL0R6Ojgrbn/4ssrIeL5JM/wj71/IB5duAnmy/nQ==
+X-Received: by 2002:a05:6512:10c7:b0:518:c82a:bdf9 with SMTP id k7-20020a05651210c700b00518c82abdf9mr5635913lfg.44.1713198333772;
+        Mon, 15 Apr 2024 09:25:33 -0700 (PDT)
+Received: from localhost (37-48-2-146.nat.epc.tmcz.cz. [37.48.2.146])
+        by smtp.gmail.com with ESMTPSA id b18-20020a1709063f9200b00a523cf3293fsm4181949ejj.59.2024.04.15.09.25.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 09:13:06 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1rwOx7-006Br7-Sv;
-	Mon, 15 Apr 2024 13:13:05 -0300
-Date: Mon, 15 Apr 2024 13:13:05 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Michael Kelley <mikelley@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Subject: Re: [PATCH net-next] net: mana: Add new device attributes for mana
-Message-ID: <20240415161305.GO223006@ziepe.ca>
-References: <1713174589-29243-1-git-send-email-shradhagupta@linux.microsoft.com>
+        Mon, 15 Apr 2024 09:25:33 -0700 (PDT)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	parav@nvidia.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	shuah@kernel.org,
+	petrm@nvidia.com,
+	liuhangbin@gmail.com,
+	vladimir.oltean@nxp.com,
+	bpoirier@nvidia.com,
+	idosch@nvidia.com,
+	virtualization@lists.linux.dev
+Subject: [patch net-next v2 0/6] selftests: virtio_net: introduce initial testing infrastructure
+Date: Mon, 15 Apr 2024 18:25:24 +0200
+Message-ID: <20240415162530.3594670-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1713174589-29243-1-git-send-email-shradhagupta@linux.microsoft.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 15, 2024 at 02:49:49AM -0700, Shradha Gupta wrote:
-> Add new device attributes to view multiport, msix, and adapter MTU
-> setting for MANA device.
-> 
-> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> ---
->  .../net/ethernet/microsoft/mana/gdma_main.c   | 74 +++++++++++++++++++
->  include/net/mana/gdma.h                       |  9 +++
->  2 files changed, 83 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> index 1332db9a08eb..6674a02cff06 100644
-> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> @@ -1471,6 +1471,65 @@ static bool mana_is_pf(unsigned short dev_id)
->  	return dev_id == MANA_PF_DEVICE_ID;
->  }
->  
-> +static ssize_t mana_attr_show(struct device *dev,
-> +			      struct device_attribute *attr, char *buf)
-> +{
-> +	struct pci_dev *pdev = to_pci_dev(dev);
-> +	struct gdma_context *gc = pci_get_drvdata(pdev);
-> +	struct mana_context *ac = gc->mana.driver_data;
-> +
-> +	if (strcmp(attr->attr.name, "mport") == 0)
-> +		return snprintf(buf, PAGE_SIZE, "%d\n", ac->num_ports);
-> +	else if (strcmp(attr->attr.name, "adapter_mtu") == 0)
-> +		return snprintf(buf, PAGE_SIZE, "%d\n", gc->adapter_mtu);
-> +	else if (strcmp(attr->attr.name, "msix") == 0)
-> +		return snprintf(buf, PAGE_SIZE, "%d\n", gc->max_num_msix);
-> +	else
-> +		return -EINVAL;
-> +
+From: Jiri Pirko <jiri@nvidia.com>
 
-That is not how sysfs should be implemented at all, please find a
-good example to copy from. Every attribute should use its own function
-with the macros to link it into an attributes group and sysfs_emit
-should be used for printing
+This patchset aims at introducing very basic initial infrastructure
+for virtio_net testing, namely it focuses on virtio feature testing.
 
-Jason
+The first patch adds support for debugfs for virtio devices, allowing
+user to filter features to pretend to be driver that is not capable
+of the filtered feature.
+
+Example:
+$cat /sys/bus/virtio/devices/virtio0/features
+1110010111111111111101010000110010000000100000000000000000000000
+$ echo "5" >/sys/kernel/debug/virtio/virtio0/filter_feature_add
+$ cat /sys/kernel/debug/virtio/virtio0/filter_features
+5
+$ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/unbind
+$ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/bind
+$ cat /sys/bus/virtio/devices/virtio0/features
+1110000111111111111101010000110010000000100000000000000000000000
+
+Leverage that in the last patch that lays ground for virtio_net
+selftests testing, including very basic F_MAC feature test.
+
+To run this, do:
+make -C tools/testing/selftests/ TARGETS=drivers/net/virtio_net/ run_tests
+
+It is assumed, as with lot of other selftests in the net group,
+that there are netdevices connected back-to-back. In this case,
+two virtio_net devices connected back to back. To configure this loop
+on a hypervisor, one may use this script:
+#!/bin/bash
+
+DEV1="$1"
+DEV2="$2"
+
+sudo tc qdisc add dev $DEV1 clsact
+sudo tc qdisc add dev $DEV2 clsact
+sudo tc filter add dev $DEV1 ingress protocol all pref 1 matchall action mirred egress redirect dev $DEV2
+sudo tc filter add dev $DEV2 ingress protocol all pref 1 matchall action mirred egress redirect dev $DEV1
+sudo ip link set $DEV1 up
+sudo ip link set $DEV2 up
+
+---
+v1->v2:
+- addressed comments from Jakub and Benjamin, see individual
+  patches #3, #5 and #6 for details.
+
+Jiri Pirko (6):
+  virtio: add debugfs infrastructure to allow to debug virtio features
+  selftests: forwarding: move couple of initial check to the beginning
+  selftests: forwarding: add ability to assemble NETIFS array by driver
+    name
+  selftests: forwarding: add check_driver() helper
+  selftests: forwarding: add wait_for_dev() helper
+  selftests: virtio_net: add initial tests
+
+ MAINTAINERS                                   |   1 +
+ drivers/virtio/Kconfig                        |   9 ++
+ drivers/virtio/Makefile                       |   1 +
+ drivers/virtio/virtio.c                       |   8 ++
+ drivers/virtio/virtio_debug.c                 | 109 +++++++++++++++
+ include/linux/virtio.h                        |  34 +++++
+ tools/testing/selftests/Makefile              |   1 +
+ .../selftests/drivers/net/virtio_net/Makefile |  15 +++
+ .../drivers/net/virtio_net/basic_features.sh  | 127 ++++++++++++++++++
+ .../selftests/drivers/net/virtio_net/config   |   2 +
+ .../net/virtio_net/virtio_net_common.sh       |  99 ++++++++++++++
+ tools/testing/selftests/net/forwarding/lib.sh |  82 +++++++++--
+ 12 files changed, 479 insertions(+), 9 deletions(-)
+ create mode 100644 drivers/virtio/virtio_debug.c
+ create mode 100644 tools/testing/selftests/drivers/net/virtio_net/Makefile
+ create mode 100755 tools/testing/selftests/drivers/net/virtio_net/basic_features.sh
+ create mode 100644 tools/testing/selftests/drivers/net/virtio_net/config
+ create mode 100644 tools/testing/selftests/drivers/net/virtio_net/virtio_net_common.sh
+
+-- 
+2.44.0
+
 
