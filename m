@@ -1,179 +1,131 @@
-Return-Path: <netdev+bounces-87777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 449EC8A4928
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:36:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D19968A494C
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:46:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D88841F22855
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 07:36:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E6431C21619
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 07:46:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7361924A06;
-	Mon, 15 Apr 2024 07:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5177286AD;
+	Mon, 15 Apr 2024 07:46:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YyRLmHiy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cDFzUa+C"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E9928DA4;
-	Mon, 15 Apr 2024 07:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565E12575F;
+	Mon, 15 Apr 2024 07:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713166590; cv=none; b=eJN3Qt5iOgeDhPR0PUb49PI+BkaUw7seR+Mze4abKk7MMFponb1/qLc2kyopzU6DZnAeLkhw6WtsExSxlX+/Y36E4GrKh01YuNl11vdgpmjMCm2+lk9WrywlKpsPVXP9WEr1AVqGWswMcpMp/fuSlgxUbNSkPfkLXPgz1Z5YQC8=
+	t=1713167191; cv=none; b=cHcherD8HlJiOBOuUBPhLGc/Icbek2FW6lbSBJ+ngVJaZjFniYdnD5S655qogKcTaqP1QsJl7OLpwPJkpBxd7kpRV6aTOhpfNvYJgcB5I8TLnPlFZK0qyiwyokjlTKFg0u16HfIz1ghMmTeKzo1M+JdGSjuz/2j0HKi7TK3UlNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713166590; c=relaxed/simple;
-	bh=QEw7la3k+1B4uCDc5JgoVTPpyYgSenrHp3AkQ1ZVoJU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bSyCdcw0LAnGgSFuwhA5FBXrLBvQTRXIJYwAVi8hgpthfYuaeTyAkQuFzfsdSok8p48/taJVyPle90Eqjapww5cmyObmimlrasBBqOatlsZ1JtXhos0DnHuVZOaoZZWhZc0a36V+NuK1ZHBnR8VITt+V4zn53ujZxB4z+08woYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YyRLmHiy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBFF7C113CC;
-	Mon, 15 Apr 2024 07:36:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713166589;
-	bh=QEw7la3k+1B4uCDc5JgoVTPpyYgSenrHp3AkQ1ZVoJU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YyRLmHiyug+86g4mlvEV92WKvQWj+LlNyCyjYn5muAT8/zLjDAb59Hv0bmqyWxrS4
-	 rV+0tP4dKrzcp6qN9fwibJ0+Ol/j+n8lSLPYtdKvjBvAoxm4gqX/5agtxIPm95FGhx
-	 QQXBXMCKyVsJy5GF1jz6fLxB4af0/yZ2DRukpSd1JvHd2RhC0pK4ZKfvyuZ17mbfdf
-	 XooX7dDXA7p/RONR4G6I1x/dQ6aDeUGFiNC6Ep3IZ9yuVRYjGpk7xzJ530pcsW3Yha
-	 ZhNOT1v5UnD5NZOLhQBySfy4NPVr7HJ/Q/nadoj+zG03v+C69+zLxrBB3KVQ+asp2j
-	 bRIvoNGTRXjrg==
-Message-ID: <01c82cfb-e215-4929-9540-484378275ec3@kernel.org>
-Date: Mon, 15 Apr 2024 09:36:25 +0200
+	s=arc-20240116; t=1713167191; c=relaxed/simple;
+	bh=yXSkbV/J50HfP3pMGfH2WUQoK6n1YGjWdUKZLKpFasA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jJxPgLilJVFGRI5FQFlHELIB6+r8NQ/07mhQrSG+6SDxpyn5JsBzdyDZ9rLvIW2bk3CTCBVlFYhaFbcnCA57YR4XMD2YYsjAzCK/x5KSRXJlJKr205eJlDVVMvWXYHxGE5OUiQYXb57u0jkRCAH7ha6MAjHhvgdEieTqGdbAkyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cDFzUa+C; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6ed11782727so2410136b3a.1;
+        Mon, 15 Apr 2024 00:46:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713167189; x=1713771989; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vgj1VTu82+m6P0j2dFsK+PNoaXP8Shv2+ErdOUuu+zk=;
+        b=cDFzUa+Cdd+I0AzPMxw7ecC03k0iVtPQz5s7KxBM9UeHT4RCuf88QuU/27BZlW3UKL
+         Pt2R7c0oJw3dob1LrKnhEH59VZSyTgNy02t0jySMnFo9BAbj7ckVppWqUqwXBS/4g1Gp
+         Tf4JimIXd1V+MaYOuv98dvVtf1vB+JvTEY7sSM0Xl67ofCH7PudEZlIHNceQAJbROuXP
+         vP1nEw7InXmBMblodGL7vGgTAhZaSv5PdbnSpX/XQQC4htIIgHkY0ZHBGPz32/AaDZQz
+         WrK4x2cMVcLJaBIr+c5LlwXnAQVcdNzJqrUs+Elp9SBdxITlzQIQz/vjM8x3kwjBFrSU
+         6BCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713167189; x=1713771989;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vgj1VTu82+m6P0j2dFsK+PNoaXP8Shv2+ErdOUuu+zk=;
+        b=g02QCdMojMgmIHYBmBoBmkyfuLJdL6NEMmFbWoo0zqKlBzm+eryhK5yKW38deMR7+I
+         5MgMLGzC07R4wCLQkhLBlC8GymH1AjMmqryuRHkPqNuY1za+GRhkLg9bjfbo/tdmqQhR
+         pM9dG1nH/jBdi/NCNF8f8Z6xuc/LDPcXn24gmfB8TuZUpaPqA9EVW4L48HuzZZUGhVaD
+         /zTVVTepR0dmgNRLsTLwUBOjj1obRVZnnbS8rrFwJi2tZargAX8z2aQjUgWwbx6HTho5
+         0+8kAG/JDXHgaZOuJGqnw/YxGboH0+lMGd/sW89oZHCpqqH8nsSwFLCaLmGYGNj5br7/
+         ectQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUxcMjHFaF8bZtMUWBrsFRbNr8cwn43LOF4CTH8RmhGgPUrtH/pAm/iFCj64iWfQV52RjZMeV6IlQzBR3F8jdAH4lHVhd4O3p3379EvwrUvQwtaZti0m+HOJ33sb22Fte9ZAdnKZ7c9
+X-Gm-Message-State: AOJu0YxCTOMJ7cYEOh0PGlcSfw0BudDGWRk9XEJASrma/3IUK/3FkD4L
+	QLsCLqS3dR9QLey+EY7M5HKI1FNv5xbuYFol96YbAd+DyjUoCinw3sUGXV/szM556Q==
+X-Google-Smtp-Source: AGHT+IGv8RQgNpGbLyrm7SjeHgdm3VchI2p4LSF1np0u1KbAjvifMu26I1kU1qdOvJrZkI1ynivXuA==
+X-Received: by 2002:a05:6a20:2444:b0:1a7:4887:771e with SMTP id t4-20020a056a20244400b001a74887771emr8125147pzc.44.1713167189447;
+        Mon, 15 Apr 2024 00:46:29 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id m7-20020a1709026bc700b001dd69aca213sm7244316plt.270.2024.04.15.00.46.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 00:46:29 -0700 (PDT)
+Date: Mon, 15 Apr 2024 15:46:24 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+	mlxsw@nvidia.com, Benjamin Poirier <bpoirier@nvidia.com>
+Subject: Re: [PATCH net-next 03/10] selftests: forwarding: bail_on_lldpad()
+ should SKIP
+Message-ID: <ZhzbUBrJJ6-6l5Ql@Laptop-X1>
+References: <cover.1712940759.git.petrm@nvidia.com>
+ <686eeb760a35f228bde1392ffa3f59462223db26.1712940759.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7] virtio_net: Support RX hash XDP hint
-To: Liang Chen <liangchen.linux@gmail.com>, mst@redhat.com,
- jasowang@redhat.com, xuanzhuo@linux.alibaba.com, hengqi@linux.alibaba.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, john.fastabend@gmail.com,
- daniel@iogearbox.net, ast@kernel.org
-References: <20240413041035.7344-1-liangchen.linux@gmail.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <20240413041035.7344-1-liangchen.linux@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <686eeb760a35f228bde1392ffa3f59462223db26.1712940759.git.petrm@nvidia.com>
 
-
-
-On 13/04/2024 06.10, Liang Chen wrote:
-> The RSS hash report is a feature that's part of the virtio specification.
-> Currently, virtio backends like qemu, vdpa (mlx5), and potentially vhost
-> (still a work in progress as per [1]) support this feature. While the
-> capability to obtain the RSS hash has been enabled in the normal path,
-> it's currently missing in the XDP path. Therefore, we are introducing
-> XDP hints through kfuncs to allow XDP programs to access the RSS hash.
+On Fri, Apr 12, 2024 at 07:03:06PM +0200, Petr Machata wrote:
+> $ksft_skip is used to mark selftests that have tooling issues. The fact
+> that LLDPad is running, but shouldn't, is one such issue. Therefore have
+> bail_on_lldpad() bail with $ksft_skip.
 > 
-> 1.
-> https://lore.kernel.org/all/20231015141644.260646-1-akihiko.odaki@daynix.com/#r
-> 
-> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
+> Reviewed-by: Benjamin Poirier <bpoirier@nvidia.com>
 > ---
->    Changes from v6:
-> - fix a coding style issue
->    Changes from v5:
-> - Preservation of the hash value has been dropped, following the conclusion
->    from discussions in V3 reviews. The virtio_net driver doesn't
->    accessing/using the virtio_net_hdr after the XDP program execution, so
->    nothing tragic should happen. As to the xdp program, if it smashes the
->    entry in virtio header, it is likely buggy anyways. Additionally, looking
->    up the Intel IGC driver,  it also does not bother with this particular
->    aspect.
-> ---
->   drivers/net/virtio_net.c | 55 ++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 55 insertions(+)
+>  tools/testing/selftests/net/forwarding/lib.sh | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index c22d1118a133..2a1892b7b8d3 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -4621,6 +4621,60 @@ static void virtnet_set_big_packets(struct virtnet_info *vi, const int mtu)
->   	}
->   }
->   
-> +static int virtnet_xdp_rx_hash(const struct xdp_md *_ctx, u32 *hash,
-> +			       enum xdp_rss_hash_type *rss_type)
-> +{
-> +	const struct xdp_buff *xdp = (void *)_ctx;
-> +	struct virtio_net_hdr_v1_hash *hdr_hash;
-> +	struct virtnet_info *vi;
-> +
-> +	if (!(xdp->rxq->dev->features & NETIF_F_RXHASH))
-> +		return -ENODATA;
-> +
-> +	vi = netdev_priv(xdp->rxq->dev);
-> +	hdr_hash = (struct virtio_net_hdr_v1_hash *)(xdp->data - vi->hdr_len);
-> +
-> +	switch (__le16_to_cpu(hdr_hash->hash_report)) {
-> +	case VIRTIO_NET_HASH_REPORT_TCPv4:
-> +		*rss_type = XDP_RSS_TYPE_L4_IPV4_TCP;
-> +		break;
-> +	case VIRTIO_NET_HASH_REPORT_UDPv4:
-> +		*rss_type = XDP_RSS_TYPE_L4_IPV4_UDP;
-> +		break;
-> +	case VIRTIO_NET_HASH_REPORT_TCPv6:
-> +		*rss_type = XDP_RSS_TYPE_L4_IPV6_TCP;
-> +		break;
-> +	case VIRTIO_NET_HASH_REPORT_UDPv6:
-> +		*rss_type = XDP_RSS_TYPE_L4_IPV6_UDP;
-> +		break;
-> +	case VIRTIO_NET_HASH_REPORT_TCPv6_EX:
-> +		*rss_type = XDP_RSS_TYPE_L4_IPV6_TCP_EX;
-> +		break;
-> +	case VIRTIO_NET_HASH_REPORT_UDPv6_EX:
-> +		*rss_type = XDP_RSS_TYPE_L4_IPV6_UDP_EX;
-> +		break;
-> +	case VIRTIO_NET_HASH_REPORT_IPv4:
-> +		*rss_type = XDP_RSS_TYPE_L3_IPV4;
-> +		break;
-> +	case VIRTIO_NET_HASH_REPORT_IPv6:
-> +		*rss_type = XDP_RSS_TYPE_L3_IPV6;
-> +		break;
-> +	case VIRTIO_NET_HASH_REPORT_IPv6_EX:
-> +		*rss_type = XDP_RSS_TYPE_L3_IPV6_EX;
-> +		break;
-> +	case VIRTIO_NET_HASH_REPORT_NONE:
-> +	default:
-> +		*rss_type = XDP_RSS_TYPE_NONE;
-> +	}
-
-Why is this not implemented as a table lookup?
-
-Like:
- 
-https://elixir.bootlin.com/linux/v6.9-rc4/source/drivers/net/ethernet/intel/igc/igc_main.c#L6652
-  https://elixir.bootlin.com/linux/latest/A/ident/xdp_rss_hash_type
-
---Jesper
-
-> +
-> +	*hash = __le32_to_cpu(hdr_hash->hash_value);
-> +	return 0;
-> +}
-> +
-> +static const struct xdp_metadata_ops virtnet_xdp_metadata_ops = {
-> +	.xmo_rx_hash			= virtnet_xdp_rx_hash,
-> +};
-> +
->   static int virtnet_probe(struct virtio_device *vdev)
->   {
->   	int i, err = -ENOMEM;
-> @@ -4747,6 +4801,7 @@ static int virtnet_probe(struct virtio_device *vdev)
->   				  VIRTIO_NET_RSS_HASH_TYPE_UDP_EX);
->   
->   		dev->hw_features |= NETIF_F_RXHASH;
-> +		dev->xdp_metadata_ops = &virtnet_xdp_metadata_ops;
->   	}
->   
->   	if (vi->has_rss_hash_report)
+> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+> index 3cbbc2fd4d7d..7913c6ee418d 100644
+> --- a/tools/testing/selftests/net/forwarding/lib.sh
+> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+> @@ -2138,6 +2138,8 @@ bail_on_lldpad()
+>  {
+>  	local reason1="$1"; shift
+>  	local reason2="$1"; shift
+> +	local caller=${FUNCNAME[1]}
+> +	local src=${BASH_SOURCE[1]}
+>  
+>  	if systemctl is-active --quiet lldpad; then
+>  
+> @@ -2158,7 +2160,8 @@ bail_on_lldpad()
+>  				an environment variable ALLOW_LLDPAD to a
+>  				non-empty string.
+>  			EOF
+> -			exit 1
+> +			log_test_skip $src:$caller
+> +			exit $EXIT_STATUS
+>  		else
+>  			return
+>  		fi
+> -- 
+> 2.43.0
+> 
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
