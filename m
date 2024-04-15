@@ -1,122 +1,106 @@
-Return-Path: <netdev+bounces-88122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D3F68A5D94
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 00:04:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9506F8A5DAD
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 00:21:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD2B2B2267A
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 22:04:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A5B8284CB9
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 22:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6E1157485;
-	Mon, 15 Apr 2024 22:04:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E349157A45;
+	Mon, 15 Apr 2024 22:20:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Sq/IyNDJ"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NgHr/1ls"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16424156F31
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 22:03:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADCF7154C11
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 22:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713218640; cv=none; b=MYJcRAzwhzWJtnR5KF7SgGit2G/9sWPISbxKqyPvdKNNP1/0twJL+2EsQptleuT1o4EViylHpoSXsUQCV4ad/7ndVFvxzhJSySypQ2W6pdz4/9gpjuPycH2UEm2npfwEm3EcleCcwIL0CF/pn1oNQ71bxMl3sqcH0eR4aMCVzRI=
+	t=1713219659; cv=none; b=UKHy78G/N1pGmOnXSVi9o+DmYTGoLHF9kqxF63W9WNkU4PscMsjrkjx2Qn3kt2eJ9CeZpwu+MGnw8RZqwBn9HIHUG2viu4ua2q2rF8ECtFa8sMv4qq/sAUms9FYcBAHL81yCWQ7P35BMV7GnU7vMiMUYfl8V5vfYL1mmKdmRsD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713218640; c=relaxed/simple;
-	bh=J+fYbj3a7gasvITQzaPd5JI1Op9dd0PU05k09NqZ2Gw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mDHysV2FS4+91l6dy+/owbTz7JySXey6P10BuPlbaVBM9nqEQrVEe/Y99QSGKyj4kBIXeAthpokVsaiQjIxW9Ue7VooMjCMLZjPY+I9GLvv4jGuPKdtTaQxJfWqshpTnsdCAShrMlECpV77r0DINAQEmdLgVNRlAzLem06x7EE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Sq/IyNDJ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=oxrf3akoGwRFkimu+tMKpVP07mO1UfmnTsS0nQnyHfI=; b=Sq/IyNDJQh2Gef61+STytwjNgn
-	BraETNwrzA9KCNdttNOJNcNoQNUEm4BwQEdimN4KGyGffheiJrpVi9V7+EoYQt4su9gKmSy5jPO2G
-	YIynYSYALfGDyCX3HoKx2BcuaTOSqvPDwhuQ40GIRa99CddjtyzWQ3Z61D/culTrIwuk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rwUQX-00D52B-Eo; Tue, 16 Apr 2024 00:03:49 +0200
-Date: Tue, 16 Apr 2024 00:03:49 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-Cc: pabeni@redhat.com, netdev@vger.kernel.org, edumazet@google.com,
-	marcin.szycik@linux.intel.com, anthony.l.nguyen@intel.com,
-	idosch@nvidia.com, kuba@kernel.org,
-	intel-wired-lan@lists.osuosl.org, przemyslaw.kitszel@intel.com
-Subject: Re: [Intel-wired-lan] [PATCH net-next 0/3] ethtool: Max power support
-Message-ID: <6514e6a9-3b4d-48ba-b895-a12c5beff820@lunn.ch>
-References: <38d874e3-f25b-4af2-8c1c-946ab74c1925@lunn.ch>
- <a3fd2b83-93af-4a59-a651-1ffe0dbddbe4@intel.com>
- <dc601a7c-7bb7-4857-8991-43357b15ed5a@lunn.ch>
- <ad026426-f6a4-4581-b090-31ab65fb4782@intel.com>
- <61a89488-e79a-4175-8868-3de36af7f62d@lunn.ch>
- <206686dc-c39b-4b52-a35c-914b93fe3f36@intel.com>
- <e4224da7-0a09-41b7-b652-bf651cfea0d0@lunn.ch>
- <cf30ce2e-ab70-4bbe-82ab-d687c2ea2efc@intel.com>
- <c6258afd-2631-4e5d-ab25-6b2b7e2f4df4@lunn.ch>
- <fb1a53ea-d5cd-45a1-9073-450f6a753f87@intel.com>
+	s=arc-20240116; t=1713219659; c=relaxed/simple;
+	bh=mhEdwISggCvZfH1ibIka9yzkgLuWqTRLR2LhLmanVMo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m65jM2kWvstzCDWUh4V4Sd1KwMwtK1scnNdK1SlrwWh7meH1/+X08c5oeYQ/3t5ofooPx84paj+ZsZ6ggRkGC7vEhExxG9nh+scprWoJ3XGaUvIIh1V2Xv/nFiNwx2gv9Vtw2uatBEq/G9Akenw3CSUgLBcXM7Zlmx5YMA/7QqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NgHr/1ls; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1713219658; x=1744755658;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Acd3gOnBTSw2gfpr+MttzNOKABecBMk9ELoAZFrs9oM=;
+  b=NgHr/1lsmtmmMIjY/rn1rMBAQv1yP8y1hkeqYjSrV3j9xBh7Sj/xuR52
+   +hANB3zoZob6impbFy7XqDWgINViidCYJmhtWB9AhOp7zizxWiGk/4DNm
+   CXoChsY2Ci69f2sctuTNNFFhQSs4JPZeiRLCDhXdxW99UbfK+04nAFn6W
+   o=;
+X-IronPort-AV: E=Sophos;i="6.07,204,1708387200"; 
+   d="scan'208";a="626569573"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 22:20:55 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:23984]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.20.81:2525] with esmtp (Farcaster)
+ id b4047d5d-ae00-4882-b4ea-2ac2cde7d580; Mon, 15 Apr 2024 22:20:54 +0000 (UTC)
+X-Farcaster-Flow-ID: b4047d5d-ae00-4882-b4ea-2ac2cde7d580
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Mon, 15 Apr 2024 22:20:53 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.23) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Mon, 15 Apr 2024 22:20:50 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
+CC: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>, Willem de Bruijn <willemb@google.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net 0/5] ip: Fix warning in pskb_may_pull_reason() for tunnel devices.
+Date: Mon, 15 Apr 2024 15:20:36 -0700
+Message-ID: <20240415222041.18537-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fb1a53ea-d5cd-45a1-9073-450f6a753f87@intel.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWA002.ant.amazon.com (10.13.139.17) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Fri, Apr 12, 2024 at 03:21:24PM +0200, Wojciech Drewek wrote:
-> 
-> 
-> On 09.04.2024 15:39, Andrew Lunn wrote:
-> >> This is something my current design supports I think. Using
-> >> ETHTOOL_A_MODULE_MAX_POWER_SET user can get what cage supports
-> >> and change it.
-> >  
-> >> This could be done using ethtool_module_power_mode_policy I think.
-> > 
-> > All these 'I think' don't give me a warm fuzzy feeling this is a well
-> > thought out and designed uAPI.
-> > 
-> > I assume you have ethtool patches for your new netlink attributes. So
-> > show us the real usage. Start with an SFP in its default lower power
-> > mode. Show us the commands to display the current status. Allocate it
-> > more power, tell the module it can use more power, and then show us
-> > the status after the change has been made.
-> 
-> Ok, but do we really need an API to switch the module between high/low power mode?
+syzkaller reported warnings in pskb_may_pull_reason(), which was
+triggered by a VLAN packet sent over tunnel devices.
 
-Probably not. But you need to document that the API you are adding is
-also expected to talk to the module and tell it to use more/less
-power.
+This series fixes the warning for sit, vti, vti6, ipip, and ip6tnl.
 
-> Regarding the current status and what module supports, there is -m option:
-> $ ethtool -m ens801f0np0
->         Identifier                                : 0x0d (QSFP+)
->         Extended identifier                       : 0x00
->         Extended identifier description           : 1.5W max. Power consumption
->         Extended identifier description           : No CDR in TX, No CDR in RX
->         Extended identifier description           : High Power Class (> 3.5 W) not enabled
 
-So you can make this part of your commit message. Show this. Invoke
-your new ethtool option, then show this again with the module
-reporting a higher power consumption. The reduce the power using
-ethtool and show the power consumption has reduced.
+Kuniyuki Iwashima (5):
+  sit: Pull header after checking skb->protocol in sit_tunnel_xmit().
+  vti: Pull header after checking skb->protocol in vti_tunnel_xmit().
+  ip6_vti: Pull header after checking skb->protocol in vti6_tnl_xmit().
+  ipip: Pull header after checking skb->protocol in ipip_tunnel_xmit().
+  ip6_tunnel: Pull header after checking skb->protocol in
+    ip6_tnl_start_xmit().
 
-Also, in the ethtool-netlink.rst file, clearly document what the API
-is doing, so that somebody else can implement it for another device.
+ net/ipv4/ip_vti.c     | 9 ++++++---
+ net/ipv4/ipip.c       | 6 +++---
+ net/ipv6/ip6_tunnel.c | 9 ++++++---
+ net/ipv6/ip6_vti.c    | 9 ++++++---
+ net/ipv6/sit.c        | 9 ++++++---
+ 5 files changed, 27 insertions(+), 15 deletions(-)
 
-Please also document hotplug behaviour. Say I use your new API to
-increase the power to 3.5W. I then eject the module. Does the
-available power automatically get put back into the pool? When i
-reinsert the module, it will be in low power class, and i need to
-issue the ethtool command again to increase its power?
+-- 
+2.30.2
 
-   Andrew
 
