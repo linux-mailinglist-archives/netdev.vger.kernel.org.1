@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-88089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C4A28A5A04
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 265A88A5A03
 	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 20:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7586F1C21233
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:40:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5D9828242E
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1485A154C09;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14486154C02;
 	Mon, 15 Apr 2024 18:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hWLCh0LP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F76Djn8G"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E240E41C66;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E245D139CEC;
 	Mon, 15 Apr 2024 18:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713206429; cv=none; b=H0FLcMtpdys3qMzigjaiZolXOD6ApbtOH+HzJQEe0n4tZdQpKI69JwcAi7rI/4tZQm35UlQLZiSTqKaU9j2Uw0PpaOPErdVGiPAZs5AMGK4S+T73j6aOiM4LKzVtgpZEyQBFdgUq/PZPVExZUuAQMBLeKw8vnwlLvyeCuouvPxc=
+	t=1713206429; cv=none; b=aM/FJKcBqXARnkhHZug/6Bh6FvziHzXOx05XzcPEZr3flAKSM/W8u56CCYCOjhk1vZOKsk1ubaD4xxa4CKyiE+NhRLhX2MBDSdKLeWkSow8s6zmX3zIwqizLyA4VD1/ngSNfb5hiwRncvOtrB2VgTVmGdUYWrCH4ATp26g6dfSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713206429; c=relaxed/simple;
-	bh=kgowzD5fH9d5m5BdHrdoSAm9Nv8Ny5qyh36nwbqfVJU=;
+	bh=qgSpcyoK3xUB+Vn+ZWMgWScWqWWQJPItCnITCl/a6SU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kBVbwGzHZS2VtTolcmYpv/mUtxVGD0D3NlzAcNZF3IZ/2MdKUFjvfEv/1QZNYvug5a0YQ93FZVQuLvlVZK6k7uFweRTXYS9JQ6eenL6VaFGwM8z5i2fyo7FC8Q7Ul1r7U7SLlns+j0M+9iuLI02G9oxyZ+iCDQychTAw4eRCfpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hWLCh0LP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6AF4AC32781;
+	 In-Reply-To:To:Cc; b=lyk27fzVaXot1R7Xo1fR07B7b+g95z7pcl44DlwrrzS378HzQIXZOBAKG2/ed71ZRf8pCJA4Z6jXEyd7E6axbrZczeYf0a6UE6LJbtnWZhRsPVL2igN7E0OlmykHrZlBcMzoaQyGuQ7rkc3zBPWoTLExCEyE6Btt4GOcZnf3/L0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F76Djn8G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 791F3C2BD11;
 	Mon, 15 Apr 2024 18:40:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1713206428;
-	bh=kgowzD5fH9d5m5BdHrdoSAm9Nv8Ny5qyh36nwbqfVJU=;
+	bh=qgSpcyoK3xUB+Vn+ZWMgWScWqWWQJPItCnITCl/a6SU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hWLCh0LPmuKPaERfjBv0puRjxeizWuCM4pfy2PtEWKbpolywviYo7FmIyvqL4uJqQ
-	 AJoFgBe30f2dE+O8SCA1BKsa4woQj2QGAx7EcZhOymwDh3NnVnZz3/qLMhO8uo1Fkf
-	 8EdEkNCu/n4tuKPUdDTIlRoHSzt7+IHMifwcKdBk2OhFBWXL994ufpLUY5HsozuLpx
-	 MZvxk7zs+LYPFDVPp1ZC96Gyj96g9IN9ZgaJkwS4ytoXEa3/u0zazdshmezGrzrcAe
-	 5eyQKmNu8OuwnUb1k4uJQ/aulAlWM8lUns4e+d4dtudtRaY/sEh4j0t/Dtc6uorJ1a
-	 SAUaASD3waicQ==
+	b=F76Djn8GO5/NsXdvcXKzJrc2ihXvpvFq8nBckOhMmFzHF2i/rc0whhc1QTo7AHMbS
+	 b89DYLyts81aTjLCImE0Ge9hyfaDbmVW5MxkVaCOnYdPvcYWVDMidg8h+YTXpQ3aTV
+	 JXiquFuSHlpMsxiNh9aqEgWCZ+NQeQZTRUKupTvg/UVFRINMkvvhcjJrRpQ+tLWsDG
+	 NgFyhHa9i4jJOJ0gZcbDVjlPmBSZdKj0lKyHSouN5Uno69eZe/tnUUj0YBcvgrnhhU
+	 I57mylpdGItCoWBygWoQj2TVc7mk0XKCrHAJXBaKIkpC9e02aE+rKDgDpazh7m+LyQ
+	 U3WtcyrAIpTzQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5D8BCC395FE;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6E4B5C54BB2;
 	Mon, 15 Apr 2024 18:40:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,42 +52,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/4] net: dqs: optimize if stall threshold is not
- set
+Subject: Re: [PATCH net-next v2 0/6] selftests: net: exercise page pool reporting
+ via netlink
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171320642837.24301.3642985390319068381.git-patchwork-notify@kernel.org>
+ <171320642844.24301.8058088349546274076.git-patchwork-notify@kernel.org>
 Date: Mon, 15 Apr 2024 18:40:28 +0000
-References: <20240411192241.2498631-1-leitao@debian.org>
-In-Reply-To: <20240411192241.2498631-1-leitao@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
- edumazet@google.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20240412141436.828666-1-kuba@kernel.org>
+In-Reply-To: <20240412141436.828666-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, petrm@nvidia.com,
+ linux-kselftest@vger.kernel.org
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 11 Apr 2024 12:22:28 -0700 you wrote:
-> Here are four patches aimed at enhancing the Dynamic Queue Limit (DQL)
-> subsystem within the networking stack.
+On Fri, 12 Apr 2024 07:14:30 -0700 you wrote:
+> Add a basic test for page pool netlink reporting.
 > 
-> The first two commits involve code refactoring, while the third patch
-> introduces the actual change. The fourth patch just improves the cache
-> locality.
+> v2:
+>  - pass args as *args (patch 3)
+>  - improve the test and add busy wait helper (patch 6)
+> v1: https://lore.kernel.org/all/20240411012815.174400-1-kuba@kernel.org/
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,1/4] net: dql: Avoid calling BUG() when WARN() is enough
-    https://git.kernel.org/netdev/net-next/c/4854b463c4b2
-  - [net-next,v3,2/4] net: dql: Separate queue function responsibilities
-    https://git.kernel.org/netdev/net-next/c/cbe481a1b741
-  - [net-next,v3,3/4] net: dql: Optimize stall information population
-    https://git.kernel.org/netdev/net-next/c/721f076b62cb
-  - [net-next,v3,4/4] net: dqs: make struct dql more cache efficient
-    https://git.kernel.org/netdev/net-next/c/4ba67ef3a1fb
+  - [net-next,v2,1/6] net: netdevsim: add some fake page pool use
+    https://git.kernel.org/netdev/net-next/c/1580cbcbfe77
+  - [net-next,v2,2/6] tools: ynl: don't return None for dumps
+    https://git.kernel.org/netdev/net-next/c/72ba6cba0a6e
+  - [net-next,v2,3/6] selftests: net: print report check location in python tests
+    https://git.kernel.org/netdev/net-next/c/eeb409bde964
+  - [net-next,v2,4/6] selftests: net: print full exception on failure
+    https://git.kernel.org/netdev/net-next/c/99583b970b90
+  - [net-next,v2,5/6] selftests: net: support use of NetdevSimDev under "with" in python
+    https://git.kernel.org/netdev/net-next/c/8554d6e39b6a
+  - [net-next,v2,6/6] selftests: net: exercise page pool reporting via netlink
+    https://git.kernel.org/netdev/net-next/c/05fa5c31b988
 
 You are awesome, thank you!
 -- 
