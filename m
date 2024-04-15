@@ -1,60 +1,58 @@
-Return-Path: <netdev+bounces-88077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BBC78A5964
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 19:46:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B3668A5967
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 19:48:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36ADB1C20BF8
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:46:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0F2BFB21F7D
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:48:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53DAD85268;
-	Mon, 15 Apr 2024 17:46:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F9EB131E54;
+	Mon, 15 Apr 2024 17:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a+W91PH0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oQ+aDlYJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4981E877;
-	Mon, 15 Apr 2024 17:46:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 235E776033;
+	Mon, 15 Apr 2024 17:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713203188; cv=none; b=I2EIsMs0izYrvqpmU8/rma8txsMwL1+J3qZbwljYHuUko2kZCa6PCDBfwrs/o2nOcGuHd7rA2WUuQLHbDSyGtTesSqrB4swBw3itmV8TaY/+ew9l3sd0wU8E1xdlyngpMAI6syRZcUylQCHuKBm1YZN9uY4/NZkxsbNF15mIcdk=
+	t=1713203284; cv=none; b=ktR1gCu0nn7Kj1I8z3cCHRtBf6zadHvHSfQOwF7V1YGux91pbNxFSp/GeBJVRU8VBcqgGJiUUJV2Bhkg6ladx4F5no79DDMbCuJCLocl4I55h++sn+yC2RdfHl6e1O7cBbely1u2DN6cM6LnfTrzuNoaUv0m5biSMMqi2qPnQoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713203188; c=relaxed/simple;
-	bh=m8GGov/pwkd9DiB/jsPNMMdHvIl9JLyjEqpFvD8mT3Y=;
+	s=arc-20240116; t=1713203284; c=relaxed/simple;
+	bh=aPShdw2DP64iiJ1YwOdHPMtTmJVIyo36jyERNxM2Bmg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Fk5MVbe5H3ldR4y6ljLNmHFRv6Bf7uCDRFV0Yf15lr/USJgljkjbOhnRdIXZaPfjGYxEtEkxoBz/Rc+U2VChIh46g2BFYAJOORaAHveisZw/VT6F0lzFft2aP6RMERzZ+Z4y0XjPhdDKF4ayOl7xvF5WcgHAxP3XQV8SjdxeU9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a+W91PH0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B944C113CC;
-	Mon, 15 Apr 2024 17:46:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=CcsweLFYknOvxwJxDR9a5j+v0AqQReF9bGitqWxeoWET2mcpTkblZ+y92H+KQ0cEg3Gl8L72FJvz5uxyiua/VlFFgrKZHRw2JtwemqL5t0JXjPNaopn8s1lbyA7p+V3BDjsSbxAa6fCmZWOBfWe5WaBN+L9qmuUpEPWQ/sNHzrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oQ+aDlYJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EFD6C2BD11;
+	Mon, 15 Apr 2024 17:48:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713203187;
-	bh=m8GGov/pwkd9DiB/jsPNMMdHvIl9JLyjEqpFvD8mT3Y=;
+	s=k20201202; t=1713203283;
+	bh=aPShdw2DP64iiJ1YwOdHPMtTmJVIyo36jyERNxM2Bmg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=a+W91PH0rJbR34rVIb7i4ZG92oLj8k+4w0usTtj1xmw4ZbA73Zek/eXLKIHKYApl1
-	 +HfbjjVJhWRI5T4jUCjJBgsBl41atVlS3KE2RMKnkbzmrm3dzJc2vGcw/yR97tWP56
-	 9fOuRHqUxvxUAVRkMIQXl/9G5TiGa6MUp/LKsa7gN1S0KpnnXLi0CagQUP/uneFoxg
-	 9u93KFknrdZEAHKkjRwp7jbxgnONldjl78B0KLdk+kP0/4klKPjt0SOa/FWzBcAmlY
-	 BVaAQMqzZ7ZlilMEvssvIlxQPiDL1asPv4k1dvm9cIwrQ7woV5Mo/pdTFpMxQDkrhX
-	 tYQq3qfv09urg==
-Date: Mon, 15 Apr 2024 10:46:26 -0700
+	b=oQ+aDlYJ1RtNc+up9pT4B1jjw8AsUys3NmpGqycmvUIfKkjGlKdNvZe6dUfEu4gpn
+	 yTkctKYIR+V8pbXG/tzzvvrUpA+A2zvfHijap2aJmfjnQ8sV1GU30FRF0yJowywL8f
+	 r+lLchMCMd2Nd6U6Rno0GYqsBuOdAa+dO9iFjZvfnjC++NWzuCxAE/bN+1QLvV2eMT
+	 mG2l0QAB8wxaGyobPG7e7tl4JlOmNpitdmTugO5FuCK8ZiTi/qgZB2sNBzn5NYMqW0
+	 dVnbh/Cdw05PVRy/jm0htwbycd+TIp1G0/P/edWhX5d2FMKQQGasMJk2laN7cDNENx
+	 6325l6N7xrq8A==
+Date: Mon, 15 Apr 2024 10:48:02 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- netfilter-devel@vger.kernel.org, pablo@netfilter.org
-Subject: Re: [PATCH net-next 12/12] selftests: netfilter: update makefiles
- and kernel config
-Message-ID: <20240415104626.2b1ad88f@kernel.org>
-In-Reply-To: <20240415143054.GA27869@breakpoint.cc>
-References: <20240414225729.18451-1-fw@strlen.de>
-	<20240414225729.18451-13-fw@strlen.de>
-	<20240415070240.3d4b63c2@kernel.org>
-	<20240415143054.GA27869@breakpoint.cc>
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+Cc: davem@davemloft.net, edumazet@google.com, jarkko.palviainen@gmail.com,
+ linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org
+Subject: Re: [PATCH] net: usb: ax88179_178a: avoid writing the mac address
+ before first reading
+Message-ID: <20240415104802.6765bcdb@kernel.org>
+In-Reply-To: <20240415072735.6135-1-jtornosm@redhat.com>
+References: <20240411195129.69ff2bac@kernel.org>
+	<20240415072735.6135-1-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,9 +62,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 15 Apr 2024 16:30:54 +0200 Florian Westphal wrote:
-> If you prefer you can apply the series without the last patch
-> and then wait for v2 of that last one.
+On Mon, 15 Apr 2024 09:27:32 +0200 Jose Ignacio Tornos Martinez wrote:
+> The issue happened at the initialization stage. At that moment, during
+> normal rtnl_setlink call, the mac address is set and written in the device
+> registers, but since the reset was not commanded previously, the mac
+> address is not read from the device and without that, it always has the
+> random address that is pre-generated just in case. 
+> After this, during open operation, the reset is commanded and the mac
+> address is read, but as the device registers were modified, it reads the
+> pregenerated random mac address and not the default mac address for the
+> device.
 
-Sounds good, let me do that (in a few hours)!
+Oh, I see, why don't we issue the reset and probe time, then?
 
