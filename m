@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-88032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ECC88A564C
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:25:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FA1F8A565D
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:27:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 719191C2074A
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:25:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25F7D282261
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:27:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD67B78297;
-	Mon, 15 Apr 2024 15:25:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A9BB78C75;
+	Mon, 15 Apr 2024 15:27:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="brGdpK8p"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YriKVBW5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F55642047
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 15:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBCAF76046
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 15:27:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713194749; cv=none; b=OyD/17+Zgch8tQGR1ywFfJeqbBZVzYRsh3Ei7yI5Ac8zgrvbzWiokipOPkAcdtnVs8uhk3If1TgPenAWBURu8R8/3kvMmuqt/PfwPbtcjIcBiVWtDsDOERkYVid2vA7X0/gUGV44EGUlPgo9MaZ/UpzBCl+jqJgUYpHFszuXg10=
+	t=1713194855; cv=none; b=gCczXaA3qb2KaFXkok16r1bxkRg2O1vDwtXfR2vE/A87MRx9PcafblnY7IWCXkvGdJAuXiD/Dep/5Gz29wB2/lovNU4En4euBH1MshkYRE7386JRSu06lsLf3dPG1W1S9M03r4FwtNKPbE6dqBgHo0DnHvRG1UL0RpvTNvC7FOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713194749; c=relaxed/simple;
-	bh=afcKoWY3BS3iKrsLoB2PpUjmru6accZAQPrSMQKHF4M=;
+	s=arc-20240116; t=1713194855; c=relaxed/simple;
+	bh=U6MwTHQts3ueK1pmFz5i4IUS0KYgsWiNF2E+bQp/GBc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q7IidFa26mjraCgC4nnmvxfr9ihhLZ1jMSXoBrDHYLH+0J7LzrjgIn/OPr3FiJ9PyBwkEWwFEGKvJi/KJq1Q2UxpXJ2Tu5pEGOXmTiN3naPzgg9S4xmCbH0eokWaY7v+qKkjinvRrnji4xQrnFR1UV4PAj/aUTcBQsbWU0hMMxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=brGdpK8p; arc=none smtp.client-ip=209.85.210.182
+	 In-Reply-To:Content-Type; b=FB5r5KY2kFHYpTvJ2c24JUKElviOHzb8BpUpwZOrZP4URKmj9bikUD4OaA58HMSo6y3IU4d1G1k+l/jrdS6VNN5V8zUU+SJmw6vNppSC2VWhrX5W5Ww8UXauTZD2QvYU0Vq1F11dr4vUAJGStTQqW2Utm72xYkbq1TEfEa3nh/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YriKVBW5; arc=none smtp.client-ip=209.85.160.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6ecf05fd12fso3233488b3a.2
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 08:25:48 -0700 (PDT)
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-43493745415so16034191cf.1
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 08:27:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713194748; x=1713799548; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1713194853; x=1713799653; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3QzitXRHy8s+eVCe3/z2aGXhzIMD/8ZtUdVLyvRy4Sg=;
-        b=brGdpK8prtPBDJEjmw3XstXXz6d5ynABu1AH6RG2jqaWZttNllQtAk6tDkajeM5J55
-         6GOYdEtWK6MMZh+MHKGPTtH+5dWhLXR4pST9zGoin1h0JAsdXTRZmoBDbbYl2TiGsRwS
-         di3Kv5rrJWedb1Y7a+YQ/VXPEQ1Q9YgWo1Z7v8Up9zzn/UEh3+5oadmJUzlk9oRa4RK9
-         H1AzK2AFF9GZWykfwl6RC5IK+HxSEkRFnFNtmmUzlyiWdjzI2YgG8wHVEJpcXzy8eC1W
-         aRgm1xCE4k+wM5gZCecEJnUxcTzNnVmDiaD8+zjyS/+Ro6jjWVLr0vX5gdUxJ/h4728Y
-         FsXQ==
+        bh=WNbDcb5ydh2sjgDOavChgiz7jlCWIxUV458orncVUFA=;
+        b=YriKVBW5GZtMLKFZUDK6oniQGQ0q+oI90rLg21558vJ4AOobEjXMziGebdOIwerbRi
+         xXUoH9lOIb4zsq+PGTGOqi65UMTnOUD1IzjMg2kjR6PPp31+yJ5sfvzXNXl9WRdOxY4Z
+         9VlgWXLgE2tVubZZ5hFcx/SkhO4HK0KAkDY3AZOP0XrloW9KnzSlUZhjLJpkimi2NUno
+         c97HxWpQ5zDnILrNqNuUA7XBrMo77guiMBpsSloP9WdNZwoPFZ0o2c7HeKHChEqisNir
+         kuuOPvC0CHp5iTNee1Tt+W60iE2qmctuOIeLOcARMHkPOgfXFlZyfEde7qzwintCooYj
+         1zLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713194748; x=1713799548;
+        d=1e100.net; s=20230601; t=1713194853; x=1713799653;
         h=content-transfer-encoding:in-reply-to:autocrypt:from
          :content-language:references:cc:to:subject:user-agent:mime-version
          :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3QzitXRHy8s+eVCe3/z2aGXhzIMD/8ZtUdVLyvRy4Sg=;
-        b=OLI/8nShpMZ4YcvscDB8uP/Zpcw8VkGJxzDqcmFxCOsO1PlZ0yqdP7aKrv6EXtbXj0
-         9IXcf1Ewhb3TcFmHtwU3Aeq3cnLp+khKiCBlstL+OrX47CNXRhPKk/lrPstATzTUXnPl
-         JxSESe9Ifgcv5dtNpMp7lss2rHtzLeEQbYsmLQnWZ/J2tRyj6DTuwPDGsm41aBlGl+om
-         v9cz7W+p39A7EkZweq7y4z+nAnGe5BIFEXoeenE/uUO+ly9Qjo+7miLGyOcw1LOHDu4Y
-         kK1DDGRvzJEu62XxY8YKylDQBKaRA4R8smtiBb85DjcKEmNkjLUZYgI5ms2sG8S/yOqp
-         UV9w==
-X-Forwarded-Encrypted: i=1; AJvYcCVws6QHz4UUojzhsamfgdnhbj8r34ha8gDbAEJbqljxO7cPrmhaUIqM5JuEMnbeMHMM+6MGqVb7iH/1k/FSzwN94MwCcT6M
-X-Gm-Message-State: AOJu0YyCcKdmjQpdzBgUhXQZv5HbLwEv6Dpc3YDqJNYhVnyvs583qQNj
-	1xjX2PM9WsUybcJyPtBYUKHysky9L2cnw2HDp7rQ/RXdWJ2rBOgi
-X-Google-Smtp-Source: AGHT+IEOwxRngl/fS3a3B6seKT/kfVXi/GGoLTbp+QuVxeGCzTDfl8c3LRpw6gNmvq64X4qDAEMDEQ==
-X-Received: by 2002:a05:6a21:3405:b0:1a9:d24d:9439 with SMTP id yn5-20020a056a21340500b001a9d24d9439mr8100406pzb.56.1713194747623;
-        Mon, 15 Apr 2024 08:25:47 -0700 (PDT)
-Received: from [10.230.29.214] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id w9-20020a62c709000000b006e6c88d7690sm7678554pfg.160.2024.04.15.08.25.44
+        bh=WNbDcb5ydh2sjgDOavChgiz7jlCWIxUV458orncVUFA=;
+        b=YzmILhP63KrggwXt4a8gT1H7EPq9+Xhi+856W4Os8p/XzOJ8hWycgFxi0C+9cqCTsr
+         E8Lhc65YtZfLD/sgKESrflfLHIocZZjT8vJmu4P7osk9WeKRPIQ6ylVb+Z0cnG1FI3Ih
+         M78QBh3VdR/SGHOt55XY7qRUiaokFUfR+ZBValTY57HJFhhtM2RPChfx61GFqJn3oTxR
+         bfvZmjMZXCpyB+8HyPqAlizzrAtOjaA7f8074VIDgwt0JNLB6TBcKI7ihDGDVCs8JTzy
+         yuIG3m/N4q9qRu77KuzcEh+IsFfB+jXB2zphEO/AAEpd+Wz7UmckFgrnbWFL9RQVPKjf
+         fdEw==
+X-Forwarded-Encrypted: i=1; AJvYcCVgY3Jq87M2NKVdDbfK+Tbex1TyYPXrQ7Vw9q0DRKiWgjjjgClwYZo5KGS4HwHZO/7q42lq34efb4POg/uQ8sMnRGrgB5rb
+X-Gm-Message-State: AOJu0YxnckvSr0R5jA+EmmXfIYOaKus0j2j2vVv9sA2Jx5rd0BeKCboY
+	Q4B1OBU3OcCOtYCDQLbxCJ9FaSlQP3BaZ9I1NDQ+xXWvfW0EVjlm
+X-Google-Smtp-Source: AGHT+IHwEQWcmhY+GTJHeaOIYVgvgOsWOKkWAklfy5ZunmvAu7xqqynEa2yP4f+OWVFNloKZzvQkxA==
+X-Received: by 2002:a05:622a:308:b0:434:5e7e:9538 with SMTP id q8-20020a05622a030800b004345e7e9538mr13458965qtw.16.1713194852772;
+        Mon, 15 Apr 2024 08:27:32 -0700 (PDT)
+Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
+        by smtp.gmail.com with ESMTPSA id h11-20020ac8514b000000b00432bd953506sm6132256qtn.84.2024.04.15.08.27.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Apr 2024 08:25:46 -0700 (PDT)
-Message-ID: <ecf820bf-57fc-40ca-99db-a0274dceb2ac@gmail.com>
-Date: Mon, 15 Apr 2024 08:25:42 -0700
+        Mon, 15 Apr 2024 08:27:32 -0700 (PDT)
+Message-ID: <2ff3df2f-a300-45fe-95b7-64f4b5190f90@gmail.com>
+Date: Mon, 15 Apr 2024 08:27:28 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,14 +77,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: dsa: sja1105: provide own phylink MAC
+Subject: Re: [PATCH net-next] net: dsa: qca8k: provide own phylink MAC
  operations
 To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
  Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
  Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <E1rvIcT-006bQW-S3@rmk-PC.armlinux.org.uk>
+References: <E1rvIce-006bQi-58@rmk-PC.armlinux.org.uk>
 Content-Language: en-US
 From: Florian Fainelli <f.fainelli@gmail.com>
 Autocrypt: addr=f.fainelli@gmail.com; keydata=
@@ -120,15 +120,15 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
  X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
  HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <E1rvIcT-006bQW-S3@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1rvIce-006bQi-58@rmk-PC.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 4/12/2024 8:15 AM, Russell King (Oracle) wrote:
-> Convert sja1105 to provide its own phylink MAC operations, thus
-> avoiding the shim layer in DSA's port.c
+> Convert qca8k to provide its own phylink MAC operations, thus
+> avoiding the shim layer in DSA's port.c.
 > 
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
