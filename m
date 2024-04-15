@@ -1,111 +1,272 @@
-Return-Path: <netdev+bounces-87770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E8AB8A488B
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 08:58:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A56C8A48A1
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:04:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE83C283D75
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 06:58:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 943691F234C9
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 07:04:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F2420315;
-	Mon, 15 Apr 2024 06:58:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CPfoXfsn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7315C20DC8;
+	Mon, 15 Apr 2024 07:04:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B56200BF
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 06:58:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54DF5208D4;
+	Mon, 15 Apr 2024 07:04:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713164303; cv=none; b=tg7C/W8A8eAn/PdeKcuP4uQFhWm4QdKe0yB4WYmAklKBmfLaFNI7rL4uV4W3zTbGf2dsHHLCNg0MeCBXJkx0rGFgdge3nkNR2TVk2LEplS2FtByt6IwRf+W7zOwFeKp580EcP99NZAiczyiUruk+xsE7Cw7F2Q/pT2BfKq7mCtA=
+	t=1713164662; cv=none; b=MqdEr9yJyeYWumF4DOjbvLlhpd4n322YnWd0F3sMGfqSVEr6eEFugvHAxKybfLWc83wuzQHR06U2zotHnwBuqbprxHlc1RZG3v2hOETU8LG8sJO9VFKkCovrE9Az6UW4iajJXFLLmOz2d79bJ6IZLfpJAqHHZdpOPkT/7dPz1+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713164303; c=relaxed/simple;
-	bh=8zRocQO/rRgL1qKa5DTF7pfCxE7+mgM0HcYZDkfYtek=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u3URCIMbSr44uRV5o2niP75POfuFLBedr7rLVxhn/ARNC2rhC5ApyDa5tsBNY88rOf+5M5zMT0m2W5bwh3HyliIHHVLbVzlCv87XZe6SVSUf+2YzQzmX3IFIhGXHAxWtg0kz1IlDOHKNwtPlNZvqVkqvy2GA2iiiTSfulPbLwjg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CPfoXfsn; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713164300;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8zRocQO/rRgL1qKa5DTF7pfCxE7+mgM0HcYZDkfYtek=;
-	b=CPfoXfsn0SmyrpHVAW+tBvMWI/siVaRNiB5bWz2yt2cD7q9WuusDG2ealHOf7q+83ld8R3
-	BhxfGsBqLbJ1AiIlLa3VoNLAVpZaJYcTeJVWuxYSPumY2ZqOQJY2MqEOEhryv/W700tmc4
-	ZBsS4WU+VqPQPyPsUIwE4wx4+SbgxvI=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-375-3gt0HA-0MWamHdzVhtfGMg-1; Mon, 15 Apr 2024 02:58:17 -0400
-X-MC-Unique: 3gt0HA-0MWamHdzVhtfGMg-1
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5ca4ee5b97aso1550841a12.1
-        for <netdev@vger.kernel.org>; Sun, 14 Apr 2024 23:58:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713164296; x=1713769096;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8zRocQO/rRgL1qKa5DTF7pfCxE7+mgM0HcYZDkfYtek=;
-        b=e9wGMw7N7LDJzsq73DVgDb3dYmnO8pv4xaIgsq0Ctd6VAlBWCW6o7p+aMswmuz6Tvp
-         7ssHgh4uC2znNfNH9/I69jcGZglimwnjsBCK/PgUaxIbIAFepj9Kt/9Mc5ldxW3boJ6l
-         Taj0RhzMtbQ1K4dNz7/pLormaEGmpOOoBzdlgCBpVevek74WOaDSnXFy4A6UTxIY+D/u
-         zvzQ+IU/kG285QczOjgYhN5T99C5GvHdfTI/42bs6XYXUREPhnR+NI/l/3t0CHIn2Wff
-         8m3RsQa8Qm4oUG1O56dGEZDBKzDmQ/o4oh5uhOjOBFP6FWGT/fam7HPR2GfXFnKBmMlL
-         bmGQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWZgnbDFoUPOdsmT1JYctUYtbxE98lQP1sZ981NnNdsWK7tFf9Pq0QA6shC97b1WGfocG+bgqCEN4iwQtm1X6Nw0BAC5i+F
-X-Gm-Message-State: AOJu0YydKnmDk4CW2RTZvTjVfLWy5Dx3eBuxFKqCOs2ykw8jslIv3xMV
-	z0liAYtB4t4SYs/dDb+UR772M3Ic2bKOBiwtfyHh3MDgMBsGE2KYT3nNoYP8MtKj9H+PaTr2CP4
-	kIqF4O2exA24IOyvAnzuxuDVD4Mf2GOzi1P7Tgc2o44basyCN2YgjY0nY3bAb+9y2XcM8FGnOBp
-	CZTuZw/KSbfr9k7s1LC+5uuk/zxkl4
-X-Received: by 2002:a05:6a21:191:b0:1a9:6d96:c700 with SMTP id le17-20020a056a21019100b001a96d96c700mr8932591pzb.48.1713164296261;
-        Sun, 14 Apr 2024 23:58:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEfCe10Cxttrxe8F4OkPc7KjxC+SFTe/Z0SKvR0xbdRbE8/iQQiMdWF3kDr6DPf/3wtsnu4W5Rb/yh0o2uaUZk=
-X-Received: by 2002:a05:6a21:191:b0:1a9:6d96:c700 with SMTP id
- le17-20020a056a21019100b001a96d96c700mr8932578pzb.48.1713164295965; Sun, 14
- Apr 2024 23:58:15 -0700 (PDT)
+	s=arc-20240116; t=1713164662; c=relaxed/simple;
+	bh=rpDcJJsdf/Eq//NobJNfTfLV2gkVQLggG3kYjidJamE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=vB3dy199rWIzZCRnfPGNt1ixx/cJVXeG4QoAhl2oRA/z9NIrcbfw2rDdHLbp1q1wMrJhqI1Oz11Pjxief1fAbGJ4JkUfJ7OfyZsGRcD88pDPNXVMa9f0TxdHiThVDvY8a05Lip7TTN5mAWsc21n4tM/Gs9Lphm0GqtIq5TD1f7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-IronPort-AV: E=Sophos;i="6.07,202,1708354800"; 
+   d="asc'?scan'208";a="205411633"
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie6.idc.renesas.com with ESMTP; 15 Apr 2024 16:04:09 +0900
+Received: from [10.226.93.74] (unknown [10.226.93.74])
+	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 2713D4152EDB;
+	Mon, 15 Apr 2024 16:04:05 +0900 (JST)
+Message-ID: <e3e3c75f-9aee-40b6-b5b8-08260a8bac06@bp.renesas.com>
+Date: Mon, 15 Apr 2024 08:04:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <67c2edf49788c27d5f7a49fc701520b9fcf739b5.1713088999.git.christophe.jaillet@wanadoo.fr>
-In-Reply-To: <67c2edf49788c27d5f7a49fc701520b9fcf739b5.1713088999.git.christophe.jaillet@wanadoo.fr>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 15 Apr 2024 14:58:04 +0800
-Message-ID: <CACGkMEtufa6MqWkcsZqHW8eQzj4b2wCh8zFMSAuHkxpWowLmdQ@mail.gmail.com>
-Subject: Re: [PATCH v2] vhost-vdpa: Remove usage of the deprecated
- ida_simple_xx() API
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org, 
-	kernel-janitors@vger.kernel.org, Simon Horman <horms@kernel.org>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/4] net: ravb: Count packets instead of descriptors
+ in R-Car RX path
+Content-Language: en-GB
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240411114434.26186-1-paul.barker.ct@bp.renesas.com>
+ <20240411114434.26186-2-paul.barker.ct@bp.renesas.com>
+ <20240414120843.GA2860391@ragnatech.se>
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+Organization: Renesas Electronics Corporation
+In-Reply-To: <20240414120843.GA2860391@ragnatech.se>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------N7OjoLjMXkYdnC3RzfR3Vku5"
+
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------N7OjoLjMXkYdnC3RzfR3Vku5
+Content-Type: multipart/mixed; boundary="------------5cJdu37HikjVed8jxrLfA18V";
+ protected-headers="v1"
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+Message-ID: <e3e3c75f-9aee-40b6-b5b8-08260a8bac06@bp.renesas.com>
+Subject: Re: [PATCH net 1/4] net: ravb: Count packets instead of descriptors
+ in R-Car RX path
+References: <20240411114434.26186-1-paul.barker.ct@bp.renesas.com>
+ <20240411114434.26186-2-paul.barker.ct@bp.renesas.com>
+ <20240414120843.GA2860391@ragnatech.se>
+In-Reply-To: <20240414120843.GA2860391@ragnatech.se>
+
+--------------5cJdu37HikjVed8jxrLfA18V
+Content-Type: multipart/mixed; boundary="------------gmEemoc0LUPVlPiV0b6JebQ0"
+
+--------------gmEemoc0LUPVlPiV0b6JebQ0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Apr 14, 2024 at 6:04=E2=80=AFPM Christophe JAILLET
-<christophe.jaillet@wanadoo.fr> wrote:
->
-> ida_alloc() and ida_free() should be preferred to the deprecated
-> ida_simple_get() and ida_simple_remove().
->
-> Note that the upper limit of ida_simple_get() is exclusive, but the one o=
-f
-> ida_alloc_max() is inclusive. So a -1 has been added when needed.
->
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> Reviewed-by: Simon Horman <horms@kernel.org>
+On 14/04/2024 13:08, Niklas S=C3=B6derlund wrote:
+> Hi Paul,
+>=20
+> Thanks for your patch.
+>=20
+> On 2024-04-11 12:44:30 +0100, Paul Barker wrote:
+>> The units of "work done" in the RX path should be packets instead of
+>> descriptors.
+>>
+>> Descriptors which are used by the hardware to record error conditions =
+or
+>> are empty in the case of a DMA mapping error should not count towards
+>> our RX work budget.
+>>
+>> Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+>> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+>> ---
+>>  drivers/net/ethernet/renesas/ravb_main.c | 20 ++++++++------------
+>>  1 file changed, 8 insertions(+), 12 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/et=
+hernet/renesas/ravb_main.c
+>> index ba01c8cc3c90..70f2900648d4 100644
+>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+>> @@ -892,29 +892,25 @@ static bool ravb_rx_rcar(struct net_device *ndev=
+, int *quota, int q)
+>>  	struct ravb_private *priv =3D netdev_priv(ndev);
+>>  	const struct ravb_hw_info *info =3D priv->info;
+>>  	int entry =3D priv->cur_rx[q] % priv->num_rx_ring[q];
+>> -	int boguscnt =3D (priv->dirty_rx[q] + priv->num_rx_ring[q]) -
+>> -			priv->cur_rx[q];
+>>  	struct net_device_stats *stats =3D &priv->stats[q];
+>>  	struct ravb_ex_rx_desc *desc;
+>>  	struct sk_buff *skb;
+>>  	dma_addr_t dma_addr;
+>>  	struct timespec64 ts;
+>> +	int rx_packets =3D 0;
+>>  	u8  desc_status;
+>>  	u16 pkt_len;
+>>  	int limit;
+>> +	int i;
+>=20
+> The loop variable can never be negative, use unsigned int.
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+I matched the type we're comparing against - should we also convert
+limit to an unsigned int?
 
-Thanks
+>=20
+>> =20
+>> -	boguscnt =3D min(boguscnt, *quota);
+>> -	limit =3D boguscnt;
+>> +	limit =3D priv->dirty_rx[q] + priv->num_rx_ring[q] - priv->cur_rx[q]=
+;
+>>  	desc =3D &priv->rx_ring[q].ex_desc[entry];
+>> -	while (desc->die_dt !=3D DT_FEMPTY) {
+>> +	for (i =3D 0; i < limit && rx_packets < *quota && desc->die_dt !=3D =
+DT_FEMPTY; i++) {
+>>  		/* Descriptor type must be checked before all other reads */
+>>  		dma_rmb();
+>>  		desc_status =3D desc->msc;
+>>  		pkt_len =3D le16_to_cpu(desc->ds_cc) & RX_DS;
+>> =20
+>> -		if (--boguscnt < 0)
+>> -			break;
+>> -
+>=20
+> nit: It's a matter of taste, but I like this break condition in the cod=
+e=20
+> instead of modifying the loop as it's much clearer what's going on. But=
+=20
+> feel free to keep it as is as Sergey likes it.
+>=20
+>>  		/* We use 0-byte descriptors to mark the DMA mapping errors */
+>>  		if (!pkt_len)
+>>  			continue;
+>> @@ -960,7 +956,7 @@ static bool ravb_rx_rcar(struct net_device *ndev, =
+int *quota, int q)
+>>  			if (ndev->features & NETIF_F_RXCSUM)
+>>  				ravb_rx_csum(skb);
+>>  			napi_gro_receive(&priv->napi[q], skb);
+>> -			stats->rx_packets++;
+>> +			rx_packets++;
+>=20
+> Why do you add this intermediary variable? Is it not confusing to treat=
+=20
+> rx_packets and rx_bytes differently? Why not instead decrement *quota=20
+> here?
 
+To me, it's simpler to count received packets once instead of twice
+inside the loop (once by incrementing stats->rx_packets, a second time
+by decrementing *quota). This also makes future refactoring simpler as
+we already have the rx_packets count which we will need to be able to
+return so that we can properly track work done in ravb_poll().
+
+Thanks,
+
+--=20
+Paul Barker
+--------------gmEemoc0LUPVlPiV0b6JebQ0
+Content-Type: application/pgp-keys; name="OpenPGP_0x27F4B3459F002257.asc"
+Content-Disposition: attachment; filename="OpenPGP_0x27F4B3459F002257.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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3D
+=3DsIIN
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------gmEemoc0LUPVlPiV0b6JebQ0--
+
+--------------5cJdu37HikjVed8jxrLfA18V--
+
+--------------N7OjoLjMXkYdnC3RzfR3Vku5
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQSiu8gv1Xr0fIw/aoLbaV4Vf/JGvQUCZhzRZQUDAAAAAAAKCRDbaV4Vf/JGvb6T
+AQDt0Sq7XAl2b0ADsg4UuWOttQvO752J9tW6SaWtB7zzuwD9Fk0qUyOTK4NM7w9nn/MCwfNjIyM2
+qthDGJHJUweK4gQ=
+=xmZQ
+-----END PGP SIGNATURE-----
+
+--------------N7OjoLjMXkYdnC3RzfR3Vku5--
 
