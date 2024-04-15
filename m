@@ -1,55 +1,75 @@
-Return-Path: <netdev+bounces-88020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD9828A5578
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:44:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21E158A558C
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:48:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAF511C224A3
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:44:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC42C1F2276E
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E722071B32;
-	Mon, 15 Apr 2024 14:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3E54C618;
+	Mon, 15 Apr 2024 14:48:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Mfi3Icp7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NHxNZKKI"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2432F433C9
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 14:44:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAFAB2119;
+	Mon, 15 Apr 2024 14:48:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713192275; cv=none; b=RVRn47Q38uu6n9XJ0FG/6jfLAxj2XWzeGqB9vc+K+fhBI3ylfeZmQPINWSLeu6D3e7zyPw3/YMz74rWs8lv08M3qIURoMZ14cPepjjBPXK91B3KxBH/Txi8X8/ggoy8ePlVrhnXqG5ydwCOLd0khhvy3nqo1AnaPRFjJfKUDWRA=
+	t=1713192522; cv=none; b=jhdtCMYa2c2m/8nnPA3RTLvUpPQq7x/soRN6xyK0vBXj+acO5As8ZYUPR9q3Bgdfx0hIxP7f6RUJZAndKjzE9WJLwBZNu0ItF+smEpMZ0AlX8rWuy+G5gQzapz92EgUSToo32iUOPw13Njsa3ZttSgTMu+m1fHHL+hup7CW+Tqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713192275; c=relaxed/simple;
-	bh=px+oR5opa0NE96Az9oykOVE/JDuE/xpVMeE4NRV3dM8=;
+	s=arc-20240116; t=1713192522; c=relaxed/simple;
+	bh=ogpbZ9xNksQ+p1/2BEXp3imOyyJTQHkyfqcNvWF10aA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OC8PxW3xanKaL29oaZkgPS+HrDb72GRU+UYSOMk7mDD0S1d/S5/wYS1EYhNPtG3qlWDm15GT7kFbaoxiL65Pw4R8G8++0+KBWczPkk2/PcerdJdms5h6h9PSkXX5MR8kfw6geh/3YL1O3rpteP0Nl6gDaJ8/llQvl4iJDq/aAJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Mfi3Icp7; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Lox1M7KzM3D32ETAZKYxfhDA40PwMm/0xKMv1uwd2dg=; b=Mfi3Icp7VyqPqvpRI3sw1TWWtU
-	iJP7gZPyb7XaSVPKN3/g6wZn8FCTG2iSk//9KfZoO+v6R896R0Y8VtoMTNBiqEmbCo3cHKOrHLn+g
-	HrBMoYnm2X9dqp09Dn800KAnCO1VgiFcSfPr854B7n6PFovjakiju/tYk/s35YYBzjeM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rwNZP-00D39m-UX; Mon, 15 Apr 2024 16:44:31 +0200
-Date: Mon, 15 Apr 2024 16:44:31 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v1 5/5] net: tn40xx: add PHYLIB support
-Message-ID: <7c20aefa-d93b-41e2-9a23-97782926369d@lunn.ch>
-References: <20240415104352.4685-1-fujita.tomonori@gmail.com>
- <20240415104352.4685-6-fujita.tomonori@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gFTc/uCY4NI4erGryZE/ycx6jRJwPtT0/GN9x11Mb7BExWQkgjWaq4IlICrI5U5pslhGYmDnl2TkSTi3KJJGp4/8gaml+l5+n21WJvCvMhyLoqkjb1Qdu7r6pfE2SLe4nrEKYYdV2g3Rln+kQdfK29aoSDmO+uSzZuxFAUH/06Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NHxNZKKI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41E2EC113CC;
+	Mon, 15 Apr 2024 14:48:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713192522;
+	bh=ogpbZ9xNksQ+p1/2BEXp3imOyyJTQHkyfqcNvWF10aA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NHxNZKKIppeBSC3JQu3ygrnZyXklvG7/pkDk/jSlNlpA7gGaLQQqTyDt4sdwUqqCY
+	 mPjGWgSv6YacD9SisNO+liVkQ+ezivKaoc6zV4gyOlJStEJay7IBWOCbNhi3EQVJl+
+	 nuGFLLfV4d/XM5s7ueWjRbUQeQ7bmPWGwSTuM7StSE6+PCTLCKvQjqpNoIHKAnLdLm
+	 nSmovcOLbnT0UQGRF7RPCuuokxTouVBpC+eBsfMfLwY/NVLfh14BcKjUSqYU30lcTW
+	 hcXSL3qqiGY38y/nmocNRhe+iqmY4a3OdGvldLdIkliGgBMhnvChHx7Oacp9e8UJFM
+	 gsbJZQTzYL8Tw==
+Date: Mon, 15 Apr 2024 15:48:34 +0100
+From: Simon Horman <horms@kernel.org>
+To: Yi-De Wu <yi-de.wu@mediatek.com>
+Cc: Yingshiuan Pan <yingshiuan.pan@mediatek.com>,
+	Ze-Yu Wang <ze-yu.wang@mediatek.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
+	David Bradil <dbrazdil@google.com>,
+	Trilok Soni <quic_tsoni@quicinc.com>,
+	My Chuang <my.chuang@mediatek.com>,
+	Shawn Hsiao <shawn.hsiao@mediatek.com>,
+	PeiLun Suei <peilun.suei@mediatek.com>,
+	Liju Chen <liju-clr.chen@mediatek.com>,
+	Willix Yeh <chi-shen.yeh@mediatek.com>,
+	Kevenny Hsieh <kevenny.hsieh@mediatek.com>
+Subject: Re: [PATCH v10 06/21] virt: geniezone: Add set_user_memory_region
+ for vm
+Message-ID: <20240415144834.GC2320920@kernel.org>
+References: <20240412065718.29105-1-yi-de.wu@mediatek.com>
+ <20240412065718.29105-7-yi-de.wu@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,88 +78,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240415104352.4685-6-fujita.tomonori@gmail.com>
+In-Reply-To: <20240412065718.29105-7-yi-de.wu@mediatek.com>
 
-On Mon, Apr 15, 2024 at 07:43:52PM +0900, FUJITA Tomonori wrote:
-> This patch adds supports for multiple PHY hardware with PHYLIB. The
-> adapters with TN40xx chips use multiple PHY hardware; AMCC QT2025, TI
-> TLK10232, Aqrate AQR105, and Marvell 88X3120, 88X3310, and MV88E2010.
+On Fri, Apr 12, 2024 at 02:57:03PM +0800, Yi-De Wu wrote:
+> From: "Yingshiuan Pan" <yingshiuan.pan@mediatek.com>
 > 
-> For now, the PCI ID table of this driver enables adapters using only
-> QT2025 PHY. I've tested this driver and the QT2025 PHY driver with
-> Edimax EN-9320 10G adapter.
+> Direct use of physical memory from VMs is forbidden and designed to be
+> dictated to the privilege models managed by GenieZone hypervisor for
+> security reason. With the help of gzvm-ko, the hypervisor would be able
+> to manipulate memory as objects. And the memory management is highly
+> integrated with ARM 2-stage translation tables to convert VA to IPA to
+> PA under proper security measures required by protected VMs.
+> 
+> Signed-off-by: Yingshiuan Pan <yingshiuan.pan@mediatek.com>
+> Signed-off-by: Jerry Wang <ze-yu.wang@mediatek.com>
+> Signed-off-by: Liju Chen <liju-clr.chen@mediatek.com>
+> Signed-off-by: Yi-De Wu <yi-de.wu@mediatek.com>
 
-Please split this up. Add the MDIO bus master in one patch. Then add
-support for phylib in a second patch. They are logically different
-things.
+...
 
-Are there variants of this device using SFP? It might be you actually
-want to use phylink, not phylib. That is a bit messy for a PCI device,
-look at drivers/net/ethernet/wangxun.
+> diff --git a/drivers/virt/geniezone/gzvm_vm.c b/drivers/virt/geniezone/gzvm_vm.c
 
-> diff --git a/drivers/net/ethernet/tehuti/Kconfig b/drivers/net/ethernet/tehuti/Kconfig
-> index 4198fd59e42e..71f22471f9a0 100644
-> --- a/drivers/net/ethernet/tehuti/Kconfig
-> +++ b/drivers/net/ethernet/tehuti/Kconfig
-> @@ -27,6 +27,7 @@ config TEHUTI_TN40
->  	tristate "Tehuti Networks TN40xx 10G Ethernet adapters"
->  	depends on PCI
->  	select FW_LOADER
-> +	select AMCC_QT2025_PHY
+...
 
-That is pretty unusual, especially when you say there are a few
-different choices.
-
-> +static u32 bdx_mdio_get(struct bdx_priv *priv)
+> +/* gzvm_vm_ioctl() - Ioctl handler of VM FD */
+> +static long gzvm_vm_ioctl(struct file *filp, unsigned int ioctl,
+> +			  unsigned long arg)
 > +{
-> +	void __iomem *regs = priv->regs;
+> +	long ret;
+> +	void __user *argp = (void __user *)arg;
+> +	struct gzvm *gzvm = filp->private_data;
 > +
-> +#define BDX_MAX_MDIO_BUSY_LOOPS 1024
-> +	int tries = 0;
+> +	switch (ioctl) {
+> +	case GZVM_SET_USER_MEMORY_REGION: {
+> +		struct gzvm_userspace_memory_region userspace_mem;
 > +
-> +	while (++tries < BDX_MAX_MDIO_BUSY_LOOPS) {
-> +		u32 mdio_cmd_stat = readl(regs + REG_MDIO_CMD_STAT);
+> +		if (copy_from_user(&userspace_mem, argp, sizeof(userspace_mem)))
+> +			return -EFAULT;
 > +
-> +		if (GET_MDIO_BUSY(mdio_cmd_stat) == 0)
-> +			return mdio_cmd_stat;
+> +		ret = gzvm_vm_ioctl_set_memory_region(gzvm, &userspace_mem);
+> +		break;
 > +	}
-> +	dev_err(&priv->pdev->dev, "MDIO busy!\n");
+> +	default:
+> +		ret = -ENOTTY;
+> +	}
+> +out:
 
-include/linux/iopoll.h
+nit: the out label as added here, but it does not seem to be used
+     (until [PATCH v10 11/21] virt: geniezone: Add irqfd support).
 
-> +	return 0xFFFFFFFF;
+     Although it probably isn't hurting anything - other than automated
+     testing - it would be best to add as part of a patch that uses it.
 
-It is always better to use standard error codes. In this case,
--ETIMEDOUT.
+Flagged by gcc-13 and clang-18 W=1 builds.
 
-> +static u16 bdx_mdio_read(struct bdx_priv *priv, int device, int port, u16 addr)
-> +{
-> +	void __iomem *regs = priv->regs;
-> +	u32 tmp_reg, i;
-> +	/* wait until MDIO is not busy */
-> +	if (bdx_mdio_get(priv) == 0xFFFFFFFF)
-> +		return -1;
+> +	return ret;
+> +}
 > +
-> +	i = ((device & 0x1F) | ((port & 0x1F) << 5));
-> +	writel(i, regs + REG_MDIO_CMD);
-> +	writel((u32)addr, regs + REG_MDIO_ADDR);
-> +	tmp_reg = bdx_mdio_get(priv);
-> +	if (tmp_reg == 0xFFFFFFFF)
-> +		return -1;
+>  static void gzvm_destroy_vm(struct gzvm *gzvm)
+>  {
+>  	pr_debug("VM-%u is going to be destroyed\n", gzvm->vm_id);
 
-This function has a return type of u16. So returning -1 makes no sense.
-
-> +static int mdio_read_reg(struct mii_bus *mii_bus, int addr, int devnum, int regnum)
-> +{
-> +	return bdx_mdio_read(mii_bus->priv, devnum, addr, regnum);
-
-I would probably change bdx_mdio_read() so that it takes the
-parameters in the same order as mdio_read_reg().
-
-There is also a reasonably common convention that the functions
-performing C45 bus protocol operations have c45 in their name. It
-appears this hardware does not support C22 at all. That makes it
-unusual, and little hits like this are useful.
-
-	 Andrew
+...
 
