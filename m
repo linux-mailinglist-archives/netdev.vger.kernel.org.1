@@ -1,143 +1,147 @@
-Return-Path: <netdev+bounces-87805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E16D8A4B26
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:11:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D79E58A4B4C
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:19:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D62CB20A7C
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:11:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 068891C21472
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:19:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2F83BBF0;
-	Mon, 15 Apr 2024 09:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940834D11F;
+	Mon, 15 Apr 2024 09:18:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="pFymHNoy"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="OQ8hiKdq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A0983BBEF
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 09:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1DA83BBF8;
+	Mon, 15 Apr 2024 09:18:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713172259; cv=none; b=f8JyAtFFkD+VZr30ZzKlqQCvZQbav3rprlouIADUkCp03vj7L3Fm5GOpysGbJjG8YRisFr6YQFFH7dVZ2FWJ4xlWjUlRv5ECUYendtGDxe3tw2MDfMwMfyMS/VASGCSLyutk6MFQT8P4vJwqTeewsCJmzwNhNS1NyEqfcddsEQ0=
+	t=1713172696; cv=none; b=ft6gaznxI8a6Kbn2eDQb4yObHgB0tNj8S9CWojsyIEvb5w0gRDe9++Xf/IvVvPqUDAxsJVP7dyqLhOPHajav1Wr4rLdlHi4R3EEMOfb75okP5TRwMSylp4rMbPSnCxHZV8N/MJkS1d8YY1EhjPjBaay9223lfaFd1zpaDzLNxmM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713172259; c=relaxed/simple;
-	bh=9us6Y1ajEiiV1jyVFPoncNu5ktaGpKe94wnmRRspazY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=msBO3EnRtn86O9cp7rERgbsfQ+XbvMZr8/qbXYIPXE2CrNwtCH7xtM6Mn1IKxTeF9Rw64et/1Lit6JKXbqHFD4V2AtZ19FmB/vcnUV6VIiRYiZmDpatlgEvyqu3ukN5O2zglbDPsz+h7iuRXo3EpBLVWvDSCJ6dAJaUlJOJjvvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=pFymHNoy; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-57020ad438fso1502569a12.0
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 02:10:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713172254; x=1713777054; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=d4XjbL6a5/Im8TK1zXqyW0HHwUewiq1K7ne1Tk5toYM=;
-        b=pFymHNoyWTr7tg4VwooAxF2MudzZ5VoeEI8WVVuNv6Peiog3VVaCUDy4H1Kx2b1jXd
-         R1+UBRwK9S/8xMZP8OdnRnD5Nskeq1JvnnMSNYNRiSebsQJ9ZQvmaFt3TX/emi9tIdzv
-         DMZ2zLm+7NtQmx6yIx4P+NmuUy8UzKlfjHiTia9gEy94oIHqUkjNlL/msxzjK6g3Qxva
-         lUqfAzYoro1iDyEhhtBnDax8UlOoWHIkdzMnZAjxNtjXNPFP+zCa6g4X21l2eikpBEBs
-         BlUhDwV99W+/sZfp0torIUYzvysdVcWzcbPD1Kczr4h4l6LuBCeSVj7AfbkX4dXjJ6m4
-         goPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713172254; x=1713777054;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d4XjbL6a5/Im8TK1zXqyW0HHwUewiq1K7ne1Tk5toYM=;
-        b=HwEFk+NBDkc0MW8KVIwc8U87XBWNvY7oujKSLu/jtDEqF95sWT2Ab/rSjC0V0ANMQx
-         4VG6DR5hI+868dBJ4YnKSXRNY0u0KGiFXZk36MvzHrHHwj2uP/2uDYxrPd9drSJNh5cK
-         qstFT1UBQ19clXYXbbrcKt5bdBRQuA8Yd3TyRZKl/VGRImHIqcfeFxA4e3aIZsMB5abo
-         baObrhhX6nC9/NKwgrijEumHNV++RrFZmeck6X62vWrFJOAXlhJCh4gP2dYjxDJNd7vA
-         C/9h7S3Jfey+hXckaJt/7MI1kOiD9Z/2e9Sa5gW2XRtjRNP1ao1FdQwHQq33BKOlxccN
-         WqFA==
-X-Forwarded-Encrypted: i=1; AJvYcCXAdeWcmLTDKWZTt5jJGCY9tzNQ7IjUgMrh8hLgF5BZbGB+IMHwONf9V0ndnv6SDHPjBBUhs9/rzpDLvurC9afpU75n+ZUd
-X-Gm-Message-State: AOJu0Yy4Tyhr78jyUl0ZtWoZBj9eYZcE4vwm+7ddyrNANyKuiMZjuX99
-	5Tilfv9S/Jq6jdRHqSGYLpLoFdGLi+ZGEVy2RAcETacuKVjOsseaM3HQuvVE5ww=
-X-Google-Smtp-Source: AGHT+IFoB0ypaD1UliUU36N22hJtn0BEz8IsHUYPTfllYjwZT6Ka9HjyF/0E/gkjeav1LS85OdOydQ==
-X-Received: by 2002:a50:d78c:0:b0:570:392:aa1a with SMTP id w12-20020a50d78c000000b005700392aa1amr6121914edi.7.1713172254337;
-        Mon, 15 Apr 2024 02:10:54 -0700 (PDT)
-Received: from localhost (37-48-2-146.nat.epc.tmcz.cz. [37.48.2.146])
-        by smtp.gmail.com with ESMTPSA id g18-20020a056402091200b0057025ea16f2sm1149069edz.39.2024.04.15.02.10.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 02:10:53 -0700 (PDT)
-Date: Mon, 15 Apr 2024 11:10:50 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com, jiri@nvidia.com,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	mateusz.polchlopek@intel.com,
-	Piotr Raczynski <piotr.raczynski@intel.com>
-Subject: Re: [iwl-next v3 3/7] ice: add basic devlink subfunctions support
-Message-ID: <ZhzvGlDiuaPSEHCX@nanopsycho>
-References: <20240412063053.339795-1-michal.swiatkowski@linux.intel.com>
- <20240412063053.339795-4-michal.swiatkowski@linux.intel.com>
- <Zhje0mQgQTMXwICb@nanopsycho>
- <Zhzny769lYYmLUs0@mev-dev>
+	s=arc-20240116; t=1713172696; c=relaxed/simple;
+	bh=lDThYcOt7vma13MyZay//1zpRu7cNoGhY8q4H2Vz6kM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=eR59hPkwhrPxl1hq8VSHN6Sqg6zVF45Q83SqU2JE7Kl9ZQADQ5nq2u55+NLuUyP6OIwdFNnZuIOFpR9TAfnFsAFcPHvXZ5UpUmW/1EYokfi2GFagMfxcYpji6quk+/P85l8pzhO1wPd/N5JpmntgnSquUh7uLEZGqDzhdhqOYJE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=OQ8hiKdq; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 46EBCC000D;
+	Mon, 15 Apr 2024 09:18:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1713172687;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=eCigKqN4ZXuHAYp92YPMCsXR7qfiMRuuveYHe/CK+2c=;
+	b=OQ8hiKdqSSbmmEj6NjpkJX7Vn0on02LMlhLvbW3F4WfEAQTJWElox9WK50sPGuWsIWTyWG
+	rqYg+aS5sy4EQgcRiOEPn/VI7rCl/fVImaCeF5MuMFIxHGBEjmYlqKq6Y9LAJHfSOdaEtA
+	KCkKEoJbs2nnij2JoGRgAyDIDUff4qkk1PfQi4sWjWqLXqKetM8dCFrDKj91RksZNc/he+
+	bj8akanG+yTuO/syaLY0DFlUGo60m++6H7IiaM6Z3E9YzsRX52DZjx0e3RmruVLn37d08A
+	F/6ySdW4/ubj1ypWs9yv5XqInqzANk0oUKQbpZBg8jMvXjm6QdZePGbkKMm3PA==
+From: Romain Gantois <romain.gantois@bootlin.com>
+Subject: [PATCH net-next v3 0/5] net: stmmac: Add support for RZN1 GMAC
+ devices
+Date: Mon, 15 Apr 2024 11:18:40 +0200
+Message-Id: <20240415-rzn1-gmac1-v3-0-ab12f2c4401d@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zhzny769lYYmLUs0@mev-dev>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAPHwHGYC/22NQQ6DIBQFr2L+ujSIWKGr3qPpQvGjJBUaIMTWe
+ PcSVjXpcvIy8zYI6A0GuFYbeEwmGGczNKcK1NzbCYkZMwOjjFNOGfEfW5Np6VVNLqJVWnSyGSl
+ CFl4etVlL7A4WI7G4RnjkZTYhOv8uL6ku+79gqgkl7YBsYELyUajb4Fx8GntWbimhxH5leZBZl
+ jupet5qplUnj/K+71/j/dum7QAAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>, 
+ Geert Uytterhoeven <geert+renesas@glider.be>, 
+ Magnus Damm <magnus.damm@gmail.com>, 
+ Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ =?utf-8?q?Cl=C3=A9ment_L=C3=A9ger?= <clement.leger@bootlin.com>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-renesas-soc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, 
+ Romain Gantois <romain.gantois@bootlin.com>, 
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>
+X-Mailer: b4 0.13.0
+X-GND-Sasl: romain.gantois@bootlin.com
 
-Mon, Apr 15, 2024 at 10:39:39AM CEST, michal.swiatkowski@linux.intel.com wrote:
->On Fri, Apr 12, 2024 at 09:12:18AM +0200, Jiri Pirko wrote:
->> Fri, Apr 12, 2024 at 08:30:49AM CEST, michal.swiatkowski@linux.intel.com wrote:
->> >From: Piotr Raczynski <piotr.raczynski@intel.com>
+Hello everyone,
 
-[...]
+This is version three of my series that adds support for a Gigabit Ethernet
+controller featured in the Renesas r9a06g032 SoC, of the RZ/N1 family. This
+GMAC device is based on a Synopsys IP and is compatible with the stmmac driver.
 
->> >+static int
->> >+ice_devlink_port_fn_state_get(struct devlink_port *port,
->> >+			      enum devlink_port_fn_state *state,
->> >+			      enum devlink_port_fn_opstate *opstate,
->> >+			      struct netlink_ext_ack *extack)
->> >+{
->> >+	struct ice_dynamic_port *dyn_port;
->> >+
->> >+	dyn_port = ice_devlink_port_to_dyn(port);
->> >+
->> >+	if (dyn_port->active) {
->> >+		*state = DEVLINK_PORT_FN_STATE_ACTIVE;
->> >+		*opstate = DEVLINK_PORT_FN_OPSTATE_ATTACHED;
->> 
->> Interesting. This means that you don't distinguish between admin state
->> and operational state. Meaning, when user does activate, you atomically
->> achive the hw attachment and it is ready to go before activation cmd
->> returns, correct? I'm just making sure I understand the code.
->> 
->
->I am setting the dyn_port->active after the activation heppens, so it is
->true, when active is set it is ready to go.
->
->Do you mean that dyn_port->active should be set even before the activation is
->finished? I mean when user only call devlink to active the port?
+My former colleague Clément Léger originally sent a series for this driver,
+but an issue in bringing up the PCS clock had blocked the upstreaming
+process. This issue has since been resolved by the following series:
 
-The devlink instance lock is taken the whole time, isn't it?
+https://lore.kernel.org/all/20240326-rxc_bugfix-v6-0-24a74e5c761f@bootlin.com/
 
->
->> 
->> >+	} else {
->> >+		*state = DEVLINK_PORT_FN_STATE_INACTIVE;
->> >+		*opstate = DEVLINK_PORT_FN_OPSTATE_DETACHED;
->> >+	}
->> >+
->> >+	return 0;
->> >+}
->> >+
+This series consists of a devicetree binding describing the RZN1 GMAC
+controller IP, a node for the GMAC1 device in the r9a06g032 SoC device
+tree, and the GMAC driver itself which is a glue layer in stmmac.
 
-[...]
+There are also two patches by Russell that improve pcs initialization handling
+in stmmac.
+
+Best Regards,
+
+Romain Gantois
+
+---
+Changes in v3:
+- Fixed a typo in the socfpga patch
+- Link to v2: https://lore.kernel.org/r/20240409-rzn1-gmac1-v2-0-79ca45f2fc79@bootlin.com
+
+Changes in v2:
+- Add pcs_init/exit callbacks in stmmac to solve race condition
+- Use pcs_init/exit callbacks in dwmac_socfpga glue layer
+- Miscellaneous device tree binding corrections
+- Link to v1: https://lore.kernel.org/r/20240402-rzn1-gmac1-v1-0-5be2b2894d8c@bootlin.com
+
+---
+Clément Léger (3):
+      dt-bindings: net: renesas,rzn1-gmac: Document RZ/N1 GMAC support
+      net: stmmac: add support for RZ/N1 GMAC
+      ARM: dts: r9a06g032: describe GMAC1
+
+Russell King (Oracle) (2):
+      net: stmmac: introduce pcs_init/pcs_exit stmmac operations
+      net: stmmac: dwmac-socfpga: use pcs_init/pcs_exit
+
+ .../devicetree/bindings/net/renesas,rzn1-gmac.yaml |  66 +++++++++++++
+ MAINTAINERS                                        |   6 ++
+ arch/arm/boot/dts/renesas/r9a06g032.dtsi           |  19 ++++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig        |  12 +++
+ drivers/net/ethernet/stmicro/stmmac/Makefile       |   1 +
+ drivers/net/ethernet/stmicro/stmmac/dwmac-rzn1.c   |  88 +++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/dwmac-socfpga.c    | 109 +++++++++++----------
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  14 +++
+ include/linux/stmmac.h                             |   2 +
+ 9 files changed, 263 insertions(+), 54 deletions(-)
+---
+base-commit: f1e197a665c2148ebc25fe09c53689e60afea195
+change-id: 20240402-rzn1-gmac1-685cf8793d0e
+
+Best regards,
+-- 
+Romain Gantois <romain.gantois@bootlin.com>
+
 
