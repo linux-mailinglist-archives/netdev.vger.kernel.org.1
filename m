@@ -1,130 +1,137 @@
-Return-Path: <netdev+bounces-88047-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D38CD8A571B
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:08:44 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 091408A5723
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:09:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 621A9B23392
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:08:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C59A1F22D35
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:09:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE6F7F7EF;
-	Mon, 15 Apr 2024 16:08:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8EEA7F7EF;
+	Mon, 15 Apr 2024 16:09:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hZtsjETm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XNYNBx6O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37BEA8BF8;
-	Mon, 15 Apr 2024 16:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1669F7F7FF
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 16:09:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713197315; cv=none; b=J62F+ySPPGcg1LjIBPyZmhlS8wecBp0kjz0czPoaTMxOLU6yGVAdOFSA/Yn24JxC7+w5Ul6Z33VTahpIaBhOlNw1np8OU06/nSsfaArhV6rcg/1ROtCx/vtGh8+SSnkgYAUbP07P3gEHm41qMr/Tipfk5sKX3L7vI/RcT9hM+iQ=
+	t=1713197365; cv=none; b=uXwIEB22UOeTwTzGUEy4/D6O6txyYVh5S6fyyITqx7+Tj/nU1e6UGFoinCaP3VKuWKscUJED/kiaDL9+jPAA8Hsg3LTRvGYWR404f6undEhscoAEehSoVDT9uoCKxYR33lD5ZEcYBOSVJrW3gouiTfmYxGU3kc5hk2XMyiS54Po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713197315; c=relaxed/simple;
-	bh=7uG1NhDw6PKvPJnncdvPDTqawqTBZ9/3GLUgAKyTgCQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AVlG+id+nZXvd+y5Fy6OO/3IDBHhc9kXAjpt3qY8t5rRsAqSKKa6CWH1BWa3GyUc66znJUWHyfY+OO/AsCrnWOAkxbwfd/8cD0Zqu7dGASDtKFA5+SKD1b5w2TSm7WkwHoq6xP724ginspqvR8p1zHzeca7m3WKhr0uWlKnDlfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hZtsjETm; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2a55a3d0b8eso2160725a91.1;
-        Mon, 15 Apr 2024 09:08:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713197313; x=1713802113; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=7uG1NhDw6PKvPJnncdvPDTqawqTBZ9/3GLUgAKyTgCQ=;
-        b=hZtsjETmnhejSU3mWEE5wgZkgfbkKtnG7Ep/trTq5LVkZNX2YaLeVkaV36W4tBB6W4
-         ASkzuB1Jk4PJgyprpMq224gS6XnKnE9fv/S4A7WLZdtRMzzgumW1u+1ArmNXPEj7/7F1
-         xB5e0fk19IeKIDhBIqQV3j7Q/DEOD6IUX2oV7HVg6CQhQBqwDPzAhn274ZuHA7xqaY1Q
-         1TJN6zGi2H/kQK8/aychGxXrro2UZw7S9W4wgPXHqUhjGzN9v8CHtw4f8aikoRzhP853
-         nr9DxqGWFbun408GsCBohaLlvdWyqLySQsQZH18foig4aXEam4GO8LKSNLX6tK7lMNLn
-         mR1Q==
+	s=arc-20240116; t=1713197365; c=relaxed/simple;
+	bh=3Zh80JPSryowBZLANIsp7Zr2FfKLqAS7PBCMqtsGz40=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=fVoTcGwr/Hohr6/6pS3+sf8FB4wgzHeDTHDGt/u0YLjOoM4El8Qi0d6iakeGTwwCLbrDjFbmkpNdGKK7lDzYJwC6e8UymXD46/Ihn0ehwpKURVEeLKHCHO7/tSnSif4nuzcTDzqQ7jSsz/tAe3yPSR5mDBRGuUQ678i4qsIkXM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XNYNBx6O; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713197363;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=rKI2tlDGlTTbSFeh1O6HwK6knZX0i4+ANwkgdRtQfhI=;
+	b=XNYNBx6OelbbUMOc66aNeIOhSbdYMmafFvKWeI1NZGov/VPV/or4tCykeyvA/Es7cY/TAl
+	kIEZrSr/Hh87or6VrBykJjw7rXGoCNnqXQ8wpd15kODq7PEdShbyGBXZEV4Nb5BpoEcZmS
+	h6q6YiecyBoYQ+AOBUgEXt9igQxQ/yQ=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-7-25mCQIB0MJ2dZMZ3nlzpUA-1; Mon, 15 Apr 2024 12:09:21 -0400
+X-MC-Unique: 25mCQIB0MJ2dZMZ3nlzpUA-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2dabbf48251so93471fa.0
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 09:09:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713197313; x=1713802113;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7uG1NhDw6PKvPJnncdvPDTqawqTBZ9/3GLUgAKyTgCQ=;
-        b=S9WuIAl7c2BgbKK5pGBacZTz/rTWEow2HSUnNyjuZpNZZZn6usms0eQrnQ+yJ3DWNg
-         gWf2arXl9fv5Fht0VeV5mdW1qnPEd/Dl0cHpdWmIoF75QRhcLShQIQgXuqLdmYGk0bBy
-         LXsX1T7vRWK0iPLsZogJH5ydEpeD6GRCsjj2MrI7Ufmcs6s2EiTku0JB1e0V4y5Tq/E6
-         BbtwmNMIi0Lpag3xQtcAKxlysX6jxeOJ20ltlBrzzyHBwfBJN0fSVQTTX6Y/DjIbMvHb
-         f9KL6bvojhNTYjubXmXO5HclDbOxc6vAU2KeiXu96qTJ7Lpi/L6JaRhMDi0l7Oa/214V
-         fvTA==
-X-Forwarded-Encrypted: i=1; AJvYcCXW4cDwPSGVIzcfdayjNsx5fy9n1E8Bm3dev3vdwIrOiD4ktfLcO/AcO33KJf2B9j6psUamdi2himlE1iSgWrtrnMPe4eZcHKNd6RvDkNBUAlJcn1AGQtLcwAaITVmny5ESlrEUISSaYLAviXY23RO1EqmB/aA8cyieQTtCA2MGa9IdmgrujsICkBSTphRSSxELVZtZ2NPcDN1gw84K7XRH
-X-Gm-Message-State: AOJu0YwNhNr2S323b7jS5hVJ7Fi4rLxy1Bp+9QFuLDar6cAMMRe8o05L
-	FBJTw4HpaFDwa9vqMXq5axPlr4jLd7KHZ5HEHZW05Ft0WY1DmMXSxdgfKvXYGFrsSwA92xZc3gx
-	7qmjLv6FX6AVZfpSz5c3QCiB7gOo=
-X-Google-Smtp-Source: AGHT+IFWO6nlrMJmutSX59RW7e3qJHcpdliV/hqVvvX5tCC4s9nNzTrSMT2rNbIwYz3dSTVQ1wEOkjiblCWkFGYaVuc=
-X-Received: by 2002:a17:90a:5315:b0:2a2:6244:32b5 with SMTP id
- x21-20020a17090a531500b002a2624432b5mr124718pjh.11.1713197313458; Mon, 15 Apr
- 2024 09:08:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713197360; x=1713802160;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rKI2tlDGlTTbSFeh1O6HwK6knZX0i4+ANwkgdRtQfhI=;
+        b=O64cjfFvgHaJtMngRGYRRTl7IBBTBWxIZ0/jwtiqNZAjGzD4K5rlTGNqfS+mgnTi8k
+         yK5jnxhwogtv5l7uheQbqEEimE62Sq4iyFHqUhCJJhIgMI6+A1ULm6LVeY+vpbzTO0PV
+         dSE3c2zAkR5ERf3t8DYmgp/+SlgWRNwRs2BjiDEmnO7TtO/15OxmFsFRUG7vSnNwYwZU
+         81/W4LIV6tA8IKyDYg0ZfoE278tEoT2kwYEe4v8FjND32IKwQ0HtGcBmt/kSKFe5PEoC
+         KJ4WQZimZTgE5y1LfEix2YAUtkvGpzvcxjmXAQNOQ9zpJBcLpOOEZQ1U+gGGYPPkgHk5
+         uQOw==
+X-Forwarded-Encrypted: i=1; AJvYcCUrBYPMRqoKfWXq0Dgal0q3VGEJLVbLTEIG4BIL2TWWZb7MQ7h/IhM8p/5TzH6dXsX37OsIUhkGk6qbYyyf/6BLsZ9JdxC1
+X-Gm-Message-State: AOJu0YyqLmUxj+pvkJtfk7xJMoI4EkO5SgDnYHxGN124jK60y3TvDQbd
+	WxRgXlyEyhlXP/3sCNV4qrMsUkYovosN4fZULg2hUpstFLQUckO243JSC4wCyA0x0pEnagJk2hm
+	SiZ/JMZlPgKAYOoIUHgECvEAL1JDA6HgqRL0Rp4/MYDtGmJuBDwZzLiEwHnjv9A==
+X-Received: by 2002:a2e:7016:0:b0:2da:590:db77 with SMTP id l22-20020a2e7016000000b002da0590db77mr5288657ljc.0.1713197359819;
+        Mon, 15 Apr 2024 09:09:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF0ANBrqbbcSLy7HUz6/jGdBvOrBvWPDcFM4Pn6JwGc+nZ3qpoeMU1dHED5oIYrroivu2hWVw==
+X-Received: by 2002:a2e:7016:0:b0:2da:590:db77 with SMTP id l22-20020a2e7016000000b002da0590db77mr5288641ljc.0.1713197359486;
+        Mon, 15 Apr 2024 09:09:19 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-228-238.dyn.eolo.it. [146.241.228.238])
+        by smtp.gmail.com with ESMTPSA id u17-20020a05600c139100b0041496734318sm20039352wmf.24.2024.04.15.09.09.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 09:09:19 -0700 (PDT)
+Message-ID: <d6a773cd3091d07822e49049dc0a8c95066c9510.camel@redhat.com>
+Subject: Re: [PATCH net-next 5/5] selftests: drv-net: add a trivial ping test
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	shuah@kernel.org, petrm@nvidia.com, linux-kselftest@vger.kernel.org, 
+	willemb@google.com
+Date: Mon, 15 Apr 2024 18:09:17 +0200
+In-Reply-To: <20240415073323.351c888b@kernel.org>
+References: <20240412233705.1066444-1-kuba@kernel.org>
+	 <20240412233705.1066444-6-kuba@kernel.org>
+	 <49deeded3764fd43b9af23f2f6e1b8f4ab599910.camel@redhat.com>
+	 <20240415073323.351c888b@kernel.org>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240412162510.29483-1-robimarko@gmail.com> <20240412162510.29483-2-robimarko@gmail.com>
- <4a1e0cb6-c319-4eb1-9bd1-5ff13eabfe1b@isd.uni-stuttgart.de>
- <c7106c8e-0c99-4160-966e-b1a8ba5770ee@quicinc.com> <87ttk2y5iz.fsf@kernel.org>
-In-Reply-To: <87ttk2y5iz.fsf@kernel.org>
-From: Robert Marko <robimarko@gmail.com>
-Date: Mon, 15 Apr 2024 18:08:21 +0200
-Message-ID: <CAOX2RU535xy_nGBnsqZzbjF1VGqNRtFKdT-zMVTNTgUmi0HeXw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] wifi: ath11k: support DT ieee80211-freq-limit
- property to limit channels
-To: Kalle Valo <kvalo@kernel.org>
-Cc: Jeff Johnson <quic_jjohnson@quicinc.com>, 
-	Christian Lamparter <christian.lamparter@isd.uni-stuttgart.de>, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, 
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, jjohnson@kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, ath11k@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 15 Apr 2024 at 18:06, Kalle Valo <kvalo@kernel.org> wrote:
->
-> Jeff Johnson <quic_jjohnson@quicinc.com> writes:
->
-> > On 4/12/2024 12:52 PM, Christian Lamparter wrote:
-> >> On 4/12/24 6:24 PM, Robert Marko wrote:
-> >>> The common DT property can be used to limit the available channels
-> >>> but ath11k has to manually call wiphy_read_of_freq_limits().
-> >>>
-> >>> Signed-off-by: Robert Marko <robimarko@gmail.com>
-> >>
-> >> I've seen this before.
-> >>
-> >> https://patchwork.kernel.org/project/linux-wireless/patch/ed266944c721de8dbf0fe35f387a3a71b2c84037.1686486468.git.chunkeey@gmail.com/
-> >>
-> >> (dt-binding too. it has/had an ack)
-> >> https://patchwork.kernel.org/project/linux-wireless/patch/fc606d2550d047a53b4289235dd3c0fe23d5daac.1686486468.git.chunkeey@gmail.com/
-> >>
-> >> sooo.... this is awkward.
-> >
-> > Patchwork indicates Changes Requested
-> > Any idea what changes Kalle is looking for?
->
-> I can't remember anymore but most likely I assumed based on Krzysztof's
-> comments there will be v3 and missed that Conor already had acked it.
-> Sorry about that, I set Christian's patches to New state now so that
-> they are back in queue. And I'll drop Robert patches. Does this sound ok
-> to everyone?
+On Mon, 2024-04-15 at 07:33 -0700, Jakub Kicinski wrote:
+> On Mon, 15 Apr 2024 11:31:05 +0200 Paolo Abeni wrote:
+> > On Fri, 2024-04-12 at 16:37 -0700, Jakub Kicinski wrote:
+> > > +def ping_v4(cfg) -> None:
+> > > +    if not cfg.v4:
+> > > +        raise KsftXfailEx()
+> > > +
+> > > +    cmd(f"ping -c 1 -W0.5 {cfg.ep_v4}")
+> > > +    cmd(f"ping -c 1 -W0.5 {cfg.v4}", host=3Dcfg.endpoint) =20
+> >=20
+> > Very minor nit, I personally find a bit more readable:
+> >=20
+> > 	cfg.endpoint.cmd()
+> >=20
+> > Which is already supported by the current infra, right?
+> >=20
+> > With both endpoint possibly remote could be:
+> >=20
+> > 	cfg.ep1.cmd()
+> > 	cfg.ep2.cmd()
+>=20
+> As I said in the cover letter, I don't want to push us too much towards
+> classes. The argument format make local and local+remote tests look more
+> similar.
 
-Sounds good to me, thanks for looking into it.
+I guess it's a matter of personal preferences. I know mine are usually
+quite twisted ;)
 
-Regards,
-Robert
->
-> --
-> https://patchwork.kernel.org/project/linux-wireless/list/
->
-> https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+I'm fine with either syntax.
+
+Cheers,
+
+Paolo
+
 
