@@ -1,79 +1,107 @@
-Return-Path: <netdev+bounces-88013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6F578A5419
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:34:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8E968A541B
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:34:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92FFF282A29
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:34:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EE061F21C8E
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:34:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5AD78C97;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D57EF82D89;
 	Mon, 15 Apr 2024 14:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EznNHSgU"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7AC745D5;
-	Mon, 15 Apr 2024 14:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD37F82D83;
+	Mon, 15 Apr 2024 14:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713191469; cv=none; b=HyHlLo8B5PTXjrcLIqyR80LxNZ4LJyy84mq9cRO0OkoDi19SJi04piAF6kzaRy1z0CkrKW3WkaVGJ/nK+9kS8SLwvAzFiqSOEG+hMJxFXRO90KhaL3JtKB0FVS/bLoKmvk1Ww4n9imu1boO13jEo9OsGYBRJXDlbEOKNSYTb4hQ=
+	t=1713191470; cv=none; b=Cdi4x1ErCaihaXdm/HDrU5Goraix37B+mAo6N+grOdoHLHmGt+srW/ldnU659rGOZETweNOO9OXdvg9VjAs0ejZsFyn2w/orlcnnwKcZ8Gchpa4pAdNT+R15KLTe10I5HU+T+2gqlE4Wlb2eidq4DWJEGQBHXDwyTcw+tonS1yk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713191469; c=relaxed/simple;
-	bh=bW2Dw6kU+VfIMhwD/SgbJdX2R5Fl9uzx7u7DkFDENMs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ETMAt1d6Rtwq9T3uatE/EkoDINI2Nip6iqFRcsTia6NgbqjL8u/wFyPNhIWgoEiaz31mYKOujIoQaHctB1P4aBAZixcxhKFlNvXJevRYQ0piVpp3Y4d0gXeQdUZvzKInG+97B2blFIva8YwFNMvJCASt640S1DPOzNCwOsyaDpQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1rwNME-0007qJ-Aw; Mon, 15 Apr 2024 16:30:54 +0200
-Date: Mon, 15 Apr 2024 16:30:54 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, netfilter-devel@vger.kernel.org,
-	pablo@netfilter.org
-Subject: Re: [PATCH net-next 12/12] selftests: netfilter: update makefiles
- and kernel config
-Message-ID: <20240415143054.GA27869@breakpoint.cc>
-References: <20240414225729.18451-1-fw@strlen.de>
- <20240414225729.18451-13-fw@strlen.de>
- <20240415070240.3d4b63c2@kernel.org>
+	s=arc-20240116; t=1713191470; c=relaxed/simple;
+	bh=dQuoOPLDUre5qwCxXwBna/2X/qog5wf02zbWEBGe7x8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ulDt9hHeHRphWpJd+XRf8QAmSMVcYK2Qf8DPhwtvvhYVCN3uNSe3hZrXZbNUgR8jqo6BFcBuVgCg817K8F6H8hBuecoYdkE/Dk2SPne9ye48vr+3qzKjCHH3pOUL5uVU7nqKde1O9MavcMUXUgrh10BisyWpgJQUFxEXhkZRsuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EznNHSgU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11405C113CC;
+	Mon, 15 Apr 2024 14:31:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713191470;
+	bh=dQuoOPLDUre5qwCxXwBna/2X/qog5wf02zbWEBGe7x8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=EznNHSgUy8w7kxNEUMeWVqguT1snbXYVg1Z6z0P8yaqzHWeXPdHw8L0sCLEqxjgxS
+	 UFsf92m3QZGPmfnClN0bd352fDg3UnEvtCUZNU5Y8h62qlfc0ycPgXqADCQK6U36xR
+	 a6UqaNFjRiXSo1JXw52qOVomlMYcxGaO3fKTphAAcYf9WGPWaVXyP8Rb7cl2atnnct
+	 Sa+ByjYOEfjaeJ6BYs27mPIwI1Sjex3KktHi8MYys34EnuquJfxz0rIJ+K79+SKZO7
+	 heJ9SFVk1OwFDLhsE3W+e+bfsTTua6q+/+2B057naNK7MAP6ZGuPMmKCQxKksehFO7
+	 FTk3xDTagk+EQ==
+Date: Mon, 15 Apr 2024 07:31:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, petrm@nvidia.com,
+ linux-kselftest@vger.kernel.org, willemb@google.com
+Subject: Re: [PATCH net-next 4/5] selftests: drv-net: construct environment
+ for running tests which require an endpoint
+Message-ID: <20240415073109.57629e54@kernel.org>
+In-Reply-To: <661c0837eb5a6_3e773229499@willemb.c.googlers.com.notmuch>
+References: <20240412233705.1066444-1-kuba@kernel.org>
+	<20240412233705.1066444-5-kuba@kernel.org>
+	<661c0837eb5a6_3e773229499@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240415070240.3d4b63c2@kernel.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Jakub Kicinski <kuba@kernel.org> wrote:
-> On Mon, 15 Apr 2024 00:57:24 +0200 Florian Westphal wrote:
-> > --- a/tools/testing/selftests/net/netfilter/config
-> > +++ b/tools/testing/selftests/net/netfilter/config
+On Sun, 14 Apr 2024 12:45:43 -0400 Willem de Bruijn wrote:
+> Overall, this is really cool stuff (obviously)!
 > 
-> Looks like we're still missing veth, and possibly more.
-> Here's more details on how we build:
+> REMOTE instead of EP?
+
+If I have to (:
+Endpoint isn't great.
+But remote doesn't seem much better, and it doesn't have a nice
+abbreviation :(
+
+> Apparently I missed the earlier discussion. Would it also be possible
+> to have both sides be remote. Where the test runner might run on the
+> build host, but the kernel under test is run on two test machines.
 > 
-> https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+> To a certain extent, same for having two equivalent child network
+> namespaces isolated from the runner's environment.
 
-Thanks for the pointer, it will take me some time to catch up and
-make sure the generated build works.
+I was thinking about it (and even wrote one large test which uses
+2 namespaces [1]). But I could not convince myself that the added
+complication is worth it.
 
-You are right, at least VETH and NETFILTER_ADVANCED are missing.
+[1] https://github.com/kuba-moo/linux/blob/psp/tools/net/ynl/psp.py
 
-If you prefer you can apply the series without the last patch
-and then wait for v2 of that last one.
+Local namespace testing is one thing, entering the namespace from
+python and using the right process abstraction to make sure garbage
+collector doesn't collect the namespace before the test exits it
+(sigh) is all doable. But we lose the ability interact with the local
+system directly when the endpoint is remote. No local FW access with
+read/write, we have to "cat" and "echo" like in bash. No YNL access,
+unless we ship specs and CLI over.
 
-Thanks!
+So I concluded that we're better off leaning on kselftest for
+remote/remote. make install, copy the tests over, run them remotely.
+I may be biased tho, I don't have much use for remote/remote in my
+development env.
+
+> Use FC00::/7 ULA addresses?
+
+Doesn't ULA have some magic address selection rules which IETF 
+is just trying to fix now? IIUC 0100:: is the documentation prefix,
+so shouldn't be too bad?
 
