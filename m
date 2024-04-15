@@ -1,138 +1,157 @@
-Return-Path: <netdev+bounces-88034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BE728A565E
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:27:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A1708A5665
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:28:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F2E11C21465
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:27:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35C6D280DFC
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:28:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77CC878C71;
-	Mon, 15 Apr 2024 15:27:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE76878C6D;
+	Mon, 15 Apr 2024 15:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Uz1C1AOD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="laIGp7W7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-vk1-f181.google.com (mail-vk1-f181.google.com [209.85.221.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A05B76046
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 15:27:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E66660EF9;
+	Mon, 15 Apr 2024 15:28:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713194858; cv=none; b=r14PoekLfMSC2VnbY/DfeL5yAyDNS1xRhPKf0ho1eMkE2RS3ELlSYpDrOAiWqh7UzMMdLZBcnu0evN3UGppCbVUZF3gmcEF0KJ0BLEj0cdd7NgHTvp4ejHaFRfeZMKWCwxMXhGkUgfEAqcc82tqtQK7Dqj+8n2uFOHGCdCdRHVM=
+	t=1713194930; cv=none; b=bjjbOfqX/Td0BoaRdCpLs58ge1WPGZXxmWrgfr5H8XquyPK9oF5hC3bo5VGk4Q/iQOFD1dAxWJ7bx9NNIyBnP1JuB7ugriCQg/JalRGXcdxwoSWZdOl9X30NkIN3gzVh4BTBDf6Hsjq4iGElywOFLlyI5+a6d75/A709mBe6zcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713194858; c=relaxed/simple;
-	bh=K684+xOEQxmYo5QLH8VxV26rPRLzfZxHY+TO8v1kGQg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W6r93PAjMdndTC0Rst1+dqTOM6xXBy4XMKQ0IFoDeMYaKqTHKgd/sj1KfYZd/h/HxwoqnmtS4uHTI0he3xLz96JqRF6YXczDmIgtWzcDANXSUr2yLOYXbAbz6IA9XTy4ByRpZILkdJRQHM9vm9Pauocuzz4pTZGnvXz181ylPc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Uz1C1AOD; arc=none smtp.client-ip=209.85.167.171
+	s=arc-20240116; t=1713194930; c=relaxed/simple;
+	bh=m0sB9eCjIqzz+E4+mSkrkZ3C/EaeCzMVFfX5BdgG2g8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Um5CXQcSFkh6pwA9cwDPFGvuwdMUpSX3MkpNQiRls/5y8ECt0ApSLH5WwwSLOD8jRarjVTYLZ7CVLlQTxZwqofQKY6ltJXfD3XQMPPeKg8g9gWNbW7fI+sUCKi7bsi7J5YPNm2E967dskUDBt7jugSCIyNMCuNITO/+hqie642s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=laIGp7W7; arc=none smtp.client-ip=209.85.221.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3c3d2d0e86dso1477144b6e.2
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 08:27:36 -0700 (PDT)
+Received: by mail-vk1-f181.google.com with SMTP id 71dfb90a1353d-4dac5a3fbeaso1115274e0c.3;
+        Mon, 15 Apr 2024 08:28:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713194856; x=1713799656; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=iDPwJjyq2MIYW1ygvvGBm1ZCOEtgZxhDAxvP2M2VPSs=;
-        b=Uz1C1AODAz4ToiT8hZKfFG2bJg+lbEoTtLjQ8FsYvzrI/J/4fc6mcGLpqDyU6483Eg
-         4C2Lcac2RDlKG9xEcMUb3k5o4+6KqbVreMKbEkcYitIidHRPPE+55dtoHg85snDZOfnj
-         EJFAlPijLw79S7AIi53BHd00MzFIhtW5U5FNPkXUd/cT/QrqkY0UndpJs6EosnveZ/hc
-         88bwU9lYpbcCKLgkaGGGG+jCBaWSBxOX5ZjDFLDSO+TqfU/rU5UJKNPg2uIuZpqZgBuL
-         u5EqTR2d//Uo4tyDw4pronRbPJIgOzjW751jMpDjn6cE+aSCoPaEtPLAnnerzfDFcS/v
-         8cuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713194856; x=1713799656;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1713194928; x=1713799728; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iDPwJjyq2MIYW1ygvvGBm1ZCOEtgZxhDAxvP2M2VPSs=;
-        b=uHeXyQXYUxsfx79hw8gAlNtpGuFFEUZy7CraHRpGNjdn5MSnKEUBVSrPcPnUpLllLj
-         D9Sg8pOwFTBf0xTvuLkQGXXDJux/tg7drjUDg8icTyeZyWyuAdnYLv6VGLTBB1SgVwtB
-         WQ3VN48/i8LWK4WKLVlAqKYP5JPgUVBy6cT+006nBhxL/vqr5i5xX1N0Rfhwsb4XH68g
-         IEDn0Q/qUf0Oo1+l38frBG12bP3IbIf9Wtmj7khrsnlp+lHk/X43hrfA3LX5J4Qub3+j
-         u+HvSlvFFA3CPWQkrwK8K0WvlhGkby/kiuWWVkIy+rnu6nuwNbHt2E1nmEp0uW3yMaB0
-         YRqA==
-X-Forwarded-Encrypted: i=1; AJvYcCV6kG6d/fgY8ayzbdejk+EcwsqyB2NtqvKClO8H35geWd4MzX/qDAJd3/fHfkbWFmNQuV6l5/mB0QUj3uccUZOrE3Ltf4BC
-X-Gm-Message-State: AOJu0YwhywKAszdPCFBLY+7k6TDL1jUZ14l+AyPIzDQx3vaZcYXqs68C
-	pT0Q/gUGqNUkdd1iGsbioh7DUK2nXlhm5dmL5bfW/uXsJ3SlXtsy
-X-Google-Smtp-Source: AGHT+IESvnm90j9T0EKPUdtFyHDge68fZoLJosz8o07a7icCKQ+wjOKopYtHrw2HvR6R1nb40T7Rjg==
-X-Received: by 2002:aca:d15:0:b0:3c7:51f:156c with SMTP id 21-20020aca0d15000000b003c7051f156cmr6405249oin.29.1713194856192;
-        Mon, 15 Apr 2024 08:27:36 -0700 (PDT)
-Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id h11-20020ac8514b000000b00432bd953506sm6132256qtn.84.2024.04.15.08.27.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Apr 2024 08:27:34 -0700 (PDT)
-Message-ID: <eff4fe5f-c9dc-40df-a7c4-8abcad579918@gmail.com>
-Date: Mon, 15 Apr 2024 08:27:32 -0700
+        bh=Qu/hutXJUSv7QQ6eI7MoPzXs3chbYRHqkbwVjfaG0ms=;
+        b=laIGp7W7emPO4VfRKPX/rOUOV43hkwKMO9H9FAjZE8HBGn5LC25Ipp2Quq2/sQ7fVq
+         xxZRjziyqXlqy7lIlBSov9uaLUm2KZFd6ISYgY7Fb9uBatIVK34I0dHkNVtzyXo7hkfQ
+         IiJxvqIKhcX+EfFAOdHjriHUTndHCas1TmXL3nP7QAVF8HVPhUM8cxbqrmUVqumOkuwm
+         h3z9xaOCSiYbWT5RDSkfKi2Cmt15Es6S0AyA+2Wib5KHCiKgL9Q4hjyRFvOsO3iZGCCx
+         8h7Gy90q7auv+GiRfmkJJynWlWEwDxW2NdRIk4Lrh+99p3ihpW7oLiAq4bDgnHeCwsul
+         Zcrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713194928; x=1713799728;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Qu/hutXJUSv7QQ6eI7MoPzXs3chbYRHqkbwVjfaG0ms=;
+        b=XGQGcnpvM4XVmzW1MZ3xdeAJm6rwjWUIaHMD3IjNTvPnadYY+rr9VoCZ8OrWrtOpX3
+         dcjv6OTstDacU5A04Wy1oA65yOMLuSol8ZuLb4rWUcXtIAZXUwZD+emvYU3yip11UlPm
+         yKqcl8Q4i5YMezLI/g7fnEhQiwHh23v7Mi43HtNFqKDIyzT2odhcb/gGXn36oKfyFzVr
+         E3uebEXJDJTImV8+zjRVq6AT+rWKvoHCcAVQUC8t/gsFjylYIuxOb/ZcaKILnZ6Wwkov
+         0UCEtossolzTa7s5/Qw/YmrxFpDpoZ+3elZiqWpv5WqC5f8BKIxK4o8djQM50c/Xraeq
+         5NNg==
+X-Forwarded-Encrypted: i=1; AJvYcCUwQE1iQSiEQ5wK0ewjelDVRDxymGhCv/8MnMzUb8eHCI+r3eGg+0piVQOiFr+dMdtnmYPCQTOZGVKHaFnSZZrl7gfAYawacUoHm5soxBeQcH7oC/fm9P8ZwnJ79tlmRGt/yzY4aDRe
+X-Gm-Message-State: AOJu0YzeGj9ZWBku29yxchoI0ArRFwc/Y3zewHCEScwVDs3BLHV1zDgG
+	lU4sxTAHL3vc6XM2wNymJ8yrM8Q7QKJe73Zr4B8h7pekqrW9XuGW
+X-Google-Smtp-Source: AGHT+IE1ruwx2bx3t3L5mvRshVQehrkGa2QMVh2CwfsvuWGskZVg978sAMZwtYeFlEOHXkqL/AtEmA==
+X-Received: by 2002:a05:6122:2009:b0:4da:a82e:95f5 with SMTP id l9-20020a056122200900b004daa82e95f5mr6711632vkd.5.1713194928317;
+        Mon, 15 Apr 2024 08:28:48 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id bd14-20020ad4568e000000b0069b7aca529esm1596806qvb.14.2024.04.15.08.28.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 08:28:48 -0700 (PDT)
+Date: Mon, 15 Apr 2024 11:28:47 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, 
+ netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ shuah@kernel.org, 
+ petrm@nvidia.com, 
+ linux-kselftest@vger.kernel.org, 
+ willemb@google.com
+Message-ID: <661d47afcc6a7_1073d2941a@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240415073109.57629e54@kernel.org>
+References: <20240412233705.1066444-1-kuba@kernel.org>
+ <20240412233705.1066444-5-kuba@kernel.org>
+ <661c0837eb5a6_3e773229499@willemb.c.googlers.com.notmuch>
+ <20240415073109.57629e54@kernel.org>
+Subject: Re: [PATCH net-next 4/5] selftests: drv-net: construct environment
+ for running tests which require an endpoint
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: dsa: ar9331: provide own phylink MAC
- operations
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-References: <E1rvIcZ-006bQc-0W@rmk-PC.armlinux.org.uk>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <E1rvIcZ-006bQc-0W@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-
-
-On 4/12/2024 8:15 AM, Russell King (Oracle) wrote:
-> Convert ar9331 to provide its own phylink MAC operations, thus
-> avoiding the shim layer in DSA's port.c.
+Jakub Kicinski wrote:
+> On Sun, 14 Apr 2024 12:45:43 -0400 Willem de Bruijn wrote:
+> > Overall, this is really cool stuff (obviously)!
+> > 
+> > REMOTE instead of EP?
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> If I have to (:
+> Endpoint isn't great.
+> But remote doesn't seem much better, and it doesn't have a nice
+> abbreviation :(
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+It pairs well with local.
+
+Since in some tests the (local) machine under test is the sender and
+in others it is the receiver, we cannot use SERVER/CLIENT or so.
+ 
+> > Apparently I missed the earlier discussion. Would it also be possible
+> > to have both sides be remote. Where the test runner might run on the
+> > build host, but the kernel under test is run on two test machines.
+> > 
+> > To a certain extent, same for having two equivalent child network
+> > namespaces isolated from the runner's environment.
+> 
+> I was thinking about it (and even wrote one large test which uses
+> 2 namespaces [1]). But I could not convince myself that the added
+> complication is worth it.
+> 
+> [1] https://github.com/kuba-moo/linux/blob/psp/tools/net/ynl/psp.py
+> 
+> Local namespace testing is one thing, entering the namespace from
+> python and using the right process abstraction to make sure garbage
+> collector doesn't collect the namespace before the test exits it
+> (sigh) is all doable. But we lose the ability interact with the local
+> system directly when the endpoint is remote. No local FW access with
+> read/write, we have to "cat" and "echo" like in bash. No YNL access,
+> unless we ship specs and CLI over.
+
+In cases like testing jumbo frames (or other MTU, like 4K),
+configuration changes will have to be made on both the machine under
+test and the remote traffic generator/sink. It seems to me
+unavoidable. Most of the two-machine tests I require an equal amount
+of setup on both sides. But again, cart before the horse. We can
+always revisit this later if needed.
+ 
+> So I concluded that we're better off leaning on kselftest for
+> remote/remote. make install, copy the tests over, run them remotely.
+> I may be biased tho, I don't have much use for remote/remote in my
+> development env.
+> 
+> > Use FC00::/7 ULA addresses?
+> 
+> Doesn't ULA have some magic address selection rules which IETF 
+> is just trying to fix now? IIUC 0100:: is the documentation prefix,
+> so shouldn't be too bad?
+
+RFC 6666 defines this as the "Discard Prefix".
+
 
