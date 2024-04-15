@@ -1,112 +1,133 @@
-Return-Path: <netdev+bounces-88026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C56A8A55F8
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:06:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98CD58A5603
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 17:07:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBDB81C225E1
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:06:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4F0F31F230D8
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:07:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 672327E57F;
-	Mon, 15 Apr 2024 15:05:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23B9877A03;
+	Mon, 15 Apr 2024 15:06:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aZQShd1y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="afcYw8qV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D97D7E0F4;
-	Mon, 15 Apr 2024 15:05:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AECEE762D0;
+	Mon, 15 Apr 2024 15:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713193511; cv=none; b=BPqXvvI2hII1J4JEuu4Yza3LuGW/+UGOCnr49XN0Ex8dPxzz21OnAHRMueV8ssqAMFCUyluJ1sYGofAl6G53/VesNDVyr1MNTtUt291YhBkh8Osnbs9FKu167We2eJb02UqCHyBzZML1k1zLupgcDJC9wc9fMb4TRXxkaFbAv6w=
+	t=1713193616; cv=none; b=sHFyYQui/JXiEyLwWCSfUDMuEZFB3aBC7VutXY3z636Au81ZdNqpXA2MS23SRc+h03sK90KJ3Dff0WGFtxQbXTk3+Beml9QvM4/p38cMuAVtm/8f4RzluPKEMSqFffdPWcKn92ggS+02fEEADJ+9gzoT50WkvLUVjMW5A09GGtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713193511; c=relaxed/simple;
-	bh=6ML2aSaXsuAzFVNhdPewOEk6bDpNpols2sKAQORUAXM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jXL/GQdQYdus7NFOHt1/7g1Y8dNXdvHthF46pNgyEGy0qwp+S4Ucn4W89rybOhQcQgvJgjrAhQIHne6fszMtD0UOC6GEdeZNbeug4h2d8OdZWqo4SyqsI806T8rn6tq0s4B7f6iZ01/dFp4ACa1eD8Jz/dPUJHCrJ+Tm2LDZ5f0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aZQShd1y; arc=none smtp.client-ip=209.85.215.173
+	s=arc-20240116; t=1713193616; c=relaxed/simple;
+	bh=fo9y5t172LfDuFmPfvG8nPyZgXk8vePbKgvHaewlI+s=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=UAai+KPcvuIkKSTXMkvQ+umh5dRo2kEjqigfaHgOy90au5sf5lK5zBOKcgJhscBfJ4sZTLQhY5rh4bKyoDzD4cLmXj5LDs9eRlDcatsH9xQkCt+vbnkAORt9kjI2Q+b2+JZnZQxeZF5u9wL9haJ/baQdTVTtAqk8yhTtq3gwKTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=afcYw8qV; arc=none smtp.client-ip=209.85.222.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-53fa455cd94so2678005a12.2;
-        Mon, 15 Apr 2024 08:05:08 -0700 (PDT)
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-78d778e6d3cso304664085a.3;
+        Mon, 15 Apr 2024 08:06:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713193508; x=1713798308; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1713193613; x=1713798413; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MchRxx74dTbYu503nGGqEqc0g3arLCUesliZbRkQQPQ=;
-        b=aZQShd1yJCfjBSJmyu1NkQ0CirNpEW83cAEyZkedidl3Q+XzZAcdnmdEf6ceZRG+fv
-         DINdtutVB0pnOuORO2gWB8kEMd3g5XW3ezeQq/2hCrecHmEi1nZgL6cznDzh4DQR/0hw
-         lvVV1Vimhe20gpWby0akZZx3wt1msH2gqbyF6ZcQLH3SlMQ7NX0jB7e3oc4RiF3I1k6K
-         5GFrtBb8ICdYrDv3evis+JEf5hIjeSzOXpt6YfnYp56/uap9wfaX2ekiRbIycbz1lLFX
-         olnpzgxsSpFXsHnWoX2w0iVtDy3Nha9Ui+G+261UeivhRvTUgdCPrhcbnoEnApDYnxU+
-         sLeg==
+        bh=qggmMOwxDeK7hvmgMXReK9EVETMDWVfdWiCof6KB3Ks=;
+        b=afcYw8qV33rbgXQDaHWYtrlFMv/rnJjBNiO4hXFTnKT9o8/NAOuVwOBZGS3Kwk9eHG
+         SXEzPFBZNMf2Pj0GFm9Tw3g5eh79CyFOiPOrkdevX8WvFRBCk+EOdw1K8Pyl9Q5QgAKF
+         wyWmZE5QMbEyThDG7nfI+uCsE70Vf8UnvDhG/4BU6mrlr00HiAwUMQRd8c2MdvNM6BoH
+         w0DkZ0dqnp2mxmbxGAVjpsmShx+OzICiRH35hEHyWa6wjivDCkdBYwvbZK1H86kZd3vr
+         GXvkcDG99wanxf05ovwV3TrnGK2AeBEmw53BAYctYWzazETNxLZH92cQSBuZTZSX09gO
+         H9sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713193508; x=1713798308;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MchRxx74dTbYu503nGGqEqc0g3arLCUesliZbRkQQPQ=;
-        b=YfPiK0nAKXc1JpWFddUGGOXFneKwF2PYPppqWL4p8tnX/+MQYUU9pQAzhNg9Hggddz
-         DNXACw/Gak9ltKBpqoeOSF1FPHQE7TLOp4PFPsCEM+TeJUK4Y3YbcUAWx7E/8w8/t6zq
-         7sRkZ2JLhBLqcZjY7SN1M0KmD+ffZql0HZv+mNBHMnoKqG9VEaokGzktgOcK5//b1YIY
-         jOCjnvK3lVAVMI+uu4qBRFj7E4rpKYhTNvv6lox1oUUE6oa9Kd/A34vfQHzCXpipJ8ZD
-         S4ckS+gfg3//wcdS9g2gEpM5L4NSjsnlhzByY40YB8L7X3I0R4uiXcjyDfG06m2EBGBN
-         1GhA==
-X-Forwarded-Encrypted: i=1; AJvYcCWVp0l0XVilGrQoRbrKglV0LbNblvkPT3PFKlp/fYPMSmyo5z/vc7jny/YSKJARRNopUHELgjv1EbxS2IGNbzHgP4a3xf3ih0a3PKPWBw/8X1jYohwA4V7bhn+7TDI39eV9eUKg
-X-Gm-Message-State: AOJu0YyNM8YuoenQXasLSyKsOwE7KqywjB6lbpoOqUN1yWgOeXrWpjo4
-	ge8DkQvNljvvkZy+IJw4eaCGdqowbmc/q4J7vGvIsu3f8swZfnNhlBsoTTCdZbgDpAi4w9yU26o
-	CYBsB4PvXgIFuSJqCLAoJedT+HHY=
-X-Google-Smtp-Source: AGHT+IEO7I1lSzq0j+XEmqqLAv697PcGVygiYFHtKCQ8zWed31n/gCxa+Jv1oMUo2qrCY77NF3oB2ou9LHirHgzneMY=
-X-Received: by 2002:a17:90a:9a86:b0:2a6:e703:3d06 with SMTP id
- e6-20020a17090a9a8600b002a6e7033d06mr6938696pjp.6.1713193507607; Mon, 15 Apr
- 2024 08:05:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713193613; x=1713798413;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qggmMOwxDeK7hvmgMXReK9EVETMDWVfdWiCof6KB3Ks=;
+        b=JBXu3Jw39pyQu+pNZ25xLvKIH/XK3T2DfHk3o99j11z0Mt9oMQWx9fTRmZXDK7ohnB
+         Tx9hc7qtQq/zVmdCHPUqXA9jbjsaL1QD8lgitKjPH+RtbeW1KMF60mKHU1B4HYPFre8k
+         ULdmmrZMjUZYjLlf8LSEhbZA9yBpto013PNR661GI8kuJBbyD89vdZv8tcWWMEORlnLV
+         P/M8AWvwIDvkh7qoczl9uyCqUhpZqeze0B1slwToQEcuNodPgN69gC3OmDYHgvGO5nLl
+         yFgND98+frgHkna7qonrV+pYQk+CQN0G0UfYU5FOldu1Kl2hrlfon+h3fnsmd8IMu/Yt
+         a8Sw==
+X-Forwarded-Encrypted: i=1; AJvYcCWesVK31qRn6PLJKvEPPdlfme1D62TUtvv1CXG3GItTZlZEw3UMIA9hehmCGTChQ/DTJ7icWP4Hr74WVdr4ZHkgi5C9MTqCelfC5BnCruNhXcFJJr0Nik+inaqq5Z1xP74=
+X-Gm-Message-State: AOJu0YyUZGLN/sRaXnU65RBB4OUYulWRKJMJnWSMM51JQW1rrmJQkrQM
+	D1O6ooED/ugqvHmixywezsc316Oqf1OCu/pR6hRgangDD6rZtav6
+X-Google-Smtp-Source: AGHT+IGXgC4EJp/WqobAe9u/lgLjL9nefw0n8pKO+M6oFtRpiEDLzrZOmmw+BMtvmzqBi8yiesVPTw==
+X-Received: by 2002:a05:620a:671:b0:789:df6e:c412 with SMTP id a17-20020a05620a067100b00789df6ec412mr10938653qkh.24.1713193613548;
+        Mon, 15 Apr 2024 08:06:53 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id i10-20020a05620a144a00b0078d5fdc929fsm6443442qkl.104.2024.04.15.08.06.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 08:06:52 -0700 (PDT)
+Date: Mon, 15 Apr 2024 11:06:52 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Pavel Begunkov <asml.silence@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ io-uring@vger.kernel.org, 
+ netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, 
+ "David S . Miller" <davem@davemloft.net>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ David Ahern <dsahern@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>
+Message-ID: <661d428c4c454_1073d2945f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <8b329b39-f601-436b-8a17-6873b6e73f91@gmail.com>
+References: <cover.1712923998.git.asml.silence@gmail.com>
+ <62a4e09968a9a0f73780876dc6fb0f784bee5fae.1712923998.git.asml.silence@gmail.com>
+ <661c0d589f493_3e773229421@willemb.c.googlers.com.notmuch>
+ <8b329b39-f601-436b-8a17-6873b6e73f91@gmail.com>
+Subject: Re: [RFC 1/6] net: extend ubuf_info callback to ops structure
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240415131941.51153-1-linyunsheng@huawei.com> <20240415131941.51153-3-linyunsheng@huawei.com>
-In-Reply-To: <20240415131941.51153-3-linyunsheng@huawei.com>
-From: Max Filippov <jcmvbkbc@gmail.com>
-Date: Mon, 15 Apr 2024 08:04:55 -0700
-Message-ID: <CAMo8BfJ5KwXjFDKGs2oBSTH1C7Vnnsbvcm6-qfV5gYh30+VvUQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 02/15] xtensa: remove the get_order() implementation
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Chris Zankel <chris@zankel.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Apr 15, 2024 at 6:21=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> As the get_order() implemented by xtensa supporting 'nsau'
-> instruction seems be the same as the generic implementation
-> in include/asm-generic/getorder.h when size is not a constant
-> value as the generic implementation calling the fls*() is also
-> utilizing the 'nsau' instruction for xtensa.
->
-> So remove the get_order() implemented by xtensa, as using the
-> generic implementation may enable the compiler to do the
-> computing when size is a constant value instead of runtime
-> computing and enable the using of get_order() in BUILD_BUG_ON()
-> macro.
->
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> ---
->  arch/xtensa/include/asm/page.h | 18 ------------------
->  1 file changed, 18 deletions(-)
+Pavel Begunkov wrote:
+> On 4/14/24 18:07, Willem de Bruijn wrote:
+> > Pavel Begunkov wrote:
+> >> We'll need to associate additional callbacks with ubuf_info, introduce
+> >> a structure holding ubuf_info callbacks. Apart from a more smarter
+> >> io_uring notification management introduced in next patches, it can be
+> >> used to generalise msg_zerocopy_put_abort() and also store
+> >> ->sg_from_iter, which is currently passed in struct msghdr.
+> > 
+> > This adds an extra indirection for all other ubuf implementations.
+> > Can that be avoided?
+> 
+> It could be fitted directly into ubuf_info, but that doesn't feel
+> right. It should be hot, so does it even matter?
 
-Acked-by: Max Filippov <jcmvbkbc@gmail.com>
+That depends on the workload (working set size)?
 
---=20
-Thanks.
--- Max
+> On the bright side,
+> with the patch I'll also ->sg_from_iter from msghdr into it, so it
+> doesn't have to be in the generic path.
+
+I don't follow this: is this suggested future work?
+
+> 
+> I think it's the right approach, but if you have a strong opinion
+> I can fit it as a new field in ubuf_info.
+
+If there is a significant cost, I suppose we could use
+INDIRECT_CALL or go one step further and demultiplex
+based on the new ops
+
+    if (uarg->ops == &msg_zerocopy_ubuf_ops)
+        msg_zerocopy_callback(..);
+
+
 
