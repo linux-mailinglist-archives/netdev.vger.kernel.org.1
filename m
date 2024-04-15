@@ -1,152 +1,488 @@
-Return-Path: <netdev+bounces-87790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35E078A4A61
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 10:32:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 60A9C8A4A69
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 10:35:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5A03282424
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 08:32:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 183C9282A44
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 08:35:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6071376F4;
-	Mon, 15 Apr 2024 08:31:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 152AA3BBE1;
+	Mon, 15 Apr 2024 08:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BWRup/SG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RzSkp0ff"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9230A2868D;
-	Mon, 15 Apr 2024 08:31:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F91B3A8F9
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 08:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713169919; cv=none; b=pbgyeoxSdNrQfojpioFoxn1mreAnSBs6XTIb6O6jxvGbpE/GwgyC0Tf504vZeRHekuj5cJ7w5PoeRUFmROphFsgqXqQI21xvAKOV3QfO3c9UTobRHcWZope6zlKD3zq+xfWnXBFoI2urjQmyUcudc6fLHT9fLYxsOYEzxv/FnBg=
+	t=1713170096; cv=none; b=Hl4KPNJt01hLbOIbGsap4mfgxI5mJ1fuQAAtr8wjHc7pS534dZi92XJS6qMfA6x/7OvVs0hDxmt05s0CAESVN0cF8nGBpnvSfHivouwLUIqJWd6cSKuY32xNyY4M7uIypOmtPC5tXNmGTrzc/fB+AoA+vpuaECfFp56ivRgSz0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713169919; c=relaxed/simple;
-	bh=4Ik2Ko1zBi6l+eZz8A/Ik9o0FLr9nF6jobrAJvLC0Fk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SdD90bQXv+jvZkqkSLtiqMvOUE8u0GIxayOw4SC3l06wfxdqVDw6wH0H35hoS9pitUw1wf6FxLfJ83e1jHypALCGWvbQQfRUH483CXpYAcIbKJVSjeiV2JjqU7wyz2D3osC1uzhkMNETvhIqBK76LOm1wijCKLrU8BWGO/iUWAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BWRup/SG; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6ecec796323so3106173b3a.3;
-        Mon, 15 Apr 2024 01:31:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713169918; x=1713774718; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rV5r33AzK19B4yToz4RMwSjQuySmQzfJ9nUG6alLpRo=;
-        b=BWRup/SGuhgQJIe81o0SjCYVXAxDSbqoHyYsW5+tr19PXVtXfaWRQRMLXrFivGpQ5q
-         ifd3G5pmuuxsqV6kX5dax4KbIISh2hGzmRbf7Cg56tQEn2gjW31Tbu5qkklUuCstgqIF
-         tnUWY4vRLMjKM1J2WxJ/MKi174YjWhieBGF0Uq6cgOxJclTv9XKXZr+vP8ULbM2rxMyl
-         f1qlHvZ/HSXEuK9uakzA5sueJP2P1ayjfQdOcG31VLLnPwjQ7ZrsbXE9hstj4YhdcMPh
-         3LWGF9QVLqbpgn0jVLE6OS7r2say4wWbGPuIEl6X5XUU9j6qFZ+bUS0biYpnFqtx964w
-         3yhA==
+	s=arc-20240116; t=1713170096; c=relaxed/simple;
+	bh=kP2vVarYJUgfZsE02DabXd55VBnSX70aqj2Sn6PmIYk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gafO714MliivnNtbYw0PiNvNK/JEnFSHLrdQa8qnU3DJdH8XFSuMStJ13inU3+ZbqLKF+76/bJf1zBXnGxOsw3bgTufXkMBWOjchTuy72BI1moOeSY5RhUCz5K57F+4cFT1EnVU1wA4q38jjwDLMdaCov/6JcZlnw6IXI9h+iiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RzSkp0ff; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713170092;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=elJjozH+zMMLVFAhsEocpxXCjTMSFN+CvE7S6kRfGzM=;
+	b=RzSkp0ff2HBrYqRP2Y59I4fh8a56JQi8iCzHRY45OWYZaiZe39QKSUB8DDV7we9AmUjuJu
+	IVmv2qHN/iTn/bVAjYjlhGfwmpJZcVy9vLk0PUOZ5Vy8cPTw97tGS54Ha5UQ5jDONsFw93
+	s/rIuCxXlpqth6kVBGEqxzVsyZVYoVA=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-682-3i0Q6ucmPb6nZpg8weFpiA-1; Mon, 15 Apr 2024 04:34:50 -0400
+X-MC-Unique: 3i0Q6ucmPb6nZpg8weFpiA-1
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5c5c8ef7d0dso2420282a12.2
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 01:34:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713169918; x=1713774718;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rV5r33AzK19B4yToz4RMwSjQuySmQzfJ9nUG6alLpRo=;
-        b=OFH8O4EyryF3wcnuk+iV6bUXqwQXgF1CbX6lVj6PWHFBZNtP2whcB/ndOie7z1T00O
-         /o8Jo0F9mVhiMNeLxorE1ENvm368q6CG7y0yQQvK2fL1l6QbL/IdPyCgtQzr+ZH7nLly
-         1jOE0B5vmfbrdC3iSr6bsMswV5wyTBCiJDJzgSYBlj5z/Dl1kGKtrBCn0HkhOPRulols
-         PczPIOQKxoqUYoQ4+RmEPk4c8AYL2xATsU4w1G0ZGMjYDNlZq4sWeHc8e+4M0VW0eO7l
-         C3QyScRtujyfw0bog/4M9+POBD+CpIKMWXTQdzpwCGg98dKSed/wia/8jEvy6FTxBuev
-         AG7g==
-X-Forwarded-Encrypted: i=1; AJvYcCUW8Lj7VSfmKoQ9rnX4lYRtgBvG5IPnUwvY8xfSYpBob9A7znT6MzoQR/qOg23daz9GM4NAaKaRHsEOricdurETGyCH/38BNEazxSiSYCqF3cCyTfU+byPV23IDSvFIAQK/9pNw8Zr+
-X-Gm-Message-State: AOJu0YzZzFjjgIo1CxpYCP/gACdZ68T+r3lFME9QTu6STxOtcj3/vIk6
-	k/1BdNYNs1/UMgAcTAMQLtqK04ZgnAue8FscIVBViDc6d6I2YRDG
-X-Google-Smtp-Source: AGHT+IEJoDoKUh2VyN+Orxdp9uNfZAd0UfuULXqu898lDIsZPXg9eBwYs+eyLou/T2WaehxbCJtnww==
-X-Received: by 2002:a05:6a00:a8c:b0:6ec:f28b:659f with SMTP id b12-20020a056a000a8c00b006ecf28b659fmr12049252pfl.3.1713169917830;
-        Mon, 15 Apr 2024 01:31:57 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id q24-20020a62e118000000b006ecf76df20csm6740839pfh.158.2024.04.15.01.31.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 01:31:57 -0700 (PDT)
-Date: Mon, 15 Apr 2024 16:31:52 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	mlxsw@nvidia.com
-Subject: Re: [PATCH net-next 09/10] selftests: forwarding:
- router_mpath_nh_res: Add a diagram
-Message-ID: <Zhzl-NuWNtNJZIcN@Laptop-X1>
-References: <cover.1712940759.git.petrm@nvidia.com>
- <1a34016962a2678462c656516ad90d4c0b7ae258.1712940759.git.petrm@nvidia.com>
+        d=1e100.net; s=20230601; t=1713170089; x=1713774889;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=elJjozH+zMMLVFAhsEocpxXCjTMSFN+CvE7S6kRfGzM=;
+        b=saz5824xqInDXXl22q+HZBZXCr5RksobS2o65D1+dLyIAXLtd5snExJ2ThNc6V+ZqN
+         GFLxod5ASCOvuw4fi9TxMYlvid25PX0RlWMD3voNURCxpw/1Zg3Sme+hFLpBCRCcR6Yp
+         3Lz9Jo6lxWBOLoXPiw854B9h+1g0d98f+COJm5TkLk5WfsYrEyGi3l3Wm36ifHAszhXw
+         giE8wwJir9TGXup7CTDBO7RMbz8qu/qtfmy2iUrCzDZcpWyHMytc+BKnNzIZ1AtkKAJZ
+         d/fmbyH7cmiYEox9OY5y9VDmQalff07lpvUFacTJC8/qhBATaZQ92GTLKe+sxqmfWaBV
+         xI9A==
+X-Gm-Message-State: AOJu0YxwTAz2bydQwHE5UUusB+7csPqVvbe0O6S9i5jMXdER+qTilVT9
+	egHnbXtAt8I0DbwHwjqg/z7OhIsV6uoTX9YIKwWWaoxzs1bQrXFs+dQUs6+tQaMIbvS7VHlFXBJ
+	oYr0EpdW32Jw8jKtY0zTD+W2xSLcbnKbb3l74q8fX1A3jNM+YXf5sLirF/4I3BhpGDgh50iowkC
+	AXIk/ptJGSDz8mQs3ZGpsecwiIDmoY
+X-Received: by 2002:a05:6a20:564b:b0:1a7:79b2:ff1b with SMTP id is11-20020a056a20564b00b001a779b2ff1bmr6568174pzc.27.1713170088974;
+        Mon, 15 Apr 2024 01:34:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHZmwPZ2hWrbm8QS2tSip80S0YLAIlyuhoPq8TcCqWtl7XkbZ1bqDM/18ra+zjHttBP7954Xc0SAL+7PnM+ihE=
+X-Received: by 2002:a05:6a20:564b:b0:1a7:79b2:ff1b with SMTP id
+ is11-20020a056a20564b00b001a779b2ff1bmr6568155pzc.27.1713170088618; Mon, 15
+ Apr 2024 01:34:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1a34016962a2678462c656516ad90d4c0b7ae258.1712940759.git.petrm@nvidia.com>
+References: <20240318110602.37166-1-xuanzhuo@linux.alibaba.com>
+ <20240318110602.37166-5-xuanzhuo@linux.alibaba.com> <CACGkMEujuYh+Ups9jx5jEwe7bydtgCyurG5bPLe3X8jpSJhqvA@mail.gmail.com>
+ <1712746366.8053942-2-xuanzhuo@linux.alibaba.com> <CACGkMEsvAUyk+h3e5SO5T4L8HuSGcViKj2WM2J33JOb7KTKjUw@mail.gmail.com>
+ <1713148927.6675713-2-xuanzhuo@linux.alibaba.com> <CACGkMEvbLvQUppO6nnp0DCxACco7S=2QLgge4ZhARo9Ov_fJKQ@mail.gmail.com>
+ <1713168679.2714498-1-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1713168679.2714498-1-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 15 Apr 2024 16:34:37 +0800
+Message-ID: <CACGkMEucuS0yGP1d9w3KEUigGusP_ks71KwZAwuBJNdZQ=v13Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 4/9] virtio_net: support device stats
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Stanislav Fomichev <sdf@google.com>, Amritha Nambiar <amritha.nambiar@intel.com>, 
+	Larysa Zaremba <larysa.zaremba@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, virtualization@lists.linux.dev, 
+	bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Apr 12, 2024 at 07:03:12PM +0200, Petr Machata wrote:
-> This test lacks a topology diagram, making the setup not obvious.
-> Add one.
-> 
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
-> ---
->  .../net/forwarding/router_mpath_nh_res.sh     | 35 +++++++++++++++++++
->  1 file changed, 35 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/net/forwarding/router_mpath_nh_res.sh b/tools/testing/selftests/net/forwarding/router_mpath_nh_res.sh
-> index 4b483d24ad00..cd9e346436fc 100755
-> --- a/tools/testing/selftests/net/forwarding/router_mpath_nh_res.sh
-> +++ b/tools/testing/selftests/net/forwarding/router_mpath_nh_res.sh
-> @@ -1,6 +1,41 @@
->  #!/bin/bash
->  # SPDX-License-Identifier: GPL-2.0
->  
-> +# +-------------------------+
-> +# |  H1                     |
-> +# |               $h1 +     |
-> +# |      192.0.2.2/24 |     |
-> +# |  2001:db8:1::2/64 |     |
-> +# +-------------------|-----+
-> +#                     |
-> +# +-------------------|----------------------+
-> +# |                   |                   R1 |
-> +# |             $rp11 +                      |
-> +# |      192.0.2.1/24                        |
-> +# |  2001:db8:1::1/64                        |
-> +# |                                          |
-> +# |  + $rp12              + $rp13            |
-> +# |  | 169.254.2.12/24    | 169.254.3.13/24  |
-> +# |  | fe80:2::12/64      | fe80:3::13/64    |
-> +# +--|--------------------|------------------+
-> +#    |                    |
-> +# +--|--------------------|------------------+
-> +# |  + $rp22              + $rp23            |
-> +# |    169.254.2.22/24      169.254.3.23/24  |
-> +# |    fe80:2::22/64        fe80:3::23/64    |
-> +# |                                          |
-> +# |             $rp21 +                      |
-> +# |   198.51.100.1/24 |                      |
-> +# |  2001:db8:2::1/64 |                   R2 |
-> +# +-------------------|----------------------+
-> +#                     |
-> +# +-------------------|-----+
-> +# |                   |     |
-> +# |               $h2 +     |
-> +# |   198.51.100.2/24       |
-> +# |  2001:db8:2::2/64    H2 |
-> +# +-------------------------+
-> +
->  ALL_TESTS="
->  	ping_ipv4
->  	ping_ipv6
-> -- 
-> 2.43.0
-> 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+On Mon, Apr 15, 2024 at 4:15=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
+>
+> On Mon, 15 Apr 2024 14:45:36 +0800, Jason Wang <jasowang@redhat.com> wrot=
+e:
+> > On Mon, Apr 15, 2024 at 10:51=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alib=
+aba.com> wrote:
+> > >
+> > > On Thu, 11 Apr 2024 14:09:24 +0800, Jason Wang <jasowang@redhat.com> =
+wrote:
+> > > > On Wed, Apr 10, 2024 at 6:55=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.a=
+libaba.com> wrote:
+> > > > >
+> > > > > On Wed, 10 Apr 2024 14:09:23 +0800, Jason Wang <jasowang@redhat.c=
+om> wrote:
+> > > > > > On Mon, Mar 18, 2024 at 7:06=E2=80=AFPM Xuan Zhuo <xuanzhuo@lin=
+ux.alibaba.com> wrote:
+> > > > > > >
+> > > > > > > As the spec https://github.com/oasis-tcs/virtio-spec/commit/4=
+2f389989823039724f95bbbd243291ab0064f82
+> > > > > > >
+> > > > > > > make virtio-net support getting the stats from the device by =
+ethtool -S
+> > > > > > > <eth0>.
+> > > > > > >
+> > > > > > > Due to the numerous descriptors stats, an organization method=
+ is
+> > > > > > > required. For this purpose, I have introduced the "virtnet_st=
+ats_map".
+> > > > > > > Utilizing this array simplifies coding tasks such as generati=
+ng field
+> > > > > > > names, calculating buffer sizes for requests and responses, a=
+nd parsing
+> > > > > > > replies from the device. By iterating over the "virtnet_stats=
+_map,"
+> > > > > > > these operations become more streamlined and efficient.
+> > > > > > >
+> > > > > > > NIC statistics:
+> > > > > > >      rx0_packets: 582951
+> > > > > > >      rx0_bytes: 155307077
+> > > > > > >      rx0_drops: 0
+> > > > > > >      rx0_xdp_packets: 0
+> > > > > > >      rx0_xdp_tx: 0
+> > > > > > >      rx0_xdp_redirects: 0
+> > > > > > >      rx0_xdp_drops: 0
+> > > > > > >      rx0_kicks: 17007
+> > > > > > >      rx0_hw_packets: 2179409
+> > > > > > >      rx0_hw_bytes: 510015040
+> > > > > > >      rx0_hw_notifications: 0
+> > > > > > >      rx0_hw_interrupts: 0
+> > > > > > >      rx0_hw_drops: 12964
+> > > > > > >      rx0_hw_drop_overruns: 0
+> > > > > > >      rx0_hw_csum_valid: 2179409
+> > > > > > >      rx0_hw_csum_none: 0
+> > > > > > >      rx0_hw_csum_bad: 0
+> > > > > > >      rx0_hw_needs_csum: 2179409
+> > > > > > >      rx0_hw_ratelimit_packets: 0
+> > > > > > >      rx0_hw_ratelimit_bytes: 0
+> > > > > > >      tx0_packets: 15361
+> > > > > > >      tx0_bytes: 1918970
+> > > > > > >      tx0_xdp_tx: 0
+> > > > > > >      tx0_xdp_tx_drops: 0
+> > > > > > >      tx0_kicks: 15361
+> > > > > > >      tx0_timeouts: 0
+> > > > > > >      tx0_hw_packets: 32272
+> > > > > > >      tx0_hw_bytes: 4311698
+> > > > > > >      tx0_hw_notifications: 0
+> > > > > > >      tx0_hw_interrupts: 0
+> > > > > > >      tx0_hw_drops: 0
+> > > > > > >      tx0_hw_drop_malformed: 0
+> > > > > > >      tx0_hw_csum_none: 0
+> > > > > > >      tx0_hw_needs_csum: 32272
+> > > > > > >      tx0_hw_ratelimit_packets: 0
+> > > > > > >      tx0_hw_ratelimit_bytes: 0
+> > > > > > >
+> > > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > > > ---
+> > > > > > >  drivers/net/virtio_net.c | 401 +++++++++++++++++++++++++++++=
++++++++++-
+> > > > > > >  1 file changed, 397 insertions(+), 4 deletions(-)
+> > > > > > >
+> > > > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_ne=
+t.c
+> > > > > > > index 8cb5bdd7ad91..70c1d4e850e0 100644
+> > > > > > > --- a/drivers/net/virtio_net.c
+> > > > > > > +++ b/drivers/net/virtio_net.c
+> > > > > > > @@ -128,6 +128,129 @@ static const struct virtnet_stat_desc v=
+irtnet_rq_stats_desc[] =3D {
+> > > > > > >  #define VIRTNET_SQ_STATS_LEN   ARRAY_SIZE(virtnet_sq_stats_d=
+esc)
+> > > > > > >  #define VIRTNET_RQ_STATS_LEN   ARRAY_SIZE(virtnet_rq_stats_d=
+esc)
+> > > > > > >
+> > > > > > > +#define VIRTNET_STATS_DESC_CQ(name) \
+> > > > > > > +       {#name, offsetof(struct virtio_net_stats_cvq, name)}
+> > > > > > > +
+> > > > > > > +#define VIRTNET_STATS_DESC_RX(class, name) \
+> > > > > > > +       {#name, offsetof(struct virtio_net_stats_rx_ ## class=
+, rx_ ## name)}
+> > > > > > > +
+> > > > > > > +#define VIRTNET_STATS_DESC_TX(class, name) \
+> > > > > > > +       {#name, offsetof(struct virtio_net_stats_tx_ ## class=
+, tx_ ## name)}
+> > > > > > > +
+> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_cvq_desc=
+[] =3D {
+> > > > > > > +       VIRTNET_STATS_DESC_CQ(command_num),
+> > > > > > > +       VIRTNET_STATS_DESC_CQ(ok_num),
+> > > > > > > +};
+> > > > > > > +
+> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_rx_basic=
+_desc[] =3D {
+> > > > > > > +       VIRTNET_STATS_DESC_RX(basic, packets),
+> > > > > > > +       VIRTNET_STATS_DESC_RX(basic, bytes),
+> > > > > > > +
+> > > > > > > +       VIRTNET_STATS_DESC_RX(basic, notifications),
+> > > > > > > +       VIRTNET_STATS_DESC_RX(basic, interrupts),
+> > > > > > > +
+> > > > > > > +       VIRTNET_STATS_DESC_RX(basic, drops),
+> > > > > > > +       VIRTNET_STATS_DESC_RX(basic, drop_overruns),
+> > > > > > > +};
+> > > > > > > +
+> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_tx_basic=
+_desc[] =3D {
+> > > > > > > +       VIRTNET_STATS_DESC_TX(basic, packets),
+> > > > > > > +       VIRTNET_STATS_DESC_TX(basic, bytes),
+> > > > > > > +
+> > > > > > > +       VIRTNET_STATS_DESC_TX(basic, notifications),
+> > > > > > > +       VIRTNET_STATS_DESC_TX(basic, interrupts),
+> > > > > > > +
+> > > > > > > +       VIRTNET_STATS_DESC_TX(basic, drops),
+> > > > > > > +       VIRTNET_STATS_DESC_TX(basic, drop_malformed),
+> > > > > > > +};
+> > > > > > > +
+> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_rx_csum_=
+desc[] =3D {
+> > > > > > > +       VIRTNET_STATS_DESC_RX(csum, csum_valid),
+> > > > > > > +       VIRTNET_STATS_DESC_RX(csum, needs_csum),
+> > > > > > > +
+> > > > > > > +       VIRTNET_STATS_DESC_RX(csum, csum_none),
+> > > > > > > +       VIRTNET_STATS_DESC_RX(csum, csum_bad),
+> > > > > > > +};
+> > > > > > > +
+> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_tx_csum_=
+desc[] =3D {
+> > > > > > > +       VIRTNET_STATS_DESC_TX(csum, needs_csum),
+> > > > > > > +       VIRTNET_STATS_DESC_TX(csum, csum_none),
+> > > > > > > +};
+> > > > > > > +
+> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_rx_gso_d=
+esc[] =3D {
+> > > > > > > +       VIRTNET_STATS_DESC_RX(gso, gso_packets),
+> > > > > > > +       VIRTNET_STATS_DESC_RX(gso, gso_bytes),
+> > > > > > > +       VIRTNET_STATS_DESC_RX(gso, gso_packets_coalesced),
+> > > > > > > +       VIRTNET_STATS_DESC_RX(gso, gso_bytes_coalesced),
+> > > > > > > +};
+> > > > > > > +
+> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_tx_gso_d=
+esc[] =3D {
+> > > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_packets),
+> > > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_bytes),
+> > > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_segments),
+> > > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_segments_bytes),
+> > > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_packets_noseg),
+> > > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_bytes_noseg),
+> > > > > > > +};
+> > > > > > > +
+> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_rx_speed=
+_desc[] =3D {
+> > > > > > > +       VIRTNET_STATS_DESC_RX(speed, ratelimit_packets),
+> > > > > > > +       VIRTNET_STATS_DESC_RX(speed, ratelimit_bytes),
+> > > > > > > +};
+> > > > > > > +
+> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_tx_speed=
+_desc[] =3D {
+> > > > > > > +       VIRTNET_STATS_DESC_TX(speed, ratelimit_packets),
+> > > > > > > +       VIRTNET_STATS_DESC_TX(speed, ratelimit_bytes),
+> > > > > > > +};
+> > > > > > > +
+> > > > > > > +#define VIRTNET_Q_TYPE_RX 0
+> > > > > > > +#define VIRTNET_Q_TYPE_TX 1
+> > > > > > > +#define VIRTNET_Q_TYPE_CQ 2
+> > > > > > > +
+> > > > > > > +struct virtnet_stats_map {
+> > > > > > > +       /* The stat type in bitmap. */
+> > > > > > > +       u64 stat_type;
+> > > > > > > +
+> > > > > > > +       /* The bytes of the response for the stat. */
+> > > > > > > +       u32 len;
+> > > > > > > +
+> > > > > > > +       /* The num of the response fields for the stat. */
+> > > > > > > +       u32 num;
+> > > > > > > +
+> > > > > > > +       /* The type of queue corresponding to the statistics.=
+ (cq, rq, sq) */
+> > > > > > > +       u32 queue_type;
+> > > > > > > +
+> > > > > > > +       /* The reply type of the stat. */
+> > > > > > > +       u8 reply_type;
+> > > > > > > +
+> > > > > > > +       /* Describe the name and the offset in the response. =
+*/
+> > > > > > > +       const struct virtnet_stat_desc *desc;
+> > > > > > > +};
+> > > > > > > +
+> > > > > > > +#define VIRTNET_DEVICE_STATS_MAP_ITEM(TYPE, type, queue_type=
+)  \
+> > > > > > > +       {                                                    =
+   \
+> > > > > > > +               VIRTIO_NET_STATS_TYPE_##TYPE,                =
+   \
+> > > > > > > +               sizeof(struct virtio_net_stats_ ## type),    =
+   \
+> > > > > > > +               ARRAY_SIZE(virtnet_stats_ ## type ##_desc),  =
+   \
+> > > > > > > +               VIRTNET_Q_TYPE_##queue_type,                 =
+   \
+> > > > > > > +               VIRTIO_NET_STATS_TYPE_REPLY_##TYPE,          =
+   \
+> > > > > > > +               &virtnet_stats_##type##_desc[0]              =
+   \
+> > > > > > > +       }
+> > > > > > > +
+> > > > > > > +static struct virtnet_stats_map virtio_net_stats_map[] =3D {
+> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(CVQ, cvq, CQ),
+> > > > > > > +
+> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_BASIC, rx_basic, RX)=
+,
+> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_CSUM,  rx_csum,  RX)=
+,
+> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_GSO,   rx_gso,   RX)=
+,
+> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_SPEED, rx_speed, RX)=
+,
+> > > > > > > +
+> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_BASIC, tx_basic, TX)=
+,
+> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_CSUM,  tx_csum,  TX)=
+,
+> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_GSO,   tx_gso,   TX)=
+,
+> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_SPEED, tx_speed, TX)=
+,
+> > > > > > > +};
+> > > > > >
+> > > > > > I think the reason you did this is to ease the future extension=
+s but
+> > > > > > multiple levels of nested macros makes the code hard to review.=
+ Any
+> > > > > > way to eliminate this?
+> > > > >
+> > > > >
+> > > > > NOT only for the future extensions.
+> > > > >
+> > > > > When we parse the reply from the device, we need to check the rep=
+ly stats
+> > > > > one by one, we need the stats info to help parse the stats.
+> > > >
+> > > > Yes, but I meant for example any reason why it can't be done by
+> > > > extending virtnet_stat_desc ?
+> > >
+> > >
+> > >
+> > > You know, virtio_net_stats_map is way to organize the descs.
+> > >
+> > > This is used to avoid the big if-else when parsing the replys from th=
+e device.
+> > >
+> > > If no this map, we will have a big if-else like:
+> > >
+> > >  if (reply.type =3D=3D rx_basic) {
+> > >          /* do the same something */
+> > >  }
+> > >  if (reply.type =3D=3D tx_basic) {
+> > >          /* do the same something */
+> > >  }
+> > >  if (reply.type =3D=3D rx_csum) {
+> > >          /* do the same something */
+> > >  }
+> > >  if (reply.type =3D=3D tx_csum) {
+> > >          /* do the same something */
+> > >  }
+> > >  if (reply.type =3D=3D rx_gso) {
+> > >          /* do the same something */
+> > >  }
+> > >  if (reply.type =3D=3D tx_gso) {
+> > >          /* do the same something */
+> > >  }
+> > >  if (reply.type =3D=3D rx_speed) {
+> > >          /* do the same something */
+> > >  }
+> > >  if (reply.type =3D=3D tx_speed) {
+> > >          /* do the same something */
+> > >  }
+> > >
+> > > I want to avoid this, so introducing this map.
+> >
+> > Could we have a function pointers array indexed by the type?
+>
+> Then these functions will be similar and mass.
+>
+> Maybe we can start with the if-else or the function.
+> That will be easy to review. We can optimize on that.
+
+Fine with me.
+
+Thanks
+
+>
+> Thanks.
+>
+>
+>
+> >
+> > Thanks
+> >
+> > >
+> > > YES. I noticed other comments, but I think we should
+> > > fix this problem firstly.
+> > >
+> > > Thanks.
+> > >
+> > >
+> > > >
+> > > > >
+> > > > >         static void virtnet_fill_stats(struct virtnet_info *vi, u=
+32 qid,
+> > > > >                                       struct virtnet_stats_ctx *c=
+tx,
+> > > > >                                       const u8 *base, u8 type)
+> > > > >         {
+> > > > >                u32 queue_type, num_rx, num_tx, num_cq;
+> > > > >                struct virtnet_stats_map *m;
+> > > > >                u64 offset, bitmap;
+> > > > >                const __le64 *v;
+> > > > >                int i, j;
+> > > > >
+> > > > >                num_rx =3D VIRTNET_RQ_STATS_LEN + ctx->desc_num[VI=
+RTNET_Q_TYPE_RX];
+> > > > >                num_tx =3D VIRTNET_SQ_STATS_LEN + ctx->desc_num[VI=
+RTNET_Q_TYPE_TX];
+> > > > >                num_cq =3D ctx->desc_num[VIRTNET_Q_TYPE_CQ];
+> > > > >
+> > > > >                queue_type =3D vq_type(vi, qid);
+> > > > >                bitmap =3D ctx->bitmap[queue_type];
+> > > > >                offset =3D 0;
+> > > > >
+> > > > >                if (queue_type =3D=3D VIRTNET_Q_TYPE_TX) {
+> > > > >                        offset =3D num_cq + num_rx * vi->curr_queu=
+e_pairs + num_tx * (qid / 2);
+> > > > >                        offset +=3D VIRTNET_SQ_STATS_LEN;
+> > > > >                } else if (queue_type =3D=3D VIRTNET_Q_TYPE_RX) {
+> > > > >                        offset =3D num_cq + num_rx * (qid / 2) + V=
+IRTNET_RQ_STATS_LEN;
+> > > > >                }
+> > > > >
+> > > > >                for (i =3D 0; i < ARRAY_SIZE(virtio_net_stats_map)=
+; ++i) {
+> > > > >                        m =3D &virtio_net_stats_map[i];
+> > > > >
+> > > > > ->                     if (m->stat_type & bitmap)
+> > > > >                                offset +=3D m->num;
+> > > > >
+> > > > > ->                     if (type !=3D m->reply_type)
+> > > > >                                continue;
+> > > > >
+> > > > >                        for (j =3D 0; j < m->num; ++j) {
+> > > > >                                v =3D (const __le64 *)(base + m->d=
+esc[j].offset);
+> > > > >                                ctx->data[offset + j] =3D le64_to_=
+cpu(*v);
+> > > > >                        }
+> > > > >
+> > > > >                        break;
+> > > > >                }
+> > > > >         }
+> > > > >
+> > > > > Thanks.
+> > > >
+> > > > Btw, just a reminder, there are other comments for this patch.
+> > > >
+> > > > Thanks
+> > > >
+> > >
+> >
+>
+
 
