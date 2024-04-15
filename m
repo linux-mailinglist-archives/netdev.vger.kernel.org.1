@@ -1,59 +1,65 @@
-Return-Path: <netdev+bounces-88132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BBBA8A5DE9
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 00:55:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33DE08A5DFE
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 01:05:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B578B2128D
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 22:55:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA2401F22568
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 23:05:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74EB3156225;
-	Mon, 15 Apr 2024 22:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59FC815885D;
+	Mon, 15 Apr 2024 23:05:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="CHbuCJWH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gx6d951X"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809B637163;
-	Mon, 15 Apr 2024 22:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F72B156977;
+	Mon, 15 Apr 2024 23:05:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713221728; cv=none; b=UeryxojHvdy6br3WVBxLsYTLFHFyGNNkNmlzcUyiu8JfbWUngxeUpD/mW3YAb1Q3iPX5e+CtgW5cZZVAKNvgzX4R7/cZbFfMmk2rfUSZPWOJ07kjVg+528mX6kROGQU0Q1OCNLpq4KDXlZbMvedEGRfb9VN8wr3KeiQj/bqdcc0=
+	t=1713222334; cv=none; b=VrT5N84XiJtBY9BnuGtb48cQ2KnJkEceWeUQh9M4QYSdGncoM9OdomXt/dlpIz1dOkUrYYEUtLmsx60B+eas/0N2doTgHXMrN9j1DcfSeEIbYdMol3bmw4FqFr7Yf9hp00fgoDjOa8SrvmwLVmspDrVTeNlRlgbg61UVxyhEI3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713221728; c=relaxed/simple;
-	bh=vNrWg79zp8E9Gy10UqKJrgchk27U7xmOVr++0im7i1c=;
+	s=arc-20240116; t=1713222334; c=relaxed/simple;
+	bh=ujka/03jMUb0XAncsAq1DSp6vUMODs+NmGkGQhLYg68=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uFf6yueyElKTKFjgyvvc/uDeopfpMJQKxcdHBOguZ8nUJlufoItKu7H0AdyKkEgo0SPhZudE0mrQh1iINXDjRmSmEwbcejLOhrPChZ4WGHODXyfGYU5gOY2Tv3v7Z5nmqCfGOjqe+1Q6/S1DaYyoe7RgxjWM2rBxp/62prrUwAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=CHbuCJWH; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=eahv/bklwljDptMn1vlz60ty2xXz5774rXfatfdTHfI=; b=CHbuCJWHxLTd954WWlWQbHeXnZ
-	Gr8gMM/HN/ZsbGlSIyPU7ynh9Pd6PsloQQDWMhkYWVxE8JMa9r/wdY0lynnQj4/u5Xci8Js7oJP46
-	WIBdo0WWsIPoIQJcJHsGZ51l9TsWhpi6YGh0y7aBKAYDeGkxMWtjIioH2PmHIZAL2pWw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rwVEG-00D59n-9K; Tue, 16 Apr 2024 00:55:12 +0200
-Date: Tue, 16 Apr 2024 00:55:12 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
-Message-ID: <5fd25c58-b421-4ec0-8b4f-24f86f054a44@lunn.ch>
-References: <20240414135937.1139611-1-niklas.soderlund+renesas@ragnatech.se>
+	 Content-Type:Content-Disposition:In-Reply-To; b=APnU3uLh8EBtDFJLXntWat0Rma+Jiqn3jhrTnFZx+dVEGXObSgiNQIlknZeKjg4h4Hwjazs/28YOPw1o/RH38CRAAldTdff9W3MccXF1LtWtFXHshicZ7L0Djr1lk+zWbP+3tuaH2ZV/9sudiTRsxuPGAYqUTdOMBDFp8iMUDVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gx6d951X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39EA4C113CC;
+	Mon, 15 Apr 2024 23:05:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713222333;
+	bh=ujka/03jMUb0XAncsAq1DSp6vUMODs+NmGkGQhLYg68=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Gx6d951XUcnisiPltyGh2R86ooQuEYTrxs3fuuz33iLrsJZKIr4Yh7kIEhpgZYT0u
+	 +cscArqD1yK5tD3G0VQc+Ap7mBDtsJdrKBNrU1S3p32nkeZGHxgvSM3TImP1L3AnT+
+	 F1Nn6ThGM/Nxfr+vuJQoaLTePGQ8EfFhYr8JHlpahucJC6/h2JaGVs/KfAy6oNyMOG
+	 N+dAJk9Pas+V8JpKU1LFAZJsJJQ8Z4hWi+pQzAMfGyvrh+MkM1rVX2dbNMvB1H0UsB
+	 9dOhkk3jUFJLdhWOMw6dCldHzd9gEp8IhUOIXELJODAGnL83vI0TUDlFCajFJHVR0y
+	 /+aHDeMK9aFHg==
+Date: Mon, 15 Apr 2024 18:05:30 -0500
+From: Rob Herring <robh@kernel.org>
+To: Chen-Yu Tsai <wenst@chromium.org>
+Cc: Matthias Brugger <matthias.bgg@gmail.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	devicetree@vger.kernel.org,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-bluetooth@vger.kernel.org, Rob Herring <robh+dt@kernel.org>,
+	netdev@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+	linux-arm-kernel@lists.infradead.org,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, linux-kernel@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	Conor Dooley <conor+dt@kernel.org>
+Subject: Re: [PATCH v3 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
+ SDIO Bluetooth
+Message-ID: <171322232789.252337.16326980700188367647.robh@kernel.org>
+References: <20240412073046.1192744-1-wenst@chromium.org>
+ <20240412073046.1192744-2-wenst@chromium.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,280 +68,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240414135937.1139611-1-niklas.soderlund+renesas@ragnatech.se>
-
-> +static int rtsn_get_phy_params(struct rtsn_private *priv)
-> +{
-> +	struct device_node *np = priv->ndev->dev.parent->of_node;
-> +
-> +	of_get_phy_mode(np, &priv->iface);
-> +	switch (priv->iface) {
-> +	case PHY_INTERFACE_MODE_MII:
-> +		priv->speed = 100;
-> +		break;
-> +	case PHY_INTERFACE_MODE_RGMII:
-
-There are 4 different RGMII modes, and you probably should be using
-PHY_INTERFACE_MODE_RGMII_ID with the PHY. So you should list them all
-here.
-
-> +		priv->speed = 1000;
-> +		break;
-> +	default:
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static void rtsn_set_phy_interface(struct rtsn_private *priv)
-> +{
-> +	u32 val;
-> +
-> +	switch (priv->iface) {
-> +	case PHY_INTERFACE_MODE_MII:
-> +		val = MPIC_PIS_MII;
-> +		break;
-> +	case PHY_INTERFACE_MODE_RGMII:
-
-And here.
-
-> +		val = MPIC_PIS_GMII;
-> +		break;
-> +	default:
-> +		return;
-> +	}
-> +
-> +	rtsn_modify(priv, MPIC, MPIC_PIS_MASK, val);
-> +}
-> +
-> +static void rtsn_set_delay_mode(struct rtsn_private *priv)
-> +{
-> +	struct device_node *np = priv->ndev->dev.parent->of_node;
-> +	u32 delay;
-> +	u32 val;
-> +
-> +	val = 0;
-> +
-> +	/* Valid values are 0 and 1800, according to DT bindings */
-
-The bindings should not matter. It is what the hardware supports. The
-bindings should match the hardware, since it is hard to modify the
-hardware to make it match the binding.
-
-> +	if (!of_property_read_u32(np, "rx-internal-delay-ps", &delay))
-> +		if (delay)
-> +			val |= GPOUT_RDM;
-> +
-> +	/* Valid values are 0 and 2000, according to DT bindings */
-> +	if (!of_property_read_u32(np, "tx-internal-delay-ps", &delay))
-> +		if (delay)
-> +			val |= GPOUT_TDM;
-> +
-> +	rtsn_write(priv, GPOUT, val);
-
-So you seem to be using it as bool? That is wrong. It is a number of
-pico seconds!
-
-> +static int rtsn_mii_access_indirect(struct mii_bus *bus, bool read, int phyad,
-> +				    int devnum, int regnum, u16 data)
-> +{
-> +	int ret;
-> +
-> +	ret = rtsn_mii_access(bus, false, phyad, MII_MMD_CTRL, devnum);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = rtsn_mii_access(bus, false, phyad, MII_MMD_DATA, regnum);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = rtsn_mii_access(bus, false, phyad, MII_MMD_CTRL,
-> +			      devnum | MII_MMD_CTRL_NOINCR);
-
-This looks to be C45 over C22. phylib core knows how to do this, since
-it should be the same for all PHYs which implement C45 over C22. So
-there is no need for you to implement it again.
-
-> +static int rtsn_mii_register(struct rtsn_private *priv)
-> +{
-> +	struct platform_device *pdev = priv->pdev;
-> +	struct device *dev = &pdev->dev;
-> +	struct device_node *mdio_node;
-> +	struct mii_bus *mii;
-> +	int ret;
-> +
-> +	mii = mdiobus_alloc();
-> +	if (!mii)
-> +		return -ENOMEM;
-> +
-> +	mdio_node = of_get_child_by_name(dev->of_node, "mdio");
-> +	if (!mdio_node) {
-> +		ret = -ENODEV;
-> +		goto out_free_bus;
-> +	};
-> +
-> +	mii->name = "rtsn_mii";
-> +	sprintf(mii->id, "%s-%x", pdev->name, pdev->id);
-> +	mii->priv = priv;
-> +	mii->read = rtsn_mii_read;
-> +	mii->write = rtsn_mii_write;
-> +	mii->read_c45 = rtsn_mii_read_c45;
-> +	mii->write_c45 = rtsn_mii_write_c45;
-
-Just leave these two empty, and the core will do C45 over C22 for you.
-
-> +static void rtsn_phy_deinit(struct rtsn_private *priv)
-> +{
-> +	phy_stop(priv->ndev->phydev);
-
-I would normally expect rtsn_phy_init() and rtsn_phy_deinit() to be
-mirrors. You don't call phy_start() in rtsn_phy_init(), so why do you
-call phy_stop() here? It probably should be somewhere else.
-
-> +	phy_disconnect(priv->ndev->phydev);
-> +	priv->ndev->phydev = NULL;
-> +}
+In-Reply-To: <20240412073046.1192744-2-wenst@chromium.org>
 
 
-> +static int rtsn_open(struct net_device *ndev)
-> +{
-> +	struct rtsn_private *priv = netdev_priv(ndev);
-> +	int ret;
-> +
-> +	napi_enable(&priv->napi);
-> +
-> +	ret = rtsn_init(priv);
-> +	if (ret) {
-> +		napi_disable(&priv->napi);
-> +		return ret;
-> +	}
-> +
-> +	phy_start(ndev->phydev);
-> +
-> +	netif_start_queue(ndev);
-> +
-> +	return 0;
-> +}
-> +
-> +static int rtsn_stop(struct net_device *ndev)
-> +{
-> +	struct rtsn_private *priv = netdev_priv(ndev);
+On Fri, 12 Apr 2024 15:30:42 +0800, Chen-Yu Tsai wrote:
+> The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
+> SDIO. WiFi and Bluetooth are separate SDIO functions within the chip.
+> While the Bluetooth SDIO function is fully discoverable, the chip has
+> a pin that can reset just the Bluetooth core, as opposed to the full
+> chip. This should be described in the device tree.
+> 
+> Add a device tree binding for the Bluetooth SDIO function of the MT7921S
+> specifically to document the reset line. This binding is based on the MMC
+> controller binding, which specifies one device node per SDIO function.
+> 
+> Cc: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+> ---
+> Changes since v2:
+> - Expand description and commit message to clearly state that WiFi and
+>   Bluetooth are separate SDIO functions, and that each function should
+>   be a separate device node, as specified by the MMC binding.
+> - Change 'additionalProperties' to 'unevaluatedProperties'
+> - Add missing separating new line
+> - s/ot/to/
+> 
+> Angelo's reviewed-by was not picked up due to the above changes.
+> 
+> Changes since v1:
+> - Reworded descriptions
+> - Moved binding maintainer section before description
+> - Added missing reference to bluetooth-controller.yaml
+> - Added missing GPIO header to example
+> ---
+>  .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 55 +++++++++++++++++++
+>  MAINTAINERS                                   |  1 +
+>  2 files changed, 56 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bluetooth.yaml
+> 
 
-This is probably where your phy_stop() belongs.
+Reviewed-by: Rob Herring <robh@kernel.org>
 
-> +
-> +	napi_disable(&priv->napi);
-> +	rtsn_change_mode(priv, OCR_OPC_DISABLE);
-> +	rtsn_deinit(priv);
-> +
-> +	return 0;
-> +}
-
-> +
-> +static int rtsn_do_ioctl(struct net_device *ndev, struct ifreq *req, int cmd)
-> +{
-> +	if (!netif_running(ndev))
-> +		return -EINVAL;
-> +
-> +	switch (cmd) {
-> +	case SIOCGHWTSTAMP:
-> +		return rtsn_hwstamp_get(ndev, req);
-> +	case SIOCSHWTSTAMP:
-> +		return rtsn_hwstamp_set(ndev, req);
-> +	default:
-> +		break;
-> +	}
-> +
-> +	return 0;
-
-Call phy_do_ioctl() rather than return 0. That allows the PHY driver
-to handle its IOCTLs.
-
-> +static int rtsn_probe(struct platform_device *pdev)
-> +{
-> +	struct rtsn_private *priv;
-> +	struct net_device *ndev;
-> +	struct resource *res;
-> +	int ret;
-> +
-> +	ndev = alloc_etherdev_mqs(sizeof(struct rtsn_private), TX_NUM_CHAINS,
-> +				  RX_NUM_CHAINS);
-> +	if (!ndev)
-> +		return -ENOMEM;
-> +
-> +	priv = netdev_priv(ndev);
-> +	priv->pdev = pdev;
-> +	priv->ndev = ndev;
-> +	priv->ptp_priv = rcar_gen4_ptp_alloc(pdev);
-> +
-> +	spin_lock_init(&priv->lock);
-> +	platform_set_drvdata(pdev, priv);
-> +
-> +	priv->clk = devm_clk_get(&pdev->dev, NULL);
-> +	if (IS_ERR(priv->clk)) {
-> +		ret = -PTR_ERR(priv->clk);
-> +		goto error_alloc;
-> +	}
-> +
-> +	priv->reset = devm_reset_control_get(&pdev->dev, NULL);
-> +	if (IS_ERR(priv->reset)) {
-> +		ret = -PTR_ERR(priv->reset);
-> +		goto error_alloc;
-> +	}
-> +
-> +	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "tsnes");
-> +	if (!res) {
-> +		dev_err(&pdev->dev, "Can't find tsnes resource\n");
-> +		ret = -EINVAL;
-> +		goto error_alloc;
-> +	}
-> +
-> +	priv->base = devm_ioremap_resource(&pdev->dev, res);
-> +	if (IS_ERR(priv->base)) {
-> +		ret = PTR_ERR(priv->base);
-> +		goto error_alloc;
-> +	}
-> +
-> +	SET_NETDEV_DEV(ndev, &pdev->dev);
-> +	ether_setup(ndev);
-> +
-> +	ndev->features = NETIF_F_RXCSUM;
-> +	ndev->hw_features = NETIF_F_RXCSUM;
-> +	ndev->base_addr = res->start;
-> +	ndev->netdev_ops = &rtsn_netdev_ops;
-> +	ndev->ethtool_ops = &rtsn_ethtool_ops;
-> +
-> +	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "gptp");
-> +	if (!res) {
-> +		dev_err(&pdev->dev, "Can't find gptp resource\n");
-> +		ret = -EINVAL;
-> +		goto error_alloc;
-> +	}
-> +	priv->ptp_priv->addr = devm_ioremap_resource(&pdev->dev, res);
-> +	if (IS_ERR(priv->ptp_priv->addr)) {
-> +		ret = -PTR_ERR(priv->ptp_priv->addr);
-> +		goto error_alloc;
-> +	}
-> +
-> +	pm_runtime_enable(&pdev->dev);
-> +	pm_runtime_get_sync(&pdev->dev);
-> +
-> +	netif_napi_add(ndev, &priv->napi, rtsn_poll);
-> +
-> +	rtsn_parse_mac_address(pdev->dev.of_node, ndev);
-> +
-> +	ret = register_netdev(ndev);
-> +	if (ret)
-> +		goto error_pm;
-> +
-> +	dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32));
-
-You need to be careful what you put after register_netdev(). The
-kernel can be sending packets before register_netdev() even
-returns. This can happen with NFS root, when the kernel will
-immediately try to mount the root file system. Is it safe to handle
-packets with the DMA mask set wrong?
-
-	Andrew
 
