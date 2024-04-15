@@ -1,133 +1,149 @@
-Return-Path: <netdev+bounces-87961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49AF68A5154
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:29:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB3B38A5198
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:37:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 030A2284251
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:29:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBFFB1C22483
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:37:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1281784FAC;
-	Mon, 15 Apr 2024 13:21:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA1A0745C0;
+	Mon, 15 Apr 2024 13:28:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ut4Jt07v"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="NEMoiFhO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A62BA84E16
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 13:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6F77443E;
+	Mon, 15 Apr 2024 13:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713187278; cv=none; b=oudDyu9bUE5kE+LjFq2y59AkYV2A5tuHoaCz7P52bDtpYjPq1L7zQMWsL/AZs2dN00Bm+eajsjEC7Wp5u5hCJv1joxmtIFBhzqRDWU0juYXrdeGWUJoQnB6Lni8ve89lDAmAXPYOw8EU8OaP1t1ia/2y6MD74TPwNGsJwVp4gVM=
+	t=1713187738; cv=none; b=TiuGv6bArEPmj6DgIRMFGqFZ5jBEwLaTaGrBY8Md4g8BTvX27h0IL0aOCfxhHU/MyWhPIxv0jEgHeDA1aK0+f58mU+svmW6cosvnrHWU+XUtFfGD1hZqiuRlLwrurtIxU+7TaCX88w3hYD9ip39oNJCP918CMh4A83/i4uGzCdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713187278; c=relaxed/simple;
-	bh=UihTBynof5ByLo8nWwjGOmB5TjVe1WZ5vmelRO+R5AQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ovJ7tYoClMteh/e8gKPcgfHStbSKgyDF0JmcrMr2mOoXaJuhD+4CteDgnF9rW+5WysGntNGjdQv7KNNnFz08z5WNs27t+ttMESVX7b3cOtc1u3W6CqrpaGNhB4Pn2Q0pBDdgoUk+qAQRD7bTt2nbsYNb6GbImE7/O3viMUvtLk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ut4Jt07v; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6183c4a6d18so48984647b3.3
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 06:21:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713187276; x=1713792076; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Znp+vQdYzVYcETVz3Us8OPerpcvuVBrznxNI9AWwpzs=;
-        b=ut4Jt07vZU04zpBfku9lVNqs+/grYh7Az12LblHHQLEBmkOQXKBPRKT4fobdNhLJvI
-         DOMAEZGaR7dgIzuu/Xdy9udqWurrdFpADQB9yB6Sr9LWTb47XJWgM5Ozib6h/R0Y8Ah/
-         mSC8w63RSmTfob3e2B7WLEgVWyM0vfHcD6Xn1RhPEzHDvXfY4oxCo+UbXjQkM2rVuU88
-         ag+ZSl1TuGyF7p0Sq7kFCH78ur367bBwLr0cU3fM1LLSd0SKtdU058/3wZXfsz/y7YeH
-         LwSo9HK4EYrAUZWUYOHhuaLcnrRE5Ma+jiCljJUfsG81l56AGNl+/iOV638xQtZ7tV9X
-         ygug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713187276; x=1713792076;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Znp+vQdYzVYcETVz3Us8OPerpcvuVBrznxNI9AWwpzs=;
-        b=FfdSeHsAiUf5KQrapZtfmFc/Zh8hnFa/kxGUYSZj05vqZnlVmB1p9Z8wU9lMYoB0gY
-         fMQu6Am33N3m2JJbLFeN3l3eiECOi9Yl3d7u4cgpDwGSTeyC1/CIOmeiLyNfD4UQCRnN
-         2IjOD3Zf7VdPoSbjU/6EWFEDDA46rHli7YhRRJzdm3AupT0SCg+C1P/PgWOEicJfBKsc
-         IwB9M1iXMMinTkmUslUVoFDEDD6Y3GmE+e54l9QX/w026F8TKI/G0E8c3VPqZ80IS27B
-         UU5fgnzU8g3uLRti+dNNwMjPy2wEj4I19dgegFOhIYWW8JoryV5y8Ow0fwwzF0sLKY0M
-         cbCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU5SuGEb8BhwMqJQf/yj7P61FAFdYB+mbpiKu+MhngyyzH982j87DdgQyHUMcKR1eweXJT2lG39YtmOz5ogrya6H0g26D3g
-X-Gm-Message-State: AOJu0YxZvyzyx7v14PczzKCp95rpccku5+6zyiQLCeoXASJEv8pSzj9W
-	4G07s0dn47EFzBl2PUAS2sTBVHVpoysbSexUpa54KmqsoPrjq+0RtUwlwk4QCH2SWHe3ipRYUh5
-	1Vj1QDAXVVA==
-X-Google-Smtp-Source: AGHT+IGWSeEEmDug5+P0RUq8SP/KB5Iio3SLbLzm77PNN1+ENHvqpoQocbx+PXobEhN4yCnwTL4Ifn3udB16hA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:d886:0:b0:dd9:2d94:cd8a with SMTP id
- p128-20020a25d886000000b00dd92d94cd8amr736954ybg.9.1713187275828; Mon, 15 Apr
- 2024 06:21:15 -0700 (PDT)
-Date: Mon, 15 Apr 2024 13:20:54 +0000
-In-Reply-To: <20240415132054.3822230-1-edumazet@google.com>
+	s=arc-20240116; t=1713187738; c=relaxed/simple;
+	bh=gW5dJkONTtADcSzWSi8+D1cvrcM+lztYTM9P1lx6LCk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=AZ7KKjCPNc2c2bSU3ZauEjyeFO5C0vzCxnu5z1q0G6/oYVfGF7ZzDsFCHbGWNcymU/snVod6xOfkCHHcuiN2d3Ur+xeF7s9cR8AwDg1FeFjDKkY4BBt6ldxDoistNlE0I7bePC2u5wzm2ZH2f7tvr0OmXvXENzg1NpkDhQpQ+Ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=NEMoiFhO; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43FD02kN004214;
+	Mon, 15 Apr 2024 13:28:53 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=gW5dJkONTtADcSzWSi8+D1cvrcM+lztYTM9P1lx6LCk=;
+ b=NEMoiFhOKrje2Rt6ITVnRsFiEBRqo//FqVZpcwGkiN5eWhtBlyWuApEXioIG0bEHoZtd
+ 5jdPMt/afMW7dehfQMmOn2J/oDmub02o72kCEblopOYQGAdeRklev/ElBgo7o9N+b0w+
+ WPCd4YRe3GZZpSZsIqdpwMfVUOLNIrJv7PN+cW089MFbbwYRfERw3Rb+Kkw3HFJNPoW4
+ zFaQcskjf40t7Ms63Adt36CaVRlrvsclWJQDONPW44C40hnXO5fdtRlDUFB3zDzQZJB/
+ OBX3CwkdRoZD8sED/CGzRn8R+uwrsNper9dS6Xj76WnvygP3Qb7iHKtkAszn7mXPyrwG /w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xh4r0r20k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Apr 2024 13:28:52 +0000
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43FDSqfg027926;
+	Mon, 15 Apr 2024 13:28:52 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xh4r0r20f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Apr 2024 13:28:52 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43FAusYb011111;
+	Mon, 15 Apr 2024 13:28:51 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xg7327m32-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Apr 2024 13:28:51 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43FDSkt951773786
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 15 Apr 2024 13:28:48 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2542220043;
+	Mon, 15 Apr 2024 13:28:46 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A5CB320040;
+	Mon, 15 Apr 2024 13:28:45 +0000 (GMT)
+Received: from [9.155.208.153] (unknown [9.155.208.153])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 15 Apr 2024 13:28:45 +0000 (GMT)
+Message-ID: <eed4aeb2566f5e9681ad2d24c6572eca5a8d037d.camel@linux.ibm.com>
+Subject: Re: [PATCH net 1/1] s390/ism: fix receive message buffer allocation
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Christoph Hellwig <hch@lst.de>, Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
+        Wen Gu <guwen@linux.alibaba.com>, Heiko Carstens <hca@linux.ibm.com>,
+        pasic@linux.ibm.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>,
+        Thorsten Winkler
+ <twinkler@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander
+ Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>
+Date: Mon, 15 Apr 2024 15:28:41 +0200
+In-Reply-To: <20240405143641.GA5865@lst.de>
+References: <20240328154144.272275-1-gbayer@linux.ibm.com>
+	 <20240328154144.272275-2-gbayer@linux.ibm.com>
+	 <68ce59955f13751b3ced82cd557b069ed397085a.camel@redhat.com>
+	 <cb7b036b4d3db02ab70d17ee83e6bc4f2df03171.camel@linux.ibm.com>
+	 <20240405064919.GA3788@lst.de>
+	 <50b6811dbb53b19385260f6b0dffa1534f8e341e.camel@linux.ibm.com>
+	 <1e31497c3d655c237c106c97e8eaf6a72bcb562f.camel@linux.ibm.com>
+	 <20240405143641.GA5865@lst.de>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.50.4 (3.50.4-2.fc39app4) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: cuj-LQzlz5lHsz3ZO6yueKHgD2fL2LkV
+X-Proofpoint-ORIG-GUID: rgfTaLwGucmfQBHVxzM5oDdv_1wBZ0GS
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240415132054.3822230-1-edumazet@google.com>
-X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240415132054.3822230-15-edumazet@google.com>
-Subject: [PATCH net-next 14/14] net_sched: sch_skbprio: implement lockless skbprio_dump()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-15_10,2024-04-15_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=704 mlxscore=0 spamscore=0 lowpriorityscore=0 suspectscore=0
+ clxscore=1015 adultscore=0 impostorscore=0 priorityscore=1501 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404150086
 
-Instead of relying on RTNL, skbprio_dump() can use READ_ONCE()
-annotation, paired with WRITE_ONCE() one in skbprio_change().
+On Fri, 2024-04-05 at 16:36 +0200, Christoph Hellwig wrote:
+> On Fri, Apr 05, 2024 at 01:29:55PM +0200, Niklas Schnelle wrote:
+> > Personally I'd go with a temporary variable here if only to make
+> > the
+> > lines a bit shorter and easier to read. I also think above is not
+> > correct for allocation failure since folio_address() accesses
+> > folio-
+> > > page without first checking for NULL. So I'm guessing the NULL
+> > > check
+> > needs to move and be done on the temporary struct folio*.
+>=20
+> Yes, it needs a local variable to NULL check the folio_alloc return.
+>=20
 
-Also add a READ_ONCE(sch->limit) in skbprio_enqueue().
+Hi, just a heads-up:
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/sched/sch_skbprio.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+v2 that still missed this check got picked then dropped through the
+netdev tree. Meanwhile I've sent new proper patch to this list of
+recipients:
 
-diff --git a/net/sched/sch_skbprio.c b/net/sched/sch_skbprio.c
-index b4dd626c309c36725e6030a338d21d1fabcb6704..20ff7386b74bd89c00b50a8f0def91b6c5cce7f4 100644
---- a/net/sched/sch_skbprio.c
-+++ b/net/sched/sch_skbprio.c
-@@ -79,7 +79,9 @@ static int skbprio_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	prio = min(skb->priority, max_priority);
- 
- 	qdisc = &q->qdiscs[prio];
--	if (sch->q.qlen < sch->limit) {
-+
-+	/* sch->limit can change under us from skbprio_change() */
-+	if (sch->q.qlen < READ_ONCE(sch->limit)) {
- 		__skb_queue_tail(qdisc, skb);
- 		qdisc_qstats_backlog_inc(sch, skb);
- 		q->qstats[prio].backlog += qdisc_pkt_len(skb);
-@@ -172,7 +174,7 @@ static int skbprio_change(struct Qdisc *sch, struct nlattr *opt,
- 	if (opt->nla_len != nla_attr_size(sizeof(*ctl)))
- 		return -EINVAL;
- 
--	sch->limit = ctl->limit;
-+	WRITE_ONCE(sch->limit, ctl->limit);
- 	return 0;
- }
- 
-@@ -200,7 +202,7 @@ static int skbprio_dump(struct Qdisc *sch, struct sk_buff *skb)
- {
- 	struct tc_skbprio_qopt opt;
- 
--	opt.limit = sch->limit;
-+	opt.limit = READ_ONCE(sch->limit);
- 
- 	if (nla_put(skb, TCA_OPTIONS, sizeof(opt), &opt))
- 		return -1;
--- 
-2.44.0.683.g7961c838ac-goog
+https://lore.kernel.org/all/20240415131507.156931-1-gbayer@linux.ibm.com/
 
+Thanks,
+Gerd
 
