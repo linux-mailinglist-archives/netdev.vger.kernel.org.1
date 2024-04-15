@@ -1,247 +1,393 @@
-Return-Path: <netdev+bounces-87897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E0418A4E30
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:57:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EA918A4E3A
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:58:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 96D3FB2300F
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:57:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32E69281D09
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:58:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C898D66B50;
-	Mon, 15 Apr 2024 11:57:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230BE6775E;
+	Mon, 15 Apr 2024 11:58:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bcZaZPak"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="UwHe80wt";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="gnoonKqZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from flow4-smtp.messagingengine.com (flow4-smtp.messagingengine.com [103.168.172.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19346605B6;
-	Mon, 15 Apr 2024 11:57:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3AC66B50;
+	Mon, 15 Apr 2024 11:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713182245; cv=none; b=Ty/1KxMGPRxsZ3AwgcacEBUARuhUrMT4F4xwtey0JxtTa10tc9r1U2UIRfde9E2KdIOOmEgd8TyGlNkgG9c1SiUpj3Rkov5s4rStAo8hWxQxY+y2fbq6O6T7ysS5ua4Zjol/O1Qr0+z+ba2vAkIlz+N7so8B7pGRiop5L329vOM=
+	t=1713182283; cv=none; b=CbC+iNtvWZang7VERENXXRhYbhqZZvpKuzPfwk8M74kEbIbr+/YjnTz2rr4sOar6iJzj97IfJpLvsko0Vi95Ml9gD2GTDVm+naMDOr+OavouJqhkPWlqu0cBzLHw9ibqiyWS9JENmXyalndw+NJkSW8yExklGeFPf+Q1gMebiLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713182245; c=relaxed/simple;
-	bh=xG7070IKtllLIE5Jx5TWiM3Jo+uZEnEHiu8qrG0JR64=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=Xoptb2iF6neYOY2dYd5iN4rZLWmNLEwsRZLMbtVV71iXHfUaEYppoRNrhm99+Y4UOpVT84NA6SYJ02Gzr1PvNgfjTqczPC9dj9g648YNZQQa5eLzvBOsuMf6X25r22KskJqGAbz1/B7WCbVkAtzEvdlLunz+escKkKzeEU3CMzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bcZaZPak; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-56e69888a36so4265488a12.3;
-        Mon, 15 Apr 2024 04:57:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713182242; x=1713787042; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=52DKIr5XjPxE0lxaaQl58l9lNteOOTdG5ZI5b4uihM0=;
-        b=bcZaZPakz8NgyMhZt2Hirgs3xd6zRLnWViW144qofF+i902oXVHIusb/wfGsONgwgy
-         a4fBedL3E9QKgm/HeHQ61krLsx3Gb2tl7l+epuLTG/w6KkLKlXRWrqyS0XxFqtbUapey
-         YliGasBOvEQYWTcMP5wieSot1ldK7tESM5vvqu9SDCxuDwVFaz0ukPe33ayx8zq53JN/
-         w9bTpFeG6gxls+oOc3GF+XsAonXEAaLUhc0yrR/sI6EpL5BZL6rZQMyIwiU7tfbd3vpp
-         rtla1u2vHBqIkIEN4otZL51c9dHAPoKrQasw/FAqenBcvGWiksFJgz0AOv/rW61tOsIt
-         X3RA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713182242; x=1713787042;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=52DKIr5XjPxE0lxaaQl58l9lNteOOTdG5ZI5b4uihM0=;
-        b=kMS+7BNiL2cBOo9opzrfJaCsZcnNNVjh+R5Vg411/W+SSTCuje0U31k2GHO/Tur91b
-         g1XZZ2oAm7tTwPoBguz833NONS3SZPbhOw5HlakJqi8Qiy6Ho8TYHw//9CQ/FaLNLT0m
-         Nq1v5DXTeXpRvMtsemElhdCjGXHnuDPbhUvs0hAMblIwAq9cEa2TNU8lqmP+J+KIWX+P
-         8ZPkrleJaTDZVnK0U2pvTNJTaxREa4irmxg45wTCyo35AYy+udfhb0PNeZwKcdcNwOyA
-         dUL1CFHaHOO82fcfSdn6uA5nz4TJJv5+2W/uBGCD0bkhtr1vgQsYTI0ViRG2k1lJdyIo
-         Y4qw==
-X-Gm-Message-State: AOJu0YwD1klB5gYECD9M3RYIlnLH6u9dF6FzaQKrJTP80I3QaGjOyHGR
-	ipGMCqbVl1ca+1359BqJgBdtmX+uw57ae5klbz4jPQGOZEdFzrY0bcNLHA==
-X-Google-Smtp-Source: AGHT+IGAaiEjAn4cxbXq8ujn9hnbq8IUB4YldWxH41kFI890qXPbI3eIOahSGaPEYsUlTZHDL8+sGA==
-X-Received: by 2002:a17:906:35ce:b0:a52:71af:405d with SMTP id p14-20020a17090635ce00b00a5271af405dmr1015020ejb.56.1713182236138;
-        Mon, 15 Apr 2024 04:57:16 -0700 (PDT)
-Received: from ?IPV6:2a01:c22:6fba:a100:9cae:aacf:9cd8:e36e? (dynamic-2a01-0c22-6fba-a100-9cae-aacf-9cd8-e36e.c22.pool.telefonica.de. [2a01:c22:6fba:a100:9cae:aacf:9cd8:e36e])
-        by smtp.googlemail.com with ESMTPSA id qb42-20020a1709077eaa00b00a5216df5d25sm5367008ejc.3.2024.04.15.04.57.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 15 Apr 2024 04:57:15 -0700 (PDT)
-Message-ID: <ded9d793-83f8-4f11-87d9-a218d10c2981@gmail.com>
-Date: Mon, 15 Apr 2024 13:57:17 +0200
+	s=arc-20240116; t=1713182283; c=relaxed/simple;
+	bh=js2YN1Qo629boZLbSY3aVwQVI34D4FtKkj4pbWAjcWE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZCPc5GlYjKe9ZjLiSrqCW1/RkKFQ4g6UukPWed9GTPU22x6Uupp1hmjUVVz1fZSikXEBxffu77uXBB9ZGvves+AzDOnpaBz7L3TqosfYDErgCrLxAZuM1VmS/jM3ezzVN6kMVTO7MwxRTfqIVf5H34n+rQFyP2fHoEeI9yCjZLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=UwHe80wt; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=gnoonKqZ; arc=none smtp.client-ip=103.168.172.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	by mailflow.nyi.internal (Postfix) with ESMTP id 14D9A200308;
+	Mon, 15 Apr 2024 07:57:59 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute2.internal (MEProxy); Mon, 15 Apr 2024 07:57:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1713182279;
+	 x=1713185879; bh=fpeIFJt/e4VgY821sioo/9oXpbmdWuQxmoFZkYNqrJ0=; b=
+	UwHe80wt/CyBz6Ucar+bkTjPWe/Hb7Q/V52aR5SA7vMjC5LhXO1kCjl3B/sX5ecR
+	dAAF6MXDrMAeIaF9ippombXh6e89ZjdW9mWtixPuLGMVKuu4erq5X2OZoxEUlU2w
+	+ZrodEh3vgxd3O0ylgp2bkTtRTkYtJDm27TCbAydYpneHK5IadfztxP48r8H0mpg
+	ugZsJslR0fcjSMdbfYxR/U2hFY+ZzxLW35RGzPqe17rTR20DJJA6MbipSDuF1c3/
+	LcU9sDHhi7QPMyVNdZx8P5L5cIc5KLDaxvr+F5znoPapX4i+A3OymGhNkwh/L5Od
+	6E9c9cJRABS1fyNk4qZPTA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1713182279; x=
+	1713185879; bh=fpeIFJt/e4VgY821sioo/9oXpbmdWuQxmoFZkYNqrJ0=; b=g
+	noonKqZaIiFD+XfFjRy7dRmvZSGftzGjobKv/4JhYDt4lh3Lxlviu9NphBCNXe/j
+	10Xn6MrHNO9UIZ9lSUxX4wwDJsd2glIqQ+uU7BqbYJY/4lIEtdDcMYg5YnSbdpbL
+	Lzk1rw9ZyCCgQ7RU96ap48nEUzJU9951aAnGUocOgnNFYgJznwDZNdWfg9DDYOGn
+	4lr0Y0DOxj6umoq3cYiFX46YbsgKxVFdZCV6oxpUyKXoW8mq+HCR9M9Vf/TLhLnu
+	Z653l4fHMaru50akucIU8yIaBEMSPhYGxCYHyRof7qgyo6Did9NGgLGR7aOQUn3j
+	qgBZXi1XJeuuWpmdVgIvA==
+X-ME-Sender: <xms:RhYdZtvONupHr1X1EOMrW7RExqNYHceLYlIosk332v65--JpKiBkjQ>
+    <xme:RhYdZmfxCNuiMTecc4xdZ-qU0im8hpOJq66mMP3R5miS9kUKx-jO0hzt1G1VNlKdR
+    wY0IxWkT64tliNPdBY>
+X-ME-Received: <xmr:RhYdZgyrBSCXBxWSApbHbq6DDvknMtTJYB9ZNWI2xMk8m216tfS-yXaEBSyMSe4-7a66zZw1ndNfB11iVzumLGI3TRI9P3c>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudejvddggeejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhk
+    lhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnh
+    gvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeefhfellefh
+    ffejgfefudfggeejlefhveehieekhfeulefgtdefueehffdtvdelieenucevlhhushhtvg
+    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggv
+    rhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgv
+X-ME-Proxy: <xmx:RhYdZkMIChbwxyeUCuI9GQf9KJE-Nq_jNwmkyOnAhCLiopfsAapZKA>
+    <xmx:RhYdZt96uVkVfrs-uHNthCJu-T0hguyQH1nIKchP8kZ2unmrpfXPKw>
+    <xmx:RhYdZkVH2AC3KG0gKCD5EGiMT06_nNDdILfRM2JLCtcy8A44HjEqbQ>
+    <xmx:RhYdZufnV6jpMK8lKr0zXWWJ94gOu_BfCAVRZiBkVLD4UnQNV14D7A>
+    <xmx:RhYdZmOjPaS_n-Mo8MF0qnBZjGsMToND_YRHNFu2ueQIqmkiHLXCZAhF>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 15 Apr 2024 07:57:57 -0400 (EDT)
+Date: Mon, 15 Apr 2024 13:57:55 +0200
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Paul Barker <paul.barker.ct@bp.renesas.com>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next RFC v3 3/7] net: ravb: Refactor RX ring refill
+Message-ID: <20240415115755.GH3156415@ragnatech.se>
+References: <20240415094804.8016-1-paul.barker.ct@bp.renesas.com>
+ <20240415094804.8016-4-paul.barker.ct@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net] r8169: fix LED-related deadlock on module removal
-To: "stable@vger.kernel.org" <stable@vger.kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240415094804.8016-4-paul.barker.ct@bp.renesas.com>
 
-Binding devm_led_classdev_register() to the netdev is problematic
-because on module removal we get a RTNL-related deadlock. Fix this
-by avoiding the device-managed LED functions.
+Hi Paul,
 
-Note: We can safely call led_classdev_unregister() for a LED even
-if registering it failed, because led_classdev_unregister() detects
-this and is a no-op in this case.
+Thanks for your work, I really like this deduplication of code!
 
-Fixes: 18764b883e15 ("r8169: add support for LED's on RTL8168/RTL8101")
-Cc: <stable@vger.kernel.org> # 6.8.x
-Reported-by: Lukas Wunner <lukas@wunner.de>
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
-The original change was introduced with 6.8, 6.9 added support for
-LEDs on RTL8125. Therefore the first version of the fix applied on
-6.9-rc only. This is the modified version for 6.8.
-Upstream commit: 19fa4f2a85d7
----
- drivers/net/ethernet/realtek/r8169.h      |  4 +++-
- drivers/net/ethernet/realtek/r8169_leds.c | 23 +++++++++++++++++------
- drivers/net/ethernet/realtek/r8169_main.c |  7 ++++++-
- 3 files changed, 26 insertions(+), 8 deletions(-)
+On 2024-04-15 10:48:00 +0100, Paul Barker wrote:
+> To reduce code duplication, we add a new RX ring refill function which
+> can handle both the initial RX ring population (which was split between
+> ravb_ring_init() and ravb_ring_format()) and the RX ring refill after
+> polling (in ravb_rx()).
+> 
+> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+> ---
+>  drivers/net/ethernet/renesas/ravb_main.c | 141 +++++++++--------------
+>  1 file changed, 52 insertions(+), 89 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 1ac599a044b2..baa01bd81f2d 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -317,35 +317,42 @@ static void ravb_ring_free(struct net_device *ndev, int q)
+>  	priv->tx_skb[q] = NULL;
+>  }
+>  
+> -static void ravb_rx_ring_format(struct net_device *ndev, int q)
+> +static u32
+> +ravb_rx_ring_refill(struct net_device *ndev, int q, u32 count, gfp_t gfp_mask)
+>  {
+>  	struct ravb_private *priv = netdev_priv(ndev);
+> +	const struct ravb_hw_info *info = priv->info;
+>  	struct ravb_rx_desc *rx_desc;
+> -	unsigned int rx_ring_size;
+>  	dma_addr_t dma_addr;
+> -	unsigned int i;
+> +	u32 i, entry;
+>  
+> -	rx_ring_size = priv->info->rx_desc_size * priv->num_rx_ring[q];
+> -	memset(priv->rx_ring[q].raw, 0, rx_ring_size);
+> -	/* Build RX ring buffer */
+> -	for (i = 0; i < priv->num_rx_ring[q]; i++) {
+> -		/* RX descriptor */
+> -		rx_desc = ravb_rx_get_desc(priv, q, i);
+> -		rx_desc->ds_cc = cpu_to_le16(priv->info->rx_max_desc_use);
+> -		dma_addr = dma_map_single(ndev->dev.parent, priv->rx_skb[q][i]->data,
+> -					  priv->info->rx_max_frame_size,
+> -					  DMA_FROM_DEVICE);
+> -		/* We just set the data size to 0 for a failed mapping which
+> -		 * should prevent DMA from happening...
+> -		 */
+> -		if (dma_mapping_error(ndev->dev.parent, dma_addr))
+> -			rx_desc->ds_cc = cpu_to_le16(0);
+> -		rx_desc->dptr = cpu_to_le32(dma_addr);
+> +	for (i = 0; i < count; i++) {
+> +		entry = (priv->dirty_rx[q] + i) % priv->num_rx_ring[q];
+> +		rx_desc = ravb_rx_get_desc(priv, q, entry);
+> +		rx_desc->ds_cc = cpu_to_le16(info->rx_max_desc_use);
+> +
+> +		if (!priv->rx_skb[q][entry]) {
+> +			priv->rx_skb[q][entry] = ravb_alloc_skb(ndev, info, gfp_mask);
+> +			if (!priv->rx_skb[q][entry])
+> +				break;
+> +			dma_addr = dma_map_single(ndev->dev.parent,
+> +						  priv->rx_skb[q][entry]->data,
+> +						  priv->info->rx_max_frame_size,
+> +						  DMA_FROM_DEVICE);
+> +			skb_checksum_none_assert(priv->rx_skb[q][entry]);
+> +			/* We just set the data size to 0 for a failed mapping
+> +			 * which should prevent DMA from happening...
+> +			 */
+> +			if (dma_mapping_error(ndev->dev.parent, dma_addr))
+> +				rx_desc->ds_cc = cpu_to_le16(0);
+> +			rx_desc->dptr = cpu_to_le32(dma_addr);
+> +		}
+> +		/* Descriptor type must be set after all the above writes */
+> +		dma_wmb();
+>  		rx_desc->die_dt = DT_FEMPTY;
+>  	}
+> -	rx_desc = ravb_rx_get_desc(priv, q, i);
+> -	rx_desc->dptr = cpu_to_le32((u32)priv->rx_desc_dma[q]);
+> -	rx_desc->die_dt = DT_LINKFIX; /* type */
+> +
+> +	return i;
+>  }
+>  
+>  /* Format skb and descriptor buffer for Ethernet AVB */
+> @@ -353,6 +360,7 @@ static void ravb_ring_format(struct net_device *ndev, int q)
+>  {
+>  	struct ravb_private *priv = netdev_priv(ndev);
+>  	unsigned int num_tx_desc = priv->num_tx_desc;
+> +	struct ravb_rx_desc *rx_desc;
+>  	struct ravb_tx_desc *tx_desc;
+>  	struct ravb_desc *desc;
+>  	unsigned int tx_ring_size = sizeof(*tx_desc) * priv->num_tx_ring[q] *
+> @@ -364,8 +372,6 @@ static void ravb_ring_format(struct net_device *ndev, int q)
+>  	priv->dirty_rx[q] = 0;
+>  	priv->dirty_tx[q] = 0;
+>  
+> -	ravb_rx_ring_format(ndev, q);
+> -
+>  	memset(priv->tx_ring[q], 0, tx_ring_size);
+>  	/* Build TX ring buffer */
+>  	for (i = 0, tx_desc = priv->tx_ring[q]; i < priv->num_tx_ring[q];
+> @@ -379,6 +385,14 @@ static void ravb_ring_format(struct net_device *ndev, int q)
+>  	tx_desc->dptr = cpu_to_le32((u32)priv->tx_desc_dma[q]);
+>  	tx_desc->die_dt = DT_LINKFIX; /* type */
+>  
+> +	/* Regular RX descriptors have already been initialized by
+> +	 * ravb_rx_ring_refill(), we just need to initialize the final link
+> +	 * descriptor.
+> +	 */
+> +	rx_desc = ravb_rx_get_desc(priv, q, priv->num_rx_ring[q]);
+> +	rx_desc->dptr = cpu_to_le32((u32)priv->rx_desc_dma[q]);
+> +	rx_desc->die_dt = DT_LINKFIX; /* type */
+> +
 
-diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
-index 81567fcf3..1ef399287 100644
---- a/drivers/net/ethernet/realtek/r8169.h
-+++ b/drivers/net/ethernet/realtek/r8169.h
-@@ -72,6 +72,7 @@ enum mac_version {
- };
- 
- struct rtl8169_private;
-+struct r8169_led_classdev;
- 
- void r8169_apply_firmware(struct rtl8169_private *tp);
- u16 rtl8168h_2_get_adc_bias_ioffset(struct rtl8169_private *tp);
-@@ -83,4 +84,5 @@ void r8169_get_led_name(struct rtl8169_private *tp, int idx,
- 			char *buf, int buf_len);
- int rtl8168_get_led_mode(struct rtl8169_private *tp);
- int rtl8168_led_mod_ctrl(struct rtl8169_private *tp, u16 mask, u16 val);
--void rtl8168_init_leds(struct net_device *ndev);
-+struct r8169_led_classdev *rtl8168_init_leds(struct net_device *ndev);
-+void r8169_remove_leds(struct r8169_led_classdev *leds);
-diff --git a/drivers/net/ethernet/realtek/r8169_leds.c b/drivers/net/ethernet/realtek/r8169_leds.c
-index 007d077ed..1c97f3cca 100644
---- a/drivers/net/ethernet/realtek/r8169_leds.c
-+++ b/drivers/net/ethernet/realtek/r8169_leds.c
-@@ -138,20 +138,31 @@ static void rtl8168_setup_ldev(struct r8169_led_classdev *ldev,
- 	led_cdev->hw_control_get_device = r8169_led_hw_control_get_device;
- 
- 	/* ignore errors */
--	devm_led_classdev_register(&ndev->dev, led_cdev);
-+	led_classdev_register(&ndev->dev, led_cdev);
- }
- 
--void rtl8168_init_leds(struct net_device *ndev)
-+struct r8169_led_classdev *rtl8168_init_leds(struct net_device *ndev)
- {
--	/* bind resource mgmt to netdev */
--	struct device *dev = &ndev->dev;
- 	struct r8169_led_classdev *leds;
- 	int i;
- 
--	leds = devm_kcalloc(dev, RTL8168_NUM_LEDS, sizeof(*leds), GFP_KERNEL);
-+	leds = kcalloc(RTL8168_NUM_LEDS + 1, sizeof(*leds), GFP_KERNEL);
- 	if (!leds)
--		return;
-+		return NULL;
- 
- 	for (i = 0; i < RTL8168_NUM_LEDS; i++)
- 		rtl8168_setup_ldev(leds + i, ndev, i);
-+
-+	return leds;
-+}
-+
-+void r8169_remove_leds(struct r8169_led_classdev *leds)
-+{
-+	if (!leds)
-+		return;
-+
-+	for (struct r8169_led_classdev *l = leds; l->ndev; l++)
-+		led_classdev_unregister(&l->led);
-+
-+	kfree(leds);
- }
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 4b6c28576..32b73f398 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -634,6 +634,8 @@ struct rtl8169_private {
- 	const char *fw_name;
- 	struct rtl_fw *rtl_fw;
- 
-+	struct r8169_led_classdev *leds;
-+
- 	u32 ocp_base;
- };
- 
-@@ -4930,6 +4932,9 @@ static void rtl_remove_one(struct pci_dev *pdev)
- 
- 	cancel_work_sync(&tp->wk.work);
- 
-+	if (IS_ENABLED(CONFIG_R8169_LEDS))
-+		r8169_remove_leds(tp->leds);
-+
- 	unregister_netdev(tp->dev);
- 
- 	if (tp->dash_type != RTL_DASH_NONE)
-@@ -5391,7 +5396,7 @@ static int rtl_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (IS_ENABLED(CONFIG_R8169_LEDS) &&
- 	    tp->mac_version > RTL_GIGA_MAC_VER_06 &&
- 	    tp->mac_version < RTL_GIGA_MAC_VER_61)
--		rtl8168_init_leds(dev);
-+		tp->leds = rtl8168_init_leds(dev);
- 
- 	netdev_info(dev, "%s, %pM, XID %03x, IRQ %d\n",
- 		    rtl_chip_infos[chipset].name, dev->dev_addr, xid, tp->irq);
+super-nit: Should you not move this addition up to where you removed the 
+call to ravb_rx_ring_format()? Before this change the order of things 
+are,
+
+    /* Init RX ring */
+    /* Init TX ring */
+    /* Set RX descriptor base address */
+    /* Set TX descriptor base address */
+
+
+While after it is,
+
+    /* Init TX ring */
+    /* Init RX ring */
+    /* Set RX descriptor base address */
+    /* Set TX descriptor base address */
+
+My OCD is itching ;-)
+
+>  	/* RX descriptor base address for best effort */
+>  	desc = &priv->desc_bat[RX_QUEUE_OFFSET + q];
+>  	desc->die_dt = DT_LINKFIX; /* type */
+> @@ -408,11 +422,9 @@ static void *ravb_alloc_rx_desc(struct net_device *ndev, int q)
+>  static int ravb_ring_init(struct net_device *ndev, int q)
+>  {
+>  	struct ravb_private *priv = netdev_priv(ndev);
+> -	const struct ravb_hw_info *info = priv->info;
+>  	unsigned int num_tx_desc = priv->num_tx_desc;
+>  	unsigned int ring_size;
+> -	struct sk_buff *skb;
+> -	unsigned int i;
+> +	u32 num_filled;
+>  
+>  	/* Allocate RX and TX skb rings */
+>  	priv->rx_skb[q] = kcalloc(priv->num_rx_ring[q],
+> @@ -422,13 +434,6 @@ static int ravb_ring_init(struct net_device *ndev, int q)
+>  	if (!priv->rx_skb[q] || !priv->tx_skb[q])
+>  		goto error;
+>  
+> -	for (i = 0; i < priv->num_rx_ring[q]; i++) {
+> -		skb = ravb_alloc_skb(ndev, info, GFP_KERNEL);
+> -		if (!skb)
+> -			goto error;
+> -		priv->rx_skb[q][i] = skb;
+> -	}
+> -
+>  	if (num_tx_desc > 1) {
+>  		/* Allocate rings for the aligned buffers */
+>  		priv->tx_align[q] = kmalloc(DPTR_ALIGN * priv->num_tx_ring[q] +
+> @@ -443,6 +448,13 @@ static int ravb_ring_init(struct net_device *ndev, int q)
+>  
+>  	priv->dirty_rx[q] = 0;
+>  
+> +	/* Populate RX ring buffer. */
+> +	ring_size = priv->info->rx_desc_size * priv->num_rx_ring[q];
+> +	memset(priv->rx_ring[q].raw, 0, ring_size);
+> +	num_filled = ravb_rx_ring_refill(ndev, q, priv->num_rx_ring[q], GFP_KERNEL);
+> +	if (num_filled != priv->num_rx_ring[q])
+> +		goto error;
+> +
+
+Here you also change the order, but it make sense here as you first deal 
+with all TX and then all RX ;-)
+
+>  	/* Allocate all TX descriptors. */
+>  	ring_size = sizeof(struct ravb_tx_desc) *
+>  		    (priv->num_tx_ring[q] * num_tx_desc + 1);
+> @@ -762,11 +774,9 @@ static struct sk_buff *ravb_get_skb_gbeth(struct net_device *ndev, int entry,
+>  static int ravb_rx_gbeth(struct net_device *ndev, int budget, int q)
+>  {
+>  	struct ravb_private *priv = netdev_priv(ndev);
+> -	const struct ravb_hw_info *info = priv->info;
+>  	struct net_device_stats *stats;
+>  	struct ravb_rx_desc *desc;
+>  	struct sk_buff *skb;
+> -	dma_addr_t dma_addr;
+>  	int rx_packets = 0;
+>  	u8  desc_status;
+>  	u16 desc_len;
+> @@ -854,32 +864,9 @@ static int ravb_rx_gbeth(struct net_device *ndev, int budget, int q)
+>  	}
+>  
+>  	/* Refill the RX ring buffers. */
+> -	for (; priv->cur_rx[q] - priv->dirty_rx[q] > 0; priv->dirty_rx[q]++) {
+> -		entry = priv->dirty_rx[q] % priv->num_rx_ring[q];
+> -		desc = &priv->rx_ring[q].desc[entry];
+> -		desc->ds_cc = cpu_to_le16(priv->info->rx_max_desc_use);
+> -
+> -		if (!priv->rx_skb[q][entry]) {
+> -			skb = ravb_alloc_skb(ndev, info, GFP_ATOMIC);
+> -			if (!skb)
+> -				break;
+> -			dma_addr = dma_map_single(ndev->dev.parent,
+> -						  skb->data,
+> -						  priv->info->rx_max_frame_size,
+> -						  DMA_FROM_DEVICE);
+> -			skb_checksum_none_assert(skb);
+> -			/* We just set the data size to 0 for a failed mapping
+> -			 * which should prevent DMA  from happening...
+> -			 */
+> -			if (dma_mapping_error(ndev->dev.parent, dma_addr))
+> -				desc->ds_cc = cpu_to_le16(0);
+> -			desc->dptr = cpu_to_le32(dma_addr);
+> -			priv->rx_skb[q][entry] = skb;
+> -		}
+> -		/* Descriptor type must be set after all the above writes */
+> -		dma_wmb();
+> -		desc->die_dt = DT_FEMPTY;
+> -	}
+> +	priv->dirty_rx[q] += ravb_rx_ring_refill(ndev, q,
+> +						 priv->cur_rx[q] - priv->dirty_rx[q],
+> +						 GFP_ATOMIC);
+>  
+>  	return rx_packets;
+>  }
+> @@ -888,11 +875,9 @@ static int ravb_rx_gbeth(struct net_device *ndev, int budget, int q)
+>  static int ravb_rx_rcar(struct net_device *ndev, int budget, int q)
+>  {
+>  	struct ravb_private *priv = netdev_priv(ndev);
+> -	const struct ravb_hw_info *info = priv->info;
+>  	struct net_device_stats *stats = &priv->stats[q];
+>  	struct ravb_ex_rx_desc *desc;
+>  	struct sk_buff *skb;
+> -	dma_addr_t dma_addr;
+>  	struct timespec64 ts;
+>  	int rx_packets = 0;
+>  	u8  desc_status;
+> @@ -964,31 +949,9 @@ static int ravb_rx_rcar(struct net_device *ndev, int budget, int q)
+>  	}
+>  
+>  	/* Refill the RX ring buffers. */
+> -	for (; priv->cur_rx[q] - priv->dirty_rx[q] > 0; priv->dirty_rx[q]++) {
+> -		entry = priv->dirty_rx[q] % priv->num_rx_ring[q];
+> -		desc = &priv->rx_ring[q].ex_desc[entry];
+> -		desc->ds_cc = cpu_to_le16(priv->info->rx_max_desc_use);
+> -
+> -		if (!priv->rx_skb[q][entry]) {
+> -			skb = ravb_alloc_skb(ndev, info, GFP_ATOMIC);
+> -			if (!skb)
+> -				break;	/* Better luck next round. */
+> -			dma_addr = dma_map_single(ndev->dev.parent, skb->data,
+> -						  priv->info->rx_max_frame_size,
+> -						  DMA_FROM_DEVICE);
+> -			skb_checksum_none_assert(skb);
+> -			/* We just set the data size to 0 for a failed mapping
+> -			 * which should prevent DMA  from happening...
+> -			 */
+> -			if (dma_mapping_error(ndev->dev.parent, dma_addr))
+> -				desc->ds_cc = cpu_to_le16(0);
+> -			desc->dptr = cpu_to_le32(dma_addr);
+> -			priv->rx_skb[q][entry] = skb;
+> -		}
+> -		/* Descriptor type must be set after all the above writes */
+> -		dma_wmb();
+> -		desc->die_dt = DT_FEMPTY;
+> -	}
+> +	priv->dirty_rx[q] += ravb_rx_ring_refill(ndev, q,
+> +						 priv->cur_rx[q] - priv->dirty_rx[q],
+> +						 GFP_ATOMIC);
+>  
+>  	return rx_packets;
+>  }
+> -- 
+> 2.39.2
+> 
+
 -- 
-2.44.0
-
+Kind Regards,
+Niklas Söderlund
 
