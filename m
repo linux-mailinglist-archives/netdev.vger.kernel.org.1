@@ -1,262 +1,209 @@
-Return-Path: <netdev+bounces-88112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFA168A5C9F
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 23:07:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44CC48A5CA4
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 23:07:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BF1E282D1D
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 21:07:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C46B21F23838
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 21:07:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB88156991;
-	Mon, 15 Apr 2024 21:07:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2032156988;
+	Mon, 15 Apr 2024 21:07:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="IsDukFQz"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="vnF+K6tU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D86B15696C;
-	Mon, 15 Apr 2024 21:07:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2751E15698B
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 21:07:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713215235; cv=none; b=Ay2nmwFxW6WGLpwcd8WFUbYjS7bnmQnDrJQb5JvYyzjxqeB877W8naG3veYnrd8zqC6t0nqca86h5aXCv+vHfWe/sY9D70OtadmiZGgWjUR3QlxUOYWk8QOtasXJDteFygc3L6InI0IfScz1JzcV/ikNYVZg+GAnMx2rNpBbsoU=
+	t=1713215256; cv=none; b=s9VTVZOocoZ+F5iSMx3tX8wFyx05pmiJTspoKfj0nY6G517LQBNvhyQURIxYmq43ZXetJuPO5ozkjf4IXTVYQVWLOK1w5yO3w4uz6Y7+pgnkJr5sGPkwDOTc6koiMwX4adbBOO624DYHE56mZXiZFBlJTL4dWDfg/9bgZkFGb04=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713215235; c=relaxed/simple;
-	bh=s3a6f3qIEir1cn382iZdpn0h+TD4VlW9wB1BAF+rIPI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=XYyXemfeKDGTAKIwgscgqKpeOAhrBTNckV8kdXPiQln0br21yMgvoxp5szd7LuxnnuVi3yDK45lIKDcTmEwCPj4K4eNM/qraQuYAEyc7KNXNQjPj6trjP5+g6g09PBQV1IorBIWYLPLcv/5zcvO/7dWisTTP2clhX9qViPI14OA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=IsDukFQz; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43FKM18r027957;
-	Mon, 15 Apr 2024 21:06:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=dM7YEgGtEvkGNcXL28WlEtqI7x0iAtZXRj4lh2wqttE=; b=Is
-	DukFQzYn4BVj7GMn2EGYIKKT2nUuOpyFQi3fJV/24NcU5uLIl/Afe2yWgS2Sb/i7
-	V9n4NoM23y+MJ8uWuhT4xdgweqSsLHBE+bQ4foJ0C/yDEGBUtwAGt2xKMedJpBN4
-	TsqCnkC0n7PV8zZfHRk4pPJlb5PmgHVYh2X4eGwsnlSMm9rEcSliHv03zDChfzRy
-	NmOlOf9HJidkRDi+DJVsg50N22bNzyvWl8D5NJcKxapuRD/rI0QLqoUz+trcudG8
-	rAKsTwa4d3DSmvfMPz1hWd9OEm+FKY/sXsHAgpN2QGJohdcxLs6Tycr/mcNeHDEf
-	bNActr0rSgt6bA8uvSwA==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xh5bsryhs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Apr 2024 21:06:51 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43FL6oGS030004
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Apr 2024 21:06:50 GMT
-Received: from [10.46.19.239] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 15 Apr
- 2024 14:06:46 -0700
-Message-ID: <6bfee126-36f4-4595-950e-058d93303362@quicinc.com>
-Date: Mon, 15 Apr 2024 14:06:45 -0700
+	s=arc-20240116; t=1713215256; c=relaxed/simple;
+	bh=+Rgoyfq/UWK5Wd6t8sltN5HvOvj/Ag/2cpHi8aCq+7M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BqaXCftclonkzSEKv/wvznDP5DuEBYhXzRhJTqA4QnTZ6Mih7gLKcx5UHJyTZWYrG2JJbbg7DK0WcKj9lV3BnqjHKNDilnzCUIsxQPYwdqNR4eF1J3tqx0aHtT6bUGKD9PovMC3Z/WgJP5uN2EPUvQhF/lr/BDZKrtlZTRTICkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=vnF+K6tU; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1e3ff14f249so28401345ad.1
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 14:07:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1713215253; x=1713820053; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=io++w2syYAvewTWIvHlSjNKUrApibADwv6cCP9jP8kY=;
+        b=vnF+K6tU+TfbDfI1GGgwFELvsd2Esc7GWGg6eXl3ROZBT3psvhWgUs2SxF46akZexe
+         zNbw9f3GTDevuRLOZGS9x0rI6gRdFoxG9uKnj/cR0aVVV2k0nzAS2cc0tNz6EchPXOK2
+         G3XohswCWSIYplso9hIgLRYTBdcVRFCluFgcUi9/hnUg83OBTATJhfataMeKYNRjXpqx
+         V6WjfkqD06ydyyzVF7WWTsNBhWXzpJGlDwfKaq7pfRTGPNDyR3aGYrGGACJyvSZAuzgd
+         9C+f0pV+2n51ec+honLdLtwHhwuwR7muRcPmp3g4AbOJqV+5+SOAbMoeKUprSprw7nc+
+         OvQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713215253; x=1713820053;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=io++w2syYAvewTWIvHlSjNKUrApibADwv6cCP9jP8kY=;
+        b=OLWI7+OV7oibtOONNqGuOhcK/vJ5E/BZoHu7HAlUkwXa77WcI+nECH5YGAhKrkW+qd
+         99cAirPfKoq0fbBpJzwqLw3ypRlE2jbmQRl9D794fiiLAqY2OJ+gmpfk29asZoCQ1wDV
+         Aq+XjAhSspQ3sX2jFbKUacLnkvhuMmxQTogVHeK65Q/036qv15ekQci7O9uS4yUowOzv
+         IV/ieiDHPWdecG1Zj/OLmDSppR3KyBz456i9HWpw23LDeBLdth6Z6vqYRhmsZ6+/4jsx
+         1tGwYTj4pQf0yN1WhqMWSeeZ6E7rASB2WKyGhbaUElYKsCQTbe2QigLkjN4rvT7pOBL6
+         bqsw==
+X-Forwarded-Encrypted: i=1; AJvYcCWIlDDYLo04EJ9fMgN3ueda9qE4W16s0J/6chZTiN1TDMLkE2Wh2/AzDUC6KBpQpL/VAnjMUretUFCYqdeXBcQGV35j+arh
+X-Gm-Message-State: AOJu0YxFlv8bFUhFiglYIIekp6V9gG3BDi/M/qH5m6XwTjJBXNfkfMoX
+	Uw8YtnSMYVyvggxedWQLUxiyrATfhISXFc0Es8mVS1oxH26xXbYkx3P7C8AiC9yHcOL4o+ISNDA
+	=
+X-Google-Smtp-Source: AGHT+IF1VyIvJezby232mSu4XaekgWptP07iThOVGW4juut5JhF6YNjQa+/aGAeuPiZPMtrGjVod/Q==
+X-Received: by 2002:a17:902:d2c2:b0:1e2:45f3:2d57 with SMTP id n2-20020a170902d2c200b001e245f32d57mr206916plc.6.1713215253203;
+        Mon, 15 Apr 2024 14:07:33 -0700 (PDT)
+Received: from localhost.localdomain ([2804:7f1:e2c3:6d3a:2639:3444:5313:18de])
+        by smtp.gmail.com with ESMTPSA id b18-20020a170903229200b001e21ddacb20sm8328239plh.297.2024.04.15.14.07.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 14:07:32 -0700 (PDT)
+From: Victor Nogueira <victor@mojatatu.com>
+To: edumazet@google.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: jhs@mojatatu.com,
+	jiri@resnulli.us,
+	xiyou.wangcong@gmail.com,
+	netdev@vger.kernel.org,
+	renmingshuai@huawei.com,
+	pctammela@mojatatu.com
+Subject: [PATCH net] net/sched: Fix mirred deadlock on device recursion
+Date: Mon, 15 Apr 2024 18:07:28 -0300
+Message-ID: <20240415210728.36949-1-victor@mojatatu.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH bpf-next v3 1/2] net: Rename mono_delivery_time to
- tstamp_type for scalabilty
-Content-Language: en-US
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
-        "Martin
- KaFai Lau" <martin.lau@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>
-CC: <kernel@quicinc.com>
-References: <20240412210125.1780574-1-quic_abchauha@quicinc.com>
- <20240412210125.1780574-2-quic_abchauha@quicinc.com>
- <661ad4f0e3766_3be9a7294a1@willemb.c.googlers.com.notmuch>
- <c992e03b-eee5-471a-9002-f35bdfa1be2d@quicinc.com>
- <661d92391de45_30101294f2@willemb.c.googlers.com.notmuch>
-From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-In-Reply-To: <661d92391de45_30101294f2@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: 3J71bhrZDOueEiCvewYfdeBtlSUBMPju
-X-Proofpoint-GUID: 3J71bhrZDOueEiCvewYfdeBtlSUBMPju
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-15_18,2024-04-15_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 mlxlogscore=999
- priorityscore=1501 spamscore=0 clxscore=1015 malwarescore=0 adultscore=0
- phishscore=0 bulkscore=0 suspectscore=0 impostorscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2404010003
- definitions=main-2404150139
+Content-Transfer-Encoding: 8bit
 
+From: Eric Dumazet <edumazet@google.com>
 
+When the mirred action is used on a classful egress qdisc and a packet is
+mirrored or redirected to self we hit a qdisc lock deadlock.
+See trace below.
 
-On 4/15/2024 1:46 PM, Willem de Bruijn wrote:
-> Abhishek Chauhan (ABC) wrote:
->>
->>
->> On 4/13/2024 11:54 AM, Willem de Bruijn wrote:
->>> Abhishek Chauhan wrote:
->>>> mono_delivery_time was added to check if skb->tstamp has delivery
->>>> time in mono clock base (i.e. EDT) otherwise skb->tstamp has
->>>> timestamp in ingress and delivery_time at egress.
->>>>
->>>> Renaming the bitfield from mono_delivery_time to tstamp_type is for
->>>> extensibilty for other timestamps such as userspace timestamp
->>>> (i.e. SO_TXTIME) set via sock opts.
->>>>
->>>> As we are renaming the mono_delivery_time to tstamp_type, it makes
->>>> sense to start assigning tstamp_type based out if enum defined as
->>>> part of this commit
->>>>
->>>> Earlier we used bool arg flag to check if the tstamp is mono in
->>>> function skb_set_delivery_time, Now the signature of the functions
->>>> accepts enum to distinguish between mono and real time
->>>>
->>>> Bridge driver today has no support to forward the userspace timestamp
->>>> packets and ends up resetting the timestamp. ETF qdisc checks the
->>>> packet coming from userspace and encounters to be 0 thereby dropping
->>>> time sensitive packets. These changes will allow userspace timestamps
->>>> packets to be forwarded from the bridge to NIC drivers.
->>>>
->>>> In future tstamp_type:1 can be extended to support userspace timestamp
->>>> by increasing the bitfield.
->>>>
->>>> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
->>>> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
->>>> ---
->>>> Changes since v2
->>>> - Minor changes to commit subject
->>>>
->>>> Changes since v1
->>>> - Squashed the two commits into one as mentioned by Willem.
->>>> - Introduced switch in skb_set_delivery_time.
->>>> - Renamed and removed directionality aspects w.r.t tstamp_type 
->>>>   as mentioned by Willem.
->>>>
->>>>  include/linux/skbuff.h                     | 33 +++++++++++++++-------
->>>>  include/net/inet_frag.h                    |  4 +--
->>>>  net/bridge/netfilter/nf_conntrack_bridge.c |  6 ++--
->>>>  net/core/dev.c                             |  2 +-
->>>>  net/core/filter.c                          |  8 +++---
->>>>  net/ipv4/inet_fragment.c                   |  2 +-
->>>>  net/ipv4/ip_fragment.c                     |  2 +-
->>>>  net/ipv4/ip_output.c                       |  8 +++---
->>>>  net/ipv4/tcp_output.c                      | 14 ++++-----
->>>>  net/ipv6/ip6_output.c                      |  6 ++--
->>>>  net/ipv6/netfilter.c                       |  6 ++--
->>>>  net/ipv6/netfilter/nf_conntrack_reasm.c    |  2 +-
->>>>  net/ipv6/reassembly.c                      |  2 +-
->>>>  net/ipv6/tcp_ipv6.c                        |  2 +-
->>>>  net/sched/act_bpf.c                        |  4 +--
->>>>  net/sched/cls_bpf.c                        |  4 +--
->>>>  16 files changed, 59 insertions(+), 46 deletions(-)
->>>>
->>>> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
->>>> index 7135a3e94afd..a83a2120b57f 100644
->>>> --- a/include/linux/skbuff.h
->>>> +++ b/include/linux/skbuff.h
->>>> @@ -702,6 +702,11 @@ typedef unsigned int sk_buff_data_t;
->>>>  typedef unsigned char *sk_buff_data_t;
->>>>  #endif
->>>>  
->>>> +enum skb_tstamp_type {
->>>> +	CLOCK_REAL = 0, /* Time base is realtime */
->>>> +	CLOCK_MONO = 1, /* Time base is Monotonic */
->>>> +};
->>>
->>> Minor: inconsistent capitalization
->>>
->> I will fix this. 
->>
->>>> +
->>>>  /**
->>>>   * DOC: Basic sk_buff geometry
->>>>   *
->>>> @@ -819,7 +824,7 @@ typedef unsigned char *sk_buff_data_t;
->>>>   *	@dst_pending_confirm: need to confirm neighbour
->>>>   *	@decrypted: Decrypted SKB
->>>>   *	@slow_gro: state present at GRO time, slower prepare step required
->>>> - *	@mono_delivery_time: When set, skb->tstamp has the
->>>> + *	@tstamp_type: When set, skb->tstamp has the
->>>>   *		delivery_time in mono clock base (i.e. EDT).  Otherwise, the
->>>>   *		skb->tstamp has the (rcv) timestamp at ingress and
->>>>   *		delivery_time at egress.
->>>> @@ -950,7 +955,7 @@ struct sk_buff {
->>>>  	/* private: */
->>>>  	__u8			__mono_tc_offset[0];
->>>>  	/* public: */
->>>> -	__u8			mono_delivery_time:1;	/* See SKB_MONO_DELIVERY_TIME_MASK */
->>>> +	__u8			tstamp_type:1;	/* See SKB_MONO_DELIVERY_TIME_MASK */
->>>
->>> Also remove reference to MONO_DELIVERY_TIME_MASK, or instead refer to
->>> skb_tstamp_type.
->>>
->>>>  #ifdef CONFIG_NET_XGRESS
->>>>  	__u8			tc_at_ingress:1;	/* See TC_AT_INGRESS_MASK */
->>>>  	__u8			tc_skip_classify:1;
->>>> @@ -4237,7 +4242,7 @@ static inline void skb_get_new_timestampns(const struct sk_buff *skb,
->>>>  static inline void __net_timestamp(struct sk_buff *skb)
->>>>  {
->>>>  	skb->tstamp = ktime_get_real();
->>>> -	skb->mono_delivery_time = 0;
->>>> +	skb->tstamp_type = CLOCK_REAL;
->>>>  }
->>>>  
->>>>  static inline ktime_t net_timedelta(ktime_t t)
->>>> @@ -4246,10 +4251,18 @@ static inline ktime_t net_timedelta(ktime_t t)
->>>>  }
->>>>  
->>>>  static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
->>>> -					 bool mono)
->>>> +					  u8 tstamp_type)
->>>>  {
->>>>  	skb->tstamp = kt;
->>>> -	skb->mono_delivery_time = kt && mono;
->>>> +
->>>> +	switch (tstamp_type) {
->>>> +	case CLOCK_REAL:
->>>> +		skb->tstamp_type = CLOCK_REAL;
->>>> +		break;
->>>> +	case CLOCK_MONO:
->>>> +		skb->tstamp_type = kt && tstamp_type;
->>>> +		break;
->>>> +	}
->>>
->>> Technically this leaves the tstamp_type undefined if (skb, 0, CLOCK_REAL)
->> Do you think i should be checking for valid value of tstamp before setting the tstamp_type ? Only then set it. 
-> 
-> A kt of 0 is interpreted as resetting the type. That should probably
-> be maintained.
-> 
-> For SO_TIMESTAMPING, a mono delivery time of 0 does have some meaning.
-> In __sock_recv_timestamp:
-> 
->         /* Race occurred between timestamp enabling and packet
->            receiving.  Fill in the current time for now. */
->         if (need_software_tstamp && skb->tstamp == 0) {
->                 __net_timestamp(skb);
->                 false_tstamp = 1;
->         }
+[..... other info removed for brevity....]
+[   82.890906]
+[   82.890906] ============================================
+[   82.890906] WARNING: possible recursive locking detected
+[   82.890906] 6.8.0-05205-g77fadd89fe2d-dirty #213 Tainted: G        W
+[   82.890906] --------------------------------------------
+[   82.890906] ping/418 is trying to acquire lock:
+[   82.890906] ffff888006994110 (&sch->q.lock){+.-.}-{3:3}, at:
+__dev_queue_xmit+0x1778/0x3550
+[   82.890906]
+[   82.890906] but task is already holding lock:
+[   82.890906] ffff888006994110 (&sch->q.lock){+.-.}-{3:3}, at:
+__dev_queue_xmit+0x1778/0x3550
+[   82.890906]
+[   82.890906] other info that might help us debug this:
+[   82.890906]  Possible unsafe locking scenario:
+[   82.890906]
+[   82.890906]        CPU0
+[   82.890906]        ----
+[   82.890906]   lock(&sch->q.lock);
+[   82.890906]   lock(&sch->q.lock);
+[   82.890906]
+[   82.890906]  *** DEADLOCK ***
+[   82.890906]
+[..... other info removed for brevity....]
 
-Well in that case the above logic still resets the tstamp and sets the tstamp_type to CLOCK_REAL(value 0). 
-Anyway the tstamp_type will be 0 to begin with. 
-The logic is still inline with previous implementation, because previously if kt was 0 then kt && mono sets the tstamp_type (previously called as mono_delivery_time) to 0 (i.e SKB_CLOCK_REAL). 
+Example setup (eth0->eth0) to recreate
+tc qdisc add dev eth0 root handle 1: htb default 30
+tc filter add dev eth0 handle 1: protocol ip prio 2 matchall \
+     action mirred egress redirect dev eth0
 
+Another example(eth0->eth1->eth0) to recreate
+tc qdisc add dev eth0 root handle 1: htb default 30
+tc filter add dev eth0 handle 1: protocol ip prio 2 matchall \
+     action mirred egress redirect dev eth1
+
+tc qdisc add dev eth1 root handle 1: htb default 30
+tc filter add dev eth1 handle 1: protocol ip prio 2 matchall \
+     action mirred egress redirect dev eth0
+
+We fix this by adding an owner field (CPU id) to struct Qdisc set after
+root qdisc is entered. When the softirq enters it a second time, if the
+qdisc owner is the same CPU, the packet is dropped to break the loop.
+
+Reported-by: Mingshuai Ren <renmingshuai@huawei.com>
+Closes: https://lore.kernel.org/netdev/20240314111713.5979-1-renmingshuai@huawei.com/
+Fixes: 3bcb846ca4cf ("net: get rid of spin_trylock() in net_tx_action()")
+Fixes: e578d9c02587 ("net: sched: use counter to break reclassify loops")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Victor Nogueira <victor@mojatatu.com>
+Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
+Tested-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+---
+ include/net/sch_generic.h | 1 +
+ net/core/dev.c            | 6 ++++++
+ net/sched/sch_generic.c   | 1 +
+ 3 files changed, 8 insertions(+)
+
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index 76db6be16083..f561dfb79743 100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -117,6 +117,7 @@ struct Qdisc {
+ 	struct qdisc_skb_head	q;
+ 	struct gnet_stats_basic_sync bstats;
+ 	struct gnet_stats_queue	qstats;
++	int                     owner;
+ 	unsigned long		state;
+ 	unsigned long		state2; /* must be written under qdisc spinlock */
+ 	struct Qdisc            *next_sched;
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 854a3a28a8d8..f6c6e494f0a9 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3808,6 +3808,10 @@ static inline int __dev_xmit_skb(struct sk_buff *skb, struct Qdisc *q,
+ 		return rc;
+ 	}
+ 
++	if (unlikely(READ_ONCE(q->owner) == smp_processor_id())) {
++		kfree_skb_reason(skb, SKB_DROP_REASON_TC_RECLASSIFY_LOOP);
++		return NET_XMIT_DROP;
++	}
+ 	/*
+ 	 * Heuristic to force contended enqueues to serialize on a
+ 	 * separate lock before trying to get qdisc main lock.
+@@ -3847,7 +3851,9 @@ static inline int __dev_xmit_skb(struct sk_buff *skb, struct Qdisc *q,
+ 		qdisc_run_end(q);
+ 		rc = NET_XMIT_SUCCESS;
+ 	} else {
++		WRITE_ONCE(q->owner, smp_processor_id());
+ 		rc = dev_qdisc_enqueue(skb, q, &to_free, txq);
++		WRITE_ONCE(q->owner, -1);
+ 		if (qdisc_run_begin(q)) {
+ 			if (unlikely(contended)) {
+ 				spin_unlock(&q->busylock);
+diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
+index ff5336493777..4a2c763e2d11 100644
+--- a/net/sched/sch_generic.c
++++ b/net/sched/sch_generic.c
+@@ -974,6 +974,7 @@ struct Qdisc *qdisc_alloc(struct netdev_queue *dev_queue,
+ 	sch->enqueue = ops->enqueue;
+ 	sch->dequeue = ops->dequeue;
+ 	sch->dev_queue = dev_queue;
++	sch->owner = -1;
+ 	netdev_hold(dev, &sch->dev_tracker, GFP_KERNEL);
+ 	refcount_set(&sch->refcnt, 1);
+ 
+-- 
+2.34.1
 
 
