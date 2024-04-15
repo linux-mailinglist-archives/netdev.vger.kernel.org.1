@@ -1,103 +1,152 @@
-Return-Path: <netdev+bounces-87901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E4F68A4E4D
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:01:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FAFE8A4FAE
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 14:52:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F1F11C20F58
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 12:01:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF2B1283A41
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 12:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D192B6775E;
-	Mon, 15 Apr 2024 12:01:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 717997FBC5;
+	Mon, 15 Apr 2024 12:49:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i+4ur96n"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PzFcslSU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46364487A5;
-	Mon, 15 Apr 2024 12:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45FD37FBB1;
+	Mon, 15 Apr 2024 12:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713182509; cv=none; b=RbELkUmqHtOReXY968/2CzwSIAkWKngzGPC83ukyHEkCXEDJ7VZ/pUzARnpjQXehjEejFn5f7JA4xARrzvlG/L+tK/iyHl1EVh07XdwYyRNux8fLqWpK+mBMnyBB9rZrbeBY12RP2B3xFftHfozoZ5PUL+uGA4/2lOQ4n20g7v4=
+	t=1713185377; cv=none; b=Ujro41LOysGtLbO+gGE2pC2tMrwEFIW7PCfT14izYp1Vg5lHXKOxtrid1Y5VMTr7ICeliIvPEnDTV0g/FNm7X+MwShHvi41mhKS0xs6CQit+I4jq0d5fVEt2ctus+zSAzW4lquD/adMu95/7AwnNEWWKhFcX82gdrCt5RLOwMdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713182509; c=relaxed/simple;
-	bh=U2+6Lr79GsLFHQ315u6tpD82JiM5TTUkPMj3699+nDk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nmxUYs/r9vvMo8qhn92vfIZy+nTwdEeoOxq843/eG3gcHnryXayOcqmHV7qYzzJ7jfwX1ndDjIPS9OmEacia6o/IFRnDZ5PRHM7lvY6pHoBxxmGIEkuYHuRK7H8+LhmvlHwlatG2vBCProWu6wzkKmhcTylAp48uvqTeQq0JmQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i+4ur96n; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56e1baf0380so3315781a12.3;
-        Mon, 15 Apr 2024 05:01:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713182506; x=1713787306; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U2+6Lr79GsLFHQ315u6tpD82JiM5TTUkPMj3699+nDk=;
-        b=i+4ur96nNGg+tNb25L7MiN6Sctc71e84SFTsQGXeumJPbdR8KSlHTsk5y92WCNDIjJ
-         xUNnP6mJru9DXT5sKJVMXZK4olAMfOD6FZvZjNNyKxNKeH1qGXGfxBXh371j9lBTyC/W
-         1CW8D8w4BaXJjeN2P+jSRlkcWX7zuXpiveoCyWZEWDOzDqjj4dWHms36Kh9rhdLQL8hc
-         358+WSArOniPQjTOFX8uDS5FLfeQeQtikFgkOr/26jjs81BYbw50peoAEI0JdAfDsY0L
-         qFtWXsUEqfDdTO90hVyuqO+SXgAQTH98LMneJHk+Ll9h67LCbXOgRRyVHt5Oge3PzJRT
-         zYDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713182506; x=1713787306;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U2+6Lr79GsLFHQ315u6tpD82JiM5TTUkPMj3699+nDk=;
-        b=bmJ/Yz7vVO/vsTITeOF+9+UWuElZsjj5Inv0GBRMXknzHkde0Wf+wcb08sOIfbeBwf
-         MLi0S7kfdiDC0jIxPpEPuITeSsemCcMW7Cr56JZQCj/X1P0y6tkfprDY1eCPYOkoFJ1i
-         lFTbKP0Ypa9xfkdpQvSNxgOaDx0TKHi/SlAQ9rA8KVidwJq203sAorI9GxVfhh73upVv
-         +8wGD8tDbZGlQ9YcwGJGcz1uPt7VRrA3/p3CkuyGV/4ICyh3cwdBqz3HVTnSbUufqj9N
-         9t3hB+8Tke+G61oJM5AgEUBA9TKftb5utM0On7UESEUKXifps1Fb4c1ei+eF9f1pMPP0
-         IXvg==
-X-Forwarded-Encrypted: i=1; AJvYcCUe0ACynUXj4Ki2SpyOqUF9iTEIkzwIzBzqQVG3YsfxlTSGmjMfS6K2O4XEFKgi88Yny3X3M/UFnr18uZ1Gu2bKXHopg9ckbu+JCxApHfHBDX67nncOqg8Ee/SICmkEAqStCNq9H6igN0q9AumllzCfp8xRNeELh9cON5tYOWEZU+OBGEQa
-X-Gm-Message-State: AOJu0YwFhX3XNttKGcMbhz9+aqhuK7YI5nYa2E76Ji0xLjLf/IHdK03D
-	QpmJt6OCc3GVuJWWePEf80Jh1sOOxUCo3iMkZqjPae7AnNgYvUQPWMLC3CO6EDsC5bm/khSJ0pP
-	yV5Fbs4Qo8uSj399uYZ7D+FgVfyGs7pkKCwA=
-X-Google-Smtp-Source: AGHT+IGbhRTjcHd2K4ztbjm7oGGgtAEi1sZPmlLlZI6mWHz2v6XhYVkLuyaUclom/SQylPmkWyk1n/jJ4ZnyEo2KLtg=
-X-Received: by 2002:a17:906:eec3:b0:a51:c84b:f17b with SMTP id
- wu3-20020a170906eec300b00a51c84bf17bmr7285354ejb.69.1713182506478; Mon, 15
- Apr 2024 05:01:46 -0700 (PDT)
+	s=arc-20240116; t=1713185377; c=relaxed/simple;
+	bh=WRvMdukuWEZ4azfjyEAI2ItEKDT0/LHddLwGlrN5QPU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=SyyVz7Vu/tDRh05vFG1/3h1JTcWYHYPQn3NrH67IV5+2ONMk2/qgxtaPRVvaZQ7YAEQBxZd942kFx9wIpCBQ/oVOC7UwIODTFPToIMyqe7Z5o0TXUxTcS7CpUHFEEYjGx43Nrr5vReWV5mGY8ZfWVxY+V9n1r022/qGwU8DPl78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PzFcslSU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D3E2C32783;
+	Mon, 15 Apr 2024 12:49:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713185376;
+	bh=WRvMdukuWEZ4azfjyEAI2ItEKDT0/LHddLwGlrN5QPU=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=PzFcslSUI880sZbMzz25afSX3nGvJbXPzr0i9sIFyS8NKTC5JG9hAoLlD2O0HjSyZ
+	 5lm0CIZiL3TpfhrPRtfEpf0gWxOiU+CJZcBrwC4P+qb4DuAKTfyo1tkFpgi1m7mS3Q
+	 UlP+vvSe5iS7jeiyogTYPg4NGz/EvXjrNgVH8Fas169l1OlPK/b+Iz/KcHPridaC5P
+	 ZcGAgl4Xe9oXzy/aos2TYVa3h0wKTMNmD4/cE/+WDgxJd2hg2GC/VUl/m/jq8JiP4Z
+	 eI/H4vriLKqmV5x6q9lVsumUcCP+RPyQAhe7Z2ZlTqOJ9rDpSZb2fo36xMK6Kt3Yen
+	 BFInhgf2CXZDA==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Phil Elwell <phil@raspberrypi.com>,
+	Maarten Vanraes <maarten@rmail.be>,
+	"David S . Miller" <davem@davemloft.net>,
+	Sasha Levin <sashal@kernel.org>,
+	opendmb@gmail.com,
+	florian.fainelli@broadcom.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.8 12/15] net: bcmgenet: Reset RBUF on first open
+Date: Mon, 15 Apr 2024 06:02:52 -0400
+Message-ID: <20240415100311.3126785-12-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240415100311.3126785-1-sashal@kernel.org>
+References: <20240415100311.3126785-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240415100713.483399-1-colin.i.king@gmail.com>
-In-Reply-To: <20240415100713.483399-1-colin.i.king@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 15 Apr 2024 20:01:09 +0800
-Message-ID: <CAL+tcoBO2SPNYE+oRSkqk+YWRK0OiG5xj3uNZ448-AWMsG1A0g@mail.gmail.com>
-Subject: Re: [PATCH][next] net/handshake: remove redundant assignment to
- variable ret
-To: Colin Ian King <colin.i.king@gmail.com>
-Cc: Chuck Lever <chuck.lever@oracle.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org, 
-	kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.8.6
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 15, 2024 at 6:08=E2=80=AFPM Colin Ian King <colin.i.king@gmail.=
-com> wrote:
->
-> The variable is being assigned an value and then is being re-assigned
-> a new value in the next statement. The assignment is redundant and can
-> be removed.
->
-> Cleans up clang scan build warning:
-> net/handshake/tlshd.c:216:2: warning: Value stored to 'ret' is never
-> read [deadcode.DeadStores]
->
-> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+From: Phil Elwell <phil@raspberrypi.com>
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+[ Upstream commit 0a6380cb4c6b5c1d6dad226ba3130f9090f0ccea ]
+
+If the RBUF logic is not reset when the kernel starts then there
+may be some data left over from any network boot loader. If the
+64-byte packet headers are enabled then this can be fatal.
+
+Extend bcmgenet_dma_disable to do perform the reset, but not when
+called from bcmgenet_resume in order to preserve a wake packet.
+
+N.B. This different handling of resume is just based on a hunch -
+why else wouldn't one reset the RBUF as well as the TBUF? If this
+isn't the case then it's easy to change the patch to make the RBUF
+reset unconditional.
+
+See: https://github.com/raspberrypi/linux/issues/3850
+See: https://github.com/raspberrypi/firmware/issues/1882
+
+Signed-off-by: Phil Elwell <phil@raspberrypi.com>
+Signed-off-by: Maarten Vanraes <maarten@rmail.be>
+Signed-off-by: David S. Miller <davem@davemloft.net>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/ethernet/broadcom/genet/bcmgenet.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+index 2d7ae71287b14..855cbe349236b 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+@@ -3282,7 +3282,7 @@ static void bcmgenet_get_hw_addr(struct bcmgenet_priv *priv,
+ }
+ 
+ /* Returns a reusable dma control register value */
+-static u32 bcmgenet_dma_disable(struct bcmgenet_priv *priv)
++static u32 bcmgenet_dma_disable(struct bcmgenet_priv *priv, bool flush_rx)
+ {
+ 	unsigned int i;
+ 	u32 reg;
+@@ -3307,6 +3307,14 @@ static u32 bcmgenet_dma_disable(struct bcmgenet_priv *priv)
+ 	udelay(10);
+ 	bcmgenet_umac_writel(priv, 0, UMAC_TX_FLUSH);
+ 
++	if (flush_rx) {
++		reg = bcmgenet_rbuf_ctrl_get(priv);
++		bcmgenet_rbuf_ctrl_set(priv, reg | BIT(0));
++		udelay(10);
++		bcmgenet_rbuf_ctrl_set(priv, reg);
++		udelay(10);
++	}
++
+ 	return dma_ctrl;
+ }
+ 
+@@ -3370,8 +3378,8 @@ static int bcmgenet_open(struct net_device *dev)
+ 
+ 	bcmgenet_set_hw_addr(priv, dev->dev_addr);
+ 
+-	/* Disable RX/TX DMA and flush TX queues */
+-	dma_ctrl = bcmgenet_dma_disable(priv);
++	/* Disable RX/TX DMA and flush TX and RX queues */
++	dma_ctrl = bcmgenet_dma_disable(priv, true);
+ 
+ 	/* Reinitialize TDMA and RDMA and SW housekeeping */
+ 	ret = bcmgenet_init_dma(priv);
+@@ -4237,7 +4245,7 @@ static int bcmgenet_resume(struct device *d)
+ 			bcmgenet_hfb_create_rxnfc_filter(priv, rule);
+ 
+ 	/* Disable RX/TX DMA and flush TX queues */
+-	dma_ctrl = bcmgenet_dma_disable(priv);
++	dma_ctrl = bcmgenet_dma_disable(priv, false);
+ 
+ 	/* Reinitialize TDMA and RDMA and SW housekeeping */
+ 	ret = bcmgenet_init_dma(priv);
+-- 
+2.43.0
+
 
