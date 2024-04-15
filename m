@@ -1,144 +1,111 @@
-Return-Path: <netdev+bounces-88105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 292408A5BF2
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 22:03:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 495898A5C0D
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 22:10:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58F591C21A61
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 20:03:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79C881C20DED
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 20:10:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B45215625E;
-	Mon, 15 Apr 2024 20:03:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E23A215666B;
+	Mon, 15 Apr 2024 20:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LeN8pphw"
+	dkim=pass (2048-bit key) header.d=pmachata.org header.i=@pmachata.org header.b="mEKrhpyz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43657823CE;
-	Mon, 15 Apr 2024 20:03:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607E7155A59;
+	Mon, 15 Apr 2024 20:10:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713211430; cv=none; b=uvsETZPLH95kLhCC5nRTWYQD+xzGM+yVv0KyXkjV3Pz+f1FFyfdx1h6q2vo+CrtSMuitiddCRTIk7NwGcDY+is4RXEvkeY8kuDAOJeYOZyHl92g8Oi6j5E0u8orYZDP0abK5s2+tSPUZS4Iic/ZdJq5xpBxibcxtKM/UR+c4IPE=
+	t=1713211830; cv=none; b=K300eLZAODf5NiUft+H06UHW/yz9x1mCEcSossGyLJeU74yG3KLXVL2WwhMNeVGl4xn+c5XnEm1idigvKGpkxOVPS1PrYeSKIUUF6KzvjOvr6uO4hJxPEfOEyYuKyloApe4LKBOdGk8f5vHhf/IOMPdelO9SEC3x5zrdq4LiDoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713211430; c=relaxed/simple;
-	bh=Um5/+vZJep1UNa+DWSW2O68e8djK4oq1dauDJrQxFlw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R2iV4bIeYeVx+ymgbgOcC9p7gwL4QdxlbjJ7aaU8XsqaHctQ2l+gk++fAhJLdEt2lFZZQucywZHvTl3OK1Xh6Zr+cgS2qkh5WUsvWE1wYLlM7Bnsy9vlpi1wZY2CkpW0xRTqFe3maJ4Hf9A/DwCtoBlr4YbbRzO7nafqOS0FrnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LeN8pphw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2BAAC113CC;
-	Mon, 15 Apr 2024 20:03:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713211428;
-	bh=Um5/+vZJep1UNa+DWSW2O68e8djK4oq1dauDJrQxFlw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LeN8pphwPo9pyuy6eX3Kx7NTwQdd7ce02R/uhEt25x9IvBF5RYLnzk+Hcxz2UsC15
-	 SlDgQ43dWzmvxl+1j1Anwjhar4wyyrsy7lUv6vT9jmNa3qMylQMFxuaU+JGBwslmVM
-	 zl3k8D9bsKv5tZhNo2cw6173p83NpjklLAjKKe3CsqzgZ8IvJM4MKwGOvbvFmbOZj/
-	 x6DaO3VB/wNALW1Xt8PkviPwvxJQbxtTjGpL1CARfeTpcoSktAu11MOC+r9ZxAqous
-	 +mi6aTpOO/Zkd9JM0nDUglN0fEk/+TAEZy34P1knwrujuYd0yu4AqwhiS2j8j4GTj3
-	 b4x6ao9CRo9Jg==
-Date: Mon, 15 Apr 2024 21:03:43 +0100
-From: Simon Horman <horms@kernel.org>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Brett Creeley <bcreeley@amd.com>,
-	Ratheesh Kannoth <rkannoth@marvell.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v7 2/4] ethtool: provide customized dim profile
- management
-Message-ID: <20240415200343.GG2320920@kernel.org>
-References: <20240415093638.123962-1-hengqi@linux.alibaba.com>
- <20240415093638.123962-3-hengqi@linux.alibaba.com>
+	s=arc-20240116; t=1713211830; c=relaxed/simple;
+	bh=g8JK/aZCfmHBUAxyv41ehSIOXvujf2qcRQoAhesluaM=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=p0W1EuaHJflG6c4FqxqUyCwSkYMK+dGcBVCEAr6xW8ZX/eJ1U64pwv6JdTGTCEqCuD0yUHmuAx7Zgz6p58rvAkGuqUozlDURf7qiIU7wEbMb+OeCjsthfiKktbeZzQmnXjYj3M0lc/IyKs2ySxTbviT7Nn46lUxwJhunlfihh0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pmachata.org; spf=pass smtp.mailfrom=pmachata.org; dkim=pass (2048-bit key) header.d=pmachata.org header.i=@pmachata.org header.b=mEKrhpyz; arc=none smtp.client-ip=80.241.56.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pmachata.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pmachata.org
+Received: from smtp102.mailbox.org (smtp102.mailbox.org [IPv6:2001:67c:2050:b231:465::102])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4VJJF42DRJz9t1M;
+	Mon, 15 Apr 2024 22:10:16 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pmachata.org;
+	s=MBO0001; t=1713211816;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eJeqVcsNvKE6dvU+h4J3wYSeASrfvCc7lVMr6jvZV1U=;
+	b=mEKrhpyzOQEWJBdVbnAEYbjg9WdFuDilOv7CCF+0YzFkwkEAmoVHjXNR01N5YxCljOk/HG
+	BH3iL6Ek12wEieRrf8Bgm56kVa4MnrmNsx70FkUz+9U09kTC4n30jH+APZ0x8I39EXl6me
+	iVqct7RVQJ4/c/EBkbj+jV/8GBGji3rlqfPmr4m9tGka1sQm4Nff/8mnrFRukVJ7B/Am5U
+	SF26FQwsQkz++LpkZkawut87jO/Z3t9W1HDMyub3Pyd1S41qSsmusSo+EH7GQdA/tZd1Rl
+	dVHfp0ZBJisdeNrvKvAPSy+z0ApefcEZxT+aWmGDY4y/42hY4anytrCoHzPjAQ==
+References: <20240412233705.1066444-1-kuba@kernel.org>
+ <20240412233705.1066444-2-kuba@kernel.org>
+ <661c0cae8110a_3e773229418@willemb.c.googlers.com.notmuch>
+From: Petr Machata <me@pmachata.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, petrm@nvidia.com,
+ linux-kselftest@vger.kernel.org, willemb@google.com, Jakub Kicinski
+ <kuba@kernel.org>
+Subject: Re: [PATCH net-next 1/5] selftests: drv-net: define endpoint
+ structures
+Date: Mon, 15 Apr 2024 21:39:06 +0200
+In-reply-to: <661c0cae8110a_3e773229418@willemb.c.googlers.com.notmuch>
+Message-ID: <87v84ie6aj.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240415093638.123962-3-hengqi@linux.alibaba.com>
+Content-Type: text/plain
+X-Rspamd-Queue-Id: 4VJJF42DRJz9t1M
 
-On Mon, Apr 15, 2024 at 05:36:36PM +0800, Heng Qi wrote:
 
-...
+Willem de Bruijn <willemdebruijn.kernel@gmail.com> writes:
 
-> @@ -10229,6 +10230,61 @@ static void netdev_do_free_pcpu_stats(struct net_device *dev)
->  	}
->  }
->  
-> +static int dev_dim_profile_init(struct net_device *dev)
-> +{
-> +#if IS_ENABLED(CONFIG_DIMLIB)
-> +	u32 supported = dev->ethtool_ops->supported_coalesce_params;
-> +	struct netdev_profile_moder *moder;
-> +	int length;
-> +
-> +	dev->moderation = kzalloc(sizeof(*dev->moderation), GFP_KERNEL);
-> +	if (!dev->moderation)
-> +		goto err_moder;
-> +
-> +	moder = dev->moderation;
-> +	length = NET_DIM_PARAMS_NUM_PROFILES * sizeof(*moder->rx_eqe_profile);
-> +
-> +	if (supported & ETHTOOL_COALESCE_RX_EQE_PROFILE) {
-> +		moder->rx_eqe_profile = kzalloc(length, GFP_KERNEL);
-> +		if (!moder->rx_eqe_profile)
-> +			goto err_rx_eqe;
-> +		memcpy(moder->rx_eqe_profile, rx_profile[0], length);
-> +	}
-> +	if (supported & ETHTOOL_COALESCE_RX_CQE_PROFILE) {
-> +		moder->rx_cqe_profile = kzalloc(length, GFP_KERNEL);
-> +		if (!moder->rx_cqe_profile)
-> +			goto err_rx_cqe;
-> +		memcpy(moder->rx_cqe_profile, rx_profile[1], length);
-> +	}
-> +	if (supported & ETHTOOL_COALESCE_TX_EQE_PROFILE) {
-> +		moder->tx_eqe_profile = kzalloc(length, GFP_KERNEL);
-> +		if (!moder->tx_eqe_profile)
-> +			goto err_tx_eqe;
-> +		memcpy(moder->tx_eqe_profile, tx_profile[0], length);
-> +	}
-> +	if (supported & ETHTOOL_COALESCE_TX_CQE_PROFILE) {
-> +		moder->tx_cqe_profile = kzalloc(length, GFP_KERNEL);
-> +		if (!moder->tx_cqe_profile)
-> +			goto err_tx_cqe;
-> +		memcpy(moder->tx_cqe_profile, tx_profile[1], length);
-> +	}
+> 1. Cleaning up remote state in all conditions, including timeout/kill.
+>
+>    Some tests require a setup phase before the test, and a matching
+>    cleanup phase. If any of the configured state is variable (even
+>    just a randomized filepath) this needs to be communicated to the
+>    cleanup phase. The remote filepath is handled well here. But if
+>    a test needs per-test setup? Say, change MTU or an Ethtool feature.
+>    Multiple related tests may want to share a setup/cleanup.
 
-nit: Coccinelle suggests that the kzalloc()/memcpy() pattern above
-     could be replaced with calls to kmemdup()
+Personally I like to wrap responsibilities of this sort in context
+managers, e.g. something along these lines:
 
-> +#endif
-> +	return 0;
-> +
-> +#if IS_ENABLED(CONFIG_DIMLIB)
-> +err_tx_cqe:
-> +	kfree(moder->tx_eqe_profile);
-> +err_tx_eqe:
-> +	kfree(moder->rx_cqe_profile);
-> +err_rx_cqe:
-> +	kfree(moder->rx_eqe_profile);
-> +err_rx_eqe:
-> +	kfree(moder);
-> +err_moder:
-> +	return -ENOMEM;
-> +#endif
-> +}
-> +
->  /**
->   * register_netdevice() - register a network device
->   * @dev: device to register
+    class changed_mtu:
+        def __init__(self, dev, mtu):
+            self.dev = dev
+            self.mtu = mtu
 
-...
+        def __enter__(self):
+            js = cmd(f"ip -j link show dev {self.dev}", json=True)
+            self.orig_mtu = something_something(js)
+            cmd(f"ip link set dev {self.dev} mtu {self.mtu}")
+
+        def __exit__(self, type, value, traceback):
+            cmd(f"ip link set dev {self.dev} mtu {self.orig_mtu}")
+
+    with changed_mtu(swp1, 10000):
+       # MTU is 10K here
+    # and back to 1500
+
+A lot of this can be made generic, where some object is given a setup /
+cleanup commands and just invokes those. But things like MTU, ethtool
+speed, sysctls and what have you that need to save a previous state and
+revert back to it will probably need a custom handler. Like we have them
+in lib.sh as well.
 
