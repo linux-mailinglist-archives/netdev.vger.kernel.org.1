@@ -1,144 +1,144 @@
-Return-Path: <netdev+bounces-88104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BD4F8A5BED
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 22:00:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 292408A5BF2
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 22:03:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59D97B21A86
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 20:00:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58F591C21A61
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 20:03:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF96D156644;
-	Mon, 15 Apr 2024 20:00:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B45215625E;
+	Mon, 15 Apr 2024 20:03:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pOd14QbR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LeN8pphw"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C1A15575F
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 20:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43657823CE;
+	Mon, 15 Apr 2024 20:03:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713211252; cv=none; b=emk6ILGSihAjZULHzAZ+lV7noC8rWtRanuyls16QDwtcsO7QbBOcwvi+GUBFTnexoC++gGUCMJJYfeRuYI60HrvWaJaaLH5S6MNws+y4tRSITNn+Iz2vHJsbWWqc4S1wnFfH4xGxjIbB2cv5oeaSwoMyGZPRCyHFIX3o1j8P7n8=
+	t=1713211430; cv=none; b=uvsETZPLH95kLhCC5nRTWYQD+xzGM+yVv0KyXkjV3Pz+f1FFyfdx1h6q2vo+CrtSMuitiddCRTIk7NwGcDY+is4RXEvkeY8kuDAOJeYOZyHl92g8Oi6j5E0u8orYZDP0abK5s2+tSPUZS4Iic/ZdJq5xpBxibcxtKM/UR+c4IPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713211252; c=relaxed/simple;
-	bh=Wng/zjvzq6AH7/m1b0joVL/p8BnUv1nNNKBDl6nF7sY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JCUGTDIzZhdM+SFO3yCKCzUQq314gZEljEE7lInsYCuTUY/TGZ6caiq0yvJlOHi/RTn0GUuWj3wZ/SDtnXlnHdt62xYknCRy8DOWIGDoinK436oWMv0fBVaZae2sCIrTMpdLGYNgZ/7fsdTWbdXJIMqGH32udIRVhxvihnoq0iY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pOd14QbR; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <617e2577-8de2-4fde-bbfe-2d6280c48c29@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713211248;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0SJ/k5TZL9DMkDb6OS5NjYq8QZGa3dXX1/Ar8kH56co=;
-	b=pOd14QbRT99LhYEk7rHt2FDGGGkJZco+GAC6Y9PWAlKTh3I//gxLAAKKq0TjqfuN5xy+Hb
-	obfsgalSovughcoaw1ZPnVR0iRjO7IM1kAmqIptIIyuLtfpx14bKNG3T5jPEmwigXS5yfK
-	JUGW32P7QwW5J7wem8Tco4LTO2a9zDs=
-Date: Mon, 15 Apr 2024 13:00:42 -0700
+	s=arc-20240116; t=1713211430; c=relaxed/simple;
+	bh=Um5/+vZJep1UNa+DWSW2O68e8djK4oq1dauDJrQxFlw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R2iV4bIeYeVx+ymgbgOcC9p7gwL4QdxlbjJ7aaU8XsqaHctQ2l+gk++fAhJLdEt2lFZZQucywZHvTl3OK1Xh6Zr+cgS2qkh5WUsvWE1wYLlM7Bnsy9vlpi1wZY2CkpW0xRTqFe3maJ4Hf9A/DwCtoBlr4YbbRzO7nafqOS0FrnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LeN8pphw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2BAAC113CC;
+	Mon, 15 Apr 2024 20:03:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713211428;
+	bh=Um5/+vZJep1UNa+DWSW2O68e8djK4oq1dauDJrQxFlw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=LeN8pphwPo9pyuy6eX3Kx7NTwQdd7ce02R/uhEt25x9IvBF5RYLnzk+Hcxz2UsC15
+	 SlDgQ43dWzmvxl+1j1Anwjhar4wyyrsy7lUv6vT9jmNa3qMylQMFxuaU+JGBwslmVM
+	 zl3k8D9bsKv5tZhNo2cw6173p83NpjklLAjKKe3CsqzgZ8IvJM4MKwGOvbvFmbOZj/
+	 x6DaO3VB/wNALW1Xt8PkviPwvxJQbxtTjGpL1CARfeTpcoSktAu11MOC+r9ZxAqous
+	 +mi6aTpOO/Zkd9JM0nDUglN0fEk/+TAEZy34P1knwrujuYd0yu4AqwhiS2j8j4GTj3
+	 b4x6ao9CRo9Jg==
+Date: Mon, 15 Apr 2024 21:03:43 +0100
+From: Simon Horman <horms@kernel.org>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Brett Creeley <bcreeley@amd.com>,
+	Ratheesh Kannoth <rkannoth@marvell.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v7 2/4] ethtool: provide customized dim profile
+ management
+Message-ID: <20240415200343.GG2320920@kernel.org>
+References: <20240415093638.123962-1-hengqi@linux.alibaba.com>
+ <20240415093638.123962-3-hengqi@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH bpf-next v3 2/2] net: Add additional bit to support
- userspace timestamp type
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: kernel@quicinc.com, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
- Martin KaFai Lau <martin.lau@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>
-References: <20240412210125.1780574-1-quic_abchauha@quicinc.com>
- <20240412210125.1780574-3-quic_abchauha@quicinc.com>
- <661ad7d4c65da_3be9a7294e@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <661ad7d4c65da_3be9a7294e@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240415093638.123962-3-hengqi@linux.alibaba.com>
 
-On 4/13/24 12:07 PM, Willem de Bruijn wrote:
->> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
->> index a83a2120b57f..b6346c21c3d4 100644
->> --- a/include/linux/skbuff.h
->> +++ b/include/linux/skbuff.h
->> @@ -827,7 +827,8 @@ enum skb_tstamp_type {
->>    *	@tstamp_type: When set, skb->tstamp has the
->>    *		delivery_time in mono clock base (i.e. EDT).  Otherwise, the
->>    *		skb->tstamp has the (rcv) timestamp at ingress and
->> - *		delivery_time at egress.
->> + *		delivery_time at egress or skb->tstamp defined by skb->sk->sk_clockid
->> + *		coming from userspace
->>    *	@napi_id: id of the NAPI struct this skb came from
->>    *	@sender_cpu: (aka @napi_id) source CPU in XPS
->>    *	@alloc_cpu: CPU which did the skb allocation.
->> @@ -955,7 +956,7 @@ struct sk_buff {
->>   	/* private: */
->>   	__u8			__mono_tc_offset[0];
->>   	/* public: */
->> -	__u8			tstamp_type:1;	/* See SKB_MONO_DELIVERY_TIME_MASK */
->> +	__u8			tstamp_type:2;	/* See SKB_MONO_DELIVERY_TIME_MASK */
->>   #ifdef CONFIG_NET_XGRESS
->>   	__u8			tc_at_ingress:1;	/* See TC_AT_INGRESS_MASK */
->>   	__u8			tc_skip_classify:1;
-> 
-> A quick pahole for a fairly standard .config that I had laying around
-> shows a hole after this list of bits, so no huge concerns there from
-> adding a bit:
-> 
->             __u8               slow_gro:1;           /*     3: 4  1 */
->             __u8               csum_not_inet:1;      /*     3: 5  1 */
-> 
->             /* XXX 2 bits hole, try to pack */
-> 
->             __u16              tc_index;             /*     4     2 */
-> 
->> @@ -1090,10 +1091,10 @@ struct sk_buff {
->>    */
->>   #ifdef __BIG_ENDIAN_BITFIELD
->>   #define SKB_MONO_DELIVERY_TIME_MASK	(1 << 7)
->> -#define TC_AT_INGRESS_MASK		(1 << 6)
->> +#define TC_AT_INGRESS_MASK		(1 << 5)
-> 
-> Have to be careful when adding a new 2 bit tstamp_type with both bits
-> set, that this does not incorrectly get interpreted as MONO.
-> 
-> I haven't looked closely at the BPF API, but hopefully it can be
-> extensible to return the specific type. If it is hardcoded to return
-> either MONO or not, then only 0x1 should match, not 0x3.
+On Mon, Apr 15, 2024 at 05:36:36PM +0800, Heng Qi wrote:
 
-Good point. I believe it is the best to have bpf to consider both bits in 
-tstamp_type:2 in filter.c to avoid the 0x3 surprise in the future. The BPF API 
-can be extended to support SKB_CLOCK_TAI.
+...
 
-Regardless, in bpf_convert_tstamp_write(), it still needs to clear both bits in 
-tstamp_type when it is at ingress. Right now it only clears the mono bit.
+> @@ -10229,6 +10230,61 @@ static void netdev_do_free_pcpu_stats(struct net_device *dev)
+>  	}
+>  }
+>  
+> +static int dev_dim_profile_init(struct net_device *dev)
+> +{
+> +#if IS_ENABLED(CONFIG_DIMLIB)
+> +	u32 supported = dev->ethtool_ops->supported_coalesce_params;
+> +	struct netdev_profile_moder *moder;
+> +	int length;
+> +
+> +	dev->moderation = kzalloc(sizeof(*dev->moderation), GFP_KERNEL);
+> +	if (!dev->moderation)
+> +		goto err_moder;
+> +
+> +	moder = dev->moderation;
+> +	length = NET_DIM_PARAMS_NUM_PROFILES * sizeof(*moder->rx_eqe_profile);
+> +
+> +	if (supported & ETHTOOL_COALESCE_RX_EQE_PROFILE) {
+> +		moder->rx_eqe_profile = kzalloc(length, GFP_KERNEL);
+> +		if (!moder->rx_eqe_profile)
+> +			goto err_rx_eqe;
+> +		memcpy(moder->rx_eqe_profile, rx_profile[0], length);
+> +	}
+> +	if (supported & ETHTOOL_COALESCE_RX_CQE_PROFILE) {
+> +		moder->rx_cqe_profile = kzalloc(length, GFP_KERNEL);
+> +		if (!moder->rx_cqe_profile)
+> +			goto err_rx_cqe;
+> +		memcpy(moder->rx_cqe_profile, rx_profile[1], length);
+> +	}
+> +	if (supported & ETHTOOL_COALESCE_TX_EQE_PROFILE) {
+> +		moder->tx_eqe_profile = kzalloc(length, GFP_KERNEL);
+> +		if (!moder->tx_eqe_profile)
+> +			goto err_tx_eqe;
+> +		memcpy(moder->tx_eqe_profile, tx_profile[0], length);
+> +	}
+> +	if (supported & ETHTOOL_COALESCE_TX_CQE_PROFILE) {
+> +		moder->tx_cqe_profile = kzalloc(length, GFP_KERNEL);
+> +		if (!moder->tx_cqe_profile)
+> +			goto err_tx_cqe;
+> +		memcpy(moder->tx_cqe_profile, tx_profile[1], length);
+> +	}
 
-Then it may as well consider both tstamp_type:2 bits in 
-bpf_convert_tstamp_read() and bpf_convert_tstamp_type_read(). e.g. 
-bpf_convert_tstamp_type_read(), it should be a pretty straight forward change 
-because the SKB_CLOCK_* enum value should be a 1:1 mapping to the BPF_SKB_TSTAMP_*.
+nit: Coccinelle suggests that the kzalloc()/memcpy() pattern above
+     could be replaced with calls to kmemdup()
 
-> 
->>   #else
->>   #define SKB_MONO_DELIVERY_TIME_MASK	(1 << 0)
->> -#define TC_AT_INGRESS_MASK		(1 << 1)
->> +#define TC_AT_INGRESS_MASK		(1 << 2)
->>   #endif
->>   #define SKB_BF_MONO_TC_OFFSET		offsetof(struct sk_buff, __mono_tc_offset)
->>   
+> +#endif
+> +	return 0;
+> +
+> +#if IS_ENABLED(CONFIG_DIMLIB)
+> +err_tx_cqe:
+> +	kfree(moder->tx_eqe_profile);
+> +err_tx_eqe:
+> +	kfree(moder->rx_cqe_profile);
+> +err_rx_cqe:
+> +	kfree(moder->rx_eqe_profile);
+> +err_rx_eqe:
+> +	kfree(moder);
+> +err_moder:
+> +	return -ENOMEM;
+> +#endif
+> +}
+> +
+>  /**
+>   * register_netdevice() - register a network device
+>   * @dev: device to register
 
+...
 
