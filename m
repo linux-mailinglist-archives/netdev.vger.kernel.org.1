@@ -1,160 +1,224 @@
-Return-Path: <netdev+bounces-87944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A88D98A5111
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:23:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C8B58A5139
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 15:26:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DB2F1F2158C
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:23:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0943E1F2110C
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:26:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F36912BF2A;
-	Mon, 15 Apr 2024 13:07:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF2D273514;
+	Mon, 15 Apr 2024 13:15:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="uG90ffqy"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LPXHA45q"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB2412BF38;
-	Mon, 15 Apr 2024 13:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26AC7823DA;
+	Mon, 15 Apr 2024 13:15:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713186478; cv=none; b=p8yhS8C9zIjgvW4WGUz4wB/q46QWJQFs430g0F/WozSg21UZS6RX9fxp/7op8Jf1VXvFlrSfbSEoZ8iDC0+nl/RMmCVd6nsOb5LR/Z0Gne8HtKpIMQuHFwa14Fg/cZ3aNqaBZmZXXpJI5U20E/EwPdWTsfranCrwQCqBXweqLSc=
+	t=1713186929; cv=none; b=O2CINnzTnnXD+xO7R+XQJk9bCOBBKf53eOuWdrYentMiPEh05UmdclyJUHNydIJc41oBdegKdaliSc+JI0VM5qw6rzeVAYvaR4b4l8x5tHEDwby5p4JyfQHHJVdwCqa0iysPUAnS9e0ecH1EvZt9XAg0TZadPJTnCnGiaDctCtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713186478; c=relaxed/simple;
-	bh=sLmgag4Ktuf2ouZPmlzSHrzVjlVxXMA7N+Uq41q0BzU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TnUVrwz/yTF9s6wkdOHUhW2onv1IkbBlu9zHqEWW0UBLXYzOtEiyAyZGVKaeakXpxZCXnyijNUSZOT3xIyX4d2/o+0Y9m/01PKD+TVAs3kUwUESqLg1YN1R+vgXHiUo14aiHuMubyPlPhltWU9XmTnLjWkCPaKd2KtX+IFClWnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=uG90ffqy; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 61D6C88158;
-	Mon, 15 Apr 2024 15:07:50 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1713186471;
-	bh=EZgCe8MC6ounYgKhKrs9TKuCFJBcKGHgVbUqPP0dKLg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uG90ffqykF9WqGbnq6FlQvywALad7kxsgS2ERfVKe11Fl54AgfevRZoYyUNJAjLA7
-	 PCeE2qbJ6ymz5LwazuqMHpM6FNxHJcc+MJKLkA8xd64zo0jx6w3VjCfd/RtpWgcPnJ
-	 kDfBJCdp6QpsHlFKRL/jreaJkutZGiVoqZbkS/MWVigjiCVn+a+dhC8OfCWWgRFRNr
-	 hqp6aB1GnrZFZbyEoBOXD7rpwAhUp16zqTAv+RqnBLsVMM789mJYyOmHTBkL3eBLsk
-	 e4S7NnN7+fy+rOuBaz+wXuSydCYBgpBxW6V516YYbZimkAnShKAzomBysW7tYXJG9k
-	 onAIlgMgB7Pmg==
-Date: Mon, 15 Apr 2024 15:07:44 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com, Sebastian Andrzej
- Siewior <bigeasy@linutronix.de>, Ravi Gunasekaran <r-gunasekaran@ti.com>,
- Simon Horman <horms@kernel.org>, Nikita Zhandarovich
- <n.zhandarovich@fintech.ru>, Murali Karicheri <m-karicheri2@ti.com>, Jiri
- Pirko <jiri@resnulli.us>, Dan Carpenter <dan.carpenter@linaro.org>, Ziyang
- Xuan <william.xuanziyang@huawei.com>, Shigeru Yoshida
- <syoshida@redhat.com>, "Ricardo B. Marliere" <ricardo@marliere.net>,
- linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v5 0/4] net: hsr: Add support for HSR-SAN
- (RedBOX)
-Message-ID: <20240415150744.5992b27e@wsk>
-In-Reply-To: <20240415124928.1263240-1-lukma@denx.de>
-References: <20240415124928.1263240-1-lukma@denx.de>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1713186929; c=relaxed/simple;
+	bh=TPjexoiFsBjnqLlyqEtdlJNJfLrpJiVzPEU2X4CDoC8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dVE9p7XK4XpMzSmvFLSOvGmOAHa6OvR40pDxXEJ5rAGHt18C+2g+jN2Zwz9xhj/+EhO38cRs4PXzKUpz0GXaXH4QlaN2ERN1/HL3DgbGB4oaws7KuGgqCkKHNUClB2PO29IyQ/b72wEx+GfPqVx3H+2CJ2NBET7D0hPBX1Tu1Lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=LPXHA45q; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43FB0nhX019528;
+	Mon, 15 Apr 2024 13:15:20 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=giddZiK+rI9ZQavSINHyi7A5c22otTe9O7BfwKZVdIE=;
+ b=LPXHA45qltHLcAHGF1F6SpJAXEofiF6c+r79faVOQnSdLgXXyDxDoc6HNKhqCIp4rWlX
+ yaXaU+9vCz4yBUBirXbOhlDFYUMWPZUVKHTCiZiYip42HDgD2CO58CyKsXI5z3F0YqRV
+ wUy5NDr5WTh7x5xLgSmiG7i1xXluGRcPiw6cnkwj0dXJr8toM8+AvznnqnQdCCTup5PO
+ ySCDYFAIp7TB6+wqUgotgNttRnTTTtTJnmwj5HXzO0zVWVUhOb2ghW5D40rKOKoQRgCc
+ ioglJb5Kii27XityTFDg9llYI1VLSL8jqhk0nimaCMn4RanolOMCMx68Qg2vwJWpiWZc eA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xfhu9bw6f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Apr 2024 13:15:19 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43FDFIBD023844;
+	Mon, 15 Apr 2024 13:15:18 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xfhu9bw6a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Apr 2024 13:15:18 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43FBvwJU027308;
+	Mon, 15 Apr 2024 13:15:17 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xg4ryr52t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Apr 2024 13:15:17 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43FDFB8Y25428368
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 15 Apr 2024 13:15:13 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6FDA62004B;
+	Mon, 15 Apr 2024 13:15:11 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0534420040;
+	Mon, 15 Apr 2024 13:15:11 +0000 (GMT)
+Received: from dilbert5.boeblingen.de.ibm.com (unknown [9.155.208.153])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 15 Apr 2024 13:15:10 +0000 (GMT)
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Alexandra Winter <wintera@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Paolo Abeni <pabeni@redhat.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Niklas Schnelle <schnelle@linux.ibm.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "David S . Miller" <davem@davemloft.net>
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+        Gerd Bayer <gbayer@linux.ibm.com>
+Subject: [PATCH net] s390/ism: Properly fix receive message buffer allocation
+Date: Mon, 15 Apr 2024 15:15:07 +0200
+Message-ID: <20240415131507.156931-1-gbayer@linux.ibm.com>
+X-Mailer: git-send-email 2.44.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 1ntSPSftJ6PGbd4J55_R12gtEHj-KJVs
+X-Proofpoint-GUID: XZQkbg4IDD2udM6-SMPJlIhkB8EiT_Fq
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/8g.6qsssst/iy6d4SlJ5m5h";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-15_10,2024-04-15_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ adultscore=0 suspectscore=0 bulkscore=0 lowpriorityscore=0 clxscore=1015
+ impostorscore=0 malwarescore=0 mlxlogscore=766 mlxscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404150086
 
---Sig_/8g.6qsssst/iy6d4SlJ5m5h
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Since [1], dma_alloc_coherent() does not accept requests for GFP_COMP
+anymore, even on archs that may be able to fulfill this. Functionality that
+relied on the receive buffer being a compound page broke at that point:
+The SMC-D protocol, that utilizes the ism device driver, passes receive
+buffers to the splice processor in a struct splice_pipe_desc with a
+single entry list of struct pages. As the buffer is no longer a compound
+page, the splice processor now rejects requests to handle more than a
+page worth of data.
 
-Dear Community,
+Replace dma_alloc_coherent() and allocate a buffer with folio_alloc and
+create a DMA map for it with dma_map_page(). Since only receive buffers
+on ISM devices use DMA, qualify the mapping as FROM_DEVICE.
+Since ISM devices are available on arch s390, only, and on that arch all
+DMA is coherent, there is no need to introduce and export some kind of
+dma_sync_to_cpu() method to be called by the SMC-D protocol layer.
 
-> This patch set provides v5 of HSR-SAN (RedBOX) as well as
-> hsr_redbox.sh test script.
->=20
-> Applied on top of:
-> Branch: net-next/main
-> SHA1: 50aee97d1511
->=20
+Analogously, replace dma_free_coherent by a two step dma_unmap_page,
+then folio_put to free the receive buffer.
 
-Please be informed that without this patch series, with the current
-net-next (with above credentials), the hsr_ping.sh test fails, as nodes
-are not merged, so duplicate HSR frames are not filtered).
+[1] https://lore.kernel.org/all/20221113163535.884299-1-hch@lst.de/
 
-I'm going to investigate this issue now.
+Fixes: c08004eede4b ("s390/ism: don't pass bogus GFP_ flags to dma_alloc_coherent")
+Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
 
-> Runs inside: Buildroot (2024.02.1+):
-> SHA1: b31443e09cb7bb67b97ae6fb7614fe3a22889d50
->=20
-> Lukasz Majewski (4):
->   net: hsr: Provide RedBox support (HSR-SAN)
->   test: hsr: Move common code to hsr_common.sh file
->   test: hsr: Extract version agnostic information from ping command
->     output
->   test: hsr: Add test for HSR RedBOX (HSR-SAN) mode of operation
->=20
->  include/uapi/linux/if_link.h                  |  1 +
->  net/hsr/hsr_device.c                          | 36 ++++++-
->  net/hsr/hsr_device.h                          |  4 +-
->  net/hsr/hsr_forward.c                         | 85 ++++++++++++++--
->  net/hsr/hsr_framereg.c                        | 52 ++++++++++
->  net/hsr/hsr_framereg.h                        |  6 ++
->  net/hsr/hsr_main.h                            |  7 ++
->  net/hsr/hsr_netlink.c                         | 30 +++++-
->  net/hsr/hsr_slave.c                           |  1 +
->  tools/testing/selftests/net/hsr/hsr_common.sh | 97
-> +++++++++++++++++++ tools/testing/selftests/net/hsr/hsr_ping.sh   |
-> 93 +----------------- tools/testing/selftests/net/hsr/hsr_redbox.sh |
-> 97 +++++++++++++++++++ 12 files changed, 403 insertions(+), 106
-> deletions(-) create mode 100644
-> tools/testing/selftests/net/hsr/hsr_common.sh create mode 100755
-> tools/testing/selftests/net/hsr/hsr_redbox.sh
->=20
+---
 
+Hi all,
 
+this is the next iteration (v3 so to speak) of the fix [2] whose v2 [3] was
+picked - then reverted - while there was still one comment outstanding. Here the
+last review comment is addressed and proper error checking is done after 
+allocating the folio.
 
+Please consider this complete patch for inclusion into the next 6.9 rc.
 
-Best regards,
+Thank you,
+Gerd
 
-Lukasz Majewski
+[2] https://lore.kernel.org/all/20240328154144.272275-1-gbayer@linux.ibm.com/
+[3] https://lore.kernel.org/all/20240405111606.1785928-1-gbayer@linux.ibm.com/
 
---
+https://lore.kernel.org/all/20240405111222.1785248-1-gbayer@linux.ibm.com/
+---
+ drivers/s390/net/ism_drv.c | 37 ++++++++++++++++++++++++++++---------
+ 1 file changed, 28 insertions(+), 9 deletions(-)
 
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+index 2c8e964425dc..43778b088ffa 100644
+--- a/drivers/s390/net/ism_drv.c
++++ b/drivers/s390/net/ism_drv.c
+@@ -292,13 +292,16 @@ static int ism_read_local_gid(struct ism_dev *ism)
+ static void ism_free_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+ {
+ 	clear_bit(dmb->sba_idx, ism->sba_bitmap);
+-	dma_free_coherent(&ism->pdev->dev, dmb->dmb_len,
+-			  dmb->cpu_addr, dmb->dma_addr);
++	dma_unmap_page(&ism->pdev->dev, dmb->dma_addr, dmb->dmb_len,
++		       DMA_FROM_DEVICE);
++	folio_put(virt_to_folio(dmb->cpu_addr));
+ }
+ 
+ static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+ {
++	struct folio *folio;
+ 	unsigned long bit;
++	int rc;
+ 
+ 	if (PAGE_ALIGN(dmb->dmb_len) > dma_get_max_seg_size(&ism->pdev->dev))
+ 		return -EINVAL;
+@@ -315,14 +318,30 @@ static int ism_alloc_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+ 	    test_and_set_bit(dmb->sba_idx, ism->sba_bitmap))
+ 		return -EINVAL;
+ 
+-	dmb->cpu_addr = dma_alloc_coherent(&ism->pdev->dev, dmb->dmb_len,
+-					   &dmb->dma_addr,
+-					   GFP_KERNEL | __GFP_NOWARN |
+-					   __GFP_NOMEMALLOC | __GFP_NORETRY);
+-	if (!dmb->cpu_addr)
+-		clear_bit(dmb->sba_idx, ism->sba_bitmap);
++	folio = folio_alloc(GFP_KERNEL | __GFP_NOWARN | __GFP_NOMEMALLOC |
++			    __GFP_NORETRY, get_order(dmb->dmb_len));
+ 
+-	return dmb->cpu_addr ? 0 : -ENOMEM;
++	if (!folio) {
++		rc = -ENOMEM;
++		goto out_bit;
++	}
++
++	dmb->cpu_addr = folio_address(folio);
++	dmb->dma_addr = dma_map_page(&ism->pdev->dev,
++				     virt_to_page(dmb->cpu_addr), 0,
++				     dmb->dmb_len, DMA_FROM_DEVICE);
++	if (dma_mapping_error(&ism->pdev->dev, dmb->dma_addr)) {
++		rc = -ENOMEM;
++		goto out_free;
++	}
++
++	return 0;
++
++out_free:
++	kfree(dmb->cpu_addr);
++out_bit:
++	clear_bit(dmb->sba_idx, ism->sba_bitmap);
++	return rc;
+ }
+ 
+ int ism_register_dmb(struct ism_dev *ism, struct ism_dmb *dmb,
+-- 
+2.44.0
 
---Sig_/8g.6qsssst/iy6d4SlJ5m5h
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmYdJqAACgkQAR8vZIA0
-zr2J5QgAo2/LHZUNbBwSVHZargWXl0pSmEZgIcHDlE+AHT4x4zrERGmEBYNfq8Ue
-O6CbnloM2VEEswtUbcKJTrXDjHaBYM1ezgwfjyafhgndvhDK0QdahT7oie0S3XXX
-znq6E/8CoMLpWuwOhcUo6v81V3+Lvnk1h7PD3I4MdSJ5bfu4tUwl0RIWQ4neqj6T
-HziXcTXV7On3jxDY+0bgO5WUr/ogWSfIaMXC9aSjfY0nU4aA5LEtfZa7BxhfiVLu
-wYA8IWnlBf8GQY81Y5wLtoZHBTXplDDcTbzt4gtpwlEuU7b4WQkrenal/kADXQH/
-w8Lcjlnpu0/XSWBfvnKKHQIHlTvNjw==
-=ZX/5
------END PGP SIGNATURE-----
-
---Sig_/8g.6qsssst/iy6d4SlJ5m5h--
 
