@@ -1,190 +1,112 @@
-Return-Path: <netdev+bounces-87773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C08E8A48D9
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:21:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 437418A48FD
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 09:27:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71656B20F78
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 07:21:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 748191C210DE
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 07:27:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C0A62206E;
-	Mon, 15 Apr 2024 07:21:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDADB2263A;
+	Mon, 15 Apr 2024 07:27:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HrwHH+Yb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JzyoWwH3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ADDB1F614;
-	Mon, 15 Apr 2024 07:21:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE2F22EED
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 07:27:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713165674; cv=none; b=Y4NifN/1LJkP/c242yYE1vGppM/K7SwT8qIG7MqnNdPDOJPsGywn4pXuiS6nNLFwOJI+3I3PJrKhgW15SQWV/dY0Ng6G8NtEYyx/DkKpG4Tnkpr3n71RFcsp5LNoHyQbHTXTNYjyOaV50vhMwckRVbgKsXbbdBK6wYteY/8JXQ8=
+	t=1713166071; cv=none; b=sntOAvz02HA3fEuw1r1AiTJ4Xc91WyB7oE3kCnKb8JBAjROpWNztdMARFaCuLVIxEXEf9yd/lcq6wn/Ul2318CkMgxL4NkLtAoymlEJ+1uEioWmc/eU62X+d6VBbZIcSAMleR4XJa361ydBC/+XXXjDmYLLEkFogchfGc8FL48U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713165674; c=relaxed/simple;
-	bh=VbBqtDwYH0uolRlSGs6w3s0f0N3BbyJC4yI5949TM+g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a0a8lvDlNhuv0tAFNa56VicXjv5ubT/0fsoPK8ayLGjG3vqvlC/z6pxBPwbW/skeM60b3M7tat4klSKapSWn/BAJAJwAPVd8Tz80f6rksmTMY6utPZCcScEiJ/JKe8YGaHVk53ZQ+YJZzWWpU/OvfQ+BRsIF6z/wC8AEda8gHbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HrwHH+Yb; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6ee12766586so1825974b3a.0;
-        Mon, 15 Apr 2024 00:21:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713165672; x=1713770472; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zSjWt43xrIQ4UPQsjgQPkSI4uu9dZcpjEC/70G7+qCk=;
-        b=HrwHH+YbepiS1NL6OCEcIbvJlxsLAtynNT/7KqqDOh7huvpTVpJgTY1oAf+DyWicqS
-         mJU8kfXxld7Zei6dES+eJv/mO0AIhNGYGph9yPwsgg+Y/gch7ec6tlGWgbwrfXKLR0Iw
-         p0NrAvCVNeqSuOQYkCn+ajlb+JDyJh9cjV6Mncq/RCz6ax/cbxnqz6AOHP/DnX7sEeMH
-         HzREsUwJahed4TWItwSed1N1mAyedSl0DaRICS/DbSF4EM4iA249McOYCl79UKzdmHGq
-         d4BWT6TTYgY9wSRzK1Wy8ewuqKdmTSGBuAo8MLFkTz6Ba8jb/3YrL32MyYmaB0+6a03g
-         xFvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713165672; x=1713770472;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zSjWt43xrIQ4UPQsjgQPkSI4uu9dZcpjEC/70G7+qCk=;
-        b=xP84iPVUuaV4a5h52BQRlLbDGvAwdYAIfT8kkPyfviLuGYleAK0ScddzFP8LQ/5YyC
-         BjBAcp8D3swykfiCtYadhWS0yEezY6aOg+RxPK1TZlNsyfRJ2Or5oTQpMfiHAfooYqmp
-         KXwGx3VZARj3nOdRJiwauYGaobAxTn8UjxMbhLg04wAKAHl03OGMqlsBbuNHkSKWQD5x
-         R0mA2++HSi6E8r1gbwGTon8NmE3gy5l6M/GONKh2nA+BUkJ1n1j0qwnZaMTB3oDYjZkQ
-         GhICpsLgbDm2/bZrBm8H0BfQ+RD24MfE92KGzFR5N995vdHDRIHMXydBlRwi9XkgAy7S
-         C9pQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXFrLFzq5PXKP8kl0xJ25dqKQYQ9z4d1bmYGmZO8RjMHO65QIYsYEEoFvzlM7ePt7OyvS4FtKSyyshfF5m+We9iS18Ep50t8EndPeYReHc3MI1Ew5i1ob7H/OF7bmKuoQSwp6aguxnk
-X-Gm-Message-State: AOJu0YxnYScCEWtLfNHrr038/wqIXngO+AN5Ctg0w63apVAvzlu73jf0
-	LJRLGaqILuyPxVpSzhdyFLo2kTXP7SDxFpENivir+HH63qPlZHbt
-X-Google-Smtp-Source: AGHT+IFMW+TSkniwUJ26r3p4R0gkuT4yVbTCCQdX2paWysXKhSKD28g/PYIsWKuWenIdoyO+eNIzfg==
-X-Received: by 2002:a05:6a00:3a1d:b0:6ed:4a97:10cc with SMTP id fj29-20020a056a003a1d00b006ed4a9710ccmr14514380pfb.3.1713165672167;
-        Mon, 15 Apr 2024 00:21:12 -0700 (PDT)
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id j16-20020a62b610000000b006ecceed26bfsm6560192pff.219.2024.04.15.00.21.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 00:21:11 -0700 (PDT)
-Date: Mon, 15 Apr 2024 15:21:06 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-	mlxsw@nvidia.com, Benjamin Poirier <bpoirier@nvidia.com>
-Subject: Re: [PATCH net-next 01/10] selftests: net: Unify code of busywait()
- and slowwait()
-Message-ID: <ZhzVYgjBmELthSUX@Laptop-X1>
-References: <cover.1712940759.git.petrm@nvidia.com>
- <db8b8885e254893bba61d824d7cf2a6774dcb336.1712940759.git.petrm@nvidia.com>
+	s=arc-20240116; t=1713166071; c=relaxed/simple;
+	bh=aNQz4mCjHtrXUXO74xyfpEhYZO1GtYeXSNV3tBQzasU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=UWy3sCAZCaj9tbjLfojn+L9JpxFDFBDlAwqs5lngAzB2hCWb6j2mzGEsIBaNkvaRx9W1TqotX1wT3mY3hohpQKGo3YjAx3mqiZfnaE1U8Y2WIKIar5JiPeut1DYs6JvxwMCH5fi9JVjyjyFERjHymAmMv2lXVpjSZClhOreHCL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JzyoWwH3; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713166069;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ATaTVK2Bc9kZGN8uLFOIs0vLM4TcjoyL+OI4o5U8z4w=;
+	b=JzyoWwH3/Zu6KaQmlJvHIJRWQeGi2Qk1D1rcSgAcbK0q4hCtabgfqmu8GfkF6MwCjKG3ch
+	ku+WwMJM/GU6mNX8fzn13uoOlpPn7Cba+tvZdc2ZpPULS0SrRSe3qJFl0S5zeH6BSueE3g
+	blTrF/zJJiRcrUwZRFE0l6ITKEHP9U8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-392-oLd4vwNWNdqW5PqaF6oagA-1; Mon, 15 Apr 2024 03:27:43 -0400
+X-MC-Unique: oLd4vwNWNdqW5PqaF6oagA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 001A980B518;
+	Mon, 15 Apr 2024 07:27:43 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.192.232])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 832742166B34;
+	Mon, 15 Apr 2024 07:27:40 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: kuba@kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	jarkko.palviainen@gmail.com,
+	jtornosm@redhat.com,
+	linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH] net: usb: ax88179_178a: avoid writing the mac address before first reading
+Date: Mon, 15 Apr 2024 09:27:32 +0200
+Message-ID: <20240415072735.6135-1-jtornosm@redhat.com>
+In-Reply-To: <20240411195129.69ff2bac@kernel.org>
+References: <20240411195129.69ff2bac@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <db8b8885e254893bba61d824d7cf2a6774dcb336.1712940759.git.petrm@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-On Fri, Apr 12, 2024 at 07:03:04PM +0200, Petr Machata wrote:
-> Bodies of busywait() and slowwait() functions are almost identical. Extract
-> the common code into a helper, loopy_wait, and convert busywait() and
-> slowwait() into trivial wrappers.
-> 
-> Moreover, the fact that slowwait() uses seconds for units is really not
-> intuitive, and the comment does not help much. Instead make the unit part
-> of the name of the argument to further clarify what units are expected.
-> 
-> Cc: Hangbin Liu <liuhangbin@gmail.com>
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
-> Reviewed-by: Benjamin Poirier <bpoirier@nvidia.com>
-> ---
->  tools/testing/selftests/net/forwarding/lib.sh | 22 ++-----------------
->  tools/testing/selftests/net/lib.sh            | 16 +++++++++++---
->  2 files changed, 15 insertions(+), 23 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-> index 4103ed7afcde..658e4e7bf4b9 100644
-> --- a/tools/testing/selftests/net/forwarding/lib.sh
-> +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> @@ -95,27 +95,9 @@ source "$net_forwarding_dir/../lib.sh"
->  # timeout in seconds
->  slowwait()
->  {
-> -	local timeout=$1; shift
-> +	local timeout_sec=$1; shift
->  
-> -	local start_time="$(date -u +%s)"
-> -	while true
-> -	do
-> -		local out
-> -		out=$("$@")
-> -		local ret=$?
-> -		if ((!ret)); then
-> -			echo -n "$out"
-> -			return 0
-> -		fi
-> -
-> -		local current_time="$(date -u +%s)"
-> -		if ((current_time - start_time > timeout)); then
-> -			echo -n "$out"
-> -			return 1
-> -		fi
-> -
-> -		sleep 0.1
-> -	done
-> +	loopy_wait "sleep 0.1" "$((timeout_sec * 1000))" "$@"
->  }
->  
->  ##############################################################################
-> diff --git a/tools/testing/selftests/net/lib.sh b/tools/testing/selftests/net/lib.sh
-> index b7f7b8695165..c868c0aec121 100644
-> --- a/tools/testing/selftests/net/lib.sh
-> +++ b/tools/testing/selftests/net/lib.sh
-> @@ -58,9 +58,10 @@ ksft_exit_status_merge()
->  		$ksft_xfail $ksft_pass $ksft_skip $ksft_fail
->  }
->  
-> -busywait()
-> +loopy_wait()
->  {
-> -	local timeout=$1; shift
-> +	local sleep_cmd=$1; shift
-> +	local timeout_ms=$1; shift
->  
->  	local start_time="$(date -u +%s%3N)"
->  	while true
-> @@ -74,13 +75,22 @@ busywait()
->  		fi
->  
->  		local current_time="$(date -u +%s%3N)"
-> -		if ((current_time - start_time > timeout)); then
-> +		if ((current_time - start_time > timeout_ms)); then
->  			echo -n "$out"
->  			return 1
->  		fi
-> +
-> +		$sleep_cmd
->  	done
->  }
->  
-> +busywait()
-> +{
-> +	local timeout_ms=$1; shift
-> +
-> +	loopy_wait : "$timeout_ms" "$@"
-> +}
-> +
->  cleanup_ns()
->  {
->  	local ns=""
-> -- 
-> 2.43.0
-> 
+Hello Jakub,
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+I have been trying to use netif_device_detach() and netif_device_attach()
+as conditions, but maybe I am misunderstanding you, becasue I think the
+detected problem is not related to suspend/resume process.
+
+Let me try to explain better (if considered, I can complete the patch
+explanation later):
+
+The issue happened at the initialization stage. At that moment, during
+normal rtnl_setlink call, the mac address is set and written in the device
+registers, but since the reset was not commanded previously, the mac
+address is not read from the device and without that, it always has the
+random address that is pre-generated just in case. 
+After this, during open operation, the reset is commanded and the mac
+address is read, but as the device registers were modified, it reads the
+pregenerated random mac address and not the default mac address for the
+device.
+
+To fix,  I am trying to protect this situtation, not allowing to write if
+the reset and the default mac address for the device is not previously
+read. I think it is easier in the driver because of the device condition.
+
+Thank you 
+
+Best regards
+José Ignacio
+
 
