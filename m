@@ -1,68 +1,98 @@
-Return-Path: <netdev+bounces-88087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FD778A59DD
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 20:27:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C4A28A5A04
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 20:40:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA7121F2172A
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:27:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7586F1C21233
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37AF813A87E;
-	Mon, 15 Apr 2024 18:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1485A154C09;
+	Mon, 15 Apr 2024 18:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lc9H7mdI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hWLCh0LP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 149A976033
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 18:27:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E240E41C66;
+	Mon, 15 Apr 2024 18:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713205630; cv=none; b=nSJwiwnjFiYPKd3Y9u0HFlDStYgA22foAY7QefYM+uQIH+J1qtVn+zaj6cKCE6FUtdyoZWfbXXa9xkptwI9n6oHtUIiF/QVK8caA2h7ae69RdtO+qeB6ggMJ5Axgep6p3A7JImwmds2Bd0Xp+MT5s8XBer0qZPwaL2BFOhAk7wE=
+	t=1713206429; cv=none; b=H0FLcMtpdys3qMzigjaiZolXOD6ApbtOH+HzJQEe0n4tZdQpKI69JwcAi7rI/4tZQm35UlQLZiSTqKaU9j2Uw0PpaOPErdVGiPAZs5AMGK4S+T73j6aOiM4LKzVtgpZEyQBFdgUq/PZPVExZUuAQMBLeKw8vnwlLvyeCuouvPxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713205630; c=relaxed/simple;
-	bh=YEmFcXqDaNOD/wJqMzGpL89WTGuVMvUPYomOi8FEFWQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nKgFxt7V+OUz2J0YfRy1aF8731H8xrFNuO9Nw1ss5a/Jpo2IMV0ZwiGRTa5Tfef0ZVtVxGVMiqYjYveU1hJ5xfhN5EnvlHn5D3mIwQFXdcubappss238Dxc8QxBl0s/QM+jVMylB4x+hauYHUP2iShWX6peGdNYlyBvXTkrHRoI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lc9H7mdI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52E50C113CC;
-	Mon, 15 Apr 2024 18:27:09 +0000 (UTC)
+	s=arc-20240116; t=1713206429; c=relaxed/simple;
+	bh=kgowzD5fH9d5m5BdHrdoSAm9Nv8Ny5qyh36nwbqfVJU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=kBVbwGzHZS2VtTolcmYpv/mUtxVGD0D3NlzAcNZF3IZ/2MdKUFjvfEv/1QZNYvug5a0YQ93FZVQuLvlVZK6k7uFweRTXYS9JQ6eenL6VaFGwM8z5i2fyo7FC8Q7Ul1r7U7SLlns+j0M+9iuLI02G9oxyZ+iCDQychTAw4eRCfpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hWLCh0LP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6AF4AC32781;
+	Mon, 15 Apr 2024 18:40:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713205629;
-	bh=YEmFcXqDaNOD/wJqMzGpL89WTGuVMvUPYomOi8FEFWQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lc9H7mdI/JPuuSgAl4EoNghANiTwtrgKzBe3KbsDc0JZJS8E6HbvRgOWPzLfqZWIj
-	 su7X5fPZtnNomZEmtgbu4kgSVGjfs+wAgGyQfwbGpYMoaxn8Lo8wQSfxe267TDrNVH
-	 BGE+Hz2H+rijhbYqqTc2j4NCFMXCLSm2LDbIaxkFRSUZOaPwqTlp7o84OznUc3FZ81
-	 2yM0i5ctgrwR4IZE2pxbuCrfbatYYX0KlQID9dXRT1XN0el+MNFQ1i2IMNydT4ee98
-	 g9juc/UeN4TC/oXJaeTnXOD/Tzj6M9ZtiCrumPZ51IvNBmllwp57NJ2XKg7oE2Drko
-	 jilaE080gTw0A==
-Date: Mon, 15 Apr 2024 11:27:08 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mengyuan Lou <mengyuanlou@net-swift.com>
-Cc: netdev@vger.kernel.org, jiawenwu@trustnetic.com,
- duanqiangwen@net-swift.com
-Subject: Re: [PATCH net-next v3 0/6] add sriov support for wangxun NICs
-Message-ID: <20240415112708.6105e143@kernel.org>
-In-Reply-To: <587FAB7876D85676+20240415110225.75132-1-mengyuanlou@net-swift.com>
-References: <587FAB7876D85676+20240415110225.75132-1-mengyuanlou@net-swift.com>
+	s=k20201202; t=1713206428;
+	bh=kgowzD5fH9d5m5BdHrdoSAm9Nv8Ny5qyh36nwbqfVJU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=hWLCh0LPmuKPaERfjBv0puRjxeizWuCM4pfy2PtEWKbpolywviYo7FmIyvqL4uJqQ
+	 AJoFgBe30f2dE+O8SCA1BKsa4woQj2QGAx7EcZhOymwDh3NnVnZz3/qLMhO8uo1Fkf
+	 8EdEkNCu/n4tuKPUdDTIlRoHSzt7+IHMifwcKdBk2OhFBWXL994ufpLUY5HsozuLpx
+	 MZvxk7zs+LYPFDVPp1ZC96Gyj96g9IN9ZgaJkwS4ytoXEa3/u0zazdshmezGrzrcAe
+	 5eyQKmNu8OuwnUb1k4uJQ/aulAlWM8lUns4e+d4dtudtRaY/sEh4j0t/Dtc6uorJ1a
+	 SAUaASD3waicQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5D8BCC395FE;
+	Mon, 15 Apr 2024 18:40:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/4] net: dqs: optimize if stall threshold is not
+ set
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171320642837.24301.3642985390319068381.git-patchwork-notify@kernel.org>
+Date: Mon, 15 Apr 2024 18:40:28 +0000
+References: <20240411192241.2498631-1-leitao@debian.org>
+In-Reply-To: <20240411192241.2498631-1-leitao@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 
-On Mon, 15 Apr 2024 18:54:27 +0800 Mengyuan Lou wrote:
-> Do not accept any new implementations of the old SR-IOV API.
-> So remove ndo_vf_xxx in these patches.
+Hello:
 
-But you're not adding support for switchdev mode either, 
-so how are you going to configure them?
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 11 Apr 2024 12:22:28 -0700 you wrote:
+> Here are four patches aimed at enhancing the Dynamic Queue Limit (DQL)
+> subsystem within the networking stack.
+> 
+> The first two commits involve code refactoring, while the third patch
+> introduces the actual change. The fourth patch just improves the cache
+> locality.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v3,1/4] net: dql: Avoid calling BUG() when WARN() is enough
+    https://git.kernel.org/netdev/net-next/c/4854b463c4b2
+  - [net-next,v3,2/4] net: dql: Separate queue function responsibilities
+    https://git.kernel.org/netdev/net-next/c/cbe481a1b741
+  - [net-next,v3,3/4] net: dql: Optimize stall information population
+    https://git.kernel.org/netdev/net-next/c/721f076b62cb
+  - [net-next,v3,4/4] net: dqs: make struct dql more cache efficient
+    https://git.kernel.org/netdev/net-next/c/4ba67ef3a1fb
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
