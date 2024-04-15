@@ -1,488 +1,263 @@
-Return-Path: <netdev+bounces-87791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60A9C8A4A69
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 10:35:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E30F18A4AD2
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 10:50:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 183C9282A44
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 08:35:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 203EA1C212AE
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 08:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 152AA3BBE1;
-	Mon, 15 Apr 2024 08:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47EDE3A29A;
+	Mon, 15 Apr 2024 08:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RzSkp0ff"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="sS7M+x35"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F91B3A8F9
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 08:34:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 324533BBC1
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 08:49:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713170096; cv=none; b=Hl4KPNJt01hLbOIbGsap4mfgxI5mJ1fuQAAtr8wjHc7pS534dZi92XJS6qMfA6x/7OvVs0hDxmt05s0CAESVN0cF8nGBpnvSfHivouwLUIqJWd6cSKuY32xNyY4M7uIypOmtPC5tXNmGTrzc/fB+AoA+vpuaECfFp56ivRgSz0U=
+	t=1713170995; cv=none; b=bU4hrrCHtOUSIrI9XHBBDl+xMjCH/HZM1ouxS32J46gCpSblu08sOTlK8SCEM0Lk7x7tjCcsUJwte9PHMh8zM6/5gKcB50Yc2hIcx2eKTqpaxVc4KRZkBEr7gyynR7jo3QnqvZDin9kkuN4nTgI8gWAD2S7BcB6VrxUc97A7I+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713170096; c=relaxed/simple;
-	bh=kP2vVarYJUgfZsE02DabXd55VBnSX70aqj2Sn6PmIYk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gafO714MliivnNtbYw0PiNvNK/JEnFSHLrdQa8qnU3DJdH8XFSuMStJ13inU3+ZbqLKF+76/bJf1zBXnGxOsw3bgTufXkMBWOjchTuy72BI1moOeSY5RhUCz5K57F+4cFT1EnVU1wA4q38jjwDLMdaCov/6JcZlnw6IXI9h+iiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RzSkp0ff; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713170092;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=elJjozH+zMMLVFAhsEocpxXCjTMSFN+CvE7S6kRfGzM=;
-	b=RzSkp0ff2HBrYqRP2Y59I4fh8a56JQi8iCzHRY45OWYZaiZe39QKSUB8DDV7we9AmUjuJu
-	IVmv2qHN/iTn/bVAjYjlhGfwmpJZcVy9vLk0PUOZ5Vy8cPTw97tGS54Ha5UQ5jDONsFw93
-	s/rIuCxXlpqth6kVBGEqxzVsyZVYoVA=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-682-3i0Q6ucmPb6nZpg8weFpiA-1; Mon, 15 Apr 2024 04:34:50 -0400
-X-MC-Unique: 3i0Q6ucmPb6nZpg8weFpiA-1
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5c5c8ef7d0dso2420282a12.2
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 01:34:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713170089; x=1713774889;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=elJjozH+zMMLVFAhsEocpxXCjTMSFN+CvE7S6kRfGzM=;
-        b=saz5824xqInDXXl22q+HZBZXCr5RksobS2o65D1+dLyIAXLtd5snExJ2ThNc6V+ZqN
-         GFLxod5ASCOvuw4fi9TxMYlvid25PX0RlWMD3voNURCxpw/1Zg3Sme+hFLpBCRCcR6Yp
-         3Lz9Jo6lxWBOLoXPiw854B9h+1g0d98f+COJm5TkLk5WfsYrEyGi3l3Wm36ifHAszhXw
-         giE8wwJir9TGXup7CTDBO7RMbz8qu/qtfmy2iUrCzDZcpWyHMytc+BKnNzIZ1AtkKAJZ
-         d/fmbyH7cmiYEox9OY5y9VDmQalff07lpvUFacTJC8/qhBATaZQ92GTLKe+sxqmfWaBV
-         xI9A==
-X-Gm-Message-State: AOJu0YxwTAz2bydQwHE5UUusB+7csPqVvbe0O6S9i5jMXdER+qTilVT9
-	egHnbXtAt8I0DbwHwjqg/z7OhIsV6uoTX9YIKwWWaoxzs1bQrXFs+dQUs6+tQaMIbvS7VHlFXBJ
-	oYr0EpdW32Jw8jKtY0zTD+W2xSLcbnKbb3l74q8fX1A3jNM+YXf5sLirF/4I3BhpGDgh50iowkC
-	AXIk/ptJGSDz8mQs3ZGpsecwiIDmoY
-X-Received: by 2002:a05:6a20:564b:b0:1a7:79b2:ff1b with SMTP id is11-20020a056a20564b00b001a779b2ff1bmr6568174pzc.27.1713170088974;
-        Mon, 15 Apr 2024 01:34:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHZmwPZ2hWrbm8QS2tSip80S0YLAIlyuhoPq8TcCqWtl7XkbZ1bqDM/18ra+zjHttBP7954Xc0SAL+7PnM+ihE=
-X-Received: by 2002:a05:6a20:564b:b0:1a7:79b2:ff1b with SMTP id
- is11-20020a056a20564b00b001a779b2ff1bmr6568155pzc.27.1713170088618; Mon, 15
- Apr 2024 01:34:48 -0700 (PDT)
+	s=arc-20240116; t=1713170995; c=relaxed/simple;
+	bh=lLt5r88o8LAtphS3/PGZVZ6F3+WFfNtfQ3Y6Y+3qncM=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=DE1ZuhC8aKRYvo5MTK+zJMa8tWC9NKcB0Amt339MBH9WpAyHJJu3hkF56N7IwJ3CswjwBbl01BXRyOXV+/ziWA48YOCEdpO/uUiTtWSpjK4RpT7X1Omtp6SWp4e89kMfIuM6Sz2ihpBH+sxGRayJZXaocv4y3cgwgPvYtOYq//g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=sS7M+x35; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1713170989; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=uMkhS7BsxeL4oglM0pwFdRZ0sutgkDQPGrAjxBhZbGc=;
+	b=sS7M+x35Wtu4vNlGK3S2lGxxHduRo5I8g15Nz6ON75SsTKo2Rt4mAjdvOuCvf1LTlMPCkXoybhOVGmR1gOY8rQvJK76NlK1vRSH8K9aelCERhdbT/a3NUDxtFJP5E86qTKXTOx6ozoJKb+1yOaw1dyk2PB5B5gIlMjwWygIwjt0=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W4YrqFd_1713170988;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W4YrqFd_1713170988)
+          by smtp.aliyun-inc.com;
+          Mon, 15 Apr 2024 16:49:49 +0800
+Message-ID: <1713170201.06163-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost 3/6] virtio_net: replace private by pp struct inside page
+Date: Mon, 15 Apr 2024 16:36:41 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <20240411025127.51945-1-xuanzhuo@linux.alibaba.com>
+ <20240411025127.51945-4-xuanzhuo@linux.alibaba.com>
+ <CACGkMEsC7AEi2SOmqNOo6KJDpx92raGWYwYzxZ_MVhmnco_LYQ@mail.gmail.com>
+ <1712900153.3715405-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvKC6JpsznW57GgxFBMhmMSk4eCZPvESpew9j5qfp9=RA@mail.gmail.com>
+ <1713146919.8867755-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvmaH9NE-5VDBPpZOpAAg4bX39Lf0-iGiYzxdV5JuZWww@mail.gmail.com>
+In-Reply-To: <CACGkMEvmaH9NE-5VDBPpZOpAAg4bX39Lf0-iGiYzxdV5JuZWww@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240318110602.37166-1-xuanzhuo@linux.alibaba.com>
- <20240318110602.37166-5-xuanzhuo@linux.alibaba.com> <CACGkMEujuYh+Ups9jx5jEwe7bydtgCyurG5bPLe3X8jpSJhqvA@mail.gmail.com>
- <1712746366.8053942-2-xuanzhuo@linux.alibaba.com> <CACGkMEsvAUyk+h3e5SO5T4L8HuSGcViKj2WM2J33JOb7KTKjUw@mail.gmail.com>
- <1713148927.6675713-2-xuanzhuo@linux.alibaba.com> <CACGkMEvbLvQUppO6nnp0DCxACco7S=2QLgge4ZhARo9Ov_fJKQ@mail.gmail.com>
- <1713168679.2714498-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1713168679.2714498-1-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 15 Apr 2024 16:34:37 +0800
-Message-ID: <CACGkMEucuS0yGP1d9w3KEUigGusP_ks71KwZAwuBJNdZQ=v13Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 4/9] virtio_net: support device stats
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Stanislav Fomichev <sdf@google.com>, Amritha Nambiar <amritha.nambiar@intel.com>, 
-	Larysa Zaremba <larysa.zaremba@intel.com>, Sridhar Samudrala <sridhar.samudrala@intel.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, virtualization@lists.linux.dev, 
-	bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 15, 2024 at 4:15=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
->
-> On Mon, 15 Apr 2024 14:45:36 +0800, Jason Wang <jasowang@redhat.com> wrot=
-e:
-> > On Mon, Apr 15, 2024 at 10:51=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alib=
-aba.com> wrote:
-> > >
-> > > On Thu, 11 Apr 2024 14:09:24 +0800, Jason Wang <jasowang@redhat.com> =
-wrote:
-> > > > On Wed, Apr 10, 2024 at 6:55=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.a=
-libaba.com> wrote:
-> > > > >
-> > > > > On Wed, 10 Apr 2024 14:09:23 +0800, Jason Wang <jasowang@redhat.c=
-om> wrote:
-> > > > > > On Mon, Mar 18, 2024 at 7:06=E2=80=AFPM Xuan Zhuo <xuanzhuo@lin=
-ux.alibaba.com> wrote:
-> > > > > > >
-> > > > > > > As the spec https://github.com/oasis-tcs/virtio-spec/commit/4=
-2f389989823039724f95bbbd243291ab0064f82
-> > > > > > >
-> > > > > > > make virtio-net support getting the stats from the device by =
-ethtool -S
-> > > > > > > <eth0>.
-> > > > > > >
-> > > > > > > Due to the numerous descriptors stats, an organization method=
- is
-> > > > > > > required. For this purpose, I have introduced the "virtnet_st=
-ats_map".
-> > > > > > > Utilizing this array simplifies coding tasks such as generati=
-ng field
-> > > > > > > names, calculating buffer sizes for requests and responses, a=
-nd parsing
-> > > > > > > replies from the device. By iterating over the "virtnet_stats=
-_map,"
-> > > > > > > these operations become more streamlined and efficient.
-> > > > > > >
-> > > > > > > NIC statistics:
-> > > > > > >      rx0_packets: 582951
-> > > > > > >      rx0_bytes: 155307077
-> > > > > > >      rx0_drops: 0
-> > > > > > >      rx0_xdp_packets: 0
-> > > > > > >      rx0_xdp_tx: 0
-> > > > > > >      rx0_xdp_redirects: 0
-> > > > > > >      rx0_xdp_drops: 0
-> > > > > > >      rx0_kicks: 17007
-> > > > > > >      rx0_hw_packets: 2179409
-> > > > > > >      rx0_hw_bytes: 510015040
-> > > > > > >      rx0_hw_notifications: 0
-> > > > > > >      rx0_hw_interrupts: 0
-> > > > > > >      rx0_hw_drops: 12964
-> > > > > > >      rx0_hw_drop_overruns: 0
-> > > > > > >      rx0_hw_csum_valid: 2179409
-> > > > > > >      rx0_hw_csum_none: 0
-> > > > > > >      rx0_hw_csum_bad: 0
-> > > > > > >      rx0_hw_needs_csum: 2179409
-> > > > > > >      rx0_hw_ratelimit_packets: 0
-> > > > > > >      rx0_hw_ratelimit_bytes: 0
-> > > > > > >      tx0_packets: 15361
-> > > > > > >      tx0_bytes: 1918970
-> > > > > > >      tx0_xdp_tx: 0
-> > > > > > >      tx0_xdp_tx_drops: 0
-> > > > > > >      tx0_kicks: 15361
-> > > > > > >      tx0_timeouts: 0
-> > > > > > >      tx0_hw_packets: 32272
-> > > > > > >      tx0_hw_bytes: 4311698
-> > > > > > >      tx0_hw_notifications: 0
-> > > > > > >      tx0_hw_interrupts: 0
-> > > > > > >      tx0_hw_drops: 0
-> > > > > > >      tx0_hw_drop_malformed: 0
-> > > > > > >      tx0_hw_csum_none: 0
-> > > > > > >      tx0_hw_needs_csum: 32272
-> > > > > > >      tx0_hw_ratelimit_packets: 0
-> > > > > > >      tx0_hw_ratelimit_bytes: 0
-> > > > > > >
-> > > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > > > > ---
-> > > > > > >  drivers/net/virtio_net.c | 401 +++++++++++++++++++++++++++++=
-+++++++++-
-> > > > > > >  1 file changed, 397 insertions(+), 4 deletions(-)
-> > > > > > >
-> > > > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_ne=
-t.c
-> > > > > > > index 8cb5bdd7ad91..70c1d4e850e0 100644
-> > > > > > > --- a/drivers/net/virtio_net.c
-> > > > > > > +++ b/drivers/net/virtio_net.c
-> > > > > > > @@ -128,6 +128,129 @@ static const struct virtnet_stat_desc v=
-irtnet_rq_stats_desc[] =3D {
-> > > > > > >  #define VIRTNET_SQ_STATS_LEN   ARRAY_SIZE(virtnet_sq_stats_d=
-esc)
-> > > > > > >  #define VIRTNET_RQ_STATS_LEN   ARRAY_SIZE(virtnet_rq_stats_d=
-esc)
-> > > > > > >
-> > > > > > > +#define VIRTNET_STATS_DESC_CQ(name) \
-> > > > > > > +       {#name, offsetof(struct virtio_net_stats_cvq, name)}
-> > > > > > > +
-> > > > > > > +#define VIRTNET_STATS_DESC_RX(class, name) \
-> > > > > > > +       {#name, offsetof(struct virtio_net_stats_rx_ ## class=
-, rx_ ## name)}
-> > > > > > > +
-> > > > > > > +#define VIRTNET_STATS_DESC_TX(class, name) \
-> > > > > > > +       {#name, offsetof(struct virtio_net_stats_tx_ ## class=
-, tx_ ## name)}
-> > > > > > > +
-> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_cvq_desc=
-[] =3D {
-> > > > > > > +       VIRTNET_STATS_DESC_CQ(command_num),
-> > > > > > > +       VIRTNET_STATS_DESC_CQ(ok_num),
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_rx_basic=
-_desc[] =3D {
-> > > > > > > +       VIRTNET_STATS_DESC_RX(basic, packets),
-> > > > > > > +       VIRTNET_STATS_DESC_RX(basic, bytes),
-> > > > > > > +
-> > > > > > > +       VIRTNET_STATS_DESC_RX(basic, notifications),
-> > > > > > > +       VIRTNET_STATS_DESC_RX(basic, interrupts),
-> > > > > > > +
-> > > > > > > +       VIRTNET_STATS_DESC_RX(basic, drops),
-> > > > > > > +       VIRTNET_STATS_DESC_RX(basic, drop_overruns),
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_tx_basic=
-_desc[] =3D {
-> > > > > > > +       VIRTNET_STATS_DESC_TX(basic, packets),
-> > > > > > > +       VIRTNET_STATS_DESC_TX(basic, bytes),
-> > > > > > > +
-> > > > > > > +       VIRTNET_STATS_DESC_TX(basic, notifications),
-> > > > > > > +       VIRTNET_STATS_DESC_TX(basic, interrupts),
-> > > > > > > +
-> > > > > > > +       VIRTNET_STATS_DESC_TX(basic, drops),
-> > > > > > > +       VIRTNET_STATS_DESC_TX(basic, drop_malformed),
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_rx_csum_=
-desc[] =3D {
-> > > > > > > +       VIRTNET_STATS_DESC_RX(csum, csum_valid),
-> > > > > > > +       VIRTNET_STATS_DESC_RX(csum, needs_csum),
-> > > > > > > +
-> > > > > > > +       VIRTNET_STATS_DESC_RX(csum, csum_none),
-> > > > > > > +       VIRTNET_STATS_DESC_RX(csum, csum_bad),
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_tx_csum_=
-desc[] =3D {
-> > > > > > > +       VIRTNET_STATS_DESC_TX(csum, needs_csum),
-> > > > > > > +       VIRTNET_STATS_DESC_TX(csum, csum_none),
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_rx_gso_d=
-esc[] =3D {
-> > > > > > > +       VIRTNET_STATS_DESC_RX(gso, gso_packets),
-> > > > > > > +       VIRTNET_STATS_DESC_RX(gso, gso_bytes),
-> > > > > > > +       VIRTNET_STATS_DESC_RX(gso, gso_packets_coalesced),
-> > > > > > > +       VIRTNET_STATS_DESC_RX(gso, gso_bytes_coalesced),
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_tx_gso_d=
-esc[] =3D {
-> > > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_packets),
-> > > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_bytes),
-> > > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_segments),
-> > > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_segments_bytes),
-> > > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_packets_noseg),
-> > > > > > > +       VIRTNET_STATS_DESC_TX(gso, gso_bytes_noseg),
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_rx_speed=
-_desc[] =3D {
-> > > > > > > +       VIRTNET_STATS_DESC_RX(speed, ratelimit_packets),
-> > > > > > > +       VIRTNET_STATS_DESC_RX(speed, ratelimit_bytes),
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +static const struct virtnet_stat_desc virtnet_stats_tx_speed=
-_desc[] =3D {
-> > > > > > > +       VIRTNET_STATS_DESC_TX(speed, ratelimit_packets),
-> > > > > > > +       VIRTNET_STATS_DESC_TX(speed, ratelimit_bytes),
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +#define VIRTNET_Q_TYPE_RX 0
-> > > > > > > +#define VIRTNET_Q_TYPE_TX 1
-> > > > > > > +#define VIRTNET_Q_TYPE_CQ 2
-> > > > > > > +
-> > > > > > > +struct virtnet_stats_map {
-> > > > > > > +       /* The stat type in bitmap. */
-> > > > > > > +       u64 stat_type;
-> > > > > > > +
-> > > > > > > +       /* The bytes of the response for the stat. */
-> > > > > > > +       u32 len;
-> > > > > > > +
-> > > > > > > +       /* The num of the response fields for the stat. */
-> > > > > > > +       u32 num;
-> > > > > > > +
-> > > > > > > +       /* The type of queue corresponding to the statistics.=
- (cq, rq, sq) */
-> > > > > > > +       u32 queue_type;
-> > > > > > > +
-> > > > > > > +       /* The reply type of the stat. */
-> > > > > > > +       u8 reply_type;
-> > > > > > > +
-> > > > > > > +       /* Describe the name and the offset in the response. =
-*/
-> > > > > > > +       const struct virtnet_stat_desc *desc;
-> > > > > > > +};
-> > > > > > > +
-> > > > > > > +#define VIRTNET_DEVICE_STATS_MAP_ITEM(TYPE, type, queue_type=
-)  \
-> > > > > > > +       {                                                    =
-   \
-> > > > > > > +               VIRTIO_NET_STATS_TYPE_##TYPE,                =
-   \
-> > > > > > > +               sizeof(struct virtio_net_stats_ ## type),    =
-   \
-> > > > > > > +               ARRAY_SIZE(virtnet_stats_ ## type ##_desc),  =
-   \
-> > > > > > > +               VIRTNET_Q_TYPE_##queue_type,                 =
-   \
-> > > > > > > +               VIRTIO_NET_STATS_TYPE_REPLY_##TYPE,          =
-   \
-> > > > > > > +               &virtnet_stats_##type##_desc[0]              =
-   \
-> > > > > > > +       }
-> > > > > > > +
-> > > > > > > +static struct virtnet_stats_map virtio_net_stats_map[] =3D {
-> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(CVQ, cvq, CQ),
-> > > > > > > +
-> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_BASIC, rx_basic, RX)=
-,
-> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_CSUM,  rx_csum,  RX)=
-,
-> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_GSO,   rx_gso,   RX)=
-,
-> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(RX_SPEED, rx_speed, RX)=
-,
-> > > > > > > +
-> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_BASIC, tx_basic, TX)=
-,
-> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_CSUM,  tx_csum,  TX)=
-,
-> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_GSO,   tx_gso,   TX)=
-,
-> > > > > > > +       VIRTNET_DEVICE_STATS_MAP_ITEM(TX_SPEED, tx_speed, TX)=
-,
-> > > > > > > +};
-> > > > > >
-> > > > > > I think the reason you did this is to ease the future extension=
-s but
-> > > > > > multiple levels of nested macros makes the code hard to review.=
- Any
-> > > > > > way to eliminate this?
-> > > > >
-> > > > >
-> > > > > NOT only for the future extensions.
-> > > > >
-> > > > > When we parse the reply from the device, we need to check the rep=
-ly stats
-> > > > > one by one, we need the stats info to help parse the stats.
-> > > >
-> > > > Yes, but I meant for example any reason why it can't be done by
-> > > > extending virtnet_stat_desc ?
-> > >
-> > >
-> > >
-> > > You know, virtio_net_stats_map is way to organize the descs.
-> > >
-> > > This is used to avoid the big if-else when parsing the replys from th=
-e device.
-> > >
-> > > If no this map, we will have a big if-else like:
-> > >
-> > >  if (reply.type =3D=3D rx_basic) {
-> > >          /* do the same something */
-> > >  }
-> > >  if (reply.type =3D=3D tx_basic) {
-> > >          /* do the same something */
-> > >  }
-> > >  if (reply.type =3D=3D rx_csum) {
-> > >          /* do the same something */
-> > >  }
-> > >  if (reply.type =3D=3D tx_csum) {
-> > >          /* do the same something */
-> > >  }
-> > >  if (reply.type =3D=3D rx_gso) {
-> > >          /* do the same something */
-> > >  }
-> > >  if (reply.type =3D=3D tx_gso) {
-> > >          /* do the same something */
-> > >  }
-> > >  if (reply.type =3D=3D rx_speed) {
-> > >          /* do the same something */
-> > >  }
-> > >  if (reply.type =3D=3D tx_speed) {
-> > >          /* do the same something */
-> > >  }
-> > >
-> > > I want to avoid this, so introducing this map.
+On Mon, 15 Apr 2024 14:43:24 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Mon, Apr 15, 2024 at 10:35=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibab=
+a.com> wrote:
 > >
-> > Could we have a function pointers array indexed by the type?
+> > On Fri, 12 Apr 2024 13:49:12 +0800, Jason Wang <jasowang@redhat.com> wr=
+ote:
+> > > On Fri, Apr 12, 2024 at 1:39=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.ali=
+baba.com> wrote:
+> > > >
+> > > > On Fri, 12 Apr 2024 12:47:55 +0800, Jason Wang <jasowang@redhat.com=
+> wrote:
+> > > > > On Thu, Apr 11, 2024 at 10:51=E2=80=AFAM Xuan Zhuo <xuanzhuo@linu=
+x.alibaba.com> wrote:
+> > > > > >
+> > > > > > Now, we chain the pages of big mode by the page's private varia=
+ble.
+> > > > > > But a subsequent patch aims to make the big mode to support
+> > > > > > premapped mode. This requires additional space to store the dma=
+ addr.
+> > > > > >
+> > > > > > Within the sub-struct that contains the 'private', there is no =
+suitable
+> > > > > > variable for storing the DMA addr.
+> > > > > >
+> > > > > >                 struct {        /* Page cache and anonymous pag=
+es */
+> > > > > >                         /**
+> > > > > >                          * @lru: Pageout list, eg. active_list =
+protected by
+> > > > > >                          * lruvec->lru_lock.  Sometimes used as=
+ a generic list
+> > > > > >                          * by the page owner.
+> > > > > >                          */
+> > > > > >                         union {
+> > > > > >                                 struct list_head lru;
+> > > > > >
+> > > > > >                                 /* Or, for the Unevictable "LRU=
+ list" slot */
+> > > > > >                                 struct {
+> > > > > >                                         /* Always even, to nega=
+te PageTail */
+> > > > > >                                         void *__filler;
+> > > > > >                                         /* Count page's or foli=
+o's mlocks */
+> > > > > >                                         unsigned int mlock_coun=
+t;
+> > > > > >                                 };
+> > > > > >
+> > > > > >                                 /* Or, free page */
+> > > > > >                                 struct list_head buddy_list;
+> > > > > >                                 struct list_head pcp_list;
+> > > > > >                         };
+> > > > > >                         /* See page-flags.h for PAGE_MAPPING_FL=
+AGS */
+> > > > > >                         struct address_space *mapping;
+> > > > > >                         union {
+> > > > > >                                 pgoff_t index;          /* Our =
+offset within mapping. */
+> > > > > >                                 unsigned long share;    /* shar=
+e count for fsdax */
+> > > > > >                         };
+> > > > > >                         /**
+> > > > > >                          * @private: Mapping-private opaque dat=
+a.
+> > > > > >                          * Usually used for buffer_heads if Pag=
+ePrivate.
+> > > > > >                          * Used for swp_entry_t if PageSwapCach=
+e.
+> > > > > >                          * Indicates order in the buddy system =
+if PageBuddy.
+> > > > > >                          */
+> > > > > >                         unsigned long private;
+> > > > > >                 };
+> > > > > >
+> > > > > > But within the page pool struct, we have a variable called
+> > > > > > dma_addr that is appropriate for storing dma addr.
+> > > > > > And that struct is used by netstack. That works to our advantag=
+e.
+> > > > > >
+> > > > > >                 struct {        /* page_pool used by netstack */
+> > > > > >                         /**
+> > > > > >                          * @pp_magic: magic value to avoid recy=
+cling non
+> > > > > >                          * page_pool allocated pages.
+> > > > > >                          */
+> > > > > >                         unsigned long pp_magic;
+> > > > > >                         struct page_pool *pp;
+> > > > > >                         unsigned long _pp_mapping_pad;
+> > > > > >                         unsigned long dma_addr;
+> > > > > >                         atomic_long_t pp_ref_count;
+> > > > > >                 };
+> > > > > >
+> > > > > > On the other side, we should use variables from the same sub-st=
+ruct.
+> > > > > > So this patch replaces the "private" with "pp".
+> > > > > >
+> > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > > ---
+> > > > >
+> > > > > Instead of doing a customized version of page pool, can we simply
+> > > > > switch to use page pool for big mode instead? Then we don't need =
+to
+> > > > > bother the dma stuffs.
+> > > >
+> > > >
+> > > > The page pool needs to do the dma by the DMA APIs.
+> > > > So we can not use the page pool directly.
+> > >
+> > > I found this:
+> > >
+> > > define PP_FLAG_DMA_MAP         BIT(0) /* Should page_pool do the DMA
+> > >                                         * map/unmap
+> > >
+> > > It seems to work here?
+> >
+> >
+> > I have studied the page pool mechanism and believe that we cannot use it
+> > directly. We can make the page pool to bypass the DMA operations.
+> > This allows us to handle DMA within virtio-net for pages allocated from=
+ the page
+> > pool. Furthermore, we can utilize page pool helpers to associate the DM=
+A address
+> > to the page.
+> >
+> > However, the critical issue pertains to unmapping. Ideally, we want to =
+return
+> > the mapped pages to the page pool and reuse them. In doing so, we can o=
+mit the
+> > unmapping and remapping steps.
+> >
+> > Currently, there's a caveat: when the page pool cache is full, it disco=
+nnects
+> > and releases the pages. When the pool hits its capacity, pages are reli=
+nquished
+> > without a chance for unmapping.
 >
-> Then these functions will be similar and mass.
->
-> Maybe we can start with the if-else or the function.
-> That will be easy to review. We can optimize on that.
+> Technically, when ptr_ring is full there could be a fallback, but then
+> it requires expensive synchronization between producer and consumer.
+> For virtio-net, it might not be a problem because add/get has been
+> synchronized. (It might be relaxed in the future, actually we've
+> already seen a requirement in the past for virito-blk).
 
-Fine with me.
+The point is that the page will be released by page pool directly,
+we will have no change to unmap that, if we work with page pool.
+
+>
+> > If we were to unmap pages each time before
+> > returning them to the pool, we would negate the benefits of bypassing t=
+he
+> > mapping and unmapping process altogether.
+>
+> Yes, but the problem in this approach is that it creates a corner
+> exception where dma_addr is used outside the page pool.
+
+YES. This is a corner exception. We need to introduce this case to the page
+pool.
+
+So for introducing the page-pool to virtio-net(not only for big mode),
+we may need to push the page-pool to support dma by drivers.
+
+Back to this patch set, I think we should keep the virtio-net to manage
+the pages.
+
+What do you think?
 
 Thanks
 
 >
-> Thanks.
+> Maybe for big mode it doesn't matter too much if there's no
+> performance improvement.
 >
->
+> Thanks
 >
 > >
-> > Thanks
+> > Thanks.
+> >
+> >
 > >
 > > >
-> > > YES. I noticed other comments, but I think we should
-> > > fix this problem firstly.
-> > >
-> > > Thanks.
-> > >
+> > > Thanks
 > > >
 > > > >
-> > > > >
-> > > > >         static void virtnet_fill_stats(struct virtnet_info *vi, u=
-32 qid,
-> > > > >                                       struct virtnet_stats_ctx *c=
-tx,
-> > > > >                                       const u8 *base, u8 type)
-> > > > >         {
-> > > > >                u32 queue_type, num_rx, num_tx, num_cq;
-> > > > >                struct virtnet_stats_map *m;
-> > > > >                u64 offset, bitmap;
-> > > > >                const __le64 *v;
-> > > > >                int i, j;
-> > > > >
-> > > > >                num_rx =3D VIRTNET_RQ_STATS_LEN + ctx->desc_num[VI=
-RTNET_Q_TYPE_RX];
-> > > > >                num_tx =3D VIRTNET_SQ_STATS_LEN + ctx->desc_num[VI=
-RTNET_Q_TYPE_TX];
-> > > > >                num_cq =3D ctx->desc_num[VIRTNET_Q_TYPE_CQ];
-> > > > >
-> > > > >                queue_type =3D vq_type(vi, qid);
-> > > > >                bitmap =3D ctx->bitmap[queue_type];
-> > > > >                offset =3D 0;
-> > > > >
-> > > > >                if (queue_type =3D=3D VIRTNET_Q_TYPE_TX) {
-> > > > >                        offset =3D num_cq + num_rx * vi->curr_queu=
-e_pairs + num_tx * (qid / 2);
-> > > > >                        offset +=3D VIRTNET_SQ_STATS_LEN;
-> > > > >                } else if (queue_type =3D=3D VIRTNET_Q_TYPE_RX) {
-> > > > >                        offset =3D num_cq + num_rx * (qid / 2) + V=
-IRTNET_RQ_STATS_LEN;
-> > > > >                }
-> > > > >
-> > > > >                for (i =3D 0; i < ARRAY_SIZE(virtio_net_stats_map)=
-; ++i) {
-> > > > >                        m =3D &virtio_net_stats_map[i];
-> > > > >
-> > > > > ->                     if (m->stat_type & bitmap)
-> > > > >                                offset +=3D m->num;
-> > > > >
-> > > > > ->                     if (type !=3D m->reply_type)
-> > > > >                                continue;
-> > > > >
-> > > > >                        for (j =3D 0; j < m->num; ++j) {
-> > > > >                                v =3D (const __le64 *)(base + m->d=
-esc[j].offset);
-> > > > >                                ctx->data[offset + j] =3D le64_to_=
-cpu(*v);
-> > > > >                        }
-> > > > >
-> > > > >                        break;
-> > > > >                }
-> > > > >         }
-> > > > >
-> > > > > Thanks.
+> > > > Thanks.
 > > > >
-> > > > Btw, just a reminder, there are other comments for this patch.
 > > > >
-> > > > Thanks
+> > > > >
+> > > > > Thanks
+> > > > >
 > > > >
 > > >
 > >
 >
-
 
