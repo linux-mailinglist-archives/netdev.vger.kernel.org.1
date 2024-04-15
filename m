@@ -1,358 +1,261 @@
-Return-Path: <netdev+bounces-87875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 242BB8A4D43
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 13:04:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFD758A4D10
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 12:59:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0057284C6D
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 11:04:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02452B21FC3
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 10:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05B1E5D73D;
-	Mon, 15 Apr 2024 11:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60C95C90F;
+	Mon, 15 Apr 2024 10:59:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="vo7D5x2U";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="m9g8733R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg154.qq.com (smtpbg154.qq.com [15.184.224.54])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CDD5CDE4
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 11:04:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.224.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC3B35C902
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 10:59:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713179046; cv=none; b=F8J+aWysAiHJ5hl5CpaIyg4FhmPAJS4Jt+tSN0Gti9TZdohi/bQa0acaExPn/KT7U01pIHrTQ9YjDn8c9/A4gTR/ZByvlv/Z+WdvyGRn0OiEnMyVeySF7bEDaRlaMu+dwyvm8/ojh+j4nPrNHe8fhygvj+tQ+JYpMTIsce+FlL0=
+	t=1713178782; cv=none; b=Zd/6q1jW3JCzjVvo+tPcNUY4t6aD8cS+w9TFjWZPTX2VGs+XVj/fxBvWjEdFXIL3HBHYF2Pln0oiKGlH/fM//DZ9GMmwEVa/8mYoU5LHeXReV8eGl5uwALHtLv47CrMoPqvQTlGOzoOORzQsg/E2/HSnptwEQW5egt22OlXwIrU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713179046; c=relaxed/simple;
-	bh=SLLPUildVf2DqJfOKV7jhzRzPdaz5wYTLhR8nojd4eA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rMaOtMMjQojg2Lzaz2Q6xrpier/t1ILoHNfgpN2lJHlZAONZ6948mQ1n9QRCIvVZEbnv19sFQq6KMGQCkFKHe+yNs3GT6dlN0vL1Y5J2RgbDiWoT111PKUJn5LOpL5hk3dm4kJjsypk2ZTbayiHHbC4Ut3xdKE4TjsdMl3gslWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=15.184.224.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: bizesmtp85t1713179028tmbkarlu
-X-QQ-Originating-IP: cEh4cjMlCnkqaFSGhrWZIWz2viDzl7/x0UAHXhBhcuU=
-Received: from localhost.localdomain ( [125.119.246.177])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Mon, 15 Apr 2024 19:03:46 +0800 (CST)
-X-QQ-SSF: 01400000000000O0Z000000A0000000
-X-QQ-FEAT: MI/pqTa+epmL+ibT+5yavQIsHXZ1zNA9P/B4D49ntZFGIofG1rM68Tk+2ZjB8
-	fbdVaEEqoggGFgGwFhmIf5ZVbG0qTzdY5Ss7nKgvNrI39fz6SzJs4Hi1o0ohv7jokVCCobX
-	S1tDWMYdLzowbo/230TJjC5weN+UG7tp/HLeMk4g0bI1oOsTEJ7gPNOaWLpS0ft7o9jA511
-	RM+F0PoTegcm8fJ2ja5oC6gfITlR7zFn/oj9Y+N8uo0xh3CI+bSX2haGpq9pbueMEvryUiH
-	wzaKN9GuWefoqdfFq0qSgpylfic8bsZXA6wWv/R+BrkBF5FOnGTKz2N0V+vE78uutCmWY7n
-	NekBBghRhRMkwBRqZl8nbSyMrDM3gKHoXI58yAX6WULqTm9dhD+EpjFWxDVkdzvCfHgO+yB
-	QGlfFqkeInw2XuQJYIac+mWowMzivNb2
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 4383869318966175657
-From: Mengyuan Lou <mengyuanlou@net-swift.com>
-To: netdev@vger.kernel.org
-Cc: jiawenwu@trustnetic.com,
-	duanqiangwen@net-swift.com,
-	Mengyuan Lou <mengyuanlou@net-swift.com>
-Subject: [PATCH net-next v3 6/6] net: txgbe: add sriov function support
-Date: Mon, 15 Apr 2024 18:54:33 +0800
-Message-ID: <88D60A29E6A81061+20240415110225.75132-7-mengyuanlou@net-swift.com>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20240415110225.75132-1-mengyuanlou@net-swift.com>
-References: <20240415110225.75132-1-mengyuanlou@net-swift.com>
+	s=arc-20240116; t=1713178782; c=relaxed/simple;
+	bh=xLlRlKF9xsDzwY3KKGHNcn1ycgRbO63/bG8okkEB9G0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=QDSjK2KKbYwKDu1YiV+aNuBMI+qf56E4+Bu2n9C1Wo0q/g9WW0S6ZR36L4UdA8cHsYrTfXHCpczZQFAinePU53GnaMTawD56Lny6PFqEtWxJAlFwPnKNZG0P9mH/vlra6TEtYfV63d1mj+vQ9CY1d9+KHl9iLyHHx2gRt+oBkb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=vo7D5x2U; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=m9g8733R; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1713178778;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=V5DuBOBDBCHQaWw9C6glh20ZIW+jv3LdeT0wtYITpAE=;
+	b=vo7D5x2Uu0VZJO04+kTXha14NKNb3dYdeBV2WBn1bOSRVg08eUnaPVuBtjXKatlHx5Or44
+	PN8bBngXOgKxuByfL3V+xwncvnBi4hyWrqDQZmuXJGKAT4RmE7Yyj6gQNFP2nM4+EUbALF
+	wxyPQI2XAWb4hEV0C3H4g+MQYP/8RbqSZv02VyyRj3G+eVM38vhATrEtVk9RhoaOnIrP3I
+	qDYLdC8uU7okl7/blJJMJLlEXmXRODSAgHA4S7916dea0rczEXfqklPZwetwHL06ExuaUE
+	7uCy4/aGAFFz7TtAfSZ6qxY5UB9QXK+VGQ90TJFotaXM2oTzwfxjknHRKC5XMg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1713178778;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=V5DuBOBDBCHQaWw9C6glh20ZIW+jv3LdeT0wtYITpAE=;
+	b=m9g8733RyBy0+jNdeYmM0t6OwWgO7YBLGwpefIt5WZeZncobsWnP2VWpgQudwtTmRBmTzW
+	aIVS9HzmL5O8QcCA==
+Date: Mon, 15 Apr 2024 12:59:37 +0200
+Subject: [PATCH iwl-net v2] igc: Fix deadlock on module removal
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrgz:qybglogicsvrgz6a-1
+Message-Id: <20240411-igc_led_deadlock-v2-1-b758c0c88b2b@linutronix.de>
+X-B4-Tracking: v=1; b=H4sIAJgIHWYC/3WOwQ6CMBAFf4Xs2RqKVMGT/2EIKe0CG2tr2ooYw
+ r9buHucTF7mLRDQEwa4Zgt4nCiQswmKQwZqlHZARjoxFHlR5iXnjAbVGtStRqmNUw92kZ2uRC3
+ KXiCkWScDss5Lq8Zt+JQhot/Ey2NP8966A30MsxihSWKkEJ3/7h8mvuv/uYkzznIt60qe1LlS4
+ mbIvqN3luajRmjWdf0BFjxqYdYAAAA=
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>, 
+ Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Andrew Lunn <andrew@lunn.ch>
+Cc: Lukas Wunner <lukas@wunner.de>, Sasha Neftin <sasha.neftin@intel.com>, 
+ Roman Lozko <lozko.roma@gmail.com>, 
+ =?utf-8?q?Marek_Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>, 
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ Kurt Kanzenbach <kurt@linutronix.de>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6093; i=kurt@linutronix.de;
+ h=from:subject:message-id; bh=4aazeCbSQxcdcATZ72Dv/MmL+45/aglVGKPPdw6BXjo=;
+ b=owEBbQKS/ZANAwAKAcGT0fKqRnOCAcsmYgBmHQiaGLPhBrgk7+BgZxj5jBLS9nzckBEFieus6
+ ZmiwiLJn9qJAjMEAAEKAB0WIQS8ub+yyMN909/bWZLBk9HyqkZzggUCZh0ImgAKCRDBk9HyqkZz
+ ghweD/9YPr/zkxq2hf2kcsiCQFbqzray3eRWybFEyhYpvLPSbIUgHNU6BWyjcgWR4I8DH0dMbJl
+ spnYXkj2tNzuyzGg/NDbnqqHCyZU3+3+oWXn6nzxL7dQ+XdfDx/RuSqRT78rXLaYtt41Xn+2Pq0
+ KpIrEmHyIrOI52MBE0CcbVlDGqFSApnQ2aJ7B6+C2lg3jUR9TTXcpz+mAvoVerr4ybA2lp4CRJ2
+ l5dbt/qWx6IyM5kNDJViwEmU+Go8uu/Kz5MPC1iiXSPebM1CGfKFPBMpokmH2oKA/glLrOWXAKA
+ mUVxez/YWb95aE7nC/5DHpLV/XitSKXczByiMcQFiI3b007PZw8j/sVLyIEAD7xKG4OvrsqdywT
+ G4Ywshu9e6/clTOA+IMCde2LSyJe6B+IpKVerddM6jITJenNDXf8xhfgxU2yA/drqmbOV9caHok
+ vtTPo+5/wJ3uGYFYZf02Q9jswpt7hHDsKU8DDAv+cTEMqsjnkMnL4hmELjwX6MguHfJKwa73Bcb
+ IjpAgyxFYZa8fRvxyfwVpNbOUZohHBfXl487DiOtFcaxVZlJ3WTgmIFOJvIxLmm837DqhawOoNJ
+ m/zxLSFDHRME9I9XbE2JC6pd6tkxyTPIaQeM/6zx9rD148rb8zWdhT36X1uPn23hQWcPhVszEkM
+ xWQf0V5Dr5EnjQw==
+X-Developer-Key: i=kurt@linutronix.de; a=openpgp;
+ fpr=BCB9BFB2C8C37DD3DFDB5992C193D1F2AA467382
 
-Add sriov_configure for driver ops.
-Add mailbox handler wx_msg_task for txgbe in
-the interrupt handler.
+From: Lukas Wunner <lukas@wunner.de>
 
-Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+The removal of the igc module leads to a deadlock:
+
+|[Mon Apr  8 17:38:55 2024]  __mutex_lock.constprop.0+0x3e5/0x7a0
+|[Mon Apr  8 17:38:55 2024]  ? preempt_count_add+0x85/0xd0
+|[Mon Apr  8 17:38:55 2024]  __mutex_lock_slowpath+0x13/0x20
+|[Mon Apr  8 17:38:55 2024]  mutex_lock+0x3b/0x50
+|[Mon Apr  8 17:38:55 2024]  rtnl_lock+0x19/0x20
+|[Mon Apr  8 17:38:55 2024]  unregister_netdevice_notifier+0x2a/0xc0
+|[Mon Apr  8 17:38:55 2024]  netdev_trig_deactivate+0x25/0x70
+|[Mon Apr  8 17:38:55 2024]  led_trigger_set+0xe2/0x2d0
+|[Mon Apr  8 17:38:55 2024]  led_classdev_unregister+0x4f/0x100
+|[Mon Apr  8 17:38:55 2024]  devm_led_classdev_release+0x15/0x20
+|[Mon Apr  8 17:38:55 2024]  release_nodes+0x47/0xc0
+|[Mon Apr  8 17:38:55 2024]  devres_release_all+0x9f/0xe0
+|[Mon Apr  8 17:38:55 2024]  device_del+0x272/0x3c0
+|[Mon Apr  8 17:38:55 2024]  netdev_unregister_kobject+0x8c/0xa0
+|[Mon Apr  8 17:38:55 2024]  unregister_netdevice_many_notify+0x530/0x7c0
+|[Mon Apr  8 17:38:55 2024]  unregister_netdevice_queue+0xad/0xf0
+|[Mon Apr  8 17:38:55 2024]  unregister_netdev+0x21/0x30
+|[Mon Apr  8 17:38:55 2024]  igc_remove+0xfb/0x1f0 [igc]
+|[Mon Apr  8 17:38:55 2024]  pci_device_remove+0x42/0xb0
+|[Mon Apr  8 17:38:55 2024]  device_remove+0x43/0x70
+
+unregister_netdev() acquires the RNTL lock and releases the LEDs bound
+to that netdevice. However, netdev_trig_deactivate() and later
+unregister_netdevice_notifier() try to acquire the RTNL lock again.
+
+Avoid this situation by not using the device-managed LED class
+functions.
+
+Link: https://lore.kernel.org/r/CAEhC_B=ksywxCG_+aQqXUrGEgKq+4mqnSV8EBHOKbC3-Obj9+Q@mail.gmail.com/
+Link: https://lore.kernel.org/r/ZhRD3cOtz5i-61PB@mail-itl/
+Reported-by: Roman Lozko <lozko.roma@gmail.com>
+Reported-by: "Marek Marczykowski-Górecki" <marmarek@invisiblethingslab.com>
+Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
+Signed-off-by: Lukas Wunner <lukas@wunner.de>
+[Kurt: Wrote commit message and tested on i225]
+Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
 ---
- drivers/net/ethernet/wangxun/libwx/wx_sriov.c | 47 +++++++++++++++++++
- drivers/net/ethernet/wangxun/libwx/wx_sriov.h |  1 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  1 +
- .../net/ethernet/wangxun/txgbe/txgbe_irq.c    | 25 ++++++++--
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 24 ++++++++++
- .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |  8 ++++
- .../net/ethernet/wangxun/txgbe/txgbe_type.h   |  4 +-
- 7 files changed, 106 insertions(+), 4 deletions(-)
+Changes in v2:
+- Add Lukas' SoB (Lukas)
+- Add Reported-by (Lukas)
+- Add links to discussions
+- Take care of error path (Lukas)
+- Remove forward declaration (Lukas)
+- Link to v1: https://lore.kernel.org/r/20240411-igc_led_deadlock-v1-1-0da98a3c68c5@linutronix.de
+---
+ drivers/net/ethernet/intel/igc/igc.h      |  2 ++
+ drivers/net/ethernet/intel/igc/igc_leds.c | 38 ++++++++++++++++++++++++-------
+ drivers/net/ethernet/intel/igc/igc_main.c |  3 +++
+ 3 files changed, 35 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-index f7a9e081a47f..51e5e4affec1 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.c
-@@ -1003,3 +1003,50 @@ void wx_ping_all_vfs_with_link_status(struct wx *wx, bool link_up)
- 		wx_write_mbx_pf(wx, msgbuf, 2, i);
+diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+index 90316dc58630..6bc56c7c181e 100644
+--- a/drivers/net/ethernet/intel/igc/igc.h
++++ b/drivers/net/ethernet/intel/igc/igc.h
+@@ -298,6 +298,7 @@ struct igc_adapter {
+ 
+ 	/* LEDs */
+ 	struct mutex led_mutex;
++	struct igc_led_classdev *leds;
+ };
+ 
+ void igc_up(struct igc_adapter *adapter);
+@@ -723,6 +724,7 @@ void igc_ptp_read(struct igc_adapter *adapter, struct timespec64 *ts);
+ void igc_ptp_tx_tstamp_event(struct igc_adapter *adapter);
+ 
+ int igc_led_setup(struct igc_adapter *adapter);
++void igc_led_free(struct igc_adapter *adapter);
+ 
+ #define igc_rx_pg_size(_ring) (PAGE_SIZE << igc_rx_pg_order(_ring))
+ 
+diff --git a/drivers/net/ethernet/intel/igc/igc_leds.c b/drivers/net/ethernet/intel/igc/igc_leds.c
+index bf240c5daf86..3929b25b6ae6 100644
+--- a/drivers/net/ethernet/intel/igc/igc_leds.c
++++ b/drivers/net/ethernet/intel/igc/igc_leds.c
+@@ -236,8 +236,8 @@ static void igc_led_get_name(struct igc_adapter *adapter, int index, char *buf,
+ 		 pci_dev_id(adapter->pdev), index);
  }
- EXPORT_SYMBOL(wx_ping_all_vfs_with_link_status);
-+
-+/**
-+ * wx_set_vf_link_state - Set link state
-+ * @wx: Pointer to adapter struct
-+ * @vf: VF identifier
-+ * @state: required link state
-+ *
-+ * Set a link force state on/off a single vf
-+ **/
-+static void wx_set_vf_link_state(struct wx *wx, int vf, int state)
-+{
-+	wx->vfinfo[vf].link_state = state;
-+	switch (state) {
-+	case IFLA_VF_LINK_STATE_AUTO:
-+		if (netif_running(wx->netdev))
-+			wx->vfinfo[vf].link_enable = true;
-+		else
-+			wx->vfinfo[vf].link_enable = false;
-+		break;
-+	case IFLA_VF_LINK_STATE_ENABLE:
-+		wx->vfinfo[vf].link_enable = true;
-+		break;
-+	case IFLA_VF_LINK_STATE_DISABLE:
-+		wx->vfinfo[vf].link_enable = false;
-+		break;
+ 
+-static void igc_setup_ldev(struct igc_led_classdev *ldev,
+-			   struct net_device *netdev, int index)
++static int igc_setup_ldev(struct igc_led_classdev *ldev,
++			  struct net_device *netdev, int index)
+ {
+ 	struct igc_adapter *adapter = netdev_priv(netdev);
+ 	struct led_classdev *led_cdev = &ldev->led;
+@@ -257,24 +257,46 @@ static void igc_setup_ldev(struct igc_led_classdev *ldev,
+ 	led_cdev->hw_control_get = igc_led_hw_control_get;
+ 	led_cdev->hw_control_get_device = igc_led_hw_control_get_device;
+ 
+-	devm_led_classdev_register(&netdev->dev, led_cdev);
++	return led_classdev_register(&netdev->dev, led_cdev);
+ }
+ 
+ int igc_led_setup(struct igc_adapter *adapter)
+ {
+ 	struct net_device *netdev = adapter->netdev;
+-	struct device *dev = &netdev->dev;
+ 	struct igc_led_classdev *leds;
+-	int i;
++	int i, err;
+ 
+ 	mutex_init(&adapter->led_mutex);
+ 
+-	leds = devm_kcalloc(dev, IGC_NUM_LEDS, sizeof(*leds), GFP_KERNEL);
++	leds = kcalloc(IGC_NUM_LEDS, sizeof(*leds), GFP_KERNEL);
+ 	if (!leds)
+ 		return -ENOMEM;
+ 
+-	for (i = 0; i < IGC_NUM_LEDS; i++)
+-		igc_setup_ldev(leds + i, netdev, i);
++	for (i = 0; i < IGC_NUM_LEDS; i++) {
++		err = igc_setup_ldev(leds + i, netdev, i);
++		if (err)
++			goto err;
 +	}
-+	/* restart the VF */
-+	wx->vfinfo[vf].clear_to_send = false;
-+	wx_ping_vf(wx, vf);
 +
-+	wx_set_vf_rx_tx(wx, vf);
++	adapter->leds = leds;
+ 
+ 	return 0;
++
++err:
++	for (i--; i >= 0; i--)
++		led_classdev_unregister(&((leds + i)->led));
++
++	kfree(leds);
++	return err;
 +}
 +
-+/**
-+ * wx_set_all_vfs - update vfs queues
-+ * @wx: Pointer to wx struct
-+ *
-+ * Update setting transmit and receive queues for all vfs
-+ **/
-+void wx_set_all_vfs(struct wx *wx)
++void igc_led_free(struct igc_adapter *adapter)
 +{
++	struct igc_led_classdev *leds = adapter->leds;
 +	int i;
 +
-+	for (i = 0 ; i < wx->num_vfs; i++)
-+		wx_set_vf_link_state(wx, i, wx->vfinfo[i].link_state);
-+}
-+EXPORT_SYMBOL(wx_set_all_vfs);
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_sriov.h b/drivers/net/ethernet/wangxun/libwx/wx_sriov.h
-index 7e45b3f71a7b..122d9c561ff5 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_sriov.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_sriov.h
-@@ -9,5 +9,6 @@ int wx_pci_sriov_configure(struct pci_dev *pdev, int num_vfs);
- void wx_msg_task(struct wx *wx);
- void wx_disable_vf_rx_tx(struct wx *wx);
- void wx_ping_all_vfs_with_link_status(struct wx *wx, bool link_up);
-+void wx_set_all_vfs(struct wx *wx);
- 
- #endif /* _WX_SRIOV_H_ */
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-index 2f4dc535d720..31c5e0a86a28 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
-@@ -1048,6 +1048,7 @@ struct vf_data_storage {
- 	u16 vf_mc_hashes[WX_MAX_VF_MC_ENTRIES];
- 	u16 num_vf_mc_hashes;
- 	u16 vlan_count;
-+	int link_state;
- };
- 
- struct vf_macvlans {
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-index b3e3605d1edb..e6be98865c2d 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_irq.c
-@@ -7,6 +7,7 @@
- #include "../libwx/wx_type.h"
- #include "../libwx/wx_lib.h"
- #include "../libwx/wx_hw.h"
-+#include "../libwx/wx_sriov.h"
- #include "txgbe_type.h"
- #include "txgbe_phy.h"
- #include "txgbe_irq.h"
-@@ -176,6 +177,24 @@ static const struct irq_domain_ops txgbe_misc_irq_domain_ops = {
- 	.map = txgbe_misc_irq_domain_map,
- };
- 
-+static irqreturn_t txgbe_irq_handler(int irq, void *data)
-+{
-+	struct txgbe *txgbe = data;
-+	struct wx *wx = txgbe->wx;
-+	u32 eicr;
++	for (i = 0; i < IGC_NUM_LEDS; i++)
++		led_classdev_unregister(&((leds + i)->led));
 +
-+	eicr = wx_misc_isb(wx, WX_ISB_MISC) & TXGBE_PX_MISC_IEN_MASK;
-+	if (!eicr)
-+		return IRQ_NONE;
-+	txgbe->eicr = eicr;
-+	if (eicr & TXGBE_PX_MISC_IC_VF_MBOX) {
-+		wx_msg_task(txgbe->wx);
-+		wx_intr_enable(wx, TXGBE_INTR_MISC);
-+	}
-+
-+	return IRQ_WAKE_THREAD;
-+}
-+
- static irqreturn_t txgbe_misc_irq_handle(int irq, void *data)
- {
- 	struct txgbe *txgbe = data;
-@@ -184,7 +203,7 @@ static irqreturn_t txgbe_misc_irq_handle(int irq, void *data)
- 	unsigned int sub_irq;
- 	u32 eicr;
- 
--	eicr = wx_misc_isb(wx, WX_ISB_MISC);
-+	eicr = txgbe->eicr;
- 	if (eicr & TXGBE_PX_MISC_GPIO) {
- 		sub_irq = irq_find_mapping(txgbe->misc.domain, TXGBE_IRQ_GPIO);
- 		handle_nested_irq(sub_irq);
-@@ -226,7 +245,7 @@ int txgbe_setup_misc_irq(struct txgbe *txgbe)
- 	struct wx *wx = txgbe->wx;
- 	int hwirq, err;
- 
--	txgbe->misc.nirqs = 2;
-+	txgbe->misc.nirqs = TXGBE_IRQ_MAX;
- 	txgbe->misc.domain = irq_domain_add_simple(NULL, txgbe->misc.nirqs, 0,
- 						   &txgbe_misc_irq_domain_ops, txgbe);
- 	if (!txgbe->misc.domain)
-@@ -241,7 +260,7 @@ int txgbe_setup_misc_irq(struct txgbe *txgbe)
- 	else
- 		txgbe->misc.irq = wx->pdev->irq;
- 
--	err = request_threaded_irq(txgbe->misc.irq, NULL,
-+	err = request_threaded_irq(txgbe->misc.irq, txgbe_irq_handler,
- 				   txgbe_misc_irq_handle,
- 				   IRQF_ONESHOT,
- 				   wx->netdev->name, txgbe);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index bd4624d14ca0..022f3622f92b 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -14,6 +14,8 @@
- #include "../libwx/wx_type.h"
- #include "../libwx/wx_lib.h"
- #include "../libwx/wx_hw.h"
-+#include "../libwx/wx_mbx.h"
-+#include "../libwx/wx_sriov.h"
- #include "txgbe_type.h"
- #include "txgbe_hw.h"
- #include "txgbe_phy.h"
-@@ -99,6 +101,12 @@ static void txgbe_up_complete(struct wx *wx)
- 
- 	/* enable transmits */
- 	netif_tx_start_all_queues(netdev);
-+
-+	/* Set PF Reset Done bit so PF/VF Mail Ops can work */
-+	wr32m(wx, WX_CFG_PORT_CTL, WX_CFG_PORT_CTL_PFRSTD,
-+	      WX_CFG_PORT_CTL_PFRSTD);
-+	/* update setting rx tx for all active vfs */
-+	wx_set_all_vfs(wx);
++	kfree(leds);
  }
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 35ad40a803cb..4d975d620a8e 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -7021,6 +7021,9 @@ static void igc_remove(struct pci_dev *pdev)
+ 	cancel_work_sync(&adapter->watchdog_task);
+ 	hrtimer_cancel(&adapter->hrtimer);
  
- static void txgbe_reset(struct wx *wx)
-@@ -144,6 +152,16 @@ static void txgbe_disable_device(struct wx *wx)
- 		wx_err(wx, "%s: invalid bus lan id %d\n",
- 		       __func__, wx->bus.func);
- 
-+	if (wx->num_vfs) {
-+		/* Clear EITR Select mapping */
-+		wr32(wx, WX_PX_ITRSEL, 0);
-+		/* Mark all the VFs as inactive */
-+		for (i = 0 ; i < wx->num_vfs; i++)
-+			wx->vfinfo[i].clear_to_send = 0;
-+		/* update setting rx tx for all active vfs */
-+		wx_set_all_vfs(wx);
-+	}
++	if (IS_ENABLED(CONFIG_IGC_LEDS))
++		igc_led_free(adapter);
 +
- 	if (!(((wx->subsystem_device_id & WX_NCSI_MASK) == WX_NCSI_SUP) ||
- 	      ((wx->subsystem_device_id & WX_WOL_MASK) == WX_WOL_SUP))) {
- 		/* disable mac transmiter */
-@@ -269,6 +287,10 @@ static int txgbe_sw_init(struct wx *wx)
- 	wx->tx_work_limit = TXGBE_DEFAULT_TX_WORK;
- 	wx->rx_work_limit = TXGBE_DEFAULT_RX_WORK;
- 
-+	wx->mbx.size = WX_VXMAILBOX_SIZE;
-+	wx->setup_tc = txgbe_setup_tc;
-+	set_bit(0, &wx->fwd_bitmask);
-+
- 	return 0;
- }
- 
-@@ -694,6 +716,7 @@ static void txgbe_remove(struct pci_dev *pdev)
- 	struct net_device *netdev;
- 
- 	netdev = wx->netdev;
-+	wx_disable_sriov(wx);
- 	unregister_netdev(netdev);
- 
- 	txgbe_remove_phy(txgbe);
-@@ -715,6 +738,7 @@ static struct pci_driver txgbe_driver = {
- 	.probe    = txgbe_probe,
- 	.remove   = txgbe_remove,
- 	.shutdown = txgbe_shutdown,
-+	.sriov_configure = wx_pci_sriov_configure,
- };
- 
- module_pci_driver(txgbe_driver);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-index 93295916b1d2..22402a6d2f50 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-@@ -16,6 +16,7 @@
- #include "../libwx/wx_type.h"
- #include "../libwx/wx_lib.h"
- #include "../libwx/wx_hw.h"
-+#include "../libwx/wx_sriov.h"
- #include "txgbe_type.h"
- #include "txgbe_phy.h"
- #include "txgbe_hw.h"
-@@ -179,6 +180,9 @@ static void txgbe_mac_link_down(struct phylink_config *config,
- 	struct wx *wx = phylink_to_wx(config);
- 
- 	wr32m(wx, WX_MAC_TX_CFG, WX_MAC_TX_CFG_TE, 0);
-+	wx->speed = 0;
-+	/* ping all the active vfs to let them know we are going down */
-+	wx_ping_all_vfs_with_link_status(wx, false);
- }
- 
- static void txgbe_mac_link_up(struct phylink_config *config,
-@@ -215,6 +219,10 @@ static void txgbe_mac_link_up(struct phylink_config *config,
- 	wr32(wx, WX_MAC_PKT_FLT, WX_MAC_PKT_FLT_PR);
- 	wdg = rd32(wx, WX_MAC_WDG_TIMEOUT);
- 	wr32(wx, WX_MAC_WDG_TIMEOUT, wdg);
-+
-+	wx->speed = speed;
-+	/* ping all the active vfs to let them know we are going up */
-+	wx_ping_all_vfs_with_link_status(wx, true);
- }
- 
- static int txgbe_mac_prepare(struct phylink_config *config, unsigned int mode,
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-index 1b4ff50d5857..28717788c348 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_type.h
-@@ -71,12 +71,13 @@
- #define TXGBE_PX_MISC_ETH_LK                    BIT(18)
- #define TXGBE_PX_MISC_ETH_AN                    BIT(19)
- #define TXGBE_PX_MISC_INT_ERR                   BIT(20)
-+#define TXGBE_PX_MISC_IC_VF_MBOX                BIT(23)
- #define TXGBE_PX_MISC_GPIO                      BIT(26)
- #define TXGBE_PX_MISC_IEN_MASK                            \
- 	(TXGBE_PX_MISC_ETH_LKDN | TXGBE_PX_MISC_DEV_RST | \
- 	 TXGBE_PX_MISC_ETH_EVENT | TXGBE_PX_MISC_ETH_LK | \
- 	 TXGBE_PX_MISC_ETH_AN | TXGBE_PX_MISC_INT_ERR |   \
--	 TXGBE_PX_MISC_GPIO)
-+	 TXGBE_PX_MISC_IC_VF_MBOX | TXGBE_PX_MISC_GPIO)
- 
- /* Port cfg registers */
- #define TXGBE_CFG_PORT_ST                       0x14404
-@@ -195,6 +196,7 @@ struct txgbe {
- 	struct gpio_chip *gpio;
- 	unsigned int gpio_irq;
- 	unsigned int link_irq;
-+	u32 eicr;
- };
- 
- #endif /* _TXGBE_TYPE_H_ */
+ 	/* Release control of h/w to f/w.  If f/w is AMT enabled, this
+ 	 * would have already happened in close and is redundant.
+ 	 */
+
+---
+base-commit: 7efd0a74039fb6b584be2cb91c1d0ef0bd796ee1
+change-id: 20240411-igc_led_deadlock-7abd85954f5e
+
+Best regards,
 -- 
-2.43.2
+Kurt Kanzenbach <kurt@linutronix.de>
 
 
