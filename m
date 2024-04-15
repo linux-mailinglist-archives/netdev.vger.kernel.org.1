@@ -1,196 +1,205 @@
-Return-Path: <netdev+bounces-87784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-87787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3A8E8A4A1B
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 10:15:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A794B8A4A5B
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 10:29:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17364B23114
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 08:15:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C93928166B
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 08:29:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC652E852;
-	Mon, 15 Apr 2024 08:14:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9F3637142;
+	Mon, 15 Apr 2024 08:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BD3tzoNv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70CBD2E83C
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 08:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40353715E
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 08:29:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713168864; cv=none; b=Qpuw+59lAKprHXZeMP6PgQXUSsDm08xqstrg9LMzrLN2wgVGeTYRs9js5jyT2FXr9ycTNRBBd/MNcWTQaOnTShylnDysdx0/ZJgEwwdUfTVi8iNRME6D/ovcRgcfiHln7hBu9CCJILgJIP9x52ENXM3A0iJOrYmjfVdIc+lZ1es=
+	t=1713169770; cv=none; b=Gd7WtjOdPwZ2bgX0NuOTg1sVWu0YaAAWPLtExRTLOLxtyOqEf3/g7rcyEPB2i4UsyXk8RFbQKuYD0BZ9GX2jBgHwerMNc2EU0c9rMsYJnKokIrDKwNfyE1vKyYHKDv0/xFhkD0LBc7d4G8MjuTmW1O7frVMuD+DL4lakXdK9Q0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713168864; c=relaxed/simple;
-	bh=EXu1YamII0jBrmX1jolH50irNc885vfZZELz9VpEyBY=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=B2dNKmjKIH1SkbqN5pmmG00VdCTswdhg5cB68H3OMzXdg+MlL/kxZpWgZ28MtdQ906FDa7gqjC51rCpwqSE1dpzE/rCPd9jJbdac5eCG+jksekWyLSFU4xM5c/cHfVhgPOtsPpLw8DhQF2inf8lXXBvp+HA8iKXce28DdrN6SLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-36a14031548so30924205ab.2
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 01:14:23 -0700 (PDT)
+	s=arc-20240116; t=1713169770; c=relaxed/simple;
+	bh=g11QqmbkDPrU2HyfPuX2M8pembz+Hi35FyACwPLnOIU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qY0VWisgDX5X/N+6OftNq3BFU59ApmCGK1OI/dyOLILyfuYYUwb9nvs0PLPdMXQC4IqdVy1OfQ7tUwKy8mtcT6QO1Tmp3nZDO5UcN00mii3TvQ5juLxKK/NwZ49GvPQ9ozUprbnioMzoCw2iLuBt/fsjVMtA/OAUz8LyceZhor0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BD3tzoNv; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713169767;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P+tf9SnOnHLqT5q4tQiv3UN0FjYFcbXUVL6l2rl/L1I=;
+	b=BD3tzoNvd295fcZLGPFPbvxQUCala3L1emE8H0UvfbilSEvD+CvD7PReWUqt62z6/menG7
+	VCp9dhS+c0ra4yoPvAvC1+OpQjYUsRNi9AhHa2HSq2i1wtPhGykz50rW1ZkQl3mW7On21a
+	BOc8sq7W+fYYG0zgxyuZKZNRFdssCws=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-454-iF06_n8IPXuPw6nZnY9Z7g-1; Mon, 15 Apr 2024 04:28:56 -0400
+X-MC-Unique: iF06_n8IPXuPw6nZnY9Z7g-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2d883dab079so27467411fa.3
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 01:28:55 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713168862; x=1713773662;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=unBRzWypSrJQ8YW71ur/h2ey7MzVUScJD83UCwpFu3U=;
-        b=JipYW/7Nc9sI3iG0xVC2Y7Cd7+eUpQ9Yojvt/qQOHXr9bP9f6lhelBfXwyigWk1o5W
-         330qh8S9RLY5enUYBEMDC7yDdPI1WeMfNutPuT5n3Uc7QPXpf3xCI61n9TWEyzXWdSuf
-         4GMg/+KHeJN7LNAyUqIGrMbIykNVMdPRQCTYwcsMrVrJmM++kyT8FXfVeL2ZYI0L3Lc2
-         ltnqeSMfwzS/iP05CHypt1WApfck3/XW7hDqcYQw7ipDud/1VUMYgCgJo/p5EaIL5Kni
-         +aOKv4m79aW9PQ605Mp2tir7j/j82DwV000LKQWHYDK7NZw3NYOZWDiUNTpgg2z48lpM
-         t+9w==
-X-Forwarded-Encrypted: i=1; AJvYcCUQvMyivNdhG7koRaf8E4VNAuLg7LPe3gz1Dr20qwGmvP6Jz8hehKoYN9/Mh/fW9zI3/mSm7ThmkAwXJYRFho6qGpU3xUXw
-X-Gm-Message-State: AOJu0YwcvUE/zlXsdQPGBIjF18hPBxEAu50AdeOoWKITu/kpNKTGz1jE
-	GfvEC2n5Oc/APA3NJfQbK61OEa7TRm9m1/7hWo+215TZn1PU/HlfVrBnzW+JJohrVF2N+xuu2lx
-	5zm4LhVXtnTQu9D8+1lEFT0VITm/BwH1QSHEVj12PSvr53xn43ledvFM=
-X-Google-Smtp-Source: AGHT+IEt3SFuLEiRKDlVYQ8lLq+THHzy+aJwZ3u9HCjYjg3DmzNFxh+OUklfjwvf4wh66nqlMGaGqBhqRJ4fnfghxa4APKwLygcH
+        d=1e100.net; s=20230601; t=1713169734; x=1713774534;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P+tf9SnOnHLqT5q4tQiv3UN0FjYFcbXUVL6l2rl/L1I=;
+        b=Bl1GGgFqnRORnh+EHNsBw1U+fyav2GIoxjBWP0PLzVxxQj1khyhbZZ/oz4pbQLgg3/
+         /EJAF3/pBFAfZIi/f7pTioLQqkSHc1xUl+l+zS0+P0pWQ8lrGbXihfGW2K3se5kPDPMI
+         YtN3ytYDcEiHcQn9EI3SArA9WHelWWVHy26D2eldc0iYFvucAjZng49LvfiYlopva7lo
+         LOguv2BBukhv+Y5rJKEfXPX+4/XMmwRgFdyuQZ2MeikIwHPMXG1SWz0wz5KB89syBdMP
+         G+xJgD7tG7krQMxLbe9H94VFFseWAYuf4XvpaQYeCvvCuS5EK/qVChM+pzeogXuD9xUA
+         0QWA==
+X-Forwarded-Encrypted: i=1; AJvYcCUEToioZp7NJDrTEMyNJq7ZVRqDPJth3VSrqXHbGWeOxJzhjnRgHgnaPr3ZbOI2uJYPlc/PdqnWrepEFy4kRXtEMaCcmsdu
+X-Gm-Message-State: AOJu0YyFMlSH1pIlqEi7ccv7gGp3QzJVhNQhWLB0XNv8QRFz5sY0xLMF
+	m/qoNe5tJrBglSw+jmCxBahQrASq9zH3ukWBfw3c5V5G/J9jmRp8mPTNs/j1M/T2XRjj1uDxaLS
+	UWfvwNkP2C5TnRBQkfIGE1R2VsOts81tnRS4+dqsaMj+0Uw0Nlf2eUg==
+X-Received: by 2002:a2e:3815:0:b0:2da:5f41:10c8 with SMTP id f21-20020a2e3815000000b002da5f4110c8mr2451686lja.3.1713169734451;
+        Mon, 15 Apr 2024 01:28:54 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHnaWhO8kV0NnEt1Tu69gzDj2un/ADxh/1SZoIktVoFWj49rCxo2t6ZtkoKKWd6uKza2mxtGw==
+X-Received: by 2002:a2e:3815:0:b0:2da:5f41:10c8 with SMTP id f21-20020a2e3815000000b002da5f4110c8mr2451674lja.3.1713169733820;
+        Mon, 15 Apr 2024 01:28:53 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:172:a95b:a91:79d:72cd:ca48])
+        by smtp.gmail.com with ESMTPSA id gw7-20020a05600c850700b004146e58cc35sm18790311wmb.46.2024.04.15.01.28.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 01:28:53 -0700 (PDT)
+Date: Mon, 15 Apr 2024 04:28:47 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Lei Chen <lei.chen@smartx.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Willem de Bruijn <willemb@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v5] tun: limit printing rate when illegal packet
+ received by tun dev
+Message-ID: <20240415042840-mutt-send-email-mst@kernel.org>
+References: <20240415020247.2207781-1-lei.chen@smartx.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d8c:b0:368:c21e:3898 with SMTP id
- h12-20020a056e021d8c00b00368c21e3898mr581433ila.3.1713168862732; Mon, 15 Apr
- 2024 01:14:22 -0700 (PDT)
-Date: Mon, 15 Apr 2024 01:14:22 -0700
-In-Reply-To: <000000000000f94ee2061458a2e0@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000080f98606161e35c8@google.com>
-Subject: Re: [syzbot] [usb?] WARNING: ODEBUG bug in netdev_freemem (3)
-From: syzbot <syzbot+83845bb93916bb30c048@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	netdev@vger.kernel.org, oneukum@suse.com, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240415020247.2207781-1-lei.chen@smartx.com>
 
-syzbot has found a reproducer for the following issue on:
+On Sun, Apr 14, 2024 at 10:02:46PM -0400, Lei Chen wrote:
+> vhost_worker will call tun call backs to receive packets. If too many
+> illegal packets arrives, tun_do_read will keep dumping packet contents.
+> When console is enabled, it will costs much more cpu time to dump
+> packet and soft lockup will be detected.
+> 
+> net_ratelimit mechanism can be used to limit the dumping rate.
+> 
+> PID: 33036    TASK: ffff949da6f20000  CPU: 23   COMMAND: "vhost-32980"
+>  #0 [fffffe00003fce50] crash_nmi_callback at ffffffff89249253
+>  #1 [fffffe00003fce58] nmi_handle at ffffffff89225fa3
+>  #2 [fffffe00003fceb0] default_do_nmi at ffffffff8922642e
+>  #3 [fffffe00003fced0] do_nmi at ffffffff8922660d
+>  #4 [fffffe00003fcef0] end_repeat_nmi at ffffffff89c01663
+>     [exception RIP: io_serial_in+20]
+>     RIP: ffffffff89792594  RSP: ffffa655314979e8  RFLAGS: 00000002
+>     RAX: ffffffff89792500  RBX: ffffffff8af428a0  RCX: 0000000000000000
+>     RDX: 00000000000003fd  RSI: 0000000000000005  RDI: ffffffff8af428a0
+>     RBP: 0000000000002710   R8: 0000000000000004   R9: 000000000000000f
+>     R10: 0000000000000000  R11: ffffffff8acbf64f  R12: 0000000000000020
+>     R13: ffffffff8acbf698  R14: 0000000000000058  R15: 0000000000000000
+>     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+>  #5 [ffffa655314979e8] io_serial_in at ffffffff89792594
+>  #6 [ffffa655314979e8] wait_for_xmitr at ffffffff89793470
+>  #7 [ffffa65531497a08] serial8250_console_putchar at ffffffff897934f6
+>  #8 [ffffa65531497a20] uart_console_write at ffffffff8978b605
+>  #9 [ffffa65531497a48] serial8250_console_write at ffffffff89796558
+>  #10 [ffffa65531497ac8] console_unlock at ffffffff89316124
+>  #11 [ffffa65531497b10] vprintk_emit at ffffffff89317c07
+>  #12 [ffffa65531497b68] printk at ffffffff89318306
+>  #13 [ffffa65531497bc8] print_hex_dump at ffffffff89650765
+>  #14 [ffffa65531497ca8] tun_do_read at ffffffffc0b06c27 [tun]
+>  #15 [ffffa65531497d38] tun_recvmsg at ffffffffc0b06e34 [tun]
+>  #16 [ffffa65531497d68] handle_rx at ffffffffc0c5d682 [vhost_net]
+>  #17 [ffffa65531497ed0] vhost_worker at ffffffffc0c644dc [vhost]
+>  #18 [ffffa65531497f10] kthread at ffffffff892d2e72
+>  #19 [ffffa65531497f50] ret_from_fork at ffffffff89c0022f
+> 
+> Fixes: ef3db4a59542 ("tun: avoid BUG, dump packet on GSO errors")
+> Signed-off-by: Lei Chen <lei.chen@smartx.com>
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> Acked-by: Jason Wang <jasowang@redhat.com>
 
-HEAD commit:    72374d71c315 Merge tag 'pull-sysfs-annotation-fix' of git:..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1391f7cb180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=2881987c7d7b722d
-dashboard link: https://syzkaller.appspot.com/bug?extid=83845bb93916bb30c048
-compiler:       arm-linux-gnueabi-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=147d8f6d180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14fb0bf3180000
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/8ead8862021c/non_bootable_disk-72374d71.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/664d9f3a4812/vmlinux-72374d71.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/767ecc5e77ad/zImage-72374d71.xz
+> ---
+> Changes from v4:
+> https://lore.kernel.org/all/20240414081806.2173098-1-lei.chen@smartx.com/
+>  1. Adjust code indentation
+> 
+> Changes from v3:
+> https://lore.kernel.org/all/20240412065841.2148691-1-lei.chen@smartx.com/
+>  1. Change patch target from net tun to tun.
+>  2. Move change log below the seperator "---".
+>  3. Remove escaped parentheses in the Fixes string.
+> 
+> Changes from v2:
+> https://lore.kernel.org/netdev/20240410042245.2044516-1-lei.chen@smartx.com/
+>  1. Add net-dev to patch subject-prefix.
+>  2. Add fix tag.
+> 
+> Changes from v1:
+> https://lore.kernel.org/all/20240409062407.1952728-1-lei.chen@smartx.com/
+>  1. Use net_ratelimit instead of raw __ratelimit.
+>  2. Use netdev_err instead of pr_err to print more info abort net dev.
+>  3. Adjust git commit message to make git am happy.
+>  drivers/net/tun.c | 18 ++++++++++--------
+>  1 file changed, 10 insertions(+), 8 deletions(-)
+> 
+>  drivers/net/tun.c | 18 ++++++++++--------
+>  1 file changed, 10 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index 0b3f21cba552..92da8c03d960 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -2125,14 +2125,16 @@ static ssize_t tun_put_user(struct tun_struct *tun,
+>  					    tun_is_little_endian(tun), true,
+>  					    vlan_hlen)) {
+>  			struct skb_shared_info *sinfo = skb_shinfo(skb);
+> -			pr_err("unexpected GSO type: "
+> -			       "0x%x, gso_size %d, hdr_len %d\n",
+> -			       sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
+> -			       tun16_to_cpu(tun, gso.hdr_len));
+> -			print_hex_dump(KERN_ERR, "tun: ",
+> -				       DUMP_PREFIX_NONE,
+> -				       16, 1, skb->head,
+> -				       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
+> +
+> +			if (net_ratelimit()) {
+> +				netdev_err(tun->dev, "unexpected GSO type: 0x%x, gso_size %d, hdr_len %d\n",
+> +					   sinfo->gso_type, tun16_to_cpu(tun, gso.gso_size),
+> +					   tun16_to_cpu(tun, gso.hdr_len));
+> +				print_hex_dump(KERN_ERR, "tun: ",
+> +					       DUMP_PREFIX_NONE,
+> +					       16, 1, skb->head,
+> +					       min((int)tun16_to_cpu(tun, gso.hdr_len), 64), true);
+> +			}
+>  			WARN_ON_ONCE(1);
+>  			return -EINVAL;
+>  		}
+> -- 
+> 2.44.0
+> 
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+83845bb93916bb30c048@syzkaller.appspotmail.com
-
-cdc_ncm 1-1:1.0 usb0: register 'cdc_ncm' at usb-dummy_hcd.0-1, CDC NCM (NO ZLP), 42:42:42:42:42:42
-usb 1-1: USB disconnect, device number 10
-cdc_ncm 1-1:1.0 usb0: unregister 'cdc_ncm' usb-dummy_hcd.0-1, CDC NCM (NO ZLP)
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 45 at lib/debugobjects.c:514 debug_print_object+0xc4/0xd8 lib/debugobjects.c:514
-ODEBUG: free active (active state 0) object: 841377ac object type: work_struct hint: usbnet_deferred_kevent+0x0/0x388 drivers/net/usb/usbnet.c:630
-Modules linked in:
-Kernel panic - not syncing: kernel: panic_on_warn set ...
-CPU: 0 PID: 45 Comm: kworker/0:2 Not tainted 6.9.0-rc3-syzkaller #0
-Hardware name: ARM-Versatile Express
-Workqueue: usb_hub_wq hub_event
-Call trace: 
-[<818a18bc>] (dump_backtrace) from [<818a19b8>] (show_stack+0x18/0x1c arch/arm/kernel/traps.c:256)
- r7:00000000 r6:82622e44 r5:00000000 r4:81fcea10
-[<818a19a0>] (show_stack) from [<818bf0e0>] (__dump_stack lib/dump_stack.c:88 [inline])
-[<818a19a0>] (show_stack) from [<818bf0e0>] (dump_stack_lvl+0x54/0x7c lib/dump_stack.c:114)
-[<818bf08c>] (dump_stack_lvl) from [<818bf120>] (dump_stack+0x18/0x1c lib/dump_stack.c:123)
- r5:00000000 r4:8285ad18
-[<818bf108>] (dump_stack) from [<818a2460>] (panic+0x120/0x358 kernel/panic.c:348)
-[<818a2340>] (panic) from [<8024390c>] (check_panic_on_warn kernel/panic.c:241 [inline])
-[<818a2340>] (panic) from [<8024390c>] (print_tainted+0x0/0xa0 kernel/panic.c:236)
- r3:8260c584 r2:00000001 r1:81fb773c r0:81fbf2e0
- r7:8080a0d0
-[<80243898>] (check_panic_on_warn) from [<80243b00>] (__warn+0x7c/0x180 kernel/panic.c:694)
-[<80243a84>] (__warn) from [<80243dec>] (warn_slowpath_fmt+0x1e8/0x1f4 kernel/panic.c:727)
- r8:00000009 r7:8201b320 r6:df919a7c r5:82fd3c00 r4:00000000
-[<80243c08>] (warn_slowpath_fmt) from [<8080a0d0>] (debug_print_object+0xc4/0xd8 lib/debugobjects.c:514)
- r10:00000005 r9:84137000 r8:81a02b44 r7:82043274 r6:828be454 r5:df919b24
- r4:8260ce18
-[<8080a00c>] (debug_print_object) from [<8080b968>] (__debug_check_no_obj_freed lib/debugobjects.c:989 [inline])
-[<8080a00c>] (debug_print_object) from [<8080b968>] (debug_check_no_obj_freed+0x254/0x2a0 lib/debugobjects.c:1019)
- r8:84137800 r7:841377ac r6:00000100 r5:00000003 r4:00000000
-[<8080b714>] (debug_check_no_obj_freed) from [<804b2820>] (slab_free_hook mm/slub.c:2078 [inline])
-[<8080b714>] (debug_check_no_obj_freed) from [<804b2820>] (slab_free mm/slub.c:4280 [inline])
-[<8080b714>] (debug_check_no_obj_freed) from [<804b2820>] (kfree+0x1a0/0x334 mm/slub.c:4390)
- r10:82775a28 r9:84534880 r8:84137000 r7:8045a920 r6:82c023c0 r5:dde8bac0
- r4:84137000
-[<804b2680>] (kfree) from [<8045a920>] (kvfree+0x2c/0x30 mm/util.c:680)
- r10:82775a28 r9:84534880 r8:84137000 r7:00000000 r6:844b9480 r5:84652200
- r4:84137000
-[<8045a8f4>] (kvfree) from [<813dbb0c>] (netdev_freemem+0x1c/0x20 net/core/dev.c:10797)
- r5:84652200 r4:84137000
-[<813dbaf0>] (netdev_freemem) from [<81416b74>] (netdev_release+0x2c/0x34 net/core/net-sysfs.c:2031)
-[<81416b48>] (netdev_release) from [<80a404e0>] (device_release+0x38/0xa8 drivers/base/core.c:2580)
- r5:84652200 r4:841373b8
-[<80a404a8>] (device_release) from [<8187b820>] (kobject_cleanup lib/kobject.c:689 [inline])
-[<80a404a8>] (device_release) from [<8187b820>] (kobject_release lib/kobject.c:720 [inline])
-[<80a404a8>] (device_release) from [<8187b820>] (kref_put include/linux/kref.h:65 [inline])
-[<80a404a8>] (device_release) from [<8187b820>] (kobject_put+0xc8/0x1f8 lib/kobject.c:737)
- r5:81b489c4 r4:841373b8
-[<8187b758>] (kobject_put) from [<80a40768>] (put_device+0x18/0x1c drivers/base/core.c:3828)
- r7:84536800 r6:8413710c r5:84137000 r4:00000000
-[<80a40750>] (put_device) from [<813cce58>] (free_netdev+0x108/0x188 net/core/dev.c:10993)
-[<813ccd50>] (free_netdev) from [<80d10be0>] (usbnet_disconnect+0xac/0xf0 drivers/net/usb/usbnet.c:1636)
- r6:84137774 r5:84137660 r4:00000000
-[<80d10b34>] (usbnet_disconnect) from [<80d6bcc4>] (usb_unbind_interface+0x84/0x2c4 drivers/usb/core/driver.c:461)
- r8:00000044 r7:84536830 r6:82775a28 r5:00000000 r4:84536800
-[<80d6bc40>] (usb_unbind_interface) from [<80a485bc>] (device_remove drivers/base/dd.c:568 [inline])
-[<80d6bc40>] (usb_unbind_interface) from [<80a485bc>] (device_remove+0x64/0x6c drivers/base/dd.c:560)
- r10:84534880 r9:828eed04 r8:00000044 r7:84536874 r6:82775a28 r5:00000000
- r4:84536830
-[<80a48558>] (device_remove) from [<80a49ad4>] (__device_release_driver drivers/base/dd.c:1270 [inline])
-[<80a48558>] (device_remove) from [<80a49ad4>] (device_release_driver_internal+0x18c/0x200 drivers/base/dd.c:1293)
- r5:00000000 r4:84536830
-[<80a49948>] (device_release_driver_internal) from [<80a49b60>] (device_release_driver+0x18/0x1c drivers/base/dd.c:1316)
- r9:828eed04 r8:82f51a40 r7:82f51a38 r6:82f51a0c r5:84536830 r4:82f51a30
-[<80a49b48>] (device_release_driver) from [<80a47c60>] (bus_remove_device+0xcc/0x120 drivers/base/bus.c:574)
-[<80a47b94>] (bus_remove_device) from [<80a41ce4>] (device_del+0x15c/0x3bc drivers/base/core.c:3909)
- r9:828eed04 r8:84536800 r7:82fd3c00 r6:843cc208 r5:04208060 r4:84536830
-[<80a41b88>] (device_del) from [<80d69720>] (usb_disable_device+0xdc/0x1f0 drivers/usb/core/message.c:1418)
- r10:00000000 r9:00000000 r8:84536800 r7:84534800 r6:843cc208 r5:00000001
- r4:00000038
-[<80d69644>] (usb_disable_device) from [<80d5e58c>] (usb_disconnect+0xec/0x29c drivers/usb/core/hub.c:2305)
- r10:00000001 r9:8464e800 r8:845348c4 r7:83e1a400 r6:84534880 r5:84534800
- r4:60000013
-[<80d5e4a0>] (usb_disconnect) from [<80d6113c>] (hub_port_connect drivers/usb/core/hub.c:5361 [inline])
-[<80d5e4a0>] (usb_disconnect) from [<80d6113c>] (hub_port_connect_change drivers/usb/core/hub.c:5661 [inline])
-[<80d5e4a0>] (usb_disconnect) from [<80d6113c>] (port_event drivers/usb/core/hub.c:5821 [inline])
-[<80d5e4a0>] (usb_disconnect) from [<80d6113c>] (hub_event+0xd78/0x194c drivers/usb/core/hub.c:5903)
- r10:00000001 r9:00000101 r8:83c48b00 r7:84534800 r6:83e19c00 r5:83e1a610
- r4:00000001
-[<80d603c4>] (hub_event) from [<8026660c>] (process_one_work+0x1b8/0x508 kernel/workqueue.c:3254)
- r10:82e65805 r9:82fd3c00 r8:00000080 r7:dddd00c0 r6:82e65800 r5:83c48b00
- r4:82f57a80
-[<80266454>] (process_one_work) from [<80267330>] (process_scheduled_works kernel/workqueue.c:3335 [inline])
-[<80266454>] (process_one_work) from [<80267330>] (worker_thread+0x1ec/0x418 kernel/workqueue.c:3416)
- r10:82fd3c00 r9:82f57aac r8:61c88647 r7:dddd00e0 r6:82604d40 r5:dddd00c0
- r4:82f57a80
-[<80267144>] (worker_thread) from [<80270044>] (kthread+0x104/0x134 kernel/kthread.c:388)
- r10:00000000 r9:df839e90 r8:82f59740 r7:82f57a80 r6:80267144 r5:82fd3c00
- r4:82f59540
-[<8026ff40>] (kthread) from [<80200104>] (ret_from_fork+0x14/0x30 arch/arm/kernel/entry-common.S:134)
-Exception stack(0xdf919fb0 to 0xdf919ff8)
-9fa0:                                     00000000 00000000 00000000 00000000
-9fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
-9fe0: 00000000 00000000 00000000 00000000 00000013 00000000
- r9:00000000 r8:00000000 r7:00000000 r6:00000000 r5:8026ff40 r4:82f59540
-Rebooting in 86400 seconds..
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
