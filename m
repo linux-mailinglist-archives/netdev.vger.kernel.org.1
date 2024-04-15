@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-88079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BBFB8A5985
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 20:03:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9773A8A598B
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 20:04:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0005E2826F5
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:03:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52C3A2828D5
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1250313666E;
-	Mon, 15 Apr 2024 18:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J/HnPyWk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3307413A864;
+	Mon, 15 Apr 2024 18:04:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31321E877;
-	Mon, 15 Apr 2024 18:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA0913A411;
+	Mon, 15 Apr 2024 18:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713204202; cv=none; b=T+lVWR9cK8vb1xNBej/rGROdLFkWXqax2BlINTs4+FqU3KEk64EKuSamGaGuvRn83aISSa1O7bRbYppttsHlwAxIE9dQDlEBWX2DBXR6e35W8T2+2i2PW+naQrtI/kyUgwc58JE9Hd9cOsaXlrEaVlm8c8OLEnzwzNvPcBpsQ1s=
+	t=1713204251; cv=none; b=jVNvrWOSWB5P6ukW+chQcOrJNwxORhR8tMCklVbPH/OmGuKlmZyMkdtFUOUMlGcWamoAXGpaPA5lwOhDMid58S+JHRLfNpKbnAKN0WoiSAzyTqQGaqU8zDUfVbl1IwoDd6AuBVM1+4pyNRcdwFgu7o7ZzOFOWZVRRvM6xmuXo9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713204202; c=relaxed/simple;
-	bh=3GqZpk7DoO2fxKbi2ufcnw0GZVZyswnxL6e6C+xYNak=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PaCOObMLGqpyyEjFx6qWsxk8k32z2BnNZOzcnb8Q6w+F+yxGOyoHQiZKiQoqd/O70wlxRmNEJ5g5JngVZ7eodDJl98FKjqEHUMcnoUuNJR1DKKv8Jl/HlXekI/LtINYpHLObNfjdDzTIiP/zmIIOgMORJ7pxbQXE6b/OpvExIZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J/HnPyWk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D2AEC113CC;
-	Mon, 15 Apr 2024 18:03:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713204201;
-	bh=3GqZpk7DoO2fxKbi2ufcnw0GZVZyswnxL6e6C+xYNak=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=J/HnPyWkefDzuZn5kJANBCiahieYSINa5oAs81pVYGglRtgqHUvOsL0OskwcFqq3U
-	 MF5i8Lbq61xwnxWhd7zlBQm/MhvNeSny+70bUddW5jijxey+R9SS1VqFKDifYvpmXZ
-	 LC54gaapvlVt63LIimJ3IgR7XJPRLX3KceXCCQ74MOBgsudfxjvfQt9QpwZYfNBECB
-	 zTTo1D5DUJ1qmEBXwkCs0ogxSulROG8FVrqOtPYwvFjhHBND+bA0i75qPy5HLfkdn5
-	 i5bu9u45DQWRCkiGbyRho7LNSKmrU0A0mDIIRnmYrRnF+vC1w8ykO72u1kTIcqmgNm
-	 1eCMrJsH9Du5A==
-Date: Mon, 15 Apr 2024 11:03:20 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: linux-nfs@vger.kernel.org, lorenzo.bianconi@redhat.com,
- chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de,
- netdev@vger.kernel.org
-Subject: Re: [PATCH v7 2/5] NFSD: add write_version to netlink command
-Message-ID: <20240415110320.0291ac00@kernel.org>
-In-Reply-To: <bd85d1a774cb362ab9f70ac6a2af70d9ed7a309e.1712853394.git.lorenzo@kernel.org>
-References: <cover.1712853393.git.lorenzo@kernel.org>
-	<bd85d1a774cb362ab9f70ac6a2af70d9ed7a309e.1712853394.git.lorenzo@kernel.org>
+	s=arc-20240116; t=1713204251; c=relaxed/simple;
+	bh=prw3a4gxZDfNxq4KrMzr2hxWepF5GrE6RAspKqgvOLc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ozGoCG2XfX4GXQu43oYu19NGGqSSY0nXCtAy+kIXlmAxZthAYctz31axg9dtMgsAYKWqeOhol3fT8RR+bhR3uxbjnm+AVkisTTUEwHISTrMlg2m5JjfcK67XTzlalHCuKe7wzrMwos0h7NP2vwMFAzBTSPFLgEEOzJ8nDLS6RXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1rwQgS-0000gj-49; Mon, 15 Apr 2024 20:04:00 +0200
+Date: Mon, 15 Apr 2024 20:04:00 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, netfilter-devel@vger.kernel.org,
+	pablo@netfilter.org
+Subject: Re: [PATCH net-next 12/12] selftests: netfilter: update makefiles
+ and kernel config
+Message-ID: <20240415180400.GC27869@breakpoint.cc>
+References: <20240414225729.18451-1-fw@strlen.de>
+ <20240414225729.18451-13-fw@strlen.de>
+ <20240415070240.3d4b63c2@kernel.org>
+ <20240415143054.GA27869@breakpoint.cc>
+ <20240415104626.2b1ad88f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240415104626.2b1ad88f@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Thu, 11 Apr 2024 18:47:25 +0200 Lorenzo Bianconi wrote:
-> +			attr = nla_nest_start_noflag(skb,
-> +					NFSD_A_SERVER_PROTO_VERSION);
+Jakub Kicinski <kuba@kernel.org> wrote:
+> On Mon, 15 Apr 2024 16:30:54 +0200 Florian Westphal wrote:
+> > If you prefer you can apply the series without the last patch
+> > and then wait for v2 of that last one.
+> 
+> Sounds good, let me do that (in a few hours)!
 
-The _noflag() version is for legacy code, I think you should let 
-the nest be marked appropriately.
+Sure, no rush, thanks Jakub.
 
