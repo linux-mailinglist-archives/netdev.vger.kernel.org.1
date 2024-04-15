@@ -1,228 +1,135 @@
-Return-Path: <netdev+bounces-88043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A7FC8A56F2
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:02:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 891958A56F9
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 18:03:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC3651C20CAB
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:02:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 002811F21F11
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 16:03:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06D3E7F490;
-	Mon, 15 Apr 2024 16:02:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E09B97F7DA;
+	Mon, 15 Apr 2024 16:02:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Y9VszjMO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CIYVi7a3"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2045.outbound.protection.outlook.com [40.107.7.45])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E497E7F495
-	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 16:02:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.7.45
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713196926; cv=fail; b=a7ORihlnDsMnoLkeVQGevc6GsL6uPGWhMEP4QGbjyakoe49o9f7MdryqU59AWwopmX0c91ZMA0hjX8srEu1BxHiooocvJhQT8WzFnicNUmlyHuOFOVoydJSnTpbyLrNv6u5mPV87FYw/3FXeu3GUl0yzNV9qp5pjTWSmv7BgvoY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713196926; c=relaxed/simple;
-	bh=xnh/0y7YpK/bbOs9WJ1safYWgKFMPIO2K1qgyvy19vs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ZZaCmRGRarM8Yr+iz+FH1yJmzJoqOuKT6TBHx0N/D+R/SKXEugKFToMvTIkblgpnp6KIsA9PEvCahdFstW+K4klwojY0htEY3YJHSTjsKO6qZIY0fjRhDESKNG9V4Gv75HBw6g1h3gbj0PEP05N7c/vN7ioPwUvSKsUbi52m6Uc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=Y9VszjMO; arc=fail smtp.client-ip=40.107.7.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=F7yVoO+J2PSlR74Fgz/n4hoFkh3gTV6bvn+nlb9fEb4c1Dhq+B5Oo+G5GRAoWyVn3dvMfmVOJp9PF5nFcJ5P/HYufXd7lSD8iX2tgKw+G/Bh6CVcJhirosIcqC56Iy1SfPTrlDHpagyP8UOe1S40WMyHB2VSm30CFLcpiuHj5mHJIUZaWw+xQmEoDcglni/vpgEiB3JJgYj6SUzNdED0TB8KgwrvE0kBMFelrnEEJgRJYg39jia/C2vfne0ns3vba0e02eGzFGeH3FBF0FsDp+dakqWekXzSmc1lJRdWQRm84yl7mGV2JG2IZE9eoTmcbiMbnEx5JSzF+EtFAUzjnA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ErTNaZWBwmenEQGnJfSAT7xTKzzov/aVir94HzqZD6g=;
- b=fj4TBhM9VnmX1CrNoFZLvW3SSdRR8fYEtZfHP63nGPS+K2/m0Umy190so79KyM9cZJ8aYcuQwOiT+1inONpIB9nNN3LJ5jVS0KccudSy0Dm6p97cYHwtBf0OqF67WxKPVy0vf30TzfL16OuuOdrSZktKntIsAWJttpuGpEIDSukM89h/GTXVOt6xZYaB/0QkjgpJUcjTzxIO7dMvAySvik70QfWIpLTzTotHBT6WEfSmUXNmNvmSuq5eMNMw3n9aXTr01hkSRqhBHyjydEPeKsghLMeXukErA/GZDcV2RBQnV4mEyC6zl9OPCQXuFyAELfPQDMGr6kA5CFhqNVB01Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ErTNaZWBwmenEQGnJfSAT7xTKzzov/aVir94HzqZD6g=;
- b=Y9VszjMOyi8T8iqHFSYnfoIgyh2wSbFnHu/Dguab/VogI99zSPa4ob34gqLYYRkzNhekhTn3j9dr7857cUDcxj3I7v74+UnbkqJQ8vnNEie2QpOWvC0g8AE/FnZuby3rYiTVox+bK+3qIg9VVT6mU9yRI4arMtTMMy7SnFOFsTk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from VE1PR04MB7374.eurprd04.prod.outlook.com (2603:10a6:800:1ac::11)
- by GV1PR04MB9214.eurprd04.prod.outlook.com (2603:10a6:150:29::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.50; Mon, 15 Apr
- 2024 16:01:57 +0000
-Received: from VE1PR04MB7374.eurprd04.prod.outlook.com
- ([fe80::2975:705f:b952:c7f6]) by VE1PR04MB7374.eurprd04.prod.outlook.com
- ([fe80::2975:705f:b952:c7f6%7]) with mapi id 15.20.7452.049; Mon, 15 Apr 2024
- 16:01:54 +0000
-Date: Mon, 15 Apr 2024 19:01:50 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Colin Foster <colin.foster@in-advantage.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: felix: provide own phylink MAC
- operations
-Message-ID: <20240415160150.yejcazpjqvn7vhxu@skbuf>
-References: <E1rvIcO-006bQQ-Md@rmk-PC.armlinux.org.uk>
- <E1rvIcO-006bQQ-Md@rmk-PC.armlinux.org.uk>
- <20240415103453.drozvtf7tnwtpiht@skbuf>
- <Zh1GvcOTXqb7CpQt@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zh1GvcOTXqb7CpQt@shell.armlinux.org.uk>
-X-ClientProxiedBy: AS4P189CA0033.EURP189.PROD.OUTLOOK.COM
- (2603:10a6:20b:5dd::6) To VE1PR04MB7374.eurprd04.prod.outlook.com
- (2603:10a6:800:1ac::11)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EADB179DD5
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 16:02:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713196977; cv=none; b=urfxHP4CYiSbQ/IPC5B6HYMp9Sr+25gM8QkCFO8/eSebx7mg6T1N9JaTOGGNXLjp1nFxL9GXtiJFjG/ejN5cgjMqvr5Me6m8cEkoF6dEYWwLaDUh/OOGAkLBU/Jb4hPpOeqIDZpkffM/Upx17JAPpa4jgesu6ehEz3UK8iu8m6E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713196977; c=relaxed/simple;
+	bh=RdF5KTAEd8tP63a5S5xqNAtGrngcFzpU05PPOfhTqD0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=sIFG0SOkO+I2bk6qoCBRHfbFUvNQJMIl3Ao9vhYElpL5oG5HAjOm1VKd+8kwqDYv+TJLs1Dht5E9FRdxtxf3AyjmHLsXv0HdXvxMSEvhLc3Kb9zYbHaFSvjvywwIgQamjGzpXC6HzNJNbY1gOBbuOjPVU+GNhPYA2WvKeaZ8K7w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CIYVi7a3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713196972;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=RdF5KTAEd8tP63a5S5xqNAtGrngcFzpU05PPOfhTqD0=;
+	b=CIYVi7a33BMudbdtNDHtcB5SXCCUxmhNd2mRXfjCeI6gTp3BWcQIAmQeC+5T25kx1UYPmz
+	8KD9LilIrwNhJj1zDrC4oK0HUK4ZR+P35dq1DGyvXWiGlUbOqZd1nnJMTBTZd/DGX29m8A
+	tfZThIgf3Dg2Glgef1dGJxXfKJhkeYg=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-679-lOHMrXe_NJakcT8h6JEiHw-1; Mon, 15 Apr 2024 12:02:50 -0400
+X-MC-Unique: lOHMrXe_NJakcT8h6JEiHw-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3450bcc1482so892137f8f.1
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 09:02:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713196969; x=1713801769;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RdF5KTAEd8tP63a5S5xqNAtGrngcFzpU05PPOfhTqD0=;
+        b=UDMa9g7gNK2Krf+p4wJwYP5xJLzBWlwn/EMh8EfZhfIX9GZokjKUmy1mEEVC8aii47
+         LqeDLaRKRYCyl6R6ZH2GlE3PeDVt13gjFnUv+yoUdt1PVKxWmwOVql62BgCJfc4V7LMT
+         7p0nIauxuZO3vMeCPnRXvuC/lQDIJpncG3XcyaUbwROdrVWBodHBcNm7JxtfEr8w19x6
+         JdAMRkvm3FxZiLyDPqyqasG6X21RBdn8QxsI4LMYAB23uX6v0f2Z0tioAW+QUvDU0aaB
+         O8A34JRChHqro4mfjLFpNy5WeEAAJnypWIAkSQWlEO2Z4k17uQiNl/wTJC1auSqVNUCn
+         95Ew==
+X-Forwarded-Encrypted: i=1; AJvYcCWUmAsLunkwv+D+6rQiWsyi7vJFHM/6+xbX/Yn2oS159SEV+e4ZnH8+dO+HtbE8f7UEePD2Je95aJVDISFsUwrW/mwNsdRi
+X-Gm-Message-State: AOJu0YywxBHTCKXuir0gLb/X3o4mPJ8QpTacKDO60ER/PjeyrA7AJXGd
+	EkKwjJjNToodWaQMeaP77W/Wg6FGd2uW0UIkwGga8PPPAbl2OiUZ5DZjRdNvGTFlx7eLdU11i3d
+	lzlSL6mFRZoaXqFmi55O+IsV6b4s25UcS7HN8/R91Vn+vyK/SJnQB0w==
+X-Received: by 2002:a5d:4ed1:0:b0:347:c3c7:9636 with SMTP id s17-20020a5d4ed1000000b00347c3c79636mr1996010wrv.0.1713196969382;
+        Mon, 15 Apr 2024 09:02:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGi7mKQpeI5LjsD7Na6Y0KmHDTB9nCL71TU5jjZgoOgX+C40H8rEgRC+0acrKh8lA8UrTFKdw==
+X-Received: by 2002:a5d:4ed1:0:b0:347:c3c7:9636 with SMTP id s17-20020a5d4ed1000000b00347c3c79636mr1995988wrv.0.1713196968979;
+        Mon, 15 Apr 2024 09:02:48 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-228-238.dyn.eolo.it. [146.241.228.238])
+        by smtp.gmail.com with ESMTPSA id b10-20020a056000054a00b00341b7d5054bsm12594496wrf.72.2024.04.15.09.02.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 09:02:48 -0700 (PDT)
+Message-ID: <0d02dbf78a0ab9f149c0c70a8508560d22abeffe.camel@redhat.com>
+Subject: Re: [PATCH net-next 1/5] selftests: drv-net: define endpoint
+ structures
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	shuah@kernel.org, petrm@nvidia.com, linux-kselftest@vger.kernel.org, 
+	willemb@google.com
+Date: Mon, 15 Apr 2024 18:02:46 +0200
+In-Reply-To: <20240415071914.23589fb8@kernel.org>
+References: <20240412233705.1066444-1-kuba@kernel.org>
+	 <20240412233705.1066444-2-kuba@kernel.org>
+	 <a80414c647940747c37a8c750bad4290ec81bd66.camel@redhat.com>
+	 <20240415071914.23589fb8@kernel.org>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: VE1PR04MB7374:EE_|GV1PR04MB9214:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9f404f2f-fb8b-4b54-862d-08dc5d655e7b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	3ZxFYCXrmZs0Zkh58Db9oFjP1TQ1X9LlSt6oDc6wLVOS6QygNi3MtUzV3WYLOrvyzR99O2RtTtrDlJh48Ts5HoFaHnUkE6bL5mnWUoq9hH2Li782lPFYq6tu43K7W8/tLAyOtLTrAuOfbsyjONVcinzG86+uQ8GmjvD4zWbpTz4v9ABxq3/FjHnnDZplU1Hvclb7PFproKZeNKiaI7RTBc5FVwvAHMZlC+5mFXFx1QbXzfAAkFzFSsAVO39h+AMq+pzyDnngEwNWCpCCeu3zPnT2BfchUdaaraN9OXSTrkGggNSKtH5ZzcY6a/JuoMtZAVKzzFlNy51aWiu27oj+/yG6p3rAOoZ9+IQleCXw9gnxQ3GwlwuxqhQuV3TSkPe3grkxTTC3C6XP/XSuQdYWaseYWOs/aiodhz2QsaPrhEKRDatZcr46pW8gwi+jWFg3JKsE7B02NaJ9NTRSRjXSNjOxRvFkPIS3wBEZ3YMnuRe9CFHiSlTduIf61B6oV88latfm2L1eVvDGGFk76+wYYt8ajyHlQE7TgPIabn6pIbKUVXjqrEOj56KoIZ5LT76ulu18fY+acrHDvxGwRLexvYJL0ErlYhYpnueRQdNyPhDcDK3btSs77UI2Q18IXR8x9oN6fvw/fhdk3MrT9RXJeSORHlEaw8Iu0cr/cywAjXc=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7374.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(7416005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?7RNfCj0CrAaAcJ8c+leKHhr/+j6PUEPb/6t4Wns9DGy/M4Gy9h6gUjHKD8I0?=
- =?us-ascii?Q?wcQPgUQfNDTpQJB5dA+/la7BQUOj3WQ90RVKRvrImqTu5QK+J72h0Nyqr9Vl?=
- =?us-ascii?Q?QqIl6k3UhurZuGcYMkPUgvLHqIFAQEgUzLuzvkIxw6ChLVpg83ZoTh2qBVYS?=
- =?us-ascii?Q?VA12D0Fyluf3yD6NnBCofeBpGnLvZG4IQUJ+CtQfHKy6jpn0+QGaP6brN1pd?=
- =?us-ascii?Q?cZZrOZojuarenKrhBnuut/GlqN0kjUZ7B7JFfNCmArtY7g54KlYPsoB7BMMo?=
- =?us-ascii?Q?XxKSuzpibUKFTNfODXnKDx3W2gb5B1xvvMbbk6/ZvC4f+f91ULJjc8FGYqYA?=
- =?us-ascii?Q?ERGK/kE6oHbg64IrG1joY6S4E48GZWP0PJCdgXPM+BhkwOOgoKrhc1T88+q2?=
- =?us-ascii?Q?c2zfrXoqPQzYLQ3rlfwlqfU1vkUCizHbIKSq/ySKUT9E4sy20DGupKNqfmRY?=
- =?us-ascii?Q?pvUeNnuvm+dZuFz+//06J+tWQ88XDoPYB9NhXk5kwmWHPiuzli4MqyNQjDMH?=
- =?us-ascii?Q?HtYdNTasJzvOAoXCAHqL32htxa07rTlxMn9icbcgt1th+QNtdXUlpXxJWNPv?=
- =?us-ascii?Q?BZ63ydZCrn6zAd7JhKwP08gCpKbS2NYtzxoYOPo8m4zylknlJJGQqT/E52xh?=
- =?us-ascii?Q?F5Kjiw1W46eCVDM1cNdJ9y5VUemvR71sREoQAMYASV4t56u1u1HdSew1SaEQ?=
- =?us-ascii?Q?yQvzxqV/258tbYt0OR1M2mAkpHNtrXpVJr048QwTsga4Yg13P7in6TeIORsE?=
- =?us-ascii?Q?lLxTv5hYiJPkMG4K8V7uFCuUuhjwOkDoASb1RXMzdLJZyKmGFYjf21qybyvB?=
- =?us-ascii?Q?86XaUklEjFsZr4NyIVbfcLfsmVMacM/ApESaizlAg2t4UT42z7OmXFeZxdfG?=
- =?us-ascii?Q?ojjMSjuf+VI/9tt0TbU9M58TVO0tcKoz9jgXxG527F+LVtKXyzwAsXXCZ+44?=
- =?us-ascii?Q?tUS/J4J+BIjAjgTajKL4NchWsjxp7q7rosvV4FgMqmAmBoKnQ9dAOyvXfWgo?=
- =?us-ascii?Q?8CdLW7T0EegPzKFYO9e+1b3K4X4MiiLDO7TxfyWqKNyF8PyGYy+W/gRyJ0Mk?=
- =?us-ascii?Q?gcJ4/LVUhI5VYlRHX4M8Kkg2Hbu8cbFORf+aVegNMI5Ebq0DL+LIemy8RH9o?=
- =?us-ascii?Q?hkHNM2H1Rp+YQpKUlWM2Dc4tEGwkkN2BFn5AP0NRIEvy/WaR6SQ/d3ey0wsk?=
- =?us-ascii?Q?pUdq+DRebHDprpB3unvF0TGZ/+/+Xs28JFVQbc/5qfjMVboNNTgHBAo1JrQD?=
- =?us-ascii?Q?vKag89TvKIPD38NcQQg0TDRtci39CocpOBZs1Bs4092qDNMiGAkf0MvwjcPH?=
- =?us-ascii?Q?T44ktCmKSlkuzDSK1F71y6RV16EudJT8zJr1wjuSiRn6XKlCphZ0ladsuxDf?=
- =?us-ascii?Q?MfNqVtXhHIg0KsVouult9lFBTdY8n3YJbjokZKBTEWDeE/84V/rEhbrBWOCy?=
- =?us-ascii?Q?m79QafOlsl9UYvjrZu66kcxabZ9IPWTmDWOftl5Gkdkg4rysTLCM9fyV5xaH?=
- =?us-ascii?Q?JbhPLLT0XYx64ecmlfiyOFlmCh1X99vEWi3gpEYnwPGKxACBUwZFUD90aVkM?=
- =?us-ascii?Q?Y5uuLSrn0WnKc9FvjGDnAQ7mTcfn15e7Zo2wVK8iEnpiZVArM5SqwkKHpd2L?=
- =?us-ascii?Q?fu9sSC0GOA5xocTU4svDqsc=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9f404f2f-fb8b-4b54-862d-08dc5d655e7b
-X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB7374.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2024 16:01:54.1104
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: U1/V2txkx2fS8Cin8V6GRO1fEXhTR0GhhlftRK9LH0ea2SE0YDroUcRRi2mSpUwxsmtuyAyDP94AjXTo4hLHLg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR04MB9214
 
-On Mon, Apr 15, 2024 at 04:24:45PM +0100, Russell King (Oracle) wrote:
-> Looking at these three, isn't there good reason to merge the allocation
-> and initialisation of struct dsa_switch together in all three drivers?
-> All three are basically doing the same thing:
-> 
-> felix_vsc9959.c:
->         ds->dev = &pdev->dev;
->         ds->num_ports = felix->info->num_ports;
->         ds->num_tx_queues = felix->info->num_tx_queues;
->         ds->ops = &felix_switch_ops;
->         ds->priv = ocelot;
->         felix->ds = ds;
-> 
-> ocelot_ext.c:
->         ds->dev = dev;
->         ds->num_ports = felix->info->num_ports;
->         ds->num_tx_queues = felix->info->num_tx_queues;
->         ds->ops = &felix_switch_ops;
->         ds->priv = ocelot;
->         felix->ds = ds;
-> 
-> seville_vsc9953.c:
->         ds->dev = &pdev->dev;
->         ds->num_ports = felix->info->num_ports;
->         ds->ops = &felix_switch_ops;
->         ds->priv = ocelot;
->         felix->ds = ds;
+On Mon, 2024-04-15 at 07:19 -0700, Jakub Kicinski wrote:
+> On Mon, 15 Apr 2024 10:57:31 +0200 Paolo Abeni wrote:
+> > If I read correctly the above will do a full ssh handshake for each
+> > command. If the test script/setup is complex, I think/fear the overhead
+> > could become a bit cumbersome.
+>=20
+> Connection reuse. I wasn't sure if I should add a hint to the README,
+> let me do so.
+>=20
+> > Would using something alike Fabric to create a single connection at
+> > endpoint instantiation time and re-using it for all the command be too
+> > much?=20
+>=20
+> IDK what "Fabric" is, if its commonly used we can add the option
+> in tree. If less commonly - I hope the dynamic loading scheme
+> will allow users to very easily drop in their own class that=20
+> integrates with Fabric, without dirtying the tree? :)
 
-Yes, there is :)
+I'm really a python-expert. 'Fabric' a python library to execute
+commands over ssh:
 
-If dev_set_drvdata() were to be used instead of platform_set_drvdata()/
-pci_set_drvdata(), there's room for even more common code.
+https://www.fabfile.org/
+>=20
+No idea how much commont it is.
 
-> Also, I note that felix->info->num_tx_queues on seville_vsc9953.c
-> is set to OCELOT_NUM_TC, which is defined to be 8, and is the same
-> value for ocelot_ext and felix_vsc9959. Presumably this unintentionally
-> missing from seville_vsc9953.c... because why initialise a private
-> struct member to a non-zero value and then not use it.
-> 
-> An alternative would be to initialise .num_tx_queues in seville_vsc9953.c
-> to zero.
+I'm fine with ssh connection sharing.
 
-It makes me wonder why felix->info->num_tx_queues even exists...
+Thanks,
 
-It was introduced by commit de143c0e274b ("net: dsa: felix: Configure
-Time-Aware Scheduler via taprio offload") at a time when vsc9959
-(LS1028A) was the only switch supported by the driver. It seems
-unnecessary.
+Paolo=20
 
-8 traffic classes, and 1 queue per traffic class, is a common
-architectural feature of all switches in the family. So they could all
-just set OCELOT_NUM_TC in the common allocation function and be fine
-(and remove felix->info->num_tx_queues).
-
-When num_tx_queues=0, this is implicitly converted to 1 by dsa_user_create(),
-and this is good enough for basic operation for a switch port. The tc
-qdisc offload layer works with netdev TX queues, so for QoS offload we
-need to pretend we have multiple TX queues. The VSC9953, like ocelot_ext,
-doesn't export QoS offload, so it doesn't really matter. But we can
-definitely set num_tx_queues=8 for all switches.
-
-> If we had common code doing this initialisation, then it wouldn't be
-> missed... and neither would have _this_ addition of the phylink MAC
-> ops missed the other two drivers - so I think that's something which
-> should be done as a matter of course - and thus there will be no need
-> to export these two data structures, just an initialisation (and
-> destruction) function. I don't think we would even need the destruction
-> function if we used devm_kzalloc().
-> 
-> Good idea?
-
-Looking again at the driver, I see it's not very consistent in its use of
-devres... It is used elsewhere, including in felix_pci_probe() itself:
-devm_request_threaded_irq().
-
-Yes, I think the use of devres here would be an improvement.
-
-Note that felix_pci_probe() will still have to call pci_disable_device()
-on the error teardown path.
-
-For even more consistency, it would be great if the error teardown
-labels were called after what they do, rather than after the path that
-triggered them. Example:
-- goto err_pci_enable -> goto out
-- goto err_alloc_felix -> goto out_pci_disable
 
