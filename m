@@ -1,156 +1,134 @@
-Return-Path: <netdev+bounces-88118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B606B8A5CEC
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 23:26:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C98E8A5D1B
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 23:40:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3AAF1C216DB
-	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 21:26:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7483B23E87
+	for <lists+netdev@lfdr.de>; Mon, 15 Apr 2024 21:39:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AA0D156F31;
-	Mon, 15 Apr 2024 21:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EDBA823CE;
+	Mon, 15 Apr 2024 21:39:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="j3ACQGsb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a2HDqMVb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99BF2156236;
-	Mon, 15 Apr 2024 21:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23BAE157467
+	for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 21:39:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713216405; cv=none; b=OxKN03NJ8CEzbCqYibPrT4bNF7lyMjtuVVfiB+6kPqF7Z51rLqMAq+q8aw6Vpv+rdIo2uoRUGmKpB2zdS/WRVz1o+0TPLsww4j/2Lwq8JKaU+H9y9b81xkDEWgIe05yeCRK2FWgql/WFcsUIqBVyDyisQP6NiCjAcKGRTHYfFwk=
+	t=1713217186; cv=none; b=RbrfVS16cIj8x04u7Ev3VBmQYXndP/vKlfAfkEWTd87W6z9vxxr45v/OsSpm+amxds+Hk5ctaASQX/sUlD0v+JSrvV3mujda3NWcyeiadtdFd13VJBMf7KEbAeUadiOItBpkfwlT31XaN9/6xNwNcPeE9WfjQs9CqkhmKC360vA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713216405; c=relaxed/simple;
-	bh=zJtKB7O3/WvCqOnP2/g5NcTJPMuxI5QmR9+UIN4j/Bw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=OcxfaV5BUSd+Tnsx1U3bdrDnblBFos5HBGNn1ymG8mcdHV70gp+e8xLbEBdJ7XlrAFXygEmm/k1zFCG40x+EYpqZfnB/gdGSfXt2xBC+vHrcDSvkGSaIn4CtjxH0QTtri3FwaV3iYKderuMektOq9C/qBcOLg+DlpQk1Rg0ZVvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=j3ACQGsb; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43FKfUTV006457;
-	Mon, 15 Apr 2024 21:26:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=tOrMnghh2NCP6ZkuUqQk7otGncms/swKbAn60nOpyaQ=; b=j3
-	ACQGsbXKUGv9+CSTk2GRX0G03ICqYhvtvoJ5Vf1sVMZo87NZXtAb+JdQLVXpg6zF
-	+EFRgi4qjJqpKBPEMZ5ANaZIWzHlokVbRhpXfOt303PnJpFX1x/M6oyxe+rP+8E/
-	dXK3I8WACQpJq5Rm/XODe5tsHyQH9Nz7p0vYyoxOGirQmFYFq7nykMEFEo9yxzi/
-	eAktNFv2TAsM9HkrdoxPvbaN4vEZsivaIkXGytO3mgEb7MdbEXMFz8BZuzCQhknt
-	rVbaqLonQ4c9joqRear1CYwkaSbyRM6N4YfNQmRxDmcO2ryZTBg6lJdeSPziXymo
-	5FWlokwbjmWiWWLodBNg==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xhbg882gg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Apr 2024 21:26:16 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43FLQFB7026132
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Apr 2024 21:26:15 GMT
-Received: from [10.46.19.239] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 15 Apr
- 2024 14:26:11 -0700
-Message-ID: <83dbc057-be42-41d6-95a3-af4b01d64afb@quicinc.com>
-Date: Mon, 15 Apr 2024 14:26:10 -0700
+	s=arc-20240116; t=1713217186; c=relaxed/simple;
+	bh=Ou+FvOs1B0WuJzy4wjnTiHrS07o3mwtSQsNGZnNkSo4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U4uFbh5DJqUgusN4clcuvdFoDuJtGIlqpAJNs8szAbKfKddwq85wJl3R+h65PzIy5AEkxVo0sZMvIjW9BK0knlvYRKuzkJjfe2fSe4aUct8iVk6BkT4zwZX0IaaRaydy/cRk71xlDvFEH+fh9JnGrFlwU1KEIFMzvmitI8J/8xA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a2HDqMVb; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-61ad5f2c231so15808847b3.2
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 14:39:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713217184; x=1713821984; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=O4Igzsw7nTVFssFguk/Rbj2YFohqP9KtmCQuZOOHSCU=;
+        b=a2HDqMVbDtozTmEdIClIQJo9FL3/AinIORJwrNpm5QXlXViiKsUCvOpk0ELHKDgmQK
+         GhRTw9nGGmbhL0L+nILpkamRfMn1zCRLh9AQ5vo9HiVkycIskfw61Og/Uc9s8FI3rWYI
+         9vFjzAucSkoQkf3Wnq6kX8//8Ao5yTBHmHeWA2f74Fa+eD6D+t1SSnNJWJ3/B2Dn36NP
+         fU/0BBqGmUNNGrBdyuobTT6W56UV0JmpyGUgwSVgeSCL4pzVciCo5a9Td3VHWqDNNXK/
+         6sMhoYQLA9qfaa8djWgsHalD5RbhQHkQuYIXtOob+zAMvvVj418bUyZQQc53l6oEgySw
+         Un1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713217184; x=1713821984;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O4Igzsw7nTVFssFguk/Rbj2YFohqP9KtmCQuZOOHSCU=;
+        b=JmN1w0gpmCEm/Uw4IuTcTNUOG5YI54j5v703iOeKgadCfkZQa8qKmfyJWkK1pSkRq6
+         AHUNw4cE3N4iuZkYnzYLzUqFnDzKxlCR/AMDEsNY0WIo3AM2Sgf/rwRjUOjLW41pjJ3k
+         mFLNyV9i6RVeEZcs/tLdHzCVJ2X6r0/TYJHtdheAHomgCfEbXWpozb7rhJfsRnRnb8zB
+         InQvuWjzzhk8v5AaO80NQKWyZX+99yX2n4AfYV0m6MLKPvUDun5zdT1bxpuFX7iX/LLj
+         nyG6h4WYCxr04/BNAIldTRLJYMMskWOOXl5cAIT0ZUY3tW17SpOvxVgwYscz1qYdphef
+         IKoQ==
+X-Gm-Message-State: AOJu0Yy/l0cI9lrz87Pg4I8ayy/VWnO0UPEQSTDT4XC+0NeID7+IkqOE
+	va3ZmhTS4lo1b68ZbPQloSbSoMUXGq5XwjL4Mvj3uciyRc9wwkFk
+X-Google-Smtp-Source: AGHT+IEuBFvQdGq8XC+xGsXmOG6swS+A7y4Wz4C+E83HgqZ7NES/HexAlN3tWxT3W9BaCURm0cI74g==
+X-Received: by 2002:a0d:f584:0:b0:618:8a27:f26 with SMTP id e126-20020a0df584000000b006188a270f26mr8434646ywf.48.1713217184009;
+        Mon, 15 Apr 2024 14:39:44 -0700 (PDT)
+Received: from localhost ([2001:18c0:22:6700:503f:95a9:a73f:4ee8])
+        by smtp.gmail.com with ESMTPSA id l25-20020a05620a211900b0078d67d40c49sm6825704qkl.70.2024.04.15.14.39.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 14:39:43 -0700 (PDT)
+Date: Mon, 15 Apr 2024 17:39:42 -0400
+From: Benjamin Poirier <benjamin.poirier@gmail.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, edumazet@google.com, parav@nvidia.com,
+	mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	shuah@kernel.org, petrm@nvidia.com, liuhangbin@gmail.com,
+	vladimir.oltean@nxp.com, idosch@nvidia.com,
+	virtualization@lists.linux.dev
+Subject: Re: [patch net-next v2 5/6] selftests: forwarding: add
+ wait_for_dev() helper
+Message-ID: <Zh2enn9ArVKDrdIy@f4>
+References: <20240415162530.3594670-1-jiri@resnulli.us>
+ <20240415162530.3594670-6-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH bpf-next v3 1/2] net: Rename mono_delivery_time to
- tstamp_type for scalabilty
-Content-Language: en-US
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
-        "Martin
- KaFai Lau" <martin.lau@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>
-CC: <kernel@quicinc.com>
-References: <20240412210125.1780574-1-quic_abchauha@quicinc.com>
- <20240412210125.1780574-2-quic_abchauha@quicinc.com>
- <661ad4f0e3766_3be9a7294a1@willemb.c.googlers.com.notmuch>
- <c992e03b-eee5-471a-9002-f35bdfa1be2d@quicinc.com>
- <661d92391de45_30101294f2@willemb.c.googlers.com.notmuch>
- <6bfee126-36f4-4595-950e-058d93303362@quicinc.com>
- <661d9a8bb862c_314dd2942c@willemb.c.googlers.com.notmuch>
-From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-In-Reply-To: <661d9a8bb862c_314dd2942c@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: GXEKuWOz6boZJQfEpxUP9kMgRF79ZkN6
-X-Proofpoint-ORIG-GUID: GXEKuWOz6boZJQfEpxUP9kMgRF79ZkN6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-15_18,2024-04-15_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- malwarescore=0 spamscore=0 mlxscore=0 mlxlogscore=999 priorityscore=1501
- phishscore=0 lowpriorityscore=0 impostorscore=0 adultscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2404010003
- definitions=main-2404150143
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240415162530.3594670-6-jiri@resnulli.us>
 
-
-
-On 4/15/2024 2:22 PM, Willem de Bruijn wrote:
->>>>>>  static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
->>>>>> -					 bool mono)
->>>>>> +					  u8 tstamp_type)
->>>>>>  {
->>>>>>  	skb->tstamp = kt;
->>>>>> -	skb->mono_delivery_time = kt && mono;
->>>>>> +
->>>>>> +	switch (tstamp_type) {
->>>>>> +	case CLOCK_REAL:
->>>>>> +		skb->tstamp_type = CLOCK_REAL;
->>>>>> +		break;
->>>>>> +	case CLOCK_MONO:
->>>>>> +		skb->tstamp_type = kt && tstamp_type;
->>>>>> +		break;
->>>>>> +	}
->>>>>
->>>>> Technically this leaves the tstamp_type undefined if (skb, 0, CLOCK_REAL)
->>>> Do you think i should be checking for valid value of tstamp before setting the tstamp_type ? Only then set it. 
->>>
->>> A kt of 0 is interpreted as resetting the type. That should probably
->>> be maintained.
->>>
->>> For SO_TIMESTAMPING, a mono delivery time of 0 does have some meaning.
->>> In __sock_recv_timestamp:
->>>
->>>         /* Race occurred between timestamp enabling and packet
->>>            receiving.  Fill in the current time for now. */
->>>         if (need_software_tstamp && skb->tstamp == 0) {
->>>                 __net_timestamp(skb);
->>>                 false_tstamp = 1;
->>>         }
->>
->> Well in that case the above logic still resets the tstamp and sets the tstamp_type to CLOCK_REAL(value 0). 
->> Anyway the tstamp_type will be 0 to begin with. 
->> The logic is still inline with previous implementation, because previously if kt was 0 then kt && mono sets the tstamp_type (previously called as mono_delivery_time) to 0 (i.e SKB_CLOCK_REAL). 
+On 2024-04-15 18:25 +0200, Jiri Pirko wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
 > 
-> Sorry, I got my defaults confused. If we maintain that a zero tstamp
-> resets the type, then here should be no case with skb->tstamp 0 and
-> skb->tstamp_type SKB_CLOCK_REAL (or SKB_CLOCK_TAI or whatever). I
-> think it's preferable to make that obvious in the
-> skb_set_delivery_time implementation, rather than depend on knowledge
-> of its callers.
+> The existing setup_wait*() helper family check the status of the
+> interface to be up. Introduce wait_for_dev() to wait for the netdevice
+> to appear, for example after test script does manual device bind.
+> 
+> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+> ---
+> v1->v2:
+> - reworked wait_for_dev() helper to use slowwait() helper
+> ---
+>  tools/testing/selftests/net/forwarding/lib.sh | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+> index 254698c6ba56..e85b361dc85d 100644
+> --- a/tools/testing/selftests/net/forwarding/lib.sh
+> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+> @@ -746,6 +746,19 @@ setup_wait()
+>  	sleep $WAIT_TIME
+>  }
+>  
+> +wait_for_dev()
+> +{
+> +        local dev=$1; shift
+> +        local timeout=${1:-$WAIT_TIMEOUT}; shift
+> +
+> +        slowwait $timeout ip link show dev $dev up &> /dev/null
 
-Noted!. I will do the same as part of the next patchset. 
+Sorry, I just noticed that this includes the "up" flag. I was confused
+for a while until I realized that `ip` returns success even if the
+interface is not up:
+
+# ip link set dev eth1 down
+# ip link show dev eth1 up
+# echo $?
+0
+
+So wait_for_dev() really does just wait for the device to appear, not
+for it to be up. If you agree, please remove the 'up' keyword to avoid
+confusion.
 
