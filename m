@@ -1,145 +1,105 @@
-Return-Path: <netdev+bounces-88465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCDEB8A757A
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 22:23:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 842AC8A757B
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 22:24:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64FD0B21D3A
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 20:23:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F826281046
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 20:24:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D09BB139D10;
-	Tue, 16 Apr 2024 20:23:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF40139D04;
+	Tue, 16 Apr 2024 20:24:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r6cTamxE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I0XhIJQA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7C602AE91;
-	Tue, 16 Apr 2024 20:23:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D23C2AE91
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 20:24:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713298982; cv=none; b=hBjE0wX7Eg0pWKmhBuUWmrzhYXZ3FQIKHDVOrUaji6tpv6lhiMxgno1cmg5c8x31FKAgbw0fXTRX++GEcLNFN88Ii7Nvhb7AVqIVAKek8wF/IdMay1sSvbqjQ1CGrZLXv2BHi2/kJkiVUU2KusuYHEL8uNqYQBwFC1W7Ierg5Cs=
+	t=1713299055; cv=none; b=uAozl1cqL+WzACgXlkvwqoaEz9ntnuHyyoNrl2R7Wjd7RMbSTN8vNfvLHd/fQJCJxN9gY0z3nmm6fgtUbU+yo+8zYlkUnrV/9dQwa4cTcciil3409rN5qq0E5V6XBRD+0Y3XJlYzxagj7ta7CMy4d+9ubU6HhKZ///HRdA7+uRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713298982; c=relaxed/simple;
-	bh=P8lF68ySs95YEFtG1UXAcD86630c/ZMTacV5Xy+yOjA=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=snmRCN0xvBrAF1UJHJNd5iwmKO+n+d82gmqFUNB+E5GW1SlxGwGh4yFZzBhu7u71wQ0t2epJzG4byJJ8Qj581V/jED4hI7+T6wpMRMHEG20L6sICxZTivOeQQ20UQoe5FrvYyUG8pAEacICQhbxTWKzdnymjgxiMbUbfsUMOVGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r6cTamxE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05958C113CE;
-	Tue, 16 Apr 2024 20:22:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713298982;
-	bh=P8lF68ySs95YEFtG1UXAcD86630c/ZMTacV5Xy+yOjA=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=r6cTamxEhtPFTsHpoWSGRGg9oVyCzpubmHcZ050GCKFvWFQ7reQ5wPeb74rhDWP1Z
-	 RUjpPlxmmoBSPxdyJs9OhyrWyigB7xPSj3WFhkY97EcGEj1oImQGYUkluiSYMHMFpt
-	 AQ/PK4i8miQpb3FduG8E0CqzLGx0CW6cO49BAA8Arg9ZWMSXxHPvtDg41SDPno8HSW
-	 f3iaJITQsvQeCmHPDrdjVszYwyneKkSZpYPfyhr1KLi2fKoDa8tdY8h9pjROqxiMVx
-	 K0abnuU9nAn5Bcqd4RZrRUbAojp8h7wSl8B/nzNXJ3ARTkB10GAknACS2gcXUcKbC7
-	 +z+UCGYalf7cg==
-Date: Tue, 16 Apr 2024 22:22:55 +0200 (GMT+02:00)
-From: Matthieu Baerts <matttbe@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Eric Dumazet <edumazet@google.com>, dsahern@kernel.org,
-	martineau@kernel.org, geliang@kernel.org, kuba@kernel.org,
-	pabeni@redhat.com, davem@davemloft.net, rostedt@goodmis.org,
-	mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
-	atenart@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Message-ID: <c64c8a6c-2e24-43ca-8ee7-7e15547ed2d1@kernel.org>
-In-Reply-To: <CAL+tcoDVFtvg6+Kio9frU5W=2e2n7qrCJkitXUxNjsouAG+iGg@mail.gmail.com>
-References: <20240411115630.38420-1-kerneljasonxing@gmail.com> <20240411115630.38420-5-kerneljasonxing@gmail.com> <CANn89iKbBuEqsjyJ-di3e-cF1zv000YY1HEeYq-Ah5x7nX5ppg@mail.gmail.com> <CAL+tcoB=Hr8s+j7Sm8viF-=3aHwhEevZZcpn5ek0RYmNowAtoQ@mail.gmail.com> <CAL+tcoDVFtvg6+Kio9frU5W=2e2n7qrCJkitXUxNjsouAG+iGg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 4/6] tcp: support rstreason for passive
- reset
+	s=arc-20240116; t=1713299055; c=relaxed/simple;
+	bh=DEoA+CURLyCpXOL7v77u0P9G8o8JQPmfAcMupKHxQFc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c69ytP4f3/yvpzBoHG5ugbcA+Jzp9mBU1+NW6Lk0XcusiWUcoAVcMJfgVmga+H2GFgDrm6fC8esh7j2ZalagUm6Kh8Si/+CuWHqn/ghBi07gurxyvWvE1t8qV+gpRzCu58ylC0JIXv3bNVK3ux5ceb9c8SeELt8ssLuNJK/iepQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I0XhIJQA; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713299053; x=1744835053;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=DEoA+CURLyCpXOL7v77u0P9G8o8JQPmfAcMupKHxQFc=;
+  b=I0XhIJQAvd7TIaLwW6S8aQ7SULVDSKXCBcosSB8jwovd+aAFmY3J1qgj
+   m4XZxtbo8jZjgLs+tR2Lw68xFG1EkbQ+FCX3jwjEsCSOwbcFPHGl2x/hv
+   eaF54eE7D2NatHYdZFrT7bH81/3tRXgeWAEzd3WUmAwMv/KcCcAfbFrFo
+   4apurwTT+WzqbiCEYj2RhBKN6xyswtB60Ls/a3FVfBfw6r+u7DCjprQvS
+   3SxQE9ZmZPjBIqpQi7TVZF+QgTpFcKuMy6aU+qwqYDq5Hhyn5QDSTJqRn
+   zqYUKHxw9YPYb5o8REUddEbRLJrWI7zhtpaaRugyPaKA6m4Ts+mxQxMAo
+   w==;
+X-CSE-ConnectionGUID: qTXbUM9fTduBqgZNqEi/Ng==
+X-CSE-MsgGUID: gwVsdGd4Tm2aNs3bXw91zQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="8688445"
+X-IronPort-AV: E=Sophos;i="6.07,207,1708416000"; 
+   d="scan'208";a="8688445"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 13:24:12 -0700
+X-CSE-ConnectionGUID: L8Ie8bP/T5+obbORfiSjYw==
+X-CSE-MsgGUID: N288vf7PTK+QX2WXMBeYsw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,207,1708416000"; 
+   d="scan'208";a="26941866"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmviesa003.fm.intel.com with ESMTP; 16 Apr 2024 13:24:12 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net 0/3][pull request] Intel Wired LAN Driver Updates 2024-04-16 (ice)
+Date: Tue, 16 Apr 2024 13:24:05 -0700
+Message-ID: <20240416202409.2008383-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Correlation-ID: <c64c8a6c-2e24-43ca-8ee7-7e15547ed2d1@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-Hi Jason,
+This series contains updates to ice driver only.
 
-16 Apr 2024 14:25:13 Jason Xing <kerneljasonxing@gmail.com>:
+Michal fixes a couple of issues with TC filter parsing; always add match
+for src_vsi and remove flag check that could prevent addition of valid
+filters.
 
-> On Tue, Apr 16, 2024 at 3:45=E2=80=AFPM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
->>
->> On Tue, Apr 16, 2024 at 2:34=E2=80=AFPM Eric Dumazet <edumazet@google.co=
-m> wrote:
->>>
->>> On Thu, Apr 11, 2024 at 1:57=E2=80=AFPM Jason Xing <kerneljasonxing@gma=
-il.com> wrote:
->>>>
->>>> From: Jason Xing <kernelxing@tencent.com>
->>>>
->>>> Reuse the dropreason logic to show the exact reason of tcp reset,
->>>> so we don't need to implement those duplicated reset reasons.
->>>> This patch replaces all the prior NOT_SPECIFIED reasons.
->>>>
->>>> Signed-off-by: Jason Xing <kernelxing@tencent.com>
->>>> ---
->>>> net/ipv4/tcp_ipv4.c | 8 ++++----
->>>> net/ipv6/tcp_ipv6.c | 8 ++++----
->>>> 2 files changed, 8 insertions(+), 8 deletions(-)
->>>>
->>>> diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
->>>> index 441134aebc51..863397c2a47b 100644
->>>> --- a/net/ipv4/tcp_ipv4.c
->>>> +++ b/net/ipv4/tcp_ipv4.c
->>>> @@ -1935,7 +1935,7 @@ int tcp_v4_do_rcv(struct sock *sk, struct sk_buf=
-f *skb)
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return 0;
->>>>
->>>> reset:
->>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tcp_v4_send_reset(rsk, skb, SK_R=
-ST_REASON_NOT_SPECIFIED);
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tcp_v4_send_reset(rsk, skb, (u32=
-)reason);
->>>> discard:
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 kfree_skb_reason(skb, reaso=
-n);
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* Be careful here. If this=
- function gets more complicated and
->>>> @@ -2278,7 +2278,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 } else {
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 drop_=
-reason =3D tcp_child_process(sk, nsk, skb);
->>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (d=
-rop_reason) {
->>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tcp_v4_send_reset(nsk, skb, SK_RST_REA=
-SON_NOT_SPECIFIED);
->>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tcp_v4_send_reset(nsk, skb, (u32)drop_=
-reason);
->>>
->>> Are all these casts really needed ?
->>
->> Not really. If without, the compiler wouldn't complain about it.
->
-> The truth is mptcp CI treats it as an error (see link[1]) when I
-> submitted the V5 patchset but my machine works well. I wonder whether
-> I should not remove all the casts or ignore the warnings?
+Marcin adds additional checks for unsupported flower filters.
 
-Please do not ignore the warnings, they are not specific to the
-MPTCP CI, they are also visible on the Netdev CI, and avoidable:
+The following are changes since commit e226eade8f50cda14a353f13777709797c21abf8:
+  Merge branch 'net-stmmac-fix-mac-capabilities-procedure'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 100GbE
 
-https://patchwork.kernel.org/project/netdevbpf/patch/20240416114003.62110-5=
--kerneljasonxing@gmail.com/
+Marcin Szycik (1):
+  ice: Fix checking for unsupported keys on non-tunnel device
 
-Cheers,
-Matt
+Michal Swiatkowski (2):
+  ice: tc: check src_vsi in case of traffic from VF
+  ice: tc: allow zero flags in parsing tc flower
+
+ drivers/net/ethernet/intel/ice/ice_tc_lib.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
+
+-- 
+2.41.0
+
 
