@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-88194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12D938A63CD
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:33:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 653C78A63C4
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:32:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDB981F21AB5
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 06:33:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2709B21C85
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 06:32:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDCA96BFC2;
-	Tue, 16 Apr 2024 06:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E241332C8C;
+	Tue, 16 Apr 2024 06:32:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bg5.exmail.qq.com (bg5.exmail.qq.com [43.154.197.177])
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC021E49D
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 06:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.154.197.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D23EEAB
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 06:32:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713249202; cv=none; b=cUgZuAN4zjHhMSzTTmXSPIINNVD0Fn/9p8ag74hsjjAMCFwEPFO7pe4d50H8hz8YO78dzwblluWCQEKbqyMnSPi6Xr+kXGcCiOWvBvEQKvO50/vJ+VDoUfgxPt69M7t1JE07f5e99RD06YdShqgm/Clwowd4d7d1iuKWUek3EJA=
+	t=1713249134; cv=none; b=OM9EPC3BCQkb+oZHiL+gLmvTMs5KuMEik+zPcTxcSEYzMdn92uVcrJkEW4zY5wDUqOjyqNaQiPPh1L5anPIMTXN0ajPQtYO4bymlq3uEcoWXaVqIMyigqPwKeXZpYQYzUKdA0+NBsFsjhuC6CGfDCqKPAldXfEUA/nX5ELRdEmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713249202; c=relaxed/simple;
-	bh=84W4/VSC8EgR7MavgN14T/xjQvFRS15y3wisyIOW2NY=;
+	s=arc-20240116; t=1713249134; c=relaxed/simple;
+	bh=I9NlJCrGWYknxzFJuEAMKKNKEzn9Y6o2XipBwQOUzpU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=L6NVEduUkRrT1XLPMEDzzpEvCFCwuUtL2mfVP6kf9AEOscLCEBYlDbsk5vB8STU+tqFULFQhDsZUbzxSLQzIljWj0RO8Af/gK1NrQgyy9Z8yCNxd6gm6ZgTPJjNgk2Yjs26PYP0WN9y762wI6USkoXEoywTuxadMvWHUtEWZOuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=43.154.197.177
+	 MIME-Version; b=Rq8Jl/DBzVRay40N6tUygpIxkcPRwSC/lUQuCk3tUxUZSB+iX0V07uWj4O6p528Iy7+qT0XQbSZp2ULpIrzcowZDL8ksZDSvNX0r2kUHkAiNma9hZOTalkB4mJsTGRckNrnFEfWvv6NLGj4lzamGTqwpttvm6750HlfiUxkvWsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.129
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtp88t1713249008t91m9pmw
-X-QQ-Originating-IP: 93RTpw930k7+K8yfwIbpURyp49p/cjo1gWMfMmh1NKs=
+X-QQ-mid: bizesmtp88t1713249012t9podm90
+X-QQ-Originating-IP: 7bFxeUF4S6HrGTS4dwigIYHShdpYgT8k6TphMBVBehE=
 Received: from lap-jiawenwu.trustnetic.com ( [125.119.246.177])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 16 Apr 2024 14:30:07 +0800 (CST)
+	id ; Tue, 16 Apr 2024 14:30:11 +0800 (CST)
 X-QQ-SSF: 01400000000000L0Z000000A0000000
-X-QQ-FEAT: GiL6AMY6vMBVcNHTqizpNXH4mD01zlKK3fAVKAyHhGPOt9WjVe70g8ptoQ2Wb
-	OBUqimIKojlfMCXPTrWS1NZnvNILPEP5fVAB2v9O1pv9KCXU1FhL2RzJnyN3GkIgSBJBxgu
-	FfMT41rJPcJ2nx26zCb1eLpBl3M3hxpSuqbNSozt0JTFFREZO6MPUYy/nohaglJTY/mY6wg
-	OMHeboUKXQAkl2BtiC5mhS/A/q4vQ3XSP6HADcdS/By0Y12kTu51qY4bwtKfyYCV2GtV/tH
-	glpEpfuTwxEmZz8jjWcStv6LCkJGuLiUP3YDqJpFy0/30b1KxvzcA1jaJTuuach1Cg5PqVw
-	KRbHqrTaVbNjWtFUM3AlSEu8+wXsYIh2Kk2UmlXJyx96a5Kh/00BzQECWsdojixqTHyX7dH
-	moPogAqp6e4=
+X-QQ-FEAT: RmDZc/K2LPFhQoYLMgbzg3Y6Wky8qVCKu6KDAv4QzWrF5rXMOxM2No2xBObby
+	/OwKT+EJnQJg0bc9YIz5LQlw4Dzs3vCa/yNh0NCr/Zku+kwW7yFOc1Xxa2T7myRuEeohetJ
+	SQNDgb/WfRwP5Xc/J75jNNxchIFJZZpDKJHUF8Zqrk9YwsheDRVekyGRnf8C2d7p8llOUH4
+	HWr/r8CE10hNPd5e45qvdAS9rOk4GyG/1YBT1bEBRmErN51w6dVDU7610MmMVlyQWMZMazx
+	DLypOjEeO0lRvkpwJaekY6LDEa9jrZcRqjxIPNxyRxgpcyLEyEw285YaOvZIsOitTHGT6X/
+	IC7NIOpQf5gc0kCb6irHMzoypArCsYpG8+2wRUOnSPckMVMjIJlBLTXPVdl1Pbsw2MZl1Yw
+	5uuGlaveujg=
 X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 13564188104620174498
+X-BIZMAIL-ID: 4555667413392080334
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -55,9 +55,9 @@ To: davem@davemloft.net,
 Cc: mengyuanlou@net-swift.com,
 	duanqiangwen@net-swift.com,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net 1/5] net: wangxun: fix the incorrect display of queue number in statistics
-Date: Tue, 16 Apr 2024 14:29:48 +0800
-Message-Id: <20240416062952.14196-2-jiawenwu@trustnetic.com>
+Subject: [PATCH net 2/5] net: wangxun: fix error statistics when the device is reset
+Date: Tue, 16 Apr 2024 14:29:49 +0800
+Message-Id: <20240416062952.14196-3-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.21.0.windows.1
 In-Reply-To: <20240416062952.14196-1-jiawenwu@trustnetic.com>
 References: <20240416062952.14196-1-jiawenwu@trustnetic.com>
@@ -71,79 +71,173 @@ Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-When using ethtool -S to print hardware statistics, the number of
-Rx/Tx queues printed is greater than the number of queues actually
-used.
+Add flag for reset state to avoid reading statistics when hardware
+is reset.
 
-Fixes: 46b92e10d631 ("net: libwx: support hardware statistics")
+Fixes: 883b5984a5d2 ("net: wangxun: add ethtool_ops for ring parameters")
 Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
 ---
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 19 ++++++++++++++-----
- 1 file changed, 14 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  3 +++
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  6 +++++
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  | 24 +++++++++++++++----
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    | 24 +++++++++++++++----
+ 4 files changed, 47 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-index cc3bec42ed8e..3847c909ba1a 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
-@@ -59,9 +59,17 @@ static const struct wx_stats wx_gstrings_stats[] = {
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+index 945c13d1a982..e4e6a14c4efc 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+@@ -2285,6 +2285,9 @@ void wx_update_stats(struct wx *wx)
+ 	u64 restart_queue = 0, tx_busy = 0;
+ 	u32 i;
  
- int wx_get_sset_count(struct net_device *netdev, int sset)
- {
-+	struct wx *wx = netdev_priv(netdev);
++	if (test_bit(WX_STATE_RESETTING, wx->state))
++		return;
 +
- 	switch (sset) {
- 	case ETH_SS_STATS:
--		return WX_STATS_LEN;
-+		if (wx->num_tx_queues <= WX_NUM_RX_QUEUES) {
-+			return WX_STATS_LEN -
-+			       (WX_NUM_RX_QUEUES - wx->num_tx_queues) *
-+			       (sizeof(struct wx_queue_stats) / sizeof(u64)) * 2;
-+		} else {
-+			return WX_STATS_LEN;
+ 	/* gather some stats to the wx struct that are per queue */
+ 	for (i = 0; i < wx->num_rx_queues; i++) {
+ 		struct wx_ring *rx_ring = wx->rx_ring[i];
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index 1fdeb464d5f4..3726ec2fec06 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -982,8 +982,14 @@ struct wx_hw_stats {
+ 	u64 qmprc;
+ };
+ 
++enum wx_state {
++	WX_STATE_RESETTING,
++	WX_STATE_NBITS,		/* must be last */
++};
++
+ struct wx {
+ 	unsigned long active_vlans[BITS_TO_LONGS(VLAN_N_VID)];
++	DECLARE_BITMAP(state, WX_STATE_NBITS);
+ 
+ 	void *priv;
+ 	u8 __iomem *hw_addr;
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
+index 786a652ae64f..0e85c5a6633e 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
+@@ -52,7 +52,8 @@ static int ngbe_set_ringparam(struct net_device *netdev,
+ 	struct wx *wx = netdev_priv(netdev);
+ 	u32 new_rx_count, new_tx_count;
+ 	struct wx_ring *temp_ring;
+-	int i;
++	u8 timeout = 50;
++	int i, err = 0;
+ 
+ 	new_tx_count = clamp_t(u32, ring->tx_pending, WX_MIN_TXD, WX_MAX_TXD);
+ 	new_tx_count = ALIGN(new_tx_count, WX_REQ_TX_DESCRIPTOR_MULTIPLE);
+@@ -64,6 +65,15 @@ static int ngbe_set_ringparam(struct net_device *netdev,
+ 	    new_rx_count == wx->rx_ring_count)
+ 		return 0;
+ 
++	while (test_and_set_bit(WX_STATE_RESETTING, wx->state)) {
++		timeout--;
++		if (!timeout) {
++			err = -EBUSY;
++			goto clear_reset;
 +		}
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -70,6 +78,7 @@ EXPORT_SYMBOL(wx_get_sset_count);
++		usleep_range(1000, 2000);
++	}
++
+ 	if (!netif_running(wx->netdev)) {
+ 		for (i = 0; i < wx->num_tx_queues; i++)
+ 			wx->tx_ring[i]->count = new_tx_count;
+@@ -72,14 +82,16 @@ static int ngbe_set_ringparam(struct net_device *netdev,
+ 		wx->tx_ring_count = new_tx_count;
+ 		wx->rx_ring_count = new_rx_count;
  
- void wx_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
- {
-+	struct wx *wx = netdev_priv(netdev);
- 	u8 *p = data;
- 	int i;
- 
-@@ -77,11 +86,11 @@ void wx_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
- 	case ETH_SS_STATS:
- 		for (i = 0; i < WX_GLOBAL_STATS_LEN; i++)
- 			ethtool_puts(&p, wx_gstrings_stats[i].stat_string);
--		for (i = 0; i < netdev->num_tx_queues; i++) {
-+		for (i = 0; i < wx->num_tx_queues; i++) {
- 			ethtool_sprintf(&p, "tx_queue_%u_packets", i);
- 			ethtool_sprintf(&p, "tx_queue_%u_bytes", i);
- 		}
--		for (i = 0; i < WX_NUM_RX_QUEUES; i++) {
-+		for (i = 0; i < wx->num_rx_queues; i++) {
- 			ethtool_sprintf(&p, "rx_queue_%u_packets", i);
- 			ethtool_sprintf(&p, "rx_queue_%u_bytes", i);
- 		}
-@@ -107,7 +116,7 @@ void wx_get_ethtool_stats(struct net_device *netdev,
- 			   sizeof(u64)) ? *(u64 *)p : *(u32 *)p;
+-		return 0;
++		goto clear_reset;
  	}
  
--	for (j = 0; j < netdev->num_tx_queues; j++) {
-+	for (j = 0; j < wx->num_tx_queues; j++) {
- 		ring = wx->tx_ring[j];
- 		if (!ring) {
- 			data[i++] = 0;
-@@ -122,7 +131,7 @@ void wx_get_ethtool_stats(struct net_device *netdev,
- 		} while (u64_stats_fetch_retry(&ring->syncp, start));
- 		i += 2;
+ 	/* allocate temporary buffer to store rings in */
+ 	i = max_t(int, wx->num_tx_queues, wx->num_rx_queues);
+ 	temp_ring = kvmalloc_array(i, sizeof(struct wx_ring), GFP_KERNEL);
+-	if (!temp_ring)
+-		return -ENOMEM;
++	if (!temp_ring) {
++		err = -ENOMEM;
++		goto clear_reset;
++	}
+ 
+ 	ngbe_down(wx);
+ 
+@@ -89,7 +101,9 @@ static int ngbe_set_ringparam(struct net_device *netdev,
+ 	wx_configure(wx);
+ 	ngbe_up(wx);
+ 
+-	return 0;
++clear_reset:
++	clear_bit(WX_STATE_RESETTING, wx->state);
++	return err;
+ }
+ 
+ static int ngbe_set_channels(struct net_device *dev,
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
+index db675512ce4d..216599bbf9de 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_ethtool.c
+@@ -19,7 +19,8 @@ static int txgbe_set_ringparam(struct net_device *netdev,
+ 	struct wx *wx = netdev_priv(netdev);
+ 	u32 new_rx_count, new_tx_count;
+ 	struct wx_ring *temp_ring;
+-	int i;
++	u8 timeout = 50;
++	int i, err = 0;
+ 
+ 	new_tx_count = clamp_t(u32, ring->tx_pending, WX_MIN_TXD, WX_MAX_TXD);
+ 	new_tx_count = ALIGN(new_tx_count, WX_REQ_TX_DESCRIPTOR_MULTIPLE);
+@@ -31,6 +32,15 @@ static int txgbe_set_ringparam(struct net_device *netdev,
+ 	    new_rx_count == wx->rx_ring_count)
+ 		return 0;
+ 
++	while (test_and_set_bit(WX_STATE_RESETTING, wx->state)) {
++		timeout--;
++		if (!timeout) {
++			err = -EBUSY;
++			goto clear_reset;
++		}
++		usleep_range(1000, 2000);
++	}
++
+ 	if (!netif_running(wx->netdev)) {
+ 		for (i = 0; i < wx->num_tx_queues; i++)
+ 			wx->tx_ring[i]->count = new_tx_count;
+@@ -39,14 +49,16 @@ static int txgbe_set_ringparam(struct net_device *netdev,
+ 		wx->tx_ring_count = new_tx_count;
+ 		wx->rx_ring_count = new_rx_count;
+ 
+-		return 0;
++		goto clear_reset;
  	}
--	for (j = 0; j < WX_NUM_RX_QUEUES; j++) {
-+	for (j = 0; j < wx->num_rx_queues; j++) {
- 		ring = wx->rx_ring[j];
- 		if (!ring) {
- 			data[i++] = 0;
+ 
+ 	/* allocate temporary buffer to store rings in */
+ 	i = max_t(int, wx->num_tx_queues, wx->num_rx_queues);
+ 	temp_ring = kvmalloc_array(i, sizeof(struct wx_ring), GFP_KERNEL);
+-	if (!temp_ring)
+-		return -ENOMEM;
++	if (!temp_ring) {
++		err = -ENOMEM;
++		goto clear_reset;
++	}
+ 
+ 	txgbe_down(wx);
+ 
+@@ -55,7 +67,9 @@ static int txgbe_set_ringparam(struct net_device *netdev,
+ 
+ 	txgbe_up(wx);
+ 
+-	return 0;
++clear_reset:
++	clear_bit(WX_STATE_RESETTING, wx->state);
++	return err;
+ }
+ 
+ static int txgbe_set_channels(struct net_device *dev,
 -- 
 2.27.0
 
