@@ -1,60 +1,85 @@
-Return-Path: <netdev+bounces-88244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FECE8A6722
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 11:30:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ED9C8A6730
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 11:34:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA6AE1F21B51
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 09:30:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3D63282346
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 09:34:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AEC28529D;
-	Tue, 16 Apr 2024 09:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0348593D;
+	Tue, 16 Apr 2024 09:34:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n59vF7jk"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="c+q9JnaZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1B793BBEC;
-	Tue, 16 Apr 2024 09:30:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8FDB84E0A
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 09:34:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713259810; cv=none; b=T5GyJpaoYlpCCd0vharTxY8Irmpvm7UBtJ/StxTURr4DfwfofWVs9cGk5mnbYmPfU/GKJsAQKwDiTLcZ/3sQFzD4YUp+/sKlASyS1Fwl5BHlZQBO04yxSVO5qqr+pjWBWqXObjPc5lxmV7JCtv49moYHKjbKACpW1GLViWaYOKg=
+	t=1713260085; cv=none; b=O8FcX3Hz/zss7m65q4XRj99Bb5Tgh9rBBiNm2TK46gnronmPd7rJFV32gy+sY39NoPbGVxGkDFTgbvHfGaK9/L1wZeUPcWIpbuWRM08SkcjMyp6kiOwtn+SQxzh9UkSB9j150Z+pILwPp2/3ZqJiyQJswg1W71pOtiVaHN0NS54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713259810; c=relaxed/simple;
-	bh=WkygNKfyFZB4KyWZpojMTvLTOsLkMXsRNu5G7hcxtJc=;
+	s=arc-20240116; t=1713260085; c=relaxed/simple;
+	bh=0robNhg7B+9Zlp5j5e9aAu88aVVJ97HJME/FDcistg0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fLWDVQBvv0MKPUrT3qcwV86t3RSG9hjQIVKuoiyzVyiNjqUL57m5NI2w+b52g3sBHaL2141w53IqhcMx+eu1l+T/Tb+7CM7RQG363CVTiHZ3fT/nOiq9DGpvntYaOBBXUpyVP19+PnqawvJ3yWBPwOc6j/GS7mTMi5eCTMeYHC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n59vF7jk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A813C4AF1B;
-	Tue, 16 Apr 2024 09:30:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713259809;
-	bh=WkygNKfyFZB4KyWZpojMTvLTOsLkMXsRNu5G7hcxtJc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=n59vF7jkTOHxBhiQopo58oqJUX/HHosM4W0a+Mp+n85wMirrCz4rrUheI+yiS0I2r
-	 5WcC4aNMhD3lZMiv/qdz0lY+VvlbyVJLLo774Onj1+jB5cUCJstvLhM8U95+47e9uK
-	 g2SxRJm7MFvL1PVzcru2Q+LtHqLBSN717oQE0PDUijJ1TBxduB4Y1SesFbxPfdEhJu
-	 YU771e7Uy0yGES5DpCCSIgKSse6CCxIdgUQo9uvEa9nvp21MHrf4YMFlYdxj+ES1Ju
-	 0+7r/1wJl/R8j5Z3MMG/ILAN872lKr/YPKkgCGPBrvxEnrRjDCNG0cOKELu7pkG7K2
-	 BlvHInVxXMceA==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1rwf8h-000000005Ye-3g2V;
-	Tue, 16 Apr 2024 11:30:08 +0200
-Date: Tue, 16 Apr 2024 11:30:07 +0200
-From: Johan Hovold <johan@kernel.org>
-To: Vanillan Wang <vanillanwang@163.com>
-Cc: gregkh@linuxfoundation.org, bjorn@mork.no, kuba@kernel.org,
-	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] USB:serial:option/net:usb:qmi_wwan:add Rolling moudles
- support
-Message-ID: <Zh5FH5iblkjq9XEL@hovoldconsulting.com>
-References: <20240416084409.21550-1-vanillanwang@163.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=E3jc1fyv10/QChrSx62MbHzWFMI89OWHfF97MQAigcwZKGKWvFNwlC/GEW7BOTQweVjwu2WUhmuDmwfnA49+Tqx3zPmBGWF91l8YnVpgNZUwsd8tKnBZgEV73PVWr29HF3MwxDiM3BMRpvGT2UCmdQ5wKBL0eV79rMlqUvaitzg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=c+q9JnaZ; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-570441bc23bso519242a12.0
+        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 02:34:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713260081; x=1713864881; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=TXdJcj/+kkmPAAsoR7RNPh07NL/neM0chAFl9zi98KQ=;
+        b=c+q9JnaZlHTXJCLSrDRdnGvHSQEUPsEr5fgCs+Q2izsJT4uIx0x7aJ3j2GX6a9X65I
+         I2lzPYj5lujyfE4Phv6/qPwDO8HNQvreoaKn4gJyvWjsE603PeAVW+ujypTU2n6BlCtE
+         GXXUBitaCimlpHtxETKuEDxhAPtlKWEzdc86p2cnx0BMzq8deDisOoCaeP7JZoKnbS1Y
+         zip392i+XuYFMqZA8kHumt5dD+iJ9YMzQvAUTbQtGgp+dhsuTD6G0sz21g12VCqi1jYy
+         VZLa6dZttowxVWarJuJZzR1HCRXspOeJdR0gHt1AFA5DS1iSa2AUJaxF8SVbNqDD19sU
+         F3TA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713260081; x=1713864881;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TXdJcj/+kkmPAAsoR7RNPh07NL/neM0chAFl9zi98KQ=;
+        b=AvqXIr/JPjGBJTb88TlP76QMox/yfkBZIj+hIG511mOR1D+dkpqbyWmTh0kAII1xo/
+         Ca8GSVV+sSrjll4Fc6CpMF7sxNP+ym5viljtOY9lUzFJ2tdy01xNDrK+6UftQ1EGWpah
+         xS88W9YCV/T95SoNjDeGK+gzihkxPSrU2cAAJY7fonCUqfZlF42djKlkXif8jw7c3Pxh
+         MPr42k6Oiy4w8ftBv5l6YqJGluFkU4zgNmyyBNENKfQpUo88D9FdR/CClbQ65g2rZY7C
+         FjuJiCbN/k0JXqGvAxCCG4ZC7nnxZBgk1apylkXt/pkXvCLvAhPtPUtblKUg5EkD28KR
+         54sw==
+X-Gm-Message-State: AOJu0YzjwmcUtkpUCz1bzud6OADCfIGh9WHbTPNcSvvtU2x2EtA0cUEf
+	03J0Wqx9YxhPZKf7+AtZRgUGnJaNpoTQOiTldjwecGWaqx/uQxOwx3X0ifepby8=
+X-Google-Smtp-Source: AGHT+IEcF71q+APVvmpSN2MuaXTLK4lkrhQWNOrBmoEma6xaeVUC0eN75AkjqcL8y4SJsprLmIdWIg==
+X-Received: by 2002:a50:cdc2:0:b0:56e:bad:36b with SMTP id h2-20020a50cdc2000000b0056e0bad036bmr7845401edj.21.1713260080886;
+        Tue, 16 Apr 2024 02:34:40 -0700 (PDT)
+Received: from localhost ([37.48.42.173])
+        by smtp.gmail.com with ESMTPSA id l3-20020a056402124300b00570229afc16sm2726329edw.7.2024.04.16.02.34.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Apr 2024 02:34:40 -0700 (PDT)
+Date: Tue, 16 Apr 2024 11:34:37 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Benjamin Poirier <benjamin.poirier@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, edumazet@google.com, parav@nvidia.com,
+	mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	shuah@kernel.org, petrm@nvidia.com, liuhangbin@gmail.com,
+	vladimir.oltean@nxp.com, idosch@nvidia.com,
+	virtualization@lists.linux.dev
+Subject: Re: [patch net-next v2 5/6] selftests: forwarding: add
+ wait_for_dev() helper
+Message-ID: <Zh5GLQZxfW7d4WBF@nanopsycho>
+References: <20240415162530.3594670-1-jiri@resnulli.us>
+ <20240415162530.3594670-6-jiri@resnulli.us>
+ <Zh2enn9ArVKDrdIy@f4>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,20 +88,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240416084409.21550-1-vanillanwang@163.com>
+In-Reply-To: <Zh2enn9ArVKDrdIy@f4>
 
-On Tue, Apr 16, 2024 at 04:44:09PM +0800, Vanillan Wang wrote:
-> Update the USB serial option and qmi_wwan driver support for the Rolling
-> LTE modules.
+Mon, Apr 15, 2024 at 11:39:42PM CEST, benjamin.poirier@gmail.com wrote:
+>On 2024-04-15 18:25 +0200, Jiri Pirko wrote:
+>> From: Jiri Pirko <jiri@nvidia.com>
+>> 
+>> The existing setup_wait*() helper family check the status of the
+>> interface to be up. Introduce wait_for_dev() to wait for the netdevice
+>> to appear, for example after test script does manual device bind.
+>> 
+>> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>> ---
+>> v1->v2:
+>> - reworked wait_for_dev() helper to use slowwait() helper
+>> ---
+>>  tools/testing/selftests/net/forwarding/lib.sh | 13 +++++++++++++
+>>  1 file changed, 13 insertions(+)
+>> 
+>> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+>> index 254698c6ba56..e85b361dc85d 100644
+>> --- a/tools/testing/selftests/net/forwarding/lib.sh
+>> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+>> @@ -746,6 +746,19 @@ setup_wait()
+>>  	sleep $WAIT_TIME
+>>  }
+>>  
+>> +wait_for_dev()
+>> +{
+>> +        local dev=$1; shift
+>> +        local timeout=${1:-$WAIT_TIMEOUT}; shift
+>> +
+>> +        slowwait $timeout ip link show dev $dev up &> /dev/null
+>
+>Sorry, I just noticed that this includes the "up" flag. I was confused
+>for a while until I realized that `ip` returns success even if the
+>interface is not up:
+>
+># ip link set dev eth1 down
+># ip link show dev eth1 up
+># echo $?
+>0
+>
+>So wait_for_dev() really does just wait for the device to appear, not
+>for it to be up. If you agree, please remove the 'up' keyword to avoid
+>confusion.
 
-> Signed-off-by: Vanillan Wang <vanillanwang@163.com>
-> ---
->  drivers/net/usb/qmi_wwan.c  | 1 +
->  drivers/usb/serial/option.c | 8 ++++++++
->  2 files changed, 9 insertions(+)
+That is the intension :) I don't care about it being up, I just need to
+have it in the system.
 
-Please split this in two patches (they will go in through different
-subsystem trees).
-
-Johan
 
