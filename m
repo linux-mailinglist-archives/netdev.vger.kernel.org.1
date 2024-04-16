@@ -1,139 +1,120 @@
-Return-Path: <netdev+bounces-88371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CCD28A6E9B
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:40:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6ED68A6E79
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:36:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5D19B260CA
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:37:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9491328469A
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:36:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6F512D203;
-	Tue, 16 Apr 2024 14:35:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CAC812FF65;
+	Tue, 16 Apr 2024 14:35:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Avodo1e6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EfCE4Bqn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFE21CAA6
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 14:35:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EABF12D741;
+	Tue, 16 Apr 2024 14:35:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713278146; cv=none; b=AeFsOfVx9v9QV5O1fQZnASuI+NeKxpvWMmpKj7AwiSJtJJPRCEjbP/ad1Hwu7MI3q4JscIlZhv1LC+J853MSaFe1b8A32C/AD+iZ9PRFttMTBwMOztGKjPIldSqMeXKUjdNavRLGbBUzROqe+/JcFjh6SEeFfVEXx+jP6IhgAx4=
+	t=1713278137; cv=none; b=g73pDEXN6uYlrqLwTTLRDXBL12lvkwSH7IrKHM5nUsrwrixaw5uWTKR9YBV8jR6vfb9oXiWF0u3olJpUhtL0x1Bv+Vs1RkxWqNmoohRgfTSLcyD3sMh8rg3cA+eIm28b5mJwfgiVXkPuZSHO26WJRJJo6rMwVlPw1HNUTgoGJ8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713278146; c=relaxed/simple;
-	bh=R2aZvhNp+Rf+64BcKlxWRa4Zfgc4xnS1zXhNuMgnwUE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OVhYDtvmX8ugivcvHh12ArdAofly8GN1euUgEPd4HUQ+2Olr7Oy3M4coIO5/wvE80MWS+DrkkQBJnFI++EbDHhSWdAy9dYOeSqUB2GgKltHF3nuCDlImPr53lPzfYi3qEbTnQAGEBFVnm856gXKXxlaSFTI6qhIR+0IlHmtdEHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Avodo1e6; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-343f1957ffcso2676370f8f.0
-        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 07:35:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713278140; x=1713882940; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=neOc/Dpw59RF7ud53ejx/znC7Itf/4I5NFf8iGSF8EE=;
-        b=Avodo1e6CIR6yLsYUJ1sANlHjZl38BW/QF6LMfl9tVsnbJakjtKeirVcXRdC+jBmnR
-         JhdtIIGvGrEjs/ee/CdLBWoMKT9xCM4XRX3Hk8fO08IvRdCAmJKbn501QGPzFzkWyDrM
-         pmSTwF6Cb4wRsqmUCSJ51r9Vpp8H5dW9rG4HvT4GaZBPFp8qrU63KaZyYpZQMoUC28DR
-         7AOhvMSf7Rzbwr1CxxW36+ifgiUjmZGFzQhKkRrniXAQRpRXjh9Q7wQDOcn7EtJi9Jek
-         GxKqQ4HAeN6XN9R6ixVqs09ACLXXJ8c5XYW4kcqeFcyXJT8miGY/ucYJTunEIhM2MslN
-         +7eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713278140; x=1713882940;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=neOc/Dpw59RF7ud53ejx/znC7Itf/4I5NFf8iGSF8EE=;
-        b=ipZtw8824c+pgIq3f/k8QWJJoPXAC5A12s4RFXWOuT0PyMeb9gQOD4fsqHQMxYS8eH
-         cMJlmbWL9Z/xZy4G1lfiZ9bbxSu9swZqDSU4pk/JM/OEFFS8/ZFj4TipU6weES/DqyhI
-         sDYXtCBaWupIbtMtoRrYYb7c5Gqlo2TGTtz3WwBmgJz55YQHOET5ZJE2i94PmavC1tp8
-         oaV7liKXPtVxLR/MivGs4VSJ3gpSiGMUrlO21WEgJ0gyY+r0a/aS6vraG8guc7t50cHj
-         vqoQFsPNa7b6c7tZZ3PFvS0TLHZdUHMBhpjnTF9+5srcNCqEp8Br4I4BvJlH+5ARNdGj
-         4B8A==
-X-Forwarded-Encrypted: i=1; AJvYcCUk3dCySeRVSk/Kj5NHg0lsQoPBBEyt+dZ/j/5gEl+NWD0gEZqe0Wggow9OSjNExuvnO6MQolBkyyqM8kmjcy6uVhV+EKsU
-X-Gm-Message-State: AOJu0Yy2ZYD70OQZWIwXBGwLBAX6J/6vLujhAn6tYOoglWcfjY3cEdzK
-	DLw41G9/rIKkhiZtc009UHgi/Y7x22RktiwHQgzzQWvS9wyuilZcU9YPrtMij04ltrRwvRHPHxL
-	UmEmK5dniuXjRMnIyQSf773LO2kg=
-X-Google-Smtp-Source: AGHT+IFjYKnGfjQd5n0HAAgtXpG+19WSfEDB+KXHlqsXWplteZ7ixPlzhVyaiPIonXqMbgw30xfZnX+U7kHSXdXvnAE=
-X-Received: by 2002:adf:eec2:0:b0:342:d5ac:c712 with SMTP id
- a2-20020adfeec2000000b00342d5acc712mr2248305wrp.7.1713278139505; Tue, 16 Apr
- 2024 07:35:39 -0700 (PDT)
+	s=arc-20240116; t=1713278137; c=relaxed/simple;
+	bh=bucavU5HfQwA1yemtOpcU4H0NN+3+/h4cXMCk96/A6s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s+RP/jmVu4/RQg7HHAJr4GMla/sLeaMaw1IxJGQ8htkkzzrHjuroV7fKP0IakspcLWcKDQi/9QyxEIVORLaHlORx1ZUs5Mn7hCOmp6BLa4nqzBBEtLv+YhBXO+IigPM3mZ8tbRlFyZSXNo5FAoppZR1Z1XcVNchjkl6KRRUm5RE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EfCE4Bqn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 220D1C113CE;
+	Tue, 16 Apr 2024 14:35:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713278136;
+	bh=bucavU5HfQwA1yemtOpcU4H0NN+3+/h4cXMCk96/A6s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=EfCE4BqnmunYvNboW8U7r6o8if1ruEE5iowfEac9iRxH4d4Xm3OTot+uQA2GiM5Ej
+	 H7RHsx5q2j+CbSW9LMVB9w0LR7PojkHBgceHEEQFKeuXf/vfZKUs7YVAW/wdfdLT49
+	 FZGKZFgzUTQPx4PuNaWX/ZLVrSvf15Pfi4Uzq7tXXdOyPwl4+CWO4CqKk0zb4lYas4
+	 Oc/QbSjsEP6v9m/Sxk3rEQEB3kgNvttj4aJaktOMnfh6fj/v5OfIUeDfHIiCi/26D6
+	 urAHd0PnMxQ40jtgJoKU0miGkV+H2OHw+qJK8ZlNDiyBbUq71T5or4uaa+jXOJAzns
+	 GIMFhnOfSnuQQ==
+Date: Tue, 16 Apr 2024 15:35:30 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Peng Fan <peng.fan@nxp.com>
+Cc: "Peng Fan (OSS)" <peng.fan@oss.nxp.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"shawnguo@kernel.org" <shawnguo@kernel.org>,
+	"s.hauer@pengutronix.de" <s.hauer@pengutronix.de>,
+	"kernel@pengutronix.de" <kernel@pengutronix.de>,
+	"festevam@gmail.com" <festevam@gmail.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	dl-linux-imx <linux-imx@nxp.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] dt-bindings: net: nxp,dwmac-imx: allow nvmem cells
+ property
+Message-ID: <20240416-simplify-septic-0fd3f7fe4b31@spud>
+References: <20240415103621.1644735-1-peng.fan@oss.nxp.com>
+ <20240415-limes-chasing-dbc111fa9cf2@spud>
+ <DU0PR04MB94173B23CBB11E8DC736E90788082@DU0PR04MB9417.eurprd04.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <171217496013.1598374.10126180029382922588.stgit@ahduyck-xeon-server.home.arpa>
- <41a39896-480b-f08d-ba67-17e129e39c0f@huawei.com> <CAKgT0Uf6MdYX_1OuAFAXadh86zDX_w1a_cwpoPGMxpmC4hGyEA@mail.gmail.com>
- <53b80db6-f2bc-d824-ea42-4b2ac64625f2@huawei.com> <CAKgT0UeQS5q=Y2j3mmu9AhWyUMbey-iFL+sKES1UrBtoAXMdzw@mail.gmail.com>
- <0e5e3196-ca2f-b905-a6ba-7721e8586ed7@huawei.com> <CAKgT0UeRWsJ+NiniSKa7Z3Law=QrYZp3giLAigJf7EvuAbjkRA@mail.gmail.com>
- <bf070035-ba9c-d028-1b11-72af8651f979@huawei.com> <CAKgT0UccovDVS8-TPXxgGbrTAqpeVHRQuCwf7f2qkfcPaPOA-A@mail.gmail.com>
- <20240415101101.3dd207c4@kernel.org> <CAKgT0UcGN3-6R4pt8BQv2hD04oYk48GfFs1O_UGChvrrFT5eCw@mail.gmail.com>
- <20240415111918.340ebb98@kernel.org> <CAKgT0Ud366SsaLftQ6Gd4hg+MW9VixOhG9nA9pa4VKh0maozBg@mail.gmail.com>
- <20240415150136.337ada44@kernel.org> <b725331c-ae88-b9dd-de12-e8e9b9fc020b@huawei.com>
-In-Reply-To: <b725331c-ae88-b9dd-de12-e8e9b9fc020b@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 16 Apr 2024 07:35:02 -0700
-Message-ID: <CAKgT0Ufgn6O7GXZd8+YR53ciRdyBbWmw-qShy8vo1Es_Xn5KBA@mail.gmail.com>
-Subject: Re: [net-next PATCH 13/15] eth: fbnic: add basic Rx handling
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="LbFcVf2EOeZRzbNd"
+Content-Disposition: inline
+In-Reply-To: <DU0PR04MB94173B23CBB11E8DC736E90788082@DU0PR04MB9417.eurprd04.prod.outlook.com>
+
+
+--LbFcVf2EOeZRzbNd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 16, 2024 at 6:25=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> On 2024/4/16 6:01, Jakub Kicinski wrote:
-> > On Mon, 15 Apr 2024 11:55:37 -0700 Alexander Duyck wrote:
-> >> It would take a few more changes to make it all work. Basically we
-> >> would need to map the page into every descriptor entry since the worst
-> >> case scenario would be that somehow we end up with things getting so
-> >> tight that the page is only partially mapped and we are working
-> >> through it as a subset of 4K slices with some at the beginning being
-> >> unmapped from the descriptor ring while some are still waiting to be
-> >> assigned to a descriptor and used. What I would probably have to look
-> >> at doing is adding some sort of cache on the ring to hold onto it
-> >> while we dole it out 4K at a time to the descriptors. Either that or
-> >> enforce a hard 16 descriptor limit where we have to assign a full page
-> >> with every allocation meaning we are at a higher risk for starving the
-> >> device for memory.
-> >
-> > Hm, that would be more work, indeed, but potentially beneficial. I was
-> > thinking of separating the page allocation and draining logic a bit
-> > from the fragment handling logic.
-> >
-> > #define RXPAGE_IDX(idx)               ((idx) >> PAGE_SHIFT - 12)
-> >
-> > in fbnic_clean_bdq():
-> >
-> >       while (RXPAGE_IDX(head) !=3D RXPAGE_IDX(hw_head))
-> >
-> > refer to rx_buf as:
-> >
-> >       struct fbnic_rx_buf *rx_buf =3D &ring->rx_buf[idx >> LOSE_BITS];
-> >
-> > Refill always works in batches of multiple of PAGE_SIZE / 4k.
->
-> Are we expecting drivers wanting best possible performance doing the
-> above duplicated trick?
->
-> "grep -rn '_reuse_' drivers/net/ethernet/" seems to suggest that we
-> already have similar trick to do the page spliting in a lot of drivers,
-> I would rather we do not duplicate the above trick again.
+On Tue, Apr 16, 2024 at 01:52:18PM +0000, Peng Fan wrote:
+> > Subject: Re: [PATCH] dt-bindings: net: nxp,dwmac-imx: allow nvmem cells
+> > property
+> >=20
+> > On Mon, Apr 15, 2024 at 06:36:21PM +0800, Peng Fan (OSS) wrote:
+> > > From: Peng Fan <peng.fan@nxp.com>
+> > >
+> > > Allow nvmem-cells and nvmem-cell-names to get mac_address from onchip
+> > > fuse.
+> >=20
+> > Is this valid for all 3 devices in this binding?
+>=20
+> Yes. It is valid for all the three devices.
 
-Then why not focus on those drivers? You may have missed the whole
-point but it isn't possible to test this device on a system with 64K
-pages currently. There aren't any platforms we can drop the device
-into that support that.
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+
+Ty,
+Conor.
+
+--LbFcVf2EOeZRzbNd
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZh6MsQAKCRB4tDGHoIJi
+0qwpAP4yvTjwx08VV0VAKWzRYa9NlvgQYCEVtOlvbUu9rEG4VwEAhqWVRlHReAgp
+ezG+zW9kzq6/B7Zd0xKKWyPpR4NZaws=
+=TITW
+-----END PGP SIGNATURE-----
+
+--LbFcVf2EOeZRzbNd--
 
