@@ -1,124 +1,102 @@
-Return-Path: <netdev+bounces-88310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89B548A6A3F
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:08:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E99A8A6A4D
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:08:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46F48282603
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:08:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B0821C21295
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:08:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18275129E89;
-	Tue, 16 Apr 2024 12:08:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1831DFEF;
+	Tue, 16 Apr 2024 12:08:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="oTToowc7"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="b00vZ9g7"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416B912A152;
-	Tue, 16 Apr 2024 12:08:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A50683CCD;
+	Tue, 16 Apr 2024 12:08:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713269290; cv=none; b=YGmPdp/j0XWKL5+k8VzvdvGiIw3PyVe2qUaTX3m1pNl4/0qtxPrSYZVnmbYzqrj5b0r8M3hR7YKidFF/57kOsskOS7NucKtqm3ApMG4RD8OsPKRASA9+xFnXaZuDO0E0faCiGRdpWdJ9Q8RYl9xxi+XkqNnSrMJbxAAYQImtjQ4=
+	t=1713269323; cv=none; b=oyPJlUNO8qOdF+QCKfgxrdzwkCpwc89Qm+Srth57gi4vW+nr81MG1WdFPzNRTQUlQRw1jnwGQ3Fix6ZDQxT4AtIGyDvenw5HARye/QvsK+L+rtcCv4A7qm+05K1M8tbE/aCauWemw+OgSJZ6lu3us3BNBAOGhPDnLSABesWl7Qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713269290; c=relaxed/simple;
-	bh=IAHSnrcKlcI8ozUz5u3hnsd15J+T6mwYexmmNVoCE8U=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tlSIYkLOfG3TxmINl/rsuxY3nP2hYBUuUv6Swrsz3LzrZbkmIZdFb73ClX35uOUWV5W9WXvs+A61zTy1GMgpuo4rv3R4gEWOsg+DTOALgbw7CnUCea9Bwr+cP3HAq8r1M9u/qq1+8gg5ABOVuoKSe7eqnYWwyO0ORNzKNn+J79k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=oTToowc7; arc=none smtp.client-ip=220.197.31.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=If8AF
-	FWxkDIUWXQPk3YZpE9a/mxnoJ4QeoIijjT/Lrg=; b=oTToowc7t04fDfWi6RkN3
-	5T16wdYInp9nDcNJAIwSBNghByTLSG0OrhM+tIF63A8PwXidISn8dWfpD+0Yitl/
-	2sLpCS8YPZW92+pc9DkFQAs0mydDCUdeWF/darGHWFuCzQdvtr1WnZB9wqtoYzvf
-	O9/xUylc635/Gx6FIJ4wqM=
-Received: from smtp.163.com (unknown [124.89.89.114])
-	by gzga-smtp-mta-g1-4 (Coremail) with SMTP id _____wDntzTyaR5mIlBKBQ--.22456S4;
-	Tue, 16 Apr 2024 20:07:15 +0800 (CST)
-From: Vanillan Wang <vanillanwang@163.com>
-To: bjorn@mork.no,
-	davem@davemloft.net,
-	kuba@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Vanillan Wang <vanillanwang@163.com>
-Subject: [PATCH] net:usb:qmi_wwan: support Rolling modules
-Date: Tue, 16 Apr 2024 20:07:13 +0800
-Message-Id: <20240416120713.24777-1-vanillanwang@163.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1713269323; c=relaxed/simple;
+	bh=JPUAg8CKdAIwgdoZNkQeMsiJ4zY6KVT0YCL6rtRwpTs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jn1MsZyP2z5wYAD/QFSB6g9KZ/eygWfKyMKxDVofBvsua296hQwh+k3NC4+beJiUWr8YndbAL7AOx6C7sYHkwsY/BpAn24reRtXDauwCQqzZh++MM/R8nbsxkGwGOhTR4gblL+5AzaeceyrCKvZZRC9VnSjtQZ5+DwSbJAdI7vc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=b00vZ9g7; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=FS9J2Fip8TfYkPZ+m/CmO8+R1mu1fbpLQrM1HAAlF2o=; b=b00vZ9g7YvlqFvkMK/6ur5FRpO
+	mXezNz5Rvi1bQ0+3+hCCImuGH/999eEkaAwdxJqAG+6UDYwed9P8W1MziW/9+0UbkAqj3bUNHW1Ee
+	rNiUBpcIFfQPrVZ18+UPJbpEBt5GnLgMbgsUp0cVNAeqfQRcLg2Wt7UytCR5PFWVIvCk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rwhc0-00D8Fc-7N; Tue, 16 Apr 2024 14:08:32 +0200
+Date: Tue, 16 Apr 2024 14:08:32 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Trevor Gross <tmgross@umich.edu>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org
+Subject: Re: [PATCH net-next v1 4/4] net: phy: add Applied Micro QT2025 PHY
+ driver
+Message-ID: <0aa87df5-a2b8-45b8-a483-37eee86739bc@lunn.ch>
+References: <20240415104701.4772-1-fujita.tomonori@gmail.com>
+ <20240415104701.4772-5-fujita.tomonori@gmail.com>
+ <CALNs47v+35RX4+ibHrcZgrJEJ52RqWRQUBa=_Aky_6gk1ika4w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDntzTyaR5mIlBKBQ--.22456S4
-X-Coremail-Antispam: 1Uf129KBjvJXoWxJrW8tF18Kr4xXw17WFy7trb_yoW5JF4kpa
-	17Ga1fXF1rJF1Yk3ZIkF1xZaySq3Z7Wr12ka4UX3ySqFWxArs7Gr1YvrZ7Wr1q9r40yF4v
-	qayDG3y8GF93GFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UDnYwUUUUU=
-X-CM-SenderInfo: pydqxz5odq4tlqj6il2tof0z/1tbisgXCUmVOCw5ovQABsd
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALNs47v+35RX4+ibHrcZgrJEJ52RqWRQUBa=_Aky_6gk1ika4w@mail.gmail.com>
 
-Update the qmi_wwan driver support for the Rolling
-LTE modules.
+> > +        let mut a = MDIO_MMD_PCS;
+> > +        for (i, val) in fw.data().iter().enumerate() {
+> > +            if i == 0x4000 {
+> > +                a = MDIO_MMD_PHYXS;
+> > +                j = 0x8000;
+> > +            }
+> 
+> Looks like firmware is split between PCS and PHYXS at 0x4000, but like
+> Greg said you should probably explain where this comes from.
+> 
+> > +            dev.c45_write(a, j, (*val).into())?;
+> 
+> I think this is writing one byte at a time, to answer Andrew's
+> question. Can you write a `u16::from_le_bytes(...)` to alternating
+> addresses instead? This would be pretty easy by doing
+> `fw.data().chunks(2)`.
 
-- VID:PID 33f8:0104, RW101-GL for laptop debug M.2 cards(with RMNET
-interface for /Linux/Chrome OS)
-0x0104: RMNET, diag, at, pipe
+That probably does not work, given my understanding of what is going
+on. A C45 register is a u16.
 
-Here are the outputs of usb-devices:
-T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=5000 MxCh= 0
-D:  Ver= 3.20 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 9 #Cfgs=  1
-P:  Vendor=33f8 ProdID=0104 Rev=05.04
-S:  Manufacturer=Rolling Wireless S.a.r.l.
-S:  Product=Rolling Module
-S:  SerialNumber=ba2eb033
-C:  #Ifs= 6 Cfg#= 1 Atr=a0 MxPwr=896mA
-I:  If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
-E:  Ad=01(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E:  Ad=81(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=02(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E:  Ad=83(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=03(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E:  Ad=84(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E:  Ad=85(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 3 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=00 Prot=40 Driver=option
-E:  Ad=04(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E:  Ad=86(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E:  Ad=87(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 4 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
-E:  Ad=0f(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E:  Ad=88(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
-E:  Ad=8e(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-I:  If#= 5 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=usbfs
-E:  Ad=05(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E:  Ad=89(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+The data sheet says:
 
-Signed-off-by: Vanillan Wang <vanillanwang@163.com>
----
- drivers/net/usb/qmi_wwan.c | 1 +
- 1 file changed, 1 insertion(+)
+  The 24kB of program memory space is accessible by
+  MDIO. The first 16kB of memory is located in the
+  address range 3.8000h - 3.BFFFh. The next 8kB of
+  memory is located at 4.8000h - 4.9FFFh.
 
-diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-index e2e181378f41..edc34402e787 100644
---- a/drivers/net/usb/qmi_wwan.c
-+++ b/drivers/net/usb/qmi_wwan.c
-@@ -1431,6 +1431,7 @@ static const struct usb_device_id products[] = {
- 	{QMI_FIXED_INTF(0x2692, 0x9025, 4)},    /* Cellient MPL200 (rebranded Qualcomm 05c6:9025) */
- 	{QMI_QUIRK_SET_DTR(0x1546, 0x1312, 4)},	/* u-blox LARA-R6 01B */
- 	{QMI_QUIRK_SET_DTR(0x1546, 0x1342, 4)},	/* u-blox LARA-L6 */
-+	{QMI_QUIRK_SET_DTR(0x33f8, 0x0104, 4)}, /* Rolling RW101 RMNET */
- 
- 	/* 4. Gobi 1000 devices */
- 	{QMI_GOBI1K_DEVICE(0x05c6, 0x9212)},	/* Acer Gobi Modem Device */
--- 
-2.34.1
+0x3bfff-0x3800 = 0x0x3fff = 16K.
 
+So there are 16K u16 registers mapped onto 16K bytes of SRAM. So each
+register holds one byte. Trying to write two bytes every other
+register is not something which the datasheet talks about. So i doubt
+it will work. Which is shame, because it would double the download
+speed.
+
+	Andrew
 
