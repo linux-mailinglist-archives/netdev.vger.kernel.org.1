@@ -1,125 +1,105 @@
-Return-Path: <netdev+bounces-88423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 738DA8A726C
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 19:33:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 641F08A7298
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 19:44:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 04CED282485
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 17:33:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E841C2825D8
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 17:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71B8132C1F;
-	Tue, 16 Apr 2024 17:33:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A29D013342A;
+	Tue, 16 Apr 2024 17:44:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wzt72N49"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2186FF4E7;
-	Tue, 16 Apr 2024 17:33:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E3F1332A7
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 17:44:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713288823; cv=none; b=DAztOFBc7nKg2rKccNWDeUojtRM8Iz3ZRVfMxpdBsZ2ZpgexktzXwiB1nS2f3vaV5hgh9op7W6Ca6r7aByn3q+4qrmgYdNex8OQCksUdK8/MI09rLdVYBZZjq1K4ptBJVLJ2tH0K/1dgxjMSBP7Acd9TWvzJA/N8EweJacl50tA=
+	t=1713289486; cv=none; b=dpfa+v9a1iF/Yx6sZ8Q6xIBFaE9pupJ7WLVtCNrH/nM5ir2OiwkjP802/zO3LEgj1iPbA4JfptYwJJpeIcgpBtANvx9PlV/IZk46qx6LUo+9f81PzlcSIbU0kyEQJXjuAvsQPJjfEAH9DsYzFXbz3ld+4W4HOkqeoPC+0FxExfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713288823; c=relaxed/simple;
-	bh=oyuMKSYGoMfRz+tvPVJ/jIgvFe45ZdlNrFcZrO/Oozo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cARZ+MBZ0F/ha0SSCEde9f29OgY9hg1MjDsmGJegmxMHcl2w14yCyE3QL7+PgHmiRLg4PEOqPW5b5kroc5VxqjFaAskpW87myvHgzEoKyojrrANRnz8yWQ/NqHQmNll9IBaEMU+10EhBGN1ptvMYVnorLYoZKdvNSp3QXoqtx1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=auristor.com; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=auristor.com
+	s=arc-20240116; t=1713289486; c=relaxed/simple;
+	bh=nr4g1oINXA11L+a73PiTlGoU/0iSIb8Hy8dL+fJSMlA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W+EbtBeu53kroMGV0TGpVEDJb4dOnXt3WJm+RvSSolu1U5u6WscMPU0MQI1rqMqYICl412TsxboHFxPBpx0/zc1na4RJI1FLL0UmX7bZoJFS0ZXsItTD8z2tAIqDA5pwWBqHIEvR0cCeHwvpN6MqAMR3DmL6nfP1MofjFZw3ktg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wzt72N49; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-6e9e1a52b74so781276a34.0;
-        Tue, 16 Apr 2024 10:33:40 -0700 (PDT)
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-78d68c08df7so369279285a.2
+        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 10:44:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713289484; x=1713894284; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XrIP5NfD1uVdOzJdpOysC0NK7Um7o2M5ma7/UNP5Z/c=;
+        b=Wzt72N49XjcwXboAM0i0lVLER3SVtqUjKxSYu0Yk4HnBRnv+/ZAinvgy6aUoq76/y2
+         NUDCkp1y5lAB9ww/UmwUmkUu/uj5DOSibZfkl284nRgjORxHn0hUuuSuQ3sIHsfFisFB
+         t060S/4ZUcJk5O/T405CBix8LvhpB8H000wZME7ee9mCLMVI9xezX87QkDL284nelHEi
+         aOaFRwPfL+Mm3z668QR+7Im0XtXmO+KtvWa3dHH1fcYiOPb6i+na7elWQPV7KuFMAlGz
+         loNk9CTff5EINQAUbRQ9DrHVrtlBQywy7SQ0RzROFLN+9KVvT6nQYSOOtXit9/ZvwX+K
+         P4WQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713288820; x=1713893620;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=F8Fq3HZ/CaefZ5llRGtNvq0zZoQTpNhHnR6rkcG9Onc=;
-        b=oTXCCSbaUNGxS0kZdKo1Db0xteqmsWV3znkAYDRdPeePHZyqqDH8ja/lmWEVG4J5WP
-         VReN8U7bNa8PGY6jAFV2hjfM1VVnV4uNLbfHi82i5pAMbcW/hpZLOT7uO0q6STcRgp/d
-         TZJTSooCGMvlabelEwxGXkh2ICjbX01dfeL8E7bexonxEAqGKP3NZZaVKEEM5HJKJZU/
-         cOLNlGAqaj2hWBZF43e6SLppKKF7XG7iZ8KI5MxCKFpZeHrk4L5aPPwU1TW4eTtKHYsH
-         nmcjvsSNibRaD6ZSO8q/dY8Ep+MXLeKlgYzquzoXZusGQFmBNauxXFbV8YS4kSArhfn8
-         igLw==
-X-Forwarded-Encrypted: i=1; AJvYcCWN5k4hxdy9GzMY325wEYooMI60dH6ppqbIRIvVmJheOSZ8ZL7KoLkVQ/X5Yj3ZdyldyMbemV9LQX4EKXiImqpT70364kPM
-X-Gm-Message-State: AOJu0Yz5hWKH54xjTxSQCUiAaY/V94NlMirMmD1GwBbL0pOlf2T6c6X8
-	2bzwdUmtRWGR1sqUQNVVMtRK4kTFEDgCM59VGKUA4J57/MYwVQnYTpIvOuBQ
-X-Google-Smtp-Source: AGHT+IHlUJXf+egTIlLcd42IFhCtKBOGMyeucgOobbmxD7Sy4JCYOTx59oxRQCIT8vAf0H1CE0Fkhg==
-X-Received: by 2002:a9d:4d89:0:b0:6eb:7cc9:93c3 with SMTP id u9-20020a9d4d89000000b006eb7cc993c3mr8004133otk.0.1713288820102;
-        Tue, 16 Apr 2024 10:33:40 -0700 (PDT)
-Received: from hemlock.fiveisland.rocks (hlfxns014qw-156-57-186-228.dhcp-dynamic.fibreop.ns.bellaliant.net. [156.57.186.228])
-        by smtp.gmail.com with ESMTPSA id d6-20020a05620a136600b0078ed1f9f101sm5667027qkl.88.2024.04.16.10.33.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 10:33:39 -0700 (PDT)
-From: Marc Dionne <marc.dionne@auristor.com>
-To: David Howells <dhowells@redhat.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jeffrey Altman <jaltman@auristor.com>
-Cc: linux-kernel@vger.kernel.org,
-	linux-afs@lists.infradead.org
-Subject: [PATCH] rxrpc: Clients must accept conn from any address
-Date: Tue, 16 Apr 2024 14:31:38 -0300
-Message-ID: <20240416173138.126853-1-marc.dionne@auristor.com>
-X-Mailer: git-send-email 2.44.0
+        d=1e100.net; s=20230601; t=1713289484; x=1713894284;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XrIP5NfD1uVdOzJdpOysC0NK7Um7o2M5ma7/UNP5Z/c=;
+        b=XQVc/j0tbf6kxNvnqZ/K4h2SEb3F7+yNBtFHOeZaqTPsP/fljBf+xYiQijwtS7kniL
+         IYQA1KOj4E+x1CXFHwWKnqgCSmKGL61l4MlM9QAoUtlMccl1Xf69Adc9gW5hCgu3aMV0
+         zn75Xy8HUR6JKm6VcDWxwhXjPcE0OKBkDZu5yWCEQiHUcp/myji9b5lAMNHTb10u+8gm
+         7MckOcqQTky+EEAFHWwLrLECtRGa9sfXfH2yqlMNUst11oATz3SVdHHZNu6GdpwPb5dZ
+         sLUc9jQ+OSIl4bz24XeQlV9uG1TaTHOuIsoLcINcKNrRVsE+2pHs1ku9qF7DU1zNEKUL
+         ZwdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUrKJ5nHv0KUZ/So1Q9ZkhcU9BApLd8FeexxCxMZQB6mzh5UF5pvy/3l7t0iskRI0ViUJh4J7k5VEdzHaHz02IF3Z2Q+V0O
+X-Gm-Message-State: AOJu0YwEtCbN23ADTdwTuTWlSUZyKkVVSk6yTnZsbeh1mh90/GqgxXUf
+	NZj5G44s8DN+v0jS8RIktuNSyBkjzvAKaeLgqBUBZWnsgqEVwEJB
+X-Google-Smtp-Source: AGHT+IEn9tHMTKBV2UxEMUh8zm0oXy63l3ne0ZXcUpEPyKCR6cUqyYlvOFmruvOaxNfUTcE6WMFPdA==
+X-Received: by 2002:a05:620a:262a:b0:78e:bd7f:4db4 with SMTP id z42-20020a05620a262a00b0078ebd7f4db4mr16543483qko.51.1713289484004;
+        Tue, 16 Apr 2024 10:44:44 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id a15-20020a05620a16cf00b0078d5f2924e1sm7706590qkn.63.2024.04.16.10.44.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Apr 2024 10:44:43 -0700 (PDT)
+Message-ID: <3b57b26c-3f1e-4db6-a584-59c84f16dcae@gmail.com>
+Date: Tue, 16 Apr 2024 10:44:38 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: dsa: bcm_sf2: provide own phylink MAC
+ operations
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <E1rwfu3-00752s-On@rmk-PC.armlinux.org.uk>
+Content-Language: en-US
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <E1rwfu3-00752s-On@rmk-PC.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Jeffrey Altman <jaltman@auristor.com>
+On 4/16/24 03:19, Russell King (Oracle) wrote:
+> Convert bcm_sf2 to provide its own phylink MAC operations, thus
+> avoiding the shim layer in DSA's port.c
+> 
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-The find connection logic of Transarc's Rx was modified in the mid-1990s
-to support multi-homed servers which might send a response packet from
-an address other than the destination address in the received packet.
-The rules for accepting a packet by an Rx initiator (RX_CLIENT_CONNECTION)
-were altered to permit acceptance of a packet from any address provided
-that the port number was unchanged and all of the connection identifiers
-matched (Epoch, CID, SecurityClass, ...).
-
-This change applies the same rules to the Linux implementation which makes
-it consistent with IBM AFS 3.6, Arla, OpenAFS and AuriStorFS.
-
-Signed-off-by: Jeffrey E Altman <jaltman@auristor.com>
-Acked-by: David Howells <dhowells@redhat.com>
-Signed-off-by: Marc Dionne <marc.dionne@auristor.com>
----
- net/rxrpc/conn_object.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
-
-diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
-index 0af4642aeec4..1539d315afe7 100644
---- a/net/rxrpc/conn_object.c
-+++ b/net/rxrpc/conn_object.c
-@@ -119,18 +119,13 @@ struct rxrpc_connection *rxrpc_find_client_connection_rcu(struct rxrpc_local *lo
- 	switch (srx->transport.family) {
- 	case AF_INET:
- 		if (peer->srx.transport.sin.sin_port !=
--		    srx->transport.sin.sin_port ||
--		    peer->srx.transport.sin.sin_addr.s_addr !=
--		    srx->transport.sin.sin_addr.s_addr)
-+		    srx->transport.sin.sin_port)
- 			goto not_found;
- 		break;
- #ifdef CONFIG_AF_RXRPC_IPV6
- 	case AF_INET6:
- 		if (peer->srx.transport.sin6.sin6_port !=
--		    srx->transport.sin6.sin6_port ||
--		    memcmp(&peer->srx.transport.sin6.sin6_addr,
--			   &srx->transport.sin6.sin6_addr,
--			   sizeof(struct in6_addr)) != 0)
-+		    srx->transport.sin6.sin6_port)
- 			goto not_found;
- 		break;
- #endif
+Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Tested-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
-2.44.0
+Florian
 
 
