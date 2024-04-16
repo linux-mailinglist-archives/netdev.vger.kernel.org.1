@@ -1,71 +1,75 @@
-Return-Path: <netdev+bounces-88433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DCBB8A72EB
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 20:16:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24E8B8A72F0
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 20:19:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DC221F22638
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:16:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5606B21D2B
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:19:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E7AE134436;
-	Tue, 16 Apr 2024 18:16:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 137751350DD;
+	Tue, 16 Apr 2024 18:18:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rxRLrQvD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UoK8ibTI"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529FD134425
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 18:16:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82215134CD0;
+	Tue, 16 Apr 2024 18:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713291377; cv=none; b=H/haV50NVhWdp0+UuOkOTmPaLkY3ASF94o2hbkAOuKSP/vFbDzaWQwMkkD4GvcRf7jhOaS7hC2SIZD3UYM4fUDK3JlDr0jiafbmoL8pOD5YXlm5nwxqXtlYAJKPsPgoJyJeivhdNbvnYeuPl/5+8RcE7Ng7Z4iD9JBJRllOEzPs=
+	t=1713291539; cv=none; b=UJDYqA+IzvtgyBlPPl88CecDRr8D0KPCT9dr7d4KATtguZzNhHfwrJUb5bBEpt7DHuIp3bj9mCguRlT4x09Lh+291joy3s801YFo3tfnaK+Xwt8wIPmgnJkps+lXfMbJUL7NAxaxh7MD04uTQExFqyxyUZ4UN/5dlXiHfg8GXog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713291377; c=relaxed/simple;
-	bh=OoQ0a1Cn7FaCeJPx4DN3Lc0ZOMegJDCoEylRT8HpdgQ=;
+	s=arc-20240116; t=1713291539; c=relaxed/simple;
+	bh=b8lvL9NZew815z7UQj8VRuFSqjRmCSD7OcL9Id2dkB8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tuoKeAtIwpWdnh7vLBBOmloBDddg/5vwvJ7QVkOITJQz5+htHkYdp2E6jbatp+VogJ9dT/lrEqF0LBuOUzIuRJgLaCsi/VViCPClR1Q4BA/8SWNGDjE3ZxEO8QhRENK+8qhk6276Jn9IWTygIwyHMsWyGTQBqcfKotKpMx2tjgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=rxRLrQvD; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=dTKECMt9cHk1i0+6TIRQlYGHzql3YOg032n4aglyiC4=; b=rxRLrQvDjxoJ8RswJJ1YbqdZ4A
-	RMDjU9+aSJbvMQx00JQscybSO4QWX6VT2mPhVGaZbhMMnlLv60StW0EJwJE4McrglTjsU8MsHV5WH
-	CtqU0lYq8enT6ZD8aFgslncnpQkF3yLPDO+8mcViz9temN6XJGlBHJSQBhHRHY4uCaQl7qdI4xXeq
-	0bUpZVB4gwO0i/poDxcfuhBwTmDMT+40hg6vmjRd5WHskJzFJVo+38LLAvACfKRtVfyGdIO2QUhaR
-	7hAyd8OmNL7LOJ8zhRR7AfqWQ40t0Bu444uttd5MQhvzDBh9iaBoEVyiNKdxD+/qmDJqlYngG5x/t
-	jpBehNGg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53118)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rwnLk-0000pB-0Z;
-	Tue, 16 Apr 2024 19:16:08 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rwnLk-00053F-Ef; Tue, 16 Apr 2024 19:16:08 +0100
-Date: Tue, 16 Apr 2024 19:16:08 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: bcm_sf2: provide own phylink MAC
- operations
-Message-ID: <Zh7AaJd4jno/NQDR@shell.armlinux.org.uk>
-References: <E1rwfu3-00752s-On@rmk-PC.armlinux.org.uk>
- <3b57b26c-3f1e-4db6-a584-59c84f16dcae@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=CTpQnzdebsh/hzsAeO6K65fjJd4v85sdjT8UcZEM0IbkStsQ63QjYR57rDb4lC3+s0VUTgBNvTwQkRaD4rLE8W7mfUrPDFSnZjVAoXIcbVRCVfQHfE22gstb4cQJQMfGR8mnvebRDobxaJjNytfbDDSQIXzPi7unoh9KyfE3VnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UoK8ibTI; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=IJtSvi5devvC9L1eX50DCm36YklubqRumK1P8fx4YOA=; b=UoK8ibTI6a9OA/iKMvvm+u23B8
+	jhD/eq0oeaNxg/BaMPkbw8KSC/bQvnRS53bnIemDyRG4Z6X/fy4sAAB7dLvo3Ccnk/iAojxu1N75a
+	rgp85eFzsGj92uzTSC5txCEaAZeOf2fUHn0eartoPoyFqFJ9dk6ewWUi1FTRpBQXXZbs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rwnOB-00DARl-KL; Tue, 16 Apr 2024 20:18:39 +0200
+Date: Tue, 16 Apr 2024 20:18:39 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Parthiban.Veerasooran@microchip.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
+	anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, corbet@lwn.net,
+	linux-doc@vger.kernel.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	devicetree@vger.kernel.org, Horatiu.Vultur@microchip.com,
+	ruanjinjie@huawei.com, Steen.Hegelund@microchip.com,
+	vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
+	Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
+	Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
+	benjamin.bigler@bernformulastudent.ch
+Subject: Re: [PATCH net-next v3 06/12] net: ethernet: oa_tc6: implement
+ internal PHY initialization
+Message-ID: <af6d3a74-7e7b-4953-bba7-f9ceb26df2d3@lunn.ch>
+References: <20240306085017.21731-7-Parthiban.Veerasooran@microchip.com>
+ <8c2b95f4-75a7-4d6d-ab9c-9c3498c040d8@lunn.ch>
+ <eeb57938-e21e-406d-a835-93c6fb19b161@microchip.com>
+ <7ddbe599-187e-401f-b508-4dc62bca8374@lunn.ch>
+ <e9bc573e-61f0-484a-b1fb-b5100eb9ee0a@microchip.com>
+ <8de7a4bb-a127-4771-97dd-038f08fcce9d@lunn.ch>
+ <372a45c3-1372-4956-8d42-8e989f86d131@microchip.com>
+ <ee5dcd07-7c44-4317-9d62-0fc68565988a@microchip.com>
+ <3fc3b5c3-0750-4aff-ab26-240f4bc55236@lunn.ch>
+ <5100ab9d-1b70-46fb-b3ba-d4bcff6d6870@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,34 +78,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3b57b26c-3f1e-4db6-a584-59c84f16dcae@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <5100ab9d-1b70-46fb-b3ba-d4bcff6d6870@microchip.com>
 
-On Tue, Apr 16, 2024 at 10:44:38AM -0700, Florian Fainelli wrote:
-> On 4/16/24 03:19, Russell King (Oracle) wrote:
-> > Convert bcm_sf2 to provide its own phylink MAC operations, thus
-> > avoiding the shim layer in DSA's port.c
-> > 
-> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> Tested-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> I tried this approach and it works as expected. Means whenever there is 
+> a c45 register access, it directly uses the 
+> oa_tc6_read_c45()/oa_tc6_write_c45() functions. Herewith I have attached 
+> the patch 
+> (v4-0006-net-ethernet-oa_tc6-implement-internal-PHY-initia.patch) which 
+> has this new implementation for your reference. Is this you expected? 
+> Can you comment on this?
 
-Great, thanks for testing.
+Please just post a new patch series. I will then review it just like
+other patches. Its O.K. to send patch series frequently, not just more
+than one per day.
 
-(Unrelated to this patch... so please don't delay applying based on
-ongoing discussion!)
+> I tried this approach by setting up is_c45 flag when I use 
+> phy_read_mmd() function but ended up with the kernel call trace 
+> (c45_kernel_call_trace.png) attached here for your reference.
 
-The other Broadcom driver, b53, isn't going to be as simple - I believe
-it uses a mixture of the .adjust_link method for shared ports, and
-.phylink_mac_* for user ports. That makes it very awkward now, given
-the check that was added (and suggested by Vladimir) to check for the
-legacy methods if dsa_switch's .phylink_mac_ops is populated.
+Please post plain ASCII. I assume you have a serial port, so you
+should be able to capture it. I'm not too surprised though, no other
+driver plays with is_c45.
 
-Is there any scope for converting b53 to use only phylink methods for
-everything, thus eliminating the .adjust_link callback?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+       Andrew
 
