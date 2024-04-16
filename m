@@ -1,74 +1,63 @@
-Return-Path: <netdev+bounces-88403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EA4E8A70C9
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:02:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18BBC8A70D3
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:03:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD7A2286E1E
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:02:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABE6C1F2371E
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:03:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E322D131BB4;
-	Tue, 16 Apr 2024 16:01:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B869131BC0;
+	Tue, 16 Apr 2024 16:02:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wg/HhgsP"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GM4WQbf/"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A44F013175E;
-	Tue, 16 Apr 2024 16:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0C50131740;
+	Tue, 16 Apr 2024 16:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713283266; cv=none; b=HQs/KIgn42xKbdgKvQK2jwFCEZSyJ9gI3eNjjAnsOMDkvTrF8ndHzU9vue+dgKHMmtStuX/O4d0iE1cGzble+CM9iuYXhwJgMaKrJfL7sjcouTIp754ASKsmjP97JYkcA4agLYPdtXCCON3JleK3gaZfYSDOkpLmtz65oYoi6pU=
+	t=1713283352; cv=none; b=V9AqQcayQeCZdOsYsJQq3kY6VBsVH3S4Xz0E7obRQpzcgTbwzFwe2ebbWdOUgr2sJ7XG5M34/2Bv3Q/qgw1Sy3Uk5YTFBNLTXbinxO1Rqela0/6DrARgH+UKMl3U7CD1uDKzXE+ehUrCyktu5DDV6Qj8iJjEoWBLFdHAFOYQaqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713283266; c=relaxed/simple;
-	bh=DhO5h+b7vIc6jbIsUWA7z1iTfKMcBvd2Dz5vJhvMzhs=;
+	s=arc-20240116; t=1713283352; c=relaxed/simple;
+	bh=hCYaejWoX+jAPlE8/5kHoJpYp4YWRYoLhn+cUlzPdYw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m1CubdqeDx8sn/GJ9rGY56SqYpfiRGf3nBUdZsR6cgq5kpBx9eYi16WDsa9ebg4iRRaLabO1d+p9rLuCP9VAwk92yhK5vpthKVdGM3Ly4WCh/KzAgqTawPJITIwNy32LIkIxlGFSsJTNiof5CkU0mj9rJzrmbVyNNN2pTSE1dMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wg/HhgsP; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=xeBMrRqxBEZ22eqTgIxs2B4bjpNxoQ68pH+OW+DIVMQ=; b=wg/HhgsPYE6YyJZQVYTCS/CrYE
-	+Uhyf2Cn4T3O5dFfSP+jCgrPe9F6/099JdqxRqP+Haa1VP1hbHEg+Zi99y6VPbGfEHd0mlM4Vb3gd
-	Epqw1r3yPo43uot0cs2K93+BzqJB8EZ/syBaZhrFSvC1fW5yLF1Ae8DRqHiBL/OSujAQP4P9dlDcF
-	vXn8OjaYYHzUfisd0Jmyr1KlEg7H6tLn6YjvoZdtLnexRqbSqP1Lxli6A3HC/xZ2Guxr3o1IwSpXs
-	O8ZLiXs7qYU9B6Yau36kPMHxe4EIOIly4MB0k6MLvTGK2sdFHy6ILqE5peqeeMWfyIau1YiAKoV8S
-	iYVYZmfg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:45642)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rwlEm-0000cR-1Y;
-	Tue, 16 Apr 2024 17:00:48 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rwlEm-0004xr-Bh; Tue, 16 Apr 2024 17:00:48 +0100
-Date: Tue, 16 Apr 2024 17:00:48 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=sDmD3qU9GEWQbeScbNvbw8gK9B9q3+yJJoENSfb9SMkElnpGRCqH+LmMLm/AFtTOjrVgAr4BP0Y7T8uJWptXA2xTVFvAN7RNGHcjYHR9ehes2OL2nzl7ADrKFJoZQtR6o9i922ICljDPb46bpLKX+YJUA8toogReFbWbF3GnTJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GM4WQbf/; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=G5o05jTqo01zQ53H9jaSu+jx2p3uSn458GF7UnQPPOA=; b=GM4WQbf/ReowHtLEIc4K2fKQIF
+	r4EzLuiLXad2eARmWlc0B8HxLrO2BmRWWgN5QBt2sS/xex/kFRGQb22LASn6JRZ5O++n1LV++1QU5
+	MNMLNre4KKjl3h8h+alavWMYrAAm88OOQnobd99yRpFLB4XcKSwXwEFMQ88BqnoOHMko=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rwlG4-00D9gp-W4; Tue, 16 Apr 2024 18:02:08 +0200
+Date: Tue, 16 Apr 2024 18:02:08 +0200
+From: Andrew Lunn <andrew@lunn.ch>
 To: Stefan Eichenberger <eichest@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org,
 	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	lxu@maxlinear.com, hkallweit1@gmail.com, michael@walle.cc,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
+	lxu@maxlinear.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	michael@walle.cc, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property
  to disable SGMII autoneg
-Message-ID: <Zh6gsHqOM+ienmzE@shell.armlinux.org.uk>
+Message-ID: <5ed39628-4ac0-4c4e-9a16-fd4bf9a6db29@lunn.ch>
 References: <20240416121032.52108-1-eichest@gmail.com>
  <20240416121032.52108-3-eichest@gmail.com>
  <3f7f278f-e490-47f1-971c-ecf44a70cee4@lunn.ch>
  <Zh6clAtI3NO+nMEi@eichest-laptop>
- <Zh6d0VKVFK7JJWAf@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,53 +66,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zh6d0VKVFK7JJWAf@shell.armlinux.org.uk>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <Zh6clAtI3NO+nMEi@eichest-laptop>
 
-On Tue, Apr 16, 2024 at 04:48:34PM +0100, Russell King (Oracle) wrote:
-> On Tue, Apr 16, 2024 at 05:43:16PM +0200, Stefan Eichenberger wrote:
-> > Hi Andrew,
-> > 
-> > Thanks a lot for the feedback.
-> > 
-> > On Tue, Apr 16, 2024 at 03:46:19PM +0200, Andrew Lunn wrote:
-> > > On Tue, Apr 16, 2024 at 02:10:32PM +0200, Stefan Eichenberger wrote:
-> > > > Add a new device tree property to disable SGMII autonegotiation and
-> > > > instead use the option to match the SGMII speed to what was negotiated
-> > > > on the twisted pair interface (tpi).
-> > > 
-> > > Could you explain this is more detail.
-> > > 
-> > > SGMII always runs its clocks at 1000Mbps. The MAC needs to duplicate
-> > > the symbols 100 times when running at 10Mbs, and 10 times when running
-> > > at 100Mbps.
-> > 
-> > Currently, the mxl-gpy driver uses SGMII autonegotiation for 10 Mbps,
-> > 100 Mbps, and 1000 Mbps. For our Ethernet controller, which is on an
-> > Octeon TX2 SoC, this means that we have to enable "in-band-status" on
-> > the controller. This will work for all three speed settings. However, if
-> > we have a link partner that can do 2.5 Gbps, the mxl-gpy driver will
-> > disable SGMII autonegotiation in gpy_update_interface. This is not
-> > supported by this Ethernet controller because in-band-status is still
-> > enabled. Therefore, we will not be able to transfer data at 2.5 Gbps,
-> > the SGMII link will not go into a working state.
+On Tue, Apr 16, 2024 at 05:43:16PM +0200, Stefan Eichenberger wrote:
+> Hi Andrew,
 > 
-> I have been working on a phylink/phylib patch set to address this. As
-> I've been busy with health-based appointments during last week and this
-> week, I haven't been able to spend enough time to get that to a point
-> that I'm happy to publish it yet.
+> Thanks a lot for the feedback.
+> 
+> On Tue, Apr 16, 2024 at 03:46:19PM +0200, Andrew Lunn wrote:
+> > On Tue, Apr 16, 2024 at 02:10:32PM +0200, Stefan Eichenberger wrote:
+> > > Add a new device tree property to disable SGMII autonegotiation and
+> > > instead use the option to match the SGMII speed to what was negotiated
+> > > on the twisted pair interface (tpi).
+> > 
+> > Could you explain this is more detail.
+> > 
+> > SGMII always runs its clocks at 1000Mbps. The MAC needs to duplicate
+> > the symbols 100 times when running at 10Mbs, and 10 times when running
+> > at 100Mbps.
+> 
+> Currently, the mxl-gpy driver uses SGMII autonegotiation for 10 Mbps,
+> 100 Mbps, and 1000 Mbps. For our Ethernet controller, which is on an
+> Octeon TX2 SoC, this means that we have to enable "in-band-status" on
+> the controller. This will work for all three speed settings. However, if
+> we have a link partner that can do 2.5 Gbps, the mxl-gpy driver will
+> disable SGMII autonegotiation in gpy_update_interface. This is not
+> supported by this Ethernet controller because in-band-status is still
+> enabled. Therefore, we will not be able to transfer data at 2.5 Gbps,
+> the SGMII link will not go into a working state.
 
-You can find the experimental patches at:
+This is where i expect Russel to point out that SGMII does not support
+2.5G. What you actually mean is that the PHY swaps to 2500BaseX. And
+2500BaseX does not perform speed negotiation, since it only supports
+2500. So you also need the MAC to swap to 2500BaseX.
 
-http://git.armlinux.org.uk/cgit/linux-arm.git/commit/?h=net-queue&id=0c2fb62db211312ad2f5695997694908b54e9a17
+I don't think any DT property is required here. This is fundamental to
+SGMII only be 10/100/1G, and when you go above that, you swap to
+something else.
 
-and the three parents to that patch.
+Lets see what Russell patches do.
 
-It's buried in:
+    Andrew
 
-http://git.armlinux.org.uk/cgit/linux-arm.git/log/?h=net-queue
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+---
+pw-bot: cr
 
