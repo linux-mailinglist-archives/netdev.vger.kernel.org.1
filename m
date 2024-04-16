@@ -1,120 +1,124 @@
-Return-Path: <netdev+bounces-88251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9D828A677E
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 11:54:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E0468A6782
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 11:54:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2689D1C20A90
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 09:54:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E3121F216C5
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 09:54:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1C8586270;
-	Tue, 16 Apr 2024 09:53:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411FA8663A;
+	Tue, 16 Apr 2024 09:54:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="oc69htZf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="METD/9a7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67D9C127B50
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 09:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADCA2907;
+	Tue, 16 Apr 2024 09:54:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713261221; cv=none; b=dBYtdQ+QeSUalo9BQVnOSXuKgvibfMRPJR1i2P3x26YTQClV5Ubp8MrN+yMUXtJPBFGD6y3E4PKAMEsdOjyA7NPPSM8Xd1UQ5X2rkOE31tl6mtH3sq1LbfgZIxa11h0gck6Deu/+T/t7G3a05EOq61cJe4HhBL8TBoqzflY6aJE=
+	t=1713261265; cv=none; b=J0AdPPXRlFH9GuJRAMWhNnc0HRVHKqNgAaX18AM7WddFZJCuplkORd+X1GqPOYK+0ooth0H4mPiNMCijdTOAVapVj8bw4wO/5KeJnU9igVFzc5J/rJPbnHbyuG2EW8Zfe346+FKLmw+8TZw+gq2UX948i3huhfBQG2RCn8cWE3M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713261221; c=relaxed/simple;
-	bh=iIEonw6NbxRylvPksI0bLcfKTL65JpeWOssN5KniBYA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A8RUl1wTqY2AGKCjuy+MMj8Qm97xoQbIUGK7GNnl0gTBleb3a0X2pa3ZddBfyQyuRm/eWq/zDfYo8X2mdxkfXXtkSVEdrdbh1PpBl7TAqW69Tzr0o2w2Ojdc/w3cbD/JFbsPYnTNEdhlk+ilxvzJk9H2ZWSuNmTXhHDZ+50KhTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=oc69htZf; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-563cb3ba9daso4102025a12.3
-        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 02:53:40 -0700 (PDT)
+	s=arc-20240116; t=1713261265; c=relaxed/simple;
+	bh=f6QM5JXdMDO6/yNlxDjFr/vdBADbZovxkibV/MEnESY=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=I9CrDgGDayUj2aWu341ThCbXgKclZ3iETImru1/WWvNS9SGpOLnC+1wuw0tceyc6ahQ5coRLjUfnqJunxQXF+RllQH8QkPZfuD+pd1VblEzmqKTwEw8tpmHW44mqtHfUT/1FP0DBTkAcJhTpXdA/7AXhy4yau9dFERTO5grva4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=METD/9a7; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1e7af7eb4ccso2345705ad.1;
+        Tue, 16 Apr 2024 02:54:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713261219; x=1713866019; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xyOljcBoxRZtBlXPwq1twMKjVMaHbywxijMJdFOzxMA=;
-        b=oc69htZfD20sFbRH/7zAgNePCzMTmvYMEvKWjbnmfiP7kU44tkOi3gVgsgkgFsUx16
-         r71r1XqknPbknXf3Wc7DkU7TnSSQuH5PlXlDpSTkLflQS4ddVu8Co2XCLZwGRx/YxUZC
-         Z402CcHv7tNY6sdhVUv0/BSMMlAWwB2McONReWC/HYBJSbXXWcRZVOE0a4ooWERz+wu/
-         zfxFDWhQZHCpwFT/QkssLxj6WAK012Zm3WNkQkM19N1taX8B9B9+eEUaVcS+zJ3TsugL
-         h8prO50YZD8utH5Nk3GJrpqg90c+ZDuUHRg5Qs/znULnFgYE/MYJZu0bDphz5bRYQf8H
-         ywtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713261219; x=1713866019;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1713261263; x=1713866063; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xyOljcBoxRZtBlXPwq1twMKjVMaHbywxijMJdFOzxMA=;
-        b=j+P2kje+Jc5RgUl8NHd7TEfYRa064Paj7mpKRRr2tRT9vVA9F0VYmSS2OKn7Rj1gjx
-         T/eFZj/lOza5so+yfZnDnJ+pKNZG3nJLTOEODURJOorn1cjuDHF2XFCmw8zYq40hrsyQ
-         bMo++5G2hpWEtzky1Eq4tajpZlY2rYXQJ1e+tLt6JkZLfKH8gXamS8YKrjYQheaqc2N0
-         KAryZew1DdsXhub5z/jSXatt1A4fRA1XXBcB11RZXsEDkcGp9OYenVTtFG2MLbKOD0Mm
-         qtXS7XuVsxAFEEAP268k/i3kj7pCxekv9s0zDKL+xLr1dE2g1RefZ79dA8l4nyREYy+D
-         T+7g==
-X-Gm-Message-State: AOJu0YyqxnAU6syeecHfYdNfz5DhgyalyuFzopBhmMFtxdvL3IeJ9UQi
-	TH8zywSOvFTtGQGzoyqMLpT6+c+rL+7OmjBrelt7jPnC5GyxaHADd70RU1BW0jk=
-X-Google-Smtp-Source: AGHT+IGPXttzg9aeuCAj6911eurDwuoGohgiWyCghHh4Uj9hzK08/0+nOrj6kSaE/gRrPbhckX7Srw==
-X-Received: by 2002:a50:cd5b:0:b0:56e:d9e:f4d3 with SMTP id d27-20020a50cd5b000000b0056e0d9ef4d3mr10605693edj.18.1713261218408;
-        Tue, 16 Apr 2024 02:53:38 -0700 (PDT)
-Received: from localhost (37-48-42-173.nat.epc.tmcz.cz. [37.48.42.173])
-        by smtp.gmail.com with ESMTPSA id ew14-20020a056402538e00b0056fe8f3eec6sm5678489edb.62.2024.04.16.02.53.37
+        bh=YH8x+9QSdnsXkpAcgDXkNiseSDaJMzAAo+Br2k+QtbI=;
+        b=METD/9a7SN4u7xD0q87ia+BhLh+bUFe9INZqVykotDSPcBoJXgWtg9W/CdvE2ofSM4
+         4bfyp/is8iD04ORPRTX1rfN/F50Oa9biIovqjL0QHrj8qgZkflWD/2xM1I5LKdsmbtZ7
+         HV47JbkYL+syGZbV01d4cgnjreV77dWf3wZMsu7SyFPDk3Dpoj6IhsXOcycMJpjAczel
+         2EE9DfgSILkWv5Zk+6z8EOWeG5f3SIXvDUkbz2AiYrxFn55KKib/7/irKRMQXq57LNv8
+         eUmyXzbSIIMWAC0m175czl9Jvtbx8l4VD5K0M15x8Ief7gZ1b3gT/ftFqMbs/SzyhEfA
+         yG8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713261263; x=1713866063;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YH8x+9QSdnsXkpAcgDXkNiseSDaJMzAAo+Br2k+QtbI=;
+        b=dv1npbNbXi7Yokens11MkIcwRvc2rs1jLruKlU2aNH5ExhXJwrGWWrS4LLy6640VAG
+         AogrPEC52baQ4vsc8Jt85q9SqmtQJniELZ0pH10gUQPBYloDxvExDD1PxYt7wZutDMpQ
+         ATbOqtY+tZr7OwgMfH5HkdXniYgLLqEyZAw1Xu0d6fpy0iZKK8NPHggd10ZpQ+zcmxue
+         JJXaFQ+DFQtRkg4QBXodhD2nLEhxnWcw71fXMHWLPs6vYhe3fYd9kWGRw+R7F/7kBpQH
+         m3TO3E1DEk1tRYbA2oCVLPZ7t06ounLuItiMXgwJ1FpbdZDZ8AVu6islee5TujoTJTI6
+         0lug==
+X-Forwarded-Encrypted: i=1; AJvYcCVMqf7+iNrz9aVWHavP65J2IXHZhkI2MIYJr+bEZm1kCd6Pw5G3sPmwVXrOE7xN6DgfX1gjAexlFzGjgf+LO/4uXxxu
+X-Gm-Message-State: AOJu0Yw6CtJp1g2pJM3J20oHWLerw9qwRPqe5rAGzSNf5weGqOzwfmjD
+	o26xVqY2chMxOL7yJuUzhNxRVrU28poQn3ROcbz8c3wjMn7VEbhHTkoNc4+XUQk=
+X-Google-Smtp-Source: AGHT+IEv9o0nxF3QYyj2CF43eErkchMVPMhJclik0hZqlokvYElxVQFkXN5zNjwWD043eNfq+gRV9g==
+X-Received: by 2002:a17:903:32d0:b0:1e4:3299:2acc with SMTP id i16-20020a17090332d000b001e432992accmr14475895plr.3.1713261262893;
+        Tue, 16 Apr 2024 02:54:22 -0700 (PDT)
+Received: from localhost.localdomain ([111.194.45.84])
+        by smtp.gmail.com with ESMTPSA id kf13-20020a17090305cd00b001e29acb2d18sm9393087plb.4.2024.04.16.02.54.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 02:53:37 -0700 (PDT)
-Date: Tue, 16 Apr 2024 11:53:35 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, parav@nvidia.com, mst@redhat.com,
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, shuah@kernel.org,
-	petrm@nvidia.com, liuhangbin@gmail.com, vladimir.oltean@nxp.com,
-	bpoirier@nvidia.com, idosch@nvidia.com,
-	virtualization@lists.linux.dev
-Subject: Re: [patch net-next 0/6] selftests: virtio_net: introduce initial
- testing infrastructure
-Message-ID: <Zh5Kn5OnDdzgB6Rm@nanopsycho>
-References: <20240412151314.3365034-1-jiri@resnulli.us>
- <20240412180428.35b83923@kernel.org>
- <ZhqHadH3G5kfGO8H@nanopsycho>
- <20240415102659.7f72ae8d@kernel.org>
+        Tue, 16 Apr 2024 02:54:22 -0700 (PDT)
+From: Zheng Li <lizheng043@gmail.com>
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	davem@davemloft.net,
+	jmorris@namei.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	kuba@kernel.org
+Cc: James.Z.Li@Dell.com
+Subject: [PATCH] neighbour: guarantee the localhost connections be established successfully even the ARP table is full
+Date: Tue, 16 Apr 2024 17:53:43 +0800
+Message-Id: <20240416095343.540-1-lizheng043@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240415102659.7f72ae8d@kernel.org>
 
-Mon, Apr 15, 2024 at 07:26:59PM CEST, kuba@kernel.org wrote:
->On Sat, 13 Apr 2024 15:23:53 +0200 Jiri Pirko wrote:
->> That is a goal. Currently I do it with:
->> vng --qemu-opts="-nic tap,id=nd0,ifname=xtap0,model=virtio-net-pci,script=no,downscript=no,mac=52:54:00:12:34:57 -nic tap,id=nd1,ifname=xtap1,model=virtio-net-pci,script=no,downscript=no,mac=52:54:00:12:34:58"
->> 
->> and setting loop manually with tc-matchall-mirred
->> 
->> Implementing virtio loop instantiation in vng is on the todo list for
->> this.
->
->Just to be clear - I think the loop configuration is better off outside
->vng. It may need SUID and such. We just need to make vng spawn the two
->interfaces with a less verbose syntax. --network-count 2 ?
+From: Zheng Li <James.Z.Li@Dell.com>
 
-Well, you ask vng for network device by:
---net=user/bridge
+Inter-process communication on localhost should be established successfully
+even the ARP table is full, many processes on server machine use the
+localhost to communicate such as command-line interface (CLI),
+servers hope all CLI commands can be executed successfully even the arp
+table is full. Right now CLI commands got timeout when the arp table is
+full. Set the parameter of exempt_from_gc to be true for LOOPBACK net
+device to keep localhost neigh in arp table, not removed by gc.
 
-Currently putting the option multiple times is ignored, but I don't see
-why that can't work.
+the steps of reproduced:
+server with "gc_thresh3 = 1024" setting, ping server from more than 1024
+same netmask Lan IPv4 addresses, run "ssh localhost" on console interface,
+then the command will get timeout.
 
-Regarding the loop configuration, I would like to make this as
-convenient for the user as possible, I was thinking about something like
---net=loop which would create the tc-based loop.
+Signed-off-by: Zheng Li <James.Z.Li@Dell.com>
+---
+ net/core/neighbour.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-How to do this without root, I'm not sure. Perhaps something similar
-like qemu-bridge-helper could be used.
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index 552719c3bbc3..47d07b122f7a 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -734,7 +734,9 @@ ___neigh_create(struct neigh_table *tbl, const void *pkey,
+ struct neighbour *__neigh_create(struct neigh_table *tbl, const void *pkey,
+ 				 struct net_device *dev, bool want_ref)
+ {
+-	return ___neigh_create(tbl, pkey, dev, 0, false, want_ref);
++	bool exempt_from_gc = !!(dev->flags & IFF_LOOPBACK);
++
++	return ___neigh_create(tbl, pkey, dev, 0, exempt_from_gc, want_ref);
+ }
+ EXPORT_SYMBOL(__neigh_create);
+ 
+-- 
+2.17.1
+
 
