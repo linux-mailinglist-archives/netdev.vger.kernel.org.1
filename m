@@ -1,58 +1,57 @@
-Return-Path: <netdev+bounces-88366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 001EF8A6E44
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:30:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F08988A6E49
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:31:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B619CB27C2D
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:29:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 800A8281F1E
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:31:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA2C12FF67;
-	Tue, 16 Apr 2024 14:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C62A738DE8;
+	Tue, 16 Apr 2024 14:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="No9PgoR/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LHdpc4bl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B945E12C522;
-	Tue, 16 Apr 2024 14:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2AC61CAA6
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 14:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713277691; cv=none; b=XYpy540vtp0dNeVLnJS5pqX35i6ZNZ3d2KlGh1RICqWbOTbfa5x/m7hIrK4M+AgQvMNcTh/chCg4BQd6Yf7lnu36WGzhSOZS9C9AQ9ZNYmfOVnTVudFohqRSD+/fdQeYV3xzEfLmRta4ancQPiOsJ2jM6J61d5Gll9U6iI8vUgw=
+	t=1713277904; cv=none; b=HQUsVg2J39I/P1dliDRxiQQYRLVJ7p29JSFGAtKzmknopVeQmIL7RqZs24d9D08GcWQu6diip1i7SyGQQZpFNK9hQdeLbBca69CLEY8AcvO5Bk3R5bZCarV3s5uWn3F4itT4ze0DJ5DMVLDktupwZGRiXA2QV03JAF5HRf2WHgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713277691; c=relaxed/simple;
-	bh=/CMP70YEKE5aZJD43DMwgQoee9fnrUCCIlSosfdVRRs=;
+	s=arc-20240116; t=1713277904; c=relaxed/simple;
+	bh=n6qs9LjIi04AReiV2pJvW/dGAVlfRkYMDDsBHcp2zk0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rGy6RnB0ivQK6eBzQbhbuVmYQq7QJ9nayxNh93kLYdNFnYV0MPTPHidRFwKS++A39xD49fobXoLF8g1K8O/UiBmPeI1uIEheP//EO5W66qw8Pz1hVqlzOnvAwpucg08C4uVQBGsxRfcWjpOUTi6f1rzFtB9t6tHQlUHhb44OUVc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=No9PgoR/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEC47C113CE;
-	Tue, 16 Apr 2024 14:28:10 +0000 (UTC)
+	 MIME-Version:Content-Type; b=MkUPGbPXMTbUqi0E1Fy/duSPqMpdiAt3d2ZsFJNxL6aVFvpWc25EsZgwUq1x861Lwq4ngf2ldgJXGC2Fx/mxOg6ti++oI2QG8u9v2iTmnkHLXpSfu2NUjkOj30nGhsrRI2lxsWsi9UrX5QSg7axF4wEf49oVa2MLKdPf4Fn1XMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LHdpc4bl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13987C113CE;
+	Tue, 16 Apr 2024 14:31:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713277691;
-	bh=/CMP70YEKE5aZJD43DMwgQoee9fnrUCCIlSosfdVRRs=;
+	s=k20201202; t=1713277904;
+	bh=n6qs9LjIi04AReiV2pJvW/dGAVlfRkYMDDsBHcp2zk0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=No9PgoR/Xm/Rigmzr0Fh3v/MNih1kYHRWSETuOhJGSi5tZC5YL5ZGJujz2nR0jLV4
-	 +g7O9KRpvEgbwGaUhfZBY7hNSpjYEkDVnqWBpiMStL7EiUtqd1C4jjvXy0jKKVTLWJ
-	 VStbWu8gpFvoonRzeHz08QmTQNP+DgerKR/8lbMxHu7Z5hv6L2UB1WI3J5kxok8k5X
-	 Bz6hd1r8aZ/cR91Tu3LJeFdSUvxsFzCzwHKlXxTWXOMy4dmFyhj84GDCPSHq4+jG+6
-	 s0LrBDXUIrXa/J7ATMVce+PW71+QJC50tjClwfMHsWtdyvkspbA8P5GX7RsmBnfI4Q
-	 la5OkPrvly5Yw==
-Date: Tue, 16 Apr 2024 07:28:09 -0700
+	b=LHdpc4blkmFqGlZCTuO5OJ7TOEy3/acrVFwhy+Pmt7RQ1nw8CwXPLcQJvbZzfdQH/
+	 qQzNoZhGBzdFeYWkseSCtE2yyfaZNiHYZVYlvQxjoUuooD1dVfdwKLQ+THcek/MxVG
+	 wv5lyKoR5+8wTDumCndD2JZx532d2yE87kj4KZgdZ9hejZHYUIDA/3F9FHWNs5vVdJ
+	 Qqg3rqjEfPyDJh9qRpx3Sj0NAU4QXv1swkCU/bbgxv+TLtp8lAWfMu/8Rz7vGqC2e2
+	 Bn4dckxLEq1bu8ygBmbNcF3wS3etGF6xHDloNdlj4HlXttsKL/CPYufW3Ounk7igSG
+	 zuVoAoBwvCHKg==
+Date: Tue, 16 Apr 2024 07:31:43 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
-Cc: 0x7f454c46@gmail.com, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 0/4] selftests/net/tcp_ao: A bunch of fixes for
- TCP-AO selftests
-Message-ID: <20240416072809.3ae7c3d3@kernel.org>
-In-Reply-To: <20240413-tcp-ao-selftests-fixes-v1-0-f9c41c96949d@gmail.com>
-References: <20240413-tcp-ao-selftests-fixes-v1-0-f9c41c96949d@gmail.com>
+To: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+Cc: netdev@vger.kernel.org, Jiawen Wu <jiawenwu@trustnetic.com>,
+ =?UTF-8?B?5rip56uv5by6?= <duanqiangwen@net-swift.com>
+Subject: Re: [PATCH net-next v3 0/6] add sriov support for wangxun NICs
+Message-ID: <20240416073143.581a56c5@kernel.org>
+In-Reply-To: <36569F35-F1C1-44DB-AC46-4E67158EEF0A@net-swift.com>
+References: <587FAB7876D85676+20240415110225.75132-1-mengyuanlou@net-swift.com>
+	<20240415112708.6105e143@kernel.org>
+	<36569F35-F1C1-44DB-AC46-4E67158EEF0A@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,9 +61,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 13 Apr 2024 02:42:51 +0100 Dmitry Safonov via B4 Relay wrote:
-> Started as addressing the flakiness issues in rst_ipv*, that affect
-> netdev dashboard.
+On Tue, 16 Apr 2024 10:55:16 +0800 mengyuanlou@net-swift.com wrote:
+> > On Mon, 15 Apr 2024 18:54:27 +0800 Mengyuan Lou wrote:  
+> >> Do not accept any new implementations of the old SR-IOV API.
+> >> So remove ndo_vf_xxx in these patches.  
+> > 
+> > But you're not adding support for switchdev mode either, 
+> > so how are you going to configure them?  
+> 
+> Do you mean .sriov_configure?
+> Had implement it in patch2 and add it patch5/6.
 
-Thank you! :)
+No, I mean configuring the forwarding, VF MAC addrs, getting stats, etc.
 
