@@ -1,89 +1,63 @@
-Return-Path: <netdev+bounces-88684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2D378A8373
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 14:52:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EC438A833B
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 14:37:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 301B01C21D6D
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 12:52:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A5B91C21108
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 12:37:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 460E513D265;
-	Wed, 17 Apr 2024 12:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D8FD85C7A;
+	Wed, 17 Apr 2024 12:37:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yz+FmA7O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VWBAQPIc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD79513C3E0;
-	Wed, 17 Apr 2024 12:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62A744C6B;
+	Wed, 17 Apr 2024 12:37:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713358343; cv=none; b=XnfZemMLD9JFnagHVEtvJczs3c3EnrMyu4WLN8Kj3OiUrJE5OwkOUtXTxpzYEr8tJQ4z4XhCwKobpFPwqs6UsUB/33b6VoubdTRBh+eIbR62OiTfO9cr7CLc41RNJ/kl81AJVzRZcWgN4XkXh16U0Vv9d+5YPA9A/0nZXDottUo=
+	t=1713357463; cv=none; b=ekVB7JaLrU4XAIkNej9f/VxylbrVwaa07JP10zBiRrHCq/Ne3CpTFcoewZecqIgBDBbzU7VC0mircIMJZwipLrhAXyvdsUAL/jn7xGyMxcvGSe5PALhYS24RdM2h0CLOzcDO2JMOXtZa9JoC67h4jrK1G+owmRTlp5ZNSmlxDkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713358343; c=relaxed/simple;
-	bh=GKwwC0OJ8qTLZqlAyHGWZALDR76oktdMPcYkUMRED8E=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=ejDKXXeWYrywJXKBWTK4L9Jwf5iIDj+krnHh/1JWOfOUMSScQRk58DN0MYgt0Kh/Gm7VuBVvDHsExzdWWzeIuwG2uGxazipF7p/3HHd5q0Eh1Jj8QJdm+Dg47xdA8cs//ar2CcrxQ1Nr7Gxq+Sk33Z28G8UTjNm6LyMj2MK5x90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yz+FmA7O; arc=none smtp.client-ip=209.85.222.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-78f04924a96so24288185a.0;
-        Wed, 17 Apr 2024 05:52:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713358341; x=1713963141; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=EuBc5E44cBkpe2s8uTRcWQCylcIMSOJ9KujKuoAaf8c=;
-        b=Yz+FmA7OIzi+nO+DF2CY/3tGI5HNm0nkKMJQynHAsMOBSefcFC/qbm/ERCm7c+YR9f
-         7s9oKGLtG4xDDfyG/qO6ETZ9N1VEzIC2xMQYAUwMgh/+G6ubJI5J1eUIQQSLEaCDTpfo
-         D9iojA6J+Gm0apekpk9ihG7okC1YQmRzkHkIcyL4BmWrw14e0qKwFB16Ym7CFuad8b8/
-         HOYdLHky9+o5ul1uUO+7ojzxFE6X8xxwNi1BPfAVZYhm6oZebN287MGdd1OmAMGIsc+e
-         r/KaKJnrqYfd/ca/EkDp4QKG9mFPK1Lf2yIXkUma0lExai65ScbuBrWKfO+cAmrNaeaG
-         Wv9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713358341; x=1713963141;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EuBc5E44cBkpe2s8uTRcWQCylcIMSOJ9KujKuoAaf8c=;
-        b=gftgBHudmojWCYiAxsoBWW4jJ7ilbVgJSIqQV7c2pSEwa/rw5NakKdHFCccI+kpd04
-         ZX8lfYOSMiw/6FlXekPigoeezfPlvNfNteqJKOpSKk7tyPVAU5sL+FNer5792ZRlBbeB
-         2QB30qaQFps4bAbNJb+OsBrhW5+FEHQD6DUPUvP/AGO8WLwBqfOdtDrt9OZKHTtgzylB
-         bmJ1mAaS8GD3TVo27owiLjPm09BM6wiHzeg1+hbtfFRGz6wRT65KnB9Wfne0tvq/ZEP0
-         1DP/lmK5CnzxYs3XoKHIhu891VaCNu23YKSC8H9uearXjN5mzUaD/ZJMGccuGQdZ1I0Y
-         Wtzw==
-X-Forwarded-Encrypted: i=1; AJvYcCUGibQceb1Nkv/jGgM8ZxiKNJI765l52A6MudZKa0tM/x13Qc7oFYyfxsWzjfp2qwkXAPuk1TqyDKKv17nJX8KfrTvMRv4f80nMlt51KUPF
-X-Gm-Message-State: AOJu0Yyxcj0iyZy+Z0Lv9v7fY8vN3YEGEfWKCwFrTcz+XBo92E776h53
-	Wl9V7hRN0TN7XKmlWa3dnfmJWzx06EsLF2O5WlVA/Z/cCrRB749G
-X-Google-Smtp-Source: AGHT+IFuFjOChlyrCu41ENDj5+wqqR3go1+czOgkWcys0ry5WI4/gVhKVbXToQn760THaQDnWneGDA==
-X-Received: by 2002:a05:6214:528f:b0:69b:695f:ad20 with SMTP id kj15-20020a056214528f00b0069b695fad20mr13634790qvb.16.1713358340809;
-        Wed, 17 Apr 2024 05:52:20 -0700 (PDT)
-Received: from imac ([88.97.103.74])
-        by smtp.gmail.com with ESMTPSA id v7-20020a0ccd87000000b00699413a7386sm8204953qvm.114.2024.04.17.05.52.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Apr 2024 05:52:20 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Jiri
- Pirko <jiri@resnulli.us>,  Jacob Keller <jacob.e.keller@intel.com>,  Pablo
- Neira Ayuso <pablo@netfilter.org>,  Jozsef Kadlecsik
- <kadlec@netfilter.org>,  netfilter-devel@vger.kernel.org,
-  coreteam@netfilter.org,  donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v2 3/3] tools/net/ynl: Add multi message
- support to ynl
-In-Reply-To: <20240411102522.4eceedb9@kernel.org> (Jakub Kicinski's message of
-	"Thu, 11 Apr 2024 10:25:22 -0700")
-Date: Fri, 12 Apr 2024 10:53:43 +0100
-Message-ID: <m2r0fahpp4.fsf@gmail.com>
-References: <20240410221108.37414-1-donald.hunter@gmail.com>
-	<20240410221108.37414-4-donald.hunter@gmail.com>
-	<20240411102522.4eceedb9@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1713357463; c=relaxed/simple;
+	bh=8NObq/H4Dilb0Mnzuz0GRC8TDvT8oEl+kBLbpirx3zw=;
+	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=N/Id05rMwByN+frNwPD1PctAqiINKyDVprqiPNKArBKwYK9a88+Ig/l/2l38zkVM23itCoEHVbHTjsW0RZrAEZla9jbeT+PYdvfQhyG623xy54gJI8V4rtBUPpftJHaNUf91IPXxcCFCPkqwIavi1NqQhAvER4JadNUY81rXyic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VWBAQPIc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4080CC072AA;
+	Wed, 17 Apr 2024 12:37:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713357463;
+	bh=8NObq/H4Dilb0Mnzuz0GRC8TDvT8oEl+kBLbpirx3zw=;
+	h=From:To:Subject:In-Reply-To:References:Date:From;
+	b=VWBAQPIcG5eH+UcK0zoGVNOJ1fwoN8Y23l/oCXcVl/1rHZzXxd0gg2RBCVGV+HeSE
+	 8vSNK8noQlpR1r8qacFDJt7mRkJcgG2Ri0Pczr9MlrBQi8XchBgATSr5VvmmktQjdl
+	 SaMCm9YaexbHT+73XbAM3+lGzftRqoGZgykJmZl4Xuq7iQGQcBo3ZXUya3vL9WxQWz
+	 F49sHhxLZ4thb99SLkaAawgdYTjFFy1hW+FF+SGTReLpEYDIo8mIcNhJaEkRm8KBgs
+	 IFnSwIDCMK0XmMWYIhaKHePdXmWbwL7RpymdxbkTA7CR4PQQZXzEBpDOffEQYzYsdc
+	 ph0tmdLM/5VPA==
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 4211D123389F; Tue, 16 Apr 2024 22:55:00 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+To: syzbot <syzbot+af9492708df9797198d6@syzkaller.appspotmail.com>,
+ andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+ daniel@iogearbox.net, davem@davemloft.net, eadavis@qq.com,
+ eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org,
+ john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
+ kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, sdf@google.com, song@kernel.org,
+ syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Subject: Re: [syzbot] [bpf?] [net?] general protection fault in dev_map_enqueue
+In-Reply-To: <0000000000003a924406159cf8ee@google.com>
+References: <0000000000003a924406159cf8ee@google.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 16 Apr 2024 22:55:00 +0200
+Message-ID: <87il0huixn.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,26 +66,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-Jakub Kicinski <kuba@kernel.org> writes:
+syzbot <syzbot+af9492708df9797198d6@syzkaller.appspotmail.com> writes:
 
-> On Wed, 10 Apr 2024 23:11:08 +0100 Donald Hunter wrote:
->> -    def do(self, method, vals, flags=None):
->> +    def _op(self, method, vals, flags):
->> +        ops = [(method, vals, flags)]
->> +        return self._ops(ops)[0]
->> +
->> +    def do(self, method, vals, flags=[]):
->>          return self._op(method, vals, flags)
+> Hello,
 >
-> Commenting here instead of on my own series but there are already tests
-> using dump=True in net-next:
->
-> tools/testing/selftests/drivers/net/stats.py:    stats = netfam.qstats_get({}, dump=True)
-> tools/testing/selftests/net/nl_netdev.py:        devs = nf.dev_get({}, dump=True)
->
-> "flags=[Netlink.NLM_F_DUMP]" is going to be a lot less convenient 
-> to write :( Maybe we can keep support for both?
+> syzbot has tested the proposed patch but the reproducer is still triggering an issue:
+> general protection fault in dev_map_enqueue
 
-Good catch, I overlooked the generated methods. I'll make sure to add it
-back in.
+Alright, trying a different thing (not a correct patch, just testing a theory):
+
+#syz test https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git 443574b03387
+
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 786d792ac816..c2fd4f67766f 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -4301,8 +4301,9 @@ void bpf_clear_redirect_map(struct bpf_map *map)
+                 * cmpxchg() to make sure it hasn't been changed in
+                 * the meantime by remote CPU.
+                 */
+-               if (unlikely(READ_ONCE(ri->map) == map))
+-                       cmpxchg(&ri->map, map, NULL);
++               if (unlikely(READ_ONCE(ri->map) == map) &&
++                   cmpxchg(&ri->map, map, NULL) == map)
++                       WRITE_ONCE(ri->map_type, BPF_MAP_TYPE_UNSPEC);
+        }
+ }
 
