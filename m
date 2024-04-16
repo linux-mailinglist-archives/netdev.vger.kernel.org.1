@@ -1,297 +1,170 @@
-Return-Path: <netdev+bounces-88414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03FCD8A717F
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:33:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D5448A71A6
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:48:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B02992838D0
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:33:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 156611F213FB
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:48:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07245132801;
-	Tue, 16 Apr 2024 16:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 928E839FCF;
+	Tue, 16 Apr 2024 16:48:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VwyMBzCv"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Flv3GWAh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 764D512B156;
-	Tue, 16 Apr 2024 16:33:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33B5E37165
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 16:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713285187; cv=none; b=ZGCieD0TUhrAd7S8pR3veH35s4wxIuFHNB4SYSzB1ffWfN9OpH/oy7FmlVtdgDWqqqYJ0x9EGx7EwA2G2f1aWBIxJpfkQQcL4n7/FWFsQB0OE1RHcI/Oas0AR0d887khHRVtJkC3aejCevArJHVTPKADoxZURLmMwi1hRJ+8XJ0=
+	t=1713286113; cv=none; b=gA2kiylK5uPrJtwhYw42knFzytRtLswZxCMRfawCxZVdJZSnuOw+6LdvV0wHRV+OhlUgn5zSujo11OC9P635jc9RkDdvQSUFUueIsnDXu198oT17EKlDBFnDInvQsbeTnehrLbF0R+PliZbYeWu8ZSpbPIO6+8IaFvCHA2ttAGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713285187; c=relaxed/simple;
-	bh=Kj4GhrzN1mgURyBgFw5cPJ9Iq68JBstD2Xl8+AQmqag=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SPMlnebD/7DalUZ7YM0xHjd7xPrrEJLhELoCh0+TmnVU9yyeHCcHZM7HFwdzO3BcpE1jrx3bnYTXsGQzzGGw18ube/k7eAQBqO9tJk9TxP3AadxVdWr2RS8O5x6uuYQHWdCwKx/1gkK60amyyV896zxP0booB0ovcUKbyQE2YrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VwyMBzCv; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-6ed32341906so4098251b3a.1;
-        Tue, 16 Apr 2024 09:33:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713285185; x=1713889985; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=tK9x7x40WZ7DIzDRnFtv8z/geV5DKL/J2+8lsUGQtTc=;
-        b=VwyMBzCvAsof5f1T8IwssY3ubRwz1r980UDZwWtAkaVxYpL0P8OaiHZqU5D34/rgVv
-         0h9p2pNI8eDREPyD/lkPAwl2+UtX9Y6jgcv/iTehXim+/Hbn+Jk1poNtto8SgXrm7YHq
-         dcmCsFEvK2r117cMP5BcWMlW7wR4Z1nfFrdcC9ksK1NYzGmrJgpMN4EsCaPx7o4+/8/d
-         pwtzuhv69CU9lsAmceFEk/8lnmK3xC347KRczqlJofABiavQzugFsl0MBb92b/sDMWWW
-         vF6/qAd4gkoTsT3xKSKHfmynNmxF9QST3hPrA2avJoPgiWTMeMUknSAiWFqHLbpat7YB
-         /HFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713285185; x=1713889985;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tK9x7x40WZ7DIzDRnFtv8z/geV5DKL/J2+8lsUGQtTc=;
-        b=WRh36g62FWDIn6mc9l/LRGu+1q2ft+rBDMIDvWmE3WOZaGzgKFed0GgG0p3iyL+bBj
-         g2BRwSNEaMkYTZP6S0DNHBeAfNaO6cCDLYX0NUIgmXargGp0Pgfk3sREIKmUtJND/A3v
-         vNHNDWjCtN4J+Ycdq7kZgkvHFj7z6c9X97BUS5APZ8Nf9N412lIo3RDxbaF4VXIOCpxR
-         mnDaYPemaftdhjk3voMX449TO5kfyiIdV2bhPFKPGGMksFhGkn++J5dSHKUZw2JIWrcV
-         LuQTrJcnyDXsfyMkxDRFgcSuv0iIxpvYXlFIABGJNIyv3pDdHO3/jVyTy/xHjb6Zb1ZD
-         1M+g==
-X-Forwarded-Encrypted: i=1; AJvYcCXqAzoSkOMiKjbPLJ3+YEy6/VMtbqTgq9EePMNT1F1Cmjzvg+DMBo48b4ShtWzq/ydESEZz0jiPvR14M7KtspyStDP0bhR0VDMryfoM
-X-Gm-Message-State: AOJu0Yz/0x0MaPbm2+xn6wK7dnNg6WjlmdvIkqdqtlRcfiRwgG3J0IXT
-	Qn4cY7gxpMdBDzQqn0DtL9BZRpltHLmVDnrpHVFOAPJAG/d3QQsj
-X-Google-Smtp-Source: AGHT+IFpTA0jTqw9y9iYKwIdPqS5F46X2wkv0G7mkYRbbd5RWB6PG9jrId9b8vMkN48RU8IXHCYhug==
-X-Received: by 2002:a05:6a00:98d:b0:6ed:7684:484b with SMTP id u13-20020a056a00098d00b006ed7684484bmr13708804pfg.27.1713285185462;
-        Tue, 16 Apr 2024 09:33:05 -0700 (PDT)
-Received: from ?IPv6:2605:59c8:43f:400:82ee:73ff:fe41:9a02? ([2605:59c8:43f:400:82ee:73ff:fe41:9a02])
-        by smtp.googlemail.com with ESMTPSA id o11-20020a62f90b000000b006e6fc52ecd0sm9079650pfh.123.2024.04.16.09.33.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 09:33:04 -0700 (PDT)
-Message-ID: <68d1c7d3dfcd780fa3bed0bb71e41d7fb0a8c15d.camel@gmail.com>
-Subject: Re: [PATCH net-next v2 10/15] mm: page_frag: reuse existing bit
- field of 'va' for pagecnt_bias
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org,  pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Morton
-	 <akpm@linux-foundation.org>, linux-mm@kvack.org
-Date: Tue, 16 Apr 2024 09:33:03 -0700
-In-Reply-To: <20240415131941.51153-11-linyunsheng@huawei.com>
-References: <20240415131941.51153-1-linyunsheng@huawei.com>
-	 <20240415131941.51153-11-linyunsheng@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	s=arc-20240116; t=1713286113; c=relaxed/simple;
+	bh=hhL9YC42AxZ31cC7ksJqTvYmpcwQRAoX4BjrVD6H3jI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jHybi8xubZUI2HXX5BSOtsKu6nPTI7aNDx0GcStTJx1KbgiYjIg8EkD3MAAaN0GPwD2Bh8iqAPZsZ0jISE3RUw4VR/Jq2b3fEk2rRjBEXPUmSEXEdGKSSfdeRm8di3F5/Qix5xm0BUqh/ysf/hZ9vSvGrpmEbHHmBYhJBhLrcB4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Flv3GWAh; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43GGmAXI002517
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 16:48:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : content-transfer-encoding : mime-version; s=pp1;
+ bh=sjYiRT5qx99G4nCeAfBOwzFkqon8oVmryUsZSL2Tb+M=;
+ b=Flv3GWAh+AQgdGQhIvWW5cdk4ayWRmskrylTal/E/dliSCWkkNdw0caSCkmCcvSsVYST
+ +B+7EFfzEXdLbs5UIg7wXSwsdKSH6OUGx64uRqOSxgF5n0UWEJ1gRbmKj1YFcsWGSE3C
+ F6z/PzupIeMKKoL5MlUM7uktdbTuREXvOZchxB62N/HlrjYQgYGrug10+sDoGbK7PMiF
+ Oc0FtDRl5LtbnTcEy88QHMMe+3buEtXIdzjC+hBMFwqXkOz/qyVzWeA3eVjgW5yRVfqe
+ ykMTdV9NrWmeyk54LvhItzrqYD077pQd2YQCn+Wu6CUorBRUlekL6FvdfsHF8o2X2zNO sg== 
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xhw5s001a-8
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 16:48:29 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43GEtQZQ018218
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 16:41:42 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xg4ct7gbq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 16:41:42 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43GGfaKt8716904
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 16 Apr 2024 16:41:38 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 76F3F5805B;
+	Tue, 16 Apr 2024 16:41:36 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 142DC5806B;
+	Tue, 16 Apr 2024 16:41:36 +0000 (GMT)
+Received: from tinkpad.austin.ibm.com (unknown [9.24.5.26])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 16 Apr 2024 16:41:35 +0000 (GMT)
+From: Nick Child <nnac123@linux.ibm.com>
+To: netdev@vger.kernel.org
+Cc: haren@linux.ibm.com, ricklind@us.ibm.com, mmc@linux.ibm.com,
+        Nick Child <nnac123@linux.ibm.com>
+Subject: [PATCH v2 net-next] ibmvnic: Return error code on TX scrq flush fail
+Date: Tue, 16 Apr 2024 11:41:28 -0500
+Message-Id: <20240416164128.387920-1-nnac123@linux.ibm.com>
+X-Mailer: git-send-email 2.39.3
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: CTs4rb2n5sltmeRDO7ybl0Q81A2ZeTRF
+X-Proofpoint-GUID: CTs4rb2n5sltmeRDO7ybl0Q81A2ZeTRF
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-16_14,2024-04-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ mlxlogscore=914 suspectscore=0 impostorscore=0 phishscore=0
+ lowpriorityscore=0 spamscore=0 malwarescore=0 adultscore=0 mlxscore=0
+ bulkscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404160104
 
-On Mon, 2024-04-15 at 21:19 +0800, Yunsheng Lin wrote:
-> As alignment of 'va' is always aligned with the order of the
-> page allocated, we can reuse the LSB bits for the pagecount
-> bias, and remove the orginal space needed by 'pagecnt_bias'.
-> Also limit the 'fragsz' to be at least the size of
-> 'usigned int' to match the limited pagecnt_bias.
->=20
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+In ibmvnic_xmit() if ibmvnic_tx_scrq_flush() returns H_CLOSED then
+it will inform upper level networking functions to disable tx
+queues. H_CLOSED signals that the connection with the vnic server is
+down and a transport event is expected to recover the device.
 
-What is the point of this? You are trading off space for size on a data
-structure that is only something like 24B in size and only allocated a
-few times.
+Previously, ibmvnic_tx_scrq_flush() was hard-coded to return success.
+Therefore, the queues would remain active until ibmvnic_cleanup() is
+called within do_reset().
 
-> ---
->  include/linux/page_frag_cache.h | 20 +++++++----
->  mm/page_frag_cache.c            | 63 +++++++++++++++++++--------------
->  2 files changed, 50 insertions(+), 33 deletions(-)
->=20
-> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_ca=
-che.h
-> index 40a7d6da9ef0..a97a1ac017d6 100644
-> --- a/include/linux/page_frag_cache.h
-> +++ b/include/linux/page_frag_cache.h
-> @@ -9,7 +9,18 @@
->  #define PAGE_FRAG_CACHE_MAX_ORDER	get_order(PAGE_FRAG_CACHE_MAX_SIZE)
-> =20
->  struct page_frag_cache {
-> -	void *va;
-> +	union {
-> +		void *va;
-> +		/* we maintain a pagecount bias, so that we dont dirty cache
-> +		 * line containing page->_refcount every time we allocate a
-> +		 * fragment. As 'va' is always aligned with the order of the
-> +		 * page allocated, we can reuse the LSB bits for the pagecount
-> +		 * bias, and its bit width happens to be indicated by the
-> +		 * 'size_mask' below.
-> +		 */
-> +		unsigned long pagecnt_bias;
-> +
-> +	};
+The problem is that do_reset() depends on the RTNL lock. If several
+ibmvnic devices are resetting then there can be a long wait time until
+the last device can grab the lock. During this time the tx/rx queues
+still appear active to upper level functions.
 
-Both va and pagecnt_bias are frequently accessed items. If pagecnt_bias
-somehow ends up exceeding the alignment of the page we run the risk of
-corrupting data or creating an page fault.
+FYI, we do make a call to netif_carrier_off() outside the RTNL lock but
+its calls to dev_deactivate() are also dependent on the RTNL lock.
 
-In my opinion this is not worth the risk especially since with the
-previous change your new change results in 0 size savings on 64b
-systems as the structure will be aligned to the size of the pointer.
+As a result, large amounts of retransmissions were observed in a short
+period of time, eventually leading to ETIMEOUT. This was specifically
+seen with HNV devices, likely because of even more RTNL dependencies.
 
->  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
->  	__u16 offset;
->  	__u16 size_mask:15;
-> @@ -18,10 +29,6 @@ struct page_frag_cache {
->  	__u32 offset:31;
->  	__u32 pfmemalloc:1;
->  #endif
-> -	/* we maintain a pagecount bias, so that we dont dirty cache line
-> -	 * containing page->_refcount every time we allocate a fragment.
-> -	 */
-> -	unsigned int		pagecnt_bias;
->  };
-> =20
->  static inline void page_frag_cache_init(struct page_frag_cache *nc)
-> @@ -56,7 +63,8 @@ static inline void *page_frag_alloc_va_align(struct pag=
-e_frag_cache *nc,
->  					     gfp_t gfp_mask,
->  					     unsigned int align)
->  {
-> -	WARN_ON_ONCE(!is_power_of_2(align) || align >=3D PAGE_SIZE);
-> +	WARN_ON_ONCE(!is_power_of_2(align) || align >=3D PAGE_SIZE ||
-> +		     fragsz < sizeof(unsigned int));
+Therefore, ensure the return code of ibmvnic_tx_scrq_flush() is
+propagated to the xmit function to allow for an earlier (and lock-less)
+response to a transport event.
 
-What is the reason for this change? Seems like it is to account for an
-issue somewhere.
+Signed-off-by: Nick Child <nnac123@linux.ibm.com>
+---
+v1 - https://lore.kernel.org/netdev/20240414102337.GA645060@kernel.org/
+Changes:
+ - Edit based on Simon's review (thanks!), all callers of
+   ibmvnic_tx_scrq_flush should respoind to the return code
+ 
+ drivers/net/ethernet/ibm/ibmvnic.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-> =20
->  	return __page_frag_alloc_va_align(nc, fragsz, gfp_mask, align);
->  }
-> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
-> index 8d93029116e1..5f7f96c88163 100644
-> --- a/mm/page_frag_cache.c
-> +++ b/mm/page_frag_cache.c
-> @@ -18,8 +18,8 @@
->  #include <linux/page_frag_cache.h>
->  #include "internal.h"
-> =20
-> -static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
-> -					     gfp_t gfp_mask)
-> +static bool __page_frag_cache_refill(struct page_frag_cache *nc,
-> +				     gfp_t gfp_mask)
->  {
->  	struct page *page =3D NULL;
->  	gfp_t gfp =3D gfp_mask;
-> @@ -38,9 +38,26 @@ static struct page *__page_frag_cache_refill(struct pa=
-ge_frag_cache *nc,
->  	if (unlikely(!page))
->  		page =3D alloc_pages_node(NUMA_NO_NODE, gfp, 0);
-> =20
-> -	nc->va =3D page ? page_address(page) : NULL;
-> +	if (unlikely(!page)) {
-> +		nc->va =3D NULL;
-> +		return false;
-> +	}
-> +
-> +	nc->va =3D page_address(page);
-> =20
-> -	return page;
-> +#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-> +	VM_BUG_ON(nc->pagecnt_bias & nc->size_mask);
-> +	page_ref_add(page, nc->size_mask - 1);
-> +	nc->pagecnt_bias |=3D nc->size_mask;
-> +#else
-> +	VM_BUG_ON(nc->pagecnt_bias & (PAGE_SIZE - 1));
-> +	page_ref_add(page, PAGE_SIZE - 2);
-> +	nc->pagecnt_bias |=3D (PAGE_SIZE - 1);
-> +#endif
-> +
-> +	nc->pfmemalloc =3D page_is_pfmemalloc(page);
-> +	nc->offset =3D 0;
-> +	return true;
->  }
-> =20
->  void page_frag_cache_drain(struct page_frag_cache *nc)
-> @@ -65,38 +82,31 @@ EXPORT_SYMBOL(__page_frag_cache_drain);
->  void *page_frag_alloc_va(struct page_frag_cache *nc, unsigned int fragsz=
-,
->  			 gfp_t gfp_mask)
->  {
-> -	unsigned int size, offset;
-> +	unsigned long size_mask;
-> +	unsigned int offset;
->  	struct page *page;
-> +	void *va;
-> =20
->  	if (unlikely(!nc->va)) {
->  refill:
-> -		page =3D __page_frag_cache_refill(nc, gfp_mask);
-> -		if (!page)
-> +		if (!__page_frag_cache_refill(nc, gfp_mask))
->  			return NULL;
-> -
-> -		/* Even if we own the page, we do not use atomic_set().
-> -		 * This would break get_page_unless_zero() users.
-> -		 */
-> -		page_ref_add(page, PAGE_FRAG_CACHE_MAX_SIZE);
-> -
-> -		/* reset page count bias and offset to start of new frag */
-> -		nc->pfmemalloc =3D page_is_pfmemalloc(page);
-> -		nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
-> -		nc->offset =3D 0;
->  	}
-> =20
->  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
->  	/* if size can vary use size else just use PAGE_SIZE */
-> -	size =3D nc->size_mask + 1;
-> +	size_mask =3D nc->size_mask;
->  #else
-> -	size =3D PAGE_SIZE;
-> +	size_mask =3D PAGE_SIZE - 1;
->  #endif
-> =20
-> +	va =3D (void *)((unsigned long)nc->va & ~size_mask);
->  	offset =3D nc->offset;
-> -	if (unlikely(offset + fragsz > size)) {
-> -		page =3D virt_to_page(nc->va);
-> =20
-> -		if (!page_ref_sub_and_test(page, nc->pagecnt_bias))
-> +	if (unlikely(offset + fragsz > (size_mask + 1))) {
-> +		page =3D virt_to_page(va);
-> +
-> +		if (!page_ref_sub_and_test(page, nc->pagecnt_bias & size_mask))
->  			goto refill;
-> =20
->  		if (unlikely(nc->pfmemalloc)) {
-> @@ -105,12 +115,11 @@ void *page_frag_alloc_va(struct page_frag_cache *nc=
-, unsigned int fragsz,
->  		}
-> =20
->  		/* OK, page count is 0, we can safely set it */
-> -		set_page_count(page, PAGE_FRAG_CACHE_MAX_SIZE + 1);
-> +		set_page_count(page, size_mask);
-> +		nc->pagecnt_bias |=3D size_mask;
-> =20
-> -		/* reset page count bias and offset to start of new frag */
-> -		nc->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
->  		offset =3D 0;
-> -		if (unlikely(fragsz > size)) {
-> +		if (unlikely(fragsz > (size_mask + 1))) {
->  			/*
->  			 * The caller is trying to allocate a fragment
->  			 * with fragsz > PAGE_SIZE but the cache isn't big
-> @@ -127,7 +136,7 @@ void *page_frag_alloc_va(struct page_frag_cache *nc, =
-unsigned int fragsz,
->  	nc->pagecnt_bias--;
->  	nc->offset =3D offset + fragsz;
-> =20
-> -	return nc->va + offset;
-> +	return va + offset;
->  }
->  EXPORT_SYMBOL(page_frag_alloc_va);
-> =20
-
-The rest of this seems like unnecessary obfuscation and change.
-Basically it is adding more overhead to page allocation for no reward.
+diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
+index 30c47b8470ad..5e9a93bdb518 100644
+--- a/drivers/net/ethernet/ibm/ibmvnic.c
++++ b/drivers/net/ethernet/ibm/ibmvnic.c
+@@ -2371,7 +2371,7 @@ static int ibmvnic_tx_scrq_flush(struct ibmvnic_adapter *adapter,
+ 		ibmvnic_tx_scrq_clean_buffer(adapter, tx_scrq);
+ 	else
+ 		ind_bufp->index = 0;
+-	return 0;
++	return rc;
+ }
+ 
+ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
+@@ -2424,7 +2424,9 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 		tx_dropped++;
+ 		tx_send_failed++;
+ 		ret = NETDEV_TX_OK;
+-		ibmvnic_tx_scrq_flush(adapter, tx_scrq);
++		lpar_rc = ibmvnic_tx_scrq_flush(adapter, tx_scrq);
++		if (lpar_rc != H_SUCCESS)
++			goto tx_err;
+ 		goto out;
+ 	}
+ 
+@@ -2439,8 +2441,10 @@ static netdev_tx_t ibmvnic_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 		dev_kfree_skb_any(skb);
+ 		tx_send_failed++;
+ 		tx_dropped++;
+-		ibmvnic_tx_scrq_flush(adapter, tx_scrq);
+ 		ret = NETDEV_TX_OK;
++		lpar_rc = ibmvnic_tx_scrq_flush(adapter, tx_scrq);
++		if (lpar_rc != H_SUCCESS)
++			goto tx_err;
+ 		goto out;
+ 	}
+ 
+-- 
+2.39.3
 
 
