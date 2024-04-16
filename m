@@ -1,130 +1,119 @@
-Return-Path: <netdev+bounces-88225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AFDD8A661C
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:30:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 471CE8A6629
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D1FAB24C0F
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:30:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D39551F21E3F
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39F7E86AE7;
-	Tue, 16 Apr 2024 08:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66C73B78D;
+	Tue, 16 Apr 2024 08:33:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p61+UYgY"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="SXiPD9tA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE2985959;
-	Tue, 16 Apr 2024 08:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3314B3EA7B;
+	Tue, 16 Apr 2024 08:32:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713256203; cv=none; b=W+SXq8KM17NfxZqf61n/tUo9fwAai5VwhGx+sK6vcjYb3X1oeaAZRK+2Zpj8VHOxghWRl+cJYat+Uf0d3GRL0ndbuEd9noHuEHcRjOseGxcngjUsvOSATWfK+ZFbio5iOat0HTz0xsEowElko8dROj5cPI3+XWm5WFkB0o/Lcpk=
+	t=1713256384; cv=none; b=PDIIhO58g48SNRnQ0xD/0BV3ig8mv0oBae5L5aUrzd7Ur6W/yJdckC7jGQt1LSBQ+hI2JZV5IdrPTLCRuqszxrC+b6tnS3cPawXmyGoGwapTszzEOp3XSdj0Pj7eWRox4D8b9opShE9E0bMnD/1LSV6oqwOjGi0/05rv4FtbLpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713256203; c=relaxed/simple;
-	bh=lJrj9v6ekM+Ddi5L9uY9dMcBsBq+d7SARM1jH6N4GQQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gST/C1vOqA1EmWlrS9NrQhVdPkaV6TrAcfTSGDr/mgR262tD0XWwJtFxWy/aUxo59T30bsOXjCs7UN8/Qx+O7pRXNcA7hkPrNPXgsWXPxVQIgqMrHoGqz89UhdLOfnUtzF0dPatyFEQ3b3wg4rxCU8rgYlNn92+nlvFbJY0on1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p61+UYgY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B131DC113CE;
-	Tue, 16 Apr 2024 08:30:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713256202;
-	bh=lJrj9v6ekM+Ddi5L9uY9dMcBsBq+d7SARM1jH6N4GQQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=p61+UYgYo11o8wr+9Y1NTCQKaUdil+iO3y09VvB2XgUFcg+G0hFo9nVW748ZyFVyS
-	 jbsf9lWI/fFLW2RS99UV30A3yiEWvznNPQ8QGOUpP08u3lFxS3v2xFdx4iUVfPLLvQ
-	 kUTrfHBa2we/FaHPNnxCp/OEulJA6LTIK+TyCuJUppYn2sc73MSIfB37zKPHIXDyXM
-	 vJfCDtHbQXfm1eYIVsUEcNy+DkO2Ld937JnJ/MOVna6c+oUdYFKaKxzWRGG033qwRR
-	 LtIIu1HqZaC3Ig8eBWSR97uPo608TMUmpzBoHQXGVFzkEUxfvYwv7vLMjz8gm6l87/
-	 XztQv707Kx+FQ==
-Date: Tue, 16 Apr 2024 11:29:57 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, llvm@lists.linux.dev,
-	Ingo Molnar <mingo@redhat.com>, Bill Wendling <morbo@google.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thomas Gleixner <tglx@linutronix.de>, x86@kernel.org,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Mark Rutland <mark.rutland@arm.com>,
-	Michael Guralnik <michaelgur@mellanox.com>, patches@lists.linux.dev,
-	Niklas Schnelle <schnelle@linux.ibm.com>,
-	Jijie Shao <shaojijie@huawei.com>, Will Deacon <will@kernel.org>
-Subject: Re: [PATCH v3 6/6] IB/mlx5: Use __iowrite64_copy() for write
- combining stores
-Message-ID: <20240416082957.GC6832@unreal>
-References: <0-v3-1893cd8b9369+1925-mlx5_arm_wc_jgg@nvidia.com>
- <6-v3-1893cd8b9369+1925-mlx5_arm_wc_jgg@nvidia.com>
+	s=arc-20240116; t=1713256384; c=relaxed/simple;
+	bh=lflb0pIufUXxyIEvkfnw/gPvn4JiT4OjGBMvQmX6qxk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=n94Bjpl5jAblhaCbpUY7CDmAJikp4NoeYYN6f0DxQTKSFItDPgyMQjxqv+YejL5hB44ZdXA+ZGIhJ5teXyvGQBlxsVxg4T9OxyM+5M3ydAScrkDTWfMMcdEevlxEPdwsIjnCkl+XWtCCB5tpLSf0+ZglMxKUs7F1t1bL8WCQfdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=SXiPD9tA; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id EE1FD1C0009;
+	Tue, 16 Apr 2024 08:32:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1713256375;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=m566RVi6Hjc4VyINZc6IMhS42+xhOl1ARnyrIuF1SbM=;
+	b=SXiPD9tA3i+YVZj1nSoulZISksMVUPC9CQbgwO1PiVLiguE+LcuIS0qBfzixGRc6j1xhi8
+	uHlSIWDTTgF9NgPoZmZVWz3UbBplGE0SEwWD8uV/dz1mJu2vgjF/uiboHYWpd7dkgcNdRf
+	WtN3t/O3N9yp+lfpAQUvgCmhXpe9ofeAPmn8o9JGkoOiyR82NwHPluSG1W/ARFWQ/IUAZU
+	RyxVW7rNmzpEU1pZvtOnNXCSpcisSn0AnWaZDO3/CwnLH7Qcyo7NgQJQ7l3O/9WtY3MX2r
+	T/8TcK3bBxBkX140iMJJHuBG3qUoOZERTbl3FFLHznSEszmBgZZjXcFWdMI7HQ==
+Message-ID: <7d0ded52-14f0-4f6a-b639-72f537603be8@arinc9.com>
+Date: Tue, 16 Apr 2024 11:32:49 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6-v3-1893cd8b9369+1925-mlx5_arm_wc_jgg@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/2] net: dsa: mt7530-mdio: read PHY address
+ of switch from device tree
+Content-Language: en-US
+To: Florian Fainelli <f.fainelli@gmail.com>,
+ Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240414-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v2-0-1a7649c4d3b6@arinc9.com>
+ <20240414-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v2-1-1a7649c4d3b6@arinc9.com>
+ <459b31bd-64b3-4804-bc5a-c8ffd145e055@gmail.com>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <459b31bd-64b3-4804-bc5a-c8ffd145e055@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On Thu, Apr 11, 2024 at 01:46:19PM -0300, Jason Gunthorpe wrote:
-> mlx5 has a built in self-test at driver startup to evaluate if the
-> platform supports write combining to generate a 64 byte PCIe TLP or
-> not. This has proven necessary because a lot of common scenarios end up
-> with broken write combining (especially inside virtual machines) and there
-> is other way to learn this information.
+On 15/04/2024 18:30, Florian Fainelli wrote:
 > 
-> This self test has been consistently failing on new ARM64 CPU
-> designs (specifically with NVIDIA Grace's implementation of Neoverse
-> V2). The C loop around writeq() generates some pretty terrible ARM64
-> assembly, but historically this has worked on a lot of existing ARM64 CPUs
-> till now.
 > 
-> We see it succeed about 1 time in 10,000 on the worst effected
-> systems. The CPU architects speculate that the load instructions
-> interspersed with the stores makes the WC buffers statistically flush too
-> often and thus the generation of large TLPs becomes infrequent. This makes
-> the boot up test unreliable in that it indicates no write-combining,
-> however userspace would be fine since it uses a ST4 instruction.
+> On 4/13/2024 11:07 PM, Arınç ÜNAL via B4 Relay wrote:
+>> From: Arınç ÜNAL <arinc.unal@arinc9.com>
+>>
+>> Read the PHY address the switch listens on from the reg property of the
+>> switch node on the device tree. This change brings support for MT7530
+>> switches on boards with such bootstrapping configuration where the switch
+>> listens on a different PHY address than the hardcoded PHY address on the
+>> driver, 31.
+>>
+>> As described on the "MT7621 Programming Guide v0.4" document, the MT7530
+>> switch and its PHYs can be configured to listen on the range of 7-12,
+>> 15-20, 23-28, and 31 and 0-4 PHY addresses.
+>>
+>> There are operations where the switch PHY registers are used. For the PHY
+>> address of the control PHY, transform the MT753X_CTRL_PHY_ADDR constant
+>> into a macro and use it. The PHY address for the control PHY is 0 when the
+>> switch listens on 31. In any other case, it is one greater than the PHY
+>> address the switch listens on.
+>>
+>> Reviewed-by: Daniel Golle <daniel@makrotopia.org>
+>> Tested-by: Daniel Golle <daniel@makrotopia.org>
+>> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
 > 
-> Further, S390 has similar issues where only the special zpci_memcpy_toio()
-> will actually generate large TLPs, and the open coded loop does not
-> trigger it at all.
+> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 > 
-> Fix both ARM64 and S390 by switching to __iowrite64_copy() which now
-> provides architecture specific variants that have a high change of
-> generating a large TLP with write combining. x86 continues to use a
-> similar writeq loop in the generate __iowrite64_copy().
-> 
-> Fixes: 11f552e21755 ("IB/mlx5: Test write combining support")
-> Tested-by: Niklas Schnelle <schnelle@linux.ibm.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/infiniband/hw/mlx5/mem.c | 8 +++-----
->  1 file changed, 3 insertions(+), 5 deletions(-)
-> 
+> I would go a step further and name phy_addr switch_mdio_addr, or something along those lines to clearly denote this is not a per-port PHY address neither a proper PHY device, but we've already had a similar discussion before about spelling this out clearly as a "pseudo PHY"....
 
-Thanks,
-Acked-by: Leon Romanovsky <leonro@nvidia.com>
+I am fine with calling the switch operating on an MDIO bus a psuedo-PHY.
+But I don't believe this grants making up names on our own instead of using
+the name described in IEEE Std 802.3-2022. The switch listens on a PHY
+address on the MDIO bus. The description for the phy_addr member of the
+mt753x_info structure clearly explains that so I don't see a reason to
+change the variable name.
+
+Arınç
 
