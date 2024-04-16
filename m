@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-88234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8B548A669D
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 11:00:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 554A88A669A
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 11:00:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70CB5B2496B
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 09:00:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF1BC2841E0
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 09:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B4D31F19A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DEBB84D0F;
 	Tue, 16 Apr 2024 09:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rzJppfI9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qrtQ0K19"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6757184A5F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A50F84D06
 	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 09:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713258029; cv=none; b=LFVcZMtFRSplGNNBq0Bg3byHtn2V5cGwpzGUzE7dZzv3lG3FOgYAmtibaq9cvD624pB1gGAH1+AA+sT11opt6fSrJPeGRgKqdV8+JIxxyJKcfE6sPmNtSs/ohl5yXvy7LIU6ylpknMNqN2qdLh6L9eKDm+n4M5MlX4fqKmpdsLU=
+	t=1713258029; cv=none; b=RUvrg59m2aBHq1v1YqVQSmalJTP/D6BCOqv7CTdkf/g7HpflhVIGQLWRy9gvj1+SPVCA3m1MDYZ9GjVdD6rPcae+DH5KvqcHtCg+h1ESwaqZ9IvIeFWrJpcXn09agQ42tS9zb3IMNcWdBFsWDxBn44LVL9JKB9Q8LMcnZG+ADj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713258029; c=relaxed/simple;
-	bh=vDFwBbHNajlZAfcVvPf/2hIljjdEjtTX1H9CXe9tXVI=;
+	bh=Ngq8XxS6CulGMketFUGR8+wvFXxjSj2wfUu+RI9QHYs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sI88kze5+7EBWctFtc2tMhuoplN3gUmp7A4FDLY6XCSiIBZxXvwVRHNw321iI8vCvnWlaJEhOrLbAvlAPznCXUB2tGI1zkA/E1l+itK8CnuPp88qyRByCSJFjFit+c6Ib+T8ZV34m1PIto606/RsI0YxKGivGXvKYHxZ2xriqYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rzJppfI9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 362A2C32781;
+	 In-Reply-To:To:Cc; b=B/WuO67YGdCfBiF5VaJQUfzAGAG1KofGcKcd0yis1NJ9dYxfvOwh1Vk4jbSsSX99XWlMNFxd6goU+9D+eEeyMWqyAqTfxBcJR3kCfTAggg00m5Dky/VN5DCVaJSqrAk7+hCjXZCkHrnJd31muJLtL45GP6Pgr1fldICjd3/cQmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qrtQ0K19; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 28536C2BD10;
 	Tue, 16 Apr 2024 09:00:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1713258029;
-	bh=vDFwBbHNajlZAfcVvPf/2hIljjdEjtTX1H9CXe9tXVI=;
+	bh=Ngq8XxS6CulGMketFUGR8+wvFXxjSj2wfUu+RI9QHYs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rzJppfI9pMfYfJ2fmNrK76/EQMGlT1VLV4b1NXG/wzaeHhv2rxn/xYlyOG1C1+HpI
-	 tbH0g51tLISEST55OmSG8a+oxuAlifSlMlbSaHl5kI2MttRdm/VAgpIke0lrIcJvmR
-	 Di6TmfwJzsrmN6vfB176kQP7E0ChU6qo0rRzy8AnTfaZemtgRTWQ576cE/lvj4/690
-	 AAGQTEHXL4PVZevkghQEDZ7xRggDiE2frxWwhsYDQ11mvxOYOLwHjekv4O7lUJXHab
-	 orZaLW9TiQE5lBpMvr+tj2AwoihADHBZkhhaO4KXLWU7gifTkTr/epprTVNJS1PaCO
-	 u9uA4ol7LGKFQ==
+	b=qrtQ0K19m3vvov8WC6cr8iqa4NB4e6xG+P/Q9tclnz0J55HmYB/jON0BdAxQmdyBs
+	 JzI9n59BSBPpNk88K42xchgPjNqlJDoMVLfWQ+NYvkQ+xqFLNVgZ1sc+5HPwPkmN5A
+	 dju8xhzr8l9/1IzW+gAz1vgc6SHuzWyUWOyxjIXmf2xLf8xY+Csr1jwG07s/CDc+tU
+	 AA0CUdlHYz07o6ITNhVmnPL5/itO5Hq0ml5Rlk34xy85wpk7hFNo5oE+ls/r8MBLbY
+	 hSy/+TKyLju7TV+o01gp/uaaRK1dlgG+abnprOdhIvCnNP5f6B66drjrp/QKwq+Kjd
+	 8Fc+T/NT4O3pg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 278ACC54BC8;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 16935C395EC;
 	Tue, 16 Apr 2024 09:00:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,16 +52,15 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: dsa: lantiq_gswip: provide own phylink MAC
- operations
+Subject: Re: [PATCH net-next] net: dsa: qca8k: provide own phylink MAC operations
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171325802915.5697.14066625366040400848.git-patchwork-notify@kernel.org>
+ <171325802908.5697.8358107695952444873.git-patchwork-notify@kernel.org>
 Date: Tue, 16 Apr 2024 09:00:29 +0000
-References: <E1rvIcj-006bQo-B3@rmk-PC.armlinux.org.uk>
-In-Reply-To: <E1rvIcj-006bQo-B3@rmk-PC.armlinux.org.uk>
+References: <E1rvIce-006bQi-58@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1rvIce-006bQi-58@rmk-PC.armlinux.org.uk>
 To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-Cc: andrew@lunn.ch, olteanv@gmail.com, hauke@hauke-m.de, f.fainelli@gmail.com,
+Cc: andrew@lunn.ch, olteanv@gmail.com, f.fainelli@gmail.com,
  davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
  netdev@vger.kernel.org
 
@@ -70,20 +69,18 @@ Hello:
 This patch was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Fri, 12 Apr 2024 16:15:29 +0100 you wrote:
-> Convert lantiq_gswip to provide its own phylink MAC operations, thus
-> avoiding the shim layer in DSA's port.c. For lantiq_gswip, it means
-> we end up with a common instance of phylink MAC operations that are
-> shared between the different variants, rather than having duplicated
-> initialisers in dsa_switch_ops.
+On Fri, 12 Apr 2024 16:15:24 +0100 you wrote:
+> Convert qca8k to provide its own phylink MAC operations, thus
+> avoiding the shim layer in DSA's port.c.
 > 
 > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> 
-> [...]
+> ---
+>  drivers/net/dsa/qca/qca8k-8xxx.c | 49 +++++++++++++++++++++-----------
+>  1 file changed, 32 insertions(+), 17 deletions(-)
 
 Here is the summary with links:
-  - [net-next] net: dsa: lantiq_gswip: provide own phylink MAC operations
-    https://git.kernel.org/netdev/net-next/c/94c437edce65
+  - [net-next] net: dsa: qca8k: provide own phylink MAC operations
+    https://git.kernel.org/netdev/net-next/c/636d022cd586
 
 You are awesome, thank you!
 -- 
