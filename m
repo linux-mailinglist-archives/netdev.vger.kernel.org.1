@@ -1,148 +1,121 @@
-Return-Path: <netdev+bounces-88356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47E358A6D52
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:07:05 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B68C8A6D57
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:08:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F10F32816A6
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:07:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81D46B23997
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:08:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8767912C534;
-	Tue, 16 Apr 2024 14:07:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BF4512CD91;
+	Tue, 16 Apr 2024 14:07:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="vOCo3gk0";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Q5IXnJrP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LYd0zphF"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C87F12C485
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 14:06:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5C112CD99
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 14:07:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713276421; cv=none; b=MyKoQx7dNRFqSEj0WH1Q8YmPxOlK+MgkGh6oq24g0PC9UZMrNG4IiwanWymntzb4vCH7KmnzlBtFfg3HWyfiQng89m5i/3zvN4bsLdaYWPSl3mch3CQ3pUyOIJBZWF0fUBFoBj8V+RsdiOiihprl99+8Lni/jEu598VzEnotSOk=
+	t=1713276463; cv=none; b=sLPwic3UkgiA8n+QCKROI37jRCxiL3ZWuwH7iUSJ8rFsrru4a9AEfbl3bD4kLg3iy5XnDwjE6bNFxUmfwNqVEMFDrlKbyy3CYf68zLA0jjFRQMfEvtaZFxEXXQPWm+KMSf0WO0s36mAdxTmldZ7aLxvZy7wImr6th1tXUSMiJrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713276421; c=relaxed/simple;
-	bh=sx7r29DmXh6gGC9ku7ZNaJ9vE6D8AbIaHgHm/uwwXFs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=o75wBNBSs+mM9vyYvIFE1iD9SzOHajWGJKlz1tDeTRKKi5YVgtrEcpmdIHQfFT6sW391sv+ejQmk+kJ5Xk1JacAkFkGAl6hkifGSMsivU/uoySoMlH7gJgk8ruHiRfTXD9YpjpFhA0G6Lb2DnPJvl+Pa6oa9za9zzd1be33RAXo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=vOCo3gk0; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Q5IXnJrP; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1713276411;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+J9P2ULNkyUwgvpEdf0Gep794Rg7+MINnBkDkinXNUQ=;
-	b=vOCo3gk03i2s2/ACNfZ8RH1vBt+vz15GsQrmoXKgT8pyqSLqueMk+ZRIcr8Gj1uJVtRINx
-	08HYPThnstuT6SYiT+pePQSGVLAYvlQWwY4FgTr0QXBy4Y6U4WPuCjd5XNapR6ESLVOOCQ
-	e/mzORvCSzpJRyMA7+G943QwtmmxZazNqs/5jgj8LffGfMAa4DaTwr8HxHctya489LcX+q
-	eWiXbyPjFr8vZUfUdnuNTCru6fNaDkeMHjvJ5v2AF5z5+3Ke9ZIKihSzsVsTTgIaDMdJHv
-	PHC2/p5KmRhFRth3YzikjR7vIbBsLmABk6MtVD01tml3u2quHDMSeS1XHkfi4w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1713276411;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+J9P2ULNkyUwgvpEdf0Gep794Rg7+MINnBkDkinXNUQ=;
-	b=Q5IXnJrP2NxOay1V1W+0xr3gFUCCVYBCJO7FA8D6FmJCbXxBwXP0mkWoyZgkY8RKkA/KQz
-	5GezuL39/ULv6qCA==
-To: Lukas Wunner <lukas@wunner.de>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, Roman Lozko
- <lozko.roma@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Andrew
- Lunn <andrew@lunn.ch>, Sasha Neftin <sasha.neftin@intel.com>
-Subject: Re: [PATCH net] igc: Fix LED-related deadlock on driver unbind
-In-Reply-To: <2f1be6b1cf2b3346929b0049f2ac7d7d79acb5c9.1713188539.git.lukas@wunner.de>
-References: <2f1be6b1cf2b3346929b0049f2ac7d7d79acb5c9.1713188539.git.lukas@wunner.de>
-Date: Tue, 16 Apr 2024 16:06:49 +0200
-Message-ID: <87plupe70m.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1713276463; c=relaxed/simple;
+	bh=T4QBNTdPWgn2+Y70k/HETB3HkKN076WpzzT0wssNHxI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PM+z58O2bH1XTNkdGRseynBf6KJPJiqUHL0LZVl6Zc8Nr1HBdtjya+p5fiX6eWbfT/UHYPq7qyCVbUIX3U7hnFi8uP/O54OIKTB7hAJzaGkXZ4jKbl+OI0SgdsaP3/cYqz0F4DgoPY3V01FIwo4S7MC4FpZBE5dd38SNLp/8QUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LYd0zphF; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dd8e82dd47eso6089213276.2
+        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 07:07:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713276461; x=1713881261; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=MXqb6WMJmglkxwoGnQhBGCaU/Lemolzb8pYRtLYA7N4=;
+        b=LYd0zphF7Ejnjn7yt/9LnsWf7DDVAjZ6Fj3ieRdp1VsZT4jKDfBPvCBtxBXCjlWzmW
+         p4NK6EW/Nss9BA2OQbtMPn9FiUurjmOcfMlpTzuKaV8bO8QuhUxBtqWy0+8prKWi+3Gb
+         5loeRkb/dqFoadh/hs4pbqrK+q6pcHvHYuLocqiFafPaPIyMKAPXhIOthRjGVCAVV2sC
+         kGicLYzYN7B/aCOd4a/IwZfa+NyvEubphSSxNbMLZkNeiDbDCohrEJXQyOw5oFCA86sH
+         dDC/ZvlAguza5Hz07qhLGBg3mQyCVV+UT0/PFr2nDXj2549RREBs9j5tTdIPhMe7UhKa
+         /mFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713276461; x=1713881261;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=MXqb6WMJmglkxwoGnQhBGCaU/Lemolzb8pYRtLYA7N4=;
+        b=ISjQjy91fFNkTKUk9Euf9s0GHSs0mo3DJx0w9MdoAbJK5tyACoDZSOLE2ac4GOWuQd
+         jqKgGs3i7BKvz9jdxOHFfLgo1il228+A5UfK4yQWaplkb29/rTt4/AD2cJDvcferNOZm
+         ZIj5EIUE+6h7tNOQjlJj/w2AfXjKAzY9TEuqhCEzgF/zquBKrTL7crbKErDDArKtyqzd
+         tgu4J7Lbo8zNyadG0+zww94JOEPKywZ0AH9o0SkIqeevIZye/nKOhFXnmog/oFBIVbIt
+         6izGV1r/Oid0CPaG2WHrqgYihiAlJUNx20Oyzr3YVLTRWaNU/mmCHEMWyzmQ2sTIRVr+
+         DbNw==
+X-Gm-Message-State: AOJu0Yxd5AIjXCAGGSeBAlIRzR9KJ8Xn+D2FZiQGA73/VyCJaP2IKws7
+	KsgMhnY8weVeEdR6Zq1OI8tDnQyKppKLSDcDBF+0A0Wyyga1iU+GPZsoj1Q0C2WmwHSxRRDaL9C
+	vEQNyXUKhiw==
+X-Google-Smtp-Source: AGHT+IGgUf/hhPTlLB9wB2vJNsWfNneTdnwBh2OvYf/n8ZZIOX/YCgJV15BET8nbY+Bw3YcMlrAYwpkx41JeOA==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:154b:b0:dc7:3189:4e75 with SMTP
+ id r11-20020a056902154b00b00dc731894e75mr796038ybu.3.1713276461460; Tue, 16
+ Apr 2024 07:07:41 -0700 (PDT)
+Date: Tue, 16 Apr 2024 14:07:39 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
+Message-ID: <20240416140739.967941-1-edumazet@google.com>
+Subject: [PATCH net-next] netns: no longer hold RTNL in rtnl_net_dumpid()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Guillaume Nault <gnault@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 
---=-=-=
-Content-Type: text/plain
+- rtnl_net_dumpid() is already fully RCU protected,
+  RTNL is not needed there.
 
-On Mon Apr 15 2024, Lukas Wunner wrote:
-> Roman reports a deadlock on unplug of a Thunderbolt docking station
-> containing an Intel I225 Ethernet adapter.
->
-> The root cause is that led_classdev's for LEDs on the adapter are
-> registered such that they're device-managed by the netdev.  That
-> results in recursive acquisition of the rtnl_lock() mutex on unplug:
->
-> When the driver calls unregister_netdev(), it acquires rtnl_lock(),
-> then frees the device-managed resources.  Upon unregistering the LEDs,
-> netdev_trig_deactivate() invokes unregister_netdevice_notifier(),
-> which tries to acquire rtnl_lock() again.
->
-> Avoid by using non-device-managed LED registration.
->
-> Stack trace for posterity:
->
->   schedule+0x6e/0xf0
->   schedule_preempt_disabled+0x15/0x20
->   __mutex_lock+0x2a0/0x750
->   unregister_netdevice_notifier+0x40/0x150
->   netdev_trig_deactivate+0x1f/0x60 [ledtrig_netdev]
->   led_trigger_set+0x102/0x330
->   led_classdev_unregister+0x4b/0x110
->   release_nodes+0x3d/0xb0
->   devres_release_all+0x8b/0xc0
->   device_del+0x34f/0x3c0
->   unregister_netdevice_many_notify+0x80b/0xaf0
->   unregister_netdev+0x7c/0xd0
->   igc_remove+0xd8/0x1e0 [igc]
->   pci_device_remove+0x3f/0xb0
->
-> Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
-> Reported-by: Roman Lozko <lozko.roma@gmail.com>
-> Closes: https://lore.kernel.org/r/CAEhC_B=ksywxCG_+aQqXUrGEgKq+4mqnSV8EBHOKbC3-Obj9+Q@mail.gmail.com/
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+- Fix return value at the end of a dump,
+  so that NLMSG_DONE can be appended to current skb,
+  saving one recvmsg() system call.
 
-I think, the first SoB has to be yours, because you are the patch
-author. In fact, my SoB is not required at all.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Guillaume Nault <gnault@redhat.com>
+---
+ net/core/net_namespace.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-However, feel free to add:
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index f0540c5575157135b1dc5dece2220f81a408fb7e..2f5190aa2f15cec2e934ebee9c502fb426cf0d7d 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -1090,7 +1090,7 @@ static int rtnl_net_dumpid(struct sk_buff *skb, struct netlink_callback *cb)
+ end:
+ 	if (net_cb.fillargs.add_ref)
+ 		put_net(net_cb.tgt_net);
+-	return err < 0 ? err : skb->len;
++	return err;
+ }
+ 
+ static void rtnl_net_notifyid(struct net *net, int cmd, int id, u32 portid,
+@@ -1205,7 +1205,8 @@ void __init net_ns_init(void)
+ 	rtnl_register(PF_UNSPEC, RTM_NEWNSID, rtnl_net_newid, NULL,
+ 		      RTNL_FLAG_DOIT_UNLOCKED);
+ 	rtnl_register(PF_UNSPEC, RTM_GETNSID, rtnl_net_getid, rtnl_net_dumpid,
+-		      RTNL_FLAG_DOIT_UNLOCKED);
++		      RTNL_FLAG_DOIT_UNLOCKED |
++		      RTNL_FLAG_DUMP_UNLOCKED);
+ }
+ 
+ static void free_exit_list(struct pernet_operations *ops, struct list_head *net_exit_list)
+-- 
+2.44.0.683.g7961c838ac-goog
 
-Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-Tested-by: Kurt Kanzenbach <kurt@linutronix.de> # Intel i225
-
-Thanks,
-Kurt
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmYehfkTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgphAD/9ltXyXjzN1q3F45uzk/J9xVD1M+yCM
-lppwpQGGZrFVuI0wjOnTYdmGXMUC6xD+bUrm6+21zo+V6xd06Kvq1igO/mUDU/dz
-7fAlEWKWjB0cg7QG1g0oC09xJSviTOoTXT9DDktsR9EaEVFz89UzLysYcdoPeTVa
-m3pP8NSt9fhzCTkZbx09wAZeOCJrQLORfA3LMKaLnbh3JX12Slmh80qyrP7QtYcQ
-oGT3KCURaycGzDh3Pa8eZSwx70Xnncx4+/Q2DyYMrlUoMHorJ0pIrxiGI0dnXm1L
-NWF/3zhCCwNMqynmrbDK+WvWpwWhx/oKE++x3snZKIEZ8T1CZNke5pjMW8ysPSp2
-ZnPYVE9+QdjzKnW7JpcEJQVDAuB4Id5D2qhNR02DJdXgu7ZpbJn2nm+gKuCPWMJF
-pvVYktL8heufp/eae4nTTG/TV5I1qjtJEgTafFvk1mAaBJ8bOtn7AfPoh8jttrjj
-HRRjsoZjITAu+oBPVZTATN5mM61I318IX/8KsKOgVQq35kZa8H2Q3YSATFw0NBHl
-rUrMDDp8e5y0cdk2rFtGTqUZcIj6RPO+xR4HG7h/ZH9Zuqr6B/9Quo+v97uD8GZk
-1JPDGqHErU/DD5LJjlEZSkQWAtBVQ2iMDEFYlnBWHU21qC+cqQrh9HWtBCw/KZJj
-mLc1tBCTMJu3+w==
-=pxWU
------END PGP SIGNATURE-----
---=-=-=--
 
