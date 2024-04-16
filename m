@@ -1,270 +1,261 @@
-Return-Path: <netdev+bounces-88428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D4C98A72A9
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 19:52:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 344E88A72B7
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 19:58:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB9E01F21B18
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 17:52:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B74221F21CD0
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 17:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2432134437;
-	Tue, 16 Apr 2024 17:51:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B909413440C;
+	Tue, 16 Apr 2024 17:57:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rBTGA/j4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jSvXkSsk"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98950134433;
-	Tue, 16 Apr 2024 17:51:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEAE613340D
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 17:57:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713289905; cv=none; b=DJfenTjdETCQEVgJda860L8ShI6LGm6KhkE2xw/+SsBwYRu+61Pjwi95VMpVeXHGb/qDHD2CZF27Wzq3KE308i0TCHWmCOVuMCXLbOtdXqgLVswHGvbf3p3nhnqKiDsquTjEgvZbzTGP8LZuTibS5vBQ9FU0w+WCAT1FG7aR7/Y=
+	t=1713290272; cv=none; b=Xpjsxz1Ge2GuH6p+Rg7vbnoC8DrlMVe4yJDDHRruF9SP/JC4t/iPam1M2eZxfF/nKa3N3tCiDMhjjvm2eezG8W3TxlcQd5DRAxsCwd88NxwGO360I8i/3rsIl3p9Rb3YUOKhf/eKvW1YYLucdudK4il1+ZDOaBD02MN+ASMHpus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713289905; c=relaxed/simple;
-	bh=xykn9xlAKIRlCdpBDJjUFA6u/Fh4oeaFhP6Oe5BJZ9w=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lOZet7CEiS9THFD9w6v5DpK/KnksXQhlmTOtl47Z8+adlRULND+7dlStWMFICv41GnYev1G5X6a7Wjt9QRZB9yvUd3SgNdvcxC7WOGCIl7yJfuCfJVDGwCRRdGak4dKJUcfLGhrymjx70TQBoGii38Pq+mdbaLQBQq392l+V/ZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rBTGA/j4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0820FC2BD11;
-	Tue, 16 Apr 2024 17:51:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713289905;
-	bh=xykn9xlAKIRlCdpBDJjUFA6u/Fh4oeaFhP6Oe5BJZ9w=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=rBTGA/j4eYXaha1zep2XsWqQMo/7AuaFqKvR+9ztUt384qlMMGAN+2aCqPtF1UGaK
-	 U2ZPG0IxNZ5eBgCilfLyWL7Af8dqomP8JBPxoNHkHEQrQ9yumvgnBhvEkzyfFooiYh
-	 UfuchUwUlMiYHINfQ1r4Of3CW93zlTmy08apcPnyltNYZTekRluD60kr7Yi5rvjlco
-	 eKvF5OPmD8pQ46Zmo4DAUT/lv+uhsTwiXWRXDTCWzlfR2mmHCpoiw3Bnwu4NSLAo0f
-	 BbHg1J8OD7NoRHbsi3B6F+e5OyqeUQ1cNugA+Vu+KrvrJNxx1NXzHZ2s1+sDQcTf3h
-	 yFyl/RclpMJmg==
-Subject: [PATCH v1 3/3] cgroup/rstat: introduce ratelimited rstat flushing
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-To: tj@kernel.org, hannes@cmpxchg.org, lizefan.x@bytedance.com,
- cgroups@vger.kernel.org, yosryahmed@google.com, longman@redhat.com
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org, shakeel.butt@linux.dev,
- kernel-team@cloudflare.com, linux-kernel@vger.kernel.org,
- Arnaldo Carvalho de Melo <acme@kernel.org>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, mhocko@kernel.org
-Date: Tue, 16 Apr 2024 19:51:40 +0200
-Message-ID: <171328990014.3930751.10674097155895405137.stgit@firesoul>
-In-Reply-To: <171328983017.3930751.9484082608778623495.stgit@firesoul>
-References: <171328983017.3930751.9484082608778623495.stgit@firesoul>
-User-Agent: StGit/1.5
+	s=arc-20240116; t=1713290272; c=relaxed/simple;
+	bh=A+Dn9JU2Ub67zrb2LLRGQ+9jvnfSK7ebeHiPzPDswvE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SPS83PZc/Mrtu2HeomupFLIwXGJas3oJnH9vA290e5e5gziHPJmvhbRdtka8s2eHtdzQD5qK/D6kCqfcRLur1ujWcxUjAEL/qj1bX/sRkupxZK2ZxfXTJmEiiV//d1PILw7XBxTAdi/9X/nVhCvmNrBlS48BmUr7/Po/3OkW2B8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jSvXkSsk; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-56e2e851794so1746a12.0
+        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 10:57:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713290269; x=1713895069; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KqAfh1LemdGeoEGZBsK1uDH9ZqA59qr8lE2AuWsogk8=;
+        b=jSvXkSsk8g51ci3n3KuiJikLLPMM3j6bXy3drTqTOXKx4a3DcynoRZBGqK9dp0VP1g
+         55mHj/S1TNCTRlCBqAW9ncyphGc5VEpO/99xmQuCtHSeAS5yeKOgoXzSGCVQpywcQy2I
+         QNjiZ+X3ZhAYtb5+yhurPLs7ihHrI2PMwAXpHO8E45lYz/8igUiT0V0aiRy0oPtves8Y
+         9LS1tSNtURrhK/zXYEOJUYYqlE1XsmFVz8jbAiV1T6Mk9ZfnDRWS7/to9WZpAXEuiO+t
+         ZFPZGAjuFJjeQJHncPWZqGWJdBoH+XsFl/OE9ZS/KDSQh8+5edhAbW55BP3vx4gYjpuS
+         CC9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713290269; x=1713895069;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KqAfh1LemdGeoEGZBsK1uDH9ZqA59qr8lE2AuWsogk8=;
+        b=AuE6mQ20CdUwT01rG7xd0eg0cehXRifGOatRL5/3LBuONzY05tR+bYHb4ZUIHS80ZV
+         A1iHn7Ns1RA6TwnKhOuC8J1uLx3RnkXH0MhcGlu14G//YV5zJuWvvEMPwiOLfBJhpJgX
+         7QTbjXOIpmXF54vZbimZbu9VsVyv0ZlNAbbxqru+CT6a8oSkNRuX6zxpRUOHUtRPW6C1
+         tOHtZ2eNBttB8Zi237H11vJ48ZD0oZG6W/YC2Za42fabqgwyuqFzjeVokTw1II9JYaGO
+         SrLKWbwkxcE6agGbC/brDzgeMGUzySQAuWuXPOoAH/bJsPsrE0qx/1Qt5NWMebtX4+yu
+         4OBA==
+X-Forwarded-Encrypted: i=1; AJvYcCUHs36somhzBl0zOjwAZ/BoACI0vqSovcOsciBC09uvgn59vfQFPJvcFK2jpgP0uLG9naubHVAIEh/8vHLKl/karIOHko1I
+X-Gm-Message-State: AOJu0Yy0tnLwgV370FCsJ6GU/Ouanfgo6bLjSr91uQ8bYqk4nCr53CSj
+	4whE4pMtjll63nt8qi9IS+c+YnS1/+WL1YpOTFIXXYp1DkG73ltV3smOEQRXD5fExZq5bzQgGqc
+	DVJZ/6re4eeqjzqJpDCRAcuYq6RDzr0Z63VDz
+X-Google-Smtp-Source: AGHT+IFxCMda5906nh0Devdxatg/+3FcIZ/D6W495UPSNZY6EGW00h1ueg2qVcu9c/im8lmHZ6TLv0HSpSdLVBymSJE=
+X-Received: by 2002:aa7:c058:0:b0:570:481a:8a1f with SMTP id
+ k24-20020aa7c058000000b00570481a8a1fmr6183edo.5.1713290269009; Tue, 16 Apr
+ 2024 10:57:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+References: <20240415150103.23316-1-shiming.cheng@mediatek.com>
+ <661d93b4e3ec3_3010129482@willemb.c.googlers.com.notmuch> <65e3e88a53d466cf5bad04e5c7bc3f1648b82fd7.camel@mediatek.com>
+ <CANP3RGdkxT4TjeSvv1ftXOdFQd5Z4qLK1DbzwATq_t_Dk+V8ig@mail.gmail.com>
+ <661eb25eeb09e_6672129490@willemb.c.googlers.com.notmuch> <CANP3RGdrRDERiPFVQ1nZYVtopErjqOQ72qQ_+ijGQiL7bTtcLQ@mail.gmail.com>
+In-Reply-To: <CANP3RGdrRDERiPFVQ1nZYVtopErjqOQ72qQ_+ijGQiL7bTtcLQ@mail.gmail.com>
+From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
+Date: Tue, 16 Apr 2024 10:57:37 -0700
+Message-ID: <CANP3RGd+Zd-bx6S-NzeGch_crRK2w0-u6xwSVn71M581uCp9cQ@mail.gmail.com>
+Subject: Re: [PATCH net] udp: fix segmentation crash for GRO packet without fraglist
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: =?UTF-8?B?TGVuYSBXYW5nICjnjovlqJwp?= <Lena.Wang@mediatek.com>, 
+	"steffen.klassert@secunet.com" <steffen.klassert@secunet.com>, "kuba@kernel.org" <kuba@kernel.org>, 
+	=?UTF-8?B?U2hpbWluZyBDaGVuZyAo5oiQ6K+X5piOKQ==?= <Shiming.Cheng@mediatek.com>, 
+	"pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com" <edumazet@google.com>, 
+	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This patch aims to reduce userspace-triggered pressure on the global
-cgroup_rstat_lock by introducing a mechanism to limit how often reading
-stat files causes cgroup rstat flushing.
+On Tue, Apr 16, 2024 at 10:51=E2=80=AFAM Maciej =C5=BBenczykowski <maze@goo=
+gle.com> wrote:
+>
+> On Tue, Apr 16, 2024 at 10:16=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Maciej =C5=BBenczykowski wrote:
+> > > On Mon, Apr 15, 2024 at 7:14=E2=80=AFPM Lena Wang (=E7=8E=8B=E5=A8=9C=
+) <Lena.Wang@mediatek.com> wrote:
+> > > >
+> > > > On Mon, 2024-04-15 at 16:53 -0400, Willem de Bruijn wrote:
+> > > > >
+> > > > > External email : Please do not click links or open attachments un=
+til
+> > > > > you have verified the sender or the content.
+> > > > >  shiming.cheng@ wrote:
+> > > > > > From: Shiming Cheng <shiming.cheng@mediatek.com>
+> > > > > >
+> > > > > > A GRO packet without fraglist is crashed and backtrace is as be=
+low:
+> > > > > >  [ 1100.812205][    C3] CPU: 3 PID: 0 Comm: swapper/3 Tainted:
+> > > > > > G        W  OE      6.6.17-android15-0-g380371ea9bf1 #1
+> > > > > >  [ 1100.812317][    C3]  __udp_gso_segment+0x298/0x4d4
+> > > > > >  [ 1100.812335][    C3]  __skb_gso_segment+0xc4/0x120
+> > > > > >  [ 1100.812339][    C3]  udp_rcv_segment+0x50/0x134
+> > > > > >  [ 1100.812344][    C3]  udp_queue_rcv_skb+0x74/0x114
+> > > > > >  [ 1100.812348][    C3]  udp_unicast_rcv_skb+0x94/0xac
+> > > > > >  [ 1100.812358][    C3]  udp_rcv+0x20/0x30
+> > > > > >
+> > > > > > The reason that the packet loses its fraglist is that in ingres=
+s
+> > > > > bpf
+> > > > > > it makes a test pull with to make sure it can read packet heade=
+rs
+> > > > > > via direct packet access: In bpf_progs/offload.c
+> > > > > > try_make_writable -> bpf_skb_pull_data -> pskb_may_pull ->
+> > > > > > __pskb_pull_tail  This operation pull the data in fraglist into
+> > > > > linear
+> > > > > > and set the fraglist to null.
+> > > > >
+> > > > > What is the right behavior from BPF with regard to SKB_GSO_FRAGLI=
+ST
+> > > > > skbs?
+> > > > >
+> > > > > Some, like SCTP, cannot be linearized ever, as the do not have a
+> > > > > single gso_size.
+> > > > >
+> > > > > Should this BPF operation just fail?
+> > > > >
+> > > > In most situation for big gso size packet, it indeed fails but BPF
+> > > > doesn't check the result. It seems the udp GRO packet can't be pull=
+ed/
+> > > > trimed/condensed or else it can't be segmented correctly.
+> > > >
+> > > > As the BPF function comments it doesn't matter if the data pull fai=
+led
+> > > > or pull less. It just does a blind best effort pull.
+> > > >
+> > > > A patch to modify bpf pull length is upstreamed to Google before an=
+d
+> > > > below are part of Google BPF expert maze's reply:
+> > > > maze@google.com<maze@google.com> #5Apr 13, 2024 02:30AM
+> > > > I *think* if that patch fixes anything, then it's really proving th=
+at
+> > > > there's a bug in the kernel that needs to be fixed instead.
+> > > > It should be legal to call try_make_writable(skb, X) with *any* val=
+ue
+> > > > of X.
+> > > >
+> > > > I add maze in loop and we could start more discussion here.
+> > >
+> > > Personally, I think bpf_skb_pull_data() should have automatically
+> > > (ie. in kernel code) reduced how much it pulls so that it would pull
+> > > headers only,
+> >
+> > That would be a helper that parses headers to discover header length.
+>
+> Does it actually need to?  Presumably the bpf pull function could
+> notice that it is
+> a packet flagged as being of type X (UDP GSO FRAGLIST) and reduce the pul=
+l
+> accordingly so that it doesn't pull anything from the non-linear
+> fraglist portion???
+>
+> I know only the generic overview of what udp gso is, not any details, so =
+I am
+> assuming here that there's some sort of guarantee to how these packets
+> are structured...  But I imagine there must be or we wouldn't be hitting =
+these
+> issues deeper in the stack?
 
-In the memory cgroup subsystem, memcg_vmstats_needs_flush() combined with
-mem_cgroup_flush_stats_ratelimited() already limits pressure on the
-global lock (cgroup_rstat_lock). As a result, reading memory-related stat
-files (such as memory.stat, memory.numa_stat, zswap.current) is already
-a less userspace-triggerable issue.
+Perhaps for a packet of this type we're already guaranteed the headers
+are in the linear portion,
+and the pull should simply be ignored?
 
-However, other userspace users of cgroup_rstat_flush(), such as when
-reading io.stat (blk-cgroup.c) and cpu.stat, lack a similar system to
-limit pressure on the global lock. Furthermore, userspace can easily
-trigger this issue by reading those stat files.
+>
+> > Parsing is better left to the BPF program.
+> >
+> > > and not packet content.
+> > > (This is assuming the rest of the code isn't ready to deal with a lon=
+ger pull,
+> > > which I think is the case atm.  Pulling too much, and then crashing o=
+r forcing
+> > > the stack to drop packets because of them being malformed seems wrong=
+...)
+> > >
+> > > In general it would be nice if there was a way to just say pull all h=
+eaders...
+> > > (or possibly all L2/L3/L4 headers)
+> > > You in general need to pull stuff *before* you've even looked at the =
+packet,
+> > > so that you can look at the packet,
+> > > so it's relatively hard/annoying to pull the correct length from bpf
+> > > code itself.
+> > >
+> > > > > > BPF needs to modify a proper length to do pull data. However ke=
+rnel
+> > > > > > should also improve the flow to avoid crash from a bpf function
+> > > > > call.
+> > > > > > As there is no split flow and app may not decode the merged UDP
+> > > > > packet,
+> > > > > > we should drop the packet without fraglist in skb_segment_list
+> > > > > here.
+> > > > > >
+> > > > > > Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
+> > > > > > Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+> > > > > > Signed-off-by: Lena Wang <lena.wang@mediatek.com>
+> > > > > > ---
+> > > > > >  net/core/skbuff.c | 3 +++
+> > > > > >  1 file changed, 3 insertions(+)
+> > > > > >
+> > > > > > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > > > > > index b99127712e67..f68f2679b086 100644
+> > > > > > --- a/net/core/skbuff.c
+> > > > > > +++ b/net/core/skbuff.c
+> > > > > > @@ -4504,6 +4504,9 @@ struct sk_buff *skb_segment_list(struct
+> > > > > sk_buff *skb,
+> > > > > >  if (err)
+> > > > > >  goto err_linearize;
+> > > > > >
+> > > > > > +if (!list_skb)
+> > > > > > +goto err_linearize;
+> > > > > > +
+> >
+> > This would catch the case where the entire data frag_list is
+> > linearized, but not a pskb_may_pull that only pulls in part of the
+> > list.
+> >
+> > Even with BPF being privileged, the kernel should not crash if BPF
+> > pulls a FRAGLIST GSO skb.
+> >
+> > But the check needs to be refined a bit. For a UDP GSO packet, I
+> > think gso_size is still valid, so if the head_skb length does not
+> > match gso_size, it has been messed with and should be dropped.
+> >
+> > For a GSO_BY_FRAGS skb, there is no single gso_size, and this pull
+> > may be entirely undetectable as long as frag_list !=3D NULL?
+> >
+> >
+> > > > > >  skb_shinfo(skb)->frag_list =3D NULL;
+> > > > >
+> > > > > In absense of plugging the issue in BPF, dropping here is the bes=
+t
+> > > > > we can do indeed, I think.
 
-Typically, normal userspace stats tools (e.g., cadvisor, nomad, systemd)
-spawn threads that read io.stat, cpu.stat, and memory.stat (even from the
-same cgroup) without realizing that on the kernel side, they share the
-same global lock. This limitation also helps prevent malicious userspace
-applications from harming the kernel by reading these stat files in a
-tight loop.
-
-To address this, the patch introduces cgroup_rstat_flush_ratelimited(),
-similar to memcg's mem_cgroup_flush_stats_ratelimited().
-
-Flushing occurs per cgroup (even though the lock remains global) a
-variable named rstat_flush_last_time is introduced to track when a given
-cgroup was last flushed. This variable, which contains the jiffies of the
-flush, shares properties and a cache line with rstat_flush_next and is
-updated simultaneously.
-
-For cpu.stat, we need to acquire the lock (via cgroup_rstat_flush_hold)
-because other data is read under the lock, but we skip the expensive
-flushing if it occurred recently.
-
-Regarding io.stat, there is an opportunity outside the lock to skip the
-flush, but inside the lock, we must recheck to handle races.
-
-Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
----
- block/blk-cgroup.c          |    2 +
- include/linux/cgroup-defs.h |    1 +
- include/linux/cgroup.h      |    3 +-
- kernel/cgroup/rstat.c       |   60 ++++++++++++++++++++++++++++++++++++++++++-
- mm/memcontrol.c             |    1 +
- 5 files changed, 63 insertions(+), 4 deletions(-)
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index bdbb557feb5a..4156fedbb910 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1162,7 +1162,7 @@ static int blkcg_print_stat(struct seq_file *sf, void *v)
- 	if (!seq_css(sf)->parent)
- 		blkcg_fill_root_iostats();
- 	else
--		cgroup_rstat_flush(blkcg->css.cgroup);
-+		cgroup_rstat_flush_ratelimited(blkcg->css.cgroup);
- 
- 	rcu_read_lock();
- 	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
-diff --git a/include/linux/cgroup-defs.h b/include/linux/cgroup-defs.h
-index ea48c861cd36..366dc644e075 100644
---- a/include/linux/cgroup-defs.h
-+++ b/include/linux/cgroup-defs.h
-@@ -509,6 +509,7 @@ struct cgroup {
- 	 * cgroup_rstat_flush_locked() and protected by cgroup_rstat_lock.
- 	 */
- 	struct cgroup	*rstat_flush_next;
-+	unsigned long	rstat_flush_last_time;
- 
- 	/* cgroup basic resource statistics */
- 	struct cgroup_base_stat last_bstat;
-diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-index 2150ca60394b..8622b222453e 100644
---- a/include/linux/cgroup.h
-+++ b/include/linux/cgroup.h
-@@ -689,7 +689,8 @@ static inline void cgroup_path_from_kernfs_id(u64 id, char *buf, size_t buflen)
-  */
- void cgroup_rstat_updated(struct cgroup *cgrp, int cpu);
- void cgroup_rstat_flush(struct cgroup *cgrp);
--void cgroup_rstat_flush_hold(struct cgroup *cgrp);
-+int cgroup_rstat_flush_hold(struct cgroup *cgrp);
-+int cgroup_rstat_flush_ratelimited(struct cgroup *cgrp);
- void cgroup_rstat_flush_release(struct cgroup *cgrp);
- 
- /*
-diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
-index a90d68a7c27f..8c71af67b197 100644
---- a/kernel/cgroup/rstat.c
-+++ b/kernel/cgroup/rstat.c
-@@ -193,6 +193,7 @@ static struct cgroup *cgroup_rstat_updated_list(struct cgroup *root, int cpu)
- 	/* Push @root to the list first before pushing the children */
- 	head = root;
- 	root->rstat_flush_next = NULL;
-+	root->rstat_flush_last_time = jiffies;
- 	child = rstatc->updated_children;
- 	rstatc->updated_children = root;
- 	if (child != root)
-@@ -261,12 +262,15 @@ static void cgroup_rstat_flush_locked(struct cgroup *cgrp)
- 
- 	lockdep_assert_held(&cgroup_rstat_lock);
- 
-+	cgrp->rstat_flush_last_time = jiffies;
-+
- 	for_each_possible_cpu(cpu) {
- 		struct cgroup *pos = cgroup_rstat_updated_list(cgrp, cpu);
- 
- 		for (; pos; pos = pos->rstat_flush_next) {
- 			struct cgroup_subsys_state *css;
- 
-+			pos->rstat_flush_last_time = jiffies;
- 			cgroup_base_stat_flush(pos, cpu);
- 			bpf_rstat_flush(pos, cgroup_parent(pos), cpu);
- 
-@@ -309,6 +313,49 @@ __bpf_kfunc void cgroup_rstat_flush(struct cgroup *cgrp)
- 	__cgroup_rstat_unlock(cgrp, -1);
- }
- 
-+#define FLUSH_TIME	msecs_to_jiffies(50)
-+
-+/**
-+ * cgroup_rstat_flush_ratelimited - limit pressure on global lock (cgroup_rstat_lock)
-+ * @cgrp: target cgroup
-+ *
-+ * Trade accuracy for less pressure on global lock. Only use this when caller
-+ * don't need 100% up-to-date stats.
-+ *
-+ * Userspace stats tools spawn threads reading io.stat, cpu.stat and memory.stat
-+ * from same cgroup, but kernel side they share same global lock.  This also
-+ * limit malicious userspace from hurting kernel by reading these stat files in
-+ * a tight loop.
-+ *
-+ * This function exit early if flush recently happened.
-+ *
-+ * Returns 1 if flush happened
-+ */
-+int cgroup_rstat_flush_ratelimited(struct cgroup *cgrp)
-+{
-+	int res = 0;
-+
-+	might_sleep();
-+
-+	/* Outside lock: check if this flush and lock can be skipped */
-+	if (time_before(jiffies,
-+			READ_ONCE(cgrp->rstat_flush_last_time) + FLUSH_TIME))
-+		return 0;
-+
-+	__cgroup_rstat_lock(cgrp, -1);
-+
-+	/* Recheck inside lock, do flush after enough time have passed */
-+	if (time_after(jiffies,
-+		       cgrp->rstat_flush_last_time + FLUSH_TIME)) {
-+		cgroup_rstat_flush_locked(cgrp);
-+		res = 1;
-+	}
-+
-+	__cgroup_rstat_unlock(cgrp, -1);
-+
-+	return res;
-+}
-+
- /**
-  * cgroup_rstat_flush_hold - flush stats in @cgrp's subtree and hold
-  * @cgrp: target cgroup
-@@ -317,13 +364,22 @@ __bpf_kfunc void cgroup_rstat_flush(struct cgroup *cgrp)
-  * paired with cgroup_rstat_flush_release().
-  *
-  * This function may block.
-+ *
-+ * Returns 1 if flush happened
-  */
--void cgroup_rstat_flush_hold(struct cgroup *cgrp)
-+int cgroup_rstat_flush_hold(struct cgroup *cgrp)
- 	__acquires(&cgroup_rstat_lock)
- {
- 	might_sleep();
- 	__cgroup_rstat_lock(cgrp, -1);
--	cgroup_rstat_flush_locked(cgrp);
-+
-+	/* Only do expensive flush after enough time have passed */
-+	if (time_after(jiffies,
-+		       cgrp->rstat_flush_last_time + FLUSH_TIME)) {
-+		cgroup_rstat_flush_locked(cgrp);
-+		return 1;
-+	}
-+	return 0;
- }
- 
- /**
-diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-index fabce2b50c69..771261612ec1 100644
---- a/mm/memcontrol.c
-+++ b/mm/memcontrol.c
-@@ -742,6 +742,7 @@ static void do_flush_stats(struct mem_cgroup *memcg)
- 	if (mem_cgroup_is_root(memcg))
- 		WRITE_ONCE(flush_last_time, jiffies_64);
- 
-+	/* memcg have own ratelimit layer */
- 	cgroup_rstat_flush(memcg->css.cgroup);
- }
- 
-
-
+--
+Maciej =C5=BBenczykowski, Kernel Networking Developer @ Google
 
