@@ -1,141 +1,111 @@
-Return-Path: <netdev+bounces-88178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 777EC8A62E2
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 07:15:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FA168A62E4
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 07:15:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D78C1F238F9
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 05:15:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B137283D8E
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 05:15:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 686FF37160;
-	Tue, 16 Apr 2024 05:15:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC0BD39ADB;
+	Tue, 16 Apr 2024 05:15:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LnjRglU9"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="xmSLJ01V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8271CD06
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 05:15:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BE71CD06
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 05:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713244513; cv=none; b=Fr+Bd5Hmot27AITp3OpCeUogczNJ7fRk+QKTR7zh9KZLaxOFbxoJJX7F3LRGBPsXPgOWfkWg2homBZaPS7SEzCQ1UcNGqScZh/m7N/LywPoPJhS7opbP/BQzd90eIC1DE26vQWBZJLYytY7jUq4PXlShptEnqMfcOGp0KN4sTic=
+	t=1713244537; cv=none; b=u8hb6ZMdp12cXXguf76GWE1pNbA5R6IW9/BNWjW0KzLOGllA6lDlHqyBBfvrBaeyfVt8nmoF71od/PN1oicTud+lYaT+JIcFerk4sj6qKy0gv0DAcchZAIBfj7gg4nuU1/hzxCPT8/yITcET42Neriqwz5k3TYr7TAmrbfZMszw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713244513; c=relaxed/simple;
-	bh=WfSW2fVy8MmEj/24vCs7MxT/+kMMLLr7ED9NEYvKF/8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rjYUqjyQkmhYxnDv+U9n0QUdosG6lM+b6rMIFMW5qxsSxHKh5PXxSQQQS7AuUhfJRzchcWPeZ9AH6/Z3tfcKO0xIfnVLs6jwZkUtFjW2LFyBt26tioBO+f17oooJRjDZqquf+txt8wqFo0RI8cRMnn4xIWYuDfH5ElvwqNipFWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LnjRglU9; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713244512; x=1744780512;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WfSW2fVy8MmEj/24vCs7MxT/+kMMLLr7ED9NEYvKF/8=;
-  b=LnjRglU9QIXYW2Y415sJ8kBoVwYhg2rNUqWKatF0iEJ4E0hmZADtv1Jb
-   0LoNibSipdeb6INhXGvbbkR45loF1RcLkNZqLASgGAFNO6YVa7xNYU2xQ
-   PU1mN5l+4Wg6NP3A2ZPzlt0zsjyx1vndinngQp7GRnaulG6/9Hqg5c5hP
-   vXFzFfB5TltFL580iPoHAZmEf6NPjF5KBwDwFFXwQGNQtGld3LG6STG4+
-   Ip8jYU+9bxAxvuHJsg8VZ0bc/bvQ/6/KAYE6HXnD1nGzHpXQLGaSobioh
-   v6RDe+2lfcpmpzHK4FNmikG0Kn3XyY+oKlELFcYWIHl0FPlQ4MOMEH3DW
-   g==;
-X-CSE-ConnectionGUID: oy1G0DV3RtO1CPlUHDNbvA==
-X-CSE-MsgGUID: 72CV4ErJTpu2Yfsy/o4TSQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11045"; a="8829163"
-X-IronPort-AV: E=Sophos;i="6.07,205,1708416000"; 
-   d="scan'208";a="8829163"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 22:15:11 -0700
-X-CSE-ConnectionGUID: x0z0GotsSq2zUkovfnWCqA==
-X-CSE-MsgGUID: nrBr4JvnRyi3YWuefjX0gg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,205,1708416000"; 
-   d="scan'208";a="22210031"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 22:15:08 -0700
-Date: Tue, 16 Apr 2024 07:14:43 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com, jiri@nvidia.com,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	mateusz.polchlopek@intel.com,
-	Piotr Raczynski <piotr.raczynski@intel.com>
-Subject: Re: [iwl-next v3 3/7] ice: add basic devlink subfunctions support
-Message-ID: <Zh4JQ4RDRIAYC+V7@mev-dev>
-References: <20240412063053.339795-1-michal.swiatkowski@linux.intel.com>
- <20240412063053.339795-4-michal.swiatkowski@linux.intel.com>
- <Zhje0mQgQTMXwICb@nanopsycho>
- <Zhzny769lYYmLUs0@mev-dev>
- <ZhzvGlDiuaPSEHCX@nanopsycho>
+	s=arc-20240116; t=1713244537; c=relaxed/simple;
+	bh=2cvfxopkrYEneBgQEiymkJRtScCSGQY/O5tU6ZASMpk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eW+RRCeavJ6DUxiFKf70iLVDxn/+cRzGOaRnHhJPZlJWkWAK9rW/Lt3HHomrAxOkewUAwlKjfDVnwRPqXpRYzUQywzO4FQWw8VAXJV18V1pdaMn3eEDwgCixvSvJQ1lZxd1/asvbdthap+0jZ0/z6GnyycMNWViqEYut2URU47w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=xmSLJ01V; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-5ca29c131ebso2565168a12.0
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 22:15:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1713244536; x=1713849336; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GqdAbLR0vxsZOamUL3FQrTQtvI/2Reh1qLUiccoK6wg=;
+        b=xmSLJ01VjMHtAPICe/YsR8V6/PZRzaSiPO3zxMvsC1qixs9fMhA2ZpVZXtqq7YTJfE
+         mLuFyZEfU2FX1QVmvgXWefTeAk/OGbkdbNjypdY8bHgbOAhieokrd0YCjv16Vkk+iX4X
+         pwwMbcuCzwIT82HmDkMEcRuFHA0qFd6ylp7GI/608fmGeBp4uzkVr8ffhxKHB/dVhXJQ
+         d7vFhgkvGDzGWWld+OmCBaNeWbiNld6yk2oRD2hlNnTkgThRpxBOMk39w/ivdzI2o5E2
+         x/qmo7GoPMNJA1Ga5pUYrDrxK6+T9hlaCHjys1BHGrsnxBDwRrVSrsFjxqGkO0F5fk2u
+         JvSw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713244536; x=1713849336;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GqdAbLR0vxsZOamUL3FQrTQtvI/2Reh1qLUiccoK6wg=;
+        b=nazejTNurglhTdqpDlHR653P6VdM/naqq+1oBYPFeBPFuVx/oxFkiU23ZX6adVuDNU
+         JWMlE5HpIf9bAMRS/dCkDeKk3VU13S993Z4AF25gLMFoFpKMXCZ1BtPHPs8fj9e0YIAk
+         IerpmtAgCbY1OK+5P/ZrvSNpKVuUw/sudR1NPAsnhV9ysIlsGA/y9z90/EXt+bWKm766
+         zcijPfDSrC3TztO4w5GGApi587a5dmSAeQ6WtorVeCsj+GDiushmWq+acXoTH5rySmKs
+         98i0ifyngENgfZFF6bVugrtb4TpK1a+x7lXvAbnJt/v1eHkU5vR5LMdOLz199uCN0Uk5
+         uAtA==
+X-Gm-Message-State: AOJu0YzKLM1mvm5ioOWXDm5BtLZ44UWF/yoqsyodGHQGO0gOphK3A+g+
+	W0Fx+0gK2HqJdrDctbgSGQsCO68ezSDcmHAouilfR4DH+VzwYGNTLwwhn1gXa5isBiiYgAheE2d
+	Z
+X-Google-Smtp-Source: AGHT+IHePWNce7D161fBiYVak4o3SGEosIxKAsVgeI2lwShQs+t6AIGUGZSJ0B68Q+DGwtENRHju3w==
+X-Received: by 2002:a05:6a20:748b:b0:1a9:a011:cdcd with SMTP id p11-20020a056a20748b00b001a9a011cdcdmr15953037pzd.18.1713244535660;
+        Mon, 15 Apr 2024 22:15:35 -0700 (PDT)
+Received: from localhost (fwdproxy-prn-120.fbsv.net. [2a03:2880:ff:78::face:b00c])
+        by smtp.gmail.com with ESMTPSA id c17-20020a170902d49100b001e0d6cd042bsm8802043plg.303.2024.04.15.22.15.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 22:15:35 -0700 (PDT)
+From: David Wei <dw@davidwei.uk>
+To: netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH v1 0/2] netdevsim: add NAPI support
+Date: Mon, 15 Apr 2024 22:15:25 -0700
+Message-ID: <20240416051527.1657233-1-dw@davidwei.uk>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZhzvGlDiuaPSEHCX@nanopsycho>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Apr 15, 2024 at 11:10:50AM +0200, Jiri Pirko wrote:
-> Mon, Apr 15, 2024 at 10:39:39AM CEST, michal.swiatkowski@linux.intel.com wrote:
-> >On Fri, Apr 12, 2024 at 09:12:18AM +0200, Jiri Pirko wrote:
-> >> Fri, Apr 12, 2024 at 08:30:49AM CEST, michal.swiatkowski@linux.intel.com wrote:
-> >> >From: Piotr Raczynski <piotr.raczynski@intel.com>
-> 
-> [...]
-> 
-> >> >+static int
-> >> >+ice_devlink_port_fn_state_get(struct devlink_port *port,
-> >> >+			      enum devlink_port_fn_state *state,
-> >> >+			      enum devlink_port_fn_opstate *opstate,
-> >> >+			      struct netlink_ext_ack *extack)
-> >> >+{
-> >> >+	struct ice_dynamic_port *dyn_port;
-> >> >+
-> >> >+	dyn_port = ice_devlink_port_to_dyn(port);
-> >> >+
-> >> >+	if (dyn_port->active) {
-> >> >+		*state = DEVLINK_PORT_FN_STATE_ACTIVE;
-> >> >+		*opstate = DEVLINK_PORT_FN_OPSTATE_ATTACHED;
-> >> 
-> >> Interesting. This means that you don't distinguish between admin state
-> >> and operational state. Meaning, when user does activate, you atomically
-> >> achive the hw attachment and it is ready to go before activation cmd
-> >> returns, correct? I'm just making sure I understand the code.
-> >> 
-> >
-> >I am setting the dyn_port->active after the activation heppens, so it is
-> >true, when active is set it is ready to go.
-> >
-> >Do you mean that dyn_port->active should be set even before the activation is
-> >finished? I mean when user only call devlink to active the port?
-> 
-> The devlink instance lock is taken the whole time, isn't it?
-> 
+Add NAPI support to netdevsim and register its Rx queues with NAPI
+instances. Then add a selftest using the new netdev Python selftest
+infra to exercise the existing Netdev Netlink API, specifically the
+queue-get API.
 
-I don't take PF devlink lock here. Only subfunction devlink lock is
-taken during the initialization of subfunction.
+This expands test coverage and further fleshes out netdevsim as a test
+device. It's still my goal to make it useful for testing things like
+flow steering and ZC Rx.
 
-> >
-> >> 
-> >> >+	} else {
-> >> >+		*state = DEVLINK_PORT_FN_STATE_INACTIVE;
-> >> >+		*opstate = DEVLINK_PORT_FN_OPSTATE_DETACHED;
-> >> >+	}
-> >> >+
-> >> >+	return 0;
-> >> >+}
-> >> >+
-> 
-> [...]
+David Wei (2):
+  netdevsim: add NAPI support
+  net: selftest: add test for netdev netlink queue-get API
+
+ drivers/net/netdevsim/netdev.c                | 227 +++++++++++++++++-
+ drivers/net/netdevsim/netdevsim.h             |   7 +
+ tools/testing/selftests/drivers/net/Makefile  |   1 +
+ .../selftests/drivers/net/lib/py/env.py       |  10 +-
+ tools/testing/selftests/drivers/net/queues.py |  67 ++++++
+ tools/testing/selftests/net/lib/py/nsim.py    |   4 +-
+ 6 files changed, 301 insertions(+), 15 deletions(-)
+ create mode 100755 tools/testing/selftests/drivers/net/queues.py
+
+-- 
+2.43.0
+
 
