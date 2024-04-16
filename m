@@ -1,195 +1,142 @@
-Return-Path: <netdev+bounces-88411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1A998A7144
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:22:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E47178A7149
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:24:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D46F11C20AE8
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:22:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 136D51C226A8
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:24:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9252F131BA1;
-	Tue, 16 Apr 2024 16:22:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E67CB131BC9;
+	Tue, 16 Apr 2024 16:24:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="POfCQfX6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wHhoQ0VX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DAF312F387;
-	Tue, 16 Apr 2024 16:22:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D856A43AA5;
+	Tue, 16 Apr 2024 16:24:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713284538; cv=none; b=RWizx8qEd1Yqn5kHDTTE3ohdp25Qq0nzwtFvhfgvTGJXxeTeOgCH0yHCI1sDH9sQ2hDVvWl6j7OEpDjOG5K/QgrVUgECNDGqclJPLk+h6CTTk6WaDbU/AVhwG8n9GV+dLJq0zxWDqpVFK2yvt7EIevqqXkKHem6ADi2XfJapQ6o=
+	t=1713284659; cv=none; b=Fusj6dVU8cGlvkg97Tkv5iqH60xSkiWoadcxUwKxYaUO1q0FjhGEQxumjwK87zX7ost+j7llSw39Py8FpFrhdfkFagBvLc3rd7FgA28+u4i243UksU8U6x/oP2IuQunYOmJ0axhmLyjm7pFoDU6eY2jkT/h+5eLoHjZ/5b5W6Ig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713284538; c=relaxed/simple;
-	bh=3tsLNEVapDlNuxJKNo8Pn4fLWw0VPKuZhgZOo6sHkA4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Wbk30wU35XDH/Dk9gKqjMvHjp7T/pPO26sTeUImLQD0G3tSa4p3zihfeynQLNJgwrzQeD2TAB41qxr/PwvBKgfWwNPaZNty2b31/K0PlPByMMoojyx2p6gsMYbdXA8tduxyaBONiAeQXc6c++Gqbr3F16ybzfpriCFvNy3pLmME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=POfCQfX6; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6ecec796323so4777164b3a.3;
-        Tue, 16 Apr 2024 09:22:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713284536; x=1713889336; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=AZ4By8kx0gFset4vqlanrt2cwjHe/0P230mvGWNMhPQ=;
-        b=POfCQfX6/VKult/yrnXTW4MueKmp2LN2tnUkG3CcRvVjFIXxYqjGjz2K/Ablou+M1W
-         9xYvRkKuFuUsgQZrRhFG9j5dFRcN/zrzEboyaNYtSnM5KAHux3eriZDHO+qDwLNNCa1Z
-         lcDHIYgjPvRnRs11YS93SzjqF9ji+eMsOShyTdO/Ssi+x310mUB3jZl3fPvuhMhyEnTw
-         N3Bun2YeOHX2uL43Eo0RgyWTsf9Yh8EHO3Syfx3tIpBE3WyVi6e4uZPOs8h/LqY2Kedc
-         vvzTkxNfvgG99rm0hdJgCTWpBNvUAqm6SjZZo21BHb7+ti7YaP9aDOIrFOodm1rYAly/
-         AbRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713284536; x=1713889336;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=AZ4By8kx0gFset4vqlanrt2cwjHe/0P230mvGWNMhPQ=;
-        b=XxDm+yaJ/XdaYnPoGdjn79SSMl5SNMIIgF7TU4tXXXo5HH/ASlkd50yZPJyX6nuFPG
-         rM1+C7IZlbPFVmrHYYXMONyqbOI5d/j+yiwgEJDG5DmXmx+CLoI5fWHYK9dp7nsenp5p
-         iZe/aD5JORpFYmkZO+nMxcwaCoNFoi3dhIWl6wl6pSceOiV7klhzXQfRtVtLJDPv2qjD
-         esR1blWDf+19fjLoCDRIGD6Cui5+w8wAxUjRn7E0zYCdOS7aGLepqdfbjbCVzyhlKnx9
-         YAvq2L7c+2ChWtNVWTTqRUTuVVn+TBTNwv+rRXX4UBI0b8fAORTi+74etR8CKVYg/BtR
-         ZkUA==
-X-Forwarded-Encrypted: i=1; AJvYcCXkHRGBrOWHBi6jeGehHkHFbsEFAxi3gy1BblxNHAja4wtgV59UBrXnfqTRmY4h9NfuisiQeIuJPx5Oy6ySDds4KTXB/UeileM0j3GS
-X-Gm-Message-State: AOJu0YzcQTaXpG1CFC7Gxx5Tu21Zv4N/slvTs1lDib5rb0TujEogriHL
-	t2pcPd+Y9dVHKAGcGJkqFKvto4JgZ+jLBTSPm17tofjwE7hECLIK
-X-Google-Smtp-Source: AGHT+IEUcecI89KJcxO4bdyAEaKuPOEWjzAq92Tsddkmk7lM8Dxh6sxfWs7GUP8/jFDeTzbXdw94fg==
-X-Received: by 2002:a05:6a20:1a91:b0:1a7:802d:f67c with SMTP id ci17-20020a056a201a9100b001a7802df67cmr13606350pzb.53.1713284536293;
-        Tue, 16 Apr 2024 09:22:16 -0700 (PDT)
-Received: from ?IPv6:2605:59c8:43f:400:82ee:73ff:fe41:9a02? ([2605:59c8:43f:400:82ee:73ff:fe41:9a02])
-        by smtp.googlemail.com with ESMTPSA id q23-20020a631f57000000b005eb4d24e809sm9151661pgm.34.2024.04.16.09.22.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 09:22:15 -0700 (PDT)
-Message-ID: <37d012438d4850c3d7090e784e09088d02a2780c.camel@gmail.com>
-Subject: Re: [PATCH net-next v2 09/15] mm: page_frag: reuse MSB of 'size'
- field for pfmemalloc
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org,  pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Morton
-	 <akpm@linux-foundation.org>, linux-mm@kvack.org
-Date: Tue, 16 Apr 2024 09:22:14 -0700
-In-Reply-To: <20240415131941.51153-10-linyunsheng@huawei.com>
-References: <20240415131941.51153-1-linyunsheng@huawei.com>
-	 <20240415131941.51153-10-linyunsheng@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	s=arc-20240116; t=1713284659; c=relaxed/simple;
+	bh=LXD6sGC7ShZwC4XuH56juxpwduozJ54f6l/hd3qy1JI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vCxpBZLfPn1BGN7rpFQM6LE6G2yqZV0g6ZD0afmFqJk1kevR5rdpSaV45e+ii1/68e09ywKeblhfmcsAanzSV8KrJXIInUV2OnIzq83vspApfKDTJ6aZ58WRzZpUAjBHPbfQ0Y38WC7/YqLmtkfUAsMACy/mf9bqZwF+OdDIGGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wHhoQ0VX; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=EafU4aiUFWAg4n1i3C5qywi8YkpDQMqeSo4IU9drGL8=; b=wHhoQ0VXF2dXp8ma/AE6evD/s6
+	QEVXU9/p8kWTKdBV3Shx+k2MG3D/KjQLhaz2LvhgEt8nPMFI0CLdeLosUcYNmc7IiNOabqTNbSMP5
+	JsTufL2pU2bfBEkEKipN1P5a+w6uGLMe4dooqp/B377ob3gs/hKJq+Y3ZYzYQn+nT60OG1r2DHHTl
+	EiaOVAmiKtqKlXDrXTZhRIBMrNbXJk/4nnQv6MIASp7KC9NYA++N+VEKaRIE6/MJpBNI7bQb9fRaK
+	DLkrHcHqUENqA8kb3W1e19U44okMRMi4omlnbWejLmCb1fb+9ThQlksB6uh1qwPYtpgGwBRYA69Tr
+	pmyRv28Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41312)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rwlbH-0000et-1X;
+	Tue, 16 Apr 2024 17:24:03 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rwlbG-0004yv-9z; Tue, 16 Apr 2024 17:24:02 +0100
+Date: Tue, 16 Apr 2024 17:24:02 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Stefan Eichenberger <eichest@gmail.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, lxu@maxlinear.com, hkallweit1@gmail.com,
+	michael@walle.cc, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property
+ to disable SGMII autoneg
+Message-ID: <Zh6mIv1Ee+1h21Xo@shell.armlinux.org.uk>
+References: <20240416121032.52108-1-eichest@gmail.com>
+ <20240416121032.52108-3-eichest@gmail.com>
+ <3f7f278f-e490-47f1-971c-ecf44a70cee4@lunn.ch>
+ <Zh6clAtI3NO+nMEi@eichest-laptop>
+ <5ed39628-4ac0-4c4e-9a16-fd4bf9a6db29@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5ed39628-4ac0-4c4e-9a16-fd4bf9a6db29@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, 2024-04-15 at 21:19 +0800, Yunsheng Lin wrote:
-> The '(PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)' case is for the
-> system with page size less than 32KB, which is 0x8000 bytes
-> requiring 16 bits space, change 'size' to 'size_mask' to avoid
-> using the MSB, and change 'pfmemalloc' field to reuse the that
-> MSB, so that we remove the orginal space needed by 'pfmemalloc'.
->=20
-> For another case, the MSB of 'offset' is reused for 'pfmemalloc'.
->=20
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> ---
->  include/linux/page_frag_cache.h | 13 ++++++++-----
->  mm/page_frag_cache.c            |  5 +++--
->  2 files changed, 11 insertions(+), 7 deletions(-)
->=20
-> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_ca=
-che.h
-> index fe5faa80b6c3..40a7d6da9ef0 100644
-> --- a/include/linux/page_frag_cache.h
-> +++ b/include/linux/page_frag_cache.h
-> @@ -12,15 +12,16 @@ struct page_frag_cache {
->  	void *va;
->  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
->  	__u16 offset;
-> -	__u16 size;
-> +	__u16 size_mask:15;
-> +	__u16 pfmemalloc:1;
->  #else
-> -	__u32 offset;
-> +	__u32 offset:31;
-> +	__u32 pfmemalloc:1;
->  #endif
+On Tue, Apr 16, 2024 at 06:02:08PM +0200, Andrew Lunn wrote:
+> On Tue, Apr 16, 2024 at 05:43:16PM +0200, Stefan Eichenberger wrote:
+> > Hi Andrew,
+> > 
+> > Thanks a lot for the feedback.
+> > 
+> > On Tue, Apr 16, 2024 at 03:46:19PM +0200, Andrew Lunn wrote:
+> > > On Tue, Apr 16, 2024 at 02:10:32PM +0200, Stefan Eichenberger wrote:
+> > > > Add a new device tree property to disable SGMII autonegotiation and
+> > > > instead use the option to match the SGMII speed to what was negotiated
+> > > > on the twisted pair interface (tpi).
+> > > 
+> > > Could you explain this is more detail.
+> > > 
+> > > SGMII always runs its clocks at 1000Mbps. The MAC needs to duplicate
+> > > the symbols 100 times when running at 10Mbs, and 10 times when running
+> > > at 100Mbps.
+> > 
+> > Currently, the mxl-gpy driver uses SGMII autonegotiation for 10 Mbps,
+> > 100 Mbps, and 1000 Mbps. For our Ethernet controller, which is on an
+> > Octeon TX2 SoC, this means that we have to enable "in-band-status" on
+> > the controller. This will work for all three speed settings. However, if
+> > we have a link partner that can do 2.5 Gbps, the mxl-gpy driver will
+> > disable SGMII autonegotiation in gpy_update_interface. This is not
+> > supported by this Ethernet controller because in-band-status is still
+> > enabled. Therefore, we will not be able to transfer data at 2.5 Gbps,
+> > the SGMII link will not go into a working state.
+> 
+> This is where i expect Russel to point out that SGMII does not support
+> 2.5G. What you actually mean is that the PHY swaps to 2500BaseX. And
+> 2500BaseX does not perform speed negotiation, since it only supports
+> 2500. So you also need the MAC to swap to 2500BaseX.
 
-This seems like a really bad idea. Using a bit-field like this seems
-like a waste as it means that all the accesses now have to add
-additional operations to access either offset or size. It wasn't as if
-this is an oversized struct, or one that we are allocating a ton of. As
-such I am not sure why we need to optmize for size like this.
+Yes, absolutely true that SGMII does not support 2.5G... and when
+operating faster, than 2500base-X is normally used.
 
->  	/* we maintain a pagecount bias, so that we dont dirty cache line
->  	 * containing page->_refcount every time we allocate a fragment.
->  	 */
->  	unsigned int		pagecnt_bias;
-> -	bool pfmemalloc;
->  };
-> =20
->  static inline void page_frag_cache_init(struct page_frag_cache *nc)
-> @@ -43,7 +44,9 @@ static inline void *__page_frag_alloc_va_align(struct p=
-age_frag_cache *nc,
->  					       gfp_t gfp_mask,
->  					       unsigned int align)
->  {
-> -	nc->offset =3D ALIGN(nc->offset, align);
-> +	unsigned int offset =3D nc->offset;
-> +
-> +	nc->offset =3D ALIGN(offset, align);
-> =20
->  	return page_frag_alloc_va(nc, fragsz, gfp_mask);
->  }
-> @@ -53,7 +56,7 @@ static inline void *page_frag_alloc_va_align(struct pag=
-e_frag_cache *nc,
->  					     gfp_t gfp_mask,
->  					     unsigned int align)
->  {
-> -	WARN_ON_ONCE(!is_power_of_2(align));
-> +	WARN_ON_ONCE(!is_power_of_2(align) || align >=3D PAGE_SIZE);
+How, 2500base-X was slow to be standardised, and consequently different
+manufacturers came up with different ideas. The common theme is that
+it's 1000base-X up-clocked by 2.5x. Where the ideas differ is whether
+in-band negotiation is supported or not. This has been a pain point for
+a while now.
 
-The "align >=3D PAGE_SIZE" fix should probably go with your change that
-reversed the direction.
+As I mentioned in my previous two messages, I have an experimental
+patch series that helps to address this.
 
-> =20
->  	return __page_frag_alloc_va_align(nc, fragsz, gfp_mask, align);
->  }
-> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
-> index 50511d8522d0..8d93029116e1 100644
-> --- a/mm/page_frag_cache.c
-> +++ b/mm/page_frag_cache.c
-> @@ -32,7 +32,8 @@ static struct page *__page_frag_cache_refill(struct pag=
-e_frag_cache *nc,
->  		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
->  	page =3D alloc_pages_node(NUMA_NO_NODE, gfp_mask,
->  				PAGE_FRAG_CACHE_MAX_ORDER);
-> -	nc->size =3D page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
-> +	nc->size_mask =3D page ? PAGE_FRAG_CACHE_MAX_SIZE - 1 : PAGE_SIZE - 1;
-> +	VM_BUG_ON(page && nc->size_mask !=3D PAGE_FRAG_CACHE_MAX_SIZE - 1);
->  #endif
->  	if (unlikely(!page))
->  		page =3D alloc_pages_node(NUMA_NO_NODE, gfp, 0);
-> @@ -86,7 +87,7 @@ void *page_frag_alloc_va(struct page_frag_cache *nc, un=
-signed int fragsz,
-> =20
->  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
->  	/* if size can vary use size else just use PAGE_SIZE */
-> -	size =3D nc->size;
-> +	size =3D nc->size_mask + 1;
->  #else
->  	size =3D PAGE_SIZE;
->  #endif
+The issue is that implementations mix manufacturers, so we need to
+know the capabilities of the PHY and the capabilities of the PCS, and
+then hope that we can find some common ground between their
+requirements.
 
-So now we are having to add arithmetic operations to the size in
-addition having to mask in order to read the values. That just seems
-like that much more overhead.
+There is then the issue that if you're not using phylink, then...
+guess what... you either need to convert to use phylink or implement
+the logic in your own MAC driver to detect what the PHY is doing
+and what its capabilities are - but I think from what you've said,
+you are using phylink.
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
