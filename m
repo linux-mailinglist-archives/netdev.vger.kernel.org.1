@@ -1,124 +1,203 @@
-Return-Path: <netdev+bounces-88220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BEDA8A65AC
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:05:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4339A8A65EF
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:19:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A49BB21704
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:05:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CE67B253FB
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8661A82C8E;
-	Tue, 16 Apr 2024 08:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6BD415688D;
+	Tue, 16 Apr 2024 08:18:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ht4CpKzG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TByiiSen"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8991C6F066
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 08:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45091139589
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 08:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713254752; cv=none; b=P/KOABxwW7tASmNqfLwVEQyn16tQozM5MecISzi3pAT/XM1EMPReSNDlCUXXgg2Nj0VmwLkgoUpvrtus/He8PoJqct4ku2E/xVMbpSWZCyaXaqPdI3ILCort23VonQFsZtjxqC/Axq6WM4arH0UMJ2Zns+OEaBU9phmDAobSqlw=
+	t=1713255532; cv=none; b=Tj7G+C4hFngmcFLUPzi5/A1wuiclY7Kljll09b5yi4r4dYXvbcyOauRjvoOu8Ag2hfO/xu0mueOI0ZgAP7eES2LWECXW+duksK6IL1YSb/6lSLSyK6JC2vWMv0l+y74XxDqvDpVkqKbP+esaIHjUYw4N+rF4FQrzqWF1cRxCDNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713254752; c=relaxed/simple;
-	bh=Dxj0Hhx6hXr6d5PMmla7qb1sW6EAca1XfiNKS1tQGhU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m5E8omplpiYOUpNSWRE3HQbRrrTVv8mCiaATyQKgxILzqUed0VCP41Guw2dO3CH7cfEz4XvfM+/JHVHpbokKuYi0yNSQVfgCxl5BmKrObOuyR77LYhjz4uyBfU4QpAd4goD2vv22bDoz6/iOdMRX0m/QlFmI5nD7XAm4MuTFT2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ht4CpKzG; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1713255532; c=relaxed/simple;
+	bh=WSUcYTGfMiJPS6dBoWIy1OiuZHDqhA72PAGbwoqjEHc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=awTVqLZ7yApq3WhnUEyr+SR8w0IsEh7edqbwEfYIoV1e5jw0AfNHfZpVqUa7cJTCDvN48qe09PVehno/S3xN/S2osYL/rJxDDoYg4WnQcenJRTlAJ2xvPeIP4Y735p7aPCRtmwar/65NroMSu9ZBH4k/O1a09QbwL+3luU+y434=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TByiiSen; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713254746;
+	s=mimecast20190719; t=1713255529;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8M2+7m/dx14DrPihTBNC9BjUd6JP+Zvk5co7qqWvO0I=;
-	b=ht4CpKzG582DgcNbTlPM5zlgm3rQJKCL21H04zi5eP0p5IUhejP029K9GJhKjg/ARlp7uc
-	GljhwkbYgzr+93nUk4BSEEHvHiMCTGPQb19HHIOt7sOWj6b1TWnL311nf6E51DInjT5c6k
-	IGYvAI94vBQoCh3I/Fk/WlnEepi0mNc=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=sx9FIAo9TZjFdKuhika+AQetmZMIT9vu9nUh+3JKCOQ=;
+	b=TByiiSen8u4aSXJIcOd8ZEvHzJ1U8Izegjbg0vUe7+kU55q01CaBCCds/86hosbbmARQWZ
+	uFNPqUQIlAVqsVjxpRhoiT4PZyXfUqjAGHzVy2nIkE/wnPu51iHD057H8lfoyAwzq0zZbV
+	S/LoLmJ64E/oz1JfvlTyAQPDixFuCRQ=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-217-P5izMkakOXGNww6XSTDnrA-1; Tue, 16 Apr 2024 04:05:44 -0400
-X-MC-Unique: P5izMkakOXGNww6XSTDnrA-1
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2a53909676fso3834823a91.3
-        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 01:05:44 -0700 (PDT)
+ us-mta-207-lrgV7YDlMLa5haCOzorSAA-1; Tue, 16 Apr 2024 04:18:47 -0400
+X-MC-Unique: lrgV7YDlMLa5haCOzorSAA-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a51a65f488cso86114866b.1
+        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 01:18:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713254743; x=1713859543;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8M2+7m/dx14DrPihTBNC9BjUd6JP+Zvk5co7qqWvO0I=;
-        b=gIjy+ql6OLz5QTkT0ydAmHe9tk26nMtDcTijlll6jD3vN1mY2S9uZ1C3z3b/U0VBDq
-         3jHmhmaBrMcrN0QD+9knFCU8MDutSi69zUHz2PpdB0UYACndeqJGj8/Ni84PT94V2l5Y
-         Lksq0l+0RRgSyCwukCzwjtJBY63nUbRtflELEaoxJnIEAKqYON8TH7lgVhddxEvpVTru
-         iXQP+BAZGZzC2oVXhYQjNLrYm01LkPdxPPArjUsVRE9AHTZg5Nyw/eirbNvmEL4lCPCf
-         Dq5wiLTtLtNkZrU6nTrlyAG/A6Lyjj6RNqJovia5CAMM/96cyKy863CARmo61ERpByQJ
-         JoNg==
-X-Forwarded-Encrypted: i=1; AJvYcCVAO62sOGaM60rdT6XBDtcuyVTuFZYW7Oi8NLZUieTkhC3LcSi0uE6Nrxq7rHeXkFtAoSxq25902PJTL58GC21zYdODj6oT
-X-Gm-Message-State: AOJu0YxaDafNHmnYnQiIMOcxoKDYu5CSZGG9qblHvTgeqnQwOAiLBbnT
-	yhEYGC6TejgmFEvCLMipuG6lJpP+7n4Q1seGo85m/TBdXabErlIL+f5kO9gvLJ/VHSSVMtbi73Y
-	PQ/EfxNoK2sBCnXd+fLcS2eUX6a4zgSZhuJo/SPVJSmLmtVJ+hkuTJ5dt7/k9Fg2meYjBV5Mw8q
-	xa3YxKD4RRDlMiDZ6ztbqwbnBUgRCZ
-X-Received: by 2002:a17:90a:dc0a:b0:29f:ef34:3004 with SMTP id i10-20020a17090adc0a00b0029fef343004mr10514423pjv.43.1713254743048;
-        Tue, 16 Apr 2024 01:05:43 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHIthdkzYZyQB5RfrPWYbm8VKYTlfdr9CE9FoaXNprgDKvBhnS3838gkc7f54cTc8wvylu4sncEJCMD5gBIa1s=
-X-Received: by 2002:a17:90a:dc0a:b0:29f:ef34:3004 with SMTP id
- i10-20020a17090adc0a00b0029fef343004mr10514398pjv.43.1713254742535; Tue, 16
- Apr 2024 01:05:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713255527; x=1713860327;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sx9FIAo9TZjFdKuhika+AQetmZMIT9vu9nUh+3JKCOQ=;
+        b=qcZAijtCjS0tU6FMO3rmz4FmfHmOAk7WVSTZC1RMsbJ4bxmDenN6fM8JXIszdVVzz8
+         6KlreTB2wHqDRpFzhMRT6SukhGnMt7mmrzfyRNQNhyUXyvRQsCGfkyEQBeiSvkWv0pnZ
+         d+tkip43xw9P7upWFsc2IXEkcyZrEbD+mTAzxp2usxoFR8NRFQA/hlfC+mE5BL50zdbg
+         x5h/XVyX44XULqOjV2rt/gHB7aDDRxmefc/qmsq0makAilvl8N4RWnhrRhCV5xM1Km/X
+         HrHT33iOVkDSHwgFk0ibV9LfOeHcis87xljoSapPUComiazap5frYxsK128sZtByLoDJ
+         zSFw==
+X-Forwarded-Encrypted: i=1; AJvYcCUwh9QW6/PUG9ws2LbJ5rZO9Ec7iGpEkEJczlBxCY1exeQxki+XaqaH0yqyWKTyueG1pqNuxPsp/SGwCF7/16doGJ01BoXP
+X-Gm-Message-State: AOJu0YzqdjaIGWxrj7QR8O8H/0EZAkiD78MBHqfyseIgENAxv3N9mYcT
+	QlavwjUGuy8OI6mzu92YmoMfaluDY/Ce2BLbg1rhKSj0j5RWN/g56fg8sEU6i5AtmjY73VNp+VT
+	tIN6NLcTuOPGGwkcZsR7fRtPrDzw4LJkU1yeV59Zc1ce8o8C66Ngciw==
+X-Received: by 2002:a17:906:4ecf:b0:a52:6535:d078 with SMTP id i15-20020a1709064ecf00b00a526535d078mr3213786ejv.7.1713255526679;
+        Tue, 16 Apr 2024 01:18:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEeWubKk9sfU5n4Eg4r0fgR17oDosoRykSHGnpq+PCrNmzGMeRZ2HKjVJzu/+KOc5EhcE24Ng==
+X-Received: by 2002:a17:906:4ecf:b0:a52:6535:d078 with SMTP id i15-20020a1709064ecf00b00a526535d078mr3213728ejv.7.1713255526227;
+        Tue, 16 Apr 2024 01:18:46 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-231-31.dyn.eolo.it. [146.241.231.31])
+        by smtp.gmail.com with ESMTPSA id gf14-20020a170906e20e00b00a51e6222200sm6539922ejb.156.2024.04.16.01.18.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Apr 2024 01:18:45 -0700 (PDT)
+Message-ID: <be056435353af60a564f457c79dacc16c6ea920e.camel@redhat.com>
+Subject: Re: [PATCH v3 1/4] networking: Remove the now superfluous sentinel
+ elements from ctl_table array
+From: Paolo Abeni <pabeni@redhat.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	devnull+j.granados.samsung.com@kernel.org
+Cc: Dai.Ngo@oracle.com, alex.aring@gmail.com, alibuda@linux.alibaba.com, 
+ allison.henderson@oracle.com, anna@kernel.org, bridge@lists.linux.dev, 
+ chuck.lever@oracle.com, coreteam@netfilter.org, courmisch@gmail.com, 
+ davem@davemloft.net, dccp@vger.kernel.org, dhowells@redhat.com,
+ dsahern@kernel.org,  edumazet@google.com, fw@strlen.de, geliang@kernel.org,
+ guwen@linux.alibaba.com,  herbert@gondor.apana.org.au, horms@verge.net.au,
+ j.granados@samsung.com, ja@ssi.bg,  jaka@linux.ibm.com, jlayton@kernel.org,
+ jmaloy@redhat.com, jreuter@yaina.de,  kadlec@netfilter.org,
+ keescook@chromium.org, kolga@netapp.com, kuba@kernel.org, 
+ linux-afs@lists.infradead.org, linux-hams@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, 
+ linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org, 
+ linux-sctp@vger.kernel.org, linux-wpan@vger.kernel.org, 
+ linux-x25@vger.kernel.org, lucien.xin@gmail.com, lvs-devel@vger.kernel.org,
+  marc.dionne@auristor.com, marcelo.leitner@gmail.com, martineau@kernel.org,
+  matttbe@kernel.org, mcgrof@kernel.org, miquel.raynal@bootlin.com, 
+ mptcp@lists.linux.dev, ms@dev.tdt.de, neilb@suse.de,
+ netdev@vger.kernel.org,  netfilter-devel@vger.kernel.org,
+ pablo@netfilter.org, ralf@linux-mips.org,  razor@blackwall.org,
+ rds-devel@oss.oracle.com, roopa@nvidia.com,  stefan@datenfreihafen.org,
+ steffen.klassert@secunet.com,  tipc-discussion@lists.sourceforge.net,
+ tom@talpey.com, tonylu@linux.alibaba.com,  trond.myklebust@hammerspace.com,
+ wenjia@linux.ibm.com, ying.xue@windriver.com
+Date: Tue, 16 Apr 2024 10:18:42 +0200
+In-Reply-To: <20240415231210.22785-1-kuniyu@amazon.com>
+References: <20240412-jag-sysctl_remset_net-v3-1-11187d13c211@samsung.com>
+	 <20240415231210.22785-1-kuniyu@amazon.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240326230319.190117-1-jhs@mojatatu.com> <CANn89iLhd4iD-pDVJHzKqWbf16u9KyNtgV41X3sd=iy15jDQtQ@mail.gmail.com>
- <CAM0EoMmQHsucU6n1O3XEd50zUB4TENkEH0+J-cZ=5Bbv9298mA@mail.gmail.com>
- <CANn89iKaMKeY7pR7=RH1NMBpYiYFmBRfAWmbZ61PdJ2VYoUJ9g@mail.gmail.com>
- <CAM0EoM=s_MvUa32kUyt=VfeiAwxOm2OUJ3H=i0ARO1xupM2_Xg@mail.gmail.com>
- <CAM0EoMk33ga5dh12ViZz8QeFwjwNQBvykM53VQo1B3BdfAZtaQ@mail.gmail.com>
- <CANn89iLmhaC8fuu4UpPdELOAapBzLv0+S50gr0Rs+J+=4+9j=g@mail.gmail.com>
- <CAM0EoMm+cqkY9tQC6+jpvLJrRxw43Gzffgw85Q3Fe2tBgA7k2Q@mail.gmail.com>
- <CAM0EoMmdp_ik6EA2q8vhr+gGh=OcxUkvBOsxPHFWjn1eDX_33Q@mail.gmail.com>
- <CANn89iLsV8sj1cJJ8VJmBwZvsD5PoV_NXfXYSCXTjaYCRm6gmA@mail.gmail.com> <CAM0EoMnKh67wGo5XV1vdUd8p8LhxrT5mtbioPOLr=sVprYNKjA@mail.gmail.com>
-In-Reply-To: <CAM0EoMnKh67wGo5XV1vdUd8p8LhxrT5mtbioPOLr=sVprYNKjA@mail.gmail.com>
-From: Davide Caratti <dcaratti@redhat.com>
-Date: Tue, 16 Apr 2024 10:05:31 +0200
-Message-ID: <CAKa-r6tNMuAR0RXuGbYLFW0jhpbPn4BvW1erGcqu0nCLRzH-aA@mail.gmail.com>
-Subject: Re: [PATCH RFC net 1/1] net/sched: Fix mirred to self recursion
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Eric Dumazet <edumazet@google.com>, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
-	netdev@vger.kernel.org, renmingshuai@huawei.com, 
-	Victor Nogueira <victor@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-hello,
+On Mon, 2024-04-15 at 16:12 -0700, Kuniyuki Iwashima wrote:
+> From: Joel Granados via B4 Relay <devnull+j.granados.samsung.com@kernel.o=
+rg>
+> Date: Fri, 12 Apr 2024 16:48:29 +0200
+> > From: Joel Granados <j.granados@samsung.com>
+> >=20
+> > This commit comes at the tail end of a greater effort to remove the
+> > empty elements at the end of the ctl_table arrays (sentinels) which
+> > will reduce the overall build time size of the kernel and run time
+> > memory bloat by ~64 bytes per sentinel (further information Link :
+> > https://lore.kernel.org/all/ZO5Yx5JFogGi%2FcBo@bombadil.infradead.org/)
+> >=20
+> > * Remove sentinel element from ctl_table structs.
+> > * Remove extra element in ctl_table arrays declarations
+> > * Remove instances where an array element is zeroed out to make it look
+> >   like a sentinel. This is not longer needed and is safe after commit
+> >   c899710fe7f9 ("networking: Update to register_net_sysctl_sz") added
+> >   the array size to the ctl_table registration
+> > * Replace the for loop stop condition that tests for procname =3D=3D NU=
+LL with
+> >   one that depends on array size
+> > * Removed the "-1" that adjusted for having an extra empty element when
+> >   looping over ctl_table arrays
+> > * Removing the unprivileged user check in ipv6_route_sysctl_init is
+> >   safe as it is replaced by calling ipv6_route_sysctl_table_size;
+> >   introduced in commit c899710fe7f9 ("networking: Update to
+> >   register_net_sysctl_sz")
+> > * Replace empty array registration with the register_net_sysctl_sz call=
+.
+> >=20
+> > Signed-off-by: Joel Granados <j.granados@samsung.com>
+> > ---
+> >  net/core/neighbour.c                | 5 +----
+> >  net/core/sysctl_net_core.c          | 9 ++++-----
+> >  net/dccp/sysctl.c                   | 2 --
+> >  net/ieee802154/6lowpan/reassembly.c | 6 +-----
+> >  net/ipv4/devinet.c                  | 5 ++---
+> >  net/ipv4/ip_fragment.c              | 2 --
+> >  net/ipv4/route.c                    | 8 ++------
+> >  net/ipv4/sysctl_net_ipv4.c          | 7 +++----
+> >  net/ipv4/xfrm4_policy.c             | 1 -
+> >  net/ipv6/addrconf.c                 | 5 +----
+> >  net/ipv6/icmp.c                     | 1 -
+> >  net/ipv6/reassembly.c               | 2 --
+> >  net/ipv6/route.c                    | 5 -----
+> >  net/ipv6/sysctl_net_ipv6.c          | 4 +---
+> >  net/ipv6/xfrm6_policy.c             | 1 -
+> >  net/llc/sysctl_net_llc.c            | 8 ++------
+> >  net/mpls/af_mpls.c                  | 3 +--
+> >  net/mptcp/ctrl.c                    | 1 -
+> >  net/netrom/sysctl_net_netrom.c      | 1 -
+> >  net/phonet/sysctl.c                 | 1 -
+> >  net/rds/ib_sysctl.c                 | 1 -
+> >  net/rds/sysctl.c                    | 1 -
+> >  net/rds/tcp.c                       | 1 -
+> >  net/rose/sysctl_net_rose.c          | 1 -
+> >  net/rxrpc/sysctl.c                  | 1 -
+> >  net/sctp/sysctl.c                   | 6 +-----
+> >  net/smc/smc_sysctl.c                | 1 -
+> >  net/sunrpc/sysctl.c                 | 1 -
+> >  net/sunrpc/xprtrdma/svc_rdma.c      | 1 -
+> >  net/sunrpc/xprtrdma/transport.c     | 1 -
+> >  net/sunrpc/xprtsock.c               | 1 -
+> >  net/tipc/sysctl.c                   | 1 -
+> >  net/unix/sysctl_net_unix.c          | 1 -
+> >  net/x25/sysctl_net_x25.c            | 1 -
+> >  net/xfrm/xfrm_sysctl.c              | 5 +----
+> >  35 files changed, 20 insertions(+), 81 deletions(-)
+>=20
+> You may want to split patch based on subsystem or the type of changes
+> to make review easier.
 
-On Mon, Apr 15, 2024 at 11:15=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com=
-> wrote:
->
-[...]
+I agree with Kuniyuki. I think the x25 chunks can me moved in the last
+patch, and at least sunrpc and rds could go in separate patches,
+possibly even xfrm and smc.
 
-> Victor sent the patch. As i mentioned earlier, we found a lockdep
-> false positive for the case of redirect from eth0->eth1->eth0
-> (potential fix attached)
+Thanks,
 
-I tried a similar approach some months ago [1],  but  _ like Eric
-noticed  _ it might slowdown qdisc_destroy() too much because of the
-call to synchronize_rcu(). Maybe the key unregistering can be done
-later (e.g. when the qdisc is freed) ?
-
-[1] https://lore.kernel.org/netdev/73065927a49619fcd60e5b765c929f899a66cd1a=
-.1701853200.git.dcaratti@redhat.com/
-
---=20
-davide
+Paolo
 
 
