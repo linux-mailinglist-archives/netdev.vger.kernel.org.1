@@ -1,217 +1,148 @@
-Return-Path: <netdev+bounces-88167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 065BB8A6271
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 06:34:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D25D8A62BE
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 07:06:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EE1CB224F5
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 04:34:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 518AF1C21E30
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 05:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2646A1BC5C;
-	Tue, 16 Apr 2024 04:34:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 610CE38FA1;
+	Tue, 16 Apr 2024 05:06:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="do3WCFXP"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="iLwXxxVb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B3F17554
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 04:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B74381DE;
+	Tue, 16 Apr 2024 05:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713242085; cv=none; b=nXgIQ4jG261d0XiwnGnI4VsRzafAFY/fYfERieGlaLYkho5uAMHfq2BxgzncHdFHh2nAMOLKdCRlYmonnRGCl9bSPdzj7AmNigRSt/XrSeRNeFwsz8RQ4NqsDzVnvjNYofQszjGy/Hjg548cP9VCw7ouRYkqAluWX/Bt31ktCsw=
+	t=1713243998; cv=none; b=ZsYQKejXq//7bb87xwdnGewCDK+znE21B/opZ/Qxlg3qdBLxMiKzQVxleGOkVcV1pdX2hgrPtxWCXsQj8jsN8BFs3TZNvYDqUY/FRTPlQ841FL7/itiLw7T1Dkr0juwN8H+aiUJVFUwxqQZbeZtWcWTWGxMp8CUeZGRxUc0s1MA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713242085; c=relaxed/simple;
-	bh=ckuFnaAZyrvaPmoW29Qcog/aA0EJPKftH0hR/DYCVxA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dNkE2Ih66sXBfuSrkybZNIF2vTxyZ2acXINccELVEAtXuNVyon/JJIvtj576uRP/1oPCHtcjyyHqMiGFjyN60lUiZGzlKpHvGrq3RbVSds3Zc4r7+q3jaSuBBB8tTBH8Mymd+SKAzfkdJDnWJjNyhZ+V7BQ6YVAT/E2lJ5HXOY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=do3WCFXP; arc=none smtp.client-ip=209.85.219.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-dcc80d6004bso3941832276.0
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 21:34:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=umich.edu; s=google-2016-06-03; t=1713242081; x=1713846881; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VVnb03bD1Z8TQFj1cA3icDceZSAeMVLYBfSfOHapuPU=;
-        b=do3WCFXPnvf9hOyKRMgCadwlSk6dAT56SUIoLsj4D1aitkmhyfyFloDo72lxNbKevK
-         frbWB1E1vx+8HHiLHmsc3J6CSdi/HCTwbtuQ6w4nu2amkLv4xpZrx7GK++n4DCRrUwC3
-         MG5sbf7TB6hWIAjOi52jRERfA4/yV+uLqyGsiAT1eB5iFq4oNR6w88vTpziCJZ8CrUFr
-         eUMdZnFho4RuWuTrve8sjknO736/K2kd3lX3+4WViP1m2Fi9Ho+4SGhd/BFjQoAR0puj
-         QF72/UNtt0dfiwQSz9LhqqYDvxnKyYt/0LoFWlqL0t0LE4qsdsptXuVJjOvZiQjz8PRq
-         MMpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713242081; x=1713846881;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VVnb03bD1Z8TQFj1cA3icDceZSAeMVLYBfSfOHapuPU=;
-        b=Dg1r1m0nvlTnYpPa+41OQMb/2U9BuJT+rK9Fnw1CBv+qUiK/958F8eVsuPEFv/1aSM
-         hgSgsdllq4YhDeLtbZhCMkQHW5+AOuVBMvV3NZ87qNm0YGGBou5M22v2Fv/9dHxVOdjp
-         fDkZK9jg0W8+xwFKNX7mLd8EXRGNBwUh/JhU5l04RXzBGv+1fMOGoh0YH+60knYmwvFA
-         oZqgLoxcdm4FGMfouSu1aRGNj82JDdvw3Ey34ACgu2H7uoXhhrVaAYo2xFEuV54hjtiC
-         cf0xkE1n27+InRlmo4D+7JBIVZWP+3BKz8/JzzNAsHg4+C3DzjA8p6AVrpQePlXcBboc
-         S+yA==
-X-Gm-Message-State: AOJu0YyBQy02cWBuId3vtIW+kkJXmqWQ/Smk38owGGF4nItjW4DGRANk
-	bCgQSyILlEDZcw5y4wnLmudUTMcuMKmwH0Va/NlC6uJ2PIH3WN+ouOTenMqbpdyTXSbOYhmrZ5z
-	myUmODDTttNuxgkcuBady2FbLJsdUZOt9z58l4txKc+bPHr8Rw8A=
-X-Google-Smtp-Source: AGHT+IEAbxIA+OY9506mxCbXOCtoissDBk6PAajWelbGc+T6BABwSPxhobkhj7tZC19fvPBDx2j6cUxcnSVSIQLMs1s=
-X-Received: by 2002:a25:7405:0:b0:de3:ec94:2e94 with SMTP id
- p5-20020a257405000000b00de3ec942e94mr3519723ybc.15.1713242081392; Mon, 15 Apr
- 2024 21:34:41 -0700 (PDT)
+	s=arc-20240116; t=1713243998; c=relaxed/simple;
+	bh=FtPVwxpazB+LTsdeHlcML2FBH0nSAup/h6vWHsSB4yk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ecgbGyUVVBN2MCbiTEZFzHwebKCLwqs6kvc9igbKNVlLTuft/11zgEDc6TDcUJ03C8TnYvdiKhxmV/65ku0OJMsyPo5R+XyxNMeKXrSHsW6jPrrgUCvtmkh27jsPbXSGNdmyRVBDjEd4QJ4ShMBoIT1JP1EUT/vvlUvVBavnNJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=iLwXxxVb; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43G19E6o029795;
+	Mon, 15 Apr 2024 22:06:23 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	pfpt0220; bh=F42ZO3PwDbnZJkaHBcltiAhhCQWaLh7MZqhgu2XJ3Zc=; b=iLw
+	XxxVbOPlC6bx2H3DrAY9Hszm3rzWHTjswBbBG5/Qhm2UkMaUXVhaXE8uuhlxqLsj
+	/qC2WEkh2VfralJ/mHGIzMco+stwogAF+2+F5lI9kmsVTvE1RZFDxkvNOGuNj0BQ
+	wSzmaIOkX2t9Q7qeUbYNqJl7NllPT41hHHP9CeQtA5CFiyykS9SJcjV38fgTkpEr
+	1ZgJnFCqL82kgGhcTriCvn5x50qgPQg3GwppenoZaX/6DwUs6IQN0PZDOpvXLUZ4
+	EZGrShpY0t7MhAEwcmWz36CCKx5AQwaWKwt0V9zTgmzeT0/W87qwYqRGP4u5vHWQ
+	80WHe3DaNAIvFswzRqQ==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3xhfdn0j7d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Apr 2024 22:06:23 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Mon, 15 Apr 2024 22:06:20 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Mon, 15 Apr 2024 22:06:20 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id E3B913F7084;
+	Mon, 15 Apr 2024 22:06:17 -0700 (PDT)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>
+Subject: [net-next PATCH 0/9] Introduce RVU representors
+Date: Tue, 16 Apr 2024 10:36:07 +0530
+Message-ID: <20240416050616.6056-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240415104701.4772-1-fujita.tomonori@gmail.com> <20240415104701.4772-5-fujita.tomonori@gmail.com>
-In-Reply-To: <20240415104701.4772-5-fujita.tomonori@gmail.com>
-From: Trevor Gross <tmgross@umich.edu>
-Date: Tue, 16 Apr 2024 00:34:30 -0400
-Message-ID: <CALNs47v+35RX4+ibHrcZgrJEJ52RqWRQUBa=_Aky_6gk1ika4w@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 4/4] net: phy: add Applied Micro QT2025 PHY driver
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, rust-for-linux@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Proofpoint-GUID: t65CxtMA38EyCgxYLjCT0h-n6t9r08Qt
+X-Proofpoint-ORIG-GUID: t65CxtMA38EyCgxYLjCT0h-n6t9r08Qt
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-16_02,2024-04-15_01,2023-05-22_02
 
-On Mon, Apr 15, 2024 at 6:47=E2=80=AFAM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
->
-> This driver supports Applied Micro Circuits Corporation QT2025 PHY,
-> based on a driver for Tehuti Networks TN40xx chips.
->
-> The original driver for TN40xx chips supports multiple PHY hardware
-> (AMCC QT2025, TI TLK10232, Aqrate AQR105, and Marvell 88X3120,
-> 88X3310, and MV88E2010). This driver is extracted from the original
-> driver and modified to a PHY driver in Rust.
->
-> This has been tested with Edimax EN-9320SFP+ 10G network adapter.
->
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> [...]
-> diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
-> new file mode 100644
-> index 000000000000..e42b77753717
-> --- /dev/null
-> +++ b/drivers/net/phy/qt2025.rs
-> @@ -0,0 +1,75 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +// Copyright (C) Tehuti Networks Ltd.
-> +// Copyright (C) 2024 FUJITA Tomonori <fujita.tomonori@gmail.com>
-> +
-> +//! Applied Micro Circuits Corporation QT2025 PHY driver
-> +use kernel::c_str;
-> +use kernel::net::phy::{self, DeviceId, Driver, Firmware};
-> +use kernel::prelude::*;
-> +use kernel::uapi;
-> +
-> +kernel::module_phy_driver! {
-> +    drivers: [PhyQT2025],
-> +    device_table: [
-> +        DeviceId::new_with_driver::<PhyQT2025>(),
-> +    ],
-> +    name: "qt2025_phy",
-> +    author: "FUJITA Tomonori <fujita.tomonori@gmail.com>",
-> +    description: "AMCC QT2025 PHY driver",
-> +    license: "GPL",
-> +}
-> +
-> +const MDIO_MMD_PMAPMD: u8 =3D uapi::MDIO_MMD_PMAPMD as u8;
-> +const MDIO_MMD_PCS: u8 =3D uapi::MDIO_MMD_PCS as u8;
-> +const MDIO_MMD_PHYXS: u8 =3D uapi::MDIO_MMD_PHYXS as u8;
-> +
-> +struct PhyQT2025;
-> +
-> +#[vtable]
-> +impl Driver for PhyQT2025 {
-> +    const NAME: &'static CStr =3D c_str!("QT2025 10Gpbs SFP+");
+This series adds representor support for each rvu devices.
+When switchdev mode is enabled, representor netdev is registered
+for each rvu device. In implementation of representor model, 
+one NIX HW LF with multiple SQ and RQ is reserved, where each
+RQ and SQ of the LF are mapped to a representor. A loopback channel
+is reserved to support packet path between representors and VFs.
+CN10K silicon supports 2 types of MACs, RPM and SDP. This
+patch set adds representor support for both RPM and SDP MAC
+interfaces.
 
-Since 1.77 we have C string literals, `c"QT2025 10Gpbs SFP+"` (woohoo)
+- Patch 1: Refactors and exports the shared service functions.
+- patch 2: Implements basic representor driver.
+- patch 3: Add devlink support to create representor netdevs that
+  can be used to manage VFs.
+- patch 4: Implements basec netdev_ndo_ops.
+- Patch 5: Installs tcam rules to route packets between representor and
+	   VFs.
+- patch 6: Enables fetching VF stats via representor interface
+- Patch 7: Adds support to sync link state between representors and VFs .
+- patch 8: Enables configuring VF MTU via representor netdevs.
+- patch 9: Add representors for sdp MAC
 
-> +    const PHY_DEVICE_ID: phy::DeviceId =3D phy::DeviceId::new_with_exact=
-_mask(0x0043A400);
-> +
-> +    fn config_init(dev: &mut phy::Device) -> Result<()> {
-> +        let fw =3D Firmware::new(c_str!("qt2025-2.0.3.3.fw"), dev)?;
+Geetha sowjanya (9):
+  octeontx2-pf: Refactoring RVU driver
+  octeontx2-pf: RVU representor driver
+  octeontx2-pf: Create representor netdev
+  octeontx2-pf: Add basic net_device_ops
+  octeontx2-af: Add packet path between representor and VF
+  octeontx2-pf: Get VF stats via representor
+  octeontx2-pf: Add support to sync link state between representor and
+    VFs
+  octeontx2-pf: Configure VF mtu via representor
+  octeontx2-pf: Add representors for sdp MAC
 
-Same as above
+ .../net/ethernet/marvell/octeontx2/Kconfig    |   8 +
+ .../ethernet/marvell/octeontx2/af/Makefile    |   3 +-
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  73 +++
+ .../net/ethernet/marvell/octeontx2/af/npc.h   |   1 +
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   |  30 +-
+ .../marvell/octeontx2/af/rvu_debugfs.c        |  27 -
+ .../marvell/octeontx2/af/rvu_devlink.c        |   6 +
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |  67 +-
+ .../marvell/octeontx2/af/rvu_npc_fs.c         |   4 +
+ .../ethernet/marvell/octeontx2/af/rvu_rep.c   | 457 +++++++++++++
+ .../marvell/octeontx2/af/rvu_struct.h         |  26 +
+ .../marvell/octeontx2/af/rvu_switch.c         |  20 +-
+ .../ethernet/marvell/octeontx2/nic/Makefile   |   2 +
+ .../ethernet/marvell/octeontx2/nic/cn10k.c    |   4 +-
+ .../ethernet/marvell/octeontx2/nic/cn10k.h    |   2 +-
+ .../marvell/octeontx2/nic/otx2_common.c       |  53 +-
+ .../marvell/octeontx2/nic/otx2_common.h       |  83 ++-
+ .../marvell/octeontx2/nic/otx2_devlink.c      |  48 ++
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 305 ++++++---
+ .../ethernet/marvell/octeontx2/nic/otx2_reg.h |   1 +
+ .../marvell/octeontx2/nic/otx2_txrx.c         |  33 +-
+ .../marvell/octeontx2/nic/otx2_txrx.h         |   3 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  18 +-
+ .../net/ethernet/marvell/octeontx2/nic/rep.c  | 602 ++++++++++++++++++
+ .../net/ethernet/marvell/octeontx2/nic/rep.h  |  51 ++
+ 25 files changed, 1704 insertions(+), 223 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/af/rvu_rep.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/rep.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/rep.h
 
-> +        let phy_id =3D dev.c45_read(MDIO_MMD_PMAPMD, 0xd001)?;
-> +        if (phy_id >> 8) & 0xff !=3D 0xb3 {
-> +            return Ok(());
-> +        }
+-- 
+2.25.1
 
-Could you add a note about why you are returning early? Also some magic num=
-bers
-
-> +
-> +        dev.c45_write(MDIO_MMD_PMAPMD, 0xC300, 0x0000)?;
-> +        dev.c45_write(MDIO_MMD_PMAPMD, 0xC302, 0x4)?;
-> +        dev.c45_write(MDIO_MMD_PMAPMD, 0xC319, 0x0038)?;
-> +
-> +        dev.c45_write(MDIO_MMD_PMAPMD, 0xC31A, 0x0098)?;
-> +        dev.c45_write(MDIO_MMD_PCS, 0x0026, 0x0E00)?;
-> +
-> +        dev.c45_write(MDIO_MMD_PCS, 0x0027, 0x0893)?;
-> +
-> +        dev.c45_write(MDIO_MMD_PCS, 0x0028, 0xA528)?;
-> +        dev.c45_write(MDIO_MMD_PCS, 0x0029, 0x03)?;
-> +        dev.c45_write(MDIO_MMD_PMAPMD, 0xC30A, 0x06E1)?;
-> +        dev.c45_write(MDIO_MMD_PMAPMD, 0xC300, 0x0002)?;
-> +        dev.c45_write(MDIO_MMD_PCS, 0xE854, 0x00C0)?;
-
-It might be nicer to put this in a table, like
-
-    const QT2025_INIT_ROUTINE: &[(u8, u16, u16)] =3D &[
-        // Add some notes about what the registers do, or put them in
-separate consts
-        (MDIO_MMD_PMAPMD, 0xC300, 0x0000),
-        (MDIO_MMD_PMAPMD, 0xC302, 0x4),
-        // ...
-    ];
-
-    for (add reg, val) in QT2025_INIT_ROUTINE {
-        dev.c45_write(add, reg, val)?;
-    }
-
-> +        let mut j =3D 0x8000;
-
-Could you give this one a name?
-
-> +        let mut a =3D MDIO_MMD_PCS;
-> +        for (i, val) in fw.data().iter().enumerate() {
-> +            if i =3D=3D 0x4000 {
-> +                a =3D MDIO_MMD_PHYXS;
-> +                j =3D 0x8000;
-> +            }
-
-Looks like firmware is split between PCS and PHYXS at 0x4000, but like
-Greg said you should probably explain where this comes from.
-
-> +            dev.c45_write(a, j, (*val).into())?;
-
-I think this is writing one byte at a time, to answer Andrew's
-question. Can you write a `u16::from_le_bytes(...)` to alternating
-addresses instead? This would be pretty easy by doing
-`fw.data().chunks(2)`.
-
-> +
-> +            j +=3D 1;
-> +        }
-> +        dev.c45_write(MDIO_MMD_PCS, 0xe854, 0x0040)?;
-> +
-> +        Ok(())
-> +    }
-> +
-> +    fn read_status(dev: &mut phy::Device) -> Result<u16> {
-> +        dev.genphy_c45_read_status()
-> +    }
-> +}
 
