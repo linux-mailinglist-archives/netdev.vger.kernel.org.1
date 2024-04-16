@@ -1,118 +1,191 @@
-Return-Path: <netdev+bounces-88346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26AF18A6CCE
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 15:51:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EE888A6CDA
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 15:52:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 575171C22143
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 13:51:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5422CB22A49
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 13:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F3212C53B;
-	Tue, 16 Apr 2024 13:51:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8F3112C520;
+	Tue, 16 Apr 2024 13:52:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h5QRW70W"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="dc9YPY0a"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2087.outbound.protection.outlook.com [40.107.21.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7435712C531
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 13:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713275495; cv=none; b=DHCl2qf4yAOfayJYa+jO/UtLPdHhsHprN63OvhCl3vo8Mn4Y0lBi8RMyfZ9+u6owKGXI0DU/IHOMdYUVyjC5mp4Cudr5QVyGuZcPI625HfZ4fHxPAjWjhS6NmX3cHopjL2N2OQ4j4G/rNDU+Otl1hhR8sZK14d7gEC0G1M+3oxo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713275495; c=relaxed/simple;
-	bh=4otepq24ibU/BFgkCAGDDODzhJI1QplbGSgPPr0bnNA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OuXIqQGFyde6rKdE57zU/2/TQuMY1Uh+MZmLqd1yVH2V5Q5nhf/B8Em+DHoIUplVTV3RUwDLjTL4WLsT1fIaRyLTFTnf8OVP7CI/l9IbJmZwQQcD28wxeryeNVFIdTcrkXi/fypmuY2jB7onPjMHbBf7XE/wp8Np/4Gy72qkjt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h5QRW70W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECBB7C2BD10;
-	Tue, 16 Apr 2024 13:51:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713275495;
-	bh=4otepq24ibU/BFgkCAGDDODzhJI1QplbGSgPPr0bnNA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=h5QRW70WEVB/gjlxQF34XfHI8FAXbbwHnSKkZJgaVQnUEtTNThMJb97o0PD9IaeNK
-	 efdNoubBn/DS6cPrFYrxB8DbMRoNtUPBy1SS2cduKNPdK11oUwRyjbcmrX6PmL0Mev
-	 KiJ36YAHFDoyUbYswGVn5Ykj5UuDf4IR3Rixacty6DfYfS+gVPVPRakyNlou3CJIFa
-	 Rcbbj4ZdOeN7aCuwC6qntXqUuPZTBQxT54F58YyPYrR3H3nnkyFC7CUd5WL3PctA/R
-	 D5zuGwWEucz1vQ059yTlnSlrfviH32XR0U869Gi8ZkvpZNC+ilcYzgA2bGnNUyfT+e
-	 7kEDVHjToYhIA==
-Date: Tue, 16 Apr 2024 14:51:29 +0100
-From: Simon Horman <horms@kernel.org>
-To: Kurt Kanzenbach <kurt@linutronix.de>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Lunn <andrew@lunn.ch>, Lukas Wunner <lukas@wunner.de>,
-	Sasha Neftin <sasha.neftin@intel.com>,
-	Roman Lozko <lozko.roma@gmail.com>,
-	Marek =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: Re: [PATCH iwl-net v2] igc: Fix deadlock on module removal
-Message-ID: <20240416135129.GA3769813@kernel.org>
-References: <20240411-igc_led_deadlock-v2-1-b758c0c88b2b@linutronix.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB80D12C534;
+	Tue, 16 Apr 2024 13:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713275543; cv=fail; b=h+90jUo8rdDJ1UCnaC5hVIqd6V0YOVZY/AFeGOiwG3T3J6Ciq868B4hKG+UbUhswsVRSeip1XX+l4wz9/5IE1zxBDRy+dG0WjuSBprMotta2Mpmv2J/G67odSPSVf5aoaOuHoBZJjcULzYYGPj3829PG/Cg5f1sP0SNne5efDcI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713275543; c=relaxed/simple;
+	bh=qjkDPeaaPYfDDMFnH5O2X0v1mclZEHVyaPAMonTTAO4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=YOPPMWfey+479hs5oYLBdVHlGunv+TmvmCfrdW9b5MGBM0LMmkOUX3GMbpY50yrM79iQeBmkNcReexdyEdU9nSiAH7vZf6M0Quf9c63ILb6nNzsYPPvKBLd7+CGMZhoece7vRs5VDPfUiuVriTy0z22g36drJqCdGL5HIMOleBM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=dc9YPY0a; arc=fail smtp.client-ip=40.107.21.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=S4cm/7VUvAtkQw2Nsf7tXTXYcb8u6LYu0cxi+UlPGqHfRqIz4wDlvrwNBrQMFBBmrZc6XAx4BW7vRS40JRt7hvqVTgjwdH0a9UplbEyxv7kLD3nyZeg0sxhbft1x9aFnMdSjp5aGw1PZiZDeZadQOKijNwI6kZwGLzTPxIlTj53P+1UKoqHu2ob8qLsf5IhPeQv4HkWGbEEfMFWGrSPcqS59oa00NiVd8qhsVZMiDJ3N+tHJq4zaalzaAW1Q/2fhcNGg+r0vrH5vMyOXBD1BvfR4CSbHTK6BlDdVo6jkhr9wvJDnKv/F1/s7TpKXJnEeyketpXZ6QOgWuTunijTB5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EhLIgztNbwtF1+NerSfW11EUh3nH2rXcl5kHZ6gKj6s=;
+ b=UFYDgw/JVh5wqoetqtTO4EXr9PwBjqtF56B4EsACCrfxQU00saL+o+k5eMmIkkyPh0XQ2c5l4uPvocce/ypKfPxARAdsI1Rw3sh+KpndaIkT69JvGFKKIZKkt/aXh34zSNHweUcerI9kFjYpzrdd0zeVZAzXk1iXYePKryZZnVAlqx7W7EV1AD99n/f3KyO7rVmBeOKVCHpRpBV3WMYbznkAQtfU3PuUTPICprinp/lwdwfUqiLZkYNqMKRti/ueinoRll6XeJZkrkh7+RsmINHQFLdDLX0tp3jSjk4CqM3nyQew6tMRQsHuo3D35ZOcTbEp51eMncwPRLZnv4vk2w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EhLIgztNbwtF1+NerSfW11EUh3nH2rXcl5kHZ6gKj6s=;
+ b=dc9YPY0abTHZuTKOrCYCZ9tZP+xG9dMls3mLO/pnK/sonm7EKELRef3/IflQA9UUc+6i7n0EVxv5orLgUL4Z0+5ZAH3NeGv0tEe9t4DaEaQMpJP49t6GpZ4k0+imIVXFEwn1rD2gmjn14V7+I6DUDEl5af2i9V2B6A5XBoO4aMg=
+Received: from DU0PR04MB9417.eurprd04.prod.outlook.com (2603:10a6:10:358::11)
+ by VI1PR04MB6942.eurprd04.prod.outlook.com (2603:10a6:803:136::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.50; Tue, 16 Apr
+ 2024 13:52:18 +0000
+Received: from DU0PR04MB9417.eurprd04.prod.outlook.com
+ ([fe80::d30b:44e7:e78e:662d]) by DU0PR04MB9417.eurprd04.prod.outlook.com
+ ([fe80::d30b:44e7:e78e:662d%4]) with mapi id 15.20.7452.049; Tue, 16 Apr 2024
+ 13:52:18 +0000
+From: Peng Fan <peng.fan@nxp.com>
+To: Conor Dooley <conor@kernel.org>, "Peng Fan (OSS)" <peng.fan@oss.nxp.com>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>,
+	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
+	<conor+dt@kernel.org>, "shawnguo@kernel.org" <shawnguo@kernel.org>,
+	"s.hauer@pengutronix.de" <s.hauer@pengutronix.de>, "kernel@pengutronix.de"
+	<kernel@pengutronix.de>, "festevam@gmail.com" <festevam@gmail.com>, Clark
+ Wang <xiaoning.wang@nxp.com>, dl-linux-imx <linux-imx@nxp.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"imx@lists.linux.dev" <imx@lists.linux.dev>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH] dt-bindings: net: nxp,dwmac-imx: allow nvmem cells
+ property
+Thread-Topic: [PATCH] dt-bindings: net: nxp,dwmac-imx: allow nvmem cells
+ property
+Thread-Index: AQHajx+kgtAO4dwFyE2ikpRkMhstB7FpehEAgAFyDMA=
+Date: Tue, 16 Apr 2024 13:52:18 +0000
+Message-ID:
+ <DU0PR04MB94173B23CBB11E8DC736E90788082@DU0PR04MB9417.eurprd04.prod.outlook.com>
+References: <20240415103621.1644735-1-peng.fan@oss.nxp.com>
+ <20240415-limes-chasing-dbc111fa9cf2@spud>
+In-Reply-To: <20240415-limes-chasing-dbc111fa9cf2@spud>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DU0PR04MB9417:EE_|VI1PR04MB6942:EE_
+x-ms-office365-filtering-correlation-id: 086f99a8-1c97-4783-ead0-08dc5e1c6e75
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ ZHELb//xHdipugEH0ZeWr9HA7e3yaLkva+yQDnse6HCeQbdP83zNQbT7MVAKD9/iIIITg04q42oi4x09gWTBQN1HcozXbTc7VldgqDGG4ilH9u6CPK7v8oTdvJUMCiz0fixxvRqA77dvG8wAY2QpW+MQlNohtqTo94nkUJnpJGH6+AWenztoJ5Ker3tE+DDqIU+XocmEuBRC1Uj1QMW4Q5flpzTpEroTdDVuk8sqFPpjluKh/yWtIMlsKPobHQlk5yHmI8y01Viv0MsUq16fshZ4yfxT1Kwgn0GHDjL7VwZScedwFnmMFdN9GN+bzFwlOnDgOOZX7YJKqJ1qqV5DX8xQED2MrdD+J7uCTJK0Ptn6PD5z/Fe64P5aAMkFcxzJhmvmwbmJ2DKsS8uQMDsjXh6a5iLL6KWG/0W+NPwgUFC7yWwqEYpYAqNu5LBvjnzY6fXhS6RgZZDywJUlZlRW0t1CyZ9jHhQG5UQWqSyyoTilvVueIdcNxiS9z/U5ZRAEFTp4t479Q7Vli34o83OAuL6MqK13iwNxbzFtcx0IdtuqAus35eSIP6eGLD4rut5t15IcvwIzmIjq4O+jKlmXGHViABKhK4MlsGAYaz5IB9cUZuX7P9gdn/KFXklaTVs7lvTma9HNH+zBLcxCGM+7mdlRuzTwIUWGXrka6OJPMu7o+N/d5uFOAWhELQj3TaIk8INuH8zt5jmeFtj6Gnq/jpFEVYjoqPiz4iX75JvZ6Ok=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR04MB9417.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(7416005)(366007)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?Um0zY9Fa8/RsOJ6X3W2I+MjtbwHqmad1DtH4DRRDw66IETQmjiHLOraueAlN?=
+ =?us-ascii?Q?fDa+u85FeqoappQkpIXSoldOGyq0rbhhue+i4n8jy7ChsebP3BDHpeLzfhRz?=
+ =?us-ascii?Q?85JH+5BF8BFTQw6vVHZg8RfK/aZ1OUo9LMMnnX25aWZimAmkTmp9B8PSOKR4?=
+ =?us-ascii?Q?ZmAR2g7GMIjUEQS3g8ga4fg6LXSMEvCGxn7GH99ndSACujO5FCxr0gWJDKIK?=
+ =?us-ascii?Q?BL8u6zK5a8TBEyeWj3h03LZa06+gASYUTrrnP4on3JeqtVo3YF8d1pNKUKON?=
+ =?us-ascii?Q?DUbYP7sa4GOmJiZVzS50otAhnT1BCh2QjurYeyBksFcVlI6JwtPoRb8OK6IQ?=
+ =?us-ascii?Q?v6SGi6mUslQXMwpd9bfi+Pp4tqN6FUEOL6092jjkh6Z5I7zVuUgBstyoMwWL?=
+ =?us-ascii?Q?rx+cuyzms+oFsIPb3aX2Stq71DUOYkbr3oylpaGTHI0ALdn+wGkEr2qNlt0N?=
+ =?us-ascii?Q?j7aNmXBkTIbjw6nuf1M1PSuCBX6HivM0esrxI5StU8Xcs1/P5bfVWMfRmcY5?=
+ =?us-ascii?Q?p1UMOFWvz9Do+Mr5SXQXeSM/jagGxV/Wrczbms2lgMdnUOWlw6sY2sorbguq?=
+ =?us-ascii?Q?c7AUQvtJFd4Jnc1xr8odliv/xPl4sl5lgOXopLKl7UA8MKZNZrpOuM/ruQG8?=
+ =?us-ascii?Q?98fW33ONMh0e8Nijc9Qq2zOX7pJskaGHku7tPqpnnuX/CC5UQDrFwo5bAOvO?=
+ =?us-ascii?Q?OukRV9kzkN040PA8AOCg/CPFzMsKlzKLVdwOKVia37rq/pCXdYrQn24j6EAU?=
+ =?us-ascii?Q?+zZEu/W6vppPjhy8M1kDKR9KBY2FoXNEGSPbJ+93hXMPU2S9c0ZQWhxthddJ?=
+ =?us-ascii?Q?KTgp8aLQO5Unl8acdW5c/ZJIbJdeRk1tu1SmX0Rg1zPSsYHgwmMElYh5sxy4?=
+ =?us-ascii?Q?JUAA+WPamMQwO35WZU7n17LDhmtXHNKL61N1wOGIpl+FyO5VG7Hbr0MuSOMf?=
+ =?us-ascii?Q?kv5uH3LKkwdC77wL7/0lZ+iyasx9jLwWYuV/x0Qk9arhJW5oOcShR5N4pa8R?=
+ =?us-ascii?Q?SD6gVoNivUsbYoCozunjc5v3qIwMiThZhFcp6o+wguTLON6LwWdysTQ/jRTq?=
+ =?us-ascii?Q?3LgLCoiLeU9sZf9+K2Eug3X/7aWjmQsBKcPnxg6U8EBsdSCugp6Dx/EWE8rX?=
+ =?us-ascii?Q?IzfzFdq24OLDYWEMSAQkPWUaK4PIghjiRx70gpUq5ABukZLsc2VRbh5Agx/W?=
+ =?us-ascii?Q?qucM25vgzvtuATCdfpdeCZOVj7f+aNV3rvoRRggFyu6vPK19euTpRZWEXXAt?=
+ =?us-ascii?Q?u2XJrvX+6xpcxcevWSSZrHboJyDvCQgctCGH21RIbmBbnS+5TGB3b/OK4qqz?=
+ =?us-ascii?Q?7ArJlk9JFvThezI5AAxyyS6FGNbWOFtGdXmDwDzJ05TtFcLI7vwV0YPKD1A5?=
+ =?us-ascii?Q?FuhsFOHFbkSMHYEW7YGnik7G7INHdTL2vV+U1Ya3DRHy3Nz8ToLX3tTOkK3G?=
+ =?us-ascii?Q?LG3Q9oQmtveMIYjiJaOUISJvkfF8BJqQVUVt6w8LTK3Ob2m8lGzrymuaeKxH?=
+ =?us-ascii?Q?58HrItnKj0u5gnk6E4UhGr5vOFGKBdCGvTBLJTQ0k9RJEcU/+0RGXe6N6Ygv?=
+ =?us-ascii?Q?fhp+rDyJfuB7Sa3DZWg=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240411-igc_led_deadlock-v2-1-b758c0c88b2b@linutronix.de>
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DU0PR04MB9417.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 086f99a8-1c97-4783-ead0-08dc5e1c6e75
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2024 13:52:18.1919
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: mo6X8GgDDTPk8NHiBBrwzuiLJ4qDgqQvda9MKwocvHUDLpIGwXtiBEb1GCAE0NaaTW3FpLm6iePotfcXQPAdug==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB6942
 
-On Mon, Apr 15, 2024 at 12:59:37PM +0200, Kurt Kanzenbach wrote:
-> From: Lukas Wunner <lukas@wunner.de>
-> 
-> The removal of the igc module leads to a deadlock:
-> 
-> |[Mon Apr  8 17:38:55 2024]  __mutex_lock.constprop.0+0x3e5/0x7a0
-> |[Mon Apr  8 17:38:55 2024]  ? preempt_count_add+0x85/0xd0
-> |[Mon Apr  8 17:38:55 2024]  __mutex_lock_slowpath+0x13/0x20
-> |[Mon Apr  8 17:38:55 2024]  mutex_lock+0x3b/0x50
-> |[Mon Apr  8 17:38:55 2024]  rtnl_lock+0x19/0x20
-> |[Mon Apr  8 17:38:55 2024]  unregister_netdevice_notifier+0x2a/0xc0
-> |[Mon Apr  8 17:38:55 2024]  netdev_trig_deactivate+0x25/0x70
-> |[Mon Apr  8 17:38:55 2024]  led_trigger_set+0xe2/0x2d0
-> |[Mon Apr  8 17:38:55 2024]  led_classdev_unregister+0x4f/0x100
-> |[Mon Apr  8 17:38:55 2024]  devm_led_classdev_release+0x15/0x20
-> |[Mon Apr  8 17:38:55 2024]  release_nodes+0x47/0xc0
-> |[Mon Apr  8 17:38:55 2024]  devres_release_all+0x9f/0xe0
-> |[Mon Apr  8 17:38:55 2024]  device_del+0x272/0x3c0
-> |[Mon Apr  8 17:38:55 2024]  netdev_unregister_kobject+0x8c/0xa0
-> |[Mon Apr  8 17:38:55 2024]  unregister_netdevice_many_notify+0x530/0x7c0
-> |[Mon Apr  8 17:38:55 2024]  unregister_netdevice_queue+0xad/0xf0
-> |[Mon Apr  8 17:38:55 2024]  unregister_netdev+0x21/0x30
-> |[Mon Apr  8 17:38:55 2024]  igc_remove+0xfb/0x1f0 [igc]
-> |[Mon Apr  8 17:38:55 2024]  pci_device_remove+0x42/0xb0
-> |[Mon Apr  8 17:38:55 2024]  device_remove+0x43/0x70
-> 
-> unregister_netdev() acquires the RNTL lock and releases the LEDs bound
-> to that netdevice. However, netdev_trig_deactivate() and later
-> unregister_netdevice_notifier() try to acquire the RTNL lock again.
-> 
-> Avoid this situation by not using the device-managed LED class
-> functions.
-> 
-> Link: https://lore.kernel.org/r/CAEhC_B=ksywxCG_+aQqXUrGEgKq+4mqnSV8EBHOKbC3-Obj9+Q@mail.gmail.com/
-> Link: https://lore.kernel.org/r/ZhRD3cOtz5i-61PB@mail-itl/
-> Reported-by: Roman Lozko <lozko.roma@gmail.com>
-> Reported-by: "Marek Marczykowski-Górecki" <marmarek@invisiblethingslab.com>
-> Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
-> Signed-off-by: Lukas Wunner <lukas@wunner.de>
-> [Kurt: Wrote commit message and tested on i225]
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+> Subject: Re: [PATCH] dt-bindings: net: nxp,dwmac-imx: allow nvmem cells
+> property
+>=20
+> On Mon, Apr 15, 2024 at 06:36:21PM +0800, Peng Fan (OSS) wrote:
+> > From: Peng Fan <peng.fan@nxp.com>
+> >
+> > Allow nvmem-cells and nvmem-cell-names to get mac_address from onchip
+> > fuse.
+>=20
+> Is this valid for all 3 devices in this binding?
 
-I am aware that this patch seems to have also been submitted by Lucas
-himself. I'd like to suggest that we focus on review of that submission.
+Yes. It is valid for all the three devices.
 
-https://lore.kernel.org/netdev/2f1be6b1cf2b3346929b0049f2ac7d7d79acb5c9.1713188539.git.lukas@wunner.de/
-
+Thanks,
+Peng.
+>=20
+> >
+> > Signed-off-by: Peng Fan <peng.fan@nxp.com>
+> > ---
+> >  Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> >
+> > diff --git a/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml
+> > b/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml
+> > index 4c01cae7c93a..87bc4416eadf 100644
+> > --- a/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml
+> > +++ b/Documentation/devicetree/bindings/net/nxp,dwmac-imx.yaml
+> > @@ -66,6 +66,10 @@ properties:
+> >        Should be phandle/offset pair. The phandle to the syscon node wh=
+ich
+> >        encompases the GPR register, and the offset of the GPR register.
+> >
+> > +  nvmem-cells: true
+> > +
+> > +  nvmem-cell-names: true
+> > +
+> >    snps,rmii_refclk_ext:
+> >      $ref: /schemas/types.yaml#/definitions/flag
+> >      description:
+> > --
+> > 2.37.1
+> >
 
