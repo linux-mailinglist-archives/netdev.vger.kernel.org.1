@@ -1,47 +1,49 @@
-Return-Path: <netdev+bounces-88190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D96828A63C5
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:32:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12D938A63CD
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:33:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1120E1C21C82
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 06:32:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDB981F21AB5
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 06:33:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C1126CDD0;
-	Tue, 16 Apr 2024 06:32:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDCA96BFC2;
+	Tue, 16 Apr 2024 06:33:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.124.171])
+Received: from bg5.exmail.qq.com (bg5.exmail.qq.com [43.154.197.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262D41E49D
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 06:32:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.124.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC021E49D
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 06:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=43.154.197.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713249136; cv=none; b=Sle4DbfBz+CkM6yUazEKk52zbaVtk9pYGumrlzyJ1IsnsNNrYfVQUth9oCatoguyEu9BVcjh0OiMhbKZIdL4YyHNqY65QthQ6GQYmLethf1KWtGiOiziB/nckYY2tX6/cPWHQrQkO5GfoRuRD+oB37IJtp6YJw2FB/BCG/XD9Sw=
+	t=1713249202; cv=none; b=cUgZuAN4zjHhMSzTTmXSPIINNVD0Fn/9p8ag74hsjjAMCFwEPFO7pe4d50H8hz8YO78dzwblluWCQEKbqyMnSPi6Xr+kXGcCiOWvBvEQKvO50/vJ+VDoUfgxPt69M7t1JE07f5e99RD06YdShqgm/Clwowd4d7d1iuKWUek3EJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713249136; c=relaxed/simple;
-	bh=rKgS9gJSgIQaNW8TlCqdIt7O+gTdHiP4EkRYIzSqI8k=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iJ4t0xi13mcbKo1tKSs2KPfU847iENpEOcYMiXskh602kFKfEu+p7WXISrkZFqdC2OgOdzdGTwf8+941K/ijUxP94jgXUz7vqSDXOfp31Wjp0Kvc+ygXSSkmAgUamfhCra6+pYfdt1WIRHUIBiEkruwewITHeboJLAMStsoErsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=114.132.124.171
+	s=arc-20240116; t=1713249202; c=relaxed/simple;
+	bh=84W4/VSC8EgR7MavgN14T/xjQvFRS15y3wisyIOW2NY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=L6NVEduUkRrT1XLPMEDzzpEvCFCwuUtL2mfVP6kf9AEOscLCEBYlDbsk5vB8STU+tqFULFQhDsZUbzxSLQzIljWj0RO8Af/gK1NrQgyy9Z8yCNxd6gm6ZgTPJjNgk2Yjs26PYP0WN9y762wI6USkoXEoywTuxadMvWHUtEWZOuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=43.154.197.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtp88t1713249004t4u6z1wf
-X-QQ-Originating-IP: KYaA9508BYvgZgDE9yGCKmyLenS81AyzIsYc1iuHk3E=
+X-QQ-mid: bizesmtp88t1713249008t91m9pmw
+X-QQ-Originating-IP: 93RTpw930k7+K8yfwIbpURyp49p/cjo1gWMfMmh1NKs=
 Received: from lap-jiawenwu.trustnetic.com ( [125.119.246.177])
 	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 16 Apr 2024 14:30:01 +0800 (CST)
+	id ; Tue, 16 Apr 2024 14:30:07 +0800 (CST)
 X-QQ-SSF: 01400000000000L0Z000000A0000000
-X-QQ-FEAT: wFWfi5UJT1vgrRCDAOlTygB3L/7Gbz8u1DFF4RLi6axuQovgVW5ZbNKV1VuUh
-	pOSotUExAI1Jt+ij0HImI/HK2EM0rOWhHG4tr6YvgNQfHIcseltsQAvMH9wla8cGqzvyP6x
-	BebqF21wAxACP3+TrZNv5WIu6x3hQY+XYly7BCuANxfKGybWjcOp/2i030qtRjNr5R7uJsq
-	ZPAjf6dqA77K6nIjRHm/yRdbSm3JnxQUYa6dHjwd1G3e8f/Y82od9LH9GVuV8KZTPBDzpkR
-	h3A20eRko577ZwsCCehHbGAcTfqzN4vV0UsdJn95986Klv7roCTe2nEc8giXvMOhnXF4syH
-	byBLch7ECbTb/fI5/Om0X2ZhfIhrbYgVO1nGmim39H+tFIiEAM=
+X-QQ-FEAT: GiL6AMY6vMBVcNHTqizpNXH4mD01zlKK3fAVKAyHhGPOt9WjVe70g8ptoQ2Wb
+	OBUqimIKojlfMCXPTrWS1NZnvNILPEP5fVAB2v9O1pv9KCXU1FhL2RzJnyN3GkIgSBJBxgu
+	FfMT41rJPcJ2nx26zCb1eLpBl3M3hxpSuqbNSozt0JTFFREZO6MPUYy/nohaglJTY/mY6wg
+	OMHeboUKXQAkl2BtiC5mhS/A/q4vQ3XSP6HADcdS/By0Y12kTu51qY4bwtKfyYCV2GtV/tH
+	glpEpfuTwxEmZz8jjWcStv6LCkJGuLiUP3YDqJpFy0/30b1KxvzcA1jaJTuuach1Cg5PqVw
+	KRbHqrTaVbNjWtFUM3AlSEu8+wXsYIh2Kk2UmlXJyx96a5Kh/00BzQECWsdojixqTHyX7dH
+	moPogAqp6e4=
 X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 12021446528250099071
+X-BIZMAIL-ID: 13564188104620174498
 From: Jiawen Wu <jiawenwu@trustnetic.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -53,10 +55,12 @@ To: davem@davemloft.net,
 Cc: mengyuanlou@net-swift.com,
 	duanqiangwen@net-swift.com,
 	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net 0/5] Wangxun fixes
-Date: Tue, 16 Apr 2024 14:29:47 +0800
-Message-Id: <20240416062952.14196-1-jiawenwu@trustnetic.com>
+Subject: [PATCH net 1/5] net: wangxun: fix the incorrect display of queue number in statistics
+Date: Tue, 16 Apr 2024 14:29:48 +0800
+Message-Id: <20240416062952.14196-2-jiawenwu@trustnetic.com>
 X-Mailer: git-send-email 2.21.0.windows.1
+In-Reply-To: <20240416062952.14196-1-jiawenwu@trustnetic.com>
+References: <20240416062952.14196-1-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,26 +71,79 @@ Content-Transfer-Encoding: 8bit
 X-QQ-SENDSIZE: 520
 Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
 
-Fixed some bugs when using ethtool to operate network devices.
+When using ethtool -S to print hardware statistics, the number of
+Rx/Tx queues printed is greater than the number of queues actually
+used.
 
-Jiawen Wu (5):
-  net: wangxun: fix the incorrect display of queue number in statistics
-  net: wangxun: fix error statistics when the device is reset
-  net: wangxun: fix to change Rx features
-  net: wangxun: change NETIF_F_HW_VLAN_STAG_* to fixed features
-  net: txgbe: fix to control VLAN strip
+Fixes: 46b92e10d631 ("net: libwx: support hardware statistics")
+Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+---
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
 
- .../net/ethernet/wangxun/libwx/wx_ethtool.c   | 19 ++++--
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  3 +
- drivers/net/ethernet/wangxun/libwx/wx_lib.c   | 26 +++++++-
- drivers/net/ethernet/wangxun/libwx/wx_lib.h   |  2 +
- drivers/net/ethernet/wangxun/libwx/wx_type.h  |  6 ++
- .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  | 24 +++++--
- drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |  6 +-
- .../ethernet/wangxun/txgbe/txgbe_ethtool.c    | 24 +++++--
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   | 63 ++++++++++++++++++-
- 9 files changed, 154 insertions(+), 19 deletions(-)
-
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+index cc3bec42ed8e..3847c909ba1a 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_ethtool.c
+@@ -59,9 +59,17 @@ static const struct wx_stats wx_gstrings_stats[] = {
+ 
+ int wx_get_sset_count(struct net_device *netdev, int sset)
+ {
++	struct wx *wx = netdev_priv(netdev);
++
+ 	switch (sset) {
+ 	case ETH_SS_STATS:
+-		return WX_STATS_LEN;
++		if (wx->num_tx_queues <= WX_NUM_RX_QUEUES) {
++			return WX_STATS_LEN -
++			       (WX_NUM_RX_QUEUES - wx->num_tx_queues) *
++			       (sizeof(struct wx_queue_stats) / sizeof(u64)) * 2;
++		} else {
++			return WX_STATS_LEN;
++		}
+ 	default:
+ 		return -EOPNOTSUPP;
+ 	}
+@@ -70,6 +78,7 @@ EXPORT_SYMBOL(wx_get_sset_count);
+ 
+ void wx_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
+ {
++	struct wx *wx = netdev_priv(netdev);
+ 	u8 *p = data;
+ 	int i;
+ 
+@@ -77,11 +86,11 @@ void wx_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
+ 	case ETH_SS_STATS:
+ 		for (i = 0; i < WX_GLOBAL_STATS_LEN; i++)
+ 			ethtool_puts(&p, wx_gstrings_stats[i].stat_string);
+-		for (i = 0; i < netdev->num_tx_queues; i++) {
++		for (i = 0; i < wx->num_tx_queues; i++) {
+ 			ethtool_sprintf(&p, "tx_queue_%u_packets", i);
+ 			ethtool_sprintf(&p, "tx_queue_%u_bytes", i);
+ 		}
+-		for (i = 0; i < WX_NUM_RX_QUEUES; i++) {
++		for (i = 0; i < wx->num_rx_queues; i++) {
+ 			ethtool_sprintf(&p, "rx_queue_%u_packets", i);
+ 			ethtool_sprintf(&p, "rx_queue_%u_bytes", i);
+ 		}
+@@ -107,7 +116,7 @@ void wx_get_ethtool_stats(struct net_device *netdev,
+ 			   sizeof(u64)) ? *(u64 *)p : *(u32 *)p;
+ 	}
+ 
+-	for (j = 0; j < netdev->num_tx_queues; j++) {
++	for (j = 0; j < wx->num_tx_queues; j++) {
+ 		ring = wx->tx_ring[j];
+ 		if (!ring) {
+ 			data[i++] = 0;
+@@ -122,7 +131,7 @@ void wx_get_ethtool_stats(struct net_device *netdev,
+ 		} while (u64_stats_fetch_retry(&ring->syncp, start));
+ 		i += 2;
+ 	}
+-	for (j = 0; j < WX_NUM_RX_QUEUES; j++) {
++	for (j = 0; j < wx->num_rx_queues; j++) {
+ 		ring = wx->rx_ring[j];
+ 		if (!ring) {
+ 			data[i++] = 0;
 -- 
 2.27.0
 
