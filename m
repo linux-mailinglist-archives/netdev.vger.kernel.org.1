@@ -1,105 +1,134 @@
-Return-Path: <netdev+bounces-88334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FA468A6BE8
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 15:11:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ECC68A6C10
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 15:21:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 818EC1C20ED8
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 13:11:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B5A31C20AB4
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 13:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE05C12C467;
-	Tue, 16 Apr 2024 13:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F7412C46F;
+	Tue, 16 Apr 2024 13:21:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NMMiLWnA"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ADEA12AAE7;
-	Tue, 16 Apr 2024 13:11:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE0312C49B;
+	Tue, 16 Apr 2024 13:21:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713273092; cv=none; b=KgSSE0RWp5O+ByoMQKUPl23pHEHF+0paMmhW6S+PrUBav5b0R7whyBqo/wq/BGZOK0bynGlXQT50HxWq+ngTkMWSOhK+dc8XDRohTtt3zIEx+ws4mFg3YFcWHDHzmYzXjuP8Jc1kGjUDcEtBJCDrMbX5+5WfNw5i46IU9UdLEkE=
+	t=1713273697; cv=none; b=S9Am1md4xe0ApmEQGgIsBwdy3gCO+dO/NI5RpE1eptsFctNm/4ZR2gZ9ZBD3RFb5zhnfp0jJ9reDsW3nVV31KSjxslgJvfB7xw1XISKimMW0Dw5HgC8ueK/QIxN/h3sfyP1pqMGU89AkQujMMoZ8Jo3wDoXeFjSP/Kw5D+EWeNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713273092; c=relaxed/simple;
-	bh=LPP/2ZESy+w5a7RXrfWqEvuaDZMNiJboMaxL8S7iUR4=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=URfcDZXV5HL3UyYfJBPzpmNG5C+orhEUpHT0slnydTQ3xICcwUne8R1KH0jq2ytqBEh71jwXvfOvO9mOMnw8IQX7R6Z2a9whzLc2ZygrPErO/6U1Q1SQYQpBKv8D+e3dX7kV92psse9MYrKRKnRF/ALjX7PiawZzSnfK6Cc1vMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.112])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4VJktG0Bmyz17N1f;
-	Tue, 16 Apr 2024 21:10:30 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 2940C140120;
-	Tue, 16 Apr 2024 21:11:28 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Tue, 16 Apr
- 2024 21:11:27 +0800
-Subject: Re: [PATCH net-next v2 14/15] mm: page_frag: update documentation for
- page_frag
-To: Bagas Sanjaya <bagasdotme@gmail.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexander Duyck
-	<alexander.duyck@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Andrew Morton
-	<akpm@linux-foundation.org>, <linux-mm@kvack.org>,
-	<linux-doc@vger.kernel.org>
-References: <20240415131941.51153-1-linyunsheng@huawei.com>
- <20240415131941.51153-15-linyunsheng@huawei.com> <Zh4XD6jP4dLoZN4Q@archie.me>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <483f22fe-1830-8b5c-c32d-9422e356f296@huawei.com>
-Date: Tue, 16 Apr 2024 21:11:27 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	s=arc-20240116; t=1713273697; c=relaxed/simple;
+	bh=rECNAQA2b5JeKpe3ThQ0Ts912GhBjOsctzDrRD27EuI=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=hVAvPWjgWJMgZmT5yx0z1dYp81QfC7kKtc1P2K8f5dRyji/6eVtifRxhrPY5poEJ2HyIdV/dwauDQ2nBriO8cKbZFRdMKjdKdkriOQsXfSLVOxCzSH6/mbwvyF5rwE2lnUwhfOAreR8+NtpZaRkZFVW8ez/r/nPeEEVUNTJ0YVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NMMiLWnA; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-58962bf3f89so950298a12.0;
+        Tue, 16 Apr 2024 06:21:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713273694; x=1713878494; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=549tbuOuKpI8ovt9UKf5mDbOdIqq2Ll6o+uA6hkmv4s=;
+        b=NMMiLWnAZfvws60pjBkhxpTG3mGcc5bXWQ0j5YYV9mwaax4un/unRPGvrU0QZYlHZr
+         4Dxr6RNO34UitP5/RRwOaAS+Z7cl45ilQwGOniORw/hS+ibK+oSzGQvkr8i4KvvHEXhJ
+         NapP2iy4Hst2OCLJ9HtPkJtCUftQathq5q42QveDyXd6uBJ/RuEghhi40KpjP0CgGH64
+         ZSukGFKw3FkGmFpIhbUiI4yCCMVO5gf7f0wwgQe4vMznTbrSmBIQxFRa/59Cmjc+szrV
+         608n0niPsHWYRa6uyzqnb0cyvSZvWi+HZ/i7fbpjWdEXPEezzYtuQvMkN4/T+vnz+9L6
+         wHgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713273694; x=1713878494;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=549tbuOuKpI8ovt9UKf5mDbOdIqq2Ll6o+uA6hkmv4s=;
+        b=ZymI4xVKb89Bf3a1U8EqGAIeQo8cMG8SRIrsgqsESOdgs86uKQM5J6mv8djC5upXtt
+         Nc2bmDsPmRYOoRpVqw3crucKoAIopnMkrSg1dw4MR97wx4kxOn71epIUg08WfOPExNxD
+         YNxXv7WvXfJedhkvFOIab9bJvc+uyflgXWqlHUpBWnbHj/8GIkWAYPTuKdEquqDzBSKS
+         J/LDd1Bx30lpgpXl7g3uJxeReel/aCNt1rmnQSh3JLDE398UH8PABtMNsw0nzVsFXaiL
+         CH8YXy7MVXRsBJ01wtEjH/IPqa65VM9XSfNBCcoZiN68BNCYtwWoeitfaN31TddH2JiT
+         6Z0w==
+X-Forwarded-Encrypted: i=1; AJvYcCUI1OF7X16PeCGz715eLnTmBjH0tKNGOHoA15DUxAEJ13r0LPWc+r2j95Tw6ossUVaiHJfCjxSCcRVycoBJUzk6Z1FjY22ixCh6WXtcP0c79OjIowbOsv1LjLd7LdGHepGvBJhHGJw=
+X-Gm-Message-State: AOJu0YwCRVYU/loSzwtTjuJSTdhX1XEuFFvCL7u6Oaj/yMFBETu4lVKs
+	FdiwKhGWn0EU6jyTNkQzqURxfpq21etpIr9qw4pY3IqgJy1yVTKI
+X-Google-Smtp-Source: AGHT+IE0ul1+uFXU8qmq1kSK8DZLpSv/2o/mhnlYSWClPGMyGx3wejSwcw6EqGxsbBrLMX8AmRuKtw==
+X-Received: by 2002:a05:6a20:c41b:b0:1aa:584f:3b6b with SMTP id en27-20020a056a20c41b00b001aa584f3b6bmr832897pzb.2.1713273693676;
+        Tue, 16 Apr 2024 06:21:33 -0700 (PDT)
+Received: from localhost (p5315239-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.87.239])
+        by smtp.gmail.com with ESMTPSA id z2-20020a17090a6d0200b002a5290ad3d4sm9762831pjj.3.2024.04.16.06.21.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Apr 2024 06:21:33 -0700 (PDT)
+Date: Tue, 16 Apr 2024 22:21:19 +0900 (JST)
+Message-Id: <20240416.222119.1989306221012409360.fujita.tomonori@gmail.com>
+To: andrew@lunn.ch
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, tmgross@umich.edu
+Subject: Re: [PATCH net-next v1 2/4] rust: net::phy support C45 helpers
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <26f64e48-4fd3-4e0f-b7c5-e77abeee391a@lunn.ch>
+References: <e8a440c7-d0a6-4a5e-97ff-a8bcde662583@lunn.ch>
+	<20240416.204030.1728964191738742483.fujita.tomonori@gmail.com>
+	<26f64e48-4fd3-4e0f-b7c5-e77abeee391a@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <Zh4XD6jP4dLoZN4Q@archie.me>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500005.china.huawei.com (7.185.36.74)
 
-On 2024/4/16 14:13, Bagas Sanjaya wrote:
-> On Mon, Apr 15, 2024 at 09:19:39PM +0800, Yunsheng Lin wrote:
->> +API interface
->> +=============
->> +As the design and implementation of page_frag API, the allocation side does not
->                                         "... implies, the allocation side ..."
->> +allow concurrent calling, it is assumed that the caller must ensure there is not
->                       "... . Instead, it is assumed that ...:
->> +concurrent alloc calling to the same page_frag_cache instance by using it's own
->                                                             "... by using its own ..."
->> +lock or rely on some lockless guarantee like NAPI softirq.
->> +
->> +Depending on different use cases, callers expecting to deal with va, page or
->> +both va and page for them may call page_frag_alloc_va*, page_frag_alloc_pg*,
->> +or page_frag_alloc* API accordingly.
->> +
->> +There is also a use case that need minimum memory in order for forward
->> +progressing, but can do better if there is more memory available. Introduce
-> Did you mean "... but more performant if more memory is available"?
->> +page_frag_alloc_prepare() and page_frag_alloc_commit() related API, the caller
-> s/Introduce/Using/
->> +requests the minimum memory it need and the prepare API will return the maximum
->> +size of the fragment returned, caller need to report back to the page_frag core
->                                   "The caller needs to either call the commit API ..."
->> +how much memory it actually use by calling commit API, or not calling the commit
-> "... to report how much memory it actually uses ..."
->> +API if deciding to not use any memory.
-> "... or not do so if deciding to not use any memory."
+Hi,
 
-Thanks.
-Your wording seems better than mine, will update it accordingly.
+On Tue, 16 Apr 2024 14:38:11 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
+>> If I correctly understand the original driver code, C45 bus protocol
+>> is used. Adding functions for C45 bus protocol read/write would be
+>> enough for this driver, I guess.
 > 
-> Thanks.
+> Now i've read more of the patches, i can see that the MDIO bus master
+> is C45 only. At least, that is all that is implemented in the
+> driver. So for this combination of MAC and PHY, forcing C45 register
+> access using C45 bus protocol will work.
+
+Thanks a lot!
+
+> However, can you combine this PHY with some other MDIO bus master,
+> which does not support C45? Then C45 over C22 would need to be used?
+> Looking at the data sheet i found online, there is no suggestion it
+> does support C22 bus protocol. All the diagrams/tables only show C45
+> bus protocol.
+
+qt2025_ds3014.pdf?
+
+> So this PHY is a special case. So you can use wrapper methods which
+> force C45 bus protocol, and ignore phylib support for performing C45
+> over C22 when needed. However, while doing this:
 > 
+> 1: Clearly document that these helpers are not generic, they force C45
+>    register access using C45 bus protocol, and should only by used PHY
+>    drivers which know the PHY device does not support C45 over C22
+> 
+> 2: Think about naming. At some point we are going to add the generic
+>    helpers for accessing C45 registers which leave the core to decide
+>    if to perform a C45 bus protocol access or C45 over C22. Those
+>    generic helpers need to have the natural name for accessing a C45
+>    register since 99% of drivers will be using them. The helpers you
+>    add now need to use a less common name.
+
+Sounds like we should save the names of c45_read and c45_write.
+
+read_with_c45_bus_protocol and write_with_c45_bus_protocol?
+
+They call mdiobus_c45_*, right?
 
