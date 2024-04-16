@@ -1,134 +1,117 @@
-Return-Path: <netdev+bounces-88339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AB208A6C22
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 15:23:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F0428A6C36
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 15:25:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E753BB21710
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 13:23:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F5ED1F21402
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 13:25:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2DD12C550;
-	Tue, 16 Apr 2024 13:22:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gptTwyKa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D90E212C473;
+	Tue, 16 Apr 2024 13:25:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A577812AACE;
-	Tue, 16 Apr 2024 13:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7855F8594D
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 13:25:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713273768; cv=none; b=G+70bwdEw4gaC9PYZD4IGjYYij8A5geZB0X/zL8FHcPBPe03TaunOvuwZs6or1BSK2MxEvLrO2P1RAR+iKWcgwznEgBXrh7gHTFdUSEuptjRCX03PwBPS/LQ8HU8pwrVILs/vcrb6rh1fplb/qD0R/F+xKR8B6T0zyJRnNmOTbs=
+	t=1713273938; cv=none; b=UovNR31maCYt6P7Le1ISXKSeAnmlOkX8qZQPsjqmRMFCabnqoj1u0dCEUOdZK/K74uQzmPhzIg8xyR08Uzu1TQXf8zM9lWHQxuF4Gwp9bTiEeKnJ0Phy5AAnebFcoDxIqtXDItG5PCSJ0MgVpswz54yKilJ1dAPvEbWjQL6brEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713273768; c=relaxed/simple;
-	bh=1BjZEULlCLvJqv4DjncS8MZEajXmIYaXA1X0dAnpp98=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EdiyNKT6uNYJ5vzyQNSp+znKAHJDEaYELi+785XLY367fMXTQn3l2FrQ6d6NDfV/83+QpMpYPEtKfPNs7w7tec50vA7MUj8IU+51pOZmgg1/yNkyFc0hyVatGrJ8j5MTzsawfa6OFTuBtfTI38WMX+uxicv941Tfb84CnFSIYXY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gptTwyKa; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-5dcc4076c13so2909144a12.0;
-        Tue, 16 Apr 2024 06:22:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713273767; x=1713878567; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=NUyFM9i0rtryeQoNW8AUTADCgYG36OPoQZzM4bvcyrg=;
-        b=gptTwyKaPIGx7CbGGFezkEYsD86lxBYlmJnbbfu8ili3c+37vBkjBgOoPQhKFdJKui
-         5QBEg0bnUccKdgICEERjj3Y/jOXLL1aU9fw3LrJIdNZglaneYK8XG8P8cu/Ld27lBmr5
-         uK0xujJhza5a6LX3RagqqfgrZq4Deovj+IqxXoVLA5wwphP7oAhoaQI6BqkzdNT6L6xf
-         hWJmaMJWz0VeFZACYjb7x6QFcxo5syVRIJur/Kd+YiH2w2otxtrVSTXRC6aMvwKu4GAf
-         Ejwq1EzxwiMOpx1yzdiREjtyl9SwrlHSGEFdXoLNAiYe9bIPjdIEMk1FbAStxs1J/Dcz
-         vHMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713273767; x=1713878567;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NUyFM9i0rtryeQoNW8AUTADCgYG36OPoQZzM4bvcyrg=;
-        b=Wpl/7g5QSErpX9GdHB6A++ODVFvDOFKEtQhEfhDOG0NEGxuSdv9SoiwdbLgVK9FzOX
-         e+m/uL3jo8SQJ/zlGTC0+2Ue2bPh4MWB7czn2WyrVKZdm2gBaSNcbo1BgfOf+M1jitzC
-         QbIqffKCjlo96a4TCM9XWC4YE17532tEdihCpIVDJhuWg8auNAtR5YPMMpkgXoCs9GTA
-         WW4HP4x70OdtUTieLRZOQJDc29ioWJr929vAi1ZsfxjFyLtZNPqi7r7oVnVhpuqX7HCb
-         U8B3/YKVT+qFFQTNWhixDmplZpB/IXUsrq0xI/iFwn47uB3NnxodFwWop3eP/pPXX8D1
-         NT1w==
-X-Forwarded-Encrypted: i=1; AJvYcCWfQ4EodvKQXhzeAY9m3r+BgErU9d8NAxygoGuWMsuxwlkLUGUYm5d581SJsn5t2713dUB/mjauj407r644ew13Ct2IZogdxbwNH/gP49eJefbQ//maF/84DqfB8CqAAg+Sr75wdXS/mLxOzM2cwAVMjhbMsCk0aYvftjBTyWZ8smEc4oOUqC72O6E7AFNKaH/N+oP0eDcW2GkXehFkQCvc
-X-Gm-Message-State: AOJu0YwqtAeGxrmRscc2UB4w/Z6rXSxG9o6/DArROqdOto1HqVPSUq2Z
-	6fhOfvwfe5WMOcgEWAVcLyvHeFXh4AFyT1JdMn4fmgTR/A7nfnkCqz1z7qVh/yCW2QiW7z+6/Ms
-	RdRaubMPIL9mkyOUl/xpsM5zKKYk=
-X-Google-Smtp-Source: AGHT+IFP6210waMqO1NN+/uEDyO7Znkn9Ms/B1bjT8WrCAkXIpVxBUQKxtXXNBOYwcbWaGoZpe/UQlzDo69EIq+/22M=
-X-Received: by 2002:a17:90a:ad7:b0:2a2:dcfe:bd69 with SMTP id
- r23-20020a17090a0ad700b002a2dcfebd69mr3827029pje.13.1713273766756; Tue, 16
- Apr 2024 06:22:46 -0700 (PDT)
+	s=arc-20240116; t=1713273938; c=relaxed/simple;
+	bh=7nidbYpb0tGozLwTJYYC4iIQm0/4yteJ/UjiXKd/Ulg=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=eSqb/kDjhUVQ9z81kvsmhtS+RgwIIg0eU1njEzx9XCkNUrrd27vN1zmvXsl05rd3ZY3b3+qjJLbDN+xymPVcZHsKxJpjq65Rt/58vTKcemgZ15zy+IIx689pKqGIDRE0UTGEjL0Byr7t0eb2uuCY7UZ4YIqOIsU32zdqiSMvt4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4VJl8375kXz1RD9H;
+	Tue, 16 Apr 2024 21:22:27 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9E91F140120;
+	Tue, 16 Apr 2024 21:25:25 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Tue, 16 Apr
+ 2024 21:25:25 +0800
+Subject: Re: [net-next PATCH 13/15] eth: fbnic: add basic Rx handling
+To: Jakub Kicinski <kuba@kernel.org>, Alexander Duyck
+	<alexander.duyck@gmail.com>
+CC: <netdev@vger.kernel.org>, Alexander Duyck <alexanderduyck@fb.com>,
+	<davem@davemloft.net>, <pabeni@redhat.com>
+References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
+ <171217496013.1598374.10126180029382922588.stgit@ahduyck-xeon-server.home.arpa>
+ <41a39896-480b-f08d-ba67-17e129e39c0f@huawei.com>
+ <CAKgT0Uf6MdYX_1OuAFAXadh86zDX_w1a_cwpoPGMxpmC4hGyEA@mail.gmail.com>
+ <53b80db6-f2bc-d824-ea42-4b2ac64625f2@huawei.com>
+ <CAKgT0UeQS5q=Y2j3mmu9AhWyUMbey-iFL+sKES1UrBtoAXMdzw@mail.gmail.com>
+ <0e5e3196-ca2f-b905-a6ba-7721e8586ed7@huawei.com>
+ <CAKgT0UeRWsJ+NiniSKa7Z3Law=QrYZp3giLAigJf7EvuAbjkRA@mail.gmail.com>
+ <bf070035-ba9c-d028-1b11-72af8651f979@huawei.com>
+ <CAKgT0UccovDVS8-TPXxgGbrTAqpeVHRQuCwf7f2qkfcPaPOA-A@mail.gmail.com>
+ <20240415101101.3dd207c4@kernel.org>
+ <CAKgT0UcGN3-6R4pt8BQv2hD04oYk48GfFs1O_UGChvrrFT5eCw@mail.gmail.com>
+ <20240415111918.340ebb98@kernel.org>
+ <CAKgT0Ud366SsaLftQ6Gd4hg+MW9VixOhG9nA9pa4VKh0maozBg@mail.gmail.com>
+ <20240415150136.337ada44@kernel.org>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <b725331c-ae88-b9dd-de12-e8e9b9fc020b@huawei.com>
+Date: Tue, 16 Apr 2024 21:25:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240412162510.29483-1-robimarko@gmail.com> <20240416132124.GA2143558-robh@kernel.org>
-In-Reply-To: <20240416132124.GA2143558-robh@kernel.org>
-From: Robert Marko <robimarko@gmail.com>
-Date: Tue, 16 Apr 2024 15:22:34 +0200
-Message-ID: <CAOX2RU5tWt-dEA4it1G+LeNawwPqkwdG=vBBgnmdD6CNc4iywA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] dt-bindings: net: wireless: ath11k: add
- ieee80211-freq-limit property
-To: Rob Herring <robh@kernel.org>
-Cc: kvalo@kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, krzysztof.kozlowski+dt@linaro.org, 
-	conor+dt@kernel.org, jjohnson@kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	ath11k@lists.infradead.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20240415150136.337ada44@kernel.org>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-On Tue, 16 Apr 2024 at 15:21, Rob Herring <robh@kernel.org> wrote:
->
-> On Fri, Apr 12, 2024 at 06:24:08PM +0200, Robert Marko wrote:
-> > This is an existing optional property that ieee80211.yaml/cfg80211
-> > provides. It's useful to further restrict supported frequencies
-> > for a specified device through device-tree.
-> >
-> > Signed-off-by: Robert Marko <robimarko@gmail.com>
-> > ---
-> >  .../devicetree/bindings/net/wireless/qcom,ath11k.yaml          | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml
-> > index 672282cdfc2f..907bbb646614 100644
-> > --- a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml
-> > +++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml
-> > @@ -55,6 +55,8 @@ properties:
-> >        phandle to a node describing reserved memory (System RAM memory)
-> >        used by ath11k firmware (see bindings/reserved-memory/reserved-memory.txt)
-> >
-> > +  ieee80211-freq-limit: true
-> > +
->
-> Drop this and change additionalProperties to unevaluatedProperties.
+On 2024/4/16 6:01, Jakub Kicinski wrote:
+> On Mon, 15 Apr 2024 11:55:37 -0700 Alexander Duyck wrote:
+>> It would take a few more changes to make it all work. Basically we
+>> would need to map the page into every descriptor entry since the worst
+>> case scenario would be that somehow we end up with things getting so
+>> tight that the page is only partially mapped and we are working
+>> through it as a subset of 4K slices with some at the beginning being
+>> unmapped from the descriptor ring while some are still waiting to be
+>> assigned to a descriptor and used. What I would probably have to look
+>> at doing is adding some sort of cache on the ring to hold onto it
+>> while we dole it out 4K at a time to the descriptors. Either that or
+>> enforce a hard 16 descriptor limit where we have to assign a full page
+>> with every allocation meaning we are at a higher risk for starving the
+>> device for memory.
+> 
+> Hm, that would be more work, indeed, but potentially beneficial. I was
+> thinking of separating the page allocation and draining logic a bit
+> from the fragment handling logic.
+> 
+> #define RXPAGE_IDX(idx)		((idx) >> PAGE_SHIFT - 12)
+> 
+> in fbnic_clean_bdq():
+> 
+> 	while (RXPAGE_IDX(head) != RXPAGE_IDX(hw_head))
+> 
+> refer to rx_buf as:
+> 
+> 	struct fbnic_rx_buf *rx_buf = &ring->rx_buf[idx >> LOSE_BITS];
+> 
+> Refill always works in batches of multiple of PAGE_SIZE / 4k.
 
-Hi Rob,
-This patch series has been dropped as Christian already proposed the
-same before and it was reviewed.
+Are we expecting drivers wanting best possible performance doing the
+above duplicated trick?
 
-Regards,
-Robert
->
-> >    iommus:
-> >      minItems: 1
-> >      maxItems: 2
-> > @@ -88,6 +90,7 @@ required:
-> >  additionalProperties: false
-> >
-> >  allOf:
-> > +  - $ref: ieee80211.yaml#
-> >    - if:
-> >        properties:
-> >          compatible:
-> > --
-> > 2.44.0
-> >
+"grep -rn '_reuse_' drivers/net/ethernet/" seems to suggest that we
+already have similar trick to do the page spliting in a lot of drivers,
+I would rather we do not duplicate the above trick again.
 
