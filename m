@@ -1,248 +1,167 @@
-Return-Path: <netdev+bounces-88419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A10BC8A7209
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 19:16:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 123888A721D
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 19:19:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE777B21DE1
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 17:16:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F80DB227B6
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 17:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D879131750;
-	Tue, 16 Apr 2024 17:16:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CD8A132801;
+	Tue, 16 Apr 2024 17:19:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AZWeydN0"
+	dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="tUGGNUz6";
+	dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b="8Re553De"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [81.169.146.167])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAE9010A22;
-	Tue, 16 Apr 2024 17:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713287778; cv=none; b=YCDjJViQYHSYRtDjUe3Iy+U3kG5n6sfddAPgVTrnehSnHBDPE4wYaaoicPA5ITVZTOTYkStJRjiMPdJy435O3mAry3rxq5Ycyd/AhOj8iS4z6of1+za90+iWvSa9rxd0qdV85aYRysW64RErKPspx1hNcvLmMvDMBTCYmo8rf8s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713287778; c=relaxed/simple;
-	bh=n8ReTsBrzbzNDM1bJ3Y4vBVNowqFrcc47uei46T090c=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Nm18AvkOnv5IyByrbhcfn6T+R4MKm15trfJkJjb85eVjgGsvpqAvqkCCe2ZOAXcyCEmw4SmRraBRur1L9D4X/vtreSPuFngTdlsETvPazNYCQBZLRSRUmbGBxTGokoT99WjAQKRwRv356ByISZaaY1RSXiH4a2o9mCgvqkKtPS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AZWeydN0; arc=none smtp.client-ip=209.85.219.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-69b628c4893so30152086d6.0;
-        Tue, 16 Apr 2024 10:16:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713287775; x=1713892575; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Co8MQgeNISibKFBhSCSTMbwBrtJNLOcf4lbHRGmAXfM=;
-        b=AZWeydN0kLQVaD2US1MQEzvnObBkRNcyQa61KPG59EPd7YH6Pw4pBT8e2IhUCHL+Nt
-         FXKIZyS6zuPoY+KijN6x2IUSE2g7lHGob9t/MR6ReTUMmoJucpCK8gDuCLP8DjWeiQpg
-         FzmvV7MbPhDj0s/BgA710ieMyqYN0lpoFJ6BHi/z8st+nKNF5H5q9iWZiqCo39t/3vCB
-         9F+g7iP0RO+z9BGLJnHjm5lxLxfGJR1e0LsSoF9yWo95W0wKERrckeLJ9ZmKlCWcQzN5
-         F7JltRmoaiiy1DGByyfdhG3jSrhX4k59xIN2a8noIRfoy+wxamVCfjFXc9vVw51syZqf
-         Pl2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713287775; x=1713892575;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Co8MQgeNISibKFBhSCSTMbwBrtJNLOcf4lbHRGmAXfM=;
-        b=q8DCEaclGrRPxLCK2SwiS94D42Hc2L4CMdv3zrmoaIweOaShazayZyuLhZVta7d/BI
-         p/z4/4OXgw6cnY3Ylnv/vGlRADHVIzVRbaYXQTX776uYssB58AOiSMwv++jl2TrYiafh
-         ZqkJwwPXyQrTtkcloMKBhvzQ5FpQ1G9X8HyuJVOKJDom/Vdqw/Lzc1IZVOfcUzyXJJ1e
-         yXc9uPo4QY4vPhhxpys60+6EolKMIwIRg6LA61USwrLWEesx7jgmhRPdfRa+SMi3QDMA
-         Qcf7BcZjZhwUT3ccUAsJyev9vSXKROS/jMRTDb2iIMZ9cALAgGbrCEXL4iF6tiMMFRkO
-         lOOw==
-X-Forwarded-Encrypted: i=1; AJvYcCW2Rc3RhYK1TTDQf1JJK6Cm3FjF/DtqW8z4s5V5whY6wO1EZSNyszaIIzSmXcnEz2+QW9glM8wSYfkGwlkJLPnAPHF5c4rY5GYinUfXnIw/jQLvOf55Cn4Qhw7hw2p5px6PxCNdMKHJHMd9SM4cWS5zm2u/tB/jitOx
-X-Gm-Message-State: AOJu0Yy/8SusXuHfwtu789g52nYii4b4FEt/xSV0Ko8aJbs04HvQnY9B
-	16piSKh6vSSFmiTduYbB3awsGryzqY+JmYWSwhpeMgowRuNIdSVvgN/LTQ==
-X-Google-Smtp-Source: AGHT+IHdhwAdbRDc7XWvejV6sTR5Qi5OKow9KLGF18VdknwADqTT0s97nwXOELds6Bz8pfx6VKAxbw==
-X-Received: by 2002:ad4:57d3:0:b0:6a0:439a:7f46 with SMTP id y19-20020ad457d3000000b006a0439a7f46mr15965qvx.27.1713287775530;
-        Tue, 16 Apr 2024 10:16:15 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id w25-20020a0ca819000000b0069945cef316sm7531060qva.144.2024.04.16.10.16.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 10:16:15 -0700 (PDT)
-Date: Tue, 16 Apr 2024 13:16:14 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: =?UTF-8?B?TWFjaWVqIMW7ZW5jenlrb3dza2k=?= <maze@google.com>, 
- =?UTF-8?B?TGVuYSBXYW5nICjnjovlqJwp?= <Lena.Wang@mediatek.com>
-Cc: "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>, 
- "kuba@kernel.org" <kuba@kernel.org>, 
- =?UTF-8?B?U2hpbWluZyBDaGVuZyAo5oiQ6K+X5piOKQ==?= <Shiming.Cheng@mediatek.com>, 
- "pabeni@redhat.com" <pabeni@redhat.com>, 
- "edumazet@google.com" <edumazet@google.com>, 
- "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, 
- "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>, 
- "davem@davemloft.net" <davem@davemloft.net>, 
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
- bpf <bpf@vger.kernel.org>
-Message-ID: <661eb25eeb09e_6672129490@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CANP3RGdkxT4TjeSvv1ftXOdFQd5Z4qLK1DbzwATq_t_Dk+V8ig@mail.gmail.com>
-References: <20240415150103.23316-1-shiming.cheng@mediatek.com>
- <661d93b4e3ec3_3010129482@willemb.c.googlers.com.notmuch>
- <65e3e88a53d466cf5bad04e5c7bc3f1648b82fd7.camel@mediatek.com>
- <CANP3RGdkxT4TjeSvv1ftXOdFQd5Z4qLK1DbzwATq_t_Dk+V8ig@mail.gmail.com>
-Subject: Re: [PATCH net] udp: fix segmentation crash for GRO packet without
- fraglist
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34938132493;
+	Tue, 16 Apr 2024 17:19:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=81.169.146.167
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713287975; cv=pass; b=IE7lbJZ2Whco3BD/o9BOKQq83b2bJSK834XvQEy7BcKyRc2I7ppFQWGBW66AzSV6AVZ0YUc5BIj4VBMTGwHgv0rUkBcsdihUV/YXvwRcpI/gL7iwVOUVCVfMFJTwfNOn6h4FehaczjanBaukBWD45tbQAgXDWcwv5aHaAQehhZs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713287975; c=relaxed/simple;
+	bh=Azr7ovdYaxV3PlnjjsIAyizZx7zMsRJjz5oo0vl5kMo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y9UTsn3PWuYzFd7UIWcZPj1au/HW2P7NOEEbhy8+g7GuhE8G+b0NpoTf2R13atz36ndQgUyn5jEt52OGeVwi1GQV3tM/Cg4Ct0m+QF288T9k1+BkLnU6PX9yIdsFrOuumBftEw+xAAiUeyVrbYnsp+oX74AlnSvPeO5A3VYaArI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net; spf=pass smtp.mailfrom=hartkopp.net; dkim=pass (2048-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=tUGGNUz6; dkim=permerror (0-bit key) header.d=hartkopp.net header.i=@hartkopp.net header.b=8Re553De; arc=pass smtp.client-ip=81.169.146.167
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hartkopp.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hartkopp.net
+ARC-Seal: i=1; a=rsa-sha256; t=1713287950; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=VYjrR8FNDMNqQJZ1flH9Y/rD9hieKAIvH0HbpU+zeJcSUOQwEualufMNRhsx4lLnAO
+    6CCOQmtdF/I35BqaBGt14Bmftm/iMlvdPFVFrYDZta33tN7QomhLknSoV/l4b/G0o8DK
+    8+IIMvuiuKi+pogsUk8ilknWsYaG3YR57ySHlTU67Z15WLCXViYhAU6oZJgzZmB2rAgK
+    ElR4fpg84nG565p0RycMVYfqRV6NCP5Mk94vEJOUWC8SMCUUqQ/37v9372Dm/DLTMLXC
+    Ddnd8RsbN3/E1C+/bxGF6/8J21dMUbCqVHnPa7F+CS+5c0GRv70hSrF7QUCLymVZiSSj
+    UkJw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1713287950;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=UZNazYxiaUPP62ZqofHCxP4mD8sMhtRghorMzgkk/Zs=;
+    b=gLXnXCttLlYyG60NJNPGm+Xp5Xbvu6Plo9XMZ5kbfpeGh9+GuZ1R3ew8e7JjZytxYy
+    +SK+wMNCCGs4kpeaZ/qMTd89bYuN0ip99NAP2jyQYpmWZ8pUg/B2Hc20K+xW9e0IsVX2
+    9orGlhI8ufrMfgVghLnVsIjyCyRi15U4iey+01KHrbYjwm2KET+idnTJlgbPuTnw7+9/
+    652S8wmKeaO/FYxCWEQaqfPconBNMa+WgYm223cvpvLXaXoPiUlU+RzbKzbJJhtiEY1P
+    r5aThUOIso3Gm8TA6wYMeoeFtGQGYrlbAqh5VDlhxR5+ALQaj7GbzQBmCucGduEPTf9Q
+    60lw==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1713287950;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=UZNazYxiaUPP62ZqofHCxP4mD8sMhtRghorMzgkk/Zs=;
+    b=tUGGNUz6T13vFpz9+ezMtiFNIURaWR+iWcfWN6sUvBU9/es0JKhD2h50vlTjfOzVkR
+    kgrdh9wPcOAagKKdaAB2IQKUbAJeKgSHwcauz+9B4pNV2vIAGPVkOX1Eb4yCFP1jIZw0
+    DjGvAJNTsXROBng+mcMZfkmoxxRKTMklJeHVoP53iYGpLZJEvTfZ9tWy8jRlyZ7znjQ6
+    yxK+6Up7aKnW4p9VmGTNKoUFWBHRqgaSKB/fwrTK66j8IxVlXJJ0ww62GIb3hEkJvAt2
+    EluNeS3c9EOwwUU8Tvjsxx4LOUIkVvhVBok76DSALfS8lSzD8+8XplIGxpCdVUhtDenn
+    r9eQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1713287950;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:Cc:To:Subject:Date:Message-ID:Cc:Date:
+    From:Subject:Sender;
+    bh=UZNazYxiaUPP62ZqofHCxP4mD8sMhtRghorMzgkk/Zs=;
+    b=8Re553DeDZ5GUPLWwSAt3vpX8+Zf9DSidpB8rfsjmi8ZORdySd5HY+9yrvECcDPNVa
+    lk9BQxcVpQ4XX0vQ73CA==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1qCHSa1GLptZHusl129OHEdFr0USEbHoO0g=="
+Received: from [IPV6:2a00:6020:4a8e:5010::923]
+    by smtp.strato.de (RZmta 50.3.2 AUTH)
+    with ESMTPSA id K701d603GHJ9TIN
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Tue, 16 Apr 2024 19:19:09 +0200 (CEST)
+Message-ID: <d4a55991-0ccc-4e8f-8acb-56077600c9e0@hartkopp.net>
+Date: Tue, 16 Apr 2024 19:19:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/1] Documentation: networking: document ISO
+ 15765-2:2016
+To: Francesco Valla <valla.francesco@gmail.com>,
+ Vincent Mailhol <vincent.mailhol@gmail.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Simon Horman <horms@kernel.org>, Bagas Sanjaya <bagasdotme@gmail.com>,
+ fabio@redaril.me
+References: <20240329133458.323041-2-valla.francesco@gmail.com>
+ <20240329133458.323041-3-valla.francesco@gmail.com>
+ <CAMZ6RqKLaYb+8EaeoFMHofcaBT5G2-qdqSb4do73xrgMvWMZaA@mail.gmail.com>
+ <9f5ad308-f2a0-47be-85f3-d152bc98099a@hartkopp.net>
+ <CAMZ6RqKGKcYd4hAM8AVV72t78H-Kt92NXowx6Q+YCw=AuSxKuw@mail.gmail.com>
+ <64586257-3cf6-4c10-a30b-200b1ecc5e80@hartkopp.net> <Zh6qiDwbEnaJtTvl@fedora>
+Content-Language: en-US
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <Zh6qiDwbEnaJtTvl@fedora>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Maciej =C5=BBenczykowski wrote:
-> On Mon, Apr 15, 2024 at 7:14=E2=80=AFPM Lena Wang (=E7=8E=8B=E5=A8=9C) =
-<Lena.Wang@mediatek.com> wrote:
-> >
-> > On Mon, 2024-04-15 at 16:53 -0400, Willem de Bruijn wrote:
-> > >
-> > > External email : Please do not click links or open attachments unti=
-l
-> > > you have verified the sender or the content.
-> > >  shiming.cheng@ wrote:
-> > > > From: Shiming Cheng <shiming.cheng@mediatek.com>
-> > > >
-> > > > A GRO packet without fraglist is crashed and backtrace is as belo=
-w:
-> > > >  [ 1100.812205][    C3] CPU: 3 PID: 0 Comm: swapper/3 Tainted:
-> > > > G        W  OE      6.6.17-android15-0-g380371ea9bf1 #1
-> > > >  [ 1100.812317][    C3]  __udp_gso_segment+0x298/0x4d4
-> > > >  [ 1100.812335][    C3]  __skb_gso_segment+0xc4/0x120
-> > > >  [ 1100.812339][    C3]  udp_rcv_segment+0x50/0x134
-> > > >  [ 1100.812344][    C3]  udp_queue_rcv_skb+0x74/0x114
-> > > >  [ 1100.812348][    C3]  udp_unicast_rcv_skb+0x94/0xac
-> > > >  [ 1100.812358][    C3]  udp_rcv+0x20/0x30
-> > > >
-> > > > The reason that the packet loses its fraglist is that in ingress
-> > > bpf
-> > > > it makes a test pull with to make sure it can read packet headers=
+Hi Francesco and Vincent,
 
-> > > > via direct packet access: In bpf_progs/offload.c
-> > > > try_make_writable -> bpf_skb_pull_data -> pskb_may_pull ->
-> > > > __pskb_pull_tail  This operation pull the data in fraglist into
-> > > linear
-> > > > and set the fraglist to null.
-> > >
-> > > What is the right behavior from BPF with regard to SKB_GSO_FRAGLIST=
+On 16.04.24 18:42, Francesco Valla wrote:
+> On Sun, Apr 14, 2024 at 10:21:33PM +0200, Oliver Hartkopp wrote:
+>> On 14.04.24 06:03, Vincent Mailhol wrote:
 
-> > > skbs?
-> > >
-> > > Some, like SCTP, cannot be linearized ever, as the do not have a
-> > > single gso_size.
-> > >
-> > > Should this BPF operation just fail?
-> > >
-> > In most situation for big gso size packet, it indeed fails but BPF
-> > doesn't check the result. It seems the udp GRO packet can't be pulled=
-/
-> > trimed/condensed or else it can't be segmented correctly.
-> >
-> > As the BPF function comments it doesn't matter if the data pull faile=
-d
-> > or pull less. It just does a blind best effort pull.
-> >
-> > A patch to modify bpf pull length is upstreamed to Google before and
-> > below are part of Google BPF expert maze's reply:
-> > maze@google.com<maze@google.com> #5Apr 13, 2024 02:30AM
-> > I *think* if that patch fixes anything, then it's really proving that=
+>>> Regardless, here is a verbatim extract from the Foreworld section of
+>>> ISO 15765-2:2024
+>>>
+>>>     This fourth edition cancels and replaces the third edition (ISO
+>>>     15765-2:2016), which has been technically revised.
+>>>
+>>>     The main changes are as follows:
+>>>
+>>>       - restructured the document to achieve compatibility with OSI
+>>>         7-layers model;
+>>>
+>>>       - introduced T_Data abstract service primitive interface to
+>>>         achieve compatibility with ISO 14229-2;
+>>>
+>>>       - moved all transport layer protocol-related information to Clause 9;
+>>>
+>>>       - clarification and editorial corrections
+>>>
+>>
+>> Yes, I've checked the release notes on the ISO website too.
+>> This really looks like editorial stuff that has nothing to do with the data
+>> protocol and its segmentation.
+>>
+> 
+> The :2016 suffix is cited both here and inside the Kconfig. We can:
+> - keep the :2016 here and then update both the documentation and the
+>    Kconfig once the standard has been checked
+> - move to :2024 both here and inside the Kconfig
+> - drop the :2016 from everywhere (leaving only ISO 15765) and move to
+>    ISO 15765:2024 only inside the "Specifications used" paragraph
+> 
+> What do you think? Shall the modifications to the Kconfig be done as part of
+> this series?
 
-> > there's a bug in the kernel that needs to be fixed instead.
-> > It should be legal to call try_make_writable(skb, X) with *any* value=
+So here is my completely new view on this version topic ... ;-D
 
-> > of X.
-> >
-> > I add maze in loop and we could start more discussion here.
-> =
+I would vote for ISO 15765-2:2016 in all places.
 
-> Personally, I think bpf_skb_pull_data() should have automatically
-> (ie. in kernel code) reduced how much it pulls so that it would pull
-> headers only,
+The ISO 15765-2:2016 is the first ISO 15765-2 standard which supports 
+CAN FD and ISO 15765-2:2024 does not bring any functional change neither 
+to the standard nor to the implementation in the Linux kernel.
 
-That would be a helper that parses headers to discover header length.
-Parsing is better left to the BPF program.
+For that reason ISO 15765-2:2016 is still correct and relevant (due to 
+the CAN FD support) and does not confuse the users whether the 2024 
+version has some completely new feature or is potentially incompatible 
+to the 2016 version.
 
-> and not packet content.
-> (This is assuming the rest of the code isn't ready to deal with a longe=
-r pull,
-> which I think is the case atm.  Pulling too much, and then crashing or =
-forcing
-> the stack to drop packets because of them being malformed seems wrong..=
-.)
-> =
-
-> In general it would be nice if there was a way to just say pull all hea=
-ders...
-> (or possibly all L2/L3/L4 headers)
-> You in general need to pull stuff *before* you've even looked at the pa=
-cket,
-> so that you can look at the packet,
-> so it's relatively hard/annoying to pull the correct length from bpf
-> code itself.
-> =
-
-> > > > BPF needs to modify a proper length to do pull data. However kern=
-el
-> > > > should also improve the flow to avoid crash from a bpf function
-> > > call.
-> > > > As there is no split flow and app may not decode the merged UDP
-> > > packet,
-> > > > we should drop the packet without fraglist in skb_segment_list
-> > > here.
-> > > >
-> > > > Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
-> > > > Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
-> > > > Signed-off-by: Lena Wang <lena.wang@mediatek.com>
-> > > > ---
-> > > >  net/core/skbuff.c | 3 +++
-> > > >  1 file changed, 3 insertions(+)
-> > > >
-> > > > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > > > index b99127712e67..f68f2679b086 100644
-> > > > --- a/net/core/skbuff.c
-> > > > +++ b/net/core/skbuff.c
-> > > > @@ -4504,6 +4504,9 @@ struct sk_buff *skb_segment_list(struct
-> > > sk_buff *skb,
-> > > >  if (err)
-> > > >  goto err_linearize;
-> > > >
-> > > > +if (!list_skb)
-> > > > +goto err_linearize;
-> > > > +
-
-This would catch the case where the entire data frag_list is
-linearized, but not a pskb_may_pull that only pulls in part of the
-list.
-
-Even with BPF being privileged, the kernel should not crash if BPF
-pulls a FRAGLIST GSO skb.
-
-But the check needs to be refined a bit. For a UDP GSO packet, I
-think gso_size is still valid, so if the head_skb length does not
-match gso_size, it has been messed with and should be dropped.
-
-For a GSO_BY_FRAGS skb, there is no single gso_size, and this pull
-may be entirely undetectable as long as frag_list !=3D NULL?
-
-
-> > > >  skb_shinfo(skb)->frag_list =3D NULL;
-> > >
-> > > In absense of plugging the issue in BPF, dropping here is the best
-> > > we can do indeed, I think.
-> > >
-> =
-
-> --
-> Maciej =C5=BBenczykowski, Kernel Networking Developer @ Google
-
-
+Best regards,
+Oliver
 
