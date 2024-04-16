@@ -1,133 +1,170 @@
-Return-Path: <netdev+bounces-88431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3205A8A72D7
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 20:09:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40E728A72E6
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 20:13:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D67A51F2262C
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:09:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8E11283AE7
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:13:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 251A3134431;
-	Tue, 16 Apr 2024 18:09:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D40EA134CE0;
+	Tue, 16 Apr 2024 18:13:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QeyODSL4"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="LxmMU96F"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62F9134429;
-	Tue, 16 Apr 2024 18:09:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D950784A32;
+	Tue, 16 Apr 2024 18:13:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713290985; cv=none; b=nvn2dtFsHSV5Y+RkRYErgH6VY9nMECe0D27rptc99p6FGSJesYfebf/cL5dVoRFuaEoLaju+liq9vYVZeVvsaUb7ftCLLmpZzkVk7R3CDezh7oVMSQfTrbgxK5wbUl8hDn64QTR6SnwJSOnE3z1VQ4O9wraG0mBqIjnCWfvNTiw=
+	t=1713291188; cv=none; b=IYH8c1hc9IKVJHOw+yNHv80dhdHm9O5OqAzGkCUWQuErj0Titp5bt8QmGq5Tl8+YtH6h76h4IdxeUVT0IXoC40YTMrPwzrlUYf8aqS/9y+xPies8VHgmCtzu+2FbG63f/jpH1609wJseQcaRpD3Zkeab8djxfH1GJ0z/n01ouK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713290985; c=relaxed/simple;
-	bh=N4C2FjdiqPsdy0C9kaCE8/PgntEeBxpWzcAr3NeY9aQ=;
+	s=arc-20240116; t=1713291188; c=relaxed/simple;
+	bh=AA6SJbQhGfB9M3x1QbK3z/D1vMSid8qosIO1GNXxywM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ez0kvxrDA3lV8TKlCPmQkb5FuDRkJnjXOf0vREw9fqbIHRYn/rbYU/mIoI+Lawji0uo1rqWXe4RpDLhQaBX8zy06R1L2MGU9OgfwefmKHPgy+6U9muFD1Ur+LZgFmorGsZIlG0+1KtPDkssYrBcK5ZGa0oQTOb9I6v+Kdctrj8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QeyODSL4; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=TXomqugHQL46au9N8uw64oQNOo/r6UX6m/Q4x5PGJ/s=; b=Qe
-	yODSL4fDFv1MzBJSrO1z8zZKmNc73pmcIo2Y/X2bUlc0REHNbm32Y+FukB9CDnKVU3YceRNG4ohs/
-	+EwRYyI6BHmc5MiGJxj0ROQQ194dkGh8nChvnOeB9LWjDnvUJ9OjcEHN2928IhGbX7jisHyBuyoqd
-	sQq2Yfra6x8SjD0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rwnFP-00DAOS-No; Tue, 16 Apr 2024 20:09:35 +0200
-Date: Tue, 16 Apr 2024 20:09:35 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Zhu Yanjun <yanjun.zhu@linux.dev>
-Cc: Jason Gunthorpe <jgg@ziepe.ca>,
-	Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Long Li <longli@microsoft.com>,
-	Michael Kelley <mikelley@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Subject: Re: [PATCH net-next] net: mana: Add new device attributes for mana
-Message-ID: <b34bfb11-98a3-4418-b482-14f2e50745d3@lunn.ch>
-References: <1713174589-29243-1-git-send-email-shradhagupta@linux.microsoft.com>
- <20240415161305.GO223006@ziepe.ca>
- <56b0a8c1-50f6-41a9-9ea5-ed45ada58892@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=bYecA10Gt9HTPJaTWm+1IeGVKsNF+9IcilYc28iSw/TDehWQoaS7Q/qPqxiJUmqamU61rTQh5AFNsv1KC6ykG2uf9q0f6Qrqk9YVwMAJ9Tg4ew88uIWxFs2+aKJl+inHmwOqpWDKi6Biq3UIFR15djNBfZgRqLz/eNhd3u9hqlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=LxmMU96F; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=36ZXpuO31IIMkNaMOUNE9BMTLk6qz2b58hlyspvsh9M=; b=LxmMU96F7hOkagMMuarOGWvM2P
+	iVEy91jkVu6Y+T2Ub1KdC1k6J+5O7cFaujlahZKKGdFUQP6OsgZzD3cjkqzKb6RWTIbX40Y9weyRe
+	12pw+XjIzratPnUlLJkPIiCD3w+FFB+MQiqjMZsDSa00FTMCrfGjES55si1xevo4dkbc6l/YEX1FB
+	jucTBymlDlyp9pd4TJoNCrGFf7DcmoD/ItwBeMgwHGQDArIt9VjLXQ956G94/m8RaBkhOd4z1fm/k
+	VQ0tsBd4c/5rNMYNP6KMzeH/WMjrwenFlSko2KQXaSzPapRpdzff1RWBqiBhf+rIbjCstQeQfNKOn
+	+FYKNOMQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57804)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rwnIZ-0000oT-2i;
+	Tue, 16 Apr 2024 19:12:51 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rwnIX-000537-Sy; Tue, 16 Apr 2024 19:12:49 +0100
+Date: Tue, 16 Apr 2024 19:12:49 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Stefan Eichenberger <eichest@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	lxu@maxlinear.com, hkallweit1@gmail.com, michael@walle.cc,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property
+ to disable SGMII autoneg
+Message-ID: <Zh6/oVHUvnOVtHaC@shell.armlinux.org.uk>
+References: <20240416121032.52108-1-eichest@gmail.com>
+ <20240416121032.52108-3-eichest@gmail.com>
+ <3f7f278f-e490-47f1-971c-ecf44a70cee4@lunn.ch>
+ <Zh6clAtI3NO+nMEi@eichest-laptop>
+ <5ed39628-4ac0-4c4e-9a16-fd4bf9a6db29@lunn.ch>
+ <Zh6mIv1Ee+1h21Xo@shell.armlinux.org.uk>
+ <Zh6z90iCpLqF4fla@eichest-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <56b0a8c1-50f6-41a9-9ea5-ed45ada58892@linux.dev>
+In-Reply-To: <Zh6z90iCpLqF4fla@eichest-laptop>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Apr 16, 2024 at 06:27:04AM +0200, Zhu Yanjun wrote:
-> 在 2024/4/15 18:13, Jason Gunthorpe 写道:
-> > On Mon, Apr 15, 2024 at 02:49:49AM -0700, Shradha Gupta wrote:
-> > > Add new device attributes to view multiport, msix, and adapter MTU
-> > > setting for MANA device.
-> > > 
-> > > Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-> > > ---
-> > >   .../net/ethernet/microsoft/mana/gdma_main.c   | 74 +++++++++++++++++++
-> > >   include/net/mana/gdma.h                       |  9 +++
-> > >   2 files changed, 83 insertions(+)
-> > > 
-> > > diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > > index 1332db9a08eb..6674a02cff06 100644
-> > > --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > > +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> > > @@ -1471,6 +1471,65 @@ static bool mana_is_pf(unsigned short dev_id)
-> > >   	return dev_id == MANA_PF_DEVICE_ID;
-> > >   }
-> > > +static ssize_t mana_attr_show(struct device *dev,
-> > > +			      struct device_attribute *attr, char *buf)
-> > > +{
-> > > +	struct pci_dev *pdev = to_pci_dev(dev);
-> > > +	struct gdma_context *gc = pci_get_drvdata(pdev);
-> > > +	struct mana_context *ac = gc->mana.driver_data;
-> > > +
-> > > +	if (strcmp(attr->attr.name, "mport") == 0)
-> > > +		return snprintf(buf, PAGE_SIZE, "%d\n", ac->num_ports);
-> > > +	else if (strcmp(attr->attr.name, "adapter_mtu") == 0)
-> > > +		return snprintf(buf, PAGE_SIZE, "%d\n", gc->adapter_mtu);
-> > > +	else if (strcmp(attr->attr.name, "msix") == 0)
-> > > +		return snprintf(buf, PAGE_SIZE, "%d\n", gc->max_num_msix);
-> > > +	else
-> > > +		return -EINVAL;
-> > > +
-> > 
-> > That is not how sysfs should be implemented at all, please find a
-> > good example to copy from. Every attribute should use its own function
-> > with the macros to link it into an attributes group and sysfs_emit
-> > should be used for printing
+On Tue, Apr 16, 2024 at 07:23:03PM +0200, Stefan Eichenberger wrote:
+> Hi Russell and Andrew,
 > 
-> Not sure if this file drivers/infiniband/hw/usnic/usnic_ib_sysfs.c is a good
-> example or not.
+> On Tue, Apr 16, 2024 at 05:24:02PM +0100, Russell King (Oracle) wrote:
+> > On Tue, Apr 16, 2024 at 06:02:08PM +0200, Andrew Lunn wrote:
+> > > On Tue, Apr 16, 2024 at 05:43:16PM +0200, Stefan Eichenberger wrote:
+> > > > Hi Andrew,
+> > > > 
+> > > > Thanks a lot for the feedback.
+> > > > 
+> > > > On Tue, Apr 16, 2024 at 03:46:19PM +0200, Andrew Lunn wrote:
+> > > > > On Tue, Apr 16, 2024 at 02:10:32PM +0200, Stefan Eichenberger wrote:
+> > > > > > Add a new device tree property to disable SGMII autonegotiation and
+> > > > > > instead use the option to match the SGMII speed to what was negotiated
+> > > > > > on the twisted pair interface (tpi).
+> > > > > 
+> > > > > Could you explain this is more detail.
+> > > > > 
+> > > > > SGMII always runs its clocks at 1000Mbps. The MAC needs to duplicate
+> > > > > the symbols 100 times when running at 10Mbs, and 10 times when running
+> > > > > at 100Mbps.
+> > > > 
+> > > > Currently, the mxl-gpy driver uses SGMII autonegotiation for 10 Mbps,
+> > > > 100 Mbps, and 1000 Mbps. For our Ethernet controller, which is on an
+> > > > Octeon TX2 SoC, this means that we have to enable "in-band-status" on
+> > > > the controller. This will work for all three speed settings. However, if
+> > > > we have a link partner that can do 2.5 Gbps, the mxl-gpy driver will
+> > > > disable SGMII autonegotiation in gpy_update_interface. This is not
+> > > > supported by this Ethernet controller because in-band-status is still
+> > > > enabled. Therefore, we will not be able to transfer data at 2.5 Gbps,
+> > > > the SGMII link will not go into a working state.
+> > > 
+> > > This is where i expect Russel to point out that SGMII does not support
+> > > 2.5G. What you actually mean is that the PHY swaps to 2500BaseX. And
+> > > 2500BaseX does not perform speed negotiation, since it only supports
+> > > 2500. So you also need the MAC to swap to 2500BaseX.
+> > 
+> > Yes, absolutely true that SGMII does not support 2.5G... and when
+> > operating faster, than 2500base-X is normally used.
+> > 
+> > How, 2500base-X was slow to be standardised, and consequently different
+> > manufacturers came up with different ideas. The common theme is that
+> > it's 1000base-X up-clocked by 2.5x. Where the ideas differ is whether
+> > in-band negotiation is supported or not. This has been a pain point for
+> > a while now.
+> > 
+> > As I mentioned in my previous two messages, I have an experimental
+> > patch series that helps to address this.
+> > 
+> > The issue is that implementations mix manufacturers, so we need to
+> > know the capabilities of the PHY and the capabilities of the PCS, and
+> > then hope that we can find some common ground between their
+> > requirements.
+> > 
+> > There is then the issue that if you're not using phylink, then...
+> > guess what... you either need to convert to use phylink or implement
+> > the logic in your own MAC driver to detect what the PHY is doing
+> > and what its capabilities are - but I think from what you've said,
+> > you are using phylink.
+> 
+> Thanks for the patch series and the explanation. In our use case we have
+> the mismatch between the PHY and the mvpp2 driver in 2500BaseX mode.
 
-The first question should be, what are these values used for? You can
-then decide on debugfs or sysfs. debugfs is easier to use, and you
-avoid any ABI, which will make long term support easier.
+Ah, mvpp2. This is one of those cases where I think you have a
+disagreement between manufacturers over 2500base-X.
 
-      Andrew
+Marvell's documentation clearly states that when operating in 1000base-X
+mode, AN _must_ be enabled. Since programming 2500base-X is programming
+the mvpp2 hardware for 1000base-X and then configuring the COMPHY to
+clock faster, AN must also be enabled when operating at 2500base-X.
+
+It seems you've coupled it with the mxl-gpy PHY which doesn't apparently
+support AN when in 2500base-X.
+
+Welcome to the mess of 2500base-X, and sadly we finally have the
+situation that I've feared for years: one end of a 2500base-X link
+that's documented as requiring AN, and the other end not providing it.
+
+Sigh. If only the IEEE 802.3 committee had been more pro-active and
+standardised 2500base-X _before_ manufacturers went off and did their
+own different things.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
