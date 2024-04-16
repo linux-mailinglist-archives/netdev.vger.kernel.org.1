@@ -1,169 +1,160 @@
-Return-Path: <netdev+bounces-88185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B52918A6371
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:07:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 803B48A637C
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:13:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 705182836D9
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 06:07:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32B53281C28
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 06:13:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99D4B3C08A;
-	Tue, 16 Apr 2024 06:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4AB23BBFE;
+	Tue, 16 Apr 2024 06:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vwK1gDNU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fdsM2K5q"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F6A439AF2
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 06:07:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B7F33998;
+	Tue, 16 Apr 2024 06:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713247656; cv=none; b=KMkbiJE6u/0btn+zgFV82AYaA/xqgTwGZcmyGcgpn9xfYOUBa596+RnRoc+lj5KZUqj0cd7I/cNEmyLriMgvgemL+mKTTj3H1phNd5wl+tDzK5gGJvoxAPWHZR0EEh+cJaFrFFKNQoL5YQiuEj5L+f02hpFky2tzC25eEulp5h4=
+	t=1713248021; cv=none; b=EVLkE8NIpK414Y/UEpiYV8iHSL4lVoLBlScSBB8wm/+8MY0KE0DK6CUMfg1bVbp8X6z6vxGpZ7gQxLaWmObLF7QyHi9/fg20jJkBEAGigDaoXviM2KISP4xvlrSWazfYOqqXnkPhEk1XMXyT7skIb/y+p7HMSclMINqzZ8t4yXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713247656; c=relaxed/simple;
-	bh=Itih821s4Pz6EeuBtxCyww/EuZLn3dR4lQszUSsSx8w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NaX5KCY7miIljYNxPbgymmwZMdoofEV/wNm04rX29rCsO9X3ZrEVBRL8MIAAQEfx1buqDcS6LPpCVEMGdlktEaMI72A0RbbiUITWadWDIisPU90H55faRVSrLoXvGJC+kBgrTrq8D38OC5zivNHbvkIaAG/wiRwJkitvE6fDQUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vwK1gDNU; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ce275c37-d45e-451a-985e-e60f8a45ca77@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713247651;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xDQZtCQlsQAIfw4f4Zwq1DM+OHXN7Y67mnFGrJ4ftZA=;
-	b=vwK1gDNU2MWjIW7qtapuyzJ2csPghaAScWFTQfMth7dHoes5T73KjNHhU8cbySSNr35Mgo
-	UF/MuPBJIsoJLZ4AXt/RylJmqsKxdQ4dwyAW/K26E+sGRKI3TWH2D89XivKq53ahwEwR5d
-	pYeqWamvSfUWMprCOMaZcR4mjT8bsy4=
-Date: Mon, 15 Apr 2024 23:07:19 -0700
+	s=arc-20240116; t=1713248021; c=relaxed/simple;
+	bh=bJKfCh4TOpH4ZqKQgc6vvRE6Ro7oRSWDp+zAGLT1a74=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wf2Z26xt7kgGh6NTzoVDGlS9uH44BefoGbjYDNvdw2uRzZHzBXpZ1zeylLI31v3nc46UYCYONGGVJNmw+XAr8Y05hBFvZ8Ai2V/issew6yP5Xw7WZRaRBcX2B8jNEK+EYJn1opem7wR5fH9d/2yNGjHmFCHPjByQnPN5omYzNJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fdsM2K5q; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1e2b137d666so33056155ad.2;
+        Mon, 15 Apr 2024 23:13:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713248020; x=1713852820; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=CZ6ecSrVtYcanZSvOFQ1ox/50yBmtYgCGB61sRcLhXo=;
+        b=fdsM2K5q1d5NqmKfVSr5Zu++NnUS7igDswII5gacwpVP/19zrFeC8+/uC3ja++3smF
+         W8awc2ZgzFtzFDLI6hoLBmi2+mlJPKIzSaqGcKNnMkeFDJPnUgCRJu/vVAjJV4MLJ4X8
+         KA0ivhikQzyRbLgyY6vzWH47HLzHstNKWsM9bS8oVXjj7AdS32O1IQjnHZneywrLYPmP
+         AmCcVYw5FfxxZ0dQLQAKxQKlfEIdJOTeIQ+e0MNDg2AMQi5zFdbt+QBwQdXLOB7cK4oO
+         IV8DERD4+aZNRusi0VllyePy6A3em+tMnafq9XvV8IbNF5L4yrnZxE8+ua8Y58wsu6o6
+         xFrQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713248020; x=1713852820;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CZ6ecSrVtYcanZSvOFQ1ox/50yBmtYgCGB61sRcLhXo=;
+        b=gmwfgjQq8ZM4x6F/g5cBPbGafoTZrt7Cum4LGgNdI3l/7ziG9RmY//VNTEA5d6I0Ip
+         W2HAWoZl9y65neEuMd32SGYQWJVx5UnF9b7R8ir9VaTp3KCpVsRDMBYyc3vhyU0N7sAu
+         3F92Ip7nU2/L/O3xis1ur4kdobl0k5ygO00bvBVBPrJ6Y7xQN4vamKrUHqKGcullYU+h
+         igm17SkDDQo2pxq3BovsdQ4+/3TUlBsCpPES60dAW7fWKvTUz3wmBgO5jb6+bsFYnf8K
+         2HtcRYIVMQAdm+M2nQbSrbL/u4eU+WXo84UymSmJPhSvjCSNro3EjA+7DerXXHHMNSm/
+         YTuw==
+X-Forwarded-Encrypted: i=1; AJvYcCXux9UtvriFOgaFRp0wvOQqDWOEC18TEmhtsVZJjAUAUMIvoc/+lsY/bxCrPbd9FJAPe4pGGcPILQmMZgzOzxzCweJv+3E3afCSuHEsjtduafLsUlM5QNSmd+f4BD3zvhnzTnhjZjD/
+X-Gm-Message-State: AOJu0YxxT6aEhRIdkhWCxqTJla5Vvf3TPs6si8mjbUbSJEcFmPdljSgJ
+	dHn3DFfgruLURQFtXTzHMKTNX65ix9G71Wv2fI0k35/KpaGDMOq1
+X-Google-Smtp-Source: AGHT+IHo1g0xIh9Zq4tQT6ZgqBpNNX8qlCCYceyGks9TWejitkCg/+/KVWFWO9PgevyWpGP9p2ZULg==
+X-Received: by 2002:a17:903:24e:b0:1e2:7aba:6d0f with SMTP id j14-20020a170903024e00b001e27aba6d0fmr15871189plh.36.1713248019757;
+        Mon, 15 Apr 2024 23:13:39 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id n9-20020a170902d2c900b001e1071cf0bbsm8940249plc.302.2024.04.15.23.13.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 15 Apr 2024 23:13:39 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id A125A180F6DB9; Tue, 16 Apr 2024 13:13:36 +0700 (WIB)
+Date: Tue, 16 Apr 2024 13:13:35 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Alexander Duyck <alexander.duyck@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v2 14/15] mm: page_frag: update documentation
+ for page_frag
+Message-ID: <Zh4XD6jP4dLoZN4Q@archie.me>
+References: <20240415131941.51153-1-linyunsheng@huawei.com>
+ <20240415131941.51153-15-linyunsheng@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 bpf-next 4/6] selftests/bpf: Add IPv4 and IPv6 sockaddr
- test cases
-To: Jordan Rife <jrife@google.com>, bpf@vger.kernel.org
-Cc: linux-kselftest@vger.kernel.org, netdev@vger.kernel.org,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, Kui-Feng Lee <thinker.li@gmail.com>,
- Artem Savkov <asavkov@redhat.com>, Dave Marchevsky <davemarchevsky@fb.com>,
- Menglong Dong <imagedong@tencent.com>, Daniel Xu <dxu@dxuuu.xyz>,
- David Vernet <void@manifault.com>, Daan De Meyer <daan.j.demeyer@gmail.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-References: <20240412165230.2009746-1-jrife@google.com>
- <20240412165230.2009746-5-jrife@google.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20240412165230.2009746-5-jrife@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="0I6/Ma35WnVqMhhN"
+Content-Disposition: inline
+In-Reply-To: <20240415131941.51153-15-linyunsheng@huawei.com>
 
-On 4/12/24 9:52 AM, Jordan Rife wrote:
-> This patch lays the groundwork for testing IPv4 and IPv6 sockaddr hooks
-> and their interaction with both socket syscalls and kernel functions
-> (e.g. kernel_connect, kernel_bind, etc.) and moves the test cases from
-> the old-style bpf/test_sock_addr.c self test into the sock_addr
-> prog_test.
 
-Thanks for moving the existing sock_addr test to the test_progs.
+--0I6/Ma35WnVqMhhN
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> +static int ping_once(int ipv, const char *addr)
-> +{
-> +	const char *ping_cmd_prefix = "ping -";
+On Mon, Apr 15, 2024 at 09:19:39PM +0800, Yunsheng Lin wrote:
+> +API interface
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +As the design and implementation of page_frag API, the allocation side d=
+oes not
+                                        "... implies, the allocation side .=
+=2E."
+> +allow concurrent calling, it is assumed that the caller must ensure ther=
+e is not
+                      "... . Instead, it is assumed that ...:
+> +concurrent alloc calling to the same page_frag_cache instance by using i=
+t's own
+                                                            "... by using i=
+ts own ..."
+> +lock or rely on some lockless guarantee like NAPI softirq.
 > +
-> +	if (!SYS_NOFAIL("type ping%d >/dev/null 2>&1", ipv))
-> +		ping_cmd_prefix = "ping";
+> +Depending on different use cases, callers expecting to deal with va, pag=
+e or
+> +both va and page for them may call page_frag_alloc_va*, page_frag_alloc_=
+pg*,
+> +or page_frag_alloc* API accordingly.
 > +
-> +	return SYS_NOFAIL("%s%d -q -c 1 -W 1 %s >/dev/null 2>&1",
-> +			  ping_cmd_prefix, ipv, addr);
-> +}
-> +
-> +static int setup_test_env(void)
-> +{
-> +	SYS(err, "ip link add dev %s1 type veth peer name %s2", TEST_IF_PREFIX,
-> +	    TEST_IF_PREFIX);
+> +There is also a use case that need minimum memory in order for forward
+> +progressing, but can do better if there is more memory available. Introd=
+uce
+Did you mean "... but more performant if more memory is available"?
+> +page_frag_alloc_prepare() and page_frag_alloc_commit() related API, the =
+caller
+s/Introduce/Using/
+> +requests the minimum memory it need and the prepare API will return the =
+maximum
+> +size of the fragment returned, caller need to report back to the page_fr=
+ag core
+                                  "The caller needs to either call the comm=
+it API ..."
+> +how much memory it actually use by calling commit API, or not calling th=
+e commit
+"... to report how much memory it actually uses ..."
+> +API if deciding to not use any memory.
+"... or not do so if deciding to not use any memory."
 
-I would like to take this chance to simplify the setup.
+Thanks.
 
-Does it need a veth pair? The %s2 interface is not used.
+--=20
+An old man doll... just what I always wanted! - Clara
 
-Can it be done in lo alone?
+--0I6/Ma35WnVqMhhN
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Also, all this setup (and test) has to be done in a new netns. Anything blocking 
-the kfunc in patch 2 using the current task netns instead of the init_net?
+-----BEGIN PGP SIGNATURE-----
 
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZh4XCwAKCRD2uYlJVVFO
+o85iAP0UEZ96bTaKdZC0FmSard5z0dMjRBPD69wzKG6rmE9CagD+LpsBRsgW1frt
+81TmfyhS9gzn/HY0KhWP63uiPguKkQY=
+=zrUk
+-----END PGP SIGNATURE-----
 
-> +	SYS(err, "ip link set %s1 up", TEST_IF_PREFIX);
-> +	SYS(err, "ip link set %s2 up", TEST_IF_PREFIX);
-> +	SYS(err, "ip -4 addr add %s/8 dev %s1", TEST_IPV4, TEST_IF_PREFIX);
-> +	SYS(err, "ip -6 addr add %s/128 dev %s1", TEST_IPV6, TEST_IF_PREFIX);
-
-Add nodad to the "ip -6 addr add...". just in case it may add unnecessary delay.
-
-> +
-> +	int i;
-> +
-> +	for (i = 0; i < 5; i++) {
-> +		if (!ping_once(4, TEST_IPV4) && !ping_once(6, TEST_IPV6))
-
-This interface/address ping should not be needed. Other tests under prog_tests/ 
-don't need this interface/address ping also.
-
-> +			return 0;
-> +	}
-> +
-> +	ASSERT_FAIL("Timed out waiting for test IP to become available.");
-> +err:
-> +	return -1;
-> +}
-> +
-> +static void cleanup_test_env(void)
-> +{
-> +	SYS_NOFAIL("ip link del %s1 2>/dev/null", TEST_IF_PREFIX);
-> +	SYS_NOFAIL("ip link del %s2 2>/dev/null", TEST_IF_PREFIX);
-
-Using lo will make this easier. Regardless, the link should go away with the netns.
-
-> +}
-> +
->   void test_sock_addr(void)
->   {
->   	int cgroup_fd = -1;
->   	void *skel;
->   
-> +	if (!ASSERT_OK(setup_test_env(), "setup_test_env"))
-
-This will probably have to be called after the test__join_cgroup() if it also 
-creates a new netns.
-
-pw-bot: cr
-
-> +		goto cleanup;
-> +
->   	cgroup_fd = test__join_cgroup("/sock_addr");
->   	if (!ASSERT_GE(cgroup_fd, 0, "join_cgroup"))
->   		goto cleanup;
-> @@ -609,4 +755,5 @@ void test_sock_addr(void)
->   cleanup:
->   	if (cgroup_fd >= 0)
->   		close(cgroup_fd);
-> +	cleanup_test_env();
->   }
-
+--0I6/Ma35WnVqMhhN--
 
