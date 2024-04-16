@@ -1,225 +1,259 @@
-Return-Path: <netdev+bounces-88317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63E208A6AC2
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:21:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AC888A6ADE
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:25:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D51421F2193A
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:21:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A00A3B215F6
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469FF12C485;
-	Tue, 16 Apr 2024 12:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6B5412B142;
+	Tue, 16 Apr 2024 12:25:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WR9gTknF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXA9z89x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2FF12C481
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 12:19:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6B21DFEF
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 12:25:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713269981; cv=none; b=D9mI+IbHbJlds8A/G0qVhCoEgF/RbSUazdXrVFHq0kh9cnTItlUoRUTdGRFEt3KhYmdIhyTF28qb/GjLLPZ5IFy9bWYM985/j0BEudn9F7e3PI+Tbcmjy3AYZsBxtmSoVcaxGDPK7ld0eFmZzvX+K9k+5zsbfLwZfBret5U988U=
+	t=1713270312; cv=none; b=aM8w+AEOOU34zrUH5/eZLLEHWCQn+6WmEQosxr/PEvaWbhOLJzfM/t/BAF1ceg3MLuV+0KHsYTgmlxj5logb8lwWl2il7umD8GjoN7ji3i5djVTeofZvtAQM/oNrXAYoifvZ1Bnv3+pGwIC43MGSWvCz170v6jP4/u/Xhd7X/dM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713269981; c=relaxed/simple;
-	bh=yekDoSMPIs7ET75V7Z52GKdQ8aYWEp+cGIOiKti/F6A=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=Gz9JblDgbxWhtpu4V3MngS/TTC7ec1xzfkhnhSPckTKwCAbVeQ0fnQvC6HUtGXMGvs3c1EOWagRBLjle0PaE/JnzMKLo+esY4ZF6iZ7kDtUpWoAOJO629wy8GkaPu+ud40K+8IKkRvbWEFB3874ZHuqQGarzokWlXLZNxxpyqbM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WR9gTknF; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1713270312; c=relaxed/simple;
+	bh=A3I3UnEi4Jj6XEGZVoebUIPjEFSfASUBccQUwXzsHM0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A98tvYGAj+OXQCvrJEnACbVnnTGgEEwbZYysii4i8nWWGpQFn/ismgzsINLxIgf6buqeao6UvI+xO7SPUin5tOzQZkEsvFzmKOpGHtEaVm7FyAMI4L10jsbLeApKbKV96wBW/Z7FHxLidjkXxdL1PIgI8zs5Cyv/olcD/6oGlUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KXA9z89x; arc=none smtp.client-ip=209.85.218.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1e2be2361efso7348155ad.0
-        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 05:19:39 -0700 (PDT)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a526a200879so285240566b.1
+        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 05:25:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713269979; x=1713874779; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JX3ysg83DC7xVvgYObrnTkfp4//VheRNGQlTemkEcVQ=;
-        b=WR9gTknF/M5b/G14PgOzx9v5vjmxxJz5QU1egFtCUDD4DgCLhPwJu/u7NMbON2OYMy
-         mjLh2VCMx9OC8pUHPXGwFTYaOTNqToiWvHBOohwtCwc0lxX3YmEtyJDKMjVg5CQYPq48
-         o6nqYORIUCn1pewEMY9WCJuEwhio5Qdb08d/kUWYUMxqb74sQhn7LZEzILlGDQLegyYd
-         FljPQGTCIJPQq3nOSfHRVLyKXppFEd8tSFUJETJHqUnLwRRWCxmDSWIsn2IjMqWRQoCx
-         ishRXPRtTnxlfQ4fQ9gQInEPYhJF7+KmvuJq6e7t3gYBl62Egxl+h6WSBdwLgk04Jrnh
-         p2xQ==
+        d=gmail.com; s=20230601; t=1713270309; x=1713875109; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3Iqz3uYB03cZmo9aNBvR/ZOxNMywrtwP/4mJcGIIpN4=;
+        b=KXA9z89xEaR++lR61COXJ/scMXnD+ZXCA2eXqqLxe3uukOzOkoU75QwrYyX+s6oXNf
+         AOkLlajgQ5LYxZrXacqhJbxYXsaQtAnXIvqOxfaDTsI96m4P3eyQGxTf1XidHfyJcRwb
+         Q+9JLkietNTjOyJMoWHiGmOcwC1Kr8pqoy49FwiE8zSdod+8zAKohF+R6Pvsp3Kxvy/Y
+         +XOfV91sLvo6k+XTJG8GTDgOvINnMVmW3/qOYRHDMOHiWw710632DB+FS6/IbQzz28XP
+         2qAnYtclOWCmbrpOQKRGYwzljXhAwV2V1buHEQ3oX9CEWraHRECI/RYAKQr31Gg2GD6t
+         7gtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713269979; x=1713874779;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=JX3ysg83DC7xVvgYObrnTkfp4//VheRNGQlTemkEcVQ=;
-        b=Flx+93RPYIoqg6/0MiaV3xjhEukjT13vJk2Av83offgYkH/b+VOu3D8NjOC5QCFakj
-         J5a3hHMtpY9lapusE6EPn/QautaB7qTqKaqQPKA1lP8MNmuTMNB+FBSdbPW98/JiZUjO
-         AHA/6wstoh8PS6rB/4RDB+9PHmiOSxdrslTRcNtrzFmShA5lTc5Om3uL+6CfdeCJlmGa
-         de/JjlWB2BIZkZvMs8SZcLEGDGr5nlwkdLs17yjQ1wfCloTtX+viiDP5b3KDHFJltoaT
-         gxjKpDYHWSXU8BbTU7umS+EhcpNSaFzIpNT1R/DczCBQr2ZY5JqnnnYIO4gLnUujkgg8
-         7BxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVr8lvai3w4+EgUFk1snLlHMszl7q7Mar5ePeSoKxDWe6Y8Z/wuBxmuXteAREa4jCn0y3e5vg8KY3T4hLlkaE62gCjcLxlY
-X-Gm-Message-State: AOJu0YxLxEYEgBg2Uzyh95/K2qUKPb70gVpnA1arnA2Ld9FuG83thFbw
-	8heEhXSdDvyUX/kW7B2TNtXjCsS263IeqluIBaUDrrKef9An7OkQphiQFJK7
-X-Google-Smtp-Source: AGHT+IGaHuwfeplw6/GsiZdCO9wIcCd1Y4Voq582KwVxjdWway/y5ZhGEQ/RlFVL+9xP8tzkrJebJw==
-X-Received: by 2002:a17:902:f542:b0:1e2:b3d:8c67 with SMTP id h2-20020a170902f54200b001e20b3d8c67mr14787129plf.6.1713269979066;
-        Tue, 16 Apr 2024 05:19:39 -0700 (PDT)
-Received: from localhost (p5315239-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.87.239])
-        by smtp.gmail.com with ESMTPSA id p18-20020a1709028a9200b001e2b4f513e1sm9618580plo.106.2024.04.16.05.19.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 05:19:38 -0700 (PDT)
-Date: Tue, 16 Apr 2024 21:19:26 +0900 (JST)
-Message-Id: <20240416.211926.560322866915632259.fujita.tomonori@gmail.com>
-To: andrew@lunn.ch
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v1 5/5] net: tn40xx: add PHYLIB support
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <7c20aefa-d93b-41e2-9a23-97782926369d@lunn.ch>
-References: <20240415104352.4685-1-fujita.tomonori@gmail.com>
-	<20240415104352.4685-6-fujita.tomonori@gmail.com>
-	<7c20aefa-d93b-41e2-9a23-97782926369d@lunn.ch>
+        d=1e100.net; s=20230601; t=1713270309; x=1713875109;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3Iqz3uYB03cZmo9aNBvR/ZOxNMywrtwP/4mJcGIIpN4=;
+        b=PrpVXRc95lU2j4X6H42TjBi/feWScQ906p5S+LOjWdj4XH7y6LuUen8+94OBzsWZo4
+         wKhJlPH725iefwtdw++8otekS+mOe4r4bizBYj5r71axEp4oAXOq3dJYTIq62Xg49VD7
+         HExmbd5kj5F+ig+ypXjn26skkI4T5xFJI8nsGptSwlpJMRO8CgF0WTL9iJ/tY+tguqxo
+         g+s1llyoAr4b+LyBNeh8ygoB6wlLiR4BQm9O/rI81ubxFLDJWXJteeNJUE4W99bbUhH5
+         1Z6BwfRs4bZgsmIuWN3coaXXhWo6TkPB+XariMNEXcqZ6cxeP+u4F9r9lSSv+ONAAw/T
+         imEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWJFj5d3QMrDX6U83tQ2vKejbJNZg8l+YcFGG+JmVZtrjEPXMvyXX2aMEyLsYTc/aJIe3TgITsyU6dzrWFsu3F/yxvRuiEa
+X-Gm-Message-State: AOJu0YzI3d/3H6ucBwcTM5NH51qiG8DNDXRg2ry1q5Xq4lcjvmWi8/m4
+	64/E0JnEOOy907QC9ZQ7HhsI+qFU/D87hkg5Tz/qYPTkcJlWao3+I1uY0n/xquQCBHlQz8mbjMb
+	Ef8UArh4VuTpV7HpmVJC1Fbv9rHgKZRSodXk=
+X-Google-Smtp-Source: AGHT+IFAlHbB8sWqNMPSyWvDGwR8gagW+jfhM7hArqhN/K9UaYFyybAhAdOI1y0UHIcKye+RvecL9GUppbL71gD+27k=
+X-Received: by 2002:a17:907:9717:b0:a51:c88e:e95a with SMTP id
+ jg23-20020a170907971700b00a51c88ee95amr9550001ejc.23.1713270308559; Tue, 16
+ Apr 2024 05:25:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <20240411115630.38420-1-kerneljasonxing@gmail.com>
+ <20240411115630.38420-5-kerneljasonxing@gmail.com> <CANn89iKbBuEqsjyJ-di3e-cF1zv000YY1HEeYq-Ah5x7nX5ppg@mail.gmail.com>
+ <CAL+tcoB=Hr8s+j7Sm8viF-=3aHwhEevZZcpn5ek0RYmNowAtoQ@mail.gmail.com>
+In-Reply-To: <CAL+tcoB=Hr8s+j7Sm8viF-=3aHwhEevZZcpn5ek0RYmNowAtoQ@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 16 Apr 2024 20:24:31 +0800
+Message-ID: <CAL+tcoDVFtvg6+Kio9frU5W=2e2n7qrCJkitXUxNjsouAG+iGg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 4/6] tcp: support rstreason for passive reset
+To: Eric Dumazet <edumazet@google.com>
+Cc: dsahern@kernel.org, matttbe@kernel.org, martineau@kernel.org, 
+	geliang@kernel.org, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
+	rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
+	atenart@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Tue, Apr 16, 2024 at 3:45=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> On Tue, Apr 16, 2024 at 2:34=E2=80=AFPM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Thu, Apr 11, 2024 at 1:57=E2=80=AFPM Jason Xing <kerneljasonxing@gma=
+il.com> wrote:
+> > >
+> > > From: Jason Xing <kernelxing@tencent.com>
+> > >
+> > > Reuse the dropreason logic to show the exact reason of tcp reset,
+> > > so we don't need to implement those duplicated reset reasons.
+> > > This patch replaces all the prior NOT_SPECIFIED reasons.
+> > >
+> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > ---
+> > >  net/ipv4/tcp_ipv4.c | 8 ++++----
+> > >  net/ipv6/tcp_ipv6.c | 8 ++++----
+> > >  2 files changed, 8 insertions(+), 8 deletions(-)
+> > >
+> > > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> > > index 441134aebc51..863397c2a47b 100644
+> > > --- a/net/ipv4/tcp_ipv4.c
+> > > +++ b/net/ipv4/tcp_ipv4.c
+> > > @@ -1935,7 +1935,7 @@ int tcp_v4_do_rcv(struct sock *sk, struct sk_bu=
+ff *skb)
+> > >         return 0;
+> > >
+> > >  reset:
+> > > -       tcp_v4_send_reset(rsk, skb, SK_RST_REASON_NOT_SPECIFIED);
+> > > +       tcp_v4_send_reset(rsk, skb, (u32)reason);
+> > >  discard:
+> > >         kfree_skb_reason(skb, reason);
+> > >         /* Be careful here. If this function gets more complicated an=
+d
+> > > @@ -2278,7 +2278,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
+> > >                 } else {
+> > >                         drop_reason =3D tcp_child_process(sk, nsk, sk=
+b);
+> > >                         if (drop_reason) {
+> > > -                               tcp_v4_send_reset(nsk, skb, SK_RST_RE=
+ASON_NOT_SPECIFIED);
+> > > +                               tcp_v4_send_reset(nsk, skb, (u32)drop=
+_reason);
+> >
+> > Are all these casts really needed ?
+>
+> Not really. If without, the compiler wouldn't complain about it.
 
-On Mon, 15 Apr 2024 16:44:31 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
+The truth is mptcp CI treats it as an error (see link[1]) when I
+submitted the V5 patchset but my machine works well. I wonder whether
+I should not remove all the casts or ignore the warnings?
 
-> On Mon, Apr 15, 2024 at 07:43:52PM +0900, FUJITA Tomonori wrote:
->> This patch adds supports for multiple PHY hardware with PHYLIB. The
->> adapters with TN40xx chips use multiple PHY hardware; AMCC QT2025, TI
->> TLK10232, Aqrate AQR105, and Marvell 88X3120, 88X3310, and MV88E2010.
->> 
->> For now, the PCI ID table of this driver enables adapters using only
->> QT2025 PHY. I've tested this driver and the QT2025 PHY driver with
->> Edimax EN-9320 10G adapter.
-> 
-> Please split this up. Add the MDIO bus master in one patch. Then add
-> support for phylib in a second patch. They are logically different
-> things.
+[1]: https://github.com/multipath-tcp/mptcp_net-next/actions/runs/870508471=
+7/job/23874718134
+net/ipv6/tcp_ipv6.c: In function 'tcp_v6_do_rcv':
+4148 net/ipv6/tcp_ipv6.c:1683:36: error: implicit conversion from
+'enum skb_drop_reason' to 'enum sk_rst_reason'
+[-Werror=3Denum-conversion]
+4149 1683 | tcp_v6_send_reset(sk, skb, reason);
+4150 | ^~~~~~
+4151 net/ipv6/tcp_ipv6.c: In function 'tcp_v6_rcv':
+4152 net/ipv6/tcp_ipv6.c:1868:61: error: implicit conversion from
+'enum skb_drop_reason' to 'enum sk_rst_reason'
+[-Werror=3Denum-conversion]
+4153 1868 | tcp_v6_send_reset(nsk, skb, drop_reason);
+4154 | ^~~~~~~~~~~
+4155 net/ipv6/tcp_ipv6.c:1945:46: error: implicit conversion from
+'enum skb_drop_reason' to 'enum sk_rst_reason'
+[-Werror=3Denum-conversion]
+4156 1945 | tcp_v6_send_reset(NULL, skb, drop_reason);
+4157 | ^~~~~~~~~~~
+4158 net/ipv6/tcp_ipv6.c:2001:44: error: implicit conversion from
+'enum skb_drop_reason' to 'enum sk_rst_reason'
+[-Werror=3Denum-conversion]
+4159 2001 | tcp_v6_send_reset(sk, skb, drop_reason);
 
-Understood, I'll split this in v2.
+Thanks,
+Jason
 
-
-> Are there variants of this device using SFP? It might be you actually
-> want to use phylink, not phylib. That is a bit messy for a PCI device,
-> look at drivers/net/ethernet/wangxun.
-
-phylink is necessary if PHY is hot-pluggable, right? if so, the driver
-doesn't need it. The PHYs that adapters with TN40XX use are
-
-AMCC QT2025 PHY (SFP+)
-- Tehuti TN9310
-- DLink DXE-810S
-- Asus XG-C100F
-- Edimax EN-9320
-
-Marvell MV88x3120 (10GBase-T)
-- Tehuti TN9210
-
-Marvell MV88X3310 (10GBase-T)
-- Tehuti TN9710
-- Edimax EN-9320TX-E
-- Buffalo LGY-PCIE-MG
-- IOI GE10
-- LR-Link LREC6860BT
-- QNAP PCIe Expansion Card
-
-Marvell MV88E2010 (5GBase-T)
-- Tehuti TN9710Q
-
-TI TLK10232 (SFP+)
-- Tehuti TN9610
-- LR-Link LREC6860AF
-
-Aquantia AQR105 (10GBase-T)
-- Tehuti TN9510
-- DLink DXE-810T
-- Edimax EN-9320TX-E
-
-
->> diff --git a/drivers/net/ethernet/tehuti/Kconfig b/drivers/net/ethernet/tehuti/Kconfig
->> index 4198fd59e42e..71f22471f9a0 100644
->> --- a/drivers/net/ethernet/tehuti/Kconfig
->> +++ b/drivers/net/ethernet/tehuti/Kconfig
->> @@ -27,6 +27,7 @@ config TEHUTI_TN40
->>  	tristate "Tehuti Networks TN40xx 10G Ethernet adapters"
->>  	depends on PCI
->>  	select FW_LOADER
->> +	select AMCC_QT2025_PHY
-> 
-> That is pretty unusual, especially when you say there are a few
-> different choices.
-
-I should not put any 'select *_PHY' here?
-
-
->> +static u32 bdx_mdio_get(struct bdx_priv *priv)
->> +{
->> +	void __iomem *regs = priv->regs;
->> +
->> +#define BDX_MAX_MDIO_BUSY_LOOPS 1024
->> +	int tries = 0;
->> +
->> +	while (++tries < BDX_MAX_MDIO_BUSY_LOOPS) {
->> +		u32 mdio_cmd_stat = readl(regs + REG_MDIO_CMD_STAT);
->> +
->> +		if (GET_MDIO_BUSY(mdio_cmd_stat) == 0)
->> +			return mdio_cmd_stat;
->> +	}
->> +	dev_err(&priv->pdev->dev, "MDIO busy!\n");
-> 
-> include/linux/iopoll.h
-> 
->> +	return 0xFFFFFFFF;
-> 
-> It is always better to use standard error codes. In this case,
-> -ETIMEDOUT.
-
-I'll
-
-
->> +static u16 bdx_mdio_read(struct bdx_priv *priv, int device, int port, u16 addr)
->> +{
->> +	void __iomem *regs = priv->regs;
->> +	u32 tmp_reg, i;
->> +	/* wait until MDIO is not busy */
->> +	if (bdx_mdio_get(priv) == 0xFFFFFFFF)
->> +		return -1;
->> +
->> +	i = ((device & 0x1F) | ((port & 0x1F) << 5));
->> +	writel(i, regs + REG_MDIO_CMD);
->> +	writel((u32)addr, regs + REG_MDIO_ADDR);
->> +	tmp_reg = bdx_mdio_get(priv);
->> +	if (tmp_reg == 0xFFFFFFFF)
->> +		return -1;
-> 
-> This function has a return type of u16. So returning -1 makes no sense.
-
-Yeah, I thought the same but left it alone. I'll change in v2.
-
-
->> +static int mdio_read_reg(struct mii_bus *mii_bus, int addr, int devnum, int regnum)
->> +{
->> +	return bdx_mdio_read(mii_bus->priv, devnum, addr, regnum);
-> 
-> I would probably change bdx_mdio_read() so that it takes the
-> parameters in the same order as mdio_read_reg().
-
-Sure, I'll.
-
-
-> There is also a reasonably common convention that the functions
-> performing C45 bus protocol operations have c45 in their name. It
-> appears this hardware does not support C22 at all. That makes it
-> unusual, and little hits like this are useful.
-
-I'm not sure the adapters supports C22 or not (probably do, I
-guess). But the original driver uses C45 bus protocol operations.
+>
+> >
+> > enum sk_rst_reason is not the same as u32 anyway ?
+>
+> I will remove the cast in the next version.
+>
+> Thanks,
+> Jason
+>
+> >
+> >
+> >
+> > >                                 goto discard_and_relse;
+> > >                         }
+> > >                         sock_put(sk);
+> > > @@ -2356,7 +2356,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
+> > >  bad_packet:
+> > >                 __TCP_INC_STATS(net, TCP_MIB_INERRS);
+> > >         } else {
+> > > -               tcp_v4_send_reset(NULL, skb, SK_RST_REASON_NOT_SPECIF=
+IED);
+> > > +               tcp_v4_send_reset(NULL, skb, (u32)drop_reason);
+> > >         }
+> > >
+> > >  discard_it:
+> > > @@ -2407,7 +2407,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
+> > >                 tcp_v4_timewait_ack(sk, skb);
+> > >                 break;
+> > >         case TCP_TW_RST:
+> > > -               tcp_v4_send_reset(sk, skb, SK_RST_REASON_NOT_SPECIFIE=
+D);
+> > > +               tcp_v4_send_reset(sk, skb, (u32)drop_reason);
+> > >                 inet_twsk_deschedule_put(inet_twsk(sk));
+> > >                 goto discard_it;
+> > >         case TCP_TW_SUCCESS:;
+> > > diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+> > > index 6cad32430a12..ba9d9ceb7e89 100644
+> > > --- a/net/ipv6/tcp_ipv6.c
+> > > +++ b/net/ipv6/tcp_ipv6.c
+> > > @@ -1678,7 +1678,7 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_bu=
+ff *skb)
+> > >         return 0;
+> > >
+> > >  reset:
+> > > -       tcp_v6_send_reset(sk, skb, SK_RST_REASON_NOT_SPECIFIED);
+> > > +       tcp_v6_send_reset(sk, skb, (u32)reason);
+> > >  discard:
+> > >         if (opt_skb)
+> > >                 __kfree_skb(opt_skb);
+> > > @@ -1864,7 +1864,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct s=
+k_buff *skb)
+> > >                 } else {
+> > >                         drop_reason =3D tcp_child_process(sk, nsk, sk=
+b);
+> > >                         if (drop_reason) {
+> > > -                               tcp_v6_send_reset(nsk, skb, SK_RST_RE=
+ASON_NOT_SPECIFIED);
+> > > +                               tcp_v6_send_reset(nsk, skb, (u32)drop=
+_reason);
+> > >                                 goto discard_and_relse;
+> > >                         }
+> > >                         sock_put(sk);
+> > > @@ -1940,7 +1940,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct s=
+k_buff *skb)
+> > >  bad_packet:
+> > >                 __TCP_INC_STATS(net, TCP_MIB_INERRS);
+> > >         } else {
+> > > -               tcp_v6_send_reset(NULL, skb, SK_RST_REASON_NOT_SPECIF=
+IED);
+> > > +               tcp_v6_send_reset(NULL, skb, (u32)drop_reason);
+> > >         }
+> > >
+> > >  discard_it:
+> > > @@ -1995,7 +1995,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct s=
+k_buff *skb)
+> > >                 tcp_v6_timewait_ack(sk, skb);
+> > >                 break;
+> > >         case TCP_TW_RST:
+> > > -               tcp_v6_send_reset(sk, skb, SK_RST_REASON_NOT_SPECIFIE=
+D);
+> > > +               tcp_v6_send_reset(sk, skb, (u32)drop_reason);
+> > >                 inet_twsk_deschedule_put(inet_twsk(sk));
+> > >                 goto discard_it;
+> > >         case TCP_TW_SUCCESS:
+> > > --
+> > > 2.37.3
+> > >
 
