@@ -1,107 +1,152 @@
-Return-Path: <netdev+bounces-88352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88374-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB1378A6D3C
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:03:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC5988A6E96
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:40:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7834C1F21F7D
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:03:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 198711C208BF
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2F6912C534;
-	Tue, 16 Apr 2024 14:03:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8220C12D741;
+	Tue, 16 Apr 2024 14:40:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y6a/QgKJ"
+	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="PHNTRx7R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-00190b01.pphosted.com (mx0a-00190b01.pphosted.com [67.231.149.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF2A12838C
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 14:03:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B429012C7E1
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 14:40:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.149.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713276235; cv=none; b=cFA2pCwX0yYDFE8rB+6BGXesMpdQqB8P7HDKMwC5h9QzTtAnTaY5SzjquYg6nFNglDctrBT6tIiglA23k7R9eHYMLw/OWnMfY4ZnC64TUnqfmGL9Qn4E/pI5/J7I9/ljSY8A6byxbfoni63iMt/hDlMTh1dEsRNJSgtrc8ZEVmI=
+	t=1713278420; cv=none; b=isHk7UAgu+WUkOD0Jwrnd74rp3nKp3baS3QSV2m5UQGvWiLxdC9WKpn9oXeMKL6Ma1X6EMS47LQQBlzlB0/dzOZ3prihlTe8+01mYGZzgOpKIZinwVuXjO4NaWOJBFa4dp1SNp84Q5QXDHuggKDDsqNL4LofcXZASslZhIByGQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713276235; c=relaxed/simple;
-	bh=NBj2faIDWfRGvaFskrldJQKqfGDtLnqcZK0ZzhWnlw4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Dtzw5mFE1WqLChoiVbeOQrDzZJusjkGeXJ7HAPN1T7ZQq25w9Siwqg3Oso+FOA63M9XoR6cajYUnBG/VjOEDVp2w1jZMObMsyWxsgaubap2OSUuyCNwZxV+8c+IJ1N8oq0Eq8Wi1Vt98Cjq2VIMZFIXy6sQfJNC/cJsWCJ/tuG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y6a/QgKJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFD9BC113CE;
-	Tue, 16 Apr 2024 14:03:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713276235;
-	bh=NBj2faIDWfRGvaFskrldJQKqfGDtLnqcZK0ZzhWnlw4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y6a/QgKJ5jPw0oOpFuzPk1MQBVrR33ugiu2GIac2tTKKdMaHDHzvbs+zkh/E78OTr
-	 27pjoJphG6Tl45cVlIPJ4KjqoUWI43QHl6+UFiGyQVfKRj7v3+i99a+G3Sb70eKEKY
-	 wPaeAE+PEA/kfL5QlsIIUDWEUMCr4H1sphkNueiYebUFusQj3bOiESQZbny6fjEF4+
-	 Er9PELtY6Vm+ZjSrI+6bPwpK2uojvAEa1QmeAEIC/AlBwywInaZT3euJDJj6EQWqot
-	 JRoTR8qrEsdYA8oYR5VS+e2mpGHxHEVP9wa6GUtZiifg/nSMN+ZGDcTmTaWdVSEWn9
-	 jo+MT70G1djxQ==
-Date: Tue, 16 Apr 2024 15:03:50 +0100
-From: Simon Horman <horms@kernel.org>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Breno Leitao <leitao@debian.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	David Ahern <dsahern@kernel.org>
-Subject: Re: [PATCH net-next] ip6_vti: fix memleak on netns dismantle
-Message-ID: <20240416140350.GN2320920@kernel.org>
-References: <20240415122346.26503-1-fw@strlen.de>
+	s=arc-20240116; t=1713278420; c=relaxed/simple;
+	bh=1BdBPVAV0mrWTGTreldc7Ot1QrtRmHp3dJMaCMuooME=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=V/+Z8mGQT3GYRxbQ77PjA6ABbUy0Prs2OKSY+A2VE4dDf164uzqH6IfRiDkz877l6xuf4/SK/gjDf4/JNVEdx46BuujupEuIUN3lW/qVkQ6NffR0n8MHHx4/CeV/10qdePFPoOZghzXg26QgauNiKfarC103Z56J8Nc4K4fKuPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=PHNTRx7R; arc=none smtp.client-ip=67.231.149.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=akamai.com
+Received: from pps.filterd (m0409409.ppops.net [127.0.0.1])
+	by m0409409.ppops.net-00190b01. (8.17.1.24/8.17.1.24) with ESMTP id 43GDZM0Y022093;
+	Tue, 16 Apr 2024 14:55:51 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	jan2016.eng; bh=DHwnHypu6sHzP6tjQeyxFr/Sxhwumgdt7dqnAJdslrE=; b=
+	PHNTRx7RK0rLBCyG7fLAppwypSKglxCwLuXh3uJpUxeZtmxToAtGiQyNJUw7ZEbg
+	q3O0+TE5PUKqhnopDy/j8/GiS+W43XIe9W8NFxfQfzTzwZQi25AiVH5QZsw4gK6/
+	1j1TbJyI5wvrnK9OcE/UV1IAYsmfWjH1rWHvBlnSEMWrqcvBG6mARidCFIlamncU
+	ywlhkPG4W5Xmvg3t3RkuW4L2cq4yNitOHGncyjISZXVKOQoZoDlzVa9iTTUeEFWr
+	ZU+rcPfPydaVhctdizeKLeTDrsA97MqVBv8SubadfxagKud6Tolqw5XhZqqh7h42
+	floWpsdKhNtrKaherhEp/w==
+Received: from prod-mail-ppoint6 (prod-mail-ppoint6.akamai.com [184.51.33.61] (may be forged))
+	by m0409409.ppops.net-00190b01. (PPS) with ESMTPS id 3xhtbng6j3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Apr 2024 14:55:49 +0100 (BST)
+Received: from pps.filterd (prod-mail-ppoint6.akamai.com [127.0.0.1])
+	by prod-mail-ppoint6.akamai.com (8.17.1.19/8.17.1.19) with ESMTP id 43GB0p1g008621;
+	Tue, 16 Apr 2024 09:55:47 -0400
+Received: from prod-mail-relay11.akamai.com ([172.27.118.250])
+	by prod-mail-ppoint6.akamai.com (PPS) with ESMTP id 3xfncxg04s-1;
+	Tue, 16 Apr 2024 09:55:47 -0400
+Received: from [172.19.45.47] (bos-lpa4700a.bos01.corp.akamai.com [172.19.45.47])
+	by prod-mail-relay11.akamai.com (Postfix) with ESMTP id 9029C33251;
+	Tue, 16 Apr 2024 13:55:47 +0000 (GMT)
+Message-ID: <f3065c55-5123-4cd7-8e93-85a74b150a27@akamai.com>
+Date: Tue, 16 Apr 2024 09:55:47 -0400
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240415122346.26503-1-fw@strlen.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: mlx5 and gre tunneling
+To: Gal Pressman <gal@nvidia.com>, saeedm@nvidia.com
+Cc: netdev@vger.kernel.org
+References: <c42961cb-50b9-4a9a-bd43-87fe48d88d29@akamai.com>
+ <6e722b57-7fd9-40ea-8dc5-0ecf62dcfb66@nvidia.com>
+Content-Language: en-US
+From: Jason Baron <jbaron@akamai.com>
+In-Reply-To: <6e722b57-7fd9-40ea-8dc5-0ecf62dcfb66@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-16_10,2024-04-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxscore=0
+ mlxlogscore=999 adultscore=0 phishscore=0 bulkscore=0 spamscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404160083
+X-Proofpoint-ORIG-GUID: oSfDGNZMXMIDYQ_lZv3n0NaXzOORqvd7
+X-Proofpoint-GUID: oSfDGNZMXMIDYQ_lZv3n0NaXzOORqvd7
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-16_10,2024-04-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
+ adultscore=0 spamscore=0 priorityscore=1501 clxscore=1011 impostorscore=0
+ mlxscore=0 bulkscore=0 lowpriorityscore=0 phishscore=0 mlxlogscore=999
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2404010003
+ definitions=main-2404160083
 
-+ Steffen Klassert, Herbert Xu, David Ahern
+On 4/16/24 8:28 AM, Gal Pressman wrote:
+> On 08/04/2024 16:41, Jason Baron wrote:
+>> Hi,
+>>
+>> I recently found an issue where if I send udp traffic in a GRE tunnel
+>> over a mellanox 5 NIC where tx-gre-segmentation is enbalbed on the NIC,
+>> then packets on the receive side are corrupted to a point that they are
+>> never passed up to the user receive socket. I took a look at the
+>> received traffic and the inner ip headers appear corrupted as well as
+>> the payloads. This reproduces every time for me on both AMD and Intel
+>> based x86 systems.
+>>
+>> The reproducer is quite simple. For example something like this will work:
+>>
+>> https://urldefense.com/v3/__https://github.com/rom1v/udp-segmentation__;!!GjvTz_vk!TPSVKAaeP_0RAV6hCgRl1GVxyz54xSI1oNXyo8HgWbTXLQ8ZyPRZIlOhPq68YerjtMBMo4bm$
+>>
+>> It just needs to be modified to actually pass the traffic through the
+>> NIC (ie not localhost). As long as the original UDP packet needs to be
+>> segmented I see the corruption. That is if it all fits in one packet, I
+>> don't see the corruption. Turning off tx-gre-segmentation on the
+>> mellanox NIC makes the problem go away (as it gets segmented first in
+>> software). Also, I've successfully run this test with other NICs. So
+>> this appears to be something specific to the Mellanox NIC.
+>>
+>> Here's an example one that fails, with the latest upstream (6.8) kernel,
+>> for example:
+>>
+>> driver: mlx5_core
+>> version: 6.8.0+
+>> firmware-version: 16.35.3502 (MT_0000000242)
+>>
+>> Let me know if I can fill in any more details.
+>>
+>> Thanks!
+>>
+>> -Jason
+>>
+> 
+> Hi Jason, thanks for the report!
+> 
+> I have managed to reproduce the issue on our side, let me see what went
+> wrong.
+> 
 
-On Mon, Apr 15, 2024 at 02:23:44PM +0200, Florian Westphal wrote:
-> kmemleak reports net_device resources are no longer released, restore
-> needs_free_netdev toggle.  Sample backtrace:
-> 
-> unreferenced object 0xffff88810874f000 (size 4096): [..]
->     [<00000000a2b8af8b>] __kmalloc_node+0x209/0x290
->     [<0000000040b0a1a9>] alloc_netdev_mqs+0x58/0x470
->     [<00000000b4be1e78>] vti6_init_net+0x94/0x230
->     [<000000008830c1ea>] ops_init+0x32/0xc0
->     [<000000006a26fa8f>] setup_net+0x134/0x2e0
-> [..]
-> 
-> Cc: Breno Leitao <leitao@debian.org>
-> Fixes: a9b2d55a8f1e ("ip6_vti: Do not use custom stat allocator")
-> Signed-off-by: Florian Westphal <fw@strlen.de>
+Hi Gal,
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Thanks for looking into this.
 
-> ---
->  net/ipv6/ip6_vti.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
-> index 4d68a0777b0c..78344cf3867e 100644
-> --- a/net/ipv6/ip6_vti.c
-> +++ b/net/ipv6/ip6_vti.c
-> @@ -901,6 +901,7 @@ static void vti6_dev_setup(struct net_device *dev)
->  {
->  	dev->netdev_ops = &vti6_netdev_ops;
->  	dev->header_ops = &ip_tunnel_header_ops;
-> +	dev->needs_free_netdev = true;
->  
->  	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
->  	dev->type = ARPHRD_TUNNEL6;
-> -- 
-> 2.43.2
-> 
-> 
+We've also found that vxlan encapsulation also fails using the same 
+testcase as used for gre tunneling. For vxlan encapsulation if we turn 
+off 'tx-udp_tnl-csum-segmentation' then things work again.
+
+Thanks,
+
+-Jason
 
