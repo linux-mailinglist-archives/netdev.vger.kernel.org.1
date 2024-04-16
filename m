@@ -1,125 +1,272 @@
-Return-Path: <netdev+bounces-88257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43E0A8A67CB
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:09:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C1DC78A67DE
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:10:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE7A7280E90
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:09:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 781AA28118E
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDA8486626;
-	Tue, 16 Apr 2024 10:09:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9234586AFC;
+	Tue, 16 Apr 2024 10:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NYGipsTw"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aJMP13Eq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96E885280
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 10:09:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713262149; cv=none; b=MpEavr2J/tQsr600CMtFb7ZP2HlMkzB/ciwCVGvL7TvdNbzCZ8w/bkm6dHPHwBPFyvjfbrllPXItvV4H0vqzWHAxP6wWF0cJjy1r6gQeZRJPR7h080j02VjISlxrxgXk+GQyMHgg/r0HurBZ4QLjGLSNMsEaTS1/AWeZVfIuKhg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713262149; c=relaxed/simple;
-	bh=peiz5cFEm1TubSTCXtHzjoG9rCXhQkkt7Egr0UoVjv0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=N+6Os3m+z32lJdQB1BnQyKXOeQ6TF/a4xG4CQcPd2mmD71DHPC/+qVB2STDcZ/xMzm2dh5tz447E9Q0hM1hKQYicTBm02I4d67NLQ+xVMq4o72OYuXkh5N0NZV3rUHlsmkmc01wRVSFfEfB6sG4dbCZhEVGGDvQf+zMxL5anHSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NYGipsTw; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713262146;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=peiz5cFEm1TubSTCXtHzjoG9rCXhQkkt7Egr0UoVjv0=;
-	b=NYGipsTwKhbhmizJEjFRdtaEB56cPlAmH4tGCsPrPlLUrKA/PTP5UY/3UUphM+Urb/b+bB
-	0be0yC0CcdByg4yKxx+bBdPyYEkFQe2BU+dNdTWZYVN8lKMrBHJVK24kANlnNR7XXEx93P
-	wSK9aYnjapkhCw3r+XzgxQ9mqM3wtaY=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-319-wHfAV7zdNv-nTxnYW5CHTQ-1; Tue, 16 Apr 2024 06:09:05 -0400
-X-MC-Unique: wHfAV7zdNv-nTxnYW5CHTQ-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2dad57bfc5dso1085071fa.3
-        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 03:09:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713262144; x=1713866944;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=peiz5cFEm1TubSTCXtHzjoG9rCXhQkkt7Egr0UoVjv0=;
-        b=kj+z2r+aQc1/ByMml26U9OAL57/dA657ELlw/K3DisD9mHqt8sswLTpfCFZ0nqQ1C7
-         Kx2SIkVc7lHI5MGJwsZOiELmzJ8eT/v9rr9J0ICSbSpAy+oGZ6Rz/IrzJdIKtyTQqVOA
-         CkNr8HJ4XvKxU9TGmz9CRvdK+IhPy9eDtXzTt/R21Hlorn8o4z0xYBkiqjxNLMbcTE9c
-         DaqKLcb+t5Z7SuBQRLdH/NNW3KY+Wg17FB2yrUyqEkJDy1AYAKldSFaxEcc17YGnicaV
-         xwPFVs0ivxlBHRIrFYk5r73UF5i7nr+PlggXm7lvt8qcgmNEL+IUHNdhlR4j8FCk03Ot
-         XSFg==
-X-Forwarded-Encrypted: i=1; AJvYcCXS+WFdMVgENMSND+ykuTU1Mno1viZpSqbAiDR/0rlBGhRX39rLJ5v/uMDkalMehYQapheutKTiNNQy9NO3/uufETN+5mMF
-X-Gm-Message-State: AOJu0YyYfCdp97RnODBE1RThNiav1VrD+j1UUwp5D5TqxW0CJUc5Ig98
-	Kar/Rmnz+oTEYgD/F1aSsBuxG7yjd1sIjnoX/8M+jszVPWb2MKK0g2KuXNhBGYez/5VR2gwdHXl
-	d4Id1yTmWdBpUe0BsDAB4WRwDsolUCNwbqm5Bh9tvPLfCmiozQmsxJw==
-X-Received: by 2002:a2e:9247:0:b0:2da:5f41:10db with SMTP id v7-20020a2e9247000000b002da5f4110dbmr3737773ljg.0.1713262143819;
-        Tue, 16 Apr 2024 03:09:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF2ts/HPghqslvzYPwxZxNJtFxXafGyq8dW6Gf+vRvPH/ZJJ7zl2YH8o3o2A9cm45AmNhdgXg==
-X-Received: by 2002:a2e:9247:0:b0:2da:5f41:10db with SMTP id v7-20020a2e9247000000b002da5f4110dbmr3737759ljg.0.1713262143409;
-        Tue, 16 Apr 2024 03:09:03 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-231-31.dyn.eolo.it. [146.241.231.31])
-        by smtp.gmail.com with ESMTPSA id he8-20020a05600c540800b00416a08788a5sm22651170wmb.27.2024.04.16.03.09.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 03:09:02 -0700 (PDT)
-Message-ID: <66d0b3bad41b995232f058970f5414e9e852b77b.camel@redhat.com>
-Subject: Re: [PATCH net-next v3 1/1] ptp: 82p33: move register definitions
- out of ptp folder
-From: Paolo Abeni <pabeni@redhat.com>
-To: Min Li <lnimi@hotmail.com>, richardcochran@gmail.com, lee@kernel.org
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, Min Li
-	 <min.li.xe@renesas.com>
-Date: Tue, 16 Apr 2024 12:09:01 +0200
-In-Reply-To: <LV3P220MB12025B8C285BC6D8541B052BA0042@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
-References: 
-	<LV3P220MB12025B8C285BC6D8541B052BA0042@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18F9486250;
+	Tue, 16 Apr 2024 10:10:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713262232; cv=fail; b=NIXyXwNwSCUpzg1gIOgasXuBGDAu9HScwwPGD4oWsZ0+2baU5x03/aHsduXlkyBL605GqH2mE8xO35R3o3QiWG3XfsyrMCbC7xtsw0EdgegmqV7v3mjqlruVOSFjfODOCW87S9xwbFEtnn279Q9h0jE8pt0ow6EjnZSXNkBZAqU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713262232; c=relaxed/simple;
+	bh=MMIYebeu+dDlQKXx09cmRZVC4onTFT+ZqrRTeijtzHo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=SCRgaIjV+rVd9zn1K2mQyi0ryE2rewRsNoD1uyK6tT3yrZdq39AEvzQiWGM0FDiIjymeNrE6ax00hlJJojC5TZFcPxhfr3wyfj98+zwCkUyb0FHY15M1Us828oMaDb7P1wJBie6beviRzBkqxe6ISPTxQ85bSywsQ3PXEZq3Kww=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aJMP13Eq; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713262230; x=1744798230;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=MMIYebeu+dDlQKXx09cmRZVC4onTFT+ZqrRTeijtzHo=;
+  b=aJMP13EqesjY16cotX3CJ4t4ptp2cubv7OSNg7fLdKTO8C89FYinZ5zW
+   o4vBsWMakmTHpZVNBDGf2+E0cu3MobSXyquMlxEEy0HqlBJU4HWQrqnrt
+   D6+oOeMBJcl4ysM0lWusqsobuulCUxXmA7vc/BrJO4hqIpiakf+ZcIi58
+   nngt1NswBxwSjB5+CmfYmwAkPzs64s1hsHhP5V6fxYX+4zv/Iic1yab0H
+   zgb557cAj+PsGHysrkxJnluajlud9Qa/IX9wS7xozse7CLemkP+1RVHa6
+   /lA2LtpjFr3V9QG/TOdyoIugUWjfbcn7CjMFXSVQ7e4Bq2wBDl4F3KQwU
+   w==;
+X-CSE-ConnectionGUID: Cj0uKZt4Rl+3PLGIIPNjYg==
+X-CSE-MsgGUID: KZidoLJkRsehVwWqIdiUgg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11045"; a="19251680"
+X-IronPort-AV: E=Sophos;i="6.07,205,1708416000"; 
+   d="scan'208";a="19251680"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 03:10:29 -0700
+X-CSE-ConnectionGUID: Gi72GF/BShS87ivh+ZN3kA==
+X-CSE-MsgGUID: cRtgRmxVSCWRoaUY/XSeuw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,205,1708416000"; 
+   d="scan'208";a="27008272"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 16 Apr 2024 03:10:27 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 16 Apr 2024 03:10:27 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 16 Apr 2024 03:10:26 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.101)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 16 Apr 2024 03:10:26 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Qyg2RNKWp/63sAWaCrovgfUu3Jmlc+itgqZ+vRX0hhHm1tQSpSlzvuHEm3fuVw9+9r7+FSBeOqpzDG/0nYfuwk335b2XVVytY3PwDKtbK2PwiVPnr39zZD7FwGbdUU7u32KoB0RWxj/1vxEgraR39t/n3CGEiWfeuJl6pHXBhoijm8lhkt/rukkuZFjns2db14SJGZF6re9rxUwyIIgxkDAGWmWaqCsZwTmf00t8uod0iz0NwbTkkuovHD0Svb1YXNNbA1hD8Uo/elHuqXL5PD5SEuK8AQHwxVDMrUsaDZWW1zP0mhE01k62BFtehvpTthEnq2WpD/bpB2zhPHHmsA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CnVz6ESopbQxq+Ko0NebdCvA29iAVUVzwTPfiWasmoU=;
+ b=FhFuoLLNpW0rTNYpTkRGKA3WonC6ocu15enFnBROsJUILGQspYBQJjJvP13mJ62dfp5f7ZLw9gF3UXcsiQcQMdYsxj9WR6YyZUm35x91Gowi/NZPPm88Mq49KalHykOKhaiBOnEvO/lK4Va2gi/Tn4TVSiQ6OKwMYQdf7VAin2AR6qZtm+bS7stytaXA10778n2OCBn2GGtUNJYPkjQMv6I2dLKiy622X+HIgS9dAGgT1ihW3zLlMAfWGdfc+Q4Wocv+zGPQcKolzb+hGNU4Yz0jQGXN4ytCmSBQNkZl/64D8DVgz7K9rZ8jmL9JfsALPEV9jamR/3/i0WLeK3U8bg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CY8PR11MB7364.namprd11.prod.outlook.com (2603:10b6:930:87::14)
+ by MW4PR11MB6617.namprd11.prod.outlook.com (2603:10b6:303:20d::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.25; Tue, 16 Apr
+ 2024 10:10:24 +0000
+Received: from CY8PR11MB7364.namprd11.prod.outlook.com
+ ([fe80::6a93:4191:4aa3:6f7d]) by CY8PR11MB7364.namprd11.prod.outlook.com
+ ([fe80::6a93:4191:4aa3:6f7d%4]) with mapi id 15.20.7452.049; Tue, 16 Apr 2024
+ 10:10:24 +0000
+From: "D, Lakshmi Sowjanya" <lakshmi.sowjanya.d@intel.com>
+To: Thomas Gleixner <tglx@linutronix.de>, "jstultz@google.com"
+	<jstultz@google.com>, "giometti@enneenne.com" <giometti@enneenne.com>,
+	"corbet@lwn.net" <corbet@lwn.net>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+CC: "x86@kernel.org" <x86@kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>, "andriy.shevchenko@linux.intel.com"
+	<andriy.shevchenko@linux.intel.com>, "Dong, Eddie" <eddie.dong@intel.com>,
+	"Hall, Christopher S" <christopher.s.hall@intel.com>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
+	"joabreu@synopsys.com" <joabreu@synopsys.com>, "mcoquelin.stm32@gmail.com"
+	<mcoquelin.stm32@gmail.com>, "perex@perex.cz" <perex@perex.cz>,
+	"linux-sound@vger.kernel.org" <linux-sound@vger.kernel.org>, "Nguyen, Anthony
+ L" <anthony.l.nguyen@intel.com>, "peter.hilber@opensynergy.com"
+	<peter.hilber@opensynergy.com>, "N, Pandith" <pandith.n@intel.com>, "Mohan,
+ Subramanian" <subramanian.mohan@intel.com>, "T R, Thejesh Reddy"
+	<thejesh.reddy.t.r@intel.com>
+Subject: RE: [PATCH v6 01/11] x86/tsc: Add base clock properties in
+ clocksource structure
+Thread-Topic: [PATCH v6 01/11] x86/tsc: Add base clock properties in
+ clocksource structure
+Thread-Index: AQHaiz0PazTrRHQXt0yKbKUcSArdGrFiA2oAgAiwZpA=
+Date: Tue, 16 Apr 2024 10:10:24 +0000
+Message-ID: <CY8PR11MB7364EAD4BE0E1038A13C695DC4082@CY8PR11MB7364.namprd11.prod.outlook.com>
+References: <20240410114828.25581-1-lakshmi.sowjanya.d@intel.com>
+ <20240410114828.25581-2-lakshmi.sowjanya.d@intel.com> <87frvs3oer.ffs@tglx>
+In-Reply-To: <87frvs3oer.ffs@tglx>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CY8PR11MB7364:EE_|MW4PR11MB6617:EE_
+x-ms-office365-filtering-correlation-id: 877dfa4a-73c9-4314-a941-08dc5dfd6e9a
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 7X2j3Sr+sPvm66KH+R59lMGm9DP3RJljiynYa8B+z1IHTrBdeI/cHyR6q3EmbRzqdwMVuxFyL1CliVAGauLaociz6MvM9pHIW0xpgc4qYW0GUUpG5NsFx5SI89n5EtBm5z6EPJhpOD+AEB2N9RHUPpgSx5C6578pkoZjtj9G9gXwmvB55RjzZVCneIcSf9j91wb/6mUB25ry911rrarC02R1W3SmFNjwkgwomYd1PjdESlN0TYX+Ht7huRHHnPMnZSQS7oiC5Uqw6Qrfhv3s+p32XJEuYwyVvoEUuk+VRObEV96C2ja74vZipMnJ8oyekchpsbH6gP3Q/sQ8JMa4VM2eo5YhhtHptEyO849dGyHVseOqiadpYsuFtR+m0q3x7/pAWxYZKLonhW52yQtHOXc8N/oox5BW7K/MgDOonbjRMBXzwHQ68OFwO24erlZm8Dqo36er+hIw9v0w7INBXcYpsOg2qwdoWD0UG1YAtCXp04hpJ4rroEOi+dmTa3I/0L3xB3t6jmDJe6yVAu9pzmQUEUL1G6G6QlpSp1DE4pGF+v/x2NfX7v/USWXEUd5NLcQ1OYHYvoqnIBNUksOTNEpQ/QXblaDaQ3ZPm/JSeuaLZctwBSL+R4iHd5ts8dP5an7tyhaqiPgnUvYkmShZINGkop6wl1tabdGQDKK8HFSL+fC6utuzphAqjKsFJ4eoXg2GKdamO5RFlyFnBZMEzbNYghoLEwirVtF9+DvfK2c=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR11MB7364.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(366007)(1800799015)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?fZCem3OfmRUeadGxLm3Cl0AeviwAjXW5YG+w0oxua+WA9hjGMqE0BfrDlo6y?=
+ =?us-ascii?Q?92eqSYfM+RNGb0JjvK4J5rtMWReKzT07+My3BawvUndpu1gD0eWfz9XH9sAy?=
+ =?us-ascii?Q?VjetWVWFYOP4QJlM+cTuzu0UeFJgMkTD1kzONoKA5QxquFgByHqm3eEwsvDa?=
+ =?us-ascii?Q?p3IPSlULX6CDsDe625iHADPPcU8cnpc5kZnU0svE9s6oHwDD+untMDsvbudk?=
+ =?us-ascii?Q?jRnrCfYvzIQkPrG0mzDT4AcA9AigWhh9s9hieHhhy0DSG+hfAoba3nwimka6?=
+ =?us-ascii?Q?UElYmswymiWadqtPnyqNvzqNnsE3198+An0AsjPFz3fiUUYX5wGvH4Mcr7zl?=
+ =?us-ascii?Q?2aNueSyftcMni63kE1+cDwIx5qd5h5rgreICmWWLvAL0IHhXKywDQhY3jsjF?=
+ =?us-ascii?Q?swWhpi1Jid+nbtX8hP2J7s0Qc4kBlibuxIqM4RNPqjLsxptPtn5WtKgQ+Bpu?=
+ =?us-ascii?Q?8NXIk6OJwTzv0PE+LxAyIwquVS8/yg8HmyM14Q3Invnt4mwc0eJ54xZnuE6J?=
+ =?us-ascii?Q?YvHDGcUg51F5OkjP6CGsWM/Iz582QMjBPWv2cK25hPOIEt5dlwIVMo1uqb2u?=
+ =?us-ascii?Q?9stDOd6AF2dQd5oUJF/4QyKbNpchF08/H3GzciWHjSHO14Kl5PUUpSnqxc7k?=
+ =?us-ascii?Q?omeywCAE8tAUvP48Hkbe6UlxFAl76WJXwTce8w3vIUZjMpiwU7JISob0cOUg?=
+ =?us-ascii?Q?D4+bcgMLpBIStFVelZBHBBZ528KXhXRO9+m7J//1yN3+OpEavF9OfOSUdySP?=
+ =?us-ascii?Q?razx7TtZqETjFF+WJwEixeofBnIruVGVby8cVKaV5PIZ5BlyCFAtCX11t45K?=
+ =?us-ascii?Q?JHRNreLVaVpXo51ysG9/JDH4KeoJcSv+afXabEJrmPajIL+O7n9HGh2AaMC7?=
+ =?us-ascii?Q?Mx9Jf7XITKvTUE3DnlYINouTmm4bmDiQ22ui/YflZfA/fZJecpHCnwo4HBXN?=
+ =?us-ascii?Q?mYdY7ZG/NLhidlYk5XpIhpJGpFZh7eUP/sj8hhvxkhX1nR82eFuI88Wb5xvo?=
+ =?us-ascii?Q?SHKPtB8+h44fCmOJ0i3XTlRaYId6lEaUC4FnSzqvoH/32EotFMdoRZIIfEp3?=
+ =?us-ascii?Q?7Hf5AudjdKu6qSGMd3wz+PWyxXYaWLVLJhj78jvK0AwLM0KdKv6bD7+sUnot?=
+ =?us-ascii?Q?N+r92W0a6Qid1B3wE8YmP+j0JyJmbdCZ1o70c9+HA1fbrBb1Zc2VIpuBZ6Ve?=
+ =?us-ascii?Q?ZEQoB78v3+/XvQSyV7VJyycPyN8VvKzh+hsy50Q1qPqfmz6ZF5grEpIm8qoo?=
+ =?us-ascii?Q?EUq4nhmRX3LU+3xtTJrM8UpHOAx16yURlk+t2Fz0qzdEqZublLyY1vpoTU8k?=
+ =?us-ascii?Q?13351P8f9v9ONJx/RyJ4QWO2v8Sl/IG2mzrTyJir0qRLG20lE5m/XP1tCBIr?=
+ =?us-ascii?Q?13xodUGY6qI81OeMoqU21v55PRHPGniie0tgKAoo3KUo9JLvj4K2BT8OUR5S?=
+ =?us-ascii?Q?4yNiSt9d9WSkc7ygwQFsiO3yGnz7rK5S6rUFItCQkicLbVDxFPxhMth/VMh0?=
+ =?us-ascii?Q?B8Vo7C3UWiRnX5UhC+Tw1sSMvcodGJPDLTbobL9LcIDu0MotgpPbnwWxqmQZ?=
+ =?us-ascii?Q?iPJcs5ZFFsSB6EXW/1TW3jwckqPFq+AMz/mzuGWlLMBNcSQlKv0O+oBFF7NS?=
+ =?us-ascii?Q?Hg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR11MB7364.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 877dfa4a-73c9-4314-a941-08dc5dfd6e9a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Apr 2024 10:10:24.3316
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: xlzBk8Cqa+5gwmqz/F/tMSwkbRX9lwjASXOtiD8h+SSsQWVci8DLT37rC8fgTqk2vjmLs/k8kQ9RcKb/U4z2+QB+mZ7YuLvmvA0Jacg00Gk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6617
+X-OriginatorOrg: intel.com
 
-On Fri, 2024-04-12 at 12:17 -0400, Min Li wrote:
-> From: Min Li <min.li.xe@renesas.com>
+
+
+> -----Original Message-----
+> From: Thomas Gleixner <tglx@linutronix.de>
+> Sent: Thursday, April 11, 2024 2:51 AM
+> To: D, Lakshmi Sowjanya <lakshmi.sowjanya.d@intel.com>;
+> jstultz@google.com; giometti@enneenne.com; corbet@lwn.net; linux-
+> kernel@vger.kernel.org
+> Cc: x86@kernel.org; netdev@vger.kernel.org; linux-doc@vger.kernel.org; in=
+tel-
+> wired-lan@lists.osuosl.org; andriy.shevchenko@linux.intel.com; Dong, Eddi=
+e
+> <eddie.dong@intel.com>; Hall, Christopher S <christopher.s.hall@intel.com=
+>;
+> Brandeburg, Jesse <jesse.brandeburg@intel.com>; davem@davemloft.net;
+> alexandre.torgue@foss.st.com; joabreu@synopsys.com;
+> mcoquelin.stm32@gmail.com; perex@perex.cz; linux-sound@vger.kernel.org;
+> Nguyen, Anthony L <anthony.l.nguyen@intel.com>;
+> peter.hilber@opensynergy.com; N, Pandith <pandith.n@intel.com>; Mohan,
+> Subramanian <subramanian.mohan@intel.com>; T R, Thejesh Reddy
+> <thejesh.reddy.t.r@intel.com>; D, Lakshmi Sowjanya
+> <lakshmi.sowjanya.d@intel.com>
+> Subject: Re: [PATCH v6 01/11] x86/tsc: Add base clock properties in clock=
+source
+> structure
 >=20
-> Relocate idt82p33 register definitions so that other multi-functional
-> devices (such as the future DPLL subsystem hardware driver that are
-> currently being developed for Renesas timing devices) can access them.
+> On Wed, Apr 10 2024 at 17:18, lakshmi.sowjanya.d@intel.com wrote:
+> > From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
+> >
+> > Add base clock hardware abstraction in clocksource structure.
+> >
+> > Add clocksource ID for x86 ART(Always Running Timer). The newly added
+> > clocksource ID and conversion parameters are used to convert time in a
+> > clocksource domain to base clock and vice versa.
+> >
+> > Convert the base clock to the system clock using convert_base_to_cs()
+> > in get_device_system_crosststamp().
 >=20
-> Signed-off-by: Min Li <min.li.xe@renesas.com>
-> ---
-> -Submit to net-next and add driver name suggested by Jakub
-> -Name the driver that can benefit from thie change suggested by Jakub
+> In https://lore.kernel.org/all/875xxhi1ty.ffs@tglx I asked you to provide=
+ a
+> change log which explains the WHY and not the WHAT. The new change log st=
+ill
+> fails to explain WHY this change is needed and which problem it is trying=
+ to
+> solve.
 
-I think that the main point from Jakub was that this patch should be
-included/posted with the series introducing the driver actually using
-the register definition.
+Rephrased the commit message to:
+" Add base clock hardware abstraction in clocksource structure.
 
-That will also better justify the 'net-next' target. For this bare
-patch such target is bit arbitrary (e.g. it could go via Lee's tree,
-possibly causing less conflicts).
+The core code has a mechanism to convert the ART base clock to
+the corresponding tsc value.=20
+Provide the generic functionality in convert_base_to_cs() to convert
+base clock timestamps to system clocksource without requiring
+architecture specific parameters.
+
+Add the infrastructure in get_device_system_crosststamp()."
+
+>=20
+> I further asked you to do:
+>=20
+>     1) Add the clocksource_base struct and provide the infrastructure in
+>        get_device_system_crosststamp()
+>=20
+>     2) Make TSC/ART use it
+>=20
+> But this still does #1 and #2 in one go.
+>=20
+> If you don't understand my review comments, then please ask. If you disag=
+ree
+> with them then please tell me and argue with me.
+>=20
+> Just ignoring them is not an option.
+
+Sorry Thomas, that was a mis-understanding. We had split only realtime as s=
+eparate patch.
+We will split the first patch as suggested.=20
+	1. Timekeeping part(convert_base_to_cs() and infrastructure in get_device_=
+system_crosststamp())
+	2. x86(TSC/ART values update into the structure)
 
 Thanks,
+Sowjanya
 
-Paolo
-
+>=20
+> Thanks,
+>=20
+>         tglx
 
