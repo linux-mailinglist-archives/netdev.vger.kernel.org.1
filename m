@@ -1,121 +1,81 @@
-Return-Path: <netdev+bounces-88357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B68C8A6D57
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:08:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 796868A6D81
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:11:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81D46B23997
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:08:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17A9B1F21429
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:11:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BF4512CD91;
-	Tue, 16 Apr 2024 14:07:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529C9130488;
+	Tue, 16 Apr 2024 14:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LYd0zphF"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="n3PM0L7f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5C112CD99
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 14:07:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE15712FF64;
+	Tue, 16 Apr 2024 14:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713276463; cv=none; b=sLPwic3UkgiA8n+QCKROI37jRCxiL3ZWuwH7iUSJ8rFsrru4a9AEfbl3bD4kLg3iy5XnDwjE6bNFxUmfwNqVEMFDrlKbyy3CYf68zLA0jjFRQMfEvtaZFxEXXQPWm+KMSf0WO0s36mAdxTmldZ7aLxvZy7wImr6th1tXUSMiJrM=
+	t=1713276614; cv=none; b=k1e8dxVt9l1LlmmIWFy04uA+OuTCCVWEXEV8s5ddgwLdHh5mM4wpOg3UtfcQw2PBImid1vyl5suOGX5lkDhdFDYUQ9nQwQdsun6QcY4G9OcPAQV1+mDba+Km4bvHYwqda7iq105K/lUXL+YCTBOqSwSAk5NOZ6q6TOTsKuq0H2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713276463; c=relaxed/simple;
-	bh=T4QBNTdPWgn2+Y70k/HETB3HkKN076WpzzT0wssNHxI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PM+z58O2bH1XTNkdGRseynBf6KJPJiqUHL0LZVl6Zc8Nr1HBdtjya+p5fiX6eWbfT/UHYPq7qyCVbUIX3U7hnFi8uP/O54OIKTB7hAJzaGkXZ4jKbl+OI0SgdsaP3/cYqz0F4DgoPY3V01FIwo4S7MC4FpZBE5dd38SNLp/8QUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LYd0zphF; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dd8e82dd47eso6089213276.2
-        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 07:07:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713276461; x=1713881261; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MXqb6WMJmglkxwoGnQhBGCaU/Lemolzb8pYRtLYA7N4=;
-        b=LYd0zphF7Ejnjn7yt/9LnsWf7DDVAjZ6Fj3ieRdp1VsZT4jKDfBPvCBtxBXCjlWzmW
-         p4NK6EW/Nss9BA2OQbtMPn9FiUurjmOcfMlpTzuKaV8bO8QuhUxBtqWy0+8prKWi+3Gb
-         5loeRkb/dqFoadh/hs4pbqrK+q6pcHvHYuLocqiFafPaPIyMKAPXhIOthRjGVCAVV2sC
-         kGicLYzYN7B/aCOd4a/IwZfa+NyvEubphSSxNbMLZkNeiDbDCohrEJXQyOw5oFCA86sH
-         dDC/ZvlAguza5Hz07qhLGBg3mQyCVV+UT0/PFr2nDXj2549RREBs9j5tTdIPhMe7UhKa
-         /mFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713276461; x=1713881261;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MXqb6WMJmglkxwoGnQhBGCaU/Lemolzb8pYRtLYA7N4=;
-        b=ISjQjy91fFNkTKUk9Euf9s0GHSs0mo3DJx0w9MdoAbJK5tyACoDZSOLE2ac4GOWuQd
-         jqKgGs3i7BKvz9jdxOHFfLgo1il228+A5UfK4yQWaplkb29/rTt4/AD2cJDvcferNOZm
-         ZIj5EIUE+6h7tNOQjlJj/w2AfXjKAzY9TEuqhCEzgF/zquBKrTL7crbKErDDArKtyqzd
-         tgu4J7Lbo8zNyadG0+zww94JOEPKywZ0AH9o0SkIqeevIZye/nKOhFXnmog/oFBIVbIt
-         6izGV1r/Oid0CPaG2WHrqgYihiAlJUNx20Oyzr3YVLTRWaNU/mmCHEMWyzmQ2sTIRVr+
-         DbNw==
-X-Gm-Message-State: AOJu0Yxd5AIjXCAGGSeBAlIRzR9KJ8Xn+D2FZiQGA73/VyCJaP2IKws7
-	KsgMhnY8weVeEdR6Zq1OI8tDnQyKppKLSDcDBF+0A0Wyyga1iU+GPZsoj1Q0C2WmwHSxRRDaL9C
-	vEQNyXUKhiw==
-X-Google-Smtp-Source: AGHT+IGgUf/hhPTlLB9wB2vJNsWfNneTdnwBh2OvYf/n8ZZIOX/YCgJV15BET8nbY+Bw3YcMlrAYwpkx41JeOA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:154b:b0:dc7:3189:4e75 with SMTP
- id r11-20020a056902154b00b00dc731894e75mr796038ybu.3.1713276461460; Tue, 16
- Apr 2024 07:07:41 -0700 (PDT)
-Date: Tue, 16 Apr 2024 14:07:39 +0000
+	s=arc-20240116; t=1713276614; c=relaxed/simple;
+	bh=7JZc8UnPkyq1RzEo8SIHO6WK5tK7l6pzq2Uiq95LxoU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=h/45AOoRFEyHmrYMHTbPZ0LBdLUO1pWpbH96yd6NFHkj9jy7dEfQIxrD1019jvZVOzfMHt/3OqQWzsar/FeGjdFx6D+ye8ihSZIkicnZvpm87JVpxkHoGDiJgSbKu0CuLHZoe4mRw7XHVEUxonaHMnKafg2Brj1v+eVwCCPBPFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=n3PM0L7f; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=w6da/WRbFvg8QeAUygR52mX3V4b4pJ5TAZXxzhpIMts=; b=n3PM0L7fraZGETa4yFlMW03vnC
+	17VhNj5wsjiv8VOy0KA2V9q48v7L2Kvhfkvv4o7jxzbflPqHpiznjQZfZh6BWVV/Z15ebdjX+J+aX
+	L1VZ9tlqHqsmp4l16VGfYxSJdzANxp0nqQYDL2shJl2djDcE0ENFc/+x8bc6jGNDSk0E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rwjVf-00D8th-8s; Tue, 16 Apr 2024 16:10:07 +0200
+Date: Tue, 16 Apr 2024 16:10:07 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kamil =?iso-8859-1?Q?Hor=E1k?= - 2N <kamilh@axis.com>
+Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
+	hkallweit1@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: bcm54811: add support for BroadR-Reach mode
+Message-ID: <3aaf1b82-247e-447d-a39c-c209105c2d7c@lunn.ch>
+References: <20240416123811.1880177-1-kamilh@axis.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240416140739.967941-1-edumazet@google.com>
-Subject: [PATCH net-next] netns: no longer hold RTNL in rtnl_net_dumpid()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Guillaume Nault <gnault@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240416123811.1880177-1-kamilh@axis.com>
 
-- rtnl_net_dumpid() is already fully RCU protected,
-  RTNL is not needed there.
+> @@ -258,6 +257,9 @@ static const struct phy_setting settings[] = {
+>  	PHY_SETTING(    100, HALF,    100baseT_Half		),
+>  	PHY_SETTING(    100, HALF,    100baseFX_Half		),
+>  	PHY_SETTING(    100, FULL,    100baseFX_Full		),
+> +	PHY_SETTING(    100, FULL,    4BR100			),
+> +	PHY_SETTING(    100, FULL,    2BR100			),
+> +	PHY_SETTING(    100, FULL,    1BR100			),
 
-- Fix return value at the end of a dump,
-  so that NLMSG_DONE can be appended to current skb,
-  saving one recvmsg() system call.
+Please could you explain the name convention. IEEE puts the speed
+first, then some letters to indicate the media type, and then a number
+for the number of pairs. Why is this not followed here? 100BaseBR4?
+100BaseBR2? 100BaseBR1? Are these names part of the BroadR-Reach
+standard?
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Guillaume Nault <gnault@redhat.com>
----
- net/core/net_namespace.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+Also, is there any compatibility? Are 100BaseT1 and 1BR100 compatible?
 
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index f0540c5575157135b1dc5dece2220f81a408fb7e..2f5190aa2f15cec2e934ebee9c502fb426cf0d7d 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -1090,7 +1090,7 @@ static int rtnl_net_dumpid(struct sk_buff *skb, struct netlink_callback *cb)
- end:
- 	if (net_cb.fillargs.add_ref)
- 		put_net(net_cb.tgt_net);
--	return err < 0 ? err : skb->len;
-+	return err;
- }
- 
- static void rtnl_net_notifyid(struct net *net, int cmd, int id, u32 portid,
-@@ -1205,7 +1205,8 @@ void __init net_ns_init(void)
- 	rtnl_register(PF_UNSPEC, RTM_NEWNSID, rtnl_net_newid, NULL,
- 		      RTNL_FLAG_DOIT_UNLOCKED);
- 	rtnl_register(PF_UNSPEC, RTM_GETNSID, rtnl_net_getid, rtnl_net_dumpid,
--		      RTNL_FLAG_DOIT_UNLOCKED);
-+		      RTNL_FLAG_DOIT_UNLOCKED |
-+		      RTNL_FLAG_DUMP_UNLOCKED);
- }
- 
- static void free_exit_list(struct pernet_operations *ops, struct list_head *net_exit_list)
--- 
-2.44.0.683.g7961c838ac-goog
-
+      Andrew
 
