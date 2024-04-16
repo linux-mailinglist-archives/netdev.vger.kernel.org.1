@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-88345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E9388A6CC3
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 15:47:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DEBE8A6CCF
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 15:51:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 536B21F21904
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 13:47:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EFFF1C221EE
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 13:51:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292CB12C530;
-	Tue, 16 Apr 2024 13:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A09212C544;
+	Tue, 16 Apr 2024 13:51:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zaU4dryC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W0cqfBIL"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657B91272AA;
-	Tue, 16 Apr 2024 13:46:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7430E129A72
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 13:51:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713275218; cv=none; b=D+BJOgZz9v+7pavhxp320MbUdPZ0/EFDuj+/ZgfaqJXla3Bjss3XEGsTYqN1PVxOqq3KBCWcJzJhl/TTjP3aN9vnJu1i9Oc+TJIM+oBZVBXzNDn6hjaQf/Kab8R+hpxuLHomIfjHmoV235JMcoxoZhZrE88rTHGP3+BoZyJTtrE=
+	t=1713275495; cv=none; b=Vl0AogWH41VW9MlKEWO8WSR5mtVIH3/6CzlsabAtFtOH56dmCcUjNbBnl/RPhXc8CnRG4yuk3ZjbO1YYFczxWlohZKRyFipe29FzmHaImQq4E3bw5GTx+ow5FTu1kawdSdS0zaMRRvH3kQShMsYz9oCpXTGwGV+ieJgg1gPly5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713275218; c=relaxed/simple;
-	bh=UFZS2qhw3Gwe+c8wfAS9gjs/ftg/X94cDZM2MpqoPnI=;
+	s=arc-20240116; t=1713275495; c=relaxed/simple;
+	bh=yzjOk/XT1m/fqB5jnXhoNIDg6Ef7jDbuSx6EqGNgTWk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CfUNch0AL0YbYVNpStKxCUHI7jYhDZd18LRDoSapYWSdMrwNyDVWzxj+SPE2Kd0lAqUAI7jBHaf7aHe3M9+ea8CZGYmtO3yswTdIriIvmmD7KGBrQqZKyRIRxuTppsWQrvnqigVc5FcpwSsHY2hKnXX7qjon1swnlXQHFJpAF04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zaU4dryC; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kvfisbNrUr5sf0S3A1nPCGGsrN3i5lCUqXwLFDIDJxc=; b=zaU4dryChTbyn+h5fpt/46J1rO
-	ZWaTM9ZCNkBg0FOdMH661xyOE4pMiI7WKHLbw0t5ng66WnojzXZEze5V6zyrZfYbHSzmhqBDGZ1SE
-	cgYLgiXAaqwMMvKAuAeUaVvm6V3LJRBqiAkt5ibC3qPBEm0GUpw0Kj9mBVkMQlEX9BPY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rwj8d-00D8ld-OM; Tue, 16 Apr 2024 15:46:19 +0200
-Date: Tue, 16 Apr 2024 15:46:19 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	lxu@maxlinear.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	michael@walle.cc, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property
- to disable SGMII autoneg
-Message-ID: <3f7f278f-e490-47f1-971c-ecf44a70cee4@lunn.ch>
-References: <20240416121032.52108-1-eichest@gmail.com>
- <20240416121032.52108-3-eichest@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ms0sJ3u5jZYqGBl5rqyhK7+yI8LAecLOauwQ70CLVhgC7YsKISKkxU6O2PvftspV0Clif9L/9NXYNJ1RQQdVaEEU/QcrmSMw4/umDkVcEvEygFgxnHXeJ7s+jAMHQFhQjBlwucfPtxknTX7EvGZJtVFgHD9wLa1JbsQeviyfhUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W0cqfBIL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9FD2C113CE;
+	Tue, 16 Apr 2024 13:51:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713275494;
+	bh=yzjOk/XT1m/fqB5jnXhoNIDg6Ef7jDbuSx6EqGNgTWk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=W0cqfBILIohuyYCKz1tkeVq/k4ktRDgW5CURsD1BRriJqR+l7N2ohQpxBU9O4Y6B7
+	 2iYEAeMYyv4RkEcbPCZLsMFy/ZY4r8N26rigKuaGkv3iaw520Df8hujfgYrIAn/GQL
+	 /wJDwLxUsk2Yue7uP840qBTRg3axkji5mNfKj8CtHh3hsi5vs0Hwmn6+W+EBIBMQ5u
+	 S/hOYqwfr6RccLtSsZKLP2B/lLHBVSp4SpcbrnDzXhiHrHm32N4mKz+y1kS4T6XX59
+	 cLw2jcrVScJAAU+uiih5OCi97s5/2s4hWz6JH4f8LBkAMnCGxETtqgfNCEnnDjn9wV
+	 wpy0vicjMPcPA==
+Date: Tue, 16 Apr 2024 14:51:29 +0100
+From: Simon Horman <horms@kernel.org>
+To: Lukas Wunner <lukas@wunner.de>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Roman Lozko <lozko.roma@gmail.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>, Sasha Neftin <sasha.neftin@intel.com>
+Subject: Re: [PATCH net] igc: Fix LED-related deadlock on driver unbind
+Message-ID: <20240416135129.GM2320920@kernel.org>
+References: <2f1be6b1cf2b3346929b0049f2ac7d7d79acb5c9.1713188539.git.lukas@wunner.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,18 +65,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240416121032.52108-3-eichest@gmail.com>
+In-Reply-To: <2f1be6b1cf2b3346929b0049f2ac7d7d79acb5c9.1713188539.git.lukas@wunner.de>
 
-On Tue, Apr 16, 2024 at 02:10:32PM +0200, Stefan Eichenberger wrote:
-> Add a new device tree property to disable SGMII autonegotiation and
-> instead use the option to match the SGMII speed to what was negotiated
-> on the twisted pair interface (tpi).
+On Mon, Apr 15, 2024 at 03:48:48PM +0200, Lukas Wunner wrote:
+> Roman reports a deadlock on unplug of a Thunderbolt docking station
+> containing an Intel I225 Ethernet adapter.
+> 
+> The root cause is that led_classdev's for LEDs on the adapter are
+> registered such that they're device-managed by the netdev.  That
+> results in recursive acquisition of the rtnl_lock() mutex on unplug:
+> 
+> When the driver calls unregister_netdev(), it acquires rtnl_lock(),
+> then frees the device-managed resources.  Upon unregistering the LEDs,
+> netdev_trig_deactivate() invokes unregister_netdevice_notifier(),
+> which tries to acquire rtnl_lock() again.
+> 
+> Avoid by using non-device-managed LED registration.
+> 
+> Stack trace for posterity:
+> 
+>   schedule+0x6e/0xf0
+>   schedule_preempt_disabled+0x15/0x20
+>   __mutex_lock+0x2a0/0x750
+>   unregister_netdevice_notifier+0x40/0x150
+>   netdev_trig_deactivate+0x1f/0x60 [ledtrig_netdev]
+>   led_trigger_set+0x102/0x330
+>   led_classdev_unregister+0x4b/0x110
+>   release_nodes+0x3d/0xb0
+>   devres_release_all+0x8b/0xc0
+>   device_del+0x34f/0x3c0
+>   unregister_netdevice_many_notify+0x80b/0xaf0
+>   unregister_netdev+0x7c/0xd0
+>   igc_remove+0xd8/0x1e0 [igc]
+>   pci_device_remove+0x3f/0xb0
+> 
+> Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
+> Reported-by: Roman Lozko <lozko.roma@gmail.com>
+> Closes: https://lore.kernel.org/r/CAEhC_B=ksywxCG_+aQqXUrGEgKq+4mqnSV8EBHOKbC3-Obj9+Q@mail.gmail.com/
+> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> Cc: Heiner Kallweit <hkallweit1@gmail.com>
 
-Could you explain this is more detail.
+I am aware that Kurt has submitted what appears to be the same patch [1,2],
+which I'm inclined to put down to miscommunication (email based workflows
+are like that sometimes).
 
-SGMII always runs its clocks at 1000Mbps. The MAC needs to duplicate
-the symbols 100 times when running at 10Mbs, and 10 times when running
-at 100Mbps.
+FWIIW, it is my understanding is that the patch originated from
+Lukas[3], and thus it seems most appropriate to take his submission.
 
-    Andrew
+As for the patch itself, I agree that it addresses the problem at hand.
+For the record, I have not tested it.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+[1] [PATCH iwl-net] igc: Fix deadlock on module removal
+    https://lore.kernel.org/netdev/20240411-igc_led_deadlock-v1-1-0da98a3c68c5@linutronix.de/
+[2] [PATCH iwl-net v2] igc: Fix deadlock on module removal
+    https://lore.kernel.org/netdev/20240411-igc_led_deadlock-v2-1-b758c0c88b2b@linutronix.de/
+[3] Re: Deadlock in pciehp on dock disconnect
+    https://lore.kernel.org/all/ZhBN9p1yOyciXkzw@wunner.de/
+
 
