@@ -1,89 +1,71 @@
-Return-Path: <netdev+bounces-88416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41B288A71A2
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:46:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC9858A71BD
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:56:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D64391F21386
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:46:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 168731C2180F
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:56:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 905EC7764E;
-	Tue, 16 Apr 2024 16:46:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFC1F12AAE3;
+	Tue, 16 Apr 2024 16:56:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mtU+x0LS"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Cd9doH1V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2FA10A22;
-	Tue, 16 Apr 2024 16:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0232E7764E;
+	Tue, 16 Apr 2024 16:56:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713285979; cv=none; b=qlZcB421E6q3o45TTO2ApKgAvKLebewtjMESCQRykRRIKjIxVXntPQ4tl3njq6D0uwD3XfMZkkxOlWCs0KFic1YziYSbfPnvwg8zGs/G5DggEI3ZuuX6o8fl1YQkZlm3YRcPgNvNoBmPqtUNmd1kQ6iJyUmOUUa2CG1mDykooNc=
+	t=1713286590; cv=none; b=YS4ov28skZFMMHaT8pQD2dZ8w6jpcSnah7BeymRoRe8ayZwuYrwWHo42sOOiqpv+KX0E4ab74ikMV8ZZtL4zS9E72IlxlcqWHRCdqJ5iNbrn22pwNrbzBPSycV7VlXXpOIfcLLVfQbGmRis9OkDju3ydVtg9qGMnGd/orBE5QrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713285979; c=relaxed/simple;
-	bh=G1/i1XTJcrVySOoFIsF/bsn1GVKpIRHZ/G7KdMBY+nI=;
+	s=arc-20240116; t=1713286590; c=relaxed/simple;
+	bh=XKB3FT4Mg1Gff+mXe9Mh5mHwZ84D8ow6gVjtrKU9f4A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A8ohShF7zgs7iAR4WvZSSaJ4P4Uw1kAh0RawV/4fl73laCkLCKbTMezmgJQSkVCx2PiexNNv8ZaoYr9LFj8BBp/bh+8Hi0L4UAP49sHv5wqoA23pg1FGdzjrufC8Z9TFWXUN1yzbMlA5FzyF1ZF4ln7h/W9Gw1EmpYCmkkbGvzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mtU+x0LS; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a450bedffdfso591772166b.3;
-        Tue, 16 Apr 2024 09:46:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713285976; x=1713890776; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8KwfYv9s9CNReFqGmEgJ8O6Pxz+KGqIgs20E/Gs/Yew=;
-        b=mtU+x0LSQ2YlturUymwXYZnzX12e382XIr8VB7hDBLFGJ9RR4uQhpDX6HvGnarLJWt
-         NJhJkJaknNcRU0sEpL91rvauchWgpndCGbIqOI2rt6iAzKMDG/EToGzDCgIjSw9MCsNu
-         aCNbB7WYUiGQE88JQNKH6udtBAZounM8YL6Zj8JsG3DSReNN01BnYSkkP8L8w9z3cSS3
-         huV4fSsJSwWSF0FFjtjV+jSoVgMjBVe6TpfeQRVT3iXHRu5Qr64B0ALz7531EOBbfiKv
-         3Jg5FzTJNXwxYkNGVQp/k4EFEbFJX32OeMrveMzfiHfvplNLwUBKmJonmjAe8ml+Ffno
-         /WwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713285976; x=1713890776;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8KwfYv9s9CNReFqGmEgJ8O6Pxz+KGqIgs20E/Gs/Yew=;
-        b=v2jgXz4dfqYD9zWMNuM3E60NZB+dEjbRqtvvfNAYXHDYxjWz3FUrg7Pqf6uENRXyxQ
-         MsAuvHAJhtPH/tcCHiv3AzGI3PZX6cxJmtpIUwgypwMGxSqdVtfrkO9JgUnPn5Ko2yy+
-         7VRCHIZKFqiveP0Xr2OtIjorOI1kCWUaC8bND/GLV7DCeOs3VG2rHu79A78KVMp3O1jr
-         KlyaIOjZ2WBQLtDQS0jwGGRlM/3IBzMCsETGYoW/2Za1pZQyalBGJ4d/vpi5EnLJ+mul
-         GSN/r5O/QyT8PAb/7cxIWe6xsxYYWNNi1j64GUpm18vKATbz27+KRPf5+mw7Jk92HXPb
-         GigA==
-X-Forwarded-Encrypted: i=1; AJvYcCVy2kJRCXElA9LeopH216fPq1stnNDWk8k3DXYRioent40dg03Bvdz9a0vwPND3dxS3klOWQRFzu5ETJWzTnUA1nSYMQTisO4Kof71x3LzYWV7XPwF4gXw0R+frMqvFUmqzek5CffCt43ko5QQExYYwxaJy7eZ5h6OgyYed+TCA
-X-Gm-Message-State: AOJu0YyHWNjrqaGe1Ug5aqdlmV8Tfu+e9bya3aV9MG+218UutCwHY4Rw
-	vQ7m4TAw9bbj9ZylHM3u3HVv5g8Go/0m7VjZ1Lv0cj7RsoejMudDFT3Uox6W
-X-Google-Smtp-Source: AGHT+IGRIiQlbaJp1thbJmdm9VDlSSbedhwFf3PAEq68sJsXPkTF8SCv5gGIXIt4Wg4rMB/S33hAZA==
-X-Received: by 2002:a17:906:af8b:b0:a51:8d60:215a with SMTP id mj11-20020a170906af8b00b00a518d60215amr8125981ejb.27.1713285975999;
-        Tue, 16 Apr 2024 09:46:15 -0700 (PDT)
-Received: from fedora (host-79-27-41-113.retail.telecomitalia.it. [79.27.41.113])
-        by smtp.gmail.com with ESMTPSA id bw26-20020a170906c1da00b00a52222f2b21sm6919666ejb.66.2024.04.16.09.46.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 09:46:15 -0700 (PDT)
-Date: Tue, 16 Apr 2024 18:46:13 +0200
-From: Francesco Valla <valla.francesco@gmail.com>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Linux CAN <linux-can@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Simon Horman <horms@kernel.org>, fabio@redaril.me,
-	Mao Zhu <zhumao001@208suo.com>, Xiang wangx <wangxiang@cdjrlc.com>,
-	Shaomin Deng <dengshaomin@cdjrlc.com>,
-	Charles Han <hanchunchao@inspur.com>
-Subject: Re: [PATCH v2 1/1] Documentation: networking: document ISO
- 15765-2:2016
-Message-ID: <Zh6rVbkheAcS-K3D@fedora>
-References: <20240329133458.323041-2-valla.francesco@gmail.com>
- <20240329133458.323041-3-valla.francesco@gmail.com>
- <Zhyabya8UyRG0ZY5@archie.me>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SeQoD7jHtOFosnigX62EBrg9XeIY7DndUxlCt++ruQm7qthDyd1Q4hBkk9DHXX5o5MiqMZpdksQK3C58JNM3ArrbhXzAPcu99ukOYFVNdY60IK8OVh955Ve/S1+3KE0bS0/5HnpaKREtiKEe9udmxkXT4QfbFL6dvZJyWy7Xo1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Cd9doH1V; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=pC6bagQ6vg68uB6dljn9J+Y6O1xZqp8PVpkbc7gYlUM=; b=Cd9doH1VnwOV0U2dH8QwWtI+AJ
+	QXvht6YpWfeorYwCORZL5zO6r9HLjcBcEzARet+dOyF/kdrSEF+/ELpgs8LIkPdK3n9QfGSjfucRL
+	Y+zW4/3RfCNscqjBE9O75x9WTv93blXcjLQg2NPXTovy0crcu5sFJVyYrDwVBf7R82xSCiUmRCnf2
+	rJvS1b7c9IaKDC2bNhzeV5olxx6TP2+8KqxvEFgcduEKEmGCE85susTJBzcoSbgCpl9q56rnPFCFL
+	pIkLxZiWZbeNDGCkCHcXRhwc/IR5/eUrVC9vBNtUuxb+Csz1DpZobGYv6QN0Ci80q1nDpECTsgh1A
+	u/wRqUYA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37618)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rwm6T-0000h2-2A;
+	Tue, 16 Apr 2024 17:56:17 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rwm6R-0004zx-PO; Tue, 16 Apr 2024 17:56:15 +0100
+Date: Tue, 16 Apr 2024 17:56:15 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux@ew.tq-group.com
+Subject: Re: [PATCH net] net: dsa: mv88e6xx: fix supported_interfaces setup
+ in mv88e6250_phylink_get_caps()
+Message-ID: <Zh6trxU0hB+yt6rV@shell.armlinux.org.uk>
+References: <20240416155054.3650354-1-matthias.schiffer@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,22 +74,73 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zhyabya8UyRG0ZY5@archie.me>
+In-Reply-To: <20240416155054.3650354-1-matthias.schiffer@ew.tq-group.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Apr 15, 2024 at 10:09:35AM +0700, Bagas Sanjaya wrote:
+On Tue, Apr 16, 2024 at 05:50:54PM +0200, Matthias Schiffer wrote:
+> +int mv88e6250_port_get_mode(struct mv88e6xxx_chip *chip, int port,
+> +			    phy_interface_t *mode)
+> +{
+> +	int err;
+> +	u16 reg;
+> +
+> +	if (port < 5) {
+> +		*mode = PHY_INTERFACE_MODE_INTERNAL;
+> +		return 0;
+> +	}
 
-(...)
+Note that if mv88e6xxx_phy_is_internal() returns TRUE for the port,
+then this will be handled automatically.
 
-> 
-> Other than the ongoing review comments, the doc LGTM (no htmldocs warnings).
-> Thanks!
-> 
-> Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
-> 
+> +
+> +	err = mv88e6xxx_port_read(chip, port, MV88E6XXX_PORT_STS, &reg);
+> +	if (err)
+> +		return err;
+> +
+> +	switch (reg & MV88E6250_PORT_STS_PORTMODE_MASK) {
+> +	case MV88E6250_PORT_STS_PORTMODE_MII_10_HALF_PHY:
+> +	case MV88E6250_PORT_STS_PORTMODE_MII_100_HALF_PHY:
+> +	case MV88E6250_PORT_STS_PORTMODE_MII_10_FULL_PHY:
+> +	case MV88E6250_PORT_STS_PORTMODE_MII_100_FULL_PHY:
+> +		*mode = PHY_INTERFACE_MODE_REVMII;
+> +		break;
+> +
+> +	case MV88E6250_PORT_STS_PORTMODE_MII_HALF:
+> +	case MV88E6250_PORT_STS_PORTMODE_MII_FULL:
+> +		*mode = PHY_INTERFACE_MODE_MII;
+> +		break;
+> +
+> +	case MV88E6250_PORT_STS_PORTMODE_MII_DUAL_100_RMII_FULL_PHY:
+> +	case MV88E6250_PORT_STS_PORTMODE_MII_200_RMII_FULL_PHY:
+> +	case MV88E6250_PORT_STS_PORTMODE_MII_10_100_RMII_HALF_PHY:
+> +	case MV88E6250_PORT_STS_PORTMODE_MII_10_100_RMII_FULL_PHY:
+> +		*mode = PHY_INTERFACE_MODE_REVRMII;
+> +		break;
+> +
+> +	case MV88E6250_PORT_STS_PORTMODE_MII_DUAL_100_RMII_FULL:
+> +	case MV88E6250_PORT_STS_PORTMODE_MII_10_100_RMII_FULL:
+> +		*mode = PHY_INTERFACE_MODE_RMII;
+> +		break;
+> +
+> +	case MV88E6250_PORT_STS_PORTMODE_MII_100_RGMII:
+> +		*mode = PHY_INTERFACE_MODE_RGMII;
+> +		break;
+> +
+> +	default:
+> +		*mode = PHY_INTERFACE_MODE_NA;
 
-Thank you!
+What does this mean? I don't allow PHY_INTERFACE_MODE_NA to be set in
+the list of supported interfaces because it isn't an interface mode.
+If it's invalid, then it's probably best to return an error.
 
-Best regards,
-Francesco Valla
+I wonder whether it would just be better to pass the
+supported_interfaces bitmap into this function and have it set the
+appropriate bit itself, renaming the function to something more
+better suited to that purpose.
 
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
