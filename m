@@ -1,129 +1,291 @@
-Return-Path: <netdev+bounces-88149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A64058A6057
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 03:32:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4027A8A606F
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 03:37:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BAAC1F21A3A
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 01:32:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1DEB1F219D4
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 01:37:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21605240;
-	Tue, 16 Apr 2024 01:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7A39139E;
+	Tue, 16 Apr 2024 01:37:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EyCFOW0I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C9ZIUnbF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139E8523D
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 01:32:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A68127464;
+	Tue, 16 Apr 2024 01:37:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713231175; cv=none; b=IVdg35umSzS5EorW5ERxZpOuo7OA5+KYt/CYtMdbxh+US/qUbVwhNvdDkLwhU0IwbQut20lEki645H1yKTEdA1/xYEifwP0HkbOZ6n16U/l64NgnxkKyOz5zzo1drvILM4uJ4JNXHnBIVgHMgN/bxUHknlN+CpO96NcDbwPwNsQ=
+	t=1713231426; cv=none; b=ndRVrfbZRa/1yc92TKSLrb5HAT3bpvUMS4HpVsd9uoEJR43E3kU7UZ+S8+N/P96SHWN01fHCz93F+TU6Ls2+17d5sDcwjj5p6Emw/SNqFb1vVoVufaI1WsNchJcae69w2RfBH8DqlS8kQV84j+KS+fSPAFIDJ3aop7ZWFa1OJ8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713231175; c=relaxed/simple;
-	bh=PZcZkgO/y6rDtSzGZ/DtlGZfrw3B5AFK9P4aOdyhO98=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sJUTGR79W7sBCAHNbCEy/tfnFqz50ZISWUlOgmx0zMbU0jTsK1rDaOZYm+eqTv1alDZV0zOnsuoXT5rlgUi+y9D6vI+vNfQ9GpPVURtlWn5r8XK6E2uz3coed5Un+YBiNWURKwwwcLuMppVh6PMn5H7+kF70exIzEJ1zyrwVZ5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EyCFOW0I; arc=none smtp.client-ip=209.85.167.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3c71c7e2d40so446063b6e.3
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 18:32:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713231173; x=1713835973; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ceOTDmOL3/4c3hpiPQlqFU9LQ3hSotPDbA4J5nguoCo=;
-        b=EyCFOW0IXIq2c+mMeMxWNJLZwuoQkYVVyNhkkQTztdTwvcBBBQFPusYm/svSw+aVg3
-         pEKKjM83OInXE0hR7kZLihyYAUj5wcJzW6mzBCfDpPBGOBqsVdIaW4nQailfVHCGpQ/c
-         5l/LWFiCOu9i9sJwu4IgH/pdwQzC6f6QjdS8Q8wupvgVxA86bNI14T8SzksureP59T08
-         k/hkYYUZYNhRJi/x9DcY+K4iBLcBl6EcYU04f/l6fc2FWQmnfNuTdUSygikJuVhdSj/d
-         dUeJc4v1mC5Hl5nk1SZtEosd37SMoiUFWs9hcOJpcn25MGzb5P/V0rcX2FsSDrKLf253
-         Xvbw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713231173; x=1713835973;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ceOTDmOL3/4c3hpiPQlqFU9LQ3hSotPDbA4J5nguoCo=;
-        b=fs+GSTMQxM8QooczDqhJpTjN5FVKqwg4tPr0bKaqsdkiOoTNH50OJ1c6+XJEyMQtC5
-         qP9tzE+idXkqFcFQWwMft2QSvdMEeyP0n96TXWDUhOLm903DpEbJS/rrJY8rfOvernP4
-         TiRiGy3ovwt+Lg26G7AY9cHqn6H/qAFaXuBNmpe18eKT2f5j6vhbkwrf4XeQfFJhHnPl
-         5YUkbjcycaq9C+wEmkFy6ArHigCaSM9lC1IDu/TYhqHk0v5Ejz8fHUOJfIWUbbb6hbnY
-         xJEtgIfMgv64M+oJ8Fdd4zyaNkFnwJYjcPYJilLM02Txm/wtLQ5xqdXn7JhAHp1cVxfI
-         kddg==
-X-Gm-Message-State: AOJu0Yz4KHxjpjjPeCqQsHnZBu4FGDtUupw4rcRCvllN6eiJcgV6W+Qb
-	qaEhBq9+0s0Yb0V96BPhLpTKksT0gIjttCFyJS3FRBfNKgrbGrxqfQya3x98YO7S9g==
-X-Google-Smtp-Source: AGHT+IFq0v9oDYiZ2KlLIenBFet91cIwdnvS2i2js8tqqI3UUTFSSjEzOI/4MDVJDusZGTwqmQf0Vg==
-X-Received: by 2002:a05:6808:20a3:b0:3c5:f495:b8df with SMTP id s35-20020a05680820a300b003c5f495b8dfmr14901341oiw.11.1713231173014;
-        Mon, 15 Apr 2024 18:32:53 -0700 (PDT)
-Received: from VM-4-8-ubuntu.. ([124.222.65.152])
-        by smtp.gmail.com with ESMTPSA id o7-20020a056a001b4700b006ecdb55db60sm7892515pfv.195.2024.04.15.18.32.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 18:32:52 -0700 (PDT)
-From: Jiayun Chen <chenjiayunju@gmail.com>
-To: netdev@vger.kernel.org
-Cc: shemminger@osdl.org,
-	Jiayun Chen <jiayunchen@smail.nju.edu.cn>
-Subject: [PATCH] man: fix doc, ip link does support "change"
-Date: Tue, 16 Apr 2024 09:32:15 +0800
-Message-Id: <20240416013214.3131696-1-chenjiayunju@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1713231426; c=relaxed/simple;
+	bh=MRnZAn/34/F3uJzAswtdGPYBP2MTvfc7DxyHqDFZPv0=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=c/BhO+0VISJ99bTPACSluL9RoVkE7hpSJwV1nrI8JDO5DTj9kmH75AsWrOm6oV9naEKAAecuqnmKp7G8U9lW+Y54TvRvofSk6vAdZYWp4QbovcpEH2g0bq8yMO7gG8jatbCu2bDWYV5VXgolNg3651IH4Ny5J1nADg/MNAYy6iU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C9ZIUnbF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B616C113CC;
+	Tue, 16 Apr 2024 01:37:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713231426;
+	bh=MRnZAn/34/F3uJzAswtdGPYBP2MTvfc7DxyHqDFZPv0=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+	b=C9ZIUnbF8xh0maYgafKeDukAR2aeT1Rt6m7K2ugQmk3IGeVfsihYYbtq1pFn670UR
+	 5xBf0WObLpZpdGoVO1Qkmsz8Hr3MunXRaLBz80pZIIHrVYzultJFe/2WhM6xNIpHDL
+	 QbpHf6nnl3TGyHyaT1LdkkezNGjH3H7V0LydiO5e4tQkw65he8/xiY+UcL7DyvqjmP
+	 +sXDpglVwlNx+11TFrJF94NT//QARhkZKh1OiKxnpjcL4zsXxzY8Vm9q5XBQrmSOPe
+	 gzh7L7EkwWSo007LFgLgUO5aUyLR/QVIvt0PJAUZOaeQ6EcDSLDEIMdTHEZkbM61zQ
+	 k+8T4xUnvaNqw==
+Date: Mon, 15 Apr 2024 18:37:05 -0700 (PDT)
+From: Mat Martineau <martineau@kernel.org>
+To: Yunsheng Lin <linyunsheng@huawei.com>, Paolo Abeni <pabeni@redhat.com>
+cc: davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org, 
+    linux-kernel@vger.kernel.org, Ayush Sawal <ayush.sawal@chelsio.com>, 
+    Eric Dumazet <edumazet@google.com>, 
+    Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+    Jason Wang <jasowang@redhat.com>, Ingo Molnar <mingo@redhat.com>, 
+    Peter Zijlstra <peterz@infradead.org>, Juri Lelli <juri.lelli@redhat.com>, 
+    Vincent Guittot <vincent.guittot@linaro.org>, 
+    Dietmar Eggemann <dietmar.eggemann@arm.com>, 
+    Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>, 
+    Mel Gorman <mgorman@suse.de>, 
+    Daniel Bristot de Oliveira <bristot@redhat.com>, 
+    Valentin Schneider <vschneid@redhat.com>, 
+    John Fastabend <john.fastabend@gmail.com>, 
+    Jakub Sitnicki <jakub@cloudflare.com>, David Ahern <dsahern@kernel.org>, 
+    Matthieu Baerts <matttbe@kernel.org>, Geliang Tang <geliang@kernel.org>, 
+    Boris Pismenny <borisp@nvidia.com>, bpf@vger.kernel.org, 
+    mptcp@lists.linux.dev
+Subject: Re: [PATCH net-next v2 13/15] net: replace page_frag with
+ page_frag_cache
+In-Reply-To: <20240415131941.51153-14-linyunsheng@huawei.com>
+Message-ID: <c5a8eabb-1b46-1e9f-88c9-e707c3a086c4@kernel.org>
+References: <20240415131941.51153-1-linyunsheng@huawei.com> <20240415131941.51153-14-linyunsheng@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; format=flowed; charset=US-ASCII
 
-From: Jiayun Chen <jiayunchen@smail.nju.edu.cn>
+On Mon, 15 Apr 2024, Yunsheng Lin wrote:
 
-ip link does support "change".
+> Use the newly introduced prepare/commit API to replace
+> page_frag with page_frag_cache for sk_page_frag().
+>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+> .../chelsio/inline_crypto/chtls/chtls.h       |   3 -
+> .../chelsio/inline_crypto/chtls/chtls_io.c    | 101 ++++---------
+> .../chelsio/inline_crypto/chtls/chtls_main.c  |   3 -
+> drivers/net/tun.c                             |  34 ++---
+> include/linux/sched.h                         |   4 +-
+> include/net/sock.h                            |  14 +-
+> kernel/exit.c                                 |   3 +-
+> kernel/fork.c                                 |   2 +-
+> net/core/skbuff.c                             |  32 ++--
+> net/core/skmsg.c                              |  22 +--
+> net/core/sock.c                               |  46 ++++--
+> net/ipv4/ip_output.c                          |  35 +++--
+> net/ipv4/tcp.c                                |  35 ++---
+> net/ipv4/tcp_output.c                         |  28 ++--
+> net/ipv6/ip6_output.c                         |  35 +++--
+> net/kcm/kcmsock.c                             |  30 ++--
+> net/mptcp/protocol.c                          |  74 ++++++----
+> net/tls/tls_device.c                          | 139 ++++++++++--------
+> 18 files changed, 342 insertions(+), 298 deletions(-)
 
-if (matches(*argv, "set") == 0 ||
-    matches(*argv, "change") == 0)
-    return iplink_modify(RTM_NEWLINK, 0,
-                 argc-1, argv+1);
+Hi Yunsheng,
 
-The attached patch documents this.
+Just focusing on mptcp:
 
-Signed-off-by: Jiayun Chen <jiayunchen@smail.nju.edu.cn>
----
- ip/iplink.c           | 2 +-
- man/man8/ip-link.8.in | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+> index f8bc34f0d973..368dd480c4cd 100644
+> --- a/net/mptcp/protocol.c
+> +++ b/net/mptcp/protocol.c
+> @@ -959,17 +959,16 @@ static bool mptcp_skb_can_collapse_to(u64 write_seq,
+> }
+>
+> /* we can append data to the given data frag if:
+> - * - there is space available in the backing page_frag
+> - * - the data frag tail matches the current page_frag free offset
+> + * - the data frag tail matches the current page and offset
+>  * - the data frag end sequence number matches the current write seq
+>  */
+> static bool mptcp_frag_can_collapse_to(const struct mptcp_sock *msk,
+> -				       const struct page_frag *pfrag,
+> +				       const struct page *page,
+> +				       const unsigned int offset,
+> 				       const struct mptcp_data_frag *df)
+> {
+> -	return df && pfrag->page == df->page &&
+> -		pfrag->size - pfrag->offset > 0 &&
+> -		pfrag->offset == (df->offset + df->data_len) &&
+> +	return df && page == df->page &&
+> +		offset == (df->offset + df->data_len) &&
+> 		df->data_seq + df->data_len == msk->write_seq;
+> }
+>
+> @@ -1084,30 +1083,36 @@ static void mptcp_enter_memory_pressure(struct sock *sk)
+> /* ensure we get enough memory for the frag hdr, beyond some minimal amount of
+>  * data
+>  */
+> -static bool mptcp_page_frag_refill(struct sock *sk, struct page_frag *pfrag)
+> +static struct page *mptcp_page_frag_alloc_prepare(struct sock *sk,
+> +						  struct page_frag_cache *pfrag,
+> +						  unsigned int *offset,
+> +						  unsigned int *size, void **va)
+> {
+> -	if (likely(skb_page_frag_refill(32U + sizeof(struct mptcp_data_frag),
+> -					pfrag, sk->sk_allocation)))
+> -		return true;
+> +	struct page *page;
+> +
+> +	page = page_frag_alloc_prepare(pfrag, offset, size, va,
+> +				       sk->sk_allocation);
+> +	if (likely(page))
+> +		return page;
+>
+> 	mptcp_enter_memory_pressure(sk);
+> -	return false;
+> +	return NULL;
+> }
+>
+> static struct mptcp_data_frag *
+> -mptcp_carve_data_frag(const struct mptcp_sock *msk, struct page_frag *pfrag,
+> -		      int orig_offset)
+> +mptcp_carve_data_frag(const struct mptcp_sock *msk, struct page *page,
+> +		      unsigned int orig_offset)
+> {
+> 	int offset = ALIGN(orig_offset, sizeof(long));
+> 	struct mptcp_data_frag *dfrag;
+>
+> -	dfrag = (struct mptcp_data_frag *)(page_to_virt(pfrag->page) + offset);
+> +	dfrag = (struct mptcp_data_frag *)(page_to_virt(page) + offset);
+> 	dfrag->data_len = 0;
+> 	dfrag->data_seq = msk->write_seq;
+> 	dfrag->overhead = offset - orig_offset + sizeof(struct mptcp_data_frag);
+> 	dfrag->offset = offset + sizeof(struct mptcp_data_frag);
+> 	dfrag->already_sent = 0;
+> -	dfrag->page = pfrag->page;
+> +	dfrag->page = page;
+>
+> 	return dfrag;
+> }
+> @@ -1792,7 +1797,7 @@ static u32 mptcp_send_limit(const struct sock *sk)
+> static int mptcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+> {
+> 	struct mptcp_sock *msk = mptcp_sk(sk);
+> -	struct page_frag *pfrag;
+> +	struct page_frag_cache *pfrag;
+> 	size_t copied = 0;
+> 	int ret = 0;
+> 	long timeo;
+> @@ -1831,9 +1836,12 @@ static int mptcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+> 	while (msg_data_left(msg)) {
+> 		int total_ts, frag_truesize = 0;
+> 		struct mptcp_data_frag *dfrag;
+> -		bool dfrag_collapsed;
+> -		size_t psize, offset;
+> +		bool dfrag_collapsed = false;
+> +		unsigned int offset, size;
+> +		struct page *page;
+> +		size_t psize;
+> 		u32 copy_limit;
+> +		void *va;
+>
+> 		/* ensure fitting the notsent_lowat() constraint */
+> 		copy_limit = mptcp_send_limit(sk);
+> @@ -1844,21 +1852,31 @@ static int mptcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+> 		 * page allocator
+> 		 */
+> 		dfrag = mptcp_pending_tail(sk);
+> -		dfrag_collapsed = mptcp_frag_can_collapse_to(msk, pfrag, dfrag);
+> +		size = 32U;
+> +		page = mptcp_page_frag_alloc_prepare(sk, pfrag, &offset, &size,
+> +						     &va);
+> +		if (!page)
+> +			goto wait_for_memory;
+> +
+> +		dfrag_collapsed = mptcp_frag_can_collapse_to(msk, page, offset,
+> +							     dfrag);
+> 		if (!dfrag_collapsed) {
+> -			if (!mptcp_page_frag_refill(sk, pfrag))
+> +			size = 32U + sizeof(struct mptcp_data_frag);
+> +			page = mptcp_page_frag_alloc_prepare(sk, pfrag, &offset,
+> +							     &size, &va);
 
-diff --git a/ip/iplink.c b/ip/iplink.c
-index 95314af5..d5cb9a04 100644
---- a/ip/iplink.c
-+++ b/ip/iplink.c
-@@ -64,7 +64,7 @@ void iplink_usage(void)
- 		"\n"
- 		"	ip link delete { DEVICE | dev DEVICE | group DEVGROUP } type TYPE [ ARGS ]\n"
- 		"\n"
--		"	ip link set { DEVICE | dev DEVICE | group DEVGROUP }\n"
-+		"	ip link { set | change } { DEVICE | dev DEVICE | group DEVGROUP }\n"
- 		"			[ { up | down } ]\n"
- 		"			[ type TYPE ARGS ]\n");
- 
-diff --git a/man/man8/ip-link.8.in b/man/man8/ip-link.8.in
-index 31e2d7f0..1e4dfcdd 100644
---- a/man/man8/ip-link.8.in
-+++ b/man/man8/ip-link.8.in
-@@ -63,7 +63,7 @@ ip-link \- network device configuration
- .RI "[ " ARGS " ]"
- 
- .ti -8
--.BR "ip link set " {
-+.BR "ip link" " { " set " | " change " } " {
- .IR DEVICE " | "
- .BI "group " GROUP
- }
--- 
-2.34.1
+Since 'size' was updated to contain the maximum available space on the 
+first call to mptcp_page_frag_alloc_prepare(), is it necessary to call it 
+again instead of checking to see if 'size' is large enough for the 
+mptcp_data_frag struct?
 
+> +			if (!page)
+> 				goto wait_for_memory;
+>
+> -			dfrag = mptcp_carve_data_frag(msk, pfrag, pfrag->offset);
+> +			dfrag = mptcp_carve_data_frag(msk, page, offset);
+> 			frag_truesize = dfrag->overhead;
+> +			va += dfrag->overhead;
+> 		}
+>
+> 		/* we do not bound vs wspace, to allow a single packet.
+> 		 * memory accounting will prevent execessive memory usage
+> 		 * anyway
+> 		 */
+> -		offset = dfrag->offset + dfrag->data_len;
+> -		psize = pfrag->size - offset;
+> +		psize = size - frag_truesize;
+> 		psize = min_t(size_t, psize, msg_data_left(msg));
+> 		psize = min_t(size_t, psize, copy_limit);
+> 		total_ts = psize + frag_truesize;
+> @@ -1866,8 +1884,7 @@ static int mptcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+> 		if (!sk_wmem_schedule(sk, total_ts))
+> 			goto wait_for_memory;
+>
+> -		ret = do_copy_data_nocache(sk, psize, &msg->msg_iter,
+> -					   page_address(dfrag->page) + offset);
+> +		ret = do_copy_data_nocache(sk, psize, &msg->msg_iter, va);
+> 		if (ret)
+> 			goto do_error;
+>
+> @@ -1876,7 +1893,6 @@ static int mptcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+> 		copied += psize;
+> 		dfrag->data_len += psize;
+> 		frag_truesize += psize;
+> -		pfrag->offset += frag_truesize;
+> 		WRITE_ONCE(msk->write_seq, msk->write_seq + psize);
+>
+> 		/* charge data on mptcp pending queue to the msk socket
+> @@ -1884,11 +1900,15 @@ static int mptcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+> 		 */
+> 		sk_wmem_queued_add(sk, frag_truesize);
+> 		if (!dfrag_collapsed) {
+> -			get_page(dfrag->page);
+> +			page_frag_alloc_commit(pfrag, offset, frag_truesize);
+
+It would be more efficient (but more complicated) to defer the commit 
+until the loop is done or the maximum frag size is reached. This would 
+perform more like the older code, which only had to call refill when 
+mptcp_frag_can_collapse_to() returned false.
+
+- Mat
+
+> 			list_add_tail(&dfrag->list, &msk->rtx_queue);
+> 			if (!msk->first_pending)
+> 				WRITE_ONCE(msk->first_pending, dfrag);
+> +		} else {
+> +			page_frag_alloc_commit_noref(pfrag, offset,
+> +						     frag_truesize);
+> 		}
+> +
+> 		pr_debug("msk=%p dfrag at seq=%llu len=%u sent=%u new=%d", msk,
+> 			 dfrag->data_seq, dfrag->data_len, dfrag->already_sent,
+> 			 !dfrag_collapsed);
 
