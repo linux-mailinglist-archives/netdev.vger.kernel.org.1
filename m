@@ -1,93 +1,118 @@
-Return-Path: <netdev+bounces-88301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 855308A6A0E
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:00:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 75F768A6A13
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:01:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5D5D1C20D83
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:00:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 886F91C20C96
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:01:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C2A9129E94;
-	Tue, 16 Apr 2024 12:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DDF9129E94;
+	Tue, 16 Apr 2024 12:01:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MbMakYq3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="R6GDJn38"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360A4129E8A
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 12:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42E9127B57;
+	Tue, 16 Apr 2024 12:01:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713268829; cv=none; b=PXATX2rxtR3jrzuT2bgOpTuzxohibtFggGvha8Xjd+dou5feuT94q0VT0pIMbJ/ftROu4j6T+fLG4h5/QReKkxOuUiSGjp/CwlkhNPplUb1dxDXF642cqJ3EvkriAc4eNYVoj3YwSjYZDPMz1BtC27vSWy7mtjptZOD1z3V0DNo=
+	t=1713268913; cv=none; b=ix8DA2qTeoHyEYvFiMvNKTF7lNaxH7MWdi7OAHNGNme0Qag8hzJn5SnJ2SzQHzyb1sts02j9LzOLseelRLHFr5yrn65ndKRfXVQZ02V1zpxtYSEbIDW2jky/h5WpVpVwkRoug4Z2ijU4Cqd4zmEM/lkG2zKhmUkDR5v7Qwgdf/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713268829; c=relaxed/simple;
-	bh=B21NExIxiaAFGziDO4gJ6cOYj/67G0NxNvx7RSnWpm8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TWBbonRNiL6zDB5otleEPORDUW1sf3Qil25sUgHBiQn0sCpVAtPAhU0LIoHOQH8Ca8BMygQ/TQOZyNkcNLsvY4QTSrT2bpV4Cudy/tapBTxecKACqZ3ptCefQIYqc8ItnCwuv792S+gEHTbd8aGYtEVU9VPuvUOqjLdKQ53KQPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MbMakYq3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A5FC2C2BD11;
-	Tue, 16 Apr 2024 12:00:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713268828;
-	bh=B21NExIxiaAFGziDO4gJ6cOYj/67G0NxNvx7RSnWpm8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MbMakYq3tr8aP1pVqYKUu/JodVpR0jK0soFjZBiEMx+39Km/bzWwVmTN3ssR7jGin
-	 RoM2lwuUgykn40r7hnyV1l7TfDC5Z33DPCzHUngknHRms91cbXu8aZODgLZUkBbY1S
-	 b8f7nh1yyUNErLXm6XyhARr4flDUvnuYB85pg79r7ZukvdAfquNvhTxot5EyMEzJbH
-	 OrgkhqmzN/YWEm1U1YngJTLiY4KGaI4jQM+PjL3b7UzwFjStFWoeMeQ4M/7Z+5wHfR
-	 iz5sDR+PmzQeQ2jh4/nPfnCfVD87MGjrDBEOT2z0UwKtCc6ltAltPYZyYtgn855oID
-	 sNaTpz5AftAyw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9265DC395EC;
-	Tue, 16 Apr 2024 12:00:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1713268913; c=relaxed/simple;
+	bh=y04OwjH/sbLKlcXwliMQHnCBgTseJ+PQ3aes3eUFGXQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jNbMHH9wY+jLN4IVESRdQes4EEQDWxP4jXeWTFUBgCvKYuI3G0GrWYjNnX+3e3OBJUZ5cOQzRBG9RQqWF6Ju7j2Du/ViQLCIhjyLUUB1j7SsAk57sQHiFC3ScQFM3b3yt9LSyZD2/qv4mOBjTe/W+O27QCghUnF65WfpCttnJwA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=R6GDJn38; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=IsKWmq3S1tbhsPEHkpNJ+4wTjZvXqEyH5UAdmDYEQ5Q=; b=R6GDJn38hgKmNBGIc81JtA0h1Q
+	R3uScF+x+HDTqA8bIZi8vFrRKzu4vgwk6os8ntlO2z4sio2h40d5XAbu9VYldnSIq9/Uc2BFgxhWU
+	gYhHN/JWQBuDrHapNFeqQUlssHeUz7jEXzIuxbYOR+Oiam/vKXNlqS5aZKZVHPLStzH5rEMJFdeqp
+	xIQ6DJrAGZh1xsU74mUnzpwU4/s02XomHhPQoL9yiF7qk88W8YEcIa7iMY0o8e51JmSx2V1NTExas
+	kZAUfITBlX3IP8E9E9hqhJkAqpfhfBqhepNUAQFCPz8I/PhRvoptM3wQRl+1nbrmTPPkjr9jiogV0
+	sxjM8eCA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33062)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rwhUv-00009J-1B;
+	Tue, 16 Apr 2024 13:01:13 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rwhUo-0004pX-19; Tue, 16 Apr 2024 13:01:06 +0100
+Date: Tue, 16 Apr 2024 13:01:05 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: Serge Semin <fancer.lancer@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yanteng Si <siyanteng@loongson.cn>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Huacai Chen <chenhuacai@kernel.org>, Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-sunxi@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 4/4] net: stmmac: Move MAC caps init to phylink
+ MAC caps getter
+Message-ID: <Zh5ogZ433lrUOi9b@shell.armlinux.org.uk>
+References: <20240412180340.7965-1-fancer.lancer@gmail.com>
+ <20240412180340.7965-5-fancer.lancer@gmail.com>
+ <714199e5-edf2-dcbb-216b-563431d70488@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net-next] af_unix: Try not to hold unix_gc_lock during
- accept().
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171326882859.28194.17780379532860600908.git-patchwork-notify@kernel.org>
-Date: Tue, 16 Apr 2024 12:00:28 +0000
-References: <20240413021928.20946-1-kuniyu@amazon.com>
-In-Reply-To: <20240413021928.20946-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, kuni1840@gmail.com, netdev@vger.kernel.org,
- oliver.sang@intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <714199e5-edf2-dcbb-216b-563431d70488@bootlin.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 12 Apr 2024 19:19:28 -0700 you wrote:
-> Commit dcf70df2048d ("af_unix: Fix up unix_edge.successor for embryo
-> socket.") added spin_lock(&unix_gc_lock) in accept() path, and it
-> caused regression in a stress test as reported by kernel test robot.
+On Tue, Apr 16, 2024 at 09:56:32AM +0200, Romain Gantois wrote:
+> Hi Serge,
 > 
-> If the embryo socket is not part of the inflight graph, we need not
-> hold the lock.
+> On Fri, 12 Apr 2024, Serge Semin wrote:
 > 
-> [...]
+> > +static unsigned long stmmac_mac_get_caps(struct phylink_config *config,
+> > +					 phy_interface_t interface)
+> > +{
+> > +	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
+> > +
+> > +	/* Get the MAC-specific capabilities */
+> > +	stmmac_mac_phylink_get_caps(priv);
+> 
+> This is a bit of a nitpick, but the terminology is quite confusing between 
+> stmmac_mac_phylink_get_caps() and stmmac_mac_get_caps(). Ideally, we could just 
+> get rid of the whole stmmac_do_void_callback() complexity and just call 
+> phylink_get_caps() directly. In the meantime, maybe renaming this to 
+> stmmac_mac_core_get_caps() would be acceptable?
 
-Here is the summary with links:
-  - [v2,net-next] af_unix: Try not to hold unix_gc_lock during accept().
-    https://git.kernel.org/netdev/net-next/c/fd86344823b5
+I'd prefer not to do that. If the method is called mac_get_caps() then
+I'd much rather have method implementations called foo_mac_get_caps()
+which makes grep easier.
 
-You are awesome, thank you!
+So... stmmac_core_mac_get_caps() would be acceptable to me.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
