@@ -1,336 +1,410 @@
-Return-Path: <netdev+bounces-88499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92C9F8A77B5
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 00:19:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D26AD8A77C3
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 00:28:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 226701F22D8E
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 22:19:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12FF9B2272B
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 22:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA2313A86C;
-	Tue, 16 Apr 2024 22:18:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0223984E0D;
+	Tue, 16 Apr 2024 22:28:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=LIVE.NL header.i=@LIVE.NL header.b="tWq1uH37"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fjOSM1NY";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="W5hk69oL";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="fjOSM1NY";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="W5hk69oL"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-db5eur01olkn2060.outbound.protection.outlook.com [40.92.64.60])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 735F913777C;
-	Tue, 16 Apr 2024 22:18:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.64.60
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713305924; cv=fail; b=Rx15WlWaG6FHz9C1PLOch7yEDOJAL8XFyUuS++gch7RekMizyKrhkCRyvW0eS9CDqkMOpupiKl2iPmpkN1oTYnTP14AuGbl7tr/Tp3u17ReCsCm5CKkbz1xbEdvsDJJPlGVxrrCOaUANXh0qxSX/qhLYu/hSiiX/WY1gKmxS8Jw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713305924; c=relaxed/simple;
-	bh=QDJJvpAHPsNCSVqmuCO7kQVxCxCVVOsklX++k4Jq5OI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LwdDi2V5jc+LEf5foeuX1vt5GjX/clD6IDt6lB+nTtpxZrZI8hD5ES/Uxg/qyZ9geaB+holqajamFwEHgMZUtIJ4ps4JNabWknINRyYaGfxn2QKsGyYe3QARYSMeHDUOnrLLhU7QaU3akmPj8c7L0bUgCcD4Rr3DUn1Nlxgke7s=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=live.nl; spf=pass smtp.mailfrom=live.nl; dkim=pass (2048-bit key) header.d=LIVE.NL header.i=@LIVE.NL header.b=tWq1uH37; arc=fail smtp.client-ip=40.92.64.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=live.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=live.nl
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cBGsNbCEuZdIaFQWGEnNkS/nvwkz8l/UqE8uLlxA+zyo5LXXOhquyq3QWcPK1splGIfxrcwbje/cfFnGaxT/sDDSKq8asmm8U3I0AGhgzu78dBykAHA3tY8213RnQMfTEckH9lTROuuP+OHgFz0JPO2N6vExy7d7AJciYzoUn9ktgrSimdR9mBOq30Gx1AxCQ5FN72pweYRek6TjtuyIaJubojkD3PJAitErjN2rDgnK71h0nMzNypYm59kCiCwR7zyCpA3M7Ux4Y6CPVdZue52GMchf4qCsAuxyJ8m/WK+cogajZWo7dqq4rCLAaOy0O9hJwEXslFBfR/CduLPsbQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=K39q10R9C1RayyooyeKvFUTWftpyWkmzP58m9XrM/IA=;
- b=XPrr/zra0EDbc0HBp1vwG4zd6ki/xtaOqKEgMin9QtoG2NIHCPT5FsuCGuhU4+luwq5g4anSBtg4hHGJUlhljEcpjL8olhamCzBVYEFh0nzBvbzV5xmqfVHRrlY0lE+Ig9VJ1R1QxiZlyZJJBokbzQKSxHGzqqkf6+tzLHXNcuofCqSM7MDffBm6jgkAr67ApZjZcC4ktyTqAz2+NFZAGbHQjXEOPybAHydT7Xz+DXwHpUigpDKePA4JBkjEvWpu7qwT0ldAN7ohnuKfwr/m4JcF6IYj/iKYgDZzuchgyLn0Q+iIS1mE991bqB0oI8xbJuXSByHDQHpxvAPuqOaomg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=LIVE.NL; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=K39q10R9C1RayyooyeKvFUTWftpyWkmzP58m9XrM/IA=;
- b=tWq1uH37v9WCxbRGBzn8DfesmjM3yFX0jmTlaGhsKL4UJROlG7UpRZmisV9rv3NXClaLaPZj3QndYtusl8JNzatVCUaR/wmrCcJSLFeApxWSifLpZLHw66unqZ1jRmCmXXTKTJpgIUC8yUnn4fh/K97KK3PmGvlWJ+gQJDBzjMIleDlbieBpEp/buQgmUNU7BETh731bhQ2WpmFUSIWYey0Eq+C0fP9vLqXHBYp2STIolo18pIfSXIhjHrRjjQc1Uy6pV8oxLxMzhBEUTxk7MqalHyAQ/ZKzFywEpUmIpx5IGOeS5If5Wri0GwLi9AuAkC1gKzxjSYXzGB7wpI20Wg==
-Received: from AM0PR09MB2675.eurprd09.prod.outlook.com (2603:10a6:208:d3::24)
- by DU2PR09MB5357.eurprd09.prod.outlook.com (2603:10a6:10:276::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.50; Tue, 16 Apr
- 2024 22:18:38 +0000
-Received: from AM0PR09MB2675.eurprd09.prod.outlook.com
- ([fe80::6881:178c:bae6:1644]) by AM0PR09MB2675.eurprd09.prod.outlook.com
- ([fe80::6881:178c:bae6:1644%6]) with mapi id 15.20.7452.049; Tue, 16 Apr 2024
- 22:18:38 +0000
-From: Paul Geurts <paul_geurts@live.nl>
-To: mgreer@animalcreek.com,
-	krzk@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	conor+dt@kernel.org,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Paul Geurts <paul_geurts@live.nl>
-Subject: [PATCH 2/2] NFC: trf7970a: Create device-tree parameter for RX gain reduction
-Date: Wed, 17 Apr 2024 00:18:16 +0200
-Message-ID:
- <AM0PR09MB2675AB84E150CCF698CF73BC95082@AM0PR09MB2675.eurprd09.prod.outlook.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <cover.1713305374.git.paul_geurts@live.nl>
-References: <cover.1713305374.git.paul_geurts@live.nl>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [GMe95/uJwlAuyKkMPCMvZSzF08AmRkc6u01mCI1d9sco6cIb0NAABeDPFfoM8ySM]
-X-ClientProxiedBy: AM0PR03CA0093.eurprd03.prod.outlook.com
- (2603:10a6:208:69::34) To AM0PR09MB2675.eurprd09.prod.outlook.com
- (2603:10a6:208:d3::24)
-X-Microsoft-Original-Message-ID:
- <19a371556f8770c551ae89a107c43b3eb5eb378f.1713305374.git.paul_geurts@live.nl>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D00784D3B;
+	Tue, 16 Apr 2024 22:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713306527; cv=none; b=rAZQSjsJrYF4JVl8qR+PGGi6NWCdhOCHPnlxjRg5I2CvaPsk5Jdh+ZsUzS7S9YxTwOXMfv5rb25Gf1kfgxLE6MHyRT2aVO5ErR+J+0XPIsO/QrYlBYRDjX52yWKxhrfWnD0uLIF3e6SW1+CnbRng2UE9A0FMcijFmLmmJ5Yfv3U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713306527; c=relaxed/simple;
+	bh=43ggudsvQTZKaXFGAoljkt0JnDEsFhO+Y3m34cP0svU=;
+	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
+	 References:Date:Message-id; b=u02euvwQKE21IUMpUn8laKfEb2UtpPP67eHIAYR0e1BDGAh+tZaTv5e4nTZdDOXZ/DEJGvkkaBOLgKH5DozmDHQ3EWAGPf/KerADEKasHO2mnG2CvVZFJ0vnd8clxDOCh965tEd5BoRU6QhgTtq5VcKLK6y85byTKZ3LHyBSoyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fjOSM1NY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=W5hk69oL; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=fjOSM1NY; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=W5hk69oL; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 13DB82280C;
+	Tue, 16 Apr 2024 22:28:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1713306524; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vZ9FCDXlN7R0d7/mZxq0OQNJPfx2sZYrt83BD8WSZNo=;
+	b=fjOSM1NYBuIQYbkzq3kObkl7Gvyx57BwR4pZ/HblHclLnIFuSQDR9UIulmeeHarhvABxRR
+	ecogG4SkS6uUWNXX+qtFdUYUR/nyC79f+y826MWMxdQUrZizOU6sYHKEuk/nnM7VN1+Tv5
+	ZDV9EBq718TLHyFoAc4EtvSRGYjjYdg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1713306524;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vZ9FCDXlN7R0d7/mZxq0OQNJPfx2sZYrt83BD8WSZNo=;
+	b=W5hk69oLMrySwtx0wF2z4O+E//lR5ej08/Idl5RA2492u9os/Axesv8Ch9Metlh1a7o895
+	KXFYmf2MeGkK9LBg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1713306524; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vZ9FCDXlN7R0d7/mZxq0OQNJPfx2sZYrt83BD8WSZNo=;
+	b=fjOSM1NYBuIQYbkzq3kObkl7Gvyx57BwR4pZ/HblHclLnIFuSQDR9UIulmeeHarhvABxRR
+	ecogG4SkS6uUWNXX+qtFdUYUR/nyC79f+y826MWMxdQUrZizOU6sYHKEuk/nnM7VN1+Tv5
+	ZDV9EBq718TLHyFoAc4EtvSRGYjjYdg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1713306524;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vZ9FCDXlN7R0d7/mZxq0OQNJPfx2sZYrt83BD8WSZNo=;
+	b=W5hk69oLMrySwtx0wF2z4O+E//lR5ej08/Idl5RA2492u9os/Axesv8Ch9Metlh1a7o895
+	KXFYmf2MeGkK9LBg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 1DFBD13931;
+	Tue, 16 Apr 2024 22:28:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id GF/tLJj7HmbcDQAAD6G6ig
+	(envelope-from <neilb@suse.de>); Tue, 16 Apr 2024 22:28:40 +0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR09MB2675:EE_|DU2PR09MB5357:EE_
-X-MS-Office365-Filtering-Correlation-Id: a6c87ffb-95a0-4116-142c-08dc5e632a2a
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	V/LCffn7N6ZdxdbWenCtLA7T59BbsJdZ67KYvXxLWAVdjUQvfgT9EcltNpaHETDpVtvhvOkPdFKSRI08dLB1Ce5xxeGqbmb6pmTTP3spNisj9SrYZMOMPKjpzxGddHaqJRlBv4X3rI5WgoO9ExHhhLzNf6qWFYyHb2G5bfISn8Hl7btJIa3aV0xw0D5568GCVv/sup6G91Dq/4FSzOL2NKVLLIaG/eJ8Yu9WdxmPIEEUYzAUGlH8N0u9MAhuBdue9SLSGaceVMEqI5elSG+FSLgU8eKPKXEQs25l10/gief1GKIPlGAa07YGK7yuN92J9VxIjqmvfrosxz7WdF+RfR84boNJMR0UYUxiF2553kqDoYy7jeS/BJTSo9O1Ng5aYXdwyD/ZV7I7RY1yeR2nXKcG7ORqRmltTcttbVCnAIE/FaMopE0Lf05v0WaC5iwx8f8o28D/UJagM2dehhyTS2ycgYsLXqLybB0/xLdT23cyAstSohEIOPYH9pmrPoqBNin0QdwtMhCd6M+yIIEf31MKu0YMVGWbPiHdMslVK/RagYBMa+APD/fmNK0XN67DMAxLG7eRZlhFk74sNFQZh9MqPwEBHZXr9V1LYD8D216jaDesgHE2ab0fE5m5nldw
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?dUEHAWh7XeXWKJcYZ9T3w/tGoKBue/qKmnSDZI2/57P3BY0KupdV4MI1A3en?=
- =?us-ascii?Q?37GpaUsRK/e8BwtXMG4ibcJo0NmEbhMrJL2/gP3FF+JSoHdsRsbSSojBruYm?=
- =?us-ascii?Q?jGjJGQji8cCXS1eCmmNVjGy2fYIjZQ12b/xH2xeVg0x/2OkCh7gIMPyBQRDv?=
- =?us-ascii?Q?1f2jgBTTG8upEa7BcYHXCR04/xRmSYPo8FELQXPRGdQycieQQweWJXky8OxH?=
- =?us-ascii?Q?Rr3Szewkw5QGam+vjBvZ+Q4dI7UuzkZSiMBbyG7QrUpSLpJrCg0KxbgTn62D?=
- =?us-ascii?Q?xar0XMN1irX9aIaLiPojtm7BsBpqvnPaJ5Ji2036rqvKS6PAuyWQGTLQhu+k?=
- =?us-ascii?Q?9OnLFaRoggC10MCWGzQfWvLEWkCwbqX6h4ftQT1/63knFFPYnaI5e5enXE1V?=
- =?us-ascii?Q?kP7QZrkYE23MveimIPxcSp/LiCsIiwCe/OpNgWuPB6mSfm5RquT0LYSw1Wpm?=
- =?us-ascii?Q?wK2sAioFDVAk3myyCAzhA8yPOn1gJBBjBRP9eSsGz1I4EvmXtyTs06x4oQjX?=
- =?us-ascii?Q?10RYVMoPPyMjqBTkwLQFpU4I0WkR+PoIt87Wf3oLQjisiICAXC2fMrrQY0Yc?=
- =?us-ascii?Q?ajkYcdSFOx9n45vZIlR/mpkAm2z2TbgDKou82K91zDpqLFGEirjjB/ddnb0+?=
- =?us-ascii?Q?CweiT5HOmOjqE2taT4JEETUbky/9KL81wBKFfBQbYqiJjxS5Roj1SraTMD5i?=
- =?us-ascii?Q?B560NFTbn07ko5f1pI28hUF+++g16ZKmcnzcyyv96AqKig0Pj4H/wkN5aYS4?=
- =?us-ascii?Q?vG1RVwhiahoT0wb6YATsfNoxFVCqLM7vws2BqRVvHZ5C9Mt8gxC+QQmwd5Tt?=
- =?us-ascii?Q?PHcf7201wZ7VgIi4EPuKvzvsdPz2KvwnzaVYfHloKdwb8ws4m/p13yzPPryv?=
- =?us-ascii?Q?ru4MuQFYEtiHSXLUS0wlkndyfPJuw3pH6DeOEwZdRV6ZC8YYYcGbFSgfv3Rf?=
- =?us-ascii?Q?g7DUTuPrmsiT1nizCwTjUsQjDKAi/MEMTjzWH1AHV64CiLmI4CpxR6CSZo0U?=
- =?us-ascii?Q?hJpqqS6pmmHUeXXVWD8xzlJHQpfAOyVji9b0eIpXR3a6AEXhzVvKbmPK6Zx/?=
- =?us-ascii?Q?vVq59tZgAGUHuAG7xvRNgOT24equ7I9d+5kSgmXb29QyZXxZ4QmKoBA9V1XE?=
- =?us-ascii?Q?ZV8r6XX2fFJhkQXcYLklMzUJD05niBUEQwjVEehZi7e3K0bXJUjsU71dJU3Y?=
- =?us-ascii?Q?nKMmzGo8YBcOLEcUCNswlDEfNaJBP+IlNk1Nv1yy7h4IN+6NnPhPeN5FpnJ5?=
- =?us-ascii?Q?po/ScGMucJMGZCHNvtBn58PUn2e8nt22ABh7YaStC+9r6ldH4EIG9KLHw2nz?=
- =?us-ascii?Q?7Yk=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-64da6.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: a6c87ffb-95a0-4116-142c-08dc5e632a2a
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR09MB2675.eurprd09.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Apr 2024 22:18:38.5039
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR09MB5357
+From: "NeilBrown" <neilb@suse.de>
+To: "Lorenzo Bianconi" <lorenzo@kernel.org>
+Cc: linux-nfs@vger.kernel.org, lorenzo.bianconi@redhat.com,
+ chuck.lever@oracle.com, netdev@vger.kernel.org, kuba@kernel.org,
+ jlayton@kernel.org
+Subject: Re: [PATCH v8 2/6] NFSD: convert write_threads to netlink command
+In-reply-to:
+ <4ff777ebb8652e31709bd91c3af50693edf86a26.1713209938.git.lorenzo@kernel.org>
+References: <cover.1713209938.git.lorenzo@kernel.org>,
+ <4ff777ebb8652e31709bd91c3af50693edf86a26.1713209938.git.lorenzo@kernel.org>
+Date: Wed, 17 Apr 2024 08:28:33 +1000
+Message-id: <171330651306.17212.2078718779289951086@noble.neil.brown.name>
+X-Spam-Flag: NO
+X-Spam-Score: -4.30
+X-Spam-Level: 
+X-Spamd-Result: default: False [-4.30 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	MISSING_XM_UA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCPT_COUNT_SEVEN(0.00)[7];
+	RCVD_TLS_ALL(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
 
-The TRF7970a device is sensitive to RF disturbances, which can make it
-hard to pass some EMC immunity tests. By reducing the RX antenna gain,
-the device becomes less sensitive to EMC disturbances, as a trade-off
-against antenna performance.
+On Tue, 16 Apr 2024, Lorenzo Bianconi wrote:
+> Introduce write_threads netlink command similar to the one available
+> through the procfs.
+>=20
+> Tested-by: Jeff Layton <jlayton@kernel.org>
+> Reviewed-by: Jeff Layton <jlayton@kernel.org>
+> Co-developed-by: Jeff Layton <jlayton@kernel.org>
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  Documentation/netlink/specs/nfsd.yaml |  33 ++++++++
+>  fs/nfsd/netlink.c                     |  19 +++++
+>  fs/nfsd/netlink.h                     |   2 +
+>  fs/nfsd/nfsctl.c                      | 104 ++++++++++++++++++++++++++
+>  include/uapi/linux/nfsd_netlink.h     |  11 +++
+>  5 files changed, 169 insertions(+)
+>=20
+> diff --git a/Documentation/netlink/specs/nfsd.yaml b/Documentation/netlink/=
+specs/nfsd.yaml
+> index 05acc73e2e33..cbe6c5fd6c4d 100644
+> --- a/Documentation/netlink/specs/nfsd.yaml
+> +++ b/Documentation/netlink/specs/nfsd.yaml
+> @@ -62,6 +62,18 @@ attribute-sets:
+>          name: compound-ops
+>          type: u32
+>          multi-attr: true
+> +  -
+> +    name: server-worker
+> +    attributes:
+> +      -
+> +        name: threads
+> +        type: u32
+> +      -
+> +        name: gracetime
+> +        type: u32
+> +      -
+> +        name: leasetime
+> +        type: u32
 
-Add a device tree option to select RX gain reduction to improve EMC
-performance.
+Another thought: I would be really happy if the "scope" were another
+optional argument here.  The mechanism of setting the scope by user the
+hostname works but is ugly.  I'm inclined to ignore the hostname
+completely when netlink is used, but I'm not completely sure about that.
+(aside - I think using the hostname for the default scope was a really
+bad idea.  It should have been a fixed string like "Linux").
 
-Selecting a communication standard in the ISO control register resets
-the RX antenna gain settings. Therefore set the RX gain reduction
-everytime the ISO control register changes, when the option is used.
+NeilBrown
 
-Signed-off-by: Paul Geurts <paul_geurts@live.nl>
----
- drivers/nfc/trf7970a.c | 86 ++++++++++++++++++++++++++++++++++++------
- 1 file changed, 75 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/nfc/trf7970a.c b/drivers/nfc/trf7970a.c
-index 7eb17f46a815..0991c717a5de 100644
---- a/drivers/nfc/trf7970a.c
-+++ b/drivers/nfc/trf7970a.c
-@@ -274,10 +274,14 @@
- 
- #define TRF7970A_RX_SPECIAL_SETTINGS_NO_LIM	BIT(0)
- #define TRF7970A_RX_SPECIAL_SETTINGS_AGCR	BIT(1)
--#define TRF7970A_RX_SPECIAL_SETTINGS_GD_0DB	(0x0 << 2)
--#define TRF7970A_RX_SPECIAL_SETTINGS_GD_5DB	(0x1 << 2)
--#define TRF7970A_RX_SPECIAL_SETTINGS_GD_10DB	(0x2 << 2)
--#define TRF7970A_RX_SPECIAL_SETTINGS_GD_15DB	(0x3 << 2)
-+#define TRF7970A_RX_SPECIAL_SETTINGS_GD_SHIFT	2
-+#define TRF7970A_RX_SPECIAL_SETTINGS_GD_MAX	(0x3)
-+#define TRF7970A_RX_SPECIAL_SETTINGS_GD_MASK	(TRF7970A_RX_SPECIAL_SETTINGS_GD_MAX << \
-+							TRF7970A_RX_SPECIAL_SETTINGS_GD_SHIFT)
-+#define TRF7970A_RX_SPECIAL_SETTINGS_GD_0DB	(0x0 << TRF7970A_RX_SPECIAL_SETTINGS_GD_SHIFT)
-+#define TRF7970A_RX_SPECIAL_SETTINGS_GD_5DB	(0x1 << TRF7970A_RX_SPECIAL_SETTINGS_GD_SHIFT)
-+#define TRF7970A_RX_SPECIAL_SETTINGS_GD_10DB	(0x2 << TRF7970A_RX_SPECIAL_SETTINGS_GD_SHIFT)
-+#define TRF7970A_RX_SPECIAL_SETTINGS_GD_15DB	(0x3 << TRF7970A_RX_SPECIAL_SETTINGS_GD_SHIFT)
- #define TRF7970A_RX_SPECIAL_SETTINGS_HBT	BIT(4)
- #define TRF7970A_RX_SPECIAL_SETTINGS_M848	BIT(5)
- #define TRF7970A_RX_SPECIAL_SETTINGS_C424	BIT(6)
-@@ -451,6 +455,8 @@ struct trf7970a {
- 	unsigned int			timeout;
- 	bool				ignore_timeout;
- 	struct delayed_work		timeout_work;
-+	u8				rx_gain_reduction;
-+	bool			custom_rx_gain_reduction;
- };
- 
- static int trf7970a_cmd(struct trf7970a *trf, u8 opcode)
-@@ -550,6 +556,41 @@ static int trf7970a_read_irqstatus(struct trf7970a *trf, u8 *status)
- 	return ret;
- }
- 
-+static int trf7970a_update_rx_gain_reduction(struct trf7970a *trf)
-+{
-+	int ret = 0;
-+	u8 reg;
-+
-+	if (!trf->custom_rx_gain_reduction)
-+		return 0;
-+
-+	ret = trf7970a_read(trf, TRF7970A_RX_SPECIAL_SETTINGS, &reg);
-+	if (ret)
-+		return ret;
-+	reg &= ~(TRF7970A_RX_SPECIAL_SETTINGS_GD_MASK);
-+	reg |= trf->rx_gain_reduction;
-+
-+	ret = trf7970a_write(trf, TRF7970A_RX_SPECIAL_SETTINGS, reg);
-+
-+	return ret;
-+}
-+
-+static int trf7970a_update_iso_ctrl_register(struct trf7970a *trf, u8 iso_ctrl)
-+{
-+	int ret;
-+
-+	ret = trf7970a_write(trf, TRF7970A_ISO_CTRL, iso_ctrl);
-+	if (ret)
-+		return ret;
-+	/*
-+	 * Every time the ISO_CTRL register is written, the RX special setting register is reset by
-+	 * the chip. When a custom gain reguduction is required, it should be rewritten now.
-+	 */
-+	ret = trf7970a_update_rx_gain_reduction(trf);
-+
-+	return ret;
-+}
-+
- static int trf7970a_read_target_proto(struct trf7970a *trf, u8 *target_proto)
- {
- 	int ret;
-@@ -929,8 +970,7 @@ static irqreturn_t trf7970a_irq(int irq, void *dev_id)
- 			}
- 
- 			if (iso_ctrl != trf->iso_ctrl) {
--				ret = trf7970a_write(trf, TRF7970A_ISO_CTRL,
--						     iso_ctrl);
-+				ret = trf7970a_update_iso_ctrl_register(trf, iso_ctrl);
- 				if (ret)
- 					goto err_unlock_exit;
- 
-@@ -1034,6 +1074,11 @@ static int trf7970a_init(struct trf7970a *trf)
- 	if (ret)
- 		goto err_out;
- 
-+	/* Set the gain reduction after soft init */
-+	ret = trf7970a_update_rx_gain_reduction(trf);
-+	if (ret)
-+		goto err_out;
-+
- 	ret = trf7970a_cmd(trf, TRF7970A_CMD_IDLE);
- 	if (ret)
- 		goto err_out;
-@@ -1308,7 +1353,7 @@ static int trf7970a_in_config_framing(struct trf7970a *trf, int framing)
- 	}
- 
- 	if (iso_ctrl != trf->iso_ctrl) {
--		ret = trf7970a_write(trf, TRF7970A_ISO_CTRL, iso_ctrl);
-+		ret = trf7970a_update_iso_ctrl_register(trf, iso_ctrl);
- 		if (ret)
- 			return ret;
- 
-@@ -1440,7 +1485,7 @@ static int trf7970a_per_cmd_config(struct trf7970a *trf,
- 		}
- 
- 		if (iso_ctrl != trf->iso_ctrl) {
--			ret = trf7970a_write(trf, TRF7970A_ISO_CTRL, iso_ctrl);
-+			ret = trf7970a_update_iso_ctrl_register(trf, iso_ctrl);
- 			if (ret)
- 				return ret;
- 
-@@ -1604,8 +1649,7 @@ static int trf7970a_tg_config_rf_tech(struct trf7970a *trf, int tech)
- 	 */
- 	if ((trf->framing == NFC_DIGITAL_FRAMING_NFC_DEP_ACTIVATED) &&
- 	    (trf->iso_ctrl_tech != trf->iso_ctrl)) {
--		ret = trf7970a_write(trf, TRF7970A_ISO_CTRL,
--				     trf->iso_ctrl_tech);
-+		ret = trf7970a_update_iso_ctrl_register(trf, trf->iso_ctrl_tech);
- 
- 		trf->iso_ctrl = trf->iso_ctrl_tech;
- 	}
-@@ -1653,7 +1697,7 @@ static int trf7970a_tg_config_framing(struct trf7970a *trf, int framing)
- 	trf->framing = framing;
- 
- 	if (iso_ctrl != trf->iso_ctrl) {
--		ret = trf7970a_write(trf, TRF7970A_ISO_CTRL, iso_ctrl);
-+		ret = trf7970a_update_iso_ctrl_register(trf, iso_ctrl);
- 		if (ret)
- 			return ret;
- 
-@@ -1754,6 +1798,10 @@ static int _trf7970a_tg_listen(struct nfc_digital_dev *ddev, u16 timeout,
- 	if (ret)
- 		goto out_err;
- 
-+	ret = trf7970a_update_rx_gain_reduction(trf);
-+	if (ret)
-+		goto out_err;
-+
- 	ret = trf7970a_write(trf, TRF7970A_REG_IO_CTRL,
- 			     trf->io_ctrl | TRF7970A_REG_IO_CTRL_VRS(0x1));
- 	if (ret)
-@@ -1944,6 +1992,10 @@ static int trf7970a_startup(struct trf7970a *trf)
- 	if (ret)
- 		return ret;
- 
-+	ret = trf7970a_update_rx_gain_reduction(trf);
-+	if (ret)
-+		return ret;
-+
- 	pm_runtime_set_active(trf->dev);
- 	pm_runtime_enable(trf->dev);
- 	pm_runtime_mark_last_busy(trf->dev);
-@@ -1992,6 +2044,7 @@ static int trf7970a_probe(struct spi_device *spi)
- 	struct trf7970a *trf;
- 	int uvolts, autosuspend_delay, ret;
- 	u32 clk_freq = TRF7970A_13MHZ_CLOCK_FREQUENCY;
-+	u32 rx_gain_reduction;
- 
- 	if (!np) {
- 		dev_err(&spi->dev, "No Device Tree entry\n");
-@@ -2053,6 +2106,17 @@ static int trf7970a_probe(struct spi_device *spi)
- 		trf->modulator_sys_clk_ctrl = 0;
- 	}
- 
-+	if (of_property_read_u32(np, "rx-gain-reduction", &rx_gain_reduction) == 0) {
-+		if (rx_gain_reduction > TRF7970A_RX_SPECIAL_SETTINGS_GD_MAX) {
-+			dev_warn(trf->dev, "invalid RX gain reduction setting: %u. Limiting to %u\n",
-+				 rx_gain_reduction, TRF7970A_RX_SPECIAL_SETTINGS_GD_MAX);
-+			rx_gain_reduction = TRF7970A_RX_SPECIAL_SETTINGS_GD_MAX;
-+		}
-+		trf->rx_gain_reduction = (rx_gain_reduction <<
-+			TRF7970A_RX_SPECIAL_SETTINGS_GD_SHIFT);
-+		trf->custom_rx_gain_reduction = true;
-+	}
-+
- 	ret = devm_request_threaded_irq(trf->dev, spi->irq, NULL,
- 					trf7970a_irq,
- 					IRQF_TRIGGER_RISING | IRQF_ONESHOT,
--- 
-2.20.1
+
+> =20
+>  operations:
+>    list:
+> @@ -87,3 +99,24 @@ operations:
+>              - sport
+>              - dport
+>              - compound-ops
+> +    -
+> +      name: threads-set
+> +      doc: set the number of running threads
+> +      attribute-set: server-worker
+> +      flags: [ admin-perm ]
+> +      do:
+> +        request:
+> +          attributes:
+> +            - threads
+> +            - gracetime
+> +            - leasetime
+> +    -
+> +      name: threads-get
+> +      doc: get the number of running threads
+> +      attribute-set: server-worker
+> +      do:
+> +        reply:
+> +          attributes:
+> +            - threads
+> +            - gracetime
+> +            - leasetime
+> diff --git a/fs/nfsd/netlink.c b/fs/nfsd/netlink.c
+> index 0e1d635ec5f9..20a646af0324 100644
+> --- a/fs/nfsd/netlink.c
+> +++ b/fs/nfsd/netlink.c
+> @@ -10,6 +10,13 @@
+> =20
+>  #include <uapi/linux/nfsd_netlink.h>
+> =20
+> +/* NFSD_CMD_THREADS_SET - do */
+> +static const struct nla_policy nfsd_threads_set_nl_policy[NFSD_A_SERVER_WO=
+RKER_LEASETIME + 1] =3D {
+> +	[NFSD_A_SERVER_WORKER_THREADS] =3D { .type =3D NLA_U32, },
+> +	[NFSD_A_SERVER_WORKER_GRACETIME] =3D { .type =3D NLA_U32, },
+> +	[NFSD_A_SERVER_WORKER_LEASETIME] =3D { .type =3D NLA_U32, },
+> +};
+> +
+>  /* Ops table for nfsd */
+>  static const struct genl_split_ops nfsd_nl_ops[] =3D {
+>  	{
+> @@ -19,6 +26,18 @@ static const struct genl_split_ops nfsd_nl_ops[] =3D {
+>  		.done	=3D nfsd_nl_rpc_status_get_done,
+>  		.flags	=3D GENL_CMD_CAP_DUMP,
+>  	},
+> +	{
+> +		.cmd		=3D NFSD_CMD_THREADS_SET,
+> +		.doit		=3D nfsd_nl_threads_set_doit,
+> +		.policy		=3D nfsd_threads_set_nl_policy,
+> +		.maxattr	=3D NFSD_A_SERVER_WORKER_LEASETIME,
+> +		.flags		=3D GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+> +	},
+> +	{
+> +		.cmd	=3D NFSD_CMD_THREADS_GET,
+> +		.doit	=3D nfsd_nl_threads_get_doit,
+> +		.flags	=3D GENL_CMD_CAP_DO,
+> +	},
+>  };
+> =20
+>  struct genl_family nfsd_nl_family __ro_after_init =3D {
+> diff --git a/fs/nfsd/netlink.h b/fs/nfsd/netlink.h
+> index d83dd6bdee92..4137fac477e4 100644
+> --- a/fs/nfsd/netlink.h
+> +++ b/fs/nfsd/netlink.h
+> @@ -16,6 +16,8 @@ int nfsd_nl_rpc_status_get_done(struct netlink_callback *=
+cb);
+> =20
+>  int nfsd_nl_rpc_status_get_dumpit(struct sk_buff *skb,
+>  				  struct netlink_callback *cb);
+> +int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info *info);
+> +int nfsd_nl_threads_get_doit(struct sk_buff *skb, struct genl_info *info);
+> =20
+>  extern struct genl_family nfsd_nl_family;
+> =20
+> diff --git a/fs/nfsd/nfsctl.c b/fs/nfsd/nfsctl.c
+> index f2e442d7fe16..38a5df03981b 100644
+> --- a/fs/nfsd/nfsctl.c
+> +++ b/fs/nfsd/nfsctl.c
+> @@ -1653,6 +1653,110 @@ int nfsd_nl_rpc_status_get_done(struct netlink_call=
+back *cb)
+>  	return 0;
+>  }
+> =20
+> +/**
+> + * nfsd_nl_threads_set_doit - set the number of running threads
+> + * @skb: reply buffer
+> + * @info: netlink metadata and command arguments
+> + *
+> + * Return 0 on success or a negative errno.
+> + */
+> +int nfsd_nl_threads_set_doit(struct sk_buff *skb, struct genl_info *info)
+> +{
+> +	struct net *net =3D genl_info_net(info);
+> +	struct nfsd_net *nn =3D net_generic(net, nfsd_net_id);
+> +	int ret =3D -EBUSY;
+> +	u32 nthreads;
+> +
+> +	if (GENL_REQ_ATTR_CHECK(info, NFSD_A_SERVER_WORKER_THREADS))
+> +		return -EINVAL;
+> +
+> +	nthreads =3D nla_get_u32(info->attrs[NFSD_A_SERVER_WORKER_THREADS]);
+> +
+> +	mutex_lock(&nfsd_mutex);
+> +	if (info->attrs[NFSD_A_SERVER_WORKER_GRACETIME] ||
+> +	    info->attrs[NFSD_A_SERVER_WORKER_LEASETIME]) {
+> +		const struct nlattr *attr;
+> +
+> +		if (nn->nfsd_serv && nn->nfsd_serv->sv_nrthreads)
+> +			goto out_unlock;
+> +
+> +		ret =3D -EINVAL;
+> +		attr =3D info->attrs[NFSD_A_SERVER_WORKER_GRACETIME];
+> +		if (attr) {
+> +			u32 gracetime =3D nla_get_u32(attr);
+> +
+> +			if (gracetime < 10 || gracetime > 3600)
+> +				goto out_unlock;
+> +
+> +			nn->nfsd4_grace =3D gracetime;
+> +		}
+> +
+> +		attr =3D info->attrs[NFSD_A_SERVER_WORKER_LEASETIME];
+> +		if (attr) {
+> +			u32 leasetime =3D nla_get_u32(attr);
+> +
+> +			if (leasetime < 10 || leasetime > 3600)
+> +				goto out_unlock;
+> +
+> +			nn->nfsd4_lease =3D leasetime;
+> +		}
+> +	}
+> +
+> +	ret =3D nfsd_svc(nthreads, net, get_current_cred());
+> +out_unlock:
+> +	mutex_unlock(&nfsd_mutex);
+> +
+> +	return ret =3D=3D nthreads ? 0 : ret;
+> +}
+> +
+> +/**
+> + * nfsd_nl_threads_get_doit - get the number of running threads
+> + * @skb: reply buffer
+> + * @info: netlink metadata and command arguments
+> + *
+> + * Return 0 on success or a negative errno.
+> + */
+> +int nfsd_nl_threads_get_doit(struct sk_buff *skb, struct genl_info *info)
+> +{
+> +	struct net *net =3D genl_info_net(info);
+> +	struct nfsd_net *nn =3D net_generic(net, nfsd_net_id);
+> +	void *hdr;
+> +	int err;
+> +
+> +	skb =3D genlmsg_new(GENLMSG_DEFAULT_SIZE, GFP_KERNEL);
+> +	if (!skb)
+> +		return -ENOMEM;
+> +
+> +	hdr =3D genlmsg_iput(skb, info);
+> +	if (!hdr) {
+> +		err =3D -EMSGSIZE;
+> +		goto err_free_msg;
+> +	}
+> +
+> +	mutex_lock(&nfsd_mutex);
+> +	err =3D nla_put_u32(skb, NFSD_A_SERVER_WORKER_GRACETIME,
+> +			  nn->nfsd4_grace) ||
+> +	      nla_put_u32(skb, NFSD_A_SERVER_WORKER_LEASETIME,
+> +			  nn->nfsd4_lease) ||
+> +	      nla_put_u32(skb, NFSD_A_SERVER_WORKER_THREADS,
+> +			  nn->nfsd_serv ? nn->nfsd_serv->sv_nrthreads : 0);
+> +	mutex_unlock(&nfsd_mutex);
+> +
+> +	if (err) {
+> +		err =3D -EINVAL;
+> +		goto err_free_msg;
+> +	}
+> +
+> +	genlmsg_end(skb, hdr);
+> +
+> +	return genlmsg_reply(skb, info);
+> +
+> +err_free_msg:
+> +	nlmsg_free(skb);
+> +
+> +	return err;
+> +}
+> +
+>  /**
+>   * nfsd_net_init - Prepare the nfsd_net portion of a new net namespace
+>   * @net: a freshly-created network namespace
+> diff --git a/include/uapi/linux/nfsd_netlink.h b/include/uapi/linux/nfsd_ne=
+tlink.h
+> index 3cd044edee5d..ccc78a5ee650 100644
+> --- a/include/uapi/linux/nfsd_netlink.h
+> +++ b/include/uapi/linux/nfsd_netlink.h
+> @@ -29,8 +29,19 @@ enum {
+>  	NFSD_A_RPC_STATUS_MAX =3D (__NFSD_A_RPC_STATUS_MAX - 1)
+>  };
+> =20
+> +enum {
+> +	NFSD_A_SERVER_WORKER_THREADS =3D 1,
+> +	NFSD_A_SERVER_WORKER_GRACETIME,
+> +	NFSD_A_SERVER_WORKER_LEASETIME,
+> +
+> +	__NFSD_A_SERVER_WORKER_MAX,
+> +	NFSD_A_SERVER_WORKER_MAX =3D (__NFSD_A_SERVER_WORKER_MAX - 1)
+> +};
+> +
+>  enum {
+>  	NFSD_CMD_RPC_STATUS_GET =3D 1,
+> +	NFSD_CMD_THREADS_SET,
+> +	NFSD_CMD_THREADS_GET,
+> =20
+>  	__NFSD_CMD_MAX,
+>  	NFSD_CMD_MAX =3D (__NFSD_CMD_MAX - 1)
+> --=20
+> 2.44.0
+>=20
+>=20
 
 
