@@ -1,130 +1,107 @@
-Return-Path: <netdev+bounces-88351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF278A6D21
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 15:59:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB1378A6D3C
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:03:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A6FC1F2205D
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 13:59:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7834C1F21F7D
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46DE12CD90;
-	Tue, 16 Apr 2024 13:58:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2F6912C534;
+	Tue, 16 Apr 2024 14:03:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mzbtWPQZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y6a/QgKJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4353012CD8C;
-	Tue, 16 Apr 2024 13:58:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EF2A12838C
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 14:03:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713275902; cv=none; b=cLnJq15wro8IYxTlJDyx5i0GEJ0dyKeCUND+wQzUVrDcW2f276JS9rDMgU4vTuNGeFw3/6KPN2snOQs9oN6DhwXxHJLzZXpLMSBSdFMbJ9+BsiNlpH/cetUikt6iKjbZAqi2C0EzHiEFuwFH7rjh+hSIQYxMaEMFPvCK1bGe74s=
+	t=1713276235; cv=none; b=cFA2pCwX0yYDFE8rB+6BGXesMpdQqB8P7HDKMwC5h9QzTtAnTaY5SzjquYg6nFNglDctrBT6tIiglA23k7R9eHYMLw/OWnMfY4ZnC64TUnqfmGL9Qn4E/pI5/J7I9/ljSY8A6byxbfoni63iMt/hDlMTh1dEsRNJSgtrc8ZEVmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713275902; c=relaxed/simple;
-	bh=bVObwWVu5VNJo3NA5gkLnTyvUBGMjZWlseKPTAVlCq4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z47IONXB9Gp048cXWgM7D+jrqIV0xlL4KYLZnntfYGTCAwVVz08YxpzfiUqD+BDMJuCwKz9d2c/rb9o49aY3lbM3IHC1dAR468yh4OVWljQR9ExRoIF2ggRAlE4VQwBVAR0Q3h2gOawYUSvQRJKGXR8tgcR237pcxKhcINTTkWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mzbtWPQZ; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1713275896; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=BC/5DvwfhJ3cE4ERIBbj5/0ioEzu3C+4IXCq9AiJ8bA=;
-	b=mzbtWPQZynN6PjHdJA97ssE/mFs5wimFZhqo0KD7WxQzD+uc6Zm+1WfVw/wBaOiDCUMw8I8xF4Na/WIPd1EX6RUWemSNElLK7r3xHpUgllpftpJXfz0N9i6Hys26Zjr6jj19CMAHiEv9PCYzBLcNrEfAqC/mgEMzcva5bqZI0gw=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W4i82Hn_1713275893;
-Received: from 30.213.156.135(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W4i82Hn_1713275893)
-          by smtp.aliyun-inc.com;
-          Tue, 16 Apr 2024 21:58:15 +0800
-Message-ID: <46c56be1-a8a5-4ad4-9a58-5b3e5f629eeb@linux.alibaba.com>
-Date: Tue, 16 Apr 2024 21:58:12 +0800
+	s=arc-20240116; t=1713276235; c=relaxed/simple;
+	bh=NBj2faIDWfRGvaFskrldJQKqfGDtLnqcZK0ZzhWnlw4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Dtzw5mFE1WqLChoiVbeOQrDzZJusjkGeXJ7HAPN1T7ZQq25w9Siwqg3Oso+FOA63M9XoR6cajYUnBG/VjOEDVp2w1jZMObMsyWxsgaubap2OSUuyCNwZxV+8c+IJ1N8oq0Eq8Wi1Vt98Cjq2VIMZFIXy6sQfJNC/cJsWCJ/tuG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y6a/QgKJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFD9BC113CE;
+	Tue, 16 Apr 2024 14:03:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713276235;
+	bh=NBj2faIDWfRGvaFskrldJQKqfGDtLnqcZK0ZzhWnlw4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Y6a/QgKJ5jPw0oOpFuzPk1MQBVrR33ugiu2GIac2tTKKdMaHDHzvbs+zkh/E78OTr
+	 27pjoJphG6Tl45cVlIPJ4KjqoUWI43QHl6+UFiGyQVfKRj7v3+i99a+G3Sb70eKEKY
+	 wPaeAE+PEA/kfL5QlsIIUDWEUMCr4H1sphkNueiYebUFusQj3bOiESQZbny6fjEF4+
+	 Er9PELtY6Vm+ZjSrI+6bPwpK2uojvAEa1QmeAEIC/AlBwywInaZT3euJDJj6EQWqot
+	 JRoTR8qrEsdYA8oYR5VS+e2mpGHxHEVP9wa6GUtZiifg/nSMN+ZGDcTmTaWdVSEWn9
+	 jo+MT70G1djxQ==
+Date: Tue, 16 Apr 2024 15:03:50 +0100
+From: Simon Horman <horms@kernel.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Breno Leitao <leitao@debian.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Ahern <dsahern@kernel.org>
+Subject: Re: [PATCH net-next] ip6_vti: fix memleak on netns dismantle
+Message-ID: <20240416140350.GN2320920@kernel.org>
+References: <20240415122346.26503-1-fw@strlen.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 01/11] net/smc: decouple ism_client from SMC-D
- DMB registration
-To: Alexandra Winter <wintera@linux.ibm.com>, twinkler@linux.ibm.com,
- hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, wenjia@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240414040304.54255-1-guwen@linux.alibaba.com>
- <20240414040304.54255-2-guwen@linux.alibaba.com>
- <c7f6be91-6591-4b00-95c3-48417bf98ac1@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <c7f6be91-6591-4b00-95c3-48417bf98ac1@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240415122346.26503-1-fw@strlen.de>
 
++ Steffen Klassert, Herbert Xu, David Ahern
 
+On Mon, Apr 15, 2024 at 02:23:44PM +0200, Florian Westphal wrote:
+> kmemleak reports net_device resources are no longer released, restore
+> needs_free_netdev toggle.  Sample backtrace:
+> 
+> unreferenced object 0xffff88810874f000 (size 4096): [..]
+>     [<00000000a2b8af8b>] __kmalloc_node+0x209/0x290
+>     [<0000000040b0a1a9>] alloc_netdev_mqs+0x58/0x470
+>     [<00000000b4be1e78>] vti6_init_net+0x94/0x230
+>     [<000000008830c1ea>] ops_init+0x32/0xc0
+>     [<000000006a26fa8f>] setup_net+0x134/0x2e0
+> [..]
+> 
+> Cc: Breno Leitao <leitao@debian.org>
+> Fixes: a9b2d55a8f1e ("ip6_vti: Do not use custom stat allocator")
+> Signed-off-by: Florian Westphal <fw@strlen.de>
 
-On 2024/4/15 16:41, Alexandra Winter wrote:
-> 
-> 
-> On 14.04.24 06:02, Wen Gu wrote:
->> The struct 'ism_client' is specialized for s390 platform firmware ISM.
->> So replace it with 'void' to make SMCD DMB registration helper generic
->> for both Emulated-ISM and existing ISM.
->>
->> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
->> ---
-> 
-> Just a thought:
-> The client concept is really specific to s390 platform firmware ISM.
-> So wouldn't it be nice to do something like:
-> 
-> diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
-> index 78cca4839a31..37dcdf2bc044 100644
-> --- a/drivers/s390/net/ism_drv.c
-> +++ b/drivers/s390/net/ism_drv.c
-> @@ -747,10 +747,9 @@ static int smcd_query_rgid(struct smcd_dev *smcd, struct smcd_gid *rgid,
->          return ism_query_rgid(smcd->priv, rgid->gid, vid_valid, vid);
->   }
-> 
-> -static int smcd_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
-> -                            struct ism_client *client)
-> +static int smcd_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
->   {
-> -       return ism_register_dmb(smcd->priv, (struct ism_dmb *)dmb, client);
-> +       return ism_register_dmb(smcd->priv, (struct ism_dmb *)dmb, &smc_ism_client);
->   }
-> 
->   static int smcd_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
-> 
-> --------------
-> 
-> This is not a real patch, just a sketch, but I hope you
-> get the idea.
-> 
-> 
-> This may be a step in the direction of moving the ism_client concept from
-> net/smc/smc_ism.c to drivers/s390/net/ism*
-> 
-> 
-> I know that there are several dependencies to consider.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Yeah.. I think so too. The move of ism_client concept may involve much work.
-
-> And I haven't looked at the other patches in this series yet in detail, to see how you solve
-> things like smcd_register_dev. Seems like smcd_register_dmb() is the only one of the smcd_ops
-> that you need for loopback and uses ism_client.
+> ---
+>  net/ipv6/ip6_vti.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-
-loopback-ism uses smcd_lo_register_dev instead. And yes, smcd_register_dmb() is
-the only one of smcd_ops that use ism_client in its function argument.
-
+> diff --git a/net/ipv6/ip6_vti.c b/net/ipv6/ip6_vti.c
+> index 4d68a0777b0c..78344cf3867e 100644
+> --- a/net/ipv6/ip6_vti.c
+> +++ b/net/ipv6/ip6_vti.c
+> @@ -901,6 +901,7 @@ static void vti6_dev_setup(struct net_device *dev)
+>  {
+>  	dev->netdev_ops = &vti6_netdev_ops;
+>  	dev->header_ops = &ip_tunnel_header_ops;
+> +	dev->needs_free_netdev = true;
+>  
+>  	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+>  	dev->type = ARPHRD_TUNNEL6;
+> -- 
+> 2.43.2
 > 
 > 
-> Wenjia, Gerd, and others what do you think?
 
