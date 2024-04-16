@@ -1,259 +1,181 @@
-Return-Path: <netdev+bounces-88318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AC888A6ADE
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:25:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C68F78A6AE5
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:29:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A00A3B215F6
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:25:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 351831F21705
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6B5412B142;
-	Tue, 16 Apr 2024 12:25:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4787D12A17F;
+	Tue, 16 Apr 2024 12:29:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXA9z89x"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="TY0rwblV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2077.outbound.protection.outlook.com [40.107.244.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6B21DFEF
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 12:25:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713270312; cv=none; b=aM8w+AEOOU34zrUH5/eZLLEHWCQn+6WmEQosxr/PEvaWbhOLJzfM/t/BAF1ceg3MLuV+0KHsYTgmlxj5logb8lwWl2il7umD8GjoN7ji3i5djVTeofZvtAQM/oNrXAYoifvZ1Bnv3+pGwIC43MGSWvCz170v6jP4/u/Xhd7X/dM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713270312; c=relaxed/simple;
-	bh=A3I3UnEi4Jj6XEGZVoebUIPjEFSfASUBccQUwXzsHM0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A98tvYGAj+OXQCvrJEnACbVnnTGgEEwbZYysii4i8nWWGpQFn/ismgzsINLxIgf6buqeao6UvI+xO7SPUin5tOzQZkEsvFzmKOpGHtEaVm7FyAMI4L10jsbLeApKbKV96wBW/Z7FHxLidjkXxdL1PIgI8zs5Cyv/olcD/6oGlUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KXA9z89x; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a526a200879so285240566b.1
-        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 05:25:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713270309; x=1713875109; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3Iqz3uYB03cZmo9aNBvR/ZOxNMywrtwP/4mJcGIIpN4=;
-        b=KXA9z89xEaR++lR61COXJ/scMXnD+ZXCA2eXqqLxe3uukOzOkoU75QwrYyX+s6oXNf
-         AOkLlajgQ5LYxZrXacqhJbxYXsaQtAnXIvqOxfaDTsI96m4P3eyQGxTf1XidHfyJcRwb
-         Q+9JLkietNTjOyJMoWHiGmOcwC1Kr8pqoy49FwiE8zSdod+8zAKohF+R6Pvsp3Kxvy/Y
-         +XOfV91sLvo6k+XTJG8GTDgOvINnMVmW3/qOYRHDMOHiWw710632DB+FS6/IbQzz28XP
-         2qAnYtclOWCmbrpOQKRGYwzljXhAwV2V1buHEQ3oX9CEWraHRECI/RYAKQr31Gg2GD6t
-         7gtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713270309; x=1713875109;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3Iqz3uYB03cZmo9aNBvR/ZOxNMywrtwP/4mJcGIIpN4=;
-        b=PrpVXRc95lU2j4X6H42TjBi/feWScQ906p5S+LOjWdj4XH7y6LuUen8+94OBzsWZo4
-         wKhJlPH725iefwtdw++8otekS+mOe4r4bizBYj5r71axEp4oAXOq3dJYTIq62Xg49VD7
-         HExmbd5kj5F+ig+ypXjn26skkI4T5xFJI8nsGptSwlpJMRO8CgF0WTL9iJ/tY+tguqxo
-         g+s1llyoAr4b+LyBNeh8ygoB6wlLiR4BQm9O/rI81ubxFLDJWXJteeNJUE4W99bbUhH5
-         1Z6BwfRs4bZgsmIuWN3coaXXhWo6TkPB+XariMNEXcqZ6cxeP+u4F9r9lSSv+ONAAw/T
-         imEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWJFj5d3QMrDX6U83tQ2vKejbJNZg8l+YcFGG+JmVZtrjEPXMvyXX2aMEyLsYTc/aJIe3TgITsyU6dzrWFsu3F/yxvRuiEa
-X-Gm-Message-State: AOJu0YzI3d/3H6ucBwcTM5NH51qiG8DNDXRg2ry1q5Xq4lcjvmWi8/m4
-	64/E0JnEOOy907QC9ZQ7HhsI+qFU/D87hkg5Tz/qYPTkcJlWao3+I1uY0n/xquQCBHlQz8mbjMb
-	Ef8UArh4VuTpV7HpmVJC1Fbv9rHgKZRSodXk=
-X-Google-Smtp-Source: AGHT+IFAlHbB8sWqNMPSyWvDGwR8gagW+jfhM7hArqhN/K9UaYFyybAhAdOI1y0UHIcKye+RvecL9GUppbL71gD+27k=
-X-Received: by 2002:a17:907:9717:b0:a51:c88e:e95a with SMTP id
- jg23-20020a170907971700b00a51c88ee95amr9550001ejc.23.1713270308559; Tue, 16
- Apr 2024 05:25:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A2541292D7
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 12:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713270540; cv=fail; b=WNtFJosgezHRAUC3L52kZAg2+kAKlmApfoF5J6QKTGZkqG5vR3d9aHYfxt3LgHghNvynbFwT1iRhCwHo8MHvRBTLB4PJsS8kvkL77gFiGEiCPyACsoiwypYWf3gqEsP9sy+5tKWl76vyou6MyXZP6PTPNI48MdaDs9Ejyv2irlg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713270540; c=relaxed/simple;
+	bh=7UhxP5bAq0+9j40PX9tld+XiLddDrc4yxg6ny0IQP/M=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=PP7YLe9EdW/kyHHr5I60CVC4HP2HuLgpe/Veo60qZsnKcKjRwXPiHTfPcgVgtQj0NoOBb6bQ6lsJmVUEdwsa3K88JvM+zEGau1KTZm9r5sOU4k6vKfkHm8KVpyFodtdmEers3Jv7PHTRROv9dsf4tgD3Exk7dy+/1yagRbIRvT8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=TY0rwblV; arc=fail smtp.client-ip=40.107.244.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CUvpnmZ4+afoXxpqUekTEt1tBMwK9TfrqFqksEUusZMOPESjmuQYb+aHJsnfpmaE0M6iVP8bK+gwlO7Q0yZHU7VVuBQjudd+FVAMOfDomK7ceQRbIqyhjwMNyYeOKBQjlkQMjwUJXa/XBG9vWC47gJNpp+APnb0+m+3yHpzJEXcwkc8OI1nX2E9dyoaz/jVqL2a8j1hJzE1Mn7cHjuz6mlYLpActhE6WJ7pjGCXmYKml5lFyr6Uq1ZGzXR17UCrL2GWO7x6tKubEySykOqbSZ59xmc/4wuN8D1psP0G/ED8lLcEq7Hf7IfkZ8FwPNE3GuadvUiqyMoT8Nx/4U1NCTw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Zk+gTYtkCMfq7pz9TFvCAlmtHrtVTe4mfEAqb204I0k=;
+ b=fWo9jj7ipnCpLnU+VwKBQg8tS86g9xDZ55ctQVQBr89sIPcKMjwHhJQdc51Aq75FlcPcTSWuoyKQ2O8QK/WbEz7P00I92S1C5ZcVjH3xsBrbitMt1kXdL+trIvKFdpSLtLiEbRRl7L1EfzEBXr2H1U4vfvzeiG/dMEH3u9/mIDQj/5A5ioFHTID1xG0SpL8vmj1pwZLNfW89JJwV780tsW0pIv+iZzzbxPauNSMOW76FLUCMxk2IEk4v09l3GefUHCMvB2CVCmWV3pgxySUDJMlRVcDTknJc6NBBepv99IS+4ciTLltjXTkrXpCpr0TYKjUq/e+oIEUWKosi9woR3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Zk+gTYtkCMfq7pz9TFvCAlmtHrtVTe4mfEAqb204I0k=;
+ b=TY0rwblV5EPdE2CLLIQ6cyhurxOR4ilMdzvE0/fe29M7O46Vi/BcBM8H8Kz+L2yOPUYqIn/D/nECnp/O6PeiC6aa+f9xR4PTBAQcznj5oPfilZQuHpCpntQTldybYUkaqhA8fpRnU4jzKnIEI5uaWVLFpZz3P0gCv2dp4tbvv1RFChQqgEicxUMlTwds3q4JcsXKG3UOhn8egx4CuYR9FUzzfwRn/D7HpXmFiaLHVlVgRPDY/jtI+fORG9QHjN7fFRE52w5UpCHYvr/1yjCYqYzwyMlu0yd7qyIxsB5HhdT2YP9l2KakKIiCk5WbjkjW7Lw8Y2eIqqFELCPsY8E3FA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS7PR12MB6288.namprd12.prod.outlook.com (2603:10b6:8:93::7) by
+ DM4PR12MB6109.namprd12.prod.outlook.com (2603:10b6:8:ae::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.50; Tue, 16 Apr 2024 12:28:55 +0000
+Received: from DS7PR12MB6288.namprd12.prod.outlook.com
+ ([fe80::10e2:bf63:7796:ba08]) by DS7PR12MB6288.namprd12.prod.outlook.com
+ ([fe80::10e2:bf63:7796:ba08%4]) with mapi id 15.20.7452.049; Tue, 16 Apr 2024
+ 12:28:55 +0000
+Message-ID: <6e722b57-7fd9-40ea-8dc5-0ecf62dcfb66@nvidia.com>
+Date: Tue, 16 Apr 2024 15:28:49 +0300
+User-Agent: Mozilla Thunderbird
+Subject: Re: mlx5 and gre tunneling
+To: Jason Baron <jbaron@akamai.com>, saeedm@nvidia.com
+Cc: netdev@vger.kernel.org
+References: <c42961cb-50b9-4a9a-bd43-87fe48d88d29@akamai.com>
+From: Gal Pressman <gal@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <c42961cb-50b9-4a9a-bd43-87fe48d88d29@akamai.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO4P123CA0034.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:151::21) To DS7PR12MB6288.namprd12.prod.outlook.com
+ (2603:10b6:8:93::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240411115630.38420-1-kerneljasonxing@gmail.com>
- <20240411115630.38420-5-kerneljasonxing@gmail.com> <CANn89iKbBuEqsjyJ-di3e-cF1zv000YY1HEeYq-Ah5x7nX5ppg@mail.gmail.com>
- <CAL+tcoB=Hr8s+j7Sm8viF-=3aHwhEevZZcpn5ek0RYmNowAtoQ@mail.gmail.com>
-In-Reply-To: <CAL+tcoB=Hr8s+j7Sm8viF-=3aHwhEevZZcpn5ek0RYmNowAtoQ@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 16 Apr 2024 20:24:31 +0800
-Message-ID: <CAL+tcoDVFtvg6+Kio9frU5W=2e2n7qrCJkitXUxNjsouAG+iGg@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 4/6] tcp: support rstreason for passive reset
-To: Eric Dumazet <edumazet@google.com>
-Cc: dsahern@kernel.org, matttbe@kernel.org, martineau@kernel.org, 
-	geliang@kernel.org, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
-	rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
-	atenart@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6288:EE_|DM4PR12MB6109:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c001f22-c793-47fe-b7b1-08dc5e10c83d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	EjbqYCjnMsGoGcYvQuRSktSQzPiqp31jXcgcIstxmHQpOFqtW4gfVHba9lgbXbZQO0y9bwytr5nG6vBJN25mF/zkgLR2AzVSXbDuPeansLV6Uz5+d3hScmphvViSLdnOiK8kZ7TmKYSsHsGBnCRQ3H8aVKI12wfcWPqvvGvro5y6ajttYEvlfvVMzxgkXAW7vgtrWt+b0W9AIL7YaS1fvf+iijbQ1Ufn1ZwKHM0KE/5Wb15t3FS2wIdxjsUkPkNg7wa82sodYuWJscXNMfuo4Jw8eUytmD297yy8i03aHtk/evC1N/6bdj/UCjQZB8est9B3x2fCHUM8qZUqK4Opp4NMZiwHBwx380YAghzQw3uphk3elktbLv+lTJkHNfUunld43iQxkpJKnLSwRRT1EBXiFKuhohDtot5BepCQ/7eiyaVgrt6pZqe+CrwtYrCZBXXIow4Qd3MsXt+Kj0Ly8Ka8NZRHoqCMPco3ZsW5YOXVhmmoV3qPqNobUH9GS5AYT2Djcak2kYh0r+vt0Pkc9LeQiiG3bcJ2hNL739G8piFQxxnyyzYLL7xwMhPHW/Ecl4KkjvXULx+rYZ1PXwDaFa9RxyYzc4VQEmA7TGtfOwsXMu4xaRUTwxNjCwUQp9FpVEvBNSxqtGlbHw/23NIu7mu45nFIhbeesKLKIcBMIf4=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6288.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ZTF3Z1VIWncwTGRlZ2I3YWN6NFFFNDJHMzRodmNXTWxTSVNmanRrbzdzV2d3?=
+ =?utf-8?B?emx5ZTJGMkdGUzRIS1lzUGE2ZTZkQVMrMnZ5QzJkSkZSNzBvSUxaNFZXV3Np?=
+ =?utf-8?B?bkd5anhlSTVkcklTYXVzV2dTN3lxVDR5VVM4UkpxYzdnZ1pCQ21sb2tEYjg4?=
+ =?utf-8?B?MC9XQ0U4VXFoUlpOVVlEZnR2T3BpRWoxQk1lWXh2OWNkMTlEZWdtT0sxUDlM?=
+ =?utf-8?B?dlVQaWVmdzRVMGwvOFA3NDkxZVJNMHZSZ2JBUHEwaTRpMVBFN0l4VTFQVjlr?=
+ =?utf-8?B?V0RDMm5hSDNJaXV2T1hFVkovNURyQ0RwL2xMWU1HR2pFZUxYLzh3OEZiWmVH?=
+ =?utf-8?B?UXF6OTBGSTJvakZNR1AwdHRpL3BlcTNsczkycWsvTm9CTUZXVmtqRFo1Zmxk?=
+ =?utf-8?B?VUZ3T1hHejRCdUtOaWlwTUQ1bDhsd0M1QlNqb3haN0xFOUE0ZVJVamJBWWVC?=
+ =?utf-8?B?TjN2cURnbEJRR1R6RXJSemExcnI3aUFDQ2hyTHNFSmVZWVlKRjRPVVcvbTFM?=
+ =?utf-8?B?cWVBUUJxMDFnUS9DM1ZkSjQzL0VDRk44TVRXRE5CdnN4UjJiREpRUTRyWXli?=
+ =?utf-8?B?S0pZSXZUUFBXNVlDNXoxL3Rjd3BRNE16aW9PZ0g4Nm1RWUR1WU1NbmFLOUpk?=
+ =?utf-8?B?ckR0ZXRnd01MT1dDOG4rMldrejY3VlpMQnpZdzEzU2lRbEtNai9FcHBYZXQ3?=
+ =?utf-8?B?MUt2SHMwV1FmQ1MyMm5SOGswTjJ3Y0JWNFlnQ1czb0ZuM0ZTcmQwcXg2aXpj?=
+ =?utf-8?B?azF1MjNQV2FzbXZ5U1haN3pVY2JXTUxId2piKzVtL2Q1L3kra2lWK3BkWHpU?=
+ =?utf-8?B?Ri95THZDU1dtb085TGQyeHN4S29pZUQrbnR0NlgwQUVhdGN1WXdaVExCOVFB?=
+ =?utf-8?B?dkwwQ3k3VGdFMXRwOVBRU3BMdWFrMGk1dlZGbDV1K1VVbjlMNWtlc2FZNnV0?=
+ =?utf-8?B?azdZcGdac2c3c3ZORFoxc3ZpV3BhcFJLYXR6YldZdkNYMzRFejNJR0Z5TFJS?=
+ =?utf-8?B?UlRLVTZvSXN6WTEzMlpocUpKQTZDbXRORTB4ZjljcmlDTU9HV2FzNk04WTl5?=
+ =?utf-8?B?RzBnWVpJOEJpWHpQSTZTY2lhQnVYTDBpUDZienhhOTFXV1VFTzZDVERYVDVH?=
+ =?utf-8?B?TlFTWkNmc056RmE5b25ESzAvVTdKdU45Rjh0akdZOU9hcDN4WWQzMzRNZUZj?=
+ =?utf-8?B?NGRTMGh2WFJQeEdxKytaRi9vdnpSOGpFUjBkZ3crVzBSa1M5UFMyZlR3ZFox?=
+ =?utf-8?B?UGpYdWVzYTJFNk9kYndtRlBmNEZvT0RHYk81WXBCNUF0aGRvcnI5YU1sUjdQ?=
+ =?utf-8?B?NG5nR3ZTYU16aG9oYmZtVW9pT2ZiYTVqZTlrNkY1VlFmVHF3elhCU0wxelRC?=
+ =?utf-8?B?OGI4RzdhWU93cnlmVlJOb3l0Ly9WK2dLcjN1dzZsWldOZzlodTh5eDBxQ3Yw?=
+ =?utf-8?B?WGxqTVMzM0E0MVppTEZUbFh4OGt2Z1F3Nit5V1hrRFhZZ09OVEtqMUs5dEg1?=
+ =?utf-8?B?Wm1CendhdGxSU2xXOWtDUUlIS0tlTi9kVHE5V2g4UCsxMENiOFRZYUNGTy9s?=
+ =?utf-8?B?b1BzRnpHbThGdXUraWJGVzY2RjV0eU9EeUc2RnJwK1lvT2p6TStKNGtLa2Fl?=
+ =?utf-8?B?YURsRFlIWVNQcjZCZ2VyQjZTNTVHZDFaN1BtRW84NWtIdndpSXhEek5MaDl4?=
+ =?utf-8?B?YklCSUd0VUo2cmNNU3BlU05odnNVUXF3NXpHZHdReGJuSWd5VHg5MUZkMXZ6?=
+ =?utf-8?B?MXdQdlVSQXBFUERzVjUwc0Z5KzI2UWw5K0pZT2xoeUFKaHZvVDJSalpGYlpp?=
+ =?utf-8?B?eWEwL3hOd0svS2dRUEcrMFhaZEVjcHMwZkpBNElkS0lzR2lxYnJjSWY1RmF5?=
+ =?utf-8?B?czlJT0xwOTM3VXYyOU1FQ1VTazNpN283VlUwKzdiMjJBVit4QzRMbVRIcE5H?=
+ =?utf-8?B?NmNHMG5DczVSczNhRTJFZTN3YVV5MEFtejdGSGhDMFpLV3ZDNXp3NE9Ra1JE?=
+ =?utf-8?B?elJ3eUQyNU9FWVkwMWdMc3orZEJBUERSQXc3aDZTUlpaVnlBOEE1Sm1ZaGZy?=
+ =?utf-8?B?bXFFVDBNanVHL3QwT2RvK1lLb0IwQnN4TXVKdSs1eXQ4VmNPUk16eUxGRVdt?=
+ =?utf-8?Q?CvLHRTWKBNNj6vDbTT7+K+u/B?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c001f22-c793-47fe-b7b1-08dc5e10c83d
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6288.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Apr 2024 12:28:55.3985
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: efs9VPpC5pjpdqoVlXTP7dUlAUGfK3N2K2/FaZwAsR+zfJU0+ng87oohPLV83ljm
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6109
 
-On Tue, Apr 16, 2024 at 3:45=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> On Tue, Apr 16, 2024 at 2:34=E2=80=AFPM Eric Dumazet <edumazet@google.com=
-> wrote:
-> >
-> > On Thu, Apr 11, 2024 at 1:57=E2=80=AFPM Jason Xing <kerneljasonxing@gma=
-il.com> wrote:
-> > >
-> > > From: Jason Xing <kernelxing@tencent.com>
-> > >
-> > > Reuse the dropreason logic to show the exact reason of tcp reset,
-> > > so we don't need to implement those duplicated reset reasons.
-> > > This patch replaces all the prior NOT_SPECIFIED reasons.
-> > >
-> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > ---
-> > >  net/ipv4/tcp_ipv4.c | 8 ++++----
-> > >  net/ipv6/tcp_ipv6.c | 8 ++++----
-> > >  2 files changed, 8 insertions(+), 8 deletions(-)
-> > >
-> > > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> > > index 441134aebc51..863397c2a47b 100644
-> > > --- a/net/ipv4/tcp_ipv4.c
-> > > +++ b/net/ipv4/tcp_ipv4.c
-> > > @@ -1935,7 +1935,7 @@ int tcp_v4_do_rcv(struct sock *sk, struct sk_bu=
-ff *skb)
-> > >         return 0;
-> > >
-> > >  reset:
-> > > -       tcp_v4_send_reset(rsk, skb, SK_RST_REASON_NOT_SPECIFIED);
-> > > +       tcp_v4_send_reset(rsk, skb, (u32)reason);
-> > >  discard:
-> > >         kfree_skb_reason(skb, reason);
-> > >         /* Be careful here. If this function gets more complicated an=
-d
-> > > @@ -2278,7 +2278,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
-> > >                 } else {
-> > >                         drop_reason =3D tcp_child_process(sk, nsk, sk=
-b);
-> > >                         if (drop_reason) {
-> > > -                               tcp_v4_send_reset(nsk, skb, SK_RST_RE=
-ASON_NOT_SPECIFIED);
-> > > +                               tcp_v4_send_reset(nsk, skb, (u32)drop=
-_reason);
-> >
-> > Are all these casts really needed ?
->
-> Not really. If without, the compiler wouldn't complain about it.
+On 08/04/2024 16:41, Jason Baron wrote:
+> Hi,
+> 
+> I recently found an issue where if I send udp traffic in a GRE tunnel
+> over a mellanox 5 NIC where tx-gre-segmentation is enbalbed on the NIC,
+> then packets on the receive side are corrupted to a point that they are
+> never passed up to the user receive socket. I took a look at the
+> received traffic and the inner ip headers appear corrupted as well as
+> the payloads. This reproduces every time for me on both AMD and Intel
+> based x86 systems.
+> 
+> The reproducer is quite simple. For example something like this will work:
+> 
+> https://github.com/rom1v/udp-segmentation
+> 
+> It just needs to be modified to actually pass the traffic through the
+> NIC (ie not localhost). As long as the original UDP packet needs to be
+> segmented I see the corruption. That is if it all fits in one packet, I
+> don't see the corruption. Turning off tx-gre-segmentation on the
+> mellanox NIC makes the problem go away (as it gets segmented first in
+> software). Also, I've successfully run this test with other NICs. So
+> this appears to be something specific to the Mellanox NIC.
+> 
+> Here's an example one that fails, with the latest upstream (6.8) kernel,
+> for example:
+> 
+> driver: mlx5_core
+> version: 6.8.0+
+> firmware-version: 16.35.3502 (MT_0000000242)
+> 
+> Let me know if I can fill in any more details.
+> 
+> Thanks!
+> 
+> -Jason
+> 
 
-The truth is mptcp CI treats it as an error (see link[1]) when I
-submitted the V5 patchset but my machine works well. I wonder whether
-I should not remove all the casts or ignore the warnings?
+Hi Jason, thanks for the report!
 
-[1]: https://github.com/multipath-tcp/mptcp_net-next/actions/runs/870508471=
-7/job/23874718134
-net/ipv6/tcp_ipv6.c: In function 'tcp_v6_do_rcv':
-4148 net/ipv6/tcp_ipv6.c:1683:36: error: implicit conversion from
-'enum skb_drop_reason' to 'enum sk_rst_reason'
-[-Werror=3Denum-conversion]
-4149 1683 | tcp_v6_send_reset(sk, skb, reason);
-4150 | ^~~~~~
-4151 net/ipv6/tcp_ipv6.c: In function 'tcp_v6_rcv':
-4152 net/ipv6/tcp_ipv6.c:1868:61: error: implicit conversion from
-'enum skb_drop_reason' to 'enum sk_rst_reason'
-[-Werror=3Denum-conversion]
-4153 1868 | tcp_v6_send_reset(nsk, skb, drop_reason);
-4154 | ^~~~~~~~~~~
-4155 net/ipv6/tcp_ipv6.c:1945:46: error: implicit conversion from
-'enum skb_drop_reason' to 'enum sk_rst_reason'
-[-Werror=3Denum-conversion]
-4156 1945 | tcp_v6_send_reset(NULL, skb, drop_reason);
-4157 | ^~~~~~~~~~~
-4158 net/ipv6/tcp_ipv6.c:2001:44: error: implicit conversion from
-'enum skb_drop_reason' to 'enum sk_rst_reason'
-[-Werror=3Denum-conversion]
-4159 2001 | tcp_v6_send_reset(sk, skb, drop_reason);
-
-Thanks,
-Jason
-
->
-> >
-> > enum sk_rst_reason is not the same as u32 anyway ?
->
-> I will remove the cast in the next version.
->
-> Thanks,
-> Jason
->
-> >
-> >
-> >
-> > >                                 goto discard_and_relse;
-> > >                         }
-> > >                         sock_put(sk);
-> > > @@ -2356,7 +2356,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
-> > >  bad_packet:
-> > >                 __TCP_INC_STATS(net, TCP_MIB_INERRS);
-> > >         } else {
-> > > -               tcp_v4_send_reset(NULL, skb, SK_RST_REASON_NOT_SPECIF=
-IED);
-> > > +               tcp_v4_send_reset(NULL, skb, (u32)drop_reason);
-> > >         }
-> > >
-> > >  discard_it:
-> > > @@ -2407,7 +2407,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
-> > >                 tcp_v4_timewait_ack(sk, skb);
-> > >                 break;
-> > >         case TCP_TW_RST:
-> > > -               tcp_v4_send_reset(sk, skb, SK_RST_REASON_NOT_SPECIFIE=
-D);
-> > > +               tcp_v4_send_reset(sk, skb, (u32)drop_reason);
-> > >                 inet_twsk_deschedule_put(inet_twsk(sk));
-> > >                 goto discard_it;
-> > >         case TCP_TW_SUCCESS:;
-> > > diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-> > > index 6cad32430a12..ba9d9ceb7e89 100644
-> > > --- a/net/ipv6/tcp_ipv6.c
-> > > +++ b/net/ipv6/tcp_ipv6.c
-> > > @@ -1678,7 +1678,7 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_bu=
-ff *skb)
-> > >         return 0;
-> > >
-> > >  reset:
-> > > -       tcp_v6_send_reset(sk, skb, SK_RST_REASON_NOT_SPECIFIED);
-> > > +       tcp_v6_send_reset(sk, skb, (u32)reason);
-> > >  discard:
-> > >         if (opt_skb)
-> > >                 __kfree_skb(opt_skb);
-> > > @@ -1864,7 +1864,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct s=
-k_buff *skb)
-> > >                 } else {
-> > >                         drop_reason =3D tcp_child_process(sk, nsk, sk=
-b);
-> > >                         if (drop_reason) {
-> > > -                               tcp_v6_send_reset(nsk, skb, SK_RST_RE=
-ASON_NOT_SPECIFIED);
-> > > +                               tcp_v6_send_reset(nsk, skb, (u32)drop=
-_reason);
-> > >                                 goto discard_and_relse;
-> > >                         }
-> > >                         sock_put(sk);
-> > > @@ -1940,7 +1940,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct s=
-k_buff *skb)
-> > >  bad_packet:
-> > >                 __TCP_INC_STATS(net, TCP_MIB_INERRS);
-> > >         } else {
-> > > -               tcp_v6_send_reset(NULL, skb, SK_RST_REASON_NOT_SPECIF=
-IED);
-> > > +               tcp_v6_send_reset(NULL, skb, (u32)drop_reason);
-> > >         }
-> > >
-> > >  discard_it:
-> > > @@ -1995,7 +1995,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct s=
-k_buff *skb)
-> > >                 tcp_v6_timewait_ack(sk, skb);
-> > >                 break;
-> > >         case TCP_TW_RST:
-> > > -               tcp_v6_send_reset(sk, skb, SK_RST_REASON_NOT_SPECIFIE=
-D);
-> > > +               tcp_v6_send_reset(sk, skb, (u32)drop_reason);
-> > >                 inet_twsk_deschedule_put(inet_twsk(sk));
-> > >                 goto discard_it;
-> > >         case TCP_TW_SUCCESS:
-> > > --
-> > > 2.37.3
-> > >
+I have managed to reproduce the issue on our side, let me see what went
+wrong.
 
