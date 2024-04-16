@@ -1,138 +1,124 @@
-Return-Path: <netdev+bounces-88309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FD3F8A6A37
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:06:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89B548A6A3F
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:08:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2F071F217F4
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:06:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46F48282603
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:08:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3023129E85;
-	Tue, 16 Apr 2024 12:06:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18275129E89;
+	Tue, 16 Apr 2024 12:08:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I9Yd1l6y"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="oTToowc7"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CAAC6D1BC
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 12:06:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416B912A152;
+	Tue, 16 Apr 2024 12:08:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713269209; cv=none; b=c0MGUfGRYo9BfKsRfu/B/X5KGk5nRO3Qcuuae7fRW4a9xs1hOT+UlkscZe1ivCmK8EazeAIQPEnxJny3A4S0EsHMJpVh8u1voiuVQHOGCN4mAr4PGN/nf8LpfdQc7bvJ/BJQuNQ7Ca9IuAf+1IWZ882DQFsvjtz4wsxtTrLFVjE=
+	t=1713269290; cv=none; b=YGmPdp/j0XWKL5+k8VzvdvGiIw3PyVe2qUaTX3m1pNl4/0qtxPrSYZVnmbYzqrj5b0r8M3hR7YKidFF/57kOsskOS7NucKtqm3ApMG4RD8OsPKRASA9+xFnXaZuDO0E0faCiGRdpWdJ9Q8RYl9xxi+XkqNnSrMJbxAAYQImtjQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713269209; c=relaxed/simple;
-	bh=L3gLHmGR54K6SZNtYN6NHQ8Yv2YeQe4FVtPT6weNbkM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ul950lqNx0aPYEueq/CUY03nR5nkR5H/sAgPGDwWX7faT+zm5Dhheb2a5PcXpDuUNdNEa77kTkuWukRH0zO+yd4MUWnRx+V+HjVBf0lEzpQkHGI6YoNAFncGHil95n8UdTGMDFhifPXeratgbExv9zW+gerIu3eh5vL39M/vZ50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I9Yd1l6y; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713269207;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=TqRKbpNBE+kprBkHiETijO6t8ioX2KMP2NFaEORNgog=;
-	b=I9Yd1l6yUPqyojmJ8j1L52TJfSzP6hJnm1WioVA0oDTmWY7oT43zLtyuDIV4eEBLuzKUJH
-	S2T0fJ5+xykB2on0DugJsy2QaZc8IxMUjoBIcAodiMx4AUG/wdZIOm+3zqxWeOF9q1d2Zi
-	C61EkzDfNIfxHRW9b/PqqW+Kpgs3BGE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-116-rRNffDF0PLaVx1eJUgSPsQ-1; Tue, 16 Apr 2024 08:06:45 -0400
-X-MC-Unique: rRNffDF0PLaVx1eJUgSPsQ-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-343edd4ac01so925721f8f.0
-        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 05:06:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713269204; x=1713874004;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TqRKbpNBE+kprBkHiETijO6t8ioX2KMP2NFaEORNgog=;
-        b=sQcVVmM2fhGLiCnfwCthqe8bi9xSWvQm8XmMCl7YWwD/1jWW/t+rI7qbu10dCNQ99g
-         rpWTwxQx4c5N+5zjaOc5zjZF0O6eNA8/RbXDfqtIh/zGoXT7KrbGOPPVk5nykzqnOI9k
-         yFinca2YqTVHQDRIfFzvb5uAL7xCHHk9joejkcLm3unsrEeAinFYCvBUPCUZm5IbCzcS
-         Hk8cOYvsAjSY/VgC75GC/nI8L27yp3E2p0JXweUxRscJRGrZAdgy70H8iBeBpXh17P6p
-         KXpU0qivLMq1p63W75FjhLOZ3RW9dNEQg780lm1RflyRWQv8Xyx8KT8h8w2JeEaDr5i+
-         pogg==
-X-Forwarded-Encrypted: i=1; AJvYcCXPrBIcGGqa9nZIA7p0q1auh6LUBW9B8qGvezkeJedagC3mDNsR8HVg/JE1tzelIa5Q8Lt3EYclFz1ZMH8HMMir+k1t7nWO
-X-Gm-Message-State: AOJu0YzcegCuPFE7IhcY8/Rm48aEP/w4kuyAzywfrTcxM+tc38TndziN
-	nvQ2nvb/k04Q1ouCWFGc0hHdKOJhj1/FpCZTcDkLVO2jzauakXdSjGeWtYkiDOeiAFgi5ZEoHeU
-	DSLXGsywVea8YfznZECDYnNVfklB+pZF3KRJPuqBVGDXjff14xKiIAQ==
-X-Received: by 2002:a05:600c:3556:b0:418:3cf7:7f7b with SMTP id i22-20020a05600c355600b004183cf77f7bmr5411899wmq.3.1713269204727;
-        Tue, 16 Apr 2024 05:06:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFp9e8u/HJoCPvdDm1tdgrLn9iFLeuSuJJQGxRhAu4E1tl/xynojmx7/RiaY9ChbsAR72lJDA==
-X-Received: by 2002:a05:600c:3556:b0:418:3cf7:7f7b with SMTP id i22-20020a05600c355600b004183cf77f7bmr5411886wmq.3.1713269204369;
-        Tue, 16 Apr 2024 05:06:44 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-231-31.dyn.eolo.it. [146.241.231.31])
-        by smtp.gmail.com with ESMTPSA id g13-20020a05600c4ecd00b004148d7b889asm23021219wmq.8.2024.04.16.05.06.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 05:06:43 -0700 (PDT)
-Message-ID: <b2573ccf2340a19b6cb039dac639b2d431c1404c.camel@redhat.com>
-Subject: Re: [PATCH net] net/smc: fix potential sleeping issue in
- smc_switch_conns
-From: Paolo Abeni <pabeni@redhat.com>
-To: Zhengchao Shao <shaozhengchao@huawei.com>, linux-s390@vger.kernel.org, 
- netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org
-Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com, 
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com, weiyongjun1@huawei.com, 
-	yuehaibing@huawei.com, tangchengchang@huawei.com
-Date: Tue, 16 Apr 2024 14:06:42 +0200
-In-Reply-To: <20240413035150.3338977-1-shaozhengchao@huawei.com>
-References: <20240413035150.3338977-1-shaozhengchao@huawei.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1713269290; c=relaxed/simple;
+	bh=IAHSnrcKlcI8ozUz5u3hnsd15J+T6mwYexmmNVoCE8U=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tlSIYkLOfG3TxmINl/rsuxY3nP2hYBUuUv6Swrsz3LzrZbkmIZdFb73ClX35uOUWV5W9WXvs+A61zTy1GMgpuo4rv3R4gEWOsg+DTOALgbw7CnUCea9Bwr+cP3HAq8r1M9u/qq1+8gg5ABOVuoKSe7eqnYWwyO0ORNzKNn+J79k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=oTToowc7; arc=none smtp.client-ip=220.197.31.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=If8AF
+	FWxkDIUWXQPk3YZpE9a/mxnoJ4QeoIijjT/Lrg=; b=oTToowc7t04fDfWi6RkN3
+	5T16wdYInp9nDcNJAIwSBNghByTLSG0OrhM+tIF63A8PwXidISn8dWfpD+0Yitl/
+	2sLpCS8YPZW92+pc9DkFQAs0mydDCUdeWF/darGHWFuCzQdvtr1WnZB9wqtoYzvf
+	O9/xUylc635/Gx6FIJ4wqM=
+Received: from smtp.163.com (unknown [124.89.89.114])
+	by gzga-smtp-mta-g1-4 (Coremail) with SMTP id _____wDntzTyaR5mIlBKBQ--.22456S4;
+	Tue, 16 Apr 2024 20:07:15 +0800 (CST)
+From: Vanillan Wang <vanillanwang@163.com>
+To: bjorn@mork.no,
+	davem@davemloft.net,
+	kuba@kernel.org
+Cc: netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Vanillan Wang <vanillanwang@163.com>
+Subject: [PATCH] net:usb:qmi_wwan: support Rolling modules
+Date: Tue, 16 Apr 2024 20:07:13 +0800
+Message-Id: <20240416120713.24777-1-vanillanwang@163.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wDntzTyaR5mIlBKBQ--.22456S4
+X-Coremail-Antispam: 1Uf129KBjvJXoWxJrW8tF18Kr4xXw17WFy7trb_yoW5JF4kpa
+	17Ga1fXF1rJF1Yk3ZIkF1xZaySq3Z7Wr12ka4UX3ySqFWxArs7Gr1YvrZ7Wr1q9r40yF4v
+	qayDG3y8GF93GFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UDnYwUUUUU=
+X-CM-SenderInfo: pydqxz5odq4tlqj6il2tof0z/1tbisgXCUmVOCw5ovQABsd
 
-On Sat, 2024-04-13 at 11:51 +0800, Zhengchao Shao wrote:
-> Potential sleeping issue exists in the following processes:
-> smc_switch_conns
->   spin_lock_bh(&conn->send_lock)
->   smc_switch_link_and_count
->     smcr_link_put
->       __smcr_link_clear
->         smc_lgr_put
->           __smc_lgr_free
->             smc_lgr_free_bufs
->               __smc_lgr_free_bufs
->                 smc_buf_free
->                   smcr_buf_free
->                     smcr_buf_unmap_link
->                       smc_ib_put_memory_region
->                         ib_dereg_mr
->                           ib_dereg_mr_user
->                             mr->device->ops.dereg_mr
-> If scheduling exists when the IB driver implements .dereg_mr hook
-> function, the bug "scheduling while atomic" will occur. For example,
-> cxgb4 and efa driver. Use mutex lock instead of spin lock to fix it.
+Update the qmi_wwan driver support for the Rolling
+LTE modules.
 
-I tried to inspect all the lock call sites, and it *look* like they are
-all in process context, so the switch should be feasible.
+- VID:PID 33f8:0104, RW101-GL for laptop debug M.2 cards(with RMNET
+interface for /Linux/Chrome OS)
+0x0104: RMNET, diag, at, pipe
 
-Still the fact that the existing lock is a BH variant is suspect.
-Either the BH part was not needed or this can introduce subtle
-regressions/issues.=20
+Here are the outputs of usb-devices:
+T:  Bus=04 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=5000 MxCh= 0
+D:  Ver= 3.20 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 9 #Cfgs=  1
+P:  Vendor=33f8 ProdID=0104 Rev=05.04
+S:  Manufacturer=Rolling Wireless S.a.r.l.
+S:  Product=Rolling Module
+S:  SerialNumber=ba2eb033
+C:  #Ifs= 6 Cfg#= 1 Atr=a0 MxPwr=896mA
+I:  If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+E:  Ad=01(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=02(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=83(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=03(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=84(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=85(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 3 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=00 Prot=40 Driver=option
+E:  Ad=04(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=86(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=87(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+I:  If#= 4 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+E:  Ad=0f(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=88(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+E:  Ad=8e(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+I:  If#= 5 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=usbfs
+E:  Ad=05(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
+E:  Ad=89(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
 
-I think this deserves at least a 3rd party testing.
+Signed-off-by: Vanillan Wang <vanillanwang@163.com>
+---
+ drivers/net/usb/qmi_wwan.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks,
-
-Paolo
+diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+index e2e181378f41..edc34402e787 100644
+--- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+@@ -1431,6 +1431,7 @@ static const struct usb_device_id products[] = {
+ 	{QMI_FIXED_INTF(0x2692, 0x9025, 4)},    /* Cellient MPL200 (rebranded Qualcomm 05c6:9025) */
+ 	{QMI_QUIRK_SET_DTR(0x1546, 0x1312, 4)},	/* u-blox LARA-R6 01B */
+ 	{QMI_QUIRK_SET_DTR(0x1546, 0x1342, 4)},	/* u-blox LARA-L6 */
++	{QMI_QUIRK_SET_DTR(0x33f8, 0x0104, 4)}, /* Rolling RW101 RMNET */
+ 
+ 	/* 4. Gobi 1000 devices */
+ 	{QMI_GOBI1K_DEVICE(0x05c6, 0x9212)},	/* Acer Gobi Modem Device */
+-- 
+2.34.1
 
 
