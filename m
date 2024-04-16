@@ -1,160 +1,151 @@
-Return-Path: <netdev+bounces-88186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 803B48A637C
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:13:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFDB98A63A4
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:20:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32B53281C28
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 06:13:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73DDCB2420A
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 06:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4AB23BBFE;
-	Tue, 16 Apr 2024 06:13:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136913D0A4;
+	Tue, 16 Apr 2024 06:16:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fdsM2K5q"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QOPcagGg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B7F33998;
-	Tue, 16 Apr 2024 06:13:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC023C08A
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 06:16:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713248021; cv=none; b=EVLkE8NIpK414Y/UEpiYV8iHSL4lVoLBlScSBB8wm/+8MY0KE0DK6CUMfg1bVbp8X6z6vxGpZ7gQxLaWmObLF7QyHi9/fg20jJkBEAGigDaoXviM2KISP4xvlrSWazfYOqqXnkPhEk1XMXyT7skIb/y+p7HMSclMINqzZ8t4yXU=
+	t=1713248207; cv=none; b=VW+bYC6SRjCnYk9WgaE26mDwFMTSugwn4TUr/whd9zzNhk13TZ/ndkrcT3+62V6P+nN8AJ9PUDauqg7z+61H+krh2n+hw5CPF9sJwvMBsgiaEPkdTfqQ1A4HUJArFFZo67sPhg9MsErYcPqiDzyr8P1uKNwVj6g+thkbH377cBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713248021; c=relaxed/simple;
-	bh=bJKfCh4TOpH4ZqKQgc6vvRE6Ro7oRSWDp+zAGLT1a74=;
+	s=arc-20240116; t=1713248207; c=relaxed/simple;
+	bh=LS6kxqMr2jweAkl/e91IqtJx4zTS2TvjSxqvBc6KXKM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Wf2Z26xt7kgGh6NTzoVDGlS9uH44BefoGbjYDNvdw2uRzZHzBXpZ1zeylLI31v3nc46UYCYONGGVJNmw+XAr8Y05hBFvZ8Ai2V/issew6yP5Xw7WZRaRBcX2B8jNEK+EYJn1opem7wR5fH9d/2yNGjHmFCHPjByQnPN5omYzNJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fdsM2K5q; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-1e2b137d666so33056155ad.2;
-        Mon, 15 Apr 2024 23:13:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713248020; x=1713852820; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CZ6ecSrVtYcanZSvOFQ1ox/50yBmtYgCGB61sRcLhXo=;
-        b=fdsM2K5q1d5NqmKfVSr5Zu++NnUS7igDswII5gacwpVP/19zrFeC8+/uC3ja++3smF
-         W8awc2ZgzFtzFDLI6hoLBmi2+mlJPKIzSaqGcKNnMkeFDJPnUgCRJu/vVAjJV4MLJ4X8
-         KA0ivhikQzyRbLgyY6vzWH47HLzHstNKWsM9bS8oVXjj7AdS32O1IQjnHZneywrLYPmP
-         AmCcVYw5FfxxZ0dQLQAKxQKlfEIdJOTeIQ+e0MNDg2AMQi5zFdbt+QBwQdXLOB7cK4oO
-         IV8DERD4+aZNRusi0VllyePy6A3em+tMnafq9XvV8IbNF5L4yrnZxE8+ua8Y58wsu6o6
-         xFrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713248020; x=1713852820;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CZ6ecSrVtYcanZSvOFQ1ox/50yBmtYgCGB61sRcLhXo=;
-        b=gmwfgjQq8ZM4x6F/g5cBPbGafoTZrt7Cum4LGgNdI3l/7ziG9RmY//VNTEA5d6I0Ip
-         W2HAWoZl9y65neEuMd32SGYQWJVx5UnF9b7R8ir9VaTp3KCpVsRDMBYyc3vhyU0N7sAu
-         3F92Ip7nU2/L/O3xis1ur4kdobl0k5ygO00bvBVBPrJ6Y7xQN4vamKrUHqKGcullYU+h
-         igm17SkDDQo2pxq3BovsdQ4+/3TUlBsCpPES60dAW7fWKvTUz3wmBgO5jb6+bsFYnf8K
-         2HtcRYIVMQAdm+M2nQbSrbL/u4eU+WXo84UymSmJPhSvjCSNro3EjA+7DerXXHHMNSm/
-         YTuw==
-X-Forwarded-Encrypted: i=1; AJvYcCXux9UtvriFOgaFRp0wvOQqDWOEC18TEmhtsVZJjAUAUMIvoc/+lsY/bxCrPbd9FJAPe4pGGcPILQmMZgzOzxzCweJv+3E3afCSuHEsjtduafLsUlM5QNSmd+f4BD3zvhnzTnhjZjD/
-X-Gm-Message-State: AOJu0YxxT6aEhRIdkhWCxqTJla5Vvf3TPs6si8mjbUbSJEcFmPdljSgJ
-	dHn3DFfgruLURQFtXTzHMKTNX65ix9G71Wv2fI0k35/KpaGDMOq1
-X-Google-Smtp-Source: AGHT+IHo1g0xIh9Zq4tQT6ZgqBpNNX8qlCCYceyGks9TWejitkCg/+/KVWFWO9PgevyWpGP9p2ZULg==
-X-Received: by 2002:a17:903:24e:b0:1e2:7aba:6d0f with SMTP id j14-20020a170903024e00b001e27aba6d0fmr15871189plh.36.1713248019757;
-        Mon, 15 Apr 2024 23:13:39 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id n9-20020a170902d2c900b001e1071cf0bbsm8940249plc.302.2024.04.15.23.13.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Apr 2024 23:13:39 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id A125A180F6DB9; Tue, 16 Apr 2024 13:13:36 +0700 (WIB)
-Date: Tue, 16 Apr 2024 13:13:35 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Alexander Duyck <alexander.duyck@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next v2 14/15] mm: page_frag: update documentation
- for page_frag
-Message-ID: <Zh4XD6jP4dLoZN4Q@archie.me>
-References: <20240415131941.51153-1-linyunsheng@huawei.com>
- <20240415131941.51153-15-linyunsheng@huawei.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SC4zvJqcyhPdLjoJBzUtA2C8g1bSbPU/VW5ljKNYNSxx0OwQwV/rJaGiL2eSLKzRxYIocNVOoqbFm5DpFRowySDaEi8CaJouIRsMsDFmTf6hxPAzmrkgHpfL7YYmE+cF+jf42Uk6NAuVlJV9z67xFetS5PPcbu3UDdg4LvOCYP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QOPcagGg; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713248206; x=1744784206;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=LS6kxqMr2jweAkl/e91IqtJx4zTS2TvjSxqvBc6KXKM=;
+  b=QOPcagGgesHwE9tB5OEBQ3ViS+8aEbnmGFDCdkOW0X+dOXw2+FznWtKK
+   h4M9hhIWDSZkgjLnsT/7yxofVHNB97GcidJhEH7mV2Jr4OSji5TJrXwC2
+   mg0hYQkFAEcYFjcp63TnAz9v3r8dCkJJRotUH6/KcoSynX64aDV7SiP5V
+   LWv5U3p8ERhWsJMO7x0E7G6sBzwf5w7PUVVdB1Ifz9TCQuCwIteYOfT3A
+   qjHNvGQppf4yRYkr4AAPC8xEGgX4Bq3sqmMoRov4evge+FHexp1BYhe7G
+   m4zT2KI9hsCsFIaHeBtzR+xnVu2l/b8VISKcar0jW7qRSzvvUrUfbRj0v
+   w==;
+X-CSE-ConnectionGUID: IYR/9OlERm6IUJgTfmQSbw==
+X-CSE-MsgGUID: pjbqGvBHTEmw3eFLiGUvuQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11045"; a="8546745"
+X-IronPort-AV: E=Sophos;i="6.07,205,1708416000"; 
+   d="scan'208";a="8546745"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 23:16:45 -0700
+X-CSE-ConnectionGUID: TflDeatzQ8WEuacwtQYjPA==
+X-CSE-MsgGUID: 1uQyPdlARhu2JLYl3yPx8A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,205,1708416000"; 
+   d="scan'208";a="26810051"
+Received: from unknown (HELO mev-dev) ([10.237.112.144])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Apr 2024 23:16:42 -0700
+Date: Tue, 16 Apr 2024 08:16:17 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: maciej.fijalkowski@intel.com, mateusz.polchlopek@intel.com,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org,
+	jiri@nvidia.com, michal.kubiak@intel.com,
+	intel-wired-lan@lists.osuosl.org, pio.raczynski@gmail.com,
+	sridhar.samudrala@intel.com, jacob.e.keller@intel.com,
+	wojciech.drewek@intel.com,
+	Piotr Raczynski <piotr.raczynski@intel.com>,
+	przemyslaw.kitszel@intel.com
+Subject: Re: [Intel-wired-lan] [iwl-next v3 3/7] ice: add basic devlink
+ subfunctions support
+Message-ID: <Zh4XsXwDxeu936kw@mev-dev>
+References: <20240412063053.339795-1-michal.swiatkowski@linux.intel.com>
+ <20240412063053.339795-4-michal.swiatkowski@linux.intel.com>
+ <Zhje0mQgQTMXwICb@nanopsycho>
+ <Zhzny769lYYmLUs0@mev-dev>
+ <ZhzvGlDiuaPSEHCX@nanopsycho>
+ <Zh4JQ4RDRIAYC+V7@mev-dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="0I6/Ma35WnVqMhhN"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240415131941.51153-15-linyunsheng@huawei.com>
+In-Reply-To: <Zh4JQ4RDRIAYC+V7@mev-dev>
 
+On Tue, Apr 16, 2024 at 07:14:43AM +0200, Michal Swiatkowski wrote:
+> On Mon, Apr 15, 2024 at 11:10:50AM +0200, Jiri Pirko wrote:
+> > Mon, Apr 15, 2024 at 10:39:39AM CEST, michal.swiatkowski@linux.intel.com wrote:
+> > >On Fri, Apr 12, 2024 at 09:12:18AM +0200, Jiri Pirko wrote:
+> > >> Fri, Apr 12, 2024 at 08:30:49AM CEST, michal.swiatkowski@linux.intel.com wrote:
+> > >> >From: Piotr Raczynski <piotr.raczynski@intel.com>
+> > 
+> > [...]
+> > 
+> > >> >+static int
+> > >> >+ice_devlink_port_fn_state_get(struct devlink_port *port,
+> > >> >+			      enum devlink_port_fn_state *state,
+> > >> >+			      enum devlink_port_fn_opstate *opstate,
+> > >> >+			      struct netlink_ext_ack *extack)
+> > >> >+{
+> > >> >+	struct ice_dynamic_port *dyn_port;
+> > >> >+
+> > >> >+	dyn_port = ice_devlink_port_to_dyn(port);
+> > >> >+
+> > >> >+	if (dyn_port->active) {
+> > >> >+		*state = DEVLINK_PORT_FN_STATE_ACTIVE;
+> > >> >+		*opstate = DEVLINK_PORT_FN_OPSTATE_ATTACHED;
+> > >> 
+> > >> Interesting. This means that you don't distinguish between admin state
+> > >> and operational state. Meaning, when user does activate, you atomically
+> > >> achive the hw attachment and it is ready to go before activation cmd
+> > >> returns, correct? I'm just making sure I understand the code.
+> > >> 
+> > >
+> > >I am setting the dyn_port->active after the activation heppens, so it is
+> > >true, when active is set it is ready to go.
+> > >
+> > >Do you mean that dyn_port->active should be set even before the activation is
+> > >finished? I mean when user only call devlink to active the port?
+> > 
+> > The devlink instance lock is taken the whole time, isn't it?
+> > 
+> 
+> I don't take PF devlink lock here. Only subfunction devlink lock is
+> taken during the initialization of subfunction.
+>
 
---0I6/Ma35WnVqMhhN
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Did you mean that the devlink lock is taken for DEVLINK_CMD_PORT_SET/GET
+command? In this case, I think so, it is for the whole time of the
+command execution.
 
-On Mon, Apr 15, 2024 at 09:19:39PM +0800, Yunsheng Lin wrote:
-> +API interface
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +As the design and implementation of page_frag API, the allocation side d=
-oes not
-                                        "... implies, the allocation side .=
-=2E."
-> +allow concurrent calling, it is assumed that the caller must ensure ther=
-e is not
-                      "... . Instead, it is assumed that ...:
-> +concurrent alloc calling to the same page_frag_cache instance by using i=
-t's own
-                                                            "... by using i=
-ts own ..."
-> +lock or rely on some lockless guarantee like NAPI softirq.
-> +
-> +Depending on different use cases, callers expecting to deal with va, pag=
-e or
-> +both va and page for them may call page_frag_alloc_va*, page_frag_alloc_=
-pg*,
-> +or page_frag_alloc* API accordingly.
-> +
-> +There is also a use case that need minimum memory in order for forward
-> +progressing, but can do better if there is more memory available. Introd=
-uce
-Did you mean "... but more performant if more memory is available"?
-> +page_frag_alloc_prepare() and page_frag_alloc_commit() related API, the =
-caller
-s/Introduce/Using/
-> +requests the minimum memory it need and the prepare API will return the =
-maximum
-> +size of the fragment returned, caller need to report back to the page_fr=
-ag core
-                                  "The caller needs to either call the comm=
-it API ..."
-> +how much memory it actually use by calling commit API, or not calling th=
-e commit
-"... to report how much memory it actually uses ..."
-> +API if deciding to not use any memory.
-"... or not do so if deciding to not use any memory."
+Sorry I probably missed the point.
 
-Thanks.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---0I6/Ma35WnVqMhhN
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZh4XCwAKCRD2uYlJVVFO
-o85iAP0UEZ96bTaKdZC0FmSard5z0dMjRBPD69wzKG6rmE9CagD+LpsBRsgW1frt
-81TmfyhS9gzn/HY0KhWP63uiPguKkQY=
-=zrUk
------END PGP SIGNATURE-----
-
---0I6/Ma35WnVqMhhN--
+> > >
+> > >> 
+> > >> >+	} else {
+> > >> >+		*state = DEVLINK_PORT_FN_STATE_INACTIVE;
+> > >> >+		*opstate = DEVLINK_PORT_FN_OPSTATE_DETACHED;
+> > >> >+	}
+> > >> >+
+> > >> >+	return 0;
+> > >> >+}
+> > >> >+
+> > 
+> > [...]
 
