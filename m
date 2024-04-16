@@ -1,112 +1,93 @@
-Return-Path: <netdev+bounces-88396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005BD8A6FDA
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 17:31:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6FB98A7002
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 17:40:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 902B71F21B16
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 15:31:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CF961F22063
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 15:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCB8E1304A2;
-	Tue, 16 Apr 2024 15:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB2AC13119F;
+	Tue, 16 Apr 2024 15:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aaYDQFPc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ml6OFkyu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F295130AE5;
-	Tue, 16 Apr 2024 15:31:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9640C131185
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 15:40:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713281504; cv=none; b=DdMidjRYnlgzocf6uWwUSRc0voQam+Oeqi9BGCunHPj0xF2NDd0aFC66BoSipFz4phlTQ+Z35HJ/mus1U4F5+mq3bld4/AbRE7pySRvlv9f+9SEmTiZDw4ZZUiSlc4eeeTgE8X+o1A5wI+LsegiG3912e7eBI5wYrRDwhfnxZuQ=
+	t=1713282028; cv=none; b=VGEAJDFe0Oine1//gjc+fm2ncw/EY2JkpNX1uP/UYgPunkYuSOUJL2hVZeOrnuskrNybmhW+CqmNhcMUwYnN2H7gjizxvxGZiR+Q3VPwkybyWSRZjfMdZ3BIuZYaHKauO/6f0pW4qJKLpYmyM5U3ykN7KlnSwcmYutISdoj6fGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713281504; c=relaxed/simple;
-	bh=cidw1n/YgMA3/WKaCBYFBA7zjZugTU7R1lAjK1WZ7og=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T4ZT/BWf/+7RKgqIlA5dYf6K5PyRRazXOf9TeW5EqasxxsZPYkTPw0/jo9cReDx/w6Y1hVBXRjNtXGUITbqqdyYNgzwmyk5TR7I8OuunTGx6S+NV74t02F/AKpfh9G2erA5xl3SW4tis758ATPvDWhZDasPsC1eavwwpZ5bsB+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aaYDQFPc; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5701f175201so718921a12.1;
-        Tue, 16 Apr 2024 08:31:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713281501; x=1713886301; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=17WfKab0NfR6qDB7g04dZD9V8Bdl6JixIYq10hAWnWE=;
-        b=aaYDQFPc0bI9dSTLm8hgFN7+tUjprZ1EZZFSkv4uI1lkXSJO8J+pryiaRRX27WwHrf
-         F/QI6tF0QneWgejUApQwYNP2tmqNPUxsC5D1XxPGGTwFHl8iR+73OjJLiYLSoVXekxZO
-         KCdVADwTguPtfdZ7VcBg5oL4gLPbRoi8fAKX+QjyBKLDCg9xQYraxmcPZm/J1YcVhY9h
-         gMR/e2JuR0GqD6Z55duU4mxBOcIP3IMS87PDrIF0kVyqR4vPQSSlZOv43MSn2pl/eE2V
-         OTA5K5DwtpRee4az9YWjBn4ljQvBLNw4s+H2AHb1sKaSOB1HTGoydB2ebpKvkGwPNFnw
-         36/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713281501; x=1713886301;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=17WfKab0NfR6qDB7g04dZD9V8Bdl6JixIYq10hAWnWE=;
-        b=qL6TmG3/cYAsYUxhr+aj9oz9vjMyMNiFey92AeJrhV31SbBU6uxOrVrAfT4sBObR2g
-         0RoGR+fVsJiP/KTp0rHrB6wlriSC+O8XtAgfcplz6NFj3U3ZKKxW3qsKqF0J8ZoyX2R5
-         cScVKYJqLKuKYi8sqlioRkKmcQ4ET8WH1Lxg5DeX0kOB1M6ctCGSCTuGVi40gWGIaZyB
-         /XmM9Px9njocgm/r3JCleTWclwrWPsIG9e31pbBFmKYFWXSdOGbJDQkwya/q2T4eITDu
-         4x6QZf+OIfZ5jjXOTl04WRYar7RFcHFfOxGjageqCIJX4pZ91eBP0UGXhvcv/+gJFAaV
-         uBWg==
-X-Forwarded-Encrypted: i=1; AJvYcCUa5dTNTnGFVq8zScFkQG9M48BdZuL1bBW66HoAIsUlqjxTx6BUw95IWpcv9WBajwsAzgw+bHCBuWYsLR5Mg033ijii+9BaJo/hD730XWgOQTEaOH2XWJATDZ18U0Ml0Vk=
-X-Gm-Message-State: AOJu0YzrueJgBV7lfNdCsS4tr6dxGdFy/FWfVw++/jM+ysE1JlILSFXa
-	SpdRNIjSEmZJUbbQ+NN6AWV7ifTzKU7vXZP407jgFeZ+9txqV6Hz
-X-Google-Smtp-Source: AGHT+IHmfe15k27Trw/I4tgeg4rZ9o5wSoXNBQCXetuO4jc2KzRlW7hBQZu0DTazvthL3H9zAF7upQ==
-X-Received: by 2002:a50:d49c:0:b0:56c:1735:57a2 with SMTP id s28-20020a50d49c000000b0056c173557a2mr12152251edi.31.1713281501336;
-        Tue, 16 Apr 2024 08:31:41 -0700 (PDT)
-Received: from [192.168.42.213] ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id h14-20020a1709070b0e00b00a518c69c4e3sm6938326ejl.23.2024.04.16.08.31.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Apr 2024 08:31:41 -0700 (PDT)
-Message-ID: <26442b80-047f-4bd6-a455-89afd2c07539@gmail.com>
-Date: Tue, 16 Apr 2024 16:31:48 +0100
+	s=arc-20240116; t=1713282028; c=relaxed/simple;
+	bh=rGXV5Ik/rDlHRZtBWXFBgPyD2qXXUD9wUe4gglKYAUk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=X+UZluXz3JNs2SnvoXs1Z2M+BSVydHvdoMmUAbh8cxS1azFAR41fY098tQKLIkv2NgfSqmYirgqNv5C8ypKpMuLqkoYYlsLDsXnMcdmjPC8DcWkTH37gtjGeItqsK2gDqFSErVNMKKGQpziRHNg51B9/kjmhIjG9lAiR8xovQvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ml6OFkyu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 42549C32786;
+	Tue, 16 Apr 2024 15:40:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713282028;
+	bh=rGXV5Ik/rDlHRZtBWXFBgPyD2qXXUD9wUe4gglKYAUk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Ml6OFkyu6ZprcSJ2b1oTQPVM6TauKrtO2HZjy+yJAJdAzV8D3d+cufs+emXKwkfBL
+	 F7ccLKYzy9A22YjjtcmLzrlOB8zPgP/tPNHcnv8NDqMcElcKdp9M2V1uE2tq+vGavd
+	 5vIrBG+zHkpz6A4PCSKNcnqjPGCkwV5me3fj57HMXdm95SyKdn5t2jo8bVWvFO0SjP
+	 6yFgwo4m15sT/iPo/KRsBREz+efty2QW2h3hcDPIAJtF63aURsmiFemMPEp7LBktAj
+	 UqArJR+kUFMQhbLAJd2rkZniT6BIXhJIxvx5uGKJjAb3Hot/xddC5AeaOaw+ddb1tY
+	 7Wz59aPaeu1Iw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2F2FCD4F15D;
+	Tue, 16 Apr 2024 15:40:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 1/6] net: extend ubuf_info callback to ops structure
-To: David Ahern <dsahern@kernel.org>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- io-uring@vger.kernel.org, netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>, "David S . Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>
-References: <cover.1712923998.git.asml.silence@gmail.com>
- <62a4e09968a9a0f73780876dc6fb0f784bee5fae.1712923998.git.asml.silence@gmail.com>
- <661c0d589f493_3e773229421@willemb.c.googlers.com.notmuch>
- <8b329b39-f601-436b-8a17-6873b6e73f91@gmail.com>
- <502a2cfc-b4b1-4903-a6eb-3cbe2369047d@kernel.org>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <502a2cfc-b4b1-4903-a6eb-3cbe2369047d@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2-next] man: use clsact qdisc for port mirroring
+ examples on matchall and mirred
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171328202818.2661.13622342567404919438.git-patchwork-notify@kernel.org>
+Date: Tue, 16 Apr 2024 15:40:28 +0000
+References: <20240413-man-use-clsact-qdisc-for-matchall-and-mirred-v1-1-5c9f61677863@arinc9.com>
+In-Reply-To: <20240413-man-use-clsact-qdisc-for-matchall-and-mirred-v1-1-5c9f61677863@arinc9.com>
+To: =?utf-8?b?QXLEsW7DpyDDnE5BTCB2aWEgQjQgUmVsYXkgPGRldm51bGwrYXJpbmMudW5hbC5h?=@codeaurora.org,
+	=?utf-8?b?cmluYzkuY29tQGtlcm5lbC5vcmc+?=@codeaurora.org
+Cc: dsahern@gmail.com, mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+ netdev@vger.kernel.org, arinc.unal@arinc9.com
 
-On 4/16/24 15:50, David Ahern wrote:
-> On 4/14/24 6:07 PM, Pavel Begunkov wrote:
->> On the bright side,
->> with the patch I'll also ->sg_from_iter from msghdr into it, so it
->> doesn't have to be in the generic path.
+Hello:
+
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
+
+On Sat, 13 Apr 2024 17:48:48 +0300 you wrote:
+> From: Arınç ÜNAL <arinc.unal@arinc9.com>
 > 
-> So, what's old is new again? That's where it started:
+> The clsact qdisc supports ingress and egress. Instead of using two qdiscs
+> to do ingress and egress port mirroring, clsact can be used. Therefore, use
+> clsact for the port mirroring examples on the tc-matchall.8 and tc-mirred.8
+> documents.
 > 
-> https://lore.kernel.org/netdev/20220628225204.GA27554@u2004-local/
+> [...]
 
-Hah, indeed, your patch had it in uarg. I wonder why I didn't put
-them all in a table back then, if the argument was to keep struct
-ubuf_info leaner.
+Here is the summary with links:
+  - [iproute2-next] man: use clsact qdisc for port mirroring examples on matchall and mirred
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=dedcf62f3956
 
+You are awesome, thank you!
 -- 
-Pavel Begunkov
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
