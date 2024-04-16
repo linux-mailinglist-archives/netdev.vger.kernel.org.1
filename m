@@ -1,140 +1,148 @@
-Return-Path: <netdev+bounces-88462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E5BE8A74D0
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 21:33:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A85C8A7511
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 21:44:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85D1CB220F9
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 19:33:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 166C71C21645
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 19:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40F6D1386A8;
-	Tue, 16 Apr 2024 19:32:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9BB1386D9;
+	Tue, 16 Apr 2024 19:44:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UD3feV0u"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1xxyTWxQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+Received: from mail-vk1-f169.google.com (mail-vk1-f169.google.com [209.85.221.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6A7139D17;
-	Tue, 16 Apr 2024 19:32:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F5912E1F0
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 19:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713295964; cv=none; b=LjJYd5tGS/0gN/gjZ07qHOrUkSbl3NCX5+lDpqU/BPBd/WynNKZ1VJ7eBCnCpI1ZU5TUkCxyiSCUrDjIwjlgAqltzGTOi/5QSULM+VLAcDJfIGUjcYQyxxQYY/pp4A0T8ccD17AHOy/BrJ1KGLkPgzizE3u8hRQkQ45PGe0TyPM=
+	t=1713296653; cv=none; b=qj+ZfFfo6keMqZ+uu0QNEYxZepAxsBYnLwD/HrZpNdIiycz+qPeP4bL5c7AirFI8uZaFcp7fbTraOM8nU6evwDz1jhzUESsfbuFesZlSpqR+5uN5DeRy5Q+IgOSxFHadV+4QuiEOGONnBtx9sywDBGxsoXjlcqp3Akh8tIt99Xg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713295964; c=relaxed/simple;
-	bh=ZI17aBFXnfNIX5gg0TIh85FQjVSnOaICYAT+dqo6FJ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=SPnyE2vI6GE/Vk+o4fro0xMhVU1RIBxUUR/BHAi9bluINXqGpfaGBAmnbcFnNIUzD1KKu9tobvQLMu+pPpP+kHvwOMsFoiz9A6Pb+p/sSBc7opLOMz5UwkV+gYW/Ceo98FbKxuxMSvWKtiEuoMv7UTZUro5ZwQ/TMHpD1VaUw28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UD3feV0u; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-69b16b614d7so30703656d6.0;
-        Tue, 16 Apr 2024 12:32:42 -0700 (PDT)
+	s=arc-20240116; t=1713296653; c=relaxed/simple;
+	bh=fgOMsfsromnWR7crsvunBcNbNIL7r1FqTV8g43WikSU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Q7eET5r9S/OBMCoNF2U3UsWKdrOpyfyMhUkADi09ztPTLCUdYCTynDMmas2y2YNxxKS/9Vm6n2JOYsY/EwCeHrCJ1aDJANqCuDALo3gbPdpSEIEojVI4lrm3xDSoZMuR43pxEit8pAQkCkv5/FIlMZ7s9ZRXlL4GMSfZswUiU/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1xxyTWxQ; arc=none smtp.client-ip=209.85.221.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vk1-f169.google.com with SMTP id 71dfb90a1353d-4dcc7c1055bso822770e0c.0
+        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 12:44:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713295961; x=1713900761; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1713296650; x=1713901450; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BLXhtS7COhldJZyUQwRPNq3Lb/qi4UMCEJcdHCvY3ZI=;
-        b=UD3feV0uYqHxmrSY9C/zeoBEhAlstkj3kCS0WOWpM9Ux2g3uK3r2TR1CeMeYVgrGCj
-         7UU8+WYqJ6WHftUqMw26YVjqt5LI7aX27o8yOmhY3F99EllQ3NLKyYgHLGiL834n2tox
-         78eLEC2ACOavdZmFNMSaHefxu11uP+MIqMMQSEoaeaTxsCtShbzERTgKQKdl7X7OuGB/
-         26zn3vdBkFcTmIkDwi6BEtxY7O+54ITJF6sLjrCDSPwmNfLPF0DjHQEKbyg2uKsktBah
-         gcVX21K6f9+MHDNXz1UV5VZEuH5cw/hk1vSoIbwPSaTEupsRps793Pi2W8Ujoyg7k9Y1
-         V0DQ==
+        bh=0liEvfgvDJcNB8HN7DG0Qs0xaumItJ8wGdENTGSU0i8=;
+        b=1xxyTWxQOPNwjvfWdk2ynAH0GuB7IJ83idyG3pkwVvVDDPjv84ucEb8cbE4Tkjzfzm
+         VMhe8INSlHJ3y9Nqnbt7IHi0ZDwOnTb9uO1uXUHIzrKNlR9bIe6DnW7YYZoTYOPYGl6M
+         AWYGYkJUUVXGGFbLFEcNIc65MAmRiCkxMP/AVFnISf4WmSH9ZgJ8nFdInC8Huk+r3Z87
+         +n6CzSeVb0rO4XZ8UHNXfnHR7ZdDiL2iwBicLI+KQsC+gxD8boRI/dW1PTiEiCoxUEZP
+         LkjrouKSnQue3xZmVw2F+oHpncP25MAEMGm95wad3OxaZdl36jkv4lt1seSwtVx4OABw
+         aPsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713295961; x=1713900761;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1713296650; x=1713901450;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BLXhtS7COhldJZyUQwRPNq3Lb/qi4UMCEJcdHCvY3ZI=;
-        b=GTuKr3lGtC7/svSqqll+uKhA0RPQmCFFDDTJBXrsxeYw6e+xwJ685O9CBmSywvui4+
-         Xx2qfp6e8lDScwKmzIMa8YP82ccHQv8vwbr5dpjUEC4MOdaSFDdQwGg2GnXkNpkFUqYh
-         pW4xufdLm+gATakwZI5PV13gUox3M5eXx52qNeVMLnGZnX29c6PeLz8Ye5JUEI9bqpiC
-         hcqq4pno0WFFse5pyA/7moOMEPX9KqYAngV1JsGmGCk5Loq/+JCfrk4Jhx/0tLE4kd3e
-         1u6r+6zOvCboX6K9MTTxEAhe8cmN6TJHUv5XrsQOQkdwoLqir+KrPtvtPSR2G4chgjM7
-         JcYA==
-X-Forwarded-Encrypted: i=1; AJvYcCWhYKJfCRWkwfaIRyfzVHF6t0EbiBNKt8R9gCRDKnSO+7h6R8KgwBggNlH4kDal9VZvPJMgKUhVFNhnL4doaAvDtH1lPD9bQnw0OjYFSnvg
-X-Gm-Message-State: AOJu0YyAgrCrOQOQHAGRVTkmicpTnWoAVWfMvSmZn037iscyHLzt56q9
-	jpnvObssjx4/7MBYahEjdoMkipPYHneTvuVOAIf+C5Sdpf4i9923evpVf2nN
-X-Google-Smtp-Source: AGHT+IEBZEtf19dA+qcI5ddYQsHakMQOEXKRiazZQ5RYpy01SKYNvM87N7Ll8iMHb9KvWdtYQBS92Q==
-X-Received: by 2002:a05:6214:a12:b0:699:29e5:18e0 with SMTP id dw18-20020a0562140a1200b0069929e518e0mr14088439qvb.13.1713295961554;
-        Tue, 16 Apr 2024 12:32:41 -0700 (PDT)
-Received: from imac.redhat.com ([88.97.103.74])
-        by smtp.gmail.com with ESMTPSA id p12-20020a0cfacc000000b0069b52026a19sm6901757qvo.25.2024.04.16.12.32.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 12:32:41 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org
-Cc: donald.hunter@redhat.com,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v3 4/4] netfilter: nfnetlink: Handle ACK flags for batch messages
-Date: Tue, 16 Apr 2024 20:32:15 +0100
-Message-ID: <20240416193215.8259-5-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240416193215.8259-1-donald.hunter@gmail.com>
-References: <20240416193215.8259-1-donald.hunter@gmail.com>
+        bh=0liEvfgvDJcNB8HN7DG0Qs0xaumItJ8wGdENTGSU0i8=;
+        b=IzfUEPAAqzh+bxcQ8yiH/p6rEE/4eQ5eCimmRyvoxHgzKkkkW/CTYN1J9htTKIgRxZ
+         LLVc1+xdzlD+Tm46gLfriMm8iWDOGi5f+ge2Szauh0Mf85bXJbWJov0l9J/kEG3coExx
+         rKPO1Uf5X0cTlYhXgyrhuzB5tJ5A660nbjb4wHRyoFtKARMAjb6cZKcqakr80HzDcurW
+         trmyiGuKu26Mk/vr+qtEGxircx+NhokzhqyU0nwKeGIG6q07O1xhHEHVq5ePe/keSa5y
+         SRVMMex0zZx/1cCayxZT8WZiDBeJvFauEK0rf5P5DYlLYqfPDHZDkI39cBJ4IglmWaBF
+         u2Dg==
+X-Forwarded-Encrypted: i=1; AJvYcCWD07exnzG6+kX/i/UMsRC0dcHwK4eQyMaZbxyCbudeGyrqsB8a1ZsjiOp0IH/kum7PTVRRTHO7dVkdUoMtU3/hiCmUh6IU
+X-Gm-Message-State: AOJu0YzCHi3P6MPL3BoJ0k/7CZ/P7a05vsrFnjuaKbrr5JUXaUdSPw1S
+	jtZ+/BcAq9nmtezaktOKociWXiYITPwJoT5JrTvSDtzcgXI/4vFHCBdYdnsgngY59DHwwVW976w
+	To/GlLb8wFZya0YHhbjMmDKoSMcxYnjd6KjPV
+X-Google-Smtp-Source: AGHT+IGAi017fzJCBa1nWjezpdfsvD1Sqm/9JMe39Np4aI1Pv98ApLSskkXTTPfqa58PpaS26f2lG8pnoXJPyYXjmno=
+X-Received: by 2002:a05:6122:2209:b0:4c9:a9c9:4b3b with SMTP id
+ bb9-20020a056122220900b004c9a9c94b3bmr12243537vkb.9.1713296650485; Tue, 16
+ Apr 2024 12:44:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240416095054.703956-1-edumazet@google.com>
+In-Reply-To: <20240416095054.703956-1-edumazet@google.com>
+From: Neal Cardwell <ncardwell@google.com>
+Date: Tue, 16 Apr 2024 15:43:50 -0400
+Message-ID: <CADVnQy=+5-Hkz9Ud0Vy34wJmdQhUB47QujkQrCbXRKi3yq3STA@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: accept bare FIN packets under memory pressure
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Andrew Oates <aoates@google.com>, Christoph Paasch <cpaasch@apple.com>, Vidhi Goel <vidhi_goel@apple.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The NLM_F_ACK flag is ignored for nfnetlink batch begin and end
-messages. This is a problem for ynl which wants to receive an ack for
-every message it sends, not just the commands in between the begin/end
-messages.
+On Tue, Apr 16, 2024 at 5:50=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> Andrew Oates reported that some macOS hosts could repeatedly
+> send FIN packets even if the remote peer drops them and
+> send back DUP ACK RWIN 0 packets.
+>
+> <quoting Andrew>
+>
+>  20:27:16.968254 gif0  In  IP macos > victim: Flags [SEW], seq 1950399762=
+, win 65535, options [mss 1460,nop,wscale 6,nop,nop,TS val 501897188 ecr 0,=
+sackOK,eol], length 0
+>  20:27:16.968339 gif0  Out IP victim > macos: Flags [S.E], seq 2995489058=
+, ack 1950399763, win 1448, options [mss 1460,sackOK,TS val 3829877593 ecr =
+501897188,nop,wscale 0], length 0
+>  20:27:16.968833 gif0  In  IP macos > victim: Flags [.], ack 1, win 2058,=
+ options [nop,nop,TS val 501897188 ecr 3829877593], length 0
+>  20:27:16.968885 gif0  In  IP macos > victim: Flags [P.], seq 1:1449, ack=
+ 1, win 2058, options [nop,nop,TS val 501897188 ecr 3829877593], length 144=
+8
+>  20:27:16.968896 gif0  Out IP victim > macos: Flags [.], ack 1449, win 0,=
+ options [nop,nop,TS val 3829877593 ecr 501897188], length 0
+>  20:27:19.454593 gif0  In  IP macos > victim: Flags [F.], seq 1449, ack 1=
+, win 2058, options [nop,nop,TS val 501899674 ecr 3829877593], length 0
+>  20:27:19.454675 gif0  Out IP victim > macos: Flags [.], ack 1449, win 0,=
+ options [nop,nop,TS val 3829880079 ecr 501899674], length 0
+>  20:27:19.455116 gif0  In  IP macos > victim: Flags [F.], seq 1449, ack 1=
+, win 2058, options [nop,nop,TS val 501899674 ecr 3829880079], length 0
+>
+>  The retransmits/dup-ACKs then repeat in a tight loop.
+>
+> </quoting Andrew>
+>
+> RFC 9293 3.4. Sequence Numbers states :
+>
+>   Note that when the receive window is zero no segments should be
+>   acceptable except ACK segments.  Thus, it is be possible for a TCP to
+>   maintain a zero receive window while transmitting data and receiving
+>   ACKs.  However, even when the receive window is zero, a TCP must
+>   process the RST and URG fields of all incoming segments.
+>
+> Even if we could consider a bare FIN.ACK packet to be an ACK in RFC terms=
+,
+> the retransmits should use exponential backoff.
+>
+> Accepting the FIN in linux does not add extra memory costs,
+> because the FIN flag will simply be merged to the tail skb in
+> the receive queue, and incoming packet is freed.
+>
+> Reported-by: Andrew Oates <aoates@google.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Neal Cardwell <ncardwell@google.com>
+> Cc: Christoph Paasch <cpaasch@apple.com>
+> Cc: Vidhi Goel <vidhi_goel@apple.com>
+> ---
 
-Add processing for ACKs for begin/end messages and provide responses
-when requested.
+Acked-by: Neal Cardwell <ncardwell@google.com>
 
-I have checked that iproute2, pyroute2 and systemd are unaffected by
-this change since none of them use NLM_F_ACK for batch begin/end.
+Thanks, Eric!
 
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
----
- net/netfilter/nfnetlink.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/net/netfilter/nfnetlink.c b/net/netfilter/nfnetlink.c
-index c9fbe0f707b5..4abf660c7baf 100644
---- a/net/netfilter/nfnetlink.c
-+++ b/net/netfilter/nfnetlink.c
-@@ -427,6 +427,9 @@ static void nfnetlink_rcv_batch(struct sk_buff *skb, struct nlmsghdr *nlh,
- 
- 	nfnl_unlock(subsys_id);
- 
-+	if (nlh->nlmsg_flags & NLM_F_ACK)
-+		nfnl_err_add(&err_list, nlh, 0, &extack);
-+
- 	while (skb->len >= nlmsg_total_size(0)) {
- 		int msglen, type;
- 
-@@ -573,6 +576,8 @@ static void nfnetlink_rcv_batch(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		} else if (err) {
- 			ss->abort(net, oskb, NFNL_ABORT_NONE);
- 			netlink_ack(oskb, nlmsg_hdr(oskb), err, NULL);
-+		} else if (nlh->nlmsg_flags & NLM_F_ACK) {
-+			nfnl_err_add(&err_list, nlh, 0, &extack);
- 		}
- 	} else {
- 		enum nfnl_abort_action abort_action;
--- 
-2.44.0
-
+neal
 
