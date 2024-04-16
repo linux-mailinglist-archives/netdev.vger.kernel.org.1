@@ -1,117 +1,242 @@
-Return-Path: <netdev+bounces-88400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 339478A7024
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 17:48:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C32168A7035
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 17:51:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6499E1C20FD7
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 15:48:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B45681C2140A
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 15:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 720DA1311AF;
-	Tue, 16 Apr 2024 15:48:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3836313172A;
+	Tue, 16 Apr 2024 15:51:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vNe6/Btr"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="EX0isN24";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="hKs61Q4c"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E0B130A76;
-	Tue, 16 Apr 2024 15:48:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B341311AF;
+	Tue, 16 Apr 2024 15:51:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713282534; cv=none; b=qFmDIJIrdoXd01HEIEqGmX1YfgaHkVcgtE4l7c/5EbUtZG3hzN2gIRYjTHaTf9OdQQvdwRTNBPvm7ENo1CjC9O/sX68v+EZXsuHuLu3qQVED5CBw2keppocc98cQJOswFlwzhmG9uwonBuaLpH0mYnSHCKuqTE2Of64xXAzQLbc=
+	t=1713282694; cv=none; b=SOALQywGkiYlwTmtazWwiHiC7uYyq78vmIhJaRWeXHC2zk//E8cOEZT4DQXRsXTu0EimWBmZRQkmOgMhe2XfSwCYX3wKv5SeitoFQy4AfL1xADvbDTwTTZoSGExWtBWCXE+cDgcC7n6Mn9/nUD0IqrrQP/uYfscXWf3tZ5BAf+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713282534; c=relaxed/simple;
-	bh=7LiuzRlYvi/96BvFLIFohrkKwHGDfivoCdvdPYQ/DZY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F4/KldMongEJZfFMW67fBnmc3FrxG1HlptFxN8sY4dxSm5LpM5F8Sg5/zsbiXG5zEvsGK5uKcWfV+4EGixnAgMW0gELQnmovnP0ZuW/3SKAzwY4QaNA2+fLHTWNsdeP+7iuVvwkXeyCcGFoCIZtROXLWcnQ+wCdK/YYKE2kIuFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vNe6/Btr; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=NVCA4wyFU9exr9tcOuCRXVzr7IFOkRpJTnTyMwRKb/Y=; b=vNe6/BtrCFUChNdBAmAQtdF7m0
-	klnwkXW067VvhjKBRYUQgr1B6eJRvKht/6EGx0Y9LDHmRbZMeLK228Rp6lRRGOWockUxHFUscjygL
-	zzvzW9kd/04HGMjrbUG+KQo7IB5aLjkZzdLz+ty8oW/bPnfLTQ0iDg4UDWhKrZ5job7vEcQWVzP0h
-	sjAJYRLWYf1X8ZmY27oniyalobcuHJ/LmiPQX9S5xwBXiVcPkRGljVBcgX0OeQuPJuuk5HbbldzZv
-	+UmlLldaRskCEp6514Leom7uLjtNOljjr3UzQJm/f0SX5a9gpBBIrXZIupn6c6e5BQsILo/o+IOjn
-	4SCq10EA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53342)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rwl2y-0000Zt-0V;
-	Tue, 16 Apr 2024 16:48:36 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rwl2v-0004xT-TS; Tue, 16 Apr 2024 16:48:33 +0100
-Date: Tue, 16 Apr 2024 16:48:33 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	lxu@maxlinear.com, hkallweit1@gmail.com, michael@walle.cc,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property
- to disable SGMII autoneg
-Message-ID: <Zh6d0VKVFK7JJWAf@shell.armlinux.org.uk>
-References: <20240416121032.52108-1-eichest@gmail.com>
- <20240416121032.52108-3-eichest@gmail.com>
- <3f7f278f-e490-47f1-971c-ecf44a70cee4@lunn.ch>
- <Zh6clAtI3NO+nMEi@eichest-laptop>
+	s=arc-20240116; t=1713282694; c=relaxed/simple;
+	bh=5oTLXSg9VThA0XmuLIPgX+kAVJpFfEndfwdGLIxq7u8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JgY4b+t5RbghQQTmuHwcIU4Xvxy5eq/4Ww7Y23en6hWr0rU0RG3OtI+INmiJdoP7N7frbyyAeag2CLABQ9egAdqiChaOS5bFMYnu9e8GogVGL2kpd6RxffEDakGNVhKFDs6MCVyyc2YdgqOFDL3/pjl3gHccdhW5NjldDOyUJuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=EX0isN24; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=hKs61Q4c reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1713282690; x=1744818690;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ValPnQMCccu24ZWqvid4D2T9VS9AWOgVRjH4jCPZzCg=;
+  b=EX0isN244pQr3uFeIflEiU0AVQCb3YJZVQeSHz/F2PXaSy30UgNuIlvI
+   jqyTXjeXsNB857TuY0wbwtr4KeuzfK5xWMXPWBsCbqgGGbcw7iJhX8gN5
+   7/uvI15GoPKGolht5iddCR9RD4B65yL9o1ouImr0o35T5/HhaihGzyH2G
+   5w5RsDbrQ8tty/z4Fre9TOxnIbmwZyh++iy+Bjy5NBaN41xPvPR6IHYmo
+   vAsodIHtku8mWxdtmAFwf3o/E37Ibb3EVDc2VN27EfUJBQnRU9rc4v8ve
+   xyG5ut6+ho5b7fj97Eox8GKRnUoptsFLjZSFFIIhRb0/HvtTQ0GN13Srs
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.07,206,1708383600"; 
+   d="scan'208";a="36448115"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 16 Apr 2024 17:51:27 +0200
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 9698A16FB53;
+	Tue, 16 Apr 2024 17:51:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1713282683;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=ValPnQMCccu24ZWqvid4D2T9VS9AWOgVRjH4jCPZzCg=;
+	b=hKs61Q4cXTorjWWyPQKyrm8TsJD8EmMXOEEn0PpjKRD6xRHJ0/AKWO1gmvD0P2ePPIoDXR
+	i5R9Vk+OlxGN15UlR0sl0BsIiGkLnaZbPo36xRvI/GT4SPCs3MEsDuI9G7X33DDSI1bzoW
+	uI+flvknnSNIC2uKmt4tA4KTl8MLxwhaNnR8xw0sg0IvLGFlSPu+3pmlM6POaV70B6uonU
+	F9fpXXc/QI4zTZVDPgHwC6Rk43l/eJzZXcVF1QEzQl/SypFjo5Ho+9hsUXiAU8MR38oxkS
+	TKV0gdJMxMLK7qXrk6N94eP4Mbzpp8F/NFzrxLdcmnIdwH7JPjMTyaCh9FQK4A==
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux@ew.tq-group.com,
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Subject: [PATCH net] net: dsa: mv88e6xx: fix supported_interfaces setup in mv88e6250_phylink_get_caps()
+Date: Tue, 16 Apr 2024 17:50:54 +0200
+Message-ID: <20240416155054.3650354-1-matthias.schiffer@ew.tq-group.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zh6clAtI3NO+nMEi@eichest-laptop>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-On Tue, Apr 16, 2024 at 05:43:16PM +0200, Stefan Eichenberger wrote:
-> Hi Andrew,
-> 
-> Thanks a lot for the feedback.
-> 
-> On Tue, Apr 16, 2024 at 03:46:19PM +0200, Andrew Lunn wrote:
-> > On Tue, Apr 16, 2024 at 02:10:32PM +0200, Stefan Eichenberger wrote:
-> > > Add a new device tree property to disable SGMII autonegotiation and
-> > > instead use the option to match the SGMII speed to what was negotiated
-> > > on the twisted pair interface (tpi).
-> > 
-> > Could you explain this is more detail.
-> > 
-> > SGMII always runs its clocks at 1000Mbps. The MAC needs to duplicate
-> > the symbols 100 times when running at 10Mbs, and 10 times when running
-> > at 100Mbps.
-> 
-> Currently, the mxl-gpy driver uses SGMII autonegotiation for 10 Mbps,
-> 100 Mbps, and 1000 Mbps. For our Ethernet controller, which is on an
-> Octeon TX2 SoC, this means that we have to enable "in-band-status" on
-> the controller. This will work for all three speed settings. However, if
-> we have a link partner that can do 2.5 Gbps, the mxl-gpy driver will
-> disable SGMII autonegotiation in gpy_update_interface. This is not
-> supported by this Ethernet controller because in-band-status is still
-> enabled. Therefore, we will not be able to transfer data at 2.5 Gbps,
-> the SGMII link will not go into a working state.
+With the recent PHYLINK changes requiring supported_interfaces to be set,
+MV88E6250 family switches like the 88E6020 fail to probe - cmode is
+never initialized on these devices, so mv88e6250_phylink_get_caps() does
+not set any supported_interfaces flags.
 
-I have been working on a phylink/phylib patch set to address this. As
-I've been busy with health-based appointments during last week and this
-week, I haven't been able to spend enough time to get that to a point
-that I'm happy to publish it yet.
+Instead of a cmode, on 88E6250 we have a read-only port mode value that
+encodes similar information. There is no reason to bother mapping port
+mode to the cmodes of other switch models; instead we introduce a
+mv88e6250_port_get_mode() that is called directly from
+mv88e6250_phylink_get_caps().
 
+Fixes: de5c9bf40c45 ("net: phylink: require supported_interfaces to be filled")
+Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+---
+ drivers/net/dsa/mv88e6xxx/chip.c | 11 +++++--
+ drivers/net/dsa/mv88e6xxx/port.c | 51 ++++++++++++++++++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/port.h | 25 +++++++++++++---
+ 3 files changed, 81 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index c95787cb90867..76040b63a5c33 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -570,9 +570,16 @@ static void mv88e6250_phylink_get_caps(struct mv88e6xxx_chip *chip, int port,
+ 				       struct phylink_config *config)
+ {
+ 	unsigned long *supported = config->supported_interfaces;
++	phy_interface_t mode;
++	int err;
+ 
+-	/* Translate the default cmode */
+-	mv88e6xxx_translate_cmode(chip->ports[port].cmode, supported);
++	err = mv88e6250_port_get_mode(chip, port, &mode);
++	if (err) {
++		dev_err(chip->dev, "p%d: failed to get port mode\n", port);
++		return;
++	}
++
++	__set_bit(mode, supported);
+ 
+ 	config->mac_capabilities = MAC_SYM_PAUSE | MAC_10 | MAC_100;
+ }
+diff --git a/drivers/net/dsa/mv88e6xxx/port.c b/drivers/net/dsa/mv88e6xxx/port.c
+index 5394a8cf7bf1d..d58060e94250e 100644
+--- a/drivers/net/dsa/mv88e6xxx/port.c
++++ b/drivers/net/dsa/mv88e6xxx/port.c
+@@ -740,6 +740,57 @@ int mv88e6352_port_get_cmode(struct mv88e6xxx_chip *chip, int port, u8 *cmode)
+ 	return 0;
+ }
+ 
++int mv88e6250_port_get_mode(struct mv88e6xxx_chip *chip, int port,
++			    phy_interface_t *mode)
++{
++	int err;
++	u16 reg;
++
++	if (port < 5) {
++		*mode = PHY_INTERFACE_MODE_INTERNAL;
++		return 0;
++	}
++
++	err = mv88e6xxx_port_read(chip, port, MV88E6XXX_PORT_STS, &reg);
++	if (err)
++		return err;
++
++	switch (reg & MV88E6250_PORT_STS_PORTMODE_MASK) {
++	case MV88E6250_PORT_STS_PORTMODE_MII_10_HALF_PHY:
++	case MV88E6250_PORT_STS_PORTMODE_MII_100_HALF_PHY:
++	case MV88E6250_PORT_STS_PORTMODE_MII_10_FULL_PHY:
++	case MV88E6250_PORT_STS_PORTMODE_MII_100_FULL_PHY:
++		*mode = PHY_INTERFACE_MODE_REVMII;
++		break;
++
++	case MV88E6250_PORT_STS_PORTMODE_MII_HALF:
++	case MV88E6250_PORT_STS_PORTMODE_MII_FULL:
++		*mode = PHY_INTERFACE_MODE_MII;
++		break;
++
++	case MV88E6250_PORT_STS_PORTMODE_MII_DUAL_100_RMII_FULL_PHY:
++	case MV88E6250_PORT_STS_PORTMODE_MII_200_RMII_FULL_PHY:
++	case MV88E6250_PORT_STS_PORTMODE_MII_10_100_RMII_HALF_PHY:
++	case MV88E6250_PORT_STS_PORTMODE_MII_10_100_RMII_FULL_PHY:
++		*mode = PHY_INTERFACE_MODE_REVRMII;
++		break;
++
++	case MV88E6250_PORT_STS_PORTMODE_MII_DUAL_100_RMII_FULL:
++	case MV88E6250_PORT_STS_PORTMODE_MII_10_100_RMII_FULL:
++		*mode = PHY_INTERFACE_MODE_RMII;
++		break;
++
++	case MV88E6250_PORT_STS_PORTMODE_MII_100_RGMII:
++		*mode = PHY_INTERFACE_MODE_RGMII;
++		break;
++
++	default:
++		*mode = PHY_INTERFACE_MODE_NA;
++	}
++
++	return 0;
++}
++
+ /* Offset 0x02: Jamming Control
+  *
+  * Do not limit the period of time that this port can be paused for by
+diff --git a/drivers/net/dsa/mv88e6xxx/port.h b/drivers/net/dsa/mv88e6xxx/port.h
+index 86deeb347cbc1..43d69c8f74a8b 100644
+--- a/drivers/net/dsa/mv88e6xxx/port.h
++++ b/drivers/net/dsa/mv88e6xxx/port.h
+@@ -25,10 +25,25 @@
+ #define MV88E6250_PORT_STS_PORTMODE_PHY_100_HALF	0x0900
+ #define MV88E6250_PORT_STS_PORTMODE_PHY_10_FULL		0x0a00
+ #define MV88E6250_PORT_STS_PORTMODE_PHY_100_FULL	0x0b00
+-#define MV88E6250_PORT_STS_PORTMODE_MII_10_HALF		0x0c00
+-#define MV88E6250_PORT_STS_PORTMODE_MII_100_HALF	0x0d00
+-#define MV88E6250_PORT_STS_PORTMODE_MII_10_FULL		0x0e00
+-#define MV88E6250_PORT_STS_PORTMODE_MII_100_FULL	0x0f00
++/* - Modes with PHY suffix use output instead of input clock
++ * - Modes without RMII or RGMII use MII
++ * - Modes without speed do not have a fixed speed specified in the manual
++ *   ("DC to x MHz" - variable clock support?)
++ */
++#define MV88E6250_PORT_STS_PORTMODE_MII_DISABLED		0x0000
++#define MV88E6250_PORT_STS_PORTMODE_MII_100_RGMII		0x0100
++#define MV88E6250_PORT_STS_PORTMODE_MII_DUAL_100_RMII_FULL_PHY	0x0200
++#define MV88E6250_PORT_STS_PORTMODE_MII_200_RMII_FULL_PHY	0x0400
++#define MV88E6250_PORT_STS_PORTMODE_MII_DUAL_100_RMII_FULL	0x0600
++#define MV88E6250_PORT_STS_PORTMODE_MII_10_100_RMII_FULL	0x0700
++#define MV88E6250_PORT_STS_PORTMODE_MII_HALF			0x0800
++#define MV88E6250_PORT_STS_PORTMODE_MII_10_100_RMII_HALF_PHY	0x0900
++#define MV88E6250_PORT_STS_PORTMODE_MII_FULL			0x0a00
++#define MV88E6250_PORT_STS_PORTMODE_MII_10_100_RMII_FULL_PHY	0x0b00
++#define MV88E6250_PORT_STS_PORTMODE_MII_10_HALF_PHY		0x0c00
++#define MV88E6250_PORT_STS_PORTMODE_MII_100_HALF_PHY		0x0d00
++#define MV88E6250_PORT_STS_PORTMODE_MII_10_FULL_PHY		0x0e00
++#define MV88E6250_PORT_STS_PORTMODE_MII_100_FULL_PHY		0x0f00
+ #define MV88E6XXX_PORT_STS_LINK			0x0800
+ #define MV88E6XXX_PORT_STS_DUPLEX		0x0400
+ #define MV88E6XXX_PORT_STS_SPEED_MASK		0x0300
+@@ -442,6 +457,8 @@ int mv88e6393x_port_set_cmode(struct mv88e6xxx_chip *chip, int port,
+ 			      phy_interface_t mode);
+ int mv88e6185_port_get_cmode(struct mv88e6xxx_chip *chip, int port, u8 *cmode);
+ int mv88e6352_port_get_cmode(struct mv88e6xxx_chip *chip, int port, u8 *cmode);
++int mv88e6250_port_get_mode(struct mv88e6xxx_chip *chip, int port,
++			    phy_interface_t *mode);
+ int mv88e6xxx_port_drop_untagged(struct mv88e6xxx_chip *chip, int port,
+ 				 bool drop_untagged);
+ int mv88e6xxx_port_set_map_da(struct mv88e6xxx_chip *chip, int port, bool map);
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht München, HRB 105018
+Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+https://www.tq-group.com/
+
 
