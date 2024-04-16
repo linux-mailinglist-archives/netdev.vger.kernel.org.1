@@ -1,52 +1,63 @@
-Return-Path: <netdev+bounces-88226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 471CE8A6629
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:33:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0DA68A663E
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:36:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D39551F21E3F
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:33:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DE3E1C203BC
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:36:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E66C73B78D;
-	Tue, 16 Apr 2024 08:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33D273EA7B;
+	Tue, 16 Apr 2024 08:36:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="SXiPD9tA"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="NYRh5pJ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3314B3EA7B;
-	Tue, 16 Apr 2024 08:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AB3D205E10;
+	Tue, 16 Apr 2024 08:36:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713256384; cv=none; b=PDIIhO58g48SNRnQ0xD/0BV3ig8mv0oBae5L5aUrzd7Ur6W/yJdckC7jGQt1LSBQ+hI2JZV5IdrPTLCRuqszxrC+b6tnS3cPawXmyGoGwapTszzEOp3XSdj0Pj7eWRox4D8b9opShE9E0bMnD/1LSV6oqwOjGi0/05rv4FtbLpI=
+	t=1713256581; cv=none; b=u+MEhjF68XgvNmRpV7xAkmQ8T7p0u5GDrbfQ+bKki2riJ97q0rl/FXtCX0Fquw//QBe98D1Fi2woFpUKHDYQWp8OCQOoSHHpMVdzCjDFBu5tGc6YpgQJfbU2DnrhYDX9VJwgezSYz0xV+YC0YShneY6Hx8UBEULIbTzYX1W2VTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713256384; c=relaxed/simple;
-	bh=lflb0pIufUXxyIEvkfnw/gPvn4JiT4OjGBMvQmX6qxk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n94Bjpl5jAblhaCbpUY7CDmAJikp4NoeYYN6f0DxQTKSFItDPgyMQjxqv+YejL5hB44ZdXA+ZGIhJ5teXyvGQBlxsVxg4T9OxyM+5M3ydAScrkDTWfMMcdEevlxEPdwsIjnCkl+XWtCCB5tpLSf0+ZglMxKUs7F1t1bL8WCQfdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=SXiPD9tA; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id EE1FD1C0009;
-	Tue, 16 Apr 2024 08:32:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1713256375;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=m566RVi6Hjc4VyINZc6IMhS42+xhOl1ARnyrIuF1SbM=;
-	b=SXiPD9tA3i+YVZj1nSoulZISksMVUPC9CQbgwO1PiVLiguE+LcuIS0qBfzixGRc6j1xhi8
-	uHlSIWDTTgF9NgPoZmZVWz3UbBplGE0SEwWD8uV/dz1mJu2vgjF/uiboHYWpd7dkgcNdRf
-	WtN3t/O3N9yp+lfpAQUvgCmhXpe9ofeAPmn8o9JGkoOiyR82NwHPluSG1W/ARFWQ/IUAZU
-	RyxVW7rNmzpEU1pZvtOnNXCSpcisSn0AnWaZDO3/CwnLH7Qcyo7NgQJQ7l3O/9WtY3MX2r
-	T/8TcK3bBxBkX140iMJJHuBG3qUoOZERTbl3FFLHznSEszmBgZZjXcFWdMI7HQ==
-Message-ID: <7d0ded52-14f0-4f6a-b639-72f537603be8@arinc9.com>
-Date: Tue, 16 Apr 2024 11:32:49 +0300
+	s=arc-20240116; t=1713256581; c=relaxed/simple;
+	bh=AveT/kzhMyKqy9qT8luIjlZhEw74u3Rg6QrwfWqr29U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=DU3YN6axj1wfTW3SFFGLR82rGaWUOi7edOsJ0d9mGMwH8dsv88GHGH3HSLxpsikPON9KckSeQAMnDbkYDR7+XdgXgBoTgqvwd/xAC8N4AsqYAoKaNV1S7Y6eAx6JtLn27WX0NqDDbSdIKJPeKUomDL6hsprJgJxlZ1x49vRJYoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=NYRh5pJ/; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43G8a5ET051699;
+	Tue, 16 Apr 2024 03:36:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1713256565;
+	bh=gunZQjBXlTN74AuFxyYpvMjk5/cg4ebKFt9lvmAInR0=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=NYRh5pJ/awzVIVr4sD0Qm2nOpnz+fNtcJuwBVUH09sLg4gr37FOxU/L1UY1w/cTMV
+	 jxqZaAOI86/Aa1lA/vToagLbAxf/77FVw1WdPdL6DJRa1tM1yzlFlugUFkhNdnUeTi
+	 5cIgmeWO1Rz+oHEqVHNrdtLYDgDfOZEbX1bSFLlc=
+Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43G8a5Uj060264
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 16 Apr 2024 03:36:05 -0500
+Received: from DLEE112.ent.ti.com (157.170.170.23) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 16
+ Apr 2024 03:36:05 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE112.ent.ti.com
+ (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 16 Apr 2024 03:36:05 -0500
+Received: from [172.24.227.220] (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.227.220])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43G8a0Dr067512;
+	Tue, 16 Apr 2024 03:36:01 -0500
+Message-ID: <dc4563a4-949a-4e5e-a87b-2068a42eea85@ti.com>
+Date: Tue, 16 Apr 2024 14:05:59 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,66 +65,97 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 1/2] net: dsa: mt7530-mdio: read PHY address
- of switch from device tree
+Subject: Re: [PATCH net-next v5 1/2] net: ethernet: ti: am65-cpts: Enable RX
+ HW timestamp for PTP packets using CPTS FIFO
 Content-Language: en-US
-To: Florian Fainelli <f.fainelli@gmail.com>,
- Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>,
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20240414-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v2-0-1a7649c4d3b6@arinc9.com>
- <20240414-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v2-1-1a7649c4d3b6@arinc9.com>
- <459b31bd-64b3-4804-bc5a-c8ffd145e055@gmail.com>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <459b31bd-64b3-4804-bc5a-c8ffd145e055@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+To: Paolo Abeni <pabeni@redhat.com>, Dan Carpenter <dan.carpenter@linaro.org>,
+        Siddharth Vadapalli <s-vadapalli@ti.com>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+        Roger Quadros
+	<rogerq@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Jakub
+ Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S.
+ Miller" <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+References: <20240402114405.219100-1-c-vankar@ti.com>
+ <20240402114405.219100-2-c-vankar@ti.com>
+ <7c8be16329668d343a971e265e923543cba5e304.camel@redhat.com>
+From: Chintan Vankar <c-vankar@ti.com>
+In-Reply-To: <7c8be16329668d343a971e265e923543cba5e304.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On 15/04/2024 18:30, Florian Fainelli wrote:
-> 
-> 
-> On 4/13/2024 11:07 PM, Arınç ÜNAL via B4 Relay wrote:
->> From: Arınç ÜNAL <arinc.unal@arinc9.com>
->>
->> Read the PHY address the switch listens on from the reg property of the
->> switch node on the device tree. This change brings support for MT7530
->> switches on boards with such bootstrapping configuration where the switch
->> listens on a different PHY address than the hardcoded PHY address on the
->> driver, 31.
->>
->> As described on the "MT7621 Programming Guide v0.4" document, the MT7530
->> switch and its PHYs can be configured to listen on the range of 7-12,
->> 15-20, 23-28, and 31 and 0-4 PHY addresses.
->>
->> There are operations where the switch PHY registers are used. For the PHY
->> address of the control PHY, transform the MT753X_CTRL_PHY_ADDR constant
->> into a macro and use it. The PHY address for the control PHY is 0 when the
->> switch listens on 31. In any other case, it is one greater than the PHY
->> address the switch listens on.
->>
->> Reviewed-by: Daniel Golle <daniel@makrotopia.org>
->> Tested-by: Daniel Golle <daniel@makrotopia.org>
->> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> 
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> 
-> I would go a step further and name phy_addr switch_mdio_addr, or something along those lines to clearly denote this is not a per-port PHY address neither a proper PHY device, but we've already had a similar discussion before about spelling this out clearly as a "pseudo PHY"....
 
-I am fine with calling the switch operating on an MDIO bus a psuedo-PHY.
-But I don't believe this grants making up names on our own instead of using
-the name described in IEEE Std 802.3-2022. The switch listens on a PHY
-address on the MDIO bus. The description for the phy_addr member of the
-mt753x_info structure clearly explains that so I don't see a reason to
-change the variable name.
 
-Arınç
+On 04/04/24 16:10, Paolo Abeni wrote:
+> On Tue, 2024-04-02 at 17:14 +0530, Chintan Vankar wrote:
+>> Add a new function "am65_cpts_rx_timestamp()" which checks for PTP
+>> packets from header and timestamps them.
+>>
+>> Add another function "am65_cpts_find_rx_ts()" which finds CPTS FIFO
+>> Event to get the timestamp of received PTP packet.
+>>
+>> Signed-off-by: Chintan Vankar <c-vankar@ti.com>
+>> ---
+>>
+>> Link to v4:
+>> https://lore.kernel.org/r/20240327054234.1906957-1-c-vankar@ti.com/
+>>
+>> Changes from v4 to v5:
+>> - Updated commit message.
+>> - Replaced "list_del_entry()" and "list_add()" functions with equivalent
+>>    "list_move()" function.
+>>
+>>   drivers/net/ethernet/ti/am65-cpts.c | 64 +++++++++++++++++++++++++++++
+>>   drivers/net/ethernet/ti/am65-cpts.h |  6 +++
+>>   2 files changed, 70 insertions(+)
+>>
+>> diff --git a/drivers/net/ethernet/ti/am65-cpts.c b/drivers/net/ethernet/ti/am65-cpts.c
+>> index c66618d91c28..bc0bfda1db12 100644
+>> --- a/drivers/net/ethernet/ti/am65-cpts.c
+>> +++ b/drivers/net/ethernet/ti/am65-cpts.c
+>> @@ -906,6 +906,70 @@ static int am65_skb_get_mtype_seqid(struct sk_buff *skb, u32 *mtype_seqid)
+>>   	return 1;
+>>   }
+>>   
+>> +static u64 am65_cpts_find_rx_ts(struct am65_cpts *cpts, u32 skb_mtype_seqid)
+>> +{
+>> +	struct list_head *this, *next;
+>> +	struct am65_cpts_event *event;
+>> +	unsigned long flags;
+>> +	u32 mtype_seqid;
+>> +	u64 ns = 0;
+>> +
+>> +	am65_cpts_fifo_read(cpts);
+>> +	spin_lock_irqsave(&cpts->lock, flags);
+> 
+> am65_cpts_fifo_read() acquires and releases this same lock. If moving
+> to a lockless schema is too complex, you should at least try to acquire
+> the lock only once. e.g. factor out a lockless  __am65_cpts_fifo_read
+> variant and explicitly acquire the lock before invoke it.
+> 
+
+Moving to a lockless schema is complex for now, but I will make the
+changes suggested by you in next version.
+
+>> +	list_for_each_safe(this, next, &cpts->events) {
+>> +		event = list_entry(this, struct am65_cpts_event, list);
+>> +		if (time_after(jiffies, event->tmo)) {
+>> +			list_del_init(&event->list);
+>> +			list_add(&event->list, &cpts->pool);
+> 
+> Jakub suggested to use list_move() in v4, you should apply that here,
+> too.
+> 
+Okay. I will update that too.
+
+> Cheers,
+> 
+> Paolo
+> 
+> 
 
