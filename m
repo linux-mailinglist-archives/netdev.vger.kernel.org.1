@@ -1,109 +1,143 @@
-Return-Path: <netdev+bounces-88281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C6DF8A693D
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:59:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 812478A6941
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 13:01:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 130BE1F21FAC
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:59:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 217281F21DC4
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 11:01:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3147128814;
-	Tue, 16 Apr 2024 10:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE23712837E;
+	Tue, 16 Apr 2024 11:01:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OKBkthMV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UxyZdEl7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADC4012837E
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 10:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492CA42A89;
+	Tue, 16 Apr 2024 11:01:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713265168; cv=none; b=F4HfZQ+D7h6hVBIljlrQkW41FJVaQbeqjUuIu024Ii0A+76nJzBn8w9hhAg7V8PFtt3z8QsiDKmXhfE2wwMmwy5pNwVuoMzQoCYfvYKwG4DxS8uxe/E/pvNkuYR5hjL0rDy6xNCmDTfv+d7JLk173rtbXkFDUT1cYzZQEp/2BYA=
+	t=1713265283; cv=none; b=N/nX+GVvYCbNl6nKyrpTHPVlLznDBA16ewPbnDYejssHoFqECHOMrovY/CC4LNpAmuWxBlmk8kPz7x1O304NXblpTfm90XCGGL3CKkg3Y6/H6evgeukznga4dylvrtb/pDLB66bti7b5hkB5dMDHFCfUCbYsuNooSHxg4/ooUe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713265168; c=relaxed/simple;
-	bh=3LsWGxkwVx0t5bTDQO9rXkPIQRdhikJCc0vMmTFx9x0=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=XCGC7eQLq2e4sTyyQSkYu6CVpwVrlWAa6yh78YVsPIxhW7GdGApDSjjcNNggy0ix3IyVC5Q2f5Q+SYIqLxRsmctmev5pAQYP0QS6HPCiU5mKnHFiiH0jDiCq2jn5bpD1FVlMgi1mikl8iOeQ4y9+eQfarcNluL2CdyzXaDcR8h0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OKBkthMV; arc=none smtp.client-ip=209.85.210.169
+	s=arc-20240116; t=1713265283; c=relaxed/simple;
+	bh=rucFRDUwhz9mjFWRhohQGSaM+EbpELVZQbhGdj40ILk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ubSRILRC6Zhw7huEqGeWcpmQMvAcCTdadpEJcKVGK4boWTvxOPUWBlvS3d7XYL0YgxXcHTpv8c4Gv9fpHcDIn57V9NEB19sTBE+eHZr/fUwN3+uO7hoG4gbIhXAQTgcsvcDi+rLyVIgAYSRRzPoO7lxhFA8Y6wX4HFyCFamOZTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UxyZdEl7; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6ee0654573aso526805b3a.1
-        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 03:59:27 -0700 (PDT)
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2dae975d0dcso3122981fa.1;
+        Tue, 16 Apr 2024 04:01:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713265167; x=1713869967; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3LsWGxkwVx0t5bTDQO9rXkPIQRdhikJCc0vMmTFx9x0=;
-        b=OKBkthMVkcEyUxIv/qNWZ95mlpXtbPD0Rb6/0eup9n8aychpbAE/WZyCilNlHemX4c
-         8G6IZm6s6w3QQ8JJw3T3iX77pGxshQYeGC1azqw9rlVRraAZdGDGyApXZaFj1FEUXEPS
-         fZwMyZWdbF2al0vAgKacs9XrAN2SG8XW8l20h+X/zW2bHvbSrSAfHDjFkd8j0c+ccMCl
-         AEEIp8WndtlRTpnq17ncGgsHdMrU4SM5jkYHki8I3nDWjrVqBR7XfW0Y/sS8uvtPYGem
-         XTXUL26Cw62LLyywJAnqeJ58sJtDc17Tod53eiksbGcNiAKs/ybOS9KnMKhc05EV4wy5
-         OVtg==
+        d=gmail.com; s=20230601; t=1713265280; x=1713870080; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Ytr2gjGDi6MOUgYACZdiW0scYQdKsmNLgN4Zn17oOZo=;
+        b=UxyZdEl7NDzGwciKNIenIAq/MWhrZHmVWyiL0lxtfHXuGuu8yU0GseWT5wzlcCz2Kc
+         kQk4TGiPuP+0iU6MVizggTMQKep4FtuDN1qAl3e0H4QPGdmmuyv3r0yh9XUhUOUKK/BT
+         Jq1hfbfUHNbBh6/6t0r/KEI1VO4zUC8SSl1z92jFOtSCXY7BbEWIPmmGVGNXp3A8//rf
+         /05IVq5UGKw7uDlPfXesQkutpOgSPBZ1SxqC7x7b8xnHA5Rn3j9+kJKNU5Rtnv9ZTeao
+         Z4zCOEyQPdgMhTXt5zFhqkgbL+aSXq+y34w+HbGLY4FaeaXtPdXA5m81a8Z7nuXhtU3d
+         gkQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713265167; x=1713869967;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3LsWGxkwVx0t5bTDQO9rXkPIQRdhikJCc0vMmTFx9x0=;
-        b=YB2PR5k6lhPrB4kYUmxHYawlwwCuxryQ61DOHLtz6fdttgXZmGdkv4DVao/1LCYz6O
-         g4nbrTuB2godWTUx/zD8AK6PW4QRmghEXxjmlhE2fXEZ72JFFNiZlqQ1OKLUaqgDzbI+
-         1tRR/tQZk3iTup4rd0theky7FQ7KmEG14FCL3Z7e7ATuEeYAIVPkEfC2I/7LCqjfQSc0
-         56hXe9AKyNq+Sd0sbImq5tYsMDgt5RFCYRdcBXOAjUUw/50xZsL5OmpcuuI5GV6Ohako
-         WBdQZF/Gn8ke0yXcnWMqzlEEzZbW6sRg5959dcSwpP8x+sEhsOb88kc0uj1U2i5eOy8x
-         O0Bg==
-X-Forwarded-Encrypted: i=1; AJvYcCXJBtgYB8MWp3uC93wW7cJNhGErPfcnsKc/paqyBvf2IJnQwYQASDipwCY/lBACfRXCpXHMIInI1Mm5KnCPue5DCPbGOhGf
-X-Gm-Message-State: AOJu0YzLZJ9CncDopzzAfj6JDrmoDezzx8+TeuRqQEqRZpXQs12ODLkd
-	0yU7pzC40qd1LoDMb989Gz3dUBjbBq7y9gRZE58PwVqC0xS2VNI57MpfUAhy
-X-Google-Smtp-Source: AGHT+IHL5mgPk45yD/+syPuTUuHsWfAisNyV17kvs6sjvfjjlQUZPeM4vBCstU2OATL60z7kRY112Q==
-X-Received: by 2002:a05:6a00:4a05:b0:6ec:ceb5:e5de with SMTP id do5-20020a056a004a0500b006ecceb5e5demr13024372pfb.0.1713265166909;
-        Tue, 16 Apr 2024 03:59:26 -0700 (PDT)
-Received: from localhost (p5315239-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.87.239])
-        by smtp.gmail.com with ESMTPSA id 125-20020a630283000000b005e485fbd455sm8525837pgc.45.2024.04.16.03.59.25
+        d=1e100.net; s=20230601; t=1713265280; x=1713870080;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ytr2gjGDi6MOUgYACZdiW0scYQdKsmNLgN4Zn17oOZo=;
+        b=oBwbczk/mZabC3J7xsb2EwPP3mVfoh2gdbJ6V6DuW9G/6zalHPhYPG/sM+233gq9H5
+         n7B2RI82Hwq38/hKMaKBKF5L3bD0OuYV7TybUu6zwFbUJSVApyLilN3wnuPdnc1ZWj9x
+         Sk7iFYQ29DZSm3X3dolY0utM33by0pk7blWq5P8ZY1RejfGX9LRcAJgfXPgLnI1TLQSF
+         Yn/TU1t2UQT+3L1vTvgdmIIbOx2g4fqo4Ke/KIBR4n6IS6HDfnmNPVJRfb1q/9q9okTh
+         HSK/1l9UshID5oQxIMtgExmOjRKxl9PAqDYnMxQ3ngTPpNbguQVMDen8EEBI1Y9oUryj
+         I+nw==
+X-Forwarded-Encrypted: i=1; AJvYcCWy0Hnq8yWfawHfRbc9qyvBK7h35xoiNG9rk307KMA73FEpVc/ey6HMHtwEhnZArP18tTiz3STJuV2rRpr+w4YqrTPjSYPb4gQGEeJazoPWOpghZm4ijGQv3ApC/kKjC/mtYwZX
+X-Gm-Message-State: AOJu0YzTxC3BwwaRvXucYmXo43QqM9HN5OSEfT5bAJTrCrhhIGi/LY+a
+	8OJu7+hi3gN6M4uzJujsyYmGwc46YYsOtO6OR98S7gZBuiYyW+4P
+X-Google-Smtp-Source: AGHT+IG0D+e1m7dFn1q9C4/cK5VHSr2W95LT82IU7SVm/yesKp+FKUPQjomsggxh50eO2gSxhqVoAQ==
+X-Received: by 2002:a2e:7406:0:b0:2d9:f301:9771 with SMTP id p6-20020a2e7406000000b002d9f3019771mr654146ljc.5.1713265280208;
+        Tue, 16 Apr 2024 04:01:20 -0700 (PDT)
+Received: from mobilestation ([213.79.110.82])
+        by smtp.gmail.com with ESMTPSA id e8-20020a2e8ec8000000b002d860a40f9dsm1535007ljl.136.2024.04.16.04.01.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 03:59:26 -0700 (PDT)
-Date: Tue, 16 Apr 2024 19:59:12 +0900 (JST)
-Message-Id: <20240416.195912.615260830449617081.fujita.tomonori@gmail.com>
-To: f.fainelli@gmail.com
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch
-Subject: Re: [PATCH net-next v1 0/5] add ethernet driver for Tehuti
- Networks TN40xx chips
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <e9506345-8245-4b3c-83a1-9425e0b37136@gmail.com>
-References: <20240415104352.4685-1-fujita.tomonori@gmail.com>
-	<e9506345-8245-4b3c-83a1-9425e0b37136@gmail.com>
+        Tue, 16 Apr 2024 04:01:19 -0700 (PDT)
+Date: Tue, 16 Apr 2024 14:01:17 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Russell King <linux@armlinux.org.uk>, Yanteng Si <siyanteng@loongson.cn>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Simon Horman <horms@kernel.org>, 
+	Huacai Chen <chenhuacai@kernel.org>, Chen-Yu Tsai <wens@csie.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-sunxi@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 4/4] net: stmmac: Move MAC caps init to phylink
+ MAC caps getter
+Message-ID: <uaq3tbsogvuv6vjm7ga63boltao2vvi55yzyw75z7yido2a5zr@h26npwx3pdwa>
+References: <20240412180340.7965-1-fancer.lancer@gmail.com>
+ <20240412180340.7965-5-fancer.lancer@gmail.com>
+ <9644a96d17152014c8e7f91e9786dde26f67d7a5.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9644a96d17152014c8e7f91e9786dde26f67d7a5.camel@redhat.com>
 
-Hi,
+On Tue, Apr 16, 2024 at 12:27:29PM +0200, Paolo Abeni wrote:
+> On Fri, 2024-04-12 at 21:03 +0300, Serge Semin wrote:
+> > After a set of fixes the stmmac_phy_setup() and stmmac_reinit_queues()
+> > method have turned to having some duplicated code. Let's get rid from the
+> > duplication by moving the MAC-capabilities initialization to the PHYLINK
+> > MAC-capabilities getter. The getter is called during each network device
+> > interface open/close cycle. So the MAC-capabilities will be initialized in
+> > normal device functioning and in case of the Tx/Rx queues
+> > re-initialization as the original code semantics implies.
+> > 
+> > Signed-off-by: Serge Semin <fancer.lancer@gmail.com>
+> 
+> This is a net-next follow-up for the previous 3 patches
+> targeting 'net', right?
 
-On Mon, 15 Apr 2024 16:21:35 -0700
-Florian Fainelli <f.fainelli@gmail.com> wrote:
+Right. The last patch in the series is a cleanup patch which gets rid
+from the duplicated code by moving it to the PHYLINK MAC-capability
+getter.
 
-> Thanks a lot for attempting to upstream support for the TN40xx chips,
-> those are extremely popular 10GbE PCIe cards under USD 100. Last I
-> checked the vendor driver, it was not entirely clear however whether
-> it would be possible to get the various PHY firmwares included in
-> linux-firmware, that is the licensing was not very specific either way
-> (redistribution allowed or not).
+> 
+> If so, you should have posted this one separately after the other would
+> have been merged back into net-next.
 
-The code of the original driver has MODULE_LICENSE("GPL"). The
-firmware of QT2025 PHY is embedded in a header file in the source code
-in the binary format. So I assume that it's also under GPL.
+I thought about that initially. But since this patch content is
+connected with the rest of patches and the maintainers/reviewers may
+ask to do things differently than it's provided in the initial
+patches, I decided to submit the entire series as is but indicating
+that the last patch is intended for 'net-next'.
 
-Unlike QT2025 firmware file, firmware files for Marvell PHYs aren't
-included in the original driver code. The README says you need to get
-Marvell firmware files and compile the code with them. So I guess that
-they can't be redistributed.
+> 
+> We can apply the first 3 to 'net', but you will have to repost 4/4
+> after ~Thu.
+
+Agreed. I'll repost 4/4 after the initial 3 patches get to be merged
+in.
+
+Thanks
+-Serge(y)
+
+> 
+> Thanks,
+> 
+> Paolo
+> 
 
