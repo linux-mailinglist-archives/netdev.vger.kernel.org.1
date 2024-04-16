@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-88375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 111B38A6EA6
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:44:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A35768A6EAA
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:44:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4B2B1F21887
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:44:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 448DE1F21F9F
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:44:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A009F12EBD0;
-	Tue, 16 Apr 2024 14:44:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBE9A12FB39;
+	Tue, 16 Apr 2024 14:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="cJ77AM88"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="Xgb85BgK"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48AD912E1D9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B1512E1E4;
 	Tue, 16 Apr 2024 14:44:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713278653; cv=none; b=ZRHxFWlWRgd5g0wB2n/swX4mbFSlx75xMB94vCk2y1agwt64kaCtdYkswHvyeghaq0R15LHmWaD4nXbhC4jXPvr3eAn568HADnwjgXybHh1TowWAetXpNSq+DN4ZbsEorcqahvqaI4PfTqcs/DKjAlNQ9W21SN8MM8wiWSzsdO4=
+	t=1713278654; cv=none; b=gPS0ErDN+lc6IyCzQTOXvGwkXE7bHddZIoNPoNQHjtGvO6FY7AKp/HGicGh8f13cdk3hu+u+DdNQa4zkLYLSgdYvTnFw/Qc7pjVytFdbC7jGDwgxskeCELDWHrjji324WQWc7/iOiPS8EEIXdIKRRbnLDfYfY2VC/hVgSBFhlJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713278653; c=relaxed/simple;
-	bh=1ISri2bYvVsZAxWaG9HkNxGsuBog0gqAtEuAMx45XWs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=H0yl6PMEVcP/diUjOrJCORz9iYAjg+kQnXZjd7+X0ihMaunskFAHmrJayAV+SqbkxjsQaJHHpeFj41mC8HDyYaoVgJBngjnNUus6E4OuPgQsXeJD28h8oeMXMTZ6VLkeETpUOyjqc9avY3xUMPV14ziDCULSq3bZMibrQISzxFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=cJ77AM88; arc=none smtp.client-ip=193.104.135.124
+	s=arc-20240116; t=1713278654; c=relaxed/simple;
+	bh=5BwHBYqxMFeIngfy155cTEhlu7ALrPnplvMVvaMfee0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=c6MTUoQXmlcc9WD6Mxx6XMEMzOFrxpa4R98ihslnbDlTqLOqBe9NndWlbPAJoz+tBTluoTjIh9obJlsPJt1qaINNKrjZoTX86fnwsWxv7u1fkav4eOQWRw70YlczUQHmiVXWYE+rKHHfKbcWH/LbtpZh1pcLkvOnc3FlsPtaNXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=Xgb85BgK; arc=none smtp.client-ip=193.104.135.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
 Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 71B41600A2;
+	by mail1.fiberby.net (Postfix) with ESMTPSA id C7327600AF;
 	Tue, 16 Apr 2024 14:43:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
 	s=202008; t=1713278649;
-	bh=1ISri2bYvVsZAxWaG9HkNxGsuBog0gqAtEuAMx45XWs=;
+	bh=5BwHBYqxMFeIngfy155cTEhlu7ALrPnplvMVvaMfee0=;
 	h=From:To:Cc:Subject:Date:From;
-	b=cJ77AM88UOdtiL1hxDlCM/LDyadeS5Fy4mTUBJZ0bVwdC0BAa5qi/0Tepp86grPka
-	 VTRhnsMsOkx71RdasvKCZM4gyoNMJVcquFGND2lIX1sECz9YsgAxq91W+LNFDN7jpV
-	 T8PrgAtr0OEqOhdfxLDOVS5hd4dMAcvazMFESrpKpxN9JOU55v1weh310C/1bB1fGh
-	 dLhaIXut+mYSpUmSMiZsEoJOFkDKuBDItY4UR/dLgNZXa6SvS7G/2bXSAK/Kw/bQIx
-	 kCg5VHbl7GxQmUjkw0Vnq/EtO/5bV+eYWh8ubbCNjv5hIkJekGPac9stRnzO6F9wnu
-	 p5u0BFCA7Ztpg==
+	b=Xgb85BgKLWsdRhM36K3eRzcf4c9sMeZX5xgUX0gQUPqGHoy2FUs/6nFwcqiQwx/0e
+	 izTYlD7ipM+2kp9dWZfiJfbhUlIc1N8Ec26EjadQUwcNQVp3uAG+Hg97/Qm/Wg1+xb
+	 BLURF7GjjF7V2qn7U/8HD93L3sVmancpYp1/AtXCWpPj4w/4GF+1RIIjYs//9yRtFS
+	 TlqqtjUwS5HcmYgKCzetYA5plB3rj4D7lMMRQeS1wi3JMtnsTkh1KORyiR2DIAHnY0
+	 oJ8evaBerEj6DPiis11bO/+rIYju6KBSWG9XEX4i9Di83kGkUEpEM9o9y6RXkT/5ri
+	 7JsOZ3Nnt/hUA==
 Received: by x201s (Postfix, from userid 1000)
-	id B5812202498; Tue, 16 Apr 2024 14:43:20 +0000 (UTC)
+	id 3185F203455; Tue, 16 Apr 2024 14:43:27 +0000 (UTC)
 From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
 To: intel-wired-lan@lists.osuosl.org
 Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
@@ -56,9 +56,9 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Jesse Brandeburg <jesse.brandeburg@intel.com>,
 	Tony Nguyen <anthony.l.nguyen@intel.com>
-Subject: [PATCH iwl-next] i40e: flower: validate control flags
-Date: Tue, 16 Apr 2024 14:43:19 +0000
-Message-ID: <20240416144320.15300-1-ast@fiberby.net>
+Subject: [PATCH iwl-next] iavf: flower: validate control flags
+Date: Tue, 16 Apr 2024 14:43:25 +0000
+Message-ID: <20240416144325.15319-1-ast@fiberby.net>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -81,14 +81,14 @@ Only compile-tested.
 
 Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 ---
- drivers/net/ethernet/intel/i40e/i40e_main.c | 4 ++++
+ drivers/net/ethernet/intel/iavf/iavf_main.c | 4 ++++
  1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-index 0bdcdea0be3e..e219f757820d 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-@@ -8643,6 +8643,10 @@ static int i40e_parse_cls_flower(struct i40e_vsi *vsi,
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
+index 13361a780ece..f14355d52f47 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_main.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
+@@ -3757,6 +3757,10 @@ static int iavf_parse_cls_flower(struct iavf_adapter *adapter,
  
  		flow_rule_match_control(rule, &match);
  		addr_type = match.key->addr_type;
