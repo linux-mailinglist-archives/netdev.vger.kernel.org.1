@@ -1,181 +1,177 @@
-Return-Path: <netdev+bounces-88206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 231078A652F
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 09:35:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96B4C8A6537
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 09:36:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFA342844AB
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 07:35:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E4DD1F226D5
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 07:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 584327EEFD;
-	Tue, 16 Apr 2024 07:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABA4771B50;
+	Tue, 16 Apr 2024 07:36:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="lEcc89Ad"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mVH5r1Fv"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2A56EB76;
-	Tue, 16 Apr 2024 07:35:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 836333B78B;
+	Tue, 16 Apr 2024 07:36:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713252905; cv=none; b=CXx+fxn0bBDjm+y5vnvb+7tI4ZZt6LxrCgt9CcHqziWrTNzG/tnWeMRaUPwCq3KuVZPaCLGU7fja523i0S/fYaqVYSbouNM/8LjIJyBL2ylBeAy2YcFeqLUbzZBLR4yeMt0g9KegprHbtw6C6POjKDc5gGuTgOJaoetVKVqqvgU=
+	t=1713253006; cv=none; b=ChyOzkvew5NPc/1faONgo6izeA5i/RloTiUjwWqkfmWcfN/ZOC2dz2WCH6WoWyLyTSkIcBywt6d8i9dD8dHziK0+UY3FsSy5GqdpXNiGKFSBWNYQ3ZWwe/AsFAFvWA1a+zTnyWNQMS4X/b5Ln9HvflILUb9Jiy2aVgL7XVZdJ/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713252905; c=relaxed/simple;
-	bh=YZPpjFD2h0BWhFauzUKmPOsfcH02IyKQ+EGYXS83Mwk=;
+	s=arc-20240116; t=1713253006; c=relaxed/simple;
+	bh=h/lQtZIwrELyNxzNTszhRhT4BgUCCZ1e32RY0cQ9Q5E=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yy84q3hpMtuTXeN005Q7amK9Ipprf0SDOSwscY+dzH+eu99xLGtDlkfM7MYMP57yA+tSE9cDjvLG2cFnlpxA7sjtV+BWcInblJs57X/dxCo97e1KmYt2XiInhMafiKezTj/VKX/SYMTBuyb+3rdtDZz4FStY1JiOUDAdtTM7GWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=lEcc89Ad; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1713252894; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=9meh8oyY29GyYPeAQDY+XOsQifc0/vEfvP4YeEQ/6s4=;
-	b=lEcc89AdvBT62ld7EXPuakApOtoY8wi9L2dfGTAAELpjzdiJ4w6MQKgj5NxsT2IR3JhBAgOmwoMwjUxg4xZ1f7Knh6TEczICU0zHM2YuKnL0Hlx4uSSI3NFCCzW39FmaWyCHqHg1EP5s+hSnzqtkUs9XnBMPda9xnGxOzKxpQvw=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0W4gwW5N_1713252892;
-Received: from 30.221.148.212(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W4gwW5N_1713252892)
-          by smtp.aliyun-inc.com;
-          Tue, 16 Apr 2024 15:34:53 +0800
-Message-ID: <04dcbbcd-7079-42d4-b77c-3bbf55cfc823@linux.alibaba.com>
-Date: Tue, 16 Apr 2024 15:34:51 +0800
+	 In-Reply-To:Content-Type; b=OYh72NRmTB3BOVd067oONpDbW3fmCKN7KmzkNtTjdAxv1iwK0qIyEMAJLWjARULVDX8xqsR2pE20KxLeMfKN2Vqx7uAhH2J4wR6h4o9TPM6XtZ0Q3eIEzCZloZeXywn8AMjOSbZxVk6Ux0uH6/lSosSM7J12SsG4ukCeXPPOJ9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mVH5r1Fv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E1BAC113CE;
+	Tue, 16 Apr 2024 07:36:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713253006;
+	bh=h/lQtZIwrELyNxzNTszhRhT4BgUCCZ1e32RY0cQ9Q5E=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=mVH5r1FvjpCPVBYzALfue5Kp9J/MxTu7fH6Hnc4jVCkJaE6Qf3bzX0kRRnStW4fsf
+	 /UNMNiIAozJOneZeuLR+L5yW5Ol4v2wl4+J1AHrlsWkDJMvE1svFJt2GFjHSwetnyE
+	 yWqhtP5Qc1++hfocHGC/+CWHGRJgcxppW2MAXuRVa5/vNeXIv3aEdkxRbmAGFnZeof
+	 9uapHa6Ibo3Wj6Mc2alCu+3sXT+mZb7V9ohTx2N1guyt/WktZg4H5LZn7YlkchZd7f
+	 45xD7AYDl2qZokAEq111tdXXs0Mb2AL0lyGbSTJF/hHtCW8n539yeZug9kYP44a46R
+	 7Hr8I+/zOeUNw==
+Message-ID: <35c0e6dd-ad60-44e6-9f25-00362a5095c7@kernel.org>
+Date: Tue, 16 Apr 2024 09:36:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8] virtio_net: Support RX hash XDP hint
-To: Liang Chen <liangchen.linux@gmail.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
- ast@kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>
-References: <20240416061943.407082-1-liangchen.linux@gmail.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <20240416061943.407082-1-liangchen.linux@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH iproute2-next] ss: mptcp: print out last time counters
+Content-Language: en-GB
+To: David Ahern <dsahern@gmail.com>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ Stephen Hemminger <stephen@networkplumber.org>,
+ Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>
+References: <20240412-upstream-iproute2-next-20240412-mptcp-last-time-info-v1-1-7985c7c395b9@kernel.org>
+ <69e00bd0-a1d7-4021-ada9-9d344e0e84e4@gmail.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <69e00bd0-a1d7-4021-ada9-9d344e0e84e4@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+Hi David,
 
+On 13/04/2024 18:45, David Ahern wrote:
+> On 4/12/24 2:19 AM, Matthieu Baerts (NGI0) wrote:
+>> From: Geliang Tang <geliang@kernel.org>
+>>
+>> Three new "last time" counters have been added to "struct mptcp_info":
+>> last_data_sent, last_data_recv and last_ack_recv. They have been added
+>> in commit 18d82cde7432 ("mptcp: add last time fields in mptcp_info") in
+>> net-next recently.
+>>
+>> This patch prints out these new counters into mptcp_stats output in ss.
+>>
+>> Signed-off-by: Geliang Tang <geliang@kernel.org>
+>> Acked-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+>> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+>> ---
+>>  include/uapi/linux/mptcp.h | 4 ++++
+>>  misc/ss.c                  | 6 ++++++
+>>  2 files changed, 10 insertions(+)
+>>
+>> diff --git a/include/uapi/linux/mptcp.h b/include/uapi/linux/mptcp.h
+>> index c2e6f3be..a0da2632 100644
+>> --- a/include/uapi/linux/mptcp.h
+>> +++ b/include/uapi/linux/mptcp.h
+> 
+> uapi headers are synced using scripts, meaning at best uapi updates
+> should be a separate patch (the updates can also be omitted).
 
-在 2024/4/16 下午2:19, Liang Chen 写道:
-> The RSS hash report is a feature that's part of the virtio specification.
-> Currently, virtio backends like qemu, vdpa (mlx5), and potentially vhost
-> (still a work in progress as per [1]) support this feature. While the
-> capability to obtain the RSS hash has been enabled in the normal path,
-> it's currently missing in the XDP path. Therefore, we are introducing
-> XDP hints through kfuncs to allow XDP programs to access the RSS hash.
->
-> 1.
-> https://lore.kernel.org/all/20231015141644.260646-1-akihiko.odaki@daynix.com/#r
->
-> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-> ---
->    Changes from v7:
-> - use table lookup for rss hash type
->    Changes from v6:
-> - fix a coding style issue
->    Changes from v5:
-> - Preservation of the hash value has been dropped, following the conclusion
->    from discussions in V3 reviews. The virtio_net driver doesn't
->    accessing/using the virtio_net_hdr after the XDP program execution, so
->    nothing tragic should happen. As to the xdp program, if it smashes the
->    entry in virtio header, it is likely buggy anyways. Additionally, looking
->    up the Intel IGC driver,  it also does not bother with this particular
->    aspect.
-> ---
->   drivers/net/virtio_net.c        | 42 +++++++++++++++++++++++++++++++++
->   include/uapi/linux/virtio_net.h |  1 +
->   2 files changed, 43 insertions(+)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index c22d1118a133..1d750009f615 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -4621,6 +4621,47 @@ static void virtnet_set_big_packets(struct virtnet_info *vi, const int mtu)
->   	}
->   }
->   
-> +static enum xdp_rss_hash_type
-> +virtnet_xdp_rss_type[VIRTIO_NET_HASH_REPORT_MAX_TABLE] = {
-> +	[VIRTIO_NET_HASH_REPORT_NONE] = XDP_RSS_TYPE_NONE,
-> +	[VIRTIO_NET_HASH_REPORT_IPv4] = XDP_RSS_TYPE_L3_IPV4,
-> +	[VIRTIO_NET_HASH_REPORT_TCPv4] = XDP_RSS_TYPE_L4_IPV4_TCP,
-> +	[VIRTIO_NET_HASH_REPORT_UDPv4] = XDP_RSS_TYPE_L4_IPV4_UDP,
-> +	[VIRTIO_NET_HASH_REPORT_IPv6] = XDP_RSS_TYPE_L3_IPV6,
-> +	[VIRTIO_NET_HASH_REPORT_TCPv6] = XDP_RSS_TYPE_L4_IPV6_TCP,
-> +	[VIRTIO_NET_HASH_REPORT_UDPv6] = XDP_RSS_TYPE_L4_IPV6_UDP,
-> +	[VIRTIO_NET_HASH_REPORT_IPv6_EX] = XDP_RSS_TYPE_L3_IPV6_EX,
-> +	[VIRTIO_NET_HASH_REPORT_TCPv6_EX] = XDP_RSS_TYPE_L4_IPV6_TCP_EX,
-> +	[VIRTIO_NET_HASH_REPORT_UDPv6_EX] = XDP_RSS_TYPE_L4_IPV6_UDP_EX
-> +};
-> +
-> +static int virtnet_xdp_rx_hash(const struct xdp_md *_ctx, u32 *hash,
-> +			       enum xdp_rss_hash_type *rss_type)
-> +{
-> +	const struct xdp_buff *xdp = (void *)_ctx;
-> +	struct virtio_net_hdr_v1_hash *hdr_hash;
-> +	struct virtnet_info *vi;
-> +	u16 hash_report;
-> +
-> +	if (!(xdp->rxq->dev->features & NETIF_F_RXHASH))
-> +		return -ENODATA;
-> +
-> +	vi = netdev_priv(xdp->rxq->dev);
-> +	hdr_hash = (struct virtio_net_hdr_v1_hash *)(xdp->data - vi->hdr_len);
-> +	hash_report = __le16_to_cpu(hdr_hash->hash_report);
-> +
-> +	if (hash_report >= VIRTIO_NET_HASH_REPORT_MAX_TABLE)
-> +		hash_report = VIRTIO_NET_HASH_REPORT_NONE;
+Sorry for that, I didn't know. Thank you for the explanation, noted!
 
-When this happens, it may mean an error or user modification of the 
-header occurred.
-Should the following *hash* value be cleared to 0?
+>> @@ -56,6 +56,10 @@ struct mptcp_info {
+>>  	__u64	mptcpi_bytes_received;
+>>  	__u64	mptcpi_bytes_acked;
+>>  	__u8	mptcpi_subflows_total;
+>> +	__u8	reserved[3];
+>> +	__u32	mptcpi_last_data_sent;
+>> +	__u32	mptcpi_last_data_recv;
+>> +	__u32	mptcpi_last_ack_recv;
+>>  };
+>>  
+>>  /* MPTCP Reset reason codes, rfc8684 */
+>> diff --git a/misc/ss.c b/misc/ss.c
+>> index 87008d7c..81b813c1 100644
+>> --- a/misc/ss.c
+>> +++ b/misc/ss.c
+>> @@ -3279,6 +3279,12 @@ static void mptcp_stats_print(struct mptcp_info *s)
+>>  		out(" bytes_acked:%llu", s->mptcpi_bytes_acked);
+>>  	if (s->mptcpi_subflows_total)
+>>  		out(" subflows_total:%u", s->mptcpi_subflows_total);
+>> +	if (s->mptcpi_last_data_sent)
+>> +		out(" last_data_sent:%u", s->mptcpi_last_data_sent);
+>> +	if (s->mptcpi_last_data_recv)
+>> +		out(" last_data_recv:%u", s->mptcpi_last_data_recv);
+>> +	if (s->mptcpi_last_ack_recv)
+>> +		out(" last_ack_recv:%u", s->mptcpi_last_ack_recv);
+>>  }
+>>  
+> 
+> applied to iproute2-next
+Thank you!
 
-Thanks,
-Heng
-
-> +
-> +	*rss_type = virtnet_xdp_rss_type[hash_report];
-> +	*hash = __le32_to_cpu(hdr_hash->hash_value);
-> +	return 0;
-> +}
-> +
-> +static const struct xdp_metadata_ops virtnet_xdp_metadata_ops = {
-> +	.xmo_rx_hash			= virtnet_xdp_rx_hash,
-> +};
-> +
->   static int virtnet_probe(struct virtio_device *vdev)
->   {
->   	int i, err = -ENOMEM;
-> @@ -4747,6 +4788,7 @@ static int virtnet_probe(struct virtio_device *vdev)
->   				  VIRTIO_NET_RSS_HASH_TYPE_UDP_EX);
->   
->   		dev->hw_features |= NETIF_F_RXHASH;
-> +		dev->xdp_metadata_ops = &virtnet_xdp_metadata_ops;
->   	}
->   
->   	if (vi->has_rss_hash_report)
-> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_net.h
-> index cc65ef0f3c3e..3ee695450096 100644
-> --- a/include/uapi/linux/virtio_net.h
-> +++ b/include/uapi/linux/virtio_net.h
-> @@ -176,6 +176,7 @@ struct virtio_net_hdr_v1_hash {
->   #define VIRTIO_NET_HASH_REPORT_IPv6_EX         7
->   #define VIRTIO_NET_HASH_REPORT_TCPv6_EX        8
->   #define VIRTIO_NET_HASH_REPORT_UDPv6_EX        9
-> +#define VIRTIO_NET_HASH_REPORT_MAX_TABLE      10
->   	__le16 hash_report;
->   	__le16 padding;
->   };
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
