@@ -1,189 +1,162 @@
-Return-Path: <netdev+bounces-88379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 288DB8A6ECA
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:47:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA8638A6ED8
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:48:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 480791C22E5E
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:47:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 861D62831B7
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:48:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9126F12EBD7;
-	Tue, 16 Apr 2024 14:46:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13ACE12EBDC;
+	Tue, 16 Apr 2024 14:47:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CCQeHuRQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AWQdZpZJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCAAD12E1C7
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 14:46:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5046C12E1D9;
+	Tue, 16 Apr 2024 14:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713278806; cv=none; b=rdg/cIwGEkP5JPqSYlvD64dygGs7xOZRHJ5rEnd+cavC0goj+6rXMgWvNdmiUoMGyeV+V+M3Gi93ms2nZLkCGs/3+qWs4sxV8zuqcz2Tj6pmPBM3HbhZhYppdYpgTlagkrmokXFOAcj9JRcxOF9FuCZGYPJIFAJ58Wl1pFOFOj8=
+	t=1713278865; cv=none; b=G5mc9P4nIac2U8r7LGIDNnzBzFHS4Lc7zTTrvQzINIq2WbaCAPrpdd3y03TXN1nUCNiwX9egA/OGofjR4sDgJG1s5rpmTH959iP2eEDMV4j3+H0NdgL46oHFwP3DHvMq3FftkSKjUR73zQeReCYKIc3SNzNZa6tlWhIt80F+cW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713278806; c=relaxed/simple;
-	bh=SjFK7lLw08XXYd8La56ucbZ4biYVUyvt++bSZx1oOfQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t8bE/8NX6Bl67jzSOpDOnD2PKGpS4tuzIXeoZ9ieswxNXBxNQao+5W3ncpPp68n3/h1RYK3cZGT4pY/07hTYtUsxTaggoVky5xPNySiCk8nOj0m6w0VvLJTxO08IY5/zfBVkvPfM8/vJK2AGhsZf2bdV/aq8dFg4OEVup/G5vuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CCQeHuRQ; arc=none smtp.client-ip=209.85.221.41
+	s=arc-20240116; t=1713278865; c=relaxed/simple;
+	bh=8cfg8Z9zJeLzJLzSRlYp8D+SSkO5uxZDS/dJ+fBVazA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f9jaWU7yKOXmaH6XGfbY0MS1fIkniDW9iYuQ0P5jRUTbU3UizQ6MMT2rMEaalv+rf9m4QvHtKV8UsBC90kOBcak8xbKQye+KjdPb7EbmnzpO7FK2VR4+o0+W7ObfWhl8daFQfPgoQxZCJhaB6uG1NqsJIwUxHE4fpoSvBsNgkk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AWQdZpZJ; arc=none smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-346b146199eso3225717f8f.0
-        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 07:46:44 -0700 (PDT)
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-516cdb21b34so5773581e87.1;
+        Tue, 16 Apr 2024 07:47:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713278803; x=1713883603; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XWupoMxW1DCsGvmyMgJRrqtgkTLDgLgOv8+w4mjO5vc=;
-        b=CCQeHuRQZbFMVIso3z5egm+H1U6TMSE346KvZYysHH18YjHVc9N3WEO3gcTPxW+RrY
-         4cQOM3gfWNT9c7StGeBxla6GTN+avjkL3Nzy0BgEPuZd19L0dDn+4ujNg/IJLbOosDDN
-         ExEIQVqTnxjgyBdfj8nz97T2xVYCG4UiL/nabT1kCn8jHxhcxmFwe4Az22I66DTW3fpv
-         U+pTqwbCZ4aGkIYQAvHecgBPpZhumoWWNnmCESOB+3s/N9BWzsIgz2WqO5oyZ/wo1ewC
-         wQhIZYhrSmO4p32FfQ6zfJ+ltTml3dBZgdIXZo3hSs48z8cxsITwAtnmFNJR42yGNByr
-         AsaQ==
+        d=gmail.com; s=20230601; t=1713278861; x=1713883661; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=dbrXiXP1Z0BGggRg41SKIMpA/U+f24cxgl+dajAMLS8=;
+        b=AWQdZpZJaTaI5Puj5mDNb3YXgDGEGBEOtWa3yJGXTznQUhESQSfUKrtY/c6oGlfV6G
+         RgZ2eRvIqQHLsaEEGtHSUTONXWb9GQO2I/ZZuzmVR+lf5K56mEUB5syz95ATxgUfH8qu
+         cV4veDFfCfd3esU7Raww4PjT+zu+68JZo5D7cTv9vTxcpcdjM7pIUcvfoCyTBt9QgZ0g
+         k/57V2JGXzR7ukQR+bQQZPm46rXg+8SrZ5dni75UxgmtzFrNoJ+sCZN+9RcWCSlmaCqS
+         xDGfm6Kru1iSth0Jef5XxRV8+SOHgP4wr1FIh0sd/3lNg6rZiyrI/hXEIfLAc0fvegKH
+         jUoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713278803; x=1713883603;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XWupoMxW1DCsGvmyMgJRrqtgkTLDgLgOv8+w4mjO5vc=;
-        b=AwVMNJxSn8vwXQjZE6n3NVK/AXA3c90GQne8bRQXoMFZ/kXmLVx5v8diIMbvbkzokV
-         9pH8dI9P9rdCFpf2NinfcswV3avlUDZycsoZ3XGHgwu/WTd/pL39LvszRWJpOzZqQXiM
-         IHoSnouI57Q/2giwTxZHCAQaoVfFDOJNZZHxE9oEEvnWRpv+z1Y0E2WElMxf373uUhql
-         +F4sf/yXYUq6+LNa974/7/ReNROJY0WhdrFQM2Bgrw/X6JNYOPA0HqA1S+z06eYnTgqP
-         IZjDo18B8bplD5JnhGDCRIna/lboRxp8/foxvCLvCOYBqBO3XR10hgDE6rK3DF8n9Vch
-         OEuw==
-X-Forwarded-Encrypted: i=1; AJvYcCUZ/ca38jZ5M8MUERucJMmPl0DL1y2uB7d1HiTviO8rG8fkFpZijA6dF4I1VkKTUgJUbFPsbnU029VdEIzgRPWobx+x+sp4
-X-Gm-Message-State: AOJu0YwSwL9/eRm/XYtazHCFJ7VwUvFsdz0IvgPV9gQXo5vAcEuVlUi2
-	WMF3ovq40NGX0JDkqHdzAYN0LB8K9yfeJNNYT+1imx5FKxnAs4WKjLC3w5Rn5r3x2kognlz4njT
-	WUH9mTkaRd4sQKHR51X8qJtdJah0=
-X-Google-Smtp-Source: AGHT+IF7qx2ADZsEgrCe3iiORQD7p5asYsU/jyVC2cs++BSarBA7rJjKdPTXrjV8Itu1SB7wp2GFiHEzdhPu+UF8Y6Y=
-X-Received: by 2002:a05:6000:12cc:b0:345:daff:97e0 with SMTP id
- l12-20020a05600012cc00b00345daff97e0mr7987052wrx.16.1713278802897; Tue, 16
- Apr 2024 07:46:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713278861; x=1713883661;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dbrXiXP1Z0BGggRg41SKIMpA/U+f24cxgl+dajAMLS8=;
+        b=uOzV+Q2D3gpGcKjP1wnamwxDMnkWU7d+uwaRD93z5lne8O+QlHnCPiGg+IFsUmT9Or
+         9hhug+OthURJN1zu3em0BZ5zxEOp+gOyMjGSFrsI2LDUZr3LqEsVo6sBiHCtIENz1OV5
+         XGTQLSln6TIw3XxX3cpE/u25aGGGP4Tt17dT9SXB8KDmkjmGN8PBbNdqGQ4+xmqzQDir
+         bSpzqxABUebz/UkXIsodM33BR2dJh87nh6ZBUmVcVHjvcI4Z688lrRKu4Dqk8B8gAhqu
+         G3CgUwS44RW6YJT5Gz+XnjI2rN7bERcHlqRUQIrrYQUahTg9vGt/lZwJqjKELsjIDGYW
+         BzEg==
+X-Forwarded-Encrypted: i=1; AJvYcCVn0xx/aCC6D65TYbgvW6ctDAohlje87LQu6kHUP1BeyQgKrt2itIAL9tbaQD+VSVFBSTO5Ybbz3WVaOPKjB6KC8ZKH003TjOCQqrX367QY8QuOveMpZu3FYfyacp2e7YGSS2j7JbKIfJxfpSBQ7ZY8Xqw4Hdb7/3Nx+75j1Is1lJsO9way82juc3xW4DzLOt38hsLIMLp/NSY59yilVET6QfoK
+X-Gm-Message-State: AOJu0YzARsxRaf8JGvGdB754IY21WHYIcqfPk7jxvBreC95OC1LM/WRT
+	yJhiEcBXHVkFg4MD5cCJZy0/seDlN3ELwR2Lxz8yzTxAIoFTQ/Tp
+X-Google-Smtp-Source: AGHT+IGVhUdbPenkEaBQEHoVWuoYM/g4N2s7D3ZyC86/yvbgSIn/UZQYlQxGwuRqXOP8zkYj3k1bUg==
+X-Received: by 2002:a05:6512:473:b0:516:9f1a:929d with SMTP id x19-20020a056512047300b005169f1a929dmr8026763lfd.1.1713278861201;
+        Tue, 16 Apr 2024 07:47:41 -0700 (PDT)
+Received: from mobilestation.baikal.int (srv1.baikalchip.ru. [87.245.175.227])
+        by smtp.gmail.com with ESMTPSA id v17-20020a05651203b100b00516b07d95c0sm1606425lfp.217.2024.04.16.07.47.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Apr 2024 07:47:40 -0700 (PDT)
+Date: Tue, 16 Apr 2024 17:47:38 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Romain Gantois <romain.gantois@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v3 4/5] net: stmmac: add support for RZ/N1 GMAC
+Message-ID: <xp34tp5cjmdshefxjczltz2prqtiikagfspf4lobznzypvsyah@ihpmwfynwzhh>
+References: <20240415-rzn1-gmac1-v3-0-ab12f2c4401d@bootlin.com>
+ <20240415-rzn1-gmac1-v3-4-ab12f2c4401d@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <171217454226.1598374.8971335637623132496.stgit@ahduyck-xeon-server.home.arpa>
- <171217496013.1598374.10126180029382922588.stgit@ahduyck-xeon-server.home.arpa>
- <41a39896-480b-f08d-ba67-17e129e39c0f@huawei.com> <CAKgT0Uf6MdYX_1OuAFAXadh86zDX_w1a_cwpoPGMxpmC4hGyEA@mail.gmail.com>
- <53b80db6-f2bc-d824-ea42-4b2ac64625f2@huawei.com> <CAKgT0UeQS5q=Y2j3mmu9AhWyUMbey-iFL+sKES1UrBtoAXMdzw@mail.gmail.com>
- <0e5e3196-ca2f-b905-a6ba-7721e8586ed7@huawei.com> <CAKgT0UeRWsJ+NiniSKa7Z3Law=QrYZp3giLAigJf7EvuAbjkRA@mail.gmail.com>
- <bf070035-ba9c-d028-1b11-72af8651f979@huawei.com> <CAKgT0UccovDVS8-TPXxgGbrTAqpeVHRQuCwf7f2qkfcPaPOA-A@mail.gmail.com>
- <20240415101101.3dd207c4@kernel.org> <CAKgT0UcGN3-6R4pt8BQv2hD04oYk48GfFs1O_UGChvrrFT5eCw@mail.gmail.com>
- <008a9e73-16a4-4d45-9559-0df7a08e9855@intel.com>
-In-Reply-To: <008a9e73-16a4-4d45-9559-0df7a08e9855@intel.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 16 Apr 2024 07:46:06 -0700
-Message-ID: <CAKgT0UfyAQaPKApZoV6YJhMPAac3q3KBN4yHdF0j48mKZopsBw@mail.gmail.com>
-Subject: Re: [net-next PATCH 13/15] eth: fbnic: add basic Rx handling
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Yunsheng Lin <linyunsheng@huawei.com>, netdev@vger.kernel.org, 
-	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240415-rzn1-gmac1-v3-4-ab12f2c4401d@bootlin.com>
 
-On Tue, Apr 16, 2024 at 7:05=E2=80=AFAM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> From: Alexander Duyck <alexander.duyck@gmail.com>
-> Date: Mon, 15 Apr 2024 11:03:13 -0700
->
-> > On Mon, Apr 15, 2024 at 10:11=E2=80=AFAM Jakub Kicinski <kuba@kernel.or=
-g> wrote:
-> >>
-> >> On Mon, 15 Apr 2024 08:03:38 -0700 Alexander Duyck wrote:
-> >>>>> The advantage of being a purpose built driver is that we aren't
-> >>>>> running on any architectures where the PAGE_SIZE > 4K. If it came t=
-o
-> >>>>
-> >>>> I am not sure if 'being a purpose built driver' argument is strong e=
-nough
-> >>>> here, at least the Kconfig does not seems to be suggesting it is a p=
-urpose
-> >>>> built driver, perhaps add a 'depend on' to suggest that?
-> >>>
-> >>> I'm not sure if you have been following the other threads. One of the
-> >>> general thoughts of pushback against this driver was that Meta is
-> >>> currently the only company that will have possession of this NIC. As
-> >>> such Meta will be deciding what systems it goes into and as a result
-> >>> of that we aren't likely to be running it on systems with 64K pages.
-> >>
-> >> Didn't take long for this argument to float to the surface..
-> >
-> > This wasn't my full argument. You truncated the part where I
-> > specifically called out that it is hard to justify us pushing a
-> > proprietary API that is only used by our driver.
-> >
-> >> We tried to write some rules with Paolo but haven't published them, ye=
-t.
-> >> Here is one that may be relevant:
-> >>
-> >>   3. External contributions
-> >>   -------------------------
-> >>
-> >>   Owners of drivers for private devices must not exhibit a stronger
-> >>   sense of ownership or push back on accepting code changes from
-> >>   members of the community. 3rd party contributions should be evaluate=
-d
-> >>   and eventually accepted, or challenged only on technical arguments
-> >>   based on the code itself. In particular, the argument that the owner
-> >>   is the only user and therefore knows best should not be used.
-> >>
-> >> Not exactly a contribution, but we predicted the "we know best"
-> >> tone of the argument :(
-> >
-> > The "we know best" is more of an "I know best" as someone who has
-> > worked with page pool and the page fragment API since well before it
-> > existed. My push back is based on the fact that we don't want to
->
-> I still strongly believe Jesper-style arguments like "I've been working
-> with this for aeons", "I invented the Internet", "I was born 3 decades
-> before this API was introduced" are not valid arguments.
-
-Sorry that is a bit of my frustration with Yunsheng coming through. He
-has another patch set that mostly just moves my code and made himself
-the maintainer. Admittedly I am a bit annoyed with that. Especially
-since the main drive seems to be to force everything to use that one
-approach and then optimize for his use case for vhost net over all
-others most likely at the expense of everything else.
-
-It seems like it is the very thing we were complaining about in patch
-0 with other drivers getting penalized at the cost of optimizing for
-one specific driver.
-
-> > allocate fragments, we want to allocate pages and fragment them
-> > ourselves after the fact. As such it doesn't make much sense to add an
-> > API that will have us trying to use the page fragment API which holds
-> > onto the page when the expectation is that we will take the whole
-> > thing and just fragment it ourselves.
->
+On Mon, Apr 15, 2024 at 11:18:44AM +0200, Romain Gantois wrote:
 > [...]
->
-> Re "this HW works only on x86, why bother" -- I still believe there
-> shouldn't be any hardcodes in any driver based on the fact that the HW
-> is deployed only on particular systems. Page sizes, Endianness,
-> 32/64-bit... It's not difficult to make a driver look like it's
-> universal and could work anywhere, really.
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rzn1.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rzn1.c
+> new file mode 100644
+> index 0000000000000..e85524c2017cf
+> --- /dev/null
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rzn1.c
+> @@ -0,0 +1,88 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * Copyright (C) 2024 Schneider-Electric
+> + *
+> + * Clément Léger <clement.leger@bootlin.com>
+> + */
+> +
+> +#include <linux/of.h>
+> +#include <linux/pcs-rzn1-miic.h>
+> +#include <linux/phylink.h>
+> +#include <linux/platform_device.h>
+> +
+> +#include "stmmac_platform.h"
+> +#include "stmmac.h"
+> +
+> +static int rzn1_dwmac_pcs_init(struct stmmac_priv *priv,
 
-It isn't that this only works on x86. It is that we can only test it
-on x86. The biggest issue right now is that I wouldn't have any
-systems w/ 64K pages that I could test on, and the worst that could
-happen based on the current code is that the NIC driver will be a
-memory hog.
+> +			       struct mac_device_info *hw)
 
-I would much prefer the potential of being a memory hog on an untested
-hardware over implementing said code untested and introducing
-something like a memory leak or page fault issue.
+AFAICS hw is unused, and the mac_device_info instance is reached via
+the priv pointer. What about dropping the unused argument then?
 
-That is why I am more than willing to make this an x86_64 only driver
-for now and we can look at expanding out as I get time and get
-equipment to to add support and test for other architectures.
+> +{
+> +	struct device_node *np = priv->device->of_node;
+> +	struct device_node *pcs_node;
+> +	struct phylink_pcs *pcs;
+> +
+> +	pcs_node = of_parse_phandle(np, "pcs-handle", 0);
+> +
+> +	if (pcs_node) {
+> +		pcs = miic_create(priv->device, pcs_node);
+> +		of_node_put(pcs_node);
+> +		if (IS_ERR(pcs))
+> +			return PTR_ERR(pcs);
+> +
+> +		priv->hw->phylink_pcs = pcs;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void rzn1_dwmac_pcs_exit(struct stmmac_priv *priv,
+
+> +				struct mac_device_info *hw)
+
+ditto.
+
+-Serge(y)
+
+> +{
+> +	if (priv->hw->phylink_pcs)
+> +		miic_destroy(priv->hw->phylink_pcs);
+> +}
+> +
+> [...]
 
