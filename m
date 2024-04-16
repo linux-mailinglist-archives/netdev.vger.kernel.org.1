@@ -1,124 +1,70 @@
-Return-Path: <netdev+bounces-88252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E0468A6782
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 11:54:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CE1D8A6790
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 11:57:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2E3121F216C5
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 09:54:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 293EA1F21D04
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 09:57:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411FA8663A;
-	Tue, 16 Apr 2024 09:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="METD/9a7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4530B8613E;
+	Tue, 16 Apr 2024 09:57:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADCA2907;
-	Tue, 16 Apr 2024 09:54:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1B386250;
+	Tue, 16 Apr 2024 09:57:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713261265; cv=none; b=J0AdPPXRlFH9GuJRAMWhNnc0HRVHKqNgAaX18AM7WddFZJCuplkORd+X1GqPOYK+0ooth0H4mPiNMCijdTOAVapVj8bw4wO/5KeJnU9igVFzc5J/rJPbnHbyuG2EW8Zfe346+FKLmw+8TZw+gq2UX948i3huhfBQG2RCn8cWE3M=
+	t=1713261466; cv=none; b=NI03QTVDfUEMJ8ZnO+KDY0jJrMR6jCBQWxRK/RaY5cyOZHS9OFbD/z6uv+JUY2a1rwyAHgyI340yEIY1tVoyE5IBAKq05l4yHhbm1viXf1kJfGWvqG39Q8kE784LmFste5yMKGE9BmOa3CXUSQsXn0GlTHuUe84X4ItQtjI3XzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713261265; c=relaxed/simple;
-	bh=f6QM5JXdMDO6/yNlxDjFr/vdBADbZovxkibV/MEnESY=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=I9CrDgGDayUj2aWu341ThCbXgKclZ3iETImru1/WWvNS9SGpOLnC+1wuw0tceyc6ahQ5coRLjUfnqJunxQXF+RllQH8QkPZfuD+pd1VblEzmqKTwEw8tpmHW44mqtHfUT/1FP0DBTkAcJhTpXdA/7AXhy4yau9dFERTO5grva4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=METD/9a7; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1e7af7eb4ccso2345705ad.1;
-        Tue, 16 Apr 2024 02:54:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713261263; x=1713866063; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YH8x+9QSdnsXkpAcgDXkNiseSDaJMzAAo+Br2k+QtbI=;
-        b=METD/9a7SN4u7xD0q87ia+BhLh+bUFe9INZqVykotDSPcBoJXgWtg9W/CdvE2ofSM4
-         4bfyp/is8iD04ORPRTX1rfN/F50Oa9biIovqjL0QHrj8qgZkflWD/2xM1I5LKdsmbtZ7
-         HV47JbkYL+syGZbV01d4cgnjreV77dWf3wZMsu7SyFPDk3Dpoj6IhsXOcycMJpjAczel
-         2EE9DfgSILkWv5Zk+6z8EOWeG5f3SIXvDUkbz2AiYrxFn55KKib/7/irKRMQXq57LNv8
-         eUmyXzbSIIMWAC0m175czl9Jvtbx8l4VD5K0M15x8Ief7gZ1b3gT/ftFqMbs/SzyhEfA
-         yG8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713261263; x=1713866063;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YH8x+9QSdnsXkpAcgDXkNiseSDaJMzAAo+Br2k+QtbI=;
-        b=dv1npbNbXi7Yokens11MkIcwRvc2rs1jLruKlU2aNH5ExhXJwrGWWrS4LLy6640VAG
-         AogrPEC52baQ4vsc8Jt85q9SqmtQJniELZ0pH10gUQPBYloDxvExDD1PxYt7wZutDMpQ
-         ATbOqtY+tZr7OwgMfH5HkdXniYgLLqEyZAw1Xu0d6fpy0iZKK8NPHggd10ZpQ+zcmxue
-         JJXaFQ+DFQtRkg4QBXodhD2nLEhxnWcw71fXMHWLPs6vYhe3fYd9kWGRw+R7F/7kBpQH
-         m3TO3E1DEk1tRYbA2oCVLPZ7t06ounLuItiMXgwJ1FpbdZDZ8AVu6islee5TujoTJTI6
-         0lug==
-X-Forwarded-Encrypted: i=1; AJvYcCVMqf7+iNrz9aVWHavP65J2IXHZhkI2MIYJr+bEZm1kCd6Pw5G3sPmwVXrOE7xN6DgfX1gjAexlFzGjgf+LO/4uXxxu
-X-Gm-Message-State: AOJu0Yw6CtJp1g2pJM3J20oHWLerw9qwRPqe5rAGzSNf5weGqOzwfmjD
-	o26xVqY2chMxOL7yJuUzhNxRVrU28poQn3ROcbz8c3wjMn7VEbhHTkoNc4+XUQk=
-X-Google-Smtp-Source: AGHT+IEv9o0nxF3QYyj2CF43eErkchMVPMhJclik0hZqlokvYElxVQFkXN5zNjwWD043eNfq+gRV9g==
-X-Received: by 2002:a17:903:32d0:b0:1e4:3299:2acc with SMTP id i16-20020a17090332d000b001e432992accmr14475895plr.3.1713261262893;
-        Tue, 16 Apr 2024 02:54:22 -0700 (PDT)
-Received: from localhost.localdomain ([111.194.45.84])
-        by smtp.gmail.com with ESMTPSA id kf13-20020a17090305cd00b001e29acb2d18sm9393087plb.4.2024.04.16.02.54.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 02:54:22 -0700 (PDT)
-From: Zheng Li <lizheng043@gmail.com>
-To: netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	davem@davemloft.net,
-	jmorris@namei.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	kuba@kernel.org
-Cc: James.Z.Li@Dell.com
-Subject: [PATCH] neighbour: guarantee the localhost connections be established successfully even the ARP table is full
-Date: Tue, 16 Apr 2024 17:53:43 +0800
-Message-Id: <20240416095343.540-1-lizheng043@gmail.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1713261466; c=relaxed/simple;
+	bh=C4buNi5HQaB9xUouhHdqLHIvKmxLD2IZol+trZBEkBw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LgTzRZgZJVFQfthw/iRAHHIGwVNTKEo6jqzzsU/QUQE5Oqq7Dd13W9G6YykT/sH5kCdhhveUIogUL7yljYc3T6WFmzvDFBQCTNEDVZEbgV3mdjFuUNsrGr5mjLuQVuNLoPBHpSHk8IAIQg9s7gw835uX51AHy4o1PCjALRdOFJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1rwfZD-0005fV-8Q; Tue, 16 Apr 2024 11:57:31 +0200
+Date: Tue, 16 Apr 2024 11:57:31 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netfilter-devel@vger.kernel.org,
+	pablo@netfilter.org
+Subject: Re: [PATCH net-next 01/12] selftests: netfilter:
+ conntrack_icmp_related.sh: move to lib.sh infra
+Message-ID: <20240416095731.GD27869@breakpoint.cc>
+References: <20240414225729.18451-1-fw@strlen.de>
+ <20240414225729.18451-2-fw@strlen.de>
+ <ce433aee-b478-4fcf-b8e1-3b38bfca795a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ce433aee-b478-4fcf-b8e1-3b38bfca795a@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-From: Zheng Li <James.Z.Li@Dell.com>
+Matthieu Baerts <matttbe@kernel.org> wrote:
+> According to the patch title and description, it looks like something is
+> missing from the diff below where on the 'config' file is modified, no?
+> 
+> Same for patch 2/12 where we have the opposite modification.
 
-Inter-process communication on localhost should be established successfully
-even the ARP table is full, many processes on server machine use the
-localhost to communicate such as command-line interface (CLI),
-servers hope all CLI commands can be executed successfully even the arp
-table is full. Right now CLI commands got timeout when the arp table is
-full. Set the parameter of exempt_from_gc to be true for LOOPBACK net
-device to keep localhost neigh in arp table, not removed by gc.
-
-the steps of reproduced:
-server with "gc_thresh3 = 1024" setting, ping server from more than 1024
-same netmask Lan IPv4 addresses, run "ssh localhost" on console interface,
-then the command will get timeout.
-
-Signed-off-by: Zheng Li <James.Z.Li@Dell.com>
----
- net/core/neighbour.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 552719c3bbc3..47d07b122f7a 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -734,7 +734,9 @@ ___neigh_create(struct neigh_table *tbl, const void *pkey,
- struct neighbour *__neigh_create(struct neigh_table *tbl, const void *pkey,
- 				 struct net_device *dev, bool want_ref)
- {
--	return ___neigh_create(tbl, pkey, dev, 0, false, want_ref);
-+	bool exempt_from_gc = !!(dev->flags & IFF_LOOPBACK);
-+
-+	return ___neigh_create(tbl, pkey, dev, 0, exempt_from_gc, want_ref);
- }
- EXPORT_SYMBOL(__neigh_create);
- 
--- 
-2.17.1
-
+Rebase artifact.  Jakub/netdev maintainers, please toss this series,
+it needs more work, I can use this opportunity to also update a few
+scripts to skip instead of failing when requirements are not met.
 
