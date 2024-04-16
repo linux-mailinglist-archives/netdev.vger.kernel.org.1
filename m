@@ -1,145 +1,131 @@
-Return-Path: <netdev+bounces-88446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D52218A742D
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 21:03:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 121998A7456
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 21:07:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7510B1F21F20
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 19:03:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71C84B21C18
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 19:07:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0420613A248;
-	Tue, 16 Apr 2024 19:01:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFA8413777D;
+	Tue, 16 Apr 2024 19:07:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h4kccgOM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sr2rMEkY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A06413473F;
-	Tue, 16 Apr 2024 19:01:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83084137748;
+	Tue, 16 Apr 2024 19:07:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713294117; cv=none; b=VRMUPGoUUlm4WvmIB4k5xRPEqeRce68gz4QS0pCrXg+Ap6kt4tCMMUeZbxO84x3ptyGEoxjFohfoj2dzKOKcEaq1Sr7gBKNg1l0zVuKvW6agwOtxid+hAJppdUhyl7px9WvvnWnz3ERAynpMwdMUlqXaipllDa7VXC+bSxzJeGw=
+	t=1713294427; cv=none; b=mN+xIeaXlMDXFNXKlFIu5G0jU9eDdK5bd5g+9X3onMfgSc1PhXhzv3oeTbYs7nK5oef2aNqjzbi6fKMp4iZMhDCU8V1Ps0GR8FIjHpQt73rJlKEKSqNS7I3M358mmVJkYTx662CBJTZ72Ue5V75tKDtjAXSFOPQH7xbAzw9nm5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713294117; c=relaxed/simple;
-	bh=Iqa1jZFbSawQjr+CJUz7nVCyrQTIWjYRq/y+SFNwWHo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=buIWiyj92RdIaL58E0VDSz6GD2j2V4dLRxGPrYRbcIybLgOXl05su7HIh++/ekzDvwAjmDLr4H/XjHIohsGL8P7p/im17frvAwAy+e0ZEuoz1MClp3iKU54kccSZu5iYSyfYj00XZRSjyFtHCcIQb8Yql3u3JnYTlPyvZbZIyTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h4kccgOM; arc=none smtp.client-ip=209.85.218.44
+	s=arc-20240116; t=1713294427; c=relaxed/simple;
+	bh=DAngsWtX5i5JPK0TVotIyyLHrT3kU1QwvuimQUMuUwg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=URqR5vnnprpmwX3lxHrPRHqsFUYRP+OToCIEji9wV/pzLTjGfDfSMTIHVU27Jez9Ehw8RW5+yc4PWdwuprp8GVrMWsN7c7v77TOi50ip2YyAZbI4izmHNXmhlUFyh6NLNkHS9cWZiahT5lS/GTps8KDWVKtkmxqKvyLh4gj2bfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Sr2rMEkY; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a523524e5baso581109566b.3;
-        Tue, 16 Apr 2024 12:01:55 -0700 (PDT)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6ed04c91c46so4911461b3a.0;
+        Tue, 16 Apr 2024 12:07:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713294114; x=1713898914; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jZpJcz4q96m6H/9BjAU0EaM5FaeOMwdztZTURkwBQn4=;
-        b=h4kccgOMtt4cuiihkEbZv9W4jVNGW6/Cx5Bcwu1d7Nh8iGC6LmrIQpZZE8ttyAhp65
-         MfAErLRTnR/CjOkcrTMI5ZZQm1GhwpoZtlHGffEwSxb35chPwCbndEFoW74UvSjRG5hN
-         CmDjqkY80VFs4VVhejJznEIEzfrJmoulC8SZq3R81V1KN+9GUNcVQ67ArgGn34VezDPt
-         6/5Hr8UxhJFFzWV4+wROb1fm4bRx5CryP96W8EMSt7s/xOTjXLxgVyZMEUWPPwZreXjW
-         MqqetXuCB8rUOyqEq+FK4yVVwt4paaFFtZ7TmwhkOA2xv2iaenCVo2heJlJQhy7sI6/9
-         o3Vw==
+        d=gmail.com; s=20230601; t=1713294426; x=1713899226; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ymh6/7DVgNq/BVrdLDL6ajyFa00O1IrR2fX6zfmoZZQ=;
+        b=Sr2rMEkYhxxq9Vo8Dc+elN0e+8QHloyvN5HCHDRgr7FuuKC/4/j0heZH7rE1TZyviq
+         T8Bl2uruwY68YgloLPAJhHOwrMuMxekykKOYxtrUi3xBvG9RS1loTc7bAfC5wdnZkoeX
+         zCsO9v3W61yPtNlpHb9SnKobAwbRDWmiFQ1zCvd77YTQk8emxlOLhwTh7YXDIWxrZxY9
+         9bDuu7x+Q4yI7PbZgpsa4EsKvoU2F7kvg1nqVM9JF2egf15O2f1aZIdbhFfx9zOeVdHi
+         2/48unguQgueg3mlIIi+aVYelCgu0lbJTiPsJ4uEoakzAVuIhMjoi+TwxsINLMbft+US
+         ItZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713294114; x=1713898914;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jZpJcz4q96m6H/9BjAU0EaM5FaeOMwdztZTURkwBQn4=;
-        b=ElV1k+eUbj9Aj67AKEERP96yByGm73mvJCKG/S9DN8gBYJTzQ2eVPNrman6zel5uHc
-         6SYt8HcHAPInttEsh7zq0walBH0WhktXIr8+dbOJm/bErLB/wG4sLfyHsI0epdJA5Ljt
-         nW/Ts5R2porFNwywp/dh+90mgMZY5fD63PrByNbr1LgbecyrjiG64uDlMNMJt2SlNOwP
-         vxp8MvGcxt3NAB4gZT3oQgFIP+chUkL4jMUHSs9IgDeNiykV0pLhMIogcJcZKhv4DuT9
-         ZodvMG5KkYXFjtkQ/0yvjYruVWWDJdhCKWcA7Msbz8YJo27kogK1JugQOpCwowRpvr/x
-         tGqg==
-X-Forwarded-Encrypted: i=1; AJvYcCVcqQSEh1Fp9Fuhwi8/44tYMJhc3EA52HiArSm/nciZvDPKIBPgTfOSWI3k2WvWH9ZDXiHXPBFE3XcgIQT0tmKbo5pbwsIA2R941MQr
-X-Gm-Message-State: AOJu0Yz44zK2ICv28HAj0XpLsfKTTfN/8v3fIDhjIm+OVSev1WRa88Ds
-	I1g9p6kOAzWurgNPHjip2hnCD6t4UrGGnPxVP1bHbyBkGVx9FvzKEk3uSI1y
-X-Google-Smtp-Source: AGHT+IFtz5PGkW2Z9Ps1y2/0w7YPPFU74m3LSkzcbMbLPyvEGuQON7EzjEJ/yIrXR1c1c/POvEskiQ==
-X-Received: by 2002:a17:906:5799:b0:a52:6c4b:cc18 with SMTP id k25-20020a170906579900b00a526c4bcc18mr5099905ejq.71.1713294114162;
-        Tue, 16 Apr 2024 12:01:54 -0700 (PDT)
-Received: from WBEC325.dom.lan ([185.188.71.122])
-        by smtp.gmail.com with ESMTPSA id mm10-20020a170906cc4a00b00a524531a580sm5247981ejb.152.2024.04.16.12.01.53
+        d=1e100.net; s=20230601; t=1713294426; x=1713899226;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ymh6/7DVgNq/BVrdLDL6ajyFa00O1IrR2fX6zfmoZZQ=;
+        b=c67fqQ2hmth2gVWhDrIgjk2l74Org+Vv6blRP6cSPlrIK4LHtehTNhU2oj0iIeQGHB
+         gOBmPHmZsRf4ESPk7gMBTCVxVeGxa+U+h7CKaVR4Bhz3AHACtTFFyEqXt6CgKEHHMnxH
+         pHUD9Zs87gTu6p5tJHPCMy0VdYxFHz/Ue8nuBUjGHO6FmIcVDIm4sDJiNO9hmuSSprck
+         DLH5sa8qZYUrfp65niUJfw3GRxY0MRr4oYtvT6yUGypdYS0DV8v8WpvB0LfvNGEB1Z+7
+         fx4nbkTeeVGTaT0ZCqjDFAebIb1t15umsI/tayprhV5iAQhHsxnEEfuyLQreFYW22JVq
+         MUdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWUSAf7Fe62oy4N6iC9uCcxoNGd3akU5reqY2K0Xb2ZiNBLpthTB0OEMKlwpucx6yZteRr2ij+Zwt3HWun2nIEI52jY8xO+nKBU1zHYjzGc3H8/m14hhlYJBOqKwrLbiPVHlTFK
+X-Gm-Message-State: AOJu0YzVOM6hOaP0lsi7NTBSz16wN6VcafCZA2Eqian4Q+26D/imdD75
+	2zNBMM5FtaEL618hk++8dKrMW2TJBPpITlmUPTFscg7AaKVNn1IyNgBtffl36viFvw==
+X-Google-Smtp-Source: AGHT+IGoEfX05qonJWd6vzzxV0e1rBcqS8DZ97ASOVz0k0L6okXuaCutvnvql2+UOdD0V4O9OW7O7A==
+X-Received: by 2002:a05:6a21:6d87:b0:1a7:c67:82ff with SMTP id wl7-20020a056a216d8700b001a70c6782ffmr17824895pzb.13.1713294425646;
+        Tue, 16 Apr 2024 12:07:05 -0700 (PDT)
+Received: from localhost.localdomain ([67.198.131.126])
+        by smtp.gmail.com with ESMTPSA id n21-20020a056a000d5500b006ed066ebed4sm9716764pfv.93.2024.04.16.12.07.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 12:01:53 -0700 (PDT)
-From: Pawel Dembicki <paweldembicki@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Pawel Dembicki <paweldembicki@gmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 5/5] net: dsa: vsc73xx: add structure descriptions
-Date: Tue, 16 Apr 2024 21:00:55 +0200
-Message-Id: <20240416190055.3277007-6-paweldembicki@gmail.com>
+        Tue, 16 Apr 2024 12:07:05 -0700 (PDT)
+From: Yick Xie <yick.xie@gmail.com>
+To: willemdebruijn.kernel@gmail.com,
+	willemb@google.com
+Cc: netdev@vger.kernel.org,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: [PATCH net v2] udp: don't be set unconnected if only UDP cmsg
+Date: Wed, 17 Apr 2024 03:03:30 +0800
+Message-Id: <20240416190330.492972-1-yick.xie@gmail.com>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240416190055.3277007-1-paweldembicki@gmail.com>
-References: <20240416190055.3277007-1-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-This commit adds updates to the documentation describing the structures
-used in vsc73xx. This will help prevent kdoc-related issues in the future.
+If "udp_cmsg_send()" returned 0 (i.e. only UDP cmsg),
+"connected" should not be set to 0. Otherwise it stops
+the connected socket from using the cached route.
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
-Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+Fixes: 2e8de8576343 ("udp: add gso segment cmsg")
+Signed-off-by: Yick Xie <yick.xie@gmail.com>
+Cc: stable@vger.kernel.org
 ---
- drivers/net/dsa/vitesse-vsc73xx.h | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+v2: Add Fixes tag
+v1: https://lore.kernel.org/netdev/20240414195213.106209-1-yick.xie@gmail.com/
+---
+ net/ipv4/udp.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/dsa/vitesse-vsc73xx.h b/drivers/net/dsa/vitesse-vsc73xx.h
-index fee1378508b5..2997f7e108b1 100644
---- a/drivers/net/dsa/vitesse-vsc73xx.h
-+++ b/drivers/net/dsa/vitesse-vsc73xx.h
-@@ -15,7 +15,16 @@
- #define VSC73XX_MAX_NUM_PORTS	8
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index c02bf011d4a6..420905be5f30 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -1123,16 +1123,17 @@ int udp_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
  
- /**
-- * struct vsc73xx - VSC73xx state container
-+ * struct vsc73xx - VSC73xx state container: main data structure
-+ * @dev: The device pointer
-+ * @reset: The descriptor for the GPIO line tied to the reset pin
-+ * @ds: Pointer to the DSA core structure
-+ * @gc: Main structure of the GPIO controller
-+ * @chipid: Storage for the Chip ID value read from the CHIPID register of the
-+ *	switch
-+ * @addr: MAC address used in flow control frames
-+ * @ops: Structure with hardware-dependent operations
-+ * @priv: Pointer to the configuration interface structure
-  */
- struct vsc73xx {
- 	struct device			*dev;
-@@ -28,6 +37,11 @@ struct vsc73xx {
- 	void				*priv;
- };
- 
-+/**
-+ * struct vsc73xx_ops - VSC73xx methods container
-+ * @read: Method for register reading over the hardware-dependent interface
-+ * @write: Method for register writing over the hardware-dependent interface
-+ */
- struct vsc73xx_ops {
- 	int (*read)(struct vsc73xx *vsc, u8 block, u8 subblock, u8 reg,
- 		    u32 *val);
+ 	if (msg->msg_controllen) {
+ 		err = udp_cmsg_send(sk, msg, &ipc.gso_size);
+-		if (err > 0)
++		if (err > 0) {
+ 			err = ip_cmsg_send(sk, msg, &ipc,
+ 					   sk->sk_family == AF_INET6);
++			connected = 0;
++		}
+ 		if (unlikely(err < 0)) {
+ 			kfree(ipc.opt);
+ 			return err;
+ 		}
+ 		if (ipc.opt)
+ 			free = 1;
+-		connected = 0;
+ 	}
+ 	if (!ipc.opt) {
+ 		struct ip_options_rcu *inet_opt;
 -- 
 2.34.1
 
