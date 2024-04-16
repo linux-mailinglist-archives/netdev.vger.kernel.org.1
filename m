@@ -1,76 +1,88 @@
-Return-Path: <netdev+bounces-88367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F08988A6E49
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:31:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC2D88A6E58
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:34:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 800A8281F1E
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:31:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91E871F2342F
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:34:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C62A738DE8;
-	Tue, 16 Apr 2024 14:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E3D712CD91;
+	Tue, 16 Apr 2024 14:33:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LHdpc4bl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dt34q4aB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2AC61CAA6
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 14:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A19D12BF14
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 14:33:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713277904; cv=none; b=HQUsVg2J39I/P1dliDRxiQQYRLVJ7p29JSFGAtKzmknopVeQmIL7RqZs24d9D08GcWQu6diip1i7SyGQQZpFNK9hQdeLbBca69CLEY8AcvO5Bk3R5bZCarV3s5uWn3F4itT4ze0DJ5DMVLDktupwZGRiXA2QV03JAF5HRf2WHgQ=
+	t=1713278009; cv=none; b=GJaM1kFCugeBBy3wXJG9gAaSBrBG8/lpLvR8biHGMhPfA5T03yoL4MjWa9c/dHxg6OIUBhFSt6hHPOoN/CtH1tHMR5jbZ+9nzd85wrBr7gWxbhJ0WsH12d9cyjsym1WOD/bLwJ0nbRjun1oRzXmCKmWf2xQ4AzdAVoN1goQynHA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713277904; c=relaxed/simple;
-	bh=n6qs9LjIi04AReiV2pJvW/dGAVlfRkYMDDsBHcp2zk0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MkUPGbPXMTbUqi0E1Fy/duSPqMpdiAt3d2ZsFJNxL6aVFvpWc25EsZgwUq1x861Lwq4ngf2ldgJXGC2Fx/mxOg6ti++oI2QG8u9v2iTmnkHLXpSfu2NUjkOj30nGhsrRI2lxsWsi9UrX5QSg7axF4wEf49oVa2MLKdPf4Fn1XMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LHdpc4bl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13987C113CE;
-	Tue, 16 Apr 2024 14:31:44 +0000 (UTC)
+	s=arc-20240116; t=1713278009; c=relaxed/simple;
+	bh=mhwbcjqLrz5XXdHAHG7RO7Vg4LmFPW8936lZlOYOXoQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=si49qaWbC6p2kGpqfeViZ+GzNiJhOZiGjKw4xv1dmf9E7odM+eJXTgl/Af7GylO3HK9pYXtm8O6Ie4SShK1Irmo1b6FfXqz8bR5B70FB67/c/iDHU1R7FsDSI7lSJ2xMLGG3NHgJcqNXgiL7FcUzX5ece+7CS/3cwHehA4bOwcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dt34q4aB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE21FC2BD10;
+	Tue, 16 Apr 2024 14:33:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713277904;
-	bh=n6qs9LjIi04AReiV2pJvW/dGAVlfRkYMDDsBHcp2zk0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LHdpc4blkmFqGlZCTuO5OJ7TOEy3/acrVFwhy+Pmt7RQ1nw8CwXPLcQJvbZzfdQH/
-	 qQzNoZhGBzdFeYWkseSCtE2yyfaZNiHYZVYlvQxjoUuooD1dVfdwKLQ+THcek/MxVG
-	 wv5lyKoR5+8wTDumCndD2JZx532d2yE87kj4KZgdZ9hejZHYUIDA/3F9FHWNs5vVdJ
-	 Qqg3rqjEfPyDJh9qRpx3Sj0NAU4QXv1swkCU/bbgxv+TLtp8lAWfMu/8Rz7vGqC2e2
-	 Bn4dckxLEq1bu8ygBmbNcF3wS3etGF6xHDloNdlj4HlXttsKL/CPYufW3Ounk7igSG
-	 zuVoAoBwvCHKg==
-Date: Tue, 16 Apr 2024 07:31:43 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
-Cc: netdev@vger.kernel.org, Jiawen Wu <jiawenwu@trustnetic.com>,
- =?UTF-8?B?5rip56uv5by6?= <duanqiangwen@net-swift.com>
-Subject: Re: [PATCH net-next v3 0/6] add sriov support for wangxun NICs
-Message-ID: <20240416073143.581a56c5@kernel.org>
-In-Reply-To: <36569F35-F1C1-44DB-AC46-4E67158EEF0A@net-swift.com>
-References: <587FAB7876D85676+20240415110225.75132-1-mengyuanlou@net-swift.com>
-	<20240415112708.6105e143@kernel.org>
-	<36569F35-F1C1-44DB-AC46-4E67158EEF0A@net-swift.com>
+	s=k20201202; t=1713278009;
+	bh=mhwbcjqLrz5XXdHAHG7RO7Vg4LmFPW8936lZlOYOXoQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dt34q4aBcI5vx2JLLMv9oIAmJgt5ClnRjP6xTFUPPIq2QtMxGMoPvxtc7KtkbW4OE
+	 r5ppMb1MaPd7mwmbc9CGyqBSKsegpqFlWCZgnzmPOag5KS/o3Uwlevfnj6A5OllSc6
+	 EkUTkB5NNjSPVSV8b0KjoCRvAPyLV4I7Wy+T8pwnJSJ3ksdzrCM+rDNe1et2n58lR/
+	 /KyPuyBlfx3osKRhuJzRSwQuLh1UU3sFaoVPCPiUOtj065zrfc+MPDWVLrGtiPhSw2
+	 IfRpTuLqFUuKlfFORKOsIr9W89D1zYImFUjwP74gqPCT865YoSEWGxUlBWuDjsM7En
+	 cFQdNSgVVXjvA==
+Date: Tue, 16 Apr 2024 15:33:24 +0100
+From: Simon Horman <horms@kernel.org>
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
+	mlxsw@nvidia.com, Tim 'mithro' Ansell <me@mith.ro>
+Subject: Re: [PATCH net 3/3] mlxsw: pci: Fix driver initialization with old
+ firmware
+Message-ID: <20240416143324.GP2320920@kernel.org>
+References: <cover.1713262810.git.petrm@nvidia.com>
+ <449181a5ed544dd4790ae4d650586436848007cd.1713262810.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <449181a5ed544dd4790ae4d650586436848007cd.1713262810.git.petrm@nvidia.com>
 
-On Tue, 16 Apr 2024 10:55:16 +0800 mengyuanlou@net-swift.com wrote:
-> > On Mon, 15 Apr 2024 18:54:27 +0800 Mengyuan Lou wrote:  
-> >> Do not accept any new implementations of the old SR-IOV API.
-> >> So remove ndo_vf_xxx in these patches.  
-> > 
-> > But you're not adding support for switchdev mode either, 
-> > so how are you going to configure them?  
+On Tue, Apr 16, 2024 at 12:24:16PM +0200, Petr Machata wrote:
+> From: Ido Schimmel <idosch@nvidia.com>
 > 
-> Do you mean .sriov_configure?
-> Had implement it in patch2 and add it patch5/6.
+> The driver queries the Management Capabilities Mask (MCAM) register
+> during initialization to understand if a new and deeper reset flow is
+> supported.
+> 
+> However, not all firmware versions support this register, leading to the
+> driver failing to load.
+> 
+> Fix by treating an error in the register query as an indication that the
+> feature is not supported.
+> 
+> Fixes: f257c73e5356 ("mlxsw: pci: Add support for new reset flow")
+> Reported-by: Tim 'mithro' Ansell <me@mith.ro>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
 
-No, I mean configuring the forwarding, VF MAC addrs, getting stats, etc.
+Reviewed-by: Simon Horman <horms@kernel.org>
+
 
