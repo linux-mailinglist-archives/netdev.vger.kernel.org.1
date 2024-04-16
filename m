@@ -1,180 +1,225 @@
-Return-Path: <netdev+bounces-88316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B7F38A6A5F
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:11:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63E208A6AC2
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:21:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0EDB2829D8
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:11:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D51421F2193A
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:21:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F8212BE8C;
-	Tue, 16 Apr 2024 12:10:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469FF12C485;
+	Tue, 16 Apr 2024 12:19:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JNUj3Y9T"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WR9gTknF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D0B12AACC;
-	Tue, 16 Apr 2024 12:10:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2FF12C481
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 12:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713269439; cv=none; b=Jmjgt/VyZwlQ4MDapGlY/rBWGNKbW0u5gR6C8yKZ5nMjWG7HbuNUc5GctJrqyOaKS27LbgwpYdjb1fC15xWKBcT7pN/lvfkvwRFpQ32ETMj3g0luEaz0K/Ph1Xj7OdD1MSHaMyXj60u3THAoTn+1zB2uN10yxyOX7x61UD9KH2Q=
+	t=1713269981; cv=none; b=D9mI+IbHbJlds8A/G0qVhCoEgF/RbSUazdXrVFHq0kh9cnTItlUoRUTdGRFEt3KhYmdIhyTF28qb/GjLLPZ5IFy9bWYM985/j0BEudn9F7e3PI+Tbcmjy3AYZsBxtmSoVcaxGDPK7ld0eFmZzvX+K9k+5zsbfLwZfBret5U988U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713269439; c=relaxed/simple;
-	bh=Np0xodRkfHCyc2ASkxWCyonOqAUzHF+7BznmT2uScWQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=N3qluMBkNIQkoNPpKkof//8Sz/FtjnBMjR81aP2DjZzqNMunxx3tB9zxPQomELtTCtX+n23BBNI0gzygslFMliO5s4zTNYV8VteCzUag+s/3wOUUykE6eRCVGRjNvZfmvDufNQZV+HTL8z/xnNF+eQkw7f2Zori6N8/F5wgAiuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JNUj3Y9T; arc=none smtp.client-ip=209.85.218.52
+	s=arc-20240116; t=1713269981; c=relaxed/simple;
+	bh=yekDoSMPIs7ET75V7Z52GKdQ8aYWEp+cGIOiKti/F6A=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=Gz9JblDgbxWhtpu4V3MngS/TTC7ec1xzfkhnhSPckTKwCAbVeQ0fnQvC6HUtGXMGvs3c1EOWagRBLjle0PaE/JnzMKLo+esY4ZF6iZ7kDtUpWoAOJO629wy8GkaPu+ud40K+8IKkRvbWEFB3874ZHuqQGarzokWlXLZNxxpyqbM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WR9gTknF; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a51a7d4466bso491686966b.2;
-        Tue, 16 Apr 2024 05:10:37 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1e2be2361efso7348155ad.0
+        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 05:19:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713269435; x=1713874235; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EywP0ORbcwYupTHjZxnseaKIdgopmLjXc6Kh63nwRpk=;
-        b=JNUj3Y9TXOQQv8ZMjEKJhMTK4/Rqv1zS0d//069auA1SJKhTlqtcp5FDN34qPJvdV1
-         e3NiVVBsET+LHx8VvUjeR1+FAjc6EpkziQ5SVrLA1JMH/CeBY6JsKECGYrXqPglCeu7b
-         hVfkgYY8CbWU6PacwSUbtNneX2zJmco+u1ZYTE1F43QueW+zNlRQyCJluy4WT5g/KcdK
-         pW9HIPpgchqCPyhKxR2xiYBH0lkFRj6s7jhT9vHAe5gaNqrJfyMDxZTLUQH73frEOeWe
-         P/jZ1RKrdqFDDe2uIHiS55ijpga5435GBjoCbVsRldPcfOshe0Mq9fKb39Go6SIMSuDh
-         gCrg==
+        d=gmail.com; s=20230601; t=1713269979; x=1713874779; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JX3ysg83DC7xVvgYObrnTkfp4//VheRNGQlTemkEcVQ=;
+        b=WR9gTknF/M5b/G14PgOzx9v5vjmxxJz5QU1egFtCUDD4DgCLhPwJu/u7NMbON2OYMy
+         mjLh2VCMx9OC8pUHPXGwFTYaOTNqToiWvHBOohwtCwc0lxX3YmEtyJDKMjVg5CQYPq48
+         o6nqYORIUCn1pewEMY9WCJuEwhio5Qdb08d/kUWYUMxqb74sQhn7LZEzILlGDQLegyYd
+         FljPQGTCIJPQq3nOSfHRVLyKXppFEd8tSFUJETJHqUnLwRRWCxmDSWIsn2IjMqWRQoCx
+         ishRXPRtTnxlfQ4fQ9gQInEPYhJF7+KmvuJq6e7t3gYBl62Egxl+h6WSBdwLgk04Jrnh
+         p2xQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713269436; x=1713874236;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EywP0ORbcwYupTHjZxnseaKIdgopmLjXc6Kh63nwRpk=;
-        b=AOue4lpoFvoDSWpKTdbdHoq3pS1fdbbTson0cSHmdTxuxB/YlH4qrffaT6V5/k2x/l
-         gYRh6XStOaj1vsKb23o4sVmAGbGCLaD+9XVXRO2cePTz/sTh93DElQnrSKREXGvlAmzN
-         EyME5erjQnqLuJ7/hz2cTxnoxIoFFFQfPVxTB2RCYyb/kwJhzoQMNOVdA6taAuvkA9g0
-         GmoUbyllZWzWeBrLJuOfCiWC0IsVCH+rW8RCMUmDeMrp8TkqmmPR3VK7yggi7pUgvTiC
-         cq7PO8SBLpKgdmcsQlUxnSu4sNEi0W6cFHEQk1sYDF7l7bCU/1yiEyl6icRqk8qkE2CQ
-         r0Ig==
-X-Forwarded-Encrypted: i=1; AJvYcCVl6ldDqIvf53R2y5W+l4uHkdRT+xAXjIL714IHH9La98hBRp+T4ipWC1Xw7CkTgY5tfeCoElzhncPTZktyPoc21p/nQWsrvRxqa7Qr4JL1/wYY6lo3KPmH+bmwsRdegireh4YcedyPqw==
-X-Gm-Message-State: AOJu0YzPid4OXGQbKGtq/S+91QIJ4/1A4s+ZQdxDiz+JT6w5JT/tHfvZ
-	09gKpicR6SuXk1q6iLIq403TpoviaXgADkUvgROUfhh8n7VmV7iG
-X-Google-Smtp-Source: AGHT+IHSL8lBWdoxil/kiJaFxgpUjKdUY4oR9IJ/STOc6VcsQt43Bj6omc0sg9tnSjrfSQCkXj4Hag==
-X-Received: by 2002:a17:907:8690:b0:a55:357d:1ed4 with SMTP id qa16-20020a170907869000b00a55357d1ed4mr2809328ejc.6.1713269435516;
-        Tue, 16 Apr 2024 05:10:35 -0700 (PDT)
-Received: from eichest-laptop.netmodule.intranet ([77.109.188.34])
-        by smtp.gmail.com with ESMTPSA id hg17-20020a170906f35100b00a469d3df3c1sm6767509ejb.96.2024.04.16.05.10.34
+        d=1e100.net; s=20230601; t=1713269979; x=1713874779;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JX3ysg83DC7xVvgYObrnTkfp4//VheRNGQlTemkEcVQ=;
+        b=Flx+93RPYIoqg6/0MiaV3xjhEukjT13vJk2Av83offgYkH/b+VOu3D8NjOC5QCFakj
+         J5a3hHMtpY9lapusE6EPn/QautaB7qTqKaqQPKA1lP8MNmuTMNB+FBSdbPW98/JiZUjO
+         AHA/6wstoh8PS6rB/4RDB+9PHmiOSxdrslTRcNtrzFmShA5lTc5Om3uL+6CfdeCJlmGa
+         de/JjlWB2BIZkZvMs8SZcLEGDGr5nlwkdLs17yjQ1wfCloTtX+viiDP5b3KDHFJltoaT
+         gxjKpDYHWSXU8BbTU7umS+EhcpNSaFzIpNT1R/DczCBQr2ZY5JqnnnYIO4gLnUujkgg8
+         7BxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVr8lvai3w4+EgUFk1snLlHMszl7q7Mar5ePeSoKxDWe6Y8Z/wuBxmuXteAREa4jCn0y3e5vg8KY3T4hLlkaE62gCjcLxlY
+X-Gm-Message-State: AOJu0YxLxEYEgBg2Uzyh95/K2qUKPb70gVpnA1arnA2Ld9FuG83thFbw
+	8heEhXSdDvyUX/kW7B2TNtXjCsS263IeqluIBaUDrrKef9An7OkQphiQFJK7
+X-Google-Smtp-Source: AGHT+IGaHuwfeplw6/GsiZdCO9wIcCd1Y4Voq582KwVxjdWway/y5ZhGEQ/RlFVL+9xP8tzkrJebJw==
+X-Received: by 2002:a17:902:f542:b0:1e2:b3d:8c67 with SMTP id h2-20020a170902f54200b001e20b3d8c67mr14787129plf.6.1713269979066;
+        Tue, 16 Apr 2024 05:19:39 -0700 (PDT)
+Received: from localhost (p5315239-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.87.239])
+        by smtp.gmail.com with ESMTPSA id p18-20020a1709028a9200b001e2b4f513e1sm9618580plo.106.2024.04.16.05.19.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 05:10:35 -0700 (PDT)
-From: Stefan Eichenberger <eichest@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org,
-	conor+dt@kernel.org,
-	lxu@maxlinear.com,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	michael@walle.cc
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property to disable SGMII autoneg
-Date: Tue, 16 Apr 2024 14:10:32 +0200
-Message-Id: <20240416121032.52108-3-eichest@gmail.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240416121032.52108-1-eichest@gmail.com>
-References: <20240416121032.52108-1-eichest@gmail.com>
+        Tue, 16 Apr 2024 05:19:38 -0700 (PDT)
+Date: Tue, 16 Apr 2024 21:19:26 +0900 (JST)
+Message-Id: <20240416.211926.560322866915632259.fujita.tomonori@gmail.com>
+To: andrew@lunn.ch
+Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v1 5/5] net: tn40xx: add PHYLIB support
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <7c20aefa-d93b-41e2-9a23-97782926369d@lunn.ch>
+References: <20240415104352.4685-1-fujita.tomonori@gmail.com>
+	<20240415104352.4685-6-fujita.tomonori@gmail.com>
+	<7c20aefa-d93b-41e2-9a23-97782926369d@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-Add a new device tree property to disable SGMII autonegotiation and
-instead use the option to match the SGMII speed to what was negotiated
-on the twisted pair interface (tpi). This allows us to disable SGMII
-autonegotiation on Ethernet controllers that are not compatible with
-this mode.
+Hi,
 
-Signed-off-by: Stefan Eichenberger <eichest@gmail.com>
----
- drivers/net/phy/mxl-gpy.c | 18 +++++++++++++++++-
- 1 file changed, 17 insertions(+), 1 deletion(-)
+On Mon, 15 Apr 2024 16:44:31 +0200
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-diff --git a/drivers/net/phy/mxl-gpy.c b/drivers/net/phy/mxl-gpy.c
-index b2d36a3a96f1..4147b4c29eaf 100644
---- a/drivers/net/phy/mxl-gpy.c
-+++ b/drivers/net/phy/mxl-gpy.c
-@@ -114,6 +114,7 @@ struct gpy_priv {
- 	 * is enabled.
- 	 */
- 	u64 lb_dis_to;
-+	bool sgmii_match_tpi_speed;
- };
- 
- static const struct {
-@@ -262,8 +263,17 @@ static int gpy_mbox_read(struct phy_device *phydev, u32 addr)
- 
- static int gpy_config_init(struct phy_device *phydev)
- {
-+	struct gpy_priv *priv = phydev->priv;
- 	int ret;
- 
-+	/* Disalbe SGMII Autoneg if we want to match SGMII to TPI speed */
-+	if (priv->sgmii_match_tpi_speed) {
-+		ret = phy_modify_mmd(phydev, MDIO_MMD_VEND1, VSPEC1_SGMII_CTRL,
-+				     VSPEC1_SGMII_CTRL_ANEN, 0);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
- 	/* Mask all interrupts */
- 	ret = phy_write(phydev, PHY_IMASK, 0);
- 	if (ret)
-@@ -304,6 +314,9 @@ static int gpy_probe(struct phy_device *phydev)
- 	if (!device_property_present(dev, "maxlinear,use-broken-interrupts"))
- 		phydev->dev_flags |= PHY_F_NO_IRQ;
- 
-+	priv->sgmii_match_tpi_speed =
-+		device_property_present(dev, "maxlinear,sgmii-match-tpi-speed");
-+
- 	fw_version = phy_read(phydev, PHY_FWV);
- 	if (fw_version < 0)
- 		return fw_version;
-@@ -516,6 +529,7 @@ static int gpy_update_mdix(struct phy_device *phydev)
- 
- static int gpy_update_interface(struct phy_device *phydev)
- {
-+	struct gpy_priv *priv = phydev->priv;
- 	int ret;
- 
- 	/* Interface mode is fixed for USXGMII and integrated PHY */
-@@ -529,6 +543,8 @@ static int gpy_update_interface(struct phy_device *phydev)
- 	switch (phydev->speed) {
- 	case SPEED_2500:
- 		phydev->interface = PHY_INTERFACE_MODE_2500BASEX;
-+		if (!gpy_sgmii_aneg_en(phydev))
-+			break;
- 		ret = phy_modify_mmd(phydev, MDIO_MMD_VEND1, VSPEC1_SGMII_CTRL,
- 				     VSPEC1_SGMII_CTRL_ANEN, 0);
- 		if (ret < 0) {
-@@ -542,7 +558,7 @@ static int gpy_update_interface(struct phy_device *phydev)
- 	case SPEED_100:
- 	case SPEED_10:
- 		phydev->interface = PHY_INTERFACE_MODE_SGMII;
--		if (gpy_sgmii_aneg_en(phydev))
-+		if (gpy_sgmii_aneg_en(phydev) || priv->sgmii_match_tpi_speed)
- 			break;
- 		/* Enable and restart SGMII ANEG for 10/100/1000Mbps link speed
- 		 * if ANEG is disabled (in 2500-BaseX mode).
--- 
-2.40.1
+> On Mon, Apr 15, 2024 at 07:43:52PM +0900, FUJITA Tomonori wrote:
+>> This patch adds supports for multiple PHY hardware with PHYLIB. The
+>> adapters with TN40xx chips use multiple PHY hardware; AMCC QT2025, TI
+>> TLK10232, Aqrate AQR105, and Marvell 88X3120, 88X3310, and MV88E2010.
+>> 
+>> For now, the PCI ID table of this driver enables adapters using only
+>> QT2025 PHY. I've tested this driver and the QT2025 PHY driver with
+>> Edimax EN-9320 10G adapter.
+> 
+> Please split this up. Add the MDIO bus master in one patch. Then add
+> support for phylib in a second patch. They are logically different
+> things.
 
+Understood, I'll split this in v2.
+
+
+> Are there variants of this device using SFP? It might be you actually
+> want to use phylink, not phylib. That is a bit messy for a PCI device,
+> look at drivers/net/ethernet/wangxun.
+
+phylink is necessary if PHY is hot-pluggable, right? if so, the driver
+doesn't need it. The PHYs that adapters with TN40XX use are
+
+AMCC QT2025 PHY (SFP+)
+- Tehuti TN9310
+- DLink DXE-810S
+- Asus XG-C100F
+- Edimax EN-9320
+
+Marvell MV88x3120 (10GBase-T)
+- Tehuti TN9210
+
+Marvell MV88X3310 (10GBase-T)
+- Tehuti TN9710
+- Edimax EN-9320TX-E
+- Buffalo LGY-PCIE-MG
+- IOI GE10
+- LR-Link LREC6860BT
+- QNAP PCIe Expansion Card
+
+Marvell MV88E2010 (5GBase-T)
+- Tehuti TN9710Q
+
+TI TLK10232 (SFP+)
+- Tehuti TN9610
+- LR-Link LREC6860AF
+
+Aquantia AQR105 (10GBase-T)
+- Tehuti TN9510
+- DLink DXE-810T
+- Edimax EN-9320TX-E
+
+
+>> diff --git a/drivers/net/ethernet/tehuti/Kconfig b/drivers/net/ethernet/tehuti/Kconfig
+>> index 4198fd59e42e..71f22471f9a0 100644
+>> --- a/drivers/net/ethernet/tehuti/Kconfig
+>> +++ b/drivers/net/ethernet/tehuti/Kconfig
+>> @@ -27,6 +27,7 @@ config TEHUTI_TN40
+>>  	tristate "Tehuti Networks TN40xx 10G Ethernet adapters"
+>>  	depends on PCI
+>>  	select FW_LOADER
+>> +	select AMCC_QT2025_PHY
+> 
+> That is pretty unusual, especially when you say there are a few
+> different choices.
+
+I should not put any 'select *_PHY' here?
+
+
+>> +static u32 bdx_mdio_get(struct bdx_priv *priv)
+>> +{
+>> +	void __iomem *regs = priv->regs;
+>> +
+>> +#define BDX_MAX_MDIO_BUSY_LOOPS 1024
+>> +	int tries = 0;
+>> +
+>> +	while (++tries < BDX_MAX_MDIO_BUSY_LOOPS) {
+>> +		u32 mdio_cmd_stat = readl(regs + REG_MDIO_CMD_STAT);
+>> +
+>> +		if (GET_MDIO_BUSY(mdio_cmd_stat) == 0)
+>> +			return mdio_cmd_stat;
+>> +	}
+>> +	dev_err(&priv->pdev->dev, "MDIO busy!\n");
+> 
+> include/linux/iopoll.h
+> 
+>> +	return 0xFFFFFFFF;
+> 
+> It is always better to use standard error codes. In this case,
+> -ETIMEDOUT.
+
+I'll
+
+
+>> +static u16 bdx_mdio_read(struct bdx_priv *priv, int device, int port, u16 addr)
+>> +{
+>> +	void __iomem *regs = priv->regs;
+>> +	u32 tmp_reg, i;
+>> +	/* wait until MDIO is not busy */
+>> +	if (bdx_mdio_get(priv) == 0xFFFFFFFF)
+>> +		return -1;
+>> +
+>> +	i = ((device & 0x1F) | ((port & 0x1F) << 5));
+>> +	writel(i, regs + REG_MDIO_CMD);
+>> +	writel((u32)addr, regs + REG_MDIO_ADDR);
+>> +	tmp_reg = bdx_mdio_get(priv);
+>> +	if (tmp_reg == 0xFFFFFFFF)
+>> +		return -1;
+> 
+> This function has a return type of u16. So returning -1 makes no sense.
+
+Yeah, I thought the same but left it alone. I'll change in v2.
+
+
+>> +static int mdio_read_reg(struct mii_bus *mii_bus, int addr, int devnum, int regnum)
+>> +{
+>> +	return bdx_mdio_read(mii_bus->priv, devnum, addr, regnum);
+> 
+> I would probably change bdx_mdio_read() so that it takes the
+> parameters in the same order as mdio_read_reg().
+
+Sure, I'll.
+
+
+> There is also a reasonably common convention that the functions
+> performing C45 bus protocol operations have c45 in their name. It
+> appears this hardware does not support C22 at all. That makes it
+> unusual, and little hits like this are useful.
+
+I'm not sure the adapters supports C22 or not (probably do, I
+guess). But the original driver uses C45 bus protocol operations.
 
