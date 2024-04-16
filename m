@@ -1,150 +1,174 @@
-Return-Path: <netdev+bounces-88231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 306268A6657
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:44:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B6FA8A6691
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:58:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8FBBFB20DDE
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:44:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D115B24901
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8D9482D82;
-	Tue, 16 Apr 2024 08:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1669983CC1;
+	Tue, 16 Apr 2024 08:58:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sfqe+/XQ"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="G5mY67qz";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="PQAea+fT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from flow1-smtp.messagingengine.com (flow1-smtp.messagingengine.com [103.168.172.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C05D7EEB7;
-	Tue, 16 Apr 2024 08:44:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73F5F2907;
+	Tue, 16 Apr 2024 08:58:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713257057; cv=none; b=lWpoMbD5K/ZxWNWktp7IinLhuuZjrcS/X5UMNANTarfuvoanlUvy7UsfLgVjHMhgM03tAngjt8x8cNBw8jF56pyexjOQ8dHt6aYVTT8zleQIclrVlV52uNyXAoa0CtaZ6rtLvIg206fA1UEmPDWzfoyTMcP9/aKf1Ku1N6h3s3U=
+	t=1713257889; cv=none; b=cb1pJSVMmLQo8SRmSlMoTS7MkeeO8PoOmqwQ0JbzU1u6pZSPeuHs5b+LCVlRkG/cvcWoXUJMbNkwwdXmBqPGaVHjWiicGwsSvYL2mHziCpO0n/NL/Sx4yghw95qvlvdu7eGAj0EXjq6Ba7TwDKsdZZusz9nVCMpF28ISxEILcLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713257057; c=relaxed/simple;
-	bh=wzQ1AYXTGr5az/pyEpj7BjxnP08LN1p5OfLYS23YDAE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ryf7PfXDvWc7NVeEnz3+JEwEFV+/7agogV0Yoonvy6cOm8I4Z5pV8BF59uJfRJTb5ZviWUCFbWSz3ciV3DkAGWlS/95qhFOiDM6abxmxohglyUjF8eRvXMiAR66gL8ymcgHUtiIkljNChkSBYqNl4uTmuT/imvurm/7Y3+UMFJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sfqe+/XQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7CC3BC113CE;
-	Tue, 16 Apr 2024 08:44:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713257057;
-	bh=wzQ1AYXTGr5az/pyEpj7BjxnP08LN1p5OfLYS23YDAE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=sfqe+/XQmepM1HPmDwJ46+tIyidLRfA28k+ZDddgrUjm71BGB2d3TZ39/r+N99Nyx
-	 w3YuFdf7j4yaW9KyQcaKluOqnT+QqFLS5KlTP62NTIn9XQEdZsTiPuEBRwjZDgUkrx
-	 Zpw2i60xnh5hdrzTLyhhP7Ao9jp1LyC9rlg1qeDluvs85x0B/eEoy3DlRCwhU4qSSZ
-	 GRt7ATd2k7P0zsHXayositbL312+Se3P6T72At6h32IXGBspkhLVG25GFnBSmT3HJM
-	 v5kuEmTOamUNlcHUEXdGZ9me1QKEvqL4GUAArpUrrXlyDeBN1GcyWTadjni/AqjoML
-	 F4jZPvn0gAdog==
-Message-ID: <ce433aee-b478-4fcf-b8e1-3b38bfca795a@kernel.org>
-Date: Tue, 16 Apr 2024 10:44:13 +0200
+	s=arc-20240116; t=1713257889; c=relaxed/simple;
+	bh=4/1ePeI69MfhY87vj18253cEWi6mAn19+2Xq/5mfrVw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LQEkRFUTgaG9eNePj8Tk/Gi/2ErkaTnQtTmmG/D6ovLEzbm7J1kvQOZmz+TAKAXZdbYNvx1WlZFx+eBeQvTz3E3drrwW6FSUEuNjC/rQJ6P5dlpsArjAtv83I7ARo7MbccWfwXNXmNTwgcMewsadkH4l0F1Wc06r1zHUkYUojSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=G5mY67qz; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=PQAea+fT; arc=none smtp.client-ip=103.168.172.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from compute7.internal (compute7.nyi.internal [10.202.2.48])
+	by mailflow.nyi.internal (Postfix) with ESMTP id 3D6D320030A;
+	Tue, 16 Apr 2024 04:58:05 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute7.internal (MEProxy); Tue, 16 Apr 2024 04:58:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1713257885;
+	 x=1713261485; bh=2vpzAJq9BdhgMku9x0Zyb1TfC6+YDET8qPtrzKEqebs=; b=
+	G5mY67qzN2jWP7fcyNPtkQTsK7gq2dy+HnqFzmKUouFApIcuyQbnXOoFK8hou1Ye
+	slrQzXzrWhc3VpMXh+EC0cErXyBfXnZmmPqHqp8CZKYl/aGLyyp1Z+fDi5EesTnP
+	rSaZ2Y/mylaOrv7bQO/YYaNcK1hulrSEx4G/1EbqB/ou3TnaGZ7T7d928yTY65lZ
+	NCNIPEp1OnHMswcG6Y+jN2nAqg1eUYL75enX8jhwvdpnDnNq8U3Bu1pVrsBIfD6U
+	z169vOROPcM6an69I9sWoaplPqRGcGJ/RmwUDnvf3Mgoq0WTWR9ymzKN6bDtC0JO
+	YYudFTOQdl9mDqKsuUg1Uw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1713257885; x=
+	1713261485; bh=2vpzAJq9BdhgMku9x0Zyb1TfC6+YDET8qPtrzKEqebs=; b=P
+	QAea+fTKL/0s4ynJlqUt95Im2AFnw1Eq26a5ScfUY3iTrFJPCSQi2gLv+SZ20Hzn
+	zgHjxNqUK9tK9b7dVeI4AAirAPlJJ19c2aOKYzyWbSsXbZysp+zLfzna7f3ep6GM
+	lWpIJ78MyUAfj2epMK5IFJpa2gGd6qwoeROUeUBaW7vk0AG0kBxajAhNSkhm4z9v
+	xgTLieVGhJ+jWnK1WRNDQbjIhXU5CF3Lv30PS+yNwFBU7huBwh092+MdvvXHcZI8
+	ESP0hYJJAnJrcBlAfOqNLYoty2g8g0/FtAcGNVIqNumiLtrDi82cru93+9etxm1l
+	Vq0Flwloz+OCP7I0u8hAw==
+X-ME-Sender: <xms:nD0eZlZw6lwvN1U2VchrTp7TeykmfUh6RtUGeQLOrJvRok0GUzA4WA>
+    <xme:nD0eZsY0_ZvVsnh8dsGA7YcUiVaICHygRZyk6b-oR78v6K0Dq_GPSl35OSq4jPr2f
+    WFZxkPgisx9OoW0BvM>
+X-ME-Received: <xmr:nD0eZn-0ITqNMK4ZJz7qVfwKcZ4voLBeJvn3qzzmp25T7qBdhEaC-5RWb46H2lkKj0vRUJYrs9GJrrvmZUvqNigKh9SLFR0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudejgedgtdelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhk
+    lhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnh
+    gvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeffkefgudek
+    gefhhfejtedviedtgeetieekffeiudfhgeevteejvedtffdvkefftdenucffohhmrghinh
+    epkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehm
+    rghilhhfrhhomhepnhhikhhlrghsrdhsohguvghrlhhunhguodhrvghnvghsrghssehrrg
+    hgnhgrthgvtghhrdhsvg
+X-ME-Proxy: <xmx:nD0eZjpge9Sf3M8RY92iLJy4MZ_OTXEs3aUaJQMWoHJjOqEymjSmoA>
+    <xmx:nD0eZgrZt47jlLiZBa_XF4Xv4r1S5z1-xpldvbT9TPc12jwlkwU_rg>
+    <xmx:nD0eZpQBZTNfwEgAbWELDLFkjKs63Gp0iHJ4FnBaeLNdVewZlKP0Zg>
+    <xmx:nD0eZoo1euBj95x2zzZPHFG_yGasXUSc9pQoEbwPwFJtYBUinSiltg>
+    <xmx:nT0eZlD8E6CT8_AqNFgOxwZanhndxKHsff3Ki-rpfPyrKMc0zH2CuKNV>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 16 Apr 2024 04:58:03 -0400 (EDT)
+Date: Tue, 16 Apr 2024 10:58:02 +0200
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next] net: ethernet: rtsn: Add support for Renesas
+ Ethernet-TSN
+Message-ID: <20240416085802.GE3460978@ragnatech.se>
+References: <20240414135937.1139611-1-niklas.soderlund+renesas@ragnatech.se>
+ <5fd25c58-b421-4ec0-8b4f-24f86f054a44@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next 01/12] selftests: netfilter:
- conntrack_icmp_related.sh: move to lib.sh infra
-Content-Language: en-GB
-To: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org
-Cc: Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- netfilter-devel@vger.kernel.org, pablo@netfilter.org
-References: <20240414225729.18451-1-fw@strlen.de>
- <20240414225729.18451-2-fw@strlen.de>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20240414225729.18451-2-fw@strlen.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5fd25c58-b421-4ec0-8b4f-24f86f054a44@lunn.ch>
 
-Hi Florian,
+Hi Andrew,
 
-On 15/04/2024 00:57, Florian Westphal wrote:
-> Only relevant change is that netns names have random suffix names,
-> i.e. its safe to run this in parallel with other tests.
+Thanks for your thorough review, much appreciated.
 
-According to the patch title and description, it looks like something is
-missing from the diff below where on the 'config' file is modified, no?
+I agree with all suggestions except one and will fix those for v2.
 
-Same for patch 2/12 where we have the opposite modification.
+On 2024-04-16 00:55:12 +0200, Andrew Lunn wrote:
 
-(BTW, it is good to see all the shellcheck cleanups, my text editor will
-show fewer warnings :) )
+<snip>
+
+> > +static void rtsn_set_delay_mode(struct rtsn_private *priv)
+> > +{
+> > +	struct device_node *np = priv->ndev->dev.parent->of_node;
+> > +	u32 delay;
+> > +	u32 val;
+> > +
+> > +	val = 0;
+> > +
+> > +	/* Valid values are 0 and 1800, according to DT bindings */
+> 
+> The bindings should not matter. It is what the hardware supports. The
+> bindings should match the hardware, since it is hard to modify the
+> hardware to make it match the binding.
+
+I agree the comment could be improved. It should likely point to the 
+datasheet instead. See below for why.
 
 > 
-> Signed-off-by: Florian Westphal <fw@strlen.de>
-> ---
->  tools/testing/selftests/net/netfilter/config | 2 ++
->  1 file changed, 2 insertions(+)
+> > +	if (!of_property_read_u32(np, "rx-internal-delay-ps", &delay))
+> > +		if (delay)
+> > +			val |= GPOUT_RDM;
+> > +
+> > +	/* Valid values are 0 and 2000, according to DT bindings */
+> > +	if (!of_property_read_u32(np, "tx-internal-delay-ps", &delay))
+> > +		if (delay)
+> > +			val |= GPOUT_TDM;
+> > +
+> > +	rtsn_write(priv, GPOUT, val);
 > 
-> diff --git a/tools/testing/selftests/net/netfilter/config b/tools/testing/selftests/net/netfilter/config
-> index 9df6a9f11384..a34c284242ec 100644
-> --- a/tools/testing/selftests/net/netfilter/config
-> +++ b/tools/testing/selftests/net/netfilter/config
-> @@ -2,6 +2,8 @@ CONFIG_AUDIT=y
->  CONFIG_BRIDGE_EBT_BROUTE=m
->  CONFIG_BRIDGE_EBT_REDIRECT=m
->  CONFIG_BRIDGE_NETFILTER=m
-> +CONFIG_NF_CONNTRACK=m
-> +CONFIG_NF_CT_NETLINK=m
->  CONFIG_IP_NF_MATCH_RPFILTER=m
->  CONFIG_IP6_NF_MATCH_RPFILTER=m
->  CONFIG_IP_SCTP=m
+> So you seem to be using it as bool?
 
-Cheers,
-Matt
+Yes.
+
+> That is wrong. It is a number of pico seconds!
+
+The issue is that the hardware only supports no delay or a fixed delay 
+that can depend on electric properties of the board. The datasheets 
+states that the typical Rx delay is 1800 ps while the typical Tx delay 
+is 2000 ps. The hardware register implementation for this is a single 
+bit for each delay, on or off.
+
+To model this in the bindings after some discussions [1] the standard 
+property was picked over a vendor specific bool variant of it. Here in 
+the driver I tried to document that the binding will enforce the value 
+to either be 0 or {1800,2000}, but that for the hardware it should be 
+treated as a on/off switch.
+
+<snip>
+
+1. https://lore.kernel.org/linux-renesas-soc/ZVzbigCtv2q_2-Bx@oden.dyn.berto.se/
+
 -- 
-Sponsored by the NGI0 Core fund.
-
+Kind Regards,
+Niklas Söderlund
 
