@@ -1,159 +1,126 @@
-Return-Path: <netdev+bounces-88239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3864D8A66BE
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 11:09:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CD8C8A66CF
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 11:14:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 692991C214DC
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 09:09:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19D9128629F
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 09:14:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C811E84A5C;
-	Tue, 16 Apr 2024 09:09:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB5F67A1A;
+	Tue, 16 Apr 2024 09:14:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M5tgH0p4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lrsZHW+U"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE18B205E10
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 09:09:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59185205E10
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 09:14:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713258569; cv=none; b=J1jK2SgVt1oqYeBHpsup3HMCLfR7oS6aebtlBKHaaKlOvkvli3AXIYxvWOl3Ior13tqX/51mFtjCZAwu6DaFE7EkTRsaMjAH+P9FKHOZGfeRgguz+V+Job5nKFbKXsaV4faRNvEgoH/DVBazDPcdb4niLhawhDfnSpMeXCvRHZE=
+	t=1713258888; cv=none; b=puth1ndZCiU2h/DPP5pVIqS3mQkqqQJQH4lCfdvmuHwbM370T6nJQynfMH1d0v73/SXGeFbHAg+OW5An610q4XoVrm9KY/NfUD2GbjtCsA8JcOlw+/Lz0WYqEcqHZnSXcJvPesoOvudsxWPZtApX2TlrNByGw2n4MwNhwnFSaY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713258569; c=relaxed/simple;
-	bh=xMgY05o4WNcGwMIbf2FoP4hSuwsoezTTxvV9Y0tGpJ0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QGIs3yaf6ovI7Lc0cN5+lSe7JN7m5Xed5jGOLKcSXJFF9tYYa8EoXx1mP47qDxcCNvPRKlmdNPiphMofJpYAwSagfP5lxF1jm/CyuoUhSF3erEeNjGamfuP3iH7fp8zQHbOT5X2guf2OnncUUIKlPjVJHKEelXtZjXTv/yfdJ5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M5tgH0p4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713258565;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=gSAH6Nk/9SCDTRf8sqeYrw4zixzICDDrHmbedYYm3Os=;
-	b=M5tgH0p44kPQMFenWYxCWoknKjWpJd4KHAbf/wGowj/o32YCMaYfEI50yP3M9+WYxP9n2L
-	vvPTQyG6zs0OKnkgXGgk0HLryerijk9k8mX3IU72etpFVMwWR4Brpar7WKoO33KvPZ3PAG
-	AHo1qwz7SlPpYDUPVC1REm626VkwE0o=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-433-MD1thbgZOoaGS9oUpN-O5g-1; Tue,
- 16 Apr 2024 05:09:22 -0400
-X-MC-Unique: MD1thbgZOoaGS9oUpN-O5g-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 79BBB29AC00E;
-	Tue, 16 Apr 2024 09:09:21 +0000 (UTC)
-Received: from antares.redhat.com (unknown [10.39.195.33])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4A4372026962;
-	Tue, 16 Apr 2024 09:09:18 +0000 (UTC)
-From: Adrian Moreno <amorenoz@redhat.com>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org (open list),
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	dev@openvswitch.org (open list:OPENVSWITCH),
-	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
-	Pravin B Shelar <pshelar@ovn.org>,
-	aconole@redhat.com,
-	"David S. Miller" <davem@davemloft.net>,
-	Shuah Khan <shuah@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Adrian Moreno <amorenoz@redhat.com>
-Subject: [PATCH net-next] selftests: openvswitch: Fix escape chars in regexp.
-Date: Tue, 16 Apr 2024 11:09:13 +0200
-Message-ID: <20240416090913.2028475-1-amorenoz@redhat.com>
+	s=arc-20240116; t=1713258888; c=relaxed/simple;
+	bh=p5A+FmshabQPklerWfVdNunFt6kxFD+LtiOLKOrRwmE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AzOB8GR4JdFnrPZoitjrpGOpFxN1tGcneHRgqOoAKJ6Tmnmi4EM3UyhkVWm/swTJg0vXcyK4FXuAct+wW/tFgsK0LJPYXJjX1PQM6ro3FbRU7iktgA8GU5l+a7cRtzFuM36ggWYPbbtr3PtMFsNVuQq87WtORmJfPII3HEurn08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lrsZHW+U; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5700ed3017fso8883a12.1
+        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 02:14:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713258886; x=1713863686; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3T1/g8SLYMEVMxmnwXmx00cL8lyMdNVj3Q9MXayeKsE=;
+        b=lrsZHW+UwhZbH6wn45Y38a+H9Rga72D6ax/KEqnNZC+WQM7Wy61G+dchKL4V+tP/fX
+         HhG9qLUjK0Aj08Su2oce+JZ/OTSoQVUpiZ0y0epaDtqrKFSwo0Eadpb/84OlkLypkH1Y
+         PhT5TGFnEIL5QlfM/gk9wLAkmBAOczL0GvPLtuxEiwdVXJgWgBSaEp92Xyo0q8FLq09L
+         LTlqP0mfVfgCDm60Pw2wXXJW3RtU1uY+/P5dD7nFCw8WOcx8pcLV2IdAQGA7IfAM7d/w
+         PKblYzP+On7gFtkGft39Zwggeqb8ItZLR+aWJhvkk5xhBY+9vWWdkJ7p8tt/Tjv4j7tb
+         v36A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713258886; x=1713863686;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3T1/g8SLYMEVMxmnwXmx00cL8lyMdNVj3Q9MXayeKsE=;
+        b=eINsBu+HmSIO5SH6ukGecWbWf3HwnehziJg3TlzV4rqe3qUcF5ovtOkRUXjWrAQfpx
+         3JSl6n/40OIL3NCKtLfyleiOSRPtce4ksaGBkPeiW5kPUfvVzQQoydwNh2+dZavlXt3b
+         KZKXxdr7CjxvQOg7yz+z+0mENo8wPenLvLdBPYlIWMd+PzG9panzNyvFUUx4sonJ4TeS
+         emZzmwjxDVrRFt2JFCLJno65felNdvz4Au9L6n1uY5+HuPVifORbQ2m4hZu06TsDvZko
+         ji2UDsahmHdAw2ORmMe+VpmjgGbN+LU9dso4tiNLFumnXSbbOMD5KFJ3s666Q8g3qrGo
+         l2DA==
+X-Forwarded-Encrypted: i=1; AJvYcCXKfzZAhz3ORj7rdSvf2DHni23eUpMm4YNH8neQs0Z/78xa3NKI+i6rZYrCfoa2RlEJ9440elGyvQ/4IRZ7vN+ZfFVoxYjg
+X-Gm-Message-State: AOJu0YxYAfDY2q8CJFDSy9PAcyz7ls5ln2YntTSFNwvzm9mCb/1kzOnZ
+	l5WorVN8UDc54yS063Etlh4g9e6UAJ0jeJh//mR52p4OCED6I7xu+0wjMhV/8Dx8Is276+XtGFN
+	L0R5K5e+CwLWnyaywPOJqh09HdwyGqTd+dJ36
+X-Google-Smtp-Source: AGHT+IEJnJuIkdmQhKmtemsqDE0mH9/bJXAX8RSm6OTDfuWp2hgtbOdgm/KhEpR2/qeEnMhYjpcqucZJMllqfTMHTvk=
+X-Received: by 2002:aa7:d654:0:b0:570:320c:821a with SMTP id
+ v20-20020aa7d654000000b00570320c821amr133279edr.2.1713258885418; Tue, 16 Apr
+ 2024 02:14:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+References: <20240326230319.190117-1-jhs@mojatatu.com> <CANn89iLhd4iD-pDVJHzKqWbf16u9KyNtgV41X3sd=iy15jDQtQ@mail.gmail.com>
+ <CAM0EoMmQHsucU6n1O3XEd50zUB4TENkEH0+J-cZ=5Bbv9298mA@mail.gmail.com>
+ <CANn89iKaMKeY7pR7=RH1NMBpYiYFmBRfAWmbZ61PdJ2VYoUJ9g@mail.gmail.com>
+ <CAM0EoM=s_MvUa32kUyt=VfeiAwxOm2OUJ3H=i0ARO1xupM2_Xg@mail.gmail.com>
+ <CAM0EoMk33ga5dh12ViZz8QeFwjwNQBvykM53VQo1B3BdfAZtaQ@mail.gmail.com>
+ <CANn89iLmhaC8fuu4UpPdELOAapBzLv0+S50gr0Rs+J+=4+9j=g@mail.gmail.com>
+ <CAM0EoMm+cqkY9tQC6+jpvLJrRxw43Gzffgw85Q3Fe2tBgA7k2Q@mail.gmail.com>
+ <CAM0EoMmdp_ik6EA2q8vhr+gGh=OcxUkvBOsxPHFWjn1eDX_33Q@mail.gmail.com>
+ <CANn89iLsV8sj1cJJ8VJmBwZvsD5PoV_NXfXYSCXTjaYCRm6gmA@mail.gmail.com>
+ <CAM0EoMnKh67wGo5XV1vdUd8p8LhxrT5mtbioPOLr=sVprYNKjA@mail.gmail.com> <CAKa-r6tNMuAR0RXuGbYLFW0jhpbPn4BvW1erGcqu0nCLRzH-aA@mail.gmail.com>
+In-Reply-To: <CAKa-r6tNMuAR0RXuGbYLFW0jhpbPn4BvW1erGcqu0nCLRzH-aA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 16 Apr 2024 11:14:30 +0200
+Message-ID: <CANn89iJQZ5R=Cct494W0DbNXR3pxOj54zDY7bgtFFCiiC1abDg@mail.gmail.com>
+Subject: Re: [PATCH RFC net 1/1] net/sched: Fix mirred to self recursion
+To: Davide Caratti <dcaratti@redhat.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
+	netdev@vger.kernel.org, renmingshuai@huawei.com, 
+	Victor Nogueira <victor@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Character sequences starting with `\` are interpreted by python as
-escaped Unicode characters. However, they have other meaning in
-regular expressions (e.g: "\d").
+On Tue, Apr 16, 2024 at 10:05=E2=80=AFAM Davide Caratti <dcaratti@redhat.co=
+m> wrote:
+>
+> hello,
+>
+> On Mon, Apr 15, 2024 at 11:15=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
+> >
+> [...]
+>
+> > Victor sent the patch. As i mentioned earlier, we found a lockdep
+> > false positive for the case of redirect from eth0->eth1->eth0
+> > (potential fix attached)
+>
+> I tried a similar approach some months ago [1],  but  _ like Eric
+> noticed  _ it might slowdown qdisc_destroy() too much because of the
+> call to synchronize_rcu(). Maybe the key unregistering can be done
+> later (e.g. when the qdisc is freed) ?
+>
+> [1] https://lore.kernel.org/netdev/73065927a49619fcd60e5b765c929f899a66cd=
+1a.1701853200.git.dcaratti@redhat.com/
+>
 
-It seems Python >= 3.12 starts emitting a SyntaxWarning when these
-escaped sequences are not recognized as valid Unicode characters.
+Hmmm, I think I missed that lockdep_unregister_key() was a NOP unless
+CONFIG_LOCKDEP=3Dy
 
-An example of these warnings:
+Sorry for this, can you repost your patch ?
 
-tools/testing/selftests/net/openvswitch/ovs-dpctl.py:505:
-SyntaxWarning: invalid escape sequence '\d'
-
-Fix all the warnings by flagging literals as raw strings.
-
-Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
----
- .../selftests/net/openvswitch/ovs-dpctl.py       | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-index 5e0e539a323d..1dd057afd3fb 100644
---- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-+++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-@@ -489,7 +489,7 @@ class ovsactions(nla):
-                     actstr, reason = parse_extract_field(
-                         actstr,
-                         "drop(",
--                        "([0-9]+)",
-+                        r"([0-9]+)",
-                         lambda x: int(x, 0),
-                         False,
-                         None,
-@@ -502,9 +502,9 @@ class ovsactions(nla):
-                     actstr = actstr[len("drop"): ]
-                     return (totallen - len(actstr))
- 
--            elif parse_starts_block(actstr, "^(\d+)", False, True):
-+            elif parse_starts_block(actstr, r"^(\d+)", False, True):
-                 actstr, output = parse_extract_field(
--                    actstr, None, "(\d+)", lambda x: int(x), False, "0"
-+                    actstr, None, r"(\d+)", lambda x: int(x), False, "0"
-                 )
-                 self["attrs"].append(["OVS_ACTION_ATTR_OUTPUT", output])
-                 parsed = True
-@@ -512,7 +512,7 @@ class ovsactions(nla):
-                 actstr, recircid = parse_extract_field(
-                     actstr,
-                     "recirc(",
--                    "([0-9a-fA-Fx]+)",
-+                    r"([0-9a-fA-Fx]+)",
-                     lambda x: int(x, 0),
-                     False,
-                     0,
-@@ -588,17 +588,17 @@ class ovsactions(nla):
-                                 actstr = actstr[3:]
- 
-                             actstr, ip_block_min = parse_extract_field(
--                                actstr, "=", "([0-9a-fA-F\.]+)", str, False
-+                                actstr, "=", r"([0-9a-fA-F\.]+)", str, False
-                             )
-                             actstr, ip_block_max = parse_extract_field(
--                                actstr, "-", "([0-9a-fA-F\.]+)", str, False
-+                                actstr, "-", r"([0-9a-fA-F\.]+)", str, False
-                             )
- 
-                             actstr, proto_min = parse_extract_field(
--                                actstr, ":", "(\d+)", int, False
-+                                actstr, ":", r"(\d+)", int, False
-                             )
-                             actstr, proto_max = parse_extract_field(
--                                actstr, "-", "(\d+)", int, False
-+                                actstr, "-", r"(\d+)", int, False
-                             )
- 
-                             if t is not None:
--- 
-2.44.0
-
+Thanks.
 
