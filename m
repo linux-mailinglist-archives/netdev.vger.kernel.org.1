@@ -1,140 +1,139 @@
-Return-Path: <netdev+bounces-88161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C1E18A61AF
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 05:25:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F00578A61E1
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 05:53:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE4B61C209A8
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 03:25:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A74AF282EAF
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 03:53:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 272DB17984;
-	Tue, 16 Apr 2024 03:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B9551CD06;
+	Tue, 16 Apr 2024 03:52:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="Mxb7aFqO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bT0crxME"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B8B12E4A
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 03:25:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625831BC5C
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 03:52:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713237937; cv=none; b=A2LPgv0YWhofBfzT1wBUV9IlYVyX7J4FwogdCL4iIuV/DKzakBOZTVOL5hy8C6u6LFM++7NMIHYrn+NWT6EclwAPlrEnPm0JpscozUzARxpxvwyfuzDtoYbu6c6Yhl89I7Ug+oJjK9194Ou3cxLBMxX4xJYiuSNA5BHXZ+IEWeQ=
+	t=1713239578; cv=none; b=geUWNukF4I8oRJtopv9L7DDzpB+jx3ukHNlOjlfSqXhmHeK3JvOwCqDa/0PL+67jRG8dbQuFSGERgJyRdnxlA0+O1XTqNeZFrST6Ds2hhFbIFV2g9/CSW27XlbXxC1EAbO9o8F3Ha133APMxLjyblf7RWK6OAY2sVSn4QKsfcpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713237937; c=relaxed/simple;
-	bh=5u4IqC43ipuEAkRDPZ3NfLs9iokoA9eSZLj0W4K46TI=;
+	s=arc-20240116; t=1713239578; c=relaxed/simple;
+	bh=2sgJxnJigr8wcFGR1iwhSNcT2nBcK5Eld3s+LF+X6uc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Hgfc4NaFE6Io434V5+ueQ0ljj6Trz5EzaBIE8vxvL7NX4zlk5zVykypu4g76ydCb6G2QmOYfyh5dkvHu9qi//7dHk2eY6ASuERw00BSkKYYu5GqS4mszyJzd7HylneLJBcoLH0BafY7N8WyurYax5/DZj86N93kgtv0V88MT4wU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=Mxb7aFqO; arc=none smtp.client-ip=209.85.128.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-61ab6faf179so25519007b3.1
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 20:25:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=umich.edu; s=google-2016-06-03; t=1713237934; x=1713842734; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Zkw2Yl+TD51SHy98hT0iftYNGABYn450n8OBsTQ7BwM=;
-        b=Mxb7aFqO8AKszE+R90/4IPgzsqP441iXHA3l8QyanBTq5MNNo4b5lVWQvAGtHm1vaE
-         M+yZpaDvPBHAg6yUY9IuyjJgVwqliW8yOg3zMybkXWx1Dw0tR9TpPisnpLmNt8YjDeI+
-         bjQVv1PeJCWjCG55VOQ6yZO68uOUpu4b85l9Pi/ObKMmEMFlmJEs3eANOjIq+P19n6Wc
-         VdKBYV8lGoEJdi4XQU80r/xGazX+MXDlwUdTq0Iu69OV4PVwvQ7yBugN+dPhOmhI/5pL
-         hI5ZnYI8ls5sZyYWCqjf3qshoiPuyxFc8wTtPZ/Awp9258kjINc2qlASlk2nPm5bI01P
-         Zrtg==
+	 To:Cc:Content-Type; b=smU7gH1m/QC++OehN9zoPnIq/+ILiVg1n6T0uy2VsbdHwX0TitgLVdCaqVCR6TvirCP+hlOVbncRICD8Ot280okZHwkLqauet01zQNGTjWw69gwF8m3RuEvyeVkIG5BHYFUCHsrZilhydVeq0lg0dlYqcOnBAUqfdIu6DwcHP7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bT0crxME; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713239576;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hbgF6/U11epiwGC99e3x/yP6nFxwSBfWiCFk3BvgC/U=;
+	b=bT0crxMEj4jGu9Quc3xdrTzwN6x849XvSdZkXjNIIFZmQEUTvCV40MjxbfnVs3C4DKaryQ
+	P9yMvfUJC08H8iTFPnjcCe8fZH2gmVL9PHJNzzT1hHtJ2cOfAZynilNLblZokr13aX3T3G
+	btLrDNV3YjRg2A1I0f/14sj/OQi8exg=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-587-bbwgo_eNOPqTxQeDaIdMtw-1; Mon, 15 Apr 2024 23:52:54 -0400
+X-MC-Unique: bbwgo_eNOPqTxQeDaIdMtw-1
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-6ed25ed4a5fso3852754b3a.1
+        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 20:52:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713237934; x=1713842734;
+        d=1e100.net; s=20230601; t=1713239573; x=1713844373;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Zkw2Yl+TD51SHy98hT0iftYNGABYn450n8OBsTQ7BwM=;
-        b=BoWuks6nmlx97PUPsMoKCvclPxSqb+xfhvHuGsaTd3q4hSOKUq8hWxxtJhBGqDlNeW
-         VHMF74bx3JX7Od4uqOfQI7rlYgAUoAmvTgkdNDwpBV4ys9SFoQ/CLH1CxNhiIRgObCxR
-         pSrAA7dRmp9Qw0Rx2zVigA3UBLB2pZmVAbwlIM/vLhOQK57vG9GcJo+EEIZljM6cgVuW
-         rflC8uBkrj5SJ7TImH20pg4+DTSBOYRu+rXuxnB2QFAC1MZPoa3ayxWWTQ2q6YV4gZf5
-         H3Gz7colu0N3sh8augwZJFr8vWb4BaRDE+dhyxWX8jtGrKiwdxeskMKWPKG1WSBQTtJz
-         /lUQ==
-X-Gm-Message-State: AOJu0YwzU2pOFQN2v280re2UUDzaOesU/QUV/j8twe7AABqIja5Qr2jF
-	E46yL4jIDMDZSUt8toCFcHsWWLDqfWOqSd/P48Uhsk3hXY06OZuH7Kz4KCT69XQi2mGP4ezmpv1
-	GUMryFvYjPRgeS6gOpaLZkwAhjE9+IJfaD54v1pylp3Uob8tO
-X-Google-Smtp-Source: AGHT+IFrJmLvi4vRnX1dZLLLS6KxyIa1VK1FW7aBEzzN9FjDmlgBrihG8RGfeBlVCkeDRH95ozQmE17XCXQJkP5TV6M=
-X-Received: by 2002:a25:7455:0:b0:dcc:97e4:bc61 with SMTP id
- p82-20020a257455000000b00dcc97e4bc61mr11960479ybc.57.1713237933834; Mon, 15
- Apr 2024 20:25:33 -0700 (PDT)
+        bh=hbgF6/U11epiwGC99e3x/yP6nFxwSBfWiCFk3BvgC/U=;
+        b=CBETbWDq7IRc5JZdiVB+qnnElPXAhuYl/AWi6dm/hDz8HEC38tnaP9j8Ixs0YuWS0w
+         ++GbwQX64cX33Sn/gGyOe5i49r+lndoAFaNHbM74muB3XyZuye4IVBXMb2LQJf/vPWir
+         gTNNfuL4L32C8f2r2gxrI2ZV+lWxhMKO8BYdQLAoQ3uNg88atRkz70UaUnjHYM/tXloc
+         glc6g2WgV6yCube6Qk5xtelWll1DQwnWsAHuQFj/rDQeic//XObUCyyCjxuOsyjcCf80
+         00a76J5AhOYpAU+q84NwlM6HlyOgdpO/2IrS2IZS+lKYCcFhWyuGGFXtq1EHx4mjQiHY
+         Y7Kw==
+X-Gm-Message-State: AOJu0Yzwb40//+wEmFc0AHxDovfCTSE3QfrghszWRojSbo0xl+jLBS3/
+	fLvZxACwc7IjOYjkP+UzVD1pKt1ObbbQsARtC9o717V0iSUtHhXJgbYKL6BB5gtLt8CQ3rCkJoN
+	6Wy9w9c+931YEkIVHSOsqKI5UuMxQ6Mrm+N4ndIv2BgKY4r1aebiN4eHZhY/rI9bkAD/sxdSiTT
+	AiR/fDSyaHeNk69xUx8KVRGAxq702U
+X-Received: by 2002:a05:6a20:1a91:b0:1a7:802d:f67c with SMTP id ci17-20020a056a201a9100b001a7802df67cmr12232025pzb.53.1713239573413;
+        Mon, 15 Apr 2024 20:52:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHHoyAP1wkJw/DB1EQ793IhrBgwbVmMVVgNjLcjYO082GE/+PThXolxxzYq5LJiiJio9HBvdJXNAxfQ9evpVQ0=
+X-Received: by 2002:a05:6a20:1a91:b0:1a7:802d:f67c with SMTP id
+ ci17-20020a056a201a9100b001a7802df67cmr12232013pzb.53.1713239573117; Mon, 15
+ Apr 2024 20:52:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240415104701.4772-1-fujita.tomonori@gmail.com> <20240415104701.4772-3-fujita.tomonori@gmail.com>
-In-Reply-To: <20240415104701.4772-3-fujita.tomonori@gmail.com>
-From: Trevor Gross <tmgross@umich.edu>
-Date: Mon, 15 Apr 2024 23:25:22 -0400
-Message-ID: <CALNs47t0FDS59xckUV0QkozbX-RAs8U3woN_sBc0TVm8d=dKNA@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 2/4] rust: net::phy support C45 helpers
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, rust-for-linux@vger.kernel.org
+References: <20240415162530.3594670-1-jiri@resnulli.us> <20240415162530.3594670-2-jiri@resnulli.us>
+In-Reply-To: <20240415162530.3594670-2-jiri@resnulli.us>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 16 Apr 2024 11:52:41 +0800
+Message-ID: <CACGkMEtpSPFSpikcrsZZBtXOgpAukjCwFRcF79xfzDG-s8_SyQ@mail.gmail.com>
+Subject: Re: [patch net-next v2 1/6] virtio: add debugfs infrastructure to
+ allow to debug virtio features
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com, 
+	davem@davemloft.net, edumazet@google.com, parav@nvidia.com, mst@redhat.com, 
+	xuanzhuo@linux.alibaba.com, shuah@kernel.org, petrm@nvidia.com, 
+	liuhangbin@gmail.com, vladimir.oltean@nxp.com, bpoirier@nvidia.com, 
+	idosch@nvidia.com, virtualization@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 15, 2024 at 6:47=E2=80=AFAM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
-> +    /// Reads a given C45 PHY register.
-> +    /// This function reads a hardware register and updates the stats so=
- takes `&mut self`.
-> +    pub fn c45_read(&mut self, devad: u8, regnum: u16) -> Result<u16> {
-> +        let phydev =3D self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type in=
-variant of `Self`.
-> +        // So it's just an FFI call.
+On Tue, Apr 16, 2024 at 12:25=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrot=
+e:
+>
+> From: Jiri Pirko <jiri@nvidia.com>
+>
+> Currently there is no way for user to set what features the driver
+> should obey or not, it is hard wired in the code.
+>
+> In order to be able to debug the device behavior in case some feature is
+> disabled, introduce a debugfs infrastructure with couple of files
+> allowing user to see what features the device advertises and
+> to set filter for features used by driver.
+>
+> Example:
+> $cat /sys/bus/virtio/devices/virtio0/features
+> 1110010111111111111101010000110010000000100000000000000000000000
+> $ echo "5" >/sys/kernel/debug/virtio/virtio0/filter_feature_add
+> $ cat /sys/kernel/debug/virtio/virtio0/filter_features
+> 5
+> $ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/unbind
+> $ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/bind
+> $ cat /sys/bus/virtio/devices/virtio0/features
+> 1110000111111111111101010000110010000000100000000000000000000000
+>
+> Note that sysfs "features" know already exists, this patch does not
+> touch it.
+>
+> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+> ---
 
-Depending on the response to Andrew's notes, these SAFETY comments
-will probably need to be updated to say why we know C45 is supported.
+Note that this can be done already with vp_vdpa feature provisioning:
 
-> +        let ret =3D unsafe {
-> +            bindings::mdiobus_c45_read(
-> +                (*phydev).mdio.bus,
-> +                (*phydev).mdio.addr,
-> +                devad as i32,
+commit c1ca352d371f724f7fb40f016abdb563aa85fe55
+Author: Jason Wang <jasowang@redhat.com>
+Date:   Tue Sep 27 15:48:10 2022 +0800
 
-This could probably also be from/.into()
+    vp_vdpa: support feature provisioning
 
-> +                regnum.into(),
-> +            )
-> +        };
-> +        if ret < 0 {
-> +            Err(Error::from_errno(ret))
-> +        } else {
-> +            Ok(ret as u16)
-> +        }
+For example:
 
-Could this be simplified with to_result?
+vdpa dev add name dev1 mgmtdev pci/0000:02:00.0 device_features 0x300020000
 
-> +    }
-> +
-> +    /// Writes a given C45 PHY register.
-> +    pub fn c45_write(&mut self, devad: u8, regnum: u16, val: u16) -> Res=
-ult {
-> +        let phydev =3D self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type in=
-variant of `Self`.
-> +        // So it's just an FFI call.
-> +        to_result(unsafe {
-> +            bindings::mdiobus_c45_write(
-> +                (*phydev).mdio.bus,
-> +                (*phydev).mdio.addr,
-> +                devad as i32,
+Thanks
 
-Same as above
-
-> +                regnum.into(),
-> +                val,
-> +            )
-> +        })
-> +    }
-> +
 
