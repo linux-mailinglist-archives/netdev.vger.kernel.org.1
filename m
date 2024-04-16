@@ -1,134 +1,104 @@
-Return-Path: <netdev+bounces-88338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4ECC68A6C10
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 15:21:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 837388A6C0C
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 15:21:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B5A31C20AB4
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 13:21:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4E5B1C20FCA
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 13:21:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F7412C46F;
-	Tue, 16 Apr 2024 13:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 171BF12C47F;
+	Tue, 16 Apr 2024 13:21:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NMMiLWnA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PcQvRfl1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE0312C49B;
-	Tue, 16 Apr 2024 13:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D14A612BF29;
+	Tue, 16 Apr 2024 13:21:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713273697; cv=none; b=S9Am1md4xe0ApmEQGgIsBwdy3gCO+dO/NI5RpE1eptsFctNm/4ZR2gZ9ZBD3RFb5zhnfp0jJ9reDsW3nVV31KSjxslgJvfB7xw1XISKimMW0Dw5HgC8ueK/QIxN/h3sfyP1pqMGU89AkQujMMoZ8Jo3wDoXeFjSP/Kw5D+EWeNE=
+	t=1713273687; cv=none; b=cj2y/ToxzWuDME2+m0FzRBOTZjmFJfh0ElmDAmPAyI5H41l1uZGMSsR0DDUwEU+hmKxL0kuNnko+k0vs5cyI5Pz6So5XnzN8JnA7X5oQ6Za7lU7A/o9soibO6gcoJRCpM0XJR2STUy7ml99I6JYKmQ0oerEiCphL1DvFquJWN/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713273697; c=relaxed/simple;
-	bh=rECNAQA2b5JeKpe3ThQ0Ts912GhBjOsctzDrRD27EuI=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=hVAvPWjgWJMgZmT5yx0z1dYp81QfC7kKtc1P2K8f5dRyji/6eVtifRxhrPY5poEJ2HyIdV/dwauDQ2nBriO8cKbZFRdMKjdKdkriOQsXfSLVOxCzSH6/mbwvyF5rwE2lnUwhfOAreR8+NtpZaRkZFVW8ez/r/nPeEEVUNTJ0YVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NMMiLWnA; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-58962bf3f89so950298a12.0;
-        Tue, 16 Apr 2024 06:21:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713273694; x=1713878494; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=549tbuOuKpI8ovt9UKf5mDbOdIqq2Ll6o+uA6hkmv4s=;
-        b=NMMiLWnAZfvws60pjBkhxpTG3mGcc5bXWQ0j5YYV9mwaax4un/unRPGvrU0QZYlHZr
-         4Dxr6RNO34UitP5/RRwOaAS+Z7cl45ilQwGOniORw/hS+ibK+oSzGQvkr8i4KvvHEXhJ
-         NapP2iy4Hst2OCLJ9HtPkJtCUftQathq5q42QveDyXd6uBJ/RuEghhi40KpjP0CgGH64
-         ZSukGFKw3FkGmFpIhbUiI4yCCMVO5gf7f0wwgQe4vMznTbrSmBIQxFRa/59Cmjc+szrV
-         608n0niPsHWYRa6uyzqnb0cyvSZvWi+HZ/i7fbpjWdEXPEezzYtuQvMkN4/T+vnz+9L6
-         wHgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713273694; x=1713878494;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=549tbuOuKpI8ovt9UKf5mDbOdIqq2Ll6o+uA6hkmv4s=;
-        b=ZymI4xVKb89Bf3a1U8EqGAIeQo8cMG8SRIrsgqsESOdgs86uKQM5J6mv8djC5upXtt
-         Nc2bmDsPmRYOoRpVqw3crucKoAIopnMkrSg1dw4MR97wx4kxOn71epIUg08WfOPExNxD
-         YNxXv7WvXfJedhkvFOIab9bJvc+uyflgXWqlHUpBWnbHj/8GIkWAYPTuKdEquqDzBSKS
-         J/LDd1Bx30lpgpXl7g3uJxeReel/aCNt1rmnQSh3JLDE398UH8PABtMNsw0nzVsFXaiL
-         CH8YXy7MVXRsBJ01wtEjH/IPqa65VM9XSfNBCcoZiN68BNCYtwWoeitfaN31TddH2JiT
-         6Z0w==
-X-Forwarded-Encrypted: i=1; AJvYcCUI1OF7X16PeCGz715eLnTmBjH0tKNGOHoA15DUxAEJ13r0LPWc+r2j95Tw6ossUVaiHJfCjxSCcRVycoBJUzk6Z1FjY22ixCh6WXtcP0c79OjIowbOsv1LjLd7LdGHepGvBJhHGJw=
-X-Gm-Message-State: AOJu0YwCRVYU/loSzwtTjuJSTdhX1XEuFFvCL7u6Oaj/yMFBETu4lVKs
-	FdiwKhGWn0EU6jyTNkQzqURxfpq21etpIr9qw4pY3IqgJy1yVTKI
-X-Google-Smtp-Source: AGHT+IE0ul1+uFXU8qmq1kSK8DZLpSv/2o/mhnlYSWClPGMyGx3wejSwcw6EqGxsbBrLMX8AmRuKtw==
-X-Received: by 2002:a05:6a20:c41b:b0:1aa:584f:3b6b with SMTP id en27-20020a056a20c41b00b001aa584f3b6bmr832897pzb.2.1713273693676;
-        Tue, 16 Apr 2024 06:21:33 -0700 (PDT)
-Received: from localhost (p5315239-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.87.239])
-        by smtp.gmail.com with ESMTPSA id z2-20020a17090a6d0200b002a5290ad3d4sm9762831pjj.3.2024.04.16.06.21.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 06:21:33 -0700 (PDT)
-Date: Tue, 16 Apr 2024 22:21:19 +0900 (JST)
-Message-Id: <20240416.222119.1989306221012409360.fujita.tomonori@gmail.com>
-To: andrew@lunn.ch
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, tmgross@umich.edu
-Subject: Re: [PATCH net-next v1 2/4] rust: net::phy support C45 helpers
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <26f64e48-4fd3-4e0f-b7c5-e77abeee391a@lunn.ch>
-References: <e8a440c7-d0a6-4a5e-97ff-a8bcde662583@lunn.ch>
-	<20240416.204030.1728964191738742483.fujita.tomonori@gmail.com>
-	<26f64e48-4fd3-4e0f-b7c5-e77abeee391a@lunn.ch>
+	s=arc-20240116; t=1713273687; c=relaxed/simple;
+	bh=Z3szNAXs6ookddwvTqDP6loCkEgNjGn9QA3Y5AYjnD4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JuXX28ezK8ONdgZtjeS4TKaePu4uPlHp0x39BH2SHzjA9alscDPlbnwHWdScOTkUQ2rHYtuJy31SSMW4KWFXFdEdhLPK4B//hUcNlq4p63/fdNsWhLqUWWCteALvAldx8ZweXx/t7+ctf+OrAwOaL40BXJ0AJtKWCjNb+UPe2r4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PcQvRfl1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15684C113CE;
+	Tue, 16 Apr 2024 13:21:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713273686;
+	bh=Z3szNAXs6ookddwvTqDP6loCkEgNjGn9QA3Y5AYjnD4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PcQvRfl1PF1/Kl0BySnWfDqHKFK5MwmrpmyHjJdHuGazVgbWmowxihz+X9Z1ydyV6
+	 WQwFGwvxMPYCFMDwvHitP9bfrnn9N/7OWL8rLRe5hIU1QXetQ+FqBXTf6M2L4Es/Gq
+	 Y9Uvtb+U4nABOQ7FuBRAouvHSMziyxKaXAxvPocg6z7de6skX9QVzplTjqVDgcejaV
+	 I66+RuWPA40e0Y6inNySzxwOIYy1MEG1ji1fso7X3LWcACj4yWBuFTNHMYiWzkkYBU
+	 ie+0XMkKGuWj6Fmr6h93aoRpaG72qvwsuGwhFTatP8S1nnqSBW8GAV6CnYSx7l+HEV
+	 6Fxj87lCsurdg==
+Date: Tue, 16 Apr 2024 08:21:24 -0500
+From: Rob Herring <robh@kernel.org>
+To: Robert Marko <robimarko@gmail.com>
+Cc: kvalo@kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	jjohnson@kernel.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	ath11k@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] dt-bindings: net: wireless: ath11k: add
+ ieee80211-freq-limit property
+Message-ID: <20240416132124.GA2143558-robh@kernel.org>
+References: <20240412162510.29483-1-robimarko@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240412162510.29483-1-robimarko@gmail.com>
 
-Hi,
-
-On Tue, 16 Apr 2024 14:38:11 +0200
-Andrew Lunn <andrew@lunn.ch> wrote:
-
->> If I correctly understand the original driver code, C45 bus protocol
->> is used. Adding functions for C45 bus protocol read/write would be
->> enough for this driver, I guess.
+On Fri, Apr 12, 2024 at 06:24:08PM +0200, Robert Marko wrote:
+> This is an existing optional property that ieee80211.yaml/cfg80211
+> provides. It's useful to further restrict supported frequencies
+> for a specified device through device-tree.
 > 
-> Now i've read more of the patches, i can see that the MDIO bus master
-> is C45 only. At least, that is all that is implemented in the
-> driver. So for this combination of MAC and PHY, forcing C45 register
-> access using C45 bus protocol will work.
-
-Thanks a lot!
-
-> However, can you combine this PHY with some other MDIO bus master,
-> which does not support C45? Then C45 over C22 would need to be used?
-> Looking at the data sheet i found online, there is no suggestion it
-> does support C22 bus protocol. All the diagrams/tables only show C45
-> bus protocol.
-
-qt2025_ds3014.pdf?
-
-> So this PHY is a special case. So you can use wrapper methods which
-> force C45 bus protocol, and ignore phylib support for performing C45
-> over C22 when needed. However, while doing this:
+> Signed-off-by: Robert Marko <robimarko@gmail.com>
+> ---
+>  .../devicetree/bindings/net/wireless/qcom,ath11k.yaml          | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> 1: Clearly document that these helpers are not generic, they force C45
->    register access using C45 bus protocol, and should only by used PHY
->    drivers which know the PHY device does not support C45 over C22
+> diff --git a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml
+> index 672282cdfc2f..907bbb646614 100644
+> --- a/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml
+> +++ b/Documentation/devicetree/bindings/net/wireless/qcom,ath11k.yaml
+> @@ -55,6 +55,8 @@ properties:
+>        phandle to a node describing reserved memory (System RAM memory)
+>        used by ath11k firmware (see bindings/reserved-memory/reserved-memory.txt)
+>  
+> +  ieee80211-freq-limit: true
+> +
+
+Drop this and change additionalProperties to unevaluatedProperties.
+
+>    iommus:
+>      minItems: 1
+>      maxItems: 2
+> @@ -88,6 +90,7 @@ required:
+>  additionalProperties: false
+>  
+>  allOf:
+> +  - $ref: ieee80211.yaml#
+>    - if:
+>        properties:
+>          compatible:
+> -- 
+> 2.44.0
 > 
-> 2: Think about naming. At some point we are going to add the generic
->    helpers for accessing C45 registers which leave the core to decide
->    if to perform a C45 bus protocol access or C45 over C22. Those
->    generic helpers need to have the natural name for accessing a C45
->    register since 99% of drivers will be using them. The helpers you
->    add now need to use a less common name.
-
-Sounds like we should save the names of c45_read and c45_write.
-
-read_with_c45_bus_protocol and write_with_c45_bus_protocol?
-
-They call mdiobus_c45_*, right?
 
