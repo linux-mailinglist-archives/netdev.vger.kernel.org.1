@@ -1,125 +1,138 @@
-Return-Path: <netdev+bounces-88406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFF788A70ED
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:11:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6463C8A70F1
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:12:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F6E91F2159A
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:11:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E9AC2855FA
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:12:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35F3B131737;
-	Tue, 16 Apr 2024 16:11:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3283313175E;
+	Tue, 16 Apr 2024 16:12:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Vln4qJUS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PNYd/+WM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11EA12BE9F
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 16:11:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4C6B131726;
+	Tue, 16 Apr 2024 16:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713283876; cv=none; b=JE5/b9086otSsYPoLtm9QbzpwWKQgzUf9j96n7okm3oOWJusjYATRulMJ2eS3FYou41MvtWM9p8SRu5Kt6QzZkuxhRypriUna5iyRcFMLR43x4ALYIq5jb4lgtP2b/XPbK4aB6rZejkpLBD1hhwhiTPqCJtZGHr6DYpM9+GUl44=
+	t=1713283938; cv=none; b=UV1qUmnZ4BkxM8W9OlcTxkV+WRELxfWf3m6KM8f0EATt10F7uAPVK3X5HpUP0sBXLBGRIrmSngqWrDhOsvY3T4IUCSngPShP5D6dPhcdyAb+JfhFa3S2wN2MKiN9n3qGHnvMZhjC5ZGk/53OUWpJEFJ0NyFwuJz/Qf7GJPsIj3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713283876; c=relaxed/simple;
-	bh=WyRoh4sl70M498CJ9tMGz81P+g1RM+DndqovavljXoE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=GuX2agmtCg7UucARv8wnDvAUUYQFjKnMPuJO97IDnV05nFsT6E4geYBH4OpQFcVzjfrBDZIWLbhStqc1di7J7j/vgea26loX3wMujIk/23Hg/bhLmYJ6l82AuZ5BllShLI+7Poj1hkuJr9l5RUQvx51UWx3Go58XzRiCrTIbJCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Vln4qJUS; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf216080f5so7519421276.1
-        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 09:11:14 -0700 (PDT)
+	s=arc-20240116; t=1713283938; c=relaxed/simple;
+	bh=EKrDgIJgNXo/R8quzpUy0yW7erzp8PxvHvcTe/50ujU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=q7UxvlvWIMrRYgIqavvjuZXm4TWeJvaYaQKqnjkrro0MXCmAbgj+dBsv/sJfDssMNJhQLfk5Jg9l6fc14Hk5uVvMC/Xf6WARZ9oBWxrfhgs6cAOyhbJMjm9hZP9qmRTd6Phch63S5xwkhyk7rtP/wgzMYWGqJqNa7y7sGo+14hI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PNYd/+WM; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1e5715a9ebdso36956275ad.2;
+        Tue, 16 Apr 2024 09:12:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713283874; x=1713888674; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+        d=gmail.com; s=20230601; t=1713283935; x=1713888735; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=T+0WDqN//fwjWBrfsDezWmZtt2VX6qDIy0gtOaLPAeo=;
-        b=Vln4qJUSJwroOhnIcxFWdZdboSwyHAx4vOWZQqmyJu5FvMv1VYHEioEp8TgXtRddb3
-         TWCKruHrYwAwHhVMBzCK610R32NsJ3p/5n5DfHeg4p6A7UdBjl0J/jUKkWJzIfUZ1UZ8
-         YCblI5uoNkIh89aQm/ojPEkDRDISxkvFVlNCGBYsWgkYlMisoNEDPUaELWtGh/A0bcX/
-         0wGbhlHO9fpeIjJkLo/c3QqIvGqsBLCoyPgz11E8VFZjKa36Ch5T5zjLPtEDdLa3INXS
-         rwzTajqnAdDBMDcQ/SOp+rPaGtfD9+VSSnqxQXivb7LuMOyn10mTwoIgJrryp1LMAA/Q
-         +/yQ==
+        bh=EKrDgIJgNXo/R8quzpUy0yW7erzp8PxvHvcTe/50ujU=;
+        b=PNYd/+WMCJkxq3lys23g1hgaUEyZDH1rNd3cGHTeIZzcTbiGxR4EJSJfGjllMpxSRE
+         zVGBGd5oBS2dqmpSQXwo9F5Jd0Uc6F4W0NHSefezL2ECSOf0Ol9weMtdjPRDiNxQ8Veh
+         Otl5fuAjZMdnHg8Xryp27Np2YneqRbR4up7gua7mzTdj6YEEBSE3njQfHDHaZA5WfbPU
+         hJk6I7oY1eYDa8eJIdBhQJH02XnfXL6L6yt8cGeR5cp5POgzfyrt8VCgB0DV0IHLshmO
+         +Cy1H8oHpuS/p7BI12gVvm3quEpQLICCIUrgUjtUh9jdY+zA+nB5VEsEZhInhr4zx1bL
+         wfUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713283874; x=1713888674;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=1e100.net; s=20230601; t=1713283935; x=1713888735;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=T+0WDqN//fwjWBrfsDezWmZtt2VX6qDIy0gtOaLPAeo=;
-        b=rne2aDDnbGJJJJqKHVQJBRaUNHl8Aym5uodfSOGmyXfwCaXS5Y/Ty31ef8sATx4xjf
-         z3Sq9kyTaxWFDxuplsVfZBqPRc+5P1X9LrI8qbg0/2fzwyDj98Xz+G+AbqDOtJ0wHCde
-         +wdOJLjnOT7+wk80Trzol22H0pXDLKzTkmm8QogC7F0GytsaciMkbeKlX4OIrTAJVkEp
-         QB/1uQNFQPVOgSyz0H4ddFhBcn1KSyafsBu1J53cDNzEXDMr9umbqHl8GyN/ojM/dqAj
-         kIy/h3BApcvx0MkJgpV/BaG5lSglWqPIoOPgW6q0BQM48a5oe+IyOSzvZX9e65MnIwlr
-         rVXA==
-X-Gm-Message-State: AOJu0YyIMJGHIn8XLtxAZQA+DUK9YVE4UNou2Q6b7TGASIB2RCR/lBY0
-	sJF5nfBGQ+/LzKNH4ap1VNTemFNWZXm8DlTwYCyp+uyGm8qNetUL3kB8moqBsRbZt1VIFuNCqwT
-	BjxcHZTcTNg==
-X-Google-Smtp-Source: AGHT+IHfx2rR/09nr1b8hOQj+LluEX581cmYwszZqiOhHKPul6Pmnfs7duE6aTMCFkJilDKi0V5NtEfwjoN4iQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:120a:b0:dc7:68b5:4f21 with SMTP
- id s10-20020a056902120a00b00dc768b54f21mr4186483ybu.9.1713283873721; Tue, 16
- Apr 2024 09:11:13 -0700 (PDT)
-Date: Tue, 16 Apr 2024 16:11:12 +0000
+        bh=EKrDgIJgNXo/R8quzpUy0yW7erzp8PxvHvcTe/50ujU=;
+        b=uIhZvmNcPkotHAjbcXNcvgaGy9oZV/gOuvauDmOAkT4wf5M3ANTTEabBcVqZMGghwa
+         f7Zb4d9GRAZOkrhSjMT7AHbbsYWmP9dT6EZbSzPfi96/Lz7BTV7egzW0vX1MX+fmquRR
+         rnCYyKKYFrK/Ei3r1zfT6Fmzx5pZfCCpxVqnuC23Aiq0G/Eer+zHcNSYhfY37IixN96Q
+         VUFJuKijSmsBK0SOCSj3pKVohMAUf5iCnd/y1P9bbIxY7bUA/2jUglcA8rlBgvcd0NrC
+         bxpIyUrAotBypc0OGDIKH9nSTS8I8AIzkxZU/arxOWxiOMp9F7krPJdxvRb849xj/wkz
+         WxwA==
+X-Forwarded-Encrypted: i=1; AJvYcCVS0MgTdoo7wFMTLSulSEvz+2b7OO/s6+WmAyns19h5rAmY/ze0RUpCsuu6PmdQgy+K9TKk5Z89wqfaXUV1RiUgrMEBS32EopEE79EK07YJqNBMguwwapqcpH6UrfR79mNhYs08tcWb+fGBRmBCVbrJMibsLExNth2xNi865QDetTSXhSQQ5lcgPeU1yLQckkNK
+X-Gm-Message-State: AOJu0YzWpY1EXhk3exoVoit84aRuoDx8ttU6/o+KVRDblvcLjVSUwj/s
+	8cGcGaBsXKVhs4Y0PoAdSDp+ndNr69++X0C0/owHehkAqwTKIyrf
+X-Google-Smtp-Source: AGHT+IEaBhKQrtE4y17EN+JRfoZ0nAtlgq9TOIgtvD46kDZyqFoPetYC3y2iMwccARAF9quBrezxcQ==
+X-Received: by 2002:a17:903:595:b0:1e3:e4ff:7054 with SMTP id jv21-20020a170903059500b001e3e4ff7054mr10328895plb.38.1713283934861;
+        Tue, 16 Apr 2024 09:12:14 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:43f:400:82ee:73ff:fe41:9a02? ([2605:59c8:43f:400:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id lf16-20020a170902fb5000b001e5119c1923sm10005822plb.71.2024.04.16.09.12.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Apr 2024 09:12:14 -0700 (PDT)
+Message-ID: <18ca19fa64267b84bee10473a81cbc63f53104a0.camel@gmail.com>
+Subject: Re: [PATCH net-next v2 07/15] mm: page_frag: add '_va' suffix to
+ page_frag API
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org,  pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Jeroen de Borst
+ <jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>, 
+ Shailend Chand <shailend@google.com>, Eric Dumazet <edumazet@google.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>,  Sunil Goutham <sgoutham@marvell.com>, Geetha
+ sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
+ hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
+ <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith
+ Busch <kbusch@kernel.org>,  Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
+ <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>,  Chaitanya Kulkarni
+ <kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+ <jasowang@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,  David Howells
+ <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, Chuck Lever
+ <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
+ <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo
+ <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Trond Myklebust
+ <trond.myklebust@hammerspace.com>, Anna Schumaker <anna@kernel.org>, 
+ intel-wired-lan@lists.osuosl.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, linux-nvme@lists.infradead.org, 
+ kvm@vger.kernel.org, virtualization@lists.linux.dev, linux-mm@kvack.org, 
+ bpf@vger.kernel.org, linux-afs@lists.infradead.org,
+ linux-nfs@vger.kernel.org
+Date: Tue, 16 Apr 2024 09:12:01 -0700
+In-Reply-To: <20240415131941.51153-8-linyunsheng@huawei.com>
+References: <20240415131941.51153-1-linyunsheng@huawei.com>
+	 <20240415131941.51153-8-linyunsheng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240416161112.1199265-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp_metrics: fix tcp_metrics_nl_dump() return value
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 
-Change tcp_metrics_nl_dump() to return 0 at the end
-of a dump so that NLMSG_DONE can be appended
-to the current skb, saving one recvmsg() system call.
+On Mon, 2024-04-15 at 21:19 +0800, Yunsheng Lin wrote:
+> Currently most of the API for page_frag API is returning
+> 'virtual address' as output or expecting 'virtual address'
+> as input, in order to differentiate the API handling between
+> 'virtual address' and 'struct page', add '_va' suffix to the
+> corresponding API mirroring the page_pool_alloc_va() API of
+> the page_pool.
+>=20
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/tcp_metrics.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+This patch is a total waste of time. By that logic we should be
+renaming __get_free_pages since it essentially does the same thing.
 
-diff --git a/net/ipv4/tcp_metrics.c b/net/ipv4/tcp_metrics.c
-index c2a925538542b5d787596b7d76705dda86cf48d8..301881eb23f376339d59a62bebf150b4b1cae3fb 100644
---- a/net/ipv4/tcp_metrics.c
-+++ b/net/ipv4/tcp_metrics.c
-@@ -766,6 +766,7 @@ static int tcp_metrics_nl_dump(struct sk_buff *skb,
- 	unsigned int max_rows = 1U << tcp_metrics_hash_log;
- 	unsigned int row, s_row = cb->args[0];
- 	int s_col = cb->args[1], col = s_col;
-+	int res = 0;
- 
- 	for (row = s_row; row < max_rows; row++, s_col = 0) {
- 		struct tcp_metrics_block *tm;
-@@ -778,7 +779,8 @@ static int tcp_metrics_nl_dump(struct sk_buff *skb,
- 				continue;
- 			if (col < s_col)
- 				continue;
--			if (tcp_metrics_dump_info(skb, cb, tm) < 0) {
-+			res = tcp_metrics_dump_info(skb, cb, tm);
-+			if (res < 0) {
- 				rcu_read_unlock();
- 				goto done;
- 			}
-@@ -789,7 +791,7 @@ static int tcp_metrics_nl_dump(struct sk_buff *skb,
- done:
- 	cb->args[0] = row;
- 	cb->args[1] = col;
--	return skb->len;
-+	return res;
- }
- 
- static int __parse_nl_addr(struct genl_info *info, struct inetpeer_addr *addr,
--- 
-2.44.0.683.g7961c838ac-goog
+This just seems like more code changes for the sake of adding code
+changes rather than fixing anything. In my opinion it should be dropped
+from the set.
 
 
