@@ -1,369 +1,356 @@
-Return-Path: <netdev+bounces-88228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 615018A6645
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:37:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B5948A664C
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:39:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CF39281BAF
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:36:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 94174B214C0
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:39:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26834205E10;
-	Tue, 16 Apr 2024 08:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68DC82860;
+	Tue, 16 Apr 2024 08:39:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="bBBN3r8X";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="FlYO4H5H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ESy0l+YV"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow8-smtp.messagingengine.com (flow8-smtp.messagingengine.com [103.168.172.143])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5744184D0A;
-	Tue, 16 Apr 2024 08:36:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.143
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35DB7205E10;
+	Tue, 16 Apr 2024 08:39:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713256590; cv=none; b=Aeu7tJEiy8SYccNbpqLY0Ga9FhvBt0KIlh5UvOeQYCgME8Gq2pgY9sjFeJ7ynHaH/+8zV4tD5PFkM/d+oG3afKpQLatlKRLa9eHiCBWdZzFkFWf8R0/0v7697rbHE+dvabjy8xr34lQ0kYSuJ8JUuqdZ5q7yPs/VeWNI94Whef4=
+	t=1713256761; cv=none; b=rykVCSJDUq4tnljy8t5xRQ+aPbYR3eADsrDxoCP36OvAgIzIuNGYr2RGJxZQA/UZCPowQtQDcLq4cBQrHLm4GdivK88prDgyqN36D7VClIIPXwzuL1LMZUcdIQ1WSxl8qCBs0nA5J0xlzAprye3pgIObhz7uXdhRaSPLA1IHrc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713256590; c=relaxed/simple;
-	bh=ixYue9KwOmSErPSyvpSBYoSpxPmCTDR7AwjJ2DHe93A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nr7Qg6hKCyWoVCbJKMI2RkoLUVVzPM4tfy7+RFtC5jqopEcehDwJBWFuXdigbLGhA3HtonWlQ/jjQGxxYrW6NOiI2nEQ0I9mb9C9l0SixM6hpB7cRHhABiI9oRADT2XC/nlojzWlqJF2pDz1MwyXk+LFBzlUh+gLZujPcRpV090=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=bBBN3r8X; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=FlYO4H5H; arc=none smtp.client-ip=103.168.172.143
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-	by mailflow.nyi.internal (Postfix) with ESMTP id F03D52002FC;
-	Tue, 16 Apr 2024 04:36:24 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute4.internal (MEProxy); Tue, 16 Apr 2024 04:36:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1713256584;
-	 x=1713260184; bh=KgnLMpzO9JVVaPVLKim6fGcmIiXVhEZWusvVAMrpG1U=; b=
-	bBBN3r8Xx0UTtqriiuNWJLDW6R1ko+STP42fVjSjx1ry4p/b6Rp4Eynmv6sCyKZf
-	2OCdI6BHd/NIfUhVCknI8UWbnDWBBp6hCKu0Z5M3t0+KE8fTf/9qjP1kd1X6BRhJ
-	9HhrZEhzuNjfw58I4UBeFlFKZettWX0JVM3TzSntYuiBLNAwsDFW/EwXrjI0gNmo
-	y3ZrMZeOMOcsXdG5zlvMSCv8JnBsEp1qiLYWV2XEO7SVCCJHiVGv3Sg0E36tJtWB
-	L2fVGBfevg9sTSXoG9WfI/2vUkzqImx0H998NPos2hSx4oMdKOGsoxUTwDOtt9LF
-	pwizBcDxPzg0pmLjQ4YWQw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1713256584; x=
-	1713260184; bh=KgnLMpzO9JVVaPVLKim6fGcmIiXVhEZWusvVAMrpG1U=; b=F
-	lYO4H5H6LNjKBnNDpAOwgVWSNiu4epZsIMEGuyyylTkPASQWQ61JwNlOaKPW3bhJ
-	b7Cqzs56CVgsEzaSNEMO1jXisk6Xx1wMib3p15iIU1o7C/rhpITal7e7CiaR5MFB
-	uPjLAnfl1zIHp9P+kOlfAHKfHzy1MSB2GibHfjPsGakQO1MDjuZCM7azk2RmeyDt
-	1blSH6lWuH6URnu4s47++uKLBF7Hvg0prXOTb1jv8lnIGNbhdPuuyYAgbNKQzeRB
-	dBOECnEMM3cvNQcZNAhrWbFEMoG+rhVmCH5aJ+mEqNKfilOR807OcTVOZWLCB8zy
-	yqbCFQH4DlM+wk6HkmqVw==
-X-ME-Sender: <xms:hzgeZmGZbSK1H7m3HGm1KOmsK_AAeMFPVYMixay1Eru8sd7yHDgpiA>
-    <xme:hzgeZnWQ2esUMSfU_0D24my2fG0qY2cJNnUNtNtcD2C6rKaFRHtwdHSUnXAnMGhcz
-    R7nbiQUhkG6xFzmgC8>
-X-ME-Received: <xmr:hzgeZgL4p3xOWEG3oS3ChSupA_xQWuNCojRtuOzIcyFSQu-ogt0Gw_1gfdW37WOalXYL69ozk8ZBIXmnEDxWD79GVtae60Y>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudejgedgtdehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhk
-    lhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnh
-    gvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeefhfellefh
-    ffejgfefudfggeejlefhveehieekhfeulefgtdefueehffdtvdelieenucevlhhushhtvg
-    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggv
-    rhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgv
-X-ME-Proxy: <xmx:hzgeZgHREZ80XBy4jnNvrmtiApv1GlE_Q_QuRqqabRUqMsKrFa8xPg>
-    <xmx:hzgeZsWnjIPgAsnbfsNy03qbsTda4gAblXQaINkW8NlWUFo9aar9Ew>
-    <xmx:hzgeZjMJIWID2nyNKYsRLfVyX2YY_GpSPm8rIJ0BHR8kfP99Udj6RA>
-    <xmx:hzgeZj1O9p1zEX7cuBBUZUfAUDDT81PY8u7bacEbsmPpkHVcgsddDQ>
-    <xmx:iDgeZmdCCdbUfYNPDhx_cScbLSnZQodEv26xWXQqtXgMUP8dPj00ARDN>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 16 Apr 2024 04:36:23 -0400 (EDT)
-Date: Tue, 16 Apr 2024 10:36:21 +0200
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
-Message-ID: <20240416083621.GD3460978@ragnatech.se>
-References: <20240414135937.1139611-1-niklas.soderlund+renesas@ragnatech.se>
- <98ae4f14-397b-49b7-a0a9-cb316f2594f6@bp.renesas.com>
+	s=arc-20240116; t=1713256761; c=relaxed/simple;
+	bh=VLcr7turOPRMgRs/A8QlWs0P9uv2o5oZwAVIsW3GaQU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MCJPC6zgV7PU5E1TTzS6Zf0PXVJCKYwBstgUyOv0hfHro31hPCNuZPHSi5P/9zRFMlMHH6rY5f/XbpGFXaRmBjs0/FaAfIQV6Pv0qvMd26bMwnFPT9qGZzVw7/1YzaAuyD8wYbumhY899IjTJ6eBj8HLvyXzzT84XUvSFv4qcgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ESy0l+YV; arc=none smtp.client-ip=209.85.219.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-dcc80d6004bso4097581276.0;
+        Tue, 16 Apr 2024 01:39:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713256759; x=1713861559; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ULx2+CdWwJ5T12P64Gy2FAgavzRX9V/iUSqZ7uInxDo=;
+        b=ESy0l+YVtOFKjF6QsnZqMQAQ7r95qSZr78fooEkzy5IH1axmGv6kAPIJOoNtMiA+b0
+         tu7hGTGReOKeLjIdfuX56WQITDbYyTrjOafNfYLI/cu/i2t9Gx8HBuJ6DhQWuD93owmQ
+         7xbAa2DqDB175uhCbRehYli2SsU94Mdru4RaAUbf/hTPTMJTYVTUNwpepxyE8DPURSzS
+         VK/pZJ3R8KCpPUYQdv8UIEv0JU6wtTvwBcIgDZn2x7YyOe2H4r+v/BOKVDXwNpcdUUIz
+         ksQjfvP9mak7IZb76IbewnKKXqBbubfQZOpm6s6F/fbj4DGMT4ome+esgqID9I+6Sl3D
+         xslA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713256759; x=1713861559;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ULx2+CdWwJ5T12P64Gy2FAgavzRX9V/iUSqZ7uInxDo=;
+        b=cnaasOsHjL8e6tw2xCiuw97+M2bJKEqXV94j7Ky0F162aAP9oVaOFmUjDykOis7mnJ
+         dj59a94KQ4p6g/QRJwLadeMwpLlDgGPENjbVl/MuCDiy4xjuBnjyWZ2DmLh2PL55vhQB
+         1SUNQGRuOyGVZC39U8WJ4J6s5dFx/fkgPWfiQPmdC+9UNWJvR2xVm0jRzm1Hrl02sqpr
+         muOCKVxgUerorYFubzsTWYtMY6tMv5wxvp/vV/WQOVFsuiPTpsXuBmKXiZlkDdL7jci7
+         D9mGz1ICPwfVEF5zMe6T6O7zaqsxzcr/Gud+aHUw1iJ7LBE6j3YEcTpPeHm5w/ktNJ0h
+         1zDg==
+X-Forwarded-Encrypted: i=1; AJvYcCWYPDOHFk7hByW74VUiIOZ8ibcTskFSWwaKpWkd99zml1T6GQd/ymUjMLSRL9MfXc0eB3LHPKxL1nK6QmxiH5kLkC/9XLdO3RNJNNKO1RewMvbwf859QQFgQv6Bd9on2InMc6HFjwl7hhvj7sjCxKwdtUmHazF7LpLmb9/P2Acm4/1u6DPvtMjD0POXGqs321ocOWazwEUBotbzhA==
+X-Gm-Message-State: AOJu0YzDktCxj/A+c2sAeYA3auRwpRL3Q9spxVMvqzgicII59SDx8t3V
+	zgntY/asH8Fv9JHuMLjMzwUwztqBWz6FG2rt1rVjJ0Hy+EvrGZZLEvZrAIZGoIr8UouC+RpVNwH
+	AwwCvfElpSzkjKvCIXilxdM4Gwds=
+X-Google-Smtp-Source: AGHT+IEEmVdiu9Gd0tesh6Kak+5mFQ5Pf9yXtyzs9shjKlhDRu6+XMRfxl925MhXSV+0qTM5vV7kF11Bs519Pn3G++U=
+X-Received: by 2002:a25:7405:0:b0:de3:ec94:2e94 with SMTP id
+ p5-20020a257405000000b00de3ec942e94mr3904813ybc.15.1713256758911; Tue, 16 Apr
+ 2024 01:39:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <98ae4f14-397b-49b7-a0a9-cb316f2594f6@bp.renesas.com>
+References: <CAMuE1bHBky9NGP22PVHKdi2+WniwxiLSmMnwRM6wm36sU8W4jA@mail.gmail.com>
+ <878r29hjds.ffs@tglx> <CAMuE1bF9ioo39_08Eh26X4WOtnvJ1geJ=WRVt5DhU8gEbYJNdA@mail.gmail.com>
+ <87o7asdd65.ffs@tglx> <CAF2d9jjA8iM1AoPUhQPK62tdd7gPnCnt51f_NMhOAs546rU3dA@mail.gmail.com>
+ <87il10ce1g.ffs@tglx> <CAF2d9jj6km7aVSqgcOE-b-A-WDH2TJNGzGy-5MRyw5HrzbqhaA@mail.gmail.com>
+ <877chfcrx3.ffs@tglx> <CAF2d9jjg0PEgPorXdrBHVkvz-fmUV7UXUPqnpQGVEvgXTpHY0A@mail.gmail.com>
+ <871q7md0ak.ffs@tglx> <CAF2d9jikELOQa_9Kk+oF_=_7NZTn9DuAw=s9KQR6-EfWTiW5RQ@mail.gmail.com>
+ <CAMuE1bFkmj70DO66PfvBPjM1d_JDEwTkOyz6o6wO_C0uyJ_0zw@mail.gmail.com>
+ <CAF2d9jj-kwmP+LWBBmU41Yhpmc0zE1w9UAoRHj=j-wLBSOwU5Q@mail.gmail.com>
+ <CAMuE1bFomKFTz+E9=4=F8r0DOoPdjZYt4ofubJgXGP0rpEjnqA@mail.gmail.com> <CAF2d9jg0X_HKSZbiwPTEXdmrhY49D1zfT3Q4xzNAqv1z+TYXtA@mail.gmail.com>
+In-Reply-To: <CAF2d9jg0X_HKSZbiwPTEXdmrhY49D1zfT3Q4xzNAqv1z+TYXtA@mail.gmail.com>
+From: Sagi Maimon <maimon.sagi@gmail.com>
+Date: Tue, 16 Apr 2024 11:39:07 +0300
+Message-ID: <CAMuE1bHj2w0HLyxj0eQ-OOg+=qqyFoxeb5Ko0G81DEXVLtNjdw@mail.gmail.com>
+Subject: Re: [PATCH v7] posix-timers: add clock_compare system call
+To: =?UTF-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS14KS+4KSwKQ==?= <maheshb@google.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, richardcochran@gmail.com, luto@kernel.org, 
+	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
+	hpa@zytor.com, arnd@arndb.de, geert@linux-m68k.org, peterz@infradead.org, 
+	hannes@cmpxchg.org, sohil.mehta@intel.com, rick.p.edgecombe@intel.com, 
+	nphamcs@gmail.com, palmer@sifive.com, keescook@chromium.org, 
+	legion@kernel.org, mark.rutland@arm.com, mszeredi@redhat.com, 
+	casey@schaufler-ca.com, reibax@gmail.com, davem@davemloft.net, 
+	brauner@kernel.org, linux-kernel@vger.kernel.org, linux-api@vger.kernel.org, 
+	linux-arch@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Paul,
+Thanks
 
-Thanks for your review!
-
-On 2024-04-15 08:34:09 +0100, Paul Barker wrote:
-> On 14/04/2024 14:59, Niklas Söderlund wrote:
-> > Add initial support for Renesas Ethernet-TSN End-station device of R-Car
-> > V4H. The Ethernet End-station can connect to an Ethernet network using a
-> > 10 Mbps, 100 Mbps, or 1 Gbps full-duplex link via MII/GMII/RMII/RGMII.
-> > Depending on the connected PHY.
-> > 
-> > Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-> > ---
-> > * Changes since RFC
-> > - Fix issues in MDIO communication.
-> > - Use a dedicated OF node for the MDIO bus.
-> > ---
-> >  MAINTAINERS                           |    8 +
-> >  drivers/net/ethernet/renesas/Kconfig  |   11 +
-> >  drivers/net/ethernet/renesas/Makefile |    2 +
-> >  drivers/net/ethernet/renesas/rtsn.c   | 1421 +++++++++++++++++++++++++
-> >  drivers/net/ethernet/renesas/rtsn.h   |  464 ++++++++
-> >  5 files changed, 1906 insertions(+)
-> >  create mode 100644 drivers/net/ethernet/renesas/rtsn.c
-> >  create mode 100644 drivers/net/ethernet/renesas/rtsn.h
-> 
-> <snip>
-> 
-> > diff --git a/drivers/net/ethernet/renesas/rtsn.c b/drivers/net/ethernet/renesas/rtsn.c
-> > new file mode 100644
-> > index 000000000000..291ab421d68f
-> > --- /dev/null
-> > +++ b/drivers/net/ethernet/renesas/rtsn.c
-> 
-> <snip>
-> 
-> > +static bool rtsn_rx(struct net_device *ndev, int *quota)
-> > +{
-> > +	struct rtsn_ext_ts_desc *desc;
-> > +	struct rtsn_private *priv;
-> > +	struct sk_buff *skb;
-> > +	dma_addr_t dma_addr;
-> > +	int boguscnt;
-> 
-> I find the variable name `boguscnt` very unclear, I'm not sure if it
-> means the count is bogus, or it is counting bogus items?
-> 
-> I don't think you need to match what I've done in ravb_main.c exactly,
-> but I'd prefer to see a better variable name here.
-
-I like the changes you did in this area for RAVB, I will reuse some of 
-it in v2 of this.
-
-> 
-> > +	u16 pkt_len;
-> > +	u32 get_ts;
-> > +	int entry;
-> > +	int limit;
-> > +
-> > +	priv = netdev_priv(ndev);
-> > +
-> > +	entry = priv->cur_rx % priv->num_rx_ring;
-> > +	desc = &priv->rx_ring[entry];
-> > +
-> > +	boguscnt = priv->dirty_rx + priv->num_rx_ring - priv->cur_rx;
-> > +	boguscnt = min(boguscnt, *quota);
-> > +	limit = boguscnt;
-> > +
-> > +	while ((desc->die_dt & DT_MASK) != DT_FEMPTY) {
-> > +		dma_rmb();
-> > +		pkt_len = le16_to_cpu(desc->info_ds) & RX_DS;
-> > +		if (--boguscnt < 0)
-> > +			break;
-> > +
-> > +		skb = priv->rx_skb[entry];
-> > +		priv->rx_skb[entry] = NULL;
-> > +		dma_addr = le32_to_cpu(desc->dptr);
-> > +		dma_unmap_single(ndev->dev.parent, dma_addr, PKT_BUF_SZ,
-> > +				 DMA_FROM_DEVICE);
-> > +
-> > +		get_ts = priv->ptp_priv->tstamp_rx_ctrl &
-> > +			RCAR_GEN4_RXTSTAMP_TYPE_V2_L2_EVENT;
-> > +		if (get_ts) {
-> > +			struct skb_shared_hwtstamps *shhwtstamps;
-> > +			struct timespec64 ts;
-> > +
-> > +			shhwtstamps = skb_hwtstamps(skb);
-> > +			memset(shhwtstamps, 0, sizeof(*shhwtstamps));
-> > +
-> > +			ts.tv_sec = (u64)le32_to_cpu(desc->ts_sec);
-> > +			ts.tv_nsec = le32_to_cpu(desc->ts_nsec & cpu_to_le32(0x3fffffff));
-> > +
-> > +			shhwtstamps->hwtstamp = timespec64_to_ktime(ts);
-> > +		}
-> > +
-> > +		skb_put(skb, pkt_len);
-> > +		skb->protocol = eth_type_trans(skb, ndev);
-> > +		netif_receive_skb(skb);
-> > +		ndev->stats.rx_packets++;
-> > +		ndev->stats.rx_bytes += pkt_len;
-> > +
-> > +		entry = (++priv->cur_rx) % priv->num_rx_ring;
-> > +		desc = &priv->rx_ring[entry];
-> > +	}
-> > +
-> > +	/* Refill the RX ring buffers */
-> > +	for (; priv->cur_rx - priv->dirty_rx > 0; priv->dirty_rx++) {
-> > +		entry = priv->dirty_rx % priv->num_rx_ring;
-> > +		desc = &priv->rx_ring[entry];
-> > +		desc->info_ds = cpu_to_le16(PKT_BUF_SZ);
-> > +
-> > +		if (!priv->rx_skb[entry]) {
-> > +			skb = netdev_alloc_skb(ndev,
-> > +					       PKT_BUF_SZ + RTSN_ALIGN - 1);
-> 
-> I'll send my work using a page pool today as an RFC so you can see if it
-> would be beneficial to use that here as well. I was going to hold off
-> until the bugfix patches have merged so that I don't need to go through
-> another RFC round, but it will be good to get some more review on the
-> series anyway.
-
-I like the page pool idea, but there is no real benefit for it in this 
-driver at the moment. I would like to play and learn a bit more with it 
-in RAVB. And once I know more I can convert this driver too if it fits.
-
-> 
-> > +			if (!skb)
-> > +				break;
-> > +			skb_reserve(skb, NET_IP_ALIGN);
-> > +			dma_addr = dma_map_single(ndev->dev.parent, skb->data,
-> > +						  le16_to_cpu(desc->info_ds),
-> > +						  DMA_FROM_DEVICE);
-> > +			if (dma_mapping_error(ndev->dev.parent, dma_addr))
-> > +				desc->info_ds = cpu_to_le16(0);
-> > +			desc->dptr = cpu_to_le32(dma_addr);
-> > +			skb_checksum_none_assert(skb);
-> > +			priv->rx_skb[entry] = skb;
-> > +		}
-> > +		dma_wmb();
-> > +		desc->die_dt = DT_FEMPTY | D_DIE;
-> > +	}
-> > +
-> > +	desc = &priv->rx_ring[priv->num_rx_ring];
-> > +	desc->die_dt = DT_LINK;
-> > +
-> > +	*quota -= limit - (++boguscnt);
-> > +
-> > +	return boguscnt <= 0;
-> > +}
-> > +
-> > +static int rtsn_poll(struct napi_struct *napi, int budget)
-> > +{
-> > +	struct rtsn_private *priv;
-> > +	struct net_device *ndev;
-> > +	unsigned long flags;
-> > +	int quota = budget;
-> > +
-> > +	ndev = napi->dev;
-> > +	priv = netdev_priv(ndev);
-> > +
-> > +	/* Processing RX Descriptor Ring */
-> > +	if (rtsn_rx(ndev, &quota))
-> > +		goto out;
-> > +
-> > +	/* Processing TX Descriptor Ring */
-> > +	spin_lock_irqsave(&priv->lock, flags);
-> > +	rtsn_tx_free(ndev, true);
-> > +	netif_wake_subqueue(ndev, 0);
-> > +	spin_unlock_irqrestore(&priv->lock, flags);
-> > +
-> > +	napi_complete(napi);
-> 
-> We should use napi_complete_done() here as described in
-> Documentation/networking/napi.rst. That will require rtsn_rx() to return
-> the number of packets received so that it can be passed as the work_done
-> argument to napi_complete_done().
-
-Good point will update in v2.
-
-> 
-> > +
-> > +	/* Re-enable TX/RX interrupts */
-> > +	spin_lock_irqsave(&priv->lock, flags);
-> > +	rtsn_ctrl_data_irq(priv, true);
-> > +	__iowmb();
-> > +	spin_unlock_irqrestore(&priv->lock, flags);
-> > +out:
-> > +	return budget - quota;
-> > +}
-> 
-> <snip>
-> 
-> > +static int rtsn_probe(struct platform_device *pdev)
-> > +{
-> > +	struct rtsn_private *priv;
-> > +	struct net_device *ndev;
-> > +	struct resource *res;
-> > +	int ret;
-> > +
-> > +	ndev = alloc_etherdev_mqs(sizeof(struct rtsn_private), TX_NUM_CHAINS,
-> > +				  RX_NUM_CHAINS);
-> > +	if (!ndev)
-> > +		return -ENOMEM;
-> > +
-> > +	priv = netdev_priv(ndev);
-> > +	priv->pdev = pdev;
-> > +	priv->ndev = ndev;
-> > +	priv->ptp_priv = rcar_gen4_ptp_alloc(pdev);
-> > +
-> > +	spin_lock_init(&priv->lock);
-> > +	platform_set_drvdata(pdev, priv);
-> > +
-> > +	priv->clk = devm_clk_get(&pdev->dev, NULL);
-> > +	if (IS_ERR(priv->clk)) {
-> > +		ret = -PTR_ERR(priv->clk);
-> > +		goto error_alloc;
-> > +	}
-> > +
-> > +	priv->reset = devm_reset_control_get(&pdev->dev, NULL);
-> > +	if (IS_ERR(priv->reset)) {
-> > +		ret = -PTR_ERR(priv->reset);
-> > +		goto error_alloc;
-> > +	}
-> > +
-> > +	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "tsnes");
-> > +	if (!res) {
-> > +		dev_err(&pdev->dev, "Can't find tsnes resource\n");
-> > +		ret = -EINVAL;
-> > +		goto error_alloc;
-> > +	}
-> > +
-> > +	priv->base = devm_ioremap_resource(&pdev->dev, res);
-> > +	if (IS_ERR(priv->base)) {
-> > +		ret = PTR_ERR(priv->base);
-> > +		goto error_alloc;
-> > +	}
-> > +
-> > +	SET_NETDEV_DEV(ndev, &pdev->dev);
-> > +	ether_setup(ndev);
-> > +
-> > +	ndev->features = NETIF_F_RXCSUM;
-> > +	ndev->hw_features = NETIF_F_RXCSUM;
-> 
-> A quick skim of the datasheet suggests that TX checksum calculation is
-> also supported. It's probably worth listing which hardware features this
-> driver supports/does not support in the commit message.
-> 
-> Thanks,
-> 
-> -- 
-> Paul Barker
-
-
-
-
-
-
--- 
-Kind Regards,
-Niklas Söderlund
+On Mon, Apr 15, 2024 at 8:23=E2=80=AFPM Mahesh Bandewar (=E0=A4=AE=E0=A4=B9=
+=E0=A5=87=E0=A4=B6 =E0=A4=AC=E0=A4=82=E0=A4=A1=E0=A5=87=E0=A4=B5=E0=A4=BE=
+=E0=A4=B0)
+<maheshb@google.com> wrote:
+>
+> On Sun, Apr 14, 2024 at 5:22=E2=80=AFAM Sagi Maimon <maimon.sagi@gmail.co=
+m> wrote:
+> >
+> > On Thu, Apr 11, 2024 at 7:34=E2=80=AFPM Mahesh Bandewar (=E0=A4=AE=E0=
+=A4=B9=E0=A5=87=E0=A4=B6 =E0=A4=AC=E0=A4=82=E0=A4=A1=E0=A5=87=E0=A4=B5=E0=
+=A4=BE=E0=A4=B0)
+> > <maheshb@google.com> wrote:
+> > >
+> > > On Thu, Apr 11, 2024 at 12:11=E2=80=AFAM Sagi Maimon <maimon.sagi@gma=
+il.com> wrote:
+> > > >
+> > > > Hi Mahesh
+> > > > What is the status of your patch?
+> > > > if your patch is upstreamed , then it will have all I need.
+> > > > But, If not , I will upstream my patch.
+> > > > BR,
+> > > >
+> > > Hi Sagi,
+> > >
+> > > If you want to pursue the syscall option, then those are tangential
+> > > and please go ahead. (I cannot stop you!)
+> > > I'm interested in getting the "tight sandwich timestamps" that
+> > > gettimex64() ioctl offers and I would want enhancements to
+> > > gettimex64() done the way it was discussed in the later half of this
+> > > thread. If you want to sign-up for that please let me know.
+> > Hi Mahesh
+> > I do need to modify the  PTP_SYS_OFFSET_EXTENDED ioctl for cases which
+> > gettimex64
+> > not supported by the driver (look at Thomas suggestion), but I need
+> > your changes in ptp_read_system_prets.
+> > I like to add my changes above your changes, so we won't do duplicate w=
+ork.
+> > please show me your latest patch and the status of it
+> > Once you have upstream yours , I will add my changes on the next patch.
+>
+> OK, in that case let me post the patch since your changes would need
+> pieces from it.
+>
+> thanks,
+> --mahesh..
+>
+> > BR
+> > Sagi
+> >
+> > >
+> > > thanks,
+> > > --mahesh..
+> > >
+> > >
+> > > > On Thu, Apr 11, 2024 at 5:56=E2=80=AFAM Mahesh Bandewar (=E0=A4=AE=
+=E0=A4=B9=E0=A5=87=E0=A4=B6 =E0=A4=AC=E0=A4=82=E0=A4=A1=E0=A5=87=E0=A4=B5=
+=E0=A4=BE=E0=A4=B0)
+> > > > <maheshb@google.com> wrote:
+> > > > >
+> > > > > On Wed, Apr 3, 2024 at 6:48=E2=80=AFAM Thomas Gleixner <tglx@linu=
+tronix.de> wrote:
+> > > > > >
+> > > > > > On Tue, Apr 02 2024 at 16:37, Mahesh Bandewar (=E0=A4=AE=E0=A4=
+=B9=E0=A5=87=E0=A4=B6 =E0=A4=AC=E0=A4=82=E0=A4=A1=E0=A5=87=E0=A4=B5=E0=A4=
+=BE=E0=A4=B0) wrote:
+> > > > > > > On Tue, Apr 2, 2024 at 3:37=E2=80=AFPM Thomas Gleixner <tglx@=
+linutronix.de> wrote:
+> > > > > > > The modification that you have proposed (in a couple of posts=
+ back)
+> > > > > > > would work but it's still not ideal since the pre/post ts are=
+ not
+> > > > > > > close enough as they are currently  (properly implemented!)
+> > > > > > > gettimex64() would have. The only way to do that would be to =
+have
+> > > > > > > another ioctl as I have proposed which is a superset of curre=
+nt
+> > > > > > > gettimex64 and pre-post collection is the closest possible.
+> > > > > >
+> > > > > > Errm. What I posted as sketch _is_ using gettimex64() with the =
+extra
+> > > > > > twist of the flag vs. a clockid (which is an implementation det=
+ail) and
+> > > > > > the difference that I carry the information in ptp_system_times=
+tamp
+> > > > > > instead of needing a new argument clockid to all existing callb=
+acks
+> > > > > > because the modification to ptp_read_prets() and postts() will =
+just be
+> > > > > > sufficient, no?
+> > > > > >
+> > > > > OK, that makes sense.
+> > > > >
+> > > > > > For the case where the driver does not provide gettimex64() the=
+n the
+> > > > > > extension of the original offset ioctl is still providing a bet=
+ter
+> > > > > > mechanism than the proposed syscall.
+> > > > > >
+> > > > > > I also clearly said that all drivers should be converted over t=
+o
+> > > > > > gettimex64().
+> > > > > >
+> > > > > I agree. Honestly that should have been mandatory and
+> > > > > ptp_register_clock() should fail otherwise! Probably should have =
+been
+> > > > > part of gettimex64 implementation :(
+> > > > >
+> > > > > I don't think we can do anything other than just hoping all drive=
+r
+> > > > > implementations include gettimex64 implementation.
+> > > > >
+> > > > > > > Having said that, the 'flag' modification proposal is a good =
+backup
+> > > > > > > for the drivers that don't have good implementation (close en=
+ough but
+> > > > > > > not ideal). Also, you don't need a new ioctl-op. So if we rea=
+lly want
+> > > > > > > precision, I believe, we need a new ioctl op (with supporting
+> > > > > > > implementation similar to the mlx4 code above). but we want t=
+o save
+> > > > > > > the new ioctl-op and have less precision then proposed modifi=
+cation
+> > > > > > > would work fine.
+> > > > > >
+> > > > > > I disagree. The existing gettimex64() is good enough if the dri=
+ver
+> > > > > > implements it correctly today. If not then those drivers need t=
+o be
+> > > > > > fixed independent of this.
+> > > > > >
+> > > > > > So assumed that a driver does:
+> > > > > >
+> > > > > > gettimex64()
+> > > > > >    ptp_prets(sts);
+> > > > > >    read_clock();
+> > > > > >    ptp_postts(sts);
+> > > > > >
+> > > > > > today then having:
+> > > > > >
+> > > > > > static inline void ptp_read_system_prets(struct ptp_system_time=
+stamp *sts)
+> > > > > > {
+> > > > > >         if (sts) {
+> > > > > >                 if (sts->flags & PTP_SYS_OFFSET_MONO_RAW)
+> > > > > >                         ktime_get_raw_ts64(&sts->pre_ts);
+> > > > > >                 else
+> > > > > >                         ktime_get_real_ts64(&sts->pre_ts);
+> > > > > >         }
+> > > > > > }
+> > > > > >
+> > > > > > static inline void ptp_read_system_postts(struct ptp_system_tim=
+estamp *sts)
+> > > > > > {
+> > > > > >         if (sts) {
+> > > > > >                 if (sts->flags & PTP_SYS_OFFSET_MONO_RAW)
+> > > > > >                         ktime_get_raw_ts64(&sts->post_ts);
+> > > > > >                 else
+> > > > > >                         ktime_get_real_ts64(&sts->post_ts);
+> > > > > >         }
+> > > > > > }
+> > > > > >
+> > > > > > or
+> > > > > >
+> > > > > > static inline void ptp_read_system_prets(struct ptp_system_time=
+stamp *sts)
+> > > > > > {
+> > > > > >         if (sts) {
+> > > > > >                 switch (sts->clockid) {
+> > > > > >                 case CLOCK_MONOTONIC_RAW:
+> > > > > >                         time_get_raw_ts64(&sts->pre_ts);
+> > > > > >                         break;
+> > > > > >                 case CLOCK_REALTIME:
+> > > > > >                         ktime_get_real_ts64(&sts->pre_ts);
+> > > > > >                         break;
+> > > > > >                 }
+> > > > > >         }
+> > > > > > }
+> > > > > >
+> > > > > > static inline void ptp_read_system_postts(struct ptp_system_tim=
+estamp *sts)
+> > > > > > {
+> > > > > >         if (sts) {
+> > > > > >                 switch (sts->clockid) {
+> > > > > >                 case CLOCK_MONOTONIC_RAW:
+> > > > > >                         time_get_raw_ts64(&sts->post_ts);
+> > > > > >                         break;
+> > > > > >                 case CLOCK_REALTIME:
+> > > > > >                         ktime_get_real_ts64(&sts->post_ts);
+> > > > > >                         break;
+> > > > > >                 }
+> > > > > >         }
+> > > > > > }
+> > > > > >
+> > > > > > is doing the exact same thing as your proposal but without touc=
+hing any
+> > > > > > driver which implements gettimex64() correctly at all.
+> > > > > >
+> > > > > I see. Yes, this makes sense.
+> > > > >
+> > > > > > While your proposal requires to touch every single driver for n=
+o reason,
+> > > > > > no?
+> > > > > >
+> > > > > > It is just an implementation detail whether you use a flag or a
+> > > > > > clockid. You can carry the clockid for the clocks which actuall=
+y can be
+> > > > > > read in that context in a reserved field of PTP_SYS_OFFSET_EXTE=
+NDED:
+> > > > > >
+> > > > > > struct ptp_sys_offset_extended {
+> > > > > >         unsigned int    n_samples; /* Desired number of measure=
+ments. */
+> > > > > >         clockid_t       clockid;
+> > > > > >         unsigned int    rsv[2];    /* Reserved for future use. =
+*/
+> > > > > > };
+> > > > > >
+> > > > > > and in the IOCTL:
+> > > > > >
+> > > > > >         if (extoff->clockid !=3D CLOCK_MONOTONIC_RAW)
+> > > > > >                 return -EINVAL;
+> > > > > >
+> > > > > >         sts.clockid =3D extoff->clockid;
+> > > > > >
+> > > > > > and it all just works, no?
+> > > > > >
+> > > > > Yes, this should work. However, I didn't check if struct
+> > > > > ptp_system_timestamp is used in some other context.
+> > > > >
+> > > > > > I have no problem to decide that PTP_SYS_OFFSET will not get th=
+is
+> > > > > > treatment and the drivers have to be converted over to
+> > > > > > PTP_SYS_OFFSET_EXTENDED.
+> > > > > >
+> > > > > > But adding yet another callback just to carry a clockid as argu=
+ment is a
+> > > > > > more than pointless exercise as I demonstrated.
+> > > > > >
+> > > > > Agreed. As I said, I thought we cannot change the gettimex64() wi=
+thout
+> > > > > breaking the compatibility but the fact that CLOCK_REALTIME is "0=
+"
+> > > > > works well for the backward compatibility case.
+> > > > >
+> > > > > I can spin up an updated patch/series that updates gettimex64
+> > > > > implementation instead of adding a new ioctl-op If you all agree.
+> > > > >
+> > > > > thanks,
+> > > > > --mahesh..
+> > > > >
+> > > > > > Thanks,
+> > > > > >
+> > > > > >         tglx
 
