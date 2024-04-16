@@ -1,250 +1,369 @@
-Return-Path: <netdev+bounces-88229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 922098A6646
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:37:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 615018A6645
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:37:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF80AB25EDC
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:37:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CF39281BAF
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 08:36:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5B883CBA;
-	Tue, 16 Apr 2024 08:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26834205E10;
+	Tue, 16 Apr 2024 08:36:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="bBBN3r8X";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="FlYO4H5H"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+Received: from flow8-smtp.messagingengine.com (flow8-smtp.messagingengine.com [103.168.172.143])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A6F383CAE
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 08:36:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5744184D0A;
+	Tue, 16 Apr 2024 08:36:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.143
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713256596; cv=none; b=IBJYZhDq4SJQBYbnJFqVJ1taTcn1pBBZ8KySUgbuVrNTQMMQ0GuBoj7egrjqLkFUwZpAjP1OixFAnCPZ23uteEjGI5+yrXZ5rCfHshiSYR0RGlsJwiCTVA95QmJPzKuQ7qz0WTcG6jtLW7Zp0xyEm81fD3lSTvXj2ZTpqFpeq8Y=
+	t=1713256590; cv=none; b=Aeu7tJEiy8SYccNbpqLY0Ga9FhvBt0KIlh5UvOeQYCgME8Gq2pgY9sjFeJ7ynHaH/+8zV4tD5PFkM/d+oG3afKpQLatlKRLa9eHiCBWdZzFkFWf8R0/0v7697rbHE+dvabjy8xr34lQ0kYSuJ8JUuqdZ5q7yPs/VeWNI94Whef4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713256596; c=relaxed/simple;
-	bh=Ke39qFcW28U/I4a9/xFt1cLdP0Ly1JfX5EqWaUJgYSk=;
+	s=arc-20240116; t=1713256590; c=relaxed/simple;
+	bh=ixYue9KwOmSErPSyvpSBYoSpxPmCTDR7AwjJ2DHe93A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 In-Reply-To:Content-Type:Content-Disposition; b=Ys6hnXtRqnBy8QCeWXqiRPQQwM266OdK/U5gv9ZRd9vjAfB0lsWaJ39NnK1iVH252MlYdGJ7KqYHzkRYwDMUaTeGqhLLMNTebLFV0LMof/VjAqUdhiBavS3PkVyV39cG5SLxEMb1YPP9l4vJn3zPq3q+o5j5Gahb3tmv9fYsdso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-310-pnJDNQZEMFqH81JcPsrwSg-1; Tue, 16 Apr 2024 04:36:25 -0400
-X-MC-Unique: pnJDNQZEMFqH81JcPsrwSg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9F1518007BA;
-	Tue, 16 Apr 2024 08:36:24 +0000 (UTC)
-Received: from hog (unknown [10.39.192.17])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id EE50C1121306;
-	Tue, 16 Apr 2024 08:36:21 +0000 (UTC)
-Date: Tue, 16 Apr 2024 10:36:16 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antony Antony <antony@phenome.org>
-Cc: Antony Antony <antony.antony@secunet.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nr7Qg6hKCyWoVCbJKMI2RkoLUVVzPM4tfy7+RFtC5jqopEcehDwJBWFuXdigbLGhA3HtonWlQ/jjQGxxYrW6NOiI2nEQ0I9mb9C9l0SixM6hpB7cRHhABiI9oRADT2XC/nlojzWlqJF2pDz1MwyXk+LFBzlUh+gLZujPcRpV090=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=bBBN3r8X; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=FlYO4H5H; arc=none smtp.client-ip=103.168.172.143
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailflow.nyi.internal (Postfix) with ESMTP id F03D52002FC;
+	Tue, 16 Apr 2024 04:36:24 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute4.internal (MEProxy); Tue, 16 Apr 2024 04:36:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm2; t=1713256584;
+	 x=1713260184; bh=KgnLMpzO9JVVaPVLKim6fGcmIiXVhEZWusvVAMrpG1U=; b=
+	bBBN3r8Xx0UTtqriiuNWJLDW6R1ko+STP42fVjSjx1ry4p/b6Rp4Eynmv6sCyKZf
+	2OCdI6BHd/NIfUhVCknI8UWbnDWBBp6hCKu0Z5M3t0+KE8fTf/9qjP1kd1X6BRhJ
+	9HhrZEhzuNjfw58I4UBeFlFKZettWX0JVM3TzSntYuiBLNAwsDFW/EwXrjI0gNmo
+	y3ZrMZeOMOcsXdG5zlvMSCv8JnBsEp1qiLYWV2XEO7SVCCJHiVGv3Sg0E36tJtWB
+	L2fVGBfevg9sTSXoG9WfI/2vUkzqImx0H998NPos2hSx4oMdKOGsoxUTwDOtt9LF
+	pwizBcDxPzg0pmLjQ4YWQw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1713256584; x=
+	1713260184; bh=KgnLMpzO9JVVaPVLKim6fGcmIiXVhEZWusvVAMrpG1U=; b=F
+	lYO4H5H6LNjKBnNDpAOwgVWSNiu4epZsIMEGuyyylTkPASQWQ61JwNlOaKPW3bhJ
+	b7Cqzs56CVgsEzaSNEMO1jXisk6Xx1wMib3p15iIU1o7C/rhpITal7e7CiaR5MFB
+	uPjLAnfl1zIHp9P+kOlfAHKfHzy1MSB2GibHfjPsGakQO1MDjuZCM7azk2RmeyDt
+	1blSH6lWuH6URnu4s47++uKLBF7Hvg0prXOTb1jv8lnIGNbhdPuuyYAgbNKQzeRB
+	dBOECnEMM3cvNQcZNAhrWbFEMoG+rhVmCH5aJ+mEqNKfilOR807OcTVOZWLCB8zy
+	yqbCFQH4DlM+wk6HkmqVw==
+X-ME-Sender: <xms:hzgeZmGZbSK1H7m3HGm1KOmsK_AAeMFPVYMixay1Eru8sd7yHDgpiA>
+    <xme:hzgeZnWQ2esUMSfU_0D24my2fG0qY2cJNnUNtNtcD2C6rKaFRHtwdHSUnXAnMGhcz
+    R7nbiQUhkG6xFzmgC8>
+X-ME-Received: <xmr:hzgeZgL4p3xOWEG3oS3ChSupA_xQWuNCojRtuOzIcyFSQu-ogt0Gw_1gfdW37WOalXYL69ozk8ZBIXmnEDxWD79GVtae60Y>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudejgedgtdehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhk
+    lhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnh
+    gvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeefhfellefh
+    ffejgfefudfggeejlefhveehieekhfeulefgtdefueehffdtvdelieenucevlhhushhtvg
+    hrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehnihhklhgrshdrshhouggv
+    rhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgv
+X-ME-Proxy: <xmx:hzgeZgHREZ80XBy4jnNvrmtiApv1GlE_Q_QuRqqabRUqMsKrFa8xPg>
+    <xmx:hzgeZsWnjIPgAsnbfsNy03qbsTda4gAblXQaINkW8NlWUFo9aar9Ew>
+    <xmx:hzgeZjMJIWID2nyNKYsRLfVyX2YY_GpSPm8rIJ0BHR8kfP99Udj6RA>
+    <xmx:hzgeZj1O9p1zEX7cuBBUZUfAUDDT81PY8u7bacEbsmPpkHVcgsddDQ>
+    <xmx:iDgeZmdCCdbUfYNPDhx_cScbLSnZQodEv26xWXQqtXgMUP8dPj00ARDN>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 16 Apr 2024 04:36:23 -0400 (EDT)
+Date: Tue, 16 Apr 2024 10:36:21 +0200
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Paul Barker <paul.barker.ct@bp.renesas.com>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	devel@linux-ipsec.org, Leon Romanovsky <leon@kernel.org>,
-	Eyal Birger <eyal.birger@gmail.com>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v10 1/3] xfrm: Add Direction to
- the SA in or out
-Message-ID: <Zh44gO885KtSjBHC@hog>
-References: <0e0d997e634261fcdf16cf9f07c97d97af7370b6.1712828282.git.antony.antony@secunet.com>
- <Zh0b3gfnr99ddaYM@hog>
- <Zh4kYUjvDtUq69-h@Antony2201.local>
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next] net: ethernet: rtsn: Add support for Renesas
+ Ethernet-TSN
+Message-ID: <20240416083621.GD3460978@ragnatech.se>
+References: <20240414135937.1139611-1-niklas.soderlund+renesas@ragnatech.se>
+ <98ae4f14-397b-49b7-a0a9-cb316f2594f6@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <Zh4kYUjvDtUq69-h@Antony2201.local>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <98ae4f14-397b-49b7-a0a9-cb316f2594f6@bp.renesas.com>
 
-2024-04-16, 09:10:25 +0200, Antony Antony wrote:
-> On Mon, Apr 15, 2024 at 02:21:50PM +0200, Sabrina Dubroca via Devel wrote=
-:
-> > 2024-04-11, 11:40:59 +0200, Antony Antony wrote:
-> > > diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-> > > index 6346690d5c69..2455a76a1cff 100644
-> > > --- a/net/xfrm/xfrm_device.c
-> > > +++ b/net/xfrm/xfrm_device.c
-> > > @@ -253,6 +253,12 @@ int xfrm_dev_state_add(struct net *net, struct x=
-frm_state *x,
-> > >  =09=09return -EINVAL;
-> > >  =09}
-> > >=20
-> > > +=09if ((xuo->flags & XFRM_OFFLOAD_INBOUND && x->dir =3D=3D XFRM_SA_D=
-IR_OUT) ||
-> > > +=09    (!(xuo->flags & XFRM_OFFLOAD_INBOUND) && x->dir =3D=3D XFRM_S=
-A_DIR_IN)) {
-> > > +=09=09NL_SET_ERR_MSG(extack, "Mismatched SA and offload direction");
-> > > +=09=09return -EINVAL;
-> > > +=09}
-> >=20
-> > It would be nice to set x->dir to match the flag, but then I guess the
-> > validation in xfrm_state_update would fail if userspaces tries an
-> > update without providing XFRMA_SA_DIR. (or not because we already went
-> > through this code by the time we get to xfrm_state_update?)
->=20
-> this code already executed from xfrm_state_construct.
-> We could set the in flag in xuo when x->dir =3D=3D XFRM_SA_DIR_IN, let me=
- think=20
-> again.  May be we can do that later:)
+Hi Paul,
 
-I mean setting x->dir, not setting xuo, ie adding something like this
-to xfrm_dev_state_add:
+Thanks for your review!
 
-    x->dir =3D xuo->flags & XFRM_OFFLOAD_INBOUND ? XFRM_SA_DIR_IN : XFRM_SA=
-_DIR_OUT;
+On 2024-04-15 08:34:09 +0100, Paul Barker wrote:
+> On 14/04/2024 14:59, Niklas Söderlund wrote:
+> > Add initial support for Renesas Ethernet-TSN End-station device of R-Car
+> > V4H. The Ethernet End-station can connect to an Ethernet network using a
+> > 10 Mbps, 100 Mbps, or 1 Gbps full-duplex link via MII/GMII/RMII/RGMII.
+> > Depending on the connected PHY.
+> > 
+> > Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+> > ---
+> > * Changes since RFC
+> > - Fix issues in MDIO communication.
+> > - Use a dedicated OF node for the MDIO bus.
+> > ---
+> >  MAINTAINERS                           |    8 +
+> >  drivers/net/ethernet/renesas/Kconfig  |   11 +
+> >  drivers/net/ethernet/renesas/Makefile |    2 +
+> >  drivers/net/ethernet/renesas/rtsn.c   | 1421 +++++++++++++++++++++++++
+> >  drivers/net/ethernet/renesas/rtsn.h   |  464 ++++++++
+> >  5 files changed, 1906 insertions(+)
+> >  create mode 100644 drivers/net/ethernet/renesas/rtsn.c
+> >  create mode 100644 drivers/net/ethernet/renesas/rtsn.h
+> 
+> <snip>
+> 
+> > diff --git a/drivers/net/ethernet/renesas/rtsn.c b/drivers/net/ethernet/renesas/rtsn.c
+> > new file mode 100644
+> > index 000000000000..291ab421d68f
+> > --- /dev/null
+> > +++ b/drivers/net/ethernet/renesas/rtsn.c
+> 
+> <snip>
+> 
+> > +static bool rtsn_rx(struct net_device *ndev, int *quota)
+> > +{
+> > +	struct rtsn_ext_ts_desc *desc;
+> > +	struct rtsn_private *priv;
+> > +	struct sk_buff *skb;
+> > +	dma_addr_t dma_addr;
+> > +	int boguscnt;
+> 
+> I find the variable name `boguscnt` very unclear, I'm not sure if it
+> means the count is bogus, or it is counting bogus items?
+> 
+> I don't think you need to match what I've done in ravb_main.c exactly,
+> but I'd prefer to see a better variable name here.
 
-xuo will already be set correctly when we're using offload, and won't
-be present if we're not.
+I like the changes you did in this area for RAVB, I will reuse some of 
+it in v2 of this.
+
+> 
+> > +	u16 pkt_len;
+> > +	u32 get_ts;
+> > +	int entry;
+> > +	int limit;
+> > +
+> > +	priv = netdev_priv(ndev);
+> > +
+> > +	entry = priv->cur_rx % priv->num_rx_ring;
+> > +	desc = &priv->rx_ring[entry];
+> > +
+> > +	boguscnt = priv->dirty_rx + priv->num_rx_ring - priv->cur_rx;
+> > +	boguscnt = min(boguscnt, *quota);
+> > +	limit = boguscnt;
+> > +
+> > +	while ((desc->die_dt & DT_MASK) != DT_FEMPTY) {
+> > +		dma_rmb();
+> > +		pkt_len = le16_to_cpu(desc->info_ds) & RX_DS;
+> > +		if (--boguscnt < 0)
+> > +			break;
+> > +
+> > +		skb = priv->rx_skb[entry];
+> > +		priv->rx_skb[entry] = NULL;
+> > +		dma_addr = le32_to_cpu(desc->dptr);
+> > +		dma_unmap_single(ndev->dev.parent, dma_addr, PKT_BUF_SZ,
+> > +				 DMA_FROM_DEVICE);
+> > +
+> > +		get_ts = priv->ptp_priv->tstamp_rx_ctrl &
+> > +			RCAR_GEN4_RXTSTAMP_TYPE_V2_L2_EVENT;
+> > +		if (get_ts) {
+> > +			struct skb_shared_hwtstamps *shhwtstamps;
+> > +			struct timespec64 ts;
+> > +
+> > +			shhwtstamps = skb_hwtstamps(skb);
+> > +			memset(shhwtstamps, 0, sizeof(*shhwtstamps));
+> > +
+> > +			ts.tv_sec = (u64)le32_to_cpu(desc->ts_sec);
+> > +			ts.tv_nsec = le32_to_cpu(desc->ts_nsec & cpu_to_le32(0x3fffffff));
+> > +
+> > +			shhwtstamps->hwtstamp = timespec64_to_ktime(ts);
+> > +		}
+> > +
+> > +		skb_put(skb, pkt_len);
+> > +		skb->protocol = eth_type_trans(skb, ndev);
+> > +		netif_receive_skb(skb);
+> > +		ndev->stats.rx_packets++;
+> > +		ndev->stats.rx_bytes += pkt_len;
+> > +
+> > +		entry = (++priv->cur_rx) % priv->num_rx_ring;
+> > +		desc = &priv->rx_ring[entry];
+> > +	}
+> > +
+> > +	/* Refill the RX ring buffers */
+> > +	for (; priv->cur_rx - priv->dirty_rx > 0; priv->dirty_rx++) {
+> > +		entry = priv->dirty_rx % priv->num_rx_ring;
+> > +		desc = &priv->rx_ring[entry];
+> > +		desc->info_ds = cpu_to_le16(PKT_BUF_SZ);
+> > +
+> > +		if (!priv->rx_skb[entry]) {
+> > +			skb = netdev_alloc_skb(ndev,
+> > +					       PKT_BUF_SZ + RTSN_ALIGN - 1);
+> 
+> I'll send my work using a page pool today as an RFC so you can see if it
+> would be beneficial to use that here as well. I was going to hold off
+> until the bugfix patches have merged so that I don't need to go through
+> another RFC round, but it will be good to get some more review on the
+> series anyway.
+
+I like the page pool idea, but there is no real benefit for it in this 
+driver at the moment. I would like to play and learn a bit more with it 
+in RAVB. And once I know more I can convert this driver too if it fits.
+
+> 
+> > +			if (!skb)
+> > +				break;
+> > +			skb_reserve(skb, NET_IP_ALIGN);
+> > +			dma_addr = dma_map_single(ndev->dev.parent, skb->data,
+> > +						  le16_to_cpu(desc->info_ds),
+> > +						  DMA_FROM_DEVICE);
+> > +			if (dma_mapping_error(ndev->dev.parent, dma_addr))
+> > +				desc->info_ds = cpu_to_le16(0);
+> > +			desc->dptr = cpu_to_le32(dma_addr);
+> > +			skb_checksum_none_assert(skb);
+> > +			priv->rx_skb[entry] = skb;
+> > +		}
+> > +		dma_wmb();
+> > +		desc->die_dt = DT_FEMPTY | D_DIE;
+> > +	}
+> > +
+> > +	desc = &priv->rx_ring[priv->num_rx_ring];
+> > +	desc->die_dt = DT_LINK;
+> > +
+> > +	*quota -= limit - (++boguscnt);
+> > +
+> > +	return boguscnt <= 0;
+> > +}
+> > +
+> > +static int rtsn_poll(struct napi_struct *napi, int budget)
+> > +{
+> > +	struct rtsn_private *priv;
+> > +	struct net_device *ndev;
+> > +	unsigned long flags;
+> > +	int quota = budget;
+> > +
+> > +	ndev = napi->dev;
+> > +	priv = netdev_priv(ndev);
+> > +
+> > +	/* Processing RX Descriptor Ring */
+> > +	if (rtsn_rx(ndev, &quota))
+> > +		goto out;
+> > +
+> > +	/* Processing TX Descriptor Ring */
+> > +	spin_lock_irqsave(&priv->lock, flags);
+> > +	rtsn_tx_free(ndev, true);
+> > +	netif_wake_subqueue(ndev, 0);
+> > +	spin_unlock_irqrestore(&priv->lock, flags);
+> > +
+> > +	napi_complete(napi);
+> 
+> We should use napi_complete_done() here as described in
+> Documentation/networking/napi.rst. That will require rtsn_rx() to return
+> the number of packets received so that it can be passed as the work_done
+> argument to napi_complete_done().
+
+Good point will update in v2.
+
+> 
+> > +
+> > +	/* Re-enable TX/RX interrupts */
+> > +	spin_lock_irqsave(&priv->lock, flags);
+> > +	rtsn_ctrl_data_irq(priv, true);
+> > +	__iowmb();
+> > +	spin_unlock_irqrestore(&priv->lock, flags);
+> > +out:
+> > +	return budget - quota;
+> > +}
+> 
+> <snip>
+> 
+> > +static int rtsn_probe(struct platform_device *pdev)
+> > +{
+> > +	struct rtsn_private *priv;
+> > +	struct net_device *ndev;
+> > +	struct resource *res;
+> > +	int ret;
+> > +
+> > +	ndev = alloc_etherdev_mqs(sizeof(struct rtsn_private), TX_NUM_CHAINS,
+> > +				  RX_NUM_CHAINS);
+> > +	if (!ndev)
+> > +		return -ENOMEM;
+> > +
+> > +	priv = netdev_priv(ndev);
+> > +	priv->pdev = pdev;
+> > +	priv->ndev = ndev;
+> > +	priv->ptp_priv = rcar_gen4_ptp_alloc(pdev);
+> > +
+> > +	spin_lock_init(&priv->lock);
+> > +	platform_set_drvdata(pdev, priv);
+> > +
+> > +	priv->clk = devm_clk_get(&pdev->dev, NULL);
+> > +	if (IS_ERR(priv->clk)) {
+> > +		ret = -PTR_ERR(priv->clk);
+> > +		goto error_alloc;
+> > +	}
+> > +
+> > +	priv->reset = devm_reset_control_get(&pdev->dev, NULL);
+> > +	if (IS_ERR(priv->reset)) {
+> > +		ret = -PTR_ERR(priv->reset);
+> > +		goto error_alloc;
+> > +	}
+> > +
+> > +	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "tsnes");
+> > +	if (!res) {
+> > +		dev_err(&pdev->dev, "Can't find tsnes resource\n");
+> > +		ret = -EINVAL;
+> > +		goto error_alloc;
+> > +	}
+> > +
+> > +	priv->base = devm_ioremap_resource(&pdev->dev, res);
+> > +	if (IS_ERR(priv->base)) {
+> > +		ret = PTR_ERR(priv->base);
+> > +		goto error_alloc;
+> > +	}
+> > +
+> > +	SET_NETDEV_DEV(ndev, &pdev->dev);
+> > +	ether_setup(ndev);
+> > +
+> > +	ndev->features = NETIF_F_RXCSUM;
+> > +	ndev->hw_features = NETIF_F_RXCSUM;
+> 
+> A quick skim of the datasheet suggests that TX checksum calculation is
+> also supported. It's probably worth listing which hardware features this
+> driver supports/does not support in the commit message.
+> 
+> Thanks,
+> 
+> -- 
+> Paul Barker
 
 
-> > > diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-> > > index 810b520493f3..df141edbe8d1 100644
-> > > --- a/net/xfrm/xfrm_user.c
-> > > +++ b/net/xfrm/xfrm_user.c
-> > > +=09=09=09return -EINVAL;
-> > > +=09=09}
-> > > +
-> > > +=09=09if (x->replay_esn) {
-> > > +=09=09=09if (x->replay_esn->replay_window > 1) {
-> > > +=09=09=09=09NL_SET_ERR_MSG(extack,
-> > > +=09=09=09=09=09       "Replay window should be 1 for OUT SA with ESN=
-");
-> >=20
-> > I don't think that we should introduce something we know doesn't make
-> > sense (replay window =3D 1 on output). It will be API and we won't be
-> > able to fix it up later. We get a chance to make things nice and
-> > reasonable with this new attribute, let's not waste it.
-> >
-> > As I said, AFAICT replay_esn->replay_window isn't used on output, so
-> > unless I missed something, it should just be a matter of changing the
-> > validation. The additional checks in this version should guarantee we
-> > don't have dir=3D=3DOUT SAs in the packet input path, so this should wo=
-rk.
->=20
-> I agree. Your message and Steffen's message helped me figure out,
-> how to allow replay-window zero for output SA;
-> It is in v11.
-
-Nice, thanks.
-
-> > [...]
-> > >  static int xfrm_add_sa(struct sk_buff *skb, struct nlmsghdr *nlh,
-> > >  =09=09       struct nlattr **attrs, struct netlink_ext_ack *extack)
-> > >  {
-> > > @@ -796,6 +881,16 @@ static int xfrm_add_sa(struct sk_buff *skb, stru=
-ct nlmsghdr *nlh,
-> > >  =09if (!x)
-> > >  =09=09return err;
-> > >=20
-> > > +=09if (x->dir) {
-> > > +=09=09err =3D verify_sa_dir(x, extack);
-> > > +=09=09if (err) {
-> > > +=09=09=09x->km.state =3D XFRM_STATE_DEAD;
-> > > +=09=09=09xfrm_dev_state_delete(x);
-> > > +=09=09=09xfrm_state_put(x);
-> > > +=09=09=09return err;
-> >=20
-> > That's not very nice. We're creating a state and just throwing it away
-> > immediately. How hard would it be to validate all that directly from
-> > verify_newsa_info instead?
->=20
-> Your proposal would introduce redundant code, requiring accessing attribu=
-tes=20
-> in verify_newsa_info() and other functions.
->=20
-> The way I propsed, a state x,  xfrm_state, is created but it remains=20
-> km.stae=3DXFRM_STATE_VOID.
-> Newely added verify is before auditing and generating new genid changes,=
-=20
-> xfrm_state_add() or xfrm_state_update() would be called later. So deletei=
-ng=20
-> a state just after xfrm_staet_constructi() is not  bad!
->=20
-> So I think the current code is cleaner, avoiding the need redundant code =
-in=20
-> verify_newsa_info().
-
-Avoids a few easy accesses to the netlink attributes, but allocating a
-state and all its associated info just to throw it away almost
-immediately is not "cleaner" IMO.
 
 
-> > And as we discussed, I'd really like XFRMA_SA_DIR to be rejected in
-> > commands that don't use its value.
->=20
-> I still don't see how to add such a check to about 20 functions. A burte=
-=20
-> force method would be 18-20 times copy code bellow, with different extack=
-=20
-> message.
 
-Yes, I think with the current netlink infrastructure and a single
-shared policy for all netlink message types, that's what we have to
-do. Doing it in the netlink core (or with help of the netlink core)
-seems difficult, as only the caller (xfrm_user) has all the
-information about which attributes are acceptable with each message
-type.
 
-> +++ b/net/xfrm/xfrm_user.c
-> @@ -957,6 +957,11 @@ static int xfrm_del_sa(struct sk_buff *skb, struct n=
-lmsghdr *nlh,
->         struct km_event c;
->         struct xfrm_usersa_id *p =3D nlmsg_data(nlh);
->=20
-> +       if (attrs[XFRMA_SA_DIR]) {
-> +               NL_SET_ERR_MSG(extack, "Delete should not have dir attrib=
-ute set");
-> +               return -ESRCH;
-> +       }
-> +
->=20
-> I am still trying to figure out netlink examples, including the ones you=
-=20
-> pointed out : rtnl_valid_dump_net_req, rtnl_net_valid_getid_req.
-
-These do pretty much what you wrote.
-
-> I wonder if there is a way to specifiy rejeced attributes per method.
->
-> may be there is  way to call nlmsg_parse_deprecated_strict()
-> with .type =3D NLA_REJECT.
-
-For that, we'd have to separate the policies for each netlink
-command. Otherwise NLA_REJECT will reject the SA_DIR attribute for all
-commands, which is not what we want.
-
-> And also this looks like a general cleanup up to me. I wonder how Steffen=
-=20
-> would add such a check for the upcoming PCPU attribute! Should that be=20
-> prohibited DELSA or XFRM_MSG_FLUSHSA or DELSA?
-
-IMO, new attributes should be rejected in any handler that doesn't use
-them. That's not a general cleanup because it's a new attribute, and
-the goal is to allow us to decide later if we want to use that
-attribute in DELSA etc. Maybe in one year, we want to make DELSA able
-to match on SA_DIR. If we don't reject SA_DIR from DELSA now, we won't
-be able to do that. That's why I'm insisting on this.
-
---=20
-Sabrina
-
+-- 
+Kind Regards,
+Niklas Söderlund
 
