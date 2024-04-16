@@ -1,200 +1,91 @@
-Return-Path: <netdev+bounces-88156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C23448A6133
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 04:54:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF87F8A6138
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 04:56:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21A52B2137A
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 02:54:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 786902826EB
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 02:56:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2919B107A6;
-	Tue, 16 Apr 2024 02:54:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EnOWv3mz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B173125A9;
+	Tue, 16 Apr 2024 02:56:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbg156.qq.com (smtpbg156.qq.com [15.184.82.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68062F4E7
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 02:54:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59B2D512
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 02:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.82.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713236043; cv=none; b=nZTLozlxZqrTY+G+vJXozWZfkehqzjDNGWdtzcCixt9K87E8Gs8bARt9/TGhzW2MfIJJRA2xcWSK6xr9XfnP0+UhgYAvHXhmu/h4UFQ+Ag/QCq6l6qupQT82i36kkQ73imJZVtwoMv2iw+TrlYZ9ZLbtt775sLuTpKzSOdspe1M=
+	t=1713236171; cv=none; b=Ft0zrVhLcAA5T/rVLMiB5sUnxBmtxhIhKP+7b1oBpav9mYqM2RIy3Kg8u2Pnr+MpaogAbleuEaIFvaHgaQV/K1uYPoZQI8MN1zxDH/dr0Nmiv92U7T0vLTYc/ZItoCJLdvLC7EK6UledXlwJr6x9C3O9xLOv4c6qs4XocN3RUPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713236043; c=relaxed/simple;
-	bh=IRel4Lsu2YoxCkxFMRRoIZ+lVMAqvPZv1ftyFTWXsh0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s716R5XSY4xWCihdIDTiNHiJizmYJGEAg2u8OjvEVyfMmgtCyGfQEeiKIwrflxEob8zHRoSWEMzIvK4yC2Ay9X8rNFhVCNvpakXg8Obtmlgh6ay17dTN16Ayh/FekPJ1Y5/RZDceW9Dv8p0d8sN1l2bfB12n4y+KYvOz2FsCLsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EnOWv3mz; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-56e5174ffc2so4567a12.1
-        for <netdev@vger.kernel.org>; Mon, 15 Apr 2024 19:54:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713236040; x=1713840840; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZaSImIW1hTM0apnFwhhJ7XqvtxkKwtwLHWxv6+n7UWE=;
-        b=EnOWv3mzyfm0rDKRKtC0GRU5HCWIYQMK7OF/1epFYwmgVwL79xrCiAqKCN2jIQm+Jt
-         d3qXf3rAzN/mn+YvPJwir8nVDGd5GxQpM4ZB23x5VwpDPtQXwXqzTaXqnTMBI9vapfe0
-         AUlqQQJeJXhaXg/kF511CW8+Wpes2fdg2EaL/IDJECZ0zD1YrFqAb09YinmUQlu3AbPB
-         Yj0h+Ae/auAnSCpzclgKlTcO6Rv6aSV6X9aRTUYzIUl55xS7KLxEjP+CdjbVBv3i1Sk6
-         5Q1nSc2qfzb5y+wYSdyvuF1aYcQiCiurxzb6VyniUH+JY+hOfZRGQEg5TRzTm7PwNXc2
-         u4xA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713236040; x=1713840840;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZaSImIW1hTM0apnFwhhJ7XqvtxkKwtwLHWxv6+n7UWE=;
-        b=QSb4wOo8bztIf10JrazTSGtqEkaQpUlQ0rm+OO5oz+9KK25MBU2yq8Gcc8GpQFFMiy
-         v1Z2BGTFFdXP8GmLiDA0fxOPtglTEB5Xz+TnpUfTz+6JEcdIjj6uCRZmMuonUWX0L+1+
-         jATr++Xuk52x8Yl4IxG1ZTyArD28XwCuWrawdwUT0vtfBe20/HWk6VEMDZ67k3udWwpd
-         MseBzMK+WmfIqA/btXXO7YgSj8wX3cqrq0Gede8NZU6GLq1y91nscXtxgPgXabtr07Cg
-         dAkoy8ZcXMANOs9SMr9XkDIgAEDfjn+EIKraQXrbg6ZuS+BPDWiBjNTYbXFgAqOtJwyG
-         jIFw==
-X-Forwarded-Encrypted: i=1; AJvYcCUYgJy6Fmuexdw1nzWWvRdq7YDeKjGC5ft31WK5786sWq8POqvGngfpf2Zt0c6lVJExrgzq3/K0s0pnuzUYagrnCm/b/XIl
-X-Gm-Message-State: AOJu0Yzya3saswdOspH31sPr9VCk4tAWYGYwyle9jbFe7X407Qt3qRtX
-	Yv9UcpTb90AazA1C66Q/scfRtIsmbyXjJKLcqZIk1jrC+XvNN0WXcFvG6po9ZOuczTgZo1wivw8
-	OHfWO6GS+2z59axNsbNuXdZqHLMSYcEsNQwa+
-X-Google-Smtp-Source: AGHT+IGZQ7v6n8rnAdMX07vEbWN6xVu0E1WerrXVb2RxsdXJKzkDUgNzJP6JnEDwvByBxmg2WGvOBWYueEk74xSmxSI=
-X-Received: by 2002:a05:6402:7cf:b0:570:257:8ea3 with SMTP id
- u15-20020a05640207cf00b0057002578ea3mr55062edy.7.1713236039593; Mon, 15 Apr
- 2024 19:53:59 -0700 (PDT)
+	s=arc-20240116; t=1713236171; c=relaxed/simple;
+	bh=iwdvYM09X/jbPkDJ+mz8mGgL8fm5hPBD/5nlnZ0mziQ=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=rBQ9qdiWhDRnsUp5DTY+LFw3iwKtClWPw1qKosLSqqcocR1DE93xCzkBV6R+6yHshMnPZrff8jIP+zM+wuc7AkSYNB5ucSKAyEOuDqFITQm2YT1/1YdXpyrUJj/NiTBZ+QleTytM4tSs9CHZI4L6yB90Gc/1bmpV7J0ZVBEiA3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=15.184.82.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: bizesmtpsz9t1713236130tf2gfmc
+X-QQ-Originating-IP: tR21tQOy+BxuUV8EQtveoGh7CjTBRXhsEXApkH1hUeU=
+Received: from smtpclient.apple ( [125.119.246.177])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Tue, 16 Apr 2024 10:55:28 +0800 (CST)
+X-QQ-SSF: 00400000000000O0Z000000A0000000
+X-QQ-FEAT: QityeSR92A251LSQf5EyvpjRhO6AWPnrWQPUEWFC6aDitdjRIunQBryTOlWqT
+	bw6IYz62wCMCTO3P/lSavve5fPPWTVR9qYRUNwOJQo8eC1eKJnuXr57G/GibUeHh/7XB/Y2
+	KskezwN42Fikt06tEk1YyYL3RQAwYQwmfbNjJJSGU7/isHKnNfEonS0yRDhWWCc0APWsTt6
+	kqDv3y+2qQ7ogdTrWcrbZ3KXI9KIQDO+xy73TJ7caZk9kvum8sDpADcWFnotsg/Gr40gDGj
+	UJLKK000da9xL5SKfxEgE7uNVwx8EsB3vle4rqluAhkU05paoGo4hnEaGwRXZzFN0rPBc/Q
+	Usk+/2nDJGOGZI3lUq40EkJbJGaA50u28kAPXjgdvdPTXmil3p5kSSIUKgf4d7EhISnZCbf
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 14005444982630097532
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240415150103.23316-1-shiming.cheng@mediatek.com>
- <661d93b4e3ec3_3010129482@willemb.c.googlers.com.notmuch> <65e3e88a53d466cf5bad04e5c7bc3f1648b82fd7.camel@mediatek.com>
-In-Reply-To: <65e3e88a53d466cf5bad04e5c7bc3f1648b82fd7.camel@mediatek.com>
-From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
-Date: Mon, 15 Apr 2024 19:53:48 -0700
-Message-ID: <CANP3RGdkxT4TjeSvv1ftXOdFQd5Z4qLK1DbzwATq_t_Dk+V8ig@mail.gmail.com>
-Subject: Re: [PATCH net] udp: fix segmentation crash for GRO packet without fraglist
-To: =?UTF-8?B?TGVuYSBXYW5nICjnjovlqJwp?= <Lena.Wang@mediatek.com>
-Cc: "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>, "kuba@kernel.org" <kuba@kernel.org>, 
-	=?UTF-8?B?U2hpbWluZyBDaGVuZyAo5oiQ6K+X5piOKQ==?= <Shiming.Cheng@mediatek.com>, 
-	"pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com" <edumazet@google.com>, 
-	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, 
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.500.153.1.1\))
+Subject: Re: [PATCH net-next v3 0/6] add sriov support for wangxun NICs
+From: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
+In-Reply-To: <20240415112708.6105e143@kernel.org>
+Date: Tue, 16 Apr 2024 10:55:16 +0800
+Cc: netdev@vger.kernel.org,
+ Jiawen Wu <jiawenwu@trustnetic.com>,
+ =?utf-8?B?5rip56uv5by6?= <duanqiangwen@net-swift.com>
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <36569F35-F1C1-44DB-AC46-4E67158EEF0A@net-swift.com>
+References: <587FAB7876D85676+20240415110225.75132-1-mengyuanlou@net-swift.com>
+ <20240415112708.6105e143@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+X-Mailer: Apple Mail (2.3774.500.153.1.1)
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:net-swift.com:qybglogicsvrgz:qybglogicsvrgz6a-1
 
-On Mon, Apr 15, 2024 at 7:14=E2=80=AFPM Lena Wang (=E7=8E=8B=E5=A8=9C) <Len=
-a.Wang@mediatek.com> wrote:
->
-> On Mon, 2024-04-15 at 16:53 -0400, Willem de Bruijn wrote:
-> >
-> > External email : Please do not click links or open attachments until
-> > you have verified the sender or the content.
-> >  shiming.cheng@ wrote:
-> > > From: Shiming Cheng <shiming.cheng@mediatek.com>
-> > >
-> > > A GRO packet without fraglist is crashed and backtrace is as below:
-> > >  [ 1100.812205][    C3] CPU: 3 PID: 0 Comm: swapper/3 Tainted:
-> > > G        W  OE      6.6.17-android15-0-g380371ea9bf1 #1
-> > >  [ 1100.812317][    C3]  __udp_gso_segment+0x298/0x4d4
-> > >  [ 1100.812335][    C3]  __skb_gso_segment+0xc4/0x120
-> > >  [ 1100.812339][    C3]  udp_rcv_segment+0x50/0x134
-> > >  [ 1100.812344][    C3]  udp_queue_rcv_skb+0x74/0x114
-> > >  [ 1100.812348][    C3]  udp_unicast_rcv_skb+0x94/0xac
-> > >  [ 1100.812358][    C3]  udp_rcv+0x20/0x30
-> > >
-> > > The reason that the packet loses its fraglist is that in ingress
-> > bpf
-> > > it makes a test pull with to make sure it can read packet headers
-> > > via direct packet access: In bpf_progs/offload.c
-> > > try_make_writable -> bpf_skb_pull_data -> pskb_may_pull ->
-> > > __pskb_pull_tail  This operation pull the data in fraglist into
-> > linear
-> > > and set the fraglist to null.
-> >
-> > What is the right behavior from BPF with regard to SKB_GSO_FRAGLIST
-> > skbs?
-> >
-> > Some, like SCTP, cannot be linearized ever, as the do not have a
-> > single gso_size.
-> >
-> > Should this BPF operation just fail?
-> >
-> In most situation for big gso size packet, it indeed fails but BPF
-> doesn't check the result. It seems the udp GRO packet can't be pulled/
-> trimed/condensed or else it can't be segmented correctly.
->
-> As the BPF function comments it doesn't matter if the data pull failed
-> or pull less. It just does a blind best effort pull.
->
-> A patch to modify bpf pull length is upstreamed to Google before and
-> below are part of Google BPF expert maze's reply:
-> maze@google.com<maze@google.com> #5Apr 13, 2024 02:30AM
-> I *think* if that patch fixes anything, then it's really proving that
-> there's a bug in the kernel that needs to be fixed instead.
-> It should be legal to call try_make_writable(skb, X) with *any* value
-> of X.
->
-> I add maze in loop and we could start more discussion here.
 
-Personally, I think bpf_skb_pull_data() should have automatically
-(ie. in kernel code) reduced how much it pulls so that it would pull
-headers only,
-and not packet content.
-(This is assuming the rest of the code isn't ready to deal with a longer pu=
-ll,
-which I think is the case atm.  Pulling too much, and then crashing or forc=
-ing
-the stack to drop packets because of them being malformed seems wrong...)
 
-In general it would be nice if there was a way to just say pull all headers=
-...
-(or possibly all L2/L3/L4 headers)
-You in general need to pull stuff *before* you've even looked at the packet=
-,
-so that you can look at the packet,
-so it's relatively hard/annoying to pull the correct length from bpf
-code itself.
+> 2024=E5=B9=B44=E6=9C=8816=E6=97=A5 02:27=EF=BC=8CJakub Kicinski =
+<kuba@kernel.org> =E5=86=99=E9=81=93=EF=BC=9A
+>=20
+> On Mon, 15 Apr 2024 18:54:27 +0800 Mengyuan Lou wrote:
+>> Do not accept any new implementations of the old SR-IOV API.
+>> So remove ndo_vf_xxx in these patches.
+>=20
+> But you're not adding support for switchdev mode either,=20
+> so how are you going to configure them?
 
-> > > BPF needs to modify a proper length to do pull data. However kernel
-> > > should also improve the flow to avoid crash from a bpf function
-> > call.
-> > > As there is no split flow and app may not decode the merged UDP
-> > packet,
-> > > we should drop the packet without fraglist in skb_segment_list
-> > here.
-> > >
-> > > Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist chaining.")
-> > > Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
-> > > Signed-off-by: Lena Wang <lena.wang@mediatek.com>
-> > > ---
-> > >  net/core/skbuff.c | 3 +++
-> > >  1 file changed, 3 insertions(+)
-> > >
-> > > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > > index b99127712e67..f68f2679b086 100644
-> > > --- a/net/core/skbuff.c
-> > > +++ b/net/core/skbuff.c
-> > > @@ -4504,6 +4504,9 @@ struct sk_buff *skb_segment_list(struct
-> > sk_buff *skb,
-> > >  if (err)
-> > >  goto err_linearize;
-> > >
-> > > +if (!list_skb)
-> > > +goto err_linearize;
-> > > +
-> > >  skb_shinfo(skb)->frag_list =3D NULL;
-> >
-> > In absense of plugging the issue in BPF, dropping here is the best
-> > we can do indeed, I think.
-> >
+Do you mean .sriov_configure?
+Had implement it in patch2 and add it patch5/6.
 
---
-Maciej =C5=BBenczykowski, Kernel Networking Developer @ Google
+I have missed any other interfaces?
+
+Thanks.
+Lou
+>=20
+
 
