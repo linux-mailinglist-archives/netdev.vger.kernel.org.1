@@ -1,105 +1,92 @@
-Return-Path: <netdev+bounces-88424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 641F08A7298
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 19:44:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EF618A72A0
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 19:51:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E841C2825D8
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 17:44:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E00211F21D6F
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 17:51:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A29D013342A;
-	Tue, 16 Apr 2024 17:44:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7EF313398E;
+	Tue, 16 Apr 2024 17:51:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Wzt72N49"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FAmSAcR6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40E3F1332A7
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 17:44:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CF512EBF0;
+	Tue, 16 Apr 2024 17:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713289486; cv=none; b=dpfa+v9a1iF/Yx6sZ8Q6xIBFaE9pupJ7WLVtCNrH/nM5ir2OiwkjP802/zO3LEgj1iPbA4JfptYwJJpeIcgpBtANvx9PlV/IZk46qx6LUo+9f81PzlcSIbU0kyEQJXjuAvsQPJjfEAH9DsYzFXbz3ld+4W4HOkqeoPC+0FxExfo=
+	t=1713289885; cv=none; b=l+iMg7fUoocKxFUBEfiy8MeAl+tq7ZsrjJzideV+G42B/NzPBNxkRcoEfhg1G7i1/+FihHYBwE4Zl4K2gLBEd1KSUt4irsNVHLnPVSoGjrcxmlrpfureKBUYqGc+Icw5WS2Cuh4yu0m4hEq4lABkAedfioN8wt2EW1R0GgQ39TY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713289486; c=relaxed/simple;
-	bh=nr4g1oINXA11L+a73PiTlGoU/0iSIb8Hy8dL+fJSMlA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W+EbtBeu53kroMGV0TGpVEDJb4dOnXt3WJm+RvSSolu1U5u6WscMPU0MQI1rqMqYICl412TsxboHFxPBpx0/zc1na4RJI1FLL0UmX7bZoJFS0ZXsItTD8z2tAIqDA5pwWBqHIEvR0cCeHwvpN6MqAMR3DmL6nfP1MofjFZw3ktg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Wzt72N49; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-78d68c08df7so369279285a.2
-        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 10:44:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713289484; x=1713894284; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XrIP5NfD1uVdOzJdpOysC0NK7Um7o2M5ma7/UNP5Z/c=;
-        b=Wzt72N49XjcwXboAM0i0lVLER3SVtqUjKxSYu0Yk4HnBRnv+/ZAinvgy6aUoq76/y2
-         NUDCkp1y5lAB9ww/UmwUmkUu/uj5DOSibZfkl284nRgjORxHn0hUuuSuQ3sIHsfFisFB
-         t060S/4ZUcJk5O/T405CBix8LvhpB8H000wZME7ee9mCLMVI9xezX87QkDL284nelHEi
-         aOaFRwPfL+Mm3z668QR+7Im0XtXmO+KtvWa3dHH1fcYiOPb6i+na7elWQPV7KuFMAlGz
-         loNk9CTff5EINQAUbRQ9DrHVrtlBQywy7SQ0RzROFLN+9KVvT6nQYSOOtXit9/ZvwX+K
-         P4WQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713289484; x=1713894284;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XrIP5NfD1uVdOzJdpOysC0NK7Um7o2M5ma7/UNP5Z/c=;
-        b=XQVc/j0tbf6kxNvnqZ/K4h2SEb3F7+yNBtFHOeZaqTPsP/fljBf+xYiQijwtS7kniL
-         IYQA1KOj4E+x1CXFHwWKnqgCSmKGL61l4MlM9QAoUtlMccl1Xf69Adc9gW5hCgu3aMV0
-         zn75Xy8HUR6JKm6VcDWxwhXjPcE0OKBkDZu5yWCEQiHUcp/myji9b5lAMNHTb10u+8gm
-         7MckOcqQTky+EEAFHWwLrLECtRGa9sfXfH2yqlMNUst11oATz3SVdHHZNu6GdpwPb5dZ
-         sLUc9jQ+OSIl4bz24XeQlV9uG1TaTHOuIsoLcINcKNrRVsE+2pHs1ku9qF7DU1zNEKUL
-         ZwdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUrKJ5nHv0KUZ/So1Q9ZkhcU9BApLd8FeexxCxMZQB6mzh5UF5pvy/3l7t0iskRI0ViUJh4J7k5VEdzHaHz02IF3Z2Q+V0O
-X-Gm-Message-State: AOJu0YwEtCbN23ADTdwTuTWlSUZyKkVVSk6yTnZsbeh1mh90/GqgxXUf
-	NZj5G44s8DN+v0jS8RIktuNSyBkjzvAKaeLgqBUBZWnsgqEVwEJB
-X-Google-Smtp-Source: AGHT+IEn9tHMTKBV2UxEMUh8zm0oXy63l3ne0ZXcUpEPyKCR6cUqyYlvOFmruvOaxNfUTcE6WMFPdA==
-X-Received: by 2002:a05:620a:262a:b0:78e:bd7f:4db4 with SMTP id z42-20020a05620a262a00b0078ebd7f4db4mr16543483qko.51.1713289484004;
-        Tue, 16 Apr 2024 10:44:44 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id a15-20020a05620a16cf00b0078d5f2924e1sm7706590qkn.63.2024.04.16.10.44.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Apr 2024 10:44:43 -0700 (PDT)
-Message-ID: <3b57b26c-3f1e-4db6-a584-59c84f16dcae@gmail.com>
-Date: Tue, 16 Apr 2024 10:44:38 -0700
+	s=arc-20240116; t=1713289885; c=relaxed/simple;
+	bh=bM4xJrevzHisjJsEBCKMA21c1+HdvIZqUoYp2jCPlJw=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=aZUS60I1x8OWj9ek0ewslWoqSa0bQhGCxTzZU5VLJmuNdi+OopaCZMVMJv/vy4/8cjVQuLkXrOELSb2/vN70jY5xPWuAbdLVNt9ZkOz1da5KBe88/0T2178S+ltRip/3HoWTsrDdoaCE9HwWwZFtuQwxZgeRSEbQir2VcRsnNBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FAmSAcR6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEECFC113CE;
+	Tue, 16 Apr 2024 17:51:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713289885;
+	bh=bM4xJrevzHisjJsEBCKMA21c1+HdvIZqUoYp2jCPlJw=;
+	h=Subject:From:To:Cc:Date:From;
+	b=FAmSAcR6ed3Fi+OIR5DzruE8DSs+YfuciiT/vPtdTIR08H4t8Vx9gAqgaWFWagxOQ
+	 gJW4+sL1iz+m0xWQtVZpMl7RIW5S0ufVGcXMGJZOdU7dmCzn0X21tdcFljjJ6XrRlM
+	 xjmXTs6bUj9Tvrz2bo5yUPQjnruWastd0fcH97gH/DgUEGy2NoEtP6IIos+FZp7++4
+	 ccmzDFNPzkTRYfPIs3D9h5LIvUZPKsz33aMHRSD1DfGVNNucW9AAuMClftZvfPEYYA
+	 rF3SqZSlqtRhExXS6EUYr3IfizqJ5W5nND9fgkb48e74MFsdtYEFE80+yd4x9d9sZL
+	 DRkygFoJbUvog==
+Subject: [PATCH v1 0/3] cgroup/rstat: global cgroup_rstat_lock changes
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: tj@kernel.org, hannes@cmpxchg.org, lizefan.x@bytedance.com,
+ cgroups@vger.kernel.org, yosryahmed@google.com, longman@redhat.com
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>, netdev@vger.kernel.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org, shakeel.butt@linux.dev,
+ kernel-team@cloudflare.com, linux-kernel@vger.kernel.org,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, mhocko@kernel.org
+Date: Tue, 16 Apr 2024 19:51:19 +0200
+Message-ID: <171328983017.3930751.9484082608778623495.stgit@firesoul>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: dsa: bcm_sf2: provide own phylink MAC
- operations
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org
-References: <E1rwfu3-00752s-On@rmk-PC.armlinux.org.uk>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <E1rwfu3-00752s-On@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
-On 4/16/24 03:19, Russell King (Oracle) wrote:
-> Convert bcm_sf2 to provide its own phylink MAC operations, thus
-> avoiding the shim layer in DSA's port.c
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+This patchset is focused on the global cgroup_rstat_lock.
 
-Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
-Tested-by: Florian Fainelli <florian.fainelli@broadcom.com>
--- 
-Florian
+ Patch-1: Adds tracepoints to improve measuring lock behavior.
+ Patch-2: Converts the global lock into a mutex.
+ Patch-3: Limits userspace triggered pressure on the lock.
+
+Background in discussion thread [1].
+ [1] https://lore.kernel.org/all/ac4cf07f-52dd-454f-b897-2a4b3796a4d9@kernel.org/
+
+---
+
+Jesper Dangaard Brouer (3):
+      cgroup/rstat: add cgroup_rstat_lock helpers and tracepoints
+      cgroup/rstat: convert cgroup_rstat_lock back to mutex
+      cgroup/rstat: introduce ratelimited rstat flushing
+
+
+ block/blk-cgroup.c            |   2 +-
+ include/linux/cgroup-defs.h   |   1 +
+ include/linux/cgroup.h        |   5 +-
+ include/trace/events/cgroup.h |  48 +++++++++++++++
+ kernel/cgroup/rstat.c         | 111 ++++++++++++++++++++++++++++++----
+ mm/memcontrol.c               |   1 +
+ 6 files changed, 153 insertions(+), 15 deletions(-)
+
+--
+
 
 
