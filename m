@@ -1,348 +1,125 @@
-Return-Path: <netdev+bounces-88405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0EE98A70E9
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:08:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFF788A70ED
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:11:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E31301C21889
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:08:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F6E91F2159A
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:11:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68E9613172A;
-	Tue, 16 Apr 2024 16:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35F3B131737;
+	Tue, 16 Apr 2024 16:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i2cX1f/8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Vln4qJUS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC4612BE9F;
-	Tue, 16 Apr 2024 16:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11EA12BE9F
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 16:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713283735; cv=none; b=CQLGcVlIEtwiPTTD47RKb/EsJ0WJS2PbPnuqIt6r88uV9KqK9If+dLBtIpUEBYV8cF6GtcqNcPo6dfs9W9ZB6fZHyL8nmphTUbqKzmrRPw+jrMeBwkeQ3sqv5gHy+P1DVnFoRdV56tPSvGp/zQkoRbtOtsU4ZAPdvvEeVTEsvIk=
+	t=1713283876; cv=none; b=JE5/b9086otSsYPoLtm9QbzpwWKQgzUf9j96n7okm3oOWJusjYATRulMJ2eS3FYou41MvtWM9p8SRu5Kt6QzZkuxhRypriUna5iyRcFMLR43x4ALYIq5jb4lgtP2b/XPbK4aB6rZejkpLBD1hhwhiTPqCJtZGHr6DYpM9+GUl44=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713283735; c=relaxed/simple;
-	bh=xJTZUAnxgcV31l2lk2qqoJPE2M8jusD+gc6I2kuThFU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GEf1AjueclYDyTOSbfS8T+SLlalPWsGYkIRzbeNJiZm3tUqMN3CXpNL+/ynVjlgPNt5nyQLiPbNHnQMYO4RZeXM7I4yLnAecmCj+zbFMrJI8O2KcUv9n5tJM5GmDLoYgoDdZzQ2DV43NZJ/O87PAdIdR2OdFqg6yhLqiVlj+XmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i2cX1f/8; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3454fbdd88aso4004782f8f.3;
-        Tue, 16 Apr 2024 09:08:53 -0700 (PDT)
+	s=arc-20240116; t=1713283876; c=relaxed/simple;
+	bh=WyRoh4sl70M498CJ9tMGz81P+g1RM+DndqovavljXoE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=GuX2agmtCg7UucARv8wnDvAUUYQFjKnMPuJO97IDnV05nFsT6E4geYBH4OpQFcVzjfrBDZIWLbhStqc1di7J7j/vgea26loX3wMujIk/23Hg/bhLmYJ6l82AuZ5BllShLI+7Poj1hkuJr9l5RUQvx51UWx3Go58XzRiCrTIbJCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Vln4qJUS; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf216080f5so7519421276.1
+        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 09:11:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713283732; x=1713888532; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TfqeinlZEWtIXVEkZjds66VVZ8TL7yzBqLVW5+SS5fc=;
-        b=i2cX1f/8kayXC5spMaZvlCaQwf0f79sHNgNeBLm9OBpr1fWbS/BVWXbRpGRHh2K/kh
-         tSMfsoZjERMEphOcqCkmJZZcnEyoby9z2t84tgWRT4BvT1u1VKe3K0w652kckRH+svt1
-         35AS/wPljoQ3II/t+64qHTL3oABoJ1DSgtHMCLXOorWqU2M0jTJNK0GMF23/1J6BAW/r
-         6DS8TMV6Fc7tnTql2TZrKNsHmcAsV8xJoRD10H3ypHAuP7EzKg+kNpTLuX7BWEoBEQYr
-         v0opZBN7poOeChnFqBUueN2XDr1hvfVxDI5F17C49SR0EAzGi96lrIMw54bEANdjNfMB
-         5OVw==
+        d=google.com; s=20230601; t=1713283874; x=1713888674; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=T+0WDqN//fwjWBrfsDezWmZtt2VX6qDIy0gtOaLPAeo=;
+        b=Vln4qJUSJwroOhnIcxFWdZdboSwyHAx4vOWZQqmyJu5FvMv1VYHEioEp8TgXtRddb3
+         TWCKruHrYwAwHhVMBzCK610R32NsJ3p/5n5DfHeg4p6A7UdBjl0J/jUKkWJzIfUZ1UZ8
+         YCblI5uoNkIh89aQm/ojPEkDRDISxkvFVlNCGBYsWgkYlMisoNEDPUaELWtGh/A0bcX/
+         0wGbhlHO9fpeIjJkLo/c3QqIvGqsBLCoyPgz11E8VFZjKa36Ch5T5zjLPtEDdLa3INXS
+         rwzTajqnAdDBMDcQ/SOp+rPaGtfD9+VSSnqxQXivb7LuMOyn10mTwoIgJrryp1LMAA/Q
+         +/yQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713283732; x=1713888532;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TfqeinlZEWtIXVEkZjds66VVZ8TL7yzBqLVW5+SS5fc=;
-        b=d3t0yC+9t4P/HVTjOsj/yKncYuYZIgETCcANbEKZWO4LcLy+Z/GcNMa1CYh7hgNdJN
-         nWnzSjfZohqEEGoE7qBVI6ZuqSb7DSYvcFMucJG3pfx0p9DrmAh+NMm7PDJW3ChlAJ7D
-         LeOZSSecs1DgiBfBcgCSOnCNAlU/wXm1F2wWQt6Odm+MMuSqVrscTioizrIsDeanGlU4
-         jz5ul+NqvdS0lD1Xcz1ByxbnpO8XImT5avk8xyr6d2MRqU09xJ3KEt58BMneTLIQqplN
-         iqKiaLw6E29rDnHmk7i95zH/mSLWQdlRDYfAqwshUS5U4OnAoZQv5QjIpiedSYEczsQV
-         Sd/g==
-X-Forwarded-Encrypted: i=1; AJvYcCXgrqUJQmgIl+2yj3eS9+CWigwCDyfjbfQdHQNpTSL1kvkGr+ufRPhBDtS2uakn0+/3HYuoWHJpc1NSCNFJo0e5KQSEATvtCuW1GfKJXvoVo323fEDOFSljivZJKa2gHeK/D1A0
-X-Gm-Message-State: AOJu0YwRtRn9FKrtybFpuH/1oig2ERU7/8on5dShbU59QfMtdYTVN07a
-	au+JIcEqZOFfoh7q6vaDBt8Pi82yyQc0s5hz9MQq+ab2eMJ3SR94XCAsrFPN9UYJV1V5Bu3jJbn
-	W4zu/Bt+PaNcQ02iTBd+2ALdw53k=
-X-Google-Smtp-Source: AGHT+IGF5abEcTvau2mHvo9SZL7EcchFBWSdkvIwcQqqBgNJB7O3i8rimyfDFs0cfpgylrUUTfGBxVDks5HFfnr/FOY=
-X-Received: by 2002:a5d:510f:0:b0:346:cd1c:dc73 with SMTP id
- s15-20020a5d510f000000b00346cd1cdc73mr11149953wrt.46.1713283731429; Tue, 16
- Apr 2024 09:08:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713283874; x=1713888674;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=T+0WDqN//fwjWBrfsDezWmZtt2VX6qDIy0gtOaLPAeo=;
+        b=rne2aDDnbGJJJJqKHVQJBRaUNHl8Aym5uodfSOGmyXfwCaXS5Y/Ty31ef8sATx4xjf
+         z3Sq9kyTaxWFDxuplsVfZBqPRc+5P1X9LrI8qbg0/2fzwyDj98Xz+G+AbqDOtJ0wHCde
+         +wdOJLjnOT7+wk80Trzol22H0pXDLKzTkmm8QogC7F0GytsaciMkbeKlX4OIrTAJVkEp
+         QB/1uQNFQPVOgSyz0H4ddFhBcn1KSyafsBu1J53cDNzEXDMr9umbqHl8GyN/ojM/dqAj
+         kIy/h3BApcvx0MkJgpV/BaG5lSglWqPIoOPgW6q0BQM48a5oe+IyOSzvZX9e65MnIwlr
+         rVXA==
+X-Gm-Message-State: AOJu0YyIMJGHIn8XLtxAZQA+DUK9YVE4UNou2Q6b7TGASIB2RCR/lBY0
+	sJF5nfBGQ+/LzKNH4ap1VNTemFNWZXm8DlTwYCyp+uyGm8qNetUL3kB8moqBsRbZt1VIFuNCqwT
+	BjxcHZTcTNg==
+X-Google-Smtp-Source: AGHT+IHfx2rR/09nr1b8hOQj+LluEX581cmYwszZqiOhHKPul6Pmnfs7duE6aTMCFkJilDKi0V5NtEfwjoN4iQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:120a:b0:dc7:68b5:4f21 with SMTP
+ id s10-20020a056902120a00b00dc768b54f21mr4186483ybu.9.1713283873721; Tue, 16
+ Apr 2024 09:11:13 -0700 (PDT)
+Date: Tue, 16 Apr 2024 16:11:12 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240415131941.51153-1-linyunsheng@huawei.com> <20240415131941.51153-7-linyunsheng@huawei.com>
-In-Reply-To: <20240415131941.51153-7-linyunsheng@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 16 Apr 2024 09:08:14 -0700
-Message-ID: <CAKgT0UdAW9EBh_eauHMArxjUeV-mwC9arZuCYPk=scn5yvW9gQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 06/15] mm: page_frag: change page_frag_alloc_*
- API to accept align param
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, 
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, linux-mm@kvack.org, 
-	linux-afs@lists.infradead.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
+Message-ID: <20240416161112.1199265-1-edumazet@google.com>
+Subject: [PATCH net-next] tcp_metrics: fix tcp_metrics_nl_dump() return value
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 15, 2024 at 6:22=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> When page_frag_alloc_* API doesn't need data alignment, the
-> ALIGN() operation is unnecessary, so change page_frag_alloc_*
-> API to accept align param instead of align_mask param, and do
-> the ALIGN()'ing in the inline helper when needed.
->
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+Change tcp_metrics_nl_dump() to return 0 at the end
+of a dump so that NLMSG_DONE can be appended
+to the current skb, saving one recvmsg() system call.
 
-The vast majority of callers are using this aligned one way or
-another. If anything with your recent changes we should probably be
-making sure to align the fragsz as well as the offset since most
-callers were only using the alignment of the fragsz in order to get
-their alignment.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv4/tcp_metrics.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-My main concern is that this change implies that most are using an
-unaligned setup when it is in fact quite the opposite.
+diff --git a/net/ipv4/tcp_metrics.c b/net/ipv4/tcp_metrics.c
+index c2a925538542b5d787596b7d76705dda86cf48d8..301881eb23f376339d59a62bebf150b4b1cae3fb 100644
+--- a/net/ipv4/tcp_metrics.c
++++ b/net/ipv4/tcp_metrics.c
+@@ -766,6 +766,7 @@ static int tcp_metrics_nl_dump(struct sk_buff *skb,
+ 	unsigned int max_rows = 1U << tcp_metrics_hash_log;
+ 	unsigned int row, s_row = cb->args[0];
+ 	int s_col = cb->args[1], col = s_col;
++	int res = 0;
+ 
+ 	for (row = s_row; row < max_rows; row++, s_col = 0) {
+ 		struct tcp_metrics_block *tm;
+@@ -778,7 +779,8 @@ static int tcp_metrics_nl_dump(struct sk_buff *skb,
+ 				continue;
+ 			if (col < s_col)
+ 				continue;
+-			if (tcp_metrics_dump_info(skb, cb, tm) < 0) {
++			res = tcp_metrics_dump_info(skb, cb, tm);
++			if (res < 0) {
+ 				rcu_read_unlock();
+ 				goto done;
+ 			}
+@@ -789,7 +791,7 @@ static int tcp_metrics_nl_dump(struct sk_buff *skb,
+ done:
+ 	cb->args[0] = row;
+ 	cb->args[1] = col;
+-	return skb->len;
++	return res;
+ }
+ 
+ static int __parse_nl_addr(struct genl_info *info, struct inetpeer_addr *addr,
+-- 
+2.44.0.683.g7961c838ac-goog
 
-> ---
->  include/linux/page_frag_cache.h | 20 ++++++++++++--------
->  include/linux/skbuff.h          | 12 ++++++------
->  mm/page_frag_cache.c            |  9 ++++-----
->  net/core/skbuff.c               | 12 +++++-------
->  net/rxrpc/txbuf.c               |  5 +++--
->  5 files changed, 30 insertions(+), 28 deletions(-)
->
-> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_ca=
-che.h
-> index 04810d8d6a7d..cc0ede0912f3 100644
-> --- a/include/linux/page_frag_cache.h
-> +++ b/include/linux/page_frag_cache.h
-> @@ -25,21 +25,25 @@ struct page_frag_cache {
->
->  void page_frag_cache_drain(struct page_frag_cache *nc);
->  void __page_frag_cache_drain(struct page *page, unsigned int count);
-> -void *__page_frag_alloc_align(struct page_frag_cache *nc, unsigned int f=
-ragsz,
-> -                             gfp_t gfp_mask, unsigned int align_mask);
-> +void *page_frag_alloc(struct page_frag_cache *nc, unsigned int fragsz,
-> +                     gfp_t gfp_mask);
-> +
-> +static inline void *__page_frag_alloc_align(struct page_frag_cache *nc,
-> +                                           unsigned int fragsz, gfp_t gf=
-p_mask,
-> +                                           unsigned int align)
-> +{
-> +       nc->offset =3D ALIGN(nc->offset, align);
-> +
-> +       return page_frag_alloc(nc, fragsz, gfp_mask);
-> +}
->
-
-I would rather not have us breaking up the alignment into another
-function. It makes this much more difficult to work with. In addition
-you are adding offsets without actually adding to the pages which
-makes this seem exploitable. Basically just pass an alignment value of
-32K and you are forcing a page eviction regardless.
-
->  static inline void *page_frag_alloc_align(struct page_frag_cache *nc,
->                                           unsigned int fragsz, gfp_t gfp_=
-mask,
->                                           unsigned int align)
->  {
->         WARN_ON_ONCE(!is_power_of_2(align));
-> -       return __page_frag_alloc_align(nc, fragsz, gfp_mask, -align);
-> -}
->
-> -static inline void *page_frag_alloc(struct page_frag_cache *nc,
-> -                                   unsigned int fragsz, gfp_t gfp_mask)
-> -{
-> -       return page_frag_alloc_align(nc, fragsz, gfp_mask, ~0u);
-> +       return __page_frag_alloc_align(nc, fragsz, gfp_mask, align);
->  }
->
->  void page_frag_free(void *addr);
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index f2dc1f735c79..43c704589deb 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -3268,7 +3268,7 @@ static inline void skb_queue_purge(struct sk_buff_h=
-ead *list)
->  unsigned int skb_rbtree_purge(struct rb_root *root);
->  void skb_errqueue_purge(struct sk_buff_head *list);
->
-> -void *__netdev_alloc_frag_align(unsigned int fragsz, unsigned int align_=
-mask);
-> +void *__netdev_alloc_frag_align(unsigned int fragsz, unsigned int align)=
-;
->
->  /**
->   * netdev_alloc_frag - allocate a page fragment
-> @@ -3279,14 +3279,14 @@ void *__netdev_alloc_frag_align(unsigned int frag=
-sz, unsigned int align_mask);
->   */
->  static inline void *netdev_alloc_frag(unsigned int fragsz)
->  {
-> -       return __netdev_alloc_frag_align(fragsz, ~0u);
-> +       return __netdev_alloc_frag_align(fragsz, 1u);
->  }
->
->  static inline void *netdev_alloc_frag_align(unsigned int fragsz,
->                                             unsigned int align)
->  {
->         WARN_ON_ONCE(!is_power_of_2(align));
-> -       return __netdev_alloc_frag_align(fragsz, -align);
-> +       return __netdev_alloc_frag_align(fragsz, align);
->  }
->
->  struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int =
-length,
-> @@ -3346,18 +3346,18 @@ static inline void skb_free_frag(void *addr)
->         page_frag_free(addr);
->  }
->
-> -void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align_ma=
-sk);
-> +void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align);
->
->  static inline void *napi_alloc_frag(unsigned int fragsz)
->  {
-> -       return __napi_alloc_frag_align(fragsz, ~0u);
-> +       return __napi_alloc_frag_align(fragsz, 1u);
->  }
->
->  static inline void *napi_alloc_frag_align(unsigned int fragsz,
->                                           unsigned int align)
->  {
->         WARN_ON_ONCE(!is_power_of_2(align));
-> -       return __napi_alloc_frag_align(fragsz, -align);
-> +       return __napi_alloc_frag_align(fragsz, align);
->  }
->
->  struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int le=
-ngth);
-> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
-> index dc864ee09536..b4408187e1ab 100644
-> --- a/mm/page_frag_cache.c
-> +++ b/mm/page_frag_cache.c
-> @@ -61,9 +61,8 @@ void __page_frag_cache_drain(struct page *page, unsigne=
-d int count)
->  }
->  EXPORT_SYMBOL(__page_frag_cache_drain);
->
-> -void *__page_frag_alloc_align(struct page_frag_cache *nc,
-> -                             unsigned int fragsz, gfp_t gfp_mask,
-> -                             unsigned int align_mask)
-> +void *page_frag_alloc(struct page_frag_cache *nc, unsigned int fragsz,
-> +                     gfp_t gfp_mask)
->  {
->         unsigned int size, offset;
->         struct page *page;
-> @@ -92,7 +91,7 @@ void *__page_frag_alloc_align(struct page_frag_cache *n=
-c,
->         size =3D PAGE_SIZE;
->  #endif
->
-> -       offset =3D ALIGN(nc->offset, -align_mask);
-> +       offset =3D nc->offset;
->         if (unlikely(offset + fragsz > size)) {
->                 page =3D virt_to_page(nc->va);
->
-> @@ -129,7 +128,7 @@ void *__page_frag_alloc_align(struct page_frag_cache =
-*nc,
->
->         return nc->va + offset;
->  }
-> -EXPORT_SYMBOL(__page_frag_alloc_align);
-> +EXPORT_SYMBOL(page_frag_alloc);
->
->  /*
->   * Frees a page fragment allocated out of either a compound or order 0 p=
-age.
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index ea052fa710d8..676e2d857f02 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -306,18 +306,17 @@ void napi_get_frags_check(struct napi_struct *napi)
->         local_bh_enable();
->  }
->
-> -void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align_ma=
-sk)
-> +void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align)
->  {
->         struct napi_alloc_cache *nc =3D this_cpu_ptr(&napi_alloc_cache);
->
->         fragsz =3D SKB_DATA_ALIGN(fragsz);
->
-
-So this is a perfect example. This caller is aligning the size by
-SMP_CACHE_BYTES. This is the most typical case. Either this or
-L1_CACHE_BYTES. As such all requests should be aligned to at least
-that. I would prefer it if we didn't strip the alignment code out of
-our main allocating function. If anything, maybe we should make it
-more specific that the expectation is that fragsz is a multiple of the
-alignment.
-
-> -       return __page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC,
-> -                                      align_mask);
-> +       return __page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC, ali=
-gn);
->  }
->  EXPORT_SYMBOL(__napi_alloc_frag_align);
->
-> -void *__netdev_alloc_frag_align(unsigned int fragsz, unsigned int align_=
-mask)
-> +void *__netdev_alloc_frag_align(unsigned int fragsz, unsigned int align)
->  {
->         void *data;
->
-> @@ -325,15 +324,14 @@ void *__netdev_alloc_frag_align(unsigned int fragsz=
-, unsigned int align_mask)
->         if (in_hardirq() || irqs_disabled()) {
->                 struct page_frag_cache *nc =3D this_cpu_ptr(&netdev_alloc=
-_cache);
->
-> -               data =3D __page_frag_alloc_align(nc, fragsz, GFP_ATOMIC,
-> -                                              align_mask);
-> +               data =3D __page_frag_alloc_align(nc, fragsz, GFP_ATOMIC, =
-align);
->         } else {
->                 struct napi_alloc_cache *nc;
->
->                 local_bh_disable();
->                 nc =3D this_cpu_ptr(&napi_alloc_cache);
->                 data =3D __page_frag_alloc_align(&nc->page, fragsz, GFP_A=
-TOMIC,
-> -                                              align_mask);
-> +                                              align);
->                 local_bh_enable();
->         }
->         return data;
-> diff --git a/net/rxrpc/txbuf.c b/net/rxrpc/txbuf.c
-> index e0679658d9de..eb640875bf07 100644
-> --- a/net/rxrpc/txbuf.c
-> +++ b/net/rxrpc/txbuf.c
-> @@ -32,9 +32,10 @@ struct rxrpc_txbuf *rxrpc_alloc_data_txbuf(struct rxrp=
-c_call *call, size_t data_
->                 hoff =3D round_up(sizeof(*whdr), data_align) - sizeof(*wh=
-dr);
->         total =3D hoff + sizeof(*whdr) + data_size;
->
-> +       data_align =3D max_t(size_t, data_align, L1_CACHE_BYTES);
->         mutex_lock(&call->conn->tx_data_alloc_lock);
-> -       buf =3D __page_frag_alloc_align(&call->conn->tx_data_alloc, total=
-, gfp,
-> -                                     ~(data_align - 1) & ~(L1_CACHE_BYTE=
-S - 1));
-> +       buf =3D page_frag_alloc_align(&call->conn->tx_data_alloc, total, =
-gfp,
-> +                                   data_align);
->         mutex_unlock(&call->conn->tx_data_alloc_lock);
->         if (!buf) {
->                 kfree(txb);
-> --
-> 2.33.0
->
 
