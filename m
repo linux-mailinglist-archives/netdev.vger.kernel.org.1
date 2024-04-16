@@ -1,106 +1,195 @@
-Return-Path: <netdev+bounces-88410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D39298A7136
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:20:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B1A998A7144
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:22:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 113DB1C21EF3
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D46F11C20AE8
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:22:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B403131750;
-	Tue, 16 Apr 2024 16:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9252F131BA1;
+	Tue, 16 Apr 2024 16:22:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lAfU6aWp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="POfCQfX6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2069685644
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 16:20:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DAF312F387;
+	Tue, 16 Apr 2024 16:22:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713284429; cv=none; b=qnUD8/KA9x/KIHO9q/y2whKcDmPjogDGJtNWwVuuBAFfJ6TQsJcpSoD0zjZu7LFLgXHQAQqn/ywLvFLh+0CkSWzyadr13RWjpP8dTtFgYqtGAay72glG38XAvDnrtBdzYY1vubF3LgH71U6YwPgo4d7nxAIRH9wRiSZrJTXwqMk=
+	t=1713284538; cv=none; b=RWizx8qEd1Yqn5kHDTTE3ohdp25Qq0nzwtFvhfgvTGJXxeTeOgCH0yHCI1sDH9sQ2hDVvWl6j7OEpDjOG5K/QgrVUgECNDGqclJPLk+h6CTTk6WaDbU/AVhwG8n9GV+dLJq0zxWDqpVFK2yvt7EIevqqXkKHem6ADi2XfJapQ6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713284429; c=relaxed/simple;
-	bh=U9I7MwRup10i6CGSw2yavcWZAxJ5SporaJsPqNwl+p4=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=srw6JSEttMGOU1TLzIDjSQvDrxfmKiHdVVdSuKMgjAScv1pGZ+6RV2HTc45JL38PMpAq1OSzr6M/Ql9cdbFwsdSHLF44+xI51PhJm2mIE+xHGOp5BJwLMdRrqHF37ODIyRup1hsX6Lb3X+2BdPG3o13T/TwEVu+MrNYFvKHEVPU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lAfU6aWp; arc=none smtp.client-ip=209.85.219.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-69b81cb0865so22972366d6.2
-        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 09:20:27 -0700 (PDT)
+	s=arc-20240116; t=1713284538; c=relaxed/simple;
+	bh=3tsLNEVapDlNuxJKNo8Pn4fLWw0VPKuZhgZOo6sHkA4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Wbk30wU35XDH/Dk9gKqjMvHjp7T/pPO26sTeUImLQD0G3tSa4p3zihfeynQLNJgwrzQeD2TAB41qxr/PwvBKgfWwNPaZNty2b31/K0PlPByMMoojyx2p6gsMYbdXA8tduxyaBONiAeQXc6c++Gqbr3F16ybzfpriCFvNy3pLmME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=POfCQfX6; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6ecec796323so4777164b3a.3;
+        Tue, 16 Apr 2024 09:22:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713284427; x=1713889227; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+        d=gmail.com; s=20230601; t=1713284536; x=1713889336; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=2j1+4e1zwDvCqs4OGfseHDOM+IwC0cpeK8oQ65BCXfI=;
-        b=lAfU6aWpe5zkRivBSgzToG3yLSf9Sol0k9um6ZZjAT9lQHLyCiZfCKOFZO7pVMUK22
-         qfQnLNk7Fv/GdD2hPYbTkpPEKutW4rP1cxq+AoiCA1gAQ3qgT0iajOGwwWxL+VfCFhWH
-         ECi+DAZ20CX6GnFHf6yVH7vUF6o2sAejkUSSZdhx7JEGuFraqTMYmFPcslvVqMLMVKcu
-         AYIwlHtgu887IKCzdYwUUWdo6byFZ6CKUdSvhM+nBtkkhXI9lcSUi92UbX4PpTRXNU5k
-         F4RfEDGNub8bkCdTkDkfeBzRwmkkNP2P4F1Dpp8zLieQjqWrkgtEOm+8MtH6aXFZYqf1
-         hfzg==
+        bh=AZ4By8kx0gFset4vqlanrt2cwjHe/0P230mvGWNMhPQ=;
+        b=POfCQfX6/VKult/yrnXTW4MueKmp2LN2tnUkG3CcRvVjFIXxYqjGjz2K/Ablou+M1W
+         9xYvRkKuFuUsgQZrRhFG9j5dFRcN/zrzEboyaNYtSnM5KAHux3eriZDHO+qDwLNNCa1Z
+         lcDHIYgjPvRnRs11YS93SzjqF9ji+eMsOShyTdO/Ssi+x310mUB3jZl3fPvuhMhyEnTw
+         N3Bun2YeOHX2uL43Eo0RgyWTsf9Yh8EHO3Syfx3tIpBE3WyVi6e4uZPOs8h/LqY2Kedc
+         vvzTkxNfvgG99rm0hdJgCTWpBNvUAqm6SjZZo21BHb7+ti7YaP9aDOIrFOodm1rYAly/
+         AbRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713284427; x=1713889227;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=1e100.net; s=20230601; t=1713284536; x=1713889336;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=2j1+4e1zwDvCqs4OGfseHDOM+IwC0cpeK8oQ65BCXfI=;
-        b=H808l8iiqxOlBXfu2uFS23cNGvjj8I3DugqgMauRyrpQ7pj6TE8BVGaoai8d8t4aqO
-         I2c+V0jiLjhAYpDXDkqgUgaSJRRQjV/iWJOaEK7M+kbPnTVWH+xiy81XLdnrwZeUwjTt
-         ulIrSCp1/89/+FWjJ+Vn/QkUsC+KHvfMUuUbtqAqlecUNLAZzxmkATqMlSdEK6MlsI2w
-         7Op5dQa7WWLogvwfFVsdJABeb6TC2VXAPiFXL3Kt9v4TqqVP6LBsX580jWRkN+I/K+08
-         I3WeOzN6QRN9GQDPHXtad3yTKtfsJRXHSLIXYIwo8EaSmgYto0u1Vq8BXB/Rz5y2Ub8c
-         /Y4A==
-X-Gm-Message-State: AOJu0YzsDyec6aDHuqRAb0h2aarsySWBAZWdbYolkw6YLXvPX8cZQMOZ
-	c7uQ6sV1AUm6uGEcs5sIM1ThZaOWGSLAgD28U0UXFivZi2HhTby+ca90E8/rI7UbIQKxf4dfY8k
-	VIOmh6jLvuA==
-X-Google-Smtp-Source: AGHT+IGoRWmRy6GkRBHKQKtnV+/xMcuswtVOwXTM4vYKHKTXFe0USYl53sg26ZhvLM5wlvNRMGKifqJZA/h7LQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6214:108e:b0:69b:5209:7526 with SMTP
- id o14-20020a056214108e00b0069b52097526mr109499qvr.9.1713284427049; Tue, 16
- Apr 2024 09:20:27 -0700 (PDT)
-Date: Tue, 16 Apr 2024 16:20:25 +0000
+        bh=AZ4By8kx0gFset4vqlanrt2cwjHe/0P230mvGWNMhPQ=;
+        b=XxDm+yaJ/XdaYnPoGdjn79SSMl5SNMIIgF7TU4tXXXo5HH/ASlkd50yZPJyX6nuFPG
+         rM1+C7IZlbPFVmrHYYXMONyqbOI5d/j+yiwgEJDG5DmXmx+CLoI5fWHYK9dp7nsenp5p
+         iZe/aD5JORpFYmkZO+nMxcwaCoNFoi3dhIWl6wl6pSceOiV7klhzXQfRtVtLJDPv2qjD
+         esR1blWDf+19fjLoCDRIGD6Cui5+w8wAxUjRn7E0zYCdOS7aGLepqdfbjbCVzyhlKnx9
+         YAvq2L7c+2ChWtNVWTTqRUTuVVn+TBTNwv+rRXX4UBI0b8fAORTi+74etR8CKVYg/BtR
+         ZkUA==
+X-Forwarded-Encrypted: i=1; AJvYcCXkHRGBrOWHBi6jeGehHkHFbsEFAxi3gy1BblxNHAja4wtgV59UBrXnfqTRmY4h9NfuisiQeIuJPx5Oy6ySDds4KTXB/UeileM0j3GS
+X-Gm-Message-State: AOJu0YzcQTaXpG1CFC7Gxx5Tu21Zv4N/slvTs1lDib5rb0TujEogriHL
+	t2pcPd+Y9dVHKAGcGJkqFKvto4JgZ+jLBTSPm17tofjwE7hECLIK
+X-Google-Smtp-Source: AGHT+IEUcecI89KJcxO4bdyAEaKuPOEWjzAq92Tsddkmk7lM8Dxh6sxfWs7GUP8/jFDeTzbXdw94fg==
+X-Received: by 2002:a05:6a20:1a91:b0:1a7:802d:f67c with SMTP id ci17-20020a056a201a9100b001a7802df67cmr13606350pzb.53.1713284536293;
+        Tue, 16 Apr 2024 09:22:16 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:43f:400:82ee:73ff:fe41:9a02? ([2605:59c8:43f:400:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id q23-20020a631f57000000b005eb4d24e809sm9151661pgm.34.2024.04.16.09.22.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Apr 2024 09:22:15 -0700 (PDT)
+Message-ID: <37d012438d4850c3d7090e784e09088d02a2780c.camel@gmail.com>
+Subject: Re: [PATCH net-next v2 09/15] mm: page_frag: reuse MSB of 'size'
+ field for pfmemalloc
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org,  pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Morton
+	 <akpm@linux-foundation.org>, linux-mm@kvack.org
+Date: Tue, 16 Apr 2024 09:22:14 -0700
+In-Reply-To: <20240415131941.51153-10-linyunsheng@huawei.com>
+References: <20240415131941.51153-1-linyunsheng@huawei.com>
+	 <20240415131941.51153-10-linyunsheng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240416162025.1251547-1-edumazet@google.com>
-Subject: [PATCH net-next] tcp_metrics: use parallel_ops for tcp_metrics_nl_family
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
 
-TCP_METRICS_CMD_GET and TCP_METRICS_CMD_DEL use their
-own locking (tcp_metrics_lock and RCU),
-they do not need genl_mutex protection.
+On Mon, 2024-04-15 at 21:19 +0800, Yunsheng Lin wrote:
+> The '(PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)' case is for the
+> system with page size less than 32KB, which is 0x8000 bytes
+> requiring 16 bits space, change 'size' to 'size_mask' to avoid
+> using the MSB, and change 'pfmemalloc' field to reuse the that
+> MSB, so that we remove the orginal space needed by 'pfmemalloc'.
+>=20
+> For another case, the MSB of 'offset' is reused for 'pfmemalloc'.
+>=20
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+>  include/linux/page_frag_cache.h | 13 ++++++++-----
+>  mm/page_frag_cache.c            |  5 +++--
+>  2 files changed, 11 insertions(+), 7 deletions(-)
+>=20
+> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_ca=
+che.h
+> index fe5faa80b6c3..40a7d6da9ef0 100644
+> --- a/include/linux/page_frag_cache.h
+> +++ b/include/linux/page_frag_cache.h
+> @@ -12,15 +12,16 @@ struct page_frag_cache {
+>  	void *va;
+>  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+>  	__u16 offset;
+> -	__u16 size;
+> +	__u16 size_mask:15;
+> +	__u16 pfmemalloc:1;
+>  #else
+> -	__u32 offset;
+> +	__u32 offset:31;
+> +	__u32 pfmemalloc:1;
+>  #endif
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/tcp_metrics.c | 1 +
- 1 file changed, 1 insertion(+)
+This seems like a really bad idea. Using a bit-field like this seems
+like a waste as it means that all the accesses now have to add
+additional operations to access either offset or size. It wasn't as if
+this is an oversized struct, or one that we are allocating a ton of. As
+such I am not sure why we need to optmize for size like this.
 
-diff --git a/net/ipv4/tcp_metrics.c b/net/ipv4/tcp_metrics.c
-index 301881eb23f376339d59a62bebf150b4b1cae3fb..e93df98de3f454e9118116c3ca1b19b237ead04f 100644
---- a/net/ipv4/tcp_metrics.c
-+++ b/net/ipv4/tcp_metrics.c
-@@ -988,6 +988,7 @@ static struct genl_family tcp_metrics_nl_family __ro_after_init = {
- 	.maxattr	= TCP_METRICS_ATTR_MAX,
- 	.policy = tcp_metrics_nl_policy,
- 	.netnsok	= true,
-+	.parallel_ops	= true,
- 	.module		= THIS_MODULE,
- 	.small_ops	= tcp_metrics_nl_ops,
- 	.n_small_ops	= ARRAY_SIZE(tcp_metrics_nl_ops),
--- 
-2.44.0.683.g7961c838ac-goog
+>  	/* we maintain a pagecount bias, so that we dont dirty cache line
+>  	 * containing page->_refcount every time we allocate a fragment.
+>  	 */
+>  	unsigned int		pagecnt_bias;
+> -	bool pfmemalloc;
+>  };
+> =20
+>  static inline void page_frag_cache_init(struct page_frag_cache *nc)
+> @@ -43,7 +44,9 @@ static inline void *__page_frag_alloc_va_align(struct p=
+age_frag_cache *nc,
+>  					       gfp_t gfp_mask,
+>  					       unsigned int align)
+>  {
+> -	nc->offset =3D ALIGN(nc->offset, align);
+> +	unsigned int offset =3D nc->offset;
+> +
+> +	nc->offset =3D ALIGN(offset, align);
+> =20
+>  	return page_frag_alloc_va(nc, fragsz, gfp_mask);
+>  }
+> @@ -53,7 +56,7 @@ static inline void *page_frag_alloc_va_align(struct pag=
+e_frag_cache *nc,
+>  					     gfp_t gfp_mask,
+>  					     unsigned int align)
+>  {
+> -	WARN_ON_ONCE(!is_power_of_2(align));
+> +	WARN_ON_ONCE(!is_power_of_2(align) || align >=3D PAGE_SIZE);
+
+The "align >=3D PAGE_SIZE" fix should probably go with your change that
+reversed the direction.
+
+> =20
+>  	return __page_frag_alloc_va_align(nc, fragsz, gfp_mask, align);
+>  }
+> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
+> index 50511d8522d0..8d93029116e1 100644
+> --- a/mm/page_frag_cache.c
+> +++ b/mm/page_frag_cache.c
+> @@ -32,7 +32,8 @@ static struct page *__page_frag_cache_refill(struct pag=
+e_frag_cache *nc,
+>  		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
+>  	page =3D alloc_pages_node(NUMA_NO_NODE, gfp_mask,
+>  				PAGE_FRAG_CACHE_MAX_ORDER);
+> -	nc->size =3D page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
+> +	nc->size_mask =3D page ? PAGE_FRAG_CACHE_MAX_SIZE - 1 : PAGE_SIZE - 1;
+> +	VM_BUG_ON(page && nc->size_mask !=3D PAGE_FRAG_CACHE_MAX_SIZE - 1);
+>  #endif
+>  	if (unlikely(!page))
+>  		page =3D alloc_pages_node(NUMA_NO_NODE, gfp, 0);
+> @@ -86,7 +87,7 @@ void *page_frag_alloc_va(struct page_frag_cache *nc, un=
+signed int fragsz,
+> =20
+>  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+>  	/* if size can vary use size else just use PAGE_SIZE */
+> -	size =3D nc->size;
+> +	size =3D nc->size_mask + 1;
+>  #else
+>  	size =3D PAGE_SIZE;
+>  #endif
+
+So now we are having to add arithmetic operations to the size in
+addition having to mask in order to read the values. That just seems
+like that much more overhead.
 
 
