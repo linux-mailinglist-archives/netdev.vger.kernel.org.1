@@ -1,170 +1,77 @@
-Return-Path: <netdev+bounces-88384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86FA28A6F2A
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:59:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 625498A6F11
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:54:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D3EB28246B
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:59:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC62CB272C7
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:52:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BA4312F5A6;
-	Tue, 16 Apr 2024 14:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2F8B1304B0;
+	Tue, 16 Apr 2024 14:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="bTNnjpIa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gnshtU9S"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CF6E12EBE1
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 14:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ABC013172A;
+	Tue, 16 Apr 2024 14:50:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713279560; cv=none; b=Y/h//bxXtlTEd2SXCMDy91olBJjOzp3s2bjXw3X2cj+oLHMcrRxwRZJCmyriSJ6nITKAW+omsyPOcDIJDIc/kPpEiw70u3qbcJYHcxdtvDhIc6WRoctxrmjHglZXnxTpx/zUD/oeNX1Gf1LVbK9qtBq/x3XgeX4zHdgpLVpatE8=
+	t=1713279006; cv=none; b=WAhEOwzAPsd96X1RcYqqYJSrzjxI6s/KkUKG5GNkZGLb7zTrEVLykJGZo5Ko4s0JdraEuvmEOqirAnTtUaFHw+i+ISr0SYFNWODKBjsjwOiOMurKVBNZN74uCrMZsoDj46lmkIrlO74a3dHewV0foRZdz+jm8DHuobc22vSMotg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713279560; c=relaxed/simple;
-	bh=7lyToubjndBkFS/xjTwm6ZMyDvw4t6Soiztt3CZy43I=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Cp3jTmISmCgo1TI2W1R08OxeYpnzoU5z+MZatnBU+AUYMflozkE6GAZbYf+u+Y5WmvtztQRzWuEKIkuf/ffsDDufnQbmDrNLFB2yekc5IZBUofR1rVLnumQCyakvNfJYpk+4dYYiKU5D10H3Br5vHl/flbZxK4Z+c8BqbjjCEsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=bTNnjpIa; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com [209.85.218.69])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 2C30D4031E
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 14:49:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1713278952;
-	bh=SQh3gD+ToMzBSqvlRyRoPbaP+xTFtE8pqccMPR/X80o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type;
-	b=bTNnjpIaXCd5s6ImaVwHNR7OSVdldJr9ZXp9rizlLvN0oab5b/ipYE1rYNTdWZcki
-	 sZiYr2Lria1r4Y3P94FTAa6fggkFwnfmoN2+KShG2m4/2STcSOG9IHkidpZ2O4Iug3
-	 kZArQ6TkTQkayjwKRqUoNi3Be6Aip/zaV/5es6pil2Y+fW2rJVAJOEXUWZFbGIjFFD
-	 ss2W4hgwqToocZT+FvWrvBkcKhYaAiN9S4dDRjGBw3n5gH65e4/4Gx67ThzOrQQTzA
-	 Ew+p07TB13snTlofinejF86g628ukNRtOZL4zmzXpAuPav7cFQ31/HxJ2tgLFg/9pV
-	 5oT28nwGfqUmg==
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a52539e4970so177230066b.1
-        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 07:49:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713278952; x=1713883752;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SQh3gD+ToMzBSqvlRyRoPbaP+xTFtE8pqccMPR/X80o=;
-        b=FnIj+yjeu3TRTuMshS5UD/zLKJBCES1upA+UDJlPwquOXyrzemeXceBj0avrw1hAmn
-         LZnyBS+/cVI39SXSyNBIIT85ozdzAIi6zDYj0tv3vJQ+x14Yr3tn4NEHYWoNjWfb5MUV
-         pDEJ28oeyQCpZfmmCmPTqkNc9e+hoYPw7p6m5Js3QsYVohwh+sbQlzJrpgZUNLXZAq28
-         /IFFqaeudZAa6v+lEJeOQGvz56jaCwllyww3kIpZisZQ+geohJML/olJOcl2ioMJajtv
-         FwFSTSKZR3ezQcrq8FBzlcr1UK0f1f+LnYSvNtP1h4wgd0lH3xWFV4tAATM3ai7tE0Uk
-         QAsA==
-X-Gm-Message-State: AOJu0YwH/QBUYmOWo91yOe3l+pJV//Eom0FbnE9HO0uPDvIN0zr5vGKX
-	ubQXu6bYTZZf02RQNyiNLHecgN0WXllvEO2s3puudBeP8Jug3wKyD0oU1tUu/2Y0i+EC/UArBs+
-	vUagqK5fMD72dSX0Xcc9ootUr6XAINccSwGawEMdloGMmlZOe8w3II6Aw6gofBzVzgOQRGQ==
-X-Received: by 2002:a17:906:4956:b0:a52:6a4b:c810 with SMTP id f22-20020a170906495600b00a526a4bc810mr3400655ejt.35.1713278951885;
-        Tue, 16 Apr 2024 07:49:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEyz7nSFg/BkyuaXVLZ2ohQQZlKhJDri29PE7VWvk9uGXGz9gTCezlFmTExiTaW78zWQV6OQA==
-X-Received: by 2002:a17:906:4956:b0:a52:6a4b:c810 with SMTP id f22-20020a170906495600b00a526a4bc810mr3400639ejt.35.1713278951519;
-        Tue, 16 Apr 2024 07:49:11 -0700 (PDT)
-Received: from amikhalitsyn.lan ([2001:470:6d:781:ef8b:47ab:e73a:9349])
-        by smtp.gmail.com with ESMTPSA id gv15-20020a170906f10f00b00a517995c070sm6916856ejb.33.2024.04.16.07.49.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 07:49:11 -0700 (PDT)
-From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-To: horms@verge.net.au
-Cc: netdev@vger.kernel.org,
-	lvs-devel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
-	=?UTF-8?q?St=C3=A9phane=20Graber?= <stgraber@stgraber.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Julian Anastasov <ja@ssi.bg>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>
-Subject: [PATCH net-next] ipvs: allow some sysctls in non-init user namespaces
-Date: Tue, 16 Apr 2024 16:48:14 +0200
-Message-Id: <20240416144814.173185-1-aleksandr.mikhalitsyn@canonical.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1713279006; c=relaxed/simple;
+	bh=dHq2TQSuOJ7OrY8KhpXk6oNmx6FsOkorWYiOVPylDwE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lm8OdE1FnoOU0UvAqHrR13DRXJF3dKSMVGHovQiT6M7x0jyNDCXFufL7ksRrIR+4uWqUuOuzY07eqKccUn2REDywudEsIzKcC0E3V//VN1KwQ1UTs2S9F3IBhR1SvqtsG78YM2AX5ytLXDuugbAsNzOtlFsNuR8KoXW4IjQYvoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gnshtU9S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DC42C2BD10;
+	Tue, 16 Apr 2024 14:50:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713279006;
+	bh=dHq2TQSuOJ7OrY8KhpXk6oNmx6FsOkorWYiOVPylDwE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=gnshtU9SaSwZzp/Mjfat+zy9zM353gx95DE1j9mRZPCC8rOwdxsPH7tkmBBkNa814
+	 N681ZFdfC28NpfiWcWcEvPnyeyy819vWaqqU5foEFdpvE75L29CugisyMzv8P2SY9L
+	 s9uAoxCk23kws2T+AjKjRT2sXxdpf+0iidPOntPVS2OdcYbZd5tNbEBrpIb3ozx4O2
+	 42wOrQKnF2aDhew1aXDa78vjtZLoiUIfqz3VAq64/9dNJu5ozv8N55QCOtRXvXp7r3
+	 GVT9N+29zdSGhJePeWzUdpcNS11kI/K/jwRPyzUAJ1WZtbQfILPG5lDJhwJERVve1D
+	 hEv3d56+Sy3bg==
+Message-ID: <502a2cfc-b4b1-4903-a6eb-3cbe2369047d@kernel.org>
+Date: Tue, 16 Apr 2024 07:50:04 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 1/6] net: extend ubuf_info callback to ops structure
+Content-Language: en-US
+To: Pavel Begunkov <asml.silence@gmail.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ io-uring@vger.kernel.org, netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>, "David S . Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>
+References: <cover.1712923998.git.asml.silence@gmail.com>
+ <62a4e09968a9a0f73780876dc6fb0f784bee5fae.1712923998.git.asml.silence@gmail.com>
+ <661c0d589f493_3e773229421@willemb.c.googlers.com.notmuch>
+ <8b329b39-f601-436b-8a17-6873b6e73f91@gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <8b329b39-f601-436b-8a17-6873b6e73f91@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Let's make all IPVS sysctls visible and RO even when
-network namespace is owned by non-initial user namespace.
+On 4/14/24 6:07 PM, Pavel Begunkov wrote:
+> On the bright side,
+> with the patch I'll also ->sg_from_iter from msghdr into it, so it
+> doesn't have to be in the generic path.
 
-Let's make a few sysctls to be writable:
-- conntrack
-- conn_reuse_mode
-- expire_nodest_conn
-- expire_quiescent_template
+So, what's old is new again? That's where it started:
 
-I'm trying to be conservative with this to prevent
-introducing any security issues in there. Maybe,
-we can allow more sysctls to be writable, but let's
-do this on-demand and when we see real use-case.
-
-This list of sysctls was chosen because I can't
-see any security risks allowing them and also
-Kubernetes uses [2] these specific sysctls.
-
-This patch is motivated by user request in the LXC
-project [1].
-
-[1] https://github.com/lxc/lxc/issues/4278
-[2] https://github.com/kubernetes/kubernetes/blob/b722d017a34b300a2284b890448e5a605f21d01e/pkg/proxy/ipvs/proxier.go#L103
-
-Cc: Stéphane Graber <stgraber@stgraber.org>
-Cc: Christian Brauner <brauner@kernel.org>
-Cc: Julian Anastasov <ja@ssi.bg>
-Cc: Simon Horman <horms@verge.net.au>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
-Cc: Florian Westphal <fw@strlen.de>
-Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
----
- net/netfilter/ipvs/ip_vs_ctl.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
-
-diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-index 143a341bbc0a..92a818c2f783 100644
---- a/net/netfilter/ipvs/ip_vs_ctl.c
-+++ b/net/netfilter/ipvs/ip_vs_ctl.c
-@@ -4285,10 +4285,22 @@ static int __net_init ip_vs_control_net_init_sysctl(struct netns_ipvs *ipvs)
- 		if (tbl == NULL)
- 			return -ENOMEM;
- 
--		/* Don't export sysctls to unprivileged users */
-+		/* Let's show all sysctls in non-init user namespace-owned
-+		 * net namespaces, but make them read-only.
-+		 *
-+		 * Allow only a few specific sysctls to be writable.
-+		 */
- 		if (net->user_ns != &init_user_ns) {
--			tbl[0].procname = NULL;
--			ctl_table_size = 0;
-+			for (idx = 0; idx < ARRAY_SIZE(vs_vars); idx++) {
-+				if (!tbl[idx].procname)
-+					continue;
-+
-+				if (!((strcmp(tbl[idx].procname, "conntrack") == 0) ||
-+				      (strcmp(tbl[idx].procname, "conn_reuse_mode") == 0) ||
-+				      (strcmp(tbl[idx].procname, "expire_nodest_conn") == 0) ||
-+				      (strcmp(tbl[idx].procname, "expire_quiescent_template") == 0)))
-+					tbl[idx].mode = 0444;
-+			}
- 		}
- 	} else
- 		tbl = vs_vars;
--- 
-2.34.1
-
+https://lore.kernel.org/netdev/20220628225204.GA27554@u2004-local/
 
