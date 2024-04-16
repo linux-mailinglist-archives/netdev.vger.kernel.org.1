@@ -1,232 +1,348 @@
-Return-Path: <netdev+bounces-88409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18A1B8A7123
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:18:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0EE98A70E9
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:08:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1249287142
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:18:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E31301C21889
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:08:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58C7131BD6;
-	Tue, 16 Apr 2024 16:18:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68E9613172A;
+	Tue, 16 Apr 2024 16:08:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="oQA3y6Km"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i2cX1f/8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81911130492;
-	Tue, 16 Apr 2024 16:18:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC4612BE9F;
+	Tue, 16 Apr 2024 16:08:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713284323; cv=none; b=etO/SzJxwr50cJ/MTTfVkWxQm0INqhPRIUFUUS7y/AcnNvNy1GCAsXF/jo7VbwtOpWDY8C+7owgiXIm2qfOBnXLlfI9gRh0+HnpL7bRo3pXJD0Ih/Qr5F4fLs6MwQeWc2Lixsqr1h12jD918Jp2+L0SaCK9GLpZXaal4fFubGOQ=
+	t=1713283735; cv=none; b=CQLGcVlIEtwiPTTD47RKb/EsJ0WJS2PbPnuqIt6r88uV9KqK9If+dLBtIpUEBYV8cF6GtcqNcPo6dfs9W9ZB6fZHyL8nmphTUbqKzmrRPw+jrMeBwkeQ3sqv5gHy+P1DVnFoRdV56tPSvGp/zQkoRbtOtsU4ZAPdvvEeVTEsvIk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713284323; c=relaxed/simple;
-	bh=TMe84rkKVnERfDW7pnotvDYbq5M96tycRe0wAzXGtTE=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:References; b=cK4V1282Jq825iOMsdQ7LwVDRLXh15dLoIXdtq8qrHmJGUIPwbHbPQWvv2ucCbKjqktTDhZSTp3c5BK8HUk2HNygwCCJlYRztFShSHffqa2pj43CxIa0Ccnb6hk9j3hnjHQQUKy3CuIUoASIaPmgYsIYdb7boPusk20bdpodWHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=oQA3y6Km; arc=none smtp.client-ip=210.118.77.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20240416161834euoutp016ed8e3413fe609790c0d8dbf9feac414~GzwGfGfWW3240132401euoutp019;
-	Tue, 16 Apr 2024 16:18:34 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20240416161834euoutp016ed8e3413fe609790c0d8dbf9feac414~GzwGfGfWW3240132401euoutp019
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1713284314;
-	bh=h+c9h4XaiZkjioKXCmApqXr79Ng5aLpw1//8aiqZHc0=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=oQA3y6KmBKthx8qB9iE4BR3H6yqJ6FukwNapodgwSnRYzAL31g2zz1LG0XV+UMQtL
-	 4zQb3hb/qbUPieVGupbzz8vixmzqZg/dtu/87j1Ox0AjkK/QGpaLghlYR8LlHkWnMB
-	 IcVLcJI4qek4WgTYJyN7I9My/dEfKwnCG6u2qbyY=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-	20240416161833eucas1p2933e7709d8615304a664fce5197722dc~GzwGP5yav1903019030eucas1p2N;
-	Tue, 16 Apr 2024 16:18:33 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-	eusmges1new.samsung.com (EUCPMTA) with SMTP id 88.0B.09624.9D4AE166; Tue, 16
-	Apr 2024 17:18:33 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240416161833eucas1p12e7e5db7e46bb558f0b7e7b7c0f3a17d~GzwFfH9zE2936029360eucas1p1t;
-	Tue, 16 Apr 2024 16:18:33 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20240416161833eusmtrp13acb475819bd914644dc864e75f24f1b~GzwFdvMoW2276022760eusmtrp1Q;
-	Tue, 16 Apr 2024 16:18:33 +0000 (GMT)
-X-AuditID: cbfec7f2-c11ff70000002598-dd-661ea4d9ad2d
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms2.samsung.com (EUCPMTA) with SMTP id D1.78.09010.8D4AE166; Tue, 16
-	Apr 2024 17:18:32 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240416161832eusmtip2f37c2e32456a165bc55314d3e78c49a2~GzwFH_cTH1934419344eusmtip27;
-	Tue, 16 Apr 2024 16:18:32 +0000 (GMT)
-Received: from localhost (106.210.248.3) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Tue, 16 Apr 2024 17:18:31 +0100
-Date: Tue, 16 Apr 2024 14:32:12 +0200
-From: Joel Granados <j.granados@samsung.com>
-To: Paolo Abeni <pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>,
-	<devnull+j.granados.samsung.com@kernel.org>, <Dai.Ngo@oracle.com>,
-	<alex.aring@gmail.com>, <alibuda@linux.alibaba.com>,
-	<allison.henderson@oracle.com>, <anna@kernel.org>, <bridge@lists.linux.dev>,
-	<chuck.lever@oracle.com>, <coreteam@netfilter.org>, <courmisch@gmail.com>,
-	<davem@davemloft.net>, <dccp@vger.kernel.org>, <dhowells@redhat.com>,
-	<dsahern@kernel.org>, <edumazet@google.com>, <fw@strlen.de>,
-	<geliang@kernel.org>, <guwen@linux.alibaba.com>,
-	<herbert@gondor.apana.org.au>, <horms@verge.net.au>, <ja@ssi.bg>,
-	<jaka@linux.ibm.com>, <jlayton@kernel.org>, <jmaloy@redhat.com>,
-	<jreuter@yaina.de>, <kadlec@netfilter.org>, <keescook@chromium.org>,
-	<kolga@netapp.com>, <kuba@kernel.org>, <linux-afs@lists.infradead.org>,
-	<linux-hams@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-nfs@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<linux-s390@vger.kernel.org>, <linux-sctp@vger.kernel.org>,
-	<linux-wpan@vger.kernel.org>, <linux-x25@vger.kernel.org>,
-	<lucien.xin@gmail.com>, <lvs-devel@vger.kernel.org>,
-	<marc.dionne@auristor.com>, <marcelo.leitner@gmail.com>,
-	<martineau@kernel.org>, <matttbe@kernel.org>, <mcgrof@kernel.org>,
-	<miquel.raynal@bootlin.com>, <mptcp@lists.linux.dev>, <ms@dev.tdt.de>,
-	<neilb@suse.de>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <pablo@netfilter.org>,
-	<ralf@linux-mips.org>, <razor@blackwall.org>, <rds-devel@oss.oracle.com>,
-	<roopa@nvidia.com>, <stefan@datenfreihafen.org>,
-	<steffen.klassert@secunet.com>, <tipc-discussion@lists.sourceforge.net>,
-	<tom@talpey.com>, <tonylu@linux.alibaba.com>,
-	<trond.myklebust@hammerspace.com>, <wenjia@linux.ibm.com>,
-	<ying.xue@windriver.com>
-Subject: Re: [PATCH v3 1/4] networking: Remove the now superfluous sentinel
- elements from ctl_table array
-Message-ID: <20240416123212.nrgpuix3dhkmfbzq@joelS2.panther.com>
+	s=arc-20240116; t=1713283735; c=relaxed/simple;
+	bh=xJTZUAnxgcV31l2lk2qqoJPE2M8jusD+gc6I2kuThFU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GEf1AjueclYDyTOSbfS8T+SLlalPWsGYkIRzbeNJiZm3tUqMN3CXpNL+/ynVjlgPNt5nyQLiPbNHnQMYO4RZeXM7I4yLnAecmCj+zbFMrJI8O2KcUv9n5tJM5GmDLoYgoDdZzQ2DV43NZJ/O87PAdIdR2OdFqg6yhLqiVlj+XmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i2cX1f/8; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3454fbdd88aso4004782f8f.3;
+        Tue, 16 Apr 2024 09:08:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713283732; x=1713888532; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TfqeinlZEWtIXVEkZjds66VVZ8TL7yzBqLVW5+SS5fc=;
+        b=i2cX1f/8kayXC5spMaZvlCaQwf0f79sHNgNeBLm9OBpr1fWbS/BVWXbRpGRHh2K/kh
+         tSMfsoZjERMEphOcqCkmJZZcnEyoby9z2t84tgWRT4BvT1u1VKe3K0w652kckRH+svt1
+         35AS/wPljoQ3II/t+64qHTL3oABoJ1DSgtHMCLXOorWqU2M0jTJNK0GMF23/1J6BAW/r
+         6DS8TMV6Fc7tnTql2TZrKNsHmcAsV8xJoRD10H3ypHAuP7EzKg+kNpTLuX7BWEoBEQYr
+         v0opZBN7poOeChnFqBUueN2XDr1hvfVxDI5F17C49SR0EAzGi96lrIMw54bEANdjNfMB
+         5OVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713283732; x=1713888532;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TfqeinlZEWtIXVEkZjds66VVZ8TL7yzBqLVW5+SS5fc=;
+        b=d3t0yC+9t4P/HVTjOsj/yKncYuYZIgETCcANbEKZWO4LcLy+Z/GcNMa1CYh7hgNdJN
+         nWnzSjfZohqEEGoE7qBVI6ZuqSb7DSYvcFMucJG3pfx0p9DrmAh+NMm7PDJW3ChlAJ7D
+         LeOZSSecs1DgiBfBcgCSOnCNAlU/wXm1F2wWQt6Odm+MMuSqVrscTioizrIsDeanGlU4
+         jz5ul+NqvdS0lD1Xcz1ByxbnpO8XImT5avk8xyr6d2MRqU09xJ3KEt58BMneTLIQqplN
+         iqKiaLw6E29rDnHmk7i95zH/mSLWQdlRDYfAqwshUS5U4OnAoZQv5QjIpiedSYEczsQV
+         Sd/g==
+X-Forwarded-Encrypted: i=1; AJvYcCXgrqUJQmgIl+2yj3eS9+CWigwCDyfjbfQdHQNpTSL1kvkGr+ufRPhBDtS2uakn0+/3HYuoWHJpc1NSCNFJo0e5KQSEATvtCuW1GfKJXvoVo323fEDOFSljivZJKa2gHeK/D1A0
+X-Gm-Message-State: AOJu0YwRtRn9FKrtybFpuH/1oig2ERU7/8on5dShbU59QfMtdYTVN07a
+	au+JIcEqZOFfoh7q6vaDBt8Pi82yyQc0s5hz9MQq+ab2eMJ3SR94XCAsrFPN9UYJV1V5Bu3jJbn
+	W4zu/Bt+PaNcQ02iTBd+2ALdw53k=
+X-Google-Smtp-Source: AGHT+IGF5abEcTvau2mHvo9SZL7EcchFBWSdkvIwcQqqBgNJB7O3i8rimyfDFs0cfpgylrUUTfGBxVDks5HFfnr/FOY=
+X-Received: by 2002:a5d:510f:0:b0:346:cd1c:dc73 with SMTP id
+ s15-20020a5d510f000000b00346cd1cdc73mr11149953wrt.46.1713283731429; Tue, 16
+ Apr 2024 09:08:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="arc6idvhr2tglhrq"
-Content-Disposition: inline
-In-Reply-To: <be056435353af60a564f457c79dacc16c6ea920e.camel@redhat.com>
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA2WTe1BUdRTH+9179+6KLV12KX+DZoqShUJSpqc0n6XX0VHLPyKnRhi4osjD
-	dqUgs5AF0UV0cymT1wLmykNWhXUVQaSNhy4GKE9RbFiXFoFEgVVAYWO9ODrjf5/zPecz95zf
-	zBWRkt9EbqJtYTs5WZh/iDvtRBkqh2q8bvwxdcvcv3s9wRi9ANpLlAKIjt1LQFyRnQLDsQQC
-	7G1WAkaK4knob7cKQJNVSENqbSwFI80JNNSnWQi4F/OYAt2FOAI6Ks1CMCTmIciLuUXBOesj
-	GhK6poDirA2B5ZBZAA3a+zQMaXOF8I/NTMHQwYlwVKkg4GpCKJxvs1BQZzgoAO2BfBpUJh9o
-	OtdGQP2FVBrqyqoF8K8xkQJVpoKEjoxuAdxSaykou6hBYD7VS4BC00eCov8OCcPZVQKoSbST
-	kKzLJaFF1YHgr/hSAVw9FSOEh+mXSbioiaagMuMNUOlMFDys7kFwpKeRhOslM8E0YCegprBf
-	AP2p74A6W09A8f5BIehrg8E0bCLgziMrDfaWJUuXs9l1SgHbaraR7L2aK4hNP7mLTYm+RrHD
-	Q56sPucGwSaUd5FsUXKbkDWUebAZBRHsE+MZIVuQu59mK3LyCbao/SNWlVWGNrhvcloUyIVs
-	+46TvbfYz2mrPUGNdjS4RGZq+8hoFOesRBNEmJmH0zp1pBI5iSRMNsLX2kbGiwGET2tKhHzR
-	j3B7/E3imZKjiEN84wTClt5Lz6f2FOeP+4UIlx+vIB0KxXjgjuZy5GCamYNre249zV2ZGbh7
-	5DLtEEimSow7Ux8/HZIy27EpuYd2sJhZis9Wd5A8u+ArRy2Ug0kmEl/45fgYi8Z4Mj4xKnLE
-	ExgWJ2U2IX7V6VhX20DxvBub9K2E41uYufIqNpuHab7xKT6vqhHyLMVdVfpxnoKr1QcoXlAj
-	fGn0vpAv8hDW7rGNv8ZCHNtgGTeW4bKUlqcbYcYZt/znwi/qjA8bjpB8LMb79kr46bdx3u0e
-	SoVmJL9wWvILpyU/P42P5+CM4j76pXg21mZ2kzx/gnW6XioDCXPRJC5CHhrEyX3CuO+95f6h
-	8oiwIO+A8NACNPa7Vo9W9Z1HaV0PvI2IECEjmjkmm0/n1SE3Kiw8jHN3FcdK39wiEQf6R/3A
-	ycI3yyJCOLkRTRZR7pPEHoFvcRImyH8nt53jdnCyZ11CNMEtmpjf2XXa69i6DeRXQs3G11ev
-	/RJ1rJll4O4GpKxK/LXx3MDNkE22kDVWaUqU9IOVReqNwVNju4VLTlwvMGU3mGNcSuTiubNr
-	dOnVt5uy7MEPj8t8xDp5U7Dfu7agk1HrzwRWLbT0TZzuXjS64GvfAmXSrAfLPvz9SUBzaUVd
-	Vqvey2dzqXX9IXudJP3PwbKAafqfNLleWWnTIpfvS9ncWOG84uNgpa9xRZKhJa7ix0VLC90k
-	921LSL9vDgrWba9IbVy98PDnoz2DEqnUuy9gduVrZ6yv+MYv3t1kXZtqmb4yX7GKix8ovyzL
-	UX9xPWtXVH3prrstnx3zeuTqMe/n91Uebt82SOcvTnKn5Fv9fTxJmdz/f4S0r8gpBQAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA2WTe0xTdxTH/d17e1vc0EpR79At2kliulkoFDxd8JFlSy7LsviHWzLN5hq4
-	gtoHttQ9zBakoFIESkCmFQR8lNeE8bCIw0mqIhRjOxSsW4HRgmQUZViF8WrX2i0z2X+f8z3n
-	+83JSQ4HD2tkR3D2KdIZlUIq45NLiR7v7cFN9gtv7I1+bBeDOWMzDLfrWJCRdRSD7DYfAabz
-	uRj4BsYwWGw7hoNneIwF5eeaSSi1ZhGw+CCXhHtlIxg8yZwnoP5qNgajnU42mPLqENRlOgho
-	HZshIXd8LWgvP0cwUuBkwX3jnyTMGmvZMPTcScBs/itwWqfF4E6uHK4MjBBgM+WzwHjiEgl6
-	iwj6WwcwuHe1lARbRw8LHpnzCNBXanEYrXCzwFFkJKDjWjkCZ8MkBtrypzhoPS4c5qpvs+Bu
-	ng8HQ30tDnb9KIIbx35mwZ2GTDZMn+3C4Vp5BgGdFatAX28hYLpnAsH3E3049LZvAMszHwZ3
-	mz0s8JRuhKLqFgx+yvmLDS3W/WCZs2DgmhkjwWfftv1dutqmY9G/Op/j9JO73Yg++8Nh+kzG
-	LwQ9NyugW2oeYnTuzXGcbjMMsGlTRyRd0aShF8yNbLqpNoekb9Vcwui2YQmtP9eBdvB3CRNU
-	Sk06sy5VqU7fwt8tghihSALCGLFEKIrd/Nk7MXH8qK0JyYxs3yFGFbX1C2GqXasj0npXfFVR
-	OIRlIO0yHQrhUFwxVaPNRgEO415ElNG4PqivpRqf9bGCzKMW+nWkDi31z0wh6nbr9X+KZkQd
-	OTX3wk1wI6nRBzdfMMl9m7JOOPAAh3PfpNyLXS8MOPdWKOUuGmQHGjzuAcpimCADHMrdTl3u
-	GcWDqTkYlZOdzQo2VlDdp0eIAOPcQ1Tp74GdOH5eQ1V5OQE5hEtTxZX9KLjqeqreep8I8reU
-	Z/ER0iOe4aUkw0tJhv+SgrKAsnv/wP4nv0UZK914kLdQ9fWTRAVi16JwRqOWp8jVMUK1VK7W
-	KFKESUp5E/L/i6lztuUKqhmfEpoRxkFmtMHvdP5YZ0MRhEKpYPjhoVm81/eGhSZLv/6GUSn3
-	qDQyRm1Gcf4zFuIRK5OU/udTpO8RxUfHicTxkug4SXwsf3VoYtpxaRg3RZrOHGCYNEb1rw/j
-	hERkYLB5tdablXQwa++qeCH+Pr1c4ZgS9H7auu1z0/HhZv6IZuM6HD+zKSay8bHMdbZ5RlFu
-	trzqEsc/beLYY2dk0wuupWWJj5n+ecFr7I/XamDhS897ndVXf0voXba8Shd3fuWOglZ5Vrji
-	4WDiZTI2jO86v1j5XQivLpnXlFBDr/nE1n4jsVZf5xa4lxjm91dtPzQdNX7R0VByhK3Zrbz+
-	YZo0uezoPtOsJtxlG9zJiy7buatAdbDLunxJ/gfWR0eijBeKo91Dp4uTxpSn5iXKtsMlDbLS
-	B91DXonPVtDZUygebpjMjLVJtjlOHKVL+pQTfaJi0TXmozjRzAFve/pJD59Qp0pFAlyllv4N
-	Xa6R4cQEAAA=
-X-CMS-MailID: 20240416161833eucas1p12e7e5db7e46bb558f0b7e7b7c0f3a17d
-X-Msg-Generator: CA
-X-RootMTR: 20240416081854eucas1p102081018d3e61cd9a250ab62f46b4e8a
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240416081854eucas1p102081018d3e61cd9a250ab62f46b4e8a
-References: <20240412-jag-sysctl_remset_net-v3-1-11187d13c211@samsung.com>
-	<20240415231210.22785-1-kuniyu@amazon.com>
-	<CGME20240416081854eucas1p102081018d3e61cd9a250ab62f46b4e8a@eucas1p1.samsung.com>
-	<be056435353af60a564f457c79dacc16c6ea920e.camel@redhat.com>
-
---arc6idvhr2tglhrq
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
+References: <20240415131941.51153-1-linyunsheng@huawei.com> <20240415131941.51153-7-linyunsheng@huawei.com>
+In-Reply-To: <20240415131941.51153-7-linyunsheng@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 16 Apr 2024 09:08:14 -0700
+Message-ID: <CAKgT0UdAW9EBh_eauHMArxjUeV-mwC9arZuCYPk=scn5yvW9gQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 06/15] mm: page_frag: change page_frag_alloc_*
+ API to accept align param
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, 
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, linux-mm@kvack.org, 
+	linux-afs@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 16, 2024 at 10:18:42AM +0200, Paolo Abeni wrote:
-> On Mon, 2024-04-15 at 16:12 -0700, Kuniyuki Iwashima wrote:
-> > From: Joel Granados via B4 Relay <devnull+j.granados.samsung.com@kernel=
-=2Eorg>
-> > Date: Fri, 12 Apr 2024 16:48:29 +0200
-> > > From: Joel Granados <j.granados@samsung.com>
-=2E..
-> > >  net/rxrpc/sysctl.c                  | 1 -
-> > >  net/sctp/sysctl.c                   | 6 +-----
-> > >  net/smc/smc_sysctl.c                | 1 -
-> > >  net/sunrpc/sysctl.c                 | 1 -
-> > >  net/sunrpc/xprtrdma/svc_rdma.c      | 1 -
-> > >  net/sunrpc/xprtrdma/transport.c     | 1 -
-> > >  net/sunrpc/xprtsock.c               | 1 -
-> > >  net/tipc/sysctl.c                   | 1 -
-> > >  net/unix/sysctl_net_unix.c          | 1 -
-> > >  net/x25/sysctl_net_x25.c            | 1 -
-> > >  net/xfrm/xfrm_sysctl.c              | 5 +----
-> > >  35 files changed, 20 insertions(+), 81 deletions(-)
-> >=20
-> > You may want to split patch based on subsystem or the type of changes
-> > to make review easier.
->=20
-> I agree with Kuniyuki. I think the x25 chunks can me moved in the last
-> patch, and at least sunrpc and rds could go in separate patches,
-> possibly even xfrm and smc.
+On Mon, Apr 15, 2024 at 6:22=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> When page_frag_alloc_* API doesn't need data alignment, the
+> ALIGN() operation is unnecessary, so change page_frag_alloc_*
+> API to accept align param instead of align_mask param, and do
+> the ALIGN()'ing in the inline helper when needed.
+>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
 
-No problem. I'll put x25 and ax.25 patches together into one commit.
-Thx
+The vast majority of callers are using this aligned one way or
+another. If anything with your recent changes we should probably be
+making sure to align the fragsz as well as the offset since most
+callers were only using the alignment of the fragsz in order to get
+their alignment.
 
-Best
+My main concern is that this change implies that most are using an
+unaligned setup when it is in fact quite the opposite.
 
---=20
+> ---
+>  include/linux/page_frag_cache.h | 20 ++++++++++++--------
+>  include/linux/skbuff.h          | 12 ++++++------
+>  mm/page_frag_cache.c            |  9 ++++-----
+>  net/core/skbuff.c               | 12 +++++-------
+>  net/rxrpc/txbuf.c               |  5 +++--
+>  5 files changed, 30 insertions(+), 28 deletions(-)
+>
+> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_ca=
+che.h
+> index 04810d8d6a7d..cc0ede0912f3 100644
+> --- a/include/linux/page_frag_cache.h
+> +++ b/include/linux/page_frag_cache.h
+> @@ -25,21 +25,25 @@ struct page_frag_cache {
+>
+>  void page_frag_cache_drain(struct page_frag_cache *nc);
+>  void __page_frag_cache_drain(struct page *page, unsigned int count);
+> -void *__page_frag_alloc_align(struct page_frag_cache *nc, unsigned int f=
+ragsz,
+> -                             gfp_t gfp_mask, unsigned int align_mask);
+> +void *page_frag_alloc(struct page_frag_cache *nc, unsigned int fragsz,
+> +                     gfp_t gfp_mask);
+> +
+> +static inline void *__page_frag_alloc_align(struct page_frag_cache *nc,
+> +                                           unsigned int fragsz, gfp_t gf=
+p_mask,
+> +                                           unsigned int align)
+> +{
+> +       nc->offset =3D ALIGN(nc->offset, align);
+> +
+> +       return page_frag_alloc(nc, fragsz, gfp_mask);
+> +}
+>
 
-Joel Granados
+I would rather not have us breaking up the alignment into another
+function. It makes this much more difficult to work with. In addition
+you are adding offsets without actually adding to the pages which
+makes this seem exploitable. Basically just pass an alignment value of
+32K and you are forcing a page eviction regardless.
 
---arc6idvhr2tglhrq
-Content-Type: application/pgp-signature; name="signature.asc"
+>  static inline void *page_frag_alloc_align(struct page_frag_cache *nc,
+>                                           unsigned int fragsz, gfp_t gfp_=
+mask,
+>                                           unsigned int align)
+>  {
+>         WARN_ON_ONCE(!is_power_of_2(align));
+> -       return __page_frag_alloc_align(nc, fragsz, gfp_mask, -align);
+> -}
+>
+> -static inline void *page_frag_alloc(struct page_frag_cache *nc,
+> -                                   unsigned int fragsz, gfp_t gfp_mask)
+> -{
+> -       return page_frag_alloc_align(nc, fragsz, gfp_mask, ~0u);
+> +       return __page_frag_alloc_align(nc, fragsz, gfp_mask, align);
+>  }
+>
+>  void page_frag_free(void *addr);
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index f2dc1f735c79..43c704589deb 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -3268,7 +3268,7 @@ static inline void skb_queue_purge(struct sk_buff_h=
+ead *list)
+>  unsigned int skb_rbtree_purge(struct rb_root *root);
+>  void skb_errqueue_purge(struct sk_buff_head *list);
+>
+> -void *__netdev_alloc_frag_align(unsigned int fragsz, unsigned int align_=
+mask);
+> +void *__netdev_alloc_frag_align(unsigned int fragsz, unsigned int align)=
+;
+>
+>  /**
+>   * netdev_alloc_frag - allocate a page fragment
+> @@ -3279,14 +3279,14 @@ void *__netdev_alloc_frag_align(unsigned int frag=
+sz, unsigned int align_mask);
+>   */
+>  static inline void *netdev_alloc_frag(unsigned int fragsz)
+>  {
+> -       return __netdev_alloc_frag_align(fragsz, ~0u);
+> +       return __netdev_alloc_frag_align(fragsz, 1u);
+>  }
+>
+>  static inline void *netdev_alloc_frag_align(unsigned int fragsz,
+>                                             unsigned int align)
+>  {
+>         WARN_ON_ONCE(!is_power_of_2(align));
+> -       return __netdev_alloc_frag_align(fragsz, -align);
+> +       return __netdev_alloc_frag_align(fragsz, align);
+>  }
+>
+>  struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int =
+length,
+> @@ -3346,18 +3346,18 @@ static inline void skb_free_frag(void *addr)
+>         page_frag_free(addr);
+>  }
+>
+> -void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align_ma=
+sk);
+> +void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align);
+>
+>  static inline void *napi_alloc_frag(unsigned int fragsz)
+>  {
+> -       return __napi_alloc_frag_align(fragsz, ~0u);
+> +       return __napi_alloc_frag_align(fragsz, 1u);
+>  }
+>
+>  static inline void *napi_alloc_frag_align(unsigned int fragsz,
+>                                           unsigned int align)
+>  {
+>         WARN_ON_ONCE(!is_power_of_2(align));
+> -       return __napi_alloc_frag_align(fragsz, -align);
+> +       return __napi_alloc_frag_align(fragsz, align);
+>  }
+>
+>  struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int le=
+ngth);
+> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
+> index dc864ee09536..b4408187e1ab 100644
+> --- a/mm/page_frag_cache.c
+> +++ b/mm/page_frag_cache.c
+> @@ -61,9 +61,8 @@ void __page_frag_cache_drain(struct page *page, unsigne=
+d int count)
+>  }
+>  EXPORT_SYMBOL(__page_frag_cache_drain);
+>
+> -void *__page_frag_alloc_align(struct page_frag_cache *nc,
+> -                             unsigned int fragsz, gfp_t gfp_mask,
+> -                             unsigned int align_mask)
+> +void *page_frag_alloc(struct page_frag_cache *nc, unsigned int fragsz,
+> +                     gfp_t gfp_mask)
+>  {
+>         unsigned int size, offset;
+>         struct page *page;
+> @@ -92,7 +91,7 @@ void *__page_frag_alloc_align(struct page_frag_cache *n=
+c,
+>         size =3D PAGE_SIZE;
+>  #endif
+>
+> -       offset =3D ALIGN(nc->offset, -align_mask);
+> +       offset =3D nc->offset;
+>         if (unlikely(offset + fragsz > size)) {
+>                 page =3D virt_to_page(nc->va);
+>
+> @@ -129,7 +128,7 @@ void *__page_frag_alloc_align(struct page_frag_cache =
+*nc,
+>
+>         return nc->va + offset;
+>  }
+> -EXPORT_SYMBOL(__page_frag_alloc_align);
+> +EXPORT_SYMBOL(page_frag_alloc);
+>
+>  /*
+>   * Frees a page fragment allocated out of either a compound or order 0 p=
+age.
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index ea052fa710d8..676e2d857f02 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -306,18 +306,17 @@ void napi_get_frags_check(struct napi_struct *napi)
+>         local_bh_enable();
+>  }
+>
+> -void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align_ma=
+sk)
+> +void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align)
+>  {
+>         struct napi_alloc_cache *nc =3D this_cpu_ptr(&napi_alloc_cache);
+>
+>         fragsz =3D SKB_DATA_ALIGN(fragsz);
+>
 
------BEGIN PGP SIGNATURE-----
+So this is a perfect example. This caller is aligning the size by
+SMP_CACHE_BYTES. This is the most typical case. Either this or
+L1_CACHE_BYTES. As such all requests should be aligned to at least
+that. I would prefer it if we didn't strip the alignment code out of
+our main allocating function. If anything, maybe we should make it
+more specific that the expectation is that fragsz is a multiple of the
+alignment.
 
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmYeb8sACgkQupfNUreW
-QU9IgQv/f3B6o6CgzcLe66voGeH52C4Mqq88G+CAPi1Y55DViplwGANdfK6EBoDN
-6Uzq/iW+1nx0YiieJ0iErfZYCed7fAx2cY90xhYzfiJk3+e0xJGOzirNFxHFI0oL
-/AdldpRWTtKVIjqOLxy8V75vvztbqeUhe7WrLg59RD3bDhmRtwXp/VsJ7bfe+HjC
-lUB3RjWgKUyR0J8eRFAi0cq3JgnpPHxOyHmr6RUrARc/MEm/fXh+L/GiipQLOjMM
-3AiwB/v96pvRP+gjjIVHvB87IAZYCrpeLlx5YKpxNg6z3YxKf+unw2DrwXrbsduD
-Uxd0fgyicGQFvBbm4eSG/49a5uByExNlmH7aldYY1QuSbCVgTCFc/85ybpbyufFJ
-k0MgrMSr4J7H+kxulOrh3U0NW7qhZXo0HGc6isvypx0qZARcVunY/pLIqyyGsInv
-V6iNf9SGHFSR5BL81V0wQVuPrRaIgae5oho/2EzF8x5dCuwZtIc3oW5dfmk0Nlr4
-EsKgK3Yv
-=6qGD
------END PGP SIGNATURE-----
-
---arc6idvhr2tglhrq--
+> -       return __page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC,
+> -                                      align_mask);
+> +       return __page_frag_alloc_align(&nc->page, fragsz, GFP_ATOMIC, ali=
+gn);
+>  }
+>  EXPORT_SYMBOL(__napi_alloc_frag_align);
+>
+> -void *__netdev_alloc_frag_align(unsigned int fragsz, unsigned int align_=
+mask)
+> +void *__netdev_alloc_frag_align(unsigned int fragsz, unsigned int align)
+>  {
+>         void *data;
+>
+> @@ -325,15 +324,14 @@ void *__netdev_alloc_frag_align(unsigned int fragsz=
+, unsigned int align_mask)
+>         if (in_hardirq() || irqs_disabled()) {
+>                 struct page_frag_cache *nc =3D this_cpu_ptr(&netdev_alloc=
+_cache);
+>
+> -               data =3D __page_frag_alloc_align(nc, fragsz, GFP_ATOMIC,
+> -                                              align_mask);
+> +               data =3D __page_frag_alloc_align(nc, fragsz, GFP_ATOMIC, =
+align);
+>         } else {
+>                 struct napi_alloc_cache *nc;
+>
+>                 local_bh_disable();
+>                 nc =3D this_cpu_ptr(&napi_alloc_cache);
+>                 data =3D __page_frag_alloc_align(&nc->page, fragsz, GFP_A=
+TOMIC,
+> -                                              align_mask);
+> +                                              align);
+>                 local_bh_enable();
+>         }
+>         return data;
+> diff --git a/net/rxrpc/txbuf.c b/net/rxrpc/txbuf.c
+> index e0679658d9de..eb640875bf07 100644
+> --- a/net/rxrpc/txbuf.c
+> +++ b/net/rxrpc/txbuf.c
+> @@ -32,9 +32,10 @@ struct rxrpc_txbuf *rxrpc_alloc_data_txbuf(struct rxrp=
+c_call *call, size_t data_
+>                 hoff =3D round_up(sizeof(*whdr), data_align) - sizeof(*wh=
+dr);
+>         total =3D hoff + sizeof(*whdr) + data_size;
+>
+> +       data_align =3D max_t(size_t, data_align, L1_CACHE_BYTES);
+>         mutex_lock(&call->conn->tx_data_alloc_lock);
+> -       buf =3D __page_frag_alloc_align(&call->conn->tx_data_alloc, total=
+, gfp,
+> -                                     ~(data_align - 1) & ~(L1_CACHE_BYTE=
+S - 1));
+> +       buf =3D page_frag_alloc_align(&call->conn->tx_data_alloc, total, =
+gfp,
+> +                                   data_align);
+>         mutex_unlock(&call->conn->tx_data_alloc_lock);
+>         if (!buf) {
+>                 kfree(txb);
+> --
+> 2.33.0
+>
 
