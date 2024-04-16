@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-88432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40E728A72E6
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 20:13:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DCBB8A72EB
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 20:16:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8E11283AE7
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:13:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DC221F22638
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 18:16:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D40EA134CE0;
-	Tue, 16 Apr 2024 18:13:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E7AE134436;
+	Tue, 16 Apr 2024 18:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="LxmMU96F"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="rxRLrQvD"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D950784A32;
-	Tue, 16 Apr 2024 18:13:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529FD134425
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 18:16:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713291188; cv=none; b=IYH8c1hc9IKVJHOw+yNHv80dhdHm9O5OqAzGkCUWQuErj0Titp5bt8QmGq5Tl8+YtH6h76h4IdxeUVT0IXoC40YTMrPwzrlUYf8aqS/9y+xPies8VHgmCtzu+2FbG63f/jpH1609wJseQcaRpD3Zkeab8djxfH1GJ0z/n01ouK8=
+	t=1713291377; cv=none; b=H/haV50NVhWdp0+UuOkOTmPaLkY3ASF94o2hbkAOuKSP/vFbDzaWQwMkkD4GvcRf7jhOaS7hC2SIZD3UYM4fUDK3JlDr0jiafbmoL8pOD5YXlm5nwxqXtlYAJKPsPgoJyJeivhdNbvnYeuPl/5+8RcE7Ng7Z4iD9JBJRllOEzPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713291188; c=relaxed/simple;
-	bh=AA6SJbQhGfB9M3x1QbK3z/D1vMSid8qosIO1GNXxywM=;
+	s=arc-20240116; t=1713291377; c=relaxed/simple;
+	bh=OoQ0a1Cn7FaCeJPx4DN3Lc0ZOMegJDCoEylRT8HpdgQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bYecA10Gt9HTPJaTWm+1IeGVKsNF+9IcilYc28iSw/TDehWQoaS7Q/qPqxiJUmqamU61rTQh5AFNsv1KC6ykG2uf9q0f6Qrqk9YVwMAJ9Tg4ew88uIWxFs2+aKJl+inHmwOqpWDKi6Biq3UIFR15djNBfZgRqLz/eNhd3u9hqlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=LxmMU96F; arc=none smtp.client-ip=78.32.30.218
+	 Content-Type:Content-Disposition:In-Reply-To; b=tuoKeAtIwpWdnh7vLBBOmloBDddg/5vwvJ7QVkOITJQz5+htHkYdp2E6jbatp+VogJ9dT/lrEqF0LBuOUzIuRJgLaCsi/VViCPClR1Q4BA/8SWNGDjE3ZxEO8QhRENK+8qhk6276Jn9IWTygIwyHMsWyGTQBqcfKotKpMx2tjgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=rxRLrQvD; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,40 +37,35 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=36ZXpuO31IIMkNaMOUNE9BMTLk6qz2b58hlyspvsh9M=; b=LxmMU96F7hOkagMMuarOGWvM2P
-	iVEy91jkVu6Y+T2Ub1KdC1k6J+5O7cFaujlahZKKGdFUQP6OsgZzD3cjkqzKb6RWTIbX40Y9weyRe
-	12pw+XjIzratPnUlLJkPIiCD3w+FFB+MQiqjMZsDSa00FTMCrfGjES55si1xevo4dkbc6l/YEX1FB
-	jucTBymlDlyp9pd4TJoNCrGFf7DcmoD/ItwBeMgwHGQDArIt9VjLXQ956G94/m8RaBkhOd4z1fm/k
-	VQ0tsBd4c/5rNMYNP6KMzeH/WMjrwenFlSko2KQXaSzPapRpdzff1RWBqiBhf+rIbjCstQeQfNKOn
-	+FYKNOMQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57804)
+	bh=dTKECMt9cHk1i0+6TIRQlYGHzql3YOg032n4aglyiC4=; b=rxRLrQvDjxoJ8RswJJ1YbqdZ4A
+	RMDjU9+aSJbvMQx00JQscybSO4QWX6VT2mPhVGaZbhMMnlLv60StW0EJwJE4McrglTjsU8MsHV5WH
+	CtqU0lYq8enT6ZD8aFgslncnpQkF3yLPDO+8mcViz9temN6XJGlBHJSQBhHRHY4uCaQl7qdI4xXeq
+	0bUpZVB4gwO0i/poDxcfuhBwTmDMT+40hg6vmjRd5WHskJzFJVo+38LLAvACfKRtVfyGdIO2QUhaR
+	7hAyd8OmNL7LOJ8zhRR7AfqWQ40t0Bu444uttd5MQhvzDBh9iaBoEVyiNKdxD+/qmDJqlYngG5x/t
+	jpBehNGg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53118)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1rwnIZ-0000oT-2i;
-	Tue, 16 Apr 2024 19:12:51 +0100
+	id 1rwnLk-0000pB-0Z;
+	Tue, 16 Apr 2024 19:16:08 +0100
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rwnIX-000537-Sy; Tue, 16 Apr 2024 19:12:49 +0100
-Date: Tue, 16 Apr 2024 19:12:49 +0100
+	id 1rwnLk-00053F-Ef; Tue, 16 Apr 2024 19:16:08 +0100
+Date: Tue, 16 Apr 2024 19:16:08 +0100
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	lxu@maxlinear.com, hkallweit1@gmail.com, michael@walle.cc,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property
- to disable SGMII autoneg
-Message-ID: <Zh6/oVHUvnOVtHaC@shell.armlinux.org.uk>
-References: <20240416121032.52108-1-eichest@gmail.com>
- <20240416121032.52108-3-eichest@gmail.com>
- <3f7f278f-e490-47f1-971c-ecf44a70cee4@lunn.ch>
- <Zh6clAtI3NO+nMEi@eichest-laptop>
- <5ed39628-4ac0-4c4e-9a16-fd4bf9a6db29@lunn.ch>
- <Zh6mIv1Ee+1h21Xo@shell.armlinux.org.uk>
- <Zh6z90iCpLqF4fla@eichest-laptop>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: dsa: bcm_sf2: provide own phylink MAC
+ operations
+Message-ID: <Zh7AaJd4jno/NQDR@shell.armlinux.org.uk>
+References: <E1rwfu3-00752s-On@rmk-PC.armlinux.org.uk>
+ <3b57b26c-3f1e-4db6-a584-59c84f16dcae@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,90 +74,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Zh6z90iCpLqF4fla@eichest-laptop>
+In-Reply-To: <3b57b26c-3f1e-4db6-a584-59c84f16dcae@gmail.com>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Apr 16, 2024 at 07:23:03PM +0200, Stefan Eichenberger wrote:
-> Hi Russell and Andrew,
+On Tue, Apr 16, 2024 at 10:44:38AM -0700, Florian Fainelli wrote:
+> On 4/16/24 03:19, Russell King (Oracle) wrote:
+> > Convert bcm_sf2 to provide its own phylink MAC operations, thus
+> > avoiding the shim layer in DSA's port.c
+> > 
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 > 
-> On Tue, Apr 16, 2024 at 05:24:02PM +0100, Russell King (Oracle) wrote:
-> > On Tue, Apr 16, 2024 at 06:02:08PM +0200, Andrew Lunn wrote:
-> > > On Tue, Apr 16, 2024 at 05:43:16PM +0200, Stefan Eichenberger wrote:
-> > > > Hi Andrew,
-> > > > 
-> > > > Thanks a lot for the feedback.
-> > > > 
-> > > > On Tue, Apr 16, 2024 at 03:46:19PM +0200, Andrew Lunn wrote:
-> > > > > On Tue, Apr 16, 2024 at 02:10:32PM +0200, Stefan Eichenberger wrote:
-> > > > > > Add a new device tree property to disable SGMII autonegotiation and
-> > > > > > instead use the option to match the SGMII speed to what was negotiated
-> > > > > > on the twisted pair interface (tpi).
-> > > > > 
-> > > > > Could you explain this is more detail.
-> > > > > 
-> > > > > SGMII always runs its clocks at 1000Mbps. The MAC needs to duplicate
-> > > > > the symbols 100 times when running at 10Mbs, and 10 times when running
-> > > > > at 100Mbps.
-> > > > 
-> > > > Currently, the mxl-gpy driver uses SGMII autonegotiation for 10 Mbps,
-> > > > 100 Mbps, and 1000 Mbps. For our Ethernet controller, which is on an
-> > > > Octeon TX2 SoC, this means that we have to enable "in-band-status" on
-> > > > the controller. This will work for all three speed settings. However, if
-> > > > we have a link partner that can do 2.5 Gbps, the mxl-gpy driver will
-> > > > disable SGMII autonegotiation in gpy_update_interface. This is not
-> > > > supported by this Ethernet controller because in-band-status is still
-> > > > enabled. Therefore, we will not be able to transfer data at 2.5 Gbps,
-> > > > the SGMII link will not go into a working state.
-> > > 
-> > > This is where i expect Russel to point out that SGMII does not support
-> > > 2.5G. What you actually mean is that the PHY swaps to 2500BaseX. And
-> > > 2500BaseX does not perform speed negotiation, since it only supports
-> > > 2500. So you also need the MAC to swap to 2500BaseX.
-> > 
-> > Yes, absolutely true that SGMII does not support 2.5G... and when
-> > operating faster, than 2500base-X is normally used.
-> > 
-> > How, 2500base-X was slow to be standardised, and consequently different
-> > manufacturers came up with different ideas. The common theme is that
-> > it's 1000base-X up-clocked by 2.5x. Where the ideas differ is whether
-> > in-band negotiation is supported or not. This has been a pain point for
-> > a while now.
-> > 
-> > As I mentioned in my previous two messages, I have an experimental
-> > patch series that helps to address this.
-> > 
-> > The issue is that implementations mix manufacturers, so we need to
-> > know the capabilities of the PHY and the capabilities of the PCS, and
-> > then hope that we can find some common ground between their
-> > requirements.
-> > 
-> > There is then the issue that if you're not using phylink, then...
-> > guess what... you either need to convert to use phylink or implement
-> > the logic in your own MAC driver to detect what the PHY is doing
-> > and what its capabilities are - but I think from what you've said,
-> > you are using phylink.
-> 
-> Thanks for the patch series and the explanation. In our use case we have
-> the mismatch between the PHY and the mvpp2 driver in 2500BaseX mode.
+> Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> Tested-by: Florian Fainelli <florian.fainelli@broadcom.com>
 
-Ah, mvpp2. This is one of those cases where I think you have a
-disagreement between manufacturers over 2500base-X.
+Great, thanks for testing.
 
-Marvell's documentation clearly states that when operating in 1000base-X
-mode, AN _must_ be enabled. Since programming 2500base-X is programming
-the mvpp2 hardware for 1000base-X and then configuring the COMPHY to
-clock faster, AN must also be enabled when operating at 2500base-X.
+(Unrelated to this patch... so please don't delay applying based on
+ongoing discussion!)
 
-It seems you've coupled it with the mxl-gpy PHY which doesn't apparently
-support AN when in 2500base-X.
+The other Broadcom driver, b53, isn't going to be as simple - I believe
+it uses a mixture of the .adjust_link method for shared ports, and
+.phylink_mac_* for user ports. That makes it very awkward now, given
+the check that was added (and suggested by Vladimir) to check for the
+legacy methods if dsa_switch's .phylink_mac_ops is populated.
 
-Welcome to the mess of 2500base-X, and sadly we finally have the
-situation that I've feared for years: one end of a 2500base-X link
-that's documented as requiring AN, and the other end not providing it.
-
-Sigh. If only the IEEE 802.3 committee had been more pro-active and
-standardised 2500base-X _before_ manufacturers went off and did their
-own different things.
+Is there any scope for converting b53 to use only phylink methods for
+everything, thus eliminating the .adjust_link callback?
 
 -- 
 RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
