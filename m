@@ -1,56 +1,55 @@
-Return-Path: <netdev+bounces-88279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12BC48A688E
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:37:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 691378A6902
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:50:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3AC7281BA5
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:37:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AD3A1C20A79
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E03127B62;
-	Tue, 16 Apr 2024 10:37:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2D7C128805;
+	Tue, 16 Apr 2024 10:50:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZmWN4tHh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ps13Ao5p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D97C3FC2;
-	Tue, 16 Apr 2024 10:37:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F9012839F;
+	Tue, 16 Apr 2024 10:50:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713263827; cv=none; b=JUt1aTumloJFpNZ4ibCZ7vrJReQrzvVNg7lfUsm+iIBJHhyl1NATwGmN8KrDg53AZRZL9THxhd+IU2EqF04nqiQs2O1wX+eH3x2DIMhyOrfUWp3L6+AmdXx31XBwEQKRtBI3UdZ6fXfHV/firy3TJPFXvnMdVwZR6hDX82//1NE=
+	t=1713264640; cv=none; b=fayh7vSNNZMos14stfsNTU/+EXqnJcww1ER3DGKLEcpgD8l1oeUBdylaHFltb1gbEIGW0XmsUablDsbWAsVICWt8bdr+dijFpe7QiBr/9QbNMv5MdusWYyWOBAa891DmRSbzekyyveAocy5Mnpr4GraFDmAMyri/8AJQDgjyz6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713263827; c=relaxed/simple;
-	bh=Q17prcLTZ4z/UsT9fHA73b3ttRGaWuJzjG+Viwqifs4=;
+	s=arc-20240116; t=1713264640; c=relaxed/simple;
+	bh=VGTWG/vBXuvEV6+9ARdx5dcmf9g+Ly8+3/hYzr+P298=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jA50gBeaQSCnptO0v7YtQD8NSJJlvTMvnII6CLPhO3joXV8D9Wgdy7vKX8QobeUVoI2SPzj3VUytnqcuDJLai5wZs49R/O4pAlk6BtkYowOzshL6f6A3N8Cz+hVqUluU6FVlRdvisFztWa9wZDKfW71OgWu1IUJFAUwlvA7zJPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZmWN4tHh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3544C113CE;
-	Tue, 16 Apr 2024 10:37:04 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=TmUKUOJzmHP9jKzn5ZfLTZGVHXOocq2xdVcgT//BR9v95CtlMGIjOc+5nBqwNUrwWyaKh89ey74pHmX0rSnBYYJjyJn/KSdTEl/m/L2FaH2qCIcLCUkTB7hLyAKjyhixR/1X1OZxGknY5kJmngFugO/RfOvry1rMVsCqTn0zeO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ps13Ao5p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40F98C32781;
+	Tue, 16 Apr 2024 10:50:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713263827;
-	bh=Q17prcLTZ4z/UsT9fHA73b3ttRGaWuJzjG+Viwqifs4=;
+	s=k20201202; t=1713264640;
+	bh=VGTWG/vBXuvEV6+9ARdx5dcmf9g+Ly8+3/hYzr+P298=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZmWN4tHhWI43GRSRrNxifMOevONMzAQjGB+y+H6S0b2dl9u98KntHuN4EtaeedBti
-	 DKuA60j76SwG8Q1hWCqJXYr4pOY1AbT86A9+2pVPM76NUhpzB9+hw+0hJzL285DMgE
-	 z3qz5HNPaxK3HSdJHKPSahY9EFGcLlhV346FJLzEBwHtpxGSp+zcN1GXHgZaU9PWKo
-	 Na/No3ZQnPhWixSnwcZSZv1NnFjO13w48bmk107YrLfa1yjrt2EXqKu1hEUJ2hnLyF
-	 hD5PpQOZWjwvyI9zUWb+x8i50Pop+QmSwo+M0X4SAGF3bk6aScz5Iy/4Pmreq8XMMa
-	 Lijr8/9xwCZuQ==
-Date: Tue, 16 Apr 2024 11:37:02 +0100
+	b=ps13Ao5pwl8TlKtA0SIwrc2SVatH/m3sZ3saWl8UF4seBT09fcZQuoJeQahJ8n3Uj
+	 KUsvYAFV3iBuPf7uhV8lNADankMUUc8iuv3RMTY8iwvY6ZznkS5Km/ytLLxUHV8JKB
+	 fkcwzo1MQAzm4wcWEPBBhh5m8FsgozyMhpQ+46VNm9132P8jOF0hBq+SxHNKmgsLCC
+	 EuWEPlECUaDSxcqu/9vUCdYVKMTHKqpN8pRFX7TDdNEwPAG67LhvVczNxfiICc9CSG
+	 pyS5q3+9KDDG8NlKk54mFIaAwOdpLSNVtW4ebJgXkqqqJrfVc8tG5eqllLiDK1JaAN
+	 l4TL8CHPAf5lA==
+Date: Tue, 16 Apr 2024 11:50:35 +0100
 From: Simon Horman <horms@kernel.org>
-To: Geetha sowjanya <gakula@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
-Subject: Re: [net-next PATCH v2] octeontx2-pf: Add support for offload tc
- with skbedit mark action
-Message-ID: <20240416103702.GI2320920@kernel.org>
-References: <20240414062957.18840-1-gakula@marvell.com>
+To: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+Cc: elder@kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Abaci Robot <abaci@linux.alibaba.com>
+Subject: Re: [PATCH] net: ipa: Remove unnecessary print function dev_err()
+Message-ID: <20240416105035.GJ2320920@kernel.org>
+References: <20240415031456.10805-1-jiapeng.chong@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,82 +58,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240414062957.18840-1-gakula@marvell.com>
+In-Reply-To: <20240415031456.10805-1-jiapeng.chong@linux.alibaba.com>
 
-On Sun, Apr 14, 2024 at 11:59:57AM +0530, Geetha sowjanya wrote:
-> Support offloading of skbedit mark action.
+On Mon, Apr 15, 2024 at 11:14:56AM +0800, Jiapeng Chong wrote:
+> The print function dev_err() is redundant because
+> platform_get_irq_byname() already prints an error.
 > 
-> For example, to mark with 0x0008, with dest ip 60.60.60.2 on eth2
-> interface:
+> ./drivers/net/ipa/ipa_interrupt.c:300:2-9: line 300 is redundant because platform_get_irq() already prints an error.
 > 
->  # tc qdisc add dev eth2 ingress
->  # tc filter add dev eth2 ingress protocol ip flower \
->       dst_ip 60.60.60.2 action skbedit mark 0x0008 skip_sw
-> 
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
-> ---
-> v1-v2: 
->   -Changed mark_flows data type to refcount_t 
+> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=8756
+> Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
 
-Thanks Geetha,
+Hi Jiapeng Chong,
 
-The nit below notwithstanding, this looks good to me.
+I don't think that you need to repost because of this,
+but when sending Networking patches please specify the target tree
+in the subject; net for fixes, and net-next for other patches.
+
+e.g.
+
+	Subject: [PATCH net-next] ...
+
+That notwithstanding, this patch looks good to me.
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
-...
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-> index 87bdb93cb066..8b8ac179f3c3 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-> @@ -511,7 +511,15 @@ static int otx2_tc_parse_actions(struct otx2_nic *nic,
->  			nr_police++;
->  			break;
->  		case FLOW_ACTION_MARK:
-> +			if (act->mark & ~OTX2_RX_MATCH_ID_MASK) {
-> +				NL_SET_ERR_MSG_MOD(extack, "Bad flow mark, only 16 bit supported");
-> +				return -EOPNOTSUPP;
-> +			}
->  			mark = act->mark;
-> +			req->match_id = mark & 0xFFFFULL;
-
-nit: Is the mask necessary here?
-     act->mark was already checked against OTX2_RX_MATCH_ID_MASK
-     to ensure that nothing is set in the upper 16 bits.
-
-     If it is, could OTX2_RX_MATCH_ID_MASK be used instead of 0xFFFFULL ?
-     Or perhaps use lower_16_bits().
-
-     No need for this to block this patch, AFAIK.
-     But perhaps a follow-up could be considered.
-
-> +			req->op = NIX_RX_ACTION_DEFAULT;
-> +			nic->flags |= OTX2_FLAG_TC_MARK_ENABLED;
-> +			refcount_inc(&nic->flow_cfg->mark_flows);
->  			break;
->  
->  		case FLOW_ACTION_RX_QUEUE_MAPPING:
-
-...
-
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-> index a82ffca8ce1b..3f1d2655ff77 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.h
-> @@ -62,6 +62,9 @@
->  #define CQ_OP_STAT_OP_ERR       63
->  #define CQ_OP_STAT_CQ_ERR       46
->  
-> +/* Packet mark mask */
-> +#define OTX2_RX_MATCH_ID_MASK 0x0000ffff
-> +
->  struct queue_stats {
->  	u64	bytes;
->  	u64	pkts;
-> -- 
-> 2.25.1
-> 
-> 
 
