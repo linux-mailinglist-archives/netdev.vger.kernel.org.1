@@ -1,297 +1,218 @@
-Return-Path: <netdev+bounces-88201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C25D8A6491
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 09:10:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 990DF8A64EB
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 09:20:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13639282F86
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 07:10:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FEAA1C21EA9
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 07:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 089BA7FBC4;
-	Tue, 16 Apr 2024 07:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B3B84FBA;
+	Tue, 16 Apr 2024 07:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b="CTmQZy5a"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DoRLkf0N"
 X-Original-To: netdev@vger.kernel.org
-Received: from ewsoutbound.kpnmail.nl (ewsoutbound.kpnmail.nl [195.121.94.168])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D402E78274
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 07:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.121.94.168
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7AE84D3E
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 07:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713251432; cv=none; b=cmF+hli3BJuyAPtLeLjqpoXzFUBqqd/RJ+OobmoDblpCImPIh2FjXZ9d2THLmi0dpeAznndEYaZ2+2aEpKYu0l45nSElqOX+jnC825ruRYGbjxZTkq5tKkX5wPU53ou7rKaBuRkFgaIx6lkwBMpTRLz9KLtvWmbhqPP748aFxjc=
+	t=1713252009; cv=none; b=Pjix9iycz1U2F/PEUnIbkGvvlwMB0XlDb7ymguWssSBsD/JhfI2s57fkjhG0d4OMQG9U+vlhSCY+sE9p5pIdYSyOu0Ov9R3gm4ZziUlXa5l588RMqnykxqBGv8+eeaaXrswHGdqMXNtcCisDtU0qxOjdtjF30wZjpCTN2OsMRuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713251432; c=relaxed/simple;
-	bh=6KtZVrfUgv7NFlHvshVY0CeRFcl3xDbihu1O6NRicXE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=trQm+vOLlQFAO9Zj5VR25fDMiLXBvUjOmIpTBFnvCEs58gKTgiDYLyDMiOKWkM3azLWPuuHVttCO4uwjC6VmPP9PY44XqTZyZYTPZqYG8zD6NGiSJ4BWicf7mBOkRNOD9UR/tDqORa74xvSm+13mSdzzQp+D4RXOE1itvZvbWEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org; spf=none smtp.mailfrom=phenome.org; dkim=pass (1024-bit key) header.d=kpnmail.nl header.i=@kpnmail.nl header.b=CTmQZy5a; arc=none smtp.client-ip=195.121.94.168
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=phenome.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=phenome.org
-X-KPN-MessageId: 60693421-fbc0-11ee-8fdf-005056aba152
-Received: from smtp.kpnmail.nl (unknown [10.31.155.40])
-	by ewsoutbound.so.kpn.org (Halon) with ESMTPS
-	id 60693421-fbc0-11ee-8fdf-005056aba152;
-	Tue, 16 Apr 2024 09:10:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=kpnmail.nl; s=kpnmail01;
-	h=content-type:mime-version:message-id:subject:to:from:date;
-	bh=lYDa+YN/DDiQIYy7joqqN/HQ3zv4Gh4lKY9bA89ktOg=;
-	b=CTmQZy5atymt5Ys9Reso/GbgSadoO18/zwaY31mIPPq06J/Y8MTZj3/s1Mivt1aPKDMjdUhERd+iv
-	 hZKZqaEsXHHaCMh204mAXPwLhxnpBkuueCSujoZ52ZpfawsTJqo4Flavx4ICPBCBseAS/SBQQzFSEa
-	 0OdlEbyRv2XP+3hg=
-X-KPN-MID: 33|IIl5i5fzby3fhIYkEnavkDs88dB5IHb5gKtT95DpLz2HApNMFPLaGXtHwDamp2s
- /dCXCXMr0uYotCX7jOb4knxuulPFRcLmI888MNN/V3ZU=
-X-KPN-VerifiedSender: No
-X-CMASSUN: 33|Fh1Bs2F6Y/uaDSBxCvgF5ywPvsHr553M5IG1riIThmxt8O66hgktHuw9P4f5Qx+
- 38C7Xw6Xjou41eIe+QM5LSA==
-Received: from Antony2201.local (213-10-186-43.fixed.kpn.net [213.10.186.43])
-	by smtp.xs4all.nl (Halon) with ESMTPSA
-	id 65afea57-fbc0-11ee-9f0d-005056ab7584;
-	Tue, 16 Apr 2024 09:10:26 +0200 (CEST)
-Date: Tue, 16 Apr 2024 09:10:25 +0200
-From: Antony Antony <antony@phenome.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Antony Antony <antony.antony@secunet.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	devel@linux-ipsec.org, Leon Romanovsky <leon@kernel.org>,
-	Eyal Birger <eyal.birger@gmail.com>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: Re: [devel-ipsec] [PATCH ipsec-next v10 1/3] xfrm: Add Direction to
- the SA in or out
-Message-ID: <Zh4kYUjvDtUq69-h@Antony2201.local>
-References: <0e0d997e634261fcdf16cf9f07c97d97af7370b6.1712828282.git.antony.antony@secunet.com>
- <Zh0b3gfnr99ddaYM@hog>
+	s=arc-20240116; t=1713252009; c=relaxed/simple;
+	bh=yWsm5BADRNm0BAbA8BrXoabIASc6hnzuKhZ+xqYwZFE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sSPYXc64+tIXP44s++JK0XEXvbCoenDBRelJb+2ugzvwAQtCnNI3gnldLdki0qLZpqzZS+urFKFENcsYA9Kf9QdWbLPcfrrtj5qWjVv/23sEcXOegZMsi9HLnDf4N6Y39cjMq7vJBFT33y5KyiSZ+0yNpqSnBh5UkoogJQkncpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DoRLkf0N; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713252007;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N6JZjfWmVVy6GZCTR5QhlAS0fPiwwYqciHqJUFxR3Hw=;
+	b=DoRLkf0Nkg+7SYW8mNbJdWq1ekh2ePmm+crh29nNXhTFsBgcBXLGyF3tpOwNiWfGjGkroR
+	1LffoFxEAc2tJCCswlEtO8GuLR2nqnEmGMGSlyS5QMNybBY8i5pdg8h4NZkNoPzRqLWM+5
+	3MssBH1uucflsEVhUqdxjGouTlz1ujQ=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-422-iGrgXx86Ptqx6IWnhg_lyA-1; Tue, 16 Apr 2024 03:20:05 -0400
+X-MC-Unique: iGrgXx86Ptqx6IWnhg_lyA-1
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5c17cff57f9so2621813a12.0
+        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 00:20:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713252005; x=1713856805;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N6JZjfWmVVy6GZCTR5QhlAS0fPiwwYqciHqJUFxR3Hw=;
+        b=I1nKfhbKjGAXGWp0tmyJxekB7bt+EpTCOzy0r1Y6EYt9afhDwO4B67dQYvjWgczQHa
+         aTj0wqpPO0HiPX9Pp06g/Zlio/+2qX/LNBg7OhTND/vaZnREhpdgIWMvl5uDUzKJL9tQ
+         TZBmS1P/e1hTT27r9jVZ5gOU3I07w2NqGaiBpytScIqfpn8C6Ort7ZgMXJNF41EiqlGG
+         OF/F+jFEOcCDJ7oPB3Kmrs9k3i1Idy0VPhTOojkN1V5d6Pg3/lRRXMMsr9q186ti2X2m
+         jUWpo1Y/0+X+ToIqNFSDR37VYcbHr5vXMGt8221wQlypbXdZvPW9SqqBGQQEB3EKgQJs
+         LX0A==
+X-Forwarded-Encrypted: i=1; AJvYcCXHYjSeYmkm8dEKlpeO2chRtv4wGfp35E7w7gFBG/g+5wV8GYNNkp7dyWiv4iyd2aI3a6jUnp9O7Tm6G4fCHekirk9N7s/u
+X-Gm-Message-State: AOJu0Yw7CnFfrAKMj6Mpj6iEu+qsZ0mUkzZItSSxZpZlXTjJN8+BOcIu
+	rin8CmJey+DVcA7iN+M/MXLd8HmvFCI8x5/ss7OjRYEJ5RJQWY/w4xN3qdcgti/5M0HuK3H6u9z
+	oUaAG6zdRhH+YY6EbuUW+ozmiYQzlC4omMUdBypNodcyAi85ha7V3F5m2UVY5yEMWuXB0+NcUpZ
+	EKT87PoO183TBJu5eP131H/hbyNU9f
+X-Received: by 2002:a17:90b:3a8e:b0:2a5:275c:ed with SMTP id om14-20020a17090b3a8e00b002a5275c00edmr10702671pjb.23.1713252003250;
+        Tue, 16 Apr 2024 00:20:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG+l20/tJxppb54gd4K/tvseZzfAqVGlIC9/84+hZbdu2wNQwshpvR1SZGpF1E0rlbB94MitQIqdwJz5TJsdis=
+X-Received: by 2002:a17:90b:3a8e:b0:2a5:275c:ed with SMTP id
+ om14-20020a17090b3a8e00b002a5275c00edmr10702656pjb.23.1713252002908; Tue, 16
+ Apr 2024 00:20:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zh0b3gfnr99ddaYM@hog>
+References: <20240416061943.407082-1-liangchen.linux@gmail.com>
+In-Reply-To: <20240416061943.407082-1-liangchen.linux@gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 16 Apr 2024 15:19:51 +0800
+Message-ID: <CACGkMEuJBdsePgszsM51DZc1GvF0naorHDsMR+SGZ1SiA6jrZQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v8] virtio_net: Support RX hash XDP hint
+To: Liang Chen <liangchen.linux@gmail.com>
+Cc: mst@redhat.com, xuanzhuo@linux.alibaba.com, hengqi@linux.alibaba.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	hawk@kernel.org, john.fastabend@gmail.com, netdev@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	bpf@vger.kernel.org, daniel@iogearbox.net, ast@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Apr 15, 2024 at 02:21:50PM +0200, Sabrina Dubroca via Devel wrote:
-> 2024-04-11, 11:40:59 +0200, Antony Antony wrote:
-> > diff --git a/net/xfrm/xfrm_compat.c b/net/xfrm/xfrm_compat.c
-> > index 655fe4ff8621..007dee03b1bc 100644
-> > --- a/net/xfrm/xfrm_compat.c
-> > +++ b/net/xfrm/xfrm_compat.c
-> > @@ -98,6 +98,7 @@ static const int compat_msg_min[XFRM_NR_MSGTYPES] = {
-> >  };
-> > 
-> >  static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
-> > +	[XFRMA_UNSPEC]          = { .strict_start_type = XFRMA_SA_DIR },
-> >  	[XFRMA_SA]		= { .len = XMSGSIZE(compat_xfrm_usersa_info)},
-> >  	[XFRMA_POLICY]		= { .len = XMSGSIZE(compat_xfrm_userpolicy_info)},
-> >  	[XFRMA_LASTUSED]	= { .type = NLA_U64},
-> > @@ -129,6 +130,7 @@ static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
-> >  	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
-> >  	[XFRMA_IF_ID]		= { .type = NLA_U32 },
-> >  	[XFRMA_MTIMER_THRESH]	= { .type = NLA_U32 },
-> > +	[XFRMA_SA_DIR]          = { .type = NLA_U8}
-> 
-> nit: <...> },
-> 
-> (space before } and , afterwards)
-> 
-> See below for a comment on the policy itself.
-
-fixed in v11.
-
-> 
-> 
-> > diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-> > index 6346690d5c69..2455a76a1cff 100644
-> > --- a/net/xfrm/xfrm_device.c
-> > +++ b/net/xfrm/xfrm_device.c
-> > @@ -253,6 +253,12 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
-> >  		return -EINVAL;
-> >  	}
-> > 
-> > +	if ((xuo->flags & XFRM_OFFLOAD_INBOUND && x->dir == XFRM_SA_DIR_OUT) ||
-> > +	    (!(xuo->flags & XFRM_OFFLOAD_INBOUND) && x->dir == XFRM_SA_DIR_IN)) {
-> > +		NL_SET_ERR_MSG(extack, "Mismatched SA and offload direction");
-> > +		return -EINVAL;
-> > +	}
-> 
-> It would be nice to set x->dir to match the flag, but then I guess the
-> validation in xfrm_state_update would fail if userspaces tries an
-> update without providing XFRMA_SA_DIR. (or not because we already went
-> through this code by the time we get to xfrm_state_update?)
-
-this code already executed from xfrm_state_construct.
-We could set the in flag in xuo when x->dir == XFRM_SA_DIR_IN, let me think 
-again.  May be we can do that later:)
-
-> > diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-> > index 810b520493f3..df141edbe8d1 100644
-> > --- a/net/xfrm/xfrm_user.c
-> > +++ b/net/xfrm/xfrm_user.c
-> [...]
-> > @@ -779,6 +793,77 @@ static struct xfrm_state *xfrm_state_construct(struct net *net,
-> >  	return NULL;
-> >  }
-> > 
-> > +static int verify_sa_dir(const struct xfrm_state *x, struct netlink_ext_ack *extack)
-> > +{
-> > +	if (x->dir == XFRM_SA_DIR_OUT)  {
-> > +		if (x->props.replay_window > 0) {
-> > +			NL_SET_ERR_MSG(extack, "Replay window should not be set for OUT SA");
-> > +			return -EINVAL;
-> > +		}
-> > +
-> > +		if (x->replay.seq || x->replay.bitmap) {
-> > +			NL_SET_ERR_MSG(extack,
-> > +				       "Replay seq, or bitmap should not be set for OUT SA with ESN");
-> 
-> I thought x->replay was for non-ESN, since we have x->replay_esn.
-> 
-you are right. It is a wrong text due to copy paste.
-Fixed in v11.
-
-> > +			return -EINVAL;
-> > +		}
-> > +
-> > +		if (x->replay_esn) {
-> > +			if (x->replay_esn->replay_window > 1) {
-> > +				NL_SET_ERR_MSG(extack,
-> > +					       "Replay window should be 1 for OUT SA with ESN");
-> 
-> I don't think that we should introduce something we know doesn't make
-> sense (replay window = 1 on output). It will be API and we won't be
-> able to fix it up later. We get a chance to make things nice and
-> reasonable with this new attribute, let's not waste it.
-
-
+On Tue, Apr 16, 2024 at 2:20=E2=80=AFPM Liang Chen <liangchen.linux@gmail.c=
+om> wrote:
 >
-> As I said, AFAICT replay_esn->replay_window isn't used on output, so
-> unless I missed something, it should just be a matter of changing the
-> validation. The additional checks in this version should guarantee we
-> don't have dir==OUT SAs in the packet input path, so this should work.
+> The RSS hash report is a feature that's part of the virtio specification.
+> Currently, virtio backends like qemu, vdpa (mlx5), and potentially vhost
+> (still a work in progress as per [1]) support this feature. While the
+> capability to obtain the RSS hash has been enabled in the normal path,
+> it's currently missing in the XDP path. Therefore, we are introducing
+> XDP hints through kfuncs to allow XDP programs to access the RSS hash.
+>
+> 1.
+> https://lore.kernel.org/all/20231015141644.260646-1-akihiko.odaki@daynix.=
+com/#r
+>
+> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
+> ---
+>   Changes from v7:
+> - use table lookup for rss hash type
+>   Changes from v6:
+> - fix a coding style issue
+>   Changes from v5:
+> - Preservation of the hash value has been dropped, following the conclusi=
+on
+>   from discussions in V3 reviews. The virtio_net driver doesn't
+>   accessing/using the virtio_net_hdr after the XDP program execution, so
+>   nothing tragic should happen. As to the xdp program, if it smashes the
+>   entry in virtio header, it is likely buggy anyways. Additionally, looki=
+ng
+>   up the Intel IGC driver,  it also does not bother with this particular
+>   aspect.
+> ---
+>  drivers/net/virtio_net.c        | 42 +++++++++++++++++++++++++++++++++
+>  include/uapi/linux/virtio_net.h |  1 +
+>  2 files changed, 43 insertions(+)
+>
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index c22d1118a133..1d750009f615 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -4621,6 +4621,47 @@ static void virtnet_set_big_packets(struct virtnet=
+_info *vi, const int mtu)
+>         }
+>  }
+>
+> +static enum xdp_rss_hash_type
+> +virtnet_xdp_rss_type[VIRTIO_NET_HASH_REPORT_MAX_TABLE] =3D {
+> +       [VIRTIO_NET_HASH_REPORT_NONE] =3D XDP_RSS_TYPE_NONE,
+> +       [VIRTIO_NET_HASH_REPORT_IPv4] =3D XDP_RSS_TYPE_L3_IPV4,
+> +       [VIRTIO_NET_HASH_REPORT_TCPv4] =3D XDP_RSS_TYPE_L4_IPV4_TCP,
+> +       [VIRTIO_NET_HASH_REPORT_UDPv4] =3D XDP_RSS_TYPE_L4_IPV4_UDP,
+> +       [VIRTIO_NET_HASH_REPORT_IPv6] =3D XDP_RSS_TYPE_L3_IPV6,
+> +       [VIRTIO_NET_HASH_REPORT_TCPv6] =3D XDP_RSS_TYPE_L4_IPV6_TCP,
+> +       [VIRTIO_NET_HASH_REPORT_UDPv6] =3D XDP_RSS_TYPE_L4_IPV6_UDP,
+> +       [VIRTIO_NET_HASH_REPORT_IPv6_EX] =3D XDP_RSS_TYPE_L3_IPV6_EX,
+> +       [VIRTIO_NET_HASH_REPORT_TCPv6_EX] =3D XDP_RSS_TYPE_L4_IPV6_TCP_EX=
+,
+> +       [VIRTIO_NET_HASH_REPORT_UDPv6_EX] =3D XDP_RSS_TYPE_L4_IPV6_UDP_EX
+> +};
+> +
+> +static int virtnet_xdp_rx_hash(const struct xdp_md *_ctx, u32 *hash,
+> +                              enum xdp_rss_hash_type *rss_type)
+> +{
+> +       const struct xdp_buff *xdp =3D (void *)_ctx;
+> +       struct virtio_net_hdr_v1_hash *hdr_hash;
+> +       struct virtnet_info *vi;
+> +       u16 hash_report;
+> +
+> +       if (!(xdp->rxq->dev->features & NETIF_F_RXHASH))
+> +               return -ENODATA;
+> +
+> +       vi =3D netdev_priv(xdp->rxq->dev);
+> +       hdr_hash =3D (struct virtio_net_hdr_v1_hash *)(xdp->data - vi->hd=
+r_len);
+> +       hash_report =3D __le16_to_cpu(hdr_hash->hash_report);
+> +
+> +       if (hash_report >=3D VIRTIO_NET_HASH_REPORT_MAX_TABLE)
+> +               hash_report =3D VIRTIO_NET_HASH_REPORT_NONE;
+> +
+> +       *rss_type =3D virtnet_xdp_rss_type[hash_report];
+> +       *hash =3D __le32_to_cpu(hdr_hash->hash_value);
+> +       return 0;
+> +}
+> +
+> +static const struct xdp_metadata_ops virtnet_xdp_metadata_ops =3D {
+> +       .xmo_rx_hash                    =3D virtnet_xdp_rx_hash,
+> +};
+> +
+>  static int virtnet_probe(struct virtio_device *vdev)
+>  {
+>         int i, err =3D -ENOMEM;
+> @@ -4747,6 +4788,7 @@ static int virtnet_probe(struct virtio_device *vdev=
+)
+>                                   VIRTIO_NET_RSS_HASH_TYPE_UDP_EX);
+>
+>                 dev->hw_features |=3D NETIF_F_RXHASH;
+> +               dev->xdp_metadata_ops =3D &virtnet_xdp_metadata_ops;
+>         }
+>
+>         if (vi->has_rss_hash_report)
+> diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virtio_=
+net.h
+> index cc65ef0f3c3e..3ee695450096 100644
+> --- a/include/uapi/linux/virtio_net.h
+> +++ b/include/uapi/linux/virtio_net.h
+> @@ -176,6 +176,7 @@ struct virtio_net_hdr_v1_hash {
+>  #define VIRTIO_NET_HASH_REPORT_IPv6_EX         7
+>  #define VIRTIO_NET_HASH_REPORT_TCPv6_EX        8
+>  #define VIRTIO_NET_HASH_REPORT_UDPv6_EX        9
+> +#define VIRTIO_NET_HASH_REPORT_MAX_TABLE      10
 
-I agree. Your message and Steffen's message helped me figure out,
-how to allow replay-window zero for output SA;
-It is in v11.
+This should not be part of uAPI. It may confuse the userspace.
 
-> > +				return -EINVAL;
-> > +			}
-> > +
-> > +			if (x->replay_esn->seq || x->replay_esn->seq_hi || x->replay_esn->bmp_len) {
-> > +				NL_SET_ERR_MSG(extack,
-> > +					       "Replay seq, seq_hi, bmp_len should not be set for OUT SA with ESN");
-> > +				return -EINVAL;
-> > +			}
-> > +		}
-> > +
-> > +		if (x->props.flags & XFRM_STATE_DECAP_DSCP) {
-> > +			NL_SET_ERR_MSG(extack, "Flag NDECAP_DSCP should not be set for OUT SA");
-> 
->                                                      ^ extra N?
-> 
-> > +			return -EINVAL;
-> > +		}
-> > +
-> 
-> [...]
-> >  static int xfrm_add_sa(struct sk_buff *skb, struct nlmsghdr *nlh,
-> >  		       struct nlattr **attrs, struct netlink_ext_ack *extack)
-> >  {
-> > @@ -796,6 +881,16 @@ static int xfrm_add_sa(struct sk_buff *skb, struct nlmsghdr *nlh,
-> >  	if (!x)
-> >  		return err;
-> > 
-> > +	if (x->dir) {
-> > +		err = verify_sa_dir(x, extack);
-> > +		if (err) {
-> > +			x->km.state = XFRM_STATE_DEAD;
-> > +			xfrm_dev_state_delete(x);
-> > +			xfrm_state_put(x);
-> > +			return err;
-> 
-> That's not very nice. We're creating a state and just throwing it away
-> immediately. How hard would it be to validate all that directly from
-> verify_newsa_info instead?
+Others look good.
 
-Your proposal would introduce redundant code, requiring accessing attributes 
-in verify_newsa_info() and other functions.
+Thanks
 
-The way I propsed, a state x,  xfrm_state, is created but it remains 
-km.stae=XFRM_STATE_VOID.
-Newely added verify is before auditing and generating new genid changes, 
-xfrm_state_add() or xfrm_state_update() would be called later. So deleteing 
-a state just after xfrm_staet_constructi() is not  bad!
+>         __le16 hash_report;
+>         __le16 padding;
+>  };
+> --
+> 2.40.1
+>
 
-So I think the current code is cleaner, avoiding the need redundant code in 
-verify_newsa_info().
-
-> 
-> [...]
-> > @@ -3018,6 +3137,7 @@ EXPORT_SYMBOL_GPL(xfrm_msg_min);
-> >  #undef XMSGSIZE
-> > 
-> >  const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
-> > +	[XFRMA_UNSPEC]		= { .strict_start_type = XFRMA_SA_DIR },
-> >  	[XFRMA_SA]		= { .len = sizeof(struct xfrm_usersa_info)},
-> >  	[XFRMA_POLICY]		= { .len = sizeof(struct xfrm_userpolicy_info)},
-> >  	[XFRMA_LASTUSED]	= { .type = NLA_U64},
-> > @@ -3049,6 +3169,7 @@ const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
-> >  	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
-> >  	[XFRMA_IF_ID]		= { .type = NLA_U32 },
-> >  	[XFRMA_MTIMER_THRESH]   = { .type = NLA_U32 },
-> > +	[XFRMA_SA_DIR]          = { .type = NLA_U8 }
-> 
-> With
-> 
->     .type = NLA_POLICY_RANGE(NLA_U8, XFRM_SA_DIR_IN, XFRM_SA_DIR_OUT) },
-> 
-> you wouldn't need to validate the attribute's values in
-> verify_newsa_info and xfrm_alloc_userspi. And same for the xfrm_compat
-> version of this.
-
-thanks, this is much better.
-
- 
-> (also a nit on the formatting: a "," after the } would be nice, so
-> that the next addition doesn't need to touch this line)
-> 
-> 
-> And as we discussed, I'd really like XFRMA_SA_DIR to be rejected in
-> commands that don't use its value.
-
-I still don't see how to add such a check to about 20 functions. A burte 
-force method would be 18-20 times copy code bellow, with different extack 
-message.
-
-+++ b/net/xfrm/xfrm_user.c
-@@ -957,6 +957,11 @@ static int xfrm_del_sa(struct sk_buff *skb, struct nlmsghdr *nlh,
-        struct km_event c;
-        struct xfrm_usersa_id *p = nlmsg_data(nlh);
-
-+       if (attrs[XFRMA_SA_DIR]) {
-+               NL_SET_ERR_MSG(extack, "Delete should not have dir attribute set");
-+               return -ESRCH;
-+       }
-+
-
-I am still trying to figure out netlink examples, including the ones you 
-pointed out : rtnl_valid_dump_net_req, rtnl_net_valid_getid_req.
-I wonder if there is a way to specifiy rejeced attributes per method.
-
-may be there is  way to call nlmsg_parse_deprecated_strict()
-with .type = NLA_REJECT.
-
-And also this looks like a general cleanup up to me. I wonder how Steffen 
-would add such a check for the upcoming PCPU attribute! Should that be 
-prohibited DELSA or XFRM_MSG_FLUSHSA or DELSA?
-
--antony
 
