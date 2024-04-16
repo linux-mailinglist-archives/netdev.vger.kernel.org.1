@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-88263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 029958A6824
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:19:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 72E018A6825
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 12:19:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B0DFB21330
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:19:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0103FB2160B
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 10:19:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C037127B47;
-	Tue, 16 Apr 2024 10:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE98A127B66;
+	Tue, 16 Apr 2024 10:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="nv6k+Hld"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VYiRPX7C"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE9AB85624
-	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 10:19:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692E11272C0
+	for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 10:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713262759; cv=none; b=F2GSWnZ2V/xGmnPsX+A7FrllTvXjgPzKEmIoCxAxyLUbRin8T5uSFITgzw1QYp6H0OQOtzdadvQF66I7UvDqlzZpA5EFJ8CXTNOzmZsnX5hbs+mxEgb7rxFrUUrPFR+jZGHuI9T5Oro/QnNYSzXBZMCBuyrqxx7vyB8VXgdcuf0=
+	t=1713262760; cv=none; b=ulId6bu0E6Lsry+SMtDN8/WaGzFNhLNufl4VhPGRD3FuQX2YgwhddaWGkNQQBiKSyVpwNhHPaiDQVFQ/PcqnbSJWbVltwVkB559QQ2NYfvOZ1/ZQfG1bzZOg++N8xS7axZeAovzHA7xiro+QRaUqAmy9d9FGE2anV603od97jiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713262759; c=relaxed/simple;
-	bh=vOOgRjB5ucQRBKkiEgHT3tjRpOOSoLw/siD9KpSh1gI=;
+	s=arc-20240116; t=1713262760; c=relaxed/simple;
+	bh=0i0fbq7ZxCufz1qM95HmCtNJSK/7T7s2UOROhSGFAvo=;
 	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=nK8k9LQQoKFkR9x9b+KpaAqBsRsSoaWVAzFcm/d6SmNUDSEdCPkJ9+KTwpj1xNaPUWrj9Gk96ITOcGDfDDiDBXS60z0aP25nzNPkD0s76ITKXCGgpdVMuhyV58TA/h+46xHtW5Ydl6SKhLhjBrt7MCBUfpEstcG1jMQPw06PGWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=nv6k+Hld; arc=none smtp.client-ip=78.32.30.218
+	 Message-Id:Date; b=geEQ5W0zLp+pvGgY98XH+LIeVIcgohp8OlgXHn6j0ao+3q09i1uOJmdaVu5UAwhdX1n/Rd/Ar/TzCXhBtLizo2mbNuUQQVTjzB/jALnsr5hEYDr1RLAJuYSMYZZujbnv7cxokJLs86mNBj4H1tgbulvNd23svPoy7dCB+28Ewe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VYiRPX7C; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,31 +37,32 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
 	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=0sRRUzi1xc9cir3LWNBUZGX5SNC1LWl11WajyicP5BY=; b=nv6k+HldwbZV3rheuNwLdVov89
-	6hqYp569ZqXHngs+GTepi7SkhFmJ7J+Q+87lVH0RnVMmRdUL/4PD+/W0nGyQjgPcmuVRvtVTpHR2o
-	Oe0INMf79GZh3mS+YN8ETNXwvxhCdr5XWFMTZ4Q67n2WZ9qhnpURvBfh7K3ixEpV2bWMAfw4BP/PN
-	7tcsdZ1g1ghb20Cnr1wQErq13c4CjdivBR3X0vJp4fg+hmhGVxZxKO11Y1aWN0oZ/W8AcOpd5SLSg
-	xllR1xP+pMJPpV5iFu8cW0TgqMhJ5tTuGTxyIcqvy7r1+BeiNNW38xCf3k1RnwtMiN2oMzn7dAZHX
-	EBmjATvw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:49960 helo=rmk-PC.armlinux.org.uk)
+	bh=ZJdesVBGXpllB0+wd5jNhT03t0Bq07oYWxkGLqR0mQ0=; b=VYiRPX7C5s6dSMhqi2w3d61KOC
+	W6hVoy0t/yHsiFOxZLS8HJ2iiSJFyIiV3tjP2T9KQfF8/5Zdwmlx3PjurPE7mUz27NSIXMdMTS668
+	4BzPxBhVHdrdaHC91pLESYcBo2Q6gwd7ba53VWiAAt6e2uoLcTu4yyfb8u8MZKxHm+ZtcGIYDlKfx
+	BVasPjANpX6uFfgomxWL8qv3xAEqE9pGTfbhowBoHRzLrJa+bu9x+nuH9PtM+cDxwSnD18Psd6GUw
+	icv5BjqbE1ouHPiKkozFAAeB70oajA5KdiiHkac0mlw7TkMQSB18oUVPJoz0SmesNJaZVkUInMYHp
+	QvnJ/ugw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:49976 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1rwfu2-0008Pi-2W;
-	Tue, 16 Apr 2024 11:19:02 +0100
+	id 1rwfu8-0008Pt-0E;
+	Tue, 16 Apr 2024 11:19:08 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1rwfu3-00752s-On; Tue, 16 Apr 2024 11:19:03 +0100
+	id 1rwfu8-007531-TG; Tue, 16 Apr 2024 11:19:08 +0100
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
 To: Andrew Lunn <andrew@lunn.ch>,
 	 Vladimir Oltean <olteanv@gmail.com>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+Cc: George McCollister <george.mccollister@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next] net: dsa: bcm_sf2: provide own phylink MAC
+Subject: [PATCH net-next] net: dsa: xrs700x: provide own phylink MAC
  operations
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -72,150 +73,72 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1rwfu3-00752s-On@rmk-PC.armlinux.org.uk>
+Message-Id: <E1rwfu8-007531-TG@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 16 Apr 2024 11:19:03 +0100
+Date: Tue, 16 Apr 2024 11:19:08 +0100
 
-Convert bcm_sf2 to provide its own phylink MAC operations, thus
-avoiding the shim layer in DSA's port.c
+Convert xrs700x to provide its own phylink MAC operations, thus
+avoiding the shim layer in DSA's port.c. We need to provide stubs for
+the mac_link_down() and mac_config() methods which are mandatory.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/dsa/bcm_sf2.c | 49 +++++++++++++++++++++++++--------------
- 1 file changed, 32 insertions(+), 17 deletions(-)
+ drivers/net/dsa/xrs700x/xrs700x.c | 25 +++++++++++++++++++++----
+ 1 file changed, 21 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/dsa/bcm_sf2.c b/drivers/net/dsa/bcm_sf2.c
-index bc77ee9e6d0a..ed1e6560df25 100644
---- a/drivers/net/dsa/bcm_sf2.c
-+++ b/drivers/net/dsa/bcm_sf2.c
-@@ -740,16 +740,19 @@ static void bcm_sf2_sw_get_caps(struct dsa_switch *ds, int port,
- 		MAC_10 | MAC_100 | MAC_1000;
- }
- 
--static void bcm_sf2_sw_mac_config(struct dsa_switch *ds, int port,
-+static void bcm_sf2_sw_mac_config(struct phylink_config *config,
- 				  unsigned int mode,
- 				  const struct phylink_link_state *state)
- {
--	struct bcm_sf2_priv *priv = bcm_sf2_to_priv(ds);
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
- 	u32 id_mode_dis = 0, port_mode;
-+	struct bcm_sf2_priv *priv;
- 	u32 reg_rgmii_ctrl;
- 	u32 reg;
- 
--	if (port == core_readl(priv, CORE_IMP0_PRT_ID))
-+	priv = bcm_sf2_to_priv(dp->ds);
-+
-+	if (dp->index == core_readl(priv, CORE_IMP0_PRT_ID))
- 		return;
- 
- 	switch (state->interface) {
-@@ -770,7 +773,7 @@ static void bcm_sf2_sw_mac_config(struct dsa_switch *ds, int port,
- 		return;
+diff --git a/drivers/net/dsa/xrs700x/xrs700x.c b/drivers/net/dsa/xrs700x/xrs700x.c
+index 96db032b478f..6605fa44bcf0 100644
+--- a/drivers/net/dsa/xrs700x/xrs700x.c
++++ b/drivers/net/dsa/xrs700x/xrs700x.c
+@@ -466,13 +466,25 @@ static void xrs700x_phylink_get_caps(struct dsa_switch *ds, int port,
  	}
- 
--	reg_rgmii_ctrl = bcm_sf2_reg_rgmii_cntrl(priv, port);
-+	reg_rgmii_ctrl = bcm_sf2_reg_rgmii_cntrl(priv, dp->index);
- 
- 	/* Clear id_mode_dis bit, and the existing port mode, let
- 	 * RGMII_MODE_EN bet set by mac_link_{up,down}
-@@ -809,13 +812,16 @@ static void bcm_sf2_sw_mac_link_set(struct dsa_switch *ds, int port,
- 	reg_writel(priv, reg, reg_rgmii_ctrl);
  }
  
--static void bcm_sf2_sw_mac_link_down(struct dsa_switch *ds, int port,
-+static void bcm_sf2_sw_mac_link_down(struct phylink_config *config,
- 				     unsigned int mode,
- 				     phy_interface_t interface)
+-static void xrs700x_mac_link_up(struct dsa_switch *ds, int port,
+-				unsigned int mode, phy_interface_t interface,
++static void xrs700x_mac_config(struct phylink_config *config, unsigned int mode,
++			       const struct phylink_link_state *state)
++{
++}
++
++static void xrs700x_mac_link_down(struct phylink_config *config,
++				  unsigned int mode, phy_interface_t interface)
++{
++}
++
++static void xrs700x_mac_link_up(struct phylink_config *config,
+ 				struct phy_device *phydev,
++				unsigned int mode, phy_interface_t interface,
+ 				int speed, int duplex,
+ 				bool tx_pause, bool rx_pause)
  {
--	struct bcm_sf2_priv *priv = bcm_sf2_to_priv(ds);
+-	struct xrs700x *priv = ds->priv;
 +	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct bcm_sf2_priv *priv;
++	struct xrs700x *priv = dp->ds->priv;
 +	int port = dp->index;
- 	u32 reg, offset;
+ 	unsigned int val;
  
-+	priv = bcm_sf2_to_priv(dp->ds);
- 	if (priv->wol_ports_mask & BIT(port))
- 		return;
- 
-@@ -824,23 +830,26 @@ static void bcm_sf2_sw_mac_link_down(struct dsa_switch *ds, int port,
- 	reg &= ~LINK_STS;
- 	core_writel(priv, reg, offset);
- 
--	bcm_sf2_sw_mac_link_set(ds, port, interface, false);
-+	bcm_sf2_sw_mac_link_set(dp->ds, port, interface, false);
+ 	switch (speed) {
+@@ -699,13 +711,18 @@ static int xrs700x_hsr_leave(struct dsa_switch *ds, int port,
+ 	return 0;
  }
  
--static void bcm_sf2_sw_mac_link_up(struct dsa_switch *ds, int port,
-+static void bcm_sf2_sw_mac_link_up(struct phylink_config *config,
-+				   struct phy_device *phydev,
- 				   unsigned int mode,
- 				   phy_interface_t interface,
--				   struct phy_device *phydev,
- 				   int speed, int duplex,
- 				   bool tx_pause, bool rx_pause)
- {
--	struct bcm_sf2_priv *priv = bcm_sf2_to_priv(ds);
--	struct ethtool_keee *p = &priv->dev->ports[port].eee;
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct bcm_sf2_priv *priv;
- 	u32 reg_rgmii_ctrl = 0;
-+	struct ethtool_keee *p;
-+	int port = dp->index;
- 	u32 reg, offset;
- 
--	bcm_sf2_sw_mac_link_set(ds, port, interface, true);
-+	bcm_sf2_sw_mac_link_set(dp->ds, port, interface, true);
- 
-+	priv = bcm_sf2_to_priv(dp->ds);
- 	offset = bcm_sf2_port_override_offset(priv, port);
- 
- 	if (phy_interface_mode_is_rgmii(interface) ||
-@@ -886,8 +895,10 @@ static void bcm_sf2_sw_mac_link_up(struct dsa_switch *ds, int port,
- 
- 	core_writel(priv, reg, offset);
- 
--	if (mode == MLO_AN_PHY && phydev)
--		p->eee_enabled = b53_eee_init(ds, port, phydev);
-+	if (mode == MLO_AN_PHY && phydev) {
-+		p = &priv->dev->ports[port].eee;
-+		p->eee_enabled = b53_eee_init(dp->ds, port, phydev);
-+	}
- }
- 
- static void bcm_sf2_sw_fixed_state(struct dsa_switch *ds, int port,
-@@ -1196,6 +1207,12 @@ static int bcm_sf2_sw_get_sset_count(struct dsa_switch *ds, int port,
- 	return cnt;
- }
- 
-+static const struct phylink_mac_ops bcm_sf2_phylink_mac_ops = {
-+	.mac_config	= bcm_sf2_sw_mac_config,
-+	.mac_link_down	= bcm_sf2_sw_mac_link_down,
-+	.mac_link_up	= bcm_sf2_sw_mac_link_up,
++static const struct phylink_mac_ops xrs700x_phylink_mac_ops = {
++	.mac_config		= xrs700x_mac_config,
++	.mac_link_down		= xrs700x_mac_link_down,
++	.mac_link_up		= xrs700x_mac_link_up,
 +};
 +
- static const struct dsa_switch_ops bcm_sf2_ops = {
- 	.get_tag_protocol	= b53_get_tag_protocol,
- 	.setup			= bcm_sf2_sw_setup,
-@@ -1206,9 +1223,6 @@ static const struct dsa_switch_ops bcm_sf2_ops = {
- 	.get_ethtool_phy_stats	= b53_get_ethtool_phy_stats,
- 	.get_phy_flags		= bcm_sf2_sw_get_phy_flags,
- 	.phylink_get_caps	= bcm_sf2_sw_get_caps,
--	.phylink_mac_config	= bcm_sf2_sw_mac_config,
--	.phylink_mac_link_down	= bcm_sf2_sw_mac_link_down,
--	.phylink_mac_link_up	= bcm_sf2_sw_mac_link_up,
- 	.phylink_fixed_state	= bcm_sf2_sw_fixed_state,
- 	.suspend		= bcm_sf2_sw_suspend,
- 	.resume			= bcm_sf2_sw_resume,
-@@ -1399,6 +1413,7 @@ static int bcm_sf2_sw_probe(struct platform_device *pdev)
- 	priv->dev = dev;
- 	ds = dev->ds;
- 	ds->ops = &bcm_sf2_ops;
-+	ds->phylink_mac_ops = &bcm_sf2_phylink_mac_ops;
- 
- 	/* Advertise the 8 egress queues */
- 	ds->num_tx_queues = SF2_NUM_EGRESS_QUEUES;
+ static const struct dsa_switch_ops xrs700x_ops = {
+ 	.get_tag_protocol	= xrs700x_get_tag_protocol,
+ 	.setup			= xrs700x_setup,
+ 	.teardown		= xrs700x_teardown,
+ 	.port_stp_state_set	= xrs700x_port_stp_state_set,
+ 	.phylink_get_caps	= xrs700x_phylink_get_caps,
+-	.phylink_mac_link_up	= xrs700x_mac_link_up,
+ 	.get_strings		= xrs700x_get_strings,
+ 	.get_sset_count		= xrs700x_get_sset_count,
+ 	.get_ethtool_stats	= xrs700x_get_ethtool_stats,
 -- 
 2.30.2
 
