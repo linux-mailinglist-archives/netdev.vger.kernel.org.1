@@ -1,81 +1,125 @@
-Return-Path: <netdev+bounces-88358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 796868A6D81
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:11:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 654BE8A6DBA
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 16:17:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17A9B1F21429
-	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:11:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 970091C22910
+	for <lists+netdev@lfdr.de>; Tue, 16 Apr 2024 14:16:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529C9130488;
-	Tue, 16 Apr 2024 14:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D213B12FB0A;
+	Tue, 16 Apr 2024 14:11:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="n3PM0L7f"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="xvyadDZY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE15712FF64;
-	Tue, 16 Apr 2024 14:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2709B12D757;
+	Tue, 16 Apr 2024 14:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713276614; cv=none; b=k1e8dxVt9l1LlmmIWFy04uA+OuTCCVWEXEV8s5ddgwLdHh5mM4wpOg3UtfcQw2PBImid1vyl5suOGX5lkDhdFDYUQ9nQwQdsun6QcY4G9OcPAQV1+mDba+Km4bvHYwqda7iq105K/lUXL+YCTBOqSwSAk5NOZ6q6TOTsKuq0H2c=
+	t=1713276678; cv=none; b=sIcCj9WLWSmYi+f50oqGFS1hekBqBiylc5ncQJhk6U3BDAIsXmH3mSRzaffqxzk+VQFRjt+sPqQsSTXBlGS7NSmwCr7iNWcpKSaBlJpBFK9SV7xlTdMPYCMkWwcQVMZND3oZ353yvHfXuIWIjauvukiVmZuPR97SrraMw4cMmUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713276614; c=relaxed/simple;
-	bh=7JZc8UnPkyq1RzEo8SIHO6WK5tK7l6pzq2Uiq95LxoU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h/45AOoRFEyHmrYMHTbPZ0LBdLUO1pWpbH96yd6NFHkj9jy7dEfQIxrD1019jvZVOzfMHt/3OqQWzsar/FeGjdFx6D+ye8ihSZIkicnZvpm87JVpxkHoGDiJgSbKu0CuLHZoe4mRw7XHVEUxonaHMnKafg2Brj1v+eVwCCPBPFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=n3PM0L7f; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=w6da/WRbFvg8QeAUygR52mX3V4b4pJ5TAZXxzhpIMts=; b=n3PM0L7fraZGETa4yFlMW03vnC
-	17VhNj5wsjiv8VOy0KA2V9q48v7L2Kvhfkvv4o7jxzbflPqHpiznjQZfZh6BWVV/Z15ebdjX+J+aX
-	L1VZ9tlqHqsmp4l16VGfYxSJdzANxp0nqQYDL2shJl2djDcE0ENFc/+x8bc6jGNDSk0E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rwjVf-00D8th-8s; Tue, 16 Apr 2024 16:10:07 +0200
-Date: Tue, 16 Apr 2024 16:10:07 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Kamil =?iso-8859-1?Q?Hor=E1k?= - 2N <kamilh@axis.com>
-Cc: florian.fainelli@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
-	hkallweit1@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net: phy: bcm54811: add support for BroadR-Reach mode
-Message-ID: <3aaf1b82-247e-447d-a39c-c209105c2d7c@lunn.ch>
-References: <20240416123811.1880177-1-kamilh@axis.com>
+	s=arc-20240116; t=1713276678; c=relaxed/simple;
+	bh=lBX4NJaGUPxlRyv+fZ66xHNmQuwj7oNNQtO+Tn+dwxA=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=ZLkW0Kf9WoLQOf9qWBKQP5o8yE1WyhMr4ycXfGC0MPjydtp74eauqetTPN2WWpICEArAUu8o6c5qPvamPc3DU0RPHPpI1lmHAwjyya9VnSysf/7mDYkecI1xFMaPZzJPF98ZjvCOfGTvY8JcyC/3GHD+axFJsvC1lHWP2VfVF5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=xvyadDZY; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1713276671;
+	bh=lBX4NJaGUPxlRyv+fZ66xHNmQuwj7oNNQtO+Tn+dwxA=;
+	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
+	b=xvyadDZY5lUYMI/GC2dN0DkBZBWOJcvsVVlZp6hG7Rg+M2yMrd6TudCv1/nxeJO4I
+	 w8ZYNQFpWfJTOWEf1923bAHobmO5UiJrlkREPMS8iWJOgbd10eJnxaMLeiTC3DHWk6
+	 LOOLeRd/v6/gPecdh5Wfps+nDY9zqHsSbTV0Twg3pazLNsLl1Y89v+zrca6Jl96jPk
+	 yFugCgEQA83V576p0NiEqQzrAMBwM12H7o2ACuS7RV2c2O17mpnYlxuJKPwnnPzrrv
+	 o9VpV5dGreXzWIcVCLx0KqFJ8BI4UYdxIqasKzXfbioTDhQj/q3nYHzzCHG+8gUpqU
+	 COKlk+mHqZ5Kw==
+Received: from [10.193.1.1] (broslavsky.collaboradmins.com [68.183.210.73])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: usama.anjum)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 33F313782141;
+	Tue, 16 Apr 2024 14:11:07 +0000 (UTC)
+Message-ID: <8859fafe-2df1-42ba-b9de-2ba1c0e75d14@collabora.com>
+Date: Tue, 16 Apr 2024 19:11:39 +0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240416123811.1880177-1-kamilh@axis.com>
+User-Agent: Mozilla Thunderbird
+Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>, netdev@vger.kernel.org,
+ edumazet@google.com, pabeni@redhat.com, linux-kselftest@vger.kernel.org,
+ mic@digikod.net, linux-security-module@vger.kernel.org,
+ jakub@cloudflare.com, davem@davemloft.net
+Subject: Re: [PATCH v4 10/12] selftests: kselftest_harness: let PASS / FAIL
+ provide diagnostic
+To: Jakub Kicinski <kuba@kernel.org>, keescook@chromium.org,
+ shuah@kernel.org, Nathan Chancellor <nathan@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>
+References: <20240229005920.2407409-1-kuba@kernel.org>
+ <20240229005920.2407409-11-kuba@kernel.org>
+Content-Language: en-US
+From: Muhammad Usama Anjum <usama.anjum@collabora.com>
+In-Reply-To: <20240229005920.2407409-11-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> @@ -258,6 +257,9 @@ static const struct phy_setting settings[] = {
->  	PHY_SETTING(    100, HALF,    100baseT_Half		),
->  	PHY_SETTING(    100, HALF,    100baseFX_Half		),
->  	PHY_SETTING(    100, FULL,    100baseFX_Full		),
-> +	PHY_SETTING(    100, FULL,    4BR100			),
-> +	PHY_SETTING(    100, FULL,    2BR100			),
-> +	PHY_SETTING(    100, FULL,    1BR100			),
+On 2/29/24 5:59 AM, Jakub Kicinski wrote:
+> Switch to printing KTAP line for PASS / FAIL with ksft_test_result_code(),
+> this gives us the ability to report diagnostic messages.
+> 
+> Reviewed-by: Kees Cook <keescook@chromium.org>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  tools/testing/selftests/kselftest_harness.h | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
+> index 5b0592e4b7a4..b643a577f9e1 100644
+> --- a/tools/testing/selftests/kselftest_harness.h
+> +++ b/tools/testing/selftests/kselftest_harness.h
+> @@ -1143,14 +1143,13 @@ void __run_test(struct __fixture_metadata *f,
+>  
+>  	if (t->results->reason[0])
+>  		diagnostic = t->results->reason;
+> +	else if (t->exit_code == KSFT_PASS || t->exit_code == KSFT_FAIL)
+> +		diagnostic = NULL;
+>  	else
+>  		diagnostic = "unknown";
+>  
+> -	if (t->exit_code == KSFT_SKIP)
+> -		ksft_test_result_code(t->exit_code, test_name,
+> -				      "%s", diagnostic);
+> -	else
+> -		ksft_test_result(__test_passed(t), "%s\n", test_name);
+> +	ksft_test_result_code(t->exit_code, test_name,
+> +			      diagnostic ? "%s" : "", diagnostic);
+We are getting the following annoying warning while using clang:
 
-Please could you explain the name convention. IEEE puts the speed
-first, then some letters to indicate the media type, and then a number
-for the number of pairs. Why is this not followed here? 100BaseBR4?
-100BaseBR2? 100BaseBR1? Are these names part of the BroadR-Reach
-standard?
+./../kselftest_harness.h:1207:30: warning: format string is empty
+[-Wformat-zero-length]
+ 1207 |            diagnostic ? "%s" : "", diagnostic);
+      |                                 ^~
+1 warning generated.
 
-Also, is there any compatibility? Are 100BaseT1 and 1BR100 compatible?
+I've tried to look for solution. In my opinion, the best solution would be
+to just revert this patch. Any thoughts?
 
-      Andrew
+>  }
+>  
+>  static int test_harness_run(int argc, char **argv)
+
+-- 
+BR,
+Muhammad Usama Anjum
 
