@@ -1,427 +1,276 @@
-Return-Path: <netdev+bounces-88809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D511C8A8950
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 18:47:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D88A8A895D
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 18:53:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32B841F241BE
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 16:47:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A65D1F24528
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 16:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD34B171E4A;
-	Wed, 17 Apr 2024 16:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF77917109D;
+	Wed, 17 Apr 2024 16:52:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="aYGEBgqg"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KUY8c/23"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40ED17166A
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 16:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B215146A73
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 16:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713372373; cv=none; b=qfHv/EIG6pY0y2y4MmQiMMwRPuaXoZZBiotQnvJ4ejjr/LSPe1QsL5lWG8m6yHuNa7xoDDsqq9rUjKJmVQphqRHzCqN+NKyn62vMGlwgHOVW4vAL8b9aVjI+YFppLNu7MSyO2wlNAARNg/7CK1wBPco8QoezC18+XKBdLgnWLNI=
+	t=1713372775; cv=none; b=k5BD4881J8yPN0Imgak1wTheUfn00IPSSasvSfU/vtApzNLWrPn0QcaZ9ay+S5mz+V0N/2GseQdum2lVSCU3ycTM/P+wikIJfGPpQ0fqiJBM1dl5NOnAshuwvx6/CfhOEa8DkYYPpNXY51VxwRiNzhYmpnNt3jWQfoVwBVrJ9b0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713372373; c=relaxed/simple;
-	bh=0H/vjaQNmYH3GF4YhFbd93FGwox9U+b0fRkfa5doB5g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=lFUhJ8VvHyBn7B4cFraVOI/Nvk458sow8cBUWyMlTg7Lp+RO9yeMngLpblOreGbp2+ITyDSnvc0cmLfr+Mhyt8W9IZvAQYQ8zrF3mbCs5oHT3S0OxmEEWEsMolOKGZul1Xr+M/Af7D0cuwSdTcy7b1fQQ2LgtprQZVHKZPXPl2A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=aYGEBgqg; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a555b203587so105156566b.3
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 09:46:11 -0700 (PDT)
+	s=arc-20240116; t=1713372775; c=relaxed/simple;
+	bh=UG85shuMfXi+GHY7J/tEqW4GO2Z6mSarbDl0QRl55jA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DO0eDg+/1G/aty2vv84TttAGBCFhRLoYv8Gu/J1Mbh76gX+Eh0knE64+o/hd6Hno2BWzVkxzkQLfFFmlYXeRu7tPELlmA+wCBVj5v5Bm2U3YNyu23YPsEqnZpixD92oXWezQmAZPArU5evPz+zvSwxbX0qt+mNZobQPh6lPAliI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KUY8c/23; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6ed20fb620fso4908169b3a.2
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 09:52:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713372370; x=1713977170; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6GseBsN1q0bdHXbiUKHMINZDqk1bayHyPFFMBfv8P5c=;
-        b=aYGEBgqgPcOMVDsq22eGqjWncwrWkO3Ah8yjKJ2J5FeD7JZ6gkIce3Nau+s0w/iOaA
-         QTUsdmOxLt6V3MVCmHLNfwkb5STeQpJRxYce9ye4Tcg7uZrHf9XQ6i8guFlfx870PIh1
-         3RetC422TZSiFQ8sIahXK7MVON+ILkw3Bpbl3L9+RKItww6/4gtZezAOmoEddokE5gCc
-         lp/EG2BzybXoCt6UtiBuEPj8gBG4HAdf6Q37FZvA+eRA6bm451SBFxwtzYuQKw640M/L
-         FPmHu6d97CgsspVAvR18gztirwOp1VLmpmhbDSNcO+zRsb5LfeL4tqufxVg/oj/8Pne9
-         hFvw==
+        d=broadcom.com; s=google; t=1713372774; x=1713977574; darn=vger.kernel.org;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kh+JXYkpZzVZyY4FAwpBBn1PAsIIFaFc5XGgXeIxQTI=;
+        b=KUY8c/23iva7nEebV8ChbTND5LS0YazCKIg1l3SsRS6dYPMjJ0IPDjIYW0EoDsuZVl
+         KJJhMpMxRvxfbcd+v/Wm8/+2YV3M0M7rJdSHqhUDaj0aqXey3ONp5pbLZxqEltoyFlqO
+         5zLMJEuIns1HBtFzmEJ0LWJpGCBL3PUcP61oY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713372370; x=1713977170;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6GseBsN1q0bdHXbiUKHMINZDqk1bayHyPFFMBfv8P5c=;
-        b=ucxeb/kI+LkWuA1JzafeUydh/6DmnvIvHTfOMDpu1Sj6GkexwKn8tgcx/k9W+XI7XN
-         BT7gwhVqmSCfsj86TGzDWMtVVS8BfEXIOcLeTQLbPSyDPnOTbRWpasDIIIDo5d5hxuxj
-         z/OmfYBaeJvt+YHQ7DCxS8vn7sF+Z/PL+3TniVTA6SVKG5QSUa8PPLtZrDnesCZgSR9E
-         gSFTH2aQ1lI9hHVnuE78Km2LzX6YDR6k0UpidP6+4h2gInAoDvSkWh4sx/0ZarbA/kKx
-         9PUh8TnCSgVpYYTjmbgzUi/5c4zALM2w5r2ap9HElt3IdlsdmE07evHV+7UsR5EZ6r8N
-         lhHA==
-X-Gm-Message-State: AOJu0Yz0AoEOmHEJDHYGxnHYDMfiXk+TxhiMG5G77kz8asmF8wsMdEO9
-	D6PgU+lUG5NNJ2CSqmmEw3MEDMk2D+cpwJCyHpZbC/smVV60XBAjOem2FeKDW2fPYAZGM2f0TYw
-	P
-X-Google-Smtp-Source: AGHT+IE4TduzrmMU67mJ9eaY8RMcPBvKsaxFK5cqcv2dr69+laIDIKIa2YTJMVf7Btwo7Vuks2Iqgw==
-X-Received: by 2002:a17:906:19d3:b0:a46:cef3:4aba with SMTP id h19-20020a17090619d300b00a46cef34abamr38360ejd.75.1713372370171;
-        Wed, 17 Apr 2024 09:46:10 -0700 (PDT)
-Received: from localhost (78-80-105-131.customers.tmcz.cz. [78.80.105.131])
-        by smtp.gmail.com with ESMTPSA id ht8-20020a170907608800b00a525669000csm5474091ejc.154.2024.04.17.09.46.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Apr 2024 09:46:09 -0700 (PDT)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	parav@nvidia.com,
-	mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	shuah@kernel.org,
-	petrm@nvidia.com,
-	liuhangbin@gmail.com,
-	vladimir.oltean@nxp.com,
-	bpoirier@nvidia.com,
-	idosch@nvidia.com,
-	virtualization@lists.linux.dev
-Subject: [patch net-next v3 6/6] selftests: virtio_net: add initial tests
-Date: Wed, 17 Apr 2024 18:45:54 +0200
-Message-ID: <20240417164554.3651321-7-jiri@resnulli.us>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240417164554.3651321-1-jiri@resnulli.us>
-References: <20240417164554.3651321-1-jiri@resnulli.us>
+        d=1e100.net; s=20230601; t=1713372774; x=1713977574;
+        h=in-reply-to:autocrypt:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=kh+JXYkpZzVZyY4FAwpBBn1PAsIIFaFc5XGgXeIxQTI=;
+        b=edpdWZRwlsIryqf77LXquMZNDvyOoDmCZTNr5CipF48SqcghUhNEu1cszw+MrcdirI
+         Z1OnlBUKN2H4XYjsantNP6E9N3kOlJnI5MEGmL1vglA6k4zsIFT8TbaOah7I9ldZxrD8
+         4c006oJVDT9eISX220sfjk7ozkC2HikbIl0SoGVtnZKG666vCcYzlVbWo16wGKM1uAZt
+         6Bk6tkhAfD5DJR4XXdqjqJxOMu7L1HNz1GY4bVO2URYdmHfGdwyJiX9vrcHbYAN/FFx0
+         LiJsxWQqxPx+m0MF6qbj1FSjTc7e8fv4taQqatXU4MurpJSw1ZFm6J3yKIjEl5Ow305S
+         jH6A==
+X-Forwarded-Encrypted: i=1; AJvYcCWBU9xNcBAq7YiL2Sf7wEUt6nx97EzHZ32k9RvM73tCT+5ZoZsa4cfvg8dzm8A/mS7j6QDFKyru22Kss/TqtpGVmcN25K8A
+X-Gm-Message-State: AOJu0YydwQd7rNvTaagCoxzYVIWRWNb37bcsYYB9zkKu7xWhaCqOZuOz
+	cYTaMOuTBQVINv/OheT2EIdQ+LOcDAkKsKehyDL/qi7c29hAW/ChNZ1pyhfijA==
+X-Google-Smtp-Source: AGHT+IGQnqhDXTt3HFR1MjWIBL2VewkUfvA/6cRc16NoQlmGA8uSrtayaCX+ZxVMZeq6Cw/NBlRtcw==
+X-Received: by 2002:a05:6a20:2449:b0:1aa:4d10:db46 with SMTP id t9-20020a056a20244900b001aa4d10db46mr268538pzc.36.1713372773787;
+        Wed, 17 Apr 2024 09:52:53 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id g3-20020a170902868300b001e2c1e56f3bsm11766333plo.104.2024.04.17.09.52.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 17 Apr 2024 09:52:52 -0700 (PDT)
+Message-ID: <3a5cb80e-7169-4e82-b10c-843ff1eb0fd3@broadcom.com>
+Date: Wed, 17 Apr 2024 09:52:47 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: bcmasp: fix memory leak when bringing down if
+To: Simon Horman <horms@kernel.org>, Markus Elfring <Markus.Elfring@web.de>
+Cc: Justin Chen <justin.chen@broadcom.com>,
+ bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20240412181631.3488324-1-justin.chen@broadcom.com>
+ <6881c322-8fbb-422f-bdbb-392a83d0b326@web.de>
+ <9afad2b3-38a5-470d-a66f-10aa2cba3bab@broadcom.com>
+ <8ae97386-876f-45cf-9e82-af082d8ea338@web.de>
+ <20240417161933.GA2320920@kernel.org>
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
+ xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
+ M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
+ JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
+ PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
+ KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
+ AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
+ IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
+ ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
+ bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
+ Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
+ tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
+ TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
+ zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
+ WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
+ IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
+ U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
+ 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
+ pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
+ MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
+ IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
+ gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
+ obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
+ N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
+ CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
+ C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
+ wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
+ EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
+ fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
+ MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
+ 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
+ 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
+In-Reply-To: <20240417161933.GA2320920@kernel.org>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="00000000000093ddbf06164daf0c"
+
+--00000000000093ddbf06164daf0c
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Jiri Pirko <jiri@nvidia.com>
+On 4/17/24 09:19, Simon Horman wrote:
+> On Mon, Apr 15, 2024 at 09:46:44PM +0200, Markus Elfring wrote:
+>>>>> When bringing down the TX rings we flush the rings but forget to
+>>>>> reclaimed the flushed packets. This lead to a memory leak since we
+>>>>> do not free the dma mapped buffers. …
+>>>>
+>>>> I find this change description improvable.
+>>>>
+>>>> * How do you think about to avoid typos?
+>>>>
+>>>> * Would another imperative wording be more desirable?
+>>>
+>>> The change description makes sense to me. Can you be a bit more specific as to what isn't clear here?
+>>
+>> Spelling suggestions:
+>> + … forget to reclaim …
+>> + … This leads to …
+> 
+> Markus, let's cut to the chase.
+> 
+> What portion of your responses of this thread were produced
+> by an LLM or similar technology?
+> 
+> The suggestions in your second email are correct.
+> But, ironically, your first response appears to be grammatically incorrect.
+> 
+> Specifically:
+> 
+> * What does "improvable" mean in this context?
 
-Introduce initial tests for virtio_net driver. Focus on feature testing
-leveraging previously introduced debugfs feature filtering
-infrastructure. Add very basic ping and F_MAC feature tests.
+I read it as "improbable", but this patch came out of an actual bug 
+report we had internally and code inspection revealed the leaks being 
+plugged by this patch.
 
-To run this, do:
-$ make -C tools/testing/selftests/ TARGETS=drivers/net/virtio_net/ run_tests
+> * "How do you think about to avoid typos?"
+>    is, in my opinion, grammatically incorrect.
+>    And, FWIW, I see no typos.
 
-Run it on a system with 2 virtio_net devices connected back-to-back
-on the hypervisor.
+There was one, "This lead to a memory leak" -> "This leads to a memory leak"
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
-v1->v2:
-- added TEST_FILES and TEST_INCLUDES in the Makefile
-- fixed directory name in selftests/Makefile
-- added MAINTAINERS entry
-- added config file with kernel config options
----
- MAINTAINERS                                   |   1 +
- tools/testing/selftests/Makefile              |   1 +
- .../selftests/drivers/net/virtio_net/Makefile |  15 +++
- .../drivers/net/virtio_net/basic_features.sh  | 127 ++++++++++++++++++
- .../selftests/drivers/net/virtio_net/config   |   2 +
- .../net/virtio_net/virtio_net_common.sh       |  99 ++++++++++++++
- 6 files changed, 245 insertions(+)
- create mode 100644 tools/testing/selftests/drivers/net/virtio_net/Makefile
- create mode 100755 tools/testing/selftests/drivers/net/virtio_net/basic_features.sh
- create mode 100644 tools/testing/selftests/drivers/net/virtio_net/config
- create mode 100644 tools/testing/selftests/drivers/net/virtio_net/virtio_net_common.sh
+> * "Would another imperative wording be more desirable?"
+>    is, in my opinion, also grammatically incorrect.
+> 
+> And yet your comment is ostensibly about grammar.
+> I'm sorry, but this strikes me as absurd.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f22698a7859f..5655fc89f3e5 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -23450,6 +23450,7 @@ F:	include/linux/virtio*.h
- F:	include/linux/vringh.h
- F:	include/uapi/linux/virtio_*.h
- F:	tools/virtio/
-+F:	tools/testing/selftests/drivers/net/virtio_net/
- 
- VIRTIO CRYPTO DRIVER
- M:	Gonglei <arei.gonglei@huawei.com>
-diff --git a/tools/testing/selftests/Makefile b/tools/testing/selftests/Makefile
-index c785b6256a45..2c940e9c4ced 100644
---- a/tools/testing/selftests/Makefile
-+++ b/tools/testing/selftests/Makefile
-@@ -20,6 +20,7 @@ TARGETS += drivers/s390x/uvdevice
- TARGETS += drivers/net
- TARGETS += drivers/net/bonding
- TARGETS += drivers/net/team
-+TARGETS += drivers/net/virtio_net
- TARGETS += dt
- TARGETS += efivarfs
- TARGETS += exec
-diff --git a/tools/testing/selftests/drivers/net/virtio_net/Makefile b/tools/testing/selftests/drivers/net/virtio_net/Makefile
-new file mode 100644
-index 000000000000..7ec7cd3ab2cc
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/virtio_net/Makefile
-@@ -0,0 +1,15 @@
-+# SPDX-License-Identifier: GPL-2.0+ OR MIT
-+
-+TEST_PROGS = basic_features.sh \
-+        #
-+
-+TEST_FILES = \
-+        virtio_net_common.sh \
-+        #
-+
-+TEST_INCLUDES = \
-+        ../../../net/forwarding/lib.sh \
-+        ../../../net/lib.sh \
-+        #
-+
-+include ../../../lib.mk
-diff --git a/tools/testing/selftests/drivers/net/virtio_net/basic_features.sh b/tools/testing/selftests/drivers/net/virtio_net/basic_features.sh
-new file mode 100755
-index 000000000000..b9047299b510
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/virtio_net/basic_features.sh
-@@ -0,0 +1,127 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# See virtio_net_common.sh comments for more details about assumed setup
-+
-+ALL_TESTS="
-+	initial_ping_test
-+	f_mac_test
-+"
-+
-+source virtio_net_common.sh
-+
-+lib_dir=$(dirname "$0")
-+source "$lib_dir"/../../../net/forwarding/lib.sh
-+
-+h1=${NETIFS[p1]}
-+h2=${NETIFS[p2]}
-+
-+h1_create()
-+{
-+	simple_if_init $h1 $H1_IPV4/24 $H1_IPV6/64
-+}
-+
-+h1_destroy()
-+{
-+	simple_if_fini $h1 $H1_IPV4/24 $H1_IPV6/64
-+}
-+
-+h2_create()
-+{
-+	simple_if_init $h2 $H2_IPV4/24 $H2_IPV6/64
-+}
-+
-+h2_destroy()
-+{
-+	simple_if_fini $h2 $H2_IPV4/24 $H2_IPV6/64
-+}
-+
-+initial_ping_test()
-+{
-+	cleanup
-+	setup_prepare
-+	ping_test $h1 $H2_IPV4 " simple"
-+}
-+
-+f_mac_test()
-+{
-+	RET=0
-+	local test_name="mac feature filtered"
-+
-+	virtio_feature_present $h1 $VIRTIO_NET_F_MAC
-+	if [ $? -ne 0 ]; then
-+		log_test_skip "$test_name" "Device $h1 is missing feature $VIRTIO_NET_F_MAC."
-+		return 0
-+	fi
-+	virtio_feature_present $h1 $VIRTIO_NET_F_MAC
-+	if [ $? -ne 0 ]; then
-+		log_test_skip "$test_name" "Device $h2 is missing feature $VIRTIO_NET_F_MAC."
-+		return 0
-+	fi
-+
-+	cleanup
-+	setup_prepare
-+
-+	grep -q 0 /sys/class/net/$h1/addr_assign_type
-+	check_err $? "Permanent address assign type for $h1 is not set"
-+	grep -q 0 /sys/class/net/$h2/addr_assign_type
-+	check_err $? "Permanent address assign type for $h2 is not set"
-+
-+	cleanup
-+	virtio_filter_feature_add $h1 $VIRTIO_NET_F_MAC
-+	virtio_filter_feature_add $h2 $VIRTIO_NET_F_MAC
-+	setup_prepare
-+
-+	grep -q 0 /sys/class/net/$h1/addr_assign_type
-+	check_fail $? "Permanent address assign type for $h1 is set when F_MAC feature is filtered"
-+	grep -q 0 /sys/class/net/$h2/addr_assign_type
-+	check_fail $? "Permanent address assign type for $h2 is set when F_MAC feature is filtered"
-+
-+	ping_do $h1 $H2_IPV4
-+	check_err $? "Ping failed"
-+
-+	log_test "$test_name"
-+}
-+
-+setup_prepare()
-+{
-+	virtio_device_rebind $h1
-+	virtio_device_rebind $h2
-+	wait_for_dev $h1
-+	wait_for_dev $h2
-+
-+	vrf_prepare
-+
-+	h1_create
-+	h2_create
-+}
-+
-+cleanup()
-+{
-+	pre_cleanup
-+
-+	h2_destroy
-+	h1_destroy
-+
-+	vrf_cleanup
-+
-+	virtio_filter_features_clear $h1
-+	virtio_filter_features_clear $h2
-+	virtio_device_rebind $h1
-+	virtio_device_rebind $h2
-+	wait_for_dev $h1
-+	wait_for_dev $h2
-+}
-+
-+check_driver $h1 "virtio_net"
-+check_driver $h2 "virtio_net"
-+check_virtio_debugfs $h1
-+check_virtio_debugfs $h2
-+
-+trap cleanup EXIT
-+
-+setup_prepare
-+
-+tests_run
-+
-+exit "$EXIT_STATUS"
-diff --git a/tools/testing/selftests/drivers/net/virtio_net/config b/tools/testing/selftests/drivers/net/virtio_net/config
-new file mode 100644
-index 000000000000..f35de0542b60
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/virtio_net/config
-@@ -0,0 +1,2 @@
-+CONFIG_VIRTIO_NET=y
-+CONFIG_VIRTIO_DEBUG=y
-diff --git a/tools/testing/selftests/drivers/net/virtio_net/virtio_net_common.sh b/tools/testing/selftests/drivers/net/virtio_net/virtio_net_common.sh
-new file mode 100644
-index 000000000000..57bd8055e2e5
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/virtio_net/virtio_net_common.sh
-@@ -0,0 +1,99 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# This assumes running on a host with two virtio interfaces connected
-+# back to back. Example script to do such wire-up of tap devices would
-+# look like this:
-+#
-+# =======================================================================================================
-+# #!/bin/bash
-+#
-+# DEV1="$1"
-+# DEV2="$2"
-+#
-+# sudo tc qdisc add dev $DEV1 clsact
-+# sudo tc qdisc add dev $DEV2 clsact
-+# sudo tc filter add dev $DEV1 ingress protocol all pref 1 matchall action mirred egress redirect dev $DEV2
-+# sudo tc filter add dev $DEV2 ingress protocol all pref 1 matchall action mirred egress redirect dev $DEV1
-+# sudo ip link set $DEV1 up
-+# sudo ip link set $DEV2 up
-+# =======================================================================================================
-+
-+REQUIRE_MZ="no"
-+NETIF_CREATE="no"
-+NETIF_FIND_DRIVER="virtio_net"
-+NUM_NETIFS=2
-+
-+H1_IPV4="192.0.2.1"
-+H2_IPV4="192.0.2.2"
-+H1_IPV6="2001:db8:1::1"
-+H2_IPV6="2001:db8:1::2"
-+
-+VIRTIO_NET_F_MAC=5
-+
-+virtio_device_get()
-+{
-+	local dev=$1; shift
-+	local device_path="/sys/class/net/$dev/device/"
-+
-+	basename `realpath $device_path`
-+}
-+
-+virtio_device_rebind()
-+{
-+	local dev=$1; shift
-+	local device=`virtio_device_get $dev`
-+
-+	echo "$device" > /sys/bus/virtio/drivers/virtio_net/unbind
-+	echo "$device" > /sys/bus/virtio/drivers/virtio_net/bind
-+}
-+
-+virtio_debugfs_get()
-+{
-+	local dev=$1; shift
-+	local device=`virtio_device_get $dev`
-+
-+	echo /sys/kernel/debug/virtio/$device/
-+}
-+
-+check_virtio_debugfs()
-+{
-+	local dev=$1; shift
-+	local debugfs=`virtio_debugfs_get $dev`
-+
-+	if [ ! -f "$debugfs/device_features" ] ||
-+	   [ ! -f "$debugfs/filter_feature_add"  ] ||
-+	   [ ! -f "$debugfs/filter_feature_del"  ] ||
-+	   [ ! -f "$debugfs/filter_features"  ] ||
-+	   [ ! -f "$debugfs/filter_features_clear"  ]; then
-+		echo "SKIP: not possible to access debugfs for $dev"
-+		exit $ksft_skip
-+	fi
-+}
-+
-+virtio_feature_present()
-+{
-+	local dev=$1; shift
-+	local feature=$1; shift
-+	local debugfs=`virtio_debugfs_get $dev`
-+
-+	cat $debugfs/device_features |grep "^$feature$" &> /dev/null
-+	return $?
-+}
-+
-+virtio_filter_features_clear()
-+{
-+	local dev=$1; shift
-+	local debugfs=`virtio_debugfs_get $dev`
-+
-+	echo "1" > $debugfs/filter_features_clear
-+}
-+
-+virtio_filter_feature_add()
-+{
-+	local dev=$1; shift
-+	local feature=$1; shift
-+	local debugfs=`virtio_debugfs_get $dev`
-+
-+	echo "$feature" > $debugfs/filter_feature_add
-+}
+Yeah, I share that too, if you are to nitpick on every single word 
+someone wrote in a commit message, your responses better be squeaky 
+clean such that Shakespeare himself would be proud of you.
+
+There is a track record of what people might consider bike shedding, 
+others might consider useless, and others might find uber pedantic 
+comments from Markus done under his other email address: 
+elfring@users.sourceforge.net.
+
+Me personally, I read his comments and apply my own judgement as to 
+whether they justify spinning a new patch just to address the feedback 
+given. He has not landed on my ignore filter, but of course that can 
+change at a moments notice.
 -- 
-2.44.0
+Florian
 
+
+--00000000000093ddbf06164daf0c
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
+9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
+AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
+UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
+KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
+nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
+Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
+VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
+ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
+CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
+MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
+d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
+hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
+bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
+BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
+KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
+kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
+2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
+3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
+NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
+AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
+LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
+/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIBp6lyNJHeWP7N/O
+943bKZVCPZFu2c5pvbfAdjbztJgJMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
+AQkFMQ8XDTI0MDQxNzE2NTI1NFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
+AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
+MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAObr0EOOI/QTb1SnMDR1MdlKZNztE6uVlD
+hv8tZfAgV/fAuVML9ldpIhgWcF3MyZk01Rv96Kim093q1oS9yRDLKHwWvNbR9q7uwXPbbcLucpWu
+nQInbc+KzppZDZxfESpcTxslFW5T0DkrgX4ARPUh40JmsfnUDTZNM08ErbQ2yclNj7g8cW4IvZd5
+fi0g2kpsZp71xbh54y0SdtugbWknTTFU19zESgpa6mqQVZ/ERNguGWKGqRd6xqvH2GOGldXvYUTK
+IBTvLF/7YPdibJwxOr8iYwzTWOMSh9WoK5uwLiBbsbdhyF7YQ0trC7B+NGTMazBG7odjTf83hYsv
+A31g
+--00000000000093ddbf06164daf0c--
 
