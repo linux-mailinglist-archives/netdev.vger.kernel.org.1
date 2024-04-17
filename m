@@ -1,128 +1,112 @@
-Return-Path: <netdev+bounces-88884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31E098A8EDC
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 00:31:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 253138A8EE1
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 00:33:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CB211C21360
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 22:31:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D65422836C6
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 22:33:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04CAB84055;
-	Wed, 17 Apr 2024 22:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXIhwSN1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B47AF482C7;
+	Wed, 17 Apr 2024 22:33:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bmailout1.hostsharing.net (bmailout1.hostsharing.net [83.223.95.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D017C6C6;
-	Wed, 17 Apr 2024 22:30:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3812C43ACD;
+	Wed, 17 Apr 2024 22:33:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.95.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713393043; cv=none; b=HIZthqj1ma5Jlfj9tPnIKkVZuddr7XStvB/jPhYlhUWc0uwG3G24vDqQMxPCFhVL3hnlvO80UOa5SNoSV31DdImb7is1GyZlOQgRGLO4Anb4UP+0Iv19Zip8MWKbh9TWBMDQHdk4MBMjw0kSwsKgmR5EdiIxv0xGehboYGMf3vM=
+	t=1713393193; cv=none; b=Mpu0nU7xCGleeWZVdz6QZEaCiFe/5Lc099TPDCH/8V9fDy7AhR7WRHADuxHNt01288Zljv2NwYJ3dmcy35n3n5ekuc5fsizuF7bABimJbj/qTaClQU+DWAwVOltE877ruaOliAE0KM+wNH6sStdu0yaWK/ZLOtcSNei1aZ+GNiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713393043; c=relaxed/simple;
-	bh=go4rXzn30HjFjmyvddvUsnhccgo8cwdfzjUyWgFOz2U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YE2DUThPOqMiugTf36lZhjP+ywU6hinvvJG3KNyFZ420nnCP3gd8llRZ/wt86Qt1Iu0vO3ZATipKG6qrZYt02fum76YdwA3snPppl2g3FBVWQHnh9B+aO3z7+rjHUo9xh5dj8QiSfjysjAdfeit0135Kvjwt6Q9obaEk/oPQzCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KXIhwSN1; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2a2e5d86254so978701a91.1;
-        Wed, 17 Apr 2024 15:30:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713393042; x=1713997842; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=q+gf/XCxYwLyR9ufpAByfaftVWu4p7It7YbQSgc9fYU=;
-        b=KXIhwSN1jr69nsGVY/TpJewW0Hfl5FWSBW0YecRyNULfXpNhaNV4TVWyvRvZ78yMWs
-         JPVOqQ0zq+PJ3ommPGT8y+RFbsQFSvmGtlvgotzWqwlH2cVslAZbJZbV+9PdMmorEtq2
-         U9aXrOWwTv2732cSYqjFK+ROvZCd7dDWgVMmHzXHZJfJSaRwul9Z5LeIabqcBysBAZoz
-         jix2vnaocP8DebH2zoOnrNnuDM4o921zvdZMeMleK2dUUxM8KG+FzXuTm4Vx+6XhpERt
-         CRW7RN5JjEBjAIHW1V0QYVal2+DBVW12NwtH9CwRIRCMaVf/b+jLsaGsvGbu7JufBkUj
-         4czw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713393042; x=1713997842;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q+gf/XCxYwLyR9ufpAByfaftVWu4p7It7YbQSgc9fYU=;
-        b=QnzTCFRslBmLFhquVp8xvBGBmp+urnzcmUpHKnwyiE0PkZbOLedI9U4S80aPjQ9ji/
-         Q51/4EDwvn0uqEXf6/eS5WFu+lqCr7DA8Sutj4iL0u9oPJ0mpyvvLeP5JSk7CA3zEV3M
-         k+RxMtZ43pBNjzaUV97G5FW6StRMsEdD1jHTpuWmMcS6BOEOjk2hOpCcZ6BrS3U7wDg4
-         jhAZErhbWeT0U/FTNBR07OfkRdgDBr9Pig08O8iyKw2RnXW+UJqvOYLVcoK87BEpEFvo
-         zNcFAO6edlgee0qG1202JQQukE1WdHFBbTKiJjvOlJXbZS+yTmesfM7zM3wR9RC5aOSg
-         MqWg==
-X-Forwarded-Encrypted: i=1; AJvYcCWM2ZKj5qVRX4mTYI4wIneizvMSBvHpPs2oNHcYG49tfwBkaVG3XjniOHfsmWcAcrsBBJtsc/LbhnySUQLmumoL+7pWT4fRlai68lelp4SemkbRJ9S8fMmr4/pg/p8FHeqboaRbx8l9P/dd4Z8CW0LOu7T8AfU6ThA0Gh75fc0vhF0F6qPV
-X-Gm-Message-State: AOJu0YyG/Z12/hMHljJ9bKPdVSSYT2YvijoozdB687HQzFhc06RsixSu
-	dhVR+U6mUHqz40Z/2MiYZoYN2rg66CrTyO8f8fmgqeU4LATZVmzeZtBB1nh4Jurwi5ps6b75wvo
-	TPURxEGHAMaOkOY+I75rNbWT6l00=
-X-Google-Smtp-Source: AGHT+IHCSTBVrPAHK0lZoXXj7dEZN7R8pA/Yna1VOwZAkttLIuRGJGk8KlHUmOvSEnjjlcNVZk3Wnd8z1stY4zVb7ZY=
-X-Received: by 2002:a17:90a:f484:b0:29b:d747:f7ae with SMTP id
- bx4-20020a17090af48400b0029bd747f7aemr657518pjb.14.1713393041590; Wed, 17 Apr
- 2024 15:30:41 -0700 (PDT)
+	s=arc-20240116; t=1713393193; c=relaxed/simple;
+	bh=olEtmW1Fdb+ZA6bekXHJ/ecjbAH6rD4LnRBRS5a25K0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bwVNTvizER7sUw8OZk/RsY7KAf7q07Md0eK62n8OT6fzGth04BMEQM+A03RqWZ57OO/sawEXIvPMvwPUnLeXiAS8M6VTeJWwAnCj7x7pTpwwIdWwE0m1ZqqTZOq5vu283IkXCe2M7Xc+z0YIm8Ha1G4bFDiMDf9I2CY53C8PItY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.95.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
+Received: from h08.hostsharing.net (h08.hostsharing.net [83.223.95.28])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
+	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
+	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
+	by bmailout1.hostsharing.net (Postfix) with ESMTPS id A4B0E3000D926;
+	Thu, 18 Apr 2024 00:33:00 +0200 (CEST)
+Received: by h08.hostsharing.net (Postfix, from userid 100393)
+	id 82D8E1BD02; Thu, 18 Apr 2024 00:33:00 +0200 (CEST)
+Date: Thu, 18 Apr 2024 00:33:00 +0200
+From: Lukas Wunner <lukas@wunner.de>
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net] r8169: fix LED-related deadlock on module removal
+Message-ID: <ZiBOHF24EDoaI9gm@wunner.de>
+References: <ded9d793-83f8-4f11-87d9-a218d10c2981@gmail.com>
+ <20240416193458.1e2c799d@kernel.org>
+ <4b0495fd-fab5-4341-9b06-2f48613ee921@gmail.com>
+ <2024041709-prorate-swifter-523d@gregkh>
+ <17a3f8cb-26d4-4185-8e8b-0040ed62ae77@gmail.com>
+ <2024041746-heritage-annex-3b66@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240413-tcp-ao-selftests-fixes-v1-0-f9c41c96949d@gmail.com>
- <20240416072809.3ae7c3d3@kernel.org> <CAJwJo6Yw4S1wCcimRVy=P8h0Ez0UDt-yw2jqSY-ph3TKsQVVGA@mail.gmail.com>
- <20240417134636.102f0120@kernel.org> <20240417142843.27a221f8@kernel.org>
-In-Reply-To: <20240417142843.27a221f8@kernel.org>
-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Date: Wed, 17 Apr 2024 23:30:29 +0100
-Message-ID: <CAJwJo6agHEsWjhNzAstwU_+kQd4er3QsNZebkCOCDGBGh4SiMQ@mail.gmail.com>
-Subject: Re: [PATCH net 0/4] selftests/net/tcp_ao: A bunch of fixes for TCP-AO selftests
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2024041746-heritage-annex-3b66@gregkh>
 
-On Wed, 17 Apr 2024 at 22:28, Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Wed, 17 Apr 2024 13:46:36 -0700 Jakub Kicinski wrote:
-> > > I can spend some time on them after I verify that my fix for -stable
-> > > is actually fixing an issue I think it fixes.
-> > > Seems like your automation + my selftests are giving some fruits, hehe.
-> >
-> > Oh, very interesting, I don't recall these coming up before.
->
-> Correction, these are old, and if I plug the branch names here:
-> https://netdev.bots.linux.dev/contest.html
-> there is a whole bunch of tests failing that day.
+On Wed, Apr 17, 2024 at 09:43:27AM +0200, Greg KH wrote:
+> On Wed, Apr 17, 2024 at 09:16:04AM +0200, Heiner Kallweit wrote:
+> > On 17.04.2024 09:04, Greg KH wrote:
+> > > On Wed, Apr 17, 2024 at 08:02:31AM +0200, Heiner Kallweit wrote:
+> > >> On 17.04.2024 04:34, Jakub Kicinski wrote:
+> > >>> On Mon, 15 Apr 2024 13:57:17 +0200 Heiner Kallweit wrote:
+> > >>>> Binding devm_led_classdev_register() to the netdev is problematic
+> > >>>> because on module removal we get a RTNL-related deadlock. Fix this
+> > >>>> by avoiding the device-managed LED functions.
+> > >>>>
+> > >>>> Note: We can safely call led_classdev_unregister() for a LED even
+> > >>>> if registering it failed, because led_classdev_unregister() detects
+> > >>>> this and is a no-op in this case.
+> > >>>>
+> > >>>> Fixes: 18764b883e15 ("r8169: add support for LED's on RTL8168/RTL8101")
+> > >>>> Cc: <stable@vger.kernel.org> # 6.8.x
+> > >>>> Reported-by: Lukas Wunner <lukas@wunner.de>
+> > >>>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> > >> 
+> > >> This is a version of the fix modified to apply on 6.8.
+> > > 
+> > > That was not obvious at all :(
+> > > 
+> > Stating "Cc: <stable@vger.kernel.org> # 6.8.x" isn't sufficient?
+> 
+> Without showing what commit id this is in Linus's tree, no.
 
-Hmm, yeah, I was looking at the history of selftests to see if there
-is anything else interesting:
+The upstream commit id *is* called out in the patch, but it's buried
+below the three dashes:
 
-2024-04-11--15-00 - lockdep for hashinfo->ehash_locks vs tw->tw_timer
+    The original change was introduced with 6.8, 6.9 added support for
+    LEDs on RTL8125. Therefore the first version of the fix applied on
+    6.9-rc only. This is the modified version for 6.8.
+    Upstream commit: 19fa4f2a85d7
+                     ^^^^^^^^^^^^
 
-It seems that you actually reported that already here:
-https://lore.kernel.org/all/20240411100536.224fa1e7@kernel.org/
+The proper way to do this is to prominently add ...
 
-2024-04-04--12-00 - lockdep for p->alloc_lock vs ul->lock
-(rt6_uncached_list_flush_dev)
-2024-04-04--09-00 - lockdep for p->alloc_lock vs ndev->lock
-(addrconf_permanent_addr)
-2024-04-04--03-00 - lockdep for p->alloc_lock vs ul->lock
+    commit 19fa4f2a85d777a8052e869c1b892a2f7556569d upstream.
 
-Was reported as well:
-https://lore.kernel.org/all/8576a80ac958812ac75b01299c2de3a6485f84a1.camel@redhat.com/
+... or ...
 
-2024-03-06--00-00 - kernel BUG at net/core/skbuff.c:2813
+    [ Upstream commit 19fa4f2a85d777a8052e869c1b892a2f7556569d ]
 
-Can't really track this down to any report/fix. Probably as it's month
-old and hasn't happened since on these tests - something was borken on
-that particular day.
-
-> Keep in mind these run pre-commit so not all failures are flakes.
-
-Thanks,
-             Dmitry
+... as the first line of the commit message, as per
+Documentation/process/stable-kernel-rules.rst
 
