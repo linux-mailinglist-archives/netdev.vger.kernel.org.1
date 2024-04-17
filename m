@@ -1,246 +1,222 @@
-Return-Path: <netdev+bounces-88570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6E7B8A7BBA
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 07:15:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3C518A7BC2
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 07:18:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D484B227FE
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 05:15:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2801AB20C1F
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 05:18:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 024FD51C3E;
-	Wed, 17 Apr 2024 05:15:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19A88524A2;
+	Wed, 17 Apr 2024 05:18:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="rzdQKg5l"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="rnuBPc1x"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BB3F516;
-	Wed, 17 Apr 2024 05:15:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713330951; cv=none; b=IROLPOnYc1A9If/K3Jvn9ZgK9bg+c+953nkPFnRHwz6/OFMs1XUuaGZF7orHy0kKqJjEtJpfyaTS50UNR19kEm3gL1mNvSO67CNiJMh1dPiTmtKCri02gZ2iP7OAA57Aw53ZKJPvg7Y8y0EUl0OmQXPMQ+mJ75JHbRwUEzOr4g0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713330951; c=relaxed/simple;
-	bh=xl5Ie0fhJpQqVcqkI3YRZyUMdgGsowrcOdwyU3nze48=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=PpofRSZvngkyjF6403p6r3ipGevyCUJAAuw/9KnyT4tYfB6tbHiG9j4Lnf05D4qN4aD31QW+s8NZvDeqKyTAwxcrtTtjuqwFm2dPchTModybKH9Ke474bAjirllslHN8Qa7WHydEH3GoqPO/VgUD94BNBzHnCuWLaZZk3frZBfM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=rzdQKg5l; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43H5FArm111187;
-	Wed, 17 Apr 2024 00:15:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1713330910;
-	bh=Fo8TQ5AxW91DWwN2mHnILU3BPi2jl2Q4yLOHSsngmzA=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=rzdQKg5lE/klDnuCRHiqCt75Ykt6E3d6vblK83mOgxL6ufSa5LPED4HZrsb1OUeJG
-	 t/7JTKoInHCyl2VQ0u142S5r02Qg3QboYMyHXygbIJ045XQX5DcBBQlwLklPLQ7rNk
-	 rHzBgSG/3QlUW8PQOfa60AXFT4WeGwPY89Gakb+o=
-Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43H5FAim043081
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Wed, 17 Apr 2024 00:15:10 -0500
-Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE102.ent.ti.com
- (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 17
- Apr 2024 00:15:09 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE106.ent.ti.com
- (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 17 Apr 2024 00:15:09 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43H5F2rA065474;
-	Wed, 17 Apr 2024 00:15:03 -0500
-Message-ID: <57d78d3b-dadf-488f-87dc-08a07759fb3e@ti.com>
-Date: Wed, 17 Apr 2024 10:45:02 +0530
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B8E4524BB;
+	Wed, 17 Apr 2024 05:18:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713331087; cv=fail; b=KSaUctlwTwamKqaGCKzWJK83u402RL2OWmV9t9qX04UyNe5C2KicHvFNNgR21ax4289Pk5z4MIL95FCzUzfZTXlbNC5Ch1kJ7LTMusW8jGFsAH7S9gccT91N16R8u+c0dtklHAwhMxQU8QUO7XD/RyJquYmuEiwpxncPeq4oAXs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713331087; c=relaxed/simple;
+	bh=JkTGdJcqlk70H29MOGq/zKZOnrOAS6qXzu5rxzcDdZg=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=dhLwDZrI8Ixkv3o4vJkdaWzyDjGYa/r/zHNOQl4QdcM99iKopR/jsMnf59MVYjpOrmBrNuttv87g+fVM3xsZUervlNh7t5EZVrctKCCWKJOJNpZ+9VegvPJQhbICOY5nT1KZRhTe1eGa58KVN2MCKU6+RZZhhu6iQYwix26IAGw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=rnuBPc1x; arc=fail smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43GK1vJa017006;
+	Tue, 16 Apr 2024 22:17:52 -0700
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2100.outbound.protection.outlook.com [104.47.55.100])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3xhfdn50b3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 16 Apr 2024 22:17:51 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WcFn0aIXoyuW9bcaIfFfsqlBcMB3CbHCmVTYWDXH1FmW3h6CdGVCoX3m0BoxYIprEO+G/eMBx70+/YdCRJIzl21p77NYaJskYZkxgeYNFgi+cfdkIdkBYBzPsRXAZmLTXJ0hQc2IAG9VCHZfQHLTqSBIClYyKWGgu278lAfntPfezKdmWR9xoMGdQG1LBIr0wg1HT8jgPT96D9I6zw1xzCbFN80SVdH19GoZBbPzL8ukIuDmXM+dGkvtcnbnYIAuPTKYxe9fQFedRsnVhPO8qR69ynyJzft0mj8wk32hv1P3+eirPyAIx3Nys7VivQ/Ivkd+nFgNCRLkl0lG0srWMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=X6EpYmwBJS6wtsL/X6jS63nAZcdOwbiWNMlmP7/MWr4=;
+ b=n8IXaORs+NSHJQsnE89Z6gAc4+Sc1G+ftcPYLRhYbHfeyyUznkSrCK02hbfdNxGk3SBQo8NSdlw5y3x7CVH58r3VZ+xQdgVd66H0mJVkhyxFUufUk2xUN+7OTerOI2Q9BU9wIaGACRKz9IY11dCicT1bi46Amzymm/wngJ2VDFYf9ucieWGctpiFWSb0vbm3qW2zOjfydWDH+PPcHBQzbDKrtjrUP4lrW28/UwaBwj4upFSEylwy78Oxbi6dkFRswqco0LiRUBeX90REAvu5zHfzwt2bKE4+mAWXauZDpFVhQlriqhJYWgaWG7719eXn61qa06s9ImUmuSMlUNBhVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=X6EpYmwBJS6wtsL/X6jS63nAZcdOwbiWNMlmP7/MWr4=;
+ b=rnuBPc1xZupE4kdCOw325jKYiZI5lG+lfXCj7KJDrXkVLui81K1i86cjqrArRRfUa+NMhuyereJXcApkhAuAaMWBzlHi6uqw49J3JcEcWexryTU+/2+DhkKalr24P51hSeyCE8pEasPd/G19z/j8CQYEjdgXhf2Xy0898V2wESo=
+Received: from BY3PR18MB4707.namprd18.prod.outlook.com (2603:10b6:a03:3ca::23)
+ by PH0PR18MB5815.namprd18.prod.outlook.com (2603:10b6:510:16b::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.49; Wed, 17 Apr
+ 2024 05:17:49 +0000
+Received: from BY3PR18MB4707.namprd18.prod.outlook.com
+ ([fe80::1f55:2359:3c4d:2c81]) by BY3PR18MB4707.namprd18.prod.outlook.com
+ ([fe80::1f55:2359:3c4d:2c81%5]) with mapi id 15.20.7452.049; Wed, 17 Apr 2024
+ 05:17:49 +0000
+From: Sai Krishna Gajula <saikrishnag@marvell.com>
+To: Simon Horman <horms@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+        Geethasowjanya Akula <gakula@marvell.com>,
+        Hariprasad Kelam
+	<hkelam@marvell.com>,
+        Subbaraya Sundeep Bhatta <sbhatta@marvell.com>
+Subject: Re: [net-next PATCH] octeontx2-pf: Add ucast filter count
+ configurability via devlink.
+Thread-Topic: [net-next PATCH] octeontx2-pf: Add ucast filter count
+ configurability via devlink.
+Thread-Index: AQHakIaWlkZ9Gh8L9EajC5AeXoKhZA==
+Date: Wed, 17 Apr 2024 05:17:49 +0000
+Message-ID: 
+ <BY3PR18MB47071C9FB7E516063668825EA00F2@BY3PR18MB4707.namprd18.prod.outlook.com>
+References: <20240414105830.678293-1-saikrishnag@marvell.com>
+ <20240416102236.GH2320920@kernel.org>
+In-Reply-To: <20240416102236.GH2320920@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BY3PR18MB4707:EE_|PH0PR18MB5815:EE_
+x-ms-office365-filtering-correlation-id: 33a7f982-dfdf-4e17-9fe8-08dc5e9db949
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ Cln/WiqpdCSMZHGhXoFQRMN9DsA8+FHJY/oUo8edGWSpmNabbyWr2V4STWhvpgA+WEwOyWtDEvUMAadr7wATfUzwXX9lwa8qBiyjD8kR+CiHHWNkUh0bBMltpZIwBAOFOgwkGZlIzM/OfNQ0iRUFHLWaikxqg/8whLiMD7l+wqh4sKOxPvtWQphhZ/JcJ/ax0FHiajKBI7E3DCv+ZOxWKVX1412C+nz0jRHB02rncb4DTaAvxor1JKbi0cc0WqKL02p9wUkk6MW1/mYuotQlTP+9+u7iNPnIJJulBBGQ3CcR0heQ82i0xo9gL+cdl4k5AIp6dmLhj7okU3tkGAbmzqn8uIlohxQr/12puU/05s6iD0bveLngij2zLPzCiGiY1p13Ig5Clx2w7UCz3fyr+19rM2yNusboeqOD7ixzu4ULdQGdLor+O/wlgXG6mSOPh07pFPYE6mO1q2KX3veURborXEk9zk6rfC3y9BdVft6ir+HVWlNE9ouK1R+InszNpOPhQP3r+HnPSh90/Jv8LYd0O5nU1h6oHgOYo8EuB9y0AbflwycuBhubVj9uOTGr1KJTUYHjK6DWxEhMJJC7vw5cTka9SEIDw0pwOnnFQVwp90harwrgDTWuilmaE4uiVYJAZQS2HMHghc9E/jupRVUjk88J1eO3Q5g3B7mXRCkQ+7l5dYfpAHIpGOfEWEjxVLaQUC7KfKu+h68rQfA7Rg==
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR18MB4707.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?An6QCV09SQKZGWSyTq287fNuVXaJCNgfOGBw2Q/bGqr8T1cVpRq+fWQWAjCp?=
+ =?us-ascii?Q?DQvMQgP+l26NRJDzTk8WY3x2inEOynKjVikelmnAoLB6krZdYRHMtEJ1mg0d?=
+ =?us-ascii?Q?HUhfdlIxMrMoZct6rJY/AYCmLexevB2ZQ4drph7OeLC7WVqNDJtEKjzFNbgZ?=
+ =?us-ascii?Q?gRfnatIw3VP67FZpwfp1P5akf21myZuvL4c+5GGf1HZmqKW8waVSMeTD1hh9?=
+ =?us-ascii?Q?KDx5HPGHvicIjkAoTak9Qf/ttttydzWCSlN7+oSK1frAFGFEutYm/1bIsr5D?=
+ =?us-ascii?Q?S1rG2Fa/xFM5edvrUIrq8+vZxCKFZpoVXPleuvQo5MEnABH5OAoI80Mh+OTh?=
+ =?us-ascii?Q?bPS7ac/cWLc6JIAX0aQPTZSye+xRwF2fy4/9zM+g7zzC1Qk37Fgi7FoSLIvd?=
+ =?us-ascii?Q?Itc/49PqlVlhnF6JlahAiXR794JZ0f+S8ZG4W+B6FFZwnMuX5UIu3q/5HfLe?=
+ =?us-ascii?Q?ilYvv/G2sxLn+q6PCUaczu+5BiLsJvzpKPBjjeUBRDpxCJvnK8YW/XRDAMIR?=
+ =?us-ascii?Q?GXMNwQtk8PG2mKc+t1GWmnxSe/k7DQtFle05prH1LoipMFSlyFVqANYyrh/B?=
+ =?us-ascii?Q?SsAoxgmQRW0JwQ6VEPilpN2NU2E15hcJlS0CzU8E/njxlKSifs4dLjPRRdJ4?=
+ =?us-ascii?Q?3SycNmK76XUZD4bRMS8+1o3pcpvM/DRJUuFNa5fo87xOkYgjNoIXN65El3Ye?=
+ =?us-ascii?Q?WRGsyjvburOi1qpQZHZVpHXmTCnduaruZqkLbCtkLaso0zw6vRGY35/QiZki?=
+ =?us-ascii?Q?EeYKrfeOLHOfC7z/8lGEhE/EADf3il4A/fO14EwubuJ/xA/1bJYgZ72joEMG?=
+ =?us-ascii?Q?QlzYKsERLoyYIoweU/PI6zBBvhodoxqSxukkuYhZu/tNXQmnO1VgsGWV9pI6?=
+ =?us-ascii?Q?aKNbWZwZKzvBMBkrppR3vBt+cxmB8gYOaD29MlHyEIY0/B3ULQH/cZpxXpTR?=
+ =?us-ascii?Q?O6dvfRJbON8KaRZ5vb7bgg4/gB2lJFGJwxxBWM+k4uXk4QumJoJFDHPkO218?=
+ =?us-ascii?Q?WJ/G27WNHzXAR/vl6AhCnkodgFxbOL0wNx48rLHmK7W7B80nZ1loghY/LYMG?=
+ =?us-ascii?Q?pTyOHX06xqHQnw2BrwqBmUrmh2S4luLrSOZn2a2S+bSegHsr6MwI341xjPgV?=
+ =?us-ascii?Q?jYh99d7r0Vtzs8k1GZnLPiZzIlOo2ThmYUDiE4IGX9zbap1zoOovEvpefG20?=
+ =?us-ascii?Q?v6u7Ba3pOoHZY96ATiVGCahWqkSlj02ayf6mFO1bWYIp72ZxJg+H3wJGDwsr?=
+ =?us-ascii?Q?A8pKlpHj+wrd+EhIso4dsm180/7R8Ws5GFkWpdhAbS9UkmvgY03W78sSWDwR?=
+ =?us-ascii?Q?fTPpjvLCTeyHBnsRr5u3Nd3YCc2qn+xxPHdY6lOg/lFnoOSjR/nGUkZ8Wt3T?=
+ =?us-ascii?Q?GGcXEuRbdUfzfj0fzUlwY5H25qpsqzYUfd9GHZxjPcGZF/nCaajcyAX5mkMh?=
+ =?us-ascii?Q?2gV33SUORkk5ghowoMXLFk5uvogrwxmoYvwGDjq5bUbH//YUTFA8S8y59W7N?=
+ =?us-ascii?Q?uf2RRB8fZTOYZ/lhPEBqDFhg4PjFAHc8qNs7Ycbd2fD2GZRvsNrhj5Niu5aK?=
+ =?us-ascii?Q?U7ohn7/qFmREpzp0pchZi75NPdFqghz9v4J334vx?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add support for
- ICSSG switch firmware
-Content-Language: en-US
-To: Andrew Davis <afd@ti.com>, "Anwar, Md Danish" <a0501179@ti.com>,
-        Diogo Ivo
-	<diogo.ivo@siemens.com>, Rob Herring <robh@kernel.org>,
-        Dan Carpenter
-	<dan.carpenter@linaro.org>,
-        Jan Kiszka <jan.kiszka@siemens.com>, Simon Horman
-	<horms@kernel.org>,
-        Andrew Lunn <andrew@lunn.ch>,
-        Wolfram Sang
-	<wsa+renesas@sang-engineering.com>,
-        Arnd Bergmann <arnd@arndb.de>, Vignesh
- Raghavendra <vigneshr@ti.com>,
-        Vladimir Oltean <vladimir.oltean@nxp.com>,
-        Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Jakub
- Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-        "David S.
- Miller" <davem@davemloft.net>
-CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
-References: <20240327114054.1907278-1-danishanwar@ti.com>
- <20240327114054.1907278-4-danishanwar@ti.com>
- <cb13da4a-13c9-409a-a813-0ac852062163@ti.com>
- <bc0e05c5-11a8-4519-b50d-04dabd6e5999@ti.com>
- <f4a91360-bf31-4dd0-a00d-cd4b7464160e@ti.com>
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <f4a91360-bf31-4dd0-a00d-cd4b7464160e@ti.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY3PR18MB4707.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 33a7f982-dfdf-4e17-9fe8-08dc5e9db949
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Apr 2024 05:17:49.0978
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: IVa/X++mTw6LrHHOd07DqzPUDbAznkth73XXIgQZWUeesdIg/+U7IjAjCZCuCP8JMwZqqFBZleMZ2yQ8R6IDzg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR18MB5815
+X-Proofpoint-GUID: Z6b7AvIeGQrXprujbyjV8tQOWn94CTN_
+X-Proofpoint-ORIG-GUID: Z6b7AvIeGQrXprujbyjV8tQOWn94CTN_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-17_04,2024-04-16_01,2023-05-22_02
 
 
+> -----Original Message-----
+> From: Simon Horman <horms@kernel.org>
+> Sent: Tuesday, April 16, 2024 3:53 PM
+> To: Sai Krishna Gajula <saikrishnag@marvell.com>
+> Cc: davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> pabeni@redhat.com; netdev@vger.kernel.org; linux-kernel@vger.kernel.org;
+> Sunil Kovvuri Goutham <sgoutham@marvell.com>; Geethasowjanya Akula
+> <gakula@marvell.com>; Hariprasad Kelam <hkelam@marvell.com>; Subbaraya
+> Sundeep Bhatta <sbhatta@marvell.com>
+> Subject: Re: [net-next PATCH] octeontx2-pf: Add ucast filter
+> count configurability via devlink.
+>=20
+> On Sun, Apr 14, 2024 at 04:28:30PM +0530, Sai Krishna wrote:
+> > Added a devlink param to set/modify unicast filter count. Currently
+> > it's hardcoded with a macro.
+>=20
+> Hi Sai,
+>=20
+> I think it would be nice to provide a sample devlink command in the patch
+> description, as you did for:
+>=20
+> 2da489432747 ("octeontx2-pf: devlink params support to set mcam entry
+> count")
+>=20
+> > Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
 
-On 16/04/24 10:49 pm, Andrew Davis wrote:
-> On 4/15/24 1:56 AM, Anwar, Md Danish wrote:
->> Hi Andrew,
->>
->> On 4/13/2024 12:22 AM, Andrew Davis wrote:
->>> On 3/27/24 6:40 AM, MD Danish Anwar wrote:
->>>> Add support for ICSSG switch firmware using existing Dual EMAC driver
->>>> with switchdev.
->>>>
->>>> Limitations:
->>>> VLAN offloading is limited to 0-256 IDs.
->>>> MDB/FDB static entries are limited to 511 entries and different FDBs
->>>> can
->>>> hash to same bucket and thus may not completely offloaded
->>>>
->>>> Switch mode requires loading of new firmware into ICSSG cores. This
->>>> means interfaces have to taken down and then reconfigured to switch
->>>> mode.
->>>>
->>>> Example assuming ETH1 and ETH2 as ICSSG2 interfaces:
->>>>
->>>> Switch to ICSSG Switch mode:
->>>>    ip link set dev eth1 down
->>>>    ip link set dev eth2 down
->>>>    ip link add name br0 type bridge
->>>>    ip link set dev eth1 master br0
->>>>    ip link set dev eth2 master br0
->>>>    ip link set dev br0 up
->>>>    ip link set dev eth1 up
->>>>    ip link set dev eth2 up
->>>>    bridge vlan add dev br0 vid 1 pvid untagged self
->>>>
->>>> Going back to Dual EMAC mode:
->>>>
->>>>    ip link set dev br0 down
->>>>    ip link set dev eth1 nomaster
->>>>    ip link set dev eth2 nomaster
->>>>    ip link set dev eth1 down
->>>>    ip link set dev eth2 down
->>>>    ip link del name br0 type bridge
->>>>    ip link set dev eth1 up
->>>>    ip link set dev eth2 up
->>>>
->>>> By default, Dual EMAC firmware is loaded, and can be changed to switch
->>>> mode by above steps
->>>>
->>>
->>> This was asked before, maybe I missed the answer, but why do we
->>> default to Dual-EMAC firmware? I remember when I was working on
->>> the original ICSS-ETH driver, we started with the Dual-EMAC
->>> firmware as the switch firmware was not ready yet (and EMAC mode
->>> was easier). Now that we have both available, if we just use Switch
->>> firmwar by default, what would we lose? Seems that would solve
->>> the issues with re-loading firmware at runtime (configuration loss
->>> and dropping packets, etc..).
->>>
->>
->> We can start the driver with either Dual-EMAC firmware or SWITCH
->> firmware. But the problem lies in switching between these two firmwares.
->> For switching to / from Dual-EMAC and switch firmwares we need to stop
->> the cores and that is where we previously used to bring down the
->> interfaces, switch firmware and bring it up again. But as discussed on
->> this thread, I can now do the same without bringing interfaces up /
->> down. We'll just need to stop the cores and change firmware this will
->> also result in preserving the configuration. There will be packet loss
->> but that will not be a big concern as Andrew L. pointed out.
->>
-> 
-> Yes I saw that and understand all this, but that is not my question.
-> 
->> Currently we are starting in Dual-EMAC mode as by default the interfaces
->> are not needed to forward packets. They are supposed to act as
->> individual ports. Port to port forwarding is not needed. Only when user
->> adds a bridge and starts forwarding we switch to Switch mode and load
->> different firmware so that packet forwarding can happen in firmware.
->> That is why currently we are starting Dual-EMAC mode and then switching
->> to firmware.
->>
-> 
-> Same, I see what we do here, this doesn't give me the "why".
-> 
->> If we use switch firmware by default, we will not be able to use
->> individual ports separately and any data sent to one port will be
->> forwarded to the second port.
-> 
-> So this seems to almost answer the question, but I still do not see
-> why we could not use the ports separately when using SWITCH firmware.
-> 
+Ack, yeah.. missed to add example command. Will do in patch v2.
 
-This was discussed during v1 of this series [1]. Andrew Lunn also
-commented asking for a single firmware that can do both. But the problem
-is having a single firmware to do both Switch and EMAC operation will
-require additional check in firmware to check whether we are in switch
-or mac mode based on that firmware will forward the packet to the other
-port or host. I had talked to firmware team regarding this, this
-additional check will result in consuming alot of extra cycles and the
-performance will be degraded substantially. That is why we decided to
-stick with two different firmwares as combining them in one has a very
-big penalty.
+>=20
+> ...
+>=20
+> > diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
+> > b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_devlink.c
+>=20
+> ...
+>=20
+> > +static int otx2_dl_ucast_flt_cnt_get(struct devlink *devlink, u32 id,
+> > +				     struct devlink_param_gset_ctx *ctx) {
+> > +	struct otx2_devlink *otx2_dl =3D devlink_priv(devlink);
+> > +	struct otx2_nic *pfvf =3D otx2_dl->pfvf;
+> > +
+> > +	if (!pfvf->flow_cfg) {
+> > +		ctx->val.vu8 =3D 0;
+> > +		return 0;
+> > +	}
+> > +
+> > +	ctx->val.vu8 =3D pfvf->flow_cfg->ucast_flt_cnt;
+>=20
+> nit: perhaps this could be more succinctly expressed as follows
+>      (completely untested!):
+>=20
+> 	ctx->val.vu8 =3D pfvf->flow_cfg ? pfvf->flow_cfg->ucast_flt_cnt : 0;
 
-Such firmware doesn't exist as of now. Furthermore, we are also working
-on hsr mode for ICSSG driver and this will also introduce new hsr
-firmware. In future their could be more different modes. Now combining
-all this firmwares into one will consume all the budget cycles and that
-is why firmware team has decided to have split firmware.
+Ack, Will submit changes with patch V2.
 
-While switching modes, stopping and restarting the PRU cores after
-changing firmware works fine and it's completely abstracted from user.
-For a user it's same as a software bridge. There will be some packet
-loss but as Andrew Lunn pointed out, even in sofware bridging there are
-some packets losses.
-
-> Why not have a filter/rule set by default to each port so that they
-> do not forward packets automatically but instead always forward
-> to the host port? That would result in the same functionality as
-> the Dual-EMAC firmware, but without all the mess of runtime firmware
-> switching based on usecase (simply update the forwarding rules when
-> in bridge mode).
-> 
-> Andrew
-> 
->>
->> I will be posting v4 soon and I will describe all the details on how to
->> use and switch between different modes in the cover letter.
->>
->>> Andrew
->>>
->>
->> [ ... ]
->>
->>>>      static const struct prueth_pdata am64x_icssg_pdata = {
->>>>        .fdqring_mode = K3_RINGACC_RING_MODE_RING,
->>>> +    .switch_mode = 1,
->>>>    };
->>>>      static const struct of_device_id prueth_dt_match[] = {
->>
-
-[1] https://lore.kernel.org/all/92864bda-3028-f8be-0e27-487024d1a874@ti.com/
-
--- 
-Thanks and Regards,
-Danish
+>=20
+> > +
+> > +	return 0;
+> > +}
+>=20
+> ...
 
