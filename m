@@ -1,424 +1,177 @@
-Return-Path: <netdev+bounces-88818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5086E8A898E
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 19:00:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDD478A89D7
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 19:06:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 068B1285ACC
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 17:00:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46ECAB216EA
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 17:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2AC5171E4D;
-	Wed, 17 Apr 2024 17:00:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0EA171081;
+	Wed, 17 Apr 2024 17:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i5cBF2ud"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cjLhU7tc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2087.outbound.protection.outlook.com [40.107.223.87])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10EA217167E
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 17:00:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713373218; cv=none; b=Z5Jl2ejZjZLJ5qUgetXg9RjsFsyOZc8ee9WATUnaAZFjMtM21C3PSruDD+qZvBUQ8pxdHyRPcONlfnsxGvTQs8WwvsA6QXd/NGR1vh5lu7365y+Z2tMjRzxSttNCXTKbRC0N6PghMHvviLNawt+0amvheJL5IxtBgT9lhZHeVLc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713373218; c=relaxed/simple;
-	bh=56tOu9eUB47d8KPYjjK51a05MyD+g5MwMnzZxCMBDX4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RrS0pEw+8zc/tWPaTWGrR1470i/LSTBliBv28hV7dc3yv3lwQs/ZflGBiAxCnj7btPb5sd/8mKXMbOBiqQO9881ftgOVB1SkE/XMhdYmM++GWjFgfeBkRnVuigz2ey2CU1WbhJS6oA95xBuN6qa2BNhHLrnIf0QXACJIp7unOGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i5cBF2ud; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4365c1451d4so23264091cf.2
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 10:00:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713373216; x=1713978016; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YgC6tWfrCjT+R+mHvE+Tw2Te80mN3OqYF5qyRLtY9IQ=;
-        b=i5cBF2ud5goFCJNgvzTtmt1ggaprX1WLQZGDghBAmOuz7h62nhqA60VBQzkFhITLNY
-         r2NQP2PlWUOBsanF039+EPyBdwIJPMzWQr+iBIOQfNd0GwNZnPVjjXNwjvwiCYaLssrT
-         C7zdTrwDK8BWAgQQQepK1LMGTaVltAWOJTCtNzXa2E8rvgzXGzIMWQrE1TEyfbAcGqSU
-         zJ52j+KEyYd83mIjIZxpq+5IpOmtPgo+cr7+sW0Gq+a/qoUP4eSVzv6dZlhlIqXZ4lpc
-         mnjvVk7D57ZXMYoXgfaWog8pBHS5cvZ7Y75eSUA2c+cTT8sFtAHnGc1/bQ6/EXSpLBNW
-         cV1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713373216; x=1713978016;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YgC6tWfrCjT+R+mHvE+Tw2Te80mN3OqYF5qyRLtY9IQ=;
-        b=YYJpe4+7O/2eu8jrU4Yi2ItjsOmKB+eEruMhnfYex0Sm9yJcAn1LssM41JCyFTD1G2
-         QpSNNaWJC8fmsDnGgtRZaj+fMaBsVaXE7ILNAITXy0duY8QhwSkPln2beh0Zc+rmnKFA
-         TimKwEJv3cv23QLl6ugDoTaCvC4ehVOwJ2/zdGMwGvVPcp2X88jHKahvJG70nZpQgHKn
-         LsOvXSxmhB2H2eUVATdggF5kjghYDO3M5Mb6fRntVCVKynEHYyAwr7+dtCKsY2TUpZzN
-         uz6HWdPeCT0G2w4aJaoUSb81xkJIb+rsCpu+DcQxkW97Egn6s/JP009UXMsr4771w8F9
-         2xfw==
-X-Forwarded-Encrypted: i=1; AJvYcCUWDXe364kdIiUZpkSEoRKk3UPoDof8aNCUgfvqdicZHLQjHI6KNy3OgC5c1KjDdWYNv0FnoX356kfR/01FiG8bzhajiWlg
-X-Gm-Message-State: AOJu0YzHus4dlAgo76OQGGao8/AR7u13mbyEkGyGEKmuuthc2xaEaMRQ
-	N76iH8DTuHhfShQm+Qu/o/WkFpL1ro+M11WYFImnn0pI1tNJTMbVvG/+VMIBHCVvjtjlZ0mSNXr
-	7ZDuUsSEwrhXr5OmylZRTIhL9e4GtkSHQ0IFB
-X-Google-Smtp-Source: AGHT+IFXiu93+9CON0CZlmqFKCb6l2EaLUrXof0ILnYpyXQf/L4IDG/UItFW263lu19ZxV/stOYbPZz4raXJd9UoXfY=
-X-Received: by 2002:a0c:e852:0:b0:699:2b62:2f19 with SMTP id
- l18-20020a0ce852000000b006992b622f19mr18794026qvo.30.1713373215547; Wed, 17
- Apr 2024 10:00:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5055516FF52;
+	Wed, 17 Apr 2024 17:05:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713373512; cv=fail; b=jduI+UOyQVuRTjrr/oqOHrEBQ96zzxifeJ3UNV1cADBq9mggWdQAczGQ/FgCfuvcmofkqrEKfizaQWa77ImK3/2/8sOx5nB/+Tv+RvoK8t+icYwaFNbKnTSpFu7BWl2FoHtajMQ/ZkZHBV7eeyH+LZ/pIyJs6UWQaYVCup01d+8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713373512; c=relaxed/simple;
+	bh=vfw50eBwPhAEiXkT8poLDj4RJZPos9fLTJn1CTeGns8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=LZEocpSpcsrD2f+3xG5OMmDmIhXqbgZzyjhKMZI1a68GJoziy96Jtzzmq5/jCjrSp2oKO0DbCq4TFJURa4JqrDkNC5qMHZ0nx+mtwsQ8se5kRDIeuQwso6cZew5kUjGCk3hoQTCYmyqVxoq9qX+LIuhkYZPEwFWt1Gjl4GnvEHg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=fail (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cjLhU7tc reason="signature verification failed"; arc=fail smtp.client-ip=40.107.223.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=a+B39hVuRSMi8zdpT2CqrlDoe/4bTGCSOJIPX/8O7pEXvKrlVqFn+TTygv/zy8YiqSDSJ00sTjndno8Ecf0/SdVDFfOFVPyYf0ryNYmaorXVvWKbSBAIqJEejMVm9m3fFJC/DrcOyZaqTXeNMA+irBBakFXxqLW3OdGWMDWRwOV6f2oj1Bytzo6HD5g9xYdbwcTQf+j3xhlk9i5LZoGg5UBUdlcc03LdoTz3LAUKjXPSJxalSxzCJ605/Hh+JqypuguiD29IU8lKqGcTt7IyGykrm100WMynCOvPajFou5k4WrU6gajO+eea0X7QhUuLaLO+mn+pbg5IkbJeGQ77Sw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ouyjCA0kVZ04iCEEwdn1Y1QGlwZKCwsIZDD+bRKxwyw=;
+ b=Np1sdeobxQz5LO27KP80uhvuqR4jui07aLuJ+OwY8KuHERcXW8DOHBPBiVTguc+UUEyMTd1KzEq8DTC/m8yZWpEavjdS5yBc1+Itpv5g3VrOCs29ah8cAH9mwWvWR6Amsmv6HuGX4ujoBLxM3CZ15PDYF4IWlRKw67u58kCqWybfM1gg7A+hzEhbRuheGzQz0JtLuSsPTgEfFkAkIpogxN6EMsQN+kfjeK2E7kHQySNC4EGSSw7o1stAic9+Htr107v4ILSKSSYjdwCX6F6lo+KdIaqcKklY5f2wJnVD7nuJypP1QYceWdgBPwqblLtgO3bJqjtDXdf8ZsRv2ZNlng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ouyjCA0kVZ04iCEEwdn1Y1QGlwZKCwsIZDD+bRKxwyw=;
+ b=cjLhU7tcsoQx6EkKE2PZKs8n25uIlUu1OZ/1Od1t2rqZJABBemwgdGwJXY7qxChm7SvZuz5aeWU4syQhHRuIyjH+B6LbRR4JbDNA2CScruoFxRG2pokRaSaQJ6nmr3ehjdwV0s3Rgl3ZAHQ6LX5H+hX9O/VsVGAImkigCPTv6yShBCgvqa+wsPZeZmi7pNTS5pMlOsRpmGZFedNZjdUYgC3QyRc8ve2oaoWnJKubvM10dLxkO9bfKWTw7KLnXAtM1fd9T5AgkVUTGMYyojJy+nNXB0ZsWmmwBOeN9Di/wRsMgh8xdsEG/DbB1QOj+UsZzWTuO7wSqCxyLI0ZAd1acw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
+ by PH0PR12MB7885.namprd12.prod.outlook.com (2603:10b6:510:28f::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.37; Wed, 17 Apr
+ 2024 17:05:06 +0000
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::b93d:10a3:632:c543]) by CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::b93d:10a3:632:c543%4]) with mapi id 15.20.7452.046; Wed, 17 Apr 2024
+ 17:05:06 +0000
+Date: Wed, 17 Apr 2024 20:05:00 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: =?iso-8859-1?Q?Asbj=F8rn_Sloth_T=F8nnesen?= <ast@fiberby.net>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Petr Machata <petrm@nvidia.com>
+Subject: Re: [PATCH net-next] mlxsw: spectrum_flower: validate control flags
+Message-ID: <ZiABPNMbOOYGiHCq@shredder>
+References: <20240417135131.99921-1-ast@fiberby.net>
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240417135131.99921-1-ast@fiberby.net>
+X-ClientProxiedBy: LO0P265CA0011.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:355::19) To CY5PR12MB6179.namprd12.prod.outlook.com
+ (2603:10b6:930:24::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240412165230.2009746-1-jrife@google.com> <20240412165230.2009746-3-jrife@google.com>
- <65b2f4a3-bd8e-495b-adca-1e7adce5301d@linux.dev>
-In-Reply-To: <65b2f4a3-bd8e-495b-adca-1e7adce5301d@linux.dev>
-From: Jordan Rife <jrife@google.com>
-Date: Wed, 17 Apr 2024 12:59:58 -0400
-Message-ID: <CADKFtnRYnJG0dk53erhuEK8Ew148nuTRwFgbUxkV6LRZQ=y+Hw@mail.gmail.com>
-Subject: Re: [PATCH v2 bpf-next 2/6] selftests/bpf: Implement socket kfuncs
- for bpf_testmod
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	Kui-Feng Lee <thinker.li@gmail.com>, Artem Savkov <asavkov@redhat.com>, 
-	Dave Marchevsky <davemarchevsky@fb.com>, Menglong Dong <imagedong@tencent.com>, Daniel Xu <dxu@dxuuu.xyz>, 
-	David Vernet <void@manifault.com>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|PH0PR12MB7885:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6628a444-253e-4faa-96ed-08dc5f0087a3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	SgcLOdm+7+QGb68UiJ1C6K6WvHyNFg9yzcEz0mRtk6NL6tNWV2HUf84VGno9yWOdMp4bacHYyGUC3J0zll22a4vCwU95d+Dt53Volkx41cCzU4GSucdw6lX+UHfBzv61EmEa51BEJ9GPt6kJOHk9mqEKHPrbGONeUx5RTkbobcMr40Ptm7DIugCHHfV2RU4b9DhzHBf3+eMmL8ZF/0cbSIi+S/uayRS9jtVtE3llwFtHucreZOWbkHig3x98GC+Me4jJAzCV5Mog/OgIfweDOEVzECcVZ/Jmmg7dPsoBZkpsE+ZkpP1vMLdNCcjDMrFhw+D8Ya5145sr+PJ2VN6qw9cHkys/TNn+xmIN9fV8GkUB2oeO9uqAW43OM5H6XLgfFA4JO3klyMSFRv6/+EC3IHBPpXdZBeCaCmzbs/r4k6opM9j2ckrQbjndPrYi/oq+pfOzXoODvqz0+GY+6brXKtuNfAGA0oMGf75fsiU/ixKQXVNaY/qp5JlKmP+zhc+/0vLMmDUgnXnOWF1u4pcXs1WS+sah1K2o/x8W11dhc2H61MEF90PT1VLq+QVuytmOCCM0Nu6EFuvzp4krJlQ/TXJyvuuOlEZL8Ut+xge6ZiEyA3/NIHthQ++ZAwMX5QCRcEDrzIKF1Q5943DQI0w4l2uK5PQwd5OQ9ho7M/rNPTU=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?iso-8859-1?Q?6ZDcvGibTmPJ02jTAdcHBipzPH5Q8FwllN0nqFAgUVciLZyK9S5fngnZtm?=
+ =?iso-8859-1?Q?qxEan8BNuV8Fhv7aIrnqmW2gV0Z6JRdLwJoEcZ8E0JsEKshc1tMg38vjNC?=
+ =?iso-8859-1?Q?iU+n011l1ozh1VMxeKwIYIXQL+1KgVkwwZKh8x+ePI0KykDxQxYs/88TLu?=
+ =?iso-8859-1?Q?jLbxtgv1sK5kaaakd73Ygu+WRcJ2IETrxh0WKNn+MnnVeYiWrA29xhbZYh?=
+ =?iso-8859-1?Q?duhoKjsOnzLF9ny93nhHD7ZljoJTgK1W2v40GJxU+ia6MsbvFMITY7iX1t?=
+ =?iso-8859-1?Q?6jcA2DqTE3V7gBa/pOllXXZ4ZmLQXSOAawolG0izlZZRz2f10VgGIClzBD?=
+ =?iso-8859-1?Q?0v9veXkyRkG/9CNGL0Y8srVzchrVPn5kf1TtYFfOiAW//2fu/g1QESFuET?=
+ =?iso-8859-1?Q?i7Q4NiXHEyAvjhyJdugfsOqrRcEkR9F8cTkBILis8RcYPVAyZlqEeusK2m?=
+ =?iso-8859-1?Q?jEWVeyn60EV0YRyho/IqU9amHECCdFhTmb+3b8XBoZDDI3f+YkDNGe1gtY?=
+ =?iso-8859-1?Q?PF3xfnHtIzlvMhIq15SLTN2MuVPDNuxobWieaohQ893s2Lu5p1+znt1qIg?=
+ =?iso-8859-1?Q?F2zQjjHKp1mWKPXogp8cumx+fPGlrHRAYB9wPR6jjuC5MYtZqDY6DA4LLV?=
+ =?iso-8859-1?Q?VH5HOoDHOkFSFrXhFkBNU67p6PbNMDvVqtDM2PKcyA95ZHW9zoK6ft92XL?=
+ =?iso-8859-1?Q?QXGKZJCXkcleFfa07bN3+xvPriE4Le+wBHbNKmvVeYmbYySOdepp3bbE/N?=
+ =?iso-8859-1?Q?HzB+rqzU2bmLJyJuCwV4/Itv3ZR14L6TU2YCO7M+W63ACE9dd/cK7KHrK5?=
+ =?iso-8859-1?Q?4IM3fVG76m3DhYIzDYU1TUbMVJZXQZL9GWBKLD9eCiYvGoIflKHJOwCuCp?=
+ =?iso-8859-1?Q?olW+uvVWtk5hIM3ce0YXq9nIDlh9Y2NH8pm6eNt6uVRm3O4BUuA0VIlhv/?=
+ =?iso-8859-1?Q?QbgJLtfBVkOKrjNviTtP5+uaWZD/l1Y0a0z878qEpTyWLTCZBt3R1FTIo4?=
+ =?iso-8859-1?Q?zu2qSq7cg5qNqQ1XR04PLFOvY02LVi5VlMtNBggybrC56H5lGrJx0CKQbB?=
+ =?iso-8859-1?Q?50X8MsF5hCVqbvF7plAwRDe/QCmkzpakr3VNHratuft23Nv1Mze6YFPGpT?=
+ =?iso-8859-1?Q?1f1wbNunBg/LbIkfkqB3DqysBQEiir8TgnsD7bgZzjUV1ly3td0JRTmmbo?=
+ =?iso-8859-1?Q?3zm8kQOkQ2H+RIxckFyMiUxoo/tacrDXZZU6almahZAlJVdlqE6vsbTVhb?=
+ =?iso-8859-1?Q?dQc4yiAFQDKvEoUrGwZORrDkTe+0W2MB1d2pQiESspUUbsymlt6j1Id8jl?=
+ =?iso-8859-1?Q?a4D81n3lD2H6oKVWW9/acVYyMB7xtiR7Crk1TVs3hQaiCtuPZijFIc+7Gw?=
+ =?iso-8859-1?Q?O0Vk19ntCguTzpTgOwuB/M3GRmVakiiNcyTcnnCZlchTK5ZmJH70Sn6sZR?=
+ =?iso-8859-1?Q?8Ocs0ArBXXcpCYq97/uRJGPOpjU71qrS2iH8+075HIGla0bkUMDh+18skP?=
+ =?iso-8859-1?Q?VPHmW0q5qnTPhszMpU4k9pUSnHVikm0hJysUN6diJu2uiu/jiuQIccV74d?=
+ =?iso-8859-1?Q?0mvHW4sFf4pj/RQKdHdqOgkwAxDE8Pwh+amFtNAISgWbDd1dFzogAO9sH4?=
+ =?iso-8859-1?Q?jKt7VjXnySYobCaSRTImO7U0LLCxBXT+NF?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6628a444-253e-4faa-96ed-08dc5f0087a3
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2024 17:05:06.1176
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: W9gXmp2+bRurQsAbnOg1hrKw3wmrEgQ9sUnIkdhlg0rZJD/Ho3eoq3Z4fdK9OZhPBLhE0fXp3FbpnSwcGr7oNg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7885
 
-Martin,
+On Wed, Apr 17, 2024 at 01:51:20PM +0000, Asbjørn Sloth Tønnesen wrote:
+> This driver currently doesn't support any control flags.
+> 
+> Use flow_rule_has_control_flags() to check for control flags,
+> such as can be set through `tc flower ... ip_flags frag`.
+> 
+> In case any control flags are masked, flow_rule_has_control_flags()
+> sets a NL extended error message, and we return -EOPNOTSUPP.
+> 
+> Only compile-tested.
+> 
+> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 
-Thank you for the detailed feedback.
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Tested-by: Ido Schimmel <idosch@nvidia.com>
 
-> Can a separate global lock/mutex (not the lock_sock) be acquired first be=
-fore
-> using the sock pointer in the kfuncs?
+Without patch:
 
-Sure. I will add the mutex around the socket operations. As for the
-single global sock pointer, I wanted to keep it simple in this patch
-series to fulfill the current use case. I agree it might be overkill
-for now to add the bpf map and such.
++ tc qdisc add dev swp1 clsact
++ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags frag action drop
++ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags nofrag action drop
++ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags firstfrag action drop
++ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags nofirstfrag action drop
 
-> Is it better to set sk_sndtimeo in bpf_kfunc_init_sock() ?
-> All these new kfunc should have the KF_SLEEPABLE flag.
-> bpf_testmod_exit() should probably do this NULL check and sock_release() =
-also.
+With patch:
 
-Ack. I will add this.
++ tc qdisc add dev swp1 clsact
++ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags frag action drop
+Error: mlxsw_spectrum: Unsupported match on control.flags 0x1.
+We have an error talking to the kernel
++ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags nofrag action drop
+Error: mlxsw_spectrum: Unsupported match on control.flags 0x1.
+We have an error talking to the kernel
++ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags firstfrag action drop
+Error: mlxsw_spectrum: Unsupported match on control.flags 0x2.
+We have an error talking to the kernel
++ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags nofirstfrag action drop
+Error: mlxsw_spectrum: Unsupported match on control.flags 0x2.
+We have an error talking to the kernel
 
-> nit. Can "struct sockaddr_storage addr;" be directly used instead of a ch=
-ar array?
-
-When using "struct sockaddr_storage addr;" directly, the BPF program
-fails to load with the following error message.
-
-> libbpf: prog 'kernel_connect': BPF program load failed: Invalid argument
-> libbpf: prog 'kernel_connect': -- BEGIN PROG LOAD LOG --
-> 0: R1=3Dctx() R10=3Dfp0
-> ; return bpf_kfunc_call_kernel_connect(args); @ sock_addr_kern.c:26
-> 0: (85) call bpf_kfunc_call_kernel_connect#99994
-> arg#0 pointer type STRUCT addr_args must point to scalar, or struct with =
-scalar
-> processed 1 insns (limit 1000000) max_states_per_insn 0 total_states 0 pe=
-ak_states 0 mark_read 0
-> -- END PROG LOAD LOG --
-> libbpf: prog 'kernel_connect': failed to load: -22
-> libbpf: failed to load object 'sock_addr_kern'
-> libbpf: failed to load BPF skeleton 'sock_addr_kern': -22
-> load_sock_addr_kern:FAIL:skel unexpected error: -22
-> test_sock_addr:FAIL:load_sock_addr_kern unexpected error: -1 (errno 22)
-> #288 sock_addr:FAIL
-
--Jordan
-
-On Tue, Apr 16, 2024 at 2:43=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 4/12/24 9:52 AM, Jordan Rife wrote:
-> > This patch adds a set of kfuncs to bpf_testmod that can be used to
-> > manipulate a socket from kernel space.
-> >
-> > Signed-off-by: Jordan Rife <jrife@google.com>
-> > ---
-> >   .../selftests/bpf/bpf_testmod/bpf_testmod.c   | 139 +++++++++++++++++=
-+
-> >   .../bpf/bpf_testmod/bpf_testmod_kfunc.h       |  27 ++++
-> >   2 files changed, 166 insertions(+)
-> >
-> > diff --git a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c b/to=
-ols/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-> > index 39ad96a18123f..663df8148097e 100644
-> > --- a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-> > +++ b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
-> > @@ -10,18 +10,29 @@
-> >   #include <linux/percpu-defs.h>
-> >   #include <linux/sysfs.h>
-> >   #include <linux/tracepoint.h>
-> > +#include <linux/net.h>
-> > +#include <linux/socket.h>
-> > +#include <linux/nsproxy.h>
-> > +#include <linux/inet.h>
-> > +#include <linux/in.h>
-> > +#include <linux/in6.h>
-> > +#include <linux/un.h>
-> > +#include <net/sock.h>
-> >   #include "bpf_testmod.h"
-> >   #include "bpf_testmod_kfunc.h"
-> >
-> >   #define CREATE_TRACE_POINTS
-> >   #include "bpf_testmod-events.h"
-> >
-> > +#define CONNECT_TIMEOUT_SEC 1
-> > +
-> >   typedef int (*func_proto_typedef)(long);
-> >   typedef int (*func_proto_typedef_nested1)(func_proto_typedef);
-> >   typedef int (*func_proto_typedef_nested2)(func_proto_typedef_nested1)=
-;
-> >
-> >   DEFINE_PER_CPU(int, bpf_testmod_ksym_percpu) =3D 123;
-> >   long bpf_testmod_test_struct_arg_result;
-> > +static struct socket *sock;
-> >
-> >   struct bpf_testmod_struct_arg_1 {
-> >       int a;
-> > @@ -494,6 +505,124 @@ __bpf_kfunc static u32 bpf_kfunc_call_test_static=
-_unused_arg(u32 arg, u32 unused
-> >       return arg;
-> >   }
-> >
-> > +__bpf_kfunc int bpf_kfunc_init_sock(struct init_sock_args *args)
-> > +{
-> > +     int proto;
-> > +
-> > +     if (sock)
-> > +             pr_warn("%s called without releasing old sock", __func__)=
-;
->
-> hmm...this global sock pointer is quite unease. e.g. what if multiple tas=
-ks
-> trying to use init/close/connect... in parallel.
->
-> Storing sock in a bpf map will be better but that may be overkill for tes=
-ting.
-> Can a separate global lock/mutex (not the lock_sock) be acquired first be=
-fore
-> using the sock pointer in the kfuncs?
->
-> > +
-> > +     switch (args->af) {
-> > +     case AF_INET:
-> > +     case AF_INET6:
-> > +             proto =3D args->type =3D=3D SOCK_STREAM ? IPPROTO_TCP : I=
-PPROTO_UDP;
-> > +             break;
-> > +     case AF_UNIX:
-> > +             proto =3D PF_UNIX;
-> > +             break;
-> > +     default:
-> > +             pr_err("invalid address family %d\n", args->af);
-> > +             return -EINVAL;
-> > +     }
-> > +
-> > +     return sock_create_kern(&init_net, args->af, args->type, proto, &=
-sock);
-> > +}
-> > +
-> > +__bpf_kfunc void bpf_kfunc_close_sock(void)
-> > +{
-> > +     if (sock) {
-> > +             sock_release(sock);
->
-> bpf_testmod_exit() should probably do this NULL check and sock_release() =
-also.
->
-> > +             sock =3D NULL;
-> > +     }
-> > +}
-> > +
-> > +__bpf_kfunc int bpf_kfunc_call_kernel_connect(struct addr_args *args)
-> > +{
-> > +     /* Set timeout for call to kernel_connect() to prevent it from ha=
-nging,
-> > +      * and consider the connection attempt failed if it returns
-> > +      * -EINPROGRESS.
-> > +      */
-> > +     sock->sk->sk_sndtimeo =3D CONNECT_TIMEOUT_SEC * HZ;
->
-> Is it better to set sk_sndtimeo in bpf_kfunc_init_sock() ?
->
-> > +
-> > +     return kernel_connect(sock, (struct sockaddr *)&args->addr,
-> > +                           args->addrlen, 0);
-> > +}
-> > +
-> > +__bpf_kfunc int bpf_kfunc_call_kernel_bind(struct addr_args *args)
-> > +{
-> > +     return kernel_bind(sock, (struct sockaddr *)&args->addr, args->ad=
-drlen);
-> > +}
-> > +
-> > +__bpf_kfunc int bpf_kfunc_call_kernel_listen(void)
-> > +{
-> > +     return kernel_listen(sock, 128);
-> > +}
-> > +
-> > +__bpf_kfunc int bpf_kfunc_call_kernel_sendmsg(struct sendmsg_args *arg=
-s)
-> > +{
-> > +     struct msghdr msg =3D {
-> > +             .msg_name       =3D &args->addr.addr,
-> > +             .msg_namelen    =3D args->addr.addrlen,
-> > +     };
-> > +     struct kvec iov;
-> > +     int err;
-> > +
-> > +     iov.iov_base =3D args->msg;
-> > +     iov.iov_len  =3D args->msglen;
-> > +
-> > +     err =3D kernel_sendmsg(sock, &msg, &iov, 1, args->msglen);
-> > +     args->addr.addrlen =3D msg.msg_namelen;
-> > +
-> > +     return err;
-> > +}
-> > +
-> > +__bpf_kfunc int bpf_kfunc_call_sock_sendmsg(struct sendmsg_args *args)
-> > +{
-> > +     struct msghdr msg =3D {
-> > +             .msg_name       =3D &args->addr.addr,
-> > +             .msg_namelen    =3D args->addr.addrlen,
-> > +     };
-> > +     struct kvec iov;
-> > +     int err;
-> > +
-> > +     iov.iov_base =3D args->msg;
-> > +     iov.iov_len  =3D args->msglen;
-> > +
-> > +     iov_iter_kvec(&msg.msg_iter, ITER_SOURCE, &iov, 1, args->msglen);
-> > +     err =3D sock_sendmsg(sock, &msg);
-> > +     args->addr.addrlen =3D msg.msg_namelen;
-> > +
-> > +     return err;
-> > +}
-> > +
-> > +__bpf_kfunc int bpf_kfunc_call_kernel_getsockname(struct addr_args *ar=
-gs)
-> > +{
-> > +     int err;
-> > +
-> > +     err =3D kernel_getsockname(sock, (struct sockaddr *)&args->addr);
-> > +     if (err < 0)
-> > +             goto out;
-> > +
-> > +     args->addrlen =3D err;
-> > +     err =3D 0;
-> > +out:
-> > +     return err;
-> > +}
-> > +
-> > +__bpf_kfunc int bpf_kfunc_call_kernel_getpeername(struct addr_args *ar=
-gs)
-> > +{
-> > +     int err;
-> > +
-> > +     err =3D kernel_getpeername(sock, (struct sockaddr *)&args->addr);
-> > +     if (err < 0)
-> > +             goto out;
-> > +
-> > +     args->addrlen =3D err;
-> > +     err =3D 0;
-> > +out:
-> > +     return err;
-> > +}
-> > +
-> >   BTF_KFUNCS_START(bpf_testmod_check_kfunc_ids)
-> >   BTF_ID_FLAGS(func, bpf_testmod_test_mod_kfunc)
-> >   BTF_ID_FLAGS(func, bpf_kfunc_call_test1)
-> > @@ -520,6 +649,15 @@ BTF_ID_FLAGS(func, bpf_kfunc_call_test_ref, KF_TRU=
-STED_ARGS | KF_RCU)
-> >   BTF_ID_FLAGS(func, bpf_kfunc_call_test_destructive, KF_DESTRUCTIVE)
-> >   BTF_ID_FLAGS(func, bpf_kfunc_call_test_static_unused_arg)
-> >   BTF_ID_FLAGS(func, bpf_kfunc_call_test_offset)
-> > +BTF_ID_FLAGS(func, bpf_kfunc_init_sock)
-> > +BTF_ID_FLAGS(func, bpf_kfunc_close_sock)
-> > +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_connect)
-> > +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_bind)
-> > +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_listen)
-> > +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_sendmsg)
-> > +BTF_ID_FLAGS(func, bpf_kfunc_call_sock_sendmsg)
-> > +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_getsockname)
-> > +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_getpeername)
->
-> All these new kfunc should have the KF_SLEEPABLE flag.
->
-> >   BTF_KFUNCS_END(bpf_testmod_check_kfunc_ids)
-> >
-> >   static int bpf_testmod_ops_init(struct btf *btf)
-> > @@ -650,6 +788,7 @@ static int bpf_testmod_init(void)
-> >               return ret;
-> >       if (bpf_fentry_test1(0) < 0)
-> >               return -EINVAL;
-> > +     sock =3D NULL;
-> >       return sysfs_create_bin_file(kernel_kobj, &bin_attr_bpf_testmod_f=
-ile);
-> >   }
-> >
-> > diff --git a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod_kfunc.=
-h b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod_kfunc.h
-> > index 7c664dd610597..cdf7769a7d8ca 100644
-> > --- a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod_kfunc.h
-> > +++ b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod_kfunc.h
-> > @@ -64,6 +64,22 @@ struct prog_test_fail3 {
-> >       char arr2[];
-> >   };
-> >
-> > +struct init_sock_args {
-> > +     int af;
-> > +     int type;
-> > +};
-> > +
-> > +struct addr_args {
-> > +     char addr[sizeof(struct __kernel_sockaddr_storage)];
->
-> nit. Can "struct sockaddr_storage addr;" be directly used instead of a ch=
-ar array?
->
-> > +     int addrlen;
-> > +};
-> > +
-> > +struct sendmsg_args {
-> > +     struct addr_args addr;
-> > +     char msg[10];
-> > +     int msglen;
-> > +};
-> > +
-> >   struct prog_test_ref_kfunc *
-> >   bpf_kfunc_call_test_acquire(unsigned long *scalar_ptr) __ksym;
-> >   void bpf_kfunc_call_test_release(struct prog_test_ref_kfunc *p) __ksy=
-m;
-> > @@ -106,4 +122,15 @@ void bpf_kfunc_call_test_fail3(struct prog_test_fa=
-il3 *p);
-> >   void bpf_kfunc_call_test_mem_len_fail1(void *mem, int len);
-> >
-> >   void bpf_kfunc_common_test(void) __ksym;
-> > +
-> > +int bpf_kfunc_init_sock(struct init_sock_args *args) __ksym;
-> > +void bpf_kfunc_close_sock(void) __ksym;
-> > +int bpf_kfunc_call_kernel_connect(struct addr_args *args) __ksym;
-> > +int bpf_kfunc_call_kernel_bind(struct addr_args *args) __ksym;
-> > +int bpf_kfunc_call_kernel_listen(void) __ksym;
-> > +int bpf_kfunc_call_kernel_sendmsg(struct sendmsg_args *args) __ksym;
-> > +int bpf_kfunc_call_sock_sendmsg(struct sendmsg_args *args) __ksym;
-> > +int bpf_kfunc_call_kernel_getsockname(struct addr_args *args) __ksym;
-> > +int bpf_kfunc_call_kernel_getpeername(struct addr_args *args) __ksym;
-> > +
-> >   #endif /* _BPF_TESTMOD_KFUNC_H */
->
+Thanks!
 
