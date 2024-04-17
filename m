@@ -1,178 +1,485 @@
-Return-Path: <netdev+bounces-88874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53D948A8D5B
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 22:57:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C28338A8D64
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 22:58:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BBCE2830CB
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 20:57:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 798ED287C64
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 20:58:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2232481A8;
-	Wed, 17 Apr 2024 20:57:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22430482C8;
+	Wed, 17 Apr 2024 20:58:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=est.tech header.i=@est.tech header.b="WT/HVwBv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PH0khpJ+"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2110.outbound.protection.outlook.com [40.107.20.110])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 041B73D966;
-	Wed, 17 Apr 2024 20:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.110
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713387429; cv=fail; b=mO+8nuh2MkrY+Vcx+DRT6BEQtMba3whzsKoESd8o6NJNCuuwffdsXhjAQW26mNOhkcqKRFY+54A0HENCEUAYwe/ZikhW4obP5DYwm3s8B1LsvPihBVFEmY5c2eRslMjPOn8Y+GPQTKtphFDwTO/YW5vUPbEn2F0ESKDM2qESW+o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713387429; c=relaxed/simple;
-	bh=8JttYOL48ZiCTzSBrA46kuVAs3RAQT2JNWiTA4+xYos=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=HkdO4p1ZS3UMuxZ0FnCCf2rzz8bAf8ZR7Vp2a1l4Cb/uhTNWSVD/oi8cRUi4KE/Zz3me+xW9so6jidtyLmlg/No0yPINFvUqmoIrdWtSyzKRIWNlZZZg+kszrlokMRVlYZjonL1tVy91o2AT1ZJozeKcaB6afngs/pNLM+v7EVo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech; spf=pass smtp.mailfrom=est.tech; dkim=pass (1024-bit key) header.d=est.tech header.i=@est.tech header.b=WT/HVwBv; arc=fail smtp.client-ip=40.107.20.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=est.tech
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=est.tech
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=C0bPTQRwNU7AE567FpCEYoiWzqUsN4b4gy9uZlSveW0TEkwpVvG/kddh5BlN1GMyr/RsmD9ZoDEMlF0NU3b5tnOH9Gw6trDO8PN+sJ3NaLumygiwzG71Qb+ZgRz1GgYoZ2a7jLG2JYBV1Ovwi61odGl/QELzLxSITgY12gPIGWllipJRrcWRFY/Rq61J7PzvYO8/Ud0R7BruWk/9xr3nQ/xKaWBdZ0iKpNLLHBFw4737jXJhq5/+dmb0CM3PA7nH1eMv/hvR1yYiO4i4llQM0Lc9GeEti98LSuhvnfiiW9PCwd8/PRbc4UFNQJUF1hdi2KY2h/N8jEVuXp/ILLiclg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tduVQVf5sRHYzO1k5MdrVHFkqnby77Qq0ovt92I9vFk=;
- b=kU0TgHt1mau2vPhpyChWtDXN43AcXWf9U/Rxv8V2FcxrHC4igIydXbNRbPKMMxKRXvmktZpY9PflmQUKHI9AVKauJh+00ApN+YKAPL5h+tMsRPNZP9a15T9EGIQsi/zXUETOejaB2vifCfD87vayoDl2VJjXTtKAdqXW93/+BboEZ4kywVjIigbLojrR42E+kLxbrSTRoJH19xu5SvW4Ub57WOfvfJiFwMFHTpXMt7UHImNmpDF22XsFpbzxeQD7EY1InPBERaN2Fp6hxSAAUrzgS9KcuzUOvVtlKdFeeIvdDqgjLdlO7QOw3H7v/D6a8xA7D2bVnmlc308bNfFtNA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=est.tech; dmarc=pass action=none header.from=est.tech;
- dkim=pass header.d=est.tech; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=est.tech; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tduVQVf5sRHYzO1k5MdrVHFkqnby77Qq0ovt92I9vFk=;
- b=WT/HVwBvNTRbSQiVlaXIRRH0Cy/LhtjUKhdf1DFIL/bIibjY8lbR8N9FQonEyD4chz09N0zsOQ81SXuUyYeN1Vjba8F1W/F6QHbHAjPr3/NsUzAn1352sX9YH+kqZ6ct2HGZ78U6gXW1lTgiQA6MQHLT7gXpsb9pz4MH+PcipcQ=
-Received: from AM7P189MB0807.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:115::19)
- by AS1P189MB1912.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:4a2::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.46; Wed, 17 Apr
- 2024 20:57:04 +0000
-Received: from AM7P189MB0807.EURP189.PROD.OUTLOOK.COM
- ([fe80::53cd:a2f6:34be:7dab]) by AM7P189MB0807.EURP189.PROD.OUTLOOK.COM
- ([fe80::53cd:a2f6:34be:7dab%6]) with mapi id 15.20.7452.049; Wed, 17 Apr 2024
- 20:57:04 +0000
-From: Kyle Swenson <kyle.swenson@est.tech>
-To: Kory Maincent <kory.maincent@bootlin.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
-	<mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg Kroah-Hartman
-	<gregkh@linuxfoundation.org>, "Rafael J. Wysocki" <rafael@kernel.org>, Rob
- Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
-	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, Dent Project <dentproject@linuxfoundation.org>,
-	"kernel@pengutronix.de" <kernel@pengutronix.de>, Maxime Chevallier
-	<maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v9 00/14] net: Add support for Power over
- Ethernet (PoE)
-Thread-Topic: [PATCH net-next v9 00/14] net: Add support for Power over
- Ethernet (PoE)
-Thread-Index: AQHakNVHtcNb31DvJEedkVvpiHJYm7Fs8eaA
-Date: Wed, 17 Apr 2024 20:57:04 +0000
-Message-ID: <ZiA3UKgbLOa-a9Le@p620>
-References: <20240417-feature_poe-v9-0-242293fd1900@bootlin.com>
-In-Reply-To: <20240417-feature_poe-v9-0-242293fd1900@bootlin.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=est.tech;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM7P189MB0807:EE_|AS1P189MB1912:EE_
-x-ms-office365-filtering-correlation-id: 8ba09f7f-3e76-4485-666e-08dc5f20efc7
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- MxhD1g9Dr/wvLfCleXPpZ72NsYYx5FevdfGKz91XQCmsgbVTC++vMU68xHowZqPDawv+F2G3FJuVC1kT46NhY6fnY1Ak9jLfsrFdZbGjAJYs9nCU296Dj5qMa/3YeNEB/Mn1Hz8BlxQa5RlfkX2wWoi+9zZ7u5jW4CQFTnlTeAJyb6+SdDTPBxg9YKLxevTe6ujAMd7pMaz6JOEqgcwLt4UdVhfYn6PNEBR1h+z6/OkKsMI2KjckT/T2CG/vD5SYMT9F43kfB+GmX2GTYvF/Oaf3eSu8J/68HwCD21z9gOcpTJk0O7ID0rPBWZRC3IR6MnbnSSk3Q31JvmrQoxIPPQIr5mZndOTpoBvUwFdUMpl8oHRzlqIvnKjXUsIF+HI8Ao7I2Kr1tX4hj+qCZcp47sBLaJm4JoViqTKRXOiiNs8FRwwUXXffQBwCOyYm9OzOidyJrlxS+UiIPFK4b/A+QdF48HcQn21OKuxbXPqo2JhO2SaGbLDifhTPXf2wPO08+p5ylv5dT0/jocz7CyY0E7aMgWeCCOAC0XTbn6FEXF+VimHRuNJA4yxGxAwQJBoKFCZoSHvPadz3IQ1ch24HYi1a01QnGyiIPBvs+vnoptWHcNe/4gls8vv4kZ+okFqv3huaOcexXDklRhExycFYZhbBbYOtoIzksXuCAkJN6DQWwB75LuZjUc7AT7lygdWQx3iz90joRvNIisFbVnlJt/wQ/IIf0+Rjz/eizOYHdXc=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM7P189MB0807.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(7416005)(366007)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?McV3mC2nvZN/GTmt80/jNw7dHCJmn7qetU4Jnyk0uG6tC27pgGWTUKnu9ARZ?=
- =?us-ascii?Q?6LGzJM08WumLmeFLP05JvHYHbam1qPLc0hsJ1JyRIZ936P9avvDTvRXDDEON?=
- =?us-ascii?Q?fwyWVdg16z9pMn6wPUIM1GjEu8CReHGL6LlBnsagX87LUh01q2yNusW52wqb?=
- =?us-ascii?Q?4NjO3j7N4U4N+Y3HWDTh8A2UmCoKIWLPz4LO1tPZMiyoSZoqFEKuNd5TYYYk?=
- =?us-ascii?Q?pKfONs6MUeKH9CJkDwHF4weVHsix3bWW7PWzRRA0mrOv2v6DqaQ7uToyXG4g?=
- =?us-ascii?Q?UPKzm4/cQJ9oHVqsEsI/M4I0y0RWVZFzBCGUijxjMwffZHUK/QwCpIUBpqgO?=
- =?us-ascii?Q?yysfV0BRt3pVubeGASESi7B+Nv3KwcVzGulaP8ojsV0HiM6945x7WN27+TL2?=
- =?us-ascii?Q?u78ZbMcS9nvY7rukEHXXPPCGQmlBVDmLUB6cj1vwfZW2RwS6LOMU3BS0GC24?=
- =?us-ascii?Q?KRrCEG/y6MZ943eFEzIQ+CVj38/v45KQ7JcGXTo5YbB+CzfLALi5e/xBHCjF?=
- =?us-ascii?Q?0+ZFuiobnL6O/KzT+UY0cSIZ1dFk/lVjIRf2eIlwLVZ1zD8CyAvepSUconyx?=
- =?us-ascii?Q?pqpmpsG+opi6wf7Pgj/R5f7KnFR41QJ6ejvEDjF+3DDNUJct9V4edLuDzA8I?=
- =?us-ascii?Q?yuGfgTXiEc2LNQfO7r/Nq7AeM0+5xfAhKaBjKs6GwQSN/ET9mhHX/YOv/HYx?=
- =?us-ascii?Q?+uyuFvzNkfid3PJkHFs1zcB3JMQ0uZDgzjGg5KDlqXMwip7jDhXFJY5V7mXS?=
- =?us-ascii?Q?3STx+4gwUMUoeEpo1q5N4OJUI1Im5UN9KAS7yRMy5WXADwh7MWD4rdTlU+ui?=
- =?us-ascii?Q?6TR0GEfv2kcG7MOljX34NbeHSb9M+6uG79CmCBqZgHFtu4lcHQ2JiFLVHo0/?=
- =?us-ascii?Q?j/e1IakoLmdklik2wZKdJizdunaO8iC0DapBkR2FVLDjh+jjGOmvCoZrWCLf?=
- =?us-ascii?Q?Vq12tRTKRug22GBgi3AnZ5MXzN07wWdKKry/Sj+/wrUjQ8iQ+WHUtyHI4TRZ?=
- =?us-ascii?Q?9e2cx5MCnedWEsZQp7Wdk0dzhujykxu+/fvlYLFOiAkKRyKHBOZ8uX/Dq/3X?=
- =?us-ascii?Q?dfryxhMRboSxf1izAwUnsgBgg7xoQc2IiRfFgjej1a20hm5bIef9t2UQNegF?=
- =?us-ascii?Q?XZtC6usnqiD9+vcU7c1dyMhkpI5B6f8DuN201Z9BU+3QNXQqpVU65GgDrlZQ?=
- =?us-ascii?Q?DbX5yI0cNucX29xKZK1VpH1k9NE0E6R0mbMOwUZ7XOnGIR41WiOYWro8YhXb?=
- =?us-ascii?Q?waCtFklCP/HiKWefk5+/yIos5hivQkGY0VO5+R4/jaBkUjkE6zqn3qVkznX6?=
- =?us-ascii?Q?TWSj/enRgPUMgChlJMFrkYiLkrnrwFMTBmafVCfGdrGnhLcNuxaM1AMNUlQb?=
- =?us-ascii?Q?P7xpCBz5WyB/y6PxDpYAECxhbcYiLtYnUsMRtVB4YLHYd/Wq08qbejsLYvRG?=
- =?us-ascii?Q?SSof5l3+3Y+4kfPDyaiNxSn0GORWrKm3BDLcKF07NvvsJqz4Vw9qnr2GbKNO?=
- =?us-ascii?Q?XG5Z78+9QTx6xvOxPc3z1PoPHbGy2qAbY+u96oVlGTAe8lPGW+bW4XLooZZM?=
- =?us-ascii?Q?DCH9H+fPNq9wIODmUIrBaUg52p5m6/wxavZX9ITC?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <E8467FCC43867542B7E91EC0CC01C565@EURP189.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB9F481BE
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 20:58:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713387491; cv=none; b=kIsO1MCNCSiTILODwd+8Ir6FNEjv1+o6tDNk1rz7j4T9UdRBRktE+6Ms325WZDgeJNb498Q3Cv0ecy3wKN5aBn3ClyE+4NnmKly+Kpv2Afn9vMx7bUwc5DehDUdXfwYWzuUxQ3UdDLFjztX3Aqz3E+vru0MlZyzyFd6eIty23f4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713387491; c=relaxed/simple;
+	bh=xIgWSxLBbguyRcb0zKhiKbT1dbRUzTnSdHRJoAVzhVs=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=YPSxkZWQcIf+GWLKzJX4KKhxVW4E/djul4NlDFPe510QthM+nWs7U44DaU81POIDbgYlXwzeYSOdqoWAgbLnEX+H8cAm6LEmWgmkB3QiOLjy26/qO98SG+rKRJu9XItpzdaXC6IvDU/9S59Gocqgtkmo9SVHbqOLDZsu6DhgESg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ziweixiao.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PH0khpJ+; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ziweixiao.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5d8bdadc79cso96345a12.2
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 13:58:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713387489; x=1713992289; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=gEAhZlLshKO/PptO5/jBMX3CmASJWwGmWZLqDVkQJdg=;
+        b=PH0khpJ+UpzuKErvWIN4DgO+lBUWTffwSBC36lSds8Bh7goeNCIrmlaoHibPgqT2Nx
+         7xT27+P3mbhmOpk9WvPO4H79HmzNvqDr5EhUmedhdqiebXJG+O4MwvuQ+teUQxSXipPh
+         vmErxTCVjShs0/dwg6rkYgQw04aV/2J0CjLycFOK8pjUxLUnL1TaH2ZSYv0WuEGpk4IM
+         ZVOi5D2/4VZskSt3bNmkQLec8C7TfLPI7u1h9UNCvta1/+jS7oMbp3TezkY9tB6YbYy3
+         Sd3awESLPk1wMOb4WO6FqcFcNcUdjkkO4p+DD9/knrr2RX0dqZCgc5xSW2VsuADgUKc9
+         g6yg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713387489; x=1713992289;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=gEAhZlLshKO/PptO5/jBMX3CmASJWwGmWZLqDVkQJdg=;
+        b=cZ4yixQFOCsl17UBVOdDiIwuoDm3eOyBzgJi0G9oytB6bSMX1ZxvreMsfdXa4PgW7X
+         qq0Des99hJNHmWNJMlN+rFmk2gU9xpV6pI507zQjEweoUb2Dr1/QcK8nP5EUc6fzKVN3
+         Pq+/kF3uEm5k1xKX+CU3nhuoHP/5GPWekp53WlFPoH/aW6Pfmg9Ft6LbE2vfobWAoYbq
+         qu8YCCadb98CSJboDw3WqSUALQFPcCJw44zxwl8CoIUxdrqiVPO7zkOe7Apij0//EIqM
+         ogp6SHdRaWStxMRJ9M5KMhgzDXcAjGeUVkRVT5pVbGekvI4umokuRm5S45PmcYZu/Q5w
+         ks+A==
+X-Gm-Message-State: AOJu0YxZaZQcZ98CEI7BkyD8gomgbFV5f7KwoH3eDWFwSbmFRzaG03ws
+	lw2LeaBjXfDCbktl813BUZ0CHYpbsNzPpk7OYU/Usr1Kn4q8BYOW5M3fc5JaOQSKwaW6DHk92Cw
+	NvGrBKcvaU1adpZ3pm3UrUYUfglbB/T8XoIvtpoYNUKsBm8XnEJtMVjPBpk7sHBOmAZ5EhLROI0
+	Q6ap0lYnsae9FU2jJy0RWoIqBJfwC04evBIferYDrM1cvnIMbV
+X-Google-Smtp-Source: AGHT+IEgXH3RvQT2/Y9Asb+xVSS6BM3mP3BTVVzG4B+WcQtNy06SR1k9LfX02V/9rhbYZjdmkEXlX+wNmitsBw8=
+X-Received: from ziwei-gti.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:9b0])
+ (user=ziweixiao job=sendgmr) by 2002:a63:2d7:0:b0:5f0:6959:8a46 with SMTP id
+ 206-20020a6302d7000000b005f069598a46mr1723pgc.9.1713387487983; Wed, 17 Apr
+ 2024 13:58:07 -0700 (PDT)
+Date: Wed, 17 Apr 2024 20:57:57 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: est.tech
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM7P189MB0807.EURP189.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ba09f7f-3e76-4485-666e-08dc5f20efc7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Apr 2024 20:57:04.5850
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: d2585e63-66b9-44b6-a76e-4f4b217d97fd
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lwk6yCgC6Mm4GNLnninKgWBk4+WUOK+F9awoOMtXpnv9NOuBQNAvZtwPYq7U6Re+bIkcY/zovjP5sWQ00630hA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1P189MB1912
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
+Message-ID: <20240417205757.778551-1-ziweixiao@google.com>
+Subject: [PATCH net-next] gve: Remove qpl_cfg struct since qpl_ids map with
+ queues respectively
+From: Ziwei Xiao <ziweixiao@google.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, jeroendb@google.com, pkaligineedi@google.com, 
+	shailend@google.com, willemb@google.com, hramamurthy@google.com, 
+	rushilg@google.com, jfraker@google.com, junfeng.guo@intel.com, 
+	Julia.Lawall@inria.fr, horms@kernel.org, linux-kernel@vger.kernel.org, 
+	Ziwei Xiao <ziweixiao@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Apr 17, 2024 at 04:39:48PM +0200, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
->=20
-> This patch series aims at adding support for PoE (Power over Ethernet),
-> based on the already existing support for PoDL (Power over Data Line)
-> implementation. In addition, it adds support for two specific PoE
-> controller, the Microchip PD692x0 and the TI TPS23881.
->=20
+The qpl_cfg struct was used to make sure that no two different queues
+are using QPL with the same qpl_id. We can remove that qpl_cfg struct
+since now the qpl_ids map with the queues respectively as follows:
+For tx queues: qpl_id = tx_qid
+For rx queues: qpl_id = max_tx_queues + rx_qid
 
-I don't have much in the way of review comments, it all looks pretty
-good to me, for whatever that's worth.  I am excited for this support to
-be mainlined, it will be super useful for our routers and provides and
-extensible way I can eventually add support for additional PSE chipsets,
-like the LTC4266 from Linear Technology.
+And when XDP is used, it will need the user to reduce the tx queues to
+be at most half of the max_tx_queues. Then it will use the same number
+of tx queues starting from the end of existing tx queues for XDP. So the
+XDP queues will not exceed the max_tx_queues range and will not overlap
+with the rx queues, where the qpl_ids will not have overlapping too.
 
-I look forward to working with this to add support for port priorities
-and power management given a system-level power budget that is less than
-the sum of total power that could be supplied by all ports.  I don't
-know exactly how this will look, but I do know that without this first
-part, it wouldn't be possible.
+Considering of that, we remove the qpl_cfg struct to get the qpl_id
+directly based on the queue id. Unless we are erroneously allocating a
+rx/tx queue that has already been allocated, we would never allocate
+the qpl with the same qpl_id twice. In that case, it should fail much
+earlier than the QPL assignment.
 
-So, great work, and thanks for the effort.  It's appreciated and will be
-very useful for us.  I look forward to working with you to build on top
-of this.
+Suggested-by: Praveen Kaligineedi <pkaligineedi@google.com>
+Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
+Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
+Reviewed-by: Shailend Chand <shailend@google.com>
+---
+ drivers/net/ethernet/google/gve/gve.h         | 39 +------------------
+ drivers/net/ethernet/google/gve/gve_ethtool.c |  9 -----
+ drivers/net/ethernet/google/gve/gve_main.c    | 38 +-----------------
+ drivers/net/ethernet/google/gve/gve_rx.c      | 12 ++----
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c  | 12 +++---
+ drivers/net/ethernet/google/gve/gve_tx.c      | 12 ++----
+ drivers/net/ethernet/google/gve/gve_tx_dqo.c  | 11 ++----
+ 7 files changed, 20 insertions(+), 113 deletions(-)
 
-Thanks so much,
-Kyle=
+diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
+index e97633b68e25..53b5244dc7bc 100644
+--- a/drivers/net/ethernet/google/gve/gve.h
++++ b/drivers/net/ethernet/google/gve/gve.h
+@@ -639,7 +639,6 @@ struct gve_ptype_lut {
+ 
+ /* Parameters for allocating queue page lists */
+ struct gve_qpls_alloc_cfg {
+-	struct gve_qpl_config *qpl_cfg;
+ 	struct gve_queue_config *tx_cfg;
+ 	struct gve_queue_config *rx_cfg;
+ 
+@@ -655,9 +654,8 @@ struct gve_qpls_alloc_cfg {
+ struct gve_tx_alloc_rings_cfg {
+ 	struct gve_queue_config *qcfg;
+ 
+-	/* qpls and qpl_cfg must already be allocated */
++	/* qpls must already be allocated */
+ 	struct gve_queue_page_list *qpls;
+-	struct gve_qpl_config *qpl_cfg;
+ 
+ 	u16 ring_size;
+ 	u16 start_idx;
+@@ -674,9 +672,8 @@ struct gve_rx_alloc_rings_cfg {
+ 	struct gve_queue_config *qcfg;
+ 	struct gve_queue_config *qcfg_tx;
+ 
+-	/* qpls and qpl_cfg must already be allocated */
++	/* qpls must already be allocated */
+ 	struct gve_queue_page_list *qpls;
+-	struct gve_qpl_config *qpl_cfg;
+ 
+ 	u16 ring_size;
+ 	u16 packet_buffer_size;
+@@ -732,7 +729,6 @@ struct gve_priv {
+ 	u16 num_xdp_queues;
+ 	struct gve_queue_config tx_cfg;
+ 	struct gve_queue_config rx_cfg;
+-	struct gve_qpl_config qpl_cfg; /* map used QPL ids */
+ 	u32 num_ntfy_blks; /* spilt between TX and RX so must be even */
+ 
+ 	struct gve_registers __iomem *reg_bar0; /* see gve_register.h */
+@@ -1053,37 +1049,6 @@ static inline u32 gve_get_rx_pages_per_qpl_dqo(u32 rx_desc_cnt)
+ 	return 2 * rx_desc_cnt;
+ }
+ 
+-/* Returns a pointer to the next available tx qpl in the list of qpls */
+-static inline
+-struct gve_queue_page_list *gve_assign_tx_qpl(struct gve_tx_alloc_rings_cfg *cfg,
+-					      int tx_qid)
+-{
+-	/* QPL already in use */
+-	if (test_bit(tx_qid, cfg->qpl_cfg->qpl_id_map))
+-		return NULL;
+-	set_bit(tx_qid, cfg->qpl_cfg->qpl_id_map);
+-	return &cfg->qpls[tx_qid];
+-}
+-
+-/* Returns a pointer to the next available rx qpl in the list of qpls */
+-static inline
+-struct gve_queue_page_list *gve_assign_rx_qpl(struct gve_rx_alloc_rings_cfg *cfg,
+-					      int rx_qid)
+-{
+-	int id = gve_get_rx_qpl_id(cfg->qcfg_tx, rx_qid);
+-	/* QPL already in use */
+-	if (test_bit(id, cfg->qpl_cfg->qpl_id_map))
+-		return NULL;
+-	set_bit(id, cfg->qpl_cfg->qpl_id_map);
+-	return &cfg->qpls[id];
+-}
+-
+-/* Unassigns the qpl with the given id */
+-static inline void gve_unassign_qpl(struct gve_qpl_config *qpl_cfg, int id)
+-{
+-	clear_bit(id, qpl_cfg->qpl_id_map);
+-}
+-
+ /* Returns the correct dma direction for tx and rx qpls */
+ static inline enum dma_data_direction gve_qpl_dma_dir(struct gve_priv *priv,
+ 						      int id)
+diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
+index 299206d15c73..bd7632eed776 100644
+--- a/drivers/net/ethernet/google/gve/gve_ethtool.c
++++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
+@@ -510,7 +510,6 @@ static int gve_adjust_ring_sizes(struct gve_priv *priv,
+ 	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
+ 	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
+ 	struct gve_qpls_alloc_cfg qpls_alloc_cfg = {0};
+-	struct gve_qpl_config new_qpl_cfg;
+ 	int err;
+ 
+ 	/* get current queue configuration */
+@@ -521,14 +520,6 @@ static int gve_adjust_ring_sizes(struct gve_priv *priv,
+ 	tx_alloc_cfg.ring_size = new_tx_desc_cnt;
+ 	rx_alloc_cfg.ring_size = new_rx_desc_cnt;
+ 
+-	/* qpl_cfg is not read-only, it contains a map that gets updated as
+-	 * rings are allocated, which is why we cannot use the yet unreleased
+-	 * one in priv.
+-	 */
+-	qpls_alloc_cfg.qpl_cfg = &new_qpl_cfg;
+-	tx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
+-	rx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
+-
+ 	if (netif_running(priv->dev)) {
+ 		err = gve_adjust_config(priv, &qpls_alloc_cfg,
+ 					&tx_alloc_cfg, &rx_alloc_cfg);
+diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
+index a515e5af843c..61039e3dd2bb 100644
+--- a/drivers/net/ethernet/google/gve/gve_main.c
++++ b/drivers/net/ethernet/google/gve/gve_main.c
+@@ -829,7 +829,6 @@ static void gve_tx_get_curr_alloc_cfg(struct gve_priv *priv,
+ 	cfg->qcfg = &priv->tx_cfg;
+ 	cfg->raw_addressing = !gve_is_qpl(priv);
+ 	cfg->qpls = priv->qpls;
+-	cfg->qpl_cfg = &priv->qpl_cfg;
+ 	cfg->ring_size = priv->tx_desc_cnt;
+ 	cfg->start_idx = 0;
+ 	cfg->num_rings = gve_num_tx_queues(priv);
+@@ -1119,22 +1118,13 @@ static int gve_alloc_qpls(struct gve_priv *priv, struct gve_qpls_alloc_cfg *cfg,
+ 	if (!qpls)
+ 		return -ENOMEM;
+ 
+-	cfg->qpl_cfg->qpl_map_size = BITS_TO_LONGS(max_queues) *
+-		sizeof(unsigned long) * BITS_PER_BYTE;
+-	cfg->qpl_cfg->qpl_id_map = kvcalloc(BITS_TO_LONGS(max_queues),
+-					    sizeof(unsigned long), GFP_KERNEL);
+-	if (!cfg->qpl_cfg->qpl_id_map) {
+-		err = -ENOMEM;
+-		goto free_qpl_array;
+-	}
+-
+ 	/* Allocate TX QPLs */
+ 	page_count = priv->tx_pages_per_qpl;
+ 	tx_num_qpls = gve_num_tx_qpls(cfg->tx_cfg, cfg->num_xdp_queues,
+ 				      gve_is_qpl(priv));
+ 	err = gve_alloc_n_qpls(priv, qpls, page_count, 0, tx_num_qpls);
+ 	if (err)
+-		goto free_qpl_map;
++		goto free_qpl_array;
+ 
+ 	/* Allocate RX QPLs */
+ 	rx_start_id = gve_rx_start_qpl_id(cfg->tx_cfg);
+@@ -1157,9 +1147,6 @@ static int gve_alloc_qpls(struct gve_priv *priv, struct gve_qpls_alloc_cfg *cfg,
+ 
+ free_tx_qpls:
+ 	gve_free_n_qpls(priv, qpls, 0, tx_num_qpls);
+-free_qpl_map:
+-	kvfree(cfg->qpl_cfg->qpl_id_map);
+-	cfg->qpl_cfg->qpl_id_map = NULL;
+ free_qpl_array:
+ 	kvfree(qpls);
+ 	return err;
+@@ -1175,9 +1162,6 @@ static void gve_free_qpls(struct gve_priv *priv,
+ 	if (!qpls)
+ 		return;
+ 
+-	kvfree(cfg->qpl_cfg->qpl_id_map);
+-	cfg->qpl_cfg->qpl_id_map = NULL;
+-
+ 	for (i = 0; i < max_queues; i++)
+ 		gve_free_queue_page_list(priv, &qpls[i], i);
+ 
+@@ -1292,7 +1276,6 @@ static void gve_qpls_get_curr_alloc_cfg(struct gve_priv *priv,
+ 	  cfg->raw_addressing = !gve_is_qpl(priv);
+ 	  cfg->is_gqi = gve_is_gqi(priv);
+ 	  cfg->num_xdp_queues = priv->num_xdp_queues;
+-	  cfg->qpl_cfg = &priv->qpl_cfg;
+ 	  cfg->tx_cfg = &priv->tx_cfg;
+ 	  cfg->rx_cfg = &priv->rx_cfg;
+ 	  cfg->qpls = priv->qpls;
+@@ -1306,7 +1289,6 @@ static void gve_rx_get_curr_alloc_cfg(struct gve_priv *priv,
+ 	cfg->raw_addressing = !gve_is_qpl(priv);
+ 	cfg->enable_header_split = priv->header_split_enabled;
+ 	cfg->qpls = priv->qpls;
+-	cfg->qpl_cfg = &priv->qpl_cfg;
+ 	cfg->ring_size = priv->rx_desc_cnt;
+ 	cfg->packet_buffer_size = gve_is_gqi(priv) ?
+ 				  GVE_DEFAULT_RX_BUFFER_SIZE :
+@@ -1419,7 +1401,6 @@ static int gve_queues_start(struct gve_priv *priv,
+ 	priv->rx = rx_alloc_cfg->rx;
+ 
+ 	/* Record new configs into priv */
+-	priv->qpl_cfg = *qpls_alloc_cfg->qpl_cfg;
+ 	priv->tx_cfg = *tx_alloc_cfg->qcfg;
+ 	priv->rx_cfg = *rx_alloc_cfg->qcfg;
+ 	priv->tx_desc_cnt = tx_alloc_cfg->ring_size;
+@@ -1916,20 +1897,11 @@ int gve_adjust_queues(struct gve_priv *priv,
+ 	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
+ 	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
+ 	struct gve_qpls_alloc_cfg qpls_alloc_cfg = {0};
+-	struct gve_qpl_config new_qpl_cfg;
+ 	int err;
+ 
+ 	gve_get_curr_alloc_cfgs(priv, &qpls_alloc_cfg,
+ 				&tx_alloc_cfg, &rx_alloc_cfg);
+ 
+-	/* qpl_cfg is not read-only, it contains a map that gets updated as
+-	 * rings are allocated, which is why we cannot use the yet unreleased
+-	 * one in priv.
+-	 */
+-	qpls_alloc_cfg.qpl_cfg = &new_qpl_cfg;
+-	tx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
+-	rx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
+-
+ 	/* Relay the new config from ethtool */
+ 	qpls_alloc_cfg.tx_cfg = &new_tx_config;
+ 	tx_alloc_cfg.qcfg = &new_tx_config;
+@@ -2121,18 +2093,10 @@ static int gve_set_features(struct net_device *netdev,
+ 	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
+ 	struct gve_qpls_alloc_cfg qpls_alloc_cfg = {0};
+ 	struct gve_priv *priv = netdev_priv(netdev);
+-	struct gve_qpl_config new_qpl_cfg;
+ 	int err;
+ 
+ 	gve_get_curr_alloc_cfgs(priv, &qpls_alloc_cfg,
+ 				&tx_alloc_cfg, &rx_alloc_cfg);
+-	/* qpl_cfg is not read-only, it contains a map that gets updated as
+-	 * rings are allocated, which is why we cannot use the yet unreleased
+-	 * one in priv.
+-	 */
+-	qpls_alloc_cfg.qpl_cfg = &new_qpl_cfg;
+-	tx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
+-	rx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
+ 
+ 	if ((netdev->features & NETIF_F_LRO) != (features & NETIF_F_LRO)) {
+ 		netdev->features ^= NETIF_F_LRO;
+diff --git a/drivers/net/ethernet/google/gve/gve_rx.c b/drivers/net/ethernet/google/gve/gve_rx.c
+index cd727e55ae0f..9b56e89c4f43 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx.c
++++ b/drivers/net/ethernet/google/gve/gve_rx.c
+@@ -38,7 +38,6 @@ static void gve_rx_unfill_pages(struct gve_priv *priv,
+ 		for (i = 0; i < slots; i++)
+ 			page_ref_sub(rx->data.page_info[i].page,
+ 				     rx->data.page_info[i].pagecnt_bias - 1);
+-		gve_unassign_qpl(cfg->qpl_cfg, rx->data.qpl->id);
+ 		rx->data.qpl = NULL;
+ 
+ 		for (i = 0; i < rx->qpl_copy_pool_mask + 1; i++) {
+@@ -145,13 +144,11 @@ static int gve_rx_prefill_pages(struct gve_rx_ring *rx,
+ 		return -ENOMEM;
+ 
+ 	if (!rx->data.raw_addressing) {
+-		rx->data.qpl = gve_assign_rx_qpl(cfg, rx->q_num);
+-		if (!rx->data.qpl) {
+-			kvfree(rx->data.page_info);
+-			rx->data.page_info = NULL;
+-			return -ENOMEM;
+-		}
++		u32 qpl_id = gve_get_rx_qpl_id(cfg->qcfg_tx, rx->q_num);
++
++		rx->data.qpl = &cfg->qpls[qpl_id];
+ 	}
++
+ 	for (i = 0; i < slots; i++) {
+ 		if (!rx->data.raw_addressing) {
+ 			struct page *page = rx->data.qpl->pages[i];
+@@ -204,7 +201,6 @@ static int gve_rx_prefill_pages(struct gve_rx_ring *rx,
+ 		page_ref_sub(rx->data.page_info[i].page,
+ 			     rx->data.page_info[i].pagecnt_bias - 1);
+ 
+-	gve_unassign_qpl(cfg->qpl_cfg, rx->data.qpl->id);
+ 	rx->data.qpl = NULL;
+ 
+ 	return err;
+diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+index 15108407b54f..53fd2d87233f 100644
+--- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
+@@ -247,10 +247,8 @@ static void gve_rx_free_ring_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
+ 		if (bs->page_info.page)
+ 			gve_free_page_dqo(priv, bs, !rx->dqo.qpl);
+ 	}
+-	if (rx->dqo.qpl) {
+-		gve_unassign_qpl(cfg->qpl_cfg, rx->dqo.qpl->id);
+-		rx->dqo.qpl = NULL;
+-	}
++
++	rx->dqo.qpl = NULL;
+ 
+ 	if (rx->dqo.bufq.desc_ring) {
+ 		size = sizeof(rx->dqo.bufq.desc_ring[0]) * buffer_queue_slots;
+@@ -359,9 +357,9 @@ static int gve_rx_alloc_ring_dqo(struct gve_priv *priv,
+ 		goto err;
+ 
+ 	if (!cfg->raw_addressing) {
+-		rx->dqo.qpl = gve_assign_rx_qpl(cfg, rx->q_num);
+-		if (!rx->dqo.qpl)
+-			goto err;
++		u32 qpl_id = gve_get_rx_qpl_id(cfg->qcfg_tx, rx->q_num);
++
++		rx->dqo.qpl = &cfg->qpls[qpl_id];
+ 		rx->dqo.next_qpl_page_idx = 0;
+ 	}
+ 
+diff --git a/drivers/net/ethernet/google/gve/gve_tx.c b/drivers/net/ethernet/google/gve/gve_tx.c
+index 4b9853adc113..f805700d67e7 100644
+--- a/drivers/net/ethernet/google/gve/gve_tx.c
++++ b/drivers/net/ethernet/google/gve/gve_tx.c
+@@ -225,7 +225,6 @@ static void gve_tx_free_ring_gqi(struct gve_priv *priv, struct gve_tx_ring *tx,
+ 
+ 	if (!tx->raw_addressing) {
+ 		gve_tx_fifo_release(priv, &tx->tx_fifo);
+-		gve_unassign_qpl(cfg->qpl_cfg, tx->tx_fifo.qpl->id);
+ 		tx->tx_fifo.qpl = NULL;
+ 	}
+ 
+@@ -280,12 +279,12 @@ static int gve_tx_alloc_ring_gqi(struct gve_priv *priv,
+ 	tx->raw_addressing = cfg->raw_addressing;
+ 	tx->dev = hdev;
+ 	if (!tx->raw_addressing) {
+-		tx->tx_fifo.qpl = gve_assign_tx_qpl(cfg, idx);
+-		if (!tx->tx_fifo.qpl)
+-			goto abort_with_desc;
++		u32 qpl_id = gve_tx_qpl_id(priv, tx->q_num);
++
++		tx->tx_fifo.qpl = &cfg->qpls[qpl_id];
+ 		/* map Tx FIFO */
+ 		if (gve_tx_fifo_init(priv, &tx->tx_fifo))
+-			goto abort_with_qpl;
++			goto abort_with_desc;
+ 	}
+ 
+ 	tx->q_resources =
+@@ -301,9 +300,6 @@ static int gve_tx_alloc_ring_gqi(struct gve_priv *priv,
+ abort_with_fifo:
+ 	if (!tx->raw_addressing)
+ 		gve_tx_fifo_release(priv, &tx->tx_fifo);
+-abort_with_qpl:
+-	if (!tx->raw_addressing)
+-		gve_unassign_qpl(cfg->qpl_cfg, tx->tx_fifo.qpl->id);
+ abort_with_desc:
+ 	dma_free_coherent(hdev, bytes, tx->desc, tx->bus);
+ 	tx->desc = NULL;
+diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+index 70f29b90a982..3d825e406c4b 100644
+--- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
++++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
+@@ -236,10 +236,7 @@ static void gve_tx_free_ring_dqo(struct gve_priv *priv, struct gve_tx_ring *tx,
+ 	kvfree(tx->dqo.tx_qpl_buf_next);
+ 	tx->dqo.tx_qpl_buf_next = NULL;
+ 
+-	if (tx->dqo.qpl) {
+-		gve_unassign_qpl(cfg->qpl_cfg, tx->dqo.qpl->id);
+-		tx->dqo.qpl = NULL;
+-	}
++	tx->dqo.qpl = NULL;
+ 
+ 	netif_dbg(priv, drv, priv->dev, "freed tx queue %d\n", idx);
+ }
+@@ -352,9 +349,9 @@ static int gve_tx_alloc_ring_dqo(struct gve_priv *priv,
+ 		goto err;
+ 
+ 	if (!cfg->raw_addressing) {
+-		tx->dqo.qpl = gve_assign_tx_qpl(cfg, idx);
+-		if (!tx->dqo.qpl)
+-			goto err;
++		u32 qpl_id = gve_tx_qpl_id(priv, tx->q_num);
++
++		tx->dqo.qpl = &cfg->qpls[qpl_id];
+ 
+ 		if (gve_tx_qpl_buf_init(tx))
+ 			goto err;
+-- 
+2.44.0.769.g3c40516874-goog
+
 
