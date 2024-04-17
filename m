@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-88549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B4A48A7A68
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 04:15:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE5958A7A77
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 04:20:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 691AE1C21377
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 02:15:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84CB7283B67
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 02:20:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CB474687;
-	Wed, 17 Apr 2024 02:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E916FB9;
+	Wed, 17 Apr 2024 02:20:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o5wayfYw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rseRoqw4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D9A4430;
-	Wed, 17 Apr 2024 02:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F9B63A9;
+	Wed, 17 Apr 2024 02:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713320120; cv=none; b=N+/XXfn8U2B/mRbH8pllcTfPs+UY1Q4MPUoj4L4CPL4Xi6jyEQS2dsv+WgL8Idt3DO56HhQOUKylgJg1A/7Dp2XO3DG9MIsHBEkTBQEWm86JULhIJODTMTWZmRjbd3Lo0ZtrOkyG2wX3501BxZpuYQLRjikBtF4U310qTZEe9QQ=
+	t=1713320440; cv=none; b=P61pUn1/LIzuGf8qjYn2Bg86ieBoslWUxek+O6WnATjrOYwJnFj0z8iT0pTVkb84thQ7phii4JqY0KFwPIhKxnsWk8vLC9j0Q1TFkhLzDsPs+ZdpnZuTqBkhNxpMVF+5Tl4BiMFjPMPZgaQCw4ThcgCOI9UrLvnMs+kgZ/JPLxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713320120; c=relaxed/simple;
-	bh=KcjW4v9LPhuP/rC4Hb0v6FD940Tv/do/SHcz+AsZO6g=;
+	s=arc-20240116; t=1713320440; c=relaxed/simple;
+	bh=0Hg5c0S/t8RZQIbbjbz1G+f//lzhTJ+pyxHazCXMv1Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I+n/tQb1DvmUCrR3hqwsYblNITcUiFSzpsZfK5NNapVRa2A8GnitZ4XH9MHnHsGPBLFsmReAASJySrBSH4OBvqymMQV1e/oLCnk1eo+cHbJPD3jG4Qsune+LXDRJO36XYjYXO/u1hqrJdxwtx+SoJFsnBcK8WLlkQjaDoJ+ctsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o5wayfYw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACA29C113CE;
-	Wed, 17 Apr 2024 02:15:18 +0000 (UTC)
+	 MIME-Version:Content-Type; b=F5RH6uDXSyRlbGkVThVLdPAsPTL0pnNjQPFo5a+PWxcg3CYNZ/4zCOYQVkCY2+OPlGpc4NYvH2PjcDsGJAIHn8kbhVG0xUuCGux2cm2TFHYSv5a3ovQ4Apm1lrtKYzsQCrbZ0kBnc3P3Kkp+J/HtHbvHwyG8Yh4tzoTwzd5QXiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rseRoqw4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AB7FC2BD11;
+	Wed, 17 Apr 2024 02:20:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713320119;
-	bh=KcjW4v9LPhuP/rC4Hb0v6FD940Tv/do/SHcz+AsZO6g=;
+	s=k20201202; t=1713320439;
+	bh=0Hg5c0S/t8RZQIbbjbz1G+f//lzhTJ+pyxHazCXMv1Y=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=o5wayfYwbiuwQnVYrPQlpT72jghBvBMQC6rckXjnlBaNiTaRmHcoR8vmJ5oz8Nx9X
-	 Js+6FebnrF9YaP+4rDpGNQVtDOiFvhHaS6ggMkuwFUwvUimaawBbhEvqZyiFzq2S8l
-	 CWzB483BmU7R+fWbigPbXvlqLeJONF3zfS3O9BCsB5EgUHJfVG0/NTgkmh+I2sfsyv
-	 W/dN7gw9gF11ciLXU5fthI/js3PrMcdqFP17WYrV3kL1qJ1sEWa8vM4C65lwgPAi57
-	 VVyJ28M/BuTt2H7t44+/BLabCrxQkbVd68hw/q5oLMQUyr5wXqrCA4uDKomH/uTHMV
-	 sePX1d+1W0ZyQ==
-Date: Tue, 16 Apr 2024 19:15:17 -0700
+	b=rseRoqw4lFdF0hhyXzvd7xrgXS6prHI7OMzmlnz4IwxZqXfNOFWg364bzbK7t0RBK
+	 d0+eM2DXbEfmfryDUxqeoahYGPISMjRWv/eO3YzFxeA1JqZkRCmpleQi52sjVLBaWc
+	 7NB545njetPwrYcrBE1fsrpUtAU97jCZP9Zgz45soGkGnCwk0UN9cWux2U2ZMMJ0gs
+	 XxfKrn1krvGLkNhewiBMuZcMFnR99eg0QboUQj+GZ2vLqOahxpZ5EwvswEOBv/BsBd
+	 kOydH/0qv4J+KqJGPlf4CF0rGFl3d19ar4HYXBhSZiPmXNSzSnZZI7SY8RmeITOAQu
+	 7wtW6Sm2gKx+A==
+Date: Tue, 16 Apr 2024 19:20:37 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Kory Maincent <kory.maincent@bootlin.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
@@ -58,11 +58,12 @@ Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
  linux-doc@vger.kernel.org, devicetree@vger.kernel.org, Dent Project
  <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime Chevallier
  <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v8 10/17] net: pse-pd: Add support for PSE PIs
-Message-ID: <20240416191517.65c63e21@kernel.org>
-In-Reply-To: <20240414-feature_poe-v8-10-e4bf1e860da5@bootlin.com>
+Subject: Re: [PATCH net-next v8 04/17] ethtool: Expand Ethernet Power
+ Equipment with c33 (PoE) alongside PoDL
+Message-ID: <20240416192037.50aa0136@kernel.org>
+In-Reply-To: <20240414-feature_poe-v8-4-e4bf1e860da5@bootlin.com>
 References: <20240414-feature_poe-v8-0-e4bf1e860da5@bootlin.com>
-	<20240414-feature_poe-v8-10-e4bf1e860da5@bootlin.com>
+	<20240414-feature_poe-v8-4-e4bf1e860da5@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,44 +73,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 14 Apr 2024 16:21:59 +0200 Kory Maincent wrote:
-> +/**
-> + * of_pse_match_pi - Return the PSE PI id of the device node phandle
-> + * @pcdev: a pointer to the PSE controller device
-> + * @np: a pointer to the device node
-> + */
-> +static int of_pse_match_pi(struct pse_controller_dev *pcdev,
+On Sun, 14 Apr 2024 16:21:53 +0200 Kory Maincent wrote:
+> + * @ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED: "The enumeration \u201cdisabled\u201d
+> + *	indicates that the PSE State diagram is in the state DISABLED."
+> + * @ETHTOOL_C33_PSE_PW_D_STATUS_SEARCHING: "The enumeration \u201csearching\u201d
+> + *	indicates the PSE State diagram is in a state other than those
+> + *	listed."
+> + * @ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING: "The enumeration
+> + *	\u201cdeliveringPower\u201d indicates that the PSE State diagram is in the
+> + *	state POWER_ON."
+> + * @ETHTOOL_C33_PSE_PW_D_STATUS_TEST: "The enumeration \u201ctest\u201d indicates that
+> + *	the PSE State diagram is in the state TEST_MODE."
+> + * @ETHTOOL_C33_PSE_PW_D_STATUS_FAULT: "The enumeration \u201cfault\u201d indicates that
+> + *	the PSE State diagram is in the state TEST_ERROR."
+> + * @ETHTOOL_C33_PSE_PW_D_STATUS_OTHERFAULT: "The enumeration \u201cotherFault\u201d
 
-There's new nitpick from kernel-doc - if the function returns something
-the kdoc needs to document Return:  ..
-
-Sorry I missed this check failing because the fact that the series is
-17 patches lights it up as red in patchwork :( I'll apply the first
-3 patches to make v9 smaller.
-
-> +			   struct device_node *np)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i <= pcdev->nr_lines; i++) {
-> +		if (pcdev->pi[i].np == np)
-> +			return i;
-> +	}
-> +
-> +	return -EINVAL;
-> +}
-> +
-> +/**
-> + * psec_id_xlate - translate pse_spec to the PSE line number according
-> + *		   to the number of pse-cells in case of no pse_pi node
-> + * @pcdev: a pointer to the PSE controller device
-> + * @pse_spec: PSE line specifier as found in the device tree
-> + *
-> + * Return 0 if #pse-cells = <0>. Return PSE line number otherwise.
-
-here missing ":"
-
-> + */
-> +static int psec_id_xlate(struct pse_controller_dev *pcdev,
-> +			 const struct of_phandle_args *pse_spec)
+funny characters here: \u201c and \u201d
 
