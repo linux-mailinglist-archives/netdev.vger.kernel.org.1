@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-88864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A67A8A8D12
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 22:39:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 35FDF8A8D13
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 22:39:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADB901F21B61
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 20:39:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B58CC1F226B0
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 20:39:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B4541C62;
-	Wed, 17 Apr 2024 20:39:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70FC047A7D;
+	Wed, 17 Apr 2024 20:39:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RfG/7jwN"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cMKyZ2f5"
 X-Original-To: netdev@vger.kernel.org
 Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2045.outbound.protection.outlook.com [40.107.223.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC8FB3D0C6
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 20:39:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE24042A81
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 20:39:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.45
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713386368; cv=fail; b=YgPZQOJ/Jq17xmuorAqzykdtt/GcoJFa+X9TyNT/c+EtQUYkTYh60eRppRAPJSK1uD9KfI6UovXwjyQTOyiDnHSEg8M5jOg6j20bWnraoXcD+dVyIJOzk3T+fDFfV65hI8lOriD81R1ptkFhC23ZXnOqY2zLTz+WpzkseIlLBr0=
+	t=1713386370; cv=fail; b=DQW/sbB7XnTmxFvwJCAEy5miqTW/hSNBRKxA61AYNlfCRzJ5NpfacYDZvR/Qbg4TcYqK6oeTVUYtKKnJQrRJ7itlb9Rl0A6y3yE0A1anEeFhccyA/ftNol0o7fzjqEsTFNm56E4Wbz4b/awYy4HRXw8/ztD1Iz/i7/Hv/tAiC2k=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713386368; c=relaxed/simple;
-	bh=jgqEC0+hAc371XO46V8UyVrReQfg3lwIeQXa+NayMeg=;
+	s=arc-20240116; t=1713386370; c=relaxed/simple;
+	bh=ec8uEQq5Rtku2IPDfKpRLZ32xJzJWiArIQAraGDVTWw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IbivKram8TR9nNBItFbSnIfQQeL9FYrtaU7pPIl92WiOCM+Vaa5BPnn0O8CRcT++2evR1NAelgRYpaE2e5Re2Icbjwlu4fhYJp/M9NOjMIEflDUy8LNxaXDvC8S5FBaD1Dii09zazC7kQjQ7BUpsWtVz540hlERAty/yNq2J4YE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RfG/7jwN; arc=fail smtp.client-ip=40.107.223.45
+	 Content-Type:MIME-Version; b=s1STAcHJ+VnyM+DJmhrRsGkO9iej9ZsR9coSAJaDWD3sQX3eolNJU91lV0AYvpWZt0Q7y9YgFBWahSWo/qp+g/1dPDpEBnRLl5L3JHKQy0VrxRUfcnsOy50TV+TDEcuhS9uamMH6qprdlIkGk+RMLwwqABF8uu7IY3/ectg9bRQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cMKyZ2f5; arc=fail smtp.client-ip=40.107.223.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KeVkBp5ItLyx6dY+xggcKBXULWqSVmaU9hH1xkc8wHn+MXs0VTsVGQbduH9YCkmzaIv0bZUeEQbwjUasV/Gb/phg0S32x3Al+JKOXBhRg6Hvl40DzqzUW8WqDE/DCm7pFqzOfjI/RBrnUE9qU+RV+44uj+KvfDyr6uI6VExvJEfoEXPXnL2+Ec4laadAQSL+exL84mT9tCuSLFiOvI26CdQLAgeIJYq425cY8sS4mNUxEDcen/Dhb0MNa3TJA/KQBtFWI/vnY5uqkANePxePvWggc3Dchb41Fa0AhMW5lE4RVnEzQWXTpfdJamtyFeQRyKs+kfOo31pOlZ+/LoAt0Q==
+ b=PWhsr+5yrcb4ne2J8uJk3yRS3jxE+RKBK5fhKHhXNWg4NoJr7xGEVuF3gi4wQFTbljBYjyVY/sWlq1lIkPDUbh7t0zTmumsjYmrsvMGXEN8q94fnr2A/bI8/S6lhPzowGKEBabroCCF0AjlCBAgLk3OLugfo0qjdxqux0HkvIhEQ3ZS5fQJHQ38JyHWACpU4hQHIbGBKDWYKDIwN7B8ospR2LPnWj0X5Sf1upg8aqp+P6Gcx0N69y1dr9r7xC4qakaZc6FtE+l0lgbZPWYtrG2SlU1jQHUbhMYHA1wrOpWnLRO866n5yhbgt+qvnHCCgVy/W+YOfozrF5VAiGuK1gg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AJXSa2jeKERof9nIQI9tcfoWZL4xnpaDaW8XIpKSV0Y=;
- b=LekYZqt4SLt53U0/bN31jswcP8N6bCmSIqOzSlONVXU5oxEzYk8B0b0KIJaylKEYVHzMJNM5el9eSAbcECvW/jTz4Gte4gi/fn0IUUMGPcVargjsWPCTChz1ArLwKnFvQLVRX9qdt0rXhm4/Cax5xQoTGBTpbXturawJAqK6vUnjvbzptmnqGhN+BMA5RStd6DtA0f6WGRK3q5SfHyBLDyfK8mK1UsptzWyrQ06KUTTFgly2hqVEwajlhzq/1yvBGtbw/QMxLfCVdsg7NZZQ2XFKsXGc6ym/Alm6AdTkzSnRarNhruz/PmSN+QWiCgfDm8wHSI9btIebrAke15TUdA==
+ bh=Kfs9MntLRXbq9W91bfvnyG9wYGqfyZA9CFvG0S/pocA=;
+ b=Vn+wvr9+Cr45+nSZFa80Ri5lfHPq2+FgoLSgK34g0rP99VyQfgOkzUIu3RASdvGbxy3YYD/OgAcdmS+Iyj19PSz9uswXsrzwNsNd4PQGqTLyZO8YtWCxOzV9sbvbKxgi2AOFoIEGs37h5qPE5WmPDbJBm31aq17tzmPrLvLhHQ2I/gqwfSnU/RVHOJN7kbFCzcMzsYDMFKy5FNyd0t8awXzlS3W8nIHIrim59TYQKneuzX+UxVknzy/EMEOaAyIKMMzw3xRaNQQHyQnZBg940y1D/9AKSrfK9opVIJOQjnaO2nOaxwtE7dPhiMUprvf/b9mxd3RwI0KPwkJIh9WRDw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
  dkim=pass header.d=nvidia.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AJXSa2jeKERof9nIQI9tcfoWZL4xnpaDaW8XIpKSV0Y=;
- b=RfG/7jwNrQ4MUhVKaPzmaZkalqbqAgrNSVez0/axlEnp0Y4RjEI/ljln52tgs19SQk/ffqVqXLg0R7swoXMkrsYik0nG3pFdDcyGeZMQBb1/ZxRCKJo0sUuly1U8a1jBu2YsxNBn2isG5YsG5uru3nrBN8zPpII6ZCmHCGv+zk+c6TvfbZwZGbLbJ7X+Jl68TdisznwALoe1xqJp22LXWfvo7SHtVBbkFfJXtvtHhUX91jWwDRTgJzm65TXpWDkEgTcRJxBmRDFUDmqF8dU7YgTYkW1Zw4VTyNbY22HMXL6BKVFrgJo2wrTwIgVff560uqgk+LfsTXSIGqte3ECERA==
+ bh=Kfs9MntLRXbq9W91bfvnyG9wYGqfyZA9CFvG0S/pocA=;
+ b=cMKyZ2f5iDs+dsY1DI+ORI6c4Yam9sajTYenIdpswjdv/ALje/QR/S4/jF/GLlCv+111i8UGCSdoiJ+b7Nh1+y/9krYTkbxZHtUeSfRIXN297D0StKQdN4/n5MelXtJ6FOpl0AtAuI0bu5PTdmWLTW7eQTc4eEb8BVC+a2/ipv+nIrB5IrdJWad0EyWSEFRWx7BY8Enkr3owoa4x5b1mJ6EM3f1hbqYoocMVOrNGxvn4Yu7iJGQoO4p3Ykmf2XFP8OL+iVHF4KYPIkwjt7uVCZYtrL8QLSerpY/e1sai1iR6oajW/5V5pmpfzLBd0fwO+LsrDmIncjsOTX25S4tclA==
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=nvidia.com;
 Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
  by SJ1PR12MB6243.namprd12.prod.outlook.com (2603:10b6:a03:456::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.50; Wed, 17 Apr
- 2024 20:39:20 +0000
+ 2024 20:39:21 +0000
 Received: from BYAPR12MB2743.namprd12.prod.outlook.com
  ([fe80::3ec0:1215:f4ed:9535]) by BYAPR12MB2743.namprd12.prod.outlook.com
  ([fe80::3ec0:1215:f4ed:9535%4]) with mapi id 15.20.7452.049; Wed, 17 Apr 2024
- 20:39:20 +0000
+ 20:39:21 +0000
 From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 To: netdev@vger.kernel.org
 Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
@@ -73,16 +73,16 @@ Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
 	Michal Kubecek <mkubecek@suse.cz>,
 	Alexandra Winter <wintera@linux.ibm.com>,
 	Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: [PATCH ethtool-next v2 1/2] update UAPI header copies
-Date: Wed, 17 Apr 2024 13:38:28 -0700
-Message-ID: <20240417203836.113377-2-rrameshbabu@nvidia.com>
+Subject: [PATCH ethtool-next v2 2/2] netlink: tsinfo: add statistics support
+Date: Wed, 17 Apr 2024 13:38:29 -0700
+Message-ID: <20240417203836.113377-3-rrameshbabu@nvidia.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240417203836.113377-1-rrameshbabu@nvidia.com>
 References: <20240417203836.113377-1-rrameshbabu@nvidia.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR05CA0108.namprd05.prod.outlook.com
- (2603:10b6:a03:334::23) To BYAPR12MB2743.namprd12.prod.outlook.com
+X-ClientProxiedBy: SJ0PR05CA0100.namprd05.prod.outlook.com
+ (2603:10b6:a03:334::15) To BYAPR12MB2743.namprd12.prod.outlook.com
  (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -92,57 +92,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|SJ1PR12MB6243:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0a61b02a-11a7-435c-a018-08dc5f1e752b
+X-MS-Office365-Filtering-Correlation-Id: 4f8f042f-0885-4749-70dc-08dc5f1e75e1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	l+yUfjqlLepghNMC2kwFZszqVIn9tg0iQrzF4lFYi8rRQLdceE5hkhLyGQyKepKj4gR7i7uIY7L9lmupIGkKmd3ezU1tQl+Tp7Zuo9Zm0JnYTYOxCqKpc4IVOPCCTr+3nvIL4wnCZ++1nP3ZWOAaudd2aT1VFK1eNFoDNOpNWPP1QCXuNIYk8ZIUYjsw0PXx/hQwqeN6boAZ5rzaCnmbH/sHXnIqrA5fRyoiUMKFyrxSnpx7bwuwKIQXD2j+5amFJGSDms2opGWnYtTHKyq0TG0Zc15Ne5sMomrZwZmFw4kuq9h1ppSqVVQITIwDyDVY7b5ptJX5qvVwpmcuN79guQGamiQUm5oDs75QgND9gZdab94n/f5c95Yrk1IjWZCkPPi86m0eNFPa8lPAwbh5LpGGrKvY82Ksz9WOy56BHUoe+nuqQLHELMLmY1r0+yIPkD8ursMtnCyp7JdvC3aoSOOrLlSg7JLw+NaK7Iv6lxj9IPCZjcFdFeo3+5c0deav9pwWJGtcK3x+qFXcdHaL2ClWNFKmKB/iy6gYs/YNIgxHlO5sfJCqZmXbga7VVXSJLN+aoXimeN1jpGSwiwDvK8ONZhcqMJoH5ESsJ2AstNaH+RUq5d+8h54XGGckCu2nIaQ6mBSfb2PPuZGXFE52Va8qrGqMV8leuwjIoYOvkic=
+	JVupTgJjXQcWP6Xvw8PFTz6G8wlyQwRvLWrdcNwecoa1GFCunhqUfCZCbiQhgQjuyK0L8ygayOCNYz/8T5An1nVljHsFbbwyl0aMTZrA9q/H3pYYAnLe40Gm1fB4aq9GuhhwSawPT4c9fAstUZPTFCB2Dd3g+dD6vOfGqmYGLZez6n2cl1IoRGRqjNauJgWFN3OlnFB1H8CZo9bbHp/mzXJphvlYBN2uGK/4JUwVUdPQ+0uFAU6y8DGeouTHZDP8Dy7rp19XNqu4UD92hK2TpN1E2bwbYGvrC3bG/0UyYf4WCgiMyEGWYjOtJl2YdQLVFwPDEIeR4NwEQZB3Up3EebkczlnHRYLjOR+cKHKOYxivWjVVOBaJFftFj0UrXiIXkyL09PThwLj4wHffbsGdk8WlY0dKxS7Bii1ezIQU9K+g+X2Je0isz5knluOZlVETnA5Z1ccaOoblwZi9vCjbP4G4Y5DXS6UweOmZgAfVURHMDrwrgN3m9DmLkIKc4DqJWl+GG0BQXw5KG1u1WUh2IFKSD9D0IUsed1HvhvyPYwr4EJ+QUQaxMXZuBAWPdiVCxFQzPTgpkVlZuwVewlf5ioQGMF1gBGlckbg2M7s2KyvxGouS9ZHqbYOsM5BL44g2Eq01+EAptoJ9zqHhW6H4DhivNRL3EJm6UFCxdQVDYBU=
 X-Forefront-Antispam-Report:
 	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?9LRd6iecQBBHJ1Ghs6Spq9QvfQJ2TFhCkzy9YkmFTAn1ENRS+j5gk52MU4p0?=
- =?us-ascii?Q?0jBDvCWhSMO5sn0ss2y8ftN1jmpnXgabPY23Fd7FgIXPHXtc9MmThYZJvpoX?=
- =?us-ascii?Q?Al8soyY9/wdw3hD2e5j5y/798T3rf4fQv/Js2wZ+9oaxXS+beQrBJVz598JN?=
- =?us-ascii?Q?cJukqhD1TMxfybpcmzF5Pzis7O1cYPkAWCE3pufWSPjIdVVjjSHiYEUuQxXR?=
- =?us-ascii?Q?TsiFBSa0W55rM5ZzHxZnaoGPojKJtMgxb5a3EfGbf83U+gpLF5XbPTP1D3qr?=
- =?us-ascii?Q?izprxP2sic+ofW9bSHEj3zBHN2FNv+d9xSstLgxEFXoRRa/gSbyddYr/9xtv?=
- =?us-ascii?Q?pJWNiRPF8rrr8Tadd65u/3rM9JH8lNW40MQ+wmeHMGd/tN3YVyI26BwYsaWX?=
- =?us-ascii?Q?EsAPF+KNke26dQgBdpjC3Z1LJoSfJNFOHwYOIxuemp393eE/seV9cqM42WEY?=
- =?us-ascii?Q?7e/Aq6ubxT+DoA5t2m2KLRtoNwsdzlF2Su3nAcQQ0dmEm435wq0UANUvYWDx?=
- =?us-ascii?Q?PeYxakRRVdaLObxHKsNKp+caGQoJ7dOFbge9jYX+LaYxN/T/1ToLJJvY2BS+?=
- =?us-ascii?Q?y3isL5uCBK7HI8NvsmGtiSuflJ8HeDc2Sb+3SULXn1e+Nq9e6A9W6NTkwldz?=
- =?us-ascii?Q?xiYKJl/tPFILCjATtz/SLcYWVY3Jt2L1P4m1QZNcBYgu0bANmiZj5DCiggFS?=
- =?us-ascii?Q?vZWX4fUkofgVmEAC98szUxhJ+/ltiyuOz0iJNVQM9m2bb76Df803F91rLH3w?=
- =?us-ascii?Q?QPhURY5ozJZA46O3U60QCXMUM1sCv8cIptrqSlZshHkdTklPqauqOlb0nndF?=
- =?us-ascii?Q?RA9HJTotm9V9WhVLLv9mIAaphDAboPvFGDlFis3TCyUdheV+nS7NBeI+DE9p?=
- =?us-ascii?Q?wYmVpI3RJyRP+jfO9YMRwBDx/sIbnpXI56bn+P6akKKrKmmWgUOreLK/mFiR?=
- =?us-ascii?Q?x4XWMKWxIHpYjJmta7bRGa4Z2UtLhTfACDhHlPkIfbhJY2mpRhmwjCRKZokC?=
- =?us-ascii?Q?rrga3pE2gssqunxCuZe2KA/k3NDB37e/yAJT6x2UHWw5drDOpTh4rDeAcwRW?=
- =?us-ascii?Q?EZ4ggOF337XpjTqqyp/U1CflmKcEKIDdi4ss5kP4iVVhY2h8Tn3EKq6sx713?=
- =?us-ascii?Q?neq7DFYVTkE6E0zwYdALbsABCPSTABUBBXFzSb7jy0VmC0TWkT09SDk7NNQp?=
- =?us-ascii?Q?7Me3P6K2ECkw//90GjqXWIAuYRnlmgQy8+ixnTRH+0Ky397C4yGZZ83stMOW?=
- =?us-ascii?Q?lhdAHD8XCj+xv+TN/djGvwMCK8VipQarEpW1d9EUGx/Rh9hDeoxzM6wKAPiH?=
- =?us-ascii?Q?24s/az15m04ax2xFbnQFTGOhJuZGI8F1YY5XBujy3HUs+GPfLFlOazQwnlws?=
- =?us-ascii?Q?NlHTQFKEx8RpIl+OCxUCGYTW+sDbj85V/d0J/aqwwSPfcd64sXIXAjGoCeID?=
- =?us-ascii?Q?GuxMMa7Buw+eHVVZg4Jb+CTUOHKumcSpECQnL+SNmFAxjqU6rCe9KQT2WakX?=
- =?us-ascii?Q?LoWVMuWDco3/ri8WgUV92aZTxfbzj/X+owPjSQkV5Xyf6PYUU1PGfjuIMsSx?=
- =?us-ascii?Q?VeU8aBkpX5G07sSvPnzNaS7g1yZSaIvIEZkrvh2j4XEwzVjxHfhI/EBvh/1v?=
- =?us-ascii?Q?Hw=3D=3D?=
+	=?us-ascii?Q?I6dwtO/eep6Bvt0Ag1aXbNyVglT3jxakmfpLjkS+SyW1MqyvsL8jDfc62tnt?=
+ =?us-ascii?Q?YpNPSqRDl0lyLn5jpdWD0Zx75MnH9eRGt2/C45WTswc6QgARm8OH9KXmnunW?=
+ =?us-ascii?Q?M4okYcr48A2w19yET2JvIzF2UPitSNSrOWQ1mi90pvy3WqVbpgLDYWFVy1DM?=
+ =?us-ascii?Q?nUT45ALKKR2TTAQLPTkqnSv1DRglHDGbpgK2qCzJexCgXCCNMivAwAbTHjpb?=
+ =?us-ascii?Q?1ce1OtJU9CL+dsUEby0/WhzcjKOZj5hurOFqxBh3RSqd/4syQCUh77/13YzN?=
+ =?us-ascii?Q?Ei7PAHdjxeWDqRfyubup0YnrZVx1NIlfS8qtilcW9RzckkhNpBDaLg0+Tq7c?=
+ =?us-ascii?Q?1lP+FuPd8K2d1BcIuAnvXFRNM7kVOz9ljNFVU62AgLP+WWPR+3hd+7K4VQrz?=
+ =?us-ascii?Q?N7VKJnDwWyCoO2Ga6tQl3wJnXEXHfwndGt2pVynT/VFUXg3uufV/DckcVn+l?=
+ =?us-ascii?Q?2fZZ7upx/XBKlcWlBaD3RO7aujJ+bFObUIABbxrIzZeql+7rQHXfkRKw8haX?=
+ =?us-ascii?Q?EK3KHRVJjEG+0kvlIvuvR/tLHi2E+Fa19VCQprvRBMtDIUaPiTNHE2DLP9Yt?=
+ =?us-ascii?Q?xSs1kgrq2/jykomn6S0+SlEtcsGYYqxDj763lF/rAyOzepn3G3hHTEq2l+9k?=
+ =?us-ascii?Q?rHeonQBXCEY3kjrhRDNYZuKynIcyLlvshpeJccj/2zfvzV+KVOSJoQudrfI/?=
+ =?us-ascii?Q?fw/u0cQGr6AOkGFpExgNlMwWGjW0Trtvf97Wj8NsfBVCM2l2bq0KWwp6fOP0?=
+ =?us-ascii?Q?UYqTTEupcDuxB1zIX35Qzh3x18JK353sY/iL7i74cZ5qpVj7X12Bq8zQRj7m?=
+ =?us-ascii?Q?xvRG0qajeL/9Z39vohFOMF/2UNSRU99GqWQqaea6aE3AlpVtGcEMMLFzAFcZ?=
+ =?us-ascii?Q?MAyqvoZEHlJDp7VB4lFuQZBC3HcrHHCD7XRmnKk/cEDn1hhoU+60ZvdHw8qE?=
+ =?us-ascii?Q?y62QMxAhRQoqFbW21yY/xn25ch0LgxQGz0aVIPtgGJ/pA38yWNFpTW/4djUv?=
+ =?us-ascii?Q?tcauTOSAodCbf7z0EOG1da/zCwievvecuvaXqhcioF3t8BPjpGFfXQ3UAOkM?=
+ =?us-ascii?Q?LqTh/3qHN0XxciAZUaEFDnksTDSO4ndUxDhiz4J8p9rjX2VkPOKs1xZ8sjIQ?=
+ =?us-ascii?Q?9Qp+ym+u4OZmzRRrwpXghIqXvpLKmYKLX127E5mEOv+e7EqsUuyx4UR17vjn?=
+ =?us-ascii?Q?CNIfS1fk1iYtYLk+hCPVJ2bcIAzFo264uSiMDbrEcuqeDYEL5kbKFHry5IEn?=
+ =?us-ascii?Q?B787AM/R2FL68BfVfq0W8yJ8QrG0k75SSP7q6KUFF3fZmD/0ZQpxzCyRySBI?=
+ =?us-ascii?Q?H/rK/OH3fJPCVo9+6TGSvd4HcPwNmBsjy7eVYyAMWU8m+7f+QvvbfJJkSOEt?=
+ =?us-ascii?Q?5x+3FFGqc4x736CUhIFWWaYFyUSYXFWqBDqYumPefImt0WA4UyH3sH3okNhv?=
+ =?us-ascii?Q?Ss3mRcEoP1k10mWTKsPkHHjLfaSvSNxlJ2jewq2IYfmxyB0W21Lxuctuqr9x?=
+ =?us-ascii?Q?wmw2p9m45UcFxs/S/YcmVGxoZhSNfBzBDhD8HVx2/lxZaPCO3p3XxZUMyty6?=
+ =?us-ascii?Q?zZkiIu5o+r+qjzw5QLgHdJJ/nJkqsXBaxSgL2OMYAME8/kRkzgNLVzhSLnow?=
+ =?us-ascii?Q?/Q=3D=3D?=
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0a61b02a-11a7-435c-a018-08dc5f1e752b
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4f8f042f-0885-4749-70dc-08dc5f1e75e1
 X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2024 20:39:20.0657
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2024 20:39:21.2226
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: E3cXYMLWl4qBkazWsnWJulGLAu9W5ev3yb5ZMBVBkZBE62+RTpirUrdafupVw7+F9E28+sUh/uREtSmDy3jYaw==
+X-MS-Exchange-CrossTenant-UserPrincipalName: YEjfViGfVAnAg0vbRH43E+222YxmzScas6r9XZ1Ne92STh2n0lc0tJxJRX9Aqlt+ekimiW9lI8QBJi+h3wAWlw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6243
 
-Update to kernel commit 2bd99aef1b19.
+If stats flag is present, report back statistics for tsinfo if the netlink
+response body contains statistics information.
 
 Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
@@ -153,182 +154,117 @@ Notes:
     Changes:
     
       v1->v2:
-        - Updated UAPI header copy to be based on a valid commit in the
-          net-next tree. Thanks Alexandra Winter <wintera@linux.ibm.com> for
-          the catch.
+        - Refactored logic based on a suggestion from Jakub Kicinski
+          <kuba@kernel.org>.
 
- uapi/linux/ethtool.h         | 64 ++++++++++++++++++++++++++++++++++++
- uapi/linux/ethtool_netlink.h | 30 +++++++++++++----
- uapi/linux/if_link.h         |  1 +
- 3 files changed, 89 insertions(+), 6 deletions(-)
+ netlink/tsinfo.c | 65 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 64 insertions(+), 1 deletion(-)
 
-diff --git a/uapi/linux/ethtool.h b/uapi/linux/ethtool.h
-index 70f2b90..4d1738a 100644
---- a/uapi/linux/ethtool.h
-+++ b/uapi/linux/ethtool.h
-@@ -2021,6 +2021,53 @@ static __inline__ int ethtool_validate_duplex(__u8 duplex)
- #define	IPV4_FLOW	0x10	/* hash only */
- #define	IPV6_FLOW	0x11	/* hash only */
- #define	ETHER_FLOW	0x12	/* spec only (ether_spec) */
-+
-+/* Used for GTP-U IPv4 and IPv6.
-+ * The format of GTP packets only includes
-+ * elements such as TEID and GTP version.
-+ * It is primarily intended for data communication of the UE.
-+ */
-+#define GTPU_V4_FLOW 0x13	/* hash only */
-+#define GTPU_V6_FLOW 0x14	/* hash only */
-+
-+/* Use for GTP-C IPv4 and v6.
-+ * The format of these GTP packets does not include TEID.
-+ * Primarily expected to be used for communication
-+ * to create sessions for UE data communication,
-+ * commonly referred to as CSR (Create Session Request).
-+ */
-+#define GTPC_V4_FLOW 0x15	/* hash only */
-+#define GTPC_V6_FLOW 0x16	/* hash only */
-+
-+/* Use for GTP-C IPv4 and v6.
-+ * Unlike GTPC_V4_FLOW, the format of these GTP packets includes TEID.
-+ * After session creation, it becomes this packet.
-+ * This is mainly used for requests to realize UE handover.
-+ */
-+#define GTPC_TEID_V4_FLOW 0x17	/* hash only */
-+#define GTPC_TEID_V6_FLOW 0x18	/* hash only */
-+
-+/* Use for GTP-U and extended headers for the PSC (PDU Session Container).
-+ * The format of these GTP packets includes TEID and QFI.
-+ * In 5G communication using UPF (User Plane Function),
-+ * data communication with this extended header is performed.
-+ */
-+#define GTPU_EH_V4_FLOW 0x19	/* hash only */
-+#define GTPU_EH_V6_FLOW 0x1a	/* hash only */
-+
-+/* Use for GTP-U IPv4 and v6 PSC (PDU Session Container) extended headers.
-+ * This differs from GTPU_EH_V(4|6)_FLOW in that it is distinguished by
-+ * UL/DL included in the PSC.
-+ * There are differences in the data included based on Downlink/Uplink,
-+ * and can be used to distinguish packets.
-+ * The functions described so far are useful when you want to
-+ * handle communication from the mobile network in UPF, PGW, etc.
-+ */
-+#define GTPU_UL_V4_FLOW 0x1b	/* hash only */
-+#define GTPU_UL_V6_FLOW 0x1c	/* hash only */
-+#define GTPU_DL_V4_FLOW 0x1d	/* hash only */
-+#define GTPU_DL_V6_FLOW 0x1e	/* hash only */
-+
- /* Flag to enable additional fields in struct ethtool_rx_flow_spec */
- #define	FLOW_EXT	0x80000000
- #define	FLOW_MAC_EXT	0x40000000
-@@ -2035,6 +2082,7 @@ static __inline__ int ethtool_validate_duplex(__u8 duplex)
- #define	RXH_IP_DST	(1 << 5)
- #define	RXH_L4_B_0_1	(1 << 6) /* src port in case of TCP/UDP/SCTP */
- #define	RXH_L4_B_2_3	(1 << 7) /* dst port in case of TCP/UDP/SCTP */
-+#define	RXH_GTP_TEID	(1 << 8) /* teid in case of GTP */
- #define	RXH_DISCARD	(1 << 31)
+diff --git a/netlink/tsinfo.c b/netlink/tsinfo.c
+index c6571ff..4df4141 100644
+--- a/netlink/tsinfo.c
++++ b/netlink/tsinfo.c
+@@ -5,6 +5,7 @@
+  */
  
- #define	RX_CLS_FLOW_DISC	0xffffffffffffffffULL
-@@ -2218,4 +2266,20 @@ struct ethtool_link_settings {
- 	 * __u32 map_lp_advertising[link_mode_masks_nwords];
- 	 */
- };
+ #include <errno.h>
++#include <inttypes.h>
+ #include <string.h>
+ #include <stdio.h>
+ 
+@@ -15,6 +16,60 @@
+ 
+ /* TSINFO_GET */
+ 
++static int tsinfo_show_stats(const struct nlattr *nest)
++{
++	const struct nlattr *tb[ETHTOOL_A_TS_STAT_MAX + 1] = {};
++	DECLARE_ATTR_TB_INFO(tb);
++	static const struct {
++		unsigned int attr;
++		char *name;
++	} stats[] = {
++		{ ETHTOOL_A_TS_STAT_TX_PKTS, "tx_pkts" },
++		{ ETHTOOL_A_TS_STAT_TX_LOST, "tx_lost" },
++		{ ETHTOOL_A_TS_STAT_TX_ERR, "tx_err" },
++	};
++	bool header = false;
++	unsigned int i;
++	__u64 val;
++	int ret;
 +
-+/**
-+ * enum phy_upstream - Represents the upstream component a given PHY device
-+ * is connected to, as in what is on the other end of the MII bus. Most PHYs
-+ * will be attached to an Ethernet MAC controller, but in some cases, there's
-+ * an intermediate PHY used as a media-converter, which will driver another
-+ * MII interface as its output.
-+ * @PHY_UPSTREAM_MAC: Upstream component is a MAC (a switch port,
-+ *		      or ethernet controller)
-+ * @PHY_UPSTREAM_PHY: Upstream component is a PHY (likely a media converter)
-+ */
-+enum phy_upstream {
-+	PHY_UPSTREAM_MAC,
-+	PHY_UPSTREAM_PHY,
-+};
++	ret = mnl_attr_parse_nested(nest, attr_cb, &tb_info);
++	if (ret < 0)
++		return ret;
 +
- #endif /* _LINUX_ETHTOOL_H */
-diff --git a/uapi/linux/ethtool_netlink.h b/uapi/linux/ethtool_netlink.h
-index 447d922..2503b26 100644
---- a/uapi/linux/ethtool_netlink.h
-+++ b/uapi/linux/ethtool_netlink.h
-@@ -117,12 +117,11 @@ enum {
- 
- /* request header */
- 
--/* use compact bitsets in reply */
--#define ETHTOOL_FLAG_COMPACT_BITSETS	(1 << 0)
--/* provide optional reply for SET or ACT requests */
--#define ETHTOOL_FLAG_OMIT_REPLY	(1 << 1)
--/* request statistics, if supported by the driver */
--#define ETHTOOL_FLAG_STATS		(1 << 2)
-+enum ethtool_header_flags {
-+	ETHTOOL_FLAG_COMPACT_BITSETS	= 1 << 0,	/* use compact bitsets in reply */
-+	ETHTOOL_FLAG_OMIT_REPLY		= 1 << 1,	/* provide optional reply for SET or ACT requests */
-+	ETHTOOL_FLAG_STATS		= 1 << 2,	/* request statistics, if supported by the driver */
-+};
- 
- #define ETHTOOL_FLAG_ALL (ETHTOOL_FLAG_COMPACT_BITSETS | \
- 			  ETHTOOL_FLAG_OMIT_REPLY | \
-@@ -133,6 +132,7 @@ enum {
- 	ETHTOOL_A_HEADER_DEV_INDEX,		/* u32 */
- 	ETHTOOL_A_HEADER_DEV_NAME,		/* string */
- 	ETHTOOL_A_HEADER_FLAGS,			/* u32 - ETHTOOL_FLAG_* */
-+	ETHTOOL_A_HEADER_PHY_INDEX,		/* u32 */
- 
- 	/* add new constants above here */
- 	__ETHTOOL_A_HEADER_CNT,
-@@ -478,12 +478,26 @@ enum {
- 	ETHTOOL_A_TSINFO_TX_TYPES,			/* bitset */
- 	ETHTOOL_A_TSINFO_RX_FILTERS,			/* bitset */
- 	ETHTOOL_A_TSINFO_PHC_INDEX,			/* u32 */
-+	ETHTOOL_A_TSINFO_STATS,				/* nest - _A_TSINFO_STAT */
- 
- 	/* add new constants above here */
- 	__ETHTOOL_A_TSINFO_CNT,
- 	ETHTOOL_A_TSINFO_MAX = (__ETHTOOL_A_TSINFO_CNT - 1)
- };
- 
-+enum {
-+	ETHTOOL_A_TS_STAT_UNSPEC,
++	open_json_object("statistics");
++	for (i = 0; i < ARRAY_SIZE(stats); i++) {
++		char fmt[64];
 +
-+	ETHTOOL_A_TS_STAT_TX_PKTS,			/* uint */
-+	ETHTOOL_A_TS_STAT_TX_LOST,			/* uint */
-+	ETHTOOL_A_TS_STAT_TX_ERR,			/* uint */
++		if (!tb[stats[i].attr])
++			continue;
 +
-+	/* add new constants above here */
-+	__ETHTOOL_A_TS_STAT_CNT,
-+	ETHTOOL_A_TS_STAT_MAX = (__ETHTOOL_A_TS_STAT_CNT - 1)
++		if (!header && !is_json_context()) {
++			printf("Statistics:\n");
++			header = true;
++		}
 +
-+};
++		if (!mnl_attr_validate(tb[stats[i].attr], MNL_TYPE_U32)) {
++			val = mnl_attr_get_u32(tb[stats[i].attr]);
++		} else if (!mnl_attr_validate(tb[stats[i].attr], MNL_TYPE_U64)) {
++			val = mnl_attr_get_u64(tb[stats[i].attr]);
++		} else {
++			fprintf(stderr, "malformed netlink message (statistic)\n");
++			goto err_close_stats;
++		}
 +
- /* PHC VCLOCKS */
++		snprintf(fmt, sizeof(fmt), "  %s: %%" PRIu64 "\n", stats[i].name);
++		print_u64(PRINT_ANY, stats[i].name, fmt, val);
++	}
++	close_json_object();
++
++	return 0;
++
++err_close_stats:
++	close_json_object();
++	return -1;
++}
++
+ static void tsinfo_dump_cb(unsigned int idx, const char *name, bool val,
+ 			   void *data __maybe_unused)
+ {
+@@ -99,6 +154,12 @@ int tsinfo_reply_cb(const struct nlmsghdr *nlhdr, void *data)
+ 	if (ret < 0)
+ 		return err_ret;
  
- enum {
-@@ -515,6 +529,10 @@ enum {
- 	ETHTOOL_A_CABLE_RESULT_CODE_OPEN,
- 	ETHTOOL_A_CABLE_RESULT_CODE_SAME_SHORT,
- 	ETHTOOL_A_CABLE_RESULT_CODE_CROSS_SHORT,
-+	/* detected reflection caused by the impedance discontinuity between
-+	 * a regular 100 Ohm cable and a part with the abnormal impedance value
-+	 */
-+	ETHTOOL_A_CABLE_RESULT_CODE_IMPEDANCE_MISMATCH,
- };
++	if (tb[ETHTOOL_A_TSINFO_STATS]) {
++		ret = tsinfo_show_stats(tb[ETHTOOL_A_TSINFO_STATS]);
++		if (ret < 0)
++			return err_ret;
++	}
++
+ 	return MNL_CB_OK;
+ }
  
- enum {
-diff --git a/uapi/linux/if_link.h b/uapi/linux/if_link.h
-index d17271f..ff4ceea 100644
---- a/uapi/linux/if_link.h
-+++ b/uapi/linux/if_link.h
-@@ -1503,6 +1503,7 @@ enum {
- 	IFLA_BOND_AD_LACP_ACTIVE,
- 	IFLA_BOND_MISSED_MAX,
- 	IFLA_BOND_NS_IP6_TARGET,
-+	IFLA_BOND_COUPLED_CONTROL,
- 	__IFLA_BOND_MAX,
- };
+@@ -106,6 +167,7 @@ int nl_tsinfo(struct cmd_context *ctx)
+ {
+ 	struct nl_context *nlctx = ctx->nlctx;
+ 	struct nl_socket *nlsk = nlctx->ethnl_socket;
++	u32 flags;
+ 	int ret;
  
+ 	if (netlink_cmd_check(ctx, ETHTOOL_MSG_TSINFO_GET, true))
+@@ -116,8 +178,9 @@ int nl_tsinfo(struct cmd_context *ctx)
+ 		return 1;
+ 	}
+ 
++	flags = get_stats_flag(nlctx, ETHTOOL_MSG_TSINFO_GET, ETHTOOL_A_TSINFO_HEADER);
+ 	ret = nlsock_prep_get_request(nlsk, ETHTOOL_MSG_TSINFO_GET,
+-				      ETHTOOL_A_TSINFO_HEADER, 0);
++				      ETHTOOL_A_TSINFO_HEADER, flags);
+ 	if (ret < 0)
+ 		return ret;
+ 	return nlsock_send_get_request(nlsk, tsinfo_reply_cb);
 -- 
 2.42.0
 
