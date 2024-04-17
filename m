@@ -1,225 +1,203 @@
-Return-Path: <netdev+bounces-88558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 793DD8A7ACB
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 04:55:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 304728A7AE2
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 05:10:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7A8F2824A0
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 02:55:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B149B1F23273
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 03:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75A326FB9;
-	Wed, 17 Apr 2024 02:55:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC188F66;
+	Wed, 17 Apr 2024 03:09:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EGIFg4c5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dxiwm2Tt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E92D1878;
-	Wed, 17 Apr 2024 02:55:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1CDF79D8;
+	Wed, 17 Apr 2024 03:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713322542; cv=none; b=BYgWVBR7Jdho/jCoStNwZq63W0vlRWmAlTqzUeRY2ZHmS3voe21Ds+3+aQ5aBNggrrASNuK5XKXYbuJbV1qq/VGspTId9+wEplewG+cYPxZFMQl9GkD7qRnI/hwKCpBBGdM8kFhkhzpaqlqtQ6380BIDz1III0MwTaPEe+t0u6E=
+	t=1713323398; cv=none; b=MhvDuK7C4kIKf7GKalTtYZ0w3wHofOxjJ7vIgmL/kx16E2JzMRGkv9C+Jd4KVm7XUPpZugMlBfPNLa/b/zknwouUmWvxHwL3OhWHLGwXKpflad/7yMxty3DLAJEXfcBW/rzHww3q+aFqb0R4tU7HXzgGKr7nv4hMyTuoFdCVxjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713322542; c=relaxed/simple;
-	bh=IAj14PITpzUBBfd0BdPRImzQrp8Sr8llvz7H0t6Se+c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KIztE5tlnGIxoYNVPXo5alU5XKeVkpI8iOYA45KzmFfhlC203odQWwuNEVBjNsyijGK0XM8S2f6Gjuwkwtc90ws3Nch272i3IwT35Wfm3AtaK/40pKUV2TpoTZvy70+kLNlHL63njpqPS/hVVSeM9J7M4H07Lj450zf0GBpRM3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EGIFg4c5; arc=none smtp.client-ip=209.85.208.47
+	s=arc-20240116; t=1713323398; c=relaxed/simple;
+	bh=CqWv/m6W9/2XEdEZswVlFVzt5xhZhM6JxBcKQDA4jjA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tMxB1irAf3+Jq+l/qYUcUJp4ntpp9i/cESjcRCIOzNcYzjr7TRuZuKIk7McBCOpj1KAuwg2XAzg7cwLV3rq+f06XIG3MmB6phE7CI8F16AK++9XNfitsX4aL1LzF1oLeWeMyz7ATDA2kv61flQiL16t5Aefj2RPATHu/4WS+aLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dxiwm2Tt; arc=none smtp.client-ip=209.85.222.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56e477db7fbso8210622a12.3;
-        Tue, 16 Apr 2024 19:55:39 -0700 (PDT)
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-78d68de297fso402844885a.2;
+        Tue, 16 Apr 2024 20:09:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713322538; x=1713927338; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YU8HGKFVgDu5PmPmQa9rQm9q2w67RmlvbR2fV4Fj4C8=;
-        b=EGIFg4c5N26fOhESuplhAtqNPahD/0pwRniiZwIx+0YS82YXbPbwhSUnCMDQf09o+s
-         mImhNF4cbG0p5Xc756HedHrWokn/as7xpL3ikayzFa1ZTm1Hc/I3sNr8DATmrLyFEjMD
-         Umw8AnMFjKAy6tSvYOfbypa8m5+jN0nnj+XKjCCAi3f7JNEfXw42GX+0cdx6Z+l3Vwa9
-         98NC4AIxuWUhPFgmcmyMTQRj3a4cAG7UhLKxdvDdfhfUQGDb7h48biQh1RsdhJBnZFer
-         F6IGBVnEmGloAWi/TpKhSFDVME/M4OXNPp8X6bjeFBNCTofB2tSPREexLyBfCbOu100u
-         9jwA==
+        d=gmail.com; s=20230601; t=1713323395; x=1713928195; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZmB2mNgA8q4RGQiquNCt84NUWuA0LWLQljDpEYXLFWI=;
+        b=Dxiwm2TtR0B7WdxGCLACkQxigm5O9feWxMIfThRBiAQYd0tVLG0HlxT7qJwYwCI188
+         KLsLt4V6wOL7HwHAfI5/nkt8aPrkzs1bJkQ0eQt4KXD1sOsSQ/IAhyO2D2M6oArdumNL
+         88C10HqsdjpnlaWtUwtpzC/hi0+acAlsHx2Wu0t/HlnH4Gc4mULHyCuxm+K05W8iMu0K
+         GVtu3DVEJ4s+F0b3Ky3kRVV+Wjvwr4xfw5WdNhXo10YMqWjvwvBqOebib/A3tbUz3dCO
+         zBCZnimbqSc49cxN5i7+Xbh6Sq+ci8HaxY2OwzLil+YDdJoIWMyztjDSmTYUk7N2OuWT
+         8Wew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713322538; x=1713927338;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YU8HGKFVgDu5PmPmQa9rQm9q2w67RmlvbR2fV4Fj4C8=;
-        b=d2jHND11EqcFnOTlAPCRN0OfKbHpaPCUUAskf3z0tWSKNOz4W2cleUXvV9vOQ53/cm
-         nicqvznntsMjbWBjZTz29VgnI/rnaTjZX+dnZryc7qgnQtw8oSTaqscz1ED0Ogh7ehHU
-         A62yWMbndqOLm+iLbtK7ZFgSa/GJvcuD0O1V9RUeyB1Kq0V8UxGPkqJCdd9jTHxtPwys
-         NQIBwoj86+nz6lSJW0iDi36l37S02cWQH+Gue3GubqXtb5prM1oh/mgPLToRZyeo8Pyo
-         goHUmi2bryaUiLrUS8h0mkqNDiAxF11sQPuATlIyw4kcYDs3JIethWNxVlYtONhg9A3l
-         Y8ig==
-X-Forwarded-Encrypted: i=1; AJvYcCXjW9sLvsIkPSgiJ8b7NVWouKvLYvg40lt2HRWj39/Xv8jgb5YjVqCJSXWaPTyyuuW805iNIQJGECZ9l1Xj22I1jYvSHxrpx3IC3T7x76LhVh0o66FCIMF2zIGLQGkDukoMzazN90FWRw/7jtQnq8oI/sRcVTXkguiY
-X-Gm-Message-State: AOJu0YzXz+ay30TLCjW5owv2ZNIhOs3xdIQpbv8/Ly6mFai1+NvEG5Pi
-	d/yA4CZ1TQ6/kRGcBFPd7vwb9rf9flAtVJqqqe2+v4ZId4ef81fcBdm2c64DJSs6R/mvDNITnX4
-	aVMBrGlsN0UlvtUF8Im/HxHilJ8o=
-X-Google-Smtp-Source: AGHT+IHnLcuxtZ/uwP32Uiu9SghWa6lLAfLw4GcSxchoRgTp88uEW8gkPF8hzIXEyKeaaD+Mj9NOczupbaoeOSmiIDI=
-X-Received: by 2002:a50:c313:0:b0:568:c6a2:f427 with SMTP id
- a19-20020a50c313000000b00568c6a2f427mr9999014edb.27.1713322537712; Tue, 16
- Apr 2024 19:55:37 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713323395; x=1713928195;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZmB2mNgA8q4RGQiquNCt84NUWuA0LWLQljDpEYXLFWI=;
+        b=xOwvWpS5JlLYI0meUJ4fBT+UCF455vbzz9DA7WlWJATpudHhD9iBx6qrFiQ+ul4cV2
+         XRHsM1SqxxUGIPc/Tq2GkRjNJ6WJHGTbhg4DgXrnk2FWgN97irAQWtjqBMAoMGB3XMzX
+         cwiNcU/erbuvAcZYAjpvg2EfnINQQCtJdZQaQ0ja8CXG3EOHW8/RuFrPIwDPCo0fIBTP
+         vD5poPecG0mnGLqyaVULHnBklfsAsVl06k6AAVN/BzfiAa3/g4DfwK/hyBv2WWJugoMJ
+         k40ycAs3wRB5Zz3kubVGJ/Yr7vp1zPhV8k/qU+ryY1RBNoaOvaqr7UIGqOJ+BMwvnQGH
+         I2tg==
+X-Forwarded-Encrypted: i=1; AJvYcCXpdD/JteTmlocqSi8Xr8e9t1gFwPMX/R3l8eJD6FE5ogbqEPwAV/qjpx+yLJYW34ZnMSnqOUucUGXKyhqg1D7z+Y/dwUz9jkIbeaWuX5dzK0nELPFTHSsX3fpmQtAi8ozqIplz
+X-Gm-Message-State: AOJu0Yw5b1uVKY7xJeVLn+nerLcRPZnKDlDudLOH5AG8vfC0zx68v1zf
+	SUZ7esKlv4M39iVfDQEMX+MNDlpsCQOCuE74gxBa9gRDGoQcTixL
+X-Google-Smtp-Source: AGHT+IETJ9k9mKCNBunC8b0Yz1c8lQDgg7FAC6fT4smpbBh487SS1A3TsJejAqG3PArmUu07sETxxw==
+X-Received: by 2002:a05:620a:47aa:b0:78e:dcb2:4cbb with SMTP id dt42-20020a05620a47aa00b0078edcb24cbbmr11078301qkb.31.1713323395272;
+        Tue, 16 Apr 2024 20:09:55 -0700 (PDT)
+Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
+        by smtp.gmail.com with ESMTPSA id v1-20020a05620a090100b0078ede19b680sm4229193qkv.75.2024.04.16.20.09.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 16 Apr 2024 20:09:54 -0700 (PDT)
+Message-ID: <050ef345-9f4c-437c-863b-fdb8e2a47041@gmail.com>
+Date: Tue, 16 Apr 2024 20:09:50 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240416061943.407082-1-liangchen.linux@gmail.com> <CACGkMEuJBdsePgszsM51DZc1GvF0naorHDsMR+SGZ1SiA6jrZQ@mail.gmail.com>
-In-Reply-To: <CACGkMEuJBdsePgszsM51DZc1GvF0naorHDsMR+SGZ1SiA6jrZQ@mail.gmail.com>
-From: Liang Chen <liangchen.linux@gmail.com>
-Date: Wed, 17 Apr 2024 10:55:19 +0800
-Message-ID: <CAKhg4tLsjeJASbdvDumBrbhkddGs4xAV0y5QPv=nhrHcZdSM0g@mail.gmail.com>
-Subject: Re: [PATCH net-next v8] virtio_net: Support RX hash XDP hint
-To: Jason Wang <jasowang@redhat.com>
-Cc: mst@redhat.com, xuanzhuo@linux.alibaba.com, hengqi@linux.alibaba.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	hawk@kernel.org, john.fastabend@gmail.com, netdev@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	bpf@vger.kernel.org, daniel@iogearbox.net, ast@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/2] net: dsa: mt7530-mdio: read PHY address
+ of switch from device tree
+To: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+ Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240414-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v2-0-1a7649c4d3b6@arinc9.com>
+ <20240414-b4-for-netnext-mt7530-phy-addr-from-dt-and-simplify-core-ops-v2-1-1a7649c4d3b6@arinc9.com>
+ <459b31bd-64b3-4804-bc5a-c8ffd145e055@gmail.com>
+ <7d0ded52-14f0-4f6a-b639-72f537603be8@arinc9.com>
+Content-Language: en-US
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ HGuUuzv+GKZ6nsysJw==
+In-Reply-To: <7d0ded52-14f0-4f6a-b639-72f537603be8@arinc9.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Apr 16, 2024 at 3:20=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> On Tue, Apr 16, 2024 at 2:20=E2=80=AFPM Liang Chen <liangchen.linux@gmail=
-.com> wrote:
-> >
-> > The RSS hash report is a feature that's part of the virtio specificatio=
-n.
-> > Currently, virtio backends like qemu, vdpa (mlx5), and potentially vhos=
-t
-> > (still a work in progress as per [1]) support this feature. While the
-> > capability to obtain the RSS hash has been enabled in the normal path,
-> > it's currently missing in the XDP path. Therefore, we are introducing
-> > XDP hints through kfuncs to allow XDP programs to access the RSS hash.
-> >
-> > 1.
-> > https://lore.kernel.org/all/20231015141644.260646-1-akihiko.odaki@dayni=
-x.com/#r
-> >
-> > Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-> > ---
-> >   Changes from v7:
-> > - use table lookup for rss hash type
-> >   Changes from v6:
-> > - fix a coding style issue
-> >   Changes from v5:
-> > - Preservation of the hash value has been dropped, following the conclu=
-sion
-> >   from discussions in V3 reviews. The virtio_net driver doesn't
-> >   accessing/using the virtio_net_hdr after the XDP program execution, s=
-o
-> >   nothing tragic should happen. As to the xdp program, if it smashes th=
-e
-> >   entry in virtio header, it is likely buggy anyways. Additionally, loo=
-king
-> >   up the Intel IGC driver,  it also does not bother with this particula=
-r
-> >   aspect.
-> > ---
-> >  drivers/net/virtio_net.c        | 42 +++++++++++++++++++++++++++++++++
-> >  include/uapi/linux/virtio_net.h |  1 +
-> >  2 files changed, 43 insertions(+)
-> >
-> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > index c22d1118a133..1d750009f615 100644
-> > --- a/drivers/net/virtio_net.c
-> > +++ b/drivers/net/virtio_net.c
-> > @@ -4621,6 +4621,47 @@ static void virtnet_set_big_packets(struct virtn=
-et_info *vi, const int mtu)
-> >         }
-> >  }
-> >
-> > +static enum xdp_rss_hash_type
-> > +virtnet_xdp_rss_type[VIRTIO_NET_HASH_REPORT_MAX_TABLE] =3D {
-> > +       [VIRTIO_NET_HASH_REPORT_NONE] =3D XDP_RSS_TYPE_NONE,
-> > +       [VIRTIO_NET_HASH_REPORT_IPv4] =3D XDP_RSS_TYPE_L3_IPV4,
-> > +       [VIRTIO_NET_HASH_REPORT_TCPv4] =3D XDP_RSS_TYPE_L4_IPV4_TCP,
-> > +       [VIRTIO_NET_HASH_REPORT_UDPv4] =3D XDP_RSS_TYPE_L4_IPV4_UDP,
-> > +       [VIRTIO_NET_HASH_REPORT_IPv6] =3D XDP_RSS_TYPE_L3_IPV6,
-> > +       [VIRTIO_NET_HASH_REPORT_TCPv6] =3D XDP_RSS_TYPE_L4_IPV6_TCP,
-> > +       [VIRTIO_NET_HASH_REPORT_UDPv6] =3D XDP_RSS_TYPE_L4_IPV6_UDP,
-> > +       [VIRTIO_NET_HASH_REPORT_IPv6_EX] =3D XDP_RSS_TYPE_L3_IPV6_EX,
-> > +       [VIRTIO_NET_HASH_REPORT_TCPv6_EX] =3D XDP_RSS_TYPE_L4_IPV6_TCP_=
-EX,
-> > +       [VIRTIO_NET_HASH_REPORT_UDPv6_EX] =3D XDP_RSS_TYPE_L4_IPV6_UDP_=
-EX
-> > +};
-> > +
-> > +static int virtnet_xdp_rx_hash(const struct xdp_md *_ctx, u32 *hash,
-> > +                              enum xdp_rss_hash_type *rss_type)
-> > +{
-> > +       const struct xdp_buff *xdp =3D (void *)_ctx;
-> > +       struct virtio_net_hdr_v1_hash *hdr_hash;
-> > +       struct virtnet_info *vi;
-> > +       u16 hash_report;
-> > +
-> > +       if (!(xdp->rxq->dev->features & NETIF_F_RXHASH))
-> > +               return -ENODATA;
-> > +
-> > +       vi =3D netdev_priv(xdp->rxq->dev);
-> > +       hdr_hash =3D (struct virtio_net_hdr_v1_hash *)(xdp->data - vi->=
-hdr_len);
-> > +       hash_report =3D __le16_to_cpu(hdr_hash->hash_report);
-> > +
-> > +       if (hash_report >=3D VIRTIO_NET_HASH_REPORT_MAX_TABLE)
-> > +               hash_report =3D VIRTIO_NET_HASH_REPORT_NONE;
-> > +
-> > +       *rss_type =3D virtnet_xdp_rss_type[hash_report];
-> > +       *hash =3D __le32_to_cpu(hdr_hash->hash_value);
-> > +       return 0;
-> > +}
-> > +
-> > +static const struct xdp_metadata_ops virtnet_xdp_metadata_ops =3D {
-> > +       .xmo_rx_hash                    =3D virtnet_xdp_rx_hash,
-> > +};
-> > +
-> >  static int virtnet_probe(struct virtio_device *vdev)
-> >  {
-> >         int i, err =3D -ENOMEM;
-> > @@ -4747,6 +4788,7 @@ static int virtnet_probe(struct virtio_device *vd=
-ev)
-> >                                   VIRTIO_NET_RSS_HASH_TYPE_UDP_EX);
-> >
-> >                 dev->hw_features |=3D NETIF_F_RXHASH;
-> > +               dev->xdp_metadata_ops =3D &virtnet_xdp_metadata_ops;
-> >         }
-> >
-> >         if (vi->has_rss_hash_report)
-> > diff --git a/include/uapi/linux/virtio_net.h b/include/uapi/linux/virti=
-o_net.h
-> > index cc65ef0f3c3e..3ee695450096 100644
-> > --- a/include/uapi/linux/virtio_net.h
-> > +++ b/include/uapi/linux/virtio_net.h
-> > @@ -176,6 +176,7 @@ struct virtio_net_hdr_v1_hash {
-> >  #define VIRTIO_NET_HASH_REPORT_IPv6_EX         7
-> >  #define VIRTIO_NET_HASH_REPORT_TCPv6_EX        8
-> >  #define VIRTIO_NET_HASH_REPORT_UDPv6_EX        9
-> > +#define VIRTIO_NET_HASH_REPORT_MAX_TABLE      10
->
-> This should not be part of uAPI. It may confuse the userspace.
->
 
-Sure. I will just move it to virtio_net.c right above the table
-definition. Thanks!
 
-> Others look good.
->
-> Thanks
->
-> >         __le16 hash_report;
-> >         __le16 padding;
-> >  };
-> > --
-> > 2.40.1
-> >
->
+On 4/16/2024 1:32 AM, Arınç ÜNAL wrote:
+> On 15/04/2024 18:30, Florian Fainelli wrote:
+>>
+>>
+>> On 4/13/2024 11:07 PM, Arınç ÜNAL via B4 Relay wrote:
+>>> From: Arınç ÜNAL <arinc.unal@arinc9.com>
+>>>
+>>> Read the PHY address the switch listens on from the reg property of the
+>>> switch node on the device tree. This change brings support for MT7530
+>>> switches on boards with such bootstrapping configuration where the 
+>>> switch
+>>> listens on a different PHY address than the hardcoded PHY address on the
+>>> driver, 31.
+>>>
+>>> As described on the "MT7621 Programming Guide v0.4" document, the MT7530
+>>> switch and its PHYs can be configured to listen on the range of 7-12,
+>>> 15-20, 23-28, and 31 and 0-4 PHY addresses.
+>>>
+>>> There are operations where the switch PHY registers are used. For the 
+>>> PHY
+>>> address of the control PHY, transform the MT753X_CTRL_PHY_ADDR constant
+>>> into a macro and use it. The PHY address for the control PHY is 0 
+>>> when the
+>>> switch listens on 31. In any other case, it is one greater than the PHY
+>>> address the switch listens on.
+>>>
+>>> Reviewed-by: Daniel Golle <daniel@makrotopia.org>
+>>> Tested-by: Daniel Golle <daniel@makrotopia.org>
+>>> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+>>
+>> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+>>
+>> I would go a step further and name phy_addr switch_mdio_addr, or 
+>> something along those lines to clearly denote this is not a per-port 
+>> PHY address neither a proper PHY device, but we've already had a 
+>> similar discussion before about spelling this out clearly as a "pseudo 
+>> PHY"....
+> 
+> I am fine with calling the switch operating on an MDIO bus a psuedo-PHY.
+> But I don't believe this grants making up names on our own instead of using
+> the name described in IEEE Std 802.3-2022. The switch listens on a PHY
+> address on the MDIO bus. 
+
+The switch listens at a particular address on the MDIO bus, that is the 
+key thing. Whether the addressable device happens to be an 
+Ethernet/SATA/PCIe/USB PHY, an accelerometer, a light switch or an 
+Ethernet switch does not matter as long as it is addressable over clause 
+22 and/or 45. For all that matters the switch's MDIO interface is not a 
+PHY, otherwise its registers 0-15 would be abiding by the IEEE 
+802.3-2022 standard, and that is not the case.
+
+> The description for the phy_addr member of the
+> mt753x_info structure clearly explains that so I don't see a reason to
+> change the variable name.
+
+IMHO it is clearer to use mdiodev->addr through and through, the 
+shorthand is not necessary and does not save that many characters to 
+type in the first place. Saving a mdiodev pointer into mt7530_priv and 
+accessing priv->mdiodev->addr would be 18 characters to type versus 14 
+with priv->phy_addr.
+
+Anyway.
+-- 
+Florian
 
