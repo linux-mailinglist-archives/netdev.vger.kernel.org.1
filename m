@@ -1,106 +1,100 @@
-Return-Path: <netdev+bounces-88668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 190B78A82A2
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 13:59:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 587918A82AE
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 14:00:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 49F841C203B9
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:59:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 892A91C218C6
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 12:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5060513CFBA;
-	Wed, 17 Apr 2024 11:58:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC1A13D245;
+	Wed, 17 Apr 2024 12:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E2hMp4WC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K+BSqGKt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B135313CA9E
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 11:58:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBB8213CFBD
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 12:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713355132; cv=none; b=KGLPw5fEv0YsHkvVQfF/yhXYtl+MtaY1Ia8rRluJeM2XZYhtQ7F1c/n/Mxj1REeIj6VwPWWQzIliQYg+mnNTCcyk1dCU5ZwAN7XFiQhkcTHtAkaR0GlnRf0dJrRx/Y0XMX20w+bnNIekCa1ecNeNOZr9Yr4xa5hcO5aD8jRK5B8=
+	t=1713355228; cv=none; b=s45K7t6rkCjlggCqPLMPOJorbQET0g9aKWnsltE3onTtQFhFIFA8TYQDtLlcieD+c8SO/250tEMIrauqpWQXKlMEzU2PXx201LZtpunB0biukpUlp4gcCiEipTOTAk2MAOMRWP+aAybv40Tti5PvEoPdxxtXRSGnk2JU24bHdkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713355132; c=relaxed/simple;
-	bh=i++d/LSGW+ItQM1cv25ZIcpp8R8VZzG/u0n7K8I+Zro=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cnJrKgRZ2zEA9WRCQ82MBjXNHxr7H4RQz1zCqdHgcUI13/plTGicQVg157J1FSMdNFzh74nwMpNeamcxsaGdY09mU2ZC3HC+TnYQXMaGpUoSxQG9UnlRawflegt+dqW6gBV9ovN/zKIGHfQf9gXOQv4fTImYyBhV3yraJQEMq20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E2hMp4WC; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5700ed3017fso12083a12.1
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 04:58:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713355129; x=1713959929; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1ddgmhf4VOJewzysoq0Rn4OGoTJBxt8VjAEnHieO5oY=;
-        b=E2hMp4WC/ndwFusUXUhTA+mTwf3+NHWxKppdsKemMHLx+L9sFLtv3DvWlyArWMGFOb
-         KLyV9u7PFUhzpSEIZiZbEaUCRGPluqsmUAgAOJKvt73DREuLkFP8WyyrEnS2Kz9eP5Xi
-         hV0+qyjdA15MBGA4gLHHNCn3IJc7MeZ87D0dUKKvF9vsUV7ZywBuGir2ea++U4tpa0KZ
-         pbbSfbikOv5U/Ej/BBRxQXN14GggRA4nlqKg63GvM4nFIrJVpRnEAp/TIx6QVREpxHj4
-         VKzrGxnjMAzK9MW3M5oTybVDLb5JwmQyKgz8KnDmB0++z7RHHIOJaizM3yP1zMRsAmSH
-         l/Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713355129; x=1713959929;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1ddgmhf4VOJewzysoq0Rn4OGoTJBxt8VjAEnHieO5oY=;
-        b=ZHkXX86EzY15298bqvExTfzuDMVOFFbogUwPhSVfE17+u5nIETvTQjSjQzHK9BqbJD
-         Uku2pBUzszplH791BClB7J+/LQRU3MB6W+MMitscWpv58y9hSaLvB83Ale8qnRNXKOWP
-         GWMxKNcuv+IA2sx/5mpYkdYirbm+czrWLd+bCGXRJJMfh0dcQGbGCvxRj2cWSwIL4BOo
-         F4Xn8mEffdNYXf4cgKMezpgCkvC1x+DwqyckuY1haDwBiWizCqWyEInHTCn0XNRYRjLP
-         u6c3VawpWhK7M9+oQEMm2C8grNJzwcK+cKy3YSpwQLfQ4mQoK/VtBx78hSZagBQ4St2Z
-         npsg==
-X-Forwarded-Encrypted: i=1; AJvYcCViPboAYqY6BZsVY9ogBQrpRBULTyLbnYCrMGtRrmQNz92dXXzlqO/6CXY+DAUad6+zkeLMNCA5HCWUroWcJHxtcS+m4iOg
-X-Gm-Message-State: AOJu0Yxg+mzIPlehZ227tt6brMk8A0iCsWzXlkghAgOu4UrK7ZPlWRUB
-	9L/yo5U2PCCGu62wszq2EJdCEw+Ih7Gv4xCqzvX3n10XhjwVggiv+lx1UwhSr+xCpjwZvtnii8t
-	sDJn6r3WB06zV5FH1x9hLCHADz+zOEiu4C6R4
-X-Google-Smtp-Source: AGHT+IF1rihMtq4Tk3ikzU7fRYVPFHCJ6l3Ie9PP+b0QgG7TSFcZPFLZmdUKOeP50/KhMY6+oZaoKfVknr+lxHbdl+M=
-X-Received: by 2002:aa7:c90c:0:b0:570:49fb:79d0 with SMTP id
- b12-20020aa7c90c000000b0057049fb79d0mr142349edt.3.1713355128771; Wed, 17 Apr
- 2024 04:58:48 -0700 (PDT)
+	s=arc-20240116; t=1713355228; c=relaxed/simple;
+	bh=HzGMgnDrZvUIv1uGxXoX3B+eBoUnhMaKa3oceiR5HQE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=tDtEVBLDtYfZbRa99aLft8N+7R0cWAS8gxYFFhCYIGSBlaBDo5WqvT1fEa1P4rakiCH7/GgS8qgqGAg2kCoLQ+fyqQbLjUsiX9twF0D+M+3QrU9kbZ4QiGKM0WbfkMfwFImGw8+i2Xs9X80P0SwRCDoMtX0iUTjGwqjjHfkC2TE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K+BSqGKt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 701BEC4AF08;
+	Wed, 17 Apr 2024 12:00:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713355228;
+	bh=HzGMgnDrZvUIv1uGxXoX3B+eBoUnhMaKa3oceiR5HQE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=K+BSqGKtp5BuQMD3coF/l/t2MYkSvFI/bGA5T3tr0ezNZOrhTHH/XIxIRQQTvCHlW
+	 8lqy1GOEaOeNCbIGba0jbGhi7BDD+Unc6OV+YFsHIhnkyZ8vYOrogDLek3BYtAnQT1
+	 hFxhOVCqPrcKwPqNoDH5RalNG0vVa24y239faMVVqvV3L4WVg1KoTQmcZkoH93Cgd9
+	 24ArNZ6KTiR1QcAqyqDLLChcRwA5PLO7eD5npK1CAViTxAWVTxmnhltnMpbLaSUZIo
+	 6Q9scowyCYZCD7mrCraTwOVK4x6GF7/RTd7glSWgtvxlVK60koESWH2GKeNN6yx5DK
+	 EPMb3pi1Mxikw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 647B2C54BB3;
+	Wed, 17 Apr 2024 12:00:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240417062721.45652-1-kerneljasonxing@gmail.com>
- <20240417062721.45652-3-kerneljasonxing@gmail.com> <CANn89iLKxuBcriFNjtAS8DuhyLq2MPzGdvZxzijzhYdKM+Cw6w@mail.gmail.com>
- <CAL+tcoBZ0MCntKO2POZ9g6kZ7euMXZY94FWN85siH1tZ6w5Lrg@mail.gmail.com> <CANn89iJovrpBc8vFadJZdA89=H5Qt8uvj2Cu3jr=HHP2pELw2Q@mail.gmail.com>
-In-Reply-To: <CANn89iJovrpBc8vFadJZdA89=H5Qt8uvj2Cu3jr=HHP2pELw2Q@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 17 Apr 2024 13:58:37 +0200
-Message-ID: <CANn89iJm3Pokx2hJy4af-frhV2+cadRYBSydG2Pc5w3C7d8RrA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 2/3] net: rps: protect filter locklessly
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, horms@kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] tcp: accept bare FIN packets under memory pressure
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171335522840.25671.6144928889217490556.git-patchwork-notify@kernel.org>
+Date: Wed, 17 Apr 2024 12:00:28 +0000
+References: <20240416095054.703956-1-edumazet@google.com>
+In-Reply-To: <20240416095054.703956-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, aoates@google.com,
+ ncardwell@google.com, cpaasch@apple.com, vidhi_goel@apple.com
 
-On Wed, Apr 17, 2024 at 1:52=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> @@ -4668,7 +4668,7 @@ bool rps_may_expire_flow(struct net_device *dev,
-> u16 rxq_index,
->                 cpu =3D READ_ONCE(rflow->cpu);
->                 if (rflow->filter =3D=3D filter_id && cpu < nr_cpu_ids &&
->                     ((int)(READ_ONCE(per_cpu(softnet_data,
-> cpu).input_queue_head) -
-> -                          READ_ONCE(rflow->last_qtail)) <
-> +                          rflow->last_qtail) <
->                      (int)(10 * flow_table->mask)))
->                         expire =3D false;
->         }
+Hello:
 
-Oh well, rps_may_expire_flow() might be called from other contexts, so
-only the  READ_ONCE()
-from get_rps_cpu() is not really necessary.
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Tue, 16 Apr 2024 09:50:54 +0000 you wrote:
+> Andrew Oates reported that some macOS hosts could repeatedly
+> send FIN packets even if the remote peer drops them and
+> send back DUP ACK RWIN 0 packets.
+> 
+> <quoting Andrew>
+> 
+>  20:27:16.968254 gif0  In  IP macos > victim: Flags [SEW], seq 1950399762, win 65535, options [mss 1460,nop,wscale 6,nop,nop,TS val 501897188 ecr 0,sackOK,eol], length 0
+>  20:27:16.968339 gif0  Out IP victim > macos: Flags [S.E], seq 2995489058, ack 1950399763, win 1448, options [mss 1460,sackOK,TS val 3829877593 ecr 501897188,nop,wscale 0], length 0
+>  20:27:16.968833 gif0  In  IP macos > victim: Flags [.], ack 1, win 2058, options [nop,nop,TS val 501897188 ecr 3829877593], length 0
+>  20:27:16.968885 gif0  In  IP macos > victim: Flags [P.], seq 1:1449, ack 1, win 2058, options [nop,nop,TS val 501897188 ecr 3829877593], length 1448
+>  20:27:16.968896 gif0  Out IP victim > macos: Flags [.], ack 1449, win 0, options [nop,nop,TS val 3829877593 ecr 501897188], length 0
+>  20:27:19.454593 gif0  In  IP macos > victim: Flags [F.], seq 1449, ack 1, win 2058, options [nop,nop,TS val 501899674 ecr 3829877593], length 0
+>  20:27:19.454675 gif0  Out IP victim > macos: Flags [.], ack 1449, win 0, options [nop,nop,TS val 3829880079 ecr 501899674], length 0
+>  20:27:19.455116 gif0  In  IP macos > victim: Flags [F.], seq 1449, ack 1, win 2058, options [nop,nop,TS val 501899674 ecr 3829880079], length 0
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] tcp: accept bare FIN packets under memory pressure
+    https://git.kernel.org/netdev/net-next/c/2bd99aef1b19
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
