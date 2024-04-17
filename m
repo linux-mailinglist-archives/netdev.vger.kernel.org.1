@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-88574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02D128A7C1E
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 08:13:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CCEA8A7C26
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 08:15:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6146E28511E
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 06:13:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B642C1C2197E
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 06:15:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32AA0537EC;
-	Wed, 17 Apr 2024 06:13:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B431D537E5;
+	Wed, 17 Apr 2024 06:14:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="U/OXeJl7"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="o0vJFIB9"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8700432182;
-	Wed, 17 Apr 2024 06:13:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D1F184D;
+	Wed, 17 Apr 2024 06:14:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713334386; cv=none; b=DFXH3PIR44FMZi6Z5fa/MnlGTW7EVhASU3e8VkUpMirzdCL4k8QrCNbe8w48jQSyfzyiEObMAJGMKJ2BcReSzx+IUR1WFFzSzTTGBfzjG1iipEc2VhgJ1S9GWyf75vPB+98CJaI/OhDE+AkIXp54H9Px8Z3sdYU+DdQTMDTcxJw=
+	t=1713334498; cv=none; b=l4yiYDi7C+K0/sNKb7VP+ZfsbHBww4ABTOJ73mL07vK5ngk5nyubX0Q38Ocfmt26lMHiarpxzQaoX1Gs494OyvPjvGPclZABU1wAjqi77+FwwlmLcbMqcbMJC9N/b2xIAMKb/cPIguQItMx/ClvJ5gR0Gu6iYH3i2BYKWGeLTak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713334386; c=relaxed/simple;
-	bh=7ZgUen8ot11Qz879HUcjaNN0IEVPXOLC3zfr6OtSodc=;
+	s=arc-20240116; t=1713334498; c=relaxed/simple;
+	bh=6OCRfMWE1Nl1glL6JHGetGOp1oOm4UmouTp4ctm6Ohs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qU1acFmWG4Q2LjNXfDwbZTnwBuOnMzG4vYqwjoJOXo0i/ke2hLPbESkgxNISzbKyvaJ5wcvBFMLW6fKVnaHSSYjiY+44pVqIQlzVaL4ZQB5J0QXU+7CCiaUum9KLsFFI2iaXoJe67RsJK2YjW3uam9mOLL20Ct3rBjh2J2j7gvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=U/OXeJl7; arc=none smtp.client-ip=217.70.183.200
+	 MIME-Version:Content-Type; b=bMda3uhHG/kGcJrQgEm2ur0qDIyp+q9gdHQg+tCLSmmOG/wDEqf9Sd3k4z3m/VYclUUnmW+M+q9ikSUQOJ4WLQY5G3MGuwkdujjV1wNph102y1KSAi0mf1on9bIr0PHMgmQFZrmMRUI5YvVivgQZEDwJFhyHQBvN+Md1TTdARDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=o0vJFIB9; arc=none smtp.client-ip=217.70.183.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7DE592000A;
-	Wed, 17 Apr 2024 06:12:54 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 25FAB1BF203;
+	Wed, 17 Apr 2024 06:14:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1713334381;
+	t=1713334494;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6dGOFNPsAT2bpY0iMzqWzQtr2Je5V47A0xRQXyXChek=;
-	b=U/OXeJl7xv4grdNUAujts4V4Qv/0Yd1oYDnqOoIEqZRNxHQ8szmmKg9wc7usiesylnz+/l
-	2DdOB+MCM+3LiRMgPb3kn4spUT+VEbdmTmTxzYz1Vu2tEMwYwNl1NtdzwZQ35yb49uvmsH
-	nnWJs/bwZm51gm5YE1SYSsPAVPWOsWUCsMgddeIa4SlMXWbPSoDcHVSzTouVXxoycr/PNx
-	7XZjvH7nphEvJbtVHdVTMmH1SYWRM6MkrxOD48d0u1R4jvdQc860aAm+gspLQVwaNGn5Xi
-	wqZ0i9rP4CbDtIAScjFsEMDkgRuLGcjDYM6wne9IX5dK0d1+0Wbv7PRkHjMoSA==
-Date: Wed, 17 Apr 2024 08:12:49 +0200
+	bh=zExFMDHxfXPeW+ilYZceHxAY8OTO9Z8sxt8dwhaGhUs=;
+	b=o0vJFIB9IpqBkYfqT711EFYlGPpY7zc8iqeBbo7HWthTkRRu7+428Psex93iwDUr4tcarP
+	57G59lHiH6Jywws3w/0ECVc5c5D0LrU3ApKd3I0m69mYaDdzsJBAe66wNOQBybNWMAv9QP
+	PEqvrTcjSAT2S0hN1Emj6o7MbFmaJwEE08s/y0nfmj90MHmLDJmV/LLXYvbY5/0er3p6OO
+	FCAyaYcxa6fjqdInrNiEIn3czQuno4yWq+8zwi6Ut7MBKALh2XR54wqYeN0corNCe8cANe
+	Wm7bVYKqTl/XfFrm60EiLwygqICx+R4cA+RQVqvDvc2b8V3qQZCVzx+8P5vqGg==
+Date: Wed, 17 Apr 2024 08:14:43 +0200
 From: Kory Maincent <kory.maincent@bootlin.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
@@ -62,13 +62,13 @@ Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
  linux-doc@vger.kernel.org, devicetree@vger.kernel.org, Dent Project
  <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime Chevallier
  <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v8 04/17] ethtool: Expand Ethernet Power
- Equipment with c33 (PoE) alongside PoDL
-Message-ID: <20240417081249.1e92dab2@kmaincent-XPS-13-7390>
-In-Reply-To: <20240416192037.50aa0136@kernel.org>
+Subject: Re: [PATCH net-next v8 06/17] net: ethtool: pse-pd: Expand pse
+ commands with the PSE PoE interface
+Message-ID: <20240417081443.4bcfc452@kmaincent-XPS-13-7390>
+In-Reply-To: <20240416192302.72b37f09@kernel.org>
 References: <20240414-feature_poe-v8-0-e4bf1e860da5@bootlin.com>
-	<20240414-feature_poe-v8-4-e4bf1e860da5@bootlin.com>
-	<20240416192037.50aa0136@kernel.org>
+	<20240414-feature_poe-v8-6-e4bf1e860da5@bootlin.com>
+	<20240416192302.72b37f09@kernel.org>
 Organization: bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
@@ -81,37 +81,23 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-GND-Sasl: kory.maincent@bootlin.com
 
-On Tue, 16 Apr 2024 19:20:37 -0700
+On Tue, 16 Apr 2024 19:23:02 -0700
 Jakub Kicinski <kuba@kernel.org> wrote:
 
-> On Sun, 14 Apr 2024 16:21:53 +0200 Kory Maincent wrote:
-> > + * @ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED: "The enumeration
-> > \u201cdisabled\u201d
-> > + *	indicates that the PSE State diagram is in the state DISABLED."
-> > + * @ETHTOOL_C33_PSE_PW_D_STATUS_SEARCHING: "The enumeration
-> > \u201csearching\u201d
-> > + *	indicates the PSE State diagram is in a state other than those
-> > + *	listed."
-> > + * @ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING: "The enumeration
-> > + *	\u201cdeliveringPower\u201d indicates that the PSE State diagram
-> > is in the
-> > + *	state POWER_ON."
-> > + * @ETHTOOL_C33_PSE_PW_D_STATUS_TEST: "The enumeration \u201ctest\u201d
-> > indicates that
-> > + *	the PSE State diagram is in the state TEST_MODE."
-> > + * @ETHTOOL_C33_PSE_PW_D_STATUS_FAULT: "The enumeration \u201cfault\u2=
-01d
-> > indicates that
-> > + *	the PSE State diagram is in the state TEST_ERROR."
-> > + * @ETHTOOL_C33_PSE_PW_D_STATUS_OTHERFAULT: "The enumeration
-> > \u201cotherFault\u201d =20
+> On Sun, 14 Apr 2024 16:21:55 +0200 Kory Maincent wrote:
+> > +	    !(pse_has_podl(phydev->psec))) {
+> > +		NL_SET_ERR_MSG_ATTR(info->extack,
+> > +				    tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL],
+> > +				    "setting PoDL PSE admin control not
+> > supported");
+> > +		return -EOPNOTSUPP;
+> > +	}
+> > +	if (tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL] &&
+> > +	    !(pse_has_c33(phydev->psec))) { =20
 >=20
-> funny characters here: \u201c and \u201d
+> nit: unnecessary parenthesis around the function call
 
-Arf again, I have learned the hard way of do not copy past some documentati=
-on
-from the standard to Linux.
-Thanks Jakub, for the reviewing and the merge try!
+Right, thanks for spotting it!
 
 Regards,
 --=20
