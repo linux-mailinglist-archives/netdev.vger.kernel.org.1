@@ -1,147 +1,172 @@
-Return-Path: <netdev+bounces-88641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88642-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38DFC8A7F8A
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:22:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5032E8A7F91
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:24:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67DE51C20E1C
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:22:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E568281806
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:24:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0DF512DD87;
-	Wed, 17 Apr 2024 09:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3F713A259;
+	Wed, 17 Apr 2024 09:23:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dKX9QEQv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cEqZ5pnU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8A7127B45;
-	Wed, 17 Apr 2024 09:22:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 374AE12FB3E
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 09:23:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713345765; cv=none; b=DgR5mzRsedPhElXxQEtqFscBoFJeNLmaYFiwKgUKizEbb4QVWrKKxj4+XRnMJJo0SXogwNPm/N0qCcVH6U2zkduzsylV+vUO/M+Qd98dnYxqnNdk6taOlkHsecLyo09IMjs4VVbQNo+D/CA73KdVnCc8p3iQxnZIt+3e6Cyfq6M=
+	t=1713345823; cv=none; b=P+COkU4NIhq3XyGFpfQFXf6Qn/FU3z+eIvPOXbycB6UMvCRSkaomN22AewP1UdHCIHNt0NglcmMIXf+YFWZBTlFCltK3NNX+OaOQPwc0q/O41UQFuzrB2GCYzZpGMYfZKRvn41AW9C8lvGdTSmb5i2MUsRvsMJV9Ozu47jPiHfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713345765; c=relaxed/simple;
-	bh=c4au2icJSPKncXqRvVreWlcffcYZI2pV7PV/A3myfjE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FoOL3A8CfW8epNZ260t8CW+XTXH5rNNzkPGxHXm7wNQNrhUawkqvmTAr0pPARtQ+K16wd8qVBtln5U3B+ipfr6DU5pJKWHNLodq/fh0sclqf1N0y4DAQhePb7TCRMwfDVbnf1ODKeOaw/lB1kLpCyClbyOStgZak+4YiCKyWtc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dKX9QEQv; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a51beae2f13so614247366b.1;
-        Wed, 17 Apr 2024 02:22:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713345762; x=1713950562; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OW9PmjLbwn7pJabXhHqlARTl4IzAtlALQknNYaa1aEo=;
-        b=dKX9QEQvVJcf9wPo8bwNyOYa70DxEY8vp7W/ED66w6jmxzKw6WmHmf8Jb7fD/xtSjQ
-         dGpI5B67+G4wkeSZJJBbBWSzPmet+k/o/Si92aEBtmLkz079ypmT2M8yJWeKs+7Zy0NM
-         2c8WQXtGCUxlZsNjhqw3YBU9Ql6QFQyNVcEKr9LvHRDdx3Y/Pjqg+tcaNWxdcmuMnzkG
-         XsADrvdECCSCIHS+ZRFDgwjmhAtJ14epcjAHRRlr5GwwOOLj+bMJi52piGh3+y4qCgnk
-         8ZXFIbwTO+ab7kRUiyvI8HyfBfKAkk5dwH21yyViGOgQ20mCawsiq7++p4Qh3ekLBR5J
-         b2TQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713345762; x=1713950562;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OW9PmjLbwn7pJabXhHqlARTl4IzAtlALQknNYaa1aEo=;
-        b=Y8yQF2lJWDfPZG677aE+9YLQby2L6L//zV9HTKb9JrAyXjpi9/dx8iLEYjoABOXfRf
-         YDjnauDFJtP5R/W57wBKOY/1Vv4IFh/s3Tll9gXS/ZEyLy1yuMtVSCv9Jiad55ElCSA0
-         2hyx7xXcF8T4ssGOY8DGbcL0iNrXxdiNgOBo+q0MRx2Zy2EfIHHjtRe8IJuwnW+hXz7h
-         5RvPeWnh8vbWpySPMIrtJWKylmZbaRZqIuh3QVQ/zhVohrMASz9NKTz1mBtbWKNd5zX2
-         gBG+h6uHR0YGS6Y/kng3YnB5MquSVb3j1Fm6Vyd/0mWm0l32UPNtfPHxAj2CHWqzXrlu
-         4PaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVoVR7EGVfok721rPWgVTTJ+luCnGui534WMNt/mLg6ZHV96JvFUJav4X6AcFHrbjtDxEKEQ0n62wf3d65olXADUvXCY3mKmB/wQK+hry9ya3c7PgkcZpz+eO1hoed4l9xnCr8BokZYFhww
-X-Gm-Message-State: AOJu0YxwIpZ1XHJLGYagLyUR2Vf40GQrSPDu7ZvkurE24bykhdhOlGsa
-	FYMldG9yl9bMBhBWHSp8pSV2e9/9XaJ78F9PCWmZovr7zcNAAHIZ+FivtJ0fmfZfM8sYCEJtpxn
-	FZOfmq8YaAHbUk6sfFe0nX4QgJeQ=
-X-Google-Smtp-Source: AGHT+IHL2T/dUxZvTLwRpF9eorxg0NEt2cytKUT4skY49BBflJcjLDdYgmw3ytzpCLdQ5PdeePx2tsTKBimLdU+a+kQ=
-X-Received: by 2002:a17:906:3fd6:b0:a55:54eb:c3dc with SMTP id
- k22-20020a1709063fd600b00a5554ebc3dcmr801485ejj.77.1713345761680; Wed, 17 Apr
- 2024 02:22:41 -0700 (PDT)
+	s=arc-20240116; t=1713345823; c=relaxed/simple;
+	bh=NwvTcqsLSHiNBxj71cJNo8o1PpgdRSNp+v2iXI02XDU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f+r3yTksFp30sNa9V/5NuYh4Moah46yo2bCUM7PVIfajbtKwBd0HryBGWHDZHpUNLHhc8XKBq5nPg64VlFBLA9BgM/QEyGW/cmaY80jHw0/V++giKIsbeCYpau3LpY5e+ZM2w5jfaMsHYwNGRvKTIOVZTDvWGd6FMV/d2/NpOrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cEqZ5pnU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A70B1C32783;
+	Wed, 17 Apr 2024 09:23:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713345822;
+	bh=NwvTcqsLSHiNBxj71cJNo8o1PpgdRSNp+v2iXI02XDU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cEqZ5pnUmdLFU1grip03BOg5GXU+FYftxMCMGOFtyyIniKR5TStxwjz9HWT72naE1
+	 JhOUmuqLcbzjPsW/oUtLbyuZ5wTnEtGDpllGeL95dp6hmXmpNZ/zR9b45cbzwHEnU2
+	 r+E4HkBmscA4WdBwtEL4lvobnBrMH8PTh0fOiwYbjvQF3iWnAu0xxq+osBq+qAk86b
+	 GExyQm/IBeu4Tz4Kq7ad3RHlKEUw1ryzisrxv+y3fNVFJKwQTrTS47kc7ZgxVBDBmF
+	 8Ms1eoMJp2OOEROI6m7XwjmzcjHG4U+iyd5zIZHBaUglXNv2tQA/DfO0j/3KYQwVMY
+	 aVA2gZwfas0Uw==
+Date: Wed, 17 Apr 2024 10:23:38 +0100
+From: Simon Horman <horms@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next 01/14] net_sched: sch_fq: implement lockless
+ fq_dump()
+Message-ID: <20240417092338.GU2320920@kernel.org>
+References: <20240415132054.3822230-1-edumazet@google.com>
+ <20240415132054.3822230-2-edumazet@google.com>
+ <20240416181915.GT2320920@kernel.org>
+ <CANn89i+X3zkk-RwRVuMursG-RY+R6P29AWK-pjjVuNKT91VsJw@mail.gmail.com>
+ <CANn89i+iNKvCv+RPtCa4KOY9DCEQJfGP9xHSedFUbWZHt2DSFw@mail.gmail.com>
+ <20240417090046.GB3846178@kernel.org>
+ <CANn89iJwJHz4T-Rz03TYJcGCn8fBUncK-Wbefn_zPDh7Vy80Kw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240417085143.69578-1-kerneljasonxing@gmail.com>
- <20240417085143.69578-2-kerneljasonxing@gmail.com> <CANn89i+aLO_aGYC8dr8dkFyi+6wpzCGrogysvgR8FrfRvaa-Vg@mail.gmail.com>
-In-Reply-To: <CANn89i+aLO_aGYC8dr8dkFyi+6wpzCGrogysvgR8FrfRvaa-Vg@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 17 Apr 2024 17:22:04 +0800
-Message-ID: <CAL+tcoC8VPOhvPbdbJUrRrAiLaOF2jwsoBkFBEkivPgMzijG5g@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 1/7] net: introduce rstreason to detect why
- the RST is sent
-To: Eric Dumazet <edumazet@google.com>
-Cc: dsahern@kernel.org, matttbe@kernel.org, martineau@kernel.org, 
-	geliang@kernel.org, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
-	rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
-	atenart@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iJwJHz4T-Rz03TYJcGCn8fBUncK-Wbefn_zPDh7Vy80Kw@mail.gmail.com>
 
-Hello Eric,
-
-On Wed, Apr 17, 2024 at 5:02=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Wed, Apr 17, 2024 at 10:51=E2=80=AFAM Jason Xing <kerneljasonxing@gmai=
-l.com> wrote:
+On Wed, Apr 17, 2024 at 11:02:55AM +0200, Eric Dumazet wrote:
+> On Wed, Apr 17, 2024 at 11:00 AM Simon Horman <horms@kernel.org> wrote:
 > >
-> > From: Jason Xing <kernelxing@tencent.com>
+> > On Wed, Apr 17, 2024 at 10:45:09AM +0200, Eric Dumazet wrote:
+> > > On Tue, Apr 16, 2024 at 8:33 PM Eric Dumazet <edumazet@google.com> wrote:
+> > > >
+> > > > On Tue, Apr 16, 2024 at 8:19 PM Simon Horman <horms@kernel.org> wrote:
+> > > > >
+> > > > > On Mon, Apr 15, 2024 at 01:20:41PM +0000, Eric Dumazet wrote:
+> > > > > > Instead of relying on RTNL, fq_dump() can use READ_ONCE()
+> > > > > > annotations, paired with WRITE_ONCE() in fq_change()
+> > > > > >
+> > > > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > > > > ---
+> > > > > >  net/sched/sch_fq.c | 96 +++++++++++++++++++++++++++++-----------------
+> > > > > >  1 file changed, 60 insertions(+), 36 deletions(-)
+> > > > > >
+> > > > > > diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
+> > > > > > index cdf23ff16f40bf244bb822e76016fde44e0c439b..934c220b3f4336dc2f70af74d7758218492b675d 100644
+> > > > > > --- a/net/sched/sch_fq.c
+> > > > > > +++ b/net/sched/sch_fq.c
+> > > > > > @@ -888,7 +888,7 @@ static int fq_resize(struct Qdisc *sch, u32 log)
+> > > > > >               fq_rehash(q, old_fq_root, q->fq_trees_log, array, log);
+> > > > > >
+> > > > > >       q->fq_root = array;
+> > > > > > -     q->fq_trees_log = log;
+> > > > > > +     WRITE_ONCE(q->fq_trees_log, log);
+> > > > > >
+> > > > > >       sch_tree_unlock(sch);
+> > > > > >
+> > > > > > @@ -931,7 +931,7 @@ static void fq_prio2band_compress_crumb(const u8 *in, u8 *out)
+> > > > > >
+> > > > > >       memset(out, 0, num_elems / 4);
+> > > > > >       for (i = 0; i < num_elems; i++)
+> > > > > > -             out[i / 4] |= in[i] << (2 * (i & 0x3));
+> > > > > > +             out[i / 4] |= READ_ONCE(in[i]) << (2 * (i & 0x3));
+> > > > > >  }
+> > > > > >
+> > > > >
+> > > > > Hi Eric,
+> > > > >
+> > > > > I am a little unsure about the handling of q->prio2band in this patch.
+> > > > >
+> > > > > It seems to me that fq_prio2band_compress_crumb() is used to
+> > > > > to store values in q->prio2band, and is called (indirectly)
+> > > > > from fq_change() (and directly from fq_init()).
+> > > > >
+> > > > > While fq_prio2band_decompress_crumb() is used to read values
+> > > > > from q->prio2band, and is called from fq_dump().
+> > > > >
+> > > > > So I am wondering if should use WRITE_ONCE() when storing elements
+> > > > > of out. And fq_prio2band_decompress_crumb should use READ_ONCE when
+> > > > > reading elements of in.
+> > > >
+> > > > Yeah, you are probably right, I recall being a bit lazy on this part,
+> > > > thanks !
+> > >
+> > > I will squash in V2 this part :
+> > >
+> > > diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
+> > > index 934c220b3f4336dc2f70af74d7758218492b675d..238974725679327b0a0d483c011e15fc94ab0878
+> > > 100644
+> > > --- a/net/sched/sch_fq.c
+> > > +++ b/net/sched/sch_fq.c
+> > > @@ -106,6 +106,8 @@ struct fq_perband_flows {
+> > >         int                 quantum; /* based on band nr : 576KB, 192KB, 64KB */
+> > >  };
+> > >
+> > > +#define FQ_PRIO2BAND_CRUMB_SIZE ((TC_PRIO_MAX + 1) >> 2)
+> > > +
+> > >  struct fq_sched_data {
+> > >  /* Read mostly cache line */
+> > >
+> > > @@ -122,7 +124,7 @@ struct fq_sched_data {
+> > >         u8              rate_enable;
+> > >         u8              fq_trees_log;
+> > >         u8              horizon_drop;
+> > > -       u8              prio2band[(TC_PRIO_MAX + 1) >> 2];
+> > > +       u8              prio2band[FQ_PRIO2BAND_CRUMB_SIZE];
+> > >         u32             timer_slack; /* hrtimer slack in ns */
+> > >
+> > >  /* Read/Write fields. */
+> > > @@ -159,7 +161,7 @@ struct fq_sched_data {
+> > >  /* return the i-th 2-bit value ("crumb") */
+> > >  static u8 fq_prio2band(const u8 *prio2band, unsigned int prio)
+> > >  {
+> > > -       return (prio2band[prio / 4] >> (2 * (prio & 0x3))) & 0x3;
+> > > +       return (READ_ONCE(prio2band[prio / 4]) >> (2 * (prio & 0x3))) & 0x3;
+> > >  }
 > >
-> > Add a new standalone file for the easy future extension to support
-> > both active reset and passive reset in the TCP/DCCP/MPTCP protocols.
+> > Thanks Eric,
 > >
-> > This patch only does the preparations for reset reason mechanism,
-> > nothing else changes.
-> >
-> > The reset reasons are divided into three parts:
-> > 1) reuse drop reasons for passive reset in TCP
-> > 2) reuse MP_TCPRST option for MPTCP
-> > 3) our own reasons
-> >
-> > I will implement the basic codes of active/passive reset reason in
-> > those three protocols, which is not complete for this moment. But
-> > it provides a new chance to let other people add more reasons into
-> > it:)
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
->
-> My original suggestion was to use normal values in  'enum
-> skb_drop_reason', even if there was not necessarily a 'drop'
-> in the common sense.
->
-> https://lore.kernel.org/all/CANn89iJw8x-LqgsWOeJQQvgVg6DnL5aBRLi10QN2WBdr=
-+X4k=3Dw@mail.gmail.com/
->
-> This would avoid these ugly casts later, even casting an enum to other
-> ones is not very logical.
+> > assuming that it is ok for this version of fq_prio2band() to run
+> > from fq_enqueue(), this update looks good to me.
+> 
+> It is ok, a READ_ONCE() here is not adding any constraint on compiler output.
 
-Thanks for your comment.
-
-It's a little bit tricky. That's the reason I documented and commented
-on this in the rstreason.h file. I hope it's not that hard to
-understand.
-
-> Going through an u32 pivot is quite a hack.
->
-> If you feel the need to put them in a special group, this is fine by me.
-
-Yes, rst reasons only partially rely on the drop reason mechanism to
-support passive rst for TCP well, but not supporting other cases. My
-final goal is to cover all the cases for the future, so I wish I can
-put it into a separate group, then people like me who find it useful
-can introduce more reasons into it.
-
-Thanks,
-Jason
+Thanks for confirming.
+This looks good to me.
 
