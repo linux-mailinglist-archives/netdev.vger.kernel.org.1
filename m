@@ -1,107 +1,140 @@
-Return-Path: <netdev+bounces-88575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CCEA8A7C26
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 08:15:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C7168A7C3D
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 08:18:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B642C1C2197E
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 06:15:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C17E2B22DCB
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 06:18:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B431D537E5;
-	Wed, 17 Apr 2024 06:14:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10B154737;
+	Wed, 17 Apr 2024 06:17:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="o0vJFIB9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Sh5mrPfe"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D1F184D;
-	Wed, 17 Apr 2024 06:14:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A75393C68C;
+	Wed, 17 Apr 2024 06:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713334498; cv=none; b=l4yiYDi7C+K0/sNKb7VP+ZfsbHBww4ABTOJ73mL07vK5ngk5nyubX0Q38Ocfmt26lMHiarpxzQaoX1Gs494OyvPjvGPclZABU1wAjqi77+FwwlmLcbMqcbMJC9N/b2xIAMKb/cPIguQItMx/ClvJ5gR0Gu6iYH3i2BYKWGeLTak=
+	t=1713334670; cv=none; b=I1bP0w1/mZ5SxaxOExuI86vsdH/OTNA63+fIIrruijLgNgXu/4M9+f3zzYqd96BdfxzW3gJ07pTHoikdhl/i+DKcvzmEdkn5rMN+8vU+fJc3YbLmcBvttYdQXtFGOTIo9lY+UwLk3oKfClq0wsawJOu3Zs68LwxVCoCmTIChQfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713334498; c=relaxed/simple;
-	bh=6OCRfMWE1Nl1glL6JHGetGOp1oOm4UmouTp4ctm6Ohs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bMda3uhHG/kGcJrQgEm2ur0qDIyp+q9gdHQg+tCLSmmOG/wDEqf9Sd3k4z3m/VYclUUnmW+M+q9ikSUQOJ4WLQY5G3MGuwkdujjV1wNph102y1KSAi0mf1on9bIr0PHMgmQFZrmMRUI5YvVivgQZEDwJFhyHQBvN+Md1TTdARDM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=o0vJFIB9; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 25FAB1BF203;
-	Wed, 17 Apr 2024 06:14:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1713334494;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zExFMDHxfXPeW+ilYZceHxAY8OTO9Z8sxt8dwhaGhUs=;
-	b=o0vJFIB9IpqBkYfqT711EFYlGPpY7zc8iqeBbo7HWthTkRRu7+428Psex93iwDUr4tcarP
-	57G59lHiH6Jywws3w/0ECVc5c5D0LrU3ApKd3I0m69mYaDdzsJBAe66wNOQBybNWMAv9QP
-	PEqvrTcjSAT2S0hN1Emj6o7MbFmaJwEE08s/y0nfmj90MHmLDJmV/LLXYvbY5/0er3p6OO
-	FCAyaYcxa6fjqdInrNiEIn3czQuno4yWq+8zwi6Ut7MBKALh2XR54wqYeN0corNCe8cANe
-	Wm7bVYKqTl/XfFrm60EiLwygqICx+R4cA+RQVqvDvc2b8V3qQZCVzx+8P5vqGg==
-Date: Wed, 17 Apr 2024 08:14:43 +0200
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight
- <russ.weight@linux.dev>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
- <conor+dt@kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown
- <broonie@kernel.org>, Frank Rowand <frowand.list@gmail.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, devicetree@vger.kernel.org, Dent Project
- <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime Chevallier
- <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v8 06/17] net: ethtool: pse-pd: Expand pse
- commands with the PSE PoE interface
-Message-ID: <20240417081443.4bcfc452@kmaincent-XPS-13-7390>
-In-Reply-To: <20240416192302.72b37f09@kernel.org>
-References: <20240414-feature_poe-v8-0-e4bf1e860da5@bootlin.com>
-	<20240414-feature_poe-v8-6-e4bf1e860da5@bootlin.com>
-	<20240416192302.72b37f09@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1713334670; c=relaxed/simple;
+	bh=w42aKlhS0gcP36dJaMyx5AB9fm5TuxlheUjjF+LgHsc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JEcL3ZvckghlP48UYyHaJiF8PuEAVe70dBTvF8EQ2HznXrxa1QrX6ZGDQdRj8/NeAMkIiG473SCRPE7gcmrObK0yz9xEYP+ATzdvxWB0xwLmKX6LMhbbL54Sh8OqKGo66KmT1jIbYPbUTRn57r4/qP1e1nCz9ZXUUz2qy1jC5+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Sh5mrPfe; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713334669; x=1744870669;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=w42aKlhS0gcP36dJaMyx5AB9fm5TuxlheUjjF+LgHsc=;
+  b=Sh5mrPfeCWT32U7qkUmejNiFjdwdHvipftj3wZi+Rbro6WCDE9gXCiHy
+   4hbd8Yc+69zw7pmLOy+kS8Qfho5BvtFfVSYPIGTczfdR/YEPPnZIDY5cL
+   gjFQIrd65Os/Q6AsAFStbOFnvqQvkxU9pUhVrdquUzbd39L3ENrkS8I3y
+   H/cnL1xvkNFQJLmGR7Lor8A/h9DFXMlwpvGa4qIWTf4QiRlx3KQ8kmzQL
+   C/IA8kqLzAGPLzLSmfYxvfyQjta+e5SXMnCWy+1k1RKy3wyXd+KDfioh8
+   GCnPz4FwMGbpGitQ2L5BIyX61RmjdLO9nv0NhAQf4a7rOM9XN57tz4KyD
+   g==;
+X-CSE-ConnectionGUID: sdX4RHwQQCK3iuVmSoDe+w==
+X-CSE-MsgGUID: 1Obv11YjR4iDWQ/Yc0ul/Q==
+X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="11750873"
+X-IronPort-AV: E=Sophos;i="6.07,208,1708416000"; 
+   d="scan'208";a="11750873"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 23:17:48 -0700
+X-CSE-ConnectionGUID: imgM1LG1QZyQQQFDxbqDqA==
+X-CSE-MsgGUID: VdZm10H+T8Ok8H03lXuMzQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,208,1708416000"; 
+   d="scan'208";a="23109144"
+Received: from unknown (HELO 23c141fc0fd8) ([10.239.97.151])
+  by orviesa008.jf.intel.com with ESMTP; 16 Apr 2024 23:17:44 -0700
+Received: from kbuild by 23c141fc0fd8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rwyc2-0006Cc-1J;
+	Wed, 17 Apr 2024 06:17:42 +0000
+Date: Wed, 17 Apr 2024 14:17:30 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vadim Fedorenko <vadfed@meta.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Mykola Lysenko <mykolal@fb.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next v9 1/4] bpf: make common crypto API for TC/XDP
+ programs
+Message-ID: <202404171409.EgchVGya-lkp@intel.com>
+References: <20240416204004.3942393-2-vadfed@meta.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240416204004.3942393-2-vadfed@meta.com>
 
-On Tue, 16 Apr 2024 19:23:02 -0700
-Jakub Kicinski <kuba@kernel.org> wrote:
+Hi Vadim,
 
-> On Sun, 14 Apr 2024 16:21:55 +0200 Kory Maincent wrote:
-> > +	    !(pse_has_podl(phydev->psec))) {
-> > +		NL_SET_ERR_MSG_ATTR(info->extack,
-> > +				    tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL],
-> > +				    "setting PoDL PSE admin control not
-> > supported");
-> > +		return -EOPNOTSUPP;
-> > +	}
-> > +	if (tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL] &&
-> > +	    !(pse_has_c33(phydev->psec))) { =20
->=20
-> nit: unnecessary parenthesis around the function call
+kernel test robot noticed the following build warnings:
 
-Right, thanks for spotting it!
+[auto build test WARNING on bpf-next/master]
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+url:    https://github.com/intel-lab-lkp/linux/commits/Vadim-Fedorenko/bpf-make-common-crypto-API-for-TC-XDP-programs/20240417-044349
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20240416204004.3942393-2-vadfed%40meta.com
+patch subject: [PATCH bpf-next v9 1/4] bpf: make common crypto API for TC/XDP programs
+config: x86_64-rhel-8.3-rust (https://download.01.org/0day-ci/archive/20240417/202404171409.EgchVGya-lkp@intel.com/config)
+compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240417/202404171409.EgchVGya-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202404171409.EgchVGya-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> kernel/bpf/crypto.c:53: warning: Function parameter or struct member 'siv_len' not described in 'bpf_crypto_ctx'
+
+
+vim +53 kernel/bpf/crypto.c
+
+    37	
+    38	/**
+    39	 * struct bpf_crypto_ctx - refcounted BPF crypto context structure
+    40	 * @type:	The pointer to bpf crypto type
+    41	 * @tfm:	The pointer to instance of crypto API struct.
+    42	 * @rcu:	The RCU head used to free the crypto context with RCU safety.
+    43	 * @usage:	Object reference counter. When the refcount goes to 0, the
+    44	 *		memory is released back to the BPF allocator, which provides
+    45	 *		RCU safety.
+    46	 */
+    47	struct bpf_crypto_ctx {
+    48		const struct bpf_crypto_type *type;
+    49		void *tfm;
+    50		u32 siv_len;
+    51		struct rcu_head rcu;
+    52		refcount_t usage;
+  > 53	};
+    54	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
