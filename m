@@ -1,114 +1,199 @@
-Return-Path: <netdev+bounces-88637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFEA38A7F02
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:03:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07D868A7F09
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:03:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 165EF1C209F0
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:03:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4AAB28336D
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952C7128807;
-	Wed, 17 Apr 2024 09:03:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F086512F5AC;
+	Wed, 17 Apr 2024 09:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MsSyj1UE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zXGA3O1O"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 250ED6A353
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 09:03:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5804112B16A
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 09:03:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713344585; cv=none; b=ZicwJtT4Hj0/gkoQZPS7LCFItMdUnrCG1CW788pd00oDmdXQcJLvKAZ2o5XWGq4Y8r6d8U6k1CteKkwkwZf4454VapNCgCuh8wP5JwJcLtJbgpdlRyGZqvjjLrcvvIZdmDTv4nFDWjv05JTfPrf0+/3zzacJ1I4asaZJySw1OzA=
+	t=1713344589; cv=none; b=cFkeUF7PdjmQj9JUeq2Dup8rjWzUK538jlWbENHriFCHg5GjyRLOxzt+ke/0Dgk4sxoK8I9M7XMf2djheyZ+A87zTe08McJZ3YnZek4L83jlLSUZ1Wsyiwu5GbbmMmBKmaWyAFBK99B7rgj8HTFBugLpdCtqRi3o2n30l+egmmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713344585; c=relaxed/simple;
-	bh=R4xZIyD420GCJPk7IwQrpmZ24e54I/xuenwhI6qQfh8=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=SxFP+977GNZfsSxM5K6YjycAZ/6sAZTuKDlzO0EVFGZzWIg91z4ke/ehESqzCP8ysl0rY4Gk+VkBnXKeaYITX4psVDiFJWYz+eaQs38OnrZ5f9sld3VcUrjHGQHIJComSCQ/9IHsxAIsiUCy5Dd1V3c9ehas+b866+4tOCFyZcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MsSyj1UE; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713344582;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+cqHolZFVcFPpeLBdV05ZqicpNbJqZRKW17Kvjt/Abs=;
-	b=MsSyj1UE6i/cS41UL+w8WzDpIVIgF9ckJs3xYw6F4hJgCQAFdwLZrcDsopeeDPaRW1dxyq
-	ailxTD/ZP54rQn++0rm1awUKFIV/nFBB0CPROwIj66ZNxUeKaWTq2EIi8qxiSAjeGI6l1v
-	QMmPf8N6pa7DBFJoHhrl1FKA3zddYpI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-455-UAKkPT0cNTu8x3FwjUWu1g-1; Wed, 17 Apr 2024 05:03:00 -0400
-X-MC-Unique: UAKkPT0cNTu8x3FwjUWu1g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D56BA10499A0;
-	Wed, 17 Apr 2024 09:02:58 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.200])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6F32BC13FA2;
-	Wed, 17 Apr 2024 09:02:53 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <3570373a3db66151033a3667cb8c28bbf8bc505b.camel@kernel.org>
-References: <3570373a3db66151033a3667cb8c28bbf8bc505b.camel@kernel.org> <20240328163424.2781320-1-dhowells@redhat.com> <20240328163424.2781320-10-dhowells@redhat.com>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: David Howells <dhowells@redhat.com>,
-    Christian Brauner <christian@brauner.io>,
-    Gao Xiang <hsiangkao@linux.alibaba.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Steve French <smfrench@gmail.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-    linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-    ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
-    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org, Miklos Szeredi <miklos@szeredi.hu>,
-    Trond Myklebust <trond.myklebust@hammerspace.com>,
-    Christoph Hellwig <hch@lst.de>,
-    Andrew Morton <akpm@linux-foundation.org>,
-    Alexander Viro <viro@zeniv.linux.org.uk>,
-    Christian Brauner <brauner@kernel.org>, devel@lists.orangefs.org
-Subject: Re: [PATCH 09/26] mm: Provide a means of invalidation without using launder_folio
+	s=arc-20240116; t=1713344589; c=relaxed/simple;
+	bh=c3x1WWAjvQ9L6jxaILXvEihEKfF3yPNzw1mmk5TzDm8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cyrXIvH8rOfz5Yb7qIKGO/+SAtW5JRNmFU9MdkovE0iZsXx2HYmEkgVtxW3Dmfgm+BX4OBIvpxKnGLWmOsMRM7HFoTwo8AjZyHUjeeERHmmr1pjG1qVGKSkfknX1hmau6CltizlOlA78Ym/bkkIW6d0IjEdeGAs2iyumrkDs/uI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zXGA3O1O; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56fd95160e5so6894a12.0
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 02:03:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713344587; x=1713949387; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qw4QVuFdV0t5j6l8eLsmKjgYFLjItZJ+AfV99LSApYY=;
+        b=zXGA3O1OpYkxD7t9aQr5layqFXhIV1VEy0xTVF3xaA4fHXlNvTlrpuxLnBNFBveMR7
+         o88WG0Ec5r7LQ+24WQMBJR8Q1ixnbFdYxcGakXevuzQoP0E7YD1TSoPq8NahNtfCSawS
+         VvVM3YIkaGJmoaocuGlXiV5TBRtsNFfEiA093liNuwZB5vx3Qj1d8/sOevSJa8zHF3Rn
+         iQK2zL0g9fI/WPbnAsNwFG8GsS/w6nl4szjba4PUNXRE9xjUdDa+e7u19+zwkoKz7LHn
+         gM44TiR1TBXJMp0dunD3DCB+VfpPGrmHlOW7iNJ7n6bxggvWxPChPBLAoaLz3QVaS5u6
+         /ECQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713344587; x=1713949387;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Qw4QVuFdV0t5j6l8eLsmKjgYFLjItZJ+AfV99LSApYY=;
+        b=HAwFkNeVmKls+m7WuelEWOBmTolFPwdHjI4et9Hpw5C1EVzoynU3RK/mrAdy9Sn5YC
+         M8yqqmiCSFw40hs5jODAG7lu5ZoInXZNy9Wdll0a6vABeKa9Oa9rWouimw326l1gLgsf
+         UEKWT/j2duoB9iHAWAsvH2EhM++NoaC1JmDDbsrGZ3dI3cwVROyCIBYSShcVCTe1H4bh
+         KVhjv2uFhsmXNNy2Vo89qCHHC/IFnpJlrOmM3qBSgMU+SAcJ2a4KEWUWlhJojEA+AWzi
+         EIxigZ9vO6/zIQjzjBWhSsQK9u6stMhatXAyi8ZIRAjrMwKPFUUfa14S/lintqWdZnUX
+         ugwA==
+X-Forwarded-Encrypted: i=1; AJvYcCViWu/+HZnpdVfulWnR+SzR+m3dF2+d+D5nVLI0HqJdQCSHf/cat7ewjFfhSTTcS5s6qPkM7+1LaNxNne0LLQsz4XJikEEL
+X-Gm-Message-State: AOJu0YyOmbbIb4RVtcIXU2R7EE8atszwNL6GbkB8WoSsY5fXYgfEE2dz
+	8lr2QQ9ZUeBD3/mr8AU2HbJKXBE+YXgOwqpfsIW5Do8SUiKw2eiH91sOWZ4FaRyADQtgQg13tYf
+	ovmYZsKOhy99WVGzqeY94dJmVJoamdAdSoDHX
+X-Google-Smtp-Source: AGHT+IHWG3gtNj8HfdjenwtXHVj5eEU1xeXDgJETyhlyvDgKlafTWuBYJG4PqLYYjqBV0RD4PrDDBQZb+S5HnKYNbWQ=
+X-Received: by 2002:aa7:c90c:0:b0:570:49fb:79d0 with SMTP id
+ b12-20020aa7c90c000000b0057049fb79d0mr115412edt.3.1713344586393; Wed, 17 Apr
+ 2024 02:03:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <28262.1713344568.1@warthog.procyon.org.uk>
-Date: Wed, 17 Apr 2024 10:02:48 +0100
-Message-ID: <28263.1713344568@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
+References: <20240415132054.3822230-1-edumazet@google.com> <20240415132054.3822230-2-edumazet@google.com>
+ <20240416181915.GT2320920@kernel.org> <CANn89i+X3zkk-RwRVuMursG-RY+R6P29AWK-pjjVuNKT91VsJw@mail.gmail.com>
+ <CANn89i+iNKvCv+RPtCa4KOY9DCEQJfGP9xHSedFUbWZHt2DSFw@mail.gmail.com> <20240417090046.GB3846178@kernel.org>
+In-Reply-To: <20240417090046.GB3846178@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 17 Apr 2024 11:02:55 +0200
+Message-ID: <CANn89iJwJHz4T-Rz03TYJcGCn8fBUncK-Wbefn_zPDh7Vy80Kw@mail.gmail.com>
+Subject: Re: [PATCH net-next 01/14] net_sched: sch_fq: implement lockless fq_dump()
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Jeff Layton <jlayton@kernel.org> wrote:
+On Wed, Apr 17, 2024 at 11:00=E2=80=AFAM Simon Horman <horms@kernel.org> wr=
+ote:
+>
+> On Wed, Apr 17, 2024 at 10:45:09AM +0200, Eric Dumazet wrote:
+> > On Tue, Apr 16, 2024 at 8:33=E2=80=AFPM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > On Tue, Apr 16, 2024 at 8:19=E2=80=AFPM Simon Horman <horms@kernel.or=
+g> wrote:
+> > > >
+> > > > On Mon, Apr 15, 2024 at 01:20:41PM +0000, Eric Dumazet wrote:
+> > > > > Instead of relying on RTNL, fq_dump() can use READ_ONCE()
+> > > > > annotations, paired with WRITE_ONCE() in fq_change()
+> > > > >
+> > > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > > > ---
+> > > > >  net/sched/sch_fq.c | 96 +++++++++++++++++++++++++++++-----------=
+------
+> > > > >  1 file changed, 60 insertions(+), 36 deletions(-)
+> > > > >
+> > > > > diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
+> > > > > index cdf23ff16f40bf244bb822e76016fde44e0c439b..934c220b3f4336dc2=
+f70af74d7758218492b675d 100644
+> > > > > --- a/net/sched/sch_fq.c
+> > > > > +++ b/net/sched/sch_fq.c
+> > > > > @@ -888,7 +888,7 @@ static int fq_resize(struct Qdisc *sch, u32 l=
+og)
+> > > > >               fq_rehash(q, old_fq_root, q->fq_trees_log, array, l=
+og);
+> > > > >
+> > > > >       q->fq_root =3D array;
+> > > > > -     q->fq_trees_log =3D log;
+> > > > > +     WRITE_ONCE(q->fq_trees_log, log);
+> > > > >
+> > > > >       sch_tree_unlock(sch);
+> > > > >
+> > > > > @@ -931,7 +931,7 @@ static void fq_prio2band_compress_crumb(const=
+ u8 *in, u8 *out)
+> > > > >
+> > > > >       memset(out, 0, num_elems / 4);
+> > > > >       for (i =3D 0; i < num_elems; i++)
+> > > > > -             out[i / 4] |=3D in[i] << (2 * (i & 0x3));
+> > > > > +             out[i / 4] |=3D READ_ONCE(in[i]) << (2 * (i & 0x3))=
+;
+> > > > >  }
+> > > > >
+> > > >
+> > > > Hi Eric,
+> > > >
+> > > > I am a little unsure about the handling of q->prio2band in this pat=
+ch.
+> > > >
+> > > > It seems to me that fq_prio2band_compress_crumb() is used to
+> > > > to store values in q->prio2band, and is called (indirectly)
+> > > > from fq_change() (and directly from fq_init()).
+> > > >
+> > > > While fq_prio2band_decompress_crumb() is used to read values
+> > > > from q->prio2band, and is called from fq_dump().
+> > > >
+> > > > So I am wondering if should use WRITE_ONCE() when storing elements
+> > > > of out. And fq_prio2band_decompress_crumb should use READ_ONCE when
+> > > > reading elements of in.
+> > >
+> > > Yeah, you are probably right, I recall being a bit lazy on this part,
+> > > thanks !
+> >
+> > I will squash in V2 this part :
+> >
+> > diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
+> > index 934c220b3f4336dc2f70af74d7758218492b675d..238974725679327b0a0d483=
+c011e15fc94ab0878
+> > 100644
+> > --- a/net/sched/sch_fq.c
+> > +++ b/net/sched/sch_fq.c
+> > @@ -106,6 +106,8 @@ struct fq_perband_flows {
+> >         int                 quantum; /* based on band nr : 576KB, 192KB=
+, 64KB */
+> >  };
+> >
+> > +#define FQ_PRIO2BAND_CRUMB_SIZE ((TC_PRIO_MAX + 1) >> 2)
+> > +
+> >  struct fq_sched_data {
+> >  /* Read mostly cache line */
+> >
+> > @@ -122,7 +124,7 @@ struct fq_sched_data {
+> >         u8              rate_enable;
+> >         u8              fq_trees_log;
+> >         u8              horizon_drop;
+> > -       u8              prio2band[(TC_PRIO_MAX + 1) >> 2];
+> > +       u8              prio2band[FQ_PRIO2BAND_CRUMB_SIZE];
+> >         u32             timer_slack; /* hrtimer slack in ns */
+> >
+> >  /* Read/Write fields. */
+> > @@ -159,7 +161,7 @@ struct fq_sched_data {
+> >  /* return the i-th 2-bit value ("crumb") */
+> >  static u8 fq_prio2band(const u8 *prio2band, unsigned int prio)
+> >  {
+> > -       return (prio2band[prio / 4] >> (2 * (prio & 0x3))) & 0x3;
+> > +       return (READ_ONCE(prio2band[prio / 4]) >> (2 * (prio & 0x3))) &=
+ 0x3;
+> >  }
+>
+> Thanks Eric,
+>
+> assuming that it is ok for this version of fq_prio2band() to run
+> from fq_enqueue(), this update looks good to me.
 
-> I'd have liked to have seen the first caller of this function too.
-
-Looking again at my code, I also need to make netfs_unbuffered_write_iter()
-use this function too.  I missed it before because that wasn't calling
-invalidate_inode_pages2_range() directly, but rather going through
-kiocb_invalidate_pages().
-
-So I'll add those changes into this patch to give you a first caller.  I also
-then need to make filemap_invalidate_inode() take a byte range.
-
-David
-
+It is ok, a READ_ONCE() here is not adding any constraint on compiler outpu=
+t.
 
