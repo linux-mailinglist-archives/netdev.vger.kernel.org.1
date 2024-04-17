@@ -1,219 +1,246 @@
-Return-Path: <netdev+bounces-88569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 504AA8A7B74
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 06:38:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6E7B8A7BBA
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 07:15:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA6552843DC
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 04:38:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D484B227FE
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 05:15:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7035647F7C;
-	Wed, 17 Apr 2024 04:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 024FD51C3E;
+	Wed, 17 Apr 2024 05:15:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="eZBcM3NZ";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="DJ2p7Sty"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="rzdQKg5l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8D3E3DB89
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 04:38:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713328684; cv=fail; b=nJcXYk3JiH3+x6vXF4zE2ORfnoOqXaLRZ1wL5WfKw9x6avqLUwfy1R0YkZgQDoL6AkdaP4fWXi69CJ3I8WRf5xa2QGnlzWqvxx64JDitDeQ3RhpS3UUfxhac6qaqyEPzbhXhzWsdwbqlMejEuvIhx5Z9+bmwBSm9t12zxVHq6H4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713328684; c=relaxed/simple;
-	bh=ntNJ+QuXZrv0/Ebu+9rLiQ2hq2BBdQM2gKDHgS/ESzo=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=iFSAmHamfV3AYR1SXzhX9TfCiUPTzssDIJhtse5Fb1acxrcbPZiNXZ3IZQPA63oRjd+TXqCK92i/fgqxMS/AlV2WO2rorp/WaB+oEwY6tdW1kTiibd7GEzQeKgyStGJslCpNxie4T66PfJa2ICcLumygLuaR0XQ9ieiYvXf3bDQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=eZBcM3NZ; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=DJ2p7Sty; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43GJjiGT027180;
-	Wed, 17 Apr 2024 04:37:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-11-20;
- bh=6J0rTCzMuohGHCT37FIi2T+/zpqDb01uilma8OBlI4M=;
- b=eZBcM3NZuJxXovBRHZwgH1pbJDYC+wOlBQyRgs+oFobJQUeSnPiy+Y52FZyF0+zDXr/W
- UMliDP+buaG8B5I09G+7X3BHStSYjKEid8LaUsg3/7zlFuffwQwZQ/Xxzy/GPZjOTg5Z
- H9t70Ftl4xwvMa3LGUC5yu59WaQUcCMnlOrEnGWYaCoRqaFzWdJnMItRQTBeF0ijGYdd
- p9Mf+O+RxNE1urrZs0czc3GjIitWCHsRrDwunfuodOtxVqfFXS+qa6aPGDVEhpsfKUT/
- dSGEc3nSdtgyJrlRPy6W0WP/rA7Dxc/QMb2yKauxX9RjoX52DkCZTNfU+TLnhfjorK0Z gg== 
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3xfgujpy8x-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 17 Apr 2024 04:37:52 +0000
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 43H4XZoB029181;
-	Wed, 17 Apr 2024 04:37:51 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2100.outbound.protection.outlook.com [104.47.55.100])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3xfgg87dtm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 17 Apr 2024 04:37:51 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E+dJ6Uads8gcdRXSon5pInuTi6w+f+vuh7sFr02EdaCoEg74dV14MJc76ky9GlN0Egixb45SsC4H5V7pteYivW/oJ3rjVIP+39lDAgEs1dk39iSKw7UObiI8dmMZduVStOTs27eEQfKkSS2VORHVvEuY+/JeXMJ+O/6xHZr/jUDtJv6xJSS3aeNamq16qBwr32bdDhYWbC5v0B4E/XvRJ2F6ZwN/3z6HS/siA+Xsjx2Jqn5o2LNvID0O2fjxf0EkDS94y5kbzEsYJaqi4RONaJBdQfiLu9thII08whLqTeGZUAFMNgouJQXFFHV9w+Ys6p0DeuSHSBVPWsMlWashRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6J0rTCzMuohGHCT37FIi2T+/zpqDb01uilma8OBlI4M=;
- b=jBrDYhxS9AGYkUa2GLIzX9R4nzCSbo9PrXb2W6ZpjOLkrjpYuhlEqIbpGgPUnH92GzwsS8ddKbT7lXxc+IMjAQfuDY5et/Gbye5kBUsBuTxjTf7zjGZC0596z4B88W73bI444efjO8iS5LbtKrJd4jLGR6tp7CUXuXz6OnvVLWRVwdtS9PMVwUXKLNWKxhamn8CV0QoPAepde7T6zU+BeRetuuElSIcZSLFTLhTYp0Cr7yAHk1ObH39VtzpKLEur9m54Gi2H3tcbqFHYp15G2B4PpinuiSor6bqLymV7iUg4lY7BB8BJRvwZObY+yB1qHUqF2czYosNjQVCVT4OXLg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6J0rTCzMuohGHCT37FIi2T+/zpqDb01uilma8OBlI4M=;
- b=DJ2p7Sty4Wem211N7wGodhXI4cz/qkaLXMYhtfD/ttnJkkvbQEXkPxQJehrH6dV5ZHwX9ooqAi+5e7aDOTgkN1CJdkipHv98RU3PpsXX6WQnVjCvnUUhbXcnTiCzCLtsgwGbi18MnLgRRGlMtozIPIPMwIA8PCO22xXBrzvBYbo=
-Received: from CH3PR10MB6833.namprd10.prod.outlook.com (2603:10b6:610:150::8)
- by DM6PR10MB4347.namprd10.prod.outlook.com (2603:10b6:5:211::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.37; Wed, 17 Apr
- 2024 04:37:49 +0000
-Received: from CH3PR10MB6833.namprd10.prod.outlook.com
- ([fe80::8372:fd65:d1ad:2485]) by CH3PR10MB6833.namprd10.prod.outlook.com
- ([fe80::8372:fd65:d1ad:2485%4]) with mapi id 15.20.7409.053; Wed, 17 Apr 2024
- 04:37:49 +0000
-Message-ID: <f7cb246f-a0a1-4ea0-938d-45ce80aa8414@oracle.com>
-Date: Tue, 16 Apr 2024 21:37:46 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net 2/2] af_unix: Don't peek OOB data without MSG_OOB.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        kuni1840@gmail.com, netdev@vger.kernel.org, pabeni@redhat.com
-References: <dc42242b-40f2-4be0-b068-62e897678461@oracle.com>
- <20240416221055.35661-1-kuniyu@amazon.com>
-Content-Language: en-US
-From: Rao Shoaib <rao.shoaib@oracle.com>
-In-Reply-To: <20240416221055.35661-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0069.namprd03.prod.outlook.com
- (2603:10b6:a03:331::14) To CH3PR10MB6833.namprd10.prod.outlook.com
- (2603:10b6:610:150::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BB3F516;
+	Wed, 17 Apr 2024 05:15:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713330951; cv=none; b=IROLPOnYc1A9If/K3Jvn9ZgK9bg+c+953nkPFnRHwz6/OFMs1XUuaGZF7orHy0kKqJjEtJpfyaTS50UNR19kEm3gL1mNvSO67CNiJMh1dPiTmtKCri02gZ2iP7OAA57Aw53ZKJPvg7Y8y0EUl0OmQXPMQ+mJ75JHbRwUEzOr4g0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713330951; c=relaxed/simple;
+	bh=xl5Ie0fhJpQqVcqkI3YRZyUMdgGsowrcOdwyU3nze48=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=PpofRSZvngkyjF6403p6r3ipGevyCUJAAuw/9KnyT4tYfB6tbHiG9j4Lnf05D4qN4aD31QW+s8NZvDeqKyTAwxcrtTtjuqwFm2dPchTModybKH9Ke474bAjirllslHN8Qa7WHydEH3GoqPO/VgUD94BNBzHnCuWLaZZk3frZBfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=rzdQKg5l; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43H5FArm111187;
+	Wed, 17 Apr 2024 00:15:10 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1713330910;
+	bh=Fo8TQ5AxW91DWwN2mHnILU3BPi2jl2Q4yLOHSsngmzA=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=rzdQKg5lE/klDnuCRHiqCt75Ykt6E3d6vblK83mOgxL6ufSa5LPED4HZrsb1OUeJG
+	 t/7JTKoInHCyl2VQ0u142S5r02Qg3QboYMyHXygbIJ045XQX5DcBBQlwLklPLQ7rNk
+	 rHzBgSG/3QlUW8PQOfa60AXFT4WeGwPY89Gakb+o=
+Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43H5FAim043081
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 17 Apr 2024 00:15:10 -0500
+Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE102.ent.ti.com
+ (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 17
+ Apr 2024 00:15:09 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE106.ent.ti.com
+ (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 17 Apr 2024 00:15:09 -0500
+Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43H5F2rA065474;
+	Wed, 17 Apr 2024 00:15:03 -0500
+Message-ID: <57d78d3b-dadf-488f-87dc-08a07759fb3e@ti.com>
+Date: Wed, 17 Apr 2024 10:45:02 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR10MB6833:EE_|DM6PR10MB4347:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5abb0cc8-4a8a-4fc3-6022-08dc5e9822ed
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	7Z66JhZn95kpfrvgtfbrONtHZwWeEg/HMjtsOacPJvQeDNCAWbaPkgS6ehd/KphlPwLg44Eo0rsgE0V4yEHEXn1q9lWmM32N96dOF/cw6110bXHzrw5V/G4vYLUfnBH3RNkgf5X/X2mIYeZfmXJ05m+LyxDbDPsODtkQ0vTOs107HG0Os3juk0RcQ6ML0kiS89ow+bdQAFtkYdyxNHWABMQW9Ywomw2aUlgygnXMghjlcEAq4xvVuPpPpSic79T9C3upJWmT4ntPpGpr6nAO0Ke9nFEzEolYWXdwkTeHv8HNH9Dg2X7VOgqnsyyj/MR9FMZpoBp6vnzBRVoKxaPozdI/F/kDWuUrllZDQkmAZ8toOheg0Wk+Wa+xCYL8F6M/hcZpShR4BUYXOm83mdNi0Cn0FEjYAStxxTqdcA3fTTi1ARkg70rm+ZAn6o9sJ6W7svwnvCy2GiFciCevNEqGLDW/hA/nG36ShprafKXTTTIefUhTJRopEYORFU6ju7V49u++tzdvmz3zc9GqRDlHA5J/XfdSjaJ7ZBikCEHw28g/fSoUuW/cR7HOm4ESSW0/4ZiF3TMchxpTm1FVst5J2x2VcdqdGYD7n71cFKXulcJi9edHQEGeM9Pd14nNsWBcCZsQqSg7yLy4WjXIc4SOaWqiMsCm4LKG8F/TeEwwgB0=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR10MB6833.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?utf-8?B?bldEUGdaQnoyRzhvcDYraWhGcWI4SGlwekNTNWFDckZ3U0t0L0F1Y1V1NXZX?=
- =?utf-8?B?NEM3bzJvajhTR0hEOWFQRTZyYXBOd3NUNmZjV2NjcFlBR3ZIZ2NOV3lRZ2hm?=
- =?utf-8?B?amRDUDhXYnhiK0NGYm9iT2RDNDQrUDE5TTZXZms4czVrUWxUMDAybDNtUXNM?=
- =?utf-8?B?a29idnNvVWVXV1FnQXJBbjhYZXlRSUI1OFJUSWdPU3ZyODR2M2E4ZlVobzFU?=
- =?utf-8?B?Z3lkd01jV0pPeW43dndrclJzQS9oUlVncG1WZ2FwRmY3UDNQaWd6NzNPekky?=
- =?utf-8?B?cDBnbEhlQ25xTkhqOS96MDg1QkVORHgwSGY5bDZGcmliTDk2UDhUVzRLUWFN?=
- =?utf-8?B?ZURPRmVZejJnc0VCWFU3NG9iODkvZkNaeHorejF5Mjc0YUhTWlBYMzliYVRy?=
- =?utf-8?B?cVZCM2JaM0FaTzdSZHgvQlJVTzFDdlpnUVVBcURWWVVpQzdWeUFYbVV2Z3RZ?=
- =?utf-8?B?c3VTMHZ3TWV3WE5mREIra28yM0laSG1TcTR3WnNqNzBWZUd1NjRpcWZVUGpF?=
- =?utf-8?B?OUF4alV6dVppbmF3R1JwTDhjVWVrRW1aTUMyQXdRSG53TXNaWFozS2tKSHEx?=
- =?utf-8?B?dnZlOWJ1K0lRdlM0MVVsOTJkM2pjcGM3bVA2N2pZRnlzejBXY01HdjBHTHli?=
- =?utf-8?B?cUd2NTBvUTBjazV3VTJwakRoeko5RXNrMklXNFd0MDlCTFczV3htZmVCWVFL?=
- =?utf-8?B?UzBUeHpZeGJONXVvUFFOdVNIYy8yZXpmYU5TdWxydGV5Rmt5ZmVpcU1OMnli?=
- =?utf-8?B?dXpCREhVSFFjS21NbEdxY1F4Z1dRTC9lK1FndEx6VHE0ZTJOZXBENHF6ZG43?=
- =?utf-8?B?R3Q0MlhBTVZ6aDBuWGJBMlZFSWpRWldWM0VpUHBqdjhrK3ZFMU16cXRmajZU?=
- =?utf-8?B?WisrTEd0d2duMktaWEZlUDVGN284K1ZLR2wxWVl4Zk1xZEVpREYzaG5HdGVa?=
- =?utf-8?B?RHBCbVBQaEd5ai8zZi8vY2VVQlFmTmhrbFlGOUZ5WkI5Z0pERll4YTV3UFpr?=
- =?utf-8?B?dXNENTk3THdLdHAzY3I1eVJBL0dWK3c2UnJxb2x0M256aWR4dzVtL1l0L3pk?=
- =?utf-8?B?V0RCd2E5M2RGemVQcTdrUkZlQkljYm0ycnlPcW5aUnhTclF6Ukloc0RuZ1JL?=
- =?utf-8?B?NjZ2cU05M0JXaVpjTnloaVk1MWR4UWNOc2tWQVR3MHNTVG5MV1ZIQUUyRGVi?=
- =?utf-8?B?em1xWU1kT243NmFFd2JVbUZyY3BxdnA5NWUzdmFjUVZwWm55TmRYMUJ3L3V5?=
- =?utf-8?B?cDFaUFE4NTZvOGswQk9iMkVpL1laQ1hYdDkyR2F5TUt5MHVlak5acUN6ME5k?=
- =?utf-8?B?MnJ2VmpPc3p2MnRqRHQ4NVIzYmJ3Q0NqdHN0eCtXanczdG1zekM4VzJLNFdV?=
- =?utf-8?B?dGNBYTluM1hJUytMMExvN1VyKytudlJXbnA3MHFhYWNkSGp1ZXVNZndpbERt?=
- =?utf-8?B?VUoxQkhXcmhTczJiQ1J1cWhqMjFVYXYzZ3R4TC8yVkhPT2VSZmt3RWltN3A5?=
- =?utf-8?B?MHhwVUd4WG1yVWpwYnB2Q0RISVhSYVFmRDAwZ1Zmc1I0ZjFjWjloRkZKem8v?=
- =?utf-8?B?ODFsZlg0d0I3ODlvb1VOdFpkaTEvem5qZ01kN3Vjam5jMHhwS053QTdVbE5M?=
- =?utf-8?B?L0VqaDArL3JrRVNZQmdqSHQvdEN4bldGU01FdVllM2FBamExdnEwY0tnUXJl?=
- =?utf-8?B?UU8zSzFzK245ME1DS3NwYUViNmxCQzl1aGduSG5hdVM5ZGdHTkQ2dnMydk9J?=
- =?utf-8?B?T1pJcG5xVnJIOFBpYUd6RXd1YytudjFKRmliNjZzc0RrbVBaTFV2VFlTR0VJ?=
- =?utf-8?B?SXFDd21XdkVFeEdBUk5QZG5IL0lmemd4eUJoNUFKZW5qR1oyZEdkbTZZR0xU?=
- =?utf-8?B?a3ZRNEFnTHh2RHZ2UjZ6WG9zUjF4TVpaR2hQRXlEaCtITWhlM2dqd2lSdnln?=
- =?utf-8?B?amRhajloNVMrRzRsazZMWTdiTFAycVlCdE1nRERLR0NBck9mbWozbnFJM3Vq?=
- =?utf-8?B?Z2lPS25hWEk5YjZOMnMxM1NXaDBhOHhPLzdHRHB3OTVGc3M3MHhQTXEwN045?=
- =?utf-8?B?dE9hdHMvVlo5WVlNclg5Q0Y1SmFJb1lJb1R0SkFJL0M1eGF1a3ZHTHU5Y2o2?=
- =?utf-8?Q?N7/AflbSgtkWedsgxF/m8kV3N?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	sBT6YB/eQ5eqLv9hOTKMt70DspqG/YP5nBLPA0yGxBMTYG4zz/PfobZ1HJgjgK06SZCHuWiIPNHMQe7+wLb3QW0SavdVs+hgCKDQYoh2wmG146j9FSFxlBgxtf+aoQg70HaAWS8hqIgEGU/8zOEhtpY6JCusDGARCo0+dMp84O2CrWaw43Hkdt53HC22oBXuds0EPLZWQ8He5/OimQgBtCas8B4I1e8aH/TEH4tmbPBMjyTEJrpw6HsAlJR9ANoaRPYFFATWwgkicz3R4OWcRshY5zH4RG+eXdtzCokNaCzJccXNcWw3bdbJ3Ac6seCTUVJ5b7sKBUMGtK1+28kAE/SkBRkSKe+DAV/jTs1tMAZWcYE/V9Gm1IYW5Mx8kNF1z+Hq6bSLPIA1h/96ppGowuC66QqCvaV77sU6kqpn4xsSFYOGegXiHh/SQPZL6SENIYna2XmlxOQNP3qPlQXMrL15aqkkTvL/bW59AgdkEvT5hxR1EoeUYo2QjxP81alb57NdmI9bqQn5VKMp6x/+Wu51KnIFG/3qWv9JE2n22DZywClo1ZxiUvPiYFBOhSGiAc3/mfLiZeqqdqpdh+xApNwBIoBVVpt6HAlvHWsMJu0=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5abb0cc8-4a8a-4fc3-6022-08dc5e9822ed
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR10MB6833.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2024 04:37:49.5379
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FAX3eZpT39quWGGnWcE39WjFG98M9mYNbsJ67/EdEku9mIMjB1wYWMrmvO5BheUGSYaDjXGiUDo5L8Bd2UxUVw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR10MB4347
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-17_04,2024-04-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 spamscore=0
- mlxlogscore=999 phishscore=0 mlxscore=0 malwarescore=0 bulkscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404170029
-X-Proofpoint-ORIG-GUID: Bbfzmlnj-mVvWprx-ors_nUZvmRuKMev
-X-Proofpoint-GUID: Bbfzmlnj-mVvWprx-ors_nUZvmRuKMev
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 3/3] net: ti: icssg-prueth: Add support for
+ ICSSG switch firmware
+Content-Language: en-US
+To: Andrew Davis <afd@ti.com>, "Anwar, Md Danish" <a0501179@ti.com>,
+        Diogo Ivo
+	<diogo.ivo@siemens.com>, Rob Herring <robh@kernel.org>,
+        Dan Carpenter
+	<dan.carpenter@linaro.org>,
+        Jan Kiszka <jan.kiszka@siemens.com>, Simon Horman
+	<horms@kernel.org>,
+        Andrew Lunn <andrew@lunn.ch>,
+        Wolfram Sang
+	<wsa+renesas@sang-engineering.com>,
+        Arnd Bergmann <arnd@arndb.de>, Vignesh
+ Raghavendra <vigneshr@ti.com>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        Roger Quadros <rogerq@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub
+ Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S.
+ Miller" <davem@davemloft.net>
+CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>, <r-gunasekaran@ti.com>
+References: <20240327114054.1907278-1-danishanwar@ti.com>
+ <20240327114054.1907278-4-danishanwar@ti.com>
+ <cb13da4a-13c9-409a-a813-0ac852062163@ti.com>
+ <bc0e05c5-11a8-4519-b50d-04dabd6e5999@ti.com>
+ <f4a91360-bf31-4dd0-a00d-cd4b7464160e@ti.com>
+From: MD Danish Anwar <danishanwar@ti.com>
+In-Reply-To: <f4a91360-bf31-4dd0-a00d-cd4b7464160e@ti.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
 
 
-On 4/16/24 15:10, Kuniyuki Iwashima wrote:
-> From: Rao Shoaib <rao.shoaib@oracle.com>
-> Date: Tue, 16 Apr 2024 15:01:15 -0700
->> On 4/16/24 14:47, Kuniyuki Iwashima wrote:
->>> From: Rao Shoaib <rao.shoaib@oracle.com>
->>> Date: Tue, 16 Apr 2024 14:34:20 -0700
->>>> On 4/16/24 13:51, Kuniyuki Iwashima wrote:
->>>>> From: Rao Shoaib <rao.shoaib@oracle.com>
->>>>> Date: Tue, 16 Apr 2024 13:11:09 -0700
->>>>>> The proposed fix is not the correct fix as among other things it does
->>>>>> not allow going pass the OOB if data is present. TCP allows that.
->>>>>
->>>>> Ugh, exactly.
->>>>>
->>>>> But the behaviour was broken initially, so the tag is
->>>>>
->>>>> Fixes: 314001f0bf92 ("af_unix: Add OOB support")
->>>>>
->>>>
->>>> Where is this requirement listed?
->>>
->>> Please start with these docs.
->>> https://urldefense.com/v3/__https://docs.kernel.org/process/submitting-patches.html__;!!ACWV5N9M2RV99hQ!PswtQoZm7r5MGnH8pv3OewI_PvmSRJb29YcA0pnVOzuu8T3xvWlw4lLlLzFhzn6uO2lo0bUA5Yikc2A$
->>> https://urldefense.com/v3/__https://docs.kernel.org/process/maintainer-netdev.html__;!!ACWV5N9M2RV99hQ!PswtQoZm7r5MGnH8pv3OewI_PvmSRJb29YcA0pnVOzuu8T3xvWlw4lLlLzFhzn6uO2lo0bUAdoz3l7w$
->>>
->>>
->> That is a suggestion. I see commits in even af_unix.c which do not
->> follow that convention. They just mention what the fix is about. In this
->> case it is implied.
+On 16/04/24 10:49 pm, Andrew Davis wrote:
+> On 4/15/24 1:56 AM, Anwar, Md Danish wrote:
+>> Hi Andrew,
 >>
->> I am not opposed specifying it but it seems it's optional.
+>> On 4/13/2024 12:22 AM, Andrew Davis wrote:
+>>> On 3/27/24 6:40 AM, MD Danish Anwar wrote:
+>>>> Add support for ICSSG switch firmware using existing Dual EMAC driver
+>>>> with switchdev.
+>>>>
+>>>> Limitations:
+>>>> VLAN offloading is limited to 0-256 IDs.
+>>>> MDB/FDB static entries are limited to 511 entries and different FDBs
+>>>> can
+>>>> hash to same bucket and thus may not completely offloaded
+>>>>
+>>>> Switch mode requires loading of new firmware into ICSSG cores. This
+>>>> means interfaces have to taken down and then reconfigured to switch
+>>>> mode.
+>>>>
+>>>> Example assuming ETH1 and ETH2 as ICSSG2 interfaces:
+>>>>
+>>>> Switch to ICSSG Switch mode:
+>>>>    ip link set dev eth1 down
+>>>>    ip link set dev eth2 down
+>>>>    ip link add name br0 type bridge
+>>>>    ip link set dev eth1 master br0
+>>>>    ip link set dev eth2 master br0
+>>>>    ip link set dev br0 up
+>>>>    ip link set dev eth1 up
+>>>>    ip link set dev eth2 up
+>>>>    bridge vlan add dev br0 vid 1 pvid untagged self
+>>>>
+>>>> Going back to Dual EMAC mode:
+>>>>
+>>>>    ip link set dev br0 down
+>>>>    ip link set dev eth1 nomaster
+>>>>    ip link set dev eth2 nomaster
+>>>>    ip link set dev eth1 down
+>>>>    ip link set dev eth2 down
+>>>>    ip link del name br0 type bridge
+>>>>    ip link set dev eth1 up
+>>>>    ip link set dev eth2 up
+>>>>
+>>>> By default, Dual EMAC firmware is loaded, and can be changed to switch
+>>>> mode by above steps
+>>>>
+>>>
+>>> This was asked before, maybe I missed the answer, but why do we
+>>> default to Dual-EMAC firmware? I remember when I was working on
+>>> the original ICSS-ETH driver, we started with the Dual-EMAC
+>>> firmware as the switch firmware was not ready yet (and EMAC mode
+>>> was easier). Now that we have both available, if we just use Switch
+>>> firmwar by default, what would we lose? Seems that would solve
+>>> the issues with re-loading firmware at runtime (configuration loss
+>>> and dropping packets, etc..).
+>>>
+>>
+>> We can start the driver with either Dual-EMAC firmware or SWITCH
+>> firmware. But the problem lies in switching between these two firmwares.
+>> For switching to / from Dual-EMAC and switch firmwares we need to stop
+>> the cores and that is where we previously used to bring down the
+>> interfaces, switch firmware and bring it up again. But as discussed on
+>> this thread, I can now do the same without bringing interfaces up /
+>> down. We'll just need to stop the cores and change firmware this will
+>> also result in preserving the configuration. There will be packet loss
+>> but that will not be a big concern as Andrew L. pointed out.
+>>
 > 
-> You want to read the 2nd doc.
+> Yes I saw that and understand all this, but that is not my question.
 > 
->    1.1 tl;dr
->    for fixes the Fixes: tag is required, regardless of the tree
+>> Currently we are starting in Dual-EMAC mode as by default the interfaces
+>> are not needed to forward packets. They are supposed to act as
+>> individual ports. Port to port forwarding is not needed. Only when user
+>> adds a bridge and starts forwarding we switch to Switch mode and load
+>> different firmware so that packet forwarding can happen in firmware.
+>> That is why currently we are starting Dual-EMAC mode and then switching
+>> to firmware.
+>>
+> 
+> Same, I see what we do here, this doesn't give me the "why".
+> 
+>> If we use switch firmware by default, we will not be able to use
+>> individual ports separately and any data sent to one port will be
+>> forwarded to the second port.
+> 
+> So this seems to almost answer the question, but I still do not see
+> why we could not use the ports separately when using SWITCH firmware.
+> 
 
-Thanks will do.
+This was discussed during v1 of this series [1]. Andrew Lunn also
+commented asking for a single firmware that can do both. But the problem
+is having a single firmware to do both Switch and EMAC operation will
+require additional check in firmware to check whether we are in switch
+or mac mode based on that firmware will forward the packet to the other
+port or host. I had talked to firmware team regarding this, this
+additional check will result in consuming alot of extra cycles and the
+performance will be degraded substantially. That is why we decided to
+stick with two different firmwares as combining them in one has a very
+big penalty.
 
-Shoaib
+Such firmware doesn't exist as of now. Furthermore, we are also working
+on hsr mode for ICSSG driver and this will also introduce new hsr
+firmware. In future their could be more different modes. Now combining
+all this firmwares into one will consume all the budget cycles and that
+is why firmware team has decided to have split firmware.
+
+While switching modes, stopping and restarting the PRU cores after
+changing firmware works fine and it's completely abstracted from user.
+For a user it's same as a software bridge. There will be some packet
+loss but as Andrew Lunn pointed out, even in sofware bridging there are
+some packets losses.
+
+> Why not have a filter/rule set by default to each port so that they
+> do not forward packets automatically but instead always forward
+> to the host port? That would result in the same functionality as
+> the Dual-EMAC firmware, but without all the mess of runtime firmware
+> switching based on usecase (simply update the forwarding rules when
+> in bridge mode).
+> 
+> Andrew
+> 
+>>
+>> I will be posting v4 soon and I will describe all the details on how to
+>> use and switch between different modes in the cover letter.
+>>
+>>> Andrew
+>>>
+>>
+>> [ ... ]
+>>
+>>>>      static const struct prueth_pdata am64x_icssg_pdata = {
+>>>>        .fdqring_mode = K3_RINGACC_RING_MODE_RING,
+>>>> +    .switch_mode = 1,
+>>>>    };
+>>>>      static const struct of_device_id prueth_dt_match[] = {
+>>
+
+[1] https://lore.kernel.org/all/92864bda-3028-f8be-0e27-487024d1a874@ti.com/
+
+-- 
+Thanks and Regards,
+Danish
 
