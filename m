@@ -1,163 +1,147 @@
-Return-Path: <netdev+bounces-88640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6349D8A7F75
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:17:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38DFC8A7F8A
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:22:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8403C1C20EA2
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:17:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67DE51C20E1C
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:22:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D9B4130A64;
-	Wed, 17 Apr 2024 09:15:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0DF512DD87;
+	Wed, 17 Apr 2024 09:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dKX9QEQv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98BE12FB3E
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 09:15:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8A7127B45;
+	Wed, 17 Apr 2024 09:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713345324; cv=none; b=bYNmQ13xZOuaDg8R9QX57/GAWoV0pCaCBgdoo61HPAUjbnSC+HElun+8G6WBGdsvuN3yjnVGKCwbW5SW530kszKPiDBDwfFCvHHiw2odOMtE1JrdFr2J2E/ydSxb3u5HdQJwHWiRw+C8A6aScfIIQ5Wn6CGs1APFmXpX3q7cFgw=
+	t=1713345765; cv=none; b=DgR5mzRsedPhElXxQEtqFscBoFJeNLmaYFiwKgUKizEbb4QVWrKKxj4+XRnMJJo0SXogwNPm/N0qCcVH6U2zkduzsylV+vUO/M+Qd98dnYxqnNdk6taOlkHsecLyo09IMjs4VVbQNo+D/CA73KdVnCc8p3iQxnZIt+3e6Cyfq6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713345324; c=relaxed/simple;
-	bh=tNUgxFQw6eMCYlR6Ekzg2/SYAJVF+N2IQw803Gb6PyA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=urX6pfksGs6CcVd1rz+cbvgu8zMEWDO/Q720hZojmwHK49m5QVPD8YQNyZH7iZaCGkj9UU/ut0/R98QpEe2y4mDMszTahQSAnmRJbVlIbSnOEBhdApletVWaEuWKDuJG469r0bEKRFLxK4zXTezqChBmmWXRa1owiS7E5nys+uk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7d096c4d663so710588839f.2
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 02:15:22 -0700 (PDT)
+	s=arc-20240116; t=1713345765; c=relaxed/simple;
+	bh=c4au2icJSPKncXqRvVreWlcffcYZI2pV7PV/A3myfjE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FoOL3A8CfW8epNZ260t8CW+XTXH5rNNzkPGxHXm7wNQNrhUawkqvmTAr0pPARtQ+K16wd8qVBtln5U3B+ipfr6DU5pJKWHNLodq/fh0sclqf1N0y4DAQhePb7TCRMwfDVbnf1ODKeOaw/lB1kLpCyClbyOStgZak+4YiCKyWtc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dKX9QEQv; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a51beae2f13so614247366b.1;
+        Wed, 17 Apr 2024 02:22:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713345762; x=1713950562; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OW9PmjLbwn7pJabXhHqlARTl4IzAtlALQknNYaa1aEo=;
+        b=dKX9QEQvVJcf9wPo8bwNyOYa70DxEY8vp7W/ED66w6jmxzKw6WmHmf8Jb7fD/xtSjQ
+         dGpI5B67+G4wkeSZJJBbBWSzPmet+k/o/Si92aEBtmLkz079ypmT2M8yJWeKs+7Zy0NM
+         2c8WQXtGCUxlZsNjhqw3YBU9Ql6QFQyNVcEKr9LvHRDdx3Y/Pjqg+tcaNWxdcmuMnzkG
+         XsADrvdECCSCIHS+ZRFDgwjmhAtJ14epcjAHRRlr5GwwOOLj+bMJi52piGh3+y4qCgnk
+         8ZXFIbwTO+ab7kRUiyvI8HyfBfKAkk5dwH21yyViGOgQ20mCawsiq7++p4Qh3ekLBR5J
+         b2TQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713345322; x=1713950122;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lMHDWXruCDKqdIqw0iUevbAqhPVYOFER4yVLIRlEfe8=;
-        b=SmlzKC3kGRXkR1XIbrKX87ligyAGhL4cxUeEvYymBUA541GiAEtqV6e/pmbB6/xJAi
-         XiGygDsqb5s7x5UdOSqPFH3XoWFhGFUTEVuN7idkR3KKpoZ/tEGu+6365EGXwk4ziw7S
-         v/+Nli7URYFsaHuW982ioXphXX0Tc4imKbgpUVU5CoosLhCb8nPJrHqK/fXAZtynlWz1
-         ac/u17zwClxj3N12yA+uuG92MFKzqlpsmTbcOF5KRBc5R9a0infnQC6OznA5hmq8Rr3J
-         Grl7wPsLuDoQIrAwa6w0LULkQAwIS8QPl5/x1IgePbRJxks0WEHOchhdUdZeBaoeSMnK
-         3nnw==
-X-Forwarded-Encrypted: i=1; AJvYcCX4vCFlLaFQj4WP/qnH5u008DJ0cXlPJMmv/u1DbukRSF9ETRjNh8WoDfCrBGndBHroyYnYWJfLCOD0Z50W6aLhKUy/YZMx
-X-Gm-Message-State: AOJu0YwK+krMem8RwYA1k00BG1F6U9JpPmmCUdTzQpETJf44vqhXcnkj
-	zauevOw9ib0ZxkIe8goqv2mLH1+zosOJLZMbocfLacIceYpRYH2kX/HVWz28mIJ6Gy+7D01amkV
-	qU14XKMbI2qoqAkwXC+LbMkgPvaTM0eC+BvTXwBHOGf1tQk6EkuXbBbk=
-X-Google-Smtp-Source: AGHT+IG783qjym/uoLFNulcfb2mQcdjbO/UaIe+3eiYM1979Fo/fvMutrN4Uj6cPOPD5D1cYFW8foWxF+deScaJxkQXdYhR5sdyo
+        d=1e100.net; s=20230601; t=1713345762; x=1713950562;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OW9PmjLbwn7pJabXhHqlARTl4IzAtlALQknNYaa1aEo=;
+        b=Y8yQF2lJWDfPZG677aE+9YLQby2L6L//zV9HTKb9JrAyXjpi9/dx8iLEYjoABOXfRf
+         YDjnauDFJtP5R/W57wBKOY/1Vv4IFh/s3Tll9gXS/ZEyLy1yuMtVSCv9Jiad55ElCSA0
+         2hyx7xXcF8T4ssGOY8DGbcL0iNrXxdiNgOBo+q0MRx2Zy2EfIHHjtRe8IJuwnW+hXz7h
+         5RvPeWnh8vbWpySPMIrtJWKylmZbaRZqIuh3QVQ/zhVohrMASz9NKTz1mBtbWKNd5zX2
+         gBG+h6uHR0YGS6Y/kng3YnB5MquSVb3j1Fm6Vyd/0mWm0l32UPNtfPHxAj2CHWqzXrlu
+         4PaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVoVR7EGVfok721rPWgVTTJ+luCnGui534WMNt/mLg6ZHV96JvFUJav4X6AcFHrbjtDxEKEQ0n62wf3d65olXADUvXCY3mKmB/wQK+hry9ya3c7PgkcZpz+eO1hoed4l9xnCr8BokZYFhww
+X-Gm-Message-State: AOJu0YxwIpZ1XHJLGYagLyUR2Vf40GQrSPDu7ZvkurE24bykhdhOlGsa
+	FYMldG9yl9bMBhBWHSp8pSV2e9/9XaJ78F9PCWmZovr7zcNAAHIZ+FivtJ0fmfZfM8sYCEJtpxn
+	FZOfmq8YaAHbUk6sfFe0nX4QgJeQ=
+X-Google-Smtp-Source: AGHT+IHL2T/dUxZvTLwRpF9eorxg0NEt2cytKUT4skY49BBflJcjLDdYgmw3ytzpCLdQ5PdeePx2tsTKBimLdU+a+kQ=
+X-Received: by 2002:a17:906:3fd6:b0:a55:54eb:c3dc with SMTP id
+ k22-20020a1709063fd600b00a5554ebc3dcmr801485ejj.77.1713345761680; Wed, 17 Apr
+ 2024 02:22:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:8929:b0:482:c7c8:5019 with SMTP id
- jc41-20020a056638892900b00482c7c85019mr918925jab.0.1713345322069; Wed, 17 Apr
- 2024 02:15:22 -0700 (PDT)
-Date: Wed, 17 Apr 2024 02:15:22 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004cc3030616474b1e@google.com>
-Subject: [syzbot] [bpf?] [net?] WARNING in __xdp_reg_mem_model
-From: syzbot <syzbot+f534bd500d914e34b59e@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
-	hawk@kernel.org, john.fastabend@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
+References: <20240417085143.69578-1-kerneljasonxing@gmail.com>
+ <20240417085143.69578-2-kerneljasonxing@gmail.com> <CANn89i+aLO_aGYC8dr8dkFyi+6wpzCGrogysvgR8FrfRvaa-Vg@mail.gmail.com>
+In-Reply-To: <CANn89i+aLO_aGYC8dr8dkFyi+6wpzCGrogysvgR8FrfRvaa-Vg@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 17 Apr 2024 17:22:04 +0800
+Message-ID: <CAL+tcoC8VPOhvPbdbJUrRrAiLaOF2jwsoBkFBEkivPgMzijG5g@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 1/7] net: introduce rstreason to detect why
+ the RST is sent
+To: Eric Dumazet <edumazet@google.com>
+Cc: dsahern@kernel.org, matttbe@kernel.org, martineau@kernel.org, 
+	geliang@kernel.org, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
+	rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
+	atenart@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Hello Eric,
 
-syzbot found the following issue on:
+On Wed, Apr 17, 2024 at 5:02=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Wed, Apr 17, 2024 at 10:51=E2=80=AFAM Jason Xing <kerneljasonxing@gmai=
+l.com> wrote:
+> >
+> > From: Jason Xing <kernelxing@tencent.com>
+> >
+> > Add a new standalone file for the easy future extension to support
+> > both active reset and passive reset in the TCP/DCCP/MPTCP protocols.
+> >
+> > This patch only does the preparations for reset reason mechanism,
+> > nothing else changes.
+> >
+> > The reset reasons are divided into three parts:
+> > 1) reuse drop reasons for passive reset in TCP
+> > 2) reuse MP_TCPRST option for MPTCP
+> > 3) our own reasons
+> >
+> > I will implement the basic codes of active/passive reset reason in
+> > those three protocols, which is not complete for this moment. But
+> > it provides a new chance to let other people add more reasons into
+> > it:)
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+>
+> My original suggestion was to use normal values in  'enum
+> skb_drop_reason', even if there was not necessarily a 'drop'
+> in the common sense.
+>
+> https://lore.kernel.org/all/CANn89iJw8x-LqgsWOeJQQvgVg6DnL5aBRLi10QN2WBdr=
++X4k=3Dw@mail.gmail.com/
+>
+> This would avoid these ugly casts later, even casting an enum to other
+> ones is not very logical.
 
-HEAD commit:    f99c5f563c17 Merge tag 'nf-24-03-21' of git://git.kernel.o..
-git tree:       net
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1502f36d180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
-dashboard link: https://syzkaller.appspot.com/bug?extid=f534bd500d914e34b59e
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17ac600b180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1144b797180000
+Thanks for your comment.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/65d3f3eb786e/disk-f99c5f56.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/799cf7f28ff8/vmlinux-f99c5f56.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ab26c60c3845/bzImage-f99c5f56.xz
+It's a little bit tricky. That's the reason I documented and commented
+on this in the rstreason.h file. I hope it's not that hard to
+understand.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f534bd500d914e34b59e@syzkaller.appspotmail.com
+> Going through an u32 pivot is quite a hack.
+>
+> If you feel the need to put them in a special group, this is fine by me.
 
-RDX: 0000000000000050 RSI: 0000000020000000 RDI: 000000000000000a
-RBP: 00007ffebb32f750 R08: 00007ffebb32f4e7 R09: 00007f2c42da0038
-R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffebb32f9b8 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5065 at net/core/xdp.c:299 __xdp_reg_mem_model+0x2d9/0x650 net/core/xdp.c:299
-Modules linked in:
-CPU: 0 PID: 5065 Comm: syz-executor883 Not tainted 6.8.0-syzkaller-05271-gf99c5f563c17 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-RIP: 0010:__xdp_reg_mem_model+0x2d9/0x650 net/core/xdp.c:299
-Code: 89 c5 85 c0 79 62 e8 c6 b4 3e f8 eb a5 e8 bf b4 3e f8 4c 89 ff e8 97 a9 96 f8 4d 63 fd 48 c7 c7 80 27 39 8f e8 a8 36 23 02 90 <0f> 0b 90 e9 f8 01 00 00 e8 9a b4 3e f8 48 8d 7c 24 60 48 89 f8 48
-RSP: 0018:ffffc90003d0f640 EFLAGS: 00010246
-RAX: 1158ab1705932a00 RBX: dffffc0000000000 RCX: ffffffff8b7974ad
-RDX: 0000000000000001 RSI: 0000000000000008 RDI: ffffc90003d0f5c0
-RBP: ffffc90003d0f710 R08: ffffc90003d0f5c7 R09: 1ffff920007a1eb8
-R10: dffffc0000000000 R11: fffff520007a1eb9 R12: 0000000000000002
-R13: ffff88802ead6000 R14: 1ffff920007a1ed0 R15: fffffffffffffff4
-FS:  0000555581756480(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000066c7e0 CR3: 0000000020174000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- xdp_reg_mem_model+0x22/0x40 net/core/xdp.c:344
- xdp_test_run_setup net/bpf/test_run.c:188 [inline]
- bpf_test_run_xdp_live+0x365/0x1e90 net/bpf/test_run.c:377
- bpf_prog_test_run_xdp+0x813/0x11b0 net/bpf/test_run.c:1267
- bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4240
- __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5649
- __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-RIP: 0033:0x7f2c42ddb279
-Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffebb32f748 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007f2c42ddb279
-RDX: 0000000000000050 RSI: 0000000020000000 RDI: 000000000000000a
-RBP: 00007ffebb32f750 R08: 00007ffebb32f4e7 R09: 00007f2c42da0038
-R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffebb32f9b8 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
+Yes, rst reasons only partially rely on the drop reason mechanism to
+support passive rst for TCP well, but not supporting other cases. My
+final goal is to cover all the cases for the future, so I wish I can
+put it into a separate group, then people like me who find it useful
+can introduce more reasons into it.
 
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Thanks,
+Jason
 
