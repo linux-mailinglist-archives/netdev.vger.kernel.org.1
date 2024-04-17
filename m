@@ -1,155 +1,100 @@
-Return-Path: <netdev+bounces-88814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9824A8A896F
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 18:56:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCB228A8982
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 18:59:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CCBC1F24545
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 16:56:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9925B285F2C
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 16:59:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E71E17108B;
-	Wed, 17 Apr 2024 16:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A91FD171661;
+	Wed, 17 Apr 2024 16:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EaWx5IEn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cxWRb0QR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E65D171071
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 16:56:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44DA6171657
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 16:57:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713373004; cv=none; b=GoE9GCvMcWlgmGYjJ0hVjsPr+56JI5M6kDk8NvstT94gpM9ouVfh6jDqNgYjZ7aSAAxPirp8yd/pysf3LYm9cjpSTBl4T/k5HT6ZjwAAcThkR2CBkTMvrgfT8iRo0UZ/fuYm9bXw4zaHdWXRW7NbIP8vmnfjKRs8Q1dwH3fslU4=
+	t=1713373080; cv=none; b=gSJ8hMj5dsXSWJ+UHo/Oiahpul2ZErlhgCek7ptZuuzghuXOU9wiFMX9ZkXRpPr5jFMJ8m3MfcYmLwofdozSBraI0SWQmkfBdqLCfOiV6reJLAvDmOD27BMWukr6AU48+xqXG8STTgiIGwcW0Ml5Oi9+GH7v8WYMUMmfJZyRCy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713373004; c=relaxed/simple;
-	bh=UNHXbiPN7410xMhCJZuPlJNB4RzFR5VCyU3wmS4kHzY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=R/EBllBg4A4qgbYEfwmn0QZG81g1slIqi/bKyhnaOCPphi4D6uiRAyCiXd7Dy1wrkrLeO/yV/Fy9LuYIIZWypGGH74OcmlRRYP87e2yMNKYNE01kHAN5nplXm5K6ktofLN0hPQOQPHqC4phq25ef1QCPwfNvOpSHmVqZ8jfpks8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EaWx5IEn; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713373002; x=1744909002;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=UNHXbiPN7410xMhCJZuPlJNB4RzFR5VCyU3wmS4kHzY=;
-  b=EaWx5IEnM6JUaqz/neMmNqJJSlLioAuplWsEk59fF+aku6AFZghq/Xqj
-   B7a1GYpJy7kH9YPzBMzV/SExhEEOCvnoaoyx66LTjRv6B3CTI2HNJUcqo
-   ENxMVd9s2VMzbuDZeC7/QEj5djhrW4Hy3+M6udHQ/4vbEzWKXPOXGfYOU
-   76rMWqs/HB5w2BAj+iM1hQfnNOaJOodA6uv16B0BzGbXKRlulJ7xBYG/N
-   ILkUgrC+riKpJ1zVsZpf5StyLniWc7V8YAl/4YTVWrSvCp7Zpn8vIGin4
-   5HuHJZhmFt/1I1MY/YMcELCyimBXG1jixY4jibkLOzobKmDRPetUc3nCB
-   A==;
-X-CSE-ConnectionGUID: Qig72+WjTlaqnkpGDbfAGQ==
-X-CSE-MsgGUID: KAVuHGZQRR2HEvH83f8mcA==
-X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="9047291"
-X-IronPort-AV: E=Sophos;i="6.07,209,1708416000"; 
-   d="scan'208";a="9047291"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Apr 2024 09:56:40 -0700
-X-CSE-ConnectionGUID: +J83yb7hRGGJSkCcYK4etQ==
-X-CSE-MsgGUID: 6bp8tUYQQrqF2tLbyeh1/w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,209,1708416000"; 
-   d="scan'208";a="27257619"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa003.fm.intel.com with ESMTP; 17 Apr 2024 09:56:40 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Dariusz Aftanski <dariusz.aftanski@linux.intel.com>,
-	anthony.l.nguyen@intel.com,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>,
-	Jiri Pirko <jiri@nvidia.com>
-Subject: [PATCH net-next 2/2] ice: Remove ndo_get_phys_port_name
-Date: Wed, 17 Apr 2024 09:56:33 -0700
-Message-ID: <20240417165634.2081793-3-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240417165634.2081793-1-anthony.l.nguyen@intel.com>
-References: <20240417165634.2081793-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1713373080; c=relaxed/simple;
+	bh=y7suL1YK3od3twvRIX/ZIugIqRFjCDPxvszDNcSw8B4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=sMEKtzz8MYil7sd5qGlo22fXL8wWUtUHOcMPCm/atIneZTV6LPMoYexPHoHR2lHK9FG2c6GaIBG/cCwiUdGd05L+aAZgMxvcd17g6RIqpBfhLIV43LnZ5It+bDGp9r8MOVfJX9JOzHYyu/8BIKAZFnvQI3D0OBEsz/DzWgzcvL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cxWRb0QR; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61890f3180aso78942877b3.2
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 09:57:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713373078; x=1713977878; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=sPAaR+H/YkZY/hGenagMkiG9wPIJQG+Q6rDyjTBBqfs=;
+        b=cxWRb0QRqo3pRRdjEKXHC3r1jp1pDGa7hVKsd66mbRLvZzYxoNCfmmt4InrszFc+Rc
+         swYvG3rinOkpeSdbg4d1fmrS/fPcgpmkD0s4SeQmsMNiSM7Qb0VFrLrCX94PSE44zcxT
+         OMlj1S634DeMaPPgD0WO9c5IfP4m6RRtqNokvIC5StpMM+7DXQXXy+Hd7UO9yMtk04UX
+         Kqf6r4KWyCNkvdT2nTh4oecNnxb3jV+l+kS0EY8UckjTRj2TXe2YEzYxmctbo6ZFyxTO
+         Up207BT14zuls1QUhZ602MeG1HPl5PaPqhrX7DZqNHRTj3HioZChqqg0ZoMFspy+x3pn
+         X9eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713373078; x=1713977878;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sPAaR+H/YkZY/hGenagMkiG9wPIJQG+Q6rDyjTBBqfs=;
+        b=AREtG7DyikV8CQLon9TN6zCYjsoDmcdJNCYWj5F5K9JLVWYhoinY6ncXQmAkN/rGe1
+         YN7pP4NLyXJ6MIx3NTe1TZEHqmqJHF+EpB/ARTczQ8aGntc6IR+GteAL++Bq+ssr7FL6
+         OGC+7AiPA+8XlJu4G7MBR4C9kzOmo4E+0V8gfsg7JRzeO2Jd0pfsULjWt1uumQ8x/zYv
+         1bsDC7Jn6d0hxwjT+gmYXaMqKiE7Zdj2E+JQm/RgObkm+C3Z89G2er43vGGG2upNF1aT
+         nWSJQBpC5IviSZeBxSoCOzELhi56MUr2M5EC/fE2AKqq8hSC41qS3OS5kXT47bbvHop7
+         fu2A==
+X-Gm-Message-State: AOJu0YxPa550UItjJGSQxYdRAJR+8K8Jc5+iZAoPNPmoymfXFf3QMe0k
+	1go932r1AfwssIGFt1roanQeGOu6PjkU1s1ro2TP0gAn+iqg69PldyvrFqFzpMg7y2B5nk0XPu+
+	uopowbEXN5A==
+X-Google-Smtp-Source: AGHT+IFPdsBP0dPeqWQDvEDhDXZr7fj64zJvP/W5x6H+UmV5/BC73X9+2ViPS8KsH3cbM3tQdEGQnSEvkakY0w==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a81:4ed0:0:b0:61a:bfc8:64ce with SMTP id
+ c199-20020a814ed0000000b0061abfc864cemr2717908ywb.8.1713373078303; Wed, 17
+ Apr 2024 09:57:58 -0700 (PDT)
+Date: Wed, 17 Apr 2024 16:57:54 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
+Message-ID: <20240417165756.2531620-1-edumazet@google.com>
+Subject: [PATCH net-next 0/2] tcp: tcp_v4_err() changes
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
+	Dragos Tatulea <dtatulea@nvidia.com>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Dariusz Aftanski <dariusz.aftanski@linux.intel.com>
+First patch fixes a bug in tcp_v4_err().
 
-ndo_get_phys_port_name is never actually used, as in switchdev
-devlink is always being created.
+Fixing this old bug allows us to bring back a patch
+that we had to revert. Hopefully linux TCP can better
+meet RFC 1122 requirements.
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Signed-off-by: Dariusz Aftanski <dariusz.aftanski@linux.intel.com>
-Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_repr.c | 34 -----------------------
- 1 file changed, 34 deletions(-)
+Eric Dumazet (2):
+  tcp: conditionally call ip_icmp_error() from tcp_v4_err()
+  tcp: no longer abort SYN_SENT when receiving some ICMP (II)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_repr.c b/drivers/net/ethernet/intel/ice/ice_repr.c
-index b8009a301e39..d367f4c66dcd 100644
---- a/drivers/net/ethernet/intel/ice/ice_repr.c
-+++ b/drivers/net/ethernet/intel/ice/ice_repr.c
-@@ -9,39 +9,6 @@
- #include "ice_tc_lib.h"
- #include "ice_dcb_lib.h"
- 
--/**
-- * ice_repr_get_sw_port_id - get port ID associated with representor
-- * @repr: pointer to port representor
-- */
--static int ice_repr_get_sw_port_id(struct ice_repr *repr)
--{
--	return repr->src_vsi->back->hw.port_info->lport;
--}
--
--/**
-- * ice_repr_get_phys_port_name - get phys port name
-- * @netdev: pointer to port representor netdev
-- * @buf: write here port name
-- * @len: max length of buf
-- */
--static int
--ice_repr_get_phys_port_name(struct net_device *netdev, char *buf, size_t len)
--{
--	struct ice_netdev_priv *np = netdev_priv(netdev);
--	struct ice_repr *repr = np->repr;
--	int res;
--
--	/* Devlink port is registered and devlink core is taking care of name formatting. */
--	if (repr->vf->devlink_port.devlink)
--		return -EOPNOTSUPP;
--
--	res = snprintf(buf, len, "pf%dvfr%d", ice_repr_get_sw_port_id(repr),
--		       repr->id);
--	if (res <= 0)
--		return -EOPNOTSUPP;
--	return 0;
--}
--
- /**
-  * ice_repr_inc_tx_stats - increment Tx statistic by one packet
-  * @repr: repr to increment stats on
-@@ -279,7 +246,6 @@ ice_repr_setup_tc(struct net_device *netdev, enum tc_setup_type type,
- }
- 
- static const struct net_device_ops ice_repr_netdev_ops = {
--	.ndo_get_phys_port_name = ice_repr_get_phys_port_name,
- 	.ndo_get_stats64 = ice_repr_get_stats64,
- 	.ndo_open = ice_repr_open,
- 	.ndo_stop = ice_repr_stop,
+ net/ipv4/tcp_ipv4.c | 9 ++++++++-
+ net/ipv6/tcp_ipv6.c | 9 ++++++---
+ 2 files changed, 14 insertions(+), 4 deletions(-)
+
 -- 
-2.41.0
+2.44.0.683.g7961c838ac-goog
 
 
