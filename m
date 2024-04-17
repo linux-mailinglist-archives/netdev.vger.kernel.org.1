@@ -1,50 +1,72 @@
-Return-Path: <netdev+bounces-88647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B72F58A801A
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:50:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AE788A802B
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:55:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E89BE1C2162D
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:50:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E8E01C21AB8
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:55:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58042136E13;
-	Wed, 17 Apr 2024 09:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93EB01327E0;
+	Wed, 17 Apr 2024 09:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S4VNWHbg"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="HJPwhTvt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E3E412F37C;
-	Wed, 17 Apr 2024 09:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C54062207A;
+	Wed, 17 Apr 2024 09:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713347430; cv=none; b=obf+DrtAme43mavk6x0G7Gsiuvme9evBnk1rbhVhE/jH0gAfJ9XnIfNpui585DyYK9TsOgZhCNUB+B0Bc2J36pqrwJE9sN51yjB3SyiLOYiv9ZSA5dDTHC9lgHGlQwEpDIfgXmVhLUw74K5PniEbGPyHXmwgz82woTbNqKfETjc=
+	t=1713347703; cv=none; b=iXKuW9u+QsB520lTfc0aXHGQ17xP8B8HB/zGFh9nYg9BaHmSwDGo0nLbIyZslofLM9ha7Wsy3vRXifQzpCvYE3ksRg3BLkneH7oCIJ9F6DGSKteglwosQx45qiVQde3XmQ9SV2WzTkhwlphAcHj9J/BISMYHYd8nITEySStQ8Fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713347430; c=relaxed/simple;
-	bh=tBFygEfgSUOLTCcaP5hAlsAek9UxTj79UaNMYkCENrU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=JbhfUySeoLDfaoitW0WaQoyXu04J7vAosENR50d7Cbso2BXrRV4niuBuUvUUMOmiS2GYSG1HFJdSWRm0h9K1FiDGCSAwJj3e362xvlFLT0fkU4xbhTESUCZqsqX/DePuDx8/tG1Ln8wu/2IdIXLr9JCIN7vFKsTEKRWAAZEkvhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S4VNWHbg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C2538C072AA;
-	Wed, 17 Apr 2024 09:50:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713347429;
-	bh=tBFygEfgSUOLTCcaP5hAlsAek9UxTj79UaNMYkCENrU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=S4VNWHbg0UIkFb04/UpCUqvZN9Au5SJjFlsCVGBIkENYVpRDtdJz91xAVMmda8XVY
-	 uQZ12U7P4m0+G3aXiM1Te1ZcURvlELXIDoxUia5NFyoX8HpxvBCWAS/VoQXU7P5wjW
-	 jroMfBLOqySTkRDiHJnK/H2ksghvy/nBsrcqwM6wIjOhNV+J9vGNzQ84joGa9JJMFt
-	 PFgrH8Ed7SRtRWO0UGBYGbgdRLP8AOkgRyoDA176g1geYcpgmQ6tQ2TS4S15fbpwlR
-	 O+rB9IalE23M6rO4gPtJ4mrDxjYlyUHONOuD5OZVKoXwUlSYtWty3HvFRp0T4AhrsR
-	 EZaP73M64Gl/w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AF5E3D5B3FD;
-	Wed, 17 Apr 2024 09:50:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1713347703; c=relaxed/simple;
+	bh=JlnfYvxKQVsKU+a5E01G9fuAf4OwPy0l1HUe6pgpowI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YQ2MxARLNAIzs7GOTpIy10GTCLs6aiPUEwFtlz9Ts3wJ11nKJ34BY1mPF9OH59XqkVtAWSQLqb8Yac2wNgZynr6mZ6K2Pi6AQVnkNEcgsNf+BkLj3ZZzHYxrqGGHY4UBGh26NmPno9gV4s8C5pNAl4HIvOhTFqTiYfZsTQXWVKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=HJPwhTvt; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43H9sUsO049786;
+	Wed, 17 Apr 2024 04:54:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1713347670;
+	bh=42szbn/JKNKxbraPXd7JD5FF4kFxy+kYXLBy8GFxv5g=;
+	h=From:To:CC:Subject:Date;
+	b=HJPwhTvtrQCrpkrWpsVu4jWNljaK1CW4Qpczkf7At3QMGjEvI/+Dps9yRxoJLP7yu
+	 l50CymYrK7p3mEi1hPKGHh8/k+Pi7TqxMblA/ZQG0QkresXOKXzKMtN0x24aLpmb+D
+	 O/TfhpDYhSyjDT3J2L74s95mQWghL1mBkHWwpFBA=
+Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43H9sUsn022608
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 17 Apr 2024 04:54:30 -0500
+Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 17
+ Apr 2024 04:54:30 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE106.ent.ti.com
+ (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 17 Apr 2024 04:54:30 -0500
+Received: from uda0492258.dhcp.ti.com (uda0492258.dhcp.ti.com [172.24.227.9])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43H9sPoJ085723;
+	Wed, 17 Apr 2024 04:54:26 -0500
+From: Siddharth Vadapalli <s-vadapalli@ti.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <rogerq@kernel.org>, <dan.carpenter@linaro.org>,
+        <robh@kernel.org>, <jpanis@baylibre.com>,
+        <u.kleine-koenig@pengutronix.de>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <spatton@ti.com>, <srk@ti.com>,
+        <s-vadapalli@ti.com>
+Subject: [PATCH net] net: ethernet: ti: am65-cpsw-nuss: cleanup DMA Channels before using them
+Date: Wed, 17 Apr 2024 15:24:25 +0530
+Message-ID: <20240417095425.2253876-1-s-vadapalli@ti.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,47 +74,68 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phy: mediatek-ge: do not disable EEE
- advertisement
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171334742971.18271.14228801300401339058.git-patchwork-notify@kernel.org>
-Date: Wed, 17 Apr 2024 09:50:29 +0000
-References: <20240414-for-netnext-mediatek-ge-do-not-disable-eee-adv-v1-1-2fefd63c990b@arinc9.com>
-In-Reply-To: <20240414-for-netnext-mediatek-ge-do-not-disable-eee-adv-v1-1-2fefd63c990b@arinc9.com>
-To: =?utf-8?b?QXLEsW7DpyDDnE5BTCB2aWEgQjQgUmVsYXkgPGRldm51bGwrYXJpbmMudW5hbC5h?=@codeaurora.org,
-	=?utf-8?b?cmluYzkuY29tQGtlcm5lbC5vcmc+?=@codeaurora.org
-Cc: daniel@makrotopia.org, dqfext@gmail.com, SkyLake.Huang@mediatek.com,
- andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, arinc.unal@arinc9.com
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Hello:
+The TX and RX DMA Channels used by the driver to exchange data with CPSW
+are not guaranteed to be in a clean state during driver initialization.
+The Bootloader could have used the same DMA Channels without cleaning them
+up in the event of failure. Thus, reset and disable the DMA Channels to
+ensure that they are in a clean state before using them.
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Fixes: 93a76530316a ("net: ethernet: ti: introduce am65x/j721e gigabit eth subsystem driver")
+Reported-by: Schuyler Patton <spatton@ti.com>
+Signed-off-by: Siddharth Vadapalli <s-vadapalli@ti.com>
+---
+Hello,
 
-On Sun, 14 Apr 2024 00:08:13 +0300 you wrote:
-> From: Arınç ÜNAL <arinc.unal@arinc9.com>
-> 
-> The mediatek-ge PHY driver already disables EEE advertisement on the switch
-> PHYs but my testing [1] shows that it is somehow enabled afterwards.
-> Disabling EEE advertisement before the PHY driver initialises keeps it off.
-> Therefore, remove disabling EEE advertisement here as it's useless.
-> 
-> [...]
+This patch is based on commit:
+96fca68c4fbf Merge tag 'nfsd-6.9-3' of git://git.kernel.org/pub/scm/linux/kernel/git/cel/linux
+of mainline Linux.
 
-Here is the summary with links:
-  - [net-next] net: phy: mediatek-ge: do not disable EEE advertisement
-    https://git.kernel.org/netdev/net-next/c/af3b4b0e59de
+Regards,
+Siddharth.
 
-You are awesome, thank you!
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
+
+diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+index bfba883d4fc4..259d7cb13f6e 100644
+--- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
++++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
+@@ -3260,6 +3260,8 @@ static void am65_cpsw_unregister_devlink(struct am65_cpsw_common *common)
+ 
+ static int am65_cpsw_nuss_register_ndevs(struct am65_cpsw_common *common)
+ {
++	struct am65_cpsw_rx_chn *rx_chan = &common->rx_chns;
++	struct am65_cpsw_tx_chn *tx_chan = common->tx_chns;
+ 	struct device *dev = common->dev;
+ 	struct am65_cpsw_port *port;
+ 	int ret = 0, i;
+@@ -3272,6 +3274,22 @@ static int am65_cpsw_nuss_register_ndevs(struct am65_cpsw_common *common)
+ 	if (ret)
+ 		return ret;
+ 
++	/* The DMA Channels are not guaranteed to be in a clean state.
++	 * Reset and disable them to ensure that they are back to the
++	 * clean state and ready to be used.
++	 */
++	for (i = 0; i < common->tx_ch_num; i++) {
++		k3_udma_glue_reset_tx_chn(tx_chan[i].tx_chn, &tx_chan[i],
++					  am65_cpsw_nuss_tx_cleanup);
++		k3_udma_glue_disable_tx_chn(tx_chan[i].tx_chn);
++	}
++
++	for (i = 0; i < AM65_CPSW_MAX_RX_FLOWS; i++)
++		k3_udma_glue_reset_rx_chn(rx_chan->rx_chn, i, rx_chan,
++					  am65_cpsw_nuss_rx_cleanup, !!i);
++
++	k3_udma_glue_disable_rx_chn(rx_chan->rx_chn);
++
+ 	ret = am65_cpsw_nuss_register_devlink(common);
+ 	if (ret)
+ 		return ret;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.40.1
 
 
