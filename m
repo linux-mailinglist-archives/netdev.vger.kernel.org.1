@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-88533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AAB18A79C4
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 02:20:46 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D55738A79C6
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 02:20:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BCA11C2248E
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 00:20:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 40E7DB21FEE
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 00:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A9517F6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D17A1FA3;
 	Wed, 17 Apr 2024 00:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BQvSDFab"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mXAciEce"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E65ACA40;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C6EEEDF;
 	Wed, 17 Apr 2024 00:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713313233; cv=none; b=lwRh9/h7uHOZNyqS6mTOTRKoqqFimS3LMab1esvmrdJdDmmv1yxWJ9RfO/myfq3N9Ql0daG6pqvLbbfvxWDmiomXBmdxqcOJu+zQgk8Mogq4t5X74ipHLFSE2Ko0I9vE3s5NdaTZqcIDkPAi47Ozv/KfrOcayD6wf0UaduUtKTE=
+	t=1713313233; cv=none; b=VXQmeyct3y3N1YqKhsM6armezd66HwF2MekpBItK/DJjPH9w4DOUsrRZQGlJdwH16iC3iiE22H5v/pQpwZAVm2z007L9ypa6eDPviZ3xdhUG0Jn2CUfuvRWyvVMfN10TcJs5qbCb0k4JCiNCBa83IBLsRoF3BtbR2FoU0j7TurE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713313233; c=relaxed/simple;
-	bh=/i9bdPohR3Hwnz6elKCfzDTvkDD/UZyPKPtJnBQFJGI=;
+	bh=MuXir1a4HxUc5/elRkP4fSNYnpZOhVEyKYUO9DQGCVE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=H8bv4VkAT8Id6SE6aRUfbcvRDhwERgOYdJle13nnOorcXkO2k+JPclIwY6CXNnylJ5cJbCuHxP09HQZPFvlhQ3lZmcvxUZY8yromS5VOccWR+D0aO10PiGI0y8VJMwLyxW7cj1au2lIwG2zrkY9H5kF75QKg77K42Wv2GaiwSTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BQvSDFab; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B9803C32783;
+	 In-Reply-To:To:Cc; b=q1Ty6YS6wzHB9HV3HE/NKNJKI2dFYN0OcJyFL2Cb+sAiNyW4UVDePpZYVXa6AsZRgsilEfiFBTLaKbSHLiVE/QXkmRiFMPdu8pebYXNQIc7JK2IkLu26rYeJhiSJFC+Po3dhVDElQqNdFkOXAHbdDV1gc5RHWznZkTGvwS3NDnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mXAciEce; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 95CB2C4AF07;
 	Wed, 17 Apr 2024 00:20:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1713313232;
-	bh=/i9bdPohR3Hwnz6elKCfzDTvkDD/UZyPKPtJnBQFJGI=;
+	bh=MuXir1a4HxUc5/elRkP4fSNYnpZOhVEyKYUO9DQGCVE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BQvSDFab91ZIIYmGF5PiICYqxDJLf/nYC3+gI3Rguyo/8VrqJPD+4OBgKeZ/NZRuA
-	 uJ413Vtf7hMTI7SkhFba7vsPvFynhQcwNwX7z5lRD++UhyIFAi4DswZklO35viMS4f
-	 fCFXCFwlNNZNAOZdU5Mag8/Dbdr8OAewLXlqo3rPe0GLYz+ClYpbV0wu4kHJJHLUYF
-	 a+TtKQ/N/HW6vMn1BL7mdFUSG/hr0/dkkeKMnOs18h20LqrhYTRPVUdo8hr00armhw
-	 QeyK2kf2HksegKU87b4QA2zMs3CTTricUHJwhKJqVWpVkVnUrh4mw6lEL5CdeRgJhn
-	 kx3Q1Y5FSDOfA==
+	b=mXAciEceGxrBh+JjCwliKgOyglzZ57WUbPIFs8oGnZtPCu0fgjhgvAT9H4lBkzRTi
+	 Xy0Q3TQpYRoQpSov6hOvCfWpO9wxsFUgVUJjGMJwf1qK1TS4CiLzlxOQJKzIb1Awik
+	 LrOlc7o/jE+w5FlTiXNlnetilAKQg2mdQ5FWi8Kso6ru9sOuEo9Bef+Yjdq8rjLKHe
+	 oCi8Z63jfsoUoEkVcCW429JsuiN0Fui4MgjHTZUP84DDsxef8I0yqtqIP4K4JKTNAK
+	 JZANlh+/kysVxfuu4/pUln41Jhf52Wkyo9gMlfJz/Sd9OSiaReKpRLe+I6tKOUodT0
+	 rKEax4oSSrdUg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id ABF1DD4F15D;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8B7A0C395F3;
 	Wed, 17 Apr 2024 00:20:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,37 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: dsa: microchip: drop unneeded MODULE_ALIAS
+Subject: Re: [PATCH][next] net/handshake: remove redundant assignment to variable
+ ret
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171331323270.29224.2660598885504020651.git-patchwork-notify@kernel.org>
+ <171331323256.29224.18144970785462425420.git-patchwork-notify@kernel.org>
 Date: Wed, 17 Apr 2024 00:20:32 +0000
-References: <20240414154929.127045-1-krzk@kernel.org>
-In-Reply-To: <20240414154929.127045-1-krzk@kernel.org>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, andrew@lunn.ch,
- f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240415100713.483399-1-colin.i.king@gmail.com>
+In-Reply-To: <20240415100713.483399-1-colin.i.king@gmail.com>
+To: Colin Ian King <colin.i.king@gmail.com>
+Cc: chuck.lever@oracle.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, kernel-tls-handshake@lists.linux.dev,
+ netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 14 Apr 2024 17:49:29 +0200 you wrote:
-> The ID table already has respective entry and MODULE_DEVICE_TABLE and
-> creates proper alias for SPI driver.  Having another MODULE_ALIAS causes
-> the alias to be duplicated.
+On Mon, 15 Apr 2024 11:07:13 +0100 you wrote:
+> The variable is being assigned an value and then is being re-assigned
+> a new value in the next statement. The assignment is redundant and can
+> be removed.
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-> ---
->  drivers/net/dsa/microchip/ksz_spi.c | 7 -------
->  1 file changed, 7 deletions(-)
+> Cleans up clang scan build warning:
+> net/handshake/tlshd.c:216:2: warning: Value stored to 'ret' is never
+> read [deadcode.DeadStores]
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] net: dsa: microchip: drop unneeded MODULE_ALIAS
-    https://git.kernel.org/netdev/net-next/c/9b07508845f9
+  - [next] net/handshake: remove redundant assignment to variable ret
+    https://git.kernel.org/netdev/net-next/c/c2b640529ec7
 
 You are awesome, thank you!
 -- 
