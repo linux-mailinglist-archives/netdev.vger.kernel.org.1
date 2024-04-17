@@ -1,108 +1,104 @@
-Return-Path: <netdev+bounces-88653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 672CE8A810B
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 12:36:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B05188A8113
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 12:37:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9850B1C20A82
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 10:36:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 515F61F2119A
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 10:37:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C768813C3D3;
-	Wed, 17 Apr 2024 10:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD4913AD25;
+	Wed, 17 Apr 2024 10:37:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WhihDZCr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fCX1w3gP"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238161327E0
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 10:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4981D128807
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 10:37:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713350189; cv=none; b=bZXyZwYTXJppZRfjb0dFpr2TWawWIUyIrjfSDrEdwXyrcr6Ewz/hu2yEXRtGLG3cqyPTBfXefqm6I+OoGxqDjFcYTPX1gOY2QXUfb2oip1gSEr3YmKh0VLdT32NK2xVMV7WoeP51qu1uPk5xg+jhMn0o/Q+dCfB4fXtOnvfDnoQ=
+	t=1713350247; cv=none; b=LapIZOzglVWPUYrWKqbtZ9AIEHWlnNeeTw/zYgEvwzmcBZQVFDppEID5xU7Jnt0+c65htDEAsWQgDlh0TXxGeALMmelopTZCkesa/WtCJfiGUiqiohFllPVupI6uA2gJudTOo0q68xITCSByGedYmzl5xixhVieCmINWMJfACmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713350189; c=relaxed/simple;
-	bh=l3AYSJ/+mdg3v48SneVucrIzOcn2/tdaJ1WQ9uXh3tk=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=n0jpzqMD8SsMNvDdYLRqbHjSiHvXlFdvJ7KQNEbXQ7R1ekR7q1fAac7LTDj++7LKN0Y4OQghS+Wp/ZjrG9U6XP0Mb3Y/XgyghTXFScCqiscTjRo7k8WzoA/jrzFbIk1zfkQbQ73Lm3Fr4K0yU0ieVFDbdSVw7qVXzpUIoChca+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WhihDZCr; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1713350247; c=relaxed/simple;
+	bh=F82AssVgXvCob8ZL9Z4+OKy8YClSbjD7FR4etRy+/zw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AL6cficKYur5BlnNPGtcK3Ln3iHxUJUs66bnNzcyx2lEwcEJfjd1mcVVcATLIg7KPWRQinQ8Zn8aTxSwUoIKYwk1hqq44M1KjR1oZem7UXN45jOYkcfA7JKpUSdoUmRK/P49fW5tWqG/NkeBGZUP+AWl3s3laB9xgrHSVzBG0Ls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fCX1w3gP; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713350187;
+	s=mimecast20190719; t=1713350244;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=oIJdAoOJD1/uhXCiQOPpdfvotOmhyFiedfiW/yeHsWQ=;
-	b=WhihDZCrYFxfYBBsIYfcHxfQB6sVrU4ei71rJHJgntpfk5cZH/7ygqIoYq8AQqofipDeCM
-	TqfoTPNWrrUjScPRMYNJsrCxgFHGZK0tJcow6/IucZpnJbsNnGvobpP3+kfjJbsa0rVBAR
-	WebyAx0qucZnd/sDjSg0UCx7frDHx0Q=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-361-tzkEwGWLMWac2hfcSazMmA-1; Wed,
- 17 Apr 2024 06:36:24 -0400
-X-MC-Unique: tzkEwGWLMWac2hfcSazMmA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 65AB738041CC;
-	Wed, 17 Apr 2024 10:36:23 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.200])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2FDF82026962;
-	Wed, 17 Apr 2024 10:36:20 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <87d451ff8cd030a380b522b4dfc56ca42c9de444.camel@kernel.org>
-References: <87d451ff8cd030a380b522b4dfc56ca42c9de444.camel@kernel.org> <20240328163424.2781320-1-dhowells@redhat.com> <20240328163424.2781320-25-dhowells@redhat.com>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
-    Gao Xiang <hsiangkao@linux.alibaba.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Steve French <smfrench@gmail.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-    linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-    ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
-    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org, Latchesar Ionkov <lucho@ionkov.net>,
-    Christian Schoenebeck <linux_oss@crudebyte.com>
-Subject: Re: [PATCH 24/26] netfs: Remove the old writeback code
+	bh=J9nMNnE8K+akgXeJg/dpP7arElOO03kY2h1QsuXP85M=;
+	b=fCX1w3gPZTTZ9yOMK6UymEbEaHB/ph+5Q6gFHIMx5QlGtvAQjmeOUXydgwFOYFuzQCSL2p
+	gBlWI+Oy5aaUK1vWNbow/fYKh8u6h6gsVW+bDKz4hgLQHZzHmPIcABAtm1unJ6CcM1clc4
+	wRAgdG6EJsrhW85TpBluFXvWqQDFfJQ=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-44-JXHFyWvAOPqPVG8S5vyZEQ-1; Wed, 17 Apr 2024 06:37:22 -0400
+X-MC-Unique: JXHFyWvAOPqPVG8S5vyZEQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-417bf71efb4so3677585e9.0
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 03:37:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713350242; x=1713955042;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J9nMNnE8K+akgXeJg/dpP7arElOO03kY2h1QsuXP85M=;
+        b=Ef2EMa4jlNvk3v+n0PBML4RINloT/YBYTnAKX+KfHqF34eWqZMeEofksNGwEcuGswK
+         hA8QzGjcZ4iH08tSkGT2s0i75hZFkXzrYmSUzSoiKRSmxo+Kt1KPY4ORLRrD8lsBmvUL
+         LeUXaIxtBEQm2VAiKUav06eDPIKwOrWH+HLFmIrduiiLKqjLmAwb3IjFj9Ak4c+NOOrU
+         N15n9Y4Zj6Y2bDbLdZ3FuWNXvx+f8DNTGW7B1DFpoj7r1ExYuz/pq7v/k/oRuoID8si/
+         78LxmEb7eAU9GR6kd2kLAy7c/Sh8ANlLqQCRdeu8GYitjngFUDhA9fuNJKVaXb5ynkzl
+         sC9g==
+X-Forwarded-Encrypted: i=1; AJvYcCWr+FF0kGOQcKbJjg8zC1AS2fEaCkxPdLWWe0TrF1J8oTJFmN5Z7QsCOyoPH+MOEpiwEvxi9/C5Bl9Jnb5MFLJ9GZAlMziM
+X-Gm-Message-State: AOJu0Yx1BF4e4QVEy1iuDbAPepT5WWvrVO+H+C+7a9B/QOI/4+Dqea0N
+	r+uYYmrBeCy8pVAEqNpADnR8m9h+XkUQdbJR+b55RTVMtuuLJnudFAkSi0je7U/OkyrPmInPjH0
+	kmSMtzC7rVKCu5ot03kUiUgWCXDwMsDjm8anrmSI4jOyWUz7mAIFJlg==
+X-Received: by 2002:a05:600c:1c11:b0:418:b62c:70dd with SMTP id j17-20020a05600c1c1100b00418b62c70ddmr1424281wms.4.1713350241843;
+        Wed, 17 Apr 2024 03:37:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEUlAXjYfIucv/x0TWFHnbg7SSh6ulD9yz6nzYtJvVu/55CHOaGWjd3kw5nXT52z397jFoudw==
+X-Received: by 2002:a05:600c:1c11:b0:418:b62c:70dd with SMTP id j17-20020a05600c1c1100b00418b62c70ddmr1424266wms.4.1713350241560;
+        Wed, 17 Apr 2024 03:37:21 -0700 (PDT)
+Received: from debian (2a01cb058d23d60016331420a0ce55f3.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:1633:1420:a0ce:55f3])
+        by smtp.gmail.com with ESMTPSA id jg23-20020a05600ca01700b004189cf6bd6esm2229047wmb.22.2024.04.17.03.37.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Apr 2024 03:37:21 -0700 (PDT)
+Date: Wed, 17 Apr 2024 12:37:19 +0200
+From: Guillaume Nault <gnault@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next] netns: no longer hold RTNL in rtnl_net_dumpid()
+Message-ID: <Zh+mX5YQyJMzddn7@debian>
+References: <20240416140739.967941-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <98240.1713350175.1@warthog.procyon.org.uk>
-Date: Wed, 17 Apr 2024 11:36:15 +0100
-Message-ID: <98241.1713350175@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240416140739.967941-1-edumazet@google.com>
 
-Jeff Layton <jlayton@kernel.org> wrote:
+On Tue, Apr 16, 2024 at 02:07:39PM +0000, Eric Dumazet wrote:
+> - rtnl_net_dumpid() is already fully RCU protected,
+>   RTNL is not needed there.
+> 
+> - Fix return value at the end of a dump,
+>   so that NLMSG_DONE can be appended to current skb,
+>   saving one recvmsg() system call.
 
-> #23 and #24 should probably be merged. I don't see any reason to do the
-> two-step of ifdef'ing out the code and then removing it. Just go for it
-> at this point in the series.
-
-I would prefer to keep the ~500 line patch that's rearranging the plumbing
-separate from the ~1200 line patch that just deletes a load of lines to make
-the cutover patch easier to review.  I guess that comes down to a matter of
-preference.
-
-David
+Reviewed-by: Guillaume Nault <gnault@redhat.com>
 
 
