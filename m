@@ -1,66 +1,57 @@
-Return-Path: <netdev+bounces-88603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C29E68A7DE9
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 10:15:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FFD98A7E0D
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 10:21:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AB5A1F22CA3
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 08:15:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A0CF81C21EBD
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 08:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF605839E3;
-	Wed, 17 Apr 2024 08:14:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD277D3F0;
+	Wed, 17 Apr 2024 08:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NbogXVAz"
+	dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b="nAM/4NC+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail-40134.protonmail.ch (mail-40134.protonmail.ch [185.70.40.134])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A80408175B
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 08:14:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9E0B6F066
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 08:20:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.134
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713341680; cv=none; b=okHzSR3tTwyMWSZxub58/6kwshBjOToKQOOV901FN+I2kllNbVPilJRZ/CGxH/qfB/8SgXD0ZpFz/QmI987YJy9bSrJ/dqWZCiR951e5tQQFCXYP7ddaEnU0fKTQzFZGHWU3ch5Pgmyha191zKTK5CeVOl1Vpn/osTPH1CM6eSc=
+	t=1713342060; cv=none; b=T/XONwrsXfab9BlUu5YHE36g8LcVar89T/VPHoYrtXhxeSxW/0SMS+qEpJf5S3exD2r1RyohEZ3dgm8hgzTz5HGaEC4vHzsIC8xOJ/54Et7xOZmnq3/SJOic6rZoU6MBbWSqlbdmrVbIDJEwYsgfR0qV72Drd4GeEvlZnZrrYto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713341680; c=relaxed/simple;
-	bh=B7XzM/gwXeM5hGmVFdPq++r0UO9h/qCQmb38qpTyGkk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nSRFh3XIT4GIpmkGMSESMeRIw5pwjNOotrp57sj6oXeX53IgeVHvmhJIZg2qRrG57AZXJdWA8cfJosWTboHbpY4THROeWnlenHm/r3U47msEJlpx7vopy5bAQ6W316k4nqWoUBdryDjRa17bFvR4JAy0tkZv8Gd38j8BlYG8bRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NbogXVAz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FA12C4AF07;
-	Wed, 17 Apr 2024 08:14:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713341680;
-	bh=B7XzM/gwXeM5hGmVFdPq++r0UO9h/qCQmb38qpTyGkk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NbogXVAzJIhjfe51ZtEalg8knvQjRQNApV5vevPQADpRaJ3O/+jm2TEFFsXaU3gNb
-	 m0p9AA48ogTBmYgbsjwfisEbepRAcBhs2HbK9jg5AOzSGvdJevC34iW5X+MuXlCiE8
-	 TOQ9mZBpfMNQDoE9xN7d5AdMUUEX6bfE2X2Pl9U0jJw2xc3hvhZJrVjxlln9lO3Ydn
-	 e7ycVm43Xt9F1n7MjXEWmXq4mJlxMTH0zMRbsUu3E4WMC5pMj73burkJ7yvqh/azZa
-	 MhjH+SecBvBLRDjOXn3t+QqWLKPorYNB4e0VtbiD8Fi7chZmU++XDg7gDttJnuUoSN
-	 DBBI6USgGYpVA==
-Date: Wed, 17 Apr 2024 11:14:35 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Alexander Duyck <alexander.duyck@gmail.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Yunsheng Lin <linyunsheng@huawei.com>, netdev@vger.kernel.org,
-	Alexander Duyck <alexanderduyck@fb.com>, davem@davemloft.net,
-	pabeni@redhat.com
-Subject: Re: [net-next PATCH 13/15] eth: fbnic: add basic Rx handling
-Message-ID: <20240417081435.GD6832@unreal>
-References: <53b80db6-f2bc-d824-ea42-4b2ac64625f2@huawei.com>
- <CAKgT0UeQS5q=Y2j3mmu9AhWyUMbey-iFL+sKES1UrBtoAXMdzw@mail.gmail.com>
- <0e5e3196-ca2f-b905-a6ba-7721e8586ed7@huawei.com>
- <CAKgT0UeRWsJ+NiniSKa7Z3Law=QrYZp3giLAigJf7EvuAbjkRA@mail.gmail.com>
- <bf070035-ba9c-d028-1b11-72af8651f979@huawei.com>
- <CAKgT0UccovDVS8-TPXxgGbrTAqpeVHRQuCwf7f2qkfcPaPOA-A@mail.gmail.com>
- <20240415101101.3dd207c4@kernel.org>
- <CAKgT0UcGN3-6R4pt8BQv2hD04oYk48GfFs1O_UGChvrrFT5eCw@mail.gmail.com>
- <008a9e73-16a4-4d45-9559-0df7a08e9855@intel.com>
- <CAKgT0UfyAQaPKApZoV6YJhMPAac3q3KBN4yHdF0j48mKZopsBw@mail.gmail.com>
+	s=arc-20240116; t=1713342060; c=relaxed/simple;
+	bh=5MJ4ULJtiT+NtD9quXQLg5e8ZoTj/dJm+IRRRJYsaW8=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XTfkD4GbN/zG+8/ELNZWs7GJn6/khw0/NbJYIgdOUwxz+BlSQT8M5MNVeSLeG+tjw0yO8wiKSo4GBiZvqVkUB4lzNu+R4lO2mYGu+Dbl4QW1YOOYLDrqM0alDTMcapOkLDdFktISseiEKkwtUmVFBPgM4XuY9o9K0cEX5CxVxHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=nAM/4NC+; arc=none smtp.client-ip=185.70.40.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=t4f7k7zxxzff5dq6yi37iz4tsm.protonmail; t=1713342050; x=1713601250;
+	bh=oSROv3Iwo6bfEF+7tLKAC5SiM8qWLf03xQ+IXBGe/uU=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector;
+	b=nAM/4NC+NjUFFV3Bidlgy49rHmBWC+gjfVUqA6PzjJ5c5yvOKdSsoBI5fApd4i3vp
+	 9Q+N5nHEloE9+CUgB130mlGckg28sk087ZsZDd6IWIuig67rfgSqyVqjJNVpGHNKHF
+	 W+9tF6djcev8OSHiKK0A2xFBStFVFA0lzhISXcEk7cEBdiFEojBcGyeuNZP5m0PomL
+	 356b2Yb6DaEwiju+no3ZdqdWUvcOw38+qiUp6TxtvKyUo5i6a/7GY9XVHezM+5w1/F
+	 vEVYetW2u4CXTnnv3xixsJ0yGtbLDU6NG+abhl+NlzRG6o3OYyqwK7NptfGIigngSq
+	 NHoAWZTSduwSg==
+Date: Wed, 17 Apr 2024 08:20:25 +0000
+To: Andrew Lunn <andrew@lunn.ch>
+From: Benno Lossin <benno.lossin@proton.me>
+Cc: FUJITA Tomonori <fujita.tomonori@gmail.com>, netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, tmgross@umich.edu
+Subject: Re: [PATCH net-next v1 2/4] rust: net::phy support C45 helpers
+Message-ID: <92b60274-6b32-4dfd-9e46-d447184572d2@proton.me>
+In-Reply-To: <f908e54a-b0e6-49d5-b4ff-768072755a78@lunn.ch>
+References: <e8a440c7-d0a6-4a5e-97ff-a8bcde662583@lunn.ch> <20240416.204030.1728964191738742483.fujita.tomonori@gmail.com> <26f64e48-4fd3-4e0f-b7c5-e77abeee391a@lunn.ch> <20240416.222119.1989306221012409360.fujita.tomonori@gmail.com> <b03584c7-205e-483f-96f0-dde533cf0536@proton.me> <f908e54a-b0e6-49d5-b4ff-768072755a78@lunn.ch>
+Feedback-ID: 71780778:user:proton
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,93 +59,89 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKgT0UfyAQaPKApZoV6YJhMPAac3q3KBN4yHdF0j48mKZopsBw@mail.gmail.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 16, 2024 at 07:46:06AM -0700, Alexander Duyck wrote:
-> On Tue, Apr 16, 2024 at 7:05 AM Alexander Lobakin
-> <aleksander.lobakin@intel.com> wrote:
-> >
-> > From: Alexander Duyck <alexander.duyck@gmail.com>
-> > Date: Mon, 15 Apr 2024 11:03:13 -0700
-> >
-> > > On Mon, Apr 15, 2024 at 10:11 AM Jakub Kicinski <kuba@kernel.org> wrote:
-> > >>
-> > >> On Mon, 15 Apr 2024 08:03:38 -0700 Alexander Duyck wrote:
-> > >>>>> The advantage of being a purpose built driver is that we aren't
-> > >>>>> running on any architectures where the PAGE_SIZE > 4K. If it came to
-> > >>>>
-> > >>>> I am not sure if 'being a purpose built driver' argument is strong enough
-> > >>>> here, at least the Kconfig does not seems to be suggesting it is a purpose
-> > >>>> built driver, perhaps add a 'depend on' to suggest that?
-> > >>>
-> > >>> I'm not sure if you have been following the other threads. One of the
-> > >>> general thoughts of pushback against this driver was that Meta is
-> > >>> currently the only company that will have possession of this NIC. As
-> > >>> such Meta will be deciding what systems it goes into and as a result
-> > >>> of that we aren't likely to be running it on systems with 64K pages.
-> > >>
-> > >> Didn't take long for this argument to float to the surface..
-> > >
-> > > This wasn't my full argument. You truncated the part where I
-> > > specifically called out that it is hard to justify us pushing a
-> > > proprietary API that is only used by our driver.
-> > >
-> > >> We tried to write some rules with Paolo but haven't published them, yet.
-> > >> Here is one that may be relevant:
-> > >>
-> > >>   3. External contributions
-> > >>   -------------------------
-> > >>
-> > >>   Owners of drivers for private devices must not exhibit a stronger
-> > >>   sense of ownership or push back on accepting code changes from
-> > >>   members of the community. 3rd party contributions should be evaluated
-> > >>   and eventually accepted, or challenged only on technical arguments
-> > >>   based on the code itself. In particular, the argument that the owner
-> > >>   is the only user and therefore knows best should not be used.
-> > >>
-> > >> Not exactly a contribution, but we predicted the "we know best"
-> > >> tone of the argument :(
-> > >
-> > > The "we know best" is more of an "I know best" as someone who has
-> > > worked with page pool and the page fragment API since well before it
-> > > existed. My push back is based on the fact that we don't want to
-> >
-> > I still strongly believe Jesper-style arguments like "I've been working
-> > with this for aeons", "I invented the Internet", "I was born 3 decades
-> > before this API was introduced" are not valid arguments.
-> 
-> Sorry that is a bit of my frustration with Yunsheng coming through. He
-> has another patch set that mostly just moves my code and made himself
-> the maintainer. Admittedly I am a bit annoyed with that. Especially
-> since the main drive seems to be to force everything to use that one
-> approach and then optimize for his use case for vhost net over all
-> others most likely at the expense of everything else.
-> 
-> It seems like it is the very thing we were complaining about in patch
-> 0 with other drivers getting penalized at the cost of optimizing for
-> one specific driver.
-> 
-> > > allocate fragments, we want to allocate pages and fragment them
-> > > ourselves after the fact. As such it doesn't make much sense to add an
-> > > API that will have us trying to use the page fragment API which holds
-> > > onto the page when the expectation is that we will take the whole
-> > > thing and just fragment it ourselves.
-> >
-> > [...]
-> >
-> > Re "this HW works only on x86, why bother" -- I still believe there
-> > shouldn't be any hardcodes in any driver based on the fact that the HW
-> > is deployed only on particular systems. Page sizes, Endianness,
-> > 32/64-bit... It's not difficult to make a driver look like it's
-> > universal and could work anywhere, really.
-> 
-> It isn't that this only works on x86. It is that we can only test it
-> on x86. The biggest issue right now is that I wouldn't have any
-> systems w/ 64K pages that I could test on.
+On 17.04.24 00:30, Andrew Lunn wrote:
+>> I think we could also do a more rusty solution. For example we could
+>> have these generic functions for `phy::Device`:
+>>
+>>      fn read_register<R: Register>(&mut self, which: R::Index) -> Result=
+<R::Value>;
+>>      fn write_register<R: Register>(&mut self, which: R::Index, value: R=
+::Value) -> Result;
+>>
+>> That way we can support many different registers without polluting the
+>> namespace. We can then have a `C45` register and a `C22` register and a
+>> `C45OrC22` (maybe we should use `C45_OrC22` instead, since I can read
+>> that better, but let's bikeshed when we have the actual patch).
+>>
+>> Calling those functions would look like this:
+>>
+>>      let value =3D dev.read_register::<C45>(reg1)?;
+>>      dev.write_register::<C45>(reg2, value)?;
+>=20
+> I don't know how well that will work out in practice. The addressing
+> schemes for C22 and C45 are different.
+>=20
+> C22 simply has 32 registers, numbered 0-31.
+>=20
+> C45 has 32 MDIO manageable devices (MMD) each with 65536 registers.
+>=20
+> All of the 32 C22 registers have well defined names, which are listed
+> in mii.h. Ideally we want to keep the same names. The most of the MMD
+> also have defined names, listed in mdio.h. Many of the registers are
+> also named in mdio.h, although vendors do tend to add more vendor
+> proprietary registers.
+>=20
+> Your R::Index would need to be a single value for C22 and a tuple of
+> two values for C45.
 
-Didn't you write that you will provide QEMU emulation for this device?
+Yes that was my idea:
 
-Thanks
+    enum C22Index {
+        // The unique 32 names of the C22 registers...
+    }
+
+    impl Register for C22 {
+        type Index =3D C22Index;
+        type Value =3D u16;
+    }
+
+    impl Register for C45 {
+        type Index =3D (u8, u16); // We could also create a newtype that wr=
+aps this and give it a better name.
+        type Value =3D u16;
+    }
+
+You can then do:
+
+    let val =3D dev.read_register::<C45>((4, 406))?;
+    dev.write_register::<C22>(4, val)?;
+
+If you only have these two registers types, then I would say this is
+overkill, but I assumed that there are more.
+
+> There is nothing like `C45OrC22`. A register is either in C22
+> namespace, or in the C45 namespace.
+
+I see, I got this idea from:
+
+> [...] At some point we are going to add the generic
+> helpers for accessing C45 registers which leave the core to decide
+> if to perform a C45 bus protocol access or C45 over C22. [...]
+
+Is this not accessing a C45 register via C22 and letting phylib decide?
+
+> Where it gets interesting is that there are two methods to access the
+> C45 register namespace. The PHY driver should not care about this, it
+> is the MDIO bus driver and the PHYLIB core which handles the two
+> access mechanisms.
+
+If the driver shouldn't be concerned with how the access gets handled,
+why do we even have a naming problem?
+
+--=20
+Cheers,
+Benno
+
 
