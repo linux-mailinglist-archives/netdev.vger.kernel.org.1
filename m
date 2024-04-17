@@ -1,104 +1,163 @@
-Return-Path: <netdev+bounces-88639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88640-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A99D8A7F1D
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:05:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6349D8A7F75
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:17:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0184B1F26765
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:05:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8403C1C20EA2
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:17:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2F2F12DD87;
-	Wed, 17 Apr 2024 09:04:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ma/1MAkK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D9B4130A64;
+	Wed, 17 Apr 2024 09:15:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9549212CD98
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 09:04:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98BE12FB3E
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 09:15:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713344692; cv=none; b=HWaZIN7WOaEvJghLf/sg5+TjqQabsNxeX+og1o78t7QtZb67+6314O2O0XDKG8KFNRLR4uo7HOp9gSJP4OleCAcX6xJTBbSEoaRPn03IgNHxcCrlOtYbz0oc1+LzT1yX/3XhgqHUDQWBbrf9Cr8LhIwu1GM2CVW+yqXdTzPsffQ=
+	t=1713345324; cv=none; b=bYNmQ13xZOuaDg8R9QX57/GAWoV0pCaCBgdoo61HPAUjbnSC+HElun+8G6WBGdsvuN3yjnVGKCwbW5SW530kszKPiDBDwfFCvHHiw2odOMtE1JrdFr2J2E/ydSxb3u5HdQJwHWiRw+C8A6aScfIIQ5Wn6CGs1APFmXpX3q7cFgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713344692; c=relaxed/simple;
-	bh=qPI0pCxxPzUoBEsI0BzOZn8buvMBR2S+RPSF+No4b5c=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=RDrchOJ6F7M72UVP1FKGsX3VjUNrHVQFI0EJwmSwR1xxFRVkqgreKJAcwbu2F+4iSJvyyT8D87vNCw4NU5CDgomVqmCFzQTT5xwekL1DAWu8pITE6S2SUjLMQSh8pk4Icc43IgCmiRrg8J/ymPI2po5PTy/tz5iMSWXIy6gqzCA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ma/1MAkK; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713344690;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l0o9cqWvopzRGIbQrWEpYy4RFrMHbVHwEFIkzoBARCg=;
-	b=Ma/1MAkKX1oqlz0AiByVYvBf/isWjn9ydU1rIGqNpMbc5MtbuFPAI/85gZKH502FIxEkSd
-	BPKKzkpU+14vorjPk9uozg4H36FhBYCJ5TRtnK7Bc/qYHn0Xhx8Ugoljk1Az2RnJzkebHA
-	KeedE3nuFRqGLCp4Jhxwsnk2/ZmhfPw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-140-NWduv8-0ObmjjPW5VGH_hQ-1; Wed, 17 Apr 2024 05:04:44 -0400
-X-MC-Unique: NWduv8-0ObmjjPW5VGH_hQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9A15C806528;
-	Wed, 17 Apr 2024 09:04:43 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.200])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 24BDC490DD;
-	Wed, 17 Apr 2024 09:04:40 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <f555b324b79829d6fc63da0d05995ce337969f65.camel@kernel.org>
-References: <f555b324b79829d6fc63da0d05995ce337969f65.camel@kernel.org> <20240328163424.2781320-1-dhowells@redhat.com> <20240328163424.2781320-18-dhowells@redhat.com>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
-    Gao Xiang <hsiangkao@linux.alibaba.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Steve French <smfrench@gmail.com>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-    linux-cachefs@redhat.com, linux-afs@lists.infradead.org,
-    linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org,
-    ceph-devel@vger.kernel.org, v9fs@lists.linux.dev,
-    linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org,
-    linux-mm@kvack.org, netdev@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 17/26] netfs: Fix writethrough-mode error handling
+	s=arc-20240116; t=1713345324; c=relaxed/simple;
+	bh=tNUgxFQw6eMCYlR6Ekzg2/SYAJVF+N2IQw803Gb6PyA=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=urX6pfksGs6CcVd1rz+cbvgu8zMEWDO/Q720hZojmwHK49m5QVPD8YQNyZH7iZaCGkj9UU/ut0/R98QpEe2y4mDMszTahQSAnmRJbVlIbSnOEBhdApletVWaEuWKDuJG469r0bEKRFLxK4zXTezqChBmmWXRa1owiS7E5nys+uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7d096c4d663so710588839f.2
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 02:15:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713345322; x=1713950122;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=lMHDWXruCDKqdIqw0iUevbAqhPVYOFER4yVLIRlEfe8=;
+        b=SmlzKC3kGRXkR1XIbrKX87ligyAGhL4cxUeEvYymBUA541GiAEtqV6e/pmbB6/xJAi
+         XiGygDsqb5s7x5UdOSqPFH3XoWFhGFUTEVuN7idkR3KKpoZ/tEGu+6365EGXwk4ziw7S
+         v/+Nli7URYFsaHuW982ioXphXX0Tc4imKbgpUVU5CoosLhCb8nPJrHqK/fXAZtynlWz1
+         ac/u17zwClxj3N12yA+uuG92MFKzqlpsmTbcOF5KRBc5R9a0infnQC6OznA5hmq8Rr3J
+         Grl7wPsLuDoQIrAwa6w0LULkQAwIS8QPl5/x1IgePbRJxks0WEHOchhdUdZeBaoeSMnK
+         3nnw==
+X-Forwarded-Encrypted: i=1; AJvYcCX4vCFlLaFQj4WP/qnH5u008DJ0cXlPJMmv/u1DbukRSF9ETRjNh8WoDfCrBGndBHroyYnYWJfLCOD0Z50W6aLhKUy/YZMx
+X-Gm-Message-State: AOJu0YwK+krMem8RwYA1k00BG1F6U9JpPmmCUdTzQpETJf44vqhXcnkj
+	zauevOw9ib0ZxkIe8goqv2mLH1+zosOJLZMbocfLacIceYpRYH2kX/HVWz28mIJ6Gy+7D01amkV
+	qU14XKMbI2qoqAkwXC+LbMkgPvaTM0eC+BvTXwBHOGf1tQk6EkuXbBbk=
+X-Google-Smtp-Source: AGHT+IG783qjym/uoLFNulcfb2mQcdjbO/UaIe+3eiYM1979Fo/fvMutrN4Uj6cPOPD5D1cYFW8foWxF+deScaJxkQXdYhR5sdyo
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <28313.1713344659.1@warthog.procyon.org.uk>
-Date: Wed, 17 Apr 2024 10:04:19 +0100
-Message-ID: <28314.1713344659@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
+X-Received: by 2002:a05:6638:8929:b0:482:c7c8:5019 with SMTP id
+ jc41-20020a056638892900b00482c7c85019mr918925jab.0.1713345322069; Wed, 17 Apr
+ 2024 02:15:22 -0700 (PDT)
+Date: Wed, 17 Apr 2024 02:15:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000004cc3030616474b1e@google.com>
+Subject: [syzbot] [bpf?] [net?] WARNING in __xdp_reg_mem_model
+From: syzbot <syzbot+f534bd500d914e34b59e@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	hawk@kernel.org, john.fastabend@gmail.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Jeff Layton <jlayton@kernel.org> wrote:
+Hello,
 
-> Should this be merged independently? It looks like a bug that's present
-> now.
+syzbot found the following issue on:
 
-Yes.  I've just posted that as a separate fix for Christian to pick up.  I
-still need to keep it in this set, though, until it is upstream.
+HEAD commit:    f99c5f563c17 Merge tag 'nf-24-03-21' of git://git.kernel.o..
+git tree:       net
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1502f36d180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
+dashboard link: https://syzkaller.appspot.com/bug?extid=f534bd500d914e34b59e
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17ac600b180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1144b797180000
 
-David
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/65d3f3eb786e/disk-f99c5f56.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/799cf7f28ff8/vmlinux-f99c5f56.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ab26c60c3845/bzImage-f99c5f56.xz
 
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f534bd500d914e34b59e@syzkaller.appspotmail.com
+
+RDX: 0000000000000050 RSI: 0000000020000000 RDI: 000000000000000a
+RBP: 00007ffebb32f750 R08: 00007ffebb32f4e7 R09: 00007f2c42da0038
+R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffebb32f9b8 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5065 at net/core/xdp.c:299 __xdp_reg_mem_model+0x2d9/0x650 net/core/xdp.c:299
+Modules linked in:
+CPU: 0 PID: 5065 Comm: syz-executor883 Not tainted 6.8.0-syzkaller-05271-gf99c5f563c17 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
+RIP: 0010:__xdp_reg_mem_model+0x2d9/0x650 net/core/xdp.c:299
+Code: 89 c5 85 c0 79 62 e8 c6 b4 3e f8 eb a5 e8 bf b4 3e f8 4c 89 ff e8 97 a9 96 f8 4d 63 fd 48 c7 c7 80 27 39 8f e8 a8 36 23 02 90 <0f> 0b 90 e9 f8 01 00 00 e8 9a b4 3e f8 48 8d 7c 24 60 48 89 f8 48
+RSP: 0018:ffffc90003d0f640 EFLAGS: 00010246
+RAX: 1158ab1705932a00 RBX: dffffc0000000000 RCX: ffffffff8b7974ad
+RDX: 0000000000000001 RSI: 0000000000000008 RDI: ffffc90003d0f5c0
+RBP: ffffc90003d0f710 R08: ffffc90003d0f5c7 R09: 1ffff920007a1eb8
+R10: dffffc0000000000 R11: fffff520007a1eb9 R12: 0000000000000002
+R13: ffff88802ead6000 R14: 1ffff920007a1ed0 R15: fffffffffffffff4
+FS:  0000555581756480(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000000066c7e0 CR3: 0000000020174000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ xdp_reg_mem_model+0x22/0x40 net/core/xdp.c:344
+ xdp_test_run_setup net/bpf/test_run.c:188 [inline]
+ bpf_test_run_xdp_live+0x365/0x1e90 net/bpf/test_run.c:377
+ bpf_prog_test_run_xdp+0x813/0x11b0 net/bpf/test_run.c:1267
+ bpf_prog_test_run+0x33a/0x3b0 kernel/bpf/syscall.c:4240
+ __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5649
+ __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
+ do_syscall_64+0xfb/0x240
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+RIP: 0033:0x7f2c42ddb279
+Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffebb32f748 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007f2c42ddb279
+RDX: 0000000000000050 RSI: 0000000020000000 RDI: 000000000000000a
+RBP: 00007ffebb32f750 R08: 00007ffebb32f4e7 R09: 00007f2c42da0038
+R10: 0000000000000001 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffebb32f9b8 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
