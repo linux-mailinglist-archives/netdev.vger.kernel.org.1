@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-88551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8517C8A7A7E
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 04:23:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F0F28A7A87
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 04:28:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A7541F23CFD
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 02:23:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4E611F21E36
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 02:28:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2204C99;
-	Wed, 17 Apr 2024 02:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5195C4C99;
+	Wed, 17 Apr 2024 02:28:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k5vzLal0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fDZRSjM4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D544685;
-	Wed, 17 Apr 2024 02:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9671878;
+	Wed, 17 Apr 2024 02:28:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713320585; cv=none; b=WHLk5h+jwT0oH8eIo5bTuFioohG7bRGIocc5XKLKD98HUas6ZfAbnW2z9SjmOGfIAczY1ldIXTj+b2xqMDdHbaUgZs7MPLi8/J5/Wa9xwFxNdfVyv01Q0WGw6S+unuiZ8LCRfLoaMSUkVwcUowR+aFDUJRQgh2Xzv8qaLoltbk0=
+	t=1713320917; cv=none; b=gyBGhR4VbHcTTRavP4nHHG2YT871o6Jro0tX+rrEh/wkttDfmYZJ4Fmk3nfRmiXs7YlyLR9j+V5h1CcAlMs18CtBr3uV21GCUO/EffTe++H7G81wi+cUxdn6BTFSYuUcfYqbuyunpPEp2VCcI1k/U9igAMP2RSjuUZTFa5AKOg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713320585; c=relaxed/simple;
-	bh=46aRmITiOUVBynMBETaAGe/3vLl0jA+4t6Miv67/OSU=;
+	s=arc-20240116; t=1713320917; c=relaxed/simple;
+	bh=b5OJV5mTeLlWdant20509uXDPJumqjJsxb4nkrE+waQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sJWZKKEYoiScu/PTqjs9x4LsGXmowoM9vhbBMxPdq0rasjo4hsWxJliyfRuT8jWcFrxxIKuiPiykiYoTRCMhWskYLBwJ63BRIj/Y/gCpmQLgwFydsbM87Td5adVqMhnM3BB9apIXC3XNhL6EZyrFhAe12ZFWGeMpE1mMxe9Wrvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k5vzLal0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0098C113CE;
-	Wed, 17 Apr 2024 02:23:03 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mlSTerjwsZvpzllZ/M12akYGx0ibhyLWMZTh1vC7A7gR1mlS2o/xjsvMUPkGGL0T9e5ZDZcX5rdwTGkGPd7/fcSHgIYaoujstRMw2Q+CEzmbukQkeuRem/vNynGoq2BBVRcHf5jFW2sslpEcXSVx8bpHeYo0VgIhdytdthTh7dA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fDZRSjM4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68D7AC113CE;
+	Wed, 17 Apr 2024 02:28:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713320585;
-	bh=46aRmITiOUVBynMBETaAGe/3vLl0jA+4t6Miv67/OSU=;
+	s=k20201202; t=1713320916;
+	bh=b5OJV5mTeLlWdant20509uXDPJumqjJsxb4nkrE+waQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=k5vzLal0dkLpUT57JnJ1eUDaPSfH7ufjYabxE47W5BNOqCYEC9JIxVZdl0aDEUXS4
-	 C9hvvN6Uk2H1I/Yf5zaAfmUaM/1kjWlRpnOcsH4l6/pZfpW/TyJf/s7acQgwxOe/3x
-	 FxLq9flUjWO4S/UMdeuZ3g6JwtjDH/M7HBvYR5EImzIr0MmG7AlOkpZaXncOkzblX+
-	 VUxCVLyYK17U7uIryJ5YpctQwBs4IR8oXmZL+yrqKPEGlXAI1WTT6oQkfX7zlx1UOs
-	 l6aJG6Te0XojLRV+2BaxP5ygkPxQ2cQbrktJED2ptOZfq4lm/OrfMYfAVpRHMheaej
-	 efQrPfWN/1pEA==
-Date: Tue, 16 Apr 2024 19:23:02 -0700
+	b=fDZRSjM4PlSKb33n0SVThT42AqX/suE7+TV0pSpjTLYot8MPyoCs1JD9RP7YBVY4c
+	 dWsojCT3G7tAi8A824Py+jPO519I7S5WtIb7Ltzq4HzAwRMpjtqgR0zcKjIagyZ6N8
+	 QpD4dN/gA6V2sYyxMAD8QYGCTu8RCPwsnwS63ClWqLtG428XScnkiKaLmLozn2jwvP
+	 2BFMcsLIl51IJv6EzUvE3mZ7KyTU6njg96sKxXNnZAGS001E6F+/oA0irY9fQLu13t
+	 jKaIr52AMLNB91SyHbEmjYWdds8Rdsc81RJP7RYmBYSvL51x2AiLMPXGmKoEIl9qLA
+	 Y1718YrNx+cog==
+Date: Tue, 16 Apr 2024 19:28:34 -0700
 From: Jakub Kicinski <kuba@kernel.org>
 To: Kory Maincent <kory.maincent@bootlin.com>
 Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
@@ -58,12 +58,11 @@ Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
  linux-doc@vger.kernel.org, devicetree@vger.kernel.org, Dent Project
  <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime Chevallier
  <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v8 06/17] net: ethtool: pse-pd: Expand pse
- commands with the PSE PoE interface
-Message-ID: <20240416192302.72b37f09@kernel.org>
-In-Reply-To: <20240414-feature_poe-v8-6-e4bf1e860da5@bootlin.com>
+Subject: Re: [PATCH net-next v8 10/17] net: pse-pd: Add support for PSE PIs
+Message-ID: <20240416192834.5f16e883@kernel.org>
+In-Reply-To: <20240414-feature_poe-v8-10-e4bf1e860da5@bootlin.com>
 References: <20240414-feature_poe-v8-0-e4bf1e860da5@bootlin.com>
-	<20240414-feature_poe-v8-6-e4bf1e860da5@bootlin.com>
+	<20240414-feature_poe-v8-10-e4bf1e860da5@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,15 +72,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 14 Apr 2024 16:21:55 +0200 Kory Maincent wrote:
-> +	    !(pse_has_podl(phydev->psec))) {
-> +		NL_SET_ERR_MSG_ATTR(info->extack,
-> +				    tb[ETHTOOL_A_PODL_PSE_ADMIN_CONTROL],
-> +				    "setting PoDL PSE admin control not supported");
-> +		return -EOPNOTSUPP;
+On Sun, 14 Apr 2024 16:21:59 +0200 Kory Maincent wrote:
+> +	pis = of_get_child_by_name(np, "pse-pis");
+> +	if (!pis) {
+> +		/* no description of PSE PIs */
+> +		pcdev->no_of_pse_pi = true;
+> +		return 0;
 > +	}
-> +	if (tb[ETHTOOL_A_C33_PSE_ADMIN_CONTROL] &&
-> +	    !(pse_has_c33(phydev->psec))) {
+> +
+> +	pcdev->pi = kcalloc(pcdev->nr_lines, sizeof(*pcdev->pi), GFP_KERNEL);
+> +	if (!pcdev->pi)
+> +		return -ENOMEM;
 
-nit: unnecessary parenthesis around the function call
+leaking reference on pis here
+
+> +
+> +	for_each_child_of_node(pis, node) {
+> +		struct pse_pi pi = {0};
+> +		u32 id;
 
