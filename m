@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-88598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BACE68A7D90
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 10:00:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B6A48A7D94
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 10:00:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A7B91F226D3
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 08:00:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CC771C21935
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 08:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD33D6F071;
-	Wed, 17 Apr 2024 07:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F746F071;
+	Wed, 17 Apr 2024 08:00:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="SOWomeNd"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="vNpMyzk5"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC53933CC2;
-	Wed, 17 Apr 2024 07:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC7033CC2;
+	Wed, 17 Apr 2024 08:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713340797; cv=none; b=djBEbelzy9+QsuUheIGeQ1Gm83Ym2aa7/SFTSwKptSLmgfVWg9VI+YuRzhu3DzY8Vkxjj1An+vel5T04zhvuuLRfqLdh8+e3W5QQsAOa4RvYOfse3O/XNsmySq6x/br97pMU4s48uycPuzceZy9zIfKMF7AybsljElNIOEmqBw0=
+	t=1713340810; cv=none; b=i/q9tm+d8XjhgoLNLlqZpl8hLZaD6grtIVwMSEqWtbQ4EYNkKPSYwXoWGvRAuOFmEJw69aowx7pIQplnbtzq8bzFpsbMoewAdtCrqgYynanoBTqiiUvh/Gyc5zxK2y++rcklajMXf4/VC1fnIpmTquIRWnIGeWR2dbBaDlHlJRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713340797; c=relaxed/simple;
-	bh=36MTnlcp33XwHHxLO/m8OsWJKQx4HmShuAbNDoPWRD0=;
+	s=arc-20240116; t=1713340810; c=relaxed/simple;
+	bh=1d8Das0aWluPw1yvMOJaa8hAwf+veUsd5fsg+jQfw60=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=R6Bz8Bb39dxonzJPH481vGIUvTl83S9Lkj5WjXiqhTBus1C7d4TlIGppjoYJ4QMOqPAmWpDPjhE9qKitR345J/RED3JESHFPfN/khSVraINJiFEEhCVSVjr84b5034UZGIJRISs+Vj31oIxtz5aaHFJ2iRYjZzSMBiebhVufukY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=SOWomeNd; arc=none smtp.client-ip=115.124.30.97
+	 In-Reply-To:Content-Type; b=FIBuMSkQi4JbxNoQQaFS0ceyo7cTiaSUKO6b7EcE0k0vN26p15qr5rr17wVRpBbiIry7GqCvjk50TC+FW1IqgMiiMYOCQVOhpFQSw2ze8m2M3jUKgZ4NVpUqw9cFhtVW9Hk59XZLHel8Fx3wD2ciDcMsPCpyzZZnAJ+zXt2RQ6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=vNpMyzk5; arc=none smtp.client-ip=115.124.30.130
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1713340787; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=00eV10aYqBSEYTxuhgv4GNMQMHte1deFn+CrhZCt04s=;
-	b=SOWomeNdq6rv0zkORBWlsPAY7d+p2MNfkmyFhpn5epQiCVr+Oe7NJBvOgU82+BdpRpNl6cMqv+jvGfhsqCoBhq3GUNHnJRL1M1kPVetAROOywJMnp1x0wjtUJHOnVvt6S0/gjA4U4JEYyBP966ycP2IluPTbPsr2OlTrAEqV4Wg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R681e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0W4kiWz7_1713340784;
-Received: from 30.221.148.177(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W4kiWz7_1713340784)
+	t=1713340803; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=LUeR/jp3bxeHCiX5tZat99Q/kYEgiO/5uqllP4LX6T4=;
+	b=vNpMyzk5G0yxht/1rMyVxFhbD8RanJHbtwtCXwfqNLDCZ5L/uAl8iWkSUi0eDrn2XehqtAVSCiOuiS5kOw0Yh+F0Rfu0cxvbDEnjSQh7WbqioMMhzrjaJuvTg7+PnpwuwzugCz0eeoegSmXw6uLiaxedTgQGg6t1fL73IkEzzBI=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0W4kiX3p_1713340801;
+Received: from 30.221.101.43(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0W4kiX3p_1713340801)
           by smtp.aliyun-inc.com;
-          Wed, 17 Apr 2024 15:59:46 +0800
-Message-ID: <ae00d109-403f-46f5-9b70-19fd7a94d3cf@linux.alibaba.com>
-Date: Wed, 17 Apr 2024 15:59:44 +0800
+          Wed, 17 Apr 2024 16:00:02 +0800
+Message-ID: <6520c574-e1c6-49e0-8bb1-760032faaf7a@linux.alibaba.com>
+Date: Wed, 17 Apr 2024 16:00:01 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,120 +49,61 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9] virtio_net: Support RX hash XDP hint
-To: Liang Chen <liangchen.linux@gmail.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
- ast@kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>
-References: <20240417071822.27831-1-liangchen.linux@gmail.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <20240417071822.27831-1-liangchen.linux@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net/smc: fix potential sleeping issue in
+ smc_switch_conns
+To: Zhengchao Shao <shaozhengchao@huawei.com>, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
+ tonylu@linux.alibaba.com, guwen@linux.alibaba.com, weiyongjun1@huawei.com,
+ yuehaibing@huawei.com, tangchengchang@huawei.com
+References: <20240413035150.3338977-1-shaozhengchao@huawei.com>
+Content-Language: en-US
+From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+In-Reply-To: <20240413035150.3338977-1-shaozhengchao@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
 
 
-在 2024/4/17 下午3:18, Liang Chen 写道:
-> The RSS hash report is a feature that's part of the virtio specification.
-> Currently, virtio backends like qemu, vdpa (mlx5), and potentially vhost
-> (still a work in progress as per [1]) support this feature. While the
-> capability to obtain the RSS hash has been enabled in the normal path,
-> it's currently missing in the XDP path. Therefore, we are introducing
-> XDP hints through kfuncs to allow XDP programs to access the RSS hash.
->
-> 1.
-> https://lore.kernel.org/all/20231015141644.260646-1-akihiko.odaki@daynix.com/#r
->
-> Signed-off-by: Liang Chen <liangchen.linux@gmail.com>
-
-Reviewed-by: Heng Qi <hengqi@linux.alibaba.com>
-
-Thanks.
-
+On 2024/4/13 11:51, Zhengchao Shao wrote:
+> Potential sleeping issue exists in the following processes:
+> smc_switch_conns
+>   spin_lock_bh(&conn->send_lock)
+>   smc_switch_link_and_count
+>     smcr_link_put
+>       __smcr_link_clear
+>         smc_lgr_put
+>           __smc_lgr_free
+>             smc_lgr_free_bufs
+>               __smc_lgr_free_bufs
+>                 smc_buf_free
+>                   smcr_buf_free
+>                     smcr_buf_unmap_link
+>                       smc_ib_put_memory_region
+>                         ib_dereg_mr
+>                           ib_dereg_mr_user
+>                             mr->device->ops.dereg_mr
+> If scheduling exists when the IB driver implements .dereg_mr hook
+> function, the bug "scheduling while atomic" will occur. For example,
+> cxgb4 and efa driver. Use mutex lock instead of spin lock to fix it.
+> 
+> Fixes: 20c9398d3309 ("net/smc: Resolve the race between SMC-R link access and clear")
+> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
 > ---
->    Changes from v8:
-> - move max table macro out of uAPI
->    Changes from v7:
-> - use table lookup for rss hash type
->    Changes from v6:
-> - fix a coding style issue
->    Changes from v5:
-> - Preservation of the hash value has been dropped, following the conclusion
->    from discussions in V3 reviews. The virtio_net driver doesn't
->    accessing/using the virtio_net_hdr after the XDP program execution, so
->    nothing tragic should happen. As to the xdp program, if it smashes the
->    entry in virtio header, it is likely buggy anyways. Additionally, looking
->    up the Intel IGC driver,  it also does not bother with this particular
->    aspect.
-> ---
->   drivers/net/virtio_net.c | 43 ++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 43 insertions(+)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index c22d1118a133..eb99bf6c555e 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -4621,6 +4621,48 @@ static void virtnet_set_big_packets(struct virtnet_info *vi, const int mtu)
->   	}
->   }
->   
-> +#define VIRTIO_NET_HASH_REPORT_MAX_TABLE      10
-> +static enum xdp_rss_hash_type
-> +virtnet_xdp_rss_type[VIRTIO_NET_HASH_REPORT_MAX_TABLE] = {
-> +	[VIRTIO_NET_HASH_REPORT_NONE] = XDP_RSS_TYPE_NONE,
-> +	[VIRTIO_NET_HASH_REPORT_IPv4] = XDP_RSS_TYPE_L3_IPV4,
-> +	[VIRTIO_NET_HASH_REPORT_TCPv4] = XDP_RSS_TYPE_L4_IPV4_TCP,
-> +	[VIRTIO_NET_HASH_REPORT_UDPv4] = XDP_RSS_TYPE_L4_IPV4_UDP,
-> +	[VIRTIO_NET_HASH_REPORT_IPv6] = XDP_RSS_TYPE_L3_IPV6,
-> +	[VIRTIO_NET_HASH_REPORT_TCPv6] = XDP_RSS_TYPE_L4_IPV6_TCP,
-> +	[VIRTIO_NET_HASH_REPORT_UDPv6] = XDP_RSS_TYPE_L4_IPV6_UDP,
-> +	[VIRTIO_NET_HASH_REPORT_IPv6_EX] = XDP_RSS_TYPE_L3_IPV6_EX,
-> +	[VIRTIO_NET_HASH_REPORT_TCPv6_EX] = XDP_RSS_TYPE_L4_IPV6_TCP_EX,
-> +	[VIRTIO_NET_HASH_REPORT_UDPv6_EX] = XDP_RSS_TYPE_L4_IPV6_UDP_EX
-> +};
-> +
-> +static int virtnet_xdp_rx_hash(const struct xdp_md *_ctx, u32 *hash,
-> +			       enum xdp_rss_hash_type *rss_type)
-> +{
-> +	const struct xdp_buff *xdp = (void *)_ctx;
-> +	struct virtio_net_hdr_v1_hash *hdr_hash;
-> +	struct virtnet_info *vi;
-> +	u16 hash_report;
-> +
-> +	if (!(xdp->rxq->dev->features & NETIF_F_RXHASH))
-> +		return -ENODATA;
-> +
-> +	vi = netdev_priv(xdp->rxq->dev);
-> +	hdr_hash = (struct virtio_net_hdr_v1_hash *)(xdp->data - vi->hdr_len);
-> +	hash_report = __le16_to_cpu(hdr_hash->hash_report);
-> +
-> +	if (hash_report >= VIRTIO_NET_HASH_REPORT_MAX_TABLE)
-> +		hash_report = VIRTIO_NET_HASH_REPORT_NONE;
-> +
-> +	*rss_type = virtnet_xdp_rss_type[hash_report];
-> +	*hash = __le32_to_cpu(hdr_hash->hash_value);
-> +	return 0;
-> +}
-> +
-> +static const struct xdp_metadata_ops virtnet_xdp_metadata_ops = {
-> +	.xmo_rx_hash			= virtnet_xdp_rx_hash,
-> +};
-> +
->   static int virtnet_probe(struct virtio_device *vdev)
->   {
->   	int i, err = -ENOMEM;
-> @@ -4747,6 +4789,7 @@ static int virtnet_probe(struct virtio_device *vdev)
->   				  VIRTIO_NET_RSS_HASH_TYPE_UDP_EX);
->   
->   		dev->hw_features |= NETIF_F_RXHASH;
-> +		dev->xdp_metadata_ops = &virtnet_xdp_metadata_ops;
->   	}
->   
->   	if (vi->has_rss_hash_report)
+>  net/smc/af_smc.c   |  2 +-
+>  net/smc/smc.h      |  2 +-
+>  net/smc/smc_cdc.c  | 14 +++++++-------
+>  net/smc/smc_core.c |  8 ++++----
+>  net/smc/smc_tx.c   |  8 ++++----
+>  5 files changed, 17 insertions(+), 17 deletions(-)
+> 
 
+Hi Zhengchao,
+
+I doubt whether this bug really exists, as efa supports SRD QP while SMC-R relies on RC QP,
+cxgb4 is a IWARP adaptor while SMC-R relies on ROCE adaptor.
+
+Thanks,
+Guangguan Wang
 
