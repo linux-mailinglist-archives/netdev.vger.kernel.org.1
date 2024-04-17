@@ -1,108 +1,86 @@
-Return-Path: <netdev+bounces-88595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1FA88A7D51
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:43:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 874F58A7D63
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:51:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80F4D1F2156F
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 07:43:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B91AC1C211B0
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 07:51:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 507EF65BA8;
-	Wed, 17 Apr 2024 07:43:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B406EB5F;
+	Wed, 17 Apr 2024 07:51:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="efUVN4ur"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Esh0qFBT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1765D184D;
-	Wed, 17 Apr 2024 07:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 920316CDA6;
+	Wed, 17 Apr 2024 07:51:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713339811; cv=none; b=iDQBdvoytyxkYiz9oB/7EK+qQjfiXrLpV8MZPwlFFcZC+Xc9l2S7ePEdH9XUblbGbkwrNaSLIZDcFc7A0H29FNKcWEoUgqVtS0ru3ZqlkOc8V4sl/rXmJ3vkTpwcVovMjauTPVrAjwNjO3hkrfwTcYglfTShaO7GRR3x30/V2p0=
+	t=1713340265; cv=none; b=GtD5Ucx2ou+95xLZRcQl40qh3GZHU720aDJWsosLuQb/pDndZygBaymKREtoeDOeNCONIbIIuurqgbS3ecEbKmC/THkSxyILD8G+O40P2Mh0dCU4Y2l0wjmzLkmbDF8yf8C31JG3N5uRgRyUWo2xLxJW76xXCGms2hTwTECQAqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713339811; c=relaxed/simple;
-	bh=t03L1s42OcwhscuOshzmRA4k+Qv058R/Bk9bmgwqgF0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sym7yIFm66sx+KeN/xzkYwOj1rtGhbr+RsTjCsQchN3z9YD7aCbOPz/mL1JNvJS4XflRTHG+4Pw0aRQjqI/uLUqWoLOmryfYaC1t8YRxF8UFoae02UGV6hVeYbY6pmeQrQSvYHX/Hk+ZpFOEmyeV16pVduQxaoPIc0jQ7yr3mH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=efUVN4ur; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13AF2C072AA;
-	Wed, 17 Apr 2024 07:43:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1713339810;
-	bh=t03L1s42OcwhscuOshzmRA4k+Qv058R/Bk9bmgwqgF0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=efUVN4ur3E7W/z7JXB6G523ZEcUK6tUrUzfQdiQ6D84Uu4EkrKzb1SGCgyfAayZ6l
-	 ga6RWLGSYcJL5cShhE/g42cQuKaFTn45pzB4drMR+TPCJShHGO3QBRzC0EnHp6IAz1
-	 OZcG8rRgc6khrH7cuGICt4AsXpTd/nskqraobJ60=
-Date: Wed, 17 Apr 2024 09:43:27 +0200
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net] r8169: fix LED-related deadlock on module removal
-Message-ID: <2024041746-heritage-annex-3b66@gregkh>
-References: <ded9d793-83f8-4f11-87d9-a218d10c2981@gmail.com>
- <20240416193458.1e2c799d@kernel.org>
- <4b0495fd-fab5-4341-9b06-2f48613ee921@gmail.com>
- <2024041709-prorate-swifter-523d@gregkh>
- <17a3f8cb-26d4-4185-8e8b-0040ed62ae77@gmail.com>
+	s=arc-20240116; t=1713340265; c=relaxed/simple;
+	bh=jXXyD1I8CogloKubEo76l4oe31rDSKZyXzyr4ox5Chs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qlKIrHPS+Fh18fkDIkc0/bwXLZ2kh79YfELbwtX1a3wkiAbfbjQ0sCIHdZ89ZEmmAspnv2T9AJfEwRRTFlIiD8LWGNIlHWKPcyuwFW8ZouKAZKIj8PJGxRGmWN8BLDEk7XVEK+wMDOVgcu5bNx/Yba6prKJD8dvTc9zPsdenQXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Esh0qFBT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45BF3C072AA;
+	Wed, 17 Apr 2024 07:51:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713340265;
+	bh=jXXyD1I8CogloKubEo76l4oe31rDSKZyXzyr4ox5Chs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Esh0qFBTC6WJGlOzJkrP+JTkBripnOOtQuBMZsls0mEuf0mil8ecnLlwiRykAEvpM
+	 8DJAFpfMI+0YCN8w0jaicczzOASwR5w+AEQrVdaXBpTO5idyGIsrpra494yRAct3GH
+	 ZrwxGxB3tVTTDpUWzbkj6DEWrGK1xmN2E7fuYQ8C5axi6eq9ynqpH/sC2YKBLlN/6l
+	 O2Pbbpj37INrAwvlzkHoTD0PBUaK5SS0PdiOlNwFB9qgD5c+D4Xh5GVH24ggew0njM
+	 7uI3NMFgSNOdkVSTEc4XAj2pxCs5qivysGilYayaaI7ei28g4t+TfBbHUMSCxv7Qn+
+	 nV3wLMd6VR6xw==
+Message-ID: <3ed3c70c-0bc4-4ae3-92e5-ce5af1958deb@kernel.org>
+Date: Wed, 17 Apr 2024 09:51:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <17a3f8cb-26d4-4185-8e8b-0040ed62ae77@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9] virtio_net: Support RX hash XDP hint
+To: Liang Chen <liangchen.linux@gmail.com>, mst@redhat.com,
+ jasowang@redhat.com, xuanzhuo@linux.alibaba.com, hengqi@linux.alibaba.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, john.fastabend@gmail.com
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
+ ast@kernel.org
+References: <20240417071822.27831-1-liangchen.linux@gmail.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <20240417071822.27831-1-liangchen.linux@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 17, 2024 at 09:16:04AM +0200, Heiner Kallweit wrote:
-> On 17.04.2024 09:04, Greg KH wrote:
-> > On Wed, Apr 17, 2024 at 08:02:31AM +0200, Heiner Kallweit wrote:
-> >> On 17.04.2024 04:34, Jakub Kicinski wrote:
-> >>> On Mon, 15 Apr 2024 13:57:17 +0200 Heiner Kallweit wrote:
-> >>>> Binding devm_led_classdev_register() to the netdev is problematic
-> >>>> because on module removal we get a RTNL-related deadlock. Fix this
-> >>>> by avoiding the device-managed LED functions.
-> >>>>
-> >>>> Note: We can safely call led_classdev_unregister() for a LED even
-> >>>> if registering it failed, because led_classdev_unregister() detects
-> >>>> this and is a no-op in this case.
-> >>>>
-> >>>> Fixes: 18764b883e15 ("r8169: add support for LED's on RTL8168/RTL8101")
-> >>>> Cc: <stable@vger.kernel.org> # 6.8.x
-> >>>> Reported-by: Lukas Wunner <lukas@wunner.de>
-> >>>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> >>>
-> >>> Looks like I already applied one chunk of this as commit 97e176fcbbf3
-> >>> ("r8169: add missing conditional compiling for call to r8169_remove_leds")
-> >>> Is it worth throwing that in as a Fixes tag?
-> >>
-> >> This is a version of the fix modified to apply on 6.8.
-> > 
-> > That was not obvious at all :(
-> > 
-> Stating "Cc: <stable@vger.kernel.org> # 6.8.x" isn't sufficient?
 
-Without showing what commit id this is in Linus's tree, no.
 
-> >> It's not supposed to be applied on net / net-next.
-> >> Should I have sent it to stable@vger.kernel.org only?
-> > 
-> > Why woudlu a commit only be relevent for older kernels and not the
-> > latest one?
-> > 
-> The fix version for 6.9-rc and next has been applied already.
+On 17/04/2024 09.18, Liang Chen wrote:
+> The RSS hash report is a feature that's part of the virtio specification.
+> Currently, virtio backends like qemu, vdpa (mlx5), and potentially vhost
+> (still a work in progress as per [1]) support this feature. While the
+> capability to obtain the RSS hash has been enabled in the normal path,
+> it's currently missing in the XDP path. Therefore, we are introducing
+> XDP hints through kfuncs to allow XDP programs to access the RSS hash.
+> 
+> 1.
+> https://lore.kernel.org/all/20231015141644.260646-1-akihiko.odaki@daynix.com/#r
+> 
+> Signed-off-by: Liang Chen<liangchen.linux@gmail.com>
 
-Then a hint as to what the git id of that commit is would help out a lot
-here.
+LGTM
 
-Thanks,
-
-greg k-h
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
