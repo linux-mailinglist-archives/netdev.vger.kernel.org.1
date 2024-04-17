@@ -1,91 +1,100 @@
-Return-Path: <netdev+bounces-88858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 504FF8A8C3D
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 21:39:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EC228A8C4B
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 21:48:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 056FF281B1A
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 19:39:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 063E51F2280B
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 19:48:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE36428DD1;
-	Wed, 17 Apr 2024 19:39:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C14182D03D;
+	Wed, 17 Apr 2024 19:48:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IcwfIlGy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dNVdaASX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F133D2D03D;
-	Wed, 17 Apr 2024 19:39:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8F4125DB;
+	Wed, 17 Apr 2024 19:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713382788; cv=none; b=LffB6dOlgj9KqJmOkXp6eeOmY9ZKkfbZ8nyTI80drpRYX9PDtF//DFJkRIeEOLv37jCkxOKgZ+WUNCVisCfIJ/aNzWYhscSN8rsVTvGucq41SyfEP56WXAAiACOVEPnuV60G99ZUBWr+Q5TxyO1A0AQtlz+HW5S7tWQYldtGUpE=
+	t=1713383321; cv=none; b=VR7ILvMspuB64awdlgzvz5gHE/OHC5HgZG4PtXA5N8aQVD9UY9PWLlnOO5CVwa1SbKmeu3q8ifX9FoL6acR7DUF2ST8UMqBp/ujpvlALHjIkNEtQ/IFjrat8dGiI11Ob8xq3fN2T0/VOK3WvJhUUH6MqLSkrTkPPcYX0kUZ/TmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713382788; c=relaxed/simple;
-	bh=zxO5FTHZBJatbovSI1Bv8y3XpQsEQLyFo6WZvP6NdD4=;
-	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=XaYbpVfMgL24L1zrb3psaMmkUtkXXtJzpY4bL3N7jVtslHSVzSBCmzDV74h5NUMsFTDALeUbngr5fKIU3ctLOT5cC6Mylem5n6Pe4INb5HbHQOpO7WChHWlLUvva634f46LFSVdvC6gNC3MgMDMvlo+plDVHGw2rA1oxX4/cGCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IcwfIlGy; arc=none smtp.client-ip=209.85.167.181
+	s=arc-20240116; t=1713383321; c=relaxed/simple;
+	bh=1LZ19GrsRzL4nqKN2VxIPU9A/Aloyj4ott6F8ugH6Bg=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=M66idv1FCeCJkf9i+TG4jzhSMn8s67qYFf39sVbCFnNNdQqhcllWnvmye/MIPt/C3lk7febr9oW7XK83tcn2YiH5n+u9IiMK3wfEabDN4hH/pJLvLl9vTbKBnLGGYsU+ubqkHzkv3NE0a3IXUF8TWCPtZxMVth8Xy0JBVnnnADw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dNVdaASX; arc=none smtp.client-ip=209.85.222.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3bbbc6b4ed1so100978b6e.2;
-        Wed, 17 Apr 2024 12:39:46 -0700 (PDT)
+Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-78f0593f45dso4821385a.2;
+        Wed, 17 Apr 2024 12:48:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713382786; x=1713987586; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1713383319; x=1713988119; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dayZus1mGCRrZdIvYDkToR0L5oG5CYWlQiBkii6pQtM=;
-        b=IcwfIlGyAhYkwwsU3pXSReSdYMV+6lIKHbXRlRXZgglzKra/ac7UFIU9+Srb0UixHw
-         HjSaPKT5hYcUm/Naocb5lVdmPc179orj17uvHUnEK3Wz0ioT6pYwxi5Lqj+WqjIT6mDS
-         i0/0JlFOV/l1hCgbPtE9jhbNrvTYvJFATR3Sa5NO79wAs46dSbIAUb/sDz6ktsb+oe6X
-         u7/o53ILmfIiUM/g5PfId08iswUjc37h05L324wDqNbfUx6ZJorpu1N7u3PPf3+6GR1G
-         UWB8+X3d+BovZIdTpSYZcxWwOfabWEn/2QrNPSsdIGIDLpFdsXAWwZG9UVC5Fxe1OBec
-         dsYA==
+        bh=c1idUfe7Ux7dDWnZBEsflY2Rpd/cnwAKgfd2vpdjKHc=;
+        b=dNVdaASXYqhTsFyFQeV2Ruo5sKllaMI101H0fMURt8NCIHiMUIjHLb1+QBjWtHuRDk
+         TIvBXUfiUZnxBz7JkmDhP3q3vtDni+p6le4Z1Eg1awWqz2wfVvPaJQBPV3G2pQgJsHQl
+         stDOVoTsSBNxKSJd2vcxSDvXDkVQE7Hdr0aBbkO+1K9BdRxqOj6M2El6L2EHkJh9sGVG
+         CbLN1WnZvtkzs3+VwPNWvT1SOgB7psOQNWkVttU4wS91jWobBNbLaixhU7yJiM1l2Yr3
+         Bn/+QQhBxgxQEwUeMToDWOHmeanFS8yt3BoG1Es3/zSIDL/lj5piHQFiduy3bjryB/eG
+         q4bQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713382786; x=1713987586;
+        d=1e100.net; s=20230601; t=1713383319; x=1713988119;
         h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dayZus1mGCRrZdIvYDkToR0L5oG5CYWlQiBkii6pQtM=;
-        b=G4mP+hCTtiAJtBpP7nLdIfzxCmzOZu7SyXwz8oNUNkAt4RpHZ2uQMHzeNnGJUGpsJx
-         1yfDvWXoiIHsHq390NZo6U1AA+bMB6FsiCoZueHjpoB02r1Ht6txkDOgAMjz2KfnuSVj
-         BMNeX8fSqNFmxHHgwoGFLie+TZiii/whK//BMjsEDT3zt6+K1ssCExz9+trbkZkES/oY
-         mqGxCYH7H83V782oRIA948pRESrMdGfa4djKsZytX9wKcD5HA4cvG/9nQnaKcxDiN4LL
-         A5mfj4HmDkWyffXy6trzxKOehFS4xDXPQWhic5TcWyM4eT4KQLRAnKrYd59+3sgcT4fu
-         eklQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUs+RWBjqy7/QKgxiZmcmUMicYzWDu7aNoYF8sa6VK1MbMh1Ulswz/7B8RUsgtKfNmp7OnVncfboR2QzhGMiH/hc6joChOK0PdAqQtxvFyn5ndf41V5gMcNkNvhV7Cha1h2B01G
-X-Gm-Message-State: AOJu0Ywog3yuAWZBuDCP1WbzIX6JzaL5B/q2SGAizMDB4r8EHys1I6/X
-	k4TWZ0JUm5DVe/kw3WUa7XBf3Hnvgy7MaymjsG8DI8kFcIY328Mh
-X-Google-Smtp-Source: AGHT+IHDk9UbacaOz4BVEILDw3rLBAEPXBv5z8odX48avi2verV9OcJKCLigNNBeKKfhKacNxHTODg==
-X-Received: by 2002:aca:1106:0:b0:3c6:f34b:e90b with SMTP id 6-20020aca1106000000b003c6f34be90bmr624442oir.1.1713382785927;
-        Wed, 17 Apr 2024 12:39:45 -0700 (PDT)
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=c1idUfe7Ux7dDWnZBEsflY2Rpd/cnwAKgfd2vpdjKHc=;
+        b=qgpEyA2NSMFgFkrwxGL8PG81ljoh0NOCs6b2uPRe7iqjZxRnCYIx/2PXatEZmvkPma
+         nhpwPkhxVatFAZZPZkYCAJ/l1XNQHUmw+Qh47/vrNLGzRFYudX0DkNz6p3wlkEBR2bIf
+         mEuvyufSnj9J+vTc4fkUwgHqe2y4dfMTN9Zk9UOzIIJ8iq82skv+WhAAt75bb/QfHoc8
+         MIeI8vL05jLOOCz9rppq93Cd7vcK/rfs7uWqKvLMwHFb8A55zal0p6nEP5eItwcr59we
+         K9GeVLOK8zr0lS/ANMkVbIW0fKb9PYhrqbd6a9BdPxiWJ4sgBlpIY+7Fyj7lQu30tciw
+         aTaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXpcbO2lqzujOJQZqYxMXZoBrMfoPwiel49LYxSi9QSDgdXzA02YCi5gLVB8hf+ip17anWilbVchLlpj1NcVFaDvo3H5+9chAuo+Qpq92vFMMwR01CxwskOns1Q
+X-Gm-Message-State: AOJu0YxovaruQ2n7qyV3kRBhQCQcFbSZxeTm+b0a8UJXPULPRufRdYxx
+	OeRybKp8dFZkukLcJBlBqnW3JW6yGGnFss05sihqTsb2YmCCS6Hx
+X-Google-Smtp-Source: AGHT+IGico5U4WBIarM0nzdXr8kutGWAKtkpKVg67bXQc00lA6d7n5Xxku6XcJmDICBwSvuaa5bJ6w==
+X-Received: by 2002:a05:620a:29c7:b0:78f:182:5a17 with SMTP id s7-20020a05620a29c700b0078f01825a17mr514475qkp.45.1713383318898;
+        Wed, 17 Apr 2024 12:48:38 -0700 (PDT)
 Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id t24-20020ac865d8000000b00437392f1c20sm868744qto.76.2024.04.17.12.39.45
+        by smtp.gmail.com with ESMTPSA id v9-20020a05620a0a8900b0078d5e60b52esm8631094qkg.114.2024.04.17.12.48.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Apr 2024 12:39:45 -0700 (PDT)
-Date: Wed, 17 Apr 2024 15:39:45 -0400
+        Wed, 17 Apr 2024 12:48:38 -0700 (PDT)
+Date: Wed, 17 Apr 2024 15:48:38 -0400
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Richard Gobert <richardbgobert@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- aleksander.lobakin@intel.com, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Message-ID: <662025813539e_c86472944@willemb.c.googlers.com.notmuch>
-In-Reply-To: <97a01bf9-99d2-4368-9ebd-1e1194c1d7fd@gmail.com>
-References: <20240412152120.115067-1-richardbgobert@gmail.com>
- <20240412152120.115067-3-richardbgobert@gmail.com>
- <661ad2e8a7e95_3be9a7294a5@willemb.c.googlers.com.notmuch>
- <97a01bf9-99d2-4368-9ebd-1e1194c1d7fd@gmail.com>
-Subject: Re: [PATCH net v1 2/2] net: gro: add p_off param in *_gro_complete
+To: =?UTF-8?B?TGVuYSBXYW5nICjnjovlqJwp?= <Lena.Wang@mediatek.com>, 
+ "maze@google.com" <maze@google.com>, 
+ "willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>
+Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+ "steffen.klassert@secunet.com" <steffen.klassert@secunet.com>, 
+ "kuba@kernel.org" <kuba@kernel.org>, 
+ =?UTF-8?B?U2hpbWluZyBDaGVuZyAo5oiQ6K+X5piOKQ==?= <Shiming.Cheng@mediatek.com>, 
+ "pabeni@redhat.com" <pabeni@redhat.com>, 
+ "edumazet@google.com" <edumazet@google.com>, 
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>, 
+ "davem@davemloft.net" <davem@davemloft.net>
+Message-ID: <662027965bdb1_c8647294b3@willemb.c.googlers.com.notmuch>
+In-Reply-To: <77068ef60212e71b270281b2ccd86c8c28ee6be3.camel@mediatek.com>
+References: <20240415150103.23316-1-shiming.cheng@mediatek.com>
+ <661d93b4e3ec3_3010129482@willemb.c.googlers.com.notmuch>
+ <65e3e88a53d466cf5bad04e5c7bc3f1648b82fd7.camel@mediatek.com>
+ <CANP3RGdkxT4TjeSvv1ftXOdFQd5Z4qLK1DbzwATq_t_Dk+V8ig@mail.gmail.com>
+ <661eb25eeb09e_6672129490@willemb.c.googlers.com.notmuch>
+ <CANP3RGdrRDERiPFVQ1nZYVtopErjqOQ72qQ_+ijGQiL7bTtcLQ@mail.gmail.com>
+ <CANP3RGd+Zd-bx6S-NzeGch_crRK2w0-u6xwSVn71M581uCp9cQ@mail.gmail.com>
+ <661f066060ab4_7a39f2945d@willemb.c.googlers.com.notmuch>
+ <77068ef60212e71b270281b2ccd86c8c28ee6be3.camel@mediatek.com>
+Subject: Re: [PATCH net] udp: fix segmentation crash for GRO packet without
+ fraglist
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,260 +103,200 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain;
  charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-Richard Gobert wrote:
-> Willem de Bruijn wrote:
-> > Richard Gobert wrote:
-> >> Commits a602456 ("udp: Add GRO functions to UDP socket") and 57c67ff ("udp:
-> >> additional GRO support") introduce incorrect usage of {ip,ipv6}_hdr in the
-> >> complete phase of gro. The functions always return skb->network_header,
-> >> which in the case of encapsulated packets at the gro complete phase, is
-> >> always set to the innermost L3 of the packet. That means that calling
-> >> {ip,ipv6}_hdr for skbs which completed the GRO receive phase (both in
-> >> gro_list and *_gro_complete) when parsing an encapsulated packet's _outer_
-> >> L3/L4 may return an unexpected value.
-> >>
-> >> This incorrect usage leads to a bug in GRO's UDP socket lookup.
-> >> udp{4,6}_lib_lookup_skb functions use ip_hdr/ipv6_hdr respectively. These
-> >> *_hdr functions return network_header which will point to the innermost L3,
-> >> resulting in the wrong offset being used in __udp{4,6}_lib_lookup with
-> >> encapsulated packets.
-> >>
-> >> To fix this issue p_off param is used in *_gro_complete to pass off the
-> >> offset of the previous layer.
-> >>
-> >> Reproduction example:
-> >>
-> >> Endpoint configuration example (fou + local address bind)
-> >>
-> >>     # ip fou add port 6666 ipproto 4
-> >>     # ip link add name tun1 type ipip remote 2.2.2.1 local 2.2.2.2 encap fou encap-dport 5555 encap-sport 6666 mode ipip
-> >>     # ip link set tun1 up
-> >>     # ip a add 1.1.1.2/24 dev tun1
-> >>
-> >> Netperf TCP_STREAM result on net-next before patch is applied:
-> >>
-> >> net-next main, GRO enabled:
-> >>     $ netperf -H 1.1.1.2 -t TCP_STREAM -l 5
-> >>     Recv   Send    Send
-> >>     Socket Socket  Message  Elapsed
-> >>     Size   Size    Size     Time     Throughput
-> >>     bytes  bytes   bytes    secs.    10^6bits/sec
-> >>
-> >>     131072  16384  16384    5.28        2.37
-> >>
-> >> net-next main, GRO disabled:
-> >>     $ netperf -H 1.1.1.2 -t TCP_STREAM -l 5
-> >>     Recv   Send    Send
-> >>     Socket Socket  Message  Elapsed
-> >>     Size   Size    Size     Time     Throughput
-> >>     bytes  bytes   bytes    secs.    10^6bits/sec
-> >>
-> >>     131072  16384  16384    5.01     2745.06
-> >>
-> >> patch applied, GRO enabled:
-> >>     $ netperf -H 1.1.1.2 -t TCP_STREAM -l 5
-> >>     Recv   Send    Send
-> >>     Socket Socket  Message  Elapsed
-> >>     Size   Size    Size     Time     Throughput
-> >>     bytes  bytes   bytes    secs.    10^6bits/sec
-> >>
-> >>     131072  16384  16384    5.01     2877.38
-> >>
-> >> Fixes: 57c67ff4bd92 ("udp: additional GRO support")
-> >> Suggested-by: Eric Dumazet <edumazet@google.com>
-> >> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
-> > 
-> >> diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-> >> index 163f94a5a58f..9c18a39b0d0c 100644
-> >> --- a/drivers/net/geneve.c
-> >> +++ b/drivers/net/geneve.c
-> >> @@ -555,7 +555,7 @@ static struct sk_buff *geneve_gro_receive(struct sock *sk,
-> >>  }
-> >>  
-> >>  static int geneve_gro_complete(struct sock *sk, struct sk_buff *skb,
-> >> -			       int nhoff)
-> >> +			       int p_off, int nhoff)
-> >>  {
-> >>  	struct genevehdr *gh;
-> >>  	struct packet_offload *ptype;
-> >> @@ -569,11 +569,12 @@ static int geneve_gro_complete(struct sock *sk, struct sk_buff *skb,
-> >>  
-> >>  	/* since skb->encapsulation is set, eth_gro_complete() sets the inner mac header */
-> >>  	if (likely(type == htons(ETH_P_TEB)))
-> >> -		return eth_gro_complete(skb, nhoff + gh_len);
-> >> +		return eth_gro_complete(skb, p_off, nhoff + gh_len);
-> > 
-> > Since the new field to the callback is only used between IP and
-> > transport layer callback implementations, I think the others should
-> > just return zero, to make it clear that the value is unused.
-> > 
-> 
-> Got it. I'll push it in v2.
-> 
-> > I still think that if the only issue is with udp, we can just special
-> > case those and pass the nhoff instead of thoff in the existing one
-> > available offset field, and compute the transport offset in the udp
-> > function. For much less code churn. But unless anyone else agrees you
-> > can ignore that suggestion.
-> > 
-> >> -int inet_gro_complete(struct sk_buff *skb, int nhoff)
-> >> +int inet_gro_complete(struct sk_buff *skb, int prior_off, int nhoff)
-> >>  {
-> >>  	struct iphdr *iph = (struct iphdr *)(skb->data + nhoff);
-> >>  	const struct net_offload *ops;
-> >> @@ -1667,17 +1667,17 @@ int inet_gro_complete(struct sk_buff *skb, int nhoff)
-> >>  	 */
-> >>  	err = INDIRECT_CALL_2(ops->callbacks.gro_complete,
-> >>  			      tcp4_gro_complete, udp4_gro_complete,
-> >> -			      skb, nhoff + sizeof(*iph));
-> >> +				  skb, nhoff, nhoff + sizeof(*iph));
-> > 
-> > Identation change
-> > 
-> 
-> Will fix in v2 as well, thanks!
-> 
-> >>  struct sock *udp4_lib_lookup_skb(const struct sk_buff *skb,
-> >> +				 int nhoff,
-> >>  				 __be16 sport, __be16 dport)
-> >>  {
-> >> -	const struct iphdr *iph = ip_hdr(skb);
-> >> +	const struct iphdr *iph = (const struct iphdr *)(skb->data + nhoff);
-> > 
-> > How about instead just pass the saddr and daddr and leave the iph
-> > pointer to the caller (which also computes the udph pointer).
-> 
-> Here's a snippet I wrote - could you make sure this is what you mean?
-> 
-> BTW I couldn't find a union type which contains both in_addr and in6_addr
-> and is generic enough (I wrote udp_offload_addr which is similar to
-> tcp_ao_addr, is there a more generic one? Should it be created?)
+Lena Wang (=E7=8E=8B=E5=A8=9C) wrote:
+> On Tue, 2024-04-16 at 19:14 -0400, Willem de Bruijn wrote:
+> >  	 =
 
-Thanks for the sketch. That is a bit more complex than I had in mind.
+> > External email : Please do not click links or open attachments until
+> > you have verified the sender or the content.
+> >  > > > > Personally, I think bpf_skb_pull_data() should have
+> > automatically
+> > > > > > (ie. in kernel code) reduced how much it pulls so that it
+> > would pull
+> > > > > > headers only,
+> > > > >
+> > > > > That would be a helper that parses headers to discover header
+> > length.
+> > > >
+> > > > Does it actually need to?  Presumably the bpf pull function could=
 
->  
-> diff --git a/include/net/gro.h b/include/net/gro.h
-> index ebead1d642b4..56e5e21feb00 100644
-> --- a/include/net/gro.h
-> +++ b/include/net/gro.h
-> @@ -405,7 +405,8 @@ INDIRECT_CALLABLE_DECLARE(int udp6_gro_complete(struct sk_buff *, int, int));
->  
->  struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
->  				struct udphdr *uh, struct sock *sk);
-> -int udp_gro_complete(struct sk_buff *skb, int nhoff, int thoff,
-> +int udp_gro_complete(struct sk_buff *skb, const union udp_offload_addr *saddr,
-> +		     const union udp_offload_addr *daddr, int thoff,
->  		     udp_lookup_t lookup);
->  
->  static inline struct udphdr *udp_gro_udphdr(struct sk_buff *skb)
-> diff --git a/include/net/udp.h b/include/net/udp.h
-> index 601d1c3b677a..5f7224e6eb1e 100644
-> --- a/include/net/udp.h
-> +++ b/include/net/udp.h
-> @@ -62,6 +62,11 @@ struct udp_hslot {
->  	spinlock_t		lock;
->  } __attribute__((aligned(2 * sizeof(long))));
->  
-> +union udp_offload_addr {
-> +	__be32 ipaddr;
-> +	struct in6_addr ip6addr;
-> +};
-> +
+> > > > notice that it is
+> > > > a packet flagged as being of type X (UDP GSO FRAGLIST) and reduce=
 
-No need for such a union if the code just either calls
-udp4_lib_lookup_skb or udp6_lib_lookup_skb
->  /**
->   *	struct udp_table - UDP table
->   *
-> @@ -166,7 +171,9 @@ static inline void udp_csum_pull_header(struct sk_buff *skb)
->  	UDP_SKB_CB(skb)->cscov -= sizeof(struct udphdr);
->  }
->  
-> -typedef struct sock *(*udp_lookup_t)(const struct sk_buff *skb, int nhoff,
-> +typedef struct sock *(*udp_lookup_t)(const struct sk_buff *skb,
-> +				     const union udp_offload_addr *saddr,
-> +				     const union udp_offload_addr *daddr,
->  				     __be16 sport, __be16 dport);
->  
->  void udp_v6_early_demux(struct sk_buff *skb);
-> @@ -301,7 +308,9 @@ struct sock *udp4_lib_lookup(struct net *net, __be32 saddr, __be16 sport,
->  struct sock *__udp4_lib_lookup(struct net *net, __be32 saddr, __be16 sport,
->  			       __be32 daddr, __be16 dport, int dif, int sdif,
->  			       struct udp_table *tbl, struct sk_buff *skb);
-> -struct sock *udp4_lib_lookup_skb(const struct sk_buff *skb, int nhoff,
-> +struct sock *udp4_lib_lookup_skb(const struct sk_buff *skb,
-> +				 const union udp_offload_addr *saddr,
-> +				 const union udp_offload_addr *daddr,
->  				 __be16 sport, __be16 dport);
->  struct sock *udp6_lib_lookup(struct net *net,
->  			     const struct in6_addr *saddr, __be16 sport,
-> @@ -312,7 +321,9 @@ struct sock *__udp6_lib_lookup(struct net *net,
->  			       const struct in6_addr *daddr, __be16 dport,
->  			       int dif, int sdif, struct udp_table *tbl,
->  			       struct sk_buff *skb);
-> -struct sock *udp6_lib_lookup_skb(const struct sk_buff *skb, int nhoff,
-> +struct sock *udp6_lib_lookup_skb(const struct sk_buff *skb,
-> +				 const union udp_offload_addr *saddr,
-> +				 const union udp_offload_addr *daddr,
->  				 __be16 sport, __be16 dport);
->  int udp_read_skb(struct sock *sk, skb_read_actor_t recv_actor);
->  
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index 306d2a78fefa..151c3adecc21 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -529,17 +529,18 @@ static inline struct sock *__udp4_lib_lookup_skb(struct sk_buff *skb,
->  				 inet_sdif(skb), udptable, skb);
->  }
->  
-> -struct sock *udp4_lib_lookup_skb(const struct sk_buff *skb, int nhoff,
-> +struct sock *udp4_lib_lookup_skb(const struct sk_buff *skb,
-> +				 const union udp_offload_addr *saddr,
-> +				 const union udp_offload_addr *daddr,
->  				 __be16 sport, __be16 dport)
->  {
-> -	const struct iphdr *iph = (const struct iphdr *)(skb->data + nhoff);
->  	struct net *net = dev_net(skb->dev);
->  	int iif, sdif;
->  
->  	inet_get_iif_sdif(skb, &iif, &sdif);
->  
-> -	return __udp4_lib_lookup(net, iph->saddr, sport,
-> -				 iph->daddr, dport, iif,
-> +	return __udp4_lib_lookup(net, saddr->ipaddr, sport,
-> +				 daddr->ipaddr, dport, iif,
->  				 sdif, net->ipv4.udp_table, NULL);
->  }
->  
-> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-> index dcf8124b1a6a..0f05c7ed05d3 100644
-> --- a/net/ipv4/udp_offload.c
-> +++ b/net/ipv4/udp_offload.c
-> @@ -689,7 +689,8 @@ static int udp_gro_complete_segment(struct sk_buff *skb)
->  	return 0;
->  }
->  
-> -int udp_gro_complete(struct sk_buff *skb, int nhoff, int thoff,
-> +int udp_gro_complete(struct sk_buff *skb, const union udp_offload_addr *saddr,
-> +		     const union udp_offload_addr *daddr, int thoff,
->  		     udp_lookup_t lookup)
->  {
->  	struct udphdr *uh = (struct udphdr *)(skb->data + thoff);
-> @@ -700,8 +701,8 @@ int udp_gro_complete(struct sk_buff *skb, int nhoff, int thoff,
->  	uh->len = newlen;
->  
->  	sk = INDIRECT_CALL_INET(lookup, udp6_lib_lookup_skb,
-> -				udp4_lib_lookup_skb, skb, nhoff, uh->source,
-> -				uh->dest);
-> +				udp4_lib_lookup_skb, skb, saddr, daddr,
-> +				uh->source, uh->dest);
+> > the pull
+> > > > accordingly so that it doesn't pull anything from the non-linear
+> > > > fraglist portion???
+> > > >
+> > > > I know only the generic overview of what udp gso is, not any
+> > details, so I am
+> > > > assuming here that there's some sort of guarantee to how these
+> > packets
+> > > > are structured...  But I imagine there must be or we wouldn't be
+> > hitting these
+> > > > issues deeper in the stack?
+> > > =
 
-Since this INDIRECT_CALL_INET needs to know about the definitions of
-udp4_lib_lookup_skb and udp6_lib_lookup_skb anyway, we can just get
-rid of the whole udp_lookup_t type and function pointer passing?
+> > > Perhaps for a packet of this type we're already guaranteed the
+> > headers
+> > > are in the linear portion,
+> > > and the pull should simply be ignored?
+> > > =
 
-Or move the entire lookup to udp4_gro_complete/udp6_gro_complete and
-pass the sk to udp_gro_complete.
+> > > >
+> > > > > Parsing is better left to the BPF program.
+> > =
+
+> > I do prefer adding sanity checks to the BPF helpers, over having to
+> > add then in the net hot path only to protect against dangerous BPF
+> > programs.
+> > =
+
+> Is it OK to ignore or decrease pull length for udp gro fraglist packet?=
+
+> It could save the normal packet and sent to user correctly.
+> =
+
+> In common/net/core/filter.c
+> static inline int __bpf_try_make_writable(struct sk_buff *skb,
+>               unsigned int write_len)
+> { =
+
+> +	if (skb_is_gso(skb) && (skb_shinfo(skb)->gso_type &
+> +		(SKB_GSO_UDP  |SKB_GSO_UDP_L4)) {
+
+The issue is not with SKB_GSO_UDP_L4, but with SKB_GSO_FRAGLIST.
+
+> +		return 0;
+
+Failing for any pull is a bit excessive. And would kill a sane
+workaround of pulling only as many bytes as needed.
+ =
+
+> +	     or if (write_len > skb_headlen(skb))
+> +			write_len =3D skb_headlen(skb);
+
+Truncating requests would be a surprising change of behavior
+for this function.
+
+Failing for a pull > skb_headlen is arguably reasonable, as
+the alternative is that we let it go through but have to drop
+the now malformed packets on segmentation.
+
+
+> +	}
+> 	return skb_ensure_writable(skb, write_len);
+> }
+>  =
+
+> =
+
+> > In this case, it would be detecting this GSO type and failing the
+> > operation if exceeding skb_headlen().
+> > > > >
+> > > > > > and not packet content.
+> > > > > > (This is assuming the rest of the code isn't ready to deal
+> > with a longer pull,
+> > > > > > which I think is the case atm.  Pulling too much, and then
+> > crashing or forcing
+> > > > > > the stack to drop packets because of them being malformed
+> > seems wrong...)
+> > > > > >
+> > > > > > In general it would be nice if there was a way to just say
+> > pull all headers...
+> > > > > > (or possibly all L2/L3/L4 headers)
+> > > > > > You in general need to pull stuff *before* you've even looked=
+
+> > at the packet,
+> > > > > > so that you can look at the packet,
+> > > > > > so it's relatively hard/annoying to pull the correct length
+> > from bpf
+> > > > > > code itself.
+> > > > > >
+> > > > > > > > > BPF needs to modify a proper length to do pull data.
+> > However kernel
+> > > > > > > > > should also improve the flow to avoid crash from a bpf
+> > function
+> > > > > > > > call.
+> > > > > > > > > As there is no split flow and app may not decode the
+> > merged UDP
+> > > > > > > > packet,
+> > > > > > > > > we should drop the packet without fraglist in
+> > skb_segment_list
+> > > > > > > > here.
+> > > > > > > > >
+> > > > > > > > > Fixes: 3a1296a38d0c ("net: Support GRO/GSO fraglist
+> > chaining.")
+> > > > > > > > > Signed-off-by: Shiming Cheng <
+> > shiming.cheng@mediatek.com>
+> > > > > > > > > Signed-off-by: Lena Wang <lena.wang@mediatek.com>
+> > > > > > > > > ---
+> > > > > > > > >  net/core/skbuff.c | 3 +++
+> > > > > > > > >  1 file changed, 3 insertions(+)
+> > > > > > > > >
+> > > > > > > > > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > > > > > > > > index b99127712e67..f68f2679b086 100644
+> > > > > > > > > --- a/net/core/skbuff.c
+> > > > > > > > > +++ b/net/core/skbuff.c
+> > > > > > > > > @@ -4504,6 +4504,9 @@ struct sk_buff
+> > *skb_segment_list(struct
+> > > > > > > > sk_buff *skb,
+> > > > > > > > >  if (err)
+> > > > > > > > >  goto err_linearize;
+> > > > > > > > >
+> > > > > > > > > +if (!list_skb)
+> > > > > > > > > +goto err_linearize;
+> > > > > > > > > +
+> > > > >
+> > > > > This would catch the case where the entire data frag_list is
+> > > > > linearized, but not a pskb_may_pull that only pulls in part of
+> > the
+> > > > > list.
+> > > > >
+> > > > > Even with BPF being privileged, the kernel should not crash if
+> > BPF
+> > > > > pulls a FRAGLIST GSO skb.
+> > > > >
+> > > > > But the check needs to be refined a bit. For a UDP GSO packet,
+> > I
+> > > > > think gso_size is still valid, so if the head_skb length does
+> > not
+> > > > > match gso_size, it has been messed with and should be dropped.
+> > > > >
+> Is it OK as below? Is it OK to add log to record the error for easy
+> checking issue.
+> =
+
+> In net/core/skbuff.c skb_segment_list
+> +unsigned int mss =3D skb_shinfo(head_skb)->gso_size;
+> +bool err_len =3D false;
+> =
+
+> +if ( mss !=3D GSO_BY_FRAGS && mss !=3D skb_headlen(head_skb)) {
+> +	pr_err("skb is dropped due to messed data. gso size:%d,
+> +		hdrlen:%d", mss, skb_headlen(head_skb)
+
+Such logs should always be rate limited. But no need to log cases
+where we well understood how we get there.
+
+I would stick with one approach: either in the BPF func or in
+segmentation, not both. And then I find BPF preferable, as explained
+before.
+
+> +	if (!list_skb)
+> +		goto err_linearize;
+> +	else
+> +		err_len =3D true;
+> +}
+> =
+
+> ...
+> +if (err_len) {
+> +	goto err_linearize;
+> +}
+> =
+
+> skb_get(skb);
+> ...=
 
