@@ -1,168 +1,177 @@
-Return-Path: <netdev+bounces-88761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D24B88A8744
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 17:18:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B92EF8A8768
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 17:21:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C3091F225E0
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:18:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D51891C2195E
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 310D0146D5E;
-	Wed, 17 Apr 2024 15:18:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73858146D77;
+	Wed, 17 Apr 2024 15:21:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jv0wX1H1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QD9/fE6s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F0D146D77;
-	Wed, 17 Apr 2024 15:18:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DCF81422B6;
+	Wed, 17 Apr 2024 15:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713367097; cv=none; b=OfrvZ4oNIk8n228869t+jn5fLhh3pBVLVu3jbdudmYK043aCbckHT4B9Bblic7yXw9poe0kr19C5geV/nAba1RYuEpvxAuEpKWNfqfIoaUzDbmKOpAyDMGdHpbCrycbmWfwX/Ed0MZ422bCOBS8z/8pvRMI9LeMRn3Wwazh+Gk4=
+	t=1713367315; cv=none; b=rDSjacCj/O1ZSsKXikKIaZonfK2Tvw1PhRChcGc5fn8vA8ZrgbRiEw6SKZwU+UX1fDOXHtIoJfaXjz88u4yXLslYZjXD4gQhoy/ajYTguSQ8lYD+QijBXUkIpfL2cTeJp39C29I7dkfF93j0TZGVqHWK0GN3hVEToOPvYy1b2OM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713367097; c=relaxed/simple;
-	bh=YHaVPj+iSuEOyB6ZA3xnahzX1PCRmORtT89CkjQ7/BU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CFoQkHxTHXCIr82GuEPiWiRd8KVJKmPBNcwU5f9zMjWBafp3xCXqleNF+5dvmrCo2rJ5v9vyYvRvk4bFw5wZ0gQRtD4N99zbtGdO3j8SFY25vcBakb+hHzieUgQUOHBjQfP3VMpTCzxoEn5MyS6p3Xn6fIPHwN/9tFWaiHF2pok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jv0wX1H1; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43HFGrXc022375;
-	Wed, 17 Apr 2024 15:18:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=vFsflYqoST0FVYmNY0FM+GujFSx1cOAiMV41fi3PiAQ=;
- b=jv0wX1H1Topyjqsjx5xw8Veh9EEMLY6r+FKZn/uwj/BUT92Bm8lHBSE/ZJlbPPVH2Oyi
- 0wIytvCfhmZ+jH78huE2McXwv80WgT2sPOxJIViwENhcSbbgC5BNPRAyd+xe4WVUG3s5
- P/4B+9BfctirQ70slBLxiylbHTJbhnkeNiWsy8Tn8LXFvbxJNqpavXEdZvnDbUWa4zIh
- DlQjgUI813v41gHWn2avRU+J+5J2L1dzAh/nTkrTXVMKXgUbJuSi3DQ8u2+iQ7JuBzsD
- 7jjHPE0J+4Ywc2AyzQbXE7TZOVUbhGCIA1YqiybRVYz7dHVwn2qQ82OKzGCssxndbZpG Ww== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xjgx6g03n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Apr 2024 15:18:01 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43HFI0YW025508;
-	Wed, 17 Apr 2024 15:18:00 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xjgx6g03d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Apr 2024 15:18:00 +0000
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43HExNFf023582;
-	Wed, 17 Apr 2024 15:17:59 GMT
-Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xg5cp56sp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 17 Apr 2024 15:17:59 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43HFHuwM39977294
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 17 Apr 2024 15:17:58 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 37C865804E;
-	Wed, 17 Apr 2024 15:17:56 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 699645803F;
-	Wed, 17 Apr 2024 15:17:53 +0000 (GMT)
-Received: from [9.171.10.59] (unknown [9.171.10.59])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 17 Apr 2024 15:17:53 +0000 (GMT)
-Message-ID: <f614e5fe-29cb-42f5-a02b-b777c043e014@linux.ibm.com>
-Date: Wed, 17 Apr 2024 17:17:52 +0200
+	s=arc-20240116; t=1713367315; c=relaxed/simple;
+	bh=eaGY130EEfNXK73Gt7yZNiqyMJf/fKU75Cs6qodOdYs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oY9r+siyoUP4GX2TDo24lolzCeE+wFsU+UJqKXj/VxIXVjtsXTWI3ueyQok0Kib3c4sXfc/hQb2cVcuXx5h5cpJWZxJTWE6wvhcoqUkM7EUrK6FT9LHrpm1WFZowMA1IhkaPCRiAWXjq4txzg6o1Hf1e0WPQYdWTlI0VDnsVRM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QD9/fE6s; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1e51398cc4eso53103975ad.2;
+        Wed, 17 Apr 2024 08:21:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713367313; x=1713972113; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=UHqy/YNAwuIo5hSIvZMWYfCNqZ6Gl94Xq9snb/hWpDM=;
+        b=QD9/fE6sP5J+G9qgZ5cyd4tWtiAESl6R9XLjO6yyCqvmJ9jTyo91Qi34QUE3X0I7EH
+         DBCgOu4hfNsY2umLtXlXVTUQwbVbMbBlFiSRFPVMRAsUs3UND//f3KrDjBm+bQWPFGEE
+         yBv21jo0yfo4XRP4K6rTnZB5HRjAYBk3DDCQgjdOmcEO2NLU8X6NINleyT4/3NGvLi81
+         xvqA2XfTYDCQIySqijC6haJNNc5JBSqwKSaZG/8mMwgq92jGk2r5V6h7RXMc85ttjmUe
+         qOwoYZtWowQEYjRUgKRMcMfkpHEUNuj931Wn9h2T5ARDVLZ4A4Fsu5tthpqqdulPvmwd
+         ppHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713367313; x=1713972113;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UHqy/YNAwuIo5hSIvZMWYfCNqZ6Gl94Xq9snb/hWpDM=;
+        b=rV6PMdUhJw4rRmNvWtYDU1ilE95mFe+KAVOCut0s0HQIowDFp9NBgyDPDwSsmvTcDi
+         3jVB42tWXDLxiwbkKDNnVGlV9+QkZdw9Oz1E7Oo6QvdJKoG9Y9nFpWRnpzZIYwWzU/SZ
+         FmDSqe0tSAf1Ryqg3h09xptoA5NmP3+IcW/WELpY+sIrElzm/KVPmvqplzJ8f1EdrkTh
+         PqixwwN0WJlllO9k2NmjPLqkGHusuIf6+vE9EP52PoApJ6p7iKaRxaZjmo2x7qsvcIK9
+         R0JaIg+/4Evv06y8Vl6nH8XOPtnzGGxVSlJAkdfyWi+cSWRZCaNFhA9aOCEgGncibX2W
+         hTvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUoOwYUvS0ZELB+A+fVNGJ9vzjuYG+/5gUlxketnpoRJRrspV3WHUGI2xlabEwgIA9OycanvGAX38zmV073DwU0l2TpMbURjWawQs0Mo489EnHvDynN91yFJcGzXkhBmeTSZE4P1x5kzdZg8ASaTXlh0fW1pyWnv67VBj8Px6Xi
+X-Gm-Message-State: AOJu0YzHHcp027/PXqRv2MMGfIxo6Oh2EIMIW9axV13u6sK2dx28y4LC
+	RzzUKf5OnPo1V7uTX3j3Cwv5S2+6KBiBbqoAIlT0yOKbbnut/n0mtaCDvRqIpdZsb7xjt7IMAwi
+	Ll+HPpS4UEx8oTbHGsb8UCOaMB4E=
+X-Google-Smtp-Source: AGHT+IFH0RxVWSWvxx7Od2F5Bjl9fNOEbOopFEH/T64IAZv/Jx37DVoXUhgbLBomLUTUmvQhXUEHJDp07NpWEJm0XTw=
+X-Received: by 2002:a17:90a:f309:b0:2a4:ac8a:ca05 with SMTP id
+ ca9-20020a17090af30900b002a4ac8aca05mr18818244pjb.34.1713367313228; Wed, 17
+ Apr 2024 08:21:53 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: fix potential sleeping issue in
- smc_switch_conns
-Content-Language: en-GB
-To: Guangguan Wang <guangguan.wang@linux.alibaba.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: jaka@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        guwen@linux.alibaba.com, weiyongjun1@huawei.com, yuehaibing@huawei.com,
-        tangchengchang@huawei.com, kuba@kernel.org, edumazet@google.com,
-        davem@davemloft.net, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org
-References: <20240413035150.3338977-1-shaozhengchao@huawei.com>
- <b2573ccf2340a19b6cb039dac639b2d431c1404c.camel@redhat.com>
- <a94de96f-8b18-482c-90e2-7f8584528bc8@linux.alibaba.com>
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <a94de96f-8b18-482c-90e2-7f8584528bc8@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: jgDXjJUjAdZnjbZAPbzUCf9MNtWSnraZ
-X-Proofpoint-ORIG-GUID: lEFEOn2K2zQADe4HYYnjeTqF0kjUGp9G
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-17_12,2024-04-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
- mlxlogscore=791 spamscore=0 clxscore=1015 bulkscore=0 malwarescore=0
- mlxscore=0 priorityscore=1501 suspectscore=0 lowpriorityscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2404010000 definitions=main-2404170106
+References: <20240329133458.323041-2-valla.francesco@gmail.com>
+ <20240329133458.323041-3-valla.francesco@gmail.com> <CAMZ6RqKLaYb+8EaeoFMHofcaBT5G2-qdqSb4do73xrgMvWMZaA@mail.gmail.com>
+ <9f5ad308-f2a0-47be-85f3-d152bc98099a@hartkopp.net> <CAMZ6RqKGKcYd4hAM8AVV72t78H-Kt92NXowx6Q+YCw=AuSxKuw@mail.gmail.com>
+ <64586257-3cf6-4c10-a30b-200b1ecc5e80@hartkopp.net> <Zh6qiDwbEnaJtTvl@fedora> <d4a55991-0ccc-4e8f-8acb-56077600c9e0@hartkopp.net>
+In-Reply-To: <d4a55991-0ccc-4e8f-8acb-56077600c9e0@hartkopp.net>
+From: Vincent Mailhol <vincent.mailhol@gmail.com>
+Date: Thu, 18 Apr 2024 00:21:40 +0900
+Message-ID: <CAMZ6RqJUHJdq30CrAzT26_RqpDOH_iMP8A6SKSAYrWBe-T+Oww@mail.gmail.com>
+Subject: Re: [PATCH v2 1/1] Documentation: networking: document ISO 15765-2:2016
+To: Oliver Hartkopp <socketcan@hartkopp.net>
+Cc: Francesco Valla <valla.francesco@gmail.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	Bagas Sanjaya <bagasdotme@gmail.com>, fabio@redaril.me
+Content-Type: text/plain; charset="UTF-8"
 
+On Wed. 17 Apr. 2024 at 02:19, Oliver Hartkopp <socketcan@hartkopp.net> wrote:
+> Hi Francesco and Vincent,
+>
+> On 16.04.24 18:42, Francesco Valla wrote:
+> > On Sun, Apr 14, 2024 at 10:21:33PM +0200, Oliver Hartkopp wrote:
+> >> On 14.04.24 06:03, Vincent Mailhol wrote:
+>
+> >>> Regardless, here is a verbatim extract from the Foreworld section of
+> >>> ISO 15765-2:2024
+> >>>
+> >>>     This fourth edition cancels and replaces the third edition (ISO
+> >>>     15765-2:2016), which has been technically revised.
+> >>>
+> >>>     The main changes are as follows:
+> >>>
+> >>>       - restructured the document to achieve compatibility with OSI
+> >>>         7-layers model;
+> >>>
+> >>>       - introduced T_Data abstract service primitive interface to
+> >>>         achieve compatibility with ISO 14229-2;
+> >>>
+> >>>       - moved all transport layer protocol-related information to Clause 9;
+> >>>
+> >>>       - clarification and editorial corrections
+> >>>
+> >>
+> >> Yes, I've checked the release notes on the ISO website too.
+> >> This really looks like editorial stuff that has nothing to do with the data
+> >> protocol and its segmentation.
+> >>
+> >
+> > The :2016 suffix is cited both here and inside the Kconfig. We can:
+> > - keep the :2016 here and then update both the documentation and the
+> >    Kconfig once the standard has been checked
+> > - move to :2024 both here and inside the Kconfig
+> > - drop the :2016 from everywhere (leaving only ISO 15765) and move to
+> >    ISO 15765:2024 only inside the "Specifications used" paragraph
+> >
+> > What do you think? Shall the modifications to the Kconfig be done as part of
+> > this series?
 
+If we bump the version to :2024, then I suggest to:
 
-On 17.04.24 09:32, Guangguan Wang wrote:
-> 
-> 
-> On 2024/4/16 20:06, Paolo Abeni wrote:
->> On Sat, 2024-04-13 at 11:51 +0800, Zhengchao Shao wrote:
->>> Potential sleeping issue exists in the following processes:
->>> smc_switch_conns
->>>    spin_lock_bh(&conn->send_lock)
->>>    smc_switch_link_and_count
->>>      smcr_link_put
->>>        __smcr_link_clear
->>>          smc_lgr_put
->>>            __smc_lgr_free
->>>              smc_lgr_free_bufs
->>>                __smc_lgr_free_bufs
->>>                  smc_buf_free
->>>                    smcr_buf_free
->>>                      smcr_buf_unmap_link
->>>                        smc_ib_put_memory_region
->>>                          ib_dereg_mr
->>>                            ib_dereg_mr_user
->>>                              mr->device->ops.dereg_mr
->>> If scheduling exists when the IB driver implements .dereg_mr hook
->>> function, the bug "scheduling while atomic" will occur. For example,
->>> cxgb4 and efa driver. Use mutex lock instead of spin lock to fix it.
->>
->> I tried to inspect all the lock call sites, and it *look* like they are
->> all in process context, so the switch should be feasible.
-> 
-> There exist some calls from tasklet, where mutex lock is infeasible.
-> For example:
-> - tasklet -> smc_wr_tx_tasklet_fn -> smc_wr_tx_process_cqe -> pnd_snd.handler -> smc_cdc_tx_handler -> smc_tx_pending -> smc_tx_sndbuf_nonempty -> smcr_tx_sndbuf_nonempty -> spin_lock_bh(&conn->send_lock)
-> - tasklet -> smc_wr_rx_tasklet_fn -> smc_wr_rx_process_cqes -> smc_wr_rx_demultiplex -> smc_cdc_rx_handler -> smc_cdc_msg_validate -> spin_lock_bh(&conn->send_lock)
-> 
-> Thanks,
-> Guangguan Wang
-> Agree! Thank you, Guangguan, for the examples!
-If we can verify that this bug exits, we should find other solutions.
->>
->> Still the fact that the existing lock is a BH variant is suspect.
->> Either the BH part was not needed or this can introduce subtle
->> regressions/issues.
->>
->> I think this deserves at least a 3rd party testing.
->>
->> Thanks,
->>
->> Paolo
->>
-> 
+  - add a first patch in this series to update Kconfig.
+  - add your documentation as a second patch directly with the :2024 version.
+
+Generally speaking, when a feature requires any kind of clean-up, I
+think it is better to do that clean-up first, prior to introducing the
+feature.
+
+I am also supportive of your idea to drop the year suffix in most
+places and only keep it once.
+
+> So here is my completely new view on this version topic ... ;-D
+>
+> I would vote for ISO 15765-2:2016 in all places.
+>
+> The ISO 15765-2:2016 is the first ISO 15765-2 standard which supports
+> CAN FD and ISO 15765-2:2024 does not bring any functional change neither
+> to the standard nor to the implementation in the Linux kernel.
+>
+> For that reason ISO 15765-2:2016 is still correct and relevant (due to
+> the CAN FD support) and does not confuse the users whether the 2024
+> version has some completely new feature or is potentially incompatible
+> to the 2016 version.
+
+ISO publications are backward compatible (if you dig enough, you may
+find exceptions, but it is *extremely* uncommon that a newer revision
+would break the specification from a prior publication). Without prior
+knowledge, if I see ISO 15765-2:2024, I would know that it is the
+latest and that I can thus expect support for both ISO 15765-2:2016
+and ISO 15765-2:2024. If I see ISO 15765-2:2016, I may think that the
+newer ISO 15765-2:2024 is not supported.
+
+I can also use ISO 11898-1 as an example. Our documentation says that
+we support ISO 11898-1:2015. The previous version: ISO 11898-1:2003 is
+not mentioned a single time in the full kernel tree. Yet, I do not
+think that any one was ever confused that the kernel may not be
+compatible with ISO 11898-1:2003.
+
+If you really think that there is a risk of confusion, then maybe just
+adding a sentence to say that we support ISO 15765-2:2024 and all
+previous versions would be enough?
+
+But overall, I do not see the benefit to keep the older version.
+
+> Best regards,
+> Oliver
 
