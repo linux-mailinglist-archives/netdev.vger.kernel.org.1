@@ -1,193 +1,167 @@
-Return-Path: <netdev+bounces-88590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88591-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACB668A7CFE
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:23:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C0958A7D02
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:23:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF4E41C20D25
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 07:22:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 351B4282DA5
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 07:23:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BAB96A353;
-	Wed, 17 Apr 2024 07:22:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 614F26E613;
+	Wed, 17 Apr 2024 07:22:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VYsQSqmX"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="l3fWh4v5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D65C40850;
-	Wed, 17 Apr 2024 07:22:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ABF76A8A7
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 07:22:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713338577; cv=none; b=GmZhG6ryZSqi4SJGYEwUeoYcVZ2VfAQRP5+PF5UBT1taApjvHKs5q7exkfket9gq2eYP1a+f1PMMlA5g8sUVCcvbXcbEEwuMbUsoDL/WV1jmCSx0O05smy5hmPuzCGDQnRSEIFUWYTskpCJrXOJWh1xf78I5zpkWBpAPS6BkhxQ=
+	t=1713338579; cv=none; b=CLzIr/7B0cBGOGhdFfjJIEK/jrrvImCtPI4ng/YOsvBW/W/VwGkvAmyeLCwb1a3+fVcUCgRClNKy6z0eB2SHpWW1R0A4GRY8eAuqnrP6lH4YGQXw+q6sbZxyFdzQOntVHBQpiw2kE39ni2PnYaKHXm6ttiBM7pesHbOyYi72sg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713338577; c=relaxed/simple;
-	bh=88FMoahohhlkfN+9CzcIFpURNfThc9jeG/zAbMllpjY=;
+	s=arc-20240116; t=1713338579; c=relaxed/simple;
+	bh=A9w0TNw8xOwwO7aK3Yc6awMgv37h3KiP86rdJZ3sluo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MX3lzQO6sLdIHwAP1+yIgrocJnbCTXoa+1xAtU9zKTymYRYQ3EiezFeJkH6f/VqgE0WTv3ed6M6UI5PV14/PqS6CC7YcaOGeCHecS79gD9nJi6b0xVUalWj4SY/4wzNcW0HV9HRIq62xI4n16J3m2ql/58S+1G1RE2AlqTkkr74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VYsQSqmX; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5176f217b7bso9283641e87.0;
-        Wed, 17 Apr 2024 00:22:55 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Pt83ONzpAglhU92CGfeIyh1ISSsbaYF3ypb86WNhpzAz+ZtnnrqO72GwmjNoJo5A1VFurda1YryAK/7lBuHVQ5VegFWKd7MWNdQYK5t97K6d1hFtqvTExbbVa81joNPKrjgK843pWyTfPws4PqSZMLjH+gtAD4PdvAeVBiSm9/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=l3fWh4v5; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-41879819915so17682645e9.1
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 00:22:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713338573; x=1713943373; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qFd3LuiLz7mwemccGmzwHdBRLXnnOHlxLN8go5cVxJg=;
-        b=VYsQSqmXFqgrWbyZMu57YaRK9vXMXtzjqof9gDh4Iiubf56zvn2li8VXdeqDW6TfZ3
-         bQkS8etfoL962yJhkNbycmVZW1UVemh872tp8WlJUq+vJ1S9YlnHPbkqbVFsVLGbo8xQ
-         3U07pyGXB2Uidm407EBDbXCHmcds9hQunjJgAud58KX+O03feV17orMgKqp8JemlE15T
-         7N9BY22skFFsjYLEb4cjppI81nwN76pB/1g14jix9VDjwJ46hJCqiRPPV93xBn2/1mTU
-         L9e77+89y3YQ58ZUi3ybiJS8GPhsAUtV7DJ59YHgIX6ckUohrGnW0gmGlkm5MS/CSI+h
-         TxsA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713338575; x=1713943375; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=x1fZRmtUCzpag8fleysfaO/F+gV8nCRc5HsAwDzsIyo=;
+        b=l3fWh4v5wr4HyP5qFZnna7nwKbRKVWQu1qbG0n1LoHROCF9O6kUoldTA3Cq2Mjpas6
+         5Fr3amvmSleDDYezmWvojXERDKAUjtbBliXDE6Rn+P6vS7LKYMCJA15ogop2mEN773SV
+         vWp//1SZEFiASc89KDMjfshgO0PRvHEZgAH0s0+L121zBdwPY0etGqTYkE+Y3qozQxzV
+         o5YO7LfW6G+v2glrEmzgnNaXI4/ODhBd1zBTgYv5t2evSwwHlDOyW2S1YhSWXu4aOxnm
+         d40tuKeyUugJSy+tiF1GYuO3WppFT2DVzPBwnCHRzyXfmRitXDeM+t934mBEmeqtaXJZ
+         cNkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713338573; x=1713943373;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qFd3LuiLz7mwemccGmzwHdBRLXnnOHlxLN8go5cVxJg=;
-        b=QS6BVSR42hsFCsrPTUCTD10TZVMZhxSrdKA60HxlYwWzUTF4/my3YkzH7Yw2joRcjd
-         1kX9XSWUojvzxPx8jwwlJ0cko52PGemQKbPNDnnb8iMNs+5cD5+2VlxI4oYCdvslAfPa
-         759RWbEVnV7dwZ6xsXo6sHWZ5CATgFmqTiZKZf3HttMEXdxsxoRJZN65zc7Af3cUrdI8
-         7RUeSOL7U9BhkT+vv3PLI6fObLRDUmymyRsS7ZgmsebZYrWo1WDpp+h8zXeZpCXcdr8G
-         HIJUXb7MEm9brvleeMCkH2CpSXT00lDYddRiLJZEikDQiy/hfJ9iVFbFYryqYp/WFVKS
-         73zw==
-X-Forwarded-Encrypted: i=1; AJvYcCUL9qWbDiwYKvH6qO0umPLBSR28bvZr2BYOdYjjAYxoyjeYVAofu5qNmZCWuBhMri3wEV/qAs2jbBGICdFtHUOaSzBLfT+i76CYzjZz7sic06LJVIZ2bDiGuVlLb3BmgXgucMp1PhHGSD+aMZhJeT+6/zo8ORLZb6zqbxz/nCvABQ==
-X-Gm-Message-State: AOJu0Yw9CMnSC7nrWbhzrt4aXxvEpqUVW7j70fwmhIkROFKp45DWyAil
-	mavTEQughvaRhal+ap+i+2bMst0sdNwVEoK/w1AZkl18yeMHFA5w
-X-Google-Smtp-Source: AGHT+IFZZ2U7d0JdYD8EptTdQp9cL8YV7EclZe9DISQJlewmpYlm0svdc0PjJZvieY/1vVanvlp2Xg==
-X-Received: by 2002:a19:9112:0:b0:516:9f03:6a92 with SMTP id t18-20020a199112000000b005169f036a92mr11278915lfd.43.1713338573024;
-        Wed, 17 Apr 2024 00:22:53 -0700 (PDT)
-Received: from eichest-laptop (31-10-206-125.static.upc.ch. [31.10.206.125])
-        by smtp.gmail.com with ESMTPSA id kw6-20020a170907770600b00a555be38aaasm317083ejc.164.2024.04.17.00.22.52
+        d=1e100.net; s=20230601; t=1713338575; x=1713943375;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=x1fZRmtUCzpag8fleysfaO/F+gV8nCRc5HsAwDzsIyo=;
+        b=QW6/TmW8YE4GwlqgrXCPnxR91Q3c1wOEatZeU+hFtmdTRKA23kMhYFnv+4AjApiIA4
+         DGRdsFCOJIi42hU6ogaYMkv/N9t27ZjchTCaK9uJE/Ybt8ld19/NMnu830Pq+zQCjRaL
+         R55VkWdgY1fNaaPIDZ1GhT8eG8OdiQK9eyi5RovKuG2n1CC6cfbNcgsZ4LIf7cVRD2jI
+         16+0GEeA7H8t9tgQYDRE31kf78VZLhnpPUstii7aGIBzbs+aBIx/AR2A2OoKqEb1n3Jk
+         oE/kMXZkpK2Uyhg9ERTKt1chmgEx5HLjG6px+5dADoM4cWnJWOoxcSakbgqwesscwEDW
+         qycA==
+X-Gm-Message-State: AOJu0Yxh7RYtJxCZrmtIwabRbRdBv+s9yjm25blEHi78JE+VXc7KQHrQ
+	GQRqKwxwfKHJa1g8snGDDR9tEX2D5O716REFMkPgwg8BNuPM3JQeaaFZ6oRbm24=
+X-Google-Smtp-Source: AGHT+IHOMJ6tvg51q7LMCwZaW8Psh5Qlr9UINCBTzEN2w/aV4BJkd1soo+fKHO3Uwy83GP++CdPA3w==
+X-Received: by 2002:a05:600c:4f07:b0:414:726:87d9 with SMTP id l7-20020a05600c4f0700b00414072687d9mr13509829wmq.12.1713338575493;
+        Wed, 17 Apr 2024 00:22:55 -0700 (PDT)
+Received: from localhost (78-80-105-131.customers.tmcz.cz. [78.80.105.131])
+        by smtp.gmail.com with ESMTPSA id s4-20020a5d5104000000b00346f9071405sm14418312wrt.21.2024.04.17.00.22.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Apr 2024 00:22:52 -0700 (PDT)
-Date: Wed, 17 Apr 2024 09:22:50 +0200
-From: Stefan Eichenberger <eichest@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	lxu@maxlinear.com, hkallweit1@gmail.com, michael@walle.cc,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 2/2] net: phy: mxl-gpy: add new device tree property
- to disable SGMII autoneg
-Message-ID: <Zh94yqo2EHRq8eEq@eichest-laptop>
-References: <20240416121032.52108-1-eichest@gmail.com>
- <20240416121032.52108-3-eichest@gmail.com>
- <3f7f278f-e490-47f1-971c-ecf44a70cee4@lunn.ch>
- <Zh6clAtI3NO+nMEi@eichest-laptop>
- <5ed39628-4ac0-4c4e-9a16-fd4bf9a6db29@lunn.ch>
- <Zh6mIv1Ee+1h21Xo@shell.armlinux.org.uk>
- <Zh6z90iCpLqF4fla@eichest-laptop>
- <Zh6/oVHUvnOVtHaC@shell.armlinux.org.uk>
+        Wed, 17 Apr 2024 00:22:55 -0700 (PDT)
+Date: Wed, 17 Apr 2024 09:22:53 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, edumazet@google.com, parav@nvidia.com,
+	mst@redhat.com, xuanzhuo@linux.alibaba.com, shuah@kernel.org,
+	petrm@nvidia.com, liuhangbin@gmail.com, vladimir.oltean@nxp.com,
+	bpoirier@nvidia.com, idosch@nvidia.com,
+	virtualization@lists.linux.dev
+Subject: Re: [patch net-next v2 1/6] virtio: add debugfs infrastructure to
+ allow to debug virtio features
+Message-ID: <Zh94zX-oQs96tuKk@nanopsycho>
+References: <20240415162530.3594670-1-jiri@resnulli.us>
+ <20240415162530.3594670-2-jiri@resnulli.us>
+ <CACGkMEtpSPFSpikcrsZZBtXOgpAukjCwFRcF79xfzDG-s8_SyQ@mail.gmail.com>
+ <Zh5G0sh62hZtOM0J@nanopsycho>
+ <CACGkMEvRMGvx0jTqFK2WH1iuPMUZJ0LfW1jDLgt-iQd2+AT=+g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Zh6/oVHUvnOVtHaC@shell.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEvRMGvx0jTqFK2WH1iuPMUZJ0LfW1jDLgt-iQd2+AT=+g@mail.gmail.com>
 
-On Tue, Apr 16, 2024 at 07:12:49PM +0100, Russell King (Oracle) wrote:
-> On Tue, Apr 16, 2024 at 07:23:03PM +0200, Stefan Eichenberger wrote:
-> > Hi Russell and Andrew,
-> > 
-> > On Tue, Apr 16, 2024 at 05:24:02PM +0100, Russell King (Oracle) wrote:
-> > > On Tue, Apr 16, 2024 at 06:02:08PM +0200, Andrew Lunn wrote:
-> > > > On Tue, Apr 16, 2024 at 05:43:16PM +0200, Stefan Eichenberger wrote:
-> > > > > Hi Andrew,
-> > > > > 
-> > > > > Thanks a lot for the feedback.
-> > > > > 
-> > > > > On Tue, Apr 16, 2024 at 03:46:19PM +0200, Andrew Lunn wrote:
-> > > > > > On Tue, Apr 16, 2024 at 02:10:32PM +0200, Stefan Eichenberger wrote:
-> > > > > > > Add a new device tree property to disable SGMII autonegotiation and
-> > > > > > > instead use the option to match the SGMII speed to what was negotiated
-> > > > > > > on the twisted pair interface (tpi).
-> > > > > > 
-> > > > > > Could you explain this is more detail.
-> > > > > > 
-> > > > > > SGMII always runs its clocks at 1000Mbps. The MAC needs to duplicate
-> > > > > > the symbols 100 times when running at 10Mbs, and 10 times when running
-> > > > > > at 100Mbps.
-> > > > > 
-> > > > > Currently, the mxl-gpy driver uses SGMII autonegotiation for 10 Mbps,
-> > > > > 100 Mbps, and 1000 Mbps. For our Ethernet controller, which is on an
-> > > > > Octeon TX2 SoC, this means that we have to enable "in-band-status" on
-> > > > > the controller. This will work for all three speed settings. However, if
-> > > > > we have a link partner that can do 2.5 Gbps, the mxl-gpy driver will
-> > > > > disable SGMII autonegotiation in gpy_update_interface. This is not
-> > > > > supported by this Ethernet controller because in-band-status is still
-> > > > > enabled. Therefore, we will not be able to transfer data at 2.5 Gbps,
-> > > > > the SGMII link will not go into a working state.
-> > > > 
-> > > > This is where i expect Russel to point out that SGMII does not support
-> > > > 2.5G. What you actually mean is that the PHY swaps to 2500BaseX. And
-> > > > 2500BaseX does not perform speed negotiation, since it only supports
-> > > > 2500. So you also need the MAC to swap to 2500BaseX.
-> > > 
-> > > Yes, absolutely true that SGMII does not support 2.5G... and when
-> > > operating faster, than 2500base-X is normally used.
-> > > 
-> > > How, 2500base-X was slow to be standardised, and consequently different
-> > > manufacturers came up with different ideas. The common theme is that
-> > > it's 1000base-X up-clocked by 2.5x. Where the ideas differ is whether
-> > > in-band negotiation is supported or not. This has been a pain point for
-> > > a while now.
-> > > 
-> > > As I mentioned in my previous two messages, I have an experimental
-> > > patch series that helps to address this.
-> > > 
-> > > The issue is that implementations mix manufacturers, so we need to
-> > > know the capabilities of the PHY and the capabilities of the PCS, and
-> > > then hope that we can find some common ground between their
-> > > requirements.
-> > > 
-> > > There is then the issue that if you're not using phylink, then...
-> > > guess what... you either need to convert to use phylink or implement
-> > > the logic in your own MAC driver to detect what the PHY is doing
-> > > and what its capabilities are - but I think from what you've said,
-> > > you are using phylink.
-> > 
-> > Thanks for the patch series and the explanation. In our use case we have
-> > the mismatch between the PHY and the mvpp2 driver in 2500BaseX mode.
-> 
-> Ah, mvpp2. This is one of those cases where I think you have a
-> disagreement between manufacturers over 2500base-X.
-> 
-> Marvell's documentation clearly states that when operating in 1000base-X
-> mode, AN _must_ be enabled. Since programming 2500base-X is programming
-> the mvpp2 hardware for 1000base-X and then configuring the COMPHY to
-> clock faster, AN must also be enabled when operating at 2500base-X.
-> 
-> It seems you've coupled it with the mxl-gpy PHY which doesn't apparently
-> support AN when in 2500base-X.
-> 
-> Welcome to the mess of 2500base-X, and sadly we finally have the
-> situation that I've feared for years: one end of a 2500base-X link
-> that's documented as requiring AN, and the other end not providing it.
-> 
-> Sigh. If only the IEEE 802.3 committee had been more pro-active and
-> standardised 2500base-X _before_ manufacturers went off and did their
-> own different things.
+Wed, Apr 17, 2024 at 06:37:30AM CEST, jasowang@redhat.com wrote:
+>On Tue, Apr 16, 2024 at 5:37 PM Jiri Pirko <jiri@resnulli.us> wrote:
+>>
+>> Tue, Apr 16, 2024 at 05:52:41AM CEST, jasowang@redhat.com wrote:
+>> >On Tue, Apr 16, 2024 at 12:25 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>> >>
+>> >> From: Jiri Pirko <jiri@nvidia.com>
+>> >>
+>> >> Currently there is no way for user to set what features the driver
+>> >> should obey or not, it is hard wired in the code.
+>> >>
+>> >> In order to be able to debug the device behavior in case some feature is
+>> >> disabled, introduce a debugfs infrastructure with couple of files
+>> >> allowing user to see what features the device advertises and
+>> >> to set filter for features used by driver.
+>> >>
+>> >> Example:
+>> >> $cat /sys/bus/virtio/devices/virtio0/features
+>> >> 1110010111111111111101010000110010000000100000000000000000000000
+>> >> $ echo "5" >/sys/kernel/debug/virtio/virtio0/filter_feature_add
+>> >> $ cat /sys/kernel/debug/virtio/virtio0/filter_features
+>> >> 5
+>> >> $ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/unbind
+>> >> $ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/bind
+>> >> $ cat /sys/bus/virtio/devices/virtio0/features
+>> >> 1110000111111111111101010000110010000000100000000000000000000000
+>> >>
+>> >> Note that sysfs "features" know already exists, this patch does not
+>> >> touch it.
+>> >>
+>> >> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>> >> ---
+>> >
+>> >Note that this can be done already with vp_vdpa feature provisioning:
+>> >
+>> >commit c1ca352d371f724f7fb40f016abdb563aa85fe55
+>> >Author: Jason Wang <jasowang@redhat.com>
+>> >Date:   Tue Sep 27 15:48:10 2022 +0800
+>> >
+>> >    vp_vdpa: support feature provisioning
+>> >
+>> >For example:
+>> >
+>> >vdpa dev add name dev1 mgmtdev pci/0000:02:00.0 device_features 0x300020000
+>>
+>> Sure. My intension was to make the testing possible on any virtio
+>> device.
+>
+>It did that actually, vp_vdpa bridge virtio-pci device into vDPA bus
+>with mediation layer (like feature filtering etc). So it can only run
+>on top of standard virtio-pci device.
+>
+>> Narrowing the testing for vpda would be limitting.
+>
+>Unless you want to use other transport like virtio-mmio.
 
-I also checked the datasheet and you are right about the 1000base-X mode
-and in-band AN. What worked for us so far was to use SGMII mode even for
-2.5Gbps and disable in-band AN (which is possible for SGMII). I think
-this works because as you wrote, the genphy just multiplies the clock by
-2.5 and doesn't care if it's 1000base-X or SGMII. With your patches we
-might even be able to use in-band autonegoation for 10,100 and 1000Mbps
-and then just disable it for 2.5Gbps. I need to test it, but I have hope
-that this should work.
+Also, the goal is to test virtio_net emulated devices. There are couple
+of implementation. Non-vdpa.
 
-Regards,
-Stefan
+
+>
+>Thanks
+>
+>>
+>>
+>> >
+>> >Thanks
+>> >
+>>
+>
 
