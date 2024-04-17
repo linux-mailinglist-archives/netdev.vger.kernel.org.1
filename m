@@ -1,127 +1,183 @@
-Return-Path: <netdev+bounces-88580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E0448A7C4B
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 08:27:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D43EC8A7C5D
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 08:35:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF1FD1C21D79
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 06:27:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 639E21F22CF0
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 06:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6545C57870;
-	Wed, 17 Apr 2024 06:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE87857898;
+	Wed, 17 Apr 2024 06:35:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QwQmjS61"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AZFo5gro"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f47.google.com (mail-ot1-f47.google.com [209.85.210.47])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F0D5A784
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 06:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28253657B0;
+	Wed, 17 Apr 2024 06:35:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713335261; cv=none; b=D2PjM6mLpSdtjKcbZQsOpSfcEA+/ByX74bZKAiKbsdeeVHwG2e1649hcgQQe93KWT3PkyqmARuyqiHs14/PsvZLVegfafZ1uhBsAiqtovKdworsnGmvoUPdl7lyDqjOVquQl7W/jZzmAvXq368OUjo9GVJ0VTpbfnLHj1HXn9RA=
+	t=1713335704; cv=none; b=p7YI4tdxXT2YnrcJiiMd5MLiWoqaPXV2I9VNNOcEzlQqBRa7GDFzXanISlGQu63akknQRYuUGfPVDkeIEVLGe+l+HL2/eZJKDke0kuRmrSO2ZGi3GFnZS2V2b3JesdhzYli5p8A1FfeTk9+wk39Mp9Gss6X7k0O4m6tWYEwypNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713335261; c=relaxed/simple;
-	bh=lG1VqfYPVS5aljnryZS192B21YJzSt3bL0wKDML71Dk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CGWRlvr2SezQRGupT3eWtz/sSQmcuRYRqlcFlAFYlyKIAAs77DxlZUuQ+JJNfy6weBLM+Oj33VO7j+x++jGtReSQM6CD+8B7krAqnatedqizMilPYxgsbFoC3KRejiEIDaZVU8bwf8xZBPPgHHCp7qkbIBoyA3SJLX0QGKpCCv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QwQmjS61; arc=none smtp.client-ip=209.85.210.47
+	s=arc-20240116; t=1713335704; c=relaxed/simple;
+	bh=EKdKhbBfwCgxWOd/SIJMcmDwql5vodTnlVj842FGldY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aas78w/oaHBOv3IiYBX2iOyYOWIwis4mBhFg2R2SJWwQFR4QR0/EBTykqTB/JCqNmuSaoiOwGj1NSiB8cEQLNA1dZPtCKQuqokPuD+5cwQMfh0R7zHDT/V7YbpMJv7uQ6Z6YtU2ZjGqJRcDDe4ACPGixmg+DWAmVXkKXUWP2qjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AZFo5gro; arc=none smtp.client-ip=209.85.218.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f47.google.com with SMTP id 46e09a7af769-6eb812370a5so1601831a34.0
-        for <netdev@vger.kernel.org>; Tue, 16 Apr 2024 23:27:39 -0700 (PDT)
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a5200202c1bso685779366b.0;
+        Tue, 16 Apr 2024 23:35:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713335259; x=1713940059; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1713335701; x=1713940501; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2MWNLBsgAvWpxcDaMrRSKJ3+W1whAYT8zWw7ExmTZfk=;
-        b=QwQmjS61xJNGqTqXKmsodHIZ7hSbNlv8kmN81n0ZIwY3q8xgLFioddfVAhyJixhpiY
-         r7AggenJItr4NYYrOjNIb7T3u76EOdTg0ZMoYl7bXm/3hTLUlR2VW+39DA4qul5ZA9kU
-         OzqXgNqxobIoY31LdX2voCcHtuaz9zPsumMcTt8/HZaMU4S0VozRfe9XtVXZnSpOChIG
-         1qbBFCEuQVFcVAvM9aZH+Zo6CsD6SGUGwZBV4HfeUdWDliS9ox8GXG0o1U6t9Tw1Aijo
-         0MpnSV1+oGVuojyc6UNZoshXUFnpn9dvoPKdXhz/ANFet4uGC6RqlzlX5/vyJzlM6V6m
-         +fjA==
+        bh=p74U05au3463azxpQVZWhtcaru2hq/shbVKOKWYd3z8=;
+        b=AZFo5groRzmbWo988PR1q3jOg88wM0t8YYVS9m1W76ZqJkpNP7ZgZBoR54Z2eSfVqc
+         wAov/C8l53An6AskjOWrYTIN0tye5g/Cv2q+1BMujRu0D8097gybqKZmddbaiNWwj+pU
+         2dX267BTmCwZzQwL3mZK+8c+uo0v5oOPHXcRA2i2bxPbnO9B3XJJD9bClUTCvlFl7Gke
+         JpbHKgsExSUakqw+nqRmeEQo4ZL+/z3wX6x2z+GFM5dTsNVPzAoMhuWS/0csygoakBOK
+         80w3PO+THpdD9oxEfJ8+x17t8wzHo+Pa60OW6UkmCe50r0REJIK1Ppr46WTNSvXvJqeh
+         M0nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713335259; x=1713940059;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1713335701; x=1713940501;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2MWNLBsgAvWpxcDaMrRSKJ3+W1whAYT8zWw7ExmTZfk=;
-        b=LK5p1l5UI8Mo69euk5TN1bdwB0+ZWO3L/t4eoFj+edUlydDFsGCCTMJaEgsAWj7qE7
-         4OU8WYlqmSJWSRefSidRefNwooZ3EvfALz2Orvnv9Iv2CYMsfbOsakGGnDeFMO9HuBsg
-         g/85RkVIUYViS8imI+VsYvSEpG90CxTLy9ItqFViwyVqctEsIONvqxGe9grzYql8vFMd
-         qnFDbAORcXU4ZaDlQoXG1dmzJdHmd98Tw1e7ZLwMPdoz4XBbUeNV2kSZU6rPZJ0Kbz48
-         s28R7cgECnNTVxMRj13+tNU0d/UCGUV0E9E1pAgzkWvuUsAY0AK1BwyPnLDkCpzdldr4
-         ZJMw==
-X-Gm-Message-State: AOJu0Yw4DAungqdnSzIOh6eJGysKrDzzOZp6w7qsBo9tpMyqYPmf1Niq
-	CaW4LwJK1Xzf85TfPZT+mdcIEdd/M5tAkE0fFopS8+dXfEvs0exJ
-X-Google-Smtp-Source: AGHT+IEI6Peo3RP0ZxOU6CcegaA6NGdJ7zZU3BCVAQi8tTemSGFF4BUMEww+E3NyhIJBvnUPlqnv0g==
-X-Received: by 2002:a05:6830:2051:b0:6eb:7d1c:bfdf with SMTP id f17-20020a056830205100b006eb7d1cbfdfmr10544868otp.25.1713335259090;
-        Tue, 16 Apr 2024 23:27:39 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
-        by smtp.gmail.com with ESMTPSA id a193-20020a6390ca000000b005dc120fa3b2sm9821006pge.18.2024.04.16.23.27.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Apr 2024 23:27:38 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v2 3/3] net: rps: locklessly access rflow->cpu
-Date: Wed, 17 Apr 2024 14:27:21 +0800
-Message-Id: <20240417062721.45652-4-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240417062721.45652-1-kerneljasonxing@gmail.com>
-References: <20240417062721.45652-1-kerneljasonxing@gmail.com>
+        bh=p74U05au3463azxpQVZWhtcaru2hq/shbVKOKWYd3z8=;
+        b=kmmNTdhJSVGmL5OrQLjTQ5wJH0u6Aim97J+63yRzcF6/zOzqzPrqjKo5JhTIIjhgek
+         si5M32ZOD24eDCkfxUie2AuEZ6mdMCkhdxkqQkkauYd/VRxruFL31/a0eYY+4n/xjUvN
+         Bz3a1UrydIcAz7eZo5cM963AJUArdpuPkc/NOkk3HvwcHAn6Vw9uy66NdFcxoLkCJI3A
+         yhkjtcMEPTT3PPn45kU+/rgTBYhwivaiSgDHEbe/KYxwOpR/oD55aV42efjTj2w96yIv
+         d2+btEoqtaZUiO0rM4F3ASRIPVa0H7bREQfSGWpb98eL2A1TukCs661fT9PkrLCNLn35
+         nE7g==
+X-Forwarded-Encrypted: i=1; AJvYcCUH7JgsHwJ2vknnIbU+tX479uUyRUjoJ3zRhDtipaq30VBlmpn/DFoFw5ki0xjzq4rk1T9ZQPX02lwa50rSccBUI/XFCjI1
+X-Gm-Message-State: AOJu0Yz3kXtdD3PObAYBzKvrdYrTWU3UOvFcIHnorJpNwIbd8z4WeVTB
+	bhGeelpRaFZVhQkkEKYjqMrqXK1U3W3nXGCySXVdH7gUNSDcH+I7h04Hdbm238JDwA/1yLslWrl
+	0KvJd3pvB1ZfSXEekeyZ7wFGEyCU=
+X-Google-Smtp-Source: AGHT+IGzuG1KQGSuS4q/NVj+STQwFYpIbPNlWccBlyh+4xa+BXzCo7x0l35MjmdifbiwW+oyAqvwqNDvlZGIuYewRI0=
+X-Received: by 2002:a17:906:f90f:b0:a52:225b:602a with SMTP id
+ lc15-20020a170906f90f00b00a52225b602amr12120585ejb.7.1713335701239; Tue, 16
+ Apr 2024 23:35:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAEkJfYOnsLLiCrtgOpq2Upr+_W0dViYVHU8YdjJOi-mxD8H9oQ@mail.gmail.com>
+ <20240416142428.GO2320920@kernel.org>
+In-Reply-To: <20240416142428.GO2320920@kernel.org>
+From: Sam Sun <samsun1006219@gmail.com>
+Date: Wed, 17 Apr 2024 14:34:49 +0800
+Message-ID: <CAEkJfYPR-jeZoVz63b2UmvjgBOen7DDy8yyrojLckD9OT2XaiQ@mail.gmail.com>
+Subject: Re: [PATCH net v3] drivers/net/bonding: Fix out-of-bounds read in bond_option_arp_ip_targets_set()
+To: Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, j.vosburgh@gmail.com, 
+	Hangbin Liu <liuhangbin@gmail.com>, Eric Dumazet <edumazet@google.com>, pabeni@redhat.com, 
+	kuba@kernel.org, andy@greyhouse.net, davem@davemloft.net
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jason Xing <kernelxing@tencent.com>
+On Tue, Apr 16, 2024 at 10:24=E2=80=AFPM Simon Horman <horms@kernel.org> wr=
+ote:
+>
+> On Tue, Apr 16, 2024 at 08:09:44PM +0800, Sam Sun wrote:
+> > In function bond_option_arp_ip_targets_set(), if newval->string is an
+> > empty string, newval->string+1 will point to the byte after the
+> > string, causing an out-of-bound read.
+> >
+> > BUG: KASAN: slab-out-of-bounds in strlen+0x7d/0xa0 lib/string.c:418
+> > Read of size 1 at addr ffff8881119c4781 by task syz-executor665/8107
+> > CPU: 1 PID: 8107 Comm: syz-executor665 Not tainted 6.7.0-rc7 #1
+> > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04=
+/01/2014
+> > Call Trace:
+> >  <TASK>
+> >  __dump_stack lib/dump_stack.c:88 [inline]
+> >  dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
+> >  print_address_description mm/kasan/report.c:364 [inline]
+> >  print_report+0xc1/0x5e0 mm/kasan/report.c:475
+> >  kasan_report+0xbe/0xf0 mm/kasan/report.c:588
+> >  strlen+0x7d/0xa0 lib/string.c:418
+> >  __fortify_strlen include/linux/fortify-string.h:210 [inline]
+> >  in4_pton+0xa3/0x3f0 net/core/utils.c:130
+> >  bond_option_arp_ip_targets_set+0xc2/0x910
+> > drivers/net/bonding/bond_options.c:1201
+> >  __bond_opt_set+0x2a4/0x1030 drivers/net/bonding/bond_options.c:767
+> >  __bond_opt_set_notify+0x48/0x150 drivers/net/bonding/bond_options.c:79=
+2
+> >  bond_opt_tryset_rtnl+0xda/0x160 drivers/net/bonding/bond_options.c:817
+> >  bonding_sysfs_store_option+0xa1/0x120 drivers/net/bonding/bond_sysfs.c=
+:156
+> >  dev_attr_store+0x54/0x80 drivers/base/core.c:2366
+> >  sysfs_kf_write+0x114/0x170 fs/sysfs/file.c:136
+> >  kernfs_fop_write_iter+0x337/0x500 fs/kernfs/file.c:334
+> >  call_write_iter include/linux/fs.h:2020 [inline]
+> >  new_sync_write fs/read_write.c:491 [inline]
+> >  vfs_write+0x96a/0xd80 fs/read_write.c:584
+> >  ksys_write+0x122/0x250 fs/read_write.c:637
+> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+> >  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> > ---[ end trace ]---
+> >
+> > Fix it by adding a check of string length before using it.
+> >
+> > v2
+> > According to Jay and Hangbin's opinion, remove target address in
+> > netdev_err message since target is not initialized in error path and
+> > will not provide useful information.
+> >
+> > v3
+> > According to Hangbin's opinion, change Fixes tag from 4fb0ef585eb2
+> > ("bonding: convert arp_ip_target to use the new option API") to
+> > f9de11a16594 ("bonding: add ip checks when store ip target").
+> >
+> > Fixes: f9de11a16594 ("bonding: add ip checks when store ip target")
+> > Signed-off-by: Yue Sun <samsun1006219@gmail.com>
+> > ---
+>
+> Hi Sam Sun,
+>
+> Some comments about the formatting of this submission:
+>
+> * The list of chances, (v2, v3, ...) should be below rather than
+>   above the scissors ("---"), so it is not included when the patch
+>   is applied.
+>
+> * Looking at git history, the patch prefix should probably be "bonding:"
+>
+>         Subject: [PATCH net v3] bonding: ...
+>
+> * The diff seems to be a bit mangled, f.e. tabs seem to
+>   have been translated into spaces. So it does not apply.
+>   Which breaks automated testing. And for this reason
+>   I am asking you to repost this patch.
+>
+>   git send-email, and b4, are two tools that can typically be used
+>   to send patches in a way that this doesn't occur.
+>
+> ---
+> pw-bot: changes-requested
 
-This is the last member in struct rps_dev_flow which should be
-protected locklessly. So finish it.
+I sincerely apologize for not using git send-email. I tried to set up
+the environment but it did not work. For some reason, I needed to use
+a proxy to connect with my gmail account, but the proxy service
+provider banned using their proxy to send email through smtp. Maybe I
+need to rent a VPS and set up a working environment there, but it
+would take time and I don't know for sure whether the VPS provider
+would allow me to send email through smtp either.
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- net/core/dev.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Could you or anyone please help me submit this patch? Sorry for
+causing this trouble.
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 40a535158e45..aeb45025e2bc 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4533,7 +4533,7 @@ set_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 		rps_input_queue_tail_save(&rflow->last_qtail, head);
- 	}
- 
--	rflow->cpu = next_cpu;
-+	WRITE_ONCE(rflow->cpu, next_cpu);
- 	return rflow;
- }
- 
-@@ -4597,7 +4597,7 @@ static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 		 * we can look at the local (per receive queue) flow table
- 		 */
- 		rflow = &flow_table->flows[hash & flow_table->mask];
--		tcpu = rflow->cpu;
-+		tcpu = READ_ONCE(rflow->cpu);
- 
- 		/*
- 		 * If the desired CPU (where last recvmsg was done) is
--- 
-2.37.3
-
+Best Regards,
+Yue
 
