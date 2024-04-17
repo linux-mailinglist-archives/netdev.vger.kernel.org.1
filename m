@@ -1,228 +1,157 @@
-Return-Path: <netdev+bounces-88702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71F888A84DC
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:38:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 567DF8A8502
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:42:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94CA41C20CF5
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 13:38:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 882241C20849
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 13:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE49140380;
-	Wed, 17 Apr 2024 13:38:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29C3D13BAFB;
+	Wed, 17 Apr 2024 13:41:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ouS5hiro"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MuiMdD9m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C9013D89F
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 13:38:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AFD13EFEC
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 13:41:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713361085; cv=none; b=ceLgtS5bHVWbS2DwSXCoC/2p3gX2+M/xRmyNUYCBnpGWAK7d+Wi/lTYsAbT/4Cg3DorcWWqV9y2mxvc2QJGkB9EdisG0UNxCIF+a8HxmRCa7WBU7RKUkWocc09MbzQYs7xzUY9q8WQutt/Q/4MZfhSRbPHExwbcP/U6N3E/V3n4=
+	t=1713361311; cv=none; b=lGmkrsimzDZMMk7obKlJq9VR5xCowgp2+JQ37y/DhCfBqYPsDs/L0yU9qKNy7lUbTybwcMMXjQE7ottXIzJ/uMWKtqXaMgbPpWjZ3eb3xSx7skPHF6Rlczk4qNdw6taZjnVEHZ011xqfYsk5KxJWEdQUR+Bv84RDH8z5zzOsh2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713361085; c=relaxed/simple;
-	bh=SrAwHiw5DS+3uTSjKRZI5h+3ICzAKM4DzCwh7BbwxAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=TN4pPIrWpiJa6KVK/hCu3G96+ETUg3449dxP/HMzqZ9oB/46opisTOvg/TJik07RHKt57hxtTrt2LXMhKwcAnmJ5oLtgSIQY3ObK0YxtzNs6oJdZKz8FHfsllrwpoqVX3qhINAQe6n8C0ib90LBqmPm1wnt7dG6Do8pD9b3NkFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ouS5hiro; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a555b203587so75108566b.3
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 06:38:02 -0700 (PDT)
+	s=arc-20240116; t=1713361311; c=relaxed/simple;
+	bh=X+/cfiR4iNqSKXq8lW33tt99/MeuzNZg7ukPyI8/gjE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qklUocw1P31ps8kmPjP1QtpzwaM+SMYo3KrcuSLZC4ZXToPH4bSupzeLKHe0S8RDRnZZpWtWwA0EgIRgf3JnXsvcD+7JRRf5B+r/JL8AaYq5sg0Hw1v70v/qln8+ikrHqd6fsPDtwqqxSJgIJNZ0xRp4eE6dhQNVsVyLjosYmyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MuiMdD9m; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5700ed3017fso13967a12.1
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 06:41:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713361081; x=1713965881; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8/KcmpYcei3Au2kK2wtQQuvWtpfCCMou6DWdFUvWLAs=;
-        b=ouS5hiro/cWi0hG34ogY8GhoCee2yv3BsnNhum7rxFQ1YZ12w3/XswkUmUQzi7b0Ju
-         UDcC96pZL4Z+QBxgemtDCfA6x5MfdmOGHVGhhQ9YqzFynF6xQrzVkZGl/RvN04vH1HCH
-         gbk6sdRylFDrL/66/6H9S3c/GlgwHVBCNY/EXyACwJq25LVzXW9mYddG9c3u6+iuTvXI
-         E7kzj7AP4kCREHNBlwISUeSnK+VMPfiJ/ZQNpYcuvP23VRwwQ7x7KnFGEeDTRUiHhS2I
-         nUJzHSIQlec8+tK5l3mVgiUXv6dlShEHqi8tBRK9s3wcKgEidzx8P+eMf0NHLcLrrsbD
-         Ghjw==
+        d=google.com; s=20230601; t=1713361308; x=1713966108; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ir6mAZ6zXQKjXFH2S4EFREhOkP7PFDaMNclShTW76p0=;
+        b=MuiMdD9mlCspBTSbizzONZA33owHoLbDeRPYP5/5bRng7hGTXflhzo5BFlLguHJ9No
+         x17V8QVolqFHfdDpbCecNFNUaZ207zNGsHaTFKl4zGeB0LB/9pFzja1Xaccpg6ug9P0r
+         zeA9RAH2m3QBEZzBi7Jm/U32BcCWo3ELznRsi+kwYNPgBvS3ShZamRPCmBZLb0j4kuRs
+         5di0l0dENZoSSYRqeyO0jO7KbL83k/e7dB1V6XoX+dG5j2bPmVWz+2UCpWth8Ck+y4/x
+         KZwui+cb/8UKWV47c1OfUfYKk/XVkOP5wOfktUQB9vYraq6gSs9NCPRxSv2nh4Qg+sT+
+         LJmA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713361081; x=1713965881;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8/KcmpYcei3Au2kK2wtQQuvWtpfCCMou6DWdFUvWLAs=;
-        b=LAyUwhf3Se8oH9HRCnSAAzESBeTHWH/NjjGLONmRDwrJf4gev4Qp2TiM5iqY0jhpy1
-         JMvCLVr+C0ZKHmTt4JPthM3YI9EXUhxwkbSMhYrcj4tfMNagTiNvI8KciDskpbTaXnMW
-         PU/BPOFGKrRYwGDbU+Ts9wiGIXwqWqHygXJz1CpoYKeHPT0GGp75wlwcIi6sW68h8pwy
-         v0aFHlpTvCztdr/Gjr/akXRsu/P9ZZY0s7VZ4Xc9JCOvVj7NaK7Hv5ZW5LlPDf2wdxCp
-         LgvS6prlt8oVlhl5G0xq126HZ08hexY69nMjxVyQCPM+egi9vMbv0zWxiKio+62KWfAJ
-         QzZA==
-X-Forwarded-Encrypted: i=1; AJvYcCUWSXmx0Ox2FoSzqQS1S2wjwsGVuZiyKKREyT8ozLNGnSGTRkpnsbeeZlBhMPL3SNS4hb9Dy9T3YvqgbAIbv8VQFGo94ItL
-X-Gm-Message-State: AOJu0YxbdvysO/imbl2weYzs4EgnS4eYlbEnNqJwyUuWrESyAZeVQbJ0
-	qTElZORMgiu+gGXmyXKWRMeHmOT1EqGO+4CLh8s9MmoB3VSLNVhYsYwz837lke8=
-X-Google-Smtp-Source: AGHT+IH8LxCS7KS5d8H7g/NIwyGENvuKbbtlWI07tDHjS6X1fV1ErfXpF9XVc1J7DgEdG+8mWfhWYA==
-X-Received: by 2002:a17:906:dc8f:b0:a51:af7d:4652 with SMTP id cs15-20020a170906dc8f00b00a51af7d4652mr15531363ejc.32.1713361080838;
-        Wed, 17 Apr 2024 06:38:00 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id y9-20020a170906470900b00a51a74409dcsm8216147ejq.221.2024.04.17.06.37.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Apr 2024 06:38:00 -0700 (PDT)
-Date: Wed, 17 Apr 2024 16:37:56 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Geetha sowjanya <gakula@marvell.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, kuba@kernel.org,
-	davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
-	sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com
-Subject: Re: [net-next PATCH 2/9] octeontx2-pf: RVU representor driver
-Message-ID: <546b7783-78ec-4fec-b338-f1980a5871d0@moroto.mountain>
+        d=1e100.net; s=20230601; t=1713361308; x=1713966108;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ir6mAZ6zXQKjXFH2S4EFREhOkP7PFDaMNclShTW76p0=;
+        b=xIJxF86mDIyMDQCYhJIkQajDxa2mtmFeUuz3EjiLVZyHCzhDQYL/ueAWZFLX5I1kWE
+         HGvYxV5xrKvSq5hw6408+4wVNFq1C5gaet4wHE1o8CagewULrZyceL+aBd2quq2/2CHG
+         C5d+40uoDk27FMXkLlsXiQVL5aucbPzV5L0IrEpZAu3QxkmU/DvAn2ZteRe7vZVr9h9S
+         Addi8fXrqj8oLqr3ZrmnuP4OnARNqnL00ikFlcMIJdjtUFsSdkHHhbVcFjU8CVLRTAze
+         ZH5ZwTvqaaZTMBp5VJhnRtNnGC0izNi28VEEKesMVDPkPSoErtyiLcDEtA1TrjhxVzu0
+         GV7w==
+X-Forwarded-Encrypted: i=1; AJvYcCUijYThXFtLPB0cw2lenm0B7KbOXVj1co/xxD7QOcktsIRQAMhexW/kh2GX3M72cT1hx4L629OXxCTBF51/gLDhhlT3N5S/
+X-Gm-Message-State: AOJu0YwFFxRQM+yKjNpgBtmUt9KYeFXPQ69gA5t9W98LWg4fGWtdAt0T
+	hlRSQ8Pvi3NPqmyLP2k26L6RkX5FmsY9FzZIUkR9aQc3C2/khDEhArwVLNVc98PSqEi3twyTLV0
+	1Os3nSTtw/qgrFy0OlfEgCtAOcgUGE/iKQc8o
+X-Google-Smtp-Source: AGHT+IFsb715k64J9SwPrrrSA5GdkhJwQXlEH6djqerBuf23jjhspvA88wftknnWwOnPxpMx54ju/XCyqWdsb2plHeU=
+X-Received: by 2002:aa7:d749:0:b0:570:320c:821a with SMTP id
+ a9-20020aa7d749000000b00570320c821amr212557eds.2.1713361307496; Wed, 17 Apr
+ 2024 06:41:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240416050616.6056-3-gakula@marvell.com>
+References: <20240415132054.3822230-1-edumazet@google.com> <20240415132054.3822230-5-edumazet@google.com>
+ <20240417131404.GX2320920@kernel.org>
+In-Reply-To: <20240417131404.GX2320920@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 17 Apr 2024 15:41:36 +0200
+Message-ID: <CANn89iJkEzcU1-8yJF6AvYUqiE1U8-4oUcLOe73EtV=sHHnjZw@mail.gmail.com>
+Subject: Re: [PATCH net-next 04/14] net_sched: sch_choke: implement lockless choke_dump()
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Geetha,
+On Wed, Apr 17, 2024 at 3:14=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
+te:
+>
+> On Mon, Apr 15, 2024 at 01:20:44PM +0000, Eric Dumazet wrote:
+> > Instead of relying on RTNL, choke_dump() can use READ_ONCE()
+> > annotations, paired with WRITE_ONCE() ones in choke_change().
+> >
+> > Also use READ_ONCE(q->limit) in choke_enqueue() as the value
+> > could change from choke_change().
+>
+> Hi Eric,
+>
+> I'm wondering if you could expand on why q->limit needs this treatment
+> but not other fields, f.e. q->parms.qth_min (aka p->qth_min).
 
-kernel test robot noticed the following build warnings:
+Other fields got their WRITE_ONCE() in red_set_parms()
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Geetha-sowjanya/octeontx2-pf-Refactoring-RVU-driver/20240416-131052
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240416050616.6056-3-gakula%40marvell.com
-patch subject: [net-next PATCH 2/9] octeontx2-pf: RVU representor driver
-config: alpha-randconfig-r081-20240417 (https://download.01.org/0day-ci/archive/20240417/202404172056.MpOMwcGB-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.2.0
++       WRITE_ONCE(p->qth_min, qth_min << Wlog);
++       WRITE_ONCE(p->qth_max, qth_max << Wlog);
++       WRITE_ONCE(p->Wlog, Wlog);
++       WRITE_ONCE(p->Plog, Plog);
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202404172056.MpOMwcGB-lkp@intel.com/
 
-New smatch warnings:
-drivers/net/ethernet/marvell/octeontx2/nic/rep.c:95 rvu_get_rep_cnt() warn: passing zero to 'PTR_ERR'
-drivers/net/ethernet/marvell/octeontx2/nic/rep.c:140 rvu_rep_probe() warn: missing unwind goto?
+>
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > ---
+> >  include/net/red.h     | 10 +++++-----
+> >  net/sched/sch_choke.c | 23 ++++++++++++-----------
+> >  2 files changed, 17 insertions(+), 16 deletions(-)
+> >
+> > diff --git a/include/net/red.h b/include/net/red.h
+>
+> ...
+>
+> > @@ -244,7 +244,7 @@ static inline void red_set_parms(struct red_parms *=
+p,
+> >               max_P =3D red_maxp(Plog);
+> >               max_P *=3D delta; /* max_P =3D (qth_max - qth_min)/2^Plog=
+ */
+> >       }
+> > -     p->max_P =3D max_P;
+> > +     WRITE_ONCE(p->max_P, max_P);
+> >       max_p_delta =3D max_P / delta;
+> >       max_p_delta =3D max(max_p_delta, 1U);
+> >       p->max_P_reciprocal  =3D reciprocal_value(max_p_delta);
+>
+> A little further down in this function p->Scell_log is set.
+> I think it also needs the WRITE_ONCE() treatment as it
+> is read in choke_dump().
+>
 
-vim +/PTR_ERR +95 drivers/net/ethernet/marvell/octeontx2/nic/rep.c
+I will squash in v2 the missing WRITE_ONCE(), thanks !
 
-1e15129a77b419 Geetha sowjanya 2024-04-16   76  static int rvu_get_rep_cnt(struct otx2_nic *priv)
-1e15129a77b419 Geetha sowjanya 2024-04-16   77  {
-1e15129a77b419 Geetha sowjanya 2024-04-16   78  	struct get_rep_cnt_rsp *rsp;
-1e15129a77b419 Geetha sowjanya 2024-04-16   79  	struct mbox_msghdr *msghdr;
-1e15129a77b419 Geetha sowjanya 2024-04-16   80  	struct msg_req *req;
-1e15129a77b419 Geetha sowjanya 2024-04-16   81  	int err, rep;
-1e15129a77b419 Geetha sowjanya 2024-04-16   82  
-1e15129a77b419 Geetha sowjanya 2024-04-16   83  	mutex_lock(&priv->mbox.lock);
-1e15129a77b419 Geetha sowjanya 2024-04-16   84  	req = otx2_mbox_alloc_msg_get_rep_cnt(&priv->mbox);
-1e15129a77b419 Geetha sowjanya 2024-04-16   85  	if (!req) {
-1e15129a77b419 Geetha sowjanya 2024-04-16   86  		mutex_unlock(&priv->mbox.lock);
-1e15129a77b419 Geetha sowjanya 2024-04-16   87  		return -ENOMEM;
-1e15129a77b419 Geetha sowjanya 2024-04-16   88  	}
-1e15129a77b419 Geetha sowjanya 2024-04-16   89  	err = otx2_sync_mbox_msg(&priv->mbox);
-1e15129a77b419 Geetha sowjanya 2024-04-16   90  	if (err)
-1e15129a77b419 Geetha sowjanya 2024-04-16   91  		goto exit;
-1e15129a77b419 Geetha sowjanya 2024-04-16   92  
-1e15129a77b419 Geetha sowjanya 2024-04-16   93  	msghdr = otx2_mbox_get_rsp(&priv->mbox.mbox, 0, &req->hdr);
-1e15129a77b419 Geetha sowjanya 2024-04-16   94  	if (IS_ERR(msghdr)) {
-1e15129a77b419 Geetha sowjanya 2024-04-16  @95  		err = PTR_ERR(rsp);
-                                                                              ^^^
-s/rsp/msghdr/
+diff --git a/include/net/red.h b/include/net/red.h
+index 7daf7cf6130aeccf3d81a77600f4445759f174b7..802287d52c9e37e76ba9154539f=
+511629e4b9780
+100644
+--- a/include/net/red.h
++++ b/include/net/red.h
+@@ -257,7 +257,7 @@ static inline void red_set_parms(struct red_parms *p,
+        p->target_min =3D qth_min + 2*delta;
+        p->target_max =3D qth_min + 3*delta;
 
-1e15129a77b419 Geetha sowjanya 2024-04-16   96  		goto exit;
-1e15129a77b419 Geetha sowjanya 2024-04-16   97  	}
-1e15129a77b419 Geetha sowjanya 2024-04-16   98  
-1e15129a77b419 Geetha sowjanya 2024-04-16   99  	rsp = (struct get_rep_cnt_rsp *)msghdr;
-1e15129a77b419 Geetha sowjanya 2024-04-16  100  	priv->hw.tx_queues = rsp->rep_cnt;
-1e15129a77b419 Geetha sowjanya 2024-04-16  101  	priv->hw.rx_queues = rsp->rep_cnt;
-1e15129a77b419 Geetha sowjanya 2024-04-16  102  	priv->rep_cnt = rsp->rep_cnt;
-1e15129a77b419 Geetha sowjanya 2024-04-16  103  	for (rep = 0; rep < priv->rep_cnt; rep++)
-1e15129a77b419 Geetha sowjanya 2024-04-16  104  		priv->rep_pf_map[rep] = rsp->rep_pf_map[rep];
-1e15129a77b419 Geetha sowjanya 2024-04-16  105  
-1e15129a77b419 Geetha sowjanya 2024-04-16  106  exit:
-1e15129a77b419 Geetha sowjanya 2024-04-16  107  	mutex_unlock(&priv->mbox.lock);
-1e15129a77b419 Geetha sowjanya 2024-04-16  108  	return err;
-1e15129a77b419 Geetha sowjanya 2024-04-16  109  }
-1e15129a77b419 Geetha sowjanya 2024-04-16  110  
-1e15129a77b419 Geetha sowjanya 2024-04-16  111  static int rvu_rep_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-1e15129a77b419 Geetha sowjanya 2024-04-16  112  {
-1e15129a77b419 Geetha sowjanya 2024-04-16  113  	struct device *dev = &pdev->dev;
-1e15129a77b419 Geetha sowjanya 2024-04-16  114  	struct otx2_nic *priv;
-1e15129a77b419 Geetha sowjanya 2024-04-16  115  	struct otx2_hw *hw;
-1e15129a77b419 Geetha sowjanya 2024-04-16  116  	int err;
-1e15129a77b419 Geetha sowjanya 2024-04-16  117  
-1e15129a77b419 Geetha sowjanya 2024-04-16  118  	err = pcim_enable_device(pdev);
-1e15129a77b419 Geetha sowjanya 2024-04-16  119  	if (err) {
-1e15129a77b419 Geetha sowjanya 2024-04-16  120  		dev_err(dev, "Failed to enable PCI device\n");
-1e15129a77b419 Geetha sowjanya 2024-04-16  121  		return err;
-1e15129a77b419 Geetha sowjanya 2024-04-16  122  	}
-1e15129a77b419 Geetha sowjanya 2024-04-16  123  
-1e15129a77b419 Geetha sowjanya 2024-04-16  124  	err = pci_request_regions(pdev, DRV_NAME);
-1e15129a77b419 Geetha sowjanya 2024-04-16  125  	if (err) {
-1e15129a77b419 Geetha sowjanya 2024-04-16  126  		dev_err(dev, "PCI request regions failed 0x%x\n", err);
-1e15129a77b419 Geetha sowjanya 2024-04-16  127  		return err;
-1e15129a77b419 Geetha sowjanya 2024-04-16  128  	}
-1e15129a77b419 Geetha sowjanya 2024-04-16  129  
-1e15129a77b419 Geetha sowjanya 2024-04-16  130  	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
-1e15129a77b419 Geetha sowjanya 2024-04-16  131  	if (err) {
-1e15129a77b419 Geetha sowjanya 2024-04-16  132  		dev_err(dev, "DMA mask config failed, abort\n");
-1e15129a77b419 Geetha sowjanya 2024-04-16  133  		goto err_release_regions;
-1e15129a77b419 Geetha sowjanya 2024-04-16  134  	}
-1e15129a77b419 Geetha sowjanya 2024-04-16  135  
-1e15129a77b419 Geetha sowjanya 2024-04-16  136  	pci_set_master(pdev);
-1e15129a77b419 Geetha sowjanya 2024-04-16  137  
-1e15129a77b419 Geetha sowjanya 2024-04-16  138  	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
-1e15129a77b419 Geetha sowjanya 2024-04-16  139  	if (!priv)
-1e15129a77b419 Geetha sowjanya 2024-04-16 @140  		return -ENOMEM;
+-       p->Scell_log    =3D Scell_log;
++       WRITE_ONCE(p->Scell_log, Scell_log);
+        p->Scell_max    =3D (255 << Scell_log);
 
-goto err_release_regions.
-
-1e15129a77b419 Geetha sowjanya 2024-04-16  141  	pci_set_drvdata(pdev, priv);
-1e15129a77b419 Geetha sowjanya 2024-04-16  142  	priv->pdev = pdev;
-1e15129a77b419 Geetha sowjanya 2024-04-16  143  	priv->dev = dev;
-1e15129a77b419 Geetha sowjanya 2024-04-16  144  	priv->flags |= OTX2_FLAG_INTF_DOWN;
-1e15129a77b419 Geetha sowjanya 2024-04-16  145  	priv->flags |= OTX2_FLAG_REP_MODE_ENABLED;
-1e15129a77b419 Geetha sowjanya 2024-04-16  146  
-1e15129a77b419 Geetha sowjanya 2024-04-16  147  	hw = &priv->hw;
-1e15129a77b419 Geetha sowjanya 2024-04-16  148  	hw->pdev = pdev;
-1e15129a77b419 Geetha sowjanya 2024-04-16  149  	hw->max_queues = OTX2_MAX_CQ_CNT;
-1e15129a77b419 Geetha sowjanya 2024-04-16  150  	hw->rbuf_len = OTX2_DEFAULT_RBUF_LEN;
-1e15129a77b419 Geetha sowjanya 2024-04-16  151  	hw->xqe_size = 128;
-1e15129a77b419 Geetha sowjanya 2024-04-16  152  
-1e15129a77b419 Geetha sowjanya 2024-04-16  153  	err = otx2_init_rsrc(pdev, priv);
-1e15129a77b419 Geetha sowjanya 2024-04-16  154  	if (err)
-1e15129a77b419 Geetha sowjanya 2024-04-16  155  		goto err_release_regions;
-1e15129a77b419 Geetha sowjanya 2024-04-16  156  
-1e15129a77b419 Geetha sowjanya 2024-04-16  157  	err = rvu_get_rep_cnt(priv);
-1e15129a77b419 Geetha sowjanya 2024-04-16  158  	if (err)
-1e15129a77b419 Geetha sowjanya 2024-04-16  159  		goto err_detach_rsrc;
-1e15129a77b419 Geetha sowjanya 2024-04-16  160  
-1e15129a77b419 Geetha sowjanya 2024-04-16  161  	err = rvu_rep_rsrc_init(priv);
-1e15129a77b419 Geetha sowjanya 2024-04-16  162  	if (err)
-1e15129a77b419 Geetha sowjanya 2024-04-16  163  		goto err_detach_rsrc;
-1e15129a77b419 Geetha sowjanya 2024-04-16  164  
-1e15129a77b419 Geetha sowjanya 2024-04-16  165  	return 0;
-1e15129a77b419 Geetha sowjanya 2024-04-16  166  
-1e15129a77b419 Geetha sowjanya 2024-04-16  167  err_detach_rsrc:
-1e15129a77b419 Geetha sowjanya 2024-04-16  168  	if (priv->hw.lmt_info)
-1e15129a77b419 Geetha sowjanya 2024-04-16  169  		free_percpu(priv->hw.lmt_info);
-1e15129a77b419 Geetha sowjanya 2024-04-16  170  	if (test_bit(CN10K_LMTST, &priv->hw.cap_flag))
-1e15129a77b419 Geetha sowjanya 2024-04-16  171  		qmem_free(priv->dev, priv->dync_lmt);
-1e15129a77b419 Geetha sowjanya 2024-04-16  172  	otx2_detach_resources(&priv->mbox);
-1e15129a77b419 Geetha sowjanya 2024-04-16  173  	otx2_disable_mbox_intr(priv);
-1e15129a77b419 Geetha sowjanya 2024-04-16  174  	otx2_pfaf_mbox_destroy(priv);
-1e15129a77b419 Geetha sowjanya 2024-04-16  175  	pci_free_irq_vectors(pdev);
-1e15129a77b419 Geetha sowjanya 2024-04-16  176  err_release_regions:
-1e15129a77b419 Geetha sowjanya 2024-04-16  177  	pci_set_drvdata(pdev, NULL);
-1e15129a77b419 Geetha sowjanya 2024-04-16  178  	pci_release_regions(pdev);
-1e15129a77b419 Geetha sowjanya 2024-04-16  179  	return err;
-1e15129a77b419 Geetha sowjanya 2024-04-16  180  }
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
-
+        if (stab)
 
