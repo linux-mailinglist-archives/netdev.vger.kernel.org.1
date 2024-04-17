@@ -1,64 +1,63 @@
-Return-Path: <netdev+bounces-88642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5032E8A7F91
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:24:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 96E2E8A7F92
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:25:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E568281806
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:24:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 536142816F7
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:25:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3F713A259;
-	Wed, 17 Apr 2024 09:23:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0DA1292F2;
+	Wed, 17 Apr 2024 09:25:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cEqZ5pnU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jhMosd0s"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 374AE12FB3E
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 09:23:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1378CE572
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 09:25:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713345823; cv=none; b=P+COkU4NIhq3XyGFpfQFXf6Qn/FU3z+eIvPOXbycB6UMvCRSkaomN22AewP1UdHCIHNt0NglcmMIXf+YFWZBTlFCltK3NNX+OaOQPwc0q/O41UQFuzrB2GCYzZpGMYfZKRvn41AW9C8lvGdTSmb5i2MUsRvsMJV9Ozu47jPiHfI=
+	t=1713345903; cv=none; b=JkVKX0RTve8fp4EeUKsaSBV9qtf4ltsKsp0zp68BSsqC9jl2PRQnmHBLUOMNZrIfUBMM11/KO5cEehjyIwVoj/KwUUvJ95iSEc6T+QEECulcC6MSIjNFLiHBGsznN0Znomdbn8z6n6fzqxtVlv5qs+CAhXhgmTDhyQ16do3tELw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713345823; c=relaxed/simple;
-	bh=NwvTcqsLSHiNBxj71cJNo8o1PpgdRSNp+v2iXI02XDU=;
+	s=arc-20240116; t=1713345903; c=relaxed/simple;
+	bh=fNMmbkJuU3IED0ufkEjMnLl7wKiPZUgjwjUWyLlUhi0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=f+r3yTksFp30sNa9V/5NuYh4Moah46yo2bCUM7PVIfajbtKwBd0HryBGWHDZHpUNLHhc8XKBq5nPg64VlFBLA9BgM/QEyGW/cmaY80jHw0/V++giKIsbeCYpau3LpY5e+ZM2w5jfaMsHYwNGRvKTIOVZTDvWGd6FMV/d2/NpOrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cEqZ5pnU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A70B1C32783;
-	Wed, 17 Apr 2024 09:23:40 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=m319kO4+ZePcuZBWez7TVigmjRi1AtjccF9bW8ArpPjlX7KzqWVBMvPzjRSq2vljBIN7g1S35tn/fYYY3ipdHXOEA4UrzXM1liPO0f97Z5msnYiJDzLvOX5DaUGlWY5lehHsvCZnGw0V+uH5R9TaKqeGFyPINBCQiHTmRTP5jC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jhMosd0s; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 484C7C072AA;
+	Wed, 17 Apr 2024 09:25:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713345822;
-	bh=NwvTcqsLSHiNBxj71cJNo8o1PpgdRSNp+v2iXI02XDU=;
+	s=k20201202; t=1713345902;
+	bh=fNMmbkJuU3IED0ufkEjMnLl7wKiPZUgjwjUWyLlUhi0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cEqZ5pnUmdLFU1grip03BOg5GXU+FYftxMCMGOFtyyIniKR5TStxwjz9HWT72naE1
-	 JhOUmuqLcbzjPsW/oUtLbyuZ5wTnEtGDpllGeL95dp6hmXmpNZ/zR9b45cbzwHEnU2
-	 r+E4HkBmscA4WdBwtEL4lvobnBrMH8PTh0fOiwYbjvQF3iWnAu0xxq+osBq+qAk86b
-	 GExyQm/IBeu4Tz4Kq7ad3RHlKEUw1ryzisrxv+y3fNVFJKwQTrTS47kc7ZgxVBDBmF
-	 8Ms1eoMJp2OOEROI6m7XwjmzcjHG4U+iyd5zIZHBaUglXNv2tQA/DfO0j/3KYQwVMY
-	 aVA2gZwfas0Uw==
-Date: Wed, 17 Apr 2024 10:23:38 +0100
+	b=jhMosd0sVYSxhty5VZQJtOKDbZpBuuMr9dbR87T/sE9gEtvH7yqm+qV+BreZ77e8O
+	 Ck5bcDar2Y4LDAbVAX/DdGBXjsy+gsaD7ruxXLQ2SI13VAeWd5zTnw8Oi6EpjyVu4y
+	 tlHzaDb22+zfeL1on1MxpozyTrF0h1r3f+dvRCXMcAzE7rImBjVcsU3dACiHvhjpQU
+	 XOeHCBjKReoaUKgByeun6bUhB/wC2wqSSVD5h/YGKw7Tj/yc2hgEzduQiDAVKs3YDj
+	 QFR5pxIexnHy6dwA2drSJRcI1th8Zl5JX4JgnCNNhq08+gv5VaOimH3XcClwm5nukK
+	 AiSZF3OrJHFZg==
+Date: Wed, 17 Apr 2024 10:24:57 +0100
 From: Simon Horman <horms@kernel.org>
 To: Eric Dumazet <edumazet@google.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Jamal Hadi Salim <jhs@mojatatu.com>,
 	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 01/14] net_sched: sch_fq: implement lockless
- fq_dump()
-Message-ID: <20240417092338.GU2320920@kernel.org>
+	netdev@vger.kernel.org, eric.dumazet@gmail.com,
+	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
+	cake@lists.bufferbloat.net
+Subject: Re: [PATCH net-next 02/14] net_sched: cake: implement lockless
+ cake_dump()
+Message-ID: <20240417092457.GV2320920@kernel.org>
 References: <20240415132054.3822230-1-edumazet@google.com>
- <20240415132054.3822230-2-edumazet@google.com>
- <20240416181915.GT2320920@kernel.org>
- <CANn89i+X3zkk-RwRVuMursG-RY+R6P29AWK-pjjVuNKT91VsJw@mail.gmail.com>
- <CANn89i+iNKvCv+RPtCa4KOY9DCEQJfGP9xHSedFUbWZHt2DSFw@mail.gmail.com>
- <20240417090046.GB3846178@kernel.org>
- <CANn89iJwJHz4T-Rz03TYJcGCn8fBUncK-Wbefn_zPDh7Vy80Kw@mail.gmail.com>
+ <20240415132054.3822230-3-edumazet@google.com>
+ <20240417083549.GA3846178@kernel.org>
+ <CANn89i+MF3F8Q063USmLYvyrffBKQRvb3ZM2c1MhAbFOwk9B-A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,105 +67,96 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iJwJHz4T-Rz03TYJcGCn8fBUncK-Wbefn_zPDh7Vy80Kw@mail.gmail.com>
+In-Reply-To: <CANn89i+MF3F8Q063USmLYvyrffBKQRvb3ZM2c1MhAbFOwk9B-A@mail.gmail.com>
 
-On Wed, Apr 17, 2024 at 11:02:55AM +0200, Eric Dumazet wrote:
-> On Wed, Apr 17, 2024 at 11:00 AM Simon Horman <horms@kernel.org> wrote:
+On Wed, Apr 17, 2024 at 10:54:30AM +0200, Eric Dumazet wrote:
+> On Wed, Apr 17, 2024 at 10:35 AM Simon Horman <horms@kernel.org> wrote:
 > >
-> > On Wed, Apr 17, 2024 at 10:45:09AM +0200, Eric Dumazet wrote:
-> > > On Tue, Apr 16, 2024 at 8:33 PM Eric Dumazet <edumazet@google.com> wrote:
-> > > >
-> > > > On Tue, Apr 16, 2024 at 8:19 PM Simon Horman <horms@kernel.org> wrote:
-> > > > >
-> > > > > On Mon, Apr 15, 2024 at 01:20:41PM +0000, Eric Dumazet wrote:
-> > > > > > Instead of relying on RTNL, fq_dump() can use READ_ONCE()
-> > > > > > annotations, paired with WRITE_ONCE() in fq_change()
-> > > > > >
-> > > > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > > > > ---
-> > > > > >  net/sched/sch_fq.c | 96 +++++++++++++++++++++++++++++-----------------
-> > > > > >  1 file changed, 60 insertions(+), 36 deletions(-)
-> > > > > >
-> > > > > > diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-> > > > > > index cdf23ff16f40bf244bb822e76016fde44e0c439b..934c220b3f4336dc2f70af74d7758218492b675d 100644
-> > > > > > --- a/net/sched/sch_fq.c
-> > > > > > +++ b/net/sched/sch_fq.c
-> > > > > > @@ -888,7 +888,7 @@ static int fq_resize(struct Qdisc *sch, u32 log)
-> > > > > >               fq_rehash(q, old_fq_root, q->fq_trees_log, array, log);
-> > > > > >
-> > > > > >       q->fq_root = array;
-> > > > > > -     q->fq_trees_log = log;
-> > > > > > +     WRITE_ONCE(q->fq_trees_log, log);
-> > > > > >
-> > > > > >       sch_tree_unlock(sch);
-> > > > > >
-> > > > > > @@ -931,7 +931,7 @@ static void fq_prio2band_compress_crumb(const u8 *in, u8 *out)
-> > > > > >
-> > > > > >       memset(out, 0, num_elems / 4);
-> > > > > >       for (i = 0; i < num_elems; i++)
-> > > > > > -             out[i / 4] |= in[i] << (2 * (i & 0x3));
-> > > > > > +             out[i / 4] |= READ_ONCE(in[i]) << (2 * (i & 0x3));
-> > > > > >  }
-> > > > > >
-> > > > >
-> > > > > Hi Eric,
-> > > > >
-> > > > > I am a little unsure about the handling of q->prio2band in this patch.
-> > > > >
-> > > > > It seems to me that fq_prio2band_compress_crumb() is used to
-> > > > > to store values in q->prio2band, and is called (indirectly)
-> > > > > from fq_change() (and directly from fq_init()).
-> > > > >
-> > > > > While fq_prio2band_decompress_crumb() is used to read values
-> > > > > from q->prio2band, and is called from fq_dump().
-> > > > >
-> > > > > So I am wondering if should use WRITE_ONCE() when storing elements
-> > > > > of out. And fq_prio2band_decompress_crumb should use READ_ONCE when
-> > > > > reading elements of in.
-> > > >
-> > > > Yeah, you are probably right, I recall being a bit lazy on this part,
-> > > > thanks !
+> > + Toke Høiland-Jørgensen <toke@toke.dk>
+> >   cake@lists.bufferbloat.net
+> >
+> > On Mon, Apr 15, 2024 at 01:20:42PM +0000, Eric Dumazet wrote:
+> > > Instead of relying on RTNL, cake_dump() can use READ_ONCE()
+> > > annotations, paired with WRITE_ONCE() ones in cake_change().
 > > >
-> > > I will squash in V2 this part :
-> > >
-> > > diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-> > > index 934c220b3f4336dc2f70af74d7758218492b675d..238974725679327b0a0d483c011e15fc94ab0878
-> > > 100644
-> > > --- a/net/sched/sch_fq.c
-> > > +++ b/net/sched/sch_fq.c
-> > > @@ -106,6 +106,8 @@ struct fq_perband_flows {
-> > >         int                 quantum; /* based on band nr : 576KB, 192KB, 64KB */
-> > >  };
-> > >
-> > > +#define FQ_PRIO2BAND_CRUMB_SIZE ((TC_PRIO_MAX + 1) >> 2)
-> > > +
-> > >  struct fq_sched_data {
-> > >  /* Read mostly cache line */
-> > >
-> > > @@ -122,7 +124,7 @@ struct fq_sched_data {
-> > >         u8              rate_enable;
-> > >         u8              fq_trees_log;
-> > >         u8              horizon_drop;
-> > > -       u8              prio2band[(TC_PRIO_MAX + 1) >> 2];
-> > > +       u8              prio2band[FQ_PRIO2BAND_CRUMB_SIZE];
-> > >         u32             timer_slack; /* hrtimer slack in ns */
-> > >
-> > >  /* Read/Write fields. */
-> > > @@ -159,7 +161,7 @@ struct fq_sched_data {
-> > >  /* return the i-th 2-bit value ("crumb") */
-> > >  static u8 fq_prio2band(const u8 *prio2band, unsigned int prio)
+> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> >
+> > ...
+> >
+> > > @@ -2774,68 +2783,71 @@ static int cake_dump(struct Qdisc *sch, struct sk_buff *skb)
 > > >  {
-> > > -       return (prio2band[prio / 4] >> (2 * (prio & 0x3))) & 0x3;
-> > > +       return (READ_ONCE(prio2band[prio / 4]) >> (2 * (prio & 0x3))) & 0x3;
-> > >  }
+> > >       struct cake_sched_data *q = qdisc_priv(sch);
+> > >       struct nlattr *opts;
+> > > +     u16 rate_flags;
+> > >
+> > >       opts = nla_nest_start_noflag(skb, TCA_OPTIONS);
+> > >       if (!opts)
+> > >               goto nla_put_failure;
+> > >
+> > > -     if (nla_put_u64_64bit(skb, TCA_CAKE_BASE_RATE64, q->rate_bps,
+> > > -                           TCA_CAKE_PAD))
+> > > +     if (nla_put_u64_64bit(skb, TCA_CAKE_BASE_RATE64,
+> > > +                           READ_ONCE(q->rate_bps), TCA_CAKE_PAD))
+> > >               goto nla_put_failure;
+> > >
+> > >       if (nla_put_u32(skb, TCA_CAKE_FLOW_MODE,
+> > > -                     q->flow_mode & CAKE_FLOW_MASK))
+> > > +                     READ_ONCE(q->flow_mode) & CAKE_FLOW_MASK))
+> > >               goto nla_put_failure;
 > >
-> > Thanks Eric,
+> > Hi Eric,
 > >
-> > assuming that it is ok for this version of fq_prio2band() to run
-> > from fq_enqueue(), this update looks good to me.
+> > q->flow_mode is read twice in this function. Once here...
+> >
+> > >
+> > > -     if (nla_put_u32(skb, TCA_CAKE_RTT, q->interval))
+> > > +     if (nla_put_u32(skb, TCA_CAKE_RTT, READ_ONCE(q->interval)))
+> > >               goto nla_put_failure;
+> > >
+> > > -     if (nla_put_u32(skb, TCA_CAKE_TARGET, q->target))
+> > > +     if (nla_put_u32(skb, TCA_CAKE_TARGET, READ_ONCE(q->target)))
+> > >               goto nla_put_failure;
+> > >
+> > > -     if (nla_put_u32(skb, TCA_CAKE_MEMORY, q->buffer_config_limit))
+> > > +     if (nla_put_u32(skb, TCA_CAKE_MEMORY,
+> > > +                     READ_ONCE(q->buffer_config_limit)))
+> > >               goto nla_put_failure;
+> > >
+> > > +     rate_flags = READ_ONCE(q->rate_flags);
+> > >       if (nla_put_u32(skb, TCA_CAKE_AUTORATE,
+> > > -                     !!(q->rate_flags & CAKE_FLAG_AUTORATE_INGRESS)))
+> > > +                     !!(rate_flags & CAKE_FLAG_AUTORATE_INGRESS)))
+> > >               goto nla_put_failure;
+> > >
+> > >       if (nla_put_u32(skb, TCA_CAKE_INGRESS,
+> > > -                     !!(q->rate_flags & CAKE_FLAG_INGRESS)))
+> > > +                     !!(rate_flags & CAKE_FLAG_INGRESS)))
+> > >               goto nla_put_failure;
+> > >
+> > > -     if (nla_put_u32(skb, TCA_CAKE_ACK_FILTER, q->ack_filter))
+> > > +     if (nla_put_u32(skb, TCA_CAKE_ACK_FILTER, READ_ONCE(q->ack_filter)))
+> > >               goto nla_put_failure;
+> > >
+> > >       if (nla_put_u32(skb, TCA_CAKE_NAT,
+> > > -                     !!(q->flow_mode & CAKE_FLOW_NAT_FLAG)))
+> > > +                     !!(READ_ONCE(q->flow_mode) & CAKE_FLOW_NAT_FLAG)))
+> > >               goto nla_put_failure;
+> >
+> > ... and once here.
+> >
+> > I am assuming that it isn't a big deal, but perhaps it is better to save
+> > q->flow_mode into a local variable.
+> >
+> > Also, more importantly, q->flow_mode does not seem to be handled
+> > using WRITE_ONCE() in cake_change(). It's a non-trivial case,
+> > which I guess is well served by a mechanism built around a local variable.
 > 
-> It is ok, a READ_ONCE() here is not adding any constraint on compiler output.
+> Thanks !
+> 
+> I will squash in v2:
 
-Thanks for confirming.
+Likewise, thanks.
 This looks good to me.
+
+...
 
