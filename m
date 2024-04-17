@@ -1,101 +1,77 @@
-Return-Path: <netdev+bounces-88881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D8A88A8DFA
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 23:30:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30BB38A8EAE
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 00:02:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01BBE1F2133C
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 21:30:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A69F61F21EAF
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 22:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DAD94CB36;
-	Wed, 17 Apr 2024 21:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01F9B80C14;
+	Wed, 17 Apr 2024 22:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V0W3kPhR"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xPEFXTuI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0C48F4A
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 21:30:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 989D72134B
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 22:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713389431; cv=none; b=jNmUnyCSls25lYZ5Wl9hMwGRlpGlwD1xNTe5iGWvM51Zt9vljZDIjGjLS0LAXZLegaw/EJo/SA1NtOF20zVzEM1V/I7jXLojqdXRwUBuuyFpiJBl75GaAGgjkGPGQJ+oRrjxftOR9/9o+y3k+7y9KGs54TKPz/K110tkkSeHN6g=
+	t=1713391353; cv=none; b=pnrhoxwsIkt8eNQMfcy1Ku8uabKBseykLdzplIrWw9mNg/FTfqeGeA/ocVB9CqbyjIvVfbZENQi5veJo4sdz6QZqb1nUC7R7rLxcZL1PjvAHpSLC5TjEdOxX7zABM/iyXB395X3xOd2feB+VzLHyFC86uq8PzXUhtFIQiVItLPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713389431; c=relaxed/simple;
-	bh=2gjMxle0B3QlrdDeEHV5D1cqmPVD9mrteKzuxei0n5Y=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TLi7R+oaORAsuPy7afA+7vbwn8H+/v/QWfuYZ+pKQY4pbOODrelJHEB/WNkJf2IZvb8LLQqo9hN9Ytnna0VsYWt+DEyDu9nx4zyB622MT3Ip59wdcTrzxtwnKKuH5PE62XtF9C0pdLkgskRa/fXMF5r+ZkCLFuiMiMu/enJeYis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V0W3kPhR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 212B9C116B1;
-	Wed, 17 Apr 2024 21:30:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713389430;
-	bh=2gjMxle0B3QlrdDeEHV5D1cqmPVD9mrteKzuxei0n5Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=V0W3kPhRI6yJQX1yVp9B5jYLClweJhknulMJioIa9Pna5ODmxI/ARf8i42dXPJxNU
-	 WFN90k43DcDC01V0gWx83HeMQgpoEVRsHwuoxg5DXcquQC/sJc3XjGxQyzr2odv1ih
-	 ZldllOOvO1AlgzTigOeaJ6t/i3oFc0fJMTAEosTanAQ3AmEZ+mZiMwVhwrLEkL8jgw
-	 xeaGlavIRntzOK2AFTJFvWcx5/Axnmu3rxjROYj6whqZnDyxXCx3lxsZi16mFdg3o9
-	 ylA/pE0GAwFsxDPi2mUmZaPmrsFKCY5/tcqFZ7jyoiwaA8H03/Su8Q//D2SXl/YxxD
-	 hRCfcuSQ/jdJA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 104D9C43619;
-	Wed, 17 Apr 2024 21:30:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1713391353; c=relaxed/simple;
+	bh=bu/4b1nQG3qd7NnohD+IUmostsLLwiF7mNvCYpEgIOU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LU9dUsKiH/86wLXtcl5S6ZPMKYOG786DoJT7t/wpYyMjWe1o9f/ZidiOfxORtsk7CM4by3To2s6yRhXapWbkGPI5KrluV95FVvouDyrCcwPm8Eocs9p/s12ZAOznlywNwmxKlCzonQpb3GPJvtxdM8z+j9hr8b5MA+0SDm/cygU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xPEFXTuI; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=cqmTA1cGqmgQqHvwJfyXslc2g9QSnVyqWYInuUH3HjY=; b=xPEFXTuIOuDl00Ny9ipguf+6+o
+	Hwwb60Ba0n5kjppOW/e/4suyP0Hw1hZISGWY4NMPM32OWZb9XUv9mrSUI4f0JZMNdM7bT/kdwGFt2
+	fAL/qrU0SlcXIS/WvxGc9y7/8WBFLd+mY/F9XPlT8UMaICdIm3odKKltziP4KvaKXVSU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rxDMH-00DHpT-Aj; Thu, 18 Apr 2024 00:02:25 +0200
+Date: Thu, 18 Apr 2024 00:02:25 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: SIMON BABY <simonkbaby@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org
+Subject: Re: support needed for DSA (macb driver with marvel 6390)
+Message-ID: <891684f3-9f23-49fe-bdbd-650a539c5321@lunn.ch>
+References: <CAEFUPH3dvgvS27UDF+XHZcZbo6YSuHuo6bZeydFq740KmAD04g@mail.gmail.com>
+ <CAEFUPH3o2A0uKwb4Om=gRJ5snKxS6AGBjEnFaPmm2bTUXiHN9Q@mail.gmail.com>
+ <CAEFUPH1PYfECian1KAmMW=neEVtEQCeLkbZuXV2ZvY6HWH8dFg@mail.gmail.com>
+ <CAEFUPH1iE27OabKiFqj7iKmpzBNpn--kUyHwsXtK5OA8q=uOnQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH ethtool-next v2 0/2] Userspace code for ethtool HW TS
- statistics
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171338943006.32225.7031146712000724574.git-patchwork-notify@kernel.org>
-Date: Wed, 17 Apr 2024 21:30:30 +0000
-References: <20240417203836.113377-1-rrameshbabu@nvidia.com>
-In-Reply-To: <20240417203836.113377-1-rrameshbabu@nvidia.com>
-To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Cc: netdev@vger.kernel.org, vadim.fedorenko@linux.dev,
- jacob.e.keller@intel.com, pabeni@redhat.com, kuba@kernel.org,
- davem@davemloft.net, edumazet@google.com, gal@nvidia.com, tariqt@nvidia.com,
- saeedm@nvidia.com, cjubran@nvidia.com, cratiu@nvidia.com, mkubecek@suse.cz,
- wintera@linux.ibm.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAEFUPH1iE27OabKiFqj7iKmpzBNpn--kUyHwsXtK5OA8q=uOnQ@mail.gmail.com>
 
-Hello:
+> => mdio write 0xe2800034 0x58029800
+> => mdio write 0xe2800034 0x68060000
+> => mdio read 0xe2800034
+> Reading from bus ethernet@e2800000
+> PHY at address 0:
+> -494927820 - 0xffff
 
-This series was applied to ethtool/ethtool.git (next)
-by Michal Kubecek <mkubecek@suse.cz>:
+That does not look like valid usage of the commands:
 
-On Wed, 17 Apr 2024 13:38:27 -0700 you wrote:
-> Adds support for querying statistics related to tsinfo if the kernel supports
-> such statistics.
-> 
-> Changes:
->   v1->v2:
->     - Updated UAPI header copy to be based on a valid commit in the
->       net-next tree. Thanks Alexandra Winter <wintera@linux.ibm.com> for
->       the catch.
->     - Refactored logic based on a suggestion from Jakub Kicinski
->       <kuba@kernel.org>.
-> 
-> [...]
+https://github.com/u-boot/u-boot/blob/master/cmd/mdio.c#L317
 
-Here is the summary with links:
-  - [ethtool-next,v2,1/2] update UAPI header copies
-    https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/commit/?id=d324940988f3
-  - [ethtool-next,v2,2/2] netlink: tsinfo: add statistics support
-    (no matching commit)
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+	Andrew
 
