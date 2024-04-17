@@ -1,107 +1,128 @@
-Return-Path: <netdev+bounces-88883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 619D48A8ED8
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 00:30:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31E098A8EDC
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 00:31:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9181F1C21250
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 22:30:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6CB211C21360
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 22:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66EC13BBFA;
-	Wed, 17 Apr 2024 22:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04CAB84055;
+	Wed, 17 Apr 2024 22:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="TlhGwZqc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KXIhwSN1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F48F7E0FB
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 22:30:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0D017C6C6;
+	Wed, 17 Apr 2024 22:30:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713393012; cv=none; b=POkOTqyoGXvmjukdwDJkJN53ujKraCb/3vsz4G9m0JadBSCP77JiR3hu1v75i8OjjvpU1JI2NZOzXP6FripeeEAZFP8XXY2OCf/FYyioUo5UWM2Z82C8RLV8aT9bG1tLgwewXJviisKYegsqr0dnqScuK29j2kodYWKsYozLcvg=
+	t=1713393043; cv=none; b=HIZthqj1ma5Jlfj9tPnIKkVZuddr7XStvB/jPhYlhUWc0uwG3G24vDqQMxPCFhVL3hnlvO80UOa5SNoSV31DdImb7is1GyZlOQgRGLO4Anb4UP+0Iv19Zip8MWKbh9TWBMDQHdk4MBMjw0kSwsKgmR5EdiIxv0xGehboYGMf3vM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713393012; c=relaxed/simple;
-	bh=P247JodJXQeobK+hPLi21y8wHqmwGi1a7FAwxAcI6XE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ukVvfpzCBbB+Z9p0iqMtTG6lHztyqJZi4MLXW2eJbzdEXXTXWmveNMmy/tHCSYkKGzKR1JX6P5WM1JKKopesVmUh4WPGZqClfrepOgiDQgrkMeLu+7Yhluu3CbhJc/Nt9sdqCG82Ot7NON8nPIKMUSK+ghUbPStSkkcXBce/FUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=TlhGwZqc; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6ead4093f85so289886b3a.3
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 15:30:09 -0700 (PDT)
+	s=arc-20240116; t=1713393043; c=relaxed/simple;
+	bh=go4rXzn30HjFjmyvddvUsnhccgo8cwdfzjUyWgFOz2U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YE2DUThPOqMiugTf36lZhjP+ywU6hinvvJG3KNyFZ420nnCP3gd8llRZ/wt86Qt1Iu0vO3ZATipKG6qrZYt02fum76YdwA3snPppl2g3FBVWQHnh9B+aO3z7+rjHUo9xh5dj8QiSfjysjAdfeit0135Kvjwt6Q9obaEk/oPQzCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KXIhwSN1; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2a2e5d86254so978701a91.1;
+        Wed, 17 Apr 2024 15:30:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1713393009; x=1713997809; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tMj3kDds4c2Z+X1vqMpXmpY1ruqjvWfDxs0KmIb5Rc8=;
-        b=TlhGwZqcVUdJVhmFTNjQp+b11BtGJ2+IAy3ndRSDBBXQzlHUzYLAxHUe+9fUosvT+Q
-         tDPSMZxO0LawwTrXWfaECpmUOfd/9lCMO/dQ7w6p6ZmNNDXckq/NnUCRCdtgvWcSx/wY
-         62CoQBun5MDTXx6/t5/RagfRNcLaA1fPjI118No+26CgXJBWOTrkwAFRCcLN+azOjSnE
-         HfnrU072GYBcjc7SHgqqVgzcRAKoXtA6ic7aL5Y26dYQjJ1xH1elu2vEGBUJ6bnRB5Ol
-         xArhn56QQyfI4VktHFHbH6kzwkPiJFIwGQ47+tR/Lmkig//NKThAZVr5w7M5/MHzazJU
-         DOzQ==
+        d=gmail.com; s=20230601; t=1713393042; x=1713997842; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=q+gf/XCxYwLyR9ufpAByfaftVWu4p7It7YbQSgc9fYU=;
+        b=KXIhwSN1jr69nsGVY/TpJewW0Hfl5FWSBW0YecRyNULfXpNhaNV4TVWyvRvZ78yMWs
+         JPVOqQ0zq+PJ3ommPGT8y+RFbsQFSvmGtlvgotzWqwlH2cVslAZbJZbV+9PdMmorEtq2
+         U9aXrOWwTv2732cSYqjFK+ROvZCd7dDWgVMmHzXHZJfJSaRwul9Z5LeIabqcBysBAZoz
+         jix2vnaocP8DebH2zoOnrNnuDM4o921zvdZMeMleK2dUUxM8KG+FzXuTm4Vx+6XhpERt
+         CRW7RN5JjEBjAIHW1V0QYVal2+DBVW12NwtH9CwRIRCMaVf/b+jLsaGsvGbu7JufBkUj
+         4czw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713393009; x=1713997809;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tMj3kDds4c2Z+X1vqMpXmpY1ruqjvWfDxs0KmIb5Rc8=;
-        b=MJuiqCTm+MKvhvgpTcamSY+ul52UJTLlBgAsnhHNFHTL49zENTSUAnhELpNkhmoBUB
-         MYzIqt+HuFcNwk0wKzvrCxNQ9Aq7HH5+sJOM+SdZa+ac6+V990gL/bWfbaQvp3skVEpY
-         GmTGi132oMfffIxRoPZrJ7QP3UQXWDv1/IJ6tSAjuiqItY+Tg9z/K7cBJTdS0USopgwE
-         qz4tBHdNfws57TtXVCzA0JDhn8f2F3wwhJH5NFT1iVbEEOSjRoNxP8skeDPDcvR/ilkP
-         gwP96fXINrQI9kLapVeRxdq991RxtNHO8vatcGm/jktlSot+AOqduJC4I2OVnJXK5lXy
-         yE+g==
-X-Gm-Message-State: AOJu0YwMjsLeCcoJFYCp357+DL0lrmyE7iduTfXpmCfCOWb9Vlm9SibB
-	rWBF3jSxa3oZVfiHNfqDq8ejJkrSj4ZcGheNeXY3KJBjMV6qE07CWyEhWFFNz2Q=
-X-Google-Smtp-Source: AGHT+IE9Xrg0Y+NjiMcna2yisr52r5CFrx+KvyPx7qHzRAHXC7AG4mkZfMHYbpDjdkySpK/tZmfW0Q==
-X-Received: by 2002:a05:6a21:1f2a:b0:1a3:673b:62b8 with SMTP id ry42-20020a056a211f2a00b001a3673b62b8mr1147411pzb.35.1713393009386;
-        Wed, 17 Apr 2024 15:30:09 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id z2-20020a63e542000000b005e838955bc4sm106089pgj.58.2024.04.17.15.30.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Apr 2024 15:30:09 -0700 (PDT)
-Date: Wed, 17 Apr 2024 15:30:07 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Maks Mishin <maks.mishinfz@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH] m_ife: Remove unused value
-Message-ID: <20240417153007.4bca29aa@hermes.local>
-In-Reply-To: <CAEh9MGTwqGVpuq8M+So8bfU2y=bpbQMJjPJo3F52MjFHQ_BiRQ@mail.gmail.com>
-References: <20240417170722.28084-1-maks.mishinFZ@gmail.com>
-	<CAEh9MGTwqGVpuq8M+So8bfU2y=bpbQMJjPJo3F52MjFHQ_BiRQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1713393042; x=1713997842;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=q+gf/XCxYwLyR9ufpAByfaftVWu4p7It7YbQSgc9fYU=;
+        b=QnzTCFRslBmLFhquVp8xvBGBmp+urnzcmUpHKnwyiE0PkZbOLedI9U4S80aPjQ9ji/
+         Q51/4EDwvn0uqEXf6/eS5WFu+lqCr7DA8Sutj4iL0u9oPJ0mpyvvLeP5JSk7CA3zEV3M
+         k+RxMtZ43pBNjzaUV97G5FW6StRMsEdD1jHTpuWmMcS6BOEOjk2hOpCcZ6BrS3U7wDg4
+         jhAZErhbWeT0U/FTNBR07OfkRdgDBr9Pig08O8iyKw2RnXW+UJqvOYLVcoK87BEpEFvo
+         zNcFAO6edlgee0qG1202JQQukE1WdHFBbTKiJjvOlJXbZS+yTmesfM7zM3wR9RC5aOSg
+         MqWg==
+X-Forwarded-Encrypted: i=1; AJvYcCWM2ZKj5qVRX4mTYI4wIneizvMSBvHpPs2oNHcYG49tfwBkaVG3XjniOHfsmWcAcrsBBJtsc/LbhnySUQLmumoL+7pWT4fRlai68lelp4SemkbRJ9S8fMmr4/pg/p8FHeqboaRbx8l9P/dd4Z8CW0LOu7T8AfU6ThA0Gh75fc0vhF0F6qPV
+X-Gm-Message-State: AOJu0YyG/Z12/hMHljJ9bKPdVSSYT2YvijoozdB687HQzFhc06RsixSu
+	dhVR+U6mUHqz40Z/2MiYZoYN2rg66CrTyO8f8fmgqeU4LATZVmzeZtBB1nh4Jurwi5ps6b75wvo
+	TPURxEGHAMaOkOY+I75rNbWT6l00=
+X-Google-Smtp-Source: AGHT+IHCSTBVrPAHK0lZoXXj7dEZN7R8pA/Yna1VOwZAkttLIuRGJGk8KlHUmOvSEnjjlcNVZk3Wnd8z1stY4zVb7ZY=
+X-Received: by 2002:a17:90a:f484:b0:29b:d747:f7ae with SMTP id
+ bx4-20020a17090af48400b0029bd747f7aemr657518pjb.14.1713393041590; Wed, 17 Apr
+ 2024 15:30:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240413-tcp-ao-selftests-fixes-v1-0-f9c41c96949d@gmail.com>
+ <20240416072809.3ae7c3d3@kernel.org> <CAJwJo6Yw4S1wCcimRVy=P8h0Ez0UDt-yw2jqSY-ph3TKsQVVGA@mail.gmail.com>
+ <20240417134636.102f0120@kernel.org> <20240417142843.27a221f8@kernel.org>
+In-Reply-To: <20240417142843.27a221f8@kernel.org>
+From: Dmitry Safonov <0x7f454c46@gmail.com>
+Date: Wed, 17 Apr 2024 23:30:29 +0100
+Message-ID: <CAJwJo6agHEsWjhNzAstwU_+kQd4er3QsNZebkCOCDGBGh4SiMQ@mail.gmail.com>
+Subject: Re: [PATCH net 0/4] selftests/net/tcp_ao: A bunch of fixes for TCP-AO selftests
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 17 Apr 2024 20:08:55 +0300
-Maks Mishin <maks.mishinfz@gmail.com> wrote:
-
-> >                 ife_type = rta_getattr_u16(tb[TCA_IFE_TYPE]);
-> > -               has_optional = 1;
-> >                 print_0xhex(PRINT_ANY, "type", "type %#llX ", ife_type);
-> >         }
+On Wed, 17 Apr 2024 at 22:28, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Wed, 17 Apr 2024 13:46:36 -0700 Jakub Kicinski wrote:
+> > > I can spend some time on them after I verify that my fix for -stable
+> > > is actually fixing an issue I think it fixes.
+> > > Seems like your automation + my selftests are giving some fruits, hehe.
 > >
-> > -       if (has_optional)
-> > -               print_string(PRINT_FP, NULL, "%s\t", _SL_);
-> > -
+> > Oh, very interesting, I don't recall these coming up before.
+>
+> Correction, these are old, and if I plug the branch names here:
+> https://netdev.bots.linux.dev/contest.html
+> there is a whole bunch of tests failing that day.
 
-It is used. The printout would change with your patch. It would cause more
-things to be one line.
+Hmm, yeah, I was looking at the history of selftests to see if there
+is anything else interesting:
 
-The lower two has_optional parts have no effect and could be removed.
+2024-04-11--15-00 - lockdep for hashinfo->ehash_locks vs tw->tw_timer
 
-But before removing them, it would to look back in older versions
-of iproute2 before JSON was introduced to see if this was something
-that got mangled then.
+It seems that you actually reported that already here:
+https://lore.kernel.org/all/20240411100536.224fa1e7@kernel.org/
+
+2024-04-04--12-00 - lockdep for p->alloc_lock vs ul->lock
+(rt6_uncached_list_flush_dev)
+2024-04-04--09-00 - lockdep for p->alloc_lock vs ndev->lock
+(addrconf_permanent_addr)
+2024-04-04--03-00 - lockdep for p->alloc_lock vs ul->lock
+
+Was reported as well:
+https://lore.kernel.org/all/8576a80ac958812ac75b01299c2de3a6485f84a1.camel@redhat.com/
+
+2024-03-06--00-00 - kernel BUG at net/core/skbuff.c:2813
+
+Can't really track this down to any report/fix. Probably as it's month
+old and hasn't happened since on these tests - something was borken on
+that particular day.
+
+> Keep in mind these run pre-commit so not all failures are flakes.
+
+Thanks,
+             Dmitry
 
