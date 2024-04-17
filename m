@@ -1,181 +1,145 @@
-Return-Path: <netdev+bounces-88651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 945908A8066
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 12:07:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26C6E8A80C8
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 12:22:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC88DB2343E
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 10:07:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5817A1C21834
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 10:22:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0310D13A3F3;
-	Wed, 17 Apr 2024 10:07:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F98813BC1B;
+	Wed, 17 Apr 2024 10:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="cC2jJ09I";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="rnsDuuQH"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="SlGgvyop"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0C4128807;
-	Wed, 17 Apr 2024 10:07:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA04213AD1D;
+	Wed, 17 Apr 2024 10:20:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713348465; cv=none; b=bbX+SctYYUmEQT4rEwJuvTMZ+W4Y9lBPw03zVXANkh5363egYbzvkGs6nUwKqVHOuBbglm/DIzR+Nkhjy7SUwAAYZFShvxS1AngsbIiPAEURP1ZJBsqLXbcgR3A7m3Spvy26UByGseEPmStJvlniQ1NXCMrNDefxps/hq0yqkAA=
+	t=1713349223; cv=none; b=CV+brkzLy3y6NimzN0ch6mF0xbiomvk7V1gzGm52nRHLWRbShfhF7clBVBXtGqKRJ5aBobVomoWz2yUPsJjBNE/RmiUIJFoTCUU5cylPD+wPzao0xv5hRdj7lmRVs9kB1st3pr51FtcttSVRcjEJ/JE+N+KZrND43XzY4bHbisk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713348465; c=relaxed/simple;
-	bh=/hPVDH/l/50vOuhlKj+xEGfXoIYzQz449xMEPLDiU10=;
+	s=arc-20240116; t=1713349223; c=relaxed/simple;
+	bh=BL9sVr1FX2Bl7U7DH4Ih8dPNhWgEwo/nV1rJcFVOilg=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=UbGNKQZ9iYC03mBY41fJisphFe2Qpmcdc5IhJsOMhINoQFBpa+0Hnhyoln/qNydQncy+o0k9+NlqrC99BwZUgYr87XIAd5fPa2NTU63AD3hpfiuVf/x76ZVqPtIGzXfqOTdtkIiGFFUwh4LMJf9t3TDczhoYPk4YpHjcWc1cZDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=cC2jJ09I; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=rnsDuuQH reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1713348461; x=1744884461;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=P4jjLHNDzTJwlTjX0l1tjUZ36wXeBEDfuonIOwgdrMk=;
-  b=cC2jJ09IBGpB8/JbqmWlkxvMdqLfKrifVvH82HNOHN0TDdB/ySaILK6G
-   oTB0+NgsdJcGBXNL2GWsG9pzoY82SZUMN355FhqtZw2fRevVOo0l8wovW
-   VZHikQeL3yWbPr9cxhj2dIVQP4PAtJ3gx46qfGuro5/AygzdUoUyoIQ66
-   9RGcLMiqMBLmmyZHhMwAALnC1Y5hsj/meAUU+buqzscWvhLSGLkQLIJLw
-   BL1AYMCr5mgS1yC73+ihhkimGLXTvYPSahWD4rzLs2iaEJU+yFBmWi61W
-   vpyF+cdDqfdE+R/0T2+y/t4uAgH+V+Te08uTjSmjJ2ByKudebA++Bp3Sb
-   A==;
-X-IronPort-AV: E=Sophos;i="6.07,208,1708383600"; 
-   d="scan'208";a="36464413"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 17 Apr 2024 12:07:38 +0200
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EFB271703EB;
-	Wed, 17 Apr 2024 12:07:32 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1713348454;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=P4jjLHNDzTJwlTjX0l1tjUZ36wXeBEDfuonIOwgdrMk=;
-	b=rnsDuuQHFmSNSZ0itQmLdJ4PzQNgKcfOmgivwmVBHf5dmbBT4Ru3Czmh46Or+baeXY/QR/
-	mflfyya8wsE5fA8O2BsOZ3sLjul1rMVVc/H8S27iFdsh21i34ppaW/uEJ3FDBGmaEb4HRG
-	bNcwpK0X10bP+APDMir9fzk51a11tCu9NnCmjhN+cFCGz/+PT1zU6qq4B/uQTUZnh8bZwh
-	XNz/mbTCPgtzPwrofAYGXXaHUiV21QXm/TfiRFrJq6qC3E4ZNUU7nCWYO7iYCxkJlBrXq3
-	ukdhTvWQLgoSxlhDhFGlKUk9leCacfvEVrfxZDy0Df55wTKlaGq69Dc1+KZHXg==
-Message-ID: <6f64a875911eff522674e9a22b6dc23ec629db3a.camel@ew.tq-group.com>
-Subject: Re: [PATCH net] net: dsa: mv88e6xx: fix supported_interfaces setup
- in mv88e6250_phylink_get_caps()
-From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-  linux-kernel@vger.kernel.org, linux@ew.tq-group.com
-Date: Wed, 17 Apr 2024 12:07:32 +0200
-In-Reply-To: <5f09543db3de88e83116c5b2f6e3d9edbfdb4af8.camel@ew.tq-group.com>
-References: <20240416155054.3650354-1-matthias.schiffer@ew.tq-group.com>
-	 <Zh6trxU0hB+yt6rV@shell.armlinux.org.uk>
-	 <5f09543db3de88e83116c5b2f6e3d9edbfdb4af8.camel@ew.tq-group.com>
+	 Content-Type:MIME-Version; b=VPpbNU6xXN5bCUvF1ACBxPcKjGl/xK1TiTNZ7WJeYdRVut9QTbraeSmqD5ZQyHWfiFPVpmVSBJDN6FF9qH1lKBio8BeQKmweDJs+X136jW8f30rb0U11XWUqye6CnwIsnKMFpgTDqZQkmhZQadZGr4fmgPDrWw22cG6J6ddhGhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=SlGgvyop; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43H9sgAb031215;
+	Wed, 17 Apr 2024 10:20:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=BL9sVr1FX2Bl7U7DH4Ih8dPNhWgEwo/nV1rJcFVOilg=;
+ b=SlGgvyopI8pehtw2KLxtPHePnESLMfJCSbBzmAOQ5hSWXcQ1aAY0jC3EXXkxk43qjdfL
+ 55d0MgDgF9WR9d2McwmKCkW9bI1ezvOE6xAtkdYUAKM0vcbwuuXopkdP0AhV/Lj/VYIH
+ NSOy1GoHFTNIc/LHP/X3IxBg+1iKYbPpR39rCgyq+8oiq2sPaRLe8HxFaDQThwaK8YQj
+ dOHCcHW140EBkmu0SzmIwdZnLoMQa9I/UNjle7VUhjiUOS67JnireicYzi2eEuEalpY8
+ fq6x6pa7lbiP6tHT61VpTrje3PQ92yeeiAS0evaBlcvI9wD4isJpLmofNIDDTVyuW0BC YA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xjbc4r5xw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Apr 2024 10:20:15 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43HAKEdb017897;
+	Wed, 17 Apr 2024 10:20:14 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xjbc4r5xp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Apr 2024 10:20:14 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43H8Umm0027323;
+	Wed, 17 Apr 2024 10:20:12 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xg4s03tt9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Apr 2024 10:20:12 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43HAK7Q131588628
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 17 Apr 2024 10:20:09 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 32D6E20063;
+	Wed, 17 Apr 2024 10:20:07 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4BE422005A;
+	Wed, 17 Apr 2024 10:20:06 +0000 (GMT)
+Received: from [9.179.14.55] (unknown [9.179.14.55])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 17 Apr 2024 10:20:06 +0000 (GMT)
+Message-ID: <5c1ef62610506524763bc2d4f673279e0cb624b6.camel@linux.ibm.com>
+Subject: Re: [PATCH net-next v6 02/11] net/smc: introduce loopback-ism for
+ SMC intra-OS shortcut
+From: Gerd Bayer <gbayer@linux.ibm.com>
+To: Wen Gu <guwen@linux.alibaba.com>, wintera@linux.ibm.com,
+        twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com,
+        jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org
+Date: Wed, 17 Apr 2024 12:20:06 +0200
+In-Reply-To: <20240414040304.54255-3-guwen@linux.alibaba.com>
+References: <20240414040304.54255-1-guwen@linux.alibaba.com>
+	 <20240414040304.54255-3-guwen@linux.alibaba.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.44.4-0ubuntu2 
+User-Agent: Evolution 3.50.4 (3.50.4-2.fc39app4) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Last-TLS-Session-Version: TLSv1.3
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: nq42N4N8rAnD0oGf9Kk5FcUB5bWQ0kOK
+X-Proofpoint-ORIG-GUID: xEYjGSR6ovHWU4xcYSmlh8GzMhk0EH_v
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-17_08,2024-04-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
+ malwarescore=0 phishscore=0 clxscore=1011 lowpriorityscore=0 spamscore=0
+ priorityscore=1501 suspectscore=0 adultscore=0 mlxlogscore=937 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
+ definitions=main-2404170071
 
-On Wed, 2024-04-17 at 09:13 +0200, Matthias Schiffer wrote:
-> On Tue, 2024-04-16 at 17:56 +0100, Russell King (Oracle) wrote:
-> > On Tue, Apr 16, 2024 at 05:50:54PM +0200, Matthias Schiffer wrote:
-> > > +int mv88e6250_port_get_mode(struct mv88e6xxx_chip *chip, int port,
-> > > +			    phy_interface_t *mode)
-> > > +{
-> > > +	int err;
-> > > +	u16 reg;
-> > > +
-> > > +	if (port < 5) {
-> > > +		*mode =3D PHY_INTERFACE_MODE_INTERNAL;
-> > > +		return 0;
-> > > +	}
-> >=20
-> > Note that if mv88e6xxx_phy_is_internal() returns TRUE for the port,
-> > then this will be handled automatically.
-> >=20
-> > > +
-> > > +	err =3D mv88e6xxx_port_read(chip, port, MV88E6XXX_PORT_STS, &reg);
-> > > +	if (err)
-> > > +		return err;
-> > > +
-> > > +	switch (reg & MV88E6250_PORT_STS_PORTMODE_MASK) {
-> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_10_HALF_PHY:
-> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_100_HALF_PHY:
-> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_10_FULL_PHY:
-> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_100_FULL_PHY:
-> > > +		*mode =3D PHY_INTERFACE_MODE_REVMII;
-> > > +		break;
-> > > +
-> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_HALF:
-> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_FULL:
-> > > +		*mode =3D PHY_INTERFACE_MODE_MII;
-> > > +		break;
-> > > +
-> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_DUAL_100_RMII_FULL_PHY:
-> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_200_RMII_FULL_PHY:
-> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_10_100_RMII_HALF_PHY:
-> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_10_100_RMII_FULL_PHY:
-> > > +		*mode =3D PHY_INTERFACE_MODE_REVRMII;
-> > > +		break;
-> > > +
-> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_DUAL_100_RMII_FULL:
-> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_10_100_RMII_FULL:
-> > > +		*mode =3D PHY_INTERFACE_MODE_RMII;
-> > > +		break;
-> > > +
-> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_100_RGMII:
-> > > +		*mode =3D PHY_INTERFACE_MODE_RGMII;
-> > > +		break;
-> > > +
-> > > +	default:
-> > > +		*mode =3D PHY_INTERFACE_MODE_NA;
-> >=20
-> > What does this mean? I don't allow PHY_INTERFACE_MODE_NA to be set in
-> > the list of supported interfaces because it isn't an interface mode.
-> > If it's invalid, then it's probably best to return an error.
-> >=20
-> > I wonder whether it would just be better to pass the
-> > supported_interfaces bitmap into this function and have it set the
-> > appropriate bit itself, renaming the function to something more
-> > better suited to that purpose.
-> >=20
-> > Thanks.
+On Sun, 2024-04-14 at 12:02 +0800, Wen Gu wrote:
+> This introduces a kind of Emulated-ISM device named loopback-ism for
+> SMCv2.1. The loopback-ism device is currently exclusive for SMC
+> usage, and aims to provide an SMC shortcut for sockets within the
+> same kernel, leading to improved intra-OS traffic performance.
+> Configuration of this feature is managed through the config SMC_LO.
 >=20
-> I'm explicitly checking for PHY_INTERFACE_MODE_NA in the caller to handle=
- the "this interface isn't
-> useable" case. Passing supported_interfaces into the function handling th=
-e port modes is fine with
-> me, too - will send a v2 later.
->=20
-> Best regards,
-> Matthias
-
-... and I realize I don't even check for PHY_INTERFACE_MODE_NA in the calle=
-r in the version of the
-patch I submitted. Oh well, time for v2.
-
-
->=20
->=20
-> >=20
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+> ---
+> =C2=A0net/smc/Kconfig=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1=
+3 ++++
+> =C2=A0net/smc/Makefile=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0 =
+1 +
+> =C2=A0net/smc/af_smc.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 12 +++=
+-
+> =C2=A0net/smc/smc_loopback.c | 156
+> +++++++++++++++++++++++++++++++++++++++++
+> =C2=A0net/smc/smc_loopback.h |=C2=A0 43 ++++++++++++
+> =C2=A05 files changed, 224 insertions(+), 1 deletion(-)
+> =C2=A0create mode 100644 net/smc/smc_loopback.c
+> =C2=A0create mode 100644 net/smc/smc_loopback.h
 >=20
 
---=20
-TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
-any
-Amtsgericht M=C3=BCnchen, HRB 105018
-Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
-neider
-https://www.tq-group.com/
+Thanks Wen Gu,
+
+this looks good to me now. A W=3D1 compile-test of the whole series with
+SMC_LO undefined showed that there were no additional unresolved
+symbols introduced.
+
+Feel free to add my
+Reviewed-by: Gerd Bayer <gbayer@linux.ibm.com>
 
