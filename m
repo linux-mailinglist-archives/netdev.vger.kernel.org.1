@@ -1,485 +1,663 @@
-Return-Path: <netdev+bounces-88875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C28338A8D64
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 22:58:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDA168A8D76
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 23:06:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 798ED287C64
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 20:58:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8392F281DC2
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 21:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22430482C8;
-	Wed, 17 Apr 2024 20:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71C8B48CFC;
+	Wed, 17 Apr 2024 21:06:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PH0khpJ+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lbBgfz1g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB9F481BE
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 20:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C109481A7;
+	Wed, 17 Apr 2024 21:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713387491; cv=none; b=kIsO1MCNCSiTILODwd+8Ir6FNEjv1+o6tDNk1rz7j4T9UdRBRktE+6Ms325WZDgeJNb498Q3Cv0ecy3wKN5aBn3ClyE+4NnmKly+Kpv2Afn9vMx7bUwc5DehDUdXfwYWzuUxQ3UdDLFjztX3Aqz3E+vru0MlZyzyFd6eIty23f4=
+	t=1713387984; cv=none; b=ka2UsoKwoewJsHTQpUAiqdJyhXdxs2Pvqm/jdEgOVni1Dtv590wa7pt8r+GAfBHDR+x8KADJ2Ze0+HJSnYa4Ualb0wSpTi1efes+j/FtIMVk21m0sshr2/Acb00nygCNxr9kDeyvnX62LZzKWTxee0JH2oTGEFd8bLuoj5H/pEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713387491; c=relaxed/simple;
-	bh=xIgWSxLBbguyRcb0zKhiKbT1dbRUzTnSdHRJoAVzhVs=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=YPSxkZWQcIf+GWLKzJX4KKhxVW4E/djul4NlDFPe510QthM+nWs7U44DaU81POIDbgYlXwzeYSOdqoWAgbLnEX+H8cAm6LEmWgmkB3QiOLjy26/qO98SG+rKRJu9XItpzdaXC6IvDU/9S59Gocqgtkmo9SVHbqOLDZsu6DhgESg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ziweixiao.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PH0khpJ+; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ziweixiao.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5d8bdadc79cso96345a12.2
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 13:58:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713387489; x=1713992289; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=gEAhZlLshKO/PptO5/jBMX3CmASJWwGmWZLqDVkQJdg=;
-        b=PH0khpJ+UpzuKErvWIN4DgO+lBUWTffwSBC36lSds8Bh7goeNCIrmlaoHibPgqT2Nx
-         7xT27+P3mbhmOpk9WvPO4H79HmzNvqDr5EhUmedhdqiebXJG+O4MwvuQ+teUQxSXipPh
-         vmErxTCVjShs0/dwg6rkYgQw04aV/2J0CjLycFOK8pjUxLUnL1TaH2ZSYv0WuEGpk4IM
-         ZVOi5D2/4VZskSt3bNmkQLec8C7TfLPI7u1h9UNCvta1/+jS7oMbp3TezkY9tB6YbYy3
-         Sd3awESLPk1wMOb4WO6FqcFcNcUdjkkO4p+DD9/knrr2RX0dqZCgc5xSW2VsuADgUKc9
-         g6yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713387489; x=1713992289;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=gEAhZlLshKO/PptO5/jBMX3CmASJWwGmWZLqDVkQJdg=;
-        b=cZ4yixQFOCsl17UBVOdDiIwuoDm3eOyBzgJi0G9oytB6bSMX1ZxvreMsfdXa4PgW7X
-         qq0Des99hJNHmWNJMlN+rFmk2gU9xpV6pI507zQjEweoUb2Dr1/QcK8nP5EUc6fzKVN3
-         Pq+/kF3uEm5k1xKX+CU3nhuoHP/5GPWekp53WlFPoH/aW6Pfmg9Ft6LbE2vfobWAoYbq
-         qu8YCCadb98CSJboDw3WqSUALQFPcCJw44zxwl8CoIUxdrqiVPO7zkOe7Apij0//EIqM
-         ogp6SHdRaWStxMRJ9M5KMhgzDXcAjGeUVkRVT5pVbGekvI4umokuRm5S45PmcYZu/Q5w
-         ks+A==
-X-Gm-Message-State: AOJu0YxZaZQcZ98CEI7BkyD8gomgbFV5f7KwoH3eDWFwSbmFRzaG03ws
-	lw2LeaBjXfDCbktl813BUZ0CHYpbsNzPpk7OYU/Usr1Kn4q8BYOW5M3fc5JaOQSKwaW6DHk92Cw
-	NvGrBKcvaU1adpZ3pm3UrUYUfglbB/T8XoIvtpoYNUKsBm8XnEJtMVjPBpk7sHBOmAZ5EhLROI0
-	Q6ap0lYnsae9FU2jJy0RWoIqBJfwC04evBIferYDrM1cvnIMbV
-X-Google-Smtp-Source: AGHT+IEgXH3RvQT2/Y9Asb+xVSS6BM3mP3BTVVzG4B+WcQtNy06SR1k9LfX02V/9rhbYZjdmkEXlX+wNmitsBw8=
-X-Received: from ziwei-gti.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:9b0])
- (user=ziweixiao job=sendgmr) by 2002:a63:2d7:0:b0:5f0:6959:8a46 with SMTP id
- 206-20020a6302d7000000b005f069598a46mr1723pgc.9.1713387487983; Wed, 17 Apr
- 2024 13:58:07 -0700 (PDT)
-Date: Wed, 17 Apr 2024 20:57:57 +0000
+	s=arc-20240116; t=1713387984; c=relaxed/simple;
+	bh=jQajXNUTSdJbOiuE3X14B9u4IThzdGztOYCaLIYkni8=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=XKOWuZzeb6nDT7OPOqbMCTw1SjtbX/KmijdfIEhIaW6BUkV9Taz36V5z/g2l3IxitD9v90SVgPHdOMMXIBlLV3btLj0tRVGPwBV9h7t/mccrE3gMNfrrKlS7DcjA7GRIZllE6RkvLkUgKnDrrMqWeSxc42DXa33QphUZAOc4JKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lbBgfz1g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84D73C072AA;
+	Wed, 17 Apr 2024 21:06:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713387983;
+	bh=jQajXNUTSdJbOiuE3X14B9u4IThzdGztOYCaLIYkni8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lbBgfz1g+EmTpf/8B5LIXDK5AF+zBI+SdBC4ANMbfR6bQy5kajH30uqxk71pfMuvr
+	 cJZB6d+U9AflERemSpVZHriQJFfT/Z8DFuTlYVyXvQJnSapgiRnEO7t/KOgW6pwcaS
+	 z5Lm5RAA1OxjUUlwXOrBldmqUzlSWaTXyrLOGADjCWzkJdtuKGaC8DdXWXo4pSdXIV
+	 BeW8RFqLQMeqhkQGZ4unhmrg2J0L+4KdO1LN7vnTam7UWqspWie+u+aDSM0c42Q0D+
+	 m9IG0KDe7SBu0YWrOMaaNeWVon+uqrzpeW1LEIVNSnooBS9s9ht4q6rRfMNeSk6pb+
+	 e1WagiG+9QRUg==
+Date: Thu, 18 Apr 2024 06:06:13 +0900
+From: Masami Hiramatsu (Google) <mhiramat@kernel.org>
+To: Mike Rapoport <rppt@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>,
+ Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, "David S. Miller"
+ <davem@davemloft.net>, Dinh Nguyen <dinguyen@kernel.org>, Donald Dutile
+ <ddutile@redhat.com>, Eric Chanudet <echanude@redhat.com>, Heiko Carstens
+ <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>, Huacai Chen
+ <chenhuacai@kernel.org>, Kent Overstreet <kent.overstreet@linux.dev>, Luis
+ Chamberlain <mcgrof@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nadav Amit <nadav.amit@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Puranjay Mohan <puranjay12@gmail.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, Russell King
+ <linux@armlinux.org.uk>, Song Liu <song@kernel.org>, Steven Rostedt
+ <rostedt@goodmis.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ bpf@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+ linux-mm@kvack.org, linux-modules@vger.kernel.org,
+ linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
+ netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v4 05/15] mm: introduce execmem_alloc() and
+ execmem_free()
+Message-Id: <20240418060613.cdcf85650e5d0c43da5d1c1b@kernel.org>
+In-Reply-To: <20240411160051.2093261-6-rppt@kernel.org>
+References: <20240411160051.2093261-1-rppt@kernel.org>
+	<20240411160051.2093261-6-rppt@kernel.org>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240417205757.778551-1-ziweixiao@google.com>
-Subject: [PATCH net-next] gve: Remove qpl_cfg struct since qpl_ids map with
- queues respectively
-From: Ziwei Xiao <ziweixiao@google.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, jeroendb@google.com, pkaligineedi@google.com, 
-	shailend@google.com, willemb@google.com, hramamurthy@google.com, 
-	rushilg@google.com, jfraker@google.com, junfeng.guo@intel.com, 
-	Julia.Lawall@inria.fr, horms@kernel.org, linux-kernel@vger.kernel.org, 
-	Ziwei Xiao <ziweixiao@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The qpl_cfg struct was used to make sure that no two different queues
-are using QPL with the same qpl_id. We can remove that qpl_cfg struct
-since now the qpl_ids map with the queues respectively as follows:
-For tx queues: qpl_id = tx_qid
-For rx queues: qpl_id = max_tx_queues + rx_qid
+On Thu, 11 Apr 2024 19:00:41 +0300
+Mike Rapoport <rppt@kernel.org> wrote:
 
-And when XDP is used, it will need the user to reduce the tx queues to
-be at most half of the max_tx_queues. Then it will use the same number
-of tx queues starting from the end of existing tx queues for XDP. So the
-XDP queues will not exceed the max_tx_queues range and will not overlap
-with the rx queues, where the qpl_ids will not have overlapping too.
+> From: "Mike Rapoport (IBM)" <rppt@kernel.org>
+> 
+> module_alloc() is used everywhere as a mean to allocate memory for code.
+> 
+> Beside being semantically wrong, this unnecessarily ties all subsystems
+> that need to allocate code, such as ftrace, kprobes and BPF to modules and
+> puts the burden of code allocation to the modules code.
+> 
+> Several architectures override module_alloc() because of various
+> constraints where the executable memory can be located and this causes
+> additional obstacles for improvements of code allocation.
+> 
+> Start splitting code allocation from modules by introducing execmem_alloc()
+> and execmem_free() APIs.
+> 
+> Initially, execmem_alloc() is a wrapper for module_alloc() and
+> execmem_free() is a replacement of module_memfree() to allow updating all
+> call sites to use the new APIs.
+> 
+> Since architectures define different restrictions on placement,
+> permissions, alignment and other parameters for memory that can be used by
+> different subsystems that allocate executable memory, execmem_alloc() takes
+> a type argument, that will be used to identify the calling subsystem and to
+> allow architectures define parameters for ranges suitable for that
+> subsystem.
+> 
 
-Considering of that, we remove the qpl_cfg struct to get the qpl_id
-directly based on the queue id. Unless we are erroneously allocating a
-rx/tx queue that has already been allocated, we would never allocate
-the qpl with the same qpl_id twice. In that case, it should fail much
-earlier than the QPL assignment.
+This looks good to me for the kprobe part.
 
-Suggested-by: Praveen Kaligineedi <pkaligineedi@google.com>
-Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
-Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
-Reviewed-by: Shailend Chand <shailend@google.com>
----
- drivers/net/ethernet/google/gve/gve.h         | 39 +------------------
- drivers/net/ethernet/google/gve/gve_ethtool.c |  9 -----
- drivers/net/ethernet/google/gve/gve_main.c    | 38 +-----------------
- drivers/net/ethernet/google/gve/gve_rx.c      | 12 ++----
- drivers/net/ethernet/google/gve/gve_rx_dqo.c  | 12 +++---
- drivers/net/ethernet/google/gve/gve_tx.c      | 12 ++----
- drivers/net/ethernet/google/gve/gve_tx_dqo.c  | 11 ++----
- 7 files changed, 20 insertions(+), 113 deletions(-)
+Acked-by: Masami Hiramatsu (Google) <mhiramat@kernel.org>
 
-diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index e97633b68e25..53b5244dc7bc 100644
---- a/drivers/net/ethernet/google/gve/gve.h
-+++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -639,7 +639,6 @@ struct gve_ptype_lut {
- 
- /* Parameters for allocating queue page lists */
- struct gve_qpls_alloc_cfg {
--	struct gve_qpl_config *qpl_cfg;
- 	struct gve_queue_config *tx_cfg;
- 	struct gve_queue_config *rx_cfg;
- 
-@@ -655,9 +654,8 @@ struct gve_qpls_alloc_cfg {
- struct gve_tx_alloc_rings_cfg {
- 	struct gve_queue_config *qcfg;
- 
--	/* qpls and qpl_cfg must already be allocated */
-+	/* qpls must already be allocated */
- 	struct gve_queue_page_list *qpls;
--	struct gve_qpl_config *qpl_cfg;
- 
- 	u16 ring_size;
- 	u16 start_idx;
-@@ -674,9 +672,8 @@ struct gve_rx_alloc_rings_cfg {
- 	struct gve_queue_config *qcfg;
- 	struct gve_queue_config *qcfg_tx;
- 
--	/* qpls and qpl_cfg must already be allocated */
-+	/* qpls must already be allocated */
- 	struct gve_queue_page_list *qpls;
--	struct gve_qpl_config *qpl_cfg;
- 
- 	u16 ring_size;
- 	u16 packet_buffer_size;
-@@ -732,7 +729,6 @@ struct gve_priv {
- 	u16 num_xdp_queues;
- 	struct gve_queue_config tx_cfg;
- 	struct gve_queue_config rx_cfg;
--	struct gve_qpl_config qpl_cfg; /* map used QPL ids */
- 	u32 num_ntfy_blks; /* spilt between TX and RX so must be even */
- 
- 	struct gve_registers __iomem *reg_bar0; /* see gve_register.h */
-@@ -1053,37 +1049,6 @@ static inline u32 gve_get_rx_pages_per_qpl_dqo(u32 rx_desc_cnt)
- 	return 2 * rx_desc_cnt;
- }
- 
--/* Returns a pointer to the next available tx qpl in the list of qpls */
--static inline
--struct gve_queue_page_list *gve_assign_tx_qpl(struct gve_tx_alloc_rings_cfg *cfg,
--					      int tx_qid)
--{
--	/* QPL already in use */
--	if (test_bit(tx_qid, cfg->qpl_cfg->qpl_id_map))
--		return NULL;
--	set_bit(tx_qid, cfg->qpl_cfg->qpl_id_map);
--	return &cfg->qpls[tx_qid];
--}
--
--/* Returns a pointer to the next available rx qpl in the list of qpls */
--static inline
--struct gve_queue_page_list *gve_assign_rx_qpl(struct gve_rx_alloc_rings_cfg *cfg,
--					      int rx_qid)
--{
--	int id = gve_get_rx_qpl_id(cfg->qcfg_tx, rx_qid);
--	/* QPL already in use */
--	if (test_bit(id, cfg->qpl_cfg->qpl_id_map))
--		return NULL;
--	set_bit(id, cfg->qpl_cfg->qpl_id_map);
--	return &cfg->qpls[id];
--}
--
--/* Unassigns the qpl with the given id */
--static inline void gve_unassign_qpl(struct gve_qpl_config *qpl_cfg, int id)
--{
--	clear_bit(id, qpl_cfg->qpl_id_map);
--}
--
- /* Returns the correct dma direction for tx and rx qpls */
- static inline enum dma_data_direction gve_qpl_dma_dir(struct gve_priv *priv,
- 						      int id)
-diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
-index 299206d15c73..bd7632eed776 100644
---- a/drivers/net/ethernet/google/gve/gve_ethtool.c
-+++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
-@@ -510,7 +510,6 @@ static int gve_adjust_ring_sizes(struct gve_priv *priv,
- 	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
- 	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
- 	struct gve_qpls_alloc_cfg qpls_alloc_cfg = {0};
--	struct gve_qpl_config new_qpl_cfg;
- 	int err;
- 
- 	/* get current queue configuration */
-@@ -521,14 +520,6 @@ static int gve_adjust_ring_sizes(struct gve_priv *priv,
- 	tx_alloc_cfg.ring_size = new_tx_desc_cnt;
- 	rx_alloc_cfg.ring_size = new_rx_desc_cnt;
- 
--	/* qpl_cfg is not read-only, it contains a map that gets updated as
--	 * rings are allocated, which is why we cannot use the yet unreleased
--	 * one in priv.
--	 */
--	qpls_alloc_cfg.qpl_cfg = &new_qpl_cfg;
--	tx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
--	rx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
--
- 	if (netif_running(priv->dev)) {
- 		err = gve_adjust_config(priv, &qpls_alloc_cfg,
- 					&tx_alloc_cfg, &rx_alloc_cfg);
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index a515e5af843c..61039e3dd2bb 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -829,7 +829,6 @@ static void gve_tx_get_curr_alloc_cfg(struct gve_priv *priv,
- 	cfg->qcfg = &priv->tx_cfg;
- 	cfg->raw_addressing = !gve_is_qpl(priv);
- 	cfg->qpls = priv->qpls;
--	cfg->qpl_cfg = &priv->qpl_cfg;
- 	cfg->ring_size = priv->tx_desc_cnt;
- 	cfg->start_idx = 0;
- 	cfg->num_rings = gve_num_tx_queues(priv);
-@@ -1119,22 +1118,13 @@ static int gve_alloc_qpls(struct gve_priv *priv, struct gve_qpls_alloc_cfg *cfg,
- 	if (!qpls)
- 		return -ENOMEM;
- 
--	cfg->qpl_cfg->qpl_map_size = BITS_TO_LONGS(max_queues) *
--		sizeof(unsigned long) * BITS_PER_BYTE;
--	cfg->qpl_cfg->qpl_id_map = kvcalloc(BITS_TO_LONGS(max_queues),
--					    sizeof(unsigned long), GFP_KERNEL);
--	if (!cfg->qpl_cfg->qpl_id_map) {
--		err = -ENOMEM;
--		goto free_qpl_array;
--	}
--
- 	/* Allocate TX QPLs */
- 	page_count = priv->tx_pages_per_qpl;
- 	tx_num_qpls = gve_num_tx_qpls(cfg->tx_cfg, cfg->num_xdp_queues,
- 				      gve_is_qpl(priv));
- 	err = gve_alloc_n_qpls(priv, qpls, page_count, 0, tx_num_qpls);
- 	if (err)
--		goto free_qpl_map;
-+		goto free_qpl_array;
- 
- 	/* Allocate RX QPLs */
- 	rx_start_id = gve_rx_start_qpl_id(cfg->tx_cfg);
-@@ -1157,9 +1147,6 @@ static int gve_alloc_qpls(struct gve_priv *priv, struct gve_qpls_alloc_cfg *cfg,
- 
- free_tx_qpls:
- 	gve_free_n_qpls(priv, qpls, 0, tx_num_qpls);
--free_qpl_map:
--	kvfree(cfg->qpl_cfg->qpl_id_map);
--	cfg->qpl_cfg->qpl_id_map = NULL;
- free_qpl_array:
- 	kvfree(qpls);
- 	return err;
-@@ -1175,9 +1162,6 @@ static void gve_free_qpls(struct gve_priv *priv,
- 	if (!qpls)
- 		return;
- 
--	kvfree(cfg->qpl_cfg->qpl_id_map);
--	cfg->qpl_cfg->qpl_id_map = NULL;
--
- 	for (i = 0; i < max_queues; i++)
- 		gve_free_queue_page_list(priv, &qpls[i], i);
- 
-@@ -1292,7 +1276,6 @@ static void gve_qpls_get_curr_alloc_cfg(struct gve_priv *priv,
- 	  cfg->raw_addressing = !gve_is_qpl(priv);
- 	  cfg->is_gqi = gve_is_gqi(priv);
- 	  cfg->num_xdp_queues = priv->num_xdp_queues;
--	  cfg->qpl_cfg = &priv->qpl_cfg;
- 	  cfg->tx_cfg = &priv->tx_cfg;
- 	  cfg->rx_cfg = &priv->rx_cfg;
- 	  cfg->qpls = priv->qpls;
-@@ -1306,7 +1289,6 @@ static void gve_rx_get_curr_alloc_cfg(struct gve_priv *priv,
- 	cfg->raw_addressing = !gve_is_qpl(priv);
- 	cfg->enable_header_split = priv->header_split_enabled;
- 	cfg->qpls = priv->qpls;
--	cfg->qpl_cfg = &priv->qpl_cfg;
- 	cfg->ring_size = priv->rx_desc_cnt;
- 	cfg->packet_buffer_size = gve_is_gqi(priv) ?
- 				  GVE_DEFAULT_RX_BUFFER_SIZE :
-@@ -1419,7 +1401,6 @@ static int gve_queues_start(struct gve_priv *priv,
- 	priv->rx = rx_alloc_cfg->rx;
- 
- 	/* Record new configs into priv */
--	priv->qpl_cfg = *qpls_alloc_cfg->qpl_cfg;
- 	priv->tx_cfg = *tx_alloc_cfg->qcfg;
- 	priv->rx_cfg = *rx_alloc_cfg->qcfg;
- 	priv->tx_desc_cnt = tx_alloc_cfg->ring_size;
-@@ -1916,20 +1897,11 @@ int gve_adjust_queues(struct gve_priv *priv,
- 	struct gve_tx_alloc_rings_cfg tx_alloc_cfg = {0};
- 	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
- 	struct gve_qpls_alloc_cfg qpls_alloc_cfg = {0};
--	struct gve_qpl_config new_qpl_cfg;
- 	int err;
- 
- 	gve_get_curr_alloc_cfgs(priv, &qpls_alloc_cfg,
- 				&tx_alloc_cfg, &rx_alloc_cfg);
- 
--	/* qpl_cfg is not read-only, it contains a map that gets updated as
--	 * rings are allocated, which is why we cannot use the yet unreleased
--	 * one in priv.
--	 */
--	qpls_alloc_cfg.qpl_cfg = &new_qpl_cfg;
--	tx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
--	rx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
--
- 	/* Relay the new config from ethtool */
- 	qpls_alloc_cfg.tx_cfg = &new_tx_config;
- 	tx_alloc_cfg.qcfg = &new_tx_config;
-@@ -2121,18 +2093,10 @@ static int gve_set_features(struct net_device *netdev,
- 	struct gve_rx_alloc_rings_cfg rx_alloc_cfg = {0};
- 	struct gve_qpls_alloc_cfg qpls_alloc_cfg = {0};
- 	struct gve_priv *priv = netdev_priv(netdev);
--	struct gve_qpl_config new_qpl_cfg;
- 	int err;
- 
- 	gve_get_curr_alloc_cfgs(priv, &qpls_alloc_cfg,
- 				&tx_alloc_cfg, &rx_alloc_cfg);
--	/* qpl_cfg is not read-only, it contains a map that gets updated as
--	 * rings are allocated, which is why we cannot use the yet unreleased
--	 * one in priv.
--	 */
--	qpls_alloc_cfg.qpl_cfg = &new_qpl_cfg;
--	tx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
--	rx_alloc_cfg.qpl_cfg = &new_qpl_cfg;
- 
- 	if ((netdev->features & NETIF_F_LRO) != (features & NETIF_F_LRO)) {
- 		netdev->features ^= NETIF_F_LRO;
-diff --git a/drivers/net/ethernet/google/gve/gve_rx.c b/drivers/net/ethernet/google/gve/gve_rx.c
-index cd727e55ae0f..9b56e89c4f43 100644
---- a/drivers/net/ethernet/google/gve/gve_rx.c
-+++ b/drivers/net/ethernet/google/gve/gve_rx.c
-@@ -38,7 +38,6 @@ static void gve_rx_unfill_pages(struct gve_priv *priv,
- 		for (i = 0; i < slots; i++)
- 			page_ref_sub(rx->data.page_info[i].page,
- 				     rx->data.page_info[i].pagecnt_bias - 1);
--		gve_unassign_qpl(cfg->qpl_cfg, rx->data.qpl->id);
- 		rx->data.qpl = NULL;
- 
- 		for (i = 0; i < rx->qpl_copy_pool_mask + 1; i++) {
-@@ -145,13 +144,11 @@ static int gve_rx_prefill_pages(struct gve_rx_ring *rx,
- 		return -ENOMEM;
- 
- 	if (!rx->data.raw_addressing) {
--		rx->data.qpl = gve_assign_rx_qpl(cfg, rx->q_num);
--		if (!rx->data.qpl) {
--			kvfree(rx->data.page_info);
--			rx->data.page_info = NULL;
--			return -ENOMEM;
--		}
-+		u32 qpl_id = gve_get_rx_qpl_id(cfg->qcfg_tx, rx->q_num);
-+
-+		rx->data.qpl = &cfg->qpls[qpl_id];
- 	}
-+
- 	for (i = 0; i < slots; i++) {
- 		if (!rx->data.raw_addressing) {
- 			struct page *page = rx->data.qpl->pages[i];
-@@ -204,7 +201,6 @@ static int gve_rx_prefill_pages(struct gve_rx_ring *rx,
- 		page_ref_sub(rx->data.page_info[i].page,
- 			     rx->data.page_info[i].pagecnt_bias - 1);
- 
--	gve_unassign_qpl(cfg->qpl_cfg, rx->data.qpl->id);
- 	rx->data.qpl = NULL;
- 
- 	return err;
-diff --git a/drivers/net/ethernet/google/gve/gve_rx_dqo.c b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-index 15108407b54f..53fd2d87233f 100644
---- a/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_rx_dqo.c
-@@ -247,10 +247,8 @@ static void gve_rx_free_ring_dqo(struct gve_priv *priv, struct gve_rx_ring *rx,
- 		if (bs->page_info.page)
- 			gve_free_page_dqo(priv, bs, !rx->dqo.qpl);
- 	}
--	if (rx->dqo.qpl) {
--		gve_unassign_qpl(cfg->qpl_cfg, rx->dqo.qpl->id);
--		rx->dqo.qpl = NULL;
--	}
-+
-+	rx->dqo.qpl = NULL;
- 
- 	if (rx->dqo.bufq.desc_ring) {
- 		size = sizeof(rx->dqo.bufq.desc_ring[0]) * buffer_queue_slots;
-@@ -359,9 +357,9 @@ static int gve_rx_alloc_ring_dqo(struct gve_priv *priv,
- 		goto err;
- 
- 	if (!cfg->raw_addressing) {
--		rx->dqo.qpl = gve_assign_rx_qpl(cfg, rx->q_num);
--		if (!rx->dqo.qpl)
--			goto err;
-+		u32 qpl_id = gve_get_rx_qpl_id(cfg->qcfg_tx, rx->q_num);
-+
-+		rx->dqo.qpl = &cfg->qpls[qpl_id];
- 		rx->dqo.next_qpl_page_idx = 0;
- 	}
- 
-diff --git a/drivers/net/ethernet/google/gve/gve_tx.c b/drivers/net/ethernet/google/gve/gve_tx.c
-index 4b9853adc113..f805700d67e7 100644
---- a/drivers/net/ethernet/google/gve/gve_tx.c
-+++ b/drivers/net/ethernet/google/gve/gve_tx.c
-@@ -225,7 +225,6 @@ static void gve_tx_free_ring_gqi(struct gve_priv *priv, struct gve_tx_ring *tx,
- 
- 	if (!tx->raw_addressing) {
- 		gve_tx_fifo_release(priv, &tx->tx_fifo);
--		gve_unassign_qpl(cfg->qpl_cfg, tx->tx_fifo.qpl->id);
- 		tx->tx_fifo.qpl = NULL;
- 	}
- 
-@@ -280,12 +279,12 @@ static int gve_tx_alloc_ring_gqi(struct gve_priv *priv,
- 	tx->raw_addressing = cfg->raw_addressing;
- 	tx->dev = hdev;
- 	if (!tx->raw_addressing) {
--		tx->tx_fifo.qpl = gve_assign_tx_qpl(cfg, idx);
--		if (!tx->tx_fifo.qpl)
--			goto abort_with_desc;
-+		u32 qpl_id = gve_tx_qpl_id(priv, tx->q_num);
-+
-+		tx->tx_fifo.qpl = &cfg->qpls[qpl_id];
- 		/* map Tx FIFO */
- 		if (gve_tx_fifo_init(priv, &tx->tx_fifo))
--			goto abort_with_qpl;
-+			goto abort_with_desc;
- 	}
- 
- 	tx->q_resources =
-@@ -301,9 +300,6 @@ static int gve_tx_alloc_ring_gqi(struct gve_priv *priv,
- abort_with_fifo:
- 	if (!tx->raw_addressing)
- 		gve_tx_fifo_release(priv, &tx->tx_fifo);
--abort_with_qpl:
--	if (!tx->raw_addressing)
--		gve_unassign_qpl(cfg->qpl_cfg, tx->tx_fifo.qpl->id);
- abort_with_desc:
- 	dma_free_coherent(hdev, bytes, tx->desc, tx->bus);
- 	tx->desc = NULL;
-diff --git a/drivers/net/ethernet/google/gve/gve_tx_dqo.c b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-index 70f29b90a982..3d825e406c4b 100644
---- a/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-+++ b/drivers/net/ethernet/google/gve/gve_tx_dqo.c
-@@ -236,10 +236,7 @@ static void gve_tx_free_ring_dqo(struct gve_priv *priv, struct gve_tx_ring *tx,
- 	kvfree(tx->dqo.tx_qpl_buf_next);
- 	tx->dqo.tx_qpl_buf_next = NULL;
- 
--	if (tx->dqo.qpl) {
--		gve_unassign_qpl(cfg->qpl_cfg, tx->dqo.qpl->id);
--		tx->dqo.qpl = NULL;
--	}
-+	tx->dqo.qpl = NULL;
- 
- 	netif_dbg(priv, drv, priv->dev, "freed tx queue %d\n", idx);
- }
-@@ -352,9 +349,9 @@ static int gve_tx_alloc_ring_dqo(struct gve_priv *priv,
- 		goto err;
- 
- 	if (!cfg->raw_addressing) {
--		tx->dqo.qpl = gve_assign_tx_qpl(cfg, idx);
--		if (!tx->dqo.qpl)
--			goto err;
-+		u32 qpl_id = gve_tx_qpl_id(priv, tx->q_num);
-+
-+		tx->dqo.qpl = &cfg->qpls[qpl_id];
- 
- 		if (gve_tx_qpl_buf_init(tx))
- 			goto err;
+Thank you,
+
+> Signed-off-by: Mike Rapoport (IBM) <rppt@kernel.org>
+> ---
+>  arch/powerpc/kernel/kprobes.c    |  6 ++--
+>  arch/s390/kernel/ftrace.c        |  4 +--
+>  arch/s390/kernel/kprobes.c       |  4 +--
+>  arch/s390/kernel/module.c        |  5 +--
+>  arch/sparc/net/bpf_jit_comp_32.c |  8 ++---
+>  arch/x86/kernel/ftrace.c         |  6 ++--
+>  arch/x86/kernel/kprobes/core.c   |  4 +--
+>  include/linux/execmem.h          | 57 ++++++++++++++++++++++++++++++++
+>  include/linux/moduleloader.h     |  3 --
+>  kernel/bpf/core.c                |  6 ++--
+>  kernel/kprobes.c                 |  8 ++---
+>  kernel/module/Kconfig            |  1 +
+>  kernel/module/main.c             | 25 +++++---------
+>  mm/Kconfig                       |  3 ++
+>  mm/Makefile                      |  1 +
+>  mm/execmem.c                     | 26 +++++++++++++++
+>  16 files changed, 122 insertions(+), 45 deletions(-)
+>  create mode 100644 include/linux/execmem.h
+>  create mode 100644 mm/execmem.c
+> 
+> diff --git a/arch/powerpc/kernel/kprobes.c b/arch/powerpc/kernel/kprobes.c
+> index bbca90a5e2ec..9fcd01bb2ce6 100644
+> --- a/arch/powerpc/kernel/kprobes.c
+> +++ b/arch/powerpc/kernel/kprobes.c
+> @@ -19,8 +19,8 @@
+>  #include <linux/extable.h>
+>  #include <linux/kdebug.h>
+>  #include <linux/slab.h>
+> -#include <linux/moduleloader.h>
+>  #include <linux/set_memory.h>
+> +#include <linux/execmem.h>
+>  #include <asm/code-patching.h>
+>  #include <asm/cacheflush.h>
+>  #include <asm/sstep.h>
+> @@ -130,7 +130,7 @@ void *alloc_insn_page(void)
+>  {
+>  	void *page;
+>  
+> -	page = module_alloc(PAGE_SIZE);
+> +	page = execmem_alloc(EXECMEM_KPROBES, PAGE_SIZE);
+>  	if (!page)
+>  		return NULL;
+>  
+> @@ -142,7 +142,7 @@ void *alloc_insn_page(void)
+>  	}
+>  	return page;
+>  error:
+> -	module_memfree(page);
+> +	execmem_free(page);
+>  	return NULL;
+>  }
+>  
+> diff --git a/arch/s390/kernel/ftrace.c b/arch/s390/kernel/ftrace.c
+> index c46381ea04ec..798249ef5646 100644
+> --- a/arch/s390/kernel/ftrace.c
+> +++ b/arch/s390/kernel/ftrace.c
+> @@ -7,13 +7,13 @@
+>   *   Author(s): Martin Schwidefsky <schwidefsky@de.ibm.com>
+>   */
+>  
+> -#include <linux/moduleloader.h>
+>  #include <linux/hardirq.h>
+>  #include <linux/uaccess.h>
+>  #include <linux/ftrace.h>
+>  #include <linux/kernel.h>
+>  #include <linux/types.h>
+>  #include <linux/kprobes.h>
+> +#include <linux/execmem.h>
+>  #include <trace/syscall.h>
+>  #include <asm/asm-offsets.h>
+>  #include <asm/text-patching.h>
+> @@ -220,7 +220,7 @@ static int __init ftrace_plt_init(void)
+>  {
+>  	const char *start, *end;
+>  
+> -	ftrace_plt = module_alloc(PAGE_SIZE);
+> +	ftrace_plt = execmem_alloc(EXECMEM_FTRACE, PAGE_SIZE);
+>  	if (!ftrace_plt)
+>  		panic("cannot allocate ftrace plt\n");
+>  
+> diff --git a/arch/s390/kernel/kprobes.c b/arch/s390/kernel/kprobes.c
+> index f0cf20d4b3c5..3c1b1be744de 100644
+> --- a/arch/s390/kernel/kprobes.c
+> +++ b/arch/s390/kernel/kprobes.c
+> @@ -9,7 +9,6 @@
+>  
+>  #define pr_fmt(fmt) "kprobes: " fmt
+>  
+> -#include <linux/moduleloader.h>
+>  #include <linux/kprobes.h>
+>  #include <linux/ptrace.h>
+>  #include <linux/preempt.h>
+> @@ -21,6 +20,7 @@
+>  #include <linux/slab.h>
+>  #include <linux/hardirq.h>
+>  #include <linux/ftrace.h>
+> +#include <linux/execmem.h>
+>  #include <asm/set_memory.h>
+>  #include <asm/sections.h>
+>  #include <asm/dis.h>
+> @@ -38,7 +38,7 @@ void *alloc_insn_page(void)
+>  {
+>  	void *page;
+>  
+> -	page = module_alloc(PAGE_SIZE);
+> +	page = execmem_alloc(EXECMEM_KPROBES, PAGE_SIZE);
+>  	if (!page)
+>  		return NULL;
+>  	set_memory_rox((unsigned long)page, 1);
+> diff --git a/arch/s390/kernel/module.c b/arch/s390/kernel/module.c
+> index 42215f9404af..ac97a905e8cd 100644
+> --- a/arch/s390/kernel/module.c
+> +++ b/arch/s390/kernel/module.c
+> @@ -21,6 +21,7 @@
+>  #include <linux/moduleloader.h>
+>  #include <linux/bug.h>
+>  #include <linux/memory.h>
+> +#include <linux/execmem.h>
+>  #include <asm/alternative.h>
+>  #include <asm/nospec-branch.h>
+>  #include <asm/facility.h>
+> @@ -76,7 +77,7 @@ void *module_alloc(unsigned long size)
+>  #ifdef CONFIG_FUNCTION_TRACER
+>  void module_arch_cleanup(struct module *mod)
+>  {
+> -	module_memfree(mod->arch.trampolines_start);
+> +	execmem_free(mod->arch.trampolines_start);
+>  }
+>  #endif
+>  
+> @@ -510,7 +511,7 @@ static int module_alloc_ftrace_hotpatch_trampolines(struct module *me,
+>  
+>  	size = FTRACE_HOTPATCH_TRAMPOLINES_SIZE(s->sh_size);
+>  	numpages = DIV_ROUND_UP(size, PAGE_SIZE);
+> -	start = module_alloc(numpages * PAGE_SIZE);
+> +	start = execmem_alloc(EXECMEM_FTRACE, numpages * PAGE_SIZE);
+>  	if (!start)
+>  		return -ENOMEM;
+>  	set_memory_rox((unsigned long)start, numpages);
+> diff --git a/arch/sparc/net/bpf_jit_comp_32.c b/arch/sparc/net/bpf_jit_comp_32.c
+> index da2df1e84ed4..bda2dbd3f4c5 100644
+> --- a/arch/sparc/net/bpf_jit_comp_32.c
+> +++ b/arch/sparc/net/bpf_jit_comp_32.c
+> @@ -1,10 +1,10 @@
+>  // SPDX-License-Identifier: GPL-2.0
+> -#include <linux/moduleloader.h>
+>  #include <linux/workqueue.h>
+>  #include <linux/netdevice.h>
+>  #include <linux/filter.h>
+>  #include <linux/cache.h>
+>  #include <linux/if_vlan.h>
+> +#include <linux/execmem.h>
+>  
+>  #include <asm/cacheflush.h>
+>  #include <asm/ptrace.h>
+> @@ -713,7 +713,7 @@ cond_branch:			f_offset = addrs[i + filter[i].jf];
+>  				if (unlikely(proglen + ilen > oldproglen)) {
+>  					pr_err("bpb_jit_compile fatal error\n");
+>  					kfree(addrs);
+> -					module_memfree(image);
+> +					execmem_free(image);
+>  					return;
+>  				}
+>  				memcpy(image + proglen, temp, ilen);
+> @@ -736,7 +736,7 @@ cond_branch:			f_offset = addrs[i + filter[i].jf];
+>  			break;
+>  		}
+>  		if (proglen == oldproglen) {
+> -			image = module_alloc(proglen);
+> +			image = execmem_alloc(EXECMEM_BPF, proglen);
+>  			if (!image)
+>  				goto out;
+>  		}
+> @@ -758,7 +758,7 @@ cond_branch:			f_offset = addrs[i + filter[i].jf];
+>  void bpf_jit_free(struct bpf_prog *fp)
+>  {
+>  	if (fp->jited)
+> -		module_memfree(fp->bpf_func);
+> +		execmem_free(fp->bpf_func);
+>  
+>  	bpf_prog_unlock_free(fp);
+>  }
+> diff --git a/arch/x86/kernel/ftrace.c b/arch/x86/kernel/ftrace.c
+> index 70139d9d2e01..c8ddb7abda7c 100644
+> --- a/arch/x86/kernel/ftrace.c
+> +++ b/arch/x86/kernel/ftrace.c
+> @@ -25,6 +25,7 @@
+>  #include <linux/memory.h>
+>  #include <linux/vmalloc.h>
+>  #include <linux/set_memory.h>
+> +#include <linux/execmem.h>
+>  
+>  #include <trace/syscall.h>
+>  
+> @@ -261,15 +262,14 @@ void arch_ftrace_update_code(int command)
+>  #ifdef CONFIG_X86_64
+>  
+>  #ifdef CONFIG_MODULES
+> -#include <linux/moduleloader.h>
+>  /* Module allocation simplifies allocating memory for code */
+>  static inline void *alloc_tramp(unsigned long size)
+>  {
+> -	return module_alloc(size);
+> +	return execmem_alloc(EXECMEM_FTRACE, size);
+>  }
+>  static inline void tramp_free(void *tramp)
+>  {
+> -	module_memfree(tramp);
+> +	execmem_free(tramp);
+>  }
+>  #else
+>  /* Trampolines can only be created if modules are supported */
+> diff --git a/arch/x86/kernel/kprobes/core.c b/arch/x86/kernel/kprobes/core.c
+> index d0e49bd7c6f3..72e6a45e7ec2 100644
+> --- a/arch/x86/kernel/kprobes/core.c
+> +++ b/arch/x86/kernel/kprobes/core.c
+> @@ -40,12 +40,12 @@
+>  #include <linux/kgdb.h>
+>  #include <linux/ftrace.h>
+>  #include <linux/kasan.h>
+> -#include <linux/moduleloader.h>
+>  #include <linux/objtool.h>
+>  #include <linux/vmalloc.h>
+>  #include <linux/pgtable.h>
+>  #include <linux/set_memory.h>
+>  #include <linux/cfi.h>
+> +#include <linux/execmem.h>
+>  
+>  #include <asm/text-patching.h>
+>  #include <asm/cacheflush.h>
+> @@ -495,7 +495,7 @@ void *alloc_insn_page(void)
+>  {
+>  	void *page;
+>  
+> -	page = module_alloc(PAGE_SIZE);
+> +	page = execmem_alloc(EXECMEM_KPROBES, PAGE_SIZE);
+>  	if (!page)
+>  		return NULL;
+>  
+> diff --git a/include/linux/execmem.h b/include/linux/execmem.h
+> new file mode 100644
+> index 000000000000..43e7995593a1
+> --- /dev/null
+> +++ b/include/linux/execmem.h
+> @@ -0,0 +1,57 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef _LINUX_EXECMEM_ALLOC_H
+> +#define _LINUX_EXECMEM_ALLOC_H
+> +
+> +#include <linux/types.h>
+> +#include <linux/moduleloader.h>
+> +
+> +/**
+> + * enum execmem_type - types of executable memory ranges
+> + *
+> + * There are several subsystems that allocate executable memory.
+> + * Architectures define different restrictions on placement,
+> + * permissions, alignment and other parameters for memory that can be used
+> + * by these subsystems.
+> + * Types in this enum identify subsystems that allocate executable memory
+> + * and let architectures define parameters for ranges suitable for
+> + * allocations by each subsystem.
+> + *
+> + * @EXECMEM_DEFAULT: default parameters that would be used for types that
+> + * are not explcitly defined.
+> + * @EXECMEM_MODULE_TEXT: parameters for module text sections
+> + * @EXECMEM_KPROBES: parameters for kprobes
+> + * @EXECMEM_FTRACE: parameters for ftrace
+> + * @EXECMEM_BPF: parameters for BPF
+> + * @EXECMEM_TYPE_MAX:
+> + */
+> +enum execmem_type {
+> +	EXECMEM_DEFAULT,
+> +	EXECMEM_MODULE_TEXT = EXECMEM_DEFAULT,
+> +	EXECMEM_KPROBES,
+> +	EXECMEM_FTRACE,
+> +	EXECMEM_BPF,
+> +	EXECMEM_TYPE_MAX,
+> +};
+> +
+> +/**
+> + * execmem_alloc - allocate executable memory
+> + * @type: type of the allocation
+> + * @size: how many bytes of memory are required
+> + *
+> + * Allocates memory that will contain executable code, either generated or
+> + * loaded from kernel modules.
+> + *
+> + * The memory will have protections defined by architecture for executable
+> + * region of the @type.
+> + *
+> + * Return: a pointer to the allocated memory or %NULL
+> + */
+> +void *execmem_alloc(enum execmem_type type, size_t size);
+> +
+> +/**
+> + * execmem_free - free executable memory
+> + * @ptr: pointer to the memory that should be freed
+> + */
+> +void execmem_free(void *ptr);
+> +
+> +#endif /* _LINUX_EXECMEM_ALLOC_H */
+> diff --git a/include/linux/moduleloader.h b/include/linux/moduleloader.h
+> index 89b1e0ed9811..a3b8caee9405 100644
+> --- a/include/linux/moduleloader.h
+> +++ b/include/linux/moduleloader.h
+> @@ -29,9 +29,6 @@ unsigned int arch_mod_section_prepend(struct module *mod, unsigned int section);
+>     sections.  Returns NULL on failure. */
+>  void *module_alloc(unsigned long size);
+>  
+> -/* Free memory returned from module_alloc. */
+> -void module_memfree(void *module_region);
+> -
+>  /* Determines if the section name is an init section (that is only used during
+>   * module loading).
+>   */
+> diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+> index 696bc55de8e8..75a54024e2f4 100644
+> --- a/kernel/bpf/core.c
+> +++ b/kernel/bpf/core.c
+> @@ -22,7 +22,6 @@
+>  #include <linux/skbuff.h>
+>  #include <linux/vmalloc.h>
+>  #include <linux/random.h>
+> -#include <linux/moduleloader.h>
+>  #include <linux/bpf.h>
+>  #include <linux/btf.h>
+>  #include <linux/objtool.h>
+> @@ -37,6 +36,7 @@
+>  #include <linux/nospec.h>
+>  #include <linux/bpf_mem_alloc.h>
+>  #include <linux/memcontrol.h>
+> +#include <linux/execmem.h>
+>  
+>  #include <asm/barrier.h>
+>  #include <asm/unaligned.h>
+> @@ -1050,12 +1050,12 @@ void bpf_jit_uncharge_modmem(u32 size)
+>  
+>  void *__weak bpf_jit_alloc_exec(unsigned long size)
+>  {
+> -	return module_alloc(size);
+> +	return execmem_alloc(EXECMEM_BPF, size);
+>  }
+>  
+>  void __weak bpf_jit_free_exec(void *addr)
+>  {
+> -	module_memfree(addr);
+> +	execmem_free(addr);
+>  }
+>  
+>  struct bpf_binary_header *
+> diff --git a/kernel/kprobes.c b/kernel/kprobes.c
+> index 9d9095e81792..047ca629ce49 100644
+> --- a/kernel/kprobes.c
+> +++ b/kernel/kprobes.c
+> @@ -26,7 +26,6 @@
+>  #include <linux/slab.h>
+>  #include <linux/stddef.h>
+>  #include <linux/export.h>
+> -#include <linux/moduleloader.h>
+>  #include <linux/kallsyms.h>
+>  #include <linux/freezer.h>
+>  #include <linux/seq_file.h>
+> @@ -39,6 +38,7 @@
+>  #include <linux/jump_label.h>
+>  #include <linux/static_call.h>
+>  #include <linux/perf_event.h>
+> +#include <linux/execmem.h>
+>  
+>  #include <asm/sections.h>
+>  #include <asm/cacheflush.h>
+> @@ -113,17 +113,17 @@ enum kprobe_slot_state {
+>  void __weak *alloc_insn_page(void)
+>  {
+>  	/*
+> -	 * Use module_alloc() so this page is within +/- 2GB of where the
+> +	 * Use execmem_alloc() so this page is within +/- 2GB of where the
+>  	 * kernel image and loaded module images reside. This is required
+>  	 * for most of the architectures.
+>  	 * (e.g. x86-64 needs this to handle the %rip-relative fixups.)
+>  	 */
+> -	return module_alloc(PAGE_SIZE);
+> +	return execmem_alloc(EXECMEM_KPROBES, PAGE_SIZE);
+>  }
+>  
+>  static void free_insn_page(void *page)
+>  {
+> -	module_memfree(page);
+> +	execmem_free(page);
+>  }
+>  
+>  struct kprobe_insn_cache kprobe_insn_slots = {
+> diff --git a/kernel/module/Kconfig b/kernel/module/Kconfig
+> index f3e0329337f6..744383c1eed1 100644
+> --- a/kernel/module/Kconfig
+> +++ b/kernel/module/Kconfig
+> @@ -2,6 +2,7 @@
+>  menuconfig MODULES
+>  	bool "Enable loadable module support"
+>  	modules
+> +	select EXECMEM
+>  	help
+>  	  Kernel modules are small pieces of compiled code which can
+>  	  be inserted in the running kernel, rather than being
+> diff --git a/kernel/module/main.c b/kernel/module/main.c
+> index 5b82b069e0d3..d56b7df0cbb6 100644
+> --- a/kernel/module/main.c
+> +++ b/kernel/module/main.c
+> @@ -57,6 +57,7 @@
+>  #include <linux/audit.h>
+>  #include <linux/cfi.h>
+>  #include <linux/debugfs.h>
+> +#include <linux/execmem.h>
+>  #include <uapi/linux/module.h>
+>  #include "internal.h"
+>  
+> @@ -1179,16 +1180,6 @@ resolve_symbol_wait(struct module *mod,
+>  	return ksym;
+>  }
+>  
+> -void __weak module_memfree(void *module_region)
+> -{
+> -	/*
+> -	 * This memory may be RO, and freeing RO memory in an interrupt is not
+> -	 * supported by vmalloc.
+> -	 */
+> -	WARN_ON(in_interrupt());
+> -	vfree(module_region);
+> -}
+> -
+>  void __weak module_arch_cleanup(struct module *mod)
+>  {
+>  }
+> @@ -1213,7 +1204,7 @@ static int module_memory_alloc(struct module *mod, enum mod_mem_type type)
+>  	if (mod_mem_use_vmalloc(type))
+>  		ptr = vmalloc(size);
+>  	else
+> -		ptr = module_alloc(size);
+> +		ptr = execmem_alloc(EXECMEM_MODULE_TEXT, size);
+>  
+>  	if (!ptr)
+>  		return -ENOMEM;
+> @@ -1244,7 +1235,7 @@ static void module_memory_free(struct module *mod, enum mod_mem_type type)
+>  	if (mod_mem_use_vmalloc(type))
+>  		vfree(ptr);
+>  	else
+> -		module_memfree(ptr);
+> +		execmem_free(ptr);
+>  }
+>  
+>  static void free_mod_mem(struct module *mod)
+> @@ -2496,9 +2487,9 @@ static void do_free_init(struct work_struct *w)
+>  
+>  	llist_for_each_safe(pos, n, list) {
+>  		initfree = container_of(pos, struct mod_initfree, node);
+> -		module_memfree(initfree->init_text);
+> -		module_memfree(initfree->init_data);
+> -		module_memfree(initfree->init_rodata);
+> +		execmem_free(initfree->init_text);
+> +		execmem_free(initfree->init_data);
+> +		execmem_free(initfree->init_rodata);
+>  		kfree(initfree);
+>  	}
+>  }
+> @@ -2608,10 +2599,10 @@ static noinline int do_init_module(struct module *mod)
+>  	 * We want to free module_init, but be aware that kallsyms may be
+>  	 * walking this with preempt disabled.  In all the failure paths, we
+>  	 * call synchronize_rcu(), but we don't want to slow down the success
+> -	 * path. module_memfree() cannot be called in an interrupt, so do the
+> +	 * path. execmem_free() cannot be called in an interrupt, so do the
+>  	 * work and call synchronize_rcu() in a work queue.
+>  	 *
+> -	 * Note that module_alloc() on most architectures creates W+X page
+> +	 * Note that execmem_alloc() on most architectures creates W+X page
+>  	 * mappings which won't be cleaned up until do_free_init() runs.  Any
+>  	 * code such as mark_rodata_ro() which depends on those mappings to
+>  	 * be cleaned up needs to sync with the queued work by invoking
+> diff --git a/mm/Kconfig b/mm/Kconfig
+> index b1448aa81e15..f08a216d4793 100644
+> --- a/mm/Kconfig
+> +++ b/mm/Kconfig
+> @@ -1241,6 +1241,9 @@ config LOCK_MM_AND_FIND_VMA
+>  config IOMMU_MM_DATA
+>  	bool
+>  
+> +config EXECMEM
+> +	bool
+> +
+>  source "mm/damon/Kconfig"
+>  
+>  endmenu
+> diff --git a/mm/Makefile b/mm/Makefile
+> index 4abb40b911ec..001336c91864 100644
+> --- a/mm/Makefile
+> +++ b/mm/Makefile
+> @@ -133,3 +133,4 @@ obj-$(CONFIG_IO_MAPPING) += io-mapping.o
+>  obj-$(CONFIG_HAVE_BOOTMEM_INFO_NODE) += bootmem_info.o
+>  obj-$(CONFIG_GENERIC_IOREMAP) += ioremap.o
+>  obj-$(CONFIG_SHRINKER_DEBUG) += shrinker_debug.o
+> +obj-$(CONFIG_EXECMEM) += execmem.o
+> diff --git a/mm/execmem.c b/mm/execmem.c
+> new file mode 100644
+> index 000000000000..ed2ea41a2543
+> --- /dev/null
+> +++ b/mm/execmem.c
+> @@ -0,0 +1,26 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +#include <linux/mm.h>
+> +#include <linux/vmalloc.h>
+> +#include <linux/execmem.h>
+> +#include <linux/moduleloader.h>
+> +
+> +static void *__execmem_alloc(size_t size)
+> +{
+> +	return module_alloc(size);
+> +}
+> +
+> +void *execmem_alloc(enum execmem_type type, size_t size)
+> +{
+> +	return __execmem_alloc(size);
+> +}
+> +
+> +void execmem_free(void *ptr)
+> +{
+> +	/*
+> +	 * This memory may be RO, and freeing RO memory in an interrupt is not
+> +	 * supported by vmalloc.
+> +	 */
+> +	WARN_ON(in_interrupt());
+> +	vfree(ptr);
+> +}
+> -- 
+> 2.43.0
+> 
+> 
+
+
 -- 
-2.44.0.769.g3c40516874-goog
-
+Masami Hiramatsu (Google) <mhiramat@kernel.org>
 
