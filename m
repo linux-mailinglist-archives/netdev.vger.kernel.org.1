@@ -1,117 +1,184 @@
-Return-Path: <netdev+bounces-88853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 772188A8BD4
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 21:07:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 644428A8BE2
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 21:13:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D30D284701
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 19:07:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC0E9B2310F
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 19:13:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14BB41DFCB;
-	Wed, 17 Apr 2024 19:07:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A187822324;
+	Wed, 17 Apr 2024 19:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="p7TiSzc2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EEmc6EZm"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BF922134B
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 19:07:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FF31DA53;
+	Wed, 17 Apr 2024 19:13:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713380869; cv=none; b=MDjU6vd8yyl8MDkWwsi9hpS50K/IhZMDhMvAh5nXMhdhkBQoVT3qgWp/Ann2p3NB+Bach1gBtVmE5bdQUEeObC8NHWjry0pP6SCmlz9vASw2WEVGg1zflikY11Km9POp1/4tM6wSJmpy4Q0tNTC+cuGmpj/LvcL3H3N+5RIANdI=
+	t=1713381223; cv=none; b=QwlUfQnz84EPHLFAgZB62KlgiC0409TxPI1OYJ+WYjzsLBgrAwsZZjPiezo9KLPYmsEuZYJ6fuWS1qla4ajw/Y5iRtjosBeKAvnICnF8sV6RcdonTOWNdGcBMAxeqE5ctHrvJnBwEyR8BWeupuNQqUWOml6RxG4sR9SidjATZ2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713380869; c=relaxed/simple;
-	bh=+oHFSqNW4dkdjlORFOLf6+/2dtX1DJjWFotO6BN9AVI=;
+	s=arc-20240116; t=1713381223; c=relaxed/simple;
+	bh=CmzwNIApee8Fwt4pVcYGZwnquvTzM85msk5kFBGJ/X8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t0vbVWvbSegeHhDKy31w1gOnH7/EbiwfrigqO9WtENEoC/N3x4iqW2i7uPVtmpa9SQD0UdH90hZojmwZNLehC9d41u0+YE+vgozXB+f6Yb1KozedP4k+RcdViFSszgJBuZfD6VJnCXSoOjgph6hv4PUJv5bSxeUt1erDbnzq7hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=p7TiSzc2; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=TIp5ZMjw0wdIQg22Blnb09yiTO6wa2zTH+zQj6OwGuU=; b=p7
-	TiSzc2+NOIrWTXC2ZyMAfuP/AO87c0sHV1Jll19LR/avub8Hv/dccGrmopQc5XQ4maKFjiB+X6RNr
-	x2Rfj3IkWMzY3WyhewBvnPNCUH1n0dZFDXsx+LBSUk6Iv5mehTBaC0n9oekdcZvo8iDNDtztBj7tc
-	+ktgGvIpWY8BJsM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rxAdE-00DHAW-NN; Wed, 17 Apr 2024 21:07:44 +0200
-Date: Wed, 17 Apr 2024 21:07:44 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: SIMON BABY <simonkbaby@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: Support needed for integrating Marvel 88e6390 with microchip
- SAMA7 processor (DSA)
-Message-ID: <f3739191-1c13-481a-af70-f517f2dd75de@lunn.ch>
-References: <CAEFUPH0SoiOef1t8GS+Ch2a2sk+95PfF9Fnz_tPoveRJy2eAuw@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ERdj+R365NJmUfz0xJbM4ao0tbKTIv5zEB7lxhiGLVDRXRmfwFq6Mz/blPK+MuNBP5c546C4HDTFo0siU3t3WWtxgi25TeNd7FwoF2RNz1kNvmwfYpzrr+35E+JiJi2Qppwm6mrVlG/6tZ0WYGqoF1T4oIWghIwVnVgMsBDXy3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EEmc6EZm; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-516d1c8dc79so13277e87.1;
+        Wed, 17 Apr 2024 12:13:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713381220; x=1713986020; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JTcCtqawFKRHlvcDtRKkDTTkbfy/GJAXrQ0aSEOy+RI=;
+        b=EEmc6EZm0q9U8Kzdq5yphngQ5Bae36iIACiTgcJTOuiwgp4hUurKN9sPV6LqRnMTob
+         QXviFalp1x7Ql8xEQ9RW15u/d1JqYqteetvQgN5D0yMD18aeyV6ih16CfNTg+qEgxubH
+         3D2+DlnAHTkAqfQe8s0mO2aD7f7/ggQ6vhn5h3Ka3AWqTkZBz8un5qrukDkrBybxX7JK
+         PpVY0t2MoFfNRpBVRi+9XaliLhvwAmjG5o4rSKPYwlF8cxC6XAgRNRJ4QJCl+cxo+xLG
+         JSDFJ9/IIB6bgh617NrCozTHXHwnPC0aKWX8raDa+lAcippUIOwbXpnSp+fX4zBggZDc
+         vR9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713381220; x=1713986020;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JTcCtqawFKRHlvcDtRKkDTTkbfy/GJAXrQ0aSEOy+RI=;
+        b=gyKornl0OnUwYRVhrSfGy+1m6AZUvbBqNQUDXDAJ4zVIHSki/KZrsGzU01PyH1+dyu
+         dhKkqI+aFsa1JITBcCJ5DMG5HUuO1+qh+WrT5ySLSqImZNsLtc0jpV6GJCdxToDIQ/mO
+         Usxw42yuESx+HExq4I1zbCIKhyJ+HRZWeNMy6U3Uz32b+UcDu7ei5lIwjXSydCUkOFOZ
+         oETKXfUS4mDFPbVsjWuKJC817+jPwY27GWeZii0az+iYkr55VDsFmSlW6QyAg/2/Fyj7
+         EZ4dPA404bDrH2jE8pKkapgzv1plOk9SVzdcn8aIFzqTDr2fbE6YkoaNb3xz4SqpHdkM
+         Q56A==
+X-Forwarded-Encrypted: i=1; AJvYcCVoSH+YXISuk7zeaEfk5rjav3uUYlGfLfjlX7NZI3wL3oUYVwTYphH/AsOE7CIr0qrfBF4A9y0ww4hGauX9SKXfw1r1xnVD5uaj4Sr8GcjBfwJjjH9YkEMYCwbLMCceyQgLWRFt
+X-Gm-Message-State: AOJu0Yx0xzIeuUiN3/F7Hu3Y2I/j2xY1lbndKUxugoGc8jYTrlU5MxwF
+	Fs4suGYWp+Yeur4Sy/uG5OIqPOILvYTYgITIVGl+HkSUFT+kEdyC
+X-Google-Smtp-Source: AGHT+IEA0/ml2vS2S5lnkSe66SZb269sVi/52jJbQD/EKj42WqO5Y8kEwvaZGCTBSCq0H+wObYP3lg==
+X-Received: by 2002:ac2:5fcf:0:b0:515:99f6:2ca4 with SMTP id q15-20020ac25fcf000000b0051599f62ca4mr104968lfg.36.1713381219670;
+        Wed, 17 Apr 2024 12:13:39 -0700 (PDT)
+Received: from mobilestation.baikal.int (srv1.baikalchip.ru. [87.245.175.227])
+        by smtp.gmail.com with ESMTPSA id q3-20020ac25143000000b00518c86b3eb7sm1251742lfd.80.2024.04.17.12.13.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Apr 2024 12:13:39 -0700 (PDT)
+Date: Wed, 17 Apr 2024 22:13:37 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Woojung Huh <woojung.huh@microchip.com>, Arun Ramadoss <arun.ramadoss@microchip.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Russell King <linux@armlinux.org.uk>, kernel@pengutronix.de, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, UNGLinuxDriver@microchip.com, 
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH net-next v1 4/4] net: stmmac: use delays reported by the
+ PHY driver to correct MAC propagation delay
+Message-ID: <3ib7rkbwxtdd26waw2dseuwwlijhxxjmjp6jbxe6g6i5hk6ua2@3zt2avhdh2lu>
+References: <20240417164316.1755299-1-o.rempel@pengutronix.de>
+ <20240417164316.1755299-5-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEFUPH0SoiOef1t8GS+Ch2a2sk+95PfF9Fnz_tPoveRJy2eAuw@mail.gmail.com>
+In-Reply-To: <20240417164316.1755299-5-o.rempel@pengutronix.de>
 
-On Wed, Apr 17, 2024 at 10:24:00AM -0700, SIMON BABY wrote:
-> Hello Team,
+On Wed, Apr 17, 2024 at 06:43:16PM +0200, Oleksij Rempel wrote:
+> Now after PHY drivers are able to report data path delays, we can use
+> them in the MAC drivers for the delay correction.
 > 
-> I am trying to integrate the Marvel 88e6390 switch with the SAMA7 processor for
-> the DSA driver to work correctly.  I can get a raw mdio reply from marvel phy
-> using the devmem tool in Linux. 
-> But I could not get any reply with the macb driver code (drivers/net/ethernet/
-> cadence/macb_main.c). 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac.h    |  2 ++
+>  .../ethernet/stmicro/stmmac/stmmac_hwtstamp.c   |  4 ++++
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c   | 17 ++++++++++++++++-
+>  3 files changed, 22 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> index dddcaa9220cc3..6db54ce33ea72 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> @@ -288,6 +288,8 @@ struct stmmac_priv {
+>  	u32 sub_second_inc;
+>  	u32 systime_flags;
+>  	u32 adv_ts;
+
+> +	u64 phy_tx_delay_ns;
+> +	u64 phy_rx_delay_ns;
+
+What's the point in adding these fields to the private data if you
+retrieve the delays and use them in a single place? Just extend the
+stmmac_hwtstamp_correct_latency() arguments list and pass the delays
+as the function parameters.
+
+-Serge(y)
+
+>  	int use_riwt;
+>  	int irq_wake;
+>  	rwlock_t ptp_lock;
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
+> index f05bd757dfe52..bbf284cb7cc2a 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_hwtstamp.c
+> @@ -71,6 +71,8 @@ static void hwtstamp_correct_latency(struct stmmac_priv *priv)
+>  	/* MAC-internal ingress latency */
+>  	scaled_ns = readl(ioaddr + PTP_TS_INGR_LAT);
+>  
+> +	scaled_ns += priv->phy_rx_delay_ns << 16;
+> +
+>  	/* See section 11.7.2.5.3.1 "Ingress Correction" on page 4001 of
+>  	 * i.MX8MP Applications Processor Reference Manual Rev. 1, 06/2021
+>  	 */
+> @@ -95,6 +97,8 @@ static void hwtstamp_correct_latency(struct stmmac_priv *priv)
+>  	/* MAC-internal egress latency */
+>  	scaled_ns = readl(ioaddr + PTP_TS_EGR_LAT);
+>  
+> +	scaled_ns += priv->phy_tx_delay_ns << 16;
+> +
+>  	reg_tsec = scaled_ns >> 16;
+>  	reg_tsecsns = scaled_ns & 0xff00;
+>  
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index fe3498e86de9d..30c7c278b7062 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -1097,8 +1097,23 @@ static void stmmac_mac_link_up(struct phylink_config *config,
+>  	if (priv->dma_cap.fpesel)
+>  		stmmac_fpe_link_state_handle(priv, true);
+>  
+> -	if (priv->plat->flags & STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY)
+> +	if (priv->plat->flags & STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY) {
+> +		int ret = 0;
+> +
+> +		if (phy)
+> +			ret = phy_get_timesync_data_path_delays(phy,
+> +								&priv->phy_tx_delay_ns,
+> +								&priv->phy_rx_delay_ns);
+> +		if (!phy || ret) {
+> +			if (ret != -EOPNOTSUPP)
+> +				netdev_err(priv->dev, "Failed to get PHY delay: %pe\n",
+> +					   ERR_PTR(ret));
+> +			priv->phy_tx_delay_ns = 0;
+> +			priv->phy_rx_delay_ns = 0;
+> +		}
+> +
+>  		stmmac_hwtstamp_correct_latency(priv, priv);
+> +	}
+>  }
+>  
+>  static const struct phylink_mac_ops stmmac_phylink_mac_ops = {
+> -- 
+> 2.39.2
 > 
 > 
-> Below are some of my logs using devmem:
-> 
-> root@sama7g5ek-sd:~# devmem2 0xe2800034 w 0x58029800                 (C22 code)
-> /dev/mem opened.
-> Memory mapped at address 0xb6f86000.
-> Read at address  0xE2800034 (0xb6f86034): 0x6396C1E1
-> Write at address 0xE2800034 (0xb6f86034): 0x58029800, readback 0x58029800
-> root@sama7g5ek-sd:~# devmem2 0xe2800034 w 0x68060000                (C22 data)
-> /dev/mem opened.
-> Memory mapped at address 0xb6f2a000.
-> Read at address  0xE2800034 (0xb6f2a034): 0x58029800
-> Write at address 0xE2800034 (0xb6f2a034): 0x68060000, readback 0x68060000
-> root@sama7g5ek-sd:~# devmem2 0xe2800034         (read)
-> /dev/mem opened.
-> Memory mapped at address 0xb6f04000.
-> Read at address  0xE2800034 (0xb6f04034): 0x68071E07     (got the correct
-> marvel ID)
-
-I don't know what you are seeing here, but the 88E6390 has a product
-ID of 0x3900 in register 3.
-
-> Below are the extra debugs executed during my testing(I added these debugs in
-> my macb driver code):
-> 
-> macb: ============================>debug_build: inside macb_mdio_read mii_id=0
-> regnum=0x3 bus_id=e2800000.ethernet-ffffffff pdev_id=ffffffff
-> macb: ============================>debug_build: inside macb_mdio_read
-> macb_write C22 mii_id=0 regnum=0x3
-> macb: ============================>debug_build: inside macb_mdio_read status
-> after macb_mdio_wait_for_idle = 0
-> macb: ============================>debug_build: inside macb_mdio_read status
-> after macb_readl = 65535
-
-I would check your reset line. The switch does not respond when held
-in reset. Because the MDIO data line has a pull up, if the device does
-not respond you read all 1s.
-
-> Attached is the sama7 technical document, marvel document
-
-Marvell documents are under NDA. You should not be publishing them.
-
-	Andrew
 
