@@ -1,191 +1,239 @@
-Return-Path: <netdev+bounces-88898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E203A8A8F35
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:12:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E62168A8F55
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:32:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3AD35B2218E
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 23:12:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 150481C20D24
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 23:32:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FA9E17107D;
-	Wed, 17 Apr 2024 23:12:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B5885C62;
+	Wed, 17 Apr 2024 23:32:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TYKp4VNS"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="ISw+Fe0R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2845486642;
-	Wed, 17 Apr 2024 23:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94A7C85643
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 23:32:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713395520; cv=none; b=qZAENB8kkozdTV930xA7oeSiQEWuogD9xF7OgK3UsR2sLlgMA9fECub9rbYY5eI22wdvTq2AxuGGH9euyPPKk4eULu2tDCqoDoVRDBqax+JWqfDgDV8fdefijuEK7Bnr8f2H7+JtpFv5lfn+cxr/hI83ZmtiRoOOxwI9Xfssy4E=
+	t=1713396734; cv=none; b=GGfM3pEr+92ls4gBHLSE0kbIEPHhxR8+GRXuLtZFYFyi7fBnzlCtPz50bQKeF5iuASkVE57oB5dzF2wheQfZmJR2d6wYXaH0raLE+jDFRNLOUAUK4GTeYdiI0TUNQQWpDfK3j+YtLt/bW4inQHPq458ztbJVBKTucy6IkgA9qVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713395520; c=relaxed/simple;
-	bh=DC11VmWV/vCJfXR7IdGU4BMhT5O7Y8zbY+ZoT49PZoo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a42VvmoAMD9jt0qn0nsHd3nYr6huD3N744R9zk1tAl3h0cSO/POHssr/axhau3hYryettH9IvLtfuRXd8/pUzxJkmWV0GlbXuyvhEh7PEw4+i1FbbhmEX7uhw0hngci2kztgegkr+5sbHXorX/7sSiP2ANU9K2zGBhLH8r1HDcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TYKp4VNS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67A0CC3277B;
-	Wed, 17 Apr 2024 23:11:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713395519;
-	bh=DC11VmWV/vCJfXR7IdGU4BMhT5O7Y8zbY+ZoT49PZoo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TYKp4VNS2lMzTZfAND/qnEcsUcBot1CElx3m5m9+yNXZD4QK25sDKMD56LJCAKxfR
-	 z+Hr87ta/KRr0CMr7ozsR9sh9E4dNOORsD+CrUaRDhXoBro/kzGvdR1CZ9r5zhWM/f
-	 1+fZKm0QJ/nLGjdHvIQboeSEQDURhx9J1d+JpLeLFyG7FpMRtkdL1n1fA9vMhwVB6J
-	 3/QmOmH6W1dvt0pVoM9iGgbkBTObxu+9fXJ05Eu+NWfAJSqPj09+u0qeGEED4txbcg
-	 yodAQryiURTx0kVyThQj0aP7OE9FW0iQfZb6vfXvMIqHyLQ9Cyx4RPqScCzhaVScTR
-	 g/TK0wsJ/BJgA==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	petrm@nvidia.com,
-	linux-kselftest@vger.kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next v3 8/8] selftests: drv-net: add a TCP ping test case (and useful helpers)
-Date: Wed, 17 Apr 2024 16:11:46 -0700
-Message-ID: <20240417231146.2435572-9-kuba@kernel.org>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240417231146.2435572-1-kuba@kernel.org>
-References: <20240417231146.2435572-1-kuba@kernel.org>
+	s=arc-20240116; t=1713396734; c=relaxed/simple;
+	bh=vvp1J1SpydGRs1Ir/XmxNMPAMc5m1dHH0Oe0z/29VuE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c6W6SCed8+j7ao12Y47UZFyuUMXuZad5m8+AZg2cKnycu4sBCMBcjDkXftAct7n6FzaGvwdIc6CIeS8mLHd3MA6yFdde7nTNQBusfU30WfoMfx1di3xD3+YcSG3iS/yKo94+kxnCde4Za447ygidaYq5yzn7eMQBDK1ABpq/Pb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=ISw+Fe0R; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-518f8a69f82so267537e87.2
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 16:32:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1713396731; x=1714001531; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pXeaIqHgrQqvoS7w1DDDiuOy+AYJG35Jgluc3WBXL9E=;
+        b=ISw+Fe0RApwzUwVDImCY+ouRCwZG7aMMd3HK5CmhhV04pKART+APpuulyB6th+mf59
+         zdIh+HiPONEYyo6UHKYgYO76ABBwMT4TQ3hQNqSXrCaBuZQ6u+TeULqgYrP0wy7im3xv
+         t/JIsrwLpeH0cxDtCAuntBbMMsiMP+/d4QeuQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713396731; x=1714001531;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pXeaIqHgrQqvoS7w1DDDiuOy+AYJG35Jgluc3WBXL9E=;
+        b=R9nX1a376goNWPL9QDXYOIMo3TawQ/ER4HHmCZXmimP+fnil4QNtA7dhpSAwF4uGyC
+         46eKR3O68HdtACgLk4hhfuziStGIBxdNDeTWe5/b2lm6+OuQ2yeOzR6w9NJUh7TsAM26
+         l7NzhVv0brRykkfEX6e1w/l+v0rwWg3jVQipuy6eHcjeedTd3mOdet2FXFTnXscsMgmY
+         SltASOAVaatGhnXXTXecseAkwCTbY4eRqAep0knrYmf6YHNmL8PoIEoc8pC4yImmiAAl
+         UK87kBIuLoW3pdBV8ej7s40TtbG1dtaq4S3x3lvkWS/9b4UlWhaedp3VSB0GQz1sDwCx
+         JFsA==
+X-Forwarded-Encrypted: i=1; AJvYcCWnpANPe4sXFj/TNmHtjbO80wTFsAjz+qx1s26cG2J/sKUFjZJQJrUCZQtZZxDf47WuRcwBuiaZsolZfH/fJy6j6zyteJ6g
+X-Gm-Message-State: AOJu0Yz4TsnI6zFjfUYKjmFMLrsHj9nZjsHqKq1Os9d/mj9+Db0LH7Cm
+	YvLgF7WHP7aS1RuSVrnUY1BkAKU7Oo2/IPE/2qFKZab6191sBk+ke6WgYTbpPLh8m8LBPX7//pK
+	GM0+yA4AQxAEuSZVJcpk6lYFPeVORnJkSLT1K
+X-Google-Smtp-Source: AGHT+IEdA30trqC2FAaLVap4ZQxvHXDW+eQ/qMYNrW1mInC1+qlsTt9tjJAxb0ZRkJ6pUgTOzXndvJ5C7T1s5nX8MgU=
+X-Received: by 2002:ac2:5b4f:0:b0:519:17b6:f20 with SMTP id
+ i15-20020ac25b4f000000b0051917b60f20mr445676lfp.6.1713396730437; Wed, 17 Apr
+ 2024 16:32:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240412073046.1192744-1-wenst@chromium.org> <20240412073046.1192744-2-wenst@chromium.org>
+ <CAGp9Lzp=MKNYc70ZeGCAEgWfFVPOAOZQQ86BXukk+EQQM_C+OA@mail.gmail.com>
+In-Reply-To: <CAGp9Lzp=MKNYc70ZeGCAEgWfFVPOAOZQQ86BXukk+EQQM_C+OA@mail.gmail.com>
+From: Chen-Yu Tsai <wenst@chromium.org>
+Date: Wed, 17 Apr 2024 16:31:59 -0700
+Message-ID: <CAGXv+5FeRwYm7x+fYS9KPXW-0tQ-zSuk5nU6AZ-=yU07wXnJ9w@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
+ SDIO Bluetooth
+To: Sean Wang <sean.wang@kernel.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-More complex tests often have to spawn a background process,
-like a server which will respond to requests or tcpdump.
+On Wed, Apr 17, 2024 at 4:04=E2=80=AFPM Sean Wang <sean.wang@kernel.org> wr=
+ote:
+>
+> Hi Chen-Yu,
+>
+> On Fri, Apr 12, 2024 at 12:31=E2=80=AFAM Chen-Yu Tsai <wenst@chromium.org=
+> wrote:
+> >
+> > The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
+> > SDIO. WiFi and Bluetooth are separate SDIO functions within the chip.
+> > While the Bluetooth SDIO function is fully discoverable, the chip has
+> > a pin that can reset just the Bluetooth core, as opposed to the full
+> > chip. This should be described in the device tree.
+> >
+> > Add a device tree binding for the Bluetooth SDIO function of the MT7921=
+S
+> > specifically to document the reset line. This binding is based on the M=
+MC
+> > controller binding, which specifies one device node per SDIO function.
+> >
+> > Cc: Sean Wang <sean.wang@mediatek.com>
+> > Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+> > ---
+> > Changes since v2:
+> > - Expand description and commit message to clearly state that WiFi and
+> >   Bluetooth are separate SDIO functions, and that each function should
+> >   be a separate device node, as specified by the MMC binding.
+> > - Change 'additionalProperties' to 'unevaluatedProperties'
+> > - Add missing separating new line
+> > - s/ot/to/
+> >
+> > Angelo's reviewed-by was not picked up due to the above changes.
+> >
+> > Changes since v1:
+> > - Reworded descriptions
+> > - Moved binding maintainer section before description
+> > - Added missing reference to bluetooth-controller.yaml
+> > - Added missing GPIO header to example
+> > ---
+> >  .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 55 +++++++++++++++++++
+> >  MAINTAINERS                                   |  1 +
+> >  2 files changed, 56 insertions(+)
+> >  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/med=
+iatek,mt7921s-bluetooth.yaml
+> >
+> > diff --git a/Documentation/devicetree/bindings/net/bluetooth/mediatek,m=
+t7921s-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/med=
+iatek,mt7921s-bluetooth.yaml
+> > new file mode 100644
+> > index 000000000000..67ff7caad599
+> > --- /dev/null
+> > +++ b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-=
+bluetooth.yaml
+> > @@ -0,0 +1,55 @@
+> > +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> > +%YAML 1.2
+> > +---
+> > +$id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7921s-blue=
+tooth.yaml#
+> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > +
+> > +title: MediaTek MT7921S Bluetooth
+> > +
+> > +maintainers:
+> > +  - Sean Wang <sean.wang@mediatek.com>
+> > +
+> > +description:
+> > +  MT7921S is an SDIO-attached dual-radio WiFi+Bluetooth Combo chip; ea=
+ch
+> > +  function is its own SDIO function on a shared SDIO interface. The ch=
+ip
+> > +  has two dedicated reset lines, one for each function core.
+> > +  This binding only covers the Bluetooth SDIO function, with one devic=
+e
+> > +  node describing only this SDIO function.
+> > +
+> > +allOf:
+> > +  - $ref: bluetooth-controller.yaml#
+> > +
+> > +properties:
+> > +  compatible:
+> > +    enum:
+> > +      - mediatek,mt7921s-bluetooth
+> > +
+> > +  reg:
+> > +    const: 2
+> > +
+> > +  reset-gpios:
+> > +    maxItems: 1
+> > +    description:
+> > +      An active-low reset line for the Bluetooth core; on typical M.2
+> > +      key E modules this is the W_DISABLE2# pin.
+> > +
+>
+> Thanks for adding the new setup for the MT7921S devices. They look good t=
+o me.
+> Sometimes, the MT7921S might be set up to wake up the host when it's
+> asleep using a sideband signal.
+> This might need an extra pin called "wakeup" to make it happen. Can
+> you help add this pin to the settings in the same update, or should I
+> do it later?
 
-Add support for creating such processes using the with keyword:
+I suggest you send a patch on top of this one? I'm not sure if you
+would model it as a GPIO or interrupt. And there doesn't seem to be
+any code in the driver expecting it.
 
-  with bkg("my-daemon", ..):
-     # my-daemon is alive in this block
 
-My initial thought was to add this support to cmd() directly
-but it runs the command in the constructor, so by the time
-we __enter__ it's too late to make sure we used "background=True".
+ChenYu
 
-Second useful helper transplanted from net_helper.sh is
-wait_port_listen().
-
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/testing/selftests/drivers/net/ping.py | 24 +++++++++++++--
- tools/testing/selftests/net/lib/py/utils.py | 33 +++++++++++++++++++++
- 2 files changed, 55 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/drivers/net/ping.py b/tools/testing/selftests/drivers/net/ping.py
-index 58aefd3e740f..8532e3be72ba 100755
---- a/tools/testing/selftests/drivers/net/ping.py
-+++ b/tools/testing/selftests/drivers/net/ping.py
-@@ -1,9 +1,12 @@
- #!/usr/bin/env python3
- # SPDX-License-Identifier: GPL-2.0
- 
--from lib.py import ksft_run, ksft_exit, KsftXfailEx
-+import random
-+
-+from lib.py import ksft_run, ksft_exit
-+from lib.py import ksft_eq, KsftXfailEx
- from lib.py import NetDrvEpEnv
--from lib.py import cmd
-+from lib.py import bkg, cmd, wait_port_listen
- 
- 
- def test_v4(cfg) -> None:
-@@ -22,6 +25,23 @@ from lib.py import cmd
-     cmd(f"ping -c 1 -W0.5 {cfg.v6}", host=cfg.remote)
- 
- 
-+def test_tcp(cfg) -> None:
-+    port = random.randrange(1024 + (1 << 15))
-+    with bkg(f"nc -l {cfg.addr} {port}") as nc:
-+        wait_port_listen(port)
-+
-+        cmd(f"echo ping | nc {cfg.addr} {port}",
-+            shell=True, host=cfg.remote)
-+    ksft_eq(nc.stdout.strip(), "ping")
-+
-+    port = random.randrange(1024 + (1 << 15))
-+    with bkg(f"nc -l {cfg.remote_addr} {port}", host=cfg.remote) as nc:
-+        wait_port_listen(port, host=cfg.remote)
-+
-+        cmd(f"echo ping | nc {cfg.remote_addr} {port}", shell=True)
-+    ksft_eq(nc.stdout.strip(), "ping")
-+
-+
- def main() -> None:
-     with NetDrvEpEnv(__file__) as cfg:
-         ksft_run(globs=globals(), case_pfx={"test_"}, args=(cfg, ))
-diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
-index e80fea9f6562..6bacdc99d21b 100644
---- a/tools/testing/selftests/net/lib/py/utils.py
-+++ b/tools/testing/selftests/net/lib/py/utils.py
-@@ -1,7 +1,10 @@
- # SPDX-License-Identifier: GPL-2.0
- 
- import json as _json
-+import re
- import subprocess
-+import time
-+
- 
- class cmd:
-     def __init__(self, comm, shell=True, fail=True, ns=None, background=False, host=None):
-@@ -38,6 +41,18 @@ import subprocess
-                             (self.proc.args, stdout, stderr))
- 
- 
-+class bkg(cmd):
-+    def __init__(self, comm, shell=True, fail=True, ns=None, host=None):
-+        super().__init__(comm, background=True,
-+                         shell=shell, fail=fail, ns=ns, host=host)
-+
-+    def __enter__(self):
-+        return self
-+
-+    def __exit__(self, ex_type, ex_value, ex_tb):
-+        return self.process()
-+
-+
- def ip(args, json=None, ns=None, host=None):
-     cmd_str = "ip "
-     if json:
-@@ -47,3 +62,21 @@ import subprocess
-     if json:
-         return _json.loads(cmd_obj.stdout)
-     return cmd_obj
-+
-+
-+def wait_port_listen(port, proto="tcp", ns=None, host=None, sleep=0.005, deadline=1):
-+    end = time.monotonic() + deadline
-+
-+    pattern = f":{port:04X} .* "
-+    if proto == "tcp": # for tcp protocol additionally check the socket state
-+        pattern += "0A"
-+    pattern = re.compile(pattern)
-+
-+    while True:
-+        data = cmd(f'cat /proc/net/{proto}*', ns=ns, host=host, shell=True).stdout
-+        for row in data.split("\n"):
-+            if pattern.search(row):
-+                return
-+        if time.monotonic() > end:
-+            raise Exception("Waiting for port listen timed out")
-+        time.sleep(sleep)
--- 
-2.44.0
-
+> > +required:
+> > +  - compatible
+> > +  - reg
+> > +
+> > +unevaluatedProperties: false
+> > +
+> > +examples:
+> > +  - |
+> > +    #include <dt-bindings/gpio/gpio.h>
+> > +
+> > +    mmc {
+> > +        #address-cells =3D <1>;
+> > +        #size-cells =3D <0>;
+> > +
+> > +        bluetooth@2 {
+> > +            compatible =3D "mediatek,mt7921s-bluetooth";
+> > +            reg =3D <2>;
+> > +            reset-gpios =3D <&pio 8 GPIO_ACTIVE_LOW>;
+> > +        };
+> > +    };
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 88981d9f3958..218bc2a21207 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -13818,6 +13818,7 @@ M:      Sean Wang <sean.wang@mediatek.com>
+> >  L:     linux-bluetooth@vger.kernel.org
+> >  L:     linux-mediatek@lists.infradead.org (moderated for non-subscribe=
+rs)
+> >  S:     Maintained
+> > +F:     Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921=
+s-bluetooth.yaml
+> >  F:     Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
+> >  F:     drivers/bluetooth/btmtkuart.c
+> >
+> > --
+> > 2.44.0.683.g7961c838ac-goog
+> >
+> >
 
