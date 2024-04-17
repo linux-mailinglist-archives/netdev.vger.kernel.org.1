@@ -1,109 +1,92 @@
-Return-Path: <netdev+bounces-88547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 219078A7A4B
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 04:00:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E37218A7A56
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 04:10:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A6ECB21396
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 02:00:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59450B21669
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 02:10:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B3A1877;
-	Wed, 17 Apr 2024 02:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662E51878;
+	Wed, 17 Apr 2024 02:10:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KxyynuCg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SkV0IDPy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03A04685;
-	Wed, 17 Apr 2024 02:00:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A392184F;
+	Wed, 17 Apr 2024 02:10:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713319229; cv=none; b=jchQ6tySnQPDR4ZFgHvaEgUZBEFofp8wcaBk6ExYE9PZbtqIglfQ6b3WuJDnjhxWZHEp9RvSo37ja47+3+Yr324p2wwKItpPugkk5IlGe3S0FUBTpY56pgLwRlyNbIaO3s+HWrLOHompZF0PvhpDf0a64AgotWuhUXzML8noNU0=
+	t=1713319818; cv=none; b=XSmFUJi38T9hFmRMZg6RD52h+ri8OUXXxUzzqhIMw36dbO7TFi9RJtDr3+UTnGnb93fo6+ghJvAcg8lLMzMUY620U/yt/phqAsyUIxhZ7EOfPAMcyIFmUcIY9aPQcmqSKYl7W8mYnL912dy9O1eeWoMLhwAgvaZk4YsoYIlwX6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713319229; c=relaxed/simple;
-	bh=cC63+XpffDjWWegKYfmvLRokZnNZnA6i1aS2/skGiaI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OnsNzdQB9h7XMDN7uwHfJBtKRqkKLFIS5YD5mxQPHdQCkgrCosk3G3tJNcT2b8XdXyLUmTELBXP4crvZ+w9MdON8/gmochvA6gKi/6cRGrptXpasTZH02bi/kyBb8cfKxd2p/nlTW3zDoMmtcFKZ1rCaFj1/UNOdvhsjIiaF6VQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KxyynuCg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5041AC2BD11;
-	Wed, 17 Apr 2024 02:00:29 +0000 (UTC)
+	s=arc-20240116; t=1713319818; c=relaxed/simple;
+	bh=iQXAH9GDVARJSIBtw6I91vL4k2Xy/1mcs1G02+bi4wI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aUgHQS/EdXvjgr+Afgic5dPVNtsohVlP5PN4hVpb5mwU23gQiF5Vjuuy+SzoDx4kCkvEC83Slcg9rmpLksR1NS6/thuLXQYfXEuGmPrgXn8+VHvOIOze9N9EBNvxNVjGONOLY6AbGem0tCz5sBeCPNI7V8QKqhOwUbG4xlV/tD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SkV0IDPy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 328B6C113CE;
+	Wed, 17 Apr 2024 02:10:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713319229;
-	bh=cC63+XpffDjWWegKYfmvLRokZnNZnA6i1aS2/skGiaI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KxyynuCgZtU8ijFDCnxNz1eBnIFrxO93wCSnenjxRtTU0OEM3KFhjIdoOE09HgQIl
-	 /w7Iwny46gU1FlrbmnWhyw9XHLxIjAss/h39r8a3TpLyP+Jjersggfah6cCSVb9iZg
-	 MPG83eys/KUCJj9sapvBdsjF0NVSjWmcqCfQkBKR7NPvk72B71Fm+sYQFZoWEuFB18
-	 L6zkrkq/VFfqOfpyZGekHhwi0ekXkZz//HiIgmiTP9afmJdfHilPqss1UMKED3WFX+
-	 sQ2mfTB4ugMLvXRCaIGMA5rbYTqKUh7MqF6Fcc8JB4o7jQOq9S26uaFSU5ArR8tpRj
-	 C+xH1TmdCbYzQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3D57DD4F15E;
-	Wed, 17 Apr 2024 02:00:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1713319817;
+	bh=iQXAH9GDVARJSIBtw6I91vL4k2Xy/1mcs1G02+bi4wI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SkV0IDPyE6shQFbvmfjG/binBVNqOf2YtsUGrFbegRjdm5UqDm4VXISeoh2kfMBp1
+	 nFWSdbLU/PO8y7XUR9zk2BnZi87go/V4MjjzQWLRpQXKE4rs3xOdLmOZmqEfPBtupW
+	 5vJql/hvCBCgx79vj5Er74DxiDM0nbJjiuL7E8LPVoiH5khj3aK1znpoNjvD8MXJNp
+	 gU9tgtZbj3zFxHz+iscQn/bG0m9stamCfNAE8NGT1hZ8xHTlFeOBNEjV+6TDAj+dAN
+	 nZ8UDEY3Z1jGO5RjjFYP0xAPxD2OOyKaO+rK3bAeswLiYTXgA8XIJlglqmd1h1FhQu
+	 sa5ypnUsV8hqw==
+Date: Tue, 16 Apr 2024 19:10:16 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
+ <jiri@resnulli.us>, Jacob Keller <jacob.e.keller@intel.com>, Pablo Neira
+ Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v3 3/4] tools/net/ynl: Handle acks that use
+ req_value
+Message-ID: <20240416191016.5072e144@kernel.org>
+In-Reply-To: <20240416193215.8259-4-donald.hunter@gmail.com>
+References: <20240416193215.8259-1-donald.hunter@gmail.com>
+	<20240416193215.8259-4-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/6] selftests: drv-net: support testing with a
- remote system
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171331922924.11866.18060730176000410758.git-patchwork-notify@kernel.org>
-Date: Wed, 17 Apr 2024 02:00:29 +0000
-References: <20240416004556.1618804-1-kuba@kernel.org>
-In-Reply-To: <20240416004556.1618804-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, shuah@kernel.org, petrm@nvidia.com,
- linux-kselftest@vger.kernel.org, willemdebruijn.kernel@gmail.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 16 Apr 2024 20:32:14 +0100 Donald Hunter wrote:
+> The nfnetlink family uses the directional op model but errors get
+> reported using the request value instead of the reply value.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+What's an error in this case ? "Normal" errors come via NLMSG_ERROR
 
-On Mon, 15 Apr 2024 17:45:50 -0700 you wrote:
-> Hi!
-> 
-> Implement support for tests which require access to a remote system /
-> endpoint which can generate traffic.
-> This series concludes the "groundwork" for upstream driver tests.
-> 
-> I wanted to support the three models which came up in discussions:
->  - SW testing with netdevsim
->  - "local" testing with two ports on the same system in a loopback
->  - "remote" testing via SSH
-> so there is a tiny bit of an abstraction which wraps up how "remote"
-> commands are executed. Otherwise hopefully there's nothing surprising.
-> 
-> [...]
+> diff --git a/tools/net/ynl/lib/nlspec.py b/tools/net/ynl/lib/nlspec.py
+> index 6d08ab9e213f..04085bc6365e 100644
+> --- a/tools/net/ynl/lib/nlspec.py
+> +++ b/tools/net/ynl/lib/nlspec.py
+> @@ -567,6 +567,18 @@ class SpecFamily(SpecElement):
+>            return op
+>        return None
+>  
+> +    def get_op_by_value(self, value):
+> +        """
+> +        For a given operation value, look up operation spec. Search
+> +        by response value first then fall back to request value. This
+> +        is required for handling failure cases.
 
-Here is the summary with links:
-  - [net-next,v2,1/6] selftests: drv-net: add stdout to the command failed exception
-    https://git.kernel.org/netdev/net-next/c/232d79aaa781
-  - [net-next,v2,2/6] selftests: drv-net: add config for netdevsim
-    https://git.kernel.org/netdev/net-next/c/438ce84bae90
-  - [net-next,v2,3/6] selftests: drv-net: define endpoint structures
-    (no matching commit)
-  - [net-next,v2,4/6] selftests: drv-net: factor out parsing of the env
-    (no matching commit)
-  - [net-next,v2,5/6] selftests: drv-net: construct environment for running tests which require an endpoint
-    (no matching commit)
-  - [net-next,v2,6/6] selftests: drv-net: add a trivial ping test
-    (no matching commit)
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Looks like we're only going to need it in NetlinkProtocol, so that's
+fine. But let's somehow call out that this is a bit of a hack, so that
+people don't feel like this is the more correct way of finding the op
+than direct access to rsp_by_value[].
 
