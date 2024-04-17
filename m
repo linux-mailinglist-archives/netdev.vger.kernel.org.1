@@ -1,61 +1,68 @@
-Return-Path: <netdev+bounces-88548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E37218A7A56
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 04:10:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B4A48A7A68
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 04:15:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59450B21669
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 02:10:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 691AE1C21377
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 02:15:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662E51878;
-	Wed, 17 Apr 2024 02:10:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CB474687;
+	Wed, 17 Apr 2024 02:15:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SkV0IDPy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o5wayfYw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A392184F;
-	Wed, 17 Apr 2024 02:10:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D9A4430;
+	Wed, 17 Apr 2024 02:15:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713319818; cv=none; b=XSmFUJi38T9hFmRMZg6RD52h+ri8OUXXxUzzqhIMw36dbO7TFi9RJtDr3+UTnGnb93fo6+ghJvAcg8lLMzMUY620U/yt/phqAsyUIxhZ7EOfPAMcyIFmUcIY9aPQcmqSKYl7W8mYnL912dy9O1eeWoMLhwAgvaZk4YsoYIlwX6E=
+	t=1713320120; cv=none; b=N+/XXfn8U2B/mRbH8pllcTfPs+UY1Q4MPUoj4L4CPL4Xi6jyEQS2dsv+WgL8Idt3DO56HhQOUKylgJg1A/7Dp2XO3DG9MIsHBEkTBQEWm86JULhIJODTMTWZmRjbd3Lo0ZtrOkyG2wX3501BxZpuYQLRjikBtF4U310qTZEe9QQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713319818; c=relaxed/simple;
-	bh=iQXAH9GDVARJSIBtw6I91vL4k2Xy/1mcs1G02+bi4wI=;
+	s=arc-20240116; t=1713320120; c=relaxed/simple;
+	bh=KcjW4v9LPhuP/rC4Hb0v6FD940Tv/do/SHcz+AsZO6g=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aUgHQS/EdXvjgr+Afgic5dPVNtsohVlP5PN4hVpb5mwU23gQiF5Vjuuy+SzoDx4kCkvEC83Slcg9rmpLksR1NS6/thuLXQYfXEuGmPrgXn8+VHvOIOze9N9EBNvxNVjGONOLY6AbGem0tCz5sBeCPNI7V8QKqhOwUbG4xlV/tD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SkV0IDPy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 328B6C113CE;
-	Wed, 17 Apr 2024 02:10:17 +0000 (UTC)
+	 MIME-Version:Content-Type; b=I+n/tQb1DvmUCrR3hqwsYblNITcUiFSzpsZfK5NNapVRa2A8GnitZ4XH9MHnHsGPBLFsmReAASJySrBSH4OBvqymMQV1e/oLCnk1eo+cHbJPD3jG4Qsune+LXDRJO36XYjYXO/u1hqrJdxwtx+SoJFsnBcK8WLlkQjaDoJ+ctsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o5wayfYw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACA29C113CE;
+	Wed, 17 Apr 2024 02:15:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713319817;
-	bh=iQXAH9GDVARJSIBtw6I91vL4k2Xy/1mcs1G02+bi4wI=;
+	s=k20201202; t=1713320119;
+	bh=KcjW4v9LPhuP/rC4Hb0v6FD940Tv/do/SHcz+AsZO6g=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=SkV0IDPyE6shQFbvmfjG/binBVNqOf2YtsUGrFbegRjdm5UqDm4VXISeoh2kfMBp1
-	 nFWSdbLU/PO8y7XUR9zk2BnZi87go/V4MjjzQWLRpQXKE4rs3xOdLmOZmqEfPBtupW
-	 5vJql/hvCBCgx79vj5Er74DxiDM0nbJjiuL7E8LPVoiH5khj3aK1znpoNjvD8MXJNp
-	 gU9tgtZbj3zFxHz+iscQn/bG0m9stamCfNAE8NGT1hZ8xHTlFeOBNEjV+6TDAj+dAN
-	 nZ8UDEY3Z1jGO5RjjFYP0xAPxD2OOyKaO+rK3bAeswLiYTXgA8XIJlglqmd1h1FhQu
-	 sa5ypnUsV8hqw==
-Date: Tue, 16 Apr 2024 19:10:16 -0700
+	b=o5wayfYwbiuwQnVYrPQlpT72jghBvBMQC6rckXjnlBaNiTaRmHcoR8vmJ5oz8Nx9X
+	 Js+6FebnrF9YaP+4rDpGNQVtDOiFvhHaS6ggMkuwFUwvUimaawBbhEvqZyiFzq2S8l
+	 CWzB483BmU7R+fWbigPbXvlqLeJONF3zfS3O9BCsB5EgUHJfVG0/NTgkmh+I2sfsyv
+	 W/dN7gw9gF11ciLXU5fthI/js3PrMcdqFP17WYrV3kL1qJ1sEWa8vM4C65lwgPAi57
+	 VVyJ28M/BuTt2H7t44+/BLabCrxQkbVd68hw/q5oLMQUyr5wXqrCA4uDKomH/uTHMV
+	 sePX1d+1W0ZyQ==
+Date: Tue, 16 Apr 2024 19:15:17 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
- <jiri@resnulli.us>, Jacob Keller <jacob.e.keller@intel.com>, Pablo Neira
- Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v3 3/4] tools/net/ynl: Handle acks that use
- req_value
-Message-ID: <20240416191016.5072e144@kernel.org>
-In-Reply-To: <20240416193215.8259-4-donald.hunter@gmail.com>
-References: <20240416193215.8259-1-donald.hunter@gmail.com>
-	<20240416193215.8259-4-donald.hunter@gmail.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
+ <corbet@lwn.net>, Luis Chamberlain <mcgrof@kernel.org>, Russ Weight
+ <russ.weight@linux.dev>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
+ <conor+dt@kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown
+ <broonie@kernel.org>, Frank Rowand <frowand.list@gmail.com>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, devicetree@vger.kernel.org, Dent Project
+ <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime Chevallier
+ <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH net-next v8 10/17] net: pse-pd: Add support for PSE PIs
+Message-ID: <20240416191517.65c63e21@kernel.org>
+In-Reply-To: <20240414-feature_poe-v8-10-e4bf1e860da5@bootlin.com>
+References: <20240414-feature_poe-v8-0-e4bf1e860da5@bootlin.com>
+	<20240414-feature_poe-v8-10-e4bf1e860da5@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,28 +72,44 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 16 Apr 2024 20:32:14 +0100 Donald Hunter wrote:
-> The nfnetlink family uses the directional op model but errors get
-> reported using the request value instead of the reply value.
+On Sun, 14 Apr 2024 16:21:59 +0200 Kory Maincent wrote:
+> +/**
+> + * of_pse_match_pi - Return the PSE PI id of the device node phandle
+> + * @pcdev: a pointer to the PSE controller device
+> + * @np: a pointer to the device node
+> + */
+> +static int of_pse_match_pi(struct pse_controller_dev *pcdev,
 
-What's an error in this case ? "Normal" errors come via NLMSG_ERROR
+There's new nitpick from kernel-doc - if the function returns something
+the kdoc needs to document Return:  ..
 
-> diff --git a/tools/net/ynl/lib/nlspec.py b/tools/net/ynl/lib/nlspec.py
-> index 6d08ab9e213f..04085bc6365e 100644
-> --- a/tools/net/ynl/lib/nlspec.py
-> +++ b/tools/net/ynl/lib/nlspec.py
-> @@ -567,6 +567,18 @@ class SpecFamily(SpecElement):
->            return op
->        return None
->  
-> +    def get_op_by_value(self, value):
-> +        """
-> +        For a given operation value, look up operation spec. Search
-> +        by response value first then fall back to request value. This
-> +        is required for handling failure cases.
+Sorry I missed this check failing because the fact that the series is
+17 patches lights it up as red in patchwork :( I'll apply the first
+3 patches to make v9 smaller.
 
-Looks like we're only going to need it in NetlinkProtocol, so that's
-fine. But let's somehow call out that this is a bit of a hack, so that
-people don't feel like this is the more correct way of finding the op
-than direct access to rsp_by_value[].
+> +			   struct device_node *np)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i <= pcdev->nr_lines; i++) {
+> +		if (pcdev->pi[i].np == np)
+> +			return i;
+> +	}
+> +
+> +	return -EINVAL;
+> +}
+> +
+> +/**
+> + * psec_id_xlate - translate pse_spec to the PSE line number according
+> + *		   to the number of pse-cells in case of no pse_pi node
+> + * @pcdev: a pointer to the PSE controller device
+> + * @pse_spec: PSE line specifier as found in the device tree
+> + *
+> + * Return 0 if #pse-cells = <0>. Return PSE line number otherwise.
+
+here missing ":"
+
+> + */
+> +static int psec_id_xlate(struct pse_controller_dev *pcdev,
+> +			 const struct of_phandle_args *pse_spec)
 
