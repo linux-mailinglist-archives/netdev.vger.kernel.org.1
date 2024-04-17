@@ -1,127 +1,117 @@
-Return-Path: <netdev+bounces-88852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7889F8A8BBB
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 20:58:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 772188A8BD4
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 21:07:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 797A61C2458D
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 18:58:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D30D284701
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 19:07:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ED3F1DFF3;
-	Wed, 17 Apr 2024 18:58:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14BB41DFCB;
+	Wed, 17 Apr 2024 19:07:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KyU7bQXV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="p7TiSzc2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD93B1CD38
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 18:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BF922134B
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 19:07:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713380312; cv=none; b=EylY3m2fjSFnOcY9UaHBPctaV42HAz4ImVEQGXxXCuxlK/+xOt6Pwz22jSirPLkw6tscLGTmwLLO9m1ao3AAPjuxkfUzV4pmrhh3xmlXBblyRWLlacswmaDwpcZyKPhbdGQSe3JmN8aE/BJf07WuttJ2YHahbPWwVb4btNzBtek=
+	t=1713380869; cv=none; b=MDjU6vd8yyl8MDkWwsi9hpS50K/IhZMDhMvAh5nXMhdhkBQoVT3qgWp/Ann2p3NB+Bach1gBtVmE5bdQUEeObC8NHWjry0pP6SCmlz9vASw2WEVGg1zflikY11Km9POp1/4tM6wSJmpy4Q0tNTC+cuGmpj/LvcL3H3N+5RIANdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713380312; c=relaxed/simple;
-	bh=/jnFAtk5JrhCZKzNlE0FZi4DnJAjgqAmYsYCDTMivik=;
+	s=arc-20240116; t=1713380869; c=relaxed/simple;
+	bh=+oHFSqNW4dkdjlORFOLf6+/2dtX1DJjWFotO6BN9AVI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sadBbF2XMsP4n2bwcqrbf4reuVUXKj1mu1DdGS6sbvMtpNmuN4qgoPLM8/6kvyQ2WaasrznaI5Azkp9jF5PquU/21Sz3ou4nNZ1S1h1bqItIf18hEdm6b9LD+GftXa9tiJtpIuLc3zCMyQFr9GL2xhHGnuG9AxppT6yV9Bz1g4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KyU7bQXV; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-437202687bfso18767121cf.2
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 11:58:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713380308; x=1713985108; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fAbbCnyx7krUH4X1bdxFgDOmkasKsIov7yr+n3NIJH0=;
-        b=KyU7bQXVzCSap4OsDoVBFNjFZxK1HkoC3SutfuC+2++MgyA+RMFMpVGZg8L0UExv0d
-         vRfQK3qijVJJjCqcxnzwPm1pi68fGaaYZbGFP/SCzhVR4E6qtDl662E6Y395wssu+Azc
-         MebL49QZMfcxLl7KBqKqargr/NhBXBFeoIUJNA2xtq9jtV+eVGIAL0NXOhdR9vmgBCVP
-         5i/LeRZVxVzFOP6vE38QaSuYRYn7fsglBVwd9lOhR+QsTmQNKbFM8AbPluiSVBUK8jMd
-         4bsUvM954D5G2fWuAJvqvz7a42yh6Jie8DjKIg03D8fC7wmyvy6R+NfDgSxk7Qu/5Vfo
-         jNbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713380308; x=1713985108;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fAbbCnyx7krUH4X1bdxFgDOmkasKsIov7yr+n3NIJH0=;
-        b=V7gJSwl03HkaJPoxVAgYSgF5KzCkf7l9LU23WcYQFaFCnbZlk4hHTImuJFJC1DsyGR
-         vkV6jysANJxd1VUc/cFUuwDRreiCFTq881yHaGtiIMJcF6Cf3xxpl/tPjRaBWqYA7aR3
-         rF+0+LLxBpgBML3P6tNN3K9zk8tkpWIJnwjMyL1W+6CpmBElyedCNm9IxOXREef3Emsh
-         EoSC/dklPRcg2mVQ7JxE0OOScJi8oter5KsX8aCMds+eYTBte4+XIZcSQjD79DqJZIAP
-         JOa6m1MdTHQFEu+GZg6SF2xg42GR7ZxyQjxtHuJKqJd+c2sbzIMH47WGr28mU9AUlJ+I
-         tRCA==
-X-Gm-Message-State: AOJu0YzHRA44aoJDoMTjufhL9JeQkccJRsKQ8K1S3hQtf1lG7hwlOwAZ
-	m/8EfndniZSU1vu8K9sAxTMZ/Q69QrEHGsMpFzOOybMqPiljUJ8C
-X-Google-Smtp-Source: AGHT+IFbqlGvvzByv8jR2ziRuPLaB/yqLU/1wtab9WpmRhUSYTXy/ttB2aaZU4Y+QHqkOgRWl7qnkQ==
-X-Received: by 2002:a05:622a:1787:b0:436:888f:80d0 with SMTP id s7-20020a05622a178700b00436888f80d0mr501009qtk.28.1713380308527;
-        Wed, 17 Apr 2024 11:58:28 -0700 (PDT)
-Received: from localhost (24-122-67-147.resi.cgocable.ca. [24.122.67.147])
-        by smtp.gmail.com with ESMTPSA id e15-20020ac8490f000000b00434d86fb403sm8327092qtq.86.2024.04.17.11.58.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Apr 2024 11:58:28 -0700 (PDT)
-Date: Wed, 17 Apr 2024 14:58:27 -0400
-From: Benjamin Poirier <benjamin.poirier@gmail.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, edumazet@google.com, parav@nvidia.com,
-	mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
-	shuah@kernel.org, petrm@nvidia.com, liuhangbin@gmail.com,
-	vladimir.oltean@nxp.com, idosch@nvidia.com,
-	virtualization@lists.linux.dev
-Subject: Re: [patch net-next v3 2/6] selftests: forwarding: move couple of
- initial check to the beginning
-Message-ID: <ZiAb0wZcWDSozCoq@f4>
-References: <20240417164554.3651321-1-jiri@resnulli.us>
- <20240417164554.3651321-3-jiri@resnulli.us>
+	 Content-Type:Content-Disposition:In-Reply-To; b=t0vbVWvbSegeHhDKy31w1gOnH7/EbiwfrigqO9WtENEoC/N3x4iqW2i7uPVtmpa9SQD0UdH90hZojmwZNLehC9d41u0+YE+vgozXB+f6Yb1KozedP4k+RcdViFSszgJBuZfD6VJnCXSoOjgph6hv4PUJv5bSxeUt1erDbnzq7hs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=p7TiSzc2; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=TIp5ZMjw0wdIQg22Blnb09yiTO6wa2zTH+zQj6OwGuU=; b=p7
+	TiSzc2+NOIrWTXC2ZyMAfuP/AO87c0sHV1Jll19LR/avub8Hv/dccGrmopQc5XQ4maKFjiB+X6RNr
+	x2Rfj3IkWMzY3WyhewBvnPNCUH1n0dZFDXsx+LBSUk6Iv5mehTBaC0n9oekdcZvo8iDNDtztBj7tc
+	+ktgGvIpWY8BJsM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rxAdE-00DHAW-NN; Wed, 17 Apr 2024 21:07:44 +0200
+Date: Wed, 17 Apr 2024 21:07:44 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: SIMON BABY <simonkbaby@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: Support needed for integrating Marvel 88e6390 with microchip
+ SAMA7 processor (DSA)
+Message-ID: <f3739191-1c13-481a-af70-f517f2dd75de@lunn.ch>
+References: <CAEFUPH0SoiOef1t8GS+Ch2a2sk+95PfF9Fnz_tPoveRJy2eAuw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240417164554.3651321-3-jiri@resnulli.us>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEFUPH0SoiOef1t8GS+Ch2a2sk+95PfF9Fnz_tPoveRJy2eAuw@mail.gmail.com>
 
-On 2024-04-17 18:45 +0200, Jiri Pirko wrote:
-> From: Jiri Pirko <jiri@nvidia.com>
+On Wed, Apr 17, 2024 at 10:24:00AM -0700, SIMON BABY wrote:
+> Hello Team,
 > 
-> These two check can be done at he very beginning of the script.
-> As the follow up patch needs to add early code that needs to be executed
-> after the checks, move them.
+> I am trying to integrate the Marvel 88e6390 switch with the SAMA7 processor for
+> the DSA driver to work correctly.  I can get a raw mdio reply from marvel phy
+> using the devmem tool in Linux. 
+> But I could not get any reply with the macb driver code (drivers/net/ethernet/
+> cadence/macb_main.c). 
 > 
-> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-> ---
->  tools/testing/selftests/net/forwarding/lib.sh | 15 ++++++++++-----
->  1 file changed, 10 insertions(+), 5 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-> index 7913c6ee418d..2e7695b94b6b 100644
-> --- a/tools/testing/selftests/net/forwarding/lib.sh
-> +++ b/tools/testing/selftests/net/forwarding/lib.sh
-> @@ -84,6 +84,16 @@ declare -A NETIFS=(
->  # e.g. a low-power board.
->  : "${KSFT_MACHINE_SLOW:=no}"
->  
-> +if [[ "$(id -u)" -ne 0 ]]; then
-> +	echo "SKIP: need root privileges"
-> +	exit $ksft_skip
-> +fi
-> +
-> +if [[ ! -v NUM_NETIFS ]]; then
-> +	echo "SKIP: importer does not define \"NUM_NETIFS\""
-> +	exit $ksft_skip
-> +fi
-> +
+> Below are some of my logs using devmem:
+> 
+> root@sama7g5ek-sd:~# devmem2 0xe2800034 w 0x58029800                 (C22 code)
+> /dev/mem opened.
+> Memory mapped at address 0xb6f86000.
+> Read at address  0xE2800034 (0xb6f86034): 0x6396C1E1
+> Write at address 0xE2800034 (0xb6f86034): 0x58029800, readback 0x58029800
+> root@sama7g5ek-sd:~# devmem2 0xe2800034 w 0x68060000                (C22 data)
+> /dev/mem opened.
+> Memory mapped at address 0xb6f2a000.
+> Read at address  0xE2800034 (0xb6f2a034): 0x58029800
+> Write at address 0xE2800034 (0xb6f2a034): 0x68060000, readback 0x68060000
+> root@sama7g5ek-sd:~# devmem2 0xe2800034         (read)
+> /dev/mem opened.
+> Memory mapped at address 0xb6f04000.
+> Read at address  0xE2800034 (0xb6f04034): 0x68071E07     (got the correct
+> marvel ID)
 
-I noticed that this part conflicts with the recently merged commit
-2291752fae3d ("selftests: forwarding: lib.sh: Validate NETIFS"). Can you
-please verify that the conflict was fixed correctly? The above check is
-now duplicated in the file.
+I don't know what you are seeing here, but the 88E6390 has a product
+ID of 0x3900 in register 3.
+
+> Below are the extra debugs executed during my testing(I added these debugs in
+> my macb driver code):
+> 
+> macb: ============================>debug_build: inside macb_mdio_read mii_id=0
+> regnum=0x3 bus_id=e2800000.ethernet-ffffffff pdev_id=ffffffff
+> macb: ============================>debug_build: inside macb_mdio_read
+> macb_write C22 mii_id=0 regnum=0x3
+> macb: ============================>debug_build: inside macb_mdio_read status
+> after macb_mdio_wait_for_idle = 0
+> macb: ============================>debug_build: inside macb_mdio_read status
+> after macb_readl = 65535
+
+I would check your reset line. The switch does not respond when held
+in reset. Because the MDIO data line has a pull up, if the device does
+not respond you read all 1s.
+
+> Attached is the sama7 technical document, marvel document
+
+Marvell documents are under NDA. You should not be publishing them.
+
+	Andrew
 
