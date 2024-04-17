@@ -1,143 +1,145 @@
-Return-Path: <netdev+bounces-88689-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88690-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 412828A83E5
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:12:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 310B88A83EE
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:12:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2BDEB24B0E
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 13:12:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E91AD285508
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 13:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DBE113D290;
-	Wed, 17 Apr 2024 13:12:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15B1713F42A;
+	Wed, 17 Apr 2024 13:12:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SXBIrMMC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WWPyUSti"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FAAF2770B;
-	Wed, 17 Apr 2024 13:12:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D515D13F01A;
+	Wed, 17 Apr 2024 13:12:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713359523; cv=none; b=SKiAjHg63Bq1Rts8SLDVnJCVLGENj403leqW1bswptuLoTXyGFHTG955JQXX8eN5MEyCsuQzwZQtz26Fb0SyNSsCT8soASsQcOqbpR7nb3+cq0XeqdE4Gsr9Uu2XSyb7H08kcww8hmmdbIufpKg8GhOpic5DWeOVrh4gluFXxYI=
+	t=1713359527; cv=none; b=DAHfepebwGRbZexIvY5LyTkRS5ecKiNUcVBeBfzPcMQN3poekRFhD+pee4hIeni9SguL/jqjMmfWpTe8MWVsV9e51g9WV6V+6NBoQF0MEiHIHiRd/P024PkZ5umuq+TfwYGSpD08VvFyOdmRCZh0oOBv5fG2wWZwmAKIdwl3yyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713359523; c=relaxed/simple;
-	bh=19fci4LLyfvbsiSMg+CCqqk9ZM2XGVW9YX76UIsPwO8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X+3S7CumTHEDy/+swoec5jk/p7gV+qS3rLrakMpFERFM1YJKvawLvzkZgacuqKVjduS5KssvxGUfPd9fDU39LG2xij6GQU+5M9lGT6kGx/GSjYh8C6bHWUmwUxthf3pXrxwJil4+U0xwp6O4mgyqPT6eKvvj0Jiv6Bb5QRPG5+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SXBIrMMC; arc=none smtp.client-ip=209.85.208.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2d718ee7344so56132791fa.2;
-        Wed, 17 Apr 2024 06:12:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713359519; x=1713964319; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xvq5XhFeUgxKjTzR6bSBfVpoXUJWQ7jeCb714ZUuuUI=;
-        b=SXBIrMMCZHO/bt/n/qrtFdMS25rl+QyJeqEtEsSIfiYu64z82lNWjBA46TkojdsQlD
-         TuKZQfk6F1RtB6LhslsSYgSIWc3A2Za32DrwhkUFa6h7tLW5tGGfJJ7QHSs6IsLY/u9f
-         GRGO7D+mzaFvAG4Fy70UKeNaSt4R0Kgk5oIAMTW2hnxuZSAEkvQxIKAT26UZCg6lYvnY
-         MnMbx5RbXCMJ09ks3yhN8a1P8loEldKvpedXPSF/64GLQ1n5PsuQ4KX69F5XxIczIYF1
-         NVq/gJXNw/vRyZUOOmDRR+SxWL+zC7NYmrN5a8EZl6eMr3GH6jw4V/xSMc+iOSv9yzcm
-         HGHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713359519; x=1713964319;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xvq5XhFeUgxKjTzR6bSBfVpoXUJWQ7jeCb714ZUuuUI=;
-        b=SMtPKdFfSjjxr49AUI0Y56INqBp/dy158mtezTTb+PscnS/gUxt3tNp0fF7s4fw+HU
-         Nfc5YH1z2EyOkDWb2P60kwCHAaylTQSBOv8U+Q0+RTAIdO7/yJytBa2p/DkwLo0h8J3R
-         8yXbpAd269xBQHuGLjJ1/QJG2KBZOpmGphfGAOnNfhIVipDas1UgLll32Wgi9I9sJY8b
-         TSCkp+x5qFNjf47cY9cibHdVep8iTdfOg7U7TyYq7p7VBuT4c/VL78z4Z7sQFs7GvCva
-         xq+NPUKlTChVQEtdxSllMc0RIPJKEqeOACEWT91ZDKddsIAur0Tc3P4AJp3Ls9t+Sf34
-         0L2w==
-X-Forwarded-Encrypted: i=1; AJvYcCWoQ/MScLI6luyuDf0FVI7ACv0dWbYdJbW1uo1RSsT4ITG7y7auZqCFxHlFbEayMWa9bGcKGYgws4h8eu1+tZxJRW2uZLEQ7roNthBRIQaRbNMc4ztqx60rRqnr+W1UXcedLcfpJaHuTPcPBq9IKHXnzhcZx9X1Np76Jp0P5ncmC11i7pPd01aJc53uDNQeB1FJppzuIeuE69D6uA5zopts32FS
-X-Gm-Message-State: AOJu0YzPYtbwuaKa+LjBO4CFDXESozXGfbHjNy29r5IKP3mBPx0Pflah
-	OP3D39EVsbJzNtzQ8izPPPr/1k5w9oLNvMZKDw9niG/Sf40auVKB
-X-Google-Smtp-Source: AGHT+IHdGh0cJoN5BQEheZbFU09X48BOOMw+EqWuSPIB0M7jeLokHHm06r2P5q8vQRJCzBR50C7lPg==
-X-Received: by 2002:a2e:9657:0:b0:2db:4f3f:55a7 with SMTP id z23-20020a2e9657000000b002db4f3f55a7mr655852ljh.45.1713359519045;
-        Wed, 17 Apr 2024 06:11:59 -0700 (PDT)
-Received: from mobilestation.baikal.int (srv1.baikalchip.ru. [87.245.175.227])
-        by smtp.gmail.com with ESMTPSA id u22-20020a2e8456000000b002da25e60918sm1389162ljh.18.2024.04.17.06.11.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Apr 2024 06:11:58 -0700 (PDT)
-Date: Wed, 17 Apr 2024 16:11:56 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Magnus Damm <magnus.damm@gmail.com>, 
-	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-renesas-soc@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, 
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH net-next v3 2/5] net: stmmac: introduce pcs_init/pcs_exit
- stmmac operations
-Message-ID: <abgmcmebzv5323wmumurygggeho2mbyf2l24fe42c6zvvueutc@w7zpxqndlqox>
-References: <20240415-rzn1-gmac1-v3-0-ab12f2c4401d@bootlin.com>
- <20240415-rzn1-gmac1-v3-2-ab12f2c4401d@bootlin.com>
- <42chuecdt7dpgm6fcrtt2crifvv5hflmtnmdrw5fvk3r7pwjgu@hlcv56dbeosf>
- <77722ced-4956-0e70-9492-c7b2e8557253@bootlin.com>
+	s=arc-20240116; t=1713359527; c=relaxed/simple;
+	bh=kPWeSFcFPXFuvbJls+Y5yQfrhQbbBP7OBjl0oczt/VE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=rwd+CWvyM2l4TwHn9vjxVzOZNHNT4DW5Am79x4dlHwFQ9e2KUU+QAQcyJLKvRFhPV68ZFJkcxHQu1KJdNFNItvYEUtf0q60YL/0ChRcopmOO1ZUOiWSsp8wZg4kZ6MrExHR6e7er/+o7SXeOZdwriVDD+s/Uiqu6fD/ij1tNMKM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WWPyUSti; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A2C7C072AA;
+	Wed, 17 Apr 2024 13:12:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713359526;
+	bh=kPWeSFcFPXFuvbJls+Y5yQfrhQbbBP7OBjl0oczt/VE=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=WWPyUStiBszPszoPQtDdb0CNNl6hDRgPB23WqyudxCveub9vZbpjPJFAGDQ1Ap16b
+	 cUw27pQGYZFbQAinWJLDBNp737tukgjG6n+jC3suxq2kvvDdBu09I0AEvSeDBTMOzy
+	 rOs40M0g7kD/RlKZAu8S2arsv3Xvj2okMcVKDheLh9N1Cjo0Apw0u82vuM559bnDnU
+	 KGeJTO2JIQOZ1t8Nvjz2SWHm1LNR+RUlFxe4b+wTT/UFyYnWXJubjSJhcCsByqTtMD
+	 hpP2s6MP/kYD9NOsuK4fhriN7YiNAaMpzj3ixUafqS9GEGJH3J4rcPXmoUjmrLCvdN
+	 bs9qax2NrsJ6w==
+Message-ID: <150d467e-3ea6-40fb-8ddf-21d678b150d1@kernel.org>
+Date: Wed, 17 Apr 2024 15:12:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <77722ced-4956-0e70-9492-c7b2e8557253@bootlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] dt-bindings: net/nfc: ti,trf7970a: Add
+ rx-gain-reduction option
+To: Paul Geurts <paul_geurts@live.nl>, mgreer@animalcreek.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh@kernel.org, conor+dt@kernel.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <cover.1713305374.git.paul_geurts@live.nl>
+ <AM0PR09MB267553535F7A85EA639D739C95082@AM0PR09MB2675.eurprd09.prod.outlook.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <AM0PR09MB267553535F7A85EA639D739C95082@AM0PR09MB2675.eurprd09.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Apr 17, 2024 at 11:30:09AM +0200, Romain Gantois wrote:
-> Hi Serge,
+On 17/04/2024 00:18, Paul Geurts wrote:
+> Add option to reduce the RX antenna gain to be able to reduce the
+> sensitivity.
 > 
-> On Tue, 16 Apr 2024, Serge Semin wrote:
+> Signed-off-by: Paul Geurts <paul_geurts@live.nl>
+> ---
+>  Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml | 6 ++++++
+>  1 file changed, 6 insertions(+)
 > 
-> > I am currently working on my Memory-mapped DW XPCS patchset cooking:
-> > https://lore.kernel.org/netdev/20231205103559.9605-1-fancer.lancer@gmail.com/
-> > The changes in this series seems to intersect to what is/will be
-> > introduced in my patchset. In particular as before I am going to
-> > use the "pcs-handle" property for getting the XPCS node. If so what
-> > about collecting PCS-related things in a single place. Like this:
-> > 
-> > int stmmac_xpcs_setup(struct net_device *ndev)
-> > {
-> > 	...
-> > 
-> > 	if (priv->plat->pcs_init) {
-> > 		return priv->plat->pcs_init(priv); /* Romain' part */
-> >	} else if (fwnode_property_present(priv->plat->port_node, "pcs-handle")) {
-> > 		/* My DW XPCS part */
-> > 	} else if (priv->plat->mdio_bus_data && priv->plat->mdio_bus_data->has_xpcs) {
-> > 		/* Currently implemented procedure */
-> > 	}
-> > 
-> > 	...
-> > }
-> 
-> That seems like a good idea to me, although those setup functions would have to 
-> be renamed to stmmac_pcs_setup/exit.
+> diff --git a/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml b/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml
+> index d0332eb76ad2..bbd045f6cf04 100644
+> --- a/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml
+> +++ b/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml
+> @@ -55,6 +55,11 @@ properties:
+>      description: |
+>        Regulator for supply voltage to VIN pin
+>  
+> +  rx-gain-reduction:
 
-Why not, seeing they will be responsible for any PCS attached to the
-MAC.
+Missing vendor prefix.
 
--Serge(y)
+> +    $ref: /schemas/types.yaml#/definitions/uint32
+> +    description: |
 
-> 
-> Thanks,
-> 
-> -- 
-> Romain Gantois, Bootlin
-> Embedded Linux and Kernel engineering
-> https://bootlin.com
+Do not need '|' unless you need to preserve formatting.
+
+> +      Specify a RX gain reduction to reduce antenna sensitivity.
+
+Reduction by what? What are the units?
+
+
+Best regards,
+Krzysztof
+
 
