@@ -1,193 +1,244 @@
-Return-Path: <netdev+bounces-88906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 091608A8F80
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:37:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DA488A8F8D
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:41:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 88F9A1F219D1
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 23:37:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B92AD1F2125A
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 23:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39F917A920;
-	Wed, 17 Apr 2024 23:36:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B7185945;
+	Wed, 17 Apr 2024 23:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u3kGHDmM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ebHDLHww"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D33B17966E
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 23:36:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB3A81748;
+	Wed, 17 Apr 2024 23:41:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713396975; cv=none; b=R2++oHcPZiJ/O0Vc4iuKm2jZZ0COaK/01N0oGU3AHI6rNMpdSUzN388pvEz3cSK4eVBhFF+EkIlx8PnCpz1LIGKMZ/GJVMgrnBWVCALEufI60ZA4c/jyCy++hQyTyTL8cWuuFoJpqalGEI84bSFTS9hlun2F5+vHCH3K7a52gHY=
+	t=1713397313; cv=none; b=EwTnulc5nhmTOOk6yQscSbTvP5bfZT3aHIPX8z13V6J+SWxpAty8eUcoYuj6++UcjgQgNvmPePb1K38CHE5LPf7GQAVpF31ZDRTEKKj5fWfBrxIoyh0bS7n+dOl02k7m4tlGPW6R1g51SYbOsU/N5ONXEbhij7kInXpPcB0EXc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713396975; c=relaxed/simple;
-	bh=vjRJ1U7DKOKEv8zqHNl/1MSWTfJ+WAHC2urS1kF08ZE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=NlkP6d6Ao5DgYaEeQ+K4m9+k8NsjD6tKxu2v02cMCIgDUGr5+dhZZ6S7dOrHzDrFSwtHTEQ85wC1PC6RrHwVLn6FxBYARN6xmp6rI5WFeGWTS6AhQlxRh0Jsz+lxgphywEplLlgCTpFg5oMiHKFHnPUwlYSq0p6aZVYMtK1eo/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u3kGHDmM; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1e86d7823d0so3300825ad.3
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 16:36:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713396974; x=1714001774; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cuQpI8q1wJxBD6X4kJwl22uAmYchmA+XE2ed6Sx/XW8=;
-        b=u3kGHDmM3WeWIKAcWsNDAO4lmvYJjUM0EFTBCufzySQDLfDsvq5Wf9XFKLBGojw3QR
-         p0402lfVsJdt+YgvNp4xLvH2GHuJRnKMaPbbLEDMUGVuKth+O0JY/v0NCAWA+LeAqGh3
-         Cy45vzdZYySsg+LsMzbEmjxwt/Sg1loN2LcdCo+GgZXEJ8GrAMfZdEvQkliN+NWS0XCa
-         cRk219GkqtLqQMJU24N3U5EQTR8IpAJwIlWciKolLgbNhOTQgXatslAafV2EIHHTi43y
-         UcAjCz2CDObBmyoQNj62jIaYWm0npBCWwUM6hy1r9cxBFc2kPdOsGt2ratZvlMybmYtP
-         5VOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713396974; x=1714001774;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cuQpI8q1wJxBD6X4kJwl22uAmYchmA+XE2ed6Sx/XW8=;
-        b=Qfjz8ROnedZ+agCnLHqOEFNd9MjzsU/eZIIJHZIGehBIpWrecsz7zO/yWBd2fm26f3
-         n6Avwi21KqPk90W63gpADNHH1GKkDPiaqE3Pp1ib0rjW4aFOzL57b8+gJiKqpB78wu9J
-         crwDPZD8FJ5taLre+IZvGxGXdKnELPhT+uw7jCizKkkT4Ufj3IrIWnR91ycjdBm1vZ6h
-         8qoLh0EaVnn6AODfC29NSd09b5ZwrY+SQl1sxZFIaXG9VCB5cM0/Pdu1ozMkiLnahVCn
-         Db1jm7e+o6G/Wcga/ZAi+UJNYgrNk2KZV/l2gSV+ElzhwfDED8LU2xIFBPX3x1kGVdwU
-         anBA==
-X-Forwarded-Encrypted: i=1; AJvYcCWaspcbo+/dj5pNpN7IZvZFe0t8IOeLoSZceRQVn19yw8y/gARq+XrNDlbWbYg37zsYxObIpgi0yp4Sh0gDBtDclJx90wrr
-X-Gm-Message-State: AOJu0YzPTWf9nO0aQGqSDWF2RUdnWVpV435FohfnoodAKN5NI9HYt3CV
-	xL8QOaAF2kQvuUc4p8cY1KNSxcbToNw0IcnqJ0c2+VE4X1xud8eexJSKBAveFAlKEBAsWbtbIFM
-	oLA==
-X-Google-Smtp-Source: AGHT+IEobOYF40oLdCObDrE0/kpftePvc8OynfTVVcOc8erPQdeh2yti6opEqDb6c+vxVQiAGfnmmPMhneU=
-X-Received: from edliaw.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:305d])
- (user=edliaw job=sendgmr) by 2002:a17:902:7c02:b0:1e0:c486:9af1 with SMTP id
- x2-20020a1709027c0200b001e0c4869af1mr2438pll.12.1713396973649; Wed, 17 Apr
- 2024 16:36:13 -0700 (PDT)
-Date: Wed, 17 Apr 2024 23:35:07 +0000
-In-Reply-To: <20240417233517.3044316-1-edliaw@google.com>
+	s=arc-20240116; t=1713397313; c=relaxed/simple;
+	bh=Nfp4Bt/UB3lYOjUFF0rfs/aN8U0aosIdPb074abhs2o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=c5rj/chMcuQPYBb9GbQ9DqkKbzusvcADg9T4XPIcrJDVQc/PW/ISMbToB9mJeHu9hPJxVX6Cv4JZctO2ozD59ZATIux5SuVrwvBnPx6RpqbNa8P0UjhNYgLQghi7fnTIZOSJsWhVhnYCKh0/SrEo071tY6vv/2b2u+34fONNft0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ebHDLHww; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CDD35C3277B;
+	Wed, 17 Apr 2024 23:41:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713397312;
+	bh=Nfp4Bt/UB3lYOjUFF0rfs/aN8U0aosIdPb074abhs2o=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=ebHDLHww1sRu0/F4b2uaU6+v4ZNFQlqOEV5l5dHioS9xgrLfSAh/eVxz8a6AmGTcS
+	 8sQ069W4VNHVEItjcYazb+m6p2mLxHyjRSuU/fsX5GCr5tMcUnVWhpmb7RAddtbmJr
+	 q/KkvTy52wBOq7mNs24PM2PCBd1y8DxKIJXmXhOj2/W1f32qgWnxORCTEj3XFChIDU
+	 kvnTh3MQpCj6zD4uCZIkhEgXJeyZCzIuLQo6Pl/HGxTr2A0vGMNHJoIkkIIzCwfkoR
+	 ChI/5SoIXiflj+wCDHcjfl/nY0HTRfFlNkJyYylq5531zV4sO8MT1eNgs8I0bobfpX
+	 C+NkyTW909qEg==
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-56e6583942dso63594a12.1;
+        Wed, 17 Apr 2024 16:41:52 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVUs0Hmu6MJQcIPxYBarU3aFPr41rC0n8+g8yWZ15eBIUW1wGBYo+cVZOwhhvSMdpjOGZ5+oZFapChDO/s1+72EnTUaRdB2JSp05evTLtdi5xwUGlpX0EZUwhHOCkYRYD7+t2VWVP+rdbUgnm4vaeuLdeWR2du8IYBo42bxO0K9yw8VeRsOAAG2vQLbLvqCq1nMQ2XhO+5j0QHSNWyh00JHTA==
+X-Gm-Message-State: AOJu0YyZpp5LS67JHctIYJFm2cik424UzgaqKgrkQj5C2CIYY0lpyWXa
+	RDjTM6i24mTUjyawM2Qzg/87DUsHMuJgvuZ1Ah9goVa19YGD2qU1pU5thSUiYEiTWmw07R2zmwq
+	kXVcqTLprhNKwAZATcJ55w4sM48c=
+X-Google-Smtp-Source: AGHT+IF4viARxx3GZxQCpGS5aZWzP8rCaswrtzXJWmo/s4eeUGc8cWg9XndNIL6tihZSuLbHwQq+1pEMz/4p7hGte/k=
+X-Received: by 2002:a17:906:cd0f:b0:a55:144a:adc2 with SMTP id
+ oz15-20020a170906cd0f00b00a55144aadc2mr473106ejb.6.1713397311258; Wed, 17 Apr
+ 2024 16:41:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <16430256912363@kroah.com> <20240417233517.3044316-1-edliaw@google.com>
-X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240417233517.3044316-6-edliaw@google.com>
-Subject: [PATCH 5.15.y 5/5] bpf: Fix ringbuf memory type confusion when
- passing to helpers
-From: Edward Liaw <edliaw@google.com>
-To: stable@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Hao Luo <haoluo@google.com>
-Cc: bpf@vger.kernel.org, kernel-team@android.com, 
-	Edward Liaw <edliaw@google.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+MIME-Version: 1.0
+References: <20240412073046.1192744-1-wenst@chromium.org> <20240412073046.1192744-2-wenst@chromium.org>
+ <CAGp9Lzp=MKNYc70ZeGCAEgWfFVPOAOZQQ86BXukk+EQQM_C+OA@mail.gmail.com> <CAGXv+5FeRwYm7x+fYS9KPXW-0tQ-zSuk5nU6AZ-=yU07wXnJ9w@mail.gmail.com>
+In-Reply-To: <CAGXv+5FeRwYm7x+fYS9KPXW-0tQ-zSuk5nU6AZ-=yU07wXnJ9w@mail.gmail.com>
+From: Sean Wang <sean.wang@kernel.org>
+Date: Wed, 17 Apr 2024 16:41:39 -0700
+X-Gmail-Original-Message-ID: <CAGp9Lzrm6GDdm61FZR60aqmnSVg7k1+NJ=UfNwr6x8Y5RUwOKA@mail.gmail.com>
+Message-ID: <CAGp9Lzrm6GDdm61FZR60aqmnSVg7k1+NJ=UfNwr6x8Y5RUwOKA@mail.gmail.com>
+Subject: Re: [PATCH v3 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
+ SDIO Bluetooth
+To: Chen-Yu Tsai <wenst@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Daniel Borkmann <daniel@iogearbox.net>
+Hi Chen-Yu,
 
-The bpf_ringbuf_submit() and bpf_ringbuf_discard() have ARG_PTR_TO_ALLOC_MEM
-in their bpf_func_proto definition as their first argument, and thus both expect
-the result from a prior bpf_ringbuf_reserve() call which has a return type of
-RET_PTR_TO_ALLOC_MEM_OR_NULL.
+okay, we will add it once we have implemented it in the driver. thanks
+for adding the dt-binding.
 
-While the non-NULL memory from bpf_ringbuf_reserve() can be passed to other
-helpers, the two sinks (bpf_ringbuf_submit(), bpf_ringbuf_discard()) right now
-only enforce a register type of PTR_TO_MEM.
+     Sean
 
-This can lead to potential type confusion since it would allow other PTR_TO_MEM
-memory to be passed into the two sinks which did not come from bpf_ringbuf_reserve().
-
-Add a new MEM_ALLOC composable type attribute for PTR_TO_MEM, and enforce that:
-
- - bpf_ringbuf_reserve() returns NULL or PTR_TO_MEM | MEM_ALLOC
- - bpf_ringbuf_submit() and bpf_ringbuf_discard() only take PTR_TO_MEM | MEM_ALLOC
-   but not plain PTR_TO_MEM arguments via ARG_PTR_TO_ALLOC_MEM
- - however, other helpers might treat PTR_TO_MEM | MEM_ALLOC as plain PTR_TO_MEM
-   to populate the memory area when they use ARG_PTR_TO_{UNINIT_,}MEM in their
-   func proto description
-
-Fixes: 457f44363a88 ("bpf: Implement BPF ring buffer and verifier support for it")
-Reported-by: Alexei Starovoitov <ast@kernel.org>
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Acked-by: John Fastabend <john.fastabend@gmail.com>
-Acked-by: Alexei Starovoitov <ast@kernel.org>
-(cherry picked from commit a672b2e36a648afb04ad3bda93b6bda947a479a5)
-Signed-off-by: Edward Liaw <edliaw@google.com>
----
- include/linux/bpf.h   | 9 +++++++--
- kernel/bpf/verifier.c | 6 +++++-
- 2 files changed, 12 insertions(+), 3 deletions(-)
-
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index 84efd8dd139d..96b2aa567d23 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -312,7 +312,12 @@ enum bpf_type_flag {
- 	 */
- 	MEM_RDONLY		= BIT(1 + BPF_BASE_TYPE_BITS),
- 
--	__BPF_TYPE_LAST_FLAG	= MEM_RDONLY,
-+	/* MEM was "allocated" from a different helper, and cannot be mixed
-+	 * with regular non-MEM_ALLOC'ed MEM types.
-+	 */
-+	MEM_ALLOC		= BIT(2 + BPF_BASE_TYPE_BITS),
-+
-+	__BPF_TYPE_LAST_FLAG	= MEM_ALLOC,
- };
- 
- /* Max number of base types. */
-@@ -396,7 +401,7 @@ enum bpf_return_type {
- 	RET_PTR_TO_SOCKET_OR_NULL	= PTR_MAYBE_NULL | RET_PTR_TO_SOCKET,
- 	RET_PTR_TO_TCP_SOCK_OR_NULL	= PTR_MAYBE_NULL | RET_PTR_TO_TCP_SOCK,
- 	RET_PTR_TO_SOCK_COMMON_OR_NULL	= PTR_MAYBE_NULL | RET_PTR_TO_SOCK_COMMON,
--	RET_PTR_TO_ALLOC_MEM_OR_NULL	= PTR_MAYBE_NULL | RET_PTR_TO_ALLOC_MEM,
-+	RET_PTR_TO_ALLOC_MEM_OR_NULL	= PTR_MAYBE_NULL | MEM_ALLOC | RET_PTR_TO_ALLOC_MEM,
- 	RET_PTR_TO_BTF_ID_OR_NULL	= PTR_MAYBE_NULL | RET_PTR_TO_BTF_ID,
- 
- 	/* This must be the last entry. Its purpose is to ensure the enum is
-diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-index 3dfc45ed428a..6162ba31a89e 100644
---- a/kernel/bpf/verifier.c
-+++ b/kernel/bpf/verifier.c
-@@ -567,6 +567,8 @@ static const char *reg_type_str(struct bpf_verifier_env *env,
- 
- 	if (type & MEM_RDONLY)
- 		strncpy(prefix, "rdonly_", 16);
-+	if (type & MEM_ALLOC)
-+		strncpy(prefix, "alloc_", 16);
- 
- 	snprintf(env->type_str_buf, TYPE_STR_BUF_LEN, "%s%s%s",
- 		 prefix, str[base_type(type)], postfix);
-@@ -4970,6 +4972,7 @@ static const struct bpf_reg_types mem_types = {
- 		PTR_TO_MAP_KEY,
- 		PTR_TO_MAP_VALUE,
- 		PTR_TO_MEM,
-+		PTR_TO_MEM | MEM_ALLOC,
- 		PTR_TO_BUF,
- 	},
- };
-@@ -4987,7 +4990,7 @@ static const struct bpf_reg_types int_ptr_types = {
- static const struct bpf_reg_types fullsock_types = { .types = { PTR_TO_SOCKET } };
- static const struct bpf_reg_types scalar_types = { .types = { SCALAR_VALUE } };
- static const struct bpf_reg_types context_types = { .types = { PTR_TO_CTX } };
--static const struct bpf_reg_types alloc_mem_types = { .types = { PTR_TO_MEM } };
-+static const struct bpf_reg_types alloc_mem_types = { .types = { PTR_TO_MEM | MEM_ALLOC } };
- static const struct bpf_reg_types const_map_ptr_types = { .types = { CONST_PTR_TO_MAP } };
- static const struct bpf_reg_types btf_ptr_types = { .types = { PTR_TO_BTF_ID } };
- static const struct bpf_reg_types spin_lock_types = { .types = { PTR_TO_MAP_VALUE } };
-@@ -5150,6 +5153,7 @@ static int check_func_arg(struct bpf_verifier_env *env, u32 arg,
- 	case PTR_TO_MAP_VALUE:
- 	case PTR_TO_MEM:
- 	case PTR_TO_MEM | MEM_RDONLY:
-+	case PTR_TO_MEM | MEM_ALLOC:
- 	case PTR_TO_BUF:
- 	case PTR_TO_BUF | MEM_RDONLY:
- 	case PTR_TO_STACK:
--- 
-2.44.0.769.g3c40516874-goog
-
+On Wed, Apr 17, 2024 at 4:32=E2=80=AFPM Chen-Yu Tsai <wenst@chromium.org> w=
+rote:
+>
+> On Wed, Apr 17, 2024 at 4:04=E2=80=AFPM Sean Wang <sean.wang@kernel.org> =
+wrote:
+> >
+> > Hi Chen-Yu,
+> >
+> > On Fri, Apr 12, 2024 at 12:31=E2=80=AFAM Chen-Yu Tsai <wenst@chromium.o=
+rg> wrote:
+> > >
+> > > The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
+> > > SDIO. WiFi and Bluetooth are separate SDIO functions within the chip.
+> > > While the Bluetooth SDIO function is fully discoverable, the chip has
+> > > a pin that can reset just the Bluetooth core, as opposed to the full
+> > > chip. This should be described in the device tree.
+> > >
+> > > Add a device tree binding for the Bluetooth SDIO function of the MT79=
+21S
+> > > specifically to document the reset line. This binding is based on the=
+ MMC
+> > > controller binding, which specifies one device node per SDIO function=
+.
+> > >
+> > > Cc: Sean Wang <sean.wang@mediatek.com>
+> > > Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+> > > ---
+> > > Changes since v2:
+> > > - Expand description and commit message to clearly state that WiFi an=
+d
+> > >   Bluetooth are separate SDIO functions, and that each function shoul=
+d
+> > >   be a separate device node, as specified by the MMC binding.
+> > > - Change 'additionalProperties' to 'unevaluatedProperties'
+> > > - Add missing separating new line
+> > > - s/ot/to/
+> > >
+> > > Angelo's reviewed-by was not picked up due to the above changes.
+> > >
+> > > Changes since v1:
+> > > - Reworded descriptions
+> > > - Moved binding maintainer section before description
+> > > - Added missing reference to bluetooth-controller.yaml
+> > > - Added missing GPIO header to example
+> > > ---
+> > >  .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 55 +++++++++++++++++=
+++
+> > >  MAINTAINERS                                   |  1 +
+> > >  2 files changed, 56 insertions(+)
+> > >  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/m=
+ediatek,mt7921s-bluetooth.yaml
+> > >
+> > > diff --git a/Documentation/devicetree/bindings/net/bluetooth/mediatek=
+,mt7921s-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/m=
+ediatek,mt7921s-bluetooth.yaml
+> > > new file mode 100644
+> > > index 000000000000..67ff7caad599
+> > > --- /dev/null
+> > > +++ b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921=
+s-bluetooth.yaml
+> > > @@ -0,0 +1,55 @@
+> > > +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> > > +%YAML 1.2
+> > > +---
+> > > +$id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7921s-bl=
+uetooth.yaml#
+> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > > +
+> > > +title: MediaTek MT7921S Bluetooth
+> > > +
+> > > +maintainers:
+> > > +  - Sean Wang <sean.wang@mediatek.com>
+> > > +
+> > > +description:
+> > > +  MT7921S is an SDIO-attached dual-radio WiFi+Bluetooth Combo chip; =
+each
+> > > +  function is its own SDIO function on a shared SDIO interface. The =
+chip
+> > > +  has two dedicated reset lines, one for each function core.
+> > > +  This binding only covers the Bluetooth SDIO function, with one dev=
+ice
+> > > +  node describing only this SDIO function.
+> > > +
+> > > +allOf:
+> > > +  - $ref: bluetooth-controller.yaml#
+> > > +
+> > > +properties:
+> > > +  compatible:
+> > > +    enum:
+> > > +      - mediatek,mt7921s-bluetooth
+> > > +
+> > > +  reg:
+> > > +    const: 2
+> > > +
+> > > +  reset-gpios:
+> > > +    maxItems: 1
+> > > +    description:
+> > > +      An active-low reset line for the Bluetooth core; on typical M.=
+2
+> > > +      key E modules this is the W_DISABLE2# pin.
+> > > +
+> >
+> > Thanks for adding the new setup for the MT7921S devices. They look good=
+ to me.
+> > Sometimes, the MT7921S might be set up to wake up the host when it's
+> > asleep using a sideband signal.
+> > This might need an extra pin called "wakeup" to make it happen. Can
+> > you help add this pin to the settings in the same update, or should I
+> > do it later?
+>
+> I suggest you send a patch on top of this one? I'm not sure if you
+> would model it as a GPIO or interrupt. And there doesn't seem to be
+> any code in the driver expecting it.
+>
+>
+> ChenYu
+>
+> > > +required:
+> > > +  - compatible
+> > > +  - reg
+> > > +
+> > > +unevaluatedProperties: false
+> > > +
+> > > +examples:
+> > > +  - |
+> > > +    #include <dt-bindings/gpio/gpio.h>
+> > > +
+> > > +    mmc {
+> > > +        #address-cells =3D <1>;
+> > > +        #size-cells =3D <0>;
+> > > +
+> > > +        bluetooth@2 {
+> > > +            compatible =3D "mediatek,mt7921s-bluetooth";
+> > > +            reg =3D <2>;
+> > > +            reset-gpios =3D <&pio 8 GPIO_ACTIVE_LOW>;
+> > > +        };
+> > > +    };
+> > > diff --git a/MAINTAINERS b/MAINTAINERS
+> > > index 88981d9f3958..218bc2a21207 100644
+> > > --- a/MAINTAINERS
+> > > +++ b/MAINTAINERS
+> > > @@ -13818,6 +13818,7 @@ M:      Sean Wang <sean.wang@mediatek.com>
+> > >  L:     linux-bluetooth@vger.kernel.org
+> > >  L:     linux-mediatek@lists.infradead.org (moderated for non-subscri=
+bers)
+> > >  S:     Maintained
+> > > +F:     Documentation/devicetree/bindings/net/bluetooth/mediatek,mt79=
+21s-bluetooth.yaml
+> > >  F:     Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
+> > >  F:     drivers/bluetooth/btmtkuart.c
+> > >
+> > > --
+> > > 2.44.0.683.g7961c838ac-goog
+> > >
+> > >
 
