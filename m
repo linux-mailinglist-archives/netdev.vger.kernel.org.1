@@ -1,203 +1,424 @@
-Return-Path: <netdev+bounces-88817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE3D58A8984
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 18:59:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5086E8A898E
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 19:00:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 633D02860AC
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 16:59:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 068B1285ACC
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 17:00:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2824171E44;
-	Wed, 17 Apr 2024 16:58:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2AC5171E4D;
+	Wed, 17 Apr 2024 17:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JX8RjuQ7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i5cBF2ud"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 612C8171657
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 16:58:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10EA217167E
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 17:00:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713373083; cv=none; b=L8lhDHmeWf6TXp9Ce7FrA3+31tODrnFYoeht1uU68Zrt0v8eEzCUVKbU5Ubez7SU6kxOvMhbZ1zIoNF2M66Dcw8jsPO+V8v0JaDES0LGsH20BHxAiXvi970RLCWPWQ7RO4jwplMWp4JOY1Mp0s+Tzcils++ARmoOyi3eTMsAPQA=
+	t=1713373218; cv=none; b=Z5Jl2ejZjZLJ5qUgetXg9RjsFsyOZc8ee9WATUnaAZFjMtM21C3PSruDD+qZvBUQ8pxdHyRPcONlfnsxGvTQs8WwvsA6QXd/NGR1vh5lu7365y+Z2tMjRzxSttNCXTKbRC0N6PghMHvviLNawt+0amvheJL5IxtBgT9lhZHeVLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713373083; c=relaxed/simple;
-	bh=N2jmBhMBn5+m4fm5zFW8foolZM+iM6Bte4t0VVhlVmw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=q17dzAKXrSaOuaIdpKPqCavCtjX0OPAP/sVjvNYdvCgRMu2lULz457r0Km0jyjutnCswypzdAr0gDBdABI8v7aWjWq9zK6YdbcPKdOZQ+3D4a3Ik4NnMc/xCDS0znA8SXNjvOVaIVHsyJyE+ahN8Dfm+19CWKQ6X6tuhrJF1EBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JX8RjuQ7; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1713373218; c=relaxed/simple;
+	bh=56tOu9eUB47d8KPYjjK51a05MyD+g5MwMnzZxCMBDX4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RrS0pEw+8zc/tWPaTWGrR1470i/LSTBliBv28hV7dc3yv3lwQs/ZflGBiAxCnj7btPb5sd/8mKXMbOBiqQO9881ftgOVB1SkE/XMhdYmM++GWjFgfeBkRnVuigz2ey2CU1WbhJS6oA95xBuN6qa2BNhHLrnIf0QXACJIp7unOGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i5cBF2ud; arc=none smtp.client-ip=209.85.160.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de45d8ec875so419828276.3
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 09:58:02 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4365c1451d4so23264091cf.2
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 10:00:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713373081; x=1713977881; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9SfHsMjvbsZ8saPJkjIJdYMKlU+OKfppDgN6rcyAi7Y=;
-        b=JX8RjuQ7mG9zOrFZYtiS4U+EYp7st2FfajGj2AbXZwQRgMRAsDKL07aTfcDM2YPIyJ
-         skxSb/hA+t0oO+GK03F9aODPFFSuSZjBh9vJvwzCpr3xMvJmKVL2IDnauCdMny3iU/qh
-         ePCL5aunD3hIb6YdYK/Bp9zsVnkAZlf+f5ybASg5bBMh6FsBMtuY5dyutSocYFVP+Q1m
-         yJ8waG/J2IHkhXyyb7Tj7oeFYcLs/86YtJidxlFPpE2W9xmGXyFB4PmyJjv6oXE1oScs
-         cpyX5UkMENwTC0ij3N8mNUR6P1VybzOIu49Rrub0/nJX993oTs44w6dysE/8gtNxUZ61
-         NtKQ==
+        d=google.com; s=20230601; t=1713373216; x=1713978016; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YgC6tWfrCjT+R+mHvE+Tw2Te80mN3OqYF5qyRLtY9IQ=;
+        b=i5cBF2ud5goFCJNgvzTtmt1ggaprX1WLQZGDghBAmOuz7h62nhqA60VBQzkFhITLNY
+         r2NQP2PlWUOBsanF039+EPyBdwIJPMzWQr+iBIOQfNd0GwNZnPVjjXNwjvwiCYaLssrT
+         C7zdTrwDK8BWAgQQQepK1LMGTaVltAWOJTCtNzXa2E8rvgzXGzIMWQrE1TEyfbAcGqSU
+         zJ52j+KEyYd83mIjIZxpq+5IpOmtPgo+cr7+sW0Gq+a/qoUP4eSVzv6dZlhlIqXZ4lpc
+         mnjvVk7D57ZXMYoXgfaWog8pBHS5cvZ7Y75eSUA2c+cTT8sFtAHnGc1/bQ6/EXSpLBNW
+         cV1Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713373081; x=1713977881;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9SfHsMjvbsZ8saPJkjIJdYMKlU+OKfppDgN6rcyAi7Y=;
-        b=Yn9zrH6Q1rcm+jS5POFAvd8w6Q6w/w6LC/cIJ87eMAX/348sY9GWhj4xGw/eZzeVux
-         jBL9Eq57Q1UEN0gZWvus/NfVQ0dTxgJEM/Bll/Z6ObVOzDQ21BbuYFrIeBHjFyQ/HDzL
-         noMDQfCwR2sGAnY5P5b7j52N3wyFGIX7VRZc+l3wTo4xuWVPTE/sgN70UU20WSUuaBGE
-         X6gVXs7Zwaz8LlVVrmM8vQ1ve9no8tpt3sX2sSZUAKPnl6zajP7hdKqAngBlabDpvlC0
-         5w9BgyVnh8TVTzPBhmqUcQOL49/fG3XbeUKVhDqhKv4ayYyoZ/UUnSoMv63u6F3Xqhii
-         2QCw==
-X-Gm-Message-State: AOJu0Yx0Ee7pPEEEpdC+lW9m7/0lzzE9+8pVZ9QBCYR/9+d9NxwnVGRj
-	FthmQYCgMmpbpU16nDss4b5CWaxUNM3BufAUfd95YQbmmPrcmuuEVlclxX04I8tYXEKMjK9sqU8
-	R60iCP5Gcfg==
-X-Google-Smtp-Source: AGHT+IEg1v6If1wu5z2wGkUiaGBXXjWDiofPW7ixTY7LVjpINF01obAWlwjXMefuIFNEecyyMeVQVHMX/iIBsg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:2b8b:b0:dc6:fa35:b42 with SMTP
- id fj11-20020a0569022b8b00b00dc6fa350b42mr5290472ybb.2.1713373081352; Wed, 17
- Apr 2024 09:58:01 -0700 (PDT)
-Date: Wed, 17 Apr 2024 16:57:56 +0000
-In-Reply-To: <20240417165756.2531620-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1713373216; x=1713978016;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YgC6tWfrCjT+R+mHvE+Tw2Te80mN3OqYF5qyRLtY9IQ=;
+        b=YYJpe4+7O/2eu8jrU4Yi2ItjsOmKB+eEruMhnfYex0Sm9yJcAn1LssM41JCyFTD1G2
+         QpSNNaWJC8fmsDnGgtRZaj+fMaBsVaXE7ILNAITXy0duY8QhwSkPln2beh0Zc+rmnKFA
+         TimKwEJv3cv23QLl6ugDoTaCvC4ehVOwJ2/zdGMwGvVPcp2X88jHKahvJG70nZpQgHKn
+         LsOvXSxmhB2H2eUVATdggF5kjghYDO3M5Mb6fRntVCVKynEHYyAwr7+dtCKsY2TUpZzN
+         uz6HWdPeCT0G2w4aJaoUSb81xkJIb+rsCpu+DcQxkW97Egn6s/JP009UXMsr4771w8F9
+         2xfw==
+X-Forwarded-Encrypted: i=1; AJvYcCUWDXe364kdIiUZpkSEoRKk3UPoDof8aNCUgfvqdicZHLQjHI6KNy3OgC5c1KjDdWYNv0FnoX356kfR/01FiG8bzhajiWlg
+X-Gm-Message-State: AOJu0YzHus4dlAgo76OQGGao8/AR7u13mbyEkGyGEKmuuthc2xaEaMRQ
+	N76iH8DTuHhfShQm+Qu/o/WkFpL1ro+M11WYFImnn0pI1tNJTMbVvG/+VMIBHCVvjtjlZ0mSNXr
+	7ZDuUsSEwrhXr5OmylZRTIhL9e4GtkSHQ0IFB
+X-Google-Smtp-Source: AGHT+IFXiu93+9CON0CZlmqFKCb6l2EaLUrXof0ILnYpyXQf/L4IDG/UItFW263lu19ZxV/stOYbPZz4raXJd9UoXfY=
+X-Received: by 2002:a0c:e852:0:b0:699:2b62:2f19 with SMTP id
+ l18-20020a0ce852000000b006992b622f19mr18794026qvo.30.1713373215547; Wed, 17
+ Apr 2024 10:00:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240417165756.2531620-1-edumazet@google.com>
-X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240417165756.2531620-3-edumazet@google.com>
-Subject: [PATCH net-next 2/2] tcp: no longer abort SYN_SENT when receiving
- some ICMP (II)
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
-	Dragos Tatulea <dtatulea@nvidia.com>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+MIME-Version: 1.0
+References: <20240412165230.2009746-1-jrife@google.com> <20240412165230.2009746-3-jrife@google.com>
+ <65b2f4a3-bd8e-495b-adca-1e7adce5301d@linux.dev>
+In-Reply-To: <65b2f4a3-bd8e-495b-adca-1e7adce5301d@linux.dev>
+From: Jordan Rife <jrife@google.com>
+Date: Wed, 17 Apr 2024 12:59:58 -0400
+Message-ID: <CADKFtnRYnJG0dk53erhuEK8Ew148nuTRwFgbUxkV6LRZQ=y+Hw@mail.gmail.com>
+Subject: Re: [PATCH v2 bpf-next 2/6] selftests/bpf: Implement socket kfuncs
+ for bpf_testmod
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
+	Kui-Feng Lee <thinker.li@gmail.com>, Artem Savkov <asavkov@redhat.com>, 
+	Dave Marchevsky <davemarchevsky@fb.com>, Menglong Dong <imagedong@tencent.com>, Daniel Xu <dxu@dxuuu.xyz>, 
+	David Vernet <void@manifault.com>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Notes:
+Martin,
 
- - A prior version of this patch in commit
-   0a8de364ff7a ("tcp: no longer abort SYN_SENT when
-   receiving some ICMP") had to be reverted.
+Thank you for the detailed feedback.
 
- - We found the root cause, and fixed it in prior patch
-   in the series.
+> Can a separate global lock/mutex (not the lock_sock) be acquired first be=
+fore
+> using the sock pointer in the kfuncs?
 
- - Many thanks to Dragos Tatulea !
+Sure. I will add the mutex around the socket operations. As for the
+single global sock pointer, I wanted to keep it simple in this patch
+series to fulfill the current use case. I agree it might be overkill
+for now to add the bpf map and such.
 
-Currently, non fatal ICMP messages received on behalf
-of SYN_SENT sockets do call tcp_ld_RTO_revert()
-to implement RFC 6069, but immediately call tcp_done(),
-thus aborting the connect() attempt.
+> Is it better to set sk_sndtimeo in bpf_kfunc_init_sock() ?
+> All these new kfunc should have the KF_SLEEPABLE flag.
+> bpf_testmod_exit() should probably do this NULL check and sock_release() =
+also.
 
-This violates RFC 1122 following requirement:
+Ack. I will add this.
 
-4.2.3.9  ICMP Messages
-...
-          o    Destination Unreachable -- codes 0, 1, 5
+> nit. Can "struct sockaddr_storage addr;" be directly used instead of a ch=
+ar array?
 
-                 Since these Unreachable messages indicate soft error
-                 conditions, TCP MUST NOT abort the connection, and it
-                 SHOULD make the information available to the
-                 application.
+When using "struct sockaddr_storage addr;" directly, the BPF program
+fails to load with the following error message.
 
-This patch makes sure non 'fatal' ICMP[v6] messages do not
-abort the connection attempt.
+> libbpf: prog 'kernel_connect': BPF program load failed: Invalid argument
+> libbpf: prog 'kernel_connect': -- BEGIN PROG LOAD LOG --
+> 0: R1=3Dctx() R10=3Dfp0
+> ; return bpf_kfunc_call_kernel_connect(args); @ sock_addr_kern.c:26
+> 0: (85) call bpf_kfunc_call_kernel_connect#99994
+> arg#0 pointer type STRUCT addr_args must point to scalar, or struct with =
+scalar
+> processed 1 insns (limit 1000000) max_states_per_insn 0 total_states 0 pe=
+ak_states 0 mark_read 0
+> -- END PROG LOAD LOG --
+> libbpf: prog 'kernel_connect': failed to load: -22
+> libbpf: failed to load object 'sock_addr_kern'
+> libbpf: failed to load BPF skeleton 'sock_addr_kern': -22
+> load_sock_addr_kern:FAIL:skel unexpected error: -22
+> test_sock_addr:FAIL:load_sock_addr_kern unexpected error: -1 (errno 22)
+> #288 sock_addr:FAIL
 
-It enables RFC 6069 for SYN_SENT sockets as a result.
+-Jordan
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Neal Cardwell <ncardwell@google.com>
-Tested-by: Dragos Tatulea <dtatulea@nvidia.com>
----
- net/ipv4/tcp_ipv4.c | 6 ++++++
- net/ipv6/tcp_ipv6.c | 9 ++++++---
- 2 files changed, 12 insertions(+), 3 deletions(-)
-
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index a717db99972d977a64178d7ed1109325d64a6d51..4b50d09f84b9ae7fec98a71bedf39594ab85e5ea 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -482,6 +482,7 @@ int tcp_v4_err(struct sk_buff *skb, u32 info)
- 	const int code = icmp_hdr(skb)->code;
- 	struct sock *sk;
- 	struct request_sock *fastopen;
-+	bool harderr = false;
- 	u32 seq, snd_una;
- 	int err;
- 	struct net *net = dev_net(skb->dev);
-@@ -555,6 +556,7 @@ int tcp_v4_err(struct sk_buff *skb, u32 info)
- 		goto out;
- 	case ICMP_PARAMETERPROB:
- 		err = EPROTO;
-+		harderr = true;
- 		break;
- 	case ICMP_DEST_UNREACH:
- 		if (code > NR_ICMP_UNREACH)
-@@ -579,6 +581,7 @@ int tcp_v4_err(struct sk_buff *skb, u32 info)
- 		}
- 
- 		err = icmp_err_convert[code].errno;
-+		harderr = icmp_err_convert[code].fatal;
- 		/* check if this ICMP message allows revert of backoff.
- 		 * (see RFC 6069)
- 		 */
-@@ -605,6 +608,9 @@ int tcp_v4_err(struct sk_buff *skb, u32 info)
- 		if (inet_test_bit(RECVERR, sk))
- 			ip_icmp_error(sk, skb, err, th->dest, info, (u8 *)th);
- 
-+		if (!harderr)
-+			break;
+On Tue, Apr 16, 2024 at 2:43=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 4/12/24 9:52 AM, Jordan Rife wrote:
+> > This patch adds a set of kfuncs to bpf_testmod that can be used to
+> > manipulate a socket from kernel space.
+> >
+> > Signed-off-by: Jordan Rife <jrife@google.com>
+> > ---
+> >   .../selftests/bpf/bpf_testmod/bpf_testmod.c   | 139 +++++++++++++++++=
 +
- 		if (!sock_owned_by_user(sk)) {
- 			WRITE_ONCE(sk->sk_err, err);
- 
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index bb7c3caf4f8536dabdcb3dbe7c90aff9c8985c90..f31527f0a13dee9488ce72834d89524e83f61e5f 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -382,7 +382,7 @@ static int tcp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
- 	struct tcp_sock *tp;
- 	__u32 seq, snd_una;
- 	struct sock *sk;
--	bool fatal;
-+	bool harderr;
- 	int err;
- 
- 	sk = __inet6_lookup_established(net, net->ipv4.tcp_death_row.hashinfo,
-@@ -403,9 +403,9 @@ static int tcp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
- 		return 0;
- 	}
- 	seq = ntohl(th->seq);
--	fatal = icmpv6_err_convert(type, code, &err);
-+	harderr = icmpv6_err_convert(type, code, &err);
- 	if (sk->sk_state == TCP_NEW_SYN_RECV) {
--		tcp_req_err(sk, seq, fatal);
-+		tcp_req_err(sk, seq, harderr);
- 		return 0;
- 	}
- 
-@@ -490,6 +490,9 @@ static int tcp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
- 
- 		ipv6_icmp_error(sk, skb, err, th->dest, ntohl(info), (u8 *)th);
- 
-+		if (!harderr)
-+			break;
-+
- 		if (!sock_owned_by_user(sk)) {
- 			WRITE_ONCE(sk->sk_err, err);
- 			sk_error_report(sk);		/* Wake people up to see the error (see connect in sock.c) */
--- 
-2.44.0.683.g7961c838ac-goog
-
+> >   .../bpf/bpf_testmod/bpf_testmod_kfunc.h       |  27 ++++
+> >   2 files changed, 166 insertions(+)
+> >
+> > diff --git a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c b/to=
+ols/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
+> > index 39ad96a18123f..663df8148097e 100644
+> > --- a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
+> > +++ b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod.c
+> > @@ -10,18 +10,29 @@
+> >   #include <linux/percpu-defs.h>
+> >   #include <linux/sysfs.h>
+> >   #include <linux/tracepoint.h>
+> > +#include <linux/net.h>
+> > +#include <linux/socket.h>
+> > +#include <linux/nsproxy.h>
+> > +#include <linux/inet.h>
+> > +#include <linux/in.h>
+> > +#include <linux/in6.h>
+> > +#include <linux/un.h>
+> > +#include <net/sock.h>
+> >   #include "bpf_testmod.h"
+> >   #include "bpf_testmod_kfunc.h"
+> >
+> >   #define CREATE_TRACE_POINTS
+> >   #include "bpf_testmod-events.h"
+> >
+> > +#define CONNECT_TIMEOUT_SEC 1
+> > +
+> >   typedef int (*func_proto_typedef)(long);
+> >   typedef int (*func_proto_typedef_nested1)(func_proto_typedef);
+> >   typedef int (*func_proto_typedef_nested2)(func_proto_typedef_nested1)=
+;
+> >
+> >   DEFINE_PER_CPU(int, bpf_testmod_ksym_percpu) =3D 123;
+> >   long bpf_testmod_test_struct_arg_result;
+> > +static struct socket *sock;
+> >
+> >   struct bpf_testmod_struct_arg_1 {
+> >       int a;
+> > @@ -494,6 +505,124 @@ __bpf_kfunc static u32 bpf_kfunc_call_test_static=
+_unused_arg(u32 arg, u32 unused
+> >       return arg;
+> >   }
+> >
+> > +__bpf_kfunc int bpf_kfunc_init_sock(struct init_sock_args *args)
+> > +{
+> > +     int proto;
+> > +
+> > +     if (sock)
+> > +             pr_warn("%s called without releasing old sock", __func__)=
+;
+>
+> hmm...this global sock pointer is quite unease. e.g. what if multiple tas=
+ks
+> trying to use init/close/connect... in parallel.
+>
+> Storing sock in a bpf map will be better but that may be overkill for tes=
+ting.
+> Can a separate global lock/mutex (not the lock_sock) be acquired first be=
+fore
+> using the sock pointer in the kfuncs?
+>
+> > +
+> > +     switch (args->af) {
+> > +     case AF_INET:
+> > +     case AF_INET6:
+> > +             proto =3D args->type =3D=3D SOCK_STREAM ? IPPROTO_TCP : I=
+PPROTO_UDP;
+> > +             break;
+> > +     case AF_UNIX:
+> > +             proto =3D PF_UNIX;
+> > +             break;
+> > +     default:
+> > +             pr_err("invalid address family %d\n", args->af);
+> > +             return -EINVAL;
+> > +     }
+> > +
+> > +     return sock_create_kern(&init_net, args->af, args->type, proto, &=
+sock);
+> > +}
+> > +
+> > +__bpf_kfunc void bpf_kfunc_close_sock(void)
+> > +{
+> > +     if (sock) {
+> > +             sock_release(sock);
+>
+> bpf_testmod_exit() should probably do this NULL check and sock_release() =
+also.
+>
+> > +             sock =3D NULL;
+> > +     }
+> > +}
+> > +
+> > +__bpf_kfunc int bpf_kfunc_call_kernel_connect(struct addr_args *args)
+> > +{
+> > +     /* Set timeout for call to kernel_connect() to prevent it from ha=
+nging,
+> > +      * and consider the connection attempt failed if it returns
+> > +      * -EINPROGRESS.
+> > +      */
+> > +     sock->sk->sk_sndtimeo =3D CONNECT_TIMEOUT_SEC * HZ;
+>
+> Is it better to set sk_sndtimeo in bpf_kfunc_init_sock() ?
+>
+> > +
+> > +     return kernel_connect(sock, (struct sockaddr *)&args->addr,
+> > +                           args->addrlen, 0);
+> > +}
+> > +
+> > +__bpf_kfunc int bpf_kfunc_call_kernel_bind(struct addr_args *args)
+> > +{
+> > +     return kernel_bind(sock, (struct sockaddr *)&args->addr, args->ad=
+drlen);
+> > +}
+> > +
+> > +__bpf_kfunc int bpf_kfunc_call_kernel_listen(void)
+> > +{
+> > +     return kernel_listen(sock, 128);
+> > +}
+> > +
+> > +__bpf_kfunc int bpf_kfunc_call_kernel_sendmsg(struct sendmsg_args *arg=
+s)
+> > +{
+> > +     struct msghdr msg =3D {
+> > +             .msg_name       =3D &args->addr.addr,
+> > +             .msg_namelen    =3D args->addr.addrlen,
+> > +     };
+> > +     struct kvec iov;
+> > +     int err;
+> > +
+> > +     iov.iov_base =3D args->msg;
+> > +     iov.iov_len  =3D args->msglen;
+> > +
+> > +     err =3D kernel_sendmsg(sock, &msg, &iov, 1, args->msglen);
+> > +     args->addr.addrlen =3D msg.msg_namelen;
+> > +
+> > +     return err;
+> > +}
+> > +
+> > +__bpf_kfunc int bpf_kfunc_call_sock_sendmsg(struct sendmsg_args *args)
+> > +{
+> > +     struct msghdr msg =3D {
+> > +             .msg_name       =3D &args->addr.addr,
+> > +             .msg_namelen    =3D args->addr.addrlen,
+> > +     };
+> > +     struct kvec iov;
+> > +     int err;
+> > +
+> > +     iov.iov_base =3D args->msg;
+> > +     iov.iov_len  =3D args->msglen;
+> > +
+> > +     iov_iter_kvec(&msg.msg_iter, ITER_SOURCE, &iov, 1, args->msglen);
+> > +     err =3D sock_sendmsg(sock, &msg);
+> > +     args->addr.addrlen =3D msg.msg_namelen;
+> > +
+> > +     return err;
+> > +}
+> > +
+> > +__bpf_kfunc int bpf_kfunc_call_kernel_getsockname(struct addr_args *ar=
+gs)
+> > +{
+> > +     int err;
+> > +
+> > +     err =3D kernel_getsockname(sock, (struct sockaddr *)&args->addr);
+> > +     if (err < 0)
+> > +             goto out;
+> > +
+> > +     args->addrlen =3D err;
+> > +     err =3D 0;
+> > +out:
+> > +     return err;
+> > +}
+> > +
+> > +__bpf_kfunc int bpf_kfunc_call_kernel_getpeername(struct addr_args *ar=
+gs)
+> > +{
+> > +     int err;
+> > +
+> > +     err =3D kernel_getpeername(sock, (struct sockaddr *)&args->addr);
+> > +     if (err < 0)
+> > +             goto out;
+> > +
+> > +     args->addrlen =3D err;
+> > +     err =3D 0;
+> > +out:
+> > +     return err;
+> > +}
+> > +
+> >   BTF_KFUNCS_START(bpf_testmod_check_kfunc_ids)
+> >   BTF_ID_FLAGS(func, bpf_testmod_test_mod_kfunc)
+> >   BTF_ID_FLAGS(func, bpf_kfunc_call_test1)
+> > @@ -520,6 +649,15 @@ BTF_ID_FLAGS(func, bpf_kfunc_call_test_ref, KF_TRU=
+STED_ARGS | KF_RCU)
+> >   BTF_ID_FLAGS(func, bpf_kfunc_call_test_destructive, KF_DESTRUCTIVE)
+> >   BTF_ID_FLAGS(func, bpf_kfunc_call_test_static_unused_arg)
+> >   BTF_ID_FLAGS(func, bpf_kfunc_call_test_offset)
+> > +BTF_ID_FLAGS(func, bpf_kfunc_init_sock)
+> > +BTF_ID_FLAGS(func, bpf_kfunc_close_sock)
+> > +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_connect)
+> > +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_bind)
+> > +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_listen)
+> > +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_sendmsg)
+> > +BTF_ID_FLAGS(func, bpf_kfunc_call_sock_sendmsg)
+> > +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_getsockname)
+> > +BTF_ID_FLAGS(func, bpf_kfunc_call_kernel_getpeername)
+>
+> All these new kfunc should have the KF_SLEEPABLE flag.
+>
+> >   BTF_KFUNCS_END(bpf_testmod_check_kfunc_ids)
+> >
+> >   static int bpf_testmod_ops_init(struct btf *btf)
+> > @@ -650,6 +788,7 @@ static int bpf_testmod_init(void)
+> >               return ret;
+> >       if (bpf_fentry_test1(0) < 0)
+> >               return -EINVAL;
+> > +     sock =3D NULL;
+> >       return sysfs_create_bin_file(kernel_kobj, &bin_attr_bpf_testmod_f=
+ile);
+> >   }
+> >
+> > diff --git a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod_kfunc.=
+h b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod_kfunc.h
+> > index 7c664dd610597..cdf7769a7d8ca 100644
+> > --- a/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod_kfunc.h
+> > +++ b/tools/testing/selftests/bpf/bpf_testmod/bpf_testmod_kfunc.h
+> > @@ -64,6 +64,22 @@ struct prog_test_fail3 {
+> >       char arr2[];
+> >   };
+> >
+> > +struct init_sock_args {
+> > +     int af;
+> > +     int type;
+> > +};
+> > +
+> > +struct addr_args {
+> > +     char addr[sizeof(struct __kernel_sockaddr_storage)];
+>
+> nit. Can "struct sockaddr_storage addr;" be directly used instead of a ch=
+ar array?
+>
+> > +     int addrlen;
+> > +};
+> > +
+> > +struct sendmsg_args {
+> > +     struct addr_args addr;
+> > +     char msg[10];
+> > +     int msglen;
+> > +};
+> > +
+> >   struct prog_test_ref_kfunc *
+> >   bpf_kfunc_call_test_acquire(unsigned long *scalar_ptr) __ksym;
+> >   void bpf_kfunc_call_test_release(struct prog_test_ref_kfunc *p) __ksy=
+m;
+> > @@ -106,4 +122,15 @@ void bpf_kfunc_call_test_fail3(struct prog_test_fa=
+il3 *p);
+> >   void bpf_kfunc_call_test_mem_len_fail1(void *mem, int len);
+> >
+> >   void bpf_kfunc_common_test(void) __ksym;
+> > +
+> > +int bpf_kfunc_init_sock(struct init_sock_args *args) __ksym;
+> > +void bpf_kfunc_close_sock(void) __ksym;
+> > +int bpf_kfunc_call_kernel_connect(struct addr_args *args) __ksym;
+> > +int bpf_kfunc_call_kernel_bind(struct addr_args *args) __ksym;
+> > +int bpf_kfunc_call_kernel_listen(void) __ksym;
+> > +int bpf_kfunc_call_kernel_sendmsg(struct sendmsg_args *args) __ksym;
+> > +int bpf_kfunc_call_sock_sendmsg(struct sendmsg_args *args) __ksym;
+> > +int bpf_kfunc_call_kernel_getsockname(struct addr_args *args) __ksym;
+> > +int bpf_kfunc_call_kernel_getpeername(struct addr_args *args) __ksym;
+> > +
+> >   #endif /* _BPF_TESTMOD_KFUNC_H */
+>
 
