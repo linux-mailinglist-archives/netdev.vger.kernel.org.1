@@ -1,110 +1,118 @@
-Return-Path: <netdev+bounces-88765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E52288A8789
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 17:26:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17DEE8A8796
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 17:30:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D07BB25A96
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:26:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6E0E282006
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04F8E1474C5;
-	Wed, 17 Apr 2024 15:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 968E51474DB;
+	Wed, 17 Apr 2024 15:30:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KJqty7dO"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="se2Q5oyT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A44A513A265;
-	Wed, 17 Apr 2024 15:26:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526E7140E29;
+	Wed, 17 Apr 2024 15:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713367575; cv=none; b=llgTF6/CY+dteC+LrZry//LfOgIbWtONsj9tiHLqsDgMb3ufNWtXB48jPcYG9bVs6PpkjdQ+97G8aGacVZIodFRQ43i9GTtmDEpUc5L850G2OqANp2cypGOjb4PD78msiy6b8Oh2DmDabrPNXNcr0FipVkQll4jcVO1nx/+rOmA=
+	t=1713367806; cv=none; b=jxfICum6kJhzf4BEfUa3H6MbxHg79OgHpAuWNJ74dF5VdZLGG00N9dXhJVlJh70U2c6NIrRpZs4GPMgjQSogGZoiWX7xJ2rIQrk6WF8j23u4u4+ev4ZoqqHssOQgPgxqxaGhK6uqpirrrHRQYg+CglveYxyGlpX07P5noADey8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713367575; c=relaxed/simple;
-	bh=66HHTs/2NdCUJhw/VTXrtHbgKW6feJo+E59Bk3vfng4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fxg1EcdPXfM96wTVVPSHYx50876ORcv7Ii9UEZ7eWtsdoFgX9OEHJ1s7D2LhO6Fsg0qCIRM+D4LIjUPltgci/U7VsE65Se/XA3WacsCb5TlKcI8lE8PUZNrYGsrKjNz3EsMAD3VbaCiVJc/z2sp3dz1yCI3H9WxylKPuJPyLfLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KJqty7dO; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-5dcc4076c13so715639a12.0;
-        Wed, 17 Apr 2024 08:26:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713367574; x=1713972374; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=66HHTs/2NdCUJhw/VTXrtHbgKW6feJo+E59Bk3vfng4=;
-        b=KJqty7dOuK6gfwV4RuK/L2iKQLS2Oob4rYvSRb5ovTrxKiK6EKjup5mjpjRMrFxeGA
-         0kKjDWgJtlOmo710B3T9udrc+WljSJtkDuxQhgEE8RINc7HBSJIYrsfyAreW9toa9/rK
-         a9RwGIqhqR8l0w0TijKEwLvUWIjNi1taod97Lnh4BDllM/Kn4FouKPWx/sPY9MxJMpSE
-         OJjxj0K4hezztm4lQgzK2tKfUMhjTMuhiyLb/sSqlXGo3n7ilgsrUnZ0mlhQ4P9q0A7e
-         879rwffmXj6UV6tG1s4kYYfYLzUzqRa44Wy2bHAdxVLFrqwKHsjxYyWk5yBlTwpGqlEI
-         kvAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713367574; x=1713972374;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=66HHTs/2NdCUJhw/VTXrtHbgKW6feJo+E59Bk3vfng4=;
-        b=D7k86VzsB5uO+sHXQxUfRyyhF5gN3Qb6AyPKIlVhMzDHmKG1w+ArvM/FZkOcgp79yM
-         N74k/vn5b8jnhbbXDoXy6qkYl7/OU8uL6PueYkMWFrTOITAtcgOIWKgMBXLCtk1Feh0l
-         QyFdnqTM7wfy5PLGC7g5THip+gXEfNz8fv0obbvc6WB92VC99Rb8aG+NeRA4IO4INq7V
-         yg5iX7qrC7hsnfGJtDzIf/6NNmn09tioUCYH85VMjNVOb1FGrIGFSAaBQlbbDa1/ABlR
-         FDeuZooaX8Ed9bp1HWkO21zQOKlHaob4oalmMeAfXNg9v6bxQLgkbOYZR2AndmKIDhRJ
-         gZsA==
-X-Forwarded-Encrypted: i=1; AJvYcCXl6thyoBX6NQllCYUPhSXmcQ7E/79+2BP7Io92hKsWtwkY7pN1Tu1UhjBaSjjB39IgnnQX7GjpdY3UBbuHb3N0OcUaQx2RyxcA2ZbIumArxbUlmutLMHVfUXPfueN3Q+IQTzx7hKZetCkIx7W2h1cU31kaoDuMz+iuh1g+Xdba
-X-Gm-Message-State: AOJu0YyFFnWTMsRBemnmA+lgDOdcrJu+GyYVCRZDNbR/o/gz8ZmnijmW
-	b9/bTQEPZLuf3jw5JfyeFimlcvhIvZixUAn2TiIHxaMSFZEvI2515QG7X1zZBPJp/Un+V1lv4wI
-	YX6djlHmf0i7UmBcil4CdApmLrJMoSw==
-X-Google-Smtp-Source: AGHT+IF4i0SrzyxsnPtLYiNicbYtOM4Q2ZIHhP8ToGBtaB2RlbVmAYmZGYXvLP2KLwY5nRo6rW5De+g0EbZ3thBOyqo=
-X-Received: by 2002:a17:90a:5289:b0:29b:c31:1fe1 with SMTP id
- w9-20020a17090a528900b0029b0c311fe1mr7822149pjh.10.1713367573788; Wed, 17 Apr
- 2024 08:26:13 -0700 (PDT)
+	s=arc-20240116; t=1713367806; c=relaxed/simple;
+	bh=XkH4g4DTe/chnyyem+t7TxDHFU5BkdWClQJ756pn9hU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DnBLG7d46aVBgn8eGWy3s2OFhhnpGw9aucC7m9caYONdrT+/YgDPN6Y81YWktGMPU57EdgrfyY49p3WWTe89UXuV4tv9FZzWtqhUWJ/s7NFti1WhpT/uUrmR5LHpbnZsPQbizOT4lCCXU4qxvJzHRTXNDc2N1BRAV2Xlkjq/3Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=se2Q5oyT; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=z71MR9/FB4ZLioSpgSrKFmW/9gLRNuEnvteXucs//5s=; b=se2Q5oyTwGO5A10GW19iibXdJX
+	2vm1ab+CjApvrXcmZbyd6fjRwHnPI1eEobHTO9OJvlpIpXILvRHyeN1fud9edIbk2nv6mhx6MoKdf
+	kyPxYhkY97Fg31Fi49zDc38CY30gObZ68HaAhenQStO14BDseyhHhlJTFDwzAPQhhBfnTyXoHMOHM
+	W628az/zUbLDjK2Si4P/cAzMULNAiLCiYZhnZJhKPBOnntgs6+JZ4oXVaFINEv9Mdi+DuJrTIkXa5
+	j0THh6+kmi2KQIfxdMj6saaPA7pFydYV1auPPZm+J2ywqo2S85CyVF7KbR6qLy5HuwJw/3KG3Lriy
+	GLIF6NUQ==;
+Received: from [50.53.2.121] (helo=[192.168.254.15])
+	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rx7ES-0000000GabK-0bD4;
+	Wed, 17 Apr 2024 15:29:56 +0000
+Message-ID: <1c1bc9c3-978c-4e41-8a4b-66da25416304@infradead.org>
+Date: Wed, 17 Apr 2024 08:29:53 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240329133458.323041-2-valla.francesco@gmail.com>
- <20240329133458.323041-3-valla.francesco@gmail.com> <CAMZ6RqKLaYb+8EaeoFMHofcaBT5G2-qdqSb4do73xrgMvWMZaA@mail.gmail.com>
- <Zh6m3jkRovDutKnZ@fedora>
-In-Reply-To: <Zh6m3jkRovDutKnZ@fedora>
-From: Vincent Mailhol <vincent.mailhol@gmail.com>
-Date: Thu, 18 Apr 2024 00:26:01 +0900
-Message-ID: <CAMZ6RqJF7P1rGMwejmF_FM25Xtjo+R+zEGkkWnh3=hiShB_piw@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] Documentation: networking: document ISO 15765-2:2016
-To: Francesco Valla <valla.francesco@gmail.com>
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde <mkl@pengutronix.de>, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, fabio@redaril.me
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 03/10] net: create a dummy net_device
+ allocator
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Johannes Berg <johannes@sipsolutions.net>, Jakub Kicinski <kuba@kernel.org>,
+ Breno Leitao <leitao@debian.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ elder@kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, nbd@nbd.name, sean.wang@mediatek.com,
+ Mark-MC.Lee@mediatek.com, lorenzo@kernel.org, taras.chornyi@plvision.eu,
+ ath11k@lists.infradead.org, ath10k@lists.infradead.org,
+ linux-wireless@vger.kernel.org, geomatsi@gmail.com, kvalo@kernel.org,
+ quic_jjohnson@quicinc.com, leon@kernel.org,
+ dennis.dalessandro@cornelisnetworks.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, idosch@idosch.org,
+ Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@resnulli.us>,
+ Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+References: <20240411135952.1096696-1-leitao@debian.org>
+ <20240411135952.1096696-4-leitao@debian.org>
+ <20240412191626.2e9bfb4a@kernel.org>
+ <ebe80c29-4884-488d-ab83-c020f9c3bc81@intel.com>
+ <e0d5741ee053c11fe078fc8afe6cf4a92e274095.camel@sipsolutions.net>
+ <d4991f11-a527-429d-b71f-d4ca3a18f501@intel.com>
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <d4991f11-a527-429d-b71f-d4ca3a18f501@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed. 17 Apr. 2024 at 01:27, Francesco Valla
-<valla.francesco@gmail.com> wrote:
-> Hi Vincent,
->
-> thank you for the review!
 
-You are welcome.
 
-> I'll omit from this reply the issue about the standard to be referenced
-> and the CAN-CC naming (discussed in another thread also with Oliver).
->
-> About the typos and formatting observations: rst is not my native
-> language (I'm more on the Markdown side), I'll apply all the corrections
-> you suggested. Thank you.
->
-> Some other considerations follow.
+On 4/17/24 4:19 AM, Alexander Lobakin wrote:
+> From: Johannes Berg <johannes@sipsolutions.net>
+> Date: Wed, 17 Apr 2024 13:11:38 +0200
+> 
+>> On Wed, 2024-04-17 at 12:51 +0200, Alexander Lobakin wrote:
+>>> Just FYI: kdoc accepts only this pattern:
+>>>
+>>>  * @last_param: blah
+>>>  *
+>>>  * Return: blah
+>>>
+>>> NOT
+>>>
+>>>  * Returns: blah
+>>
+>> Actually, it does accept that, the regex is "returns?". It's just
 
-Aside from the 2024 year bump on which I replied separately, I
-acknowledge all of these. Thanks.
+ack (Return: is documented)
 
-Yours sincerely,
-Vincent Mailhol
+> Hmm, I was sure I had warnings on "Returns:"... Not sure now.
+> 
+Yes, either way is accepted.
+
+> documented only as "Return" . IMHO it sometimes reads nicer as "Returns"
+>> depending on how you phrase it, but ...
+
+-- 
+#Randy
+https://people.kernel.org/tglx/notes-about-netiquette
+https://subspace.kernel.org/etiquette.html
 
