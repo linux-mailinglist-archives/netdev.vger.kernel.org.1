@@ -1,95 +1,145 @@
-Return-Path: <netdev+bounces-88680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EC438A833B
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 14:37:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D32F8A8337
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 14:35:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A5B91C21108
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 12:37:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE94E1F21406
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 12:35:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D8FD85C7A;
-	Wed, 17 Apr 2024 12:37:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447006F514;
+	Wed, 17 Apr 2024 12:35:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VWBAQPIc"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="o2wHHrBu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D62A744C6B;
-	Wed, 17 Apr 2024 12:37:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38DCEEDC;
+	Wed, 17 Apr 2024 12:35:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713357463; cv=none; b=ekVB7JaLrU4XAIkNej9f/VxylbrVwaa07JP10zBiRrHCq/Ne3CpTFcoewZecqIgBDBbzU7VC0mircIMJZwipLrhAXyvdsUAL/jn7xGyMxcvGSe5PALhYS24RdM2h0CLOzcDO2JMOXtZa9JoC67h4jrK1G+owmRTlp5ZNSmlxDkU=
+	t=1713357311; cv=none; b=lYD0VTWblK8FOlmChivcN+i7NvTYOsychyhPMCmqEXRY+rhNAnWoZMtccACOuAMAQM/j3jvPD2Lt/RntgKOfZ8XK/Qrx3si25YFftKtFk1C1wPrqWF2HnGXTj7AC6eqhQR/Uu52AgD/jdzXmAebbhdDAYUCcX9ZmVlwEI7Mif60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713357463; c=relaxed/simple;
-	bh=8NObq/H4Dilb0Mnzuz0GRC8TDvT8oEl+kBLbpirx3zw=;
-	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=N/Id05rMwByN+frNwPD1PctAqiINKyDVprqiPNKArBKwYK9a88+Ig/l/2l38zkVM23itCoEHVbHTjsW0RZrAEZla9jbeT+PYdvfQhyG623xy54gJI8V4rtBUPpftJHaNUf91IPXxcCFCPkqwIavi1NqQhAvER4JadNUY81rXyic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VWBAQPIc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4080CC072AA;
-	Wed, 17 Apr 2024 12:37:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713357463;
-	bh=8NObq/H4Dilb0Mnzuz0GRC8TDvT8oEl+kBLbpirx3zw=;
-	h=From:To:Subject:In-Reply-To:References:Date:From;
-	b=VWBAQPIcG5eH+UcK0zoGVNOJ1fwoN8Y23l/oCXcVl/1rHZzXxd0gg2RBCVGV+HeSE
-	 8vSNK8noQlpR1r8qacFDJt7mRkJcgG2Ri0Pczr9MlrBQi8XchBgATSr5VvmmktQjdl
-	 SaMCm9YaexbHT+73XbAM3+lGzftRqoGZgykJmZl4Xuq7iQGQcBo3ZXUya3vL9WxQWz
-	 F49sHhxLZ4thb99SLkaAawgdYTjFFy1hW+FF+SGTReLpEYDIo8mIcNhJaEkRm8KBgs
-	 IFnSwIDCMK0XmMWYIhaKHePdXmWbwL7RpymdxbkTA7CR4PQQZXzEBpDOffEQYzYsdc
-	 ph0tmdLM/5VPA==
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 4211D123389F; Tue, 16 Apr 2024 22:55:00 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-To: syzbot <syzbot+af9492708df9797198d6@syzkaller.appspotmail.com>,
- andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- daniel@iogearbox.net, davem@davemloft.net, eadavis@qq.com,
- eddyz87@gmail.com, haoluo@google.com, hawk@kernel.org,
- john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
- kuba@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, sdf@google.com, song@kernel.org,
- syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
-Subject: Re: [syzbot] [bpf?] [net?] general protection fault in dev_map_enqueue
-In-Reply-To: <0000000000003a924406159cf8ee@google.com>
-References: <0000000000003a924406159cf8ee@google.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 16 Apr 2024 22:55:00 +0200
-Message-ID: <87il0huixn.fsf@toke.dk>
+	s=arc-20240116; t=1713357311; c=relaxed/simple;
+	bh=xV9RyJnO8jY4uGL5tn563C63eGvy+VmK6A8flXYwhx8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=i4KTQhdBDgX5tA40awvxCUtWaO0BlNhw6OBwYK3woJ1GvVJrZF3cjzpR8hIm7r1CgTplqZzySDLDhhmjmPzpYGlAxhpbB4JCc7vqYzW02pkbYNkMzfMp/iC/KeeFO7JzcgvW7NQrwzaNgAfM+k7Z4VWZpmbai05ATj6MHHaXPWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=o2wHHrBu; arc=none smtp.client-ip=198.47.19.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 43HBdBTV111559;
+	Wed, 17 Apr 2024 06:39:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1713353951;
+	bh=R52pVjh/hMavFcBapHbH3dqRB91Y7TwXotnELGUYDTs=;
+	h=From:To:CC:Subject:Date;
+	b=o2wHHrBuuf86UUFFH0yCMYhP6a8ClGNQ34CxrE3XVREm7gk1qfM0MsXOv4bePSbeY
+	 B/tHwIy6dPSeFtJ6E585EVBNe4iDDYS+1r6xMakilCfqK+t+fmvuKxv8B2FLmQ8WEU
+	 J/LsbaYFvoOFu69bi2JCPs79KZyAg3ZLYKuOiuAU=
+Received: from DFLE110.ent.ti.com (dfle110.ent.ti.com [10.64.6.31])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 43HBdAGY060518
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 17 Apr 2024 06:39:11 -0500
+Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE110.ent.ti.com
+ (10.64.6.31) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 17
+ Apr 2024 06:39:10 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE112.ent.ti.com
+ (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 17 Apr 2024 06:39:10 -0500
+Received: from localhost (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.227.220])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 43HBd9i8025032;
+	Wed, 17 Apr 2024 06:39:10 -0500
+From: Chintan Vankar <c-vankar@ti.com>
+To: Julien Panis <jpanis@baylibre.com>, Arnd Bergmann <arnd@arndb.de>,
+        "Dan
+ Carpenter" <dan.carpenter@linaro.org>,
+        Chintan Vankar <c-vankar@ti.com>,
+        Heiner Kallweit <hkallweit1@gmail.com>,
+        Grygorii Strashko
+	<grygorii.strashko@ti.com>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        "Andrew Lunn" <andrew@lunn.ch>, Roger Quadros <rogerq@kernel.org>,
+        Richard
+ Cochran <richardcochran@gmail.com>,
+        Paolo Abeni <pabeni@redhat.com>, Jakub
+ Kicinski <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "David S.
+ Miller" <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+Subject: [PATCH net-next v6 0/2] Enable RX HW timestamp for PTP packets using CPTS FIFO
+Date: Wed, 17 Apr 2024 17:09:02 +0530
+Message-ID: <20240417113904.3804936-1-c-vankar@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-syzbot <syzbot+af9492708df9797198d6@syzkaller.appspotmail.com> writes:
+The CPSW offers two mechanisms for communicating packet ingress timestamp
+information to the host.
 
-> Hello,
->
-> syzbot has tested the proposed patch but the reproducer is still triggering an issue:
-> general protection fault in dev_map_enqueue
+The first mechanism is via the CPTS Event FIFO which records timestamp
+when triggered by certain events. One such event is the reception of an
+Ethernet packet with a specified EtherType field. This is used to capture
+ingress timestamps for PTP packets. With this mechanism the host must
+read the timestamp (from the CPTS FIFO) separately from the packet payload
+which is delivered via DMA.
 
-Alright, trying a different thing (not a correct patch, just testing a theory):
+In the second mechanism of timestamping, CPSW driver enables hardware
+timestamping for all received packets by setting the TSTAMP_EN bit in
+CPTS_CONTROL register, which directs the CPTS module to timestamp all
+received packets, followed by passing timestamp via DMA descriptors.
+This mechanism is responsible for triggering errata i2401:
+"CPSW: Host Timestamps Cause CPSW Port to Lock up."
 
-#syz test https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git 443574b03387
+The errata affects all K3 SoCs. Link to errata for AM64x:
+https://www.ti.com/lit/er/sprz457h/sprz457h.pdf
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 786d792ac816..c2fd4f67766f 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -4301,8 +4301,9 @@ void bpf_clear_redirect_map(struct bpf_map *map)
-                 * cmpxchg() to make sure it hasn't been changed in
-                 * the meantime by remote CPU.
-                 */
--               if (unlikely(READ_ONCE(ri->map) == map))
--                       cmpxchg(&ri->map, map, NULL);
-+               if (unlikely(READ_ONCE(ri->map) == map) &&
-+                   cmpxchg(&ri->map, map, NULL) == map)
-+                       WRITE_ONCE(ri->map_type, BPF_MAP_TYPE_UNSPEC);
-        }
- }
+As a workaround we can use first mechanism to timestamp received
+packets.
+
+Series is based on linux-next tagged next-20240417.
+
+Link to v5:
+https://lore.kernel.org/r/20240402114405.219100-1-c-vankar@ti.com/
+
+Changes from v5 to v6:
+- Defined lockless variant of "am65_cpts_fifo_read()" as
+  "__am65_cpts_fifo_read()", suggested by Paolo to avoid acquiring the
+  same lock on cpts again in "am65_cpts_fifo_read()".
+- Replaced "list_del_entry()" and "list_add()" functions with equivalent
+  "list_move()"  function.
+- Replaced "list_del_init()" and "list_add_tail()" functions with
+  equivalent "list_move_tail()" function.
+
+  This changes are done as per the discussion at here:
+  https://lore.kernel.org/r/7c8be16329668d343a971e265e923543cba5e304.camel@redhat.com/
+
+Chintan Vankar (2):
+  net: ethernet: ti: am65-cpts: Enable RX HW timestamp for PTP packets
+    using CPTS FIFO
+  net: ethernet: ti: am65-cpsw/ethtool: Enable RX HW timestamp only for
+    PTP packets
+
+ drivers/net/ethernet/ti/am65-cpsw-ethtool.c |  13 ++-
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c    |  51 +++++-----
+ drivers/net/ethernet/ti/am65-cpts.c         | 107 ++++++++++++++------
+ drivers/net/ethernet/ti/am65-cpts.h         |  11 +-
+ 4 files changed, 118 insertions(+), 64 deletions(-)
+
+-- 
+2.34.1
+
 
