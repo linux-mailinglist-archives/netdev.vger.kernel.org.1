@@ -1,124 +1,124 @@
-Return-Path: <netdev+bounces-88867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B4B58A8D37
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 22:46:48 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F03248A8D46
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 22:51:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DE25B20F60
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 20:46:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B6D8287205
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 20:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7315145C18;
-	Wed, 17 Apr 2024 20:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D8247F63;
+	Wed, 17 Apr 2024 20:51:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RkJ1tHT2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R12vZUJa"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4339F79D8;
-	Wed, 17 Apr 2024 20:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B86C3D967;
+	Wed, 17 Apr 2024 20:51:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713386798; cv=none; b=KwNoiLReZRou3Hw0FMXGQBcRfmX9LYF8varODuW806oZt4Bp3GjW0YrFSB9Rit1FDmNNCOYMGb1Q9z79iiVK81bQH9BLs9V4jyfbOxucu4HJkYQ9MR5l0iZdvJdFdI9TlppYj4TKFuKrDj823nmMTlE3FAv6jNxsbRj7+2sAHug=
+	t=1713387088; cv=none; b=Qy5EqfYez4SWa8qLcxzaXmOLYPm+9Nx6Vr5hlSx++6EhrgVPG+3faFfJWyPRUWYdJzg83OAo/Eeg1P+uOqREIQJF9iS57eBG48bbHWXpZtnCBgqPnzRI02AuWFhqeJnyc+W/w/HXYF0iFFFmfbZbuQevr9kn31cIpF+MCByDa/g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713386798; c=relaxed/simple;
-	bh=vpW2uBcFnTTkU4Vdy3ReQVcKp2u1xZV+wBorG7RxKjk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=neTCyl00IJdlz1MUNgXpsKMFOTcTKnJ9Y0ziFqNAiffFGvNYhi+HMo2HuYeld1zfbzxijgkKQxfvhVryvrb9YmZBqUwNidysmcF9j6M2zi14ru/JuZHit0F9RPKau7qzoECaH4m/FJ//2gnqpHS9VYVxgqOAwIeatRDaeRN9mZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RkJ1tHT2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6943BC116B1;
-	Wed, 17 Apr 2024 20:46:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713386797;
-	bh=vpW2uBcFnTTkU4Vdy3ReQVcKp2u1xZV+wBorG7RxKjk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RkJ1tHT27y+k0lu2QQRUrGTpEPA5UU3iWd9URd2ZdTybNiuCSoZJcWvzIScLEJTo3
-	 j2PHHyRu4FLB7fZoCfA2IziVIfmuO8kBmqRWrcMfkjT0kR6w4Wo1zZ42afTut8q4NE
-	 H4KxdWsQUxkRcixhNeIf0xLD2kViqQ3efDUTiKxw+v8SifzNUCBsDSOYfRgAEHSXDF
-	 xsECzz55hNl+R/no/eoZhtY9gEai/b9oJ7oFZQ2khaHbGdCNs8B+/tHeQaYr2Widzb
-	 D8yF16M1VOyUYZa0O/DnxSIKz43pjAF944uhasya9+85A4NRFg8oRuuMKg4J1UFUo5
-	 NTNgavSRXsFZg==
-Date: Wed, 17 Apr 2024 13:46:36 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Dmitry Safonov <0x7f454c46@gmail.com>
-Cc: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 0/4] selftests/net/tcp_ao: A bunch of fixes for
- TCP-AO selftests
-Message-ID: <20240417134636.102f0120@kernel.org>
-In-Reply-To: <CAJwJo6Yw4S1wCcimRVy=P8h0Ez0UDt-yw2jqSY-ph3TKsQVVGA@mail.gmail.com>
-References: <20240413-tcp-ao-selftests-fixes-v1-0-f9c41c96949d@gmail.com>
-	<20240416072809.3ae7c3d3@kernel.org>
-	<CAJwJo6Yw4S1wCcimRVy=P8h0Ez0UDt-yw2jqSY-ph3TKsQVVGA@mail.gmail.com>
+	s=arc-20240116; t=1713387088; c=relaxed/simple;
+	bh=ruJFVMpqO2dKVdbbCqF1Qew11TTMpiqoj2fWtLoLhj0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WjISfCKawevH+8kNyBF2qrMYJuG/to7RAvG7giPZ5ivAlU1jjaiAv/5WieAIyutkqhQiVAPWXJzQFQVy7MQ8VcTmKJhmN7tqz9Wh80cUEhJYfyu+8AOFU5Vp9NV+ZenPpf72vB5jrG+10LM4i9EL6Bo/t1vVA4QbGrpXpH3dVAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R12vZUJa; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56e1bbdb362so153658a12.1;
+        Wed, 17 Apr 2024 13:51:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713387085; x=1713991885; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PP9vybSDiobOue6OOFy5JQgDIqRTYmNSQ/1vik1IRyI=;
+        b=R12vZUJancYF5S5CnKBXO/s+bZWxE9BD+i3K/Cngb00aVA3g4CcbyiQhbzFiMkoUFB
+         ajb/Fte3Nqdqrxme/9T/XiVSVWHlaFpGjK5DWmDAOUcj7x00tM+7303FjGM8mMjHOPbi
+         PQFRArzLEzGF01jhRKJ4G2hv1MiFSQan1vco7usq1O78LXrkHAL531SuKD7Jj1HQs2J+
+         mMUWnk4El+DXTksgNC9QLRqN+4eeP89AAUPU9++nkmdNhjUyuLoleE0vHHDPeYznqErX
+         JYYbXf2v7q1/P7WOgzro9ZuF/Rh/8sT9RdPpCmdU3r+ONUlKMkgdVNr2oBv14JnFKqSH
+         semA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713387085; x=1713991885;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PP9vybSDiobOue6OOFy5JQgDIqRTYmNSQ/1vik1IRyI=;
+        b=jcoLo/5OMA7gmuE3eLUroahYm6R6n9ryK+8omKT+O9ZP6gaJ4nbta7p0JFkhRCWLjB
+         cvW2pC9ZcENmO7ljYy/aHdYWpiDLXwF9Dld2zLTfz2RaMmfJqCHkiLpnYwbN6vW9jHuC
+         y2bTkkKQ0WRVk8u7gTPEZf5v0URhHMflDZ5EiF6NTr4LUDn/3JPOFXRAr93/mNlGznNO
+         QXN5znBm++rG9//+EPIJZO0z9o1B1fWEQE0Oo0LV3fUCPpXl3KMnnSrXqR2zP0kuYc6p
+         wKfqTmiximGHQWF/Dnd1P9ZOqjc8OfNYndgTJUha/h6aBMqFQmayeytIIhHXHmWZpAeG
+         sU4w==
+X-Forwarded-Encrypted: i=1; AJvYcCVyGsnRpqppskF2ChCZEG1mFuGQ6grSmFPRrp8wn5a5vjpi4AyMGl0ktNpyWCPGLXFrguMiBJeLrJwJvVaF9NwMaNRhzZX+eZCf4u/+
+X-Gm-Message-State: AOJu0YxqeP0iN3PHfo29HKA9DEHVCAJbPShAmGyULZwysbOD4yLf6ckh
+	UQQS93gA4gux/jpeG4quFWAYUsZW8mSVk/ZExg5tYVVEtfyt7G4yu1f/dLdG
+X-Google-Smtp-Source: AGHT+IEkYrVGOwSA9AtKLOJjNjsII62JiYMBT5rhhOfQ7jmeYJGCFd4NFzGIucWoNWWU89oVKsxjjQ==
+X-Received: by 2002:a17:906:2748:b0:a52:27c6:ee67 with SMTP id a8-20020a170906274800b00a5227c6ee67mr482633ejd.43.1713387085026;
+        Wed, 17 Apr 2024 13:51:25 -0700 (PDT)
+Received: from WBEC325.dom.lan ([185.188.71.122])
+        by smtp.gmail.com with ESMTPSA id tx24-20020a1709078e9800b00a554177a2cdsm31752ejc.85.2024.04.17.13.51.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Apr 2024 13:51:19 -0700 (PDT)
+From: Pawel Dembicki <paweldembicki@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Pawel Dembicki <paweldembicki@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 0/5] net: dsa: vsc73xx: convert to PHYLINK and do some cleanup
+Date: Wed, 17 Apr 2024 22:50:43 +0200
+Message-Id: <20240417205048.3542839-1-paweldembicki@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 17 Apr 2024 19:47:18 +0100 Dmitry Safonov wrote:
-> 1. [ 240.001391][ T833] Possible interrupt unsafe locking scenario:
-> [  240.001391][  T833]
-> [  240.001635][  T833]        CPU0                    CPU1
-> [  240.001797][  T833]        ----                    ----
-> [  240.001958][  T833]   lock(&p->alloc_lock);
-> [  240.002083][  T833]                                local_irq_disable();
-> [  240.002284][  T833]                                lock(&ndev->lock);
-> [  240.002490][  T833]                                lock(&p->alloc_lock);
-> [  240.002709][  T833]   <Interrupt>
-> [  240.002819][  T833]     lock(&ndev->lock);
-> [  240.002937][  T833]
-> [  240.002937][  T833]  *** DEADLOCK ***
-> 
-> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/537021/14-self-connect-ipv6/stderr
-> 
-> 2. [  251.411647][   T71] WARNING: SOFTIRQ-safe -> SOFTIRQ-unsafe lock
-> order detected
-> [  251.411986][   T71] 6.9.0-rc1-virtme #1 Not tainted
-> [  251.412214][   T71] -----------------------------------------------------
-> [  251.412533][   T71] kworker/u16:1/71 [HC0[0]:SC0[2]:HE1:SE0] is
-> trying to acquire:
-> [  251.412837][   T71] ffff888005182c28 (&p->alloc_lock){+.+.}-{2:2},
-> at: __get_task_comm+0x27/0x70
-> [  251.413214][   T71]
-> [  251.413214][   T71] and this task is already holding:
-> [  251.413527][   T71] ffff88802f83efd8 (&ul->lock){+.-.}-{2:2}, at:
-> rt6_uncached_list_flush_dev+0x138/0x840
-> [  251.413887][   T71] which would create a new lock dependency:
-> [  251.414153][   T71]  (&ul->lock){+.-.}-{2:2} -> (&p->alloc_lock){+.+.}-{2:2}
-> [  251.414464][   T71]
-> [  251.414464][   T71] but this new dependency connects a SOFTIRQ-irq-safe lock:
-> [  251.414808][   T71]  (&ul->lock){+.-.}-{2:2}
-> 
-> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/537201/17-icmps-discard-ipv4/stderr
-> 
-> 3. [ 264.280734][ C3] Possible unsafe locking scenario:
-> [  264.280734][    C3]
-> [  264.280968][    C3]        CPU0                    CPU1
-> [  264.281117][    C3]        ----                    ----
-> [  264.281263][    C3]   lock((&tw->tw_timer));
-> [  264.281427][    C3]
-> lock(&hashinfo->ehash_locks[i]);
-> [  264.281647][    C3]                                lock((&tw->tw_timer));
-> [  264.281834][    C3]   lock(&hashinfo->ehash_locks[i]);
-> 
-> https://netdev-3.bots.linux.dev/vmksft-tcp-ao-dbg/results/547461/19-self-connect-ipv4/stderr
-> 
-> I can spend some time on them after I verify that my fix for -stable
-> is actually fixing an issue I think it fixes.
-> Seems like your automation + my selftests are giving some fruits, hehe.
+This patch series is a result of splitting a larger patch series [0],
+where some parts needed to be refactored.
 
-Oh, very interesting, I don't recall these coming up before.
+The first patch switches from a poll loop to read_poll_timeout.
 
-We try to extract crashes but apparently we're missing lockdep splats.
-I'll try to improve the extraction logic...
+The second patch is a simple conversion to phylink because adjust_link
+won't work anymore.
+
+The third patch is preparation for future use. Using the
+"phy_interface_mode_is_rgmii" macro allows for the proper recognition
+of all RGMII modes.
+
+Patches 4-5 involve some cleanup: The fourth patch introduces
+a definition with the maximum number of ports to avoid using
+magic numbers. The next one fills in documentation.
+
+[0] https://patchwork.kernel.org/project/netdevbpf/list/?series=841034&state=%2A&archive=both
+
+Pawel Dembicki (5):
+  net: dsa: vsc73xx: use read_poll_timeout instead delay loop
+  net: dsa: vsc73xx: convert to PHYLINK
+  net: dsa: vsc73xx: use macros for rgmii recognition
+  net: dsa: vsc73xx: Add define for max num of ports
+  net: dsa: vsc73xx: add structure descriptions
+
+ drivers/net/dsa/vitesse-vsc73xx-core.c | 253 ++++++++++++-------------
+ drivers/net/dsa/vitesse-vsc73xx.h      |  27 ++-
+ 2 files changed, 143 insertions(+), 137 deletions(-)
+
+-- 
+2.34.1
+
 
