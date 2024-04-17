@@ -1,251 +1,181 @@
-Return-Path: <netdev+bounces-88660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEDC78A81BA
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 13:11:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 945908A8066
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 12:07:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8560D1F23E33
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:11:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC88DB2343E
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 10:07:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17A8313C81F;
-	Wed, 17 Apr 2024 11:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0310D13A3F3;
+	Wed, 17 Apr 2024 10:07:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="h2LdnW3o"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="cC2jJ09I";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="rnsDuuQH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B99B13BC1B;
-	Wed, 17 Apr 2024 11:11:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0C4128807;
+	Wed, 17 Apr 2024 10:07:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713352273; cv=none; b=YBxn3KtND4qUlrizGjEs6dbkmYOGuuo18cB2muu+ntFfxUtLI8Dr/tzpUvzUNdsP6fCwzXGUBWH9eR+gQGvCiII6EYBbRMmyBH73pLXQoRsIbZORFWyUwGNY//a7YPzWEpQV3L2uZ1bMr+Fiks6YH33kSkaNKn6aC9/4xtO5R80=
+	t=1713348465; cv=none; b=bbX+SctYYUmEQT4rEwJuvTMZ+W4Y9lBPw03zVXANkh5363egYbzvkGs6nUwKqVHOuBbglm/DIzR+Nkhjy7SUwAAYZFShvxS1AngsbIiPAEURP1ZJBsqLXbcgR3A7m3Spvy26UByGseEPmStJvlniQ1NXCMrNDefxps/hq0yqkAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713352273; c=relaxed/simple;
-	bh=9Kuul0Us5T+DsH8WBIvY0W68/yCJswNN/bgL0D8F6/A=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:References; b=Q13joI9t0cBOITz7UP1nIBViFTYkYh8aH+UCDz+XoeJmTgGLWImtINdNGwu/9EwuH1OrSb7clP3TscfhL+A/n+DijO4bE+2tiqr94IwSOxTEKk5DpXqCiKXKOjyq76aXceWkE40K9qpELmDOzfPBULYzFyu9VX3jSWJyfUPWbJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=h2LdnW3o; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20240417111106euoutp0241e6dab5e1af4767ae19a9df21bd0d06~HDM7xY4u01112511125euoutp021;
-	Wed, 17 Apr 2024 11:11:06 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20240417111106euoutp0241e6dab5e1af4767ae19a9df21bd0d06~HDM7xY4u01112511125euoutp021
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1713352266;
-	bh=OY+E3AP4o+cMwdsRSlfCthUAuVMUvOkgraCoEy1EQcs=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=h2LdnW3oQlEqsYLbJsjvMNJan0Xxl2M9JUFeftc+dZY2ha4AfwdS6IZKD9SJJjT1e
-	 pmt5hhXhVz6EkU01r55GA1DVcoZC/ScZ78Q9i+3+g9IXtQcsLPfDbahW8RRhlqd/9A
-	 To5nCwmOXhOmebgmRDbUM4DfB+uzcGOtkgdnE7/g=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20240417111106eucas1p1eaa943e8073a58cb94d54d7f42a86df6~HDM7mGwPe2053320533eucas1p1B;
-	Wed, 17 Apr 2024 11:11:06 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges2new.samsung.com (EUCPMTA) with SMTP id 1E.E2.09875.94EAF166; Wed, 17
-	Apr 2024 12:11:05 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240417111105eucas1p19e8fbbbe60d347e12d0f6d767198e338~HDM7FrwvZ2052520525eucas1p1D;
-	Wed, 17 Apr 2024 11:11:05 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240417111105eusmtrp2e7d69c7090f22d9fcf00febc06c7bddb~HDM7E_AQx0473304733eusmtrp2Z;
-	Wed, 17 Apr 2024 11:11:05 +0000 (GMT)
-X-AuditID: cbfec7f4-11bff70000002693-fc-661fae49bb20
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms1.samsung.com (EUCPMTA) with SMTP id 91.5F.08810.94EAF166; Wed, 17
-	Apr 2024 12:11:05 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240417111105eusmtip2d9a2a1c25a17928cf241e21e4357f84d~HDM62RzBf1251912519eusmtip2k;
-	Wed, 17 Apr 2024 11:11:05 +0000 (GMT)
-Received: from localhost (106.110.32.44) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Wed, 17 Apr 2024 12:10:54 +0100
-Date: Wed, 17 Apr 2024 11:44:33 +0200
-From: Joel Granados <j.granados@samsung.com>
-To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, "Eric W.
- Biederman" <ebiederm@xmission.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Luis Chamberlain <mcgrof@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>, <stable@vger.kernel.org>
-Subject: Re: [PATCH v3] fs/proc/proc_sysctl.c: always initialize i_uid/i_gid
-Message-ID: <20240417094433.ahfnijzz2svjhrvt@joelS2.panther.com>
+	s=arc-20240116; t=1713348465; c=relaxed/simple;
+	bh=/hPVDH/l/50vOuhlKj+xEGfXoIYzQz449xMEPLDiU10=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=UbGNKQZ9iYC03mBY41fJisphFe2Qpmcdc5IhJsOMhINoQFBpa+0Hnhyoln/qNydQncy+o0k9+NlqrC99BwZUgYr87XIAd5fPa2NTU63AD3hpfiuVf/x76ZVqPtIGzXfqOTdtkIiGFFUwh4LMJf9t3TDczhoYPk4YpHjcWc1cZDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=cC2jJ09I; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=rnsDuuQH reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1713348461; x=1744884461;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=P4jjLHNDzTJwlTjX0l1tjUZ36wXeBEDfuonIOwgdrMk=;
+  b=cC2jJ09IBGpB8/JbqmWlkxvMdqLfKrifVvH82HNOHN0TDdB/ySaILK6G
+   oTB0+NgsdJcGBXNL2GWsG9pzoY82SZUMN355FhqtZw2fRevVOo0l8wovW
+   VZHikQeL3yWbPr9cxhj2dIVQP4PAtJ3gx46qfGuro5/AygzdUoUyoIQ66
+   9RGcLMiqMBLmmyZHhMwAALnC1Y5hsj/meAUU+buqzscWvhLSGLkQLIJLw
+   BL1AYMCr5mgS1yC73+ihhkimGLXTvYPSahWD4rzLs2iaEJU+yFBmWi61W
+   vpyF+cdDqfdE+R/0T2+y/t4uAgH+V+Te08uTjSmjJ2ByKudebA++Bp3Sb
+   A==;
+X-IronPort-AV: E=Sophos;i="6.07,208,1708383600"; 
+   d="scan'208";a="36464413"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 17 Apr 2024 12:07:38 +0200
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id EFB271703EB;
+	Wed, 17 Apr 2024 12:07:32 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1713348454;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding:in-reply-to:references;
+	bh=P4jjLHNDzTJwlTjX0l1tjUZ36wXeBEDfuonIOwgdrMk=;
+	b=rnsDuuQHFmSNSZ0itQmLdJ4PzQNgKcfOmgivwmVBHf5dmbBT4Ru3Czmh46Or+baeXY/QR/
+	mflfyya8wsE5fA8O2BsOZ3sLjul1rMVVc/H8S27iFdsh21i34ppaW/uEJ3FDBGmaEb4HRG
+	bNcwpK0X10bP+APDMir9fzk51a11tCu9NnCmjhN+cFCGz/+PT1zU6qq4B/uQTUZnh8bZwh
+	XNz/mbTCPgtzPwrofAYGXXaHUiV21QXm/TfiRFrJq6qC3E4ZNUU7nCWYO7iYCxkJlBrXq3
+	ukdhTvWQLgoSxlhDhFGlKUk9leCacfvEVrfxZDy0Df55wTKlaGq69Dc1+KZHXg==
+Message-ID: <6f64a875911eff522674e9a22b6dc23ec629db3a.camel@ew.tq-group.com>
+Subject: Re: [PATCH net] net: dsa: mv88e6xx: fix supported_interfaces setup
+ in mv88e6250_phylink_get_caps()
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org, linux@ew.tq-group.com
+Date: Wed, 17 Apr 2024 12:07:32 +0200
+In-Reply-To: <5f09543db3de88e83116c5b2f6e3d9edbfdb4af8.camel@ew.tq-group.com>
+References: <20240416155054.3650354-1-matthias.schiffer@ew.tq-group.com>
+	 <Zh6trxU0hB+yt6rV@shell.armlinux.org.uk>
+	 <5f09543db3de88e83116c5b2f6e3d9edbfdb4af8.camel@ew.tq-group.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="yvgo774vb4mne4gd"
-Content-Disposition: inline
-In-Reply-To: <20240402-sysctl-net-ownership-v3-1-366b1a76d48a@weissschuh.net>
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrOKsWRmVeSWpSXmKPExsWy7djP87qe6+TTDHZ1G1vMOd/CYnF40QtG
-	i//bWtgtnh57xG5xYVsfq8WynrVsFpd3zWGz+P3jGZPFjQlPGS2OLRCz+Hb6DaPFgo2PGB14
-	PFZc6GL12LLyJpPHzll32T0WbCr12LSqk83j/b6rbB6fN8l59HcfY/eYcqidJYAzissmJTUn
-	syy1SN8ugSvj+abXzAUT5Spenv3O0sD4SbKLkYNDQsBE4vRbgS5GLg4hgRWMEmvWTGKBcL4w
-	Ssy694QVwvnMKLHs8HG2LkZOsI7uZy+ZIRLLGSWOTJrLBlfV8/ECE4SzmVHi4czJrCAtLAKq
-	En93nWEHsdkEdCTOv7nDDGKLCNhIrPz2GSzOLDCdWeLLRC0QW1jAR6Jr2zYmEJtXwEFizeIv
-	LBC2oMTJmU9YQA5nFqiQOH/XGsKUllj+jwOkglPAV+LQlknsEIcqSnxdfI8Fwq6VOLXlFthp
-	EgK3OCWeH1rJCJFwkTh2sBfqM2GJV8e3QDXLSPzfOR+qYTKjxP5/H9ghnNXAsGj8ygRRZS3R
-	cuUJVIejRNeyBcyQUOWTuPFWEOIvPolJ26ZDhXklOtqEIKrVJFbfe8MygVF5FpLPZiF8Ngvh
-	s1lgc/QkbkydwoYhrC2xbOFrZgjbVmLduvcsCxjZVzGKp5YW56anFhvlpZbrFSfmFpfmpesl
-	5+duYgSmx9P/jn/Zwbj81Ue9Q4xMHIyHGFWAmh9tWH2BUYolLz8vVUmEt0VYNk2INyWxsiq1
-	KD++qDQntfgQozQHi5I4r2qKfKqQQHpiSWp2ampBahFMlomDU6qBSXjTvJMzbi6bc1yltben
-	bMYUgctHNl43bbvzVnBNwXnTbNE6h0luN5mi1jvsVq/fniDd+nLNJeXZDJW2W9K1NmtrH3t6
-	UeNc3U492dmXp3Dnxrm1HJx49kag0vua+Q7H7HiPea87+jH4FmdE84WLD8xsPDZV88x3uWQg
-	wBLmccv3zS+ptTuE/phMd7i3ufjlIn6O2ytmqBssOdDMIMJ59Me286nie/Vm/rU3eL7h5swP
-	swqKeTMbN3y/Vx395urD9cFX/kuozn20ZIGjcMVS/bbb1UKHK7OrkroSz9bKTN7klhJov8hy
-	4l9Tq1V/Dbkv75/b3X5bPFor1ap9v2KVo/OEBQZ5on6rLzzk0XzPWqjEUpyRaKjFXFScCAAt
-	WmLjCgQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprGKsWRmVeSWpSXmKPExsVy+t/xe7qe6+TTDHa+EbaYc76FxeLwoheM
-	Fv+3tbBbPD32iN3iwrY+VotlPWvZLC7vmsNm8fvHMyaLGxOeMlocWyBm8e30G0aLBRsfMTrw
-	eKy40MXqsWXlTSaPnbPusnss2FTqsWlVJ5vH+31X2Tw+b5Lz6O8+xu4x5VA7SwBnlJ5NUX5p
-	SapCRn5xia1StKGFkZ6hpYWekYmlnqGxeayVkamSvp1NSmpOZllqkb5dgl7Gm5fn2Ar65So2
-	rTzM2MD4QbKLkZNDQsBEovvZS+YuRi4OIYGljBKtrR9YIBIyEhu/XGWFsIUl/lzrYoMo+sgo
-	sWZlFxOEs5lRYsbvOWwgVSwCqhJ/d51hB7HZBHQkzr+5wwxiiwjYSKz89hksziwwnVniy0Qt
-	EFtYwEeia9s2JhCbV8BBYs3iLywQQxcwSjzecJ4dIiEocXLmExaI5jKJ+WcuMnYxcgDZ0hLL
-	/3GAhDkFfCUObZnEDnGposTXxfegPqiV+Pz3GeMERuFZSCbNQjJpFsIkiLCOxM6td9gwhLUl
-	li18zQxh20qsW/eeZQEj+ypGkdTS4tz03GJDveLE3OLSvHS95PzcTYzARLHt2M/NOxjnvfqo
-	d4iRiYPxEKMKUOejDasvMEqx5OXnpSqJ8LYIy6YJ8aYkVlalFuXHF5XmpBYfYjQFhuJEZinR
-	5HxgCssriTc0MzA1NDGzNDC1NDNWEuf1LOhIFBJITyxJzU5NLUgtgulj4uCUamAq1QpqniJv
-	rbNOsilgrW/FnRi7FysvRF7s5XThijM1tar/crN68Zr5n9obQ1P37HGYwr3MoOSsnl++ZdaR
-	LPNvvaXcfZ9udl27dVn5qUmbONta8TVFz50+aNXPVxVT3uPyqMppTeIz00uTkg9fm7TVZWZ2
-	3+FnVpzx0Umi4hO0ex4/N5r/wfqJ5TX/nhPfjnzeL7D7THDzP9GbL4MUdJ7N36S+8fbCjh7t
-	21w7fgVx59xu+TR19tcpDCVTj1tUz/DzPRr5VZTd+HDYTfcixTN725aypm390yq/uW6+8cYt
-	mgkXz8Rbnn4yLzOvuzRsZeJj2bftH68tdTn0aee/MLGqaYy3edqql83qiAiZIeqnxFKckWio
-	xVxUnAgAg0XQpakDAAA=
-X-CMS-MailID: 20240417111105eucas1p19e8fbbbe60d347e12d0f6d767198e338
-X-Msg-Generator: CA
-X-RootMTR: 20240402211043eucas1p173a936d187ae9bcf5be3729e69739e38
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240402211043eucas1p173a936d187ae9bcf5be3729e69739e38
-References: <CGME20240402211043eucas1p173a936d187ae9bcf5be3729e69739e38@eucas1p1.samsung.com>
-	<20240402-sysctl-net-ownership-v3-1-366b1a76d48a@weissschuh.net>
+X-Last-TLS-Session-Version: TLSv1.3
 
---yvgo774vb4mne4gd
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Apr 02, 2024 at 11:10:34PM +0200, Thomas Wei=DFschuh wrote:
-> Commit 5ec27ec735ba ("fs/proc/proc_sysctl.c: fix the default values of i_=
-uid/i_gid on /proc/sys inodes.")
-> added defaults for i_uid/i_gid when set_ownership() is not implemented.
-> It missed to also adjust net_ctl_set_ownership() to use the same default
-> values in case the computation of a better value fails.
+On Wed, 2024-04-17 at 09:13 +0200, Matthias Schiffer wrote:
+> On Tue, 2024-04-16 at 17:56 +0100, Russell King (Oracle) wrote:
+> > On Tue, Apr 16, 2024 at 05:50:54PM +0200, Matthias Schiffer wrote:
+> > > +int mv88e6250_port_get_mode(struct mv88e6xxx_chip *chip, int port,
+> > > +			    phy_interface_t *mode)
+> > > +{
+> > > +	int err;
+> > > +	u16 reg;
+> > > +
+> > > +	if (port < 5) {
+> > > +		*mode =3D PHY_INTERFACE_MODE_INTERNAL;
+> > > +		return 0;
+> > > +	}
+> >=20
+> > Note that if mv88e6xxx_phy_is_internal() returns TRUE for the port,
+> > then this will be handled automatically.
+> >=20
+> > > +
+> > > +	err =3D mv88e6xxx_port_read(chip, port, MV88E6XXX_PORT_STS, &reg);
+> > > +	if (err)
+> > > +		return err;
+> > > +
+> > > +	switch (reg & MV88E6250_PORT_STS_PORTMODE_MASK) {
+> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_10_HALF_PHY:
+> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_100_HALF_PHY:
+> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_10_FULL_PHY:
+> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_100_FULL_PHY:
+> > > +		*mode =3D PHY_INTERFACE_MODE_REVMII;
+> > > +		break;
+> > > +
+> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_HALF:
+> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_FULL:
+> > > +		*mode =3D PHY_INTERFACE_MODE_MII;
+> > > +		break;
+> > > +
+> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_DUAL_100_RMII_FULL_PHY:
+> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_200_RMII_FULL_PHY:
+> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_10_100_RMII_HALF_PHY:
+> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_10_100_RMII_FULL_PHY:
+> > > +		*mode =3D PHY_INTERFACE_MODE_REVRMII;
+> > > +		break;
+> > > +
+> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_DUAL_100_RMII_FULL:
+> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_10_100_RMII_FULL:
+> > > +		*mode =3D PHY_INTERFACE_MODE_RMII;
+> > > +		break;
+> > > +
+> > > +	case MV88E6250_PORT_STS_PORTMODE_MII_100_RGMII:
+> > > +		*mode =3D PHY_INTERFACE_MODE_RGMII;
+> > > +		break;
+> > > +
+> > > +	default:
+> > > +		*mode =3D PHY_INTERFACE_MODE_NA;
+> >=20
+> > What does this mean? I don't allow PHY_INTERFACE_MODE_NA to be set in
+> > the list of supported interfaces because it isn't an interface mode.
+> > If it's invalid, then it's probably best to return an error.
+> >=20
+> > I wonder whether it would just be better to pass the
+> > supported_interfaces bitmap into this function and have it set the
+> > appropriate bit itself, renaming the function to something more
+> > better suited to that purpose.
+> >=20
+> > Thanks.
 >=20
-> Instead always initialize i_uid/i_gid inside the sysfs core so
-> set_ownership() can safely skip setting them.
-
-Added this to sysctl-testing with minor changes in the commit message:
-
-"""
-sysctl: always initialize i_uid/i_gid
-
-Always initialize i_uid/i_gid inside the sysfs core so set_ownership()
-can safely skip setting them.
-
-Commit 5ec27ec735ba ("fs/proc/proc_sysctl.c: fix the default values of
-i_uid/i_gid on /proc/sys inodes.") added defaults for i_uid/i_gid when
-set_ownership() was not implemented. It also missed adjusting
-net_ctl_set_ownership() to use the same default values in case the
-computation of a better value failed.
-
-Fixes: 5ec27ec735ba ("fs/proc/proc_sysctl.c: fix the default values of i_ui=
-d/i_gid on /proc/sys inodes.")
-Cc: stable@vger.kernel.org
-Signed-off-by: Thomas Wei=DFschuh <linux@weissschuh.net>
-Signed-off-by: Joel Granados <j.granados@samsung.com>
-"""
-
-Will let it simmer in testing for now.
-
-Best
-
->=20
-> Fixes: 5ec27ec735ba ("fs/proc/proc_sysctl.c: fix the default values of i_=
-uid/i_gid on /proc/sys inodes.")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Thomas Wei=DFschuh <linux@weissschuh.net>
-> ---
-> Changes in v3:
-> - Rebase onto v6.9-rc1
-> - Reword commit message and mention correct fixed commit
-> - Link to v2: https://lore.kernel.org/r/20240322-sysctl-net-ownership-v2-=
-1-a8b4a3306542@weissschuh.net
->=20
-> Changes in v2:
-> - Move the fallback logic to the sysctl core
-> - Link to v1: https://lore.kernel.org/r/20240315-sysctl-net-ownership-v1-=
-1-2b465555a292@weissschuh.net
-> ---
->  fs/proc/proc_sysctl.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->=20
-> diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
-> index 37cde0efee57..9e34ab9c21e4 100644
-> --- a/fs/proc/proc_sysctl.c
-> +++ b/fs/proc/proc_sysctl.c
-> @@ -479,12 +479,10 @@ static struct inode *proc_sys_make_inode(struct sup=
-er_block *sb,
->  			make_empty_dir_inode(inode);
->  	}
-> =20
-> +	inode->i_uid =3D GLOBAL_ROOT_UID;
-> +	inode->i_gid =3D GLOBAL_ROOT_GID;
->  	if (root->set_ownership)
->  		root->set_ownership(head, table, &inode->i_uid, &inode->i_gid);
-> -	else {
-> -		inode->i_uid =3D GLOBAL_ROOT_UID;
-> -		inode->i_gid =3D GLOBAL_ROOT_GID;
-> -	}
-> =20
->  	return inode;
->  }
->=20
-> ---
-> base-commit: 4cece764965020c22cff7665b18a012006359095
-> change-id: 20240315-sysctl-net-ownership-bc4e17eaeea6
+> I'm explicitly checking for PHY_INTERFACE_MODE_NA in the caller to handle=
+ the "this interface isn't
+> useable" case. Passing supported_interfaces into the function handling th=
+e port modes is fine with
+> me, too - will send a v2 later.
 >=20
 > Best regards,
-> --=20
-> Thomas Wei=DFschuh <linux@weissschuh.net>
+> Matthias
+
+... and I realize I don't even check for PHY_INTERFACE_MODE_NA in the calle=
+r in the version of the
+patch I submitted. Oh well, time for v2.
+
+
+>=20
+>=20
+> >=20
 >=20
 
 --=20
-
-Joel Granados
-
---yvgo774vb4mne4gd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmYfmgAACgkQupfNUreW
-QU9U/Av9HKXJffWcIsZrwOT7yI37cd8cc4W1cjH3yBMzvQ9RWE6365mNygSJp0hs
-eGO+pFN+UtxaJmkPKG8MPVuggE+fmrvU++Ld4s/W9H55mNRALAu7q/KPPSgNXcb6
-wjfhKLcCteSVTMW/jU8LWWevH/35Y6Uf1eVWoNbzuQbxKsDTy52JzmRzSo2AC/8R
-1L10XsolcGe90NlnRlM7BHYvh02ZPrgjjZBCzYcxy8XhjqNZZsrRRmWLTwnGb80+
-gPjx6gRO3QYnQu0+jmfvu8C85dJKG9hV0oR9xSV0tqVITre0dpsjhgYKWz/mGIUN
-m/oOSDIiJhYFzUcSxcv4B/sNEnxltWMrgNYv7+lpUTekxFRKxlO7vwHVp/2SVJFO
-NoGTC//FKOPASWRRzKpCdlulMDEndfHgsYHksFxQs/90sBfGhCYGKDjZ1sCQ5Xoc
-ytuR3cgJd/01e9R235dLfq5+JXN0ORzJefcwS88B7365Yah0PY6IxR81kMhM/gCL
-niVLSZ0W
-=WR4U
------END PGP SIGNATURE-----
-
---yvgo774vb4mne4gd--
+TQ-Systems GmbH | M=C3=BChlstra=C3=9Fe 2, Gut Delling | 82229 Seefeld, Germ=
+any
+Amtsgericht M=C3=BCnchen, HRB 105018
+Gesch=C3=A4ftsf=C3=BChrer: Detlef Schneider, R=C3=BCdiger Stahl, Stefan Sch=
+neider
+https://www.tq-group.com/
 
