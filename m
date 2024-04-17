@@ -1,99 +1,115 @@
-Return-Path: <netdev+bounces-88594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B62168A7D32
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:36:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14B768A7D14
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:32:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7E481C20336
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 07:36:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CDDA1F214B8
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 07:32:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1936CDA6;
-	Wed, 17 Apr 2024 07:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01381604D3;
+	Wed, 17 Apr 2024 07:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="F/Y1k1w5"
 X-Original-To: netdev@vger.kernel.org
-Received: from bmailout2.hostsharing.net (bmailout2.hostsharing.net [83.223.78.240])
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD63F516
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 07:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.223.78.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A5EA42A93;
+	Wed, 17 Apr 2024 07:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713339373; cv=none; b=R8W2WA5NJ27XkhdsxvsOYr7LI+tZkEJ/9oIou2kCcCy8Y6SnJ/FzUeuNubuxCckaEkP6ygmY9A3at8yDFXQQwnJdoCS05lVQXyKLdkUpCWGokKmZVjdINcTptWeBbP05PiLKaDBerJXdcbv0fjzqC9Je4vWxVOSJfxtyzjMWZ3E=
+	t=1713339133; cv=none; b=YQsMd/Y6d9B6Nw1fnIjUSSnqeIQEUyPMNQOgQRfTZ6cv/a87wGLhYugUQ7blcfLNa5Us4vyX5mf8L3g8kFaHmNg3c3iyF9tkJdJKTby9Mo/r9rAMVCaIguxIaAlHrIhd6jbZlDHORbiHVlgjdQC0pmXed89ulrXmkU0Jb3TMalE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713339373; c=relaxed/simple;
-	bh=siZkua4XZaF2v2JoHWneSFI0DVRfWkp8m5BYQLNbGYs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ExC0X5dx0A2Fpw+h8l7cIcfKBAx67ItCKsTISrSdi2hwR7yoyQ10zyCozRfc+l5aj1H5nwtBPMpYc1hmsOdjrAUFq5wr2ZMWNqnI0ba8XsOj421OxgbKXrgoulg0C3qw8/VGu7fQJGgSzDPLygVjg9HAw8d6g0snpGjgzrnrb90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de; spf=none smtp.mailfrom=h08.hostsharing.net; arc=none smtp.client-ip=83.223.78.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=wunner.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=h08.hostsharing.net
-Received: from h08.hostsharing.net (h08.hostsharing.net [IPv6:2a01:37:1000::53df:5f1c:0])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256
-	 client-signature RSA-PSS (4096 bits) client-digest SHA256)
-	(Client CN "*.hostsharing.net", Issuer "RapidSSL TLS RSA CA G1" (verified OK))
-	by bmailout2.hostsharing.net (Postfix) with ESMTPS id 09B1528011608;
-	Wed, 17 Apr 2024 09:26:37 +0200 (CEST)
-Received: by h08.hostsharing.net (Postfix, from userid 100393)
-	id D2F7E32453; Wed, 17 Apr 2024 09:26:36 +0200 (CEST)
-Date: Wed, 17 Apr 2024 09:26:36 +0200
-From: Lukas Wunner <lukas@wunner.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	David Miller <davem@davemloft.net>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net] r8169: fix LED-related deadlock on module removal
-Message-ID: <Zh95rJqViOEpR40k@wunner.de>
-References: <6b6b07f5-250c-415e-bdc4-bd08ac69b24d@gmail.com>
- <ZhzqB9_xvEKSkMB7@wunner.de>
- <20240416164113.3ada12c7@kernel.org>
+	s=arc-20240116; t=1713339133; c=relaxed/simple;
+	bh=EVw/Ed5zPAVSDnFiWaniJiOl38I+q/uv8b6G8VpZDRE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eIX3WT6qGbTssFw8Ek3wD0qsyiG3RDnYktSZ7Cfe5w9JFJt7xdgeV1/mGHLkhBOInykkN2jW/AlzDZsJyRoj5ztHmoT662Qf2FtWJ+DP1snvvRu+IDQNpXuGW469TbR/gqIbQGomY88QSW5s08WkY2HS/UmuVbVQoYpwf5WfUWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=F/Y1k1w5; arc=none smtp.client-ip=115.124.30.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1713339128; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=xLo8OYi1UoX+I4QYqt1VXA9tqhdb6DaD+9+18rKvBOo=;
+	b=F/Y1k1w5wtGeioZ0h3fyfAXddrfiDODOnBdWPknlXyTdqNWXIAY+CM2gspAyckRyAfKOFhhvXPm8tr4LOr9aXKog7B+crnI62Ck6+UEC6ZU4gDNB8mDJo6KWqvWRRbh4OVQfin+w6Qvf4bTVO2qtsYWuq9wroxrojpmWVXFJ5yQ=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R541e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0W4kf6IF_1713339126;
+Received: from 30.221.101.43(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0W4kf6IF_1713339126)
+          by smtp.aliyun-inc.com;
+          Wed, 17 Apr 2024 15:32:07 +0800
+Message-ID: <a94de96f-8b18-482c-90e2-7f8584528bc8@linux.alibaba.com>
+Date: Wed, 17 Apr 2024 15:32:05 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240416164113.3ada12c7@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/smc: fix potential sleeping issue in
+ smc_switch_conns
+To: Paolo Abeni <pabeni@redhat.com>, Zhengchao Shao <shaozhengchao@huawei.com>
+Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
+ tonylu@linux.alibaba.com, guwen@linux.alibaba.com, weiyongjun1@huawei.com,
+ yuehaibing@huawei.com, tangchengchang@huawei.com, kuba@kernel.org,
+ edumazet@google.com, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org
+References: <20240413035150.3338977-1-shaozhengchao@huawei.com>
+ <b2573ccf2340a19b6cb039dac639b2d431c1404c.camel@redhat.com>
+Content-Language: en-US
+From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+In-Reply-To: <b2573ccf2340a19b6cb039dac639b2d431c1404c.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Apr 16, 2024 at 04:41:13PM -0700, Jakub Kicinski wrote:
-> On Mon, 15 Apr 2024 10:49:11 +0200 Lukas Wunner wrote:
-> > >  struct rtl8169_private;
-> > > +struct r8169_led_classdev;  
-> > 
-> > Normally these forward declarations are not needed if you're just
-> > referencing the struct name in a pointer.  Usage of the struct name
-> > in a pointer implies a forward declaration.
+
+
+On 2024/4/16 20:06, Paolo Abeni wrote:
+> On Sat, 2024-04-13 at 11:51 +0800, Zhengchao Shao wrote:
+>> Potential sleeping issue exists in the following processes:
+>> smc_switch_conns
+>>   spin_lock_bh(&conn->send_lock)
+>>   smc_switch_link_and_count
+>>     smcr_link_put
+>>       __smcr_link_clear
+>>         smc_lgr_put
+>>           __smc_lgr_free
+>>             smc_lgr_free_bufs
+>>               __smc_lgr_free_bufs
+>>                 smc_buf_free
+>>                   smcr_buf_free
+>>                     smcr_buf_unmap_link
+>>                       smc_ib_put_memory_region
+>>                         ib_dereg_mr
+>>                           ib_dereg_mr_user
+>>                             mr->device->ops.dereg_mr
+>> If scheduling exists when the IB driver implements .dereg_mr hook
+>> function, the bug "scheduling while atomic" will occur. For example,
+>> cxgb4 and efa driver. Use mutex lock instead of spin lock to fix it.
 > 
-> Unless something changed recently that only works for struct members,
-> function args need an explicit forward declaration.
+> I tried to inspect all the lock call sites, and it *look* like they are
+> all in process context, so the switch should be feasible.
 
-Not for pointers:
-
-   "You can't use an incomplete type to declare a variable or field,
-    or use it for a function parameter or return type. [...]
-    However, you can define a pointer to an incomplete type,
-    and declare a variable or field with such a pointer type.
-    In general, you can do everything with such pointers except
-    dereference them."
-
-    https://gnu-c-language-manual.github.io/GNU-C-Language-Manual/Incomplete-Types.html
-
-That's the case here:
-
-    struct r8169_led_classdev;
-    struct r8169_led_classdev *rtl8168_init_leds(struct net_device *ndev);
-    void r8169_remove_leds(struct r8169_led_classdev *leds);
-
-In this particular case, struct r8169_led_classdev is only used as a
-*pointer* passed to or returned from a function.  There's no need
-for a forward declaration of the type behind the pointer.
+There exist some calls from tasklet, where mutex lock is infeasible.
+For example:
+- tasklet -> smc_wr_tx_tasklet_fn -> smc_wr_tx_process_cqe -> pnd_snd.handler -> smc_cdc_tx_handler -> smc_tx_pending -> smc_tx_sndbuf_nonempty -> smcr_tx_sndbuf_nonempty -> spin_lock_bh(&conn->send_lock)
+- tasklet -> smc_wr_rx_tasklet_fn -> smc_wr_rx_process_cqes -> smc_wr_rx_demultiplex -> smc_cdc_rx_handler -> smc_cdc_msg_validate -> spin_lock_bh(&conn->send_lock)
 
 Thanks,
+Guangguan Wang
 
-Lukas
+> 
+> Still the fact that the existing lock is a BH variant is suspect.
+> Either the BH part was not needed or this can introduce subtle
+> regressions/issues. 
+> 
+> I think this deserves at least a 3rd party testing.
+> 
+> Thanks,
+> 
+> Paolo
+> 
 
