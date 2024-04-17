@@ -1,168 +1,81 @@
-Return-Path: <netdev+bounces-88879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 238AC8A8DD5
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 23:25:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 988378A8DF1
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 23:28:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A58971F2119B
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 21:25:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 390371F215B9
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 21:28:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074706A8DB;
-	Wed, 17 Apr 2024 21:25:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A0F651B1;
+	Wed, 17 Apr 2024 21:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G9Dy/zGs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AFF9657B6
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 21:25:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4118F4A;
+	Wed, 17 Apr 2024 21:28:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713389120; cv=none; b=kFnXPbrvb5blxOjGyrKu37wWB+LvJ+9F3cKi/RxAYkxMSa7yLs4xe8gdnEjL2eSvmdEL3zekbgRRBhT0RCXA+gkGFBBG2T78YMg5YpgT88eBWGg8r/mqENbh+IYoa0pTuOFWGfi5E+2We6RA9GZ86WTQnViYS4umE7vKsQ5R6X4=
+	t=1713389324; cv=none; b=NZV+y7s5Lv1LlAjX1GI/Iw3M+Zf9taMzsbXsv742KnoHznbIlK9iJqvS+/7LSB9n3lBtJ4sqyfHaBbrJ1vc5eXzZPYE3DuaA2////Uresa7WrpXp+UaVKPVp8oZBi1nRdHfBVwlHov0HzJEUYu0xRdQo3aYL7+yXscFi3YONULo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713389120; c=relaxed/simple;
-	bh=zuepX+b7EKccYFICDr9JFMM45fMCuiGRrgqD3FvuPuo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=UhbHJjIZ4KLIy8qT/KNCB2xjT0FljUNuMmFrzkWEEfkVLzoloKBC34gnEYg8iqz/RcPNnxsuxwOIBFYsQFaVYETBMFuExu4d9Cw4Xl6aEcvCdh00LPdfcBwbNMlbTAMwaKeoohTYQyycDGXmQ8o5oY0F3L3bGoI2u+MoMP62iiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7d9d8874383so22509339f.1
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 14:25:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713389118; x=1713993918;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NZC1n+8WGjMqyH8/u1eDu2rBP2vWkCU5Eb2xBcQ2Ems=;
-        b=w1/9DjEfa+ADo9RhPHoJn7yl8ZggIqcpG0u1ZDHCzZEgGmb+nyP1azUHs8jN2/Lg4w
-         uI/jG+rsTAghJEp32dfeSGRNaRMf0ZJmoHd7caH9se0dsVHgbJH5z0XvQj1aWZWNgrgF
-         skSwOuhiMvyzEl6Q5Jd1KHIWqjxG1udEBkRXniOn1GjPQDYPDr5+omkajWqeblc1N2cq
-         zIkH4IPxGhCqx2uZQ1wnqDdCm4kqYZCIyeRDhlsc+3ZFyyL/HL7IdxWcH9VEYDgKYJaF
-         5AYTyiXtQ9KFtG6iX72juEONiakcziG8w5KvqG7DHiS3BpgbKDW9qfZwW+/5NR9KWGza
-         /G7g==
-X-Forwarded-Encrypted: i=1; AJvYcCWAbXnziOwSySdZX7jzD9KZ29botdR4rZJk+PFMJIVw2eQhfZAxJRaIgWYUEM9r99LpfS1pDOV+5gsO39U3g24VfwiYA3id
-X-Gm-Message-State: AOJu0Yz8fs2T/JTsnbRG4LNFS0uoUJgXe30wC5BKfodKNjA9xvt2GhCV
-	Nm1w7jO+rsK8pGIYNUSfmlYDHnKMBr13yAwBQBsUzG1RNy4Yo5lO+fRItKV7M9sEqbw9TOSF1HA
-	jf1DYf1hw30dLAJT8hXZD7FalX0WgpUWLNMIyTGaCWcamLTJl19KTwe8=
-X-Google-Smtp-Source: AGHT+IEcAonNlyOsc37A+w0t0RMsyKGFJTXKMMgJEWjKcrfDPZ8Qso5N+f8+1P8NgMUaG7Z9bw0hofRq2zF3SHWQg4ULgIf1ICvw
+	s=arc-20240116; t=1713389324; c=relaxed/simple;
+	bh=CcUwRC1ONYjbKMJcsLelzN8dCXZuvmUYbPtOjD1wORI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JzgJN9pM2kWZlusBvSWrZKFyiqe5a/QjLS96raKZtjLgLcw0x8q0xRzy5jRKk97bEBiZpze5ecFII+LDhx3Q5TztnEUBL8yGhJmt+SKM+T+z9RnqJUcaN3uhA3cJs41HfeJJ2xo7sRw+LsN89bGuVqdmGhXrCNgo40vmKFSG1gY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G9Dy/zGs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F626C072AA;
+	Wed, 17 Apr 2024 21:28:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713389324;
+	bh=CcUwRC1ONYjbKMJcsLelzN8dCXZuvmUYbPtOjD1wORI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=G9Dy/zGslStluiYRn7O++1NbHg+TqBYAGJ8DDoKpYpx9roNHiKCyzIyjRw95XNMbY
+	 RWbKkHVzCQm0Ej/XuQdAv0xjmuFcfyCMXng+pZSMyj73Zh7eS7EVH/fnqtM2NmMcYM
+	 TrDLCjn8THg8qjacMX7k3VJhzh59uDT4k86gRmDerfU8oSud49vXrxpR3sRfsw2RCS
+	 YejpqSRKNzOPGKhDcOcVRYQVHsjJyQqpLZdFWh6BudeS3OQSP/drseCPAjQ92k3FFg
+	 lqJ//dng8qosZsI+hKC7bFLAgmuDqgNbHRCUGrWLFHwFLFQiNCDmrWRpfBkSofX9Gy
+	 oayyLMgNCMWtQ==
+Date: Wed, 17 Apr 2024 14:28:43 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 0/4] selftests/net/tcp_ao: A bunch of fixes for
+ TCP-AO selftests
+Message-ID: <20240417142843.27a221f8@kernel.org>
+In-Reply-To: <20240417134636.102f0120@kernel.org>
+References: <20240413-tcp-ao-selftests-fixes-v1-0-f9c41c96949d@gmail.com>
+	<20240416072809.3ae7c3d3@kernel.org>
+	<CAJwJo6Yw4S1wCcimRVy=P8h0Ez0UDt-yw2jqSY-ph3TKsQVVGA@mail.gmail.com>
+	<20240417134636.102f0120@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:4112:b0:482:f323:b373 with SMTP id
- ay18-20020a056638411200b00482f323b373mr22113jab.2.1713389118683; Wed, 17 Apr
- 2024 14:25:18 -0700 (PDT)
-Date: Wed, 17 Apr 2024 14:25:18 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c80abd0616517df9@google.com>
-Subject: [syzbot] [bpf?] possible deadlock in queue_stack_map_push_elem
-From: syzbot <syzbot+252bc5c744d0bba917e1@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On Wed, 17 Apr 2024 13:46:36 -0700 Jakub Kicinski wrote:
+> > I can spend some time on them after I verify that my fix for -stable
+> > is actually fixing an issue I think it fixes.
+> > Seems like your automation + my selftests are giving some fruits, hehe.  
+> 
+> Oh, very interesting, I don't recall these coming up before.
 
-syzbot found the following issue on:
+Correction, these are old, and if I plug the branch names here:
+https://netdev.bots.linux.dev/contest.html
+there is a whole bunch of tests failing that day.
 
-HEAD commit:    f99c5f563c17 Merge tag 'nf-24-03-21' of git://git.kernel.o..
-git tree:       net
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=14ee6467180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
-dashboard link: https://syzkaller.appspot.com/bug?extid=252bc5c744d0bba917e1
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=157093d5180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1039a7cb180000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/65d3f3eb786e/disk-f99c5f56.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/799cf7f28ff8/vmlinux-f99c5f56.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ab26c60c3845/bzImage-f99c5f56.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+252bc5c744d0bba917e1@syzkaller.appspotmail.com
-
-============================================
-WARNING: possible recursive locking detected
-6.8.0-syzkaller-05271-gf99c5f563c17 #0 Not tainted
---------------------------------------------
-syz-executor327/5092 is trying to acquire lock:
-ffff8880754591d8 (&qs->lock){-.-.}-{2:2}, at: queue_stack_map_push_elem+0x1b2/0x660 kernel/bpf/queue_stack_maps.c:210
-
-but task is already holding lock:
-ffff8880153871d8 (&qs->lock){-.-.}-{2:2}, at: queue_stack_map_push_elem+0x1b2/0x660 kernel/bpf/queue_stack_maps.c:210
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&qs->lock);
-  lock(&qs->lock);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-4 locks held by syz-executor327/5092:
- #0: ffffffff8e1dacc8 (delayed_uprobe_lock){+.+.}-{3:3}, at: uprobe_clear_state+0x54/0x290 kernel/events/uprobes.c:1545
- #1: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
- #1: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:781 [inline]
- #1: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2380 [inline]
- #1: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run2+0x114/0x420 kernel/trace/bpf_trace.c:2420
- #2: ffff8880153871d8 (&qs->lock){-.-.}-{2:2}, at: queue_stack_map_push_elem+0x1b2/0x660 kernel/bpf/queue_stack_maps.c:210
- #3: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
- #3: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:781 [inline]
- #3: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2380 [inline]
- #3: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run2+0x114/0x420 kernel/trace/bpf_trace.c:2420
-
-stack backtrace:
-CPU: 0 PID: 5092 Comm: syz-executor327 Not tainted 6.8.0-syzkaller-05271-gf99c5f563c17 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
- check_deadlock kernel/locking/lockdep.c:3062 [inline]
- validate_chain+0x15c1/0x58e0 kernel/locking/lockdep.c:3856
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
- queue_stack_map_push_elem+0x1b2/0x660 kernel/bpf/queue_stack_maps.c:210
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Keep in mind these run pre-commit so not all failures are flakes.
 
