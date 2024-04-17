@@ -1,109 +1,100 @@
-Return-Path: <netdev+bounces-88599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B6A48A7D94
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 10:00:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44A198A7D99
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 10:00:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CC771C21935
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 08:00:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB06BB22250
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 08:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12F746F071;
-	Wed, 17 Apr 2024 08:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A772E6F06F;
+	Wed, 17 Apr 2024 08:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="vNpMyzk5"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X8LTOOAL"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFC7033CC2;
-	Wed, 17 Apr 2024 08:00:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765AA74BF5;
+	Wed, 17 Apr 2024 08:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713340810; cv=none; b=i/q9tm+d8XjhgoLNLlqZpl8hLZaD6grtIVwMSEqWtbQ4EYNkKPSYwXoWGvRAuOFmEJw69aowx7pIQplnbtzq8bzFpsbMoewAdtCrqgYynanoBTqiiUvh/Gyc5zxK2y++rcklajMXf4/VC1fnIpmTquIRWnIGeWR2dbBaDlHlJRE=
+	t=1713340832; cv=none; b=pc8FNoS5KvKPmVEDv0Elu3O9c7aGLfHBCksvgVL15/+MFi7yWnZw1MfWtjmcnAq8hc+8wPi4+GO3NOiBGOnqjupXtvF4IYXy8f8Bp3ZYwlWBB/Oa9uXg3mEuboXzfd1sgwNF8HMpgPOTFqrJ6twhBhFTjSkv9VSo7ORZxGX3TFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713340810; c=relaxed/simple;
-	bh=1d8Das0aWluPw1yvMOJaa8hAwf+veUsd5fsg+jQfw60=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FIBuMSkQi4JbxNoQQaFS0ceyo7cTiaSUKO6b7EcE0k0vN26p15qr5rr17wVRpBbiIry7GqCvjk50TC+FW1IqgMiiMYOCQVOhpFQSw2ze8m2M3jUKgZ4NVpUqw9cFhtVW9Hk59XZLHel8Fx3wD2ciDcMsPCpyzZZnAJ+zXt2RQ6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=vNpMyzk5; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1713340803; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=LUeR/jp3bxeHCiX5tZat99Q/kYEgiO/5uqllP4LX6T4=;
-	b=vNpMyzk5G0yxht/1rMyVxFhbD8RanJHbtwtCXwfqNLDCZ5L/uAl8iWkSUi0eDrn2XehqtAVSCiOuiS5kOw0Yh+F0Rfu0cxvbDEnjSQh7WbqioMMhzrjaJuvTg7+PnpwuwzugCz0eeoegSmXw6uLiaxedTgQGg6t1fL73IkEzzBI=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=guangguan.wang@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0W4kiX3p_1713340801;
-Received: from 30.221.101.43(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0W4kiX3p_1713340801)
-          by smtp.aliyun-inc.com;
-          Wed, 17 Apr 2024 16:00:02 +0800
-Message-ID: <6520c574-e1c6-49e0-8bb1-760032faaf7a@linux.alibaba.com>
-Date: Wed, 17 Apr 2024 16:00:01 +0800
+	s=arc-20240116; t=1713340832; c=relaxed/simple;
+	bh=oEQgw93Cov2umXAsjiuN9cm/AxuQU4zSu7ix8xBpZsQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ndEUIJfK7mMs2DhUg00TdO/NXL7fuyDafPLn8Zq5uYSfGKxCMU0r7QzhMFeVwjBl1X6NBtUf/xEPCQWgFtltP68My0G3lpRYJk+214+zDYuTd4nQtTECKpdc9RJsQlQZlj+2KvAD6wPHFjBH260Bk0dNIeKZlc2D/LK2H+79IVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X8LTOOAL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E3BC5C32781;
+	Wed, 17 Apr 2024 08:00:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713340831;
+	bh=oEQgw93Cov2umXAsjiuN9cm/AxuQU4zSu7ix8xBpZsQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=X8LTOOALhbI5/bnuhZXwxMGCrLlwBKcCPsU+v/n08hYKD7kbLilKLS5e41s9H+iQa
+	 ZEHWI+BLCATu6S/F9HuHRtQKwyw5eybpRLXKNZ5bjK25CYJBCGNJg2PmqyR8zRgwWG
+	 53wcjsj3OX4ktA/yuoOUdpY45guRAUG0nrmnhEMYVIaL2j9T/TqkE+92NUOGkTeyyA
+	 HTOBx3n32eUL2dlCahLvzlyhzxwStDvCNb8W6EwC6IxQQWfOK9j39nOAAfkXVnN0Pn
+	 sijcC3X4F49/9tJq1YvpOzhDKX/eYNIRYdeZYmDqfYuBkF3gMd00+r4Fdo0vUkPaoL
+	 /xNPYb5/+ROnw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D5EE5D5B3FF;
+	Wed, 17 Apr 2024 08:00:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: fix potential sleeping issue in
- smc_switch_conns
-To: Zhengchao Shao <shaozhengchao@huawei.com>, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
- tonylu@linux.alibaba.com, guwen@linux.alibaba.com, weiyongjun1@huawei.com,
- yuehaibing@huawei.com, tangchengchang@huawei.com
-References: <20240413035150.3338977-1-shaozhengchao@huawei.com>
-Content-Language: en-US
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-In-Reply-To: <20240413035150.3338977-1-shaozhengchao@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] Fix port mirroring on MT7530 DSA subdriver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171334083086.1461.14636721457628814593.git-patchwork-notify@kernel.org>
+Date: Wed, 17 Apr 2024 08:00:30 +0000
+References: <20240413-b4-for-net-mt7530-fix-mirroring-to-local-port-and-mt7988-v1-0-476deff8cc06@arinc9.com>
+In-Reply-To: <20240413-b4-for-net-mt7530-fix-mirroring-to-local-port-and-mt7988-v1-0-476deff8cc06@arinc9.com>
+To: =?utf-8?b?QXLEsW7DpyDDnE5BTCB2aWEgQjQgUmVsYXkgPGRldm51bGwrYXJpbmMudW5hbC5h?=@codeaurora.org,
+	=?utf-8?b?cmluYzkuY29tQGtlcm5lbC5vcmc+?=@codeaurora.org
+Cc: daniel@makrotopia.org, dqfext@gmail.com, sean.wang@mediatek.com,
+ andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com, hs@giax.de,
+ bartel.eerdekens@constell8.be, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, arinc.unal@arinc9.com
 
+Hello:
 
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-On 2024/4/13 11:51, Zhengchao Shao wrote:
-> Potential sleeping issue exists in the following processes:
-> smc_switch_conns
->   spin_lock_bh(&conn->send_lock)
->   smc_switch_link_and_count
->     smcr_link_put
->       __smcr_link_clear
->         smc_lgr_put
->           __smc_lgr_free
->             smc_lgr_free_bufs
->               __smc_lgr_free_bufs
->                 smc_buf_free
->                   smcr_buf_free
->                     smcr_buf_unmap_link
->                       smc_ib_put_memory_region
->                         ib_dereg_mr
->                           ib_dereg_mr_user
->                             mr->device->ops.dereg_mr
-> If scheduling exists when the IB driver implements .dereg_mr hook
-> function, the bug "scheduling while atomic" will occur. For example,
-> cxgb4 and efa driver. Use mutex lock instead of spin lock to fix it.
+On Sat, 13 Apr 2024 16:01:38 +0300 you wrote:
+> Hi.
 > 
-> Fixes: 20c9398d3309 ("net/smc: Resolve the race between SMC-R link access and clear")
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> ---
->  net/smc/af_smc.c   |  2 +-
->  net/smc/smc.h      |  2 +-
->  net/smc/smc_cdc.c  | 14 +++++++-------
->  net/smc/smc_core.c |  8 ++++----
->  net/smc/smc_tx.c   |  8 ++++----
->  5 files changed, 17 insertions(+), 17 deletions(-)
+> This patch series fixes the frames received on the local port (monitor
+> port) not being mirrored, and port mirroring for the MT7988 SoC switch.
 > 
+> Arınç
+> 
+> [...]
 
-Hi Zhengchao,
+Here is the summary with links:
+  - [net,1/2] net: dsa: mt7530: fix mirroring frames received on local port
+    https://git.kernel.org/netdev/net/c/d59cf049c837
+  - [net,2/2] net: dsa: mt7530: fix port mirroring for MT7988 SoC switch
+    https://git.kernel.org/netdev/net/c/2c606d138518
 
-I doubt whether this bug really exists, as efa supports SRD QP while SMC-R relies on RC QP,
-cxgb4 is a IWARP adaptor while SMC-R relies on ROCE adaptor.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Thanks,
-Guangguan Wang
+
 
