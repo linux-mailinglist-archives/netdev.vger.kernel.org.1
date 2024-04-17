@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-88717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 873EA8A8559
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:53:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2C9D8A8557
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:53:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F57FB27A30
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 13:53:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DFE4B24E52
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 13:52:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F531411D9;
-	Wed, 17 Apr 2024 13:52:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EABC14036F;
+	Wed, 17 Apr 2024 13:52:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="MyxQToss"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="pjcIVCXN"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609DC14039D;
-	Wed, 17 Apr 2024 13:52:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F02DA13C81F;
+	Wed, 17 Apr 2024 13:52:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713361967; cv=none; b=R1uQVmM4VxNgctfDU5sAe0zD8jz1pwx1nJZg8rlbFCXYVNVCkAyomao/nzH2DoKvT9rtQiHhDq51D/+UwFtA2zm4wLAg0+Bm1VwqNz64wHwvr+NRuJkraWuNICKKDSUCmqaoe6TFbTMPfpdBnh+n5cQArZumLbBQ4ZpRDhxWzDs=
+	t=1713361965; cv=none; b=mgH5L1j905MoQhAOhpKSQfsb1cNrhShHnlIvZmPm6GnW92UkpoPne7QQkGGckSM2gLvGcmjfTRAfPqEpstUcd3MCCJqPKxlRf5B9PdCFsmEPdrSLI7insOWs3NMUVfOvQa9bbCHIuik24bSre9JLg4qLdAu9STkMY5ZTve66/ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713361967; c=relaxed/simple;
-	bh=dvs8rmkpjRbTlCQkdBXUSnIfhTY7ofWCgT1rCrbizXU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mDW7MN60CetZVDl5AgRJ6gq6kkyTSXCTqij7X6cQJG9CjOpM/qLAkTEJFT2FWDr33bKHPpmWNyQWstuJjn0bIZM0wXVHkZp93GWzISYiNnXJRBzqzAYYM3qBeKDhGWBBBtvS0WP+kW0D6ZGn4VzqSVo+UH8Zg9o+nOAM+iJgCD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=MyxQToss; arc=none smtp.client-ip=193.104.135.124
+	s=arc-20240116; t=1713361965; c=relaxed/simple;
+	bh=4Cmcmmzl6A6wun1x2yb3/vcGq9AxnztLrcfzCmZZJlE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YFnI0eDi47e6i0IY/69pC58qP59CXn+KDtU/AcszVW5IuSMyGcPYQHoYEW+ecWpm5rDn/xmb3cge7balocECj9EXW9D6igAI3LbzwULMiSHv6UVbfKq5sA8z66PlPIvCBVgfqTfWAAr8DTMkXkXmyie85fVVyjuSl9FYA1FaQpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=pjcIVCXN; arc=none smtp.client-ip=193.104.135.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
 Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id DCAFA600A7;
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 8CFC7600A2;
 	Wed, 17 Apr 2024 13:52:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1713361963;
-	bh=dvs8rmkpjRbTlCQkdBXUSnIfhTY7ofWCgT1rCrbizXU=;
+	s=202008; t=1713361953;
+	bh=4Cmcmmzl6A6wun1x2yb3/vcGq9AxnztLrcfzCmZZJlE=;
 	h=From:To:Cc:Subject:Date:From;
-	b=MyxQTossvwiZE6WUOuoKK5bTFXhKpKpktRXUUPeOLoblR/6RPr8n/UFQBZUgkuorZ
-	 sh8wBhW9kAt+tQdz2YVOCiQjKnEYncE1SMzmvl1UOxwOBrKj8sKBi3AUqDbnAF0/2r
-	 Gko18E0QzVPb4XKQ7CLJ9JHO+6sx2NnADzg2gjw3202Q4unjlv4BwmLGL9oz/qq9X9
-	 NNGfiaC2MrZC7vS6Lr+Wj2mbcXvcDL6Ms5IsHoKoxJkFm5iRxYWga6hrtPMeHF9mx0
-	 8rN6dZRDi2ach9xAjFsPSL5GdcmCKR4RGj6A1YpOGB5akL3+B+Npf5sdmHyXGE1xEY
-	 ypmuBQKAfdosw==
+	b=pjcIVCXNTxr1YmJPkL1TWaxn+SQm6stYgn86q/JpDYAOuib5zFrOAuxGrkhxZJ9/o
+	 DxS0eRBIftNC5aQ3YBBxxm7/Cd4CcFermzSZrvSi3HaM7Dh4LNtD0rt/a56p99W7MQ
+	 TXavCXLc0gO4aaODYZDNY59b3czL+PzunXCT9MIr0h75bT9TzXDVA5sBkhOD7lYVy1
+	 qceVXmTIPWpwY1yeB4kp1yYXS9T5Hi3uX9PRvKZ7OgofZO74fc3EI71Y/BcL3tGOyG
+	 tgK8Y3DYlTuHjqVdO8KpyoFwslsewZ+YQXZJ7FVObTUoskGRcwtk+9rOGIkxeBGlEH
+	 Q56XSLIdzzyUQ==
 Received: by x201s (Postfix, from userid 1000)
-	id 816AA203AC4; Wed, 17 Apr 2024 13:51:15 +0000 (UTC)
+	id 07E5520445E; Wed, 17 Apr 2024 13:52:24 +0000 (UTC)
 From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
 To: netdev@vger.kernel.org
 Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
@@ -53,12 +53,11 @@ Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>
-Subject: [PATCH net-next] net/mlx5e: flower: check for unsupported control flags
-Date: Wed, 17 Apr 2024 13:51:09 +0000
-Message-ID: <20240417135110.99900-1-ast@fiberby.net>
+	Ido Schimmel <idosch@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>
+Subject: [PATCH net-next] mlxsw: spectrum_flower: validate control flags
+Date: Wed, 17 Apr 2024 13:51:20 +0000
+Message-ID: <20240417135131.99921-1-ast@fiberby.net>
 X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -69,32 +68,32 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Use flow_rule_is_supp_control_flags() to reject filters with
-unsupported control flags.
+This driver currently doesn't support any control flags.
 
-In case any unsupported control flags are masked,
-flow_rule_is_supp_control_flags() sets a NL extended
-error message, and we return -EOPNOTSUPP.
+Use flow_rule_has_control_flags() to check for control flags,
+such as can be set through `tc flower ... ip_flags frag`.
+
+In case any control flags are masked, flow_rule_has_control_flags()
+sets a NL extended error message, and we return -EOPNOTSUPP.
 
 Only compile-tested.
 
 Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-index aeb32cb27182..5019280cfcdd 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
-@@ -2819,6 +2819,11 @@ static int __parse_cls_flower(struct mlx5e_priv *priv,
- 			else
- 				*match_level = MLX5_MATCH_L3;
- 		}
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c
+index 9fd1ca079258..f07955b5439f 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_flower.c
+@@ -595,6 +595,10 @@ static int mlxsw_sp_flower_parse(struct mlxsw_sp *mlxsw_sp,
+ 
+ 		flow_rule_match_control(rule, &match);
+ 		addr_type = match.key->addr_type;
 +
-+		if (!flow_rule_is_supp_control_flags(FLOW_DIS_IS_FRAGMENT |
-+						     FLOW_DIS_FIRST_FRAG,
-+						     match.mask->flags, extack))
++		if (flow_rule_has_control_flags(match.mask->flags,
++						f->common.extack))
 +			return -EOPNOTSUPP;
  	}
  
