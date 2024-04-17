@@ -1,136 +1,124 @@
-Return-Path: <netdev+bounces-88678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 561F18A8320
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 14:25:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 130C68A833F
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 14:38:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11F6B2822B9
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 12:25:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC9491F22381
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 12:38:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A989B13D293;
-	Wed, 17 Apr 2024 12:25:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D76D85C7A;
+	Wed, 17 Apr 2024 12:38:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RUsoOVEY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LMqJX3Ad"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E3D213C8FD
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 12:25:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C46084E01
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 12:38:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713356733; cv=none; b=L2XhrP3pz1qoaweOlUJlZv6dV0LpUW+CH1wIsUqiKT3t2FmpkuXBj34+3nWpLn+aMnHGhsrdF1cNpQxQ08hFUH6EYqxQiN9iFlxe5ntnvb07LXnEEPZu1VbPlDIZSrnGgIuOWCB1d427V0GehuCmDQ2uvbu5JzmdNS26gaqsh48=
+	t=1713357496; cv=none; b=lIFmtR4DWy+S8l2lbHcYF6Wkd91VazqIlzRSZr6AyIlKDHqC2GVmVX0esYOAqLZ70HGGa6wMiwjHf76ZblMXrdqMeVm8TCna+auikBm7nRTRD8SMuz/XBaiQZAjQHOsyHWlwPhnEpqJctoQkHgwDs6oExINsAejcFCperNM7Ez8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713356733; c=relaxed/simple;
-	bh=KxQa1zXsSJ5TQH3pbDBNaDTXMCQAqdEwEkXt5Zmcpe4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kyeDuKYeyMOAfuaF2H2aunoRgycZXPZCSmaNZEFceBZj+y33l/XJnlFnE7bxtL2eEWdLND3jF+HdTWtICpyxON64Qjsb34zQDzeBseUOsv+jBQlJhxF2AcSIIkF2YibiY9Yos7itVos4R6ISTTwf7q/P7okXxp9eG/oAvQzceLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RUsoOVEY; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a4715991c32so709701966b.1
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 05:25:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713356730; x=1713961530; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VDqIasPh/qOk8r1NFnR+3VsIG0iqk4Jd/z2QKxMLgMA=;
-        b=RUsoOVEYC5EUexGebg7J2mPQUoVnv7Goem3XKeCTnyDsuQoTPaaAlaUDJztEBu2Ihm
-         PZRLLUF62fT6SlK+eQTcgEaTHzZl416shF4StwYFqawYJd0EJL+pGjiEP+fCQ0eMAiVM
-         W1wJosCkv0fBHK5NJjabvC7g0GYs5MDzPUdkvRrOPVtjRJK4EhsQd7BOG3YXQe3nRRia
-         sjrXMQM+8p62RGA450ivSSjYat0VtmlBcqeVZq4XS4opB53y8ZyihGtFBdo6LI45+y2e
-         OyNIIl2GbOUsEJ0ultru+/NQ1LRLPPMA6S4Bmo8FKi35mpYu+aTuuybGy8x0XwDh/iBE
-         +HHA==
+	s=arc-20240116; t=1713357496; c=relaxed/simple;
+	bh=Uv+3pKCjLIkGRI/R19Z/0cMwsRJq1hQjBGjV+wyv3JY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=mSRDcCAROzQPUCLM4MVJ6cCl5E1MnKj4l47Q/luzqN9ajW2R3yvWaQvJqbnm+5VVfZib4JiRbHN5hOfL8KrYuPv7KYVa8wHpMrXGhpIwMTg2G6ALnCy+4oaVPTTsqOu//3VSuGCDZXl8+rJegboi9t3q/CAkRiflDbj1l2oubd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LMqJX3Ad; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713357493;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aQsJ74gs8uNCq3QmXHX/BCc46rTm4CPPCIlkZTHPEUk=;
+	b=LMqJX3AdMQkkWZq9C0Ki8EjfpAFi6TQ6eTj435Wt7nvYeKLN8SWeUzr8lYb9MPv+s3TGUh
+	FwFuJpkAcORU0fZXOlq2rAVr8Ij/GxsqR1Wf+XLjnym6o0ri0p//nBrpPCv/J5T6IsbDJh
+	bWvQz8jYp3iGFCEkR1Hbe/+OqfAd5ro=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-54-rpR2muN0PpC_xTVs9r-ISQ-1; Wed, 17 Apr 2024 08:38:12 -0400
+X-MC-Unique: rpR2muN0PpC_xTVs9r-ISQ-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-516d46e1bafso3222580e87.2
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 05:38:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713356730; x=1713961530;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1713357490; x=1713962290;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VDqIasPh/qOk8r1NFnR+3VsIG0iqk4Jd/z2QKxMLgMA=;
-        b=LMEARStKTMGKYJ2GfxTcmGFq0qHv6A5mtnVe++b1jlxS3/hgQ1wFvUTJ+h5AleuUqI
-         oOyXqzuGv9FWXt8t5pUGthvL6e10nTWfuVkRbuK1myeNfcE7qWV7Si41dkcTDXVo9w6x
-         yMCJuUzZnMVQawfh4mrQWKZTrR1vb6zLjwyjJOtMIPypcrHsaeaxsYYGByeYatdTxRbk
-         H0xYtHavZQ9WuGsFqkvTe/8iXxDUkriJLqVbYiSH8h44qj0LwXKBqNbVsRpX9t7CQa5L
-         yiZmJZbRDHGIBpKvJaeiWm78EAAUipwtpmDyi0RJAH270G4+ek2qWPJsZtHZ8TtMHFkK
-         trAw==
-X-Gm-Message-State: AOJu0YymedXmB2t0zHTxf2ztKnmYKo8w1khNNmLy9QnKDrkduGN/f5Qk
-	7Rtkkb1Qj6cLjdAOEITGFXwtfLmZfLmF1xc1E37gW36LUcspVOLiyRBb+WXhhWmah3lwJYuklXA
-	yrF+OPMsvtEbFCecJHwifMGSjHgyRIjA6I5s=
-X-Google-Smtp-Source: AGHT+IHAGJ3xsRj8pZK4WehfxYiyBMZ7WEtuehK9oOtZmTpOYVsaIYeYSt6M2rlpIU0MAB9nA2I8K6PJD6hmm0iDxng=
-X-Received: by 2002:a17:907:9309:b0:a55:4a80:f5d4 with SMTP id
- bu9-20020a170907930900b00a554a80f5d4mr2442205ejc.43.1713356730190; Wed, 17
- Apr 2024 05:25:30 -0700 (PDT)
+        bh=aQsJ74gs8uNCq3QmXHX/BCc46rTm4CPPCIlkZTHPEUk=;
+        b=HimI7iEUW47KcQkCXIoB4V5zR2jm2Cab2xjCYFQBBURUcSznb2ZGnkx7tu6TLRiph8
+         lZAJz7zK6Ogbk3L1p0YiyZXk86Gtu1qMd+TAV5axn8NbcvPjCyXGzYYtn0bM9GRC3lAN
+         Is9t3W6qbICFAlBu78pfFg34VGgng1MuXA9n95k3Nck9T4JGhz8xEfsKFfBJZtFi6ZtW
+         m38+CrOnFC3pE1ue5VR/rXrHE7oL2VA/+LEIBQuEplffOZ2GBjBWvgsfQipVOUWReN2v
+         ww3XN/0i+6uha6i2GSb2oQmprmMyAyniA3LTC8ZcW5uw9DzjH8Du1/a7BeEWeaxm9/gM
+         YKWw==
+X-Forwarded-Encrypted: i=1; AJvYcCX8Yq+kDtjtK6d7xCN8GuL84fuyQBglzvVcopPl/hhnjrdUuH5KJicHgzgx9CQ52ijBR5v1E84vi5ZSO0qChL3sCDSVwhKO
+X-Gm-Message-State: AOJu0YyEIuheTGE3+iDwjgYHnzbZ0lLddlJnHftuHCFbrprCVY0wkTMN
+	PjanKhxLLBdi7w06by9eZgpI3JlZel4YUZQP7p+cy8utdPitZ8FfC3cd6gFXA7ntgDHcW8WPaiA
+	X99pfivodUpNPIlhcXDGu+7JHpecTTOBYH+zBn/3MysRK+Chx7GrncQ==
+X-Received: by 2002:ac2:47e3:0:b0:518:97dc:d85b with SMTP id b3-20020ac247e3000000b0051897dcd85bmr8375586lfp.63.1713357490572;
+        Wed, 17 Apr 2024 05:38:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHeUFJ352/1MTQiEFFy/J/cM1tPdbSfRnd+F7UDGy5i/v8SGgrqD3jBxFhL9k+vsKNJouu3wg==
+X-Received: by 2002:ac2:47e3:0:b0:518:97dc:d85b with SMTP id b3-20020ac247e3000000b0051897dcd85bmr8375572lfp.63.1713357490294;
+        Wed, 17 Apr 2024 05:38:10 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id e22-20020a170906c01600b00a51cdde5d9bsm8099945ejz.225.2024.04.17.05.38.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Apr 2024 05:38:09 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 221251233A6E; Wed, 17 Apr 2024 14:25:08 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Simon Horman <horms@kernel.org>, Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
+ <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ cake@lists.bufferbloat.net
+Subject: Re: [PATCH net-next 02/14] net_sched: cake: implement lockless
+ cake_dump()
+In-Reply-To: <20240417083549.GA3846178@kernel.org>
+References: <20240415132054.3822230-1-edumazet@google.com>
+ <20240415132054.3822230-3-edumazet@google.com>
+ <20240417083549.GA3846178@kernel.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Wed, 17 Apr 2024 14:25:08 +0200
+Message-ID: <87cyqouqfv.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240417062721.45652-1-kerneljasonxing@gmail.com> <20240417062721.45652-4-kerneljasonxing@gmail.com>
-In-Reply-To: <20240417062721.45652-4-kerneljasonxing@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 17 Apr 2024 20:24:53 +0800
-Message-ID: <CAL+tcoCWT5PQ9BG697+AAxhxge2R=XsHgu-GEQjdDxYgLJn3aA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 3/3] net: rps: locklessly access rflow->cpu
-To: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, horms@kernel.org
-Cc: netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 17, 2024 at 2:27=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> This is the last member in struct rps_dev_flow which should be
-> protected locklessly. So finish it.
->
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
->  net/core/dev.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 40a535158e45..aeb45025e2bc 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -4533,7 +4533,7 @@ set_rps_cpu(struct net_device *dev, struct sk_buff =
-*skb,
->                 rps_input_queue_tail_save(&rflow->last_qtail, head);
->         }
->
-> -       rflow->cpu =3D next_cpu;
-> +       WRITE_ONCE(rflow->cpu, next_cpu);
->         return rflow;
->  }
->
-> @@ -4597,7 +4597,7 @@ static int get_rps_cpu(struct net_device *dev, stru=
-ct sk_buff *skb,
->                  * we can look at the local (per receive queue) flow tabl=
-e
->                  */
->                 rflow =3D &flow_table->flows[hash & flow_table->mask];
-> -               tcpu =3D rflow->cpu;
-> +               tcpu =3D READ_ONCE(rflow->cpu);
+Simon Horman <horms@kernel.org> writes:
 
-Hello Eric,
+> + Toke H=C3=B8iland-J=C3=B8rgensen <toke@toke.dk>
+>   cake@lists.bufferbloat.net
 
-I think I don't need this one either, right? Only protecting the
-writer side in set_rps_cpu() and the reader side in
-rps_may_expire_flow() is enough.
+Thanks!
 
-Thanks,
-Jason
+> On Mon, Apr 15, 2024 at 01:20:42PM +0000, Eric Dumazet wrote:
+>> Instead of relying on RTNL, cake_dump() can use READ_ONCE()
+>> annotations, paired with WRITE_ONCE() ones in cake_change().
+>>=20
+>> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
->
->                 /*
->                  * If the desired CPU (where last recvmsg was done) is
-> --
-> 2.37.3
->
+Just to be sure I understand this correctly: the idea is that with
+READ/WRITE_ONCE annotations, we can dump the qdisc options without
+taking the RTNL lock. This means that a dump not be consistent across a
+concurrent reconfig that changes multiple parameters, but each parameter
+will be either the new or the old value. Right?
+
+-Toke
+
 
