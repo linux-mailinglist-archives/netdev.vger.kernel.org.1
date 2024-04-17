@@ -1,85 +1,56 @@
-Return-Path: <netdev+bounces-88696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FC668A841D
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:18:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D4B58A8433
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:20:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 763D41C20FCF
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 13:18:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56B5228562F
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 13:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6093B13DDAE;
-	Wed, 17 Apr 2024 13:18:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BE9813E8BD;
+	Wed, 17 Apr 2024 13:19:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B5113C3E0;
-	Wed, 17 Apr 2024 13:18:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BDF13D290;
+	Wed, 17 Apr 2024 13:19:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713359926; cv=none; b=VH6GWKU+19IEllNnbNB37hYWcATvwO6jbcjdBEp2LzHIU/lD0ARJm3JcHqjFE1WyZn45DTyQkZpYsQ5PkgKJzzHHprQKE05+2J33DB7kTG2SK9v+8xPQ1vapRWC4V7OhoHDqB+KCzhm/hYPQMS1QVQnH6mVpAGyTNMOATNepgRU=
+	t=1713359992; cv=none; b=tlXcMjKbZJD8beTDoHa9jCvPMMXbuVYbHmf3wf5JQynFFPg/IMNDWNP3y56hdHw59G05FgulJiyFlkafF/R4LZx/TNWIgOSG/kutOvG4FXw6qBo/CuobB8BqsIB2+7/qNlV1sB/GyXX7JKdINM31mIqofVd8p/JPegWwvtawZsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713359926; c=relaxed/simple;
-	bh=zDIOvTM9o+jTTu1NNu/JxBSI7hr2E1MIf2PNjleRc6M=;
+	s=arc-20240116; t=1713359992; c=relaxed/simple;
+	bh=GOm/T8OG4KNEggUOzjxW+PjsIIqS6Eb/AF7ttlgIRlM=;
 	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=E+vqVJ3DJFADe/ZYNvQBNRRJpDHVa85yCQS3098DJ4Zhn2MBEVtbaqS0cwQ8LNv9j998iPUI7ymWAaUbB4ZHXxmNeOZxYlbbw3m475uWaNf8KfnbZ0UJBgRuOc5WO/NVyGU9eekzGRa02luZO14qIVzwcV28H4XfQfXjqExKh1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+	 In-Reply-To:Content-Type; b=S7emLtN38F4rm5/svHKPUzWhRpYjJJGAPLzE2lPRpIAJpkFJ4ICCrHrZ/tfH/qCfoCnqgFQ0zRlrVNvUCPe7rDIs5kp7zc4YX9Dr55gEwlyca0XMWbusrLQY1N95Bj6YIIjQKfTz1KHpXy7gY0WoIDUcTy74+mKLaFFgMVBb6xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4VKLxQ3gh3zXlNZ;
-	Wed, 17 Apr 2024 21:15:22 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VKLzD0SGRztT23;
+	Wed, 17 Apr 2024 21:16:56 +0800 (CST)
 Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 812AD140485;
-	Wed, 17 Apr 2024 21:18:41 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id BD4A71800C3;
+	Wed, 17 Apr 2024 21:19:48 +0800 (CST)
 Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
  (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Wed, 17 Apr
- 2024 21:18:41 +0800
-Subject: Re: [PATCH net-next v2 07/15] mm: page_frag: add '_va' suffix to
- page_frag API
+ 2024 21:19:48 +0800
+Subject: Re: [PATCH net-next v2 09/15] mm: page_frag: reuse MSB of 'size'
+ field for pfmemalloc
 To: Alexander H Duyck <alexander.duyck@gmail.com>, <davem@davemloft.net>,
 	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Jeroen de Borst
-	<jeroendb@google.com>, Praveen Kaligineedi <pkaligineedi@google.com>,
-	Shailend Chand <shailend@google.com>, Eric Dumazet <edumazet@google.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Sunil Goutham <sgoutham@marvell.com>, Geetha
- sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>,
-	hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
-	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith
- Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
-	<hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni
-	<kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
- Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong
- Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
-	<jolsa@kernel.org>, David Howells <dhowells@redhat.com>, Marc Dionne
-	<marc.dionne@auristor.com>, Chuck Lever <chuck.lever@oracle.com>, Jeff Layton
-	<jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga Kornievskaia
-	<kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
-	<tom@talpey.com>, Trond Myklebust <trond.myklebust@hammerspace.com>, Anna
- Schumaker <anna@kernel.org>, <intel-wired-lan@lists.osuosl.org>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-mediatek@lists.infradead.org>,
-	<linux-nvme@lists.infradead.org>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <linux-mm@kvack.org>,
-	<bpf@vger.kernel.org>, <linux-afs@lists.infradead.org>,
-	<linux-nfs@vger.kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Andrew Morton
+	<akpm@linux-foundation.org>, <linux-mm@kvack.org>
 References: <20240415131941.51153-1-linyunsheng@huawei.com>
- <20240415131941.51153-8-linyunsheng@huawei.com>
- <18ca19fa64267b84bee10473a81cbc63f53104a0.camel@gmail.com>
+ <20240415131941.51153-10-linyunsheng@huawei.com>
+ <37d012438d4850c3d7090e784e09088d02a2780c.camel@gmail.com>
 From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <74e7259a-c462-e3c1-73ac-8e3f49fb80b8@huawei.com>
-Date: Wed, 17 Apr 2024 21:18:40 +0800
+Message-ID: <8b7361c2-6f45-72e8-5aca-92e8a41a7e5e@huawei.com>
+Date: Wed, 17 Apr 2024 21:19:48 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
  Thunderbird/52.2.0
 Precedence: bulk
@@ -88,40 +59,62 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <18ca19fa64267b84bee10473a81cbc63f53104a0.camel@gmail.com>
+In-Reply-To: <37d012438d4850c3d7090e784e09088d02a2780c.camel@gmail.com>
 Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  dggpemm500005.china.huawei.com (7.185.36.74)
 
-On 2024/4/17 0:12, Alexander H Duyck wrote:
+On 2024/4/17 0:22, Alexander H Duyck wrote:
 > On Mon, 2024-04-15 at 21:19 +0800, Yunsheng Lin wrote:
->> Currently most of the API for page_frag API is returning
->> 'virtual address' as output or expecting 'virtual address'
->> as input, in order to differentiate the API handling between
->> 'virtual address' and 'struct page', add '_va' suffix to the
->> corresponding API mirroring the page_pool_alloc_va() API of
->> the page_pool.
+>> The '(PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)' case is for the
+>> system with page size less than 32KB, which is 0x8000 bytes
+>> requiring 16 bits space, change 'size' to 'size_mask' to avoid
+>> using the MSB, and change 'pfmemalloc' field to reuse the that
+>> MSB, so that we remove the orginal space needed by 'pfmemalloc'.
+>>
+>> For another case, the MSB of 'offset' is reused for 'pfmemalloc'.
 >>
 >> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+>> ---
+>>  include/linux/page_frag_cache.h | 13 ++++++++-----
+>>  mm/page_frag_cache.c            |  5 +++--
+>>  2 files changed, 11 insertions(+), 7 deletions(-)
+>>
+>> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
+>> index fe5faa80b6c3..40a7d6da9ef0 100644
+>> --- a/include/linux/page_frag_cache.h
+>> +++ b/include/linux/page_frag_cache.h
+>> @@ -12,15 +12,16 @@ struct page_frag_cache {
+>>  	void *va;
+>>  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+>>  	__u16 offset;
+>> -	__u16 size;
+>> +	__u16 size_mask:15;
+>> +	__u16 pfmemalloc:1;
+>>  #else
+>> -	__u32 offset;
+>> +	__u32 offset:31;
+>> +	__u32 pfmemalloc:1;
+>>  #endif
 > 
-> This patch is a total waste of time. By that logic we should be
-> renaming __get_free_pages since it essentially does the same thing.
-> 
-> This just seems like more code changes for the sake of adding code
-> changes rather than fixing anything. In my opinion it should be dropped
-> from the set.
+> This seems like a really bad idea. Using a bit-field like this seems
+> like a waste as it means that all the accesses now have to add
+> additional operations to access either offset or size. It wasn't as if
+> this is an oversized struct, or one that we are allocating a ton of. As
+> such I am not sure why we need to optmize for size like this.
 
-The rename is to support different use case as mentioned below in patch
-14:
-"Depending on different use cases, callers expecting to deal with va, page or
-both va and page for them may call page_frag_alloc_va*, page_frag_alloc_pg*,
-or page_frag_alloc* API accordingly."
-
-Naming is hard anyway, I am open to better API naming for the above use cases.
+For the old 'struct page_frag' use case, there is one 'struct page_frag'
+for every socket and task_struct, there may be tens of thousands of
+them even in a 32 bit sysmem, which might mean a lof of memory even for
+a single byte saving, see patch 13.
 
 > 
-> .
-> 
+>>  	/* we maintain a pagecount bias, so that we dont dirty cache line
+>>  	 * containing page->_refcount every time we allocate a fragment.
+>>  	 */
+>>  	unsigned int		pagecnt_bias;
+>> -	bool pfmemalloc;
+>>  };
 
