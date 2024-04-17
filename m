@@ -1,92 +1,106 @@
-Return-Path: <netdev+bounces-88758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51D1C8A86A3
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 16:51:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CED628A86BF
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 16:53:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6888C1C21787
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 14:51:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0700F1C21904
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 14:53:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0284713F44A;
-	Wed, 17 Apr 2024 14:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBB081419B3;
+	Wed, 17 Apr 2024 14:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WnyYWBfP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F0B142E6D
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 14:49:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACC322334
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 14:52:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713365345; cv=none; b=fP28Od9UU1aYa0bKs3c+fIMxfpjkTbSUJn4CBCAuuYpX+o/WdYkm4pFXHQHILFLwrL8XTVzswkyuj/ISaGG10j3OsB98DcQZKha4zoRBTvcOldKtlwLCxVcADLXfCknEBxDPxCjPv4bplcYBAQhkOAAlUNe4GRilxTdnxJW4hLA=
+	t=1713365576; cv=none; b=pDlc7JiZ8MMM7YxVlz5byvYiIRCjppNg8r+Miio/Afi+K2GG0VGOmn0fWA473jJJ5ZNW4mqR3qW3IcUsyJ/0CTa47qXayTNfEM/xDYk2P42Ivy7bLzAMjGcvLxYanh3M6gmAMfiPuWoU+dG1w2hTZw2ucydkEkBlWTRQ9keHpS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713365345; c=relaxed/simple;
-	bh=arYAiaCB5bQDcWyY6Fg5A6dpdQ7egLODjHN2gDiOR4c=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=qZgD39BIxfAOliEOka8grWIiEqo/ArUZAYGE3PTN3vtVtazYs5KhODEsJ0F3UW+a4NRyqzgE1AsBizC6WFIf7KOM1PsO3zE4QqUojxhav3bzKhDoEHgAaYGMKpcpW2R6bpLjeveLgew9UOOOs5WQpDI1gnR7HKl6JKuPqr8/ByY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7d9fde69c43so63074839f.1
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 07:49:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713365344; x=1713970144;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9iLXNunqSNr8QRXcPEHq58jPUvBUNMYnjkVj+0AeDws=;
-        b=heGJaB1B/vxorAjqXrRPbANM1DeaFw4zSgaGGSocGy6msq/BkXuv4ceyTEfF+3dZzF
-         OAmygYfKx353uMfUPaf30fC8KxS2Hmb3wbAuve0oc7akQeJr3KYvapvuEWTT1Y49FAfF
-         cZJDmyD8ujpD8YLeaUpyBmsJrtY4kDiKv8H/K01rzGHlQV7DqxNfInwn57ZrDQJDIusr
-         +UsUoAJwYUE8xUtJ22bXLbile60TEN9VCpX2dhWn3ajIRIfbiIt07zSOfzFi+oxjoPJ6
-         afVJ7chwRgP0rPpM9KePev8C/v49o5d8USftk/x75KuSVh0qh3sbCLGCikE8pDXhqqhL
-         N3zQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXVlZuePk6joO6rQ5FnkTwjVrR2VijeTym9A3sH7/WU+8a7MujTQ3sZWJ9rxCdqSSNjsDdcHnTk3WRWpI4qXceLJBppROSq
-X-Gm-Message-State: AOJu0YykEc/bxJwcs8pGyM4Y7+LKzoqrElVCFm6eBFTkul2Aee1taijx
-	2hlCbS3Nop1Y+/5P1AiBK88Zon6dbKzMK2P7R+m0XbfsSGxe86J13Ei/BBlXP0IOv/S7FuOcXij
-	8PR830l3cnu8GE8BztfwT9W9xE6wPAvri1jqJvjw7L6XaFNsJKTkcBdA=
-X-Google-Smtp-Source: AGHT+IG5KPWeJ6k7l1iEickd9TA7War8sUCpO4E/yTKozoCtWTn4mh1KzRpVsk6ZYxw9Y0eF2w0SQnmEkVvYFKet3EqQL+vJRrjo
+	s=arc-20240116; t=1713365576; c=relaxed/simple;
+	bh=o/WZVlqzqs+cchBVEDszJLyTbJFnJswqUxOSpCM7tSg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=l+epf/I6FKsjGA9bia7T24XwKOSjZlb7i54dUDGxwjNah8U6vE0sWgJ9BHo6w3vUDmaAQb87NTlsOqnItJWevei57etAmLSfVDK3aKqqTqu+f3bEdACC1wJlv8DFo30n+/r23/KELBAmtTEma9CgKrNPyYBzg+MeuRPE1QwuSKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WnyYWBfP; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713365574;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=o/WZVlqzqs+cchBVEDszJLyTbJFnJswqUxOSpCM7tSg=;
+	b=WnyYWBfPf2BgpsaA9QyRdJH0FWBsO9M3iX6vM1bnIJQQQtzQNV2oqXJ/ZP/cNXwxq/brTw
+	/I5wDd7pNEZB7zd1qc8hTdK42F6iNKVmtWK+mHUdZQzEAoI0P/7l4OxsA62hMdUbTn3GV9
+	gfMaBfZZWz/VCWuDum0VjBwBeVRHBDk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-590-hPO2HUuBOLC0GHQtplWUQA-1; Wed, 17 Apr 2024 10:52:50 -0400
+X-MC-Unique: hPO2HUuBOLC0GHQtplWUQA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4B051104B502;
+	Wed, 17 Apr 2024 14:52:50 +0000 (UTC)
+Received: from RHTRH0061144 (dhcp-17-72.bos.redhat.com [10.18.17.72])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id CEC881121306;
+	Wed, 17 Apr 2024 14:52:49 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Adrian Moreno <amorenoz@redhat.com>
+Cc: netdev@vger.kernel.org,  linux-kernel@vger.kernel.org (open list),
+  Paolo Abeni <pabeni@redhat.com>,  Eric Dumazet <edumazet@google.com>,
+  dev@openvswitch.org (open list:OPENVSWITCH),
+  linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
+  Pravin B Shelar <pshelar@ovn.org>,  "David S. Miller"
+ <davem@davemloft.net>,  Shuah Khan <shuah@kernel.org>,  Jakub Kicinski
+ <kuba@kernel.org>
+Subject: Re: [PATCH net-next] selftests: openvswitch: Fix escape chars in
+ regexp.
+In-Reply-To: <20240416090913.2028475-1-amorenoz@redhat.com> (Adrian Moreno's
+	message of "Tue, 16 Apr 2024 11:09:13 +0200")
+References: <20240416090913.2028475-1-amorenoz@redhat.com>
+Date: Wed, 17 Apr 2024 10:52:49 -0400
+Message-ID: <f7t7cgwavni.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:8529:b0:482:c2c6:65b with SMTP id
- is41-20020a056638852900b00482c2c6065bmr1093800jab.1.1713365343174; Wed, 17
- Apr 2024 07:49:03 -0700 (PDT)
-Date: Wed, 17 Apr 2024 07:49:03 -0700
-In-Reply-To: <87il0huixn.fsf@toke.dk>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a693f106164bf4c7@google.com>
-Subject: Re: [syzbot] [bpf?] [net?] general protection fault in dev_map_enqueue
-From: syzbot <syzbot+af9492708df9797198d6@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, eadavis@qq.com, eddyz87@gmail.com, 
-	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com, 
-	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	toke@kernel.org, yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-Hello,
+Adrian Moreno <amorenoz@redhat.com> writes:
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+> Character sequences starting with `\` are interpreted by python as
+> escaped Unicode characters. However, they have other meaning in
+> regular expressions (e.g: "\d").
+>
+> It seems Python >= 3.12 starts emitting a SyntaxWarning when these
+> escaped sequences are not recognized as valid Unicode characters.
+>
+> An example of these warnings:
+>
+> tools/testing/selftests/net/openvswitch/ovs-dpctl.py:505:
+> SyntaxWarning: invalid escape sequence '\d'
+>
+> Fix all the warnings by flagging literals as raw strings.
+>
+> Signed-off-by: Adrian Moreno <amorenoz@redhat.com>
+> ---
 
-Reported-and-tested-by: syzbot+af9492708df9797198d6@syzkaller.appspotmail.com
+Thanks, Adrian.
 
-Tested on:
+Reviewed-by: Aaron Conole <aconole@redhat.com>
 
-commit:         443574b0 riscv, bpf: Fix kfunc parameters incompatibil..
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git
-console output: https://syzkaller.appspot.com/x/log.txt?x=125ea0e3180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
-dashboard link: https://syzkaller.appspot.com/bug?extid=af9492708df9797198d6
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=156227cd180000
-
-Note: testing is done by a robot and is best-effort only.
 
