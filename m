@@ -1,140 +1,185 @@
-Return-Path: <netdev+bounces-88634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 382858A7EEB
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 10:59:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 507E98A7EF8
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:00:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B0058B21812
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 08:59:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CBA3280E8D
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7139C12C469;
-	Wed, 17 Apr 2024 08:55:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E60212837C;
+	Wed, 17 Apr 2024 09:00:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W7SY/qSD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OoxBrM1T"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92DFF1327ED
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 08:55:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D466A353
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 09:00:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713344146; cv=none; b=VtxU3QaHrGTnJfQHBoEIHyzWQANij5gApKycoYJn+ShHk2DpraF9aCsQsSFia2I8+0kPYJjvzG9c9yXeS+pnPZPuFoYPpn3jjgaYsEICLax3ossu+YItf0ZwyDSe/4n45bmDhDwHQPJwuembVjfscB0jwlFLub7T91+gUhDM7ZE=
+	t=1713344451; cv=none; b=nHKfTsHOtj0UuHmRJ6hiZtwHkLRy20+aug89ZVWPZCkLXvA6fRnDuL99A1ITc330qtPCdf06rRb9VLZpTumAV0ICu1c/Lyf6UC1lBq4psFHDrK8KhihAGxodNPOszC1Hcs3tC5Ub+uE44WFDgahcbgjx3s3TeNpdEuXnIU8PhbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713344146; c=relaxed/simple;
-	bh=3KtL8v+/z1deeegmlCslJhNyGqs44qnUNBL+H3cQXis=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jlDvJ9nmvYJMQ9Fsk5I8Uv2oSfe0V9PRGI9LbNvB518dYW1t982G8l0XvBONcVCftlVwKrU7YvmfSb/2KxHRNQ9FeyU0OTAJy+uMtStyvwB8Cts2Pz9hbQihQSfX0C/8sc6XmzeKvxm4vRscxjexbxnWa2NmU4EwIywfOTSoPAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W7SY/qSD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713344142;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=pQ0sSQeAADn6AXaSn6AcvMvh/Ro6ED1iNBV8xbxjGO0=;
-	b=W7SY/qSD64CVfysefiRJI30dHFZ9lPxc+O2yYeXRWcadpunHVlC9lr12QzmeISv/K4SH4K
-	05uY6ktDkooRd1qiuEFoDqTVEQA52dShSEKk+KEvwmfpHu/9DJfhGf5nCvch7tZKZaA+P/
-	dAsfKzUG6OF1prftDDztTD6ojfwqGc0=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-512-VBJASLQmOlWdBbek0Y9VbQ-1; Wed,
- 17 Apr 2024 04:55:39 -0400
-X-MC-Unique: VBJASLQmOlWdBbek0Y9VbQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ABD9C1C4C394;
-	Wed, 17 Apr 2024 08:55:38 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.39.193.59])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2F55A492BC7;
-	Wed, 17 Apr 2024 08:55:36 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>,
-	stable@vger.kernel.org,
-	Jarkko Palviainen <jarkko.palviainen@gmail.com>
-Subject: [PATCH v2] net: usb: ax88179_178a: avoid writing the mac address before first reading
-Date: Wed, 17 Apr 2024 10:55:13 +0200
-Message-ID: <20240417085524.219532-1-jtornosm@redhat.com>
+	s=arc-20240116; t=1713344451; c=relaxed/simple;
+	bh=8gSHbgbo0AKKIkxQVx1xcqgZ4ykmwU7ctyGAbe4xG+E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WbJlmPfwutMWYNn9hmd4gX9MsgoV6oKrNL8jX2smM6kpLnjuWOORLo1vPRRNmZR/cQPU0mLjpJW7A1tuIeFhbQvuT4HgskCFmKImVZGPBohqb2sOZKkiXW3L43QNgXVz9deuuJlzUkr7jtj7kQL60eHvt9CCKCeOJX9qeJJQNPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OoxBrM1T; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BE32C072AA;
+	Wed, 17 Apr 2024 09:00:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713344450;
+	bh=8gSHbgbo0AKKIkxQVx1xcqgZ4ykmwU7ctyGAbe4xG+E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OoxBrM1TGbkShYKPxiGcTCiTBhhHEsDJekg2aytVHK9r57G664DeF16mTyUp397hs
+	 yIEJ0n+R5H+jUHV42zl0dytg5GQ1bB8eFGefvkmWv4PPDc317hWxavIL7/bRZmbMfW
+	 PV+w5RZO0P5Ol8lZsjB2luR2jQAf89Y1wK4GFMwQUBCUsivCmqCbB67E3ZmR1sAdX+
+	 fDtcrLQugyHt9kl+qsM0ce8pyXQC9Oi6RT2e1oSf97chpFh2Lv5iD3gDAS/kDpNysI
+	 fmy/mBZfBdQcfgVAgWStX26SI+bSNZ6lSospTU7p37qFEq37HvS+Kf9imGOpudBA+9
+	 DJI+ZsxfEw7dQ==
+Date: Wed, 17 Apr 2024 10:00:46 +0100
+From: Simon Horman <horms@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next 01/14] net_sched: sch_fq: implement lockless
+ fq_dump()
+Message-ID: <20240417090046.GB3846178@kernel.org>
+References: <20240415132054.3822230-1-edumazet@google.com>
+ <20240415132054.3822230-2-edumazet@google.com>
+ <20240416181915.GT2320920@kernel.org>
+ <CANn89i+X3zkk-RwRVuMursG-RY+R6P29AWK-pjjVuNKT91VsJw@mail.gmail.com>
+ <CANn89i+iNKvCv+RPtCa4KOY9DCEQJfGP9xHSedFUbWZHt2DSFw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+In-Reply-To: <CANn89i+iNKvCv+RPtCa4KOY9DCEQJfGP9xHSedFUbWZHt2DSFw@mail.gmail.com>
 
-After the commit d2689b6a86b9 ("net: usb: ax88179_178a: avoid two
-consecutive device resets"), reset operation, in which the default mac
-address from the device is read, is not executed from bind operation and
-the random address, that is pregenerated just in case, is direclty written
-the first time in the device, so the default one from the device is not
-even read. This writing is not dangerous because is volatile and the
-default mac address is not missed.
+On Wed, Apr 17, 2024 at 10:45:09AM +0200, Eric Dumazet wrote:
+> On Tue, Apr 16, 2024 at 8:33 PM Eric Dumazet <edumazet@google.com> wrote:
+> >
+> > On Tue, Apr 16, 2024 at 8:19 PM Simon Horman <horms@kernel.org> wrote:
+> > >
+> > > On Mon, Apr 15, 2024 at 01:20:41PM +0000, Eric Dumazet wrote:
+> > > > Instead of relying on RTNL, fq_dump() can use READ_ONCE()
+> > > > annotations, paired with WRITE_ONCE() in fq_change()
+> > > >
+> > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > > ---
+> > > >  net/sched/sch_fq.c | 96 +++++++++++++++++++++++++++++-----------------
+> > > >  1 file changed, 60 insertions(+), 36 deletions(-)
+> > > >
+> > > > diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
+> > > > index cdf23ff16f40bf244bb822e76016fde44e0c439b..934c220b3f4336dc2f70af74d7758218492b675d 100644
+> > > > --- a/net/sched/sch_fq.c
+> > > > +++ b/net/sched/sch_fq.c
+> > > > @@ -888,7 +888,7 @@ static int fq_resize(struct Qdisc *sch, u32 log)
+> > > >               fq_rehash(q, old_fq_root, q->fq_trees_log, array, log);
+> > > >
+> > > >       q->fq_root = array;
+> > > > -     q->fq_trees_log = log;
+> > > > +     WRITE_ONCE(q->fq_trees_log, log);
+> > > >
+> > > >       sch_tree_unlock(sch);
+> > > >
+> > > > @@ -931,7 +931,7 @@ static void fq_prio2band_compress_crumb(const u8 *in, u8 *out)
+> > > >
+> > > >       memset(out, 0, num_elems / 4);
+> > > >       for (i = 0; i < num_elems; i++)
+> > > > -             out[i / 4] |= in[i] << (2 * (i & 0x3));
+> > > > +             out[i / 4] |= READ_ONCE(in[i]) << (2 * (i & 0x3));
+> > > >  }
+> > > >
+> > >
+> > > Hi Eric,
+> > >
+> > > I am a little unsure about the handling of q->prio2band in this patch.
+> > >
+> > > It seems to me that fq_prio2band_compress_crumb() is used to
+> > > to store values in q->prio2band, and is called (indirectly)
+> > > from fq_change() (and directly from fq_init()).
+> > >
+> > > While fq_prio2band_decompress_crumb() is used to read values
+> > > from q->prio2band, and is called from fq_dump().
+> > >
+> > > So I am wondering if should use WRITE_ONCE() when storing elements
+> > > of out. And fq_prio2band_decompress_crumb should use READ_ONCE when
+> > > reading elements of in.
+> >
+> > Yeah, you are probably right, I recall being a bit lazy on this part,
+> > thanks !
+> 
+> I will squash in V2 this part :
+> 
+> diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
+> index 934c220b3f4336dc2f70af74d7758218492b675d..238974725679327b0a0d483c011e15fc94ab0878
+> 100644
+> --- a/net/sched/sch_fq.c
+> +++ b/net/sched/sch_fq.c
+> @@ -106,6 +106,8 @@ struct fq_perband_flows {
+>         int                 quantum; /* based on band nr : 576KB, 192KB, 64KB */
+>  };
+> 
+> +#define FQ_PRIO2BAND_CRUMB_SIZE ((TC_PRIO_MAX + 1) >> 2)
+> +
+>  struct fq_sched_data {
+>  /* Read mostly cache line */
+> 
+> @@ -122,7 +124,7 @@ struct fq_sched_data {
+>         u8              rate_enable;
+>         u8              fq_trees_log;
+>         u8              horizon_drop;
+> -       u8              prio2band[(TC_PRIO_MAX + 1) >> 2];
+> +       u8              prio2band[FQ_PRIO2BAND_CRUMB_SIZE];
+>         u32             timer_slack; /* hrtimer slack in ns */
+> 
+>  /* Read/Write fields. */
+> @@ -159,7 +161,7 @@ struct fq_sched_data {
+>  /* return the i-th 2-bit value ("crumb") */
+>  static u8 fq_prio2band(const u8 *prio2band, unsigned int prio)
+>  {
+> -       return (prio2band[prio / 4] >> (2 * (prio & 0x3))) & 0x3;
+> +       return (READ_ONCE(prio2band[prio / 4]) >> (2 * (prio & 0x3))) & 0x3;
+>  }
 
-In order to avoid this and keep the simplification to have only one
-reset and reduce the delays, restore the reset from bind operation and
-remove the reset that is commanded from open operation. The behavior is
-the same but everything is ready for usbnet_probe.
+Thanks Eric,
 
-Tested with ASIX AX88179 USB Gigabit Ethernet devices.
-Restore the old behavior for the rest of possible devices because I don't
-have the hardware to test.
+assuming that it is ok for this version of fq_prio2band() to run
+from fq_enqueue(), this update looks good to me.
 
-cc: stable@vger.kernel.org # 6.6+
-Fixes: d2689b6a86b9 ("net: usb: ax88179_178a: avoid two consecutive device resets")
-Reported-by: Jarkko Palviainen <jarkko.palviainen@gmail.com>
-Signed-off-by: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
----
-v2:
-  - Restore reset from bind operation to avoid problems with usbnet_probe.
-v1: https://lore.kernel.org/netdev/20240410095603.502566-1-jtornosm@redhat.com/
-
- drivers/net/usb/ax88179_178a.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/usb/ax88179_178a.c b/drivers/net/usb/ax88179_178a.c
-index 69169842fa2f..a493fde1af3f 100644
---- a/drivers/net/usb/ax88179_178a.c
-+++ b/drivers/net/usb/ax88179_178a.c
-@@ -1316,6 +1316,8 @@ static int ax88179_bind(struct usbnet *dev, struct usb_interface *intf)
- 
- 	netif_set_tso_max_size(dev->net, 16384);
- 
-+	ax88179_reset(dev);
-+
- 	return 0;
- }
- 
-@@ -1694,7 +1696,6 @@ static const struct driver_info ax88179_info = {
- 	.unbind = ax88179_unbind,
- 	.status = ax88179_status,
- 	.link_reset = ax88179_link_reset,
--	.reset = ax88179_reset,
- 	.stop = ax88179_stop,
- 	.flags = FLAG_ETHER | FLAG_FRAMING_AX,
- 	.rx_fixup = ax88179_rx_fixup,
-@@ -1707,7 +1708,6 @@ static const struct driver_info ax88178a_info = {
- 	.unbind = ax88179_unbind,
- 	.status = ax88179_status,
- 	.link_reset = ax88179_link_reset,
--	.reset = ax88179_reset,
- 	.stop = ax88179_stop,
- 	.flags = FLAG_ETHER | FLAG_FRAMING_AX,
- 	.rx_fixup = ax88179_rx_fixup,
--- 
-2.44.0
-
+> 
+>  /*
+> @@ -927,11 +929,15 @@ static const struct nla_policy
+> fq_policy[TCA_FQ_MAX + 1] = {
+>  static void fq_prio2band_compress_crumb(const u8 *in, u8 *out)
+>  {
+>         const int num_elems = TC_PRIO_MAX + 1;
+> +       u8 tmp[FQ_PRIO2BAND_CRUMB_SIZE];
+>         int i;
+> 
+> -       memset(out, 0, num_elems / 4);
+> +       memset(tmp, 0, sizeof(tmp));
+>         for (i = 0; i < num_elems; i++)
+> -               out[i / 4] |= READ_ONCE(in[i]) << (2 * (i & 0x3));
+> +               tmp[i / 4] |= in[i] << (2 * (i & 0x3));
+> +
+> +       for (i = 0; i < FQ_PRIO2BAND_CRUMB_SIZE; i++)
+> +               WRITE_ONCE(out[i], tmp[i]);
+>  }
+> 
+>  static void fq_prio2band_decompress_crumb(const u8 *in, u8 *out)
+> 
 
