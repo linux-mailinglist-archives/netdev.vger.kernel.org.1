@@ -1,83 +1,105 @@
-Return-Path: <netdev+bounces-88715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A3308A8540
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:50:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 873EA8A8559
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:53:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 359DC28142D
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 13:50:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F57FB27A30
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 13:53:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78EC414039D;
-	Wed, 17 Apr 2024 13:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F531411D9;
+	Wed, 17 Apr 2024 13:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lc2lJrQA"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="MyxQToss"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B9014037E;
-	Wed, 17 Apr 2024 13:50:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609DC14039D;
+	Wed, 17 Apr 2024 13:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713361827; cv=none; b=dzv52flN1G9wOqfdllWZ+xKnkCK5qDYm8adGJ3npmWbuxvlFKANQEeTi3f/fKMUV2FKOfzOOVX5w8sUpG7X1CG/liE3WR0pYM4FPrRGL1pbYRD6ZgqxMFgTHscD8Mh1DR1RWQ3Kmlh7kha4GtvQ1o5f6fKboP4tLk/Dd3Dteeh0=
+	t=1713361967; cv=none; b=R1uQVmM4VxNgctfDU5sAe0zD8jz1pwx1nJZg8rlbFCXYVNVCkAyomao/nzH2DoKvT9rtQiHhDq51D/+UwFtA2zm4wLAg0+Bm1VwqNz64wHwvr+NRuJkraWuNICKKDSUCmqaoe6TFbTMPfpdBnh+n5cQArZumLbBQ4ZpRDhxWzDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713361827; c=relaxed/simple;
-	bh=S0wKCInWk2bMmf+CEL3Qe4U9QJ44+BgpeCC/onWUcto=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C21fzte0gxeMFvPkxO7fghcdMpKTjQdYiCYLK9IIVrQO8ANCbAd9/ue4n+xt0vzNwAYo+JmLz3W/fY7cf7HiqwolSlE5HNKjCZkJdDT60TI53ATVY5MXg1H8tBgJ/mWPISMzONVMwTNu36R/uPx1K6MKnSyHLd78/YGfkNk00/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lc2lJrQA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5397FC072AA;
-	Wed, 17 Apr 2024 13:50:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713361826;
-	bh=S0wKCInWk2bMmf+CEL3Qe4U9QJ44+BgpeCC/onWUcto=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Lc2lJrQAiFIls3X5Omox1lve0sdVoy22rr6PUNZteaikW3bKmjIG8i4aRPNlVfWKb
-	 mOect5c/BDDVX+ua808coEzi/+lQyYJyo9xAV0Ca2Xfu7nniLlPp2aJAD8PUGxfsoF
-	 s7BNBzi+gL5M5qMlqi4hPBfpmbXYh47z3b45ZN+w1LugeoyyezClnMr4KBQYJ3KcVl
-	 s1BoZWJd1OJkrS+7F4IGxjqqVuEzQ4A4C63AnPoZjuS9uJn7AdfKJK7E3v0MHCZLEy
-	 uTj1g/8STa3fTkNzK/k7KNPULq4z4ZtfiGabyYYpVgP69u9yWv6XKBw+hN5wyPzgPw
-	 8S1DdkNWsPzTg==
-Date: Wed, 17 Apr 2024 06:50:25 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
- <jiri@resnulli.us>, Jacob Keller <jacob.e.keller@intel.com>, Pablo Neira
- Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v3 3/4] tools/net/ynl: Handle acks that use
- req_value
-Message-ID: <20240417065025.678763bb@kernel.org>
-In-Reply-To: <m2mspsgnj9.fsf@gmail.com>
-References: <20240416193215.8259-1-donald.hunter@gmail.com>
-	<20240416193215.8259-4-donald.hunter@gmail.com>
-	<20240416191016.5072e144@kernel.org>
-	<m2mspsgnj9.fsf@gmail.com>
+	s=arc-20240116; t=1713361967; c=relaxed/simple;
+	bh=dvs8rmkpjRbTlCQkdBXUSnIfhTY7ofWCgT1rCrbizXU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mDW7MN60CetZVDl5AgRJ6gq6kkyTSXCTqij7X6cQJG9CjOpM/qLAkTEJFT2FWDr33bKHPpmWNyQWstuJjn0bIZM0wXVHkZp93GWzISYiNnXJRBzqzAYYM3qBeKDhGWBBBtvS0WP+kW0D6ZGn4VzqSVo+UH8Zg9o+nOAM+iJgCD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=MyxQToss; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id DCAFA600A7;
+	Wed, 17 Apr 2024 13:52:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1713361963;
+	bh=dvs8rmkpjRbTlCQkdBXUSnIfhTY7ofWCgT1rCrbizXU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=MyxQTossvwiZE6WUOuoKK5bTFXhKpKpktRXUUPeOLoblR/6RPr8n/UFQBZUgkuorZ
+	 sh8wBhW9kAt+tQdz2YVOCiQjKnEYncE1SMzmvl1UOxwOBrKj8sKBi3AUqDbnAF0/2r
+	 Gko18E0QzVPb4XKQ7CLJ9JHO+6sx2NnADzg2gjw3202Q4unjlv4BwmLGL9oz/qq9X9
+	 NNGfiaC2MrZC7vS6Lr+Wj2mbcXvcDL6Ms5IsHoKoxJkFm5iRxYWga6hrtPMeHF9mx0
+	 8rN6dZRDi2ach9xAjFsPSL5GdcmCKR4RGj6A1YpOGB5akL3+B+Npf5sdmHyXGE1xEY
+	 ypmuBQKAfdosw==
+Received: by x201s (Postfix, from userid 1000)
+	id 816AA203AC4; Wed, 17 Apr 2024 13:51:15 +0000 (UTC)
+From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
+To: netdev@vger.kernel.org
+Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>
+Subject: [PATCH net-next] net/mlx5e: flower: check for unsupported control flags
+Date: Wed, 17 Apr 2024 13:51:09 +0000
+Message-ID: <20240417135110.99900-1-ast@fiberby.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, 17 Apr 2024 13:51:38 +0100 Donald Hunter wrote:
-> > On Tue, 16 Apr 2024 20:32:14 +0100 Donald Hunter wrote:  
-> >> The nfnetlink family uses the directional op model but errors get
-> >> reported using the request value instead of the reply value.  
-> >
-> > What's an error in this case ? "Normal" errors come via NLMSG_ERROR  
-> 
-> Thanks for pointing out what should have been obvious. Looking at it
-> again today, I realise I missed the root cause which was a bug in the
-> extack decoding for directional ops. When I fix that issue, this patch
-> can be dropped.
+Use flow_rule_is_supp_control_flags() to reject filters with
+unsupported control flags.
 
-Ha :) Feel free to post v4 as soon as ready.
+In case any unsupported control flags are masked,
+flow_rule_is_supp_control_flags() sets a NL extended
+error message, and we return -EOPNOTSUPP.
+
+Only compile-tested.
+
+Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+---
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+index aeb32cb27182..5019280cfcdd 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_tc.c
+@@ -2819,6 +2819,11 @@ static int __parse_cls_flower(struct mlx5e_priv *priv,
+ 			else
+ 				*match_level = MLX5_MATCH_L3;
+ 		}
++
++		if (!flow_rule_is_supp_control_flags(FLOW_DIS_IS_FRAGMENT |
++						     FLOW_DIS_FIRST_FRAG,
++						     match.mask->flags, extack))
++			return -EOPNOTSUPP;
+ 	}
+ 
+ 	if (flow_rule_match_key(rule, FLOW_DISSECTOR_KEY_BASIC)) {
+-- 
+2.43.0
+
 
