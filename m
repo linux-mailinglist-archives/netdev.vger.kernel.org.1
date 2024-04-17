@@ -1,201 +1,168 @@
-Return-Path: <netdev+bounces-88760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D26BB8A871D
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 17:11:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D24B88A8744
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 17:18:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8879C280DFD
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:11:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C3091F225E0
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:18:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D235146A6D;
-	Wed, 17 Apr 2024 15:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 310D0146D5E;
+	Wed, 17 Apr 2024 15:18:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d/n9nMdW"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jv0wX1H1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B3213959C;
-	Wed, 17 Apr 2024 15:11:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F0D146D77;
+	Wed, 17 Apr 2024 15:18:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713366688; cv=none; b=fLAABZJMCjBsgm7c1LWO52BJz0rKbafdej7qVpxhLHGM7a0d/OCuwN/mr+Tsjx8wIEshwkHHm3h6K01RP/b5yDh2cCoUSC+YegDrf7fi/v7swXvg15rfBie56636hh+aeWZiEcJeaS89gP45SmL0RYKFttXN91t4PHThPACPxzc=
+	t=1713367097; cv=none; b=OfrvZ4oNIk8n228869t+jn5fLhh3pBVLVu3jbdudmYK043aCbckHT4B9Bblic7yXw9poe0kr19C5geV/nAba1RYuEpvxAuEpKWNfqfIoaUzDbmKOpAyDMGdHpbCrycbmWfwX/Ed0MZ422bCOBS8z/8pvRMI9LeMRn3Wwazh+Gk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713366688; c=relaxed/simple;
-	bh=t47REENBHgTyAJl5sSR4ulw08Cn/48ssyIZyYCkJm68=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=DWk8hEQRcMXQ6HwastscPqU1pfLomFK8NiAFMXF4HHPgjvHpiCoQsqWdhxBXXet4KHXYwGbA6DuKrVBk9x+D7D11h4csxeqgnR3q5q1ddbT5ylxvm7j73u8hPu98nRQTH7IlJP1EnwYooHLdJxlo2nX0Kery/BszQIdiaY5qZGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d/n9nMdW; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6ed20fb620fso4786829b3a.2;
-        Wed, 17 Apr 2024 08:11:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713366685; x=1713971485; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=dpBZLOS2Fuv5Seble3BWO+qJ4xS8G4uoQZKUk1ZQWaE=;
-        b=d/n9nMdW2p7+KUcP04l8N/XO17ounDBIb8OXQjwIwapf+2ZLa1FApEANc5oVHIkzMw
-         AhIN18XG+vDGIkpWXe183Llzq3l4+P2MIiT3Tp6m31k6oeq8f63Xux8ssDgwcQRGVFGk
-         A/Bz/rTr4ZE2T0ggprtPi5UOh1Zz76cESkBz5a0K5NoLhLvQtcM3prILTaaTO/wg5ze9
-         3b5UIBMM2Gx4gFp8lPpYkQ0dMZ2PpTaSONOTgWACG1J2h92ACL3gbxNmYc0+BAoTIyks
-         Zu2ptfAYAX+7vKVjIrboDel4F8T7zcOxQES0vU7NweXbPUSFV7oszHStMcvl28+lrMVq
-         Ivaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713366685; x=1713971485;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dpBZLOS2Fuv5Seble3BWO+qJ4xS8G4uoQZKUk1ZQWaE=;
-        b=JhEmRQGcW4Ndy31sQoZe1ZUZmculsT9zfPlFDMjjb6XfA9O5G67mZ6WA5i7ZNSoqOL
-         zTLLFn2E7yIkiA38nN0LzhJM2Qr3dCm5nzmFxZFA43vzroNoY21Rpkcqw3nHlm1MJUMg
-         jixt7uyJPz7rGPEg1p+LwPG1+/+1ZsJoNxeDGTVN9bwRPIyO38OIiv/T76Tc8ITA+9GC
-         aYMfvqpegend56Si3YtVUSYF+6knqqatwhrxRZFB08Tkkf4myemBjN7WY9qew6EVagqQ
-         rw8j10dgql+/fM5lHtfD1gtmGIifZz199e47Y83oyvUvSXg4oC0IZ35+0+VmFSRgEyxD
-         RIMw==
-X-Forwarded-Encrypted: i=1; AJvYcCX7RT69z9/MAp7XuNBOv7maAZDAhpspwwkfsXdWRZZWAPcdBt6uXUnVLq9U1EFF2jXSIdjHIMoblKLKrU8fwOOSGy8DxVi13jASOnPC
-X-Gm-Message-State: AOJu0YwVkFMpjcUlFE/ehA23TTXCifieM/d+7YLkpW9Zm3K2XYpmU6WH
-	hXUg61Agaon8+/BqIGzwVJoaYup8U9bp4VxByi6h50OttMiPifO1
-X-Google-Smtp-Source: AGHT+IF60I58mUil+yAvrTASGIidkjvHH9ReBEji9jXZNYg8MVFL+W19+1BbY1JcwK3yslsobpUhyg==
-X-Received: by 2002:a17:90b:388c:b0:2a4:7133:7e02 with SMTP id mu12-20020a17090b388c00b002a471337e02mr14723720pjb.35.1713366685168;
-        Wed, 17 Apr 2024 08:11:25 -0700 (PDT)
-Received: from ?IPv6:2605:59c8:43f:400:82ee:73ff:fe41:9a02? ([2605:59c8:43f:400:82ee:73ff:fe41:9a02])
-        by smtp.googlemail.com with ESMTPSA id b9-20020a17090a010900b002a67079c3absm1608837pjb.42.2024.04.17.08.11.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Apr 2024 08:11:24 -0700 (PDT)
-Message-ID: <17066b6a4f941eea3ef567767450b311096da22b.camel@gmail.com>
-Subject: Re: [PATCH net-next v2 09/15] mm: page_frag: reuse MSB of 'size'
- field for pfmemalloc
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org,  pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Morton
-	 <akpm@linux-foundation.org>, linux-mm@kvack.org
-Date: Wed, 17 Apr 2024 08:11:23 -0700
-In-Reply-To: <8b7361c2-6f45-72e8-5aca-92e8a41a7e5e@huawei.com>
-References: <20240415131941.51153-1-linyunsheng@huawei.com>
-	 <20240415131941.51153-10-linyunsheng@huawei.com>
-	 <37d012438d4850c3d7090e784e09088d02a2780c.camel@gmail.com>
-	 <8b7361c2-6f45-72e8-5aca-92e8a41a7e5e@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	s=arc-20240116; t=1713367097; c=relaxed/simple;
+	bh=YHaVPj+iSuEOyB6ZA3xnahzX1PCRmORtT89CkjQ7/BU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CFoQkHxTHXCIr82GuEPiWiRd8KVJKmPBNcwU5f9zMjWBafp3xCXqleNF+5dvmrCo2rJ5v9vyYvRvk4bFw5wZ0gQRtD4N99zbtGdO3j8SFY25vcBakb+hHzieUgQUOHBjQfP3VMpTCzxoEn5MyS6p3Xn6fIPHwN/9tFWaiHF2pok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jv0wX1H1; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43HFGrXc022375;
+	Wed, 17 Apr 2024 15:18:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=vFsflYqoST0FVYmNY0FM+GujFSx1cOAiMV41fi3PiAQ=;
+ b=jv0wX1H1Topyjqsjx5xw8Veh9EEMLY6r+FKZn/uwj/BUT92Bm8lHBSE/ZJlbPPVH2Oyi
+ 0wIytvCfhmZ+jH78huE2McXwv80WgT2sPOxJIViwENhcSbbgC5BNPRAyd+xe4WVUG3s5
+ P/4B+9BfctirQ70slBLxiylbHTJbhnkeNiWsy8Tn8LXFvbxJNqpavXEdZvnDbUWa4zIh
+ DlQjgUI813v41gHWn2avRU+J+5J2L1dzAh/nTkrTXVMKXgUbJuSi3DQ8u2+iQ7JuBzsD
+ 7jjHPE0J+4Ywc2AyzQbXE7TZOVUbhGCIA1YqiybRVYz7dHVwn2qQ82OKzGCssxndbZpG Ww== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xjgx6g03n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Apr 2024 15:18:01 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43HFI0YW025508;
+	Wed, 17 Apr 2024 15:18:00 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xjgx6g03d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Apr 2024 15:18:00 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43HExNFf023582;
+	Wed, 17 Apr 2024 15:17:59 GMT
+Received: from smtprelay07.dal12v.mail.ibm.com ([172.16.1.9])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3xg5cp56sp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 17 Apr 2024 15:17:59 +0000
+Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
+	by smtprelay07.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43HFHuwM39977294
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 17 Apr 2024 15:17:58 GMT
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 37C865804E;
+	Wed, 17 Apr 2024 15:17:56 +0000 (GMT)
+Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 699645803F;
+	Wed, 17 Apr 2024 15:17:53 +0000 (GMT)
+Received: from [9.171.10.59] (unknown [9.171.10.59])
+	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 17 Apr 2024 15:17:53 +0000 (GMT)
+Message-ID: <f614e5fe-29cb-42f5-a02b-b777c043e014@linux.ibm.com>
+Date: Wed, 17 Apr 2024 17:17:52 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/smc: fix potential sleeping issue in
+ smc_switch_conns
+Content-Language: en-GB
+To: Guangguan Wang <guangguan.wang@linux.alibaba.com>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Zhengchao Shao <shaozhengchao@huawei.com>
+Cc: jaka@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        guwen@linux.alibaba.com, weiyongjun1@huawei.com, yuehaibing@huawei.com,
+        tangchengchang@huawei.com, kuba@kernel.org, edumazet@google.com,
+        davem@davemloft.net, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org
+References: <20240413035150.3338977-1-shaozhengchao@huawei.com>
+ <b2573ccf2340a19b6cb039dac639b2d431c1404c.camel@redhat.com>
+ <a94de96f-8b18-482c-90e2-7f8584528bc8@linux.alibaba.com>
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <a94de96f-8b18-482c-90e2-7f8584528bc8@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: jgDXjJUjAdZnjbZAPbzUCf9MNtWSnraZ
+X-Proofpoint-ORIG-GUID: lEFEOn2K2zQADe4HYYnjeTqF0kjUGp9G
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-17_12,2024-04-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
+ mlxlogscore=791 spamscore=0 clxscore=1015 bulkscore=0 malwarescore=0
+ mlxscore=0 priorityscore=1501 suspectscore=0 lowpriorityscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2404010000 definitions=main-2404170106
 
-On Wed, 2024-04-17 at 21:19 +0800, Yunsheng Lin wrote:
-> On 2024/4/17 0:22, Alexander H Duyck wrote:
-> > On Mon, 2024-04-15 at 21:19 +0800, Yunsheng Lin wrote:
-> > > The '(PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)' case is for the
-> > > system with page size less than 32KB, which is 0x8000 bytes
-> > > requiring 16 bits space, change 'size' to 'size_mask' to avoid
-> > > using the MSB, and change 'pfmemalloc' field to reuse the that
-> > > MSB, so that we remove the orginal space needed by 'pfmemalloc'.
-> > >=20
-> > > For another case, the MSB of 'offset' is reused for 'pfmemalloc'.
-> > >=20
-> > > Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> > > ---
-> > >  include/linux/page_frag_cache.h | 13 ++++++++-----
-> > >  mm/page_frag_cache.c            |  5 +++--
-> > >  2 files changed, 11 insertions(+), 7 deletions(-)
-> > >=20
-> > > diff --git a/include/linux/page_frag_cache.h b/include/linux/page_fra=
-g_cache.h
-> > > index fe5faa80b6c3..40a7d6da9ef0 100644
-> > > --- a/include/linux/page_frag_cache.h
-> > > +++ b/include/linux/page_frag_cache.h
-> > > @@ -12,15 +12,16 @@ struct page_frag_cache {
-> > >  	void *va;
-> > >  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-> > >  	__u16 offset;
-> > > -	__u16 size;
-> > > +	__u16 size_mask:15;
-> > > +	__u16 pfmemalloc:1;
-> > >  #else
-> > > -	__u32 offset;
-> > > +	__u32 offset:31;
-> > > +	__u32 pfmemalloc:1;
-> > >  #endif
-> >=20
-> > This seems like a really bad idea. Using a bit-field like this seems
-> > like a waste as it means that all the accesses now have to add
-> > additional operations to access either offset or size. It wasn't as if
-> > this is an oversized struct, or one that we are allocating a ton of. As
-> > such I am not sure why we need to optmize for size like this.
->=20
-> For the old 'struct page_frag' use case, there is one 'struct page_frag'
-> for every socket and task_struct, there may be tens of thousands of
-> them even in a 32 bit sysmem, which might mean a lof of memory even for
-> a single byte saving, see patch 13.
->=20
 
-Yeah, I finally had time to finish getting through the patch set last
-night. Sorry for quick firing reviews but lately I haven't had much
-time to work on upstream work, and as you mentioned last time I only
-got to 3 patches so I was trying to speed through.
 
-I get that you are trying to reduce the size but in the next patch you
-actually end up overshooting that on x86_64 systems. I am assuming that
-is to try to account for the 32b use case? On 64b I am pretty sure you
-don't get any gain since a long followed by two u16s and an int will
-still be 16B. What we probably need to watch out for is the
-optimization for size versus having to add instructions to extract and
-insert the data back into the struct.
-
-Anyway as far as this layout I am not sure it is the best way to go.
-You are combining pfmemalloc with either size *OR* offset, and then
-combining the pagecnt_bias with the va. I'm wondering if it wouldn't
-make more sense to look at putting together the structure something
-like:
-
-#if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
-typedef u16 page_frag_bias_t;
-#else
-typedef u32 page_frag_bias_t;
-#endif
-
-struct page_frag_cache {
-	/* page address and offset */
-	void *va;
-	page_frag_bias_t pagecnt_bias;
-	u8 pfmemalloc;
-	u8 page_frag_order;
-}
-
-The basic idea would be that we would be able to replace the size mask
-with just a shift value representing the page order of the page being
-fragmented. With that we can reduce the size to just a single byte. In
-addition we could probably leave it there regardless of build as the
-order should be initialized to 0 when this is allocated to it would be
-correct even in the case where it isn't used (and there isn't much we
-can do about the hole anyway).
-
-In addition by combining the virtual address with the offset we can
-just use the combined result for what we need. The only item that has
-to be worked out is how to deal with the end of a page in the count up
-case. However the combination seems the most logical one since they are
-meant to be combined ultimately anyway. It does put limits on when we
-can align things as we don't want to align ourselves into the next
-page, but I think it makes more sense then the other limits that had to
-be put on allocations and such in order to allow us to squeeze
-pagecnt_bias into the virtual address.
-
-Anyway I pulled in your patches and plan to do a bit of testing, after
-I figure out what the nvme disk ID regression is I am seeing. My main
-concern can be summed up as the NIC driver use case
-(netdev/napi_alloc_frag callers) versus the socket/vhost use case. The
-main thing in the case of the NIC driver callers is that we have a need
-for isolation and guarantees that we won't lose cache line alignment. I
-think those are the callers you are missing in your benchmarks, but
-arguably that might be something you cannot test as I don't know what
-NICs you have access to and if you have any that are using those calls.
+On 17.04.24 09:32, Guangguan Wang wrote:
+> 
+> 
+> On 2024/4/16 20:06, Paolo Abeni wrote:
+>> On Sat, 2024-04-13 at 11:51 +0800, Zhengchao Shao wrote:
+>>> Potential sleeping issue exists in the following processes:
+>>> smc_switch_conns
+>>>    spin_lock_bh(&conn->send_lock)
+>>>    smc_switch_link_and_count
+>>>      smcr_link_put
+>>>        __smcr_link_clear
+>>>          smc_lgr_put
+>>>            __smc_lgr_free
+>>>              smc_lgr_free_bufs
+>>>                __smc_lgr_free_bufs
+>>>                  smc_buf_free
+>>>                    smcr_buf_free
+>>>                      smcr_buf_unmap_link
+>>>                        smc_ib_put_memory_region
+>>>                          ib_dereg_mr
+>>>                            ib_dereg_mr_user
+>>>                              mr->device->ops.dereg_mr
+>>> If scheduling exists when the IB driver implements .dereg_mr hook
+>>> function, the bug "scheduling while atomic" will occur. For example,
+>>> cxgb4 and efa driver. Use mutex lock instead of spin lock to fix it.
+>>
+>> I tried to inspect all the lock call sites, and it *look* like they are
+>> all in process context, so the switch should be feasible.
+> 
+> There exist some calls from tasklet, where mutex lock is infeasible.
+> For example:
+> - tasklet -> smc_wr_tx_tasklet_fn -> smc_wr_tx_process_cqe -> pnd_snd.handler -> smc_cdc_tx_handler -> smc_tx_pending -> smc_tx_sndbuf_nonempty -> smcr_tx_sndbuf_nonempty -> spin_lock_bh(&conn->send_lock)
+> - tasklet -> smc_wr_rx_tasklet_fn -> smc_wr_rx_process_cqes -> smc_wr_rx_demultiplex -> smc_cdc_rx_handler -> smc_cdc_msg_validate -> spin_lock_bh(&conn->send_lock)
+> 
+> Thanks,
+> Guangguan Wang
+> Agree! Thank you, Guangguan, for the examples!
+If we can verify that this bug exits, we should find other solutions.
+>>
+>> Still the fact that the existing lock is a BH variant is suspect.
+>> Either the BH part was not needed or this can introduce subtle
+>> regressions/issues.
+>>
+>> I think this deserves at least a 3rd party testing.
+>>
+>> Thanks,
+>>
+>> Paolo
+>>
+> 
 
