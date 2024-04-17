@@ -1,185 +1,125 @@
-Return-Path: <netdev+bounces-88635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 507E98A7EF8
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:00:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28ADE8A7EFD
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 11:02:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CBA3280E8D
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:00:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A3AB1C21389
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 09:02:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E60212837C;
-	Wed, 17 Apr 2024 09:00:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7172D6BFB3;
+	Wed, 17 Apr 2024 09:02:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OoxBrM1T"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HqYxPXd7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39D466A353
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 09:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B11F6A353
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 09:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713344451; cv=none; b=nHKfTsHOtj0UuHmRJ6hiZtwHkLRy20+aug89ZVWPZCkLXvA6fRnDuL99A1ITc330qtPCdf06rRb9VLZpTumAV0ICu1c/Lyf6UC1lBq4psFHDrK8KhihAGxodNPOszC1Hcs3tC5Ub+uE44WFDgahcbgjx3s3TeNpdEuXnIU8PhbU=
+	t=1713344534; cv=none; b=kqqKh4n4/hSRzK6G1SdDFM9o3C45QRfBTbBmV7XiwR0c11Unlq4XyfO+YvizjLMgzpn71S0Q4FuMVNouKj0xplILhiuadDDwlBjj+0NXNs8aMBkmy+cen+Sd3eSgaB/9PFgWi2v5MEXmTy8g2NqKtAgiDzcUz776K8Si+QjeZJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713344451; c=relaxed/simple;
-	bh=8gSHbgbo0AKKIkxQVx1xcqgZ4ykmwU7ctyGAbe4xG+E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WbJlmPfwutMWYNn9hmd4gX9MsgoV6oKrNL8jX2smM6kpLnjuWOORLo1vPRRNmZR/cQPU0mLjpJW7A1tuIeFhbQvuT4HgskCFmKImVZGPBohqb2sOZKkiXW3L43QNgXVz9deuuJlzUkr7jtj7kQL60eHvt9CCKCeOJX9qeJJQNPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OoxBrM1T; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BE32C072AA;
-	Wed, 17 Apr 2024 09:00:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713344450;
-	bh=8gSHbgbo0AKKIkxQVx1xcqgZ4ykmwU7ctyGAbe4xG+E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OoxBrM1TGbkShYKPxiGcTCiTBhhHEsDJekg2aytVHK9r57G664DeF16mTyUp397hs
-	 yIEJ0n+R5H+jUHV42zl0dytg5GQ1bB8eFGefvkmWv4PPDc317hWxavIL7/bRZmbMfW
-	 PV+w5RZO0P5Ol8lZsjB2luR2jQAf89Y1wK4GFMwQUBCUsivCmqCbB67E3ZmR1sAdX+
-	 fDtcrLQugyHt9kl+qsM0ce8pyXQC9Oi6RT2e1oSf97chpFh2Lv5iD3gDAS/kDpNysI
-	 fmy/mBZfBdQcfgVAgWStX26SI+bSNZ6lSospTU7p37qFEq37HvS+Kf9imGOpudBA+9
-	 DJI+ZsxfEw7dQ==
-Date: Wed, 17 Apr 2024 10:00:46 +0100
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 01/14] net_sched: sch_fq: implement lockless
- fq_dump()
-Message-ID: <20240417090046.GB3846178@kernel.org>
-References: <20240415132054.3822230-1-edumazet@google.com>
- <20240415132054.3822230-2-edumazet@google.com>
- <20240416181915.GT2320920@kernel.org>
- <CANn89i+X3zkk-RwRVuMursG-RY+R6P29AWK-pjjVuNKT91VsJw@mail.gmail.com>
- <CANn89i+iNKvCv+RPtCa4KOY9DCEQJfGP9xHSedFUbWZHt2DSFw@mail.gmail.com>
+	s=arc-20240116; t=1713344534; c=relaxed/simple;
+	bh=co0vGStyxzs2wYudwfZgCahyCD+9GAQnQzEr1hx3Sl4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s9l/xKQw0bmwvsktfeLGqJnTjOr4G857/GOvFjTql366GPHzclylSG/mrMOlTkM5i96Axb3Q8sJoLXRlwLbdThE7fm0QtA1vO1DSc6Q/pQo2cF+a9/OsSUDZpgtdhA+tmPzt5U6Axfy42TvxYjFjuYZrhfXk3vGbCtKOoHtLahs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HqYxPXd7; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-56e5174ffc2so7713a12.1
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 02:02:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713344530; x=1713949330; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SAY8JMpfOE+rjYgFlJjU2Fp0QQAa6jroDez9CFZ6FKk=;
+        b=HqYxPXd77MPew12v8LA56Bq0K7omPm6X2MKAEaSBhlNXILBjnUAUtPC75YnQcIYEZx
+         I2k8iR/g62xXeb1rJZlVAiC2AM+VFDR/YQmakOlgEDZYaodjL1BZ3QkK/NQMksJ+yhbP
+         o5Zk872P7wbLiDL3b+WyAGIF99tjTlQHlf85YalvcxZ0+BrrFSiemBQRnd+0UD9xwCQa
+         dhK4BU3P94N9XvN4ytbhzVQPkIDIh9Q+QtYbqUn8w1K4RZsPM0Cl0BKY/tmhMyyGc7eH
+         DfLfEkEsAGe58W52sPE97LoMWpjGzHKmiud3MYuYOVQWxooWvkMjxp3bjkj5GUH8tnuZ
+         LVsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713344530; x=1713949330;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SAY8JMpfOE+rjYgFlJjU2Fp0QQAa6jroDez9CFZ6FKk=;
+        b=xVoYd/S9yrQOwauSypwCbaSEFm6fiikRFSHpP4MbX8zlvENisl2jMAQpOQ/rJDHC1M
+         tgHMMsnQjdocpdnWcK6N0mFlWx/RYy9xaO6NxTddTHd+ONlPXYrZ5LFkppvUlD24YgIE
+         vcx4QIFM+JHR6JGBdzl5/F2V9I3u7zLmQGiuCz/FlXTt3bHwwXprwg8m1N5GCb4+bQZx
+         5PgfARaXzYshCwYaN2fXHRz/M5+A+SOF95kJyF27L4U9bJvxsXZ8ZYerT8G5FIHTUSgD
+         nWJGPJEbqopNzV4Xa8dbXerBkJX+T+RS08lUf6QSk1LYbPsthJ158xtcrz97JljGuy5C
+         cBdw==
+X-Forwarded-Encrypted: i=1; AJvYcCWZxKHTuMI3hiU8Iz7PNsJ6YUq+PIk2aRU5hM5MpxSKsWp5IuKURWkC2TnkRFv8cIzD9c2HSk2Wlfj6bwzQ3ovqQv/FwucQ
+X-Gm-Message-State: AOJu0YwWfuF0+4C2bfRj7vfaCbBb9Lc4g1EIzA0veWFPdKM7H42B5EZE
+	S0WVWHVpYOqCTK7oKoS/LyTtC1teRFUQ4V+1jVlbxCQ8+AW2SdTfkFIbXNjyTcxMbs0MSESXx5W
+	0xUDMd6xOXaYB2c8tbE0pw4//1etXKFTGzEZV
+X-Google-Smtp-Source: AGHT+IH4cUad/wnQKLE4dWvHNWAVSWHtbhac2FgNRdt0BeRKm1vTHUByA1AGiXIWwXcHIzNQLrGDOtsihbDKjDzHamk=
+X-Received: by 2002:aa7:d9cd:0:b0:570:481a:8a1f with SMTP id
+ v13-20020aa7d9cd000000b00570481a8a1fmr108872eds.5.1713344530145; Wed, 17 Apr
+ 2024 02:02:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89i+iNKvCv+RPtCa4KOY9DCEQJfGP9xHSedFUbWZHt2DSFw@mail.gmail.com>
+References: <20240417085143.69578-1-kerneljasonxing@gmail.com> <20240417085143.69578-2-kerneljasonxing@gmail.com>
+In-Reply-To: <20240417085143.69578-2-kerneljasonxing@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 17 Apr 2024 11:01:58 +0200
+Message-ID: <CANn89i+aLO_aGYC8dr8dkFyi+6wpzCGrogysvgR8FrfRvaa-Vg@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 1/7] net: introduce rstreason to detect why
+ the RST is sent
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: dsahern@kernel.org, matttbe@kernel.org, martineau@kernel.org, 
+	geliang@kernel.org, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
+	rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
+	atenart@kernel.org, mptcp@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 17, 2024 at 10:45:09AM +0200, Eric Dumazet wrote:
-> On Tue, Apr 16, 2024 at 8:33 PM Eric Dumazet <edumazet@google.com> wrote:
-> >
-> > On Tue, Apr 16, 2024 at 8:19 PM Simon Horman <horms@kernel.org> wrote:
-> > >
-> > > On Mon, Apr 15, 2024 at 01:20:41PM +0000, Eric Dumazet wrote:
-> > > > Instead of relying on RTNL, fq_dump() can use READ_ONCE()
-> > > > annotations, paired with WRITE_ONCE() in fq_change()
-> > > >
-> > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > > ---
-> > > >  net/sched/sch_fq.c | 96 +++++++++++++++++++++++++++++-----------------
-> > > >  1 file changed, 60 insertions(+), 36 deletions(-)
-> > > >
-> > > > diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-> > > > index cdf23ff16f40bf244bb822e76016fde44e0c439b..934c220b3f4336dc2f70af74d7758218492b675d 100644
-> > > > --- a/net/sched/sch_fq.c
-> > > > +++ b/net/sched/sch_fq.c
-> > > > @@ -888,7 +888,7 @@ static int fq_resize(struct Qdisc *sch, u32 log)
-> > > >               fq_rehash(q, old_fq_root, q->fq_trees_log, array, log);
-> > > >
-> > > >       q->fq_root = array;
-> > > > -     q->fq_trees_log = log;
-> > > > +     WRITE_ONCE(q->fq_trees_log, log);
-> > > >
-> > > >       sch_tree_unlock(sch);
-> > > >
-> > > > @@ -931,7 +931,7 @@ static void fq_prio2band_compress_crumb(const u8 *in, u8 *out)
-> > > >
-> > > >       memset(out, 0, num_elems / 4);
-> > > >       for (i = 0; i < num_elems; i++)
-> > > > -             out[i / 4] |= in[i] << (2 * (i & 0x3));
-> > > > +             out[i / 4] |= READ_ONCE(in[i]) << (2 * (i & 0x3));
-> > > >  }
-> > > >
-> > >
-> > > Hi Eric,
-> > >
-> > > I am a little unsure about the handling of q->prio2band in this patch.
-> > >
-> > > It seems to me that fq_prio2band_compress_crumb() is used to
-> > > to store values in q->prio2band, and is called (indirectly)
-> > > from fq_change() (and directly from fq_init()).
-> > >
-> > > While fq_prio2band_decompress_crumb() is used to read values
-> > > from q->prio2band, and is called from fq_dump().
-> > >
-> > > So I am wondering if should use WRITE_ONCE() when storing elements
-> > > of out. And fq_prio2band_decompress_crumb should use READ_ONCE when
-> > > reading elements of in.
-> >
-> > Yeah, you are probably right, I recall being a bit lazy on this part,
-> > thanks !
-> 
-> I will squash in V2 this part :
-> 
-> diff --git a/net/sched/sch_fq.c b/net/sched/sch_fq.c
-> index 934c220b3f4336dc2f70af74d7758218492b675d..238974725679327b0a0d483c011e15fc94ab0878
-> 100644
-> --- a/net/sched/sch_fq.c
-> +++ b/net/sched/sch_fq.c
-> @@ -106,6 +106,8 @@ struct fq_perband_flows {
->         int                 quantum; /* based on band nr : 576KB, 192KB, 64KB */
->  };
-> 
-> +#define FQ_PRIO2BAND_CRUMB_SIZE ((TC_PRIO_MAX + 1) >> 2)
-> +
->  struct fq_sched_data {
->  /* Read mostly cache line */
-> 
-> @@ -122,7 +124,7 @@ struct fq_sched_data {
->         u8              rate_enable;
->         u8              fq_trees_log;
->         u8              horizon_drop;
-> -       u8              prio2band[(TC_PRIO_MAX + 1) >> 2];
-> +       u8              prio2band[FQ_PRIO2BAND_CRUMB_SIZE];
->         u32             timer_slack; /* hrtimer slack in ns */
-> 
->  /* Read/Write fields. */
-> @@ -159,7 +161,7 @@ struct fq_sched_data {
->  /* return the i-th 2-bit value ("crumb") */
->  static u8 fq_prio2band(const u8 *prio2band, unsigned int prio)
->  {
-> -       return (prio2band[prio / 4] >> (2 * (prio & 0x3))) & 0x3;
-> +       return (READ_ONCE(prio2band[prio / 4]) >> (2 * (prio & 0x3))) & 0x3;
->  }
+On Wed, Apr 17, 2024 at 10:51=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
+com> wrote:
+>
+> From: Jason Xing <kernelxing@tencent.com>
+>
+> Add a new standalone file for the easy future extension to support
+> both active reset and passive reset in the TCP/DCCP/MPTCP protocols.
+>
+> This patch only does the preparations for reset reason mechanism,
+> nothing else changes.
+>
+> The reset reasons are divided into three parts:
+> 1) reuse drop reasons for passive reset in TCP
+> 2) reuse MP_TCPRST option for MPTCP
+> 3) our own reasons
+>
+> I will implement the basic codes of active/passive reset reason in
+> those three protocols, which is not complete for this moment. But
+> it provides a new chance to let other people add more reasons into
+> it:)
+>
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
 
-Thanks Eric,
+My original suggestion was to use normal values in  'enum
+skb_drop_reason', even if there was not necessarily a 'drop'
+in the common sense.
 
-assuming that it is ok for this version of fq_prio2band() to run
-from fq_enqueue(), this update looks good to me.
+https://lore.kernel.org/all/CANn89iJw8x-LqgsWOeJQQvgVg6DnL5aBRLi10QN2WBdr+X=
+4k=3Dw@mail.gmail.com/
 
-> 
->  /*
-> @@ -927,11 +929,15 @@ static const struct nla_policy
-> fq_policy[TCA_FQ_MAX + 1] = {
->  static void fq_prio2band_compress_crumb(const u8 *in, u8 *out)
->  {
->         const int num_elems = TC_PRIO_MAX + 1;
-> +       u8 tmp[FQ_PRIO2BAND_CRUMB_SIZE];
->         int i;
-> 
-> -       memset(out, 0, num_elems / 4);
-> +       memset(tmp, 0, sizeof(tmp));
->         for (i = 0; i < num_elems; i++)
-> -               out[i / 4] |= READ_ONCE(in[i]) << (2 * (i & 0x3));
-> +               tmp[i / 4] |= in[i] << (2 * (i & 0x3));
-> +
-> +       for (i = 0; i < FQ_PRIO2BAND_CRUMB_SIZE; i++)
-> +               WRITE_ONCE(out[i], tmp[i]);
->  }
-> 
->  static void fq_prio2band_decompress_crumb(const u8 *in, u8 *out)
-> 
+This would avoid these ugly casts later, even casting an enum to other
+ones is not very logical.
+Going through an u32 pivot is quite a hack.
+
+If you feel the need to put them in a special group, this is fine by me.
 
