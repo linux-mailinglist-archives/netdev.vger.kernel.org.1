@@ -1,177 +1,145 @@
-Return-Path: <netdev+bounces-88819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDD478A89D7
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 19:06:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C93AA8A89DD
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 19:07:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46ECAB216EA
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 17:06:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84D3B281ABE
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 17:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0EA171081;
-	Wed, 17 Apr 2024 17:05:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D991487E4;
+	Wed, 17 Apr 2024 17:07:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="cjLhU7tc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PNuyDvVT"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2087.outbound.protection.outlook.com [40.107.223.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5055516FF52;
-	Wed, 17 Apr 2024 17:05:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713373512; cv=fail; b=jduI+UOyQVuRTjrr/oqOHrEBQ96zzxifeJ3UNV1cADBq9mggWdQAczGQ/FgCfuvcmofkqrEKfizaQWa77ImK3/2/8sOx5nB/+Tv+RvoK8t+icYwaFNbKnTSpFu7BWl2FoHtajMQ/ZkZHBV7eeyH+LZ/pIyJs6UWQaYVCup01d+8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713373512; c=relaxed/simple;
-	bh=vfw50eBwPhAEiXkT8poLDj4RJZPos9fLTJn1CTeGns8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=LZEocpSpcsrD2f+3xG5OMmDmIhXqbgZzyjhKMZI1a68GJoziy96Jtzzmq5/jCjrSp2oKO0DbCq4TFJURa4JqrDkNC5qMHZ0nx+mtwsQ8se5kRDIeuQwso6cZew5kUjGCk3hoQTCYmyqVxoq9qX+LIuhkYZPEwFWt1Gjl4GnvEHg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=fail (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=cjLhU7tc reason="signature verification failed"; arc=fail smtp.client-ip=40.107.223.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a+B39hVuRSMi8zdpT2CqrlDoe/4bTGCSOJIPX/8O7pEXvKrlVqFn+TTygv/zy8YiqSDSJ00sTjndno8Ecf0/SdVDFfOFVPyYf0ryNYmaorXVvWKbSBAIqJEejMVm9m3fFJC/DrcOyZaqTXeNMA+irBBakFXxqLW3OdGWMDWRwOV6f2oj1Bytzo6HD5g9xYdbwcTQf+j3xhlk9i5LZoGg5UBUdlcc03LdoTz3LAUKjXPSJxalSxzCJ605/Hh+JqypuguiD29IU8lKqGcTt7IyGykrm100WMynCOvPajFou5k4WrU6gajO+eea0X7QhUuLaLO+mn+pbg5IkbJeGQ77Sw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ouyjCA0kVZ04iCEEwdn1Y1QGlwZKCwsIZDD+bRKxwyw=;
- b=Np1sdeobxQz5LO27KP80uhvuqR4jui07aLuJ+OwY8KuHERcXW8DOHBPBiVTguc+UUEyMTd1KzEq8DTC/m8yZWpEavjdS5yBc1+Itpv5g3VrOCs29ah8cAH9mwWvWR6Amsmv6HuGX4ujoBLxM3CZ15PDYF4IWlRKw67u58kCqWybfM1gg7A+hzEhbRuheGzQz0JtLuSsPTgEfFkAkIpogxN6EMsQN+kfjeK2E7kHQySNC4EGSSw7o1stAic9+Htr107v4ILSKSSYjdwCX6F6lo+KdIaqcKklY5f2wJnVD7nuJypP1QYceWdgBPwqblLtgO3bJqjtDXdf8ZsRv2ZNlng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ouyjCA0kVZ04iCEEwdn1Y1QGlwZKCwsIZDD+bRKxwyw=;
- b=cjLhU7tcsoQx6EkKE2PZKs8n25uIlUu1OZ/1Od1t2rqZJABBemwgdGwJXY7qxChm7SvZuz5aeWU4syQhHRuIyjH+B6LbRR4JbDNA2CScruoFxRG2pokRaSaQJ6nmr3ehjdwV0s3Rgl3ZAHQ6LX5H+hX9O/VsVGAImkigCPTv6yShBCgvqa+wsPZeZmi7pNTS5pMlOsRpmGZFedNZjdUYgC3QyRc8ve2oaoWnJKubvM10dLxkO9bfKWTw7KLnXAtM1fd9T5AgkVUTGMYyojJy+nNXB0ZsWmmwBOeN9Di/wRsMgh8xdsEG/DbB1QOj+UsZzWTuO7wSqCxyLI0ZAd1acw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
- by PH0PR12MB7885.namprd12.prod.outlook.com (2603:10b6:510:28f::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.37; Wed, 17 Apr
- 2024 17:05:06 +0000
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::b93d:10a3:632:c543]) by CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::b93d:10a3:632:c543%4]) with mapi id 15.20.7452.046; Wed, 17 Apr 2024
- 17:05:06 +0000
-Date: Wed, 17 Apr 2024 20:05:00 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: =?iso-8859-1?Q?Asbj=F8rn_Sloth_T=F8nnesen?= <ast@fiberby.net>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Petr Machata <petrm@nvidia.com>
-Subject: Re: [PATCH net-next] mlxsw: spectrum_flower: validate control flags
-Message-ID: <ZiABPNMbOOYGiHCq@shredder>
-References: <20240417135131.99921-1-ast@fiberby.net>
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240417135131.99921-1-ast@fiberby.net>
-X-ClientProxiedBy: LO0P265CA0011.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:355::19) To CY5PR12MB6179.namprd12.prod.outlook.com
- (2603:10b6:930:24::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9451E129A7F
+	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 17:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713373654; cv=none; b=fTKJ3E/QCXMQ15ylQegqiVswN/kZ2Fb/xa+cuDmMVx3u+BjdcrqyYZdw+1ePbER+oYoMhEzzcl4/Ro2PevJDDUVefMdMKeRkJolSCIQF9GPvO2m5+eKRlpztvo2qocG41uVd9hv+OO6nN83G+pP/7qDk1wTv0omrTtmEvf0nIhg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713373654; c=relaxed/simple;
+	bh=oho/upbxRSYY6W6iVe29XuknjGrhjljnOCrTottKaow=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=J0Bp3LGqrRaaw2QBfBf0xZrNE/c+HO6GkMMgY63+G29GQ52BGOiVP+SZyvHP3SQDEdzlVd+PvP1hK3+QxPpfNVsjsIzKdP6+xzurgUPVG7FVtJNkuyqN/5PhNFQ34jP4fDG3DIzePp2m/2mftlrZhltOkoZcs47yBCXYWBcbviA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PNuyDvVT; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5193363d255so2244957e87.3
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 10:07:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713373651; x=1713978451; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9daNPukVY065h2lUFn590o+Qk3ggCL7Q+sBm415nUPI=;
+        b=PNuyDvVTK7po43/Q651nk4pouZloDfIBk9rwDkcMTx6NEZw/wRec2JU+KeZ+U7hbcf
+         l2FJmSZZKxKV8EwsJESlgkzg7icerKFnNhYL7E8i8x7sb398tA8/ongk3J9YHUrfrY8q
+         foxmUqNFv3KUsextvfVHyGDsEOqFM4RY1bB57O5HM4qT0HTOBPiqFRDvS80NkUNlq1vo
+         H/Z3MV6uXWDFXy0B5z5okRaos93SHxPWjvHC7hijr2KYwoDrNlszZI6uIdL688cvfiTk
+         76EjwKw8QUN/RUMhgdMJt0qxHO80L3d1TA2BszQO9WwzMRc/GNbfjZbMK30hhSib4kPj
+         pMJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713373651; x=1713978451;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9daNPukVY065h2lUFn590o+Qk3ggCL7Q+sBm415nUPI=;
+        b=Ms/hEXWOO/QSW5+gCJm5hQwKJym/DiXl8tRTZ+YTo4uel3VhQws6tcHLNYYWl11s+o
+         cDxe4urEEf4PANOVJxLQcyk19qV8SeehmKvgWBaBnysiiKtbSZTw76Gb+DTeB6sHmWSR
+         KUs7QsO7CmyocVez36wJfPbe686+CwA5Ad+zRAMnSdDgIPklyfHmUNpO4GWfCRFIoBBm
+         VCz4snxT/hqs2pbOIGKS+pJRxfa/JoSLTpZE7DcqPFCKhPrdT90mHZj3E1AIteusHqhy
+         4MD5H5XuY3fDquNg8SLhDMGS9zeC9zQFMsaYHvg1XVIj+wJdtMA7CNmSebBJ3KOZ/Rqk
+         1Z9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVo9x2TzbpsnzvtUQZ6G7WwmON48kGFQfBVP4Tfo8qyRUEC/cD6covvNijvBm5MbshFsNSZ5ay/O/p4mf4rezrbYof7+IHR
+X-Gm-Message-State: AOJu0Yx5rvHiN6vyVv9km/FrsRg7LuAIvg7QHDJa7C3uI+wX+NJTsN4m
+	fY0iIuvgOS+i4jtqebsCZQuyATh0DA6XtZkx2paPOxvQ0maQaK3b
+X-Google-Smtp-Source: AGHT+IG84sYSXmvlXZlpLky2rj+fgz1IXVgXBHXnntJEYxyj+gEDh+WWnVFJmF5LH7eqxdZRNPaUig==
+X-Received: by 2002:a19:640c:0:b0:516:cec0:1fc0 with SMTP id y12-20020a19640c000000b00516cec01fc0mr9953411lfb.63.1713373650331;
+        Wed, 17 Apr 2024 10:07:30 -0700 (PDT)
+Received: from mishin.sarov.local ([95.79.90.255])
+        by smtp.gmail.com with ESMTPSA id u24-20020ac25198000000b0051593cfb556sm2006729lfi.239.2024.04.17.10.07.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Apr 2024 10:07:29 -0700 (PDT)
+From: Maks Mishin <maks.mishinfz@gmail.com>
+X-Google-Original-From: Maks Mishin <maks.mishinFZ@gmail.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Maks Mishin <maks.mishinFZ@gmail.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH] m_ife: Remove unused value
+Date: Wed, 17 Apr 2024 20:07:22 +0300
+Message-Id: <20240417170722.28084-1-maks.mishinFZ@gmail.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|PH0PR12MB7885:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6628a444-253e-4faa-96ed-08dc5f0087a3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	SgcLOdm+7+QGb68UiJ1C6K6WvHyNFg9yzcEz0mRtk6NL6tNWV2HUf84VGno9yWOdMp4bacHYyGUC3J0zll22a4vCwU95d+Dt53Volkx41cCzU4GSucdw6lX+UHfBzv61EmEa51BEJ9GPt6kJOHk9mqEKHPrbGONeUx5RTkbobcMr40Ptm7DIugCHHfV2RU4b9DhzHBf3+eMmL8ZF/0cbSIi+S/uayRS9jtVtE3llwFtHucreZOWbkHig3x98GC+Me4jJAzCV5Mog/OgIfweDOEVzECcVZ/Jmmg7dPsoBZkpsE+ZkpP1vMLdNCcjDMrFhw+D8Ya5145sr+PJ2VN6qw9cHkys/TNn+xmIN9fV8GkUB2oeO9uqAW43OM5H6XLgfFA4JO3klyMSFRv6/+EC3IHBPpXdZBeCaCmzbs/r4k6opM9j2ckrQbjndPrYi/oq+pfOzXoODvqz0+GY+6brXKtuNfAGA0oMGf75fsiU/ixKQXVNaY/qp5JlKmP+zhc+/0vLMmDUgnXnOWF1u4pcXs1WS+sah1K2o/x8W11dhc2H61MEF90PT1VLq+QVuytmOCCM0Nu6EFuvzp4krJlQ/TXJyvuuOlEZL8Ut+xge6ZiEyA3/NIHthQ++ZAwMX5QCRcEDrzIKF1Q5943DQI0w4l2uK5PQwd5OQ9ho7M/rNPTU=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?iso-8859-1?Q?6ZDcvGibTmPJ02jTAdcHBipzPH5Q8FwllN0nqFAgUVciLZyK9S5fngnZtm?=
- =?iso-8859-1?Q?qxEan8BNuV8Fhv7aIrnqmW2gV0Z6JRdLwJoEcZ8E0JsEKshc1tMg38vjNC?=
- =?iso-8859-1?Q?iU+n011l1ozh1VMxeKwIYIXQL+1KgVkwwZKh8x+ePI0KykDxQxYs/88TLu?=
- =?iso-8859-1?Q?jLbxtgv1sK5kaaakd73Ygu+WRcJ2IETrxh0WKNn+MnnVeYiWrA29xhbZYh?=
- =?iso-8859-1?Q?duhoKjsOnzLF9ny93nhHD7ZljoJTgK1W2v40GJxU+ia6MsbvFMITY7iX1t?=
- =?iso-8859-1?Q?6jcA2DqTE3V7gBa/pOllXXZ4ZmLQXSOAawolG0izlZZRz2f10VgGIClzBD?=
- =?iso-8859-1?Q?0v9veXkyRkG/9CNGL0Y8srVzchrVPn5kf1TtYFfOiAW//2fu/g1QESFuET?=
- =?iso-8859-1?Q?i7Q4NiXHEyAvjhyJdugfsOqrRcEkR9F8cTkBILis8RcYPVAyZlqEeusK2m?=
- =?iso-8859-1?Q?jEWVeyn60EV0YRyho/IqU9amHECCdFhTmb+3b8XBoZDDI3f+YkDNGe1gtY?=
- =?iso-8859-1?Q?PF3xfnHtIzlvMhIq15SLTN2MuVPDNuxobWieaohQ893s2Lu5p1+znt1qIg?=
- =?iso-8859-1?Q?F2zQjjHKp1mWKPXogp8cumx+fPGlrHRAYB9wPR6jjuC5MYtZqDY6DA4LLV?=
- =?iso-8859-1?Q?VH5HOoDHOkFSFrXhFkBNU67p6PbNMDvVqtDM2PKcyA95ZHW9zoK6ft92XL?=
- =?iso-8859-1?Q?QXGKZJCXkcleFfa07bN3+xvPriE4Le+wBHbNKmvVeYmbYySOdepp3bbE/N?=
- =?iso-8859-1?Q?HzB+rqzU2bmLJyJuCwV4/Itv3ZR14L6TU2YCO7M+W63ACE9dd/cK7KHrK5?=
- =?iso-8859-1?Q?4IM3fVG76m3DhYIzDYU1TUbMVJZXQZL9GWBKLD9eCiYvGoIflKHJOwCuCp?=
- =?iso-8859-1?Q?olW+uvVWtk5hIM3ce0YXq9nIDlh9Y2NH8pm6eNt6uVRm3O4BUuA0VIlhv/?=
- =?iso-8859-1?Q?QbgJLtfBVkOKrjNviTtP5+uaWZD/l1Y0a0z878qEpTyWLTCZBt3R1FTIo4?=
- =?iso-8859-1?Q?zu2qSq7cg5qNqQ1XR04PLFOvY02LVi5VlMtNBggybrC56H5lGrJx0CKQbB?=
- =?iso-8859-1?Q?50X8MsF5hCVqbvF7plAwRDe/QCmkzpakr3VNHratuft23Nv1Mze6YFPGpT?=
- =?iso-8859-1?Q?1f1wbNunBg/LbIkfkqB3DqysBQEiir8TgnsD7bgZzjUV1ly3td0JRTmmbo?=
- =?iso-8859-1?Q?3zm8kQOkQ2H+RIxckFyMiUxoo/tacrDXZZU6almahZAlJVdlqE6vsbTVhb?=
- =?iso-8859-1?Q?dQc4yiAFQDKvEoUrGwZORrDkTe+0W2MB1d2pQiESspUUbsymlt6j1Id8jl?=
- =?iso-8859-1?Q?a4D81n3lD2H6oKVWW9/acVYyMB7xtiR7Crk1TVs3hQaiCtuPZijFIc+7Gw?=
- =?iso-8859-1?Q?O0Vk19ntCguTzpTgOwuB/M3GRmVakiiNcyTcnnCZlchTK5ZmJH70Sn6sZR?=
- =?iso-8859-1?Q?8Ocs0ArBXXcpCYq97/uRJGPOpjU71qrS2iH8+075HIGla0bkUMDh+18skP?=
- =?iso-8859-1?Q?VPHmW0q5qnTPhszMpU4k9pUSnHVikm0hJysUN6diJu2uiu/jiuQIccV74d?=
- =?iso-8859-1?Q?0mvHW4sFf4pj/RQKdHdqOgkwAxDE8Pwh+amFtNAISgWbDd1dFzogAO9sH4?=
- =?iso-8859-1?Q?jKt7VjXnySYobCaSRTImO7U0LLCxBXT+NF?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6628a444-253e-4faa-96ed-08dc5f0087a3
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Apr 2024 17:05:06.1176
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: W9gXmp2+bRurQsAbnOg1hrKw3wmrEgQ9sUnIkdhlg0rZJD/Ho3eoq3Z4fdK9OZhPBLhE0fXp3FbpnSwcGr7oNg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7885
+Content-Transfer-Encoding: 8bit
 
-On Wed, Apr 17, 2024 at 01:51:20PM +0000, Asbjørn Sloth Tønnesen wrote:
-> This driver currently doesn't support any control flags.
-> 
-> Use flow_rule_has_control_flags() to check for control flags,
-> such as can be set through `tc flower ... ip_flags frag`.
-> 
-> In case any control flags are masked, flow_rule_has_control_flags()
-> sets a NL extended error message, and we return -EOPNOTSUPP.
-> 
-> Only compile-tested.
-> 
-> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
+The variable `has_optional` do not used after set the value.
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Tested-by: Ido Schimmel <idosch@nvidia.com>
+Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
+---
+ tc/m_ife.c | 13 ++-----------
+ 1 file changed, 2 insertions(+), 11 deletions(-)
 
-Without patch:
+diff --git a/tc/m_ife.c b/tc/m_ife.c
+index 162607ce..f8a5e427 100644
+--- a/tc/m_ife.c
++++ b/tc/m_ife.c
+@@ -219,7 +219,6 @@ static int print_ife(struct action_util *au, FILE *f, struct rtattr *arg)
+ 	__u32 mmark = 0;
+ 	__u16 mtcindex = 0;
+ 	__u32 mprio = 0;
+-	int has_optional = 0;
+ 	SPRINT_BUF(b2);
+ 
+ 	print_string(PRINT_ANY, "kind", "%s ", "ife");
+@@ -240,13 +239,9 @@ static int print_ife(struct action_util *au, FILE *f, struct rtattr *arg)
+ 
+ 	if (tb[TCA_IFE_TYPE]) {
+ 		ife_type = rta_getattr_u16(tb[TCA_IFE_TYPE]);
+-		has_optional = 1;
+ 		print_0xhex(PRINT_ANY, "type", "type %#llX ", ife_type);
+ 	}
+ 
+-	if (has_optional)
+-		print_string(PRINT_FP, NULL, "%s\t", _SL_);
+-
+ 	if (tb[TCA_IFE_METALST]) {
+ 		struct rtattr *metalist[IFE_META_MAX + 1];
+ 		int len = 0;
+@@ -290,21 +285,17 @@ static int print_ife(struct action_util *au, FILE *f, struct rtattr *arg)
+ 
+ 	}
+ 
+-	if (tb[TCA_IFE_DMAC]) {
+-		has_optional = 1;
++	if (tb[TCA_IFE_DMAC])
+ 		print_string(PRINT_ANY, "dst", "dst %s ",
+ 			     ll_addr_n2a(RTA_DATA(tb[TCA_IFE_DMAC]),
+ 					 RTA_PAYLOAD(tb[TCA_IFE_DMAC]), 0, b2,
+ 					 sizeof(b2)));
+-	}
+ 
+-	if (tb[TCA_IFE_SMAC]) {
+-		has_optional = 1;
++	if (tb[TCA_IFE_SMAC])
+ 		print_string(PRINT_ANY, "src", "src %s ",
+ 			     ll_addr_n2a(RTA_DATA(tb[TCA_IFE_SMAC]),
+ 					 RTA_PAYLOAD(tb[TCA_IFE_SMAC]), 0, b2,
+ 					 sizeof(b2)));
+-	}
+ 
+ 	print_nl();
+ 	print_uint(PRINT_ANY, "index", "\t index %u", p->index);
+-- 
+2.30.2
 
-+ tc qdisc add dev swp1 clsact
-+ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags frag action drop
-+ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags nofrag action drop
-+ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags firstfrag action drop
-+ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags nofirstfrag action drop
-
-With patch:
-
-+ tc qdisc add dev swp1 clsact
-+ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags frag action drop
-Error: mlxsw_spectrum: Unsupported match on control.flags 0x1.
-We have an error talking to the kernel
-+ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags nofrag action drop
-Error: mlxsw_spectrum: Unsupported match on control.flags 0x1.
-We have an error talking to the kernel
-+ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags firstfrag action drop
-Error: mlxsw_spectrum: Unsupported match on control.flags 0x2.
-We have an error talking to the kernel
-+ tc filter add dev swp1 ingress pref 1 proto ip flower skip_sw ip_flags nofirstfrag action drop
-Error: mlxsw_spectrum: Unsupported match on control.flags 0x2.
-We have an error talking to the kernel
-
-Thanks!
 
