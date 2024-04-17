@@ -1,159 +1,179 @@
-Return-Path: <netdev+bounces-88538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 509028A79D8
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 02:27:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 079958A79DD
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 02:32:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8297E1C20DA0
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 00:27:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27F501C20F69
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 00:32:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7EA637B;
-	Wed, 17 Apr 2024 00:27:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61DAC17C2;
+	Wed, 17 Apr 2024 00:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pKPD34Pg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f3wo3DsG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36357F8
-	for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 00:27:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35A6F812;
+	Wed, 17 Apr 2024 00:32:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713313651; cv=none; b=Oub+gp/WXINjTPhquiw4UMS/UQRIjhsH32admRxkAtNJeoBpAn+dIBf5OLRGcRZ57a3mH9ibZkmaC78/xKFU1zftPvObuXUNesOLrSqWm9CmY7pd5dEGlgAJwpyQUmxqiUxU+l0ywi7ogbKX6XHHSCctq98pnXm3DP0E9ncI320=
+	t=1713313944; cv=none; b=ugnNOLcfpQLCr9L72eAX8kzBTQqMPpyWN7Dk5d2JhErVVtBspZsN4vQdFt8wEXNlJugcECekf5bjUdSNqcuwInWMJ4XGRkEZDSzwfl6VCQgfiNXyjF2gRxg3NOMIkIL1dBpIBIdrHeI7rhiAU+uEkAyCZ5q0t/KvpKNLIU2wpTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713313651; c=relaxed/simple;
-	bh=EF2zXhy4hq4LcXMfRKQeBpUlGP93GlWlGupOb6GX3kU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jQ0j1O5MV1hItuOoOD9G0lLvLZMVcQ+PWZus70hDB0D4x50Tlk6yBTrqXR40Zmo3wptY8C+Vz9MfbC90nOk6s6WtTVRszAPUjulJrJZknymatSZ/OYDqAt9icAhvL9Y0dh0dBHtx2rWs3Z7w9JwZvo/OxDwlrbroTSOlu+BBhRM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pKPD34Pg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF03AC113CE;
-	Wed, 17 Apr 2024 00:27:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713313651;
-	bh=EF2zXhy4hq4LcXMfRKQeBpUlGP93GlWlGupOb6GX3kU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pKPD34PgHt0UhLME+0ogAcEKLhfI8cov7dmq0x4Q1BZw81B/U2OlyWrw3NXPrCxg5
-	 PNAb5B6rLJk9JP8hqEnZi1K7sV04s8Sb9K8JwURlia8HRkPseCW0TReCT9viOSpve9
-	 SJU0oHzeF8hL1I41OER8X/7SLglYpbjdWW7ihpkacIiqEh5cKexvmJUVaFAOH5bsIQ
-	 apWmrtLSVMwbNbO/RyjvRRN+MHNnHPttK4EUW7+r1cQi9Fjj/5+KfmkQZyvq/X4PPP
-	 7vUc7Q4GWq2IOZ5KFAqY9l6KjAnPBWBANDMdSPa2E9Jgr9dzP1keJEWRupjyLTNTfP
-	 FG6nesSeqx6Ng==
-Date: Tue, 16 Apr 2024 17:27:30 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH v1 1/2] netdevsim: add NAPI support
-Message-ID: <20240416172730.1b588eef@kernel.org>
-In-Reply-To: <20240416051527.1657233-2-dw@davidwei.uk>
-References: <20240416051527.1657233-1-dw@davidwei.uk>
-	<20240416051527.1657233-2-dw@davidwei.uk>
+	s=arc-20240116; t=1713313944; c=relaxed/simple;
+	bh=E78q9qxu6fgEi0Hu9VQBbhkJUlwzErCAfnhnu3DfPDI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UdnS5SgPe1aVhF8AvpyyrscyVlLuCoH66AWy5gvmS9AiwwHVWDhJg5W2kH0JUf4z0yukhUyF6FArsnFBdTB2vehYV7KNY5D3YpfregHp2sPga3V340RZy6d+8eYdbjizB+payxFFJ4StQWsfPAVZX+UQqAsjS6dTOBVpEw9h/0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f3wo3DsG; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713313942; x=1744849942;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=E78q9qxu6fgEi0Hu9VQBbhkJUlwzErCAfnhnu3DfPDI=;
+  b=f3wo3DsGjlVuWO8cALNtKxbpGb4kNXw06aoTrwbFvkcH/1XJfgnbLCs5
+   R9i9g527k6vCzbCGafLcQYzll8RQucjO6YdI2k8dAPcYui7Hv3BeDmfFM
+   0NE/65lr2p2mVwmdlBtDgUs4F9at+Iu4+aXSmoJ9TxsLUVdKOGXVPc67W
+   9fYb3jYk3CIfJ0ydgbJI8RFPh4A6EMxkqMNCUKXzwBdxn2rOlnyWkIrtT
+   4e/vICBrmGVLnN5etVj+W7qbW6pYt210tE/4OpDriXiNJtLP0sjzUjEgT
+   iFfrj5FMg/ac/9mfHavZg03L4UzSNgtpF599d/Wi1mqiTI+tuoO3uDkQA
+   g==;
+X-CSE-ConnectionGUID: F9KqvMBxQfyUSxv3Uo4IGQ==
+X-CSE-MsgGUID: vd3GX53wTSq4q7KYNddJ3g==
+X-IronPort-AV: E=McAfee;i="6600,9927,11046"; a="8667815"
+X-IronPort-AV: E=Sophos;i="6.07,207,1708416000"; 
+   d="scan'208";a="8667815"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Apr 2024 17:32:21 -0700
+X-CSE-ConnectionGUID: WeG2B2aUQ0CPFsmkwxr/JQ==
+X-CSE-MsgGUID: SD+Q6YlrQGuyEHKcbvUixw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,207,1708416000"; 
+   d="scan'208";a="23032746"
+Received: from unknown (HELO 23c141fc0fd8) ([10.239.97.151])
+  by orviesa008.jf.intel.com with ESMTP; 16 Apr 2024 17:32:19 -0700
+Received: from kbuild by 23c141fc0fd8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rwtDk-0005tW-1Z;
+	Wed, 17 Apr 2024 00:32:16 +0000
+Date: Wed, 17 Apr 2024 08:31:31 +0800
+From: kernel test robot <lkp@intel.com>
+To: Geetha sowjanya <gakula@marvell.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, kuba@kernel.org, davem@davemloft.net,
+	pabeni@redhat.com, edumazet@google.com, sgoutham@marvell.com,
+	gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
+Subject: Re: [net-next PATCH 3/9] octeontx2-pf: Create representor netdev
+Message-ID: <202404170853.i93jboPB-lkp@intel.com>
+References: <20240416050616.6056-4-gakula@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240416050616.6056-4-gakula@marvell.com>
 
-On Mon, 15 Apr 2024 22:15:26 -0700 David Wei wrote:
-> Add NAPI support to netdevim, similar to veth.
-> 
-> * Add a nsim_rq rx queue structure to hold a NAPI instance and a skb
->   queue.
-> * During xmit, store the skb in the peer skb queue and schedule NAPI.
-> * During napi_poll(), drain the skb queue and pass up the stack.
-> * Add assoc between rxq and NAPI instance using netif_queue_set_napi().
+Hi Geetha,
 
-> +#define NSIM_RING_SIZE		256
-> +
-> +static int nsim_napi_rx(struct nsim_rq *rq, struct sk_buff *skb)
-> +{
-> +	if (list_count_nodes(&rq->skb_queue) > NSIM_RING_SIZE) {
-> +		dev_kfree_skb_any(skb);
-> +		return NET_RX_DROP;
-> +	}
-> +
-> +	list_add_tail(&skb->list, &rq->skb_queue);
+kernel test robot noticed the following build warnings:
 
-Why not use struct sk_buff_head ?
-It has a purge helper for freeing, and remembers its own length.
+[auto build test WARNING on net-next/main]
 
-> +static int nsim_poll(struct napi_struct *napi, int budget)
-> +{
-> +	struct nsim_rq *rq = container_of(napi, struct nsim_rq, napi);
-> +	int done;
-> +
-> +	done = nsim_rcv(rq, budget);
-> +
-> +	if (done < budget && napi_complete_done(napi, done)) {
-> +		if (unlikely(!list_empty(&rq->skb_queue)))
-> +			napi_schedule(&rq->napi);
+url:    https://github.com/intel-lab-lkp/linux/commits/Geetha-sowjanya/octeontx2-pf-Refactoring-RVU-driver/20240416-131052
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240416050616.6056-4-gakula%40marvell.com
+patch subject: [net-next PATCH 3/9] octeontx2-pf: Create representor netdev
+config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20240417/202404170853.i93jboPB-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240417/202404170853.i93jboPB-lkp@intel.com/reproduce)
 
-I think you can drop the re-check, NAPI has a built in protection 
-for this kind of race.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202404170853.i93jboPB-lkp@intel.com/
 
-> +	}
-> +
-> +	return done;
-> +}
+All warnings (new ones prefixed by >>):
 
->  static int nsim_open(struct net_device *dev)
->  {
->  	struct netdevsim *ns = netdev_priv(dev);
-> -	struct page_pool_params pp = { 0 };
-> +	int err;
-> +
-> +	err = nsim_init_napi(ns);
-> +	if (err)
-> +		return err;
-> +
-> +	nsim_enable_napi(ns);
->  
-> -	pp.pool_size = 128;
-> -	pp.dev = &dev->dev;
-> -	pp.dma_dir = DMA_BIDIRECTIONAL;
-> -	pp.netdev = dev;
-> +	netif_carrier_on(dev);
+   drivers/net/ethernet/marvell/octeontx2/nic/rep.c: In function 'rvu_rep_create':
+>> drivers/net/ethernet/marvell/octeontx2/nic/rep.c:163:66: warning: '%d' directive output may be truncated writing between 1 and 4 bytes into a region of size between 1 and 11 [-Wformat-truncation=]
+     163 |                 snprintf(ndev->name, sizeof(ndev->name), "r%dp%dv%d", rep_id,
+         |                                                                  ^~
+   drivers/net/ethernet/marvell/octeontx2/nic/rep.c:163:58: note: directive argument in the range [0, 1023]
+     163 |                 snprintf(ndev->name, sizeof(ndev->name), "r%dp%dv%d", rep_id,
+         |                                                          ^~~~~~~~~~~
+   drivers/net/ethernet/marvell/octeontx2/nic/rep.c:163:17: note: 'snprintf' output between 7 and 20 bytes into a destination of size 16
+     163 |                 snprintf(ndev->name, sizeof(ndev->name), "r%dp%dv%d", rep_id,
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+     164 |                          rvu_get_pf(pcifunc), (pcifunc & RVU_PFVF_FUNC_MASK));
+         |                          ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Why the carrier? It's on by default.
-Should be a separate patch if needed.
 
-> -	ns->pp = page_pool_create(&pp);
-> -	return PTR_ERR_OR_ZERO(ns->pp);
-> +	return 0;
-> +}
+vim +163 drivers/net/ethernet/marvell/octeontx2/nic/rep.c
 
-> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-> index 7664ab823e29..87bf45ec4dd2 100644
-> --- a/drivers/net/netdevsim/netdevsim.h
-> +++ b/drivers/net/netdevsim/netdevsim.h
-> @@ -90,11 +90,18 @@ struct nsim_ethtool {
->  	struct ethtool_fecparam fec;
->  };
->  
-> +struct nsim_rq {
-> +	struct napi_struct napi;
-> +	struct list_head skb_queue;
-> +	struct page_pool *page_pool;
+   131	
+   132	int rvu_rep_create(struct otx2_nic *priv)
+   133	{
+   134		int rep_cnt = priv->rep_cnt;
+   135		struct net_device *ndev;
+   136		struct rep_dev *rep;
+   137		int rep_id, err;
+   138		u16 pcifunc;
+   139	
+   140		priv->reps = devm_kcalloc(priv->dev, rep_cnt, sizeof(struct rep_dev), GFP_KERNEL);
+   141		if (!priv->reps)
+   142			return -ENOMEM;
+   143	
+   144		for (rep_id = 0; rep_id < rep_cnt; rep_id++) {
+   145			ndev = alloc_etherdev(sizeof(*rep));
+   146			if (!ndev) {
+   147				dev_err(priv->dev, "PFVF representor:%d creation failed\n", rep_id);
+   148				err = -ENOMEM;
+   149				goto exit;
+   150			}
+   151	
+   152			rep = netdev_priv(ndev);
+   153			priv->reps[rep_id] = rep;
+   154			rep->mdev = priv;
+   155			rep->netdev = ndev;
+   156			rep->rep_id = rep_id;
+   157	
+   158			ndev->min_mtu = OTX2_MIN_MTU;
+   159			ndev->max_mtu = priv->hw.max_mtu;
+   160			pcifunc = priv->rep_pf_map[rep_id];
+   161			rep->pcifunc = pcifunc;
+   162	
+ > 163			snprintf(ndev->name, sizeof(ndev->name), "r%dp%dv%d", rep_id,
+   164				 rvu_get_pf(pcifunc), (pcifunc & RVU_PFVF_FUNC_MASK));
+   165	
+   166			eth_hw_addr_random(ndev);
+   167			if (register_netdev(ndev)) {
+   168				dev_err(priv->dev, "PFVF reprentator registration failed\n");
+   169				free_netdev(ndev);
+   170				ndev->netdev_ops = NULL;
+   171				goto exit;
+   172			}
+   173		}
+   174		err = rvu_rep_napi_init(priv);
+   175		if (err)
+   176			goto exit;
+   177	
+   178		return 0;
+   179	exit:
+   180		rvu_rep_free_netdev(priv);
+   181		return err;
+   182	}
+   183	
 
-You added the new page_pool pointer but didn't delete the one
-I added recently to the device?
-
-> +};
-> +
->  struct netdevsim {
->  	struct net_device *netdev;
->  	struct nsim_dev *nsim_dev;
->  	struct nsim_dev_port *nsim_dev_port;
->  	struct mock_phc *phc;
-> +	struct nsim_rq *rq;
->  
->  	u64 tx_packets;
->  	u64 tx_bytes;
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
