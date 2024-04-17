@@ -1,118 +1,154 @@
-Return-Path: <netdev+bounces-88766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17DEE8A8796
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 17:30:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 315BB8A87B7
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 17:34:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6E0E282006
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:30:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 62A4D1C21C5D
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 15:34:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 968E51474DB;
-	Wed, 17 Apr 2024 15:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 956A11474DA;
+	Wed, 17 Apr 2024 15:34:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="se2Q5oyT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i4T6AISh"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 526E7140E29;
-	Wed, 17 Apr 2024 15:30:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 651C113C3EF;
+	Wed, 17 Apr 2024 15:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713367806; cv=none; b=jxfICum6kJhzf4BEfUa3H6MbxHg79OgHpAuWNJ74dF5VdZLGG00N9dXhJVlJh70U2c6NIrRpZs4GPMgjQSogGZoiWX7xJ2rIQrk6WF8j23u4u4+ev4ZoqqHssOQgPgxqxaGhK6uqpirrrHRQYg+CglveYxyGlpX07P5noADey8k=
+	t=1713368068; cv=none; b=ARFys+a6ITm7aw+zHvcO88YYbb08f5aTUGdKeCPLJxtxGyPkcmIZa+EdWnkQRZYinsYKRO8JJYRq+InxkAqmFoY0VOmOkEOwhY+SJeFGNIQ2Rls1zKLrDEvEviKS+Ai2mzgxuuzdBjMiEVAa70W/sToC2wenLEKW7uEDUv/+1/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713367806; c=relaxed/simple;
-	bh=XkH4g4DTe/chnyyem+t7TxDHFU5BkdWClQJ756pn9hU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DnBLG7d46aVBgn8eGWy3s2OFhhnpGw9aucC7m9caYONdrT+/YgDPN6Y81YWktGMPU57EdgrfyY49p3WWTe89UXuV4tv9FZzWtqhUWJ/s7NFti1WhpT/uUrmR5LHpbnZsPQbizOT4lCCXU4qxvJzHRTXNDc2N1BRAV2Xlkjq/3Ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=se2Q5oyT; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=z71MR9/FB4ZLioSpgSrKFmW/9gLRNuEnvteXucs//5s=; b=se2Q5oyTwGO5A10GW19iibXdJX
-	2vm1ab+CjApvrXcmZbyd6fjRwHnPI1eEobHTO9OJvlpIpXILvRHyeN1fud9edIbk2nv6mhx6MoKdf
-	kyPxYhkY97Fg31Fi49zDc38CY30gObZ68HaAhenQStO14BDseyhHhlJTFDwzAPQhhBfnTyXoHMOHM
-	W628az/zUbLDjK2Si4P/cAzMULNAiLCiYZhnZJhKPBOnntgs6+JZ4oXVaFINEv9Mdi+DuJrTIkXa5
-	j0THh6+kmi2KQIfxdMj6saaPA7pFydYV1auPPZm+J2ywqo2S85CyVF7KbR6qLy5HuwJw/3KG3Lriy
-	GLIF6NUQ==;
-Received: from [50.53.2.121] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rx7ES-0000000GabK-0bD4;
-	Wed, 17 Apr 2024 15:29:56 +0000
-Message-ID: <1c1bc9c3-978c-4e41-8a4b-66da25416304@infradead.org>
-Date: Wed, 17 Apr 2024 08:29:53 -0700
+	s=arc-20240116; t=1713368068; c=relaxed/simple;
+	bh=IaRbObB5dEEIBtmpY4TQrQpfkbKo3yd2zwxXbfaJry0=;
+	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
+	 Message-Id:Subject; b=jcS+eTpuaZWeVijKeU8wGzXirr/TzjuVnRf6vuvOTyySPhANT2/7qE9a31rq7CyYoztjjdnMseZOteXJdOG1qYreKfY7aiP+GkMOiscNyQfi7nc/4sIZQY0gdmz8z1SYJ+E23pEMu5YeqVZGk3SpxauCsLDcSvGR5NbgiHuQ+A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i4T6AISh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCB6DC072AA;
+	Wed, 17 Apr 2024 15:34:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713368068;
+	bh=IaRbObB5dEEIBtmpY4TQrQpfkbKo3yd2zwxXbfaJry0=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=i4T6AIShq8iv6NzCQXuiVcBRjXys+gIu07VpRelIM/4VXfkxa3i1aKygFMcqTfTIP
+	 AxI1eScM8ogH6mCi0qFjCiT8MznN+YC6bE97ooKRydobQsZBEBBPl14dFQ/xJn7HcJ
+	 WhAUpXTxxQ+2Ln9OGR3rqkl/aitwNGoa5G5ULy5RqNdc8NReBC8F7Aw/raXUAR5Vla
+	 sVdUqc4laN664krEG2iJfuh8vTv5eP5X/Cd5kMpYf6dUmdG1Ce3KMwmHj+zgdDoFUO
+	 jLR33YbSwCQZlA1pjaR0uIv/IyOSNecht8uQWZ1RfasrybthQd67T+YCEJKhb1akT9
+	 aqEUnB1f0DATQ==
+Date: Wed, 17 Apr 2024 10:34:26 -0500
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 03/10] net: create a dummy net_device
- allocator
-To: Alexander Lobakin <aleksander.lobakin@intel.com>,
- Johannes Berg <johannes@sipsolutions.net>, Jakub Kicinski <kuba@kernel.org>,
- Breno Leitao <leitao@debian.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- elder@kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, nbd@nbd.name, sean.wang@mediatek.com,
- Mark-MC.Lee@mediatek.com, lorenzo@kernel.org, taras.chornyi@plvision.eu,
- ath11k@lists.infradead.org, ath10k@lists.infradead.org,
- linux-wireless@vger.kernel.org, geomatsi@gmail.com, kvalo@kernel.org,
- quic_jjohnson@quicinc.com, leon@kernel.org,
- dennis.dalessandro@cornelisnetworks.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, bpf@vger.kernel.org, idosch@idosch.org,
- Ido Schimmel <idosch@nvidia.com>, Jiri Pirko <jiri@resnulli.us>,
- Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-References: <20240411135952.1096696-1-leitao@debian.org>
- <20240411135952.1096696-4-leitao@debian.org>
- <20240412191626.2e9bfb4a@kernel.org>
- <ebe80c29-4884-488d-ab83-c020f9c3bc81@intel.com>
- <e0d5741ee053c11fe078fc8afe6cf4a92e274095.camel@sipsolutions.net>
- <d4991f11-a527-429d-b71f-d4ca3a18f501@intel.com>
-Content-Language: en-US
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <d4991f11-a527-429d-b71f-d4ca3a18f501@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Rob Herring <robh@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, 
+ Dent Project <dentproject@linuxfoundation.org>, 
+ linux-kernel@vger.kernel.org, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, 
+ kernel@pengutronix.de, "Rafael J. Wysocki" <rafael@kernel.org>, 
+ linux-doc@vger.kernel.org, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Russell King <linux@armlinux.org.uk>, Russ Weight <russ.weight@linux.dev>, 
+ Jakub Kicinski <kuba@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, 
+ Andrew Lunn <andrew@lunn.ch>, Mark Brown <broonie@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Oleksij Rempel <o.rempel@pengutronix.de>, 
+ Frank Rowand <frowand.list@gmail.com>, Paolo Abeni <pabeni@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
+ Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org, 
+ Rob Herring <robh+dt@kernel.org>
+In-Reply-To: <20240417-feature_poe-v9-8-242293fd1900@bootlin.com>
+References: <20240417-feature_poe-v9-0-242293fd1900@bootlin.com>
+ <20240417-feature_poe-v9-8-242293fd1900@bootlin.com>
+Message-Id: <171336806575.2618779.157615998420721814.robh@kernel.org>
+Subject: Re: [PATCH net-next v9 08/14] dt-bindings: net: pse-pd: Add
+ another way of describing several PSE PIs
 
 
-
-On 4/17/24 4:19 AM, Alexander Lobakin wrote:
-> From: Johannes Berg <johannes@sipsolutions.net>
-> Date: Wed, 17 Apr 2024 13:11:38 +0200
+On Wed, 17 Apr 2024 16:39:56 +0200, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 > 
->> On Wed, 2024-04-17 at 12:51 +0200, Alexander Lobakin wrote:
->>> Just FYI: kdoc accepts only this pattern:
->>>
->>>  * @last_param: blah
->>>  *
->>>  * Return: blah
->>>
->>> NOT
->>>
->>>  * Returns: blah
->>
->> Actually, it does accept that, the regex is "returns?". It's just
-
-ack (Return: is documented)
-
-> Hmm, I was sure I had warnings on "Returns:"... Not sure now.
+> PSE PI setup may encompass multiple PSE controllers or auxiliary circuits
+> that collectively manage power delivery to one Ethernet port.
+> Such configurations might support a range of PoE standards and require
+> the capability to dynamically configure power delivery based on the
+> operational mode (e.g., PoE2 versus PoE4) or specific requirements of
+> connected devices. In these instances, a dedicated PSE PI node becomes
+> essential for accurately documenting the system architecture. This node
+> would serve to detail the interactions between different PSE controllers,
+> the support for various PoE modes, and any additional logic required to
+> coordinate power delivery across the network infrastructure.
 > 
-Yes, either way is accepted.
+> The old usage of "#pse-cells" is unsuficient as it carries only the PSE PI
+> index information.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
+> 
+> Changes in v3:
+> - New patch
+> 
+> Changes in v4:
+> - Remove $def
+> - Fix pairset-names item list
+> - Upgrade few properties description
+> - Update the commit message
+> 
+> Changes in v5:
+> - Fix yamllint error.
+> - Replace underscore by dash in properties names.
+> - Add polarity-supported property.
+> 
+> Changes in v6:
+> - Reorder the pairset pinout table documentation to shrink the lines size.
+> - Remove pairset and polarity as required fields.
+> - Add vpwr-supply regulator supply.
+> 
+> Changes in v7:
+> - Fix weird characters issue.
+> - Fix documentation nit.
+> ---
+>  .../bindings/net/pse-pd/pse-controller.yaml        | 101 ++++++++++++++++++++-
+>  1 file changed, 98 insertions(+), 3 deletions(-)
+> 
 
-> documented only as "Return" . IMHO it sometimes reads nicer as "Returns"
->> depending on how you phrase it, but ...
+My bot found errors running 'make dt_binding_check' on your patch:
 
--- 
-#Randy
-https://people.kernel.org/tglx/notes-about-netiquette
-https://subspace.kernel.org/etiquette.html
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+
+
+doc reference errors (make refcheckdocs):
+Warning: Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml references a file that doesn't exist: Documentation/networking/pse-pd/pse-pi.rst
+Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml: Documentation/networking/pse-pd/pse-pi.rst
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240417-feature_poe-v9-8-242293fd1900@bootlin.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
