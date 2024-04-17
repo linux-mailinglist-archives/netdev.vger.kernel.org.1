@@ -1,167 +1,308 @@
-Return-Path: <netdev+bounces-88877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 474538A8D80
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 23:09:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B3FC8A8D99
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 23:16:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8563B22CAE
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 21:09:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31762282609
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 21:16:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7BD1481BB;
-	Wed, 17 Apr 2024 21:09:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF5454C62E;
+	Wed, 17 Apr 2024 21:16:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="kK0azEzb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="khHF4Kla"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3A58F4A;
-	Wed, 17 Apr 2024 21:09:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E699B37163;
+	Wed, 17 Apr 2024 21:16:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713388177; cv=none; b=GDyMO6E0tO0iqxUy5TkMi4PwZoYt7bie8cGy3Zs91k4xSUL1rzt8tvJzreMH20jQNUMF2T555DS8tELfFcccXWtztWOGMMlWObGLRM/T3X15jlRS6gbVBN5Jg9wMp9Wtt4sM5volf/Xb7Tr+MqId/9jpZsHqBjUDWq/hqb5JSgY=
+	t=1713388590; cv=none; b=Fb6SwUEs7UoKjBJ2QA9KQxmcSBn5xhcvGINp31msiVbRvIbFgiRL2pNF7KuI49gqPrkq4XfQXV6HiJnoqdLp/XeS/mGRv5+Db7ozOQgcI6qXw6e8PwdxP3bii+/gLB04kSuubQuPpfnpNDA9+Dh5z1gwJoj0pU80kw/PVFZLIJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713388177; c=relaxed/simple;
-	bh=f1rNUKMi/2p7FcIFAowLHzuCp8mNU610ACgQqvx2LUM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J+TA81y5PBFMA5Zb9VlM0as3VuhiegmiSkF+ch6WbwvjF8ITqfGcXEaR09GiG29punm9yZSwtaJAepnuA5kamxF0SGhqD6gYbKMlilZPqpqyePdZNi9o8PZ1BFYevMQbkenkvtzYQBIAKy9jErFwOV4wi7VJfxCcaDymRCXtseQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=kK0azEzb; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 81C3CE0002;
-	Wed, 17 Apr 2024 21:09:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1713388172;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O2m8pR1pCbDPDT8QEV6rLd8e1/9F0K8J7acfuqFf7QA=;
-	b=kK0azEzbFnTcYp++AYAcjqBoyE8TnPGCbJAfTbtuRI20udyuLFdbvG1CBUKlAuDGpaG2Kt
-	zg63AxtFeeVgPhYzLL5gG5uv3PZLMLqokImt9vTn8Za2vY/8ByTJ3aPiqrF6rp3H0qGLsc
-	6q/XTnohHTblzYoauX2Bfr1Py7DIMZCWDjFyH4poEMHZ83FctP7+Hoh5ewNJaam4Sut+Lv
-	AvSvOp2Z1TpJvrXkPMc0wcpSfQadLq6Mwr80gLu78ieEG45l4rTSt3sUmGWv1+Xr61QS1p
-	oM8ddfBZBBtASlEi8SlnjZC/E8UpusTmgJGiPem6H8cmHf6dwPt7B7Fb5eK90w==
-Date: Wed, 17 Apr 2024 23:09:20 +0200
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Nathan Chancellor <nathan@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Andrew Lunn
- <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
- <linux@armlinux.org.uk>, linux-arm-kernel@lists.infradead.org, Christophe
- Leroy <christophe.leroy@csgroup.eu>, Herve Codina
- <herve.codina@bootlin.com>, Florian Fainelli <f.fainelli@gmail.com>, Heiner
- Kallweit <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Marek =?UTF-8?B?QmVow7pu?=
- <kabel@kernel.org>, Piergiorgio Beruto <piergiorgio.beruto@gmail.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>
-Subject: Re: [PATCH net-next] net: phy: link_topology: Don't stub-away the
- topology creation
-Message-ID: <20240417230920.054d8803@fedora>
-In-Reply-To: <20240417180721.GA3212605@dev-arch.thelio-3990X>
-References: <20240417142707.2082523-1-maxime.chevallier@bootlin.com>
-	<20240417180721.GA3212605@dev-arch.thelio-3990X>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1713388590; c=relaxed/simple;
+	bh=B8k0rdHz9AorZ8E2yhSratxIp+xQyckEI2Rmzx/g7NU=;
+	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=LPTiKs8f4AuOvfeUrrNb1DM34aiufJkWTygzrOoYosu1gc2ONV9C+t2FrTXjJ6xKAsQrqa+/cPxaU4xf9Qt4BJpW0KbcG3i8xwkcgQad2f7InXq5EeFxuaEaNPHm9gDxguf85voPG0J1yFv0OzohNlMAtLVvp9DAwEqnBEFmHCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=khHF4Kla; arc=none smtp.client-ip=209.85.210.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6ecff9df447so246412b3a.1;
+        Wed, 17 Apr 2024 14:16:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713388587; x=1713993387; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bn6gtyCUSwijw+6XX0qI9C//f05i55ZPnAFUJjnUL90=;
+        b=khHF4KlaSlUMwRvFnAXhT6aAxJ3H68ONM4EQimKS2OKWfrU1FYu0io1xoX1A9DAmAJ
+         tmnkQSYsVBEOMddjskYVEcjEAKKDopw9g54KZILywLdzaC2FtRNU31+56ks3TjHoOWhh
+         GwDkjYwHhxo2Tt6tZTCpGW7aQ7SXyLj2wLyvZO3CwLseY3mgTlvbe+M9nBWyJJI1Vcbo
+         nSCjoqit9MzsEHoUrx+F1R+Eg30wNT+4yfI+2iNAPyM0yJ7STovIxe8svR5hEuLxWODm
+         mUNEFLDU6FMGPPgU5kE28S1UkwkUy2I/Zwl+Cv2QObvDWySvkz63OiG3XVYeLP2nw/bK
+         a7Cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713388587; x=1713993387;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bn6gtyCUSwijw+6XX0qI9C//f05i55ZPnAFUJjnUL90=;
+        b=M3/IA/K22jTkCMxKHWvjJkgbaURynhyohVoFjHIWq0vPni4RqWDy0lkN4f71dqIVQ/
+         ZErYYIctjlUo1+wNN03dt9BLA92BN8+ZlYEyKwHKCOU9dvM8vyG0SUYfymmzDAErekah
+         F1ng65h2iH/jW2CUk36p162s4BqKHt1V/gyraLwHOpryHVxrLnzZcxjrpkOcA7f87iB5
+         fVRhZd+KddYvFfs0q16z3Az9MbhXmrF+J1y7DkA1rNvnfIqhyk9Qk3rta666VbJSOxhJ
+         GclwCYPvkF8T6etLCmjiKbfQrZCUtNHnog3LxApaa+94K/k/3ElUtFvOJ2Nqqm8fxEWK
+         8ykQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVqHeWQcmAEHHGDr1dQDsAbZE/GS3Ya+mLKsQB4SJvT1+S2f+HwwvxX1ev+6fqPPqiOFO1wRN/XlfvB+52EKga7kPgfOEa2YqMw2xSEw57FnYnTLKRxAvkFmaOnWoAirAj2r6T3ivK2MnVMZwNix/iiCBEKT0xUKsgfz2S6EEWcSb+UKuvhMizS3nIz6k6Si6Vc7DkMfiPQsJhcUeUW/e7lIHtFzZnXwzihNUW332J9+v7fD9XXO7+8qSjmx1VKVAicYb3l0M9IDCjInVnarvaAr3kJDfQPggdz7txg45nd0cfFUdzCDElSMimzJKnrBi+XpOxnDXr68f+bA8D6mtisMSI0L6MrlRDR9cKF9lbe8WWhnt3kNv6ytgiecOCqRC0GdeV4lt9C3ld0QyQ=
+X-Gm-Message-State: AOJu0YyjfYlFiKm9ztD6Ofy37xWf1oxygn1iqh1RnM4uyXAF8T5Z/1w2
+	paOAaB33F8rnT6gjGBN2ueaB//zXiP64KK16F/2kfO1eMXiFPx2K
+X-Google-Smtp-Source: AGHT+IGaiPoLXXXpVrpLOJx1iAETWJgKsjUW+rWbh5/bn42gLXIa3/rbbH0xm62Oxp9IYd0WoUIt9A==
+X-Received: by 2002:aa7:8884:0:b0:6eb:1d5:6e43 with SMTP id z4-20020aa78884000000b006eb01d56e43mr962657pfe.11.1713388587052;
+        Wed, 17 Apr 2024 14:16:27 -0700 (PDT)
+Received: from devnote2 (113x37x226x201.ap113.ftth.ucom.ne.jp. [113.37.226.201])
+        by smtp.gmail.com with ESMTPSA id h3-20020a056a00218300b006ed4aa9d48esm110372pfi.212.2024.04.17.14.16.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Apr 2024 14:16:26 -0700 (PDT)
+Date: Thu, 18 Apr 2024 06:16:15 +0900
+From: Masami Hiramatsu <masami.hiramatsu@gmail.com>
+To: Mike Rapoport <rppt@kernel.org>
+Cc: linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>,
+ Andrew Morton <akpm@linux-foundation.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>, Catalin Marinas <catalin.marinas@arm.com>, Christophe
+ Leroy <christophe.leroy@csgroup.eu>, "David S. Miller"
+ <davem@davemloft.net>, Dinh Nguyen <dinguyen@kernel.org>, Donald Dutile
+ <ddutile@redhat.com>, Eric Chanudet <echanude@redhat.com>, Heiko Carstens
+ <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>, Huacai Chen
+ <chenhuacai@kernel.org>, Kent Overstreet <kent.overstreet@linux.dev>, Luis
+ Chamberlain <mcgrof@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nadav Amit <nadav.amit@gmail.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Puranjay Mohan <puranjay12@gmail.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>, Russell King
+ <linux@armlinux.org.uk>, Song Liu <song@kernel.org>, Steven Rostedt
+ <rostedt@goodmis.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+ bpf@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+ linux-mm@kvack.org, linux-modules@vger.kernel.org,
+ linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
+ netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v4 14/15] kprobes: remove dependency on CONFIG_MODULES
+Message-Id: <20240418061615.5fad23b954bf317c029acc4d@gmail.com>
+In-Reply-To: <20240411160051.2093261-15-rppt@kernel.org>
+References: <20240411160051.2093261-1-rppt@kernel.org>
+	<20240411160051.2093261-15-rppt@kernel.org>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello Nathan,
+Hi Mike,
 
-On Wed, 17 Apr 2024 11:07:21 -0700
-Nathan Chancellor <nathan@kernel.org> wrote:
+On Thu, 11 Apr 2024 19:00:50 +0300
+Mike Rapoport <rppt@kernel.org> wrote:
 
-> Hi Maxime,
+> From: "Mike Rapoport (IBM)" <rppt@kernel.org>
 > 
-> On Wed, Apr 17, 2024 at 04:27:05PM +0200, Maxime Chevallier wrote:
-> > Some of the phy_link_topology operations are protected by IS_REACHABLE,
-> > which can lead to scenarios where the consumer, built as modules, sees the topology
-> > unstubbed, whereas the initialization didn't occur.
-> > 
-> > Don't stub away the creation of the topology, it has no dependency on
-> > any other parts like phylib, so we can make it always available.
-> > 
-> > Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
-> > Closes: https://lore.kernel.org/netdev/2e11b89d-100f-49e7-9c9a-834cc0b82f97@gmail.com/
-> > Closes: https://lore.kernel.org/netdev/20240409201553.GA4124869@dev-arch.thelio-3990X/
-> > ---
-> > Hi Nathan, Heiner,
-> > 
-> > I'm currently at EOSS, so I'm sending this patch without having been
-> > able to properly test it (build-tested only), but as this addresses an
-> > issue for people using -next, I'm sending this anyway, sorry about that.  
+> kprobes depended on CONFIG_MODULES because it has to allocate memory for
+> code.
 > 
-> No worries, thanks for continuing to take a look. Unfortunately, this
-> patch fails to build during the linking stage for me with my
-> configuration:
+> Since code allocations are now implemented with execmem, kprobes can be
+> enabled in non-modular kernels.
 > 
-> x86_64-linux-ld: vmlinux.o: in function `free_netdev':
-> net/core/dev.c:11060:(.text+0xb14030): undefined reference to `phy_link_topo_destroy'
-> x86_64-linux-ld: vmlinux.o: in function `alloc_netdev_mqs':
-> net/core/dev.c:10966:(.text+0xb142d6): undefined reference to `phy_link_topo_create'
+> Add #ifdef CONFIG_MODULE guards for the code dealing with kprobes inside
+> modules, make CONFIG_KPROBES select CONFIG_EXECMEM and drop the
+> dependency of CONFIG_KPROBES on CONFIG_MODULES.
 
-Heh serves me well for trying to go too fast :) phy_link_topo_create
-then need to compile unconditionally, so I'm indeed missing some bits
-here.
+Thanks for this work, but this conflicts with the latest fix in v6.9-rc4.
+Also, can you use IS_ENABLED(CONFIG_MODULES) instead of #ifdefs in
+function body? We have enough dummy functions for that, so it should
+not make a problem.
 
-Thanks a lot for testing,
-
-Maxime
+Thank you,
 
 > 
-> > Hopefully it can address the issue for now, I haven't given-up on your
-> > idea to introduce a config option Heiner :)
-> > 
-> > Thanks,
-> > 
-> > Maxime
-> > 
-> >  include/linux/phy_link_topology_core.h | 15 ---------------
-> >  1 file changed, 15 deletions(-)
-> > 
-> > diff --git a/include/linux/phy_link_topology_core.h b/include/linux/phy_link_topology_core.h
-> > index 0a6479055745..61e2592f24ac 100644
-> > --- a/include/linux/phy_link_topology_core.h
-> > +++ b/include/linux/phy_link_topology_core.h
-> > @@ -4,22 +4,7 @@
-> >  
-> >  struct phy_link_topology;
-> >  
-> > -#if IS_REACHABLE(CONFIG_PHYLIB)
-> > -
-> >  struct phy_link_topology *phy_link_topo_create(struct net_device *dev);
-> >  void phy_link_topo_destroy(struct phy_link_topology *topo);
-> >  
-> > -#else
-> > -
-> > -static inline struct phy_link_topology *phy_link_topo_create(struct net_device *dev)
-> > -{
-> > -	return NULL;
-> > -}
-> > -
-> > -static inline void phy_link_topo_destroy(struct phy_link_topology *topo)
-> > -{
-> > -}
-> > -
-> > -#endif
-> > -
-> >  #endif /* __PHY_LINK_TOPOLOGY_CORE_H */
-> > -- 
-> > 2.44.0
-> >   
+> Signed-off-by: Mike Rapoport (IBM) <rppt@kernel.org>
+> ---
+>  arch/Kconfig                |  2 +-
+>  kernel/kprobes.c            | 43 +++++++++++++++++++++----------------
+>  kernel/trace/trace_kprobe.c | 11 ++++++++++
+>  3 files changed, 37 insertions(+), 19 deletions(-)
+> 
+> diff --git a/arch/Kconfig b/arch/Kconfig
+> index bc9e8e5dccd5..68177adf61a0 100644
+> --- a/arch/Kconfig
+> +++ b/arch/Kconfig
+> @@ -52,9 +52,9 @@ config GENERIC_ENTRY
+>  
+>  config KPROBES
+>  	bool "Kprobes"
+> -	depends on MODULES
+>  	depends on HAVE_KPROBES
+>  	select KALLSYMS
+> +	select EXECMEM
+>  	select TASKS_RCU if PREEMPTION
+>  	help
+>  	  Kprobes allows you to trap at almost any kernel address and
+> diff --git a/kernel/kprobes.c b/kernel/kprobes.c
+> index 047ca629ce49..90c056853e6f 100644
+> --- a/kernel/kprobes.c
+> +++ b/kernel/kprobes.c
+> @@ -1580,6 +1580,7 @@ static int check_kprobe_address_safe(struct kprobe *p,
+>  		goto out;
+>  	}
+>  
+> +#ifdef CONFIG_MODULES
+>  	/* Check if 'p' is probing a module. */
+>  	*probed_mod = __module_text_address((unsigned long) p->addr);
+>  	if (*probed_mod) {
+> @@ -1603,6 +1604,8 @@ static int check_kprobe_address_safe(struct kprobe *p,
+>  			ret = -ENOENT;
+>  		}
+>  	}
+> +#endif
+> +
+>  out:
+>  	preempt_enable();
+>  	jump_label_unlock();
+> @@ -2482,24 +2485,6 @@ int kprobe_add_area_blacklist(unsigned long start, unsigned long end)
+>  	return 0;
+>  }
+>  
+> -/* Remove all symbols in given area from kprobe blacklist */
+> -static void kprobe_remove_area_blacklist(unsigned long start, unsigned long end)
+> -{
+> -	struct kprobe_blacklist_entry *ent, *n;
+> -
+> -	list_for_each_entry_safe(ent, n, &kprobe_blacklist, list) {
+> -		if (ent->start_addr < start || ent->start_addr >= end)
+> -			continue;
+> -		list_del(&ent->list);
+> -		kfree(ent);
+> -	}
+> -}
+> -
+> -static void kprobe_remove_ksym_blacklist(unsigned long entry)
+> -{
+> -	kprobe_remove_area_blacklist(entry, entry + 1);
+> -}
+> -
+>  int __weak arch_kprobe_get_kallsym(unsigned int *symnum, unsigned long *value,
+>  				   char *type, char *sym)
+>  {
+> @@ -2564,6 +2549,25 @@ static int __init populate_kprobe_blacklist(unsigned long *start,
+>  	return ret ? : arch_populate_kprobe_blacklist();
+>  }
+>  
+> +#ifdef CONFIG_MODULES
+> +/* Remove all symbols in given area from kprobe blacklist */
+> +static void kprobe_remove_area_blacklist(unsigned long start, unsigned long end)
+> +{
+> +	struct kprobe_blacklist_entry *ent, *n;
+> +
+> +	list_for_each_entry_safe(ent, n, &kprobe_blacklist, list) {
+> +		if (ent->start_addr < start || ent->start_addr >= end)
+> +			continue;
+> +		list_del(&ent->list);
+> +		kfree(ent);
+> +	}
+> +}
+> +
+> +static void kprobe_remove_ksym_blacklist(unsigned long entry)
+> +{
+> +	kprobe_remove_area_blacklist(entry, entry + 1);
+> +}
+> +
+>  static void add_module_kprobe_blacklist(struct module *mod)
+>  {
+>  	unsigned long start, end;
+> @@ -2665,6 +2669,7 @@ static struct notifier_block kprobe_module_nb = {
+>  	.notifier_call = kprobes_module_callback,
+>  	.priority = 0
+>  };
+> +#endif
+>  
+>  void kprobe_free_init_mem(void)
+>  {
+> @@ -2724,8 +2729,10 @@ static int __init init_kprobes(void)
+>  	err = arch_init_kprobes();
+>  	if (!err)
+>  		err = register_die_notifier(&kprobe_exceptions_nb);
+> +#ifdef CONFIG_MODULES
+>  	if (!err)
+>  		err = register_module_notifier(&kprobe_module_nb);
+> +#endif
+>  
+>  	kprobes_initialized = (err == 0);
+>  	kprobe_sysctls_init();
+> diff --git a/kernel/trace/trace_kprobe.c b/kernel/trace/trace_kprobe.c
+> index 14099cc17fc9..f0610137d6a3 100644
+> --- a/kernel/trace/trace_kprobe.c
+> +++ b/kernel/trace/trace_kprobe.c
+> @@ -111,6 +111,7 @@ static nokprobe_inline bool trace_kprobe_within_module(struct trace_kprobe *tk,
+>  	return strncmp(module_name(mod), name, len) == 0 && name[len] == ':';
+>  }
+>  
+> +#ifdef CONFIG_MODULES
+>  static nokprobe_inline bool trace_kprobe_module_exist(struct trace_kprobe *tk)
+>  {
+>  	char *p;
+> @@ -129,6 +130,12 @@ static nokprobe_inline bool trace_kprobe_module_exist(struct trace_kprobe *tk)
+>  
+>  	return ret;
+>  }
+> +#else
+> +static inline bool trace_kprobe_module_exist(struct trace_kprobe *tk)
+> +{
+> +	return false;
+> +}
+> +#endif
+>  
+>  static bool trace_kprobe_is_busy(struct dyn_event *ev)
+>  {
+> @@ -670,6 +677,7 @@ static int register_trace_kprobe(struct trace_kprobe *tk)
+>  	return ret;
+>  }
+>  
+> +#ifdef CONFIG_MODULES
+>  /* Module notifier call back, checking event on the module */
+>  static int trace_kprobe_module_callback(struct notifier_block *nb,
+>  				       unsigned long val, void *data)
+> @@ -704,6 +712,7 @@ static struct notifier_block trace_kprobe_module_nb = {
+>  	.notifier_call = trace_kprobe_module_callback,
+>  	.priority = 1	/* Invoked after kprobe module callback */
+>  };
+> +#endif
+>  
+>  static int count_symbols(void *data, unsigned long unused)
+>  {
+> @@ -1933,8 +1942,10 @@ static __init int init_kprobe_trace_early(void)
+>  	if (ret)
+>  		return ret;
+>  
+> +#ifdef CONFIG_MODULES
+>  	if (register_module_notifier(&trace_kprobe_module_nb))
+>  		return -EINVAL;
+> +#endif
+>  
+>  	return 0;
+>  }
+> -- 
+> 2.43.0
+> 
+> 
 
+
+-- 
+Masami Hiramatsu
 
