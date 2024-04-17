@@ -1,95 +1,140 @@
-Return-Path: <netdev+bounces-88861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D66B38A8CD8
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 22:23:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3BF68A8D04
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 22:34:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81CD2284B63
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 20:23:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31AACB24F2C
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 20:34:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C825381BA;
-	Wed, 17 Apr 2024 20:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 762273AC25;
+	Wed, 17 Apr 2024 20:34:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="l7qkf56V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UdCu2ba6"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65457171A1;
-	Wed, 17 Apr 2024 20:23:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45A8C1E48B;
+	Wed, 17 Apr 2024 20:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713385406; cv=none; b=dCSMld3mp9F9LTt2hkl9ju/n1Oo6f4fOzNF/AgqAnpoKWB3w+Tn8/nCmxc6ovkyY/rQpLs45oz+5neMRy2ppwtuxF7hrf9B3bFk2g4hAJfy6UJZ8oVL7OJnZLA7MBsSiTv/2oVqCaDGvZw6Tv6lsAPZpCWiQ2a2Y9jPXrRjyLbo=
+	t=1713386075; cv=none; b=ivOnWBSiaQIEmhIed6A9yT3sHMpFFD8OHCsBVmw57Ml7+V40XcXiv+8nma94BJ5LZ5Ppqti8wcJZCKf4aw74N/DJtVPdhHk9NWpSyZtuLQPRJ0EKk3utz9I4whcIb2o0y6AfCcVYd3eScAJsRe+kPaFe2gddAvq+6rHrgW30BPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713385406; c=relaxed/simple;
-	bh=YK1LJ7V7n6YU6T4BYHDIXWISYQIofcn9Vug8OWzrD/Y=;
+	s=arc-20240116; t=1713386075; c=relaxed/simple;
+	bh=EtXU9c2X1rus7AR+E4QdwNGG0e/acH591nahmvg0zE4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kV/6pOLrSDMpQN7xeWVpQLMHT/43faazig/nU8BkQxpTdlfPsrwp22KvnlYwkvq3xByFDq1RXvxM+k/KyJkwF1Cj8w28QfVrQN77M1/hSD5iyl9+u+03cw4Jk352yZ7smJhpfjj8BH4gZn77KDPfoU+Gx9o62m3GV0TMsb6FsnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=l7qkf56V; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=heCx5Vxu+tju1CQvxfg2RJDT1aim0ThgpvJAHCHewkQ=; b=l7qkf56V7BsGBIxY9V8DlIkiwv
-	HKzTvHiZ3IR/UjgKfBgUcgt5wuK3C9vahLEMRO3lFXQd12JPokoSD72OtMgyoKSCroINAaAsZI0NZ
-	W/z/BQTDBeJuxBN398eLm6vkhaeh1BwzthRlG7gJz1ZrkUpSLlTBWyRmc+esYvk56H8I=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rxBoB-00DHPd-Q3; Wed, 17 Apr 2024 22:23:07 +0200
-Date: Wed, 17 Apr 2024 22:23:07 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=cQ0qmJlORzksu2SLIenqxmFxkUJDZ8zNwMydfFs3ZTzbfPa/Mb3BHat/GquZLF89pAZD5V6qy0E9t+zBo+uZsyZiShSBEabEquKebflfw/eQRYjY4pOaF3heATGSPI2TZDLsQRtS/OK71DaajpuW2ZJgA0mObTyDHMkPlmRKto0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UdCu2ba6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A5F7C072AA;
+	Wed, 17 Apr 2024 20:34:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713386074;
+	bh=EtXU9c2X1rus7AR+E4QdwNGG0e/acH591nahmvg0zE4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=UdCu2ba6hcAPeyyocbmuIrgN5vfGx7tuIbgJfByfWkWqHYsEwRAIdQ6ytJq6qoujB
+	 bsbrHf2dKw7omIuXKr+I2wZYriYo0KCsj6bDBPo9czZMETYAxI0IMoiR1rM5F+PXNj
+	 CmY5wXIT5HnK0/PfHPLzkr0mx1qD5reZ0JPAiYjzHigqYf05CiIIkw3K+36Gzrmzo2
+	 kcI6tEMbG0iGw7aJPAmP4hANxV/JlUCIlvcu/XOST3DWZ0UCRvrSTq7Vw2Xmz6G6QZ
+	 OO6q+2/jDKduzXDMsXDZ5Wr8dvI6SHg3+chjSY+nu6MLu09Gh0BRoEqBa/ItI7f1ur
+	 88qMoDIwMeMtA==
+Date: Wed, 17 Apr 2024 21:34:30 +0100
+From: Simon Horman <horms@kernel.org>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: Markus Elfring <Markus.Elfring@web.de>,
+	Justin Chen <justin.chen@broadcom.com>,
+	bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH net-next v1 2/4] net: phy: micrel: lan8841: set default
- PTP latency values
-Message-ID: <b44a4aee-f76f-4472-9b5c-343a09ed0d33@lunn.ch>
-References: <20240417164316.1755299-1-o.rempel@pengutronix.de>
- <20240417164316.1755299-3-o.rempel@pengutronix.de>
- <c8e3f5d0-832b-4ab1-a65f-52f983ff110a@lunn.ch>
- <ZiAtREiqPuvXkB4S@pengutronix.de>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] net: bcmasp: fix memory leak when bringing down if
+Message-ID: <20240417203430.GB3935777@kernel.org>
+References: <20240412181631.3488324-1-justin.chen@broadcom.com>
+ <6881c322-8fbb-422f-bdbb-392a83d0b326@web.de>
+ <9afad2b3-38a5-470d-a66f-10aa2cba3bab@broadcom.com>
+ <8ae97386-876f-45cf-9e82-af082d8ea338@web.de>
+ <20240417161933.GA2320920@kernel.org>
+ <3a5cb80e-7169-4e82-b10c-843ff1eb0fd3@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZiAtREiqPuvXkB4S@pengutronix.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <3a5cb80e-7169-4e82-b10c-843ff1eb0fd3@broadcom.com>
 
-> > What affect does this have on systems which have already applied
-> > adjustments in user space to correct for this? Will this cause
-> > regressions for such systems?
+On Wed, Apr 17, 2024 at 09:52:47AM -0700, Florian Fainelli wrote:
+> On 4/17/24 09:19, Simon Horman wrote:
+> > On Mon, Apr 15, 2024 at 09:46:44PM +0200, Markus Elfring wrote:
+> > > > > > When bringing down the TX rings we flush the rings but forget to
+> > > > > > reclaimed the flushed packets. This lead to a memory leak since we
+> > > > > > do not free the dma mapped buffers. …
+> > > > > 
+> > > > > I find this change description improvable.
+> > > > > 
+> > > > > * How do you think about to avoid typos?
+> > > > > 
+> > > > > * Would another imperative wording be more desirable?
+> > > > 
+> > > > The change description makes sense to me. Can you be a bit more specific as to what isn't clear here?
+> > > 
+> > > Spelling suggestions:
+> > > + … forget to reclaim …
+> > > + … This leads to …
+> > 
+> > Markus, let's cut to the chase.
+> > 
+> > What portion of your responses of this thread were produced
+> > by an LLM or similar technology?
+> > 
+> > The suggestions in your second email are correct.
+> > But, ironically, your first response appears to be grammatically incorrect.
+> > 
+> > Specifically:
+> > 
+> > * What does "improvable" mean in this context?
 > 
-> Yes.
+> I read it as "improbable", but this patch came out of an actual bug report
+> we had internally and code inspection revealed the leaks being plugged by
+> this patch.
 > 
-> > I know Richard has rejected changes like this in the past.
+> > * "How do you think about to avoid typos?"
+> >    is, in my opinion, grammatically incorrect.
+> >    And, FWIW, I see no typos.
 > 
-> In this case I would need to extend the ethtool interface. The driver
-> should provide recommended values and the user space can optionally
-> read them and optionally write them to the HW.
+> There was one, "This lead to a memory leak" -> "This leads to a memory leak"
+> 
+> > * "Would another imperative wording be more desirable?"
+> >    is, in my opinion, also grammatically incorrect.
+> > 
+> > And yet your comment is ostensibly about grammar.
+> > I'm sorry, but this strikes me as absurd.
+> 
+> Yeah, I share that too, if you are to nitpick on every single word someone
+> wrote in a commit message, your responses better be squeaky clean such that
+> Shakespeare himself would be proud of you.
+> 
+> There is a track record of what people might consider bike shedding, others
+> might consider useless, and others might find uber pedantic comments from
+> Markus done under his other email address: elfring@users.sourceforge.net.
+> 
+> Me personally, I read his comments and apply my own judgement as to whether
+> they justify spinning a new patch just to address the feedback given. He has
+> not landed on my ignore filter, but of course that can change at a moments
+> notice.
 
-I suggest you go read older messages from Richard. It was a discussion
-with Microchip about one of their PHYs.
+Thanks Florian,
 
-	Andrew
+On reflection, my previous email was inappropriate.
+I do have reservations about the review provided by Markus,
+but should not reacted as I did. I apologise to every for that.
+
 
