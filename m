@@ -1,213 +1,130 @@
-Return-Path: <netdev+bounces-88889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BB108A8F17
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:04:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B77CA8A8F24
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:11:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3C0B2828DC
-	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 23:04:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73BA3282958
+	for <lists+netdev@lfdr.de>; Wed, 17 Apr 2024 23:11:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C521A85643;
-	Wed, 17 Apr 2024 23:04:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07D5385272;
+	Wed, 17 Apr 2024 23:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KUvqalSF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PVdxB+3U"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 923048563C;
-	Wed, 17 Apr 2024 23:04:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA76E79C8;
+	Wed, 17 Apr 2024 23:11:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713395056; cv=none; b=CIEk5DIi5cNIISgQOhlWR9zQbL33RPV79Q1VvYzNvc+Dw4azw2ETqAc8977YBQzEkHqxhXtin2JIS7fmQWkJbBhNs15kZNpohkIr9QpDKJ/5cm/3ggDPxEDx24Ovu3ou7UbNOMF+2dhFRG26GDp8ld9cRg+/SO3FSuL48FBEhP4=
+	t=1713395516; cv=none; b=TeCTJtz8wrlwAKZc6rB5pdfXogfs4SNfwKhBJXbH7AYu0mLvlknH2b6dJyyMVm733lEybr1FtRwgUsuUNSY5iPnUydjtnVfR10cJP0RDByFg5EUFVZf1hIs0PUwFsGiK5fNC55ggIbWInCCMOJ3y6CWu2cH9pw2wXOZldBwoP50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713395056; c=relaxed/simple;
-	bh=DleZPmzIjopdcwuK5ScXde4KztmrAG+BSDTdahj4F34=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fWReTn63Aby50qvM/MrrZG/30m9jSOlGJcZyCymy/YGJVPw2Gg9+flcTZyp4E39LNl6D6JnWaJY2ZNVSb842PLmb9bCLl9IFaEAz/SvQnXfeeZE/WwRKw+md1dfJGJdu7Tr9+wMQyIbncGyrSXIxN4X1dlUJlLU2ltNMLDFumVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KUvqalSF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 30C76C32786;
-	Wed, 17 Apr 2024 23:04:16 +0000 (UTC)
+	s=arc-20240116; t=1713395516; c=relaxed/simple;
+	bh=2sCMdV0/f+LRWVKuBKmkrPcPzK+ls5B4k2d1V4pFHCc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pfMRf5iaJa/QdcyDEnJAduMg7EnurlrDulokpvaS/3PaxK15HfDY/+2xfAQk/Zfbt5r+yR6Eg2d+YAzsbVXv+GvNhpVMozBKmwTj+gnK1UTeJz9GcfMfnCvPFgupKXGCxsdNMnHOvy34wcO7wNlnNjPdlArP0Ri7F6ogn2WQsws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PVdxB+3U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D4CBC072AA;
+	Wed, 17 Apr 2024 23:11:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713395056;
-	bh=DleZPmzIjopdcwuK5ScXde4KztmrAG+BSDTdahj4F34=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=KUvqalSFcV7qWl7RPj4p2dAkP/ZOE6htLrjxrb2m0xtesPjAe9AGjsdAf/e8gdlh9
-	 2n+mYf8ezjDn8uv/EPeEQBJv07PBMJdceCeuoRZSpYO9oRHNdk9YD+jF5WMgdKkaVK
-	 M1ckHynpWJhOrhmQ2gZL22DrtoGLRrt3e5sDPXG/8trJnobsdOl8ybkWTfdeiC6iMI
-	 U0u1isSfwpqkWSpy/4+KGRsQv2SA4nYmIKChisqswmIqB00MPbzA/8Jl/vlXmOw8qp
-	 qa6z+ljwKUoQf7Y0efhRhv0mP1YBFpxmW/8BmeiIIPhafgKyF9NiiyJV1pdoq4Cw4/
-	 l1KZ78OyuGztA==
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-516d8764656so47041e87.1;
-        Wed, 17 Apr 2024 16:04:16 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWYYLY8L62q81DIGuL+i/gKUl07G61vBS1DvGn/O2faXG5pLdYeQJdiJfjg4gnQXKcPw0LuAKhNXrPZ8Vby/RABHc0cvZuKtZn2EnnbMszvE8eePvIDIfTkPfm9DcbhqOgDPwxg7c8R3Vnuh6ST1Fl/1/a5GOpDxU22fG8yDlAiQO0ZN8gXksM9345o7Bmku9nsXT2KO2nohKlmcs98/T0xjQ==
-X-Gm-Message-State: AOJu0Ywar3TTneXVE8e4BaLrPVBXv3cuRwgR+i4CnsJhunMPABFLdjYE
-	P7jndSvl6aNvwv1bRAHKGN3QX2NVsolg8MZax5idm7W8vb15w2NtsU/ELcCJJEGCnVU5Zej4vsK
-	n/593K9i13mMnvm7r6sPo0nwOUHM=
-X-Google-Smtp-Source: AGHT+IFynaJ23hI7LhBWah3AipQ/kHcj/2JC6nvWkyzyNtZt6uqnI9CxfUUV/FX4nKwOeNmYWCU+4a78uhTwgWEFRTk=
-X-Received: by 2002:ac2:51bc:0:b0:519:592d:adcd with SMTP id
- f28-20020ac251bc000000b00519592dadcdmr335876lfk.3.1713395054395; Wed, 17 Apr
- 2024 16:04:14 -0700 (PDT)
+	s=k20201202; t=1713395516;
+	bh=2sCMdV0/f+LRWVKuBKmkrPcPzK+ls5B4k2d1V4pFHCc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PVdxB+3UoVEuc5AKsc2jxvmmsQ7P49pnXlBrfBdkMtHSPRyS+pzWiDDRW8kYbuDc5
+	 NBBU4Nw1STv54qUOr1ZrUlBrr6v2I3vkEiGrM67xS1CJMjIbhkqGPK6Xke/Ft4/6qf
+	 RAPbqBuJSK1b0YByZ4FA96G+IBjvQ8/4+/8o9Ji9v7hrSD3euGDu1nZzk7ryVYQ+VZ
+	 u1snd9c+VWUBDrGbcLsMAncWkeSze0ih2ZLyhnQoICQGE14+xL8fldirmXNaesYjFF
+	 vfe1ZMLxSyxeXmsBtGS7nifTVEFEcMeG7sMj0ihv8eHmVs5w0XcAZ+YSR91OHzyihy
+	 YFMHCHAZiAtMw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	petrm@nvidia.com,
+	linux-kselftest@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v3 0/8] selftests: drv-net: support testing with a remote system
+Date: Wed, 17 Apr 2024 16:11:38 -0700
+Message-ID: <20240417231146.2435572-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240412073046.1192744-1-wenst@chromium.org> <20240412073046.1192744-2-wenst@chromium.org>
-In-Reply-To: <20240412073046.1192744-2-wenst@chromium.org>
-From: Sean Wang <sean.wang@kernel.org>
-Date: Wed, 17 Apr 2024 16:04:02 -0700
-X-Gmail-Original-Message-ID: <CAGp9Lzp=MKNYc70ZeGCAEgWfFVPOAOZQQ86BXukk+EQQM_C+OA@mail.gmail.com>
-Message-ID: <CAGp9Lzp=MKNYc70ZeGCAEgWfFVPOAOZQQ86BXukk+EQQM_C+OA@mail.gmail.com>
-Subject: Re: [PATCH v3 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
- SDIO Bluetooth
-To: Chen-Yu Tsai <wenst@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi Chen-Yu,
+Hi!
 
-On Fri, Apr 12, 2024 at 12:31=E2=80=AFAM Chen-Yu Tsai <wenst@chromium.org> =
-wrote:
->
-> The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
-> SDIO. WiFi and Bluetooth are separate SDIO functions within the chip.
-> While the Bluetooth SDIO function is fully discoverable, the chip has
-> a pin that can reset just the Bluetooth core, as opposed to the full
-> chip. This should be described in the device tree.
->
-> Add a device tree binding for the Bluetooth SDIO function of the MT7921S
-> specifically to document the reset line. This binding is based on the MMC
-> controller binding, which specifies one device node per SDIO function.
->
-> Cc: Sean Wang <sean.wang@mediatek.com>
-> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
-> ---
-> Changes since v2:
-> - Expand description and commit message to clearly state that WiFi and
->   Bluetooth are separate SDIO functions, and that each function should
->   be a separate device node, as specified by the MMC binding.
-> - Change 'additionalProperties' to 'unevaluatedProperties'
-> - Add missing separating new line
-> - s/ot/to/
->
-> Angelo's reviewed-by was not picked up due to the above changes.
->
-> Changes since v1:
-> - Reworded descriptions
-> - Moved binding maintainer section before description
-> - Added missing reference to bluetooth-controller.yaml
-> - Added missing GPIO header to example
-> ---
->  .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 55 +++++++++++++++++++
->  MAINTAINERS                                   |  1 +
->  2 files changed, 56 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/media=
-tek,mt7921s-bluetooth.yaml
->
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7=
-921s-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/media=
-tek,mt7921s-bluetooth.yaml
-> new file mode 100644
-> index 000000000000..67ff7caad599
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-bl=
-uetooth.yaml
-> @@ -0,0 +1,55 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7921s-blueto=
-oth.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: MediaTek MT7921S Bluetooth
-> +
-> +maintainers:
-> +  - Sean Wang <sean.wang@mediatek.com>
-> +
-> +description:
-> +  MT7921S is an SDIO-attached dual-radio WiFi+Bluetooth Combo chip; each
-> +  function is its own SDIO function on a shared SDIO interface. The chip
-> +  has two dedicated reset lines, one for each function core.
-> +  This binding only covers the Bluetooth SDIO function, with one device
-> +  node describing only this SDIO function.
-> +
-> +allOf:
-> +  - $ref: bluetooth-controller.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - mediatek,mt7921s-bluetooth
-> +
-> +  reg:
-> +    const: 2
-> +
-> +  reset-gpios:
-> +    maxItems: 1
-> +    description:
-> +      An active-low reset line for the Bluetooth core; on typical M.2
-> +      key E modules this is the W_DISABLE2# pin.
-> +
+Implement support for tests which require access to a remote system /
+endpoint which can generate traffic.
+This series concludes the "groundwork" for upstream driver tests.
 
-Thanks for adding the new setup for the MT7921S devices. They look good to =
-me.
-Sometimes, the MT7921S might be set up to wake up the host when it's
-asleep using a sideband signal.
-This might need an extra pin called "wakeup" to make it happen. Can
-you help add this pin to the settings in the same update, or should I
-do it later?
+I wanted to support the three models which came up in discussions:
+ - SW testing with netdevsim
+ - "local" testing with two ports on the same system in a loopback
+ - "remote" testing via SSH
+so there is a tiny bit of an abstraction which wraps up how "remote"
+commands are executed. Otherwise hopefully there's nothing surprising.
 
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +
-> +    mmc {
-> +        #address-cells =3D <1>;
-> +        #size-cells =3D <0>;
-> +
-> +        bluetooth@2 {
-> +            compatible =3D "mediatek,mt7921s-bluetooth";
-> +            reg =3D <2>;
-> +            reset-gpios =3D <&pio 8 GPIO_ACTIVE_LOW>;
-> +        };
-> +    };
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 88981d9f3958..218bc2a21207 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -13818,6 +13818,7 @@ M:      Sean Wang <sean.wang@mediatek.com>
->  L:     linux-bluetooth@vger.kernel.org
->  L:     linux-mediatek@lists.infradead.org (moderated for non-subscribers=
-)
->  S:     Maintained
-> +F:     Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-=
-bluetooth.yaml
->  F:     Documentation/devicetree/bindings/net/mediatek-bluetooth.txt
->  F:     drivers/bluetooth/btmtkuart.c
->
-> --
-> 2.44.0.683.g7961c838ac-goog
->
->
+I'm only adding a ping test. I had a bigger one written but I was
+worried we'll get into discussing the details of the test itself
+and how I chose to hack up netdevsim, instead of the test infra...
+So that test will be a follow up :)
+
+v3:
+ - first two patches are new
+ - make Remote::cmd() return Popen() object (patch 3)
+ - always operate on absolute paths (patch 3)
+ - last two patches are new
+v2: https://lore.kernel.org/all/20240416004556.1618804-1-kuba@kernel.org
+ - rename endpoint -> remote
+ - use 2001:db8:: v6 prefix
+ - add a note about persistent SSH connections
+ - add the kernel config
+v1: https://lore.kernel.org/all/20240412233705.1066444-1-kuba@kernel.org
+
+Jakub Kicinski (8):
+  selftests: net: fix counting totals when some checks fail
+  selftests: net: set the exit code correctly in Python tests
+  selftests: drv-net: define endpoint structures
+  selftests: drv-net: factor out parsing of the env
+  selftests: drv-net: construct environment for running tests which
+    require an endpoint
+  selftests: drv-net: add a trivial ping test
+  selftests: net: support matching cases by name prefix
+  selftests: drv-net: add a TCP ping test case (and useful helpers)
+
+ tools/testing/selftests/drivers/net/Makefile  |   5 +-
+ .../testing/selftests/drivers/net/README.rst  |  33 ++++
+ .../selftests/drivers/net/lib/py/__init__.py  |   1 +
+ .../selftests/drivers/net/lib/py/env.py       | 141 +++++++++++++++---
+ .../selftests/drivers/net/lib/py/remote.py    |  15 ++
+ .../drivers/net/lib/py/remote_netns.py        |  21 +++
+ .../drivers/net/lib/py/remote_ssh.py          |  39 +++++
+ tools/testing/selftests/drivers/net/ping.py   |  52 +++++++
+ tools/testing/selftests/drivers/net/stats.py  |   4 +-
+ .../testing/selftests/net/lib/py/__init__.py  |   1 +
+ tools/testing/selftests/net/lib/py/ksft.py    |  25 +++-
+ tools/testing/selftests/net/lib/py/netns.py   |  31 ++++
+ tools/testing/selftests/net/lib/py/utils.py   |  50 ++++++-
+ tools/testing/selftests/net/nl_netdev.py      |   4 +-
+ 14 files changed, 391 insertions(+), 31 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/lib/py/remote.py
+ create mode 100644 tools/testing/selftests/drivers/net/lib/py/remote_netns.py
+ create mode 100644 tools/testing/selftests/drivers/net/lib/py/remote_ssh.py
+ create mode 100755 tools/testing/selftests/drivers/net/ping.py
+ create mode 100644 tools/testing/selftests/net/lib/py/netns.py
+
+-- 
+2.44.0
+
 
