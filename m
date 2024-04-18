@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-88952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F8A58A9102
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 04:10:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB4DD8A9100
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 04:10:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0D0D1C210EF
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 02:10:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95BC51F21BF7
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 02:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2597495CB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF2843AAD;
 	Thu, 18 Apr 2024 02:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZL200nNP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pQfN4635"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1C83BB3D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A8253A1B6;
 	Thu, 18 Apr 2024 02:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713406228; cv=none; b=UTOhH4zQtq1gWcE8cDZChCjKiJeyuC72P89WtZzp9igMMC/6laQjAmEE05p9DKbZ26ISazqEVQmLMIFsTtkVaqTwcK8qUEggudBl24XfUAaPpoufo6h521F7XVreTE7gKtmNurmBdHKh+vdsBMWC1u5n1Y4dh5rGWxZFKwdl9Ok=
+	t=1713406228; cv=none; b=WnKatNzlkuSQNWeeXEkgeku6pfpI1Ji3dPcOItbmpmxtCbHyFQ0bHq9X1A5VPs8xAI7hEk8ygrdK50kX0abjWGjDpdXXLIxE4kN/+jEEK7S+Nyl7X5+I95tSV4YpW2MSo2HhmWCQmWQchRO07JXo/g69hd5F3Ey86hNuyo9RzK0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713406228; c=relaxed/simple;
-	bh=RAGC14c8Q1nFc1rexV5dELq1NYAVyKJAmwHd8XkO/3Q=;
+	bh=1NyEoWFlnIZwCKkRFjuPR5qYJO8RuWrIDtqwc7X6idA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ChRUcx51NgdyDBkLLlHxRKUSppu9UuLKFs77ffS33RrljSB61wrVmzObWvhJljVV0uSvsRlquJPONMO+iLsATBC91Wq/fYqGHldC9k8OH21P+ZvSE5V7VHQfpzsOVrVstLjjpiAw4mc+T2+2F8Jz0qtq8MLKxvbempbeLB+Jods=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZL200nNP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 56918C32783;
+	 In-Reply-To:To:Cc; b=YpgyB/hXcbKDpnvhFVADNfJhZaluX0vZJ8NFeb3+FDbju6YpQhMjrNnN/DpGo3vNnhcMeXUijGZra7pEJjyg3DJqdsbxYgybSHVasa0TG/huArCd00pjzZJg6xZfVDAs8erwX8X46hYCXu1mwFD14koVS1o6VmHyWGmS0a1+TLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pQfN4635; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 43580C32781;
 	Thu, 18 Apr 2024 02:10:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1713406228;
-	bh=RAGC14c8Q1nFc1rexV5dELq1NYAVyKJAmwHd8XkO/3Q=;
+	bh=1NyEoWFlnIZwCKkRFjuPR5qYJO8RuWrIDtqwc7X6idA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZL200nNPgfts9CYklTGCBByTb5/Q7SAoubfAXD1em6rPGk72YL4L/UyifMj04HZm7
-	 llICGwX0Bu3X/sDKbXBNhzYsdr6v5W1YpSiC8ayFll071gHWZ38mrcRPGK9JTYvqPJ
-	 J/OfBCS0eZGZ5KEwSDP6nJkhNHpFlv+O7bi+W025u7/DjbmpmDOfBMGP8/aXBtcc6x
-	 JyZvhotDIQ0W8kHVtUkHGxovTY6AQf0u1Zm40eQoTnpLbiHaUc+veo2KXSalzf3Ggx
-	 tW7nIg3bqaDfCJJDD9EL/009CEOMXk43UC3DSZa3O7cODQxLb5Gai/5rPX1DccafmJ
-	 1td38/cbpLO2Q==
+	b=pQfN4635WdxeOrE8SpYLCKp9+Kkm+SSt3bxqVS/xIMAjfzULXu4K3xi7aldjH6dJe
+	 NbOBlRnRamq88p+gh5OgwJfTeudhOELvcdK95AAwxX/cUIPMXx+gMBckxkBbMcdR5e
+	 lVEkoO/GyE6c3e/AJOFxb1IbkNvgT0LLw5Trf2gla1bIbankZ7Xxe4zl7LE+pX5d4T
+	 DI2oPLUWzGCeTMzK8rBw/HB3LoaXwks//dhrMDo47UESj4+xi80uEhF4CFCeORuBHd
+	 TAgsSscOy5O86JM7Gyy4M8yB6S/scigQrWw7UWlOIcZq28VSVZCHgFe5IchwVGuS+6
+	 qtL693ATrSEKQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4169AC4361C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3224FC4361A;
 	Thu, 18 Apr 2024 02:10:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,41 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: kselftest_harness: fix Clang warning about
- zero-length format
+Subject: Re: [PATCH] net:usb:qmi_wwan: support Rolling modules
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171340622826.10413.6848935617606326222.git-patchwork-notify@kernel.org>
+ <171340622820.10413.13640952951998586061.git-patchwork-notify@kernel.org>
 Date: Thu, 18 Apr 2024 02:10:28 +0000
-References: <20240416151048.1682352-1-kuba@kernel.org>
-In-Reply-To: <20240416151048.1682352-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, seanjc@google.com, shuah@kernel.org,
- keescook@chromium.org, usama.anjum@collabora.com,
- linux-kselftest@vger.kernel.org, llvm@lists.linux.dev
+References: <20240416120713.24777-1-vanillanwang@163.com>
+In-Reply-To: <20240416120713.24777-1-vanillanwang@163.com>
+To: Vanillan Wang <vanillanwang@163.com>
+Cc: bjorn@mork.no, davem@davemloft.net, kuba@kernel.org,
+ netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 16 Apr 2024 08:10:48 -0700 you wrote:
-> Apparently it's more legal to pass the format as NULL, than
-> it is to use an empty string. Clang complains about empty
-> formats:
+On Tue, 16 Apr 2024 20:07:13 +0800 you wrote:
+> Update the qmi_wwan driver support for the Rolling
+> LTE modules.
 > 
-> ./../kselftest_harness.h:1207:30: warning: format string is empty
-> [-Wformat-zero-length]
->  1207 |            diagnostic ? "%s" : "", diagnostic);
->       |                                 ^~
-> 1 warning generated.
+> - VID:PID 33f8:0104, RW101-GL for laptop debug M.2 cards(with RMNET
+> interface for /Linux/Chrome OS)
+> 0x0104: RMNET, diag, at, pipe
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] selftests: kselftest_harness: fix Clang warning about zero-length format
-    https://git.kernel.org/netdev/net/c/caed8eba2215
+  - net:usb:qmi_wwan: support Rolling modules
+    https://git.kernel.org/netdev/net/c/d362046021ea
 
 You are awesome, thank you!
 -- 
