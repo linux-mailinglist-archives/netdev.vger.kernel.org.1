@@ -1,256 +1,212 @@
-Return-Path: <netdev+bounces-89173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 102C08A99A3
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 14:16:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B55A8A99A7
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 14:21:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 915CF1F217AE
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 12:16:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12B141F21257
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 12:21:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDC6115FA7F;
-	Thu, 18 Apr 2024 12:16:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F8671B20;
+	Thu, 18 Apr 2024 12:21:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="SAeahBO2";
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="J/FEiehb"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OeWI6NeE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2052.outbound.protection.outlook.com [40.107.92.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599D415F302;
-	Thu, 18 Apr 2024 12:16:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713442600; cv=none; b=bOrtgLOL/2kbShIC5d35tyWlfkUeCKrvMUnUHxXDb2/dsx3NlKd2EvPtpre/38hucxz5/x/4fFQrrp+4RFAMi+le102NtMXUwPl2U7ZznqOVzlrseMtiXPyZP0ApyDUYyGNWLm5ntHMRfXnr/ZbEW6+GpP4l1ukXcUvH2WL7FiE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713442600; c=relaxed/simple;
-	bh=hfn0K+tyg5dmSYVIRyO5XG3tfVG0zj5BqWnh4yKNMlw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OPsK+Hig206Y6pEgVkGYOzuLhcxHfHIgddXXcYo34B9TnlfzJCVRceER3zjDKHM9xrSyxo7dorZV7lotgWoZamKuMuAkvueP4iOUSwHoP7YESyI6XwyDtWLUqJldX61bOfGmkvWGj8NTmqVpPM9YJtsjeehHy6oArxDf7mCWXcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=SAeahBO2; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=J/FEiehb reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1713442597; x=1744978597;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=+b8ok4o3krDte4VgtMzaA20YggUMVxMjScx2DsaWec8=;
-  b=SAeahBO2Nluj7yhQQ9tmN1p6y83u71rsJ6jKjWrplA7YimmbL98WQBrv
-   kmOBBchm/Tv6i3RxUdO5rFeXds6vVj1dLCNu5vVTGB+eem4s1ApSjbGO1
-   YvSIfET3gKgPe+wedjNDpA7LIsXyfKA/QtSxbJnek6iVZLub3zGAWTl4O
-   Kgbe8j9HeXIFvy9QqqST47mREWGwCbs03afnLyoDpvsi4YBNLHhRsFVYo
-   Ve1EHIuTseMgzGKZjhTsIdXtTS7Ehq85KGjOqRAwdQUSvcDMYXAZxWDpu
-   hest9qbpXCfLW0xYWLiiNfMY8Tcmr3/HePOex1T78hoJ1QHWS8sn3F6y0
-   Q==;
-X-IronPort-AV: E=Sophos;i="6.07,212,1708383600"; 
-   d="scan'208";a="36491695"
-Received: from vmailcow01.tq-net.de ([10.150.86.48])
-  by mx1.tq-group.com with ESMTP; 18 Apr 2024 14:16:35 +0200
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id B26661615A0;
-	Thu, 18 Apr 2024 14:16:30 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
-	s=dkim; t=1713442591;
-	h=from:subject:date:message-id:to:cc:mime-version:content-type:
-	 content-transfer-encoding:in-reply-to:references;
-	bh=+b8ok4o3krDte4VgtMzaA20YggUMVxMjScx2DsaWec8=;
-	b=J/FEiehbw1MV4zEII82mqSJYFIn0DGnDVMJar5vEkAndmS1P+IIO1/UN7IYLw2TDaJD3M0
-	R7NjzMbln3V502A1TMWZ6Q3OnVoGJqVP61n1Hc5Xkn9+ksUGgmhlYDHxUHr1b2LImVWHIg
-	5QHgW6m/lzRIX8sdhwdj1z2z72GJH0FI7bka1qAkbvvOAwRdMfAB09Oz+3ADrZ7/QkGzpw
-	i5Q2ndqYq/Udq1yQdXGJs6/NBTilQz/6V3uuR5QsHLn8gfXQbRAZWBFI4fSNLTNNwnbC7m
-	jSSj95amWqeXfdlAhMzOjmyIwTb4znNL7BNNxmtbGtuvFJxUI4NPI/fOoqWa+g==
-From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Fabio Estevam <festevam@denx.de>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux@ew.tq-group.com,
-	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Subject: [PATCH net 2/2] net: dsa: mv88e6xxx: Avoid EEPROM timeout without EEPROM on 88E6250-family switches
-Date: Thu, 18 Apr 2024 14:16:08 +0200
-Message-ID: <67dc4da11986fd7fd192fbb183813bf5a721001f.1713442039.git.matthias.schiffer@ew.tq-group.com>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <2b924dcdf8adfe2c0b6b5998e47e836dd8f9e1b1.1713442039.git.matthias.schiffer@ew.tq-group.com>
-References: <2b924dcdf8adfe2c0b6b5998e47e836dd8f9e1b1.1713442039.git.matthias.schiffer@ew.tq-group.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA0E7156F54
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 12:21:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.52
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713442867; cv=fail; b=kRPlvYTwqyKjoAV7z2w6V1Ap78xON6/ucPVw6cwHguLm2LwrZM2vAtMTWRmgIUMquyvZYGDzzQofd2J+goVuU422gdOXqqLDRb+fU+gN4iYUodsu6XGo3M+8Hzrhh/xDmxpgOqPNWqCFxEyM4geDxkiQ8Wh7xlr3Qo5sGAZzbJo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713442867; c=relaxed/simple;
+	bh=jULdD2yi6MjTLq3nD82fcP3FeGYpfyXHVHZfH28HPhw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Q2MwiSX3H3D/PEfcvD2Bsnfg5ZOyM9pyCD3V8RCnjjwQwTeAVS4qsSQ5IBRfBcQ4tENdbawJlIyTfXIWT7tWl63QnOOwnfY8EXoMyZYNf5trp52kVUSaq658FWPeyZxg8SO1vLg8WeGaumfB62cQ0Tz8OksOziOqRK61snsIKyI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OeWI6NeE; arc=fail smtp.client-ip=40.107.92.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SxvBslA2FK8b9na59zuayabcTPvvXMilJdKrNFV4y97UXdF6U4ZJrRqWA9DOIoI3kJb2nYYj4QEGENRcIQbtKXhQvmd5VuNYHIxyRUJnZNuqhTRDkyj+zfSWUclzEtFlaDWFCpoK6G68fpWey4Bw2Vgpmlbr9zxj8eFNVH/7naQ3awWfIdHNnorPJq9CFxAMhTPcwnKhuMeigxsp0S94+r6U1O15Xyqn7xqOsWXqh4CphLXfOAIpTlvXFurXmpc+52S9xx9eya+gWYMVX63UPgWUsaeD7K2dirXtB2inKOg3I7366ctz7FW+hSolc+I5SStoVBNd4u0RgECpeodCAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Hrn7Ts24ohSJPQg8shYa4zxh6pzBk7Dd54n3Eshd74Y=;
+ b=h122ru7gVZDs7J1BfR3PyoDUA5A07bFzvnxw36mihmfNtV63SXyTzHbW+fi++P72QO37nQjXNHot2VAGev1G0ykzEtThBHtwb8+TKi8LeIXFxrISDHqoVkhMSm7Tq2JwaoclmkOsglanVYQrzwawaJByMigBv+DK1fpQ4a1AiQbd7aYLjV5RSR7kTpzaD+cjhf2yZugQc6IimvDL9dwdaIWjY/QXkQk1JbVz5TcDP4DozoZ28huA8F+oNwdtj2LeQisVLojdPNbyFP8mi42teFfyp7cs+YrX8qpzAKyFfuZkp555TeWDp7PwtksJqpiaDiicJrEv12kpFh+q5tD5Wg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.233) smtp.rcpttodomain=linux.intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Hrn7Ts24ohSJPQg8shYa4zxh6pzBk7Dd54n3Eshd74Y=;
+ b=OeWI6NeEPCVIN1Vw7tui00lbcOgcAgfKgBx9HqaWlgsvS9XWJ7udDTdHblsNbYL33bPSVJmBJsiB9rmMkr/MH4wPmp7pKuaaNCohPmLh3uLWhLgKaSvDM3J5qZ+dhyvLT6rnSReaEYPGBOycgZeTCP9M34GIdyx4WVcyZsuZdVnQoru7e7VIIzCe38S1uilsoIBbcFuomI03q1RhS46wX8N+GEItFslM+tc1cAhf91QXUDH645zEhkkViEsuF5Wyv7Wu8gNdiU6E2l0rdTNeHDfqtuNc+Cp+9EfXOQDg0ruTkW3BdBJcYkOTsxRnCsfjw8DMYJ9/scc+rww5zYPyUQ==
+Received: from SA1P222CA0050.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:2d0::25)
+ by DS0PR12MB9273.namprd12.prod.outlook.com (2603:10b6:8:193::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.50; Thu, 18 Apr
+ 2024 12:21:00 +0000
+Received: from SA2PEPF000015CD.namprd03.prod.outlook.com
+ (2603:10b6:806:2d0:cafe::ed) by SA1P222CA0050.outlook.office365.com
+ (2603:10b6:806:2d0::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.28 via Frontend
+ Transport; Thu, 18 Apr 2024 12:21:00 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.233) by
+ SA2PEPF000015CD.mail.protection.outlook.com (10.167.241.203) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7452.22 via Frontend Transport; Thu, 18 Apr 2024 12:20:59 +0000
+Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
+ (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 18 Apr
+ 2024 05:20:44 -0700
+Received: from [172.27.34.210] (10.126.230.35) by drhqmail201.nvidia.com
+ (10.126.190.180) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 18 Apr
+ 2024 05:20:39 -0700
+Message-ID: <f5d2db9d-9992-4cb6-9ac2-456369df4366@nvidia.com>
+Date: Thu, 18 Apr 2024 15:20:39 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+User-Agent: Mozilla Thunderbird
+Subject: Re: [iwl-next v4 8/8] ice: allow to activate and deactivate
+ subfunction
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<jacob.e.keller@intel.com>, <michal.kubiak@intel.com>,
+	<maciej.fijalkowski@intel.com>, <sridhar.samudrala@intel.com>,
+	<przemyslaw.kitszel@intel.com>, <wojciech.drewek@intel.com>,
+	<pio.raczynski@gmail.com>, <jiri@nvidia.com>, <mateusz.polchlopek@intel.com>
+References: <20240417142028.2171-1-michal.swiatkowski@linux.intel.com>
+ <20240417142028.2171-9-michal.swiatkowski@linux.intel.com>
+ <0045c1a5-1065-40b3-ae61-1f372d4a89e5@nvidia.com>
+ <1b678660-7ee7-44d0-91a7-14985d2c469e@nvidia.com> <ZiEKF8Hm+ccuVedQ@mev-dev>
+Content-Language: en-US
+From: Shay Drori <shayd@nvidia.com>
+In-Reply-To: <ZiEKF8Hm+ccuVedQ@mev-dev>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ drhqmail201.nvidia.com (10.126.190.180)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF000015CD:EE_|DS0PR12MB9273:EE_
+X-MS-Office365-Filtering-Correlation-Id: a3081842-aba5-49af-578f-08dc5fa201cd
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	CxPAKqzdPiSCSb3GFr/fMAd/qvnIp82EzcJNBOzDsNG3ewpXu5IriET/0sUsYrkXmmsnw94IF0fojv5GUCsa+V8ugQQ7ZWItKP0yyfWFm3EquKK2I5hqYrNHGL6GAzX43f/RdqZ7eVGs45nzEIeG03fKdXjq21P44c4xP2ADzN/bpUmU3C1IHdEkMQXWghQaXyjKRf0ju36FVtb8uBFidSg9iS1hMEtMWyfK6J5vmY6pmRiIHrfOR7Cgyv7tL4AF0+gdKq0MpCSti1GJoqmr2JtblSpummLom3uNB1gYiTjH1TvMFgqHuUYLQeGrQddhthtuNB1x01DrRCJR3Qx2zG6z4n11X8CW70pkln+kaiq7f8bj+YItksSb0KJB0ElCWPQm/Jrtnl7cDgja/nCJrl59Eko/i9Rpw+IQ3nOmm5BSfD5D0ipogGaTm/c9F0FGT5ghED4Ih2QeZhqFUGYq6DI/T1ZnI2j+c9xG0jJ00Wb9p6BMUNxdvfsMHlgDFUeig+H0z2ptqkB7TYoN+mli4xxC3qOHIdvPy2ftsc7tDajvt9obDDH+/OCSZh2Vnv+35ijGe7ojXWLjDgEAdrcfrwnOrTUDvOi4Y6T1aUf02008sk5igJbCiktN8kBUyWerHdynofTaMJK/Q+XrnIu5/CWFIQCJHjqQuE6V+rn8Hsno0KVyeLEto49GlPFaKYQ3PO3gOoq8lZiyu1voE/IYNi34DQOJ9mZYH37JpUbVA/QCBCci7WV2yHzmG59YQvct
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(7416005)(1800799015)(82310400014)(376005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2024 12:20:59.8093
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a3081842-aba5-49af-578f-08dc5fa201cd
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF000015CD.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB9273
 
-88E6250-family switches have the quirk that the EEPROM Running flag can
-get stuck at 1 when no EEPROM is connected, causing
-mv88e6xxx_g2_eeprom_wait() to time out. We still want to wait for the
-EEPROM however, to avoid interrupting a transfer and leaving the EEPROM
-in an invalid state.
 
-The condition to wait for recommended by the hardware spec is the EEInt
-flag, however this flag is cleared on read, so before the hardware reset,
-is may have been cleared already even though the EEPROM has been read
-successfully.
 
-For this reason, we revive the mv88e6xxx_g1_wait_eeprom_done() function
-that was removed in commit 6ccf50d4d474
-("net: dsa: mv88e6xxx: Avoid EEPROM timeout when EEPROM is absent") in a
-slightly refactored form, and introduce a new
-mv88e6xxx_g1_wait_eeprom_done_prereset() that additionally handles this
-case by triggering another EEPROM reload that can be waited on.
+On 18/04/2024 14:55, Michal Swiatkowski wrote:
+> External email: Use caution opening links or attachments
+> 
+> 
+> On Thu, Apr 18, 2024 at 11:12:47AM +0300, Shay Drori wrote:
+>> resend as plain test
+>>
+>> On 18/04/2024 10:53, Shay Drori wrote:
+>>> On 17/04/2024 17:20, Michal Swiatkowski wrote:
+>>>> +/**
+>>>> + * ice_devlink_port_fn_state_get - devlink handler for port state get
+>>>> + * @port: pointer to devlink port
+>>>> + * @state: admin configured state of the port
+>>>> + * @opstate: current port operational state
+>>>> + * @extack: extack for reporting error messages
+>>>> + *
+>>>> + * Gets port state.
+>>>> + *
+>>>> + * Return: zero on success or an error code on failure.
+>>>> + */
+>>>> +static int
+>>>> +ice_devlink_port_fn_state_get(struct devlink_port *port,
+>>>> +                       enum devlink_port_fn_state *state,
+>>>> +                       enum devlink_port_fn_opstate *opstate,
+>>>> +                       struct netlink_ext_ack *extack)
+>>>> +{
+>>>> + struct ice_dynamic_port *dyn_port;
+>>>> +
+>>>> + dyn_port = ice_devlink_port_to_dyn(port);
+>>>> +
+>>>> + if (dyn_port->active) {
+>>>> +         *state = DEVLINK_PORT_FN_STATE_ACTIVE;
+>>>> +         *opstate = DEVLINK_PORT_FN_OPSTATE_ATTACHED;
+>>>
+>>>
+>>> DEVLINK_PORT_FN_OPSTATE_ATTACHED means the SF is up/bind[1].
+>>> ice is using auxiliary bus for SFs, which means user can unbind it
+>>> via the auxiliary sysfs (/sys/bus/auxiliary/drivers/ice_sf/unbind).
+>>> In this case[2], you need to return:
+>>> *state = DEVLINK_PORT_FN_STATE_ACTIVE;
+>>> *opstate = DEVLINK_PORT_FN_OPSTATE_DETACHED;
+>>>
+> 
+> Thanks, I didn't think about unbinding/binding the aux driver via sysfs. >
+> To be sure:
+> - user create the subfunction:
+> INACTIVE, DETACHED
+> - user activate it:
+> ACTIVE, ATTACHED
+> - user unbind driver:
+> ACTIVE, DETACHED
+> - user can bind it again as long as subfunction port is ACTIVE
+> is it right?
 
-On other switch models without this quirk, mv88e6xxx_g2_eeprom_wait() is
-kept, as it avoids the additional reload.
 
-Fixes: 6ccf50d4d474 ("net: dsa: mv88e6xxx: Avoid EEPROM timeout when EEPROM is absent")
-Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
----
- drivers/net/dsa/mv88e6xxx/chip.c    |  4 +-
- drivers/net/dsa/mv88e6xxx/global1.c | 89 +++++++++++++++++++++++++++++
- drivers/net/dsa/mv88e6xxx/global1.h |  2 +
- 3 files changed, 93 insertions(+), 2 deletions(-)
+yes.
 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index 8650d8646120a..7a68114bf1976 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -4948,8 +4948,8 @@ static const struct mv88e6xxx_ops mv88e6250_ops = {
- 	.watchdog_ops = &mv88e6250_watchdog_ops,
- 	.mgmt_rsvd2cpu = mv88e6352_g2_mgmt_rsvd2cpu,
- 	.pot_clear = mv88e6xxx_g2_pot_clear,
--	.hardware_reset_pre = mv88e6xxx_g2_eeprom_wait,
--	.hardware_reset_post = mv88e6xxx_g2_eeprom_wait,
-+	.hardware_reset_pre = mv88e6250_g1_wait_eeprom_done_prereset,
-+	.hardware_reset_post = mv88e6xxx_g1_wait_eeprom_done,
- 	.reset = mv88e6250_g1_reset,
- 	.vtu_getnext = mv88e6185_g1_vtu_getnext,
- 	.vtu_loadpurge = mv88e6185_g1_vtu_loadpurge,
-diff --git a/drivers/net/dsa/mv88e6xxx/global1.c b/drivers/net/dsa/mv88e6xxx/global1.c
-index 49444a72ff095..9820cd5967574 100644
---- a/drivers/net/dsa/mv88e6xxx/global1.c
-+++ b/drivers/net/dsa/mv88e6xxx/global1.c
-@@ -75,6 +75,95 @@ static int mv88e6xxx_g1_wait_init_ready(struct mv88e6xxx_chip *chip)
- 	return mv88e6xxx_g1_wait_bit(chip, MV88E6XXX_G1_STS, bit, 1);
- }
- 
-+static int mv88e6250_g1_eeprom_reload(struct mv88e6xxx_chip *chip)
-+{
-+	/* MV88E6185_G1_CTL1_RELOAD_EEPROM is also valid for 88E6250 */
-+	int bit = __bf_shf(MV88E6185_G1_CTL1_RELOAD_EEPROM);
-+	u16 val;
-+	int err;
-+
-+	err = mv88e6xxx_g1_read(chip, MV88E6XXX_G1_CTL1, &val);
-+	if (err)
-+		return err;
-+
-+	val |= MV88E6185_G1_CTL1_RELOAD_EEPROM;
-+
-+	err = mv88e6xxx_g1_write(chip, MV88E6XXX_G1_CTL1, val);
-+	if (err)
-+		return err;
-+
-+	return mv88e6xxx_g1_wait_bit(chip, MV88E6XXX_G1_CTL1, bit, 0);
-+}
-+
-+/* Returns 0 when done, -EBUSY when waiting, other negative codes on error */
-+static int mv88e6xxx_g1_is_eeprom_done(struct mv88e6xxx_chip *chip)
-+{
-+	u16 val;
-+	int err;
-+
-+	err = mv88e6xxx_g1_read(chip, MV88E6XXX_G1_STS, &val);
-+	if (err < 0) {
-+		dev_err(chip->dev, "Error reading status");
-+		return err;
-+	}
-+
-+	/* If the switch is still resetting, it may not
-+	 * respond on the bus, and so MDIO read returns
-+	 * 0xffff. Differentiate between that, and waiting for
-+	 * the EEPROM to be done by bit 0 being set.
-+	 */
-+	if (val == 0xffff || !(val & BIT(MV88E6XXX_G1_STS_IRQ_EEPROM_DONE)))
-+		return -EBUSY;
-+
-+	return 0;
-+}
-+
-+/* As the EEInt (EEPROM done) flag clears on read if the status register, this
-+ * function must be called directly after a hard reset or EEPROM ReLoad request,
-+ * or the done condition may have been missed
-+ */
-+int mv88e6xxx_g1_wait_eeprom_done(struct mv88e6xxx_chip *chip)
-+{
-+	const unsigned long timeout = jiffies + 1 * HZ;
-+	int ret;
-+
-+	/* Wait up to 1 second for the switch to finish reading the
-+	 * EEPROM.
-+	 */
-+	while (time_before(jiffies, timeout)) {
-+		ret = mv88e6xxx_g1_is_eeprom_done(chip);
-+		if (ret != -EBUSY)
-+			return ret;
-+	}
-+
-+	dev_err(chip->dev, "Timeout waiting for EEPROM done");
-+	return -ETIMEDOUT;
-+}
-+
-+int mv88e6250_g1_wait_eeprom_done_prereset(struct mv88e6xxx_chip *chip)
-+{
-+	int ret;
-+
-+	ret = mv88e6xxx_g1_is_eeprom_done(chip);
-+	if (ret != -EBUSY)
-+		return ret;
-+
-+	/* Pre-reset, we don't know the state of the switch - when
-+	 * mv88e6xxx_g1_is_eeprom_done() returns -EBUSY, that may be because
-+	 * the switch is actually busy reading the EEPROM, or because
-+	 * MV88E6XXX_G1_STS_IRQ_EEPROM_DONE has been cleared by an unrelated
-+	 * status register read already.
-+	 *
-+	 * To account for the latter case, trigger another EEPROM reload for
-+	 * another chance at seeing the done flag.
-+	 */
-+	ret = mv88e6250_g1_eeprom_reload(chip);
-+	if (ret)
-+		return ret;
-+
-+	return mv88e6xxx_g1_wait_eeprom_done(chip);
-+}
-+
- /* Offset 0x01: Switch MAC Address Register Bytes 0 & 1
-  * Offset 0x02: Switch MAC Address Register Bytes 2 & 3
-  * Offset 0x03: Switch MAC Address Register Bytes 4 & 5
-diff --git a/drivers/net/dsa/mv88e6xxx/global1.h b/drivers/net/dsa/mv88e6xxx/global1.h
-index 1095261f5b490..3dbb7a1b8fe11 100644
---- a/drivers/net/dsa/mv88e6xxx/global1.h
-+++ b/drivers/net/dsa/mv88e6xxx/global1.h
-@@ -282,6 +282,8 @@ int mv88e6xxx_g1_set_switch_mac(struct mv88e6xxx_chip *chip, u8 *addr);
- int mv88e6185_g1_reset(struct mv88e6xxx_chip *chip);
- int mv88e6352_g1_reset(struct mv88e6xxx_chip *chip);
- int mv88e6250_g1_reset(struct mv88e6xxx_chip *chip);
-+int mv88e6xxx_g1_wait_eeprom_done(struct mv88e6xxx_chip *chip);
-+int mv88e6250_g1_wait_eeprom_done_prereset(struct mv88e6xxx_chip *chip);
- 
- int mv88e6185_g1_ppu_enable(struct mv88e6xxx_chip *chip);
- int mv88e6185_g1_ppu_disable(struct mv88e6xxx_chip *chip);
--- 
-TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
-Amtsgericht München, HRB 105018
-Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
-https://www.tq-group.com/
 
+> 
+> I will fix the comment from previous patch and add state tracking for
+> ATTACHED/DETACHED.
+> 
+> Thanks,
+> Michal
+> 
+>>>
+>>> [1]
+>>> Documentation from include/uapi/linux/devlink.h:
+>>>
+>>> * @DEVLINK_PORT_FN_OPSTATE_ATTACHED: Driver is attached to the function.
+>>> <...>
+>>> * @DEVLINK_PORT_FN_OPSTATE_DETACHED: Driver is detached from the function.
+>>>
+>>>> + } else {
+>>>> +         *state = DEVLINK_PORT_FN_STATE_INACTIVE;
+>>>> +         *opstate = DEVLINK_PORT_FN_OPSTATE_DETACHED;
+>>>> + }
+>>>> +
+>>>> + return 0;
+>>>> +}
+>>>> +
 
