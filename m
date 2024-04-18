@@ -1,214 +1,92 @@
-Return-Path: <netdev+bounces-88957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB1118A9135
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 04:38:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D3188A914E
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 04:51:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17F541C20EAD
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 02:38:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4DEA1C2039B
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 02:51:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E679041760;
-	Thu, 18 Apr 2024 02:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kM3BZftC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 466D35464A;
+	Thu, 18 Apr 2024 02:51:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756C46FB0;
-	Thu, 18 Apr 2024 02:38:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE3E50A7E
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 02:51:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713407912; cv=none; b=oq8n5vHq673jUSyZmg2d+tHXp9yt97j+gj3SZadZ3KBRdADMW7Vz7nEitTHMcFjWSjHoM1sM4+6D5OwyIZoHHaBMswlV61g/Tgn4SG/Dk9BwOtfdU/iMzyKghTRJmehDqDndoHf9WZ56H8ZFpaSACXrMZSlWjVTxoqrtMPfN7B4=
+	t=1713408667; cv=none; b=YhyfWMzroTZWjC7yOA89hgkBmWRL8NXGyRbwqWvFg9Mpw72Hiky7UuVpkLmigOAfsAeg1rI5LwrWRAJoRQ+T5Tsyd3P8+8zbuJ0PPcrxA2aVsDeqocgh2yUHcGIjwd1QkTxlHF3hNie83j8l3qWYy7+wf6gJwHDVi7rHggkuyoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713407912; c=relaxed/simple;
-	bh=2/BplMB/+NX39KzviOne3YvcFRg/KQzo16KNiJwJ4bU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fg3bzIfzDNL7HaNIXAfyd5++grT3aDIn/j7alzHFmUayfWxIXdDJ1aCKxLwJSPrO4mUzhjQqCWfT9gaH2XhaFHmG6xuHAnrURHvBBrG1PmQBDOOEu2tZGEC114UdgYPfFokmiKdb9Q11UED28x1WlPsqdWjFbYGGPNvEvmqiDC8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kM3BZftC; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6ed32341906so448424b3a.1;
-        Wed, 17 Apr 2024 19:38:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713407910; x=1714012710; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+K4sgg9aCm8qn+G/ntS65DmA1a0W6wNNqGijj5xDwRw=;
-        b=kM3BZftCYpNRU9NqysGOuBK8t/x1CaB1gMIcCfLmAhIlWJN+GdBvwqiiDVji6HTYtC
-         Ych80x2ZQFwL6aCuqArdB5s0jvB2GZH5LU9TujrBAz3zmLw5P/3SjEUajN9rp7mwI0YA
-         UTSIafXZs4Ak9uoaDPDCHpMaabnJQqqS0DEoaDUofxo5XvgsOHn9J+ETUdVsl/htx9mP
-         O4FvXcu5WidbG8bUioa79SWOIrMlgi0o6rNIp7No9k+KRJ8hKfdK80pXMoAhtFT3+bmj
-         1F9Cky9hIxgp5MC/OuZ3Xn1SR2oLRxAsGkASgprqZh1aANtRk3ISrSujxL3VKgKOq5/d
-         3Oxg==
+	s=arc-20240116; t=1713408667; c=relaxed/simple;
+	bh=kemaksdsrlIR1S57gG0m03aOcevlas0sdvRbHQ9Py28=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=dakCghZ1S2FV/F1qy/eaeN8uDas+TQQIhsoUMaL3YKn1FavgYBJTdtOWBjuKCecdcyvy3YoH1lh/7hMg/0pMmDLuY1JiWnOWxt+kinX+z7FXEs88+lPFwYGCZMaIssRbAJxSrKwrrge7Om3fakxxoikKGn5Sd5VwQgP4Sg34hH4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7c9aa481ce4so62576139f.3
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 19:51:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713407910; x=1714012710;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+K4sgg9aCm8qn+G/ntS65DmA1a0W6wNNqGijj5xDwRw=;
-        b=Ar+gIFtC2c/TbjWuTIHQUIrOgLf+2fcdwtTVg/1gzc/1+cJwmq4c2sXxlBxZQk/1hM
-         YRco9ivIR9csk85Gr4Q+5UzRHQP4Wx3C9QB1KRgyW9M/8oIK2EYD0UWiZfJk6MZqAbOu
-         ILD3WWgmuxp8K3htizTIp3CKLVPt2wO/SBpk9W067KzRCJ/ByTNOsDu2AeeGu+fgMf11
-         SA5HM9UJOwE8Lkp2Ei+8z/IEU4kMIEagjnOP0Tfy005pIyfwR/TS7zwxRNrxg6hjMa61
-         UNQllZ4gHplOUGZoK1w5FcyFjI7CMJQS09jG/ILUb0PvrOJfk5K/IdJ+WgvZ8ZRkSI/b
-         kJpA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVh5w9cHbaoz9BA9OWPOALfWy5Ff9BciB04TdOhMBN0rwDK8EXCSSWdxGkO6rOiZI/tbsAaYAqwQUBSxvpGlXLve051QDXP+gjreEysIAF0pdpypxde5MNnyBsGjInU9NLqfghXE16Qd3scORoIJAlphpVWJiZF7/mP2VcFVj2
-X-Gm-Message-State: AOJu0YxY1N5YWPCiHl7p+Z1WPeO6DReDSaqXuqAPk+uJKQFpUN1wVXjb
-	h81Pp+xGnUEFhgkXGBzxoermqExmzWGbdX8pea8cblP+psjSROLM
-X-Google-Smtp-Source: AGHT+IEUVVnRvZxZrZhTcboaTALn+DFf5fhvExyo9g/fu7Aoq5uBj3vcvOQhvSWynLrZ1OycCRPNlQ==
-X-Received: by 2002:a05:6a00:10c2:b0:6ea:d149:c4e with SMTP id d2-20020a056a0010c200b006ead1490c4emr1778396pfu.14.1713407909732;
-        Wed, 17 Apr 2024 19:38:29 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id e21-20020a62ee15000000b006e729dd12d5sm381007pfi.48.2024.04.17.19.38.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Apr 2024 19:38:28 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id DBD2E181A49EF; Thu, 18 Apr 2024 09:38:26 +0700 (WIB)
-Date: Thu, 18 Apr 2024 09:38:26 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Danielle Ratson <danieller@nvidia.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, corbet@lwn.net, linux@armlinux.org.uk,
-	sdf@google.com, kory.maincent@bootlin.com,
-	maxime.chevallier@bootlin.com, vladimir.oltean@nxp.com,
-	przemyslaw.kitszel@intel.com, ahmed.zaki@intel.com,
-	richardcochran@gmail.com, shayagr@amazon.com,
-	paul.greenwalt@intel.com, jiri@resnulli.us,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mlxsw@nvidia.com, petrm@nvidia.com, idosch@nvidia.com
-Subject: Re: [PATCH net-next v3 03/10] ethtool: Add an interface for flashing
- transceiver modules' firmware
-Message-ID: <ZiCHotDYOfkPrDUt@archie.me>
-References: <20240417085347.2836385-1-danieller@nvidia.com>
- <20240417085347.2836385-4-danieller@nvidia.com>
+        d=1e100.net; s=20230601; t=1713408664; x=1714013464;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ikh/8IxQiRxUmOZmfpOtSXJ4MJQsJVrq/VyspE2r/6Y=;
+        b=BCZNzcJwhXIEi6KR8GlJihrHfaqgeft8+uHsGezFdHxOOrbXkVTilVQy0o3bDUUEu9
+         g9fFpXUAEZaMXZi0ucd3Ezl/h6br024BJ0v1vSSk0Jr5zLV0auDjmRZRIiPorDO8PamD
+         8fZH+YlM7Zfb+ffY7G4E/h5nrju5+uOeeJfg4TTLgKJiV5UA2/wXiQdbo7rd8n82pwU5
+         of52DlIQ5UgY+yFfWZzdHLEP1K8PLmgO4PjklS4yPwbHhR8lRZFCG2Hk3hJCW5ZgngGg
+         rkbBwF/ZFRoWAeuNiNoS6X1dNZA4NcWF/yR5xqDsI1XKoiAqvGJuF6zCXyPhdOisrDxu
+         BGlA==
+X-Forwarded-Encrypted: i=1; AJvYcCWf/4NUHoVm2annvDZcgN2u5wU2Y7L8EkLqLINm6uKxFxj8czycnHHIeQ/b47hp1O8I4gqUMEcQTcgaXFPjZfxM66bXQ8f2
+X-Gm-Message-State: AOJu0YxK7Z4STIS3ZmD+zxHhiWTNx2nYKFS2Ml7eGGOD51h7GC1Fbpwe
+	jhUzdYrpCq5PKDBGqmoIZ7dD+pdlcPTG8qTEGNNQ7//rkcNklFm3TwJHhq8KRv+Y/g20uX6eKev
+	ie5+vfLz+0SwCkVJAj6e6DCOFaHMxZHutB+PUjhXse0v0MDr0x0KyiwA=
+X-Google-Smtp-Source: AGHT+IEH7hcoKAZspDMi2dP3VJIZw+p013dekRsehXW/X7ylh3IrZDuqB98iGe7Y8ncILxLfuz6GLvx/hTAlufONhdsfcuPNRCmR
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="U4yNIw1J+x8YhZS5"
-Content-Disposition: inline
-In-Reply-To: <20240417085347.2836385-4-danieller@nvidia.com>
+X-Received: by 2002:a05:6638:378e:b0:482:f06b:70d5 with SMTP id
+ w14-20020a056638378e00b00482f06b70d5mr77102jal.5.1713408664122; Wed, 17 Apr
+ 2024 19:51:04 -0700 (PDT)
+Date: Wed, 17 Apr 2024 19:51:04 -0700
+In-Reply-To: <871q73vlvj.fsf@toke.dk>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c7cac10616560a93@google.com>
+Subject: Re: [syzbot] [bpf?] [net?] general protection fault in dev_map_enqueue
+From: syzbot <syzbot+af9492708df9797198d6@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eadavis@qq.com, eddyz87@gmail.com, 
+	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	toke@kernel.org, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
+Hello,
 
---U4yNIw1J+x8YhZS5
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-On Wed, Apr 17, 2024 at 11:53:40AM +0300, Danielle Ratson wrote:
-> +MODULE_FW_FLASH_ACT
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +Flashes transceiver module firmware.
-> +
-> +Request contents:
-> +
-> +  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D  =3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> +  ``ETHTOOL_A_MODULE_FW_FLASH_HEADER``     nested  request header
-> +  ``ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME``  string  firmware image file n=
-ame
-> +  ``ETHTOOL_A_MODULE_FW_FLASH_PASSWORD``   u32     transceiver module pa=
-ssword
-> +  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D  =3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> +
-> +The firmware update process is composed from three logical steps:
-                          "... consists of ..."
-> +
-> +1. Downloading a firmware image to the transceiver module and validating=
- it.
-> +2. Running the firmware image.
-> +3. Committing the firmware image so that it is run upon reset.
-> +
-> +When flash command is given, those three steps are taken in that order.
-> +
-> +The ``ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME`` attribute encodes the firmwa=
-re
-> +image file name. The firmware image is downloaded to the transceiver mod=
-ule,
-> +validated, run and committed.
-> +
-> +The optional ``ETHTOOL_A_MODULE_FW_FLASH_PASSWORD`` attribute encodes a =
-password
-> +that might be required as part of the transceiver module firmware update
-> +process.
-> +
-> +The firmware update process can take several minutes to complete. Theref=
-ore,
-> +during the update process notifications are emitted from the kernel to u=
-ser
-> +space updating it about the status and progress.
-> +
-> +Notification contents:
-> +
-> + +---------------------------------------------------+--------+---------=
--------+
-> + | ``ETHTOOL_A_MODULE_FW_FLASH_HEADER``              | nested | reply he=
-ader   |
-> + +---------------------------------------------------+--------+---------=
--------+
-> + | ``ETHTOOL_A_MODULE_FW_FLASH_STATUS``              | u32    | status  =
-       |
-> + +---------------------------------------------------+--------+---------=
--------+
-> + | ``ETHTOOL_A_MODULE_FW_FLASH_STATUS_MSG``          | string | status m=
-essage |
-> + +---------------------------------------------------+--------+---------=
--------+
-> + | ``ETHTOOL_A_MODULE_FW_FLASH_DONE``                | u64    | progress=
-       |
-> + +---------------------------------------------------+--------+---------=
--------+
-> + | ``ETHTOOL_A_MODULE_FW_FLASH_TOTAL``               | u64    | total   =
-       |
-> + +---------------------------------------------------+--------+---------=
--------+
-> +
-> +The ``ETHTOOL_A_MODULE_FW_FLASH_STATUS`` attribute encodes the current s=
-tatus
-> +of the firmware update process. Possible values are:
-> +
-> +.. kernel-doc:: include/uapi/linux/ethtool.h
-> +    :identifiers: ethtool_module_fw_flash_status
-> +
-> +The ``ETHTOOL_A_MODULE_FW_FLASH_STATUS_MSG`` attribute encodes a status =
-message
-> +string.
-> +
-> +The ``ETHTOOL_A_MODULE_FW_FLASH_DONE`` and ``ETHTOOL_A_MODULE_FW_FLASH_T=
-OTAL``
-> +attributes encode the completed and total amount of work, respectively.
-> +
+Reported-and-tested-by: syzbot+af9492708df9797198d6@syzkaller.appspotmail.com
 
-The rest of doc LGTM.
+Tested on:
 
-Thanks.
+commit:         443574b0 riscv, bpf: Fix kfunc parameters incompatibil..
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git
+console output: https://syzkaller.appspot.com/x/log.txt?x=15d5b33b180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
+dashboard link: https://syzkaller.appspot.com/bug?extid=af9492708df9797198d6
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=12bfa653180000
 
---=20
-An old man doll... just what I always wanted! - Clara
-
---U4yNIw1J+x8YhZS5
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZiCHnAAKCRD2uYlJVVFO
-o9u5AQCh991QKxPxVHkr+z8uTqo7QtFFLL6GSuC0d8NU9MjenwEAh7gsRfJhdnbM
-bPm7npHuWepvh/Y0G1tafcOvUPUNKwg=
-=VpL+
------END PGP SIGNATURE-----
-
---U4yNIw1J+x8YhZS5--
+Note: testing is done by a robot and is best-effort only.
 
