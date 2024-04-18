@@ -1,183 +1,163 @@
-Return-Path: <netdev+bounces-89393-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89394-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0069D8AA34C
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 21:49:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0A0F8AA361
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 21:52:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 522871F23896
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:49:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C455B24E88
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:52:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2AB5194C74;
-	Thu, 18 Apr 2024 19:46:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B8419067C;
+	Thu, 18 Apr 2024 19:48:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="rwwFZ/0K";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="GO0+OuHI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LJPRQcZp"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh8-smtp.messagingengine.com (fhigh8-smtp.messagingengine.com [103.168.172.159])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C11DF17BB31;
-	Thu, 18 Apr 2024 19:46:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0CC190676;
+	Thu, 18 Apr 2024 19:48:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713469601; cv=none; b=BifySO6mt7kM2I+WrjEjpOt+javDK/pIGYg/37a8s9bhQVXfLdw8Hgfe0jRQLGvguJe1C2nwlGVavYS8eBcXo0BO6Q4mCKTY1OIGtIiRPppr7zMQoh3NIFcoOj7qwOTBBTsorFPi4nczm2TuIQXo2Ktecb81dbVOYYxW4Ri3yXk=
+	t=1713469694; cv=none; b=IldV99ZhYo6KD/Mu3BUCyIObSWFFCzzdU1SgT11i/Umr67y6dYqFfWIGrVy7kpqvKcrBwEiNDUF5aNPBzOs8n5BsV2ZyZRacBmz98xS3hn3j6uzamn1eEHpDWo6lFB5qOnVtz6l3jIT64ItPfdhM0LbwMXsK2xwh3lRXCWHmipY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713469601; c=relaxed/simple;
-	bh=+3RotaxHzSvnFAl/H53BNr33qFv3TxvR2u6MwgIaq/Q=;
-	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
-	 Subject:Content-Type; b=BzzLqYlr+jMo7shvULlJ8z8JemGCn9IuoklVlE5BVrzOi0oXSAG6OwsMbtQhxw6GRtqqgkn+TXsw6kIetfGR37vLqNRmMsw/9scsQ3Bxx6ESZwLSMpwl9W0oVLH6/oqCY55o7Bjd2MG7ZFGvwsHNaQqQbEAdpnOXbCvrQksY0nE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=rwwFZ/0K; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=GO0+OuHI; arc=none smtp.client-ip=103.168.172.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailfhigh.nyi.internal (Postfix) with ESMTP id CDECB114015A;
-	Thu, 18 Apr 2024 15:46:38 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute5.internal (MEProxy); Thu, 18 Apr 2024 15:46:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:subject
-	:subject:to:to; s=fm2; t=1713469598; x=1713555998; bh=UV2QZ0oKQS
-	+W1d7GsHZtbm3RtPzbf1oADrPa/J1FbDM=; b=rwwFZ/0KA4ikU9LTnRnEkLX62k
-	w6B2PlCg/yLgoTZsAKr31B3xQczqBgwqjtBgdgoFz99wySQ/6RryftGJWDOMVHbQ
-	k/u0mkVFFC7Dc3IE3uldtgZtRsUJDi+9GZwh4s+2bpJOqzk1d46cQERsqIqAk4xC
-	yjkp689FKoX6CL7FGTyJwn+i00vtoNVeE96oBZoR+FC4vWZvITbQaELhGkallTXH
-	wCetx/ntF4uHJB/kMfApt9RIrMwdlyAKc7eLl6f9ZyZHGste7Ouwwqh7/4xIF0LG
-	ZuKG1IRM5a9bq4tC16F+TZKhYYSmXBo3/c5nLWjFAdgwhI+B3o/t1LZLyDeg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1713469598; x=1713555998; bh=UV2QZ0oKQS+W1d7GsHZtbm3RtPzb
-	f1oADrPa/J1FbDM=; b=GO0+OuHIogwk+wCCTkoM/YzzMgR0h+DTgFkxaJHoeB/c
-	8rAxMBe6t5y4EqiFDZ8iko6vQbT95Pccf59VjllS3Skq4pVCCbJTd+DTd9m8cq4I
-	iko7Q9RFLa3NnjdcCf4y3EPxk5iaHi04iSZ5c0H3W+JokWbxxgruojrbFtdMP8uZ
-	iV8f8bkg6ABUkcYTDuj5XwMFyAQZFLYkaCLkaOsLrPpfpAh6/rKAhKTQ8R1EPqd7
-	aDTuU6qN20q9K2TUIQImddPkyQlIPnlJcz7Qc9FuGMfWeQvgiwKtIwWED5wALvMj
-	CeDgADvnct1K+iO+0VkhhoQPP7AM0pNRSbRmHb17yA==
-X-ME-Sender: <xms:nnghZmkoua8JzlS38HcKMwKAztZRzf1zpUDbMSavHB91BYGFu2GoBg>
-    <xme:nnghZt2m5sL5UIYqleAyCRfHK8qm4WZ0Xyf5z_Ddc3z16c4Dz9yU05YD-nBXAa6QS
-    bkIHj1E2cbrtRIdYBQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrudektddgudegtdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfgh
-    necuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmd
-    enucfjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdet
-    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
-    htthgvrhhnpeevhfffledtgeehfeffhfdtgedvheejtdfgkeeuvefgudffteettdekkeeu
-    feehudenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivg
-    eptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:nnghZkryO6dKn-ODM8I4SzRCMBEHO7sJEAVaa8j4qsYxYEZal-2BFQ>
-    <xmx:nnghZqkRUN1fa93XBtvh_yIp7DSW3b3E3xt32Ce09NNlB-HVtROaww>
-    <xmx:nnghZk0fBT28SOY_NzfOl7WEijLjUVqrun7e9YVku8tEsrw8SX9TTw>
-    <xmx:nnghZhseMLfKm9UyvwM2EqF5NNIOwuYvxpQCtOhSbAK0fj5MGy7sMg>
-    <xmx:nnghZqPw7TxCIUoofzl4cDqlF_5T5dmBFsnxnSKBp4lAU3QTbJTPmi6d>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 5D8C1B6008D; Thu, 18 Apr 2024 15:46:38 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.11.0-alpha0-379-gabd37849b7-fm-20240408.001-gabd37849
+	s=arc-20240116; t=1713469694; c=relaxed/simple;
+	bh=OmUmZ/bnXeCow6bbFJBnXFl2ZoWC0wNBfhjT9hW/AYY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MPmiFsvD5LfBoIvGKSUYpc39Kcn+jYbsjBtfsNBzrN8dcPl7ofHb0NGxIS3jb5Rb4kFHdj25ZIZ9wrKpqBuYnjhB6RwRuDVSvTHn6LCwXof1nDNiEPCWYeYDwv+VA8HAYglzbX51lDEKbXPdm/3x4QxgwzjoSTQQKYPd+fL3mBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LJPRQcZp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9B77C113CC;
+	Thu, 18 Apr 2024 19:48:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713469694;
+	bh=OmUmZ/bnXeCow6bbFJBnXFl2ZoWC0wNBfhjT9hW/AYY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LJPRQcZpProwGjh9Z8otCZ0M9wMBqR6OML/+gw9DS1Tr0OcvTWZ0ZFFF3vxVzlCw7
+	 Y+tTR2zlcqFbSJMsbpbDY/NcFflYnxh+9H7rkPMPXcjWPW6T8Ud2KdZJr+fCHP7jTy
+	 ybVzZoWWy/RpNpM1P4PvAAkd5JlOLNDZrH4fDnlnSmSllycHz9vtT2KhzdQtHn0Y+Q
+	 Aiwjqr5Y4Tyk74t14BU5UlNwxebWwu3Q2Q8YlncVLlfaotmNgSnDEBG61A85SRZrUL
+	 Ol+9I9o2WLLcdp6MalO+cU5Xa5fp+IeXOvW3ex6DDniqol0n8BQnYoTvVQi+bNr9+e
+	 2D1tgas0kdM9A==
+Date: Thu, 18 Apr 2024 12:48:12 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, petrm@nvidia.com,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v3 8/8] selftests: drv-net: add a TCP ping test
+ case (and useful helpers)
+Message-ID: <20240418124812.48788da6@kernel.org>
+In-Reply-To: <662131d77b55d_ec9b92945@willemb.c.googlers.com.notmuch>
+References: <20240417231146.2435572-1-kuba@kernel.org>
+	<20240417231146.2435572-9-kuba@kernel.org>
+	<662131d77b55d_ec9b92945@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-Id: <798df2d7-b13f-482a-8d4a-106c6492af01@app.fastmail.com>
-In-Reply-To: <20240418151501.6056-C-hca@linux.ibm.com>
-References: 
- <20240417-s390-drivers-fix-cast-function-type-v1-0-fd048c9903b0@kernel.org>
- <20240417-s390-drivers-fix-cast-function-type-v1-1-fd048c9903b0@kernel.org>
- <20240418095438.6056-A-hca@linux.ibm.com>
- <20240418102549.6056-B-hca@linux.ibm.com>
- <20240418145121.GA1435416@dev-arch.thelio-3990X>
- <20240418151501.6056-C-hca@linux.ibm.com>
-Date: Thu, 18 Apr 2024 21:46:18 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Heiko Carstens" <hca@linux.ibm.com>,
- "Nathan Chancellor" <nathan@kernel.org>
-Cc: "Andrew Morton" <akpm@linux-foundation.org>, gor@linux.ibm.com,
- "Alexander Gordeev" <agordeev@linux.ibm.com>,
- "Christian Borntraeger" <borntraeger@linux.ibm.com>,
- "Sven Schnelle" <svens@linux.ibm.com>, wintera@linux.ibm.com,
- twinkler@linux.ibm.com, linux-s390@vger.kernel.org,
- Netdev <netdev@vger.kernel.org>, llvm@lists.linux.dev,
- patches@lists.linux.dev
-Subject: Re: [PATCH 1/3] s390/vmlogrdr: Remove function pointer cast
-Content-Type: text/plain
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 18, 2024, at 17:15, Heiko Carstens wrote:
->> > > > -		/*
->> > > > -		 * The release function could be called after the
->> > > > -		 * module has been unloaded. It's _only_ task is to
->> > > > -		 * free the struct. Therefore, we specify kfree()
->> > > > -		 * directly here. (Probably a little bit obfuscating
->> > > > -		 * but legitime ...).
->> > > > -		 */
->> > > 
->> > > Why is the comment not relevant after this change? Or better: why is it not
->> > > valid before this change, which is why the code was introduced a very long
->> > > time ago? Any reference?
->> > > 
->> > > I've seen the warning since quite some time, but didn't change the code
->> > > before sure that this doesn't introduce the bug described in the comment.
->> > 
->> > From only 20 years ago:
->> > 
->> > https://lore.kernel.org/all/20040316170812.GA14971@kroah.com/
->> > 
->> > The particular code (zfcp) was changed, so it doesn't have this code
->> > (or never did?)  anymore, but for the rest this may or may not still
->> > be valid.
->> 
->> I guess relevant may not have been the correct word. Maybe obvious? I
->> can keep the comment but I do not really see what it adds, although
->> reading the above thread, I suppose it was added as justification for
->> calling kfree() as ->release() for a 'struct device'? Kind of seems like
->> that ship has sailed since I see this all over the place as a
->> ->release() function. I do not see how this patch could have a function
->> change beyond that but I may be misreading or misinterpreting your full
->> comment.
->
-> That doesn't answer my question what prevents the release function
-> from being called after the module has been unloaded.
->
-> At least back then when the code was added it was a real bug.
+On Thu, 18 Apr 2024 10:44:39 -0400 Willem de Bruijn wrote:
+> > +def test_tcp(cfg) -> None:
+> > +    port = random.randrange(1024 + (1 << 15))
+> > +    with bkg(f"nc -l {cfg.addr} {port}") as nc:
+> > +        wait_port_listen(port)
+> > +
+> > +        cmd(f"echo ping | nc {cfg.addr} {port}",
+> > +            shell=True, host=cfg.remote)
+> > +    ksft_eq(nc.stdout.strip(), "ping")
+> > +
+> > +    port = random.randrange(1024 + (1 << 15))
+> > +    with bkg(f"nc -l {cfg.remote_addr} {port}", host=cfg.remote) as nc:
+> > +        wait_port_listen(port, host=cfg.remote)
+> > +
+> > +        cmd(f"echo ping | nc {cfg.remote_addr} {port}", shell=True)
+> > +    ksft_eq(nc.stdout.strip(), "ping")
+> > +  
+> 
+> There are different netcat implementations floating around.
+> 
+> I notice that I have to pass -N on the client to terminate the
+> connection after EOF. Else both peers keep the connection open,
+> waiting for input. And explicitly pass -6 if passing an IPv6
+> address. I think this is the one that ships with Debian..
 
-I think the way this should work is to have the allocation and
-the release function in the iucv bus driver, with a function
-roughly like
+Right, 100% laziness on my part. Mostly because socat requires
+bracketed IPv6. But once I tried it I also run into the premature
+termination problem, so ended up with this diff on top:
 
-struct device *iucv_alloc_device(char *name,
-               const struct attribute_group *attrs,
-               void *priv)
-{
-      dev = kzalloc(sizeof(struct device), GFP_KERNEL);
-      if (!dev)
-           return NULL;
-
-      dev_set_name(dev, "%s", name);
-      dev->bus = &iucv_bus;
-      dev->parent = iucv_root;
-      dev->groups = attrs;
-      dev_set_drvdata(dev, priv);
-      dev->release = iucv_free_dev;
-  
-      return dev;
-}
-
-Now the release function cannot go away as long as any module
-is loaded that links against it, and those modules cannot
-go away as long as the devices are in use.
-
-I don't remember how iucv works, but if there is a way to
-detect which system services exist, then the actual device
-creation should also be separate from the driver using those
-services, with another driver responsible for enumerating
-the existing services and creating those devices.
-
-      Arnd
+diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
+index 579c5b34e6fd..2f62270d59fa 100644
+--- a/tools/testing/selftests/drivers/net/lib/py/env.py
++++ b/tools/testing/selftests/drivers/net/lib/py/env.py
+@@ -110,6 +110,10 @@ from .remote import Remote
+         self.addr = self.v6 if self.v6 else self.v4
+         self.remote_addr = self.remote_v6 if self.remote_v6 else self.remote_v4
+ 
++        # Bracketed addresses, some commands need IPv6 to be inside []
++        self.baddr = f"[{self.v6}]" if self.v6 else self.v4
++        self.remote_baddr = f"[{self.remote_v6}]" if self.remote_v6 else self.remote_v4
++
+         self.ifname = self.dev['ifname']
+         self.ifindex = self.dev['ifindex']
+ 
+diff --git a/tools/testing/selftests/drivers/net/ping.py b/tools/testing/selftests/drivers/net/ping.py
+index 8532e3be72ba..985b06ce2e81 100755
+--- a/tools/testing/selftests/drivers/net/ping.py
++++ b/tools/testing/selftests/drivers/net/ping.py
+@@ -27,18 +27,20 @@ from lib.py import bkg, cmd, wait_port_listen
+ 
+ def test_tcp(cfg) -> None:
+     port = random.randrange(1024 + (1 << 15))
+-    with bkg(f"nc -l {cfg.addr} {port}") as nc:
++
++    with bkg(f"socat -t 2 -u TCP-LISTEN:{port} STDOUT", exit_wait=True) as nc:
+         wait_port_listen(port)
+ 
+-        cmd(f"echo ping | nc {cfg.addr} {port}",
++        cmd(f"echo ping | socat -t 2 -u STDIN TCP:{cfg.baddr}:{port}",
+             shell=True, host=cfg.remote)
+     ksft_eq(nc.stdout.strip(), "ping")
+ 
+     port = random.randrange(1024 + (1 << 15))
+-    with bkg(f"nc -l {cfg.remote_addr} {port}", host=cfg.remote) as nc:
++    with bkg(f"socat -t 2 -u TCP-LISTEN:{port} STDOUT", host=cfg.remote,
++             exit_wait=True) as nc:
+         wait_port_listen(port, host=cfg.remote)
+ 
+-        cmd(f"echo ping | nc {cfg.remote_addr} {port}", shell=True)
++        cmd(f"echo ping | socat -t 2 -u STDIN TCP:{cfg.remote_baddr}:{port}", shell=True)
+     ksft_eq(nc.stdout.strip(), "ping")
+ 
+ 
+diff --git a/tools/testing/selftests/net/lib/py/utils.py b/tools/testing/selftests/net/lib/py/utils.py
+index 6bacdc99d21b..85a6a9bb35fd 100644
+--- a/tools/testing/selftests/net/lib/py/utils.py
++++ b/tools/testing/selftests/net/lib/py/utils.py
+@@ -42,15 +42,17 @@ import time
+ 
+ 
+ class bkg(cmd):
+-    def __init__(self, comm, shell=True, fail=True, ns=None, host=None):
++    def __init__(self, comm, shell=True, fail=True, ns=None, host=None,
++                 exit_wait=False):
+         super().__init__(comm, background=True,
+                          shell=shell, fail=fail, ns=ns, host=host)
++        self.terminate = not exit_wait
+ 
+     def __enter__(self):
+         return self
+ 
+     def __exit__(self, ex_type, ex_value, ex_tb):
+-        return self.process()
++        return self.process(terminate=self.terminate)
+ 
+ 
+ def ip(args, json=None, ns=None, host=None):
 
