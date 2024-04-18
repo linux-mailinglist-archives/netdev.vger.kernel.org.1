@@ -1,122 +1,137 @@
-Return-Path: <netdev+bounces-89016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75A098A93FE
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:30:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2F568A940D
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:33:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8845B215B9
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 07:30:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DAAEB21E1F
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 07:33:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D76103C489;
-	Thu, 18 Apr 2024 07:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E7753C473;
+	Thu, 18 Apr 2024 07:32:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QY/N9fun"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JVRLIHxD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E154D38F96;
-	Thu, 18 Apr 2024 07:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAE0F7441A
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 07:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713425428; cv=none; b=Ixd5fDEKHIwfM+SKVp3poT59Hfc93DrJU/7E84YxbgxdExnODpEAFJEg3RHiwFSV5F4Pot8DPKrBRg6Kqz0i+9br109pRJV5BZjJgIuEXAvPcU8vpp8i8wMr0eCNnGQgvejO2dDVPKt9N7C/eOqTLsy7+Ds0efITFvJC6HopoQY=
+	t=1713425573; cv=none; b=d0sxkkFAS4cOdMMpXel6Nnv5Qp0jqD1Sw9T2Rx2DHgaUS81r4muNtnJIh2zyNVbqxyXx0jMw5pbmRPzDhC8jFGLePM3dR0FyQR+CmRqywZSbFxOvnxEUmLaAUjIsNceDnsT3r+aeJZ5NALPU4WfhVoV/DQP4vFRx5o2Kw72Cx3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713425428; c=relaxed/simple;
-	bh=5g7iu/VVAy/L+SP4+CheknDrk8WwulKiELdeRGtgDF8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M/MVCJyhMyZRF9YAsMSzda+yQs0rnNHxnOixg5tIqF5AS1hYkJKBMoyfRVsfImJhMt7u1K4AQqrYXbfQzGFbE2Te4N4uHpkuUzi2BjGEr6dPXKvZkpL5xGvj2Rk4RdFmdO+ApPB5P+mXsv1FSHhvmW2qD6zBRZnfpfPKkbcxBMo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QY/N9fun; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713425427; x=1744961427;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=5g7iu/VVAy/L+SP4+CheknDrk8WwulKiELdeRGtgDF8=;
-  b=QY/N9fundHkAsTf2cChu4e4/6lr9980bnzNQ21h/OQP7ztb0yckr1Da1
-   i34raXWOw5n6RxnrdiN8af7KZs+2bkdOOdDWu+rktqUIdESRRczVvAfbb
-   byMtCuht0zcmgaRUfSCcYNSZw0a0lQH41/mYZVroRvnok8HJ0D7gLl1RA
-   kBJPpyyc28KBXpHU0lXAAgeKStSL4k8e2Q62SsYoDDSGiQXhjCtFL0cK7
-   IEmlY6ktAiUY/udcclDF9l2QlEE7/Ok2sNkfLfCVCiHSll9FpA6lYUf5L
-   KQ9bCwOxgkL4AyRlo5ClX4WXKd1f5tqkRGSFpopUBOQ6kA74s5ls7/kJk
-   w==;
-X-CSE-ConnectionGUID: PqrORcytQjq02UOIjScVZw==
-X-CSE-MsgGUID: HKcH8GKpRCKGXTbzgpFAEw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="9502750"
-X-IronPort-AV: E=Sophos;i="6.07,211,1708416000"; 
-   d="scan'208";a="9502750"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 00:30:26 -0700
-X-CSE-ConnectionGUID: iks+W5Y9Q5K1RKF6sS7HkQ==
-X-CSE-MsgGUID: KqH5QFqvRm68XI9aFxiv3Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,211,1708416000"; 
-   d="scan'208";a="23316867"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 00:30:24 -0700
-Date: Thu, 18 Apr 2024 09:30:01 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: =?iso-8859-1?Q?Asbj=F8rn_Sloth_T=F8nnesen?= <ast@fiberby.net>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next] ice: flower: validate control
- flags
-Message-ID: <ZiDL+TTeJWhYam6Q@mev-dev>
-References: <20240416144331.15336-1-ast@fiberby.net>
+	s=arc-20240116; t=1713425573; c=relaxed/simple;
+	bh=SJQuaahuFCL6UoxEDhB5oFCltamuJtFBv2+9yo16u6c=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=WjOy8ogd+LjRcwU/zT2IOGDwMk6VlirHqkmTEYOxQGz0Gr+7tPs6txxUp5EEMGSe8WpBprpyrLPipdkVXBdg7fCBIOSgVz6xllzEABwdANfq+qVmC4pytiyz+1vWIxvfVt9fhdzsasj7TAy6x8nel/u1Y7eANM1+VbccICRAhMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JVRLIHxD; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de45d0b7ffaso1225893276.2
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 00:32:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713425570; x=1714030370; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=0hx205bFsl0ohGBFDqw23KLOf+Sl+qO0ARfcDuNZ0YM=;
+        b=JVRLIHxDknw2Bjh2YixWk1lRLKsuslbmG2Jx+BrXF+H42dIyVAOxiYdOMTc8Cq0uPL
+         YT+/0p8Yph1/W5ydjvnmmIU3h0wvVHA+/ycOqPf44ccfEQ9YAPdta9xkxog4vxALObhE
+         z3469Jy3lTsAShm/mCu0QZETJedPcWSfT1PuMlujOIWUPzAiI79CDHncUPiUaAmUkLtm
+         8pTwSd3jbtrK3ohvxMTR7PHZ0Ak4cbUMUjdKoMgEpNtdGwTEpcNi3KF9Uz3YBleg95S0
+         13i2G8aYOIURvCmotupLn6IFJo4Rj9NqEhyyYt7yVov1rVSVIdWLqzDSLyVi28YRNo+5
+         UjbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713425570; x=1714030370;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0hx205bFsl0ohGBFDqw23KLOf+Sl+qO0ARfcDuNZ0YM=;
+        b=nv1/uPfwtcJ73R0K48+v0Gz18LRWyrdy2FObFg1ABLUmFETDkrBmGh8QlbCD1cAahz
+         k/L45N3NS9YRTyy6tkHCdft6vbcAq+gtN8SZf0+P0ltOI+S227KB+Tb5uJK8L3Cx3R+g
+         im7N2kRNosfHaRpxxBE4zhOwRoyPiGLO9fRxBM1s5+FW63aZ9g/KPTjvctNuK/QaYFCO
+         kc/tlertsyxeXek7vZ8gmGM5bRZ1Qsb7SLXHF+GF4+DhpBrzIRZY+HebeXxDilrdrxeE
+         jS07UiXpdEh0gRZ3obl7j2g9dcatUZBREa5hlN4M0n+W562NQA3edho8kkb/3bhD8s54
+         iEOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVteJutEo6JLtwhTOdZBnw+x07ijFEc6jFjJVoTh3u4xnjgjbyxNiRKYwFEQ2uvt4iuxypUQ/Aaxil9gzx+Cl3w8ouOpp4h
+X-Gm-Message-State: AOJu0YzhBHTwbN883rW1TCjYYDpKyFPAe0IFuvlgg9Yr1D2FL3j4WPrp
+	CGTXYit9835dv5GgYSfm9SEEErlVgAtbO1+/+3qrjvnOWuFMoVddCKsjf2aWddjhSSFFluh27Pf
+	scET1u8Is1A==
+X-Google-Smtp-Source: AGHT+IGi3jCk5Zv7vIKnjyXNkVRfIc2jyjv32ANioZZHY9PtdFDz9OMAIPI4ogd0RMAC50bVcSqMlqbnM/fU+A==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1083:b0:dbe:a0c2:df25 with SMTP
+ id v3-20020a056902108300b00dbea0c2df25mr166148ybu.8.1713425570661; Thu, 18
+ Apr 2024 00:32:50 -0700 (PDT)
+Date: Thu, 18 Apr 2024 07:32:34 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240416144331.15336-1-ast@fiberby.net>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
+Message-ID: <20240418073248.2952954-1-edumazet@google.com>
+Subject: [PATCH v2 net-next 00/14] net_sched: first series for RTNL-less qdisc dumps
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Simon Horman <horms@kernel.org>, 
+	"=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?=" <toke@redhat.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Apr 16, 2024 at 02:43:30PM +0000, Asbjørn Sloth Tønnesen wrote:
-> This driver currently doesn't support any control flags.
-> 
-> Use flow_rule_has_control_flags() to check for control flags,
-> such as can be set through `tc flower ... ip_flags frag`.
-> 
-> In case any control flags are masked, flow_rule_has_control_flags()
-> sets a NL extended error message, and we return -EOPNOTSUPP.
-> 
-> Only compile-tested.
-> 
-> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
-> ---
->  drivers/net/ethernet/intel/ice/ice_tc_lib.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-> index 2f2fce285ecd..361abd7d7561 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-> @@ -1673,6 +1673,10 @@ ice_parse_cls_flower(struct net_device *filter_dev, struct ice_vsi *vsi,
->  		flow_rule_match_control(rule, &match);
->  
->  		addr_type = match.key->addr_type;
-> +
-> +		if (flow_rule_has_control_flags(match.mask->flags,
-> +						fltr->extack))
-> +			return -EOPNOTSUPP;
->  	}
->  
+Medium term goal is to implement "tc qdisc show" without needing
+to acquire RTNL.
 
-Thanks,
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+This first series makes the requested changes in 14 qdisc.
 
->  	if (addr_type == FLOW_DISSECTOR_KEY_IPV4_ADDRS) {
-> -- 
-> 2.43.0
-> 
+Notes :
+
+ - RTNL is still held in "tc qdisc show", more changes are needed.
+
+ - Qdisc returning many attributes might want/need to provide
+   a consistent set of attributes. If that is the case, their
+   dump() method could acquire the qdisc spinlock, to pair the
+   spinlock acquision in their change() method.
+
+V2: Addressed Simon feedback (Thanks a lot Simon)
+
+Eric Dumazet (14):
+  net_sched: sch_fq: implement lockless fq_dump()
+  net_sched: cake: implement lockless cake_dump()
+  net_sched: sch_cbs: implement lockless cbs_dump()
+  net_sched: sch_choke: implement lockless choke_dump()
+  net_sched: sch_codel: implement lockless codel_dump()
+  net_sched: sch_tfs: implement lockless etf_dump()
+  net_sched: sch_ets: implement lockless ets_dump()
+  net_sched: sch_fifo: implement lockless __fifo_dump()
+  net_sched: sch_fq_codel: implement lockless fq_codel_dump()
+  net_sched: sch_fq_pie: implement lockless fq_pie_dump()
+  net_sched: sch_hfsc: implement lockless accesses to q->defcls
+  net_sched: sch_hhf: implement lockless hhf_dump()
+  net_sched: sch_pie: implement lockless pie_dump()
+  net_sched: sch_skbprio: implement lockless skbprio_dump()
+
+ include/net/red.h        |  12 ++---
+ net/sched/sch_cake.c     | 110 ++++++++++++++++++++++-----------------
+ net/sched/sch_cbs.c      |  20 +++----
+ net/sched/sch_choke.c    |  21 ++++----
+ net/sched/sch_codel.c    |  29 +++++++----
+ net/sched/sch_etf.c      |  10 ++--
+ net/sched/sch_ets.c      |  25 +++++----
+ net/sched/sch_fifo.c     |  13 ++---
+ net/sched/sch_fq.c       | 108 ++++++++++++++++++++++++--------------
+ net/sched/sch_fq_codel.c |  57 ++++++++++++--------
+ net/sched/sch_fq_pie.c   |  61 ++++++++++++----------
+ net/sched/sch_hfsc.c     |   9 ++--
+ net/sched/sch_hhf.c      |  35 ++++++++-----
+ net/sched/sch_pie.c      |  39 +++++++-------
+ net/sched/sch_skbprio.c  |   8 +--
+ 15 files changed, 323 insertions(+), 234 deletions(-)
+
+-- 
+2.44.0.683.g7961c838ac-goog
+
 
