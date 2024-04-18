@@ -1,109 +1,132 @@
-Return-Path: <netdev+bounces-89464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 634DA8AA5C8
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 01:27:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88FB68AA5DC
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 01:32:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E34EDB220D0
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 23:27:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4045C1F21893
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 23:32:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D1C58119;
-	Thu, 18 Apr 2024 23:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05CD96A025;
+	Thu, 18 Apr 2024 23:32:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bD73m/Tj"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="mr32p6JA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 996652E41C;
-	Thu, 18 Apr 2024 23:27:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808A64A20;
+	Thu, 18 Apr 2024 23:32:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713482859; cv=none; b=Yb1v+5j2c5LiBGba5Mdejmrs19f8Uk2pZvcbCIhn7KE5fGDlZ7m/rfHSBFCMdoEJExIAoF4CWxG7atVzMvoTh/vX+PG2JGTDSv95DtAYe5ImTMDEtx0w9L0QYoytX7yfXUPJjGNUXz8TUogRD7Ao0AKZ//qlbCVpbqlETBzEa8M=
+	t=1713483149; cv=none; b=Ll5twSuwFncA8pAOOiUtMihfH5TdumhWjqz+jFKyoA7mUD0z9TFnjRmMKa7udu9Vy9yW7qRIfCKjmdxxWQ3XvTI91IkNDgEZ/2ANiLDCtdZmd5qiVGjDtYwYImzEIoGkVNVtAITdQm/gymvtqCavCpyEm1Ms/wu5omwaqg3nhTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713482859; c=relaxed/simple;
-	bh=xizDYZulULm1cor7kU1CBg+oGHqLt4pe1urWfkCgvDo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hq2z5GvNfmXDBKMYGhn1pfAdi/Cfeq5E7pPqaeJC/h8W6xFS+PVk1lzvd92hNqK35eUTwL05pWcYXrPHdL+WAmYC9c9XTjXDe4qBZw4SF9kuPRm2DW8zUU8OL2sWSp0Dhayz8EG8GbXlLUDeSVYhg98s4N/1WwSTEerbD0Z4Fyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bD73m/Tj; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-346b09d474dso1350884f8f.2;
-        Thu, 18 Apr 2024 16:27:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713482856; x=1714087656; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=xizDYZulULm1cor7kU1CBg+oGHqLt4pe1urWfkCgvDo=;
-        b=bD73m/TjCeKZrcLOSReNKYc7vDW/lCilpyb5g1oRD/s2CR+hOqWuyn4eP5+YsW/nSq
-         qAFg7dV1+6VJtZBjM6pJvKfzLGaDjC20Xot340pytAKR4vcGmXucbWuc9+WMoaraWkTF
-         O9JcfGI05KF2AZDtNxb6ydGDdZZdyF5ORtgHpnPF6mIQdmCZeGmD88MNWBDgyREm2fT4
-         WFsJl9KnSh3DR+Q92i4v0jQG4kID5qXfUjZEaJqJ0wFKLWoit+uD471HKgDiwCq/nm4X
-         a3wJwYcjTeOK82y7IEIje3rW8zVqVbFZPPeTdJP61/I35O9f1DRWq0Fv7ejG8Ziw+off
-         ocCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713482856; x=1714087656;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xizDYZulULm1cor7kU1CBg+oGHqLt4pe1urWfkCgvDo=;
-        b=P4Ju2p5ob68fWDsighP0PNgr3AxqU8QNQ61NxWQZJNfecunIHGfU9ZFna9WREVOgcN
-         z9ygxr7cSzm5aImXXEOsyC1PqA/cwG+VbpsUUOSKnrSuxEvyUc/pafCB0X7/pSQma3iR
-         /dNkO8D7SokL83qZLJqOyq979SnvMho1Ysbox68uN1kXmUc3RmD7rl2D/hPs2p11X8BJ
-         foHa9CA5nZ3+Aqa4mGZMIkeMs6fmoraVvtyLToRkrCCofDXlYWIlLza80Tie04HGjcH6
-         AWIIEsjeNv+olgSkHAxrV3Q5Y8TNIwk/E63HglEUbTq0DJbokx3OrRLjSbtOrQ83kgLf
-         gz8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWgygtx0fnH+VJ/AN7r6EYUdzyuNoF2aP0HPDbhwULjldzhKMAJtNV3LZcofsTGj8y9jU25SWSQFyFGaMuRi/1lxxz2UARcRivbExi2ffxLzI6E7vpHGPY55UnvnW5hYn67rJoFUc1cw11h
-X-Gm-Message-State: AOJu0YzeHz0cgaCdkqXUa81P87hLKpMuBk8/a8tvOsuWK/LlWN971o+5
-	KvDJ13NrulFkWgCACxnB5WQZBy8uPDVSiWsbHmuQt79i5ejDvdWY6U8mHpi2T8qXvTf5WNF2Ggr
-	JsID3hCiTxqIM3W/ekFx0WiHLpfU=
-X-Google-Smtp-Source: AGHT+IGx1cA9bIs5ny5tYrBbOqozFvluuDaWI9b5II0BFVbz7OLtPuXGmvlvVRvsL1YUhwViEmwaAfmQH3671sqJBLo=
-X-Received: by 2002:a5d:522d:0:b0:34a:d2a:5905 with SMTP id
- i13-20020a5d522d000000b0034a0d2a5905mr261746wra.31.1713482855640; Thu, 18 Apr
- 2024 16:27:35 -0700 (PDT)
+	s=arc-20240116; t=1713483149; c=relaxed/simple;
+	bh=EYZS2H6fzPOlRgIXVoWWJKSUl39I+Z1L0VjK4QxzVJA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=P7qYKjp8ajufHjtUgY5lY748hgxvgdSr6tJD83PvJb1xxlwoFFXIiGEOF+ZVco5sX1dhs906xyZ4xN3KqDlx4WBakEKIkwLbVDKedfSElXMxM1pdDt/8wyqYW2hmnaa897Y2TxHB6hDYOdsWkLUY8hEgSUmFjf4hO/rxQL1oge0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=mr32p6JA; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1713483144;
+	bh=R1/1szuT9hPMtMvkuBptcn8TSH/pfi2IMvhJaAia4Co=;
+	h=Date:From:To:Cc:Subject:From;
+	b=mr32p6JAyv4SxDo+9936crZYbf6KovnjXyG0Q17ypYhxbMDraLPtem01lORtrhaK/
+	 k72ummFSUpMcC3KbxHeaosI7IculQV30BCEj8VliL6fEObNUp9qIpeZaEd3P23/aBr
+	 33IoXhv3AaH7jQ1Yuxe5yapkLoZLw7tYC91Z/s1DfsF5OXaCXTmjrYr/ZUZ/uZd6bm
+	 /Uu1SJ+EgD19Vteke5FpF6pSJabPjNc76DQ0C2RVi4kUIhfNqDGjHwrGaX+ShGnzIl
+	 Dze55dlgakEoMLce6l9dBApXGw1Vr2n+J43FNKOZpDpF1z9Y7ECp7JJaPoxELB72Vr
+	 zFoYLIhDqVtcw==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VLDZv0jPMz4wyq;
+	Fri, 19 Apr 2024 09:32:23 +1000 (AEST)
+Date: Fri, 19 Apr 2024 09:32:22 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Andrew Morton <akpm@linux-foundation.org>, David Miller
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>
+Cc: Edward Liaw <edliaw@google.com>, Networking <netdev@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
+ Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the mm-hotfixes tree with Linus' tree
+Message-ID: <20240419093222.5a901a84@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240417085143.69578-1-kerneljasonxing@gmail.com>
- <CAL+tcoDJZe9pxjmVfgnq8z_sp6Zqe-jhWqoRnyuNwKXuPLGzVQ@mail.gmail.com>
- <20240418084646.68713c42@kernel.org> <CAL+tcoD4hyfBz4LrOOh6q6OO=6G7zpdXBQgR2k4rH3FwXsY3XA@mail.gmail.com>
- <CANn89iJ4pW7OFQ59RRHMimdYdN9PZ=D+vEq0je877s0ijH=xeg@mail.gmail.com>
-In-Reply-To: <CANn89iJ4pW7OFQ59RRHMimdYdN9PZ=D+vEq0je877s0ijH=xeg@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 19 Apr 2024 07:26:58 +0800
-Message-ID: <CAL+tcoBV77KmL8_d1PTk8muA6Gg3hPYb99BpAXD9W1RcFsg7Bw@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 0/7] Implement reset reason mechanism to detect
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, dsahern@kernel.org, matttbe@kernel.org, 
-	martineau@kernel.org, geliang@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, atenart@kernel.org, mptcp@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/Lo7x+b/tFAF1roENO8l.nWi";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-> When I said "If you feel the need to put them in a special group, this
-> is fine by me.",
-> this was really about partitioning the existing enum into groups, if
-> you prefer having a group of 'RES reasons'
+--Sig_/Lo7x+b/tFAF1roENO8l.nWi
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Are you suggesting copying what we need from enum skb_drop_reason{} to
-enum sk_rst_reason{}? Why not reusing them directly. I have no idea
-what the side effect of cast conversion itself is?
+Hi all,
 
-If __not__ doing so (copying reasons one by one), for passive rests,
-we can totally rely on the drop reason, which means if we implement
-more reasons for skb drop happening in reset cases, we don't need to
-handle reset cases over and over again (like adding rst reasons just
-after newly added drop reasons if without cast conversions). It's
-easier to maintain the reset reason part if we can apply the current
-patch series.
+Today's linux-next merge of the mm-hotfixes tree got a conflict in:
 
-Thank you.
+  tools/testing/selftests/kselftest_harness.h
+
+between commit:
+
+  caed8eba2215 ("selftests: kselftest_harness: fix Clang warning about zero=
+-length format")
+
+from Linus' tree and commit:
+
+  52124c13ec1f ("selftests/harness: remove use of LINE_MAX")
+
+from the mm-hotfixes-unstable branch of the mm-hotfixes tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc tools/testing/selftests/kselftest_harness.h
+index ba3ddeda24bf,f0ae1f6466db..000000000000
+--- a/tools/testing/selftests/kselftest_harness.h
++++ b/tools/testing/selftests/kselftest_harness.h
+@@@ -1205,7 -1205,8 +1208,8 @@@ void __run_test(struct __fixture_metada
+  		diagnostic =3D "unknown";
+ =20
+  	ksft_test_result_code(t->exit_code, test_name,
+ -			      diagnostic ? "%s" : "", diagnostic);
+ +			      diagnostic ? "%s" : NULL, diagnostic);
++ 	free(test_name);
+  }
+ =20
+  static int test_harness_run(int argc, char **argv)
+
+--Sig_/Lo7x+b/tFAF1roENO8l.nWi
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYhrYYACgkQAVBC80lX
+0GxIXAf9GkUydFR4L+GRsO3dV79ZUMzgzwRca1uFwzNSaJkaO54D90SFXWhPecod
+1NY7M72Lg9cNT6PqpO6xQ9zPnWjdWlU1fAdZMuZx+Li/MFzmnqBW4S73F1q6HhCx
+LikcWI939KGsPG9uBbQ0lxQnG+JBNNp+z7Wny3ypLxOp5e2oqFkySwzWFgv+BS+x
+vH9a+BAuBXOzZv/a3heyAmOLx9sNzOAT0HFRnUrEb+dSAVH0wLD9uAdXqCbBQpgd
+WtcsCPewuKXVXnKd6GLelrG78GhhED/ezFejgxzDSrJCpcWGISzLO2lR7V7ijIRB
+x8POmTps9e6xUxr+8xAYqA9cFrYtuw==
+=wSr3
+-----END PGP SIGNATURE-----
+
+--Sig_/Lo7x+b/tFAF1roENO8l.nWi--
 
