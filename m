@@ -1,143 +1,129 @@
-Return-Path: <netdev+bounces-89332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B35BC8AA0AD
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:03:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE6B58AA0AC
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:02:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0BEDDB25039
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 17:02:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63DDF1F214AE
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 17:02:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1898916F8F3;
-	Thu, 18 Apr 2024 17:02:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7D5015B117;
+	Thu, 18 Apr 2024 17:02:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="oij5gfnu"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="jMkNg6eW"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2068.outbound.protection.outlook.com [40.107.244.68])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D9FE11CA0
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 17:02:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713459773; cv=fail; b=cZOui4Kq8paz2Cz6/g5wWRjEGnrl/GFDtQQRqPAjXk+s4aXpw8obTfWWelf9SYcJZmRZ2Hs2icKOX1jRWLo0kbKCF/sUBQ+UBMNk/BSDZUXVK0r9oWEdIcB40+2JmIPsagYl47YH+XaRjyQSNSmw3YlFgi392vLvE5CfN6uj1TI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713459773; c=relaxed/simple;
-	bh=2LkoGl4IiOIxtk+gcZjxkFUfRFSzLOQ8UdsHWjw1YQ0=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=Bi4ptbb8dex3jUAY1BE4nPnZgPHXKgLDs6du71LO4pGWH/aeVeUSiBBYKX4zNxDyhRr4PIuvTdoJ2wQVt+H6230gP6eJtkKxGQcYOVsnHbj0AiYuuJmwwVXs9rvDRgRfqh3WyxoujacF6mqx9hEGyK1HiggB1o+j1RI3Xkq8gZ0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=oij5gfnu; arc=fail smtp.client-ip=40.107.244.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=UjgVnJ4CCNI2HuSiDGagXJUj/Zln0HDbfYBu+5x3j9RDBXvfyh/+etP9IqXep6zH46C4lGnc9Nym0tLiQpABtcDbIR2KwKmMXn+voTmyF6j8w5ZSkpeBJySFAkjnh+R/MmOq2keKvmtTaKTX5lDca32fAcNqxWh5xlWR3ubXhsjANRxstJ+rDP6V8MwhNyJTtJ1rQbdGZQKQDmoinggA65sis7W/iZxyaP7euYmdq2BqFQwqIM9Ahi1rLuyR7eOlFzvVCJMFEwq4as81ziDJiKtaGlgoG0vjVyQZhshpT0oMkhGI6hBv4OCsJNiu0BBgLTv8f+dwbEab+cuaAc4Ovw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2LkoGl4IiOIxtk+gcZjxkFUfRFSzLOQ8UdsHWjw1YQ0=;
- b=DMNxVgRVnKP38MU9VOM0bVTEylnMQojrKOju1q4OorlCdZyQaotzek5tiSCkrr8FlFvT8I/k/ehkP12GObERZm6P/r7w00lA1rbb0Zw5TkN/lPvNNsbqdlqFD4uFMa4eiIh2MdkAU7k+4b4XEgZegObdNdRqnDdZ/DJyWX8rZjtzb9Lk2TUVxLhh3O9opsoHOLh++KB1/lWZUfoVDh2j102m1yP0Ly1CVcbT1jTLcazrS4+lsEgAl4E7uP3mPFxNv5KqFX1fzvK1DeHZTcVQyZK9/ZNptvXLrckMiz3/7Odw4LG4yFaT/CYY11M5ESg6+6wTCBrRaxXA5q4onqjp5A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2LkoGl4IiOIxtk+gcZjxkFUfRFSzLOQ8UdsHWjw1YQ0=;
- b=oij5gfnuJfAI4YgqU70A78+q0dW91PpHiLdtGfItWI7KDgbIJCav8Z8GCGnmU7xZeksixzZoJaUflMhuWiCcIKHrxaIGOIEV0kTNYhfz4bo/yoX3NIK+BM5UVNwgbxeczKdbK5+fSjngXOC2qhAOH4TSVzowWrZdFQfRVfyIokKSPmu3XYuQYXYloW2xZlAWmyhUlK57K42vJK2u2okuG9Kof150XrUjBEy2+PggKvTpp8hQvE3eFWihTuu69pfp3Dwrb8r+Vgn/WLeUu3wClzhyUj21i0RH1PubQR2C2NpzXYt+Uc+Jib5GlNoXiaHAn/yvLb9+iUZGJXHZp1N3gQ==
-Received: from MN2PR11CA0022.namprd11.prod.outlook.com (2603:10b6:208:23b::27)
- by LV8PR12MB9182.namprd12.prod.outlook.com (2603:10b6:408:192::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.53; Thu, 18 Apr
- 2024 17:02:49 +0000
-Received: from BL02EPF0001A102.namprd05.prod.outlook.com
- (2603:10b6:208:23b:cafe::46) by MN2PR11CA0022.outlook.office365.com
- (2603:10b6:208:23b::27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.29 via Frontend
- Transport; Thu, 18 Apr 2024 17:02:49 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BL02EPF0001A102.mail.protection.outlook.com (10.167.241.134) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7452.22 via Frontend Transport; Thu, 18 Apr 2024 17:02:48 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 18 Apr
- 2024 10:02:11 -0700
-Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 18 Apr
- 2024 10:02:05 -0700
-References: <20240418160830.3751846-1-jiri@resnulli.us>
- <20240418160830.3751846-7-jiri@resnulli.us>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Petr Machata <petrm@nvidia.com>
-To: Jiri Pirko <jiri@resnulli.us>
-CC: <netdev@vger.kernel.org>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <parav@nvidia.com>,
-	<mst@redhat.com>, <jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>,
-	<shuah@kernel.org>, <petrm@nvidia.com>, <liuhangbin@gmail.com>,
-	<vladimir.oltean@nxp.com>, <bpoirier@nvidia.com>, <idosch@nvidia.com>,
-	<virtualization@lists.linux.dev>
-Subject: Re: [patch net-next v4 6/6] selftests: virtio_net: add initial tests
-Date: Thu, 18 Apr 2024 19:01:08 +0200
-In-Reply-To: <20240418160830.3751846-7-jiri@resnulli.us>
-Message-ID: <878r1abo52.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A4F15FA92
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 17:02:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713459749; cv=none; b=DrdRo348KITqWqrgUKcdMOb7P4SJ1GTVZjqcTXrciyG1kRboHGJuJtB504y2sLufdXzWCMEisD85j23WUTEMEwK9NjKdnuml4BHwE3bGf2h7cAEz6EODdKUQ8fl/t+TbpQOMUghLhsdvolVo0MB1euTrZLFWq+QICNP3VlPY9ik=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713459749; c=relaxed/simple;
+	bh=RX3o28oTXZ3os0EIFFiqztAzjEJknxtM2ibLcV5CBBE=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=EvCFdO95vLgyTyDL0vUyTGXjofA/IXq3ud2MvVQ5OFoWPv4uKHWvlYO0AE46N3BkjgSnWYNfNTinuCVXYRCVxBBfinfT5ugO+SJozzuAbdql1l8qpGwz7XvMAsHAARLRhvT1bGEISLXU38tp2vc08H5E9rQZ+3TRQSPbUOnSpO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=jMkNg6eW; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1713459748; x=1744995748;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=HaZTC6HJ1xGeOz0Y0Qp/ezMegV95yBFeV8li2c/59s0=;
+  b=jMkNg6eWFrCY+a1NgyUArUoeTCCnyG6QKKfGtjlSEV3FW28HZAEISai8
+   QA34XimuX1MF5hstnlhKjr5cb8x/kVoAXdwd1hBrs0jwe6+jIhSEIW4n5
+   L5K2IokM15trAWu4EbaPGBVullW78YJO1ci785qyenIEzV/f3/csV1jcx
+   g=;
+X-IronPort-AV: E=Sophos;i="6.07,212,1708387200"; 
+   d="scan'208";a="412724455"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 17:02:22 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:3605]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.46.15:2525] with esmtp (Farcaster)
+ id bc4bbf8f-0340-4dec-af1a-59d8bdfc13c9; Thu, 18 Apr 2024 17:02:21 +0000 (UTC)
+X-Farcaster-Flow-ID: bc4bbf8f-0340-4dec-af1a-59d8bdfc13c9
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Thu, 18 Apr 2024 17:02:21 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.33) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
+ Thu, 18 Apr 2024 17:02:17 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <pabeni@redhat.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<herbert@gondor.apana.org.au>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<steffen.klassert@secunet.com>, <syzkaller@googlegroups.com>,
+	<willemb@google.com>
+Subject: Re: [PATCH v1 net 1/5] sit: Pull header after checking skb->protocol in sit_tunnel_xmit().
+Date: Thu, 18 Apr 2024 10:02:08 -0700
+Message-ID: <20240418170208.23991-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <9fae6b381dccd6566b6366c7090468bea1f5e1d7.camel@redhat.com>
+References: <9fae6b381dccd6566b6366c7090468bea1f5e1d7.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A102:EE_|LV8PR12MB9182:EE_
-X-MS-Office365-Filtering-Correlation-Id: 99d87672-5d99-4af8-4d50-08dc5fc96073
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	xwZjvE6w5MxwQY7/Y86GqJL8e9NDLACEjJ8bR1hAXR4GJmSZncelVh3RfS/RRnmrPNpxDrTwtICT/LQ0MpbLb94RfRp4+Y4Zai9ttHnDudfnmCNSIB524QGIC/zYI9EPibEDleF3NTTaKuyYtTy9+0BJArGn1J2Eq+IYK9+U87p6mC7endrqDUC1FqzOy1lWBKyGcBwE1ReFv6c6blzAel8h185SBaXGQhEhBrA1bSh3sZZEr+Xdg8cd3Qtn5w8XrU5p/DUPYqGR4dwb0DKLkTf6n1OB2l87x6THG2u3eVOTN3HCO0YLKlgpXlAMIWWW8MdHzFS7N3mdHg8npftYpQ1svHz7dqokCG7e9V3fYmkhqgb46GmI97jQhJ3uWLLp8kmsVg8MV5uZPAvdE+mECOwLKyjNgkC3PLUStv4/FiZlTCuvkY1dEqkgc8UoYeF2enN5wSvFK76E/LrnjAVsETzPKY/Y2wjLQIEMFSy4amKMyKW/6YbJ6ZXlq4RdsPzmc3YyE9PMUxoPLTdAQcGkeTbInUa0DuC09wqmIsBCeAp9MefiVYawcp39Ha7Ss6Wy3QHDk7+EEmJZLrJZeZ4Nk/BOatodpSM9YFMShKC0k+BIh6DBUdhJ4Q/i+MOzjY9/bMiBs8N0t/jozSrKgu+f0TX6TLCSBVCi7ZPXdUE9H0mMSkUWsQuKh5mTbFMKwO1AUO0hHYjTkGBA0LOksAZcB4rRkCROOiWOhPZht1g8/d7BML1mZ+087j80JqX7zhYj
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(7416005)(36860700004)(376005)(82310400014)(1800799015);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2024 17:02:48.8970
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99d87672-5d99-4af8-4d50-08dc5fc96073
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0001A102.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9182
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D045UWC001.ant.amazon.com (10.13.139.223) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
+From: Paolo Abeni <pabeni@redhat.com>
+> On Thu, 2024-04-18 at 09:00 +0200, Eric Dumazet wrote:
+> > On Thu, Apr 18, 2024 at 8:56 AM Eric Dumazet <edumazet@google.com> wrote:
+> > > 
+> > > On Thu, Apr 18, 2024 at 5:32 AM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> > > > 
+> > > > From: Jakub Kicinski <kuba@kernel.org>
+> > > > Date: Wed, 17 Apr 2024 19:04:32 -0700
+> > > > > On Mon, 15 Apr 2024 15:20:37 -0700 Kuniyuki Iwashima wrote:
+> > > > > > syzkaller crafted a GSO packet of ETH_P_8021AD + ETH_P_NSH and sent it
+> > > > > > over sit0.
+> > > > > > 
+> > > > > > After nsh_gso_segment(), skb->data - skb->head was 138, on the other
+> > > > > > hand, skb->network_header was 128.
+> > > > > 
+> > > > > is data offset > skb->network_header valid at this stage?
+> > > > > Can't we drop these packets instead?
+> > > > 
+> > > > I think that needs another fix on the NSH side.
+> > > > 
+> > > > But even with that, we can still pass valid L2 skb to sit_tunnel_xmit()
+> > > > and friends, and then we should just drop it there without calling
+> > > > pskb_inet_may_pull() that should not be called for non-IP skb.
+> > > 
+> > > I dislike this patch series. I had this NSH bug for a while in my
+> > > queue, the bug is in NSH.
+> > > 
+> > > Also I added skb_vlan_inet_prepare() recently for a similar issue.
+> > 
+> > Kuniyuki I am releasing the syzbot bug with a repro, if you have time to fix NSH
+> > all your patches can go away I think.
 
-Jiri Pirko <jiri@resnulli.us> writes:
+Thanks for sharing the repro, Eric!
 
-> From: Jiri Pirko <jiri@nvidia.com>
->
-> Introduce initial tests for virtio_net driver. Focus on feature testing
-> leveraging previously introduced debugfs feature filtering
-> infrastructure. Add very basic ping and F_MAC feature tests.
->
-> To run this, do:
-> $ make -C tools/testing/selftests/ TARGETS=drivers/net/virtio_net/ run_tests
->
-> Run it on a system with 2 virtio_net devices connected back-to-back
-> on the hypervisor.
->
-> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+> 
+> I agree a specific/smaller scope fix on in nsh should be preferred
 
-Reviewed-by: Petr Machata <petrm@nvidia.com>
+Hmm.. I think the bug is both in NSH and the tunnel xmit
+functions in this series.
+
+geneve is in a bit differnt position because L2 skb is sane
+for geneve, and it needs to inspect vlan and the upper layer.
+
+However, L3 tunnels should validate skb->protocol first before
+accessing skb->network_header, otherwise that could trigger KMSAN.
 
