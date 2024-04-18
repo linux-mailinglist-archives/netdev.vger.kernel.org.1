@@ -1,117 +1,78 @@
-Return-Path: <netdev+bounces-89231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AC838A9BA9
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 15:52:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01F128A9BC5
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 15:56:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AA52AB21E55
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:52:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B264C2863D0
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50E96163A80;
-	Thu, 18 Apr 2024 13:52:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99EAF1607B2;
+	Thu, 18 Apr 2024 13:55:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="RmxsbDgx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HD0jWwsr"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652C26A8CA;
-	Thu, 18 Apr 2024 13:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7621A165FAC
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 13:55:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713448356; cv=none; b=ZKjOrqTuJE/EF5vU2s7jauO22adZTTuNkzOviX7mgjlL7eXpUSWhAmth2wdN77XYEhWcOr+rBJr8j6Pckr0lc/qaqWrkxxW+mhTFeyCc1pIambwZoWf+U4jdIfDwHirru5c5D+gaTsQl0QIJ7xXHBqLIkwFdlGaz3zma6i0ST/U=
+	t=1713448521; cv=none; b=i0d+wbXFO7KHnlefOW9sH26CYBKkCW0ZsFMncCgs5hM0CFFYYSsxU1boAJI9LiNJQBOPc6BLvAaT5gpNeipoHUibM2Ud0oyJGja/AAgOnCGqUoXM1RkvYALA8ttH3qcnlbRoN31WeyZqZ9Vq6bxuy6Kn4T+e8PQU5z0kOgjpVfA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713448356; c=relaxed/simple;
-	bh=DFMBpvLg9bEM08JQ9ob6upTO1i+WiZqw2n6cDonSo4w=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=hkLPK5vSU7Qq1oCMXrswgANtXkRoEOkivWE8HPXRsi8HmUIENYbZi/bAkLl+XpSaD9NKBGffq3D9MXtSnB707scAflPYNu8JMHnNsAncAttM2XpQ5VrCdaN97XoLuq2DqfnQihtwFjdVbGTR+Yqit+dLkiTuxM8LXs7nX/l8D+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=RmxsbDgx; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id C2C281BF209;
-	Thu, 18 Apr 2024 13:52:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1713448351;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8wUOi164P3lAmjE1ClSdezuP19LGck9A7BJ4c8R2rWo=;
-	b=RmxsbDgxhNpNQOPoFlayXDpwdP+tytqkGF2OJI6z52D3jvdH0BINaMaSOJABYa6/o6WxeC
-	ghog+bvm/6xdvqTf7B+xQM1u8PJB3QGicA2yN5ueeF17yS8iO+LMOt3yX/95A/69vx0wFU
-	cWHL5OJ6Vcw7APt18HuFE96l5gziHKoup8zj+aF3KookZJxRSzPjCOjoJAU1e0WxFzVysT
-	v/WQR3MUr8UJwvigXjjQu2WXU9bhHEg4YS9NtOcNTo94oqfGuwGimoaaP5yb6TJK1bx/Ff
-	aiZo6SsBfRs+qKWkz/kuZH1VCi7XUvW5NuGt7bGVzPZKfEQBmV9RD8UVbJaq/w==
-Date: Thu, 18 Apr 2024 15:53:07 +0200 (CEST)
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: Serge Semin <fancer.lancer@gmail.com>
-cc: Romain Gantois <romain.gantois@bootlin.com>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-    Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-    Conor Dooley <conor+dt@kernel.org>, 
-    Geert Uytterhoeven <geert+renesas@glider.be>, 
-    Magnus Damm <magnus.damm@gmail.com>, 
-    Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-    Jose Abreu <joabreu@synopsys.com>, 
-    Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-    Russell King <linux@armlinux.org.uk>, 
-    =?ISO-8859-15?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>, 
-    Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
-    devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-    linux-renesas-soc@vger.kernel.org, 
-    linux-stm32@st-md-mailman.stormreply.com, 
-    linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next v3 4/5] net: stmmac: add support for RZ/N1
- GMAC
-In-Reply-To: <eqfta73ost45nbzz3aoa2tw5tasg3geehf4fgphu4teq5yfvar@ngif2e6j5j2k>
-Message-ID: <c99b452b-be35-3a67-1c87-042dbc5fce49@bootlin.com>
-References: <20240415-rzn1-gmac1-v3-0-ab12f2c4401d@bootlin.com> <20240415-rzn1-gmac1-v3-4-ab12f2c4401d@bootlin.com> <xp34tp5cjmdshefxjczltz2prqtiikagfspf4lobznzypvsyah@ihpmwfynwzhh> <232e3b0c-ca55-2da0-1c9f-47520a1bcfbd@bootlin.com>
- <eqfta73ost45nbzz3aoa2tw5tasg3geehf4fgphu4teq5yfvar@ngif2e6j5j2k>
+	s=arc-20240116; t=1713448521; c=relaxed/simple;
+	bh=sED8Ptg5Tck54RTvcjpDRih5soBhsX/1jdVbhF+bl6Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o485T8a+3U2kPhDKsSkxjMTiRlFvtwv42GxQNMH8goro3+qXY4nyPwedjKyc1AQxTxs/UXr2a//fFAMonyweo5F29aBJdhabcOKe4hAtEm6o6YrIM3i3ygiR+lwPlH5nhFBVLLEXzRCeh3/Bzhlhfg44n99hgk16XCR18fJG4KQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HD0jWwsr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA7F5C4AF09;
+	Thu, 18 Apr 2024 13:55:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713448520;
+	bh=sED8Ptg5Tck54RTvcjpDRih5soBhsX/1jdVbhF+bl6Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HD0jWwsrdYmylc0YqhP+1aDELL4h2SqKKkYzuAoVGj4yPgqstvxxAYqZJfl7gbZMx
+	 EHiDj8v9magws4dhCuHDqhNWlA9EW1Xe3FSBN5veVFXg51zMm6HCx7GdhaDXfy5Kux
+	 zwFS8nLm35Z1eEkdmP/9DPjGvX+HUmb/e2BjxOLcab+uowGfAlY89PmEqyQmLpYzhI
+	 NPkNdrdXJMyyvJ+WfcdjiExO2PWUNPhsFVEYhgPc3artCfKrgAeEJrchTRWfTlxtnI
+	 byaygW3JjAALbLsX8W2e1xLrwKH58aZm9q+GKtJDgN9+zTnOB2dVVae1V+L5CKS+9v
+	 9XgOBZOmMRjXg==
+Date: Thu, 18 Apr 2024 14:55:15 +0100
+From: Simon Horman <horms@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH v2 net-next 01/14] net_sched: sch_fq: implement lockless
+ fq_dump()
+Message-ID: <20240418135515.GA3975545@kernel.org>
+References: <20240418073248.2952954-1-edumazet@google.com>
+ <20240418073248.2952954-2-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-GND-Sasl: romain.gantois@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240418073248.2952954-2-edumazet@google.com>
 
-On Thu, 18 Apr 2024, Serge Semin wrote:
-
-> On Thu, Apr 18, 2024 at 01:57:47PM +0200, Romain Gantois wrote:
-> > Hi Serge,
-> > 
-> > On Tue, 16 Apr 2024, Serge Semin wrote:
-> > 
-> > > > +static int rzn1_dwmac_pcs_init(struct stmmac_priv *priv,
-> > > 
-> > > > +			       struct mac_device_info *hw)
-> > > 
-> > > AFAICS hw is unused, and the mac_device_info instance is reached via
-> > > the priv pointer. What about dropping the unused argument then?
-> > 
+On Thu, Apr 18, 2024 at 07:32:35AM +0000, Eric Dumazet wrote:
+> Instead of relying on RTNL, fq_dump() can use READ_ONCE()
+> annotations, paired with WRITE_ONCE() in fq_change()
 > 
-> > Unfortunately, this is an implementation of the pcs_init() callback, which is 
-> > also used by socfpga (see patch 4/6 in this series). The socfpga implementations 
-> > use the hw parameter for both pcs_init() and pcs_exit() so I can't remove it.
+> v2: Addressed Simon feedback in V1: https://lore.kernel.org/netdev/20240416181915.GT2320920@kernel.org/
 > 
-> I had that patch content in mind when was writing my comment. There is
-> no point in passing the hw-pointer there either because you already
-> have the stmmac_priv pointer. There is stmmac_priv::hw field which you
-> can use instead in the same way as you do in this patch. Here is the
-> respective change for your SoCFPGA patch:
-> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-You're right, I'll remove the parameter.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Thanks,
-
--- 
-Romain Gantois, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
 
