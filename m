@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-89402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C8888AA39C
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:01:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0638D8AA389
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 21:58:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9028B29E19
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:57:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 879201F245A3
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D87801A0AF9;
-	Thu, 18 Apr 2024 19:52:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D0121BED96;
+	Thu, 18 Apr 2024 19:52:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FTbPYVUp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AkoWGY1n"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C3A01A0AEB
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 19:52:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEAF91A0AFA
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 19:52:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713469947; cv=none; b=Hf3IBOPk7ujlX9T+x9dwnH+X9yPZfYzkewDz2wkAspIq1S5mRCDSQN2HWWRenyA3lOWM5pQHyCrOXVgZHF9mqFbJmETeF+254HCsIZ1hPYwRxsi9nj+ZmJWLWk0dHNyyoDJnRt7IMWfLvwD3pnFKPW1VEGmWYZAPi+BsAxm4SG4=
+	t=1713469949; cv=none; b=TCV2GM7FqmV0rl/KyIJ+/8llUnRSawjajUnoZ5Mie9Z1nGfcms4aTYWJK/usmTVbbUDs2uDrMZFEIr678cQh/ywOlQpekA5BW1mPOhfESpKiTemIhA4cuVmXpipVPCtTqzeeHtRxbjAxbpc1tCrBbUVvxWZFQvxuD1n3Y+W9gjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713469947; c=relaxed/simple;
-	bh=vcdxpDcy+rA+HdslsUiAM9FmYkLK/OW1ILVoyBWrIqs=;
+	s=arc-20240116; t=1713469949; c=relaxed/simple;
+	bh=9VNZiN/LhNydhx1ESFWqspNdurMS5WG84UMK12gTx1Y=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dpEWdHSOvX8jbC5LZnfp0I89iisdURdozCYGyg2trcuTCWx878pqCgHIAOOPAndmT6Lb0mTrE/oTnvigEBBvM/wv/w+iOlxNj2kc8ObisrrarOjBkEHROYtN6lhirydUmNg0PBv3I/U3CwFQbamWGf9jTx46AOOPHH3/c/z8uCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FTbPYVUp; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=UM6k6Kg3JL7G0vjTRC/BmwdiaspxPC8MA7WI6ufYMqdd8pIlMWi89zly70yfgPuxrqwBjj0Gt6GwIQqR6U05sv/0/7QoSW3ayFCWxhUF0uXLhfC3UZzN9Pr0c98bjv+M2AV2UG6AxFmi+GnsjVdKklIVuPiVynVLcGM9PrwlPrI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AkoWGY1n; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61b2abd30fdso13233457b3.2
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 12:52:26 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-610b96c8ca2so22379667b3.2
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 12:52:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713469945; x=1714074745; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1713469947; x=1714074747; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EqPXJb1E2MyKZ2ZcTaUJUh/zFV0A+KSo3FwUOlz8CyU=;
-        b=FTbPYVUpGGVExJlarbEu+ZY1kiFgizzkJF95X+pLY6V3f/2QmbD0MrRS50Ti+x+flt
-         ICQKKUQuS79sLXmX/VzM8PHpk3+ZDLb/yHE6RvnHZMoYItGsHvqffwe4NEBnzAM4GEeK
-         hu2QdVPH9VoWrWTnEKQG+bMQJf//DwEbusb5dFQuDcr0hO49lYWkt1V0oPWKtdrGxOPZ
-         sLjwdqx2+eOaGIU1xhhlD24CYaQFVMFiEJlsdC/Ty+8z1HxmmyVuhuH2th9TZoMkP6cu
-         NogeiIr38do1LSehCQRqz1544+Hzwx48ZfYnccvRBY8fAnMcO2woErAZ5Gxu/TSTssy0
-         Czhw==
+        bh=bwUTYaz8zxeLWvGDnxMv0voRtmZ/Nn0Ru5SD7WhY/cY=;
+        b=AkoWGY1nxWzLbyQ4z6/F/nTvQhWwNUqW9h51DhVv6gcMPMt0K0IJJ+ca3cEn26Pro/
+         Dc2folbR1u91Gn3C9gSezm8PO3A5YzR/ErQT04c6k/DESwnOOub/FJMxcDYvK6zyRNWj
+         swTHaeOe2g8Tg0oGZGN8NFXaK9rescNEz094NMFqohG1rbtqLmVIJ+C622U8BnI2mfly
+         3wX8KH9jM1bZMDNtPxaxsaQobVWPN56FoEhoBm7oAQmyF+VdpuiesFUeyJHHYbs+tSW4
+         6gumrbQ6ilUhK64sfirnE4Zqui/de/uTiRMD/QShkxwoIsg1iSCjx8IsT4b3i/rClVlT
+         EMsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713469945; x=1714074745;
+        d=1e100.net; s=20230601; t=1713469947; x=1714074747;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EqPXJb1E2MyKZ2ZcTaUJUh/zFV0A+KSo3FwUOlz8CyU=;
-        b=ah4H+0uunlihZe1hGALt39w17DKa7UvRtbvFBazkiExsi1AM4wqexhBP+oXhrN+YsC
-         +kWrsfDR8kwT6QzVaHKnxkXdfJKscDmuDz/rauv07jr3yThgY+xD0nEMjgY3GIDkJo2X
-         1ifno36VKk/oAlN30/GwdskEthRgMGOXPEKDR6Xh4BLkgEv/Vh65Ufri9KyBUlRJUD76
-         4fZkfAvNCVhvQ7KfOmesiqU00BAJE+e1sXvLTQkhmbYWOkWUWqwAmeKY8yRsRB6xHsB7
-         r7qFlFNQKDLVsa48t3AJ9dcA4oRFLKKuhiHGiOx9J2TM0NPqNSRzDxggwj8Ss8dXMqU+
-         LC6g==
-X-Gm-Message-State: AOJu0Yy2Gj9fu+4ZC3pNpzD2v/nC82kdgwK2lByfjG35u1CqY0hsX/Ig
-	B3Cw0Z1TQI61FUbY3CmId/M4/prvcbhJK+3P7KtXKkdk7L3ZIwqDmJUqC2FyrrDtE01riNCgMet
-	258E1mUc32ZpfGtF1SRlfTBPK/jZNgUZqlITedWECum0ETn7oS3U6jGQH8KFKdZC5gG4YUzMQQ3
-	2iC+WbydLvINzw2qfOGxgrae9Oojjqc/K1f5OduC6799Q=
-X-Google-Smtp-Source: AGHT+IH5j/9OaG5VzuQyc9exHCE1jkz3GpN7vC2u70iQk6yEeLumEvr106Yj9rP2DUPk3Z7fRw1tsZMxb4jJKg==
+        bh=bwUTYaz8zxeLWvGDnxMv0voRtmZ/Nn0Ru5SD7WhY/cY=;
+        b=eQFGpxNN29fkRqgqLsSH6Uk76c4Tk/BcaPLXGrx3XJsogJAfN80SS3Sj5uOb/QQj7U
+         I0PX1NevsTqWS8Tq5A+Hrw1FhqqpxrZ8HLi5YJldP04hmrc5teID8LHrqQjMd0/8vb1Q
+         LUjzL1ojCiMObltxGQV+8FSwfyNTkJghbMCL77oahZq4AUxN7tb5puWYDo2FCrUBEk4G
+         Safnb0ZmVOYMTSen3CqguS242KQDTYo3MMxu+Lq84WSiqVYCJomoVNYufZa02Cj6j23p
+         T0YYu3OdBd93+IxDGyRRAlhM+8/AR1iofBKCyv7FVKKwjZQcUo1M9Qy6dpgF45p8zPX4
+         gA8g==
+X-Gm-Message-State: AOJu0YykztbhjyNHJhzh4IljN4QJLNGiGsbsGAtz1LGMFjnv4rb/lGbb
+	pn1HSo9Q7gAq+ahiQ+C24sY6RrOKbFlroGPQwqIIG5YKaSRSmA3J+Bnp0Yq9X597/8eAhJ+b6OJ
+	7ZRUbR8XrvID9s9YDetOO5o9gbMq6guSCCiAcYVSEqFhZA7igVO1w8W18KursHs+UjW++5CXnJu
+	3dpF1/hvRc3J901TuwvBy6X+mb4UsNo4s8JpPYhbv5m4g=
+X-Google-Smtp-Source: AGHT+IEzfufoFaqPXDZd5vA/PywOHq/fR5Z+QoGuLF1IMlWloWx/99a4euqM29iGKVszVtqcmFLy+Pd7/i5enQ==
 X-Received: from shailendkvm.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2648])
- (user=shailend job=sendgmr) by 2002:a81:848e:0:b0:61b:982:4da0 with SMTP id
- u136-20020a81848e000000b0061b09824da0mr2609ywf.0.1713469945272; Thu, 18 Apr
- 2024 12:52:25 -0700 (PDT)
-Date: Thu, 18 Apr 2024 19:51:55 +0000
+ (user=shailend job=sendgmr) by 2002:a0d:d982:0:b0:61b:2210:4f43 with SMTP id
+ b124-20020a0dd982000000b0061b22104f43mr591593ywe.6.1713469946859; Thu, 18 Apr
+ 2024 12:52:26 -0700 (PDT)
+Date: Thu, 18 Apr 2024 19:51:56 +0000
 In-Reply-To: <20240418195159.3461151-1-shailend@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240418195159.3461151-1-shailend@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240418195159.3461151-6-shailend@google.com>
-Subject: [RFC PATCH net-next 5/9] gve: Make gve_turnup work for nonempty queues
+Message-ID: <20240418195159.3461151-7-shailend@google.com>
+Subject: [RFC PATCH net-next 6/9] gve: Avoid rescheduling napi if on wrong cpu
 From: Shailend Chand <shailend@google.com>
 To: netdev@vger.kernel.org
 Cc: almasrymina@google.com, davem@davemloft.net, edumazet@google.com, 
@@ -83,55 +83,118 @@ Cc: almasrymina@google.com, davem@davemloft.net, edumazet@google.com,
 	Shailend Chand <shailend@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-gVNIC has a requirement that all queues have to be quiesced before any
-queue is operated on (created or destroyed). To enable the
-implementation of future ndo hooks that work on a single queue, we need
-to evolve gve_turnup to account for queues already having some
-unprocessed descriptors in the ring.
+In order to make possible the implementation of per-queue ndo hooks,
+gve_turnup was changed in a previous patch to account for queues already
+having some unprocessed descriptors: it does a one-off napi_schdule to
+handle them. If conditions of consistent high traffic persist in the
+immediate aftermath of this, the poll routine for a queue can be "stuck"
+on the cpu on which the ndo hooks ran, instead of the cpu its irq has
+affinity with.
 
-Say rxq 4 is being stopped and started via the queue api. Due to gve's
-requirement of quiescence, queues 0 through 3 are not processing their
-rings while queue 4 is being toggled. Once they are made live, these
-queues need to be poked to cause them to check their rings for
-descriptors that were written during their brief period of quiescence.
+This situation is exacerbated by the fact that the ndo hooks for all the
+queues are invoked on the same cpu, potentially causing all the napi
+poll routines to be residing on the same cpu.
+
+A self correcting mechanism in the poll method itself solves this
+problem.
 
 Signed-off-by: Shailend Chand <shailend@google.com>
 ---
- drivers/net/ethernet/google/gve/gve_main.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+ drivers/net/ethernet/google/gve/gve.h      |  1 +
+ drivers/net/ethernet/google/gve/gve_main.c | 33 ++++++++++++++++++++--
+ 2 files changed, 32 insertions(+), 2 deletions(-)
 
+diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
+index e97633b68e25..9f6a897c87cb 100644
+--- a/drivers/net/ethernet/google/gve/gve.h
++++ b/drivers/net/ethernet/google/gve/gve.h
+@@ -610,6 +610,7 @@ struct gve_notify_block {
+ 	struct gve_priv *priv;
+ 	struct gve_tx_ring *tx; /* tx rings on this block */
+ 	struct gve_rx_ring *rx; /* rx rings on this block */
++	u32 irq;
+ };
+ 
+ /* Tracks allowed and current queue settings */
 diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 8e875b598e78..4ab90d3eb1cb 100644
+index 4ab90d3eb1cb..c348dff7cca6 100644
 --- a/drivers/net/ethernet/google/gve/gve_main.c
 +++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -2007,6 +2007,13 @@ static void gve_turnup(struct gve_priv *priv)
- 			gve_set_itr_coalesce_usecs_dqo(priv, block,
- 						       priv->tx_coalesce_usecs);
- 		}
+@@ -9,6 +9,7 @@
+ #include <linux/etherdevice.h>
+ #include <linux/filter.h>
+ #include <linux/interrupt.h>
++#include <linux/irq.h>
+ #include <linux/module.h>
+ #include <linux/pci.h>
+ #include <linux/sched.h>
+@@ -253,6 +254,18 @@ static irqreturn_t gve_intr_dqo(int irq, void *arg)
+ 	return IRQ_HANDLED;
+ }
+ 
++static int gve_is_napi_on_home_cpu(struct gve_priv *priv, u32 irq)
++{
++	int cpu_curr = smp_processor_id();
++	const struct cpumask *aff_mask;
 +
-+		/* Any descs written by the NIC before this barrier will be
-+		 * handled by the one-off napi schedule below. Whereas any
-+		 * descs after the barrier will generate interrupts.
-+		 */
-+		mb();
-+		napi_schedule(&block->napi);
- 	}
- 	for (idx = 0; idx < priv->rx_cfg.num_queues; idx++) {
- 		int ntfy_idx = gve_rx_idx_to_ntfy(priv, idx);
-@@ -2022,6 +2029,13 @@ static void gve_turnup(struct gve_priv *priv)
- 			gve_set_itr_coalesce_usecs_dqo(priv, block,
- 						       priv->rx_coalesce_usecs);
- 		}
++	aff_mask = irq_get_effective_affinity_mask(irq);
++	if (unlikely(!aff_mask))
++		return 1;
 +
-+		/* Any descs written by the NIC before this barrier will be
-+		 * handled by the one-off napi schedule below. Whereas any
-+		 * descs after the barrier will generate interrupts.
-+		 */
-+		mb();
-+		napi_schedule(&block->napi);
++	return cpumask_test_cpu(cpu_curr, aff_mask);
++}
++
+ int gve_napi_poll(struct napi_struct *napi, int budget)
+ {
+ 	struct gve_notify_block *block;
+@@ -322,8 +335,21 @@ int gve_napi_poll_dqo(struct napi_struct *napi, int budget)
+ 		reschedule |= work_done == budget;
  	}
  
- 	gve_set_napi_enabled(priv);
+-	if (reschedule)
+-		return budget;
++	if (reschedule) {
++		/* Reschedule by returning budget only if already on the correct
++		 * cpu.
++		 */
++		if (likely(gve_is_napi_on_home_cpu(priv, block->irq)))
++			return budget;
++
++		/* If not on the cpu with which this queue's irq has affinity
++		 * with, we avoid rescheduling napi and arm the irq instead so
++		 * that napi gets rescheduled back eventually onto the right
++		 * cpu.
++		 */
++		if (work_done == budget)
++			work_done--;
++	}
+ 
+ 	if (likely(napi_complete_done(napi, work_done))) {
+ 		/* Enable interrupts again.
+@@ -428,6 +454,7 @@ static int gve_alloc_notify_blocks(struct gve_priv *priv)
+ 				"Failed to receive msix vector %d\n", i);
+ 			goto abort_with_some_ntfy_blocks;
+ 		}
++		block->irq = priv->msix_vectors[msix_idx].vector;
+ 		irq_set_affinity_hint(priv->msix_vectors[msix_idx].vector,
+ 				      get_cpu_mask(i % active_cpus));
+ 		block->irq_db_index = &priv->irq_db_indices[i].index;
+@@ -441,6 +468,7 @@ static int gve_alloc_notify_blocks(struct gve_priv *priv)
+ 		irq_set_affinity_hint(priv->msix_vectors[msix_idx].vector,
+ 				      NULL);
+ 		free_irq(priv->msix_vectors[msix_idx].vector, block);
++		block->irq = 0;
+ 	}
+ 	kvfree(priv->ntfy_blocks);
+ 	priv->ntfy_blocks = NULL;
+@@ -474,6 +502,7 @@ static void gve_free_notify_blocks(struct gve_priv *priv)
+ 		irq_set_affinity_hint(priv->msix_vectors[msix_idx].vector,
+ 				      NULL);
+ 		free_irq(priv->msix_vectors[msix_idx].vector, block);
++		block->irq = 0;
+ 	}
+ 	free_irq(priv->msix_vectors[priv->mgmt_msix_idx].vector, priv);
+ 	kvfree(priv->ntfy_blocks);
 -- 
 2.44.0.769.g3c40516874-goog
 
