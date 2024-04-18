@@ -1,109 +1,105 @@
-Return-Path: <netdev+bounces-89424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0160B8AA3F9
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:20:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFA318AA402
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:27:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC94C1F2282C
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:20:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DF561C20C06
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:27:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92695180A8D;
-	Thu, 18 Apr 2024 20:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B7616D314;
+	Thu, 18 Apr 2024 20:27:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S+gMIrZ5"
+	dkim=pass (2048-bit key) header.d=a16n.net header.i=@a16n.net header.b="e2RHoD3G"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D5C717335B
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 20:20:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from smtp-out.a16n.net (smtp-out.a16n.net [87.98.181.171])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9C2A4503A
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 20:26:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=87.98.181.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713471639; cv=none; b=efvj3n29Bn5Pc0ra7S8xjI0ACEuTuD82LWsFQeA5+vLFTP6TU9O4+lilxQpnVYo+FQclU2Ef+cHFzz5etY+5LhE0P2SZQE7L5e531ax+TtC7IiEI+IZ9JOMf0mlyyDW+/WsBZbzrwNXl0TmgxaeWyNpZq1T/ubpXIU4nENMMAEU=
+	t=1713472021; cv=none; b=LgQW8h0AxXMOnNQlTD2ovuQIqw+wsUm3x+6xgXUjpSw/WEeRW5Lw8m6haUSwIuM2x2Y/TWpMPwfChM/6XftX42Fxea2cD17lfSi66bIg8AOsG87vvMY/FbxhBBCiBAozrDjrWImclAq1R03QLAqQb1qDRPPp5mMt1/MzTdbARBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713471639; c=relaxed/simple;
-	bh=1QbGatMHVWUgzHqicfmSCgb3DA46haEIhxlTc9G6cnw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L2WpdDldF40oi2YvuS449BVhi4ssvMAlQOXEM4qNVAHZWZZSyQchLf/0+zZ+2TenORtVdgo09gSxfUcPHQWr/FAesTaGHp4H88vKjn63c9cr3KQu5d9zC4Y2EiX0u2uFvw55c2ePIC8/QmdNtYNDWG7mw+U6hjEFs6Xe7r6IFzk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S+gMIrZ5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1E91C113CC;
-	Thu, 18 Apr 2024 20:20:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713471639;
-	bh=1QbGatMHVWUgzHqicfmSCgb3DA46haEIhxlTc9G6cnw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=S+gMIrZ5nyM7sOzL3U6ja6HT7ugU3Tt25JLLPOt5dgSlH2aZS8xknHTSq7DrFJtds
-	 nuz/6Hk2yB7UJshor6lt1OKu/LPfMlOJf/CtR/1n3a+2sEbj6wBINM1WoVHv/p7o0C
-	 tlj7qdh/kFaD7kprSL1QudG7qmEc9dr6XEeApFnqbwaU80kFcO4cKajjTN+SIK/RM3
-	 rJEMmxWwQ+gYSG+X+RAq1w6KRvx1lvn9+N8zA+no5Lug8EU1G81wmBiZv+Wwwzj6fn
-	 BlW6DVBgUMfcFtcw1VqcYxM808nyP52m292SRsXzM3FAriYrvjfeIzYsZAmh6yoAV9
-	 XqYekm7jNZz6g==
-Message-ID: <ada9d2bb-d179-4cda-8c5c-bc7a39473e05@kernel.org>
-Date: Thu, 18 Apr 2024 13:20:37 -0700
+	s=arc-20240116; t=1713472021; c=relaxed/simple;
+	bh=zSQOTJ8tz/NF4BDPwrs6odb9Gsa9y+UoyTAI4gqbQeQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Bf7WH1eLeF1240ryevKkKUOQfIkOJFOorrTooaufqpLjPQ/+Z/et/nM+XAV4w6MqRR2iI+dMlqXB7/XuIpLlDE+przStmIU4lpeGCQZwT2pLlYXVRFGl2lAak5du2IY2O+TebcdrlS+CxSySWBwx2HA4HQ5LB56hQG0GiecJqo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=a16n.net; spf=pass smtp.mailfrom=a16n.net; dkim=pass (2048-bit key) header.d=a16n.net header.i=@a16n.net header.b=e2RHoD3G; arc=none smtp.client-ip=87.98.181.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=a16n.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=a16n.net
+Received: from server.a16n.net (server.a16n.net [82.65.98.121])
+	by smtp-out.a16n.net (Postfix) with ESMTP id 9F98646049A;
+	Thu, 18 Apr 2024 22:26:53 +0200 (CEST)
+Received: from ws.localdomain (unknown [192.168.13.254])
+	by server.a16n.net (Postfix) with ESMTPSA id B23D280105E;
+	Thu, 18 Apr 2024 22:26:53 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=a16n.net; s=a16n;
+	t=1713472013; bh=LfZWQsrQtgzKC/YWLBnJHi5tFb7Y5iiPMA7i9wXMaiU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date;
+	b=e2RHoD3GGDPOe7Evv3KkYLx2cPge58C5aZOGcb1s3QcorZJEG2NbzYZm9EpNlgxdg
+	 Fn08WKoqnrepW7WAyh8MIKTS14ZH3M1Mecw5Bx63pMVXB1ppkRimh9lCTtGak2dnXv
+	 fJTaXXVNZ1O+GQ3JuieXhFCD0BvfkCgY45MYlr4wdcqEJI5HAiK1raLTtQ3yKoApSp
+	 oQFhRmYu+DlrHSRh8VAbpiZFXAJNrgjDePCH4nCZ3Iutv8HdSiydKPFGyHgJUm1jsv
+	 Bjqqf2UmFzs/Z3gGkDpP8ggOLlpUvK2VFObSaVUKIR2vNmVv+7iKZDzA3V2WlimkV+
+	 31SiRXqEH8dlg==
+Received: by ws.localdomain (Postfix, from userid 1000)
+	id 832E220708; Thu, 18 Apr 2024 22:26:53 +0200 (CEST)
+From: =?utf-8?Q?Peter_M=C3=BCnster?= <pm@a16n.net>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org,  Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH net] net: b44: set pause params only when interface is up
+In-Reply-To: <e5d3c578-6142-4a30-9dd8-d5fca49566e0@lunn.ch> (Andrew Lunn's
+	message of "Thu, 18 Apr 2024 20:55:57 +0200")
+References: <871q72ahf1.fsf@a16n.net>
+	<e5d3c578-6142-4a30-9dd8-d5fca49566e0@lunn.ch>
+Date: Thu, 18 Apr 2024 22:26:53 +0200
+Message-ID: <87wmou5sdu.fsf@a16n.net>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] tcp: conditionally call ip_icmp_error() from
- tcp_v4_err()
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, "David S . Miller"
- <davem@davemloft.net>, netdev@vger.kernel.org,
- Neal Cardwell <ncardwell@google.com>, Dragos Tatulea <dtatulea@nvidia.com>,
- eric.dumazet@gmail.com, =?UTF-8?Q?Maciej_=C5=BBenczykowski?=
- <maze@google.com>, Willem de Bruijn <willemb@google.com>,
- Shachar Kagan <skagan@nvidia.com>
-References: <20240417165756.2531620-1-edumazet@google.com>
- <20240417165756.2531620-2-edumazet@google.com>
- <e332d0b8fa7b116003dfd8b47f021901e66b36b9.camel@redhat.com>
- <CANn89i+-cjHze1yiFZKr-cCGG7Fh4gb9NZnS1u4u_77bG2Mf6Q@mail.gmail.com>
- <CANn89iLSZFOYfZUSK57LLe8yw4wNt8vHt=aD79a1MbZBhfeRbw@mail.gmail.com>
- <7d1aa7d5a134ad4f4bca215ec6a075190cea03f2.camel@redhat.com>
- <CANn89iJg7AcxMLbvwnghN85L6ASuoKsSSSHdgaQzBU48G1TRiw@mail.gmail.com>
- <274d458e-36c8-4742-9923-6944d3ef44b5@kernel.org>
- <CANn89iJOLPH72pkqLWm-E4dPKL4yWxTfyJhord0r_cPcRm9WiQ@mail.gmail.com>
- <20240418110909.091b0550@kernel.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240418110909.091b0550@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha1; protocol="application/pgp-signature"
 
-On 4/18/24 12:09 PM, Jakub Kicinski wrote:
-> On Thu, 18 Apr 2024 19:47:51 +0200 Eric Dumazet wrote:
->>> You have a kernel patch that makes a test fail, and your solution is
->>> changing userspace? The tests are examples of userspace applications and
->>> how they can use APIs, so if the patch breaks a test it is by definition
->>> breaking userspace which is not allowed.  
-> 
-> Tests are often overly sensitive to kernel behavior, while this is
+--=-=-=
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-That test script is a fairly comprehensive sweep of uAPIs and kernel
-behavior. Its sole job is to detect user visible changes and breakage
-from patches. It has done its job here. Do not shoot or criticize the
-messenger because you do not like the message.
+On Thu, Apr 18 2024, Andrew Lunn wrote:
 
+> Please include a Fixed: tag indicating when the problem was added.
 
-> obviously a red flag it's not an automatic nack. The more tests we
-> have the more often we'll catch tiny changes. A lot of tests started
-> flaking with 6.9 because of the optimizations in the timer subsystem.
-> You know where I'm going with this..
-> 
->> I think the userspace program relied on a bug added in linux in 2020
->>
->> Jakub, I will stop trying to push the patches, this is a lost battle.
-> 
-> If you have the patches ready - please post them.
-> I'm happy to take the blame if they actually regress something in 
-> the wild :(
+Hi Andrew,
 
-And because of this test suite you are making a conscious decision to
-merge a patch that is making a user visible change. That is part of the
-tough decisions a maintainer has to make; I have no problem with that.
+I=E2=80=99m sorry, I don=E2=80=99t know, when the problem was added. I only=
+ know, that
+there was no problem with OpenWrt < 23.X. But I don=E2=80=99t know why. Per=
+haps
+the behaviour of netifd has changed from 22.X to 23.X.
+
+So I guess, that the problem is there since the creation of
+b44_set_pauseparam(), but it has never been triggered before.
+
+So what should I do please with the Fixed: tag?
+
+TIA for any hints,
+=2D-=20
+           Peter
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iGoEARECACoWIQS/5hHRBUjla4uZVXU6jitvQ7HLaAUCZiGCDQwccG1AYTE2bi5u
+ZXQACgkQOo4rb0Oxy2iu4QCeOa26va6PmJ4lG+hb6DHQkc06qfcAn0n4UghDJOZb
+888T/rmyO9I0Rjm6
+=n/4w
+-----END PGP SIGNATURE-----
+--=-=-=--
 
