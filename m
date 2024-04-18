@@ -1,76 +1,98 @@
-Return-Path: <netdev+bounces-88932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B55D08A9096
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 03:25:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37DBE8A90A6
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 03:30:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6D8D1C219EF
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:25:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA0391F224ED
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85EDC4D5AB;
-	Thu, 18 Apr 2024 01:24:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3328BF9;
+	Thu, 18 Apr 2024 01:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f9ZfRgc+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d7B/Cum6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53AF64AED6;
-	Thu, 18 Apr 2024 01:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5B903A27E;
+	Thu, 18 Apr 2024 01:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713403487; cv=none; b=bXx/UX/CuvNlyyO84iil2j0/qL2TBdh7fYNO3fTYE2115s4rc0MuyXT/Ny4sIVwEmDazDMHxWkbYbjpXRtp1/a7Foif5ZxL7UI3Um/BOcojzTlQYwjeGMTV5hAvM627RMACNDtzGEZk6kek865VGdEAC+YwKkzv68diO5bSh2wE=
+	t=1713403829; cv=none; b=EdIP5JiIx8PYOfkbbfBEvSN2Cl5685C6xmicDB8qYcVeOQL8fPfnM5JPUrsWlvYZYTIyCxYK6wZH4Ztv77qOVBCf9H4Bhz2ObXsfwBCa0kAUGM0DwoiTMNCaMsa9UNX6MySDDZXvh/SFM2NMa15Wvzprja1dGZU8qbqaUWasJt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713403487; c=relaxed/simple;
-	bh=drxJSdAcZeC/CUWvT5J1zYNMdGOjJPjzTzBsfHrC6Ic=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZVqsBMg6iWO2DdPjL1z7Inm6j/55Lx/eAeVTWkT9mkxMaOYuo9+e5EaQC3rVms4s9udw2NU1daPuO7wLqHyZjK+NBhopHx50/bvU5KNAr1BjVB0J9D+qxk/QHhH1caMkFLu3Xgo4XHkuX0m0V74nXBur5+lh53YGRy6qcfKWcNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f9ZfRgc+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42F0AC072AA;
-	Thu, 18 Apr 2024 01:24:46 +0000 (UTC)
+	s=arc-20240116; t=1713403829; c=relaxed/simple;
+	bh=37D7Qm9pn82o9Kl06A8JCo2MtQzsjr0UlaxhfTbtgIs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=krApiA6KSVVZXQ1E8E2jzUPVNW+tQj+UaPWQKRQY3b6g0pfcvFcI8HbnNszahB6pHzkhPMMEVVbS1vZxg8yXkiCPz9FUjxeLqv3Ln+AFrR4qYGoJ0ShYH/Wu+Es/w2QhYg1LZyTGqMJJirObwjW7DWHZMSSmSZmZXDsiQ3L0pNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d7B/Cum6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 79F66C3277B;
+	Thu, 18 Apr 2024 01:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713403486;
-	bh=drxJSdAcZeC/CUWvT5J1zYNMdGOjJPjzTzBsfHrC6Ic=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f9ZfRgc+DbHZFe5T8NopRGRaF/eXoFQEgr17C46wdynJEJgsWAjMQb+KvThPwKfmk
-	 MJU1gaJHjiNsFC9ZE+wHxatQY1a+6zZlEARai+twc7Yi2rrKQCAQILONTrTss+jwK3
-	 0jqxZjN5iOs707x83Eyu/q/LtRm6OXCsKnVgVAltfeMFREcth7NVRSceg560dhB55g
-	 ZsUiAJ1YvObFTvBS7TeX9yu01vZ9M7HBz1eTK3ejttMyvFWwRd4HaxeEoQQrC+HlWS
-	 FcqdVox9OASlkFg636eOp1vdimTqDXFOx/b3vZbwdDy00L6STk7nzfeJAqlMIw9Y8O
-	 wfADOj4fEM5CQ==
-Date: Wed, 17 Apr 2024 18:24:45 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mahesh Bandewar <maheshb@google.com>
-Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Richard Cochran <richardcochran@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
- Sagi Maimon <maimon.sagi@gmail.com>, Jonathan Corbet <corbet@lwn.net>, John
- Stultz <jstultz@google.com>, Mahesh Bandewar <mahesh@bandewar.net>
-Subject: Re: [PATCHv1 next] ptp: update gettimex64 to provide ts optionally
- in mono-raw base.
-Message-ID: <20240417182445.019fb351@kernel.org>
-In-Reply-To: <20240416215942.150202-1-maheshb@google.com>
-References: <20240416215942.150202-1-maheshb@google.com>
+	s=k20201202; t=1713403829;
+	bh=37D7Qm9pn82o9Kl06A8JCo2MtQzsjr0UlaxhfTbtgIs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=d7B/Cum6/5GIc5W+gqWZSDXuaJYBJuaCQJ5LIC2MAEBunR6+lqNYB76tZTYFov26U
+	 C92F06GJmdi/vxgUXXU2fZeOX1XzvsUnUSf7qIuPe16krdmDkgmCn7kVfdAcZKQxvi
+	 gOsALURSB8lPoiDCZFvUYkXfZKhE0aqzewVFKz1st/GhD1aUW3cAcMJUWjMHw2AMq/
+	 6ub3zT6RprqN96AUNnupw+Zhx/LGl0ijwIBFocRIN6Z/+ZLFFpTLeoot3raR4x53BK
+	 n6AyTbWQB1MuTS07wS6WQZcuGKAna0vnxSl/m+SOJ8uH1j8q2wRRVj2RX1eomNJjYb
+	 eJrE3iF6WBleQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6735AC43617;
+	Thu, 18 Apr 2024 01:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] selftests: adopt BPF's approach to quieter builds
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171340382940.22183.477575234617803213.git-patchwork-notify@kernel.org>
+Date: Thu, 18 Apr 2024 01:30:29 +0000
+References: <20240411190534.444918-1-kuba@kernel.org>
+In-Reply-To: <20240411190534.444918-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: shuah@kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@google.com, haoluo@google.com, jolsa@kernel.org, mykolal@fb.com,
+ nathan@kernel.org, ndesaulniers@google.com, morbo@google.com,
+ justinstitt@google.com, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ llvm@lists.linux.dev
 
-On Tue, 16 Apr 2024 14:59:42 -0700 Mahesh Bandewar wrote:
->  		if (extoff->n_samples > PTP_MAX_SAMPLES
-> -		    || extoff->rsv[0] || extoff->rsv[1] || extoff->rsv[2]) {
-> +		    || extoff->rsv[0] || extoff->rsv[1]
-> +		    || (extoff->clockid != CLOCK_REALTIME
-> +			&& extoff->clockid != CLOCK_MONOTONIC_RAW)) {
+Hello:
 
-Since you're touching this condition it's probably a good opportunity
-to fox the coding style.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 11 Apr 2024 12:05:34 -0700 you wrote:
+> selftest build is fairly noisy, it's easy to miss warnings.
+> It's standard practice to add alternative messages in
+> the Makefile. I was grepping for existing solutions,
+> and found that bpf already has the right knobs.
+> 
+> Move them to lib.mk and adopt in net.
+> Convert the basic rules in lib.mk.
+> 
+> [...]
+
+Here is the summary with links:
+  - selftests: adopt BPF's approach to quieter builds
+    https://git.kernel.org/netdev/net-next/c/6fc6d7f59376
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
