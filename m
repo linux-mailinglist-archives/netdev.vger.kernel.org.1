@@ -1,141 +1,82 @@
-Return-Path: <netdev+bounces-89312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5E348AA049
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 18:40:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F1C868AA05A
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 18:51:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 035BD1C21EC0
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 16:40:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EF381C20D2C
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 16:51:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC37171085;
-	Thu, 18 Apr 2024 16:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF8C16F8F7;
+	Thu, 18 Apr 2024 16:51:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XF/vq2h1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PO0v7eXd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F0316F911
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 16:38:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2313B1635A6;
+	Thu, 18 Apr 2024 16:51:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713458285; cv=none; b=GCXbeeo0HvHXrI17bcJA7SlpXN/wldWbigldkXrley1T0ltVFQOVJ/eyO9Gyt3nUl7jmh4MdKQcjVGtnSVK6G98tX0NU5OekKVAPrTkIytUSdsafnc+QVR0yf+Hrh19cbCtgHpFG6Y7KDe3PUt7gDPqfjOMSegBZLKYoBe35Cog=
+	t=1713459115; cv=none; b=gUQLCtXZr+vtajx31Y8nYDW2WCOooLGta1WaDg7eihXJkxCDpWttQHks103mC51jiKUZRCH4d5gTBsSphgmBUvXNgv1UrMcvjqtHj/R7kOc7yuiLxeqPfmrQFSgTgnUeh6Jo0B09GSxg7hwnzcopRJ18d9/sYuTQEbjJf/wsBTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713458285; c=relaxed/simple;
-	bh=V626uEJkH9jBbP9aHpW/Nvz/TdS8JMzCVHPPyBjG91g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ohzHWsn2sykiKn1oI+J2JXaLDmfA6PdN2a7IeZvv1lSBI5I8Vnyf5mleZzh69XKrydJjVjCiGv7Uty8AevkWyqrwgyMFsqeBNxMs0Xzhnh79IgjLaoU90SxMpMrp5p7rinLlLEMGF1cj8/orFPaSryz5AeIRPcLLiuZ0ZDdsai8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XF/vq2h1; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-516f2e0edb7so1393440e87.1
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 09:38:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713458282; x=1714063082; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=2fvL6J9nXYqFFsxzFO/o7239dRTb2u5K1mOJJhr20OI=;
-        b=XF/vq2h16JiedJw086qXgxCqT2jcfCjetovrVB7yhOjpuIXVSsUgAwsktvz6AsguI9
-         FjY7BzLhlG4++UipNYXkk4Nzons0R+tVK0CUElomCZqr72gp3wUHB8Iuj4QBsU7IGTtV
-         AgK41rVLCyUI9al8bNZByzGuDmNrJDFb6ZHz/TzrG4gNJES7MzofytYRU9LVubMuz0Z4
-         +smFhaKVF2iwq2JBL8EO2x/qQQ5tJu/UChtYa8cohr3Z0Ue1w+80tr77xQtKBxnZmS/1
-         ma2S13tienorDtfpO9C8awyWpH/ASwLLIf4/pHkKj4WA+EKA75irZzL4Y3nO/Tp//vW8
-         7kuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713458282; x=1714063082;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2fvL6J9nXYqFFsxzFO/o7239dRTb2u5K1mOJJhr20OI=;
-        b=Q3vHl/T3Zk9Rq/q9GJaOWLvSnh2fXUBkWFr6QCwm3KhacOK8AmazoAWfbLGBsDKDXf
-         //s5sdUWj4mop92LztzCka8h+jYfgCQ5Ij5sja9+BqI2WDFOfKSwT/7cHoMCi5I1SbmM
-         7oPU+1WetyKvyNZkH6JcLR8+YC4vafdFI7boXL5nxy6P8Bn2nkyRZBfGwKUANwaAJDxn
-         w3eG4ju7ho6R7NC2pZA1KjNoRy84MGo9fR1DdOuRltEwsG1Ptp4bDOW/nvqIze7W7RNf
-         ukKc5scJwlvKRxGVzQ30V2vlX0xz8z1oIUTjPGLBShmi7NOxhUO8LAzgP9vCtJ1Ym1eO
-         UI5A==
-X-Forwarded-Encrypted: i=1; AJvYcCXaZfp9GOlkXZt7ReQE/DmWMNVHuGYOhJRDOIn3W0naxDtfydxbpOzWN2IJ3q0/EyAa6TAGhOqp3+xllj1Lvk00dsmyrIwy
-X-Gm-Message-State: AOJu0Yyj4z0PKwY0WyjRtIv7lWZPP10YH/7BxXJvbY2GZNYqGy4IgVpu
-	xGqkCD9z+vGU/WUfmlD2MQl/VzqXlM1xc2t/ttGC0DwmMTI4Oso/t/2Wx2766Hbn80rXLjPJGfR
-	S97rdzHEvrWrNT760C81vtzdW5ZDSwNkeu62D
-X-Google-Smtp-Source: AGHT+IE/svMEdblsX6s5vPxV2ylObzjaIZ55o97lvAaXhYSugvIA3wFEwwhMNS0cq5OY9J8vFtE9CdF9Q9hKNy9Yx24=
-X-Received: by 2002:a19:5e55:0:b0:519:5df9:d945 with SMTP id
- z21-20020a195e55000000b005195df9d945mr1975972lfi.4.1713458282190; Thu, 18 Apr
- 2024 09:38:02 -0700 (PDT)
+	s=arc-20240116; t=1713459115; c=relaxed/simple;
+	bh=2FQJtEzz9rqrA7A6GSqhlQLjyYXUEdlyTHByrNoXFPE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V0a10LSTBhN8xlwTLf5050J/ULOIiZf8OfdzU69I0i3Crt2sKNVLDAHSw20dcQdEyzMszJohJ7K+38rlfkixOz+oDb3VAua1x1t1IAf4gFgzF6tHtLuSevwE8xFQvVX0n/ZaI7P/L5anFBHrMfXgea9zPD6CornHZ5AGQ80eN1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PO0v7eXd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33B3EC113CC;
+	Thu, 18 Apr 2024 16:51:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713459114;
+	bh=2FQJtEzz9rqrA7A6GSqhlQLjyYXUEdlyTHByrNoXFPE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PO0v7eXdFmLLWiPGFN6l/qbYmA63Onr2VDULSaRTa18HZLT1cePfxgWQK6DnKzwya
+	 Bc4blew8Zr3/tYqfVMGnyU6zk2dQupmpV48Kc34DPwH8adnn7ooYmSI/4o6y5e6/JY
+	 ocIrvs71dwYdGGK5tdTn3ELesJQ45rFN0QBbOkZ41f3z9NxgmeK5N7OR/x174y2QlJ
+	 pL1BnYk/CcPL8meCrWYKwHQehwNEc+ZpVCmosuJN9RLTO/xvnzCixZj7sGSKdmWPXr
+	 jgcgNww3DZXoi/g/JX3MoOZ90gJXyRdz7cAv7XdhSHvpZ/nd5lEIzkLR5HAlMrfbpw
+	 DRMIG2450ZLuA==
+Date: Thu, 18 Apr 2024 09:51:53 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Donald Hunter <donald.hunter@gmail.com>, netdev@vger.kernel.org, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, Jacob Keller
+ <jacob.e.keller@intel.com>, Jozsef Kadlecsik <kadlec@netfilter.org>,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v4 4/4] netfilter: nfnetlink: Handle ACK flags
+ for batch messages
+Message-ID: <20240418095153.47eb18a7@kernel.org>
+In-Reply-To: <ZiFKvyvojcIqMQ3R@calendula>
+References: <20240418104737.77914-1-donald.hunter@gmail.com>
+	<20240418104737.77914-5-donald.hunter@gmail.com>
+	<ZiFKvyvojcIqMQ3R@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240412165230.2009746-1-jrife@google.com> <20240412165230.2009746-5-jrife@google.com>
- <3df13496-a644-4a3a-9f9b-96ccc070f2a3@linux.dev> <CADKFtnQDJbSFRS4oyEsn3ZBDAN7T6EvxXUNdrz1kU3Bnhzfgug@mail.gmail.com>
- <f164369a-2b6b-45e0-8e3e-aa0035038cb6@linux.dev>
-In-Reply-To: <f164369a-2b6b-45e0-8e3e-aa0035038cb6@linux.dev>
-From: Jordan Rife <jrife@google.com>
-Date: Thu, 18 Apr 2024 12:37:49 -0400
-Message-ID: <CADKFtnQHy0MFeDNg6x2gzUJpuyaF6ELLyMg3tTxze3XV28qo7w@mail.gmail.com>
-Subject: Re: [PATCH v2 bpf-next 4/6] selftests/bpf: Add IPv4 and IPv6 sockaddr
- test cases
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>, 
-	Kui-Feng Lee <thinker.li@gmail.com>, Artem Savkov <asavkov@redhat.com>, 
-	Dave Marchevsky <davemarchevsky@fb.com>, Menglong Dong <imagedong@tencent.com>, Daniel Xu <dxu@dxuuu.xyz>, 
-	David Vernet <void@manifault.com>, Daan De Meyer <daan.j.demeyer@gmail.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> The test_sock_addr.{c,sh} can be retired as long as all its tests are migrated
-> to sock_addr.c
+On Thu, 18 Apr 2024 18:30:55 +0200 Pablo Neira Ayuso wrote:
+> Out of curiosity: Why does the tool need an explicit ack for each
+> command? As mentioned above, this consumes a lot netlink bandwidth.
 
-test_sock_addr.c has a few more test dimensions than
-prog_tests/sock_addr.c currently does, so it covers a few more
-scenarios.
+I think that the tool is sort of besides the point, it's just a PoC.
+The point is that we're trying to describe netlink protocols in machine
+readable fashion. Which in turn makes it possible to write netlink
+binding generators in any language, like modern RPC frameworks.
+For that to work we need protocol basics to be followed.
 
-struct sock_addr_test {
-    const char *descr;
-    /* BPF prog properties */
-    load_fn loadfn;
-    enum bpf_attach_type expected_attach_type;
-    enum bpf_attach_type attach_type;
-    /* Socket properties */
-    int domain;
-    int type;
-    /* IP:port pairs for BPF prog to override */
-    const char *requested_ip;
-    unsigned short requested_port;
-    const char *expected_ip;
-    unsigned short expected_port;
-    const char *expected_src_ip;
-    /* Expected test result */
-    enum {
-        LOAD_REJECT,
-        ATTACH_REJECT,
-        ATTACH_OKAY,
-        SYSCALL_EPERM,
-        SYSCALL_ENOTSUPP,
-        SUCCESS,
-    } expected_result;
-};
-
-We focus on the "happy path" scenarios currently in
-prog_tests/sock_addr.c while test_sock_addr.c has test cases that
-cover a range of scenarios where loading or attaching a BPF program
-should fail. There are also a few asm tests that use program loader
-functions like sendmsg4_rw_asm_prog_load which specifies a series of
-BPF instructions directly rather than loading one of the skeletons.
-Adding in these test dimensions and migrating the test cases is a
-slightly bigger lift for this patch series. Do we want to try to
-migrate all of these to prog_tests/sock_addr.c in order to fully
-retire it?
-
--Jordan
+That's not to say that we're going to force all netlink families to
+change to follow extra new rules. Just those that want to be accessed
+via the bindings.
 
