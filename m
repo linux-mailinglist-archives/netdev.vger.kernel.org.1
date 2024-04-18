@@ -1,129 +1,153 @@
-Return-Path: <netdev+bounces-89345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 052118AA156
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:48:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81A6D8AA169
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:51:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3028E1C20CEB
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 17:48:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9FD9B230C7
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 17:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D741175552;
-	Thu, 18 Apr 2024 17:48:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62AC117AD75;
+	Thu, 18 Apr 2024 17:51:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KRzXQHdu"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="lJ08rxMW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2FFC1EA8F
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 17:48:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C69CE17AD6D
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 17:51:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713462505; cv=none; b=nX5d6VR9qa8iRzgBb3juH0lgVO1Z20v6etQcJgnkL0uLC3k5Nf0ugC6foRwN0dch69rLjQCWvEy2QgKpKkaIjWbf+7O3fUPx2iobY74YKlXVEulxOLVAnUBIJ8ufltwUnXlBCaa0lA9Ya7+YiZ72Z4GGU1B0DdgDdq3h1IwZr7o=
+	t=1713462664; cv=none; b=CgYmwXcn+Kh9yx9jPFdX4LjH9deAizKvwgd3MOMjQnRTzoIq2CaQgYoEk0aLfu9x0Huw8Gc7f/tl8hKwVsM2ap6wjX2aRSrpRzifJ6AjqCZYgLP1Ms1nQJHafxO655U3qUF6ew04n4mdOnf3So3jhyvav20cIZu/GrRN1Iy075A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713462505; c=relaxed/simple;
-	bh=f76I9qm9ixVzIAOtxGZUfkt56m6lnXvWzNveKSJspIk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=izHbO0L/C1SvTvL7z0YP8k7aVH8lrwQPfsJvGkILq4h++73k2Ido716ydS5UwFUGqfkub+cTQcl9gh0K5cxF17xhstg2IhhLSZ3NSUM2q75QG02NSw/XrR2ItMD8rM8QZO1CNB3BqXEyu14vV9ut3klxZxFyQJB7tzeOL+sG8gA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KRzXQHdu; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-56e2e851794so1433a12.0
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 10:48:23 -0700 (PDT)
+	s=arc-20240116; t=1713462664; c=relaxed/simple;
+	bh=ICVQMXd+yWltnMkkLmPSWiJSyQlug6UXgcOqsu6RALs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nUGXYMSCn3RnzNOdgulrb4PYe0Ns1GnUUvf0dHA+gXmi5cVz6FkBi+qe9zCOiBywRjZ11MEplUZhG4d0+gjh8daBzFlbZn8A3DodzXmwKcuHaGEaGWsMdO5XN4A+0XrvaK4HJpO2psQhI68YhO+4R5ElolAwkTw0oYfBlTMAkhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=lJ08rxMW; arc=none smtp.client-ip=209.85.210.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-6ea2ac0c217so460862a34.1
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 10:51:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713462502; x=1714067302; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JcGoKURjzhYHjQE5mjGIjBwQUlGDndsd9afFNL3Lq3A=;
-        b=KRzXQHduNLnx14y5sAVC1n7IwWGr8vnGQ9uKZSleDcpecmKbrJospm0Wh78o1PgkRH
-         tC1GtFf9hx9CqkisXan+LUtAcveDwJJVT6pKgLQu7qz4Z2GRyfpEr2G/6D8JBpAv/n+8
-         1sqWj9Eb7/RcbPyAD1bVD0WatLK3uNTCvmyP69zq+514TuZGVn7guQ6pZ5/DJMOlfTJq
-         M4TYl2MoMUhwZOG8xhZq6XWSWE34/dQl9eE0jtrwrm8JrNy9YkggVkJzFsR7gOlH9wIL
-         p/H+U/Kl91ajzeFEiUgrSNn+qaRXbgAA2ZoGW+SiMkYm+DqRqpEKFp+R15pOod3bPwoe
-         //1Q==
+        d=ziepe.ca; s=google; t=1713462662; x=1714067462; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jYBNpNIicI/8ED5gIHnDvzk5k+KDpAJzCV70dwuFNEY=;
+        b=lJ08rxMWDcbrI1Hl6SBNOrCvACyB1LRJK8rTLBm0rfyOeX/veSr2JkDbmiQU15CJoc
+         nTUZHur42DqiwOKpoUchU07tCggKELuo4Pv2/OYAQE5f3Zsh8SisYBHXUzz2xb19e32t
+         j7M1PflzoYzH4J8ZCR4eRntOhIlQAtEk4aWLJaK1+sG8VO9v2x/7C5tMLdjvAL5qIdND
+         E8AVFxAsDGv5VXq5BmwcTleh8io2bEf7+7rOMJkQRiz4sDE7FQheFuKVQ6+jlQKqg9GJ
+         g0xSY8Z/YtG9M9QCwHhUaNAp++Wu0/S+2N9Nwd74k2rh8Nly/+Pk+a2gD6Ies3McmUHH
+         ZIwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713462502; x=1714067302;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JcGoKURjzhYHjQE5mjGIjBwQUlGDndsd9afFNL3Lq3A=;
-        b=MshcLf49s7FG2CkQ0IEsmQL8U7PyV3vwm+OOxBJgkLyDhtXtikatQ6Tkp0SJ7jjLPU
-         KS+7/j8t3CJkGJ5flBtVTVB/wYZaAl7s5rABFe3ZMVqb+xPartzJWRXvKmvsb5LAdH4g
-         zcY4F8zcSnFQ4fqwyLssiIF7qlVJC7s8wFrlDPJXCYcIlk5DGj1QSkGcz/biABPENOzJ
-         5kyQ+DC8c4HokUfqZs1IiYdMtp/YGqCAA/uhn6WR5wkZ9OUuvI6b+yxzHFSqBhDtkJPp
-         7fhUqss/T75Yzn5YaZEHwgvFW4zfNWUveoQqwmlIonAn7UTS70XJWt03Pz8wiYpeBBmN
-         1vJg==
-X-Forwarded-Encrypted: i=1; AJvYcCWRw80+TXCdkZEiyXX5LVvCaUKdFN5dSY1STXnE8jvXRszwHFr/YKE0rwocJFaYwhYpWsTOGYkeYDd9jVqANywJ2/W4BIkB
-X-Gm-Message-State: AOJu0Ywa8wmBQ/53nIwmh6pAbGMU6bpb4GHIn3g43PhU5wD+HITnLVhf
-	afgZwLxc4jdVo679D2giMVwGD5RjqAdZo3TuDb0QyHqU4oULQDkt5ou/F62W0Wk/e90PSvjihm8
-	JVzXwEQna8ZAqcEtQ27Tx/zRwdJaYWkej2Wuh
-X-Google-Smtp-Source: AGHT+IF0lF78Z2QSIcW8PHui/c0uCywUQh41qeXzGAPou1WDQP/BmuVaCNnZ5gDWGyLv9w2ZUg98PRI65FpK70K1OgA=
-X-Received: by 2002:a05:6402:26cb:b0:570:fa4:97d6 with SMTP id
- x11-20020a05640226cb00b005700fa497d6mr16763edd.0.1713462501880; Thu, 18 Apr
- 2024 10:48:21 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713462662; x=1714067462;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jYBNpNIicI/8ED5gIHnDvzk5k+KDpAJzCV70dwuFNEY=;
+        b=nranriHaBQO5ysdAWHUkHDSGeUBmQBznxVvnZg9/fccbOhOoa4TASHD4f7mVUjjTI8
+         qJUrxYtzZtqK6V5etHCHAcLWhvrVbfn7nTWHrsgZvDcQlXItlq3FhrXTB8plSwHclqh5
+         1OTczSL06ojbdKhNz3OSo54xc/YYz0WbYYa/jA25Noh1lytg3XQloIFMZefVWLUgm4Dm
+         eGInNbh4q3CS12222gWrz6jfwXnLYcFi+FMdnAQQekJOPwssxqkRCXMXr0o4qX4eYEbz
+         NT78UhOsNvTkAtpvpMGnrC6EW+iwv7TiUYxTmA4MNBOIubefZqB0F6u7Ttdw/svUve28
+         qXjA==
+X-Forwarded-Encrypted: i=1; AJvYcCVs5Wg9xvcnBojRCIVU/EZJYscEkrFinNvifbEVe2vTIrK+rpTPuh5Qoad3BnsELhZE3breg+JUNlq5qKl2rBAJmrkN6qZh
+X-Gm-Message-State: AOJu0YznPhlfyUMNI43VnC2PufduszAoKAw7Cy3xhXS9qatIlbDyGyzC
+	+Ke3UFnginJWXIT6nqNu1FeAmMeGfhvi80eIlvO2bzI5FamDftoCCgqtly9p7JI=
+X-Google-Smtp-Source: AGHT+IHAgStOV9TdoloDBt9xFRmSANx1NimuspwckNExMic3r/5mxvsR/GI8ziwcEFHL6TxWaU/P2A==
+X-Received: by 2002:a05:6830:1152:b0:6eb:85bb:144d with SMTP id x18-20020a056830115200b006eb85bb144dmr1341629otq.7.1713462661747;
+        Thu, 18 Apr 2024 10:51:01 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id s8-20020a056830148800b006eb85b34e48sm399299otq.54.2024.04.18.10.51.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 10:51:00 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1rxVuV-00EHQx-H7;
+	Thu, 18 Apr 2024 14:50:59 -0300
+Date: Thu, 18 Apr 2024 14:50:59 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Zhu Yanjun <yanjun.zhu@linux.dev>,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Long Li <longli@microsoft.com>,
+	Michael Kelley <mikelley@microsoft.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Subject: Re: [PATCH net-next] net: mana: Add new device attributes for mana
+Message-ID: <20240418175059.GZ223006@ziepe.ca>
+References: <1713174589-29243-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <20240415161305.GO223006@ziepe.ca>
+ <56b0a8c1-50f6-41a9-9ea5-ed45ada58892@linux.dev>
+ <b34bfb11-98a3-4418-b482-14f2e50745d3@lunn.ch>
+ <20240418060108.GB13182@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240417165756.2531620-1-edumazet@google.com> <20240417165756.2531620-2-edumazet@google.com>
- <e332d0b8fa7b116003dfd8b47f021901e66b36b9.camel@redhat.com>
- <CANn89i+-cjHze1yiFZKr-cCGG7Fh4gb9NZnS1u4u_77bG2Mf6Q@mail.gmail.com>
- <CANn89iLSZFOYfZUSK57LLe8yw4wNt8vHt=aD79a1MbZBhfeRbw@mail.gmail.com>
- <7d1aa7d5a134ad4f4bca215ec6a075190cea03f2.camel@redhat.com>
- <CANn89iJg7AcxMLbvwnghN85L6ASuoKsSSSHdgaQzBU48G1TRiw@mail.gmail.com> <274d458e-36c8-4742-9923-6944d3ef44b5@kernel.org>
-In-Reply-To: <274d458e-36c8-4742-9923-6944d3ef44b5@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 18 Apr 2024 19:47:51 +0200
-Message-ID: <CANn89iJOLPH72pkqLWm-E4dPKL4yWxTfyJhord0r_cPcRm9WiQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] tcp: conditionally call ip_icmp_error() from tcp_v4_err()
-To: David Ahern <dsahern@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	Neal Cardwell <ncardwell@google.com>, Dragos Tatulea <dtatulea@nvidia.com>, eric.dumazet@gmail.com, 
-	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Shachar Kagan <skagan@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240418060108.GB13182@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 
-On Thu, Apr 18, 2024 at 7:46=E2=80=AFPM David Ahern <dsahern@kernel.org> wr=
-ote:
->
-> On 4/18/24 4:15 AM, Eric Dumazet wrote:
-> >
-> > Thanks Paolo
-> >
-> > I found that the following patch is fixing the issue for me.
-> >
-> > diff --git a/tools/testing/selftests/net/nettest.c
-> > b/tools/testing/selftests/net/nettest.c
-> > index cd8a580974480212b45d86f35293b77f3d033473..ff25e53024ef6d4101f251c=
-8a8a5e936e44e280f
-> > 100644
-> > --- a/tools/testing/selftests/net/nettest.c
-> > +++ b/tools/testing/selftests/net/nettest.c
-> > @@ -1744,6 +1744,7 @@ static int connectsock(void *addr, socklen_t
-> > alen, struct sock_args *args)
-> >         if (args->bind_test_only)
-> >                 goto out;
-> >
-> > +       set_recv_attr(sd, args->version);
-> >         if (connect(sd, addr, alen) < 0) {
-> >                 if (errno !=3D EINPROGRESS) {
-> >                         log_err_errno("Failed to connect to remote host=
-");
->
-> You have a kernel patch that makes a test fail, and your solution is
-> changing userspace? The tests are examples of userspace applications and
-> how they can use APIs, so if the patch breaks a test it is by definition
-> breaking userspace which is not allowed.
+On Wed, Apr 17, 2024 at 11:01:08PM -0700, Shradha Gupta wrote:
 
-I think the userspace program relied on a bug added in linux in 2020
+> > > > > +static ssize_t mana_attr_show(struct device *dev,
+> > > > > +			      struct device_attribute *attr, char *buf)
+> > > > > +{
+> > > > > +	struct pci_dev *pdev = to_pci_dev(dev);
+> > > > > +	struct gdma_context *gc = pci_get_drvdata(pdev);
+> > > > > +	struct mana_context *ac = gc->mana.driver_data;
+> > > > > +
+> > > > > +	if (strcmp(attr->attr.name, "mport") == 0)
+> > > > > +		return snprintf(buf, PAGE_SIZE, "%d\n", ac->num_ports);
+> > > > > +	else if (strcmp(attr->attr.name, "adapter_mtu") == 0)
+> > > > > +		return snprintf(buf, PAGE_SIZE, "%d\n", gc->adapter_mtu);
+> > > > > +	else if (strcmp(attr->attr.name, "msix") == 0)
+> > > > > +		return snprintf(buf, PAGE_SIZE, "%d\n", gc->max_num_msix);
+> > > > > +	else
+> > > > > +		return -EINVAL;
+> > > > > +
+> > > > 
+> > > > That is not how sysfs should be implemented at all, please find a
+> > > > good example to copy from. Every attribute should use its own function
+> > > > with the macros to link it into an attributes group and sysfs_emit
+> > > > should be used for printing
+> > > 
+> > > Not sure if this file drivers/infiniband/hw/usnic/usnic_ib_sysfs.c is a good
+> > > example or not.
+> > 
+> > The first question should be, what are these values used for? You can
+> > then decide on debugfs or sysfs. debugfs is easier to use, and you
+> > avoid any ABI, which will make long term support easier.
+> 
+> Hi Andrew,
+> We want to eventually use these attributes to make the device settings configurable
+> and also improve debuggability for MANA devices. I feel having these attributes 
+> in sysfs would make more sense as we plan to extend the attribute list and also make
+> them settable.
 
-Jakub, I will stop trying to push the patches, this is a lost battle.
+From an RDMA perspective this is all available from other APIs already
+at least and I wouldn't want to see new sysfs unless there is a netdev
+justification.
+
+Jason
 
