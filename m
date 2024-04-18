@@ -1,135 +1,250 @@
-Return-Path: <netdev+bounces-89133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CA828A981F
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:03:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A8958A982C
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:05:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DE0C1C209F2
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:03:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E3671C214CD
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:05:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8F9215E207;
-	Thu, 18 Apr 2024 11:03:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3C815E5A8;
+	Thu, 18 Apr 2024 11:05:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i9+ZVBXG"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="poMz/N8Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53ED15B969
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 11:03:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380E715E20C
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 11:05:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713438230; cv=none; b=PFSbECoSqu5MsjqN9ZEdOAqXKQ6h9S4gwp6N3jLGn1AXlhcnRXXsvL1jho23yxmD2zVY2CkBCo96fse6Z8KhGV5LCSamVh70Ur4GnlzYWKPQivCkU0amnVicqDpAW2cNCNYfcU8qRqlqfsYGTMJI/euRebmQNHyQVLUdPgH7SD4=
+	t=1713438338; cv=none; b=SpsDhhiIG9iV2ZObQ5h4yN9KcXrzrOzjWs0w+SF+Hb3fqvihi2g5BB6dsxIdcUsxMQGDUMS3ZpulQSchKY9JvUhlymaHhlOZNxLU7+VsPC68bTOjh2NAtfzCMAsXgIi7fHQJJVMBGZyz/q7LF/l9mfTDJz1mj1Vy4M75zjo9tcw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713438230; c=relaxed/simple;
-	bh=eAVw/Rm28PRAbnn5C8EDuezCyUUUpKWahTorxk/3Nt4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nw9pqUDi1fgRZNv9WeXKKv5+ZW863syuXlmHqjEhi/b6Ud9DsN1egUFUvJV9gJqkarLGUzcO4T00b/LGOQQOVQClUa4kYYb5kG1YPM8jyDwwbDoJYz8nIQ5S7R62zkRLGzmAmE9K7ez4NLjt0t7W9gQJ2NgJXxvpiGRsfqNUQAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i9+ZVBXG; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713438227; x=1744974227;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=eAVw/Rm28PRAbnn5C8EDuezCyUUUpKWahTorxk/3Nt4=;
-  b=i9+ZVBXGig7RWEOV9oZbPQa9z55gETR9IEjcCzAxlr3rYyODJf2uZ01b
-   atyNvx93LD6Xn3WYqznsHfqsfPpg3pXqpAIkvHX1F6IP53NBhjcs9cA4+
-   NImwdp2PzFapikMoZi5yYz7DsK0ZWJyGVhrV0CLj0/msbSzsjZEZky6BH
-   fAgNK6grtvTUdLEE3VV88pwrwfx2yYi+DJcN2gHYeR7e3mrkvOsO3mv8O
-   st8RZD7uPiH2ldPIfzHZjWHyWMs1VKyEyZq+/MGG0tdkscYMEHG+QsOCd
-   XJLj08ilccsw9oF/WH6zV8fvUBQ6+1cKsanwuV+iJub+TBuBKuTZ/N5Ah
-   Q==;
-X-CSE-ConnectionGUID: zDnUiIpESqiRb1hIg2uP7w==
-X-CSE-MsgGUID: Voq8WbBARCW1di1XIqcVrQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="12763758"
-X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
-   d="scan'208";a="12763758"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 04:03:46 -0700
-X-CSE-ConnectionGUID: rp+MM2n5QnW6wQO2sVPBdw==
-X-CSE-MsgGUID: q1Uq+MiOSmiGEPggHSDVwg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
-   d="scan'208";a="23021657"
-Received: from unknown (HELO localhost.igk.intel.com) ([10.211.13.141])
-  by fmviesa008.fm.intel.com with ESMTP; 18 Apr 2024 04:03:45 -0700
-From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-next] ice: Extend auxbus device naming
-Date: Thu, 18 Apr 2024 13:03:18 +0200
-Message-Id: <20240418110318.67202-1-sergey.temerkhanov@intel.com>
-X-Mailer: git-send-email 2.35.3
+	s=arc-20240116; t=1713438338; c=relaxed/simple;
+	bh=I+PiGBk9TVIRn1ZmIbTxcCeNUNEu+yZ7+mQReEypCio=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z4aPuKxY/r8kUB/Z4DlQgzcSZNlkgx3+GT69HQp0RUbXSSlfydvQ2wjKX6A8rlnmZ3Ff7Ug8EK3Tgp6Gu/R4Zd1iuzjq9/sXZi4yIpxzPLTvVxrX2psDiR0qVb5k3t07iIy0Lr3/4ee0eo2T1MvYE3d2fPj0yU8BrzavNi6P7ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=poMz/N8Y; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com [209.85.161.70])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 3C3543F8E7
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 11:05:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1713438332;
+	bh=S59cR+vrGyi8GrH3u6e9Fe6YHWJc/gBYyRloErg97Bg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=poMz/N8Yl/laZ87Kahs83Pvw1HeAzDJs2QMUslCq2e1QLaB+zz4xY9harDyIa+dlS
+	 fj98EAYxptbfkH0YL2mDivZtCcQRzMWhmmysPCTDOXTWsb+lwILJq+UPy5o8HUo9RK
+	 Udr7sHdJfKJm71B4Os5zKkx4yKjV/YaYr8kQtXW7vKMWQRBVNNh4fhjLqEZbKYS+e3
+	 2R8D6z1Spizti4KASCrqrOiApies9evW7eVWcw2VSjOybmk31mo/mWULbjQcdb9ui/
+	 x34wUi7mpL7o6pyL/J3MkUJqEuV7l23mxZo5HnV479STb9C7u6yUrSmuLYIdfb92Ix
+	 cJTZJPtjBSPpA==
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-5aa18a128c6so1166250eaf.3
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 04:05:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713438331; x=1714043131;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S59cR+vrGyi8GrH3u6e9Fe6YHWJc/gBYyRloErg97Bg=;
+        b=PjEemvLw/G2l9Fwc0hfSwsqUioMOSX63nhegXDe8NfOpAKNf0Anj/MIudnmDQGVm5Q
+         DDjSJB2vM+f5BeLEz2uPL/T5LD+2AcDyLOTiUVookM3RP5lJApqrszvNmbsZopP1mEAq
+         aJuqiU02n+BdwM898HTW8CqqMhp2WDuFORfZsAMuMmPaKZQ8Y16h3KIuKnBUrRh2JZSu
+         xpmwKnhuFdoy8a2fq+rT87ukASgxAiqH+mIwOOhW7F1Gik9Y0dKU+yqbD5D7LbzuB6fG
+         HQ09knJb9Sn1jA81fBNRqRuyi6ojprpWK2PLaNhuhqSmLeDFmcL3Y742L82lu5QC1R5l
+         S7mA==
+X-Forwarded-Encrypted: i=1; AJvYcCUibeq8SwL3xyw5qBGM1mAWKcfaLkc/CjHk0S8Ifc72AM+NcDDPW2kWLhPQRSyoeaFqiMKvxPeR4tVmlx5fBFeDONU6L6nf
+X-Gm-Message-State: AOJu0Yy+vxgikhxXge5F7FGrZJrJgGNoQcaQP73MDifp6DTganu5msW5
+	286xnFaHiQDQglyBmVSMOvfMrR4MSlNmQCQ4Gh27kg93MXihbyc+V/eUjBLA8tr/Gtvc1/qdtnS
+	h/tWXMFthOnBW2QZ8ypFegaBRBdXzk+fffv/i21Z0nWLN8HB9YoKYhk7iS9eqriah13hYrsm1CK
+	nQGLn94TvDl+oBW5zN5gFsADD4AzfXQiPjcutysIBPT/OnamY6b+nOYXE=
+X-Received: by 2002:a05:6358:c89:b0:17f:87fc:e0cc with SMTP id o9-20020a0563580c8900b0017f87fce0ccmr2915861rwj.14.1713438330842;
+        Thu, 18 Apr 2024 04:05:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHoqZMTYgUvh9dDDcha8Q7dq0Isr6UZuzRKCg2XQSqf9dzK0Kh0+4b39/DzJ2+6zBH/hKdADicF/jQMZR2Mbew=
+X-Received: by 2002:a05:6358:c89:b0:17f:87fc:e0cc with SMTP id
+ o9-20020a0563580c8900b0017f87fce0ccmr2915831rwj.14.1713438330517; Thu, 18 Apr
+ 2024 04:05:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
-Content-Transfer-Encoding: 8bit
+References: <20240416144814.173185-1-aleksandr.mikhalitsyn@canonical.com> <32f56a2e-8142-4391-916a-65fe51a57933@ssi.bg>
+In-Reply-To: <32f56a2e-8142-4391-916a-65fe51a57933@ssi.bg>
+From: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+Date: Thu, 18 Apr 2024 13:05:19 +0200
+Message-ID: <CAEivzxfDLSrHP2H1ou8rccGLOxk5tycZH1+VKt3X8S0QcXNxcA@mail.gmail.com>
+Subject: Re: [PATCH net-next] ipvs: allow some sysctls in non-init user namespaces
+To: Julian Anastasov <ja@ssi.bg>
+Cc: horms@verge.net.au, netdev@vger.kernel.org, lvs-devel@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	=?UTF-8?Q?St=C3=A9phane_Graber?= <stgraber@stgraber.org>, 
+	Christian Brauner <brauner@kernel.org>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+	Jozsef Kadlecsik <kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Include segment/domain number in the device name to distinguish
-between PCI devices located on different root complexes in
-multi-segment configurations
+On Wed, Apr 17, 2024 at 3:02=E2=80=AFPM Julian Anastasov <ja@ssi.bg> wrote:
+>
+>
+>         Hello,
 
-Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ptp.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Dear Julian,
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index 0f17fc1181d2..54fe1931d598 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -2893,6 +2893,7 @@ ice_ptp_auxbus_create_id_table(struct ice_pf *pf, const char *name)
- static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
+>
+> On Tue, 16 Apr 2024, Alexander Mikhalitsyn wrote:
+>
+> > Let's make all IPVS sysctls visible and RO even when
+> > network namespace is owned by non-initial user namespace.
+> >
+> > Let's make a few sysctls to be writable:
+> > - conntrack
+> > - conn_reuse_mode
+> > - expire_nodest_conn
+> > - expire_quiescent_template
+> >
+> > I'm trying to be conservative with this to prevent
+> > introducing any security issues in there. Maybe,
+> > we can allow more sysctls to be writable, but let's
+> > do this on-demand and when we see real use-case.
+> >
+> > This list of sysctls was chosen because I can't
+> > see any security risks allowing them and also
+> > Kubernetes uses [2] these specific sysctls.
+> >
+> > This patch is motivated by user request in the LXC
+> > project [1].
+> >
+> > [1] https://github.com/lxc/lxc/issues/4278
+> > [2] https://github.com/kubernetes/kubernetes/blob/b722d017a34b300a2284b=
+890448e5a605f21d01e/pkg/proxy/ipvs/proxier.go#L103
+> >
+> > Cc: St=C3=A9phane Graber <stgraber@stgraber.org>
+> > Cc: Christian Brauner <brauner@kernel.org>
+> > Cc: Julian Anastasov <ja@ssi.bg>
+> > Cc: Simon Horman <horms@verge.net.au>
+> > Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+> > Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
+> > Cc: Florian Westphal <fw@strlen.de>
+> > Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.c=
+om>
+> > ---
+> >  net/netfilter/ipvs/ip_vs_ctl.c | 18 +++++++++++++++---
+> >  1 file changed, 15 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_=
+ctl.c
+> > index 143a341bbc0a..92a818c2f783 100644
+> > --- a/net/netfilter/ipvs/ip_vs_ctl.c
+> > +++ b/net/netfilter/ipvs/ip_vs_ctl.c
+> > @@ -4285,10 +4285,22 @@ static int __net_init ip_vs_control_net_init_sy=
+sctl(struct netns_ipvs *ipvs)
+>
+>         As the list of privileged vars is short I prefer
+> to use a bool and to make only some vars read-only:
+>
+>         bool unpriv =3D false;
+>
+> >               if (tbl =3D=3D NULL)
+> >                       return -ENOMEM;
+> >
+> > -             /* Don't export sysctls to unprivileged users */
+> > +             /* Let's show all sysctls in non-init user namespace-owne=
+d
+> > +              * net namespaces, but make them read-only.
+> > +              *
+> > +              * Allow only a few specific sysctls to be writable.
+> > +              */
+> >               if (net->user_ns !=3D &init_user_ns) {
+>
+>         Here we should just set: unpriv =3D true;
+>
+> > -                     tbl[0].procname =3D NULL;
+> > -                     ctl_table_size =3D 0;
+> > +                     for (idx =3D 0; idx < ARRAY_SIZE(vs_vars); idx++)=
  {
- 	struct auxiliary_driver *aux_driver;
-+	struct pci_dev *pdev = pf->pdev;
- 	struct ice_ptp *ptp;
- 	struct device *dev;
- 	char *name;
-@@ -2903,8 +2904,9 @@ static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
- 	aux_driver = &ptp->ports_owner.aux_driver;
- 	INIT_LIST_HEAD(&ptp->ports_owner.ports);
- 	mutex_init(&ptp->ports_owner.lock);
--	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
--			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
-+	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_%u_clk%u",
-+			      pci_domain_nr(pdev->bus), pdev->bus->number,
-+			      PCI_SLOT(pdev->devfn),
- 			      ice_get_ptp_src_clock_index(&pf->hw));
- 	if (!name)
- 		return -ENOMEM;
-@@ -3106,6 +3108,7 @@ static void ice_ptp_release_auxbus_device(struct device *dev)
- static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
- {
- 	struct auxiliary_device *aux_dev;
-+	struct pci_dev *pdev = pf->pdev;
- 	struct ice_ptp *ptp;
- 	struct device *dev;
- 	char *name;
-@@ -3118,8 +3121,9 @@ static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
- 
- 	aux_dev = &ptp->port.aux_dev;
- 
--	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
--			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
-+	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_%u_clk%u",
-+			      pci_domain_nr(pdev->bus), pdev->bus->number,
-+			      PCI_SLOT(pdev->devfn),
- 			      ice_get_ptp_src_clock_index(&pf->hw));
- 	if (!name)
- 		return -ENOMEM;
--- 
-2.35.3
+> > +                             if (!tbl[idx].procname)
+> > +                                     continue;
+> > +
+> > +                             if (!((strcmp(tbl[idx].procname, "conntra=
+ck") =3D=3D 0) ||
+> > +                                   (strcmp(tbl[idx].procname, "conn_re=
+use_mode") =3D=3D 0) ||
+> > +                                   (strcmp(tbl[idx].procname, "expire_=
+nodest_conn") =3D=3D 0) ||
+> > +                                   (strcmp(tbl[idx].procname, "expire_=
+quiescent_template") =3D=3D 0)))
+> > +                                     tbl[idx].mode =3D 0444;
+> > +                     }
+> >               }
+> >       } else
+> >               tbl =3D vs_vars;
+>
+>         And below at every place to use:
+>
+>         if (unpriv)
+>                 tbl[idx].mode =3D 0444;
+>
+>         for the following 4 privileged sysctl vars:
+>
+> - sync_qlen_max:
+>         - allocates messages in kernel context
+>         - this needs better tunning in another patch
+>
+> - sync_sock_size:
+>         - allocates messages in kernel context
+>
+> - run_estimation:
+>         - for now, better init ns to decide if to use est stats
+>
+> - est_nice:
+>         - for now, better init ns to decide the value
+>
+> - debug_level:
+>         - already set to 0444
+>
+>         I.e. these vars allocate resources (mem, CPU) without
+> proper control, so for now we will just copy them from init ns
+> without allowing writing. And they are vars that are not tuned
+> often. Also we do not know which netns is supposed to be the
+> privileged one, some solutions move all devices out of init_net,
+> so we can not decide where to use lower limits.
 
+I agree. I have also decided to forbid "est_cpulist" for unprivileged users=
+.
+
+>
+>         OTOH, "amemthresh" is not privileged but needs single READ_ONCE
+> for sysctl_amemthresh in update_defense_level() due to the possible
+> div by zero if we allow writing to anyone, eg.:
+>
+>         int amemthresh =3D max(READ_ONCE(ipvs->sysctl_amemthresh), 0);
+>         ...
+>         nomem =3D availmem < amemthresh;
+>         ... use only amemthresh
+>
+>         All other vars can be writable.
+
+Have fixed this and sent it as a separate patch! ;-)
+
+Thanks a lot for such a quick review!
+
+Kind regards,
+Alex
+
+>
+> Regards
+>
+> --
+> Julian Anastasov <ja@ssi.bg>
 
