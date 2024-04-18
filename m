@@ -1,143 +1,214 @@
-Return-Path: <netdev+bounces-88956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF0A38A9127
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 04:22:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB1118A9135
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 04:38:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED4231C20CBC
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 02:22:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17F541C20EAD
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 02:38:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 640074D9F7;
-	Thu, 18 Apr 2024 02:22:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E679041760;
+	Thu, 18 Apr 2024 02:38:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QpscMb+6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kM3BZftC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB08E3A27E
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 02:22:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 756C46FB0;
+	Thu, 18 Apr 2024 02:38:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713406933; cv=none; b=u3LW2OJkT+3vbv2ajPVsv88AYXz/cutVbne9TNiGLg1G80IMo5S0Lpxiefbb03fpu8UtMzRtvd+9x7Nplsbn5l3OcQ8+LK0LbFt2ATGZ/OHJJYu/IKdh+rDWh/2IFJhhMff+NIwR1UC/SccvA0GkmRCi0cgbrx6qZ7YFC9uNFsM=
+	t=1713407912; cv=none; b=oq8n5vHq673jUSyZmg2d+tHXp9yt97j+gj3SZadZ3KBRdADMW7Vz7nEitTHMcFjWSjHoM1sM4+6D5OwyIZoHHaBMswlV61g/Tgn4SG/Dk9BwOtfdU/iMzyKghTRJmehDqDndoHf9WZ56H8ZFpaSACXrMZSlWjVTxoqrtMPfN7B4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713406933; c=relaxed/simple;
-	bh=Qff+I+aGfGJWISm1b0a5UyILEZ6EJuYWH7ZKwAZRixI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lb5Oh9zLk6eLEqGfAIdt8tIMOunmSAsznOImuHziDzfCYj1vNSP5kAso3FkBV4o6nlFl9TOWrotO2OPKUTs0F9ke7MY/dHCqMnUuRRHBHymWtUbYkYXmC2EgY5UQun+RAUIAxtBQibFUGhJluG4EtZXF0VLEDeO7pCT1lz2Xrbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QpscMb+6; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a555faf94fcso28032766b.0
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 19:22:11 -0700 (PDT)
+	s=arc-20240116; t=1713407912; c=relaxed/simple;
+	bh=2/BplMB/+NX39KzviOne3YvcFRg/KQzo16KNiJwJ4bU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fg3bzIfzDNL7HaNIXAfyd5++grT3aDIn/j7alzHFmUayfWxIXdDJ1aCKxLwJSPrO4mUzhjQqCWfT9gaH2XhaFHmG6xuHAnrURHvBBrG1PmQBDOOEu2tZGEC114UdgYPfFokmiKdb9Q11UED28x1WlPsqdWjFbYGGPNvEvmqiDC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kM3BZftC; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6ed32341906so448424b3a.1;
+        Wed, 17 Apr 2024 19:38:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713406930; x=1714011730; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qff+I+aGfGJWISm1b0a5UyILEZ6EJuYWH7ZKwAZRixI=;
-        b=QpscMb+6hqAUTd5qWxcF6UIW7ngb7DEKzCUNxRUIFCcgTZAVcpt2eVTmgcnjS42vhU
-         0UU4MafQWpWsuGoNho5rKpXfC1G3RyHEOlBQOG1GBI8ywDD2a4ANzUV0rVJYVW8Sk6NK
-         M+4ru/M4YH6KMrA3pr7zSlSpRFKlW3SzXpteHwz2eH43Y7vEeBIBOrdSUldVaUTXRKC3
-         rUvoZPL6k+G25raHZymKwVq/KlmodYTfx/Cru0xz30BYpOZiTLGu2ogiwsUa4aAQzoJz
-         hgC/Jah0AdIUrL5kp4k5i4qcx7g2w4usyhnvw/skI5WPgdjn2N9TQ/PyiKfMqfxyT+yJ
-         72Gw==
+        d=gmail.com; s=20230601; t=1713407910; x=1714012710; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+K4sgg9aCm8qn+G/ntS65DmA1a0W6wNNqGijj5xDwRw=;
+        b=kM3BZftCYpNRU9NqysGOuBK8t/x1CaB1gMIcCfLmAhIlWJN+GdBvwqiiDVji6HTYtC
+         Ych80x2ZQFwL6aCuqArdB5s0jvB2GZH5LU9TujrBAz3zmLw5P/3SjEUajN9rp7mwI0YA
+         UTSIafXZs4Ak9uoaDPDCHpMaabnJQqqS0DEoaDUofxo5XvgsOHn9J+ETUdVsl/htx9mP
+         O4FvXcu5WidbG8bUioa79SWOIrMlgi0o6rNIp7No9k+KRJ8hKfdK80pXMoAhtFT3+bmj
+         1F9Cky9hIxgp5MC/OuZ3Xn1SR2oLRxAsGkASgprqZh1aANtRk3ISrSujxL3VKgKOq5/d
+         3Oxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713406930; x=1714011730;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Qff+I+aGfGJWISm1b0a5UyILEZ6EJuYWH7ZKwAZRixI=;
-        b=VHQ6cZLHnebst6Rkfhpwv3kSbzvnJ318/eVpk/Rwi98WnWYc8uy+k8AWRMFb616zWh
-         2wWA/A42oJjLjzAfFi28zt90vcYFCZiC8Lz52syndt0bw1MJOeyBpFPi1e9FEPcAobTD
-         Pyjt1jxLD6eoVoUYBc/8NbiGdpMvaIy2BUZB0qC1pWDIYHsR597IHB2Zo8X36lNKnONt
-         N/AJd226jwmbpNMC76He9dFtWKwzCTlMoOw8sgqn+/C8p/a2da6n4N5x38mxrpq0bhjG
-         ufM5eSvsh/IRNtr0RBwC+B60fQU2URCwAXLnxgvxeo0ghZn+x4hQfr9V6vV7P9/0dREU
-         NtTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU+QXLNThM4KbPIgTn+W1mYQDe03oPHudbo1++AgdY07fyQGDwIKewhVebZkF35Oohak6Mk818YXLGgcALntLVWdpagNjeH
-X-Gm-Message-State: AOJu0YxSHMryxIpsCUX3XYMFtmNxtHocMZLcbNtXtxsL6azSS7GLmUWv
-	E2EMv+TMrywoXZ2O7qDM7Gkg4dvOe5qSnnBAv79F4fekxAqKAEVyTdrcw/HbPI3rVc0KtEiKJBl
-	GZJAAG3l/UDYXqmtnUrfRT9ieZFeA39YCyhsK
-X-Google-Smtp-Source: AGHT+IEsn2jGrIe3C4gLKbA8+kMsvSSF1fhZfq37SxAlOsONgdio3k0OzSspWSZ5JGdHKbepDMsk16Du3X8HrZb0pAw=
-X-Received: by 2002:a17:906:38d:b0:a52:15dd:20d8 with SMTP id
- b13-20020a170906038d00b00a5215dd20d8mr707296eja.26.1713406929803; Wed, 17 Apr
- 2024 19:22:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713407910; x=1714012710;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+K4sgg9aCm8qn+G/ntS65DmA1a0W6wNNqGijj5xDwRw=;
+        b=Ar+gIFtC2c/TbjWuTIHQUIrOgLf+2fcdwtTVg/1gzc/1+cJwmq4c2sXxlBxZQk/1hM
+         YRco9ivIR9csk85Gr4Q+5UzRHQP4Wx3C9QB1KRgyW9M/8oIK2EYD0UWiZfJk6MZqAbOu
+         ILD3WWgmuxp8K3htizTIp3CKLVPt2wO/SBpk9W067KzRCJ/ByTNOsDu2AeeGu+fgMf11
+         SA5HM9UJOwE8Lkp2Ei+8z/IEU4kMIEagjnOP0Tfy005pIyfwR/TS7zwxRNrxg6hjMa61
+         UNQllZ4gHplOUGZoK1w5FcyFjI7CMJQS09jG/ILUb0PvrOJfk5K/IdJ+WgvZ8ZRkSI/b
+         kJpA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVh5w9cHbaoz9BA9OWPOALfWy5Ff9BciB04TdOhMBN0rwDK8EXCSSWdxGkO6rOiZI/tbsAaYAqwQUBSxvpGlXLve051QDXP+gjreEysIAF0pdpypxde5MNnyBsGjInU9NLqfghXE16Qd3scORoIJAlphpVWJiZF7/mP2VcFVj2
+X-Gm-Message-State: AOJu0YxY1N5YWPCiHl7p+Z1WPeO6DReDSaqXuqAPk+uJKQFpUN1wVXjb
+	h81Pp+xGnUEFhgkXGBzxoermqExmzWGbdX8pea8cblP+psjSROLM
+X-Google-Smtp-Source: AGHT+IEUVVnRvZxZrZhTcboaTALn+DFf5fhvExyo9g/fu7Aoq5uBj3vcvOQhvSWynLrZ1OycCRPNlQ==
+X-Received: by 2002:a05:6a00:10c2:b0:6ea:d149:c4e with SMTP id d2-20020a056a0010c200b006ead1490c4emr1778396pfu.14.1713407909732;
+        Wed, 17 Apr 2024 19:38:29 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id e21-20020a62ee15000000b006e729dd12d5sm381007pfi.48.2024.04.17.19.38.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Apr 2024 19:38:28 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id DBD2E181A49EF; Thu, 18 Apr 2024 09:38:26 +0700 (WIB)
+Date: Thu, 18 Apr 2024 09:38:26 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Danielle Ratson <danieller@nvidia.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, corbet@lwn.net, linux@armlinux.org.uk,
+	sdf@google.com, kory.maincent@bootlin.com,
+	maxime.chevallier@bootlin.com, vladimir.oltean@nxp.com,
+	przemyslaw.kitszel@intel.com, ahmed.zaki@intel.com,
+	richardcochran@gmail.com, shayagr@amazon.com,
+	paul.greenwalt@intel.com, jiri@resnulli.us,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	mlxsw@nvidia.com, petrm@nvidia.com, idosch@nvidia.com
+Subject: Re: [PATCH net-next v3 03/10] ethtool: Add an interface for flashing
+ transceiver modules' firmware
+Message-ID: <ZiCHotDYOfkPrDUt@archie.me>
+References: <20240417085347.2836385-1-danieller@nvidia.com>
+ <20240417085347.2836385-4-danieller@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <171328983017.3930751.9484082608778623495.stgit@firesoul> <171328990014.3930751.10674097155895405137.stgit@firesoul>
-In-Reply-To: <171328990014.3930751.10674097155895405137.stgit@firesoul>
-From: Yosry Ahmed <yosryahmed@google.com>
-Date: Wed, 17 Apr 2024 19:21:33 -0700
-Message-ID: <CAJD7tkbZAj3UQSHbu3kj1NG4QDowXWrohG4XM=7cX_a=QL-Shg@mail.gmail.com>
-Subject: Re: [PATCH v1 3/3] cgroup/rstat: introduce ratelimited rstat flushing
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: tj@kernel.org, hannes@cmpxchg.org, lizefan.x@bytedance.com, 
-	cgroups@vger.kernel.org, longman@redhat.com, netdev@vger.kernel.org, 
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org, shakeel.butt@linux.dev, 
-	kernel-team@cloudflare.com, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, mhocko@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="U4yNIw1J+x8YhZS5"
+Content-Disposition: inline
+In-Reply-To: <20240417085347.2836385-4-danieller@nvidia.com>
+
+
+--U4yNIw1J+x8YhZS5
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Apr 16, 2024 at 10:51=E2=80=AFAM Jesper Dangaard Brouer <hawk@kerne=
-l.org> wrote:
->
-> This patch aims to reduce userspace-triggered pressure on the global
-> cgroup_rstat_lock by introducing a mechanism to limit how often reading
-> stat files causes cgroup rstat flushing.
->
-> In the memory cgroup subsystem, memcg_vmstats_needs_flush() combined with
-> mem_cgroup_flush_stats_ratelimited() already limits pressure on the
-> global lock (cgroup_rstat_lock). As a result, reading memory-related stat
-> files (such as memory.stat, memory.numa_stat, zswap.current) is already
-> a less userspace-triggerable issue.
->
-> However, other userspace users of cgroup_rstat_flush(), such as when
-> reading io.stat (blk-cgroup.c) and cpu.stat, lack a similar system to
-> limit pressure on the global lock. Furthermore, userspace can easily
-> trigger this issue by reading those stat files.
->
-> Typically, normal userspace stats tools (e.g., cadvisor, nomad, systemd)
-> spawn threads that read io.stat, cpu.stat, and memory.stat (even from the
-> same cgroup) without realizing that on the kernel side, they share the
-> same global lock. This limitation also helps prevent malicious userspace
-> applications from harming the kernel by reading these stat files in a
-> tight loop.
->
-> To address this, the patch introduces cgroup_rstat_flush_ratelimited(),
-> similar to memcg's mem_cgroup_flush_stats_ratelimited().
->
-> Flushing occurs per cgroup (even though the lock remains global) a
-> variable named rstat_flush_last_time is introduced to track when a given
-> cgroup was last flushed. This variable, which contains the jiffies of the
-> flush, shares properties and a cache line with rstat_flush_next and is
-> updated simultaneously.
->
-> For cpu.stat, we need to acquire the lock (via cgroup_rstat_flush_hold)
-> because other data is read under the lock, but we skip the expensive
-> flushing if it occurred recently.
->
-> Regarding io.stat, there is an opportunity outside the lock to skip the
-> flush, but inside the lock, we must recheck to handle races.
->
-> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+On Wed, Apr 17, 2024 at 11:53:40AM +0300, Danielle Ratson wrote:
+> +MODULE_FW_FLASH_ACT
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +Flashes transceiver module firmware.
+> +
+> +Request contents:
+> +
+> +  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D  =3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+> +  ``ETHTOOL_A_MODULE_FW_FLASH_HEADER``     nested  request header
+> +  ``ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME``  string  firmware image file n=
+ame
+> +  ``ETHTOOL_A_MODULE_FW_FLASH_PASSWORD``   u32     transceiver module pa=
+ssword
+> +  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D  =3D=3D=3D=3D=3D=3D  =3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+> +
+> +The firmware update process is composed from three logical steps:
+                          "... consists of ..."
+> +
+> +1. Downloading a firmware image to the transceiver module and validating=
+ it.
+> +2. Running the firmware image.
+> +3. Committing the firmware image so that it is run upon reset.
+> +
+> +When flash command is given, those three steps are taken in that order.
+> +
+> +The ``ETHTOOL_A_MODULE_FW_FLASH_FILE_NAME`` attribute encodes the firmwa=
+re
+> +image file name. The firmware image is downloaded to the transceiver mod=
+ule,
+> +validated, run and committed.
+> +
+> +The optional ``ETHTOOL_A_MODULE_FW_FLASH_PASSWORD`` attribute encodes a =
+password
+> +that might be required as part of the transceiver module firmware update
+> +process.
+> +
+> +The firmware update process can take several minutes to complete. Theref=
+ore,
+> +during the update process notifications are emitted from the kernel to u=
+ser
+> +space updating it about the status and progress.
+> +
+> +Notification contents:
+> +
+> + +---------------------------------------------------+--------+---------=
+-------+
+> + | ``ETHTOOL_A_MODULE_FW_FLASH_HEADER``              | nested | reply he=
+ader   |
+> + +---------------------------------------------------+--------+---------=
+-------+
+> + | ``ETHTOOL_A_MODULE_FW_FLASH_STATUS``              | u32    | status  =
+       |
+> + +---------------------------------------------------+--------+---------=
+-------+
+> + | ``ETHTOOL_A_MODULE_FW_FLASH_STATUS_MSG``          | string | status m=
+essage |
+> + +---------------------------------------------------+--------+---------=
+-------+
+> + | ``ETHTOOL_A_MODULE_FW_FLASH_DONE``                | u64    | progress=
+       |
+> + +---------------------------------------------------+--------+---------=
+-------+
+> + | ``ETHTOOL_A_MODULE_FW_FLASH_TOTAL``               | u64    | total   =
+       |
+> + +---------------------------------------------------+--------+---------=
+-------+
+> +
+> +The ``ETHTOOL_A_MODULE_FW_FLASH_STATUS`` attribute encodes the current s=
+tatus
+> +of the firmware update process. Possible values are:
+> +
+> +.. kernel-doc:: include/uapi/linux/ethtool.h
+> +    :identifiers: ethtool_module_fw_flash_status
+> +
+> +The ``ETHTOOL_A_MODULE_FW_FLASH_STATUS_MSG`` attribute encodes a status =
+message
+> +string.
+> +
+> +The ``ETHTOOL_A_MODULE_FW_FLASH_DONE`` and ``ETHTOOL_A_MODULE_FW_FLASH_T=
+OTAL``
+> +attributes encode the completed and total amount of work, respectively.
+> +
 
-As I mentioned in another thread, I really don't like time-based
-rate-limiting [1]. Would it be possible to generalize the
-magnitude-based rate-limiting instead? Have something like
-memcg_vmstats_needs_flush() in the core rstat code?
+The rest of doc LGTM.
 
-Also, why do we keep the memcg time rate-limiting with this patch? Is
-it because we use a much larger window there (2s)? Having two layers
-of time-based rate-limiting is not ideal imo.
+Thanks.
 
-[1]https://lore.kernel.org/lkml/CAJD7tkYnSRwJTpXxSnGgo-i3-OdD7cdT-e3_S_yf7d=
-SknPoRKw@mail.gmail.com/
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--U4yNIw1J+x8YhZS5
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZiCHnAAKCRD2uYlJVVFO
+o9u5AQCh991QKxPxVHkr+z8uTqo7QtFFLL6GSuC0d8NU9MjenwEAh7gsRfJhdnbM
+bPm7npHuWepvh/Y0G1tafcOvUPUNKwg=
+=VpL+
+-----END PGP SIGNATURE-----
+
+--U4yNIw1J+x8YhZS5--
 
