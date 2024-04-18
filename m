@@ -1,132 +1,133 @@
-Return-Path: <netdev+bounces-89465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88FB68AA5DC
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 01:32:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 46A888AA5E6
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 01:38:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4045C1F21893
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 23:32:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CACB31F2169A
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 23:38:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05CD96A025;
-	Thu, 18 Apr 2024 23:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF41271B3D;
+	Thu, 18 Apr 2024 23:38:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="mr32p6JA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iibcZVH9"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808A64A20;
-	Thu, 18 Apr 2024 23:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95E4C54907;
+	Thu, 18 Apr 2024 23:38:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713483149; cv=none; b=Ll5twSuwFncA8pAOOiUtMihfH5TdumhWjqz+jFKyoA7mUD0z9TFnjRmMKa7udu9Vy9yW7qRIfCKjmdxxWQ3XvTI91IkNDgEZ/2ANiLDCtdZmd5qiVGjDtYwYImzEIoGkVNVtAITdQm/gymvtqCavCpyEm1Ms/wu5omwaqg3nhTg=
+	t=1713483530; cv=none; b=Kx/uoU40YvkaC9MZTRv9H7r+TZgDAk90L/XNgONsqquhZj4aTqXVDLgaKrLriF0DuRvWIuY8ko69T3CraBQrH035cDAknWgsdqAaOaHS9ekARye9ehLxqg/xMqoIIEYx2xPsQDT1KC5udE1PfScdpApV+ovGkpMEJMcwCV8H3Bg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713483149; c=relaxed/simple;
-	bh=EYZS2H6fzPOlRgIXVoWWJKSUl39I+Z1L0VjK4QxzVJA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=P7qYKjp8ajufHjtUgY5lY748hgxvgdSr6tJD83PvJb1xxlwoFFXIiGEOF+ZVco5sX1dhs906xyZ4xN3KqDlx4WBakEKIkwLbVDKedfSElXMxM1pdDt/8wyqYW2hmnaa897Y2TxHB6hDYOdsWkLUY8hEgSUmFjf4hO/rxQL1oge0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=mr32p6JA; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1713483144;
-	bh=R1/1szuT9hPMtMvkuBptcn8TSH/pfi2IMvhJaAia4Co=;
-	h=Date:From:To:Cc:Subject:From;
-	b=mr32p6JAyv4SxDo+9936crZYbf6KovnjXyG0Q17ypYhxbMDraLPtem01lORtrhaK/
-	 k72ummFSUpMcC3KbxHeaosI7IculQV30BCEj8VliL6fEObNUp9qIpeZaEd3P23/aBr
-	 33IoXhv3AaH7jQ1Yuxe5yapkLoZLw7tYC91Z/s1DfsF5OXaCXTmjrYr/ZUZ/uZd6bm
-	 /Uu1SJ+EgD19Vteke5FpF6pSJabPjNc76DQ0C2RVi4kUIhfNqDGjHwrGaX+ShGnzIl
-	 Dze55dlgakEoMLce6l9dBApXGw1Vr2n+J43FNKOZpDpF1z9Y7ECp7JJaPoxELB72Vr
-	 zFoYLIhDqVtcw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VLDZv0jPMz4wyq;
-	Fri, 19 Apr 2024 09:32:23 +1000 (AEST)
-Date: Fri, 19 Apr 2024 09:32:22 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Andrew Morton <akpm@linux-foundation.org>, David Miller
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>
-Cc: Edward Liaw <edliaw@google.com>, Networking <netdev@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the mm-hotfixes tree with Linus' tree
-Message-ID: <20240419093222.5a901a84@canb.auug.org.au>
+	s=arc-20240116; t=1713483530; c=relaxed/simple;
+	bh=1GK/S6OPKI5H31805uG2C4stCPsSr4VBSkY5Bv4RpkQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tWLrKDCfdDyu8JryWRBJ3SZrSGdGGZ2ExORZGM+X9CRNI7rwSXjZSj05sTsEoSnbuIfuEh1PiisXDJ3YuSOBEgoD+khtaWQ2DynKOiLIv+oxJBuQOrARfEMcRUlVNuC6aswZguduwMe+CKQVW0TNBYcxdJfOv8lPNZdRk5ElP+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iibcZVH9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A6ECC113CC;
+	Thu, 18 Apr 2024 23:38:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713483530;
+	bh=1GK/S6OPKI5H31805uG2C4stCPsSr4VBSkY5Bv4RpkQ=;
+	h=From:To:Cc:Subject:Date:From;
+	b=iibcZVH9rUQz709UH0YQ8acb9OVO4TGU+JRl/qwtkv6nosQytnQvWEFwgaq5qJk+H
+	 xYzfyRKWaKTgIBP9bDWKnLcAratQis6Az1rfN1UZLvYkWEaqzLfL/vTXo3cLC2gU6d
+	 1r/sxlnob4DAn3f0CPtGTmkjuxN2cusA7pWNdD9S0NyTYJBK6o0qbkndeVVNbIFYqq
+	 lX1GNazvbxEZbxzoe/WRRLbcyTtsEMRoZ8sk1EyzG/wPhwlHNchIbBwMz0qokd+lqu
+	 8Rvyrk7ZNckuH8JS9qW/ZUY/52CWv4ZJNOClMiYmRjiSHiSpeD2aMJgTJ2H15yRLMy
+	 NiOg6KEay87oQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	petrm@nvidia.com,
+	linux-kselftest@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next v4 0/7] selftests: drv-net: support testing with a remote system
+Date: Thu, 18 Apr 2024 16:38:37 -0700
+Message-ID: <20240418233844.2762396-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Lo7x+b/tFAF1roENO8l.nWi";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
 
---Sig_/Lo7x+b/tFAF1roENO8l.nWi
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi!
 
-Hi all,
+Implement support for tests which require access to a remote system /
+endpoint which can generate traffic.
+This series concludes the "groundwork" for upstream driver tests.
 
-Today's linux-next merge of the mm-hotfixes tree got a conflict in:
+I wanted to support the three models which came up in discussions:
+ - SW testing with netdevsim
+ - "local" testing with two ports on the same system in a loopback
+ - "remote" testing via SSH
+so there is a tiny bit of an abstraction which wraps up how "remote"
+commands are executed. Otherwise hopefully there's nothing surprising.
 
-  tools/testing/selftests/kselftest_harness.h
+I'm only adding a ping test. I had a bigger one written but I was
+worried we'll get into discussing the details of the test itself
+and how I chose to hack up netdevsim, instead of the test infra...
+So that test will be a follow up :)
 
-between commit:
+v4:
+ - improve coding sytle of patch 5
+ - switch from netcat to socat (patch 6)
+ - support exit_wait for bkg() in context manager
+ - add require_XYZ() helpers (patch 7)
+ - increase timeouts a little (1,3 -> 5 sec)
+v3: https://lore.kernel.org/all/20240417231146.2435572-1-kuba@kernel.org
+ - first two patches are new
+ - make Remote::cmd() return Popen() object (patch 3)
+ - always operate on absolute paths (patch 3)
+ - last two patches are new
+v2: https://lore.kernel.org/all/20240416004556.1618804-1-kuba@kernel.org
+ - rename endpoint -> remote
+ - use 2001:db8:: v6 prefix
+ - add a note about persistent SSH connections
+ - add the kernel config
+v1: https://lore.kernel.org/all/20240412233705.1066444-1-kuba@kernel.org
 
-  caed8eba2215 ("selftests: kselftest_harness: fix Clang warning about zero=
--length format")
+Jakub Kicinski (7):
+  selftests: drv-net: define endpoint structures
+  selftests: drv-net: factor out parsing of the env
+  selftests: drv-net: construct environment for running tests which
+    require an endpoint
+  selftests: drv-net: add a trivial ping test
+  selftests: net: support matching cases by name prefix
+  selftests: drv-net: add a TCP ping test case (and useful helpers)
+  selftests: drv-net: add require_XYZ() helpers for validating env
 
-from Linus' tree and commit:
+ tools/testing/selftests/drivers/net/Makefile  |   5 +-
+ .../testing/selftests/drivers/net/README.rst  |  33 ++++
+ .../selftests/drivers/net/lib/py/__init__.py  |   1 +
+ .../selftests/drivers/net/lib/py/env.py       | 174 ++++++++++++++++--
+ .../selftests/drivers/net/lib/py/remote.py    |  15 ++
+ .../drivers/net/lib/py/remote_netns.py        |  21 +++
+ .../drivers/net/lib/py/remote_ssh.py          |  39 ++++
+ tools/testing/selftests/drivers/net/ping.py   |  54 ++++++
+ .../testing/selftests/net/lib/py/__init__.py  |   1 +
+ tools/testing/selftests/net/lib/py/ksft.py    |  13 +-
+ tools/testing/selftests/net/lib/py/netns.py   |  31 ++++
+ tools/testing/selftests/net/lib/py/utils.py   |  52 +++++-
+ 12 files changed, 410 insertions(+), 29 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/lib/py/remote.py
+ create mode 100644 tools/testing/selftests/drivers/net/lib/py/remote_netns.py
+ create mode 100644 tools/testing/selftests/drivers/net/lib/py/remote_ssh.py
+ create mode 100755 tools/testing/selftests/drivers/net/ping.py
+ create mode 100644 tools/testing/selftests/net/lib/py/netns.py
 
-  52124c13ec1f ("selftests/harness: remove use of LINE_MAX")
+-- 
+2.44.0
 
-from the mm-hotfixes-unstable branch of the mm-hotfixes tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc tools/testing/selftests/kselftest_harness.h
-index ba3ddeda24bf,f0ae1f6466db..000000000000
---- a/tools/testing/selftests/kselftest_harness.h
-+++ b/tools/testing/selftests/kselftest_harness.h
-@@@ -1205,7 -1205,8 +1208,8 @@@ void __run_test(struct __fixture_metada
-  		diagnostic =3D "unknown";
- =20
-  	ksft_test_result_code(t->exit_code, test_name,
- -			      diagnostic ? "%s" : "", diagnostic);
- +			      diagnostic ? "%s" : NULL, diagnostic);
-+ 	free(test_name);
-  }
- =20
-  static int test_harness_run(int argc, char **argv)
-
---Sig_/Lo7x+b/tFAF1roENO8l.nWi
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYhrYYACgkQAVBC80lX
-0GxIXAf9GkUydFR4L+GRsO3dV79ZUMzgzwRca1uFwzNSaJkaO54D90SFXWhPecod
-1NY7M72Lg9cNT6PqpO6xQ9zPnWjdWlU1fAdZMuZx+Li/MFzmnqBW4S73F1q6HhCx
-LikcWI939KGsPG9uBbQ0lxQnG+JBNNp+z7Wny3ypLxOp5e2oqFkySwzWFgv+BS+x
-vH9a+BAuBXOzZv/a3heyAmOLx9sNzOAT0HFRnUrEb+dSAVH0wLD9uAdXqCbBQpgd
-WtcsCPewuKXVXnKd6GLelrG78GhhED/ezFejgxzDSrJCpcWGISzLO2lR7V7ijIRB
-x8POmTps9e6xUxr+8xAYqA9cFrYtuw==
-=wSr3
------END PGP SIGNATURE-----
-
---Sig_/Lo7x+b/tFAF1roENO8l.nWi--
 
