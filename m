@@ -1,227 +1,161 @@
-Return-Path: <netdev+bounces-89459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 350708AA4EC
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 23:57:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15F108AA573
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 00:30:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A358A1F214C1
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 21:57:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96A5F2848B4
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49850199E8E;
-	Thu, 18 Apr 2024 21:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFD39199EA8;
+	Thu, 18 Apr 2024 22:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hdDV1nrZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kkYIUns+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8DA199E89
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 21:57:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1578718410C;
+	Thu, 18 Apr 2024 22:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713477444; cv=none; b=dFfUDcG+Bgm+SAa7wG6+gzECgzdscTVq1CC5ugVaZVxwxqiwwWoCN/vYQxFkECVe+uMRkGxYglFbmJoIcj/yI4IhYTs/RCPAKMaOIbLar68aTnwwN44xn1coymhHxZU58B6ieFte5nLHAyoJuSh3UdEE78QXtPv9juCXhAoTNNY=
+	t=1713479400; cv=none; b=jtgVrbOcQNTexDkEkhj26CuYHeHcrcxjzXxHyVGbggYks0q+iSDS8U1WhymAUGXqHnzVfZPkaKyiBv2IwYsLwuTdBYfj1OatqFtG8y/UIxBJHz+a2/462/1l9vmpcnpur9p9wxVnGCPJfbb27va3XRbbEIIutgXk+MSXmlqQAuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713477444; c=relaxed/simple;
-	bh=zooV8U1KdjxrLXansfLdXT2+NI7EJnxfn32RZkboLRk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ab4dowA2pKXcZUwz2HCqFR6Uodkell68GaUfs3izE+1JUAbnCGf5foPNKNMjbQ/rWYk4iQ9YJg4Y4hb1+BE3xSyivaayMQaJ/qPe1WXc2fbvJmBO4dWPrMhabwb/1Byx0nvwHPUNpKhk425E59Q2DgTAqjgSzHeacFV77m/Xzc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hdDV1nrZ; arc=none smtp.client-ip=95.215.58.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <c6f33a36-1fac-4738-8a4f-c930b544ba62@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713477439;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=biLTizcyKoXID4ZbzhVKkocFif6oiK6wrP0PDSnRgzg=;
-	b=hdDV1nrZbThWa8XN/NOAuO1TL/Ie+Qg92kBzCL9omoSluxR1TfCLUx3kwj9uwhbZkQYaly
-	uNfd4ePrxFLgf+WRQfHgp2SaiXqpRKDRAXNl3xVPpKLOw7cA/oobIZEK8kVA4zAI/YhO1e
-	GatKGoshXof6N78AwIH65m7xeSRUk7E=
-Date: Thu, 18 Apr 2024 14:57:12 -0700
+	s=arc-20240116; t=1713479400; c=relaxed/simple;
+	bh=jny9PTEeGCQgR6BpCNvvucw65gCkhQ8IJ4lvib0jUHY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Zxg6hA+Z8jYse3j2WhhbIjU44eLD7JzHhAm/YrLurOK1wSdQ59T8KXfDw/SxiY/ZIfbXll1GIkPnCtoHAqOCm9PBFteIPmoaDFp9uhRfkkkXX/tKyIiJoRUfDpAQdnQepCRGzPkbcLFdUXMziKBWb++g044YhJzZ8drc/RVajz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kkYIUns+; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a5252e5aa01so171795366b.1;
+        Thu, 18 Apr 2024 15:29:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713479397; x=1714084197; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J+4KvND2mQ965yY+mYlrwgLNNZfgfM81bsxNc9865q0=;
+        b=kkYIUns+Vg///cRYbI/zIfbQs69OcbOKvnxU4bgcl8ZNVPIgMt8UKObIRqx0lVoQNp
+         4pnJ4s/N7ROBO7zv2ml8nw/WQ2kgnikCfPz5L5gdgeRr7miL9o+BC15F7mnpTLyrLsQ8
+         QjoC7bs2KP66o1l12H2gzoyl26Y//6fyf3T8wWKee3InnL4NHXYwoYOPGF67FJ+vuT6I
+         f53d6yBJgCqsQ9EjXJez4DasaMCyIsnpsCSFCX3pXdjsfJphrB6eaFR/lLjx4LRSU1f8
+         ABjiEj6jOLFsp/le1fjAksvkFxMQB70A+fWW7q3knd9wzlQ+XWm1UeyCPpeu7jAwGs1y
+         pJbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713479397; x=1714084197;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=J+4KvND2mQ965yY+mYlrwgLNNZfgfM81bsxNc9865q0=;
+        b=tF/89k/cmYCQQykhJ6ATlecL7Uv58+D3eil3j9oLwDA2Hyzvzg/cAXluzcxsi03Fxt
+         DqE4DM9SWy+O+T/FbJvqhBEXF5U6AxhBIKi0Dc8cmpLWhphOvn6P3tyH8G8zLK926sVc
+         9b4ALQ+AWGtYo7imyBA/TR1mRwPAlY64XbxagFHBQLSjfuTCceZwkHNi8qXohI/LSEUF
+         EAMPyG6ueXHLkh9tkcdT7qnor01SYffqzvPInUr3+gmkPAFBO//Z7LKfqUIVUKjV7V0D
+         LxEq/4IoRolFda81K6YfAPOMUS45ErfNWn3F7G5kzplz/H0uymObkhWkFaxPk9uMrBs/
+         61rg==
+X-Forwarded-Encrypted: i=1; AJvYcCXfiexOEBMBgJ1DQakhSFGIbB1onb3zxJdF2tnhAB0mMbvv0nM5+JPEoIbkvvnUHkCUembQkud/Wt99cePrqZM2/mPkHCFxq0q3cs7W2e32dWShZT4dyiARTdewcwfReBCQs8VwvVG/KKEd
+X-Gm-Message-State: AOJu0YwN4CVfkBzfhp5KYZ9iWx3h0PW4ZINl7WxcgAxN3xNNdwYVNERu
+	h/lHkMp2J8FF+I79G0sQy1b0SIM2aFqBlGyRYJug+gXZJ4by5gPCnwS7lkDgQ86v8OmRVEk2hOG
+	RBl3Uqm1PRHuBdHSVSYzTQtiWvxA=
+X-Google-Smtp-Source: AGHT+IE6V5mFUZPVGUU2SzTgBj9jbHCjqFZL9dLnzLdH+rsYdJvHGFBAYrSPLP1rELbC3l9mAh5Ete7xbMLWCE/4MbA=
+X-Received: by 2002:a17:906:855:b0:a52:5a6c:a359 with SMTP id
+ f21-20020a170906085500b00a525a6ca359mr221188ejd.63.1713479397058; Thu, 18 Apr
+ 2024 15:29:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH bpf-next v4 2/2] net: Add additional bit to support
- clockid_t timestamp type
-To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
- Martin KaFai Lau <martin.lau@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>,
- kernel@quicinc.com
-References: <20240418004308.1009262-1-quic_abchauha@quicinc.com>
- <20240418004308.1009262-3-quic_abchauha@quicinc.com>
- <66216f3ec638b_f648a294ec@willemb.c.googlers.com.notmuch>
- <cb922600-783e-4741-be85-260d1ded5bdb@quicinc.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <cb922600-783e-4741-be85-260d1ded5bdb@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20240417085143.69578-1-kerneljasonxing@gmail.com>
+ <CAL+tcoDJZe9pxjmVfgnq8z_sp6Zqe-jhWqoRnyuNwKXuPLGzVQ@mail.gmail.com>
+ <20240418084646.68713c42@kernel.org> <CAL+tcoD4hyfBz4LrOOh6q6OO=6G7zpdXBQgR2k4rH3FwXsY3XA@mail.gmail.com>
+ <CANn89iJ4pW7OFQ59RRHMimdYdN9PZ=D+vEq0je877s0ijH=xeg@mail.gmail.com>
+In-Reply-To: <CANn89iJ4pW7OFQ59RRHMimdYdN9PZ=D+vEq0je877s0ijH=xeg@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 19 Apr 2024 06:29:20 +0800
+Message-ID: <CAL+tcoBVYWaMAYRdBC6UKiNuhdR7cK+570=0Kw1MKEhPhBL_AA@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 0/7] Implement reset reason mechanism to detect
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, dsahern@kernel.org, matttbe@kernel.org, 
+	martineau@kernel.org, geliang@kernel.org, pabeni@redhat.com, 
+	davem@davemloft.net, rostedt@goodmis.org, mhiramat@kernel.org, 
+	mathieu.desnoyers@efficios.com, atenart@kernel.org, mptcp@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 4/18/24 1:10 PM, Abhishek Chauhan (ABC) wrote:
->>>   #ifdef CONFIG_NET_XGRESS
->>>   	__u8			tc_at_ingress:1;	/* See TC_AT_INGRESS_MASK */
->>>   	__u8			tc_skip_classify:1;
->>> @@ -1096,10 +1100,12 @@ struct sk_buff {
->>>    */
->>>   #ifdef __BIG_ENDIAN_BITFIELD
->>>   #define SKB_MONO_DELIVERY_TIME_MASK	(1 << 7)
->>> -#define TC_AT_INGRESS_MASK		(1 << 6)
->>> +#define SKB_TAI_DELIVERY_TIME_MASK	(1 << 6)
->>
->> SKB_TSTAMP_TYPE_BIT2_MASK?
+On Fri, Apr 19, 2024 at 2:51=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Thu, Apr 18, 2024 at 6:24=E2=80=AFPM Jason Xing <kerneljasonxing@gmail=
+.com> wrote:
+> >
+> > On Thu, Apr 18, 2024 at 11:46=E2=80=AFPM Jakub Kicinski <kuba@kernel.or=
+g> wrote:
+> > >
+> > > On Thu, 18 Apr 2024 11:30:02 +0800 Jason Xing wrote:
+> > > > I'm not sure why the patch series has been changed to 'Changes
+> > > > Requested', until now I don't think I need to change something.
+> > > >
+> > > > Should I repost this series (keeping the v6 tag) and then wait for
+> > > > more comments?
+> > >
+> > > If Eric doesn't like it - it's not getting merged.
+> >
+> > I'm not a English native speaker. If I understand correctly, it seems
+> > that Eric doesn't object to the patch series. Here is the quotation
+> > [1]:
+> > "If you feel the need to put them in a special group, this is fine by m=
+e."
+> >
+> > This rst reason mechanism can cover all the possible reasons for both
+> > TCP and MPTCP. We don't need to reinvent some definitions of reset
+> > reasons which are totally the same as drop reasons. Also, we don't
+> > need to reinvent something to cover MPTCP. If people are willing to
+> > contribute more rst reasons, they can find a good place.
+> >
+> > Reset is one big complicated 'issue' in production. I spent a lot of
+> > time handling all kinds of reset reasons daily. I'm apparently not the
+> > only one. I just want to make admins' lives easier, including me. This
+> > special/separate reason group is important because we can extend it in
+> > the future, which will not get confused.
+> >
+> > I hope it can have a chance to get merged :) Thank you.
+> >
+> > [1]: https://lore.kernel.org/all/CANn89i+aLO_aGYC8dr8dkFyi+6wpzCGrogysv=
+gR8FrfRvaa-Vg@mail.gmail.com/
+> >
+> > Thanks,
+> > Jason
+>
+> My objection was these casts between enums. Especially if hiding with (u3=
+2)
 
-nit. Shorten it to just SKB_TSTAMP_TYPE_MASK?
+So I should explicitly cast it like this:
+    tcp_v4_send_reset(rsk, skb, (enum sk_rst_reason)reason);
+?
 
-#ifdef __BIG_ENDIAN_BITFIELD
-#define SKB_TSTAMP_TYPE_MASK	(3 << 6)
-#define SKB_TSTAMP_TYPE_RSH	(6)	/* more on this later */
-#else
-#define SKB_TSTAMP_TYPE_MASK	(3)
-#endif
+>
+> I see no reason for adding these casts in TCP stack.
 
->>
-> I was thinking to keep it as TAI because it will confuse developers. I hope thats okay.
+Sorry, I don't know why the casts really make you so annoyed. But I
+still think it's not a bad way to handle all the cases for RST.
 
-I think it is not very useful to distinguish each bit since it is an enum value 
-now. It becomes more like the "pkt_type:3" and its PKT_TYPE_MAX.
+Supposing not to add a enum sk_rst_reason{}, passing drop reasons only
+works well in TCP for passive rests. For active reset cases (in the
+tcp_send_active_reset()), it's meaningless/confusing to insist on
+reusing the drop reason because I have to add some reset reasons (that
+are only used in RST cases) in the enum skb_drop_reason{}, which is
+really weird, in my view. The same problem exists in how to handle
+MPTCP. So I prefer putting them in a separate group like now. What do
+you think about it, right now?
 
->>> +#define TC_AT_INGRESS_MASK		(1 << 5)
->>>   #else
->>>   #define SKB_MONO_DELIVERY_TIME_MASK	(1 << 0)
->>> -#define TC_AT_INGRESS_MASK		(1 << 1)
->>> +#define SKB_TAI_DELIVERY_TIME_MASK	(1 << 1)
->>> +#define TC_AT_INGRESS_MASK		(1 << 2)
->>>   #endif
->>>   #define SKB_BF_MONO_TC_OFFSET		offsetof(struct sk_buff, __mono_tc_offset)
->>>   
->>> @@ -4206,6 +4212,11 @@ static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
->>>   	case CLOCK_MONOTONIC:
->>>   		skb->tstamp_type = SKB_CLOCK_MONO;
->>>   		break;
->>> +	case CLOCK_TAI:
->>> +		skb->tstamp_type = SKB_CLOCK_TAI;
->>> +		break;
->>> +	default:
->>> +		WARN_ONCE(true, "clockid %d not supported", tstamp_type);
->>
->> and set to 0 and default tstamp_type?
->> Actually thinking about it. I feel if its unsupported just fall back to default is the correct thing. I will take care of this.
->>>   	}
->>>   }
->>
->>>   >
->>   @@ -9372,10 +9378,16 @@ static struct bpf_insn *bpf_convert_tstamp_type_read(const struct bpf_insn *si,
->>>   	*insn++ = BPF_LDX_MEM(BPF_B, tmp_reg, skb_reg,
->>>   			      SKB_BF_MONO_TC_OFFSET);
->>>   	*insn++ = BPF_JMP32_IMM(BPF_JSET, tmp_reg,
->>> -				SKB_MONO_DELIVERY_TIME_MASK, 2);
->>> +				SKB_MONO_DELIVERY_TIME_MASK | SKB_TAI_DELIVERY_TIME_MASK, 2);
->>> +	*insn++ = BPF_JMP32_IMM(BPF_JSET, tmp_reg,
->>> +				SKB_MONO_DELIVERY_TIME_MASK, 3);
->>> +	*insn++ = BPF_JMP32_IMM(BPF_JSET, tmp_reg,
->>> +				SKB_TAI_DELIVERY_TIME_MASK, 4);
->>>   	*insn++ = BPF_MOV32_IMM(value_reg, BPF_SKB_TSTAMP_UNSPEC);
->>>   	*insn++ = BPF_JMP_A(1);
->>>   	*insn++ = BPF_MOV32_IMM(value_reg, BPF_SKB_TSTAMP_DELIVERY_MONO);
->>> +	*insn++ = BPF_JMP_A(1);
->>> +	*insn++ = BPF_MOV32_IMM(value_reg, BPF_SKB_TSTAMP_DELIVERY_TAI);
-
-With SKB_TSTAMP_TYPE_MASK defined like above, this could be simplified like this 
-(untested):
-
-static struct bpf_insn *bpf_convert_tstamp_type_read(const struct bpf_insn *si,
-                                                      struct bpf_insn *insn)
-{
-	__u8 value_reg = si->dst_reg;
-	__u8 skb_reg = si->src_reg;
-
-	BUILD_BUG_ON(__SKB_CLOCK_MAX != BPF_SKB_TSTAMP_DELIVERY_TAI);
-	*insn++ = BPF_LDX_MEM(BPF_B, value_reg, skb_reg, SKB_BF_MONO_TC_OFFSET);
-	*insn++ = BPF_ALU32_IMM(BPF_AND, value_reg, SKB_TSTAMP_TYPE_MASK);
-#ifdef __BIG_ENDIAN_BITFIELD
-	*insn++ = BPF_ALU32_IMM(BPF_RSH, value_reg, SKB_TSTAMP_TYPE_RSH);
-#else
-	BUILD_BUG_ON(!(SKB_TSTAMP_TYPE_MASK & 0x1));
-#endif
-
-	return insn;
-}
-
->>>   
->>>   	return insn;
->>>   }
->>> @@ -9418,10 +9430,26 @@ static struct bpf_insn *bpf_convert_tstamp_read(const struct bpf_prog *prog,
->>>   		__u8 tmp_reg = BPF_REG_AX;
->>>   
->>>   		*insn++ = BPF_LDX_MEM(BPF_B, tmp_reg, skb_reg, SKB_BF_MONO_TC_OFFSET);
->>> +		/*check if all three bits are set*/
->>>   		*insn++ = BPF_ALU32_IMM(BPF_AND, tmp_reg,
->>> -					TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK);
->>> -		*insn++ = BPF_JMP32_IMM(BPF_JNE, tmp_reg,
->>> -					TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK, 2);
->>> +					TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK |
->>> +					SKB_TAI_DELIVERY_TIME_MASK);
->>> +		/*if all 3 bits are set jump 3 instructions and clear the register */
->>> +		*insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg,
->>> +					TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK |
->>> +					SKB_TAI_DELIVERY_TIME_MASK, 4);
->>> +		/*Now check Mono is set with ingress mask if so clear */
->>> +		*insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg,
->>> +					TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK, 3);
->>> +		/*Now Check tai is set with ingress mask if so clear */
->>> +		*insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg,
->>> +					TC_AT_INGRESS_MASK | SKB_TAI_DELIVERY_TIME_MASK, 2);
->>> +		/*Now Check tai and mono are set if so clear */
->>> +		*insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg,
->>> +					SKB_MONO_DELIVERY_TIME_MASK |
->>> +					SKB_TAI_DELIVERY_TIME_MASK, 1);
-
-Same as the bpf_convert_tstamp_type_read, this could be simplified with 
-SKB_TSTAMP_TYPE_MASK.
-
->>
->> This looks as if all JEQ result in "if so clear"?
->>
->> Is the goal to only do something different for the two bits being 0x1,
->> can we have a single test with a two-bit mask, rather than four tests?
->>
-> I think Martin wanted to take care of TAI as well. I will wait for his comment here
-> 
-> My Goal was to take care of invalid combos which does not hold valid
-> 1. If all 3 bits are set => invalid combo (Test case written is Insane)
-> 2. If 2 bits are set (tai+mono)(Test case written is Insane) => this cannot happen (because clock base can only be one in skb)
-> 3. If 2 bit are set (ingress + tai/mono) => This is existing logic + tai being added (clear tstamp in ingress)
-> 4. For all other cases go ahead and fill in the tstamp in the dest register.
-
-If it is to ensure no new type is added without adding 
-BPF_SKB_TSTAMP_DELIVERY_XYZ, I would simplify this runtime bpf insns here and 
-use a BUILD_BUG_ON to catch it at compile time. Something like,
-
-enum skb_tstamp_type {
-         SKB_CLOCK_REAL, /* Time base is skb is REALTIME */
-         SKB_CLOCK_MONO, /* Time base is skb is MONOTONIC */
-  	SKB_CLOCK_TAI,  /* Time base in skb is TAI */
-         __SKB_CLOCK_MAX = SKB_CLOCK_TAI,
-};
-
-/* Same one used in the bpf_convert_tstamp_type_read() above */
-BUILD_BUG_ON(__SKB_CLOCK_MAX != BPF_SKB_TSTAMP_DELIVERY_TAI);
-
-Another thing is, the UDP test in test_tc_dtime.c probably needs to be adjusted, 
-the userspace is using the CLOCK_TAI in SO_TXTIME and it is getting forwarded now.
+Thanks,
+Jason
 
