@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-89363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61A8A8AA21A
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:35:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DBC58AA21E
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:38:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 936511C20C02
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 18:35:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF9821C2156A
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 18:38:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8BAF168B17;
-	Thu, 18 Apr 2024 18:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7396E16D30B;
+	Thu, 18 Apr 2024 18:38:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h3ijDpKv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DY50xFiE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7133D62;
-	Thu, 18 Apr 2024 18:35:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498ED16C438;
+	Thu, 18 Apr 2024 18:38:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713465349; cv=none; b=bCV0SHw8RlAztifAAUPLhozCJOltmt8CKCKiWuzOWbFVQ36M/taOjGKGhw7KoFYpTsUrSL2HfKhEcGi6FIiSzrcepVdbSz9On1fjb45bNh7ygqVMb3fTT/veghrGgxGW5ljAfWNo284YGjzBZDHrmj7R8SpWZsVhbrJgv/ShVGo=
+	t=1713465506; cv=none; b=LprRBf1VSH2/WeCDSzwzmZF+GD09mwqNPGqH6L3IMPhdzx03oyBQlbZvBCpq+kkWMbo9D7m1VAdn6VisSgeLYLEtH273kLBLF382/Z4yQ0n4JWb+Fvn0mIs55rdhX+mgMchWHpYzy77mp65fUFFMKwKQrO5Vvj/7hxLp/EuoEl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713465349; c=relaxed/simple;
-	bh=KV8JSooMa4OX5xetB7ccSt0dadeQ9ph7gDSPTOEbIr8=;
+	s=arc-20240116; t=1713465506; c=relaxed/simple;
+	bh=/2OgoxKDBN2MBqE0ejk+VYzE32r/z0A9/r00iV40u6Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o3vwMK2av81E06kad6thoPQgJ9dJumW2P6daIu18aG1PRPRDsoeehww2Lkgy6f8Z9d3xyxS5/7pSCsZVEvG0b/C7h6hIru/T/FY6uQ7LxfTS6gnRGEFZvLure1YB+2SAOmFsYg4t58Dc8KEiy2GpBNJCmsyqx0CH0Dy75hC4znE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h3ijDpKv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C2FAC113CC;
-	Thu, 18 Apr 2024 18:35:47 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=D+u8dALcToC/P8Txvyk2dYtrs8t6clW1XOp7ngAovFHYw8Ws46sJYfftvHAqEqc7nnv8W8MvS77gpudy81j3jjPgWvLORXgPscTG+45TuoIDIgM8vmH7xfHHX0N/1UsibdbhdNQE2K7fx+IuhUWDxqrk+/DIEQaRpkc/eQm9PLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DY50xFiE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9172C113CC;
+	Thu, 18 Apr 2024 18:38:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713465349;
-	bh=KV8JSooMa4OX5xetB7ccSt0dadeQ9ph7gDSPTOEbIr8=;
+	s=k20201202; t=1713465505;
+	bh=/2OgoxKDBN2MBqE0ejk+VYzE32r/z0A9/r00iV40u6Y=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=h3ijDpKvaNZHUWrm63Hqtr+tleaf0dH/AKVB7YM8gMVIkLHlxUtwlGaTTosKy0CSE
-	 Ugn89EnNrYV8eS6vpwy+AQQE9MEkcr2uUop6UeZ+qxAof+1Dj25QHfRToCzeGmGeMz
-	 6eAB6bTguYXOxsKalXfJa8/xoKF88dr+DCQ5nNNQmtRqr2XVIfYCxufuDkefZQwhbS
-	 essau1LCs7WVQe5XZaZknyA9eJMsFW9eCCUlBAW8WKTqqeRriz+9qstUF1q2rvT94d
-	 vCebvmnrTd6Bq41ZytM6ZNTLsvfJqVCvLRWy6VHZKcL0F1kZvcjS4yeaJzSg1Wbthz
-	 UvgLOHreTx2ig==
-Date: Thu, 18 Apr 2024 19:35:45 +0100
+	b=DY50xFiEN1LZrv32izTmTxre69moJG1xz2gJyKl5XZlU6bS6GLyp7mKbtYqVpKzXD
+	 V+/hUUFQ1UgQx5kjZZg7L7wGBm8kVVL2OYPl+DpWOlKr6FQiKslX23aFFQgDLUf+H/
+	 Nc8PBofvbJoH7SLWyaKOc9ztpFGBYoHZ5x7t6ji3GXSuieSScSZ24vKJF40s321UO7
+	 Q+qjB3qNZQVCU8I8HxKLk81/JDTIGsHh52YaFkgHQfSaH3IbVvWRwqJPcV8Wy3QPDg
+	 MicUAWf1dGGZ38hbz7/sbajyezfMfUxYNklgvcURlWMlk12SPawnnuJ8Bd8kNdTYjz
+	 wV0RAYLvVCF0w==
+Date: Thu, 18 Apr 2024 19:38:21 +0100
 From: Simon Horman <horms@kernel.org>
-To: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+To: =?utf-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next] net: ethernet: rtsn: Add support for Renesas
- Ethernet-TSN
-Message-ID: <20240418183545.GN3975545@kernel.org>
-References: <20240414135937.1139611-1-niklas.soderlund+renesas@ragnatech.se>
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: Re: [PATCH iwl-next] igb: flower: validate control flags
+Message-ID: <20240418183821.GO3975545@kernel.org>
+References: <20240416144335.15353-1-ast@fiberby.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,61 +63,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240414135937.1139611-1-niklas.soderlund+renesas@ragnatech.se>
+In-Reply-To: <20240416144335.15353-1-ast@fiberby.net>
 
-On Sun, Apr 14, 2024 at 03:59:37PM +0200, Niklas Söderlund wrote:
-> Add initial support for Renesas Ethernet-TSN End-station device of R-Car
-> V4H. The Ethernet End-station can connect to an Ethernet network using a
-> 10 Mbps, 100 Mbps, or 1 Gbps full-duplex link via MII/GMII/RMII/RGMII.
-> Depending on the connected PHY.
+On Tue, Apr 16, 2024 at 02:43:35PM +0000, Asbjørn Sloth Tønnesen wrote:
+> This driver currently doesn't support any control flags.
 > 
-> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+> Use flow_rule_match_has_control_flags() to check for control flags,
+> such as can be set through `tc flower ... ip_flags frag`.
+> 
+> In case any control flags are masked, flow_rule_match_has_control_flags()
+> sets a NL extended error message, and we return -EOPNOTSUPP.
+> 
+> Only compile-tested.
+> 
+> Signed-off-by: Asbjørn Sloth Tønnesen <ast@fiberby.net>
 
-...
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-> +static int rtsn_mii_register(struct rtsn_private *priv)
-> +{
-> +	struct platform_device *pdev = priv->pdev;
-> +	struct device *dev = &pdev->dev;
-> +	struct device_node *mdio_node;
-> +	struct mii_bus *mii;
-> +	int ret;
-> +
-> +	mii = mdiobus_alloc();
-> +	if (!mii)
-> +		return -ENOMEM;
-> +
-> +	mdio_node = of_get_child_by_name(dev->of_node, "mdio");
-> +	if (!mdio_node) {
-> +		ret = -ENODEV;
-> +		goto out_free_bus;
-> +	};
-
-nit: the ';' is not needed on the line above.
-
-Flagged by Coccinelle.
-
-> +
-> +	mii->name = "rtsn_mii";
-> +	sprintf(mii->id, "%s-%x", pdev->name, pdev->id);
-> +	mii->priv = priv;
-> +	mii->read = rtsn_mii_read;
-> +	mii->write = rtsn_mii_write;
-> +	mii->read_c45 = rtsn_mii_read_c45;
-> +	mii->write_c45 = rtsn_mii_write_c45;
-> +	mii->parent = dev;
-> +
-> +	ret = of_mdiobus_register(mii, mdio_node);
-> +	of_node_put(mdio_node);
-> +	if (ret)
-> +		goto out_free_bus;
-> +
-> +	priv->mii = mii;
-> +
-> +	return 0;
-> +
-> +out_free_bus:
-> +	mdiobus_free(mii);
-> +	return ret;
-> +}
 
