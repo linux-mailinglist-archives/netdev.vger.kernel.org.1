@@ -1,212 +1,280 @@
-Return-Path: <netdev+bounces-89411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B937B8AA3A5
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:03:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 346608AA3BD
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:06:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6BD6B2591A
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:00:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B43481F21212
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D70E180A6D;
-	Thu, 18 Apr 2024 20:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1822917F394;
+	Thu, 18 Apr 2024 20:06:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="M23THS5e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2074.outbound.protection.outlook.com [40.107.220.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933A017335B
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 20:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713470431; cv=none; b=f6s7hcEXZlQuik7Iz6KFcLHnyYjkHLQzQ4yvcwJsh4rZg9GRhq95xtVcfcu0Wh8CrizA7MffV/+E1Sop33clZkXgbgf6FbEnQMRiw1Kzcw9hy9qWPQAsjBPr5n0NYmDBHbmV4LXYSgCR4Ft19trbiERVOSIChxPLzQpbAcHD7iY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713470431; c=relaxed/simple;
-	bh=ySCKXj6c+3614/kDHxqx/25WYz77e4ES1LSGaIfup3A=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rRA30XbPUL98GwF7yvvp6B9q8SIH//MegdaIwQ+9Sf2A1DQOx8f32AciaNkR2X6r/Ht5IXnysn6LFXGEsUTLN2etlTAyrc9LIqNJPgvik2LZxMQzL87Q/xZ3h/jRHvck9j4TBl1tzeaJgme6sM79ozdSvTDL3UUJhsy86Qmjg5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7cf265b30e2so171474539f.1
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 13:00:29 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713470429; x=1714075229;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HvCAvI2t36jvI9ciusgvIvLSXfRKhzbxpMLYmWITJdw=;
-        b=CR2MS15/n+DqM92qODdgMn3sCO04tG+hOHHQUqSBziCBqkvgq7rAFxGvpDfesxKhjj
-         O/e9FOLuifFYNsS63b6is7LeiHp3rTzItzXA2J5yXAVCU8B4vQaU6HmRZbObBnyjR/5u
-         /350njSo9EQpH5Y5iGJoZahZMKptbz/wFO7OGPs7wDB8eGdrwmNzrPP+fvzXo3nDgkLq
-         7x436qsjvzGjJFDOufQchxKa48WqE6F7D/1ypGh8Yo4np/2HBuY/shjvWYNl8PdCiNJ6
-         UQXDmBXyXv0NhRZtxgfiovS+pq+9YqBFgb3prrLOZlfE6CJuf3k/SXR+3lQ54YIuk6st
-         9ZCw==
-X-Forwarded-Encrypted: i=1; AJvYcCUybdczWSmjlr54XFsOsimFDsZEnckURdA5rBXEFg2ikFLlikgoo/qImqRRZkypYGumXrkcH4MiNLiFZ2net6r6IttIPTwT
-X-Gm-Message-State: AOJu0Ywb+yp06r36/2F/9neDRi1CzdASz3SGt/zGlZR/85+ktOXr6RrN
-	zK3hpxiuoBl4wyB3VBtMqFWDVbAVTWNFoiN0QIaYFxJTjF8uL6Rjqv+SyvyUXKpHhECE03kUqFW
-	cpH/yb7SQf7z92Ri9sdTJVQF2Z5pTMrZgQrrdqHk1URrxjHHClBpBIjs=
-X-Google-Smtp-Source: AGHT+IGk+XtOKy4Po7IaRVWu88agNqIiebP1iXGQ/Btezc2IjMMqNUq1N7cDNgJ3owAris5vDFSgf7YXJEIgD75wZvzo0+FRfgdJ
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5492517920C
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 20:06:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.74
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713470799; cv=fail; b=ffWYOzbdFgD9h02C5+OSaLs9BIxhss1XivsWCt9zece8NZXj2+L5+qihqFWSh34IEIk9RuK/iz3JNnNVsjlsDIaW6RkEsUcXQe30QSFH/SNrv9JeisWB2TzCem6WNPsh0ptsB7PR9PcQ1LcGVwVl8l8pQsMk3bzSHkHso2MvCkc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713470799; c=relaxed/simple;
+	bh=RFkexD701ebIq+jsUtjM1cngDlSGIidL1Ai2014YfJ4=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 Content-Type:MIME-Version; b=usOXrg38ax8gPo7SBQbzGB8BKfaP4qip39g6cm11NjRR0SUHKD2EiyqvacvPjQ3BQUvDULQnXGXrXu1Scl2eEukFcuu2yQxL1NXpx2geDdDu1CGn7vnILAkywr9B3ImX7T4Tx6vIlADrNGf9U7RCFhFYYamkCSruaNWVfIZt+8M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=M23THS5e; arc=fail smtp.client-ip=40.107.220.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fgZuywfBTVIfrHfReietpZIAFXMpYYqX36IaNAJK9rdcn/ug/OaKywXaNhAUPdF/5bEzUviCskfTRerCgDK5mZBWcGfDGFPOBNNGJE10YZbHjW1mand7G1Gj7cY079162EhO4X0i220C4c9p5xinKtY+ON1moqt1sN8om4JDVXXv555Tk4c7WjpOzvPjr2YEXNF4GKHCVae2TWHjvO0xWu9xmiBk1q7C9SsjSduyRYt/aPaAB7YdwWKWkHF4Wve8U/3HEFO2LdDjaGTB/PpupVzWvgxRM6tIInwss5I2ijoA86qraXpoy+QeN9AkZDgH9b4UTNmZ1FnQdDK0dLtS1Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kRahbD2TgACBOB307nZ9jUKPnfYOrxs6S1ag0hiGQj8=;
+ b=gFbStmWvDyOUh2c07Xn0JKcN1ds3UTz/uQdRQBp0gSx69pZIavI1C+eC1G4/Pp7LsnMLfDY0DV86yN9+c1RGGVDIBY18jsmJzITZhSkbH5kWRqM7CbXsymYk+e6XcBhuKzIZIrvOvAgfglHfEImB9lQshU563DbQSwBZw3l5TjhswAZdE58nL95aNsD+pwJfyCWodO/0toDmr4wIy++mrtxYLD5vztEHUza9qBUiExdpVvNzdeDvrxlHJrbHBtw9MD/BgpoVPudextScIZNmxhlKx2uf4gpBB6iJjmqP5hEFFd1eOtRy6uEpwezOY1rPxs+quVScWhlgGLDkN/WJow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kRahbD2TgACBOB307nZ9jUKPnfYOrxs6S1ag0hiGQj8=;
+ b=M23THS5eDXZd5nIKq0+hVN0YqtPBAssKrqSeUOPeswGRTAFFbhO+w/BM3HQ0a85Ru4OdZvGh6u7sgvNWGznKxTP2eFfozX+PITV9kFu2AHDPl+Y3hlERZANOC5etu4iLr9l/r1WIGDn4wMvjTtB6D/VUSMlgx55zHxo6cAkbNifbXqNrx7udfdxSD5DZvbKl8BWYF+9iPrETdO6CnF4vcObRNGHzdYLYKAG2YhzyqAv9F2Qla9SDA/fUI9jKuY/W4ZqZIdnQFqZfSqzGh+BFSgkzq6VbuupvoAQYt/JkJYGU4QgMpzL0p9LBxYU5h9LCDl7GcSs44o8ye1IzfpZIUw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+ by CY8PR12MB8193.namprd12.prod.outlook.com (2603:10b6:930:71::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.42; Thu, 18 Apr
+ 2024 20:06:34 +0000
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::3ec0:1215:f4ed:9535]) by BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::3ec0:1215:f4ed:9535%4]) with mapi id 15.20.7452.049; Thu, 18 Apr 2024
+ 20:06:34 +0000
+References: <20240418052500.50678-1-mateusz.polchlopek@intel.com>
+ <20240418052500.50678-10-mateusz.polchlopek@intel.com>
+User-agent: mu4e 1.10.8; emacs 28.2
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ horms@kernel.org, anthony.l.nguyen@intel.com, Jacob Keller
+ <jacob.e.keller@intel.com>, Wojciech Drewek <wojciech.drewek@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v5 09/12] iavf: refactor
+ iavf_clean_rx_irq to support legacy and flex descriptors
+Date: Thu, 18 Apr 2024 13:00:40 -0700
+In-reply-to: <20240418052500.50678-10-mateusz.polchlopek@intel.com>
+Message-ID: <87frvie8qf.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: BYAPR03CA0010.namprd03.prod.outlook.com
+ (2603:10b6:a02:a8::23) To BYAPR12MB2743.namprd12.prod.outlook.com
+ (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:164b:b0:482:e69d:b0c6 with SMTP id
- a11-20020a056638164b00b00482e69db0c6mr232411jat.6.1713470428901; Thu, 18 Apr
- 2024 13:00:28 -0700 (PDT)
-Date: Thu, 18 Apr 2024 13:00:28 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000003f81750616646cb8@google.com>
-Subject: [syzbot] [bpf?] possible deadlock in __stack_map_get
-From: syzbot <syzbot+dddd99ae26c656485d89@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    f99c5f563c17 Merge tag 'nf-24-03-21' of git://git.kernel.o..
-git tree:       net
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=15d7c52b180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
-dashboard link: https://syzkaller.appspot.com/bug?extid=dddd99ae26c656485d89
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10869857180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12f1f7cb180000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/65d3f3eb786e/disk-f99c5f56.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/799cf7f28ff8/vmlinux-f99c5f56.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/ab26c60c3845/bzImage-f99c5f56.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+dddd99ae26c656485d89@syzkaller.appspotmail.com
-
-============================================
-WARNING: possible recursive locking detected
-6.8.0-syzkaller-05271-gf99c5f563c17 #0 Not tainted
---------------------------------------------
-syz-executor224/5098 is trying to acquire lock:
-ffff888021ef61d8 (&qs->lock){-.-.}-{2:2}, at: __stack_map_get+0x14b/0x4b0 kernel/bpf/queue_stack_maps.c:140
-
-but task is already holding lock:
-ffff888021ef51d8 (&qs->lock){-.-.}-{2:2}, at: __stack_map_get+0x14b/0x4b0 kernel/bpf/queue_stack_maps.c:140
-
-other info that might help us debug this:
- Possible unsafe locking scenario:
-
-       CPU0
-       ----
-  lock(&qs->lock);
-  lock(&qs->lock);
-
- *** DEADLOCK ***
-
- May be due to missing lock nesting notation
-
-4 locks held by syz-executor224/5098:
- #0: ffffffff8e200c68 (pcpu_alloc_mutex){+.+.}-{3:3}, at: pcpu_alloc+0x27b/0x1670 mm/percpu.c:1769
- #1: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
- #1: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:781 [inline]
- #1: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2380 [inline]
- #1: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run2+0x114/0x420 kernel/trace/bpf_trace.c:2420
- #2: ffff888021ef51d8 (&qs->lock){-.-.}-{2:2}, at: __stack_map_get+0x14b/0x4b0 kernel/bpf/queue_stack_maps.c:140
- #3: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:329 [inline]
- #3: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:781 [inline]
- #3: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2380 [inline]
- #3: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run2+0x114/0x420 kernel/trace/bpf_trace.c:2420
-
-stack backtrace:
-CPU: 0 PID: 5098 Comm: syz-executor224 Not tainted 6.8.0-syzkaller-05271-gf99c5f563c17 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
- check_deadlock kernel/locking/lockdep.c:3062 [inline]
- validate_chain+0x15c1/0x58e0 kernel/locking/lockdep.c:3856
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
- __stack_map_get+0x14b/0x4b0 kernel/bpf/queue_stack_maps.c:140
- bpf_prog_7a16b54e5ee857f9+0x42/0x46
- bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
- __bpf_prog_run include/linux/filter.h:657 [inline]
- bpf_prog_run include/linux/filter.h:664 [inline]
- __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
- bpf_trace_run2+0x204/0x420 kernel/trace/bpf_trace.c:2420
- __traceiter_contention_end+0x7b/0xb0 include/trace/events/lock.h:122
- trace_contention_end+0xf6/0x120 include/trace/events/lock.h:122
- __pv_queued_spin_lock_slowpath+0x939/0xc60 kernel/locking/qspinlock.c:560
- pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:584 [inline]
- queued_spin_lock_slowpath+0x42/0x50 arch/x86/include/asm/qspinlock.h:51
- queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
- do_raw_spin_lock+0x272/0x370 kernel/locking/spinlock_debug.c:116
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:111 [inline]
- _raw_spin_lock_irqsave+0xe1/0x120 kernel/locking/spinlock.c:162
- __stack_map_get+0x14b/0x4b0 kernel/bpf/queue_stack_maps.c:140
- bpf_prog_7a16b54e5ee857f9+0x42/0x46
- bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
- __bpf_prog_run include/linux/filter.h:657 [inline]
- bpf_prog_run include/linux/filter.h:664 [inline]
- __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
- bpf_trace_run2+0x204/0x420 kernel/trace/bpf_trace.c:2420
- __traceiter_contention_end+0x7b/0xb0 include/trace/events/lock.h:122
- trace_contention_end+0xd7/0x100 include/trace/events/lock.h:122
- __mutex_lock_common kernel/locking/mutex.c:617 [inline]
- __mutex_lock+0x2e5/0xd70 kernel/locking/mutex.c:752
- pcpu_alloc+0x27b/0x1670 mm/percpu.c:1769
- bpf_prog_alloc_no_stats+0x10b/0x4a0 kernel/bpf/core.c:112
- bpf_prog_alloc+0x3b/0x1b0 kernel/bpf/core.c:144
- bpf_prog_load+0x7f7/0x20f0 kernel/bpf/syscall.c:2805
- __sys_bpf+0x4ee/0x810 kernel/bpf/syscall.c:5631
- __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-RIP: 0033:0x7fb8f4667f69
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc6855faf8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fb8f4667f69
-RDX: 0000000000000090 RSI: 00000000200000c0 RDI: 0000000000000005
-RBP: 0000000000000000 R08: 00000000000000a0 R09: 00000000000000a0
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|CY8PR12MB8193:EE_
+X-MS-Office365-Filtering-Correlation-Id: f186e878-51b4-426f-9de0-08dc5fe30bc1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	HzkDNj8pssRhVYALPNjmW8Wv8tJlGYykVPU1dM/54gwGBlZbAGNRHx7PWk0lCcgKBvClbF0kEGPu4ausnu8oh2UCUNxBDNFV0Aqf1l832xiurLPoQfSgOb9VZ8XSsN+N4Oavbz6MtWhxYxJEqKIm8AIA3b6LNJYbmzgN7qAIqrLweX4yGz94ycoDRHnrP79hDrS1zAsMB6FZbfkBkNJHwT5rJdfLu4efI415Y0WtiRU0iCloryseIKkmda568G/GfBvjTqQ2qnb5TjegRDkk/xDLvnALDQ7sm/n+KUqBKqa0H5Gl9q/8QswgssesJGvwRamJLE99vPSNeknbOssvJoA1R+6ZyJL5XRT6+hKwEzYa2tHTbfc+ZEKAdwU1F4kv9F8e2tAtcfVfMsIa7oaggo5Z6j7ADm2qVyuIF2/2aYgEImNw+aGtPsO4DNW9CjfgtV3+s4wKwJfWHL46tqKHjdBYYyxDXEOoaxxSRDzaVZD6F0UuWRz66/SzWd5jfEd7GG/DwsxOPyWwOibEorGvXSLrAcYDe04VONmTsXByLRsZ21UDZ8yM1i5tAo6TTJ+l6N2xtrxbKwbDieC42W85UETq2fN9sQ1lHOyrven21UeV5kmYMR5y2ptuXQaAHOjP8Gl0SpoAAmhviTzf5xukWLVEHaHON17JsoJ16ARLDvQ=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?RMUFY3lrykh7bh2aYUWsL+uNIk8gkK66qkTsG/4Mfaivx7Opt0qJb+xW87U/?=
+ =?us-ascii?Q?JFlQpX8SFWsuhmnb2+8ZMik2yOaIDhVbM5eM/zzNiLQNvIj+LnAcj5f9H7J6?=
+ =?us-ascii?Q?797koDcxtMSdQRBaD6jug/Vuzodb84I/0ePJYncrngrnSgGhf78cn5q2Rmz6?=
+ =?us-ascii?Q?u5WcbsRiFVaakjslFHwtsxM1bgLqUY+m/37sI3nfjfndWAqdqUVyO6GHYeIn?=
+ =?us-ascii?Q?ZkiyhB2lTXtxiMG9lxhXL5IY/0IrfUq4I+uLAqgvbIUsOpTSRirNKBRk2d63?=
+ =?us-ascii?Q?/MOWWtKNp+k7SBwvEwJv0QK3jpsIWjB3J13A7a+p7ct45zQOAXz8DlI+XKb8?=
+ =?us-ascii?Q?79MNhbSDw9jFh22rpjzVR27l4TUJDu9hoorAoMwPCgxcU6Q23DpA2lAvNAiK?=
+ =?us-ascii?Q?2Em0TD2yxz4uYGWjNyA3Bu91obNawIDgEZRzpZPoy9NwRP6C90pCgXwsX96m?=
+ =?us-ascii?Q?8k10NXx16ifr2FYVlHD4w0oRWdCpEWT8YIhtcBKQy6+NQZdJDn8gKhKzjWo0?=
+ =?us-ascii?Q?iMgkCCs8ngErpf67Hh8/ZVG2fYizU+P4z0RJthUx6qHQ+iuIwR4ubyXnAZ4T?=
+ =?us-ascii?Q?7MdwruZj+T7STw3241VrGlPA9uk5hcDucZRlXq41dg5rb9aaMbs7U5SMS1p8?=
+ =?us-ascii?Q?RbqJ5e2pbohnMz1KS1LpdS1x61o49gmp6QP504AFa9jq7frGQ06niAmBa5kj?=
+ =?us-ascii?Q?Gdr2C5q1j3D2dvX5nKbRCEUixDgKO4XnItvCeuJ5cOT93iprThfVFv9cGij3?=
+ =?us-ascii?Q?nSCU2GokRlPRrBz3vWoK0DOT+XptlLSPUF7qcX/YvTV+2SDZL2Vr3ib4zAIk?=
+ =?us-ascii?Q?RVHOsvffWFqg6yOf3dHLCLYsFZD4ZVI3MfYkhET/Awi1/SSs3S0jPqZ2bc6O?=
+ =?us-ascii?Q?4DhOOJjek2XLioCi+fsm3x1pjvGzTJwGG96ilVEyU3DF5+wdN5lZviMmhS2M?=
+ =?us-ascii?Q?1zqg2JMnX8iurWTpx7x49l4VQG1JPXruMCx+tp6wpi4LUGd6zgt1hcfQqvGO?=
+ =?us-ascii?Q?LREFQejD8kFcFZpJr0rEh4Qbn+MvBIFr1QHMnq5YUyC5TbQANiY+30q9ELLP?=
+ =?us-ascii?Q?RuGX8ibbLcHTkZlpAZ5EnuBq1drWTM0JzOeJODqtzNlPU6WD7WNTrv+pHTtN?=
+ =?us-ascii?Q?WFOrWH//YxbjmvZ3raQreI2WwIJqLA9ABYeBnz5OCpYexFuvcVyLkj/o3x3W?=
+ =?us-ascii?Q?6u70UHkIrjugmFJivP8/tjwJKsU+bBHknykXSdNClqFkMpcVB7G4LhHvbAUm?=
+ =?us-ascii?Q?aSTzl7MqqZr0NLCopi2/EHzi6+if/qq1vyIr+D3uOf5/LvfMO8/uQZeLYorr?=
+ =?us-ascii?Q?GbBCJQ8ZtYwZ7DlTfXzBIUitCZhEPPAMChH5HvbHS5i/znPt9Nb2VlmxC2vB?=
+ =?us-ascii?Q?3OPZCRPzNH5yZg/6SbS80FZ48YFHTjfDk2b8t7MMpzInWwLiVuRELBTQKH8C?=
+ =?us-ascii?Q?j3Rlr+8li0uxK4hDAoyNIETTEQkgJ4s2bMTU8Z3FIl2W2ZOaTuOctZMl03lv?=
+ =?us-ascii?Q?dQykNGiGEhLy7NHs1KU7+K/qJcQo+DxarZYTEZcGljLTxC3NnNI28tdF/Kgy?=
+ =?us-ascii?Q?KqoMDqVkoijED2KCLgPSheehsMroQqXEH9RS+IyNVeBE0BNjCcq7EgEjmhjF?=
+ =?us-ascii?Q?pA=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f186e878-51b4-426f-9de0-08dc5fe30bc1
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2024 20:06:34.0716
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GlBhsYLOSgxjym+w3KcsC3SBu86Vjz6pmzksuoXinVzawFPkuMIoLt5M/CNJrUvSCTGk+FgxxPk7taVM2vsPhw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8193
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+On Thu, 18 Apr, 2024 01:24:57 -0400 Mateusz Polchlopek <mateusz.polchlopek@intel.com> wrote:
+> From: Jacob Keller <jacob.e.keller@intel.com>
+>
+> Using VIRTCHNL_VF_OFFLOAD_FLEX_DESC, the iAVF driver is capable of
+> negotiating to enable the advanced flexible descriptor layout. Add the
+> flexible NIC layout (RXDID=2) as a member of the Rx descriptor union.
+>
+> Also add bit position definitions for the status and error indications
+> that are needed.
+>
+> The iavf_clean_rx_irq function needs to extract a few fields from the Rx
+> descriptor, including the size, rx_ptype, and vlan_tag.
+> Move the extraction to a separate function that decodes the fields into
+> a structure. This will reduce the burden for handling multiple
+> descriptor types by keeping the relevant extraction logic in one place.
+>
+> To support handling an additional descriptor format with minimal code
+> duplication, refactor Rx checksum handling so that the general logic
+> is separated from the bit calculations. Introduce an iavf_rx_desc_decoded
+> structure which holds the relevant bits decoded from the Rx descriptor.
+> This will enable implementing flexible descriptor handling without
+> duplicating the general logic twice.
+>
+> Introduce an iavf_extract_flex_rx_fields, iavf_flex_rx_hash, and
+> iavf_flex_rx_csum functions which operate on the flexible NIC descriptor
+> format instead of the legacy 32 byte format. Based on the negotiated
+> RXDID, select the correct function for processing the Rx descriptors.
+>
+> With this change, the Rx hot path should be functional when using either
+> the default legacy 32byte format or when we switch to the flexible NIC
+> layout.
+>
+> Modify the Rx hot path to add support for the flexible descriptor
+> format and add request enabling Rx timestamps for all queues.
+>
+> As in ice, make sure we bump the checksum level if the hardware detected
+> a packet type which could have an outer checksum. This is important
+> because hardware only verifies the inner checksum.
+>
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> ---
+>  drivers/net/ethernet/intel/iavf/iavf_txrx.c   | 354 +++++++++++++-----
+>  drivers/net/ethernet/intel/iavf/iavf_txrx.h   |   8 +
+>  drivers/net/ethernet/intel/iavf/iavf_type.h   | 149 ++++++--
+>  .../net/ethernet/intel/iavf/iavf_virtchnl.c   |   5 +
+>  4 files changed, 390 insertions(+), 126 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.c b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
+<snip>
+> +/**
+> + * iavf_flex_rx_hash - set the hash value in the skb
+> + * @ring: descriptor ring
+> + * @rx_desc: specific descriptor
+> + * @skb: skb currently being received and modified
+> + * @rx_ptype: Rx packet type
+> + *
+> + * This function only operates on the VIRTCHNL_RXDID_2_FLEX_SQ_NIC flexible
+> + * descriptor writeback format.
+> + **/
+> +static void iavf_flex_rx_hash(struct iavf_ring *ring,
+> +			      union iavf_rx_desc *rx_desc,
+> +			      struct sk_buff *skb, u16 rx_ptype)
+> +{
+> +	__le16 status0;
+> +
+> +	if (!(ring->netdev->features & NETIF_F_RXHASH))
+> +		return;
+> +
+> +	status0 = rx_desc->flex_wb.status_error0;
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Any reason to not convert rx_desc->flex_wb.status_error0 to
+CPU-endianness for the bit check?
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+> +	if (status0 & cpu_to_le16(IAVF_RX_FLEX_DESC_STATUS0_RSS_VALID_M)) {
+> +		u32 hash = le32_to_cpu(rx_desc->flex_wb.rss_hash);
+> +
+> +		skb_set_hash(skb, hash, iavf_ptype_to_htype(rx_ptype));
+> +	}
+> +}
+<snip>
+> +/**
+> + * iavf_extract_flex_rx_fields - Extract fields from the Rx descriptor
+> + * @rx_ring: rx descriptor ring
+> + * @rx_desc: the descriptor to process
+> + * @fields: storage for extracted values
+> + *
+> + * Decode the Rx descriptor and extract relevant information including the
+> + * size, VLAN tag, Rx packet type, end of packet field and RXE field value.
+> + *
+> + * This function only operates on the VIRTCHNL_RXDID_2_FLEX_SQ_NIC flexible
+> + * descriptor writeback format.
+> + */
+> +static void iavf_extract_flex_rx_fields(struct iavf_ring *rx_ring,
+> +					union iavf_rx_desc *rx_desc,
+> +					struct iavf_rx_extracted *fields)
+> +{
+> +	__le16 status0, status1, flexi_flags0;
+> +
+> +	fields->size = FIELD_GET(IAVF_RX_FLEX_DESC_PKT_LEN_M,
+> +				 le16_to_cpu(rx_desc->flex_wb.pkt_len));
+> +
+> +	flexi_flags0 = rx_desc->flex_wb.ptype_flexi_flags0;
+> +
+> +	fields->rx_ptype = FIELD_GET(IAVF_RX_FLEX_DESC_PTYPE_M,
+> +				     le16_to_cpu(flexi_flags0));
+> +
+> +	status0 = rx_desc->flex_wb.status_error0;
+> +	if (status0 & cpu_to_le16(IAVF_RX_FLEX_DESC_STATUS0_L2TAG1P_M) &&
+> +	    rx_ring->flags & IAVF_TXRX_FLAGS_VLAN_TAG_LOC_L2TAG1)
+> +		fields->vlan_tag = le16_to_cpu(rx_desc->flex_wb.l2tag1);
+> +
+> +	status1 = rx_desc->flex_wb.status_error1;
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Similar comment to previous in this function.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+> +	if (status1 & cpu_to_le16(IAVF_RX_FLEX_DESC_STATUS1_L2TAG2P_M) &&
+> +	    rx_ring->flags & IAVF_RXR_FLAGS_VLAN_TAG_LOC_L2TAG2_2)
+> +		fields->vlan_tag = le16_to_cpu(rx_desc->flex_wb.l2tag2_2nd);
+> +
+> +	fields->end_of_packet = FIELD_GET(IAVF_RX_FLEX_DESC_STATUS_ERR0_EOP_BIT,
+> +					  le16_to_cpu(status0));
+> +	fields->rxe = FIELD_GET(IAVF_RX_FLEX_DESC_STATUS_ERR0_RXE_BIT,
+> +				le16_to_cpu(status0));
+> +}
+> +
+> +static void iavf_extract_rx_fields(struct iavf_ring *rx_ring,
+> +				   union iavf_rx_desc *rx_desc,
+> +				   struct iavf_rx_extracted *fields)
+> +{
+> +	if (rx_ring->rxdid == VIRTCHNL_RXDID_1_32B_BASE)
+> +		iavf_extract_legacy_rx_fields(rx_ring, rx_desc, fields);
+> +	else
+> +		iavf_extract_flex_rx_fields(rx_ring, rx_desc, fields);
+> +}
+> +
+<snip>
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+--
+Thanks,
 
-If you want to undo deduplication, reply with:
-#syz undup
+Rahul Rameshbabu
 
