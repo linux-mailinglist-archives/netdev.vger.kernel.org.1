@@ -1,105 +1,119 @@
-Return-Path: <netdev+bounces-89426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFA318AA402
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:27:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 21AC88AA410
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:32:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DF561C20C06
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:27:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53CE91C21C7A
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:32:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18B7616D314;
-	Thu, 18 Apr 2024 20:27:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C3A18413E;
+	Thu, 18 Apr 2024 20:32:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=a16n.net header.i=@a16n.net header.b="e2RHoD3G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jcu3C3rj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out.a16n.net (smtp-out.a16n.net [87.98.181.171])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9C2A4503A
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 20:26:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=87.98.181.171
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C57C17A938;
+	Thu, 18 Apr 2024 20:32:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713472021; cv=none; b=LgQW8h0AxXMOnNQlTD2ovuQIqw+wsUm3x+6xgXUjpSw/WEeRW5Lw8m6haUSwIuM2x2Y/TWpMPwfChM/6XftX42Fxea2cD17lfSi66bIg8AOsG87vvMY/FbxhBBCiBAozrDjrWImclAq1R03QLAqQb1qDRPPp5mMt1/MzTdbARBw=
+	t=1713472355; cv=none; b=A3YdQxntT3vvqWk+9Ggc5phAAq82HQLbJGzP9FcJ820yo2/NSD0blPHm7z2G9i06QeZDwf9xu7COYJaz+UT2zKL/1dMxSWlzhxuwMUEs0qzjdtGyyQvEVh81/Wd4Fg29EeefgxYvTSVskQMcjjvvV4GmtC4xZ949r7CvPWWXDLw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713472021; c=relaxed/simple;
-	bh=zSQOTJ8tz/NF4BDPwrs6odb9Gsa9y+UoyTAI4gqbQeQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Bf7WH1eLeF1240ryevKkKUOQfIkOJFOorrTooaufqpLjPQ/+Z/et/nM+XAV4w6MqRR2iI+dMlqXB7/XuIpLlDE+przStmIU4lpeGCQZwT2pLlYXVRFGl2lAak5du2IY2O+TebcdrlS+CxSySWBwx2HA4HQ5LB56hQG0GiecJqo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=a16n.net; spf=pass smtp.mailfrom=a16n.net; dkim=pass (2048-bit key) header.d=a16n.net header.i=@a16n.net header.b=e2RHoD3G; arc=none smtp.client-ip=87.98.181.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=a16n.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=a16n.net
-Received: from server.a16n.net (server.a16n.net [82.65.98.121])
-	by smtp-out.a16n.net (Postfix) with ESMTP id 9F98646049A;
-	Thu, 18 Apr 2024 22:26:53 +0200 (CEST)
-Received: from ws.localdomain (unknown [192.168.13.254])
-	by server.a16n.net (Postfix) with ESMTPSA id B23D280105E;
-	Thu, 18 Apr 2024 22:26:53 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=a16n.net; s=a16n;
-	t=1713472013; bh=LfZWQsrQtgzKC/YWLBnJHi5tFb7Y5iiPMA7i9wXMaiU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date;
-	b=e2RHoD3GGDPOe7Evv3KkYLx2cPge58C5aZOGcb1s3QcorZJEG2NbzYZm9EpNlgxdg
-	 Fn08WKoqnrepW7WAyh8MIKTS14ZH3M1Mecw5Bx63pMVXB1ppkRimh9lCTtGak2dnXv
-	 fJTaXXVNZ1O+GQ3JuieXhFCD0BvfkCgY45MYlr4wdcqEJI5HAiK1raLTtQ3yKoApSp
-	 oQFhRmYu+DlrHSRh8VAbpiZFXAJNrgjDePCH4nCZ3Iutv8HdSiydKPFGyHgJUm1jsv
-	 Bjqqf2UmFzs/Z3gGkDpP8ggOLlpUvK2VFObSaVUKIR2vNmVv+7iKZDzA3V2WlimkV+
-	 31SiRXqEH8dlg==
-Received: by ws.localdomain (Postfix, from userid 1000)
-	id 832E220708; Thu, 18 Apr 2024 22:26:53 +0200 (CEST)
-From: =?utf-8?Q?Peter_M=C3=BCnster?= <pm@a16n.net>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org,  Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH net] net: b44: set pause params only when interface is up
-In-Reply-To: <e5d3c578-6142-4a30-9dd8-d5fca49566e0@lunn.ch> (Andrew Lunn's
-	message of "Thu, 18 Apr 2024 20:55:57 +0200")
-References: <871q72ahf1.fsf@a16n.net>
-	<e5d3c578-6142-4a30-9dd8-d5fca49566e0@lunn.ch>
-Date: Thu, 18 Apr 2024 22:26:53 +0200
-Message-ID: <87wmou5sdu.fsf@a16n.net>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1713472355; c=relaxed/simple;
+	bh=i6IHCK7Y8d6u6GANr3/DxbBo5khouz5aFu33Kjmu+/Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MZ5/9c7kQTwWOqf9dpzy/H1o+fvf+YBCO7G/Lo2MkjG0RlXLE8z/grJ/XRPnhtjVKkN5nc8n8/VtMdrGmwmVIp1BsdM6lAGpGnDBFXKc5/CtnBEkH14qa1b6QfNyDUZWpbQH7sEER+koCp1KfqShLuQtDdjKWhAr520BzLSoB/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jcu3C3rj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54D53C113CC;
+	Thu, 18 Apr 2024 20:32:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713472355;
+	bh=i6IHCK7Y8d6u6GANr3/DxbBo5khouz5aFu33Kjmu+/Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jcu3C3rjY9LFfERyGgNHl8DlmNsLigxeBPR9EZpb9xk970H77vQLgB69t0/BpqWeW
+	 O8cIt8I3CwT7N0zZ8v//yXlpOtDc7pI4kFWxtimZVY+hBtkkaV/mPqvInZS/GQyLpY
+	 8BSs2MPPEGvuzChKpNQVGsEpBKw05tUtfFi0VhbMe/0uoXozbOdkbglsUyfpPEr0pR
+	 WWFqBL6qdz+9nG9KqWYvOFmISQyxIeoykVDYmFH0yEpGR2QaL8LuHv2w6FNo/D9xvD
+	 5rsiWROIzH9e00wSyBeEJDbeh8cpfcykJCZF0jiOTLz8poQXEhSEqdD65wwys1HuV7
+	 YHBKGkG+P5USw==
+Date: Thu, 18 Apr 2024 13:32:32 -0700
+From: Nathan Chancellor <nathan@kernel.org>
+To: Heiko Carstens <hca@linux.ibm.com>
+Cc: akpm@linux-foundation.org, arnd@arndb.de, gor@linux.ibm.com,
+	agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
+	svens@linux.ibm.com, wintera@linux.ibm.com, twinkler@linux.ibm.com,
+	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	llvm@lists.linux.dev, patches@lists.linux.dev
+Subject: Re: [PATCH 1/3] s390/vmlogrdr: Remove function pointer cast
+Message-ID: <20240418203232.GA2962980@dev-arch.thelio-3990X>
+References: <20240417-s390-drivers-fix-cast-function-type-v1-0-fd048c9903b0@kernel.org>
+ <20240417-s390-drivers-fix-cast-function-type-v1-1-fd048c9903b0@kernel.org>
+ <20240418095438.6056-A-hca@linux.ibm.com>
+ <20240418102549.6056-B-hca@linux.ibm.com>
+ <20240418145121.GA1435416@dev-arch.thelio-3990X>
+ <20240418151501.6056-C-hca@linux.ibm.com>
+ <20240418153406.GC1435416@dev-arch.thelio-3990X>
+ <20240418192100.6741-A-hca@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha1; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240418192100.6741-A-hca@linux.ibm.com>
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+On Thu, Apr 18, 2024 at 09:21:00PM +0200, Heiko Carstens wrote:
+> Hi Nathan,
+> 
+> > > > > > > -		/*
+> > > > > > > -		 * The release function could be called after the
+> > > > > > > -		 * module has been unloaded. It's _only_ task is to
+> > > > > > > -		 * free the struct. Therefore, we specify kfree()
+> > > > > > > -		 * directly here. (Probably a little bit obfuscating
+> > > > > > > -		 * but legitime ...).
+> > > > > > > -		 */
+> > > 
+> > > That doesn't answer my question what prevents the release function
+> > > from being called after the module has been unloaded.
+> > > 
+> > > At least back then when the code was added it was a real bug.
+> > 
+> > I do not know the answer to that question (and I suspect there is
+> > nothing preventing ->release() from being called after module unload),
+> > so I'll just bring back the comment (although I'll need to adjust it
+> > since kfree() is not being used there directly anymore). Andrew, would
+> > you prefer a diff from what's in -mm or a v2?
+> 
+> I guess there is some confusion here :) My request was not to keep the
 
-On Thu, Apr 18 2024, Andrew Lunn wrote:
+Heh, yes, my apologies for being rather dense, I was not interpreting
+the comment or the thread you linked properly... :(
 
-> Please include a Fixed: tag indicating when the problem was added.
+> comment. I'm much rather afraid that the comment is still valid; and if
+> that is the case then your patch series adds three bugs, exactly what is
+> described in the comment.
+> 
+> Right now the release function is kfree which is always within the kernel
+> image, and therefore always a valid branch target. If however the code is
+> changed to what you propose, then the release function would be inside of
+> the module, which potentially does not exist anymore when the release
+> function is called, since the module was unloaded.
+> So the branch target would be invalid.
 
-Hi Andrew,
+That is super subtle :/ I can understand what the comment is warning
+about with that extra context. I see Arnd's suggestion which may fix
+this problem and get rid of the warning but if there are other ideas, I
+am all ears. I guess we could just disable -Wcast-function-type-strict
+for this code since s390 does not support kCFI right now but since it
+could, it seems better to resolve it properly.
 
-I=E2=80=99m sorry, I don=E2=80=99t know, when the problem was added. I only=
- know, that
-there was no problem with OpenWrt < 23.X. But I don=E2=80=99t know why. Per=
-haps
-the behaviour of netifd has changed from 22.X to 23.X.
-
-So I guess, that the problem is there since the creation of
-b44_set_pauseparam(), but it has never been triggered before.
-
-So what should I do please with the Fixed: tag?
-
-TIA for any hints,
-=2D-=20
-           Peter
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iGoEARECACoWIQS/5hHRBUjla4uZVXU6jitvQ7HLaAUCZiGCDQwccG1AYTE2bi5u
-ZXQACgkQOo4rb0Oxy2iu4QCeOa26va6PmJ4lG+hb6DHQkc06qfcAn0n4UghDJOZb
-888T/rmyO9I0Rjm6
-=n/4w
------END PGP SIGNATURE-----
---=-=-=--
+Thanks a lot for the quick review and catching my mistake, cheers!
+Nathan
 
