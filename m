@@ -1,137 +1,136 @@
-Return-Path: <netdev+bounces-89137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E6F28A9859
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:14:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A15D8A9867
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:18:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 900681C2088C
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:14:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C54CF1C20F2D
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:18:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D315415E5A8;
-	Thu, 18 Apr 2024 11:14:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1C2615E5CF;
+	Thu, 18 Apr 2024 11:17:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mYJnHETf"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="W99gcOUK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35FA615E20D
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 11:14:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED48215E211
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 11:17:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713438860; cv=none; b=OhR3fBkf9PkHThQLaBhDvmslTd+DO0jIY6h/grtDRtYMlgzPd+iOQZM6cnbXhU3pwHAMvae19qGOMN1BuqVJgkdHERsIsB4hF8it1McSj1LP+/aWJ7YTzMJYIZqAQPtiL0PKXbXQ/IpCL3i/0Y8LfcHxDaWphgR4Dc3rPHyUp3Q=
+	t=1713439077; cv=none; b=SWS8TSpGvuJ5xHQ/NW/6upmS1n2mLUsiC38VbHqo8RNym2lsHoN9+++DXEzevMzpwCVkt//VZiVtOpKSGrFpenEQ5Y/UPUXtpmaJwSkaC+RtITKi2cBa2B+hrQEoAxUAh4ZrBTBcSsnAlsD1e2NLOnThYavapQMkqDZHpNAhibk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713438860; c=relaxed/simple;
-	bh=5tIkYBCfJCqZryJItLj7l67sCD6SNpcCgy8fz2+3wJ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D3mOHM3XSgmAsN5+bfdbee0xukMxS3ChqA9qpkr/ugkosW+MzzZOyIaduiDV1NWiQ+1kb6F9yS9O2sLaoOlK3aPrMVXLFdnkBtUEfnK3eDguTrUnu4Js/D1hSrDFfpU7Aa4e6qM1pHWNqR4SvoMPn9P+bHMprlC0kAOLXnoxsEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mYJnHETf; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-516d1ecaf25so827597e87.2
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 04:14:18 -0700 (PDT)
+	s=arc-20240116; t=1713439077; c=relaxed/simple;
+	bh=dadbVw0ZN8KGcZgqWT52RSFUotZfDdsINMbi0GWd0pk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a6rT0KWG4rGakUZ2Fh8QmCclAhjTzPNCr9pSYT8f0/GbDQw+ZYMJmB/5Xo8vLsHT/p1bH5B2/O6wJCo4SqwzUI3/y5VcV3SZ6RqH1ld8Gqsj2r/7VYp/TJ72vIbJLAodHpn4cg0scc9cO9hMK2FVOCr1DKAtziW9W2WE+BWYyOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=W99gcOUK; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a5200202c1bso87404566b.0
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 04:17:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713438857; x=1714043657; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=RjoRqTxo7HSzdTkc4gBgEfqLUPj+ljTbG3vJ3pgN6z8=;
-        b=mYJnHETfBSbYvc2+6EXdsqcL+5AMjWMolFHRFMV9u8d2Zi0OEo2vtHwj46Cu+LZMoR
-         kXOlSFvQ9z9XtlWTdyFg6kmQpsfiLx2RHmVCGgxCun7vcqlP1lbxqty1f2QFJ6KXVUP9
-         iiBqK+ULR4K2xLMzyx05S/ZMN5UwJjgP9f2tGG/UZ6Xlv5eOhWz9+Ppdozq5SrcLcDM5
-         akgfBwaWBOPFg5uU53+KrJZJOKi3z/wZXSybvvCKAN696fCVY9fpgr/RXA0UPCfhUD3j
-         LaEpYgRfGgPg06LlguRBtYNU2b8JOGKMZDOW50IroGNcnaD+u8tpLHaNG4E/VgZoeQIC
-         nsiA==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1713439073; x=1714043873; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dadbVw0ZN8KGcZgqWT52RSFUotZfDdsINMbi0GWd0pk=;
+        b=W99gcOUKyl2+fZdSBGJVqDttq0TutTfo/6hILA47OiK9Q5NGpLWd82kINRtwvJ0lvR
+         kyatA9B4IM0952YAX0i+2pg8VMETeswm4xNnuUz9EWIlyhq9xMakmTSZ5AwqcQ8cjJ+a
+         Jjdy1rSJ+S00Jp4QIy/vkmnAVLvtO4/Y+EsgYF9ZQ6lY/XoE7cnnQXZmm/IqsUdYlKrH
+         zGP72ch7jLJfnopA6zORpfzvDwgsEgWmUCk3W4iqYxYHimEHHsqxyh0+bN1S2ixRP5Hc
+         G7+S1tuV3fZPUQLfZKwtAnv4NswetcDsj+f/aA1Er605BpFnIxdV3Ee8DsemNttK6gi5
+         +pkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713438857; x=1714043657;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1713439073; x=1714043873;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RjoRqTxo7HSzdTkc4gBgEfqLUPj+ljTbG3vJ3pgN6z8=;
-        b=qVZeAsHNl1QpAUYZOtJz+nZNGvtVvvCrKItCxiqeItX9hs/4PxjTAXL77xa3AvNINC
-         PsAu2EddpgoenBtDAoSxSLfFxGtHVuhuzDz183Wk8fUFLcm+ft4NRMjn2NSd7goVKry8
-         Eji6H1aNFJCAlFAuZsd29EQljB2zxAYFGvtyNgptZkCtqha7ot1UZF4Iv9oPEUCSWM4Y
-         sli4QGo5eVsk3So6LSFClwuL8KXl/ETSNAbIV1L54FcN7YMCOmrk1F6VlaPKaTGW73lh
-         t2CVs4AUgrLOE+2xm479/50Pm7PXY2LB7MxNm5F75Q4mYlQj/x8da2SwU+6m3IeFVs9l
-         VtQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUIvVpBNziiLUA8Ai6DKabI9VYt1aNOUTh5lc+xQU++mdtaL5WQlo+Y9iUCOEeniqA7Xfuy2ArbZ4RLOYPpZaLcw42DORkn
-X-Gm-Message-State: AOJu0YzZLP8swAP7ADeMmSvMpS4QQHJPD50dA3ytN9756VI2qiBeCv9u
-	EKKS6RBViNXVMojOssxCrJVcTL8A/PaUHAiyjPsmU18Uo22701Gi
-X-Google-Smtp-Source: AGHT+IEzcr/tekYIQJxHLoH0yseds5lxtGEtTPU295fzDzlj8+1kCePk02xberhp5BGqDPbjxaqzxA==
-X-Received: by 2002:a05:6512:401:b0:518:cf01:9f21 with SMTP id u1-20020a056512040100b00518cf019f21mr1070342lfk.66.1713438857021;
-        Thu, 18 Apr 2024 04:14:17 -0700 (PDT)
-Received: from mobilestation.baikal.int (srv1.baikalchip.ru. [87.245.175.227])
-        by smtp.gmail.com with ESMTPSA id v19-20020a05651203b300b005159412ab81sm197475lfp.216.2024.04.18.04.14.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 04:14:16 -0700 (PDT)
-Date: Thu, 18 Apr 2024 14:14:14 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: Jakub Kicinski <kuba@kernel.org>, andrew@lunn.ch, hkallweit1@gmail.com, 
-	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
-	Jose.Abreu@synopsys.com, chenhuacai@kernel.org, linux@armlinux.org.uk, 
-	guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, 
-	siyanteng01@gmail.com
-Subject: Re: [PATCH net-next v11 3/6] net: stmmac: dwmac-loongson: Use
- PCI_DEVICE_DATA() macro for device identification
-Message-ID: <b3g2spu4y4f2atapsheaput7sjl4abeslwjacy65xaowsbgrsl@to7ek2fubiud>
-References: <cover.1712917541.git.siyanteng@loongson.cn>
- <b078687371ec7e740e3a630aedd3e76ecfdc1078.1712917541.git.siyanteng@loongson.cn>
- <20240412184939.2b022d42@kernel.org>
- <0e8f4d9c-e3ef-49bd-ae8b-bbc5897d9e90@loongson.cn>
+        bh=dadbVw0ZN8KGcZgqWT52RSFUotZfDdsINMbi0GWd0pk=;
+        b=HBSvJPRYtdOsoZqqr6aOCDuKp5Ocqr5EwmLt6dgi6bVssfelU5otTzaFq+QCX+VwCd
+         jbY5Vf2L3B7km+znN7tIny3Q+A7WKxApbAwTzBMPV1gH8eFeYd9oVks4+Fl1rlPPgQ2X
+         jKRC9Emm8UnXe0PeAhjJjfmsfkjcaTRLiyMveIAoACOmwSnFgRWreUs9s1UHvjLFhR/j
+         CEwqpiqbdgTmsvKtHN34LGpqMNTXr6p0ilC3w0xIWyBeMdHAkJfbjhpYxWD9Iio9sa/6
+         VplfI/+iLoKG2XPReZg4hVlzWylN2QmO05Ok6xUy5CU0Kd0wIswVYclCOgIN5sv+VOop
+         awiw==
+X-Forwarded-Encrypted: i=1; AJvYcCX+xuKQ2D/6FrzvAmQcc620RjOlbPOPRqbpqXt8B6NHhnSmXoBox2U4mfbTwY8+JYK5scw5b0Iiu/xxzKD97ymHjFYVPuLb
+X-Gm-Message-State: AOJu0YzcsFFRCMXswgxV44MHTEmQxJB2gHBKxtUw6ul7F0npGtC97VtQ
+	yL4n+y7XX//EtV8fPDPdOe3eXv0Ch9+ye1gnkYzJ+AC4BRPXU9p3HaY4Z+FkGbA=
+X-Google-Smtp-Source: AGHT+IHmqSTkMUPGya8bnbl4tVCYR5pgohc+bRojwZq6H6mlk6lXfXDEJpU5L7fvxPN2Mb70UrGa9g==
+X-Received: by 2002:a17:906:1156:b0:a55:54ec:a2fe with SMTP id i22-20020a170906115600b00a5554eca2femr1963102eja.29.1713439073194;
+        Thu, 18 Apr 2024 04:17:53 -0700 (PDT)
+Received: from [192.168.1.70] ([84.102.31.74])
+        by smtp.gmail.com with ESMTPSA id j21-20020a170906431500b00a521e5856f6sm747685ejm.51.2024.04.18.04.17.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 18 Apr 2024 04:17:52 -0700 (PDT)
+Message-ID: <08319f88-36a9-445a-9920-ad1fba666b6a@baylibre.com>
+Date: Thu, 18 Apr 2024 13:17:47 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 0/3] Add minimal XDP support to TI AM65 CPSW
+ Ethernet driver
+To: Siddharth Vadapalli <s-vadapalli@ti.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Russell King <linux@armlinux.org.uk>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+ Ratheesh Kannoth <rkannoth@marvell.com>,
+ Naveen Mamindlapalli <naveenm@marvell.com>,
+ Jacob Keller <jacob.e.keller@intel.com>
+Cc: danishanwar@ti.com, yuehaibing@huawei.com, rogerq@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org
+References: <20240223-am65-cpsw-xdp-basic-v9-0-2c194217e325@baylibre.com>
+ <260d258f-87a1-4aac-8883-aab4746b32d8@ti.com>
+Content-Language: en-US
+From: Julien Panis <jpanis@baylibre.com>
+In-Reply-To: <260d258f-87a1-4aac-8883-aab4746b32d8@ti.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <0e8f4d9c-e3ef-49bd-ae8b-bbc5897d9e90@loongson.cn>
 
-On Mon, Apr 15, 2024 at 10:21:39AM +0800, Yanteng Si wrote:
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > index 9e40c28d453a..995c9bd144e0 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > @@ -213,7 +213,7 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
-> > >   			 loongson_dwmac_resume);
-> > >   static const struct pci_device_id loongson_dwmac_id_table[] = {
-> > > -	{ PCI_VDEVICE(LOONGSON, 0x7a03) },
-> > > +	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
-> > >   	{}
-> > >   };
-> > >   MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
-> > In file included from ../drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:6:
-> > ../include/linux/pci.h:1061:51: error: ‘PCI_DEVICE_ID_LOONGSON_GMAC’ undeclared here (not in a function); did you mean ‘PCI_DEVICE_ID_LOONGSON_HDA’?
-> >   1061 |         .vendor = PCI_VENDOR_ID_##vend, .device = PCI_DEVICE_ID_##vend##_##dev, \
-> >        |                                                   ^~~~~~~~~~~~~~
-> > ../drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:216:11: note: in expansion of macro ‘PCI_DEVICE_DATA’
-> >    216 |         { PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
-> >        |           ^~~~~~~~~~~~~~~
-> > ../drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:216:44: error: ‘loongson_gmac_pci_info’ undeclared here (not in a function)
-> >    216 |         { PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
-> >        |                                            ^~~~~~~~~~~~~~~~~~~~~~
-> > ../include/linux/pci.h:1063:41: note: in definition of macro ‘PCI_DEVICE_DATA’
-> >   1063 |         .driver_data = (kernel_ulong_t)(data)
-> >        |                                         ^~~~
-> 
+On 4/18/24 13:00, Siddharth Vadapalli wrote:
+> On 12-04-2024 21:08, Julien Panis wrote:
+>> This patch adds XDP support to TI AM65 CPSW Ethernet driver.
+>>
+>> The following features are implemented: NETDEV_XDP_ACT_BASIC,
+>> NETDEV_XDP_ACT_REDIRECT, and NETDEV_XDP_ACT_NDO_XMIT.
+>>
+>> Zero-copy and non-linear XDP buffer supports are NOT implemented.
+>>
+>> Besides, the page pool memory model is used to get better performance.
+>>
+>> Signed-off-by: Julien Panis <jpanis@baylibre.com>
+> Hello Julien,
+>
+> This series crashes Linux on AM62ax SoC which also uses the
+> AM65-CPSW-NUSS driver:
+> https://gist.github.com/Siddharth-Vadapalli-at-TI/5ed0e436606001c247a7da664f75edee
+>
+> Regards,
+> Siddharth.
 
-> Will be fixed in v12.
+Hello Siddharth.
 
-Just move the PCI_DEVICE_ID_LOONGSON_GMAC macro definition from Patch
-5/6 to this one.
+Thanks for the log. I can read:
+[    1.966094] Missing net_device from driver
 
--Serge(y)
+Did you check that nodes exist in the device tree for the net devices ?
 
-> 
-> 
-> Thanks,
-> 
-> Yanteng
-> 
+Julien
+
 
