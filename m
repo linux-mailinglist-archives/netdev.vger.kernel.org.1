@@ -1,143 +1,131 @@
-Return-Path: <netdev+bounces-89000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1C868A92D5
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 08:14:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47DC48A92E6
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 08:17:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C945B2120F
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 06:14:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BE763B21DBD
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 06:17:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40EC5612F6;
-	Thu, 18 Apr 2024 06:14:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 522A66EB5D;
+	Thu, 18 Apr 2024 06:16:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DYaVT3Az"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="xWfhuAgR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C143399B
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 06:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F5D96D1C7
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 06:16:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713420841; cv=none; b=WfaGZ+sdpxFxTurNdziFpigF8Yq9cuk5KGi8FNfsUTk8Qs/IdfIg7Xr1lLXSnKEFfaRF8JjulEOSFXaOPgLNb+FMZkZnZrwS+hr2Ke9ZBB5IrmiNHZZH3CY8oceQ3Eup9Iy8bAxQwPtPZAWdCPaCZiSSzUaQ7Dj/glxd6fZ4ar4=
+	t=1713420981; cv=none; b=XP9x8UFb6AYhTuSw+5xeTwP81Ij0mTTBX5cUhjqY2Qm1vNwXnlsbkm1mp8xRml86Ri70THCuUlp7uVPFV6X9xOKRN1NQflMeqFLKrZPMCdzIP5BNJ33CPImjULuR9SFPRkVWyIlWR8sUKKypzUu1qf6BbyuRS+1lWWzhdFd95jM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713420841; c=relaxed/simple;
-	bh=DzHtYet7xw33U75FxEw5lUmOXI3xG0fMjLZjCs81rD0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nXPdfT/wL0dPa2nD6v0OsaeNxWx82lLjmfCx1KA9gtddfnjiuY1hUCfJzElnY7do9XDytsJQb1lMkk76wojL6aDXxJG/1LRUaRI2qB/Hw9MYnYMVAx+pg1et/bDkqFvtpyKSEzDX9CyKhFGNDiKfCSUzsq53jXnAN+HsMX5H8qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DYaVT3Az; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713420838;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cyAsixzg/C7NuM2YrjqrwtUhaKllzlyI1uPLxkOcmsM=;
-	b=DYaVT3AzM3eLdPQRYMhQIDOIAtwT/u/WrgoBaD1TMJDIiUBYe9eKNmxT0Go9Irwas14gL6
-	O0guuClzcWtQhjGPQ6MrzJTy/6hlWqGIJIiTSdVcU9fg0+NpBlGS7NktEoFn/SCybY42lK
-	xGYYWJdvO2cXsHQAu8TRIfy55qJIX3E=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-361-Et5IMmRGMt2SHCQaKS3pIQ-1; Thu, 18 Apr 2024 02:13:56 -0400
-X-MC-Unique: Et5IMmRGMt2SHCQaKS3pIQ-1
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2a2bc796cf4so724259a91.0
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 23:13:56 -0700 (PDT)
+	s=arc-20240116; t=1713420981; c=relaxed/simple;
+	bh=HH0x58aeITczEaoOTmgbXQZRHs2VvH12CDc1gcImzfQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jkZdukv2LrtWmx/KZnByHxKjtiMmJgrKfyhN8WNz5j3c50CWWyEjXU4haotwh42JWaTqWha1Bo90gpOoc2EGZ6QWQD1wHIDer8VY59A2P7KFirwFSpfEADyx4G8ExeASXURXt01GrL9ocXkgOCF+l3Fd/ohC7NwhCB6/kJueLws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=xWfhuAgR; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-571be483ccaso252635a12.2
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 23:16:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713420977; x=1714025777; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zM+AwiIA7FKrgS/Ytacnt1rsdmjxxW5sRnLCAiG5Ajk=;
+        b=xWfhuAgRPktpoK4oXvzyIyFYwxSPWEvp87aPRT1JQtT0rU/fbiDeK6lOc5VVZXDuQe
+         tnreZ82NPeoBaaZ92FaLOrEbnd0Pq8DuaaqUsAXjiXtEz+82ED6030WgMzL+cCp4n8OR
+         HPsQIVDCjblsMVs6O8y0GpuZiNhcwtRC0/NlQjWYZ5n3l6OThmmLBUVz9f8yX45TWxPW
+         zt8WAvXcaYMGb2F1rj7WOS09ZzUakC+XV14VsBKI/aLfJCV2pl4ucJBrz4y9Kgyi2mnr
+         S5ox3970abs4ECJgeAchiC+a9axxJGVXpw8XAcyNlu3v6zV/vdjVz7vhJEgFT/jWyG83
+         JeTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713420836; x=1714025636;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cyAsixzg/C7NuM2YrjqrwtUhaKllzlyI1uPLxkOcmsM=;
-        b=Yhw/k/eNMz8USWS9eO0Z0F6WCGvqtwp6FiRo/dhyJGkvFwUGB+ek6JwnU2TOb9bJSJ
-         7bHOq5Vgnc6jfV8ooTm+0M6IuTMBx0I/g+eYssuu0JkR7PMeEXQmmwIFQDOuMtjcp/+w
-         YqJ/BaNGlmhoaOV4rgioNUbc9dgUJbJfNqwklSIQbV1UyTG5UicOwZX8ArEYzoQEgfAR
-         Q/1p9WdklLv0A9iC/WLDGimpYcC3tH8zbXZeLojK5M2qeKVSMJMIq98ONzMwXMn72rVL
-         bMnPavIHeYh/1qQ3sl4/QhQB76JV02EPQeJhClpKNHSthHZ9AtVUxATCcR9uOBMVnNKM
-         Xeog==
-X-Forwarded-Encrypted: i=1; AJvYcCVecileGFc9sa8FJDUIbH7emz1Hpdf0psMjqHmL6464risC32sU/rKx05rDozVBc5eCiwkCeLIj4d8IUU1eXkPz5OJyqEGP
-X-Gm-Message-State: AOJu0YwSQJ+itbl8xVhnYbDkHsZk+UbsDrao5v8o9h/EuN/Fq1ZXNhHk
-	01vGulfYFM7r788x0+0FNOeOWj5vxigY6C9jICAUhCSkUqTJdKKzf4gnaTOGnZqvyaO7XyAyHpj
-	XX9O/X1N7CcIKDisT/AREI4mfvpJLE54iad6B3l6fsMekQQ/Ob0KM2EDmeq3S/1sVd+oZE/HQKP
-	CaQxctr6lMerI+woOJeiDpFUwKoMlL
-X-Received: by 2002:a17:90b:253:b0:29b:b3fa:b7a5 with SMTP id fz19-20020a17090b025300b0029bb3fab7a5mr1690935pjb.7.1713420835846;
-        Wed, 17 Apr 2024 23:13:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHVdzu9+TyIRaPXKFdcEi9FoNx1ow6iyhMtDgpvTH0oQRz2sSRKXwXqslukumyf5i3Aw/86PTvEgHH+60ZGtgs=
-X-Received: by 2002:a17:90b:253:b0:29b:b3fa:b7a5 with SMTP id
- fz19-20020a17090b025300b0029bb3fab7a5mr1690925pjb.7.1713420835550; Wed, 17
- Apr 2024 23:13:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713420977; x=1714025777;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zM+AwiIA7FKrgS/Ytacnt1rsdmjxxW5sRnLCAiG5Ajk=;
+        b=CQpkXZft+yhosaSkFCOkpps1WvQ5FCXYMR4sW9zFCtNvlyqyWGD1sHcUFQ6r4GECMZ
+         tC3XbYFXN2LrXwlot+1UjgOOCm7CtuJVBJ9i6FWrbNwvunZwD3kAKyTN6/ZU6QZjFVt/
+         JzlJFUc+Cho7PHhaDLfRBvJaMMqwe28DHDx3IGx1LehtvTO4wDPZ0fcsDI+ypyUfJUyi
+         akQ9kH+yhCUv2tdOllsreFGjamjg8/UwXzbPNycRoBFApkjxkUVl3CtsycNGOEkX6GvG
+         JdNjyvzPV/Km6pMMmuqUFN5+BWZB6FSf+I10jKL0r8Nxk3FWV0zZN0YaLKlhLX3GtHUI
+         1lLA==
+X-Gm-Message-State: AOJu0YypYRD60yeC8FNbPRNPFKSkhyQ+J80wZM4X+jgbjTcLHMZPF5VA
+	lkATSdDp4bqA5iUat4vY30VoRdjCUqlRZdBMzq/on/Os7kjv6wokUB1PrhfId88=
+X-Google-Smtp-Source: AGHT+IGizIdXTx/CsZk8PbZxvqVwV8yCfAEfxtPRXxseAeb1ekCj2GMLjSLWgN3RIojVrXMq1Sz58A==
+X-Received: by 2002:a17:906:c0d1:b0:a52:6535:d15f with SMTP id bn17-20020a170906c0d100b00a526535d15fmr887865ejb.61.1713420976631;
+        Wed, 17 Apr 2024 23:16:16 -0700 (PDT)
+Received: from localhost (78-80-105-131.customers.tmcz.cz. [78.80.105.131])
+        by smtp.gmail.com with ESMTPSA id t7-20020a1709066bc700b00a5556cd0fd5sm436991ejs.183.2024.04.17.23.16.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Apr 2024 23:16:16 -0700 (PDT)
+Date: Thu, 18 Apr 2024 08:16:14 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Benjamin Poirier <benjamin.poirier@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, edumazet@google.com, parav@nvidia.com,
+	mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	shuah@kernel.org, petrm@nvidia.com, liuhangbin@gmail.com,
+	vladimir.oltean@nxp.com, idosch@nvidia.com,
+	virtualization@lists.linux.dev
+Subject: Re: [patch net-next v3 2/6] selftests: forwarding: move couple of
+ initial check to the beginning
+Message-ID: <ZiC6rpgScGzYyJZb@nanopsycho>
+References: <20240417164554.3651321-1-jiri@resnulli.us>
+ <20240417164554.3651321-3-jiri@resnulli.us>
+ <ZiAb0wZcWDSozCoq@f4>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240411025127.51945-1-xuanzhuo@linux.alibaba.com> <20240411025127.51945-3-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20240411025127.51945-3-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 18 Apr 2024 14:13:44 +0800
-Message-ID: <CACGkMEt8hZ3UdMwuANu2KwMFAeZ3DvD9n5UcqJTbZE+eQtM=ow@mail.gmail.com>
-Subject: Re: [PATCH vhost 2/6] virtio_ring: enable premapped mode whatever use_dma_api
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZiAb0wZcWDSozCoq@f4>
 
-On Thu, Apr 11, 2024 at 10:51=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.=
-com> wrote:
+Wed, Apr 17, 2024 at 08:58:27PM CEST, benjamin.poirier@gmail.com wrote:
+>On 2024-04-17 18:45 +0200, Jiri Pirko wrote:
+>> From: Jiri Pirko <jiri@nvidia.com>
+>> 
+>> These two check can be done at he very beginning of the script.
+>> As the follow up patch needs to add early code that needs to be executed
+>> after the checks, move them.
+>> 
+>> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>> ---
+>>  tools/testing/selftests/net/forwarding/lib.sh | 15 ++++++++++-----
+>>  1 file changed, 10 insertions(+), 5 deletions(-)
+>> 
+>> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+>> index 7913c6ee418d..2e7695b94b6b 100644
+>> --- a/tools/testing/selftests/net/forwarding/lib.sh
+>> +++ b/tools/testing/selftests/net/forwarding/lib.sh
+>> @@ -84,6 +84,16 @@ declare -A NETIFS=(
+>>  # e.g. a low-power board.
+>>  : "${KSFT_MACHINE_SLOW:=no}"
+>>  
+>> +if [[ "$(id -u)" -ne 0 ]]; then
+>> +	echo "SKIP: need root privileges"
+>> +	exit $ksft_skip
+>> +fi
+>> +
+>> +if [[ ! -v NUM_NETIFS ]]; then
+>> +	echo "SKIP: importer does not define \"NUM_NETIFS\""
+>> +	exit $ksft_skip
+>> +fi
+>> +
 >
-> Now, we have virtio DMA APIs, the driver can be the premapped
-> mode whatever the virtio core uses dma api or not.
->
-> So remove the limit of checking use_dma_api from
-> virtqueue_set_dma_premapped().
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->  drivers/virtio/virtio_ring.c | 7 +------
->  1 file changed, 1 insertion(+), 6 deletions(-)
->
-> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index 1b9fb680cff3..72c438c5f7d7 100644
-> --- a/drivers/virtio/virtio_ring.c
-> +++ b/drivers/virtio/virtio_ring.c
-> @@ -2730,7 +2730,7 @@ EXPORT_SYMBOL_GPL(virtqueue_resize);
->   *
->   * Returns zero or a negative error.
->   * 0: success.
-> - * -EINVAL: vring does not use the dma api, so we can not enable premapp=
-ed mode.
-> + * -EINVAL: NOT called immediately.
+>I noticed that this part conflicts with the recently merged commit
+>2291752fae3d ("selftests: forwarding: lib.sh: Validate NETIFS"). Can you
+>please verify that the conflict was fixed correctly? The above check is
+>now duplicated in the file.
 
-Let's tweak the comment here, for example, we can say the vq is in use.
-
-Thanks
-
->   */
->  int virtqueue_set_dma_premapped(struct virtqueue *_vq)
->  {
-> @@ -2746,11 +2746,6 @@ int virtqueue_set_dma_premapped(struct virtqueue *=
-_vq)
->                 return -EINVAL;
->         }
->
-> -       if (!vq->use_dma_api) {
-> -               END_USE(vq);
-> -               return -EINVAL;
-> -       }
-> -
->         vq->premapped =3D true;
->         vq->do_unmap =3D false;
->
-> --
-> 2.32.0.3.g01195cf9f
->
-
+Right, will remove the duplicate. Thanks!
 
