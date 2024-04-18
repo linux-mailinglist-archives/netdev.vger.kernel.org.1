@@ -1,141 +1,95 @@
-Return-Path: <netdev+bounces-89371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EEFB8AA24E
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:51:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 686448AA256
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:56:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2691B221B3
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 18:51:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E68DDB20CDB
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 18:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8BE517AD6D;
-	Thu, 18 Apr 2024 18:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EAFE17AD67;
+	Thu, 18 Apr 2024 18:56:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iTi9F3JX"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Ph5g3RK6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D40017AD67
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 18:51:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AF8215FA92
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 18:55:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713466291; cv=none; b=W5GflOG+aI6UIffG72ewtNjc512WRwzxShKfSjOvOfgDYP211T1PnlZnEtKCU8EAH6hwuRN6us5ckeBNwzFCazf7ev22dSkECYfv0E+YC0uzMyztRt/6g2Qi9KARvk03nKTKgpRb8jtPjPAbyACmP5vC+uktyepGWszpjOeekj0=
+	t=1713466561; cv=none; b=NOKZlC+ke38oDdjsJGNANnXOKzsp/2gfOLP2jex0K2td3MnNGT70QOSA1yXFGMqocXer/87aRwxnA2mvFeajM7s6nFHfV7TtnaPFgyD9jOy7UU2nt8KueMLpwTnIF881dXBHZq6qOQBRgcN/27f8/LNlI73Jj9msNfRQOp0Z6u4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713466291; c=relaxed/simple;
-	bh=jvW7hMCjwo7CN/K5mcq8Qwa/N6UV2QWPgKjq0AlxuMk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Xj7E7SjZKv+BRZ3gfhhMMqPl2X6DhnS1o5zzJMmyEMSchy6SXGikz3qYHXR5rL2siKYUv2GBD6kmbB2fy94AxVCJrVcnKBfLQAeWmquZXmVX+NdovdRCRT03ariGNHe/30FZTG07AOyUfuJMbl+b+f+mrmA1xDCdmQZynbbxNM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iTi9F3JX; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56e5174ffc2so2092a12.1
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 11:51:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713466288; x=1714071088; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jvW7hMCjwo7CN/K5mcq8Qwa/N6UV2QWPgKjq0AlxuMk=;
-        b=iTi9F3JXHrojVU1jE8kISEVZER9OuO8CjI52oWkscOGq6BvNtxG9pJBhZGDbBDJLEK
-         tvoSzkcsy1SysuqgXiywcxJRQ4JfVEMw4Hf/jR9cnZeVRugasLKPl+i51QZm7Dnu3W0B
-         J0t+0WUwo42M/Czr8rsJnFgC6HC5ueAlcH65OMqyINOkFX6UhVvrSxiMvtayiClguw3p
-         M+5H57d3Ri74ltIeC7ahqDl6eydrNocoC2NadIxARXdCK6UdsTVTjpge8dsZbzzYkzJX
-         UjX4HLofxVY516QmJrsZ5zEx3kOSRs/sO6LMfpjG3Vb4mzKwaEGA6T6QJRqql9U1v3Wb
-         TG4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713466288; x=1714071088;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jvW7hMCjwo7CN/K5mcq8Qwa/N6UV2QWPgKjq0AlxuMk=;
-        b=afHIo0m3aWmAG83WfIaI7tZcUPm8ggyLIhYIfdeN02UYjDI6bxSSI4NxHu3FIOGL4k
-         +tBCdyNLXjW7wLWQleduDqLvRvWkDteYrgpjmPxn/lmMbrroeTRSRqLEXF29JEraryi4
-         oaZq7D+l9UtUVSXeOjwgvK+JFKFuS71Wpiqu5x8IQLCz7O/M2vUd5I32raDOe4bdErvD
-         g2f5HlJOVp8EHPjSmwVklkBa41/0e1BPGPGwoOf0gkjVEUYbG0x1qHe7KfQDdn0UoUNA
-         SR0zsQJKPVF1tg5zrflMMb+Rtnwd+4EKi0bSgzb0bgjLvcqRhL+RE+UwN6EgISez61hZ
-         dGFg==
-X-Forwarded-Encrypted: i=1; AJvYcCUbIuT2hyGSvziTzODwwAG1Fae1h6MQ4OAxEF9p9v5b/OInfzwqkUbiTjntyYvwneXfpOBLqptlbn7pFkt4/GrV8lmiJ/P6
-X-Gm-Message-State: AOJu0YyYcY9TfUT3ZVGWANkldwHl6dauN9zllz6mhY+KBiF+3rkxtLEh
-	Pb/aVtEgNGwsoYl8CglDTuNu9v6Td6D94yJpnCaPqAska/DO6L8BHDqCd++k7QT41y+DgpQpLe3
-	kZo4w+goiR4zXbPP1HQ1JgMfgC6nl43CLz8f9
-X-Google-Smtp-Source: AGHT+IG0nwF2sPAth0hGe1xE3k7qAAwtmvw2rthCZWtTHFJ8+eKzu9jlzZvyi0B1H3T1RgbsUYyxF016Rx65y43XYBM=
-X-Received: by 2002:aa7:d04f:0:b0:571:b8c4:bcc with SMTP id
- n15-20020aa7d04f000000b00571b8c40bccmr16051edo.6.1713466288126; Thu, 18 Apr
- 2024 11:51:28 -0700 (PDT)
+	s=arc-20240116; t=1713466561; c=relaxed/simple;
+	bh=LUH3DFoolMficHvAG1gmWGYiAGKGM+CYA9LrXA3TUAQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CSRPFdiDp0UvU8STVMYABtqsWYOiwSPs3hx3obg0z4j/karUSmACVdbnyDQ5vrfTqwRREFlINYDL17QJVMLmXvk3yDskI1nNXCwUVwDqdppOFA5o2Nxsc3J8xC3Jz2HNkBdsEVur281K/QNFB8D/vMU7pDUDVbgc/Gzr6y9zZXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Ph5g3RK6; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=/7sw4fKRwhUc7m1nekbHgHtt9yW14jXucm8YuU58S1w=; b=Ph
+	5g3RK6IKsP+klb8gG1h+yNUp//sz7EjplsPXbSQCPgJQ4/Lu20KF/xDmqOryQRb91sKZ7jg4griJy
+	dDknAniAVexIRCJOmm6ghFvynna3+BKYPRoOGAzMjyd0xg2qKNajWdfB8BSXmxbRmWg3aHMOg5F1Z
+	Q9RWlOsX1mU3K3M=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rxWvN-00DNrn-4j; Thu, 18 Apr 2024 20:55:57 +0200
+Date: Thu, 18 Apr 2024 20:55:57 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Peter =?iso-8859-1?Q?M=FCnster?= <pm@a16n.net>
+Cc: netdev@vger.kernel.org, Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH net] net: b44: set pause params only when interface is up
+Message-ID: <e5d3c578-6142-4a30-9dd8-d5fca49566e0@lunn.ch>
+References: <871q72ahf1.fsf@a16n.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240417085143.69578-1-kerneljasonxing@gmail.com>
- <CAL+tcoDJZe9pxjmVfgnq8z_sp6Zqe-jhWqoRnyuNwKXuPLGzVQ@mail.gmail.com>
- <20240418084646.68713c42@kernel.org> <CAL+tcoD4hyfBz4LrOOh6q6OO=6G7zpdXBQgR2k4rH3FwXsY3XA@mail.gmail.com>
-In-Reply-To: <CAL+tcoD4hyfBz4LrOOh6q6OO=6G7zpdXBQgR2k4rH3FwXsY3XA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 18 Apr 2024 20:51:14 +0200
-Message-ID: <CANn89iJ4pW7OFQ59RRHMimdYdN9PZ=D+vEq0je877s0ijH=xeg@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 0/7] Implement reset reason mechanism to detect
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, dsahern@kernel.org, matttbe@kernel.org, 
-	martineau@kernel.org, geliang@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, atenart@kernel.org, mptcp@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <871q72ahf1.fsf@a16n.net>
 
-On Thu, Apr 18, 2024 at 6:24=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> On Thu, Apr 18, 2024 at 11:46=E2=80=AFPM Jakub Kicinski <kuba@kernel.org>=
- wrote:
-> >
-> > On Thu, 18 Apr 2024 11:30:02 +0800 Jason Xing wrote:
-> > > I'm not sure why the patch series has been changed to 'Changes
-> > > Requested', until now I don't think I need to change something.
-> > >
-> > > Should I repost this series (keeping the v6 tag) and then wait for
-> > > more comments?
-> >
-> > If Eric doesn't like it - it's not getting merged.
->
-> I'm not a English native speaker. If I understand correctly, it seems
-> that Eric doesn't object to the patch series. Here is the quotation
-> [1]:
-> "If you feel the need to put them in a special group, this is fine by me.=
-"
->
-> This rst reason mechanism can cover all the possible reasons for both
-> TCP and MPTCP. We don't need to reinvent some definitions of reset
-> reasons which are totally the same as drop reasons. Also, we don't
-> need to reinvent something to cover MPTCP. If people are willing to
-> contribute more rst reasons, they can find a good place.
->
-> Reset is one big complicated 'issue' in production. I spent a lot of
-> time handling all kinds of reset reasons daily. I'm apparently not the
-> only one. I just want to make admins' lives easier, including me. This
-> special/separate reason group is important because we can extend it in
-> the future, which will not get confused.
->
-> I hope it can have a chance to get merged :) Thank you.
->
-> [1]: https://lore.kernel.org/all/CANn89i+aLO_aGYC8dr8dkFyi+6wpzCGrogysvgR=
-8FrfRvaa-Vg@mail.gmail.com/
->
-> Thanks,
-> Jason
+On Thu, Apr 18, 2024 at 04:12:34PM +0200, Peter Münster wrote:
+> Hi,
+> 
+> This patch fixes a kernel panic when using netifd.
+> Could you please apply it to linux-5.15.y?
 
-My objection was these casts between enums. Especially if hiding with (u32)
+Hi Peter
 
-I see no reason for adding these casts in TCP stack.
+Please take a read of:
 
-When I said "If you feel the need to put them in a special group, this
-is fine by me.",
-this was really about partitioning the existing enum into groups, if
-you prefer having a group of 'RES reasons'
+https://docs.kernel.org/process/submitting-patches.html
+
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#netdev-faq
+
+This is a networking fix, so please base the patch on net:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git
+
+Please include a Fixed: tag indicating when the problem was added.
+
+Also, add a Cc: stable@vger.kernel.org, which will cause the patch to
+be back ported to stable trees, including linux-5.15.
+
+You can use the script scripts/get_maintainer.pl to get a list of
+Maintainers you should Cc: the patch to.
+
+The code change itself looks reasonable, although Florian should
+review it.
+
+   Thanks
+	Andrew
 
