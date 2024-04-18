@@ -1,144 +1,116 @@
-Return-Path: <netdev+bounces-89212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FDDE8A9B2F
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 15:23:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C56658A9B66
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 15:36:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EABB1F236FB
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:23:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80D6D282460
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0F5715CD50;
-	Thu, 18 Apr 2024 13:23:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1848216078D;
+	Thu, 18 Apr 2024 13:36:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="VPMuh+U8"
+	dkim=pass (4096-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b="Zh/uw4Ji"
 X-Original-To: netdev@vger.kernel.org
-Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+Received: from perseus.uberspace.de (perseus.uberspace.de [95.143.172.134])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BAE115FD16;
-	Thu, 18 Apr 2024 13:23:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662C31635B6
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 13:36:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.172.134
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713446601; cv=none; b=dPI/TLcK/Kp00XxiCVLWKKU/onJaxqozQQwa+PNUbERB5feXmP8mnUNDtGVfzD3nVezvj+vd1wBSM4n6gOlQ8hflDXl/HF97nBeffGIV9szuDUVt7UoPEeNnjujd4BCOPcOdi8fLutS4RH/0TetVML85PZrwbmtAknezgkFqa9k=
+	t=1713447368; cv=none; b=brzLLbPRXmbuRHqudcvrn8CPCx7tdcl+uv9s8oOFT17yxtSVJ6Hj88pMghENSk3RsRLfoiWGd1XXmslwVj0jhdpEGABfvBlHVBGmosyVX6sn2op/yqyh6sggVaAut3GI6OZplXl8WLpHa+IqgUgieEKici7xyqd2Ufj3OU+COew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713446601; c=relaxed/simple;
-	bh=WAl7L1iBp86eXNg2Shw1xOHGw0vm5p71Lv8WUKHUN1s=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=aHh7fq3/ZJvLEX1fLjxhhwMvgblJov0W4VWFzB/6va4IVQr/FtvmF9RmfKBGPASRZxPSb1gDiWULt+cp4uTxtZPfanqPGcV49TptFxKzPouqxEPIUY0atdRt/NE0zlH9nfcUkz/bQGbnsf1FyHZ7fiIlSYo4B3gADorWRtXPuUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=VPMuh+U8; arc=none smtp.client-ip=193.238.174.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
-Received: from mg.ssi.bg (localhost [127.0.0.1])
-	by mg.ssi.bg (Proxmox) with ESMTP id F0A0A1836A;
-	Thu, 18 Apr 2024 16:23:09 +0300 (EEST)
-Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
-	by mg.ssi.bg (Proxmox) with ESMTPS;
-	Thu, 18 Apr 2024 16:23:09 +0300 (EEST)
-Received: from ja.ssi.bg (unknown [213.16.62.126])
-	by ink.ssi.bg (Postfix) with ESMTPSA id BFD95900570;
-	Thu, 18 Apr 2024 16:23:05 +0300 (EEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
-	t=1713446586; bh=WAl7L1iBp86eXNg2Shw1xOHGw0vm5p71Lv8WUKHUN1s=;
-	h=Date:From:To:cc:Subject:In-Reply-To:References;
-	b=VPMuh+U8F/Dd/e+BkI2TBEssJim6xN25jHmgFlpSmaL9wrwBSHkpkOMSCM5xXPCQw
-	 mtKTpzXsmLIvxEEtJKBz6s0S3XbZknzChjrQMGnEdndru2+08SopfQ86HOdVAcQddG
-	 3329gWCWZ+MoCyY7jaKvAqFx3TbndwCaosCxiIDM=
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 43IDMtKa057494;
-	Thu, 18 Apr 2024 16:22:57 +0300
-Date: Thu, 18 Apr 2024 16:22:55 +0300 (EEST)
-From: Julian Anastasov <ja@ssi.bg>
-To: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-cc: horms@verge.net.au, netdev@vger.kernel.org, lvs-devel@vger.kernel.org,
-        netfilter-devel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Florian Westphal <fw@strlen.de>
-Subject: Re: [PATCH net-next v2 1/2] ipvs: add READ_ONCE barrier for
- ipvs->sysctl_amemthresh
-In-Reply-To: <20240418110153.102781-1-aleksandr.mikhalitsyn@canonical.com>
-Message-ID: <eb0b4b89-9a1f-0e1b-9744-6eb3396048bd@ssi.bg>
-References: <20240418110153.102781-1-aleksandr.mikhalitsyn@canonical.com>
+	s=arc-20240116; t=1713447368; c=relaxed/simple;
+	bh=VUHSmMnwVCw3JA0JBbpeblezsi5qwZhOXSDD04pEc3o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y13626HrNRp/3+rsHDDk0wr0vh0KD8IrxaExChkwf+1JVLKvmpLVeBGPY8uOuzaSgZ3MOT2CcitoFmFYWdksk96ErV9l80Xnc/rPSWLXNHUo7pZQW/MrnOnRj+Rcfq3HG/Ld0P5egRdlq01dNSWupTymA3CxKXv3p3koWUoOFac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=david-bauer.net; spf=pass smtp.mailfrom=david-bauer.net; dkim=pass (4096-bit key) header.d=david-bauer.net header.i=@david-bauer.net header.b=Zh/uw4Ji; arc=none smtp.client-ip=95.143.172.134
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=david-bauer.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=david-bauer.net
+Received: (qmail 14947 invoked by uid 988); 18 Apr 2024 13:29:17 -0000
+Authentication-Results: perseus.uberspace.de;
+	auth=pass (plain)
+Received: from unknown (HELO unkown) (::1)
+	by perseus.uberspace.de (Haraka/3.0.1) with ESMTPSA; Thu, 18 Apr 2024 15:29:17 +0200
+From: David Bauer <mail@david-bauer.net>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	amcohen@nvidia.com
+Cc: netdev@vger.kernel.org,
+	Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net v2] vxlan: drop packets from invalid src-address
+Date: Thu, 18 Apr 2024 15:29:08 +0200
+Message-ID: <20240418132908.38032-1-mail@david-bauer.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Bar: -
+X-Rspamd-Report: MID_CONTAINS_FROM(1) BAYES_HAM(-2.999999) MIME_GOOD(-0.1) R_MISSING_CHARSET(0.5)
+X-Rspamd-Score: -1.599999
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+	d=david-bauer.net; s=uberspace;
+	h=from:to:cc:subject:date;
+	bh=VUHSmMnwVCw3JA0JBbpeblezsi5qwZhOXSDD04pEc3o=;
+	b=Zh/uw4JijyRx2uILJI5YOGD41A1uT+RFt5K/G6GVl3cZ0yNfpu1Gg3bLeTNljAB/lu97zcfLRH
+	evtDRAbKVTV15Lcn9rZuwhVi1YrPk3a77txfAwPKoQrkgJn2JCJ1rmnwYdZv1uMb81S8LW1yTC5V
+	uf93pbkzdpZ5JxSIpEdKGKXOxHteAXb+jrMh98UgHk2s7xwnQWHeKA6Vq9FJFoCML3kY0Q/Y5mSJ
+	X20SOD80X2Oi0TfQG5V1lbokvn6wLjplQKEI3EsVvwgFYYmCRnNp/mwgpT2XAXg1yV3R13N96klA
+	n3HT41S7Ge+yBXQUtxgDZwrT1JszbDwszTy9OVC4a5xIlrtFztHgwf1yhlz+g5TYW1DI4hOwlscZ
+	2+MkgGUGkq0S9kyi7VZW1F3altacwfEBhCOO9CZjt6u+hZKbtKaOt9GVzVTtMQAk8dw7EzeaO1fd
+	PwkIr7QgsEKy/wkNizHICdQa1pA51KmGYxgaCgrHTeZzi6Z93OEGJeOOC8JXeKlfy9Zk6R5NIxLF
+	ADKUCj6d+eRUPDlRy+bB+OSfnMfOG0QjxzS4fTvDiN98ra+5W2F1I5uOY7HMTAU8HrdZ+Jq6qvb9
+	vttDBkUR26xD0pH6GiStNekFntIQ1ig+kQoN/08Y1VWLy/b77DNR+MC2yf2i2dljJ071C/mndEpJ
+	8=
 
+The VXLAN driver currently does not check if the inner layer2
+source-address is valid.
 
-	Hello,
+In case source-address snooping/learning is enabled, a entry in the FDB
+for the invalid address is created with the layer3 address of the tunnel
+endpoint.
 
-On Thu, 18 Apr 2024, Alexander Mikhalitsyn wrote:
+If the frame happens to have a non-unicast address set, all this
+non-unicast traffic is subsequently not flooded to the tunnel network
+but sent to the learnt host in the FDB. To make matters worse, this FDB
+entry does not expire.
 
-> Cc: Julian Anastasov <ja@ssi.bg>
-> Cc: Simon Horman <horms@verge.net.au>
-> Cc: Pablo Neira Ayuso <pablo@netfilter.org>
-> Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
-> Cc: Florian Westphal <fw@strlen.de>
-> Suggested-by: Julian Anastasov <ja@ssi.bg>
-> Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-> ---
->  net/netfilter/ipvs/ip_vs_ctl.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
-> 
-> diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
-> index 143a341bbc0a..daa62b8b2dd1 100644
-> --- a/net/netfilter/ipvs/ip_vs_ctl.c
-> +++ b/net/netfilter/ipvs/ip_vs_ctl.c
+Apply the same filtering for packets as it is done for bridges. This not
+only drops these invalid packets but avoids them from being learnt into
+the FDB.
 
-> @@ -105,7 +106,8 @@ static void update_defense_level(struct netns_ipvs *ipvs)
->  	/* si_swapinfo(&i); */
->  	/* availmem = availmem - (i.totalswap - i.freeswap); */
->  
-> -	nomem = (availmem < ipvs->sysctl_amemthresh);
-> +	amemthresh = max(READ_ONCE(ipvs->sysctl_amemthresh), 0);
-> +	nomem = (availmem < amemthresh);
->  
->  	local_bh_disable();
->  
-> @@ -146,8 +148,8 @@ static void update_defense_level(struct netns_ipvs *ipvs)
->  	case 1:
->  		if (nomem) {
->  			ipvs->drop_rate = ipvs->drop_counter
-> -				= ipvs->sysctl_amemthresh /
-> -				(ipvs->sysctl_amemthresh-availmem);
-> +				= amemthresh /
-> +				(amemthresh-availmem);
+Fixes: d342894c5d2f ("vxlan: virtual extensible lan")
+Suggested-by: Ido Schimmel <idosch@nvidia.com>
+Signed-off-by: David Bauer <mail@david-bauer.net>
+---
+ drivers/net/vxlan/vxlan_core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-	Thanks, both patches look ok except that the old styling
-is showing warnings for this patch:
-
-scripts/checkpatch.pl --strict /tmp/file1.patch
-
-	It would be great if you silence them somehow in v3...
-
-	BTW, est_cpulist is masked with current->cpus_mask of the
-sysctl writer process, if that is of any help. That is why I skipped
-it but lets keep it read-only for now...
-
->  			ipvs->sysctl_drop_packet = 2;
->  		} else {
->  			ipvs->drop_rate = 0;
-> @@ -156,8 +158,8 @@ static void update_defense_level(struct netns_ipvs *ipvs)
->  	case 2:
->  		if (nomem) {
->  			ipvs->drop_rate = ipvs->drop_counter
-> -				= ipvs->sysctl_amemthresh /
-> -				(ipvs->sysctl_amemthresh-availmem);
-> +				= amemthresh /
-> +				(amemthresh-availmem);
->  		} else {
->  			ipvs->drop_rate = 0;
->  			ipvs->sysctl_drop_packet = 1;
-
-Regards
-
---
-Julian Anastasov <ja@ssi.bg>
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 3495591a5c29..ba319fc21957 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -1615,6 +1615,10 @@ static bool vxlan_set_mac(struct vxlan_dev *vxlan,
+ 	if (ether_addr_equal(eth_hdr(skb)->h_source, vxlan->dev->dev_addr))
+ 		return false;
+ 
++	/* Ignore packets from invalid src-address */
++	if (!is_valid_ether_addr(eth_hdr(skb)->h_source))
++		return false;
++
+ 	/* Get address from the outer IP header */
+ 	if (vxlan_get_sk_family(vs) == AF_INET) {
+ 		saddr.sin.sin_addr.s_addr = ip_hdr(skb)->saddr;
+-- 
+2.43.0
 
 
