@@ -1,180 +1,126 @@
-Return-Path: <netdev+bounces-89128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC3E58A980A
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:00:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 785878A9812
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:01:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A3751C20B22
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:00:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 337BB282D1B
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:01:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3174D15E1F8;
-	Thu, 18 Apr 2024 11:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z6ip7dtK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6228015E20B;
+	Thu, 18 Apr 2024 11:01:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A4B15E1E4;
-	Thu, 18 Apr 2024 11:00:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCDB315E1FB;
+	Thu, 18 Apr 2024 11:01:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713438035; cv=none; b=kwjDyDK6D3W1HNPKD7DtsljEDbF8ups+0LLPOQKbwZuIsvWH2YxtT6VQbJfbMSZLDOHbj2rRbkXAsdQhQCIRHa6Hda/3jmDXswXxrWWvqetbtoF1vjRIWFOstWWC+xjIiREs4PvCFcItOpHLN9uUAS76X6+2MDxsIHAIFBPGB5I=
+	t=1713438088; cv=none; b=aNyrI/JKuPgQ1FoWXmhKHdgpqGy+y42bQQpVIC7wAJ5ldHCNvdl7M4zSoVud/Q+X17A7bjCquAzoC7TtDCSbbKhoQLBinhdanw5xNH20iyN1WyDvRm+D7+cSfUMea6016IBRU+vwrT/nf23mlnriqjfIpPfNSRi0xAJKwUgrx54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713438035; c=relaxed/simple;
-	bh=4h5v9OO81NjzQxlsyJ2cFIRM5mqx39CLg3+LcKvwFH8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Jk13x7VYa3ZQRXEnb344FJvqDxkq3uzjBluE2T6edGtYb3xoRCXOWuAscCZeJeDC6zd4tZWfgUSD+EHxglJf/D/WyBmpwBYo2r6zCweDaAw+gbBQcHRirZflKxaeVt6XDZxvZr3HGXVMz2a8Lb6ySz3FzsHaAKnXXE8eYyRU4K0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z6ip7dtK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45BAAC32781;
-	Thu, 18 Apr 2024 11:00:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713438034;
-	bh=4h5v9OO81NjzQxlsyJ2cFIRM5mqx39CLg3+LcKvwFH8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Z6ip7dtK3MN/InqrV8vpt64q9inPO3FDln1IFe6XpUyoi0Uq9ItKx/iDVjvrEDfd6
-	 LBrwNEoqeeWPKyA4NxkspkErOnWCdxcUuGYH+/J/MJijm1z7/bvqnNbPfQUa9koyRT
-	 H/fVvLAgcxQUr6pzTUF3augzLjqBBuPPLWRK+9Q657atEjkKrqrUPnfbxpSxKG0r4M
-	 r/iNJbiR28UnytvFu1xbZsvKjgIMSpCyPKh6P3SKjZBTHtbmEvDBbWVjpsis9PYrNO
-	 jOGOuhRpMHJoQuzGPcaINNFD6+jNlv6hyPHQRzlJYsq3MZVzqYo1kdQ+s1BgFqvVlw
-	 IudtuDtr/YBOg==
-Message-ID: <72e4a55e-a246-4e28-9d2e-d4f1ef5637c2@kernel.org>
-Date: Thu, 18 Apr 2024 13:00:30 +0200
+	s=arc-20240116; t=1713438088; c=relaxed/simple;
+	bh=IWBVXvEKNivmLFW4lhGxT3c3JjTMOajf11zBuAEveQk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=cGev8K6ceMTYi2sUQgfGjRbcsDw6+SI0+RLd9VUgPzEaTqNnzHb+3PeMC/9n6jPn9P8UsT/7V4N3OaGFDbYBcOcj22CqrP2wabrVPM2glErf603XMLk+ykuhbTghv4X1V3hz88Q12u5wkFAeoAnqV5115/RRxSR0NFF56Cz2pEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.254])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VKvrm0sHWzwS8W;
+	Thu, 18 Apr 2024 18:58:16 +0800 (CST)
+Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
+	by mail.maildlp.com (Postfix) with ESMTPS id 557751800C3;
+	Thu, 18 Apr 2024 19:01:20 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 18 Apr 2024 19:01:19 +0800
+Message-ID: <7672ae57-86b9-91c2-b03e-2700b931b677@huawei.com>
+Date: Thu, 18 Apr 2024 19:01:19 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 3/3] cgroup/rstat: introduce ratelimited rstat flushing
-To: Yosry Ahmed <yosryahmed@google.com>
-Cc: tj@kernel.org, hannes@cmpxchg.org, lizefan.x@bytedance.com,
- cgroups@vger.kernel.org, longman@redhat.com, netdev@vger.kernel.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org, shakeel.butt@linux.dev,
- kernel-team@cloudflare.com, Arnaldo Carvalho de Melo <acme@kernel.org>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, mhocko@kernel.org
-References: <171328983017.3930751.9484082608778623495.stgit@firesoul>
- <171328990014.3930751.10674097155895405137.stgit@firesoul>
- <CAJD7tkbZAj3UQSHbu3kj1NG4QDowXWrohG4XM=7cX_a=QL-Shg@mail.gmail.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <CAJD7tkbZAj3UQSHbu3kj1NG4QDowXWrohG4XM=7cX_a=QL-Shg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH net] net/smc: fix potential sleeping issue in
+ smc_switch_conns
+To: Wenjia Zhang <wenjia@linux.ibm.com>, Guangguan Wang
+	<guangguan.wang@linux.alibaba.com>, <linux-s390@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>
+CC: <jaka@linux.ibm.com>, <alibuda@linux.alibaba.com>,
+	<tonylu@linux.alibaba.com>, <guwen@linux.alibaba.com>,
+	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
+	<tangchengchang@huawei.com>
+References: <20240413035150.3338977-1-shaozhengchao@huawei.com>
+ <6520c574-e1c6-49e0-8bb1-760032faaf7a@linux.alibaba.com>
+ <ed5f3665-43ae-cbab-b397-c97c922d26eb@huawei.com>
+ <c6deb857-2236-4ec0-b4c7-25a160f1bcfb@linux.ibm.com>
+ <cd006e26-6f6e-2771-d1bc-76098a5970ac@huawei.com>
+ <0cbb1082-8f5f-4887-b13c-802c2bbcca36@linux.ibm.com>
+From: shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <0cbb1082-8f5f-4887-b13c-802c2bbcca36@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
 
 
 
-On 18/04/2024 04.21, Yosry Ahmed wrote:
-> On Tue, Apr 16, 2024 at 10:51 AM Jesper Dangaard Brouer <hawk@kernel.org> wrote:
->>
->> This patch aims to reduce userspace-triggered pressure on the global
->> cgroup_rstat_lock by introducing a mechanism to limit how often reading
->> stat files causes cgroup rstat flushing.
->>
->> In the memory cgroup subsystem, memcg_vmstats_needs_flush() combined with
->> mem_cgroup_flush_stats_ratelimited() already limits pressure on the
->> global lock (cgroup_rstat_lock). As a result, reading memory-related stat
->> files (such as memory.stat, memory.numa_stat, zswap.current) is already
->> a less userspace-triggerable issue.
->>
->> However, other userspace users of cgroup_rstat_flush(), such as when
->> reading io.stat (blk-cgroup.c) and cpu.stat, lack a similar system to
->> limit pressure on the global lock. Furthermore, userspace can easily
->> trigger this issue by reading those stat files.
->>
->> Typically, normal userspace stats tools (e.g., cadvisor, nomad, systemd)
->> spawn threads that read io.stat, cpu.stat, and memory.stat (even from the
->> same cgroup) without realizing that on the kernel side, they share the
->> same global lock. This limitation also helps prevent malicious userspace
->> applications from harming the kernel by reading these stat files in a
->> tight loop.
->>
->> To address this, the patch introduces cgroup_rstat_flush_ratelimited(),
->> similar to memcg's mem_cgroup_flush_stats_ratelimited().
->>
->> Flushing occurs per cgroup (even though the lock remains global) a
->> variable named rstat_flush_last_time is introduced to track when a given
->> cgroup was last flushed. This variable, which contains the jiffies of the
->> flush, shares properties and a cache line with rstat_flush_next and is
->> updated simultaneously.
->>
->> For cpu.stat, we need to acquire the lock (via cgroup_rstat_flush_hold)
->> because other data is read under the lock, but we skip the expensive
->> flushing if it occurred recently.
->>
->> Regarding io.stat, there is an opportunity outside the lock to skip the
->> flush, but inside the lock, we must recheck to handle races.
->>
->> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+On 2024/4/18 15:50, Wenjia Zhang wrote:
 > 
-> As I mentioned in another thread, I really don't like time-based
-> rate-limiting [1]. Would it be possible to generalize the
-> magnitude-based rate-limiting instead? Have something like
-> memcg_vmstats_needs_flush() in the core rstat code?
 > 
+> On 18.04.24 03:48, shaozhengchao wrote:
+>>
+>>
+>> On 2024/4/17 23:23, Wenjia Zhang wrote:
+>>>
+>>>
+>>> On 17.04.24 10:29, shaozhengchao wrote:
+>>>>
+>>>> Hi Guangguan:
+>>>>    Thank you for your review. When I used the hns driver, I ran into 
+>>>> the
+>>>> problem of "scheduling while atomic". But the problem was tested on the
+>>>> 5.10 kernel branch, and I'm still trying to reproduce it using the
+>>>> mainline.
+>>>>
+>>>> Zhengchao Shao
+>>>>
+>>>
+>> Hi Wenjia:
+>>    I will try to reproduce it. 
+> 
+> Thanks!
+> 
+> In addition, the last time I sent you a
+>> issue about the smc-tool, do you have any idea?
+>>
+> 
+Hi Wenjia:
+   I have send it to you. Could you receive it?
 
-I've taken a closer look at memcg_vmstats_needs_flush(). And I'm
-concerned about overhead maintaining the stats (that is used as a filter).
-
-   static bool memcg_vmstats_needs_flush(struct memcg_vmstats *vmstats)
-   {
-	return atomic64_read(&vmstats->stats_updates) >
-		MEMCG_CHARGE_BATCH * num_online_cpus();
-   }
-
-I looked at `vmstats->stats_updates` to see how often this is getting 
-updated.  It is updated in memcg_rstat_updated(), but it gets inlined 
-into a number function (__mod_memcg_state, __mod_memcg_lruvec_state, 
-__count_memcg_events), plus it calls cgroup_rstat_updated().
-Counting invocations per sec (via funccount):
-
-   10:28:09
-   FUNC                                    COUNT
-   __mod_memcg_state                      377553
-   __count_memcg_events                   393078
-   __mod_memcg_lruvec_state              1229673
-   cgroup_rstat_updated                  2632389
-
-
-I'm surprised to see how many time per sec this is getting invoked.
-Originating from memcg_rstat_updated() = 2,000,304 times per sec.
-(On a 128 CPU core machine with 39% idle CPU-load.)
-Maintaining these stats seems excessive...
-
-Then how often does the filter lower pressure on lock:
-
-   MEMCG_CHARGE_BATCH(64) * 128 CPU = 8192
-   2000304/(64*128) = 244 time per sec (every ~4ms)
-   (assuming memcg_rstat_updated val=1)
-
-
-> Also, why do we keep the memcg time rate-limiting with this patch? Is
-> it because we use a much larger window there (2s)? Having two layers
-> of time-based rate-limiting is not ideal imo.
->
-
-I'm also not-a-fan of having two layer of time-based rate-limiting, but 
-they do operate a different time scales *and* are not active at the same 
-time with current patch, if you noticed the details, then I excluded 
-memcg from using this as I commented "memcg have own ratelimit layer" 
-(in do_flush_stats).
-
-I would prefer removing the memcg time rate-limiting and use this more 
-granular 50ms (20 timer/sec) for memcg also.  And I was planning to do 
-that in a followup patchset.  The 50ms (20 timer/sec) limit will be per 
-cgroup in the system, which then "scales"/increase with the number of 
-cgroups, but better than unbounded read/access locks per sec.
-
---Jesper
-
-
-> [1]https://lore.kernel.org/lkml/CAJD7tkYnSRwJTpXxSnGgo-i3-OdD7cdT-e3_S_yf7dSknPoRKw@mail.gmail.com/
-
-
-sudo ./bcc/tools/funccount -Ti 1 -d 10 
-'__mod_memcg_state|__mod_memcg_lruvec_state|__count_memcg_events|cgroup_rstat_updated'
+Thank you.
+Zhengchao Shao
+> mhhh, I just see a patch from you on smc_hash_sk/smc_unhash_sk, and it 
+> is already applied during my vacation and it does look good to me. If 
+> you mean others, could you send me the link again please, I mightbe have 
+> missed out on it.
+> 
+>> Thank you
+>> Zhengchao Shao
+>>> Could you please try to reproduce the bug with the latest kernel? And 
+>>> show more details (e.g. kernel log) on this bug?
+>>>
+>>> Thanks,
+>>> Wenjia
+>>
+> 
 
