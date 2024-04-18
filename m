@@ -1,134 +1,88 @@
-Return-Path: <netdev+bounces-88929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5477D8A9066
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 03:10:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86DDC8A9088
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 03:17:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85C9F1C218ED
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:10:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26B3F1F221AB
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA27C4DA03;
-	Thu, 18 Apr 2024 01:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D95826FB0;
+	Thu, 18 Apr 2024 01:17:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uZzkrlj9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0343A3BBE4;
-	Thu, 18 Apr 2024 01:09:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A47F93BB3D;
+	Thu, 18 Apr 2024 01:17:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713402599; cv=none; b=jzkxEWUjS/OYVAfhH+Go8yhCt2cDkGyLdnSlMQX3n3EO5qJvd8xzgU4fhLhBHlrH+t5evuiFcC3ExPMawpc9AgqOhw4kmmntJ0tHNBW2n1jTUB4FCREBZcFw4x7AudWLJBjs5dMgdpdCBweFx+FU4E+gdmEWbfsjuLOk9DLYeyc=
+	t=1713403056; cv=none; b=MWiaO+2TMaURsf0Lc5VcJ35IY1SvEiqEMekyPTgb88xm87nFPJlH2kqkjTnVhQVWHme7KfXO/Wh48QXujtKzkFpGUuhEX/LRUu203duwhyEjg0Tb7HBgpIQXLKZislcipv0FGL/9LvscUvYq0okgqUJAe6cvjDsRSTm6A8hOvDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713402599; c=relaxed/simple;
-	bh=rQuQ0nluDqufnJdJ7SeRkV4kvE+ksZTAcethRzPlvQQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=pBWtOHNX5ddQ1A8c0JXbK8VMnON35GVKvd7fKEZiKsTlTsrEHzTW5we+fEbqB77inb2EMlP8Q/horOx6yaL5RxMHWR1tRrTkoccGQppspU9Ig9IFS94/rqmZRU1ksG7LMtYqlxNRsbhT6Ul87eqDdPqSju98BgGCCZ5Z7Ea3Qjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com
-Subject: [PATCH net 3/3] netfilter: nf_tables: fix memleak in map from abort path
-Date: Thu, 18 Apr 2024 03:09:48 +0200
-Message-Id: <20240418010948.3332346-4-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240418010948.3332346-1-pablo@netfilter.org>
-References: <20240418010948.3332346-1-pablo@netfilter.org>
+	s=arc-20240116; t=1713403056; c=relaxed/simple;
+	bh=hdVD2zmDhEeyC9WhL+5xWGr2WwLsDZg2E07WnEotBVU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IwoBgvqXuBOMZIAaABGHz1/bCZk1Wd6AbSeDxdJiDJ0SvPc++hyxbPCUM8nq4m+y2DSwK7OkdQP2f+68wb7STeQq5Yjoz10mnhQ8RFerieX8p5jNOpr7OpBfSCm+TIq/ro54SHXsGj/KuvqqXUyfEGS30jJ9Xd/emWnRlKNcDFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uZzkrlj9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A5B1C072AA;
+	Thu, 18 Apr 2024 01:17:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713403056;
+	bh=hdVD2zmDhEeyC9WhL+5xWGr2WwLsDZg2E07WnEotBVU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uZzkrlj997OCf0jAfiVQA8ukfS+TJla4TktiJ+SHNn05x0DrvMxax8TTc8H5cDetX
+	 m0d1HhErMSoIe9B+JkZSrQLHeXDJf7+lUETuEZiUupJ1NrHvptYOfxhepUM+O+RsLp
+	 tw32M2fLQImd5vfisT4+6assR7YxEQjInGq90/dWwUSFiWJAGIe3UA0ua4w1i84Tar
+	 YQ314BrKPS+U8ysgR0HPE2fEx6s1ppLbPHW4Q9875l4jndKFi5tHOS9F677Fchscvc
+	 0Zi1hBRHny/3m6C5teIkcRt9g2LdZo+KWK8+Vm5/kO23MyJDhs9wZS4etB4ZptOjRk
+	 EBhLUhF/kfMeQ==
+Date: Wed, 17 Apr 2024 18:17:34 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Camelia Groza <camelia.groza@nxp.com>, David Gouarin
+ <dgouarin@gmail.com>, david.gouarin@thalesgroup.com, Madalin Bucur
+ <madalin.bucur@nxp.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net v4] dpaa_eth: fix XDP queue index
+Message-ID: <20240417181734.7ebc844f@kernel.org>
+In-Reply-To: <20240411113433.ulnnink3trehi44b@skbuf>
+References: <20240410194055.2bc89eeb@kernel.org>
+	<20240411113433.ulnnink3trehi44b@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The delete set command does not rely on the transaction object for
-element removal, therefore, a combination of delete element + delete set
-from the abort path could result in restoring twice the refcount of the
-mapping.
+On Thu, 11 Apr 2024 14:34:33 +0300 Vladimir Oltean wrote:
+> On Wed, Apr 10, 2024 at 07:40:55PM -0700, Jakub Kicinski wrote:
+> > On Tue,  9 Apr 2024 11:30:46 +0200 David Gouarin wrote:  
+> > > Make it possible to bind a XDP socket to a queue id.
+> > > The DPAA FQ Id was passed to the XDP program in the
+> > > xdp_rxq_info->queue_index instead of the Ethernet device queue number,
+> > > which made it unusable with bpf_map_redirect.
+> > > Instead of the DPAA FQ Id, initialise the XDP rx queue with the queue number.  
+> > 
+> > Camelia, looks good?  
+> 
+> Please allow me some time to prepare a response, even if this means the
+> patch misses this week's 'net' pull request.
 
-Check for inactive element in the next generation for the delete element
-command in the abort path, skip restoring state if next generation bit
-has been already cleared. This is similar to the activate logic using
-the set walk iterator.
-
-[ 6170.286929] ------------[ cut here ]------------
-[ 6170.286939] WARNING: CPU: 6 PID: 790302 at net/netfilter/nf_tables_api.c:2086 nf_tables_chain_destroy+0x1f7/0x220 [nf_tables]
-[ 6170.287071] Modules linked in: [...]
-[ 6170.287633] CPU: 6 PID: 790302 Comm: kworker/6:2 Not tainted 6.9.0-rc3+ #365
-[ 6170.287768] RIP: 0010:nf_tables_chain_destroy+0x1f7/0x220 [nf_tables]
-[ 6170.287886] Code: df 48 8d 7d 58 e8 69 2e 3b df 48 8b 7d 58 e8 80 1b 37 df 48 8d 7d 68 e8 57 2e 3b df 48 8b 7d 68 e8 6e 1b 37 df 48 89 ef eb c4 <0f> 0b 48 83 c4 08 5b 5d 41 5c 41 5d 41 5e 41 5f c3 cc cc cc cc 0f
-[ 6170.287895] RSP: 0018:ffff888134b8fd08 EFLAGS: 00010202
-[ 6170.287904] RAX: 0000000000000001 RBX: ffff888125bffb28 RCX: dffffc0000000000
-[ 6170.287912] RDX: 0000000000000003 RSI: ffffffffa20298ab RDI: ffff88811ebe4750
-[ 6170.287919] RBP: ffff88811ebe4700 R08: ffff88838e812650 R09: fffffbfff0623a55
-[ 6170.287926] R10: ffffffff8311d2af R11: 0000000000000001 R12: ffff888125bffb10
-[ 6170.287933] R13: ffff888125bffb10 R14: dead000000000122 R15: dead000000000100
-[ 6170.287940] FS:  0000000000000000(0000) GS:ffff888390b00000(0000) knlGS:0000000000000000
-[ 6170.287948] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 6170.287955] CR2: 00007fd31fc00710 CR3: 0000000133f60004 CR4: 00000000001706f0
-[ 6170.287962] Call Trace:
-[ 6170.287967]  <TASK>
-[ 6170.287973]  ? __warn+0x9f/0x1a0
-[ 6170.287986]  ? nf_tables_chain_destroy+0x1f7/0x220 [nf_tables]
-[ 6170.288092]  ? report_bug+0x1b1/0x1e0
-[ 6170.287986]  ? nf_tables_chain_destroy+0x1f7/0x220 [nf_tables]
-[ 6170.288092]  ? report_bug+0x1b1/0x1e0
-[ 6170.288104]  ? handle_bug+0x3c/0x70
-[ 6170.288112]  ? exc_invalid_op+0x17/0x40
-[ 6170.288120]  ? asm_exc_invalid_op+0x1a/0x20
-[ 6170.288132]  ? nf_tables_chain_destroy+0x2b/0x220 [nf_tables]
-[ 6170.288243]  ? nf_tables_chain_destroy+0x1f7/0x220 [nf_tables]
-[ 6170.288366]  ? nf_tables_chain_destroy+0x2b/0x220 [nf_tables]
-[ 6170.288483]  nf_tables_trans_destroy_work+0x588/0x590 [nf_tables]
-
-Fixes: 591054469b3e ("netfilter: nf_tables: revisit chain/object refcounting from elements")
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/nf_tables_api.c | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
-
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index d0c09f899e80..167074283ea9 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -7223,6 +7223,16 @@ void nft_data_hold(const struct nft_data *data, enum nft_data_types type)
- 	}
- }
- 
-+static int nft_setelem_active_next(const struct net *net,
-+				   const struct nft_set *set,
-+				   struct nft_elem_priv *elem_priv)
-+{
-+	const struct nft_set_ext *ext = nft_set_elem_ext(set, elem_priv);
-+	u8 genmask = nft_genmask_next(net);
-+
-+	return nft_set_elem_active(ext, genmask);
-+}
-+
- static void nft_setelem_data_activate(const struct net *net,
- 				      const struct nft_set *set,
- 				      struct nft_elem_priv *elem_priv)
-@@ -10644,8 +10654,10 @@ static int __nf_tables_abort(struct net *net, enum nfnl_abort_action action)
- 		case NFT_MSG_DESTROYSETELEM:
- 			te = (struct nft_trans_elem *)trans->data;
- 
--			nft_setelem_data_activate(net, te->set, te->elem_priv);
--			nft_setelem_activate(net, te->set, te->elem_priv);
-+			if (!nft_setelem_active_next(net, te->set, te->elem_priv)) {
-+				nft_setelem_data_activate(net, te->set, te->elem_priv);
-+				nft_setelem_activate(net, te->set, te->elem_priv);
-+			}
- 			if (!nft_setelem_is_catchall(te->set, te->elem_priv))
- 				te->set->ndeact--;
- 
--- 
-2.30.2
-
+We're getting close to the 'net' pull request of the following week :)
+The bug has been around for a while so no huge rush, but would be nice
+to get rid of this from patchwork. If you don't have time - would you
+be willing to repost it once you found the time to investigate?
 
