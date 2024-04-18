@@ -1,156 +1,98 @@
-Return-Path: <netdev+bounces-89243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98EC18A9D2D
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 16:33:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C16BB8A9D58
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 16:43:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7A741C20978
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 14:33:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24BD0B21122
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 14:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AACD78BFD;
-	Thu, 18 Apr 2024 14:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B761515F418;
+	Thu, 18 Apr 2024 14:42:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G9j4gkR9"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="M13ziffz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58A71DFC4;
-	Thu, 18 Apr 2024 14:33:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CFA6FB0;
+	Thu, 18 Apr 2024 14:42:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713450834; cv=none; b=k0/DoG+dVEw+2XL0OG/cQe35R/4GH087TWQCrNN0RVZuRm4mzZOmtb4aVxmNkfAU6/HFT80XncK3CfR+qV+f3rsEO2ucuV3hHhvEDJkATBVlNhdP+a2gprSJUIhd9g018tf7YwB9hSHcO68LUY9fJ58adojLpaBtoRCcAu5n3us=
+	t=1713451359; cv=none; b=rOz88ubd8HPhmaHgju5+Jqm7KrVxpJ8ER+psBGE457ONVS11gU/mBaIdEWF2Oq4CKSUU/YKF6Kh3+CSg6JKcE/lyjJE9+lrewjgKZCOBH8qod/3/Wfe1Y6XHQHHUeWWp9bOUM1qni+W3Iq3xa92YBNJzAy/etUBepXyp1TADK+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713450834; c=relaxed/simple;
-	bh=RzkZ4NJ0NC6ZEDfgj1yk2bDFK20UepmJNZheivhWCA4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T8Og4VqsqX9dsvYXH9XQtsFJ8Rz1zTxbf5cVsX6brq836JBxHrDzrjL0NRZF3gp8X+zNeXcZnDuN6zEQ9cH1UIKlB8lFm8ozSC5l0Xr55WYoiC5SbS6EmgCNoWJe6AL1i5qPvPlA68Yh1BXU8/TduXhIlsFanxesrjXS5ERKYJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G9j4gkR9; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-7d5e27eca85so34933139f.3;
-        Thu, 18 Apr 2024 07:33:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713450829; x=1714055629; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=748BDI+jvXbu20mK6aC5g91cz3/RNA8v08jpDyQG20s=;
-        b=G9j4gkR9XCdAfK2gbWZtX5gQRv9O6XFPGySoBIcZWUVQVsm6BQxDurMYjG5ok3bT1u
-         zh8rY1RR0vn8YsrlmW/2EfBSGe/c/0wHL+QNZTIDZG4y/2KBFwxkh8YGNEQoZtsOXR6c
-         O0cZLQux7Jx0NrW+/+gMgFE8P4DY9lFm9LjKeWZXFhfmmDxloGLbvZHoBsqC/OgCSsRg
-         cG5WgGxMrwznq4Qv+Wdq+oURzyWD6ur4Hy+TFDaACZ+FDVSPVdfJL4BOfnzeF9dYpOTa
-         6FpYxOlL9PflerA2XoQk+d87Kp7kqUScWWrGRVGFMRfXQWWk9Gw9OgrjXQJxbPDtieyK
-         rnQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713450829; x=1714055629;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=748BDI+jvXbu20mK6aC5g91cz3/RNA8v08jpDyQG20s=;
-        b=gTBu5TnS9KXiOJ3bJw8+capfdVPz3QU7HrAR/sA6tLPA21njHEahdvEpbBqF2p5s2y
-         nMiLqmvyBY38zbddxKnFrUp2N1mPocS8yg5Yuhw6xD3PJhGhBC2mcHteS6iq4CXMQBHn
-         01lue8vX9d+kspZwoA9CU93Q6n21CQQjUI2OkoU4OCIw/7vDClwxK/4QC10/kqrz4pub
-         2Ypun71zW6QbR5AnL/2hOeI3jEdl+MoyfXKgMdXD2Ab9eNmvDZBhcEfhy/9AAwKJ09/s
-         xQKVteW+LO5pFB9vno/DvYFIlzMNzkygb9qK1DfqJpwnL2FIwcpko7E4ELk6Ry/YM/VX
-         FAYg==
-X-Forwarded-Encrypted: i=1; AJvYcCX5P7FMKE42+YYk/6lkKknE7TTXox2H5RRNfjQ93zgxL+YduNcNW6AP1NBcsSt8SlXkglWQMnTEfcjin+yu0iL8SKEQUSXwI8WE6WT4llrG+k5BaGu/lhck4D2/H/JL
-X-Gm-Message-State: AOJu0YzheyNuqjNVEE7pfbIFQsr7kmoJ/ZCaHbqduulMK2LjK5LYe78W
-	CEUpiM6wn2H83OGnIOWW1bUGq8xwRrFquzt/u4Bhyio37oz/9iuL2f5sonTGIDTz7yrOpqPCJX0
-	GIRdzLY46aimLAlvGLJ9xxVGUmkNgRQ==
-X-Google-Smtp-Source: AGHT+IFT+FfdwZ/C4OC8Z5bzAWzrydxAniftNggvWr7l39jIYvywhkaAwImtMYlNPn3dawc7vtaoYGP0E90H67XvgCk=
-X-Received: by 2002:a05:6e02:1c47:b0:36a:1f5d:44ba with SMTP id
- d7-20020a056e021c4700b0036a1f5d44bamr4111208ilg.9.1713450828920; Thu, 18 Apr
- 2024 07:33:48 -0700 (PDT)
+	s=arc-20240116; t=1713451359; c=relaxed/simple;
+	bh=X/X/TboqyfyUYTUVWHRPVjdRoe8kWfo0nNRba0UUe3U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=npCsQidWbccnnuVzMGyt+OKK7q2+IQC4/krc6oReKy48axX8LKossELD9o8uFLLmqt/Gka26IbfGIs+8YM+6KlqXe605bc8EU29wry7j/qcOyZqyhoWchc5r5sodpOV6VEr72R5WvyMrD2LxoqwgsJRN06WM07CweHfc0KFClCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=M13ziffz; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=exe9fv7oChxO5dkJDmvKHfPoF5uNIcU4b4Fk47PWcJs=; b=M13ziffz/YyFgNDh+s5EP6JkLz
+	RQLWcoKOi6kSxj0F6z29pP14vOvkqXZn3xpvq7+VcLWlbkkwPPWfoWOpJR8iSv73gTtv1R540raXC
+	xkM6jU3cQq8mdkB0Bxoeil5jrjtbXYixs+esMcHSJCMPLJ2WN3P/2Du+bsoNJ5xHQjFM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rxSy9-00DMJm-3I; Thu, 18 Apr 2024 16:42:33 +0200
+Date: Thu, 18 Apr 2024 16:42:33 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: gregkh@linuxfoundation.org, netdev@vger.kernel.org,
+	rust-for-linux@vger.kernel.org, tmgross@umich.edu
+Subject: Re: [PATCH net-next v1 4/4] net: phy: add Applied Micro QT2025 PHY
+ driver
+Message-ID: <176fe839-7142-49be-9fba-1e105dc8d4de@lunn.ch>
+References: <20240415104701.4772-1-fujita.tomonori@gmail.com>
+ <20240415104701.4772-5-fujita.tomonori@gmail.com>
+ <2024041549-voicing-legged-3341@gregkh>
+ <20240418.220047.226895073727611433.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ded9d793-83f8-4f11-87d9-a218d10c2981@gmail.com>
- <20240416193458.1e2c799d@kernel.org> <4b0495fd-fab5-4341-9b06-2f48613ee921@gmail.com>
- <2024041709-prorate-swifter-523d@gregkh> <17a3f8cb-26d4-4185-8e8b-0040ed62ae77@gmail.com>
- <2024041746-heritage-annex-3b66@gregkh> <ZiBOHF24EDoaI9gm@wunner.de> <2024041800-yelp-grimy-1819@gregkh>
-In-Reply-To: <2024041800-yelp-grimy-1819@gregkh>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Date: Thu, 18 Apr 2024 16:33:37 +0200
-Message-ID: <CAFSsGVsYBJdB0-ve_bxFU8Ps-MS69YSadxqPe39X-6ui5ECiWw@mail.gmail.com>
-Subject: Re: [PATCH net] r8169: fix LED-related deadlock on module removal
-To: Greg KH <gregkh@linuxfoundation.org>
-Cc: Lukas Wunner <lukas@wunner.de>, Jakub Kicinski <kuba@kernel.org>, 
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240418.220047.226895073727611433.fujita.tomonori@gmail.com>
 
-On Thu, Apr 18, 2024 at 11:55=E2=80=AFAM Greg KH <gregkh@linuxfoundation.or=
-g> wrote:
->
-> On Thu, Apr 18, 2024 at 12:33:00AM +0200, Lukas Wunner wrote:
-> > On Wed, Apr 17, 2024 at 09:43:27AM +0200, Greg KH wrote:
-> > > On Wed, Apr 17, 2024 at 09:16:04AM +0200, Heiner Kallweit wrote:
-> > > > On 17.04.2024 09:04, Greg KH wrote:
-> > > > > On Wed, Apr 17, 2024 at 08:02:31AM +0200, Heiner Kallweit wrote:
-> > > > >> On 17.04.2024 04:34, Jakub Kicinski wrote:
-> > > > >>> On Mon, 15 Apr 2024 13:57:17 +0200 Heiner Kallweit wrote:
-> > > > >>>> Binding devm_led_classdev_register() to the netdev is problema=
-tic
-> > > > >>>> because on module removal we get a RTNL-related deadlock. Fix =
-this
-> > > > >>>> by avoiding the device-managed LED functions.
-> > > > >>>>
-> > > > >>>> Note: We can safely call led_classdev_unregister() for a LED e=
-ven
-> > > > >>>> if registering it failed, because led_classdev_unregister() de=
-tects
-> > > > >>>> this and is a no-op in this case.
-> > > > >>>>
-> > > > >>>> Fixes: 18764b883e15 ("r8169: add support for LED's on RTL8168/=
-RTL8101")
-> > > > >>>> Cc: <stable@vger.kernel.org> # 6.8.x
-> > > > >>>> Reported-by: Lukas Wunner <lukas@wunner.de>
-> > > > >>>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> > > > >>
-> > > > >> This is a version of the fix modified to apply on 6.8.
-> > > > >
-> > > > > That was not obvious at all :(
-> > > > >
-> > > > Stating "Cc: <stable@vger.kernel.org> # 6.8.x" isn't sufficient?
-> > >
-> > > Without showing what commit id this is in Linus's tree, no.
-> >
-> > The upstream commit id *is* called out in the patch, but it's buried
-> > below the three dashes:
-> >
-> >     The original change was introduced with 6.8, 6.9 added support for
-> >     LEDs on RTL8125. Therefore the first version of the fix applied on
-> >     6.9-rc only. This is the modified version for 6.8.
-> >     Upstream commit: 19fa4f2a85d7
-> >                      ^^^^^^^^^^^^
-> >
-> > The proper way to do this is to prominently add ...
-> >
-> >     commit 19fa4f2a85d777a8052e869c1b892a2f7556569d upstream.
-> >
-> > ... or ...
-> >
-> >     [ Upstream commit 19fa4f2a85d777a8052e869c1b892a2f7556569d ]
-> >
-> > ... as the first line of the commit message, as per
-> > Documentation/process/stable-kernel-rules.rst
-> >
->
-> Yes, Heiner, please resubmit this, AND submit the fix-for-this-fix as
-> well, so that if we take this patch, it is not broken.
->
-OK. The fix-for-the-fix was included already. It's trivial and IMO submitti=
-ng it
-separately would just create overhead.
+> >> +            if i == 0x4000 {
+> > 
+> > What does 0x4000 mean here?
+> > 
+> >> +                a = MDIO_MMD_PHYXS;
+> >> +                j = 0x8000;
+> > 
+> > What does 0x8000 mean here?
+> > 
+> >> +            }
+> >> +            dev.c45_write(a, j, (*val).into())?;
+> >> +
+> >> +            j += 1;
+> >> +        }
+> >> +        dev.c45_write(MDIO_MMD_PCS, 0xe854, 0x0040)?;
+> > 
+> > Lots of magic values in this driver, is that intentional?
+> 
+> The original driver uses lots of magic values. I simply use them. As
+> Andrew wrote, we could infer some. I'll try to comment these.
 
-> thanks,
->
-> greg k-hj
+When you start from a Vendor crap driver, part of the process of
+getting it into Mainline is getting it up to Mainline quality. If this
+was C code, i would be trying to replace as many of the magic numbers
+with #define. And then add comments about the best guess what things
+are doing, based on the datasheet. The data sheet however does not
+explain all the bits, nor give every register a name. But you should
+use as much information as possible from the datasheet to make the
+code as readable as possible.
+
+	Andrew
 
