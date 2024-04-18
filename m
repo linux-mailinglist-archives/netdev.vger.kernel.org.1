@@ -1,97 +1,134 @@
-Return-Path: <netdev+bounces-88936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 392D78A90AB
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 03:30:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAE148A90BB
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 03:34:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B03EDB21495
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:30:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7962EB22594
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:34:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1662D1E521;
-	Thu, 18 Apr 2024 01:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91F9A848E;
+	Thu, 18 Apr 2024 01:34:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FgkRsR9d"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="rcaZKQ35"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D584779E1;
-	Thu, 18 Apr 2024 01:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A255F1A5A2;
+	Thu, 18 Apr 2024 01:34:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713403829; cv=none; b=aau1tKDD8CkKdq0VTzMkUI8vAEV8XacYUYij8+/Fu9dsCvlpqCDPZprZmMJ1ofbZU9tVJwPy0h7S0L4FcMNviORQFZhJZCWxVHgIuH4h+1iQEoURqxjeXlkGrQtk+5jFwuYdICKrHsDlIMHzyNDzBighzavYiz8HhMU6tEoiQQY=
+	t=1713404056; cv=none; b=Xd/L/GQtuUJoWuBWPVAAPsM8ni9BDUh+Uxc9l46QTmqLirUtHE4JV9D6qZwioj2OnYrcchpwhI/EHnJpNE/VT9YAP8Cy8NQN0NjDbMLY4Rjxp4OwAMa6gGHBMbTtLybIAKAX+HVJMozzRKsSi+vJC1KG43rtGnt17S9tGD94E5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713403829; c=relaxed/simple;
-	bh=gZOT/mOu2CyMDoG/ag0UuuhYX4Sj3DH7kUHqY72aNOo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iNRsZqPslfcTvNaw5kB30r2QZM5lLjhNQGx4tiEUqLGCAbMKSIRNhQhiECOpevMRho7bLHrlweGDwZ1vlGZPjZJuE5WLAs+3fMHoXt5N0hCQLdD4zW/Rq9t3Wa/IQNnvVd6xJZOA8kcCjvabR6atY4fcRLtRo9XmbLo1YcbsV38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FgkRsR9d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7777BC2BD11;
-	Thu, 18 Apr 2024 01:30:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713403829;
-	bh=gZOT/mOu2CyMDoG/ag0UuuhYX4Sj3DH7kUHqY72aNOo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FgkRsR9dWmawSa+lnBNBzm7D5ZM9RlrEERfvyTaUHRx/3rWYNT0Q8O8cZvmCQAYJI
-	 m/F7LaRFVd4roG2p6Bpd3t8ibrTf7ke9/7lTm5M2j8R7WWmhgAJ21zW9m4t/t9WLEv
-	 w2cScYoGJM3m+/uHE0Py9Yg5Ct99El7TsOmElrO8ZyHpFvN2jvgMLxzHVEVaRSgiXo
-	 efrbo/t2d6i1G1nwRKr9hy6bd/dRys/4Af9/wnMDI1UtCN+8W8budnEZTFzUwPL0xa
-	 R9pDdKiZHvSl6ESvQE9eSlPrK0X7K552vSqzZM24EZ2QEt/s18ncUpQ2z3oO9pZKTl
-	 iUSO1jhT7aI2w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5BCFEC43619;
-	Thu, 18 Apr 2024 01:30:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1713404056; c=relaxed/simple;
+	bh=40bi0vrhk3vA+zYhVlSbaVcJKKZcL8qD8xwjiiHiDdM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=OYAWqfIYIDpQsWFyda940fE7kI+7FIqW2lZfsX1B1TgjTZQmZ1QsWCAYar8Ts8nmynA6M5etdUCkEo9+hmlyxjsmTkXYaKkpOsGBErXWT5TgxB7e1r6xntYGj9EbONeXhqIlV3+a+BGYJpsC9X8nHHgnUOH7TQbDgThG6ViWjOA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=rcaZKQ35; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1713404049;
+	bh=nPXlTkU93bQ4+Q1L6del9DzlcYprWJaUtG5tpvstX4M=;
+	h=Date:From:To:Cc:Subject:From;
+	b=rcaZKQ35lYQC5WF8rfULBgf+9tNcqZ/zSuYcK37Jrt3VdM8ffgcshMO052eLEG2Uk
+	 A89FykxuPuGsRz68QbxYjCY7GN5t7HclpICl8baqgbV9AElO/6+ScnLUbi+o7CRG5D
+	 yYjETNs9G8asN8zpefcpwoT8z0XrXQEe2dPrlgUhYgOxY0XnUqsOVHxe4YmSZj6/Wc
+	 ABIQ4XJEPHkt62ePScJWvYM2BhIAWhD+tXWekY6TYYcl/HCk06LWVdRQaJCMPuYLfX
+	 1KO6nYpkAUCJorC6Wy02M457h7pdndYTLS82VrAE/i0+X8SDid6L5dnecxp4F4Ti7u
+	 IpSukqePfj74A==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4VKgKr3dRsz4x1x;
+	Thu, 18 Apr 2024 11:34:06 +1000 (AEST)
+Date: Thu, 18 Apr 2024 11:34:03 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Alexandre Torgue <alexandre.torgue@st.com>
+Cc: Networking <netdev@vger.kernel.org>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Gatien Chevallier
+ <gatien.chevallier@foss.st.com>, "Kory Maincent (Dent Project)"
+ <kory.maincent@bootlin.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: manual merge of the net-next tree with the stm32 tree
+Message-ID: <20240418113403.06e5ceed@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 1/2 v3] USB: serial: option: add Lonsung U8300/U9300 product
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171340382937.22183.3670134253557534621.git-patchwork-notify@kernel.org>
-Date: Thu, 18 Apr 2024 01:30:29 +0000
-References: <20240415142625.1756740-1-coiaprant@gmail.com>
-In-Reply-To: <20240415142625.1756740-1-coiaprant@gmail.com>
-To: Coia Prant <coiaprant@gmail.com>
-Cc: linux-usb@vger.kernel.org, larsm17@gmail.com, stable@vger.kernel.org,
- netdev@vger.kernel.org
+Content-Type: multipart/signed; boundary="Sig_/dK=CpwLGHY4MIi=f.grU+VL";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-Hello:
+--Sig_/dK=CpwLGHY4MIi=f.grU+VL
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Hi all,
 
-On Mon, 15 Apr 2024 07:26:25 -0700 you wrote:
-> Update the USB serial option driver to support Longsung U8300/U9300.
-> 
-> For U8300
-> 
-> Interface 4 is used by for QMI interface in stock firmware of U8300, the
-> router which uses U8300 modem. Free the interface up, to rebind it to
-> qmi_wwan driver.
-> Interface 5 is used by for ADB interface in stock firmware of U8300, the
-> router which uses U8300 modem. Free the interface up.
-> The proper configuration is:
-> 
-> [...]
+Today's linux-next merge of the net-next tree got a conflict in:
 
-Here is the summary with links:
-  - [1/2,v3] USB: serial: option: add Lonsung U8300/U9300 product
-    (no matching commit)
-  - [2/2,v3] net: usb: qmi_wwan: add Lonsung U8300/U9300 product
-    https://git.kernel.org/netdev/net-next/c/bc1b7f02c8fe
+  drivers/of/property.c
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+between commit:
 
+  6a15368c1c6d ("of: property: fw_devlink: Add support for "access-controll=
+er"")
 
+from the stm32 tree and commit:
+
+  93c0d8c0ac30 ("of: property: Add fw_devlink support for pse parent")
+
+from the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc drivers/of/property.c
+index dfdda94834d5,cc064151853e..000000000000
+--- a/drivers/of/property.c
++++ b/drivers/of/property.c
+@@@ -1252,7 -1252,7 +1252,8 @@@ DEFINE_SIMPLE_PROP(backlight, "backligh
+  DEFINE_SIMPLE_PROP(panel, "panel", NULL)
+  DEFINE_SIMPLE_PROP(msi_parent, "msi-parent", "#msi-cells")
+  DEFINE_SIMPLE_PROP(post_init_providers, "post-init-providers", NULL)
+ +DEFINE_SIMPLE_PROP(access_controllers, "access-controllers", "#access-con=
+troller-cells")
++ DEFINE_SIMPLE_PROP(pses, "pses", "#pse-cells")
+  DEFINE_SUFFIX_PROP(regulators, "-supply", NULL)
+  DEFINE_SUFFIX_PROP(gpio, "-gpio", "#gpio-cells")
+ =20
+
+--Sig_/dK=CpwLGHY4MIi=f.grU+VL
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmYgeIsACgkQAVBC80lX
+0GyK2gf9F8PsfK2iumwz8tvEIJtyQYl1aDLpokl2QDXys/AAVMjSOZEK4P8aHHea
+WcDdJgjx4CowEHdBsvFRPDRf7ku7D9n1GWhpzmVrkEMrSgl+n/245C7IdbLQcFO8
+P/R5aP82LJZy9r1c52Rbd1o03z2v9bZKJ4e8Y4cxkQzcqv+Bbne+TKI2zHgW8Yy6
+rcYQxI8xvaJK2bFIUJlBqUtFi47db7Ib5TMRtgs2dIKNm8Ly+zYJVRRccWewBlXW
+pkLkGK4826hjOfPSLmhofn/0dfqQA2AH4A0QJU6nKcdxtKzVJ29+/AY1pH3TVK6c
+5Say36uPL9DZ5TxMH+wksle6bl4/FA==
+=e2O8
+-----END PGP SIGNATURE-----
+
+--Sig_/dK=CpwLGHY4MIi=f.grU+VL--
 
