@@ -1,206 +1,121 @@
-Return-Path: <netdev+bounces-89408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 506EC8AA38F
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 21:59:15 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A9638AA39A
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:00:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF4761F24B54
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:59:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59EA0B298CD
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:57:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E98E617920C;
-	Thu, 18 Apr 2024 19:55:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D641D18131D;
+	Thu, 18 Apr 2024 19:52:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="uFrFoz9i"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TKqxI5nq"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2082.outbound.protection.outlook.com [40.107.244.82])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A0E2184133
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 19:55:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713470119; cv=fail; b=Rc8Agzn4LrM47NCsUHBjBlLnZZaWJg7BQ+5fHBsfDd+UOBa6kecwp0YmhDamj63LZmdVXknQ7UHbD7V5cJ7fPpCEdjR0nDMztk7MIBfZqwo7DqowyZmSuMD2rthpnUhnM1Fe5J6b+D5i4bw0ZjAraAG/w58JzRZnfCky4Nyl4/I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713470119; c=relaxed/simple;
-	bh=A2oMFk7NdFfgpAXrke6UaCTQhvN0wV8YKI9DuC+LNg4=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 Content-Type:MIME-Version; b=AfUsuUYj3pMzJHpc4E1+fFwIe8u5g1/8aVXUNagH2YmagmqFQUHzuhpG8YavRQvE3pqVaNxEMXDwsx2YNY+GqDzKw89wBpoRvN5LQ7kjsbvyxB4Yj/di7+53NU4OmOUKS/0Cvwlqq0VH7Iwig3QZHVSJM7bzSXKtx2ywff5wOtk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=uFrFoz9i; arc=fail smtp.client-ip=40.107.244.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a+sQx0Pfj2Fs8Bv+fpmMorbEvQ6buNtX1m4wOb+oVKU/fD4otnX/2wC1/gBUbwFS1SWvEEXsACo+vBTIfqcd/l5V2kEHO2QBWDAoGIDNwd6fpwYm5eTmDb5CNax07EHHRp4rSZ8OjpmP54iPLZBKjcwNDTpmLLZtCugE6srDdETdi19ZezoeHLgvBoo3T8iKNMBmUQeLiYBunT2XwZUNEByr+vFHmVs/V5Qx7JIP4cwnIU1+Y72ObMKN3Ljo26EQErI6wZfPRuW2U7o4cSnOaK7EIRrbavouTh03hjAZWRiwO9elqOem73gghkHcZU0kWACocsD1OzeqU4TnM+Pptg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NuM9KyT7EKwq08S57ccqrXCVBbGKjdyx+T53nDRJnt4=;
- b=BQTKwoOo7/0gBax/BSzAA+jXs7m0Wz798ct87O4gej/8/7THa0Rnz5fUKMxppi9JZEEMHuQwlKZGIdBpzQ5VBC3sHlfuIFlhqdZmiROBsWH/74GOqAoo5v24ciG3EBUwmZQpINnwV4Sidh8tuS2Y9dG3+afUQwd0Kn3/spnIaOXe2P9YdUPcysR3HODSTcyq9mOnymHPTjBkVvm8EHXCdOdzpvFLnh3Iet8qYLRh76tptNEHtLVBTjjmN2HTqL4KRrDnLXVy8OoFNrJYqpgoxe0TU0hhjQW7WWFMG/FCUzFkDKlyfTR3fXLpB0x+/AmXIvZq1sPandmT2e0KMhJfIQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NuM9KyT7EKwq08S57ccqrXCVBbGKjdyx+T53nDRJnt4=;
- b=uFrFoz9ize41+qGS5/YCsO9Jy3bbjEAJBWaAFAA1Cgin1Spd07x5mxLPYM3RfAtmVIbcBOAUOsaJLxt3WnI2n9ZFUeY+dXb/d68MxzMNrniWzw5QC1CFwR5DcRRWTV3ZdMLJEVoKLf2a3etuBRCJeLfRi72DonIPx5bSKCcHHxruhIRyyMqAXKgMpqnjZwzQyhzqXwQaUBeH4gbGYTKkNTXeNx+B1OF3M8hLmIRrjVscLuwYpJeCvonXQtmiG6wgcd88JFAklYKsMJOiy3Sq0atbUJh49k0xVNQHPm7hPYwGc3GtBIyDMOEIafY7T3r91wavWohkU70Jyj6kobFG/w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by DS0PR12MB6559.namprd12.prod.outlook.com (2603:10b6:8:d1::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7472.43; Thu, 18 Apr 2024 19:55:13 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::3ec0:1215:f4ed:9535]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::3ec0:1215:f4ed:9535%4]) with mapi id 15.20.7452.049; Thu, 18 Apr 2024
- 19:55:13 +0000
-References: <20240418052500.50678-1-mateusz.polchlopek@intel.com>
- <20240418052500.50678-9-mateusz.polchlopek@intel.com>
-User-agent: mu4e 1.10.8; emacs 28.2
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- horms@kernel.org, anthony.l.nguyen@intel.com, Jacob Keller
- <jacob.e.keller@intel.com>, Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v5 08/12] iavf: periodically
- cache PHC time
-Date: Thu, 18 Apr 2024 12:51:19 -0700
-In-reply-to: <20240418052500.50678-9-mateusz.polchlopek@intel.com>
-Message-ID: <87jzkue99b.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: BYAPR11CA0078.namprd11.prod.outlook.com
- (2603:10b6:a03:f4::19) To BYAPR12MB2743.namprd12.prod.outlook.com
- (2603:10b6:a03:61::28)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4703817B4ED
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 19:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713469935; cv=none; b=WON7PBbFTwpt9FgdRVTQVwDlArqcMvR8RCFDgFhavnuqET4hXYK0Xqk+eLNtJJgpaCUjK9JxVwdM+h5IJho2THed1BcFAhRf8fkf8PrazCRsHBQpjBydkpA1Zb7a1q33ILMV5GxeXbjJ1cNtWq71IvrNjnDAKjxwVI4qSl21hX8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713469935; c=relaxed/simple;
+	bh=4RNfOBr5nqELPj6sUi2A+81JS+EfTHxWt9g5RtNPAmE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ey6r5NuPFq+k5+1ehT2aMLebEg94ZBbTUGb9HG36EfJAeO/ns8z/FttLQ606MLkAfODfVOhs11sfSeY6vgti36rmy0stU+fhXVd6bUPeav4azaXyoAUXSKov2KzLQPUG8OXB5mOpF1EEQFqzzBpw3fdJunpChatXOZERM6eRTUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TKqxI5nq; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-ddaf2f115f2so2246738276.3
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 12:52:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713469933; x=1714074733; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bd+4GgJRGKxU/QWd6mgfFt8NB/GIv5aVw3cJbYsN/AQ=;
+        b=TKqxI5nqYxTttBSGMsQstKjLk6hbRtiso4vdy/r+8pkaZsFEAIrvWbo1FW93YNx+xS
+         Sy9KDYkhn1EoF3dstHJ6BhMgOG+2KGxG3gLv7+2RoEHvYilsAIQv+pKcPTUk9oRthJ0x
+         zr0oGKoy4/m25DM9orw0k8O9qvKdR3KYWzekbBpA5FBSu9H1M6ejhCm1F75ZHM4s49JL
+         rxosukm8RmpkDXU5xJLLlMLhmH/CByy24oJHI4r6jJhg8SpaCrSDxVdbwva41UzO7tIt
+         JRecWWME7MKXkqbJC2bGwNxRerA1q9TH+5HLgv58TZdzEZaehaXr556DmoTMuwT290gf
+         Fang==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713469933; x=1714074733;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bd+4GgJRGKxU/QWd6mgfFt8NB/GIv5aVw3cJbYsN/AQ=;
+        b=u/JOHoPQ/yfugzIKaEw4q5AcvUR1UT9IkMqtsPmMfk69UFDshazQ6nbyltEHZL/6wt
+         5g4wJcu+wOQGGMaQVK9mch4gbbkStTKcbAo1SB/JGexqI0LjZ+BHSiOiSEVTyW+0A6Pe
+         lrMfc5wLpe2zp6xqqnGGLjZpO0qwXXHM6FF0w2O7eAcU55oY5xFYN5PekEmxf/8QBZN/
+         AfEF5bTxh/0HqB08I6Lyh+o6TWxfL76GrWu+4/yGj9cJ5IL67bQU4uerzXASowmKReIq
+         X4EFCZ7irzOGtPwcRkxYrT5YKwskSUdsQiE/cA4MpaUox2k7odH2VaCtz9nFoFtlY7YV
+         2FJw==
+X-Gm-Message-State: AOJu0Yx3B3bxjUCP6S4Mc5kFxvOHSRlSTwIxuf3ZrlWoRU2GGiY+yv56
+	3/kWJMR/47guGAT4OqOvfxmXotMCtDwsuCQmVVV+5CI0GJspm+CrFqAdCbwBIAYgmwe3EAFEnDV
+	/dr0xXWBKHSb6UD1F6lAv9BmBTkqwNFGPcKDxg4L6CGoG3AiLcKY6j+y5c/tDmvQXUyRjSfK4jf
+	tGPitfJqswinEuVaynVhz1HsASLdG+5VNrsYKCd5ivtk8=
+X-Google-Smtp-Source: AGHT+IHh5NbwwAoI5T50Nl02L5B4uhp8WjA/Fkb6OG5VxQGtPz16Rs+7/nqlpKBvfPavHQPbrhdmWmy9oXkuBQ==
+X-Received: from shailendkvm.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2648])
+ (user=shailend job=sendgmr) by 2002:a05:6902:1209:b0:dc6:dfd9:d423 with SMTP
+ id s9-20020a056902120900b00dc6dfd9d423mr430464ybu.3.1713469933121; Thu, 18
+ Apr 2024 12:52:13 -0700 (PDT)
+Date: Thu, 18 Apr 2024 19:51:50 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|DS0PR12MB6559:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3756cde8-a933-4b09-4031-08dc5fe17629
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	QoU4FPZJbg7xW1LcA08ql0LIx79tWvPDGR+el48jlKXH5462unqAjBw1jg8wQcAGMKABWw5mp0z6RoebXuvk3YKf6ZoarwSRDeUjOvvWP75OhNg7EjFkKablh6+SQrCvsEtjZnAFrxM+a52c1JNNdzZsXzMUX+1gldJcidxcjAp1L3rAqOPIl9YhtFoz3XLm3tPgSjKLfkJoPfI1J2+88gqJiELX5ZVJUM/iMyyt+Rbf2nvzf+fTmsa4r6H4qxzod7tRF1CX/Aqa8Lrc+QkD4Z5m3UTABIoJJWobEjT/qLdS7ILcJgjqw6nlKIpa1zeZCJMXq8GOX2Vx3m1/G8iwUkFqrfB9G/Q0IUaOESWCYWO+rpxOMiHPoLHwXsSQ9DIZOJuSWM31M4hPZGO8i8YJ7d1RokFnGIQ2LiCMii1ZHyzM3QjQvYOnpcDB0Nt1vnqfsLn/8lW7bdAm3Qp7pBI+6zRCgAGV24HVR8VZYxZc9pkNUdD+CiNrtgRCI+nOl3vOdhOetP+efLIB+jm2h4ACdq/HfAhFsubVsoBBFH7CxxeEQ8K5yBMYjFVIoBppgc+i9+llV1FbKoK4wrC1NqaPC60IdRmU/yqzjZTZeYLjatRFU7rMyoxV7YYvzrsezpysauQ2oBAzdmhb7oZ9SBFZyfh/8mM+yYgyGh8tjqlvDFw=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?qM0BfTU35v0NTpvtrPgKtuZbY3hcHJub8/WEYG01+R9QhydxCWui9dEc+Ced?=
- =?us-ascii?Q?DTHrmkudtKq99svSzoGqXrEydnazn13naq10ysP+Fl9goYYp2KdqWhoImUNR?=
- =?us-ascii?Q?nVQRrJ5POK6Rt9EqGVmSprjrTuzl0SlEWOQH6DcVaRuxMCxh7FPzYcQMSQTx?=
- =?us-ascii?Q?NPnHAJK66x44/pcDq2tB0uFaY+I/rLfVXASN6sK5qyoD17yJFkE1TdHVOL71?=
- =?us-ascii?Q?hxK3hInHqc4J+RruBJi9OrT0e/tzUQEGS45HniAPI7KXtmqXl6CfuXoW5r9J?=
- =?us-ascii?Q?I6iSuNF4eV3psP5WBv5rbuqiXaLhMrh9q5/f2UryKuO8DUg5TUUGSqS9avjQ?=
- =?us-ascii?Q?rD085oaEx8Vc+UimrflkYRc15nZ7AZykVgTO5YvdfZmUFt6mubJb7YIa4haH?=
- =?us-ascii?Q?Itmr4MVOGx1mcogCKJ6TieVh+bm0USt0HGTmPqBR36SFbq6SbRtL3RcQ6odj?=
- =?us-ascii?Q?OKh7p7qKGVZ4/hvQoUK3OlQbcpjDJoXgMD8QQ/+o+y4xJoTc55n5vv4rw88B?=
- =?us-ascii?Q?EuFk7s0XnadI4YR1OS5GAlpYFuXey43RMvrciDgq/CL1QsD5ZwzflgSGMymv?=
- =?us-ascii?Q?go2NeQHXGikZu4UCyuqOzefrErSntt36+KxjibASYRYgO2NL8e44AK13KVof?=
- =?us-ascii?Q?u7J8Y9eMXiLhlaszgeiM1zghwVziqeiEnTSp3DSO7RU9EvypupSltywGRnHA?=
- =?us-ascii?Q?gZYmV5yZns/EyMMgA/wLUL06gqCqplR9MFwdgP5zPUEA8ZcxsrHqjvmCHVpF?=
- =?us-ascii?Q?AG8hcurojB767pqohaZwZkxiZrmjlbQ8buCCRU0CGhGoH7k41XDQoCoYH2Tj?=
- =?us-ascii?Q?Y8m15raqWnYQDmyzgZnEtU9R7my3jp/eAzt7JQh4+dzbuP8ah0Cb+Pm52sGc?=
- =?us-ascii?Q?ZbNEv1Qu2WZXRECfTzLxGo8aVIKkjwcNfF+5y3DVDKCfW65ma461ynoA7EeW?=
- =?us-ascii?Q?qalUmPjzydbSlZ5bdM2qCJfqqbaLbnve0lOkE1PBDJocOLY51tqePSfkg99o?=
- =?us-ascii?Q?FqGxaK3yEnZNH/1ErUhxnXsHyn8LZKTHAszjFjSyJMc3BwkaWPv2cnfw/PM2?=
- =?us-ascii?Q?geI//+A4aUAYECZ0F4YYO5EirdkZg+WCAjNhO7wZv80svkbDu3L2obEJ0ONh?=
- =?us-ascii?Q?DOBD2rBRA3U4rcEKdgi4VaUEnDfUJaFV4uFA3rEQLS3tHmEMrxIZy5JfbNwY?=
- =?us-ascii?Q?1wQ9/aL/K50qw5dnrDpu2JLxlJyjfsL7Ymg0QpKMLN0Ceztk/ZlZJbwxfKbv?=
- =?us-ascii?Q?1qKAjhH6EH/aTqhewSB74lrJsjOOX4tsBl50Z1pVbfj/z01jmsP5/+ck2n3+?=
- =?us-ascii?Q?RmgCKMPPp8WPqyXdVC/cVkhJ2op+pbUkVDVw6W4DqECOhwU1n00a0c1nsbk1?=
- =?us-ascii?Q?UkCmbPXUTRos0Vq6EhdIxxn9cwB0kYAqkVr2EqFnmcsppYtHweLyUFdDOl0B?=
- =?us-ascii?Q?THeB0uTvBQj5PyA4xJhcA9anZt6/JRvvY/qrG5g7+E0hs8NSwuXvPxKlrupK?=
- =?us-ascii?Q?wsWWe2TTqSKL+MWtLn5fP1tANCyxmS1EaANGBeyktzLwhF24UNoEHR4PpVx9?=
- =?us-ascii?Q?sTKgzVPlsfZfq4EgFTSCZTHB19RJtkotMj+a+uqxAWA3e7ZC8+pcQNSpcDlT?=
- =?us-ascii?Q?Zw=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3756cde8-a933-4b09-4031-08dc5fe17629
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2024 19:55:13.5697
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bux08PDQ3zM5NOB5EDIHK3E6yBfaccg6/2l6ih7Cw2Ix8XSSVxbzsnJ2leVOKuwrtowxyAiOjD5c0LQ60OxXnw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6559
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
+Message-ID: <20240418195159.3461151-1-shailend@google.com>
+Subject: [RFC PATCH net-next 0/9] gve: Implement netdev queue api
+From: Shailend Chand <shailend@google.com>
+To: netdev@vger.kernel.org
+Cc: almasrymina@google.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, willemb@google.com, 
+	Shailend Chand <shailend@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 18 Apr, 2024 01:24:56 -0400 Mateusz Polchlopek <mateusz.polchlopek@intel.com> wrote:
-> From: Jacob Keller <jacob.e.keller@intel.com>
->
-> The Rx timestamps reported by hardware may only have 32 bits of storage
-> for nanosecond time. These timestamps cannot be directly reported to the
-> Linux stack, as it expects 64bits of time.
->
-> To handle this, the timestamps must be extended using an algorithm that
-> calculates the corrected 64bit timestamp by comparison between the PHC
-> time and the timestamp. This algorithm requires the PHC time to be
-> captured within ~2 seconds of when the timestamp was captured.
->
-> Instead of trying to read the PHC time in the Rx hotpath, the algorithm
-> relies on a cached value that is periodically updated.
->
-> Keep this cached time up to date by using the PTP .do_aux_work kthread
-> function.
+Following the discussion on
+https://patchwork.kernel.org/project/linux-media/patch/20240305020153.2787423-2-almasrymina@google.com/,
+the queue api defined by Mina is implemented for gve.
 
-Seems reasonable.
+The first patch is just Mina's introduction of the api. The rest of the
+patches make surgical changes in gve to enable it to work correctly with
+only a subset of queues present (thus far it had assumed that either all
+queues are up or all are down). The final patch has the api
+implementation.
 
->
-> The iavf_ptp_do_aux_work will reschedule itself about twice a second,
-> and will check whether or not the cached PTP time needs to be updated.
-> If so, it issues a VIRTCHNL_OP_1588_PTP_GET_TIME to request the time
-> from the PF. The jitter and latency involved with this command aren't
-> important, because the cached time just needs to be kept up to date
-> within about ~2 seconds.
->
-> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-> ---
->  drivers/net/ethernet/intel/iavf/iavf_ptp.c | 52 ++++++++++++++++++++++
->  drivers/net/ethernet/intel/iavf/iavf_ptp.h |  1 +
->  2 files changed, 53 insertions(+)
->
-> diff --git a/drivers/net/ethernet/intel/iavf/iavf_ptp.c b/drivers/net/ethernet/intel/iavf/iavf_ptp.c
-<snip>
-> +/**
-> + * iavf_ptp_do_aux_work - Perform periodic work required for PTP support
-> + * @ptp: PTP clock info structure
-> + *
-> + * Handler to take care of periodic work required for PTP operation. This
-> + * includes the following tasks:
-> + *
-> + *   1) updating cached_phc_time
-> + *
-> + *      cached_phc_time is used by the Tx and Rx timestamp flows in order to
-> + *      perform timestamp extension, by carefully comparing the timestamp
-> + *      32bit nanosecond timestamps and determining the corrected 64bit
-> + *      timestamp value to report to userspace. This algorithm only works if
-> + *      the cached_phc_time is within ~1 second of the Tx or Rx timestamp
-> + *      event. This task periodically reads the PHC time and stores it, to
-> + *      ensure that timestamp extension operates correctly.
-> + *
-> + * Returns: time in jiffies until the periodic task should be re-scheduled.
-> + */
-> +long iavf_ptp_do_aux_work(struct ptp_clock_info *ptp)
-> +{
-> +	struct iavf_adapter *adapter = clock_to_adapter(ptp);
-> +
-> +	iavf_ptp_cache_phc_time(adapter);
-> +
-> +	/* Check work about twice a second */
-> +	return msecs_to_jiffies(500);
+Mina Almasry (1):
+  queue_api: define queue api
 
-HZ / 2 might be more intuitive?
+Shailend Chand (8):
+  gve: Make the RX free queue funcs idempotent
+  gve: Add adminq funcs to add/remove a single Rx queue
+  gve: Make gve_turn(up|down) ignore stopped queues
+  gve: Make gve_turnup work for nonempty queues
+  gve: Avoid rescheduling napi if on wrong cpu
+  gve: Reset Rx ring state in the ring-stop funcs
+  gve: Account for stopped queues when reading NIC stats
+  gve: Implement queue api
 
-> +}
-> +
-<snip>
+ drivers/net/ethernet/google/gve/gve.h         |   7 +
+ drivers/net/ethernet/google/gve/gve_adminq.c  |  79 +++++--
+ drivers/net/ethernet/google/gve/gve_adminq.h  |   2 +
+ drivers/net/ethernet/google/gve/gve_dqo.h     |   6 +
+ drivers/net/ethernet/google/gve/gve_ethtool.c |  13 +-
+ drivers/net/ethernet/google/gve/gve_main.c    | 200 +++++++++++++++++-
+ drivers/net/ethernet/google/gve/gve_rx.c      |  89 +++++---
+ drivers/net/ethernet/google/gve/gve_rx_dqo.c  | 114 +++++++---
+ include/linux/netdevice.h                     |   3 +
+ include/net/netdev_queues.h                   |  27 +++
+ 10 files changed, 459 insertions(+), 81 deletions(-)
+
+-- 
+2.44.0.769.g3c40516874-goog
+
 
