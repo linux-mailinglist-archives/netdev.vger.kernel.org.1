@@ -1,204 +1,217 @@
-Return-Path: <netdev+bounces-89334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C7A28AA0C0
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:07:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48E128AA0C3
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:08:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC8FE1F21741
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 17:07:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CB7CAB21D40
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 17:08:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17BC617333F;
-	Thu, 18 Apr 2024 17:07:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B09815B98A;
+	Thu, 18 Apr 2024 17:08:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DVDkuqQe"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="dfFBI25j"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5894617109D;
-	Thu, 18 Apr 2024 17:07:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3FFB1649D1
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 17:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713460049; cv=none; b=MlNSMgk62vcHXE03b0BVMGi+LpMCBfmd6mhtZnguQN8QDksTzU1BneKgOBc/3EnaZLI1PDGJOe+F4H2UGmRoA1ynPkHoyuExefpfrN8GzjqQPXTcXMxSkV7YwS10pnunnOjuIMV9KF4Zpz1Z3PAvGZxnykByMVBwYzQA5DyB8Mg=
+	t=1713460086; cv=none; b=PRj7UYhsuLKnnMdlLGNSN8Bsdjek8Y1YvcwvGmKKHBavCHDBBBCKh963TJubjsUHdQbQ2x+r+RqzkxsJ81Czcc1YsNn8pxGsk57DC+buQtc+7f0568bjrbD5PqpczqLnDKO1MHE6z9GDBOyTz+UPijLzmso9Ev4ZsJnRie0xmXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713460049; c=relaxed/simple;
-	bh=CM8nI49mltTWyh4988wuYDUXZS3yI7+5n5mJ6JmHjME=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Y/Ccby9z5VA0K10N7WuhtDrXqPBbe2frRzuodFSV5oDvO9cjwALChPjFmkmmUvX0cAe4oqlHGibaBh2rnlRbqk20hmrUG1EGfVubhay9kT1AaK1nX4urrU/t6fAeoIts+w0a9zl76BHxQTDyjoGlaimsIgfwKyIRs/SU9ZPKiCg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=DVDkuqQe; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1713460086; c=relaxed/simple;
+	bh=JNRP4IbLfBf2RYOkYejcF9DoXhQFH48kanrWmi1CmvQ=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=gUjPklJ3mM3aNze3BVieLuGZ4Xxi6wcF/Wk1J1/cCWKTMxDfCnHQ9xz1tgVkpp3qEGyvbQmci821X2e0TBcqq/dfRj3sXlqqle0Lw/mYE3x4B0d3u59/6MTK5akhvWUIigJlg2yfIwtaXfoXrPi+tBOJTSSlzRoXszHsj1nl1+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=dfFBI25j; arc=none smtp.client-ip=209.85.160.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-22ed075a629so531296fac.3
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 10:08:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1713460047; x=1744996047;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=TnpL60BmwUQXb8PJ1rdJnfwkYwzlGEVJGSnW8ntW7ww=;
-  b=DVDkuqQe9afaKYg5GwT8qTpUPMoz8Irw3fcgZ17v6sZQA7kprWIorOBa
-   yKPk2qyY8lVJl3Sjrpv/GJJ4YAxSCnk9Dxw09stF5G65/uTr8++52gPY0
-   /VPT552Bl/FRP/qGBxkQSAPNxg4wfrVFpewAdPIppZRku84hmv63QMePg
-   g=;
-X-IronPort-AV: E=Sophos;i="6.07,212,1708387200"; 
-   d="scan'208";a="289833836"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 17:07:25 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:14707]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.36.251:2525] with esmtp (Farcaster)
- id 68146c37-eb72-4c08-a36e-2026240dca63; Thu, 18 Apr 2024 17:07:25 +0000 (UTC)
-X-Farcaster-Flow-ID: 68146c37-eb72-4c08-a36e-2026240dca63
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 18 Apr 2024 17:07:24 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.33) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 18 Apr 2024 17:07:21 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <syzbot+42a0dc856239de4de60e@syzkaller.appspotmail.com>,
-	<syzkaller-bugs@googlegroups.com>
-Subject: Re: [syzbot] [net?] KMSAN: uninit-value in ipvlan_queue_xmit (2)
-Date: Thu, 18 Apr 2024 10:07:13 -0700
-Message-ID: <20240418170713.24385-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CANn89iLFjPiWdLw170ng2=9juwMnN8TxrKd1D1MntWPhWRxt-g@mail.gmail.com>
-References: <CANn89iLFjPiWdLw170ng2=9juwMnN8TxrKd1D1MntWPhWRxt-g@mail.gmail.com>
+        d=broadcom.com; s=google; t=1713460083; x=1714064883; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hSdrxKcZDZh4kxoEAnqi+x+DRFp1mfGVjVpox2zSMrw=;
+        b=dfFBI25jl6YRqVq1YTz0OeTWFxnTKK634qDTYR7TmPBnHsIlOFMgKk+UiA31hwuuUI
+         8GdJdFX/huFnhIh/ZP9Ku6iF9fV8dEkMAkBR6X3jQy+bbbWegXNUDe4dhyMiJn5GgDbr
+         7n0k8QevFN/53G5JTp6sW8lhmbla4ZZmAE3j8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713460083; x=1714064883;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hSdrxKcZDZh4kxoEAnqi+x+DRFp1mfGVjVpox2zSMrw=;
+        b=BWyXs3CvGUuBM35aIvBQ2hppi0eUZj2tukLDrpDFeYhfLg6UNEOmQiisRJDLlLEW3h
+         sdZd25wHS2zNoqYN0UvpBwYiYnZI4ffRI+4fYfQra9ycpFKaWLyH7mxo/oTLuPLvoLR4
+         lM8rjZ2CZhl/zTW5qqWojPQyBAEyaXsn5MIuMr6xLzjZeTuO6VadGxHY33zZP0gGvau+
+         jDxBIvQAXVFuKkw4DAfbCrbAZ1th0Hf71/imS6JMzF1PPOVC265ILgxftx0R1btp6PBi
+         Ai4QpST+LCkRnnydati4uIWjUL/+Fsj6zuAF7ptYsudxNI+H5b8yf7R17UPhns6nU3lY
+         rGKQ==
+X-Gm-Message-State: AOJu0YzPOqPqv2or7zLFh5VKk738SPb62otnonoW2TFHuynFYdYsZhnw
+	ULpT+FcrL5BgAc6BBLBdbMBWCJS4c5pfTMPQ5o0z/siLRH4DTZU/78qHYhswPo3Ywkcx5NpSDU9
+	ZzUJ91ogOPyElXVwZd22CFhmh7EGaHtyUWLFXJ/xxv+p0cyHHSENS6mxq/NvM857dBVAaagrg7m
+	sHAscXSw2pmZaSTLwL+hF1FCKgtHRy
+X-Google-Smtp-Source: AGHT+IEQKPC1kueFocDQYCPUkA9JxxmGtjC0Iwf3eaad/oEYOzxjXsOo8VVjd+rjV6cdED9phugse3pt7Dv90IEmjbU=
+X-Received: by 2002:a05:6870:3a0e:b0:22a:508a:66e6 with SMTP id
+ du14-20020a0568703a0e00b0022a508a66e6mr3107289oab.17.1713460083170; Thu, 18
+ Apr 2024 10:08:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+From: Bob McMahon <bob.mcmahon@broadcom.com>
+Date: Thu, 18 Apr 2024 10:07:51 -0700
+Message-ID: <CAHb6LvpdHujbScC1YrVnwM5Nfp_HaSn1EAnT2eY87ZCWgXQ88w@mail.gmail.com>
+Subject: UDP recvfrom/recv question on connected/unconnected sockets
+To: netdev@vger.kernel.org
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000009d69b00616620304"
+
+--0000000000009d69b00616620304
+Content-Type: multipart/alternative; boundary="000000000000984ab30616620342"
+
+--000000000000984ab30616620342
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D044UWA001.ant.amazon.com (10.13.139.100) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 18 Apr 2024 09:19:20 +0200
-> On Thu, Apr 18, 2024 at 9:05 AM syzbot
-> <syzbot+42a0dc856239de4de60e@syzkaller.appspotmail.com> wrote:
-> >
-> > Hello,
-> >
-> > syzbot found the following issue on:
-> >
-> > HEAD commit:    f2e367d6ad3b Merge tag 'for-6.8/dm-fix-3' of git://git.ker..
-> > git tree:       upstream
-> > console+strace: https://syzkaller.appspot.com/x/log.txt?x=144a8d4a180000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=1b015d567058472
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=42a0dc856239de4de60e
-> > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=149caa54180000
-> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10bb8e22180000
-> >
-> > Downloadable assets:
-> > disk image: https://storage.googleapis.com/syzbot-assets/0dabc03369d1/disk-f2e367d6.raw.xz
-> > vmlinux: https://storage.googleapis.com/syzbot-assets/240ca250d398/vmlinux-f2e367d6.xz
-> > kernel image: https://storage.googleapis.com/syzbot-assets/cc38bcdb48c9/bzImage-f2e367d6.xz
-> >
-> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > Reported-by: syzbot+42a0dc856239de4de60e@syzkaller.appspotmail.com
-> >
-> > =====================================================
-> > BUG: KMSAN: uninit-value in ipvlan_process_outbound drivers/net/ipvlan/ipvlan_core.c:524 [inline]
-> > BUG: KMSAN: uninit-value in ipvlan_xmit_mode_l3 drivers/net/ipvlan/ipvlan_core.c:602 [inline]
-> > BUG: KMSAN: uninit-value in ipvlan_queue_xmit+0xf44/0x16b0 drivers/net/ipvlan/ipvlan_core.c:668
-> >  ipvlan_process_outbound drivers/net/ipvlan/ipvlan_core.c:524 [inline]
-> >  ipvlan_xmit_mode_l3 drivers/net/ipvlan/ipvlan_core.c:602 [inline]
-> >  ipvlan_queue_xmit+0xf44/0x16b0 drivers/net/ipvlan/ipvlan_core.c:668
-> >  ipvlan_start_xmit+0x5c/0x1a0 drivers/net/ipvlan/ipvlan_main.c:222
-> >  __netdev_start_xmit include/linux/netdevice.h:4989 [inline]
-> >  netdev_start_xmit include/linux/netdevice.h:5003 [inline]
-> >  xmit_one net/core/dev.c:3547 [inline]
-> >  dev_hard_start_xmit+0x244/0xa10 net/core/dev.c:3563
-> >  __dev_queue_xmit+0x33ed/0x51c0 net/core/dev.c:4351
-> >  dev_queue_xmit include/linux/netdevice.h:3171 [inline]
-> >  packet_xmit+0x9c/0x6b0 net/packet/af_packet.c:276
-> >  packet_snd net/packet/af_packet.c:3081 [inline]
-> >  packet_sendmsg+0x8aef/0x9f10 net/packet/af_packet.c:3113
-> >  sock_sendmsg_nosec net/socket.c:730 [inline]
-> >  __sock_sendmsg net/socket.c:745 [inline]
-> >  __sys_sendto+0x735/0xa10 net/socket.c:2191
-> >  __do_sys_sendto net/socket.c:2203 [inline]
-> >  __se_sys_sendto net/socket.c:2199 [inline]
-> >  __x64_sys_sendto+0x125/0x1c0 net/socket.c:2199
-> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> >  do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
-> >  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-> >
-> > Uninit was created at:
-> >  slab_post_alloc_hook mm/slub.c:3819 [inline]
-> >  slab_alloc_node mm/slub.c:3860 [inline]
-> >  __do_kmalloc_node mm/slub.c:3980 [inline]
-> >  __kmalloc_node_track_caller+0x705/0x1000 mm/slub.c:4001
-> >  kmalloc_reserve+0x249/0x4a0 net/core/skbuff.c:582
-> >  __alloc_skb+0x352/0x790 net/core/skbuff.c:651
-> >  skb_segment+0x20aa/0x7080 net/core/skbuff.c:4647
-> >  udp6_ufo_fragment+0xcab/0x1150 net/ipv6/udp_offload.c:109
-> >  ipv6_gso_segment+0x14be/0x2ca0 net/ipv6/ip6_offload.c:152
-> >  skb_mac_gso_segment+0x3e8/0x760 net/core/gso.c:53
-> >  nsh_gso_segment+0x6f4/0xf70 net/nsh/nsh.c:108
-> >  skb_mac_gso_segment+0x3e8/0x760 net/core/gso.c:53
-> >  __skb_gso_segment+0x4b0/0x730 net/core/gso.c:124
-> >  skb_gso_segment include/net/gso.h:83 [inline]
-> >  validate_xmit_skb+0x107f/0x1930 net/core/dev.c:3628
-> >  __dev_queue_xmit+0x1f28/0x51c0 net/core/dev.c:4343
-> >  dev_queue_xmit include/linux/netdevice.h:3171 [inline]
-> >  packet_xmit+0x9c/0x6b0 net/packet/af_packet.c:276
-> >  packet_snd net/packet/af_packet.c:3081 [inline]
-> >  packet_sendmsg+0x8aef/0x9f10 net/packet/af_packet.c:3113
-> >  sock_sendmsg_nosec net/socket.c:730 [inline]
-> >  __sock_sendmsg net/socket.c:745 [inline]
-> >  __sys_sendto+0x735/0xa10 net/socket.c:2191
-> >  __do_sys_sendto net/socket.c:2203 [inline]
-> >  __se_sys_sendto net/socket.c:2199 [inline]
-> >  __x64_sys_sendto+0x125/0x1c0 net/socket.c:2199
-> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> >  do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
-> >  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-> >
-> > CPU: 1 PID: 5101 Comm: syz-executor421 Not tainted 6.8.0-rc5-syzkaller-00297-gf2e367d6ad3b #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-> > =====================================================
-> >
-> >
-> > ---
-> > This report is generated by a bot. It may contain errors.
-> > See https://goo.gl/tpsmEJ for more information about syzbot.
-> > syzbot engineers can be reached at syzkaller@googlegroups.com.
-> >
-> > syzbot will keep track of this issue. See:
-> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> >
-> > If the report is already addressed, let syzbot know by replying with:
-> > #syz fix: exact-commit-title
-> >
-> > If you want syzbot to run the reproducer, reply with:
-> > #syz test: git://repo/address.git branch-or-commit-hash
-> > If you attach or paste a git patch, syzbot will apply it before testing.
-> >
-> > If you want to overwrite report's subsystems, reply with:
-> > #syz set subsystems: new-subsystem
-> > (See the list of subsystem names on the web dashboard)
-> >
-> > If the report is a duplicate of another one, reply with:
-> > #syz dup: exact-subject-of-another-report
-> >
-> > If you want to undo deduplication, reply with:
-> > #syz undup
-> 
-> Cc Kuniyuki Iwashima
-> 
-> This is the syzbot bug I mentioned earlier to you.
+Hi All,
 
-Will look into it.
+I have a question about the OS routing UDP packets to threads and connect
+vs unconnected sockets. Same src/dst IP and same dst port, different src
+port.
 
-Thanks!
+If there are two UDP sockets listening on the same port, each serviced by
+its own thread and they both hang a recvfrom() or recv() (for the connected
+socket,) will the OS route packets only to the thread with a connected
+socket vs the thread with th unconnected socket? If not, what will happen?
+
+Bob
+
+-- 
+This electronic communication and the information and any files transmitted 
+with it, or attached to it, are confidential and are intended solely for 
+the use of the individual or entity to whom it is addressed and may contain 
+information that is confidential, legally privileged, protected by privacy 
+laws, or otherwise restricted from disclosure to anyone else. If you are 
+not the intended recipient or the person responsible for delivering the 
+e-mail to the intended recipient, you are hereby notified that any use, 
+copying, distributing, dissemination, forwarding, printing, or copying of 
+this e-mail is strictly prohibited. If you received this e-mail in error, 
+please return the e-mail to the sender, delete it from your computer, and 
+destroy any printed copy of it.
+
+--000000000000984ab30616620342
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">Hi All,<div><br></div><div>I have a question about the OS =
+routing UDP packets to threads and connect vs unconnected sockets. Same src=
+/dst IP and same dst port, different src port.</div><div><br></div><div>If =
+there are two UDP sockets listening on the same port, each serviced by its =
+own thread and they both hang a recvfrom() or recv() (for the connected soc=
+ket,) will the OS route packets only to the thread with a connected socket =
+vs the thread with th unconnected socket? If not, what will happen?<br><br>=
+Bob</div></div>
+
+<br>
+<span style=3D"background-color:rgb(255,255,255)"><font size=3D"2">This ele=
+ctronic communication and the information and any files transmitted with it=
+, or attached to it, are confidential and are intended solely for the use o=
+f the individual or entity to whom it is addressed and may contain informat=
+ion that is confidential, legally privileged, protected by privacy laws, or=
+ otherwise restricted from disclosure to anyone else. If you are not the in=
+tended recipient or the person responsible for delivering the e-mail to the=
+ intended recipient, you are hereby notified that any use, copying, distrib=
+uting, dissemination, forwarding, printing, or copying of this e-mail is st=
+rictly prohibited. If you received this e-mail in error, please return the =
+e-mail to the sender, delete it from your computer, and destroy any printed=
+ copy of it.</font></span>
+--000000000000984ab30616620342--
+
+--0000000000009d69b00616620304
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIIQagYJKoZIhvcNAQcCoIIQWzCCEFcCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+gg3BMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
+MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
+rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
+aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
+e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
+cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
+MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
+KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
+/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
+TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
+YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
+b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
+c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
+CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
+BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
+jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
+9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
+/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
+jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
+AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
+dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
+MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
+IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
+XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
+J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
+nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBUkwggQxoAMCAQICDDGs4Qlq5OZK9mcDzTANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMzMzNDFaFw0yNTA5MTAxMzMzNDFaMIGM
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xFDASBgNVBAMTC0JvYiBNY01haG9uMScwJQYJKoZIhvcNAQkB
+Fhhib2IubWNtYWhvbkBicm9hZGNvbS5jb20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB
+AQDBfX3nsBFRdO26im8lhOadVadRmV/YWK+U9OoGlTE+2MDsjJwO5p/Q6iaTUropqMRH1E+EIuhe
+/OU6a3/btrqzARE77RaVSdz5swXt7M4ciN+z44nIEx36UQIlFLsBFa3is/J/QLFhTUFFf0wLJsUO
+wyja+KvygH/E5TyfeXf5T2Y2wjGZx8jQXZMDmNpfANlEBYDfzCNYcAIQNox8FuPpEpuxWvv7jvxV
+X5dfkSef9T/DbsDM0PeTVMVyYIQoRSMBIGxVkaqp0MJglvQ2mU4CXcoOGgm6XC8LoLoEvYojXFKC
+fRgCOT5xeMR10UPSBQIljKwt7fPhpYVY+jTtOclpAgMBAAGjggHZMIIB1TAOBgNVHQ8BAf8EBAMC
+BaAwgaMGCCsGAQUFBwEBBIGWMIGTME4GCCsGAQUFBzAChkJodHRwOi8vc2VjdXJlLmdsb2JhbHNp
+Z24uY29tL2NhY2VydC9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcnQwQQYIKwYBBQUHMAGG
+NWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwME0G
+A1UdIARGMEQwQgYKKwYBBAGgMgEoCjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxz
+aWduLmNvbS9yZXBvc2l0b3J5LzAJBgNVHRMEAjAAMEkGA1UdHwRCMEAwPqA8oDqGOGh0dHA6Ly9j
+cmwuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3JsMCMGA1UdEQQc
+MBqBGGJvYi5tY21haG9uQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSME
+GDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUpG/4RP1YQA/iXGens9pIRe7CQxMw
+DQYJKoZIhvcNAQELBQADggEBACfWLy4qJyCnOa3sl4LEDAMU/gmJ6LbclGE5iR4KanAmlAt92gzN
+5lSy/iE+wsRrXiHI7YKFgXX1kVK/RqMiPRrw4hq2j8nxoSi/VFiyS3CsfVMGkbY7HBTlBvla/tH+
++2nJprlXbJyz1GdvoJAeam5RvTWotcCGAjZmMa3U3zMkszgXN849xe3dUK1DauUGiInXEwEdXDcA
+/0CVjL3EEMj+kNWcLhrSZKwFtxggUyMW3XWRaAeAL9wOtEaXYqlgbtnV0n9FuoV2TNm3h7Mh7rjV
+I2zM+IZ3DE+XFK7dcPwte33u75QyySNJ3UMZqi25CO85yl8Bmo7aWRm99N7HGnkxggJtMIICaQIB
+ATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhH
+bG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwxrOEJauTmSvZnA80wDQYJ
+YIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIKXuChSheCtIVVuVL1CZKky1Y54W8UWqi3dR
+N5j5E3fSMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQxODE3
+MDgwM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFl
+AwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATAN
+BgkqhkiG9w0BAQEFAASCAQAQ8ACnotQqL3jPncUWVdrsEcgmLiXn+TdfqzuQ8PkszCIhU3Gb/THn
+Fy69V3pskavMy+ZYdqeyy1/PFQnpiEMnnG68LitJbYxN1s1CUwxxj8Ruv6qfJSoemAr84uqBSZ36
+qZ4Cw0GdQQpZjYpWBnnB08WsnlgXEGTJIKTBGnVKt8+M6SparVSIO0RHsDPb705CTuhtdb9CBgD5
+gVqdMb+g2/swuPgHyMZtuQb1sNsK63wX+LOwhCYXXeOi92bUhB5utgComNBwOfWPTIEXeHKH/2Vu
+muh0bzQrNVsXvPLqLYSYb3HCoNuVJhp+uNHh9FJ6aXT9Aaq0xnun26UFYJLR
+--0000000000009d69b00616620304--
 
