@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-88950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46BB38A90FF
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 04:10:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F8A58A9102
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 04:10:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78D531C20E58
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 02:10:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0D0D1C210EF
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 02:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C20A73F8DE;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2597495CB;
 	Thu, 18 Apr 2024 02:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XhwIp13G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZL200nNP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7E939FD4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1C83BB3D;
 	Thu, 18 Apr 2024 02:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713406228; cv=none; b=pXTJObYF2TnwIMs4xuIa9dHDBm7jJJ3YfSFa05ObJWeANFUM9mgSy/70TFmyiPuiqfr18A2R7GvLbAyykr1y4WpoKuA12Idk2d5BM3v43AjcGoqVIZmiIqMFB/5wW9hLyyxYGtAanoCbxg2XX5Bm26xn0zSd0jIqlLlp3zkw7FE=
+	t=1713406228; cv=none; b=UTOhH4zQtq1gWcE8cDZChCjKiJeyuC72P89WtZzp9igMMC/6laQjAmEE05p9DKbZ26ISazqEVQmLMIFsTtkVaqTwcK8qUEggudBl24XfUAaPpoufo6h521F7XVreTE7gKtmNurmBdHKh+vdsBMWC1u5n1Y4dh5rGWxZFKwdl9Ok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713406228; c=relaxed/simple;
-	bh=JvPOQX1m6VS2TnDTVCWVo4cYrpLbtbm0fzT/89T9mV0=;
+	bh=RAGC14c8Q1nFc1rexV5dELq1NYAVyKJAmwHd8XkO/3Q=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oRCNUl/Bq201bYdChJsrM62N6ePs38wp0Fyf4ItUusZd6C1k/BwSK3LTGdYh8Do91m4GTyL0GFP6N6EXYmk7tNim7hefdyOySd/trOCGCj0WnwCgtOHiZHzfovW2npZUekHsGZI+B02/l4iITc9vd/i+RSVdXb+A6FSbmhlcIi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XhwIp13G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4C11FC32782;
+	 In-Reply-To:To:Cc; b=ChRUcx51NgdyDBkLLlHxRKUSppu9UuLKFs77ffS33RrljSB61wrVmzObWvhJljVV0uSvsRlquJPONMO+iLsATBC91Wq/fYqGHldC9k8OH21P+ZvSE5V7VHQfpzsOVrVstLjjpiAw4mc+T2+2F8Jz0qtq8MLKxvbempbeLB+Jods=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZL200nNP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 56918C32783;
 	Thu, 18 Apr 2024 02:10:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1713406228;
-	bh=JvPOQX1m6VS2TnDTVCWVo4cYrpLbtbm0fzT/89T9mV0=;
+	bh=RAGC14c8Q1nFc1rexV5dELq1NYAVyKJAmwHd8XkO/3Q=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XhwIp13GS9iJfeIX3StUHnCkvbM709wrE7EVVPGakGd1/Nyu0XXIxBRu6dN6h0JGB
-	 nhCE25VSANdmOIfd1BADV0o6UTgN+l7OaJymeatq4XLiKJMXcDNPat0ZeOAdP/xmGj
-	 Zs9nFlBIa+oXMp/7HKMf+Ut55ezomdSXyytdU351np0YDJZmU/PZ0mCwW0gXAieHjz
-	 sgUPPrXhKkmXvY/T9D2/39OabVc08mnMi31Uik7hUpuWBv2Cvu75bPkhbWUtrc6pa7
-	 sUeZ4Sv3vAxmvDWKaW4nFadNCNXBGqFicqDLmPKfSFWHgGVSEuphx3FtbBWu4ql4Ji
-	 SeyQk731JEexQ==
+	b=ZL200nNPgfts9CYklTGCBByTb5/Q7SAoubfAXD1em6rPGk72YL4L/UyifMj04HZm7
+	 llICGwX0Bu3X/sDKbXBNhzYsdr6v5W1YpSiC8ayFll071gHWZ38mrcRPGK9JTYvqPJ
+	 J/OfBCS0eZGZ5KEwSDP6nJkhNHpFlv+O7bi+W025u7/DjbmpmDOfBMGP8/aXBtcc6x
+	 JyZvhotDIQ0W8kHVtUkHGxovTY6AQf0u1Zm40eQoTnpLbiHaUc+veo2KXSalzf3Ggx
+	 tW7nIg3bqaDfCJJDD9EL/009CEOMXk43UC3DSZa3O7cODQxLb5Gai/5rPX1DccafmJ
+	 1td38/cbpLO2Q==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 396DAC43619;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4169AC4361C;
 	Thu, 18 Apr 2024 02:10:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,41 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: ethernet: mtk_eth_soc: fix WED + wifi reset
+Subject: Re: [PATCH net] selftests: kselftest_harness: fix Clang warning about
+ zero-length format
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171340622823.10413.6361491426499037138.git-patchwork-notify@kernel.org>
+ <171340622826.10413.6848935617606326222.git-patchwork-notify@kernel.org>
 Date: Thu, 18 Apr 2024 02:10:28 +0000
-References: <20240416082330.82564-1-nbd@nbd.name>
-In-Reply-To: <20240416082330.82564-1-nbd@nbd.name>
-To: Felix Fietkau <nbd@nbd.name>
-Cc: netdev@vger.kernel.org, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
- lorenzo@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, sujuan.chen@mediatek.com,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
+References: <20240416151048.1682352-1-kuba@kernel.org>
+In-Reply-To: <20240416151048.1682352-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, seanjc@google.com, shuah@kernel.org,
+ keescook@chromium.org, usama.anjum@collabora.com,
+ linux-kselftest@vger.kernel.org, llvm@lists.linux.dev
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 16 Apr 2024 10:23:29 +0200 you wrote:
-> The WLAN + WED reset sequence relies on being able to receive interrupts from
-> the card, in order to synchronize individual steps with the firmware.
-> When WED is stopped, leave interrupts running and rely on the driver turning
-> off unwanted ones.
-> WED DMA also needs to be disabled before resetting.
+On Tue, 16 Apr 2024 08:10:48 -0700 you wrote:
+> Apparently it's more legal to pass the format as NULL, than
+> it is to use an empty string. Clang complains about empty
+> formats:
 > 
-> Fixes: f78cd9c783e0 ("net: ethernet: mtk_wed: update mtk_wed_stop")
-> Signed-off-by: Felix Fietkau <nbd@nbd.name>
+> ./../kselftest_harness.h:1207:30: warning: format string is empty
+> [-Wformat-zero-length]
+>  1207 |            diagnostic ? "%s" : "", diagnostic);
+>       |                                 ^~
+> 1 warning generated.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net: ethernet: mtk_eth_soc: fix WED + wifi reset
-    https://git.kernel.org/netdev/net/c/94667949ec3b
+  - [net] selftests: kselftest_harness: fix Clang warning about zero-length format
+    https://git.kernel.org/netdev/net/c/caed8eba2215
 
 You are awesome, thank you!
 -- 
