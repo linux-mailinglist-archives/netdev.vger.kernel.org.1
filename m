@@ -1,160 +1,187 @@
-Return-Path: <netdev+bounces-89054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4806A8A94D2
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 10:22:57 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A84358A94F6
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 10:30:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AF701C20C0E
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 08:22:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 344121F21A65
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 08:30:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 235517D3E6;
-	Thu, 18 Apr 2024 08:22:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D83F12FB18;
+	Thu, 18 Apr 2024 08:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hgjdfGxD"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="lFpyifOm"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2049.outbound.protection.outlook.com [40.107.93.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 970265FEED
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 08:22:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713428573; cv=fail; b=sVt5yLjhbkalorWwNWOTb5IB6m46fzh3RyrcMkFH6K2Kp4Kla0Jz8ErbG5Wzt2oLQDfIaR0a1G344bEUzTdGZ1mpySb/z2z65Lni7FLwiRs0z7VWNbqCexqYA1/Hjj/zerCv/UIJZso7daknTbqSqnXhU0ZyWgMGb+vRYbAa4Q8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713428573; c=relaxed/simple;
-	bh=SdczkbitVh7Gh8bUVibb++C4ohTCd+RW8aJL5EyRXd0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 Content-Type:MIME-Version; b=RAurTE26rFbwL/+DxOcOmze/cQaPgSb7qJA1Zyw8Oob0MDUjbBPqUUD+2OByALg+0po6c/BDKZPrzeKTm85epCAapgrthttFfJ11xWbvzDJyd/GQiEV6EZfJSm7epYSW6vjRGw69vH5TPZITPlQYlPaSWWvI0Dc4d7bA1ovhcEE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hgjdfGxD; arc=fail smtp.client-ip=40.107.93.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PXN/l9o9pzuvlj7kDtCsE3pdvAXR5QBIhNWa8jgfnRbDil2WIJ9UI4XHXGMYD0NN03bmrnPGVOV1zfYYdQmbzj23c1QO8/FOvWcrdHDPkZX0S4ZUaASL+1tDYw4UpMZFYY4HU6ooN1WP/EJx8MoSEbZwf9mkuI39nhwXlOcVkAmJH1ruFxbtxg0KhciGsPOrKue1llzczLorb7K5aIsIxMoMRURNeBQMv7ZWZFKJ7S3U6ErVhWA3a343yflDI3AKWxTbtFPxYJ7h04MrkGnaDymCVHg2EPoniudwq425KhIs9SuowKwfyvQH5q62opaNC4csAar/ttpOvy8CVojwYQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SdczkbitVh7Gh8bUVibb++C4ohTCd+RW8aJL5EyRXd0=;
- b=nC+tS4bmJpbGHRMe01H6e1MSS0FRc162v7lAd/Jbn2u9Wc4P8nwg2pO4vlup0HzD9EppsA3VkTYZACWR0pXUtmcCkIDiO3UkAkfnPzVW8DPwDTmLKxp0Xu3bsecxbiVjOQjUolf0b3/s2MthR8jjHzblJThHsbu4Kng2QRLBy9gWODjh+eFserlx++4OWcApX6n14//OUD29Hbd4RWIvU9kKPo0hj2c/x+g+ahLeKj8WV/8rX3C2nkZGripBLaSxJkrt/hUgoHsCoByamDqNKcJslvpOIWn84s+Oq7BZhg4d0StldhBkxk1KPzFr3WZGBt09ybMve2wIWhp9+swhMg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SdczkbitVh7Gh8bUVibb++C4ohTCd+RW8aJL5EyRXd0=;
- b=hgjdfGxDun05pJvHOTPVOxxLNrNIWZUIj8YvyTPyHgBiRlXRZe72PtOJ2m7S/llSm21xr2fZM9XkUjMZHqYKVL0SAAR50qcPM8QsM5UXN6J/16x7U0PzoonJoQx9GWc2k1L95p8jnjRnnoLU5H/3xX1u2r2NGGGEPiCCvBG4PknGvWlYECn2cTwnfyF7512lkb26otwXcjObRRsX9qNqShTc82buMraOze94kA3rKz1TZQhMlMweOI2PYgI/FWbWi6T6nYvnpXnCTTrBkm7RnAIh2kYoVXyqw92bwt5a8exJFNToTv8Wxod3Op3Wq0dlNXsuaHxfziYIfD2vDrgWDg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from SJ1PR12MB6075.namprd12.prod.outlook.com (2603:10b6:a03:45e::8)
- by MN2PR12MB4486.namprd12.prod.outlook.com (2603:10b6:208:263::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.41; Thu, 18 Apr
- 2024 08:22:47 +0000
-Received: from SJ1PR12MB6075.namprd12.prod.outlook.com
- ([fe80::3715:9750:b92c:7bee]) by SJ1PR12MB6075.namprd12.prod.outlook.com
- ([fe80::3715:9750:b92c:7bee%5]) with mapi id 15.20.7452.049; Thu, 18 Apr 2024
- 08:22:47 +0000
-From: Aurelien Aptel <aaptel@nvidia.com>
-To: David Laight <David.Laight@ACULAB.COM>, "linux-nvme@lists.infradead.org"
- <linux-nvme@lists.infradead.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "sagi@grimberg.me" <sagi@grimberg.me>,
- "hch@lst.de" <hch@lst.de>, "kbusch@kernel.org" <kbusch@kernel.org>,
- "axboe@fb.com" <axboe@fb.com>, "chaitanyak@nvidia.com"
- <chaitanyak@nvidia.com>, "davem@davemloft.net" <davem@davemloft.net>,
- "kuba@kernel.org" <kuba@kernel.org>
-Cc: "aurelien.aptel@gmail.com" <aurelien.aptel@gmail.com>,
- "smalin@nvidia.com" <smalin@nvidia.com>, "malin1024@gmail.com"
- <malin1024@gmail.com>, "ogerlitz@nvidia.com" <ogerlitz@nvidia.com>,
- "yorayz@nvidia.com" <yorayz@nvidia.com>, "borisp@nvidia.com"
- <borisp@nvidia.com>, "galshalom@nvidia.com" <galshalom@nvidia.com>,
- "mgurtovoy@nvidia.com" <mgurtovoy@nvidia.com>, "viro@zeniv.linux.org.uk"
- <viro@zeniv.linux.org.uk>
-Subject: RE: [PATCH v24 03/20] iov_iter: skip copy if src == dst for direct
- data placement
-In-Reply-To: <a779982fc59f4b9b94d619d0bb111738@AcuMS.aculab.com>
-References: <20240404123717.11857-1-aaptel@nvidia.com>
- <20240404123717.11857-4-aaptel@nvidia.com>
- <a779982fc59f4b9b94d619d0bb111738@AcuMS.aculab.com>
-Date: Thu, 18 Apr 2024 11:22:42 +0300
-Message-ID: <253h6fzaxm5.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: LO4P265CA0080.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2bd::10) To SJ1PR12MB6075.namprd12.prod.outlook.com
- (2603:10b6:a03:45e::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F9A1E497
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 08:28:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713428927; cv=none; b=efLpB80VA2ri+jSY1FZ0QrYlZDo2CPAozXOgG6w6AiHmPhwF0xi++vEOKb+6DMzqU058WVzrT8Y7HqvtMj17QlUxTLmd4r+DsMR7SkhbtOzF3n1+fikwE/2d41mreDlxaZYdl8gtYQ3tNQGxUUhO5jYuZUlq/WxolT+CPxzkXWQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713428927; c=relaxed/simple;
+	bh=ZQlNvuxU1Ruuhia4AiY+CRXdS6bFMo/TL73YQJTuopc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=F3uogvSXtvVTU3XBvVuqGzMr9HN4rCXTST/tGdQX0+rJ0A7QKOz7+AzQxo2h656EncZu0gK1ZqHZN0PDfw3rHI6adCb0mmvmr2sxspieGY192vTpeP6pkAO/6QEhxjWaprLd7TOdpKdGx5EnJGyPWarCmRlKKcqzYlWn2SZDkW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=lFpyifOm; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-571bddd74c1so280829a12.0
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 01:28:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713428923; x=1714033723; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=00EHNLIhtTOTMUZiuikNl15VWRGSekrYgAUwPrFoFtQ=;
+        b=lFpyifOmzmlAk3j5DWeX4O1xZzNFVIdRgCPNN3RXJypjjS0IJ+bX1T4YSc5M5drH9d
+         qYFbl4iu7w1VO5lV8h7nNyH7fVCZpd77JxvCwE4RK0y0cIfmq51YDavHikPtnyMVJsQZ
+         SJMZemY4VcK4yVXa0aBIRe0IaPeHZJ09uWeY8mHgyxJquP4p442lKRx3dwfw7OLK/093
+         wAB4thrfJW7uLMNR5DT43t2Yr2ImCzgBjSHivxDpUoE4Zvms9e5Vm+0HJTjVadfW4bO9
+         EDT1wgNdYJ04A0aRpZIGp5pbXooCMGtKE0so/fCXjPTMpoay+p4KzcXFAX2U1YbMwr0B
+         ngAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713428923; x=1714033723;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=00EHNLIhtTOTMUZiuikNl15VWRGSekrYgAUwPrFoFtQ=;
+        b=Ghj3E2kiQw4sSAcVxqfH2y/mBQFZaN08UzNrwRdiJ6X0mvj7oH8t/eHTdKtpgVm3XY
+         6kcaBuwKqdYGKDYzlALctIWxJq2rgmDDgehGXG36dbT1kszJJ8WSrwuAKtUggSpbvCpu
+         XLo47E//twkTTzdui/xn7SOmeuQhvcGf8+F2T+mK9j5c0PSPMxoXSKKfYzp45Kx5FGKi
+         Vs+s5bgl/SXDUCz417Gr9HiIeoYKFQ50kW+1V0IK5+KZP1uNU38KojyvrE5N4oxa0tE/
+         jZTVWvjZaqpP5kgT0VeGDBESarteqkP0P9dZRub8VuvrcwsCj+42Lr8eie1GaoQQVL2F
+         FPNg==
+X-Gm-Message-State: AOJu0YxTp1rb4S5okTJrTfuNQJtnkdtSRKOTRxjjPcclK+Eiyel7XCFj
+	ta4/AiaLuOqHG84dCGRmMIjggj5JVwx65tPu3oSoQlzHCg3Wo5uqFl3wS67OIBM=
+X-Google-Smtp-Source: AGHT+IELCQfsKbAJfRd6jWQR9/DGdQt4Kz33gV1dBsN0EjytMayF4FnnyYOWYDum+jCtoh41R8zKHg==
+X-Received: by 2002:a17:906:cb95:b0:a52:3ff0:4a12 with SMTP id mf21-20020a170906cb9500b00a523ff04a12mr1295937ejb.18.1713428923382;
+        Thu, 18 Apr 2024 01:28:43 -0700 (PDT)
+Received: from localhost (78-80-105-131.customers.tmcz.cz. [78.80.105.131])
+        by smtp.gmail.com with ESMTPSA id k14-20020a17090627ce00b00a525669000csm576040ejc.154.2024.04.18.01.28.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 01:28:42 -0700 (PDT)
+Date: Thu, 18 Apr 2024 10:28:41 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, edumazet@google.com, parav@nvidia.com,
+	mst@redhat.com, xuanzhuo@linux.alibaba.com, shuah@kernel.org,
+	petrm@nvidia.com, liuhangbin@gmail.com, vladimir.oltean@nxp.com,
+	bpoirier@nvidia.com, idosch@nvidia.com,
+	virtualization@lists.linux.dev
+Subject: Re: [patch net-next v2 1/6] virtio: add debugfs infrastructure to
+ allow to debug virtio features
+Message-ID: <ZiDZudK3PuSF_3sZ@nanopsycho>
+References: <20240415162530.3594670-1-jiri@resnulli.us>
+ <20240415162530.3594670-2-jiri@resnulli.us>
+ <CACGkMEtpSPFSpikcrsZZBtXOgpAukjCwFRcF79xfzDG-s8_SyQ@mail.gmail.com>
+ <Zh5G0sh62hZtOM0J@nanopsycho>
+ <CACGkMEvRMGvx0jTqFK2WH1iuPMUZJ0LfW1jDLgt-iQd2+AT=+g@mail.gmail.com>
+ <Zh94zX-oQs96tuKk@nanopsycho>
+ <CACGkMEtqJL1+D9byRLSFdFmo0aqoWAeHqmqyq+KEzoC8xhnEFA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PR12MB6075:EE_|MN2PR12MB4486:EE_
-X-MS-Office365-Filtering-Correlation-Id: 243e4525-2ab1-4f20-24b5-08dc5f80ba71
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	8j75tksI+ttNuiQ8FU608m5taY3kmMTkmZn7pogosXxcz+o11sRBMgriDldVfZtTkZgg+uurNlVqXOqgCKsn0Ee/5bI87X4l3FqC+Y0gZt543n163bqJydClWsWnR233dBmM6nW+sdjpOOBqTzlkXWwSzp0EZQY3Ho0qbhGAYTkeRq7/NB7nnMsiP5nq9/g5fNuz1FWQuUXCGia2rw/RKER2q5mCS3V8rePXgKG6skaCAB6wqkDeu2D5iUSfUl7A4iVOQkWqaW21f1yQzPJ4/P1DQsLS5yrm+HtrGA549P46GbOJkdI1tz/YAvFUCgtLy4eEaeGaCMCEJwD9xAI0VdeEB0LuUwAMGWwSrVFwvnXqmC7acm/wMUb9yHtunmVPuITOxpkIXTOc8dLryvO/u0qUYpgSS4ZbNjZPUYKIoELto2UCmMz0kbqXPvtvJJlqGEUxcZ+92XdXC6Mbb4QvTMSAJmpbpzd+g2BT4FiL6FiD9OIi+EbjHSRcoZphqV7KjMoZTrLJ4VU/6qta2y9MjVGwbstqpwwvr6R9XLLHr7cKTEg7A9kXZFM9HwQKHTtWCzdm2uyQy/fiRKpfiqWLLMkMih1XJDqGHwCWKkyVt9A6MPxp3t+MUZ6Xx/bY3JHc3S3dYPF3Nj3M713nm3S3wVD1RYABzwK/qySE05t7YXPd0urEkSFJpH3+hOax4PyaXRSILFpECMs8UiPVIYIFEw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR12MB6075.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015)(366007)(921011);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?yJR8WHzCMRgYH8gX4WcA8C8O9HZRY6mumsKWzA2hx6Ir5WuH50Ea/hQK+uHZ?=
- =?us-ascii?Q?EKfhJ70W4hMsoSukK5JBy8pvXAzgdTx3uxdya/8/gXWhq/g0lNd07p8ShxYG?=
- =?us-ascii?Q?6ygOSq77sqq62o+0ow5yGiajIbqPBK9KnvcQ0tr6Rc4vVEf6OYc4O012IyC9?=
- =?us-ascii?Q?hKvI2qw2hoEFNQYByXBlWZYzEPTHBpBeC7WVQkB7WQqKfFg1zZnGswZNfYUY?=
- =?us-ascii?Q?diRqudZE1j0ZPe6Mrs+shK9JgsYufTeX+ViT9CoE/51AHhTMTFwBKLVbrrY8?=
- =?us-ascii?Q?KB2QrHBxSBOBgCfj76q69WeTe1Q3M2E6azt8w58VQ4oEoSfQOHZvMZBIrUtt?=
- =?us-ascii?Q?ZOigHsV1yk6T8ky5cwdtRjOpLdIakKbDZ1Golo98Cfkbwuu5T68vF/qXxKSn?=
- =?us-ascii?Q?N/0dNrGzAbP3bFD9RsdRZQRrGzzwkRTUij9ZT59Yikw2eqKrz6n4ro7/KgPX?=
- =?us-ascii?Q?W/LR72qPO3C3d/uLcALthO9FcrYzqLWINMx9FOvC354e0p5A2hi4q6s2nOtR?=
- =?us-ascii?Q?wn43CfRf8cVnaxAYHiZRoIPyIMYPezDNoNt+WDeWlnnAWBGBtAFc7xWvTLZe?=
- =?us-ascii?Q?V6bE8hK7jKlq2ljdpOPWNotonFBtZZRTssxXdoB8xt14IER5V96Qk0UUHW8b?=
- =?us-ascii?Q?eX3CkZfisO0u24N/pd2b9YWbfue7WjZvYtu6h5v+1o8wIKez2u94lL1/n9RT?=
- =?us-ascii?Q?kbBEb6+5O8q+D3IPiNhJNiHiOanDvfinR5CfjQKCzGuxB9IDWmIeF7CM98L6?=
- =?us-ascii?Q?inEvThMsBb71C4k+asT0laDpGxhmGAyUZEQBg2/4rQaz5sBcl0j3P1LNjH8a?=
- =?us-ascii?Q?IYpV37eAwy3F/aZslj0xkFnboYjMaB+kgtAhranxkSvF6r8Fu3te6d5l2LYW?=
- =?us-ascii?Q?PsT3asBsfRvMod4+0R10wtrOT+CIaW+rqXHoSGs1uvbe14pTkt9MXDVbydVq?=
- =?us-ascii?Q?Dw/0cIWdZVKGCn8Bav8+CmegveYd/CSeLq0yj3iaJHEj8lHcETnwUaM70IzC?=
- =?us-ascii?Q?LA0gxmBw1Cu5clz/Mo5Mw81Fsye3szTm4wGUb+cpRD3t9eHjF+SfsDfbVwXB?=
- =?us-ascii?Q?Qf4vVfBixs5ZtRIey3GPpBXSR3CZKogFUUB0slguaKoyJV9Gh/khCkMDfid0?=
- =?us-ascii?Q?ih8nEIAdLgYC+dAX2gqUIMmxha+2Iw5cCy+KZzbm4ehTwxJ8XJwnUvA3BZ3Q?=
- =?us-ascii?Q?Da2Am7CHiey/nf9EiyNlGrT3uk8xhaqu2o7PeT40pKDngnh6Py/DgnozYpyK?=
- =?us-ascii?Q?XaS4SuIj5OcfDLYcE/4+LgM8wdIusQLdJXcGuys199CT8tOD+Uk7oS06hDLn?=
- =?us-ascii?Q?X5J1HCqJndFiWemkMQuNaBUIO55tQ0dzYDTDXN9Izf2cYZZDalDspKTHfCO3?=
- =?us-ascii?Q?4NVm3H0qfi3ET8lnk/6Xfwx4nRWFWPrT5wDqEVfL58FlIV1tEB4VfUQ6ZlFA?=
- =?us-ascii?Q?ImA0uTwtzfb3a2oi2/sZfjIXnzlHQDWhAW50TIbPUydh9PLb+pRavYtxkGox?=
- =?us-ascii?Q?PZCVMGcR8/dnAEgkDfzCTvXd3uJwtyBy7ax1VE/RbHrM5K98Pmhd74ascwIT?=
- =?us-ascii?Q?7WLDkBmkhCIoNHFKUnOogqEUKNy6TpAZZCBAlM3t?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 243e4525-2ab1-4f20-24b5-08dc5f80ba71
-X-MS-Exchange-CrossTenant-AuthSource: SJ1PR12MB6075.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2024 08:22:46.9614
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: tlA85TArzCS/cjxMCEwVnFq2A9HKc0DqehOqLv2MFIZJt2d3lf8OA4B0VpK1UWduVCVg3Sf95zElGyBzuOLk9Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4486
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEtqJL1+D9byRLSFdFmo0aqoWAeHqmqyq+KEzoC8xhnEFA@mail.gmail.com>
 
-Hi David,
+Thu, Apr 18, 2024 at 02:59:41AM CEST, jasowang@redhat.com wrote:
+>On Wed, Apr 17, 2024 at 3:23 PM Jiri Pirko <jiri@resnulli.us> wrote:
+>>
+>> Wed, Apr 17, 2024 at 06:37:30AM CEST, jasowang@redhat.com wrote:
+>> >On Tue, Apr 16, 2024 at 5:37 PM Jiri Pirko <jiri@resnulli.us> wrote:
+>> >>
+>> >> Tue, Apr 16, 2024 at 05:52:41AM CEST, jasowang@redhat.com wrote:
+>> >> >On Tue, Apr 16, 2024 at 12:25 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>> >> >>
+>> >> >> From: Jiri Pirko <jiri@nvidia.com>
+>> >> >>
+>> >> >> Currently there is no way for user to set what features the driver
+>> >> >> should obey or not, it is hard wired in the code.
+>> >> >>
+>> >> >> In order to be able to debug the device behavior in case some feature is
+>> >> >> disabled, introduce a debugfs infrastructure with couple of files
+>> >> >> allowing user to see what features the device advertises and
+>> >> >> to set filter for features used by driver.
+>> >> >>
+>> >> >> Example:
+>> >> >> $cat /sys/bus/virtio/devices/virtio0/features
+>> >> >> 1110010111111111111101010000110010000000100000000000000000000000
+>> >> >> $ echo "5" >/sys/kernel/debug/virtio/virtio0/filter_feature_add
+>> >> >> $ cat /sys/kernel/debug/virtio/virtio0/filter_features
+>> >> >> 5
+>> >> >> $ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/unbind
+>> >> >> $ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/bind
+>> >> >> $ cat /sys/bus/virtio/devices/virtio0/features
+>> >> >> 1110000111111111111101010000110010000000100000000000000000000000
+>> >> >>
+>> >> >> Note that sysfs "features" know already exists, this patch does not
+>> >> >> touch it.
+>> >> >>
+>> >> >> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+>> >> >> ---
+>> >> >
+>> >> >Note that this can be done already with vp_vdpa feature provisioning:
+>> >> >
+>> >> >commit c1ca352d371f724f7fb40f016abdb563aa85fe55
+>> >> >Author: Jason Wang <jasowang@redhat.com>
+>> >> >Date:   Tue Sep 27 15:48:10 2022 +0800
+>> >> >
+>> >> >    vp_vdpa: support feature provisioning
+>> >> >
+>> >> >For example:
+>> >> >
+>> >> >vdpa dev add name dev1 mgmtdev pci/0000:02:00.0 device_features 0x300020000
+>> >>
+>> >> Sure. My intension was to make the testing possible on any virtio
+>> >> device.
+>> >
+>> >It did that actually, vp_vdpa bridge virtio-pci device into vDPA bus
+>> >with mediation layer (like feature filtering etc). So it can only run
+>> >on top of standard virtio-pci device.
+>> >
+>> >> Narrowing the testing for vpda would be limitting.
+>> >
+>> >Unless you want to use other transport like virtio-mmio.
+>>
+>> Also, the goal is to test virtio_net emulated devices.
+>> There are couple
+>> of implementation. Non-vdpa.
+>
+>So what I want to say is, vp_vdpa works for all types of virtio-pci
+>devices no matter if it is emulated or hardware.
 
-David Laight <David.Laight@ACULAB.COM> writes:
-> How must does this conditional cost for the normal case
-> when it is true?
-> I suspect it is mispredicted 50% of the time.
-> So, while it may speed up your test, the overall system
-> impact will be negative.
+Sure, but I wanted to have a simple generic way, working on all virtio
+devices, even the ones backed by a different transport, and without need
+of extra vdpa layer.
 
-We have done some measures to evaluate the cost of the additional test
-and we don't see any noticeable impact on performances.
 
-If this is still a concern, we can add compilation-time check on
-CONFIG_ULP_DDP i.e. ifdef or IS_ENABLED() (which gets optimized out).
-
-Thanks
+>
+>Thanks
+>
+>>
+>>
+>> >
+>> >Thanks
+>> >
+>> >>
+>> >>
+>> >> >
+>> >> >Thanks
+>> >> >
+>> >>
+>> >
+>>
+>
 
