@@ -1,129 +1,150 @@
-Return-Path: <netdev+bounces-88960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 489C38A9172
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 05:11:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 75C338A9185
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 05:23:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCDC51F222A7
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 03:11:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED2E11F21A8E
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 03:23:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D49C84F218;
-	Thu, 18 Apr 2024 03:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 771AD4F889;
+	Thu, 18 Apr 2024 03:23:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="YDgX+imS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YDfYhDcz"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-113.freemail.mail.aliyun.com (out30-113.freemail.mail.aliyun.com [115.124.30.113])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C161863D5;
-	Thu, 18 Apr 2024 03:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.113
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9779286AF
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 03:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713409874; cv=none; b=VzdR3cASjXT6yybkBOsrvirymVnprdBHuQg8phVWbprFNnUuBHGY7WlRVXGMFJR0JFLQK26k3BYkJB+Qgb48pkSmhCVsHCvTS/s8DaWhL+bWbTxCIijSRdo3F/qmluYVtBGbfnO5ieI+0XjuuczmAO7wEUdRuLEvoZxOn1yaFUY=
+	t=1713410619; cv=none; b=r76wob5TljG9HrIs5gHhFXDnctoLukXuBrp1IKkP4qwtOX/h9WVqhyvm/CeX3aZBtRdBXV3hJD85funpHZ42F199UIJejYaxEPqZLzqDNoQlY16VSq92yjC+mzA3RH+5QmKGf7BkhnnIloExEREuyebXlQSfyNqjxrLPzgq/9H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713409874; c=relaxed/simple;
-	bh=49YA5bwd5aaJqE1+rtKqUQCOd/fOnn8C+82p+N5lIsU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J+TCxC5Q/Ob2D0SRigP/9SwiaqNASAjsaugE2BpCsDsft4gtqLnv1FpVzAzk/4JkkmoDqNSF29EPC503lwBwu46pZqahBiiKuplnlzZDxchYl0Lei9eQIrTTZl+Fh8dmcPLQgdEniderRKezDq10sglpswoHqe+qd7mWY0z4aHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=YDgX+imS; arc=none smtp.client-ip=115.124.30.113
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1713409868; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=kVF5Qk+qvSlVZp9kWvRyRWHVK/DL9TO3Qw2mqldmm6c=;
-	b=YDgX+imS9B/SUPRtzReSn0sNdi/hnboWE6ZNc0MdKLLofODLoNhUu0T5TNqpYoGm2tN+JEYbVJVuLIUx8pJtJmQeo6qeVxTdp07IBfv6Ah1FGNaIru4cS3Gpyd9AoHxLrPsQnNNj7x3OdGn3VEwPifYIitkifIQLRm/NHyKgvLY=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R781e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=lulie@linux.alibaba.com;NM=1;PH=DS;RN=22;SR=0;TI=SMTPD_---0W4n0ZmI_1713409866;
-Received: from 30.221.128.105(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0W4n0ZmI_1713409866)
-          by smtp.aliyun-inc.com;
-          Thu, 18 Apr 2024 11:11:07 +0800
-Message-ID: <b312ee27-50a2-4eb0-81a0-731e56a9a18e@linux.alibaba.com>
-Date: Thu, 18 Apr 2024 11:11:06 +0800
+	s=arc-20240116; t=1713410619; c=relaxed/simple;
+	bh=OcnbWGomO62dM9Er3ij/a6hEtQYmsCnNfKF64S3mWDA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=NhPX0Cq7GLpbKkOZfVIi9/g68UsfWK/MAH3hC9x+f1Zp866cul3v/fyBnPeR67YgUREHIA4P6j5PAFPk1L8Ef+1A2VlDUX9LvbckcqHSv/xWlm81WYuLLTb78RFTga548NbHjexbWBT9vfoBYmp0GM/O7nh75Nw3wu8S8auYkCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YDfYhDcz; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a5200202c1bso35949466b.0
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 20:23:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713410616; x=1714015416; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GF+YojIpju8aS7DHdqfwp0nimPHsJ8xQMAGlru6uSsI=;
+        b=YDfYhDczMQM1/tUl2VHcusE8mtfjp23cy7ac1wAb9rviTWAUmKLfjmLg1UMgebQB9S
+         H6U956jwCLyBz04LXSGq+RGAfzQDVzkwpDfi4etbpjDHglGCgsOB/efNZI3K1JNgAveI
+         yu1nIPrLaMgvh8x5Hb3bpD7pWsyjq76bL5/yo5XlONqbHGrGFiIVN0bEJIJ5ZerhyNgN
+         wzUwQgtE+gXXmEO2Q3mvqj2WBYFFx7Yk1nfbk4ZfxrIY09L1ewQvu+x8Al8gzyQYWss+
+         4zRuf8Hg5ZVFyssJbMOnrFGavw4WywxBdiX/rNUyJpVB4KPKyxh2sLCHkyeTmd15Iyxy
+         syag==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713410616; x=1714015416;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GF+YojIpju8aS7DHdqfwp0nimPHsJ8xQMAGlru6uSsI=;
+        b=Aqi0Na5uiQf/PNsgNHwTaDfm4MfENj4iiKY16ARVm6x1qdvRSj30nPlMNPWl1TtuoF
+         MvOV3pdyLkaqXwGw/ugUW7/Dx+/brpzIjdML894iwVQj6eJyzhqC9060Gd2uU80EUESX
+         bZHeBiFuuMN0vBpkVRA5YjhnIye+6aS9qWF3O5hEYeR4ZVWNIbh1NpWwih40zmjzJMry
+         DgImHdezyWI973eIFgs+tpCKx0b1+JhUxpu2Fizj5Td+iQ9nSKWhVqx8dhfcIKtJYiEk
+         TP29+irVN48q6m9JOTKT2vRuF3yGxLNvS7kJjRcYjocvPnvnzod2CarN0G4cC56425jX
+         oZcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUBF7mJmNom4kW3J+crYUsAEUYWL6Fjl3ok8dQ77ZOvRGfazIAE9cmzzgUKSHYTQXSV+gMd4OymmwV2Q++48U7DHUiZx9gA
+X-Gm-Message-State: AOJu0YyS71YGwzTsJMihnPmiYWJERlmONCesL8I5C+mXFwxt1YJExQ7S
+	CxN6FZnxNzArqd+8NjWiErQOjAA3m7Oy9Xp3B6FbNz1+wYjlJSgJy5nkswgH+jTvBsCRz42EzYq
+	81vJbD3HwaRz6IdIX7dSnvhkr1Tc=
+X-Google-Smtp-Source: AGHT+IH6v0+Gh4lN176js7QRMzXti373vrdJ5ojljCKSyppoR3/sWo3ogfbb5PhzY04bhA4C+jJEdaF5D+oSQaikXaU=
+X-Received: by 2002:a17:906:26cb:b0:a55:621d:d961 with SMTP id
+ u11-20020a17090626cb00b00a55621dd961mr1234847ejc.0.1713410615741; Wed, 17 Apr
+ 2024 20:23:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next] bpf: add sacked flag in BPF_SOCK_OPS_RETRANS_CB
-To: Martin KaFai Lau <martin.lau@linux.dev>,
- Eric Dumazet <edumazet@google.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@google.com, haoluo@google.com, jolsa@kernel.org, dsahern@kernel.org,
- laoar.shao@gmail.com, xuanzhuo@linux.alibaba.com, fred.cc@alibaba-inc.com
-References: <20240417124622.35333-1-lulie@linux.alibaba.com>
- <CANn89iLWMhAOq0R7N3utrXdro_zTmp=9cs8a7_eviNcTK-_5+w@mail.gmail.com>
- <152f00e2-8f60-4f39-8ab4-fdab1b0bc01a@linux.dev>
-From: Philo Lu <lulie@linux.alibaba.com>
-In-Reply-To: <152f00e2-8f60-4f39-8ab4-fdab1b0bc01a@linux.dev>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240417165756.2531620-1-edumazet@google.com> <20240417165756.2531620-2-edumazet@google.com>
+In-Reply-To: <20240417165756.2531620-2-edumazet@google.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 18 Apr 2024 11:22:58 +0800
+Message-ID: <CAL+tcoB0SzgtG-3mAYrG6ROGbK2HwqXCTo21-0FxfOzKQc397A@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] tcp: conditionally call ip_icmp_error() from tcp_v4_err()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Neal Cardwell <ncardwell@google.com>, Dragos Tatulea <dtatulea@nvidia.com>, eric.dumazet@gmail.com, 
+	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Shachar Kagan <skagan@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Apr 18, 2024 at 12:59=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> Blamed commit claimed in its changelog that the new functionality
+> was guarded by IP_RECVERR/IPV6_RECVERR :
+>
+>     Note that applications need to set IP_RECVERR/IPV6_RECVERR option to
+>     enable this feature, and that the error message is only queued
+>     while in SYN_SNT state.
+>
+> This was true only for IPv6, because ipv6_icmp_error() has
+> the following check:
+>
+> if (!inet6_test_bit(RECVERR6, sk))
+>     return;
+>
+> Other callers check IP_RECVERR by themselves, it is unclear
+> if we could factorize these checks in ip_icmp_error()
+>
+> For stable backports, I chose to add the missing check in tcp_v4_err()
+>
+> We think this missing check was the root cause for commit
+> 0a8de364ff7a ("tcp: no longer abort SYN_SENT when receiving
+> some ICMP") breakage, leading to a revert.
+>
+> Many thanks to Dragos Tatulea for conducting the investigations.
+>
+> As Jakub said :
+>
+>     The suspicion is that SSH sees the ICMP report on the socket error qu=
+eue
+>     and tries to connect() again, but due to the patch the socket isn't
+>     disconnected, so it gets EALREADY, and throws its hands up...
+>
+>     The error bubbles up to Vagrant which also becomes unhappy.
+>
+>     Can we skip the call to ip_icmp_error() for non-fatal ICMP errors?
+>
+> Fixes: 45af29ca761c ("tcp: allow traceroute -Mtcp for unpriv users")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Tested-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Cc: Dragos Tatulea <dtatulea@nvidia.com>
+> Cc: Maciej =C5=BBenczykowski <maze@google.com>
+> Cc: Willem de Bruijn <willemb@google.com>
+> Cc: Neal Cardwell <ncardwell@google.com>
+> Cc: Shachar Kagan <skagan@nvidia.com>
 
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
-On 2024/4/18 06:48, Martin KaFai Lau wrote:
-> On 4/17/24 6:11 AM, Eric Dumazet wrote:
->> On Wed, Apr 17, 2024 at 2:46 PM Philo Lu <lulie@linux.alibaba.com> wrote:
->>>
->>> Add TCP_SKB_CB(skb)->sacked as the 4th arg of sockops passed to bpf
->>> program. Then we can get the retransmission efficiency by counting skbs
->>> w/ and w/o TCPCB_EVER_RETRANS mark. And for this purpose, sacked
->>> updating is moved after the BPF_SOCK_OPS_RETRANS_CB hook.
->>>
->>> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
->>
->> This might be a naive question, but how the bpf program know what is 
->> the meaning
->> of each bit ?
->>
->> Are they exposed already, and how future changes in TCP stack could
->> break old bpf programs ?
->>
->> #define TCPCB_SACKED_ACKED 0x01 /* SKB ACK'd by a SACK block */
->> #define TCPCB_SACKED_RETRANS 0x02 /* SKB retransmitted */
->> #define TCPCB_LOST 0x04 /* SKB is lost */
->> #define TCPCB_TAGBITS 0x07 /* All tag bits */
->> #define TCPCB_REPAIRED 0x10 /* SKB repaired (no skb_mstamp_ns) */
->> #define TCPCB_EVER_RETRANS 0x80 /* Ever retransmitted frame */
->> #define TCPCB_RETRANS (TCPCB_SACKED_RETRANS|TCPCB_EVER_RETRANS| \
->> TCPCB_REPAIRED)
-> 
-> I think it is the best to use the trace_tcp_retransmit_skb() tracepoint 
-> instead.
-> 
-> iiuc the use case, moving the "TCP_SKB_CB(skb)->sacked |= 
-> TCPCB_EVER_RETRANS;" after the tracepoint should have similar effect.
+I wonder if we're supposed to move this check into ip_icmp_error()
+like ipv6_icmp_error() does, because I notice one caller
+rxrpc_encap_err_rcv() without checking RECVERR  bit reuses the ICMP
+error logic which is introduced in commit b6c66c4324e7 ("rxrpc: Use
+the core ICMP/ICMP6 parsers'')?
 
-Good idea. This does also achieve this goal. So it would be like:
-```
--TCP_SKB_CB(skb)->sacked |= TCPCB_EVER_RETRANS;
+Or should it be a follow-up patch (moving it inside of
+ip_icmp_error()) to handle the rxrpc case and also prevent future
+misuse for other people?
 
-  if (likely(!err)) {
-  	trace_tcp_retransmit_skb(sk, skb);
-  } else if (err != -EBUSY) {
-  	NET_ADD_STATS(sock_net(sk), LINUX_MIB_TCPRETRANSFAIL, segs);
-  }
-
-+TCP_SKB_CB(skb)->sacked |= TCPCB_EVER_RETRANS;
-  return err;
-```
-
-> 
-> If the TCPCB_* is moved to a enum, it will be included in the 
-> "vmlinux.h" that the bpf prog can use and no need to expose them in uapi.
-
-This is okay for me. Though I'm not sure if moving to enum brings any 
-unexpected side effect?
-
-BTW, need we concern about those that use trace_tcp_retransmit_skb to 
-check TCPCB_EVER_RETRANS before?
-
-Thanks.
+Thanks,
+Jason
 
