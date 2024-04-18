@@ -1,170 +1,95 @@
-Return-Path: <netdev+bounces-89085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA7718A96A6
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:50:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D6D58A96AA
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:51:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 559431F224EE
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:50:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1D201F22705
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:51:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEFB7158DDB;
-	Thu, 18 Apr 2024 09:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DFFF15AD86;
+	Thu, 18 Apr 2024 09:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="ujWsQRVh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GSy8wycF"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6CC215AAD7
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 09:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A531E489
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 09:51:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713433827; cv=none; b=JsKULQmDZk0fa5sNzlyEFVa8Hg8HdeQj0vkocwepPm0T6n233owfzIfaZRIkLMxg0CWGqxZkFOzhi4NMUXRNE+N1dyFnnMIQjtthXR+hYy2fjVkVm1Go8Yqdfx2/mWsVoOcoubD/nnqbQJzyOfzrrd64M7mlRRoBwkq+H625Ihg=
+	t=1713433870; cv=none; b=pvtkB+h+il1WytDUwCKSqxxL3dXG7B2xLHWXtB34bWX3sJKBnJNRzLOB7nEKGac1th7uZnfso5sjhtDTzBknNY8rgotumKbE5qYIJpXfyGqFhvW9a0nLeMFXN75QzyfuqZ5q96ukKz7X3ITzwiqhu+b9Q72V4kegHRDR6u38O3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713433827; c=relaxed/simple;
-	bh=DykE6FXSV4TIYBwZ3MAyprHcq1LDjyp+mjoiZLISzJA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vE0wWjFCWzHa1KfYHJrQWM1GyDnop4x2WtLHwFNoyq08BotkZWNfeSE7Hk5iXiSiA/7LTrXGLFdXCxSXGhgm/nNDrXNec7lEnc87GDYFPJR8pyU/+ss8pkdyokLk1YtLlu5zBuu30vVnxOdGVe68ySbg+aU0RJ2pp/qh8SrkA10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=ujWsQRVh; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 2C2AE208F1;
-	Thu, 18 Apr 2024 11:50:24 +0200 (CEST)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id PucOE0WtV66Y; Thu, 18 Apr 2024 11:50:23 +0200 (CEST)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 9148820882;
-	Thu, 18 Apr 2024 11:50:23 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 9148820882
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1713433823;
-	bh=NRMSGfnDdzLIHojwt4b9SHmU+VpEt9GG+DqIPhc18Jk=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=ujWsQRVh72n1sMl85fL4xYp/KDzjTU1wu2ss27jqgLz3ymObIy6QMHKOQu7nb474J
-	 c5atbxbViXVpX4WMRihZ6Ts8Hn/t6+V9L5H4kQiGF1wsxfm4PS1vb0pucvOIvV4+Dt
-	 S3iKusv854Vt/vR4/7lnqujyj/2j6SuccLroB7rHxdfhk8OxmhbI5fxRDv667ARPVW
-	 3+o/tg0L0mNHkFerpLUx9AQzNWQY472lzq3J5Q+SGYOF05GoFEpYyUQ1LUohctnS+W
-	 KfiF8y7ft3Oj4UDPSHRZkbdH1CA/E9EUGoylN1lH7lyiew8Xoq0Bi6mnuw7rYb6LL0
-	 QRamJtniatymw==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 82A5980004A;
-	Thu, 18 Apr 2024 11:50:23 +0200 (CEST)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 18 Apr 2024 11:50:23 +0200
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Thu, 18 Apr
- 2024 11:50:23 +0200
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id D89E23180479; Thu, 18 Apr 2024 11:50:22 +0200 (CEST)
-Date: Thu, 18 Apr 2024 11:50:22 +0200
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-CC: <netdev@vger.kernel.org>, <devel@linux-ipsec.org>, Paul Wouters
-	<paul@nohats.ca>, Antony Antony <antony.antony@secunet.com>, Tobias Brunner
-	<tobias@strongswan.org>, Daniel Xu <dxu@dxuuu.xyz>
-Subject: Re: [PATCH ipsec-next 1/3] xfrm: Add support for per cpu xfrm state
- handling.
-Message-ID: <ZiDs3n3yTLMnLzaK@gauss3.secunet.de>
-References: <20240412060553.3483630-1-steffen.klassert@secunet.com>
- <20240412060553.3483630-2-steffen.klassert@secunet.com>
- <Zh01zlwo0H1BmMug@hog>
+	s=arc-20240116; t=1713433870; c=relaxed/simple;
+	bh=fp4jRxzH8kqlloIgDn7+4O/K/Zav4pUPNh2ChFIK3rY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=L9ZcQ7j/RTLN/45o3Y+2MykNzNLL+LcrjNZWV1TC/kdGJWO7Bm9aYiW73ZEflYi3yAc6ZUkqlJDJOMqfjqs6Cz4ji8YeXcS5NpCBViccvFb+tXPIpR3QXax81wazIQ0Geg/iM8wmYJglvH5Xsard0IxxQCK2DT0W6mjDYJtvZjQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GSy8wycF; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf216080f5so1392938276.1
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 02:51:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713433868; x=1714038668; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vH8POpnWHSHWBwsCDGxuBIidTHCTE6Y72fU1IODbetc=;
+        b=GSy8wycFweRH+aq4aa5K9t4Lnd9qxP1SCWcATxpTPLm5FgXsy2vfK78gYIM/ra9hZq
+         Rk+OksjG7BeymjXZwAN7atho4iI3v9j2z6cZ0tpuG0QecQPVuI6hQVDTRbs+FX8ERaMc
+         mfNzdDdloojPhwQNrY7C4oTq+PvhZYu+FBrGDJ7uiRSgmfHh+kYB/5am0LHSTzunD7tI
+         9ZqSDFrNvdi2WQ49q0xiqvg+4KQj0BXVuaY/HUFSKR+N/NnsYIR+lelYI73xpFQ9kyS4
+         8QqFKPl6ZJvpieLpcX80qbo45ufyUi5JF9Uo9tC6p1/8PJZQ0iZiyf8rBl6lSNpWhcwy
+         NUMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713433868; x=1714038668;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vH8POpnWHSHWBwsCDGxuBIidTHCTE6Y72fU1IODbetc=;
+        b=QyIwv6j49grYORbCs9Eh1hf48ntWZh89P/vKSK32xzDn+yMRkX7zr0VYX442ouPeen
+         xR4BgWIsMGdt/w1hZtLWZyPTvwRglJbeP6WTsa3/bB356UnNuhsYrsc5P4E/TUFJrt3G
+         EI4xmRrcNUgErOSUYAWSn2+CTh8PEO0vmhoCeALzQ94E2YJMQdpsljMm7FYeZ+foxVym
+         waqQFOs39SR5xRrccqKIjgyHhOWUthwzPWBgFRt1ItexEUQDzSd3Zbjg0nPw0acq6Q1p
+         sdcaPXpruhRNbEn6LuildTthO0SRS6moPNkylkFf6s3vP3PD6u4JLZRfWNlD5aY+KWRB
+         Z74Q==
+X-Gm-Message-State: AOJu0Yw0CtWPI4cVawzc3BhHAFNcdszaMBPrX+cnquoS0RbVyq+mvZ8P
+	UcW90pV51jn1mh0fHJeDCCoYp2ZAKh3FB4i8+s1J/3eq8osuG2pp74LmFbvQe3vNyoJx0gFXiii
+	X1b/DWMIOQA==
+X-Google-Smtp-Source: AGHT+IGahTxr6taT/UnB92aHvUyx7EyuRQSv2SACdHeQt2Lwy75X1IQCWOB6yHe1dblgUPDqXzIt6ItRLipg1w==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1007:b0:dc7:68b5:4f21 with SMTP
+ id w7-20020a056902100700b00dc768b54f21mr595821ybt.9.1713433867839; Thu, 18
+ Apr 2024 02:51:07 -0700 (PDT)
+Date: Thu, 18 Apr 2024 09:51:03 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <Zh01zlwo0H1BmMug@hog>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
+Message-ID: <20240418095106.3680616-1-edumazet@google.com>
+Subject: [PATCH net-next 0/3] neighbour: convert neigh_dump_info() to RCU
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Apr 15, 2024 at 04:12:30PM +0200, Sabrina Dubroca wrote:
-> 2024-04-12, 08:05:51 +0200, Steffen Klassert wrote:
-> > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> > index 0c306473a79d..b41b5dd72d8e 100644
-> > --- a/net/xfrm/xfrm_state.c
-> > +++ b/net/xfrm/xfrm_state.c
-> [...]
-> > @@ -1096,6 +1098,9 @@ static void xfrm_state_look_at(struct xfrm_policy *pol, struct xfrm_state *x,
-> >  			       struct xfrm_state **best, int *acq_in_progress,
-> >  			       int *error)
-> >  {
-> > +	unsigned int pcpu_id = get_cpu();
-> > +	put_cpu();
-> 
-> That looks really strange to me. Is it safe? If it is, I guess you
-> could just use smp_processor_id(), since you don't get anything out of
-> the extra preempt_disable/enable pair.
+Remove RTNL requirement for "ip neighbour show" command.
 
-We can use use smp_processor_id() as we just need the ID as a lookup
-key.
+Eric Dumazet (3):
+  neighbour: add RCU protection to neigh_tables[]
+  neighbour: fix neigh_dump_info() return value
+  neighbour: no longer hold RTNL in neigh_dump_info()
 
-> 
-> (same in xfrm_state_find)
-> 
-> 
-> [...]
-> > @@ -2458,6 +2478,8 @@ static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct
-> >  	err = xfrm_if_id_put(skb, x->if_id);
-> >  	if (err)
-> >  		goto out_cancel;
-> > +	if (x->pcpu_num != UINT_MAX)
-> > +		err = nla_put_u32(skb, XFRMA_SA_PCPU, x->pcpu_num);
-> 
-> Missing the corresponding change to xfrm_aevent_msgsize?
+ net/core/neighbour.c | 68 +++++++++++++++++++++++---------------------
+ 1 file changed, 36 insertions(+), 32 deletions(-)
 
-Right, fixed.
+-- 
+2.44.0.683.g7961c838ac-goog
 
-> [...]
-> > @@ -3049,6 +3078,7 @@ const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
-> >  	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
-> >  	[XFRMA_IF_ID]		= { .type = NLA_U32 },
-> >  	[XFRMA_MTIMER_THRESH]   = { .type = NLA_U32 },
-> > +	[XFRMA_SA_PCPU]		= { .type = NLA_U32 },
-> 
-> What about xfrm_compat? Don't we need to add XFRMA_SA_PCPU to
-> compat_policy, and then some changes to the translators?
-
-Yeah, I forgot this. The compat layer did not yet exist when
-I wrote the initial pachset. The IETF standardization process
-held this pachset off for about 5 years :-/
-
-> [...]
-> > @@ -3216,6 +3246,11 @@ static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct
-> >  	err = xfrm_if_id_put(skb, x->if_id);
-> >  	if (err)
-> >  		return err;
-> > +	if (x->pcpu_num != UINT_MAX) {
-> > +		err = nla_put_u32(skb, XFRMA_SA_PCPU, x->pcpu_num);
-> 
-> Missing the corresponding change to xfrm_expire_msgsize?
-
-Fixed.
-
-> [...]
-> > @@ -3453,6 +3490,8 @@ static int build_acquire(struct sk_buff *skb, struct xfrm_state *x,
-> >  		err = xfrm_if_id_put(skb, xp->if_id);
-> >  	if (!err && xp->xdo.dev)
-> >  		err = copy_user_offload(&xp->xdo, skb);
-> > +	if (!err && x->pcpu_num != UINT_MAX)
-> > +		err = nla_put_u32(skb, XFRMA_SA_PCPU, x->pcpu_num);
-> 
-> Missing the corresponding change to xfrm_acquire_msgsize?
-
-Fixed.
-
-Thanks for the review Sabrina!
 
