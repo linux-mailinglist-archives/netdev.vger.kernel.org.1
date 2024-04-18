@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-88938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBB868A90CD
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 03:40:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2D1D8A90CF
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 03:40:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A13D71F22957
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:40:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 012821C21C08
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EAFC3839D;
-	Thu, 18 Apr 2024 01:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC95A3F8DE;
+	Thu, 18 Apr 2024 01:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PwDc7nSC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XP5gTkSQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48CF84EB33
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 01:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890D58C1F
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 01:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713404427; cv=none; b=BrhNuTidxbr2PvAZicxch3ci3hEozSJtRRC3h2Ns4YY0qvq6R3vP6ymZjWAiyclWsSDg1CFKfmnqm65kgDvmI8euHAthJr4MkOkVgd4A/Knqmu+mrq2lS1XATW1KBIBz2y1le18FwOu1xNNDchreSOsGEzOI/kziqHM/vFBRsXY=
+	t=1713404428; cv=none; b=PiSX6avvpPV2T0QvGRy+fgQmvufrHsBe+svC4jGYzA/JNJlIQSp3rWHZHBMrAYH6bfCFavySXxWpWYUrMGNeb1yQvc9uEK8qO9P4x4xtvtXKoh/9n1BxsTZ7jB/pL5EbMqgBf++T6tMwIKqx7rfcByYtPyQJT4zwHJDS3rG640w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713404427; c=relaxed/simple;
-	bh=nJYsOGGHYzgSe36k2CFDRye0rFWwiaiJGPzEsTMjqqw=;
+	s=arc-20240116; t=1713404428; c=relaxed/simple;
+	bh=pm//dt2Agk5QNExT39w2soXMzVRNOAVwG/poy1yAt18=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=q9meRwje2ZeBHWg0YEqEf7hj8FhiSs3WOxq7Toyq+DPuQWCKp3ETVaQ4j+Fel/X8cfufS7LZfHw42kl32jpVCsHuTMniUYSL1trHuuNT1KeBw/fvilzXFQzUciDEInTNzVIAhurgjOyg2PkwXu5oPqXDXmqx6GdAro8V6x1DNTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PwDc7nSC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D0408C3277B;
-	Thu, 18 Apr 2024 01:40:26 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=TiEIRfnCIH/rV/kESNXMWCSJOUjXF/gbya1y9AWuYKN1OpKEc+1W3DOkt8zUev5b3i6TJbFnrSZK0lJoVhGRxk86pKWiI5tmhz82IyT2wTurFHED9V/L7pd7rFUN7lqbkCGqg3pKpUoIx32qh0PbonPoaLloyj1SImzP/hPvxho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XP5gTkSQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0DFBDC32781;
+	Thu, 18 Apr 2024 01:40:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713404426;
-	bh=nJYsOGGHYzgSe36k2CFDRye0rFWwiaiJGPzEsTMjqqw=;
+	s=k20201202; t=1713404428;
+	bh=pm//dt2Agk5QNExT39w2soXMzVRNOAVwG/poy1yAt18=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PwDc7nSC1ls8YwhApj0S6YP91lvNz1Cfa91OEkZZ4IgYcDEpYRpgn1pHp98izGAT2
-	 ONkgdiVgTaN/UgEz940138n1tlcB+FtTmmC/Eb+aifiyDFonbXGOOgH4ghUj3TwKhz
-	 qcKutC4KxufHsgxz8XYVLXPx79uins5HXjEylTxQWmo5WR3qw00XQD1r4uETamRn5I
-	 Zt7cSW0rmV7xuc4dEsw7sdFGskPM89xPOzV24ApZLwqeQrSA0ClLivR0un3DcIJ+M1
-	 gzp6Ur2eW8B8JRI4jyPgBt7yeeCI6EkuIwU+RqEhXYbpW676l6CoaU8JpkpRBBlQrr
-	 NlNl80p9RUZbw==
+	b=XP5gTkSQEVmKKuiFgr/XEHNm5QjvTOMwGQE5tJvnmQEe0uESmbkYAyfZ8rh46xhDZ
+	 qTIx6lLq0AhCybcyZuyQ5dEdFrgif3xKS7zgLeOjugtKCXNygzAEgkdoeu9WlNUATh
+	 pS1gHiq5dM33URctwxwPgNy1G4xdfi6ZKit/6ALsTVtyaUtRmz12zFgZsCT/5ZYh+Q
+	 jDiei5BBWHiTaM887aQqFTQjEXpaeUbZmD3lKVcjMdpA2BS9+Th2ZyA5P2YffsEISB
+	 bBOf58rGXQcO3jVwR57zZnlSMC9Z319wr46UkUPJT1oAxGVz3QFNSrg6+aRzasrHBP
+	 r2yMive7r6+8Q==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B8B70C43616;
-	Thu, 18 Apr 2024 01:40:26 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F3D42C43619;
+	Thu, 18 Apr 2024 01:40:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,62 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/sched: Fix mirred deadlock on device recursion
+Subject: Re: [PATCH net-next] tcp_metrics: use parallel_ops for
+ tcp_metrics_nl_family
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171340442675.27861.4405474645584745327.git-patchwork-notify@kernel.org>
-Date: Thu, 18 Apr 2024 01:40:26 +0000
-References: <20240415210728.36949-1-victor@mojatatu.com>
-In-Reply-To: <20240415210728.36949-1-victor@mojatatu.com>
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: edumazet@google.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, jhs@mojatatu.com, jiri@resnulli.us,
- xiyou.wangcong@gmail.com, netdev@vger.kernel.org, renmingshuai@huawei.com,
- pctammela@mojatatu.com
+ <171340442796.27861.9767381408543638290.git-patchwork-notify@kernel.org>
+Date: Thu, 18 Apr 2024 01:40:27 +0000
+References: <20240416162025.1251547-1-edumazet@google.com>
+In-Reply-To: <20240416162025.1251547-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 15 Apr 2024 18:07:28 -0300 you wrote:
-> From: Eric Dumazet <edumazet@google.com>
+On Tue, 16 Apr 2024 16:20:25 +0000 you wrote:
+> TCP_METRICS_CMD_GET and TCP_METRICS_CMD_DEL use their
+> own locking (tcp_metrics_lock and RCU),
+> they do not need genl_mutex protection.
 > 
-> When the mirred action is used on a classful egress qdisc and a packet is
-> mirrored or redirected to self we hit a qdisc lock deadlock.
-> See trace below.
-> 
-> [..... other info removed for brevity....]
-> [   82.890906]
-> [   82.890906] ============================================
-> [   82.890906] WARNING: possible recursive locking detected
-> [   82.890906] 6.8.0-05205-g77fadd89fe2d-dirty #213 Tainted: G        W
-> [   82.890906] --------------------------------------------
-> [   82.890906] ping/418 is trying to acquire lock:
-> [   82.890906] ffff888006994110 (&sch->q.lock){+.-.}-{3:3}, at:
-> __dev_queue_xmit+0x1778/0x3550
-> [   82.890906]
-> [   82.890906] but task is already holding lock:
-> [   82.890906] ffff888006994110 (&sch->q.lock){+.-.}-{3:3}, at:
-> __dev_queue_xmit+0x1778/0x3550
-> [   82.890906]
-> [   82.890906] other info that might help us debug this:
-> [   82.890906]  Possible unsafe locking scenario:
-> [   82.890906]
-> [   82.890906]        CPU0
-> [   82.890906]        ----
-> [   82.890906]   lock(&sch->q.lock);
-> [   82.890906]   lock(&sch->q.lock);
-> [   82.890906]
-> [   82.890906]  *** DEADLOCK ***
-> [   82.890906]
-> [..... other info removed for brevity....]
-> 
-> [...]
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  net/ipv4/tcp_metrics.c | 1 +
+>  1 file changed, 1 insertion(+)
 
 Here is the summary with links:
-  - [net] net/sched: Fix mirred deadlock on device recursion
-    https://git.kernel.org/netdev/net/c/0f022d32c3ec
+  - [net-next] tcp_metrics: use parallel_ops for tcp_metrics_nl_family
+    https://git.kernel.org/netdev/net-next/c/ba3de6d8035e
 
 You are awesome, thank you!
 -- 
