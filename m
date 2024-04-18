@@ -1,206 +1,131 @@
-Return-Path: <netdev+bounces-89075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3996F8A962B
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:28:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1998F8A963C
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:34:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C4D31C21BF0
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:28:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 871781F230B0
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:34:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1753A1591FF;
-	Thu, 18 Apr 2024 09:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E03615AD99;
+	Thu, 18 Apr 2024 09:33:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FnqElyiS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cVzV3tZ4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40FD61CA92
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 09:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D67915AD81
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 09:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713432411; cv=none; b=Fexl3wKK5AVHUtYrx+71ZwOkR73lzq5wX39km5AWU/AofHjh04/J4pCawfHN+IbIMqcpMYD3CVGPk5aGWFGdxwAMDuky4D8u9ngt/9rxrEzbHZSO2Yp/DbokASmL37kj94f8XO3tO3+dS8PG2woaPaqkfgwchjtKxlHC9Ia7PA8=
+	t=1713432833; cv=none; b=ptSxiWqUZl69/VHI8fkoXmlTy9GEdAdXgIcKkODdZBjocIVfs4YfThs3i5Jbco113r5XX2EcmpVWzUkG/gzv4lZ5CweoU50wK0pzAfbUkR5VpPvAc5x5ltqhbGV1yj5H9EF+cDyPO85UUFqzKBBCQye5pohynqaguSclSkTxmOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713432411; c=relaxed/simple;
-	bh=ufO01s8DBV5PrLvABpJObWb0m5TA1em9YffNE0Pdz+k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TVzsxu6bkpGmBiM5jJEmvpN8iE8CXebU07paz7QaeZ+S63Iu/bV5e4NoqXIu7B3vIa6g5pLgMMq0RlkQQAkdkiPtqBiDSgqW1/GzPMoP7r/3wE/Epb/nu9Rx4fPeSjxPcj8Z20jLmoq7ER0OofP0t+Qazg5jP+uU3/jZFJpOjBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FnqElyiS; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56fd95160e5so6327a12.0
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 02:26:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713432407; x=1714037207; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3EvmMOndT20VHkhN1VcowmlQaFEpgIUN+jm+A4Yrmq0=;
-        b=FnqElyiS8c2wEU82j05wELwJrJrQ9wJIt3TC0pzctG1x/uyOsI8clZWGieQ+lX9XBa
-         M8ziYQ+8ql2cQJdhBjIdu45Vdb1AYMmyvCw2t4bIpTEurUwd7PHcIqZSgtoGOvyFPXhX
-         v3OLJEAXa+kdyEVJdWERS8wy+wfEXbcWswb5KaYnmgrsC+KDp0i2UFI32tn1IWQ1lBof
-         sTNzjMaZfQBnsAQvoor8Fk4BDiP5WHnTEVKwy2Ite3PZity0WMC7HhiId0x0SUSrbug/
-         FGHFyocSDp18IZJ2Y2tqUuMqJ16JzXyDmQDIsk27mA6ASEzVD7H2gQyXdWgEjKu6pNwN
-         DA3g==
+	s=arc-20240116; t=1713432833; c=relaxed/simple;
+	bh=+MXJB/ptM9FTPWPjxgDkAlUjeWnuks3pPWNXEWYClJ4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SrcQ9CJkUaLDLUcC+pCNdIYTR4vzEaPEETid1rWr/2MOeFgqlhsINzE1GPD6bmjMtvEJAd+gjluRttK214JnaIMamenFfjFemh60mwym40RJrPMqwRu7HndkQG5PzkzXrUNy8eHZK9ql2efJt6qNMcDoaLD1d3sfkzRHG79VBxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cVzV3tZ4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713432831;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Y3DuwMuv3Zm1nako5cRJVWGwfyWPAgo99+tBjI8y8is=;
+	b=cVzV3tZ4FVD+3mCTwZrlQQi33u74Y1EeM2TTGtjtx4iiGSjW/M+SaJmlV+RKY+LXKqxgB/
+	3xgj/vfK+ye2D+UEMIFSpkgYniPduQ/4ytXv019uc9nxW4QM2bHK64to5R9wreAxF6f6Vz
+	AMU1TNJGe4L4xwKh1yfrAaAzMYHDs/Y=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-591-7ks2ANo1NvqmkhSnRa5rKA-1; Thu, 18 Apr 2024 05:33:50 -0400
+X-MC-Unique: 7ks2ANo1NvqmkhSnRa5rKA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3457b0dca26so61241f8f.1
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 02:33:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713432407; x=1714037207;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3EvmMOndT20VHkhN1VcowmlQaFEpgIUN+jm+A4Yrmq0=;
-        b=Byat+07rrTD0fpcpuO+O+5TgrLQNQUBkZOxOlyoslZdNIOxL9vRWECTq7JAietqQQ4
-         mzJF+VM2RuQiyMQLu0b7cwx0ywKuYUag7oh8U2WC2yuQCigf1lJFDut5nQ8Y+SOnLf9F
-         0R5pkB67DgTgt0n5jzawR1ZK5bMX9i3kAQTLuqVhCINDDvCfab0xHnulEO1ozIwD2suG
-         dF395OHZKGLMzsliOLvYvVdNR6OfvFQzcts+dJtVZg+2Pr8FY+6oNj1xOn8hAwV55670
-         ofu+hDDCs8ASnl8+fSA0mtdMXe/tDX0xo3p7teiuox+pmawDfnKnNsd402SBl15vkl2s
-         Ep3A==
-X-Forwarded-Encrypted: i=1; AJvYcCVqbH5mbnCZ9GZ7EatXJ/KFbNqD/4N1RxNbTiDCJHWiQXjtWvYjY21UEL/Iy/hartmjiVD8eSzj/x410wBUVAd+cSaHnHw3
-X-Gm-Message-State: AOJu0YzkZDOfAPQLtZK5d0yulqa6bdfqs0NNnFKEPQxdvXnKVIk/11EJ
-	7cD0tdGQCGaok2ORxK+JkM9A7F1Yn+taIBOVLz0Ri1DliWeuKJGtj7arWXp+U3sfUyc/QBN53bS
-	nbnQX7TogGwOirGEN2OH1cTyJOjZ4Q7KZ/Z/V
-X-Google-Smtp-Source: AGHT+IFpajaK3tALiS5PGJurmKspEK2kULhNTPj8PiuMteBL44Ec70RcMkMjiX/wrLCNygcFsJhW7p24ZLDu2weQ1pw=
-X-Received: by 2002:a05:6402:1510:b0:571:bc8d:4b6e with SMTP id
- f16-20020a056402151000b00571bc8d4b6emr41277edw.3.1713432407252; Thu, 18 Apr
- 2024 02:26:47 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713432829; x=1714037629;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y3DuwMuv3Zm1nako5cRJVWGwfyWPAgo99+tBjI8y8is=;
+        b=LAlFQlunJZEi3H2p7IrIqTD+dFfcbFTUaXrIcISoRktAldkN4v2BQmAqS3yL9xvKS0
+         iIqVaANpbE3e/ep7IpFiAY0vbNNeQp0QxHl7uNQscYgLU9FxWwHF6chk/OyG6B00tqoC
+         uSrryOAf5Lq8kG2Sk5e1XdaoR5OwM7BIsBSoCkowbi2EcWrKR2YTV5fXZbiYP/qSrb5x
+         GLKK6lC2Ac7lVK7KE0P0CovEZk2+Y5rCEkGzIGq2E5CP/9f0AMAwpQ1NmNJ+oXL03p3S
+         0uDw8vIB+cg6TWn3vfmhmwfdv/DELzy+JM2yabn1uH/FyLO29mgxJ50LwCaAEfyGJON6
+         xUyg==
+X-Gm-Message-State: AOJu0Yz94bZtcFuGnGq+xGOg3d85o+ILZSTXWA7EOWtp8lXkC3TSEu0c
+	iMAmkKKuSoDEmZEr/+VgHMK4gVa9CMCZaGBZKyKOh7eFQJID8tvC1aThOgQ5AQKPHhw/oaFuGea
+	Z1mLrpvJQWKNVyDuwLlwYUJRmr7gx8VSv7U030XPGaiCvh9zHsisN/g==
+X-Received: by 2002:adf:eac7:0:b0:343:72f5:8e7c with SMTP id o7-20020adfeac7000000b0034372f58e7cmr1288830wrn.7.1713432829066;
+        Thu, 18 Apr 2024 02:33:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHlMVGQUxGXbIrh4G8D9Ycs0kxgBi6EvF56S9YBrW1LT7emhlWGKPF0oiJBPuVn5wnM4v9V1Q==
+X-Received: by 2002:adf:eac7:0:b0:343:72f5:8e7c with SMTP id o7-20020adfeac7000000b0034372f58e7cmr1288812wrn.7.1713432828660;
+        Thu, 18 Apr 2024 02:33:48 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-236-143.dyn.eolo.it. [146.241.236.143])
+        by smtp.gmail.com with ESMTPSA id r2-20020adfb1c2000000b00347c187a3a0sm1379137wra.24.2024.04.18.02.33.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 02:33:48 -0700 (PDT)
+Message-ID: <3f487ef495da476e5b0564dbb024dca54e8bee10.camel@redhat.com>
+Subject: Re: [PATCH] neighbour: guarantee the localhost connections be
+ established successfully even the ARP table is full
+From: Paolo Abeni <pabeni@redhat.com>
+To: "Li, James Zheng" <James.Z.Li@Dell.com>, Eric Dumazet
+ <edumazet@google.com>,  Zheng Li <lizheng043@gmail.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "bpf@vger.kernel.org"
+	 <bpf@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"jmorris@namei.org"
+	 <jmorris@namei.org>, "kuba@kernel.org" <kuba@kernel.org>
+Date: Thu, 18 Apr 2024 11:33:46 +0200
+In-Reply-To: <IA1PR19MB6545F5F1940C0B326058987ABB082@IA1PR19MB6545.namprd19.prod.outlook.com>
+References: <20240416095343.540-1-lizheng043@gmail.com>
+	 <CANn89i+TKbGbmy0JJbyhUxQ9Zc_jj=EHv=bYXT5dUvQY7hw12g@mail.gmail.com>
+	 <IA1PR19MB6545F5F1940C0B326058987ABB082@IA1PR19MB6545.namprd19.prod.outlook.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240417165756.2531620-1-edumazet@google.com> <20240417165756.2531620-2-edumazet@google.com>
- <e332d0b8fa7b116003dfd8b47f021901e66b36b9.camel@redhat.com> <CANn89i+-cjHze1yiFZKr-cCGG7Fh4gb9NZnS1u4u_77bG2Mf6Q@mail.gmail.com>
-In-Reply-To: <CANn89i+-cjHze1yiFZKr-cCGG7Fh4gb9NZnS1u4u_77bG2Mf6Q@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 18 Apr 2024 11:26:33 +0200
-Message-ID: <CANn89iLSZFOYfZUSK57LLe8yw4wNt8vHt=aD79a1MbZBhfeRbw@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] tcp: conditionally call ip_icmp_error() from tcp_v4_err()
-To: Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	Neal Cardwell <ncardwell@google.com>, Dragos Tatulea <dtatulea@nvidia.com>, eric.dumazet@gmail.com, 
-	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Shachar Kagan <skagan@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 18, 2024 at 10:03=E2=80=AFAM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Thu, Apr 18, 2024 at 10:02=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> =
-wrote:
-> >
-> > Hi,
-> >
-> > On Wed, 2024-04-17 at 16:57 +0000, Eric Dumazet wrote:
-> > > Blamed commit claimed in its changelog that the new functionality
-> > > was guarded by IP_RECVERR/IPV6_RECVERR :
-> > >
-> > >     Note that applications need to set IP_RECVERR/IPV6_RECVERR option=
- to
-> > >     enable this feature, and that the error message is only queued
-> > >     while in SYN_SNT state.
-> > >
-> > > This was true only for IPv6, because ipv6_icmp_error() has
-> > > the following check:
-> > >
-> > > if (!inet6_test_bit(RECVERR6, sk))
-> > >     return;
-> > >
-> > > Other callers check IP_RECVERR by themselves, it is unclear
-> > > if we could factorize these checks in ip_icmp_error()
-> > >
-> > > For stable backports, I chose to add the missing check in tcp_v4_err(=
-)
-> > >
-> > > We think this missing check was the root cause for commit
-> > > 0a8de364ff7a ("tcp: no longer abort SYN_SENT when receiving
-> > > some ICMP") breakage, leading to a revert.
-> > >
-> > > Many thanks to Dragos Tatulea for conducting the investigations.
-> > >
-> > > As Jakub said :
-> > >
-> > >     The suspicion is that SSH sees the ICMP report on the socket erro=
-r queue
-> > >     and tries to connect() again, but due to the patch the socket isn=
-'t
-> > >     disconnected, so it gets EALREADY, and throws its hands up...
-> > >
-> > >     The error bubbles up to Vagrant which also becomes unhappy.
-> > >
-> > >     Can we skip the call to ip_icmp_error() for non-fatal ICMP errors=
-?
-> > >
-> > > Fixes: 45af29ca761c ("tcp: allow traceroute -Mtcp for unpriv users")
-> > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > Tested-by: Dragos Tatulea <dtatulea@nvidia.com>
-> > > Cc: Dragos Tatulea <dtatulea@nvidia.com>
-> > > Cc: Maciej =C5=BBenczykowski <maze@google.com>
-> > > Cc: Willem de Bruijn <willemb@google.com>
-> > > Cc: Neal Cardwell <ncardwell@google.com>
-> > > Cc: Shachar Kagan <skagan@nvidia.com>
-> > > ---
-> > >  net/ipv4/tcp_ipv4.c | 3 ++-
-> > >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> > > index 88c83ac4212957f19efad0f967952d2502bdbc7f..a717db99972d977a64178=
-d7ed1109325d64a6d51 100644
-> > > --- a/net/ipv4/tcp_ipv4.c
-> > > +++ b/net/ipv4/tcp_ipv4.c
-> > > @@ -602,7 +602,8 @@ int tcp_v4_err(struct sk_buff *skb, u32 info)
-> > >               if (fastopen && !fastopen->sk)
-> > >                       break;
-> > >
-> > > -             ip_icmp_error(sk, skb, err, th->dest, info, (u8 *)th);
-> > > +             if (inet_test_bit(RECVERR, sk))
-> > > +                     ip_icmp_error(sk, skb, err, th->dest, info, (u8=
- *)th);
-> > >
-> > >               if (!sock_owned_by_user(sk)) {
-> > >                       WRITE_ONCE(sk->sk_err, err);
-> >
-> > We have a fcnal-test.sh self-test failure:
-> >
-> > https://netdev.bots.linux.dev/contest.html?branch=3Dnet-next-2024-04-18=
---06-00&test=3Dfcnal-test-sh
-> >
-> > that I suspect are related to this patch (or the following one): the
-> > test case creates a TCP connection on loopback and this is the only
-> > patchseries touching the related code, included in the relevant patch
-> > burst.
-> >
-> > Could you please have a look?
->
-> Sure, thanks Paolo !
+On Tue, 2024-04-16 at 10:36 +0000, Li, James Zheng wrote:
+> On Tuesday, April 16, 2024 6:02 PM Eric Dumazet <edumazet@google.com> wro=
+te:
+> > Hmmm...
+>=20
+> > Loopback IPv4 can hold 2^24 different addresses, that is 16384 * 1024
+>=20
+> There is only one Loopback neigh "0.0.0.0 dev lo lladdr 00:00:00:00:00:00=
+ NOARP"
+> existing even you have configured 2^24 different addresses on the loopbac=
+k device.
 
-First patch is fine, I see no failure from fcnal-test.sh (as I would expect=
-)
+Eric, I think James is right, in __ipv4_neigh_lookup_noref():
 
-For the second one, I am not familiar enough with this very slow test
-suite (all these "sleep 1" ... oh well)
+	if (dev->flags & (IFF_LOOPBACK | IFF_POINTOPOINT))
+                key =3D INADDR_ANY;
 
-I guess "failing tests" depended on TCP connect() to immediately abort
-on one ICMP message,
-depending on old kernel behavior.
+	return ___neigh_lookup_noref(&arp_tbl, neigh_key_eq32, arp_hashfn, &key, d=
+ev);
 
-I do not know how to launch a subset of the tests, and trace these.
+So there should be at most one neigh entry over the loopback device.
+The patch looks safe to me, am I missing something?
 
-"./fcnal-test.sh -t ipv4_tcp" alone takes more than 9 minutes [1] in a
-VM running a non debug kernel :/
+Thanks,
 
-David, do you have an idea how to proceed ?
+Paolo
 
-Thanks.
-
-[1]
-Tests passed: 134
-Tests failed:   0
-
-real 9m33.085s
-user 0m40.159s
-sys 0m30.098s
 
