@@ -1,358 +1,320 @@
-Return-Path: <netdev+bounces-89118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC61B8A9794
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 12:38:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B100E8A9793
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 12:38:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E77951C210BB
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 10:38:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27CF61F219D8
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 10:38:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A491607AC;
-	Thu, 18 Apr 2024 10:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="iSAU5xej"
-X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2063.outbound.protection.outlook.com [40.107.220.63])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12BBC15FD19;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F05160793;
 	Thu, 18 Apr 2024 10:36:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713436586; cv=fail; b=KAvKL2XbtGQU/CzXlrfRGf7vh0F5zH+6Tplv+GaJrpGg/1B2J7P+HxCA0oi7/pkh2YBnooxY/gyZ9d3kslNc85YbJ+Q7Jipqm5bdeJy0F9NnGCshlQ1+jWQx6a00ZTX5V/t3/zms27mvpc1DB2bBCKKFlEKLxO4t+LrG8SvTQ1s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713436586; c=relaxed/simple;
-	bh=yZfvoGxUnvDaatNkkEDXy9xr1YOYnlqdKwLC2dw6GmE=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PVruVBLPT90f3BFNHyQAEhawE6vD7ZPUpNRcOOcq8wA5FDz/X+cZHXocy+hW6iG2Fj2CuOkzj8lFPsVQYzQSj6IB2p7lF0nTaaslcLbNu5DmniWfzwAdE9Rd5fRYtxJuMEXNhdpdVPOyoCQd7hJDz8ZfCHm2kvh1N7S3yRZp2sw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=iSAU5xej; arc=fail smtp.client-ip=40.107.220.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OaSuwcqBntfOtfMRYkSUQ+py4Hw9azkJ22KLe/RwUryStCcHXmPvvI3caq8yy/GLhE5Gk5iS5AWaDuyDbC0ygZFpnNJn3HwT9AO19GBIeUQeIT0sL10c5eN0c/xIn+gdoIrG/e1wGNnqFBK9W8LQswkSjLlBqKdXxA3xRX7h3FUl+cB+0i0iOul4YNlxt9mjLhZipIeR8a0FS4IrraYE2U1i0b3RjuGSud0yy6oe+eWo5X/HOjBQM6dN52S8TssLXEXSE85fZEvBc2QMMntKqB/FXcrLWONTbutpblEhShMe+FsReisGvdBPegMVK/alh58aQUbVlSfW4042lW8TpA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cP2K2/ziAy9DPxkA8GJpo5t/WSRjiRBCvqdWzB4ohOM=;
- b=SjO3S/xg0N9Oyi3YkSAajR2jph9EUKWU7uxpG4rd41kdPoCJ+Q1yv0fJzcj4iqzYixwD7T8qp6Mvi+UmBGhbBMCyl9790U5j5yilBtnmFOCxQZLqY1RoijGV48gO6b/i9ostiVRCmPIsm0qan2fnWhiPK+XAq0u0/OETlZv1ITOjSFGkMdYVRxxTg20qta9av1OmnZN5jqIozU2sukwKu251KxnpNT8pMWPvudda9q4YE0d6rglTBrI9lncK0/dGW4FkWhsyLB/fElWpRRbDd4OPLCgsPKYVgEhrrvjZBVpZ7yNHToWTjUsaPCjAiO6GlgqwAj8bd2P0jGBpOHkrTQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cP2K2/ziAy9DPxkA8GJpo5t/WSRjiRBCvqdWzB4ohOM=;
- b=iSAU5xej+axebz1mzYLTwRiUGrgdF8qeoULDOWfBKMHIxmzfUUdPh/4WWk5htw+HdaAOK/yasxHSpnwS/xz9VZ5KEjJTROf1eODo4dbxug/O4Rs6lCX+zhjLHVv4uOBiGlIM4LDm2ox4/xqevI5llm92hFchuzWqj8NJmXscKjNkphkS/7gHltIC9DSm4N2sn+qkWklzsufvRghqczs73m4c6iDeMaStIh9PodFE0pCHZ1/XzjZkMue4CPI6K08Y28UhaRMrFFOsO9d2Nu0XE0xrf6TunNzr3IRY7a2LlPiNK5BsiHaBCgf74jGV4+FsKcfL6xfU+4G+wPfohDrvRw==
-Received: from CH2PR03CA0027.namprd03.prod.outlook.com (2603:10b6:610:59::37)
- by MN0PR12MB6173.namprd12.prod.outlook.com (2603:10b6:208:3c6::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.50; Thu, 18 Apr
- 2024 10:36:20 +0000
-Received: from CH2PEPF00000149.namprd02.prod.outlook.com
- (2603:10b6:610:59:cafe::cf) by CH2PR03CA0027.outlook.office365.com
- (2603:10b6:610:59::37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.26 via Frontend
- Transport; Thu, 18 Apr 2024 10:36:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CH2PEPF00000149.mail.protection.outlook.com (10.167.244.106) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7452.22 via Frontend Transport; Thu, 18 Apr 2024 10:36:20 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 18 Apr
- 2024 03:36:09 -0700
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 18 Apr 2024 03:36:03 -0700
-From: Danielle Ratson <danieller@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <corbet@lwn.net>, <linux@armlinux.org.uk>,
-	<sdf@google.com>, <kory.maincent@bootlin.com>,
-	<maxime.chevallier@bootlin.com>, <vladimir.oltean@nxp.com>,
-	<przemyslaw.kitszel@intel.com>, <ahmed.zaki@intel.com>,
-	<richardcochran@gmail.com>, <shayagr@amazon.com>, <paul.greenwalt@intel.com>,
-	<jiri@resnulli.us>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <mlxsw@nvidia.com>, <petrm@nvidia.com>,
-	<idosch@nvidia.com>, <danieller@nvidia.com>
-Subject: [PATCH net-next v4 10/10] ethtool: Veto some operations during firmware flashing process
-Date: Thu, 18 Apr 2024 13:34:55 +0300
-Message-ID: <20240418103455.3297870-11-danieller@nvidia.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240418103455.3297870-1-danieller@nvidia.com>
-References: <20240418103455.3297870-1-danieller@nvidia.com>
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DttbU/yU"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A8915FD19
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 10:36:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713436583; cv=none; b=uQmIbcJdGHW0XtVQmS1OqjVoKYPdynwTtk613LtRQqEgcPQuTvm+bwU5sVd6NZAyi4x7C+H/k4VDtqR/DUjXC/I3zrRzrmBQhHACvsoIohNl7SvVuDUhvVMvfRAdCQsXNWmoCFeAIiKfCb2yUiV7vhFnaBLhfKG+NQikl44dru8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713436583; c=relaxed/simple;
+	bh=JBg88H9rszxtozTHN3KCQmS5T63NVkvx85CNlw+Bx34=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=u7qlZ3jOOQqgWf+7krPXu3sZuP/nLcSJ+RedvCvTbDM8eXXory8rrKVjaD3CCQMDYiTXTkhfszB3Jo1ZsNcwUHkwKgkU0GNP0dh2w+b4/nx+h1YWyeenN6mSSxmaDaDI8+r2D5y9NQXuB1P+1DmjHS0IR+HJOJotWcFPKWc/+0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DttbU/yU; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-56e5174ffc2so7840a12.1
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 03:36:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713436579; x=1714041379; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wR48YcL7pubFu/dtux+W0UvZV+U7NVSFm4pGP3PmoPI=;
+        b=DttbU/yUgknXQZ6H/M68fMd4D44+57g2fjnvfjNHaPA4K3urOhvs/F7siPOwzAhOfj
+         tu0aUrAg33NzWXH3cRQgo8G2ujLSV+gjRN7/03oBMOJkr2+jIPzU4Z/O8WpohQpgTNta
+         ZrAWWu/wUClh2BYNPHstyvCoPFv8k9Jo8AHefXfbe9UymX/msNTNQ4BrAd56sYzOtZgW
+         tQXmZRtJZDDN+3/LBRd9etAZzrusfLPna76UKFYFMsCmXA/LQ6fKlPg2sNQVoo77Fqf7
+         RBSw1wUeBj4mqeRxWuJTTo22Oi9QQVAylm9KyJ8dcTrHuUQcGZSZdpW2zPU7i+574+1l
+         Hs5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713436580; x=1714041380;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wR48YcL7pubFu/dtux+W0UvZV+U7NVSFm4pGP3PmoPI=;
+        b=KSaJJ67s7CQfbbiJ3Vr0PBHEk+u9W6TFUzkufLvgL39zdicXE7hPmY05gFNV5b+7gB
+         NWyQuenuMUgPnAdbp/66S7gDMEyh/J4yF30aNnid03f7LIQbkXhhJukyPg3XYeJsrVwc
+         8bPzYV/inuDGD3kByX5wfyXpwfoDPGGfSqnvToSAnb9BVu9nhWMWCnQ+mFX2YBEqr19w
+         bIFLcNy2xkRHavy6/MXO5uE3pi4AwqV2ctSss6fuapU15ZqNbQEDKU1/eAOADfMvu/Qt
+         wiluNt9D08TQVgMSjL9HjxvzBohGVdQAOZS2o3cKIgpTGyuhLvEyZRPk2H5RRooGsje9
+         ER2w==
+X-Forwarded-Encrypted: i=1; AJvYcCW5WSoQLC2/RTvUDs3X5JIgTimToPWSFu98dKxn+H4ScXIW2z8mnMyYe9SCh0tUk1esUGwHxy1z1IQvAG9Apa5CZOM6Odv/
+X-Gm-Message-State: AOJu0YyMEUt28FJKjAXIXRuVTzjM4tcNedvnb5EepW7tlbDhtJQkyLRN
+	M03teXf57IR/8pRcGPvJfZ0Lt0u633ZUmAv+mnbAso+CaA9mUz0Wyi2TrBv1NnDHtv3U6PrAg9R
+	tkyenchDkr57y7IYzxMIV0yTI4lQSAVuk21+E
+X-Google-Smtp-Source: AGHT+IHRDI/KSAykxu4N+g9RbFh2tQRwAlRkJ5WP1ZWlbW0kOsOhC+JRyY5eH0ayxsXAz079cteosKOOmYT8uonOvlk=
+X-Received: by 2002:aa7:c987:0:b0:570:49e3:60a8 with SMTP id
+ c7-20020aa7c987000000b0057049e360a8mr98999edt.7.1713436579340; Thu, 18 Apr
+ 2024 03:36:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF00000149:EE_|MN0PR12MB6173:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3d678916-db14-4017-7de8-08dc5f9362d8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?oD/06bWvJv/T02tw4GWZ+gyw4HGbgkXP/bE6ysDhfGtDzSnMjvhQoGfD6Imm?=
- =?us-ascii?Q?SXlF00ygR9HSaaiYM78UAdiadl3CZE34mr/AtnJxuA50LIqSod5GAM3phffB?=
- =?us-ascii?Q?HNHXS/30UwQwOhkQ64m1S/PPApgWoX5+qbkSy0fez/wUl6SzeB63Raxi7gBS?=
- =?us-ascii?Q?C35A2OB3QBREm+GnWkCRGo1i4Hv9WLjVEkWcNbC8xRszAUqQFxwiJKxkxaKE?=
- =?us-ascii?Q?bDIbzXSt153s7Wl0h0pPIlVFvS5ff6Feflu8N1xNpjcfkALqwnA7GV9tRcUd?=
- =?us-ascii?Q?BTpm9j5gT4XSck85lnxTtERma8Vi85mmbCtN/V0dwT+gW3m4V3sfppbw8Q3Q?=
- =?us-ascii?Q?eav2gYOTOHmcDW2vP7oNlqHHHlgFxQ33nXJ2e9U3amVIrlAojJJWyz+ph4ok?=
- =?us-ascii?Q?DVlNVy/RY9d8OhrmrdQFxiypFubqawe52vkm1AdGtG+SCUegv8OraYR9gfOb?=
- =?us-ascii?Q?t2FsXb3/zi8aGpWsscwYGt7bJ/3OE582aChUZEaxkbA6bicywaDf+S9LWgiz?=
- =?us-ascii?Q?Dk+5O/BQkQZEmbw4gSVAcHTS5YBoFDTygTQiCkHTecMQQMZq6ZPXLRnkbZyr?=
- =?us-ascii?Q?RyrfdLxPS/t0IfyhOmGgZKVYZDzJnWpj2HJwr0h6TZl50dnTv0AKd1Kfgobg?=
- =?us-ascii?Q?Uu3/RtQF8/zvBuepJgVsAryWBv3BAtT3NHVp3ArSVuKH4XKMMdagZvUl5rS5?=
- =?us-ascii?Q?+b7OmK6MgmGlsnYSPh78C31crwsxqyHGoWFJig/iviM1gNGbYxWFRTuaRQ1q?=
- =?us-ascii?Q?jvI/Hed3GRtfueHf/quuO7ChDRCS0G6ypdalPY7pAWJwEqwlwS/krw1EajdR?=
- =?us-ascii?Q?0v2OHbb79yh5ovJILZkDxZpwaBpcWqk3HlplM47sFrUgCWGiYH/qTARi2eb2?=
- =?us-ascii?Q?Bg7yQ1VSCBntka3akgiLYdw6xtuDlwVsXFBpiOPwKzSl4Kp2fKuA0Izw28LT?=
- =?us-ascii?Q?sR4LUaa2qP1CFXihX+EuRSHuvKco+4OZrDeJZjhYol8IgpdHE0HIx3A8Grwn?=
- =?us-ascii?Q?DWMuWWaxCkieqYZHAqfHgzXQCr6MkaIjumxGLG9o8i5C7i66DXbwHe073Qbk?=
- =?us-ascii?Q?dCa9k22hUpjIeNNf+dSYdRUNUuyi7qXxBpb/Dsa85BJ1zJO8akjiUgP5VdX9?=
- =?us-ascii?Q?J/Br+cGShMo9yeQQhIkIQZ/XYDJafLbJBnQn5+uFWssMA7/i9i9DzLFGvjWC?=
- =?us-ascii?Q?GJjE8efP6u1x83J0axHA4sOKH3/dpT1JbIQ9Drf2FDkAke5aultVFFqXH3fX?=
- =?us-ascii?Q?wATb1lHb3/M1WgfMVX46OkSLbHhR1O1jiLmgUwZPy+n6KAj+vxvlOFwZv2aD?=
- =?us-ascii?Q?eL3R8l9boGAtAzuN2RYw5xG4r0tBYiX6sQ8IGwFG8E7KUh73mv6jHAqjk9/h?=
- =?us-ascii?Q?n27gvLM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(36860700004)(82310400014)(1800799015)(7416005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2024 10:36:20.1391
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d678916-db14-4017-7de8-08dc5f9362d8
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF00000149.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6173
+References: <20240417165756.2531620-1-edumazet@google.com> <20240417165756.2531620-2-edumazet@google.com>
+ <e332d0b8fa7b116003dfd8b47f021901e66b36b9.camel@redhat.com>
+ <CANn89i+-cjHze1yiFZKr-cCGG7Fh4gb9NZnS1u4u_77bG2Mf6Q@mail.gmail.com>
+ <CANn89iLSZFOYfZUSK57LLe8yw4wNt8vHt=aD79a1MbZBhfeRbw@mail.gmail.com>
+ <7d1aa7d5a134ad4f4bca215ec6a075190cea03f2.camel@redhat.com>
+ <CANn89iJg7AcxMLbvwnghN85L6ASuoKsSSSHdgaQzBU48G1TRiw@mail.gmail.com> <CANn89i+BKDL-BHqHyev9PAzbHqp8xhkC=4kZTB7vydcBVkc0Nw@mail.gmail.com>
+In-Reply-To: <CANn89i+BKDL-BHqHyev9PAzbHqp8xhkC=4kZTB7vydcBVkc0Nw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 18 Apr 2024 12:36:08 +0200
+Message-ID: <CANn89iK3kCqrgpyEiXHK5Y4MnHxE=CEdxgyE5HHAsasa-Fefbg@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] tcp: conditionally call ip_icmp_error() from tcp_v4_err()
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: David Ahern <dsahern@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	Neal Cardwell <ncardwell@google.com>, Dragos Tatulea <dtatulea@nvidia.com>, eric.dumazet@gmail.com, 
+	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Shachar Kagan <skagan@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Some operations cannot be performed during the firmware flashing process.
+On Thu, Apr 18, 2024 at 12:22=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> On Thu, Apr 18, 2024 at 12:15=E2=80=AFPM Eric Dumazet <edumazet@google.co=
+m> wrote:
+> >
+> > On Thu, Apr 18, 2024 at 11:58=E2=80=AFAM Paolo Abeni <pabeni@redhat.com=
+> wrote:
+> > >
+> > > On Thu, 2024-04-18 at 11:26 +0200, Eric Dumazet wrote:
+> > > > On Thu, Apr 18, 2024 at 10:03=E2=80=AFAM Eric Dumazet <edumazet@goo=
+gle.com> wrote:
+> > > > >
+> > > > > On Thu, Apr 18, 2024 at 10:02=E2=80=AFAM Paolo Abeni <pabeni@redh=
+at.com> wrote:
+> > > > > >
+> > > > > > Hi,
+> > > > > >
+> > > > > > On Wed, 2024-04-17 at 16:57 +0000, Eric Dumazet wrote:
+> > > > > > > Blamed commit claimed in its changelog that the new functiona=
+lity
+> > > > > > > was guarded by IP_RECVERR/IPV6_RECVERR :
+> > > > > > >
+> > > > > > >     Note that applications need to set IP_RECVERR/IPV6_RECVER=
+R option to
+> > > > > > >     enable this feature, and that the error message is only q=
+ueued
+> > > > > > >     while in SYN_SNT state.
+> > > > > > >
+> > > > > > > This was true only for IPv6, because ipv6_icmp_error() has
+> > > > > > > the following check:
+> > > > > > >
+> > > > > > > if (!inet6_test_bit(RECVERR6, sk))
+> > > > > > >     return;
+> > > > > > >
+> > > > > > > Other callers check IP_RECVERR by themselves, it is unclear
+> > > > > > > if we could factorize these checks in ip_icmp_error()
+> > > > > > >
+> > > > > > > For stable backports, I chose to add the missing check in tcp=
+_v4_err()
+> > > > > > >
+> > > > > > > We think this missing check was the root cause for commit
+> > > > > > > 0a8de364ff7a ("tcp: no longer abort SYN_SENT when receiving
+> > > > > > > some ICMP") breakage, leading to a revert.
+> > > > > > >
+> > > > > > > Many thanks to Dragos Tatulea for conducting the investigatio=
+ns.
+> > > > > > >
+> > > > > > > As Jakub said :
+> > > > > > >
+> > > > > > >     The suspicion is that SSH sees the ICMP report on the soc=
+ket error queue
+> > > > > > >     and tries to connect() again, but due to the patch the so=
+cket isn't
+> > > > > > >     disconnected, so it gets EALREADY, and throws its hands u=
+p...
+> > > > > > >
+> > > > > > >     The error bubbles up to Vagrant which also becomes unhapp=
+y.
+> > > > > > >
+> > > > > > >     Can we skip the call to ip_icmp_error() for non-fatal ICM=
+P errors?
+> > > > > > >
+> > > > > > > Fixes: 45af29ca761c ("tcp: allow traceroute -Mtcp for unpriv =
+users")
+> > > > > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > > > > > > Tested-by: Dragos Tatulea <dtatulea@nvidia.com>
+> > > > > > > Cc: Dragos Tatulea <dtatulea@nvidia.com>
+> > > > > > > Cc: Maciej =C5=BBenczykowski <maze@google.com>
+> > > > > > > Cc: Willem de Bruijn <willemb@google.com>
+> > > > > > > Cc: Neal Cardwell <ncardwell@google.com>
+> > > > > > > Cc: Shachar Kagan <skagan@nvidia.com>
+> > > > > > > ---
+> > > > > > >  net/ipv4/tcp_ipv4.c | 3 ++-
+> > > > > > >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > > > > > >
+> > > > > > > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> > > > > > > index 88c83ac4212957f19efad0f967952d2502bdbc7f..a717db99972d9=
+77a64178d7ed1109325d64a6d51 100644
+> > > > > > > --- a/net/ipv4/tcp_ipv4.c
+> > > > > > > +++ b/net/ipv4/tcp_ipv4.c
+> > > > > > > @@ -602,7 +602,8 @@ int tcp_v4_err(struct sk_buff *skb, u32 i=
+nfo)
+> > > > > > >               if (fastopen && !fastopen->sk)
+> > > > > > >                       break;
+> > > > > > >
+> > > > > > > -             ip_icmp_error(sk, skb, err, th->dest, info, (u8=
+ *)th);
+> > > > > > > +             if (inet_test_bit(RECVERR, sk))
+> > > > > > > +                     ip_icmp_error(sk, skb, err, th->dest, i=
+nfo, (u8 *)th);
+> > > > > > >
+> > > > > > >               if (!sock_owned_by_user(sk)) {
+> > > > > > >                       WRITE_ONCE(sk->sk_err, err);
+> > > > > >
+> > > > > > We have a fcnal-test.sh self-test failure:
+> > > > > >
+> > > > > > https://netdev.bots.linux.dev/contest.html?branch=3Dnet-next-20=
+24-04-18--06-00&test=3Dfcnal-test-sh
+> > > > > >
+> > > > > > that I suspect are related to this patch (or the following one)=
+: the
+> > > > > > test case creates a TCP connection on loopback and this is the =
+only
+> > > > > > patchseries touching the related code, included in the relevant=
+ patch
+> > > > > > burst.
+> > > > > >
+> > > > > > Could you please have a look?
+> > > > >
+> > > > > Sure, thanks Paolo !
+> > > >
+> > > > First patch is fine, I see no failure from fcnal-test.sh (as I woul=
+d expect)
+> > > >
+> > > > For the second one, I am not familiar enough with this very slow te=
+st
+> > > > suite (all these "sleep 1" ... oh well)
+> > >
+> > > @David, some of them could be replaced with loopy_wait calls
+> > >
+> > > > I guess "failing tests" depended on TCP connect() to immediately ab=
+ort
+> > > > on one ICMP message,
+> > > > depending on old kernel behavior.
+> > > >
+> > > > I do not know how to launch a subset of the tests, and trace these.
+> > > >
+> > > > "./fcnal-test.sh -t ipv4_tcp" alone takes more than 9 minutes [1] i=
+n a
+> > > > VM running a non debug kernel :/
+> > > >
+> > > > David, do you have an idea how to proceed ?
+> > >
+> > > One very dumb thing I do in that cases is commenting out the other
+> > > tests, something alike (completely untested!):
+> > > ---
+> > > diff --git a/tools/testing/selftests/net/fcnal-test.sh b/tools/testin=
+g/selftests/net/fcnal-test.sh
+> > > index 386ebd829df5..494932aa99b2 100755
+> > > --- a/tools/testing/selftests/net/fcnal-test.sh
+> > > +++ b/tools/testing/selftests/net/fcnal-test.sh
+> > > @@ -1186,6 +1186,7 @@ ipv4_tcp_novrf()
+> > >  {
+> > >         local a
+> > >
+> > > +if false; then
+> > >         #
+> > >         # server tests
+> > >         #
+> > > @@ -1271,6 +1272,7 @@ ipv4_tcp_novrf()
+> > >                 log_test_addr ${a} $? 1 "Device server, unbound clien=
+t, local connection"
+> > >         done
+> > >
+> > > +fi
+> > >         a=3D${NSA_IP}
+> > >         log_start
+> > >         run_cmd nettest -s &
+> > > @@ -1487,12 +1489,14 @@ ipv4_tcp()
+> > >         set_sysctl net.ipv4.tcp_l3mdev_accept=3D0
+> > >         ipv4_tcp_novrf
+> > >         log_subsection "tcp_l3mdev_accept enabled"
+> > > +if false; then
+> > >         set_sysctl net.ipv4.tcp_l3mdev_accept=3D1
+> > >         ipv4_tcp_novrf
+> > >
+> > >         log_subsection "With VRF"
+> > >         setup "yes"
+> > >         ipv4_tcp_vrf
+> > > +fi
+> > >  }
+> >
+> > Thanks Paolo
+> >
+> > I found that the following patch is fixing the issue for me.
+> >
+> > diff --git a/tools/testing/selftests/net/nettest.c
+> > b/tools/testing/selftests/net/nettest.c
+> > index cd8a580974480212b45d86f35293b77f3d033473..ff25e53024ef6d4101f251c=
+8a8a5e936e44e280f
+> > 100644
+> > --- a/tools/testing/selftests/net/nettest.c
+> > +++ b/tools/testing/selftests/net/nettest.c
+> > @@ -1744,6 +1744,7 @@ static int connectsock(void *addr, socklen_t
+> > alen, struct sock_args *args)
+> >         if (args->bind_test_only)
+> >                 goto out;
+> >
+> > +       set_recv_attr(sd, args->version);
+> >         if (connect(sd, addr, alen) < 0) {
+> >                 if (errno !=3D EINPROGRESS) {
+> >                         log_err_errno("Failed to connect to remote host=
+");
+>
+> When tracing nettest we now have EHOSTUNREACH
+>
+> 3343  setsockopt(3, SOL_SOCKET, SO_REUSEPORT, [1], 4) =3D 0 <0.000210>
+> 3343  setsockopt(3, SOL_SOCKET, SO_BINDTODEVICE, "eth1\0", 5) =3D 0 <0.00=
+0170>
+> 3343  setsockopt(3, SOL_IP, IP_PKTINFO, [1], 4) =3D 0 <0.000161>
+> 3343  setsockopt(3, SOL_IP, IP_RECVERR, [1], 4) =3D 0 <0.000181>
+> 3343  connect(3, {sa_family=3DAF_INET, sin_port=3Dhtons(12345),
+> sin_addr=3Dinet_addr("172.16.2.1")}, 16) =3D -1 EINPROGRESS (Operation no=
+w
+> in progress) <0.000874>
+> 3343  pselect6(1024, NULL, [3], NULL, {tv_sec=3D5, tv_nsec=3D0}, NULL) =
+=3D 1
+> (out [3], left {tv_sec=3D1, tv_nsec=3D930762080}) <3.069673>
+> 3343  getsockopt(3, SOL_SOCKET, SO_ERROR, [EHOSTUNREACH], [4]) =3D 0 <0.0=
+00270>
+>
+> As mentioned in net/ipv4/icmp.c :
+>  RFC 1122: 3.2.2.1 States that NET_UNREACH, HOST_UNREACH and SR_FAILED
+> MUST be considered 'transient errs'.
+>
+> Maybe another way to fix nettest would be to change wait_for_connect()
+> to pass a non NULL fdset in 4th argument of select()
+>
+> select(FD_SETSIZE, NULL, &wfd, NULL /* here */, tv);
 
-For example:
+This change in wait_for_connect() does not help.
 
-- Port must be down during the whole flashing process to avoid packet loss
-  while committing reset for example.
+I am guessing set_recv_attr(sd, args->version); is what we need.
 
-- Writing to EEPROM interrupts the flashing process, so operations like
-  ethtool dump, module reset, get and set power mode should be vetoed.
-
-- Split port firmware flashing should be vetoed.
-
-- Flashing firmware on a device which is already in a flashing process
-  should be forbidden.
-
-Use the 'module_fw_flashing_in_progress' flag introduced in a previous
-patch to veto those operations and prevent interruptions while preforming
-module firmware flash.
-
-Signed-off-by: Danielle Ratson <danieller@nvidia.com>
----
- net/ethtool/eeprom.c  |  6 ++++++
- net/ethtool/ioctl.c   | 12 ++++++++++++
- net/ethtool/module.c  | 29 +++++++++++++++++++++++++++++
- net/ethtool/netlink.c | 30 +++++++++++++++++++++++++++++-
- 4 files changed, 76 insertions(+), 1 deletion(-)
-
-diff --git a/net/ethtool/eeprom.c b/net/ethtool/eeprom.c
-index 6209c3a9c8f7..f36811b3ecf1 100644
---- a/net/ethtool/eeprom.c
-+++ b/net/ethtool/eeprom.c
-@@ -91,6 +91,12 @@ static int get_module_eeprom_by_page(struct net_device *dev,
- {
- 	const struct ethtool_ops *ops = dev->ethtool_ops;
- 
-+	if (dev->module_fw_flash_in_progress) {
-+		NL_SET_ERR_MSG(extack,
-+			       "Module firmware flashing is in progress");
-+		return -EBUSY;
-+	}
-+
- 	if (dev->sfp_bus)
- 		return sfp_get_module_eeprom_by_page(dev->sfp_bus, page_data, extack);
- 
-diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-index 5a55270aa86e..02b23805d2be 100644
---- a/net/ethtool/ioctl.c
-+++ b/net/ethtool/ioctl.c
-@@ -658,6 +658,9 @@ static int ethtool_get_settings(struct net_device *dev, void __user *useraddr)
- 	if (!dev->ethtool_ops->get_link_ksettings)
- 		return -EOPNOTSUPP;
- 
-+	if (dev->module_fw_flash_in_progress)
-+		return -EBUSY;
-+
- 	memset(&link_ksettings, 0, sizeof(link_ksettings));
- 	err = dev->ethtool_ops->get_link_ksettings(dev, &link_ksettings);
- 	if (err < 0)
-@@ -1449,6 +1452,9 @@ static int ethtool_reset(struct net_device *dev, char __user *useraddr)
- 	if (!dev->ethtool_ops->reset)
- 		return -EOPNOTSUPP;
- 
-+	if (dev->module_fw_flash_in_progress)
-+		return -EBUSY;
-+
- 	if (copy_from_user(&reset, useraddr, sizeof(reset)))
- 		return -EFAULT;
- 
-@@ -2462,6 +2468,9 @@ int ethtool_get_module_info_call(struct net_device *dev,
- 	const struct ethtool_ops *ops = dev->ethtool_ops;
- 	struct phy_device *phydev = dev->phydev;
- 
-+	if (dev->module_fw_flash_in_progress)
-+		return -EBUSY;
-+
- 	if (dev->sfp_bus)
- 		return sfp_get_module_info(dev->sfp_bus, modinfo);
- 
-@@ -2499,6 +2508,9 @@ int ethtool_get_module_eeprom_call(struct net_device *dev,
- 	const struct ethtool_ops *ops = dev->ethtool_ops;
- 	struct phy_device *phydev = dev->phydev;
- 
-+	if (dev->module_fw_flash_in_progress)
-+		return -EBUSY;
-+
- 	if (dev->sfp_bus)
- 		return sfp_get_module_eeprom(dev->sfp_bus, ee, data);
- 
-diff --git a/net/ethtool/module.c b/net/ethtool/module.c
-index 836c198d2cc4..239e7974f952 100644
---- a/net/ethtool/module.c
-+++ b/net/ethtool/module.c
-@@ -3,6 +3,7 @@
- #include <linux/ethtool.h>
- #include <linux/firmware.h>
- #include <linux/sfp.h>
-+#include <net/devlink.h>
- 
- #include "netlink.h"
- #include "common.h"
-@@ -36,6 +37,12 @@ static int module_get_power_mode(struct net_device *dev,
- 	if (!ops->get_module_power_mode)
- 		return 0;
- 
-+	if (dev->module_fw_flash_in_progress) {
-+		NL_SET_ERR_MSG(extack,
-+			       "Module firmware flashing is in progress");
-+		return -EBUSY;
-+	}
-+
- 	return ops->get_module_power_mode(dev, &data->power, extack);
- }
- 
-@@ -112,6 +119,12 @@ ethnl_set_module_validate(struct ethnl_req_info *req_info,
- 	if (!tb[ETHTOOL_A_MODULE_POWER_MODE_POLICY])
- 		return 0;
- 
-+	if (req_info->dev->module_fw_flash_in_progress) {
-+		NL_SET_ERR_MSG(info->extack,
-+			       "Module firmware flashing is in progress");
-+		return -EBUSY;
-+	}
-+
- 	if (!ops->get_module_power_mode || !ops->set_module_power_mode) {
- 		NL_SET_ERR_MSG_ATTR(info->extack,
- 				    tb[ETHTOOL_A_MODULE_POWER_MODE_POLICY],
-@@ -219,6 +232,7 @@ static int module_flash_fw_work_init(struct ethtool_module_fw_flash *module_fw,
- static int __module_flash_fw_schedule(struct net_device *dev,
- 				      struct netlink_ext_ack *extack)
- {
-+	struct devlink_port *devlink_port = dev->devlink_port;
- 	const struct ethtool_ops *ops = dev->ethtool_ops;
- 
- 	if (!ops->set_module_eeprom_by_page ||
-@@ -234,6 +248,21 @@ static int __module_flash_fw_schedule(struct net_device *dev,
- 		return -EOPNOTSUPP;
- 	}
- 
-+	if (dev->module_fw_flash_in_progress) {
-+		NL_SET_ERR_MSG(extack, "Module firmware flashing already in progress");
-+		return -EBUSY;
-+	}
-+
-+	if (dev->flags & IFF_UP) {
-+		NL_SET_ERR_MSG(extack, "Netdevice is up, so flashing is not permitted");
-+		return -EBUSY;
-+	}
-+
-+	if (devlink_port && devlink_port->attrs.split) {
-+		NL_SET_ERR_MSG(extack, "Can't perform firmware flashing on a split port");
-+		return -EOPNOTSUPP;
-+	}
-+
- 	return 0;
- }
- 
-diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-index 1a4f6bd1ec7f..90e5b5312aa2 100644
---- a/net/ethtool/netlink.c
-+++ b/net/ethtool/netlink.c
-@@ -1194,6 +1194,29 @@ static struct genl_family ethtool_genl_family __ro_after_init = {
- 	.n_mcgrps	= ARRAY_SIZE(ethtool_nl_mcgrps),
- };
- 
-+static int module_netdev_pre_up_event(struct notifier_block *this,
-+				      unsigned long event, void *ptr)
-+{
-+	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
-+	struct netdev_notifier_info *info = ptr;
-+	struct netlink_ext_ack *extack;
-+
-+	extack = netdev_notifier_info_to_extack(info);
-+
-+	if (event == NETDEV_PRE_UP) {
-+		if (dev->module_fw_flash_in_progress) {
-+			NL_SET_ERR_MSG(extack, "Can't set port up while flashing module firmware");
-+			return NOTIFY_BAD;
-+		}
-+	}
-+
-+	return NOTIFY_DONE;
-+}
-+
-+static struct notifier_block ethtool_module_netdev_pre_up_notifier = {
-+	.notifier_call = module_netdev_pre_up_event,
-+};
-+
- /* module setup */
- 
- static int __init ethnl_init(void)
-@@ -1206,7 +1229,12 @@ static int __init ethnl_init(void)
- 	ethnl_ok = true;
- 
- 	ret = register_netdevice_notifier(&ethnl_netdev_notifier);
--	WARN(ret < 0, "ethtool: net device notifier registration failed");
-+	if (WARN(ret < 0, "ethtool: net device notifier registration failed"))
-+		return ret;
-+
-+	ret = register_netdevice_notifier(&ethtool_module_netdev_pre_up_notifier);
-+	WARN(ret < 0, "ethtool: net device port up notifier registration failed");
-+
- 	return ret;
- }
- 
--- 
-2.43.0
-
+I am running all ./fcnal-test.sh tests to make sure everything is green.
 
