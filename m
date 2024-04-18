@@ -1,77 +1,61 @@
-Return-Path: <netdev+bounces-89250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38FDE8A9D82
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 16:48:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 036978A9D8C
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 16:49:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A279B1F2363C
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 14:48:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADE7F1F23D4C
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 14:49:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D18C161933;
-	Thu, 18 Apr 2024 14:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A698C16ABF8;
+	Thu, 18 Apr 2024 14:49:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Mf+oQqNy"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iEARRixF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED0F66FB0
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 14:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8519915E5B0
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 14:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713451677; cv=none; b=OMopGBY0keKyoANq7Y1i/TyvNyimjVSVbb1u0TnH0BklEXgdCJnunb1yz63icb0hep/GUZRxY6/mAP2Kz+O5SWLx/GRKTfOc8rFdeF/9wQOZJIKnobzeTeuTBTVnIpEQHBWJptsqRvUXYm52b+qiuMdSVfEyhDwwoNUQYYcMXN0=
+	t=1713451755; cv=none; b=Olgf0d6RgpOeIMuNp1izJixNDfwKbIeOXAbMC7D4t1SJBPAdYMtpY0IGFjdkrTc3mpfVa9Q2sI+nUILGhCwfmVIR96nVTxlmzMXHql7zPi4DP13rysjk/ZyPSpAWsyMTuQuQ8tkAx2Si8g3PLHZLWtMst6toRGM3AyOVCJXWbzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713451677; c=relaxed/simple;
-	bh=Iu13BzXGDlDt7kkFojoXFutf6qwhY1eUz6UAvbHVCns=;
+	s=arc-20240116; t=1713451755; c=relaxed/simple;
+	bh=P94DH8AqKAA5lye5i75LmkzjhoEdyTbF8tps1jGtw38=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WKjYYvkDybqKyyuFLfFuU8JAa/GJ6/hI629jg1wOmDY/JVqxMyudRofQUrhTYcgCqWsIYYaExi4jrAoum8ftpZeu2EVWYovdMopQysamA+QexZsNcqqs/wmqz39w6XmZkLkPUf/FWePTtyA47HGTk1wsXDQM5c+TVcGMeQ/mvWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Mf+oQqNy; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713451676; x=1744987676;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Iu13BzXGDlDt7kkFojoXFutf6qwhY1eUz6UAvbHVCns=;
-  b=Mf+oQqNy3zEP2Jp5OkNWSPz3g50zBcHexc3lAzaSXnGdgRrDHSWa60L7
-   40GHwXW/pXFxo7gFDLW3gzCWvtQd1xgTP2JC0OpV2EbzGTVGzdzO4ZvNS
-   KoOwERY0jRLA0HEOyLKmoSAlcP1kheNAU0favtTgltHwX0b66wiTvqjr7
-   rPATwp0bvKTstmbrAS432jmnds6Ehutm/yLSXfnliDZN3QyBxxvoks2LO
-   fsukT3YxFJQApCPqswI9qZiKTVe+3IhUswn/3Wqbr/XxBKrV0pphxRKmq
-   yszEdHfnvXfY8cOpCXunoCVvf3N7s6B1UctCiqkujbaiiFIWVJkNHfy99
-   A==;
-X-CSE-ConnectionGUID: XCkYah7NQ3uLS6JLAuxzbQ==
-X-CSE-MsgGUID: /SYaTRxiSbCTH1xxNS4Ecw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="8870721"
-X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
-   d="scan'208";a="8870721"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 07:47:55 -0700
-X-CSE-ConnectionGUID: 5rTbXyYqQiir3dyJsma7Uw==
-X-CSE-MsgGUID: b6mVba5BSiyXIhAdchBy/A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
-   d="scan'208";a="27634185"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 07:47:52 -0700
-Date: Thu, 18 Apr 2024 16:47:31 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Shay Drori <shayd@nvidia.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com, jiri@nvidia.com,
-	mateusz.polchlopek@intel.com
-Subject: Re: [iwl-next v4 6/8] ice: base subfunction aux driver
-Message-ID: <ZiEyg0qPac0GzTBN@mev-dev>
-References: <20240417142028.2171-1-michal.swiatkowski@linux.intel.com>
- <20240417142028.2171-7-michal.swiatkowski@linux.intel.com>
- <88b7e836-657c-4105-80e0-c0c68dffd140@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GauqQiOSKQuERCZaz633WCRZXv08xAf98WidFfySEe041C4nxgVRxWtj0CJTN32ZQUYd6BimA/lJwvvHZEXJQ/SzBuXQ8tMtEb+Dy0vEbL0wkqrikj9TfZcTxKGC8BvulSanMP9sywSNdz3N8BOlWFwx7EcLjvZQdV3u/Nv3r0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iEARRixF; arc=none smtp.client-ip=95.215.58.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Thu, 18 Apr 2024 07:49:02 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1713451751;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=L+oZNHCiAYDQYgTy7C1ugxmdQ034rdJRx6SliQtfo3k=;
+	b=iEARRixFPb7tY694aPQ7hwwXPQqJZftXCopWiRG8K7LuZOlONNwzObwH4juZlvCU8THu3g
+	hivCPVdZKszLw3dA047mPNFgYGE0J5Y2chC7EIdAfCoyR9ryDC++O/Q+t79Fn8O5v6p52F
+	+WXAeQRqDuYsoq2y3t68OFrSNJUIJrQ=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Shakeel Butt <shakeel.butt@linux.dev>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: Yosry Ahmed <yosryahmed@google.com>, tj@kernel.org, hannes@cmpxchg.org, 
+	lizefan.x@bytedance.com, cgroups@vger.kernel.org, longman@redhat.com, 
+	netdev@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	kernel-team@cloudflare.com, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, mhocko@kernel.org
+Subject: Re: [PATCH v1 2/3] cgroup/rstat: convert cgroup_rstat_lock back to
+ mutex
+Message-ID: <lxzi557wfbrkrj6phdlub4nmtulzbegykbmroextadvssdyfhe@qarxog72lheh>
+References: <171328983017.3930751.9484082608778623495.stgit@firesoul>
+ <171328989335.3930751.3091577850420501533.stgit@firesoul>
+ <CAJD7tkZFnQK9CFofp5rxa7Mv9wYH2vWF=Bb28Dchupm8LRt7Aw@mail.gmail.com>
+ <651a52ac-b545-4b25-b82f-ad3a2a57bf69@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,75 +64,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <88b7e836-657c-4105-80e0-c0c68dffd140@nvidia.com>
+In-Reply-To: <651a52ac-b545-4b25-b82f-ad3a2a57bf69@kernel.org>
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Apr 18, 2024 at 10:57:17AM +0300, Shay Drori wrote:
+On Thu, Apr 18, 2024 at 11:02:06AM +0200, Jesper Dangaard Brouer wrote:
 > 
-> On 17/04/2024 17:20, Michal Swiatkowski wrote:
-> > From: Piotr Raczynski <piotr.raczynski@intel.com>
+> 
+> On 18/04/2024 04.19, Yosry Ahmed wrote:
+[...]
 > > 
-> > Implement subfunction driver. It is probe when subfunction port is
-> > activated.
+> > I will keep the high-level conversation about using the mutex here in
+> > the cover letter thread, but I am wondering why we are keeping the
+> > lock dropping logic here with the mutex?
 > > 
-> > VSI is already created. During the probe VSI is being configured.
-> > MAC unicast and broadcast filter is added to allow traffic to pass.
-> > 
-> > Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-> > Signed-off-by: Piotr Raczynski <piotr.raczynski@intel.com>
-> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> > ---
-> >   drivers/net/ethernet/intel/ice/Makefile     |   1 +
-> >   drivers/net/ethernet/intel/ice/ice_main.c   |  10 ++
-> >   drivers/net/ethernet/intel/ice/ice_sf_eth.c | 140 ++++++++++++++++++++
-> >   drivers/net/ethernet/intel/ice/ice_sf_eth.h |   9 ++
-> >   4 files changed, 160 insertions(+)
-> >   create mode 100644 drivers/net/ethernet/intel/ice/ice_sf_eth.c
 > 
-> 
-> <...>
-> 
-> > +
-> > +/**
-> > + * ice_sf_driver_register - Register new auxiliary subfunction driver
-> > + *
-> > + * Return: zero on success or an error code on failure.
-> > + */
-> > +int ice_sf_driver_register(void)
-> > +{
-> > +	return auxiliary_driver_register(&ice_sf_driver);
-> > +}
-> > +
-> > +/**
-> > + * ice_sf_driver_unregister - Unregister new auxiliary subfunction driver
-> > + *
-> > + * Return: zero on success or an error code on failure.
-> 
-> 
-> this function doesn't return anything...
+> I agree that yielding the mutex in the loop makes less sense.
+> Especially since the raw_spin_unlock_irqrestore(cpu_lock, flags) call
+> will be a preemption point for my softirq.   But I kept it because, we
+> are running a CONFIG_PREEMPT_VOLUNTARY kernel, so I still worried that
+> there was no sched point for other userspace processes while holding the
+> mutex, but I don't fully know the sched implication when holding a mutex.
 > 
 
-Thanks, will remove it.
+Are the softirqs you are interested in, raised from the same cpu or
+remote cpu? What about local_softirq_pending() check in addition to
+need_resched() and spin_needbreak() checks? If softirq can only be
+raised on local cpu then convert the spin_lock to non-irq one (Please
+correct me if I am wrong but on return from hard irq and not within bh
+or irq disabled spin_lock, the kernel will run the pending softirqs,
+right?). Did you get the chance to test these two changes or something
+similar in your prod environment?
 
-> > + */
-> > +void ice_sf_driver_unregister(void)
-> > +{
-> > +	auxiliary_driver_unregister(&ice_sf_driver);
-> > +}
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.h b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
-> > index a08f8b2bceef..e972c50f96c9 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_sf_eth.h
-> > +++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.h
-> > @@ -18,4 +18,13 @@ struct ice_sf_priv {
-> >   	struct devlink_port devlink_port;
-> >   };
-> > +static inline struct
-> > +ice_sf_dev *ice_adev_to_sf_dev(struct auxiliary_device *adev)
-> > +{
-> > +	return container_of(adev, struct ice_sf_dev, adev);
-> > +}
-> > +
-> > +int ice_sf_driver_register(void);
-> > +void ice_sf_driver_unregister(void);
-> > +
-> >   #endif /* _ICE_SF_ETH_H_ */
 
