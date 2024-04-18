@@ -1,146 +1,130 @@
-Return-Path: <netdev+bounces-89089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42AAE8A96BD
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:53:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C84E8A96BE
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:53:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D79931F21575
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:53:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57E6D2849F0
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:53:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FCA515B10E;
-	Thu, 18 Apr 2024 09:52:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 313D415B125;
+	Thu, 18 Apr 2024 09:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dcnvo+UV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QIRjq8E8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A000715B55D
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 09:52:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97BE715B10E
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 09:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713433971; cv=none; b=pnTGJE+xNxkgRJ8RUy7uegft3zL3F1LHJiGKcrcIUwHLJrEVFXJRQDEsvGZKF6s1gjGDYQJt2ZU7rZMnJXqp2uNMzeCETJMA5lLZOjtyE+I376DP8Mw1vJHcMtHMISZaJGaqPdvD8zsWB91T5qWgoqhZRFUtI5fYqKJ5SUazZvA=
+	t=1713433998; cv=none; b=HBJInHA/gUaZelUEPiN8EiE8/pZEFq/AoB8xH69/aaSQGYb1w85+W2uVtNGZw2n3sLVbLKgYdV6jmnpDlp8CoX4hIi4RMYJSDRlbkiO/NTdA0AA3kxcgiG5d7dnvaLzM0yp7jwohmUGa7DS4UK+aIZmpijZFIsDVXB1SU6MTKjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713433971; c=relaxed/simple;
-	bh=PHG0S+PgfckD+46VpRSfZNFsxIzvXN6efdD4TqW4u/k=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QrMm8x09Wsa3coqOzZCTqkeic7N06qSH99lGvrUJhQaKgiNg4QzfhoIVGhB6dsHexuuYxSorUM/wLibol3AZ+hTp6iZWYnTpTSx5P/q5R42DicEWAj8mnrc2oyZh+2Jb7T+FU1XP2Z29ecIU+xXTsvAr0D1vxNG4VazZNQUu+78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dcnvo+UV; arc=none smtp.client-ip=209.85.219.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-69649f1894dso14082606d6.0
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 02:52:49 -0700 (PDT)
+	s=arc-20240116; t=1713433998; c=relaxed/simple;
+	bh=IK8lThdqMCRKXRz9XShqHKqosaImCaFR4AHVL2cUI1Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T0iNwG6tvT6fmF1ZpK2NpquGy3xcHds4g6ZKgY0mNldbr460D/+MuXbAE4wvPRtzfQj6GcVNxJWz58p+3l3YYNeqZ6iL4lr3BFUO0v3NDisNKKqsRK54BTHXokM1cQDL+g2r5h54e4SAhAXL10YeM0PAFmd/ijSgr+jUijgR2AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QIRjq8E8; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-516ef30b16eso750089e87.3
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 02:53:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713433968; x=1714038768; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=QggYsr0OgwPCyZGOwQMXRWuz9w4GPqjFwk6jl8w0FcA=;
-        b=dcnvo+UVmNByghgW/mmR5ty8EzbKwq/1lrVFOJbditazf7PSFadTa7IvcOA9aldG9C
-         Y9Na2UN9T3cNbTouVbykot+PyzTpZK0EVYAxZWqAEmICjnHUP+nrNfEjlgEpYj7Iuq2B
-         1Gba4XDnAtz/jYnr2ycKpPbvGIs9zIx56k7BCqWvT5dsdJ95EpUaLwImNxEOj9H5Z5nY
-         l3ZDt90Ep0/g6JP0Nd5vzTMM57G9KtRNsw5CHsHUDIDFthjN4S344kZmwp59CfOjbGhK
-         NtPeLp26wLcaqc3f4qn7UmCmBSL7D8MULbr0eV9l75cjCppm/j2Yp7ADxhI831HhtYsO
-         +4ww==
+        d=gmail.com; s=20230601; t=1713433995; x=1714038795; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=icJ55vHdhanFHkhy6XLbPlsv5UwxrCBLamHQvXnmHjg=;
+        b=QIRjq8E8sex1ZWu6tvOZ6+UzTjKth7/ZDRjB34AfEJM3wRiZl/MVwsSFKKXwh12NRe
+         yzDdNR9o/Uoqo804um3T+hf06uNH2/nk5w9uhEwahb3aeahldeRbSDFZ7JozaWiAu/s5
+         6QpD3DAFQS3nUwZt4y5X/1vxMwDXG9ps0sNrA3Qt+abGa+0qytD0fCuXQbr4ULzlaJjo
+         aZ6CozFc4QqubBgs7p42O5A8SzH9Re95poTZQc/kqcZIxG5UmUWH/OmHMcGn6+OzjPX7
+         aFp5fdjllnQZfc5KqEUmOzrPn09Xd3wiVVwj+3ZmleGX9tX1WsfDrxFJsQBfXs/OTdeV
+         xZ0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713433968; x=1714038768;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QggYsr0OgwPCyZGOwQMXRWuz9w4GPqjFwk6jl8w0FcA=;
-        b=eMewJT+T6njyqAi7/11BIYOKT/7u13/sPtL+m32jrpLUfanSHyqh9UVqnCMQQn0rIU
-         /4Axx4gzV7jB5/RjZwGBw5U9GieHcszJ7W1AvbmyN9OI0mY/GfgEazmjsTInJlqYVHiR
-         jYymxV1JW5+Z3wv8gysxSUJuFZl0r+xROX4wHifJ6Z66h04vFSKlpmbX5CAnMPZ8LxFS
-         iOjcDfpNU73acWLTF6sLXJ8/6LYHytwoz/12JPUfAkExGsaC2VZVnvgUGhujr3OYvU8G
-         j1tE74lB6T1WFmmycpFUk8v3Yq419MznEbaQei32oG7FxmxUTqBA8RT4VHnIVX5Jxh8I
-         mwiQ==
-X-Gm-Message-State: AOJu0YzqVXo34lV3Og7vqrIi04XutStWSJ8nO4yf8njjNuAdruC3kqvf
-	Ylk55n+sV4c47nCDa5xhDGoixRlJZXX9O6HkhbOK6UKXvJiS1goWalGXtOosaxQS/ojNFejQQDH
-	aW8rUmD58Qg==
-X-Google-Smtp-Source: AGHT+IHDDurKGpqV4tnYfiqSxJXxDrtm8Pw1aqcSQMpuqUzQJyfPvoeoRxB5hOUJPRyaohf9NQJ4tkboziAyoA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6214:27c2:b0:69f:bd88:2d88 with SMTP
- id ge2-20020a05621427c200b0069fbd882d88mr33761qvb.13.1713433968533; Thu, 18
- Apr 2024 02:52:48 -0700 (PDT)
-Date: Thu, 18 Apr 2024 09:51:06 +0000
-In-Reply-To: <20240418095106.3680616-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1713433995; x=1714038795;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=icJ55vHdhanFHkhy6XLbPlsv5UwxrCBLamHQvXnmHjg=;
+        b=LvKaEzWTSwnHRYfn5vFF1zMW7CCHMD/CXuzHf/LauMvn20p9ZGCUknNSujIpMy69kc
+         Z5YPDzZzbvGCSKf7YrQUQinaQ89QItxP+IGdASOMqBNYCUJv3BEYj7OLad/TnBSPscg4
+         R4lp6EkA44pUxJ4J+E9Pg/4V9fY4l9gDq892jGCXrqEueWrosPL79hOJkJxOwP/MiT3r
+         8sBtxrDDeCoQzV0iNTmbjM4oW2nfGknzl+48LKIOrbfVmf3ZwyTWCsxniFVtlWMXWjF8
+         tPznzlxLIjqMwFJdfc/zioGCGjcWmrhfF9LeRtXVRTQGyr3OpgqvTAKkT4ahBVUKUkPh
+         KYQA==
+X-Forwarded-Encrypted: i=1; AJvYcCUb8iup4i22kJ3fS+GP+NKC21feYDiX4sp1Lp3Obs80v9x98x3sGDjGgZpTflVR4ALctvT2hf4az+0Uu0ScxSeHK3THShhz
+X-Gm-Message-State: AOJu0YxS5WBp5ItUoutUKOIDEsQivGn8biXLogfqHvYW4tgG1dw2wASX
+	olwG6pQaoMnixJlrvuWSMg7QsT0XPLjcsSMhyVmz1PFVhdgemdKz
+X-Google-Smtp-Source: AGHT+IEiIcgCeMEZKK3DnTrPmPzhD6r4FiSyYfqos77mHhafdih3NxBOHEE0jnrr5PAmoEqR6y/Cfg==
+X-Received: by 2002:a19:5e0e:0:b0:519:b963:6591 with SMTP id s14-20020a195e0e000000b00519b9636591mr259719lfb.23.1713433994368;
+        Thu, 18 Apr 2024 02:53:14 -0700 (PDT)
+Received: from mobilestation.baikal.int (srv1.baikalchip.ru. [87.245.175.227])
+        by smtp.gmail.com with ESMTPSA id m22-20020a195216000000b005159d671616sm172373lfb.134.2024.04.18.02.53.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 02:53:14 -0700 (PDT)
+Date: Thu, 18 Apr 2024 12:53:12 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, hkallweit1@gmail.com, 
+	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
+	Jose.Abreu@synopsys.com, chenhuacai@kernel.org, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+Subject: Re: [PATCH net-next v11 1/6] net: stmmac: Move all PHYLINK MAC
+ capabilities initializations to MAC-specific setup methods
+Message-ID: <nfv3ejamjpi5zv7uzbxhqhce4myceicauoh5okjkxd3zpcewvg@ogkpkjh6detv>
+References: <cover.1712917541.git.siyanteng@loongson.cn>
+ <df31e8bcf74b3b4ddb7ddf5a1c371390f16a2ad5.1712917541.git.siyanteng@loongson.cn>
+ <zrrrivvodf7ovikm4lb7gcmkkff3umujjcrjfdlk5aglfnc6nf@vi7k5b4qjsv4>
+ <83b0af5c-6906-44b5-b4fa-d7ed8fccaae4@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240418095106.3680616-1-edumazet@google.com>
-X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240418095106.3680616-4-edumazet@google.com>
-Subject: [PATCH net-next 3/3] neighbour: no longer hold RTNL in neigh_dump_info()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <83b0af5c-6906-44b5-b4fa-d7ed8fccaae4@loongson.cn>
 
-neigh_dump_table() is already relying on RCU protection.
+On Thu, Apr 18, 2024 at 01:02:28PM +0800, Yanteng Si wrote:
+> 
+> 在 2024/4/13 02:32, Serge Semin 写道:
+> > Just submitted the series with this patch being properly split up and
+> > described:
+> > https://lore.kernel.org/netdev/20240412180340.7965-1-fancer.lancer@gmail.com/
+> > 
+> > You can drop this patch, copy my patchset into your repo and rebase
+> > your series onto it. Thus for the time being, until my series is
+> > reviewed and merged in, you'll be able to continue with your patchset
+> > developments/reviews, but submitting only your portion of the patches.
+> > 
+> > Alternatively my series could be just merged into yours as a set of
+> > the preparation patches, for instance, after it's fully reviewed.
+> 
+> Okay, I've seen your patch. I'll drop it.
 
-pneigh_dump_table() is using its own protection (tbl->lock)
+The series has been partly merged in:
+https://lore.kernel.org/netdev/20240412180340.7965-1-fancer.lancer@gmail.com/
+You can pick the first three patches up into your repo to rebase your
+work onto.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/core/neighbour.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+Two leftover patches I've just resubmitted:
+https://lore.kernel.org/netdev/20240417140013.12575-1-fancer.lancer@gmail.com/
 
-diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 2f9efc89e94e0f6d9e1491019583babb7bae77c7..13f2629091ef9ecd70a83f047a146c0990f308d9 100644
---- a/net/core/neighbour.c
-+++ b/net/core/neighbour.c
-@@ -2721,7 +2721,6 @@ static int neigh_dump_table(struct neigh_table *tbl, struct sk_buff *skb,
- 	if (filter->dev_idx || filter->master_idx)
- 		flags |= NLM_F_DUMP_FILTERED;
- 
--	rcu_read_lock();
- 	nht = rcu_dereference(tbl->nht);
- 
- 	for (h = s_h; h < (1 << nht->hash_shift); h++) {
-@@ -2745,7 +2744,6 @@ static int neigh_dump_table(struct neigh_table *tbl, struct sk_buff *skb,
- 		}
- 	}
- out:
--	rcu_read_unlock();
- 	cb->args[1] = h;
- 	cb->args[2] = idx;
- 	return err;
-@@ -2879,8 +2877,9 @@ static int neigh_dump_info(struct sk_buff *skb, struct netlink_callback *cb)
- 
- 	s_t = cb->args[0];
- 
-+	rcu_read_lock();
- 	for (t = 0; t < NEIGH_NR_TABLES; t++) {
--		tbl = rcu_dereference_rtnl(neigh_tables[t]);
-+		tbl = rcu_dereference(neigh_tables[t]);
- 
- 		if (!tbl)
- 			continue;
-@@ -2896,6 +2895,7 @@ static int neigh_dump_info(struct sk_buff *skb, struct netlink_callback *cb)
- 		if (err < 0)
- 			break;
- 	}
-+	rcu_read_unlock();
- 
- 	cb->args[0] = t;
- 	return err;
-@@ -3892,7 +3892,8 @@ static int __init neigh_init(void)
- {
- 	rtnl_register(PF_UNSPEC, RTM_NEWNEIGH, neigh_add, NULL, 0);
- 	rtnl_register(PF_UNSPEC, RTM_DELNEIGH, neigh_delete, NULL, 0);
--	rtnl_register(PF_UNSPEC, RTM_GETNEIGH, neigh_get, neigh_dump_info, 0);
-+	rtnl_register(PF_UNSPEC, RTM_GETNEIGH, neigh_get, neigh_dump_info,
-+		      RTNL_FLAG_DUMP_UNLOCKED);
- 
- 	rtnl_register(PF_UNSPEC, RTM_GETNEIGHTBL, NULL, neightbl_dump_info,
- 		      0);
--- 
-2.44.0.683.g7961c838ac-goog
+-Serge(y)
 
+> 
+> 
+> Thanks,
+> 
+> Yanteng
+> 
 
