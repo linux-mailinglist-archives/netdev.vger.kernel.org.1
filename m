@@ -1,118 +1,135 @@
-Return-Path: <netdev+bounces-89034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CF888A9429
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:36:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 848888A942C
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:37:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EB101C217F4
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 07:36:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39BF61F22405
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 07:37:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DDFA73199;
-	Thu, 18 Apr 2024 07:36:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CB793C473;
+	Thu, 18 Apr 2024 07:37:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iDmpRVVi"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="bosLVNIi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1E5C26AF0
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 07:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335ED25757
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 07:36:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713425779; cv=none; b=BHOcYI7aA1vUjyRKT2swCtDL+TxTFJ72aEpbU3VU+ftEIkDHhKKl3tPdY4JFymK254rDCIOAvmjgzgPBa3p4Gi2ito5+P8BZFgTEFuEwirM4ixb+Cjt+EFD0SJKjizM/T2kFwgFCks2NQWV763UWpi+M5TuFg77LeaaiDmLgtBc=
+	t=1713425822; cv=none; b=M28r7gKcZ82Iik0VI299Ybp3+5vRxNawh4WEdGbKKb8uPxQ6FqmRNxjLT8gOP/Uwd5WtbrRgNansy8K5D7GQZEt1s/78LM2xbhx/jEfS/jki5hMVShSgS916FRb2/PNo0CKaMy73kZGSoE3SsR3LZ9A8n6BVQhurTeYu7OMWSYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713425779; c=relaxed/simple;
-	bh=xXJa5M0q+Z8yeg9D7zkV1EikixOTeNXOom2Kh+v86rY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SOBVdGEQMj6VsVF6KlnmYEZxqOSgi1/hGPmJB/fXi2OE9iKbqhMtWUONGCwocjNhogftoW2UW2kgr8mn+CL9ZsFuIy+HevEMbIvweNi8T5xrETNyWzWNJUkXsLDIcCquaWb2eprU4flxUQMNSn1h7Hl6BljNScx+m843wpeUONo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iDmpRVVi; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5f415fd71f8so397382a12.3
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 00:36:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713425777; x=1714030577; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1tAlmVA7VN5CM2a6UW3jGyKbjIgNEcqj7ynoi9wUhLY=;
-        b=iDmpRVVinTtZkY2+7mlRapF3uCWw+xb1D5pFjN9ihs95+c+Z9UXHVy0TjM/raJTbcq
-         qGeCw6lBkBGNgWnQC56f50WeJllLQojev8+07vRgnlW8Eo8J+L3f0AAOGe/0WKXORjqE
-         sEmgOqvMiCakDIK+uq0M+Mw7pEjXzmYbCWBV+mTelvGNWj/2a1wuql5OC2HIiYPZhJi/
-         DezKm9ghkB8vhOZal6o9t6bVhYgk0KnW52MY4ZFbZN2WtJV88qO0vRPgfyjvGymfJ6xl
-         2krwl5YR3iSa8ppGmK3jfq31EH43wULMW7rNwF1TlwthwW9wzRMEpM2HKdLEpGiJTcwU
-         UOvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713425777; x=1714030577;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1tAlmVA7VN5CM2a6UW3jGyKbjIgNEcqj7ynoi9wUhLY=;
-        b=WPUGTZ5a6XSOH5rJ+L6IgBfzRuO3wLI/TOPUva2wOl+AJaxOdo1Ogsr/UuWxzz2MAe
-         07NkuVpgmlDM12+gUltvr9rjmsbrYGNLkApJPWwv99IHIB1a43dI3rx2E/rpBrTG96Z6
-         8xNwSC4K/VBa58r9J9ef/usv+6zEKqSisBZzF4riAc+vBhGku8Ya38Q+elvPkz3NRYGF
-         ZuT6tD1lgbFs0DIEd4W3CihgWa4ilQiQT6353c+b2uB2C6n6a6QiFOgS8zNIvG2ca4mN
-         Y45UA/I08VgIdHibopCwiz9PJYP5U+0TRBBPM3A/1V7JoWX5g60icPbpPucVEwIbjxsO
-         IlbQ==
-X-Gm-Message-State: AOJu0YxvPvltQK77oNlRmGjgcWiDux2dGfw7oS4qx6LjpONT89ZO7NdV
-	lZ7/CVPNCcpCBoA2TBVbx6TBNhgFwBPwvZRFEkq3znbnflj0eAe3IVrsLYnw
-X-Google-Smtp-Source: AGHT+IF/pPT+0TIoAcGwVxp1AjLR29aL6r8bCpu2lhhptazOzLSH5c3pibF7vyk2yY/8ZRuJxOtqcw==
-X-Received: by 2002:a05:6a20:551f:b0:1a3:dc33:2e47 with SMTP id ko31-20020a056a20551f00b001a3dc332e47mr2276971pzb.4.1713425777114;
-        Thu, 18 Apr 2024 00:36:17 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
-        by smtp.gmail.com with ESMTPSA id j9-20020a17090276c900b001e26ba8882fsm841756plt.287.2024.04.18.00.36.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 00:36:16 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	horms@kernel.org
-Cc: netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v3 3/3] net: rps: locklessly access rflow->cpu
-Date: Thu, 18 Apr 2024 15:36:03 +0800
-Message-Id: <20240418073603.99336-4-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240418073603.99336-1-kerneljasonxing@gmail.com>
-References: <20240418073603.99336-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1713425822; c=relaxed/simple;
+	bh=fTrQ/YWceSaRRdWxthcHz+8Uq53su8EhvbUEUZjLCig=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CU1PDHwccyrdkCynS1pwAVKuIJGcK4B0l9q46QHikU9zlcxwLw6ddvN0Yj4sM+Wr1FHTs4pW0l3CeUpia4lVP9hNtUiLw7SO9CqhNvqh/Auaf6xGQj3952sEDEGZu+XHS9XnsN/wpDNu7Jrkt8jScErlFig/RK12lwARs2M5SCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=bosLVNIi; arc=none smtp.client-ip=115.124.30.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1713425811; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=nPWRaRUZCoDTEtaSZuHhqzBNBIv2Skg8nhh77yFiiu0=;
+	b=bosLVNIiAt0TvoKBE8mpUSJqFfAIqaISMqcSmC9iVT3ynswS7rHItf8CEs6N6loa9NRQju7fsDeAZYFhvg0EmWWExApV/6wIJq3Fqc4Zk85dLWL9f+pBLayu/FRXqDEnb6cGZeN3zR8yFzkaW/Hq4puy1NUAPA71q2jlPxZkwqo=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R891e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W4njeN3_1713425809;
+Received: from 30.221.148.242(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W4njeN3_1713425809)
+          by smtp.aliyun-inc.com;
+          Thu, 18 Apr 2024 15:36:50 +0800
+Message-ID: <28e45768-5091-484d-b09e-4a63bc72a549@linux.alibaba.com>
+Date: Thu, 18 Apr 2024 15:36:48 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 3/6] virtio_net: Add a lock for the command
+ VQ.
+To: Jason Wang <jasowang@redhat.com>, Daniel Jurgens <danielj@nvidia.com>
+Cc: netdev@vger.kernel.org, mst@redhat.com, xuanzhuo@linux.alibaba.com,
+ virtualization@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, jiri@nvidia.com
+References: <20240416193039.272997-1-danielj@nvidia.com>
+ <20240416193039.272997-4-danielj@nvidia.com>
+ <CACGkMEsCm3=7FtnsTRx5QJo3ZM0Ko1OEvssWew_tfxm5V=MXvQ@mail.gmail.com>
+From: Heng Qi <hengqi@linux.alibaba.com>
+In-Reply-To: <CACGkMEsCm3=7FtnsTRx5QJo3ZM0Ko1OEvssWew_tfxm5V=MXvQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Jason Xing <kernelxing@tencent.com>
 
-This is the last member in struct rps_dev_flow which should be
-protected locklessly. So finish it.
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- net/core/dev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+在 2024/4/18 下午2:42, Jason Wang 写道:
+> On Wed, Apr 17, 2024 at 3:31 AM Daniel Jurgens <danielj@nvidia.com> wrote:
+>> The command VQ will no longer be protected by the RTNL lock. Use a
+>> spinlock to protect the control buffer header and the VQ.
+>>
+>> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+>> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+>> ---
+>>   drivers/net/virtio_net.c | 6 +++++-
+>>   1 file changed, 5 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>> index 0ee192b45e1e..d02f83a919a7 100644
+>> --- a/drivers/net/virtio_net.c
+>> +++ b/drivers/net/virtio_net.c
+>> @@ -282,6 +282,7 @@ struct virtnet_info {
+>>
+>>          /* Has control virtqueue */
+>>          bool has_cvq;
+>> +       spinlock_t cvq_lock;
+> Spinlock is instead of mutex which is problematic as there's no
+> guarantee on when the driver will get a reply. And it became even more
+> serious after 0d197a147164 ("virtio-net: add cond_resched() to the
+> command waiting loop").
+>
+> Any reason we can't use mutex?
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index ed6efef01582..8010036c07b6 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4533,7 +4533,7 @@ set_rps_cpu(struct net_device *dev, struct sk_buff *skb,
- 		rps_input_queue_tail_save(&rflow->last_qtail, head);
- 	}
- 
--	rflow->cpu = next_cpu;
-+	WRITE_ONCE(rflow->cpu, next_cpu);
- 	return rflow;
- }
- 
--- 
-2.37.3
+Hi Jason,
+
+I made a patch set to enable ctrlq's irq on top of this patch set, which 
+removes cond_resched().
+
+But I need a little time to test, this is close to fast. So could the 
+topic about cond_resched +
+spin lock or mutex lock be wait?
+
+Thank you very much!
+
+>
+> Thanks
+>
+>>          /* Host can handle any s/g split between our header and packet data */
+>>          bool any_header_sg;
+>> @@ -2529,6 +2530,7 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
+>>          /* Caller should know better */
+>>          BUG_ON(!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_VQ));
+>>
+>> +       guard(spinlock)(&vi->cvq_lock);
+>>          vi->ctrl->status = ~0;
+>>          vi->ctrl->hdr.class = class;
+>>          vi->ctrl->hdr.cmd = cmd;
+>> @@ -4818,8 +4820,10 @@ static int virtnet_probe(struct virtio_device *vdev)
+>>              virtio_has_feature(vdev, VIRTIO_F_VERSION_1))
+>>                  vi->any_header_sg = true;
+>>
+>> -       if (virtio_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ))
+>> +       if (virtio_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
+>>                  vi->has_cvq = true;
+>> +               spin_lock_init(&vi->cvq_lock);
+>> +       }
+>>
+>>          if (virtio_has_feature(vdev, VIRTIO_NET_F_MTU)) {
+>>                  mtu = virtio_cread16(vdev,
+>> --
+>> 2.34.1
+>>
 
 
