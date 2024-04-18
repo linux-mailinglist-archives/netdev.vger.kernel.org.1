@@ -1,153 +1,158 @@
-Return-Path: <netdev+bounces-89007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0226C8A934C
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 08:42:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 36E6C8A9373
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 08:46:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9728E1F21D2F
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 06:42:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4C531F21E22
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 06:46:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F27E328DDE;
-	Thu, 18 Apr 2024 06:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5FE57334;
+	Thu, 18 Apr 2024 06:45:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TccbuPnq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a/s6STIM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6383A249E5
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 06:42:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712B839FD4
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 06:45:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713422563; cv=none; b=JGBobA6+NkcA8od4obE2823dUH+JCq+u3q0uQ+0M+FSVbQdUaT9KIjZMx005E//yQvm5tvs15eFw72rkvqs9DyKEUWURqC6nNsDVM1y35lqsC/ZxWPonwZcRMXieYpMxNF5bS8LCU/IazigFnyHjFd/xah3y0joajhYmTVoBnhs=
+	t=1713422752; cv=none; b=umxy3IfdrAQgciWKC2jf2gsYoO6+fskkTWcuoll7g2Quw+6r915/lzJ3ZoqFX/9W3PubXBpiVT+YxYuHRbI1uO3VA2+aRhzo6No14aO4fYTreOH72XkQkEwKg1+Tfyz7tmAe0RlCJ/En5+i2i9lQDwnJjT+MLO/vC3nqrSgqhsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713422563; c=relaxed/simple;
-	bh=uTYEKgXv0eBXXEpY3jK1fZd6YdqS230eJksfciw6oD8=;
+	s=arc-20240116; t=1713422752; c=relaxed/simple;
+	bh=lCUHPdFnBd4NjcErHjO4SvijbWleJcowqrzwjulXax0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tvTeGCtBSG3kUNYjzSpwB++SIRyotOLsaUcrXCzOq7kcqDeUGUfCPJnk3hGfEJQTSdsVarImULpQNrCKb3DgCVJRCUbnqJ2L0z/7Dto+JsjFEH1Xd0r8+rKAeiY9tzPVhoMehk8dswmVKsqeYY72OIl9IQSpHwZt69ORsFQNDpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TccbuPnq; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713422561;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HEWjIuCSr8kkahHYj05QdOTlEm9mjcsK9j5UgFZ/k5M=;
-	b=TccbuPnqoE5pynlEO79hjEU+HQ6sAWjYMxglXl8Co0St0GjLpL9jCOmtDUYV4ipMKCBLGH
-	3KGgZ9yT4FKiy8FlAfG3HzcTG1FuZyHMteJnhi494kLh2DpiwrMWlltBmkdKMc6lIDyd5q
-	hvCNkvwlKww0NYTeF+uPOZ+9hJfAzHA=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-629-0eluyxC-ORuaOFoT-dn7iQ-1; Thu, 18 Apr 2024 02:42:39 -0400
-X-MC-Unique: 0eluyxC-ORuaOFoT-dn7iQ-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2a4fc4cf54dso789815a91.1
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 23:42:39 -0700 (PDT)
+	 To:Cc:Content-Type; b=SzWFJHr6lspbLS5WfQ/06hVPKEcdBWHaUSpePSeMciariZ/e5O7d246cWNFF4tyq/fwI9FEhIXKEZXUYuqWlj6TKIjtDjlCNn0oEkeP3AsHGSsRujOGY/1gqkzQ90npEPi4uF2DCOTP6dtRJ7tvQPAH0lMJXHvJWYn66FucU4AE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a/s6STIM; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-571b5fba660so6398a12.1
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 23:45:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713422749; x=1714027549; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YTTUlj7Aknj7w/0ZujTPXVavRhAX14b5W+gnVGdQHZo=;
+        b=a/s6STIMTw7e5kPdfKRTCzMaplRs98Yqi6lYe1KeOID7ZBGo6+Gwcb+FtOfx4Boq+x
+         BTgMpjGjgH2gcBhf+vyzXyXX26iLGZtdlcqc9FByKoA1U00JpNjYqi3cGncYy6Fhx6EO
+         rc878vr8WPHo3IjIKYTxUn6OM8dFd2uVeI9PhUvY3H39I3KMxTRxntlE+/bgrNRSHBeN
+         19atvpJdVpom123ikiJopoK0VGilusywbpmwRhT8yNv5NXhg+5lYojaW3lZ6UUYqovUF
+         29KU1xicj0u+SIonruYWBwFNxp2NNIBpyCVUsh02wJAhtKKzUM2gwiguN2rQj+luei5U
+         qdlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713422558; x=1714027358;
+        d=1e100.net; s=20230601; t=1713422749; x=1714027549;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HEWjIuCSr8kkahHYj05QdOTlEm9mjcsK9j5UgFZ/k5M=;
-        b=qBszZq3sdJoy8NmhPGHRyiepdwakgHCBeCYUSC5zs1j4OxRpQw5Atwunsq+ngOzDMx
-         2m3BEZkXlXnlD4FDHQ2HJvy4zQKB7rHvJ7oH8SljjwboxBN/losAvCenvBMj3kvUMJPB
-         nDd1Uf1eF2FLOw2rMv+ta3QlIhM8vjlkZtxYspBZ6OqCW+whTKwAmmAR8NS3qeiv6KpW
-         x5IPUhchNVcZtfmvMrolTZDscoQ2qx+PKiflx5BpA6SfbiSpfG8o5iEmI8o24+1Uu5Zg
-         vQK8/7NKpqECyDwzYyYDzZp45MwvBD8P59jVoTH6rbzZCydPnQjtYtUqwsD7uA0mDCRC
-         jfbg==
-X-Gm-Message-State: AOJu0YzQ5zzDGe4PP1WtFHH7MW4FuTPrQOHb3k6WaEm7knbaHH6QCUa/
-	X99XDoobWwo8SeQEeJ7Grwc2dChE2rDdHcHe71NtzZqvNwfabWzTwpFAfXTKZxqdQrCX1fpZujG
-	wFPPl2S+mtXnDn6wlLZQn0w8phU9c0lCjXo2o7BwKJAqNCd1QPjKIJKiEUuR5jQE8bEVz4DwF7O
-	ouoV9U9fzyVafK4bcFAqFr87KJxDXpYPT23vP58mBVYg==
-X-Received: by 2002:a17:90a:f0c3:b0:2a5:c9b2:fb53 with SMTP id fa3-20020a17090af0c300b002a5c9b2fb53mr1672126pjb.40.1713422558586;
-        Wed, 17 Apr 2024 23:42:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHP4VeoGUcsJ+M1k+EH0yckJ6Bn4LMuCZMqM5wTKg70OkDVyqOSIkGnQJL8ITQ9iL5VQbw9/CsbaWkKUQ0UVac=
-X-Received: by 2002:a17:90a:f0c3:b0:2a5:c9b2:fb53 with SMTP id
- fa3-20020a17090af0c300b002a5c9b2fb53mr1672110pjb.40.1713422558324; Wed, 17
- Apr 2024 23:42:38 -0700 (PDT)
+        bh=YTTUlj7Aknj7w/0ZujTPXVavRhAX14b5W+gnVGdQHZo=;
+        b=gT5l6Wy3fl9nYWkXpHx5J6oVTIH/cCFTNUzoiYcd/uqKkl2HyJMabCu1aU2iwgTZaI
+         QBvBk1inKytvl5xWlY/T6+/yn/5Fdb/cS5h6UCPin670rWRaZLMSYG+N0kRcBOpt9ITL
+         uBWRb0Q/XYww4IfInod70bQ3L5Tic3/kl23Ism0dHNSkpFiO8IvPzJendem0d1Y/V8hk
+         xixqUl64UpHtESQS6I8L3UamraKgLGyaeFoQgj8gPWHWnKs8JWr90E6uBrAl4c6wWImK
+         l2ArGJdSUeKN2DRAXCXtcgXs/22GiDOapyQDDslTnsqiTP0Sx168aJFHiaHX88ZWpyX/
+         N4rg==
+X-Forwarded-Encrypted: i=1; AJvYcCXwOTHnPIMtN3TjfH82WbwVPGWICxhKB5k3RLA6rk7pi+waMY8A8vVIIbszrKaPdpjNyD4YVu72oxhEoRLEtOgsRYbmfVIA
+X-Gm-Message-State: AOJu0YzSAUzFvQ/TXKeXih+1S+aC2F5ownOdp0mJxje37jupbFeVWz+m
+	7Lw+EslgG2K7Q4Lhl2yylWReND9Shzt1wLNewhoI8sVCNO0KzX2X+fry1e+2Zr53MSGxpmijDK/
+	Nh+L+7bl6iCZbM/rAZCC8iU8qBACPs1FXX0uo
+X-Google-Smtp-Source: AGHT+IH79HIhOjD3+24nsocoYQohHnYqmkg0z7+KJZUwyZFoxnNPwlOyQtFfC86jOGYSkBILODmtBU7BaDEL4YBkNFQ=
+X-Received: by 2002:a05:6402:1510:b0:571:bc8d:4b6e with SMTP id
+ f16-20020a056402151000b00571bc8d4b6emr26020edw.3.1713422748484; Wed, 17 Apr
+ 2024 23:45:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240416193039.272997-1-danielj@nvidia.com> <20240416193039.272997-4-danielj@nvidia.com>
-In-Reply-To: <20240416193039.272997-4-danielj@nvidia.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 18 Apr 2024 14:42:27 +0800
-Message-ID: <CACGkMEsCm3=7FtnsTRx5QJo3ZM0Ko1OEvssWew_tfxm5V=MXvQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 3/6] virtio_net: Add a lock for the command VQ.
-To: Daniel Jurgens <danielj@nvidia.com>
-Cc: netdev@vger.kernel.org, mst@redhat.com, xuanzhuo@linux.alibaba.com, 
-	virtualization@lists.linux.dev, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, jiri@nvidia.com
+References: <20240417165756.2531620-1-edumazet@google.com> <20240417165756.2531620-2-edumazet@google.com>
+ <CAL+tcoB0SzgtG-3mAYrG6ROGbK2HwqXCTo21-0FxfOzKQc397A@mail.gmail.com>
+In-Reply-To: <CAL+tcoB0SzgtG-3mAYrG6ROGbK2HwqXCTo21-0FxfOzKQc397A@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 18 Apr 2024 08:45:34 +0200
+Message-ID: <CANn89i+BQR+yE8H-oPaGt86Vo9DHfeg4DRhSqkKM4WqY-tJ7NA@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/2] tcp: conditionally call ip_icmp_error() from tcp_v4_err()
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Neal Cardwell <ncardwell@google.com>, Dragos Tatulea <dtatulea@nvidia.com>, eric.dumazet@gmail.com, 
+	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
+	Willem de Bruijn <willemb@google.com>, Shachar Kagan <skagan@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 17, 2024 at 3:31=E2=80=AFAM Daniel Jurgens <danielj@nvidia.com>=
- wrote:
+On Thu, Apr 18, 2024 at 5:23=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
 >
-> The command VQ will no longer be protected by the RTNL lock. Use a
-> spinlock to protect the control buffer header and the VQ.
+> On Thu, Apr 18, 2024 at 12:59=E2=80=AFAM Eric Dumazet <edumazet@google.co=
+m> wrote:
+> >
+> > Blamed commit claimed in its changelog that the new functionality
+> > was guarded by IP_RECVERR/IPV6_RECVERR :
+> >
+> >     Note that applications need to set IP_RECVERR/IPV6_RECVERR option t=
+o
+> >     enable this feature, and that the error message is only queued
+> >     while in SYN_SNT state.
+> >
+> > This was true only for IPv6, because ipv6_icmp_error() has
+> > the following check:
+> >
+> > if (!inet6_test_bit(RECVERR6, sk))
+> >     return;
+> >
+> > Other callers check IP_RECVERR by themselves, it is unclear
+> > if we could factorize these checks in ip_icmp_error()
+> >
+> > For stable backports, I chose to add the missing check in tcp_v4_err()
+> >
+> > We think this missing check was the root cause for commit
+> > 0a8de364ff7a ("tcp: no longer abort SYN_SENT when receiving
+> > some ICMP") breakage, leading to a revert.
+> >
+> > Many thanks to Dragos Tatulea for conducting the investigations.
+> >
+> > As Jakub said :
+> >
+> >     The suspicion is that SSH sees the ICMP report on the socket error =
+queue
+> >     and tries to connect() again, but due to the patch the socket isn't
+> >     disconnected, so it gets EALREADY, and throws its hands up...
+> >
+> >     The error bubbles up to Vagrant which also becomes unhappy.
+> >
+> >     Can we skip the call to ip_icmp_error() for non-fatal ICMP errors?
+> >
+> > Fixes: 45af29ca761c ("tcp: allow traceroute -Mtcp for unpriv users")
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > Tested-by: Dragos Tatulea <dtatulea@nvidia.com>
+> > Cc: Dragos Tatulea <dtatulea@nvidia.com>
+> > Cc: Maciej =C5=BBenczykowski <maze@google.com>
+> > Cc: Willem de Bruijn <willemb@google.com>
+> > Cc: Neal Cardwell <ncardwell@google.com>
+> > Cc: Shachar Kagan <skagan@nvidia.com>
 >
-> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-> ---
->  drivers/net/virtio_net.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+> Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 >
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 0ee192b45e1e..d02f83a919a7 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -282,6 +282,7 @@ struct virtnet_info {
->
->         /* Has control virtqueue */
->         bool has_cvq;
-> +       spinlock_t cvq_lock;
+> I wonder if we're supposed to move this check into ip_icmp_error()
+> like ipv6_icmp_error() does, because I notice one caller
+> rxrpc_encap_err_rcv() without checking RECVERR  bit reuses the ICMP
+> error logic which is introduced in commit b6c66c4324e7 ("rxrpc: Use
+> the core ICMP/ICMP6 parsers'')?
 
-Spinlock is instead of mutex which is problematic as there's no
-guarantee on when the driver will get a reply. And it became even more
-serious after 0d197a147164 ("virtio-net: add cond_resched() to the
-command waiting loop").
+I tried to focus on the TCP issues, and to have a stable candidate for patc=
+h #1.
 
-Any reason we can't use mutex?
-
-Thanks
+The refactoring can wait.
 
 >
->         /* Host can handle any s/g split between our header and packet da=
-ta */
->         bool any_header_sg;
-> @@ -2529,6 +2530,7 @@ static bool virtnet_send_command(struct virtnet_inf=
-o *vi, u8 class, u8 cmd,
->         /* Caller should know better */
->         BUG_ON(!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_VQ));
->
-> +       guard(spinlock)(&vi->cvq_lock);
->         vi->ctrl->status =3D ~0;
->         vi->ctrl->hdr.class =3D class;
->         vi->ctrl->hdr.cmd =3D cmd;
-> @@ -4818,8 +4820,10 @@ static int virtnet_probe(struct virtio_device *vde=
-v)
->             virtio_has_feature(vdev, VIRTIO_F_VERSION_1))
->                 vi->any_header_sg =3D true;
->
-> -       if (virtio_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ))
-> +       if (virtio_has_feature(vdev, VIRTIO_NET_F_CTRL_VQ)) {
->                 vi->has_cvq =3D true;
-> +               spin_lock_init(&vi->cvq_lock);
-> +       }
->
->         if (virtio_has_feature(vdev, VIRTIO_NET_F_MTU)) {
->                 mtu =3D virtio_cread16(vdev,
-> --
-> 2.34.1
->
-
+> Or should it be a follow-up patch (moving it inside of
+> ip_icmp_error()) to handle the rxrpc case and also prevent future
+> misuse for other people?
 
