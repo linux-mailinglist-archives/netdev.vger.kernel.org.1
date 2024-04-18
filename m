@@ -1,167 +1,93 @@
-Return-Path: <netdev+bounces-89294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A80978A9F0B
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 17:50:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC3DB8A9F71
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 18:01:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D5AC1F23FAC
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 15:50:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 799A31F22711
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 16:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01FB16F29F;
-	Thu, 18 Apr 2024 15:49:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B51416F850;
+	Thu, 18 Apr 2024 16:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="IsVD6mVu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pDYulA2Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CCF216F82F
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 15:49:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D774216F851;
+	Thu, 18 Apr 2024 16:01:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713455391; cv=none; b=GIMYHMlrr46AWuDGyI7RpvrF63fh84pRcyE1HtN4dcH87+OFsFgJ6kKh53uyPGJCKxhpgPzgQr3ey1XqzdKU8PWr6bN9ar6quiDBKJobYPLy05i7AABsyvSPd63Bty20CBVtCiyWtRn8km2tH/bSFBiXS+Z9nBOb4blkAfRkJf8=
+	t=1713456086; cv=none; b=LlUZHqgacouWsGUzhfM8IkWMVaZOfN1/AzApIp0GxU4lrCMsaEe+J+v9/JyJMTpI0ia3AV0wyRP09Bo8VVRXaT00vrpb24lxCEEmOecovt6urYMtfccE1HmjqoaAVMF+DHzWMSzRpwBZLMgc3VH/Cnvpjy7SeHZc3smP2q+QpOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713455391; c=relaxed/simple;
-	bh=p/dF7JMox6BrqaZIBuvA5pvpXeCd9gZESmiZZctmfkw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UijI0BQnQurIKejJNG1OZsyB4n2ALDgvAk7aXKMqMY8xOQEe9ynbxPuLgnTYhtzKRlRsoUR1ztF1Rd+24G8rMyFdFHaTXvE3uzrkpAOyP6IgojcE9nWXZvmWm/lhT56NG2gma5BQkOn6z6xzA73A/Zr9xipkm3LYWN/QiVtUTgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=IsVD6mVu; arc=none smtp.client-ip=91.218.175.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Thu, 18 Apr 2024 08:49:42 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713455387;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ziaS2a2JLbKpn9yWeB1wELMDTiamfefOEg/5bnjE4gE=;
-	b=IsVD6mVumHoODJn7B/wl4ZNhpjw8ihVo+pRJpCI3y59wPDzivclT2aF5c/mQG55Mp+pFY+
-	hEtMsbiS1SKwooNaoh23/Hf/B/G5u+7a4sg+2RchIP7qIEsZEfKw3QL2xjHtkUE6VINkrO
-	tqr5ma/KinE2a4BcflYzP6lbU5+7ekY=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Shakeel Butt <shakeel.butt@linux.dev>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Yosry Ahmed <yosryahmed@google.com>, tj@kernel.org, hannes@cmpxchg.org, 
-	lizefan.x@bytedance.com, cgroups@vger.kernel.org, longman@redhat.com, 
-	netdev@vger.kernel.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
-	kernel-team@cloudflare.com, Arnaldo Carvalho de Melo <acme@kernel.org>, 
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, mhocko@kernel.org
-Subject: Re: [PATCH v1 3/3] cgroup/rstat: introduce ratelimited rstat flushing
-Message-ID: <4o4qxf3tcos5rl7h2noldeg3knqkgc2ph36tv2cceourbsxgas@xicxkcacme7v>
-References: <171328983017.3930751.9484082608778623495.stgit@firesoul>
- <171328990014.3930751.10674097155895405137.stgit@firesoul>
- <CAJD7tkbZAj3UQSHbu3kj1NG4QDowXWrohG4XM=7cX_a=QL-Shg@mail.gmail.com>
- <72e4a55e-a246-4e28-9d2e-d4f1ef5637c2@kernel.org>
+	s=arc-20240116; t=1713456086; c=relaxed/simple;
+	bh=GxZ0UkuWta5XXukPFexSn1kOrolC+Aw1Ja0CF7m9Z0E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pCYorq0fwuCqcWUDNuLfXDtjUyQunSEu6rV9z6gfbD/iVOVtalPeMPq3zhYf4yezoneEf/NCZo5k/Vi9+G2yUw83cDx8QICZsE3DP0FAiE4TMAY9U+XNj++RrrNjWHRTerLm2Cbh9EEs2l9hNGkSmy0tKBs9+Mn0zidziLkX/oY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pDYulA2Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0EECC113CC;
+	Thu, 18 Apr 2024 16:01:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713456086;
+	bh=GxZ0UkuWta5XXukPFexSn1kOrolC+Aw1Ja0CF7m9Z0E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=pDYulA2ZS1zscGHLBq1orinGWH+j6edm3WuP7nT4Xe/1xOxcEg97MbEf436DClSlC
+	 oRO/ZCO4s8dKx7jTi8n04MdQHbfzAWbNfSlyRoIM88govWHsjy8AWiFF+v952bjqb3
+	 TAshu9qArXQ1LXtX3xqlyu1TKuOyRhPklz+05vkxLFMa2SHSq5XrrhV8/0MsFsC+7i
+	 i67iCIyPxZdQ1MQjSdoVLsDqTCYljRtSwQObcNmrZqPQvCxAop+JeRF7Bh2VqTNTuo
+	 tKNoqf+QxiC5XPZ+Xx4FeN+44NpjDRivPBVZYDADV2PDd3b4zfIWnkU+zlDc5M3+uj
+	 frKEkxA0qeTqQ==
+Date: Thu, 18 Apr 2024 09:01:24 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Dan Jurgens <danielj@nvidia.com>, Heng Qi <hengqi@linux.alibaba.com>,
+ Jason Wang <jasowang@redhat.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>,
+ "xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
+ "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+ "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+ <edumazet@google.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net-next v4 3/6] virtio_net: Add a lock for the command
+ VQ.
+Message-ID: <20240418090124.03be2187@kernel.org>
+In-Reply-To: <72f6c8a55adac52ad17dfe11a579b5b3d5dc3cec.camel@redhat.com>
+References: <20240416193039.272997-1-danielj@nvidia.com>
+	<20240416193039.272997-4-danielj@nvidia.com>
+	<CACGkMEsCm3=7FtnsTRx5QJo3ZM0Ko1OEvssWew_tfxm5V=MXvQ@mail.gmail.com>
+	<28e45768-5091-484d-b09e-4a63bc72a549@linux.alibaba.com>
+	<ad9f7b83e48cfd7f1463d8c728061c30a4509076.camel@redhat.com>
+	<CH0PR12MB85802CBD3808B483876F8C77C90E2@CH0PR12MB8580.namprd12.prod.outlook.com>
+	<72f6c8a55adac52ad17dfe11a579b5b3d5dc3cec.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <72e4a55e-a246-4e28-9d2e-d4f1ef5637c2@kernel.org>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Apr 18, 2024 at 01:00:30PM +0200, Jesper Dangaard Brouer wrote:
-> 
-> 
-> On 18/04/2024 04.21, Yosry Ahmed wrote:
-> > On Tue, Apr 16, 2024 at 10:51 AM Jesper Dangaard Brouer <hawk@kernel.org> wrote:
-> > > 
-> > > This patch aims to reduce userspace-triggered pressure on the global
-> > > cgroup_rstat_lock by introducing a mechanism to limit how often reading
-> > > stat files causes cgroup rstat flushing.
-> > > 
-> > > In the memory cgroup subsystem, memcg_vmstats_needs_flush() combined with
-> > > mem_cgroup_flush_stats_ratelimited() already limits pressure on the
-> > > global lock (cgroup_rstat_lock). As a result, reading memory-related stat
-> > > files (such as memory.stat, memory.numa_stat, zswap.current) is already
-> > > a less userspace-triggerable issue.
-> > > 
-> > > However, other userspace users of cgroup_rstat_flush(), such as when
-> > > reading io.stat (blk-cgroup.c) and cpu.stat, lack a similar system to
-> > > limit pressure on the global lock. Furthermore, userspace can easily
-> > > trigger this issue by reading those stat files.
-> > > 
-> > > Typically, normal userspace stats tools (e.g., cadvisor, nomad, systemd)
-> > > spawn threads that read io.stat, cpu.stat, and memory.stat (even from the
-> > > same cgroup) without realizing that on the kernel side, they share the
-> > > same global lock. This limitation also helps prevent malicious userspace
-> > > applications from harming the kernel by reading these stat files in a
-> > > tight loop.
-> > > 
-> > > To address this, the patch introduces cgroup_rstat_flush_ratelimited(),
-> > > similar to memcg's mem_cgroup_flush_stats_ratelimited().
-> > > 
-> > > Flushing occurs per cgroup (even though the lock remains global) a
-> > > variable named rstat_flush_last_time is introduced to track when a given
-> > > cgroup was last flushed. This variable, which contains the jiffies of the
-> > > flush, shares properties and a cache line with rstat_flush_next and is
-> > > updated simultaneously.
-> > > 
-> > > For cpu.stat, we need to acquire the lock (via cgroup_rstat_flush_hold)
-> > > because other data is read under the lock, but we skip the expensive
-> > > flushing if it occurred recently.
-> > > 
-> > > Regarding io.stat, there is an opportunity outside the lock to skip the
-> > > flush, but inside the lock, we must recheck to handle races.
-> > > 
-> > > Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+On Thu, 18 Apr 2024 17:48:57 +0200 Paolo Abeni wrote:
+> > > Side note: the compiler apparently does not like guard() construct, leading to
+> > > new warning, here and in later patches. I'm unsure if the code simplification
+> > > is worthy.  
 > > 
-> > As I mentioned in another thread, I really don't like time-based
-> > rate-limiting [1]. Would it be possible to generalize the
-> > magnitude-based rate-limiting instead? Have something like
-> > memcg_vmstats_needs_flush() in the core rstat code?
-> > 
+> > I didn't see any warnings with GCC or clang. This is used other places in the kernel as well.
+> > gcc version 13.2.1 20230918 (Red Hat 13.2.1-3) (GCC)
+> > clang version 17.0.6 (Fedora 17.0.6-2.fc39)
+> >   
 > 
-> I've taken a closer look at memcg_vmstats_needs_flush(). And I'm
-> concerned about overhead maintaining the stats (that is used as a filter).
+> See:
 > 
->   static bool memcg_vmstats_needs_flush(struct memcg_vmstats *vmstats)
->   {
-> 	return atomic64_read(&vmstats->stats_updates) >
-> 		MEMCG_CHARGE_BATCH * num_online_cpus();
->   }
-> 
-> I looked at `vmstats->stats_updates` to see how often this is getting
-> updated.  It is updated in memcg_rstat_updated(), but it gets inlined into a
-> number function (__mod_memcg_state, __mod_memcg_lruvec_state,
-> __count_memcg_events), plus it calls cgroup_rstat_updated().
-> Counting invocations per sec (via funccount):
-> 
->   10:28:09
->   FUNC                                    COUNT
->   __mod_memcg_state                      377553
->   __count_memcg_events                   393078
->   __mod_memcg_lruvec_state              1229673
->   cgroup_rstat_updated                  2632389
-> 
+> https://patchwork.kernel.org/project/netdevbpf/patch/20240416193039.272997-4-danielj@nvidia.com/
+> https://netdev.bots.linux.dev/static/nipa/845178/13632442/build_32bit/stderr
+> https://netdev.bots.linux.dev/static/nipa/845178/13632442/build_allmodconfig_warn/stderr
 
-Is it possible for you to also measure the frequency of the unique
-callstacks calling these functions? In addition the frequency of the
-each stat item update would be awesome.
-
-> 
-> I'm surprised to see how many time per sec this is getting invoked.
-> Originating from memcg_rstat_updated() = 2,000,304 times per sec.
-> (On a 128 CPU core machine with 39% idle CPU-load.)
-> Maintaining these stats seems excessive...
-> 
-> Then how often does the filter lower pressure on lock:
-> 
->   MEMCG_CHARGE_BATCH(64) * 128 CPU = 8192
->   2000304/(64*128) = 244 time per sec (every ~4ms)
->   (assuming memcg_rstat_updated val=1)
-> 
-
-It seems like we have opportunities to improve the stat update side and
-we definitely need to improve the stat flush side. One issue from the
-memcg side is that kernel has to do a lot of work, so we should be
-reducing that.
+These are sparse errors, I think, but I agree that there's little gain
+here and clearly a cost of wasted time, since the standard kernel
+tooling has not caught with with this ugly invention.
 
