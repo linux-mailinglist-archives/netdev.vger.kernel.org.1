@@ -1,302 +1,309 @@
-Return-Path: <netdev+bounces-89449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68BE58AA4AF
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 23:23:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E68C8AA4B7
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 23:29:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F22B281FE7
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 21:23:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15CC3282D9D
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 21:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792CD194C83;
-	Thu, 18 Apr 2024 21:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51C04194C92;
+	Thu, 18 Apr 2024 21:29:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ikSyT73d"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="E3QOA2uu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from CH1PR05CU001.outbound.protection.outlook.com (mail-northcentralusazon11020002.outbound.protection.outlook.com [52.101.193.2])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3EB194C81
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 21:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41AB9194C62;
+	Thu, 18 Apr 2024 21:29:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.193.2
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713475394; cv=fail; b=CJdyV/CTEm7F6ENH0Fs4YOBwWrjlnsPVVPdxx3U5TcMRH7G1ykRJiNG5P0XXzROPRDUfMJmVZd2KOkV/qgAgtsED7JLhd/KrzJhHrRHG3sd3c117c/vWFkJp1GGKbw5Nm9AKjH7T/ZTST5Ws1x0nWWt9oEAJtKj6asFv0wTOw+0=
+	t=1713475761; cv=fail; b=miGjcK6zaXbEih5HPmukVvj/wuCA4ZZ/cjjSDAQZJUHBDXOZGz9Z4A2PipYqry+7jMEI9k60VgHcKM0pL8tysaKn7m7QgOMTZ9jK69jjmIVL+Jnf6dn7wD9IJd0E5FLO7pKMicIfsGbb2NxFZPGSNo/EQow3l/18xDjMTNeFVqU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713475394; c=relaxed/simple;
-	bh=MNcIeVHTCNBwVTj5XHugeddc19EQeeS3oTIaY+Xlqp8=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Jg9AaGKYeh/iyD9Ni/krztf9QlPs32PtFbUbZkvR0jtPJdTAxwSN10kxJslx0vJGduiKafhowOzahsr+GrC1LfRS0AxnaAtJdC2j8aRbrVMuVbctuOQAQaSZ+bY3ck3uNKC1S9FfJc6250MezgEL3Y6WqV5Sz9DJREMehmasmWg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ikSyT73d; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713475393; x=1745011393;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=MNcIeVHTCNBwVTj5XHugeddc19EQeeS3oTIaY+Xlqp8=;
-  b=ikSyT73dWwhLtJpqmO6AebR6uoYvfwanAX3cwLx2xdumfe65uXT8AUJz
-   /oWJebjGI7rxffF59bFUM5Wzr0R9z99u+9H/yza+Jnu8eKWy0P3hCzG55
-   sCj0G5Ec5ae7Bf3ULPhAvSOgy7tx/zA13amI1Tb2S1yayEbLsBeCccKWH
-   DiDNaKiAagDfpSFJSbrtfm9iViJPQbHPWDFpO20CLWqukMpdF7ldVfvlb
-   aa8CMFY08ZOz+p8Wxj2KTpwL3CAHraGzTJxK3QxNY5ZDAOfYuNewH2k+f
-   rrf3Aa0wOVN/9nKpUHHoaYQDcHnTYO3H69bSZer2gHpmw0sygAi8pEwyJ
-   Q==;
-X-CSE-ConnectionGUID: VjU5//SAQDCLrtCzfBpnCg==
-X-CSE-MsgGUID: nA0jmVI0RAaw+HVFMqrFMw==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="12834268"
-X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="12834268"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 14:23:12 -0700
-X-CSE-ConnectionGUID: D/ygr/fjQ6Sg/LhWhMvbqQ==
-X-CSE-MsgGUID: cBJZ+YgfTkOIc4wxI3pYEA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="23184740"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Apr 2024 14:23:11 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 18 Apr 2024 14:23:11 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 18 Apr 2024 14:23:11 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 18 Apr 2024 14:23:09 -0700
+	s=arc-20240116; t=1713475761; c=relaxed/simple;
+	bh=aiIlHxiqoy60LRthI52/jpReMFnXKgSDwlRfGwg8I9c=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XBrvJAFArXht5BTDm5jB+rhVlyxrMfcRd8XOJZcssbwHLwA8ZswxIDoGpvtYZulJXy4n/dnyGEDjHgxI7uF6Oweu/MNYeYoNhokvyjPO8dRu4fYvgBtVJ9v9H2oMwFqERCgclti6wU/dbmGZL0UZ0aqQtyctNQmCfCH9Fc0vw34=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=E3QOA2uu; arc=fail smtp.client-ip=52.101.193.2
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A5wJJWIw6LXflVE6VSG9IW7ytFQroc+iJuwk4Zm1P9Oy6HVi72pBcQSZ1l22ox3k1SszVQ7GR+cKQmeGPEG6WFTKufM7hxk3OzCGn+cQZ05j+MViwS6QuVGczeIuf2/tOKcMorKhrX3JlV9ey0ywKn52nktH2XBMKoXsn9VP1Lf73ViBxhL5BbnBfJ3Javw97nCAgInqvA7qHgZl9SWkJhlbV92biZM4t6DGHx3L06XF5MiiQyYfp1EC2rf0etl8pAhlwxeB4pK0duD+7z4kIcNojpz3hI6MkTsW6FUsPj1WRVm3uDH9DyT3+4m1KvvBBNdo0/F5bgxR4EdF0sWNcA==
+ b=eoCUOceYiKpdtbLHGUk4+m1kj6D506gkCJezBkjjdWst53sWEzJGDNibG1y2xTqVapGj93f6vXqxHDjImZ/afozL2BDIzgkIk/IB7OM0AUCorSnDnZaVpTHRTRoJU4bF13FUQTAmDyyl9tnm0EpmbHZhNDGoXbFClJBoK9TaQOPevs+vFV832d6efxHcPs/RYFdimv7+6WYPZZ/Bm6riaevO5lC6DblDyskjsTxfyTIzCYe1wOSgSc4MhfYBRTFlxoKUzKj9DpwnxUcEKqcbTgXvmeS7zJlmPzLB2+C5dC8dCtS3PjhoBKIHBNHzGO8vcFMzCkjxfKZ739I+LnnDAA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CPeDzP+oX4QPJ2aJnNXcZVnPVzQejrZcISyz5rsowGg=;
- b=hCpaa6IgrGrR9yIV1vJ0WaSc+gP5aFR+sqxGCQCzGvnWHQ1W7057WmB+QdnvaHpagNe4Z7c646o8dEIFWM/zlVxQevnW2ZwZ8sxHX08R0E2+JtNe0zomgU1tn0TglrvB0+kOqGKDdT45tZOah8B6RPc7d4ehQPH55C9p+bD1PRmU9T9U5PzJpkefT+K0y96AtvvrlOUxMy2EAjpX/moAXm7OLI2HeyuEWVN9/YNFikn4Bj/UZqA4ZFGmzfDdu3QAR7N/Ih0BtyPAf1+STuYjt2eBs+rjnlrYXMLypEkl2R+V47dH5MQiaZesoJob9d35ZFwNL3amWojc5vfWi++UEw==
+ bh=SSmI5kimU83Yn6MYwZfJy4efXEEM0a0ZoXGdELs0x7U=;
+ b=SXU1M2gCfJEmnWsaOG42GGr2U2vYArZ0lMiL3JsbDKnaJGXhP/XMPgqsM1YevXiFAkoJ7a8qbd7mmwKLH19DoRDMzfR2oYi8muID49PAgFLCnh4xmkwPx4wSum5HOTi/wy2WWMaAUKf1OkZfINUlxwJB5QS4Kjg60Mo6Pmqnqi484AJ+i0bcOCAZ9lK/q7h8WWwkEpquFvcrkh0JLbPAQDXwSeU1LAvQBshf8PDc9ynmoY52hXLl5a8r18J4lZi1yf8OWvqmRVfQSPFOx2b9okFy4rsQ96aaYUayeAtHE/p/baTcGBik7Czj/WXc9ZjzeIHIInyKCn1fTVE32aE8pA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from IA1PR11MB7869.namprd11.prod.outlook.com (2603:10b6:208:3f6::7)
- by DS0PR11MB7335.namprd11.prod.outlook.com (2603:10b6:8:11e::9) with
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SSmI5kimU83Yn6MYwZfJy4efXEEM0a0ZoXGdELs0x7U=;
+ b=E3QOA2uu8RozBeHrfusOseS97EC1rH+pF0dWgBRBFQE+H1sk4whhad2+308b+L0ioZTewXE67lIKadDK4IgEBWrUo8a/KM/b8aiEN3iLftOOFiQfG9AU1XgZTn8psE3Bizp18/PbeNyF/dhj3K20JfqS4PBmEzBVoTokVNQ9/YI=
+Received: from DM6PR21MB1481.namprd21.prod.outlook.com (2603:10b6:5:22f::8) by
+ SA3PR21MB3864.namprd21.prod.outlook.com (2603:10b6:806:2f9::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.50; Thu, 18 Apr
- 2024 21:23:07 +0000
-Received: from IA1PR11MB7869.namprd11.prod.outlook.com
- ([fe80::4c76:f31a:2174:d509]) by IA1PR11MB7869.namprd11.prod.outlook.com
- ([fe80::4c76:f31a:2174:d509%6]) with mapi id 15.20.7472.025; Thu, 18 Apr 2024
- 21:23:07 +0000
-Message-ID: <acbe612f-faaa-4c70-802f-87504ee7c274@intel.com>
-Date: Thu, 18 Apr 2024 14:23:03 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next,RFC PATCH 0/5] Configuring NAPI instance for a queue
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <ast@kernel.org>, <sdf@google.com>,
-	<lorenzo@kernel.org>, <tariqt@nvidia.com>, <daniel@iogearbox.net>,
-	<anthony.l.nguyen@intel.com>, <lucien.xin@gmail.com>, <hawk@kernel.org>,
-	<sridhar.samudrala@intel.com>
-References: <171234737780.5075.5717254021446469741.stgit@anambiarhost.jf.intel.com>
- <20240409162153.5ac9845c@kernel.org>
- <94956064-9935-4ff3-8924-a99beb5adc07@intel.com>
- <20240411184740.782809eb@kernel.org>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7519.11; Thu, 18 Apr
+ 2024 21:29:14 +0000
+Received: from DM6PR21MB1481.namprd21.prod.outlook.com
+ ([fe80::93ce:566b:57a1:bb4e]) by DM6PR21MB1481.namprd21.prod.outlook.com
+ ([fe80::93ce:566b:57a1:bb4e%4]) with mapi id 15.20.7519.010; Thu, 18 Apr 2024
+ 21:29:14 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Leon Romanovsky <leon@kernel.org>, Thomas
+ Gleixner <tglx@linutronix.de>, Sebastian Andrzej Siewior
+	<bigeasy@linutronix.de>, KY Srinivasan <kys@microsoft.com>, Wei Liu
+	<wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, Long Li
+	<longli@microsoft.com>, Michael Kelley <mikelley@microsoft.com>, Shradha
+ Gupta <shradhagupta@microsoft.com>, Yury Norov <yury.norov@gmail.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>, Souradeep Chakrabarti
+	<schakrabarti@linux.microsoft.com>
+Subject: RE: [PATCH net-next] net: mana: Add new device attributes for mana
+Thread-Topic: [PATCH net-next] net: mana: Add new device attributes for mana
+Thread-Index: AQHajxpElOhYSgpXD0mPpMmQxX0tS7FugNnA
+Date: Thu, 18 Apr 2024 21:29:14 +0000
+Message-ID:
+ <DM6PR21MB14818DF8870C725A46C09A0BCA0E2@DM6PR21MB1481.namprd21.prod.outlook.com>
+References:
+ <1713174589-29243-1-git-send-email-shradhagupta@linux.microsoft.com>
+In-Reply-To:
+ <1713174589-29243-1-git-send-email-shradhagupta@linux.microsoft.com>
+Accept-Language: en-US
 Content-Language: en-US
-From: "Nambiar, Amritha" <amritha.nambiar@intel.com>
-In-Reply-To: <20240411184740.782809eb@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR13CA0198.namprd13.prod.outlook.com
- (2603:10b6:a03:2c3::23) To IA1PR11MB7869.namprd11.prod.outlook.com
- (2603:10b6:208:3f6::7)
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=d1e60117-6f45-44a5-8350-197fda9f97e4;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2024-04-18T20:32:27Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR21MB1481:EE_|SA3PR21MB3864:EE_
+x-ms-office365-filtering-correlation-id: bf7fe0b2-faa8-4e75-14eb-08dc5fee983f
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230031|7416005|1800799015|366007|376005|38070700009;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?DAWTzBOYLoRmhdn4In/+5CXzPBKkSv76rKZJOe1aQpryGNCmSXbazmRgzeKs?=
+ =?us-ascii?Q?iWBnHlpFWG8P1bAyf8GtMDK/8eMHgLpeqIu132NxDcrB6K6jokm/hhrhGUjw?=
+ =?us-ascii?Q?DYzssneDdB0URzLrxffnsmCUnQZT0QhtcuRuN1hGf66iGmsiH2TFw4VZMUp8?=
+ =?us-ascii?Q?mgBQ7G3N5biVb+iywozXWen5vJmukiKZLnXCgZyD2NqH81VKDOX0WAzHGNU7?=
+ =?us-ascii?Q?DqdnB7cbD0aDb+jW8/PxnTA1EPMEoC9wQJQ8BfEZuYvMY5nTOEDIshEHeW/S?=
+ =?us-ascii?Q?nUoJ1dgtJFDJK7GZZb47oXH0V6B7schNOn9u4PDHwbXKPQgZ+lPVSlIVJ4tX?=
+ =?us-ascii?Q?hhWjQXwi9TgVRywz10UMrIXbmOwd8WyAAmxgsj/30NgF3Q+DPz3o2MvbC708?=
+ =?us-ascii?Q?eicqzNEZiWP8XQuTkJ2dOcTilmRDbR/hiAk8Ru4e3hucU7eMZfFuqIht/bCH?=
+ =?us-ascii?Q?QA2ND8qHhcCPfWu/oKrF8Mj6lqni7ZXVjj2G5Rj3zrMRxxArBPOpFSG/5PDs?=
+ =?us-ascii?Q?1AbqHIhgcCLDK8xREnJBK9d4zgrWwgnaZC+NdOqo2Lc2Ewa3kgKIeoPFt51r?=
+ =?us-ascii?Q?n0iIUX9yRafoH8uoygb9dsysmzrsjhfSiZiCwOgnLLxmQRteBlDYZGm3Nomz?=
+ =?us-ascii?Q?auTG9eeEi2Qmjjg/YJYiuLeNdJnytk1FGJYmzKmrkR7Y/OkDEl2RsmD5thLt?=
+ =?us-ascii?Q?Hj4pMLZSmfwRc/Dm4geuEbSktCrXkBFmQUIBxjfEF2OH6QuFhycLWVENxkIj?=
+ =?us-ascii?Q?VcMHlLcjkefwYk/0ns2Jwnf7+OzMedIL4PwCam/TQwctmPNxhqobhNekieF8?=
+ =?us-ascii?Q?HizXwztBB6uwCiipXqcqeP38S8WkpGbmCLNSiQs9ZQqyD+qN0p4SK9MQN3nJ?=
+ =?us-ascii?Q?OYE80yqhFkNVDBfLKVIF2/9yE7vAWzzRnZkdBRfXm4bWzbzhscCVWHM1KRr9?=
+ =?us-ascii?Q?0234q2Hnr3QLTBzNPRHW0WpZkIaVfbM9WNy1K3B0uuyre79/m7VVVKZ+BQuN?=
+ =?us-ascii?Q?grt1A2jfmYKZbbDj8OhTFKPIHZLLHmLHPFOY9mRecC3qUXQk4FSZwLw5v12c?=
+ =?us-ascii?Q?ytuormFGDK9ufIvtGR3rfqKzJGQZUA8anGynnEY+m8yleN4fQPwOcqgJLCyp?=
+ =?us-ascii?Q?Dg9NLcx8zO5D9BUJFzNrvENZsK48lneh9MQ0zxLCN68becKdYXP7WujeicT6?=
+ =?us-ascii?Q?cCMeikTWkdZbIXygXHuBhjpD0zPqtndY64Zh8cAW58UDbake3YgNubeYlEck?=
+ =?us-ascii?Q?tEa8w4kAgTwXjO9JiG0KyDDEgZj75FoW8BnNVt+sD/MXDjzckFCDJKARq838?=
+ =?us-ascii?Q?g/2UchZYcXDjsIquYVrGs6Ltb806OM3i+PwuEUsDPW3MVQ=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR21MB1481.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(366007)(376005)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?M03tj7pdGaAxEmh5w7iManmWyh0GtCdI2f9bo9DYhXzB+IvbP3ikbJB7Bsmz?=
+ =?us-ascii?Q?otVHTqE5jZCAiTjLM0j4S7WDTV//Hs6mmzMNMn45e7FHraOfTzzi6wLNSjCO?=
+ =?us-ascii?Q?VvNW6SyKM4dNG3h+qQfYpoZ6FHT2B10yZV6yZfFjtRT/46MEz2nfqLt0Gbkn?=
+ =?us-ascii?Q?wgzgIUUbdbgXiyXFepFG9kNSbTAIbWZphZ76BmlxNUR1g2j1ThZKEnKDN3to?=
+ =?us-ascii?Q?/0s/OPzN+JMRnF8sG7LNUweukHvWmxhFqKRYFs+frJofS+pcNGVAJOTo+xWK?=
+ =?us-ascii?Q?/hKa9ggFQzNWBUH9N1Ng6IEEPBXWhvAQHfPzMVTRgBEUgl1HloYtErnfw4YS?=
+ =?us-ascii?Q?+n9NpDddHAdlPuwRhJq4/NA2t/CWlB8GrelfofavdO5SDhWk9CVfSHuNb5S3?=
+ =?us-ascii?Q?ZWCP2vzrK70cV6FS8X0VQNrSqzSXzUxgvze/Z26dhYLDnuyM2UykTJGzKwnZ?=
+ =?us-ascii?Q?1NCDRqNCBRmja3uIC7y7igkiEtxXdE+3e/jDGnQs8pIpTm7RkPpGpGOsthOk?=
+ =?us-ascii?Q?eapce6tGkB/Uy+QSoZaEmOx+nvbpiIKi8Q8aykuZD/r71hrKYevKDpgQZj7g?=
+ =?us-ascii?Q?SmPoQyzgkp7JVwDdbVExuev2h5AU1vIUtgGOMbxs4u36wxpIyuUADYXdLXcE?=
+ =?us-ascii?Q?Tj2bgp/awKSVKEDM+8RJJJxxiF6QkfggLcS8nNJ42/OtqAWvpaEnklE78n8P?=
+ =?us-ascii?Q?usLiQtmd2Mzx244FK5H2BkPlJTfc08kNfBMB51MZqzjgD+5xbuCigVTur8ej?=
+ =?us-ascii?Q?5XzGy6qAYL5ergR8O76K3f4XpXJIysnvqXlzUET+XtOArh70HG0X9bGsB6Py?=
+ =?us-ascii?Q?jrvQr6EDAicaxHc2twtQUB3rkUOOXBoNEXJ0O7vrn6B2MW0qqrtQGtbINR+e?=
+ =?us-ascii?Q?GRHSEnQbC8h73z4txmYmcInhqfx9wSu0Ab8QVk7OX6as9aI08uRjOpVIrgZW?=
+ =?us-ascii?Q?aFs9I7RVlLz4SDswL3KRXI8c4o5PMpB7AqmHS5r96IuB79nJ2Zl+WUiggNHE?=
+ =?us-ascii?Q?souQBu/HninMk/v3+cVGqnGqWcIx7rEAOpltvXggWsQzQ/I9kFaHgX/yXq1U?=
+ =?us-ascii?Q?LkpsQEFZec06ma9hPB1W3SvA66IQIr5PVyimdRdgTQ7MyB6WrXq5WLt+6uLc?=
+ =?us-ascii?Q?glN9chw252yogXEb6FrVmSJn1O6E7KL2bHlLrVn31ZaVFKERPla32yjVQp4V?=
+ =?us-ascii?Q?wszB0DiwiNYZtPb/6hVPpn6tBTENCJ+FUVU894ps5xN5+uxQgMKLdX/DYO0t?=
+ =?us-ascii?Q?yuwHdOU3KKlvPR62tkNR/HgyGvjHBmZWu+36CSeyA9cLCW969JMR8WYdC0Vk?=
+ =?us-ascii?Q?4VE2kYQ0PNZkG+E8NB/bjRhQhd65PEbyAqIRRWOh0UauPuETzBvAs9dbX8wN?=
+ =?us-ascii?Q?BEAXFiJBNgShw7CSOsm55NsrdaGtpNR7fo1X0e04+5liGkqBtQTJotVGz7CR?=
+ =?us-ascii?Q?UbT7d6IO/+vfLk48fSx4+/Ph62j6dF1ZQc7tj/X02Y26GS77VILZTmP2M7Ug?=
+ =?us-ascii?Q?8zcSQwA/2vTIQnNAedgZGRK+6p9IRPs+dNydsolMV3BVpS+xWwetBF7Ya/e1?=
+ =?us-ascii?Q?DneT6A8mLIzr2AFSKfBJr+B5YXK0GgqctS66VG3O?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR11MB7869:EE_|DS0PR11MB7335:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9ea1461d-950d-4de5-5394-08dc5fedbd8b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gFVlhZtcfMUKIq4bDkrTax93sVsSguobgm7etrNcYU+zEPLdGsepiQGAq1BIY2aIk7iWGXRYNGNmzwV14Bg7MI1XcKTspPq3peVFy9RXOhV7/IJr/0Hyq79QlumXAXH/cyDnqw6uw1WuehvNR/+4Jbq0/ihu7N7LUBud0ASkvY8KijgNECMmsrG/3pwXbxe0KWixCJaTHDj1eNRM/sWp+gRA+Ms3Yt4fgCKfePXkR9+Jo+bGMjBoMcc6RMw+54o5I+4Poj+MZEz3b55i+DgHf6ofTpt8ohYPp3WuuQMAmwwNFCZJ3PdyadJGEb2k0sBGmbm396NGIcU//+Zzm76SLNPnf1opAijtK0M0Gne/9BPu5iDBu5jnFUqMV7M0fB/Jyr8tDU7JQayG31om64U9LQGjSHjWvy6q9t0OGMdWNrzE7nqrygsDEcKd4CyjsKJrR9i2funmTb3o8kv9WBm4tFAF+IA8sEwuDIT9ITj6Kkl4L1VNckYaCKmbjcRnp6zBhCmLbNVpVW2K6ytLgnudoYKnSSPbzYYmsXA4EajGVIHWFf/amIjXFyLBqdmHEvM9QpsAHmBT27uySTVBnq0NG3x7jVObeaEg6yF8+Cad41rvYZG5WVREKXFNO73rV0aLzSQOt4FQtCiWX/3L9cIHrxdfZC68mgmy2EZMM7Bg8nA=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB7869.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015)(7416005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MmxKYkZlenl3WmZrUDNITlV0QURMQ0d0YThkNE9Td01vU3lYR2JzSnppdzBr?=
- =?utf-8?B?bGRabmYxaXJvYXBsbGV5cTA5ZXNVdlNnd1dsdHhWc2pZQTltSDJpVkk4TFF3?=
- =?utf-8?B?bGtDQnQrN2lHOTE4KzZmdTd0YUVaMmNEL1ZrQTJxdFJ4UnAveFhIakFROXhP?=
- =?utf-8?B?ZXNqazhQbmFKRzM2YXUvWEhGZlJMUzlFV2hwNzlIaVJsRDBlUHlDUEJ6ckI5?=
- =?utf-8?B?K3lPdDhJM0t0Y1ZaWXJTVG8zdjF0elc1YzdqQVpLRkZreUtTQ2lSOGd2RW1Z?=
- =?utf-8?B?MlV3OUxNWkhRTnRnbnVzSmZGRHFnWlBsTHpuMXJCTmw2U3FJNkh3YkR3Zkpr?=
- =?utf-8?B?cGI4ME1aaWU0ZUdnZTQxaklINWRYVStKbGJxWGJJUDExK1gxQ01UQnRFYmJO?=
- =?utf-8?B?dGx2RGcrUFY0dklQR0x1dG9ENHB0ZHdFMjdxci9PT3g4aDhwRWV5NFVCWTky?=
- =?utf-8?B?OXJyVjA3SG1LQitVV2MrUWFjZ1JlVzltVjVwNlZRTnFGY1NkN1JrSHFNZlFv?=
- =?utf-8?B?dURWQnlzR3hBZGp5SXhQRExFODBDSlZUcGhZQ3B6dUJaYTZ4S2h3bDgvY2k0?=
- =?utf-8?B?NTdjN3R6QTlnRFh3MkE4QWxLSjM4NXNlR3lwVUloRER1TW40QnJ1Nm96S3V2?=
- =?utf-8?B?VlNzREhwRVkzSjgzQ0VNUmg0VzdmQmxscGlYNlJYdXd2ZkF4bkdGdHU5eXpJ?=
- =?utf-8?B?eldQa1RwZ1BxdWxGeHNqVStrMnIrRGI3ODB6VHhEVTI2ekdZSE1LWVZRQmNH?=
- =?utf-8?B?cUltL0RVN3pRK2UrUDRTM0ExbHhTZTJMWEZmMFM1YzNuNmlwdkhNM2Z2bjJo?=
- =?utf-8?B?V0ZkQzRQS3JIaVpOUExRUU9FY0FSUXN4MThkZjJ0WXU0R2FxY2gvU3lIdDMy?=
- =?utf-8?B?WUNCaUVTR2NRVVpNcmdaVGwxZWp4VDhOL1VBNGlSd0NYa2hxVUJ0ZjZYTUpH?=
- =?utf-8?B?ektUREphclRTbkZNcnRNRzVFeGM2RnR6eGcvU0dHQUY3UFR5UHNTbUpSd01P?=
- =?utf-8?B?S1phNVJGeXVOb25jL1pxK1F6anYzSG9Ieit6WVZNYkI0QjQ3eHNHUnZDVThx?=
- =?utf-8?B?VWZJeWowN29BRGZKOVh4cjVMT3VZRitDQ1ZGQldqSmJUWkNnL3F1VUlla3ZX?=
- =?utf-8?B?VzVoa1hHNHVkbDREMTAwQW1lT2ZXbHhoSFp3KzJvNFJoMnBjcUxpaVNCSjRk?=
- =?utf-8?B?U2RpczFkZE52R0E2OHNJWDZPblpIemJpbnExYWJTbXZveFNHS2J4SEZuS1RU?=
- =?utf-8?B?ZUxOUXc5cFlDcDVOWjM1V212eldDRXNMM3N1NWNCdlQraHRROGhwdVdXMEJO?=
- =?utf-8?B?NUpXRFFRYjY0ZmM1Mk1GY3FqVjRLYjgwNmlpVUEwUko3b0srN0pXT3QzTzk4?=
- =?utf-8?B?a0ZQZ3NHNWRSWlVRYnFQVHJtWDVNS3FsNWV6YS96MGlJVTZ6TDBXVjUwSlB4?=
- =?utf-8?B?Qzc5dGNCV2QvUjFFcWRtRGN2R1VkY01hZGNId0RlUnNrTW45VWE3dHBzU2RL?=
- =?utf-8?B?elR6MDZidG81WTVlT1VHTDVqQnoyM0dDeDhPOCtXMGE3MDY5U0dnZWdZZCtp?=
- =?utf-8?B?WEdyR0ZDU3EwYmlNY3BGWVk5Y3VhYXk3RENIc2xUTWhjc3E2aGV3WkJtR1Vy?=
- =?utf-8?B?YVdLa3FoTzVXZ2NWbjU0N25iNGNxVjY3aDVoL3d6MWx1d1M2cjJYaXdycFlP?=
- =?utf-8?B?NGlJcE5RdHhzbUI3bHYreTJkWTNMQUtFWEVLR3B0SmFHRy9VUEJPR1h6R0Np?=
- =?utf-8?B?NUYwdm90ZHUwYVlwR055Z2hFaVExVWRLTjUyU0lIdkJhcmt2QzBhcENYUnVy?=
- =?utf-8?B?K3FoOUUvQVV1TnppYXVqQVc1YnFUdHU3MDl2UEhhM1dhZnE2U2I0OGhxTGpt?=
- =?utf-8?B?NWNGWkdSZk1Db09IeXJpR2QvaDBqbmlYU3RTOUYxL2pmaDJ6NzJhamtBenNw?=
- =?utf-8?B?dDhRYVZ2UStmYWNyYStnZmNsK05TZGFuUUpvMmZJUDFDaXcxZFB1ZEZBNDJU?=
- =?utf-8?B?dk02VzFlMlp0UDIvQW1weUU0a3k0LzJnVHMzVHM0ZkNEZGZpaFpUVWw5TlRU?=
- =?utf-8?B?aWw2K3E0UWNwZDJKbHJvb093L3hyVWhpa2UyV2VYaUkySHJzcHBONXBXVjlM?=
- =?utf-8?B?eElJeUFOd3pXc2lDanRDQmxQRW4xcWJTMFlSTUI0eEo2aFFGZTNWU0tmd3F4?=
- =?utf-8?B?UWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9ea1461d-950d-4de5-5394-08dc5fedbd8b
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB7869.namprd11.prod.outlook.com
+X-OriginatorOrg: microsoft.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2024 21:23:07.3412
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR21MB1481.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bf7fe0b2-faa8-4e75-14eb-08dc5fee983f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Apr 2024 21:29:14.0375
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UXvVr6PECGyyqZ0vXfk1tYNWKLaqedAyi1fb/76hWVpOF+5yXh3Hnr5Iosu+deSIaoK5ikiTrsGNkPBi2/ruAlrA6ED2SdVwiSKwEs4OlNE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7335
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: DOEQfPSDNpYOAKTyJq4oNucDjl0HSrmPsK4vwCE2GKVjSsjEw0Xovl7ebj9HEnTzOOslrSGBGnKVYN6DIbOwRw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR21MB3864
 
-On 4/11/2024 6:47 PM, Jakub Kicinski wrote:
-> On Thu, 11 Apr 2024 15:46:45 -0700 Nambiar, Amritha wrote:
->> On 4/9/2024 4:21 PM, Jakub Kicinski wrote:
->>> On Fri, 05 Apr 2024 13:09:28 -0700 Amritha Nambiar wrote:
->>>> $ ./cli.py --spec netdev.yaml --do queue-set  --json='{"ifindex": 12, "id": 0, "type": 0, "napi-id": 595}'
->>>> {'id': 0, 'ifindex': 12, 'napi-id': 595, 'type': 'rx'}
->>>
->>> NAPI ID is not stable. What happens if you set the ID, bring the
->>> device down and up again? I think we need to make NAPI IDs stable.
->>
->> I tried this (device down/up and check NAPIs) on both bnxt and intel/ice.
->> On bnxt: New NAPI IDs are created sequentially once the device is up
->> after turning down.
->> On ice: The NAPI IDs are stable and remains the same once the device is
->> up after turning down.
->>
->> In case of ice, device down/up executes napi_disable/napi_enable. The
->> NAPI IDs are not lost as netif_napi_del is not called at IFF_DOWN. On
->> IFF_DOWN, the IRQs associations with the OS are freed, but the resources
->> allocated for the vectors and hence the NAPIs for the vectors persists
->> (unless unload/reconfig).
-> 
-> SG! So let's just make sure we cover that in tests.
-> 
->>> What happens if you change the channel count? Do we lose the config?
->>> We try never to lose explicit user config. I think for simplicity
->>> we should store the config in the core / common code.
->>
->> Yes, we lose the config in case of re-configuring channels. The reconfig
->> path involves freeing the vectors and reallocating based on the new
->> channel config, so, for the NAPIs associated with the vectors,
->> netif_napi_del and netif_napi_add executes creating new NAPI IDs
->> sequentially.
->>
->> Wouldn't losing the explicit user config make sense in this case? By
->> changing the channel count, the user has updated the queue layout, the
->> queue<>vector mappings etc., so I think, the previous configs from set
->> queue<>NAPI should be overwritten with the new config from set-channel.
-> 
-> We do prevent indirection table from being reset on channel count
-> change. I think same logic applies here..
-> 
 
-Okay. I tried this on bnxt (this may be outside scope and secondary, but 
-hoping all the additional information helps).
-It looks like bnxt differentiates if the indirection table was based on 
-driver defaults vs user configuration. If the indirection table was from 
-driver defaults, then changing channel count to fewer queues is allowed. 
-If it was based on explicit user configuration, changing channel count 
-to fewer queues is not allowed as the indirection table might then point 
-to inactive queues. So, the rss user configuration is preserved by 
-blocking new channel configurations that do not align.
-So applying the same logic here would mean, changing the channel count 
-to queues < 'default queue for the last user configured NAPI ID' would 
-have to be prevented. This becomes difficult to track unless pre-set 
-default queue <> NAPI configs are maintained.
 
->>> How does the user know whether queue <> NAPI association is based
->>> on driver defaults or explicit configuration?
->>
->> I am not sure of this. ethtool shows pre-set defaults and current
->> settings, but in this case, it is tricky :(
-> 
-> Can you say more about the use case for moving the queues around?
-> If you just want to have fewer NAPI vectors and more queues, but
-> don't care about exact mapping - we could probably come up with
-> a simpler API, no? Are the queues stack queues or also AF_XDP?
-> 
+> -----Original Message-----
+> From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> Sent: Monday, April 15, 2024 5:50 AM
+> To: linux-kernel@vger.kernel.org; linux-hyperv@vger.kernel.org; linux-
+> rdma@vger.kernel.org; netdev@vger.kernel.org
+> Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>; Eric Dumazet
+> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
+> <pabeni@redhat.com>; Ajay Sharma <sharmaajay@microsoft.com>; Leon
+> Romanovsky <leon@kernel.org>; Thomas Gleixner <tglx@linutronix.de>;
+> Sebastian Andrzej Siewior <bigeasy@linutronix.de>; KY Srinivasan
+> <kys@microsoft.com>; Haiyang Zhang <haiyangz@microsoft.com>; Wei Liu
+> <wei.liu@kernel.org>; Dexuan Cui <decui@microsoft.com>; Long Li
+> <longli@microsoft.com>; Michael Kelley <mikelley@microsoft.com>; Shradha
+> Gupta <shradhagupta@microsoft.com>; Yury Norov <yury.norov@gmail.com>;
+> Konstantin Taranov <kotaranov@microsoft.com>; Souradeep Chakrabarti
+> <schakrabarti@linux.microsoft.com>
+> Subject: [PATCH net-next] net: mana: Add new device attributes for mana
+>=20
+> Add new device attributes to view multiport, msix, and adapter MTU
+> setting for MANA device.
+>=20
+> Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> ---
+>  .../net/ethernet/microsoft/mana/gdma_main.c   | 74 +++++++++++++++++++
+>  include/net/mana/gdma.h                       |  9 +++
+>  2 files changed, 83 insertions(+)
+>=20
+> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> index 1332db9a08eb..6674a02cff06 100644
+> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> @@ -1471,6 +1471,65 @@ static bool mana_is_pf(unsigned short dev_id)
+>  	return dev_id =3D=3D MANA_PF_DEVICE_ID;
+>  }
+>=20
+> +static ssize_t mana_attr_show(struct device *dev,
+> +			      struct device_attribute *attr, char *buf)
+> +{
+> +	struct pci_dev *pdev =3D to_pci_dev(dev);
+> +	struct gdma_context *gc =3D pci_get_drvdata(pdev);
+> +	struct mana_context *ac =3D gc->mana.driver_data;
+> +
+> +	if (strcmp(attr->attr.name, "mport") =3D=3D 0)
+> +		return snprintf(buf, PAGE_SIZE, "%d\n", ac->num_ports);
+> +	else if (strcmp(attr->attr.name, "adapter_mtu") =3D=3D 0)
+> +		return snprintf(buf, PAGE_SIZE, "%d\n", gc->adapter_mtu);
+> +	else if (strcmp(attr->attr.name, "msix") =3D=3D 0)
+> +		return snprintf(buf, PAGE_SIZE, "%d\n", gc->max_num_msix);
+> +	else
+> +		return -EINVAL;
+> +}
+> +
+> +static int mana_gd_setup_sysfs(struct pci_dev *pdev)
+> +{
+> +	struct gdma_context *gc =3D pci_get_drvdata(pdev);
+> +	int retval =3D 0;
+> +
+> +	gc->mana_attributes.mana_mport_attr.attr.name =3D "mport";
+> +	gc->mana_attributes.mana_mport_attr.attr.mode =3D 0444;
+> +	gc->mana_attributes.mana_mport_attr.show =3D mana_attr_show;
+> +	sysfs_attr_init(&gc->mana_attributes.mana_mport_attr);
+> +	retval =3D device_create_file(&pdev->dev,
+> +				    &gc->mana_attributes.mana_mport_attr);
+> +	if (retval < 0)
+> +		return retval;
+> +
+> +	gc->mana_attributes.mana_adapter_mtu_attr.attr.name =3D
+> "adapter_mtu";
+> +	gc->mana_attributes.mana_adapter_mtu_attr.attr.mode =3D 0444;
+> +	gc->mana_attributes.mana_adapter_mtu_attr.show =3D mana_attr_show;
+> +	sysfs_attr_init(&gc->mana_attributes.mana_adapter_mtu_attr);
+> +	retval =3D device_create_file(&pdev->dev,
+> +				    &gc->mana_attributes.mana_adapter_mtu_attr);
+> +	if (retval < 0)
+> +		goto mtu_attr_error;
+> +
+> +	gc->mana_attributes.mana_msix_attr.attr.name =3D "msix";
+> +	gc->mana_attributes.mana_msix_attr.attr.mode =3D 0444;
+> +	gc->mana_attributes.mana_msix_attr.show =3D mana_attr_show;
+> +	sysfs_attr_init(&gc->mana_attributes.mana_msix_attr);
+> +	retval =3D device_create_file(&pdev->dev,
+> +				    &gc->mana_attributes.mana_msix_attr);
+> +	if (retval < 0)
+> +		goto msix_attr_error;
+> +
+> +	return retval;
+> +msix_attr_error:
+> +	device_remove_file(&pdev->dev,
+> +			   &gc->mana_attributes.mana_adapter_mtu_attr);
+> +mtu_attr_error:
+> +	device_remove_file(&pdev->dev,
+> +			   &gc->mana_attributes.mana_mport_attr);
+> +	return retval;
+> +}
+> +
+>  static int mana_gd_probe(struct pci_dev *pdev, const struct
+> pci_device_id *ent)
+>  {
+>  	struct gdma_context *gc;
+> @@ -1519,6 +1578,10 @@ static int mana_gd_probe(struct pci_dev *pdev,
+> const struct pci_device_id *ent)
+>  	gc->bar0_va =3D bar0_va;
+>  	gc->dev =3D &pdev->dev;
+>=20
+> +	err =3D mana_gd_setup_sysfs(pdev);
+> +	if (err < 0)
+> +		goto free_gc;
+> +
 
-I'll try to explain. The goal is to have fewer NAPI pollers. The number 
-of NAPI pollers is the same as the number of active NAPIs (kthread per 
-NAPI). It is possible to limit the number of pollers by mapping 
-multiples queues on an interrupt vector (fewer vectors, more queues) 
-implicitly in the driver. But, we are looking for a more granular 
-approach, in our case, the queues are grouped into 
-queue-groups/rss-contexts. We would like to reduce the number of pollers 
-within certain selected queue-groups/rss-contexts (not all the 
-queue-groups), hence need the configurability.
-This would benefit our hyper-threading use case, where a single physical 
-core can be used for both network and application processing. If the 
-NAPI to queue association is known, we can pin the NAPI thread to the 
-logical core and the application thread to the corresponding sibling 
-logical core.
+Regarding examples, vmbus_drv.c has a number of sysfs variables:
 
-The queues are stack queues, not AF_XDP.
+static ssize_t in_read_bytes_avail_show(struct device *dev,
+                                        struct device_attribute *dev_attr,
+                                        char *buf)
+{
+        struct hv_device *hv_dev =3D device_to_hv_device(dev);
+        struct hv_ring_buffer_debug_info inbound;
+        int ret;
 
->>> I think I mentioned
->>> this in earlier discussions but the configuration may need to be
->>> detached from the existing objects (for one thing they may not exist
->>> at all when the device is down).
->>
->> Yes, we did have that discussion about detaching queues from NAPI. But,
->> I am not sure how to accomplish that. Any thoughts on what other
->> possible object can be used for the configuration?
-> 
-> We could stick to the queue as the object perhaps. The "target NAPI"
-> would just be part of the config passed to the alloc/start callbacks.
-> 
+        if (!hv_dev->channel)
+                return -ENODEV;
 
-Okay.
+        ret =3D hv_ringbuffer_get_debuginfo(&hv_dev->channel->inbound, &inb=
+ound);
+        if (ret < 0)
+                return ret;
 
->> WRT ice, when the device is down, the queues are listed and exists as
->> inactive queues, NAPI IDs exists, IRQs associations with the OS are freed.
->>
->>> Last but not least your driver patch implements the start/stop steps
->>> of the "queue API" I think we should pull that out into the core.
->>
->> Agree, it would be good to have these steps in the core, but I think the
->> challenge is that we would still end up with a lot of code in the driver
->> as well, due to all the hardware-centric bits in it.
-> 
-> For one feature I think adding code in the core is not beneficial.
-> But we have multiple adjacent needs, so when we add up your work,
-> zero copy, page pool config, maybe queue alloc.. hopefully the code
-> in the core will be net positive.
-> 
->>> Also the tests now exist - take a look at the sample one in
->>> tools/testing/selftests/drivers/net/stats.py
->>> Would be great to have all future netdev family extensions accompanied
->>> by tests which can run both on real HW and netdevsim.
->>
->> Okay, I will write tests for the new extensions here.
+        return sprintf(buf, "%d\n", inbound.bytes_avail_toread);
+}
+static DEVICE_ATTR_RO(in_read_bytes_avail);
+
+Thanks,
+- Haiyang
 
