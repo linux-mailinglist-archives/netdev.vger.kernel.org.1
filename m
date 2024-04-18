@@ -1,320 +1,166 @@
-Return-Path: <netdev+bounces-89117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B100E8A9793
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 12:38:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8761B8A97B2
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 12:47:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27CF61F219D8
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 10:38:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B875A1C20D16
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 10:47:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F05160793;
-	Thu, 18 Apr 2024 10:36:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E2B215D5B7;
+	Thu, 18 Apr 2024 10:47:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DttbU/yU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TWAqzrKC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58A8915FD19
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 10:36:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C5EF15B96D;
+	Thu, 18 Apr 2024 10:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713436583; cv=none; b=uQmIbcJdGHW0XtVQmS1OqjVoKYPdynwTtk613LtRQqEgcPQuTvm+bwU5sVd6NZAyi4x7C+H/k4VDtqR/DUjXC/I3zrRzrmBQhHACvsoIohNl7SvVuDUhvVMvfRAdCQsXNWmoCFeAIiKfCb2yUiV7vhFnaBLhfKG+NQikl44dru8=
+	t=1713437265; cv=none; b=SFnvTZSDUE+5+y7PWD5wKfIX6RXTY4nXPyOJfu5oqwmEVlgpdGXIFDvBuiu7907jAlBpoa5perD53G/x/i6aAr+D2wJcT/+2EhGpEVSYB7zKIUK870maM3JAJCu6t6/f1IpY8/+pT5+Uw31zK4lWGtbJU8oxxRj1sbRuNr/YnVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713436583; c=relaxed/simple;
-	bh=JBg88H9rszxtozTHN3KCQmS5T63NVkvx85CNlw+Bx34=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=u7qlZ3jOOQqgWf+7krPXu3sZuP/nLcSJ+RedvCvTbDM8eXXory8rrKVjaD3CCQMDYiTXTkhfszB3Jo1ZsNcwUHkwKgkU0GNP0dh2w+b4/nx+h1YWyeenN6mSSxmaDaDI8+r2D5y9NQXuB1P+1DmjHS0IR+HJOJotWcFPKWc/+0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DttbU/yU; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-56e5174ffc2so7840a12.1
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 03:36:21 -0700 (PDT)
+	s=arc-20240116; t=1713437265; c=relaxed/simple;
+	bh=fmuYLUML59xhwPIg8hOiLimfCuFW7JEI89Br5g+pv4M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KB+QXiRYb9leLk+z3RqVss7Zo5Wow/SEHMoM5jXIVCCV674ebgh88AIpUzht/hHPySIYiqXW3tEdiTfx1RubY92r7rCnjlUIvRt+ejxV0pBvGmjhOmXwtMrRA5QADkfVV7WRfmKZZo2sz+mLxLDvkQ3k5bJPA2YVjLnS9824I9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TWAqzrKC; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-418dc00a31dso5815515e9.0;
+        Thu, 18 Apr 2024 03:47:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713436579; x=1714041379; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wR48YcL7pubFu/dtux+W0UvZV+U7NVSFm4pGP3PmoPI=;
-        b=DttbU/yUgknXQZ6H/M68fMd4D44+57g2fjnvfjNHaPA4K3urOhvs/F7siPOwzAhOfj
-         tu0aUrAg33NzWXH3cRQgo8G2ujLSV+gjRN7/03oBMOJkr2+jIPzU4Z/O8WpohQpgTNta
-         ZrAWWu/wUClh2BYNPHstyvCoPFv8k9Jo8AHefXfbe9UymX/msNTNQ4BrAd56sYzOtZgW
-         tQXmZRtJZDDN+3/LBRd9etAZzrusfLPna76UKFYFMsCmXA/LQ6fKlPg2sNQVoo77Fqf7
-         RBSw1wUeBj4mqeRxWuJTTo22Oi9QQVAylm9KyJ8dcTrHuUQcGZSZdpW2zPU7i+574+1l
-         Hs5g==
+        d=gmail.com; s=20230601; t=1713437261; x=1714042061; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wODG72EXEIGpgfZQLFr8h5BEPPdCsI8cQeQT73zhGRk=;
+        b=TWAqzrKCMSKChc15R3i787MQ6uX3WBPxFKkQdlAqvMrcHX6Kz5H9BH8o49NfTEQYsz
+         X/tTDvoDzXDL8+wS8FK4NUPJaN9yAgdCFcnfiIT0zpGVnjxCoz5BPglY2QWh0ov3Bo67
+         mZG5SY8cHNyWAeJbhSDgRHfr0EyjxT3jK03WtTK/WH4qGqhdVpSNeGmTxghyvDaAgYFR
+         7sIyF6nVlFZDQpThCh/nXPY5Xa7Qv169I12tkqoY0y7Mc7LTUKjqJ1KrOaMWsu/vEZPf
+         2aAc43gl54XxXNGsw6A+5/mNZ2IVzSCNMTTrFh0TBg84BiSaMJhbiU9Uxor8UqS6Kkpj
+         d6Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713436580; x=1714041380;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wR48YcL7pubFu/dtux+W0UvZV+U7NVSFm4pGP3PmoPI=;
-        b=KSaJJ67s7CQfbbiJ3Vr0PBHEk+u9W6TFUzkufLvgL39zdicXE7hPmY05gFNV5b+7gB
-         NWyQuenuMUgPnAdbp/66S7gDMEyh/J4yF30aNnid03f7LIQbkXhhJukyPg3XYeJsrVwc
-         8bPzYV/inuDGD3kByX5wfyXpwfoDPGGfSqnvToSAnb9BVu9nhWMWCnQ+mFX2YBEqr19w
-         bIFLcNy2xkRHavy6/MXO5uE3pi4AwqV2ctSss6fuapU15ZqNbQEDKU1/eAOADfMvu/Qt
-         wiluNt9D08TQVgMSjL9HjxvzBohGVdQAOZS2o3cKIgpTGyuhLvEyZRPk2H5RRooGsje9
-         ER2w==
-X-Forwarded-Encrypted: i=1; AJvYcCW5WSoQLC2/RTvUDs3X5JIgTimToPWSFu98dKxn+H4ScXIW2z8mnMyYe9SCh0tUk1esUGwHxy1z1IQvAG9Apa5CZOM6Odv/
-X-Gm-Message-State: AOJu0YyMEUt28FJKjAXIXRuVTzjM4tcNedvnb5EepW7tlbDhtJQkyLRN
-	M03teXf57IR/8pRcGPvJfZ0Lt0u633ZUmAv+mnbAso+CaA9mUz0Wyi2TrBv1NnDHtv3U6PrAg9R
-	tkyenchDkr57y7IYzxMIV0yTI4lQSAVuk21+E
-X-Google-Smtp-Source: AGHT+IHRDI/KSAykxu4N+g9RbFh2tQRwAlRkJ5WP1ZWlbW0kOsOhC+JRyY5eH0ayxsXAz079cteosKOOmYT8uonOvlk=
-X-Received: by 2002:aa7:c987:0:b0:570:49e3:60a8 with SMTP id
- c7-20020aa7c987000000b0057049e360a8mr98999edt.7.1713436579340; Thu, 18 Apr
- 2024 03:36:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713437261; x=1714042061;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wODG72EXEIGpgfZQLFr8h5BEPPdCsI8cQeQT73zhGRk=;
+        b=PAuW+ID9VNfqsvL2tLY+kRouBgF5x/DXKYvMP/iiVr2vFjAsWG1DXQorCX9boyTTKS
+         1v4tFd3ovoRSIdCAu7eLN6GmUO9iqJejxYsJGRTyadVPtRIIUxEQO4d1x4uOYbIo+Ajk
+         nDPvP6ya3FP0dg24BywmOykwXp+Qua1uJtRlZF6Z0UDWoGcLTFg8XLsQ7ukNJtb+eGv+
+         fYiYmcKZVJ+LD2kMOIpDAAjJsktw/0A3jW9uttERrpYx8EYNktOq+r47fxs9IL5M6GAm
+         gO0nuhjwQ30ItFdQztgsu2OkRotikIFjPJKy/j8gQT+VvxIVdZOWaDLWwf2HG62dXAcS
+         +0hg==
+X-Forwarded-Encrypted: i=1; AJvYcCWI2f+sVXUzsKxAUbBJg3eO5I4W/aifZQJfsvubJUgMeStZuIWj8ASyT8fAxWe/zzuPWtcU3NUygjAhr216qswYaiSqV6xSlkMwTVcxXLnu
+X-Gm-Message-State: AOJu0YwNkYr45xz4X1/eQ4lchahjfWYAdbZuULbvCH8v1e7XB3hXREc5
+	LMkcwfbaPJNDoYKqhI2a7SCjKwyyBLwTBaRLQuJJdqScWoyYilk9nEXydFjc
+X-Google-Smtp-Source: AGHT+IH9jQCjBbh5pn2kxVtKHc0ETLBmJ1l0DOscj9VubHKyeDjJK4Ty4H1QcLgztK4Hsz8Sax33Dg==
+X-Received: by 2002:a05:600c:470f:b0:418:6eb6:5cd5 with SMTP id v15-20020a05600c470f00b004186eb65cd5mr1626809wmo.32.1713437261189;
+        Thu, 18 Apr 2024 03:47:41 -0700 (PDT)
+Received: from imac.fritz.box ([2a02:8010:60a0:0:702a:9979:dc91:f8d0])
+        by smtp.gmail.com with ESMTPSA id f11-20020a05600c4e8b00b00417ee886977sm6135807wmq.4.2024.04.18.03.47.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 03:47:40 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v4 0/4] netlink: Add nftables spec w/ multi messages
+Date: Thu, 18 Apr 2024 11:47:33 +0100
+Message-ID: <20240418104737.77914-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240417165756.2531620-1-edumazet@google.com> <20240417165756.2531620-2-edumazet@google.com>
- <e332d0b8fa7b116003dfd8b47f021901e66b36b9.camel@redhat.com>
- <CANn89i+-cjHze1yiFZKr-cCGG7Fh4gb9NZnS1u4u_77bG2Mf6Q@mail.gmail.com>
- <CANn89iLSZFOYfZUSK57LLe8yw4wNt8vHt=aD79a1MbZBhfeRbw@mail.gmail.com>
- <7d1aa7d5a134ad4f4bca215ec6a075190cea03f2.camel@redhat.com>
- <CANn89iJg7AcxMLbvwnghN85L6ASuoKsSSSHdgaQzBU48G1TRiw@mail.gmail.com> <CANn89i+BKDL-BHqHyev9PAzbHqp8xhkC=4kZTB7vydcBVkc0Nw@mail.gmail.com>
-In-Reply-To: <CANn89i+BKDL-BHqHyev9PAzbHqp8xhkC=4kZTB7vydcBVkc0Nw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 18 Apr 2024 12:36:08 +0200
-Message-ID: <CANn89iK3kCqrgpyEiXHK5Y4MnHxE=CEdxgyE5HHAsasa-Fefbg@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] tcp: conditionally call ip_icmp_error() from tcp_v4_err()
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: David Ahern <dsahern@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	Neal Cardwell <ncardwell@google.com>, Dragos Tatulea <dtatulea@nvidia.com>, eric.dumazet@gmail.com, 
-	=?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Willem de Bruijn <willemb@google.com>, Shachar Kagan <skagan@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Apr 18, 2024 at 12:22=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Thu, Apr 18, 2024 at 12:15=E2=80=AFPM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> >
-> > On Thu, Apr 18, 2024 at 11:58=E2=80=AFAM Paolo Abeni <pabeni@redhat.com=
-> wrote:
-> > >
-> > > On Thu, 2024-04-18 at 11:26 +0200, Eric Dumazet wrote:
-> > > > On Thu, Apr 18, 2024 at 10:03=E2=80=AFAM Eric Dumazet <edumazet@goo=
-gle.com> wrote:
-> > > > >
-> > > > > On Thu, Apr 18, 2024 at 10:02=E2=80=AFAM Paolo Abeni <pabeni@redh=
-at.com> wrote:
-> > > > > >
-> > > > > > Hi,
-> > > > > >
-> > > > > > On Wed, 2024-04-17 at 16:57 +0000, Eric Dumazet wrote:
-> > > > > > > Blamed commit claimed in its changelog that the new functiona=
-lity
-> > > > > > > was guarded by IP_RECVERR/IPV6_RECVERR :
-> > > > > > >
-> > > > > > >     Note that applications need to set IP_RECVERR/IPV6_RECVER=
-R option to
-> > > > > > >     enable this feature, and that the error message is only q=
-ueued
-> > > > > > >     while in SYN_SNT state.
-> > > > > > >
-> > > > > > > This was true only for IPv6, because ipv6_icmp_error() has
-> > > > > > > the following check:
-> > > > > > >
-> > > > > > > if (!inet6_test_bit(RECVERR6, sk))
-> > > > > > >     return;
-> > > > > > >
-> > > > > > > Other callers check IP_RECVERR by themselves, it is unclear
-> > > > > > > if we could factorize these checks in ip_icmp_error()
-> > > > > > >
-> > > > > > > For stable backports, I chose to add the missing check in tcp=
-_v4_err()
-> > > > > > >
-> > > > > > > We think this missing check was the root cause for commit
-> > > > > > > 0a8de364ff7a ("tcp: no longer abort SYN_SENT when receiving
-> > > > > > > some ICMP") breakage, leading to a revert.
-> > > > > > >
-> > > > > > > Many thanks to Dragos Tatulea for conducting the investigatio=
-ns.
-> > > > > > >
-> > > > > > > As Jakub said :
-> > > > > > >
-> > > > > > >     The suspicion is that SSH sees the ICMP report on the soc=
-ket error queue
-> > > > > > >     and tries to connect() again, but due to the patch the so=
-cket isn't
-> > > > > > >     disconnected, so it gets EALREADY, and throws its hands u=
-p...
-> > > > > > >
-> > > > > > >     The error bubbles up to Vagrant which also becomes unhapp=
-y.
-> > > > > > >
-> > > > > > >     Can we skip the call to ip_icmp_error() for non-fatal ICM=
-P errors?
-> > > > > > >
-> > > > > > > Fixes: 45af29ca761c ("tcp: allow traceroute -Mtcp for unpriv =
-users")
-> > > > > > > Signed-off-by: Eric Dumazet <edumazet@google.com>
-> > > > > > > Tested-by: Dragos Tatulea <dtatulea@nvidia.com>
-> > > > > > > Cc: Dragos Tatulea <dtatulea@nvidia.com>
-> > > > > > > Cc: Maciej =C5=BBenczykowski <maze@google.com>
-> > > > > > > Cc: Willem de Bruijn <willemb@google.com>
-> > > > > > > Cc: Neal Cardwell <ncardwell@google.com>
-> > > > > > > Cc: Shachar Kagan <skagan@nvidia.com>
-> > > > > > > ---
-> > > > > > >  net/ipv4/tcp_ipv4.c | 3 ++-
-> > > > > > >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > > > > > >
-> > > > > > > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> > > > > > > index 88c83ac4212957f19efad0f967952d2502bdbc7f..a717db99972d9=
-77a64178d7ed1109325d64a6d51 100644
-> > > > > > > --- a/net/ipv4/tcp_ipv4.c
-> > > > > > > +++ b/net/ipv4/tcp_ipv4.c
-> > > > > > > @@ -602,7 +602,8 @@ int tcp_v4_err(struct sk_buff *skb, u32 i=
-nfo)
-> > > > > > >               if (fastopen && !fastopen->sk)
-> > > > > > >                       break;
-> > > > > > >
-> > > > > > > -             ip_icmp_error(sk, skb, err, th->dest, info, (u8=
- *)th);
-> > > > > > > +             if (inet_test_bit(RECVERR, sk))
-> > > > > > > +                     ip_icmp_error(sk, skb, err, th->dest, i=
-nfo, (u8 *)th);
-> > > > > > >
-> > > > > > >               if (!sock_owned_by_user(sk)) {
-> > > > > > >                       WRITE_ONCE(sk->sk_err, err);
-> > > > > >
-> > > > > > We have a fcnal-test.sh self-test failure:
-> > > > > >
-> > > > > > https://netdev.bots.linux.dev/contest.html?branch=3Dnet-next-20=
-24-04-18--06-00&test=3Dfcnal-test-sh
-> > > > > >
-> > > > > > that I suspect are related to this patch (or the following one)=
-: the
-> > > > > > test case creates a TCP connection on loopback and this is the =
-only
-> > > > > > patchseries touching the related code, included in the relevant=
- patch
-> > > > > > burst.
-> > > > > >
-> > > > > > Could you please have a look?
-> > > > >
-> > > > > Sure, thanks Paolo !
-> > > >
-> > > > First patch is fine, I see no failure from fcnal-test.sh (as I woul=
-d expect)
-> > > >
-> > > > For the second one, I am not familiar enough with this very slow te=
-st
-> > > > suite (all these "sleep 1" ... oh well)
-> > >
-> > > @David, some of them could be replaced with loopy_wait calls
-> > >
-> > > > I guess "failing tests" depended on TCP connect() to immediately ab=
-ort
-> > > > on one ICMP message,
-> > > > depending on old kernel behavior.
-> > > >
-> > > > I do not know how to launch a subset of the tests, and trace these.
-> > > >
-> > > > "./fcnal-test.sh -t ipv4_tcp" alone takes more than 9 minutes [1] i=
-n a
-> > > > VM running a non debug kernel :/
-> > > >
-> > > > David, do you have an idea how to proceed ?
-> > >
-> > > One very dumb thing I do in that cases is commenting out the other
-> > > tests, something alike (completely untested!):
-> > > ---
-> > > diff --git a/tools/testing/selftests/net/fcnal-test.sh b/tools/testin=
-g/selftests/net/fcnal-test.sh
-> > > index 386ebd829df5..494932aa99b2 100755
-> > > --- a/tools/testing/selftests/net/fcnal-test.sh
-> > > +++ b/tools/testing/selftests/net/fcnal-test.sh
-> > > @@ -1186,6 +1186,7 @@ ipv4_tcp_novrf()
-> > >  {
-> > >         local a
-> > >
-> > > +if false; then
-> > >         #
-> > >         # server tests
-> > >         #
-> > > @@ -1271,6 +1272,7 @@ ipv4_tcp_novrf()
-> > >                 log_test_addr ${a} $? 1 "Device server, unbound clien=
-t, local connection"
-> > >         done
-> > >
-> > > +fi
-> > >         a=3D${NSA_IP}
-> > >         log_start
-> > >         run_cmd nettest -s &
-> > > @@ -1487,12 +1489,14 @@ ipv4_tcp()
-> > >         set_sysctl net.ipv4.tcp_l3mdev_accept=3D0
-> > >         ipv4_tcp_novrf
-> > >         log_subsection "tcp_l3mdev_accept enabled"
-> > > +if false; then
-> > >         set_sysctl net.ipv4.tcp_l3mdev_accept=3D1
-> > >         ipv4_tcp_novrf
-> > >
-> > >         log_subsection "With VRF"
-> > >         setup "yes"
-> > >         ipv4_tcp_vrf
-> > > +fi
-> > >  }
-> >
-> > Thanks Paolo
-> >
-> > I found that the following patch is fixing the issue for me.
-> >
-> > diff --git a/tools/testing/selftests/net/nettest.c
-> > b/tools/testing/selftests/net/nettest.c
-> > index cd8a580974480212b45d86f35293b77f3d033473..ff25e53024ef6d4101f251c=
-8a8a5e936e44e280f
-> > 100644
-> > --- a/tools/testing/selftests/net/nettest.c
-> > +++ b/tools/testing/selftests/net/nettest.c
-> > @@ -1744,6 +1744,7 @@ static int connectsock(void *addr, socklen_t
-> > alen, struct sock_args *args)
-> >         if (args->bind_test_only)
-> >                 goto out;
-> >
-> > +       set_recv_attr(sd, args->version);
-> >         if (connect(sd, addr, alen) < 0) {
-> >                 if (errno !=3D EINPROGRESS) {
-> >                         log_err_errno("Failed to connect to remote host=
-");
->
-> When tracing nettest we now have EHOSTUNREACH
->
-> 3343  setsockopt(3, SOL_SOCKET, SO_REUSEPORT, [1], 4) =3D 0 <0.000210>
-> 3343  setsockopt(3, SOL_SOCKET, SO_BINDTODEVICE, "eth1\0", 5) =3D 0 <0.00=
-0170>
-> 3343  setsockopt(3, SOL_IP, IP_PKTINFO, [1], 4) =3D 0 <0.000161>
-> 3343  setsockopt(3, SOL_IP, IP_RECVERR, [1], 4) =3D 0 <0.000181>
-> 3343  connect(3, {sa_family=3DAF_INET, sin_port=3Dhtons(12345),
-> sin_addr=3Dinet_addr("172.16.2.1")}, 16) =3D -1 EINPROGRESS (Operation no=
-w
-> in progress) <0.000874>
-> 3343  pselect6(1024, NULL, [3], NULL, {tv_sec=3D5, tv_nsec=3D0}, NULL) =
-=3D 1
-> (out [3], left {tv_sec=3D1, tv_nsec=3D930762080}) <3.069673>
-> 3343  getsockopt(3, SOL_SOCKET, SO_ERROR, [EHOSTUNREACH], [4]) =3D 0 <0.0=
-00270>
->
-> As mentioned in net/ipv4/icmp.c :
->  RFC 1122: 3.2.2.1 States that NET_UNREACH, HOST_UNREACH and SR_FAILED
-> MUST be considered 'transient errs'.
->
-> Maybe another way to fix nettest would be to change wait_for_connect()
-> to pass a non NULL fdset in 4th argument of select()
->
-> select(FD_SETSIZE, NULL, &wfd, NULL /* here */, tv);
+This series adds a ynl spec for nftables and extends ynl with a --multi
+command line option that makes it possible to send transactional batches
+for nftables.
 
-This change in wait_for_connect() does not help.
+This series includes a patch for nfnetlink which adds ACK processing for
+batch begin/end messages. If you'd prefer that to be sent separately to
+nf-next then I can do so, but I included it here so that it gets seen in
+context.
 
-I am guessing set_recv_attr(sd, args->version); is what we need.
+An example of usage is:
 
-I am running all ./fcnal-test.sh tests to make sure everything is green.
+./tools/net/ynl/cli.py \
+ --spec Documentation/netlink/specs/nftables.yaml \
+ --multi batch-begin '{"res-id": 10}' \
+ --multi newtable '{"name": "test", "nfgen-family": 1}' \
+ --multi newchain '{"name": "chain", "table": "test", "nfgen-family": 1}' \
+ --multi batch-end '{"res-id": 10}'
+[None, None, None, None]
+
+It can also be used for bundling get requests:
+
+./tools/net/ynl/cli.py \
+ --spec Documentation/netlink/specs/nftables.yaml \
+ --multi gettable '{"name": "test", "nfgen-family": 1}' \
+ --multi getchain '{"name": "chain", "table": "test", "nfgen-family": 1}' \
+ --output-json
+[{"name": "test", "use": 1, "handle": 1, "flags": [],
+ "nfgen-family": 1, "version": 0, "res-id": 2},
+ {"table": "test", "name": "chain", "handle": 1, "use": 0,
+ "nfgen-family": 1, "version": 0, "res-id": 2}]
+
+There are 2 issues that may be worth resolving:
+
+ - ynl reports errors by raising an NlError exception so only the first
+   error gets reported. This could be changed to add errors to the list
+   of responses so that multiple errors could be reported.
+
+ - If any message does not get a response (e.g. batch-begin w/o patch 2)
+   then ynl waits indefinitely. A recv timeout could be added which
+   would allow ynl to terminate.
+
+v3 -> v4:
+ - fix the underlying extack decoding bug and drop the
+   workaround patch
+
+v2 -> v3:
+ - update the ynl multi code to match the latest return value
+   semantics of ynl
+ - add a ynl patch to handle acks that use req_value
+ - update the nfnetlink patch based on feedback from Pablo
+ - move nfnetlink patch to end of series
+
+v1 -> v2:
+ - add a patch to nfnetlink to process ACKs for batch begin/end
+ - handle multiple responses correctly
+
+Donald Hunter (4):
+  doc/netlink/specs: Add draft nftables spec
+  tools/net/ynl: Fix extack decoding for directional ops
+  tools/net/ynl: Add multi message support to ynl
+  netfilter: nfnetlink: Handle ACK flags for batch messages
+
+ Documentation/netlink/specs/nftables.yaml | 1264 +++++++++++++++++++++
+ net/netfilter/nfnetlink.c                 |    5 +
+ tools/net/ynl/cli.py                      |   25 +-
+ tools/net/ynl/lib/ynl.py                  |   82 +-
+ 4 files changed, 1346 insertions(+), 30 deletions(-)
+ create mode 100644 Documentation/netlink/specs/nftables.yaml
+
+-- 
+2.44.0
+
 
