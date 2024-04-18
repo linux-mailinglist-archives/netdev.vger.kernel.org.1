@@ -1,140 +1,134 @@
-Return-Path: <netdev+bounces-89064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22CCC8A9541
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 10:45:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A3C928A953A
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 10:44:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52CA71C20F2C
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 08:45:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C72381C20D3D
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 08:44:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27BE3158845;
-	Thu, 18 Apr 2024 08:45:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC67615534D;
+	Thu, 18 Apr 2024 08:44:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="U2NF+o7f"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CqDBM1RM"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2042.outbound.protection.outlook.com [40.107.236.42])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436C1156F54
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 08:45:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713429934; cv=fail; b=bpJECwIYFC7RDt8CUIvI2/4yMKEm00Nrn38zIEHpdq+cfQff6BFIVlyOpuzG3GxVs7NBfhx0fuUpOZy3OqBbKGrKGUzOf1uenkdIkADdkI4x8TUTch/ogNXTrAfdZTb6X5w+gu55cHXaO6tfPgfds/pbJJoM2hjdCeLRhGGjB9U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713429934; c=relaxed/simple;
-	bh=Oh8SNC1Zxq79ZIIIJubX0kFxMZx5RV/fPuAEPHIxyBI=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=F747KjY+l4pUUbWwOowOnP5MKEwmF6NSXCxNcppluAU0jcsnCNVmTFw8zxbJepsr7a5yKpzOC4zzm5V7C6qbKF1YPaNXvzcYkSI0cFI0czw4UBw1X3TQoUB4jyTq5ti7DYQV5ODjIO2qKFlvuTV4WSLvnP8cfiN5efn2rEo9HQU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=U2NF+o7f; arc=fail smtp.client-ip=40.107.236.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eBJZBfIN5FAL9bJ4PrQgcsgsbwnR10hG8ZsAqwUcUMQLJc4UvQ2PoTOy1uydTGj7EEAjvPJmeiiJ2PR2506L8rn+MsdKf6/zUe1CNcdNQAQLAa0Jn6ia5QqFgeOafdjdw9sIWgOnDAWE40BZRPxm3PQ3w192eXckTBQPI4WCELxqlooado/Y90UG6yYQ7Nx98knqrsux8EDxpj5ucNTmyfiqR/AyvpCXaeCJvcrabnsia0hLydWo6tGxnIL+VtQDhBlPgW3ZAAanGck4e8mDbhtKJScCHAKMQppmNYc9TZLz0MfHTmUp6FNKm+4W6YSyTWyst0lSLZS1FB0TWMMA8g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Oh8SNC1Zxq79ZIIIJubX0kFxMZx5RV/fPuAEPHIxyBI=;
- b=nu19PVMQzN64DT4qWW0B686T5qrJj4Z3f9bAoqNd4Kg8pqwq6Oj3StnI4jM+GzfoTs1o/mrUPqJb/H9OALSCKgt3VmWqknUB4Ehvyhev3N6E7e6UO6Gu2Vpu1OdQ9N5AShIoESfO5ysDuhqubNwdWYNyfmk5b06X2p5oL3bQKRQdGiw3bVsMJgIDWdb1gPKiFKe3sILbJNaBos8mcEhUH4qXswKUtBJxtqFSOOM1ldhG2eGayCRTPJjQ4Hm/BW01gD9JijoB6skCc+Wl3yltF0yDXBzYbfqpJ8Ed8EetmH/ghwvZ5JkS+tlqCdNDT0qQC1gx6lw82Anu+SU0VyghOw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=lists.linux.dev smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Oh8SNC1Zxq79ZIIIJubX0kFxMZx5RV/fPuAEPHIxyBI=;
- b=U2NF+o7f4/1aLPz0y0lkQ/oLyBQHY17XevriRaks0rB8J5kAQXZF1x8q1cypGHNLy/OcriMZ0jU1CdI6G2vMpzsvsXGZHjxGRrvAUQ8wShRT3CEIcp949orseYrtugdqe8M6xjRLEouGIQtS9m6GiqLTd6x7FANYs80aArAECxPxg8uPVTzMT40zm6aC1C+8BoGc81/ZDmCQOlh6gI+mZav2jhsaDBefAGB7P44qi1TEPjNOm16Gn05lJePd+FQYLSztuYdF2086G8NsG79iZn4aXrXskWsaAN1FFl/TNxcLfiwVdm/DfatsyY1x55IiDJiFxPd1SpKQj5yRQejKJg==
-Received: from SA1P222CA0065.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:2c1::16)
- by MN0PR12MB6055.namprd12.prod.outlook.com (2603:10b6:208:3cd::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.37; Thu, 18 Apr
- 2024 08:45:27 +0000
-Received: from SN1PEPF0002BA50.namprd03.prod.outlook.com
- (2603:10b6:806:2c1:cafe::b7) by SA1P222CA0065.outlook.office365.com
- (2603:10b6:806:2c1::16) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.34 via Frontend
- Transport; Thu, 18 Apr 2024 08:45:27 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SN1PEPF0002BA50.mail.protection.outlook.com (10.167.242.73) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7452.22 via Frontend Transport; Thu, 18 Apr 2024 08:45:27 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 18 Apr
- 2024 01:45:14 -0700
-Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 18 Apr
- 2024 01:45:03 -0700
-References: <20240417164554.3651321-1-jiri@resnulli.us>
- <20240417164554.3651321-4-jiri@resnulli.us> <87bk67cbuc.fsf@nvidia.com>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Petr Machata <petrm@nvidia.com>
-To: Petr Machata <petrm@nvidia.com>
-CC: Jiri Pirko <jiri@resnulli.us>, <netdev@vger.kernel.org>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <davem@davemloft.net>,
-	<edumazet@google.com>, <parav@nvidia.com>, <mst@redhat.com>,
-	<jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>, <shuah@kernel.org>,
-	<liuhangbin@gmail.com>, <vladimir.oltean@nxp.com>, <bpoirier@nvidia.com>,
-	<idosch@nvidia.com>, <virtualization@lists.linux.dev>
-Subject: Re: [patch net-next v3 3/6] selftests: forwarding: add ability to
- assemble NETIFS array by driver name
-Date: Thu, 18 Apr 2024 10:43:44 +0200
-In-Reply-To: <87bk67cbuc.fsf@nvidia.com>
-Message-ID: <87y19bawl2.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02DE12E403
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 08:43:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713429840; cv=none; b=TaEbQUyUAGZ+PNAyRp/eFBHZULyGnUQKSBycJKOqnctAz0NzVurmF6qBTINJ8ZJEnCTHMkMu/UCL10/i/dexx1PbwEiW0HGWH2ip+EH8sF01UmsCgKZBM/gbo8HFpBfRQQ5WpprXeexsRgfl1paUe14bhFn+YUHV5sDmZYgFELs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713429840; c=relaxed/simple;
+	bh=M0pqY03giSoVWQJLwRJdyz+VqHm1gJ9R7OHry28YfxU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=uYjLmvyxHm9XNUxTeTTBR1oIuzy9TpeoYACvjsy302wlF4LfT9uvmhOj961Kiz+P0iv9tL8YNH1JyJYTcPTKfwe2C0rJ40cGei6E0rJPftethmiS2ZDkvV7RwZni5+Hg1N9Ohw394t+amcNmTHB7sk/C7xjEdau1cDBgYK4frgU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CqDBM1RM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1713429837;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=hH0KlyGAwY6muyn3zO72F/b5aBGpWFeE01tortR3iN4=;
+	b=CqDBM1RMIBbyTIQpfuh8vOAekTTRmsYnzWHM+q5c1Ss3bmEScKNW/IDJgUB1ywzivAFR4S
+	UDyU6yxNYl5yHQfVnCQYwHfHYUpLS+KHwTYmcIcdSKsm875bpJluBTkfrnzXdODQoBUXLi
+	vBMPM71zgLBWYav92nnEznMnflYLLB0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-686-Ne7AcNMPNGqdVFDVdcNS5g-1; Thu, 18 Apr 2024 04:43:56 -0400
+X-MC-Unique: Ne7AcNMPNGqdVFDVdcNS5g-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-346dee56965so26335f8f.0
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 01:43:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713429835; x=1714034635;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hH0KlyGAwY6muyn3zO72F/b5aBGpWFeE01tortR3iN4=;
+        b=flHB3nHBocE5Osi+9mS72imJ/2HKRnEQZfSHtay7ryhUO3Mc6UObci2nalVi9U8rsB
+         jzZmfXBW3vq4I+nWYqqobsXrqwMYR/jdRA58X4dSa+WZmvC+aGvhSX9g4B54Txwp1h6w
+         pf6quuuZy0+kk134orrYasHdcX0PHm2DCVc4Ov8QyKkpvfGE39YEW62ij+t3eClucTwf
+         7XuOUos6/8lqzqHTv+AKMppx1kDxWj/iw2xEILg6X3/X6mVFYFZgVu1/qDxyrPQ7G8F1
+         pAgPYzqeecQtodmWT2jXUfG6XI17ozKp1PcqUN17anBqcKTmDrKGjk4WpCUK3cROmGol
+         MWbw==
+X-Forwarded-Encrypted: i=1; AJvYcCXa7pD2YONhL6LDE3GWXmR4u3AGwiMcUJ/tAFnsV4FBCk6thNNz1zO+UqtlhDQfs3aJPHuy7i8xv9//rPHGE6BGkHuaEfF/
+X-Gm-Message-State: AOJu0YyIUyR6xkIVnCFIX3uiXSm58tHHC9wZ6g3jIfXgboV8yu+Lwlwb
+	uoo7G8O2jfQ7fcravYrQbccoU/1LGR6kRazWCyK0C6gxi+vuAOlAK+ZTFLwiU9MF7js+5wnkfDz
+	8xKHqEa6VyNI+OuYe7eNz7mYr6vvNwBv97975prVlok5cmxZ4KDNUPg==
+X-Received: by 2002:a05:600c:3554:b0:416:7b2c:df05 with SMTP id i20-20020a05600c355400b004167b2cdf05mr1418785wmq.1.1713429835237;
+        Thu, 18 Apr 2024 01:43:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEK+D+3mE5uBVWPtkZZRTBpgBEjyrAeFfgU5tQxnNndN3O+YqpL4ymjd3ZGwtz4ulur8/+c2g==
+X-Received: by 2002:a05:600c:3554:b0:416:7b2c:df05 with SMTP id i20-20020a05600c355400b004167b2cdf05mr1418776wmq.1.1713429834851;
+        Thu, 18 Apr 2024 01:43:54 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-236-143.dyn.eolo.it. [146.241.236.143])
+        by smtp.gmail.com with ESMTPSA id o19-20020a05600c511300b00417e36953a0sm1912220wms.20.2024.04.18.01.43.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 01:43:54 -0700 (PDT)
+Message-ID: <001b07cdcd22ce7873ce5e160000fe9ad1d59459.camel@redhat.com>
+Subject: Re: [net-next PATCH v5 4/4] test: hsr: Add test for HSR RedBOX
+ (HSR-SAN) mode of operation
+From: Paolo Abeni <pabeni@redhat.com>
+To: Lukasz Majewski <lukma@denx.de>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,  Oleksij Rempel
+ <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com, Sebastian Andrzej
+ Siewior <bigeasy@linutronix.de>, Ravi Gunasekaran <r-gunasekaran@ti.com>,
+ Simon Horman <horms@kernel.org>, Nikita Zhandarovich
+ <n.zhandarovich@fintech.ru>, Murali Karicheri <m-karicheri2@ti.com>, Jiri
+ Pirko <jiri@resnulli.us>, Dan Carpenter <dan.carpenter@linaro.org>,  Ziyang
+ Xuan <william.xuanziyang@huawei.com>, Shigeru Yoshida
+ <syoshida@redhat.com>, "Ricardo B. Marliere" <ricardo@marliere.net>,
+ linux-kernel@vger.kernel.org
+Date: Thu, 18 Apr 2024 10:43:52 +0200
+In-Reply-To: <20240415124928.1263240-5-lukma@denx.de>
+References: <20240415124928.1263240-1-lukma@denx.de>
+	 <20240415124928.1263240-5-lukma@denx.de>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
+ 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
+ iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
+ sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA50:EE_|MN0PR12MB6055:EE_
-X-MS-Office365-Filtering-Correlation-Id: e503d001-43c2-43b8-512d-08dc5f83e583
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	5Hund3Dbm8DsKAOEE/mS/6eRrgIpfKwZdz/hI2hJNVL0QV49FivcZ2j3RE4t9kLdsH0E/FKS8qRQKPvlA6EzM4iaCr3SmrW8/nb4Kfa3VyF04rwopFf6CMSQ8ka35MHAucv7HeCX+AakxI3limQc7OI82ZCUrjbOHf3dGknCtU/AHI2tA0MQer7DyJgObbX6rV5ShfQtH/AIuBAG1CY1dq2dmZR2acosnOiHZH1BNblAHJBtgMaDVE/yRLIYDyOzOhvrGK8q26XeFrMrhDYaN+hZfIV3d95iTzcUX3RRq5h8h5N5Jnklfck6Nre0LZPb5fat9ghluhJ61rNgC2vf8G9r40FMn3c8Gzh5QGMRVANM/krjF2OUN4YPGiXNLMf458wkXD05ynnOUZNHXsltUrcUChtJ5sTdyYn0e8JBdH2/t4YCd5wPHSHcX+OJlxKqh0u0sZaeOk5VWzPJmCplDu33184KgML+aUEPCjPYGMGM1TtrdS3Bzw1k0TgysIFlZ44VCj80kJK+oRTq/U7t8PE7aYYlFNwJ3LDNI5NGAea3Zgn3WqFN1wBHbU0KdwiEA24n/5BEBAUltFEx98s5ybLKqXdNgxQHZRKufLXgHnOA+LD/NUcW15wywqIZ9xkFAO7cTVeWCLl3gTsFJ7+O42MHzmzA0GbTvqaJneuyXtth10YcfAQPjL0NP8qDxVYNNI7JnEJfKfVKRuUCTVo+k2kwan9EXloyGKGYh87K+bXD+SSB6BM1A2UjrEY+PrnR
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(82310400014)(376005)(7416005)(1800799015);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2024 08:45:27.4148
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e503d001-43c2-43b8-512d-08dc5f83e583
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002BA50.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6055
 
+On Mon, 2024-04-15 at 14:49 +0200, Lukasz Majewski wrote:
+> This patch adds hsr_redbox.sh script to test if HSR-SAN mode of operation
+> works correctly.
+>=20
+> Signed-off-by: Lukasz Majewski <lukma@denx.de>
+> ---
+>  tools/testing/selftests/net/hsr/hsr_redbox.sh | 97 +++++++++++++++++++
+>  1 file changed, 97 insertions(+)
+>  create mode 100755 tools/testing/selftests/net/hsr/hsr_redbox.sh
+>=20
+> diff --git a/tools/testing/selftests/net/hsr/hsr_redbox.sh b/tools/testin=
+g/selftests/net/hsr/hsr_redbox.sh
+> new file mode 100755
+> index 000000000000..6946a0c6eb17
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/hsr/hsr_redbox.sh
 
-Petr Machata <petrm@nvidia.com> writes:
+You need to add  hsr_redbox.sh to TEST_PROGS in the net self-tests
+Makefile.
 
-> Jiri Pirko <jiri@resnulli.us> writes:
->
->> +# Whether to find netdevice according to the specified driver.
->> +: "${NETIF_FIND_DRIVER:=}"
->
-> This would be better placed up there in the Topology description
-> section. Together with NETIFS and NETIF_NO_CABLE, as it concerns
-> specification of which interfaces to use.
+Thanks,
 
-Oh never mind, it's not something a user should configure, but rather a
-test API.
+Paolo
+
 
