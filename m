@@ -1,138 +1,163 @@
-Return-Path: <netdev+bounces-89421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3021B8AA3EE
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:16:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C70388AA400
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:22:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C4E981F22712
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:16:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0482C1C21086
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:22:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFCDD17335B;
-	Thu, 18 Apr 2024 20:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275A2181B83;
+	Thu, 18 Apr 2024 20:22:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hMBeJtxk"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZkphSogP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2085.outbound.protection.outlook.com [40.107.243.85])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 423B81836CC
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 20:16:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713471413; cv=none; b=STxZB9zus9aP1OypUUVtTIhhCcpO3c3UYRtJo+vubUGXc1qCJ/eYrmDoCnZVMjoe/rbZZLFo8ruyR1OxlsK0rFE2IOvDD5+z2+TMycBqo2jwLtZRgBOUeCLvssnsVC9oYD08Q7uIh1Mc/7cAlTFI8PkDOm9FNobFzIAK7UBQvbM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713471413; c=relaxed/simple;
-	bh=sxPYPc2oa78fVTaAEGtgyMv1icwPRFja6crl/u3n6Wk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JTTT+IzBAqx9SvpZwOF+JdCALYJQQuVaqD6P8vykHNSDLLU0PL+PwW10goRjZ3Mzj9DgHgkMSu7hs10zOb58MRaRS9ejtTNeJpG77BoGOw3AZhMCeKZrV1SosPpJ50sf1Aca8OXvmOjJajAaMTQvI1A5w0isOD5DkorZEajVm6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hMBeJtxk; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3481bb34e7dso726535f8f.3
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 13:16:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713471410; x=1714076210; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BUJLXqyLsT7uEfGky6XlEof/G48boH2D+OqrPBPpmUA=;
-        b=hMBeJtxkYs4uRfrGTgN619Zu0h3i1aZJzBGYWKjyDkGy220Ktm7i8/tjwHRfgnX/JR
-         UREYXlQ2DF4UFgfnFJ/LoyK2glCSM1+TBDX8XPzAQqftQNSzfFODVgjV4yGZ0GBJtakN
-         bdNUp2Ru87vkETkg5As4eDB/x2bxCqd6Cjdz0LNh9SVbUEaaFXF/NCC67KgXzXLIQP2C
-         VXOZ827bLtwzoFi0+6Buh0lWHY3pfCmsb7/CVNR2Gzpi5oirPPwcsRdFZ9ARXyskabTR
-         T0V0IS4fohNNxOudkOevY19jGfEL0DrpB+LacJJ7NvAM6n25V1BxibobE5OuL8GZnQmD
-         9lCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713471410; x=1714076210;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BUJLXqyLsT7uEfGky6XlEof/G48boH2D+OqrPBPpmUA=;
-        b=oVDonqTwvU5LqWIQyc5CyEFECyk2SCwS4MMSm+LNmtd4MZmMJRi77ZR/P+inK69b8x
-         M+hRnQhzgXVo9dgIoxr6CLE9F476FzS41b1NL1Kmnc+zlcsKurV0YTLoe3V/D0Uj3Tpg
-         +7meXyZu5Y50bFQtMf2AjjOlm2sSB6/NuvfJUGGWHG6lG77IpWGGFq5FVIvoOUahexW3
-         t5qJr/180gg5vj/sgKzIaqm8oxSTzbJPRxnf6Nw9r9a26g05/+0gFk2vcDiKRZVwe+oW
-         hFxhfcEXRDNbrjCcGoZ5UQ0feetW3uu38fuqNr9QoOaLhm6H93ErVM2eY+0g2h9LJLbc
-         MXaw==
-X-Gm-Message-State: AOJu0YxKUJoirrZLwb0y8Us/SZj9hS7R6H/wMrqWoMm16ab9zBr9rz6T
-	//xPNKv3jWvmuPt+gEB6vjgPV8oiN84rVmS13fbkrZE/xl2YR5pMToz48Q==
-X-Google-Smtp-Source: AGHT+IH0Wdd06gacVo92O5cOLLu3eq1S1Krh4ewHa4rqLThLJFJGK+unNFvar/uPp4qNRmlgw/CnyQ==
-X-Received: by 2002:a05:6000:1841:b0:343:70bc:4578 with SMTP id c1-20020a056000184100b0034370bc4578mr2422142wri.70.1713471409829;
-        Thu, 18 Apr 2024 13:16:49 -0700 (PDT)
-Received: from abode (93-173-236-10.bb.netvision.net.il. [93.173.236.10])
-        by smtp.gmail.com with ESMTPSA id cp37-20020a056000402500b00341de3abb0esm2675174wrb.20.2024.04.18.13.16.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 13:16:49 -0700 (PDT)
-Date: Thu, 18 Apr 2024 23:16:46 +0300
-From: Yedaya <yedaya.ka@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: Re: [PATCH] ip: Exit exec in child process if setup fails
-Message-ID: <ZiF/rppvSxED2W8m@abode>
-References: <20240324163436.23276-1-yedaya.ka@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9144C13D626
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 20:22:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.85
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713471770; cv=fail; b=CKPjUsJ4+w9GS4EJwzPAOF8GmTxI4QU+slEXrqTCf+FnYUdrWC5tLS+ITcAqciw1hT1b6bRXkAJdSixFQcrs/M6yD9Aent1EjhBbKXEnaAsoRLB1MBoC+nuOTADC+Zlu9YKPzDNQFZiZMPdpBRirNqn3HqaBZ+bibGSsUIlxlu8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713471770; c=relaxed/simple;
+	bh=h/ZgV9C8lp+/d1wPozZL8WsHV7e6weYe7e+ty5pgUzo=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 Content-Type:MIME-Version; b=kjaOBpgsMkUR4CFr1o5kN2MXXcYwpsfwnaEBDI3AXPdp8ukQ0bbzpPbauD0+QvqaTSNC9DTgOykDvwFOy8HjD96l4cNsllohSTsNstR450x3qopXc/w+hZQ23DNDgfPdbk/dlxDqHPH6VQGY/exwbK3THAYF9gH2x+esswB1jt8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZkphSogP; arc=fail smtp.client-ip=40.107.243.85
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mNhyjaT+/VND3qiqDzY8cWGulcjjrSoKNYMLgPy3Qvt2Dc4U8bl7oyngR0LBJOlkA1X+JuLY4qRqfN/ptRZnvVfQiCTU67dANCIbXq9bQqz609OObmfjgzTu3re9HtT+8Ex1kCvhSlLlGaIb+NOHmAMwCMkUS/RjQECV2nX95XYcl5gqcNUxi63uT+QqoT3oRxXsyxhNE8e/y5o8R4PzBuRwaC/4uUz6vsoKhdH312OkkvqhGehg4Pari/7AmzIyJyvGUhnlM37EKWOdbTYyzEqXc6WaC58uNOOuiT/XqKzpJCG6eVhdBoL4v/6HhcnSwl3YNeaZz4rYaE5z5jmyOg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=h/ZgV9C8lp+/d1wPozZL8WsHV7e6weYe7e+ty5pgUzo=;
+ b=jSpqYVR1Y4GJxGBNs5r295xrIJ6/B5chywTEv9DeCvruLcIMFmcOKTnNFULQMG8VuRCJb7BcJ5lkdjdUy6L6K68rsF11ZHXrMYZQbXfKqr9MRWB/SUrn9N9l9pViCNqUslpHjD/aVrXZL8Hfziq18nLceK0GOtkmr4P0RrYgY8cY/IE2Jzq9zVjHS9kR0FqgXChQOfV/uKzPuofUsf4ObAghSBnNn6OE60WOuCdU88HdTSM4upnToe6YE22+Edx0f5gw+XalQTvaRdPqvwUtVm532DAQ8pznqIpen2NgnZ/h+9WRMNVOrFP11ouf6ixIbm3vHLo3IqyqO+CVHHR60Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=h/ZgV9C8lp+/d1wPozZL8WsHV7e6weYe7e+ty5pgUzo=;
+ b=ZkphSogPbQ+WpYd8yXhCTLMkel66XkXxYsp0OrbqBjnfYucMvyIOaipKfiCBbBdfcyAoKIcjz8RccAwID8MXfeDRDvtsy7tFd7MJh4MxJe9dCWMfKykGyeGxsSgc8JTOteWjM3UBlEaqE/6SyA5uN+eIV+U+ZgAq7EuabV0ANBNsqMPdqtwCNoHe5jRX/cSP45vwH/sTcwBdqBHCW94uStNEmiAy8JhUTlc3Ovr59VEHdfoyiNBWAPws0WihCriDGvIXUEpuY8/hKJ3nbwrpbEihGQQvDbjDGPTRh8bCSg2QSUudgOQ5XjFeN5WZhr4oqItcbqWWS99+iSCb9qCo9Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+ by CY8PR12MB7585.namprd12.prod.outlook.com (2603:10b6:930:98::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.40; Thu, 18 Apr
+ 2024 20:22:46 +0000
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::3ec0:1215:f4ed:9535]) by BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::3ec0:1215:f4ed:9535%4]) with mapi id 15.20.7452.049; Thu, 18 Apr 2024
+ 20:22:45 +0000
+References: <20240418052500.50678-1-mateusz.polchlopek@intel.com>
+User-agent: mu4e 1.10.8; emacs 28.2
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ horms@kernel.org, anthony.l.nguyen@intel.com
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v5 00/12] Add support for Rx
+ timestamping for both ice and iavf drivers.
+Date: Thu, 18 Apr 2024 13:19:09 -0700
+In-reply-to: <20240418052500.50678-1-mateusz.polchlopek@intel.com>
+Message-ID: <87v84ectez.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR03CA0071.namprd03.prod.outlook.com
+ (2603:10b6:a03:331::16) To BYAPR12MB2743.namprd12.prod.outlook.com
+ (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240324163436.23276-1-yedaya.ka@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|CY8PR12MB7585:EE_
+X-MS-Office365-Filtering-Correlation-Id: 405d7873-a75e-448e-8815-08dc5fe54ead
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Xsj4wiBGFiid1wiQU64Yzlx0jaf0Vl18KBpC5Cn3KqFtvdeAcXLHBqJfW1uLu7RDRVQLV0m5j06FuoaCVV1FwlyDU49fjYhWAfR2TI/YBfkVthArswRRaQS+AgC4tljFQ6bevlw3n/8KNxP2BCDEdfHK4BA+RzQIO4m1V90kxZHeZF2Um/Mu0VL5BJKFB8HJVse4WdUeZBZxX/wEmhEO4VHLjLGwEuNUQSXmMAQcQKsd2ZE4Ehplt/15oTC+snzqLNFaZbJsOW21dMzVGG8CIVN5z8gKCO1b5QyjgVWtf1Y1pZiy8XfB3wd/gx41TEGbEp7YRdgh0tx46YmMwYM5AbS3vHmG2ht2NA0pUe1F+TS1Tgjo7PL1IKdUqQm2DkJRHT1NaQb1Iw14xzGcMH+9XcA03a84p2g2CJedvbHolMdErqYUcJYLZIZ8K0Wz9yR1KpBuHpmFPX+cLa2x6VYr2la2AIZuCdWv86TpfykG0vSH1QWi7XbMxmFIQbC0s3MPCSreyO89fRN3v/uqayng1efHtOxO07sGrYhJyzMtMr1NeVc3Gebe1g7hVHuPUUSdCSgeGRwWBtD6B+Lq+XpwGRGvYPc0KqYM7af5Bk/B9DQsr4QOv1jG9mJRLfXOqn90tw8+3ZxG0yv4C+8pKmJzCg==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?sjF/YVCFu8lST63jLzYX5nSpqhH8hGW2O05VVccv4CsxxEfIVTj4MJG9JgFI?=
+ =?us-ascii?Q?1ZCrwgSYvO8x6CybRDcpvKmNb0JQr8oX4w9u3yGgOUgiycmyYmhF95qpJ5YK?=
+ =?us-ascii?Q?R2oWxk41dfepleI4nY8FjmoXScTh40Lxo3litatYj4ikD9rkEtr2HUWlys+K?=
+ =?us-ascii?Q?Lhvw/Rit4+TffBpOyNkrJlOeFZq5PXmHe3cwbjBqnyuE18cgKvgAYSYy+HnY?=
+ =?us-ascii?Q?Wf77ycZzhfiuhYxh/NXjmzIl0/bSSOXl+ImqNBvNB5bX0f4FMoGqLyTeaUcL?=
+ =?us-ascii?Q?YN/aPSLHckNVDe63fqfMNgmzXfVOhAQRyX3w0Oek0NHvfnkK++LiIbh2G0On?=
+ =?us-ascii?Q?O172/HBryYM4/LHyRCf2Uu5vZHhHgL1J0BTGmouMy6TQizNpeZw7aA+tcJcv?=
+ =?us-ascii?Q?j81CGtdJPLa6Z02XB5b+5BgRsuyM0Fjl0toh6p7HuAxS9sB77ZeP4Bc60JfH?=
+ =?us-ascii?Q?rP/TJz1BN2aABmTgHzZHdFhQ6NWlM7jbUZERfSm2t6e9H5EBZ0h9CAtVZb9q?=
+ =?us-ascii?Q?yLYX2HJusOjpWfcw6mR97567ngvJlKuk/CmFxzWe/nsunEiKrxQFa07xpECP?=
+ =?us-ascii?Q?HIrSKUvFz6euy6omze88z1kEyHZbvxN4AUUgo3k5u4JVv7g74Xz0T2fd6nWm?=
+ =?us-ascii?Q?Tc0tGm943s9mDrga643dO8kQFQke9ZgudPhfoYsZKJqydYefqoIhuVrclGk8?=
+ =?us-ascii?Q?l1KQk67qacM2Ir9gZP9ABsEOnh2oZvPo7U74W4u2YxksW7WR1OoQz6Q6KNrR?=
+ =?us-ascii?Q?9/yl754vaU/P6hPWCCEodFGWRmdcU45sQHu7v4jC+LLNQ+iQLCL2jlhsfS21?=
+ =?us-ascii?Q?lZJyN+S6hupbmBv3+GCX73nF7CjAbKHjHQEOArJjN3q+3CrIAJ4dW0oIuARC?=
+ =?us-ascii?Q?tcE6Rp1wofDAvBllA7G8YyQXTn+yB9sKBRw2+3FWG0qTi1qUe4wDpNYff+Fo?=
+ =?us-ascii?Q?hF2os0H8mbN7psLqP0UaMqFAM6/SvhREwSSXIrCfhaGK5wYy03blRGTbgaoa?=
+ =?us-ascii?Q?zyRhXK44mgIkpbRDD9+zyZrmmDErSb28ciIV4mm+ETnWb/2IA7SUf/7Q5qH9?=
+ =?us-ascii?Q?JYOVboPG9PU9LvztObVwar+xgboEK9ZDxdvc4Wf+qBYN8uzm/+wEVECfA1B6?=
+ =?us-ascii?Q?ixbVn+5wWFWuSyqBQBJzH4i9YK+foGsWvmEqmw8DMw5+aOZU9I+3oYB2anzY?=
+ =?us-ascii?Q?JaVfDf+JFLs1jLpbRg9xD56x9/juWZNZhx8jBVNkIAE0KyjEJclBxPfdRFsL?=
+ =?us-ascii?Q?eSQqc5I1KQXUChTLGDV+d6mltLAre5LTATbsRokhqGD2PVOREBqDDVmzMY6k?=
+ =?us-ascii?Q?5NIVm8KBsypcPrf1EFfSuuvAYvGXLILE5rlcgXNY061zvsJe9/qIt2IjjubV?=
+ =?us-ascii?Q?rFfnnDYNE3L4eOfB2aU8P/tUChjqxnRwybUPDr043FcuiKirrsveE9cG5kP8?=
+ =?us-ascii?Q?8YiGXaxf+K2zjd42vIQdyLrJt/836me5lk8CFoZnbiwEK0ygSzCxaT4JTnkZ?=
+ =?us-ascii?Q?gYSyLShX87F5/L8yOO9USzGI5qbUajbvDRaccINPOv6rmqTMId1F4NI+XYZJ?=
+ =?us-ascii?Q?xZNfGQ3SoJcU/WNFun9mXDzUekHYwwi8rLR/Vi5iMWraTKmCrmcdqcOeRGyR?=
+ =?us-ascii?Q?sQ=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 405d7873-a75e-448e-8815-08dc5fe54ead
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2024 20:22:45.3276
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: X0mgwz5HBlXlegGmqAG1y9AZGk4zz4b6tJNbJSFp+vn/HH6FT9kbFd2YhZusNmqUoNBWzJq5hQbY5xFULvebzg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7585
 
-Ping - in case you missed this
 
-On Sun, Mar 24, 2024 at 06:34:36PM +0200, Yedaya Katsman wrote:
-> If we forked, returning from the function will make the calling code to
-> continue in both the child and parent process. Make cmd_exec exit if
-> setup failed and it forked already.
-> 
-> An example of issues this causes, where a failure in setup causes
-> multiple unnecessary tries:
-> 
-> ```
-> $ ip netns
-> ef
-> ab
-> $ ip -all netns exec ls
-> 
-> netns: ef
-> setting the network namespace "ef" failed: Operation not permitted
-> 
-> netns: ab
-> setting the network namespace "ab" failed: Operation not permitted
-> 
-> netns: ab
-> setting the network namespace "ab" failed: Operation not permitted
-> ```
-> 
-> Signed-off-by: Yedaya Katsman <yedaya.ka@gmail.com>
+On Thu, 18 Apr, 2024 01:24:48 -0400 Mateusz Polchlopek <mateusz.polchlopek@intel.com> wrote:
+> Initially, during VF creation it registers the PTP clock in
+> the system and negotiates with PF it's capabilities. In the
+> meantime the PF enables the Flexible Descriptor for VF.
+> Only this type of descriptor allows to receive Rx timestamps.
+>
+> Enabling virtual clock would be possible, though it would probably
+> perform poorly due to the lack of direct time access.
+>
+> Enable timestamping should be done using SIOCSHWTSTAMP ioctl,
+> e.g.
+> hwstamp_ctl -i $VF -r 14
+>
+> In order to report the timestamps to userspace, the VF extends
+> timestamp to 40b.
+>
+> To support this feature the flexible descriptors and PTP part
+> in iavf driver have been introduced.
+>
 > ---
->  lib/exec.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/lib/exec.c b/lib/exec.c
-> index 9b1c8f4a1396..893937550079 100644
-> --- a/lib/exec.c
-> +++ b/lib/exec.c
-> @@ -36,8 +36,13 @@ int cmd_exec(const char *cmd, char **argv, bool do_fork,
->  		}
->  	}
->  
-> -	if (setup && setup(arg))
-> +	if (setup && setup(arg)) {
-> +		if (do_fork) {
-> +			/* In child, nothing to do */
-> +			_exit(1);
-> +		}
->  		return -1;
-> +	}
->  
->  	if (execvp(cmd, argv)  < 0)
->  		fprintf(stderr, "exec of \"%s\" failed: %s\n",
-> -- 
-> 2.34.1
-> 
+
+Just one general/cosmetic comment. It might make more sense for the
+Reviewed-by: trailer to come after the Signed-off-by: trailer, since the
+review happens after the patches have been written.
+
+--
+Thanks,
+
+Rahul Rameshbabu
 
