@@ -1,230 +1,276 @@
-Return-Path: <netdev+bounces-89445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 658198AA461
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:52:33 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 633388AA47B
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 23:01:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 883E41C234C3
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:52:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF1AF1F21B16
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 21:01:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF3719067B;
-	Thu, 18 Apr 2024 20:52:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68908194C6E;
+	Thu, 18 Apr 2024 21:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="By6e/dit"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3gFnQuRZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 871445231;
-	Thu, 18 Apr 2024 20:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12919146596
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 21:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713473540; cv=none; b=C7kX+4uKXyaTgsfxt1FxK+sh1BnBP3GsvqG4q18uJyzc0s8tPMdvsAtyVglBcvanyl8y1JCt66YQ9cs9fksukHRJcnzjtYf0ReaX5fbYtSisNL2WOeYkpErvr3brHXLkY0tquc/ZWXIkhpfn6J4Lp3n083ILiyW3mWqztlw6WzI=
+	t=1713474072; cv=none; b=tntiQskwhoyupMJBBw46O686O0SkageO6PpPMClEEjReatrxyVZi35vrcXDI3X1g/7yroMoe+gS8NGNaoNJRseEii9WXv29gYFp/MYVxxpnTORpyg2RNqFYQibj+jqcETZmWvcFYaZiPiwwQycbFVIXAjIilWod99lipQIZbOSc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713473540; c=relaxed/simple;
-	bh=Trzex6r7WZmJsjrQomymuH/d9/iiXcmPI02D/9z7YnE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=XBJ3MzviT4zivUFw3uolKiz0epGzKfXtCdEd5fb44Xy4bXGarO7ryfysq322e0PoOlHYd778oZio1kvac3VyG4SZ+m3TyA1/1bq9WbUqp/RB+KWjdR3wRPLkGfTl4lmd0863MojBdnvTg1ROjbc84pBzwg9DZcP6T0/LQaMXyWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=By6e/dit; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 43IKJUMg020446;
-	Thu, 18 Apr 2024 20:51:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=EZinXa1rUdLhTAeVNDUVuJM4q1wRofjb33lmzAZf17I=; b=By
-	6e/diticmo+uNUtC7Gd2Dj6ryv1GbUVi7/mPb7OdzA9Xd0vVJqgT4JqbOavXnkAo
-	coFt/xHVXnJER45k3dw95oIO006RdmOqhq5TH5o4R9Kp0F4vhAuVS8EkfW3w8QPv
-	NOfbtVryD1CGGMnKraFVsye5hUN5MBw+yKPK1mY0FCiULBDusxRPycTme1+T80To
-	oGYAijt+vBzfSIanC2DokKvU4OP6JEqmPx1XSN6JE68br04PbxgyLAE37MKZR7f4
-	qtuSm5sV1THrPunjbezb3G+PUDd/uMD9OIxPjEewkAmENzhsSaFAMijYJS6kWvcS
-	MAn8Q3vHppSHVMQgiDsg==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3xjx54hxfw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Apr 2024 20:51:48 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 43IKplXv005148
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Apr 2024 20:51:48 GMT
-Received: from [10.110.72.56] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 18 Apr
- 2024 13:51:43 -0700
-Message-ID: <f25fb07e-6885-447a-b91a-08efd5e01bcd@quicinc.com>
-Date: Thu, 18 Apr 2024 13:51:43 -0700
+	s=arc-20240116; t=1713474072; c=relaxed/simple;
+	bh=0ONxM8+52O8U2hWKTnoUu2oB9P+yXkLlnNibtMkppbY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l/jfDMZ1zoZZxfWrNnAzFCgd10qHK5rmYtJ1JGdSkl4HgdJ3kwi3STq+bqKzG6vWYFmg68jZ3YdxsTiwe1FnMXpdwF5Djt44etK1pJaZH1ESaiVhMIzSKnY3YV8hMQqRACb0/a4i6+YTUU4l9imRmZODkq5m8XfiEEmX7+jGlHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3gFnQuRZ; arc=none smtp.client-ip=209.85.221.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-4dd009ade11so280190e0c.0
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 14:01:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713474069; x=1714078869; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HK0AG2ye43fBHNCJU/ufv8sukfvu+p/h2Iio6a//K1k=;
+        b=3gFnQuRZEGd+DR2ROlt4ebSsrWIBo5jrXlypSNXmjMR+YfDOxvVdF+J2VlQp2hNtYb
+         PVxnWjTa5pQ4Gykfpcjj+F/d9OfcfmJBsBrdNeeOcXUiatl3VStI7P2Aj6F+0lHYkDnz
+         2m7EQsSLXIPEMBf988XpXnQg+fgg1z1d38KaBgIk5o+iiFVLEpJrXm6YYkey7mczXyAY
+         ZN8CsNBDckIQHvTBLRXVzacOwhgATRrI00SMky72gvFY6WF+opJaXrZHGaRwtSWWD4Nn
+         wuV1JfXpXbLA3cLDRtXoiZ0bvQlRQPgMueEhR9vOGXnpDXW49fQ6fWN8mazheN2qfLpE
+         YjXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713474069; x=1714078869;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HK0AG2ye43fBHNCJU/ufv8sukfvu+p/h2Iio6a//K1k=;
+        b=sTytnQ9wxGyvxLNlOC7LmrSdt1I8Qr92W5PDJGMS5G/1S5JMYtaBIkRLjnlCQ9Tk5+
+         WeT/UPHe5ju25tb/pCyDXfy4IYY4Z10cstFO+cDCFj0q2fp51JlJJ1+rlNCDUVxGRiTI
+         7E9Bbhrzvh+H4XJYk8uep9gIL8Cn8kPJcq7jv0hRMRZeOUFEigbwXpJyEkHYUhFdFITa
+         ywcZ0UL9413YQR32rP3d95JptzDxg+f/uDXlH7z/hgd4UFEJ8pvziMzjhl4tArJ9q53h
+         rVc0BkaYLLXklzYVuG4cyaXFtWrUtfiiwJDlqZD6sVp0f3Z7XcbnezBuJr9v8d7Fuv0t
+         QvKw==
+X-Forwarded-Encrypted: i=1; AJvYcCXgQ56PXsl1DIu0HGugdZCeRrgjg78xA0Wze9lW7iMCkYiInvG4war8k6QqFnvncM8Nm2gD9ePKwH+O3a8N4RNCTC8TQYV3
+X-Gm-Message-State: AOJu0YwMlNsZ+DzWrulP91mObDWXYVUz/v5eX9wj5zcgcFd5pCYOM36A
+	kWKkmtk8ORt5o6sLCe7Z8zDHEOJjaTn2kqtp+e1Uyf+hh7p7zRjbNKCeB8vvNgMMYya0OBjfXOZ
+	9V6PcWN8K5Iq47mLg8YwdsATCghnfFo8YfIaE
+X-Google-Smtp-Source: AGHT+IFBdEi2qUFzu77cpMVDPhbVlygx0PyrYLkgzO+9NRyHdqbfH4thsX5/nxN8+SubPv2KNq1jNr0iNEgZdCGM89M=
+X-Received: by 2002:a05:6122:3181:b0:4d0:36e3:40c3 with SMTP id
+ ch1-20020a056122318100b004d036e340c3mr82383vkb.13.1713474068479; Thu, 18 Apr
+ 2024 14:01:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH bpf-next v4 1/2] net: Rename mono_delivery_time to
- tstamp_type for scalabilty
-Content-Language: en-US
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
-        "Martin
- KaFai Lau" <martin.lau@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>
-CC: <kernel@quicinc.com>
-References: <20240418004308.1009262-1-quic_abchauha@quicinc.com>
- <20240418004308.1009262-2-quic_abchauha@quicinc.com>
- <66216adc8677c_f648a294aa@willemb.c.googlers.com.notmuch>
- <9a1f8011-2156-4855-8724-fea89d73df11@quicinc.com>
- <66217e7ccb46b_f9d5d294b0@willemb.c.googlers.com.notmuch>
- <d25533d6-5d09-4c9f-8801-54ac35db98ed@quicinc.com>
- <6621874d772a9_fb2e029467@willemb.c.googlers.com.notmuch>
-From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-In-Reply-To: <6621874d772a9_fb2e029467@willemb.c.googlers.com.notmuch>
+References: <171328983017.3930751.9484082608778623495.stgit@firesoul>
+ <171328990014.3930751.10674097155895405137.stgit@firesoul>
+ <CAJD7tkbZAj3UQSHbu3kj1NG4QDowXWrohG4XM=7cX_a=QL-Shg@mail.gmail.com> <72e4a55e-a246-4e28-9d2e-d4f1ef5637c2@kernel.org>
+In-Reply-To: <72e4a55e-a246-4e28-9d2e-d4f1ef5637c2@kernel.org>
+From: Yosry Ahmed <yosryahmed@google.com>
+Date: Thu, 18 Apr 2024 14:00:28 -0700
+Message-ID: <CAJD7tkbNvo4nDek5HV7rpZRbARE7yc3y=ufVY5WMBkNH6oL4Mw@mail.gmail.com>
+Subject: Re: [PATCH v1 3/3] cgroup/rstat: introduce ratelimited rstat flushing
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: tj@kernel.org, hannes@cmpxchg.org, lizefan.x@bytedance.com, 
+	cgroups@vger.kernel.org, longman@redhat.com, netdev@vger.kernel.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org, shakeel.butt@linux.dev, 
+	kernel-team@cloudflare.com, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, mhocko@kernel.org, Wei Xu <weixugc@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: bXLwP36pBQ3aMGd4ykuLCIMq-1RlSRvA
-X-Proofpoint-ORIG-GUID: bXLwP36pBQ3aMGd4ykuLCIMq-1RlSRvA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-18_19,2024-04-17_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
- suspectscore=0 malwarescore=0 phishscore=0 mlxlogscore=999 bulkscore=0
- impostorscore=0 spamscore=0 lowpriorityscore=0 priorityscore=1501
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2404010003 definitions=main-2404180152
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, Apr 18, 2024 at 4:00=E2=80=AFAM Jesper Dangaard Brouer <hawk@kernel=
+.org> wrote:
+>
+>
+>
+> On 18/04/2024 04.21, Yosry Ahmed wrote:
+> > On Tue, Apr 16, 2024 at 10:51=E2=80=AFAM Jesper Dangaard Brouer <hawk@k=
+ernel.org> wrote:
+> >>
+> >> This patch aims to reduce userspace-triggered pressure on the global
+> >> cgroup_rstat_lock by introducing a mechanism to limit how often readin=
+g
+> >> stat files causes cgroup rstat flushing.
+> >>
+> >> In the memory cgroup subsystem, memcg_vmstats_needs_flush() combined w=
+ith
+> >> mem_cgroup_flush_stats_ratelimited() already limits pressure on the
+> >> global lock (cgroup_rstat_lock). As a result, reading memory-related s=
+tat
+> >> files (such as memory.stat, memory.numa_stat, zswap.current) is alread=
+y
+> >> a less userspace-triggerable issue.
+> >>
+> >> However, other userspace users of cgroup_rstat_flush(), such as when
+> >> reading io.stat (blk-cgroup.c) and cpu.stat, lack a similar system to
+> >> limit pressure on the global lock. Furthermore, userspace can easily
+> >> trigger this issue by reading those stat files.
+> >>
+> >> Typically, normal userspace stats tools (e.g., cadvisor, nomad, system=
+d)
+> >> spawn threads that read io.stat, cpu.stat, and memory.stat (even from =
+the
+> >> same cgroup) without realizing that on the kernel side, they share the
+> >> same global lock. This limitation also helps prevent malicious userspa=
+ce
+> >> applications from harming the kernel by reading these stat files in a
+> >> tight loop.
+> >>
+> >> To address this, the patch introduces cgroup_rstat_flush_ratelimited()=
+,
+> >> similar to memcg's mem_cgroup_flush_stats_ratelimited().
+> >>
+> >> Flushing occurs per cgroup (even though the lock remains global) a
+> >> variable named rstat_flush_last_time is introduced to track when a giv=
+en
+> >> cgroup was last flushed. This variable, which contains the jiffies of =
+the
+> >> flush, shares properties and a cache line with rstat_flush_next and is
+> >> updated simultaneously.
+> >>
+> >> For cpu.stat, we need to acquire the lock (via cgroup_rstat_flush_hold=
+)
+> >> because other data is read under the lock, but we skip the expensive
+> >> flushing if it occurred recently.
+> >>
+> >> Regarding io.stat, there is an opportunity outside the lock to skip th=
+e
+> >> flush, but inside the lock, we must recheck to handle races.
+> >>
+> >> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> >
+> > As I mentioned in another thread, I really don't like time-based
+> > rate-limiting [1]. Would it be possible to generalize the
+> > magnitude-based rate-limiting instead? Have something like
+> > memcg_vmstats_needs_flush() in the core rstat code?
+> >
+>
+> I've taken a closer look at memcg_vmstats_needs_flush(). And I'm
+> concerned about overhead maintaining the stats (that is used as a filter)=
+.
+>
+>    static bool memcg_vmstats_needs_flush(struct memcg_vmstats *vmstats)
+>    {
+>         return atomic64_read(&vmstats->stats_updates) >
+>                 MEMCG_CHARGE_BATCH * num_online_cpus();
+>    }
+>
+> I looked at `vmstats->stats_updates` to see how often this is getting
+> updated.  It is updated in memcg_rstat_updated(), but it gets inlined
+> into a number function (__mod_memcg_state, __mod_memcg_lruvec_state,
+> __count_memcg_events), plus it calls cgroup_rstat_updated().
+> Counting invocations per sec (via funccount):
+>
+>    10:28:09
+>    FUNC                                    COUNT
+>    __mod_memcg_state                      377553
+>    __count_memcg_events                   393078
+>    __mod_memcg_lruvec_state              1229673
+>    cgroup_rstat_updated                  2632389
+>
+>
+> I'm surprised to see how many time per sec this is getting invoked.
+> Originating from memcg_rstat_updated() =3D 2,000,304 times per sec.
+> (On a 128 CPU core machine with 39% idle CPU-load.)
+> Maintaining these stats seems excessive...
 
+Well, the number of calls to memcg_rstat_updated() is not affected by
+maintaining stats_updates, and this only adds a few percpu updates in
+the common path. I did not see any regressions (after all
+optimizations) in any benchmarks with this, including will-it-scale
+and netperf.
 
-On 4/18/2024 1:49 PM, Willem de Bruijn wrote:
-> Abhishek Chauhan (ABC) wrote:
->>
->>
->> On 4/18/2024 1:11 PM, Willem de Bruijn wrote:
->>> Abhishek Chauhan (ABC) wrote:
->>>>
->>>>
->>>> On 4/18/2024 11:47 AM, Willem de Bruijn wrote:
->>>>> Abhishek Chauhan wrote:
->>>>>> mono_delivery_time was added to check if skb->tstamp has delivery
->>>>>> time in mono clock base (i.e. EDT) otherwise skb->tstamp has
->>>>>> timestamp in ingress and delivery_time at egress.
->>>>>>
->>>>>> Renaming the bitfield from mono_delivery_time to tstamp_type is for
->>>>>> extensibilty for other timestamps such as userspace timestamp
->>>>>> (i.e. SO_TXTIME) set via sock opts.
->>>>>>
->>>>>> As we are renaming the mono_delivery_time to tstamp_type, it makes
->>>>>> sense to start assigning tstamp_type based on enum defined
->>>>>> in this commit.
->>>>>>
->>>>>> Earlier we used bool arg flag to check if the tstamp is mono in
->>>>>> function skb_set_delivery_time, Now the signature of the functions
->>>>>> accepts tstamp_type to distinguish between mono and real time.
->>>>>>
->>>>>> In future tstamp_type:1 can be extended to support userspace timestamp
->>>>>> by increasing the bitfield.
->>>>>>
->>>>>> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
->>>>>> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
->>>>>
->>>>>> +/**
->>>>>> + * tstamp_type:1 can take 2 values each
->>>>>> + * represented by time base in skb
->>>>>> + * 0x0 => real timestamp_type
->>>>>> + * 0x1 => mono timestamp_type
->>>>>> + */
->>>>>> +enum skb_tstamp_type {
->>>>>> +	SKB_CLOCK_REAL,	/* Time base is skb is REALTIME */
->>>>>> +	SKB_CLOCK_MONO,	/* Time base is skb is MONOTONIC */
->>>>>> +};
->>>>>> +
->>>>>
->>>>> Can drop the comments. These names are self documenting.
->>>>
->>>> Noted! . I will take care of this
->>>>>
->>>>>>  /**
->>>>>>   * DOC: Basic sk_buff geometry
->>>>>>   *
->>>>>> @@ -819,7 +830,7 @@ typedef unsigned char *sk_buff_data_t;
->>>>>>   *	@dst_pending_confirm: need to confirm neighbour
->>>>>>   *	@decrypted: Decrypted SKB
->>>>>>   *	@slow_gro: state present at GRO time, slower prepare step required
->>>>>> - *	@mono_delivery_time: When set, skb->tstamp has the
->>>>>> + *	@tstamp_type: When set, skb->tstamp has the
->>>>>>   *		delivery_time in mono clock base (i.e. EDT).  Otherwise, the
->>>>>>   *		skb->tstamp has the (rcv) timestamp at ingress and
->>>>>>   *		delivery_time at egress.
->>>>>
->>>>> Is this still correct? I think all egress does now annotate correctly
->>>>> as SKB_CLOCK_MONO. So when not set it always is SKB_CLOCK_REAL.
->>>>>
->>>> That is correct. 
->>>>
->>>>>> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
->>>>>> index 61119d42b0fd..a062f88c47c3 100644
->>>>>> --- a/net/ipv4/tcp_output.c
->>>>>> +++ b/net/ipv4/tcp_output.c
->>>>>> @@ -1300,7 +1300,7 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
->>>>>>  	tp = tcp_sk(sk);
->>>>>>  	prior_wstamp = tp->tcp_wstamp_ns;
->>>>>>  	tp->tcp_wstamp_ns = max(tp->tcp_wstamp_ns, tp->tcp_clock_cache);
->>>>>> -	skb_set_delivery_time(skb, tp->tcp_wstamp_ns, true);
->>>>>> +	skb_set_delivery_time(skb, tp->tcp_wstamp_ns, CLOCK_MONOTONIC);
->>>>>
->>>>> Multiple references to CLOCK_MONOTONIC left
->>>>>
->>>> I think i took care of all the references. Apologies if i didn't understand your comment here. 
->>>
->>> On closer read, there is a type issue here.
->>>
->>> skb_set_delivery_time takes a u8 tstamp_type. But it is often passed
->>> a clockid_t, and that is also what the switch expects.
->>>
->>> But it does also get called with a tstamp_type in code like the
->>> following:
->>>
->>> +       u8 tstamp_type = skb->tstamp_type;
->>>         unsigned int hlen, ll_rs, mtu;
->>>         ktime_t tstamp = skb->tstamp;
->>>         struct ip_frag_state state;
->>> @@ -82,7 +82,7 @@ static int nf_br_ip_fragment(struct net *net, struct sock *sk,
->>>                         if (iter.frag)
->>>                                 ip_fraglist_prepare(skb, &iter);
->>>   
->>> -                       skb_set_delivery_time(skb, tstamp, mono_delivery_time);
->>> +                       skb_set_delivery_time(skb, tstamp, tstamp_type);
->>>
->>> So maybe we need two variants, one that takes a tstamp_type and one
->>> that tames a clockid_t?
->>>
->>> The first can be simple, not switch needed. Just apply the two stores.
->> I agree to what you are saying but clockid_t => points to int itself. 
->>
->> For example :- 
->> 		void qdisc_watchdog_init_clockid(struct qdisc_watchdog *wd, struct Qdisc *qdisc,
->> 				 clockid_t clockid)
->>
->> 		qdisc_watchdog_init_clockid(wd, qdisc, CLOCK_MONOTONIC); => sch_api.c
->> 	       qdisc_watchdog_init_clockid(&q->watchdog, sch, q->clockid); =>sch_etf.c (q->clockid is int)
-> 
-> My concern is more that we use CLOCK_MONOTONIC and SKB_CLOCK_MONO
-> (and other clocks) interchangeably, without invariant checks to make
-> sure that they map onto the same integer value.
-Ah i see. I got it . I will make two APIs . Makes sense. 
-1. One can check for clockid => switch => set 
-2. One can set it directly. 
+>
+> Then how often does the filter lower pressure on lock:
+>
+>    MEMCG_CHARGE_BATCH(64) * 128 CPU =3D 8192
+>    2000304/(64*128) =3D 244 time per sec (every ~4ms)
+>    (assuming memcg_rstat_updated val=3D1)
+
+This does not tell the whole story though because:
+
+1. The threshold (8192 in this case) is per-memcg. I am assuming
+2,000,304 is the number of calls per second for the entire system. In
+this case, the filtering should be more effective.
+
+2. This assumes that updates and flushes are uniform, I am not sure
+this applies in practice.
+
+3. In my experiments, this thresholding drastically improved userspace
+read latency under heavy contention (100s or 1000s of readers),
+especially the tail latencies.
+
+Generally, I think magnitude-based thresholding is better than
+time-based, especially in larger systems where a lot can change in a
+short amount of time. I did not observe any regressions from this
+scheme, and I observed very noticeable improvements in flushing
+latency.
+
+Taking a step back, I think this series is trying to address two
+issues in one go: interrupt handling latency and lock contention.
+While both are related because reducing flushing reduces irq
+disablement, I think it would be better if we can fix that issue
+separately with a more fundamental solution (e.g. using a mutex or
+dropping the lock at each CPU boundary).
+
+After that, we can more clearly evaluate the lock contention problem
+with data purely about flushing latency, without taking into
+consideration the irq handling problem.
+
+Does this make sense to you?
+
+>
+>
+> > Also, why do we keep the memcg time rate-limiting with this patch? Is
+> > it because we use a much larger window there (2s)? Having two layers
+> > of time-based rate-limiting is not ideal imo.
+> >
+>
+> I'm also not-a-fan of having two layer of time-based rate-limiting, but
+> they do operate a different time scales *and* are not active at the same
+> time with current patch, if you noticed the details, then I excluded
+> memcg from using this as I commented "memcg have own ratelimit layer"
+> (in do_flush_stats).
+
+Right, I meant generally having two schemes doing very similar things,
+even if they are not active at the same time.
+
+I think this is an artifact of different subsystems sharing the same
+rstat tree for no specific reason. I think almost all flushing calls
+really need the stats from one subsystem after all.
+
+If we have separate trees, lock contention gets slightly better as
+different subsystems do not compete. We can also have different
+subsystems "customize" their trees, for e.g. by setting different
+time-based or magnitude-based rate-limiting thresholds.
+
+I know this is a bigger lift, just thinking out loud :)
+
+>
+> I would prefer removing the memcg time rate-limiting and use this more
+> granular 50ms (20 timer/sec) for memcg also.  And I was planning to do
+> that in a followup patchset.  The 50ms (20 timer/sec) limit will be per
+> cgroup in the system, which then "scales"/increase with the number of
+> cgroups, but better than unbounded read/access locks per sec.
+>
+> --Jesper
+>
+>
+> > [1]https://lore.kernel.org/lkml/CAJD7tkYnSRwJTpXxSnGgo-i3-OdD7cdT-e3_S_=
+yf7dSknPoRKw@mail.gmail.com/
+>
+>
+> sudo ./bcc/tools/funccount -Ti 1 -d 10
+> '__mod_memcg_state|__mod_memcg_lruvec_state|__count_memcg_events|cgroup_r=
+stat_updated'
 
