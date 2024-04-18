@@ -1,158 +1,141 @@
-Return-Path: <netdev+bounces-89442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2FD48AA458
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:51:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 774A48AA45A
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:51:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2151B1C229E8
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:51:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D05E8B25B79
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:51:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A12F51BED87;
-	Thu, 18 Apr 2024 20:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25007190676;
+	Thu, 18 Apr 2024 20:49:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oc3ASbev"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jdw1Jtfg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A40D41A38C1
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 20:47:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E515817A938;
+	Thu, 18 Apr 2024 20:49:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713473269; cv=none; b=uOa/scEas7ttTkvMF+WvpDyFky4zwQv5Nb6vOmvjwr38cCfFwydFOoQ3L1qHKQ4XJihmX3hrF0MiHxJ9NAMJdd17lN/hyOj1qlJN5aqm5HGvb91hXvUHJ7tlIAUEtVVAImBIUDKfPEJa0ZJGNfN1GZHKLgsmL5fD4a8tf76iOY0=
+	t=1713473354; cv=none; b=C1DrA1f7PLB9zUvri0I6nxrV+PS0fd+9UIHU+a+hdCGgTBUG6eSujD/j4MTVVTBLae8jYetag9WGpHjKFG+7PRVBrqozQPhyuebi4IieOs2ydGNkXusHp4u6Qc6f2Fq7BPpiLDfUpohB3wQdpAvNXz4WVH1DwyIQePyDgVzRmnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713473269; c=relaxed/simple;
-	bh=P1dc1JdSs8SCHe62moGR5pSmeoHdNRxNzu0oI8BnvGo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NC8KQPXHzcUngrMdAbS7HlI/oQy7Y3PdzWUM3g0Wc36CpwJf5qJc510U9cfe9O/MkkiIC5shh2NH49w5TYfE3+kP2aLmJ4ZlKwJJIMCmcv/kQAhFfh1EiXsfYCJQoZ8ygxZVy7D5jaZPKQwJHR+yW5RXSc6rvi31/QKOkJJ7mYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=oc3ASbev; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-36b04b101b0so5051265ab.1
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 13:47:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713473266; x=1714078066; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iKHcTSaA5S2jqYA/kqtWjCsThpLVi1n0vQMddOFHVfU=;
-        b=oc3ASbevYkdVqld9rh52QgXpyn232nnKU0kqzb2+xNesGHeym/dAMg8WYIYs3MAN4q
-         hCvRryK38paWF3fDX0vlG9KhO5dGjORoT0JBIPM4FdPlDWQ9Ups+VZt/D+utC16yRKB7
-         O+99lMHdUyFpNstdA4ZlzbEkRPbZzP+wBu+Hn6Kv/93bvyL7/QNtcS6P6qNgwcf1HQsE
-         NcxZ0FDTRD6Qx6Z2gHSquf19CEcgSzqhWsn9UhhxH+XNPe7B+qZl9UBbsJCmUQ/aqUrR
-         kRPCWT+anA1nnJwttW4zRppdZ/5CTaHDQAL83Zqru2MDMMc0ieRMK0FNTB3Cbt9U+mjt
-         tdAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713473266; x=1714078066;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iKHcTSaA5S2jqYA/kqtWjCsThpLVi1n0vQMddOFHVfU=;
-        b=jtpvCHy7v5KH2jmPN8Db8BUuOz4zKOGhloIdGHnplGgLJqZj3g3I4OSN5QlepKxSLn
-         63Sfi5P9W38Phr/oNeHGa/PBJzgaQdJk3S5szr4zWlgZzc9W45naYmoMvs9l2jjFQOBp
-         A357/R38UmrpKfCd8s5UypeCanNw3TrV5FHyEuZQluIEuAIVFUI2QYlib7WoosT5a9ld
-         BlwfGz6Mvz9ue5P5vB/TfPClHfv3kNWSvEZBg6tQnFlAB+SsxD24yPFlYkkpwXaXpl7Y
-         MVclBFqWjxqHpds4BEDzyOdWmoi4g1RMeNkpz5G7IxbtMEjJYmLBEFMzaD3VDXP6KJji
-         98ig==
-X-Forwarded-Encrypted: i=1; AJvYcCW5Ei/I9SH2to3cxmdZRZfudYWTTett5vPGVv9B+/lGTSeyeFGM4dxL5wiM13ty3xJZrUZz6p7aUbAQBfvWpYsYVR/4t7AN
-X-Gm-Message-State: AOJu0YyC4S/t5V97g/AbTrKmjAFApxmg2bRgwyGq+VdgyMV1LX+k+Lsm
-	ji/DFApNVPyV1+doi5HBlXN9udf3gk75oKu6YmvVp+MrQwFJIOph1hqPxNvCIBo=
-X-Google-Smtp-Source: AGHT+IEBmjMeQWQ1C1xMXu/cVMj/XUA9qRCtQq3gRTTd6N+Ui+CHA1A/6ETWP2Hc8qGzhlX60JhUcQ==
-X-Received: by 2002:a05:6e02:13aa:b0:36b:2b56:12 with SMTP id h10-20020a056e0213aa00b0036b2b560012mr379844ilo.7.1713473265848;
-        Thu, 18 Apr 2024 13:47:45 -0700 (PDT)
-Received: from localhost.localdomain (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
-        by smtp.gmail.com with ESMTPSA id r6-20020a056638300600b00484948cb8f5sm626998jak.91.2024.04.18.13.47.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 13:47:45 -0700 (PDT)
-From: Alex Elder <elder@linaro.org>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: mka@chromium.org,
-	andersson@kernel.org,
-	quic_cpratapa@quicinc.com,
-	quic_avuyyuru@quicinc.com,
-	quic_jponduru@quicinc.com,
-	quic_subashab@quicinc.com,
-	elder@kernel.org,
-	netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 8/8] net: ipa: kill ipa_version_supported()
-Date: Thu, 18 Apr 2024 15:47:29 -0500
-Message-Id: <20240418204729.1952353-9-elder@linaro.org>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20240418204729.1952353-1-elder@linaro.org>
-References: <20240418204729.1952353-1-elder@linaro.org>
+	s=arc-20240116; t=1713473354; c=relaxed/simple;
+	bh=w0Wvi82vp9bUUFVc6RsXvhAdVyPYcbSALA6wo86ifr8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=TsAx9hsc8+6Js6IS7H8d7iOjpgnnbQY583STuT00RHCXJl0UIZSifYK5IxP4qMP3klhgoTK+5Uhb1tQ/qN4auV3gvJWt25+wiKmWwWi3aY4WO1b74LyhWlPvS1pQSVp6FaNklVJ+bWStAQzHKszTtv7rIUjzVRgsIgc6fSgP9DA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jdw1Jtfg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 509A3C113CC;
+	Thu, 18 Apr 2024 20:49:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713473353;
+	bh=w0Wvi82vp9bUUFVc6RsXvhAdVyPYcbSALA6wo86ifr8=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=jdw1JtfgHEBQMFaE+Ppm4WQeIoINYtkdOlYw2gW8elSLpYIEOeUAD0ZmFtnd/4DXk
+	 xncrqSuY0Vu0PFpGAp3RXXieZgoVSW9QA10vHLy5lSGMUEn0DeFzTk1hTLDtOXZXL2
+	 CzUfil+oWrb+BqQf2sv98ejtfDXq1O19TDFD6hADvzEXxoZOA1o84HPmi5t0QSN1RU
+	 JMt0/3zVJ7JDHoce8QGj9cRop+udpd5RXEz8A8/0rHkW6bJhwxPGieuoF0b08Kt08m
+	 2Vn9F3enbpQAfCcPWjUOS0NfINqD1ZEdspJIjhZkCR0bqtG5AbliDCSHzJ9QQycqqg
+	 S2VtPshukkDhw==
+Message-ID: <8d30868b-9870-4b17-b471-263156f5ab9e@kernel.org>
+Date: Thu, 18 Apr 2024 22:49:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] NFC: trf7970a: disable all regulators on removal
+To: Paul Geurts <paul_geurts@live.nl>, mgreer@animalcreek.com,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <DB7PR09MB26847A4EBF88D9EDFEB1DA0F950E2@DB7PR09MB2684.eurprd09.prod.outlook.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <DB7PR09MB26847A4EBF88D9EDFEB1DA0F950E2@DB7PR09MB2684.eurprd09.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The only place ipa_version_supported() is called is in the probe
-function.  The version comes from the match data.  Rather than
-checking the version validity separately, just consider anything
-that has match data to be supported.
+On 18/04/2024 21:25, Paul Geurts wrote:
+> During module probe, regulator 'vin' and 'vdd-io' are used and enabled,
+> but the vdd-io regulator overwrites the 'vin' regulator pointer. During
+> remove, only the vdd-io is disabled, as the vin regulator pointer is not
+> available anymore. When regulator_put() is called during resource
+> cleanup a kernel warning is given, as the regulator is still enabled.
+> 
+> Store the two regulators in separate pointers and disable both the
+> regulators on module remove.
+> 
+> Fixes: 49d22c70aaf0 ("NFC: trf7970a: Add device tree option of 1.8 Volt IO voltage")
+> Signed-off-by: Paul Geurts <paul_geurts@live.nl>
 
-Signed-off-by: Alex Elder <elder@linaro.org>
----
- drivers/net/ipa/ipa_main.c    |  5 -----
- drivers/net/ipa/ipa_version.h | 18 ------------------
- 2 files changed, 23 deletions(-)
+This is a friendly reminder during the review process.
 
-diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
-index 04dc0540ff7fb..08ec3581d1d27 100644
---- a/drivers/net/ipa/ipa_main.c
-+++ b/drivers/net/ipa/ipa_main.c
-@@ -811,11 +811,6 @@ static int ipa_probe(struct platform_device *pdev)
- 		return -ENODEV;
- 	}
- 
--	if (!ipa_version_supported(data->version)) {
--		dev_err(dev, "unsupported IPA version %u\n", data->version);
--		return -EINVAL;
--	}
--
- 	if (!data->modem_route_count) {
- 		dev_err(dev, "modem_route_count cannot be zero\n");
- 		return -EINVAL;
-diff --git a/drivers/net/ipa/ipa_version.h b/drivers/net/ipa/ipa_version.h
-index 38150345b607e..ae3396314acaf 100644
---- a/drivers/net/ipa/ipa_version.h
-+++ b/drivers/net/ipa/ipa_version.h
-@@ -45,24 +45,6 @@ enum ipa_version {
- 	IPA_VERSION_COUNT,			/* Last; not a version */
- };
- 
--static inline bool ipa_version_supported(enum ipa_version version)
--{
--	switch (version) {
--	case IPA_VERSION_3_1:
--	case IPA_VERSION_3_5_1:
--	case IPA_VERSION_4_2:
--	case IPA_VERSION_4_5:
--	case IPA_VERSION_4_7:
--	case IPA_VERSION_4_9:
--	case IPA_VERSION_4_11:
--	case IPA_VERSION_5_0:
--	case IPA_VERSION_5_5:
--		return true;
--	default:
--		return false;
--	}
--}
--
- /* Execution environment IDs */
- enum gsi_ee_id {
- 	GSI_EE_AP		= 0x0,
--- 
-2.40.1
+It looks like you received a tag and forgot to add it.
+
+If you do not know the process, here is a short explanation:
+Please add Acked-by/Reviewed-by/Tested-by tags when posting new
+versions, under or above your Signed-off-by tag. Tag is "received", when
+provided in a message replied to you on the mailing list. Tools like b4
+can help here. However, there's no need to repost patches *only* to add
+the tags. The upstream maintainer will do that for tags received on the
+version they apply.
+
+https://elixir.bootlin.com/linux/v6.5-rc3/source/Documentation/process/submitting-patches.rst#L577
+
+If a tag was not added on purpose, please state why and what changed.
+
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+Best regards,
+Krzysztof
 
 
