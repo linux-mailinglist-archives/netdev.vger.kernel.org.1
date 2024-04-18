@@ -1,231 +1,256 @@
-Return-Path: <netdev+bounces-89186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC6FD8A9A68
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 14:51:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D10478A9A7D
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 14:57:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 304121F210C6
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 12:51:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5DC0B1F21540
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 12:57:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D21C712EBD8;
-	Thu, 18 Apr 2024 12:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D1A2143C4A;
+	Thu, 18 Apr 2024 12:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J2+3dKX7"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="bHVazGJb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E96F7D40E;
-	Thu, 18 Apr 2024 12:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793BD1DFCF;
+	Thu, 18 Apr 2024 12:57:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713444683; cv=none; b=hznv8xOj1y5h/dmHOP7oiYmRwiH8pKikyadsr+iQZ7gQ+YcXkigiDHo0ALfznWRQrT1GOMHW18+JjLaREmxqdV55iDI67koKp+g5887C+0dbfkrjkVTeGtk9vj+8xeUUsv/kdleWj/DpLUWHKs3KXq8njgrZedmv5IYBzhydMfg=
+	t=1713445055; cv=none; b=uFkJso331hDNg/j1Q10EBra3pSHC/xabGI3SNELY0Kv+jnq418xrfS1375iH+fpw5oQyPB5tqmKmoyH2pbY3aQtGE6QSqPor5aWyPRQvxAxtTuqVBlLDUp4wTLY7eAS1bsl4U8GoXLdqM2SDARwe4X64geWfz5yXMkM5RtNcibY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713444683; c=relaxed/simple;
-	bh=r7GWD0cnvUzk4BrLd0lA2y+WxClZliaU2V71i+ooL+Y=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=al6uGVlvM7ihJgNQYgVkaHPfuXOznwb2MZ16YBNfgUnkY+16DS+MqKL4QxJq+FszdRszdBXcB/jpckXVCqEhDuDcJ53K5W5oF9ced4f3dBsLgKsLSqfLJRbT/o03/W4y4IfyPg5p0b13gmLesiYwTyJfrQYYwEcLb+8b5gC9A40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J2+3dKX7; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2abae23d682so229211a91.3;
-        Thu, 18 Apr 2024 05:51:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713444681; x=1714049481; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=AYQQ6x5PQs+7pRarP8H6SbmAo0a0VwHa5Gdfjk8N7ks=;
-        b=J2+3dKX7m2NEMJvUgMsVImlpiwSao4kvgxTv8m5W6RwxCeVJhxg/mEeNdTedDIki+s
-         0NJEvEZiQ+0XEWwT+KpDGOvA6qXbT4QseGinhU6qf4jbV6DooGWYGhm6c5JXSWWbOePQ
-         GxlGXiWtv9m2Eo3WWOJB52pSUBKWJe5dCUMQ/5tr5ZnPsV2Ogq/bLLeMSwwU+N6f9cNa
-         2kKicSn3Pnwifu3Qv5nivo4OofziIuwgO8w67mR6S0t6zBciqLIszgwBcfFxkktcBJJi
-         iQVjFW+K/2PjOKvXtVqrPl38qolDG5vGLn3kqJWQgOr+Xe6bEdTUgeBQ2FCrCaVgZ91B
-         xCWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713444681; x=1714049481;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=AYQQ6x5PQs+7pRarP8H6SbmAo0a0VwHa5Gdfjk8N7ks=;
-        b=NinNDFu26nainypIWpuU89JfiHJLYbJwy2wc6wB4D3C5bMMdxILoiPm0LXixy/TLc6
-         DdnEOB5N9SoeyYGthWdj39v7TaS3jRPNXyvVLsy7KTEk6XROCHDU8UfvovgdHYHXDxPr
-         6be2ZuioYvgNhowW9mpMeedFPOPXCtrFdmnHAvft4oEe/fhSMOVYF9tGTllzTSSpUGVs
-         iFHN6ime72kwk9QZdOXQuACpnRZE4yBFPTo+8V5eiGD3vcBTPUR1lCh7CgKMo9FoIm77
-         wYoxJ+eLVXaC8BWtPkCHxu/Kn8+ogDv/qw8NvUU3Ln3uPZrVmSC+PF/952E64PdLqaTK
-         MP6A==
-X-Forwarded-Encrypted: i=1; AJvYcCWBkTzDseNBpfjNYvCNpapeBVk8EFWXqYp26sYXDepuajpO/KicFHSi9zvxu8wf/wkqLgvvfD0HgTZnMXIHJaCk9KtFtNDzDM+D9aKIhcBjvuyC486T4OLNB4iHKcPOUWFDW3sOL60=
-X-Gm-Message-State: AOJu0Yz+ydsxZ/5AeiHPtN/8+Q2Ves1lC2QZ7cE8//0LADWrdiPFXcde
-	PnaYyJzOqtGBA7jfCNKKun1IJpH5lPmwTkEA4HY2mIoVDPdf0z5o+whB2ANO
-X-Google-Smtp-Source: AGHT+IHbq+6w80vWYaxKCglkniAg6WlEJa2DDh2HnK+6ckiKxndHkvdO4ik0XyWpyg3QMl++6pXjcw==
-X-Received: by 2002:a17:90a:c7c8:b0:2ab:be54:85ed with SMTP id gf8-20020a17090ac7c800b002abbe5485edmr2104020pjb.0.1713444681486;
-        Thu, 18 Apr 2024 05:51:21 -0700 (PDT)
-Received: from localhost (p5315239-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.87.239])
-        by smtp.gmail.com with ESMTPSA id v12-20020a17090a778c00b002ab534866dcsm2782641pjk.26.2024.04.18.05.51.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 05:51:21 -0700 (PDT)
-Date: Thu, 18 Apr 2024 21:51:08 +0900 (JST)
-Message-Id: <20240418.215108.816248101599824703.fujita.tomonori@gmail.com>
-To: gregkh@linuxfoundation.org
-Cc: fujita.tomonori@gmail.com, netdev@vger.kernel.org, andrew@lunn.ch,
- rust-for-linux@vger.kernel.org, tmgross@umich.edu, mcgrof@kernel.org,
- russ.weight@linux.dev
-Subject: Re: [PATCH net-next v1 3/4] rust: net::phy support Firmware API
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <2024041554-lagged-attest-586d@gregkh>
-References: <20240415104701.4772-1-fujita.tomonori@gmail.com>
-	<20240415104701.4772-4-fujita.tomonori@gmail.com>
-	<2024041554-lagged-attest-586d@gregkh>
+	s=arc-20240116; t=1713445055; c=relaxed/simple;
+	bh=Rb3bBJy2VszRT+9R2AqUbAa53uLcfwNZ4YFhpNUDcKs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ggicz2Yv7my4e+hrc2ozBJIgIgnz/RlAs9HMienbDM6vgWHfFZO9OyfcfYmUJnWRBxHheNE+C8/MZOLp+ZoR4a15qHP6fQfGf7k/miNemxNV+BGchwykFBAhc5ScoiW9FtCZm6PdlSGj6M27TQv1FIG17sgzCfD4upKPHbciZAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=bHVazGJb; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1713445053; x=1744981053;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Rb3bBJy2VszRT+9R2AqUbAa53uLcfwNZ4YFhpNUDcKs=;
+  b=bHVazGJbtJ1Kc7c7jltPsYiSz+Czqo/26KhUCCCShVsktbyVexQneSaR
+   f5aNk9ZKC3iO3sJReJhEj/BP77kWSj6zEhtyocZhTkYgZStNR5yKJ3JLS
+   G/wFig2hpqj3/nOLtihBrO5hx7P0D9PMRb7VFjr7UhiABie0P9f/9tkzj
+   zveK73BGyqQjZocu2Q0AhWhZ0FQzD3G2JIYDhCVz8iImAspROYYVz59Hz
+   tSqDl02J5WJCCyqqbDY37xnphDSw/XfIijlt81as9M1oZ2oOuhX6fXb0H
+   1Kwip40ELk+/YPc34lF60ompvmwvFJb5Kkhop4QAaVGwI9YftNtDHIK1v
+   w==;
+X-CSE-ConnectionGUID: Gt9eIEHaS7e6ziafVgNwUQ==
+X-CSE-MsgGUID: LjOmlH8UQR6gdapeZhRjbA==
+X-IronPort-AV: E=Sophos;i="6.07,212,1708412400"; 
+   d="scan'208";a="21557019"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Apr 2024 05:57:31 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 18 Apr 2024 05:56:47 -0700
+Received: from CHE-LT-I17164LX.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Thu, 18 Apr 2024 05:56:38 -0700
+From: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <saeedm@nvidia.com>,
+	<anthony.l.nguyen@intel.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <andrew@lunn.ch>, <corbet@lwn.net>,
+	<linux-doc@vger.kernel.org>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+	<devicetree@vger.kernel.org>, <horatiu.vultur@microchip.com>,
+	<ruanjinjie@huawei.com>, <steen.hegelund@microchip.com>,
+	<vladimir.oltean@nxp.com>
+CC: <UNGLinuxDriver@microchip.com>, <Thorsten.Kummermehr@microchip.com>,
+	<Pier.Beruto@onsemi.com>, <Selvamani.Rajagopal@onsemi.com>,
+	<Nicolas.Ferre@microchip.com>, <benjamin.bigler@bernformulastudent.ch>,
+	Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
+Subject: [PATCH net-next v4 00/12] Add support for OPEN Alliance 10BASE-T1x MACPHY Serial Interface
+Date: Thu, 18 Apr 2024 18:26:36 +0530
+Message-ID: <20240418125648.372526-1-Parthiban.Veerasooran@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Hi,
+This patch series contain the below updates,
+- Adds support for OPEN Alliance 10BASE-T1x MACPHY Serial Interface in the
+  net/ethernet/oa_tc6.c.
+  Link to the spec:
+  -----------------
+  https://opensig.org/download/document/OPEN_Alliance_10BASET1x_MAC-PHY_Serial_Interface_V1.1.pdf
 
-On Mon, 15 Apr 2024 13:10:59 +0200
-Greg KH <gregkh@linuxfoundation.org> wrote:
+- Adds driver support for Microchip LAN8650/1 Rev.B1 10BASE-T1S MACPHY
+  Ethernet driver in the net/ethernet/microchip/lan865x/lan865x.c.
+  Link to the product:
+  --------------------
+  https://www.microchip.com/en-us/product/lan8650
 
-> On Mon, Apr 15, 2024 at 07:47:00PM +0900, FUJITA Tomonori wrote:
->> This patch adds support to the following basic Firmware API:
->> 
->> - request_firmware
->> - release_firmware
->> 
->> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
->> CC: Luis Chamberlain <mcgrof@kernel.org>
->> CC: Russ Weight <russ.weight@linux.dev>
->> ---
->>  drivers/net/phy/Kconfig         |  1 +
->>  rust/bindings/bindings_helper.h |  1 +
->>  rust/kernel/net/phy.rs          | 45 +++++++++++++++++++++++++++++++++
-> 
-> Please do not bury this in the phy.rs file, put it in drivers/base/ next
-> to the firmware functions it is calling.
+Testing Details:
+----------------
+The driver performance was tested using iperf3 in the below two setups
+separately.
 
-Sure. I had a version of creating rust/kernel/firmware.rs but I wanted
-to know if a temporary solution could be accepted.
+Setup 1:
+--------
+Node 0 - Raspberry Pi 4 with LAN8650 MAC-PHY 
+Node 1 - Raspberry Pi 4 with EVB-LAN8670-USB USB Stick
 
-With the build system for Rust, we can't put it in drivers/base/ yet.
+Setup 2:
+--------
+Node 0 - SAMA7G54-EK with LAN8650 MAC-PHY 
+Node 1 - Raspberry Pi 4 with EVB-LAN8670-USB USB Stick
 
+Achieved maximum of 9.4 Mbps.
 
->> diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
->> index 421a231421f5..095dc3ccc553 100644
->> --- a/rust/kernel/net/phy.rs
->> +++ b/rust/kernel/net/phy.rs
->> @@ -9,6 +9,51 @@
->>  use crate::{bindings, error::*, prelude::*, str::CStr, types::Opaque};
->>  
->>  use core::marker::PhantomData;
->> +use core::ptr::{self, NonNull};
->> +
->> +/// A pointer to the kernel's `struct firmware`.
->> +///
->> +/// # Invariants
->> +///
->> +/// The pointer points at a `struct firmware`, and has ownership over the object.
->> +pub struct Firmware(NonNull<bindings::firmware>);
->> +
->> +impl Firmware {
->> +    /// Loads a firmware.
->> +    pub fn new(name: &CStr, dev: &Device) -> Result<Firmware> {
->> +        let phydev = dev.0.get();
-> 
-> That's risky, how do you "know" this device really is a phydev?
+Some systems like Raspberry Pi 4 need performance mode enabled to get the
+proper clock speed for SPI. Refer below link for more details.
 
-That's guaranteed. The above `Device` is phy::Device.
+https://github.com/raspberrypi/linux/issues/3381#issuecomment-1144723750
 
-> That's not how the firmware api works, use a real 'struct device' please.
+Changes:
+v2:
+- Removed RFC tag.
+- OA TC6 framework configured in the Kconfig and Makefile to compile as a
+  module.
+- Kerneldoc headers added for all the API methods exposed to MAC driver.
+- Odd parity calculation logic updated from the below link,
+  https://elixir.bootlin.com/linux/latest/source/lib/bch.c#L348
+- Control buffer memory allocation moved to the initial function.
+- struct oa_tc6 implemented as an obaque structure.
+- Removed kthread for handling mac-phy interrupt instead threaded irq is
+  used.
+- Removed interrupt implementation for soft reset handling instead of
+  that polling has been implemented.
+- Registers name in the defines changed according to the specification
+  document.
+- Registers defines are arranged in the order of offset and followed by
+  register fields.
+- oa_tc6_write_register() implemented for writing a single register and
+  oa_tc6_write_registers() implemented for writing multiple registers.
+- oa_tc6_read_register() implemented for reading a single register and
+  oa_tc6_read_registers() implemented for reading multiple registers.
+- Removed DRV_VERSION macro as git hash provided by ethtool.
+- Moved MDIO bus registration and PHY initialization to the OA TC6 lib.
+- Replaced lan865x_set/get_link_ksettings() functions with
+  phy_ethtool_ksettings_set/get() functions.
+- MAC-PHY's standard capability register values checked against the
+  user configured values.
+- Removed unnecessary parameters validity check in various places.
+- Removed MAC address configuration in the lan865x_net_open() function as
+  it is done in the lan865x_probe() function already.
+- Moved standard registers and proprietary vendor registers to the
+  respective files.
+- Added proper subject prefixes for the DT bindings.
+- Moved OA specific properties to a separate DT bindings and corrected the
+  types & mistakes in the DT bindings.
+- Inherited OA specific DT bindings to the LAN865x specific DT bindings.
+- Removed sparse warnings in all the places.
+- Used net_err_ratelimited() for printing the error messages.
+- oa_tc6_process_rx_chunks() function and the content of oa_tc6_handler()
+  function are split into small functions.
+- Used proper macros provided by network layer for calculating the
+  MAX_ETH_LEN.
+- Return value of netif_rx() function handled properly.
+- Removed unnecessary NULL initialization of skb in the
+  oa_tc6_rx_eth_ready() function removed.
+- Local variables declaration ordered in reverse xmas tree notation.
 
-Right, I'll do in v2.
+v3:
+- Completely redesigned all the patches.
+- Control and data interface patches are divided into multiple small
+  patches.
+- Device driver APIs added in the oa-tc6-framework.rst file.
+- Code readability improved in all the patches.
+- Defined macros wherever is possible.
+- Changed RESETC to STATUS0_RESETC for improving the readability.
+- Removed OA specific DT bindings.
+- Used default configurations defined in the OA spec.
+- All variables are named properly as per OA spec for more redability.
+- Bigger functions are split into multiple smaller functions.
+- DT binding check is done.
+- Phy mask is removed in phy scanning.
+- Used NET_RX_DROP to compare the rx packet submission status.
+- Indentation in the Kconfig file corrected.
+- Removed CONFIG_OF and CONFIG_ACPI ifdefs.
+- Removed MODULE_ALIAS().
 
-> 
->> +        let mut ptr: *mut bindings::firmware = ptr::null_mut();
->> +        let p_ptr: *mut *mut bindings::firmware = &mut ptr;
-> 
-> I'm sorry, but I don't understand the two step thing here, you need a
-> pointer for where the C code can put something, is this really how you
-> do that in rust?  Shouldn't it point to data somehow down below?
+v4:
+- Fixed indentation in oa-tc6-framework.rst file.
+- Replaced ENODEV error code with EPROTO in the
+  oa_tc6_check_ctrl_write_reply and oa_tc6_check_ctrl_read_reply()
+  functions.
+- Renamed oa_tc6_read_sw_reset_status() function as
+  oa_tc6_read_status0().
+- Changed software reset polling delay as 1ms and polling timeout as 1s.
+- Implemented clause 45 registers direct access.
+- Replaced ENODEV error code with ENOMEM in the
+  oa_tc6_mdiobus_register() function.
+- Changed transmit skbs queue size as 2.
+- Added skb_linearize() function to convert contiguous packet data.
+- Checked kthread_should_stop() in the oa_tc6_spi_thread_handler()
+  function before proceeding for the oa_tc6_try_spi_transfer().
+- Removed netdev_err() print in the oa_tc6_allocate_rx_skb() function.
+- Added spi-peripheral-props reference in the dt-bindings.
+- Changed the fallback order in the dt-bindings.
+- Replaced netif_start_queue() with netif_wake_queue().
+- Empty data transfer performed in the oa_tc6_init() function to clear
+  the reset complete interrupt.
+- ZARFE bit in the CONFIG0 register is set to 1 to avoid lan865x halt
+  based on the recommendation in the lan865x errata.
 
-Oops, can be simpler:
+Parthiban Veerasooran (12):
+  Documentation: networking: add OPEN Alliance 10BASE-T1x MAC-PHY serial
+    interface
+  net: ethernet: oa_tc6: implement register write operation
+  net: ethernet: oa_tc6: implement register read operation
+  net: ethernet: oa_tc6: implement software reset
+  net: ethernet: oa_tc6: implement error interrupts unmasking
+  net: ethernet: oa_tc6: implement internal PHY initialization
+  net: ethernet: oa_tc6: enable open alliance tc6 data communication
+  net: ethernet: oa_tc6: implement transmit path to transfer tx ethernet
+    frames
+  net: ethernet: oa_tc6: implement receive path to receive rx ethernet
+    frames
+  net: ethernet: oa_tc6: implement mac-phy interrupt
+  microchip: lan865x: add driver support for Microchip's LAN865X MAC-PHY
+  dt-bindings: net: add Microchip's LAN865X 10BASE-T1S MACPHY
 
-let mut ptr: *const bindings::firmware = ptr::null_mut();
-let ret = unsafe {
-        bindings::request_firmware(&mut ptr, name.as_char_ptr().cast(), &mut (*phydev).mdio.dev)
-};
+ .../bindings/net/microchip,lan865x.yaml       |   80 +
+ Documentation/networking/oa-tc6-framework.rst |  491 ++++++
+ MAINTAINERS                                   |   15 +
+ drivers/net/ethernet/Kconfig                  |   11 +
+ drivers/net/ethernet/Makefile                 |    1 +
+ drivers/net/ethernet/microchip/Kconfig        |    1 +
+ drivers/net/ethernet/microchip/Makefile       |    1 +
+ .../net/ethernet/microchip/lan865x/Kconfig    |   19 +
+ .../net/ethernet/microchip/lan865x/Makefile   |    6 +
+ .../net/ethernet/microchip/lan865x/lan865x.c  |  384 +++++
+ drivers/net/ethernet/oa_tc6.c                 | 1321 +++++++++++++++++
+ drivers/net/phy/microchip_t1s.c               |   30 +
+ include/linux/oa_tc6.h                        |   23 +
+ include/uapi/linux/mdio.h                     |    1 +
+ 14 files changed, 2384 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/microchip,lan865x.yaml
+ create mode 100644 Documentation/networking/oa-tc6-framework.rst
+ create mode 100644 drivers/net/ethernet/microchip/lan865x/Kconfig
+ create mode 100644 drivers/net/ethernet/microchip/lan865x/Makefile
+ create mode 100644 drivers/net/ethernet/microchip/lan865x/lan865x.c
+ create mode 100644 drivers/net/ethernet/oa_tc6.c
+ create mode 100644 include/linux/oa_tc6.h
 
->> +        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Device`.
-> 
-> Again, phydev is not part of the firmware api.
-> 
->> +        // So it's just an FFI call.
->> +        let ret = unsafe {
->> +            bindings::request_firmware(
->> +                p_ptr as *mut *const bindings::firmware,
-> 
-> Where is this coming from?
-> 
->> +                name.as_char_ptr().cast(),
->> +                &mut (*phydev).mdio.dev,
->> +            )
->> +        };
->> +        let fw = NonNull::new(ptr).ok_or_else(|| Error::from_errno(ret))?;
->> +        // INVARIANT: We checked that the firmware was successfully loaded.
->> +        Ok(Firmware(fw))
->> +    }
->> +
->> +    /// Accesses the firmware contents.
->> +    pub fn data(&self) -> &[u8] {
-> 
-> But firmware is not a u8, it's a structure.  Can't the rust bindings
-> handle that?  Oh wait, data is a u8, but the bindings should show that,
-> right?
+-- 
+2.34.1
 
-In the C side:
-
-struct firmware {
-        size_t size;
-        const u8 *data;
-        /* firmware loader private fields */
-        void *priv;
-};
-
-data() function allows a driver in Rust to access to the above data
-member in Rust.
-
-A driver could define its own structure over &[u8]. 
-
-> 
->> +        // SAFETY: The type invariants guarantee that `self.0.as_ptr()` is valid.
->> +        // They also guarantee that `self.0.as_ptr().data` pointers to
->> +        // a valid memory region of size `self.0.as_ptr().size`.
->> +        unsafe { core::slice::from_raw_parts((*self.0.as_ptr()).data, (*self.0.as_ptr()).size) }
-> 
-> If new fails, does accessing this also fail?
-
-If a new() fails, a Firmware object isn't created. So data() function
-cannot be called.
-
-
-> And how are you using this?  I guess I'll dig in the next patch...
-> 
->> +    }
->> +}
->> +
->> +impl Drop for Firmware {
->> +    fn drop(&mut self) {
->> +        // SAFETY: By the type invariants, `self.0.as_ptr()` is valid and
->> +        // we have ownership of the object so can free it.
->> +        unsafe { bindings::release_firmware(self.0.as_ptr()) }
-> 
-> So drop will never be called if new fails?
-
-Yes, like data() function.
 
