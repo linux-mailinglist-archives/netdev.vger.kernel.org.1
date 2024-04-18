@@ -1,158 +1,96 @@
-Return-Path: <netdev+bounces-89347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A74728AA18F
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:54:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 333C38AA1A2
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:55:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D35CD1C20853
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 17:54:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2144281471
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 17:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C6F0177980;
-	Thu, 18 Apr 2024 17:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96843171092;
+	Thu, 18 Apr 2024 17:55:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qitx/umw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="roMUL7sI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2311442F4;
-	Thu, 18 Apr 2024 17:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 724D51442F4
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 17:55:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713462839; cv=none; b=i9w5i8935nPo1sdrS6/UQmSKRCap9P+Ga8M96m0Aa2f/AaDznnb7SrkKX6zzJPlkzGj83Owk1yKukmnFLuQFHgUBDKAeCJDUXlKZERBL97VW/vtESPO+UH/iOIi0RdTKmrDjokSBxgUbb1c47Q6ersSVFvKXv18DQNEr6rzQYDs=
+	t=1713462939; cv=none; b=qaEGNpgNmqIJ0Kf4eHTtdXP40pxF/ENFcun0zOI3yyhucIlCoEF+IjzCTVaNMPoTrWvmRmsD7JC59Q4mltk7s7vky2luP1OyZW+r2GqRHJw5UB4uc5Ew/UX3s4sGpgbQsM6JPmhSa/CMUduei9G2o7n9g9HJsTYHfFKZEZ81wQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713462839; c=relaxed/simple;
-	bh=GVKHg9/GMb+Q7svthQO5bm+rPzNDL6zXlQZOsDeKWL0=;
+	s=arc-20240116; t=1713462939; c=relaxed/simple;
+	bh=BdabkZsjgYaVgIK5J0ay6Z/7d02H+4Buup2AEjH1E7Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iPDzZv5Y/UdvP5C0JHl0OsL2oiIyxexW4QoxqHuXhvBsKnOxQsbvnFrhuqK/y8RwqIwVgQLyace7C4RywoTWZIjx8w1Mvl2OrVeuA6YyeEuJdEVgz7BIGd8GYISmj1vCGm/Slf3tCd6PZdiqc/ocV0DX5HFZ9kCkgZCd25yjBMc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qitx/umw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F12DC3277B;
-	Thu, 18 Apr 2024 17:53:45 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=faiJxxm4N10IJwlr5yex91vAdWLblf2ZRV5OqtPMIG6G9X/VQFlDeLBGG2RIfcIlyT8JW8zyskIUK8P5uqkUnPnbuYK0KAppTe2oxVM8isKEPhVO5iCLWdPpU0lPZTYfcO83BG2eFjBpPDip8RprWIh81Joy3LbMRa3h+9ChjuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=roMUL7sI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A87FC113CC;
+	Thu, 18 Apr 2024 17:55:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713462839;
-	bh=GVKHg9/GMb+Q7svthQO5bm+rPzNDL6zXlQZOsDeKWL0=;
+	s=k20201202; t=1713462938;
+	bh=BdabkZsjgYaVgIK5J0ay6Z/7d02H+4Buup2AEjH1E7Y=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qitx/umwjvXDKNme47QxvztrUiipBcKV2Lg0Yvd1RXezrm9EMN+zfFrxXb923+dxO
-	 AxZ6KgXvjlorR3mUIjvBXST4+3n8nelthPynguxJTOQoS9rNBrqZ+3MIlU37kTQ9FA
-	 a4e+nx+8unMMLT17+KcFFJ93DVlkbK2eXc4Av0nU3f2Yxj+rBXrkR0WI95IANr/7qX
-	 uZj4q1Xb4qjUIP87QNJk+Jgy4oid7eW9FtvEPOx7D0x1Tt1iXSqSWNLPcTP4XbQ2OW
-	 z8BEya9Rxr0dlQHlDm5T4jpRs2aqcA2Iy8EkKuiv4ehWjUKDt48ywWZ7K+xjdgeN4d
-	 Qxf4CJCyjHkiA==
-Date: Thu, 18 Apr 2024 20:52:39 +0300
-From: Mike Rapoport <rppt@kernel.org>
-To: Song Liu <song@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>,
-	Peter Zijlstra <peterz@infradead.org>, linux-kernel@vger.kernel.org,
-	Alexandre Ghiti <alexghiti@rivosinc.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Bjorn Topel <bjorn@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Donald Dutile <ddutile@redhat.com>,
-	Eric Chanudet <echanude@redhat.com>,
-	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Puranjay Mohan <puranjay12@gmail.com>,
-	Rick Edgecombe <rick.p.edgecombe@intel.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
-	bpf@vger.kernel.org, linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
-	linux-mm@kvack.org, linux-modules@vger.kernel.org,
-	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
-	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
-Subject: Re: [PATCH v4 05/15] mm: introduce execmem_alloc() and execmem_free()
-Message-ID: <ZiFd567L4Zzm2okO@kernel.org>
-References: <20240411160051.2093261-1-rppt@kernel.org>
- <20240411160051.2093261-6-rppt@kernel.org>
- <20240415075241.GF40213@noisy.programming.kicks-ass.net>
- <Zh1lnIdgFeM1o8S5@FVFF77S0Q05N.cambridge.arm.com>
- <Zh4nJp8rv1qRBs8m@kernel.org>
- <CAPhsuW6Pbg2k_Gu4dsBx+H8H5XCHvNdtEZJBPiG_eT0qqr9D1w@mail.gmail.com>
- <ZiE91CJcNw7gBj9g@kernel.org>
- <CAPhsuW4au6v8k8Ab7Ff6Yj64rGvZ7wkz=Xrgh8ZZtLyscpChqQ@mail.gmail.com>
+	b=roMUL7sIXNe68QhF1eF6gk8UtL4Gh4djfJvhRe4V1TCfnlHOFRAxVz01HwZLwzy79
+	 dR9WUBNv5nklDsbAE5tG1l5CnS3wgQbWNGvwiMYPv79we1nNwHS4OGthMCQEw/nvEQ
+	 UI4ac2atLjlSiPZ3K7af4grwMfCM9GydJpbZLOgqx9LxX1TSXKvb4B9lz2hpSqX9gM
+	 w7iYjPvq7HNiH0kTTJhE+NRJYMYzgTuaaFzNu7xLOvuukq7tssyBNMPai+SpcG96vz
+	 95cBwzWd126aYzdFXHxXcgXJpCdr262zSB+dhGGRjySi2vsCW4j8jUG0QHZDwTTHA3
+	 fN2TNVLs1zJwg==
+Date: Thu, 18 Apr 2024 18:55:34 +0100
+From: Simon Horman <horms@kernel.org>
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
+	mlxsw@nvidia.com, Tim 'mithro' Ansell <me@mith.ro>
+Subject: Re: [PATCH net v2 2/3] mlxsw: core_env: Fix driver initialization
+ with old firmware
+Message-ID: <20240418175534.GJ3975545@kernel.org>
+References: <cover.1713446092.git.petrm@nvidia.com>
+ <0afa8b2e8bac178f5f88211344429176dcc72281.1713446092.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAPhsuW4au6v8k8Ab7Ff6Yj64rGvZ7wkz=Xrgh8ZZtLyscpChqQ@mail.gmail.com>
+In-Reply-To: <0afa8b2e8bac178f5f88211344429176dcc72281.1713446092.git.petrm@nvidia.com>
 
-On Thu, Apr 18, 2024 at 09:13:27AM -0700, Song Liu wrote:
-> On Thu, Apr 18, 2024 at 8:37 AM Mike Rapoport <rppt@kernel.org> wrote:
-> > > >
-> > > > I'm looking at execmem_types more as definition of the consumers, maybe I
-> > > > should have named the enum execmem_consumer at the first place.
-> > >
-> > > I think looking at execmem_type from consumers' point of view adds
-> > > unnecessary complexity. IIUC, for most (if not all) archs, ftrace, kprobe,
-> > > and bpf (and maybe also module text) all have the same requirements.
-> > > Did I miss something?
-> >
-> > It's enough to have one architecture with different constrains for kprobes
-> > and bpf to warrant a type for each.
+On Thu, Apr 18, 2024 at 03:46:07PM +0200, Petr Machata wrote:
+> From: Ido Schimmel <idosch@nvidia.com>
 > 
-> AFAICT, some of these constraints can be changed without too much work.
-
-But why?
-I honestly don't understand what are you trying to optimize here. A few
-lines of initialization in execmem_info?
-What is the advantage in forcing architectures to have imposed limits on
-kprobes or bpf allocations?
-
-> > Where do you see unnecessary complexity?
-> >
-> > > IOW, we have
-> > >
-> > > enum execmem_type {
-> > >         EXECMEM_DEFAULT,
-> > >         EXECMEM_TEXT,
-> > >         EXECMEM_KPROBES = EXECMEM_TEXT,
-> > >         EXECMEM_FTRACE = EXECMEM_TEXT,
-> > >         EXECMEM_BPF = EXECMEM_TEXT,      /* we may end up without
-> > > _KPROBE, _FTRACE, _BPF */
-> > >         EXECMEM_DATA,  /* rw */
-> > >         EXECMEM_RO_DATA,
-> > >         EXECMEM_RO_AFTER_INIT,
-> > >         EXECMEM_TYPE_MAX,
-> > > };
-> > >
-> > > Does this make sense?
-> >
-> > How do you suggest to deal with e.g. riscv that has separate address spaces
-> > for modules, kprobes and bpf?
+> The driver queries the Management Capabilities Mask (MCAM) register
+> during initialization to understand if it can read up to 128 bytes from
+> transceiver modules.
 > 
-> IIUC, modules and bpf use the same address space on riscv
+> However, not all firmware versions support this register, leading to the
+> driver failing to load.
+> 
+> Fix by treating an error in the register query as an indication that the
+> feature is not supported.
+> 
+> Fixes: 1f4aea1f72da ("mlxsw: core_env: Read transceiver module EEPROM in 128 bytes chunks")
+> Cc: Simon Horman <horms@kernel.org>
+> Reported-by: Tim 'mithro' Ansell <me@mith.ro>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
+> ---
+> 
+> Notes:
+>     v2:
+>     - Make mlxsw_env_max_module_eeprom_len_query() void
 
-Not exactly, bpf is a subset of modules on riscv.
+Thanks for the update.
 
-> while kprobes use vmalloc address.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-The whole point of using the entire vmalloc for kprobes is to avoid
-pollution of limited modules space.
- 
-> Thanks,
-> Song
-
--- 
-Sincerely yours,
-Mike.
 
