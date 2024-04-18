@@ -1,178 +1,174 @@
-Return-Path: <netdev+bounces-89428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B71DF8AA41B
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:38:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D0BD8AA429
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:39:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB3811C21132
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:38:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E88F2828D4
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C579184135;
-	Thu, 18 Apr 2024 20:38:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71CDD19067B;
+	Thu, 18 Apr 2024 20:39:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mhIsKdU2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nys+YJQS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FF1A2E416
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 20:38:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98545190672
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 20:39:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713472691; cv=none; b=ic4leoFQl4CT5ePpcOvzOhYEh/LbbZhgMxqG2MxuFm2D2suYShaooE6GN8YNwC8Ytd1wpVToWCrLrKJVrgQ0PT9biqY69n8AauJnnzNPMPOj/3r4S3sgI3Cuiiy1PCYUUz6xHsI0w5aoI7oGd1EajUDWbzYRa014egQAyx0pdKc=
+	t=1713472742; cv=none; b=YcxPVs4exbbp+BD6l/JHjKoX87molaKJRwGRzNtAzMo6J/ZoSy/1/CNb36DtZesHpG7A+IkwXzx1t+bdsk/q8dMEGeJ0bje4dan8uLKRRsoaM9zVvtbTOJ4lmX4u+EGvJ1+h0OaI+M+fi/N+biaRApp1uPTuhr/n75NbrkwGE4w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713472691; c=relaxed/simple;
-	bh=B6PYAxGEVdWd/iLbaLB3MWgBQSAPy9Thp2AzpzinGdQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=R/EQUx8ppAELYJYIxWKulTf1Ca0axZhYwlutXyppisPu+agOfra1G+CnOsF3RTurSS28vm/nfC6Y/Gyk+TU8epj5rLJGCgZ67WJ61aUNLcB58O+2eBFQMKqC9Ffyjp0Q9+5ALGWOnn0JFuZcWDIBaX4fiN79zdbI3oEyIH4PeXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mhIsKdU2; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1713472742; c=relaxed/simple;
+	bh=EQjWnSkdAXaSrCFiO96RSYAuq6uV5rmr2APeMYWUk2w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W8gRbixw9JPHEXvEU/nWtPEliXR9PropdO/yF9c3gAXT65BoYKyYqfZrcgGVXOPDkjBsS7G+WJBwD5t9cmIiZn98dAmUNCTQ76nVw7AHJgFcDjGMGsmuEuuyB1i6ef6FFffIVr78xCsHfqdJ0Nml7PFZkhQUr9jbY7VJBOyJFwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nys+YJQS; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2a4b60f8806so1598251a91.1
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 13:38:10 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-56e69a51a33so1396118a12.1
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 13:39:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713472690; x=1714077490; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4ixqEbq42sw0x7YwcNDUvxMCgoJ/GVN9HI1Bqf4Fj5c=;
-        b=mhIsKdU26igZwPMjFBVp3x0LGN/pHfk48V2WvrGTDm6Rt+lARVQCJQR2bFWjPBzMHs
-         wPzttP87yaHze/K/ykyp065ICFZBPZmctXJqnH69VZtoNMiAtRpXNJaAA/VnT8Sqrw+R
-         QP9kaYxlTDtMtPdFTyGzuDgyLeoy6GZRMIQquVj5Oyr60XgmJk/ynzkkVguAzE0IdKo9
-         3hCcp0JW+vURn143wSSdAXdycp9EllzXgR/kPvdpJ6YudDwglH0dwTpZLzar62Yj9t05
-         GUeflmMBrXelTcZce4XmCw9Ksm7Jss6fA0k7a1wDJpILeq9tzY3tSaWprLyMY+XpmK8E
-         pjFg==
+        d=google.com; s=20230601; t=1713472739; x=1714077539; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kB9PcMjE0hVVpql+JbzqFJwr2b8GY15J6ZW7aMEdH3Q=;
+        b=nys+YJQSD+bVtq0Co48PcXIVYeRGNykKREGFF+/QL7SEkPdariZrDfXd8UjgV9BdM9
+         55fBydZ6jx3w7G/PF8bIt8fNamPQhrryGrVEDJS6NWAw62Lwkn/5fSo1BBKJKk53QZh4
+         BH7sWmiD8hoiapl75oSTrDtFyI5zIkHFbO9nAeIHbkAEUtRQHiHJQaEiwDcE5PO0byrF
+         qRmkulUB0Wds/AIJm6zVHiKSna9HC+C+M8qk25X5RO7OBya28nTikrSc21gtRJEwWnKt
+         R16rJxEnTMjw6iK1jPla0z2LbRo6cQuirj207jiLAxcdgfwHupq33ZCN7GXWEj2Gv3df
+         K8YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713472690; x=1714077490;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=4ixqEbq42sw0x7YwcNDUvxMCgoJ/GVN9HI1Bqf4Fj5c=;
-        b=gmbsSHEdIqayQHG7TJoHu6vvbXFyHSpC0TSB7haduD6MYW3hieieGNU0KzK1Tsh67u
-         dGW3ju+VkGRgNYPoYCavSRj4uhoNnNiiNeFpxiCcMpZDvnv4/QyeTezk3hJdx8+lL8wn
-         /aNxjY0dADi/7v7d/cMjGfWSSwE1Ay8a9wb6NpDOGDJ2gvYDxu7lt/cghAIfXblSO6Jf
-         WxsrVtF/zAuOdoOEXMdkLMCYCv8Kuc1a9mxx/lgL12sqbro7LeCL3y9YLzimaYZ2N4vI
-         jWRDou/8PRsdFTjo7g220rbmtUk3uJj3DGhC6zcv0QNpS1xJGnLsNzX6rGI+RGCegXt8
-         FAyg==
-X-Forwarded-Encrypted: i=1; AJvYcCVZFpuz9qv0pVKxE10IJYK8RHcDMcUcVqSNl+7Zs+HMYKbVGeDCkcKU3glSovZXDcI6OVvzVJupw8K7S/S6TduL4VaIwMeb
-X-Gm-Message-State: AOJu0Ywtf0/M4Mi+XlAWzotkV4l4XarUvt+p5P8grSTGdCsAne2pPmaY
-	rJW4AnfRwDyTRz6pa8ByUU/A8I28A9Vx9h6EWSDHvOW26Wa081CE0RxSZ6zGxUhOfw==
-X-Google-Smtp-Source: AGHT+IFq4R2BydwxieG1CN7ABcoPMb9TaOqRjgM00dFmOyCGXtJJIEurepe1f5ZSOsEggMM0vhzrSE8=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a17:90a:1c97:b0:2a5:dd7:1c35 with SMTP id
- t23-20020a17090a1c9700b002a50dd71c35mr729pjt.8.1713472689747; Thu, 18 Apr
- 2024 13:38:09 -0700 (PDT)
-Date: Thu, 18 Apr 2024 13:38:08 -0700
-In-Reply-To: <87edb2ttdy.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1713472739; x=1714077539;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kB9PcMjE0hVVpql+JbzqFJwr2b8GY15J6ZW7aMEdH3Q=;
+        b=fPTb1pUyNj0pezxz4yVI+MdfKoVdspC2+1DuMum9TfUoU5XJW2EPvoiX0NxrgmdEHy
+         5jXIFb2LWPS0eM2sglGoHqGz3VZuuf/FdxmVLuqwlsJlgMM4KNJOQ0ryAwwJ3UYHDiEu
+         hb5Gmm1oJnHXn9ZZE8Ip3lMUwopV4/nhIA0DUEekQVmJg93oQVY/lppQjR3tMAtrdoWn
+         CUIYeqnPliSH0fJoBxpMPrcHVuTVWctC0mTlHfEpgk+m5kJaZi6eERWuwNntkCgVymLk
+         +Sz7N1mYWysMnkXCFgdKXT1DDOjlkElJI6i//Yqhgw/ZjS2tti7F16uvRrFvU6gabuHW
+         ClnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXc7V2ap0wAp6qw0U5+93krylPXV1jj0leK8euTZkkfzXRr+8V4wDulhKpuDuH1SINA9JJwpuiwGyulHcJrG7yJCzzZNRgB
+X-Gm-Message-State: AOJu0YwvJhKw5lEzx0LR0GXf1OupusPg/I2sdW8FRcMneSKUHC9Q5Vot
+	Jq6eH4jB1uNM9mgmk+A0oCf9gXUs59NAvQny3J3HD/nifzZi9aNhR8DYu9XDfu7zaYTyBdMJABF
+	oGSq0AX7hAZ2fkcMk4FU5u3uEYNOyVulpLQV2
+X-Google-Smtp-Source: AGHT+IE5WBFPkQE1UYAhvIFf0d5mnAUdlsEGWrhC2zVPDjA0RfuTTaSKcmUw73ewun1AK1uASHQuPihQ9bZCIaT/BJw=
+X-Received: by 2002:a17:906:a24c:b0:a55:59e6:13f5 with SMTP id
+ bi12-20020a170906a24c00b00a5559e613f5mr170031ejb.26.1713472738744; Thu, 18
+ Apr 2024 13:38:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240418071840.156411-1-toke@redhat.com> <ZiFkG45wi9AO3LEs@google.com>
- <87edb2ttdy.fsf@toke.dk>
-Message-ID: <ZiGEsLcInuowL25m@google.com>
-Subject: Re: [PATCH bpf] xdp: use flags field to disambiguate broadcast redirect
-From: Stanislav Fomichev <sdf@google.com>
-To: "Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?=" <toke@redhat.com>
-Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Hangbin Liu <liuhangbin@gmail.com>, 
-	syzbot+af9492708df9797198d6@syzkaller.appspotmail.com, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <171328983017.3930751.9484082608778623495.stgit@firesoul>
+ <171328989335.3930751.3091577850420501533.stgit@firesoul> <CAJD7tkZFnQK9CFofp5rxa7Mv9wYH2vWF=Bb28Dchupm8LRt7Aw@mail.gmail.com>
+ <651a52ac-b545-4b25-b82f-ad3a2a57bf69@kernel.org>
+In-Reply-To: <651a52ac-b545-4b25-b82f-ad3a2a57bf69@kernel.org>
+From: Yosry Ahmed <yosryahmed@google.com>
+Date: Thu, 18 Apr 2024 13:38:20 -0700
+Message-ID: <CAJD7tkbU1PB6ocRUVM0mw_q-c6kq1r9WsgkZwe1ppNkZG8KdQA@mail.gmail.com>
+Subject: Re: [PATCH v1 2/3] cgroup/rstat: convert cgroup_rstat_lock back to mutex
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: tj@kernel.org, hannes@cmpxchg.org, lizefan.x@bytedance.com, 
+	cgroups@vger.kernel.org, longman@redhat.com, netdev@vger.kernel.org, 
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org, shakeel.butt@linux.dev, 
+	kernel-team@cloudflare.com, Arnaldo Carvalho de Melo <acme@kernel.org>, 
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>, mhocko@kernel.org, Wei Xu <weixugc@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On 04/18, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> Stanislav Fomichev <sdf@google.com> writes:
->=20
-> > On 04/18, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> >> When redirecting a packet using XDP, the bpf_redirect_map() helper wil=
-l set
-> >> up the redirect destination information in struct bpf_redirect_info (u=
-sing
-> >> the __bpf_xdp_redirect_map() helper function), and the xdp_do_redirect=
-()
-> >> function will read this information after the XDP program returns and =
-pass
-> >> the frame on to the right redirect destination.
-> >>=20
-> >> When using the BPF_F_BROADCAST flag to do multicast redirect to a whol=
-e
-> >> map, __bpf_xdp_redirect_map() sets the 'map' pointer in struct
-> >> bpf_redirect_info to point to the destination map to be broadcast. And
-> >> xdp_do_redirect() reacts to the value of this map pointer to decide wh=
-ether
-> >> it's dealing with a broadcast or a single-value redirect. However, if =
-the
-> >> destination map is being destroyed before xdp_do_redirect() is called,=
- the
-> >> map pointer will be cleared out (by bpf_clear_redirect_map()) without
-> >> waiting for any XDP programs to stop running. This causes xdp_do_redir=
-ect()
-> >> to think that the redirect was to a single target, but the target poin=
-ter
-> >> is also NULL (since broadcast redirects don't have a single target), s=
-o
-> >> this causes a crash when a NULL pointer is passed to dev_map_enqueue()=
-.
-> >>=20
-> >> To fix this, change xdp_do_redirect() to react directly to the presenc=
-e of
-> >> the BPF_F_BROADCAST flag in the 'flags' value in struct bpf_redirect_i=
-nfo
-> >> to disambiguate between a single-target and a broadcast redirect. And =
-only
-> >> read the 'map' pointer if the broadcast flag is set, aborting if that =
-has
-> >> been cleared out in the meantime. This prevents the crash, while keepi=
-ng
-> >> the atomic (cmpxchg-based) clearing of the map pointer itself, and wit=
-hout
-> >> adding any more checks in the non-broadcast fast path.
-> >>=20
-> >> Fixes: e624d4ed4aa8 ("xdp: Extend xdp_redirect_map with broadcast supp=
-ort")
-> >> Reported-and-tested-by: syzbot+af9492708df9797198d6@syzkaller.appspotm=
-ail.com
-> >> Signed-off-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> >> ---
-> >>  net/core/filter.c | 42 ++++++++++++++++++++++++++++++++----------
-> >>  1 file changed, 32 insertions(+), 10 deletions(-)
-> >>=20
-> >> diff --git a/net/core/filter.c b/net/core/filter.c
-> >> index 786d792ac816..8120c3dddf5e 100644
-> >> --- a/net/core/filter.c
-> >> +++ b/net/core/filter.c
-> >> @@ -4363,10 +4363,12 @@ static __always_inline int __xdp_do_redirect_f=
-rame(struct bpf_redirect_info *ri,
-> >>  	enum bpf_map_type map_type =3D ri->map_type;
-> >>  	void *fwd =3D ri->tgt_value;
-> >>  	u32 map_id =3D ri->map_id;
-> >> +	u32 flags =3D ri->flags;
+On Thu, Apr 18, 2024 at 2:02=E2=80=AFAM Jesper Dangaard Brouer <hawk@kernel=
+.org> wrote:
+>
+>
+>
+> On 18/04/2024 04.19, Yosry Ahmed wrote:
+> > On Tue, Apr 16, 2024 at 10:51=E2=80=AFAM Jesper Dangaard Brouer <hawk@k=
+ernel.org> wrote:
+> >>
+> >> Since kernel v4.18, cgroup_rstat_lock has been an IRQ-disabling spinlo=
+ck,
+> >> as introduced by commit 0fa294fb1985 ("cgroup: Replace cgroup_rstat_mu=
+tex
+> >> with a spinlock").
+> >>
+> >> Despite efforts in cgroup_rstat_flush_locked() to yield the lock when
+> >> necessary during the collection of per-CPU stats, this approach has le=
+d
+> >> to several scaling issues observed in production environments. Holding
+> >> this IRQ lock has caused starvation of other critical kernel functions=
+,
+> >> such as softirq (e.g., timers and netstack). Although kernel v6.8
+> >> introduced optimizations in this area, we continue to observe instance=
+s
+> >> where the spin_lock is held for 64-128 ms in production.
+> >>
+> >> This patch converts cgroup_rstat_lock back to being a mutex lock. This
+> >> change is made possible thanks to the significant effort by Yosry Ahme=
+d
+> >> to eliminate all atomic context use-cases through multiple commits,
+> >> ending in 0a2dc6ac3329 ("cgroup: removecgroup_rstat_flush_atomic()"),
+> >> included in kernel v6.5.
+> >>
+> >> After this patch lock contention will be less obvious, as converting t=
+his
+> >> to a mutex avoids multiple CPUs spinning while waiting for the lock, b=
+ut
+> >> it doesn't remove the lock contention. It is recommended to use the
+> >> tracepoints to diagnose this.
 > >
-> > Any reason you copy ri->flags to the stack here? __bpf_xdp_redirect_map
-> > seems to be correctly resetting it for !BPF_F_BROADCAST case.
->=20
-> Well, we need to reset the values in xdp_do_redirect() to ensure things
-> are handled correctly if the next XDP program invocation returns
-> XDP_REDIRECT without calling bpf_redirect_map(). It's not *strictly*
-> necessary for the flags argument, since the other fields are reset so
-> that the code path that reads the flags field is never hit. But that is
-> not quite trivial to reason about, so I figured it was better to be
-> consistent with the other values here.
+> > I will keep the high-level conversation about using the mutex here in
+> > the cover letter thread, but I am wondering why we are keeping the
+> > lock dropping logic here with the mutex?
+> >
+>
+> I agree that yielding the mutex in the loop makes less sense.
+> Especially since the raw_spin_unlock_irqrestore(cpu_lock, flags) call
+> will be a preemption point for my softirq.   But I kept it because, we
+> are running a CONFIG_PREEMPT_VOLUNTARY kernel, so I still worried that
+> there was no sched point for other userspace processes while holding the
+> mutex, but I don't fully know the sched implication when holding a mutex.
 
-SG! Wanted to double check whether there is something I'm missing or
-the existing reset logic is fine :-)
+I guess dropping the lock before rescheduling could be more preferable
+in this case since we do not need to keep holding the lock for
+correctness.
 
-Acked-by: Stanislav Fomichev <sdf@google.com>
+>
+> > If this is to reduce lock contention, why does it depend on
+> > need_resched()? spin_needbreak() is a good indicator for lock
+> > contention, but need_resched() isn't, right?
+> >
+>
+> As I said, I'm unsure of the semantics of holding a mutex.
+>
+>
+> > Also, how was this tested?
+> >
+>
+> I tested this in a testlab, prior to posting upstream, with parallel
+> reader of the stat files.
+
+I believe high concurrency is a key point here. CC'ing Wei who
+reported regressions on previous attempts of mine before to address
+the lock contention from userspace.
+
+> As I said in other mail, I plan to experiment
+> with these patches(2+3) in production, as micro-benchmarking will not
+> reveal the corner cases we care about.
+
+Right, but micro-benchmarking should give us a signal about
+regressions. It was very useful for me when working with this code
+before to use synthetic benchmarks with high concurrency of userspace
+reads and/or kernel flushers.
 
