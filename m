@@ -1,155 +1,172 @@
-Return-Path: <netdev+bounces-89305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46B1D8A9FBE
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 18:12:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A99F58A9FC5
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 18:13:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6544B1C211D5
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 16:12:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C395B224EC
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 16:13:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C5A16F8EC;
-	Thu, 18 Apr 2024 16:12:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E98AF16F8FC;
+	Thu, 18 Apr 2024 16:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="nnf1K6FF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M66D379U"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99B4C16F8F2
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 16:12:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9435023D7;
+	Thu, 18 Apr 2024 16:13:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713456773; cv=none; b=Ks6yLB0QXA6/WVfbOTZnhL+diN5MyXz0RPpC5XfzpGMWotkXahNT6R7OdZP5P9NmZSj5JUkiooX3ZzLDaOLBxW5uuZp7mI37ZDn7IhghQOzJDCMn5+QAnS3CHMKH8pjvrjYIGtpHe2J6IPKXu1sdDuKMW98oiULyOyb6grVX3BI=
+	t=1713456821; cv=none; b=b5gXJpVfXCTedyIO9rdVajN0bQEu/RPKLlNCRzsKU8ScYvRtNPDSy+y/U+fKd02JKK2CaR7HcFYb4BPOIyFxiSNIgXkb/SThSfCOXikPnN+0pOJobb3VYuGfp+T5F0gLQoKRldfNWQE0qTxtIGc1m1PGCIkyA4TKroO9XRDtyp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713456773; c=relaxed/simple;
-	bh=DzP2+Rou1vBke4fg3Es7yZqkGcEs7wwaqusD7F504LI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k1SwaSHbmO17rOKq6S1B2w4dWBnOLLb4gSqXUxA7s3VFlPwILZgspq/5ITS6FCabX7+loBemqDaSiPFeFTNlV9KvNEoDzMzXAfogbyOz+nGcFB8xilvZIcLsVVzuWZjnErJcTMkviEcMBKYY6XlEKjBQ17IG2zmMuNZZADHkP1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=nnf1K6FF; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1713456762; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=sbRtelo6/hK6s0/wj/48pFdnZmrztc3yweXzaicZPiw=;
-	b=nnf1K6FFLkm1TX4uMvVlUp4YNtyBjXC4tUhUrEnGnO2I20e7GdqLoLGL1edoXOtHF52hPP0C2XyI4AmC49GgGGk06zT0DFhoZHnRyKOu1ZMyjtYJoeYeGe/H4rg61P3D8XRF87dCAuPqs1zcW2v8dl45ZoG4BHfTWIm3+JbGHxY=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W4p4NLF_1713456759;
-Received: from 30.13.151.155(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W4p4NLF_1713456759)
-          by smtp.aliyun-inc.com;
-          Fri, 19 Apr 2024 00:12:41 +0800
-Message-ID: <a8ffbe97-22d1-4afe-bc6a-b4f9e7a8089a@linux.alibaba.com>
-Date: Fri, 19 Apr 2024 00:12:39 +0800
+	s=arc-20240116; t=1713456821; c=relaxed/simple;
+	bh=q/TFlw8SQh+Cko4nU/ng2SJ+spicGdHxGtHPBf/Abnk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=sa5qnWUQX0RErrpdnnxH7GgWCr5lEqhJwDAuJnGGize3UarOoOIuloejC7OxMSPLUwwPPT1eEdd9me6y0BaubUNVx7nV5Dix2Fj+CvTEwHFU2X31FKk5Xed6nJQ+i3oeN2e/Doq0jWcPc62fTzQTO1p+xnswM3qk9TRO4PfG7KY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M66D379U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24FA7C32783;
+	Thu, 18 Apr 2024 16:13:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713456821;
+	bh=q/TFlw8SQh+Cko4nU/ng2SJ+spicGdHxGtHPBf/Abnk=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=M66D379UjZi2pzII5y0MS95jTIIdgeaP5CeOU5t6T8ugoVGoFqm+PLgIbtbjL7jJB
+	 NWZmI3wmyAW6yd89gdzYoIAx8VH5oZAnUb+Nm6vIWzmLAIwB+yayQqOZ7130lPGtZc
+	 76JyrlVTFHePR2a2syZozERpds1Ug/Dsrn50BaO6JXr296Nahb9Dr77AX8YroHZzWq
+	 ciX+VZkyUUoI9u3hjnf+cfLWuwOsKCHK6cQNotuS8wjUQA9NYe2vZrosUyMIWeB+1J
+	 tItBnOKtFJxbN9219aDk9FhAD2AC9p6dPGaByqxXhKspOCjdnFu5QP7jGAJaqTXGND
+	 Hk/edIrXHleKg==
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5196fe87775so1055976e87.3;
+        Thu, 18 Apr 2024 09:13:41 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWzxuaphsl+RABbKWgK+hHzWpVoE5uljVBdLb52fmQ0owrzbH3CEcvvjgOCi5BH9Kyow2XR2gNjz+j65gOSvQuBKFO7vv/Rx787BrFVcKQF2toqDopOnNBcDMgwIxPCbBeBVah/xoVOxcH6QBZMzbn+Bz0mwpNeIgh23YBHjPRyDcEJXse08UfAEJSpArLWBpHd7YcJfnJBwhxF6tbG7Trce9qqIPM5nEL+OLV2VLnsaL9eQsQMlSzM6e1OGKpKfTjCwMcaYUIOd4txRINW1sBWAQxyJfKcnnIL7Cmh1ag2Sq9WE5b12vaF8fIZ3rwGK557FUEvg8Fo4mzjwSjuhjx2QNw+aOaGkWpsdsHdbSLAruZytryCfxkikgcKk0WI/sx9mQE3oYxhoJzzPyOCXEfgmpqimuGlMpAK5Ofy4XHmjECTrH0Y3XgIifc=
+X-Gm-Message-State: AOJu0YwmiN4vTEBt/JgaK4RfY8DCk8e/WtC0+HAR6P6/ODoCrPpahoYl
+	Fl1u33dU7gW4WNBpEHPDJEOuhZSfyJ8cRzLZymo5mR8lTKpNwRux4SIYTchgMsu9LcgjJwJuIZM
+	uq6vAGlg/julyKhA4aAUTNtsK/QU=
+X-Google-Smtp-Source: AGHT+IHLiDWbpJNv5cpg7tSucX1RJbILlT9QE6EE0zaOt0RsDuLJ8JfO9fqfVmmivnqe0091gRHYHRJJ+tsSYBR5kLA=
+X-Received: by 2002:ac2:5fad:0:b0:519:569b:361b with SMTP id
+ s13-20020ac25fad000000b00519569b361bmr1973077lfe.63.1713456819439; Thu, 18
+ Apr 2024 09:13:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 3/6] virtio_net: Add a lock for the command
- VQ.
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "mst@redhat.com" <mst@redhat.com>,
- "xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, Jiri Pirko <jiri@nvidia.com>,
- Dan Jurgens <danielj@nvidia.com>, Jason Wang <jasowang@redhat.com>
-References: <20240416193039.272997-1-danielj@nvidia.com>
- <20240416193039.272997-4-danielj@nvidia.com>
- <CACGkMEsCm3=7FtnsTRx5QJo3ZM0Ko1OEvssWew_tfxm5V=MXvQ@mail.gmail.com>
- <28e45768-5091-484d-b09e-4a63bc72a549@linux.alibaba.com>
- <ad9f7b83e48cfd7f1463d8c728061c30a4509076.camel@redhat.com>
- <CH0PR12MB85802CBD3808B483876F8C77C90E2@CH0PR12MB8580.namprd12.prod.outlook.com>
- <72f6c8a55adac52ad17dfe11a579b5b3d5dc3cec.camel@redhat.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <72f6c8a55adac52ad17dfe11a579b5b3d5dc3cec.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240411160051.2093261-1-rppt@kernel.org> <20240411160051.2093261-6-rppt@kernel.org>
+ <20240415075241.GF40213@noisy.programming.kicks-ass.net> <Zh1lnIdgFeM1o8S5@FVFF77S0Q05N.cambridge.arm.com>
+ <Zh4nJp8rv1qRBs8m@kernel.org> <CAPhsuW6Pbg2k_Gu4dsBx+H8H5XCHvNdtEZJBPiG_eT0qqr9D1w@mail.gmail.com>
+ <ZiE91CJcNw7gBj9g@kernel.org>
+In-Reply-To: <ZiE91CJcNw7gBj9g@kernel.org>
+From: Song Liu <song@kernel.org>
+Date: Thu, 18 Apr 2024 09:13:27 -0700
+X-Gmail-Original-Message-ID: <CAPhsuW4au6v8k8Ab7Ff6Yj64rGvZ7wkz=Xrgh8ZZtLyscpChqQ@mail.gmail.com>
+Message-ID: <CAPhsuW4au6v8k8Ab7Ff6Yj64rGvZ7wkz=Xrgh8ZZtLyscpChqQ@mail.gmail.com>
+Subject: Re: [PATCH v4 05/15] mm: introduce execmem_alloc() and execmem_free()
+To: Mike Rapoport <rppt@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>, Peter Zijlstra <peterz@infradead.org>, 
+	linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Bjorn Topel <bjorn@kernel.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
+	"David S. Miller" <davem@davemloft.net>, Dinh Nguyen <dinguyen@kernel.org>, 
+	Donald Dutile <ddutile@redhat.com>, Eric Chanudet <echanude@redhat.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>, Huacai Chen <chenhuacai@kernel.org>, 
+	Kent Overstreet <kent.overstreet@linux.dev>, Luis Chamberlain <mcgrof@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Nadav Amit <nadav.amit@gmail.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Puranjay Mohan <puranjay12@gmail.com>, 
+	Rick Edgecombe <rick.p.edgecombe@intel.com>, Russell King <linux@armlinux.org.uk>, 
+	Steven Rostedt <rostedt@goodmis.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
+	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, bpf@vger.kernel.org, 
+	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mips@vger.kernel.org, linux-mm@kvack.org, linux-modules@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev, 
+	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-在 2024/4/18 下午11:48, Paolo Abeni 写道:
-> On Thu, 2024-04-18 at 15:38 +0000, Dan Jurgens wrote:
->>> From: Paolo Abeni <pabeni@redhat.com>
->>> Sent: Thursday, April 18, 2024 5:57 AM
->>> On Thu, 2024-04-18 at 15:36 +0800, Heng Qi wrote:
->>>> 在 2024/4/18 下午2:42, Jason Wang 写道:
->>>>> On Wed, Apr 17, 2024 at 3:31 AM Daniel Jurgens <danielj@nvidia.com>
->>> wrote:
->>>>>> The command VQ will no longer be protected by the RTNL lock. Use a
->>>>>> spinlock to protect the control buffer header and the VQ.
->>>>>>
->>>>>> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
->>>>>> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
->>>>>> ---
->>>>>>    drivers/net/virtio_net.c | 6 +++++-
->>>>>>    1 file changed, 5 insertions(+), 1 deletion(-)
->>>>>>
->>>>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->>>>>> index 0ee192b45e1e..d02f83a919a7 100644
->>>>>> --- a/drivers/net/virtio_net.c
->>>>>> +++ b/drivers/net/virtio_net.c
->>>>>> @@ -282,6 +282,7 @@ struct virtnet_info {
->>>>>>
->>>>>>           /* Has control virtqueue */
->>>>>>           bool has_cvq;
->>>>>> +       spinlock_t cvq_lock;
->>>>> Spinlock is instead of mutex which is problematic as there's no
->>>>> guarantee on when the driver will get a reply. And it became even
->>>>> more serious after 0d197a147164 ("virtio-net: add cond_resched() to
->>>>> the command waiting loop").
->>>>>
->>>>> Any reason we can't use mutex?
->>>> Hi Jason,
->>>>
->>>> I made a patch set to enable ctrlq's irq on top of this patch set,
->>>> which removes cond_resched().
->>>>
->>>> But I need a little time to test, this is close to fast. So could the
->>>> topic about cond_resched + spin lock or mutex lock be wait?
->>> The big problem is that until the cond_resched() is there, replacing the
->>> mutex with a spinlock can/will lead to scheduling while atomic splats. We
->>> can't intentionally introduce such scenario.
->> When I created the series set_rx_mode wasn't moved to a work queue,
->> and the cond_resched wasn't there.
-> Unfortunately cond_resched() is there right now.
-
-YES.
-
+On Thu, Apr 18, 2024 at 8:37=E2=80=AFAM Mike Rapoport <rppt@kernel.org> wro=
+te:
 >
->> Mutex wasn't possible, then. If the CVQ is made to be event driven, then
->> the lock can be released right after posting the work to the VQ.
-> That should work.
-
-Yes, I will test my new patches (ctrlq with irq enabled) soon, then the 
-combination
-of the this set and mine MAY make deciding between mutex or spin lock 
-easier.
-
-Thanks.
-
+[...]
+> >
+> > Is +/- 2G enough for all realistic use cases? If so, I guess we don't
+> > really need
+> > EXECMEM_ANYWHERE below?
+> >
+> > > >
+> > > > * I'm not sure about BPF's requirements; it seems happy doing the s=
+ame as
+> > > >   modules.
+> > >
+> > > BPF are happy with vmalloc().
+> > >
+> > > > So if we *must* use a common execmem allocator, what we'd reall wan=
+t is our own
+> > > > types, e.g.
+> > > >
+> > > >       EXECMEM_ANYWHERE
+> > > >       EXECMEM_NOPLT
+> > > >       EXECMEM_PREL32
+> > > >
+> > > > ... and then we use those in arch code to implement module_alloc() =
+and friends.
+> > >
+> > > I'm looking at execmem_types more as definition of the consumers, may=
+be I
+> > > should have named the enum execmem_consumer at the first place.
+> >
+> > I think looking at execmem_type from consumers' point of view adds
+> > unnecessary complexity. IIUC, for most (if not all) archs, ftrace, kpro=
+be,
+> > and bpf (and maybe also module text) all have the same requirements.
+> > Did I miss something?
 >
->>> Side note: the compiler apparently does not like guard() construct, leading to
->>> new warning, here and in later patches. I'm unsure if the code simplification
->>> is worthy.
->> I didn't see any warnings with GCC or clang. This is used other places in the kernel as well.
->> gcc version 13.2.1 20230918 (Red Hat 13.2.1-3) (GCC)
->> clang version 17.0.6 (Fedora 17.0.6-2.fc39)
->>
-> See:
+> It's enough to have one architecture with different constrains for kprobe=
+s
+> and bpf to warrant a type for each.
 >
-> https://patchwork.kernel.org/project/netdevbpf/patch/20240416193039.272997-4-danielj@nvidia.com/
-> https://netdev.bots.linux.dev/static/nipa/845178/13632442/build_32bit/stderr
-> https://netdev.bots.linux.dev/static/nipa/845178/13632442/build_allmodconfig_warn/stderr
->
-> Cheers,
->
-> Paolo
 
+AFAICT, some of these constraints can be changed without too much work.
+
+> Where do you see unnecessary complexity?
+>
+> > IOW, we have
+> >
+> > enum execmem_type {
+> >         EXECMEM_DEFAULT,
+> >         EXECMEM_TEXT,
+> >         EXECMEM_KPROBES =3D EXECMEM_TEXT,
+> >         EXECMEM_FTRACE =3D EXECMEM_TEXT,
+> >         EXECMEM_BPF =3D EXECMEM_TEXT,      /* we may end up without
+> > _KPROBE, _FTRACE, _BPF */
+> >         EXECMEM_DATA,  /* rw */
+> >         EXECMEM_RO_DATA,
+> >         EXECMEM_RO_AFTER_INIT,
+> >         EXECMEM_TYPE_MAX,
+> > };
+> >
+> > Does this make sense?
+>
+> How do you suggest to deal with e.g. riscv that has separate address spac=
+es
+> for modules, kprobes and bpf?
+
+IIUC, modules and bpf use the same address space on riscv, while kprobes us=
+e
+vmalloc address. I haven't tried this yet, but I think we can let
+kprobes use the
+same space as modules and bpf, which is:
+
+ffffffff00000000 |  -4     GB | ffffffff7fffffff |    2 GB | modules, BPF
+
+Did I get this right?
+
+Thanks,
+Song
 
