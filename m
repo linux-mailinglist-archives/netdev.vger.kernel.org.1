@@ -1,100 +1,77 @@
-Return-Path: <netdev+bounces-88946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BE718A90DC
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 03:49:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1D3A8A90F2
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 04:04:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DBF41C20B75
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:49:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29818B2105D
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 02:04:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF1D1755B;
-	Thu, 18 Apr 2024 01:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64B5039FD4;
+	Thu, 18 Apr 2024 02:04:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BVo0sdK8"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F99A93B;
-	Thu, 18 Apr 2024 01:48:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA752AC29
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 02:04:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713404939; cv=none; b=WZQlC/0JBKZ9ojXxIiiC5r+1tk8mndXsdCA4Ry10KBR7zsyYPJ62+qHRZD3+PVHX7KlIJ6lmFVKo05Y7Xjq+o7E5WpdUWEpczhZT/XybWf3N5abG/B78F2FM5w5JeU3ky1E9P1vvaiOCV8GFz6Ef6xsdro8eIjCpgbm883GydmY=
+	t=1713405874; cv=none; b=SWYb2F5LDKb/hx1tKXd27dGXgkV7u0U0aMnikAAc+w9I6udgFF5dGW/kaHthRCyeFU92LTpVe5amZpBZcQwv27HJKxpN2I/4SfkFmAFiDazT6+02mwppaS1Tk+hy9NvF2/7XwtMGOeeE2dTOyJGQTShy60tXWssDdx8cKuWkszM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713404939; c=relaxed/simple;
-	bh=2YbOWUTzBCM/VOm648w1kjTYt8pu0NEiyfJ88M/zC/0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=QvcU9dEWtRJq940TMfMbXioT2HQHANHoEfdOf6NLAPR0M4Qr7FKDkGFqEYIajQeYNetFga+15fpPNNaPBhIs+dpbVQ7bSWGKlFMkMa2Yc+iV2dhlz/XAS9HQSTrJRQJohCgVpvY5qzLWTbLoRpnv39YHawP2BsLTeJlmMK4eAps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4VKgb21G9pzXlVJ;
-	Thu, 18 Apr 2024 09:45:34 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id ED129140120;
-	Thu, 18 Apr 2024 09:48:53 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 18 Apr 2024 09:48:53 +0800
-Message-ID: <cd006e26-6f6e-2771-d1bc-76098a5970ac@huawei.com>
-Date: Thu, 18 Apr 2024 09:48:52 +0800
+	s=arc-20240116; t=1713405874; c=relaxed/simple;
+	bh=PVhKKHJI4shrFCO/huqPgSbYfjiKakyt0Oy3vIuoxxI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uQFEL/kyLjTHbL/OdsrKoHJOX1+062Aurp4GNGj9xBqq/M65O6OU903XGWzbeIhHNTImG6y5SxYQveHD78NYfjV/8a87sg68wRbCBjlJrfvcqRt1hjbA5uy98euKEQesBwELJcYoIjfPzTbyBuLNbJVahSd29kLNi6c2JgeTjFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BVo0sdK8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BA2FC072AA;
+	Thu, 18 Apr 2024 02:04:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713405873;
+	bh=PVhKKHJI4shrFCO/huqPgSbYfjiKakyt0Oy3vIuoxxI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BVo0sdK8sqYoJen8aUOvtXhYEuGGTfulJb2BdwYI6kIenibHzJF5Nm5KLPk5PKFit
+	 zBxhWJ/Br+wCgeeWqbsJwNKupZ20Z3GZq2iZy6nAL7/GfM807e3sEk3VHjlXHLm8zr
+	 WfXdIGoFZ3FWdHGhskp6frokWoIJgdU28gSQWJG0JRz+zlxu1iMoe6GcUp/av39iWb
+	 VT+MS3Mquwp1CbhsJXo9MLdf+090QiEGJiZUnzyHbd7+1qxJTCDzxCQgA2VhnuF5/r
+	 GJ5tAbeaxxZoKbf6hnXZx4L12nty3UpyiNB3+bNDXMGvveEFhE+LjMSIEsrplD+UWv
+	 ygtbrMa2lqNtw==
+Date: Wed, 17 Apr 2024 19:04:32 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, David Ahern
+ <dsahern@kernel.org>, Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, Willem de Bruijn
+ <willemb@google.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
+ <netdev@vger.kernel.org>, syzkaller <syzkaller@googlegroups.com>
+Subject: Re: [PATCH v1 net 1/5] sit: Pull header after checking
+ skb->protocol in sit_tunnel_xmit().
+Message-ID: <20240417190432.5d9dc732@kernel.org>
+In-Reply-To: <20240415222041.18537-2-kuniyu@amazon.com>
+References: <20240415222041.18537-1-kuniyu@amazon.com>
+	<20240415222041.18537-2-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH net] net/smc: fix potential sleeping issue in
- smc_switch_conns
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Guangguan Wang
-	<guangguan.wang@linux.alibaba.com>, <linux-s390@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <jaka@linux.ibm.com>, <alibuda@linux.alibaba.com>,
-	<tonylu@linux.alibaba.com>, <guwen@linux.alibaba.com>,
-	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
-	<tangchengchang@huawei.com>
-References: <20240413035150.3338977-1-shaozhengchao@huawei.com>
- <6520c574-e1c6-49e0-8bb1-760032faaf7a@linux.alibaba.com>
- <ed5f3665-43ae-cbab-b397-c97c922d26eb@huawei.com>
- <c6deb857-2236-4ec0-b4c7-25a160f1bcfb@linux.ibm.com>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <c6deb857-2236-4ec0-b4c7-25a160f1bcfb@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Mon, 15 Apr 2024 15:20:37 -0700 Kuniyuki Iwashima wrote:
+> syzkaller crafted a GSO packet of ETH_P_8021AD + ETH_P_NSH and sent it
+> over sit0.
+> 
+> After nsh_gso_segment(), skb->data - skb->head was 138, on the other
+> hand, skb->network_header was 128.
 
-
-On 2024/4/17 23:23, Wenjia Zhang wrote:
-> 
-> 
-> On 17.04.24 10:29, shaozhengchao wrote:
->>
->> Hi Guangguan:
->>    Thank you for your review. When I used the hns driver, I ran into the
->> problem of "scheduling while atomic". But the problem was tested on the
->> 5.10 kernel branch, and I'm still trying to reproduce it using the
->> mainline.
->>
->> Zhengchao Shao
->>
-> 
-Hi Wenjia:
-   I will try to reproduce it. In addition, the last time I sent you a
-issue about the smc-tool, do you have any idea?
-
-Thank you
-Zhengchao Shao
-> Could you please try to reproduce the bug with the latest kernel? And 
-> show more details (e.g. kernel log) on this bug?
-> 
-> Thanks,
-> Wenjia
+is data offset > skb->network_header valid at this stage?
+Can't we drop these packets instead?
 
