@@ -1,259 +1,130 @@
-Return-Path: <netdev+bounces-89229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F15B88A9BA0
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 15:50:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16E8D8A9BA4
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 15:52:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A880A2816E6
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:50:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48B041C22D39
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:52:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2106982889;
-	Thu, 18 Apr 2024 13:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2709B160796;
+	Thu, 18 Apr 2024 13:52:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y0bthSUN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nXJI8z3w"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60445EAD2
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 13:50:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E38EAD2;
+	Thu, 18 Apr 2024 13:52:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713448235; cv=none; b=kB7HrN3mRDph1iTBUehI2/6dQBznwUEYZDApUvCYtIiujfScAK4LPJ0MDm7QEX+/BZb0l6pK2ZMewDH1vIuhOMPi9eciKCTHbS5jFY2jSMewLDYz8cxA6F6ugrIA+V9OwlYMsDwWiyyLPlAg5OTZvSDedwXGuNLnzfXVgoAj/j8=
+	t=1713448354; cv=none; b=U6TNRrL6G1MnZEgbDT2QPLYPRYbVhkS1IT35dCfFPP9imBNq1vNwPQ5j+g8iNbIGyk5aOiGpViFxFH9/ncFLaLENX99jl486B7xWKBCSV2ZAZ04LChsYoE7Fd4VX6kmsCbXjw0TJ/kBN8nGYHPQf/fAn61sVOyhNJJmqLb7DmXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713448235; c=relaxed/simple;
-	bh=B+4p1ag6NIMNulSFYsY1N84u/KMvVtCvBo+OuAmUXy0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WNnb9ajyA7By616HrWcmznRDLn6IkCAK5P2ZH7XgxhrHDcyB5B3uCdk4KGaaZKV6O7IA/XaXI9MLs/HivseOtxdBy9VIPYNNQeHcL43oxU+aHMCTCuYQngodXZuN1hQ96BGuT9zuLxcEjfTPvgMmpdWEQ7D77poOFGHOQdQ8dDw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y0bthSUN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713448232;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=cJIktUU/P6Fto6HocisdAyKaVqJxP2VEEZLFfKubyvU=;
-	b=Y0bthSUN868GIU8O4X5pdvrjvDLRx7v04UpQFz/tA6DZ5f7yUe8BslxIFOJcLd5yAiyMso
-	NRxodpVr9q4vb47ZDhl/i8AOemZIGsK+oAB+3yzTcP4iC0NT630jONwMEelYRaT2W0hkQZ
-	/lSPSHktast/5F6Vp9Gm5267DK6D2EM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-130-1s7qMdWzOaCRiDlQpKc2XQ-1; Thu, 18 Apr 2024 09:50:30 -0400
-X-MC-Unique: 1s7qMdWzOaCRiDlQpKc2XQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4B1FF104B500;
-	Thu, 18 Apr 2024 13:50:30 +0000 (UTC)
-Received: from dcaratti.users.ipa.redhat.com (unknown [10.45.226.10])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id AC1062166B32;
-	Thu, 18 Apr 2024 13:50:27 +0000 (UTC)
-From: Davide Caratti <dcaratti@redhat.com>
-To: Eric Dumazet <edumazet@google.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Maxim Mikityanskiy <maxim@isovalent.com>,
-	Victor Nogueira <victor@mojatatu.com>
-Cc: netdev@vger.kernel.org,
-	renmingshuai@huawei.com,
-	jiri@resnulli.us,
-	xiyou.wangcong@gmail.com,
-	xmu@redhat.com,
-	Christoph Paasch <cpaasch@apple.com>
-Subject: [PATCH net-next v2] net/sched: fix false lockdep warning on qdisc root lock
-Date: Thu, 18 Apr 2024 15:50:11 +0200
-Message-ID: <7dc06d6158f72053cf877a82e2a7a5bd23692faa.1713448007.git.dcaratti@redhat.com>
+	s=arc-20240116; t=1713448354; c=relaxed/simple;
+	bh=Je31ci+eyD97RXiVi+9JjGy6yYzwIgH+zf+ojiy2P8U=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=n0PyD9gXoKwy7NrF5S3wKrU/yaQBZABboI9hvzrj/BBjvUK3MnmorAIq3Xr9H6XxodI2mkCJDa1ErSu6iw+HGxjgdxd99YyszfWsMS3gB3eM6efIPWgMqQpFkkVC0pFE+c8d6JsH77zSuzdJfGTV/Vwq7UKK62oEKXy76GbHdUs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nXJI8z3w; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-61500da846fso6349287b3.1;
+        Thu, 18 Apr 2024 06:52:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713448352; x=1714053152; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=KWDkD4GBnwBQNPancuw8naTRgpzqp6wkxrmNfvesCMc=;
+        b=nXJI8z3wGOsRB73GfOuJT9zurZ6Ji06lBZbCd1QoSnzm+Eij+0qE5Mgw6GCoZZNw++
+         GIDSSx7zG1V9hA7160zKDQ2eG1i8qXN8XthIKoBEZeEBcBOKS1gdtktmrub4q23YyLao
+         jVXmUe/5Xk1ANbzxKkF8M085EZr4MEGO2/5OE053f9f2tF3IjtJIvXJjxo1vi2VR3fOs
+         zZEQ0BqBHOtlQt2bPZEsQF4ibr1vPovxdtToo7y3bxJK8+JspKtDQ2CIjdeFaL7zJP4s
+         bQAAYVWLY9+9ZREBgicg0Fe4VD/+KerJsW+Sn58f5ZzT6rvcmEIP0eEUy+O892fkdS3r
+         8EcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713448352; x=1714053152;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=KWDkD4GBnwBQNPancuw8naTRgpzqp6wkxrmNfvesCMc=;
+        b=bdGcOPoqnRHME90qUZhnytR2jULGST+Wm3+3qHMLrLMkR+FlW2YABuiFVZzmBswqpT
+         41zOD+mgm7drcMrIyXn3zi4piM/VU75J0LKHwVShRSC6sAakTpU04/MYTviiYVzKncqe
+         uNmFzySzAgJ/IcPJS114X2CBkdLSftUq9ihtmytg30euu6nXxLayBqh3qfmmBt43BfCu
+         nsr4/dxPDMRttU7HzxbTxLLNVzJNqIXr1VWg6+o+6RiE/THJbgt95AlslRX48u6jIMVz
+         lLM9CGIFjQsrbOQNIhvGs8eN0cP8krNV6TJNbWIDWJKpsqbPe96+OxAtrvzrJ3W/PDs+
+         n5BA==
+X-Forwarded-Encrypted: i=1; AJvYcCUPwEMPyCOuJeqi987XZTW5Wxt77OIY110nswniCiPK+790FS9fuPTi7eEmkVpz+N8DgN3uiv1YXDdzL7MWFKKGXN7vKFb4ZxxnQA9MvMlIUDBQ1Sc09I/4njVE93PrCqBbN1kk
+X-Gm-Message-State: AOJu0Yxvqf6bgiOrc0J1spWBs0NuYODBndRFMm/Lu6L12FLGPJkvn7lo
+	0Z2Yh/OH4n34bwflpj9L6x1lMxDgpm7dKmpSBuTL3IIHp24Y6oaY3+aKsA==
+X-Google-Smtp-Source: AGHT+IHcC/d5g/vrVO8yq6W/ye3vmtyJcu0gh/Sfv4UXpVtFtmjp0tOz0EvRUuueXnSjUeruqSxwbw==
+X-Received: by 2002:a05:690c:25c7:b0:61b:2:6c36 with SMTP id dv7-20020a05690c25c700b0061b00026c36mr2640195ywb.24.1713448350174;
+        Thu, 18 Apr 2024 06:52:30 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id ku20-20020a05622a0a9400b00437add246c2sm240951qtb.7.2024.04.18.06.52.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 06:52:29 -0700 (PDT)
+Date: Thu, 18 Apr 2024 09:52:29 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>, 
+ Yick Xie <yick.xie@gmail.com>, 
+ willemdebruijn.kernel@gmail.com, 
+ willemb@google.com
+Cc: netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ dsahern@kernel.org, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org
+Message-ID: <6621259d66d0f_ec9b929478@willemb.c.googlers.com.notmuch>
+In-Reply-To: <0a17d6745d5c6d4bb635cfac1029e90c1ac2c676.camel@redhat.com>
+References: <20240416190330.492972-1-yick.xie@gmail.com>
+ <0a17d6745d5c6d4bb635cfac1029e90c1ac2c676.camel@redhat.com>
+Subject: Re: [PATCH net v2] udp: don't be set unconnected if only UDP cmsg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Xiumei and Christoph reported the following lockdep splat, complaining of
-the qdisc root lock being taken twice:
+Paolo Abeni wrote:
+> Hi,
+> 
+> On Wed, 2024-04-17 at 03:03 +0800, Yick Xie wrote:
+> > If "udp_cmsg_send()" returned 0 (i.e. only UDP cmsg),
+> > "connected" should not be set to 0. Otherwise it stops
+> > the connected socket from using the cached route.
+> > 
+> > Fixes: 2e8de8576343 ("udp: add gso segment cmsg")
+> > Signed-off-by: Yick Xie <yick.xie@gmail.com>
+> > Cc: stable@vger.kernel.org
+> 
+> Minor: the patch subj is IMHO a bit confusing, what about removing the
+> double negation?
+> 
+> preserve connect status with UDP-only cmsg
+> 
+> > ---
+> > v2: Add Fixes tag
+> > v1: https://lore.kernel.org/netdev/20240414195213.106209-1-yick.xie@gmail.com/
+> > ---
+> >  net/ipv4/udp.c | 5 +++--
+> >  1 file changed, 3 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > index c02bf011d4a6..420905be5f30 100644
+> > --- a/net/ipv4/udp.c
+> > +++ b/net/ipv4/udp.c
+> 
+> What about ipv6? why this fix does not apply there, too?
 
- ============================================
- WARNING: possible recursive locking detected
- 6.7.0-rc3+ #598 Not tainted
- --------------------------------------------
- swapper/2/0 is trying to acquire lock:
- ffff888177190110 (&sch->q.lock){+.-.}-{2:2}, at: __dev_queue_xmit+0x1560/0x2e70
-
- but task is already holding lock:
- ffff88811995a110 (&sch->q.lock){+.-.}-{2:2}, at: __dev_queue_xmit+0x1560/0x2e70
-
- other info that might help us debug this:
-  Possible unsafe locking scenario:
-
-        CPU0
-        ----
-   lock(&sch->q.lock);
-   lock(&sch->q.lock);
-
-  *** DEADLOCK ***
-
-  May be due to missing lock nesting notation
-
- 5 locks held by swapper/2/0:
-  #0: ffff888135a09d98 ((&in_dev->mr_ifc_timer)){+.-.}-{0:0}, at: call_timer_fn+0x11a/0x510
-  #1: ffffffffaaee5260 (rcu_read_lock){....}-{1:2}, at: ip_finish_output2+0x2c0/0x1ed0
-  #2: ffffffffaaee5200 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x209/0x2e70
-  #3: ffff88811995a110 (&sch->q.lock){+.-.}-{2:2}, at: __dev_queue_xmit+0x1560/0x2e70
-  #4: ffffffffaaee5200 (rcu_read_lock_bh){....}-{1:2}, at: __dev_queue_xmit+0x209/0x2e70
-
- stack backtrace:
- CPU: 2 PID: 0 Comm: swapper/2 Not tainted 6.7.0-rc3+ #598
- Hardware name: Red Hat KVM, BIOS 1.13.0-2.module+el8.3.0+7353+9de0a3cc 04/01/2014
- Call Trace:
-  <IRQ>
-  dump_stack_lvl+0x4a/0x80
-  __lock_acquire+0xfdd/0x3150
-  lock_acquire+0x1ca/0x540
-  _raw_spin_lock+0x34/0x80
-  __dev_queue_xmit+0x1560/0x2e70
-  tcf_mirred_act+0x82e/0x1260 [act_mirred]
-  tcf_action_exec+0x161/0x480
-  tcf_classify+0x689/0x1170
-  prio_enqueue+0x316/0x660 [sch_prio]
-  dev_qdisc_enqueue+0x46/0x220
-  __dev_queue_xmit+0x1615/0x2e70
-  ip_finish_output2+0x1218/0x1ed0
-  __ip_finish_output+0x8b3/0x1350
-  ip_output+0x163/0x4e0
-  igmp_ifc_timer_expire+0x44b/0x930
-  call_timer_fn+0x1a2/0x510
-  run_timer_softirq+0x54d/0x11a0
-  __do_softirq+0x1b3/0x88f
-  irq_exit_rcu+0x18f/0x1e0
-  sysvec_apic_timer_interrupt+0x6f/0x90
-  </IRQ>
-
-This happens when TC does a mirred egress redirect from the root qdisc of
-device A to the root qdisc of device B. As long as these two locks aren't
-protecting the same qdisc, they can be acquired in chain: add a per-qdisc
-lockdep key to silence false warnings.
-This dynamic key should safely replace the static key we have in sch_htb:
-it was added to allow enqueueing to the device "direct qdisc" while still
-holding the qdisc root lock.
-
-v2: don't use static keys anymore in HTB direct qdiscs (thanks Eric Dumazet)
-
-CC: Maxim Mikityanskiy <maxim@isovalent.com>
-CC: Xiumei Mu <xmu@redhat.com>
-Reported-by: Christoph Paasch <cpaasch@apple.com>
-Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/451
-Signed-off-by: Davide Caratti <dcaratti@redhat.com>
----
- include/net/sch_generic.h |  1 +
- net/sched/sch_generic.c   |  3 +++
- net/sched/sch_htb.c       | 22 +++-------------------
- 3 files changed, 7 insertions(+), 19 deletions(-)
-
-diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
-index 76db6be16083..47ccaa0bff29 100644
---- a/include/net/sch_generic.h
-+++ b/include/net/sch_generic.h
-@@ -127,6 +127,7 @@ struct Qdisc {
- 
- 	struct rcu_head		rcu;
- 	netdevice_tracker	dev_tracker;
-+	struct lock_class_key	root_lock_key;
- 	/* private data */
- 	long privdata[] ____cacheline_aligned;
- };
-diff --git a/net/sched/sch_generic.c b/net/sched/sch_generic.c
-index ff5336493777..7dca99a4e5d1 100644
---- a/net/sched/sch_generic.c
-+++ b/net/sched/sch_generic.c
-@@ -945,7 +945,9 @@ struct Qdisc *qdisc_alloc(struct netdev_queue *dev_queue,
- 	__skb_queue_head_init(&sch->gso_skb);
- 	__skb_queue_head_init(&sch->skb_bad_txq);
- 	gnet_stats_basic_sync_init(&sch->bstats);
-+	lockdep_register_key(&sch->root_lock_key);
- 	spin_lock_init(&sch->q.lock);
-+	lockdep_set_class(&sch->q.lock, &sch->root_lock_key);
- 
- 	if (ops->static_flags & TCQ_F_CPUSTATS) {
- 		sch->cpu_bstats =
-@@ -1067,6 +1069,7 @@ static void __qdisc_destroy(struct Qdisc *qdisc)
- 	if (ops->destroy)
- 		ops->destroy(qdisc);
- 
-+	lockdep_unregister_key(&qdisc->root_lock_key);
- 	module_put(ops->owner);
- 	netdev_put(dev, &qdisc->dev_tracker);
- 
-diff --git a/net/sched/sch_htb.c b/net/sched/sch_htb.c
-index 93e6fb56f3b5..ff3de37874e4 100644
---- a/net/sched/sch_htb.c
-+++ b/net/sched/sch_htb.c
-@@ -1039,13 +1039,6 @@ static void htb_work_func(struct work_struct *work)
- 	rcu_read_unlock();
- }
- 
--static void htb_set_lockdep_class_child(struct Qdisc *q)
--{
--	static struct lock_class_key child_key;
--
--	lockdep_set_class(qdisc_lock(q), &child_key);
--}
--
- static int htb_offload(struct net_device *dev, struct tc_htb_qopt_offload *opt)
- {
- 	return dev->netdev_ops->ndo_setup_tc(dev, TC_SETUP_QDISC_HTB, opt);
-@@ -1132,7 +1125,6 @@ static int htb_init(struct Qdisc *sch, struct nlattr *opt,
- 			return -ENOMEM;
- 		}
- 
--		htb_set_lockdep_class_child(qdisc);
- 		q->direct_qdiscs[ntx] = qdisc;
- 		qdisc->flags |= TCQ_F_ONETXQUEUE | TCQ_F_NOPARENT;
- 	}
-@@ -1468,7 +1460,6 @@ static int htb_graft(struct Qdisc *sch, unsigned long arg, struct Qdisc *new,
- 	}
- 
- 	if (q->offload) {
--		htb_set_lockdep_class_child(new);
- 		/* One ref for cl->leaf.q, the other for dev_queue->qdisc. */
- 		qdisc_refcount_inc(new);
- 		old_q = htb_graft_helper(dev_queue, new);
-@@ -1733,11 +1724,8 @@ static int htb_delete(struct Qdisc *sch, unsigned long arg,
- 		new_q = qdisc_create_dflt(dev_queue, &pfifo_qdisc_ops,
- 					  cl->parent->common.classid,
- 					  NULL);
--		if (q->offload) {
--			if (new_q)
--				htb_set_lockdep_class_child(new_q);
-+		if (q->offload)
- 			htb_parent_to_leaf_offload(sch, dev_queue, new_q);
--		}
- 	}
- 
- 	sch_tree_lock(sch);
-@@ -1947,13 +1935,9 @@ static int htb_change_class(struct Qdisc *sch, u32 classid,
- 		new_q = qdisc_create_dflt(dev_queue, &pfifo_qdisc_ops,
- 					  classid, NULL);
- 		if (q->offload) {
--			if (new_q) {
--				htb_set_lockdep_class_child(new_q);
--				/* One ref for cl->leaf.q, the other for
--				 * dev_queue->qdisc.
--				 */
-+			/* One ref for cl->leaf.q, the other for dev_queue->qdisc. */
-+			if (new_q)
- 				qdisc_refcount_inc(new_q);
--			}
- 			old_q = htb_graft_helper(dev_queue, new_q);
- 			/* No qdisc_put needed. */
- 			WARN_ON(!(old_q->flags & TCQ_F_BUILTIN));
--- 
-2.44.0
-
+Oops. Thanks Paolo. Yes, this definitely also applies to ipv6.
 
