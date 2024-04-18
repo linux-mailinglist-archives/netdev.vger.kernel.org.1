@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-88997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 121078A92C8
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 08:09:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3B278A92C9
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 08:09:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 445371C20DF2
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 06:09:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F933280D95
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 06:09:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01BC95FEED;
-	Thu, 18 Apr 2024 06:09:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C905C5FEED;
+	Thu, 18 Apr 2024 06:09:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KPAgivSP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dNFCN+eh"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9391A282F4
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 06:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696D1282F4
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 06:09:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713420545; cv=none; b=Ye7eXDPHv9EqI0NNYn9kLkZ6iBPRReqUv1X1ik9NqydjTle4usFpNG4iZo+a7AfDlPsonrDEpjb/lSaZiuTW+1aG5AmM+dsv9Gf8xO+NVgJrZiT9xXQYiLBNvujp2qInFHTp0fT3elM8oCh9WAMyQBFkFy2wWJ2f/MaIGbnKYhU=
+	t=1713420566; cv=none; b=IZOj5m7VOO7etRe6hRALuXnzdmLOQ/HEb5ERtInWZk27NolPjegfiQWqUJLPEXZzUKQbxFWurnKV0l+yD177R+uY/aGR/SidHTYzgcvess3DdgqSIpadfvTrnzsgeTLjum83w/2QsT8IT3zI0zazbNfDbJBOCgwZC7NkyvDBV0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713420545; c=relaxed/simple;
-	bh=SSUou10o2pDgMGqa3LTxveoMpsulBzmXgzKBkv/6KSU=;
+	s=arc-20240116; t=1713420566; c=relaxed/simple;
+	bh=GNh+VuNzvsRb/wOJoe/wrB+bC4lFliOIDgQ1UmO/juM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AwZzEaCyLM3Oy/PPqZMDinHGsCe1ieV7RSfXhbzNxrJso79OAARFvqBAbomrWgaK7YRlyCxDjLcsy2NgilFEVR5u1fe+gU9r5t4ATtbq9u4he3yahImwPR2vgrpyGlYs2+abr6VMzHc1shpvU7MMPGcoBZpKAO9AvpBKxWfo8vw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KPAgivSP; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=uUjLf5ekSYadcdoqQs/gKZcngQASk7klE5cuEGkxVQGzKudGx3IOOD7OfbnIZmykPcMVg9Zv9H/TUYjmjnXIgmT+KASjElJ+/z6Nx6KL2w+gxhJuIlFiwpP7c+oaw9645w3DVURe83NQy7qTUC0MbrcE41TC54+QdJE8bJrU+EQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dNFCN+eh; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713420543;
+	s=mimecast20190719; t=1713420564;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/5rAnqK45cddGOhhwEGJeeGo4xeCJaxK4G8w0kAzgPg=;
-	b=KPAgivSP/SCMXcGqZWOExEm2aocv/ALbfQY9YT3bCjPeFnsZ6qzFdJN+jHgsRlyzNiIo3l
-	4wes7/ukVEigwuoLpFhEXwj0hvoXTexBmXr9U52vRJSJq+Wz3bLOKkNqiy2HKzGuSObkWK
-	34t/HiSyqAUujaqZDSR9Pjso6IDd/1w=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=GNh+VuNzvsRb/wOJoe/wrB+bC4lFliOIDgQ1UmO/juM=;
+	b=dNFCN+ehPP+USAWDnWimrnKsMEqgrhmsyT/y+W4IAdoTadbjMcBq2cmRLuHt4dysk6/Zgi
+	fjYr+OXuVxAxEDFtS6DKNljvCTszZFJKKln2iOOQTIuAx7lgcw8C3v4SdCmKEW6JuNCkC4
+	IT0BksVMn55GLtoiaB9c6ugqNqIAz54=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-46-qK4LvfeCPHS06towKVTnRA-1; Thu, 18 Apr 2024 02:08:59 -0400
-X-MC-Unique: qK4LvfeCPHS06towKVTnRA-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-5dc992f8c8aso550900a12.3
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 23:08:59 -0700 (PDT)
+ us-mta-543-cJur1JXLNbuu_Zxm75iLHg-1; Thu, 18 Apr 2024 02:09:22 -0400
+X-MC-Unique: cJur1JXLNbuu_Zxm75iLHg-1
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-6ef9edf9910so986096b3a.1
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 23:09:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713420538; x=1714025338;
+        d=1e100.net; s=20230601; t=1713420562; x=1714025362;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/5rAnqK45cddGOhhwEGJeeGo4xeCJaxK4G8w0kAzgPg=;
-        b=UKDrsTyakTNitxcX3w4KPzAFC12x8moC0/qWn3tpjSf5Uhf1a+UL87RubG7CQRs5/v
-         eDLhzDCLEXqToufDLirb7yvVuSVFh/aUtzsZgd28v0onlmokOd8MV7c8HMvGSDNLPqDI
-         9XvSVE6AFSxse5jWYknv4VAkm2Au12RY7E0EC/aFFzXlN7SrbPTn6GQmEoxFrrHSkjnb
-         QfR/seGH9bklWCJ0zslh7+8b/ybwC1hrRSP+bWudbVPJmIPk5sgf2lh6VM4h7Movd3+4
-         KxQGu8wIz2jT2NdcakGkN+MTtsUKnfQ410n1k0QXU5I7gKmhUE5wyQN96PF/ZNLd3mfH
-         TMxg==
-X-Forwarded-Encrypted: i=1; AJvYcCU+L8Se5OQYUOOBHgyZfc6nFAA98lgyr3bdbxni/kQRuNFfCRJ4ZBXAPbA9WZ9d8X/OxKR/GFiaYz+/MobjOBG8IDN4sq91
-X-Gm-Message-State: AOJu0YxIu5ylU33lV3r6ccfcA1mSee2Qykkoy0/yLuP0VGa1HX6lGmKB
-	tH8dar+3ikng3G+cuqlwVKYYZXdFHGF47oTaiP9E409jIMfxWxl39espTUmCX2Gwlj3dHXq+7Uo
-	q/8C0zDuh1h+yywSOL4aasTyGI2sxTVHUMBFSshq5ZCHDa46DGoRPL9fi/E9eSWg+vBKfnjFOYK
-	lmEEw75RYxahNPpcv74KxDrsLt6TrZ
-X-Received: by 2002:a05:6a20:748a:b0:1a7:aecd:9785 with SMTP id p10-20020a056a20748a00b001a7aecd9785mr2293889pzd.25.1713420538545;
-        Wed, 17 Apr 2024 23:08:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGsJsT0x6OHZetDoaWQ1nKS4EkZBAC7JoKFrSyZxcWc2dmmPrIm5K1eaDg1B9l4iwS7BnuNpR7nozmkwwtVJZA=
-X-Received: by 2002:a05:6a20:748a:b0:1a7:aecd:9785 with SMTP id
- p10-20020a056a20748a00b001a7aecd9785mr2293878pzd.25.1713420538263; Wed, 17
- Apr 2024 23:08:58 -0700 (PDT)
+        bh=GNh+VuNzvsRb/wOJoe/wrB+bC4lFliOIDgQ1UmO/juM=;
+        b=FvL7lNJbthX9hfqjySLUjSkWjcdGN0AmuimJ+DeNaO0sVpaEIv1bBKGUmgZAf5FRlm
+         D+WGiMp/VksRInXUH+pdtr33vJ9NS+sOquHPa5+34uMx0tM614q01L8EWeGTj56SkbvV
+         kCy/tbGrpVCd9nAz3t3PsYtVL/AgvEsFXFt0VbuKHuIFB8N0xYthd8yWC4JSESgPuVd6
+         9ET8QWPkKwEXKidtuUzJVIb1+er7MMX42bkmJMkmZmvI16RI7/tn5QKlXedhgxLsX/P+
+         Gx9P37zeIRUaWfnliKUMR0ZzNNN267o88KNompk4mhQlBK6WeWqtNY86/U3Er2K5QiGp
+         mcpA==
+X-Forwarded-Encrypted: i=1; AJvYcCXSQKJGOdop4obdiZrwrGnzBpqXumv51tv3g8J8swfU1Ux9BXQLRtGxKUVuaRlRnyKnGx04fy86QVql46G7R5TP00SIP6Et
+X-Gm-Message-State: AOJu0YxyFkJ/crkyHdDoOivE4cZt/xbzRcbo7a5QF1WBnL0Tf92iF0DN
+	uZ23corIuzbzgz8+VMOCisExOupXsdJ2+TWDfqAoHPgM2khjUiZdStZq/ue9CJVeSdChyc1KD3W
+	KMEKxueK3/6nbMHd1ez5952HOtQYIGhRSZewFFPuhAQPoFwaBSJbJd5LFoRl01k3qMX6ejshZex
+	wQAFEFVRkoftlBZi8trXH/wysaBbnB
+X-Received: by 2002:a05:6a00:1804:b0:6ea:8b0c:584 with SMTP id y4-20020a056a00180400b006ea8b0c0584mr2437372pfa.9.1713420561777;
+        Wed, 17 Apr 2024 23:09:21 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH4PuWAAI2IJNnqNjFq7oH4FtTLkvSea/kyne1VD2dr00iqkn8rtuNOFi3+3bHz+qXVRWU9xXnO6/bB2lAJ6gA=
+X-Received: by 2002:a05:6a00:1804:b0:6ea:8b0c:584 with SMTP id
+ y4-20020a056a00180400b006ea8b0c0584mr2437356pfa.9.1713420561452; Wed, 17 Apr
+ 2024 23:09:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240411025127.51945-1-xuanzhuo@linux.alibaba.com> <20240411025127.51945-2-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20240411025127.51945-2-xuanzhuo@linux.alibaba.com>
+References: <20240411025127.51945-1-xuanzhuo@linux.alibaba.com> <20240411025127.51945-3-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20240411025127.51945-3-xuanzhuo@linux.alibaba.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 18 Apr 2024 14:08:46 +0800
-Message-ID: <CACGkMEvSTPnYGXmnOtAODS-0UPVaAqdTV_5zqGceN8R7=MvkGg@mail.gmail.com>
-Subject: Re: [PATCH vhost 1/6] virtio_ring: introduce dma map api for page
+Date: Thu, 18 Apr 2024 14:09:10 +0800
+Message-ID: <CACGkMEvkbJ2j6J=nxfh3FNQRhNBa0Wr6Kyz=6r458edgxo65RA@mail.gmail.com>
+Subject: Re: [PATCH vhost 2/6] virtio_ring: enable premapped mode whatever use_dma_api
 To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>, 
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -93,18 +93,11 @@ Content-Transfer-Encoding: quoted-printable
 On Thu, Apr 11, 2024 at 10:51=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.=
 com> wrote:
 >
-> The virtio-net big mode sq will use these APIs to map the pages.
+> Now, we have virtio DMA APIs, the driver can be the premapped
+> mode whatever the virtio core uses dma api or not.
 >
-> dma_addr_t virtqueue_dma_map_page_attrs(struct virtqueue *_vq, struct pag=
-e *page,
->                                        size_t offset, size_t size,
->                                        enum dma_data_direction dir,
->                                        unsigned long attrs);
-> void virtqueue_dma_unmap_page_attrs(struct virtqueue *_vq, dma_addr_t add=
-r,
->                                    size_t size, enum dma_data_direction d=
-ir,
->                                    unsigned long attrs);
+> So remove the limit of checking use_dma_api from
+> virtqueue_set_dma_premapped().
 >
 > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 
