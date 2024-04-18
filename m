@@ -1,128 +1,154 @@
-Return-Path: <netdev+bounces-89252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEDDC8A9D9A
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 16:51:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23B318A9DB6
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 16:57:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0B561C21BAF
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 14:51:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 469E31C217D8
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 14:57:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A79168AE9;
-	Thu, 18 Apr 2024 14:51:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A153E168B1A;
+	Thu, 18 Apr 2024 14:57:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="avA3AfO6"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D5mGcHDp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06ECF6FB0;
-	Thu, 18 Apr 2024 14:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E02906FB0
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 14:57:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713451884; cv=none; b=PuFSepq1SbDIft6l5ir7aXDghCLsDT7EE79dRZ/R9ySBVzqryrWV9IOGOvcaNf1mnp21n+BOgft4JGOTT+Npcoqn1UWYd7rSsLQKVJQ2z4wpqfu82zAXNv2OK8UU20fPo9xx5FpFxi0wOPCBuyqjs+tq1mSkPvD6SHpiEfxRoD8=
+	t=1713452241; cv=none; b=CptLuagPx6pQ3sHS8IdrHkUTkA0jk5Qg6saqNlF604h0Skek71Rp3rXYn9katDCvo1PQRInD8GfNO4ekorkPQtgmAPdvwF50Ds3JeFFBFJzFweTT7FGy89g2nYzyraXFW8tmEFUzvcw74joWtj0orHbiMWzXy+2Oz0hxr+nnNik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713451884; c=relaxed/simple;
-	bh=otmv7rhTIoDeXBnEHe3n9sVC/BWFho4XCMjhnjOJ0+Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CMXekI/Nidq4t9ZPB/GeyLWDcGT42BBCe9oFSFT7EuXupFXjjUsbxWSv8pJYhlOcKsalCKrvYt13pbEDFocUIrI6P+rNBI/3jE2/VGOXnmQBhEEZssPZ/FBcBmGxwV+bfGuwkZBfsxBaCHwNd+lwy3Eg7M5h74vmNMji2HynzCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=avA3AfO6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C484EC113CC;
-	Thu, 18 Apr 2024 14:51:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713451883;
-	bh=otmv7rhTIoDeXBnEHe3n9sVC/BWFho4XCMjhnjOJ0+Y=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=avA3AfO64KbySRBK0fRSPMK17uPXHs9lfqpO90wMXiMWbY7s5mnV+P8rgY5k7ENAK
-	 Xv60/ZO+V1h/qeOC4YUUtmXpB2J8uUO03pxEN8EwrwxW5a9No9NmCGGY8Rl0O79b6k
-	 0esWC8IBeJLIhoruXD3DXC/cfCSGeebWzOX/5nAn46R2bSdn/HVbetRfZzsrgoraiV
-	 wviU4W75cgzee/E4jb34DhKClrhLi9+atKpwcZb5XBwfRZe9d9Re+LSHuQ9uPQKaoG
-	 CkhEHxddN+vfu1tqBtIJuhsGpkKgJhCOChKFQxBHE+6m2WMuO/GFoWgWmT7agaBFM7
-	 eAMo+6+adpVgQ==
-Date: Thu, 18 Apr 2024 07:51:21 -0700
-From: Nathan Chancellor <nathan@kernel.org>
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: akpm@linux-foundation.org, arnd@arndb.de, gor@linux.ibm.com,
-	agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-	svens@linux.ibm.com, wintera@linux.ibm.com, twinkler@linux.ibm.com,
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	llvm@lists.linux.dev, patches@lists.linux.dev
-Subject: Re: [PATCH 1/3] s390/vmlogrdr: Remove function pointer cast
-Message-ID: <20240418145121.GA1435416@dev-arch.thelio-3990X>
-References: <20240417-s390-drivers-fix-cast-function-type-v1-0-fd048c9903b0@kernel.org>
- <20240417-s390-drivers-fix-cast-function-type-v1-1-fd048c9903b0@kernel.org>
- <20240418095438.6056-A-hca@linux.ibm.com>
- <20240418102549.6056-B-hca@linux.ibm.com>
+	s=arc-20240116; t=1713452241; c=relaxed/simple;
+	bh=5zKvUXdJBFPuQozJy4Os5tScuNYVv5VcQ1CguS1yJFM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L/Wto2r88YSFWPXy+MmslH4vZauKYCv6cDgY2uP6rouElAQh56N3af734y3H8b0vT+pB+AcM+OCq/Ome76Tm0CfIPQpnghuOHvHeR/e/hE7xbruVp2s+bKcTbod3IvVPIhSVjYrtTKGqhxRlTFbd7EQCRCTI5yz4VaTG+L/L7aI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=D5mGcHDp; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-51967f75729so1106561e87.0
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 07:57:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1713452238; x=1714057038; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=4170ZhgzJpAXwr6ljG/YSDARpsJn4+o6qTKEWZM1ZqQ=;
+        b=D5mGcHDpZV/3eDVGsdQM7kdPi6AjESzRhwzc6Ezf9ieNqqjEkxU5kWPXzA9TaFzf4T
+         4ikezSPrKU3QOY9rYUOj0KhOMGul2WDGqP7PWN+zngWpkY4xxXVUkkQ6s701sueYh5gF
+         zhFErGT61zNQYrzOO6sH55jKjzBurhdoEADZEXHb9qqqVHrkFRYvSKX1rzWQJfBHhNlF
+         dUxi9lYysDsrN7weVq7FYSmGnyCOspOT6/W6DCf6/WJV765NvzMUqnVIBcuDWwz4AmOt
+         w0Iv8vwahVnvhvmp3X0pKdD/5FlLP1ACwEk1qjLw3s+c1p7z29pJKVeatY3xK6DkG0Y7
+         QAXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713452238; x=1714057038;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4170ZhgzJpAXwr6ljG/YSDARpsJn4+o6qTKEWZM1ZqQ=;
+        b=i5SHZ+T4yrmkwUhXCBwMGoNjH8+DAAYlVyBetgI7UCSHKLKSPDHfjZ/QuaHsVkycM4
+         9SD7DW6Qu/2qzT7eg2PvARJhcjls2S6ObNnHv54cYi2IV5wvD2Z2RiZTNy39oc1x9trW
+         1V5I8PZgKWz4TtHtjH4xk/CnwEfXRa2RalMyphPU+oze5SXQebic6mfEo625HalKohMB
+         u0hQPXfcufogok4/MyB0Ffb95CSoviBMOiZldAB7P0S5KIwyVDON8QU/3a6lNNY75pir
+         GB0V9bVJSVUBWjOWdzlMgMtvcFa+0D2YgdcUbajwOzWNvbJnVJ4WWHrQ2tg5ymR/9Ieh
+         Cprw==
+X-Forwarded-Encrypted: i=1; AJvYcCVsbzGBWgMvm/xGmjDLnmWvuV+G0zP+hLj2MPbJbdS8EyVRIU6hqSxRzwE8Z2AbUFI3TJWKZeXzlX6Fin42RfMAzNkOzFSt
+X-Gm-Message-State: AOJu0YwKjGc/ObuLo43LBxw8UqFrUK4wNP/OL6cI64XWNchch4KW89V9
+	biGL8Ag4I4RouMU9zRtudhHIHjReVaS/13gGZ0WhyFkCbn0h1ER8fYt7IwRZNPJUiJ2pXOZLh8H
+	EhQ05jRsoZMyDrScYwxT4wUMtoHWjrAqV87yNmw==
+X-Google-Smtp-Source: AGHT+IGgo5ZpK7ScQ3STj7jd+rPX7sm4nXqGrRIqUtUQ4a24HhXvoJYmRFhhYV7WswO4nrk1SpVmPZ75uDv3YLj6r+o=
+X-Received: by 2002:a05:6512:3f0d:b0:519:7738:a5cf with SMTP id
+ y13-20020a0565123f0d00b005197738a5cfmr1605328lfa.25.1713452238069; Thu, 18
+ Apr 2024 07:57:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240418102549.6056-B-hca@linux.ibm.com>
+References: <20240418113616.1108566-1-aleksander.lobakin@intel.com> <20240418113616.1108566-7-aleksander.lobakin@intel.com>
+In-Reply-To: <20240418113616.1108566-7-aleksander.lobakin@intel.com>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Thu, 18 Apr 2024 17:56:41 +0300
+Message-ID: <CAC_iWjL6j5xS9GsLiZdLPJgJgfGNMbjKZPTMqnvX9U_9Dgq=ZQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v10 06/10] page_pool: add DMA-sync-for-CPU inline helper
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexander Duyck <alexanderduyck@fb.com>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Christoph Lameter <cl@linux.com>, Vlastimil Babka <vbabka@suse.cz>, 
+	Andrew Morton <akpm@linux-foundation.org>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com, netdev@vger.kernel.org, 
+	intel-wired-lan@lists.osuosl.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Heiko,
+On Thu, 18 Apr 2024 at 14:37, Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> Each driver is responsible for syncing buffers written by HW for CPU
+> before accessing them. Almost each PP-enabled driver uses the same
+> pattern, which could be shorthanded into a static inline to make driver
+> code a little bit more compact.
+> Introduce a simple helper which performs DMA synchronization for the
+> size passed from the driver. It can be used even when the pool doesn't
+> manage DMA-syncs-for-device, just make sure the page has a correct DMA
+> address set via page_pool_set_dma_addr().
+>
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+>  include/net/page_pool/helpers.h | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
+>
+> diff --git a/include/net/page_pool/helpers.h b/include/net/page_pool/helpers.h
+> index c7bb06750e85..873631c79ab1 100644
+> --- a/include/net/page_pool/helpers.h
+> +++ b/include/net/page_pool/helpers.h
+> @@ -52,6 +52,8 @@
+>  #ifndef _NET_PAGE_POOL_HELPERS_H
+>  #define _NET_PAGE_POOL_HELPERS_H
+>
+> +#include <linux/dma-mapping.h>
+> +
+>  #include <net/page_pool/types.h>
+>
+>  #ifdef CONFIG_PAGE_POOL_STATS
+> @@ -395,6 +397,28 @@ static inline bool page_pool_set_dma_addr(struct page *page, dma_addr_t addr)
+>         return false;
+>  }
+>
+> +/**
+> + * page_pool_dma_sync_for_cpu - sync Rx page for CPU after it's written by HW
+> + * @pool: &page_pool the @page belongs to
+> + * @page: page to sync
+> + * @offset: offset from page start to "hard" start if using PP frags
+> + * @dma_sync_size: size of the data written to the page
+> + *
+> + * Can be used as a shorthand to sync Rx pages before accessing them in the
+> + * driver. Caller must ensure the pool was created with ``PP_FLAG_DMA_MAP``.
+> + * Note that this version performs DMA sync unconditionally, even if the
+> + * associated PP doesn't perform sync-for-device.
+> + */
+> +static inline void page_pool_dma_sync_for_cpu(const struct page_pool *pool,
+> +                                             const struct page *page,
+> +                                             u32 offset, u32 dma_sync_size)
+> +{
+> +       dma_sync_single_range_for_cpu(pool->p.dev,
+> +                                     page_pool_get_dma_addr(page),
+> +                                     offset + pool->p.offset, dma_sync_size,
+> +                                     page_pool_get_dma_dir(pool));
+> +}
+> +
+>  static inline bool page_pool_put(struct page_pool *pool)
+>  {
+>         return refcount_dec_and_test(&pool->user_cnt);
+> --
+> 2.44.0
+>
 
-On Thu, Apr 18, 2024 at 12:25:49PM +0200, Heiko Carstens wrote:
-> On Thu, Apr 18, 2024 at 11:54:38AM +0200, Heiko Carstens wrote:
-> > On Wed, Apr 17, 2024 at 11:24:35AM -0700, Nathan Chancellor wrote:
-> > > Clang warns (or errors with CONFIG_WERROR) after enabling
-> > > -Wcast-function-type-strict by default:
-> > > 
-> > >   drivers/s390/char/vmlogrdr.c:746:18: error: cast from 'void (*)(const void *)' to 'void (*)(struct device *)' converts to incompatible function type [-Werror,-Wcast-function-type-strict]
-> > >     746 |                 dev->release = (void (*)(struct device *))kfree;
-> > >         |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > >   1 error generated.
-> > > 
-> > > Add a standalone function to fix the warning properly, which addresses
-> > > the root of the warning that these casts are not safe for kCFI. The
-> > > comment is not really relevant after this change, so remove it.
-> > > 
-> > > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
-> > > ---
-> > >  drivers/s390/char/vmlogrdr.c | 13 +++++--------
-> > >  1 file changed, 5 insertions(+), 8 deletions(-)
-> > 
-> > > @@ -736,14 +740,7 @@ static int vmlogrdr_register_device(struct vmlogrdr_priv_t *priv)
-> > >  		dev->driver = &vmlogrdr_driver;
-> > >  		dev->groups = vmlogrdr_attr_groups;
-> > >  		dev_set_drvdata(dev, priv);
-> > > -		/*
-> > > -		 * The release function could be called after the
-> > > -		 * module has been unloaded. It's _only_ task is to
-> > > -		 * free the struct. Therefore, we specify kfree()
-> > > -		 * directly here. (Probably a little bit obfuscating
-> > > -		 * but legitime ...).
-> > > -		 */
-> > 
-> > Why is the comment not relevant after this change? Or better: why is it not
-> > valid before this change, which is why the code was introduced a very long
-> > time ago? Any reference?
-> > 
-> > I've seen the warning since quite some time, but didn't change the code
-> > before sure that this doesn't introduce the bug described in the comment.
-> 
-> From only 20 years ago:
-> 
-> https://lore.kernel.org/all/20040316170812.GA14971@kroah.com/
-> 
-> The particular code (zfcp) was changed, so it doesn't have this code
-> (or never did?)  anymore, but for the rest this may or may not still
-> be valid.
-
-I guess relevant may not have been the correct word. Maybe obvious? I
-can keep the comment but I do not really see what it adds, although
-reading the above thread, I suppose it was added as justification for
-calling kfree() as ->release() for a 'struct device'? Kind of seems like
-that ship has sailed since I see this all over the place as a
-->release() function. I do not see how this patch could have a function
-change beyond that but I may be misreading or misinterpreting your full
-comment.
-
-Cheers,
-Nathan
+Reviewed-by: Ilias Apalodimas <ilias.apalodimas@linaro.org>
 
