@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-88939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8E418A90CE
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 03:40:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EECC48A90D5
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 03:41:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3870283A5C
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:40:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1631B1C21C30
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:41:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E04A3A1D3;
-	Thu, 18 Apr 2024 01:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B831A1755B;
+	Thu, 18 Apr 2024 01:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KkjwnnTZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FHPohald"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49CAB39FD4
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 01:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C31D44EB45;
+	Thu, 18 Apr 2024 01:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713404428; cv=none; b=ZFtqek7UQSleeMceO4VE3z8RSsPI1pin1GjtWepDi0m96P8oTwI2XQag2YnmpLMgQC+P13997XO7G79fmbfupL+YEzNUf7fZqaRRSp5xtCm5BoTB6mW8MLCuEU9HwCmQZpvit+TttqB9S6Mp0ZQgsrPtIfJqWNcX9LUXVcN34NU=
+	t=1713404428; cv=none; b=FV9sW33dinJNpATm4GNuRF1sFT2M+sjGXYgjKJfC98p/+B2j2eaLX2SRf/r2Wtiqz7m6ZfSr8Y3riY9pxjw5meRScp5sQDLzLMUg/UWhMwP9rL13WAdmE282ed0i8e4JFRMEqzpaFUXSWzgYAGlHJduj714QAzem1oXemujfJAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713404428; c=relaxed/simple;
-	bh=fEnJg/VUpA7V49HH8AN+j3ZQGLtnu/hHhPCWSR+PWFY=;
+	bh=FypjU3Cv9Xbkes0N0jwShTnlpibEfiXMY7aFZo2oBQw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=de67hP8wxCxTUn5GpuEaE6CCpIH6lrUZzMNA6dHvNqSDGxDqARg77XecebppwBs5P5OCjYtcM01DHRG/wmDO1bViC7CgjYqEBT5df72rHT6gBHpQVZ39SQWRr/Oy0mScu8c/0KjuVU4GabOnXA9pHhgNYl+S8eJDuSulCfifv7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KkjwnnTZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1D2B7C32782;
+	 In-Reply-To:To:Cc; b=NWktEHvas5hTe4n6v6GdxtnMMETAV0e/xK2/AzddhHXgAH4Cr5K0cLSILdvybM0DLvsV9JY/dyW3doKyuOEKY5ncA3hM3BqW7MSjnRKWSCKM9PFL6wNRRRYIP5sGSh6wJ8WBikzEc2CH1OkYv+MAKa3S9q1R5N0bVhkpRIzAOek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FHPohald; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4C321C4AF0E;
 	Thu, 18 Apr 2024 01:40:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1713404428;
-	bh=fEnJg/VUpA7V49HH8AN+j3ZQGLtnu/hHhPCWSR+PWFY=;
+	bh=FypjU3Cv9Xbkes0N0jwShTnlpibEfiXMY7aFZo2oBQw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KkjwnnTZLuSV5ophKQlBB9RcP+cbAuivVvOYBpctjjvpUaiB8ESu373s5mRv5fQST
-	 po5YdQlpiDWaUcwxsCzqGydIFLKvEYOSqJcC+FgSJXcf3LHjCQyr6ddq6EsF84Cw/a
-	 yvjbwaAcXHx8H3pOcWJA7aR7tDSp8eyf2O9P1/BM93oD+MRkTInYsRFMGSj1jFGk4E
-	 bc7F+a9/A53KeuS+zjpsOZ5iwx41anJAYzLrvpv5RqjpWchbT1G22r2dcHiuwydYzA
-	 kORZ6RGQ+wlX/Qe8tz1lo9WaXZAEUV0keyHlrlUWJHEU+ZUZeHBNioGEixIJQmW9UJ
-	 FEzu+uYVEEPng==
+	b=FHPohald5fY4ULFcXvQ9RYKcSK1zk3XFCNL4argR/vFjiVU25mYbcOfrI03hG1ULs
+	 WkgnF/ZMumF0RUpHoFjDYbqpvWEG8doI9qbYh5jfT4EbdfSuZFpmoAJwP02xgloMGK
+	 hhBVMqTTpAjT2hXoTNEJ+cL1lNurfDkP5+3llpmM7IqtPn4mgDxrN0kLpqdUzf4m7b
+	 HspSVVfCpLwCuMgbbgHwkiJzmOexlsDt+zfOdGGN+zjEizgDoQW5zcs1hksTC3h264
+	 oua7/Qa5ArmzPEthpmviHPP1ucRiss4eqBItdqDrQA1ysk+B8pNGQ2rCbmPpW1NWVy
+	 wgMEjcUmHrltQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0BEC5C43616;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 390BFC43638;
 	Thu, 18 Apr 2024 01:40:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,35 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] tcp_metrics: fix tcp_metrics_nl_dump() return value
+Subject: Re: [PATCH net-next] net: dsa: rzn1_a5psw: provide own phylink MAC
+ operations
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171340442803.27861.7738710930912966565.git-patchwork-notify@kernel.org>
+ <171340442822.27861.17034756086086126855.git-patchwork-notify@kernel.org>
 Date: Thu, 18 Apr 2024 01:40:28 +0000
-References: <20240416161112.1199265-1-edumazet@google.com>
-In-Reply-To: <20240416161112.1199265-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <E1rwfuJ-00753D-6d@rmk-PC.armlinux.org.uk>
+In-Reply-To: <E1rwfuJ-00753D-6d@rmk-PC.armlinux.org.uk>
+To: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Cc: andrew@lunn.ch, olteanv@gmail.com, clement.leger@bootlin.com,
+ f.fainelli@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-renesas-soc@vger.kernel.org,
+ netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 16 Apr 2024 16:11:12 +0000 you wrote:
-> Change tcp_metrics_nl_dump() to return 0 at the end
-> of a dump so that NLMSG_DONE can be appended
-> to the current skb, saving one recvmsg() system call.
+On Tue, 16 Apr 2024 11:19:19 +0100 you wrote:
+> Convert rzn1_a5psw to provide its own phylink MAC operations, thus
+> avoiding the shim layer in DSA's port.c. We need to provide a stub for
+> the mac_config() method which is mandatory.
 > 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 > ---
->  net/ipv4/tcp_metrics.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
+>  drivers/net/dsa/rzn1_a5psw.c | 47 ++++++++++++++++++++++++------------
+>  1 file changed, 31 insertions(+), 16 deletions(-)
 
 Here is the summary with links:
-  - [net-next] tcp_metrics: fix tcp_metrics_nl_dump() return value
-    https://git.kernel.org/netdev/net-next/c/ade1c9cc404a
+  - [net-next] net: dsa: rzn1_a5psw: provide own phylink MAC operations
+    https://git.kernel.org/netdev/net-next/c/a3c363df0ad2
 
 You are awesome, thank you!
 -- 
