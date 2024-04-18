@@ -1,204 +1,135 @@
-Return-Path: <netdev+bounces-89132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAD2D8A9819
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:02:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CA828A981F
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:03:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9163428315A
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:02:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DE0C1C209F2
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E9B15E1FF;
-	Thu, 18 Apr 2024 11:02:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8F9215E207;
+	Thu, 18 Apr 2024 11:03:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G3YJNmzf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i9+ZVBXG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52E515E7E7
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 11:02:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E53ED15B969
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 11:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713438144; cv=none; b=DVNuWXFp6kSJf6Zyca9Urwxoc8lGbqKB5Si7Ws6dZu6es8IGm1VMZOv+wpiLHg7GNOC3yNp0gUFnFS4IHLO7CwOJXF8YWRA2QgjlY8JcntjUzGfPWzk3OIK4MPmzYPTMlkMNrJTDTpPC0kvrPawrmrhd02yV2xPVIQP54Hpvgbo=
+	t=1713438230; cv=none; b=PFSbECoSqu5MsjqN9ZEdOAqXKQ6h9S4gwp6N3jLGn1AXlhcnRXXsvL1jho23yxmD2zVY2CkBCo96fse6Z8KhGV5LCSamVh70Ur4GnlzYWKPQivCkU0amnVicqDpAW2cNCNYfcU8qRqlqfsYGTMJI/euRebmQNHyQVLUdPgH7SD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713438144; c=relaxed/simple;
-	bh=iT1Cx9NWao1mwMNKWpDOZtMRW2vJlOL5P5/5bBe9AyQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O/i1pndEMLrn97FEvhsdI4/QaAqF0aFqu0jb5bdzhpqqJLM/47jqYS3/xB1nz8MHJGx7uuPtumumRNd2Wb5lxk2d0DM9RC9W++s6kExanszcee9PJfR39Me3XpVkQLF1FWdrqFydZQ2aw2k2xY/kRBUrsj5ctFGRMa+2QvCI3RU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G3YJNmzf; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2d8863d8a6eso10761421fa.3
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 04:02:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713438138; x=1714042938; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eXg/FCxqxrEmmJbSP4Gm/sqVNgoPv34ZwJwn4YaiB7g=;
-        b=G3YJNmzf2vNF1j9XlCYzaGMmbn/9kktOK1xAx6QMlv6B4lH8ERriULnAJS7vuY20xZ
-         TKEBGpIqAO3jwmSLGY3D9o7O71oI08/9sxrk59XQ+D3d3aDj802WM1cSZSR/bYLMjZZK
-         WIpzFkhfMTFWhz4UEPt2jLowMfB7WMEQuEx7IBOGg4fK/1+ziGF70k4rBP2bOOBW95dQ
-         L1ljcdtqmj3NmIruOMngIjuYjfyjZRgVKwYX/h6rQ3hZWMEf7b+qBnVHaMxv7WsQ5N8B
-         empXjOyh3Geqoo1xEKXwNiEKE8PLbI7wK1//9Ugrquf3uUi4P/8Xsq7xkotg8nAb5bYG
-         5EoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713438138; x=1714042938;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eXg/FCxqxrEmmJbSP4Gm/sqVNgoPv34ZwJwn4YaiB7g=;
-        b=dDAwN2fa6aXLAqGXsMDsFYhK60kis7u0HejI4ikIV3yZs2assWzLwwtfWWOzWiWLD/
-         e6J/Su54BEzYKKuYggYrCL+OV2FuQFakiA0pP2RbEJAk807+zM9clqr+2FSdWfzJtxCb
-         /5AwCg/dM2Sl/rZVZsJNoohbUNvxGdVnfQmRHf7dGfKabavqoix72X7ru9fTwatO3CoH
-         2/57FS9XFTcIgc4cjfQZHmxAt71P0Q5S7cJ0Q5pm+Ur33vce6EWr+XUVqkgAUDG+Nihn
-         QFveGXOhNQRucLvRFj90jj+6Wp/OpW3WTHhk/MYLBoZGb6Xc6AuHJ9wOsFPs82edj5Ix
-         6wLA==
-X-Forwarded-Encrypted: i=1; AJvYcCUNrpobyifcH8yEPcopExCQlct6V1sLnVI/q1CPBykKU3RuUiLU5dLc7V+wnuAVLyAtywAmUrqi2kdY1AdIOmm8h2SIs1Wy
-X-Gm-Message-State: AOJu0YxeFAWUZGrkgvF+iHxzb50T3bNa3f7qNuj2tXCv93Pf7j0gwAMn
-	/3j+O76wkY+KqW7rYuDLk+YcihnWG9CuUzWit/JGEvRGa++oQ0jj
-X-Google-Smtp-Source: AGHT+IHgX4sQVMTzP3tj/vlxIQgpW6HIp/ee3ciU9VSYdhLDTfJjGXFHuKeoDTOsQ2b6Vog/+3Qo8Q==
-X-Received: by 2002:a2e:1f12:0:b0:2d8:3e07:5651 with SMTP id f18-20020a2e1f12000000b002d83e075651mr1827831ljf.34.1713438137760;
-        Thu, 18 Apr 2024 04:02:17 -0700 (PDT)
-Received: from mobilestation.baikal.int (srv1.baikalchip.ru. [87.245.175.227])
-        by smtp.gmail.com with ESMTPSA id p12-20020a2e740c000000b002d2e81c0f18sm154057ljc.45.2024.04.18.04.02.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 04:02:17 -0700 (PDT)
-Date: Thu, 18 Apr 2024 14:02:15 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
-Subject: Re: [PATCH net-next v11 2/6] net: stmmac: Add multi-channel support
-Message-ID: <5v6ypjjtbq72ovb437p6n4fkq2z5a3nhkv6spjct2flvjaxmgq@ykrdiv7kk4kq>
-References: <cover.1712917541.git.siyanteng@loongson.cn>
- <5b6b5642a5f3e77ddf8bfe598f7c70887f9cc37f.1712917541.git.siyanteng@loongson.cn>
+	s=arc-20240116; t=1713438230; c=relaxed/simple;
+	bh=eAVw/Rm28PRAbnn5C8EDuezCyUUUpKWahTorxk/3Nt4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nw9pqUDi1fgRZNv9WeXKKv5+ZW863syuXlmHqjEhi/b6Ud9DsN1egUFUvJV9gJqkarLGUzcO4T00b/LGOQQOVQClUa4kYYb5kG1YPM8jyDwwbDoJYz8nIQ5S7R62zkRLGzmAmE9K7ez4NLjt0t7W9gQJ2NgJXxvpiGRsfqNUQAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i9+ZVBXG; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713438227; x=1744974227;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=eAVw/Rm28PRAbnn5C8EDuezCyUUUpKWahTorxk/3Nt4=;
+  b=i9+ZVBXGig7RWEOV9oZbPQa9z55gETR9IEjcCzAxlr3rYyODJf2uZ01b
+   atyNvx93LD6Xn3WYqznsHfqsfPpg3pXqpAIkvHX1F6IP53NBhjcs9cA4+
+   NImwdp2PzFapikMoZi5yYz7DsK0ZWJyGVhrV0CLj0/msbSzsjZEZky6BH
+   fAgNK6grtvTUdLEE3VV88pwrwfx2yYi+DJcN2gHYeR7e3mrkvOsO3mv8O
+   st8RZD7uPiH2ldPIfzHZjWHyWMs1VKyEyZq+/MGG0tdkscYMEHG+QsOCd
+   XJLj08ilccsw9oF/WH6zV8fvUBQ6+1cKsanwuV+iJub+TBuBKuTZ/N5Ah
+   Q==;
+X-CSE-ConnectionGUID: zDnUiIpESqiRb1hIg2uP7w==
+X-CSE-MsgGUID: Voq8WbBARCW1di1XIqcVrQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="12763758"
+X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
+   d="scan'208";a="12763758"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 04:03:46 -0700
+X-CSE-ConnectionGUID: rp+MM2n5QnW6wQO2sVPBdw==
+X-CSE-MsgGUID: q1Uq+MiOSmiGEPggHSDVwg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
+   d="scan'208";a="23021657"
+Received: from unknown (HELO localhost.igk.intel.com) ([10.211.13.141])
+  by fmviesa008.fm.intel.com with ESMTP; 18 Apr 2024 04:03:45 -0700
+From: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Sergey Temerkhanov <sergey.temerkhanov@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-next] ice: Extend auxbus device naming
+Date: Thu, 18 Apr 2024 13:03:18 +0200
+Message-Id: <20240418110318.67202-1-sergey.temerkhanov@intel.com>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <5b6b5642a5f3e77ddf8bfe598f7c70887f9cc37f.1712917541.git.siyanteng@loongson.cn>
+Organization: Intel Technology Poland sp. z o.o. - ul. Slowackiego 173, 80-298 Gdansk - KRS 101882 - NIP 957-07-52-316
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 12, 2024 at 07:28:07PM +0800, Yanteng Si wrote:
-> DW GMAC v3.x multi-channels feature is implemented as multiple
-> sets of the same CSRs. Here is only preliminary support, it will
-> be useful for the driver further evolution and for the users
-> having multi-channel DWGMAC v3.x devices.
-> 
-> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> ---
->  .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  4 +--
->  .../ethernet/stmicro/stmmac/dwmac1000_dma.c   | 34 ++++++++++---------
->  .../ethernet/stmicro/stmmac/dwmac100_dma.c    |  2 +-
->  .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |  2 +-
->  .../net/ethernet/stmicro/stmmac/dwmac_dma.h   | 20 +++++++++--
->  .../net/ethernet/stmicro/stmmac/dwmac_lib.c   | 32 ++++++++---------
->  .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  2 +-
->  drivers/net/ethernet/stmicro/stmmac/hwif.h    |  5 ++-
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 11 +++---
->  include/linux/stmmac.h                        |  1 +
->  10 files changed, 65 insertions(+), 48 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> index e1b761dcfa1d..cc93f73a380e 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
-> @@ -299,7 +299,7 @@ static int sun8i_dwmac_dma_reset(void __iomem *ioaddr)
->   * Called from stmmac via stmmac_dma_ops->init
->   */
->  static void sun8i_dwmac_dma_init(void __iomem *ioaddr,
-> -				 struct stmmac_dma_cfg *dma_cfg, int atds)
-> +				 struct stmmac_dma_cfg *dma_cfg)
->  {
->  	writel(EMAC_RX_INT | EMAC_TX_INT, ioaddr + EMAC_INT_EN);
->  	writel(0x1FFFFFF, ioaddr + EMAC_INT_STA);
-> @@ -395,7 +395,7 @@ static void sun8i_dwmac_dma_start_tx(struct stmmac_priv *priv,
->  	writel(v, ioaddr + EMAC_TX_CTL1);
->  }
->  
-> -static void sun8i_dwmac_enable_dma_transmission(void __iomem *ioaddr)
-> +static void sun8i_dwmac_enable_dma_transmission(void __iomem *ioaddr, u32 chan)
->  {
->  	u32 v;
->  
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> index daf79cdbd3ec..f161ec9ac490 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
-> @@ -70,15 +70,17 @@ static void dwmac1000_dma_axi(void __iomem *ioaddr, struct stmmac_axi *axi)
->  	writel(value, ioaddr + DMA_AXI_BUS_MODE);
->  }
->  
-> -static void dwmac1000_dma_init(void __iomem *ioaddr,
-> -			       struct stmmac_dma_cfg *dma_cfg, int atds)
-> +static void dwmac1000_dma_init_channel(struct stmmac_priv *priv,
-> +				       void __iomem *ioaddr,
+Include segment/domain number in the device name to distinguish
+between PCI devices located on different root complexes in
+multi-segment configurations
 
-> +				       struct stmmac_dma_cfg *dma_cfg, u32 chan)
+Signed-off-by: Sergey Temerkhanov <sergey.temerkhanov@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_ptp.c | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
 
-please create a pre-requisite/preparation patch with the atds argument
-movement to the stmmac_dma_cfg structure as I suggested in v8:
-https://lore.kernel.org/netdev/yzs6eqx2swdhaegxxcbijhtb5tkhkvvyvso2perkessv5swq47@ywmea5xswsug/
-That will make this patch looking simpler and providing a single
-coherent change.
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+index 0f17fc1181d2..54fe1931d598 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+@@ -2893,6 +2893,7 @@ ice_ptp_auxbus_create_id_table(struct ice_pf *pf, const char *name)
+ static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
+ {
+ 	struct auxiliary_driver *aux_driver;
++	struct pci_dev *pdev = pf->pdev;
+ 	struct ice_ptp *ptp;
+ 	struct device *dev;
+ 	char *name;
+@@ -2903,8 +2904,9 @@ static int ice_ptp_register_auxbus_driver(struct ice_pf *pf)
+ 	aux_driver = &ptp->ports_owner.aux_driver;
+ 	INIT_LIST_HEAD(&ptp->ports_owner.ports);
+ 	mutex_init(&ptp->ports_owner.lock);
+-	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
+-			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
++	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_%u_clk%u",
++			      pci_domain_nr(pdev->bus), pdev->bus->number,
++			      PCI_SLOT(pdev->devfn),
+ 			      ice_get_ptp_src_clock_index(&pf->hw));
+ 	if (!name)
+ 		return -ENOMEM;
+@@ -3106,6 +3108,7 @@ static void ice_ptp_release_auxbus_device(struct device *dev)
+ static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
+ {
+ 	struct auxiliary_device *aux_dev;
++	struct pci_dev *pdev = pf->pdev;
+ 	struct ice_ptp *ptp;
+ 	struct device *dev;
+ 	char *name;
+@@ -3118,8 +3121,9 @@ static int ice_ptp_create_auxbus_device(struct ice_pf *pf)
+ 
+ 	aux_dev = &ptp->port.aux_dev;
+ 
+-	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_clk%u",
+-			      pf->pdev->bus->number, PCI_SLOT(pf->pdev->devfn),
++	name = devm_kasprintf(dev, GFP_KERNEL, "ptp_aux_dev_%u_%u_%u_clk%u",
++			      pci_domain_nr(pdev->bus), pdev->bus->number,
++			      PCI_SLOT(pdev->devfn),
+ 			      ice_get_ptp_src_clock_index(&pf->hw));
+ 	if (!name)
+ 		return -ENOMEM;
+-- 
+2.35.3
 
-> [...]
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> index 72672391675f..7c8b3ad739f7 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h
->
-> [...]
-> 
->  void dwmac_dma_stop_rx(struct stmmac_priv *priv, void __iomem *ioaddr, u32 chan)
->  {
-> -	u32 value = readl(ioaddr + DMA_CONTROL);
-> +	u32 value = readl(ioaddr + DMA_CHAN_CONTROL(chan));
->  	value &= ~DMA_CONTROL_SR;
-> -	writel(value, ioaddr + DMA_CONTROL);
-> +	writel(value, ioaddr + DMA_CHAN_CONTROL(chan));
->  }
->  
->  #ifdef DWMAC_DMA_DEBUG
-> @@ -165,7 +165,7 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
->  	struct stmmac_pcpu_stats *stats = this_cpu_ptr(priv->xstats.pcpu_stats);
->  	int ret = 0;
->  	/* read the status register (CSR5) */
-> -	u32 intr_status = readl(ioaddr + DMA_STATUS);
-> +	u32 intr_status = readl(ioaddr + DMA_CHAN_STATUS(chan));
->  
->  #ifdef DWMAC_DMA_DEBUG
->  	/* Enable it to monitor DMA rx/tx status in case of critical problems */
-> @@ -235,7 +235,7 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
->  		pr_warn("%s: unexpected status %08x\n", __func__, intr_status);
->  
-
->  	/* Clear the interrupt by writing a logic 1 to the CSR5[15-0] */
-> -	writel((intr_status & 0x1ffff), ioaddr + DMA_STATUS);
-> +	writel((intr_status & 0x7ffff), ioaddr + DMA_CHAN_STATUS(chan));
-
-I'll ask once again:
-
-"Isn't the mask change going to be implemented in the framework of the
-Loongson-specific DMA-interrupt handler in some of the further
-patches?"
-
-The rest of the changes look good. Thanks.
-
--Serge(y)
-
->
-> [...]
->
 
