@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-88994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80A488A92B0
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 07:57:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 808148A92B4
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 07:57:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 394D828152E
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 05:57:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F38E1F218CD
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 05:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5C65CDF2;
-	Thu, 18 Apr 2024 05:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A305F569;
+	Thu, 18 Apr 2024 05:57:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VCIfWlu4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PIb/x+yi"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C5E356455
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 05:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A5B454BCC
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 05:57:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713419818; cv=none; b=R3ExA7jZX0GRNh5OOhVElnM/NVtbeXPqAP6/CFi0330O1EQlpeeqLn9hUt5Dhkv/NirFdYngceK0sPqosyKu0o6HRQ2qPdPG7ztZ3U94F2o/+NhCS1sMDCTycc2TZ8leEpW+EP5gNEkN/uXAgIWQ3hGfDxeTNoNevMJBGUyweFM=
+	t=1713419870; cv=none; b=DMM1JmswvIBPlQhd6F2qrs1nU0z08L0vbBkxmWQ2kNC/8L5m+cV8lZrL2hcx1xbWUKVSKnrp+mawd70/Y5G6HwjDiGoCpMi44vPxVxYlguds9Ii6oaTk9rWJvZjzWeY+8EYs2jPDp44euGN3Ff2h2Bf9/7yFGBOCebCIGLol4NQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713419818; c=relaxed/simple;
-	bh=RLDSVm8K87CdU8QKvkxypvN6+yIETdNq4qZlkYhiles=;
+	s=arc-20240116; t=1713419870; c=relaxed/simple;
+	bh=FSWfeJRVhpivjhcZOKtr/RECIGZFZ6Lvd8suprQ2zlc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nbb7tU0iq7RSg3VTIRWMjSuVq+9ubctda2yJiYMvVNcXGfxwYNtU7uBglLQPrQPuC8+Ry3p1rb2fGDwe/9b/9zMePvG8oxdCR0LulfplLAQfRkEaXsf2vURFxmnk1cdXwNCW7UjZhIM0HwRVqEWiOjQchSNzgs0oBsyAJGvSQOs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VCIfWlu4; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=uAOUilgaPpl8cT95KQFRLSL8qMRSXkaKKndMvWhm7k6nCUFZ9SwqrSo8tqEYji8eV9Blvrduv8nLvFLUv9wfe3DxEdmfHyPcvhAqdDXtfSqBU85Ol9qu7HUJ/DtWekLEtYjyjrDnJvBpyLnNKbIRTaOgeGqhTqAnoEtUikUeUbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PIb/x+yi; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713419816;
+	s=mimecast20190719; t=1713419866;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=8g2uuNxxiwYQyQPoW1yOkVCXoXx7/GQBe/aHyhjlL3E=;
-	b=VCIfWlu4BeIpYitjAv7eJG8osClFup8+G4ETuvPhQke2iW4qC5LdvSkJrzYA8Brp5AUUe2
-	E5IAYvwXoMtSoxnLREZ7ERm+vnhEYnoIXS1HD2LPh2+5mzqfkZHSztdGPpwfOdwErA/Fy8
-	cPgxeEn/B2ml8OrKEcA5K4MBJMty5FU=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=WnN76fVoeHJRKOHHPsuZPbIKbYuzDGfrYAq34ct/Ccs=;
+	b=PIb/x+yisoY2Up2KefHLTe8qQtOw0rshL65+xSCD4lrgWwD9qAg36FazNx6sSwmjKppYVe
+	mtvImtOMmIWma7S4e7lwLB8Mzg0xs19HEJaQ2QaeQk7NxotxP3WwULMxnhjiRdyIvGe0m4
+	gas8tibb3L7I5ZnbEkHmSNEATvaVTKo=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-10-yyMu19yNMDGwosGXbygUSA-1; Thu, 18 Apr 2024 01:56:54 -0400
-X-MC-Unique: yyMu19yNMDGwosGXbygUSA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-34619c30076so295444f8f.1
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 22:56:54 -0700 (PDT)
+ us-mta-513-uWEq0sXzMiSJ1wMTMZfSMw-1; Thu, 18 Apr 2024 01:57:45 -0400
+X-MC-Unique: uWEq0sXzMiSJ1wMTMZfSMw-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-343e775c794so296095f8f.0
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 22:57:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713419813; x=1714024613;
+        d=1e100.net; s=20230601; t=1713419864; x=1714024664;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=8g2uuNxxiwYQyQPoW1yOkVCXoXx7/GQBe/aHyhjlL3E=;
-        b=JphxmHQ13WlMul/KRNzx27WalSsbH5FwcKcYUy89kInQAYDfSRIprl1zyuUFBBpCtj
-         GzGtcVtaqBUT9mDHXdMWdEJPelB8OGeLpIDa3UOXtXZ+FL9ajyLKwny7Sx5xrSM2DZ9h
-         yl7/IPMw7QevizP6q6offDWxQweqeDjEKZYmg4kRGBgO3lFRwjGTL3cFRsu0g4yDgU03
-         /eY4iLP7zlkPiXDNUp+56moIYJ5QLn2YSqhWPbAAsd2mOoWQnUBSdOPa47iFAJDVg57F
-         XgUYd3ZEhY6sDFq0OWpHp1pT0NcAaXycJh8tw5Ayz2sMnq1alfXZTsIzyiWYsrJI5VP5
-         x4FQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV5ZsrZublka/CvSN+kDm/0OHoGgivN5SBEORzO3qZM18ZMG0ZhZn7NyCjDhWIR5/GUk4Cr7chdlLyZDx/p6RhCc+oFnZX/
-X-Gm-Message-State: AOJu0YxxiMRUoaOdDOlNtEKqKej8YhVxGQxnjDHnWuIpoY1ToSWaLSSq
-	bjsTELd9ne7ou/iTVkaUb5K9POFOUWV71xAljJx/cTfg5CiMAbd/wxbzSXT+20mY5218iOiWUp+
-	565buvUTNKiMTLj8FCxDwZAHF5Ow9/NEJm1PccarKuS+AkT2KOAxi8w==
-X-Received: by 2002:adf:f352:0:b0:33e:78ca:e039 with SMTP id e18-20020adff352000000b0033e78cae039mr974831wrp.59.1713419813387;
-        Wed, 17 Apr 2024 22:56:53 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHq6gP4Yb3ppbn7gdUi3KkDfZ8Xpf5YR62TOPtanGXmO5tiuo00HgVFIKwjTNDhOMe5uMNFxQ==
-X-Received: by 2002:adf:f352:0:b0:33e:78ca:e039 with SMTP id e18-20020adff352000000b0033e78cae039mr974814wrp.59.1713419813022;
-        Wed, 17 Apr 2024 22:56:53 -0700 (PDT)
+        bh=WnN76fVoeHJRKOHHPsuZPbIKbYuzDGfrYAq34ct/Ccs=;
+        b=R2bAfGv5f0Sq2TbYH0rI1K9RoFSgAOED2jG0jahRQB5HkB1EOUIvHr1YH/iWNH3mI3
+         P41NvxRkaNlWVohT9qFdiHPFGG4iDZfCJLMd+pksqhc8WLduvTn1eGOST6JpZxjC8boq
+         5Y7Nz/+eDxyMDuvlY6+DiOpoaey+9kgeY84BKvJwukwI6s0OT8wUVddWMZlpkDJ+TlG+
+         4b9dCTCL+9zWJOk/RRFKtuW1yzsJeDJCWPa+UvaaA58OlPF/NaMGoogGjaWJnDkxu2S6
+         62GQn38b9u+0urSazClhR9YUbULs4mwXjalY4XgkaeEbLUeHgaH5dYnkefe+LRDq18eJ
+         fogw==
+X-Forwarded-Encrypted: i=1; AJvYcCUjzJW/ec9DHuHVHSRXXyKJCqXVRuOcuKhCsgmQLbvGkjrreh1QTlT2sqWfLBI2B0St7UJm+kV73nR3hQZDnk9YXPsg1jRP
+X-Gm-Message-State: AOJu0YzeB5n/ibXQ9svwbAhABhBWCcH3jhypO26qLbP+pazQpo1GXZIJ
+	JWKwaFZRU6fQqdNcmqJkEjGWsBovImSImmvNKf4s9f3YYGVu+WoWSmPW74V05cvoWREfVt9d+v9
+	NznXupFg74QA+K2W8TIAp5/Me1KtSPPyk+it2ijUlvZiU5b5YlVjwuw==
+X-Received: by 2002:a05:600c:198f:b0:416:3f85:d49 with SMTP id t15-20020a05600c198f00b004163f850d49mr1207747wmq.18.1713419864111;
+        Wed, 17 Apr 2024 22:57:44 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEivO//bEq/fkCuEybbkIrJpkIdU2CyNNJe3O+FwYgdnqOOzAsnV3tmnt1D2t9sOwRhRe4I5g==
+X-Received: by 2002:a05:600c:198f:b0:416:3f85:d49 with SMTP id t15-20020a05600c198f00b004163f850d49mr1207738wmq.18.1713419863732;
+        Wed, 17 Apr 2024 22:57:43 -0700 (PDT)
 Received: from [192.168.0.9] (ip-109-43-177-117.web.vodafone.de. [109.43.177.117])
-        by smtp.gmail.com with ESMTPSA id d9-20020a056000114900b003469e7f5c52sm898525wrx.80.2024.04.17.22.56.51
+        by smtp.gmail.com with ESMTPSA id g18-20020adfa492000000b0033e9d9f891csm909663wrb.58.2024.04.17.22.57.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 17 Apr 2024 22:56:52 -0700 (PDT)
-Message-ID: <3c7b0835-3e4e-4c86-ae71-288aea437ed0@redhat.com>
-Date: Thu, 18 Apr 2024 07:56:51 +0200
+        Wed, 17 Apr 2024 22:57:43 -0700 (PDT)
+Message-ID: <00054ec1-66c2-46e3-917f-cd5a43ffe4cd@redhat.com>
+Date: Thu, 18 Apr 2024 07:57:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,14 +83,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/3] s390/smsgiucv_app: Remove function pointer cast
+Subject: Re: [PATCH 3/3] s390/netiucv: Remove function pointer cast
 To: Nathan Chancellor <nathan@kernel.org>, akpm@linux-foundation.org,
  arnd@arndb.de, hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com
 Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, wintera@linux.ibm.com,
  twinkler@linux.ibm.com, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
  llvm@lists.linux.dev, patches@lists.linux.dev
 References: <20240417-s390-drivers-fix-cast-function-type-v1-0-fd048c9903b0@kernel.org>
- <20240417-s390-drivers-fix-cast-function-type-v1-2-fd048c9903b0@kernel.org>
+ <20240417-s390-drivers-fix-cast-function-type-v1-3-fd048c9903b0@kernel.org>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -135,7 +135,7 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240417-s390-drivers-fix-cast-function-type-v1-2-fd048c9903b0@kernel.org>
+In-Reply-To: <20240417-s390-drivers-fix-cast-function-type-v1-3-fd048c9903b0@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
@@ -143,18 +143,19 @@ On 17/04/2024 20.24, Nathan Chancellor wrote:
 > Clang warns (or errors with CONFIG_WERROR) after enabling
 > -Wcast-function-type-strict by default:
 > 
->    drivers/s390/net/smsgiucv_app.c:176:26: error: cast from 'void (*)(const void *)' to 'void (*)(struct device *)' converts to incompatible function type [-Werror,-Wcast-function-type-strict]
->      176 |         smsg_app_dev->release = (void (*)(struct device *)) kfree;
->          |                                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+>    drivers/s390/net/netiucv.c:1716:18: error: cast from 'void (*)(const void *)' to 'void (*)(struct device *)' converts to incompatible function type [-Werror,-Wcast-function-type-strict]
+>     1716 |                 dev->release = (void (*)(struct device *))kfree;
+>          |                                ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 >    1 error generated.
 > 
 > Add a standalone function to fix the warning properly, which addresses
-> the root of the warning that these casts are not safe for kCFI.
+> the root of the warning that these casts are not safe for kCFI. The
+> comment is not really relevant after this change, so remove it.
 > 
 > Signed-off-by: Nathan Chancellor <nathan@kernel.org>
 > ---
->   drivers/s390/net/smsgiucv_app.c | 7 ++++++-
->   1 file changed, 6 insertions(+), 1 deletion(-)
+>   drivers/s390/net/netiucv.c | 14 ++++++--------
+>   1 file changed, 6 insertions(+), 8 deletions(-)
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
 
