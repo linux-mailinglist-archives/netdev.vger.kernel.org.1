@@ -1,137 +1,227 @@
-Return-Path: <netdev+bounces-89458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2948D8AA4E7
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 23:56:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 350708AA4EC
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 23:57:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D97EF281E24
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 21:56:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A358A1F214C1
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 21:57:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3D8017B4F8;
-	Thu, 18 Apr 2024 21:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49850199E8E;
+	Thu, 18 Apr 2024 21:57:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="UiHfUv63"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hdDV1nrZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0345913F443;
-	Thu, 18 Apr 2024 21:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8DA199E89
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 21:57:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713477384; cv=none; b=FyGJRtaBYTBoK/7vbPeya6YHc6dD8L/wMgrv0qvs+jtnK3L8G3u7pAOMu6OPXP/E+SQBn8c+E+pOWUBSwKIsr8c2+T3cOVbJ7iBqshm8VZxHhyV+lwEVAcwDWkT84rwWkYoGLtFL5RHxUvsEQZj4hy4RGwwlE6lFQL8uhD+geko=
+	t=1713477444; cv=none; b=dFfUDcG+Bgm+SAa7wG6+gzECgzdscTVq1CC5ugVaZVxwxqiwwWoCN/vYQxFkECVe+uMRkGxYglFbmJoIcj/yI4IhYTs/RCPAKMaOIbLar68aTnwwN44xn1coymhHxZU58B6ieFte5nLHAyoJuSh3UdEE78QXtPv9juCXhAoTNNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713477384; c=relaxed/simple;
-	bh=Fw2HMz0+gzVeOybszCdMjJTYGixVTYGrYstdX7dn5hE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hmKK0u5n7o28DVmH+mHZW+MIl20gKYEQXe/51GwR750xfJJSYjeLmxnXgBGd4vJi5eQb9+yCWpcVug6PfHBe6MaANiJX+/8qhGepY2stdaR7RmlwhVpQU+IKLZveFxmVMtTGLcC6HaooJVTWCeE7FkCh0Za25+ivCJxcol/Kj/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=UiHfUv63; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=NKHq3RRb9DZOry1fX1WTmEfYYxoxdlJDDrBtepAjKaI=; b=UiHfUv63WoWeuvhfBqP8BLCR42
-	r9wM/6ZfekDEB49NOf2VW/S5/UTloS37YkTi0QiFpimPwcr6e7ktBu2FBt4LC8UINt4aTJ8rqEryn
-	vsXSz/9x0iH7gawFtz/CrLMGRoHe24MrVnJQBdW/axtDisDqmbQhucPdx8q5E//lovEn32Y9XCm6m
-	OFmlpeXfbaCVfFyzSj9T8DmLYSWkAkmEr+jA5K2EoNmWMLVCLeXlkDdMBXd9pcPD1B5qUY8zDx6Ei
-	6lRRqTV/45CusrP8/BY+eSqv46KoE2x0yxD/SR1iM1ZNdUkzSrKNIQayWghtMMDRDWkwA+lT2WgS0
-	yLm79o0g==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rxZjt-00000006FH2-0nmU;
-	Thu, 18 Apr 2024 21:56:17 +0000
-Date: Thu, 18 Apr 2024 22:56:17 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jason Wang <jasowang@redhat.com>, virtualization@lists.linux.dev,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Linux-MM <linux-mm@kvack.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Mel Gorman <mgorman@techsingularity.net>
-Subject: Re: [PATCH vhost 3/6] virtio_net: replace private by pp struct
- inside page
-Message-ID: <ZiGXAWl1MR1rgQ5_@casper.infradead.org>
-References: <1713146919.8867755-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEvmaH9NE-5VDBPpZOpAAg4bX39Lf0-iGiYzxdV5JuZWww@mail.gmail.com>
- <1713170201.06163-2-xuanzhuo@linux.alibaba.com>
- <CACGkMEvsXN+7HpeirxzR2qek_znHp8GtjiT+8hmt3tHHM9Zbgg@mail.gmail.com>
- <1713171554.2423792-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEuK0VkqtNfZ1BUw+SW=gdasEegTMfufS-47NV4bCh3Seg@mail.gmail.com>
- <1713317444.7698638-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEvjwXpF_mLR3H8ZW9PUE+3spcxKMQV1VvUARb0-Lt7NKQ@mail.gmail.com>
- <1713342055.436048-1-xuanzhuo@linux.alibaba.com>
- <ad98cb14-cc1b-4a01-aacc-8fb53445049e@kernel.org>
+	s=arc-20240116; t=1713477444; c=relaxed/simple;
+	bh=zooV8U1KdjxrLXansfLdXT2+NI7EJnxfn32RZkboLRk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Ab4dowA2pKXcZUwz2HCqFR6Uodkell68GaUfs3izE+1JUAbnCGf5foPNKNMjbQ/rWYk4iQ9YJg4Y4hb1+BE3xSyivaayMQaJ/qPe1WXc2fbvJmBO4dWPrMhabwb/1Byx0nvwHPUNpKhk425E59Q2DgTAqjgSzHeacFV77m/Xzc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hdDV1nrZ; arc=none smtp.client-ip=95.215.58.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c6f33a36-1fac-4738-8a4f-c930b544ba62@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1713477439;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=biLTizcyKoXID4ZbzhVKkocFif6oiK6wrP0PDSnRgzg=;
+	b=hdDV1nrZbThWa8XN/NOAuO1TL/Ie+Qg92kBzCL9omoSluxR1TfCLUx3kwj9uwhbZkQYaly
+	uNfd4ePrxFLgf+WRQfHgp2SaiXqpRKDRAXNl3xVPpKLOw7cA/oobIZEK8kVA4zAI/YhO1e
+	GatKGoshXof6N78AwIH65m7xeSRUk7E=
+Date: Thu, 18 Apr 2024 14:57:12 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ad98cb14-cc1b-4a01-aacc-8fb53445049e@kernel.org>
+Subject: Re: [RFC PATCH bpf-next v4 2/2] net: Add additional bit to support
+ clockid_t timestamp type
+To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
+ Martin KaFai Lau <martin.lau@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, bpf <bpf@vger.kernel.org>,
+ kernel@quicinc.com
+References: <20240418004308.1009262-1-quic_abchauha@quicinc.com>
+ <20240418004308.1009262-3-quic_abchauha@quicinc.com>
+ <66216f3ec638b_f648a294ec@willemb.c.googlers.com.notmuch>
+ <cb922600-783e-4741-be85-260d1ded5bdb@quicinc.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <cb922600-783e-4741-be85-260d1ded5bdb@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Apr 18, 2024 at 10:19:33PM +0200, Jesper Dangaard Brouer wrote:
-> I'm not sure it is "fine" to, explicitly choosing not to use page pool,
-> and then (ab)use `struct page` member (pp) that intended for page_pool
-> for other stuff. (In this case create a linked list of pages).
+On 4/18/24 1:10 PM, Abhishek Chauhan (ABC) wrote:
+>>>   #ifdef CONFIG_NET_XGRESS
+>>>   	__u8			tc_at_ingress:1;	/* See TC_AT_INGRESS_MASK */
+>>>   	__u8			tc_skip_classify:1;
+>>> @@ -1096,10 +1100,12 @@ struct sk_buff {
+>>>    */
+>>>   #ifdef __BIG_ENDIAN_BITFIELD
+>>>   #define SKB_MONO_DELIVERY_TIME_MASK	(1 << 7)
+>>> -#define TC_AT_INGRESS_MASK		(1 << 6)
+>>> +#define SKB_TAI_DELIVERY_TIME_MASK	(1 << 6)
+>>
+>> SKB_TSTAMP_TYPE_BIT2_MASK?
+
+nit. Shorten it to just SKB_TSTAMP_TYPE_MASK?
+
+#ifdef __BIG_ENDIAN_BITFIELD
+#define SKB_TSTAMP_TYPE_MASK	(3 << 6)
+#define SKB_TSTAMP_TYPE_RSH	(6)	/* more on this later */
+#else
+#define SKB_TSTAMP_TYPE_MASK	(3)
+#endif
+
+>>
+> I was thinking to keep it as TAI because it will confuse developers. I hope thats okay.
+
+I think it is not very useful to distinguish each bit since it is an enum value 
+now. It becomes more like the "pkt_type:3" and its PKT_TYPE_MAX.
+
+>>> +#define TC_AT_INGRESS_MASK		(1 << 5)
+>>>   #else
+>>>   #define SKB_MONO_DELIVERY_TIME_MASK	(1 << 0)
+>>> -#define TC_AT_INGRESS_MASK		(1 << 1)
+>>> +#define SKB_TAI_DELIVERY_TIME_MASK	(1 << 1)
+>>> +#define TC_AT_INGRESS_MASK		(1 << 2)
+>>>   #endif
+>>>   #define SKB_BF_MONO_TC_OFFSET		offsetof(struct sk_buff, __mono_tc_offset)
+>>>   
+>>> @@ -4206,6 +4212,11 @@ static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
+>>>   	case CLOCK_MONOTONIC:
+>>>   		skb->tstamp_type = SKB_CLOCK_MONO;
+>>>   		break;
+>>> +	case CLOCK_TAI:
+>>> +		skb->tstamp_type = SKB_CLOCK_TAI;
+>>> +		break;
+>>> +	default:
+>>> +		WARN_ONCE(true, "clockid %d not supported", tstamp_type);
+>>
+>> and set to 0 and default tstamp_type?
+>> Actually thinking about it. I feel if its unsupported just fall back to default is the correct thing. I will take care of this.
+>>>   	}
+>>>   }
+>>
+>>>   >
+>>   @@ -9372,10 +9378,16 @@ static struct bpf_insn *bpf_convert_tstamp_type_read(const struct bpf_insn *si,
+>>>   	*insn++ = BPF_LDX_MEM(BPF_B, tmp_reg, skb_reg,
+>>>   			      SKB_BF_MONO_TC_OFFSET);
+>>>   	*insn++ = BPF_JMP32_IMM(BPF_JSET, tmp_reg,
+>>> -				SKB_MONO_DELIVERY_TIME_MASK, 2);
+>>> +				SKB_MONO_DELIVERY_TIME_MASK | SKB_TAI_DELIVERY_TIME_MASK, 2);
+>>> +	*insn++ = BPF_JMP32_IMM(BPF_JSET, tmp_reg,
+>>> +				SKB_MONO_DELIVERY_TIME_MASK, 3);
+>>> +	*insn++ = BPF_JMP32_IMM(BPF_JSET, tmp_reg,
+>>> +				SKB_TAI_DELIVERY_TIME_MASK, 4);
+>>>   	*insn++ = BPF_MOV32_IMM(value_reg, BPF_SKB_TSTAMP_UNSPEC);
+>>>   	*insn++ = BPF_JMP_A(1);
+>>>   	*insn++ = BPF_MOV32_IMM(value_reg, BPF_SKB_TSTAMP_DELIVERY_MONO);
+>>> +	*insn++ = BPF_JMP_A(1);
+>>> +	*insn++ = BPF_MOV32_IMM(value_reg, BPF_SKB_TSTAMP_DELIVERY_TAI);
+
+With SKB_TSTAMP_TYPE_MASK defined like above, this could be simplified like this 
+(untested):
+
+static struct bpf_insn *bpf_convert_tstamp_type_read(const struct bpf_insn *si,
+                                                      struct bpf_insn *insn)
+{
+	__u8 value_reg = si->dst_reg;
+	__u8 skb_reg = si->src_reg;
+
+	BUILD_BUG_ON(__SKB_CLOCK_MAX != BPF_SKB_TSTAMP_DELIVERY_TAI);
+	*insn++ = BPF_LDX_MEM(BPF_B, value_reg, skb_reg, SKB_BF_MONO_TC_OFFSET);
+	*insn++ = BPF_ALU32_IMM(BPF_AND, value_reg, SKB_TSTAMP_TYPE_MASK);
+#ifdef __BIG_ENDIAN_BITFIELD
+	*insn++ = BPF_ALU32_IMM(BPF_RSH, value_reg, SKB_TSTAMP_TYPE_RSH);
+#else
+	BUILD_BUG_ON(!(SKB_TSTAMP_TYPE_MASK & 0x1));
+#endif
+
+	return insn;
+}
+
+>>>   
+>>>   	return insn;
+>>>   }
+>>> @@ -9418,10 +9430,26 @@ static struct bpf_insn *bpf_convert_tstamp_read(const struct bpf_prog *prog,
+>>>   		__u8 tmp_reg = BPF_REG_AX;
+>>>   
+>>>   		*insn++ = BPF_LDX_MEM(BPF_B, tmp_reg, skb_reg, SKB_BF_MONO_TC_OFFSET);
+>>> +		/*check if all three bits are set*/
+>>>   		*insn++ = BPF_ALU32_IMM(BPF_AND, tmp_reg,
+>>> -					TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK);
+>>> -		*insn++ = BPF_JMP32_IMM(BPF_JNE, tmp_reg,
+>>> -					TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK, 2);
+>>> +					TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK |
+>>> +					SKB_TAI_DELIVERY_TIME_MASK);
+>>> +		/*if all 3 bits are set jump 3 instructions and clear the register */
+>>> +		*insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg,
+>>> +					TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK |
+>>> +					SKB_TAI_DELIVERY_TIME_MASK, 4);
+>>> +		/*Now check Mono is set with ingress mask if so clear */
+>>> +		*insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg,
+>>> +					TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK, 3);
+>>> +		/*Now Check tai is set with ingress mask if so clear */
+>>> +		*insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg,
+>>> +					TC_AT_INGRESS_MASK | SKB_TAI_DELIVERY_TIME_MASK, 2);
+>>> +		/*Now Check tai and mono are set if so clear */
+>>> +		*insn++ = BPF_JMP32_IMM(BPF_JEQ, tmp_reg,
+>>> +					SKB_MONO_DELIVERY_TIME_MASK |
+>>> +					SKB_TAI_DELIVERY_TIME_MASK, 1);
+
+Same as the bpf_convert_tstamp_type_read, this could be simplified with 
+SKB_TSTAMP_TYPE_MASK.
+
+>>
+>> This looks as if all JEQ result in "if so clear"?
+>>
+>> Is the goal to only do something different for the two bits being 0x1,
+>> can we have a single test with a two-bit mask, rather than four tests?
+>>
+> I think Martin wanted to take care of TAI as well. I will wait for his comment here
 > 
->  +#define page_chain_next(p)	((struct page *)((p)->pp))
->  +#define page_chain_add(p, n)	((p)->pp = (void *)n)
-> 
-> I'm not sure that I (as PP maintainer) can make this call actually, as I
-> think this area belong with the MM "page" maintainers (Cc MM-list +
-> people) to judge.
-> 
-> Just invention new ways to use struct page fields without adding your
-> use-case to struct page, will make it harder for MM people to maintain
-> (e.g. make future change).
+> My Goal was to take care of invalid combos which does not hold valid
+> 1. If all 3 bits are set => invalid combo (Test case written is Insane)
+> 2. If 2 bits are set (tai+mono)(Test case written is Insane) => this cannot happen (because clock base can only be one in skb)
+> 3. If 2 bit are set (ingress + tai/mono) => This is existing logic + tai being added (clear tstamp in ingress)
+> 4. For all other cases go ahead and fill in the tstamp in the dest register.
 
-I can't really follow what's being proposed; the quoting is quite deep.
+If it is to ensure no new type is added without adding 
+BPF_SKB_TSTAMP_DELIVERY_XYZ, I would simplify this runtime bpf insns here and 
+use a BUILD_BUG_ON to catch it at compile time. Something like,
 
-Here's the current plan for struct page:
+enum skb_tstamp_type {
+         SKB_CLOCK_REAL, /* Time base is skb is REALTIME */
+         SKB_CLOCK_MONO, /* Time base is skb is MONOTONIC */
+  	SKB_CLOCK_TAI,  /* Time base in skb is TAI */
+         __SKB_CLOCK_MAX = SKB_CLOCK_TAI,
+};
 
- - The individual users are being split off.  This has already happened
-   for struct folio, struct slab and struct pgdesc.  Others are hopefully
-   coming.
- - At some point, struct page will become:
+/* Same one used in the bpf_convert_tstamp_type_read() above */
+BUILD_BUG_ON(__SKB_CLOCK_MAX != BPF_SKB_TSTAMP_DELIVERY_TAI);
 
-   struct page {
-     unsigned long flags;
-     unsigned long data[5];
-     unsigned int data2[2];
-     ... some other bits and pieces ...
-   };
-
- - After that, we will turn struct page into:
-
-  struct page {
-    unsigned long memdesc;
-  };
-
-Users like pagepool will allocate a struct ppdesc that will be
-referred to by the memdesc.  The bottom 4 bits will identify it as a
-ppdesc.  You can put anything you like in a struct ppdesc, it just has
-to be allocated from a slab with a 16 byte alignment.
-
-More details here:
-https://kernelnewbies.org/MatthewWilcox/Memdescs
-
-This is all likely to land in 2025.  The goal for 2024 is to remove
-mapping & index from 'struct page'.  This has been in progress since
-2019 so I'm really excited that we're so close!  If you want to
-turn struct ppdesc into its own struct like folio, slab & ptdesc,
-I'm happy to help.  I once had a patchset for that:
-
-https://lore.kernel.org/netdev/20221130220803.3657490-1-willy@infradead.org/
-
-but I'm sure it's truly bitrotted.
+Another thing is, the UDP test in test_tc_dtime.c probably needs to be adjusted, 
+the userspace is using the CLOCK_TAI in SO_TXTIME and it is getting forwarded now.
 
