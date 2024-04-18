@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-89399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 374E88AA394
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 21:59:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 347028AA398
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:00:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D83FEB29AD3
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:57:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DF59B2547F
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:57:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D363199EA7;
-	Thu, 18 Apr 2024 19:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCCC0199EB3;
+	Thu, 18 Apr 2024 19:52:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b+Ibvbp4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vV7bR+T7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B01184105
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 19:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427C8199EAA
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 19:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713469942; cv=none; b=eI5gRSedATb+mf4NIM1XwSaOfiRosKfy/KAJh+L+sLWNs8Rec1ZbUT2MkP/+zI9Bm3NO7/fkMTc+ctpj/nTM/UPgDpmDtZHKJkSNBqQrgOrmiQdkZPOwkkK4AoRFzgrU2o4syiWulIeDSRXxkg0upPJzoYuKO+Wio861vI8v/xg=
+	t=1713469944; cv=none; b=Cx7jSlSCL515YUMeKlROnG40XmJCAPLQHz4g2zwavJcBOtx4+d8n8gbUI79R/JqmT/nL3BrikUDMoiYKICY0oov3PaaQCmDMBSAotkZwHDGyKfzSQ1thK7dEcXbXG8bymHVKZ7Cc1JxI+Jhnp8bpRFvVChFcUF5TrmEeyBZopkE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713469942; c=relaxed/simple;
-	bh=xICIZheVqhAUi0wzN0qIadCMswo7huAdA5CoSJ6L8HI=;
+	s=arc-20240116; t=1713469944; c=relaxed/simple;
+	bh=VDZOieUcpyDEH/t+Pr0QmpUi6oADY+eslJ7Li5e0SJE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=po5TgNFucO5IeWj62HW3xKiZRhvPvcVTpEXTooO5RITRgde+px0t2D7qFTdTMiBIpyQlH47Chebkhw52i0oQ6nAAirYPRYj4zFkJBoPfr2lXAUvd8IwDeYnOeIECj006kvn1JT2NdPEMeSNYj/L0DCqRamU9cW3EZZVL7HF0qgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=b+Ibvbp4; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=CFnO8SvLkqOn7GgqdjMBtPG/13lI6hIo4087JO+5GxBsa7s4ZnfZdtCuCX+xUWzpu62OGRIgtpcoX+M2bT5SaUtWEe4vKt7I1HGg/aw9gdpXp7MoMGJX9yM4nNP4qY5tx1rdKkNFQh6njqqs3/5QKr8csaQhlZSpntpVb+YOD/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vV7bR+T7; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--shailend.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61892d91207so22814987b3.3
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 12:52:21 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61890f3180aso25656717b3.2
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 12:52:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713469940; x=1714074740; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1713469942; x=1714074742; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZiKjM1W5A/xCRI9EhygNuZ2ckww6/WdQJTgN8XyXsLw=;
-        b=b+Ibvbp40tmiek3bA/kHadG43yxoKStH4saagkzDFON3w3nwfI1GV/Kgay359CZgIu
-         Y3Vmkqxfu/AngslFUWij6DXbkJ6NWboK8lmXnbW4gQEFdTK0XnfaTtrESvluEBC51xmL
-         usCozOVjf54S4kvt+vcZ7UoAvdZfEQw++p2sNzVw+kI/R0Y8P6uf4cpr2j8pruLcz/WA
-         zGczT6DshOXXgH2LNzhw2fxAXZjP40QsvQa4CeRgzP8GoSKLm0oX7zCYIJJHRZPQ4pxX
-         74j4b28iTLZ3E1iQ3ZADrxhKFLiiMbaWtk2oKOziyLjW7T2jVxKvL2Rp19GiwgSd36mX
-         Hs7Q==
+        bh=HVq9F9kHzNjyGhFTT6oKSDsOUC90CKKFIrQakeiM3wM=;
+        b=vV7bR+T7LuDqc9a0vdOLz8NJ8JwANB02pJVqySBRgBoGS2yDjxH4caMf0J3MogjbBu
+         Cz8FjJG+8tTiMw7czORN+F15Z5Cj+XDG5Td7ZaMZ7S/b5nP5NTnjdY7MXh6rAnrqi3FH
+         bmZBG53wVvj690XF4ONRK7GJYrstVCpNLolwHxJ2AGftYHT88T3oEtylZA74eB4TUfAa
+         StYSJAoFjCysVEOSoaJ63kVtRFZH9bK/m4RcNOGC49IHo8AwtlFvbAypxcMOWQXBHbj3
+         PBOckSwQ702Dn6wgG2cocG5h/zKzgMqXlHM9WsnzcrFYGiiUh5kkOXJ15sL8wnVrXE9I
+         gaaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713469940; x=1714074740;
+        d=1e100.net; s=20230601; t=1713469942; x=1714074742;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZiKjM1W5A/xCRI9EhygNuZ2ckww6/WdQJTgN8XyXsLw=;
-        b=dHWL6olc031ssXV6O0YbzamwXA95MMFu+9G6+uWTHjxuKNOQP1UZb6p5bqqLKuQ15N
-         0+lHOqdn2RgXRqCXMIoVsne0kk60l/VFPvkJHz4XezjDawHZpZzasjKt23Ltf6wAmu+h
-         nxqdzwLUOwie4ujUtY/LCdVfRYtPKciuJpgbspaC54rMha6fuO4kMN6kH7MAP6JtCwzW
-         MHgDL0bbzIx6WfSuqedr+74dP9ngFYx9kAOhRtndrT4BszIjrFSfReoA2qpmurLcsWF5
-         X25b4DND4ZCoKpYvFusLdKsgFOZIhTW9uS0GfCykneB9JoUNvqz80me75xAlTO5KYi0a
-         3uhA==
-X-Gm-Message-State: AOJu0YzpkjUp6Hcpt43LbMyF4kQMMRKp+6xnAXAb3Vhs/wm8faGgUXX5
-	rQy7fYhF/klqxuBt7F7fbYs3qLKF07E+H8Tj+KuGTlrp9W2UsFr+cfP5csbHyeSfa+tSKkv9Z4K
-	QoicBKnhLsm7KrLbk4M5ggPZlVUpXczFde7Yed058i2YdONJ6kenutmBD8JuvtVulLQWEAq80SE
-	SAcFoxZuoeaMfDKQClQ9521CAW8a3ZtUgwgeMmXAuXaoA=
-X-Google-Smtp-Source: AGHT+IFenVdYIBSfR40UZoYTgQ2dq8ytqg/m610Suv9naVUlIplsK4yVquQClt7mTMaKKjpV5K0+B9+Xr0ngtA==
+        bh=HVq9F9kHzNjyGhFTT6oKSDsOUC90CKKFIrQakeiM3wM=;
+        b=FR0v6TpkgUh4umsSFAW1GLJBCuBhA/c+1PbWqk6rFWwJSBwUOZKf+Oxruv5k1e4HSO
+         muU+XKczLUx/56QLScNsxriQfGSE0MEz8GYTfygF0+yExZtcQicAc1G25B3Iezv6Tv0H
+         qgBhO9VF5R4b4PIw4zp2BtfS3+a+ZxjsIZX0TTqh+ZZ1Y+nx1cTIYZ/TAfQXEQLqI+MA
+         D80IugkRJxx7L7MuPpS0ieWPgZ7dUsmvP1f2FO5m3AjPcyOGPBcqSPUCBxlCOQ752rT7
+         QjY2Lfg4vaBsu3FdWRz83v7DtBhIPmXu3f6psbFX9BHbYF1KeryDbpHOaR0JeOZaeu33
+         lYDQ==
+X-Gm-Message-State: AOJu0YwTx54UQrRm6a5+ESxGcRh4st06Jtn1XqR13u9i6CMNBfQmRokk
+	XKw4ZQvM2vQY70cXyxbvmI88Cauv1y02v8nRkjEkG+RCL6PMUM0+OH+yoYn+gqnfuGwts1ZgNSU
+	lA9xGJodaWFrn2Kqjj3FQxx1hiqMogHyNoyMuydZ2FoHZR2AUv67Q+LAoctKsvG31/Y/dO2C5OI
+	lCo+v5spjQTQdphrynmZttZRC60Ps+g7tcjtI1ndLUkeA=
+X-Google-Smtp-Source: AGHT+IGYMptObfYfddez9gNLgoWxhf8RHjzl4Y5YOS1Sry1gFL5zF9KdoHdIuRJzBXPZR2NUhbpFeEHW9gl1bA==
 X-Received: from shailendkvm.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:2648])
- (user=shailend job=sendgmr) by 2002:a0d:d047:0:b0:61a:e319:b0 with SMTP id
- s68-20020a0dd047000000b0061ae31900b0mr770416ywd.1.1713469940316; Thu, 18 Apr
- 2024 12:52:20 -0700 (PDT)
-Date: Thu, 18 Apr 2024 19:51:52 +0000
+ (user=shailend job=sendgmr) by 2002:a0d:ccce:0:b0:61b:1346:3cd5 with SMTP id
+ o197-20020a0dccce000000b0061b13463cd5mr797946ywd.9.1713469942068; Thu, 18 Apr
+ 2024 12:52:22 -0700 (PDT)
+Date: Thu, 18 Apr 2024 19:51:53 +0000
 In-Reply-To: <20240418195159.3461151-1-shailend@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240418195159.3461151-1-shailend@google.com>
 X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
-Message-ID: <20240418195159.3461151-3-shailend@google.com>
-Subject: [RFC PATCH net-next 2/9] gve: Make the RX free queue funcs idempotent
+Message-ID: <20240418195159.3461151-4-shailend@google.com>
+Subject: [RFC PATCH net-next 3/9] gve: Add adminq funcs to add/remove a single
+ Rx queue
 From: Shailend Chand <shailend@google.com>
 To: netdev@vger.kernel.org
 Cc: almasrymina@google.com, davem@davemloft.net, edumazet@google.com, 
@@ -83,66 +84,169 @@ Cc: almasrymina@google.com, davem@davemloft.net, edumazet@google.com,
 	Shailend Chand <shailend@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Although this is not fixing any existing double free bug, making these
-functions idempotent allows for a simpler implementation of future ndo
-hooks that act on a single queue.
+This allows for implementing future ndo hooks that act on a single
+queue.
 
 Signed-off-by: Shailend Chand <shailend@google.com>
 ---
- drivers/net/ethernet/google/gve/gve_rx.c | 29 ++++++++++++++++--------
- 1 file changed, 19 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/google/gve/gve_adminq.c | 79 ++++++++++++++------
+ drivers/net/ethernet/google/gve/gve_adminq.h |  2 +
+ 2 files changed, 58 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/net/ethernet/google/gve/gve_rx.c b/drivers/net/ethernet/google/gve/gve_rx.c
-index cd727e55ae0f..fde7503940f7 100644
---- a/drivers/net/ethernet/google/gve/gve_rx.c
-+++ b/drivers/net/ethernet/google/gve/gve_rx.c
-@@ -30,6 +30,9 @@ static void gve_rx_unfill_pages(struct gve_priv *priv,
- 	u32 slots = rx->mask + 1;
- 	int i;
+diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
+index b2b619aa2310..1b066c92d812 100644
+--- a/drivers/net/ethernet/google/gve/gve_adminq.c
++++ b/drivers/net/ethernet/google/gve/gve_adminq.c
+@@ -630,14 +630,15 @@ int gve_adminq_create_tx_queues(struct gve_priv *priv, u32 start_id, u32 num_que
+ 	return gve_adminq_kick_and_wait(priv);
+ }
  
-+	if (!rx->data.page_info)
-+		return;
+-static int gve_adminq_create_rx_queue(struct gve_priv *priv, u32 queue_index)
++static void gve_adminq_get_create_rx_queue_cmd(struct gve_priv *priv,
++					       union gve_adminq_command *cmd,
++					       u32 queue_index)
+ {
+ 	struct gve_rx_ring *rx = &priv->rx[queue_index];
+-	union gve_adminq_command cmd;
+ 
+-	memset(&cmd, 0, sizeof(cmd));
+-	cmd.opcode = cpu_to_be32(GVE_ADMINQ_CREATE_RX_QUEUE);
+-	cmd.create_rx_queue = (struct gve_adminq_create_rx_queue) {
++	memset(cmd, 0, sizeof(*cmd));
++	cmd->opcode = cpu_to_be32(GVE_ADMINQ_CREATE_RX_QUEUE);
++	cmd->create_rx_queue = (struct gve_adminq_create_rx_queue) {
+ 		.queue_id = cpu_to_be32(queue_index),
+ 		.ntfy_id = cpu_to_be32(rx->ntfy_id),
+ 		.queue_resources_addr = cpu_to_be64(rx->q_resources_bus),
+@@ -648,13 +649,13 @@ static int gve_adminq_create_rx_queue(struct gve_priv *priv, u32 queue_index)
+ 		u32 qpl_id = priv->queue_format == GVE_GQI_RDA_FORMAT ?
+ 			GVE_RAW_ADDRESSING_QPL_ID : rx->data.qpl->id;
+ 
+-		cmd.create_rx_queue.rx_desc_ring_addr =
++		cmd->create_rx_queue.rx_desc_ring_addr =
+ 			cpu_to_be64(rx->desc.bus),
+-		cmd.create_rx_queue.rx_data_ring_addr =
++		cmd->create_rx_queue.rx_data_ring_addr =
+ 			cpu_to_be64(rx->data.data_bus),
+-		cmd.create_rx_queue.index = cpu_to_be32(queue_index);
+-		cmd.create_rx_queue.queue_page_list_id = cpu_to_be32(qpl_id);
+-		cmd.create_rx_queue.packet_buffer_size = cpu_to_be16(rx->packet_buffer_size);
++		cmd->create_rx_queue.index = cpu_to_be32(queue_index);
++		cmd->create_rx_queue.queue_page_list_id = cpu_to_be32(qpl_id);
++		cmd->create_rx_queue.packet_buffer_size = cpu_to_be16(rx->packet_buffer_size);
+ 	} else {
+ 		u32 qpl_id = 0;
+ 
+@@ -662,25 +663,39 @@ static int gve_adminq_create_rx_queue(struct gve_priv *priv, u32 queue_index)
+ 			qpl_id = GVE_RAW_ADDRESSING_QPL_ID;
+ 		else
+ 			qpl_id = rx->dqo.qpl->id;
+-		cmd.create_rx_queue.queue_page_list_id = cpu_to_be32(qpl_id);
+-		cmd.create_rx_queue.rx_desc_ring_addr =
++		cmd->create_rx_queue.queue_page_list_id = cpu_to_be32(qpl_id);
++		cmd->create_rx_queue.rx_desc_ring_addr =
+ 			cpu_to_be64(rx->dqo.complq.bus);
+-		cmd.create_rx_queue.rx_data_ring_addr =
++		cmd->create_rx_queue.rx_data_ring_addr =
+ 			cpu_to_be64(rx->dqo.bufq.bus);
+-		cmd.create_rx_queue.packet_buffer_size =
++		cmd->create_rx_queue.packet_buffer_size =
+ 			cpu_to_be16(priv->data_buffer_size_dqo);
+-		cmd.create_rx_queue.rx_buff_ring_size =
++		cmd->create_rx_queue.rx_buff_ring_size =
+ 			cpu_to_be16(priv->rx_desc_cnt);
+-		cmd.create_rx_queue.enable_rsc =
++		cmd->create_rx_queue.enable_rsc =
+ 			!!(priv->dev->features & NETIF_F_LRO);
+ 		if (priv->header_split_enabled)
+-			cmd.create_rx_queue.header_buffer_size =
++			cmd->create_rx_queue.header_buffer_size =
+ 				cpu_to_be16(priv->header_buf_size);
+ 	}
++}
+ 
++static int gve_adminq_create_rx_queue(struct gve_priv *priv, u32 queue_index)
++{
++	union gve_adminq_command cmd;
 +
- 	if (rx->data.raw_addressing) {
- 		for (i = 0; i < slots; i++)
- 			gve_rx_free_buffer(&priv->pdev->dev, &rx->data.page_info[i],
-@@ -70,20 +73,26 @@ static void gve_rx_free_ring_gqi(struct gve_priv *priv, struct gve_rx_ring *rx,
- 	int idx = rx->q_num;
- 	size_t bytes;
++	gve_adminq_get_create_rx_queue_cmd(priv, &cmd, queue_index);
+ 	return gve_adminq_issue_cmd(priv, &cmd);
+ }
  
--	bytes = sizeof(struct gve_rx_desc) * cfg->ring_size;
--	dma_free_coherent(dev, bytes, rx->desc.desc_ring, rx->desc.bus);
--	rx->desc.desc_ring = NULL;
-+	if (rx->desc.desc_ring) {
-+		bytes = sizeof(struct gve_rx_desc) * cfg->ring_size;
-+		dma_free_coherent(dev, bytes, rx->desc.desc_ring, rx->desc.bus);
-+		rx->desc.desc_ring = NULL;
-+	}
++int gve_adminq_create_single_rx_queue(struct gve_priv *priv, u32 queue_index)
++{
++	union gve_adminq_command cmd;
++
++	gve_adminq_get_create_rx_queue_cmd(priv, &cmd, queue_index);
++	return gve_adminq_execute_cmd(priv, &cmd);
++}
++
+ int gve_adminq_create_rx_queues(struct gve_priv *priv, u32 num_queues)
+ {
+ 	int err;
+@@ -727,17 +742,22 @@ int gve_adminq_destroy_tx_queues(struct gve_priv *priv, u32 start_id, u32 num_qu
+ 	return gve_adminq_kick_and_wait(priv);
+ }
  
--	dma_free_coherent(dev, sizeof(*rx->q_resources),
--			  rx->q_resources, rx->q_resources_bus);
--	rx->q_resources = NULL;
-+	if (rx->q_resources) {
-+		dma_free_coherent(dev, sizeof(*rx->q_resources),
-+				  rx->q_resources, rx->q_resources_bus);
-+		rx->q_resources = NULL;
-+	}
++static void gve_adminq_make_destroy_rx_queue_cmd(union gve_adminq_command *cmd,
++						 u32 queue_index)
++{
++	memset(cmd, 0, sizeof(*cmd));
++	cmd->opcode = cpu_to_be32(GVE_ADMINQ_DESTROY_RX_QUEUE);
++	cmd->destroy_rx_queue = (struct gve_adminq_destroy_rx_queue) {
++		.queue_id = cpu_to_be32(queue_index),
++	};
++}
++
+ static int gve_adminq_destroy_rx_queue(struct gve_priv *priv, u32 queue_index)
+ {
+ 	union gve_adminq_command cmd;
+ 	int err;
  
- 	gve_rx_unfill_pages(priv, rx, cfg);
+-	memset(&cmd, 0, sizeof(cmd));
+-	cmd.opcode = cpu_to_be32(GVE_ADMINQ_DESTROY_RX_QUEUE);
+-	cmd.destroy_rx_queue = (struct gve_adminq_destroy_rx_queue) {
+-		.queue_id = cpu_to_be32(queue_index),
+-	};
+-
++	gve_adminq_make_destroy_rx_queue_cmd(&cmd, queue_index);
+ 	err = gve_adminq_issue_cmd(priv, &cmd);
+ 	if (err)
+ 		return err;
+@@ -745,6 +765,19 @@ static int gve_adminq_destroy_rx_queue(struct gve_priv *priv, u32 queue_index)
+ 	return 0;
+ }
  
--	bytes = sizeof(*rx->data.data_ring) * slots;
--	dma_free_coherent(dev, bytes, rx->data.data_ring,
--			  rx->data.data_bus);
--	rx->data.data_ring = NULL;
-+	if (rx->data.data_ring) {
-+		bytes = sizeof(*rx->data.data_ring) * slots;
-+		dma_free_coherent(dev, bytes, rx->data.data_ring,
-+				  rx->data.data_bus);
-+		rx->data.data_ring = NULL;
-+	}
- 
- 	kvfree(rx->qpl_copy_pool);
- 	rx->qpl_copy_pool = NULL;
++int gve_adminq_destroy_single_rx_queue(struct gve_priv *priv, u32 queue_index)
++{
++	union gve_adminq_command cmd;
++	int err;
++
++	gve_adminq_make_destroy_rx_queue_cmd(&cmd, queue_index);
++	err = gve_adminq_execute_cmd(priv, &cmd);
++	if (err)
++		return err;
++
++	return 0;
++}
++
+ int gve_adminq_destroy_rx_queues(struct gve_priv *priv, u32 num_queues)
+ {
+ 	int err;
+diff --git a/drivers/net/ethernet/google/gve/gve_adminq.h b/drivers/net/ethernet/google/gve/gve_adminq.h
+index beedf2353847..e64f0dbe744d 100644
+--- a/drivers/net/ethernet/google/gve/gve_adminq.h
++++ b/drivers/net/ethernet/google/gve/gve_adminq.h
+@@ -451,7 +451,9 @@ int gve_adminq_configure_device_resources(struct gve_priv *priv,
+ int gve_adminq_deconfigure_device_resources(struct gve_priv *priv);
+ int gve_adminq_create_tx_queues(struct gve_priv *priv, u32 start_id, u32 num_queues);
+ int gve_adminq_destroy_tx_queues(struct gve_priv *priv, u32 start_id, u32 num_queues);
++int gve_adminq_create_single_rx_queue(struct gve_priv *priv, u32 queue_index);
+ int gve_adminq_create_rx_queues(struct gve_priv *priv, u32 num_queues);
++int gve_adminq_destroy_single_rx_queue(struct gve_priv *priv, u32 queue_index);
+ int gve_adminq_destroy_rx_queues(struct gve_priv *priv, u32 queue_id);
+ int gve_adminq_register_page_list(struct gve_priv *priv,
+ 				  struct gve_queue_page_list *qpl);
 -- 
 2.44.0.769.g3c40516874-goog
 
