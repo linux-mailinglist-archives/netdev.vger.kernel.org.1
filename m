@@ -1,212 +1,188 @@
-Return-Path: <netdev+bounces-89174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B55A8A99A7
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 14:21:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B59C8A99BC
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 14:27:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12B141F21257
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 12:21:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2ADC7281039
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 12:27:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59F8671B20;
-	Thu, 18 Apr 2024 12:21:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3864F15D5D6;
+	Thu, 18 Apr 2024 12:26:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="OeWI6NeE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zmc0ndJ4"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2052.outbound.protection.outlook.com [40.107.92.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA0E7156F54
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 12:21:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.52
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713442867; cv=fail; b=kRPlvYTwqyKjoAV7z2w6V1Ap78xON6/ucPVw6cwHguLm2LwrZM2vAtMTWRmgIUMquyvZYGDzzQofd2J+goVuU422gdOXqqLDRb+fU+gN4iYUodsu6XGo3M+8Hzrhh/xDmxpgOqPNWqCFxEyM4geDxkiQ8Wh7xlr3Qo5sGAZzbJo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713442867; c=relaxed/simple;
-	bh=jULdD2yi6MjTLq3nD82fcP3FeGYpfyXHVHZfH28HPhw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Q2MwiSX3H3D/PEfcvD2Bsnfg5ZOyM9pyCD3V8RCnjjwQwTeAVS4qsSQ5IBRfBcQ4tENdbawJlIyTfXIWT7tWl63QnOOwnfY8EXoMyZYNf5trp52kVUSaq658FWPeyZxg8SO1vLg8WeGaumfB62cQ0Tz8OksOziOqRK61snsIKyI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=OeWI6NeE; arc=fail smtp.client-ip=40.107.92.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SxvBslA2FK8b9na59zuayabcTPvvXMilJdKrNFV4y97UXdF6U4ZJrRqWA9DOIoI3kJb2nYYj4QEGENRcIQbtKXhQvmd5VuNYHIxyRUJnZNuqhTRDkyj+zfSWUclzEtFlaDWFCpoK6G68fpWey4Bw2Vgpmlbr9zxj8eFNVH/7naQ3awWfIdHNnorPJq9CFxAMhTPcwnKhuMeigxsp0S94+r6U1O15Xyqn7xqOsWXqh4CphLXfOAIpTlvXFurXmpc+52S9xx9eya+gWYMVX63UPgWUsaeD7K2dirXtB2inKOg3I7366ctz7FW+hSolc+I5SStoVBNd4u0RgECpeodCAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Hrn7Ts24ohSJPQg8shYa4zxh6pzBk7Dd54n3Eshd74Y=;
- b=h122ru7gVZDs7J1BfR3PyoDUA5A07bFzvnxw36mihmfNtV63SXyTzHbW+fi++P72QO37nQjXNHot2VAGev1G0ykzEtThBHtwb8+TKi8LeIXFxrISDHqoVkhMSm7Tq2JwaoclmkOsglanVYQrzwawaJByMigBv+DK1fpQ4a1AiQbd7aYLjV5RSR7kTpzaD+cjhf2yZugQc6IimvDL9dwdaIWjY/QXkQk1JbVz5TcDP4DozoZ28huA8F+oNwdtj2LeQisVLojdPNbyFP8mi42teFfyp7cs+YrX8qpzAKyFfuZkp555TeWDp7PwtksJqpiaDiicJrEv12kpFh+q5tD5Wg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=linux.intel.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Hrn7Ts24ohSJPQg8shYa4zxh6pzBk7Dd54n3Eshd74Y=;
- b=OeWI6NeEPCVIN1Vw7tui00lbcOgcAgfKgBx9HqaWlgsvS9XWJ7udDTdHblsNbYL33bPSVJmBJsiB9rmMkr/MH4wPmp7pKuaaNCohPmLh3uLWhLgKaSvDM3J5qZ+dhyvLT6rnSReaEYPGBOycgZeTCP9M34GIdyx4WVcyZsuZdVnQoru7e7VIIzCe38S1uilsoIBbcFuomI03q1RhS46wX8N+GEItFslM+tc1cAhf91QXUDH645zEhkkViEsuF5Wyv7Wu8gNdiU6E2l0rdTNeHDfqtuNc+Cp+9EfXOQDg0ruTkW3BdBJcYkOTsxRnCsfjw8DMYJ9/scc+rww5zYPyUQ==
-Received: from SA1P222CA0050.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:2d0::25)
- by DS0PR12MB9273.namprd12.prod.outlook.com (2603:10b6:8:193::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.50; Thu, 18 Apr
- 2024 12:21:00 +0000
-Received: from SA2PEPF000015CD.namprd03.prod.outlook.com
- (2603:10b6:806:2d0:cafe::ed) by SA1P222CA0050.outlook.office365.com
- (2603:10b6:806:2d0::25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7495.28 via Frontend
- Transport; Thu, 18 Apr 2024 12:21:00 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- SA2PEPF000015CD.mail.protection.outlook.com (10.167.241.203) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7452.22 via Frontend Transport; Thu, 18 Apr 2024 12:20:59 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 18 Apr
- 2024 05:20:44 -0700
-Received: from [172.27.34.210] (10.126.230.35) by drhqmail201.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 18 Apr
- 2024 05:20:39 -0700
-Message-ID: <f5d2db9d-9992-4cb6-9ac2-456369df4366@nvidia.com>
-Date: Thu, 18 Apr 2024 15:20:39 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7934971B20
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 12:26:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713443219; cv=none; b=eDnFnYIubBK55lMF7KsncGWpZ7i73pxp0zy1Rz++Yg6HqiO0V9ULWHaxf7AzBarmtPsf9qNTbIpIdPwBcSUD9FN58g3Luh/o03vCAnjsqVtbsYgCncUPw50qjCxXzDVTl2544pJpjfAcr7D6jVSmJfLXkqwoDcdGAJD6U/Lb3Lc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713443219; c=relaxed/simple;
+	bh=RtKaj9xG2ma4x1CgaEzeDBSzuUk+V72sGOs27rvG0x4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SbkHnOu/XTWOhTAmfQTdid3KuWKtn2tJn2davnWBUhfOXVrIU8AH3jRvI6HpSTWH0fhjudNiH86SJ/MgQnh16sjAlSW/4A5cu2wfRe7fME/CpH0KkYGfYn4jToPl0qZXBxFbmb9eVsPv6FDzgVuiLtDKpxzgPa4zCpUCaQjwTp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zmc0ndJ4; arc=none smtp.client-ip=209.85.208.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2da0b3f7ad2so11712731fa.2
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 05:26:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713443215; x=1714048015; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=efm5I5k1qIDxQjQ5kbCS/EzVBhYJeEnSM8KlPS7rQvk=;
+        b=Zmc0ndJ4YAbDiSg8gminzm8nvOLu99J7QlnlnFGHN+cFZWVDODYKztJk/glC/hALSV
+         0y2NdDVlYTtuU5vM7V2SMfTvGDq/kBbiiabsOm0mbT9pDsccUBc98vindiilyg6B18ut
+         Faio9TkUG9l1PD5CFVCzmRwK7a/LHmLsbY06GlzXPGnM50Cz1BC75n54FZX9YrG6IaKa
+         1BS7tuEhgQ9WlpHfUEEVCGUZ9us618f+0aBC9sujbjmxaBid8ZqHo2oImZsbZo9BxXFS
+         hF95T6qfWU586Sd8YeCNmjmxAu8wz7Snw2ktWZM6kLEA+r60sUMtM/u38oeAymY3Pc2r
+         A/VQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713443215; x=1714048015;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=efm5I5k1qIDxQjQ5kbCS/EzVBhYJeEnSM8KlPS7rQvk=;
+        b=cck9u9lssjrNEJZ4Ux8d6lYGnPEY3P3peNF73mtbhgVeWz8srne1t9DVJOVfHr6W5X
+         T9mOb/X4vEWvMsLmRzHaRNeHR0ScF8SY7eFtaO90tIPl/WJcwB6lIo55n2m8jH7p2CIZ
+         UWFIwF5VLUeoLVb4MdSSSMO4kTdKkdXVlAixv4fBzz7zJUm5MqYFmC24zHw9rWWhMBiy
+         At3EFwJhf5PuiWiTtz+S8WPrZhxzbY4V6yM1O07h1yuaNPBFYxUeByB96t6IfxB/sA3c
+         YCeo01BIyoQt9HcRPdm1FYM4NTMe7zYvv6BUPdvhYEe88dEtVjMaVfFku5ZJ47lRPPJW
+         mYgA==
+X-Forwarded-Encrypted: i=1; AJvYcCVznqxSydJJ+BcSk5LknBK6hgvTeELBFeweUklWkTEYSglsTMQDr4E/RTcTyVuVr4lb9DYz8zNdUtQYa/dN64KF7XTGhQzV
+X-Gm-Message-State: AOJu0Yw/Nh48fsqRqXzt76XrG+AgC03BC6fLJvau5RfqEiSoF6u72QNx
+	c1HpLK1X4GDk371wgioL6RvJ/nxVMlFPhaVT2hb5CBAsgVMz/Nlb
+X-Google-Smtp-Source: AGHT+IEZjNnIGc9Ykr9Fv/DsIv7MYqTD504J4kGvBBvwotkY/Wo09PrKu0ivTML9t9ntr6yslxVekw==
+X-Received: by 2002:a2e:9650:0:b0:2d6:f69d:c74c with SMTP id z16-20020a2e9650000000b002d6f69dc74cmr1375944ljh.38.1713443215266;
+        Thu, 18 Apr 2024 05:26:55 -0700 (PDT)
+Received: from mobilestation.baikal.int (srv1.baikalchip.ru. [87.245.175.227])
+        by smtp.gmail.com with ESMTPSA id w15-20020a2e300f000000b002d871012b12sm179794ljw.84.2024.04.18.05.26.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 05:26:54 -0700 (PDT)
+Date: Thu, 18 Apr 2024 15:26:53 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+Subject: Re: [PATCH net-next v11 4/6] net: stmmac: dwmac-loongson: Introduce
+ GMAC setup
+Message-ID: <pyqjoofuvrscra6bluwginu5bowzb3dr424sf3riyrtpzsaheg@k3rr25ivcj7s>
+References: <cover.1712917541.git.siyanteng@loongson.cn>
+ <6f0ac42c1b60db318b7d746254a9b310dd03aa32.1712917541.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [iwl-next v4 8/8] ice: allow to activate and deactivate
- subfunction
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<jacob.e.keller@intel.com>, <michal.kubiak@intel.com>,
-	<maciej.fijalkowski@intel.com>, <sridhar.samudrala@intel.com>,
-	<przemyslaw.kitszel@intel.com>, <wojciech.drewek@intel.com>,
-	<pio.raczynski@gmail.com>, <jiri@nvidia.com>, <mateusz.polchlopek@intel.com>
-References: <20240417142028.2171-1-michal.swiatkowski@linux.intel.com>
- <20240417142028.2171-9-michal.swiatkowski@linux.intel.com>
- <0045c1a5-1065-40b3-ae61-1f372d4a89e5@nvidia.com>
- <1b678660-7ee7-44d0-91a7-14985d2c469e@nvidia.com> <ZiEKF8Hm+ccuVedQ@mev-dev>
-Content-Language: en-US
-From: Shay Drori <shayd@nvidia.com>
-In-Reply-To: <ZiEKF8Hm+ccuVedQ@mev-dev>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- drhqmail201.nvidia.com (10.126.190.180)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF000015CD:EE_|DS0PR12MB9273:EE_
-X-MS-Office365-Filtering-Correlation-Id: a3081842-aba5-49af-578f-08dc5fa201cd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	CxPAKqzdPiSCSb3GFr/fMAd/qvnIp82EzcJNBOzDsNG3ewpXu5IriET/0sUsYrkXmmsnw94IF0fojv5GUCsa+V8ugQQ7ZWItKP0yyfWFm3EquKK2I5hqYrNHGL6GAzX43f/RdqZ7eVGs45nzEIeG03fKdXjq21P44c4xP2ADzN/bpUmU3C1IHdEkMQXWghQaXyjKRf0ju36FVtb8uBFidSg9iS1hMEtMWyfK6J5vmY6pmRiIHrfOR7Cgyv7tL4AF0+gdKq0MpCSti1GJoqmr2JtblSpummLom3uNB1gYiTjH1TvMFgqHuUYLQeGrQddhthtuNB1x01DrRCJR3Qx2zG6z4n11X8CW70pkln+kaiq7f8bj+YItksSb0KJB0ElCWPQm/Jrtnl7cDgja/nCJrl59Eko/i9Rpw+IQ3nOmm5BSfD5D0ipogGaTm/c9F0FGT5ghED4Ih2QeZhqFUGYq6DI/T1ZnI2j+c9xG0jJ00Wb9p6BMUNxdvfsMHlgDFUeig+H0z2ptqkB7TYoN+mli4xxC3qOHIdvPy2ftsc7tDajvt9obDDH+/OCSZh2Vnv+35ijGe7ojXWLjDgEAdrcfrwnOrTUDvOi4Y6T1aUf02008sk5igJbCiktN8kBUyWerHdynofTaMJK/Q+XrnIu5/CWFIQCJHjqQuE6V+rn8Hsno0KVyeLEto49GlPFaKYQ3PO3gOoq8lZiyu1voE/IYNi34DQOJ9mZYH37JpUbVA/QCBCci7WV2yHzmG59YQvct
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(7416005)(1800799015)(82310400014)(376005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2024 12:20:59.8093
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a3081842-aba5-49af-578f-08dc5fa201cd
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF000015CD.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB9273
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6f0ac42c1b60db318b7d746254a9b310dd03aa32.1712917541.git.siyanteng@loongson.cn>
 
-
-
-On 18/04/2024 14:55, Michal Swiatkowski wrote:
-> External email: Use caution opening links or attachments
+On Fri, Apr 12, 2024 at 07:28:49PM +0800, Yanteng Si wrote:
+> Based on IP core classification, loongson has two types of network
+> devices: GMAC and GNET. GMAC's ip_core id is 0x35/0x37, while GNET's
+> ip_core id is 0x37/0x10.
 > 
+> Device tables:
 > 
-> On Thu, Apr 18, 2024 at 11:12:47AM +0300, Shay Drori wrote:
->> resend as plain test
->>
->> On 18/04/2024 10:53, Shay Drori wrote:
->>> On 17/04/2024 17:20, Michal Swiatkowski wrote:
->>>> +/**
->>>> + * ice_devlink_port_fn_state_get - devlink handler for port state get
->>>> + * @port: pointer to devlink port
->>>> + * @state: admin configured state of the port
->>>> + * @opstate: current port operational state
->>>> + * @extack: extack for reporting error messages
->>>> + *
->>>> + * Gets port state.
->>>> + *
->>>> + * Return: zero on success or an error code on failure.
->>>> + */
->>>> +static int
->>>> +ice_devlink_port_fn_state_get(struct devlink_port *port,
->>>> +                       enum devlink_port_fn_state *state,
->>>> +                       enum devlink_port_fn_opstate *opstate,
->>>> +                       struct netlink_ext_ack *extack)
->>>> +{
->>>> + struct ice_dynamic_port *dyn_port;
->>>> +
->>>> + dyn_port = ice_devlink_port_to_dyn(port);
->>>> +
->>>> + if (dyn_port->active) {
->>>> +         *state = DEVLINK_PORT_FN_STATE_ACTIVE;
->>>> +         *opstate = DEVLINK_PORT_FN_OPSTATE_ATTACHED;
->>>
->>>
->>> DEVLINK_PORT_FN_OPSTATE_ATTACHED means the SF is up/bind[1].
->>> ice is using auxiliary bus for SFs, which means user can unbind it
->>> via the auxiliary sysfs (/sys/bus/auxiliary/drivers/ice_sf/unbind).
->>> In this case[2], you need to return:
->>> *state = DEVLINK_PORT_FN_STATE_ACTIVE;
->>> *opstate = DEVLINK_PORT_FN_OPSTATE_DETACHED;
->>>
+> device    type    pci_id    ip_core
+> ls2k1000  gmac    7a03      0x35/0x37
+> ls7a1000  gmac    7a03      0x35/0x37
+> ls2k2000  gnet    7a13      0x10
+> ls7a2000  gnet    7a13      0x37
 > 
-> Thanks, I didn't think about unbinding/binding the aux driver via sysfs. >
-> To be sure:
-> - user create the subfunction:
-> INACTIVE, DETACHED
-> - user activate it:
-> ACTIVE, ATTACHED
-> - user unbind driver:
-> ACTIVE, DETACHED
-> - user can bind it again as long as subfunction port is ACTIVE
-> is it right?
+> The ref/ptp clock of gmac is 125000000. gmac device only
+> has a MAC chip inside and needs an external PHY chip;
+> 
+> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> ---
+>  .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 21 +++++++++++++------
+>  1 file changed, 15 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> index 995c9bd144e0..ad19b4087974 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> @@ -9,7 +9,8 @@
+>  #include <linux/of_irq.h>
+>  #include "stmmac.h"
+>  
+> -static int loongson_default_data(struct plat_stmmacenet_data *plat)
+> +static void loongson_default_data(struct pci_dev *pdev,
+> +				  struct plat_stmmacenet_data *plat)
+>  {
+>  	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
+>  	plat->has_gmac = 1;
+> @@ -24,16 +25,18 @@ static int loongson_default_data(struct plat_stmmacenet_data *plat)
+>  	/* Set the maxmtu to a default of JUMBO_LEN */
+>  	plat->maxmtu = JUMBO_LEN;
+>  
+> -	/* Set default number of RX and TX queues to use */
+> -	plat->tx_queues_to_use = 1;
+> -	plat->rx_queues_to_use = 1;
+> -
+>  	/* Disable Priority config by default */
+>  	plat->tx_queues_cfg[0].use_prio = false;
+>  	plat->rx_queues_cfg[0].use_prio = false;
+>  
+>  	/* Disable RX queues routing by default */
+>  	plat->rx_queues_cfg[0].pkt_route = 0x0;
+> +}
+> +
+> +static int loongson_gmac_data(struct pci_dev *pdev,
+> +			      struct plat_stmmacenet_data *plat)
+> +{
+> +	loongson_default_data(pdev, plat);
+>  
+>  	/* Default to phy auto-detection */
+>  	plat->phy_addr = -1;
+> @@ -42,6 +45,12 @@ static int loongson_default_data(struct plat_stmmacenet_data *plat)
+>  	plat->dma_cfg->pblx8 = true;
+>  
 
+>  	plat->multicast_filter_bins = 256;
+> +	plat->clk_ref_rate = 125000000;
+> +	plat->clk_ptp_rate = 125000000;
 
-yes.
+This change is unrelated to the rest of the changes in this patch.
+Please split the patch up into two:
+1. Add ref and ptp clocks for Loongson GMAC
+2. Split up the platform data initialization
+First one is a new feature adding the actual ref clock rates to the
+driver. The second patch is a preparation before adding the full PCI
+support.
 
+-Serge(y)
 
+> +
+> +	plat->tx_queues_to_use = 1;
+> +	plat->rx_queues_to_use = 1;
+> +
+>  	return 0;
+>  }
+>  
+> @@ -114,7 +123,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
+>  
+>  	pci_set_master(pdev);
+>  
+> -	loongson_default_data(plat);
+> +	loongson_gmac_data(pdev, plat);
+>  	pci_enable_msi(pdev);
+>  	memset(&res, 0, sizeof(res));
+>  	res.addr = pcim_iomap_table(pdev)[0];
+> -- 
+> 2.31.4
 > 
-> I will fix the comment from previous patch and add state tracking for
-> ATTACHED/DETACHED.
-> 
-> Thanks,
-> Michal
-> 
->>>
->>> [1]
->>> Documentation from include/uapi/linux/devlink.h:
->>>
->>> * @DEVLINK_PORT_FN_OPSTATE_ATTACHED: Driver is attached to the function.
->>> <...>
->>> * @DEVLINK_PORT_FN_OPSTATE_DETACHED: Driver is detached from the function.
->>>
->>>> + } else {
->>>> +         *state = DEVLINK_PORT_FN_STATE_INACTIVE;
->>>> +         *opstate = DEVLINK_PORT_FN_OPSTATE_DETACHED;
->>>> + }
->>>> +
->>>> + return 0;
->>>> +}
->>>> +
 
