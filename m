@@ -1,166 +1,142 @@
-Return-Path: <netdev+bounces-89247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 011A28A9D71
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 16:46:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C6828A9D7A
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 16:47:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E994B2518B
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 14:45:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75D37B25D73
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 14:46:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF86216E88B;
-	Thu, 18 Apr 2024 14:44:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CF1433BF;
+	Thu, 18 Apr 2024 14:46:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UFDoa+hC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hPgyKKxY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4442C16D31B;
-	Thu, 18 Apr 2024 14:44:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F57815E5B0
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 14:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713451482; cv=none; b=moAls9XMBMIVtyiA6waxewtFGsVh986ubu0Vs49YhRTn1LGgu/9HiIB4081aOUX2M9oEuTyTdt9RPKq/+FAfy3+c2Mrraibam+hZgnFWKvyoHppJlM8pznHzYPMjDl6jzJETbKdlekz9V7ElryRooqUBW4Vs/ueRmndY1LdAjCE=
+	t=1713451614; cv=none; b=Lpf3cgIgipVUp9AXeZ+iFgYQJ7kzZxrLJoZ9Z/VXvoF4dHckT+aQPJ1M9MarEwrK2GjV/l3ALjHG19LSio+RdI94G66GWiSGNyHh+7zahkm7O6MJKRBQ/LmrbwTxnMAXooWfYIUZT6dhpMoW82/Thjt5OJcpWoi+I8dlx06XGhk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713451482; c=relaxed/simple;
-	bh=R6gQDxk/AVSPY13qLrS8VUjm4XJL2skes44sclvGuTU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=fsk5UEcKu1QB9njsQE0E4aCGujsLhoLOSjMz03VRA5bIFnrB/GjqsFqDP46p315SwAYkcWuCVOxaivxc5APaH9+m8AVQm+pqvSePWeP9e70WpCr8ntL+EvJD109zct2qLXlc6MB7SK/llQRBDAH3njXPGpC2Klq9tLomDOXeyTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UFDoa+hC; arc=none smtp.client-ip=209.85.161.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-5ac61cf3fffso573168eaf.3;
-        Thu, 18 Apr 2024 07:44:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713451480; x=1714056280; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Dq1vypWIfxUnRPCTDZEjhD0u0Ss6rb5dOW5rIK2r7Q8=;
-        b=UFDoa+hCAf32T/ECkrbfkwHF/2cTwsCs6RcppOJAFlDD1Ryv1/YOnQh0oQ7gUDXK+w
-         TWbQ7mjfz/jlRsw3FIz8hYu0XjBzfNoKMldN0BfOzoHTzKw8sAuxeUuT7xldRDGzCOFc
-         to2slL+URmYdBKW3el3oSf2O84T5OCpGxwNDSKj6GQZpq4rjSawebXBv7QqKG9P4eTxI
-         dtqv4iwxXCh/8ks5rI3Rqqkd96neNwvWWUxVA3qHUKgrxcRT5pe0NZ+n1KNVXL+45xDj
-         e59bErLWFIYW173UNafGb6YdoPN3MzSYTItGAHnVxFJciI884vXuW93gLBgKi9BTP9C5
-         TPNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713451480; x=1714056280;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Dq1vypWIfxUnRPCTDZEjhD0u0Ss6rb5dOW5rIK2r7Q8=;
-        b=tR8HhxPD421zdmYjoyjjRkvlah6fVI1jUmiPYNiL6r5tz7alEOhE022YE9giGnePnX
-         WgV622tNY1s2cOojCQB9YF+l38V7yHZr5tpKC6x9cDwefwF71Tq4g28e0tcZby97pZmY
-         SXt8v2BOt1Vqib5tu0l0IPZHbtsFrcoxyMJoASB/YDEO0S2UTQ39er1LqpZmkzbNcFAI
-         pjcaW1o3FDSlAdybAybDVqS/jXGfisPMnGoRpJUlaY6KHEqaUCmycEE09hcNKRKwZNMX
-         3YSf7gHLxGHxAtKEWWh61pDk2almblP+fL/srh5+y304PeFzb0Ojrq7hoYuiAVSHDf4O
-         Ttlw==
-X-Forwarded-Encrypted: i=1; AJvYcCXQAxGBzuJMbJHuB6T8Oyq8tTMUt1HExZPep/DhHy1hw/yO5icCbU2ZBx7XMLrge95gzsqh4OoQQVzPVNpA6fp5OrWYiVJmExVem3nhiGEO
-X-Gm-Message-State: AOJu0YwSwx20p1R9zdF//bqLvZ7DwWo8/5nM9E+iyS9QTu+UBQOLq8SK
-	772/zyIRrlVJW34o20UeXcuMRFbjFqOBPM/oRdMjyc2gvxR8FMuc
-X-Google-Smtp-Source: AGHT+IFLc0rsC1uK8SMFsHseRW7GChJrJMvu2GM2IPUF1owcGeVPXEhBPPaBMHK2qwpcvQFIAOhQhA==
-X-Received: by 2002:a05:6358:7b91:b0:17e:6a4d:777 with SMTP id n17-20020a0563587b9100b0017e6a4d0777mr2309780rwg.19.1713451480169;
-        Thu, 18 Apr 2024 07:44:40 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id ol2-20020ac84142000000b00436570bb9efsm718421qtb.56.2024.04.18.07.44.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 07:44:39 -0700 (PDT)
-Date: Thu, 18 Apr 2024 10:44:39 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- shuah@kernel.org, 
- petrm@nvidia.com, 
- linux-kselftest@vger.kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- Jakub Kicinski <kuba@kernel.org>
-Message-ID: <662131d77b55d_ec9b92945@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240417231146.2435572-9-kuba@kernel.org>
-References: <20240417231146.2435572-1-kuba@kernel.org>
- <20240417231146.2435572-9-kuba@kernel.org>
-Subject: Re: [PATCH net-next v3 8/8] selftests: drv-net: add a TCP ping test
- case (and useful helpers)
+	s=arc-20240116; t=1713451614; c=relaxed/simple;
+	bh=3goLA/LDs/swhXhob3N4VYmH4WhAH75ffb2SGuLSFZw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EWLThvQx2U1HwfwJ0aXAAEDTJWuORkmVVnpCqsH1pci07MyxSCh8v1tDvMur4FWhAIwcA+6PrMKTKEkqibnnt1rWagypMEofLN4ijx/F0UeA6sLj9dVfVTDuQFsDiquEvL7CYYp5siFIfFxJkVuWxfNnoRwt8iAv3c/D5jjrblI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hPgyKKxY; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713451613; x=1744987613;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=3goLA/LDs/swhXhob3N4VYmH4WhAH75ffb2SGuLSFZw=;
+  b=hPgyKKxYEw7f2L8I4lEZdmFr7xl3X+lF0k59/OklOr1jRc5l/zqMFr+v
+   5r/m0lJZmNUfqZyqbYtSl7tT2i32bxnXGheX4gR1euhfPEt1KCSL686Aq
+   FPnPFN33Z0P/hPfirNm0RCS9cKvVSmDeISmrK2+Bk3ool+QQB01CFdv//
+   yhhakpY++kNe5++MeU1w36xlE/L0k5tv1OuXf6FcXHcZSQHBjhzjLdYX0
+   iWZ438Z5nTxOyWtdZox3C5HF0CtMKLVjB5DGo+CClIEO5kKcAl/buQMSK
+   jYu8bGub8h0aIQwWotjwGTFlG7nfQGRz+RwOarQyh46ozccES/0Ajj2TQ
+   g==;
+X-CSE-ConnectionGUID: 6i7Pj2PhT66bNNUYosdZnw==
+X-CSE-MsgGUID: fYffty5+TD6XDpiEpSa2Kg==
+X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="26461366"
+X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
+   d="scan'208";a="26461366"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 07:46:53 -0700
+X-CSE-ConnectionGUID: r8nwLN+HS5yQx2yEsGB8Wg==
+X-CSE-MsgGUID: bMgJDw1IT0G4L5Q7ldIoOA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
+   d="scan'208";a="23615599"
+Received: from unknown (HELO mev-dev) ([10.237.112.144])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 07:46:50 -0700
+Date: Thu, 18 Apr 2024 16:46:23 +0200
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	jacob.e.keller@intel.com, michal.kubiak@intel.com,
+	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
+	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
+	pio.raczynski@gmail.com, jiri@nvidia.com,
+	mateusz.polchlopek@intel.com
+Subject: Re: [iwl-next v4 5/8] ice: allocate devlink for subfunction
+Message-ID: <ZiEyP+t9uarUrLGO@mev-dev>
+References: <20240417142028.2171-1-michal.swiatkowski@linux.intel.com>
+ <20240417142028.2171-6-michal.swiatkowski@linux.intel.com>
+ <ZiEMRcP7QN5zVd8Z@nanopsycho>
+ <ZiEWtQ2bnfSO6Da7@mev-dev>
+ <ZiEZ-UKL0kYtEtOp@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZiEZ-UKL0kYtEtOp@nanopsycho>
 
-Jakub Kicinski wrote:
-> More complex tests often have to spawn a background process,
-> like a server which will respond to requests or tcpdump.
+On Thu, Apr 18, 2024 at 03:02:49PM +0200, Jiri Pirko wrote:
+> Thu, Apr 18, 2024 at 02:48:53PM CEST, michal.swiatkowski@linux.intel.com wrote:
+> >On Thu, Apr 18, 2024 at 02:04:21PM +0200, Jiri Pirko wrote:
+> >> Wed, Apr 17, 2024 at 04:20:25PM CEST, michal.swiatkowski@linux.intel.com wrote:
+> >> >From: Piotr Raczynski <piotr.raczynski@intel.com>
+> >> 
+> >> [...]
+> >> 
+> >> >+/**
+> >> >+ * ice_allocate_sf - Allocate devlink and return SF structure pointer
+> >> >+ * @dev: the device to allocate for
+> >> >+ *
+> >> >+ * Allocate a devlink instance for SF.
+> >> >+ *
+> >> >+ * Return: void pointer to allocated memory
+> >> >+ */
+> >> >+struct ice_sf_priv *ice_allocate_sf(struct device *dev)
+> >> 
+> >> This is devlink instance for SF auxdev. Please make sure it is properly
+> >> linked with the devlink port instance using devl_port_fn_devlink_set()
+> >> See mlx5 implementation for inspiration.
+> >> 
+> >> 
+> >
+> >I am going to do it in the last patchset. I know that it isn't the best
 > 
-> Add support for creating such processes using the with keyword:
+> Where? Either I'm blind or you don't do it.
 > 
->   with bkg("my-daemon", ..):
->      # my-daemon is alive in this block
 > 
-> My initial thought was to add this support to cmd() directly
-> but it runs the command in the constructor, so by the time
-> we __enter__ it's too late to make sure we used "background=True".
-> 
-> Second useful helper transplanted from net_helper.sh is
-> wait_port_listen().
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  tools/testing/selftests/drivers/net/ping.py | 24 +++++++++++++--
->  tools/testing/selftests/net/lib/py/utils.py | 33 +++++++++++++++++++++
->  2 files changed, 55 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/drivers/net/ping.py b/tools/testing/selftests/drivers/net/ping.py
-> index 58aefd3e740f..8532e3be72ba 100755
-> --- a/tools/testing/selftests/drivers/net/ping.py
-> +++ b/tools/testing/selftests/drivers/net/ping.py
-> @@ -1,9 +1,12 @@
->  #!/usr/bin/env python3
->  # SPDX-License-Identifier: GPL-2.0
->  
-> -from lib.py import ksft_run, ksft_exit, KsftXfailEx
-> +import random
-> +
-> +from lib.py import ksft_run, ksft_exit
-> +from lib.py import ksft_eq, KsftXfailEx
->  from lib.py import NetDrvEpEnv
-> -from lib.py import cmd
-> +from lib.py import bkg, cmd, wait_port_listen
->  
->  
->  def test_v4(cfg) -> None:
-> @@ -22,6 +25,23 @@ from lib.py import cmd
->      cmd(f"ping -c 1 -W0.5 {cfg.v6}", host=cfg.remote)
->  
->  
-> +def test_tcp(cfg) -> None:
-> +    port = random.randrange(1024 + (1 << 15))
-> +    with bkg(f"nc -l {cfg.addr} {port}") as nc:
-> +        wait_port_listen(port)
-> +
-> +        cmd(f"echo ping | nc {cfg.addr} {port}",
-> +            shell=True, host=cfg.remote)
-> +    ksft_eq(nc.stdout.strip(), "ping")
-> +
-> +    port = random.randrange(1024 + (1 << 15))
-> +    with bkg(f"nc -l {cfg.remote_addr} {port}", host=cfg.remote) as nc:
-> +        wait_port_listen(port, host=cfg.remote)
-> +
-> +        cmd(f"echo ping | nc {cfg.remote_addr} {port}", shell=True)
-> +    ksft_eq(nc.stdout.strip(), "ping")
-> +
 
-There are different netcat implementations floating around.
+You told me to split few patches from first patchset [1]. We agree that
+there will be too many patches for one submission, so I split it into
+3:
+- 1/3 devlink prework (already accepted)
+- 2/3 base subfunction (this patchset)
+- 3/3 port representor refactor to support subfunction (I am going to
+  include it there)
 
-I notice that I have to pass -N on the client to terminate the
-connection after EOF. Else both peers keep the connection open,
-waiting for input. And explicitly pass -6 if passing an IPv6
-address. I think this is the one that ships with Debian..
+[1] https://lore.kernel.org/netdev/20240301115414.502097-1-michal.swiatkowski@linux.intel.com/
+
+Thanks,
+Michal
+
+> >option to split patchesets like that, but it was hard to do it differently.
+> >
+> >Thanks,
+> >Michal
+> >
+> >> >+{
+> >> >+	return ice_devlink_alloc(dev, sizeof(struct ice_sf_priv),
+> >> >+				 &ice_sf_devlink_ops);
+> >> >+}
+> >> >+
+> >> 
+> >> [...]
 
