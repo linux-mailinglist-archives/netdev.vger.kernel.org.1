@@ -1,91 +1,79 @@
-Return-Path: <netdev+bounces-88918-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88919-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC3178A902A
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 02:49:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53D0A8A9035
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 02:56:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6281A1F21DAA
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 00:49:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 853FE1C21853
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 00:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF015244;
-	Thu, 18 Apr 2024 00:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B6AC5660;
+	Thu, 18 Apr 2024 00:56:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hXoMgPLq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NEmUFUP1"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D6B4C99
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 00:49:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3822CA5;
+	Thu, 18 Apr 2024 00:56:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713401373; cv=none; b=ldBuOnRbFx0jtbgq0rl+YryK0PebS8dB8FMnTjG7PGSaxwYPzf/Ep+vSA34fqm90edi2LRF5+txj6UUOgZgvohgQsMC1JvpFZbYng4jfN7f2HkKwgiO91XHebLy+mztPtpHCFAB+lEKbmLUa2cSagO9vmeATVBw34oxtcxygwyE=
+	t=1713401783; cv=none; b=TOQdnq04Zl0RJw2oo+tE0pJ6lDadl9pDc38wjEoz5DZy5136wAP1OVcYKd9lXDH8yJUmc4YMH21B5s8DwzoOyQsjMAvYOwYS/XUUNs3Ap3QW2KDNrPqH1cZYDWcAldng1PlRZEB++ZQWcu4KM6+/qH4IuQSZXvS4rOb0dIz4Rw4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713401373; c=relaxed/simple;
-	bh=F/SkmoQvSLWZ7QJaggfJvpFq6OEWRVn9qMxeTf9LvM0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Xq2tn3iWCnI9g5m1xd/rBporsIvIwC+WfeE8jt38q4kN0DhdoLIl9Q+f3/77fAKTK283VCfFl80bf3zxDP0igVYk1157JWv6olLTzR2mizJZzFSwilvPzWsCu9ehmGPQ2wXHWSFtZyy6s82JWMQ796o7NpCh9OoQGMSPo4vpN/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hXoMgPLq; arc=none smtp.client-ip=91.218.175.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <f164369a-2b6b-45e0-8e3e-aa0035038cb6@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1713401369;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O2R/bhzkqU116/NpQeIcCt+dReP6JwLb0WVDt23oS7A=;
-	b=hXoMgPLqYrqlqpzea3HP+pt6VK3cxm6EshAaFRPTEnsnLBh2zaFKZQVkNYFAtDpmLc86yG
-	0Wzk7FLlGlY1zPsF6jGDTYDDakEUSNcH/aPeJb4T9XDDvkPhY1QyenFGm568QZYLiTqPOJ
-	/AJ1zVymfUEs+gqxa5g9gbAnQq8l3pA=
-Date: Wed, 17 Apr 2024 17:49:20 -0700
+	s=arc-20240116; t=1713401783; c=relaxed/simple;
+	bh=vL4BH11YiczMtA85AfUXDUCqO8U2VxAovNR9Q83/HtE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VMQKQ+Z8jUJUufwgbuWxnKjy6gtM9j+bbDGtQu3kVAUCtKaPtVg4qLJTsbaCaLa8tZqQqRYlkTfpEEf2cQM2DW5JXGqFLUZlbt78pWBp9cUd8+u2TjMvLAVn5VYnXGf2EqDMZnOFc5pJHtNEus/NGTuV8ple03PHhaO8OmiWx8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NEmUFUP1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 565D6C072AA;
+	Thu, 18 Apr 2024 00:56:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713401782;
+	bh=vL4BH11YiczMtA85AfUXDUCqO8U2VxAovNR9Q83/HtE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NEmUFUP1seirP89YaqGwC+l/pKXO5ht+Zx9+19+PYD8SuN6mDLD2EF5Y1OPfvZcOj
+	 LtL/07TI69eLBh7U5gMgGJ36/0QYR81nZUWAwxT7KrO7/p1qT45rtctc8MWKgsIx2Z
+	 isC2YLHaFsIk2Gutqq1erKWMf/67F9SJsK6MISot2PEKBtNceO2OCdNardYyoy2kh8
+	 VxGlj7h3pOBMcOC0+OdTAYpl/EpDQAfalOD/fT1Kh1XullYd/TbIB+QxWsPnni6Xci
+	 pGwAzj7xDqTU2I/3F3gqHrYhxAtNSnTYP48AQzlTqUJFzlcctcysk6D0QoO/3j1znu
+	 MZdKhyO2Rafyg==
+Date: Wed, 17 Apr 2024 17:56:21 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Justin Chen <justin.chen@broadcom.com>
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Simon Horman
+ <horms@kernel.org>, Markus Elfring <Markus.Elfring@web.de>,
+ bcm-kernel-feedback-list@broadcom.com, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net] net: bcmasp: fix memory leak when bringing down if
+Message-ID: <20240417175621.780cb1f8@kernel.org>
+In-Reply-To: <1f3131a4-fa84-4d25-8c1a-ab0023aace23@broadcom.com>
+References: <20240412181631.3488324-1-justin.chen@broadcom.com>
+	<6881c322-8fbb-422f-bdbb-392a83d0b326@web.de>
+	<9afad2b3-38a5-470d-a66f-10aa2cba3bab@broadcom.com>
+	<8ae97386-876f-45cf-9e82-af082d8ea338@web.de>
+	<20240417161933.GA2320920@kernel.org>
+	<3a5cb80e-7169-4e82-b10c-843ff1eb0fd3@broadcom.com>
+	<1f3131a4-fa84-4d25-8c1a-ab0023aace23@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v2 bpf-next 4/6] selftests/bpf: Add IPv4 and IPv6 sockaddr
- test cases
-To: Jordan Rife <jrife@google.com>
-Cc: bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, Kui-Feng Lee <thinker.li@gmail.com>,
- Artem Savkov <asavkov@redhat.com>, Dave Marchevsky <davemarchevsky@fb.com>,
- Menglong Dong <imagedong@tencent.com>, Daniel Xu <dxu@dxuuu.xyz>,
- David Vernet <void@manifault.com>, Daan De Meyer <daan.j.demeyer@gmail.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-References: <20240412165230.2009746-1-jrife@google.com>
- <20240412165230.2009746-5-jrife@google.com>
- <3df13496-a644-4a3a-9f9b-96ccc070f2a3@linux.dev>
- <CADKFtnQDJbSFRS4oyEsn3ZBDAN7T6EvxXUNdrz1kU3Bnhzfgug@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CADKFtnQDJbSFRS4oyEsn3ZBDAN7T6EvxXUNdrz1kU3Bnhzfgug@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 4/17/24 10:08 AM, Jordan Rife wrote:
->> Can the test_sock_addr.{c,sh} be retired after this patch?
-> I know it's not used in the BPF CI tests, but is it still used in any
-> other contexts?
+On Wed, 17 Apr 2024 11:48:33 -0700 Justin Chen wrote:
+> I try my best to address feedback. After a bit of thought, I feel the 
+> feedback given was not out of good faith. I would like to keep the patch 
+> as-is unless someone else has feedback. That is if the maintainers are 
+> ok with that.
 
-If anyone depends on the test_sock_addr binary, it will have to start using 
-"./test_progs -t sock_addr".
-
-The test_sock_addr.{c,sh} can be retired as long as all its tests are migrated 
-to sock_addr.c
-
+TBH the "if" in the subject gives me pause too, please respin.
 
