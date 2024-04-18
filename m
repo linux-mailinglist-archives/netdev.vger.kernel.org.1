@@ -1,137 +1,242 @@
-Return-Path: <netdev+bounces-89155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F6AE8A98CC
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:39:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0734D8A98F7
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:49:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 609341C211AB
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:39:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B11A0284D1B
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:49:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF3071635C5;
-	Thu, 18 Apr 2024 11:37:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C73EA15FD1D;
+	Thu, 18 Apr 2024 11:48:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UBBYcrMN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XxNOm669"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 500E11635C3;
-	Thu, 18 Apr 2024 11:37:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713440239; cv=none; b=ld0+2iBPmBhHHYGdZI6g6rBh+kORyauvPakWCC1jetlkGZqQXQjBaz1Ve+GFqyJ6poqxCkZLfFYD7E+njuak79+XZPEcrsd/9KWpMR5JaClq3opY42lCjrAAlX+Ak1kAdZwUBQqpaTGkhMoR+alRL9TRIVsHFiHTRK0mpeAJnsw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713440239; c=relaxed/simple;
-	bh=32K2pvuotD+LXN0arHaoAwsqYB5fmgxg0lL5o2RpF68=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=J+/ZxTe9B+RvJWu2LxogLfZrwByIeIejzrhvIe55Yj7W1IFvitHXkXeP+a+3j4b8H34JbSEFeWXGuZ/TyDYcbtOhGdZsx46yXe8TtGnpNXRH1QYLsOCy9VjXrLvqdhrYZqc3kX2+0tqeveVda/F2nlfKMcxwxD4w/1YHxFwi7h0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UBBYcrMN; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5992615FD10
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 11:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713440916; cv=fail; b=hPzXx19eDcd32KHLvRzL/pC680Zd9VGT53lTfZtZCuaIv/sD0HnXnOF1UnV79chA4XCvtWtw0kdKyXHgY3pKp8zfV0QiZ4J7vdWuSiaLvX7Wmgxecw6ajPJAPRucQ7ad0H2VjBj3Bfj+YM91on/V8t0NKbRT6eVbSxmq8A+YtiI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713440916; c=relaxed/simple;
+	bh=Xi8yI1HDoNBhJZ4DkkLFPG9q6lAm4t+BRzph/w+zfTc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=tNzdcCppQkcU7P8W3uriICrk9kP9KqtjWsmIRvkLKKvautFb/MA8CHogJvjLFx6jDizNeycy01yCYWKeZbJg1u9Z4NXMBi1O+P2EaLHp10evb7d8PYv7oBBeLlQU5mzTXBFmHaC9GMZQKrPDfvqjZR+YUmXO2c5wroJGDOfp1SA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XxNOm669; arc=fail smtp.client-ip=198.175.65.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713440238; x=1744976238;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=32K2pvuotD+LXN0arHaoAwsqYB5fmgxg0lL5o2RpF68=;
-  b=UBBYcrMNPZn/aiC5/r54OPMDKIQVdUHXvfN+Px2/uH8wU8FR8WZ9WLH4
-   OARMmhoxw5b4EJfb6XdlcEi7WlA4AYCnVmGx8gsdgzpNQC4b2HzX3Nbgd
-   GFQXQj3dSWjT1DLGz1+UNQBXUn3VegYwMzFLB3WPoBDn1HmUeOE0R24Nk
-   cMvkL63BOwcNbqFSQAtzzwatGpF1f5RPy3sRb4FsbH4R8Sb4j26Q5y0pG
-   nfQpYw2N8mZ6adxPoKuJtZUfR/Ng3Csr2d78ggScnu0dZgKhebEqzDrY4
-   I6dQONTWwlQF6sNDkm0Lu7tfF5XfR2vD+DxNRhfCPfGZn5YMbfnep2c1V
-   A==;
-X-CSE-ConnectionGUID: JlI6Diy1T0yZB31ymujU+g==
-X-CSE-MsgGUID: pI/C95tgTEG019DlfYms4Q==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="19587850"
+  t=1713440915; x=1744976915;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Xi8yI1HDoNBhJZ4DkkLFPG9q6lAm4t+BRzph/w+zfTc=;
+  b=XxNOm669Ps/mlBLGa4ju8iTmcgFXR+pmAX8GTQlB33gdOYNY+fhG8Y7I
+   vnxeGH0XewJuxO3YvZVGo6R4x9HooLKoAsopPyqpAD6e15q2kAg+jjJ7e
+   AJVOLlAK4ED3XpPIiSQVRo4/YfJIaZQTRUgK7Nv/rs2FeJ/XuVK5n18xS
+   duIblje8Zdt7wutXWNjcCh82Tu89Gd3tzzCOxeCuvaCbtoAIrAvo21RRP
+   kcE4NTA1Xw/0DQh7AmBwYKpTHiHPOYOwCBhB/Qi9jD3O81pk8Io9aLwtz
+   sEFAweozei5IGkEmYuOTIaZmaS1k21qK/NOonhb768nNC0JP99zJBamNx
+   w==;
+X-CSE-ConnectionGUID: HDCp4Hj6RMqaZB/1zNZFpA==
+X-CSE-MsgGUID: O6xGOFaARY+SkK+hDPxPpQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="8817845"
 X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
-   d="scan'208";a="19587850"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 04:37:18 -0700
-X-CSE-ConnectionGUID: p3PmWh1VSJuoSx/X/w7GmA==
-X-CSE-MsgGUID: 1B/oRPmQQIaneUWN6a5oOw==
+   d="scan'208";a="8817845"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 04:48:35 -0700
+X-CSE-ConnectionGUID: o5Az37WERB+U6oWpeJ5X9w==
+X-CSE-MsgGUID: hWSRrB2ETRqnIWZAM0Nibw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,212,1708416000"; 
-   d="scan'208";a="27586251"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa004.fm.intel.com with ESMTP; 18 Apr 2024 04:37:13 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Christoph Lameter <cl@linux.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v10 10/10] MAINTAINERS: add entry for libeth and libie
-Date: Thu, 18 Apr 2024 13:36:16 +0200
-Message-ID: <20240418113616.1108566-11-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240418113616.1108566-1-aleksander.lobakin@intel.com>
-References: <20240418113616.1108566-1-aleksander.lobakin@intel.com>
+   d="scan'208";a="22825252"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Apr 2024 04:48:34 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 18 Apr 2024 04:48:33 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 18 Apr 2024 04:48:33 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 18 Apr 2024 04:48:33 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CbWEmjSkNshKtku6tpz07P4ajaUGQ6L7il4CpWM1nlFLa7cv0uza7jGKexDxdlO6SMggdf7wrat1hYTbAzFD6l0SOqRsJecZJZileWnLQh/VTNeaYuAQL+DDJQZ4bH6QOXyvdYAdv4EKHwrl6C+7sMSv7bwdTsxyxxttd7GZEn2NG7RNEWjGHRoL4mRrsX5wpPNwH6KgZ3fumRsphB1oBL2nV5LJtWZWfiGLhG8bTrbsI9r0MB3iwCzbpZOxhiGl/1GjLKp/pWSzTaNKChvSq9mu7tOVJS8AU0lvzKYdRXBnk3Rb41pW+sJdGO1PoOcSZeuNWV9THaS+8KYhQIm9fg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ds1+RRC2isQQP7IYJlsVJtdzJe38DAxtSYvBCa76fvs=;
+ b=bjS6uM4eA4FLqr2MT2KAfrSsaYt57cJopiuVGvRD/K7pud3KzPIbo9dCJKbzc+h7i7Up6kWC/DdUWtY1rF+5GFu664V1s59gUGv+m6J1yMC+HwZQxLckVazdMz/jLvXsqdmCNTgIyUzUfD4HyK3t+OH8Uq+qHsGQPRcn4ftRG8N81iCRG37dfpxwIu0ACwo0J5JcQa70eO7zMQJEAtrO/MKZApqHTKF1Zc/Sqs+KFtiGY0BtQKmOJp9A5VZESq/frmWhrrhdhvRJ3M0NDMDfLVawn3RL/8x4I7zkVRz+QtcCQeEPyc76SJw1bKTscA6q81L7600PHZheV0ddQvCuIw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9)
+ by IA0PR11MB7377.namprd11.prod.outlook.com (2603:10b6:208:433::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.39; Thu, 18 Apr
+ 2024 11:48:31 +0000
+Received: from MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ac3:a242:4abe:a665]) by MW4PR11MB5776.namprd11.prod.outlook.com
+ ([fe80::2ac3:a242:4abe:a665%4]) with mapi id 15.20.7472.027; Thu, 18 Apr 2024
+ 11:48:31 +0000
+Message-ID: <88fc6454-01dc-4907-9b9b-702c9464c9ec@intel.com>
+Date: Thu, 18 Apr 2024 13:48:25 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next 0/3] ethtool: Max power support
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <pabeni@redhat.com>, <netdev@vger.kernel.org>, <edumazet@google.com>,
+	<marcin.szycik@linux.intel.com>, <anthony.l.nguyen@intel.com>,
+	<idosch@nvidia.com>, <kuba@kernel.org>, <intel-wired-lan@lists.osuosl.org>,
+	<przemyslaw.kitszel@intel.com>
+References: <38d874e3-f25b-4af2-8c1c-946ab74c1925@lunn.ch>
+ <a3fd2b83-93af-4a59-a651-1ffe0dbddbe4@intel.com>
+ <dc601a7c-7bb7-4857-8991-43357b15ed5a@lunn.ch>
+ <ad026426-f6a4-4581-b090-31ab65fb4782@intel.com>
+ <61a89488-e79a-4175-8868-3de36af7f62d@lunn.ch>
+ <206686dc-c39b-4b52-a35c-914b93fe3f36@intel.com>
+ <e4224da7-0a09-41b7-b652-bf651cfea0d0@lunn.ch>
+ <cf30ce2e-ab70-4bbe-82ab-d687c2ea2efc@intel.com>
+ <c6258afd-2631-4e5d-ab25-6b2b7e2f4df4@lunn.ch>
+ <fb1a53ea-d5cd-45a1-9073-450f6a753f87@intel.com>
+ <6514e6a9-3b4d-48ba-b895-a12c5beff820@lunn.ch>
+Content-Language: en-US
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+In-Reply-To: <6514e6a9-3b4d-48ba-b895-a12c5beff820@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZR0P278CA0198.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:44::12) To MW4PR11MB5776.namprd11.prod.outlook.com
+ (2603:10b6:303:183::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MW4PR11MB5776:EE_|IA0PR11MB7377:EE_
+X-MS-Office365-Filtering-Correlation-Id: 22883547-4bd9-4128-ed89-08dc5f9d787f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: mGWk6FCruRNq2CNq5d0xEN8lPB4zRn/YRkiVRZ6NpYIzhEbDcPM1fQIRF6uGJ2BCRd5Yf5COQYKQRSTLig2G/pejc+kr4afEfw3Q7+6jdi/aaJbmupbWmk9YnHtEsz9dJO4REGFhC6prl3HHMXd7skpOOvEY+WyWCvtl6NDoFQQycQBlL/G6H6jr1N6+wpgxQ69JEJcaASx2DsVRrVVjH8kxRWklcW+QQxabqzL+dxQdfYTBjcSNesH8/WfpKwMHn9bwJ3KWyEKQWa6oE35rJaex679rzMADd5JF2txi7c0tWZaTMKG/sMMt2RM+y0zwk6NaqZiLo0Lxvdbp4OBoA/NtajNjxNYA5+0CceoXZvQXgva2Zi+EXfd1JM3LkNljrjCicVBDlw7l/t9j5XrbKFarM0htvh1MCWNjnIF79Y8xZRtPQBG+oJyh1yi2O3rY2ItLN/t6HkZAFzcSI1aRgc9pPeQLAORTBlpbgfnV7OtTkyPIm4NgIrgeXEeh07MSLscbYvbCdmhlnculddyQVMDrzs9VPN2dDN83NIKi9PKkCIM/TE5ph0G/uTggnB4JGHG/hd45H9WrBixb9rQ71HTf/obeQYl5g1WM0L6Po4EavaSQyG4EcaIX9Zxz9ALUKxSIOBDXZwfSIWtWc5HrCc3WmNeskDSe71U+IcgKdGs=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5776.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SjZzRVBUamsrK0xKaHhYVVUwRjY3ZVJxanNET1A5eWFEdWV3WE5UM2RJVkZD?=
+ =?utf-8?B?bjlmSUlONnVwdnNRTi9VZ0h4Y2I3czQzcGFGcHVaY0dGUGx6dnZTbjBQVEpK?=
+ =?utf-8?B?NS9pUm9iV3VJWVhweUNNWTNPTnNiVTNYQmo2SlF0TlIrSWtxOU1kT1FDa0tr?=
+ =?utf-8?B?KzRTTWRMcmZpWEtoUmFTcFRUeTRxa1dIZ1lpLzNXZVR4U0ZHRVNoSkZRbEM5?=
+ =?utf-8?B?WjU1UlhsWXRZaFQ1TXpoTzY4clZjcUNtRHZwa0tRRjIvK2U4ZkxzZ09QLy81?=
+ =?utf-8?B?cU4yNFdEaFN3S0xNemo1NGR2ckNYekVMV3RCR1c4amMvRmVZemFLcVJ2d3NL?=
+ =?utf-8?B?aXNQM0Zrb2l2SmxxcHZ4M3daVmpmQVhIUllOaWdZcldQRkxjRFJibEVQSHF0?=
+ =?utf-8?B?MTNmbnJMQ09tMTFLM0VmaGpXQmVMemxLSnV1ckFCd3hHU0xpSzIrdGxIUlNO?=
+ =?utf-8?B?dFVRUXV0VXdGRmhMZzV2bXh0RmpLdXl1WFVxdlVadk5HdThndjZ3TUgyTDlV?=
+ =?utf-8?B?WnY4cjBTUEFYVEpXbDJ4aWUwZEdVckxQNHRlWkh3alVBelR1ZG56R0ZQdzJ2?=
+ =?utf-8?B?eloyZm5iOTZvOTJqMFNFU3JBRFNFQlB2TEdTOTdSMGpRckN1b3djRE5ySUV0?=
+ =?utf-8?B?U25yZlp4WHpWMXdCSGxHbWw3bkpSNnQwR0tTRm5udUhncTFWM3Y1SHZWZ2Jt?=
+ =?utf-8?B?YVYwMVNMS2dTRWloM1hoUFRyK2dWTUh0VGlsUU0xdXd5a2JLN1M4eHh0bGgw?=
+ =?utf-8?B?S21sL0lwK1FFK0FiUzhLYlBVT0Q0Z2hBdjgvRzJET0tOMWhoZk5TM3pkK0xK?=
+ =?utf-8?B?OXJRektGOVhlUEN5aXlIYVJhOTJ1ejlFVmU4aGpWdDVZU08yNWtPTjdpWjZk?=
+ =?utf-8?B?RzRrL2xZc3BYWFMwMFp1dVNnVkxrdmlmN0tFZ2NmK09SSi9kdFg0M2lIcW5O?=
+ =?utf-8?B?Sy9vVkR6QlFPakpWTFErSVl6ZCtqemgwUWk2bDBTbDFnajhMSHVRWEgxV0lH?=
+ =?utf-8?B?Qy96STdCdDBnUnZuZXRxTUpISzFhZkNQMGF1b2lPV2ZlU29IcjRhbEFtaGJv?=
+ =?utf-8?B?dDljQjhVMmJXdTUwajZHclR1OG9YUytBVklFckFta1lBY0dXbmF2cTV5Z2F1?=
+ =?utf-8?B?UFN6ZHpoR3R1Q1psYzVPYklNenpSaVFiNUY1YkhIbjQ5dFVtZHFNczhKVWJo?=
+ =?utf-8?B?eW5aQUFtcFRmS0poREkzRlgvUWVRdUd2NGM2NkozT2pwWUQ0UnRoK1pWZW93?=
+ =?utf-8?B?T1Qra1J0ZXNBVWQ3N1VzNm9UekFvZUFEb2J4K2dhZGF4akdPK1NsMkMrejgz?=
+ =?utf-8?B?OFV2dGVJU2x4VkVtbXVRV3VqS3VvSGJOb0RkbmxLV01oaFVGZy9IeW9YOEVJ?=
+ =?utf-8?B?T2w4dFI4ekJmczZMQWVUanVnQWJHb1dsQng5dFJoYkNLRTdSZW43VUY2THJT?=
+ =?utf-8?B?dnY5Ykg1UCtGd2hpMVVlQ1p4M1pjejlJdlhBQUc4Y1dUNDNiWS9IdWJheS9R?=
+ =?utf-8?B?WVFEQTRCQW43MFhsRDMxejBjTzdKeXR6TkF1TmpyUE92OEp3MlVYQ2czQ1Jv?=
+ =?utf-8?B?SnVmNGJmVXMxaU0ySkVxRlhMK092TlF3RjlsMExvVEUvczAzdGtIeHdCeW1n?=
+ =?utf-8?B?SHh0eUpvdlphc3lIOEwrWHBHS0ZWRXM3aHkzeVd2VjF2K1IwcFo0QzRsbDBI?=
+ =?utf-8?B?aWVKWUhFNVdrSUFSY0EwZThzZkhRNTdSdWJFYmVEYUM1aXBxVUNmNTZHSXdz?=
+ =?utf-8?B?WEphUHhlVVpNaWxaRDhkaHlqUE52bkM2QXJQL0ttc0wvMERlbjNBT2lEVlNJ?=
+ =?utf-8?B?NW95NHFzRmRUYzVHQ2NVaDlmOWtzNnNtcm9KMm1QN1NrQiswamxzZ2VCMUJG?=
+ =?utf-8?B?MVJnL1hyNWZhYVpNS0xCSGpKcU00VExZN2Z3dVRsdTJUY2d2YlpzM2JiaUtz?=
+ =?utf-8?B?OVgvYTkyc3RZSXlhU2tvUUhKeTFoRy9lbUFFb2dZZXh0YzdvQ2NucWFjb2pa?=
+ =?utf-8?B?MHlwTUpVbUYyRjlROEVILzlja245dVdoQjRKTERJWjhBMFhZMmc3bTJUa0Np?=
+ =?utf-8?B?M3h2cDlzQngxVE1MNkxvTTNNWk9FZ1VGNjl3OU1hWER6RW5SUStQQUl4MHA4?=
+ =?utf-8?B?ZjRpMS9yTkh6NWsxd0ttVzFzcWx6QzBsWGZQeGptOTAxV1dUMXE1V0YwbFQv?=
+ =?utf-8?B?dGc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 22883547-4bd9-4128-ed89-08dc5f9d787f
+X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5776.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2024 11:48:31.8540
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UGiebKC1I7b2zy16pYGOEjrpGPNKuaXPRO87m+sNI58Fx5ROHRN/QYpLE0CPIag4bwVZvvpM5MfC6TKCC+X/gA4d0x90XGJCGufMBAb9xFo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7377
+X-OriginatorOrg: intel.com
 
-Add myself as a maintainer/supporter for libeth and libie. Let they have
-separate entries from the Intel ethernet code as it's a bit different
-case and all patches will go through me rather than Tony.
 
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- MAINTAINERS | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index f22698a7859f..6c42ce3ab266 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12392,6 +12392,26 @@ F:	drivers/ata/
- F:	include/linux/ata.h
- F:	include/linux/libata.h
- 
-+LIBETH COMMON ETHERNET LIBRARY
-+M:	Alexander Lobakin <aleksander.lobakin@intel.com>
-+L:	netdev@vger.kernel.org
-+L:	intel-wired-lan@lists.osuosl.org (moderated for non-subscribers)
-+S:	Supported
-+T:	git https://github.com/alobakin/linux.git
-+F:	drivers/net/ethernet/intel/libeth/
-+F:	include/net/libeth/
-+K:	libeth
-+
-+LIBIE COMMON INTEL ETHERNET LIBRARY
-+M:	Alexander Lobakin <aleksander.lobakin@intel.com>
-+L:	intel-wired-lan@lists.osuosl.org (moderated for non-subscribers)
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+T:	git https://github.com/alobakin/linux.git
-+F:	drivers/net/ethernet/intel/libie/
-+F:	include/linux/net/intel/libie/
-+K:	libie
-+
- LIBNVDIMM BTT: BLOCK TRANSLATION TABLE
- M:	Vishal Verma <vishal.l.verma@intel.com>
- M:	Dan Williams <dan.j.williams@intel.com>
--- 
-2.44.0
+On 16.04.2024 00:03, Andrew Lunn wrote:
+> On Fri, Apr 12, 2024 at 03:21:24PM +0200, Wojciech Drewek wrote:
+>>
+>>
+>> On 09.04.2024 15:39, Andrew Lunn wrote:
+>>>> This is something my current design supports I think. Using
+>>>> ETHTOOL_A_MODULE_MAX_POWER_SET user can get what cage supports
+>>>> and change it.
+>>>  
+>>>> This could be done using ethtool_module_power_mode_policy I think.
+>>>
+>>> All these 'I think' don't give me a warm fuzzy feeling this is a well
+>>> thought out and designed uAPI.
+>>>
+>>> I assume you have ethtool patches for your new netlink attributes. So
+>>> show us the real usage. Start with an SFP in its default lower power
+>>> mode. Show us the commands to display the current status. Allocate it
+>>> more power, tell the module it can use more power, and then show us
+>>> the status after the change has been made.
+>>
+>> Ok, but do we really need an API to switch the module between high/low power mode?
+> 
+> Probably not. But you need to document that the API you are adding is
+> also expected to talk to the module and tell it to use more/less
+> power.
+> 
+>> Regarding the current status and what module supports, there is -m option:
+>> $ ethtool -m ens801f0np0
+>>         Identifier                                : 0x0d (QSFP+)
+>>         Extended identifier                       : 0x00
+>>         Extended identifier description           : 1.5W max. Power consumption
+>>         Extended identifier description           : No CDR in TX, No CDR in RX
+>>         Extended identifier description           : High Power Class (> 3.5 W) not enabled
+> 
+> So you can make this part of your commit message. Show this. Invoke
+> your new ethtool option, then show this again with the module
+> reporting a higher power consumption. The reduce the power using
+> ethtool and show the power consumption has reduced.
+> 
+> Also, in the ethtool-netlink.rst file, clearly document what the API
+> is doing, so that somebody else can implement it for another device.
+> 
+> Please also document hotplug behaviour. Say I use your new API to
+> increase the power to 3.5W. I then eject the module. Does the
+> available power automatically get put back into the pool? When i
+> reinsert the module, it will be in low power class, and i need to
+> issue the ethtool command again to increase its power?
 
+Ok, I'll answer all of those questions in the documentation included
+in the 2nd version of the patchset.
+
+> 
+>    Andrew
+> 
 
