@@ -1,97 +1,92 @@
-Return-Path: <netdev+bounces-89068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A93748A9559
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 10:50:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDAAB8A9571
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 10:58:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36B201F218BD
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 08:50:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDDAD1C20AE0
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 08:58:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1446215AAC7;
-	Thu, 18 Apr 2024 08:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E615C158858;
+	Thu, 18 Apr 2024 08:57:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dBURE9z0"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fYOaR+w6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A424415AAB5
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 08:49:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BCC1E498
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 08:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713430194; cv=none; b=oVpjiPU8gvEJln7qnJmu2LmCOJ9luKi6CKwE+ms29ht7081RlF/ZgeCowyII1qVIgNC+VCWlBzrwAXdmqylWbF2NwDqcmOB2oMeJfxbZnbn2ecOVAj7fRljQCmsvL4udQV69ZuqQYv50v/1f8jXJRGn6uKWUEj+WCzmvoLkkPU4=
+	t=1713430678; cv=none; b=c0ws06v3lQWVE8+hQXUHxj1fZdsRU3hBLytCWbmXSoHU0/GOobCTXod8zWCcJhg2Rv3hQ4AaoHvDkD413NmWSK9krvBY4YGpZgLguUP4d7hitcZfo58/N72+TWWLxSL5eb5qQZnTa5U3Ec1EbTLFNSwXU7aVrTvCUiqC87MYMVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713430194; c=relaxed/simple;
-	bh=7t7uZR8r9HWOVXRIrXdqFbm3LrKrBLg4UMHkqY5ZUP8=;
+	s=arc-20240116; t=1713430678; c=relaxed/simple;
+	bh=jOyUpC0nJOZyXn5CGWfbaKP4X0Shy26WBetMcibpIYw=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=La9s5cTXmh4HkfSWL3JIZXcz1SNRFCjYKzgl+5OU4XQNKHeB4YmMAa3PrT9/ePpfwqQYk/DGyKjIgUOuzsVcGVMIiyneN8rrCl36hLmHzWw/gktXLx6NG+vi2mISqAfrOQ4k73bn8kelWSUMsYlyGFFwW3QjXupMj/QLYpu1wnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dBURE9z0; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:MIME-Version; b=lMi/MMfm7JtUDJ8SqjYz8cAihEubRTsuBal1a1UiYPIc/LonftJWRdfl+R24FmaUtfFbSkalAofA5Oyh1sG4yuuQ/xGV57BVHQ3a0cGvy3V5AqkFK3rxh25PRPdwA+i27PWQ/lccyW1KF8XvaC9fPrSyZE+wcgfmAUCyCYNDuOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fYOaR+w6; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713430191;
+	s=mimecast20190719; t=1713430676;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=7t7uZR8r9HWOVXRIrXdqFbm3LrKrBLg4UMHkqY5ZUP8=;
-	b=dBURE9z0IacF0dcvEzVLXm6nJX2gFLoTM+wqTSEDU+/4rWWBMEGXFuDFsLnqn7kTK9TpJK
-	gtEkUsK4bTqcOGz/ce5Qy8HJxxpGJS65Qd/br5bwVhy557kiM5Wun6GHRADQUxTVgr5+3w
-	J15CEKn2fLLkeZcFkC/XLjCFcxZUdSc=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=jOyUpC0nJOZyXn5CGWfbaKP4X0Shy26WBetMcibpIYw=;
+	b=fYOaR+w6crQ0osPd+ekqNMAOsQ0qScUA9M+rzNg9kJh1KEu/6azyIaCMAeEcg87ValB6Oy
+	OJL+zSuC5lhAnYzS07FX5hcuaV6ndKmtpGlX5if+eT8C/EMdtVvKf/fA5hD6DRY4rmcOkN
+	ojeoInGGbT/QcX/bqEiR33yXwZKLfqk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-599-Xc8vE7JBOvqGh23jrdF7lw-1; Thu, 18 Apr 2024 04:49:50 -0400
-X-MC-Unique: Xc8vE7JBOvqGh23jrdF7lw-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5195acba0e3so29876e87.2
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 01:49:49 -0700 (PDT)
+ us-mta-80-VC6s401YO86WPD77jOGfTg-1; Thu, 18 Apr 2024 04:57:53 -0400
+X-MC-Unique: VC6s401YO86WPD77jOGfTg-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-349a31b3232so63394f8f.2
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 01:57:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713430188; x=1714034988;
+        d=1e100.net; s=20230601; t=1713430672; x=1714035472;
         h=mime-version:user-agent:content-transfer-encoding:autocrypt
          :references:in-reply-to:date:cc:to:from:subject:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7t7uZR8r9HWOVXRIrXdqFbm3LrKrBLg4UMHkqY5ZUP8=;
-        b=pTkLCoiSuBZch2kaQDLhS0RZSj1hN3w5lX3VXMBgHJ0w/yNZY0+8aUqh1GZ5LHMUCG
-         stGk8fYWqPl6pFMh1MX9D4geH3jwMUphrb7tI/msJ/f3tYaaRuy15aZHRbQ/xJiNDUQj
-         bLtngjtgGzFYsy7rR5hyo8EUWl4eMW5X44qc/EVkL3m6oIgEEtT02zF96pyioCeyo7JN
-         IC3ZAqjPZWlHVkq9NqZx4VAPQwZX45gJrrM1RSlkHi12vkiQPwSUSEisP1umWeFmYuWE
-         m5yMa3TrlzUhX2sZcFrVGir/SO8OQr/xuNTsdRrFm5rzHNOmmLYiH98ekcDe9RzaU9IA
-         bjbA==
-X-Forwarded-Encrypted: i=1; AJvYcCWM/m5kMpD+Vj/jBJkyMVhPXTJMUCQpzxfXEm4G2bw8VVlCwHqhmj0M3BE6jjEsDRiZatuZ1C0r++ESO0wJety3P+3Yane+
-X-Gm-Message-State: AOJu0Yx7yfG7fxGLH001ZDR0i6JckjJyoPT4FBwTf7fpVi4sPIBPPZ34
-	vi+tN+FGakFk96qzANfrTtACsgyJehXLGETxvw2us/A+kJCvW166Bzst3yZFlpgUhOgd9qcU3vB
-	Fh2TPKSSnOXKBWoQ/HEQ5qJCK46Tg2zNwQqLxT9glT5ZM1N+7EWWR6mDeqRBX7A==
-X-Received: by 2002:a05:651c:217:b0:2d9:ec13:3356 with SMTP id y23-20020a05651c021700b002d9ec133356mr1009785ljn.0.1713430188279;
-        Thu, 18 Apr 2024 01:49:48 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IErQIUbYGgWm6K7PMKpquzKjFxJq+j40BEgVIy5m/e4gTUwODI4+BpF6VUb18DUeA5ERarMnw==
-X-Received: by 2002:a05:651c:217:b0:2d9:ec13:3356 with SMTP id y23-20020a05651c021700b002d9ec133356mr1009764ljn.0.1713430187858;
-        Thu, 18 Apr 2024 01:49:47 -0700 (PDT)
+        bh=jOyUpC0nJOZyXn5CGWfbaKP4X0Shy26WBetMcibpIYw=;
+        b=sUmyLqdj2N/4Rb6SKO5zUQetgYm9SI2fDRVHNZVyFNOPda1uZOMOLgQwCb0ka2dWPb
+         JpTcptKjG1+v+yTksxyksYp84EsNFaH3/vhRxHapKqoTM6xmzdIlVrR+W89Nand51V6F
+         U45/1W9z8auX9e7m2SCdbmfuq7FqnfEYyXJBtDMZMuqOC82G+oOQNr/3b2WQHthfLBQS
+         jXWxjEta1jb5+IiqYWoFyM5SgDgChcXOqGz7fD2MJRO61gjrAqjbR1AlwEOEx/oF7Zbe
+         r3/K6rR9zDkZ3o+Y4PoDK/mGKA680dkjL0VNq5nnDvGR0m8wpF/QpAAl85ygvbWVxdyI
+         0/0Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUZIu10iNT60zRCljY2nYJv5Loicqg4zpAV3OL1cWED1WRuA/doQpJdvTcRBZgY51O3xYGdbX70KlV7pl9jKvyjioj1fu8t
+X-Gm-Message-State: AOJu0Yx2zQnL0bTfMwsFFpS/FYjsqxHZgxDcYUhM5qt78etMkkBo7Ad6
+	mX6ajpZsR/CcsZJeZ+Sg6ugCpw96mIV25A1622479DUKVibTJtgBWU5yTgycL+W0CRBQuBDgZHm
+	MWhQfyeZz775agrSN5vRGWAD6kftPpOVsJSKIOOPSLpJNHnIFFmLFww==
+X-Received: by 2002:a05:600c:3baa:b0:418:90ac:3494 with SMTP id n42-20020a05600c3baa00b0041890ac3494mr1391983wms.2.1713430672432;
+        Thu, 18 Apr 2024 01:57:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH/XI7qBUxMqVd5G7d6TJMXnMi7AAu0DZ2aNXvMucFw7XYLwkFqE+ST8gQrnfy1ZXTNrpw7gg==
+X-Received: by 2002:a05:600c:3baa:b0:418:90ac:3494 with SMTP id n42-20020a05600c3baa00b0041890ac3494mr1391972wms.2.1713430672054;
+        Thu, 18 Apr 2024 01:57:52 -0700 (PDT)
 Received: from gerbillo.redhat.com (146-241-236-143.dyn.eolo.it. [146.241.236.143])
-        by smtp.gmail.com with ESMTPSA id l8-20020a05600c1d0800b00418a2ce884bsm1913144wms.32.2024.04.18.01.49.46
+        by smtp.gmail.com with ESMTPSA id q15-20020a05600c46cf00b00416e2c8b290sm5862917wmo.1.2024.04.18.01.57.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 01:49:47 -0700 (PDT)
-Message-ID: <794c4fcbd5b934fd378d8fe8df2fa2cfb42f424c.camel@redhat.com>
-Subject: Re: [net-next PATCH v5 0/4] net: hsr: Add support for HSR-SAN
- (RedBOX)
+        Thu, 18 Apr 2024 01:57:51 -0700 (PDT)
+Message-ID: <9fae6b381dccd6566b6366c7090468bea1f5e1d7.camel@redhat.com>
+Subject: Re: [PATCH v1 net 1/5] sit: Pull header after checking
+ skb->protocol in sit_tunnel_xmit().
 From: Paolo Abeni <pabeni@redhat.com>
-To: Lukasz Majewski <lukma@denx.de>, netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,  Oleksij Rempel
- <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com, Sebastian Andrzej
- Siewior <bigeasy@linutronix.de>, Ravi Gunasekaran <r-gunasekaran@ti.com>,
- Simon Horman <horms@kernel.org>, Nikita Zhandarovich
- <n.zhandarovich@fintech.ru>, Murali Karicheri <m-karicheri2@ti.com>, Jiri
- Pirko <jiri@resnulli.us>, Dan Carpenter <dan.carpenter@linaro.org>,  Ziyang
- Xuan <william.xuanziyang@huawei.com>, Shigeru Yoshida
- <syoshida@redhat.com>, "Ricardo B. Marliere" <ricardo@marliere.net>,
- linux-kernel@vger.kernel.org
-Date: Thu, 18 Apr 2024 10:49:45 +0200
-In-Reply-To: <20240415124928.1263240-1-lukma@denx.de>
-References: <20240415124928.1263240-1-lukma@denx.de>
+To: Eric Dumazet <edumazet@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: kuba@kernel.org, davem@davemloft.net, dsahern@kernel.org, 
+ herbert@gondor.apana.org.au, kuni1840@gmail.com, netdev@vger.kernel.org, 
+ steffen.klassert@secunet.com, syzkaller@googlegroups.com, willemb@google.com
+Date: Thu, 18 Apr 2024 10:57:50 +0200
+In-Reply-To: <CANn89i+raqGAERfsvxv9AM_AsgJNdnk3=YgLzf4guduj7G-s7Q@mail.gmail.com>
+References: <20240417190432.5d9dc732@kernel.org>
+	 <20240418033145.35894-1-kuniyu@amazon.com>
+	 <CANn89i+y8yqXZ3OHdzo5FxgwNs-j24-4wiNZKr8pSG+tvbYV9g@mail.gmail.com>
+	 <CANn89i+raqGAERfsvxv9AM_AsgJNdnk3=YgLzf4guduj7G-s7Q@mail.gmail.com>
 Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
@@ -106,21 +101,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Mon, 2024-04-15 at 14:49 +0200, Lukasz Majewski wrote:
-> This patch set provides v5 of HSR-SAN (RedBOX) as well as hsr_redbox.sh
-> test script.
+On Thu, 2024-04-18 at 09:00 +0200, Eric Dumazet wrote:
+> On Thu, Apr 18, 2024 at 8:56=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >=20
+> > On Thu, Apr 18, 2024 at 5:32=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazo=
+n.com> wrote:
+> > >=20
+> > > From: Jakub Kicinski <kuba@kernel.org>
+> > > Date: Wed, 17 Apr 2024 19:04:32 -0700
+> > > > On Mon, 15 Apr 2024 15:20:37 -0700 Kuniyuki Iwashima wrote:
+> > > > > syzkaller crafted a GSO packet of ETH_P_8021AD + ETH_P_NSH and se=
+nt it
+> > > > > over sit0.
+> > > > >=20
+> > > > > After nsh_gso_segment(), skb->data - skb->head was 138, on the ot=
+her
+> > > > > hand, skb->network_header was 128.
+> > > >=20
+> > > > is data offset > skb->network_header valid at this stage?
+> > > > Can't we drop these packets instead?
+> > >=20
+> > > I think that needs another fix on the NSH side.
+> > >=20
+> > > But even with that, we can still pass valid L2 skb to sit_tunnel_xmit=
+()
+> > > and friends, and then we should just drop it there without calling
+> > > pskb_inet_may_pull() that should not be called for non-IP skb.
+> >=20
+> > I dislike this patch series. I had this NSH bug for a while in my
+> > queue, the bug is in NSH.
+> >=20
+> > Also I added skb_vlan_inet_prepare() recently for a similar issue.
 >=20
-> Applied on top of:
-> Branch: net-next/main
-> SHA1: 50aee97d1511
->=20
-> Runs inside: Buildroot (2024.02.1+):
-> SHA1: b31443e09cb7bb67b97ae6fb7614fe3a22889d50
+> Kuniyuki I am releasing the syzbot bug with a repro, if you have time to =
+fix NSH
+> all your patches can go away I think.
 
-Please don't include the above information inside the commit message,
-they are not very useful an may confuse stable teams' tools.
-
-Instead you could add a longish overview of the series.
+I agree a specific/smaller scope fix on in nsh should be preferred
+here.
 
 Thanks,
 
