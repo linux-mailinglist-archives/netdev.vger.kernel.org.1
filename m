@@ -1,146 +1,113 @@
-Return-Path: <netdev+bounces-89462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 825EA8AA59C
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 01:05:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62D9E8AA5B0
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 01:20:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E158EB2161F
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 23:05:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0E851F21CCE
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 23:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3539F4AED6;
-	Thu, 18 Apr 2024 23:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0209A76037;
+	Thu, 18 Apr 2024 23:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="wSDcJLRX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l9KQfcbl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639E8286AF
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 23:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5AC3757F6;
+	Thu, 18 Apr 2024 23:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713481523; cv=none; b=tuDq6pX7CstW0MI1nMI2FNVSi5u8org6ohTzhwtC7ReDM8Na3C7QlvxDnuzpSluN/+o15vOxMdYXhObfiy4lmoOg0U41myFaaN9NRkJtVmRhi6eTiUb0+DIOdbOHok0fAhzyATiOXSP/J4y9BGc3Qi46hqeKPGIaZiVCl4uxXWI=
+	t=1713482427; cv=none; b=bN0eoioavCT8x4DVQlUAgsVYOCBGHHWyiyJqXB3wM1yB+IIx+4nAS+WngUfr3Rj2+mo3dPt1kRPWSVRdFwI/gqWYtNbQL/xnw4Co6SkVnxxJ8xG9m+YPy8iWygkQyVC6FdMofwfPdJ6I6EthcMt4AS7lcdWIkF8hXZ86O7SgeKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713481523; c=relaxed/simple;
-	bh=zE/X1c2GWnLTEWZsM2SNSsv7zJ1QqOOdnKpuwt9eJPc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=R8IXDIjMzk9Rnw0yJGRgZs++dBCnN3QrBIqrzyIZh/C6p4oslxGy3xp01eVrh1yHpB6ordShsECRTpowVPHeJeIz4M0k9nXQAunkgPL6SYSE+dtVCHXCluEAYPvHp+qd8Mp9F191U34BBLdRWsIkq46vAdUuiSvCvqTorhDBlTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=wSDcJLRX; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-dcd9e34430cso1682171276.1
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 16:05:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1713481520; x=1714086320; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+1iZDc8ti+hRIsONcPGumEwX6irint2hC+ddeAPUmUc=;
-        b=wSDcJLRXQclsZPqvnr4m1P7ySYQNae0un2OnlpUlz+SOb9H+5d1AnR9JAOnHou4cs+
-         JGd9kZLvZR13ZC2DkkfT3wusrfqlVDMWdjWdv2kMhqHJxCyb7HivadeGdFZ/PmgmsMK3
-         h0vP2GROnUrc1lXrY9EpE+5VRTGGYB8JuUGyn4mXC/K9JSh74tFK+MSG+1gxemItR+k/
-         M22J8I14gyp58a7qUGOdXtFqhoGO5NYbJuCPA3OUPmf+NfnD9mUcTFRnuXgn5R9HpdzU
-         ZJU6OE0VVmnq0Nlj+X2kb0Rwp/nREcatstwqtW1sEX06ksqHkF+bJSk2ItAS8zBYHTYR
-         6Ykg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713481520; x=1714086320;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+1iZDc8ti+hRIsONcPGumEwX6irint2hC+ddeAPUmUc=;
-        b=t+X2H9OMoioOGG4QuVzwhWZ5mmMYYWSrSVkao7I453Ddtn6jx2GKzr10fn99Gf+w++
-         a1dUsiuucO8qXCpyY6haDefjDgit+mrp06p28g7F3Vsos1DbYQq+/kDNtYKMpK7Ij+RM
-         YuYkbNTOMGsCVzIo13TKsx/eeAaB+G0NhNkRdgjo6JLBJedOIAIsV5976G48iGRZecce
-         kFcU3yxf69KP3hDj9VvuJSPPo/+NupsW5sERIKVuzdayuSHy+l/G/1kZfyesh/9rOD1G
-         2WsyjlumRJdQ7vZ+PE28AvDk3Pfx7uuNqrOXVvqOQK9CFAIP8xxoNaXDgajGtHhrGD6l
-         Uf2A==
-X-Forwarded-Encrypted: i=1; AJvYcCUAE4Cd5pzYlj0OEq2NEWxUhI781bkqEN7iYdwap5zGJ+li75K2I+fWIOEt0RA9vlEzRBIiGbq+HWfd1Nb39RuIer/bI0qp
-X-Gm-Message-State: AOJu0Yyqr6gmwTRH0EVeNIF0almCM3ANGHarfkVHW1W9xoBiVQOu3xe9
-	lP8kQY6dXbVCjtCVKO5fju0bQNDoIPvflO1IaIyYojJbFcQ3ge9KgdB/qPi3THeGz7j4e5WNtP5
-	I7ZdjVbytniQ/ZUbqnnj4tFQP+9w/sBTUoy1D
-X-Google-Smtp-Source: AGHT+IHFLhFbi5GM9mAA9rRvBkoGLe00u7yq+qMap3AYiyCfn+FK522bMf8820ohGe3mBmiSuVItkvz3gxAU/iwcrYo=
-X-Received: by 2002:a25:ced2:0:b0:dc7:d6:fd44 with SMTP id x201-20020a25ced2000000b00dc700d6fd44mr297051ybe.65.1713481520307;
- Thu, 18 Apr 2024 16:05:20 -0700 (PDT)
+	s=arc-20240116; t=1713482427; c=relaxed/simple;
+	bh=0Ln18wKzmGwLJy1EExmTx27AZ3IRJljHgPvbneq0Z5s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=EmadoKASrB6wWNmYmLCtF/JsFUfYWHnmotcEkJbg+0zj7wvB51j/NkncquiwUPpv0Cu+v56jgrKvLrAYjqDsfRSZmI7VnZsnvNPNK6PUMZYvtYWIaOlJyOdLbS1FDhSopICRRCLU2K5pgaC5NNONUQD3Hn86ohihIcMVL3C/p+0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l9KQfcbl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4D87BC113CC;
+	Thu, 18 Apr 2024 23:20:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713482427;
+	bh=0Ln18wKzmGwLJy1EExmTx27AZ3IRJljHgPvbneq0Z5s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=l9KQfcblGd2dBmQFb4N7J2hxO6ZlPquMvHBZyIfxiHQ5JfudvlA0LrLQ27TDUEqVX
+	 3ZoDS90A8j7Iqcel83NweabnJijea7e64zB2+0Tm1YNXMxkg9Dwzjy7EH04b2eZZUA
+	 l880k4wyhcAM+ZZYG0/2m2aoUf4LVZ0pL+WCkqnOkK9TKVZLgsFZNskgo4DhfG/o61
+	 AMGLnwCPecUC7dN4dGSetKDMwvMp1L24XePgP51QoFSskKbTc4l/APqVfWnA8PCI1V
+	 vCrqLswrPUO4UmpMRSxTZ539xFGb6H3g/c51DlRBS/cYZLjcp5MpzOjupVDvQO6CLR
+	 7VL0Q+zp962zw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3DCD4C43619;
+	Thu, 18 Apr 2024 23:20:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240418073248.2952954-1-edumazet@google.com> <CAM0EoMmi0KE6+Nr6E=HqsnMee=8uia57mv0Go8Uu_uNrsVw9Dw@mail.gmail.com>
- <20240418150816.GG3975545@kernel.org>
-In-Reply-To: <20240418150816.GG3975545@kernel.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 18 Apr 2024 19:05:08 -0400
-Message-ID: <CAM0EoM=Cen-0ctMkBvDL-jsuwPKGetz4yTG+RpmW7dXjjeVaQg@mail.gmail.com>
-Subject: Re: tdc [Was: Re: [PATCH v2 net-next 00/14] net_sched: first series
- for RTNL-less] qdisc dumps
-To: Simon Horman <horms@kernel.org>
-Cc: Eric Dumazet <edumazet@google.com>, "David S . Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v3 0/8] selftests: drv-net: support testing with a
+ remote system
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171348242724.6056.16713096833623546188.git-patchwork-notify@kernel.org>
+Date: Thu, 18 Apr 2024 23:20:27 +0000
+References: <20240417231146.2435572-1-kuba@kernel.org>
+In-Reply-To: <20240417231146.2435572-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, petrm@nvidia.com,
+ linux-kselftest@vger.kernel.org, willemdebruijn.kernel@gmail.com
 
-On Thu, Apr 18, 2024 at 11:08=E2=80=AFAM Simon Horman <horms@kernel.org> wr=
-ote:
->
-> On Thu, Apr 18, 2024 at 06:23:27AM -0400, Jamal Hadi Salim wrote:
-> > On Thu, Apr 18, 2024 at 3:32=E2=80=AFAM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > Medium term goal is to implement "tc qdisc show" without needing
-> > > to acquire RTNL.
-> > >
-> > > This first series makes the requested changes in 14 qdisc.
-> > >
-> > > Notes :
-> > >
-> > >  - RTNL is still held in "tc qdisc show", more changes are needed.
-> > >
-> > >  - Qdisc returning many attributes might want/need to provide
-> > >    a consistent set of attributes. If that is the case, their
-> > >    dump() method could acquire the qdisc spinlock, to pair the
-> > >    spinlock acquision in their change() method.
-> > >
-> >
-> > For the series:
-> > Reviewed-by: Jamal Hadi Salim<jhs@mojatatu.com>
-> >
-> > Not a show-stopper, we'll run the tdc tests after (and use this as an
-> > opportunity to add more tests if needed).
-> > For your next series we'll try to do that after you post.
->
-> Hi Jamal,
->
-> On the topic of tdc, I noticed the following both
-> with and without this series applied. Is this something
-> you are aware of?
->
-> not ok 990 ce7d - Add mq Qdisc to multi-queue device (4 queues)
->
+Hello:
 
-Since you said it also happens before Eric's patch, I took a look in
-the test and nothing seems to stand out. Which iproute2 version are
-you using?
-We are running tdc in tandem with net-next (and iproute2-next) via
-nipa for a while now and didn't see this problem pop up. So I am
-guessing something in your setup?
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 17 Apr 2024 16:11:38 -0700 you wrote:
+> Hi!
+> 
+> Implement support for tests which require access to a remote system /
+> endpoint which can generate traffic.
+> This series concludes the "groundwork" for upstream driver tests.
+> 
+> I wanted to support the three models which came up in discussions:
+>  - SW testing with netdevsim
+>  - "local" testing with two ports on the same system in a loopback
+>  - "remote" testing via SSH
+> so there is a tiny bit of an abstraction which wraps up how "remote"
+> commands are executed. Otherwise hopefully there's nothing surprising.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v3,1/8] selftests: net: fix counting totals when some checks fail
+    https://git.kernel.org/netdev/net-next/c/655614ea2bd3
+  - [net-next,v3,2/8] selftests: net: set the exit code correctly in Python tests
+    https://git.kernel.org/netdev/net-next/c/4fa6bd4b33ac
+  - [net-next,v3,3/8] selftests: drv-net: define endpoint structures
+    (no matching commit)
+  - [net-next,v3,4/8] selftests: drv-net: factor out parsing of the env
+    (no matching commit)
+  - [net-next,v3,5/8] selftests: drv-net: construct environment for running tests which require an endpoint
+    (no matching commit)
+  - [net-next,v3,6/8] selftests: drv-net: add a trivial ping test
+    (no matching commit)
+  - [net-next,v3,7/8] selftests: net: support matching cases by name prefix
+    (no matching commit)
+  - [net-next,v3,8/8] selftests: drv-net: add a TCP ping test case (and useful helpers)
+    (no matching commit)
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-> I'm not sure if it is valid, but I tried running tdc like this:
->
-> $ ng --build --config tools/testing/selftests/tc-testing/config
-> $ vng -v --run . --user root --cpus 4 -- \
->         "cd ./tools/testing/selftests/tc-testing; ./tdc.py;"
-
-This looks reasonable...
-
-cheers,
-jamal
 
