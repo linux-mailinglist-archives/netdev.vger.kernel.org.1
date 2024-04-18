@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-89025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31EBE8A9415
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:34:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50C2B8A9416
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:34:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAAD8283CC9
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 07:33:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9539B220CC
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 07:34:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59B8C7BB07;
-	Thu, 18 Apr 2024 07:33:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F10EC7C0B0;
+	Thu, 18 Apr 2024 07:33:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dIAQ2Bbh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KxxAoSF+"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D167BB15
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 07:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FA57C08C
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 07:33:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713425586; cv=none; b=qo/Igevb0+KpL7VYq71mFR9X+AArosW838AjP+1Axl5+kokhfhxuR4wutX5XfiiGXlqLn+txlcLGOlWZMq9lH6afWGmrDr4QcqEuGq2gDRGwsZnhXKEs/Q6K+qj8q/WXHTTgehULlbuJHGI0ztRUd4MAnU7doLFiBigQIlBMsW0=
+	t=1713425587; cv=none; b=CVf3kH/DIAPdq/VOoUPI7lDkHv+KBrybYoY6TvkKcoSL1o2TMNwXanXfE9fsZBMhBKhkekiKA5Xf2RTe0fCwfXrTV3u/c6YP0JDRIe7THWSamEFWxGxTnm0CY4AM6XYVuijBK+1fTa2TUh6Zbbhc+A8j6P0AVcfawT7R4RvWOSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713425586; c=relaxed/simple;
-	bh=FOH0bg2dj6T984pv4vB3lHHu3oghm8AmO3cizV67C4U=;
+	s=arc-20240116; t=1713425587; c=relaxed/simple;
+	bh=OJR8GFUO8+pJk0/M0QUGFcusMywbZZPVv+N+t3FyK/I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=J2PmkDuigwu4L2YmH7MA6Lvp8tI2A0x2Ygjm/QySIlZ9CXtA16AVmZaXpK1hwlNNbLRyfXoeH/grxXlTm/Ap6TKB1XdmjFACt6kUwTwpz46Rn0lCkj/owZZEsNeOc/njIzTjtmJMKWwmW4OwcmgZvp1hDo9FIaVEViw/oRLt0p8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dIAQ2Bbh; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=BtxjyeI/EviGaNWQACOuEN52JQuM9/P5GJwWYxQqRXTStqK/lFtbz1/lEepX8mEZHMWhc13XfQs3GmRDybGXkEZGi8IGaj7Qq3sNIPDhpDdFcFGlDYgU89Ru0GP0nMesIs6mOztIvo/BVKlS4dHt9qitaqDunwYBokYAxVuCTbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KxxAoSF+; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-609fe93b5cfso8197477b3.0
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 00:33:04 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60a20c33f06so7549847b3.2
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 00:33:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713425584; x=1714030384; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1713425585; x=1714030385; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/Mgoe9sPgEPC/OjJ+22EBFraLcJf05jCazYFAHI/DlQ=;
-        b=dIAQ2Bbhog2EtSnV5THRDPVKfQdWfdSHA8ISJvRMePr0W/XLuVUhY/7QTxT1B92lYv
-         uauLgkIFp/Yao5wCV4SJL2wf1C4Ev8qqhLOwv4JshSpgzm5nn1UJNY3EL26GOxC729Kg
-         5moAIXARZw7BkejLzVQNhI4NZr8ppirtv+ZmF/PsPFr6qnhkrFJqSm+OHhoSnGJijHeK
-         RF4OniMJZDbMO/o7UzIgN2JgG7NhnBX1ZgREfn+YKvxRC4pLHJGEKHvOfSnWZxaz666F
-         HSPFQkRDOx3NhooMZVdPAVJXtt98jMwHzO4S0t+vDtm9loyZG108YLP37DB+lObphVNW
-         /8sA==
+        bh=1P53Qros0rXXpmScM4sJQZHx9M+c/CX8Dd9IiqSMITA=;
+        b=KxxAoSF+HaVJSUkChioNgH8fZKfn750Wuzf9kMX6Rq3vuV/eEMNNvECPJ9/h8Us5gN
+         rRp1Y1ik5oV7ush3YKyzx7oRWZnwh1wafsNjffq76EolOtesCKk2YxaVf0J+fS/jmQb5
+         SBRE1j9H8l62/vVCmL50LxHmByKQwGXh4JfuXutIGmNBcF5MxbaRAQOzxf676+6zoVHG
+         Hyu5DVd2yh35d1J32CeZzGPEXe7alWiw7gXJrWi8m+yjm9DiiQ6HCrNxRo08nObsBDy0
+         wioDWDRJN53vwZzyNOygMGl+pkF61pNE5/URFiqktt5KB3cS8J/ruDR3iaQbF+2ZUcsB
+         2q0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713425584; x=1714030384;
+        d=1e100.net; s=20230601; t=1713425585; x=1714030385;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/Mgoe9sPgEPC/OjJ+22EBFraLcJf05jCazYFAHI/DlQ=;
-        b=ctiTrozkeYS+PAn9oz5U6GPSw94MuIRK0ZTJl5OmONAdD7wAuPl41IyurntxNraivh
-         4zgIYz8sQwBbSBFy02KqLaGUhyg1pSeUTvHXE1ThV/kdsXD9aK4WS7jsY1AsQqlCl5DR
-         Ldpq33t/m1u0pKSwJfiOzrTLzIx+VuDYqqGOwA8oACE5C61eK5cj+oWy8f9ghdnJ93en
-         /zf6GFBTAkcwE0P8qBVbKyM/Hwn1IeV4tlurRK2Rojko8zo3fluneos5X2i9IukR2A5D
-         xgbp4iKcIYRkBymdbyLYeV8RxHgZ7dyvioHdT7Sp2963gEi3uySjdFyQwM5G6478tLPd
-         IEfQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXoJ+BIz4nUmDBO1jFO7K5VOdOx9tayi1nyUQKcTWAA4GL36X184bMdbOhODyfOrf1+Wxk1XMl0pIxCrOkzoo1YRWlLiroV
-X-Gm-Message-State: AOJu0YxgGFj/S9O0mdhpdT8dc0EQNifAV7MVIOnTePLOe8pGkG19deCM
-	pvDkpHInrJxCFszLfRNMCbor5URmAFAD80xr7kbrorB+sKv/NA4unEg1b4waAwGiHpWR14+fjOr
-	GuImAq2mY+Q==
-X-Google-Smtp-Source: AGHT+IGTvstfTjtXZlgZ+fjC6VOgu60knvwQkZRMcKSXXEaeCjTHAQE4GyYZQ1WCOtZaoJdpWfGFku3wkIaRfg==
+        bh=1P53Qros0rXXpmScM4sJQZHx9M+c/CX8Dd9IiqSMITA=;
+        b=sKq01bP0QqdCnk0L3FE0/uTDHnEQijSbpDWdLefaxsBzxG/+nUQd1eyPCMgBx6pf5O
+         HM52D40QybKplYzC9Axc/D9y0A9RpK6uToR1iKP8ee3EjThkBF57/E2gJT0l6S1a6y0s
+         mX4wb8AP5cPFoHiKrjoaHNzurxjj0ZnIKI4AfkY8Pt/gRTlu4mT1E+GCR6safw5+MGKx
+         XeLIzjWJWJDml3cQIPJU94YMgpNKUABFBGAj4tAAFu6W20yYG/uCX3IJobGNAE86OHXx
+         di78Jn/sE/qrAzIXLcb/c+tDHrAenC6rhlcM9YylxG0o0G4cElkgcn4QU3a8Mcikvuv7
+         0Xxw==
+X-Forwarded-Encrypted: i=1; AJvYcCUB2w0fe2H4GMt8bfS0tOL6oWX3Z1aeuKe1D46KU/2AeJk654NsmpHERCaLq8V4jDzSQnugDThFwHzfgX0uRXLIebkgN3r+
+X-Gm-Message-State: AOJu0YwfBiohRMqYIXtqASyJtU44crRRH4kNsF169rrAqBLIF6x/8Wpb
+	Z7qJ2psyykk9VPuHfaQTjIjjOcOPdF0DGy+cQxjdao/aPOg+2dCzbdNIVMK++aAdtxX7CdKDLmi
+	bTdo4ObnrZw==
+X-Google-Smtp-Source: AGHT+IFVsSehM5IIMMpaAGTVzuEwav4O+VMwiSf03Uiik3zsuz/+ioFCI+f3z5RCfBHnNXytHuMsT3DeqEg2eA==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:2988:b0:de4:7037:69a2 with SMTP
- id ew8-20020a056902298800b00de4703769a2mr10067ybb.5.1713425583961; Thu, 18
- Apr 2024 00:33:03 -0700 (PDT)
-Date: Thu, 18 Apr 2024 07:32:42 +0000
+ (user=edumazet job=sendgmr) by 2002:a25:804b:0:b0:de4:71ad:72f5 with SMTP id
+ a11-20020a25804b000000b00de471ad72f5mr2118ybn.12.1713425585508; Thu, 18 Apr
+ 2024 00:33:05 -0700 (PDT)
+Date: Thu, 18 Apr 2024 07:32:43 +0000
 In-Reply-To: <20240418073248.2952954-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240418073248.2952954-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240418073248.2952954-9-edumazet@google.com>
-Subject: [PATCH v2 net-next 08/14] net_sched: sch_fifo: implement lockless __fifo_dump()
+Message-ID: <20240418073248.2952954-10-edumazet@google.com>
+Subject: [PATCH v2 net-next 09/14] net_sched: sch_fq_codel: implement lockless fq_codel_dump()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -85,75 +85,133 @@ Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Simon Horman <horms@kernel.org>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Instead of relying on RTNL, __fifo_dump() can use READ_ONCE()
-annotations, paired with WRITE_ONCE() ones in __fifo_init().
-
-Also add missing READ_ONCE(sh->limit) in bfifo_enqueue(),
-pfifo_enqueue() and pfifo_tail_enqueue().
+Instead of relying on RTNL, fq_codel_dump() can use READ_ONCE()
+annotations, paired with WRITE_ONCE() ones in fq_codel_change().
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- net/sched/sch_fifo.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ net/sched/sch_fq_codel.c | 57 ++++++++++++++++++++++++----------------
+ 1 file changed, 35 insertions(+), 22 deletions(-)
 
-diff --git a/net/sched/sch_fifo.c b/net/sched/sch_fifo.c
-index 450f5c67ac4956e21b544dfd81f886714171eced..b50b2c2cc09bc6ee5b23d9d5d3abea4423ff75b9 100644
---- a/net/sched/sch_fifo.c
-+++ b/net/sched/sch_fifo.c
-@@ -19,7 +19,8 @@
- static int bfifo_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 			 struct sk_buff **to_free)
- {
--	if (likely(sch->qstats.backlog + qdisc_pkt_len(skb) <= sch->limit))
-+	if (likely(sch->qstats.backlog + qdisc_pkt_len(skb) <=
-+		   READ_ONCE(sch->limit)))
- 		return qdisc_enqueue_tail(skb, sch);
+diff --git a/net/sched/sch_fq_codel.c b/net/sched/sch_fq_codel.c
+index 79f9d6de6c852268fa293f8067d029d385b54976..4f908c11ba9528f8f9f3af6752ff10005d6f6511 100644
+--- a/net/sched/sch_fq_codel.c
++++ b/net/sched/sch_fq_codel.c
+@@ -396,40 +396,49 @@ static int fq_codel_change(struct Qdisc *sch, struct nlattr *opt,
+ 	if (tb[TCA_FQ_CODEL_TARGET]) {
+ 		u64 target = nla_get_u32(tb[TCA_FQ_CODEL_TARGET]);
  
- 	return qdisc_drop(skb, sch, to_free);
-@@ -28,7 +29,7 @@ static int bfifo_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- static int pfifo_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 			 struct sk_buff **to_free)
- {
--	if (likely(sch->q.qlen < sch->limit))
-+	if (likely(sch->q.qlen < READ_ONCE(sch->limit)))
- 		return qdisc_enqueue_tail(skb, sch);
- 
- 	return qdisc_drop(skb, sch, to_free);
-@@ -39,7 +40,7 @@ static int pfifo_tail_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- {
- 	unsigned int prev_backlog;
- 
--	if (likely(sch->q.qlen < sch->limit))
-+	if (likely(sch->q.qlen < READ_ONCE(sch->limit)))
- 		return qdisc_enqueue_tail(skb, sch);
- 
- 	prev_backlog = sch->qstats.backlog;
-@@ -105,14 +106,14 @@ static int __fifo_init(struct Qdisc *sch, struct nlattr *opt,
- 		if (is_bfifo)
- 			limit *= psched_mtu(qdisc_dev(sch));
- 
--		sch->limit = limit;
-+		WRITE_ONCE(sch->limit, limit);
- 	} else {
- 		struct tc_fifo_qopt *ctl = nla_data(opt);
- 
- 		if (nla_len(opt) < sizeof(*ctl))
- 			return -EINVAL;
- 
--		sch->limit = ctl->limit;
-+		WRITE_ONCE(sch->limit, ctl->limit);
+-		q->cparams.target = (target * NSEC_PER_USEC) >> CODEL_SHIFT;
++		WRITE_ONCE(q->cparams.target,
++			   (target * NSEC_PER_USEC) >> CODEL_SHIFT);
  	}
  
- 	if (is_bfifo)
-@@ -154,7 +155,7 @@ static void fifo_destroy(struct Qdisc *sch)
+ 	if (tb[TCA_FQ_CODEL_CE_THRESHOLD]) {
+ 		u64 val = nla_get_u32(tb[TCA_FQ_CODEL_CE_THRESHOLD]);
  
- static int __fifo_dump(struct Qdisc *sch, struct sk_buff *skb)
+-		q->cparams.ce_threshold = (val * NSEC_PER_USEC) >> CODEL_SHIFT;
++		WRITE_ONCE(q->cparams.ce_threshold,
++			   (val * NSEC_PER_USEC) >> CODEL_SHIFT);
+ 	}
+ 
+ 	if (tb[TCA_FQ_CODEL_CE_THRESHOLD_SELECTOR])
+-		q->cparams.ce_threshold_selector = nla_get_u8(tb[TCA_FQ_CODEL_CE_THRESHOLD_SELECTOR]);
++		WRITE_ONCE(q->cparams.ce_threshold_selector,
++			   nla_get_u8(tb[TCA_FQ_CODEL_CE_THRESHOLD_SELECTOR]));
+ 	if (tb[TCA_FQ_CODEL_CE_THRESHOLD_MASK])
+-		q->cparams.ce_threshold_mask = nla_get_u8(tb[TCA_FQ_CODEL_CE_THRESHOLD_MASK]);
++		WRITE_ONCE(q->cparams.ce_threshold_mask,
++			   nla_get_u8(tb[TCA_FQ_CODEL_CE_THRESHOLD_MASK]));
+ 
+ 	if (tb[TCA_FQ_CODEL_INTERVAL]) {
+ 		u64 interval = nla_get_u32(tb[TCA_FQ_CODEL_INTERVAL]);
+ 
+-		q->cparams.interval = (interval * NSEC_PER_USEC) >> CODEL_SHIFT;
++		WRITE_ONCE(q->cparams.interval,
++			   (interval * NSEC_PER_USEC) >> CODEL_SHIFT);
+ 	}
+ 
+ 	if (tb[TCA_FQ_CODEL_LIMIT])
+-		sch->limit = nla_get_u32(tb[TCA_FQ_CODEL_LIMIT]);
++		WRITE_ONCE(sch->limit,
++			   nla_get_u32(tb[TCA_FQ_CODEL_LIMIT]));
+ 
+ 	if (tb[TCA_FQ_CODEL_ECN])
+-		q->cparams.ecn = !!nla_get_u32(tb[TCA_FQ_CODEL_ECN]);
++		WRITE_ONCE(q->cparams.ecn,
++			   !!nla_get_u32(tb[TCA_FQ_CODEL_ECN]));
+ 
+ 	if (quantum)
+-		q->quantum = quantum;
++		WRITE_ONCE(q->quantum, quantum);
+ 
+ 	if (tb[TCA_FQ_CODEL_DROP_BATCH_SIZE])
+-		q->drop_batch_size = max(1U, nla_get_u32(tb[TCA_FQ_CODEL_DROP_BATCH_SIZE]));
++		WRITE_ONCE(q->drop_batch_size,
++			   max(1U, nla_get_u32(tb[TCA_FQ_CODEL_DROP_BATCH_SIZE])));
+ 
+ 	if (tb[TCA_FQ_CODEL_MEMORY_LIMIT])
+-		q->memory_limit = min(1U << 31, nla_get_u32(tb[TCA_FQ_CODEL_MEMORY_LIMIT]));
++		WRITE_ONCE(q->memory_limit,
++			   min(1U << 31, nla_get_u32(tb[TCA_FQ_CODEL_MEMORY_LIMIT])));
+ 
+ 	while (sch->q.qlen > sch->limit ||
+ 	       q->memory_usage > q->memory_limit) {
+@@ -522,6 +531,7 @@ static int fq_codel_init(struct Qdisc *sch, struct nlattr *opt,
+ static int fq_codel_dump(struct Qdisc *sch, struct sk_buff *skb)
  {
--	struct tc_fifo_qopt opt = { .limit = sch->limit };
-+	struct tc_fifo_qopt opt = { .limit = READ_ONCE(sch->limit) };
+ 	struct fq_codel_sched_data *q = qdisc_priv(sch);
++	codel_time_t ce_threshold;
+ 	struct nlattr *opts;
  
- 	if (nla_put(skb, TCA_OPTIONS, sizeof(opt), &opt))
+ 	opts = nla_nest_start_noflag(skb, TCA_OPTIONS);
+@@ -529,30 +539,33 @@ static int fq_codel_dump(struct Qdisc *sch, struct sk_buff *skb)
  		goto nla_put_failure;
+ 
+ 	if (nla_put_u32(skb, TCA_FQ_CODEL_TARGET,
+-			codel_time_to_us(q->cparams.target)) ||
++			codel_time_to_us(READ_ONCE(q->cparams.target))) ||
+ 	    nla_put_u32(skb, TCA_FQ_CODEL_LIMIT,
+-			sch->limit) ||
++			READ_ONCE(sch->limit)) ||
+ 	    nla_put_u32(skb, TCA_FQ_CODEL_INTERVAL,
+-			codel_time_to_us(q->cparams.interval)) ||
++			codel_time_to_us(READ_ONCE(q->cparams.interval))) ||
+ 	    nla_put_u32(skb, TCA_FQ_CODEL_ECN,
+-			q->cparams.ecn) ||
++			READ_ONCE(q->cparams.ecn)) ||
+ 	    nla_put_u32(skb, TCA_FQ_CODEL_QUANTUM,
+-			q->quantum) ||
++			READ_ONCE(q->quantum)) ||
+ 	    nla_put_u32(skb, TCA_FQ_CODEL_DROP_BATCH_SIZE,
+-			q->drop_batch_size) ||
++			READ_ONCE(q->drop_batch_size)) ||
+ 	    nla_put_u32(skb, TCA_FQ_CODEL_MEMORY_LIMIT,
+-			q->memory_limit) ||
++			READ_ONCE(q->memory_limit)) ||
+ 	    nla_put_u32(skb, TCA_FQ_CODEL_FLOWS,
+-			q->flows_cnt))
++			READ_ONCE(q->flows_cnt)))
+ 		goto nla_put_failure;
+ 
+-	if (q->cparams.ce_threshold != CODEL_DISABLED_THRESHOLD) {
++	ce_threshold = READ_ONCE(q->cparams.ce_threshold);
++	if (ce_threshold != CODEL_DISABLED_THRESHOLD) {
+ 		if (nla_put_u32(skb, TCA_FQ_CODEL_CE_THRESHOLD,
+-				codel_time_to_us(q->cparams.ce_threshold)))
++				codel_time_to_us(ce_threshold)))
+ 			goto nla_put_failure;
+-		if (nla_put_u8(skb, TCA_FQ_CODEL_CE_THRESHOLD_SELECTOR, q->cparams.ce_threshold_selector))
++		if (nla_put_u8(skb, TCA_FQ_CODEL_CE_THRESHOLD_SELECTOR,
++			       READ_ONCE(q->cparams.ce_threshold_selector)))
+ 			goto nla_put_failure;
+-		if (nla_put_u8(skb, TCA_FQ_CODEL_CE_THRESHOLD_MASK, q->cparams.ce_threshold_mask))
++		if (nla_put_u8(skb, TCA_FQ_CODEL_CE_THRESHOLD_MASK,
++			       READ_ONCE(q->cparams.ce_threshold_mask)))
+ 			goto nla_put_failure;
+ 	}
+ 
 -- 
 2.44.0.683.g7961c838ac-goog
 
