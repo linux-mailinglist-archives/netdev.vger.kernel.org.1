@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-89440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AF6D8AA44D
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:49:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A65B8AA452
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:50:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16CDB280F2A
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:49:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD33AB257B1
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95C1E1A0B04;
-	Thu, 18 Apr 2024 20:47:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1725D1A38D3;
+	Thu, 18 Apr 2024 20:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZZPLlPP+"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V7ImgRe7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CD019DF70
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 20:47:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8704E1A0AFF
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 20:47:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713473265; cv=none; b=BMULODTP4v7Qd3g1XAxEokDZJrubnu5ZL0TbR47IHk48+xzY+k83aH0ThqFAhqBfpeZdAfoPwXCBC71NrFdkqRfuQrLAMsi4e8MhRkJjepXAB0LQU2qqPV7rtrdL0Jo/MyNJxtYXMOuXVvkhHOiQamLkBSJrVaPaCOK+eUpGh9U=
+	t=1713473267; cv=none; b=rj0CXVXuxGnb8o4ejTDHJ67NID7PdcT5kgKqoAhdZDDrOM15W6jq/d6ZTaM4Ji8pbvxy/MNHCsAOLV6ngi6JOefTqpNFjrvFO8YqclnX1EPUwX5mrw6wVslD6TA7yMkxz46bCjmoORrZt/e2ERcLsrYUuLIdKnIa+s7986B9UF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713473265; c=relaxed/simple;
-	bh=XyYpi71wJ0gs3n01rlT/IbyAJXkfH9+nq2GSfnQ1k/w=;
+	s=arc-20240116; t=1713473267; c=relaxed/simple;
+	bh=EM+PQeT/+Ayv+DqVTXJ6eeqpjOeHpKwRxGVuenJZOr8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IEJev0sPzX5GuU3Dk/YJm7Qn/6DS60Ii3PzVims0yYOMSh8q572oL4is4bw4MLhNn0QVq9WlXGbt2NXguMgL9Y69zajWzQ378xjB1R2d/fPNDcnGAzvaYpsyWvESrxk7mEpqkyGZQan55vcWpWQEhkozpG4Zfppq3MgMNY34LC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ZZPLlPP+; arc=none smtp.client-ip=209.85.166.42
+	 MIME-Version; b=ASVcMrho6NPK2YMd4S8Um4Zo+w4PNFoiDsTwUZKNGSR23tcXYu223xSnyg76ZNvU5xALvhGnfYSWTUDr9bxPRYhlRnCdp4nD2bRHgv+Hjf1CX147o/zRlZ/KbtnMrvMQqaVczY5W9fNa55otUzzlfj7czl2ZRKI0cMzG/MsgM5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=V7ImgRe7; arc=none smtp.client-ip=209.85.210.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-7d6a772af5bso45223939f.1
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 13:47:43 -0700 (PDT)
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-6eb812370a5so739053a34.0
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 13:47:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713473263; x=1714078063; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1713473264; x=1714078064; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fi0Ji6XcxTq7nWZptSfD6FmyaTvUSY/Oz6qXD8maVXs=;
-        b=ZZPLlPP+4XDZ7PF63LsFgJPul7de2gSxgeQkiiEHeEcL5yRoY+BERT55BVILhV2In9
-         IpXomHHSleFX90PDxkK/L9hOD8CuR9OhUhCfs8c8oLk1yCcjLPJR1P4xiUTavlICFe7y
-         nRsk/wpWEw8HrrB0hNEFiKo2SF8o6WMAOovfG2dGBUNxSrtLIGN7CcG8bX17nkc7YYLa
-         0c3cFr6J3ImAVT+t1Q1N164q8SGIqfKa/LlyxASKIijsvuC6shtmJYQo6eYMgKxdKrHU
-         clLABJ8NAdQ0NmkZzmUErd/B1B+FQzKmbaYowY/8N2dkpDbIr8AkMsSx/w65N0KUxZnj
-         3d5A==
+        bh=NOsLWHf1aG7QjlwAYhzu9K+FfSOj8nw2eYMqyFikvmc=;
+        b=V7ImgRe7jkpHOts93G+lm8ZfO9vtJki+bHJ0OYnS501S6N72QFl2VAqL0oZk92QG3q
+         m02rMzaHK9lln9LRB+LTNpKjMZM8eEUfyD2J1i88LyKH7kHzLT25MnE9nQFjXSSa0nNA
+         LZCG0xLUPXsSPUL7eoiKlZgCVixeEm3fhiN/bh+NLnpt4pdDafK0fLfYLL0RSWF9ZqPN
+         Tt2ff0T86NtzDvaqQ3/zBxJpzMMar+O82fDKHWqoBt3Ak9Odhwa0bcnlHrzZSbNbBHWH
+         WrtxPOv+FVFLhMoupMyksg6vgMYsANQq0WHtaV62EczENhL4tIsGr+Tu4JF1S1Hg7+ji
+         dq9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713473263; x=1714078063;
+        d=1e100.net; s=20230601; t=1713473264; x=1714078064;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fi0Ji6XcxTq7nWZptSfD6FmyaTvUSY/Oz6qXD8maVXs=;
-        b=oUtOQlSMwzGbqDqoudQ+tWJzmcJ/y8G/9f8IWW4VN9gpCahf1mpJ7GqV/SivX6pFof
-         S58NB/yJOlLYyW+mxyecMtZlU4EgHub68gn8xuRFjwWnKcHRI2SuUlIY2WQDaNYGUx5G
-         FivxJRqrAJJ0+os74/etHo3zWkeLOhps3qClO7arOZzUCTRXGBhWAbRxJFeyOx+yePdk
-         LpH+4tQttp6NElKZFm1SXfmXyCE2g0ttvAv7acmhYVguj1F4kC/aqsrZICH6DLcZnoQO
-         LIkXojx91t45O4eA+FHI/WW8bMqiCbo/ovki2xtsJR2yoeAbY7NcBEgcICTz3PdvC93e
-         geqA==
-X-Forwarded-Encrypted: i=1; AJvYcCUqk0gdmKxLZf7e4dKFctkHllkxVIhaeFxQ/wNCu628z6wi121RIi0AjjGZrqOonJWP0DR+nS9G0ltRtkDeoYa1NNFYbO/y
-X-Gm-Message-State: AOJu0YwYCrN7dhvqbS8ME1eaxsRXkPRrQ+MLAbas0dOVPZbb9puOWQY0
-	2js6JQeHO7Dy0WEklyPwpIbo6tfGKDfdSW8Fmu8RnChEM0fxLur+OcbejuHmdLA=
-X-Google-Smtp-Source: AGHT+IETNjFLF3X+Ku5v+Xs/f3tk1jQTaxypjSebgt5O2xuGJvzOB8jqRXYV5pbnShahTZbeDUMiWA==
-X-Received: by 2002:a05:6602:4a86:b0:7da:1885:50b5 with SMTP id ej6-20020a0566024a8600b007da188550b5mr378319iob.9.1713473263316;
-        Thu, 18 Apr 2024 13:47:43 -0700 (PDT)
+        bh=NOsLWHf1aG7QjlwAYhzu9K+FfSOj8nw2eYMqyFikvmc=;
+        b=JTrSwcDPMEU2Xgiu5yz1YGVJw1Xog23DWC2G1oQihfvgMHS2776Bzg5696NGDZp6yx
+         cvpuwhq9QEvYQ29mcD6fBPVFNJ2YARwHWWt5hRQzUHJg1XrBo0Ddiv7dNGDfEyYplwsY
+         1jQG4ADrL7OqaJXmI0XpAlMEfN1LSHjXN9Rg7CY9P3dUxbjBr1kQoS97wrzec0dyvQKz
+         X26boAbZYtZH1IZ+Rm7DLDQDe9eisYoQxNaOgFKw9OBmaQC1LspTKXUQ0hXA61P1hPHn
+         7uk8mQaNRv1lZ7EEIRsEqd3R6AFr11y6KjxM7XxkzXJ/NADzGFVSmFvcDomeZ28WgNCu
+         BfcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXWTDoo5Alwb5CS/g+MEgtq9ctnpuf9U4DVX10MimhuliBzcfTysr2uz1q3XC7Y2En71tekFPvJQUQ2+O+5+rJKXTzXdb2l
+X-Gm-Message-State: AOJu0YwMobaJdi5dQ3Ygu508NyhduDKs/eirZbtJmCB/3ajf9n5iQ564
+	udcdUBA9MQGpRYlUt+F1+OLTvh8Fo4ABNJNNITQX9NP9BKasw1kolDszqFc2g4I=
+X-Google-Smtp-Source: AGHT+IHgblJ9h1CLqLo4U6C2hS5Ih8NHrIzQTKnvXZ8o0ZznahnKl3ojygI4TwopwZYSah+zGVzmBw==
+X-Received: by 2002:a05:6870:d886:b0:22e:e1e5:b8d with SMTP id oe6-20020a056870d88600b0022ee1e50b8dmr240440oac.51.1713473264566;
+        Thu, 18 Apr 2024 13:47:44 -0700 (PDT)
 Received: from localhost.localdomain (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
-        by smtp.gmail.com with ESMTPSA id r6-20020a056638300600b00484948cb8f5sm626998jak.91.2024.04.18.13.47.42
+        by smtp.gmail.com with ESMTPSA id r6-20020a056638300600b00484948cb8f5sm626998jak.91.2024.04.18.13.47.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 13:47:42 -0700 (PDT)
+        Thu, 18 Apr 2024 13:47:44 -0700 (PDT)
 From: Alex Elder <elder@linaro.org>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -82,9 +82,9 @@ Cc: mka@chromium.org,
 	netdev@vger.kernel.org,
 	linux-arm-msm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 6/8] net: ipa: fix two bogus argument names
-Date: Thu, 18 Apr 2024 15:47:27 -0500
-Message-Id: <20240418204729.1952353-7-elder@linaro.org>
+Subject: [PATCH net-next 7/8] net: ipa: fix two minor ipa_cmd problems
+Date: Thu, 18 Apr 2024 15:47:28 -0500
+Message-Id: <20240418204729.1952353-8-elder@linaro.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240418204729.1952353-1-elder@linaro.org>
 References: <20240418204729.1952353-1-elder@linaro.org>
@@ -96,39 +96,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In "ipa_endpoint.h", two function declarations have bogus argument
-names.  Fix these.
+In "ipa_cmd.h", ipa_cmd_data_valid() is declared, but that function
+does not exist.  So delete that declaration.
+
+Also, for some reason ipa_cmd_init() never gets called.  It isn't
+really critical--it just validates that some memory offsets and a
+size can be represented in some register fields, and they won't fail
+with current data.  Regardless, call the function in ipa_probe().
 
 Signed-off-by: Alex Elder <elder@linaro.org>
 ---
- drivers/net/ipa/ipa_endpoint.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/net/ipa/ipa_cmd.h  | 8 --------
+ drivers/net/ipa/ipa_main.c | 4 ++++
+ 2 files changed, 4 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ipa/ipa_endpoint.h b/drivers/net/ipa/ipa_endpoint.h
-index 3ad2e802040aa..b431e4e462114 100644
---- a/drivers/net/ipa/ipa_endpoint.h
-+++ b/drivers/net/ipa/ipa_endpoint.h
-@@ -1,7 +1,7 @@
- /* SPDX-License-Identifier: GPL-2.0 */
+diff --git a/drivers/net/ipa/ipa_cmd.h b/drivers/net/ipa/ipa_cmd.h
+index e2cf1c2b0ef24..100a4e1133b5e 100644
+--- a/drivers/net/ipa/ipa_cmd.h
++++ b/drivers/net/ipa/ipa_cmd.h
+@@ -57,14 +57,6 @@ enum ipa_cmd_opcode {
+ bool ipa_cmd_table_init_valid(struct ipa *ipa, const struct ipa_mem *mem,
+ 			      bool route);
  
- /* Copyright (c) 2012-2018, The Linux Foundation. All rights reserved.
-- * Copyright (C) 2019-2023 Linaro Ltd.
-+ * Copyright (C) 2019-2024 Linaro Ltd.
-  */
- #ifndef _IPA_ENDPOINT_H_
- #define _IPA_ENDPOINT_H_
-@@ -199,9 +199,9 @@ int ipa_endpoint_init(struct ipa *ipa, u32 count,
- 		      const struct ipa_gsi_endpoint_data *data);
- void ipa_endpoint_exit(struct ipa *ipa);
+-/**
+- * ipa_cmd_data_valid() - Validate command-realted configuration is valid
+- * @ipa:	- IPA pointer
+- *
+- * Return:	true if assumptions required for command are valid
+- */
+-bool ipa_cmd_data_valid(struct ipa *ipa);
+-
+ /**
+  * ipa_cmd_pool_init() - initialize command channel pools
+  * @channel:	AP->IPA command TX GSI channel pointer
+diff --git a/drivers/net/ipa/ipa_main.c b/drivers/net/ipa/ipa_main.c
+index 59e7abb4a0d19..04dc0540ff7fb 100644
+--- a/drivers/net/ipa/ipa_main.c
++++ b/drivers/net/ipa/ipa_main.c
+@@ -866,6 +866,10 @@ static int ipa_probe(struct platform_device *pdev)
+ 	if (ret)
+ 		goto err_reg_exit;
  
--void ipa_endpoint_trans_complete(struct ipa_endpoint *ipa,
-+void ipa_endpoint_trans_complete(struct ipa_endpoint *endpoint,
- 				 struct gsi_trans *trans);
--void ipa_endpoint_trans_release(struct ipa_endpoint *ipa,
-+void ipa_endpoint_trans_release(struct ipa_endpoint *endpoint,
- 				struct gsi_trans *trans);
- 
- #endif /* _IPA_ENDPOINT_H_ */
++	ret = ipa_cmd_init(ipa);
++	if (ret)
++		goto err_mem_exit;
++
+ 	ret = gsi_init(&ipa->gsi, pdev, ipa->version, data->endpoint_count,
+ 		       data->endpoint_data);
+ 	if (ret)
 -- 
 2.40.1
 
