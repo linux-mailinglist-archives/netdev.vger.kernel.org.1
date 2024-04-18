@@ -1,184 +1,120 @@
-Return-Path: <netdev+bounces-88920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-88921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 670868A903A
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 03:00:00 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 581BB8A9044
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 03:07:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E731C1F21DBB
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 00:59:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11F5A281E2F
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 01:07:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C63611B;
-	Thu, 18 Apr 2024 00:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D41D563BF;
+	Thu, 18 Apr 2024 01:07:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CBDqNvPH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F9+yefgp"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C7053AC
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 00:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD1D5244
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 01:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713401997; cv=none; b=Hp8fi3sAxlSje9I77gxP9MCV9UwkOaXdU8Vlhr4sjcGduxyBSEtKDYcV9MA3S6Cx8Kxqn9cWuJT2wHzJO85lJDZV/M/5jqOqUdQEKlPE7PIqmQo49IXoXp+i3VLocQYxccWfYM7i/C+ZdaBbAEC/FJ/FRhF1HKGSt2QVQsJ4Azo=
+	t=1713402448; cv=none; b=YU85AeS//ay7MN+TyITvr/0ltiZkV8IAcCal510IAVy5Dc8vBhDPVHCBDbZyseiiTbdAiO8c7XA7B5pCwFgSrZMz1+WgcjA/kpuUsCJnfC1drMCOvq1MAD/ZXeOV3WfAtGUFohw4LsIws11UXaF2Vod/orU8Sl23lsLajc9ty50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713401997; c=relaxed/simple;
-	bh=0PLswlzdRZac7fSfdw04a3qPdOrmUrMFKAUR9gvwR3Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aqPKU4KFmiArKCthhaRIF0MPuv63T8MfB2XOSbheVDCBv9V1PJLx2KgKAH8DT41oMKMvqMt0no4Iip1pTntSE8gYfuQ5eZ9t/6/yE/41If0UmSYDJbrACMoSwUzVfCYNRAjfN6t8JnCmnZ5RY31NhNIqtKLOKeLzxk6tPvF5iQk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CBDqNvPH; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713401994;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gRp0Lio2AX9EGb63nd6AbRw/SjgJeY4MzMTWj8Re0mo=;
-	b=CBDqNvPHQKdXXMKz3dHVgyfTXj6bl+FYe6bCaBEZHQiCAoftmW1vKHVaB+vpQxklBDYf2T
-	W2bgzRXBC37tEd2nTHoKIUwGCGabxg3bD9FcyAN8LC5U9ZvcOrNQBZ7nCu5SUchhQCGLsd
-	pMY8qvxHEF+BFDkSAVghPsM11SkoCwo=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-680-YTM4-QXGMtWZM7FiQZU5_A-1; Wed, 17 Apr 2024 20:59:53 -0400
-X-MC-Unique: YTM4-QXGMtWZM7FiQZU5_A-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2a4a2cace80so398347a91.3
-        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 17:59:53 -0700 (PDT)
+	s=arc-20240116; t=1713402448; c=relaxed/simple;
+	bh=ugT74PoHd8kn03j1TJX7vb14OkXu1n5AwTPK5v5aCCg=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=hc+1JC25SQI+vxHKuM/zUmsAoROhv4N0nABOD4kHT6wKrSBfD5aBuJZVQZxkNnkZ0UJnKH7KwT6ggaL7ABbgfKjDOZJFYx9ZTuaCtMVKhbuD5sA7N6Kso9tK0cXamfdeJfZhIMW0ohMkxt55wYYBNvfBye6XAc9RZlv151X/bhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F9+yefgp; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de465caa098so372438276.2
+        for <netdev@vger.kernel.org>; Wed, 17 Apr 2024 18:07:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713402446; x=1714007246; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MdSRxrDWVrTdyXc/SZ7hHOG18QRAIlMKQeP4juS8/a4=;
+        b=F9+yefgp1nl7+IS9tccDVRKISTF7ti0wHBoZYtO5xeMClW5IeoRjUIg5mnKy2wExkQ
+         7IbHtLW1LvUwFLNr702k+80yPJoTL2wvcjGc7w4aoQB0uCLCQBMcvDobMNegIIn+wLW7
+         i+0VrBR9if43i1lQt3ByjE35ojYTmwQkt7LxhHklhh2euRfj0DewgA7/nkzpUxMQWTJf
+         0kQ7G2bMk2CsqcxHhr4dJ+GcEogX1fjeIuTcLD92z5ymnSotq2S97GjY3bZhTDc+8IEN
+         KtBvH3Yzl91CCV3Bh3lh46x90600Bp3cjixEu6y9opcMcmgW3TuIuEElSYbCFdSLRLb9
+         Ye/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713401992; x=1714006792;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gRp0Lio2AX9EGb63nd6AbRw/SjgJeY4MzMTWj8Re0mo=;
-        b=nsdPBL+oABJnsA1WQbCgT3n5Sm4lnZxh/mT81e4RP/e4HI+Pmtfs1W08eavxpNhx1c
-         01lg+8G98VT/rfgCLN76HO6D1XHz0q0RaNxfFYGmrezuBJBeiEs+XUbWfNLloi9tjfP+
-         ZKzsdHSZAIu3rgWDGOlVOYJFfvz8r7JSKSuPor9hEOJznoNkJTUVcUdXL8wqz4NyG0pb
-         b0buW1INHUhywYaCMnjpqedqrohhoYvs4T50p9fA7DNmOBRLXKrqnwgxu2C7CaLJUj9C
-         ZUoY5+tuYrVn1rfz6vf+OFi8DtdzCdrvp9wd2bR155iNxgLcO+UYa2JEa+0xaz/m6eeW
-         r18g==
-X-Gm-Message-State: AOJu0YyiEnnmuy94/32/cTIA8tKABcX9GHpGLAw8qrY7wVaA2VLD//DR
-	YbUearaoUekGSAMNzVGVAGiMzeKX9hLledmTQo307iraBhlrgpaEb+n93ehwDthFNqicE5Mz2uJ
-	tPEx2E9MJZHksai5uBny3E9JuIn5Xrjr6cgyKFy9Rajlo175iW1mlknQxVJdQel9ZCwI7FmK7YF
-	BAFqmaVRaFJkUxVxHkOd8SMBzh+Ycq
-X-Received: by 2002:a17:90a:fd0e:b0:2a4:9183:c8fd with SMTP id cv14-20020a17090afd0e00b002a49183c8fdmr1163528pjb.18.1713401992582;
-        Wed, 17 Apr 2024 17:59:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGRSEZTbSzFpG8KTOdNp1Y148is/WdwL9i3H7sSnLKQSp+rT15RLf+aKIMtklQmrOvy1WUR7L1GIi3UypknUms=
-X-Received: by 2002:a17:90a:fd0e:b0:2a4:9183:c8fd with SMTP id
- cv14-20020a17090afd0e00b002a49183c8fdmr1163505pjb.18.1713401992242; Wed, 17
- Apr 2024 17:59:52 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713402446; x=1714007246;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MdSRxrDWVrTdyXc/SZ7hHOG18QRAIlMKQeP4juS8/a4=;
+        b=MmH/Gbgt/HyZuItwdlgLhIA6hbvKBqly+uZZ9eANnQIsfVQHYHuyldRayi1BmyyQTZ
+         qpaUke3Rr0p4jnw/bNE5qwQN2diTMRRMtYYOXo1MOHBiAa8gVwZMziQnIpym6flbeD3f
+         rVaNgQNEpWs5zjSDdrhErzF4MgC8LT7VBnaXEJFZkyE1HFvukZUAb7w7JgWQri/fmlUI
+         1ERhSyGVGEFVpK8ryUkeWw1Jm1Xzkm/MGq/XGBtFsoysoK4sIAB2U1sNZwsjstv/XlSl
+         8u03p+NlQjJQrgoHYawd+vMTD6X7OTdwzuKAq4vCvMikTdv4/lAny23uEQa9HuulBeX3
+         07hA==
+X-Forwarded-Encrypted: i=1; AJvYcCURYeAGSfSIT1tDbjVTpWZIjIX66WnMRzekwmvAsVDvXZMeRVgr45mmdjOShcnoJygr5LEGSH02hkfgkUfgV6VmXGqgOnzy
+X-Gm-Message-State: AOJu0Yy37mMMUSZ5gKTFC7JS4H4eQsJZ5C7DAeywowjSwopD0wIPwlw9
+	YefE51fb04eu2BVvRhm0rx9PzH/M3qlINGmOIMzMJ63Eg289JXwOwE7GSw8M6GGK3cFxe4YjvIO
+	N5w==
+X-Google-Smtp-Source: AGHT+IG38wIupQEk9EdfJseXhTp62aHkse9umTarR8j0kkObuskwYS0w1aDzglzbg09ZRXU2Ys2DSXgm74o=
+X-Received: from edliaw.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:305d])
+ (user=edliaw job=sendgmr) by 2002:a05:6902:18cc:b0:dc6:b982:cfa2 with SMTP id
+ ck12-20020a05690218cc00b00dc6b982cfa2mr116831ybb.8.1713402446546; Wed, 17 Apr
+ 2024 18:07:26 -0700 (PDT)
+Date: Thu, 18 Apr 2024 01:07:09 +0000
+In-Reply-To: <16430256912363@kroah.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240415162530.3594670-1-jiri@resnulli.us> <20240415162530.3594670-2-jiri@resnulli.us>
- <CACGkMEtpSPFSpikcrsZZBtXOgpAukjCwFRcF79xfzDG-s8_SyQ@mail.gmail.com>
- <Zh5G0sh62hZtOM0J@nanopsycho> <CACGkMEvRMGvx0jTqFK2WH1iuPMUZJ0LfW1jDLgt-iQd2+AT=+g@mail.gmail.com>
- <Zh94zX-oQs96tuKk@nanopsycho>
-In-Reply-To: <Zh94zX-oQs96tuKk@nanopsycho>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 18 Apr 2024 08:59:41 +0800
-Message-ID: <CACGkMEtqJL1+D9byRLSFdFmo0aqoWAeHqmqyq+KEzoC8xhnEFA@mail.gmail.com>
-Subject: Re: [patch net-next v2 1/6] virtio: add debugfs infrastructure to
- allow to debug virtio features
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, edumazet@google.com, parav@nvidia.com, mst@redhat.com, 
-	xuanzhuo@linux.alibaba.com, shuah@kernel.org, petrm@nvidia.com, 
-	liuhangbin@gmail.com, vladimir.oltean@nxp.com, bpoirier@nvidia.com, 
-	idosch@nvidia.com, virtualization@lists.linux.dev
+Mime-Version: 1.0
+References: <16430256912363@kroah.com>
+X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
+Message-ID: <20240418010723.3069001-1-edliaw@google.com>
+Subject: [PATCH 5.15.y v2 0/5] Backport bounds checks for bpf
+From: Edward Liaw <edliaw@google.com>
+To: stable@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Hao Luo <haoluo@google.com>
+Cc: bpf@vger.kernel.org, kernel-team@android.com, 
+	Edward Liaw <edliaw@google.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Apr 17, 2024 at 3:23=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Wed, Apr 17, 2024 at 06:37:30AM CEST, jasowang@redhat.com wrote:
-> >On Tue, Apr 16, 2024 at 5:37=E2=80=AFPM Jiri Pirko <jiri@resnulli.us> wr=
-ote:
-> >>
-> >> Tue, Apr 16, 2024 at 05:52:41AM CEST, jasowang@redhat.com wrote:
-> >> >On Tue, Apr 16, 2024 at 12:25=E2=80=AFAM Jiri Pirko <jiri@resnulli.us=
-> wrote:
-> >> >>
-> >> >> From: Jiri Pirko <jiri@nvidia.com>
-> >> >>
-> >> >> Currently there is no way for user to set what features the driver
-> >> >> should obey or not, it is hard wired in the code.
-> >> >>
-> >> >> In order to be able to debug the device behavior in case some featu=
-re is
-> >> >> disabled, introduce a debugfs infrastructure with couple of files
-> >> >> allowing user to see what features the device advertises and
-> >> >> to set filter for features used by driver.
-> >> >>
-> >> >> Example:
-> >> >> $cat /sys/bus/virtio/devices/virtio0/features
-> >> >> 1110010111111111111101010000110010000000100000000000000000000000
-> >> >> $ echo "5" >/sys/kernel/debug/virtio/virtio0/filter_feature_add
-> >> >> $ cat /sys/kernel/debug/virtio/virtio0/filter_features
-> >> >> 5
-> >> >> $ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/unbind
-> >> >> $ echo "virtio0" > /sys/bus/virtio/drivers/virtio_net/bind
-> >> >> $ cat /sys/bus/virtio/devices/virtio0/features
-> >> >> 1110000111111111111101010000110010000000100000000000000000000000
-> >> >>
-> >> >> Note that sysfs "features" know already exists, this patch does not
-> >> >> touch it.
-> >> >>
-> >> >> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
-> >> >> ---
-> >> >
-> >> >Note that this can be done already with vp_vdpa feature provisioning:
-> >> >
-> >> >commit c1ca352d371f724f7fb40f016abdb563aa85fe55
-> >> >Author: Jason Wang <jasowang@redhat.com>
-> >> >Date:   Tue Sep 27 15:48:10 2022 +0800
-> >> >
-> >> >    vp_vdpa: support feature provisioning
-> >> >
-> >> >For example:
-> >> >
-> >> >vdpa dev add name dev1 mgmtdev pci/0000:02:00.0 device_features 0x300=
-020000
-> >>
-> >> Sure. My intension was to make the testing possible on any virtio
-> >> device.
-> >
-> >It did that actually, vp_vdpa bridge virtio-pci device into vDPA bus
-> >with mediation layer (like feature filtering etc). So it can only run
-> >on top of standard virtio-pci device.
-> >
-> >> Narrowing the testing for vpda would be limitting.
-> >
-> >Unless you want to use other transport like virtio-mmio.
->
-> Also, the goal is to test virtio_net emulated devices.
-> There are couple
-> of implementation. Non-vdpa.
+These backports fix CVE-2021-4204, CVE-2022-23222 for 5.15.y.
 
-So what I want to say is, vp_vdpa works for all types of virtio-pci
-devices no matter if it is emulated or hardware.
+This includes a conflict resolution with 45ce4b4f9009 ("bpf: Fix crash
+due to out of bounds access into reg2btf_ids.") which was cherry-picked
+previously.
+Link: https://lore.kernel.org/all/20220428235751.103203-11-haoluo@google.com/
 
-Thanks
+They were tested on 5.15.94 to pass LTP test bpf_prog06 with no
+regressions from the bpf selftests.
 
->
->
-> >
-> >Thanks
-> >
-> >>
-> >>
-> >> >
-> >> >Thanks
-> >> >
-> >>
-> >
->
+v2:
+Made a mistake of not including the out of bounds reg2btf_ids fix
+
+Daniel Borkmann (4):
+  bpf: Generalize check_ctx_reg for reuse with other types
+  bpf: Generally fix helper register offset check
+  bpf: Fix out of bounds access for ringbuf helpers
+  bpf: Fix ringbuf memory type confusion when passing to helpers
+
+Kumar Kartikeya Dwivedi (1):
+  bpf: Extend kfunc with PTR_TO_CTX, PTR_TO_MEM argument support
+
+ include/linux/bpf.h          |  9 +++-
+ include/linux/bpf_verifier.h |  4 +-
+ kernel/bpf/btf.c             | 93 ++++++++++++++++++++++++++++--------
+ kernel/bpf/verifier.c        | 66 +++++++++++++++++--------
+ 4 files changed, 129 insertions(+), 43 deletions(-)
+
+--
+2.44.0.769.g3c40516874-goog
 
 
