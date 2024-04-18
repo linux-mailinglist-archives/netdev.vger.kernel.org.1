@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-89300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 348938A9FA2
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 18:09:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A2618A9FA4
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 18:09:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC4E1283171
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 16:09:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3EF861F22822
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 16:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC4F16F8EF;
-	Thu, 18 Apr 2024 16:08:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF67716F919;
+	Thu, 18 Apr 2024 16:08:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NF8R86L0"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="BBJVsYH0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE4416F8EB
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 16:08:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2801016C68F
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 16:08:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713456530; cv=none; b=IBbzt6tM7tmPWIrVnrlms0o/L2XNL8jbKBck/cL8acFOK0mYkAOpPeTz1lTbOlFcqhK7YXPW6a1Qvp3CqrD2QBC7ka7+opT2+XhcZ7Bpm3eQQhabkgcKfIT6J06p1FelO7XUPDBPsCqw2lB7im1bwkbKw/zhxUJHnc5nJzjFVX4=
+	t=1713456534; cv=none; b=RwKde1tAzd/kxaWeyMYxqf2TjzMSQqr8RaV7CgMCxOlzPjcm9E7uAHBMMrO6FRmEvGfOYHa0tUuLAHsXtNn8mc71xnLRnzpFJyxyZb7Cg6YX5wccOfLrcaBbPHxz6XzUiK4+tv/rRScB8bT0aC1FAGekszkQM9AZ7vnZOOZydho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713456530; c=relaxed/simple;
-	bh=ODc2bT3Tgy1hAl/eXH6/NifpgPwvNvOsQzDYDnBF6ng=;
+	s=arc-20240116; t=1713456534; c=relaxed/simple;
+	bh=2jQPPr9mkTqJV56LvL7E1XGifU9BFqf1rQjL05mNI0o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OnAFguqbJrgcYejmK61dCL0wFzHAHCwNEjT1Oglib4xIFSI+rtt/93e/hpuShoqS8vDoJJKTzt1GNa2+SPtv6wLBhnu76FQRFX95TVrzy2gjhsUAIYTsGiPQc5R+QxbbCig3+Zq3HDrMtaISmFGx9jaag9p9fv1eSNHB2F/9dpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=NF8R86L0; arc=none smtp.client-ip=209.85.218.50
+	 MIME-Version; b=NvtLk0DbjqmdExobHneYQ3NlW1RonUchyC1ypElHm5moR5UGmGqwXcJQlySxkoZf6VApoioYvcwpEYZLrJmrdOYE7euIXqzxeekoa7jb82zINUhIljEQjziK+LnZmdfFBbb9RIqDGkQhBPKvKrBfjBAdVlnXF6FKwQ8oTiOY2e8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=BBJVsYH0; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a51ddc783e3so119595566b.0
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 09:08:48 -0700 (PDT)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a524ecaf215so120214166b.2
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 09:08:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713456527; x=1714061327; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713456531; x=1714061331; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=w3kdsnr+4DRfl3oY8QVhe9j08BHEG8XpCARPL+ULDq0=;
-        b=NF8R86L0gtkp3UMqNP/NaT5Q99GVCXsnmdZMjEKsdPEHDGD8T6rqm9tvX2i7caZoOv
-         eP5qjJRRhJ0vqQomjLixBUChg1rVvJnlFuP2JjFNidgaMDALVF5TN3ZRccsgovMF31YH
-         N4CjLaahm31r9szlkynIyNKYL4jpBp1q9/vVyQ/SMFQ8NlWffY3HmKq/sclhvT6wd/Ec
-         os4ciolrRtO3GkenaqNnGIuQwGViZ18L5cSlcjf5ZAEJbsEigrMmNmmIcG0BZtgQ3nT+
-         dD1ME/1LO1B4gd6BCdSymG9wmSnFWvmU3N4T//FlFaWVg+v+Dm1Og2xLvrj7OzgwvADy
-         Lx1w==
+        bh=nSQx0/+CrkjLLqkpLado9VHrrZwCAyIq3CNsBoHFJwI=;
+        b=BBJVsYH0zHjHjiLegWSlQuQg53xJk+uX+UhQ8WzRm4Q6keBl1e1fjc/bC1VjuXZqS+
+         oZmNZUBUuAMA77hGqix3kanC/QPWLe37LxRhceeHaf2baemQ70U5UHZVIUiO+1wjVFoC
+         sPcA7HPtDdTB3PGiJMhuXQYmDuQ93SoNh2Q9hDcIvLqCapWX7VEbkqrfx4l6P1Wc/pLp
+         zWs6UTH3xU36xrwUUvmFxQoDNCdtFIdctnIDXxTILovZitnj8Y3z7yXX3z7Ax1jkKFvV
+         jIhre8qZJGZnwUHV2M0YIqB7Um3eDguIamURYKCZ6tCLBnUoRNEySkY5JZdGisXOG58z
+         df7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713456527; x=1714061327;
+        d=1e100.net; s=20230601; t=1713456531; x=1714061331;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=w3kdsnr+4DRfl3oY8QVhe9j08BHEG8XpCARPL+ULDq0=;
-        b=HpDp85lwNjb4SMC551jlCoP12fSh3gYxgxMh6KiQf8je+HaPCj0QDn/k1wMrwbrLIH
-         tgsUeaEz4KOmDdKf0GSLsYu67dNyhnFPGLFVfrRLlZ+TkIgzA1P7UXL/b7+/+h6My2EV
-         nGvEkiyeHSNT6Uhu5f3W2KjtwFYRiUHvsx/M1sSt4oPA0l0U+OUPUp+cfa6uIOUQ/Fz0
-         CdMQCqHzd8IQCCOv6qaZ8OC9uBGf+12ns4GojdDPiHHF19qnQBKYDE9x0FQirECVuRfG
-         1T//Gzx1uuriCTUGCtAByq3zSB6zzs48hIg/1JRj9mDfLJnkot9QzCJV6UmO4xypJfN0
-         JzfA==
-X-Gm-Message-State: AOJu0Yy0WBkJAgSiuYYib0RPuUI1GY274tFg20WSFV+ukHBJuBP0oUay
-	L/KiFmrtQTRllpFpYJHSE1B3LVzkt7MisuI/tik/OMWdaqag8bXzcrBmxXWeQy0qn/udtAG0ufh
-	DKtA=
-X-Google-Smtp-Source: AGHT+IECj0h1cFA9hl40JSPqLgCZoPju1GzoIrhuIDwBt2vpPWd0Qkgb6sqDhRdsWNEcVAVC2+4bzQ==
-X-Received: by 2002:a17:906:470c:b0:a52:5a74:13f4 with SMTP id y12-20020a170906470c00b00a525a7413f4mr2185075ejq.12.1713456527053;
-        Thu, 18 Apr 2024 09:08:47 -0700 (PDT)
+        bh=nSQx0/+CrkjLLqkpLado9VHrrZwCAyIq3CNsBoHFJwI=;
+        b=Vh6t18//twWDj/uHEg7sFPtoUEcodZwK53kVj3YtK6+8Q+YsWA6EeDZoK7plTBAl0C
+         iPVmO4VvCz8jj/vKHQ1VRngwZ1kROBvbdhyjDP2MjXyAdd5xSH5n//6bhnsYy1fDbKVf
+         4MX0qVKrRHtogRcFbnJYLn3+d+GbJuDRzlwR0newTxNEjYz1EY8fsALBAtYrJRs1gL5H
+         EeYl3IuucWYkaDDeWYR1w1zuz75ad7EC1uhEwNvtkPjvSLSA/xiw4iEIxo1O+gggGxQS
+         ASyL11fSSl2feU/GPDTy6sl6txDJNCym1/LtRO28XtYMr+wvEpIjE8/5/1yQpM1p4FHn
+         +/RQ==
+X-Gm-Message-State: AOJu0YxNgsPlFH+vrO54LHkvGvTf8CTlDB96IfCqy5PLznMfDsQ4SF+b
+	yV3e7Voyhvyx4eG6/xVvevxLAsST2PTx6fe76gKyg+0GtbDiHD0twJwQLH1XNRgVAB9Zb3o2iyk
+	CntA=
+X-Google-Smtp-Source: AGHT+IHiaBm2LKsHV2qQHTiD3aikXdD7pxY2WNALoqBcP1UifeUoqdQS7+b2n5gVV7we9OrzlrQ6pA==
+X-Received: by 2002:a17:907:9724:b0:a55:766f:ce59 with SMTP id jg36-20020a170907972400b00a55766fce59mr1826260ejc.75.1713456531339;
+        Thu, 18 Apr 2024 09:08:51 -0700 (PDT)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id t21-20020a17090616d500b00a51a5c8ea6fsm1081695ejd.193.2024.04.18.09.08.45
+        by smtp.gmail.com with ESMTPSA id k9-20020a17090666c900b00a52274ee0a7sm1079280ejp.171.2024.04.18.09.08.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 09:08:46 -0700 (PDT)
+        Thu, 18 Apr 2024 09:08:50 -0700 (PDT)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -84,9 +84,9 @@ Cc: kuba@kernel.org,
 	bpoirier@nvidia.com,
 	idosch@nvidia.com,
 	virtualization@lists.linux.dev
-Subject: [patch net-next v4 3/6] selftests: forwarding: add ability to assemble NETIFS array by driver name
-Date: Thu, 18 Apr 2024 18:08:27 +0200
-Message-ID: <20240418160830.3751846-4-jiri@resnulli.us>
+Subject: [patch net-next v4 4/6] selftests: forwarding: add check_driver() helper
+Date: Thu, 18 Apr 2024 18:08:28 +0200
+Message-ID: <20240418160830.3751846-5-jiri@resnulli.us>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240418160830.3751846-1-jiri@resnulli.us>
 References: <20240418160830.3751846-1-jiri@resnulli.us>
@@ -100,78 +100,38 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-Allow driver tests to work without specifying the netdevice names.
-Introduce a possibility to search for available netdevices according to
-set driver name. Allow test to specify the name by setting
-NETIF_FIND_DRIVER variable.
-
-Note that user overrides this either by passing netdevice names on the
-command line or by declaring NETIFS array in custom forwarding.config
-configuration file.
+Add a helper to be used to check if the netdevice is backed by specified
+driver.
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+Reviewed-by: Petr Machata <petrm@nvidia.com>
 ---
-v3->v4:
-- rebased on top of changes in patch #2
-- reworded NETIF_FIND_DRIVER comment to explicitly refer to "importer"
-- simplified driver_name_get() avoiding else branch
-- s/find_netif/netif_find_driver/
-v1->v2:
-- removed unnecessary "-p" and "-e" options
-- removed unnecessary "! -z" from the check
-- moved NETIF_FIND_DRIVER declaration from the config options
----
- tools/testing/selftests/net/forwarding/lib.sh | 37 +++++++++++++++++++
- 1 file changed, 37 insertions(+)
+ tools/testing/selftests/net/forwarding/lib.sh | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
 diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-index b63a5866ce97..d49b97edb886 100644
+index d49b97edb886..17f8b6b9ab9f 100644
 --- a/tools/testing/selftests/net/forwarding/lib.sh
 +++ b/tools/testing/selftests/net/forwarding/lib.sh
-@@ -89,6 +89,43 @@ if [[ "$(id -u)" -ne 0 ]]; then
- 	exit $ksft_skip
- fi
+@@ -283,6 +283,18 @@ check_port_mab_support()
+ 	fi
+ }
  
-+##############################################################################
-+# Find netifs by test-specified driver name
-+
-+driver_name_get()
++check_driver()
 +{
 +	local dev=$1; shift
-+	local driver_path="/sys/class/net/$dev/device/driver"
++	local expected=$1; shift
++	local driver_name=`driver_name_get $dev`
 +
-+	if [[ -L $driver_path ]]; then
-+		basename `realpath $driver_path`
++	if [[ $driver_name != $expected ]]; then
++		echo "SKIP: expected driver $expected for $dev, got $driver_name instead"
++		exit $ksft_skip
 +	fi
 +}
 +
-+netif_find_driver()
-+{
-+	local ifnames=`ip -j link show | jq -r ".[].ifname"`
-+	local count=0
-+
-+	for ifname in $ifnames
-+	do
-+		local driver_name=`driver_name_get $ifname`
-+		if [[ ! -z $driver_name && $driver_name == $NETIF_FIND_DRIVER ]]; then
-+			count=$((count + 1))
-+			NETIFS[p$count]="$ifname"
-+		fi
-+	done
-+}
-+
-+# Whether to find netdevice according to the driver speficied by the importer
-+: "${NETIF_FIND_DRIVER:=}"
-+
-+if [[ $NETIF_FIND_DRIVER ]]; then
-+	unset NETIFS
-+	declare -A NETIFS
-+	netif_find_driver
-+fi
-+
- net_forwarding_dir=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
- 
- if [[ -f $net_forwarding_dir/forwarding.config ]]; then
+ if [[ "$CHECK_TC" = "yes" ]]; then
+ 	check_tc_version
+ fi
 -- 
 2.44.0
 
