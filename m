@@ -1,69 +1,71 @@
-Return-Path: <netdev+bounces-89032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 411488A9427
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:36:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 036238A9428
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:36:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2F29B2141A
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 07:36:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A0DE1C20843
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 07:36:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 222F326AF0;
-	Thu, 18 Apr 2024 07:36:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E36EA6CDA9;
+	Thu, 18 Apr 2024 07:36:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hd3VFQl1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H2SAwwXy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB32954BED
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 07:36:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AC7556462
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 07:36:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713425772; cv=none; b=t2eWWlNnuQLsTvP+y07kLLD4mk4HzL5mCHSFlKuHlUgz6+GGW5YFqKUerZ4v1DqQ8mjqqFCJrCfFPde+d/uIszUeP04sEbFWi3c7uhAJDZCY0C1dGqsQ+ouw3VR+BHePZVkDR6iqZc0dCN7VewU6h7qAtGMj6wXc8xkZYWiJkFo=
+	t=1713425773; cv=none; b=XH2QuZJjzqcoqMBEqYFD8ZNC76UtZuhfhNq9ISeir7PCTlbpSsSxn01Xz9fvuluRI6/oPG/dQiTKFUkiCWSohzVi82InslI0H2Pbbta5HTmYK+qSoZj8vBrGD92zRheWrkLZjUz+U0xjmFjqytsShUFzfeP/gjmgA0h8AjNFtCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713425772; c=relaxed/simple;
-	bh=lZ+R6N67ARQFzq++3LFlB+Z9QWdHpDR9Skv4qPESf40=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WQRCpsmTxp3qrivKUmAZoGBeUuTOx+wYHj5tu36obzlB8Ei8QTruiaOtW5p5ehDbo8IlaLUqxiu1F4p++iyUeMvDULFpCv+vO1h6Vkyk9kvoWVRm2jkgI6gkDupvWDIIKAd+5f+UgBXPxsmkoLFYhN86wpx6Jkq+sTirRHuJzrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hd3VFQl1; arc=none smtp.client-ip=209.85.214.177
+	s=arc-20240116; t=1713425773; c=relaxed/simple;
+	bh=SOjRjeUJDoa9oFT1O0p4M4FPxZCcohSdrD5qjmQkkRM=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=TryfS5EQHNtQk+3HPXwO5IRRp3j+oObKm4rSpaxGW/ECWIjI/PLQlD2/QbF5BLdHImDZB35lxvBAz2a4HviN0a8d8Iiqjse8cJrWP9l5HbwuKGT8nztmnOsg06GvpZuc6qvclxc+GtR6X2GwLy1uhvmLWNJ+jLvgmV1ruztrKFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H2SAwwXy; arc=none smtp.client-ip=209.85.214.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1e51398cc4eso5179235ad.2
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 00:36:09 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1e3c3aa8938so4398365ad.1
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 00:36:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713425769; x=1714030569; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dpy2rEg9ZNWJ5JbT06/E9/NLB753gLdsnym9tdupR90=;
-        b=Hd3VFQl1XKsfGXtVDWjXVIFadNiU/YQlopSkDpjOh2zvdYp55pe0NrOVKr6B7edOu5
-         l4FziKvWiaxZ9I/own5KMqVnKGT5YpPqrxHm9O3p3PKaOBGa+hCUqM2NLIeAeNSczd66
-         gL7F5FaJa688R1FPfypJhNMpf+QPpXpmZeNamrATXHB3LXwxZad05313nZsH2ntuGbT/
-         LHtND+ZGwy/W3Qavc+wLAfQ70dm6nQp/EJ9+/XtpIGMSyv4b+bVyQlqibv9+yRAwUYeV
-         v5Rk80Pq0Q+ysVMEo7EkDiaUYB4JvLb9Ih719eWznWbG1tEHsvJNv/yjtCddJUB5qSOy
-         0PnQ==
+        d=gmail.com; s=20230601; t=1713425772; x=1714030572; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oqMygDrTMWROWwU+4nXqwtf7JivSIp3ISM3CYmYtTDM=;
+        b=H2SAwwXypeesnkAttAMt7Olq5enFFpwdzmktBzB00tvFNOcq9PNGyM4sPQx2sf4bLn
+         k9noKwLQJKNQL30jpUmfrM8GYI9Zcqo0lVyaXs0fUeqCjb+U0Mn5oPyiwICZTQ4wuitz
+         k+QkFOMuJE9m6BwS6WtKAm3sR5f7+idhPpXg3jAU9/5gqQ0O5hGDtY7Y0rmP1Ox0olNq
+         GmCNY/e3W7WHO6woLc3b4nAFxyQKJjp/pB2V67VcvXfaEf46YAP80iZMaElEEN2FRNxU
+         A7qNMN0y7A2i8IfSF6IB1ROfLW4L2aMJbFWKrREx8yhFilhIW6zzlXlZ3P/yjC4zg1m6
+         Aq0w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713425769; x=1714030569;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Dpy2rEg9ZNWJ5JbT06/E9/NLB753gLdsnym9tdupR90=;
-        b=L1yy5RYz82jyo+Dq0wUsZZil7GjzsztnIhmKu+7FKBI3A+4Zf1a8t4AmDEX6JN3hn8
-         A96+ghyPVL1hGSi22+XTtTtzQ1NRI5gtg+4+a5AcjYMjD3/EcfllGcC7X+c3pTTa7Vc9
-         CFT817kARVrY6fT8q8WL2oaaelbDxyH8nPLL9foWMFVFIfHXUy6UO+Sti8MnJPHqh3/z
-         t97Y9HjnX/ImruXHEXpD/Etf2th182t+gmuM9aCVCumD7hjtNRmxy+9+9NQWR8l5vV/5
-         IdtF8anP/GzVRIq/LoBSiSNAJ4t/RrfpYVS+BhtmT2Zs+L5cYMLtfTe8Dpi+5YU3kWGS
-         uucg==
-X-Gm-Message-State: AOJu0YyWYMEm6QVwYhvz43sj/4aKFSoeq8HdyAs1EqvpfBah5dCcGe4X
-	hvhu8wYDVgrarHL6zjhUPH4lpIS0wTPBeWYUkkcFNiEyXNa1GiIs
-X-Google-Smtp-Source: AGHT+IFIAl2PHYE50esvr6yTvMmoj1qbC8mM4VW2rS2LO++l5Uw8MEmvSH5xiVcWlFIrowOJ0z2Fng==
-X-Received: by 2002:a17:902:c106:b0:1e2:90c6:839a with SMTP id 6-20020a170902c10600b001e290c6839amr2095277pli.31.1713425768962;
-        Thu, 18 Apr 2024 00:36:08 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713425772; x=1714030572;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oqMygDrTMWROWwU+4nXqwtf7JivSIp3ISM3CYmYtTDM=;
+        b=gMElbBr5SMFSgq1gd86JYhQyk3mfNDXYEvjxn5TgEw8TYyeWIXHt1W627bUykcLg97
+         QWpQte9r2w3epcGDjykL/EPtRrO1nd1LzXBh+5fAGkWlbLOWG+bmJOMBGnVNW0/mQSa7
+         YG7GpsV2v75BnAFyGVzSR7IvHpaCgVtoM13GRWXjTml8QP+0bK5Sz0fEjRSoq9cae2Tc
+         2l2un7nT9a5A0Z/hD4rPPkSmpNYic4CN3CUUpVy8u1PTMpTdfpHjmlsJgkuiEdO/59h1
+         /6xuOf2Di51iIboAKXE231sP0bIKS2s9sc1T99zAzpMADoVd+qTuijDU+WXJMRTrOBOO
+         Vb6Q==
+X-Gm-Message-State: AOJu0YzN26kSrYM+GLLFR9dvjg9wOe+iezt9JZC/pe9f50IfySDrjGDL
+	EXq+L3QCfW21Wy+VU6dOowBHTPyY0tUkpheLnybrbXGTJx5hq2yD
+X-Google-Smtp-Source: AGHT+IEXKnYVhqazbZhTC7VnTwjNePPdZajzKVglHC3nuavD1CEgxOQ0t3x3ItmPNixcMszAQN4Ufg==
+X-Received: by 2002:a17:902:e843:b0:1e4:b1a2:b40c with SMTP id t3-20020a170902e84300b001e4b1a2b40cmr2599413plg.42.1713425771690;
+        Thu, 18 Apr 2024 00:36:11 -0700 (PDT)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
-        by smtp.gmail.com with ESMTPSA id j9-20020a17090276c900b001e26ba8882fsm841756plt.287.2024.04.18.00.36.06
+        by smtp.gmail.com with ESMTPSA id j9-20020a17090276c900b001e26ba8882fsm841756plt.287.2024.04.18.00.36.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 00:36:08 -0700 (PDT)
+        Thu, 18 Apr 2024 00:36:11 -0700 (PDT)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: edumazet@google.com,
 	kuba@kernel.org,
@@ -73,10 +75,12 @@ To: edumazet@google.com,
 Cc: netdev@vger.kernel.org,
 	kerneljasonxing@gmail.com,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next v3 0/3] locklessly protect left members in struct rps_dev_flow
-Date: Thu, 18 Apr 2024 15:36:00 +0800
-Message-Id: <20240418073603.99336-1-kerneljasonxing@gmail.com>
+Subject: [PATCH net-next v3 1/3] net: rps: protect last_qtail with rps_input_queue_tail_save() helper
+Date: Thu, 18 Apr 2024 15:36:01 +0800
+Message-Id: <20240418073603.99336-2-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20240418073603.99336-1-kerneljasonxing@gmail.com>
+References: <20240418073603.99336-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,34 +91,50 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-Since Eric did a more complicated locklessly change to last_qtail
-member[1] in struct rps_dev_flow, the left members are easier to change
-as the same.
+Removing one unnecessary reader protection and add another writer
+protection to finish the locklessly proctection job.
 
-One thing important I would like to share by qooting Eric:
-"rflow is located in rxqueue->rps_flow_table, it is thus private to current
-thread. Only one cpu can service an RX queue at a time."
-So we only pay attention to the reader in the rps_may_expire_flow() and
-writer in the set_rps_cpu(). They are in the two different contexts.
+Note: the removed READ_ONCE() is not needed because we only have to protect
+the locklessly reader in the different context (rps_may_expire_flow()).
 
-[1]:
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=3b4cf29bdab
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+ net/core/dev.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-v3
-Link: https://lore.kernel.org/all/20240417062721.45652-1-kerneljasonxing@gmail.com/
-1. adjust the protection in a right way (Eric)
-
-v2
-1. fix passing wrong type qtail.
-
-Jason Xing (3):
-  net: rps: protect last_qtail with rps_input_queue_tail_save() helper
-  net: rps: protect filter locklessly
-  net: rps: locklessly access rflow->cpu
-
- net/core/dev.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
-
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 854a3a28a8d8..58e0da91bfef 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4501,7 +4501,7 @@ set_rps_cpu(struct net_device *dev, struct sk_buff *skb,
+ 		struct netdev_rx_queue *rxqueue;
+ 		struct rps_dev_flow_table *flow_table;
+ 		struct rps_dev_flow *old_rflow;
+-		u32 flow_id;
++		u32 flow_id, head;
+ 		u16 rxq_index;
+ 		int rc;
+ 
+@@ -4529,8 +4529,8 @@ set_rps_cpu(struct net_device *dev, struct sk_buff *skb,
+ 			old_rflow->filter = RPS_NO_FILTER;
+ 	out:
+ #endif
+-		rflow->last_qtail =
+-			READ_ONCE(per_cpu(softnet_data, next_cpu).input_queue_head);
++		head = READ_ONCE(per_cpu(softnet_data, next_cpu).input_queue_head);
++		rps_input_queue_tail_save(&rflow->last_qtail, head);
+ 	}
+ 
+ 	rflow->cpu = next_cpu;
+@@ -4613,7 +4613,7 @@ static int get_rps_cpu(struct net_device *dev, struct sk_buff *skb,
+ 		if (unlikely(tcpu != next_cpu) &&
+ 		    (tcpu >= nr_cpu_ids || !cpu_online(tcpu) ||
+ 		     ((int)(READ_ONCE(per_cpu(softnet_data, tcpu).input_queue_head) -
+-		      READ_ONCE(rflow->last_qtail))) >= 0)) {
++		      rflow->last_qtail)) >= 0)) {
+ 			tcpu = next_cpu;
+ 			rflow = set_rps_cpu(dev, skb, rflow, next_cpu);
+ 		}
 -- 
 2.37.3
 
