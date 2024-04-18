@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-89028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DC948A9418
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:34:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D59FA8A9419
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:34:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA98E1C20A68
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 07:34:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39D9CB21BAD
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 07:34:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16232763E0;
-	Thu, 18 Apr 2024 07:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 941E77D08A;
+	Thu, 18 Apr 2024 07:33:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lh/unBkB"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E43GOGan"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DC8A7C6E9
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 07:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D1D87BB15
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 07:33:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713425591; cv=none; b=YQfd5pfMHqBi9ttXxg1CpVNq8qGoseaeLsYMVwH4eDSidPq7C1bWO4oKBPZtkGJzHfNChUJAwe2ATwtPW7xL1wpvdWK/uyKiAi8IjQOsB9rU60dcY+e5dOEiJLfwWJoHPHgwctNCp0tJquYLHT/U2z+DFlFfyP4ldJV1UT2S81g=
+	t=1713425592; cv=none; b=MgbbnJyK2gH6ol8lzzHPb8oBDCJHiB4jXljSRnq1vvvEmeiUbieT4YnZaH8lKGUY4wiKnOItOhyOe3Q25yx0uA4CgeSydE0wKXFvY9AWIRmYQKIma1eXXJbd1U0keIe5wKm82m9B7Flm3qURlFQJne7PfJv+zO6p4xh49qsSHik=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713425591; c=relaxed/simple;
-	bh=HLoq1i+V4ApQOMYBc6PZyJGfENZMo+oN8p9CzxOHy6g=;
+	s=arc-20240116; t=1713425592; c=relaxed/simple;
+	bh=RrAEiqTycPvR23uJjnmgLpr6iHcROS6X7iTHehRp2Zc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=i7HqD0a+zSWA/rqHetPdIIiYbr+cTB3rM/aDArFF4PVCI84vq439CmI99vBf4TE6wGIM4tJpUC8ocZKR7uPYFm6n9YALyVwl/N2Jz5q9TYhr+kGe8NDe641BPHycz6bBkATmpGbPNPWrfB51z4uMZBU8gb1YxFonlKCqe0Xpbe8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lh/unBkB; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=SArLCTsvtxazsGv2K5OL5L/F/HW9ynXBFFFlZ4U44JnYDCoyQonOyjQh5C26UIC96xcmWOZbQyLw74ny7pYz1SgUbi+maD5NlENnbmEevXOhvHzaplsK+DEcUOXZIBxv7PheL1wgVheVgXcm/TMUSpwv16IxNZsD0edIayTnLVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E43GOGan; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-de46620afd7so775836276.0
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 00:33:09 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-609fe93b5cfso8198947b3.0
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 00:33:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713425588; x=1714030388; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1713425590; x=1714030390; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t2TA0iHMw7gZTifXWG5WTrNRKCCbxVowF92cfYPY/pw=;
-        b=Lh/unBkBUhUelW2CtPmtbmSwkznmAx0FnsABHqaG+Kxw69Ua3v9g3t5HqwYG0UHQKK
-         2flVnaTxVFTNxAQ0efiMZQjBassbt2ochX0rKy/6ppm4CNqJjjMcMw3VsYFwp6tFXiFi
-         B4TCGiSDmL/aO0/IWDMwdG2EyCZfZbnoOk9+7h8MRkrWUJRBv61Vj7PRcvYsmGJ/Qhlh
-         TvwzxMCZcXOLopCs6Q7FjH3oHKSTr+VbYkBP/U2nh0Y8eiy4qjGFATazBNbCOydQhIT4
-         1Nu3kRCjawTnV7+Lem6t0i9LThv54nuGUylak/s0f9nnuQ1vqb+pkVtAoS+AFEouXrza
-         3xjg==
+        bh=CpZjAKuvNjDoXx43qMPEogquDjmJ6HzWGNcLYJbWwN8=;
+        b=E43GOGanb/QFiek3rmf68XqjDT2WE2a8xOB0zOopxIDwOXdAymDywru0qCyQgJLM8g
+         KfPI5mqDj7usY312V0NyTZt0IUdmzqt1BWijnr+0A7QQa+t5NcWqPNYSBD3LsjeUmCB0
+         e4ZLH/73cHfvZ2d70sP1326CAETTkk4mTvKagm7PH8ryLgkGSpX83sXyRoNuJBfUkwg8
+         YAyF4o460/fp9Uy3U+WDeK0ykbJgnXz92S7Jj2bEYaB62bk5OsioP47NRSXzVp4wlXhx
+         U2aJmDHa++cFH/Ih/hZ3Sv1KhwV3iXZwfJPXMW1g2ilE72SpntI1wzaOV54rVi/swcLA
+         ZlIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713425588; x=1714030388;
+        d=1e100.net; s=20230601; t=1713425590; x=1714030390;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t2TA0iHMw7gZTifXWG5WTrNRKCCbxVowF92cfYPY/pw=;
-        b=nYrxlfDhM0uE84LorNP0BqIBF5Cg5jwn7qC4KkHBJFmn9rpcrrlZ7zR4izwtQMpYoN
-         Cx/d2cJv0+JWRsgYZJNnsVPUb0SuyinKpOAeX7mSKk8fF4UznaJOPEHVEp1ctsa8llrs
-         +Lk1gyTCQbPrp+3G6hfJOYNTYtLJm0/rxFp2GZM0FWltln5zaNykRcJ2I344C0kHI2df
-         QavhNU4H0DrSM1zH4lyRuQtqSo7z9tXW1YNX5kqrGpzIZLwoULe3dQYTnf8yOzm+GewW
-         gaU9+cGmIrYezC/t9tNthIQIis3EczjhiiX3PdCpVE41d3QTj4L355hUUNabUly4Lh4Y
-         wvGA==
-X-Forwarded-Encrypted: i=1; AJvYcCXcMIu/YaOaxHuUfcP0xmX9S2N8I7GuDjGYv7KbeAraQmCuOw78QJS4JSGv0lL7+8yi5ZA4ME/YXH2El8F/oXZT6nc2Q326
-X-Gm-Message-State: AOJu0YxGzGDxZBm4VCC4K+cCjdtOnW27YtAYOfBrqqnidcL73t9i9uxK
-	zaGx+Ul9/IlrBypp1opE0mDCkho0TUjonHr3EycW/4dv6HjhEukTvA18mOL//kGwiDeTJIEaRLy
-	CVUi0a2WMTQ==
-X-Google-Smtp-Source: AGHT+IGCdemKID5Ih8hkY73Nm2GNNuUItojO8QfUPVqCBKDzmRhHzkpG34NIqSXw+vWOS1nciXqGlO+vaZYt7Q==
+        bh=CpZjAKuvNjDoXx43qMPEogquDjmJ6HzWGNcLYJbWwN8=;
+        b=kf6Kj2w7aBdA5x8myASp7KRIlfeKbbKKPApvCCU9axRQaH4pP2aOlG/VGEXPUgrw+P
+         pfFOQStLucQ1f+zA78/lJ5X2cYgcmX+cpPN/CNAEwHnLMM3xTNDCs7vFp1TcyIozAkn+
+         D6DtZA65DYa14IRmQeGnx30hc/aqDV785C4csesYx0h2xTy8tpXvjLSw0AhYABbY6gtv
+         zDD+O+FriBxxv984xu4babWnKiF8IlbwkDte1bmR/c1592WHZVSXSz3VkbU5D3CLlNx6
+         0YV+/PjWjgsz3KZkqwU3x3gs2+XVXcXrblxI+yjo+ACNtHToI10rQtveBeOJ2NnOEG4W
+         3C/A==
+X-Forwarded-Encrypted: i=1; AJvYcCU35fjLLcj8OkAygD+j/fXMI7eSbzPaYmTVA4zEi0XSG151UhG2pLRUeXujw+0cpd7+5O+ijb6AuM3efYOVbPSsTlO5zEQV
+X-Gm-Message-State: AOJu0Yyivo/xcwFYSywO2WVMjRscs2faDDXqYTG9zTb/95MLSWv5Iqxe
+	2a2rRfd33dQMnk2I/mcdIbsQxZYGPkeg8Mb/6inu5nS2dS+Z8ymzelip61cKc/+inJbVbEdYZ+c
+	MTGeIyvhxlA==
+X-Google-Smtp-Source: AGHT+IFLhIKF2KRB7nroXxKAbixsG7ZmEMXkid7ZtRUKgbIowrzLTp6h2kJOLOWiIoXjgilVahiPCUE4ftxA/g==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:20c6:b0:dce:5218:c89b with SMTP
- id dj6-20020a05690220c600b00dce5218c89bmr206655ybb.5.1713425588684; Thu, 18
- Apr 2024 00:33:08 -0700 (PDT)
-Date: Thu, 18 Apr 2024 07:32:45 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:83d3:0:b0:61a:e7f7:a4cc with SMTP id
+ t202-20020a8183d3000000b0061ae7f7a4ccmr328640ywf.4.1713425590174; Thu, 18 Apr
+ 2024 00:33:10 -0700 (PDT)
+Date: Thu, 18 Apr 2024 07:32:46 +0000
 In-Reply-To: <20240418073248.2952954-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240418073248.2952954-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240418073248.2952954-12-edumazet@google.com>
-Subject: [PATCH v2 net-next 11/14] net_sched: sch_hfsc: implement lockless
- accesses to q->defcls
+Message-ID: <20240418073248.2952954-13-edumazet@google.com>
+Subject: [PATCH v2 net-next 12/14] net_sched: sch_hhf: implement lockless hhf_dump()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -86,51 +85,84 @@ Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Simon Horman <horms@kernel.org>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Instead of relying on RTNL, hfsc_dump_qdisc() can use READ_ONCE()
-annotation, paired with WRITE_ONCE() one in hfsc_change_qdisc().
-
-Use READ_ONCE(q->defcls) in hfsc_classify() to
-no longer acquire qdisc lock from hfsc_change_qdisc().
+Instead of relying on RTNL, hhf_dump() can use READ_ONCE()
+annotations, paired with WRITE_ONCE() ones in hhf_change().
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 ---
- net/sched/sch_hfsc.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ net/sched/sch_hhf.c | 35 +++++++++++++++++++++--------------
+ 1 file changed, 21 insertions(+), 14 deletions(-)
 
-diff --git a/net/sched/sch_hfsc.c b/net/sched/sch_hfsc.c
-index 4e626df742d7a937c219ae9755816f099b6f0680..c287bf8423b47b7ca022fc2e6ca19b77f3ec13a0 100644
---- a/net/sched/sch_hfsc.c
-+++ b/net/sched/sch_hfsc.c
-@@ -1174,7 +1174,8 @@ hfsc_classify(struct sk_buff *skb, struct Qdisc *sch, int *qerr)
+diff --git a/net/sched/sch_hhf.c b/net/sched/sch_hhf.c
+index 3f906df1435b2edea4286ba56bab68066be238b1..44d9efe1a96a89bdb44a6d48071b3eed90fd5554 100644
+--- a/net/sched/sch_hhf.c
++++ b/net/sched/sch_hhf.c
+@@ -534,27 +534,31 @@ static int hhf_change(struct Qdisc *sch, struct nlattr *opt,
+ 	sch_tree_lock(sch);
+ 
+ 	if (tb[TCA_HHF_BACKLOG_LIMIT])
+-		sch->limit = nla_get_u32(tb[TCA_HHF_BACKLOG_LIMIT]);
++		WRITE_ONCE(sch->limit, nla_get_u32(tb[TCA_HHF_BACKLOG_LIMIT]));
+ 
+-	q->quantum = new_quantum;
+-	q->hhf_non_hh_weight = new_hhf_non_hh_weight;
++	WRITE_ONCE(q->quantum, new_quantum);
++	WRITE_ONCE(q->hhf_non_hh_weight, new_hhf_non_hh_weight);
+ 
+ 	if (tb[TCA_HHF_HH_FLOWS_LIMIT])
+-		q->hh_flows_limit = nla_get_u32(tb[TCA_HHF_HH_FLOWS_LIMIT]);
++		WRITE_ONCE(q->hh_flows_limit,
++			   nla_get_u32(tb[TCA_HHF_HH_FLOWS_LIMIT]));
+ 
+ 	if (tb[TCA_HHF_RESET_TIMEOUT]) {
+ 		u32 us = nla_get_u32(tb[TCA_HHF_RESET_TIMEOUT]);
+ 
+-		q->hhf_reset_timeout = usecs_to_jiffies(us);
++		WRITE_ONCE(q->hhf_reset_timeout,
++			   usecs_to_jiffies(us));
  	}
  
- 	/* classification failed, try default class */
--	cl = hfsc_find_class(TC_H_MAKE(TC_H_MAJ(sch->handle), q->defcls), sch);
-+	cl = hfsc_find_class(TC_H_MAKE(TC_H_MAJ(sch->handle),
-+				       READ_ONCE(q->defcls)), sch);
- 	if (cl == NULL || cl->level > 0)
- 		return NULL;
+ 	if (tb[TCA_HHF_ADMIT_BYTES])
+-		q->hhf_admit_bytes = nla_get_u32(tb[TCA_HHF_ADMIT_BYTES]);
++		WRITE_ONCE(q->hhf_admit_bytes,
++			   nla_get_u32(tb[TCA_HHF_ADMIT_BYTES]));
  
-@@ -1443,9 +1444,7 @@ hfsc_change_qdisc(struct Qdisc *sch, struct nlattr *opt,
- 		return -EINVAL;
- 	qopt = nla_data(opt);
+ 	if (tb[TCA_HHF_EVICT_TIMEOUT]) {
+ 		u32 us = nla_get_u32(tb[TCA_HHF_EVICT_TIMEOUT]);
  
--	sch_tree_lock(sch);
--	q->defcls = qopt->defcls;
--	sch_tree_unlock(sch);
-+	WRITE_ONCE(q->defcls, qopt->defcls);
+-		q->hhf_evict_timeout = usecs_to_jiffies(us);
++		WRITE_ONCE(q->hhf_evict_timeout,
++			   usecs_to_jiffies(us));
+ 	}
  
- 	return 0;
- }
-@@ -1525,7 +1524,7 @@ hfsc_dump_qdisc(struct Qdisc *sch, struct sk_buff *skb)
- 	unsigned char *b = skb_tail_pointer(skb);
- 	struct tc_hfsc_qopt qopt;
- 
--	qopt.defcls = q->defcls;
-+	qopt.defcls = READ_ONCE(q->defcls);
- 	if (nla_put(skb, TCA_OPTIONS, sizeof(qopt), &qopt))
+ 	qlen = sch->q.qlen;
+@@ -657,15 +661,18 @@ static int hhf_dump(struct Qdisc *sch, struct sk_buff *skb)
+ 	if (opts == NULL)
  		goto nla_put_failure;
- 	return skb->len;
+ 
+-	if (nla_put_u32(skb, TCA_HHF_BACKLOG_LIMIT, sch->limit) ||
+-	    nla_put_u32(skb, TCA_HHF_QUANTUM, q->quantum) ||
+-	    nla_put_u32(skb, TCA_HHF_HH_FLOWS_LIMIT, q->hh_flows_limit) ||
++	if (nla_put_u32(skb, TCA_HHF_BACKLOG_LIMIT, READ_ONCE(sch->limit)) ||
++	    nla_put_u32(skb, TCA_HHF_QUANTUM, READ_ONCE(q->quantum)) ||
++	    nla_put_u32(skb, TCA_HHF_HH_FLOWS_LIMIT,
++			READ_ONCE(q->hh_flows_limit)) ||
+ 	    nla_put_u32(skb, TCA_HHF_RESET_TIMEOUT,
+-			jiffies_to_usecs(q->hhf_reset_timeout)) ||
+-	    nla_put_u32(skb, TCA_HHF_ADMIT_BYTES, q->hhf_admit_bytes) ||
++			jiffies_to_usecs(READ_ONCE(q->hhf_reset_timeout))) ||
++	    nla_put_u32(skb, TCA_HHF_ADMIT_BYTES,
++			READ_ONCE(q->hhf_admit_bytes)) ||
+ 	    nla_put_u32(skb, TCA_HHF_EVICT_TIMEOUT,
+-			jiffies_to_usecs(q->hhf_evict_timeout)) ||
+-	    nla_put_u32(skb, TCA_HHF_NON_HH_WEIGHT, q->hhf_non_hh_weight))
++			jiffies_to_usecs(READ_ONCE(q->hhf_evict_timeout))) ||
++	    nla_put_u32(skb, TCA_HHF_NON_HH_WEIGHT,
++			READ_ONCE(q->hhf_non_hh_weight)))
+ 		goto nla_put_failure;
+ 
+ 	return nla_nest_end(skb, opts);
 -- 
 2.44.0.683.g7961c838ac-goog
 
