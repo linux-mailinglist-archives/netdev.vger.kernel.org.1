@@ -1,96 +1,147 @@
-Return-Path: <netdev+bounces-89433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA7558AA436
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:44:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A19B08AA43D
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:47:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE5A9B20F03
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:44:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3FB511F226E1
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:47:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE5761836EE;
-	Thu, 18 Apr 2024 20:44:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD29E190695;
+	Thu, 18 Apr 2024 20:47:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ag7Yf/BH"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dU7FHAXm"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20DE15E215
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 20:44:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90883839E3
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 20:47:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713473069; cv=none; b=lrksuFSZeAtFURHXyz0C5vD/58OVyQa9S+kD7gRaoaNtLMfHBLl1Uc4Za4NU7NKu7Hyh6ke/yp63bjsm9nKCW006D/WR6GSS/MW434+3dq0rFLNa4kJUJkeZ1q4ojL/m6KIxIVnbeXk2HyyBCvYj1U1c8PR0uhJfZSOkUqHipEE=
+	t=1713473258; cv=none; b=r5pnB4PskfkFPPZEKMwqzk39ItQgi8SOQHBif68WieBKGs2ZRCFoAhg+9ifnndXHSPpQUSngTmhz1H9oeEAX9ZQQQMq12gzcyYplCYirgljdCW0vz4FsmunggszRs7nZ12OEFN6k0Z38o98ooLwD59qQ/qgRbhzbVdSfyaZA+qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713473069; c=relaxed/simple;
-	bh=8Rp73D/siHckBQuoNo9ejMxkw40jtmo0b7xKhwLI/SU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FEFWioYUx84G38j9el66mNUN1uqyR06AHxkrAYmlngkZbZ3gGXsIHx9vikMzqTJuila4D+qhwviyfkASbuRzgOizxdV6PXILO9Wz3vDDqe4OwlWxhUwEInhXFGxzF3bkVdMboC4ejgsJwbIQOglkPYlMP6QyIvY1pjJ+Go8bTbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ag7Yf/BH; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=LyrfKxnG7KT35jhSG9L5es3skdSQE45RhCHMPyVswAc=; b=ag
-	7Yf/BH7Au/Ch4dk6nMkI5nTAORm7S0BUIVC0d5FUFnSzlcspfheWHs1q+DQ1DA8P23Z6LfkHMMFQi
-	0IFKdnMC8AI3nMcM6NE9XxtewZgLT0/IvzcLXwxlHXc9NY9LErKeEQgmlgY+WId7VOZbeozQadop/
-	F8KVl64Q4mXuzu4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rxYcK-00DOQO-1R; Thu, 18 Apr 2024 22:44:24 +0200
-Date: Thu, 18 Apr 2024 22:44:24 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: Peter =?iso-8859-1?Q?M=FCnster?= <pm@a16n.net>, netdev@vger.kernel.org,
-	Florian Fainelli <f.fainelli@gmail.com>
-Subject: Re: [PATCH net] net: b44: set pause params only when interface is up
-Message-ID: <a38a8279-1e06-4e9f-894e-c7a3cda15ae6@lunn.ch>
-References: <871q72ahf1.fsf@a16n.net>
- <e5d3c578-6142-4a30-9dd8-d5fca49566e0@lunn.ch>
- <87wmou5sdu.fsf@a16n.net>
- <CACKFLi=geVU6TSciS37ZvGuKn0xzrk2ifsuytvPGubsqNMNk_g@mail.gmail.com>
+	s=arc-20240116; t=1713473258; c=relaxed/simple;
+	bh=eCAy2VzoQXirIWoHOWI7tU2DYxh8NcxGLr5VGh+V2JE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RdVNiAFmf2hgbCP7qzusPCdha6fz1tJzW20D27/mCjOdX6MRrmsSO1FNKaLoaOfYa8sC2Vmi4IxsKlKkvad2evnpdY6HIItLq9JP6ncd8u2+4lwTLdeLZ9iU89Nkh6soCDTN5Z/S+4NZcAjZG+QARojpg4vKavp0sd4ZGZlgc+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dU7FHAXm; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-7da41d81912so18568939f.1
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 13:47:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1713473256; x=1714078056; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=52Z7ajLFl+Lp6hpQ+qIhOmgAmJ2GpzNTauSk+OYPNpY=;
+        b=dU7FHAXmMvmPKpLAeNjZFTwOeY1q9sOd4XGTO0gaIqOSpBPGC0vmLaabTlTfeSw7jv
+         dsyVtVQbuEO4jioGms9RHH7EKX5Y16amH4b4gpAwHj2dfDISSoyt/qIuVywkfRWa7ZUL
+         2pLp342l6/louXr68w8uQw7GZsM6lILu81xPXptE7EDgNxnvTVZlYb2bgvLv7DjtNBlE
+         6x3ruf5EPwIhbLKuQEMyLQxP1eQu7DZEGP41rDI21BGfwj4A2xW4G1rC44+3B3MePwzf
+         3dD35+lGlJtPhJdrKgWaoR5LMWqNYqFq4iGGpG7/Jx20bGmV0dbpom6s3XHOL/7isgH1
+         fmog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713473256; x=1714078056;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=52Z7ajLFl+Lp6hpQ+qIhOmgAmJ2GpzNTauSk+OYPNpY=;
+        b=oMZ6K6EfFVMuuyvQr6svPMAFGHw3i78TwPqfiw6I1RtTttvkdPoUptX2gZowFrMpp4
+         D1/cbbtKMS4OYTPUo4xV5xtD61Fy3IbMsMmBEQ9Y/mUJUPK5KjVj1NkNjv6lVg01YwA/
+         w0WJSickD3LSN08pM4pr5p1s86aXjxyWV9zehJ1bT4sNR6c8LdrrGbRShlMWJGu2Wbob
+         +PSh2eVp74f0dj5KTW/8h0LewXqgjLfxYKABiss5aONCIMXxMo3+KoD0sEWBo7XiZuOg
+         kCnAhNqqoQcB5TV+M+1Lc+AWqo1bSlw6GPS2LYR7+/0kthZPll1GRjgHArERMa9eYwuc
+         hlYg==
+X-Forwarded-Encrypted: i=1; AJvYcCWFL1uqFkS0Mmnxh+qQ8sthPkuQ0bXdA7nnAGIk4B9vip3HXrYTZ65rBzEXw4Cm8GDHItSLDA06yjAkQtLCmnhVMzB9I+ia
+X-Gm-Message-State: AOJu0Yz5lTznK6n4WOdg+zAjJcZqrAvupE0yZFbKsO9MFJlSleFM1f0e
+	vBuzsXJbTCNpJx/p+G5aV5uVs0u6D/URNn+uKuVC9/ZqgpLTqg8THs+CWHsp2Fc=
+X-Google-Smtp-Source: AGHT+IG9c7gZDLzp7o26MzKD0Jvqz5A4e/DSQBl0MOwp/717k36BPHRYODJyVnFCA1TiCSnAPJLSCA==
+X-Received: by 2002:a6b:4e15:0:b0:7da:18b8:a4fb with SMTP id c21-20020a6b4e15000000b007da18b8a4fbmr411697iob.9.1713473255769;
+        Thu, 18 Apr 2024 13:47:35 -0700 (PDT)
+Received: from localhost.localdomain (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
+        by smtp.gmail.com with ESMTPSA id r6-20020a056638300600b00484948cb8f5sm626998jak.91.2024.04.18.13.47.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 13:47:35 -0700 (PDT)
+From: Alex Elder <elder@linaro.org>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: mka@chromium.org,
+	andersson@kernel.org,
+	quic_cpratapa@quicinc.com,
+	quic_avuyyuru@quicinc.com,
+	quic_jponduru@quicinc.com,
+	quic_subashab@quicinc.com,
+	elder@kernel.org,
+	netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/8] net: ipa: eight simple cleanups
+Date: Thu, 18 Apr 2024 15:47:21 -0500
+Message-Id: <20240418204729.1952353-1-elder@linaro.org>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACKFLi=geVU6TSciS37ZvGuKn0xzrk2ifsuytvPGubsqNMNk_g@mail.gmail.com>
 
-On Thu, Apr 18, 2024 at 01:40:00PM -0700, Michael Chan wrote:
-> On Thu, Apr 18, 2024 at 1:27 PM Peter Münster <pm@a16n.net> wrote:
-> >
-> > On Thu, Apr 18 2024, Andrew Lunn wrote:
-> >
-> > > Please include a Fixed: tag indicating when the problem was added.
-> >
-> > Hi Andrew,
-> >
-> > I’m sorry, I don’t know, when the problem was added. I only know, that
-> > there was no problem with OpenWrt < 23.X. But I don’t know why. Perhaps
-> > the behaviour of netifd has changed from 22.X to 23.X.
-> >
-> > So I guess, that the problem is there since the creation of
-> > b44_set_pauseparam(), but it has never been triggered before.
-> >
-> > So what should I do please with the Fixed: tag?
-> >
-> 
-> It looks like this dates back to the beginning of git.  So I guess it should be:
+This series contains a mix of cleanups, some dating back to
+December, 2022.
 
-Yes, i came to the same conclusion.
+The first two make it so the IPA SUSPEND interrupt only gets enabled
+when necessary.  That make it possible in the third patch to call
+device_init_wakeup() during an earlier phase of initialization, and
+remove two functions.
 
-> Fixes: 1da177e4c3f4 (Linux-2.6.12-rc2)
+The next patch removes IPA register definitions that are never used.
+The fifth patch makes ipa_table_hash_support() a real function, so
+the IPA structure only needs to be declared rather than defined when
+that file is parsed.
 
-Agreed.
+The sixth patch fixes improper argument names in two function
+declarations.  The seventh removes the declaration for a function
+that does not exist, and makes ipa_cmd_init() actually get called.
+And the last one eliminates ipa_version_supported(), in favor of
+just deciding that if a device is probed because its compatible
+matches, that device is assumed to be supported.
 
-	Andrew
+					-Alex
+
+Alex Elder (8):
+  net: ipa: maintain bitmap of suspend-enabled endpoints
+  net: ipa: only enable the SUSPEND IPA interrupt when needed
+  net: ipa: call device_init_wakeup() earlier
+  net: ipa: remove unneeded FILT_ROUT_HASH_EN definitions
+  net: ipa: make ipa_table_hash_support() a real function
+  net: ipa: fix two bogus argument names
+  net: ipa: fix two minor ipa_cmd problems
+  net: ipa: kill ipa_version_supported()
+
+ drivers/net/ipa/ipa_cmd.h            |  8 ------
+ drivers/net/ipa/ipa_endpoint.h       |  6 ++---
+ drivers/net/ipa/ipa_interrupt.c      | 38 +++++++++++++++++++++++++---
+ drivers/net/ipa/ipa_main.c           | 16 +++---------
+ drivers/net/ipa/ipa_power.c          | 19 --------------
+ drivers/net/ipa/ipa_power.h          | 14 ----------
+ drivers/net/ipa/ipa_table.c          |  8 +++++-
+ drivers/net/ipa/ipa_table.h          |  7 ++---
+ drivers/net/ipa/ipa_version.h        | 18 -------------
+ drivers/net/ipa/reg/ipa_reg-v3.1.c   | 14 ----------
+ drivers/net/ipa/reg/ipa_reg-v3.5.1.c | 14 ----------
+ drivers/net/ipa/reg/ipa_reg-v4.11.c  | 14 ----------
+ drivers/net/ipa/reg/ipa_reg-v4.5.c   | 14 ----------
+ drivers/net/ipa/reg/ipa_reg-v4.7.c   | 14 ----------
+ drivers/net/ipa/reg/ipa_reg-v4.9.c   | 14 ----------
+ 15 files changed, 51 insertions(+), 167 deletions(-)
+
+-- 
+2.40.1
+
 
