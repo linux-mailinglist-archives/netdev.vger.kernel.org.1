@@ -1,186 +1,137 @@
-Return-Path: <netdev+bounces-89138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B388D8A985A
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:15:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E6F28A9859
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:14:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 702AF2819B6
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:15:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 900681C2088C
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:14:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D50E15E5A8;
-	Thu, 18 Apr 2024 11:15:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D315415E5A8;
+	Thu, 18 Apr 2024 11:14:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UFinodbg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mYJnHETf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD32F15DBBB;
-	Thu, 18 Apr 2024 11:14:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35FA615E20D
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 11:14:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713438901; cv=none; b=QHmufMFzdZzlQlXiWKABO2n+tny/DtZzjeaEJUvtKiYtz2Kc9En8HJDK3YYp5HS16RrDYmX5ov0hvcOE0HAn6kKCsnPRfetpRZ38Drdc6Ogngky4PfNlEkACkt7/G8apt2U1FSDASk2HPyfhJuD8gROG4jOqm8JT5nPxwFCS0MA=
+	t=1713438860; cv=none; b=OhR3fBkf9PkHThQLaBhDvmslTd+DO0jIY6h/grtDRtYMlgzPd+iOQZM6cnbXhU3pwHAMvae19qGOMN1BuqVJgkdHERsIsB4hF8it1McSj1LP+/aWJ7YTzMJYIZqAQPtiL0PKXbXQ/IpCL3i/0Y8LfcHxDaWphgR4Dc3rPHyUp3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713438901; c=relaxed/simple;
-	bh=uSFfOT3JgHjx0OGrj0HE3NDNs+YSdJ2cF84HuuXu6Ac=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=K7E3Z1nYkA6HyYil1mFXiF0d/bhQyQmM1eb94aGBWfoaj4UqBGM2Qt6+QKpAUV/v1D+AdOW6S9X4nujy1jw8CczpAi4lXa76PoC5ZwQLr7KwF9n6SF2TVv4Lq7Dxeq4pwBwqNNIG3NaiHhhU2Pe1NCg02j6zXcbJVpRRHZLE65g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UFinodbg; arc=none smtp.client-ip=209.85.208.51
+	s=arc-20240116; t=1713438860; c=relaxed/simple;
+	bh=5tIkYBCfJCqZryJItLj7l67sCD6SNpcCgy8fz2+3wJ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D3mOHM3XSgmAsN5+bfdbee0xukMxS3ChqA9qpkr/ugkosW+MzzZOyIaduiDV1NWiQ+1kb6F9yS9O2sLaoOlK3aPrMVXLFdnkBtUEfnK3eDguTrUnu4Js/D1hSrDFfpU7Aa4e6qM1pHWNqR4SvoMPn9P+bHMprlC0kAOLXnoxsEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mYJnHETf; arc=none smtp.client-ip=209.85.167.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-571bddd74c1so447794a12.0;
-        Thu, 18 Apr 2024 04:14:59 -0700 (PDT)
+Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-516d1ecaf25so827597e87.2
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 04:14:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713438898; x=1714043698; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bVdNWc2S6grNgifjUV9Z9PoYPoQ+C6xx7h8NtvOHzac=;
-        b=UFinodbgKStNt8wjWteEDku7yZRfsYm6pmYZztnoOW+ThRfSgiCa6UZ08ySVe1Je8F
-         IQ3ZP9D8CvV1dlD5HZ/qwa7D0rvW15fA9ubGwG3PcmidG1rdOP4xX1XPyemY0oh35TsC
-         WP4hOsAlktaZYrnFyL5qwxWiH5daq8xFubL2LVeHTy8o5mK+T22CLHq9QTArFPtT2kik
-         Sx2COa45xlJot7HrdUgpd7ZsKxN/RzDhYZ9q0X2Hm95NLGYVXCB+IySOevsXFQ7QgdK8
-         gXPBUjs6EU2f2b8Zf1i6SEbC5TpuYdCGpONA3Qm3WR1AVt2W4jWlVox3RRHfnZ5JEH9y
-         r7uA==
+        d=gmail.com; s=20230601; t=1713438857; x=1714043657; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RjoRqTxo7HSzdTkc4gBgEfqLUPj+ljTbG3vJ3pgN6z8=;
+        b=mYJnHETfBSbYvc2+6EXdsqcL+5AMjWMolFHRFMV9u8d2Zi0OEo2vtHwj46Cu+LZMoR
+         kXOlSFvQ9z9XtlWTdyFg6kmQpsfiLx2RHmVCGgxCun7vcqlP1lbxqty1f2QFJ6KXVUP9
+         iiBqK+ULR4K2xLMzyx05S/ZMN5UwJjgP9f2tGG/UZ6Xlv5eOhWz9+Ppdozq5SrcLcDM5
+         akgfBwaWBOPFg5uU53+KrJZJOKi3z/wZXSybvvCKAN696fCVY9fpgr/RXA0UPCfhUD3j
+         LaEpYgRfGgPg06LlguRBtYNU2b8JOGKMZDOW50IroGNcnaD+u8tpLHaNG4E/VgZoeQIC
+         nsiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713438898; x=1714043698;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bVdNWc2S6grNgifjUV9Z9PoYPoQ+C6xx7h8NtvOHzac=;
-        b=Ltea6XnZyXTV+a3ICGtfEBR7Y9bZXJ/huRjz3y0p1eizmsJ5FsGPSdvpB+emuML4S0
-         aXFG/QJy1vYaGE0fIvG6pdjZxMBbpQBfQcjCPlpqqFDfwEVJR0CQqWwGkGsFdpeyO4Bt
-         fYxGWpYIKncM7oVYPGvMhYbyoy3XXA5ztvT+w1gMLPzJKYrjN082abfhAUgpgU5xgboE
-         Bu10CdqtFiUM0hvWhjyjhM5X5YfyzuxIyZ9eVjGbbnhTSZ2di3eYmikdj6gmXry3MF49
-         SAwlkFXpuMLudCS81iMzoRks6tEK+FLqWXwWYfQsO2wgKsbWyVVVtA0aiivz1lTz4Pvg
-         xvOA==
-X-Forwarded-Encrypted: i=1; AJvYcCWm1AH3Z09RfKztGPOYUTdvP/etT4fJDUvXhLKIheegnDErhGXF391cjgyuUg1tLJKVFk62/UXMGowuI63tCZj9bmox8wYbbSaO
-X-Gm-Message-State: AOJu0Yy2BAXzI3mbV1l016p9m5vcQ2nGw4zPHMudVzV1Hw6kFMBF23KH
-	dSGYC60V3yDoDwLZZOqf3F0VX+Hdc4kAXDWUvG3WX0SGeXiTKZ1l
-X-Google-Smtp-Source: AGHT+IEofVHYSPRLBpoWd7CTlJceAMB223w6wktxRVkqcQR7JZp5pW8+xcylTjyd4vaBwG0x2yko9g==
-X-Received: by 2002:a50:8e1d:0:b0:56e:323b:d7e7 with SMTP id 29-20020a508e1d000000b0056e323bd7e7mr1454301edw.34.1713438897880;
-        Thu, 18 Apr 2024 04:14:57 -0700 (PDT)
-Received: from ThinkStation-P340.tmt.telital.com ([2a01:7d0:4800:7:ec45:6e6c:9755:ee1b])
-        by smtp.gmail.com with ESMTPSA id i7-20020a056402054700b0056e78e90a1dsm742576edx.49.2024.04.18.04.14.57
+        d=1e100.net; s=20230601; t=1713438857; x=1714043657;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RjoRqTxo7HSzdTkc4gBgEfqLUPj+ljTbG3vJ3pgN6z8=;
+        b=qVZeAsHNl1QpAUYZOtJz+nZNGvtVvvCrKItCxiqeItX9hs/4PxjTAXL77xa3AvNINC
+         PsAu2EddpgoenBtDAoSxSLfFxGtHVuhuzDz183Wk8fUFLcm+ft4NRMjn2NSd7goVKry8
+         Eji6H1aNFJCAlFAuZsd29EQljB2zxAYFGvtyNgptZkCtqha7ot1UZF4Iv9oPEUCSWM4Y
+         sli4QGo5eVsk3So6LSFClwuL8KXl/ETSNAbIV1L54FcN7YMCOmrk1F6VlaPKaTGW73lh
+         t2CVs4AUgrLOE+2xm479/50Pm7PXY2LB7MxNm5F75Q4mYlQj/x8da2SwU+6m3IeFVs9l
+         VtQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUIvVpBNziiLUA8Ai6DKabI9VYt1aNOUTh5lc+xQU++mdtaL5WQlo+Y9iUCOEeniqA7Xfuy2ArbZ4RLOYPpZaLcw42DORkn
+X-Gm-Message-State: AOJu0YzZLP8swAP7ADeMmSvMpS4QQHJPD50dA3ytN9756VI2qiBeCv9u
+	EKKS6RBViNXVMojOssxCrJVcTL8A/PaUHAiyjPsmU18Uo22701Gi
+X-Google-Smtp-Source: AGHT+IEzcr/tekYIQJxHLoH0yseds5lxtGEtTPU295fzDzlj8+1kCePk02xberhp5BGqDPbjxaqzxA==
+X-Received: by 2002:a05:6512:401:b0:518:cf01:9f21 with SMTP id u1-20020a056512040100b00518cf019f21mr1070342lfk.66.1713438857021;
+        Thu, 18 Apr 2024 04:14:17 -0700 (PDT)
+Received: from mobilestation.baikal.int (srv1.baikalchip.ru. [87.245.175.227])
+        by smtp.gmail.com with ESMTPSA id v19-20020a05651203b300b005159412ab81sm197475lfp.216.2024.04.18.04.14.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 04:14:57 -0700 (PDT)
-From: Daniele Palmas <dnlplm@gmail.com>
-To: =?UTF-8?q?Bj=C3=B8rn=20Mork?= <bjorn@mork.no>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	Daniele Palmas <dnlplm@gmail.com>
-Subject: [PATCH net 1/1] net: usb: qmi_wwan: add Telit FN920C04 compositions
-Date: Thu, 18 Apr 2024 13:12:07 +0200
-Message-Id: <20240418111207.4138126-1-dnlplm@gmail.com>
-X-Mailer: git-send-email 2.37.1
+        Thu, 18 Apr 2024 04:14:16 -0700 (PDT)
+Date: Thu, 18 Apr 2024 14:14:14 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: Jakub Kicinski <kuba@kernel.org>, andrew@lunn.ch, hkallweit1@gmail.com, 
+	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
+	Jose.Abreu@synopsys.com, chenhuacai@kernel.org, linux@armlinux.org.uk, 
+	guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, 
+	siyanteng01@gmail.com
+Subject: Re: [PATCH net-next v11 3/6] net: stmmac: dwmac-loongson: Use
+ PCI_DEVICE_DATA() macro for device identification
+Message-ID: <b3g2spu4y4f2atapsheaput7sjl4abeslwjacy65xaowsbgrsl@to7ek2fubiud>
+References: <cover.1712917541.git.siyanteng@loongson.cn>
+ <b078687371ec7e740e3a630aedd3e76ecfdc1078.1712917541.git.siyanteng@loongson.cn>
+ <20240412184939.2b022d42@kernel.org>
+ <0e8f4d9c-e3ef-49bd-ae8b-bbc5897d9e90@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <0e8f4d9c-e3ef-49bd-ae8b-bbc5897d9e90@loongson.cn>
 
-Add the following Telit FN920C04 compositions:
+On Mon, Apr 15, 2024 at 10:21:39AM +0800, Yanteng Si wrote:
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > > index 9e40c28d453a..995c9bd144e0 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > > @@ -213,7 +213,7 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
+> > >   			 loongson_dwmac_resume);
+> > >   static const struct pci_device_id loongson_dwmac_id_table[] = {
+> > > -	{ PCI_VDEVICE(LOONGSON, 0x7a03) },
+> > > +	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
+> > >   	{}
+> > >   };
+> > >   MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
+> > In file included from ../drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:6:
+> > ../include/linux/pci.h:1061:51: error: ‘PCI_DEVICE_ID_LOONGSON_GMAC’ undeclared here (not in a function); did you mean ‘PCI_DEVICE_ID_LOONGSON_HDA’?
+> >   1061 |         .vendor = PCI_VENDOR_ID_##vend, .device = PCI_DEVICE_ID_##vend##_##dev, \
+> >        |                                                   ^~~~~~~~~~~~~~
+> > ../drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:216:11: note: in expansion of macro ‘PCI_DEVICE_DATA’
+> >    216 |         { PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
+> >        |           ^~~~~~~~~~~~~~~
+> > ../drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c:216:44: error: ‘loongson_gmac_pci_info’ undeclared here (not in a function)
+> >    216 |         { PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
+> >        |                                            ^~~~~~~~~~~~~~~~~~~~~~
+> > ../include/linux/pci.h:1063:41: note: in definition of macro ‘PCI_DEVICE_DATA’
+> >   1063 |         .driver_data = (kernel_ulong_t)(data)
+> >        |                                         ^~~~
+> 
 
-0x10a0: rmnet + tty (AT/NMEA) + tty (AT) + tty (diag)
-T:  Bus=03 Lev=01 Prnt=03 Port=06 Cnt=01 Dev#=  5 Spd=480  MxCh= 0
-D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=1bc7 ProdID=10a0 Rev=05.15
-S:  Manufacturer=Telit Cinterion
-S:  Product=FN920
-S:  SerialNumber=92c4c4d8
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
-E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
-I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=60 Driver=option
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=86(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 3 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
-E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> Will be fixed in v12.
 
-0x10a4: rmnet + tty (AT) + tty (AT) + tty (diag)
-T:  Bus=03 Lev=01 Prnt=03 Port=06 Cnt=01 Dev#=  8 Spd=480  MxCh= 0
-D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=1bc7 ProdID=10a4 Rev=05.15
-S:  Manufacturer=Telit Cinterion
-S:  Product=FN920
-S:  SerialNumber=92c4c4d8
-C:  #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
-E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
-I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=86(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 3 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
-E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+Just move the PCI_DEVICE_ID_LOONGSON_GMAC macro definition from Patch
+5/6 to this one.
 
-0x10a9: rmnet + tty (AT) + tty (diag) + DPL (data packet logging) + adb
-T:  Bus=03 Lev=01 Prnt=03 Port=06 Cnt=01 Dev#=  9 Spd=480  MxCh= 0
-D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=1bc7 ProdID=10a9 Rev=05.15
-S:  Manufacturer=Telit Cinterion
-S:  Product=FN920
-S:  SerialNumber=92c4c4d8
-C:  #Ifs= 5 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
-E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
-I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
-E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 3 Alt= 0 #EPs= 1 Cls=ff(vend.) Sub=ff Prot=80 Driver=(none)
-E:  Ad=86(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 4 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=(none)
-E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+-Serge(y)
 
-Signed-off-by: Daniele Palmas <dnlplm@gmail.com>
----
- drivers/net/usb/qmi_wwan.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-index edc34402e787..a5469cf5cf67 100644
---- a/drivers/net/usb/qmi_wwan.c
-+++ b/drivers/net/usb/qmi_wwan.c
-@@ -1368,6 +1368,9 @@ static const struct usb_device_id products[] = {
- 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1060, 2)},	/* Telit LN920 */
- 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1070, 2)},	/* Telit FN990 */
- 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1080, 2)}, /* Telit FE990 */
-+	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a0, 0)}, /* Telit FN920C04 */
-+	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a4, 0)}, /* Telit FN920C04 */
-+	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a9, 0)}, /* Telit FN920C04 */
- 	{QMI_FIXED_INTF(0x1bc7, 0x1100, 3)},	/* Telit ME910 */
- 	{QMI_FIXED_INTF(0x1bc7, 0x1101, 3)},	/* Telit ME910 dual modem */
- 	{QMI_FIXED_INTF(0x1bc7, 0x1200, 5)},	/* Telit LE920 */
--- 
-2.37.1
-
+> 
+> 
+> Thanks,
+> 
+> Yanteng
+> 
 
