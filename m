@@ -1,163 +1,256 @@
-Return-Path: <netdev+bounces-89425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C70388AA400
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:22:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B10E68AA3F7
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 22:19:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0482C1C21086
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:22:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26D7A1F22831
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275A2181B83;
-	Thu, 18 Apr 2024 20:22:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98225184127;
+	Thu, 18 Apr 2024 20:19:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ZkphSogP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aZFd8whs"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2085.outbound.protection.outlook.com [40.107.243.85])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9144C13D626
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 20:22:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.85
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713471770; cv=fail; b=CKPjUsJ4+w9GS4EJwzPAOF8GmTxI4QU+slEXrqTCf+FnYUdrWC5tLS+ITcAqciw1hT1b6bRXkAJdSixFQcrs/M6yD9Aent1EjhBbKXEnaAsoRLB1MBoC+nuOTADC+Zlu9YKPzDNQFZiZMPdpBRirNqn3HqaBZ+bibGSsUIlxlu8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713471770; c=relaxed/simple;
-	bh=h/ZgV9C8lp+/d1wPozZL8WsHV7e6weYe7e+ty5pgUzo=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 Content-Type:MIME-Version; b=kjaOBpgsMkUR4CFr1o5kN2MXXcYwpsfwnaEBDI3AXPdp8ukQ0bbzpPbauD0+QvqaTSNC9DTgOykDvwFOy8HjD96l4cNsllohSTsNstR450x3qopXc/w+hZQ23DNDgfPdbk/dlxDqHPH6VQGY/exwbK3THAYF9gH2x+esswB1jt8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ZkphSogP; arc=fail smtp.client-ip=40.107.243.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mNhyjaT+/VND3qiqDzY8cWGulcjjrSoKNYMLgPy3Qvt2Dc4U8bl7oyngR0LBJOlkA1X+JuLY4qRqfN/ptRZnvVfQiCTU67dANCIbXq9bQqz609OObmfjgzTu3re9HtT+8Ex1kCvhSlLlGaIb+NOHmAMwCMkUS/RjQECV2nX95XYcl5gqcNUxi63uT+QqoT3oRxXsyxhNE8e/y5o8R4PzBuRwaC/4uUz6vsoKhdH312OkkvqhGehg4Pari/7AmzIyJyvGUhnlM37EKWOdbTYyzEqXc6WaC58uNOOuiT/XqKzpJCG6eVhdBoL4v/6HhcnSwl3YNeaZz4rYaE5z5jmyOg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=h/ZgV9C8lp+/d1wPozZL8WsHV7e6weYe7e+ty5pgUzo=;
- b=jSpqYVR1Y4GJxGBNs5r295xrIJ6/B5chywTEv9DeCvruLcIMFmcOKTnNFULQMG8VuRCJb7BcJ5lkdjdUy6L6K68rsF11ZHXrMYZQbXfKqr9MRWB/SUrn9N9l9pViCNqUslpHjD/aVrXZL8Hfziq18nLceK0GOtkmr4P0RrYgY8cY/IE2Jzq9zVjHS9kR0FqgXChQOfV/uKzPuofUsf4ObAghSBnNn6OE60WOuCdU88HdTSM4upnToe6YE22+Edx0f5gw+XalQTvaRdPqvwUtVm532DAQ8pznqIpen2NgnZ/h+9WRMNVOrFP11ouf6ixIbm3vHLo3IqyqO+CVHHR60Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h/ZgV9C8lp+/d1wPozZL8WsHV7e6weYe7e+ty5pgUzo=;
- b=ZkphSogPbQ+WpYd8yXhCTLMkel66XkXxYsp0OrbqBjnfYucMvyIOaipKfiCBbBdfcyAoKIcjz8RccAwID8MXfeDRDvtsy7tFd7MJh4MxJe9dCWMfKykGyeGxsSgc8JTOteWjM3UBlEaqE/6SyA5uN+eIV+U+ZgAq7EuabV0ANBNsqMPdqtwCNoHe5jRX/cSP45vwH/sTcwBdqBHCW94uStNEmiAy8JhUTlc3Ovr59VEHdfoyiNBWAPws0WihCriDGvIXUEpuY8/hKJ3nbwrpbEihGQQvDbjDGPTRh8bCSg2QSUudgOQ5XjFeN5WZhr4oqItcbqWWS99+iSCb9qCo9Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by CY8PR12MB7585.namprd12.prod.outlook.com (2603:10b6:930:98::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.40; Thu, 18 Apr
- 2024 20:22:46 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::3ec0:1215:f4ed:9535]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::3ec0:1215:f4ed:9535%4]) with mapi id 15.20.7452.049; Thu, 18 Apr 2024
- 20:22:45 +0000
-References: <20240418052500.50678-1-mateusz.polchlopek@intel.com>
-User-agent: mu4e 1.10.8; emacs 28.2
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- horms@kernel.org, anthony.l.nguyen@intel.com
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v5 00/12] Add support for Rx
- timestamping for both ice and iavf drivers.
-Date: Thu, 18 Apr 2024 13:19:09 -0700
-In-reply-to: <20240418052500.50678-1-mateusz.polchlopek@intel.com>
-Message-ID: <87v84ectez.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR03CA0071.namprd03.prod.outlook.com
- (2603:10b6:a03:331::16) To BYAPR12MB2743.namprd12.prod.outlook.com
- (2603:10b6:a03:61::28)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE056A00E;
+	Thu, 18 Apr 2024 20:19:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713471578; cv=none; b=TG1ivPbLOaS7ipdNVGDq7ijJy0uMTshxrI50Y14KlEAFb+6qt+TrBlakmUDnlxaJ+xDcFyp2hOEXsupPFGSP91urwQuhbXQruvAaY8XZZh314k1R38WBs//ncrIVhdwIw6yrW7KjsV00AXj6C8EYe8U508rz09GXCAD0A3N/Xf8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713471578; c=relaxed/simple;
+	bh=GG7Q42d4SWcX+x6h5SvZbRjfruU7g6fkWJO6/WrdsSI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BWrdSvIpWRHagwt7mHY7cRPDI196bygqJyCHd7APW/WvIe9BQd99ZnuDShgdgtyAnfmEZWcVOFtHXENCkaSs5xWvY350uTZHEqMMHEiYVsem67R2N1hVSbUXExR2EPztiT+8I6zOcUwfqzTEXT4E8oduIPEy8lJE9gHnbdT2qTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aZFd8whs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82BAEC113CC;
+	Thu, 18 Apr 2024 20:19:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713471578;
+	bh=GG7Q42d4SWcX+x6h5SvZbRjfruU7g6fkWJO6/WrdsSI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=aZFd8whsAsjxT38Mj4Om4qBW8tijFEjj5lt4khVQ11XxBV+9sMVTbZfDylBVqpm6l
+	 LM1BuKH5qFJuTXVqy6XmR4sdyepARwLOY7KsAY0tHrFy01Td8LViQM/4K+ivTjaZmS
+	 CEBfxEn8oXVo8CcD5iwDO2lfgEpSLcIabgDfTq5GjE2Vo10SujsdSXr5t3BWo0/P6W
+	 UmNoH+Nu4DDgpAMoXJNZGYLwRpCc//0eRDPMDzrPcrO0Ip70EIHUUQfAHjMt9B+LH4
+	 E1xNT2Tar53WplVLSYd9+UughKOK9AWrCDar8UM3+CrdSSgFuYlTQStoA5K/EjpJa5
+	 cVxR0XklPn0Fw==
+Message-ID: <ad98cb14-cc1b-4a01-aacc-8fb53445049e@kernel.org>
+Date: Thu, 18 Apr 2024 22:19:33 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|CY8PR12MB7585:EE_
-X-MS-Office365-Filtering-Correlation-Id: 405d7873-a75e-448e-8815-08dc5fe54ead
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Xsj4wiBGFiid1wiQU64Yzlx0jaf0Vl18KBpC5Cn3KqFtvdeAcXLHBqJfW1uLu7RDRVQLV0m5j06FuoaCVV1FwlyDU49fjYhWAfR2TI/YBfkVthArswRRaQS+AgC4tljFQ6bevlw3n/8KNxP2BCDEdfHK4BA+RzQIO4m1V90kxZHeZF2Um/Mu0VL5BJKFB8HJVse4WdUeZBZxX/wEmhEO4VHLjLGwEuNUQSXmMAQcQKsd2ZE4Ehplt/15oTC+snzqLNFaZbJsOW21dMzVGG8CIVN5z8gKCO1b5QyjgVWtf1Y1pZiy8XfB3wd/gx41TEGbEp7YRdgh0tx46YmMwYM5AbS3vHmG2ht2NA0pUe1F+TS1Tgjo7PL1IKdUqQm2DkJRHT1NaQb1Iw14xzGcMH+9XcA03a84p2g2CJedvbHolMdErqYUcJYLZIZ8K0Wz9yR1KpBuHpmFPX+cLa2x6VYr2la2AIZuCdWv86TpfykG0vSH1QWi7XbMxmFIQbC0s3MPCSreyO89fRN3v/uqayng1efHtOxO07sGrYhJyzMtMr1NeVc3Gebe1g7hVHuPUUSdCSgeGRwWBtD6B+Lq+XpwGRGvYPc0KqYM7af5Bk/B9DQsr4QOv1jG9mJRLfXOqn90tw8+3ZxG0yv4C+8pKmJzCg==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?sjF/YVCFu8lST63jLzYX5nSpqhH8hGW2O05VVccv4CsxxEfIVTj4MJG9JgFI?=
- =?us-ascii?Q?1ZCrwgSYvO8x6CybRDcpvKmNb0JQr8oX4w9u3yGgOUgiycmyYmhF95qpJ5YK?=
- =?us-ascii?Q?R2oWxk41dfepleI4nY8FjmoXScTh40Lxo3litatYj4ikD9rkEtr2HUWlys+K?=
- =?us-ascii?Q?Lhvw/Rit4+TffBpOyNkrJlOeFZq5PXmHe3cwbjBqnyuE18cgKvgAYSYy+HnY?=
- =?us-ascii?Q?Wf77ycZzhfiuhYxh/NXjmzIl0/bSSOXl+ImqNBvNB5bX0f4FMoGqLyTeaUcL?=
- =?us-ascii?Q?YN/aPSLHckNVDe63fqfMNgmzXfVOhAQRyX3w0Oek0NHvfnkK++LiIbh2G0On?=
- =?us-ascii?Q?O172/HBryYM4/LHyRCf2Uu5vZHhHgL1J0BTGmouMy6TQizNpeZw7aA+tcJcv?=
- =?us-ascii?Q?j81CGtdJPLa6Z02XB5b+5BgRsuyM0Fjl0toh6p7HuAxS9sB77ZeP4Bc60JfH?=
- =?us-ascii?Q?rP/TJz1BN2aABmTgHzZHdFhQ6NWlM7jbUZERfSm2t6e9H5EBZ0h9CAtVZb9q?=
- =?us-ascii?Q?yLYX2HJusOjpWfcw6mR97567ngvJlKuk/CmFxzWe/nsunEiKrxQFa07xpECP?=
- =?us-ascii?Q?HIrSKUvFz6euy6omze88z1kEyHZbvxN4AUUgo3k5u4JVv7g74Xz0T2fd6nWm?=
- =?us-ascii?Q?Tc0tGm943s9mDrga643dO8kQFQke9ZgudPhfoYsZKJqydYefqoIhuVrclGk8?=
- =?us-ascii?Q?l1KQk67qacM2Ir9gZP9ABsEOnh2oZvPo7U74W4u2YxksW7WR1OoQz6Q6KNrR?=
- =?us-ascii?Q?9/yl754vaU/P6hPWCCEodFGWRmdcU45sQHu7v4jC+LLNQ+iQLCL2jlhsfS21?=
- =?us-ascii?Q?lZJyN+S6hupbmBv3+GCX73nF7CjAbKHjHQEOArJjN3q+3CrIAJ4dW0oIuARC?=
- =?us-ascii?Q?tcE6Rp1wofDAvBllA7G8YyQXTn+yB9sKBRw2+3FWG0qTi1qUe4wDpNYff+Fo?=
- =?us-ascii?Q?hF2os0H8mbN7psLqP0UaMqFAM6/SvhREwSSXIrCfhaGK5wYy03blRGTbgaoa?=
- =?us-ascii?Q?zyRhXK44mgIkpbRDD9+zyZrmmDErSb28ciIV4mm+ETnWb/2IA7SUf/7Q5qH9?=
- =?us-ascii?Q?JYOVboPG9PU9LvztObVwar+xgboEK9ZDxdvc4Wf+qBYN8uzm/+wEVECfA1B6?=
- =?us-ascii?Q?ixbVn+5wWFWuSyqBQBJzH4i9YK+foGsWvmEqmw8DMw5+aOZU9I+3oYB2anzY?=
- =?us-ascii?Q?JaVfDf+JFLs1jLpbRg9xD56x9/juWZNZhx8jBVNkIAE0KyjEJclBxPfdRFsL?=
- =?us-ascii?Q?eSQqc5I1KQXUChTLGDV+d6mltLAre5LTATbsRokhqGD2PVOREBqDDVmzMY6k?=
- =?us-ascii?Q?5NIVm8KBsypcPrf1EFfSuuvAYvGXLILE5rlcgXNY061zvsJe9/qIt2IjjubV?=
- =?us-ascii?Q?rFfnnDYNE3L4eOfB2aU8P/tUChjqxnRwybUPDr043FcuiKirrsveE9cG5kP8?=
- =?us-ascii?Q?8YiGXaxf+K2zjd42vIQdyLrJt/836me5lk8CFoZnbiwEK0ygSzCxaT4JTnkZ?=
- =?us-ascii?Q?gYSyLShX87F5/L8yOO9USzGI5qbUajbvDRaccINPOv6rmqTMId1F4NI+XYZJ?=
- =?us-ascii?Q?xZNfGQ3SoJcU/WNFun9mXDzUekHYwwi8rLR/Vi5iMWraTKmCrmcdqcOeRGyR?=
- =?us-ascii?Q?sQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 405d7873-a75e-448e-8815-08dc5fe54ead
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Apr 2024 20:22:45.3276
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: X0mgwz5HBlXlegGmqAG1y9AZGk4zz4b6tJNbJSFp+vn/HH6FT9kbFd2YhZusNmqUoNBWzJq5hQbY5xFULvebzg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7585
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH vhost 3/6] virtio_net: replace private by pp struct inside
+ page
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, Linux-MM <linux-mm@kvack.org>,
+ Matthew Wilcox <willy@infradead.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Mel Gorman <mgorman@techsingularity.net>
+References: <20240411025127.51945-1-xuanzhuo@linux.alibaba.com>
+ <20240411025127.51945-4-xuanzhuo@linux.alibaba.com>
+ <CACGkMEsC7AEi2SOmqNOo6KJDpx92raGWYwYzxZ_MVhmnco_LYQ@mail.gmail.com>
+ <1712900153.3715405-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvKC6JpsznW57GgxFBMhmMSk4eCZPvESpew9j5qfp9=RA@mail.gmail.com>
+ <1713146919.8867755-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvmaH9NE-5VDBPpZOpAAg4bX39Lf0-iGiYzxdV5JuZWww@mail.gmail.com>
+ <1713170201.06163-2-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvsXN+7HpeirxzR2qek_znHp8GtjiT+8hmt3tHHM9Zbgg@mail.gmail.com>
+ <1713171554.2423792-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEuK0VkqtNfZ1BUw+SW=gdasEegTMfufS-47NV4bCh3Seg@mail.gmail.com>
+ <1713317444.7698638-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvjwXpF_mLR3H8ZW9PUE+3spcxKMQV1VvUARb0-Lt7NKQ@mail.gmail.com>
+ <1713342055.436048-1-xuanzhuo@linux.alibaba.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <1713342055.436048-1-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
-On Thu, 18 Apr, 2024 01:24:48 -0400 Mateusz Polchlopek <mateusz.polchlopek@intel.com> wrote:
-> Initially, during VF creation it registers the PTP clock in
-> the system and negotiates with PF it's capabilities. In the
-> meantime the PF enables the Flexible Descriptor for VF.
-> Only this type of descriptor allows to receive Rx timestamps.
->
-> Enabling virtual clock would be possible, though it would probably
-> perform poorly due to the lack of direct time access.
->
-> Enable timestamping should be done using SIOCSHWTSTAMP ioctl,
-> e.g.
-> hwstamp_ctl -i $VF -r 14
->
-> In order to report the timestamps to userspace, the VF extends
-> timestamp to 40b.
->
-> To support this feature the flexible descriptors and PTP part
-> in iavf driver have been introduced.
->
-> ---
 
-Just one general/cosmetic comment. It might make more sense for the
-Reviewed-by: trailer to come after the Signed-off-by: trailer, since the
-review happens after the patches have been written.
+On 17/04/2024 10.20, Xuan Zhuo wrote:
+> On Wed, 17 Apr 2024 12:08:10 +0800, Jason Wang <jasowang@redhat.com> wrote:
+>> On Wed, Apr 17, 2024 at 9:38 AM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
+>>>
+>>> On Tue, 16 Apr 2024 11:24:53 +0800, Jason Wang <jasowang@redhat.com> wrote:
+>>>> On Mon, Apr 15, 2024 at 5:04 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
+>>>>>
+>>>>> On Mon, 15 Apr 2024 16:56:45 +0800, Jason Wang <jasowang@redhat.com> wrote:
+>>>>>> On Mon, Apr 15, 2024 at 4:50 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
+>>>>>>>
+>>>>>>> On Mon, 15 Apr 2024 14:43:24 +0800, Jason Wang <jasowang@redhat.com> wrote:
+>>>>>>>> On Mon, Apr 15, 2024 at 10:35 AM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
+>>>>>>>>>
+>>>>>>>>> On Fri, 12 Apr 2024 13:49:12 +0800, Jason Wang <jasowang@redhat.com> wrote:
+>>>>>>>>>> On Fri, Apr 12, 2024 at 1:39 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
+>>>>>>>>>>>
+>>>>>>>>>>> On Fri, 12 Apr 2024 12:47:55 +0800, Jason Wang <jasowang@redhat.com> wrote:
+>>>>>>>>>>>> On Thu, Apr 11, 2024 at 10:51 AM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> Now, we chain the pages of big mode by the page's private variable.
+>>>>>>>>>>>>> But a subsequent patch aims to make the big mode to support
+>>>>>>>>>>>>> premapped mode. This requires additional space to store the dma addr.
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> Within the sub-struct that contains the 'private', there is no suitable
+>>>>>>>>>>>>> variable for storing the DMA addr.
+>>>>>>>>>>>>>
+>>>>>>>>>>>>>                  struct {        /* Page cache and anonymous pages */
+>>>>>>>>>>>>>                          /**
+>>>>>>>>>>>>>                           * @lru: Pageout list, eg. active_list protected by
+>>>>>>>>>>>>>                           * lruvec->lru_lock.  Sometimes used as a generic list
+>>>>>>>>>>>>>                           * by the page owner.
+>>>>>>>>>>>>>                           */
+>>>>>>>>>>>>>                          union {
+>>>>>>>>>>>>>                                  struct list_head lru;
+>>>>>>>>>>>>>
+>>>>>>>>>>>>>                                  /* Or, for the Unevictable "LRU list" slot */
+>>>>>>>>>>>>>                                  struct {
+>>>>>>>>>>>>>                                          /* Always even, to negate PageTail */
+>>>>>>>>>>>>>                                          void *__filler;
+>>>>>>>>>>>>>                                          /* Count page's or folio's mlocks */
+>>>>>>>>>>>>>                                          unsigned int mlock_count;
+>>>>>>>>>>>>>                                  };
+>>>>>>>>>>>>>
+>>>>>>>>>>>>>                                  /* Or, free page */
+>>>>>>>>>>>>>                                  struct list_head buddy_list;
+>>>>>>>>>>>>>                                  struct list_head pcp_list;
+>>>>>>>>>>>>>                          };
+>>>>>>>>>>>>>                          /* See page-flags.h for PAGE_MAPPING_FLAGS */
+>>>>>>>>>>>>>                          struct address_space *mapping;
+>>>>>>>>>>>>>                          union {
+>>>>>>>>>>>>>                                  pgoff_t index;          /* Our offset within mapping. */
+>>>>>>>>>>>>>                                  unsigned long share;    /* share count for fsdax */
+>>>>>>>>>>>>>                          };
+>>>>>>>>>>>>>                          /**
+>>>>>>>>>>>>>                           * @private: Mapping-private opaque data.
+>>>>>>>>>>>>>                           * Usually used for buffer_heads if PagePrivate.
+>>>>>>>>>>>>>                           * Used for swp_entry_t if PageSwapCache.
+>>>>>>>>>>>>>                           * Indicates order in the buddy system if PageBuddy.
+>>>>>>>>>>>>>                           */
+>>>>>>>>>>>>>                          unsigned long private;
+>>>>>>>>>>>>>                  };
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> But within the page pool struct, we have a variable called
+>>>>>>>>>>>>> dma_addr that is appropriate for storing dma addr.
+>>>>>>>>>>>>> And that struct is used by netstack. That works to our advantage.
+>>>>>>>>>>>>>
+>>>>>>>>>>>>>                  struct {        /* page_pool used by netstack */
+>>>>>>>>>>>>>                          /**
+>>>>>>>>>>>>>                           * @pp_magic: magic value to avoid recycling non
+>>>>>>>>>>>>>                           * page_pool allocated pages.
+>>>>>>>>>>>>>                           */
+>>>>>>>>>>>>>                          unsigned long pp_magic;
+>>>>>>>>>>>>>                          struct page_pool *pp;
+>>>>>>>>>>>>>                          unsigned long _pp_mapping_pad;
+>>>>>>>>>>>>>                          unsigned long dma_addr;
+>>>>>>>>>>>>>                          atomic_long_t pp_ref_count;
+>>>>>>>>>>>>>                  };
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> On the other side, we should use variables from the same sub-struct.
+>>>>>>>>>>>>> So this patch replaces the "private" with "pp".
+>>>>>>>>>>>>>
+>>>>>>>>>>>>> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+>>>>>>>>>>>>> ---
+>>>>>>>>>>>>
+>>>>>>>>>>>> Instead of doing a customized version of page pool, can we simply
+>>>>>>>>>>>> switch to use page pool for big mode instead? Then we don't need to
+>>>>>>>>>>>> bother the dma stuffs.
+>>>>>>>>>>>
+>>>>>>>>>>>
+>>>>>>>>>>> The page pool needs to do the dma by the DMA APIs.
+>>>>>>>>>>> So we can not use the page pool directly.
+>>>>>>>>>>
+>>>>>>>>>> I found this:
+>>>>>>>>>>
+>>>>>>>>>> define PP_FLAG_DMA_MAP         BIT(0) /* Should page_pool do the DMA
+>>>>>>>>>>                                          * map/unmap
+>>>>>>>>>>
+>>>>>>>>>> It seems to work here?
+>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> I have studied the page pool mechanism and believe that we cannot use it
+>>>>>>>>> directly. We can make the page pool to bypass the DMA operations.
+>>>>>>>>> This allows us to handle DMA within virtio-net for pages allocated from the page
+>>>>>>>>> pool. Furthermore, we can utilize page pool helpers to associate the DMA address
+>>>>>>>>> to the page.
+>>>>>>>>>
+>>>>>>>>> However, the critical issue pertains to unmapping. Ideally, we want to return
+>>>>>>>>> the mapped pages to the page pool and reuse them. In doing so, we can omit the
+>>>>>>>>> unmapping and remapping steps.
+>>>>>>>>>
+>>>>>>>>> Currently, there's a caveat: when the page pool cache is full, it disconnects
+>>>>>>>>> and releases the pages. When the pool hits its capacity, pages are relinquished
+>>>>>>>>> without a chance for unmapping.
 
---
-Thanks,
+Could Jakub's memory provider for PP help your use-case?
 
-Rahul Rameshbabu
+See: [1] 
+https://lore.kernel.org/all/20240403002053.2376017-3-almasrymina@google.com/
+Or: [2]
+https://lore.kernel.org/netdev/f8270765-a27b-6ccf-33ea-cda097168d79@redhat.com/T/
+
+
+[...]
+>>>>>>
+>>>>>> Adding Jesper for some comments.
+>>>>>>
+>>>>>>>
+>>>>>>> Back to this patch set, I think we should keep the virtio-net to manage
+>>>>>>> the pages.
+>>>>>>>
+
+For context the patch:
+  [3] 
+https://lore.kernel.org/all/20240411025127.51945-4-xuanzhuo@linux.alibaba.com/
+
+>>>>>>> What do you think?
+>>>>>>
+>>>>>> I might be wrong, but I think if we need to either
+>>>>>>
+>>>>>> 1) seek a way to manage the pages by yourself but not touching page
+>>>>>> pool metadata (or Jesper is fine with this)
+>>>>>
+>>>>> Do you mean working with page pool or not?
+>>>>>
+>>>>
+>>>> I meant if Jesper is fine with reusing page pool metadata like this patch.
+>>>>
+>>>>> If we manage the pages by self(no page pool), we do not care the metadata is for
+>>>>> page pool or not. We just use the space of pages like the "private".
+>>>>
+>>>> That's also fine.
+>>>>
+
+I'm not sure it is "fine" to, explicitly choosing not to use page pool,
+and then (ab)use `struct page` member (pp) that intended for page_pool
+for other stuff. (In this case create a linked list of pages).
+
+  +#define page_chain_next(p)	((struct page *)((p)->pp))
+  +#define page_chain_add(p, n)	((p)->pp = (void *)n)
+
+I'm not sure that I (as PP maintainer) can make this call actually, as I
+think this area belong with the MM "page" maintainers (Cc MM-list +
+people) to judge.
+
+Just invention new ways to use struct page fields without adding your
+use-case to struct page, will make it harder for MM people to maintain
+(e.g. make future change).
+
+--Jesper
+
+
 
