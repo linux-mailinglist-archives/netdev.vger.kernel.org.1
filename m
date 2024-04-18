@@ -1,173 +1,123 @@
-Return-Path: <netdev+bounces-89340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA80B8AA107
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:25:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4FD28AA114
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:31:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44754B20FA6
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 17:25:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99E591F228DE
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 17:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65815172BC6;
-	Thu, 18 Apr 2024 17:25:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF1A9176FA3;
+	Thu, 18 Apr 2024 17:30:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ocDypQjm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BxDOm3sz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C39B15E20F
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 17:25:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CB07174EF1;
+	Thu, 18 Apr 2024 17:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713461145; cv=none; b=jqKjiKEYPhcsbmHlk3HFEnBuBckhVt6bYUKXOuAY9QRs6iqRsYErSz1AvHDAMkpoQwImbtIbueMHQUc4zP29ZAQT+OHvBwFr6VbkUOQanVu0i3JZp3AKkeXGZzRnexPosR+g2NIjkCqFmCTATcooPcZuD9Jm1+Xw9PwYIsucpYI=
+	t=1713461459; cv=none; b=tTF4asgCP+33MMCvy+ZPPraJtRHRApeZClK2O40hYtdxKrRoJRv0mUT+Z7L6OeqTTC+LxMU0dsrCqADDb1uf2pRAB1KDBvKhg3AirrIes6GCWYs73omulGnh9h8TVk9TbNXzq0dsEDW7ZmXa3YnGaa0V0x3ffpxNaK4sVHiC6DE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713461145; c=relaxed/simple;
-	bh=w9SZnApHyBHOUonz8cu+jVtYHycCUgnp9/31l8txaeQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RldD2GLlmYvLxB898OKS2Xl6zkqSTZj5wowNvnyqHZwWLly6SLKyGDt+NA9dxB/Vm/ERA1SPwVhtHOTpzqsxVIXFHiyrnuiSNCbiuDCiHv85vJ8DOddvrTpVYTfoI/LN+g53M32VZXfYUF90eroORT9/6EqMcWG2E3VtkmWcZK4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ocDypQjm; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-415515178ceso8869105e9.0
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 10:25:41 -0700 (PDT)
+	s=arc-20240116; t=1713461459; c=relaxed/simple;
+	bh=+lewmFERRt+YPRyf4LGmEgUD5Sx3IL/S5o3dHvzf/S0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KRckot9is/C3H8/KwUWsNj7Yh9AyjO1t+yDBo0lUFRIuFjgSpyKxcZosIEmWdaZR1lhggJK/YxX1x00sJEKxgBtuio+l+BekKTlINHDx6xyRpcRzo7MjZuDT+cMaCwZpE+o+n2oTOgOKnpWrKLM0nb6KIkHxfwlkeLwcCCDkl5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BxDOm3sz; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-5ca29c131ebso755131a12.0;
+        Thu, 18 Apr 2024 10:30:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713461140; x=1714065940; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mHecw+rzO+LWiL74K7/imim+VobAIrmgiBEeiSPPzs8=;
-        b=ocDypQjmLFC8TGN1Gqkyj8fm6OVxgr2zAPaY/1Md+a/UOdtqnyXvdU8RTOTaHfrPC4
-         eVDBJSVS7mBa6orbe+VMnxv3UgGsNVq5AepG664UFVqlXqr68fJ1E4mYqBysOU6iB9hP
-         nfh38oHkWMoVSxrxSWji8bljfQjZj6wa46kCqSaoIsKSonHrcrYw/lDWDSdbPOw5Me89
-         FV5/sQY7r7R3X2cWESvQ2pXzg3rbo2A19TUWUmOi3xd8CJMM2ed99DNGlgSWO3uoltcN
-         EoUsI9OmK4JDAe/VtNXrD13CGe9Iu6aLSFvRUI5hUKhTJgfSpEAbNx94/GG4nutwK+Pr
-         EJeg==
+        d=gmail.com; s=20230601; t=1713461458; x=1714066258; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sic30g8pQM0MgGpABfp+RQkYvfgOJnSukraCHCD0dbo=;
+        b=BxDOm3sz2Rup3CVK5RI5CqBrD8AD5aiVPnWpJ4YvHIJ73u4FzuQSo0Yegb8m2Tu5f7
+         VlljKpPNHeBs78c1uztKMtwvk4sN2R+06mKYJEwlUqoNUX58jQg6c5IQDvUVbfmgvOVU
+         bicfdUSEMXJ9KFjbhBbHvTFCnJlAehyqS14wWnLqI1fnZydEFimFXjg+B0JJMGcwTKhB
+         8RUREh/c41qDcU4oeNjibcD0TDqY0ShFqO+VGMLATbBPMe7cu3nH4TEinSLhmLv9JSYn
+         0dJf1lN6IJk9bFNCPURyeAS8y2sJvWuSY056WKrHxdycMZPlZUebDcku5c4o4CuAOMmB
+         0JhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713461140; x=1714065940;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mHecw+rzO+LWiL74K7/imim+VobAIrmgiBEeiSPPzs8=;
-        b=wlARCTmtiVBpclHRFKxnKswicf5dP5AP6wdAq736/Gx7F95cAtWir1MGrUYpSoxx33
-         NC0XMTtA8e5mk5TWWOf45iGmpCqL4+yJ0abP/WhjhCRLaU+1ckBSKzx+Pdp6Tlqf5uym
-         lNgADutffyMRG8XKG+zNDyxLOnYfGKbV1S72bfvIB7v8pNYuvDJfmbS03UWkVm4KCp2X
-         4Fxd8nPDNu9OJGLWbw4nVE399z+tBS7xBEKwhEh7wzmyDPqPHocSGx6UAbBk0rp9JJH3
-         evJ2Ak1UbvCxAojdwZr+CNtyAe6arSc6mi+wq19c/Q/qmFvkvCa/ICb9zjE05nCLyyEJ
-         xkeg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjxeysDH8Ut5axuAdok2EDxTwn7Ene9S9d6w3v9ZuqUiw1eufSuhGn6Q5djsKZBAIFjRbNTTf7aZ3sSNt59mGS+8e/2kFz
-X-Gm-Message-State: AOJu0YyMVd2+89Eu36TFVitIKRX5g2V83fn2LxhDu9Frv9SdQE/PQpGB
-	pF2EVnZeB0nguuilhpYGqtnGly5PTMe2maAhhDQx1WjkUm50Iqm+J2LP2XJNmmysrWhJcw8cIqT
-	mn3A=
-X-Google-Smtp-Source: AGHT+IGUnOs/6X+o4eoVm7vjfPWuKC7TcN0KjqK38tFoax52+2CFzsdhF0TDeQVPAqauerg+LGf+XQ==
-X-Received: by 2002:a05:600c:1c91:b0:416:605b:5868 with SMTP id k17-20020a05600c1c9100b00416605b5868mr2314550wms.35.1713461140130;
-        Thu, 18 Apr 2024 10:25:40 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id p6-20020a05600c468600b0041563096e15sm7238238wmo.5.2024.04.18.10.25.38
+        d=1e100.net; s=20230601; t=1713461458; x=1714066258;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sic30g8pQM0MgGpABfp+RQkYvfgOJnSukraCHCD0dbo=;
+        b=T3bxQ+XS1SwMgkJjdadQjNUhd9OKFXu0q1W3hRplIS072AIRPaZSaVCpdb40CNZwV6
+         wqnASWBCB1WGe2Y3tLEp7WmJ8NAcZOsAbf92wM7CJyEeaADLdCgjhgsimsvcl0s2yO0u
+         AeJWraL06g0CxLV0XePP/GUXGNBxEGaJxYG5t5Iz5P/+5V6dsw0ujP71pNHaBiBjPTSR
+         aEQ/D3nbG2HNhXexepTm7GQwDHn4W6FbsHddCOr5BwXQb2vXE41re8czNs/M6F7d+Gtp
+         cXwahsvIYezZ34+xQnSW+8gpAZIpl2GfiDtLsJa4xMzIrS2n7J2hpXZftJRFJaISZH+f
+         xByg==
+X-Forwarded-Encrypted: i=1; AJvYcCXEPWjNKP+pI8DARXvd7a3WIm00cN1xI+v0k/Y+hoMKqq0yrrWuOOFZmgBsEDrXV56ySBblMoR+j5HnyQ2q+ELPKKYX8cH4qYeIT8txO8QtCjCVUgKFRRvq/VMreqDeJ0X0mJkNxatkTxR0ICVZmyeWAYCPBSaOmLTsDcCW/0IAog==
+X-Gm-Message-State: AOJu0YyPIk7MlQurwgfknM4Hzv7ew7wPwIlWPBlhgxI5okoXOAqiK+la
+	CcgGm26InZuXZouJ4+jSaKSkTRlHK9MtcNTTZh32aytmqnFupdsi
+X-Google-Smtp-Source: AGHT+IGdiQPfFfe2JKLEjmGLZmK/OGwloZWthLXdWhEOZPU0dgtw2G/27Zx3J3bYnzb6rRqPwR/fVw==
+X-Received: by 2002:a05:6a20:dd88:b0:1a3:6a19:9f5f with SMTP id kw8-20020a056a20dd8800b001a36a199f5fmr3849016pzb.26.1713461457564;
+        Thu, 18 Apr 2024 10:30:57 -0700 (PDT)
+Received: from kernelexploit-virtual-machine.localdomain ([121.185.186.233])
+        by smtp.gmail.com with ESMTPSA id o13-20020a056a001b4d00b006e6c733bde9sm1732556pfv.155.2024.04.18.10.30.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 10:25:39 -0700 (PDT)
-Date: Thu, 18 Apr 2024 19:25:35 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	jacob.e.keller@intel.com, michal.kubiak@intel.com,
-	maciej.fijalkowski@intel.com, sridhar.samudrala@intel.com,
-	przemyslaw.kitszel@intel.com, wojciech.drewek@intel.com,
-	pio.raczynski@gmail.com, jiri@nvidia.com,
-	mateusz.polchlopek@intel.com
-Subject: Re: [iwl-next v4 5/8] ice: allocate devlink for subfunction
-Message-ID: <ZiFXj-58u2shLL3g@nanopsycho>
-References: <20240417142028.2171-1-michal.swiatkowski@linux.intel.com>
- <20240417142028.2171-6-michal.swiatkowski@linux.intel.com>
- <ZiEMRcP7QN5zVd8Z@nanopsycho>
- <ZiEWtQ2bnfSO6Da7@mev-dev>
- <ZiEZ-UKL0kYtEtOp@nanopsycho>
- <ZiEyP+t9uarUrLGO@mev-dev>
- <ZiE_nUEsGT8Cd3BK@nanopsycho>
- <ZiFGOkSMWs+/N2vI@mev-dev>
+        Thu, 18 Apr 2024 10:30:57 -0700 (PDT)
+From: Jeongjun Park <aha310510@gmail.com>
+To: ajk@comnets.uni-bremen.de
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-hams@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	syzkaller-bugs@googlegroups.com,
+	syzbot+8e03da5d64bc85098811@syzkaller.appspotmail.com,
+	Jeongjun Park <aha310510@gmail.com>
+Subject: [PATCH] hams: Fix deadlock caused by unsafe-irq lock in sp_get()
+Date: Fri, 19 Apr 2024 02:30:37 +0900
+Message-Id: <20240418173037.6714-1-aha310510@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZiFGOkSMWs+/N2vI@mev-dev>
-
-Thu, Apr 18, 2024 at 06:11:38PM CEST, michal.swiatkowski@linux.intel.com wrote:
->On Thu, Apr 18, 2024 at 05:43:25PM +0200, Jiri Pirko wrote:
->> Thu, Apr 18, 2024 at 04:46:23PM CEST, michal.swiatkowski@linux.intel.com wrote:
->> >On Thu, Apr 18, 2024 at 03:02:49PM +0200, Jiri Pirko wrote:
->> >> Thu, Apr 18, 2024 at 02:48:53PM CEST, michal.swiatkowski@linux.intel.com wrote:
->> >> >On Thu, Apr 18, 2024 at 02:04:21PM +0200, Jiri Pirko wrote:
->> >> >> Wed, Apr 17, 2024 at 04:20:25PM CEST, michal.swiatkowski@linux.intel.com wrote:
->> >> >> >From: Piotr Raczynski <piotr.raczynski@intel.com>
->> >> >> 
->> >> >> [...]
->> >> >> 
->> >> >> >+/**
->> >> >> >+ * ice_allocate_sf - Allocate devlink and return SF structure pointer
->> >> >> >+ * @dev: the device to allocate for
->> >> >> >+ *
->> >> >> >+ * Allocate a devlink instance for SF.
->> >> >> >+ *
->> >> >> >+ * Return: void pointer to allocated memory
->> >> >> >+ */
->> >> >> >+struct ice_sf_priv *ice_allocate_sf(struct device *dev)
->> >> >> 
->> >> >> This is devlink instance for SF auxdev. Please make sure it is properly
->> >> >> linked with the devlink port instance using devl_port_fn_devlink_set()
->> >> >> See mlx5 implementation for inspiration.
->> >> >> 
->> >> >> 
->> >> >
->> >> >I am going to do it in the last patchset. I know that it isn't the best
->> >> 
->> >> Where? Either I'm blind or you don't do it.
->> >> 
->> >> 
->> >
->> >You told me to split few patches from first patchset [1]. We agree that
->> >there will be too many patches for one submission, so I split it into
->> >3:
->> >- 1/3 devlink prework (already accepted)
->> >- 2/3 base subfunction (this patchset)
->> >- 3/3 port representor refactor to support subfunction (I am going to
->> >  include it there)
->> 
->> Sorry, but how is this relevant to my suggestion to use
->> devl_port_fn_devlink_set() which you apparently don't?
->> 
->
->Devlink port to link with is introduced in the port representor part.
->Strange, but it fitted to my splitting. I can move
->activation/deactivation part also to this patchset (as there is no
->devlink port to call it on) if you want.
-
-You have 7 more patches to use in this set. No problem. Please do it all
-at once.
+Content-Transfer-Encoding: 8bit
 
 
->
->> 
->> >
->> >[1] https://lore.kernel.org/netdev/20240301115414.502097-1-michal.swiatkowski@linux.intel.com/
->> >
->> >Thanks,
->> >Michal
->> >
->> >> >option to split patchesets like that, but it was hard to do it differently.
->> >> >
->> >> >Thanks,
->> >> >Michal
->> >> >
->> >> >> >+{
->> >> >> >+	return ice_devlink_alloc(dev, sizeof(struct ice_sf_priv),
->> >> >> >+				 &ice_sf_devlink_ops);
->> >> >> >+}
->> >> >> >+
->> >> >> 
->> >> >> [...]
+read_lock() present in sp_get() is interrupt-vulnerable, so the function needs to be modified.
+
+
+Reported-by: syzbot+8e03da5d64bc85098811@syzkaller.appspotmail.com
+Signed-off-by: Jeongjun Park <aha310510@gmail.com>
+---
+ drivers/net/hamradio/6pack.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/hamradio/6pack.c b/drivers/net/hamradio/6pack.c
+index 6ed38a3cdd73..f882682ff0c8 100644
+--- a/drivers/net/hamradio/6pack.c
++++ b/drivers/net/hamradio/6pack.c
+@@ -372,12 +372,13 @@ static DEFINE_RWLOCK(disc_data_lock);
+ static struct sixpack *sp_get(struct tty_struct *tty)
+ {
+ 	struct sixpack *sp;
++	unsigned long flags;
+ 
+-	read_lock(&disc_data_lock);
++	flags = read_lock_irqsave(&disc_data_lock);
+ 	sp = tty->disc_data;
+ 	if (sp)
+ 		refcount_inc(&sp->refcnt);
+-	read_unlock(&disc_data_lock);
++	read_unlock_irqrestore(&disc_data_lock, flags);
+ 
+ 	return sp;
+ }
+-- 
+2.34.1
 
