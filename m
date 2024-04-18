@@ -1,162 +1,204 @@
-Return-Path: <netdev+bounces-89333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B4188AA0BC
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:07:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C7A28AA0C0
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 19:07:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C386AB212F7
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 17:07:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC8FE1F21741
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 17:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF5A816F90B;
-	Thu, 18 Apr 2024 17:07:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17BC617333F;
+	Thu, 18 Apr 2024 17:07:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JuusGYyp"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DVDkuqQe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 935DF6A8D8;
-	Thu, 18 Apr 2024 17:07:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5894617109D;
+	Thu, 18 Apr 2024 17:07:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713460024; cv=none; b=ixM1702WCnkmgR9zG5fa45nRu4grij8rGGYd7Wx9z3XavTXTdLNHOqyRmzl9bpxFOI6MedX7hCwD1Ef9GXcpmmdTj8L+Dbdzh3u5w2hwfGo/85ePHY6FqziC/gl6gAPeduC7YIFVqlO0st8wDmJ2AO3mzA6w+SaD+J5pZWGZK3k=
+	t=1713460049; cv=none; b=MlNSMgk62vcHXE03b0BVMGi+LpMCBfmd6mhtZnguQN8QDksTzU1BneKgOBc/3EnaZLI1PDGJOe+F4H2UGmRoA1ynPkHoyuExefpfrN8GzjqQPXTcXMxSkV7YwS10pnunnOjuIMV9KF4Zpz1Z3PAvGZxnykByMVBwYzQA5DyB8Mg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713460024; c=relaxed/simple;
-	bh=BYwYkxm+zpYZ0DpwReyWESpX1gDBOjXLammM1+gjBc0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=n0KXLd1ck5Brk1DEPnoAKSv9lSrBCJ/kRqjkpsgaCP6D7DI0w6unPbavNbY9h9ibpOTmA13SOSi7U/U45n58+Ksziaz/SuiW3nqL/WbCspE2Xtl7f3+g0W+mDRPYqGA9nFguK/4T8VTP2zVwtbOzsgpwIDZ6z9uDdRmV5ozvdcM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JuusGYyp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25CAAC113CC;
-	Thu, 18 Apr 2024 17:07:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713460024;
-	bh=BYwYkxm+zpYZ0DpwReyWESpX1gDBOjXLammM1+gjBc0=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=JuusGYypz/r6yjrmmlRYIhsOHg5osz8Ds+a9L6Dl+CAdna5u5/YemuE+C9SMFPbVi
-	 FxutFG72eDG+ybKhe1787CiiUlnyFL0op/OaHS8A8SkHWbqQ5bOhu+PeiFE0Mge359
-	 wBZkM+7pnah2zcxUk+9L7VeU3I9W96uRFJZXITVXEEaczBl6Bjqx992Gp18Q/dac3g
-	 Q6SlU4noTRi7nn4SvbmVs2yKPgJpEQBKpDgcYtU2kFd+3EPDp+/uR2QeZ6XLHQiPh1
-	 MXnem0qsKRRdpzCtiFwQRcLBpZNnTvwcouYNMgAf3LWPDeytUHC5AAus3bmNbJLEXQ
-	 wvKFnAPXE4lEg==
-Message-ID: <6ce928fa-0a86-4d9a-8f48-d31d95fc1978@kernel.org>
-Date: Thu, 18 Apr 2024 19:07:01 +0200
+	s=arc-20240116; t=1713460049; c=relaxed/simple;
+	bh=CM8nI49mltTWyh4988wuYDUXZS3yI7+5n5mJ6JmHjME=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Y/Ccby9z5VA0K10N7WuhtDrXqPBbe2frRzuodFSV5oDvO9cjwALChPjFmkmmUvX0cAe4oqlHGibaBh2rnlRbqk20hmrUG1EGfVubhay9kT1AaK1nX4urrU/t6fAeoIts+w0a9zl76BHxQTDyjoGlaimsIgfwKyIRs/SU9ZPKiCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=DVDkuqQe; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1713460047; x=1744996047;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=TnpL60BmwUQXb8PJ1rdJnfwkYwzlGEVJGSnW8ntW7ww=;
+  b=DVDkuqQe9afaKYg5GwT8qTpUPMoz8Irw3fcgZ17v6sZQA7kprWIorOBa
+   yKPk2qyY8lVJl3Sjrpv/GJJ4YAxSCnk9Dxw09stF5G65/uTr8++52gPY0
+   /VPT552Bl/FRP/qGBxkQSAPNxg4wfrVFpewAdPIppZRku84hmv63QMePg
+   g=;
+X-IronPort-AV: E=Sophos;i="6.07,212,1708387200"; 
+   d="scan'208";a="289833836"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 17:07:25 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:14707]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.36.251:2525] with esmtp (Farcaster)
+ id 68146c37-eb72-4c08-a36e-2026240dca63; Thu, 18 Apr 2024 17:07:25 +0000 (UTC)
+X-Farcaster-Flow-ID: 68146c37-eb72-4c08-a36e-2026240dca63
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Thu, 18 Apr 2024 17:07:24 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.33) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Thu, 18 Apr 2024 17:07:21 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzbot+42a0dc856239de4de60e@syzkaller.appspotmail.com>,
+	<syzkaller-bugs@googlegroups.com>
+Subject: Re: [syzbot] [net?] KMSAN: uninit-value in ipvlan_queue_xmit (2)
+Date: Thu, 18 Apr 2024 10:07:13 -0700
+Message-ID: <20240418170713.24385-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CANn89iLFjPiWdLw170ng2=9juwMnN8TxrKd1D1MntWPhWRxt-g@mail.gmail.com>
+References: <CANn89iLFjPiWdLw170ng2=9juwMnN8TxrKd1D1MntWPhWRxt-g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] NFC: trf7970a: disable all regulators on removal
-To: Paul Geurts <paul_geurts@live.nl>, mgreer@animalcreek.com,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <AM0PR09MB2675EDFD44EC82B6BCBB430F95082@AM0PR09MB2675.eurprd09.prod.outlook.com>
- <64ca6d41-8173-4e0e-9467-4fa32db812ec@kernel.org>
- <AM0PR09MB2675C3D6432177B4CABAD49A950E2@AM0PR09MB2675.eurprd09.prod.outlook.com>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <AM0PR09MB2675C3D6432177B4CABAD49A950E2@AM0PR09MB2675.eurprd09.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D044UWA001.ant.amazon.com (10.13.139.100) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 18/04/2024 10:12, Paul Geurts wrote:
-> On 17-04-2024 15:15, Krzysztof Kozlowski wrote:
->> On 16/04/2024 22:28, Paul Geurts wrote:
->>> During module probe, regulator 'vin' and 'vdd-io' are used and enabled,
->>> but the vdd-io regulator overwrites the 'vin' regulator pointer. During
->>> remove, only the vdd-io is disabled, as the vin regulator pointer is not
->>> available anymore. When regulator_put() is called during resource
->>> cleanup a kernel warning is given, as the regulator is still enabled.
->>>
->>> Store the two regulators in separate pointers and disable both the
->>> regulators on module remove.
->>>
->>> Fixes: 49d22c70aaf0 ("NFC: trf7970a: Add device tree option of 1.8 Volt IO voltage")
->>>
->>> Signed-off-by: Paul Geurts <paul_geurts@live.nl>
->> No blank lines between tags. Please look at existing commits (git log).
-> Will fix this, thanks
->>
->>> ---
->>>  drivers/nfc/trf7970a.c | 42 +++++++++++++++++++++++-------------------
->>>  1 file changed, 23 insertions(+), 19 deletions(-)
->>>
->>> diff --git a/drivers/nfc/trf7970a.c b/drivers/nfc/trf7970a.c
->>> index 7eb17f46a815..9e1a34e23af2 100644
->>> --- a/drivers/nfc/trf7970a.c
->>> +++ b/drivers/nfc/trf7970a.c
->>> @@ -424,7 +424,8 @@ struct trf7970a {
->>>  	enum trf7970a_state		state;
->>>  	struct device			*dev;
->>>  	struct spi_device		*spi;
->>> -	struct regulator		*regulator;
->>> +	struct regulator		*vin_regulator;
->>> +	struct regulator		*vddio_regulator;
->>>  	struct nfc_digital_dev		*ddev;
->>>  	u32				quirks;
->>>  	bool				is_initiator;
->>> @@ -1883,7 +1884,7 @@ static int trf7970a_power_up(struct trf7970a *trf)
->>>  	if (trf->state != TRF7970A_ST_PWR_OFF)
->>>  		return 0;
->>>  
->>> -	ret = regulator_enable(trf->regulator);
->>> +	ret = regulator_enable(trf->vin_regulator);
->> That does not look like equivalent code. Previously this was vddio, right?
-> This is part of the original issue created by 49d22c70aaf0. This should be the VIN regulator, but the pointer override made it VDD-IO.
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 18 Apr 2024 09:19:20 +0200
+> On Thu, Apr 18, 2024 at 9:05 AM syzbot
+> <syzbot+42a0dc856239de4de60e@syzkaller.appspotmail.com> wrote:
+> >
+> > Hello,
+> >
+> > syzbot found the following issue on:
+> >
+> > HEAD commit:    f2e367d6ad3b Merge tag 'for-6.8/dm-fix-3' of git://git.ker..
+> > git tree:       upstream
+> > console+strace: https://syzkaller.appspot.com/x/log.txt?x=144a8d4a180000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=1b015d567058472
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=42a0dc856239de4de60e
+> > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=149caa54180000
+> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10bb8e22180000
+> >
+> > Downloadable assets:
+> > disk image: https://storage.googleapis.com/syzbot-assets/0dabc03369d1/disk-f2e367d6.raw.xz
+> > vmlinux: https://storage.googleapis.com/syzbot-assets/240ca250d398/vmlinux-f2e367d6.xz
+> > kernel image: https://storage.googleapis.com/syzbot-assets/cc38bcdb48c9/bzImage-f2e367d6.xz
+> >
+> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > Reported-by: syzbot+42a0dc856239de4de60e@syzkaller.appspotmail.com
+> >
+> > =====================================================
+> > BUG: KMSAN: uninit-value in ipvlan_process_outbound drivers/net/ipvlan/ipvlan_core.c:524 [inline]
+> > BUG: KMSAN: uninit-value in ipvlan_xmit_mode_l3 drivers/net/ipvlan/ipvlan_core.c:602 [inline]
+> > BUG: KMSAN: uninit-value in ipvlan_queue_xmit+0xf44/0x16b0 drivers/net/ipvlan/ipvlan_core.c:668
+> >  ipvlan_process_outbound drivers/net/ipvlan/ipvlan_core.c:524 [inline]
+> >  ipvlan_xmit_mode_l3 drivers/net/ipvlan/ipvlan_core.c:602 [inline]
+> >  ipvlan_queue_xmit+0xf44/0x16b0 drivers/net/ipvlan/ipvlan_core.c:668
+> >  ipvlan_start_xmit+0x5c/0x1a0 drivers/net/ipvlan/ipvlan_main.c:222
+> >  __netdev_start_xmit include/linux/netdevice.h:4989 [inline]
+> >  netdev_start_xmit include/linux/netdevice.h:5003 [inline]
+> >  xmit_one net/core/dev.c:3547 [inline]
+> >  dev_hard_start_xmit+0x244/0xa10 net/core/dev.c:3563
+> >  __dev_queue_xmit+0x33ed/0x51c0 net/core/dev.c:4351
+> >  dev_queue_xmit include/linux/netdevice.h:3171 [inline]
+> >  packet_xmit+0x9c/0x6b0 net/packet/af_packet.c:276
+> >  packet_snd net/packet/af_packet.c:3081 [inline]
+> >  packet_sendmsg+0x8aef/0x9f10 net/packet/af_packet.c:3113
+> >  sock_sendmsg_nosec net/socket.c:730 [inline]
+> >  __sock_sendmsg net/socket.c:745 [inline]
+> >  __sys_sendto+0x735/0xa10 net/socket.c:2191
+> >  __do_sys_sendto net/socket.c:2203 [inline]
+> >  __se_sys_sendto net/socket.c:2199 [inline]
+> >  __x64_sys_sendto+0x125/0x1c0 net/socket.c:2199
+> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >  do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+> >  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> >
+> > Uninit was created at:
+> >  slab_post_alloc_hook mm/slub.c:3819 [inline]
+> >  slab_alloc_node mm/slub.c:3860 [inline]
+> >  __do_kmalloc_node mm/slub.c:3980 [inline]
+> >  __kmalloc_node_track_caller+0x705/0x1000 mm/slub.c:4001
+> >  kmalloc_reserve+0x249/0x4a0 net/core/skbuff.c:582
+> >  __alloc_skb+0x352/0x790 net/core/skbuff.c:651
+> >  skb_segment+0x20aa/0x7080 net/core/skbuff.c:4647
+> >  udp6_ufo_fragment+0xcab/0x1150 net/ipv6/udp_offload.c:109
+> >  ipv6_gso_segment+0x14be/0x2ca0 net/ipv6/ip6_offload.c:152
+> >  skb_mac_gso_segment+0x3e8/0x760 net/core/gso.c:53
+> >  nsh_gso_segment+0x6f4/0xf70 net/nsh/nsh.c:108
+> >  skb_mac_gso_segment+0x3e8/0x760 net/core/gso.c:53
+> >  __skb_gso_segment+0x4b0/0x730 net/core/gso.c:124
+> >  skb_gso_segment include/net/gso.h:83 [inline]
+> >  validate_xmit_skb+0x107f/0x1930 net/core/dev.c:3628
+> >  __dev_queue_xmit+0x1f28/0x51c0 net/core/dev.c:4343
+> >  dev_queue_xmit include/linux/netdevice.h:3171 [inline]
+> >  packet_xmit+0x9c/0x6b0 net/packet/af_packet.c:276
+> >  packet_snd net/packet/af_packet.c:3081 [inline]
+> >  packet_sendmsg+0x8aef/0x9f10 net/packet/af_packet.c:3113
+> >  sock_sendmsg_nosec net/socket.c:730 [inline]
+> >  __sock_sendmsg net/socket.c:745 [inline]
+> >  __sys_sendto+0x735/0xa10 net/socket.c:2191
+> >  __do_sys_sendto net/socket.c:2203 [inline]
+> >  __se_sys_sendto net/socket.c:2199 [inline]
+> >  __x64_sys_sendto+0x125/0x1c0 net/socket.c:2199
+> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >  do_syscall_64+0xcf/0x1e0 arch/x86/entry/common.c:83
+> >  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> >
+> > CPU: 1 PID: 5101 Comm: syz-executor421 Not tainted 6.8.0-rc5-syzkaller-00297-gf2e367d6ad3b #0
+> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+> > =====================================================
+> >
+> >
+> > ---
+> > This report is generated by a bot. It may contain errors.
+> > See https://goo.gl/tpsmEJ for more information about syzbot.
+> > syzbot engineers can be reached at syzkaller@googlegroups.com.
+> >
+> > syzbot will keep track of this issue. See:
+> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> >
+> > If the report is already addressed, let syzbot know by replying with:
+> > #syz fix: exact-commit-title
+> >
+> > If you want syzbot to run the reproducer, reply with:
+> > #syz test: git://repo/address.git branch-or-commit-hash
+> > If you attach or paste a git patch, syzbot will apply it before testing.
+> >
+> > If you want to overwrite report's subsystems, reply with:
+> > #syz set subsystems: new-subsystem
+> > (See the list of subsystem names on the web dashboard)
+> >
+> > If the report is a duplicate of another one, reply with:
+> > #syz dup: exact-subject-of-another-report
+> >
+> > If you want to undo deduplication, reply with:
+> > #syz undup
+> 
+> Cc Kuniyuki Iwashima
+> 
+> This is the syzbot bug I mentioned earlier to you.
 
-True, good point.
+Will look into it.
 
-
-Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
-
-Best regards,
-Krzysztof
-
+Thanks!
 
