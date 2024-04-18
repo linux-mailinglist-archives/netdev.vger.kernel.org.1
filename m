@@ -1,104 +1,144 @@
-Return-Path: <netdev+bounces-89265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD7338A9E0F
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 17:13:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF5EF8A9E15
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 17:15:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C0441C214E0
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 15:13:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75A752877BB
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 15:15:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5455A16C447;
-	Thu, 18 Apr 2024 15:13:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20F716C44E;
+	Thu, 18 Apr 2024 15:15:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZWoYw6EB"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="AEqykXqX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C458016C444;
-	Thu, 18 Apr 2024 15:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613CE6FC3;
+	Thu, 18 Apr 2024 15:15:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713453181; cv=none; b=uLTvimzH+JyBClUQ3rs7cb2/+RIlWYg+nyOzqcCTTIBOZwGCw5OYNLQD5RzPm51w8J3JYsryToYAtR6nwid8gTjr0y420BilMqW4G5cN6SZHw1USZs50Hu1IW4IQsirh0LWc4LHnuHreh8QaCZcjSvZro5qXIjjZFEF8AwjlHIk=
+	t=1713453318; cv=none; b=CFsN0d/QAHVSSc/cuipIH7YnyfNzFwefXLK3aX2Iby4ylr6O4jdpQdyQrEKgFHSvGCpuJoGSyaXkpzvYejjKPs9we9pAxlZTmZ5Hqvxw8eUrOPo8JT8N48JPQyXeirNLBz0/Ij90L4FDyhffW13xm27JAdp0O4zudtUKPrvRtjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713453181; c=relaxed/simple;
-	bh=S0j6r/kzcruhemR329aT+kBaDtVcwpoh0HHfyLsCHLE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=H8I1ovgSeqGc7iYRQfFG71n3b8W43Ffn31f3tYmcpD4G7pLCZIYr/tlYuM7zpKr+dca4hl4hWj76S/plvCDTA8/1jm/J3kNlrQegYn2L74j1TkEpIqFNUJgNHH9Si8t0x2LeVnAsJYgMIlK2SdNkLnbY3e67mjNZqc8Kw+eka+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZWoYw6EB; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-41551500a7eso6918755e9.2;
-        Thu, 18 Apr 2024 08:12:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713453178; x=1714057978; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EQVPvQGda+w06QQHpjA7eEaHw2QE6VxA3M3eBLIeGSg=;
-        b=ZWoYw6EB7LW3oSL/9SG/EccZ62jg7soM8C+ulfs3L40CN89KUoIJGLbRWgzjJu1ljh
-         V6TUCdy8p1uAnB+1FepDABCjGV+YdPrxUAYxBjP6GtpGafMH9pOqkbgMl7eaUY2xN2KS
-         RG6uXnCdshZ7LBIoIasVpEee82Y9mz3Xz6jZ7cM6vg9i82Ww5/Y//5MRCcaUeWQS2ECG
-         mPe8rPRBtvEar/o9Npb9y9/3nRGWdHu5g5PIHGyFJE+OkjCEr9PGZ5pDRUcKZwdOKqE5
-         TDGZcRKcAPLhbGkqyDhRt1+luIKC2YYQ6RxAoAg9Q/zowKzZ1indiWyDHExVGSSoBNWA
-         Rjpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713453178; x=1714057978;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=EQVPvQGda+w06QQHpjA7eEaHw2QE6VxA3M3eBLIeGSg=;
-        b=tzMQ7fKK1ofb/3inc7H0/fBTpqpmT8SrWnyEm1dJ+PNrHA+mDLhF3MSbHrKgOylnig
-         xrOtJ08omM0a6pmEoO/+LH7SK+9CCUaGoHCcY77lCYigUXvMwPZveG+d6HVL5imSjWjv
-         mnAHGJz/QRHnOz1qd+8SE41t7dysDnLH46PO7GIWbNTUjYSSuUraOWOx/4/yYM2OKV0L
-         rH9likjpCF/iWfgCtM8MztW2aaJHPdkvFxSKTTqxLN24bTjNJoal9kSAUpR9mmnhi7eA
-         lk9ChZ8akpQtPOsrpCKgiZ2fpUhkkiHcJ/fVP/5RK8fLsvsfHa7bvl3amXK/s5tvXdqO
-         fBjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXIOlyG22Gg4LIWV4Wh3UOReV6z5euKuav5rRwkPw1oCOtA0HH2piyUnU6xL8s1L6DtLQXwxfLD0YsXrMzuUj2DOZ02c+w+jUiR72nkFCt3pD642XDgZ7wWwiySgTZxuhbGceGH
-X-Gm-Message-State: AOJu0Yygi0kcm5geH1PzE/FQF69Ta81TO7BsjPVRpZokE7JjfK/chkpO
-	rcccsqLN8B78AUb1diqKSDRPIKEUphZBrL2GLw1FkJQ2dRLZPzHC
-X-Google-Smtp-Source: AGHT+IGV6hnD+ktekzMTUV0X6jSrXRxddrCwn3Qf9CbT2CguIp4I0jJ1HMRtknqoUy50uXW6bT2RWQ==
-X-Received: by 2002:a05:600c:3ac7:b0:418:f195:838b with SMTP id d7-20020a05600c3ac700b00418f195838bmr1010843wms.4.1713453178060;
-        Thu, 18 Apr 2024 08:12:58 -0700 (PDT)
-Received: from debian ([146.70.204.204])
-        by smtp.gmail.com with ESMTPSA id m22-20020a05600c4f5600b004148d7b889asm6921930wmq.8.2024.04.18.08.12.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Apr 2024 08:12:57 -0700 (PDT)
-Message-ID: <6736050b-1410-453e-8afa-55e4c8f34033@gmail.com>
-Date: Thu, 18 Apr 2024 17:12:43 +0200
+	s=arc-20240116; t=1713453318; c=relaxed/simple;
+	bh=MqV2rBxMgLuJe+VPlLPa1DPQKM5xkGlhpgau/ML3Eh4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=CGrJsz/iUl7e1O7kAJicHQ72Nc3nn1Jcv+H/bSp9lUXNESc+rQTGW3UjU4SalSqcyq8TA/unrxeFnFetk8CAGqxyE1n1h/YG8jdDsWcHqohoYaL6fjQw5EIu7jRXGdWpZx2TZ9ch2V+NkN234UQ8I+HqS0+FGpqRRm6gzf5mfJk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=AEqykXqX; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43IFBU5q001060;
+	Thu, 18 Apr 2024 15:15:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=pp1; bh=yvJB7n3zcg0lP7jYTfc+29ixZY/rHTOtVz0igNMWcjY=;
+ b=AEqykXqXYh+bhRmx643unlJZxPkzEgQ/dhvx7UGCm3dHgSWUmxdPOjbAtcJl776ABwr3
+ s6lFyC6ZJpSA4iHoMJcaJumf1AyLMKTIbd7p+Ev/a0UFeC0VhOzvyW0kT+OXxEYdYd69
+ 03ThFm0e3BfoLVTQwYly7ZkAZj8lcwUHUmMX6Kcf8WA/LPVhATidZAwgDgJfRMHkj3l7
+ TSi6c9tFUWI8lkSUujIxZTo66RyaeqO0CjZZnXqeoPuV1/lR8+9hDWSS0yx3OD1XPL6a
+ rZerizTHuHyaD0/4nIVB3NO5vQpVoMzZpQTrmTdIyvKG3TmtcBCtJUwgu4LCVmvivMcs Ww== 
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xk5xb009w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Apr 2024 15:15:09 +0000
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43IDXLS8011137;
+	Thu, 18 Apr 2024 15:15:09 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xg732twcw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 18 Apr 2024 15:15:09 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43IFF3nv47513972
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 18 Apr 2024 15:15:05 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8FFDF2004D;
+	Thu, 18 Apr 2024 15:15:03 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 49C8C20043;
+	Thu, 18 Apr 2024 15:15:03 +0000 (GMT)
+Received: from osiris (unknown [9.152.212.60])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 18 Apr 2024 15:15:03 +0000 (GMT)
+Date: Thu, 18 Apr 2024 17:15:01 +0200
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Nathan Chancellor <nathan@kernel.org>
+Cc: akpm@linux-foundation.org, arnd@arndb.de, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com,
+        wintera@linux.ibm.com, twinkler@linux.ibm.com,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        llvm@lists.linux.dev, patches@lists.linux.dev
+Subject: Re: [PATCH 1/3] s390/vmlogrdr: Remove function pointer cast
+Message-ID: <20240418151501.6056-C-hca@linux.ibm.com>
+References: <20240417-s390-drivers-fix-cast-function-type-v1-0-fd048c9903b0@kernel.org>
+ <20240417-s390-drivers-fix-cast-function-type-v1-1-fd048c9903b0@kernel.org>
+ <20240418095438.6056-A-hca@linux.ibm.com>
+ <20240418102549.6056-B-hca@linux.ibm.com>
+ <20240418145121.GA1435416@dev-arch.thelio-3990X>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240418145121.GA1435416@dev-arch.thelio-3990X>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: tdDPeclmPDKm_VNRKQNLV_YRxDgk2lU6
+X-Proofpoint-GUID: tdDPeclmPDKm_VNRKQNLV_YRxDgk2lU6
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net v1 2/2] net: gro: add p_off param in *_gro_complete
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
- aleksander.lobakin@intel.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240412152120.115067-1-richardbgobert@gmail.com>
- <20240412152120.115067-3-richardbgobert@gmail.com>
- <661ad2e8a7e95_3be9a7294a5@willemb.c.googlers.com.notmuch>
- <97a01bf9-99d2-4368-9ebd-1e1194c1d7fd@gmail.com>
- <662025813539e_c86472944@willemb.c.googlers.com.notmuch>
-From: Richard Gobert <richardbgobert@gmail.com>
-In-Reply-To: <662025813539e_c86472944@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-04-18_13,2024-04-17_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ malwarescore=0 spamscore=0 priorityscore=1501 mlxscore=0 clxscore=1015
+ phishscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
+ mlxlogscore=541 bulkscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2404010000 definitions=main-2404180108
 
-Willem de Bruijn wrote:> Since this INDIRECT_CALL_INET needs to know about the definitions of
-> udp4_lib_lookup_skb and udp6_lib_lookup_skb anyway, we can just get
-> rid of the whole udp_lookup_t type and function pointer passing?
+Hi Nathan,
+
+> > > > -		/*
+> > > > -		 * The release function could be called after the
+> > > > -		 * module has been unloaded. It's _only_ task is to
+> > > > -		 * free the struct. Therefore, we specify kfree()
+> > > > -		 * directly here. (Probably a little bit obfuscating
+> > > > -		 * but legitime ...).
+> > > > -		 */
+> > > 
+> > > Why is the comment not relevant after this change? Or better: why is it not
+> > > valid before this change, which is why the code was introduced a very long
+> > > time ago? Any reference?
+> > > 
+> > > I've seen the warning since quite some time, but didn't change the code
+> > > before sure that this doesn't introduce the bug described in the comment.
+> > 
+> > From only 20 years ago:
+> > 
+> > https://lore.kernel.org/all/20040316170812.GA14971@kroah.com/
+> > 
+> > The particular code (zfcp) was changed, so it doesn't have this code
+> > (or never did?)  anymore, but for the rest this may or may not still
+> > be valid.
 > 
-> Or move the entire lookup to udp4_gro_complete/udp6_gro_complete and
-> pass the sk to udp_gro_complete.
+> I guess relevant may not have been the correct word. Maybe obvious? I
+> can keep the comment but I do not really see what it adds, although
+> reading the above thread, I suppose it was added as justification for
+> calling kfree() as ->release() for a 'struct device'? Kind of seems like
+> that ship has sailed since I see this all over the place as a
+> ->release() function. I do not see how this patch could have a function
+> change beyond that but I may be misreading or misinterpreting your full
+> comment.
 
-This sounds like a really good idea, I like it. Although I think it may be
-more relevant to net-next instead of this bug fix. I can post a
-complementing patch to net-next later if that's OK with you.
+That doesn't answer my question what prevents the release function
+from being called after the module has been unloaded.
 
+At least back then when the code was added it was a real bug.
 
