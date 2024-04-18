@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-89067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B84E68A954C
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 10:48:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A93748A9559
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 10:50:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D49BB21D9E
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 08:48:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36B201F218BD
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 08:50:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDBBB1586F5;
-	Thu, 18 Apr 2024 08:47:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1446215AAC7;
+	Thu, 18 Apr 2024 08:49:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f7e3Kw6m"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dBURE9z0"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74606158A02
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 08:47:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A424415AAB5
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 08:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713430072; cv=none; b=X0pnmhgOIHn6Node3BPRbOcx1PWPzJShE/C1yDwFLiaC+fsBLWBKeB4esIX9tw2tsAT/pkDft1mx026PCzOyaeJETOF+4uiU+Aw1P49fhjXEMNKpLFaujbq0a5ZKM8nxop/jIctoBP1YhX61A+YxM2Bd99a7wD6rB5LlsJYeD8k=
+	t=1713430194; cv=none; b=oVpjiPU8gvEJln7qnJmu2LmCOJ9luKi6CKwE+ms29ht7081RlF/ZgeCowyII1qVIgNC+VCWlBzrwAXdmqylWbF2NwDqcmOB2oMeJfxbZnbn2ecOVAj7fRljQCmsvL4udQV69ZuqQYv50v/1f8jXJRGn6uKWUEj+WCzmvoLkkPU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713430072; c=relaxed/simple;
-	bh=GfBYlvdAGTCQ1bE/wGtCuDXFAP0eWOuU/lTVLOOfC5Q=;
+	s=arc-20240116; t=1713430194; c=relaxed/simple;
+	bh=7t7uZR8r9HWOVXRIrXdqFbm3LrKrBLg4UMHkqY5ZUP8=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FuwQBQ4UrteHhO8+ETXlolR9m2q1xhKwwB3qslJITjtsvB6Ri+Aj3bQcowfhp2eY1fk6owZaGcFjWwNFxDE5OiWGz6q5HqTiDWOGwkKUMW/imxMUtk0v+FwkBJ7jcbQgd2OJs73rz4qGq+XF3EZjtJPzGbL4aduTbYmqm51dNgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f7e3Kw6m; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:MIME-Version; b=La9s5cTXmh4HkfSWL3JIZXcz1SNRFCjYKzgl+5OU4XQNKHeB4YmMAa3PrT9/ePpfwqQYk/DGyKjIgUOuzsVcGVMIiyneN8rrCl36hLmHzWw/gktXLx6NG+vi2mISqAfrOQ4k73bn8kelWSUMsYlyGFFwW3QjXupMj/QLYpu1wnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dBURE9z0; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1713430070;
+	s=mimecast20190719; t=1713430191;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=c+bxT+WHkhQSYYDIJ6Aj+zyB0rRNxM4fAFl1TIin11Y=;
-	b=f7e3Kw6m1F+AGy7GnP43QV5AXKemhQzaYEmn2BEuuHYGSqse3ilMNAmWN0/hVgPjGN4eWn
-	CeY5LGCBfd5HH8rRx/PDoKzxbc19rvGXIZsJHA7ATgqgyTsaZoMv0Duqe2k+B9xyzFVpG1
-	jCM46OHjy0ju5nn+3gjPabv1H6H3AKE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=7t7uZR8r9HWOVXRIrXdqFbm3LrKrBLg4UMHkqY5ZUP8=;
+	b=dBURE9z0IacF0dcvEzVLXm6nJX2gFLoTM+wqTSEDU+/4rWWBMEGXFuDFsLnqn7kTK9TpJK
+	gtEkUsK4bTqcOGz/ce5Qy8HJxxpGJS65Qd/br5bwVhy557kiM5Wun6GHRADQUxTVgr5+3w
+	J15CEKn2fLLkeZcFkC/XLjCFcxZUdSc=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-81-Den6rdv5O-mAe6f6MP5GHg-1; Thu, 18 Apr 2024 04:47:46 -0400
-X-MC-Unique: Den6rdv5O-mAe6f6MP5GHg-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-348973b648fso109157f8f.0
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 01:47:45 -0700 (PDT)
+ us-mta-599-Xc8vE7JBOvqGh23jrdF7lw-1; Thu, 18 Apr 2024 04:49:50 -0400
+X-MC-Unique: Xc8vE7JBOvqGh23jrdF7lw-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5195acba0e3so29876e87.2
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 01:49:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713430065; x=1714034865;
+        d=1e100.net; s=20230601; t=1713430188; x=1714034988;
         h=mime-version:user-agent:content-transfer-encoding:autocrypt
          :references:in-reply-to:date:cc:to:from:subject:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c+bxT+WHkhQSYYDIJ6Aj+zyB0rRNxM4fAFl1TIin11Y=;
-        b=pEpzRU3vYxY4da54779a24ADlCuzlsQGSDSF6oK5O7Ax6pqoRXDMA3F5smi0piGEcZ
-         zNwXCHAij443MVUR5OooxekraXx3qZIHW9RqH84CBlV3ZD24AjrlHbfHBkn8SsLYD9/n
-         As+WPT6ZOZztcsmnw7wOB2rgiO6bcriCmvKiW8bx1ms7o7eltGFe3WxFSuQyWk8xbP7M
-         HFxsqvg7cpaBOexXSRLJaPMyEPGaZ/OdE+mFDSiQRcAYxbgDM+hzPhbdmF1Dj+T4aZEh
-         lDK9hiFtL7ca1EII7VKrJ8YmwuNR02o7KCI5dLl9SvBZx1DmJ28Sy+F3Wfn+u2fAMqcV
-         j3WQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX4zcdNndC+snDad3vm2oNC8qb/T/0aX0VPh0qzxyQ1zCVeEIFiwA/BiB3GphP4rUpLqmLctm+mVj2GkQKX76sTaR7ETDs/
-X-Gm-Message-State: AOJu0Yz+f3/VqSZKU/oPKfPDUelDd8tdQZBvJu/Rdf1oqy8lXETcZGS/
-	HwtQVjYkGYeCJJ19XOlc+Wl5AfJVAZgxwPRIuA9gSvHmVa7ZfNkk0Oz5UX7W6ijf4O7o5KWQQOr
-	O3WX1QNNUf7kEwqfoYA6jsxUscGoLnD9m90eQ1ka6X76oSkksrU2uQw==
-X-Received: by 2002:a05:600c:1c91:b0:418:9a5b:d51 with SMTP id k17-20020a05600c1c9100b004189a5b0d51mr1597157wms.0.1713430064959;
-        Thu, 18 Apr 2024 01:47:44 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEuX9Onk+JFsKlfGWkDC5OFvrhLuJ7rcnieRMoInGdDbO7Ygp2ZtjuTFhV7kCUsNUGl3mDQTg==
-X-Received: by 2002:a05:600c:1c91:b0:418:9a5b:d51 with SMTP id k17-20020a05600c1c9100b004189a5b0d51mr1597136wms.0.1713430064564;
-        Thu, 18 Apr 2024 01:47:44 -0700 (PDT)
+        bh=7t7uZR8r9HWOVXRIrXdqFbm3LrKrBLg4UMHkqY5ZUP8=;
+        b=pTkLCoiSuBZch2kaQDLhS0RZSj1hN3w5lX3VXMBgHJ0w/yNZY0+8aUqh1GZ5LHMUCG
+         stGk8fYWqPl6pFMh1MX9D4geH3jwMUphrb7tI/msJ/f3tYaaRuy15aZHRbQ/xJiNDUQj
+         bLtngjtgGzFYsy7rR5hyo8EUWl4eMW5X44qc/EVkL3m6oIgEEtT02zF96pyioCeyo7JN
+         IC3ZAqjPZWlHVkq9NqZx4VAPQwZX45gJrrM1RSlkHi12vkiQPwSUSEisP1umWeFmYuWE
+         m5yMa3TrlzUhX2sZcFrVGir/SO8OQr/xuNTsdRrFm5rzHNOmmLYiH98ekcDe9RzaU9IA
+         bjbA==
+X-Forwarded-Encrypted: i=1; AJvYcCWM/m5kMpD+Vj/jBJkyMVhPXTJMUCQpzxfXEm4G2bw8VVlCwHqhmj0M3BE6jjEsDRiZatuZ1C0r++ESO0wJety3P+3Yane+
+X-Gm-Message-State: AOJu0Yx7yfG7fxGLH001ZDR0i6JckjJyoPT4FBwTf7fpVi4sPIBPPZ34
+	vi+tN+FGakFk96qzANfrTtACsgyJehXLGETxvw2us/A+kJCvW166Bzst3yZFlpgUhOgd9qcU3vB
+	Fh2TPKSSnOXKBWoQ/HEQ5qJCK46Tg2zNwQqLxT9glT5ZM1N+7EWWR6mDeqRBX7A==
+X-Received: by 2002:a05:651c:217:b0:2d9:ec13:3356 with SMTP id y23-20020a05651c021700b002d9ec133356mr1009785ljn.0.1713430188279;
+        Thu, 18 Apr 2024 01:49:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IErQIUbYGgWm6K7PMKpquzKjFxJq+j40BEgVIy5m/e4gTUwODI4+BpF6VUb18DUeA5ERarMnw==
+X-Received: by 2002:a05:651c:217:b0:2d9:ec13:3356 with SMTP id y23-20020a05651c021700b002d9ec133356mr1009764ljn.0.1713430187858;
+        Thu, 18 Apr 2024 01:49:47 -0700 (PDT)
 Received: from gerbillo.redhat.com (146-241-236-143.dyn.eolo.it. [146.241.236.143])
-        by smtp.gmail.com with ESMTPSA id u18-20020a05600c19d200b0041896d2a05fsm1916295wmq.5.2024.04.18.01.47.43
+        by smtp.gmail.com with ESMTPSA id l8-20020a05600c1d0800b00418a2ce884bsm1913144wms.32.2024.04.18.01.49.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 01:47:44 -0700 (PDT)
-Message-ID: <497b3f9b6d91a076c67f959ba878583a91b03cf5.camel@redhat.com>
-Subject: Re: [net-next PATCH v5 1/4] net: hsr: Provide RedBox support
- (HSR-SAN)
+        Thu, 18 Apr 2024 01:49:47 -0700 (PDT)
+Message-ID: <794c4fcbd5b934fd378d8fe8df2fa2cfb42f424c.camel@redhat.com>
+Subject: Re: [net-next PATCH v5 0/4] net: hsr: Add support for HSR-SAN
+ (RedBOX)
 From: Paolo Abeni <pabeni@redhat.com>
 To: Lukasz Majewski <lukma@denx.de>, netdev@vger.kernel.org
 Cc: Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
@@ -89,10 +89,9 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
  Xuan <william.xuanziyang@huawei.com>, Shigeru Yoshida
  <syoshida@redhat.com>, "Ricardo B. Marliere" <ricardo@marliere.net>,
  linux-kernel@vger.kernel.org
-Date: Thu, 18 Apr 2024 10:47:42 +0200
-In-Reply-To: <20240415124928.1263240-2-lukma@denx.de>
+Date: Thu, 18 Apr 2024 10:49:45 +0200
+In-Reply-To: <20240415124928.1263240-1-lukma@denx.de>
 References: <20240415124928.1263240-1-lukma@denx.de>
-	 <20240415124928.1263240-2-lukma@denx.de>
 Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
@@ -108,57 +107,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
 On Mon, 2024-04-15 at 14:49 +0200, Lukasz Majewski wrote:
-> Introduce RedBox support (HSR-SAN to be more precise) for HSR networks.
-> Following traffic reduction optimizations have been implemented:
-> - Do not send HSR supervisory frames to Port C (interlink)
-> - Do not forward to HSR ring frames addressed to Port C
-> - Do not forward to Port C frames from HSR ring
-> - Do not send duplicate HSR frame to HSR ring when destination is Port C
+> This patch set provides v5 of HSR-SAN (RedBOX) as well as hsr_redbox.sh
+> test script.
 >=20
-> The corresponding patch to modify iptable2 sources has already been sent:
-> https://lore.kernel.org/netdev/20240308145729.490863-1-lukma@denx.de/T/
+> Applied on top of:
+> Branch: net-next/main
+> SHA1: 50aee97d1511
 >=20
-> Testing procedure:
-> ------------------
-> The EVB-KSZ9477 has been used for testing on net-next branch
-> (SHA1: 5fc68320c1fb3c7d456ddcae0b4757326a043e6f).
->=20
-> Ports 4/5 were used for SW managed HSR (hsr1) as first hsr0 for ports 1/2
-> (with HW offloading for ksz9477) was created. Port 3 has been used as
-> interlink port (single USB-ETH dongle).
->=20
-> Configuration - RedBox (EVB-KSZ9477):
-> if link set lan1 down;ip link set lan2 down
-> ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45 ver=
-sion 1
-> ip link add name hsr1 type hsr slave1 lan4 slave2 lan5 interlink lan3 sup=
-ervision 45 version 1
-> ip link set lan4 up;ip link set lan5 up
-> ip link set lan3 up
-> ip addr add 192.168.0.11/24 dev hsr1
-> ip link set hsr1 up
->=20
-> Configuration - DAN-H (EVB-KSZ9477):
->=20
-> ip link set lan1 down;ip link set lan2 down
-> ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision 45 ver=
-sion 1
-> ip link add name hsr1 type hsr slave1 lan4 slave2 lan5 supervision 45 ver=
-sion 1
-> ip link set lan4 up;ip link set lan5 up
-> ip addr add 192.168.0.12/24 dev hsr1
-> ip link set hsr1 up
->=20
-> This approach uses only SW based HSR devices (hsr1).
->=20
-> --------------          -----------------       ------------
-> DAN-H  Port5 | <------> | Port5         |       |
->        Port4 | <------> | Port4   Port3 | <---> | PC
->              |          | (RedBox)      |       | (USB-ETH)
-> EVB-KSZ9477  |          | EVB-KSZ9477   |       |
-> --------------          -----------------       ------------
+> Runs inside: Buildroot (2024.02.1+):
+> SHA1: b31443e09cb7bb67b97ae6fb7614fe3a22889d50
 
-The above description is obsoleted by follow-up tests, right?
+Please don't include the above information inside the commit message,
+they are not very useful an may confuse stable teams' tools.
+
+Instead you could add a longish overview of the series.
 
 Thanks,
 
