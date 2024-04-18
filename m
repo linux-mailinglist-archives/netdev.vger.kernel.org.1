@@ -1,281 +1,140 @@
-Return-Path: <netdev+bounces-89206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB8798A9ADD
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 15:08:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCB598A9AEC
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 15:11:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE7501C20DA7
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:08:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C55DB21499
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:11:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E922E13D89B;
-	Thu, 18 Apr 2024 13:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38838144D1E;
+	Thu, 18 Apr 2024 13:10:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iNcu7kN9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jai9tshD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A494E823A2
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 13:08:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5107515FA7F;
+	Thu, 18 Apr 2024 13:10:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713445704; cv=none; b=F+zZo2sH9CMRAYIkI1hqU2zMIJfv0JX8+IFE32+Y0vIVsrQ4/sUOp0cuUeeGVzUgCwGbYPPyJaRJMeRYK6xgY1ppbpOV9RBHdaMIrwFeb0FoavEnAX853cnRZagdPx4hD9Cg5vv++HB5UNSMQdyqGz/xCK/Q0cBZXR7s3anm19Y=
+	t=1713445846; cv=none; b=hcnrqyC3/iCxAuP8LjkfDeQw554j0qRJBdNdAY/0d3k8IhVC290VrVDwrpdEiU/I2gnZp9HdmiwvPBvW5hdrqxcDDvFX28VGc7nKJ2wEFvb+/BRGKvbbiohPhUa4/vnBNMe3LdDNADWAKJmoNf6/uvc21M19tWjsziM6/4U/xVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713445704; c=relaxed/simple;
-	bh=aP+7HADtYJo3igKhSBrXNzs4r4e9f9NPTjqO03x94SE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YGUhsmXm2G/EDEq1E2t8PBjD39Jn33BMWau/mmt8ATpLuFVrjfko9ssez9d+tNjyOvZDkIduhJ6vMHI6e6M2XVgxmub8ILXEopFvgD8uBAuJPSl5QE4Po+wOgiccHkR3cxx977iriRH48vzEnPTvj5OXBj4QeN1QnbHFpU5Tuws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iNcu7kN9; arc=none smtp.client-ip=209.85.167.48
+	s=arc-20240116; t=1713445846; c=relaxed/simple;
+	bh=Ijj1dwb9v6F+an491VJl7zBLMESUwDnbFdaHDHwFazM=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=uhPJQprLWwRvFlBNWqXeIlBmaRDtQKK4qyg0xgiwnR1Eabubhh5P6zFng+we2sfYMGWzVc9phmUWwwJ1AICYQpk2HMAWLL1J9mES/aGc/IyMmC5Amqe4lGo+CjC20+32v7PbFRt+I0BecAEkaj0tdfN2JXuREgJxt+YnOeRSAeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jai9tshD; arc=none smtp.client-ip=209.85.215.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-518a3e0d2e4so800183e87.0
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 06:08:20 -0700 (PDT)
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5f77640a4dcso53192a12.3;
+        Thu, 18 Apr 2024 06:10:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713445699; x=1714050499; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tY0ewv6WISiK8kt2R7sB1OG56vBsDo7I8v+1iu01wuY=;
-        b=iNcu7kN9Kf+t8WPvfGmLBt/TRtJXIIDCQ5LnZ1Ahvhge8PDc9DCFCwVGpFtARLni0D
-         qDb0HBwr0Aod8cS/vLhA0Fk4uS2sNhGWOYyvkfB/qkgf1nKXwtUVcWjcNazZLPdjCVev
-         mpylCgwMYO6Wxdv472X4UmkyAE2nQU9+RtRg2uYMHoQf8Sepv1rLJDkdfHOIwprhQo3X
-         T0bLglJNqYDPmAnjKZOvqk+NLpdDLnLq+Z8AVHiBhGQALLkf9MQA/2BVHM8ogWBylg3t
-         8UDmeR9z1K/XHMT+hf6SGJn5o5N2H3BJDau5ww+filJ6IDmpWJOJ4PqEVXsfX9W+Ih1Q
-         5hsA==
+        d=gmail.com; s=20230601; t=1713445840; x=1714050640; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=KISK7P5bbl6r1Ilal3LAM8KQslNHMyxoFESJZBFyfeE=;
+        b=Jai9tshDHyxfNrmN8haSFGGNoC9n8bCHgcnQSoRbXvY4GJoq8iZohms1El8e1LWaLk
+         7qpfc1pf2AS8VxTh75qI+gsy4qpi8vVWvLu9g/p0snQp6NtqD8LWwfaZvib7fdzYSNAK
+         5Lix7iBbuyJSMSMmCHOCMgZyX/j/H/Abv4a1REtIPdCwP+1rjCZ5N52JxnM3EBfvCxfV
+         +pespJIHO/6tej+uJxy+jYnm3SHJg0qUkmOXlvSqzzs8IqSwZvWN74l+5e0w07QYlyfy
+         E3iD9Dtn5GOeYLBu7zVFznRUEMT26Ij53tgv2q5DXJKOq6WPMNJG22oOUJ4Pt2AENXhd
+         S/BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713445699; x=1714050499;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tY0ewv6WISiK8kt2R7sB1OG56vBsDo7I8v+1iu01wuY=;
-        b=GN2wiXbWkMmJwjtWdmBni3JJC9joXDXJNpwoDRisoNao2bYIIB+WmIvqafNVFHLibx
-         K4NqZEw8ri/NIMf8z4rV/FTqRF/Aq3+m9cK57CrrQ8VNOVlRuyaDeSX3EFey1VOGAu7X
-         dZBQEvtII0B+dBuWo4yfqT76+1Q0CBY6isigeulAmSjXcyURmjTAAAp/IFSizQXgpkeH
-         eea0q+GptGsH+z34X/YOw2L6B9eVhSrOU8IqkTjfKCMGdzV4agoVIqRCkSOrPhIzezHt
-         ezEfGeWTnbLt3Y+I2ycSEhIXK4rozT5Omzot0vBzHh/JmAZqtZwGOjnWp/YTDEfJ3MkE
-         aOIw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+Ao1totNaGLiiZoDzO2YGS9jiywHPNjfFhVB+c0FobRol4fN3J/XKMAXixFCkQ8TDaQQbnpPcpl41GHyUrOJ6sVOm4rmg
-X-Gm-Message-State: AOJu0Ywi0+075KdJVjmrJXR5LPuRHgYX0/vlaXKijdGYmE8UU52k9X2r
-	H7BcaPDigeCerSQAP6bsHr0jlcKc8DnnIqTj9JzTmDUTf6m24w4y
-X-Google-Smtp-Source: AGHT+IGHDtl20ewDVkCnB0KGiyOJaCb0X1zPXB6knBjbnWwKvoP2/6+/lrWcocTMVsteGPJtL5Vpyg==
-X-Received: by 2002:a19:9150:0:b0:519:99c:9018 with SMTP id y16-20020a199150000000b00519099c9018mr706515lfj.11.1713445698537;
-        Thu, 18 Apr 2024 06:08:18 -0700 (PDT)
-Received: from mobilestation.baikal.int (srv1.baikalchip.ru. [87.245.175.227])
-        by smtp.gmail.com with ESMTPSA id v27-20020a05651203bb00b0051969a5b408sm235987lfp.39.2024.04.18.06.08.17
+        d=1e100.net; s=20230601; t=1713445840; x=1714050640;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=KISK7P5bbl6r1Ilal3LAM8KQslNHMyxoFESJZBFyfeE=;
+        b=jDQas/u5BzJApRunE53zqyIR5xbTBXERHcduTsz6HIgf7oF6J4l0ipPuMId1f/uJi0
+         fwpwFbSVXjnrceOJ72/UvQfiwN1UlDncwWYFMM+FAkpbAFcalNQz+ZFGlG+kFADtusCp
+         04d9NGIa1Y1gX14J8tAvyPDPE4/0u7IpbectWrQWFBqQofhaVGSCY9pAFk6qpK+Wu9lI
+         tghPIGLNNaLAZ3w9P47aRGCCiqGZtxVCqz74htubRG0bXOycHkUk+2jubEM2LPj860Js
+         feVPX7/QAITzgx9XEZkCM7XUhI7FqW3EtN5JkamfDhucJw8Td3w0hDOCnbuExBxwWfeq
+         xGnA==
+X-Forwarded-Encrypted: i=1; AJvYcCWGn/fIre8HCUKOjXUOSJYiOPsKr0lQkkjB2lZCORUjCEOyPjrqTM+dGQO1YX2Vn6SFrqBbPv8GVZPyh9Di4DaqsQKM3dgQnP4oMxg3qSUJsB8WDvjpYW3GjFOxabWrhDGybWZ5YIw=
+X-Gm-Message-State: AOJu0YwSPXFTtuGR+l1Fkjv3k/gFf11ISpiTCsdTh03aIjYNZUqYxGdZ
+	Zzc+6W+8xTPdbabC2TjMFnwgMh7lmy6HMYbzaCMeNOWRIo3xhnhY
+X-Google-Smtp-Source: AGHT+IH6kWFmckJ6i0BDSF63YBc6hZp8YdctopiXIhX2Q9KBkirn0vyClvEEBepiF5mLWL4TAn9+Sg==
+X-Received: by 2002:a17:90a:2e18:b0:2ab:c769:4e65 with SMTP id q24-20020a17090a2e1800b002abc7694e65mr1941247pjd.2.1713445840504;
+        Thu, 18 Apr 2024 06:10:40 -0700 (PDT)
+Received: from localhost (p5315239-ipxg23901hodogaya.kanagawa.ocn.ne.jp. [180.34.87.239])
+        by smtp.gmail.com with ESMTPSA id p4-20020a17090ac00400b002a3a154b974sm1399073pjt.55.2024.04.18.06.10.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Apr 2024 06:08:18 -0700 (PDT)
-Date: Thu, 18 Apr 2024 16:08:16 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
-Subject: Re: [PATCH net-next v11 5/6] net: stmmac: dwmac-loongson: Add full
- PCI support
-Message-ID: <adnsyedexlqbncmadqzsr7f2vnqcvilzow4n3ibajxek4qes4m@pmwhb636j2qp>
-References: <cover.1712917541.git.siyanteng@loongson.cn>
- <ae660c8872297b562ee4e62cd852ba96f307e079.1712917541.git.siyanteng@loongson.cn>
+        Thu, 18 Apr 2024 06:10:40 -0700 (PDT)
+Date: Thu, 18 Apr 2024 22:10:28 +0900 (JST)
+Message-Id: <20240418.221028.963285260268190475.fujita.tomonori@gmail.com>
+To: dakr@redhat.com
+Cc: fujita.tomonori@gmail.com, gregkh@linuxfoundation.org, andrew@lunn.ch,
+ rust-for-linux@vger.kernel.org, tmgross@umich.edu, mcgrof@kernel.org,
+ netdev@vger.kernel.org, russ.weight@linux.dev, wedsonaf@gmail.com
+Subject: Re: [PATCH net-next v1 3/4] rust: net::phy support Firmware API
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <60a3d668-4653-43b5-b40f-87fb7daaef50@redhat.com>
+References: <20240415104701.4772-1-fujita.tomonori@gmail.com>
+	<20240415104701.4772-4-fujita.tomonori@gmail.com>
+	<60a3d668-4653-43b5-b40f-87fb7daaef50@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ae660c8872297b562ee4e62cd852ba96f307e079.1712917541.git.siyanteng@loongson.cn>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Fri, Apr 12, 2024 at 07:28:50PM +0800, Yanteng Si wrote:
-> Current dwmac-loongson only support LS2K in the "probed with PCI and
-> configured with DT" manner. Add LS7A support on which the devices are
-> fully PCI (non-DT).
+Hi,
+
+On Mon, 15 Apr 2024 17:45:46 +0200
+Danilo Krummrich <dakr@redhat.com> wrote:
+
+> On 4/15/24 12:47, FUJITA Tomonori wrote:
+>> This patch adds support to the following basic Firmware API:
+>> - request_firmware
+>> - release_firmware
+>> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+>> CC: Luis Chamberlain <mcgrof@kernel.org>
+>> CC: Russ Weight <russ.weight@linux.dev>
+>> ---
+>>   drivers/net/phy/Kconfig         |  1 +
+>>   rust/bindings/bindings_helper.h |  1 +
+>>   rust/kernel/net/phy.rs          | 45 +++++++++++++++++++++++++++++++++
+>>   3 files changed, 47 insertions(+)
 > 
-> Others:
-> LS2K is a SoC and LS7A is a bridge chip. In the current driving state,
-> they are both gmac and phy_interface is RGMII.
+> As Greg already mentioned, this shouldn't be implemented specifically
+> for struct
+> phy_device, but rather for a generic struct device.
+
+Yeah, I have a version of creating rust/kernel/firmware.rs locally but
+I wanted to know if a temporary solution could be accepted.
+
+
+> In order to use them from your PHY driver, I think all you need to do
+> is to implement
+> AsRef<> for your phy::Device:
 > 
-> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> ---
->  .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 103 +++++++++++-------
->  1 file changed, 64 insertions(+), 39 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> index ad19b4087974..69078eb1f923 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> @@ -9,9 +9,19 @@
->  #include <linux/of_irq.h>
->  #include "stmmac.h"
->  
-> +#define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
-> +
-> +struct stmmac_pci_info {
-> +	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
-> +};
-> +
->  static void loongson_default_data(struct pci_dev *pdev,
->  				  struct plat_stmmacenet_data *plat)
->  {
-> +	/* Get bus_id, this can be overloaded later */
-> +	plat->bus_id = (pci_domain_nr(pdev->bus) << 16) |
-> +		       PCI_DEVID(pdev->bus->number, pdev->devfn);
-> +
->  	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
->  	plat->has_gmac = 1;
->  	plat->force_sf_dma_mode = 1;
-> @@ -40,6 +50,7 @@ static int loongson_gmac_data(struct pci_dev *pdev,
->  
->  	/* Default to phy auto-detection */
->  	plat->phy_addr = -1;
-> +	plat->phy_interface = PHY_INTERFACE_MODE_RGMII_ID;
->  
->  	plat->dma_cfg->pbl = 32;
->  	plat->dma_cfg->pblx8 = true;
-> @@ -54,19 +65,17 @@ static int loongson_gmac_data(struct pci_dev *pdev,
->  	return 0;
->  }
->  
-> +static struct stmmac_pci_info loongson_gmac_pci_info = {
-> +	.setup = loongson_gmac_data,
-> +};
-> +
->  static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  {
->  	struct plat_stmmacenet_data *plat;
-> +	int ret, i, bus_id, phy_mode;
-> +	struct stmmac_pci_info *info;
->  	struct stmmac_resources res;
->  	struct device_node *np;
-> -	int ret, i, phy_mode;
-> -
+> impl AsRef<device::Device> for Device {
+>     fn as_ref(&self) -> &device::Device {
+>         // SAFETY: By the type invariants, we know that `self.ptr` is non-null
+>         and valid.
+>         unsafe { device::Device::from_raw(&mut (*self.ptr).mdio.dev) }
+>     }
+> }
 
-> -	np = dev_of_node(&pdev->dev);
-> -
-> -	if (!np) {
-> -		pr_info("dwmac_loongson_pci: No OF node\n");
-> -		return -ENODEV;
-> -	}
+My implementation uses RawDevice trait in old rust branch (Wedson
+implemented, I suppose):
 
-Hm, I see you dropping this snippet and never getting it back in this
-patch. Thus after the patch is applied np will be left uninitialized,
-which will completely break the driver. Please make sure it's fixed.
+https://github.com/Rust-for-Linux/linux/blob/18b7491480025420896e0c8b73c98475c3806c6f/rust/kernel/device.rs#L37
 
-This problem has been introduced at the v9 stage, which I didn't have
-time to review. There were no problem like that in v8.
+pub unsafe trait RawDevice {
+    /// Returns the raw `struct device` related to `self`.
+    fn raw_device(&self) -> *mut bindings::device;
 
--Serge(y)
 
->  
->  	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
->  	if (!plat)
-> @@ -78,12 +87,6 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->  	if (!plat->mdio_bus_data)
->  		return -ENOMEM;
->  
-> -	plat->mdio_node = of_get_child_by_name(np, "mdio");
-> -	if (plat->mdio_node) {
-> -		dev_info(&pdev->dev, "Found MDIO subnode\n");
-> -		plat->mdio_bus_data->needs_reset = true;
-> -	}
-> -
->  	plat->dma_cfg = devm_kzalloc(&pdev->dev, sizeof(*plat->dma_cfg), GFP_KERNEL);
->  	if (!plat->dma_cfg) {
->  		ret = -ENOMEM;
-> @@ -107,10 +110,6 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->  		break;
->  	}
->  
-> -	plat->bus_id = of_alias_get_id(np, "ethernet");
-> -	if (plat->bus_id < 0)
-> -		plat->bus_id = pci_dev_id(pdev);
-> -
->  	phy_mode = device_get_phy_mode(&pdev->dev);
->  	if (phy_mode < 0) {
->  		dev_err(&pdev->dev, "phy_mode not found\n");
-> @@ -123,30 +122,56 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
->  
->  	pci_set_master(pdev);
->  
-> -	loongson_gmac_data(pdev, plat);
-> -	pci_enable_msi(pdev);
-> -	memset(&res, 0, sizeof(res));
-> -	res.addr = pcim_iomap_table(pdev)[0];
-> -
-> -	res.irq = of_irq_get_byname(np, "macirq");
-> -	if (res.irq < 0) {
-> -		dev_err(&pdev->dev, "IRQ macirq not found\n");
-> -		ret = -ENODEV;
-> -		goto err_disable_msi;
-> -	}
-> +	info = (struct stmmac_pci_info *)id->driver_data;
-> +	ret = info->setup(pdev, plat);
-> +	if (ret)
-> +		goto err_disable_device;
->  
-> -	res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
-> -	if (res.wol_irq < 0) {
-> -		dev_info(&pdev->dev, "IRQ eth_wake_irq not found, using macirq\n");
-> -		res.wol_irq = res.irq;
-> +	if (np) {
-> +		plat->mdio_node = of_get_child_by_name(np, "mdio");
-> +		if (plat->mdio_node) {
-> +			dev_info(&pdev->dev, "Found MDIO subnode\n");
-> +			plat->mdio_bus_data->needs_reset = true;
-> +		}
-> +
-> +		bus_id = of_alias_get_id(np, "ethernet");
-> +		if (bus_id >= 0)
-> +			plat->bus_id = bus_id;
-> +
-> +		phy_mode = device_get_phy_mode(&pdev->dev);
-> +		if (phy_mode < 0) {
-> +			dev_err(&pdev->dev, "phy_mode not found\n");
-> +			ret = phy_mode;
-> +			goto err_disable_device;
-> +		}
-> +		plat->phy_interface = phy_mode;
-> +
-> +		res.irq = of_irq_get_byname(np, "macirq");
-> +		if (res.irq < 0) {
-> +			dev_err(&pdev->dev, "IRQ macirq not found\n");
-> +			ret = -ENODEV;
-> +			goto err_disable_msi;
-> +		}
-> +
-> +		res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
-> +		if (res.wol_irq < 0) {
-> +			dev_info(&pdev->dev, "IRQ eth_wake_irq not found, using macirq\n");
-> +			res.wol_irq = res.irq;
-> +		}
-> +
-> +		res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
-> +		if (res.lpi_irq < 0) {
-> +			dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
-> +			ret = -ENODEV;
-> +			goto err_disable_msi;
-> +		}
-> +	} else {
-> +		res.irq = pdev->irq;
->  	}
->  
-> -	res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
-> -	if (res.lpi_irq < 0) {
-> -		dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
-> -		ret = -ENODEV;
-> -		goto err_disable_msi;
-> -	}
-> +	pci_enable_msi(pdev);
-> +	memset(&res, 0, sizeof(res));
-> +	res.addr = pcim_iomap_table(pdev)[0];
->  
->  	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
->  	if (ret)
-> -- 
-> 2.31.4
-> 
+Which is better?
 
