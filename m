@@ -1,163 +1,103 @@
-Return-Path: <netdev+bounces-89165-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40F838A9930
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:57:52 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26C1A8A9928
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:57:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 721921C2097C
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:57:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D05CA1F21108
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:57:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B5D815F311;
-	Thu, 18 Apr 2024 11:57:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D5115EFD8;
+	Thu, 18 Apr 2024 11:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fsXI2ett"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Hy2SsbNn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AEF315F308;
-	Thu, 18 Apr 2024 11:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99BC15D5D6;
+	Thu, 18 Apr 2024 11:57:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713441468; cv=none; b=M1CcL/sczETC94Nk6uI031Zmtnfr/rgVLWh5K0w7e0tj8/IWUpS5Yk3MyHevYmyPFUNv4GvsAs73n6B3ukjzbM2Zd5BHTbyozhOIukOwF19C7Udxq4t+vy1OR9IUiRyEEh36Hwm1t7TU48WBhjb0EiFPsRsYdYs+k3KoYPsROuM=
+	t=1713441435; cv=none; b=I27qv2qQY785kiym2kiUH34xyBhGZ1Q89aVm4YW8vlHwJ1U53c55dlgUz7hyyGPzlQyqNU4aF8+umzErHGSHhZtqvVxoAFncBixVnv2Vt8yrvUYdrXoauHP/bXk0owjdfR1WQCEeyv7TvnDijdPtPrQ/ihK7C/EG0TVUo2SbI3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713441468; c=relaxed/simple;
-	bh=OS1eopgWdWaRom68gxSnrqcvK3I+vQ7mAEjAtD2j/Ns=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OrGtoCWwpfsIAmTyS4Hn5LJZz+domy+1WQYaKM5ECSdiM+oW97cZuNeGLUffd4y4aTLJOI5ztUTpspX4jraHq89j/tSH5Pyb5NrZNI+i7yBk9IYZJhPnr7Uu6BIBCRtjhbPUA1RABloK/VIXFLpaXLLS0pbjsFGJA6C8HTN7ppY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fsXI2ett; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 43IBSvKc011425;
-	Thu, 18 Apr 2024 11:57:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=k2SbzdrcCdD/gvsyTXjApTaaKdIy/TKA/AiN1OOH+Jo=;
- b=fsXI2ettbdcy/W9K+zRU72IZCAsDyagjsXC9EXYqS5pT5e0KKzvnjC7y32yqx6BCEmop
- tTr20G/r9UOeK60HSKWI28/6W2kcmFnts2oQCLmpCZYmSbUUann4JxoPhg0GRZZ0G4AY
- FRvc6QmwulGohCLNJaDXntl65Z1fhf3yNfwrrXv8BcKAfSKXOWSX1IHpNk3q9kQTMkzj
- cNVyWQxU5hP267OtGzmzYv4R79ol7hs9Lh4uAPR7F7XdkLAlcW3vMPlCIJ7RimWufuXt
- yRsi+Q4aggjKDgML7uHl4mWr0qF0Zevz4Bo2oKMk6Rx3FMx/tzMbfScBN9IHQFYL5YKj Yg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xk2p181t0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Apr 2024 11:57:24 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 43IBqfNY019155;
-	Thu, 18 Apr 2024 11:57:24 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3xk2p181su-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Apr 2024 11:57:23 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 43I9mMBC021365;
-	Thu, 18 Apr 2024 11:57:23 GMT
-Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3xg6kkt1vh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Apr 2024 11:57:23 +0000
-Received: from smtpav06.wdc07v.mail.ibm.com (smtpav06.wdc07v.mail.ibm.com [10.39.53.233])
-	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 43IBvKUG35586720
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 18 Apr 2024 11:57:22 GMT
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4C83C58054;
-	Thu, 18 Apr 2024 11:57:20 +0000 (GMT)
-Received: from smtpav06.wdc07v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A08B55803F;
-	Thu, 18 Apr 2024 11:57:17 +0000 (GMT)
-Received: from [9.171.41.254] (unknown [9.171.41.254])
-	by smtpav06.wdc07v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 18 Apr 2024 11:57:17 +0000 (GMT)
-Message-ID: <5b79f874-fe66-4b9c-b8cc-ed691c6981c5@linux.ibm.com>
-Date: Thu, 18 Apr 2024 13:57:16 +0200
+	s=arc-20240116; t=1713441435; c=relaxed/simple;
+	bh=M7F9AOhLfsq2Uh4staUpb8IChltcrroxoNWvR3Qvuxc=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=IxjEJ3BrwCjMPPf3Hgt/uFw12F4MktI64W4bIeNZogmnEdNbZ05LvG+XuhrEYIthHdlGad+efeT5ubaBXzQatyPn2fdCheG2eXC/gm+EbaH4M5ArQTQJ5K+Rw32jDWRpYBOhtF85DWuSRCVrkMV7r3s9YF9IN8ogbYlyDx1R4pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Hy2SsbNn; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id AD03D1BF20C;
+	Thu, 18 Apr 2024 11:57:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1713441431;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=O1G2JcwttleuEX4OArtvrIC9rhjBFn4pb36VCCBIh/k=;
+	b=Hy2SsbNnYmDiJbouDoQakG4O9hhGXW4f+OjvJAR3aQz8kL2s8/mbpBjipIEcykp1brgcjr
+	kJ+d9gSauDycypI+PmrGrD9mrzFGc23eeqRwQYLbkzGRyeXVKEcMiWZg5hWbUgpJznFlRn
+	5V7abewlK8QD2a6f8PjfAXELplvwBZP2YIPnkUR+48xmyi0cvNa/YPqRE2B2fk1ozWk2Y6
+	MU2FCi0NcSbFEC7E0hWlLKOWpRrQBUDsU6a9RVthAORmx26StgefFaaICrvbzSgrLdQppE
+	1ZmdlRAGxtTWxKIcm+wOGUO8UuWr6897yKZsU3eT7r8zUI5i35pKX4KaHo9c2A==
+Date: Thu, 18 Apr 2024 13:57:47 +0200 (CEST)
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: Serge Semin <fancer.lancer@gmail.com>
+cc: Romain Gantois <romain.gantois@bootlin.com>, 
+    "David S. Miller" <davem@davemloft.net>, 
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+    Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+    Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+    Conor Dooley <conor+dt@kernel.org>, 
+    Geert Uytterhoeven <geert+renesas@glider.be>, 
+    Magnus Damm <magnus.damm@gmail.com>, 
+    Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+    Jose Abreu <joabreu@synopsys.com>, 
+    Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+    Russell King <linux@armlinux.org.uk>, 
+    =?ISO-8859-15?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>, 
+    Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+    devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+    linux-renesas-soc@vger.kernel.org, 
+    linux-stm32@st-md-mailman.stormreply.com, 
+    linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v3 4/5] net: stmmac: add support for RZ/N1
+ GMAC
+In-Reply-To: <xp34tp5cjmdshefxjczltz2prqtiikagfspf4lobznzypvsyah@ihpmwfynwzhh>
+Message-ID: <232e3b0c-ca55-2da0-1c9f-47520a1bcfbd@bootlin.com>
+References: <20240415-rzn1-gmac1-v3-0-ab12f2c4401d@bootlin.com> <20240415-rzn1-gmac1-v3-4-ab12f2c4401d@bootlin.com> <xp34tp5cjmdshefxjczltz2prqtiikagfspf4lobznzypvsyah@ihpmwfynwzhh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: fix potential sleeping issue in
- smc_switch_conns
-Content-Language: en-GB
-To: shaozhengchao <shaozhengchao@huawei.com>,
-        Guangguan Wang <guangguan.wang@linux.alibaba.com>,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com
-Cc: jaka@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
-        guwen@linux.alibaba.com, weiyongjun1@huawei.com, yuehaibing@huawei.com,
-        tangchengchang@huawei.com
-References: <20240413035150.3338977-1-shaozhengchao@huawei.com>
- <6520c574-e1c6-49e0-8bb1-760032faaf7a@linux.alibaba.com>
- <ed5f3665-43ae-cbab-b397-c97c922d26eb@huawei.com>
- <c6deb857-2236-4ec0-b4c7-25a160f1bcfb@linux.ibm.com>
- <cd006e26-6f6e-2771-d1bc-76098a5970ac@huawei.com>
- <0cbb1082-8f5f-4887-b13c-802c2bbcca36@linux.ibm.com>
- <7672ae57-86b9-91c2-b03e-2700b931b677@huawei.com>
-From: Wenjia Zhang <wenjia@linux.ibm.com>
-In-Reply-To: <7672ae57-86b9-91c2-b03e-2700b931b677@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: D5B9YXgKKCs1xcDAZn1ROSFyq8AGSQxL
-X-Proofpoint-ORIG-GUID: TYkssIbEaA5EuTzpS4JQf0NRzDUryAuP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-04-18_10,2024-04-17_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
- adultscore=0 clxscore=1015 priorityscore=1501 suspectscore=0 spamscore=0
- malwarescore=0 mlxscore=0 mlxlogscore=938 phishscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2404010000
- definitions=main-2404180085
+Content-Type: text/plain; charset=US-ASCII
+X-GND-Sasl: romain.gantois@bootlin.com
 
+Hi Serge,
 
+On Tue, 16 Apr 2024, Serge Semin wrote:
 
-On 18.04.24 13:01, shaozhengchao wrote:
+> > +static int rzn1_dwmac_pcs_init(struct stmmac_priv *priv,
 > 
+> > +			       struct mac_device_info *hw)
 > 
-> On 2024/4/18 15:50, Wenjia Zhang wrote:
->>
->>
->> On 18.04.24 03:48, shaozhengchao wrote:
->>>
->>>
->>> On 2024/4/17 23:23, Wenjia Zhang wrote:
->>>>
->>>>
->>>> On 17.04.24 10:29, shaozhengchao wrote:
->>>>>
->>>>> Hi Guangguan:
->>>>>    Thank you for your review. When I used the hns driver, I ran 
->>>>> into the
->>>>> problem of "scheduling while atomic". But the problem was tested on 
->>>>> the
->>>>> 5.10 kernel branch, and I'm still trying to reproduce it using the
->>>>> mainline.
->>>>>
->>>>> Zhengchao Shao
->>>>>
->>>>
->>> Hi Wenjia:
->>>    I will try to reproduce it. 
->>
->> Thanks!
->>
->> In addition, the last time I sent you a
->>> issue about the smc-tool, do you have any idea?
->>>
->>
-> Hi Wenjia:
->    I have send it to you. Could you receive it?
-> 
-> Thank you.
-> Zhengchao Shao
+> AFAICS hw is unused, and the mac_device_info instance is reached via
+> the priv pointer. What about dropping the unused argument then?
 
-yes I see it, thank you. I'll look into it as soon as possilbe.
+Unfortunately, this is an implementation of the pcs_init() callback, which is 
+also used by socfpga (see patch 4/6 in this series). The socfpga implementations 
+use the hw parameter for both pcs_init() and pcs_exit() so I can't remove it.
+
+Thanks,
+
+-- 
+Romain Gantois, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
