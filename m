@@ -1,290 +1,170 @@
-Return-Path: <netdev+bounces-89368-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7199C8AA237
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:44:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3C7B8AA244
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 20:48:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDAF61F214D1
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 18:44:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23A581C208BF
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 18:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EAB0179956;
-	Thu, 18 Apr 2024 18:43:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E8C17A93E;
+	Thu, 18 Apr 2024 18:48:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L4BjSN0t"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bQRW0RMh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59022168B17;
-	Thu, 18 Apr 2024 18:43:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9C61168B17;
+	Thu, 18 Apr 2024 18:47:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713465838; cv=none; b=HkJTAjg81ezNIfoEwpdzxOVOI5EYYkNw3B6FLYG8lJf0AHBhIDv9c5pHvC6yxX3hg23g1QKlZqnd9c1FGl/HNfv4r7yCpM1QGjgdhSt7QLQRJLVBuHvuttOEMpmjJwaHuwMlXCCGszw2cvaieRrkZp7+q8IAcF9XJS2IzAGgozs=
+	t=1713466080; cv=none; b=C7MlszoPaTEIqVy3irgzyirulViX7j9J/MbRJXMdqPzF31QlqRBfx4/OB157faHvb75yuJINsMJKGzpdW6UHQw5rcpqJgP7BP9S5zvGXbAzXw+9C0KB3IbnrvKI0JelcCuXEPsIkTxyPF7S9XeF7OrYuu1fhPqqGHGAc/7NybW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713465838; c=relaxed/simple;
-	bh=VGl2c/vY8S75SdXUFQeJ2MVgJ7rcxWPDOWmJuiOufl0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gZokZk0HXkFnRVWESga2UfRoYcU7lqf3qAKP88Vbs30Fpv9rX5TP7CVQfrZSxvRFsYcfDs0Kl0I+XdWcB9g7+qc7LO1BVdfUpDzLbjdV3suPdj7DOUQQqSV0hJLf8WIa9rHQqeBRZ2z5zhb6Td5aBke0GngWuDKf7nVUPitnknU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=L4BjSN0t; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713465836; x=1745001836;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VGl2c/vY8S75SdXUFQeJ2MVgJ7rcxWPDOWmJuiOufl0=;
-  b=L4BjSN0tLM/O8+7x7vqORIikBC/U6QnY7jE2eOyOa9uJTmkdAx1chX8+
-   9/aUr/jybUv0H3aIdEPxxHoaNcvzIc4pHixGRIe+l1G/VraZaaa8C0xbl
-   jnBzYXyPUHI22evclyZh+7pvWQMjKd7N90qzO014hc3TarTMajvAQxX/v
-   NwmP6rDoadNpEfeOD4EyB2qKcoL1gGCocqKlCw2RIvtfJgopKXxzXgESc
-   2jzGNK9SzKnC0nVrSq4UDvhnI73bNzQCFXJi3tk29Oqr8J4YJjChDTw18
-   5AAgab1H+c4Oj0c5xx5IhG6mSBBcyiOd9yRNi4sbwcyFZ9Tw64wLVQ9i0
-   w==;
-X-CSE-ConnectionGUID: 4EZXg6bXQyO7mk7vKruhXQ==
-X-CSE-MsgGUID: 8dl9lVSUQgWbS+4vjNrhpQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="12872155"
-X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="12872155"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 11:43:55 -0700
-X-CSE-ConnectionGUID: b+kG4epdSnOW6UL5vyF8fA==
-X-CSE-MsgGUID: o92+kmM3RHWGbK9yDuPdGg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="23705452"
-Received: from unknown (HELO 23c141fc0fd8) ([10.239.97.151])
-  by orviesa008.jf.intel.com with ESMTP; 18 Apr 2024 11:43:50 -0700
-Received: from kbuild by 23c141fc0fd8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rxWjb-00096X-1T;
-	Thu, 18 Apr 2024 18:43:47 +0000
-Date: Fri, 19 Apr 2024 02:43:16 +0800
-From: kernel test robot <lkp@intel.com>
-To: Daniel Machon <daniel.machon@microchip.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Yue Haibing <yuehaibing@huawei.com>,
-	Daniel Machon <daniel.machon@microchip.com>
-Subject: Re: [PATCH net-next 3/5] net: sparx5: add port mirroring
- implementation
-Message-ID: <202404190240.Iei7Gkj3-lkp@intel.com>
-References: <20240418-port-mirroring-v1-3-e05c35007c55@microchip.com>
+	s=arc-20240116; t=1713466080; c=relaxed/simple;
+	bh=/+tu1QtFlJWofHUNwDEzFNE8HCAVwWzF7OgMc41tc00=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=DaE3V8u1YKZ5OyUa63aMGEnfa/9xEHZxO9zvnJPvMye1K+f9idNeE26W3aaCqZ/B5GfIvXBcnQZV5HmD958ilQQszwsQeu+k79k1A66s7bQYDIvIZf4SJptDRS/+rFQk3+ZlIXku7ftBzf3J2TSyx1DiWih6+0u1ujT9i3T4QoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bQRW0RMh; arc=none smtp.client-ip=209.85.167.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3c730f7f549so434651b6e.3;
+        Thu, 18 Apr 2024 11:47:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713466078; x=1714070878; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3Z9WReLj2xrkv8imtMaxtB+MgeF3SaMvjoAmAItYIjM=;
+        b=bQRW0RMhLkkS5cG9831ITtp1s0ENEyK+KhzWTEYHrklGQuZxz1dh2QDYr1G30X2yR0
+         v0tWUeEl9TwVYYbi11pwU7dTMqw67/nHD8g2hsKRjOkMXmD6mw5F756DmKFG8ByVfhv9
+         uCgNpWqdbEZIvTagh+ieYSAIt+/mJ3xwukP/Jt8e3DTEhEjgG/KdMEXks38yiBElbusA
+         pozoY/0dOki1IbO8tuM4a+d0f0xnTiqkcZNDtFUNigs0UIZg2eQuWVwXCTfUziSeMLBX
+         K6hMCcGOAHQn9pYJ3fk8aG/AaBZgEUv7H4R7ajbgykVrcFJXfutIj3GRgpvOcDzi8Mqa
+         cF9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713466078; x=1714070878;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=3Z9WReLj2xrkv8imtMaxtB+MgeF3SaMvjoAmAItYIjM=;
+        b=NLRAsY2g5/qYN1NbelPnzuJctpZ4ltibl3RlK2/E4c1hy0lUQohkxHjIcDbRV9uK3c
+         FY4rWxJmHXABO11getG6H1Iyo0MDIPZc71uddTmX2G4duSsCzySBlGN2R4xV8l/LRpuO
+         TVXsBpjiX/8v2CH5K2wStLQk/HcDWVMgy4ISRAtpyv0isiGML1zc5cMRVS+UcS0nw6h4
+         IoeyPv85NryTHQjh+Aguh+n/XQ3/P+mJbNH40dLXUC9YpEv8O7cS2Z2i84XYWQxuJ2QQ
+         qm2mqTzBOMBZ/OmEd/ucM/3dsKENcdDjpyZzdqh5kXYjB7Rey2xs9ORsUxHf1XwBQ1PC
+         pZaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUj7G16ZqPWj7Furz8gw90elRvorpwX5+SIZxKbemxebLm1IzF7EqQ7iCzgh65aG3bNqyieo2E2b+1TlWLTRW3LTHeUB0CvzoNNo44z2O95ziXHqz21mE3Zw5XsHj5G0VQ0sc8tKH2u5iM2rWUFGgFkSihTIQpOlplo
+X-Gm-Message-State: AOJu0YzhajEGnbWzkdXUgHeb2c+u0icF6v3xj4RkUi+dVo3gpuHJ+YD0
+	yDjPCJe4En/Fbbw9vOY/kuOlvHz6YAe8dnVtu70HUdtnMDne/gDk
+X-Google-Smtp-Source: AGHT+IHpHdV89IH4nrE0P2nMcgel2y6lXNZGHvqjwlDO2vx+QjGrQB2mFOZ+g5AbW9vC7IAtpGX2/g==
+X-Received: by 2002:aca:1113:0:b0:3c7:963:837a with SMTP id 19-20020aca1113000000b003c70963837amr4155044oir.54.1713466077935;
+        Thu, 18 Apr 2024 11:47:57 -0700 (PDT)
+Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
+        by smtp.gmail.com with ESMTPSA id i19-20020ae9ee13000000b0078eca9de099sm859903qkg.134.2024.04.18.11.47.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 11:47:56 -0700 (PDT)
+Date: Thu, 18 Apr 2024 14:47:56 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Abhishek Chauhan <quic_abchauha@quicinc.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Andrew Halaney <ahalaney@redhat.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Martin KaFai Lau <martin.lau@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ bpf <bpf@vger.kernel.org>
+Cc: kernel@quicinc.com
+Message-ID: <66216adc8677c_f648a294aa@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240418004308.1009262-2-quic_abchauha@quicinc.com>
+References: <20240418004308.1009262-1-quic_abchauha@quicinc.com>
+ <20240418004308.1009262-2-quic_abchauha@quicinc.com>
+Subject: Re: [RFC PATCH bpf-next v4 1/2] net: Rename mono_delivery_time to
+ tstamp_type for scalabilty
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240418-port-mirroring-v1-3-e05c35007c55@microchip.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi Daniel,
+Abhishek Chauhan wrote:
+> mono_delivery_time was added to check if skb->tstamp has delivery
+> time in mono clock base (i.e. EDT) otherwise skb->tstamp has
+> timestamp in ingress and delivery_time at egress.
+> 
+> Renaming the bitfield from mono_delivery_time to tstamp_type is for
+> extensibilty for other timestamps such as userspace timestamp
+> (i.e. SO_TXTIME) set via sock opts.
+> 
+> As we are renaming the mono_delivery_time to tstamp_type, it makes
+> sense to start assigning tstamp_type based on enum defined
+> in this commit.
+> 
+> Earlier we used bool arg flag to check if the tstamp is mono in
+> function skb_set_delivery_time, Now the signature of the functions
+> accepts tstamp_type to distinguish between mono and real time.
+> 
+> In future tstamp_type:1 can be extended to support userspace timestamp
+> by increasing the bitfield.
+> 
+> Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
+> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
 
-kernel test robot noticed the following build warnings:
+> +/**
+> + * tstamp_type:1 can take 2 values each
+> + * represented by time base in skb
+> + * 0x0 => real timestamp_type
+> + * 0x1 => mono timestamp_type
+> + */
+> +enum skb_tstamp_type {
+> +	SKB_CLOCK_REAL,	/* Time base is skb is REALTIME */
+> +	SKB_CLOCK_MONO,	/* Time base is skb is MONOTONIC */
+> +};
+> +
 
-[auto build test WARNING on 1c25fe9a044d5334153a3585754b26553f8287b9]
+Can drop the comments. These names are self documenting.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Machon/net-sparx5-add-new-register-definitions/20240418-155244
-base:   1c25fe9a044d5334153a3585754b26553f8287b9
-patch link:    https://lore.kernel.org/r/20240418-port-mirroring-v1-3-e05c35007c55%40microchip.com
-patch subject: [PATCH net-next 3/5] net: sparx5: add port mirroring implementation
-config: hexagon-allyesconfig (https://download.01.org/0day-ci/archive/20240419/202404190240.Iei7Gkj3-lkp@intel.com/config)
-compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project 7089c359a3845323f6f30c44a47dd901f2edfe63)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240419/202404190240.Iei7Gkj3-lkp@intel.com/reproduce)
+>  /**
+>   * DOC: Basic sk_buff geometry
+>   *
+> @@ -819,7 +830,7 @@ typedef unsigned char *sk_buff_data_t;
+>   *	@dst_pending_confirm: need to confirm neighbour
+>   *	@decrypted: Decrypted SKB
+>   *	@slow_gro: state present at GRO time, slower prepare step required
+> - *	@mono_delivery_time: When set, skb->tstamp has the
+> + *	@tstamp_type: When set, skb->tstamp has the
+>   *		delivery_time in mono clock base (i.e. EDT).  Otherwise, the
+>   *		skb->tstamp has the (rcv) timestamp at ingress and
+>   *		delivery_time at egress.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202404190240.Iei7Gkj3-lkp@intel.com/
+Is this still correct? I think all egress does now annotate correctly
+as SKB_CLOCK_MONO. So when not set it always is SKB_CLOCK_REAL.
 
-All warnings (new ones prefixed by >>):
+> diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+> index 61119d42b0fd..a062f88c47c3 100644
+> --- a/net/ipv4/tcp_output.c
+> +++ b/net/ipv4/tcp_output.c
+> @@ -1300,7 +1300,7 @@ static int __tcp_transmit_skb(struct sock *sk, struct sk_buff *skb,
+>  	tp = tcp_sk(sk);
+>  	prior_wstamp = tp->tcp_wstamp_ns;
+>  	tp->tcp_wstamp_ns = max(tp->tcp_wstamp_ns, tp->tcp_clock_cache);
+> -	skb_set_delivery_time(skb, tp->tcp_wstamp_ns, true);
+> +	skb_set_delivery_time(skb, tp->tcp_wstamp_ns, CLOCK_MONOTONIC);
 
-   In file included from drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c:7:
-   In file included from drivers/net/ethernet/microchip/sparx5/sparx5_main.h:11:
-   In file included from include/linux/phy/phy.h:17:
-   In file included from include/linux/regulator/consumer.h:35:
-   In file included from include/linux/suspend.h:5:
-   In file included from include/linux/swap.h:9:
-   In file included from include/linux/memcontrol.h:13:
-   In file included from include/linux/cgroup.h:26:
-   In file included from include/linux/kernel_stat.h:9:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     547 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   In file included from drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c:7:
-   In file included from drivers/net/ethernet/microchip/sparx5/sparx5_main.h:11:
-   In file included from include/linux/phy/phy.h:17:
-   In file included from include/linux/regulator/consumer.h:35:
-   In file included from include/linux/suspend.h:5:
-   In file included from include/linux/swap.h:9:
-   In file included from include/linux/memcontrol.h:13:
-   In file included from include/linux/cgroup.h:26:
-   In file included from include/linux/kernel_stat.h:9:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-         |                                                   ^
-   In file included from drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c:7:
-   In file included from drivers/net/ethernet/microchip/sparx5/sparx5_main.h:11:
-   In file included from include/linux/phy/phy.h:17:
-   In file included from include/linux/regulator/consumer.h:35:
-   In file included from include/linux/suspend.h:5:
-   In file included from include/linux/swap.h:9:
-   In file included from include/linux/memcontrol.h:13:
-   In file included from include/linux/cgroup.h:26:
-   In file included from include/linux/kernel_stat.h:9:
-   In file included from include/linux/interrupt.h:11:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:328:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     584 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   In file included from drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c:7:
-   In file included from drivers/net/ethernet/microchip/sparx5/sparx5_main.h:11:
-   In file included from include/linux/phy/phy.h:17:
-   In file included from include/linux/regulator/consumer.h:35:
-   In file included from include/linux/suspend.h:5:
-   In file included from include/linux/swap.h:9:
-   In file included from include/linux/memcontrol.h:21:
-   In file included from include/linux/mm.h:2208:
-   include/linux/vmstat.h:522:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     522 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
->> drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c:36:12: warning: comparison of distinct pointer types ('typeof ((reg)) *' (aka 'unsigned int *') and 'uint64_t *' (aka 'unsigned long long *')) [-Wcompare-distinct-pointer-types]
-      36 |         val = BIT(do_div(reg, 32));
-         |               ~~~~^~~~~~~~~~~~~~~~
-   include/asm-generic/div64.h:222:28: note: expanded from macro 'do_div'
-     222 |         (void)(((typeof((n)) *)0) == ((uint64_t *)0));  \
-         |                                   ^  ~~~~~~~~~~~~~~~
-   include/vdso/bits.h:7:30: note: expanded from macro 'BIT'
-       7 | #define BIT(nr)                 (UL(1) << (nr))
-         |                                            ^~
-   drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c:36:12: error: incompatible pointer types passing 'u32 *' (aka 'unsigned int *') to parameter of type 'uint64_t *' (aka 'unsigned long long *') [-Werror,-Wincompatible-pointer-types]
-      36 |         val = BIT(do_div(reg, 32));
-         |               ~~~~^~~~~~~~~~~~~~~~
-   include/asm-generic/div64.h:238:22: note: expanded from macro 'do_div'
-     238 |                 __rem = __div64_32(&(n), __base);       \
-         |                                    ^
-   include/vdso/bits.h:7:30: note: expanded from macro 'BIT'
-       7 | #define BIT(nr)                 (UL(1) << (nr))
-         |                                            ^~
-   include/asm-generic/div64.h:213:38: note: passing argument to parameter 'dividend' here
-     213 | extern uint32_t __div64_32(uint64_t *dividend, uint32_t divisor);
-         |                                      ^
->> drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c:36:12: warning: shift count >= width of type [-Wshift-count-overflow]
-      36 |         val = BIT(do_div(reg, 32));
-         |                   ^~~~~~~~~~~~~~~
-   include/asm-generic/div64.h:234:25: note: expanded from macro 'do_div'
-     234 |         } else if (likely(((n) >> 32) == 0)) {          \
-         |                                ^  ~~
-   include/linux/compiler.h:76:40: note: expanded from macro 'likely'
-      76 | # define likely(x)      __builtin_expect(!!(x), 1)
-         |                                             ^
-   include/vdso/bits.h:7:30: note: expanded from macro 'BIT'
-       7 | #define BIT(nr)                 (UL(1) << (nr))
-         |                                            ^~
-   drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c:49:12: warning: comparison of distinct pointer types ('typeof ((reg)) *' (aka 'unsigned int *') and 'uint64_t *' (aka 'unsigned long long *')) [-Wcompare-distinct-pointer-types]
-      49 |         val = BIT(do_div(reg, 32));
-         |               ~~~~^~~~~~~~~~~~~~~~
-   include/asm-generic/div64.h:222:28: note: expanded from macro 'do_div'
-     222 |         (void)(((typeof((n)) *)0) == ((uint64_t *)0));  \
-         |                                   ^  ~~~~~~~~~~~~~~~
-   include/vdso/bits.h:7:30: note: expanded from macro 'BIT'
-       7 | #define BIT(nr)                 (UL(1) << (nr))
-         |                                            ^~
-   drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c:49:12: error: incompatible pointer types passing 'u32 *' (aka 'unsigned int *') to parameter of type 'uint64_t *' (aka 'unsigned long long *') [-Werror,-Wincompatible-pointer-types]
-      49 |         val = BIT(do_div(reg, 32));
-         |               ~~~~^~~~~~~~~~~~~~~~
-   include/asm-generic/div64.h:238:22: note: expanded from macro 'do_div'
-     238 |                 __rem = __div64_32(&(n), __base);       \
-         |                                    ^
-   include/vdso/bits.h:7:30: note: expanded from macro 'BIT'
-       7 | #define BIT(nr)                 (UL(1) << (nr))
-         |                                            ^~
-   include/asm-generic/div64.h:213:38: note: passing argument to parameter 'dividend' here
-     213 | extern uint32_t __div64_32(uint64_t *dividend, uint32_t divisor);
-         |                                      ^
-   drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c:49:12: warning: shift count >= width of type [-Wshift-count-overflow]
-      49 |         val = BIT(do_div(reg, 32));
-         |                   ^~~~~~~~~~~~~~~
-   include/asm-generic/div64.h:234:25: note: expanded from macro 'do_div'
-     234 |         } else if (likely(((n) >> 32) == 0)) {          \
-         |                                ^  ~~
-   include/linux/compiler.h:76:40: note: expanded from macro 'likely'
-      76 | # define likely(x)      __builtin_expect(!!(x), 1)
-         |                                             ^
-   include/vdso/bits.h:7:30: note: expanded from macro 'BIT'
-       7 | #define BIT(nr)                 (UL(1) << (nr))
-         |                                            ^~
-   11 warnings and 2 errors generated.
+Multiple references to CLOCK_MONOTONIC left
 
 
-vim +36 drivers/net/ethernet/microchip/sparx5/sparx5_mirror.c
 
-    30	
-    31	/* Add port to mirror (only front ports) */
-    32	static void sparx5_mirror_port_add(struct sparx5 *sparx5, u32 idx, u32 portno)
-    33	{
-    34		u32 val, reg = portno;
-    35	
-  > 36		val = BIT(do_div(reg, 32));
-    37	
-    38		if (reg == 0)
-    39			return spx5_rmw(val, val, sparx5, ANA_AC_PROBE_PORT_CFG(idx));
-    40		else
-    41			return spx5_rmw(val, val, sparx5, ANA_AC_PROBE_PORT_CFG1(idx));
-    42	}
-    43	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
