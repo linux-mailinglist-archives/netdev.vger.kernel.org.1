@@ -1,134 +1,121 @@
-Return-Path: <netdev+bounces-89031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9BF48A941B
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:34:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 411488A9427
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:36:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A47E1F22802
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 07:34:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C2F29B2141A
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 07:36:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 939C976413;
-	Thu, 18 Apr 2024 07:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 222F326AF0;
+	Thu, 18 Apr 2024 07:36:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uDETwkoJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hd3VFQl1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3149E7D3E5
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 07:33:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB32954BED
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 07:36:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713425595; cv=none; b=VNkEeXUJREeoVivEI3LoQgEj73XWSWTubqTWcxs2qFMWnocIawm18n3iuHOVcmg5CNwklc3jktnguBEORKV4G1wu9dVVIYVOnRfQtTTYCdSUmlg7ICvQlakGoCUMsE66OglQw3m8hXXJVqmKEoxjspbSqiVMxniICp6OKb5k4Co=
+	t=1713425772; cv=none; b=t2eWWlNnuQLsTvP+y07kLLD4mk4HzL5mCHSFlKuHlUgz6+GGW5YFqKUerZ4v1DqQ8mjqqFCJrCfFPde+d/uIszUeP04sEbFWi3c7uhAJDZCY0C1dGqsQ+ouw3VR+BHePZVkDR6iqZc0dCN7VewU6h7qAtGMj6wXc8xkZYWiJkFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713425595; c=relaxed/simple;
-	bh=UihTBynof5ByLo8nWwjGOmB5TjVe1WZ5vmelRO+R5AQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Uq/y0vpQDkvEQeuvcMlW6EdYhf4hxtWJPymtdjGXUKVTtIPDl3O99N5n3OB0h9Xzv2H38oWaD7CTHJSpElH4el3ps4Ul+JejgcbOdKXVbcMlTJCm8cgVO3VEb3T6uQvYNNHALKSGidkqRGoRrcsgxOIxVZV8aWbS/0Mfu5Nr8zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uDETwkoJ; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-de463fb34c9so1134331276.3
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 00:33:14 -0700 (PDT)
+	s=arc-20240116; t=1713425772; c=relaxed/simple;
+	bh=lZ+R6N67ARQFzq++3LFlB+Z9QWdHpDR9Skv4qPESf40=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WQRCpsmTxp3qrivKUmAZoGBeUuTOx+wYHj5tu36obzlB8Ei8QTruiaOtW5p5ehDbo8IlaLUqxiu1F4p++iyUeMvDULFpCv+vO1h6Vkyk9kvoWVRm2jkgI6gkDupvWDIIKAd+5f+UgBXPxsmkoLFYhN86wpx6Jkq+sTirRHuJzrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hd3VFQl1; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1e51398cc4eso5179235ad.2
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 00:36:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713425593; x=1714030393; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Znp+vQdYzVYcETVz3Us8OPerpcvuVBrznxNI9AWwpzs=;
-        b=uDETwkoJCXyWc2guV3bYm9zuzPpQf+51WvgovrtI5/31mLdspbU/jdPIUuyPj3NkT+
-         85AV76GQnKY9aeKjR/RgNnv9axP6qebVTgwOz8pbZfdwfWDbzlnk5+1sazQ8YK1jxEpG
-         j+coICyiCtLcxD8RUkY9BMYTCRMTpLecJLBEGGC2A2Z2F4+UhtFbcgrikNClLxwjgYLc
-         ZtwRO6r5uL4UhzGe/8uxcvxQomIrv+TXJyDXUqdDW6omD3jYdK4WLMvYELj0XL2NpqPN
-         5Ag1REQIbLkVf8JhfmLz4LUKq9juA1TmReiQ3jgAwAuTWDCcxrWDcOMVjFmYDsVWGETC
-         VmYg==
+        d=gmail.com; s=20230601; t=1713425769; x=1714030569; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dpy2rEg9ZNWJ5JbT06/E9/NLB753gLdsnym9tdupR90=;
+        b=Hd3VFQl1XKsfGXtVDWjXVIFadNiU/YQlopSkDpjOh2zvdYp55pe0NrOVKr6B7edOu5
+         l4FziKvWiaxZ9I/own5KMqVnKGT5YpPqrxHm9O3p3PKaOBGa+hCUqM2NLIeAeNSczd66
+         gL7F5FaJa688R1FPfypJhNMpf+QPpXpmZeNamrATXHB3LXwxZad05313nZsH2ntuGbT/
+         LHtND+ZGwy/W3Qavc+wLAfQ70dm6nQp/EJ9+/XtpIGMSyv4b+bVyQlqibv9+yRAwUYeV
+         v5Rk80Pq0Q+ysVMEo7EkDiaUYB4JvLb9Ih719eWznWbG1tEHsvJNv/yjtCddJUB5qSOy
+         0PnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713425593; x=1714030393;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Znp+vQdYzVYcETVz3Us8OPerpcvuVBrznxNI9AWwpzs=;
-        b=BAxOYPyc6LhSJCZ9H3Dm1v4lvRo5n9qeNuRQW1eCOzYwXP3tTeoMEZuGL+WOGj9zON
-         2ZIj5lvm6b9Q85pnIPG4k+izHBYFMpzxVI00oLKXhZS757UpIFURHb5/iluPd5cjJxPX
-         H+dMlRWV23MHI9kSDFonq3AchiwhP8r5xNpXQ7638KGuzKmIFTcj/VI+FK90hYgcAof0
-         IKErPgNQe2jox3nE+ijgWASejGiy1q49Wkq2NAK2CMtZ1c68vDuQqBGri2RI78sRS5t4
-         iXoSXc+AAOifGqIRWwgpRDN+BQYfO7T/TwvmDj3CwLXIFJKmCYqNG4UkZ5oT7RFFpKKz
-         pbfw==
-X-Forwarded-Encrypted: i=1; AJvYcCUqxo5qwRarVgzBrtG/YDt7ffIRIpVyAgntPENJ6oVeBouhTfyZ4f20NyhmygMkcQURM5g0ct94+/k7qicUP4fGOf6K7g1j
-X-Gm-Message-State: AOJu0Yzu96wMVo2hTrEa94Ygh+MLTyyxQJSeTGMrn+hdX37NQG9gT3nn
-	nnNj/oKR85LnZF0sucae+ceTvLcFA3PRikzl7jJDKDfNthTG3gzJTp0gQ1AUOzw2uiS5Y6TML7X
-	Lf8g8J4fyxw==
-X-Google-Smtp-Source: AGHT+IE8Hie13hSVq0XWDGdiW0SI6fH903dqPHpHeTAYIDwA2H+Nn9Zo3at3R4HRHYL85tUuCRxL1KsK3epIzQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1141:b0:dcc:8be2:7cb0 with SMTP
- id p1-20020a056902114100b00dcc8be27cb0mr175009ybu.0.1713425593327; Thu, 18
- Apr 2024 00:33:13 -0700 (PDT)
-Date: Thu, 18 Apr 2024 07:32:48 +0000
-In-Reply-To: <20240418073248.2952954-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1713425769; x=1714030569;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Dpy2rEg9ZNWJ5JbT06/E9/NLB753gLdsnym9tdupR90=;
+        b=L1yy5RYz82jyo+Dq0wUsZZil7GjzsztnIhmKu+7FKBI3A+4Zf1a8t4AmDEX6JN3hn8
+         A96+ghyPVL1hGSi22+XTtTtzQ1NRI5gtg+4+a5AcjYMjD3/EcfllGcC7X+c3pTTa7Vc9
+         CFT817kARVrY6fT8q8WL2oaaelbDxyH8nPLL9foWMFVFIfHXUy6UO+Sti8MnJPHqh3/z
+         t97Y9HjnX/ImruXHEXpD/Etf2th182t+gmuM9aCVCumD7hjtNRmxy+9+9NQWR8l5vV/5
+         IdtF8anP/GzVRIq/LoBSiSNAJ4t/RrfpYVS+BhtmT2Zs+L5cYMLtfTe8Dpi+5YU3kWGS
+         uucg==
+X-Gm-Message-State: AOJu0YyWYMEm6QVwYhvz43sj/4aKFSoeq8HdyAs1EqvpfBah5dCcGe4X
+	hvhu8wYDVgrarHL6zjhUPH4lpIS0wTPBeWYUkkcFNiEyXNa1GiIs
+X-Google-Smtp-Source: AGHT+IFIAl2PHYE50esvr6yTvMmoj1qbC8mM4VW2rS2LO++l5Uw8MEmvSH5xiVcWlFIrowOJ0z2Fng==
+X-Received: by 2002:a17:902:c106:b0:1e2:90c6:839a with SMTP id 6-20020a170902c10600b001e290c6839amr2095277pli.31.1713425768962;
+        Thu, 18 Apr 2024 00:36:08 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
+        by smtp.gmail.com with ESMTPSA id j9-20020a17090276c900b001e26ba8882fsm841756plt.287.2024.04.18.00.36.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 00:36:08 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	horms@kernel.org
+Cc: netdev@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next v3 0/3] locklessly protect left members in struct rps_dev_flow
+Date: Thu, 18 Apr 2024 15:36:00 +0800
+Message-Id: <20240418073603.99336-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240418073248.2952954-1-edumazet@google.com>
-X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240418073248.2952954-15-edumazet@google.com>
-Subject: [PATCH v2 net-next 14/14] net_sched: sch_skbprio: implement lockless skbprio_dump()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Simon Horman <horms@kernel.org>, 
-	"=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?=" <toke@redhat.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Instead of relying on RTNL, skbprio_dump() can use READ_ONCE()
-annotation, paired with WRITE_ONCE() one in skbprio_change().
+From: Jason Xing <kernelxing@tencent.com>
 
-Also add a READ_ONCE(sch->limit) in skbprio_enqueue().
+Since Eric did a more complicated locklessly change to last_qtail
+member[1] in struct rps_dev_flow, the left members are easier to change
+as the same.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/sched/sch_skbprio.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+One thing important I would like to share by qooting Eric:
+"rflow is located in rxqueue->rps_flow_table, it is thus private to current
+thread. Only one cpu can service an RX queue at a time."
+So we only pay attention to the reader in the rps_may_expire_flow() and
+writer in the set_rps_cpu(). They are in the two different contexts.
 
-diff --git a/net/sched/sch_skbprio.c b/net/sched/sch_skbprio.c
-index b4dd626c309c36725e6030a338d21d1fabcb6704..20ff7386b74bd89c00b50a8f0def91b6c5cce7f4 100644
---- a/net/sched/sch_skbprio.c
-+++ b/net/sched/sch_skbprio.c
-@@ -79,7 +79,9 @@ static int skbprio_enqueue(struct sk_buff *skb, struct Qdisc *sch,
- 	prio = min(skb->priority, max_priority);
- 
- 	qdisc = &q->qdiscs[prio];
--	if (sch->q.qlen < sch->limit) {
-+
-+	/* sch->limit can change under us from skbprio_change() */
-+	if (sch->q.qlen < READ_ONCE(sch->limit)) {
- 		__skb_queue_tail(qdisc, skb);
- 		qdisc_qstats_backlog_inc(sch, skb);
- 		q->qstats[prio].backlog += qdisc_pkt_len(skb);
-@@ -172,7 +174,7 @@ static int skbprio_change(struct Qdisc *sch, struct nlattr *opt,
- 	if (opt->nla_len != nla_attr_size(sizeof(*ctl)))
- 		return -EINVAL;
- 
--	sch->limit = ctl->limit;
-+	WRITE_ONCE(sch->limit, ctl->limit);
- 	return 0;
- }
- 
-@@ -200,7 +202,7 @@ static int skbprio_dump(struct Qdisc *sch, struct sk_buff *skb)
- {
- 	struct tc_skbprio_qopt opt;
- 
--	opt.limit = sch->limit;
-+	opt.limit = READ_ONCE(sch->limit);
- 
- 	if (nla_put(skb, TCA_OPTIONS, sizeof(opt), &opt))
- 		return -1;
+[1]:
+https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=3b4cf29bdab
+
+v3
+Link: https://lore.kernel.org/all/20240417062721.45652-1-kerneljasonxing@gmail.com/
+1. adjust the protection in a right way (Eric)
+
+v2
+1. fix passing wrong type qtail.
+
+Jason Xing (3):
+  net: rps: protect last_qtail with rps_input_queue_tail_save() helper
+  net: rps: protect filter locklessly
+  net: rps: locklessly access rflow->cpu
+
+ net/core/dev.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
+
 -- 
-2.44.0.683.g7961c838ac-goog
+2.37.3
 
 
