@@ -1,117 +1,184 @@
-Return-Path: <netdev+bounces-89125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BB918A97D7
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 12:52:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 517938A97EE
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 12:54:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D9AB1C20DCD
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 10:52:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83D331C20A34
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 10:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75E2215E207;
-	Thu, 18 Apr 2024 10:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9233915E1FE;
+	Thu, 18 Apr 2024 10:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Q0AyzPbH"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="UCO4Z4Rs"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3871F15E1FC
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 10:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862EC15E1EE;
+	Thu, 18 Apr 2024 10:53:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713437492; cv=none; b=pVtYZnRDZZhqEPz8nbxAoHLyWlxjtPb8YNe5vvRh+pZk6zZEz89sq/6s7V/dY23CWK0+rn+SI3coA6+VClIMdiWi2wP2uyv8nLy3Ud31MVvN5A7GQSyDgO/+haNWM00qAyp2lpba9ly1mOZ9pFB0uTF8T6Ogux/i1wv2CF4wYU0=
+	t=1713437630; cv=none; b=laaB4ffyPlCuVLMyy0YpOkksyuoRtYxRHqW8CM0Vy3Va9/u7Tcy6dsyK3KRRNDomwuf1M2D5wyNra85AQ2crpQ0NMiV2sCjlI3W+B8AXzA/eBuNGNNyTvIrlcaQT/THbWve3y7EDSEwM/86KqFa4UegyB0KxYirTSomyh9H4RMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713437492; c=relaxed/simple;
-	bh=nu6lA76N5WLXYvWzhF8Lf/Nyns34NYM0MBJ0QLMuRJ8=;
-	h=From:To:Cc:Subject:MIME-Version:Content-Disposition:Content-Type:
-	 Message-Id:Date; b=NDRf37bnpBZNDGmQ/yCfqwvy4RU+s4TmqqEa3HqABzDRWJwCGKB0XGd5wqj3tn55phm1uNiPU2DlEEU+tIYtD4kklzpS9d4wpA56Ep8/RBzGpnj5C1WidCB+9r6UIA19FDXFw5xQQc7zXkWdZtjY6ky35gS/RNDqph0fWqPX+lU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Q0AyzPbH; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=7EU2L0mFIj9DzZB8BI0h80C8FpKbnCjNoYG/6UMX2OU=; b=Q0AyzPbH7wacPnQPSPllcEe1Fa
-	4c/e4dZwB0h55uydUrR1ywhRKnc9kyoOFUWC8rP8CJw+KS3UTHtqv8o4G3vDufCvBUjWpu+xpBaz2
-	ZgEVLJddl4vNsl/s0aRl4hilTrIOegKA1Eo+f7P4goeP9rBdUXqF3/vsD6WUk7xaDER8CtjRvVNtU
-	iv18l2ZsImQ5uGFs3cwYQbi0Lqx8pRm3DEOM5r0t3UGIF7oNIohN5gEUUalyi20cyYaaLfdkZ0FGq
-	pJ9cn2GY/iicdwSg3hpZBCMtFSedQSvdP5Ga02KWgMCCqk58ArFVVcQAOPjs3OD7fELUWEBPSFuKN
-	InzWmoqg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:44078 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1rxPMO-0005nz-2o;
-	Thu, 18 Apr 2024 11:51:20 +0100
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1rxPMP-007f9I-Qq; Thu, 18 Apr 2024 11:51:21 +0100
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: George McCollister <george.mccollister@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next] net: dsa: xrs700x: fix missing initialisation of
- ds->phylink_mac_ops
+	s=arc-20240116; t=1713437630; c=relaxed/simple;
+	bh=0bMymNfyilD0mEZmB2VOm3tjTxQImGlD7fHVsxlSUZo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=itfaASZnwYvVdqR1zQOzy2StAv8VJ/vUiLI4OpP//3RR354wtdNLFeg5XHfRXTfIUK80NLyT8b1C+jfC4ziGLhUMhoV2h9xT1+nZyWZK/pwD85wB3QvQeac38tt85gRu2rL1rOCEowLhBkYyex9BONbrewge62Zbg26IbH0YHs0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=UCO4Z4Rs; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: lukma@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 34549884D0;
+	Thu, 18 Apr 2024 12:53:43 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1713437626;
+	bh=Hr5k1M/26cGwCrFIGpMIAqPOxeHJ0YhH3NLKzZ9M5q8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=UCO4Z4RsJN5FsP/0P5noDLYR15AsfXdyCm5VEOm+qoL7DU99xtdt2C69DRrTEqUYD
+	 VI1pxGuUAOJFWbQ4y9GWYpVuIpxR9E0QQYLAjMpIj555gNfBSWS3B474YLs3G+seVa
+	 rX3qKVHdYB0znglvbxpVRvY0yfAXQ+IO9lMi9rVQRzas+TzxlnqYmXpLhr8sgc+42w
+	 GE0fQfp6tQiiPceXlGIikChhrQNfcuWhmrLkbjNwx0/qxcnx36pMmq/QZZ2VMkcCik
+	 8jlvrtJQSisU9micFB4h4xsnvVDpclq3PW+OqXFCr7vDAFVX3AMNWA6U9x97eAPBe6
+	 P5Vk8BcajrQhQ==
+Date: Thu, 18 Apr 2024 12:53:36 +0200
+From: Lukasz Majewski <lukma@denx.de>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
+ <edumazet@google.com>, Vladimir Oltean <olteanv@gmail.com>, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Oleksij
+ Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com, Sebastian
+ Andrzej Siewior <bigeasy@linutronix.de>, Ravi Gunasekaran
+ <r-gunasekaran@ti.com>, Simon Horman <horms@kernel.org>, Nikita
+ Zhandarovich <n.zhandarovich@fintech.ru>, Murali Karicheri
+ <m-karicheri2@ti.com>, Jiri Pirko <jiri@resnulli.us>, Dan Carpenter
+ <dan.carpenter@linaro.org>, Ziyang Xuan <william.xuanziyang@huawei.com>,
+ Shigeru Yoshida <syoshida@redhat.com>, "Ricardo B. Marliere"
+ <ricardo@marliere.net>, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v5 1/4] net: hsr: Provide RedBox support
+ (HSR-SAN)
+Message-ID: <20240418125336.7305d545@wsk>
+In-Reply-To: <497b3f9b6d91a076c67f959ba878583a91b03cf5.camel@redhat.com>
+References: <20240415124928.1263240-1-lukma@denx.de>
+	<20240415124928.1263240-2-lukma@denx.de>
+	<497b3f9b6d91a076c67f959ba878583a91b03cf5.camel@redhat.com>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1rxPMP-007f9I-Qq@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Thu, 18 Apr 2024 11:51:21 +0100
+Content-Type: multipart/signed; boundary="Sig_/o5cE9Pr733kdcosiTR3KCdG";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-The kernel build bot identified the following mistake in the recently
-merged 860a9bed2651 ("net: dsa: xrs700x: provide own phylink MAC
-operations") patch:
+--Sig_/o5cE9Pr733kdcosiTR3KCdG
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-drivers/net/dsa/xrs700x/xrs700x.c:714:37: warning: 'xrs700x_phylink_mac_ops' defined but not used [-Wunused-const-variable=]
-     714 | static const struct phylink_mac_ops xrs700x_phylink_mac_ops = {
-         |                                     ^~~~~~~~~~~~~~~~~~~~~~~
+Hi Paolo,
 
-Fix the omitted assignment of ds->phylink_mac_ops.
+> On Mon, 2024-04-15 at 14:49 +0200, Lukasz Majewski wrote:
+> > Introduce RedBox support (HSR-SAN to be more precise) for HSR
+> > networks. Following traffic reduction optimizations have been
+> > implemented:
+> > - Do not send HSR supervisory frames to Port C (interlink)
+> > - Do not forward to HSR ring frames addressed to Port C
+> > - Do not forward to Port C frames from HSR ring
+> > - Do not send duplicate HSR frame to HSR ring when destination is
+> > Port C
+> >=20
+> > The corresponding patch to modify iptable2 sources has already been
+> > sent:
+> > https://lore.kernel.org/netdev/20240308145729.490863-1-lukma@denx.de/T/
+> >=20
+> > Testing procedure:
+> > ------------------
+> > The EVB-KSZ9477 has been used for testing on net-next branch
+> > (SHA1: 5fc68320c1fb3c7d456ddcae0b4757326a043e6f).
+> >=20
+> > Ports 4/5 were used for SW managed HSR (hsr1) as first hsr0 for
+> > ports 1/2 (with HW offloading for ksz9477) was created. Port 3 has
+> > been used as interlink port (single USB-ETH dongle).
+> >=20
+> > Configuration - RedBox (EVB-KSZ9477):
+> > if link set lan1 down;ip link set lan2 down
+> > ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision
+> > 45 version 1 ip link add name hsr1 type hsr slave1 lan4 slave2 lan5
+> > interlink lan3 supervision 45 version 1 ip link set lan4 up;ip link
+> > set lan5 up ip link set lan3 up
+> > ip addr add 192.168.0.11/24 dev hsr1
+> > ip link set hsr1 up
+> >=20
+> > Configuration - DAN-H (EVB-KSZ9477):
+> >=20
+> > ip link set lan1 down;ip link set lan2 down
+> > ip link add name hsr0 type hsr slave1 lan1 slave2 lan2 supervision
+> > 45 version 1 ip link add name hsr1 type hsr slave1 lan4 slave2 lan5
+> > supervision 45 version 1 ip link set lan4 up;ip link set lan5 up
+> > ip addr add 192.168.0.12/24 dev hsr1
+> > ip link set hsr1 up
+> >=20
+> > This approach uses only SW based HSR devices (hsr1).
+> >=20
+> > --------------          -----------------       ------------
+> > DAN-H  Port5 | <------> | Port5         |       |
+> >        Port4 | <------> | Port4   Port3 | <---> | PC
+> >              |          | (RedBox)      |       | (USB-ETH)
+> > EVB-KSZ9477  |          | EVB-KSZ9477   |       |
+> > --------------          -----------------       ------------ =20
+>=20
+> The above description is obsoleted by follow-up tests, right?
+>=20
 
-Reported-by: kernel test robot <lkp@intel.com>
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
-Normal builds don't catch this, and W=1 produces 5.3klines of warnings,
-so its pretty difficult to build-test changes such as these and have
-confidence that they are correct. If anyone knows of a solution to
-this problem...
+No, it is still valid if one would like to use/test this code on two
+KSZ9477-EVB boards.
 
- drivers/net/dsa/xrs700x/xrs700x.c | 1 +
- 1 file changed, 1 insertion(+)
+However, I can add also information referring to hsr_redbox.sh tests as
+well.
 
-diff --git a/drivers/net/dsa/xrs700x/xrs700x.c b/drivers/net/dsa/xrs700x/xrs700x.c
-index 6605fa44bcf0..de3b768f2ff9 100644
---- a/drivers/net/dsa/xrs700x/xrs700x.c
-+++ b/drivers/net/dsa/xrs700x/xrs700x.c
-@@ -780,6 +780,7 @@ struct xrs700x *xrs700x_switch_alloc(struct device *base, void *devpriv)
- 	INIT_DELAYED_WORK(&priv->mib_work, xrs700x_mib_work);
- 
- 	ds->ops = &xrs700x_ops;
-+	ds->phylink_mac_ops = &xrs700x_phylink_mac_ops;
- 	ds->priv = priv;
- 	priv->dev = base;
- 
--- 
-2.30.2
+> Thanks,
+>=20
+> Paolo
+>=20
 
+
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/o5cE9Pr733kdcosiTR3KCdG
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmYg+7AACgkQAR8vZIA0
+zr1mhQgAuvTF/ITyY9rqDnd8OVYrmLANtF+DZvm3ILNdaNFE3/lZRmEPJVJ1TxuC
+SWoOZGbpJzY/8cFPfa93Jlt2nHn/jdAKkQloNoGFc0eE+oJ7eJiavFchYyipVsVI
+2/iFYckysXYsnIykYZ42Ck7FrhEtOXJqrmjG7WrwqCoHg2n940v8+mXLP5X/l5xF
+3xL/joKPEq00ejTrnNCSwCcLrsq/JAh9mMoVWpGsklv8zqupOkrzh5Bx7Ogl/QVN
+i4F/GWY/8H153ThxkCo5FaM4d4itzTQx8OEAm5D/Mg+wGxF4n2ESjyUbjm3D4RcB
+19O15jHVzVH1RDHI10+ozb3exZ11/Q==
+=iMUr
+-----END PGP SIGNATURE-----
+
+--Sig_/o5cE9Pr733kdcosiTR3KCdG--
 
