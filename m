@@ -1,126 +1,156 @@
-Return-Path: <netdev+bounces-89130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 785878A9812
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:01:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3065C8A9815
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 13:02:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 337BB282D1B
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:01:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8913BB22417
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:02:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6228015E20B;
-	Thu, 18 Apr 2024 11:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54EE315E20B;
+	Thu, 18 Apr 2024 11:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="Zj8lifKr"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCDB315E1FB;
-	Thu, 18 Apr 2024 11:01:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02E7C8C11
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 11:02:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713438088; cv=none; b=aNyrI/JKuPgQ1FoWXmhKHdgpqGy+y42bQQpVIC7wAJ5ldHCNvdl7M4zSoVud/Q+X17A7bjCquAzoC7TtDCSbbKhoQLBinhdanw5xNH20iyN1WyDvRm+D7+cSfUMea6016IBRU+vwrT/nf23mlnriqjfIpPfNSRi0xAJKwUgrx54=
+	t=1713438137; cv=none; b=jeTKeI2CVH6FrjCup85gd118Nc4qeuXdBSj2zcemJ2Je5Y7SkjKQrlSKPwmF4irUWskJqv4gLp/gf5n3NVgOBajndWhgxxWXfTI74sDVXL8pnEAoVgoeOcwvq0UGEBH0JbdRoN+u5E7PBB8nHD1HjjkqLXfQBCxu6cxpxq8tMhM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713438088; c=relaxed/simple;
-	bh=IWBVXvEKNivmLFW4lhGxT3c3JjTMOajf11zBuAEveQk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=cGev8K6ceMTYi2sUQgfGjRbcsDw6+SI0+RLd9VUgPzEaTqNnzHb+3PeMC/9n6jPn9P8UsT/7V4N3OaGFDbYBcOcj22CqrP2wabrVPM2glErf603XMLk+ykuhbTghv4X1V3hz88Q12u5wkFAeoAnqV5115/RRxSR0NFF56Cz2pEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.162.254])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4VKvrm0sHWzwS8W;
-	Thu, 18 Apr 2024 18:58:16 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id 557751800C3;
-	Thu, 18 Apr 2024 19:01:20 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 18 Apr 2024 19:01:19 +0800
-Message-ID: <7672ae57-86b9-91c2-b03e-2700b931b677@huawei.com>
-Date: Thu, 18 Apr 2024 19:01:19 +0800
+	s=arc-20240116; t=1713438137; c=relaxed/simple;
+	bh=F/TmGD6P/eBNZve0CmXoI/nVfjo5Bnc9S/wABpwztCg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Lg3VIlOa2SCFOdv85LDrgSpgofvE6oxaN67Ukfd+4PTDmYH9IKypUbaXm7uIocY0BeVxMZHTZ4qpmSpy3sCUU1eJGiC6znlimZM6bw1vLRqgUlYmyYPNU68N/p32rvCZv+tkxmuBMn8Tl1KPESZ6CyJTgUGa8yEkj5YimFiK6lI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=Zj8lifKr; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com [209.85.218.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 317D43F722
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 11:02:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1713438125;
+	bh=AOGV+CBOV8eiaEz1GoNMtohBk1/aB8bFkBW7cPKL6oU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+	b=Zj8lifKroqtWPZeSBTFG4xaigDMSFk61lNN+TOQ0/qFH3z1Oj/URB1PrWQMhPXRtB
+	 zcfP4aqo+MUK9qcRCaGsOATOPQq9Blkui7OGy0VZQjSHxFwyZlEADMaL7al0Vct/is
+	 KWIdz2OAJdoXhagsJh8l9zto6OipzSxaUGE+eoHJFmufUaKprT9FHR5e33toSvOhE0
+	 0k/ZXV8hBfBhyWMfl/ZkNI5yqxJ5Cor/c1swZI08G3Fpo77xeToW0f39Ea7TcJdfPS
+	 8Z5oK0MKV5yfvSbKF5HGZ14U9TXhqEJAkITI2JkFNkml9QVs3uviNM+G7E+iqHl2Qv
+	 HsEmItHmaeaOA==
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a51abd0d7c6so39986366b.3
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 04:02:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713438125; x=1714042925;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=AOGV+CBOV8eiaEz1GoNMtohBk1/aB8bFkBW7cPKL6oU=;
+        b=OXDkayRpr1l4i8LdJij/4Jb5wCTqqVDrjKIZpWz+9d3YfWd/4vLLqqFP8QQoRPiCwy
+         IhpSsO2fwrWbgEOVbjknInlJzSgkiJU9QsAEBNkpmlr/7R7XnJs2/dPf3eUDYpttH7XE
+         VYo5qTm7i9u35fc9ePdJ4LjTQYn3QehUjBH+whQyu+C6jdM7U0NF0qk/5bzuk53AFu29
+         XuufvJf5CLHqQfXWh8xDCyS/e2koUZ4c3pbCTbIrigDXIMHVbyqoCxp9Iftq3IITmmnX
+         dwavFN3pxsn6Kk8AqM8+zfVRk7rWc+B0ODwmYELWoI17oPMKXvltKjNAiUiwHR1MgdZN
+         lweA==
+X-Gm-Message-State: AOJu0Ywtj+7zrPg1cphJf4yXqkAuGCJLyjnBlNgefSsNSA6yNDE6TusH
+	cCzPD1uK/vAnZDrl3aWj6WDnvp7O/dCZYEAqeX/DLDe5lo+Oifm6mXwnU4+RuCq7cFE3t5hGwpB
+	jUNFnYy70edTGIWxIFQOjgEU7/1bj+8sYUVleFM1YmW8KfRjnTYweRA99/BZYc8Y6iO29VQ==
+X-Received: by 2002:a17:906:5a8c:b0:a52:5a02:2432 with SMTP id l12-20020a1709065a8c00b00a525a022432mr1500550ejq.50.1713438124765;
+        Thu, 18 Apr 2024 04:02:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFK0FFwqxygVS/MakVnyy4i3LBAXhMuv1GAxCYpN0cDVcZFrxU5v8w8WwAoL/TOLrTzl1iuHA==
+X-Received: by 2002:a17:906:5a8c:b0:a52:5a02:2432 with SMTP id l12-20020a1709065a8c00b00a525a022432mr1500533ejq.50.1713438124401;
+        Thu, 18 Apr 2024 04:02:04 -0700 (PDT)
+Received: from amikhalitsyn.lan ([2001:470:6d:781:320c:9c91:fb97:fbfc])
+        by smtp.gmail.com with ESMTPSA id yk18-20020a17090770d200b00a51983e6190sm728594ejb.205.2024.04.18.04.02.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Apr 2024 04:02:04 -0700 (PDT)
+From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+To: horms@verge.net.au
+Cc: netdev@vger.kernel.org,
+	lvs-devel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
+	Julian Anastasov <ja@ssi.bg>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>
+Subject: [PATCH net-next v2 1/2] ipvs: add READ_ONCE barrier for ipvs->sysctl_amemthresh
+Date: Thu, 18 Apr 2024 13:01:52 +0200
+Message-Id: <20240418110153.102781-1-aleksandr.mikhalitsyn@canonical.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH net] net/smc: fix potential sleeping issue in
- smc_switch_conns
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Guangguan Wang
-	<guangguan.wang@linux.alibaba.com>, <linux-s390@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <jaka@linux.ibm.com>, <alibuda@linux.alibaba.com>,
-	<tonylu@linux.alibaba.com>, <guwen@linux.alibaba.com>,
-	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>,
-	<tangchengchang@huawei.com>
-References: <20240413035150.3338977-1-shaozhengchao@huawei.com>
- <6520c574-e1c6-49e0-8bb1-760032faaf7a@linux.alibaba.com>
- <ed5f3665-43ae-cbab-b397-c97c922d26eb@huawei.com>
- <c6deb857-2236-4ec0-b4c7-25a160f1bcfb@linux.ibm.com>
- <cd006e26-6f6e-2771-d1bc-76098a5970ac@huawei.com>
- <0cbb1082-8f5f-4887-b13c-802c2bbcca36@linux.ibm.com>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <0cbb1082-8f5f-4887-b13c-802c2bbcca36@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500026.china.huawei.com (7.185.36.106)
 
+Cc: Julian Anastasov <ja@ssi.bg>
+Cc: Simon Horman <horms@verge.net.au>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: Florian Westphal <fw@strlen.de>
+Suggested-by: Julian Anastasov <ja@ssi.bg>
+Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+---
+ net/netfilter/ipvs/ip_vs_ctl.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
+diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+index 143a341bbc0a..daa62b8b2dd1 100644
+--- a/net/netfilter/ipvs/ip_vs_ctl.c
++++ b/net/netfilter/ipvs/ip_vs_ctl.c
+@@ -94,6 +94,7 @@ static void update_defense_level(struct netns_ipvs *ipvs)
+ {
+ 	struct sysinfo i;
+ 	int availmem;
++	int amemthresh;
+ 	int nomem;
+ 	int to_change = -1;
+ 
+@@ -105,7 +106,8 @@ static void update_defense_level(struct netns_ipvs *ipvs)
+ 	/* si_swapinfo(&i); */
+ 	/* availmem = availmem - (i.totalswap - i.freeswap); */
+ 
+-	nomem = (availmem < ipvs->sysctl_amemthresh);
++	amemthresh = max(READ_ONCE(ipvs->sysctl_amemthresh), 0);
++	nomem = (availmem < amemthresh);
+ 
+ 	local_bh_disable();
+ 
+@@ -146,8 +148,8 @@ static void update_defense_level(struct netns_ipvs *ipvs)
+ 	case 1:
+ 		if (nomem) {
+ 			ipvs->drop_rate = ipvs->drop_counter
+-				= ipvs->sysctl_amemthresh /
+-				(ipvs->sysctl_amemthresh-availmem);
++				= amemthresh /
++				(amemthresh-availmem);
+ 			ipvs->sysctl_drop_packet = 2;
+ 		} else {
+ 			ipvs->drop_rate = 0;
+@@ -156,8 +158,8 @@ static void update_defense_level(struct netns_ipvs *ipvs)
+ 	case 2:
+ 		if (nomem) {
+ 			ipvs->drop_rate = ipvs->drop_counter
+-				= ipvs->sysctl_amemthresh /
+-				(ipvs->sysctl_amemthresh-availmem);
++				= amemthresh /
++				(amemthresh-availmem);
+ 		} else {
+ 			ipvs->drop_rate = 0;
+ 			ipvs->sysctl_drop_packet = 1;
+-- 
+2.34.1
 
-On 2024/4/18 15:50, Wenjia Zhang wrote:
-> 
-> 
-> On 18.04.24 03:48, shaozhengchao wrote:
->>
->>
->> On 2024/4/17 23:23, Wenjia Zhang wrote:
->>>
->>>
->>> On 17.04.24 10:29, shaozhengchao wrote:
->>>>
->>>> Hi Guangguan:
->>>>    Thank you for your review. When I used the hns driver, I ran into 
->>>> the
->>>> problem of "scheduling while atomic". But the problem was tested on the
->>>> 5.10 kernel branch, and I'm still trying to reproduce it using the
->>>> mainline.
->>>>
->>>> Zhengchao Shao
->>>>
->>>
->> Hi Wenjia:
->>    I will try to reproduce it. 
-> 
-> Thanks!
-> 
-> In addition, the last time I sent you a
->> issue about the smc-tool, do you have any idea?
->>
-> 
-Hi Wenjia:
-   I have send it to you. Could you receive it?
-
-Thank you.
-Zhengchao Shao
-> mhhh, I just see a patch from you on smc_hash_sk/smc_unhash_sk, and it 
-> is already applied during my vacation and it does look good to me. If 
-> you mean others, could you send me the link again please, I mightbe have 
-> missed out on it.
-> 
->> Thank you
->> Zhengchao Shao
->>> Could you please try to reproduce the bug with the latest kernel? And 
->>> show more details (e.g. kernel log) on this bug?
->>>
->>> Thanks,
->>> Wenjia
->>
-> 
 
