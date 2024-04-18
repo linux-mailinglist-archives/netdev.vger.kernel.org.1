@@ -1,163 +1,133 @@
-Return-Path: <netdev+bounces-89071-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89073-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59D548A95B8
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:12:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A2158A95C1
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:13:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1305B281616
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:12:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AAC5B1C20CE9
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:13:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB5D15AD91;
-	Thu, 18 Apr 2024 09:12:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33EF158858;
+	Thu, 18 Apr 2024 09:13:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=smtpcorp.com header.i=@smtpcorp.com header.b="DBcujdt5";
-	dkim=pass (2048-bit key) header.d=asem.it header.i=@asem.it header.b="l2VrDT16"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DnUXUTKQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from e3i51.smtp2go.com (e3i51.smtp2go.com [158.120.84.51])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48E0415AAD5
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 09:12:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=158.120.84.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16C1B6F53D
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 09:13:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713431540; cv=none; b=mBkEDr/Xq3KcBrzMfFfZ0af4YhewSCowfeEBe0ItCP0c7P2LM2gNQS8/TZkTDfO1zvk39gvA38278cHEi7kNfW/RMLVt2mSYCr+x1iEq7R8e00lG4utDKEnkURRJea+CVbAzP4dqsM2F5FJK6s5yQwu62atBGmgil06IjvcxZ04=
+	t=1713431626; cv=none; b=Ur0wcYGpzHfGVzcFQTNXAKaV2vaE1jXiL/LuMHLP62YXFQtq4dVnlMuK6MPTDNpxTh20BkLAT3nMwnPz/Ah9hocbvgeKVI5Y/fuKunYee1Z+nF5nBXktBD9GuSk70CleQAECdP0ReDe/iEbNlso65QwdEwNRFNTUdugxhmylvgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713431540; c=relaxed/simple;
-	bh=1653cXZwkdY1XGP9TZy+tiKha1dxQmkE1Ob1WqnIEbg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LE+WMvX46gzj7q7VZnw2U+SsmVpSg/+jAt8po5Q8jWDcSCghIbohKgIzOd5+bzfDK3PB5zo8+851K8t/BBPW36Vto6UHv6E81DGo9D5Rs+ZWW9qAU3fxwmQw7ntErgpEKdIJiNMLkleF05mXazjiaX+lCsYxuSR5upJBm8TfnlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asem.it; spf=pass smtp.mailfrom=em1174574.asem.it; dkim=pass (2048-bit key) header.d=smtpcorp.com header.i=@smtpcorp.com header.b=DBcujdt5; dkim=pass (2048-bit key) header.d=asem.it header.i=@asem.it header.b=l2VrDT16; arc=none smtp.client-ip=158.120.84.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=asem.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=em1174574.asem.it
-Received: from [10.86.249.198] (helo=asas054.asem.intra)
-	by smtpcorp.com with esmtpa (Exim 4.96.1-S2G)
-	(envelope-from <f.suligoi@asem.it>)
-	id 1rxNoR-wSS1uD-0s;
-	Thu, 18 Apr 2024 09:12:11 +0000
-Received: from flavio-x.asem.intra ([172.16.18.47]) by asas054.asem.intra with Microsoft SMTPSVC(10.0.14393.4169);
-	 Thu, 18 Apr 2024 11:12:09 +0200
-From: Flavio Suligoi <f.suligoi@asem.it>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Flavio Suligoi <f.suligoi@asem.it>,
-	Krzysztof Kozlowski <krzk@kernel.org>
-Subject: [PATCH v2 1/1] dt-bindings: net: snps,dwmac: remove tx-sched-sp property
-Date: Thu, 18 Apr 2024 11:11:48 +0200
-Message-Id: <20240418091148.1968155-2-f.suligoi@asem.it>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240418091148.1968155-1-f.suligoi@asem.it>
-References: <20240418091148.1968155-1-f.suligoi@asem.it>
+	s=arc-20240116; t=1713431626; c=relaxed/simple;
+	bh=rQGVQURqecrBOAPb1l2hVI6jUgQPxnMOVRcXI3wTpIM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e7eq4r3QNR/1UZmbz7DaU9dHTwSG7GehRYbDZ94NtvZJRjokkJhwEcEjWMjuwy86APqf8bsUqgjSTgAVHF6xKcDXrxd+I1jgg9jK29OgWVPBKOdX2QYQieAbjGLxkLG7F8OYp/HzpVHhavHnwp2LQVyQ6Sh20bwKctC5Qf9oGFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DnUXUTKQ; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713431626; x=1744967626;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=rQGVQURqecrBOAPb1l2hVI6jUgQPxnMOVRcXI3wTpIM=;
+  b=DnUXUTKQ/SJjWfRvGTyIzM0pnyG3pLYXncfLylWFSvRPdBj4SJRtuAK+
+   EKCeXAN/phe0SLzEh8tDagjV/h/K5NNfGDgq+2y58WUxUTJuk3DIBmBEf
+   eEzC/GLoEVOvCRcbhz6dpBBlHmJHJaSPtP+uT/7yUIipt85WurPN6Qa/P
+   eoZ/kIL8MgsFTQt0cpEd5H41uTnWTdWdtSVEzoEDASLqhJvJhsad8qteu
+   8hrE8x+KOhTF5ZwZPaghpeQBvuV2TDdkU6TsJjMIBNnuKZUKYlfwiQNiI
+   xwfTj2VBM42H3HWnxIaHEpvxy7hamOhCUcEmXYhViS88ZnlT6Wo44xIAk
+   A==;
+X-CSE-ConnectionGUID: nEb0oQswTIGj73cHu3r0kQ==
+X-CSE-MsgGUID: foapRs5tRgy4tPzvlJxStA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="31446458"
+X-IronPort-AV: E=Sophos;i="6.07,211,1708416000"; 
+   d="scan'208";a="31446458"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 02:13:41 -0700
+X-CSE-ConnectionGUID: Q80yaZIkSROABstXCsNY9g==
+X-CSE-MsgGUID: q9OQ6LECSp20L9+ZHhLUXA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,211,1708416000"; 
+   d="scan'208";a="53852345"
+Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.245.136.172]) ([10.245.136.172])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Apr 2024 02:13:37 -0700
+Message-ID: <ebb704a3-eb09-4433-8858-990e17a87721@linux.intel.com>
+Date: Thu, 18 Apr 2024 12:13:17 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-OriginalArrivalTime: 18 Apr 2024 09:12:09.0335 (UTC) FILETIME=[7DC61870:01DA9170]
-X-smtpcorp-track: 1rxNoRwSS1ID0s.mDequQBFaHlff
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=smtpcorp.com;
- i=@smtpcorp.com; q=dns/txt; s=a1-4; t=1713431532; h=feedback-id :
- x-smtpcorp-track : date : message-id : to : subject : from : reply-to
- : sender : list-unsubscribe;
- bh=dIA5kz04Cu10qs9gImcSljfbfip11thLhvuLyaEhzfU=;
- b=DBcujdt5AJFlVDHiI5oDeFKkdmnM0uHmOp/ygUnJt/02g1Mho5KSuWsuAnu4weac5qf3h
- aGmIru3Pm6jyHUv55uMOKbysxlqJrReES95c+iy8cx6BzOjXny4RD6BcgYURi3jS1/ootK0
- C9GTO9ygWxgr5Y5HkpiAtOYTYviaI4mZzkqVOO3qFnL5SvzHstpNSmVfQAQ7ZUKns3wK1VR
- 7TBV0fzkr2BlXYNS8pgUGxXjbhmKVZpu0FwCLspQFPFVdmcV+9CxawjM3vpuqNICKCkCEYQ
- hVKlXV2v2Pl6XhHE8ukBP90sUrALua9VBzEhaN3iwMRkqQj7rVaLYD72p8yg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=asem.it;
- i=@asem.it; q=dns/txt; s=s1174574; t=1713431532; h=from : subject : to
- : message-id : date; bh=dIA5kz04Cu10qs9gImcSljfbfip11thLhvuLyaEhzfU=;
- b=l2VrDT169Aujq/fnwUHVhU0ZW/fL8fuGDVaeqrINCCfsCu8SRekvxvncSk1vC/T9x7A5G
- SDoaf+Z1GuYYNSD59NkhEp+TNC7SxxL3BViYom2NgyP69YuPtLLE57GvC4UV7t+MXBJDNwI
- hv/8VV0AcOyvJmCZnpt1zTNM0UbLxQW2N1jg+Ed2GGNOCvLuNNZ79DLjljO/hv5kEfx6x31
- rf+qkU6teG5yMjXHyFGkNWZQVnbnh1HpF9lOJrD1AKrHxQ7abhMMRbfY74bxfIENmmvKOE/
- Z6ePU6+3rsJ20je9LlkoQgi3p0TaBqbDyn/mXWOaMVR/dQILd9+qZf8S0e2w==
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net] igc: Fix LED-related deadlock on
+ driver unbind
+To: Lukas Wunner <lukas@wunner.de>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Sasha Neftin <sasha.neftin@intel.com>,
+ netdev@vger.kernel.org, Kurt Kanzenbach <kurt@linutronix.de>,
+ intel-wired-lan@lists.osuosl.org, Roman Lozko <lozko.roma@gmail.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>
+References: <2f1be6b1cf2b3346929b0049f2ac7d7d79acb5c9.1713188539.git.lukas@wunner.de>
+Content-Language: en-US
+From: "naamax.meir" <naamax.meir@linux.intel.com>
+In-Reply-To: <2f1be6b1cf2b3346929b0049f2ac7d7d79acb5c9.1713188539.git.lukas@wunner.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Strict priority for the tx scheduler is by default in Linux driver, so the
-tx-sched-sp property was removed in commit aed6864035b1 ("net: stmmac:
-platform: Delete a redundant condition branch").
+On 4/15/2024 16:48, Lukas Wunner wrote:
+> Roman reports a deadlock on unplug of a Thunderbolt docking station
+> containing an Intel I225 Ethernet adapter.
+> 
+> The root cause is that led_classdev's for LEDs on the adapter are
+> registered such that they're device-managed by the netdev.  That
+> results in recursive acquisition of the rtnl_lock() mutex on unplug:
+> 
+> When the driver calls unregister_netdev(), it acquires rtnl_lock(),
+> then frees the device-managed resources.  Upon unregistering the LEDs,
+> netdev_trig_deactivate() invokes unregister_netdevice_notifier(),
+> which tries to acquire rtnl_lock() again.
+> 
+> Avoid by using non-device-managed LED registration.
+> 
+> Stack trace for posterity:
+> 
+>    schedule+0x6e/0xf0
+>    schedule_preempt_disabled+0x15/0x20
+>    __mutex_lock+0x2a0/0x750
+>    unregister_netdevice_notifier+0x40/0x150
+>    netdev_trig_deactivate+0x1f/0x60 [ledtrig_netdev]
+>    led_trigger_set+0x102/0x330
+>    led_classdev_unregister+0x4b/0x110
+>    release_nodes+0x3d/0xb0
+>    devres_release_all+0x8b/0xc0
+>    device_del+0x34f/0x3c0
+>    unregister_netdevice_many_notify+0x80b/0xaf0
+>    unregister_netdev+0x7c/0xd0
+>    igc_remove+0xd8/0x1e0 [igc]
+>    pci_device_remove+0x3f/0xb0
+> 
+> Fixes: ea578703b03d ("igc: Add support for LEDs on i225/i226")
+> Reported-by: Roman Lozko <lozko.roma@gmail.com>
+> Closes: https://lore.kernel.org/r/CAEhC_B=ksywxCG_+aQqXUrGEgKq+4mqnSV8EBHOKbC3-Obj9+Q@mail.gmail.com/
+> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+> Signed-off-by: Lukas Wunner <lukas@wunner.de>
+> Cc: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>   drivers/net/ethernet/intel/igc/igc.h      |  2 ++
+>   drivers/net/ethernet/intel/igc/igc_leds.c | 38 ++++++++++++++++++++++++-------
+>   drivers/net/ethernet/intel/igc/igc_main.c |  3 +++
+>   3 files changed, 35 insertions(+), 8 deletions(-)
 
-This property is still in use in the following DT (and it will be removed
-in a separate patch series):
-
-- arch/arm64/boot/dts/freescale/imx8mp-beacon-som.dtsi
-- arch/arm64/boot/dts/freescale/imx8mp-evk.dts
-- arch/arm64/boot/dts/freescale/imx8mp-verdin.dtsi
-- arch/arm64/boot/dts/qcom/sa8540p-ride.dts
-- arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-
-There is no problem if that property is still used in the DTs above,
-since, as seen above, it is a default property of the driver.
-
-Signed-off-by: Flavio Suligoi <f.suligoi@asem.it>
-Acked-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- .../devicetree/bindings/net/snps,dwmac.yaml        | 14 --------------
- 1 file changed, 14 deletions(-)
-
-diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-index 15073627c53a..21cc27e75f50 100644
---- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-+++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-@@ -328,9 +328,6 @@ properties:
-       snps,tx-sched-dwrr:
-         type: boolean
-         description: Deficit Weighted Round Robin
--      snps,tx-sched-sp:
--        type: boolean
--        description: Strict priority
-     allOf:
-       - if:
-           required:
-@@ -339,7 +336,6 @@ properties:
-           properties:
-             snps,tx-sched-wfq: false
-             snps,tx-sched-dwrr: false
--            snps,tx-sched-sp: false
-       - if:
-           required:
-             - snps,tx-sched-wfq
-@@ -347,7 +343,6 @@ properties:
-           properties:
-             snps,tx-sched-wrr: false
-             snps,tx-sched-dwrr: false
--            snps,tx-sched-sp: false
-       - if:
-           required:
-             - snps,tx-sched-dwrr
-@@ -355,15 +350,6 @@ properties:
-           properties:
-             snps,tx-sched-wrr: false
-             snps,tx-sched-wfq: false
--            snps,tx-sched-sp: false
--      - if:
--          required:
--            - snps,tx-sched-sp
--        then:
--          properties:
--            snps,tx-sched-wrr: false
--            snps,tx-sched-wfq: false
--            snps,tx-sched-dwrr: false
-     patternProperties:
-       "^queue[0-9]$":
-         description: Each subnode represents a queue.
--- 
-2.34.1
-
+Tested-by: Naama Meir <naamax.meir@linux.intel.com>
 
