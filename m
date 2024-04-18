@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-89087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A88AF8A96AC
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:51:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36E608A96AF
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 11:51:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C779B22032
-	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:51:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFA6D1F22565
+	for <lists+netdev@lfdr.de>; Thu, 18 Apr 2024 09:51:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC9815B544;
-	Thu, 18 Apr 2024 09:51:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86BA715B55D;
+	Thu, 18 Apr 2024 09:51:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="b1VFsrO+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yAqCjF94"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FF4715B147
-	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 09:51:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BB7A15B543
+	for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 09:51:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713433871; cv=none; b=sPcvCsDnXTAMXM23DQSiLMCjfiDuaN1JpJayZA+F8PTfmbu5emAYN0tPfI4HBzAzdIzWSPUbH9qSZbNRbg7SSea74mTl6XcoG0CBzTCI3j1H/qX7VZmJPjlZotMTY5Fn30qIHBg9AULMlgG+iwhlg/LtABlvdmKTvAg3hMaWKkQ=
+	t=1713433873; cv=none; b=RooKmbhjLCJycLGiEbiceIUkFx0rdtb0w6ap/kjd3lfkIu+DVMZOTwT7Q6+AUGr1/N1RvArHpfJnuBJ2OB9cDPPLpwSunTeCfShdzQ7k28L5nFfQK3divxh3quIJw91EUUVZlC0zDjk8rdTIWtthBdWrbeuis7pMyKrHrDbAls8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713433871; c=relaxed/simple;
-	bh=efemuQapptPIgWZgZont2xDvzRYkJAD2euLInaeiU5w=;
+	s=arc-20240116; t=1713433873; c=relaxed/simple;
+	bh=yU4C62hAypHkcELIRLfOiOBZGR07TTBYreifZOeQdw0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gtY1EStOwAvuV6aPbQ05EdP6Chjc4XVWnaYjXEmT3HVVHAm5DzNbkNRrydUwWd2dFJI5U5jqJ4FHsf4VmxPuQXwFaaGC7MNCvHR8aIV5mzJELFyf/T6vkeBtWs54INT0QTWMUwHDml2GEWPSI8fx0I1E5sc//yRZwa3nZekDq/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=b1VFsrO+; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=F+cb4mc7sbA9gyHMQsVm+Qrgpzfgv/PIjXu54QMfrw/jcPEgUrPexmxWgQm0F8qNjqYL6oGVJHMxPKix2vlUztNMVxgQHDsSe6Ng2QQPX4s/jkPzFcb+aQDfPv/3bfxjXWl9qySE3Nkceb4LhAKRrZ/DEQCKVIpH35yYzbJe14U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yAqCjF94; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc693399655so1516693276.1
-        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 02:51:10 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-61b13ce3daaso15125357b3.0
+        for <netdev@vger.kernel.org>; Thu, 18 Apr 2024 02:51:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713433869; x=1714038669; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1713433871; x=1714038671; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=z50j+yEOvfh4aWHpc3ruom4JKMBVDFLvmRICv/rAfbM=;
-        b=b1VFsrO+RwQ49GHXZ7GVowY5srugyNcw5VOW+9nBjk95XC0LCppnfEvw0KhTDda85V
-         7WVg2fP33PJktiZt6vChrqiNHKjrc+Gp6ebtC3goglaRmcgG6bX5Rp/q5HE/xHmAA/Fz
-         AwXNvo1bWLNw9O0oiFVOcJEguAkmR4dHAmOQY5flBLMxW1+7Ov0qyjCkQYB8dqlhRTCQ
-         WOqDd/fUoYEFe7Jc1ipK9HpdwtbVpMwERwJKdDbRAcZmUJt4w0rcx8AP+WJwa6LHGpQY
-         fqZaG9OR8gOzQPgm+pyWle1PTlKSaAzaAJgNs3mp+IzlYecYg1oCAu43rM26CXd9p3zw
-         mK+A==
+        bh=LDTF76PXlvWlAKDyw0CXHPAGr9TKANpCgR+hOZHip8Y=;
+        b=yAqCjF94mSO3YI7iTslZRXl3URb77hyEXiqZbaHrXTdai9a+5pfJ1ElSNJoOb1WLrb
+         e4Zd59GFTLjtLqu7CBy1gHgXN9tFoc0QtAhWrRw11iuwYp47gSiYY3FXn0zOkzQPFliM
+         YZ21W5S5UB2HDrJXfwpb7+nQM7yMKJEEP/RjLlthtK/qyJMscrpfn/e+wGtV5LHo2fRu
+         Qn/cvUYEQQuab5f7hUlGvrxKIcNpDMLuqoJoUqaapV5NZ1FzgZDjDZd6NhEXbkr7YhKz
+         Skli7gcerXii2DvDp+gtpsxhkd+mhLTqo9moR8jEx6wkNimT463hgytokgNcmIYsUEzM
+         e5Pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713433869; x=1714038669;
+        d=1e100.net; s=20230601; t=1713433871; x=1714038671;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z50j+yEOvfh4aWHpc3ruom4JKMBVDFLvmRICv/rAfbM=;
-        b=ZcQQmuzRfpIWVmsk8B9F+socCaF7RfeWXBURMWvbn24xP7o4UCX3cxPoLAfSV+A7hu
-         YC9t6yflel7IRRpe2uSFM+sdWX3WoumfuEBjK0mrLVyb/iwIHIKcq3OTLRG7jYjJQVo+
-         qASqySlTDyt3ssG5llSfVy5SI7dDp7J6S7ymirwDQ53i9N4OMaBKi6KEFmU3hMFyExpg
-         xBsFRg9HkLFAj0zNEWBDTcOIdI0OzuqOabUSo9Z02MF0yGMhj5tOd+DsIUF7KXrHxOnE
-         XAzFUbTE1n2DEE1VtSt6UcmzkovTU+aKvEoDVUKCWFJGUb5aNAoaWAcVnPY13H9jQkxO
-         Y9wQ==
-X-Gm-Message-State: AOJu0YwNxNTBAaxHEqmIKYkmkgVPKCv9t1heaHriHO6BUY3GFMkiJ89s
-	YVegitQBlza0KAg2E2FrquYtmJYceYkYaX7RJvnueaewoRbxjeoczj7a3SxELBsPSAe/Sr9ePO+
-	qvbiAw2MQFQ==
-X-Google-Smtp-Source: AGHT+IFMQaTELGIjSVHbj/lnSw4oKybzVlYpN/SJKbAfoE5pLH0iVl4hIT0Iz1AOdiUdMccu3ZyYFfR3j4AJwQ==
+        bh=LDTF76PXlvWlAKDyw0CXHPAGr9TKANpCgR+hOZHip8Y=;
+        b=ekQlyq7qRCVLTQ7rFtj5PJEzafywGwC98QfyAPmUDsYujJ/JMipgGWkRg5oxXaJivO
+         37aggZncIh+ENBEuLnTChT6Ap5T6TIl99woEqP5TVASIu11TY4lE2xPbZMZvX8XUpeSI
+         rmVL8xaqIlohJt168ZYJyIDJ+9Ef55iqT5VGl1V3JrmuvmpnrzJAJXgPJI1RuMg24vVi
+         ErhRlb/F6EpOV0JyMWFhFkTi8Z0kKBrdKngUZFA6GW3+LAiXmwnTQDEHz5iLEr0DdT4q
+         94JUuke1TcApX4CoYN/dYMmGsaj6VaeE1ggiCil9nsJm6VFnIIXzsESGTvVJuucP5j8R
+         0vpQ==
+X-Gm-Message-State: AOJu0YzEGusx+uDX7TIBwAaJSmsNaI5MDmg1qZZiIu6xik61yYglmexl
+	idCa+iJxZqXT/1kdWpzyX7uqSyHIssG/5d5Vtx0uBkqGkZxuaTdgq/nPybM+EGIzbRXlzen9vLM
+	Q4urJdlcbzw==
+X-Google-Smtp-Source: AGHT+IHhapjuUfcATYT9NSCmrfzo0OKTXG8fdxxqTpDJ3BJUyxots3QiEwuOo9SwkL+kk1GHTGHcveiDvYu4EQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:6804:0:b0:dc9:c54e:c5eb with SMTP id
- d4-20020a256804000000b00dc9c54ec5ebmr538175ybc.7.1713433869561; Thu, 18 Apr
- 2024 02:51:09 -0700 (PDT)
-Date: Thu, 18 Apr 2024 09:51:04 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:4ed0:0:b0:619:1534:db93 with SMTP id
+ c199-20020a814ed0000000b006191534db93mr449666ywb.0.1713433871047; Thu, 18 Apr
+ 2024 02:51:11 -0700 (PDT)
+Date: Thu, 18 Apr 2024 09:51:05 +0000
 In-Reply-To: <20240418095106.3680616-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240418095106.3680616-1-edumazet@google.com>
 X-Mailer: git-send-email 2.44.0.683.g7961c838ac-goog
-Message-ID: <20240418095106.3680616-2-edumazet@google.com>
-Subject: [PATCH net-next 1/3] neighbour: add RCU protection to neigh_tables[]
+Message-ID: <20240418095106.3680616-3-edumazet@google.com>
+Subject: [PATCH net-next 2/3] neighbour: fix neigh_dump_info() return value
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -82,117 +82,111 @@ Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>, eric.dumazet@gmail
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-In order to remove RTNL protection from neightbl_dump_info()
-and neigh_dump_info() later, we need to add
-RCU protection to neigh_tables[].
+Change neigh_dump_table() and pneigh_dump_table()
+to either return 0 or -EMSGSIZE if not enough
+space was available in the skb.
+
+Then neigh_dump_info() can do the same.
+
+This allows NLMSG_DONE to be appended to the current
+skb at the end of a dump, saving a couple of recvmsg()
+system calls.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/core/neighbour.c | 30 +++++++++++++++++++-----------
- 1 file changed, 19 insertions(+), 11 deletions(-)
+ net/core/neighbour.c | 31 +++++++++++++------------------
+ 1 file changed, 13 insertions(+), 18 deletions(-)
 
 diff --git a/net/core/neighbour.c b/net/core/neighbour.c
-index 552719c3bbc3d7869c49028f4c5c9102d1ae9b0a..33913dbf4023bcb1f18107fc3b5c26280dce7341 100644
+index 33913dbf4023bcb1f18107fc3b5c26280dce7341..2f9efc89e94e0f6d9e1491019583babb7bae77c7 100644
 --- a/net/core/neighbour.c
 +++ b/net/core/neighbour.c
-@@ -1769,7 +1769,7 @@ static void neigh_parms_destroy(struct neigh_parms *parms)
- 
- static struct lock_class_key neigh_table_proxy_queue_class;
- 
--static struct neigh_table *neigh_tables[NEIGH_NR_TABLES] __read_mostly;
-+static struct neigh_table __rcu *neigh_tables[NEIGH_NR_TABLES] __read_mostly;
- 
- void neigh_table_init(int index, struct neigh_table *tbl)
+@@ -2713,7 +2713,7 @@ static int neigh_dump_table(struct neigh_table *tbl, struct sk_buff *skb,
  {
-@@ -1826,13 +1826,19 @@ void neigh_table_init(int index, struct neigh_table *tbl)
- 	tbl->last_flush = now;
- 	tbl->last_rand	= now + tbl->parms.reachable_time * 20;
- 
--	neigh_tables[index] = tbl;
-+	rcu_assign_pointer(neigh_tables[index], tbl);
- }
- EXPORT_SYMBOL(neigh_table_init);
- 
-+/*
-+ * Only called from ndisc_cleanup(), which means this is dead code
-+ * because we no longer can unload IPv6 module.
-+ */
- int neigh_table_clear(int index, struct neigh_table *tbl)
- {
--	neigh_tables[index] = NULL;
-+	RCU_INIT_POINTER(neigh_tables[index], NULL);
-+	synchronize_rcu();
-+
- 	/* It is not clean... Fix it to unload IPv6 module safely */
- 	cancel_delayed_work_sync(&tbl->managed_work);
- 	cancel_delayed_work_sync(&tbl->gc_work);
-@@ -1864,10 +1870,10 @@ static struct neigh_table *neigh_find_table(int family)
- 
- 	switch (family) {
- 	case AF_INET:
--		tbl = neigh_tables[NEIGH_ARP_TABLE];
-+		tbl = rcu_dereference_rtnl(neigh_tables[NEIGH_ARP_TABLE]);
- 		break;
- 	case AF_INET6:
--		tbl = neigh_tables[NEIGH_ND_TABLE];
-+		tbl = rcu_dereference_rtnl(neigh_tables[NEIGH_ND_TABLE]);
- 		break;
- 	}
- 
-@@ -2331,7 +2337,7 @@ static int neightbl_set(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	ndtmsg = nlmsg_data(nlh);
- 
- 	for (tidx = 0; tidx < NEIGH_NR_TABLES; tidx++) {
--		tbl = neigh_tables[tidx];
-+		tbl = rcu_dereference_rtnl(neigh_tables[tidx]);
- 		if (!tbl)
- 			continue;
- 		if (ndtmsg->ndtm_family && tbl->family != ndtmsg->ndtm_family)
-@@ -2519,7 +2525,7 @@ static int neightbl_dump_info(struct sk_buff *skb, struct netlink_callback *cb)
- 	for (tidx = 0; tidx < NEIGH_NR_TABLES; tidx++) {
- 		struct neigh_parms *p;
- 
--		tbl = neigh_tables[tidx];
-+		tbl = rcu_dereference_rtnl(neigh_tables[tidx]);
- 		if (!tbl)
- 			continue;
- 
-@@ -2879,7 +2885,7 @@ static int neigh_dump_info(struct sk_buff *skb, struct netlink_callback *cb)
- 	s_t = cb->args[0];
- 
- 	for (t = 0; t < NEIGH_NR_TABLES; t++) {
--		tbl = neigh_tables[t];
-+		tbl = rcu_dereference_rtnl(neigh_tables[t]);
- 
- 		if (!tbl)
- 			continue;
-@@ -3143,14 +3149,15 @@ int neigh_xmit(int index, struct net_device *dev,
- 	       const void *addr, struct sk_buff *skb)
- {
- 	int err = -EAFNOSUPPORT;
-+
- 	if (likely(index < NEIGH_NR_TABLES)) {
- 		struct neigh_table *tbl;
- 		struct neighbour *neigh;
- 
--		tbl = neigh_tables[index];
--		if (!tbl)
--			goto out;
- 		rcu_read_lock();
-+		tbl = rcu_dereference(neigh_tables[index]);
-+		if (!tbl)
-+			goto out_unlock;
- 		if (index == NEIGH_ARP_TABLE) {
- 			u32 key = *((u32 *)addr);
- 
-@@ -3166,6 +3173,7 @@ int neigh_xmit(int index, struct net_device *dev,
- 			goto out_kfree_skb;
+ 	struct net *net = sock_net(skb->sk);
+ 	struct neighbour *n;
+-	int rc, h, s_h = cb->args[1];
++	int err = 0, h, s_h = cb->args[1];
+ 	int idx, s_idx = idx = cb->args[2];
+ 	struct neigh_hash_table *nht;
+ 	unsigned int flags = NLM_F_MULTI;
+@@ -2735,23 +2735,20 @@ static int neigh_dump_table(struct neigh_table *tbl, struct sk_buff *skb,
+ 			if (neigh_ifindex_filtered(n->dev, filter->dev_idx) ||
+ 			    neigh_master_filtered(n->dev, filter->master_idx))
+ 				goto next;
+-			if (neigh_fill_info(skb, n, NETLINK_CB(cb->skb).portid,
+-					    cb->nlh->nlmsg_seq,
+-					    RTM_NEWNEIGH,
+-					    flags) < 0) {
+-				rc = -1;
++			err = neigh_fill_info(skb, n, NETLINK_CB(cb->skb).portid,
++					      cb->nlh->nlmsg_seq,
++					      RTM_NEWNEIGH, flags);
++			if (err < 0)
+ 				goto out;
+-			}
+ next:
+ 			idx++;
  		}
- 		err = READ_ONCE(neigh->output)(neigh, skb);
-+out_unlock:
- 		rcu_read_unlock();
  	}
- 	else if (index == NEIGH_LINK_TABLE) {
+-	rc = skb->len;
+ out:
+ 	rcu_read_unlock();
+ 	cb->args[1] = h;
+ 	cb->args[2] = idx;
+-	return rc;
++	return err;
+ }
+ 
+ static int pneigh_dump_table(struct neigh_table *tbl, struct sk_buff *skb,
+@@ -2760,7 +2757,7 @@ static int pneigh_dump_table(struct neigh_table *tbl, struct sk_buff *skb,
+ {
+ 	struct pneigh_entry *n;
+ 	struct net *net = sock_net(skb->sk);
+-	int rc, h, s_h = cb->args[3];
++	int err = 0, h, s_h = cb->args[3];
+ 	int idx, s_idx = idx = cb->args[4];
+ 	unsigned int flags = NLM_F_MULTI;
+ 
+@@ -2778,11 +2775,11 @@ static int pneigh_dump_table(struct neigh_table *tbl, struct sk_buff *skb,
+ 			if (neigh_ifindex_filtered(n->dev, filter->dev_idx) ||
+ 			    neigh_master_filtered(n->dev, filter->master_idx))
+ 				goto next;
+-			if (pneigh_fill_info(skb, n, NETLINK_CB(cb->skb).portid,
+-					    cb->nlh->nlmsg_seq,
+-					    RTM_NEWNEIGH, flags, tbl) < 0) {
++			err = pneigh_fill_info(skb, n, NETLINK_CB(cb->skb).portid,
++					       cb->nlh->nlmsg_seq,
++					       RTM_NEWNEIGH, flags, tbl);
++			if (err < 0) {
+ 				read_unlock_bh(&tbl->lock);
+-				rc = -1;
+ 				goto out;
+ 			}
+ 		next:
+@@ -2791,12 +2788,10 @@ static int pneigh_dump_table(struct neigh_table *tbl, struct sk_buff *skb,
+ 	}
+ 
+ 	read_unlock_bh(&tbl->lock);
+-	rc = skb->len;
+ out:
+ 	cb->args[3] = h;
+ 	cb->args[4] = idx;
+-	return rc;
+-
++	return err;
+ }
+ 
+ static int neigh_valid_dump_req(const struct nlmsghdr *nlh,
+@@ -2903,7 +2898,7 @@ static int neigh_dump_info(struct sk_buff *skb, struct netlink_callback *cb)
+ 	}
+ 
+ 	cb->args[0] = t;
+-	return skb->len;
++	return err;
+ }
+ 
+ static int neigh_valid_get_req(const struct nlmsghdr *nlh,
 -- 
 2.44.0.683.g7961c838ac-goog
 
