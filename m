@@ -1,95 +1,106 @@
-Return-Path: <netdev+bounces-89591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1B2F8AACDE
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 12:31:31 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E00B8AACE6
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 12:32:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D33271C21043
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 10:31:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F109E1F21B20
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 10:32:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C6D7E564;
-	Fri, 19 Apr 2024 10:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20C012BB06;
+	Fri, 19 Apr 2024 10:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BD5XMxqi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bIVUtXVC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E889F2BB06
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 10:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8170022085;
+	Fri, 19 Apr 2024 10:32:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713522628; cv=none; b=o9E7LI5ld2E6RdIe6becaXkbivD/4G8M+MAOgbRQX7SABB/vPBe4tvutNdPoFLXY2/z9ZKBKO8aAEiyPL2qBX9FZ43KRSP1zclbrkOJCWxdGXkU3AdfodUrk7v5sEzS0ZjI3JckaxNlKgUrsNVoZID5tUDR8E/phHgEU37v3AGg=
+	t=1713522724; cv=none; b=W7KpnNZ7zoVy0k3WNm4tVzxCq2LzH1WTVw1yyir/YB6cNhrmRg2+kdIL21Kl0k1XNME/sEemcrAxTwD2ATSQX4FLT11Dsns7nJ/jH6vZtCSu+/JOli+Z+5kiJy+InbO6DTo1htcEVnB6yhXZ8eFUli8aLf47wGNcymkecXKM7rE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713522628; c=relaxed/simple;
-	bh=fTzWCRa2IL0gt1/fzHaFtmKUMxl064mbwFGA0o3X+YQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=q2KV+3Qa/Ri+CCXfG6r4uJsZxWPb686Dq2CtAWbZQHt9/V2X6jQQpA5TzIyk+xeQ5Ce9MitIDKZ8iYnPLP2Xj9A74S8xigMmiNqKiTVeQg6/zlNGpC+L+E2w4zR7slKQ7JrRLrF5BpTKpvcg623GHEr7Zlwzztt1nRewzRWj8k0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BD5XMxqi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CA76AC32782;
-	Fri, 19 Apr 2024 10:30:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713522627;
-	bh=fTzWCRa2IL0gt1/fzHaFtmKUMxl064mbwFGA0o3X+YQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BD5XMxqirepXmAaUbRTSVWMhJL1JEiGP+7ay20aiGWFW/Nf71vcGVp+2J1UL9XNfj
-	 3qc1CZnk8wCWzQ/5TdRDhJnQRC4eaYmj66nfqWdcif3Z8Wd2QQcRAPwvrU1A1pk0DX
-	 kdwJpZmNNM+SN9dgwUW0SnZO3LnMekat8nCLQy38J4FyS9T4GnUIyVwqdxU24buWLr
-	 jO0Ein8bHDsETCUHIWXvjfrjK7LR+T2Vn7C7xbixi2ejjJgyUri0JUJ4TL2/k3VoIZ
-	 cURc/0EfHepI1sdEoTIY7PnKdiVlmh9KxBxtkbtX1+YQ6Ph5/Jf3HaB7bstptdDqpZ
-	 5VUaBbaMvQAVw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BE0DAC43616;
-	Fri, 19 Apr 2024 10:30:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1713522724; c=relaxed/simple;
+	bh=oMjuJg2nxzcJ7yzI/HWD4b2lVf4QtR3X0iqixF4fFGA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Lk5tEoW0MToc5nEEZfjAMbKdCZsRr4LVnoX8tGu/GjAR/Ocuql6yBXq7fh1RN2hOFG7s1ENrMtEfceiuhXGTpwE6lNzZ4zMPTT3I5ErTNg99+fHGDmWBbrQuKWdD9wF7fHmhfmTYvgvifNeS7K1A9/1lhOBpPBCTWSetclKMqM4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bIVUtXVC; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-516db2214e6so2450605e87.1;
+        Fri, 19 Apr 2024 03:32:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713522720; x=1714127520; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+ADY1jQ3fMn8t5XRSmhrf7CXlATYEKca4dISZEI/O4I=;
+        b=bIVUtXVC8g2KdZlpiVHX9sX0By/HFkvMmBPDkT2UNAE/I4dbXt29kD/DVeS0oJJ6tf
+         xC8a3BUOMpKgO54VxmfQowdo2K6e/JyeHuTif3dsPmDokJVghrtpjJNNzSiqE1+Mn9Sh
+         j02wbgaczFOZApM+M2p1xNCmi/MKJUk8KeTrm5j7orQtF/0keCq0WlJdy26SwIgwW6pa
+         NzcLMSAD2IyxOfmEnJJX+6kn2JMbcJZR+KDKSwReS+fkExtGKkANJmUzSfCFcBM/LenH
+         dSxvDh0JJfP+iys5bhSzCTBZHcZWAUsf/tVuSX8bMYVi1so5TXFoWIIZmCbB021TBksB
+         s4bQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713522720; x=1714127520;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+ADY1jQ3fMn8t5XRSmhrf7CXlATYEKca4dISZEI/O4I=;
+        b=keSX9pjd7X1a0otXIrnT/qUB7dEmOmwfFFpFPmwRYpu0FqRqsGr0ywJP5EXsCfxNZ6
+         lYr+5ce7qKCq/cJ/A/mHfjY3uB1MZKKB3droc5F/mf+i86FKye2lHDuCscoC8AJt0s0f
+         6AijEUnlV68U/wcyhKYo8dnhMqWxbR6MGQ8tEdFo78lXKXXdhNLtmfVM+1OGyfR8uudc
+         Q4eAoZbUImyeVRQEa6MuESnH3oCQAyK4VFK/ofqoJztN/XF+eZ+c4LSjNjpGcgr2lKip
+         J0uIQS4bbZRoKp/LoaKo9a6+HfEsVczZXekckcBVzWit+l2xdUeVJ85Ff2ZfdC5TB/iI
+         GLcw==
+X-Forwarded-Encrypted: i=1; AJvYcCWtyA0kE4TmJgxQLUVRePYtJUe4pxOjOX6mb5cHQuZ80WIcovx4D6GuBo8M7tcZT6DPgXf98LnLCAy3517R9YkOKYFPU9gsqIWjsLwItZI60Ty2oET8Onm4oZ1D/yuXYLj0SPRx
+X-Gm-Message-State: AOJu0YyDyZpaVUMjHExiwJL7JizW8ro5eFj7dGm0NCix840i2DNaROXk
+	rpBRG+1hdrdxhY5ut1+tpW8xtzBEsSZtxDCRWsQ+8CNIC34pPZ9V
+X-Google-Smtp-Source: AGHT+IHr1f2wQScjD2nMhwXM6LKMkGtdkS3wIc4hV1dHZdV23oMwK6P2ia0+IEZA+sRulz+K2TXHOw==
+X-Received: by 2002:a05:6512:2807:b0:513:39a0:1fec with SMTP id cf7-20020a056512280700b0051339a01fecmr1166802lfb.66.1713522720278;
+        Fri, 19 Apr 2024 03:32:00 -0700 (PDT)
+Received: from localhost (static-193-12-47-89.cust.tele2.se. [193.12.47.89])
+        by smtp.gmail.com with ESMTPSA id p7-20020a05651212c700b0051abb2bfc76sm264087lfg.304.2024.04.19.03.31.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Apr 2024 03:31:59 -0700 (PDT)
+From: Casper Andersson <casper.casan@gmail.com>
+To: Lukasz Majewski <lukma@denx.de>, netdev@vger.kernel.org, Paolo Abeni
+ <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com, Sebastian Andrzej
+ Siewior <bigeasy@linutronix.de>, Ravi Gunasekaran <r-gunasekaran@ti.com>,
+ Simon Horman <horms@kernel.org>, Nikita Zhandarovich
+ <n.zhandarovich@fintech.ru>, Murali Karicheri <m-karicheri2@ti.com>, Jiri
+ Pirko <jiri@resnulli.us>, Dan Carpenter <dan.carpenter@linaro.org>, Ziyang
+ Xuan <william.xuanziyang@huawei.com>, Shigeru Yoshida
+ <syoshida@redhat.com>, "Ricardo B. Marliere" <ricardo@marliere.net>,
+ linux-kernel@vger.kernel.org, Lukasz Majewski <lukma@denx.de>
+Subject: Re: [net-next PATCH v5 1/4] net: hsr: Provide RedBox support (HSR-SAN)
+In-Reply-To: <20240415124928.1263240-2-lukma@denx.de>
+References: <20240415124928.1263240-1-lukma@denx.de>
+ <20240415124928.1263240-2-lukma@denx.de>
+Date: Fri, 19 Apr 2024 12:31:59 +0200
+Message-ID: <86wmot7ie8.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: libwx: fix alloc msix vectors failed
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171352262777.3691.13832804483742566164.git-patchwork-notify@kernel.org>
-Date: Fri, 19 Apr 2024 10:30:27 +0000
-References: <20240418021557.5166-1-duanqiangwen@net-swift.com>
-In-Reply-To: <20240418021557.5166-1-duanqiangwen@net-swift.com>
-To: Duanqiang Wen <duanqiangwen@net-swift.com>
-Cc: netdev@vger.kernel.org, jiawenwu@trustnetic.com,
- mengyuanlou@net-swift.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linyunsheng@huawei.com
+Content-Type: text/plain
 
-Hello:
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+Hi,
 
-On Thu, 18 Apr 2024 10:15:56 +0800 you wrote:
-> driver needs queue msix vectors and one misc irq vector,
-> but only queue vectors need irq affinity.
-> when num_online_cpus is less than chip max msix vectors,
-> driver will acquire (num_online_cpus + 1) vecotrs, and
-> call pci_alloc_irq_vectors_affinity functions with affinity
-> params without setting pre_vectors or post_vectors, it will
-> cause return error code -ENOSPC.
-> Misc irq vector is vector 0, driver need to set affinity params
-> .pre_vectors = 1.
-> 
-> [...]
+On 2024-04-15 14:49 +0200, Lukasz Majewski wrote:
+> +void hsr_handle_san_frame(bool san, enum hsr_port_type port,
+> +			  struct hsr_node *node);
 
-Here is the summary with links:
-  - [net] net: libwx: fix alloc msix vectors failed
-    https://git.kernel.org/netdev/net/c/69197dfc6400
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Function declared here but never defined or used.
 
 
 
