@@ -1,205 +1,295 @@
-Return-Path: <netdev+bounces-89705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA12C8AB44C
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 19:23:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0EFD8AB460
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 19:30:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7613C1F22275
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:23:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19B50B21F70
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9948F13A3F8;
-	Fri, 19 Apr 2024 17:23:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3655813A3F8;
+	Fri, 19 Apr 2024 17:30:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="CsLIaXhh"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tqHCGa+/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCAC913A3E4;
-	Fri, 19 Apr 2024 17:23:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DF24137C32
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 17:30:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713547398; cv=none; b=obYFR40IEm+gotid+obEFIX58Pt+AdlW10VYwDp1+l3S0nz0ngqRHj0eXC5LK2xGMIYFWdf4O4XI9YRcwtDUH4YAG1+4zTS4WyHZHNhje5NucKp8SJqARzL8soWgu62XvKJ2vsu1uJ93VZW1Q1U0t6ezwhUBnopwkCMsfT2X7P4=
+	t=1713547809; cv=none; b=jPTqyiy6aUf1pbJFbsojAO8FWS2/a/NPwwkypWbypLvzGDMEjkLGGdMkOkEwaf9EYlusGL7htePKPmBRhXsgd8zev/17AryuxsWuyYciZRI2qvMgmY1aAdrzro2aQfil72uzV+N/XYPb781hNfTnIvVWssRVLLpCP3rwa5nxxMg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713547398; c=relaxed/simple;
-	bh=puamuPI71baQimptO7zyeVOerLj1tr1Hqsuh2hoHvK0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EzKd7WT6dJ+ifU6/iOHsyrTwumvQxogH8QP+Fdet0fX6OWFDhU9QcuKwC4vLrTOc431q6PsINx/TXpKWzjJ813aOeNcbtJnlUQlDtRe/bLhXnTWR66xcZtzvFXuCapM08uYWlpI9vscU0EzYfogoAvYWk3MZOQQPgvF9TdUdYNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=CsLIaXhh; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1713547809; c=relaxed/simple;
+	bh=9hYjyGUXEwckVg1Cg/VDpqtc9aM7eGRDW+Aan8bidik=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rizE3Cj4hPRLowtoxYBs+UzGxgIJhpORNaEARij9ncBAD07J58tZe3bZfqoLs+ukX8ysX8xGsCs/NQWRba6Ms1S1sZEze3tws/55VdTI+zvoFA9Dta7KuaEqWkl6wu0xRa9JpOJ3asZk1ilnUJEVBkkwgEBo+6rzaBgeHIXTVx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tqHCGa+/; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-571b5fba660so1203a12.1
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 10:30:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1713547397; x=1745083397;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=9q0M0X8NBVjwBl35ZnQ5GxeU28VDX1AEAvGVSY063dA=;
-  b=CsLIaXhh9lKLYc7Rdazm0odxdfySDTIVP8jRDLt5aZOoTraN0+JqB8vO
-   8dksAxT6S4PU1rKITyxZE5Y8NItJKrWjelTbdGYQLeIcdAdmI1rI4OOpt
-   kbvI9e6RAbX4pAiKaRGQETBZbvmCWCYrrMICs4fNp4ldyXzgjyVUWWGdb
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.07,214,1708387200"; 
-   d="scan'208";a="412998639"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 17:23:02 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:38399]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.0.190:2525] with esmtp (Farcaster)
- id c3c060b8-6c4d-4fa5-9eb4-01c1fe25df9a; Fri, 19 Apr 2024 17:23:01 +0000 (UTC)
-X-Farcaster-Flow-ID: c3c060b8-6c4d-4fa5-9eb4-01c1fe25df9a
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 19 Apr 2024 17:23:01 +0000
-Received: from 88665a182662.ant.amazon.com (10.119.231.92) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Fri, 19 Apr 2024 17:22:58 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<syzbot+c298c9f0e46a3c86332b@syzkaller.appspotmail.com>,
-	<syzkaller-bugs@googlegroups.com>
-Subject: Re: [syzbot] [net?] WARNING in gre_tap_xmit (2)
-Date: Fri, 19 Apr 2024 10:22:50 -0700
-Message-ID: <20240419172250.83685-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <CANn89iKNcQOcRX1vGVXFBXn1Z2axGS+hWuhxKOAaq8BCo4W0bw@mail.gmail.com>
-References: <CANn89iKNcQOcRX1vGVXFBXn1Z2axGS+hWuhxKOAaq8BCo4W0bw@mail.gmail.com>
+        d=google.com; s=20230601; t=1713547806; x=1714152606; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ACB+KsWFGBZZ7V+PQeAnsd5K8b26YfVzTbpcO/UizmY=;
+        b=tqHCGa+/HIpvPLzUV8QvO7QV07y0QLxKdqRdDYgGgXDBNtpgR8P/1jErys5zHT1g4a
+         5BnIl3JdEaHOisBFZcrvbuGvDvUEXZZJjemNQ1SF5v+qzaG2oXWHG0bbvdsSP/MHckqJ
+         tHFRG9q1Y/f1eApyVt+sY/KIOKqnduM4Ufxns1nIpZu2vRq5QjVNoGpys+dB1piuz1jN
+         vX2dFDZBiKRLYDqos/Uit4KEWAGlxoPlcvONYeul37HlGJGkuBIyAwUPgYC9lkuGXT7N
+         1f/pEiiEghTZb8AmX9fryjXvW6LW4xpL+dAKuyPWLwpknupt7P7AEXe2Oy6EcHk7TVUG
+         jc3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713547806; x=1714152606;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ACB+KsWFGBZZ7V+PQeAnsd5K8b26YfVzTbpcO/UizmY=;
+        b=nFJ/gnohVF2jDJlVUptgby71/I/+jNRRaA4LMXhxdrbZt178gwoiA6p3omWoQjwW9e
+         B9ubFy/kmse/eDO4/johb2BxD3VRUUPBDZNngrHSnpkCFtvKLWwvEyqffvuSZmnUxAqt
+         lGLAWlWivX3p/z4CBswkTbfL1hAJRGixGQoXLzztkYuqKLz7DIqyyjBLdR0jCAnXtDWS
+         hrI21MiGVvDypXUnff/4GAU1Xu2WR4bs0SW5OryCls3UxD0oYYyxdtRTTuqUfxIgO/gg
+         ciDEyCsv5Lc699hCYMjjC5EPEHnJQxrmKdGtbqNleD7KUiQ1E7Z5D/y+kFgVyeGXOb76
+         Llkg==
+X-Forwarded-Encrypted: i=1; AJvYcCXmWluv/2yp57fucpp7KkESwTsycHrdGQXZfLVjmIVvjkkDghaHTGTltX0H8UptJVkD9ORbNeMdA8Z/eJa3NXWspnfCRNpV
+X-Gm-Message-State: AOJu0YyRLstVFMrrTvtsynAiOTXC63RvPAwK2RlGV1JwitzckDdncss5
+	vcdsfDvJGsPPprBNl0gK9x3o7snF+GnAQd2ia3s2vON67njxzYiQfBDZwYHgd+M4sRJv+A+L/Oq
+	A2hcvQrn//te76wlnli7pctuXOPwPRt7beQrU
+X-Google-Smtp-Source: AGHT+IHsl5i6N7MypZgUZVbfAOeSNCoA9udZ0W0Svk2jnoGC9uc4W4P349cXO7g3dqHs4KtDSqZ3AaRaZnE+4zB94uI=
+X-Received: by 2002:aa7:c41a:0:b0:570:4467:ded7 with SMTP id
+ j26-20020aa7c41a000000b005704467ded7mr173183edq.7.1713547805492; Fri, 19 Apr
+ 2024 10:30:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240415150103.23316-1-shiming.cheng@mediatek.com>
+ <661d93b4e3ec3_3010129482@willemb.c.googlers.com.notmuch> <65e3e88a53d466cf5bad04e5c7bc3f1648b82fd7.camel@mediatek.com>
+ <CANP3RGdkxT4TjeSvv1ftXOdFQd5Z4qLK1DbzwATq_t_Dk+V8ig@mail.gmail.com>
+ <661eb25eeb09e_6672129490@willemb.c.googlers.com.notmuch> <CANP3RGdrRDERiPFVQ1nZYVtopErjqOQ72qQ_+ijGQiL7bTtcLQ@mail.gmail.com>
+ <CANP3RGd+Zd-bx6S-NzeGch_crRK2w0-u6xwSVn71M581uCp9cQ@mail.gmail.com>
+ <661f066060ab4_7a39f2945d@willemb.c.googlers.com.notmuch> <77068ef60212e71b270281b2ccd86c8c28ee6be3.camel@mediatek.com>
+ <662027965bdb1_c8647294b3@willemb.c.googlers.com.notmuch> <11395231f8be21718f89981ffe3703da3f829742.camel@mediatek.com>
+ <CANP3RGdh24xyH2V7Sa2fs9Ca=tiZNBdKu1qQ8LFHS3sY41CxmA@mail.gmail.com>
+ <b24bc70ae2c50dc50089c45afbed34904f3ee189.camel@mediatek.com> <66227ce6c1898_116a9b294be@willemb.c.googlers.com.notmuch>
+In-Reply-To: <66227ce6c1898_116a9b294be@willemb.c.googlers.com.notmuch>
+From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>
+Date: Fri, 19 Apr 2024 10:29:47 -0700
+Message-ID: <CANP3RGfxeKDUmGwSsZrAs88Fmzk50XxN+-MtaJZTp641aOhotA@mail.gmail.com>
+Subject: Re: [PATCH net] udp: fix segmentation crash for GRO packet without fraglist
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: =?UTF-8?B?TGVuYSBXYW5nICjnjovlqJwp?= <Lena.Wang@mediatek.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>, 
+	"steffen.klassert@secunet.com" <steffen.klassert@secunet.com>, "kuba@kernel.org" <kuba@kernel.org>, 
+	=?UTF-8?B?U2hpbWluZyBDaGVuZyAo5oiQ6K+X5piOKQ==?= <Shiming.Cheng@mediatek.com>, 
+	"pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com" <edumazet@google.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "matthias.bgg@gmail.com" <matthias.bgg@gmail.com>, 
+	"davem@davemloft.net" <davem@davemloft.net>, yan@cloudflare.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D045UWA004.ant.amazon.com (10.13.139.91) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Transfer-Encoding: quoted-printable
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 19 Apr 2024 12:10:42 +0200
-> On Fri, Apr 19, 2024 at 11:39 AM syzbot
-> <syzbot+c298c9f0e46a3c86332b@syzkaller.appspotmail.com> wrote:
+On Fri, Apr 19, 2024 at 7:17=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Lena Wang (=E7=8E=8B=E5=A8=9C) wrote:
+> > On Wed, 2024-04-17 at 21:15 -0700, Maciej =C5=BBenczykowski wrote:
+> > >
+> > > External email : Please do not click links or open attachments until
+> > > you have verified the sender or the content.
+> > >  On Wed, Apr 17, 2024 at 7:53=E2=80=AFPM Lena Wang (=E7=8E=8B=E5=A8=
+=9C) <
+> > > Lena.Wang@mediatek.com> wrote:
+> > > >
+> > > > On Wed, 2024-04-17 at 15:48 -0400, Willem de Bruijn wrote:
+> > > > >
+> > > > > External email : Please do not click links or open attachments
+> > > until
+> > > > > you have verified the sender or the content.
+> > > > >  Lena Wang (=E7=8E=8B=E5=A8=9C) wrote:
+> > > > > > On Tue, 2024-04-16 at 19:14 -0400, Willem de Bruijn wrote:
+> > > > > > >
+> > > > > > > External email : Please do not click links or open
+> > > attachments
+> > > > > until
+> > > > > > > you have verified the sender or the content.
+> > > > > > >  > > > > Personally, I think bpf_skb_pull_data() should have
+> > > > > > > automatically
+> > > > > > > > > > > (ie. in kernel code) reduced how much it pulls so
+> > > that it
+> > > > > > > would pull
+> > > > > > > > > > > headers only,
+> > > > > > > > > >
+> > > > > > > > > > That would be a helper that parses headers to discover
+> > > > > header
+> > > > > > > length.
+> > > > > > > > >
+> > > > > > > > > Does it actually need to?  Presumably the bpf pull
+> > > function
+> > > > > could
+> > > > > > > > > notice that it is
+> > > > > > > > > a packet flagged as being of type X (UDP GSO FRAGLIST)
+> > > and
+> > > > > reduce
+> > > > > > > the pull
+> > > > > > > > > accordingly so that it doesn't pull anything from the
+> > > non-
+> > > > > linear
+> > > > > > > > > fraglist portion???
+> > > > > > > > >
+> > > > > > > > > I know only the generic overview of what udp gso is, not
+> > > any
+> > > > > > > details, so I am
+> > > > > > > > > assuming here that there's some sort of guarantee to how
+> > > > > these
+> > > > > > > packets
+> > > > > > > > > are structured...  But I imagine there must be or we
+> > > wouldn't
+> > > > > be
+> > > > > > > hitting these
+> > > > > > > > > issues deeper in the stack?
+> > > > > > > >
+> > > > > > > > Perhaps for a packet of this type we're already guaranteed
+> > > the
+> > > > > > > headers
+> > > > > > > > are in the linear portion,
+> > > > > > > > and the pull should simply be ignored?
+> > > > > > > >
+> > > > > > > > >
+> > > > > > > > > > Parsing is better left to the BPF program.
+> > > > > > >
+> > > > > > > I do prefer adding sanity checks to the BPF helpers, over
+> > > having
+> > > > > to
+> > > > > > > add then in the net hot path only to protect against
+> > > dangerous
+> > > > > BPF
+> > > > > > > programs.
+> > > > > > >
+> > > > > > Is it OK to ignore or decrease pull length for udp gro fraglist
+> > > > > packet?
+> > > > > > It could save the normal packet and sent to user correctly.
+> > > > > >
+> > > > > > In common/net/core/filter.c
+> > > > > > static inline int __bpf_try_make_writable(struct sk_buff *skb,
+> > > > > >               unsigned int write_len)
+> > > > > > {
+> > > > > > +if (skb_is_gso(skb) && (skb_shinfo(skb)->gso_type &
+> > > > > > +(SKB_GSO_UDP  |SKB_GSO_UDP_L4)) {
+> > > > >
+> > > > > The issue is not with SKB_GSO_UDP_L4, but with SKB_GSO_FRAGLIST.
+> > > > >
+> > > > Current in kernel just UDP uses SKB_GSO_FRAGLIST to do GRO. In
+> > > > udp_offload.c udp4_gro_complete gso_type adds "SKB_GSO_FRAGLIST|
+> > > > SKB_GSO_UDP_L4". Here checking these two flags is to limit the
+> > > packet
+> > > > as "UDP + need GSO + fraglist".
+> > > >
+> > > > We could remove SKB_GSO_UDP_L4 check for more packet that may
+> > > addrive
+> > > > skb_segment_list.
+> > > >
+> > > > > > +return 0;
+> > > > >
+> > > > > Failing for any pull is a bit excessive. And would kill a sane
+> > > > > workaround of pulling only as many bytes as needed.
+> > > > >
+> > > > > > +     or if (write_len > skb_headlen(skb))
+> > > > > > +write_len =3D skb_headlen(skb);
+> > > > >
+> > > > > Truncating requests would be a surprising change of behavior
+> > > > > for this function.
+> > > > >
+> > > > > Failing for a pull > skb_headlen is arguably reasonable, as
+> > > > > the alternative is that we let it go through but have to drop
+> > > > > the now malformed packets on segmentation.
+> > > > >
+> > > > >
+> > > > Is it OK as below?
+> > > >
+> > > > In common/net/core/filter.c
+> > > > static inline int __bpf_try_make_writable(struct sk_buff *skb,
+> > > >               unsigned int write_len)
+> > > > {
+> > > > +       if (skb_is_gso(skb) && (skb_shinfo(skb)->gso_type &
+> > > > +               SKB_GSO_FRAGLIST) && (write_len >
+> > > skb_headlen(skb))) {
+> > > > +               return 0;
+> > >
+> > > please limit write_len to skb_headlen() instead of just returning 0
+> > >
 > >
-> > Hello,
+> > Hi Maze & Willem,
+> > Maze's advice is:
+> > In common/net/core/filter.c
+> > static inline int __bpf_try_make_writable(struct sk_buff *skb,
+> >               unsigned int write_len)
+> > {
+> > +       if (skb_is_gso(skb) && (skb_shinfo(skb)->gso_type &
+> > +               SKB_GSO_FRAGLIST) && (write_len > skb_headlen(skb))) {
+> > +               write_len =3D skb_headlen(skb);
+> > +       }
+> >         return skb_ensure_writable(skb, write_len);
+> > }
 > >
-> > syzbot found the following issue on:
+> > Willem's advice is to "Failing for a pull > skb_headlen is arguably
+> > reasonable...". It prefers to return 0 :
+> > +       if (skb_is_gso(skb) && (skb_shinfo(skb)->gso_type &
+> > +               SKB_GSO_FRAGLIST) && (write_len > skb_headlen(skb))) {
+> > +               return 0;
+> > +       }
 > >
-> > HEAD commit:    443574b03387 riscv, bpf: Fix kfunc parameters incompatibil..
-> > git tree:       bpf
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=165886c3180000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=c298c9f0e46a3c86332b
-> > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> >
-> > Unfortunately, I don't have any reproducer for this issue yet.
-> >
-> > Downloadable assets:
-> > disk image: https://storage.googleapis.com/syzbot-assets/3f355021a085/disk-443574b0.raw.xz
-> > vmlinux: https://storage.googleapis.com/syzbot-assets/44cf4de7472a/vmlinux-443574b0.xz
-> > kernel image: https://storage.googleapis.com/syzbot-assets/a99a36c7ad65/bzImage-443574b0.xz
-> >
-> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > Reported-by: syzbot+c298c9f0e46a3c86332b@syzkaller.appspotmail.com
-> >
-> > ------------[ cut here ]------------
-> > WARNING: CPU: 0 PID: 13407 at include/linux/skbuff.h:2740 pskb_may_pull_reason include/linux/skbuff.h:2740 [inline]
-> > WARNING: CPU: 0 PID: 13407 at include/linux/skbuff.h:2740 pskb_may_pull include/linux/skbuff.h:2756 [inline]
-> > WARNING: CPU: 0 PID: 13407 at include/linux/skbuff.h:2740 pskb_network_may_pull include/linux/skbuff.h:3077 [inline]
-> > WARNING: CPU: 0 PID: 13407 at include/linux/skbuff.h:2740 pskb_inet_may_pull include/net/ip_tunnels.h:361 [inline]
-> > WARNING: CPU: 0 PID: 13407 at include/linux/skbuff.h:2740 gre_tap_xmit+0x4ff/0x6e0 net/ipv4/ip_gre.c:734
-> > Modules linked in:
-> > CPU: 0 PID: 13407 Comm: syz-executor.1 Not tainted 6.8.0-syzkaller-05236-g443574b03387 #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-> > RIP: 0010:pskb_may_pull_reason include/linux/skbuff.h:2740 [inline]
-> > RIP: 0010:pskb_may_pull include/linux/skbuff.h:2756 [inline]
-> > RIP: 0010:pskb_network_may_pull include/linux/skbuff.h:3077 [inline]
-> > RIP: 0010:pskb_inet_may_pull include/net/ip_tunnels.h:361 [inline]
-> > RIP: 0010:gre_tap_xmit+0x4ff/0x6e0 net/ipv4/ip_gre.c:734
-> > Code: 00 4c 89 ef 48 89 ee 48 89 da e8 7c 8f fb ff 31 c0 48 83 c4 38 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc e8 62 55 9d f7 90 <0f> 0b 90 e9 09 fc ff ff 44 89 e7 89 ee e8 0f 57 9d f7 41 39 ec 0f
-> > RSP: 0018:ffffc90004b66e00 EFLAGS: 00010287
-> > RAX: ffffffff89f79b0e RBX: ffff888061667718 RCX: 0000000000040000
-> > RDX: ffffc9000c375000 RSI: 00000000000124e0 RDI: 00000000000124e1
-> > RBP: 00000000ffffffb6 R08: ffffffff89f79712 R09: 1ffffffff1f0d5cd
-> > R10: dffffc0000000000 R11: ffffffff89f79610 R12: 0000000000000000
-> > R13: ffff888061667640 R14: ffff888062b64000 R15: dffffc0000000000
-> > FS:  00007f08d29ff6c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 0000000020010000 CR3: 0000000061678000 CR4: 00000000003506f0
-> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000600
-> > Call Trace:
-> >  <TASK>
-> >  __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
-> >  netdev_start_xmit include/linux/netdevice.h:4917 [inline]
-> >  xmit_one net/core/dev.c:3531 [inline]
-> >  dev_hard_start_xmit+0x26a/0x790 net/core/dev.c:3547
-> >  sch_direct_xmit+0x2b6/0x5f0 net/sched/sch_generic.c:343
-> >  __dev_xmit_skb net/core/dev.c:3760 [inline]
-> >  __dev_queue_xmit+0x1912/0x3b10 net/core/dev.c:4301
-> >  bond_start_xmit+0x1389/0x1c40 drivers/net/bonding/bond_main.c:5469
-> >  __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
-> >  netdev_start_xmit include/linux/netdevice.h:4917 [inline]
-> >  xmit_one net/core/dev.c:3531 [inline]
-> >  dev_hard_start_xmit+0x26a/0x790 net/core/dev.c:3547
-> >  __dev_queue_xmit+0x19f4/0x3b10 net/core/dev.c:4335
-> >  packet_snd net/packet/af_packet.c:3083 [inline]
-> >  packet_sendmsg+0x4932/0x63d0 net/packet/af_packet.c:3115
-> >  sock_sendmsg_nosec net/socket.c:730 [inline]
-> >  __sock_sendmsg+0x221/0x270 net/socket.c:745
-> >  ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
-> >  ___sys_sendmsg net/socket.c:2638 [inline]
-> >  __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
-> >  do_syscall_64+0xfb/0x240
-> >  entry_SYSCALL_64_after_hwframe+0x6d/0x75
-> > RIP: 0033:0x7f08d2e7dea9
-> > Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-> > RSP: 002b:00007f08d29ff0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> > RAX: ffffffffffffffda RBX: 00007f08d2fabf80 RCX: 00007f08d2e7dea9
-> > RDX: 00000000200400c4 RSI: 0000000020000180 RDI: 0000000000000006
-> > RBP: 00007f08d2eca4a4 R08: 0000000000000000 R09: 0000000000000000
-> > R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> > R13: 000000000000000b R14: 00007f08d2fabf80 R15: 00007ffcba0da4f8
-> >  </TASK>
-> >
-> >
-> > ---
-> > This report is generated by a bot. It may contain errors.
-> > See https://goo.gl/tpsmEJ for more information about syzbot.
-> > syzbot engineers can be reached at syzkaller@googlegroups.com.
-> >
-> > syzbot will keep track of this issue. See:
-> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> >
-> > If the report is already addressed, let syzbot know by replying with:
-> > #syz fix: exact-commit-title
-> >
-> > If you want to overwrite report's subsystems, reply with:
-> > #syz set subsystems: new-subsystem
-> > (See the list of subsystem names on the web dashboard)
-> >
-> > If the report is a duplicate of another one, reply with:
-> > #syz dup: exact-subject-of-another-report
-> >
-> > If you want to undo deduplication, reply with:
-> > #syz undup
-> 
-> Kuniyuki , this is another manifestation of NSH bug, thanks !
+> > It seems a bit conflict. However I am not sure if my understanding is
+> > right and hope to get your further guide.
+>
+> I did not mean to return 0. But to fail a request that would pull an
+> unsafe amount. The caller must get a clear error signal.
 
-Thanks, will take a look at the repro !
+That's hostile on userspace.
+Currently the caller doesn't even check the error return...
+Why would we?  We already have to reload all pointers, and have to do
+and will thus redo checking on those.
 
-I got a similar v6 gre splat yesterday with no repro, but
-this v4 one has, nice :)
+What do you expect the caller to do? Subtract -1 and try again?
+That's hard to do from BPF as it involves looping... and is slow.
 
-Call trace:
- pskb_may_pull_reason include/linux/skbuff.h:2740 [inline]
- pskb_may_pull include/linux/skbuff.h:2756 [inline]
- pskb_network_may_pull include/linux/skbuff.h:3077 [inline]
- pskb_inet_may_pull include/net/ip_tunnels.h:361 [inline]
- ip6gre_tunnel_xmit+0xea0/0x13b8 net/ipv6/ip6_gre.c:901
+We already try to not pull too much:
+
+void try_make_writable(struct __sk_buff* skb, int len) {
+  if (len > skb->len) len =3D skb->len;
+  if (skb->data_end - skb->data < len) bpf_skb_pull_data(skb, len);
+}
+
+Is there at least something like skb->len that has the actually
+pullable length in it?
+
+Or are these skb's structured in such a way that there is never a need
+to pull anything,
+because the headers are already always in the linear portion?
+
+> Back to the original report: the issue should already have been fixed
+> by commit 876e8ca83667 ("net: fix NULL pointer in skb_segment_list").
+> But that commit is in the kernel for which you report the error.
+>
+> Turns out that the crash is not in skb_segment_list, but later in
+> __udpv4_gso_segment_list_csum. Which unconditionally dereferences
+> udp_hdr(seg).
+>
+> The above fix also mentions skb pull as the culprit, but does not
+> include a BPF program. If this can be reached in other ways, then we
+> do need a stronger test in skb_segment_list, as you propose.
+>
+> I don't want to narrowly check whether udp_hdr is safe. Essentially,
+> an SKB_GSO_FRAGLIST skb layout cannot be trusted at all if even one
+> byte would get pulled.
+
+--
+Maciej =C5=BBenczykowski, Kernel Networking Developer @ Google
 
