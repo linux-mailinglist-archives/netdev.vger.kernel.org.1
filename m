@@ -1,146 +1,464 @@
-Return-Path: <netdev+bounces-89723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF11C8AB53E
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 20:51:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4FD68AB551
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 20:57:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9572C1F221E8
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 18:51:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7DE81C2192C
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 18:57:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7138912DDA7;
-	Fri, 19 Apr 2024 18:51:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308ED13AA49;
+	Fri, 19 Apr 2024 18:57:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ixjqi4Qa"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ngfWeNMj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CEEFD268;
-	Fri, 19 Apr 2024 18:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C6DC131180
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 18:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713552708; cv=none; b=HKEAxSZqEzFr50oR1D054zxjRWNnZ21wZka5+pv4iCc7mrmmQkphcDW0LyhjT+oFgOUQFdClAstbka7gvJWJ+7d3OjFt7JE8XjnPgumtzGRehZRfgnRftlaV5kXxTrmBBf2AEJk5mkfcIwADhieWV2qFoggSvOqCm+8A3xOvd3o=
+	t=1713553057; cv=none; b=M4B3PLoQAAwddiTj4AATafO47XkrwolKN7LX7VG9SB6zHdY9LNCu9M+uRkFza1vnOTOoNU46SMFiKx4zz1qfHGVItrJPVNVWr/RNMurYBAIpXTTDBdkGKH+6+NaUA7x96946KQgXPrJaaCXF6HdVZ1fmF8wWm3ChAzs9g2lSRFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713552708; c=relaxed/simple;
-	bh=4d3Fypo2168+K4PgyttFdkSeL+sh2a96uVhh00RSqm0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=C536sNm3wFwrLiJToDh5WB5kWeiOAgcg5c9ow6Up3dAEVhp0RTRK+marOcFjLedGyHXWPh3o8+29VtUJ7bnd6GjkNbm3CoHdyoZt6vXn5Bu3dTV+YUUTRvjsEvY0nU96nTciAd0NDv6BNjT/pCm5L+czAAnHak7vjfpkK/wHomM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ixjqi4Qa; arc=none smtp.client-ip=209.85.167.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3c749aa444fso547160b6e.0;
-        Fri, 19 Apr 2024 11:51:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713552706; x=1714157506; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=27V+Y2NeTgAE7ep+KT2Y25Y98TvpuDuQH3tXtyb2m4U=;
-        b=ixjqi4Qaxc90GeFgjzjo0WV95B7T1dYT/nV43hktPvrNnVJjzLREm64Pzm5W3/Gg6x
-         CsJSCJZUWqQKKWpsJ/A+IshmGtVnCw940+YFUMkMnISBmXU7KcnUq9O4LqNRm1Pmf0Qd
-         96WvDTt7xfBWPjAuGw9J5Ihjj8pZP4qRrtSL4M4C6lTTuIzihv2vXwhuy1XeA19Cf8iO
-         Ychsn0ezTw1JSxdKk/mJpWvLWwa2nyw9NF16srVUmw2qZBMZ9FMxmcdJ0zabnwxkQ0tw
-         KaRrbGAGsB2vRBcZJMBqHboCc1HbvWnxHwYJtTsfaAqpI0i4zK594T8p4loOQz3oE8hq
-         Y7ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713552706; x=1714157506;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=27V+Y2NeTgAE7ep+KT2Y25Y98TvpuDuQH3tXtyb2m4U=;
-        b=EVatG7PWTRL60Srg7pP9DSnDgLD6Rrj2W8i1JZXH8/+S0G2wyenG6RbVQcyQp1yONx
-         xjeOO5c0kFtlecgdwmF2KqcevpmcH36BSETckkRqrKtVma0NGEABtmiJVSncjs7MP3as
-         QX6zkFTTuqYJtFYf3VbYVBKyscW4q1hJKBbGuoqQnpWdo7V3GM5MFk5vJ/wdewyHugoL
-         nKOXHOlVk/S/Sgdjmb+RZrSJC/LMwbHpHHNuR8SYEIW4Ra1+/sZ3S+i1+udlaK0BVNnF
-         Kcu/MzL14fwjCw/c/nHlKYu7m5WwGFJ6dCOdDoCzaTMQK1fZacf/+krjvUkvZaFawwXi
-         QXIw==
-X-Forwarded-Encrypted: i=1; AJvYcCU5uoBcNNPNLibIjH48Tk+2aNSIztjZmDrb+18RovG+CrHEHmtpCEWCqh4ZNL6V2Yqc1jPiyG2bVybFEutu+oyAI0KOe2wqTUQqRB7tG446fDj12X1gJlypgdZyinkoMjYGbrju
-X-Gm-Message-State: AOJu0Ywo5GADr8dFt0hcVOiuXy6Beha086g1hpwYwR02c/zYLGp8enmj
-	mOZPQotYFQDCcN/0umdoCjfCcTX/nR+RKeAL6pWuXwIQwTshG/VS
-X-Google-Smtp-Source: AGHT+IHO3f0byTLQNe/UFWR5ukG0/WNovdAwWOEPjc1iftTSZkiF1WXk2kUQNeG3TYzTM2Y/5Sk70A==
-X-Received: by 2002:a05:6808:140d:b0:3c7:28a9:2775 with SMTP id w13-20020a056808140d00b003c728a92775mr3730653oiv.11.1713552706022;
-        Fri, 19 Apr 2024 11:51:46 -0700 (PDT)
-Received: from localhost (73.84.86.34.bc.googleusercontent.com. [34.86.84.73])
-        by smtp.gmail.com with ESMTPSA id b6-20020ac812c6000000b0043769a2d3d3sm1804782qtj.78.2024.04.19.11.51.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Apr 2024 11:51:45 -0700 (PDT)
-Date: Fri, 19 Apr 2024 14:51:45 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Richard Gobert <richardbgobert@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- alexander.duyck@gmail.com, 
- aleksander.lobakin@intel.com, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org
-Cc: Richard Gobert <richardbgobert@gmail.com>
-Message-ID: <6622bd416e567_1241e229425@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240419153542.121087-2-richardbgobert@gmail.com>
-References: <20240419153542.121087-1-richardbgobert@gmail.com>
- <20240419153542.121087-2-richardbgobert@gmail.com>
-Subject: Re: [PATCH net v2 1/3] net: gro: add {inner_}network_offset to
- napi_gro_cb
+	s=arc-20240116; t=1713553057; c=relaxed/simple;
+	bh=C+Uu0Voqs0df1ulFjjPtHWbP4XxoAZiLPATcSsZ3b88=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W0hljHdZsLW3iiP7H0z96+MMa2tWOjZJu8TtbANy8nJf7SQPFXNAA4ziYAZrbWCqihIJ963zMOclPSun0SQRwMgZB7E+UylwfINjRzvhevFm5ZUpjVO1Is7A2wc0taMBSDPnDy0oLvErOiWe9PVRMsu/PibB1SNe17W/bKbvJs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ngfWeNMj; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <adf36f26-76b7-4c57-8caf-82f4bb98f017@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1713553052;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pQGF+clU8pqsfzPiMYxlEh6hNipiCLtIss6rESxKvlo=;
+	b=ngfWeNMjkBhICP6WCxu7s01f4xzJ7jdENZIQQq5oKHqZb9fKj9an2jRscAQlzVz3n9gSrj
+	UXgKgRa6kKqWG6Sw0QXaWTpgIjZJpeDUb+YrKAuGCc7Ioe5Ii1FB3T1kS8eMywf8kGcYJM
+	qq/tNhq5kiCb/4cHkACB9pKJC3/wFGA=
+Date: Fri, 19 Apr 2024 11:57:24 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Subject: Re: [PATCH bpf-next v9 1/4] bpf: make common crypto API for TC/XDP
+ programs
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Jakub Kicinski <kuba@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+ linux-crypto@vger.kernel.org, bpf@vger.kernel.org
+References: <20240416204004.3942393-1-vadfed@meta.com>
+ <20240416204004.3942393-2-vadfed@meta.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20240416204004.3942393-2-vadfed@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Richard Gobert wrote:
-> This patch adds network_offset and inner_network_offset to napi_gro_cb, and
-> makes sure both are set correctly. In the common path there's only one
-> write (skb_gro_reset_offset, which replaces skb_set_network_header).
-> 
-> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
-> ---
->  drivers/net/geneve.c           |  1 +
->  drivers/net/vxlan/vxlan_core.c |  1 +
->  include/net/gro.h              | 18 ++++++++++++++++--
->  net/8021q/vlan_core.c          |  2 ++
->  net/core/gro.c                 |  1 +
->  net/ethernet/eth.c             |  1 +
->  net/ipv4/af_inet.c             |  5 +----
->  net/ipv4/gre_offload.c         |  1 +
->  net/ipv6/ip6_offload.c         |  8 ++++----
->  9 files changed, 28 insertions(+), 10 deletions(-)
-> 
+On 4/16/24 1:40 PM, Vadim Fedorenko wrote:
+> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> index 5034c1b4ded7..acc479c13f52 100644
+> --- a/include/linux/bpf.h
+> +++ b/include/linux/bpf.h
+> @@ -1265,6 +1265,7 @@ int bpf_dynptr_check_size(u32 size);
+>   u32 __bpf_dynptr_size(const struct bpf_dynptr_kern *ptr);
+>   const void *__bpf_dynptr_data(const struct bpf_dynptr_kern *ptr, u32 len);
+>   void *__bpf_dynptr_data_rw(const struct bpf_dynptr_kern *ptr, u32 len);
+> +bool __bpf_dynptr_is_rdonly(const struct bpf_dynptr_kern *ptr);
+>   
+>   #ifdef CONFIG_BPF_JIT
+>   int bpf_trampoline_link_prog(struct bpf_tramp_link *link, struct bpf_trampoline *tr);
+> diff --git a/include/linux/bpf_crypto.h b/include/linux/bpf_crypto.h
+> new file mode 100644
+> index 000000000000..a41e71d4e2d9
+> --- /dev/null
+> +++ b/include/linux/bpf_crypto.h
+> @@ -0,0 +1,24 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/* Copyright (c) 2024 Meta Platforms, Inc. and affiliates. */
+> +#ifndef _BPF_CRYPTO_H
+> +#define _BPF_CRYPTO_H
+> +
+> +struct bpf_crypto_type {
+> +	void *(*alloc_tfm)(const char *algo);
+> +	void (*free_tfm)(void *tfm);
+> +	int (*has_algo)(const char *algo);
+> +	int (*setkey)(void *tfm, const u8 *key, unsigned int keylen);
+> +	int (*setauthsize)(void *tfm, unsigned int authsize);
+> +	int (*encrypt)(void *tfm, const u8 *src, u8 *dst, unsigned int len, u8 *iv);
+> +	int (*decrypt)(void *tfm, const u8 *src, u8 *dst, unsigned int len, u8 *iv);
+> +	unsigned int (*ivsize)(void *tfm);
+> +	unsigned int (*statesize)(void *tfm);
+> +	u32 (*get_flags)(void *tfm);
+> +	struct module *owner;
+> +	char name[14];
+> +};
+> +
+> +int bpf_crypto_register_type(const struct bpf_crypto_type *type);
+> +int bpf_crypto_unregister_type(const struct bpf_crypto_type *type);
+> +
+> +#endif /* _BPF_CRYPTO_H */
+> diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile
+> index 368c5d86b5b7..736bd22e5ce0 100644
+> --- a/kernel/bpf/Makefile
+> +++ b/kernel/bpf/Makefile
+> @@ -44,6 +44,9 @@ obj-$(CONFIG_BPF_SYSCALL) += bpf_struct_ops.o
+>   obj-$(CONFIG_BPF_SYSCALL) += cpumask.o
+>   obj-${CONFIG_BPF_LSM} += bpf_lsm.o
+>   endif
+> +ifeq ($(CONFIG_CRYPTO),y)
+> +obj-$(CONFIG_BPF_SYSCALL) += crypto.o
+> +endif
+>   obj-$(CONFIG_BPF_PRELOAD) += preload/
+>   
+>   obj-$(CONFIG_BPF_SYSCALL) += relo_core.o
+> diff --git a/kernel/bpf/crypto.c b/kernel/bpf/crypto.c
+> new file mode 100644
+> index 000000000000..a76d80f37f55
+> --- /dev/null
+> +++ b/kernel/bpf/crypto.c
+> @@ -0,0 +1,377 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/* Copyright (c) 2024 Meta, Inc */
+> +#include <linux/bpf.h>
+> +#include <linux/bpf_crypto.h>
+> +#include <linux/bpf_mem_alloc.h>
+> +#include <linux/btf.h>
+> +#include <linux/btf_ids.h>
+> +#include <linux/filter.h>
+> +#include <linux/scatterlist.h>
+> +#include <linux/skbuff.h>
+> +#include <crypto/skcipher.h>
+> +
+> +struct bpf_crypto_type_list {
+> +	const struct bpf_crypto_type *type;
+> +	struct list_head list;
+> +};
+> +
+> +/* BPF crypto initialization parameters struct */
+> +/**
+> + * struct bpf_crypto_params - BPF crypto initialization parameters structure
+> + * @type:	The string of crypto operation type.
+> + * @algo:	The string of algorithm to initialize.
+> + * @key:	The cipher key used to init crypto algorithm.
+> + * @key_len:	The length of cipher key.
+> + * @authsize:	The length of authentication tag used by algorithm.
+> + */
+> +struct bpf_crypto_params {
+> +	char type[14];
+> +	char algo[128];
+> +	__u8 key[256];
 
-> +static inline int skb_gro_network_offset(const struct sk_buff *skb)
+It should have a two byte hole here. Add
+	__u8 reserved[2];
+
+and check for 0 in bpf_crypto_ctx_create() in case it could be reused later. The 
+bpf_crypto_ctx_create() should not be called very often.
+
+> +	__u32 key_len;
+> +	__u32 authsize;
+
+I don't think there is tail padding of this struct, so should be fine.
+
+> +} __attribute__((aligned(8)));
+
+Does it need aligned(8) here?
+
+> +
+> +static LIST_HEAD(bpf_crypto_types);
+> +static DECLARE_RWSEM(bpf_crypto_types_sem);
+> +
+> +/**
+> + * struct bpf_crypto_ctx - refcounted BPF crypto context structure
+> + * @type:	The pointer to bpf crypto type
+> + * @tfm:	The pointer to instance of crypto API struct.
+> + * @rcu:	The RCU head used to free the crypto context with RCU safety.
+> + * @usage:	Object reference counter. When the refcount goes to 0, the
+> + *		memory is released back to the BPF allocator, which provides
+> + *		RCU safety.
+> + */
+> +struct bpf_crypto_ctx {
+> +	const struct bpf_crypto_type *type;
+> +	void *tfm;
+> +	u32 siv_len;
+> +	struct rcu_head rcu;
+> +	refcount_t usage;
+> +};
+> +
+> +int bpf_crypto_register_type(const struct bpf_crypto_type *type)
 > +{
-> +	return NAPI_GRO_CB(skb)->network_offsets[NAPI_GRO_CB(skb)->encap_mark];
+> +	struct bpf_crypto_type_list *node;
+> +	int err = -EEXIST;
+> +
+> +	down_write(&bpf_crypto_types_sem);
+> +	list_for_each_entry(node, &bpf_crypto_types, list) {
+> +		if (!strcmp(node->type->name, type->name))
+> +			goto unlock;
+> +	}
+> +
+> +	node = kmalloc(sizeof(*node), GFP_KERNEL);
+> +	err = -ENOMEM;
+> +	if (!node)
+> +		goto unlock;
+> +
+> +	node->type = type;
+> +	list_add(&node->list, &bpf_crypto_types);
+> +	err = 0;
+> +
+> +unlock:
+> +	up_write(&bpf_crypto_types_sem);
+> +
+> +	return err;
+> +}
+> +EXPORT_SYMBOL_GPL(bpf_crypto_register_type);
+> +
+> +int bpf_crypto_unregister_type(const struct bpf_crypto_type *type)
+> +{
+> +	struct bpf_crypto_type_list *node;
+> +	int err = -ENOENT;
+> +
+> +	down_write(&bpf_crypto_types_sem);
+> +	list_for_each_entry(node, &bpf_crypto_types, list) {
+> +		if (strcmp(node->type->name, type->name))
+> +			continue;
+> +
+> +		list_del(&node->list);
+> +		kfree(node);
+> +		err = 0;
+> +		break;
+> +	}
+> +	up_write(&bpf_crypto_types_sem);
+> +
+> +	return err;
+> +}
+> +EXPORT_SYMBOL_GPL(bpf_crypto_unregister_type);
+> +
+> +static const struct bpf_crypto_type *bpf_crypto_get_type(const char *name)
+> +{
+> +	const struct bpf_crypto_type *type = ERR_PTR(-ENOENT);
+> +	struct bpf_crypto_type_list *node;
+> +
+> +	down_read(&bpf_crypto_types_sem);
+> +	list_for_each_entry(node, &bpf_crypto_types, list) {
+> +		if (strcmp(node->type->name, name))
+> +			continue;
+> +
+> +		if (try_module_get(node->type->owner))
+> +			type = node->type;
+> +		break;
+> +	}
+> +	up_read(&bpf_crypto_types_sem);
+> +
+> +	return type;
 > +}
 > +
+> +__bpf_kfunc_start_defs();
+> +
+> +/**
+> + * bpf_crypto_ctx_create() - Create a mutable BPF crypto context.
+> + *
+> + * Allocates a crypto context that can be used, acquired, and released by
+> + * a BPF program. The crypto context returned by this function must either
+> + * be embedded in a map as a kptr, or freed with bpf_crypto_ctx_release().
+> + * As crypto API functions use GFP_KERNEL allocations, this function can
+> + * only be used in sleepable BPF programs.
+> + *
+> + * bpf_crypto_ctx_create() allocates memory for crypto context.
+> + * It may return NULL if no memory is available.
+> + * @params: pointer to struct bpf_crypto_params which contains all the
+> + *          details needed to initialise crypto context.
+> + * @err:    integer to store error code when NULL is returned.
+> + */
+> +__bpf_kfunc struct bpf_crypto_ctx *
+> +bpf_crypto_ctx_create(const struct bpf_crypto_params *params, int *err)
+
+Add a "u32 params__sz" arg in case that the params struct will have addition.
+Take a look at how opts__sz is checked in nf_conntrack_bpf.c.
+
+> +{
+> +	const struct bpf_crypto_type *type;
+> +	struct bpf_crypto_ctx *ctx;
+> +
+> +	type = bpf_crypto_get_type(params->type);
+> +	if (IS_ERR(type)) {
+> +		*err = PTR_ERR(type);
+> +		return NULL;
+> +	}
+> +
+> +	if (!type->has_algo(params->algo)) {
+> +		*err = -EOPNOTSUPP;
+> +		goto err_module_put;
+> +	}
+> +
+> +	if (!params->authsize && type->setauthsize) {
+> +		*err = -EOPNOTSUPP;
+> +		goto err_module_put;
+> +	}
+> +
+> +	if (params->authsize && !type->setauthsize) {
+
+nit. Together with the previous "if" test, replace them with one test like:
+
+	if (!!params->authsize ^ !!type->setauthsize) {
 
 
-> @@ -236,8 +236,6 @@ INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_receive(struct list_head *head,
->  	if (unlikely(!iph))
->  		goto out;
->  
-> -	skb_set_network_header(skb, off);
-> -
+> +		*err = -EOPNOTSUPP;
+> +		goto err_module_put;
+> +	}
+> +
+> +	if (!params->key_len) {
 
-Especially for net, this is still a large patch.
+Also checks "|| params->key_len > sizeof(params->key)"
 
-Can we avoid touching all those tunnel callbacks and just set the
-offsets in inet_gro_receive and ipv6_gro_receive themselves, just
-as skb_set_network_header now:
+> +		*err = -EINVAL;
+> +		goto err_module_put;
+> +	}
+> +
+> +	ctx = kzalloc(sizeof(*ctx), GFP_KERNEL);
+> +	if (!ctx) {
+> +		*err = -ENOMEM;
+> +		goto err_module_put;
+> +	}
+> +
+> +	ctx->type = type;
+> +	ctx->tfm = type->alloc_tfm(params->algo);
+> +	if (IS_ERR(ctx->tfm)) {
+> +		*err = PTR_ERR(ctx->tfm);
+> +		goto err_free_ctx;
+> +	}
+> +
+> +	if (params->authsize) {
+> +		*err = type->setauthsize(ctx->tfm, params->authsize);
+> +		if (*err)
+> +			goto err_free_tfm;
+> +	}
+> +
+> +	*err = type->setkey(ctx->tfm, params->key, params->key_len);
+> +	if (*err)
+> +		goto err_free_tfm;
+> +
+> +	if (type->get_flags(ctx->tfm) & CRYPTO_TFM_NEED_KEY) {
+> +		*err = -EINVAL;
+> +		goto err_free_tfm;
+> +	}
+> +
+> +	ctx->siv_len = type->ivsize(ctx->tfm) + type->statesize(ctx->tfm);
+> +
+> +	refcount_set(&ctx->usage, 1);
+> +
+> +	return ctx;
+> +
+> +err_free_tfm:
+> +	type->free_tfm(ctx->tfm);
+> +err_free_ctx:
+> +	kfree(ctx);
+> +err_module_put:
+> +	module_put(type->owner);
+> +
+> +	return NULL;
+> +}
+> +
+> +static void crypto_free_cb(struct rcu_head *head)
+> +{
+> +	struct bpf_crypto_ctx *ctx;
+> +
+> +	ctx = container_of(head, struct bpf_crypto_ctx, rcu);
+> +	ctx->type->free_tfm(ctx->tfm);
+> +	module_put(ctx->type->owner);
+> +	kfree(ctx);
+> +}
+> +
+> +/**
+> + * bpf_crypto_ctx_acquire() - Acquire a reference to a BPF crypto context.
+> + * @ctx: The BPF crypto context being acquired. The ctx must be a trusted
+> + *	     pointer.
+> + *
+> + * Acquires a reference to a BPF crypto context. The context returned by this function
+> + * must either be embedded in a map as a kptr, or freed with
+> + * bpf_crypto_skcipher_ctx_release().
+> + */
+> +__bpf_kfunc struct bpf_crypto_ctx *
+> +bpf_crypto_ctx_acquire(struct bpf_crypto_ctx *ctx)
+> +{
+> +	if (!refcount_inc_not_zero(&ctx->usage))
+> +		return NULL;
+> +	return ctx;
+> +}
+> +
+> +/**
+> + * bpf_crypto_ctx_release() - Release a previously acquired BPF crypto context.
+> + * @ctx: The crypto context being released.
+> + *
+> + * Releases a previously acquired reference to a BPF crypto context. When the final
+> + * reference of the BPF crypto context has been released, it is subsequently freed in
+> + * an RCU callback in the BPF memory allocator.
+> + */
+> +__bpf_kfunc void bpf_crypto_ctx_release(struct bpf_crypto_ctx *ctx)
+> +{
+> +	if (refcount_dec_and_test(&ctx->usage))
+> +		call_rcu(&ctx->rcu, crypto_free_cb);
+> +}
+> +
+> +static int bpf_crypto_crypt(const struct bpf_crypto_ctx *ctx,
+> +			    const struct bpf_dynptr_kern *src,
+> +			    struct bpf_dynptr_kern *dst,
+> +			    const struct bpf_dynptr_kern *siv,
+> +			    bool decrypt)
+> +{
+> +	u32 src_len, dst_len, siv_len;
+> +	const u8 *psrc;
+> +	u8 *pdst, *piv;
+> +	int err;
+> +
+> +	if (__bpf_dynptr_is_rdonly(dst))
+> +		return -EINVAL;
+> +
+> +	siv_len = __bpf_dynptr_size(siv);
+> +	src_len = __bpf_dynptr_size(src);
+> +	dst_len = __bpf_dynptr_size(dst);
+> +	if (!src_len || !dst_len)
+> +		return -EINVAL;
+> +
+> +	if (siv_len != ctx->siv_len)
+> +		return -EINVAL;
+> +
+> +	psrc = __bpf_dynptr_data(src, src_len);
+> +	if (!psrc)
+> +		return -EINVAL;
+> +	pdst = __bpf_dynptr_data_rw(dst, dst_len);
+> +	if (!pdst)
+> +		return -EINVAL;
+> +
+> +	piv = siv_len ? __bpf_dynptr_data_rw(siv, siv_len) : NULL;
 
-@@ -236,7 +236,7 @@ INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_receive(struct list_head *head,
-        if (unlikely(!iph))
-                goto out;
- 
--       skb_set_network_header(skb, off);
-+       NAPI_GRO_CB(skb)->network_offsets[NAPI_GRO_CB(skb)->encap_mark] = off;
+It has been a while. I don't remember if it has already been brought up before.
+
+The "const struct bpf_dynptr_kern *siv" here is essentially an optional pointer. 
+Allowing NULL is a more intuitive usage instead of passing a 0-len dynptr. The 
+verifier needs some changes to take __nullable suffix for "struct 
+bpf_dynptr_kern *siv__nullable". This could be a follow up to relax the 
+restriction to allow NULL and not necessary in this set.
+
+> +	if (siv_len && !piv)
+> +		return -EINVAL;
+> +
+> +	err = decrypt ? ctx->type->decrypt(ctx->tfm, psrc, pdst, src_len, piv)
+> +		      : ctx->type->encrypt(ctx->tfm, psrc, pdst, src_len, piv);
+> +
+> +	return err;
+> +}
+
 
 
