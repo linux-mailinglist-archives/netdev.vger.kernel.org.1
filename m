@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-89700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E06A8AB42A
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 19:08:58 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87F9E8AB42D
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 19:09:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D369E282815
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:08:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E9471F228B2
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:09:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D101369AA;
-	Fri, 19 Apr 2024 17:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28441137C32;
+	Fri, 19 Apr 2024 17:08:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FHswuvAO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F5ROR57C"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D570139D15
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 17:08:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F69713A418
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 17:08:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713546529; cv=none; b=CtUNZhWEj9gE0SeUboxyUMPfDy+u0Q7rEuHtQgbW2jtSXv0U4H63JwVgoNoRchWunixbvs8EhCWsWCi/5AfbK4PtnJC7mzXfNMiLJAro+KABXzbx6Jj06jwEt5g41opVx0KZkoVcS1cjsFwfE4NQVQX5EVA7udpUGjdgUYTzKAc=
+	t=1713546532; cv=none; b=Zmi01L+vPnGs+RhE23XlytJylfajZBbOZyj9vZ0fGYVXegoVnBa8AGMVX0TlCKupjQdIr9jJFrUrNmRAFLnG9JosNBdZlQGntX5uKzeVtH3lxZfQv6LnqZ/qXH/nJJ3v19FBoDN9Ncp39Pe2YgykhiM2x/uznIu5WALn3aCtrRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713546529; c=relaxed/simple;
-	bh=Ve378FFAuh6ujx2bfirUF+q8me2wL6AE4VK5U++MuzA=;
+	s=arc-20240116; t=1713546532; c=relaxed/simple;
+	bh=GyiODg4JIvgzDxR0uyPN5VpQruogz0ug9ATnURc1yx8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fLhclQZ/6xD9MvFVeygpo++7mSk1Nbql4x4FqApaAFMgyh0e3USCXBE5pNh/HeJFkMcZN6xv9H5vK8RgTm/dDtHR1h83Ypbm9Oo2Su5Mbqdr7LzD8BGNzRWIvfzlxx3cEzwOAl/j2f3sWQdogo5yMq3X5mixepXGk2TTyJfmcA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FHswuvAO; arc=none smtp.client-ip=192.198.163.8
+	 MIME-Version; b=LFOgOs1M84i04XQ2AmSuAcqPjlvThy67LisE5iIVxz9Dix7IpvVR7fZoXexYAtFeoGrOfeBBnPArg2TD7lsF72VOTM0shKTcXLhprYL1Bu8XFTrw8krvtIv1/sY/SCDA/nK7Z+GCko8YpCYF5YdTfBo79K33vwaxt4Cv6gIWtSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F5ROR57C; arc=none smtp.client-ip=192.198.163.8
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713546528; x=1745082528;
+  t=1713546530; x=1745082530;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Ve378FFAuh6ujx2bfirUF+q8me2wL6AE4VK5U++MuzA=;
-  b=FHswuvAOxyv9vGARX7hrrmRX8mtEpd0lpVHu+eQscPL3voyZN69F+Wk5
-   dfXZGdZlhzKS4Vm9bj7pEMwbhq+WuCIfTJ9jR40PUmWLzFCw6mYrtl6yQ
-   Im0rdS+dDQp0YcgOkERp0OcQQRCNVKSFBNdzaUiHe6Nj4lGAR2un4XwFt
-   TyYYIcWHhKRrPzx3c5ZH9Jb0De7Q4DFvEGCiF9gQv9xgKYXo2PmLeDbiL
-   ug9vjhKmY/HNrsffvxH1FwTLKMzqWFYEs0dHbxmKOkDadX3PQfpjjGaK0
-   bEGxjTLMqxwFbMgS1GfxBDImESIw3zVyK4Fa+4LRdnKfuKU2NRocZzVUW
-   w==;
-X-CSE-ConnectionGUID: iEj0xwO6Rk+JlgNPufbC1g==
-X-CSE-MsgGUID: d9pYHnWAT52Yav/9kTp8zQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11049"; a="26674295"
+  bh=GyiODg4JIvgzDxR0uyPN5VpQruogz0ug9ATnURc1yx8=;
+  b=F5ROR57CmPjle/IwebFqUwHzTutP/hNaysHrUJoRl5pBzfm1/LD668o8
+   pRety4LcOZW9ypGp1S7uzNkv0eDrZhTG6qkfn9Ws/7K7492A5//L6/yht
+   DP1uBkDlFW2FQoo15FPNF89/kcFRTBCO39zk6p2SPPiboaloUdCJJ0jLv
+   w2ITHcqfZJdN/EbP6+2OXyyI1nhq6Erjo0GSo5/kiPUzBZqhbCLar9Og3
+   SC47JGXbmpFYulAZ1KwlG3Yu4lcP1dL0Nmac2fkZZwkJHcCMgqY8K+gnM
+   Ym0yRPqa91t/+NyCxxnrMSpDkXUgJiB4PxokL6+2odmp9Rdv2/baFbclK
+   Q==;
+X-CSE-ConnectionGUID: 2thb66vUSvy6+A71d3uXqg==
+X-CSE-MsgGUID: Hlx8OX7ITHu8PLXhVu220w==
+X-IronPort-AV: E=McAfee;i="6600,9927,11049"; a="26674301"
 X-IronPort-AV: E=Sophos;i="6.07,214,1708416000"; 
-   d="scan'208";a="26674295"
+   d="scan'208";a="26674301"
 Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 10:08:47 -0700
-X-CSE-ConnectionGUID: 41OvF0zaSfKxlv68FUP/KQ==
-X-CSE-MsgGUID: KYYNKwR6S+2eft2TM352MA==
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 10:08:50 -0700
+X-CSE-ConnectionGUID: AXICHSpnRj+FYExBS64+Uw==
+X-CSE-MsgGUID: 8K4QCRbBQIyo7zMbw1LjXA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.07,214,1708416000"; 
-   d="scan'208";a="27847166"
+   d="scan'208";a="27847174"
 Received: from wasp.igk.intel.com (HELO GK3153-DR2-R750-36946.localdomain.com) ([10.102.20.192])
-  by fmviesa005.fm.intel.com with ESMTP; 19 Apr 2024 10:08:45 -0700
+  by fmviesa005.fm.intel.com with ESMTP; 19 Apr 2024 10:08:47 -0700
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -71,9 +71,9 @@ Cc: netdev@vger.kernel.org,
 	jiri@nvidia.com,
 	mateusz.polchlopek@intel.com,
 	shayd@nvidia.com
-Subject: [iwl-next v1 2/4] ice: move devlink locking outside the port creation
-Date: Fri, 19 Apr 2024 19:13:34 +0200
-Message-ID: <20240419171336.11617-3-michal.swiatkowski@linux.intel.com>
+Subject: [iwl-next v1 3/4] ice: move VSI configuration outside repr setup
+Date: Fri, 19 Apr 2024 19:13:35 +0200
+Message-ID: <20240419171336.11617-4-michal.swiatkowski@linux.intel.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240419171336.11617-1-michal.swiatkowski@linux.intel.com>
 References: <20240419171336.11617-1-michal.swiatkowski@linux.intel.com>
@@ -85,120 +85,153 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In case of subfunction lock will be taken for whole port creation. Do
-the same in VF case.
+It is needed because subfunction port representor shouldn't configure
+the source VSI during representor creation.
+
+Move the code to separate function and call it only in case the VF port
+representor is being created.
 
 Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 ---
- drivers/net/ethernet/intel/ice/devlink/devlink.c      | 2 --
- drivers/net/ethernet/intel/ice/devlink/devlink_port.c | 4 ++--
- drivers/net/ethernet/intel/ice/ice_eswitch.c          | 9 +++++++--
- drivers/net/ethernet/intel/ice/ice_repr.c             | 2 --
- 4 files changed, 9 insertions(+), 8 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_eswitch.c | 53 ++++++++++++++------
+ drivers/net/ethernet/intel/ice/ice_eswitch.h | 10 ++++
+ drivers/net/ethernet/intel/ice/ice_repr.c    |  7 +++
+ 3 files changed, 55 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-index b179eaccc774..6af7a940b6fe 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-@@ -794,10 +794,8 @@ int ice_devlink_rate_init_tx_topology(struct devlink *devlink, struct ice_vsi *v
- 
- 	tc_node = pi->root->children[0];
- 	mutex_lock(&pi->sched_lock);
--	devl_lock(devlink);
- 	for (i = 0; i < tc_node->num_children; i++)
- 		ice_traverse_tx_tree(devlink, tc_node->children[i], tc_node, pf);
--	devl_unlock(devlink);
- 	mutex_unlock(&pi->sched_lock);
- 
- 	return 0;
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
-index 13e6790d3cae..c9fbeebf7fb9 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink_port.c
-@@ -407,7 +407,7 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
- 	devlink_port_attrs_set(devlink_port, &attrs);
- 	devlink = priv_to_devlink(pf);
- 
--	err = devlink_port_register(devlink, devlink_port, vsi->idx);
-+	err = devl_port_register(devlink, devlink_port, vsi->idx);
- 	if (err) {
- 		dev_err(dev, "Failed to create devlink port for VF %d, error %d\n",
- 			vf->vf_id, err);
-@@ -426,5 +426,5 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
- void ice_devlink_destroy_vf_port(struct ice_vf *vf)
- {
- 	devl_rate_leaf_destroy(&vf->devlink_port);
--	devlink_port_unregister(&vf->devlink_port);
-+	devl_port_unregister(&vf->devlink_port);
- }
 diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-index c902848cf88e..aeee1eb17a03 100644
+index aeee1eb17a03..998590223f02 100644
 --- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
 +++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-@@ -420,6 +420,7 @@ static void ice_eswitch_start_reprs(struct ice_pf *pf)
- int
- ice_eswitch_attach(struct ice_pf *pf, struct ice_vf *vf)
- {
-+	struct devlink *devlink = priv_to_devlink(pf);
- 	struct ice_repr *repr;
- 	int err;
+@@ -117,17 +117,10 @@ static int ice_eswitch_setup_repr(struct ice_pf *pf, struct ice_repr *repr)
+ 	struct ice_vsi *vsi = repr->src_vsi;
+ 	struct metadata_dst *dst;
  
-@@ -434,7 +435,9 @@ ice_eswitch_attach(struct ice_pf *pf, struct ice_vf *vf)
+-	ice_remove_vsi_fltr(&pf->hw, vsi->idx);
+ 	repr->dst = metadata_dst_alloc(0, METADATA_HW_PORT_MUX,
+ 				       GFP_KERNEL);
+ 	if (!repr->dst)
+-		goto err_add_mac_fltr;
+-
+-	if (ice_vsi_update_security(vsi, ice_vsi_ctx_clear_antispoof))
+-		goto err_dst_free;
+-
+-	if (ice_vsi_add_vlan_zero(vsi))
+-		goto err_update_security;
++		return -ENOMEM;
  
- 	ice_eswitch_stop_reprs(pf);
+ 	netif_keep_dst(uplink_vsi->netdev);
  
-+	devl_lock(devlink);
- 	repr = ice_repr_add_vf(vf);
-+	devl_unlock(devlink);
- 	if (IS_ERR(repr)) {
- 		err = PTR_ERR(repr);
- 		goto err_create_repr;
-@@ -457,7 +460,9 @@ ice_eswitch_attach(struct ice_pf *pf, struct ice_vf *vf)
- err_xa_alloc:
- 	ice_eswitch_release_repr(pf, repr);
- err_setup_repr:
-+	devl_lock(devlink);
- 	ice_repr_rem_vf(repr);
-+	devl_unlock(devlink);
- err_create_repr:
- 	if (xa_empty(&pf->eswitch.reprs))
- 		ice_eswitch_disable_switchdev(pf);
-@@ -481,6 +486,7 @@ void ice_eswitch_detach(struct ice_pf *pf, struct ice_vf *vf)
- 		ice_eswitch_disable_switchdev(pf);
+@@ -136,16 +129,46 @@ static int ice_eswitch_setup_repr(struct ice_pf *pf, struct ice_repr *repr)
+ 	dst->u.port_info.lower_dev = uplink_vsi->netdev;
  
- 	ice_eswitch_release_repr(pf, repr);
-+	devl_lock(devlink);
- 	ice_repr_rem_vf(repr);
+ 	return 0;
++}
  
- 	if (xa_empty(&pf->eswitch.reprs)) {
-@@ -488,12 +494,11 @@ void ice_eswitch_detach(struct ice_pf *pf, struct ice_vf *vf)
- 		 * no point in keeping the nodes
- 		 */
- 		ice_devlink_rate_clear_tx_topology(ice_get_main_vsi(pf));
--		devl_lock(devlink);
- 		devl_rate_nodes_destroy(devlink);
--		devl_unlock(devlink);
- 	} else {
- 		ice_eswitch_start_reprs(pf);
- 	}
-+	devl_unlock(devlink);
+-err_update_security:
++/**
++ * ice_eswitch_cfg_vsi - configure VSI to work in slow-path
++ * @vsi: VSI structure of representee
++ * @mac: representee MAC
++ */
++int ice_eswitch_cfg_vsi(struct ice_vsi *vsi, const u8 *mac)
++{
++	int err;
++
++	ice_remove_vsi_fltr(&vsi->back->hw, vsi->idx);
++
++	err = ice_vsi_update_security(vsi, ice_vsi_ctx_clear_antispoof);
++	if (err)
++		goto err_update_security;
++
++	err = ice_vsi_add_vlan_zero(vsi);
++	if (err)
++		goto err_vlan_zero;
++
++	return 0;
++
++err_vlan_zero:
+ 	ice_vsi_update_security(vsi, ice_vsi_ctx_set_antispoof);
+-err_dst_free:
+-	metadata_dst_free(repr->dst);
+-	repr->dst = NULL;
+-err_add_mac_fltr:
+-	ice_fltr_add_mac_and_broadcast(vsi, repr->parent_mac, ICE_FWD_TO_VSI);
++err_update_security:
++	ice_fltr_add_mac_and_broadcast(vsi, mac, ICE_FWD_TO_VSI);
+ 
+-	return -ENODEV;
++	return err;
++}
++
++/**
++ * ice_eswitch_decfg_vsi - unroll changes done to VSI for switchdev
++ * @vsi: VSI structure of representee
++ * @mac: representee MAC
++ */
++void ice_eswitch_decfg_vsi(struct ice_vsi *vsi, const u8 *mac)
++{
++	ice_vsi_update_security(vsi, ice_vsi_ctx_set_antispoof);
++	ice_fltr_add_mac_and_broadcast(vsi, mac, ICE_FWD_TO_VSI);
  }
  
  /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.h b/drivers/net/ethernet/intel/ice/ice_eswitch.h
+index e2e5c0c75e7d..9a25606e9740 100644
+--- a/drivers/net/ethernet/intel/ice/ice_eswitch.h
++++ b/drivers/net/ethernet/intel/ice/ice_eswitch.h
+@@ -28,6 +28,9 @@ netdev_tx_t
+ ice_eswitch_port_start_xmit(struct sk_buff *skb, struct net_device *netdev);
+ struct net_device *ice_eswitch_get_target(struct ice_rx_ring *rx_ring,
+ 					  union ice_32b_rx_flex_desc *rx_desc);
++
++int ice_eswitch_cfg_vsi(struct ice_vsi *vsi, const u8 *mac);
++void ice_eswitch_decfg_vsi(struct ice_vsi *vsi, const u8 *mac);
+ #else /* CONFIG_ICE_SWITCHDEV */
+ static inline void ice_eswitch_detach(struct ice_pf *pf, struct ice_vf *vf) { }
+ 
+@@ -85,5 +88,12 @@ ice_eswitch_get_target(struct ice_rx_ring *rx_ring,
+ {
+ 	return rx_ring->netdev;
+ }
++
++static inline int ice_eswitch_cfg_vsi(struct ice_vsi *vsi, const u8 *mac)
++{
++	return -EOPNOTSUPP;
++}
++
++static inline void ice_eswitch_decfg_vsi(struct ice_vsi *vsi, const u8 *mac) { }
+ #endif /* CONFIG_ICE_SWITCHDEV */
+ #endif /* _ICE_ESWITCH_H_ */
 diff --git a/drivers/net/ethernet/intel/ice/ice_repr.c b/drivers/net/ethernet/intel/ice/ice_repr.c
-index fe83f305cc7d..35a6ac8c0466 100644
+index 35a6ac8c0466..bdda3401e343 100644
 --- a/drivers/net/ethernet/intel/ice/ice_repr.c
 +++ b/drivers/net/ethernet/intel/ice/ice_repr.c
-@@ -285,9 +285,7 @@ ice_repr_reg_netdev(struct net_device *netdev)
- 
- static void ice_repr_remove_node(struct devlink_port *devlink_port)
+@@ -306,6 +306,7 @@ static void ice_repr_rem(struct ice_repr *repr)
+ void ice_repr_rem_vf(struct ice_repr *repr)
  {
--	devl_lock(devlink_port->devlink);
- 	devl_rate_leaf_destroy(devlink_port);
--	devl_unlock(devlink_port->devlink);
- }
+ 	ice_repr_remove_node(&repr->vf->devlink_port);
++	ice_eswitch_decfg_vsi(repr->src_vsi, repr->parent_mac);
+ 	unregister_netdev(repr->netdev);
+ 	ice_devlink_destroy_vf_port(repr->vf);
+ 	ice_virtchnl_set_dflt_ops(repr->vf);
+@@ -401,11 +402,17 @@ struct ice_repr *ice_repr_add_vf(struct ice_vf *vf)
+ 	if (err)
+ 		goto err_netdev;
  
- /**
++	err = ice_eswitch_cfg_vsi(repr->src_vsi, repr->parent_mac);
++	if (err)
++		goto err_cfg_vsi;
++
+ 	ice_virtchnl_set_repr_ops(vf);
+ 	ice_repr_set_tx_topology(vf->pf);
+ 
+ 	return repr;
+ 
++err_cfg_vsi:
++	unregister_netdev(repr->netdev);
+ err_netdev:
+ 	ice_repr_rem(repr);
+ err_repr_add:
 -- 
 2.42.0
 
