@@ -1,363 +1,259 @@
-Return-Path: <netdev+bounces-89528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AC1D8AA992
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 09:54:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9FE68AA9A2
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 10:01:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 694711C214FC
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 07:54:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54F681F22B1A
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 08:01:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE0E482C7;
-	Fri, 19 Apr 2024 07:54:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D49852F62;
+	Fri, 19 Apr 2024 08:01:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="pQM1tOj6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i6F2Mi69"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD8047781
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 07:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3EEE46453;
+	Fri, 19 Apr 2024 08:00:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713513265; cv=none; b=QStMHqLPNa6u2N/266WSuitGlL4hOs8apH+KZfLzwksZYk3NSpXXLnBkUsOmbM+w/GMdSvL0n1LBWkXOkrBp7sEQM99BF7H4zpxqbrlPsVIGT1L/9XsVs7vgb+qCzetNOn7h93jgtWhgRoCsT07531Gbwcy2/NV2zsghlONzpx8=
+	t=1713513660; cv=none; b=RWm6blnBS5OuvOhnUjLfdj8ATJVqH2cFbCjrGYrAvcjpTFe161WA3wb8sBS97mKeo1uklWTorz/9CAJqB20JkxCyqAVMi0JqCh2BHdvr8J73P8qlr+ZCQILtVtq7YuhpIsNVhRPiWepJLNctCYOmNhV8L5HoJYVS+KJFAPHeB/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713513265; c=relaxed/simple;
-	bh=hE6IOg9TTq0sR7n+5ssuOTGZax13XDkS0jFD7Ss9jjg=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=CbpOfwOWebkUvV2xGZwMzZYAobARNaORuLRJdKeP2ermU6fcChzLMigYbtdUm5oz55faIvIVDxhclwj/jfV9Hk0S6I8NiLS1/JNvyk7T8ZaiFHQOr6wm1SOpRE5drhmUArk28p2O7QWWtrnZYjRkOddBKGszmG9l08H0nEeW7fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=pQM1tOj6; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1713513259; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=mPzHzIZ9Zp8tAG4asTZs7uUmkA98R+O7wM/rtEBIJ+I=;
-	b=pQM1tOj6bKCynvFV11wF+QOmM4shzRtq0LrsaFlBOx/+jJPk25Wi4BkDPU7yez4H8nyO2H70GNT/gfnJj8Nqk5VaE+B3CZxEWVIygz/fdhF9gD3aiQJg0Aogme7hJMPPC80FqoYRdSum/kYAqXsgfJHWe0aPG3FacPFvpM4Nrqg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W4rWqk._1713513257;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W4rWqk._1713513257)
-          by smtp.aliyun-inc.com;
-          Fri, 19 Apr 2024 15:54:19 +0800
-Message-ID: <1713513178.3479838-5-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost 4/6] virtio_net: big mode support premapped
-Date: Fri, 19 Apr 2024 15:52:58 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux.dev,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org
-References: <20240411025127.51945-1-xuanzhuo@linux.alibaba.com>
- <20240411025127.51945-5-xuanzhuo@linux.alibaba.com>
- <CACGkMEvhejnVM=x2+PxnKXcyC4W4nAbhkt4-reWb-7=fYQ6qKw@mail.gmail.com>
- <1713428960.80807-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEvDQ1Zs3Ya0TR1O8SANDEmBQ-+_2iFt7dpBDeE=i+PExQ@mail.gmail.com>
- <1713500472.3614385-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEsDB+tMFEvRtyDAz83dkd9fpuh51u=KyUZkgh+gizmK7g@mail.gmail.com>
- <1713510204.1357317-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEvconuYjrg1Oi6mgLAWCw5Pq=i_CrivnzTJ+ONavV8Rzw@mail.gmail.com>
-In-Reply-To: <CACGkMEvconuYjrg1Oi6mgLAWCw5Pq=i_CrivnzTJ+ONavV8Rzw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1713513660; c=relaxed/simple;
+	bh=Mk268iZHm80bQl4JhUwZSznuPuz8G1+XT+FPrtBx7JY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rRijV/s3gF0nqeuEYfYaPzVCtCd7aG3+yZGQKEIf4pbff93ebvBO10qNg7nVkUoxyTcbHjZO/penSUamzBTxNvmy5aD/tfKCih6YWWwfrPZkBFEj1pTsnimtzXwBTgX2k5G2JPp0y/CL3G9Z170GqD7uRWpo53Yy7TE00fOiIW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i6F2Mi69; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-56e78970853so4486753a12.0;
+        Fri, 19 Apr 2024 01:00:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713513657; x=1714118457; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tviCChO9IYzygvZXh5UtqEobuAJLo8JzLa8E9z4tXOo=;
+        b=i6F2Mi69JZH+qOe9MosKodPaW87qrJLzF6Q88F8PEd4oYiL/602zr+uhX8bJFFbP7V
+         Vs63NqijgD5DVIPz/VEaNEl2G5UWJ7BuIruvFy/+Pal82/+hp/S6trrRQkOR1sW+GrdL
+         ny3IpToXP3WrBPiAJq3fpADaKASQ2P5qAcipXqxf0WgjKLvzDwfdzt8OhBZ9qXpNazzn
+         q5OFbWPO1OmHW9AQRvCwRf8mrJ1jv951xUN5KtRvHaJ1bsF/FZYmEVBFI72PvMsdZ+5J
+         K8xR2tFPDg2ccwaFru0zz7VJ+07j3hpDYaEf7i6is+Wqc4gFtCBh6TZN96HGk9uY7zzu
+         9pWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713513657; x=1714118457;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tviCChO9IYzygvZXh5UtqEobuAJLo8JzLa8E9z4tXOo=;
+        b=NxqMrobja3Ebca47Lr2wWfzlS3ELUlvf09D56ek/k7aoN/qrcJj7cqmA1fM0fav3BN
+         5ufS+TvFK7dbUy5Z1CpgadrUajkd6sNs/pb3WaF/Ok3BNEq7d60NO5TM6dcqTbXt/So6
+         qTNpop2u91sepTCAOChFz/WDrjMl8lHz4qC1rlafclCLZ6gBUrgakEqPyn0MBmKv7Hzp
+         Wafq6AQQUkqUWy85gUi17xolrnAPYXB0SS99Q4SbU5H8AdwU/oMvcQVPD/yYLFSNM68b
+         fywNn0hBfEGx3SSAFrt9n/SaMzt/ONvsTkxvp7CUgFBrpcTVkHDgZMprz1TfrbjCBmWH
+         Eyvw==
+X-Forwarded-Encrypted: i=1; AJvYcCU4lY7pZ545/wwIbMwwMs7aORPmU4n8QkEC1uyA3Y0Zgo0Ck4+XhBUIgjw6FCdyABzuKUCcBLwg9/5WH5cc2pipz3hr7GGyO0un4zstswbUwQrWc/3YLvnE6kXyvkRGuJl2q1gWadmXENdW
+X-Gm-Message-State: AOJu0Yz2XTgwxa3kQz3EY/XKj6d2dUX01iepyQLXZ1sCBJSJZNxHDK3o
+	9sUNedgVoZxrsngSPMJx9SR2N++RF4K6Uo4KtHUvdqbpHqvLd9dt7TMSNGiiWJLbTmSFQUpEcYf
+	a0YMXKRaBnJkCYRwGQzbB5Sbyecs=
+X-Google-Smtp-Source: AGHT+IEnE2Nbg4nTQ4SUSEo5AYnPeHP3pJk0zAWMFnO/X0NHodIByqm30dH02XOp9t5/O3JZJfk18iGf2WOBbMGIpQo=
+X-Received: by 2002:a17:906:c792:b0:a51:89f0:10ee with SMTP id
+ cw18-20020a170906c79200b00a5189f010eemr1291472ejb.37.1713513656775; Fri, 19
+ Apr 2024 01:00:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20240417085143.69578-1-kerneljasonxing@gmail.com>
+ <CAL+tcoDJZe9pxjmVfgnq8z_sp6Zqe-jhWqoRnyuNwKXuPLGzVQ@mail.gmail.com>
+ <20240418084646.68713c42@kernel.org> <CAL+tcoD4hyfBz4LrOOh6q6OO=6G7zpdXBQgR2k4rH3FwXsY3XA@mail.gmail.com>
+ <CANn89iJ4pW7OFQ59RRHMimdYdN9PZ=D+vEq0je877s0ijH=xeg@mail.gmail.com>
+ <CAL+tcoBV77KmL8_d1PTk8muA6Gg3hPYb99BpAXD9W1RcFsg7Bw@mail.gmail.com>
+ <CAL+tcoAEN-OQeqn3m3zLGUiPZEaoTjz0WHaNL-xm702aot_m-g@mail.gmail.com>
+ <CANn89iL9OzD5+Y56F_8Jqyxwa5eDQPaPjhX9Y-Y_b9+bcQE08Q@mail.gmail.com>
+ <CAL+tcoBn8RHm8AbwMBJ6FM6PMLLotCwTxSgPS1ABd-_D7uBSxw@mail.gmail.com> <CANn89iJ4a5VE-_AV-wVrh9Zpu0yS=jtwJaR_s2cBX7pP_QGQXQ@mail.gmail.com>
+In-Reply-To: <CANn89iJ4a5VE-_AV-wVrh9Zpu0yS=jtwJaR_s2cBX7pP_QGQXQ@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 19 Apr 2024 16:00:20 +0800
+Message-ID: <CAL+tcoA_eU98hMoWA2UM2LD_fNp=geY0uUfc+4pDnbUCKK6=Ew@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 0/7] Implement reset reason mechanism to detect
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, dsahern@kernel.org, matttbe@kernel.org, 
+	martineau@kernel.org, geliang@kernel.org, pabeni@redhat.com, 
+	davem@davemloft.net, rostedt@goodmis.org, mhiramat@kernel.org, 
+	mathieu.desnoyers@efficios.com, atenart@kernel.org, mptcp@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 19 Apr 2024 15:24:25 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Fri, Apr 19, 2024 at 3:07=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
+On Fri, Apr 19, 2024 at 3:44=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Fri, Apr 19, 2024 at 9:29=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
 .com> wrote:
 > >
-> > On Fri, 19 Apr 2024 13:46:25 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > On Fri, Apr 19, 2024 at 12:23=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.al=
-ibaba.com> wrote:
+> > On Fri, Apr 19, 2024 at 3:02=E2=80=AFPM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > On Fri, Apr 19, 2024 at 4:31=E2=80=AFAM Jason Xing <kerneljasonxing@g=
+mail.com> wrote:
 > > > >
-> > > > On Fri, 19 Apr 2024 08:43:43 +0800, Jason Wang <jasowang@redhat.com=
-> wrote:
-> > > > > On Thu, Apr 18, 2024 at 4:35=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux=
-.alibaba.com> wrote:
-> > > > > >
-> > > > > > On Thu, 18 Apr 2024 14:25:06 +0800, Jason Wang <jasowang@redhat=
-.com> wrote:
-> > > > > > > On Thu, Apr 11, 2024 at 10:51=E2=80=AFAM Xuan Zhuo <xuanzhuo@=
-linux.alibaba.com> wrote:
-> > > > > > > >
-> > > > > > > > In big mode, pre-mapping DMA is beneficial because if the p=
-ages are not
-> > > > > > > > used, we can reuse them without needing to unmap and remap.
-> > > > > > > >
-> > > > > > > > We require space to store the DMA address. I use the page.d=
-ma_addr to
-> > > > > > > > store the DMA address from the pp structure inside the page.
-> > > > > > > >
-> > > > > > > > Every page retrieved from get_a_page() is mapped, and its D=
-MA address is
-> > > > > > > > stored in page.dma_addr. When a page is returned to the cha=
-in, we check
-> > > > > > > > the DMA status; if it is not mapped (potentially having bee=
-n unmapped),
-> > > > > > > > we remap it before returning it to the chain.
-> > > > > > > >
-> > > > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > > > > > ---
-> > > > > > > >  drivers/net/virtio_net.c | 98 ++++++++++++++++++++++++++++=
-+++++-------
-> > > > > > > >  1 file changed, 81 insertions(+), 17 deletions(-)
-> > > > > > > >
-> > > > > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_=
-net.c
-> > > > > > > > index 4446fb54de6d..7ea7e9bcd5d7 100644
-> > > > > > > > --- a/drivers/net/virtio_net.c
-> > > > > > > > +++ b/drivers/net/virtio_net.c
-> > > > > > > > @@ -50,6 +50,7 @@ module_param(napi_tx, bool, 0644);
-> > > > > > > >
-> > > > > > > >  #define page_chain_next(p)     ((struct page *)((p)->pp))
-> > > > > > > >  #define page_chain_add(p, n)   ((p)->pp =3D (void *)n)
-> > > > > > > > +#define page_dma_addr(p)       ((p)->dma_addr)
-> > > > > > > >
-> > > > > > > >  /* RX packet size EWMA. The average packet size is used to=
- determine the packet
-> > > > > > > >   * buffer size when refilling RX rings. As the entire RX r=
-ing may be refilled
-> > > > > > > > @@ -434,6 +435,46 @@ skb_vnet_common_hdr(struct sk_buff *sk=
-b)
-> > > > > > > >         return (struct virtio_net_common_hdr *)skb->cb;
-> > > > > > > >  }
-> > > > > > > >
-> > > > > > > > +static void sg_fill_dma(struct scatterlist *sg, dma_addr_t=
- addr, u32 len)
-> > > > > > > > +{
-> > > > > > > > +       sg->dma_address =3D addr;
-> > > > > > > > +       sg->length =3D len;
-> > > > > > > > +}
-> > > > > > > > +
-> > > > > > > > +static void page_chain_unmap(struct receive_queue *rq, str=
-uct page *p)
-> > > > > > > > +{
-> > > > > > > > +       virtqueue_dma_unmap_page_attrs(rq->vq, page_dma_add=
-r(p), PAGE_SIZE,
-> > > > > > > > +                                      DMA_FROM_DEVICE, 0);
-> > > > > > > > +
-> > > > > > > > +       page_dma_addr(p) =3D DMA_MAPPING_ERROR;
-> > > > > > > > +}
-> > > > > > > > +
-> > > > > > > > +static int page_chain_map(struct receive_queue *rq, struct=
- page *p)
-> > > > > > > > +{
-> > > > > > > > +       dma_addr_t addr;
-> > > > > > > > +
-> > > > > > > > +       addr =3D virtqueue_dma_map_page_attrs(rq->vq, p, 0,=
- PAGE_SIZE, DMA_FROM_DEVICE, 0);
-> > > > > > > > +       if (virtqueue_dma_mapping_error(rq->vq, addr))
-> > > > > > > > +               return -ENOMEM;
-> > > > > > > > +
-> > > > > > > > +       page_dma_addr(p) =3D addr;
-> > > > > > > > +       return 0;
-> > > > > > > > +}
-> > > > > > > > +
-> > > > > > > > +static void page_chain_release(struct receive_queue *rq)
-> > > > > > > > +{
-> > > > > > > > +       struct page *p, *n;
-> > > > > > > > +
-> > > > > > > > +       for (p =3D rq->pages; p; p =3D n) {
-> > > > > > > > +               n =3D page_chain_next(p);
-> > > > > > > > +
-> > > > > > > > +               page_chain_unmap(rq, p);
-> > > > > > > > +               __free_pages(p, 0);
-> > > > > > > > +       }
-> > > > > > > > +
-> > > > > > > > +       rq->pages =3D NULL;
-> > > > > > > > +}
-> > > > > > > > +
-> > > > > > > >  /*
-> > > > > > > >   * put the whole most recent used list in the beginning fo=
-r reuse
-> > > > > > > >   */
-> > > > > > > > @@ -441,6 +482,13 @@ static void give_pages(struct receive_=
-queue *rq, struct page *page)
-> > > > > > > >  {
-> > > > > > > >         struct page *end;
-> > > > > > > >
-> > > > > > > > +       if (page_dma_addr(page) =3D=3D DMA_MAPPING_ERROR) {
-> > > > > > >
-> > > > > > > This looks strange, the map should be done during allocation.=
- Under
-> > > > > > > which condition could we hit this?
-> > > > > >
-> > > > > > This first page is umapped before we call page_to_skb().
-> > > > > > The page can be put back to the link in case of failure.
+> > > > On Fri, Apr 19, 2024 at 7:26=E2=80=AFAM Jason Xing <kerneljasonxing=
+@gmail.com> wrote:
 > > > > >
-> > > > > See below.
+> > > > > > When I said "If you feel the need to put them in a special grou=
+p, this
+> > > > > > is fine by me.",
+> > > > > > this was really about partitioning the existing enum into group=
+s, if
+> > > > > > you prefer having a group of 'RES reasons'
 > > > > >
-> > > > > >
-> > > > > >
-> > > > > > >
-> > > > > > > > +               if (page_chain_map(rq, page)) {
-> > > > > > > > +                       __free_pages(page, 0);
-> > > > > > > > +                       return;
-> > > > > > > > +               }
-> > > > > > > > +       }
-> > > > > > > > +
-> > > > > > > >         /* Find end of list, sew whole thing into vi->rq.pa=
-ges. */
-> > > > > > > >         for (end =3D page; page_chain_next(end); end =3D pa=
-ge_chain_next(end));
-> > > > > > > >
-> > > > > > > > @@ -456,8 +504,15 @@ static struct page *get_a_page(struct =
-receive_queue *rq, gfp_t gfp_mask)
-> > > > > > > >                 rq->pages =3D page_chain_next(p);
-> > > > > > > >                 /* clear chain here, it is used to chain pa=
-ges */
-> > > > > > > >                 page_chain_add(p, NULL);
-> > > > > > > > -       } else
-> > > > > > > > +       } else {
-> > > > > > > >                 p =3D alloc_page(gfp_mask);
-> > > > > > > > +
-> > > > > > > > +               if (page_chain_map(rq, p)) {
-> > > > > > > > +                       __free_pages(p, 0);
-> > > > > > > > +                       return NULL;
-> > > > > > > > +               }
-> > > > > > > > +       }
-> > > > > > > > +
-> > > > > > > >         return p;
-> > > > > > > >  }
-> > > > > > > >
-> > > > > > > > @@ -613,8 +668,6 @@ static struct sk_buff *page_to_skb(stru=
-ct virtnet_info *vi,
-> > > > > > > >                         return NULL;
-> > > > > > > >
-> > > > > > > >                 page =3D page_chain_next(page);
-> > > > > > > > -               if (page)
-> > > > > > > > -                       give_pages(rq, page);
-> > > > > > > >                 goto ok;
-> > > > > > > >         }
-> > > > > > > >
-> > > > > > > > @@ -640,6 +693,7 @@ static struct sk_buff *page_to_skb(stru=
-ct virtnet_info *vi,
-> > > > > > > >                         skb_add_rx_frag(skb, 0, page, offse=
-t, len, truesize);
-> > > > > > > >                 else
-> > > > > > > >                         page_to_free =3D page;
-> > > > > > > > +               page =3D NULL;
-> > > > > > > >                 goto ok;
-> > > > > > > >         }
-> > > > > > > >
-> > > > > > > > @@ -657,6 +711,11 @@ static struct sk_buff *page_to_skb(str=
-uct virtnet_info *vi,
-> > > > > > > >         BUG_ON(offset >=3D PAGE_SIZE);
-> > > > > > > >         while (len) {
-> > > > > > > >                 unsigned int frag_size =3D min((unsigned)PA=
-GE_SIZE - offset, len);
-> > > > > > > > +
-> > > > > > > > +               /* unmap the page before using it. */
-> > > > > > > > +               if (!offset)
-> > > > > > > > +                       page_chain_unmap(rq, page);
-> > > > > > > > +
-> > > > > > >
-> > > > > > > This sounds strange, do we need a virtqueue_sync_for_cpu() he=
-lper here?
-> > > > > >
-> > > > > > I think we do not need that. Because the umap api does it.
-> > > > > > We do not work with DMA_SKIP_SYNC;
-> > > > >
-> > > > > Well, the problem is unmap is too heavyweight and it reduces the
-> > > > > effort of trying to avoid map/umaps as much as possible.
-> > > > >
-> > > > > For example, for most of the case DMA sync is just a nop. And such
-> > > > > unmap() cause strange code in give_pages() as we discuss above?
+> > > > > Are you suggesting copying what we need from enum skb_drop_reason=
+{} to
+> > > > > enum sk_rst_reason{}? Why not reusing them directly. I have no id=
+ea
+> > > > > what the side effect of cast conversion itself is?
 > > > >
-> > > > YES. You are right. For the first page, we just need to sync for cp=
-u.
-> > > > And we do not need to check the dma status.
-> > > > But here (in page_to_skb), we need to call unmap, because this page=
- is put
-> > > > to the skb.
+> > > > Sorry that I'm writing this email. I'm worried my statement is not
+> > > > that clear, so I write one simple snippet which can help me explain
+> > > > well :)
+> > > >
+> > > > Allow me give NO_SOCKET as an example:
+> > > > diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+> > > > index e63a3bf99617..2c9f7364de45 100644
+> > > > --- a/net/ipv4/icmp.c
+> > > > +++ b/net/ipv4/icmp.c
+> > > > @@ -767,6 +767,7 @@ void __icmp_send(struct sk_buff *skb_in, int ty=
+pe,
+> > > > int code, __be32 info,
+> > > >         if (!fl4.saddr)
+> > > >                 fl4.saddr =3D htonl(INADDR_DUMMY);
+> > > >
+> > > > +       trace_icmp_send(skb_in, type, code);
+> > > >         icmp_push_reply(sk, &icmp_param, &fl4, &ipc, &rt);
+> > > >  ende:
+> > > >         ip_rt_put(rt);
+> > > > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> > > > index 1e650ec71d2f..d5963831280f 100644
+> > > > --- a/net/ipv4/tcp_ipv4.c
+> > > > +++ b/net/ipv4/tcp_ipv4.c
+> > > > @@ -2160,6 +2160,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
+> > > >  {
+> > > >         struct net *net =3D dev_net(skb->dev);
+> > > >         enum skb_drop_reason drop_reason;
+> > > > +       enum sk_rst_reason rst_reason;
+> > > >         int sdif =3D inet_sdif(skb);
+> > > >         int dif =3D inet_iif(skb);
+> > > >         const struct iphdr *iph;
+> > > > @@ -2355,7 +2356,8 @@ int tcp_v4_rcv(struct sk_buff *skb)
+> > > >  bad_packet:
+> > > >                 __TCP_INC_STATS(net, TCP_MIB_INERRS);
+> > > >         } else {
+> > > > -               tcp_v4_send_reset(NULL, skb);
+> > > > +               rst_reason =3D RST_REASON_NO_SOCKET;
+> > > > +               tcp_v4_send_reset(NULL, skb, rst_reason);
+> > > >         }
+> > > >
+> > > >  discard_it:
+> > > >
+> > > > As you can see, we need to add a new 'rst_reason' variable which
+> > > > actually is the same as drop reason. They are the same except for t=
+he
+> > > > enum type... Such rst_reasons/drop_reasons are all over the place.
+> > > >
+> > > > Eric, if you have a strong preference, I can do it as you said.
+> > > >
+> > > > Well, how about explicitly casting them like this based on the curr=
+ent
+> > > > series. It looks better and clearer and more helpful to people who =
+is
+> > > > reading codes to understand:
+> > > > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+> > > > index 461b4d2b7cfe..eb125163d819 100644
+> > > > --- a/net/ipv4/tcp_ipv4.c
+> > > > +++ b/net/ipv4/tcp_ipv4.c
+> > > > @@ -1936,7 +1936,7 @@ int tcp_v4_do_rcv(struct sock *sk, struct sk_=
+buff *skb)
+> > > >         return 0;
+> > > >
+> > > >  reset:
+> > > > -       tcp_v4_send_reset(rsk, skb, (u32)reason);
+> > > > +       tcp_v4_send_reset(rsk, skb, (enum sk_rst_reason)reason);
+> > > >  discard:
+> > > >         kfree_skb_reason(skb, reason);
+> > > >         /* Be careful here. If this function gets more complicated =
+and
 > > >
-> > > Right, but issue still,
+> > > It makes no sense to declare an enum sk_rst_reason and then convert i=
+t
+> > > to drop_reason
+> > > or vice versa.
 > > >
-> > > The only case that we may hit
+> > > Next thing you know, compiler guys will add a new -Woption that will
+> > > forbid such conversions.
 > > >
-> > >         if (page_dma_addr(page) =3D=3D DMA_MAPPING_ERROR)
-> > >
-> > > is when the packet is smaller than GOOD_COPY_LEN.
-> > >
-> > > So if we sync_for_cpu for the head page, we don't do:
-> > >
-> > > 1) unmap in the receive_big()
-> > > 2) do snyc_for_cpu() just before skb_put_data(), so the page could be
-> > > recycled to the pool without unmapping?
+> > > Please add to tcp_v4_send_reset() an skb_drop_reason, not a new enum.
 > >
+> > Ah... It looks like I didn't make myself clear again. Sorry...
+> > Actually I wrote this part many times. My conclusion is that It's not
+> > feasible to do this.
 > >
-> > I do not get.
->
-> I meant something like e1000_copybreak().
->
+> > REASONS:
+> > If we __only__ need to deal with this passive reset in TCP, it's fine.
+> > We pass a skb_drop_reason which should also be converted to u32 type
+> > in tcp_v4_send_reset() as you said, it can work. People who use the
+> > trace will see the reason with the 'SKB_DROP_REASON' prefix stripped.
 > >
-> > I think we can remove the code "if (page_dma_addr(page) =3D=3D DMA_MAPP=
-ING_ERROR)"
-> > from give_pages(). We just do unmap when the page is leaving virtio-net.
->
-> That's the point.
->
+> > But we have to deal with other cases. A few questions are listed here:
+> > 1) What about tcp_send_active_reset() in TCP/MPTCP? Passing weird drop
+> > reasons? There is no drop reason at all. I think people will get
+> > confused. So I believe we should invent new definitions to cope with
+> > it.
+> > 2) What about the .send_reset callback in the subflow_syn_recv_sock()
+> > in MPTCP? The reasons in MPTCP are only definitions (such as
+> > MPTCP_RST_EUNSPEC). I don't think we can convert them into the enum
+> > skb_drop_reason type.
 > >
-> > >
-> > > And I think we should do something similar for the mergeable case?
+> > So where should we group those various reasons?
 > >
-> > Do what?
+> > Introducing a new enum is for extension and compatibility for all
+> > kinds of reset reasons.
 > >
-> > We have used the sync api for mergeable case.
+> > What do you think?
 >
-> Where?
+> I will stop repeating myself.
 >
-> I see virtnet_rq_get_buf which did sync but it is done after the page_to_=
-skb().
+> enums are not what you think.
+>
+> type safety is there for a reason.
+>
+> Can you show me another place in networking stacks where we cast enums
+> to others ?
 
-Do you want to refill the buffer to vq?
+No, I've checked this a month ago.
 
-But the page_frag doest not support to recycle buffer.
+BTW, I don't know the dangers of casting enum types. I know you will
+answer it, but I still insist on asking, hoping someone seeing this
+will help me.
 
-Thanks.
+Using skb_drop_reason can only deal with the passive reset in TCP. It
+is just one of all kinds of reset cases :(
 
+Forgive me, I cannot come up with a good way to cover all the cases TT
 
->
-> >
-> >
-> > >
-> > > Btw, I found one the misleading comment introduced by f80bd740cb7c9
-> > >
-> > >         /* copy small packet so we can reuse these pages */
-> > >         if (!NET_IP_ALIGN && len > GOOD_COPY_LEN && tailroom >=3D shi=
-nfo_size) {
-> > >
-> > > We're not copying but building skb around the head page.
-> >
-> > Will fix.
-> >
-> > Thanks.
->
-> Thanks
->
-> >
-> >
-> > >
-> > > Thanks
-> > >
-> > > >
-> > > > Thanks.
-> > > >
-> > > >
-> > > > >
-> > > > > Thanks
-> > > > >
-> > > >
-> > >
-> >
->
+I've tried..Sorry...
+
+If other experts see this thread, please help me. I would appreciate
+it. I have strong interests and feel strong responsibility to
+implement something like this patch series. It can be very useful!!
+
+Thanks again.
 
