@@ -1,157 +1,176 @@
-Return-Path: <netdev+bounces-89748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 406928AB690
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 23:42:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB6CB8AB69F
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 23:48:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D01B1C20929
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 21:42:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D36A21C21BB0
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 21:48:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 002EA13D284;
-	Fri, 19 Apr 2024 21:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E448313D248;
+	Fri, 19 Apr 2024 21:48:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S3GIF3P/"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="OjRjDxx9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AFA213CF83;
-	Fri, 19 Apr 2024 21:42:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 976A813D249
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 21:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713562951; cv=none; b=cazohCjQntChEdyj2M3HDCzuE4mejGNeXiLENMWI0fTKFEXIicbvWKO+4LCZiKoZkunO5/3kH5JOIZSQ8oSkFUwFwmuQ1VI1yC/hahrR5CRXgxQ0RNkw+Vb56AHU3s/gXeqcM0OJllVUTvMaf+V7h/Za5sIXn+tVWKHX9MGaePw=
+	t=1713563309; cv=none; b=QqR0J6X35+jxI9bsARyHj3IM+hfp4zisKiYU+Cu5GjsbfImU62qFH/mtTo2Mc60rXiq+ki8TSPaxnGW+VayqRqB5gptmj8U7LhgUkLM29Wt0p9yZmBOPMb5PI+kMgUiazI2tkKixSD1B/M4nCNn70pmf6LI3/k8c1HgBfPBsgt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713562951; c=relaxed/simple;
-	bh=TCFccoU0QynIlhNVSwfE9PBflv6m2g3eer2smjEjHo0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EH/PPm6n+1GFffV4eCyFCu44GODztqpIPITkiLlC0LPGtDxEdKTuFjMJWnlratHLjsmHJ3aU2Px4aVuB11bHa64vUhcVb4tzbEVj5aRsLsc8LZ283MuQwF/PRoy+5jkPpykqJyyl/RiytDZjQMM+Upq2MSTywuXs9kXQgeCx4xQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S3GIF3P/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37403C4AF0B;
-	Fri, 19 Apr 2024 21:42:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713562950;
-	bh=TCFccoU0QynIlhNVSwfE9PBflv6m2g3eer2smjEjHo0=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=S3GIF3P/lDyeKxFIF4pk3NB4voyc3jDBvrFx7J4R0RQPC7qB48PFG4JdR+LWTb5VG
-	 TVulfp4sZtTnavHG7YfjZx+qr0QC9dnKVswTmcKFscRs89DTdJ23BJZNcgr5rE8cTP
-	 GCYa7AVlhR6m2vNKGUfB4+E4ZP2+XMRA/mcbxKvZziVuxteHhStK2mndLtDfNVjE2Q
-	 rzZN4Ndc6tabVJQRtfseS5l8TWvfuyZ7Mgpj8k3neEzSInMxgygeIakC9HPWB8pW1A
-	 KTMwYXzpirJYjOMMHMhlNA3kWiCrgIQzk8AyhFrzS/yZyyqTAd0BMIA4fStLj4N5Cc
-	 q3NQekhLjCLew==
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-516d2b9cd69so3034818e87.2;
-        Fri, 19 Apr 2024 14:42:30 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUU60prFRWB6VKhtng5Uq8uprJ4pnlQJhq3BvWZPthcxwoC5zi3YZYEIJIsORsFh4uUQno3c2ENqcb3GO0BnMJy3U5bIsD0oFJdLBCv/gkEyxKfty0MTukwGUPq5VRA5HqPYsOrot0jkgfXjYjXOsKXH13B9hlzi91guyoB4neAm7It/gloqfGWsOS4Zw/ZqSPO2b6PobgniVy2ZkYB53tzvCNj8CBI7yT6eKS50pkeLeBQi78GKGSAAEsNxKgPpRmt55aovdklsaMpUz8XNUwWqr2M4D0ux8G+xi7oB0cxhLEy60udwNwUtOGmaMb1PysHr1HPj4X5IIuMg8MlqdRwsOWKlRF6r2sFZe0QTtwVZl5RB45w1RKWZRvGV1DLweFCgYKdptzeRflh3rvDugEJNkWTubWBPLahdnQUho2TD2rQydosGIksvZo=
-X-Gm-Message-State: AOJu0YzFFLhSlRvGvDmc/YE9tvA6UFuX3e5OXU47SvW8ghwd9J4HiLEB
-	pTTy74IhfnHLOGIPqkeXeyQ6DBytR2hq1uL/xmxlKaMwiW+63Q5DTLwdYX3OmsyxwSahBSzT0NN
-	7h4SOseSPZTrCdyUXhH9Lcny4RYg=
-X-Google-Smtp-Source: AGHT+IH4AnwX5zN14P6kYOA/5jMldeW1Bv8FPwjpWGtVTE89ihBaxTYgE7/68A2MjqxVZZCm/ny8Sr/SdDVp6qchZyo=
-X-Received: by 2002:a19:5f4d:0:b0:519:5b84:1038 with SMTP id
- a13-20020a195f4d000000b005195b841038mr1897119lfj.20.1713562948432; Fri, 19
- Apr 2024 14:42:28 -0700 (PDT)
+	s=arc-20240116; t=1713563309; c=relaxed/simple;
+	bh=5Vag1zgbosahQOxSLa1mqpC7CFIQB/xqh0zY0fGN6T8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lk/K51rH3Dd+sGConWh+pnRDhhC+/uuv1XECVFUqB/Ps6ezYRzfdNGXROV+T5rtB7iSCB325b+/QHVCA98q8hkyvqgeRvVENecyFuGI/vZZDm4dnWK+S69fx1fKtmDoNE867kely4lK3VMyZ4WyyAjNA+Zr67HZSxQ9++3lUcW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=OjRjDxx9; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-de45dba15feso2670098276.3
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 14:48:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1713563305; x=1714168105; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hlZrholMPQopO21vuzYYQrrDJR8lUrEFKktjzCESuvE=;
+        b=OjRjDxx9PF3UqxGZ7isSKkuyyPcE6MbQpNxjvlUILxrmUue9MbH/pDy9N3M0D4baxp
+         ABGnUZ4amhibPmsMm44HiBgoXPE/HdMvt7WDIKiw9DomNoVrzlA4F7ZFV6UP2VXJHm/J
+         WKYaCyo9MWgC/PWorES6T1y+8MCaylHMMteEshUpXP/AyIEya9U2LtmHEyqx5CaUs18P
+         s57BzUBBmOJM8sttS/fwHhEyR+z9tPb16zwxFD8DdodKhmr9c/qISWozh3ik0dIX39fG
+         /CqvTaz/jAMi/AIhtH4S+fQprIH5+Z1oZJ2y7404j3cc2cEuKATWBuD1klpZHlK5bnSk
+         XCyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713563305; x=1714168105;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hlZrholMPQopO21vuzYYQrrDJR8lUrEFKktjzCESuvE=;
+        b=KXK/rQc6+zFlqfH3pKu+K6F5cKURaiqGzTwtb2PHIoPPvjVk/bqyEsyLoZZCWboLqv
+         saUKZxgdMjcc/jYWFa65sxymHfcTmYDaLBwnyKBu04Z1A5j4x6wDYMfQ3dgjG+pd95Oy
+         go1xPv8G1NJokj1finD2qwZgLddR6lBCtg+btQ8xBRQENIwpPlHR1BGS2tGnOTh4l6ue
+         8g8eCUywWjVS05WDYyHtyL8YVV+iXmMomcQzq1dlomapWJqwUPiKVMDBNbu7DQNc7kUE
+         rz7bKFWo7dKXcJl7UEL9iu8GixEssEWcKiASaRu/S4SUv2rgqYDh+bU4MDVGrEMgAEpD
+         8t4A==
+X-Gm-Message-State: AOJu0YwLtF3lguAdLxF8uTxInKreoFb2ktk3Ru6XYXpHryUUDdof4y4k
+	6FPr20FaFihjbl+0T1yHPY3A3x3q7OCFf8JdyAn13LKeZF5ARMrRftLx/fOqVb8BIxBbq4cjpEh
+	T
+X-Google-Smtp-Source: AGHT+IFEg7XekIZ/SpVLRz/F+D6FydDz7OfU8/1PyIGRgmDP7mRA9FJNY2ulCveb5aJ46aqT+7utIA==
+X-Received: by 2002:a25:bfcf:0:b0:dcd:a28e:e5e0 with SMTP id q15-20020a25bfcf000000b00dcda28ee5e0mr3006592ybm.25.1713563304421;
+        Fri, 19 Apr 2024 14:48:24 -0700 (PDT)
+Received: from n191-036-066.byted.org ([130.44.212.119])
+        by smtp.gmail.com with ESMTPSA id n11-20020a0ce48b000000b0069b6c831e86sm1897511qvl.97.2024.04.19.14.48.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Apr 2024 14:48:24 -0700 (PDT)
+From: zijianzhang@bytedance.com
+To: netdev@vger.kernel.org
+Cc: edumazet@google.com,
+	willemdebruijn.kernel@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	cong.wang@bytedance.com,
+	xiaochun.lu@bytedance.com,
+	Zijian Zhang <zijianzhang@bytedance.com>
+Subject: [PATCH net-next v2 0/3] net: A lightweight zero-copy notification
+Date: Fri, 19 Apr 2024 21:48:16 +0000
+Message-Id: <20240419214819.671536-1-zijianzhang@bytedance.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Zh4nJp8rv1qRBs8m@kernel.org> <CAPhsuW6Pbg2k_Gu4dsBx+H8H5XCHvNdtEZJBPiG_eT0qqr9D1w@mail.gmail.com>
- <ZiE91CJcNw7gBj9g@kernel.org> <CAPhsuW4au6v8k8Ab7Ff6Yj64rGvZ7wkz=Xrgh8ZZtLyscpChqQ@mail.gmail.com>
- <ZiFd567L4Zzm2okO@kernel.org> <CAPhsuW5SL4_=ZXdHZV8o0KS+5Vf25UMvEKhRgFQLioFtf2pgoQ@mail.gmail.com>
- <ZiIVVBgaDN4RsroT@kernel.org> <CAPhsuW7WoU+a46FhqqH8f-3=ehxeD4wSgKDWegMin1pT49OSWw@mail.gmail.com>
- <ZiKjmaDgz_56ovbv@kernel.org> <CAPhsuW7Nj1Sa_9xQtTgHz9AmX39zdh2x2COqA-qmkfpfX9hNWw@mail.gmail.com>
- <ZiLNGgVSQ7_cg58y@kernel.org>
-In-Reply-To: <ZiLNGgVSQ7_cg58y@kernel.org>
-From: Song Liu <song@kernel.org>
-Date: Fri, 19 Apr 2024 14:42:16 -0700
-X-Gmail-Original-Message-ID: <CAPhsuW4KRM4O4RFbYQrt=Coqyh9w29WiF2YF=8soDfauLFsKBA@mail.gmail.com>
-Message-ID: <CAPhsuW4KRM4O4RFbYQrt=Coqyh9w29WiF2YF=8soDfauLFsKBA@mail.gmail.com>
-Subject: Re: [PATCH v4 05/15] mm: introduce execmem_alloc() and execmem_free()
-To: Mike Rapoport <rppt@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, Peter Zijlstra <peterz@infradead.org>, 
-	linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Bjorn Topel <bjorn@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
-	"David S. Miller" <davem@davemloft.net>, Dinh Nguyen <dinguyen@kernel.org>, 
-	Donald Dutile <ddutile@redhat.com>, Eric Chanudet <echanude@redhat.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>, Huacai Chen <chenhuacai@kernel.org>, 
-	Kent Overstreet <kent.overstreet@linux.dev>, Luis Chamberlain <mcgrof@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Nadav Amit <nadav.amit@gmail.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Puranjay Mohan <puranjay12@gmail.com>, 
-	Rick Edgecombe <rick.p.edgecombe@intel.com>, Russell King <linux@armlinux.org.uk>, 
-	Steven Rostedt <rostedt@goodmis.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>, bpf@vger.kernel.org, 
-	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mips@vger.kernel.org, linux-mm@kvack.org, linux-modules@vger.kernel.org, 
-	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev, 
-	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Apr 19, 2024 at 1:00=E2=80=AFPM Mike Rapoport <rppt@kernel.org> wro=
-te:
->
-> On Fri, Apr 19, 2024 at 10:32:39AM -0700, Song Liu wrote:
-> > On Fri, Apr 19, 2024 at 10:03=E2=80=AFAM Mike Rapoport <rppt@kernel.org=
-> wrote:
-> > [...]
-> > > > >
-> > > > > [1] https://lore.kernel.org/all/20240411160526.2093408-1-rppt@ker=
-nel.org
-> > > >
-> > > > For the ROX to work, we need different users (module text, kprobe, =
-etc.) to have
-> > > > the same execmem_range. From [1]:
-> > > >
-> > > > static void *execmem_cache_alloc(struct execmem_range *range, size_=
-t size)
-> > > > {
-> > > > ...
-> > > >        p =3D __execmem_cache_alloc(size);
-> > > >        if (p)
-> > > >                return p;
-> > > >       err =3D execmem_cache_populate(range, size);
-> > > > ...
-> > > > }
-> > > >
-> > > > We are calling __execmem_cache_alloc() without range. For this to w=
-ork,
-> > > > we can only call execmem_cache_alloc() with one execmem_range.
-> > >
-> > > Actually, on x86 this will "just work" because everything shares the =
-same
-> > > address space :)
-> > >
-> > > The 2M pages in the cache will be in the modules space, so
-> > > __execmem_cache_alloc() will always return memory from that address s=
-pace.
-> > >
-> > > For other architectures this indeed needs to be fixed with passing th=
-e
-> > > range to __execmem_cache_alloc() and limiting search in the cache for=
- that
-> > > range.
-> >
-> > I think we at least need the "map to" concept (initially proposed by Th=
-omas)
-> > to get this work. For example, EXECMEM_BPF and EXECMEM_KPROBE
-> > maps to EXECMEM_MODULE_TEXT, so that all these actually share
-> > the same range.
->
-> Why?
+From: Zijian Zhang <zijianzhang@bytedance.com>
 
-IIUC, we need to update __execmem_cache_alloc() to take a range pointer as
-input. module text will use "range" for EXECMEM_MODULE_TEXT, while kprobe
-will use "range" for EXECMEM_KPROBE. Without "map to" concept or sharing
-the "range" object, we will have to compare different range parameters to c=
-heck
-we can share cached pages between module text and kprobe, which is not
-efficient. Did I miss something?
+Original title is "net: socket sendmsg MSG_ZEROCOPY_UARG"
+https://lore.kernel.org/all/
+20240409205300.1346681-2-zijianzhang@bytedance.com/
 
-Thanks,
-Song
+Original notification mechanism needs poll + recvmmsg which is not
+easy for applcations to accommodate. And, it also incurs unignorable
+overhead including extra system calls and usage of optmem.
+
+While making maximum reuse of the existing MSG_ZEROCOPY related code,
+this patch set introduces a new zerocopy socket notification mechanism.
+Users of sendmsg pass a control message as a placeholder for the incoming
+notifications. Upon returning, kernel embeds notifications directly into
+user arguments passed in. By doing so, we can significantly reduce the
+complexity and overhead for managing notifications. In an ideal pattern,
+the user will keep calling sendmsg with SO_ZC_NOTIFICATION msg_control,
+and the notification will be delivered as soon as possible.
+
+Changelog:
+  v1 -> v2:
+    - Reuse msg_errqueue in the new notification mechanism, suggested
+      by Willem de Bruijn, users can actually use these two mechanisms
+      in hybrid way if they want to do so.
+    - Update case SO_ZC_NOTIFICATION in __sock_cmsg_send
+      1. Regardless of 32-bit, 64-bit program, we will always handle
+      u64 type user address.
+      2. The size of data to copy_to_user is precisely calculated
+      in case of kernel stack leak.
+    - fix (kbuild-bot)
+      1. Add SO_ZC_NOTIFICATION to arch-specific header files.
+      2. header file types.h in include/uapi/linux/socket.h
+
+* Performance
+
+We extend the selftests/msg_zerocopy.c to accommodate the new mechanism,
+test result is as follows,
+
+cfg_notification_limit = 1, in this case the original method approximately
+aligns with the semantics of new one. In this case, the new flag has
+around 13% cpu savings in TCP and 18% cpu savings in UDP.
+
++---------------------+---------+---------+---------+---------+
+| Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
++---------------------+---------+---------+---------+---------+
+| ZCopy (MB)          | 5147    | 4885    | 7489    | 7854    |
++---------------------+---------+---------+---------+---------+
+| New ZCopy (MB)      | 5859    | 5505    | 9053    | 9236    |
++---------------------+---------+---------+---------+---------+
+| New ZCopy / ZCopy   | 113.83% | 112.69% | 120.88% | 117.59% |
++---------------------+---------+---------+---------+---------+
+
+
+cfg_notification_limit = 32, the new mechanism performs 8% better in TCP.
+For UDP, no obvious performance gain is observed and sometimes may lead
+to degradation. Thus, if users don't need to retrieve the notification
+ASAP in UDP, the original mechanism is preferred.
+
++---------------------+---------+---------+---------+---------+
+| Test Type / Protocol| TCP v4  | TCP v6  | UDP v4  | UDP v6  |
++---------------------+---------+---------+---------+---------+
+| ZCopy (MB)          | 6272    | 6138    | 12138   | 10055   |
++---------------------+---------+---------+---------+---------+
+| New ZCopy (MB)      | 6774    | 6620    | 11504   | 10355   |
++---------------------+---------+---------+---------+---------+
+| New ZCopy / ZCopy   | 108.00% | 107.85% | 94.78%  | 102.98% |
++---------------------+---------+---------+---------+---------+
+
+Zijian Zhang (3):
+  selftests: fix OOM problem in msg_zerocopy selftest
+  sock: add MSG_ZEROCOPY notification mechanism based on msg_control
+  selftests: add MSG_ZEROCOPY msg_control notification test
+
+ arch/alpha/include/uapi/asm/socket.h        |   2 +
+ arch/mips/include/uapi/asm/socket.h         |   2 +
+ arch/parisc/include/uapi/asm/socket.h       |   2 +
+ arch/sparc/include/uapi/asm/socket.h        |   2 +
+ include/uapi/asm-generic/socket.h           |   2 +
+ include/uapi/linux/socket.h                 |  16 +++
+ net/core/sock.c                             |  70 +++++++++++++
+ tools/testing/selftests/net/msg_zerocopy.c  | 105 ++++++++++++++++++--
+ tools/testing/selftests/net/msg_zerocopy.sh |   1 +
+ 9 files changed, 195 insertions(+), 7 deletions(-)
+
+-- 
+2.20.1
+
 
