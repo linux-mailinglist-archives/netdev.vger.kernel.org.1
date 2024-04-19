@@ -1,289 +1,298 @@
-Return-Path: <netdev+bounces-89641-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CCDB8AB055
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 16:10:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 358218AB05F
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 16:10:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32284285ABA
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 14:10:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BBF71C22F70
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 14:10:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0298712E1C4;
-	Fri, 19 Apr 2024 14:06:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0A412E1DE;
+	Fri, 19 Apr 2024 14:08:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Ko+OXcws"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="YMZqx1Fo"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2089.outbound.protection.outlook.com [40.107.220.89])
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B9E112FB0B
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 14:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.89
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713535598; cv=fail; b=Qdp/SXHttm8sTHjRAJhCrb2npvhCFg0NR8qV+Gm0q71jWFa1KEptutmhffLYDIVoSI0wvcRZRIXzD0nkJPkI7b81G7kOhtYxlt9VDKiPpFkcoh2Oytmy5XaryuonKBn3wcDNnAcLXg62PlFpuX63vObmq0gnhFFHaAptouscm0s=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713535598; c=relaxed/simple;
-	bh=1h7GRqdV0O1XqeqTnanuGE25OqPTA1I1XxJihppgeVw=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=p4NIMEg+As/aRrm820WFWxRFJ6mUw8aNrLfou7KfajGYZlGjyXrhH2oZnlokDdwCJdr8fT3hC9q0MMqba2lstJDIGTDPubLS2qidf3zSHOg2Y3+cuESHioIvgMWuG+Jhew8+lZM5MjJ7SrN7UcwzbHQEMgncnQrtEBPlw0qFV0o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Ko+OXcws; arc=fail smtp.client-ip=40.107.220.89
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HFou+zjFw0j4ENegvvUB4KM7sk5cjkYJRQ+JGVrknE6XvgpUVMajQH5g42fYAAa/J8d1eYyDyTxxjSXaQXQzO7ltbTvclH4DAINzNEdUBYz12+ty+n2pLsCE/gYHY+uasa2jQyP08FjcB3+FucJu1SHliIRH+7y4o2X0bk6m5pIwYn3lMFqUQhSZ94Tl18r8mzeVjVk0hhTsszML/KUBz/rozpOYgwVYA0HkKJhjduO/FXak7X9F88Rtv4J4GYVJI6B1F34DVv8ptJSdZFIIwCu6l6n5MVMj99YZUtEXxg4MmM7Nm4r//VBi/Y0OU94igFbxeuOnX5Hcj6r6ez0Fzw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1h7GRqdV0O1XqeqTnanuGE25OqPTA1I1XxJihppgeVw=;
- b=YMSz/7pQ7m3sRSllW6/vC0fgQOD3Ms+g8lkrtiPRUFgf/9uPmbikemiCAjnFYoEEqqDTIecFcTPiJPz8cU3IKpifAgMzCjhsX4jNM+fsU1VjTRjdGwnppzDYkkP5gl2k2sNM357ZqQls0smJMcUAFWYqjXBfj0D2GWADcQeeUFqcoQFsY83LnFnvI8UgaNijCPrdoLYinhjst0tGN+hzn8pKNI4SD9PnNN8X2X/cMf6YwEjd5+xhVy5+KfJNt00s3MZV24a5+LDLz8um3y0hBvjfbHzn8ZJIMRGIXEkE/sS/WwXy1tNx2xKjTBTafPNBTNIN0zTSVoERIHPe+WDoKw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1h7GRqdV0O1XqeqTnanuGE25OqPTA1I1XxJihppgeVw=;
- b=Ko+OXcwsjJ1v///QEBzDzxO+UsCySyVho8p9mXkAJdSeNKg2ABEM5uu1XMMBRCZddu6rfwaxaVaFd/fkr1qt5RkG9Ns/V1J384w1VbB9gNPjlR9ln/XevUdhvbADcy+/vVcnV9FIBqSneh5C1dVpMwimgHBdOlVV3i8NRPRdT8eMCac9y+qSXlTi9uam89huMlBDSHJwKa4Uh+nUXtM12WWlpajeCfx5wzP5H7AKSA+00Fu7psFs0MV4qPDD4GHP8uKCPHPS18zXTnWHPSom9ZQPV6kPu+bNGPQrcqQ5TfeK+ZUWgJGFG/ubzxmCfFQKkGusRjYkTsdSJcvD9cbF5w==
-Received: from DM6PR12MB5565.namprd12.prod.outlook.com (2603:10b6:5:1b6::13)
- by DS0PR12MB9348.namprd12.prod.outlook.com (2603:10b6:8:1a0::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7452.50; Fri, 19 Apr
- 2024 14:06:27 +0000
-Received: from DM6PR12MB5565.namprd12.prod.outlook.com
- ([fe80::a8dd:546d:6166:c101]) by DM6PR12MB5565.namprd12.prod.outlook.com
- ([fe80::a8dd:546d:6166:c101%4]) with mapi id 15.20.7472.044; Fri, 19 Apr 2024
- 14:06:27 +0000
-From: Dragos Tatulea <dtatulea@nvidia.com>
-To: Shay Drori <shayd@nvidia.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "oxana@cloudflare.com" <oxana@cloudflare.com>
-CC: "davem@davemloft.net" <davem@davemloft.net>, Rahul Rameshbabu
-	<rrameshbabu@nvidia.com>, "kernel-team@cloudflare.com"
-	<kernel-team@cloudflare.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "edumazet@google.com"
-	<edumazet@google.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	"Anatoli.Chechelnickiy@m.interpipe.biz"
-	<Anatoli.Chechelnickiy@m.interpipe.biz>, "leon@kernel.org" <leon@kernel.org>
-Subject: Re: mlx5 driver fails to detect NIC in 6.6.28
-Thread-Topic: mlx5 driver fails to detect NIC in 6.6.28
-Thread-Index: AQHaklekYwro6CBsoUOORjm1K8wlnbFvoNkA
-Date: Fri, 19 Apr 2024 14:06:26 +0000
-Message-ID: <3caa587882624d8289b4c1fe532c90b5b5ec29f4.camel@nvidia.com>
-References: <20240419124632.60294-1-oxana@cloudflare.com>
-In-Reply-To: <20240419124632.60294-1-oxana@cloudflare.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.50.4 (3.50.4-1.fc39) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR12MB5565:EE_|DS0PR12MB9348:EE_
-x-ms-office365-filtering-correlation-id: e1a5a6dc-160b-4692-130e-08dc6079e77c
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- hbUjpVsc4p8bffGV3Cy7uSoUG/WmTBokafYw5r7JhNqHERhn3X0U2Jbjt1ve9/SDdZPbe/2Wbk62gjSNIaJSFfy8+xSSacq2gN8+ofT0sQ3RMmX8++PX3hPREDPTgInV4e3o7BqvOjyVVeXFFnzCv8Z9oW7AHSV/dJGxLfT7EXlofJ+h9YFIv1wfNgUeOkI2cxGc5yykw/qMkp8InzhpxCJQpBU6HAMmXh0JfCebleXMSX4DWpNsV2uDmZnlEH/EFrJvwMHL6O0joyCtBkfcyaXw8zWVOATcb7wwvHknkPqQvWwrt0h9j9xAEnVtjoqnhk31e/O7rRh8Lc9ZRlgnMnWbfBkRHNMqbBK1Yn/RBO/6BxUTrVQsqm/CFD9ra9YP152DkPDChRmW5qO2oFUs/1rrhQEB0khxKL4H74v2D2fqBrbp+IZRcFOCJurchXxz+hoqIooco/VUlyS07k0F184MAA4VP+xAdCh+RrdmUKYY2ajsI3u3yGxF4CaEC/kYXBiVIdbH3XP7+h77ugsRTPXML5uQnSkzfBtQPSGMs73IIlHZCR5jafxB9IfQBlRrC8RsBKz78vmCkGOnw8XF0Tca0ehPYrKzDjQcr+KWtk0bTklOejkQ31F7td919XkUNFpObRs93GR7Bj6l22bI8/PGmWRj6Ly+dQJolpgjzXaWvLtfz60OdrjGH6VuFpeCWsIUK/bs7dQN5IZ/FlBXow==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB5565.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?Mi9YUEViUGtlcUlhTGNQUmJ0OXY4bHByL1dDYTVtM2dpTjYxZFR3cHNKWVkz?=
- =?utf-8?B?ekJhZGczS05aWGtLRHpyZkpadHZxTUMrajRDaW9zQTFBVCs1eWZtSkh5cXk3?=
- =?utf-8?B?RnB5ZlBpbHRFR1RYM1NMVG9ka21KaGJUVHU1dkFuTDd0WlNzYk5IbDhaRXVa?=
- =?utf-8?B?THVCSzVEM0VnS3BHeFMxUDIzQ2V3T2dZbDR4Rm8vbU51OVM4OEdpM2FlNytx?=
- =?utf-8?B?bXlLZHpKRTlYZVhtZWwyTkhNWjBYVHVzV0M5MW40OS95bEoyVHlVempqdXZS?=
- =?utf-8?B?Y3RVVVZHdlFWWGlmMHA5cVlZQmg5WWJlMk5MbWMzcWlQMVF5Z2oxVFFHYklR?=
- =?utf-8?B?UWVkaXJRdHN6b1J4dnVpVTF3U2s4TkQxb0MrSU5qaWtwTXRvZnhFMGdmamhW?=
- =?utf-8?B?Umx4TDhCQzZQMzB1ZFRhQWhORjVjMTlkVmM4NDRpd1hGbkQxQlVtcUxpaUY1?=
- =?utf-8?B?SVNlTjcvZUtDR2FseHg5TnViaFVEajArbVJrZWhWVTk4ekF6Z1ZMQmhkU0VO?=
- =?utf-8?B?T0ZudkdjL1NYT1JsSkp1eUlTL2pVMXNPeXdrSE5oWk5UUEZGbU1sRlJqTVJi?=
- =?utf-8?B?cmJ4SFhXZmU4RTRreDZwL3JacHlieWFKcjlnYWIzbWpyczZBS0NOVWtLVjdX?=
- =?utf-8?B?b3VBYVBxQVB4WHZCTTR5ME5DdE1TTGVRaVBDOUt4T1pUZHRZR3laazVPZjFK?=
- =?utf-8?B?NGlOMW9mWmxXTFQ4SXp5TlliQ0hlWHpXWkV0VDZuTTZrMEJFRmI2YzVxZ3N3?=
- =?utf-8?B?M0pMQTJtQlBBZWRoRzFmaVNKTHRBbWVsUFJhOVJPOGh4dWNnUG9SWEJyWU9W?=
- =?utf-8?B?R2EySFAxMUFZblpRVk5oZ0dGRWhzejRST3AyczFsbEdKbVBxbXBTdTRNVDFT?=
- =?utf-8?B?WncyT0pMS2dwQjRRNEFVc3JNZUVPS2hINUhZcnBUZWFGSm5qU1YvYlU5aDZv?=
- =?utf-8?B?Ukk3Wnk1dlFqVmdxeTNWLzF5bTh5d0dmVnNmaE1zZ3MxZy8ySm5xbHBrdmJr?=
- =?utf-8?B?eDJ0cjZuajdDbDVyTjZrNjNDZ2szSEpvQ2VtV2o0cFdHbEtQS3lYcmFBa0My?=
- =?utf-8?B?WjlyWnhLWHZzVzdFWHpvWFptbzgrZUEzQTFmeVVDb3RidG91N2JFOUE1ZmtD?=
- =?utf-8?B?bVpFNjhBeU1hVmJXQ1VMUzNlWERJQTJodXFmOFJKcXlpNGczUURYcytuZjdr?=
- =?utf-8?B?VysyV0EzVmxsdjRhMjh3bUVNMW4yZGZkM0VhTm1KYkVmaUJpZjE3MEtydjBv?=
- =?utf-8?B?SXAvL0lJOW83QzV1bm43dURWYjBqUVlmaFdxbzl1bkxvdzFHZmJCUDZRUzh2?=
- =?utf-8?B?QllwV2FHbDJFSlNIS0twZ0lBaFBrMTA1dnpiRTkyQ2lmSzk5NSt5dk9xdEtz?=
- =?utf-8?B?RUY2MklxaENYcGRrZlB2Vno2djBWK1JWcVRleHowRG9Pcml5NlpEL3g2bUM1?=
- =?utf-8?B?U1BiR1Jod2dqMElLOTJFQkx3VGxSWkRPVHBaSEFudDFHL0I1UVBjcWwwcW1E?=
- =?utf-8?B?eTZsMzZRZHRYa2tnVDBVNllRc1pseW4vaFVsYkt6ZVZGTTRBQkVGSTYrWC9I?=
- =?utf-8?B?QjVZdHVoZi8wQjBrWFpkZHo0ekI4TUR0RHVLUldlZGtJUUtRU3ZvQUFzSTZ5?=
- =?utf-8?B?dDVOQXR5SlBITkxNYjRST1lFa0pmZGhTM211c3VtajdzV1VIMXhYNHAvV1hu?=
- =?utf-8?B?eGZFK1M4cEZ6aXZkT1pMN3JuUW05UG1RbUVRSnQzMlJKWktZbk80eWNpZi9y?=
- =?utf-8?B?Sm5FQVY1ekFFU3B3SmFtTldjN3NCaTFmYkE2OWhJNG55cVVsY2JQYnhocXpE?=
- =?utf-8?B?ci9HN3hreHR1V05BZlBCdGdxZU15SU1JMFUxbUNlSjF0cHRIVXVXaEdBUnk2?=
- =?utf-8?B?OFIzK3pGOFRPQjN0MVdBSzBGdk82Z3VlVStBRWIzRHVtZFNmdFVYTkpQaUMr?=
- =?utf-8?B?L3JqVEZZNldPaGdMV2FqMEZwRzVTbHZlNHNqQkdUc2JZV1NJVzFNblZaNUx0?=
- =?utf-8?B?TjV3MGVJMDE3YUVPNmE3LzRtUEpxUEczUkl3aDVqRU9pdUJnMkJwdHBDN3Ew?=
- =?utf-8?B?TzFwSmFCaytBZ1Q2ejdvV0VVNVJwT1g3MTBEaGVQdWtPbS9GSVZrMUJ4UUgv?=
- =?utf-8?B?a1JTTTJSNXBnOStkdUZ5c05HdkJQdU45UUNRenhpcUdzT3cyTHBVNkdrWDRD?=
- =?utf-8?Q?MgP+1Go2TJxfaS5FnAnuYjAUbQZiDJ9pfj712Tpzg0Hr?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C714A0BBEDBF0244A7F1BFDBCA809358@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE96912D1E8;
+	Fri, 19 Apr 2024 14:07:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713535683; cv=none; b=Ar5ysudYtni1y/d8McRkASClXMOpT9bUJ1nAa7itC04XDZEV/I8IMQ2H0Y0SY8vI+3BqAXOfFjZbJg+OT56iymdUT5Z/Qjq8BqnmMgzqIW8eG54Z/gm6xFynZF7wIjpLEzHJz4xEqIHAcJN2CmhlGjE/weatiZ6jKACNLbaUYoE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713535683; c=relaxed/simple;
+	bh=XB1NbjTeqeLEZXFch9O0h0mxeBwFTtHIXYC6eK7awDU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nAHOjZbILkZKdtnALZ/1W0C1N5fezWz+wxS1UCU+PvgBvN/WfnvN/WNQQsipcmyQuFCGniAqIoy85NEokX8RkGb7D4gMYxfyyGG7UN/PqfnD31KzwFZlFxXgd9t20+Nhokda5ciacFO2pRqFrrAXBrwonemzAKHx03yahbTHch0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=YMZqx1Fo; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=grps+hyJYghqEXjJl9/6rpNw9fYgIgcNBX8UbDtQZxQ=; b=YMZqx1FoEEZDkv/+nWLSfYOhY6
+	QBmF93bWpNheUW02oFPoQFukhxeOTp8eyxziLdlVZTawlnaqtyIrGEu6knGDYFUZdyGytiguxlU1F
+	BPvSyUt665vmfBThp6rDCUguW8WEqf1vy9b7D4YryWmfJFIpBDzXhGK6W2RwkaeMG67gJVDoY37B9
+	kBGb31LgaqhzZUmLBv+GJCItq0ju74AwLb2vx96E+/6KRkw0fGMrAVRW6CoT4CrH8B3wkYfO5QY19
+	jv1cARcLZuvnwLBGBeCERW9cyCnBzwM0KXp151dgoEswui4IddfmGGnyo2Y9ncssPcY+2SrpNP09x
+	3st38ZJsWz2Jic9b+EoMHn9lezoi/vMfUapg71panqUyIR7WsQnSiH6zDQQLCplMUbmjM3cQRCg6I
+	Six7gE3UJ4BE9BzNdAe8+zIMsfKL8onTxMkiPzSglnfc+wb/d5hR31GWs+De1FIhRnjs2m7e0GzIs
+	Q7RzrP3JTWhQ8tfWLAwjCWoD;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1rxou7-007Gf8-2B;
+	Fri, 19 Apr 2024 14:07:52 +0000
+Message-ID: <1456b69c-4ffd-4a08-b120-6a00abf1eb05@samba.org>
+Date: Fri, 19 Apr 2024 16:07:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB5565.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1a5a6dc-160b-4692-130e-08dc6079e77c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Apr 2024 14:06:27.0111
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: cIPfGmDn6PSWQB6K37PLhyrNnoSt5vZpWKMknCNh0t7Zg0jNBnlSrGJsWVa4frIwucYcyD6QfreqQID/13vu7A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB9348
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next 0/5] net: In-kernel QUIC implementation with
+ Userspace handshake
+To: Xin Long <lucien.xin@gmail.com>
+Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net,
+ kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Steve French <smfrench@gmail.com>,
+ Namjae Jeon <linkinjeon@kernel.org>, Chuck Lever III
+ <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Sabrina Dubroca <sd@queasysnail.net>, Tyler Fanelli <tfanelli@redhat.com>,
+ Pengtao He <hepengtao@xiaomi.com>,
+ "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+ Samba Technical <samba-technical@lists.samba.org>
+References: <cover.1710173427.git.lucien.xin@gmail.com>
+ <74d5db09-6b5c-4054-b9d3-542f34769083@samba.org>
+ <CADvbK_dzVcDKsJ9RN9oc0K1Jwd+kYjxgE6q=ioRbVGhJx7Qznw@mail.gmail.com>
+ <f427b422-6cfc-45ac-88eb-3e7694168b63@samba.org>
+ <CADvbK_cA-RCLiUUWkyNsS=4OhkWrUWb68QLg28yO2=8PqNuGBQ@mail.gmail.com>
+ <438496a6-7f90-403d-9558-4a813e842540@samba.org>
+ <CADvbK_fkbOnhKL+Rb+pp+NF+VzppOQ68c=nk_6MSNjM_dxpCoQ@mail.gmail.com>
+Content-Language: en-US, de-DE
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <CADvbK_fkbOnhKL+Rb+pp+NF+VzppOQ68c=nk_6MSNjM_dxpCoQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-T24gRnJpLCAyMDI0LTA0LTE5IGF0IDEzOjQ1ICswMTAwLCBPeGFuYSBLaGFyaXRvbm92YSB3cm90
-ZToNCj4gSGVsbG8sDQo+IA0KPiBOSUMgc3RvcHBlZCBiZWluZyBkZXRlY3RlZCBpbiBMaW51eCA2
-LjYuMjguIFRoZSBwcm9ibGVtIHdhcyBvYnNlcnZlZCBvbiANCj4gdHdvIHNlcnZlcnMsIGFmdGVy
-IHJldmVydGluZyBrZXJuZWwgdG8gNi42LjI1IChvdXIgY3VycmVudCBzdGFibGUgdmVyc2lvbikg
-DQo+IGV2ZXJ5dGhpbmcgcmV0dXJuZWQgdG8gbm9ybWFsLg0KPiANCj4gV2Ugc3VzcGVjdCBjb21t
-aXQgIm5ldC9tbHg1ZTogRG8gbm90IHByb2R1Y2UgbWV0YWRhdGEgZnJlZWxpc3QgZW50cmllcyBp
-biANCj4gVHggcG9ydCB0cyBXUUUgeG1pdCIsIGJ1dCB3ZSBoYXZlbid0IGRvbmUgYmlzZWN0IHll
-dC4gDQo+IA0KVGhlIGlzc3VlIGFwcGVhcnMgb25seSBpbiA2LjYuMjguIEJpc2VjdGV0IGRvd24g
-dG8gY29tbWl0ICJuZXQvbWx4NTogUmVnaXN0ZXINCmRldmxpbmsgZmlyc3QgdW5kZXIgZGV2bGlu
-ayBsb2NrIiB3aGljaCB3YXMgYWRkZWQgdG8gNi42LjI4LiBOb3RlIHRoYXQgbGF0ZXN0DQpzdGFi
-bGUgNi44IGRvZXNuJ3QgaGF2ZSB0aGlzIGlzc3VlLg0KDQpUcmllZCBxdWlja2x5IGxvb2tpbmcg
-YXJvdW5kIGFuZCBmb3VuZCB0aGF0ICJuZXQvbWx4NTogUmVzdG9yZSBtaXN0YWtlbmx5DQpkcm9w
-cGVkIHBhcnRzIGluIHJlZ2lzdGVyIGRldmxpbmsgZmxvdyIgd2FzIG1pc3NpbmcuIEJ1dCBpdCBk
-aWRuJ3QgaGVscA0KdW5mb3J0dW5hdGVseS4NCg0KQWRkaW5nIFNoYXkgYXMgaGUgcHJvYmFibHkg
-aGFzIG1vcmUgY29udGV4dC4NCg0KVGhhbmtzLA0KRHJhZ29zDQoNCg0KPiBUaGUga2VybmVsIGxv
-ZyBpcyBiZWxvdy4NCj4gDQo+IHJvb3RAbG9jYWxob3N0On4jIGlmY29uZmlnDQo+IGxvOiBmbGFn
-cz03MzxVUCxMT09QQkFDSyxSVU5OSU5HPiAgbXR1IDY1NTM2DQo+ICAgICAgICBpbmV0IDEyNy4w
-LjAuMSAgbmV0bWFzayAyNTUuMC4wLjANCj4gICAgICAgIGluZXQ2IDo6MSAgcHJlZml4bGVuIDEy
-OCAgc2NvcGVpZCAweDEwPGhvc3Q+DQo+ICAgICAgICBsb29wICB0eHF1ZXVlbGVuIDEwMDAgIChM
-b2NhbCBMb29wYmFjaykNCj4gICAgICAgIFJYIHBhY2tldHMgODAgIGJ5dGVzIDY0ODAgKDYuMyBL
-aUIpDQo+ICAgICAgICBSWCBlcnJvcnMgMCAgZHJvcHBlZCAwICBvdmVycnVucyAwICBmcmFtZSAw
-DQo+ICAgICAgICBUWCBwYWNrZXRzIDgwICBieXRlcyA2NDgwICg2LjMgS2lCKQ0KPiAgICAgICAg
-VFggZXJyb3JzIDAgIGRyb3BwZWQgMCBvdmVycnVucyAwICBjYXJyaWVyIDAgIGNvbGxpc2lvbnMg
-MA0KPiANCj4gcm9vdEBsb2NhbGhvc3Q6fiMgbHNwY2kgfCBncmVwIEV0aA0KPiBjMTowMC4wIEV0
-aGVybmV0IGNvbnRyb2xsZXI6IE1lbGxhbm94IFRlY2hub2xvZ2llcyBNVDI3NzEwIEZhbWlseSBb
-Q29ubmVjdFgtNCBMeF0NCj4gYzE6MDAuMSBFdGhlcm5ldCBjb250cm9sbGVyOiBNZWxsYW5veCBU
-ZWNobm9sb2dpZXMgTVQyNzcxMCBGYW1pbHkgW0Nvbm5lY3RYLTQgTHhdDQo+IA0KPiBbICAgMjMu
-NTE5MTEzXSBSSVA6IDAwMTA6ZXN3X3BvcnRfbWV0YWRhdGFfZ2V0IChkcml2ZXJzL25ldC9ldGhl
-cm5ldC9tZWxsYW5veC9tbHg1L2NvcmUvZXN3aXRjaF9vZmZsb2Fkcy5jOjQwOTUgZHJpdmVycy9u
-ZXQvZXRoZXJuZXQvbWVsbGFub3gvbWx4NS9jb3JlL2Vzd2l0Y2hfb2ZmbG9hZHMuYzoyNDQyKSBt
-bHg1X2NvcmUNCj4gWyAgIDIzLjUyNDI5M10gdXNiIDItMTogbmV3IFN1cGVyU3BlZWQgVVNCIGRl
-dmljZSBudW1iZXIgMiB1c2luZyB4aGNpX2hjZA0KPiBbIDIzLjUyODYwMl0gQ29kZTogZWIgOGUg
-MGYgMWYgMDAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAgOTAg
-MGYgMWYgNDQgMDAgMDAgNTMgNDggODkgZDMgZTggZjIgNWQgZWEgYzkgNDggOGIgODAgYjAgMDkg
-MDAgMDAgPDhiPiA4MCAxOCAxMSAwMCAwMCA4OCAwMyAzMSBjMCA4MCAyMyAwMSA1YiBlOSAzOCAx
-ZiBmMyBjOSAwZiAxZiA4NA0KPiBBbGwgY29kZQ0KPiA9PT09PT09PQ0KPiAgICAwOgllYiA4ZSAg
-ICAgICAgICAgICAgICAJam1wICAgIDB4ZmZmZmZmZmZmZmZmZmY5MA0KPiAgICAyOgkwZiAxZiAw
-MCAgICAgICAgICAgICAJbm9wbCAgICglcmF4KQ0KPiAgICA1Ogk5MCAgICAgICAgICAgICAgICAg
-ICAJbm9wDQo+ICAgIDY6CTkwICAgICAgICAgICAgICAgICAgIAlub3ANCj4gICAgNzoJOTAgICAg
-ICAgICAgICAgICAgICAgCW5vcA0KPiAgICA4Ogk5MCAgICAgICAgICAgICAgICAgICAJbm9wDQo+
-ICAgIDk6CTkwICAgICAgICAgICAgICAgICAgIAlub3ANCj4gICAgYToJOTAgICAgICAgICAgICAg
-ICAgICAgCW5vcA0KPiAgICBiOgk5MCAgICAgICAgICAgICAgICAgICAJbm9wDQo+ICAgIGM6CTkw
-ICAgICAgICAgICAgICAgICAgIAlub3ANCj4gICAgZDoJOTAgICAgICAgICAgICAgICAgICAgCW5v
-cA0KPiAgICBlOgk5MCAgICAgICAgICAgICAgICAgICAJbm9wDQo+ICAgIGY6CTkwICAgICAgICAg
-ICAgICAgICAgIAlub3ANCj4gICAxMDoJOTAgICAgICAgICAgICAgICAgICAgCW5vcA0KPiAgIDEx
-Ogk5MCAgICAgICAgICAgICAgICAgICAJbm9wDQo+ICAgMTI6CTkwICAgICAgICAgICAgICAgICAg
-IAlub3ANCj4gICAxMzoJOTAgICAgICAgICAgICAgICAgICAgCW5vcA0KPiAgIDE0Ogk5MCAgICAg
-ICAgICAgICAgICAgICAJbm9wDQo+ICAgMTU6CTBmIDFmIDQ0IDAwIDAwICAgICAgIAlub3BsICAg
-MHgwKCVyYXgsJXJheCwxKQ0KPiAgIDFhOgk1MyAgICAgICAgICAgICAgICAgICAJcHVzaCAgICVy
-YngNCj4gICAxYjoJNDggODkgZDMgICAgICAgICAgICAgCW1vdiAgICAlcmR4LCVyYngNCj4gICAx
-ZToJZTggZjIgNWQgZWEgYzkgICAgICAgCWNhbGwgICAweGZmZmZmZmZmYzllYTVlMTUNCj4gICAy
-MzoJNDggOGIgODAgYjAgMDkgMDAgMDAgCW1vdiAgICAweDliMCglcmF4KSwlcmF4DQo+ICAgMmE6
-Kgk4YiA4MCAxOCAxMSAwMCAwMCAgICAJbW92ICAgIDB4MTExOCglcmF4KSwlZWF4CQk8LS0gdHJh
-cHBpbmcgaW5zdHJ1Y3Rpb24NCj4gICAzMDoJODggMDMgICAgICAgICAgICAgICAgCW1vdiAgICAl
-YWwsKCVyYngpDQo+ICAgMzI6CTMxIGMwICAgICAgICAgICAgICAgIAl4b3IgICAgJWVheCwlZWF4
-DQo+ICAgMzQ6CTgwIDIzIDAxICAgICAgICAgICAgIAlhbmRiICAgJDB4MSwoJXJieCkNCj4gICAz
-NzoJNWIgICAgICAgICAgICAgICAgICAgCXBvcCAgICAlcmJ4DQo+ICAgMzg6CWU5IDM4IDFmIGYz
-IGM5ICAgICAgIAlqbXAgICAgMHhmZmZmZmZmZmM5ZjMxZjc1DQo+ICAgM2Q6CTBmICAgICAgICAg
-ICAgICAgICAgIAkuYnl0ZSAweGYNCj4gICAzZToJMWYgICAgICAgICAgICAgICAgICAgCShiYWQp
-DQo+ICAgM2Y6CTg0ICAgICAgICAgICAgICAgICAgIAkuYnl0ZSAweDg0DQo+IA0KPiBDb2RlIHN0
-YXJ0aW5nIHdpdGggdGhlIGZhdWx0aW5nIGluc3RydWN0aW9uDQo+ID09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT0NCj4gICAgMDoJOGIgODAgMTggMTEgMDAgMDAgICAg
-CW1vdiAgICAweDExMTgoJXJheCksJWVheA0KPiAgICA2Ogk4OCAwMyAgICAgICAgICAgICAgICAJ
-bW92ICAgICVhbCwoJXJieCkNCj4gICAgODoJMzEgYzAgICAgICAgICAgICAgICAgCXhvciAgICAl
-ZWF4LCVlYXgNCj4gICAgYToJODAgMjMgMDEgICAgICAgICAgICAgCWFuZGIgICAkMHgxLCglcmJ4
-KQ0KPiAgICBkOgk1YiAgICAgICAgICAgICAgICAgICAJcG9wICAgICVyYngNCj4gICAgZToJZTkg
-MzggMWYgZjMgYzkgICAgICAgCWptcCAgICAweGZmZmZmZmZmYzlmMzFmNGINCj4gICAxMzoJMGYg
-ICAgICAgICAgICAgICAgICAgCS5ieXRlIDB4Zg0KPiAgIDE0OgkxZiAgICAgICAgICAgICAgICAg
-ICAJKGJhZCkNCj4gICAxNToJODQgICAgICAgICAgICAgICAgICAgCS5ieXRlIDB4ODQNCj4gWyAg
-IDIzLjUyODYwNF0gUlNQOiAwMDE4OmZmZmZjOTAwMGRiYmZiYTggRUZMQUdTOiAwMDAxMDI4Mg0K
-PiBbICAgMjMuNTMwODAyXSBodWIgMS0xOjEuMDogNCBwb3J0cyBkZXRlY3RlZA0KPiBbICAgMjMu
-NTM3NTc0XSBSQVg6IDAwMDAwMDAwMDAwMDAwMDAgUkJYOiBmZmZmYzkwMDBkYmJmYmZjIFJDWDog
-MDAwMDAwMDAwMDAwMDAyOA0KPiBbICAgMjMuNTM3NTc2XSBSRFg6IGZmZmZjOTAwMGRiYmZiZmMg
-UlNJOiAwMDAwMDAwMDAwMDAwMDEzIFJESTogZmZmZjg4ODExZWMzODAwMA0KPiBbICAgMjMuNTM3
-NTc4XSBSQlA6IGZmZmZmZmZmYzIzZmE1NjAgUjA4OiAwMDAwMDAwMDAwMDAwMDAwIFIwOTogMDAw
-MDAwMDAwMDAwMDAwMA0KPiBbICAgMjMuNTM3NTgwXSBSMTA6IDAwMDAwMDAwMDAwMzZlYTAgUjEx
-OiAwMDAwMDAwMDAwMDAwZGMwIFIxMjogZmZmZjg4OTg1MDEwNGYwMA0KPiBbICAgMjMuNTQ3NTY4
-XSB1c2IgMi0xOiBOZXcgVVNCIGRldmljZSBmb3VuZCwgaWRWZW5kb3I9MDVlMywgaWRQcm9kdWN0
-PTA2MjAsIGJjZERldmljZT05My4wMw0KPiBbICAgMjMuNTY0MjIyXSBSMTM6IGZmZmY4ODgxMDc1
-Y2E4NDAgUjE0OiBmZmZmODg4MTFlYzM4MDAwIFIxNTogMDAwMDAwMDAwMDAwMDAwMA0KPiBbICAg
-MjMuNTY0MjI0XSBGUzogIDAwMDAwMDAwMDAwMDAwMDAoMDAwMCkgR1M6ZmZmZjg4ODQzZmEwMDAw
-MCgwMDAwKSBrbmxHUzowMDAwMDAwMDAwMDAwMDAwDQo+IFsgICAyMy41NjQyMjZdIENTOiAgMDAx
-MCBEUzogMDAwMCBFUzogMDAwMCBDUjA6IDAwMDAwMDAwODAwNTAwMzMNCj4gWyAgIDIzLjU3MDE0
-M10gdXNiIDItMTogTmV3IFVTQiBkZXZpY2Ugc3RyaW5nczogTWZyPTEsIFByb2R1Y3Q9MiwgU2Vy
-aWFsTnVtYmVyPTANCj4gWyAgIDIzLjU3NDgzOV0gQ1IyOiAwMDAwMDAwMDAwMDAxMTE4IENSMzog
-MDAwMDAwMGM3YWY1YzAwMCBDUjQ6IDAwMDAwMDAwMDAzNTBlZjANCj4gWyAgIDIzLjU3NDg0MV0g
-Q2FsbCBUcmFjZToNCj4gWyAgIDIzLjU3NDg0NF0gIDxUQVNLPg0KPiBbICAgMjMuNTc0ODQ2XSA/
-IF9fZGllIChhcmNoL3g4Ni9rZXJuZWwvZHVtcHN0YWNrLmM6NDIxIGFyY2gveDg2L2tlcm5lbC9k
-dW1wc3RhY2suYzo0MzQpIA0KPiBbICAgMjMuNTkwNDg1XSA/IHBhZ2VfZmF1bHRfb29wcyAoYXJj
-aC94ODYvbW0vZmF1bHQuYzo3MDcpIA0KPiBbICAgMjMuNTkwNDkwXSA/IGdldF9wYWdlX2Zyb21f
-ZnJlZWxpc3QgKG1tL3BhZ2VfYWxsb2MuYzoxNTUzIG1tL3BhZ2VfYWxsb2MuYzozMTc3KSANCj4g
-WyAgIDIzLjYwNjEyOV0gPyBleGNfcGFnZV9mYXVsdCAoYXJjaC94ODYvaW5jbHVkZS9hc20vaXJx
-ZmxhZ3MuaDozNyBhcmNoL3g4Ni9pbmNsdWRlL2FzbS9pcnFmbGFncy5oOjcyIGFyY2gveDg2L21t
-L2ZhdWx0LmM6MTUwNCBhcmNoL3g4Ni9tbS9mYXVsdC5jOjE1NTIpIA0KPiBbICAgMjMuNjU1ODU2
-XSA/IGFzbV9leGNfcGFnZV9mYXVsdCAoYXJjaC94ODYvaW5jbHVkZS9hc20vaWR0ZW50cnkuaDo1
-NzApIA0KPiBbICAgMjMuNjcxNTAxXSA/IGVzd19wb3J0X21ldGFkYXRhX2dldCAoZHJpdmVycy9u
-ZXQvZXRoZXJuZXQvbWVsbGFub3gvbWx4NS9jb3JlL2Vzd2l0Y2hfb2ZmbG9hZHMuYzo0MDk1IGRy
-aXZlcnMvbmV0L2V0aGVybmV0L21lbGxhbm94L21seDUvY29yZS9lc3dpdGNoX29mZmxvYWRzLmM6
-MjQ0MikgbWx4NV9jb3JlDQo+IFsgICAyMy43OTA4MTJdID8gZXN3X3BvcnRfbWV0YWRhdGFfZ2V0
-IChkcml2ZXJzL25ldC9ldGhlcm5ldC9tZWxsYW5veC9tbHg1L2NvcmUvZXN3aXRjaF9vZmZsb2Fk
-cy5jOjQwOTUgZHJpdmVycy9uZXQvZXRoZXJuZXQvbWVsbGFub3gvbWx4NS9jb3JlL2Vzd2l0Y2hf
-b2ZmbG9hZHMuYzoyNDQyKSBtbHg1X2NvcmUNCj4gWyAgIDIzLjk1NTE4MF0gZGV2bGlua19ubF9w
-YXJhbV9maWxsLmNvbnN0cHJvcC4wIChuZXQvZGV2bGluay9wYXJhbS5jOjI2OCkgDQo+IFsgICAy
-My45NjEyNzZdID8gX19hbGxvY19za2IgKG5ldC9jb3JlL3NrYnVmZi5jOjY1MSAoZGlzY3JpbWlu
-YXRvciAxKSkgDQo+IFsgICAyMy45NzQ0OTBdID8gc3Jzb19yZXR1cm5fdGh1bmsgKGFyY2gveDg2
-L2xpYi9yZXRwb2xpbmUuUzoyMTcpIA0KPiBbICAgMjMuOTg3MDEzXSA/IF9fa21hbGxvY19ub2Rl
-X3RyYWNrX2NhbGxlciAobW0vc2xhYl9jb21tb24uYzoxMDI1IG1tL3NsYWJfY29tbW9uLmM6MTA0
-NikgDQo+IFsgICAyMy45ODcwMThdID8gc3Jzb19yZXR1cm5fdGh1bmsgKGFyY2gveDg2L2xpYi9y
-ZXRwb2xpbmUuUzoyMTcpIA0KPiBbICAgMjMuOTk3ODEyXSA/IGttYWxsb2NfcmVzZXJ2ZSAobmV0
-L2NvcmUvc2tidWZmLmM6NTg0KSANCj4gWyAgIDIzLjk5NzgxNl0gPyBzcnNvX3JldHVybl90aHVu
-ayAoYXJjaC94ODYvbGliL3JldHBvbGluZS5TOjIxNykgDQo+IFsgICAyNC4wMDcyMTddID8gX19h
-bGxvY19za2IgKG5ldC9jb3JlL3NrYnVmZi5jOjY2NikgDQo+IFsgICAyNC4wMDcyMjJdIGRldmxp
-bmtfcGFyYW1fbm90aWZ5LmNvbnN0cHJvcC4wIChuZXQvZGV2bGluay9wYXJhbS5jOjM1NCBuZXQv
-ZGV2bGluay9wYXJhbS5jOjMzMCkgDQo+IFsgICAyNC4wNTU1MTJdIGRldmxfcGFyYW1zX3JlZ2lz
-dGVyIChuZXQvZGV2bGluay9wYXJhbS5jOjY4NiAoZGlzY3JpbWluYXRvciAxKSkgDQo+IFsgICAy
-NC4wNTU1MTZdIGVzd19vZmZsb2Fkc19pbml0IChkcml2ZXJzL25ldC9ldGhlcm5ldC9tZWxsYW5v
-eC9tbHg1L2NvcmUvZXN3aXRjaF9vZmZsb2Fkcy5jOjI0ODIpIG1seDVfY29yZQ0KPiBbICAgMjQu
-MDY1MDA5XSBtbHg1X2Vzd2l0Y2hfaW5pdCAoZHJpdmVycy9uZXQvZXRoZXJuZXQvbWVsbGFub3gv
-bWx4NS9jb3JlL2Vzd2l0Y2guYzoxODcyKSBtbHg1X2NvcmUNCj4gWyAgIDI0LjE2NTIyOV0gbWx4
-NV9pbml0X29uZV9kZXZsX2xvY2tlZCAoZHJpdmVycy9uZXQvZXRoZXJuZXQvbWVsbGFub3gvbWx4
-NS9jb3JlL21haW4uYzoxMDIyIGRyaXZlcnMvbmV0L2V0aGVybmV0L21lbGxhbm94L21seDUvY29y
-ZS9tYWluLmM6MTQ0NykgbWx4NV9jb3JlDQo+IFsgICAyNC4xNzcwMDddIHByb2JlX29uZSAoZHJp
-dmVycy9uZXQvZXRoZXJuZXQvbWVsbGFub3gvbWx4NS9jb3JlL21haW4uYzoxNTA3IGRyaXZlcnMv
-bmV0L2V0aGVybmV0L21lbGxhbm94L21seDUvY29yZS9tYWluLmM6MTk0NykgbWx4NV9jb3JlDQo+
-IFsgICAyNC4xODcyOTZdIGxvY2FsX3BjaV9wcm9iZSAoZHJpdmVycy9wY2kvcGNpLWRyaXZlci5j
-OjMyNSkgDQo+IFsgICAyNC4xOTY2OThdIHdvcmtfZm9yX2NwdV9mbiAoa2VybmVsL3dvcmtxdWV1
-ZS5jOjU2MTggKGRpc2NyaW1pbmF0b3IgMSkpIA0KPiBbICAgMjQuMjA1OTg4XSBwcm9jZXNzX29u
-ZV93b3JrIChrZXJuZWwvd29ya3F1ZXVlLmM6MjYzMikgDQo+IFsgICAyNC4yMTU2MTJdIHdvcmtl
-cl90aHJlYWQgKGtlcm5lbC93b3JrcXVldWUuYzoyNjk0IChkaXNjcmltaW5hdG9yIDIpIGtlcm5l
-bC93b3JrcXVldWUuYzoyNzgxIChkaXNjcmltaW5hdG9yIDIpKSANCj4gWyAgIDI0LjIyNDk5OV0g
-PyBfX3BmeF93b3JrZXJfdGhyZWFkIChrZXJuZWwvd29ya3F1ZXVlLmM6MjcyNykgDQo+IFsgICAy
-NC4yMzQ5MTJdIGt0aHJlYWQgKGtlcm5lbC9rdGhyZWFkLmM6Mzg4KSANCj4gWyAgIDI0LjI0MzY0
-N10gPyBfX3BmeF9rdGhyZWFkIChrZXJuZWwva3RocmVhZC5jOjM0MSkgDQo+IFsgICAyNC4yNTI5
-ODhdIHJldF9mcm9tX2ZvcmsgKGFyY2gveDg2L2tlcm5lbC9wcm9jZXNzLmM6MTUzKSANCj4gWyAg
-IDI0LjI2MjEwM10gPyBfX3BmeF9rdGhyZWFkIChrZXJuZWwva3RocmVhZC5jOjM0MSkgDQo+IFsg
-ICAyNC4yNzEzNDddIHJldF9mcm9tX2ZvcmtfYXNtIChhcmNoL3g4Ni9lbnRyeS9lbnRyeV82NC5T
-OjMxNCkgDQo+IFsgICAyNC4yODA3NTRdICA8L1RBU0s+DQo+IA0KPiANCg0K
+Hi Xin Long,
+
+>>>>>> first many thanks for working on this topic!
+>>>>>>
+>>>>> Hi, Stefan
+>>>>>
+>>>>> Thanks for the comment!
+>>>>>
+>>>>>>> Usage
+>>>>>>> =====
+>>>>>>>
+>>>>>>> This implementation supports a mapping of QUIC into sockets APIs. Similar
+>>>>>>> to TCP and SCTP, a typical Server and Client use the following system call
+>>>>>>> sequence to communicate:
+>>>>>>>
+>>>>>>>            Client                    Server
+>>>>>>>         ------------------------------------------------------------------
+>>>>>>>         sockfd = socket(IPPROTO_QUIC)      listenfd = socket(IPPROTO_QUIC)
+>>>>>>>         bind(sockfd)                       bind(listenfd)
+>>>>>>>                                            listen(listenfd)
+>>>>>>>         connect(sockfd)
+>>>>>>>         quic_client_handshake(sockfd)
+>>>>>>>                                            sockfd = accecpt(listenfd)
+>>>>>>>                                            quic_server_handshake(sockfd, cert)
+>>>>>>>
+>>>>>>>         sendmsg(sockfd)                    recvmsg(sockfd)
+>>>>>>>         close(sockfd)                      close(sockfd)
+>>>>>>>                                            close(listenfd)
+>>>>>>>
+>>>>>>> Please note that quic_client_handshake() and quic_server_handshake() functions
+>>>>>>> are currently sourced from libquic in the github lxin/quic repository, and might
+>>>>>>> be integrated into ktls-utils in the future. These functions are responsible for
+>>>>>>> receiving and processing the raw TLS handshake messages until the completion of
+>>>>>>> the handshake process.
+>>>>>>
+>>>>>> I see a problem with this design for the server, as one reason to
+>>>>>> have SMB over QUIC is to use udp port 443 in order to get through
+>>>>>> firewalls. As QUIC has the concept of ALPN it should be possible
+>>>>>> let a conumer only listen on a specif ALPN, so that the smb server
+>>>>>> and web server on "h3" could both accept connections.
+>>>>> We do provide a sockopt to set ALPN before bind or handshaking:
+>>>>>
+>>>>>      https://github.com/lxin/quic/wiki/man#quic_sockopt_alpn
+>>>>>
+>>>>> But it's used more like to verify if the ALPN set on the server
+>>>>> matches the one received from the client, instead of to find
+>>>>> the correct server.
+>>>>
+>>>> Ah, ok.
+>>> Just note that, with a bit change in the current libquic, it still
+>>> allows users to use ALPN to find the correct function or thread in
+>>> the *same* process, usage be like:
+>>>
+>>> listenfd = socket(IPPROTO_QUIC);
+>>> /* match all during handshake with wildcard ALPN */
+>>> setsockopt(listenfd, QUIC_SOCKOPT_ALPN, "*");
+>>> bind(listenfd)
+>>> listen(listenfd)
+>>>
+>>> while (1) {
+>>>     sockfd = accept(listenfd);
+>>>     /* the alpn from client will be set to sockfd during handshake */
+>>>     quic_server_handshake(sockfd, cert);
+>>>
+>>>     getsockopt(sockfd, QUIC_SOCKOPT_ALPN, alpn);
+>>
+>> Would quic_server_handshake() call setsockopt()?
+> Yes, I just made a bit change in the userspace libquic:
+> 
+>    https://github.com/lxin/quic/commit/9c75bd42769a8cbc1652e2f4c8d77780f23afde6
+> 
+> So you can set up multple ALPNs on listen sock:
+> 
+>    setsockopt(listenfd, QUIC_SOCKOPT_ALPN, "smbd, h3, ksmbd");
+> 
+> Then during handshake, the matched ALPN from client will be set into
+> the accept socket, then users can get it later after handshake.
+> 
+> Note that userspace libquic is a very light lib (a couple of hundred lines
+> of code), you can add more TLS related support without touching Kernel code,
+> including the SNI support you mentioned.
+> 
+>>
+>>>     switch (alpn) {
+>>>       case "smbd": smbd_thread(sockfd);
+>>>       case "h3": h3_thread(sockfd);
+>>>       case "ksmbd": ksmbd_thread(sockfd);
+>>>     }
+>>> }
+>>
+>> Ok, but that would mean all application need to be aware of each other,
+>> but it would be possible and socket fds could be passed to other
+>> processes.
+> It doesn't sound common to me, but yes, I think Unix Domain Sockets
+> can pass it to another process.
+
+I think it will be extremely common to have multiple services
+based on udp port 443.
+
+People will expect to find web services, smb and maybe more
+behind the same dnshost name. And multiple dnshostnames pointing
+to the same ip address is also very likely.
+
+With plain tcp/udp it's also possible to independent sockets
+per port. There's no single userspace daemon that listens on
+'tcp' and will dispatch into different process base on the port.
+
+And with QUIC the port space is the ALPN and/or SNI
+combination.
+
+And I think this should be addressed before this becomes an
+unchangeable kernel ABI, written is stone.
+
+>>>>> So you expect (k)smbd server and web server both to listen on UDP
+>>>>> port 443 on the same host, and which APP server accepts the request
+>>>>> from a client depends on ALPN, right?
+>>>>
+>>>> yes.
+>>> Got you. This can be done by also moving TLS 1.3 message exchange to
+>>> kernel where we can get the ALPN before looking up the listening socket.
+>>> However, In-kernel TLS 1.3 Handshake had been NACKed by both kernel
+>>> netdev maintainers and userland ssl lib developers with good reasons.
+>>>
+>>>>
+>>>>> Currently, in Kernel, this implementation doesn't process any raw TLS
+>>>>> MSG/EXTs but deliver them to userspace after decryption, and the accept
+>>>>> socket is created before processing handshake.
+>>>>>
+>>>>> I'm actually curious how userland QUIC handles this, considering
+>>>>> that the UDP sockets('listening' on the same IP:PORT) are used in
+>>>>> two different servers' processes. I think socket lookup with ALPN
+>>>>> has to be done in Kernel Space. Do you know any userland QUIC
+>>>>> implementation for this?
+>>>>
+>>>> I don't now, but I guess QUIC is only used for http so
+>>>> far and maybe dns, but that seems to use port 853.
+>>>>
+>>>> So there's no strict need for it and the web server
+>>>> would handle all relevant ALPNs.
+>>> Honestly, I don't think any userland QUIC can use ALPN to lookup for
+>>> different sockets used by different servers/processes. As such thing
+>>> can be only done in Kernel Space.
+>>>
+>>>>
+>>>>>>
+>>>>>> So the server application should have a way to specify the desired
+>>>>>> ALPN before or during the bind() call. I'm not sure if the
+>>>>>> ALPN is available in cleartext before any crypto is needed,
+>>>>>> so if the ALPN is encrypted it might be needed to also register
+>>>>>> a server certificate and key together with the ALPN.
+>>>>>> Because multiple application may not want to share the same key.
+>>>>> On send side, ALPN extension is in raw TLS messages created in userspace
+>>>>> and passed into the kernel and encoded into QUIC crypto frame and then
+>>>>> *encrypted* before sending out.
+>>>>
+>>>> Ok.
+>>>>
+>>>>> On recv side, after decryption, the raw TLS messages are decoded from
+>>>>> the QUIC crypto frame and then delivered to userspace, so in userspace
+>>>>> it processes certificate validation and also see cleartext ALPN.
+>>>>>
+>>>>> Let me know if I don't make it clear.
+>>>>
+>>>> But the first "new" QUIC pdu from will trigger the accept() to
+>>>> return and userspace (or the kernel helper function) will to
+>>>> all crypto? Or does the first decryption happen in kernel (before accept returns)?
+>>> Good question!
+>>>
+>>> The first "new" QUIC pdu will cause to create a 'request sock' (contains
+>>> 4-tuple and connection IDs only) and queue up to reqsk list of the listen
+>>> sock (if validate_peer_address param is not set), and this pdu is enqueued
+>>> in the inq->backlog_list of the listen sock.
+>>>
+>>> When accept() is called, in Kernel, it dequeues the "request sock" from the
+>>> reqsk list of the listen sock, and creates the accept socket based on this
+>>> reqsk. Then it processes the pdu for this new accept socket from the
+>>> inq->backlog_list of the listen sock, including *decrypting* QUIC packet
+>>> and decoding CRYPTO frame, then deliver the raw/cleartext TLS message to
+>>> the Userspace libquic.
+>>
+>> Ok, when the kernel already decrypts it could already
+>> look find the ALPN. It doesn't mean it should do the full
+>> handshake, but parse enough to find the ALPN.
+> Correct, in-kernel QUIC should only do the QUIC related things,
+> and all TLS handshake msgs must be handled in Userspace.
+> This won't cause "layering violation", as Nick Banks said.
+
+But I think its unavoidable for the ALPN and SNI fields on
+the server side. As every service tries to use udp port 443
+and somehow that needs to be shared if multiple services want to
+use it.
+
+I guess on the acceptor side we would need to somehow detach low level
+udp struct sock from the logical listen struct sock.
+
+And quic_do_listen_rcv() would need to find the correct logical listening
+socket and call quic_request_sock_enqueue() on the logical socket
+not the lowlevel udo socket. The same for all stuff happening after
+quic_request_sock_enqueue() at the end of quic_do_listen_rcv.
+
+>> But I don't yet understand how the kernel gets the key to
+>> do the initlal decryption, I'd assume some call before listen()
+>> need to tell the kernel about the keys.
+> For initlal decryption, the keys can be derived with the initial packet.
+> basically, it only needs the dst_connection_id from the client initial
+> packet. see:
+> 
+>    https://datatracker.ietf.org/doc/html/rfc9001#name-initial-secrets
+> 
+> so we don't need to set up anything to kernel for initial's keys.
+
+I got it thanks!
+
+metze
+
 
