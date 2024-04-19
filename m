@@ -1,151 +1,259 @@
-Return-Path: <netdev+bounces-89568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FB8B8AAB93
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 11:39:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92ADC8AAB91
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 11:39:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AADA11F218E1
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 09:39:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07F6F1F21EAB
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 09:39:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0E37C6C8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 962FC7C082;
 	Fri, 19 Apr 2024 09:39:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FE3E7B3FE
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3EC779950
 	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 09:39:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713519563; cv=none; b=uDiGKCZZv4KRMrqcJYh2zoHGa/5KCZicwqwjcRLqykENH1Hvn6Rc62vvq0EBYyE8wTidf9JkHYChMfLBbp147+mjlXG8hZ5zrWQvDaw0XVd/cUtUev622x/4BXrHwMCgTO+QTFAKkdzGndoWqdbO3UEUzdwu9k1y/mp32Nt+GYQ=
+	t=1713519563; cv=none; b=ThXWKts5E8FuL+gaznt3GW2q/Vdpvivi5lLcM0HTxEI5XBMViM02bG/jwT3rDdEE5jp9MQpyh3A5fLywJ0mSnq5pJdU4yq11MEFosEZyvO9WJg1O3MO+hjFa0CMD8nCtm58fwBB86eIvWoX0+m+wiK/RAIiPBbOTY9JzIzNWlVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713519563; c=relaxed/simple;
-	bh=EhhYJ42f9QWeElYSrZjAwIwx5T0rT+byCgouzLS1tR8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=JCB0QFYwQO1AMEzHNrwF21LpaucmCd+9W4V4N3U8n+dYvM/jopRkeKRZ7otBEDyyUI/R1UylaE2KLeK6vYRsbxM6nujIJQZ5TKlIu81AGLEXDEbilbJqqbmMDXXoxzO+h69/39qCcssUiiHTBl32+ai8cj1zoTCjyjMxVvcYjLQ=
+	bh=14Y4KZZiAhcjzJBMPil9WLZmrBhb5dyYBHzD9Q9GixU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=MTfgtwq3n79/ZUuBUXPJ1fGOyYGPaNWp7fD+UsjUaJfmLGZ2YhtVq6gf/xWfu/gHLqrGdbhxmEOUmt1zX/yWqdG3zl7M2jLzxaxGHZt7oRGkBoLdDEKuPyx9sTF8Np3bY7z/Uv0VSiQXRmsSlEAxGHpaZSxtFUBrgD0smPHGOQY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7da60b9a4f6so17819239f.0
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7da41c44e78so114142939f.1
         for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 02:39:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1713519561; x=1714124361;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=q6ZaY/rhI9lX6wl+zmzdUP6cT/PHQHY2tKSNPNJKq28=;
-        b=AlXz0Xvy34AZhRZvYwwR0c1Rlkxlhv+tGQd0iY81BKMpY+ol7nHoek3b3b9kIeAgTk
-         xKYMdxK7SAlpYKsv37h8Nv6I6hBDzUIaJa8Y41xtfibNgT6DhD74DXZPa/p/o4HE9e05
-         Lp1fuEi5NHH/gkc29DWk07C/F9Yl16O8orrSVwGLQleMOoV0k18Bg1x5AdMvnJyWQO2J
-         UWvgZejkzAL4O3/fefNtxPCJkPrfL7aFvHlq9NA4wGfm4Soie3HuwYiFxZ32XItGdo0O
-         FukgUR5LQQL9UkLFsF9cNDaetF6Vxnw+vYSpLfrTnMNBR9U43c3XwsgkVoWmcmFFkYWa
-         IOMA==
-X-Forwarded-Encrypted: i=1; AJvYcCUFVBNlXHZSDgP3vvrhoYczqRd+RXuLfkENISwQ4pqBsR+g2IGGtFZ0ID6difTr2//v4qXQWHEZLfL1c8LkjnBO9ALEmedD
-X-Gm-Message-State: AOJu0YxnNtIsR1btv8sNzfOh4EFauwDvJsJrGZiaZ7yXBv22Rp5/ChKX
-	uODkL2AMg1GrgUMcWen959ZiO+HRnuYb1jJFyYLdJl7tje45AdHxS7TSsrfL6gcpItXEWn2Sncz
-	Bp/MjlrkaLj+YSJKcu/U82wgNN6u0aL2WgHG8mCkKUpLNE3hXaEdjdzw=
-X-Google-Smtp-Source: AGHT+IHaaJNZ/icD0BqwrSfTnvGtd2dw7RaeIW67a/mcAbN0BjPh8dwIDjD1odrnKU3cIoXHjZTx59/pFKGjY883rA5BOYAgJnMk
+        bh=n/4BKGxSNKE1tgUH4BDYpPfAMy1V7jfjPS2wZ8yJuYM=;
+        b=K3xrx2Pwk/egC3cWifq/XlYFTAXTshu2o8dwIuPg3Yuz1p0wO5Idhvfrf2n1lVGRrn
+         /OqEM++Chl2vcO3svjxazHJqjXF0wvKHHzqwEHCPfJW/xzu6UaOZchPjikSx2+S3KchU
+         OBaPxJ8ZpKLrHmVjoNpnUXoNsI4eKvTQwLIh6AkQRsTmzG7yj5F8TMDCqOauzm7jfmGA
+         KFfFcI53svDreI2qDItEbzT2mzD8TOIXcimD61bU+w/z+Y8Wq5C8cCrvsx99RT0L0o4c
+         /mL0fc3sQY+hhWUnb/bhxR/eWNaZSHaufaB0icIF1nWAkJVPH2aj5uGftJCNMwT+QQLE
+         u9GQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVg83FsNwMqnkwVVDiQdLcaO3+3Kr+gMKvrLwrwVk//9DF1iP53CLWmVcY+xrzYbPNMpqTfd8QY4u9/5Z/p9jxeMfvlgtZE
+X-Gm-Message-State: AOJu0YybJNhF/bYxZzm5x2v8fIXEI3zWdxzBz5WtM3QJoMahSpNO6IKR
+	DATA2GUCAM0Qzix0cBP1L5yxuUTzqi9dR3UM9PkqT3OhttcwTdUt4Er08D0sFmis57hSdzsxiA4
+	cwfmLt6hAOMLCs7dT1a02adLK5VwLny9nFcyRwVzGr0pFDT99P6n28f4=
+X-Google-Smtp-Source: AGHT+IHb74c1pr8r0ZUEXq2T0+3WN7/E1SX6B1RfHduI/JElDKADeaCEmdGXUnn5CY772WvjQIzJgDnr9M33U1CrAj9AeUyGDOt8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:25cd:b0:482:fbfb:e72e with SMTP id
- u13-20020a05663825cd00b00482fbfbe72emr129896jat.6.1713519561422; Fri, 19 Apr
+X-Received: by 2002:a05:6638:2394:b0:482:eef9:835c with SMTP id
+ q20-20020a056638239400b00482eef9835cmr101759jat.6.1713519561140; Fri, 19 Apr
  2024 02:39:21 -0700 (PDT)
 Date: Fri, 19 Apr 2024 02:39:21 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c6405606166fdc68@google.com>
-Subject: [syzbot] [net?] WARNING in gre_tap_xmit (2)
-From: syzbot <syzbot+c298c9f0e46a3c86332b@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Message-ID: <000000000000c1fa0506166fdcfe@google.com>
+Subject: [syzbot] [net?] KASAN: slab-use-after-free Read in unix_del_edges
+From: syzbot <syzbot+f3f3eef1d2100200e593@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 
 Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    443574b03387 riscv, bpf: Fix kfunc parameters incompatibil..
-git tree:       bpf
-console output: https://syzkaller.appspot.com/x/log.txt?x=165886c3180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
-dashboard link: https://syzkaller.appspot.com/bug?extid=c298c9f0e46a3c86332b
+HEAD commit:    7b4f2bc91c15 Add linux-next specific files for 20240418
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=14a54a53180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ae644165a243bf62
+dashboard link: https://syzkaller.appspot.com/bug?extid=f3f3eef1d2100200e593
 compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=155e53af180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=128b1d53180000
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3f355021a085/disk-443574b0.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/44cf4de7472a/vmlinux-443574b0.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/a99a36c7ad65/bzImage-443574b0.xz
+disk image: https://storage.googleapis.com/syzbot-assets/524a18e6c5be/disk-7b4f2bc9.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/029f1b84d653/vmlinux-7b4f2bc9.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c02d1542e886/bzImage-7b4f2bc9.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c298c9f0e46a3c86332b@syzkaller.appspotmail.com
+Reported-by: syzbot+f3f3eef1d2100200e593@syzkaller.appspotmail.com
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 13407 at include/linux/skbuff.h:2740 pskb_may_pull_reason include/linux/skbuff.h:2740 [inline]
-WARNING: CPU: 0 PID: 13407 at include/linux/skbuff.h:2740 pskb_may_pull include/linux/skbuff.h:2756 [inline]
-WARNING: CPU: 0 PID: 13407 at include/linux/skbuff.h:2740 pskb_network_may_pull include/linux/skbuff.h:3077 [inline]
-WARNING: CPU: 0 PID: 13407 at include/linux/skbuff.h:2740 pskb_inet_may_pull include/net/ip_tunnels.h:361 [inline]
-WARNING: CPU: 0 PID: 13407 at include/linux/skbuff.h:2740 gre_tap_xmit+0x4ff/0x6e0 net/ipv4/ip_gre.c:734
-Modules linked in:
-CPU: 0 PID: 13407 Comm: syz-executor.1 Not tainted 6.8.0-syzkaller-05236-g443574b03387 #0
+==================================================================
+BUG: KASAN: slab-use-after-free in unix_edge_successor net/unix/garbage.c:109 [inline]
+BUG: KASAN: slab-use-after-free in unix_del_edge net/unix/garbage.c:165 [inline]
+BUG: KASAN: slab-use-after-free in unix_del_edges+0x148/0x630 net/unix/garbage.c:237
+Read of size 8 at addr ffff888079c6e640 by task kworker/u8:6/1099
+
+CPU: 0 PID: 1099 Comm: kworker/u8:6 Not tainted 6.9.0-rc4-next-20240418-syzkaller #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-RIP: 0010:pskb_may_pull_reason include/linux/skbuff.h:2740 [inline]
-RIP: 0010:pskb_may_pull include/linux/skbuff.h:2756 [inline]
-RIP: 0010:pskb_network_may_pull include/linux/skbuff.h:3077 [inline]
-RIP: 0010:pskb_inet_may_pull include/net/ip_tunnels.h:361 [inline]
-RIP: 0010:gre_tap_xmit+0x4ff/0x6e0 net/ipv4/ip_gre.c:734
-Code: 00 4c 89 ef 48 89 ee 48 89 da e8 7c 8f fb ff 31 c0 48 83 c4 38 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc e8 62 55 9d f7 90 <0f> 0b 90 e9 09 fc ff ff 44 89 e7 89 ee e8 0f 57 9d f7 41 39 ec 0f
-RSP: 0018:ffffc90004b66e00 EFLAGS: 00010287
-RAX: ffffffff89f79b0e RBX: ffff888061667718 RCX: 0000000000040000
-RDX: ffffc9000c375000 RSI: 00000000000124e0 RDI: 00000000000124e1
-RBP: 00000000ffffffb6 R08: ffffffff89f79712 R09: 1ffffffff1f0d5cd
-R10: dffffc0000000000 R11: ffffffff89f79610 R12: 0000000000000000
-R13: ffff888061667640 R14: ffff888062b64000 R15: dffffc0000000000
-FS:  00007f08d29ff6c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020010000 CR3: 0000000061678000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000600
+Workqueue: events_unbound __unix_gc
 Call Trace:
  <TASK>
- __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
- netdev_start_xmit include/linux/netdevice.h:4917 [inline]
- xmit_one net/core/dev.c:3531 [inline]
- dev_hard_start_xmit+0x26a/0x790 net/core/dev.c:3547
- sch_direct_xmit+0x2b6/0x5f0 net/sched/sch_generic.c:343
- __dev_xmit_skb net/core/dev.c:3760 [inline]
- __dev_queue_xmit+0x1912/0x3b10 net/core/dev.c:4301
- bond_start_xmit+0x1389/0x1c40 drivers/net/bonding/bond_main.c:5469
- __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
- netdev_start_xmit include/linux/netdevice.h:4917 [inline]
- xmit_one net/core/dev.c:3531 [inline]
- dev_hard_start_xmit+0x26a/0x790 net/core/dev.c:3547
- __dev_queue_xmit+0x19f4/0x3b10 net/core/dev.c:4335
- packet_snd net/packet/af_packet.c:3083 [inline]
- packet_sendmsg+0x4932/0x63d0 net/packet/af_packet.c:3115
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:745
- ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
- ___sys_sendmsg net/socket.c:2638 [inline]
- __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-RIP: 0033:0x7f08d2e7dea9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f08d29ff0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007f08d2fabf80 RCX: 00007f08d2e7dea9
-RDX: 00000000200400c4 RSI: 0000000020000180 RDI: 0000000000000006
-RBP: 00007f08d2eca4a4 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f08d2fabf80 R15: 00007ffcba0da4f8
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:488
+ kasan_report+0x143/0x180 mm/kasan/report.c:601
+ unix_edge_successor net/unix/garbage.c:109 [inline]
+ unix_del_edge net/unix/garbage.c:165 [inline]
+ unix_del_edges+0x148/0x630 net/unix/garbage.c:237
+ unix_destroy_fpl+0x59/0x210 net/unix/garbage.c:298
+ unix_detach_fds net/unix/af_unix.c:1811 [inline]
+ unix_destruct_scm+0x13e/0x210 net/unix/af_unix.c:1826
+ skb_release_head_state+0x100/0x250 net/core/skbuff.c:1127
+ skb_release_all net/core/skbuff.c:1138 [inline]
+ __kfree_skb net/core/skbuff.c:1154 [inline]
+ kfree_skb_reason+0x16d/0x3b0 net/core/skbuff.c:1190
+ __skb_queue_purge_reason include/linux/skbuff.h:3251 [inline]
+ __skb_queue_purge include/linux/skbuff.h:3256 [inline]
+ __unix_gc+0x1732/0x1830 net/unix/garbage.c:575
+ process_one_work kernel/workqueue.c:3218 [inline]
+ process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3299
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3380
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
  </TASK>
+
+Allocated by task 14427:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ unpoison_slab_object mm/kasan/common.c:312 [inline]
+ __kasan_slab_alloc+0x66/0x80 mm/kasan/common.c:338
+ kasan_slab_alloc include/linux/kasan.h:201 [inline]
+ slab_post_alloc_hook mm/slub.c:3897 [inline]
+ slab_alloc_node mm/slub.c:3957 [inline]
+ kmem_cache_alloc_noprof+0x135/0x290 mm/slub.c:3964
+ sk_prot_alloc+0x58/0x210 net/core/sock.c:2074
+ sk_alloc+0x38/0x370 net/core/sock.c:2133
+ unix_create1+0xb4/0x770
+ unix_create+0x14e/0x200 net/unix/af_unix.c:1034
+ __sock_create+0x490/0x920 net/socket.c:1571
+ sock_create net/socket.c:1622 [inline]
+ __sys_socketpair+0x33e/0x720 net/socket.c:1773
+ __do_sys_socketpair net/socket.c:1822 [inline]
+ __se_sys_socketpair net/socket.c:1819 [inline]
+ __x64_sys_socketpair+0x9b/0xb0 net/socket.c:1819
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Freed by task 1805:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
+ poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
+ __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
+ kasan_slab_free include/linux/kasan.h:184 [inline]
+ slab_free_hook mm/slub.c:2190 [inline]
+ slab_free mm/slub.c:4393 [inline]
+ kmem_cache_free+0x145/0x340 mm/slub.c:4468
+ sk_prot_free net/core/sock.c:2114 [inline]
+ __sk_destruct+0x467/0x5f0 net/core/sock.c:2208
+ sock_put include/net/sock.h:1948 [inline]
+ unix_release_sock+0xa8b/0xd20 net/unix/af_unix.c:665
+ unix_release+0x91/0xc0 net/unix/af_unix.c:1049
+ __sock_release net/socket.c:659 [inline]
+ sock_close+0xbc/0x240 net/socket.c:1421
+ __fput+0x406/0x8b0 fs/file_table.c:422
+ delayed_fput+0x59/0x80 fs/file_table.c:445
+ process_one_work kernel/workqueue.c:3218 [inline]
+ process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3299
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3380
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+The buggy address belongs to the object at ffff888079c6e000
+ which belongs to the cache UNIX of size 1920
+The buggy address is located 1600 bytes inside of
+ freed 1920-byte region [ffff888079c6e000, ffff888079c6e780)
+
+The buggy address belongs to the physical page:
+page: refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888079c6c000 pfn:0x79c68
+head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0xfff80000000240(workingset|head|node=0|zone=1|lastcpupid=0xfff)
+page_type: 0xffffefff(slab)
+raw: 00fff80000000240 ffff888017395a00 ffff8880173357c8 ffffea0001f97410
+raw: ffff888079c6c000 0000000000100005 00000001ffffefff 0000000000000000
+head: 00fff80000000240 ffff888017395a00 ffff8880173357c8 ffffea0001f97410
+head: ffff888079c6c000 0000000000100005 00000001ffffefff 0000000000000000
+head: 00fff80000000003 ffffea0001e71a01 ffffffffffffffff 0000000000000000
+head: 0000000000000008 0000000000000000 00000000ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 7008, tgid -583571348 (syz-executor297), ts 7008, free_ts 67977031729
+ set_page_owner include/linux/page_owner.h:32 [inline]
+ post_alloc_hook+0x1f3/0x230 mm/page_alloc.c:1476
+ prep_new_page mm/page_alloc.c:1484 [inline]
+ get_page_from_freelist+0x2ce2/0x2d90 mm/page_alloc.c:3446
+ __alloc_pages_noprof+0x256/0x6c0 mm/page_alloc.c:4704
+ __alloc_pages_node_noprof include/linux/gfp.h:244 [inline]
+ alloc_pages_node_noprof include/linux/gfp.h:271 [inline]
+ alloc_slab_page+0x5f/0x120 mm/slub.c:2259
+ allocate_slab+0x5a/0x2e0 mm/slub.c:2422
+ new_slab mm/slub.c:2475 [inline]
+ ___slab_alloc+0xcd1/0x14b0 mm/slub.c:3624
+ __slab_alloc+0x58/0xa0 mm/slub.c:3714
+ __slab_alloc_node mm/slub.c:3767 [inline]
+ slab_alloc_node mm/slub.c:3945 [inline]
+ kmem_cache_alloc_noprof+0x1c1/0x290 mm/slub.c:3964
+ sk_prot_alloc+0x58/0x210 net/core/sock.c:2074
+ sk_alloc+0x38/0x370 net/core/sock.c:2133
+ unix_create1+0xb4/0x770
+ unix_create+0x14e/0x200 net/unix/af_unix.c:1034
+ __sock_create+0x490/0x920 net/socket.c:1571
+ sock_create net/socket.c:1622 [inline]
+ __sys_socketpair+0x33e/0x720 net/socket.c:1773
+ __do_sys_socketpair net/socket.c:1822 [inline]
+ __se_sys_socketpair net/socket.c:1819 [inline]
+ __x64_sys_socketpair+0x9b/0xb0 net/socket.c:1819
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+page last free pid 5089 tgid 5089 stack trace:
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1096 [inline]
+ free_unref_page+0xd22/0xea0 mm/page_alloc.c:2609
+ __slab_free+0x31b/0x3d0 mm/slub.c:4304
+ qlink_free mm/kasan/quarantine.c:163 [inline]
+ qlist_free_all+0x9e/0x140 mm/kasan/quarantine.c:179
+ kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:286
+ __kasan_slab_alloc+0x23/0x80 mm/kasan/common.c:322
+ kasan_slab_alloc include/linux/kasan.h:201 [inline]
+ slab_post_alloc_hook mm/slub.c:3897 [inline]
+ slab_alloc_node mm/slub.c:3957 [inline]
+ kmem_cache_alloc_noprof+0x135/0x290 mm/slub.c:3964
+ vma_lock_alloc kernel/fork.c:441 [inline]
+ vm_area_dup+0x61/0x290 kernel/fork.c:494
+ dup_mmap kernel/fork.c:697 [inline]
+ dup_mm kernel/fork.c:1688 [inline]
+ copy_mm+0xcf5/0x1fb0 kernel/fork.c:1737
+ copy_process+0x187a/0x3dc0 kernel/fork.c:2390
+ kernel_clone+0x226/0x8f0 kernel/fork.c:2797
+ __do_sys_clone kernel/fork.c:2940 [inline]
+ __se_sys_clone kernel/fork.c:2924 [inline]
+ __x64_sys_clone+0x258/0x2a0 kernel/fork.c:2924
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+Memory state around the buggy address:
+ ffff888079c6e500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888079c6e580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff888079c6e600: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                           ^
+ ffff888079c6e680: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff888079c6e700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
 
 
 ---
@@ -158,6 +266,10 @@ https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
 If the report is already addressed, let syzbot know by replying with:
 #syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
 If you want to overwrite report's subsystems, reply with:
 #syz set subsystems: new-subsystem
