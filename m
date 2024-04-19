@@ -1,234 +1,119 @@
-Return-Path: <netdev+bounces-89756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5A888AB719
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 00:09:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D2898AB71F
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 00:14:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EF2E1F21CFD
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 22:09:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A62E282456
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 22:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177FF13D2A0;
-	Fri, 19 Apr 2024 22:09:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57BFC13D275;
+	Fri, 19 Apr 2024 22:14:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="FwTvDyQu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I72Toh/B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76C4713D27E
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 22:09:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF71B13D271
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 22:14:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713564552; cv=none; b=rU4i1maRbb3bASDcFLKIJc9iB2rPQgrDIbYmKymMJQaWFgevL3w6AJmuj5FIVs8RH04fFHwKHY8xvXAXOHeLTPSZMl/KQVkiC5yWaHEPM+Ubt5NHjw3e9gl+WuDTOG7pnRiZzNbx+ZM+eBCeLxO0EzdCbUQc6rT7ck0gF1tvcvQ=
+	t=1713564890; cv=none; b=WjXWpffr6MhzaASKgqx4tlbsI/zvLrEshJqJK9VrGq2zw/TQngbgphLKY1MslxZ+G/Rpb1Ehrpl6MG/mkaZVbUslbV3eDZibGBEO16mizEa/ovWc+5z1SXSBhrWyk7RwxCVklxkyEkFbdhFyDKw5sy/y1gR/4p3qvcBk3bfI7dY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713564552; c=relaxed/simple;
-	bh=oLndSq323RJoUUBeJVwHK+wXtjHYOY899IcoV3L480Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pEQznNg1Y52YH49NtcYHa1o5QBwmr5lNtCtdfqgC2kv6vXH1LbiaXGbNvhEfsT4dDaiqHZOczc389W/V+FNY1BnfeKdlSyIR2znVh0lMKjpltvhgq9UQiLxZkuOjvLCuLL6JUWNPbF/ApWZt3SNivft7WadlDSqpACqcGMNCFv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=FwTvDyQu; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1e834159f40so20663865ad.2
-        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 15:09:10 -0700 (PDT)
+	s=arc-20240116; t=1713564890; c=relaxed/simple;
+	bh=rvuzjRzSkyxRF2iNeXMy1pRg2zH+eva/o8+UMG/qlIY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UxSGSW19eQuhtlVhw8WpPEwxOBx75LA4dWhGD3fsaIB8a+5WM9Hcw8xJz4Nb5PELZhS8ktuGgx1W5hL99CkvhFsejAteuPjgoP5hMKIvoQhOXbgEWJsrHFPlWwnDXxySYeGbr7vCSGX7z2H8DaPMzqQylIL6TZwGEbnfibtiEjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I72Toh/B; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-696609f5cf2so14565596d6.3
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 15:14:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1713564549; x=1714169349; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1713564888; x=1714169688; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9clNm/2TNh3Cld8MNKIvS2XoVk57beqrqIb9UVvUVGU=;
-        b=FwTvDyQuAmkuM5nG7RYl8EAMlb6bhC96LfdQz9rin9mF7qjTlaeSX9aU1j7CY9ShzC
-         M41lhH+Tu/c361lDfLlpbF2GyHYiNGuPaDVXHhKKLq0KDwl9vmzl6E6uhdmHb/teykAp
-         O/Ix3qTSOATfXML+0lLt4oLK0LfsKCYXvGLRvS/j6orShS46Z2ixpWXWPEOKUzR+i8nj
-         uJEeW2bxEWhwpe65wcm11vJdyAtPMaifmZH7lD9fizRe3xKienlb7OWRp6KZDPop45Nc
-         Nq0cJhKuWhyatXcIuIHQBwZ5x6RHizB6JlbAVbPEjWiGOaUqwyzBKSMlnDhfDbGZ0JSB
-         MBbg==
+        bh=b6gH6XCg5jIlnRMmDrx2Di9LcjiK/49bY7DTwVZH5Us=;
+        b=I72Toh/Bv5q28LAfQJFs9TrfvMzoT1dw4Mku+A+9rmxoHFWT7iUlOk5YUJxKYhGd67
+         3dvvap4MyL61kuFqyoPQpDis7KbM+1p9gxsVSkcdrm1y71/rUv1UtTMLxxuVa9ZgG6uC
+         hfSh68vKF0r8T0dYChXpVlWR5zmpG7Q25Kj4FPwyT0ZN2EjjoNSifF42wEuAknDpqWdE
+         910UroTfC6X9gAfKrRqjmVAzbMkq5D5/TywEiP74xNkLkIQrgoZR5bfYxkSApaPIM0za
+         q8f9XcBHeRFAbcv93anSIrKGErIwitzTQh8FRNsaJfYrXHk038rWzHSwlWKLrS0BaCBb
+         E1EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713564549; x=1714169349;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1713564888; x=1714169688;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9clNm/2TNh3Cld8MNKIvS2XoVk57beqrqIb9UVvUVGU=;
-        b=b1K5z72aPE1gppn6ugq4AMOBcyK4JF8cy03OjT2Qf/CBBkVg0NA06SFwezcxAKIVNO
-         zfZ6WXApvIBPyrEpEujy2s2SgaAUyAmf9bsu7mGiSY2vPxPxfdfPUx3v4GxHALmtXvRG
-         s47M9OgC8n+8jjOlw1mxkh9qOQsgX5q2wqmXCRNeQVdUouO/bWO1emcGDmcGUupLEysR
-         xShgvz14r4g9g3PYE961pKIbkicP9ct/H76POqvFBq31Xc0u7tZAq0eJM9ckWoU6K7+m
-         PRLczfU9uDwksqrqWWT81vnqvKcuH3EOuWrsyugtvrrM8CON2VEylU/S4eu3lEmMokFJ
-         30wA==
-X-Gm-Message-State: AOJu0YwDRQN0eh4YeEBWVeYDt2JUyGnmB2PEFCdiOB7zkpuh2e8755Aj
-	OU2+jAe8ahJTfaR7N9yUpeaWCap/aCppENS39gHpuuWK46CLd+WQGQLIp8J18rxtA5JIvqrJstd
-	e
-X-Google-Smtp-Source: AGHT+IHNyu6x6adKlggRRNpdWO/K5I2/6vzq4Otc1vpvcBTXKZAojFZrSj+hczesdHTGfEYgSYSNRA==
-X-Received: by 2002:a17:902:9a46:b0:1e4:4000:a576 with SMTP id x6-20020a1709029a4600b001e44000a576mr3214483plv.43.1713564549474;
-        Fri, 19 Apr 2024 15:09:09 -0700 (PDT)
-Received: from localhost (fwdproxy-prn-014.fbsv.net. [2a03:2880:ff:e::face:b00c])
-        by smtp.gmail.com with ESMTPSA id b14-20020a170902650e00b001e5e6877494sm3924299plk.238.2024.04.19.15.09.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Apr 2024 15:09:09 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next v2 2/2] net: selftest: add test for netdev netlink queue-get API
-Date: Fri, 19 Apr 2024 15:08:57 -0700
-Message-ID: <20240419220857.2065615-3-dw@davidwei.uk>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240419220857.2065615-1-dw@davidwei.uk>
-References: <20240419220857.2065615-1-dw@davidwei.uk>
+        bh=b6gH6XCg5jIlnRMmDrx2Di9LcjiK/49bY7DTwVZH5Us=;
+        b=f56GhXqNDv6jwls543XzF79pDnC3xmxiiHCJuV9S3aUNzQ/V5ikA7j4nz1RCzULPYD
+         sUtsG3Uie8BMRHZppTIUEgGjhc3OGbB6RZNsitA1rNyD7qA4GdxwoPEMcENzH9VyYYaW
+         28FBOIpAYgfO1eVaGhKC78clNExqLmzKZreW4LPoOgyUhI4OQNipxLyTnGUZG6i/Tp0K
+         6hZQlVLUJzLEUZSP5Gx5bUSrNxF47srBm6UBA5YXIUXz+hY8pnTskWM+QhhFqRDDkjEr
+         u0s0ZXNJa4l6Ut16PggdCINWPBg4O4o6Sl4Hb57g869ktv7smAr7bs2eop0nb7dmnbD2
+         hkzQ==
+X-Gm-Message-State: AOJu0YzItyBnkUJM/derJgvF7DK1T5uLSMYW5QhPRW/EnlqV+hObN6pb
+	FS/MyE/UWkBSlvU5iEYHeiGcFNaH0Xga7HuVD8h7u9IeRopwXQeGfDCMAXUMcc8rimZ3XWvFB2J
+	mdJrYgmZAd83Ui4rY4VJIs0aUFfdH5vpEDLkh
+X-Google-Smtp-Source: AGHT+IEJb118AnyH+IevWpP8ieDaJ3zOxvlDGJ+ue1Yu9AmuXk6CyrQ4osZTMiz0UibRY5dmfssTzDpYs57t5wU2or0=
+X-Received: by 2002:a0c:e113:0:b0:69b:1be3:e773 with SMTP id
+ w19-20020a0ce113000000b0069b1be3e773mr4168322qvk.5.1713564887745; Fri, 19 Apr
+ 2024 15:14:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240418042706.1261473-1-maheshb@google.com> <20240418185524.18801983@kernel.org>
+In-Reply-To: <20240418185524.18801983@kernel.org>
+From: =?UTF-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS14KS+4KSwKQ==?= <maheshb@google.com>
+Date: Fri, 19 Apr 2024 15:14:19 -0700
+Message-ID: <CAF2d9jhrC0uywa3NJLqgXGKauTEkGhK4A0YWorw4BV-fa5hbmg@mail.gmail.com>
+Subject: Re: [PATCHv2 next] ptp: update gettimex64 to provide ts optionally in
+ mono-raw base.
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>, 
+	David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Richard Cochran <richardcochran@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
+	Sagi Maimon <maimon.sagi@gmail.com>, Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>, 
+	Mahesh Bandewar <mahesh@bandewar.net>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add a selftest for netdev generic netlink. For now there is only a
-single test that exercises the `queue-get` API.
-
-The test works with netdevsim by default or with a real device by
-setting NETIF.
-
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- tools/testing/selftests/drivers/net/Makefile  |  1 +
- .../selftests/drivers/net/lib/py/env.py       |  6 +-
- tools/testing/selftests/drivers/net/queues.py | 59 +++++++++++++++++++
- tools/testing/selftests/net/lib/py/nsim.py    |  4 +-
- 4 files changed, 66 insertions(+), 4 deletions(-)
- create mode 100755 tools/testing/selftests/drivers/net/queues.py
-
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index 379cdb1960a7..118a73650dbc 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -3,5 +3,6 @@
- TEST_INCLUDES := $(wildcard lib/py/*.py)
- 
- TEST_PROGS := stats.py
-+TEST_PROGS += queues.py
- 
- include ../../lib.mk
-diff --git a/tools/testing/selftests/drivers/net/lib/py/env.py b/tools/testing/selftests/drivers/net/lib/py/env.py
-index e1abe9491daf..0ac4e9e6cd84 100644
---- a/tools/testing/selftests/drivers/net/lib/py/env.py
-+++ b/tools/testing/selftests/drivers/net/lib/py/env.py
-@@ -7,7 +7,7 @@ from lib.py import ip
- from lib.py import NetdevSimDev
- 
- class NetDrvEnv:
--    def __init__(self, src_path):
-+    def __init__(self, src_path, **kwargs):
-         self._ns = None
- 
-         self.env = os.environ.copy()
-@@ -16,11 +16,13 @@ class NetDrvEnv:
-         if 'NETIF' in self.env:
-             self.dev = ip("link show dev " + self.env['NETIF'], json=True)[0]
-         else:
--            self._ns = NetdevSimDev()
-+            self._ns = NetdevSimDev(**kwargs)
-             self.dev = self._ns.nsims[0].dev
-         self.ifindex = self.dev['ifindex']
- 
-     def __enter__(self):
-+        ip(f"link set dev {self.dev['ifname']} up")
-+
-         return self
- 
-     def __exit__(self, ex_type, ex_value, ex_tb):
-diff --git a/tools/testing/selftests/drivers/net/queues.py b/tools/testing/selftests/drivers/net/queues.py
-new file mode 100755
-index 000000000000..c23cd5a932cb
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/queues.py
-@@ -0,0 +1,59 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+from lib.py import ksft_run, ksft_eq, KsftSkipEx
-+from lib.py import NetdevFamily
-+from lib.py import NetDrvEnv
-+from lib.py import cmd
-+import glob
-+
-+
-+def sys_get_queues(ifname) -> int:
-+    folders = glob.glob(f'/sys/class/net/{ifname}/queues/rx-*')
-+    return len(folders)
-+
-+
-+def nl_get_queues(cfg, nl):
-+    queues = nl.queue_get({'ifindex': cfg.ifindex}, dump=True)
-+    if queues:
-+        return len([q for q in queues if q['type'] == 'rx'])
-+    return None
-+
-+
-+def get_queues(cfg, nl) -> None:
-+    queues = nl_get_queues(cfg, nl)
-+    if not queues:
-+        raise KsftSkipEx("queue-get not supported by device")
-+
-+    expected = sys_get_queues(cfg.dev['ifname'])
-+    ksft_eq(queues, expected)
-+
-+
-+def addremove_queues(cfg, nl) -> None:
-+    queues = nl_get_queues(cfg, nl)
-+    if not queues:
-+        raise KsftSkipEx("queue-get not supported by device")
-+
-+    expected = sys_get_queues(cfg.dev['ifname'])
-+    ksft_eq(queues, expected)
-+
-+    # reduce queue count by 1
-+    expected = expected - 1
-+    cmd(f"ethtool -L {cfg.dev['ifname']} combined {expected}")
-+    queues = nl_get_queues(cfg, nl)
-+    ksft_eq(queues, expected)
-+
-+    # increase queue count by 1
-+    expected = expected + 1
-+    cmd(f"ethtool -L {cfg.dev['ifname']} combined {expected}")
-+    queues = nl_get_queues(cfg, nl)
-+    ksft_eq(queues, expected)
-+
-+
-+def main() -> None:
-+    with NetDrvEnv(__file__, queue_count=3) as cfg:
-+        ksft_run([get_queues, addremove_queues], args=(cfg, NetdevFamily()))
-+
-+
-+if __name__ == "__main__":
-+    main()
-diff --git a/tools/testing/selftests/net/lib/py/nsim.py b/tools/testing/selftests/net/lib/py/nsim.py
-index 06896cdf7c18..f571a8b3139b 100644
---- a/tools/testing/selftests/net/lib/py/nsim.py
-+++ b/tools/testing/selftests/net/lib/py/nsim.py
-@@ -49,7 +49,7 @@ class NetdevSimDev:
-         with open(fullpath, "w") as f:
-             f.write(val)
- 
--    def __init__(self, port_count=1, ns=None):
-+    def __init__(self, port_count=1, queue_count=1, ns=None):
-         # nsim will spawn in init_net, we'll set to actual ns once we switch it there
-         self.ns = None
- 
-@@ -59,7 +59,7 @@ class NetdevSimDev:
-         addr = random.randrange(1 << 15)
-         while True:
-             try:
--                self.ctrl_write("new_device", "%u %u" % (addr, port_count))
-+                self.ctrl_write("new_device", "%u %u %u" % (addr, port_count, queue_count))
-             except OSError as e:
-                 if e.errno == errno.ENOSPC:
-                     addr = random.randrange(1 << 15)
--- 
-2.43.0
-
+On Thu, Apr 18, 2024 at 6:55=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Wed, 17 Apr 2024 21:27:06 -0700 Mahesh Bandewar wrote:
+> > --- a/include/uapi/linux/ptp_clock.h
+> > +++ b/include/uapi/linux/ptp_clock.h
+> > @@ -157,7 +157,12 @@ struct ptp_sys_offset {
+> >
+> >  struct ptp_sys_offset_extended {
+> >       unsigned int n_samples; /* Desired number of measurements. */
+> > -     unsigned int rsv[3];    /* Reserved for future use. */
+> > +     /* The original implementation provided timestamps (always) in
+> > +      * REALTIME clock-base. Since CLOCK_REALTIME is 0, adding
+> > +      * clockid doesn't break backward compatibility.
+> > +      */
+> > +     clockid_t clockid;      /* One of the supported clock-ids */
+> > +     unsigned int rsv[2];    /* Reserved for future use. */
+>
+> This suffers from a moderate inability to build:
+>
+> usr/include/linux/ptp_clock.h:164:2: error: unknown type name 'clockid_t'
+>   164 |         clockid_t clockid;      /* One of the supported clock-ids=
+ */
+>       |         ^
+Hmm, my bad, it didn't fail while I was testing/building. I should
+watch the bot checks more carefully :(
+I'll fix it in the next revision.
+> --
+> pw-bot: cr
 
