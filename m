@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-89637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E53288AAFCF
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:54:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 184028AAFD0
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:54:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A8791C2248A
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 13:54:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36EDF1C22463
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 13:54:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3EB12C81F;
-	Fri, 19 Apr 2024 13:54:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BA1C12D1F9;
+	Fri, 19 Apr 2024 13:54:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jjQS3YQZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TnKfys5w"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0C912AAFD
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 13:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA01312CD9C
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 13:54:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713534877; cv=none; b=Wi7wnWMhy6lUkEgL6lHJ1WUEXqcJkQbQR+0SL+ghgMnqoRSp0xTLifRrTi636Ri6jHFa5P1Ca/ONRuEci3TbR1/LGPEcs31n4Atn77guYanN9E5EbL4kUbJeGkuBROiBOtgw50i6HDYyqDkHiP1WwvB1+LA1Qj9BvXRFgcrTOBs=
+	t=1713534881; cv=none; b=GhCPkOErYagouBYYaxDut8hPJp45pQp6ZPxDp+mhfkSiGo6vsQpNH7BPbgHA7/hChZ8EN/f1PlVqz01h8poNp0uuGc0S+YODYZ8u0+D/Z7JieAHKgSId3rv0VGgA6TmGSQOzUf59bazyn32fWzCmU4UiCEwVC8CtkOEJazfKRnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713534877; c=relaxed/simple;
-	bh=aBTK1cJaMQMQrFN94QGOEJpdZKLOF9ZUWyTxuqqR9ZI=;
+	s=arc-20240116; t=1713534881; c=relaxed/simple;
+	bh=CWp+GN9qxCNPsKYqst03RWYow2bzxMOhkKlXCPAazAQ=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=oP/urvMpYtlpgJbvi5URxu1aNrbvq6wdToya/f8qpNPksVE+Q+N3bVlCKbZHKoF+ofuVSohldoQJLHsIfL4Oz6OpEJWvIKR+w5sdmOMvfSoQ87qLZB0CTH1m7NWcQW7sWRHLJs1D2WOZ7ilkNdcDd6WEaUcvyJ8UeXWccDCE1s4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jjQS3YQZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9AC0C2BD10;
-	Fri, 19 Apr 2024 13:54:34 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=QDv3cgQJhRh+7Fv9p0rTXFUmalK4IotmQPTccfyy6ri8rC88RtkegXsQTF+gu3ROPqLuO+gLIwuUwW8epSTCHK2JvN5sZEE3Z5tn0bj+4fn/6UySSP9qwyOmZLvrt88ZX91Z+q6euoP3TEKS6dQhpOSQ8+XHSa/8yI1hq545fJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TnKfys5w; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAC35C072AA;
+	Fri, 19 Apr 2024 13:54:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713534877;
-	bh=aBTK1cJaMQMQrFN94QGOEJpdZKLOF9ZUWyTxuqqR9ZI=;
+	s=k20201202; t=1713534880;
+	bh=CWp+GN9qxCNPsKYqst03RWYow2bzxMOhkKlXCPAazAQ=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=jjQS3YQZ8aXjG1ECwDUcQxy+tDl5xjyi+4y3b5WaP9ffi7H6Z1chXTxhXPXIAaihx
-	 UTxgKPREUHBoewxjRrAaI3QLnqXo54q3vgn3fDjvoUSkLHj04u3l3CbhAfTEKDZL58
-	 PaSnrF/AbdMW4SXWanCtwSO5SbvUm08PV5AiWs7dMa8jRAWc0S5dUT97FbbG/JVd2o
-	 y/3KD2RsbsgJrxOzWjmzAo36fYoh8dzyTABE/PSXfLi7m0S9CYRzHaySPzX1GxVsV7
-	 teFL2liTwxwbdZ4ntfMk4+4JdttKThKIsiQefF1rby13hdlymcleCtMhg+XkZ4pRBK
-	 gNKdTXlJnJUdQ==
+	b=TnKfys5wxez8UPWxcUBIahwp/o7JLdZVxTQniR/pA/6Jp+j426bWsrwZeU7vuDXhU
+	 cOjJjh5zR1BMj3nG+bw0QYxqmt0psJNYZ0bxSU0D/BVqVKtjEl19Y898jlXHSkVCLr
+	 IgMg/1I/reVw8jGmO7urO49EhroWLr7jWFPd7onNLwjuWaRLZTen9c1nOCMrBqBdYI
+	 bAYiSBvuTEGly+mKNWi5tdKSSpfAV/wuccDDsoaiR81EfodJXmlYHgGuwtuM9rjjVb
+	 kUGm8zx+iM7L4J8Fe85yi+se7c4JGBmUpj8pC7TUHXFVHcHefPwecvUmu/aTx7nTfV
+	 z1ht3LMjeBg4Q==
 From: Simon Horman <horms@kernel.org>
-Date: Fri, 19 Apr 2024 14:54:19 +0100
-Subject: [PATCH net-next 3/4] net: encx24j600: Correct spelling in comments
+Date: Fri, 19 Apr 2024 14:54:20 +0100
+Subject: [PATCH net-next 4/4] net: sparx5: Correct spelling in comments
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,7 +52,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240419-lan743x-confirm-v1-3-2a087617a3e5@kernel.org>
+Message-Id: <20240419-lan743x-confirm-v1-4-2a087617a3e5@kernel.org>
 References: <20240419-lan743x-confirm-v1-0-2a087617a3e5@kernel.org>
 In-Reply-To: <20240419-lan743x-confirm-v1-0-2a087617a3e5@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -71,70 +71,129 @@ Correct spelling in comments, as flagged by codespell.
 
 Signed-off-by: Simon Horman <horms@kernel.org>
 ---
- drivers/net/ethernet/microchip/encx24j600-regmap.c | 4 ++--
- drivers/net/ethernet/microchip/encx24j600.c        | 6 ++++--
- drivers/net/ethernet/microchip/encx24j600_hw.h     | 2 +-
- 3 files changed, 7 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c      | 2 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_packet.c    | 2 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_port.c      | 2 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c | 2 +-
+ drivers/net/ethernet/microchip/vcap/vcap_ag_api.h        | 2 +-
+ drivers/net/ethernet/microchip/vcap/vcap_api.c           | 4 ++--
+ drivers/net/ethernet/microchip/vcap/vcap_api_client.h    | 2 +-
+ drivers/net/ethernet/microchip/vcap/vcap_api_private.h   | 2 +-
+ 8 files changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/ethernet/microchip/encx24j600-regmap.c b/drivers/net/ethernet/microchip/encx24j600-regmap.c
-index 443128adbcb6..3885d6fbace1 100644
---- a/drivers/net/ethernet/microchip/encx24j600-regmap.c
-+++ b/drivers/net/ethernet/microchip/encx24j600-regmap.c
-@@ -75,7 +75,7 @@ static int regmap_encx24j600_sfr_read(void *context, u8 reg, u8 *val,
- 		if (unlikely(ret))
- 			return ret;
- 	} else {
--		/* Translate registers that are more effecient using
-+		/* Translate registers that are more efficient using
- 		 * 3-byte SPI commands
- 		 */
- 		switch (reg) {
-@@ -129,7 +129,7 @@ static int regmap_encx24j600_sfr_update(struct encx24j600_context *ctx,
- 		if (unlikely(ret))
- 			return ret;
- 	} else {
--		/* Translate registers that are more effecient using
-+		/* Translate registers that are more efficient using
- 		 * 3-byte SPI commands
- 		 */
- 		switch (reg) {
-diff --git a/drivers/net/ethernet/microchip/encx24j600.c b/drivers/net/ethernet/microchip/encx24j600.c
-index cdc2872ace1b..b011bf5c2305 100644
---- a/drivers/net/ethernet/microchip/encx24j600.c
-+++ b/drivers/net/ethernet/microchip/encx24j600.c
-@@ -569,7 +569,7 @@ static void encx24j600_dump_config(struct encx24j600_priv *priv,
- 	pr_info(DRV_NAME " MABBIPG: %04X\n", encx24j600_read_reg(priv,
- 								 MABBIPG));
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c b/drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c
+index 141897dfe388..1915998f6079 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c
+@@ -143,7 +143,7 @@ static void sparx5_fdma_rx_activate(struct sparx5 *sparx5, struct sparx5_rx *rx)
  
--	/* PHY configuation */
-+	/* PHY configuration */
- 	pr_info(DRV_NAME " PHCON1:  %04X\n", encx24j600_read_phy(priv, PHCON1));
- 	pr_info(DRV_NAME " PHCON2:  %04X\n", encx24j600_read_phy(priv, PHCON2));
- 	pr_info(DRV_NAME " PHANA:   %04X\n", encx24j600_read_phy(priv, PHANA));
-@@ -837,7 +837,9 @@ static void encx24j600_hw_tx(struct encx24j600_priv *priv)
- 		dump_packet("TX", priv->tx_skb->len, priv->tx_skb->data);
+ static void sparx5_fdma_rx_deactivate(struct sparx5 *sparx5, struct sparx5_rx *rx)
+ {
+-	/* Dectivate the RX channel */
++	/* Deactivate the RX channel */
+ 	spx5_rmw(0, BIT(rx->channel_id) & FDMA_CH_ACTIVATE_CH_ACTIVATE,
+ 		 sparx5, FDMA_CH_ACTIVATE);
  
- 	if (encx24j600_read_reg(priv, EIR) & TXABTIF)
--		/* Last transmition aborted due to error. Reset TX interface */
-+		/* Last transmission aborted due to error.
-+		 * Reset TX interface
-+		 */
- 		encx24j600_reset_hw_tx(priv);
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
+index ac7e1cffbcec..f3f5fb420468 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
+@@ -67,7 +67,7 @@ static void sparx5_xtr_grp(struct sparx5 *sparx5, u8 grp, bool byte_swap)
+ 	for (i = 0; i < IFH_LEN; i++)
+ 		ifh[i] = spx5_rd(sparx5, QS_XTR_RD(grp));
  
- 	/* Clear the TXIF flag if were previously set */
-diff --git a/drivers/net/ethernet/microchip/encx24j600_hw.h b/drivers/net/ethernet/microchip/encx24j600_hw.h
-index 34c5a289898c..2522f4f48b67 100644
---- a/drivers/net/ethernet/microchip/encx24j600_hw.h
-+++ b/drivers/net/ethernet/microchip/encx24j600_hw.h
-@@ -243,7 +243,7 @@ int devm_regmap_init_encx24j600(struct device *dev,
+-	/* Decode IFH (whats needed) */
++	/* Decode IFH (what's needed) */
+ 	sparx5_ifh_parse(ifh, &fi);
  
- /* MAIPG */
- /* value of the high byte is given by the reserved bits,
-- * value of the low byte is recomended setting of the
-+ * value of the low byte is recommended setting of the
-  * IPG parameter.
+ 	/* Map to port netdev */
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_port.c b/drivers/net/ethernet/microchip/sparx5/sparx5_port.c
+index 60dd2fd603a8..062e486c002c 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_port.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_port.c
+@@ -370,7 +370,7 @@ static int sparx5_port_disable(struct sparx5 *sparx5, struct sparx5_port *port,
+ 	/* 6: Wait while the last frame is exiting the queues */
+ 	usleep_range(8 * spd_prm, 10 * spd_prm);
+ 
+-	/* 7: Flush the queues accociated with the port->portno */
++	/* 7: Flush the queues associated with the port->portno */
+ 	spx5_rmw(HSCH_FLUSH_CTRL_FLUSH_PORT_SET(port->portno) |
+ 		 HSCH_FLUSH_CTRL_FLUSH_DST_SET(1) |
+ 		 HSCH_FLUSH_CTRL_FLUSH_SRC_SET(1) |
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c b/drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c
+index 4af85d108a06..0b4abc3eb53d 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c
+@@ -190,7 +190,7 @@ static int sparx5_port_bridge_join(struct sparx5_port *port,
+ 	/* Remove standalone port entry */
+ 	sparx5_mact_forget(sparx5, ndev->dev_addr, 0);
+ 
+-	/* Port enters in bridge mode therefor don't need to copy to CPU
++	/* Port enters in bridge mode therefore don't need to copy to CPU
+ 	 * frames for multicast in case the bridge is not requesting them
+ 	 */
+ 	__dev_mc_unsync(ndev, sparx5_mc_unsync);
+diff --git a/drivers/net/ethernet/microchip/vcap/vcap_ag_api.h b/drivers/net/ethernet/microchip/vcap/vcap_ag_api.h
+index c3569a4c7b69..4735fad05708 100644
+--- a/drivers/net/ethernet/microchip/vcap/vcap_ag_api.h
++++ b/drivers/net/ethernet/microchip/vcap/vcap_ag_api.h
+@@ -290,7 +290,7 @@ enum vcap_keyfield_set {
+  *   Sparx5: TCP flag RST , LAN966x: TCP: TCP flag RST. PTP over UDP: messageType
+  *   bit 3
+  * VCAP_KF_L4_SEQUENCE_EQ0_IS: W1, sparx5: is2/es2, lan966x: is2
+- *   Set if TCP sequence number is 0, LAN966x: Overlayed with PTP over UDP:
++ *   Set if TCP sequence number is 0, LAN966x: Overlaid with PTP over UDP:
+  *   messageType bit 0
+  * VCAP_KF_L4_SPORT: W16, sparx5: is0/is2/es2, lan966x: is1/is2
+  *   TCP/UDP source port
+diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api.c b/drivers/net/ethernet/microchip/vcap/vcap_api.c
+index 80ae5e1708a6..a3b1dc7a5448 100644
+--- a/drivers/net/ethernet/microchip/vcap/vcap_api.c
++++ b/drivers/net/ethernet/microchip/vcap/vcap_api.c
+@@ -327,7 +327,7 @@ static int vcap_find_keystream_typegroup_sw(struct vcap_control *vctrl,
+ }
+ 
+ /* Verify that the typegroup information, subword count, keyset and type id
+- * are in sync and correct, return the list of matchin keysets
++ * are in sync and correct, return the list of matching keysets
   */
- #define MAIPGH_VAL 0x0C
+ int
+ vcap_find_keystream_keysets(struct vcap_control *vctrl,
+@@ -2943,7 +2943,7 @@ void vcap_netbytes_copy(u8 *dst, u8 *src, int count)
+ }
+ EXPORT_SYMBOL_GPL(vcap_netbytes_copy);
+ 
+-/* Convert validation error code into tc extact error message */
++/* Convert validation error code into tc exact error message */
+ void vcap_set_tc_exterr(struct flow_cls_offload *fco, struct vcap_rule *vrule)
+ {
+ 	switch (vrule->exterr) {
+diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api_client.h b/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
+index 56874f2adbba..d6c3e90745a7 100644
+--- a/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
++++ b/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
+@@ -238,7 +238,7 @@ const struct vcap_set *vcap_keyfieldset(struct vcap_control *vctrl,
+ /* Copy to host byte order */
+ void vcap_netbytes_copy(u8 *dst, u8 *src, int count);
+ 
+-/* Convert validation error code into tc extact error message */
++/* Convert validation error code into tc exact error message */
+ void vcap_set_tc_exterr(struct flow_cls_offload *fco, struct vcap_rule *vrule);
+ 
+ /* Cleanup a VCAP instance */
+diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api_private.h b/drivers/net/ethernet/microchip/vcap/vcap_api_private.h
+index df81d9ff502b..844bdf6b5f45 100644
+--- a/drivers/net/ethernet/microchip/vcap/vcap_api_private.h
++++ b/drivers/net/ethernet/microchip/vcap/vcap_api_private.h
+@@ -109,7 +109,7 @@ int vcap_addr_keysets(struct vcap_control *vctrl, struct net_device *ndev,
+ 		      struct vcap_keyset_list *kslist);
+ 
+ /* Verify that the typegroup information, subword count, keyset and type id
+- * are in sync and correct, return the list of matchin keysets
++ * are in sync and correct, return the list of matching keysets
+  */
+ int vcap_find_keystream_keysets(struct vcap_control *vctrl, enum vcap_type vt,
+ 				u32 *keystream, u32 *mskstream, bool mask,
 
 -- 
 2.43.0
