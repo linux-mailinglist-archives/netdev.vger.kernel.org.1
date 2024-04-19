@@ -1,176 +1,193 @@
-Return-Path: <netdev+bounces-89603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A95708AAD76
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 13:11:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C240E8AADA6
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 13:23:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CBCA1F220F9
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 11:11:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 002DEB21BB6
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 11:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14FCD80618;
-	Fri, 19 Apr 2024 11:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C2108121F;
+	Fri, 19 Apr 2024 11:23:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m00dxP3c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VSJuqqsu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08D980029;
-	Fri, 19 Apr 2024 11:11:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 517F12E405;
+	Fri, 19 Apr 2024 11:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713525092; cv=none; b=Q8XV0i6HrGTg++uNVUnPMSmXWbAwfNVS8/2WqnkY/QHTacj/hTCGFP8ovAfZsxA2/+KrUtl5m3Uma9FrWgvbd1R39lQQR6ET319nZQNxolU/ydWZDNhdgfem7WOPPovlrSCcL4TXHnTnVzWQep1VEhveqHKpb2r9o/cb9t+pj2w=
+	t=1713525812; cv=none; b=NY6mw/yFZbulPMDAln9V9YQz0nllpgqlm1RL5Kjj/p47SkM5BHaBMa0do/CriEnZjQkzHgodvnJWnwm2qasC0Pnfbf+dw+RjNcdBSpg0IqmLCLZxOZD1gz2XtVyHzTCHYYBOfnaRzmGypayrBi3cD41QuBjlt17EpmQDg6ZQ7Nc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713525092; c=relaxed/simple;
-	bh=tcVBXciOzJSjulAKa3MG3FY6QKb2BBsFafnZyQuc03o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QI6PGUKixVeIkCaOZQLqmMG9LOYvm7LuQehiemNONHeab/7E6RFxa9IjqbxelyEc/+EJP0JbFRKIvXb3W95nyhzIqBvDXf/iAm8xshVf3Bgt044+p8opcXAHCSvEofKOaiuaoi9dUcBOMwTE3Jx3Ve4FMyRgxLWcY3W/bQqoE3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m00dxP3c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A63EC072AA;
-	Fri, 19 Apr 2024 11:11:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713525091;
-	bh=tcVBXciOzJSjulAKa3MG3FY6QKb2BBsFafnZyQuc03o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=m00dxP3c/BmPRRNScAadFz8crQe41rfOZCmIb9HJiEVPT1VK5LNtZoCsEflJi6dTx
-	 EcbnNxdh4K+q3VdEgdsRYynzouqFgYNX/ieC1iA+8Sc4iPPWGwUdC221sbiPk5IO+/
-	 0f2CoFjzhWRMISHSkQkUd9ZJJK/bAyO1og7lznqNzBrowVMtDu+NT6DzIDv2jNAnZG
-	 Ep/FqAPfllkBx//uzrj6pUywdPBA/+gwMJbFAj2I+DkHSFIXAfTkfsvPkNui7R4DF1
-	 eapbdjBfsnUwCUEd9WwS1sUqNIhK4eQo7ctgv5WFd+m7MLM0N8pI4qc92qqilJ8LzX
-	 sbI0MJy/8nfuA==
-Date: Fri, 19 Apr 2024 12:11:26 +0100
-From: Simon Horman <horms@kernel.org>
-To: Sam Sun <samsun1006219@gmail.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	j.vosburgh@gmail.com, Hangbin Liu <liuhangbin@gmail.com>,
-	Eric Dumazet <edumazet@google.com>, pabeni@redhat.com,
-	kuba@kernel.org, andy@greyhouse.net, davem@davemloft.net
-Subject: Re: [PATCH net v3] drivers/net/bonding: Fix out-of-bounds read in
- bond_option_arp_ip_targets_set()
-Message-ID: <20240419111126.GU3975545@kernel.org>
-References: <CAEkJfYOnsLLiCrtgOpq2Upr+_W0dViYVHU8YdjJOi-mxD8H9oQ@mail.gmail.com>
- <20240416142428.GO2320920@kernel.org>
- <CAEkJfYPR-jeZoVz63b2UmvjgBOen7DDy8yyrojLckD9OT2XaiQ@mail.gmail.com>
- <20240418201023.GS3975545@kernel.org>
+	s=arc-20240116; t=1713525812; c=relaxed/simple;
+	bh=0kkw8bkTTz7qpeiQW0WRFjug7VupQ7REApR8PXhPSz0=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=HIpaALIDOAuki0vF9Ua6ULJuQyjxrnnk/tzLsQcZS5esLdcfUEjNJRdJJtFlAEJC0lsUMVNFcUGBQqpgnt+LAY0jXmUbVmv+WqHTVGp8libeFwVrSFbrl6OaWYNw1yCDs+/k6Hi7q8/hBtiM+oyD7tPqIA5N+TK/gyZm5GKaHsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VSJuqqsu; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-418c0d83d18so14080595e9.0;
+        Fri, 19 Apr 2024 04:23:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713525808; x=1714130608; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=snFlYp4KgV+yLc6IElZhwwDwX1ADO6EDxPHFaCHHkjA=;
+        b=VSJuqqsury0QZ+CZHKDlLhtyoHReSl3sva6xdOaagNDY+ANJF4i5UCpRs/uVn6T8wD
+         yopOPdzE+juPR0gj9snYKX0jxTZFMo/wsbrdCFpeh5sRFQ67Mvog+EBTVmz2b918ZFjb
+         oHDBC88Wf9vtGl4OdHrz09MJPovBMYtyN/Oji6WCS7GnUohfPPqMqpq5YVPGxcT5Nt/A
+         3K2H11frUxji5Hq/x02aiX5nOG5oAerQClmadVK1Rva/1THbI6mvt5ZL1ZMAagZCz9kG
+         MGYRz7tR6hL9evvKGRoMWhqoJGPOOyyOTL5FNbtoclkpyUPGU6BiITt/lsb9PcZ/XMfX
+         8qEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713525808; x=1714130608;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=snFlYp4KgV+yLc6IElZhwwDwX1ADO6EDxPHFaCHHkjA=;
+        b=uNQzbQWuzceTvlqF6JIjexzC3wykAA795nbBIrVuUIJ6Bpmzj+Bg1SdabSYPqg5Brv
+         XN2YxGyDGr45DXmOTLV007DiRvFnL8oLgeaxvGUHqAEzBFmmWqK0eNudq9Mqakr1rBxY
+         /LEvx76RTF7WA3VpAX78g02iP45Oi5xKGjTKyh+VNdmJTUIIMFPe9+VNfbFSE770EE+P
+         uvIo8Qbk6sjAh1kwUIdmyj8QkTwoVTO5lFvYLJ4DuKyIob7yfy6tLbu0N4QDHbGQpsxr
+         BbBB5OoQm1TgMT0FeQV43hBCPPM7tmmI7t2LQn7FRj9c4SxngLyoSuNDeYYK5GvN2zqy
+         +kYw==
+X-Forwarded-Encrypted: i=1; AJvYcCXWBEb/JCLu1gCwj58x33AOCpq5Km5T1zre4BjVePcqrTY8hfuj93+ZTtvfpIqRUAa6PWzaUmuI1J3Ae3dJM4KSngbeiEf5eZuaatofrOdu
+X-Gm-Message-State: AOJu0YypsLowREFLxhWtT5K/7G/rfkHekNURKKV9lSWCGRFJ87Wsl3hH
+	5Waxua/94iyNM/ydVlKY8ADzTKtfEIcdZ730Zw9MmnETpIuoTPGk
+X-Google-Smtp-Source: AGHT+IFeYf5HXUSQA81O5QO2J7a9UD4lVm/Kn9ZNwdXApO682UXvzybci9IW3JRCl4BhviaOmSIOZg==
+X-Received: by 2002:a05:600c:350b:b0:418:d4e6:30cf with SMTP id h11-20020a05600c350b00b00418d4e630cfmr1164254wmq.14.1713525808302;
+        Fri, 19 Apr 2024 04:23:28 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:d172:310a:8388:5ffb])
+        by smtp.gmail.com with ESMTPSA id f7-20020a05600c154700b004190d7126c0sm1654348wmg.38.2024.04.19.04.23.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Apr 2024 04:23:27 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netdev@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,  "David S.
+ Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Paolo
+ Abeni <pabeni@redhat.com>,  Jiri Pirko <jiri@resnulli.us>,  Jacob Keller
+ <jacob.e.keller@intel.com>,  Jozsef Kadlecsik <kadlec@netfilter.org>,
+  netfilter-devel@vger.kernel.org,  coreteam@netfilter.org,
+  donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v4 4/4] netfilter: nfnetlink: Handle ACK flags
+ for batch messages
+In-Reply-To: <ZiFKvyvojcIqMQ3R@calendula> (Pablo Neira Ayuso's message of
+	"Thu, 18 Apr 2024 18:30:55 +0200")
+Date: Fri, 19 Apr 2024 12:20:25 +0100
+Message-ID: <m2a5lpha4m.fsf@gmail.com>
+References: <20240418104737.77914-1-donald.hunter@gmail.com>
+	<20240418104737.77914-5-donald.hunter@gmail.com>
+	<ZiFKvyvojcIqMQ3R@calendula>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240418201023.GS3975545@kernel.org>
+Content-Type: text/plain
 
-On Thu, Apr 18, 2024 at 09:10:23PM +0100, Simon Horman wrote:
-> On Wed, Apr 17, 2024 at 02:34:49PM +0800, Sam Sun wrote:
-> > On Tue, Apr 16, 2024 at 10:24 PM Simon Horman <horms@kernel.org> wrote:
-> > >
-> > > On Tue, Apr 16, 2024 at 08:09:44PM +0800, Sam Sun wrote:
-> > > > In function bond_option_arp_ip_targets_set(), if newval->string is an
-> > > > empty string, newval->string+1 will point to the byte after the
-> > > > string, causing an out-of-bound read.
-> > > >
-> > > > BUG: KASAN: slab-out-of-bounds in strlen+0x7d/0xa0 lib/string.c:418
-> > > > Read of size 1 at addr ffff8881119c4781 by task syz-executor665/8107
-> > > > CPU: 1 PID: 8107 Comm: syz-executor665 Not tainted 6.7.0-rc7 #1
-> > > > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-> > > > Call Trace:
-> > > >  <TASK>
-> > > >  __dump_stack lib/dump_stack.c:88 [inline]
-> > > >  dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
-> > > >  print_address_description mm/kasan/report.c:364 [inline]
-> > > >  print_report+0xc1/0x5e0 mm/kasan/report.c:475
-> > > >  kasan_report+0xbe/0xf0 mm/kasan/report.c:588
-> > > >  strlen+0x7d/0xa0 lib/string.c:418
-> > > >  __fortify_strlen include/linux/fortify-string.h:210 [inline]
-> > > >  in4_pton+0xa3/0x3f0 net/core/utils.c:130
-> > > >  bond_option_arp_ip_targets_set+0xc2/0x910
-> > > > drivers/net/bonding/bond_options.c:1201
-> > > >  __bond_opt_set+0x2a4/0x1030 drivers/net/bonding/bond_options.c:767
-> > > >  __bond_opt_set_notify+0x48/0x150 drivers/net/bonding/bond_options.c:792
-> > > >  bond_opt_tryset_rtnl+0xda/0x160 drivers/net/bonding/bond_options.c:817
-> > > >  bonding_sysfs_store_option+0xa1/0x120 drivers/net/bonding/bond_sysfs.c:156
-> > > >  dev_attr_store+0x54/0x80 drivers/base/core.c:2366
-> > > >  sysfs_kf_write+0x114/0x170 fs/sysfs/file.c:136
-> > > >  kernfs_fop_write_iter+0x337/0x500 fs/kernfs/file.c:334
-> > > >  call_write_iter include/linux/fs.h:2020 [inline]
-> > > >  new_sync_write fs/read_write.c:491 [inline]
-> > > >  vfs_write+0x96a/0xd80 fs/read_write.c:584
-> > > >  ksys_write+0x122/0x250 fs/read_write.c:637
-> > > >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> > > >  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
-> > > >  entry_SYSCALL_64_after_hwframe+0x63/0x6b
-> > > > ---[ end trace ]---
-> > > >
-> > > > Fix it by adding a check of string length before using it.
-> > > >
-> > > > v2
-> > > > According to Jay and Hangbin's opinion, remove target address in
-> > > > netdev_err message since target is not initialized in error path and
-> > > > will not provide useful information.
-> > > >
-> > > > v3
-> > > > According to Hangbin's opinion, change Fixes tag from 4fb0ef585eb2
-> > > > ("bonding: convert arp_ip_target to use the new option API") to
-> > > > f9de11a16594 ("bonding: add ip checks when store ip target").
-> > > >
-> > > > Fixes: f9de11a16594 ("bonding: add ip checks when store ip target")
-> > > > Signed-off-by: Yue Sun <samsun1006219@gmail.com>
-> > > > ---
-> > >
-> > > Hi Sam Sun,
-> > >
-> > > Some comments about the formatting of this submission:
-> > >
-> > > * The list of chances, (v2, v3, ...) should be below rather than
-> > >   above the scissors ("---"), so it is not included when the patch
-> > >   is applied.
-> > >
-> > > * Looking at git history, the patch prefix should probably be "bonding:"
-> > >
-> > >         Subject: [PATCH net v3] bonding: ...
-> > >
-> > > * The diff seems to be a bit mangled, f.e. tabs seem to
-> > >   have been translated into spaces. So it does not apply.
-> > >   Which breaks automated testing. And for this reason
-> > >   I am asking you to repost this patch.
-> > >
-> > >   git send-email, and b4, are two tools that can typically be used
-> > >   to send patches in a way that this doesn't occur.
-> > >
-> > > ---
-> > > pw-bot: changes-requested
-> > 
-> > I sincerely apologize for not using git send-email. I tried to set up
-> > the environment but it did not work. For some reason, I needed to use
-> > a proxy to connect with my gmail account, but the proxy service
-> > provider banned using their proxy to send email through smtp. Maybe I
-> > need to rent a VPS and set up a working environment there, but it
-> > would take time and I don't know for sure whether the VPS provider
-> > would allow me to send email through smtp either.
-> > 
-> > Could you or anyone please help me submit this patch? Sorry for
-> > causing this trouble.
-> 
-> Sure, happy to help.
-> 
-> I'll look at doing this tomororw (Friday),
-> unless someone else does so beforehand.
+Pablo Neira Ayuso <pablo@netfilter.org> writes:
 
-I have posted the patch as v4.
-The only changes were:
-* Correct whitespace problems,
-  which I assume were added in transit as discussed above.
-* Update the patch prefix to 'bonding:' as described above
-* Move the changelog to below the scissors, as described above
+> Hi Donald,
+>
+> Apologies for a bit late jumping back on this, it took me a while.
+>
+> On Thu, Apr 18, 2024 at 11:47:37AM +0100, Donald Hunter wrote:
+>> The NLM_F_ACK flag is ignored for nfnetlink batch begin and end
+>> messages. This is a problem for ynl which wants to receive an ack for
+>> every message it sends, not just the commands in between the begin/end
+>> messages.
+>
+> Just a side note: Turning on NLM_F_ACK for every message fills up the
+> receiver buffer very quickly, leading to ENOBUFS. Netlink, in general,
+> supports batching (with non-atomic semantics), I did not look at ynl
+> in detail, if it does send() + recv() for each message for other
+> subsystem then fine, but if it uses batching to amortize the cost of
+> the syscall then this explicit ACK could be an issue with very large
+> batches.
 
-- [PATCH net v4] bonding: Fix out-of-bounds read in bond_option_arp_ip_targets_set()
-  https://lore.kernel.org/netdev/20240419-bond-oob-v4-1-69dd1a66db20@kernel.org/
+ynl is batching the messages for send() and will accept batches from
+recv() but nfnetlink is sending each ack separately. It is using
+netlink_ack() which uses a new skb for each message, for example:
 
+sudo strace -e sendto,recvfrom ./tools/net/ynl/cli.py \
+     --spec Documentation/netlink/specs/nftables.yaml \
+     --multi batch-begin '{"res-id": 10}' \
+     --multi newtable '{"name": "test", "nfgen-family": 1}' \
+     --multi newchain '{"name": "chain", "table": "test", "nfgen-family": 1}' \
+     --multi batch-end '{"res-id": 10}'
+sendto(3, [[{nlmsg_len=20, nlmsg_type=0x10 /* NLMSG_??? */, nlmsg_flags=NLM_F_REQUEST|NLM_F_ACK, nlmsg_seq=28254, nlmsg_pid=0}, "\x00\x00\x00\x0a"], [{nlmsg_len=32, nlmsg_type=0xa00 /* NLMSG_??? */, nlmsg_flags=NLM_F_REQUEST|NLM_F_ACK, nlmsg_seq=28255, nlmsg_pid=0}, "\x01\x00\x00\x00\x09\x00\x01\x00\x74\x65\x73\x74\x00\x00\x00\x00"], [{nlmsg_len=44, nlmsg_type=0xa03 /* NLMSG_??? */, nlmsg_flags=NLM_F_REQUEST|NLM_F_ACK, nlmsg_seq=28256, nlmsg_pid=0}, "\x01\x00\x00\x00\x0a\x00\x03\x00\x63\x68\x61\x69\x6e\x00\x00\x00\x09\x00\x01\x00\x74\x65\x73\x74\x00\x00\x00\x00"], [{nlmsg_len=20, nlmsg_type=0x11 /* NLMSG_??? */, nlmsg_flags=NLM_F_REQUEST|NLM_F_ACK, nlmsg_seq=28257, nlmsg_pid=0}, "\x00\x00\x00\x0a"]], 116, 0, NULL, 0) = 116
+recvfrom(3, [{nlmsg_len=36, nlmsg_type=NLMSG_ERROR, nlmsg_flags=NLM_F_CAPPED, nlmsg_seq=28254, nlmsg_pid=997}, {error=0, msg={nlmsg_len=20, nlmsg_type=NFNL_MSG_BATCH_BEGIN, nlmsg_flags=NLM_F_REQUEST|NLM_F_ACK, nlmsg_seq=28254, nlmsg_pid=0}}], 131072, 0, NULL, NULL) = 36
+recvfrom(3, [{nlmsg_len=36, nlmsg_type=NLMSG_ERROR, nlmsg_flags=NLM_F_CAPPED, nlmsg_seq=28255, nlmsg_pid=997}, {error=0, msg={nlmsg_len=32, nlmsg_type=NFNL_SUBSYS_NFTABLES<<8|NFT_MSG_NEWTABLE, nlmsg_flags=NLM_F_REQUEST|NLM_F_ACK, nlmsg_seq=28255, nlmsg_pid=0}}], 131072, 0, NULL, NULL) = 36
+recvfrom(3, [{nlmsg_len=36, nlmsg_type=NLMSG_ERROR, nlmsg_flags=NLM_F_CAPPED, nlmsg_seq=28256, nlmsg_pid=997}, {error=0, msg={nlmsg_len=44, nlmsg_type=NFNL_SUBSYS_NFTABLES<<8|NFT_MSG_NEWCHAIN, nlmsg_flags=NLM_F_REQUEST|NLM_F_ACK, nlmsg_seq=28256, nlmsg_pid=0}}], 131072, 0, NULL, NULL) = 36
+recvfrom(3, [{nlmsg_len=36, nlmsg_type=NLMSG_ERROR, nlmsg_flags=NLM_F_CAPPED, nlmsg_seq=28257, nlmsg_pid=997}, {error=0, msg={nlmsg_len=20, nlmsg_type=NFNL_MSG_BATCH_END, nlmsg_flags=NLM_F_REQUEST|NLM_F_ACK, nlmsg_seq=28257, nlmsg_pid=0}}], 131072, 0, NULL, NULL) = 36
 
+> Out of curiosity: Why does the tool need an explicit ack for each
+> command? As mentioned above, this consumes a lot netlink bandwidth.
+
+For the ynl python library, I guess it was a design choice to request an
+ack for each command.
+
+Since the Netlink API allows a user to request acks, it seems necessary
+to be consistent about providing them. Otherwise we'd need to extend the
+netlink message specs to say which messages are ack capable and which
+are not.
+
+>> Add processing for ACKs for begin/end messages and provide responses
+>> when requested.
+>> 
+>> I have checked that iproute2, pyroute2 and systemd are unaffected by
+>> this change since none of them use NLM_F_ACK for batch begin/end.
+>
+> nitpick: Quick grep shows me iproute2 does not use the nfnetlink
+> subsystem? If I am correct, maybe remove this.
+
+Yeah, my mistake. I did check iproute2 but didn't mean to add it to the
+list. For nft, NFNL_MSG_BATCH_* usage is contained in libnftnl from what
+I can see. I'll update the patch.
+
+> Thanks!
+>
+> One more comment below.
+
+Did you miss adding a comment?
+
+>
+>> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+>> ---
+>>  net/netfilter/nfnetlink.c | 5 +++++
+>>  1 file changed, 5 insertions(+)
+>> 
+>> diff --git a/net/netfilter/nfnetlink.c b/net/netfilter/nfnetlink.c
+>> index c9fbe0f707b5..4abf660c7baf 100644
+>> --- a/net/netfilter/nfnetlink.c
+>> +++ b/net/netfilter/nfnetlink.c
+>> @@ -427,6 +427,9 @@ static void nfnetlink_rcv_batch(struct sk_buff *skb, struct nlmsghdr *nlh,
+>>  
+>>  	nfnl_unlock(subsys_id);
+>>  
+>> +	if (nlh->nlmsg_flags & NLM_F_ACK)
+>> +		nfnl_err_add(&err_list, nlh, 0, &extack);
+>> +
+>>  	while (skb->len >= nlmsg_total_size(0)) {
+>>  		int msglen, type;
+>>  
+>> @@ -573,6 +576,8 @@ static void nfnetlink_rcv_batch(struct sk_buff *skb, struct nlmsghdr *nlh,
+>>  		} else if (err) {
+>>  			ss->abort(net, oskb, NFNL_ABORT_NONE);
+>>  			netlink_ack(oskb, nlmsg_hdr(oskb), err, NULL);
+>> +		} else if (nlh->nlmsg_flags & NLM_F_ACK) {
+>> +			nfnl_err_add(&err_list, nlh, 0, &extack);
+>>  		}
+>>  	} else {
+>>  		enum nfnl_abort_action abort_action;
+>> -- 
+>> 2.44.0
+>> 
 
