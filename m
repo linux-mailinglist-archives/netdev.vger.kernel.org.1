@@ -1,68 +1,84 @@
-Return-Path: <netdev+bounces-89679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E103E8AB244
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:47:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B0698AB266
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:51:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D527282F8C
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:47:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD6B41C2337A
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:51:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA13612FF9C;
-	Fri, 19 Apr 2024 15:47:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02C78130A55;
+	Fri, 19 Apr 2024 15:50:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IdnBr154"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OHj3fHUB"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44D4D12FB34;
-	Fri, 19 Apr 2024 15:47:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A52BC77F13;
+	Fri, 19 Apr 2024 15:50:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713541638; cv=none; b=lPrTpvtKOG4Nk+7Lre8OoWs+fc2uf9fqyNP06iYuLxhZ+esTuKl/nyvlf4FY/e17eIl1/OL6ca302VId6Iwu6YrGz9oKtqm3RZ2lKRj8inRI9eBphSWPhL05xVDWrp3jWo2rJ4SMLadnQPQNxSHpKk3a4SZIcfPwqcQE4RPW3OQ=
+	t=1713541839; cv=none; b=llxUtTwdAiKq8S2FEKL8LydSacvUQ9TpvrR9IJhg6N05U6DgWqyv6AGjaWydIydVEz5g0C0lpIwrVRZkWuNf/mYF7s6xZI1D5eBUk476x9Pph/MxBKWrwKPxcSuyAi/6wqycKbzEIdg91jxUnH9NppKyaWOLzDxaonOTtiP4YfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713541638; c=relaxed/simple;
-	bh=EL9kCsTV22lvYw6+slnwCr5qeD8Oo1czDJiqY4Q9Kwc=;
+	s=arc-20240116; t=1713541839; c=relaxed/simple;
+	bh=4syrMVBjLG+mqSAuWdu45onjerLE6hugRcJZYIbTm9w=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BiipVfu77P9T0bRDUP+pr6qK1tKJDOJaDfu0x9hcaTZkAIKW8iHE3FLTKpY5KbAbVCCl4YKbOH7fT2otDEqHRNG1Wh9pW3UIUwcDd9GmfHc93go57cEyME61e7/BAjsZ9P1vf5xBNpp5GYLVTW8HMpiEj54uoF7IbspcJphQGXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IdnBr154; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=JLXEF/5VB2hcB1dYfUi8oj/pSt/FLjk9X5NuzMP6VaU=; b=IdnBr15472jY5I52M21qLM7ixL
-	43CCwNezqBDlC3cUaCOsoyfDJO7Bi19fT7afae4F14aeBNn5R/bikFzt3U7MW9BtYCPcXUISx13pk
-	M/V2QS7uzu6ltce8i7LCBVEHBBKUb0RZxyWI7JDcNvxSL5YfJ5Cc5c29ATNCvW6e8ll8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rxqS8-00DSp2-Iz; Fri, 19 Apr 2024 17:47:04 +0200
-Date: Fri, 19 Apr 2024 17:47:04 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Josua Mayer <josua@solid-run.com>
-Cc: Michael Hennerich <michael.hennerich@analog.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=eRQOzsrj/ljKZqDXeCjzoqjDfNZ7gDiQqNMj/V3zxy6Yy3GW8lNZ8Wpj+4Ze0h9to0OYve361+ZtgU+i+EptEWjNOZhPbTulto8OduVyHbVsfZKROE8yHI0m5CxDzD1YOGYxJOieOXc7RpR1PtGT81f/avI2+EjtzQDf6o8E0W0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OHj3fHUB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B33F9C3277B;
+	Fri, 19 Apr 2024 15:50:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713541839;
+	bh=4syrMVBjLG+mqSAuWdu45onjerLE6hugRcJZYIbTm9w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OHj3fHUBZ5oW6uWZr153zLjsZ6q0yv8DxwxD0Zy4isctsEWry5XXGSfR8Vc3hMrh/
+	 vizLT7qFrrEF533kmJCP3HWtZ7Qzr6mVAw251VXfA8O2WlqLyeSYgvuFfPALuIdv03
+	 8KfWQePVkfruiceot7yZycnjNdoMZw4MifC81l3AU9dBYam0QRDoIaUN7a6lFYb8MN
+	 K0Whze6qtl25bkJdh4oiv03gWibiSz5LhY9l5mv+w3PTDhkRKRk4JGDzV2xKnexhV7
+	 tGBMGlG1WEFnNmkggVGWaWOAgxzIa+Avjitv3Mny3kNElAG5XpvzSHnQsEDp7b51Tm
+	 Ziw7Ozh3aQ/+w==
+Date: Fri, 19 Apr 2024 18:49:17 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: Masami Hiramatsu <masami.hiramatsu@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Alexandre Ghiti <alexghiti@rivosinc.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	=?iso-8859-1?Q?Bj=F6rn_T=F6pel?= <bjorn@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandru Tachici <alexandru.tachici@analog.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Jon Nettleton <jon@solid-run.com>,
-	Yazan Shhady <yazan.shhady@solid-run.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: phy: adin: add support for setting
- led-, link-status-pin polarity
-Message-ID: <65411c68-c76a-499d-88c7-e80ca59a3027@lunn.ch>
-References: <20240419-adin-pin-polarity-v1-0-eaae8708db8d@solid-run.com>
- <20240419-adin-pin-polarity-v1-2-eaae8708db8d@solid-run.com>
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Donald Dutile <ddutile@redhat.com>,
+	Eric Chanudet <echanude@redhat.com>,
+	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Puranjay Mohan <puranjay12@gmail.com>,
+	Rick Edgecombe <rick.p.edgecombe@intel.com>,
+	Russell King <linux@armlinux.org.uk>, Song Liu <song@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+	bpf@vger.kernel.org, linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-mips@vger.kernel.org,
+	linux-mm@kvack.org, linux-modules@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev,
+	netdev@vger.kernel.org, sparclinux@vger.kernel.org, x86@kernel.org
+Subject: Re: [PATCH v4 14/15] kprobes: remove dependency on CONFIG_MODULES
+Message-ID: <ZiKSffcTiP2c6fbs@kernel.org>
+References: <20240411160051.2093261-1-rppt@kernel.org>
+ <20240411160051.2093261-15-rppt@kernel.org>
+ <20240418061615.5fad23b954bf317c029acc4d@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,40 +87,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240419-adin-pin-polarity-v1-2-eaae8708db8d@solid-run.com>
+In-Reply-To: <20240418061615.5fad23b954bf317c029acc4d@gmail.com>
 
-On Fri, Apr 19, 2024 at 05:35:18PM +0200, Josua Mayer wrote:
-> ADIN1300 supports software control over pin polarity for both LED_0 and
-> LINK_ST pins.
+Hi Masami,
+
+On Thu, Apr 18, 2024 at 06:16:15AM +0900, Masami Hiramatsu wrote:
+> Hi Mike,
 > 
-> Configure the polarity during probe based on device-tree properties.
+> On Thu, 11 Apr 2024 19:00:50 +0300
+> Mike Rapoport <rppt@kernel.org> wrote:
 > 
-> Led polarity is only set if specified in device-tree, otherwise the phy
-> can choose either active-low or active-high based on external line
-> voltage. Link-status polarity is set to active-high as default if not
-> specified, which is always the reset-default.
+> > From: "Mike Rapoport (IBM)" <rppt@kernel.org>
+> > 
+> > kprobes depended on CONFIG_MODULES because it has to allocate memory for
+> > code.
+> > 
+> > Since code allocations are now implemented with execmem, kprobes can be
+> > enabled in non-modular kernels.
+> > 
+> > Add #ifdef CONFIG_MODULE guards for the code dealing with kprobes inside
+> > modules, make CONFIG_KPROBES select CONFIG_EXECMEM and drop the
+> > dependency of CONFIG_KPROBES on CONFIG_MODULES.
 > 
-> Signed-off-by: Josua Mayer <josua@solid-run.com>
+> Thanks for this work, but this conflicts with the latest fix in v6.9-rc4.
+> Also, can you use IS_ENABLED(CONFIG_MODULES) instead of #ifdefs in
+> function body? We have enough dummy functions for that, so it should
+> not make a problem.
 
-Hi Josua
+The code in check_kprobe_address_safe() that gets the module and checks for
+__init functions does not compile with IS_ENABLED(CONFIG_MODULES). 
+I can pull it out to a helper or leave #ifdef in the function body,
+whichever you prefer.
+ 
+> -- 
+> Masami Hiramatsu
 
-Please take a look at:
-
-commit 447b80a9330ef2d9a94fc5a9bf35b6eac061f38b
-Author: Alexander Stein <alexander.stein@ew.tq-group.com>
-Date:   Wed Jan 31 08:50:48 2024 +0100
-
-    net: phy: dp83867: Add support for active-low LEDs
-    
-    Add the led_polarity_set callback for setting LED polarity.
-    
-    Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
-    Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-    Signed-off-by: David S. Miller <davem@davemloft.net>
-
-
-    Andrew
-
----
-pw-bot: cr
+-- 
+Sincerely yours,
+Mike.
 
