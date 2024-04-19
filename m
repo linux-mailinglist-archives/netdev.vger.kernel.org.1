@@ -1,291 +1,259 @@
-Return-Path: <netdev+bounces-89761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 258508AB747
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 00:33:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7039D8AB765
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 01:00:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5AF81B21933
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 22:33:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2440F2823DF
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 23:00:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0BFC13D630;
-	Fri, 19 Apr 2024 22:33:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2FB513D636;
+	Fri, 19 Apr 2024 23:00:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u7t8xvfO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a5+gnBW/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
+Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91191364AA
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 22:33:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422C713C3F2;
+	Fri, 19 Apr 2024 23:00:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713565989; cv=none; b=aH+mU2KQOhXa/QBogW90BOygB2AL0rPnPxBWAFHBmnqurKS8luyi/RmpiJl8q9uYlNmJhJhenL6wccu823BApbnSdiyncbFftaZtmmkWLQM8xsJxubSY2TGtzb37Eg5ITFKpldibzmFNRkXN4J0caHaTCJw0D8753Yr2W49ah1o=
+	t=1713567615; cv=none; b=laMzeiUm3uSKHsD+zSd1x4zT/iBYJnd1TGyeg8/0UIyaIzZDQ6mb2w+YSgB/g+tXjyB/35tCd+gBv/QgC8ng0OLnTgRm4TiEMAlMYupVIu0bnvlszHCpIfVEWOCS1uRigmc9/cbvYUoX+CZM4BgJ1CJFQhS+nwesscRx7xahWms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713565989; c=relaxed/simple;
-	bh=qo7/N5ZF9+TTT+lb3wooerYp+x/U68ObQtBJ6S9FeKE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q6nldTPfCDWWZ0JgYHTeY/PjRdwBVB+4AlxBVkFomQZpMlaiAcwXVc82+Ilr9jZAL1wx+4x/rqG8YGmjFKT0oP3HM44SLOHqBc9op8U2T6nwnap0oCShtWaLvlUCPoCekflj2IebSgapqeXsBIO55P+064yNRea3pdaEvISsT2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u7t8xvfO; arc=none smtp.client-ip=209.85.161.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5ad21f3e5dcso585104eaf.3
-        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 15:33:06 -0700 (PDT)
+	s=arc-20240116; t=1713567615; c=relaxed/simple;
+	bh=jKqhQuL4HMmgp75/H449YSPn0tvy9xa7IQaFqYZbfTs=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=K01Y9SyTlTwQwNCfbh+3qKleyF/B7uoCoBRfS98vL33jNmWBtkpkWIxGnNuejjOS88rQOa4T3W+R1lkFE5O5qGHLjKJK5H1D0Jeb7XlEAjOjNt4aSJlUjltVn9CLQRZkucYOKSjuOchH7Bq5+/jTpkBdk9yMVDyDnpNdnhRG6u8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a5+gnBW/; arc=none smtp.client-ip=209.85.161.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-5ad21f3e5dcso596944eaf.3;
+        Fri, 19 Apr 2024 16:00:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1713565985; x=1714170785; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EICelP/lE33eIq2U0CujJA6vcfBMPCSauA8jxb4szvI=;
-        b=u7t8xvfOt/2PWWJX0GO62wwDFNOiCd8dcypkXmGjKbNPru2pGrz+Teg+hsmHdmJI8c
-         rh4d8mhsPsV+AgOtH/JgYleSZ1eehf7K91JZvGrds1erFAeAqNSfBNiZaBP5Z31am7SI
-         C4tplUS5i1avIkZWzrl99QzjpxxnS93+6mHgOrq3wamx4Ijz7w+WeDiJsQKeSZbZ8Dsk
-         UcroIMFtqiUcFwkRYIa0/KLPM0DekD3JFGzbZSoOlE3xiwqrdne96nAjnqD39ub+Qs8X
-         /uVrpqkTz2qoT0oLQGLAZ+Eeyr/7Xsr8l4VLGVbYgOlyi6Wp3ca4042DQjaNHqDHe6kM
-         oNXA==
+        d=gmail.com; s=20230601; t=1713567613; x=1714172413; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=6mNoY+63y0TWZ+UKVJ/Zs5Cs6/wNKkluXxkqj1Vg0Mc=;
+        b=a5+gnBW/l+SRlMekTQmBIh1rBmhAMBbrEj9WtHa6KKyWD9xUPk0Id1OHuerD9op9ea
+         44l0a6Yg8+UMKBErwRHCX7SLM9ukcOdm3MJd0Ze89nwFhbTXRggHREuknPNiVR72J2u2
+         dfnwGIaMI9lY4H9cPBoPy/yCNLQ3vMOfkfKO5iuLNzvC2hlhYn7SqKBVL5nrP0Kvgrux
+         e27+Ph4zAxuLTTpf64o7/j+DV2eojMjc+RYVW51AXntikzeC0MIRtiU9o7W+INOnTxYI
+         2AEkhSVcXFV5XGJIYELjbwX+gBsZeSy/pfE3V619/989jPup00GQolyxiPAuobMRIn/2
+         XPng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713565985; x=1714170785;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EICelP/lE33eIq2U0CujJA6vcfBMPCSauA8jxb4szvI=;
-        b=YuDD54aERQsklQAlvdgIkT65a/XroeqySmzViQ4oPTjIDgloa6iJPy8b83ua5B+4hI
-         gRGdyAFkHGnXagwqUN0San87IYcWfmNMgsVSvAChtYfUEknE4litBF2ILkuZtzLqLJTX
-         SJBhVUtBZv7kQ12Qc3HjGrPXFGA6LlGccuECk9fCMw7x3mWKa06i0DAKWgeiQM6bQzvF
-         EA6QzE7Seuj9R+3Ong6ZDiGGixYXz3HtnNfodU+fuqcslCNYxiPqlHlCt4Uf0v2mvNeb
-         Gc5YaVhrIDtuliSKPhzsk5XS/kpcOfx7Y28PjjpOrjcvloJsdOUbfLR3o8Nhc6/3Np+D
-         1XjQ==
-X-Gm-Message-State: AOJu0YzOYZAZnKLkf3Aa4Qo3VwxH/uVrr+HEAgP0Knz631gh/bxjg62E
-	rQ9fACu14YCF+736UEoC5ml55PUN66v8bl/73ru3vSNXXcYLbYVKjlfW0qlzEb5VheSpXSVGREw
-	bcEgWz4X4KwNWR+okd8OW8AQloe95KD8zSWaL
-X-Google-Smtp-Source: AGHT+IHEnnhJ3TpniFY55Ans9kw7hmgu60cCGtL/COtzPJLQc4/WppOPvC3h7Nu+VstK2Zo6B4TfM66ODjZpeYGOcBQ=
-X-Received: by 2002:a05:6358:5d8e:b0:185:fc1f:23ab with SMTP id
- s14-20020a0563585d8e00b00185fc1f23abmr4306920rwm.6.1713565985270; Fri, 19 Apr
- 2024 15:33:05 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1713567613; x=1714172413;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6mNoY+63y0TWZ+UKVJ/Zs5Cs6/wNKkluXxkqj1Vg0Mc=;
+        b=tesuhbd1jUw0KgD4WYSQJqwNFTLl9e/5CsoO/MrKMxWEnIRQKB+al+WGVEWMmrenIy
+         pM6P1o9kesse2Q+QhcnQ4CRNDwbtNBvq5cNBeW0fN/TSdY/H2+qKcyEpU21nB3k/cBzO
+         wdSyTrwtr6Wc6fUMoHqDJD18k7ywKJBmlctdyzs5YNCOk7x2WhKRdUv8uZlymR48FufT
+         SqIw4cyeVtIYOSYBtOrbQxW5HhnxhSY/WVAziSPfjJ72oTGIrAZWFVNtoqr1yMrFMNL2
+         AaY8NgSg8lILbfErQ1wNEqSmpL+A3GDJdO9IU2bIOw/qTlIxrGWYFNd5a2WzAEJ8jG7F
+         gwMw==
+X-Forwarded-Encrypted: i=1; AJvYcCWlz+mhRup7KEOY0NhtBEKGld6I5qVkLLKvTb+lq7AnRUX+bLbzb5ULiusir7aCWTup1cHp7TUF0US6TVEJZFK7d3A6U5o/jlrlva/FeJ/AV/vqbBB07rypqN+lVZd+USxBsAdsEYbiOaLKkx1t3W3XDNBv6p3CTdzSi80ibVR69eB/abPn87eCg/KjX1QOkGr83Uen4BnVGcCiAaMzurGp9zoQ
+X-Gm-Message-State: AOJu0YwFaeNM7lFnEW4BHcliwd2EgmNSWpK1u991pTEz0eaHMHkM1YUh
+	YvxutG6c/b36MeuknC5jc0dNI9u+fVDtiY/uPtBDZpxpQ6yDhwIa
+X-Google-Smtp-Source: AGHT+IElFsz7C2/xa7LvzuBo6XRD8qxVuJ8nQLRSUordf41ohWT0Nht6guK2hYR3sFLHfeaZZO1tog==
+X-Received: by 2002:a05:6870:96a1:b0:221:bf34:b15f with SMTP id o33-20020a05687096a100b00221bf34b15fmr3928563oaq.25.1713567613268;
+        Fri, 19 Apr 2024 16:00:13 -0700 (PDT)
+Received: from ?IPv6:2604:3d08:9880:5900:cc9b:cd8b:e2d0:f16f? ([2604:3d08:9880:5900:cc9b:cd8b:e2d0:f16f])
+        by smtp.gmail.com with ESMTPSA id fb33-20020a056a002da100b006ed14fed3a5sm3757361pfb.154.2024.04.19.16.00.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Apr 2024 16:00:12 -0700 (PDT)
+Message-ID: <e62e2971301ca7f2e9eb74fc500c520285cad8f5.camel@gmail.com>
+Subject: Re: [PATCH bpf-next v3 07/11] bpf: Fix a false rejection caused by
+ AND operation
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Xu Kuohai <xukuohai@huaweicloud.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-security-module@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko
+ <andrii@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,  Yonghong Song
+ <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Matt Bobrowski
+ <mattbobrowski@google.com>, Brendan Jackman <jackmanb@chromium.org>, Paul
+ Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, "Serge E .
+ Hallyn" <serge@hallyn.com>, Khadija Kamran <kamrankhadijadj@gmail.com>,
+ Casey Schaufler <casey@schaufler-ca.com>, Ondrej Mosnacek
+ <omosnace@redhat.com>, Kees Cook <keescook@chromium.org>, John Johansen
+ <john.johansen@canonical.com>, Lukas Bulwahn <lukas.bulwahn@gmail.com>,
+ Roberto Sassu <roberto.sassu@huawei.com>, Shung-Hsi Yu
+ <shung-hsi.yu@suse.com>
+Date: Fri, 19 Apr 2024 16:00:11 -0700
+In-Reply-To: <20240411122752.2873562-8-xukuohai@huaweicloud.com>
+References: <20240411122752.2873562-1-xukuohai@huaweicloud.com>
+	 <20240411122752.2873562-8-xukuohai@huaweicloud.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240418042706.1261473-1-maheshb@google.com> <87cyqmx850.ffs@tglx>
-In-Reply-To: <87cyqmx850.ffs@tglx>
-From: =?UTF-8?B?TWFoZXNoIEJhbmRld2FyICjgpK7gpLngpYfgpLYg4KSs4KSC4KSh4KWH4KS14KS+4KSwKQ==?= <maheshb@google.com>
-Date: Fri, 19 Apr 2024 15:32:37 -0700
-Message-ID: <CAF2d9jjeYACm3ueLPjiYqNMBXrJ3U2dnWqKx-AbgRWLVLz+qUw@mail.gmail.com>
-Subject: Re: [PATCHv2 next] ptp: update gettimex64 to provide ts optionally in
- mono-raw base.
-To: Thomas Gleixner <tglx@linutronix.de>
-Cc: Netdev <netdev@vger.kernel.org>, Linux <linux-kernel@vger.kernel.org>, 
-	David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Sagi Maimon <maimon.sagi@gmail.com>, Jonathan Corbet <corbet@lwn.net>, John Stultz <jstultz@google.com>, 
-	Mahesh Bandewar <mahesh@bandewar.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Apr 18, 2024 at 9:56=E2=80=AFPM Thomas Gleixner <tglx@linutronix.de=
-> wrote:
->
-> On Wed, Apr 17 2024 at 21:27, Mahesh Bandewar wrote:
->
-> Subject: ptp: update gettimex64 to provide ts optionally in mono-raw base=
-.
->
-> Can we please have proper sentences without cryptic abbreviations? This
-> is not twatter or SMS.
->
-character limit in the description is the limiting factor.
+On Thu, 2024-04-11 at 20:27 +0800, Xu Kuohai wrote:
+> From: Xu Kuohai <xukuohai@huawei.com>
+>=20
+> With lsm return value check, the no-alu32 version test_libbpf_get_fd_by_i=
+d_opts
+> is rejected by the verifier, and the log says:
+>=20
+>   0: R1=3Dctx() R10=3Dfp0
+>   ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test=
+_libbpf_get_fd_by_id_opts.c:27
+>   0: (b7) r0 =3D 0                        ; R0_w=3D0
+>   1: (79) r2 =3D *(u64 *)(r1 +0)
+>   func 'bpf_lsm_bpf_map' arg0 has btf_id 916 type STRUCT 'bpf_map'
+>   2: R1=3Dctx() R2_w=3Dtrusted_ptr_bpf_map()
+>   ; if (map !=3D (struct bpf_map *)&data_input) @ test_libbpf_get_fd_by_i=
+d_opts.c:29
+>   2: (18) r3 =3D 0xffff9742c0951a00       ; R3_w=3Dmap_ptr(map=3Ddata_inp=
+ut,ks=3D4,vs=3D4)
+>   4: (5d) if r2 !=3D r3 goto pc+4         ; R2_w=3Dtrusted_ptr_bpf_map() =
+R3_w=3Dmap_ptr(map=3Ddata_input,ks=3D4,vs=3D4)
+>   ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test=
+_libbpf_get_fd_by_id_opts.c:27
+>   5: (79) r0 =3D *(u64 *)(r1 +8)          ; R0_w=3Dscalar() R1=3Dctx()
+>   ; if (fmode & FMODE_WRITE) @ test_libbpf_get_fd_by_id_opts.c:32
+>   6: (67) r0 <<=3D 62                     ; R0_w=3Dscalar(smax=3D0x400000=
+0000000000,umax=3D0xc000000000000000,smin32=3D0,smax32=3Dumax32=3D0,var_off=
+=3D(0x0; 0xc000000000000000))
+>   7: (c7) r0 s>>=3D 63                    ; R0_w=3Dscalar(smin=3Dsmin32=
+=3D-1,smax=3Dsmax32=3D0)
+>   ;  @ test_libbpf_get_fd_by_id_opts.c:0
+>   8: (57) r0 &=3D -13                     ; R0_w=3Dscalar(smax=3D0x7fffff=
+fffffffff3,umax=3D0xfffffffffffffff3,smax32=3D0x7ffffff3,umax32=3D0xfffffff=
+3,var_off=3D(0x0; 0xfffffffffffffff3))
+>   ; int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode) @ test=
+_libbpf_get_fd_by_id_opts.c:27
+>   9: (95) exit
+>=20
+> And here is the C code of the prog.
+>=20
+> SEC("lsm/bpf_map")
+> int BPF_PROG(check_access, struct bpf_map *map, fmode_t fmode)
+> {
+> 	if (map !=3D (struct bpf_map *)&data_input)
+> 		return 0;
+>=20
+> 	if (fmode & FMODE_WRITE)
+> 		return -EACCES;
+>=20
+> 	return 0;
+> }
+>=20
+> It is clear that the prog can only return either 0 or -EACCESS, and both
+> values are legal.
+>=20
+> So why is it rejected by the verifier?
+>=20
+> The verifier log shows that the second if and return value setting
+> statements in the prog is optimized to bitwise operations "r0 s>>=3D 63"
+> and "r0 &=3D -13". The verifier correctly deduces that the the value of
+> r0 is in the range [-1, 0] after verifing instruction "r0 s>>=3D 63".
+> But when the verifier proceeds to verify instruction "r0 &=3D -13", it
+> fails to deduce the correct value range of r0.
+>=20
+> 7: (c7) r0 s>>=3D 63                    ; R0_w=3Dscalar(smin=3Dsmin32=3D-=
+1,smax=3Dsmax32=3D0)
+> 8: (57) r0 &=3D -13                     ; R0_w=3Dscalar(smax=3D0x7fffffff=
+fffffff3,umax=3D0xfffffffffffffff3,smax32=3D0x7ffffff3,umax32=3D0xfffffff3,=
+var_off=3D(0x0; 0xfffffffffffffff3))
+>=20
+> So why the verifier fails to deduce the result of 'r0 &=3D -13'?
+>=20
+> The verifier uses tnum to track values, and the two ranges "[-1, 0]" and
+> "[0, -1ULL]" are encoded to the same tnum. When verifing instruction
+> "r0 &=3D -13", the verifier erroneously deduces the result from
+> "[0, -1ULL] AND -13", which is out of the expected return range
+> [-4095, 0].
+>=20
+> To fix it, this patch simply adds a special SCALAR32 case for the
+> verifier. That is, when the source operand of the AND instruction is
+> a constant and the destination operand changes from negative to
+> non-negative and falls in range [-256, 256], deduce the result range
+> by enumerating all possible AND results.
+>=20
+> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
+> ---
 
-> Aside of that this is not about updating gettimex64(). The fact that
-> this is an UAPI change is the real important information. gettimex64()
-> is only the kernel side implementation detail.
->
->    ptp/ioctl: Support MONOTONIC_RAW timestamps forPTP_SYS_OFFSET_EXTENDED
->
-> or something like that.
->
-ack.
+Hello,
 
-> > The current implementation of PTP_SYS_OFFSET_EXTENDED provides
-> > PHC reads in the form of [pre-TS, PHC, post-TS]. These pre and
-> > post timestamps are useful to measure the width of the PHC read.
-> > However, the current implementation provides these timestamps in
-> > CLOCK_REALTIME only. Since CLOCK_REALTIME is disciplined by NTP
-> > or NTP-like service(s), the value is subjected to change. This
-> > makes some applications that are very sensitive to time change
-> > have these timestamps delivered in different time-base.
->
-> The last sentence does not make any sense to me.
->
-> > This patch updates the gettimex64 / ioctl op PTP_SYS_OFFSET_EXTENDED
->
-> git grep 'This patch' Documentation/process/
->
-> > to provide these (sandwich) timestamps optionally in
-> > CLOCK_MONOTONIC_RAW timebase while maintaining the default behavior
-> > or giving them in CLOCK_REALTIME.
->
-> This change log lacks a proper explanation why this is needed and what's
-> the purpose and benefit.
->
-> Aside of that it fails to mention that using the currently unused
-> reserved field is correct because CLOCK_REALTIME =3D=3D 0.
->
-> > ~# testptp -d /dev/ptp0 -x 3 -y raw
-> > extended timestamp request returned 3 samples
-> > sample # 0: mono-raw time before: 371.548640128
-> >             phc time: 371.579671788
-> >             mono-raw time after: 371.548640912
-> > sample # 1: mono-raw time before: 371.548642104
-> >             phc time: 371.579673346
-> >             mono-raw time after: 371.548642490
-> > sample # 2: mono-raw time before: 371.548643320
-> >             phc time: 371.579674652
-> >             mono-raw time after: 371.548643756
-> > ~# testptp -d /dev/ptp0 -x 3 -y real
-> > extended timestamp request returned 3 samples
-> > sample # 0: system time before: 1713243413.403474250
-> >             phc time: 385.699915490
-> >             system time after: 1713243413.403474948
-> > sample # 1: system time before: 1713243413.403476220
-> >             phc time: 385.699917168
-> >             system time after: 1713243413.403476642
-> > sample # 2: system time before: 1713243413.403477555
-> >             phc time: 385.699918442
-> >             system time after: 1713243413.403477961
->
-> That takes up a lot of space, but what's the actual value of this
-> information? Especially as there is no actual test case for this which
-> people can use to validate the changes.
->
-I'll polish the testptp.c changes and submit them later. But if this
-is not adding any value, I can remove it from the log.
+Sorry for the delay, I had to think about this issue a bit.
+I found the clang transformation that generates the pattern this patch
+tries to handle.
+It is located in DAGCombiner::SimplifySelectCC() method (see [1]).
+The transformation happens as a part of DAG to DAG rewrites
+(LLVM uses several internal representations:
+ - generic optimizer uses LLVM IR, most of the work is done
+   using this representation;
+ - before instruction selection IR is converted to Selection DAG,
+   some optimizations are applied at this stage,
+   all such optimizations are a set of pattern replacements;
+ - Selection DAG is converted to machine code, some optimizations
+   are applied at the machine code level).
 
-> > diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock=
-_kernel.h
-> > index 6e4b8206c7d0..7563da6db09b 100644
-> > --- a/include/linux/ptp_clock_kernel.h
-> > +++ b/include/linux/ptp_clock_kernel.h
-> > @@ -47,10 +47,12 @@ struct system_device_crosststamp;
-> >   * struct ptp_system_timestamp - system time corresponding to a PHC ti=
-mestamp
-> >   * @pre_ts: system timestamp before capturing PHC
-> >   * @post_ts: system timestamp after capturing PHC
-> > + * @clockid: clockid used for cpaturing timestamp
->
-> cpaturing?
->
-> s/timestamp/the system timestamps/
->
-> Precision matters not only for PTP.
->
-:) ack
+Full pattern is described as follows:
 
-> >   */
-> >  struct ptp_system_timestamp {
-> >       struct timespec64 pre_ts;
-> >       struct timespec64 post_ts;
-> > +     clockid_t clockid;
-> >  };
-> >
-> >  /**
-> > @@ -457,14 +459,34 @@ static inline ktime_t ptp_convert_timestamp(const=
- ktime_t *hwtstamp,
-> >
-> >  static inline void ptp_read_system_prets(struct ptp_system_timestamp *=
-sts)
-> >  {
-> > -     if (sts)
-> > -             ktime_get_real_ts64(&sts->pre_ts);
-> > +     if (sts) {
-> > +             switch (sts->clockid) {
-> > +             case CLOCK_REALTIME:
-> > +                     ktime_get_real_ts64(&sts->pre_ts);
-> > +                     break;
-> > +             case CLOCK_MONOTONIC_RAW:
-> > +                     ktime_get_raw_ts64(&sts->pre_ts);
-> > +                     break;
-> > +             default:
-> > +                     break;
-> > +             }
-> > +     }
-> >  }
-> >
-> >  static inline void ptp_read_system_postts(struct ptp_system_timestamp =
-*sts)
-> >  {
-> > -     if (sts)
-> > -             ktime_get_real_ts64(&sts->post_ts);
-> > +     if (sts) {
-> > +             switch (sts->clockid) {
-> > +             case CLOCK_REALTIME:
-> > +                     ktime_get_real_ts64(&sts->post_ts);
-> > +                     break;
-> > +             case CLOCK_MONOTONIC_RAW:
-> > +                     ktime_get_raw_ts64(&sts->post_ts);
-> > +                     break;
-> > +             default:
-> > +                     break;
-> > +             }
-> > +     }
-> >  }
-> >
-> >  #endif
-> > diff --git a/include/uapi/linux/ptp_clock.h b/include/uapi/linux/ptp_cl=
-ock.h
-> > index 053b40d642de..fc5825e72330 100644
-> > --- a/include/uapi/linux/ptp_clock.h
-> > +++ b/include/uapi/linux/ptp_clock.h
-> > @@ -157,7 +157,12 @@ struct ptp_sys_offset {
-> >
-> >  struct ptp_sys_offset_extended {
-> >       unsigned int n_samples; /* Desired number of measurements. */
-> > -     unsigned int rsv[3];    /* Reserved for future use. */
-> > +     /* The original implementation provided timestamps (always) in
-> > +      * REALTIME clock-base. Since CLOCK_REALTIME is 0, adding
-> > +      * clockid doesn't break backward compatibility.
-> > +      */
->
-> This wants to be in the change log.
->
-Ack
+  // fold (select_cc seteq (and x, y), 0, 0, A) -> (and (sra (shl x)) A)
+  // where y is has a single bit set.
+  // A plaintext description would be, we can turn the SELECT_CC into an AN=
+D
+  // when the condition can be materialized as an all-ones register.  Any
+  // single bit-test can be materialized as an all-ones register with
+  // shift-left and shift-right-arith.
 
-> If you want to document the evolution of this data structure in a
-> comment, then 'original implementation' is not really the best wording
-> to use.
->
-> I'd rather see the documentation fixed so that it uses proper kernel doc
-> style for the whole data structure instead of having this mix of inline
-> and tail comments along with a properly structured version information.
->
-> /**
->  * ptp_sys_offset_extended - Data structure for IOCTL_PTP_.....
->  *
->  * @n_samples:          Desired number of samples
->  * ....
->  * @...
->  *
->  * History:
->  * V1:  Initial implementation
->  *
->  * V2:  Use the first reserved field for @clockid. That's backwards
->  *      compatible for V1 user space because CLOCK_REALTIME is 0 and
->  *      the reserved fields must be 0.
->  */
->
-> Or something like that. Hmm?
->
-will attempt to add it.
+For this particular test case the DAG is converted as follows:
 
-> Thanks,
->
->         tglx
+                    .---------------- lhs         The meaning of this selec=
+t_cc is:
+                    |        .------- rhs         `lhs =3D=3D rhs ? true va=
+lue : false value`
+                    |        | .----- true value
+                    |        | |  .-- false value
+                    v        v v  v=20
+  (select_cc seteq (and X 2) 0 0 -13)
+                          ^
+->                        '---------------.
+  (and (sra (sll X 62) 63)                |
+       -13)                               |
+                                          |
+Before pattern is applied, it checks that second 'and' operand has
+only one bit set, (which is true for '2').
 
-Thanks for reviewing Thomas, I'll address them in the next revision.
+The pattern itself generates logical shift left / arithmetic shift
+right pair, that ensures that result is either all ones (-1) or all
+zeros (0). Hence, applying 'and' to shifts result and false value
+generates a correct result.
 
---mahesh..
+In my opinion the approach taken by this patch is sub-optimal:
+- 512 iterations is too much;
+- this does not cover all code that could be generated by the above
+  mentioned LLVM transformation
+  (e.g. second 'and' operand could be 1 << 16).
+
+Instead, I suggest to make a special case for source or dst register
+of '&=3D' operation being in range [-1,0].
+Meaning that one of the '&=3D' operands is either:
+- all ones, in which case the counterpart is the result of the operation;
+- all zeros, in which case zero is the result of the operation;
+- derive MIN and MAX values based on above two observations.
+
+[1] https://github.com/llvm/llvm-project/blob/4523a267829c807f3fc8fab8e5e96=
+13985a51565/llvm/lib/CodeGen/SelectionDAG/DAGCombiner.cpp#L5391
+
+Best regards,
+Eduard
+
 
