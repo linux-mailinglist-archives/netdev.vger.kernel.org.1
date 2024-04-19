@@ -1,379 +1,134 @@
-Return-Path: <netdev+bounces-89595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D711F8AACFF
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 12:42:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F75C8AAD19
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 12:53:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 875BB28268F
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 10:42:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 124CCB21C62
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 10:53:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320407EF0A;
-	Fri, 19 Apr 2024 10:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 060607F7F4;
+	Fri, 19 Apr 2024 10:53:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="vVLyhH60"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="u/MBONQF"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3C64762E5;
-	Fri, 19 Apr 2024 10:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CB517BAF9
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 10:53:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713523355; cv=none; b=uflKAmMddmLnSLBqLbxYRhakt0Yw61Rt5/EJgeM4OwH5owGuiS07aKg04HsQoBdGx1+ZbFTAxB3RX+Ma4mZfhApA9C1BUUtQ+5/XPhu9Tfpn1fN2YCwQnrDzsNuafA6dJ4SATFkhuwD6EWv4vRIH05RURuevIQR/xGyentsv7tE=
+	t=1713524015; cv=none; b=BoShECgPACK33aF8xJHODuAI3p8x2rAMzHeUL0cINQ9XPQv4L8LbsEFPmnWp2El0/cta7nCAM91ZWEsRmUPnXK4hMdcex+gQWiwrAgJwHgagbivtiJJ6/3x54nO0KrHgQ3eIJH8hALtcfXkrJ41w+oT4m6P5sKKGpwq4+Qj2fLk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713523355; c=relaxed/simple;
-	bh=/tP1iH2S3+PRQRuR3jCDSl/QheSzcPHcgN5uIKobfok=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tnXT8kNdFLZ8C0NY5M1DccH9Dh9A9ZRu2BCloXa6ulcNlqBQ5f4qiLXVATC8rGyRGkv8xAwiYwQb3IBIZQEzJ8/jEzp+PXHrOj4P/CgJSkRmKEprqBT2Ergpa3azzMOtesGg6ufp8eBK5hyJvJ+p0CZk6K//u1q5086WC9jZ32g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=vVLyhH60; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id AF799880A5;
-	Fri, 19 Apr 2024 12:42:29 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1713523351;
-	bh=n3gQjSmjB/CQLOWijnH0l7MpQ4VOQlLHcoqeSHgt34M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=vVLyhH60vks2mMaI2a7B7IK8aBlDYpTXh1scSLRpC/pNZI7EWkP3XmhkNg3SeWIJO
-	 YJ/KrLGH0JdfDcR+8YJVqGR55EQBUvBtjjqLSXdcxP0Ig5lo2B7bqLyURzt/sm40ZW
-	 G3wcODUegw1mQ69cVfZ3mpdlmPWmfVN8KqOowbXoCyBqH36nPBvNmNFY3zFOX/E/3J
-	 Dol6nWTnmGpdGistQJLrv752n7iA2BApk9HFRhtQ0EnjLQ/0C6LXDo9ANQv/tIErzd
-	 t+FbZV24SDVEr8XtLGIoMzO0RlF3AFUrTREK7aMMSJTEJEFaj+RAHjYGFuKhux+DCH
-	 n4IgBTmGdz9Kw==
-Date: Fri, 19 Apr 2024 12:42:23 +0200
-From: Lukasz Majewski <lukma@denx.de>
-To: Casper Andersson <casper.casan@gmail.com>
-Cc: netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
- <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Oleksij Rempel <o.rempel@pengutronix.de>,
- Tristram.Ha@microchip.com, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, Ravi Gunasekaran <r-gunasekaran@ti.com>, Simon
- Horman <horms@kernel.org>, Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
- Murali Karicheri <m-karicheri2@ti.com>, Jiri Pirko <jiri@resnulli.us>, Dan
- Carpenter <dan.carpenter@linaro.org>, Ziyang Xuan
- <william.xuanziyang@huawei.com>, Shigeru Yoshida <syoshida@redhat.com>,
- "Ricardo B. Marliere" <ricardo@marliere.net>, linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH v5 1/4] net: hsr: Provide RedBox support
- (HSR-SAN)
-Message-ID: <20240419124223.2388295d@wsk>
-In-Reply-To: <86mspploa3.fsf@gmail.com>
-References: <20240415124928.1263240-1-lukma@denx.de>
-	<20240415124928.1263240-2-lukma@denx.de>
-	<86mspt7glf.fsf@gmail.com>
-	<20240416150359.7362c762@wsk>
-	<86bk66hjyf.fsf@gmail.com>
-	<20240418173706.206e6a2f@wsk>
-	<86mspploa3.fsf@gmail.com>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1713524015; c=relaxed/simple;
+	bh=He6bvtI1r57LILZNjiIrnwn6xVEDf8ZkS3CR9XDqr2c=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qabVm43OPMfakK62vtgAaeRl2gnjDTJpOq/IIp1vXuLh+5atWIW9SuO+x451biXfCOp7ZxUkkrqkKSvDe+axLfRh8gbV6AdKctvYD9j2pyrUiL7Qed1DdiG23gOucSOcfm2ysNrZvUC9XJr671JeN2hLtKoLmEAs+pBi+/L4YEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=u/MBONQF; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-61afae89be3so37691107b3.0
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 03:53:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713524013; x=1714128813; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ww4u37mAY5ySAvVCwtBY2Z/kMhJTHtCAJG+tMPNgbHQ=;
+        b=u/MBONQFKF859Uv9UBWe78XwiuzDHdGGHPKCuYNakmLzucWxIGrt85TyUk8WarkVjW
+         QX+n8m92Ph6DC4nwYqtdZNsBiuCPysUk9Zhugg8ZNcFnPwa+gzFSC+9yHJxWaO+7ruFy
+         LikzvE7M4VzHbUGHMpLrXeCxrGKVpl8yR/hfdZB2Bdq7OMteYhQktIYa2lnwZYlqbP0Y
+         o8kuho4ttMrrurJYW4N/FUUDJJgkxNuH6xaCZH9n1uFuOgjSxeHMxVFKsDfrp0sVAGs5
+         820TGttye0Y/SMO2HdHoOXWjBKTbuTZqCuZtfAWSL/f4oFWBf+Xvy6ch1snGRZAlwFA3
+         6c/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713524013; x=1714128813;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ww4u37mAY5ySAvVCwtBY2Z/kMhJTHtCAJG+tMPNgbHQ=;
+        b=jm1VSKO7v3dnmvR7bp2no2BRg5njbsYyrbYSLl+mJ2ZIESXBS8q3vMeIJX2avIshLD
+         49NeMVKAKDzQX1N344egKXxMPGuk/Lolj5yi5NeAJQRnXF7M+2f7g4dfm/nbdYwzXj0z
+         Gozk67CA/xkSYos4uUWfrH66eb8PdxpKu6Jum96e8mnfXtWv1QZpo6XPwQgkFwdTmmpU
+         yiEzkpEVpFpYKMM/Q3g25FbO7nPtv68cix26iEtoQ1n/9A2Q9186tyv+rAYjQuIVlE4X
+         Zzu/wikeruC+r9xWnr9oqsvYTIPJf1oAXaClYcurTrIqY56KXQs7ICCNW0CqsqcX23Yh
+         JvVw==
+X-Gm-Message-State: AOJu0YzEnHEC0U4G9QhBTmE4cOoWCc1bCHvEqz5SX17eW/IzkbAyjnxr
+	C3m/0OvyREiNBs4xoxSjxYhnTSAlDt5p3klMZCwfQ4XpVeqAgMiOM2V67TkhfvKYudhDsxxrh7c
+	/AGfmatvswA==
+X-Google-Smtp-Source: AGHT+IHLGMEgdOJOxrRNsJCd2jcCng2eUwpzWElwB45JTx79ETw+qoHPfPsMRENeSsYW7W8bMktdLgwMYjcafA==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a81:9156:0:b0:61a:e2ee:f22f with SMTP id
+ i83-20020a819156000000b0061ae2eef22fmr400611ywg.6.1713524013569; Fri, 19 Apr
+ 2024 03:53:33 -0700 (PDT)
+Date: Fri, 19 Apr 2024 10:53:32 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/CyIf_TI5ufLTm59HKZfcaU6";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.769.g3c40516874-goog
+Message-ID: <20240419105332.2430179-1-edumazet@google.com>
+Subject: [PATCH net] icmp: prevent possible NULL dereferences from icmp_build_probe()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Andreas Roeseler <andreas.a.roeseler@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
---Sig_/CyIf_TI5ufLTm59HKZfcaU6
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+First problem is a double call to __in_dev_get_rcu(), because
+the second one could return NULL.
 
-Hi Casper,
+if (__in_dev_get_rcu(dev) && __in_dev_get_rcu(dev)->ifa_list)
 
-> On 2024-04-18 17:37 +0200, Lukasz Majewski wrote:
-> Hi Lukasz,
->=20
-> > Hi Casper,
-> > =20
-> >> Hi,
-> >>=20
-> >> Sorry for the late reply, I was awaiting confirmation on what I can
-> >> say about the hardware I have access to. They won't let me say the
-> >> name :( but I can give some details. =20
-> >
-> > Ok, good :-)
-> >
-> > At least I'm not alone and there is another person who can validate
-> > the code (or behaviour) on another HSR HW.
-> >
-> > (Some parts of the specification could be double checked on another
-> > HW as well).
-> > =20
-> >>=20
-> >> On 2024-04-16 15:03 +0200, Lukasz Majewski wrote: =20
-> >> >> On 2024-04-02 10:58 +0200, Lukasz Majewski wrote:   =20
-> >> >> > Changes for v3:
-> >> >> >
-> >> >> > - Modify frame passed Port C (Interlink) to have RedBox's
-> >> >> > source address (SA) This fixes issue with connecting L2
-> >> >> > switch to Interlink Port as switches drop frames with SA
-> >> >> > other than one registered in their (internal) routing tables.
-> >> >> >     =20
-> >> >>    =20
-> >> >> > +	/* When HSR node is used as RedBox - the frame
-> >> >> > received from HSR ring
-> >> >> > +	 * requires source MAC address (SA) replacement to
-> >> >> > one which can be
-> >> >> > +	 * recognized by SAN devices (otherwise, frames are
-> >> >> > dropped by switch)
-> >> >> > +	 */
-> >> >> > +	if (port->type =3D=3D HSR_PT_INTERLINK)
-> >> >> > +		ether_addr_copy(eth_hdr(skb)->h_source,
-> >> >> > +
-> >> >> > port->hsr->macaddress_redbox);=20
-> >> >>=20
-> >> >> I'm not really understanding the reason for this change. Can you
-> >> >> explain it in more detail?   =20
-> >> >
-> >> > According to the HSR standard [1] the RedBox device shall work
-> >> > as a "proxy" [*] between HSR network and SAN (i.e. "normal"
-> >> > ethernet) devices.
-> >> >
-> >> > This particular snippet handles the situation when frame from HSR
-> >> > node is supposed to be sent to SAN network. In that case the SA
-> >> > of HSR (SA_A) is replaced with SA of RedBox (SA_RB) as the MAC
-> >> > address of RedBox is known and used by SAN devices.
-> >> >
-> >> >
-> >> > Node A  hsr1  |=3D=3D=3D=3D=3D=3D| hsr1 Node Redbox |   |
-> >> > (SA_A) [**]   |	     |           eth3   |---| ethX SAN
-> >> > 	      |      |        	 (SA_RB)|   |  (e.g switch)
-> >> >
-> >> >
-> >> > (the =3D=3D=3D=3D=3D=3D represents duplicate link - like lan1,lan2)
-> >> >
-> >> > If the SA_A would be passed to SAN (e.g. switch) the switch could
-> >> > get confused as also RedBox MAC address would be used. Hence, all
-> >> > the frames going out from "Node Redbox" have SA set to SA_RB.
-> >> >
-> >> > According to [1] - RedBox shall have the MAC address.
-> >> > This is similar to problem from [2].   =20
-> >>=20
-> >> Thanks for the explanation, but I still don't quite follow in what
-> >> way the SAN gets confused. "also RedBox MAC address would be
-> >> used", when does this happen? Do you mean that some frames from
-> >> Node A end up using the RedBox MAC address so it's best if they
-> >> all do? =20
-> >
-> > The SAN (let's say it is a switch) can communicate with RedBox or
-> > Node A. In that way the DA is different for both (so SA on reply is
-> > also different). On my setup I've observed frames drop (caused
-> > probably by switch filtering of incoming traffic not matching the
-> > outgoing one).
-> >
-> > When I only use SA of RedBox on traffic going to SAN, the problem is
-> > gone.
-> >
-> > IMHO, such separation (i.e. to use only RedBox's SA on traffic
-> > going to SAN) is the "proxy" mentioned in the standard.
-> > =20
-> >>=20
-> >> I see there is already some address replacement going on in the HSR
-> >> interface, as you pointed out in [2]. And I get your idea of being
-> >> a proxy. If no one else is opposed to this then I'm fine with it
-> >> too.=20
-> >
-> > Ok.
-> > =20
-> >> >> The standard does not say to modify the
-> >> >> SA. However, it also does not say to *not* modify it in HSR-SAN
-> >> >> mode like it does in other places. In HSR-HSR and HSR-PRP mode
-> >> >> modifying SA breaks the duplicate discard.   =20
-> >> >
-> >> > IMHO, the HSR-SAN shall be regarded as a "proxy" [*] between two
-> >> > types (and not fully compatible) networks.
-> >> >   =20
-> >> >> So keeping the same behavior for all
-> >> >> modes would be ideal.
-> >> >>=20
-> >> >> I imagine any HW offloaded solutions will not modify the SA, so
-> >> >> if possible the SW should also behave as such.   =20
-> >> >
-> >> > The HW offloading in most cases works with HSR-HSR setup (i.e. it
-> >> > duplicates frames automatically or discards them when recived -
-> >> > like ksz9477 [3]).
-> >> >
-> >> > I think that RedBox HW offloading would be difficult to achieve
-> >> > to comply with standard. One "rough" idea would be to configure
-> >> > aforementioned ksz9477 to pass all frames in its HW between SAN
-> >> > and HSR network (but then it wouldn't filter them).   =20
-> >>=20
-> >> I don't know anything about ksz9477. The hardware I have access to
-> >> is supposed to be compliant with 2016 version in an offloaded
-> >> situation for all modes (HSR-SAN, PRP-SAN, HSR-PRP, HSR-HSR). =20
-> >
-> > Hmm... Interesting.
-> >
-> > As fair as I know - the ksz9477 driver from Microchip for RedBox
-> > sets internal (i.e. in chip) vlan for Node_A, Node_B and Interlink,
-> > so _all_ packets are flowing back and forth between HSR and SAN
-> > networks ....=20
-> >> Though, I haven't
-> >> verified if the operation is fully according to standard. =20
-> >
-> > You may use wireshark on device connected as SAN to redbox and then
-> > see if there are any frames (especially supervisory ones) passed
-> > from HSR network. =20
->=20
-> I realized I should clarify, what I'm running is non-upstream
-> software.
+Second problem is a read from dev->ip6_ptr with no NULL check:
 
-Ok.
+if (!list_empty(&rcu_dereference(dev->ip6_ptr)->addr_list))
 
-> And by offloaded I mean the redbox forwarding is
-> offloaded. Supervision frames are still handled in SW and only sent on
-> HSR/PRP ports, and doesn't reach any SAN nodes. Basic operation works
-> as it should.
+Use the correct RCU API to fix these.
 
-Ok.
+Fixes: d329ea5bd884 ("icmp: add response to RFC 8335 PROBE messages")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Andreas Roeseler <andreas.a.roeseler@gmail.com>
+---
+ net/ipv4/icmp.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
->=20
-> >> It does not
-> >> modify any addresses in HW. =20
-> >
-> > By address - you mean the MAC addresses of nodes? =20
->=20
-> I mean that it forwards all frames without modification (except
-> HSR/PRP and VLAN tags). It does not update SMAC with the proxy MAC
-> like your implementation does.
+diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+index e63a3bf99617627e17669f9b3aaee1cbbf178ebf..e1aaad4bf09cd43d9f3b376416b79a8b2c0a63ca 100644
+--- a/net/ipv4/icmp.c
++++ b/net/ipv4/icmp.c
+@@ -1032,6 +1032,8 @@ bool icmp_build_probe(struct sk_buff *skb, struct icmphdr *icmphdr)
+ 	struct icmp_ext_hdr *ext_hdr, _ext_hdr;
+ 	struct icmp_ext_echo_iio *iio, _iio;
+ 	struct net *net = dev_net(skb->dev);
++	struct inet6_dev *in6_dev;
++	struct in_device *in_dev;
+ 	struct net_device *dev;
+ 	char buff[IFNAMSIZ];
+ 	u16 ident_len;
+@@ -1115,10 +1117,15 @@ bool icmp_build_probe(struct sk_buff *skb, struct icmphdr *icmphdr)
+ 	/* Fill bits in reply message */
+ 	if (dev->flags & IFF_UP)
+ 		status |= ICMP_EXT_ECHOREPLY_ACTIVE;
+-	if (__in_dev_get_rcu(dev) && __in_dev_get_rcu(dev)->ifa_list)
++
++	in_dev = __in_dev_get_rcu(dev);
++	if (in_dev && rcu_access_pointer(in_dev->ifa_list))
+ 		status |= ICMP_EXT_ECHOREPLY_IPV4;
+-	if (!list_empty(&rcu_dereference(dev->ip6_ptr)->addr_list))
++
++	in6_dev = __in6_dev_get(dev);
++	if (in6_dev && !list_empty(&in6_dev->addr_list))
+ 		status |= ICMP_EXT_ECHOREPLY_IPV6;
++
+ 	dev_put(dev);
+ 	icmphdr->un.echo.sequence |= htons(status);
+ 	return true;
+-- 
+2.44.0.769.g3c40516874-goog
 
-Hmm... I'm wondering how "proxy" is implemented then.
-Also, what is the purpose of ProxyNodeTable in that case?
-
->=20
-> >> Does the interlink port also reach the drivers? =20
-> >
-> > Could you be more specific in your question? =20
->=20
-> Sorry, it was connected to the question below if it sets anything up
-> in the drivers for the interlink port. And you answered it.
-
-Ok.
-
->=20
-> >> Does it call
-> >> port_hsr_join and try to join as an HSR port?  =20
-> >
-> > No, not yet.
-> >
-> > The community (IIRC Vladimir Oltean) suggested to first implement
-> > the RedBox Interlink (HSR-SAN) in SW. Then, we may think about
-> > adding offloading support for it.
-> > =20
-> >> Do we maybe need a
-> >> separate path or setting for configuring the interlink in the
-> >> different modes (SAN, HSR, PRP interlink)? =20
-> >
-> > I think that it shall be handled as an extra parameter (like we do
-> > have now with 'supervision' or 'version') in ip link add.
-> >
-> > However, first I would like to have the "interlink" parameter added
-> > to iproute2 and then we can extend it to other modes if requred. =20
->=20
-> Alright, doing SW implementation first sounds good. From userspace it
-> can probably be an extra parameter. But for the driver configuration
-> maybe we want a port_interlink_join? (when it comes to implementing
-> that).
-
-IMHO, having port_interlink_join() may be useful in the future to
-provide offloading support.
-
->=20
->=20
-> I did some testing with veth interfaces (everything in SW) with your
-> patches. I tried to do a setup like yours
->                =20
->                   +-vethA---vethB-+
->                   |               |
-> vethF---vethE---hsr0             hsr1
->                   |               |
->                   +-vethC---vethD-+
->=20
-> Sending traffic from vethF results in 3 copies being seen on the ring
-> ports. One of which ends up being forwarded back to vethF (with SMAC
-> updated to the proxy address). I assume this is not intended behavior.
-
-I've reported this [2] (i.e. duplicated packets on HSR network with
-veth) when I was checking hsr_ping.sh [1] script for regression.
-
-(However, I don't see the DUP pings on my KSZ9477 setup).
-
->=20
->=20
-> Setup:
-> ip link add dev vethA type veth peer name vethB
-> ip link add dev vethC type veth peer name vethD
-> ip link add dev vethE type veth peer name vethF
-> ip link set up dev vethA
-> ip link set up dev vethB
-> ip link set up dev vethC
-> ip link set up dev vethD
-> ip link set up dev vethE
-> ip link set up dev vethF
->=20
-> ip link add name hsr0 type hsr slave1 vethA slave2 vethC interlink
-> vethE supervision 45 version 1 ip link add name hsr1 type hsr slave1
-> vethB slave2 vethD supervision 45 version 1 ip link set dev hsr0 up
-> ip link set dev hsr1 up
->=20
-> I used Nemesis to send random UDP broadcast packets but you could use
-> whatever: nemesis udp -d vethF -c 10000 -i 1=20
-
-Ok, I will check nemesis load as well.
-
-Can you check the hsr_redbox.sh (from this patch set) and hsr_ping.sh ?
-
->=20
-> BR,
-> Casper
-
-Links:
-
-[1] -
-https://elixir.bootlin.com/linux/latest/source/tools/testing/selftests/net/=
-hsr/hsr_ping.sh
-
-[2] -
-https://lore.kernel.org/linux-kernel/20240418125336.7305d545@wsk/T/#m9c54a1=
-a31366e4d1caec8fceb4329c5dbe9cc9aa
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/CyIf_TI5ufLTm59HKZfcaU6
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmYiSo8ACgkQAR8vZIA0
-zr3YLggAo1h5f8IBYV3MO+z4dv50pfNdH6KzbkFkzkr5mX5DcKEa+lcJZkk2Q0Q0
-1NKNxiWffTOmILpoBM+nnzX+nxf6mnxWHHDvocw3F05m1MO7DkOlkX/tWE22mowS
-cqLIgaTsKnm9H1dutCG9JS8yaWgXzHyUJKOB0qCe5Hv25o98H727uBXidLQGW11G
-FvypenCtm87JkPST8f36FqkGQ/c7aKC70aBjMJ4dOX5GKKpL8cMqoIyfV76+6vcm
-2HailK24hj0DsB+bt6X0xotul/+7PveIJo5rYTIYGiplfjVLZ76RfbOo/4H2Gz9R
-Eu9SOxEQy8zJ8S2DXuYX11s0gSo4pg==
-=/Vcy
------END PGP SIGNATURE-----
-
---Sig_/CyIf_TI5ufLTm59HKZfcaU6--
 
