@@ -1,430 +1,148 @@
-Return-Path: <netdev+bounces-89564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40C168AAB60
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 11:21:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 017158AAB46
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 11:17:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C207F1F228A8
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 09:21:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9B8B28167B
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 09:17:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB2776056;
-	Fri, 19 Apr 2024 09:20:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DCEF69DFB;
+	Fri, 19 Apr 2024 09:17:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d6kTlc73"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HZlN1sGS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A729F7581A
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 09:20:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C7A34D131
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 09:17:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713518439; cv=none; b=os8lIXuCVv3LQhxsrWYGz8OyJVL4uOKpGr4E3nK4LhCGeNmhLJ13q4Jp80roo8PwbBfSX+kzjf5Z8Qi6GIFhA+aAtQOBQMvZOQJcw9zA12w0Ec/nC5k7TVZUtrlv00/a/g14/1x8OVDN9Dnz4NXQUve4Q6oqvm7u8q1jY6DEfYI=
+	t=1713518230; cv=none; b=Ox3f9BugGHtGokmSmo7DpjYg/AhfSFaMLkjYqX7yGURb6IEjG/D+jqZZrC0QGyCN2gv3Y8wdoLTKhbf2ch9plSK2jpQayhtJ+0kroKm4qnEdxqQWC+8xEyNaqo5MJuT4SQt/tEBFLVaBUb7xFtHGeP5CKDUls7Kx1bzrodCrcQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713518439; c=relaxed/simple;
-	bh=kLUTdPqERbSM74gcLikb57dC1Eif7yEcCMXkhnb6xPo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jC+ucrdn7jlkftMml+LtANJFZKRFQC1DPMPATwglKyK7+hcp3BKOAM0iveRUDdL5qYgUBt0SCDelsTAc/OLDrUeyD7SpFwaWh0HD/ZYVVqmRRfTkUGXXn5KL8YM67GI/gH5zx8/BRrXzSrYTnANzhz01IBZ6cjK5knvkhzYb3RI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d6kTlc73; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1713518438; x=1745054438;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=kLUTdPqERbSM74gcLikb57dC1Eif7yEcCMXkhnb6xPo=;
-  b=d6kTlc73NVNTxh/QKyVCWtfpuKMpwca/nxx4QE+uWkvsktZdxEqXlTP5
-   f5a5gCOqHUQI1aady3cvDCCSKoTuOPVIW6liOhSSEe6bp4iB1PRbl2m0m
-   Vr5ZUWiYRuU71VZ9G2xxti+x6N2OyRp6gWOMotzt0mhmSA62r3uzkmFHv
-   VSUWsW/RdrB1EUKu8s0pp/LBk7PsjQ9V/Q7KPSXShEXAkEvdpyq8w1RIW
-   NBb6TANyMTZ/SCH8kuPCk94m16gjGcP00Tl9ThO0Rdvope0rZH+U3urYq
-   tI49SnVfvB3Wnq2wZb1JHLjHZGXWPBTB8dNEUVTaw5QimKsdwXKmawtSA
-   g==;
-X-CSE-ConnectionGUID: RJA2e51xTganBtHH2RZJeg==
-X-CSE-MsgGUID: uloYkovTRmilCT8skFRDlQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11047"; a="9238400"
-X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="9238400"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 02:20:37 -0700
-X-CSE-ConnectionGUID: HwqDJ7lqQs+uRd1N6u90Mg==
-X-CSE-MsgGUID: M4Pp741XSSSFRXlUYqLYpw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,213,1708416000"; 
-   d="scan'208";a="60716016"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa001.jf.intel.com with ESMTP; 19 Apr 2024 02:20:33 -0700
-Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 1A99428197;
-	Fri, 19 Apr 2024 10:20:25 +0100 (IST)
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Vaishnavi Tipireddy <vaishnavi.tipireddy@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-next v1] ice: refactor struct ice_vsi_cfg_params to be inside of struct ice_vsi
-Date: Fri, 19 Apr 2024 05:11:04 -0400
-Message-Id: <20240419091104.13495-1-mateusz.polchlopek@intel.com>
-X-Mailer: git-send-email 2.38.1
+	s=arc-20240116; t=1713518230; c=relaxed/simple;
+	bh=C3+dBCICsOMWLwza0Qfj9C9BoBcNN5mFcQLkVAXuz0s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X7s/hW2aWhJm7FmyveCnCoQG1b8AJhzOyekhiYhImbGsFtlxQ8/YdlOptOoVns3fqA2KbQqBlLxDOPmaA6LNkUmP31/KunToQ4JgEZ/DCRMRcGz7SFP1Rasbf7rbj25qGp/tgmxXxFS/gbrOMUOKxsXFGpd1d8poH3jZynKRvCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HZlN1sGS; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5194cebd6caso2163216e87.0
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 02:17:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713518227; x=1714123027; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qA+jHaZ971v5fc9F72WJ21aFgowg1NxbQRvruTfS7wM=;
+        b=HZlN1sGS88QEd9M025oeZVGDJETjbcz2JVmvnJLHQDELXZoGjKp4wJxnanxCZ/IWyg
+         e+CPBfkaf+wqvOPb54bfN7THKVvTMMRABVO2LvZWG1M/NA51hebxRmjal/yT5N3Un6uZ
+         pFy/P+8jaan9vaOLGp3UPF65ko7pK6aIUjO/s42gnBRMXPY0Qm+GttQI6y+6ItG147Yj
+         BZXBu5J4K5H1yIuZnnpNioU8Ileu7uxTITzwAml6ksJyOJmb0hX8H1Nq19Cl4dKjE+ig
+         ZppZOeCU0LBWZ4jElvxC1TvOyq6xoO1umYTmg3rblbW73GvG9mOgJhjFffcuqUbHyN/o
+         uN/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713518227; x=1714123027;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qA+jHaZ971v5fc9F72WJ21aFgowg1NxbQRvruTfS7wM=;
+        b=PxSxcn/0vV/xjgSAujWE4xNpyfD3xCutruu4JPE6XpEgncn0pn8l6VqoYPl8PGoEzv
+         euY1MD0yMpkni0L9ztDYCue6bGGb5cYf+xTYuB1nQyZv0QP1uNi9ViOhEgnYJ0Sefru/
+         7jvKceSVI1T9vWfrrYkDWcDaXn5zx1DdEILWNXdaa/PDHwQVu7U0zZqwAZdrd1eMB/yj
+         BbT/6CaxoFdkG8alvnIN+VyQe6oRVTIsa5LwO+W7opsXYCi9QOzHXGTA9prGYzuKzwsq
+         02/nNDJH1PY9E8yJnu7GRaJaMwbhQPxaH0sr9xLkd6Ou7ZKrS2f5skHHsvc/YE4hCcMM
+         IiAg==
+X-Forwarded-Encrypted: i=1; AJvYcCWrH3Fw3uIC0AfJN/fKGwj2bqC9z+G4U42WVvhaB+J6f3/aVrSjq6QPOE7e3Klw6ZqYeLi6ndYQhNCAUCjAdMfOSkCGH2sy
+X-Gm-Message-State: AOJu0YzFxHJ2lmei+jysaWbtkqbIPxgpWEfl4Yu0ajspfmg8oJrcEZQn
+	zpTJtR3Yhip9q78oI5iAzFjBPCEPKwLRnGrkmYm/2YGXoTzLhBqR
+X-Google-Smtp-Source: AGHT+IFf9tNzfd/0aJFV+Q2DQ/Ld2wuNriPQs/HLR8ZXmc3PIRcr3moPYfPnjEX4atblkX/hhyELhw==
+X-Received: by 2002:a19:8c0c:0:b0:51a:bd58:6764 with SMTP id o12-20020a198c0c000000b0051abd586764mr785315lfd.34.1713518226622;
+        Fri, 19 Apr 2024 02:17:06 -0700 (PDT)
+Received: from mobilestation.baikal.int (srv1.baikalchip.ru. [87.245.175.227])
+        by smtp.gmail.com with ESMTPSA id g28-20020a0565123b9c00b00518be964835sm619823lfv.53.2024.04.19.02.17.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Apr 2024 02:17:06 -0700 (PDT)
+Date: Fri, 19 Apr 2024 12:17:04 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@kernel.org, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com, siyanteng01@gmail.com
+Subject: Re: [PATCH net-next v11 2/6] net: stmmac: Add multi-channel support
+Message-ID: <juwqvnv22ky5avg72prgi2ocx7qy4kqldet4t4qfooerj3p6nn@lrnlkioxxevy>
+References: <cover.1712917541.git.siyanteng@loongson.cn>
+ <5b6b5642a5f3e77ddf8bfe598f7c70887f9cc37f.1712917541.git.siyanteng@loongson.cn>
+ <5v6ypjjtbq72ovb437p6n4fkq2z5a3nhkv6spjct2flvjaxmgq@ykrdiv7kk4kq>
+ <636a0d00-3141-4d4d-85af-5232fd5b1820@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <636a0d00-3141-4d4d-85af-5232fd5b1820@loongson.cn>
 
-Refactor struct ice_vsi_cfg_params to be embedded into struct ice_vsi.
-Prior to that the members of the struct were scattered around ice_vsi,
-and were copy-pasted for purposes of reinit.
-Now we have struct handy, and it is easier to have something sticky
-in the flags field.
+On Fri, Apr 19, 2024 at 05:02:17PM +0800, Yanteng Si wrote:
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> > > index daf79cdbd3ec..f161ec9ac490 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c
+> > > @@ -70,15 +70,17 @@ static void dwmac1000_dma_axi(void __iomem *ioaddr, struct stmmac_axi *axi)
+> > >   	writel(value, ioaddr + DMA_AXI_BUS_MODE);
+> > >   }
+> > > -static void dwmac1000_dma_init(void __iomem *ioaddr,
+> > > -			       struct stmmac_dma_cfg *dma_cfg, int atds)
+> > > +static void dwmac1000_dma_init_channel(struct stmmac_priv *priv,
+> > > +				       void __iomem *ioaddr,
+> > > +				       struct stmmac_dma_cfg *dma_cfg, u32 chan)
+> > please create a pre-requisite/preparation patch with the atds argument
+> > movement to the stmmac_dma_cfg structure as I suggested in v8:
+> > https://lore.kernel.org/netdev/yzs6eqx2swdhaegxxcbijhtb5tkhkvvyvso2perkessv5swq47@ywmea5xswsug/
+> > That will make this patch looking simpler and providing a single
+> > coherent change.
+> OK.
 
-Suggested-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Vaishnavi Tipireddy <vaishnavi.tipireddy@intel.com>
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
----
- .../net/ethernet/intel/ice/devlink/devlink.c  |  6 +--
- drivers/net/ethernet/intel/ice/ice.h          | 14 ++++---
- drivers/net/ethernet/intel/ice/ice_lib.c      | 33 ++++++----------
- drivers/net/ethernet/intel/ice/ice_lib.h      | 39 +------------------
- drivers/net/ethernet/intel/ice/ice_main.c     |  8 ++--
- drivers/net/ethernet/intel/ice/ice_sriov.c    |  2 +-
- drivers/net/ethernet/intel/ice/ice_vf_lib.c   |  8 ++--
- 7 files changed, 30 insertions(+), 80 deletions(-)
+> > >   	/* Clear the interrupt by writing a logic 1 to the CSR5[15-0] */
+> > > -	writel((intr_status & 0x1ffff), ioaddr + DMA_STATUS);
+> > > +	writel((intr_status & 0x7ffff), ioaddr + DMA_CHAN_STATUS(chan));
+> > I'll ask once again:
+> > 
+> > "Isn't the mask change going to be implemented in the framework of the
+> > Loongson-specific DMA-interrupt handler in some of the further
+> > patches?"
+> > 
+> The future is not going to change.
 
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-index be9244bb8bbc..0f1a46636b45 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-@@ -1043,18 +1043,16 @@ static int ice_devlink_set_parent(struct devlink_rate *devlink_rate,
- static int ice_devlink_reinit_up(struct ice_pf *pf)
- {
- 	struct ice_vsi *vsi = ice_get_main_vsi(pf);
--	struct ice_vsi_cfg_params params;
- 	int err;
- 
- 	err = ice_init_dev(pf);
- 	if (err)
- 		return err;
- 
--	params = ice_vsi_to_params(vsi);
--	params.flags = ICE_VSI_FLAG_INIT;
-+	vsi->flags = ICE_VSI_FLAG_INIT;
- 
- 	rtnl_lock();
--	err = ice_vsi_cfg(vsi, &params);
-+	err = ice_vsi_cfg(vsi);
- 	rtnl_unlock();
- 	if (err)
- 		goto err_vsi_cfg;
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 67a3236ab1fc..6ad8002b22e1 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -331,7 +331,6 @@ struct ice_vsi {
- 	struct net_device *netdev;
- 	struct ice_sw *vsw;		 /* switch this VSI is on */
- 	struct ice_pf *back;		 /* back pointer to PF */
--	struct ice_port_info *port_info; /* back pointer to port_info */
- 	struct ice_rx_ring **rx_rings;	 /* Rx ring array */
- 	struct ice_tx_ring **tx_rings;	 /* Tx ring array */
- 	struct ice_q_vector **q_vectors; /* q_vector array */
-@@ -349,12 +348,9 @@ struct ice_vsi {
- 	/* tell if only dynamic irq allocation is allowed */
- 	bool irq_dyn_alloc;
- 
--	enum ice_vsi_type type;
- 	u16 vsi_num;			/* HW (absolute) index of this VSI */
- 	u16 idx;			/* software index in pf->vsi[] */
- 
--	struct ice_vf *vf;		/* VF associated with this VSI */
--
- 	u16 num_gfltr;
- 	u16 num_bfltr;
- 
-@@ -446,12 +442,18 @@ struct ice_vsi {
- 	u8 old_numtc;
- 	u16 old_ena_tc;
- 
--	struct ice_channel *ch;
--
- 	/* setup back reference, to which aggregator node this VSI
- 	 * corresponds to
- 	 */
- 	struct ice_agg_node *agg_node;
-+
-+	struct_group_tagged(ice_vsi_cfg_params, params,
-+		struct ice_port_info *port_info; /* back pointer to port_info */
-+		struct ice_channel *ch; /* VSI's channel structure, may be NULL */
-+		struct ice_vf *vf; /* VF associated with this VSI, may be NULL */
-+		u32 flags; /* VSI flags used for rebuild and configuration */
-+		enum ice_vsi_type type; /* the type of the VSI */
-+	);
- } ____cacheline_internodealigned_in_smp;
- 
- /* struct that defines an interrupt vector */
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index d06e7c82c433..5371e91f6bbb 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -2227,10 +2227,8 @@ static int ice_vsi_cfg_tc_lan(struct ice_pf *pf, struct ice_vsi *vsi)
- /**
-  * ice_vsi_cfg_def - configure default VSI based on the type
-  * @vsi: pointer to VSI
-- * @params: the parameters to configure this VSI with
-  */
--static int
--ice_vsi_cfg_def(struct ice_vsi *vsi, struct ice_vsi_cfg_params *params)
-+static int ice_vsi_cfg_def(struct ice_vsi *vsi)
- {
- 	struct device *dev = ice_pf_to_dev(vsi->back);
- 	struct ice_pf *pf = vsi->back;
-@@ -2238,7 +2236,7 @@ ice_vsi_cfg_def(struct ice_vsi *vsi, struct ice_vsi_cfg_params *params)
- 
- 	vsi->vsw = pf->first_sw;
- 
--	ret = ice_vsi_alloc_def(vsi, params->ch);
-+	ret = ice_vsi_alloc_def(vsi, vsi->ch);
- 	if (ret)
- 		return ret;
- 
-@@ -2263,7 +2261,7 @@ ice_vsi_cfg_def(struct ice_vsi *vsi, struct ice_vsi_cfg_params *params)
- 	ice_vsi_set_tc_cfg(vsi);
- 
- 	/* create the VSI */
--	ret = ice_vsi_init(vsi, params->flags);
-+	ret = ice_vsi_init(vsi, vsi->flags);
- 	if (ret)
- 		goto unroll_get_qs;
- 
-@@ -2383,23 +2381,16 @@ ice_vsi_cfg_def(struct ice_vsi *vsi, struct ice_vsi_cfg_params *params)
- /**
-  * ice_vsi_cfg - configure a previously allocated VSI
-  * @vsi: pointer to VSI
-- * @params: parameters used to configure this VSI
-  */
--int ice_vsi_cfg(struct ice_vsi *vsi, struct ice_vsi_cfg_params *params)
-+int ice_vsi_cfg(struct ice_vsi *vsi)
- {
- 	struct ice_pf *pf = vsi->back;
- 	int ret;
- 
--	if (WARN_ON(params->type == ICE_VSI_VF && !params->vf))
-+	if (WARN_ON(vsi->type == ICE_VSI_VF && !vsi->vf))
- 		return -EINVAL;
- 
--	vsi->type = params->type;
--	vsi->port_info = params->pi;
--
--	/* For VSIs which don't have a connected VF, this will be NULL */
--	vsi->vf = params->vf;
--
--	ret = ice_vsi_cfg_def(vsi, params);
-+	ret = ice_vsi_cfg_def(vsi);
- 	if (ret)
- 		return ret;
- 
-@@ -2485,7 +2476,7 @@ ice_vsi_setup(struct ice_pf *pf, struct ice_vsi_cfg_params *params)
- 	 * a port_info structure for it.
- 	 */
- 	if (WARN_ON(!(params->flags & ICE_VSI_FLAG_INIT)) ||
--	    WARN_ON(!params->pi))
-+	    WARN_ON(!params->port_info))
- 		return NULL;
- 
- 	vsi = ice_vsi_alloc(pf);
-@@ -2494,7 +2485,8 @@ ice_vsi_setup(struct ice_pf *pf, struct ice_vsi_cfg_params *params)
- 		return NULL;
- 	}
- 
--	ret = ice_vsi_cfg(vsi, params);
-+	vsi->params = *params;
-+	ret = ice_vsi_cfg(vsi);
- 	if (ret)
- 		goto err_vsi_cfg;
- 
-@@ -3041,7 +3033,6 @@ ice_vsi_realloc_stat_arrays(struct ice_vsi *vsi)
-  */
- int ice_vsi_rebuild(struct ice_vsi *vsi, u32 vsi_flags)
- {
--	struct ice_vsi_cfg_params params = {};
- 	struct ice_coalesce_stored *coalesce;
- 	int prev_num_q_vectors;
- 	struct ice_pf *pf;
-@@ -3050,9 +3041,7 @@ int ice_vsi_rebuild(struct ice_vsi *vsi, u32 vsi_flags)
- 	if (!vsi)
- 		return -EINVAL;
- 
--	params = ice_vsi_to_params(vsi);
--	params.flags = vsi_flags;
--
-+	vsi->flags = vsi_flags;
- 	pf = vsi->back;
- 	if (WARN_ON(vsi->type == ICE_VSI_VF && !vsi->vf))
- 		return -EINVAL;
-@@ -3062,7 +3051,7 @@ int ice_vsi_rebuild(struct ice_vsi *vsi, u32 vsi_flags)
- 		goto err_vsi_cfg;
- 
- 	ice_vsi_decfg(vsi);
--	ret = ice_vsi_cfg_def(vsi, &params);
-+	ret = ice_vsi_cfg_def(vsi);
- 	if (ret)
- 		goto err_vsi_cfg;
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
-index 9cd23afe5f15..94ce8964dda6 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.h
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.h
-@@ -11,43 +11,6 @@
- #define ICE_VSI_FLAG_INIT	BIT(0)
- #define ICE_VSI_FLAG_NO_INIT	0
- 
--/**
-- * struct ice_vsi_cfg_params - VSI configuration parameters
-- * @pi: pointer to the port_info instance for the VSI
-- * @ch: pointer to the channel structure for the VSI, may be NULL
-- * @vf: pointer to the VF associated with this VSI, may be NULL
-- * @type: the type of VSI to configure
-- * @flags: VSI flags used for rebuild and configuration
-- *
-- * Parameter structure used when configuring a new VSI.
-- */
--struct ice_vsi_cfg_params {
--	struct ice_port_info *pi;
--	struct ice_channel *ch;
--	struct ice_vf *vf;
--	enum ice_vsi_type type;
--	u32 flags;
--};
--
--/**
-- * ice_vsi_to_params - Get parameters for an existing VSI
-- * @vsi: the VSI to get parameters for
-- *
-- * Fill a parameter structure for reconfiguring a VSI with its current
-- * parameters, such as during a rebuild operation.
-- */
--static inline struct ice_vsi_cfg_params ice_vsi_to_params(struct ice_vsi *vsi)
--{
--	struct ice_vsi_cfg_params params = {};
--
--	params.pi = vsi->port_info;
--	params.ch = vsi->ch;
--	params.vf = vsi->vf;
--	params.type = vsi->type;
--
--	return params;
--}
--
- const char *ice_vsi_type_str(enum ice_vsi_type vsi_type);
- 
- bool ice_pf_state_is_nominal(struct ice_pf *pf);
-@@ -101,7 +64,7 @@ void ice_vsi_decfg(struct ice_vsi *vsi);
- void ice_dis_vsi(struct ice_vsi *vsi, bool locked);
- 
- int ice_vsi_rebuild(struct ice_vsi *vsi, u32 vsi_flags);
--int ice_vsi_cfg(struct ice_vsi *vsi, struct ice_vsi_cfg_params *params);
-+int ice_vsi_cfg(struct ice_vsi *vsi);
- 
- bool ice_is_reset_in_progress(unsigned long *state);
- int ice_wait_for_reset(struct ice_pf *pf, unsigned long timeout);
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 80bc83f6e1ab..6e4d261d9e84 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -3684,7 +3684,7 @@ ice_pf_vsi_setup(struct ice_pf *pf, struct ice_port_info *pi)
- 	struct ice_vsi_cfg_params params = {};
- 
- 	params.type = ICE_VSI_PF;
--	params.pi = pi;
-+	params.port_info = pi;
- 	params.flags = ICE_VSI_FLAG_INIT;
- 
- 	return ice_vsi_setup(pf, &params);
-@@ -3697,7 +3697,7 @@ ice_chnl_vsi_setup(struct ice_pf *pf, struct ice_port_info *pi,
- 	struct ice_vsi_cfg_params params = {};
- 
- 	params.type = ICE_VSI_CHNL;
--	params.pi = pi;
-+	params.port_info = pi;
- 	params.ch = ch;
- 	params.flags = ICE_VSI_FLAG_INIT;
- 
-@@ -3718,7 +3718,7 @@ ice_ctrl_vsi_setup(struct ice_pf *pf, struct ice_port_info *pi)
- 	struct ice_vsi_cfg_params params = {};
- 
- 	params.type = ICE_VSI_CTRL;
--	params.pi = pi;
-+	params.port_info = pi;
- 	params.flags = ICE_VSI_FLAG_INIT;
- 
- 	return ice_vsi_setup(pf, &params);
-@@ -3738,7 +3738,7 @@ ice_lb_vsi_setup(struct ice_pf *pf, struct ice_port_info *pi)
- 	struct ice_vsi_cfg_params params = {};
- 
- 	params.type = ICE_VSI_LB;
--	params.pi = pi;
-+	params.port_info = pi;
- 	params.flags = ICE_VSI_FLAG_INIT;
- 
- 	return ice_vsi_setup(pf, &params);
-diff --git a/drivers/net/ethernet/intel/ice/ice_sriov.c b/drivers/net/ethernet/intel/ice/ice_sriov.c
-index a60dacf8942a..067712f4923f 100644
---- a/drivers/net/ethernet/intel/ice/ice_sriov.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sriov.c
-@@ -225,7 +225,7 @@ static struct ice_vsi *ice_vf_vsi_setup(struct ice_vf *vf)
- 	struct ice_vsi *vsi;
- 
- 	params.type = ICE_VSI_VF;
--	params.pi = ice_vf_get_port_info(vf);
-+	params.port_info = ice_vf_get_port_info(vf);
- 	params.vf = vf;
- 	params.flags = ICE_VSI_FLAG_INIT;
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_vf_lib.c b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-index c51e2482cad2..cf9f56a39b61 100644
---- a/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_vf_lib.c
-@@ -259,20 +259,18 @@ static void ice_vf_pre_vsi_rebuild(struct ice_vf *vf)
- int ice_vf_reconfig_vsi(struct ice_vf *vf)
- {
- 	struct ice_vsi *vsi = ice_get_vf_vsi(vf);
--	struct ice_vsi_cfg_params params = {};
- 	struct ice_pf *pf = vf->pf;
- 	int err;
- 
- 	if (WARN_ON(!vsi))
- 		return -EINVAL;
- 
--	params = ice_vsi_to_params(vsi);
--	params.flags = ICE_VSI_FLAG_NO_INIT;
-+	vsi->flags = ICE_VSI_FLAG_NO_INIT;
- 
- 	ice_vsi_decfg(vsi);
- 	ice_fltr_remove_all(vsi);
- 
--	err = ice_vsi_cfg(vsi, &params);
-+	err = ice_vsi_cfg(vsi);
- 	if (err) {
- 		dev_err(ice_pf_to_dev(pf),
- 			"Failed to reconfigure the VF%u's VSI, error %d\n",
-@@ -1243,7 +1241,7 @@ struct ice_vsi *ice_vf_ctrl_vsi_setup(struct ice_vf *vf)
- 	struct ice_vsi *vsi;
- 
- 	params.type = ICE_VSI_CTRL;
--	params.pi = ice_vf_get_port_info(vf);
-+	params.port_info = ice_vf_get_port_info(vf);
- 	params.vf = vf;
- 	params.flags = ICE_VSI_FLAG_INIT;
- 
--- 
-2.38.1
+Not sure I've completely got what you meant. You are adding the
+Loongson-specific DMA IRQ handler in Patch 6/6:
+https://lore.kernel.org/netdev/cover.1712917541.git.siyanteng@loongson.cn/T/#m439c1d8957cd6997beb0374484a8d0efbeac0182
 
+The change in the patch 2/6 concerns the _generic_ DW MAC DMA IRQ
+handler. You can't change the mask here without justification.
+Moreover the generic DW MAC doesn't have the status flags behind the
+mask you set. That's why earlier we find out a solution with creating
+the Loongson-specific DMA IRQ-handler. You have it implemented in the
+patch 6/6.
+
+So my question was mostly rhetorical. You should have dropped the mask
+change in this patch ever since the Loongson-specific DMA
+IRQ-handler was added to your series.
+
+-Serge(y) 
+
+> 
+> 
+> Thanks,
+> 
+> Yanteng
+> 
+> > 
+> 
 
