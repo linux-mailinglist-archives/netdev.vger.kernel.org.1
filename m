@@ -1,193 +1,421 @@
-Return-Path: <netdev+bounces-89746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 729D48AB679
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 23:31:16 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 147A18AB687
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 23:39:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0037A1F216DA
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 21:31:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7362DB2299D
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 21:39:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF88113D247;
-	Fri, 19 Apr 2024 21:30:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C44F13CFBD;
+	Fri, 19 Apr 2024 21:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Mfj+qBkG"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eocHHhUa"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2040.outbound.protection.outlook.com [40.107.102.40])
+Received: from out-177.mta1.migadu.com (out-177.mta1.migadu.com [95.215.58.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA0213D269;
-	Fri, 19 Apr 2024 21:30:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713562248; cv=fail; b=GsGFTJuJTw0hMLTt+OrjyT37NtxmkYEDsVZRyPlUOvlk5KmPobnmDOKZyxFu+6CWIsbnXmgeMOogQTIHW97n20qLsZOr43YDFv5VNojBjDjYiw0o8KctAgJoyjByly9E6jWOlCGJazgjCA4rkoA7/VjbtcfHkz3bBtnke9SVF1U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713562248; c=relaxed/simple;
-	bh=wlNxrNZT6VtVgr+St5xHk9CM9YwyQIld5BZC051NgzY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=IBTkc219JACyiB594nkdaQWNnZg8o36wQCl0Pp23q7oJdOVmGUjYptwPDwGWBcUzjo6KCkLWS3gyC+DH81ZFcGwjyxYcQlhdoyPnnZGTk6VEIGWrybfpuSEPdUWSuAPHMKk9bNowI3bdWCyxN6w1dnw1assfYInd3SdUlNRfbxA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Mfj+qBkG; arc=fail smtp.client-ip=40.107.102.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Pk8lzgmcGV2ooC5Z1eBYtxbSCTH0o1h0QtdMYiu7RrQ+XcFr7/6ud0fiM9nYbdcW8OmGDXYBXAac61Hwt5fhMGooFAiN1CNue+6JBjqhUa3u9KDKcrfjyeqVWkpWpubh9wQ38hCTO6sRf9dGiwLUss339QQ0RUvDuaY5nZLbOf0FRqN1BImdTnDyIyS9IoGo/DQMdt+krMpRTxx361btpEZ7kjPBSjNSvWh2ycTo+LnmwYPNil7hzEk1T2IWJTmRk/LhQP+BoeJK2UE4OfVoZSrALtys75eEPz2tzAtqL2IG9UxZXTIy/6FjMw8C4+e5thgY4al3OjDkcJDlOOxbEA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=eCTQ4Tq6NI7rX1L0FMlB2I4qV4lqKOSFAGQSBwlW6oQ=;
- b=Q4pGlPct0QzpArAE4/Z26x0lkdkIFLRvi+UlkXyUYmls5O4M04qLNaICubKRTCkL3MnGFx0Hn7YvKql7xcShgJmp+XaK9zyLEVbbQRyx+tcI1IpO1WYwIleffu4kpW4CHoQHqxUhnfiDXZrHyTz8m/JfpF18L6zpAMjpQ7lY2tgTibAxNgZ1MI0uZFAYqNvce8iWbLwdAY7+Dse3afqcRP3isODfZbQ1P40QLmCf7B9u4ew7nTbo3v45Q4NbzVzCgR00OcCWsy2wsCUOIkZCA9D4KwrDNqHTbHfQvu53ViJvrkxcA5qBc1cri0qDtJcEuEHkkTQG2bM7n7TJIJHSPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eCTQ4Tq6NI7rX1L0FMlB2I4qV4lqKOSFAGQSBwlW6oQ=;
- b=Mfj+qBkGggCjezNIlNOVo5k9IIlxA8+zpfChIRfO3XnKgB2GobIticmyEKpbh54ooBVsdcV8jiqVg+k4w3YDDn8gncUp7rN5W5TvD+96JDUHUnIyauGANZSqw3m0oUGYL/JB5VnUfzJgw3mnxsnDE19BH/B6+qFMXUrEybVDEJIIC4RP6Cx633nyA+C3LOSWZMA9u4RpWm9XOJijQk/Xqwbwth2fIGLIYSJtm6PRBcoe2w3wcQDCzFz7Z1E9zHj2rRRvC+SjqoqwCAkQ51evpBypdwYAuhSl6Q8W/s9bT0wFpvIknqMIeC0LphZZvpI0rQjZNocmmbH1DuJDWkynmg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by SA1PR12MB5670.namprd12.prod.outlook.com (2603:10b6:806:239::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.43; Fri, 19 Apr
- 2024 21:30:41 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::3ec0:1215:f4ed:9535]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::3ec0:1215:f4ed:9535%4]) with mapi id 15.20.7472.044; Fri, 19 Apr 2024
- 21:30:41 +0000
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: netdev@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Yossi Kuperman <yossiku@nvidia.com>,
-	Benjamin Poirier <bpoirier@nvidia.com>,
-	Cosmin Ratiu <cratiu@nvidia.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Subject: [PATCH net v2 4/4] net/mlx5e: Advertise mlx5 ethernet driver updates sk_buff md_dst for MACsec
-Date: Fri, 19 Apr 2024 14:30:19 -0700
-Message-ID: <20240419213033.400467-5-rrameshbabu@nvidia.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240419213033.400467-1-rrameshbabu@nvidia.com>
-References: <20240419213033.400467-1-rrameshbabu@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR03CA0237.namprd03.prod.outlook.com
- (2603:10b6:a03:39f::32) To BYAPR12MB2743.namprd12.prod.outlook.com
- (2603:10b6:a03:61::28)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9F013C91F
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 21:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713562736; cv=none; b=q20Hgjq1pCJkqxvW4bJjakEuwJvplrUoxn0kKmau0fDAe/bQqWrCAbVc/71Ndqq7fpDGIwRiE/WgIYlgxoCsjv5FqiDn2IioPhyE2Gd3eeI0opuZkVa/4f3SrqT6nOTCv8YnlwV6+IyMeWH+Hgqx7mA4uK2TPhK645i3umi/ios=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713562736; c=relaxed/simple;
+	bh=pLJhxuz8PyNKTJmjoeVjz1Oq90uzNL0mxwIZZ8ctnLI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g8bqNf9iB1reT4+yZhWQ/awqfhPx/lzEfTtujLodqbuL36zhVC0UAM+OhAEYaCWKl+F/1pSW7k9EW4MlgHmV9ZNYZOhANZu9Gz/N8evUIIw8ZFuP9uWptDqqz8m23NxBJyoIYYl8ceicbkqxKhF2m+kowi0q989tQv4mLfEc4J0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eocHHhUa; arc=none smtp.client-ip=95.215.58.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <60a88a78-d6d5-48b9-b894-47e4e54240df@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1713562731;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=2TQXggKe36TRCP6eJwykB3M+8KrdclZ3XPpoq2DnTAg=;
+	b=eocHHhUab4cU02eJwmb43bcBZ9uRWzKqBBKfZ7It/ZfmK7i8AEbxO8enHPS27gvmO7diL8
+	xhofaASFQxiEdNO27ID1+taLjt9wC9VwKgcSyIpHlr/0F2Yp3dZsJefgIcE1+L0CZj0f3v
+	0S7TjXMdUi4XiK9RwBSZ3TYDxo7Sbnk=
+Date: Fri, 19 Apr 2024 14:38:41 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|SA1PR12MB5670:EE_
-X-MS-Office365-Filtering-Correlation-Id: 81cd5250-fd12-45a1-18dc-08dc60b7f669
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?k8v4AnUavNDmPoaaqlGGL2eo7b4Sa0+n+f+AfPeoOfPSusrkY2OkxD8nHwt3?=
- =?us-ascii?Q?8UNTGJ71E+uCttuP3d+4eTRVjhs3tjUVY+HR8RW3WtKW43N48RdjQSzq5RN3?=
- =?us-ascii?Q?/I/Oy4YPXr4Om3G/IKGZz3bDVNw17eQK3Pzaic8AbC0xSvMibxFNmby4kbF8?=
- =?us-ascii?Q?x9Fq6MtgE+wF8OnZUU50k0TZYX5v9turptuHKOxGJO2lqX/IQ4nbvtXBtKRi?=
- =?us-ascii?Q?LOAMXV7vQH4cNYv0oon5QsaE8h436pU7b5rLLrJZOfk/rpkeQQ590AqoLM4I?=
- =?us-ascii?Q?xGzXtUW2sONohz9N+H5Raxputcx5r3c/Q3BPBvmkyl4q5GDXi3XsNz6nPlER?=
- =?us-ascii?Q?XihILUwE5sDmv2N9/F2wlJPtbiobE5caz9U2FQJ0m3SoUnvMZ1Tv2VQm6F0t?=
- =?us-ascii?Q?a1npbo0Ly9Fl4fM3Zz1647AyuhlavFCjsDrQMfCnrLwu1CCHem/JcDF/15Ry?=
- =?us-ascii?Q?eMdFwAfiUsDHluJlO92OetiW2RJ/MENEeuBVZFuzfZZXpp7eKwfAjD3vPs0t?=
- =?us-ascii?Q?mmFiJo/QlYhwPPbSaf6j/jk9nGUq2GbtAvdmHqXAmuIbnYUHlnhvc1Cihc0J?=
- =?us-ascii?Q?kOcn61wOOwBwXxwzhERSFQMun2mXbCzWfSIZ9t1jD3pRG6qVVsIf+kJGErrO?=
- =?us-ascii?Q?eISBUy9p26ntiggw5PkyzQJZxpzQeYgNIV475cB19RhgBK/6btciedNzC+wz?=
- =?us-ascii?Q?85dymtZtRDsKu5cUtG6wJtldSnXwm8w0/v9OlZ354opnbCFtjTn0qCZc5t+5?=
- =?us-ascii?Q?FKbuF32OkHW95B+Oeo4FH2i/xywSa+S1udOyJKVGBDI9AmJDQCBT/JBpHEXr?=
- =?us-ascii?Q?dj0f5LmWYj/HMsOR3yJ6uW3LGIX34CQCqHB3XKD2jlJTuvdSvo4mBlPDGvS4?=
- =?us-ascii?Q?FDTakJ404ujLYGN2V02m06P44uObCxaafy+6U+ouFdFmhCAzDM+NgscK2YY7?=
- =?us-ascii?Q?oG3RStZyalAg1vI/HUlGGafsuwY8UmIwWVtTYGM2fWc4/V2sZ9KzOnLXXih6?=
- =?us-ascii?Q?qDInuLQz+F9lsoCQT5y558tkkmIbDOSxFfe8qtnHstVForpMB3rV383nmXY/?=
- =?us-ascii?Q?YWRogsu3KN/lGJ/N6t5gicZX+sLTcIyUnN7NZ9HOvd4+sCgva78oqW+4RfhB?=
- =?us-ascii?Q?wpgbz48exfpgKzrcLbr/+NmYXMAKCD/q6x10w4SJB4J+JN6rXisCLciVpFhP?=
- =?us-ascii?Q?YmKFy6UFcUNhojeBIq25VDGUDe7+ylwaWbMPK3txjLtFd8Qa1sYlVzIBFEwu?=
- =?us-ascii?Q?+sESqO06Uq+8t9/Xgg8nVCK+PHXQVBJACy5yhBC6SA=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?K1JZZn5qYUdjRjKLzk6wQlseZ/lK8f9btE3P4xdcRtYbnrkNoTYrNgunhDXI?=
- =?us-ascii?Q?uV/bjKqU0GcdWKUBR2uRgv/RuFJqiemMCG8866s3FJEGIV13jnXOHjHH3kCi?=
- =?us-ascii?Q?JBzutpWP2LpF0hgb2wvFzADyB9X1scdMw/1ZIzrPKNh2H31zQ06Sh86LPjm0?=
- =?us-ascii?Q?KJtdE25awQPgshHcp+BhG8GMpTqEm6WQQHHWrgcKsEyDA+k5gbIoFJK/Pu5e?=
- =?us-ascii?Q?IYM8xCDbpy9tD9oR468nCUXfjv4/m9mgI+FvgrgLuHOJlgm+/utPJmTXsmbA?=
- =?us-ascii?Q?rEj2TLhzSmmPvtecls0UHN4KVH6qMFjRvf0gMCrYk4zAVjZqc0PrnHfRz6on?=
- =?us-ascii?Q?LCn/T5EP/iDrHskkGp9TqevbyoZS0GfWCiiMXiyLCtcqitBXFUs+qS7SoBrg?=
- =?us-ascii?Q?wJdoXMYd2wcEfjHa5kERe7mMRidM+jpRi0FIuV++Wa+rPgyDbAj9zJgdYk9D?=
- =?us-ascii?Q?rg+vgp4k5+r8oR2Oo4ZI7IJHODm5vejROUABhH5tIUwXcQOpU+sgVzyZ2Z5O?=
- =?us-ascii?Q?mU4gWC6rgFIriB7nDS0F00o0/uayaMXhiMESHw2DTAWTXkFk0+qx4wGfWHN8?=
- =?us-ascii?Q?ZvdbXw+zViteHt3LOPW5n8f7cuj3WiWsoTPTLy07DmwPJ50v71fb8TgsB2X9?=
- =?us-ascii?Q?JID/uE7ymRrpBhI7jVYX29MNqxgGtL8x7zBtFduK5UX0Jyl80E/LHl0S2kSa?=
- =?us-ascii?Q?PhGQNUyoh0RTP15w17kaDwbqGw9/xh99rLSbMME35s4MtSFKxB76PZzp9P4C?=
- =?us-ascii?Q?DBpdJ4stEjzD9l2bjt3ET503tGC19aQWRgOsOY+0Yd5WvC7zr9yT8j0GmJj7?=
- =?us-ascii?Q?HJfUh1Gxg/WsO29tPHAyjmvXyyxe446eyvSMpoVphreM/LE+KFHgujyz3X/D?=
- =?us-ascii?Q?vnGAiwT+trKFrDg5nkAUmIA6b/4sThgnUOu6H1H64RjI9HYNY3ZfvKoODsAj?=
- =?us-ascii?Q?l2DjbB6ldsQZkOxRrmHAFcysbEhzKN1HjdDJhSK5Pn7UzTxC/mwDFLoMSIIZ?=
- =?us-ascii?Q?F+LshIXUSkIenYv5KIdkuQ1E19jLQL7lkt8jylfmgtzx82hUCP8PIbYV29ge?=
- =?us-ascii?Q?sAbWrDVSiKhPGMTomNqdbhBcX6Lsboi0HebZyuL5XuOFYNiZQFKxtSfhxWij?=
- =?us-ascii?Q?tyUoZeY7qdQDMSr/PblfCmx++gH5H9encSdx4JeyGheToovNMVAX/wCHaljJ?=
- =?us-ascii?Q?u9OqVh4VSWnt0yujEYsIU0QAyzb1DENYeonhNaK9Q5z24KF7RGTW4XIlhtJz?=
- =?us-ascii?Q?izg8LtmDKEMO/JMDKztXF0xczxq7+secaEkhcwnPBpdtQmaLq9laDBRqO0xj?=
- =?us-ascii?Q?c4iYSRWJVpDuPk6oxFHlFTQ3koAals1jyfIL2l79BxUujKj2p5Ni4jpHS7XX?=
- =?us-ascii?Q?76VNaqfdJjztP7bC9vvx64qaI1DTQ1tjxE8KejfwdjC8Tn1X4RzyonESBMtf?=
- =?us-ascii?Q?3zGRjzF6UNccMx+dK8CgwRB89eeRMQMuwdzBARz0MvePaK5Lp1ug1fDljLUC?=
- =?us-ascii?Q?xYlBvxx1XmAEgVoLtqVl18v7twLlso4gFweDNSPvDefOP+8V3F/+kdOH6HGZ?=
- =?us-ascii?Q?+W3MsZau4QYOr08XfCaABf24D9M/sRH2FLwZTF59J5V3E5DVsPMqt3c0GnVm?=
- =?us-ascii?Q?CQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 81cd5250-fd12-45a1-18dc-08dc60b7f669
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Apr 2024 21:30:41.0522
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qH5j3qZ75TlI33+GFrTA7eaZFt+vtowgPhRpr/g0bXFUtnvtR3zwpKA3D2J81+wsbqcLaYXVSlvlMoa3uva3WQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB5670
+Subject: Re: [PATCH bpf-next v9 3/4] selftests: bpf: crypto skcipher algo
+ selftests
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+ Jakub Kicinski <kuba@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+ linux-crypto@vger.kernel.org, bpf@vger.kernel.org
+References: <20240416204004.3942393-1-vadfed@meta.com>
+ <20240416204004.3942393-4-vadfed@meta.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <20240416204004.3942393-4-vadfed@meta.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-mlx5 Rx flow steering and CQE handling enable the driver to be able to
-update an skb's md_dst attribute as MACsec when MACsec traffic arrives when
-a device is configured for offloading. Advertise this to the core stack to
-take advantage of this capability.
+On 4/16/24 1:40 PM, Vadim Fedorenko wrote:
+> +void test_crypto_sanity(void)
+> +{
+> +	struct crypto_syscall_args sargs = {
+> +		.key_len = 16,
+> +	};
+> +	LIBBPF_OPTS(bpf_tc_hook, qdisc_hook, .attach_point = BPF_TC_EGRESS);
+> +	LIBBPF_OPTS(bpf_tc_opts, tc_attach_enc);
+> +	LIBBPF_OPTS(bpf_tc_opts, tc_attach_dec);
+> +	LIBBPF_OPTS(bpf_test_run_opts, opts,
+> +		    .ctx_in = &sargs,
+> +		    .ctx_size_in = sizeof(sargs),
+> +	);
+> +	struct nstoken *nstoken = NULL;
+> +	struct crypto_sanity *skel;
+> +	char afalg_plain[16] = {0};
+> +	char afalg_dst[16] = {0};
+> +	struct sockaddr_in6 addr;
+> +	int sockfd, err, pfd;
+> +	socklen_t addrlen;
+> +
+> +	SYS(fail, "ip netns add %s", NS_TEST);
+> +	SYS(fail, "ip -net %s -6 addr add %s/128 dev lo nodad", NS_TEST, IPV6_IFACE_ADDR);
+> +	SYS(fail, "ip -net %s link set dev lo up", NS_TEST);
+> +
+> +	nstoken = open_netns(NS_TEST);
+> +	if (!ASSERT_OK_PTR(nstoken, "open_netns"))
+> +		goto fail;
 
-Cc: stable@vger.kernel.org
-Fixes: b7c9400cbc48 ("net/mlx5e: Implement MACsec Rx data path using MACsec skb_metadata_dst")
-Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Reviewed-by: Benjamin Poirier <bpoirier@nvidia.com>
-Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c | 1 +
- 1 file changed, 1 insertion(+)
+skel is not initialized. The "fail:" case needs it.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
-index b2cabd6ab86c..cc9bcc420032 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/macsec.c
-@@ -1640,6 +1640,7 @@ static const struct macsec_ops macsec_offload_ops = {
- 	.mdo_add_secy = mlx5e_macsec_add_secy,
- 	.mdo_upd_secy = mlx5e_macsec_upd_secy,
- 	.mdo_del_secy = mlx5e_macsec_del_secy,
-+	.rx_uses_md_dst = true,
- };
- 
- bool mlx5e_macsec_handle_tx_skb(struct mlx5e_macsec *macsec, struct sk_buff *skb)
--- 
-2.42.0
+> +
+> +	err = init_afalg();
+> +	if (!ASSERT_OK(err, "AF_ALG init fail"))
+> +		goto fail;
+> +
+> +	qdisc_hook.ifindex = if_nametoindex("lo");
+> +	if (!ASSERT_GT(qdisc_hook.ifindex, 0, "if_nametoindex lo"))
+> +		goto fail;
+> +
+> +	skel = crypto_sanity__open_and_load();
+> +	if (!ASSERT_OK_PTR(skel, "skel open"))
+> +		return;
+
+The netns "crypto_sanity_ns" is not deleted.
+
+> +
+> +	memcpy(skel->bss->key, crypto_key, sizeof(crypto_key));
+> +	snprintf(skel->bss->algo, 128, "%s", algo);
+> +	pfd = bpf_program__fd(skel->progs.skb_crypto_setup);
+> +	if (!ASSERT_GT(pfd, 0, "skb_crypto_setup fd"))
+> +		goto fail;
+> +
+> +	err = bpf_prog_test_run_opts(pfd, &opts);
+> +	if (!ASSERT_OK(err, "skb_crypto_setup") ||
+> +	    !ASSERT_OK(opts.retval, "skb_crypto_setup retval"))
+> +		goto fail;
+> +
+> +	if (!ASSERT_OK(skel->bss->status, "skb_crypto_setup status"))
+> +		goto fail;
+> +
+> +	err = crypto_sanity__attach(skel);
+
+This attach is a left over from previous revision?
+
+> +	if (!ASSERT_OK(err, "crypto_sanity__attach"))
+> +		goto fail;
+> +
+> +	err = bpf_tc_hook_create(&qdisc_hook);
+> +	if (!ASSERT_OK(err, "create qdisc hook"))
+> +		goto fail;
+> +
+> +	addrlen = sizeof(addr);
+> +	err = make_sockaddr(AF_INET6, IPV6_IFACE_ADDR, UDP_TEST_PORT,
+> +			    (void *)&addr, &addrlen);
+> +	if (!ASSERT_OK(err, "make_sockaddr"))
+> +		goto fail;
+> +
+> +	tc_attach_enc.prog_fd = bpf_program__fd(skel->progs.encrypt_sanity);
+> +	err = bpf_tc_attach(&qdisc_hook, &tc_attach_enc);
+> +	if (!ASSERT_OK(err, "attach encrypt filter"))
+> +		goto fail;
+> +
+> +	sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
+> +	if (!ASSERT_NEQ(sockfd, -1, "encrypt socket"))
+> +		goto fail;
+> +	err = sendto(sockfd, plain_text, sizeof(plain_text), 0, (void *)&addr, addrlen);
+> +	close(sockfd);
+> +	if (!ASSERT_EQ(err, sizeof(plain_text), "encrypt send"))
+> +		goto fail;
+> +
+> +	do_crypt_afalg(plain_text, afalg_dst, sizeof(afalg_dst), true);
+> +
+> +	bpf_tc_detach(&qdisc_hook, &tc_attach_enc);
+
+Check error.
+
+I suspect this detach should have failed because at least the 
+tc_attach_enc.prog_fd is not 0.
+
+The following attach (&tc_attach_"dec") may just happen to have a higher 
+priority such that the left over here does not matter. It is still better to get 
+it right.
+
+> +	if (!ASSERT_OK(skel->bss->status, "encrypt status"))
+> +		goto fail;
+> +	if (!ASSERT_STRNEQ(skel->bss->dst, afalg_dst, sizeof(afalg_dst), "encrypt AF_ALG"))
+> +		goto fail;
+> +
+> +	tc_attach_dec.prog_fd = bpf_program__fd(skel->progs.decrypt_sanity);
+> +	err = bpf_tc_attach(&qdisc_hook, &tc_attach_dec);
+> +	if (!ASSERT_OK(err, "attach decrypt filter"))
+> +		goto fail;
+> +
+> +	sockfd = socket(AF_INET6, SOCK_DGRAM, 0);
+> +	if (!ASSERT_NEQ(sockfd, -1, "decrypt socket"))
+> +		goto fail;
+> +	err = sendto(sockfd, afalg_dst, sizeof(afalg_dst), 0, (void *)&addr, addrlen);
+> +	close(sockfd);
+> +	if (!ASSERT_EQ(err, sizeof(afalg_dst), "decrypt send"))
+> +		goto fail;
+> +
+> +	do_crypt_afalg(afalg_dst, afalg_plain, sizeof(afalg_plain), false);
+> +
+> +	bpf_tc_detach(&qdisc_hook, &tc_attach_dec);
+> +	if (!ASSERT_OK(skel->bss->status, "decrypt status"))
+> +		goto fail;
+> +	if (!ASSERT_STRNEQ(skel->bss->dst, afalg_plain, sizeof(afalg_plain), "decrypt AF_ALG"))
+> +		goto fail;
+> +
+> +fail:
+> +	if (nstoken) {
+
+No need to check NULL. close_netns() can handle it.
+
+> +		bpf_tc_hook_destroy(&qdisc_hook);
+
+This also does not destroy the clsact qdisc. Although the function name feels 
+like it would, from a quick look at bpf_tc_hook_destroy, it depends on both 
+BPF_TC_INGRESS and BPF_TC_EGRESS are set in the qdisc_hook.attach_point.
+
+I would skip the whole bpf_tc_hook_destroy. It will go away together with the netns.
+
+[ ... ]
+
+> diff --git a/tools/testing/selftests/bpf/progs/crypto_sanity.c b/tools/testing/selftests/bpf/progs/crypto_sanity.c
+> new file mode 100644
+> index 000000000000..57df5776bcaf
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/crypto_sanity.c
+> @@ -0,0 +1,161 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (c) 2024 Meta Platforms, Inc. and affiliates. */
+> +
+> +#include "vmlinux.h"
+> +#include "bpf_tracing_net.h"
+> +#include <bpf/bpf_helpers.h>
+> +#include <bpf/bpf_endian.h>
+> +#include <bpf/bpf_tracing.h>
+> +#include "bpf_misc.h"
+> +#include "bpf_kfuncs.h"
+> +#include "crypto_common.h"
+> +
+> +unsigned char key[256] = {};
+> +char algo[128] = {};
+> +char dst[16] = {};
+> +int status;
+> +
+> +static int skb_dynptr_validate(struct __sk_buff *skb, struct bpf_dynptr *psrc)
+> +{
+> +	struct ipv6hdr ip6h;
+> +	struct udphdr udph;
+> +	u32 offset;
+> +
+> +	if (skb->protocol != __bpf_constant_htons(ETH_P_IPV6))
+> +		return -1;
+> +
+> +	if (bpf_skb_load_bytes(skb, ETH_HLEN, &ip6h, sizeof(ip6h)))
+> +		return -1;
+> +
+> +	if (ip6h.nexthdr != IPPROTO_UDP)
+> +		return -1;
+> +
+> +	if (bpf_skb_load_bytes(skb, ETH_HLEN + sizeof(ip6h), &udph, sizeof(udph)))
+> +		return -1;
+> +
+> +	if (udph.dest != __bpf_constant_htons(UDP_TEST_PORT))
+> +		return -1;
+> +
+> +	offset = ETH_HLEN + sizeof(ip6h) + sizeof(udph);
+> +	if (skb->len < offset + 16)
+> +		return -1;
+> +
+> +	/* let's make sure that 16 bytes of payload are in the linear part of skb */
+> +	bpf_skb_pull_data(skb, offset + 16);
+> +	bpf_dynptr_from_skb(skb, 0, psrc);
+> +	bpf_dynptr_adjust(psrc, offset, offset + 16);
+> +
+> +	return 0;
+> +}
+> +
+> +SEC("syscall")
+> +int skb_crypto_setup(struct crypto_syscall_args *ctx)
+> +{
+> +	struct bpf_crypto_params params = {
+> +		.type = "skcipher",
+> +		.key_len = ctx->key_len,
+> +		.authsize = ctx->authsize,
+> +	};
+> +	struct bpf_crypto_ctx *cctx;
+> +	int err = 0;
+> +
+> +	status = 0;
+> +
+> +	if (ctx->key_len > 255) {
+
+key_len == 256 won't work ?
+
+> +		status = -EINVAL;
+> +		return 0;
+> +	}
+> +
+> +	__builtin_memcpy(&params.algo, algo, sizeof(algo));
+> +	__builtin_memcpy(&params.key, key, sizeof(key));
+
+It will be useful to comment here what problem was hit such that the key cannot 
+be passed in the "struct crypto_syscall_args" and need to go back to the global 
+variable.
+
+Instead of "key_len" in the crypto_syscall_args and the actual "key" in global, 
+how about skip using the "struct crypto_syscall_args" altogether and put key_len 
+(and authsize) in the global?
+
+Put UDP_TEST_PORT as a global variable for config/filter usage also and the 
+"crypto_share.h" can go away.
+
+> +	cctx = bpf_crypto_ctx_create(&params, &err);
+> +
+> +	if (!cctx) {
+> +		status = err;
+> +		return 0;
+> +	}
+> +
+> +	err = crypto_ctx_insert(cctx);
+> +	if (err && err != -EEXIST)
+> +		status = err;
+> +
+> +	return 0;
+> +}
+> +
+> +SEC("tc")
+> +int decrypt_sanity(struct __sk_buff *skb)
+> +{
+> +	struct __crypto_ctx_value *v;
+> +	struct bpf_crypto_ctx *ctx;
+> +	struct bpf_dynptr psrc, pdst, iv;
+> +	int err;
+> +
+> +	err = skb_dynptr_validate(skb, &psrc);
+> +	if (err < 0) {
+> +		status = err;
+> +		return TC_ACT_SHOT;
+> +	}
+> +
+> +	v = crypto_ctx_value_lookup();
+> +	if (!v) {
+> +		status = -ENOENT;
+> +		return TC_ACT_SHOT;
+> +	}
+> +
+> +	ctx = v->ctx;
+> +	if (!ctx) {
+> +		status = -ENOENT;
+> +		return TC_ACT_SHOT;
+> +	}
+> +
+> +	bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
+
+dst is now a global which makes it easier to test the result. A comment here to 
+note this point for people referencing this test for production use case and 
+suggest a percpu map could be used.
+
+It will be useful to have dynptr working with stack memory in the future.
+
+> +	/* iv dynptr has to be initialized with 0 size, but proper memory region
+> +	 * has to be provided anyway
+> +	 */
+> +	bpf_dynptr_from_mem(dst, 0, 0, &iv);
+> +
+> +	status = bpf_crypto_decrypt(ctx, &psrc, &pdst, &iv);
+> +
+> +	return TC_ACT_SHOT;
+> +}
+> +
+> +SEC("tc")
+> +int encrypt_sanity(struct __sk_buff *skb)
+> +{
+> +	struct __crypto_ctx_value *v;
+> +	struct bpf_crypto_ctx *ctx;
+> +	struct bpf_dynptr psrc, pdst, iv;
+> +	int err;
+> +
+> +	status = 0;
+> +
+> +	err = skb_dynptr_validate(skb, &psrc);
+> +	if (err < 0) {
+> +		status = err;
+> +		return TC_ACT_SHOT;
+> +	}
+> +
+> +	v = crypto_ctx_value_lookup();
+> +	if (!v) {
+> +		status = -ENOENT;
+> +		return TC_ACT_SHOT;
+> +	}
+> +
+> +	ctx = v->ctx;
+> +	if (!ctx) {
+> +		status = -ENOENT;
+> +		return TC_ACT_SHOT;
+> +	}
+> +
+> +	bpf_dynptr_from_mem(dst, sizeof(dst), 0, &pdst);
+> +	/* iv dynptr has to be initialized with 0 size, but proper memory region
+> +	 * has to be provided anyway
+> +	 */
+> +	bpf_dynptr_from_mem(dst, 0, 0, &iv);
+> +
+> +	status = bpf_crypto_encrypt(ctx, &psrc, &pdst, &iv);
+> +
+> +	return TC_ACT_SHOT;
+> +}
+> +
+> +char __license[] SEC("license") = "GPL";
+> diff --git a/tools/testing/selftests/bpf/progs/crypto_share.h b/tools/testing/selftests/bpf/progs/crypto_share.h
+> new file mode 100644
+> index 000000000000..c5a6ef65156d
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/crypto_share.h
+> @@ -0,0 +1,10 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* Copyright (c) 2024 Meta Platforms, Inc. and affiliates. */
+> +
+> +#define UDP_TEST_PORT 7777
+> +
+> +struct crypto_syscall_args {
+> +	u32 key_len;
+> +	u32 authsize;
+> +};
+> +
 
 
