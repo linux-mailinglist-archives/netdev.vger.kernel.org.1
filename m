@@ -1,77 +1,76 @@
-Return-Path: <netdev+bounces-89718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED3358AB51B
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 20:35:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 014668AB51C
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 20:35:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C6DF1F2230B
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 18:35:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 633B0B21B00
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 18:35:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B7E27D416;
-	Fri, 19 Apr 2024 18:35:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0731D268;
+	Fri, 19 Apr 2024 18:35:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="AfZqiIGP"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gA6MWDdT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD4FA947
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 18:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2568E10A03
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 18:35:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713551707; cv=none; b=Ugzgl5ACw3YYV1ctKBPOKNTYRZg8JabFcDaAzCCj4u91lr5zaIXB7YIycfjQ/bGfFq3tiLX6qWla6agb4lOsiIxsEOuxgmPidBQp8kA7jq9EeMdUMrLcy9184oyiW/iwJ/QcgDbIyPoI75LJvjr0PfXG5WCJeKR6WGT970P4g4U=
+	t=1713551708; cv=none; b=UaxtKHSnrKiFTnZYu5XuzUAUQQEnihWvf6E9jwmF/7kkiwB1OqekHtGhtSQIAkHCtl3Xl7BcH5c9skno2gKBK0IoHdtiaoYDeK3OZSHDdghXqi/9LGwK6Cd4vL/rK4BJWXDpWDUOpeReKniAdoH6y6SfndeYSq8KVBmSJ0wmmuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713551707; c=relaxed/simple;
-	bh=ODLBCNi+4XTn+x2Q1U9bu0/Py42RFeA0vPUT2NsUuWs=;
+	s=arc-20240116; t=1713551708; c=relaxed/simple;
+	bh=Ml8/937jFhye0y3Yf/vPWhjimX4yDAH5Z7hfITWUiI0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YTx057lhZKUyJv2rGfdP40vahAQkjEQEYzxgmky95CiJEVSRukmfP4SmWm4xwVT9gvuBl8SITERSXGGBw/QfDqLNM7Z+DjugDHg5XxceapVCYyCx3acVMTJbuoVptlxBG4sc6nPDvyWfMBNdwXR0tLbu0xxbkDy1S0bGq6cgPAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=AfZqiIGP; arc=none smtp.client-ip=209.85.222.178
+	 MIME-Version:Content-Type; b=GQDiApy1uTOyofujRNm4G9rNFYRQEh0kHdkca1emPh07mkXv6YWz8oGMKfMJEe6SBL/qrB7lcG+vqH7QUuzmGFtTo5y7VbfK8ZBRDX2H7jRE0cukfATW6VK5B64tGzCiTXxEdBYhbNqaujWBUI1FMjVSd1zVCF3b8uYZPAwdBqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=gA6MWDdT; arc=none smtp.client-ip=209.85.128.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-78d62c1e82bso160107985a.3
-        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 11:35:05 -0700 (PDT)
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-618944792c3so25597477b3.1
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 11:35:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1713551704; x=1714156504; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1713551706; x=1714156506; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=+CnqHY/Y8Xc8FYH1/QaGZHUgrrfdXNTtT3SYEC309Bg=;
-        b=AfZqiIGP9ClqCV1fRKLQpCmruxbwnet/UEw/DJpAKOZNqHAW1atyAvHG+V2Pl7fKso
-         kpb/d70jVTE5NhLN6Qua7h9J/Zq+/78dV2f/N+e67RAQUk4wm9uUEQ2D+f4tQiNkEf6U
-         /jxOnhZAV45PW+YMfbsGhP40fM3k+9Lxibalw=
+        bh=YuVotY1Y4abWTYP7W/0CLEsNrurxmM2C4qIEgMh1E8w=;
+        b=gA6MWDdTs1pztH9P9sHzLC1UQlQ3BzoSLGLGtT+dKVbttxsC7QTRlIRQ5hU/wAq0RE
+         /UkCyZLLRjAu9FKd9KcDYBaHtzZk0Wi1U8zHWWWaUAVZuRu3Gy6F/DoabIz1WUR6f5S1
+         Iu+BbqUOyDFnlXE0Jrf3SFNrocgEeQQrUlnsg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713551704; x=1714156504;
+        d=1e100.net; s=20230601; t=1713551706; x=1714156506;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+CnqHY/Y8Xc8FYH1/QaGZHUgrrfdXNTtT3SYEC309Bg=;
-        b=T0P+DPF1RphB7cQm1Dw+x2fFV/1ZMjVZU3jbHL8KRNGP1jSQGrHAsH5w+JJ6nB9b8E
-         u4PicgJwxJHASLdZqJ3Ms5lTESl4leBuA+CZrcWWQgqVa4fpi2x7D4M9I0ZxFIQYhtox
-         vsGs9y2BtvHI8q3LqDTgmhR9bOjZ8Y5NoTcZss4UaSf67G3tyUv1YI4EFN4HayRtRpuw
-         jjhyzm7DkZIwUuBr7vvh13+h9la1A0qA6K5CVx81YcdwK4AFtVyh3tGOWx2cwWaNBf4r
-         rIM3CMeHn4hjBm0JBMJhBM4ru2e5qIPjXGNxI7/xmDzRlbitS/AQ582UWweqk3kuyMJl
-         9Ipg==
-X-Gm-Message-State: AOJu0Yw4ilwHvx0zsQw59udg7X31a+F6S1iQ0Nsf/6clcw+1Py+LvHLO
-	4pEKlE7S5++xVQQRkf/nqqqIp+M7d+CiwQQkLRb9Z21TL1dGhEARX5uI/7lHtA==
-X-Google-Smtp-Source: AGHT+IGsqeFmIa9meB4mY5UWFlLAg9zbgss7Q2BgAulSfFoCMWE6cfelOEi6Glb6ay9nTwf+hO23sQ==
-X-Received: by 2002:a05:622a:87:b0:436:df6a:dcab with SMTP id o7-20020a05622a008700b00436df6adcabmr3632111qtw.46.1713551704240;
-        Fri, 19 Apr 2024 11:35:04 -0700 (PDT)
+        bh=YuVotY1Y4abWTYP7W/0CLEsNrurxmM2C4qIEgMh1E8w=;
+        b=wG9wm5k1hQRBzi5aKZQQEapNzLIlCHtAL6kFiTlXAUeKw+M3L3OVZxvO1UEkdR5FFY
+         vrFsyvTV1wp5HmazaNcwsKVY7/r3Dkchhef0V3CKeJxxpW0qjaygCT9et84FFFhfQxP8
+         E3YH61wLmNY5yKnziIM5id+l6Vdk9rqc64QXSmdplFTCF2f4O6VWY6yvy8Pn8J7q2w49
+         dYA7emkZ7tYMUpQJakyozuYMJIyMdZRRdSV19e2/OQ4sW4u+5jkpbd49gKUdLkZtJO9p
+         MVSoSQHbJQqc1HIMJ4EMVY9e4KAm6MI/UN0ir6OSFTTms9uKdcRchtCZveSEpTI3Fd2z
+         3YuQ==
+X-Gm-Message-State: AOJu0YyLYWHhV+nb1745xrWAhaRUkb7v9NXagaq1IBUkB89QjfiRf6Yk
+	u0UQgZ567jUu9hq5JbQygMVscP26q/7jARrodN8CaWcrWrgh5f1nLuexNjf5TA==
+X-Google-Smtp-Source: AGHT+IF5EUhfB0YxiEUOm70nDGztNDk9kaIlemTB9vV8DA+32lu6CAAL3tC8Y8X3vRqjjDiEUSQC+g==
+X-Received: by 2002:a05:690c:fd6:b0:614:cd12:d55d with SMTP id dg22-20020a05690c0fd600b00614cd12d55dmr3463286ywb.10.1713551705891;
+        Fri, 19 Apr 2024 11:35:05 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d12-20020ac851cc000000b00438527a4eb5sm547940qtn.10.2024.04.19.11.35.02
+        by smtp.gmail.com with ESMTPSA id d12-20020ac851cc000000b00438527a4eb5sm547940qtn.10.2024.04.19.11.35.04
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 19 Apr 2024 11:35:03 -0700 (PDT)
+        Fri, 19 Apr 2024 11:35:05 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	andrew.gospodarek@broadcom.com,
-	Vikas Gupta <vikas.gupta@broadcom.com>
-Subject: [PATCH net 2/3] bnxt_en: Fix the PCI-AER routines
-Date: Fri, 19 Apr 2024 11:34:48 -0700
-Message-Id: <20240419183449.234327-3-michael.chan@broadcom.com>
+	andrew.gospodarek@broadcom.com
+Subject: [PATCH net 3/3] bnxt_en: Fix error recovery for 5760X (P7) chips
+Date: Fri, 19 Apr 2024 11:34:49 -0700
+Message-Id: <20240419183449.234327-4-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20240419183449.234327-1-michael.chan@broadcom.com>
 References: <20240419183449.234327-1-michael.chan@broadcom.com>
@@ -82,83 +81,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000ac832106167758ed"
+	boundary="000000000000c52c7d0616775853"
 
---000000000000ac832106167758ed
+--000000000000c52c7d0616775853
 Content-Transfer-Encoding: 8bit
 
-From: Vikas Gupta <vikas.gupta@broadcom.com>
+During error recovery, such as AER fatal error slot reset, we call
+bnxt_try_map_fw_health_reg() to try to get access to the health
+register to determine the firmware state.  Fix
+bnxt_try_map_fw_health_reg() to recognize the P7 chip correctly
+and set up the health register.
 
-We do not support two simultaneous recoveries so check for reset
-flag, BNXT_STATE_IN_FW_RESET, and do not proceed with AER further.
-When the pci channel state is pci_channel_io_frozen, the PCIe link
-can not be trusted so we disable the traffic immediately and stop
-BAR access by calling bnxt_fw_fatal_close().  BAR access after
-AER fatal error can cause an NMI.
+This fixes this type of AER slot reset failure:
 
-Fixes: f75d9a0aa967 ("bnxt_en: Re-write PCI BARs after PCI fatal error.")
-Signed-off-by: Vikas Gupta <vikas.gupta@broadcom.com>
+bnxt_en 0000:04:00.0: AER: PCIe Bus Error: severity=Uncorrectable (Fatal), type=Inaccessible, (Unregistered Agent ID)
+bnxt_en 0000:04:00.0 enp4s0f0np0: PCI I/O error detected
+bnxt_en 0000:04:00.0 bnxt_re0: Handle device suspend call
+bnxt_en 0000:04:00.1 enp4s0f1np1: PCI I/O error detected
+bnxt_en 0000:04:00.1 bnxt_re1: Handle device suspend call
+pcieport 0000:00:02.0: AER: Root Port link has been reset (0)
+bnxt_en 0000:04:00.0 enp4s0f0np0: PCI Slot Reset
+bnxt_en 0000:04:00.0: enabling device (0000 -> 0002)
+bnxt_en 0000:04:00.0: Firmware not ready
+bnxt_en 0000:04:00.1 enp4s0f1np1: PCI Slot Reset
+bnxt_en 0000:04:00.1: enabling device (0000 -> 0002)
+bnxt_en 0000:04:00.1: Firmware not ready
+pcieport 0000:00:02.0: AER: device recovery failed
+
+Fixes: a432a45bdba4 ("bnxt_en: Define basic P7 macros")
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 19 ++++++++++++++++---
- 1 file changed, 16 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index c852f87c842f..86c1c30c70d5 100644
+index 86c1c30c70d5..ed04a90a4fdd 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -15378,6 +15378,7 @@ static pci_ers_result_t bnxt_io_error_detected(struct pci_dev *pdev,
- {
- 	struct net_device *netdev = pci_get_drvdata(pdev);
- 	struct bnxt *bp = netdev_priv(netdev);
-+	bool abort = false;
+@@ -9089,7 +9089,7 @@ static void bnxt_try_map_fw_health_reg(struct bnxt *bp)
+ 					     BNXT_FW_HEALTH_WIN_BASE +
+ 					     BNXT_GRC_REG_CHIP_NUM);
+ 		}
+-		if (!BNXT_CHIP_P5(bp))
++		if (!BNXT_CHIP_P5_PLUS(bp))
+ 			return;
  
- 	netdev_info(netdev, "PCI I/O error detected\n");
- 
-@@ -15386,16 +15387,27 @@ static pci_ers_result_t bnxt_io_error_detected(struct pci_dev *pdev,
- 
- 	bnxt_ulp_stop(bp);
- 
--	if (state == pci_channel_io_perm_failure) {
-+	if (test_and_set_bit(BNXT_STATE_IN_FW_RESET, &bp->state)) {
-+		netdev_err(bp->dev, "Firmware reset already in progress\n");
-+		abort = true;
-+	}
-+
-+	if (abort || state == pci_channel_io_perm_failure) {
- 		rtnl_unlock();
- 		return PCI_ERS_RESULT_DISCONNECT;
- 	}
- 
--	if (state == pci_channel_io_frozen)
-+	/* Link is not reliable anymore if state is pci_channel_io_frozen
-+	 * so we disable bus master to prevent any potential bad DMAs before
-+	 * freeing kernel memory.
-+	 */
-+	if (state == pci_channel_io_frozen) {
- 		set_bit(BNXT_STATE_PCI_CHANNEL_IO_FROZEN, &bp->state);
-+		bnxt_fw_fatal_close(bp);
-+	}
- 
- 	if (netif_running(netdev))
--		bnxt_close(netdev);
-+		__bnxt_close_nic(bp, true, true);
- 
- 	if (pci_is_enabled(pdev))
- 		pci_disable_device(pdev);
-@@ -15479,6 +15491,7 @@ static pci_ers_result_t bnxt_io_slot_reset(struct pci_dev *pdev)
- 	}
- 
- reset_exit:
-+	clear_bit(BNXT_STATE_IN_FW_RESET, &bp->state);
- 	bnxt_clear_reservations(bp, true);
- 	rtnl_unlock();
- 
+ 		status_loc = BNXT_GRC_REG_STATUS_P5 |
 -- 
 2.30.1
 
 
---000000000000ac832106167758ed
+--000000000000c52c7d0616775853
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -229,14 +202,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIF+31w5M/TVYm3Vmc6Mdf2xfyy8zRLFt
-uPw719NDTVMIMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQx
-OTE4MzUwNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEINChGWq5OpMP8+6qd4qQ7Yiu8yhcLw8L
+TvfsPlNIEARhMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDQx
+OTE4MzUwNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBp8IvK5TGb+iZ95u7ihQ4S2YnKZ+iIiJEinr4pbhfDOPnItyDk
-Azvh7447EDMeynkd4+JFmnR7YDOdFV5K8wdm4cGvrhFEO5wYkqQj25hKx9ClpgfrvLiaFz9nU2Ak
-CPF540C25DewM3PnGF7GVhfaTMeT3U1ccb5Mv9+2ucGCtykku5YslRR2qI1Tgb5CSHM3yjVJz9ki
-RUXRhLM05CMjnQVtKgeSNBb8OXaL22DlXTV11pId0HbYQ73fSht9Ar+PjDvhEYmNND9pjKaXGKpa
-uyy75rymOe1o8mvtILVSgiaiFR0E7QBpEHGx92WkZe7wUZPYQFIHvvHLwooYilqx
---000000000000ac832106167758ed--
+ATANBgkqhkiG9w0BAQEFAASCAQAaNeV4mXKQory9FaggZHAR80KaxI8zvJoDMdwHdR8UWCDD5RpR
+fBiOttIGWblA90yjpYOD1qgPipOklz+UFCz/45uNuv7APbn8JgMVmWL5YUhEzEvSFNxZHdPTlzPR
+p1X1vzIWy/EygHnhbbcXC/20WpAd47N3fPNfC9/mamnRpkea3PzBtFt8xqeVP7V9rByu3yW/Klqo
+auZGM7hCePvP3L2ENFG8etyHkq/s671TNEZRbKGAI9rsmAJs8ClrydNNDncKY6mIHp+Y7UYGksFs
+HFpk93Uup9m3NVAavEm65JFzlO2OANNoTTTuDbOTcFjI4XQ1NS6zL5t1H2EE2H6b
+--000000000000c52c7d0616775853--
 
