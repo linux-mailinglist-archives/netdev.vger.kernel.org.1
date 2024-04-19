@@ -1,248 +1,176 @@
-Return-Path: <netdev+bounces-89602-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89603-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A65AB8AAD68
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 13:09:40 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A95708AAD76
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 13:11:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1DE9B1F224A7
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 11:09:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CBCA1F220F9
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 11:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849CE85632;
-	Fri, 19 Apr 2024 11:08:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14FCD80618;
+	Fri, 19 Apr 2024 11:11:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FnQDYn+6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m00dxP3c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9FC984D2E;
-	Fri, 19 Apr 2024 11:08:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08D980029;
+	Fri, 19 Apr 2024 11:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713524931; cv=none; b=G2XKu6Wm6nZNWqNeN+PSYSerqpNz0/fnj9sH0qAn9RsC5cmo2kS7ztpp5nbP3khgb4/FYnHtk4M+/oGpXODdNtUQupurXPvWQsvOD3bQV00pIY+P0HpeT6KR1NXcF4PDnqK4vPqoUk3/RAUdJmMVacUOReNnjv5DCvORYcqQQUs=
+	t=1713525092; cv=none; b=Q8XV0i6HrGTg++uNVUnPMSmXWbAwfNVS8/2WqnkY/QHTacj/hTCGFP8ovAfZsxA2/+KrUtl5m3Uma9FrWgvbd1R39lQQR6ET319nZQNxolU/ydWZDNhdgfem7WOPPovlrSCcL4TXHnTnVzWQep1VEhveqHKpb2r9o/cb9t+pj2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713524931; c=relaxed/simple;
-	bh=sgd0fnLt4r0RsBT24bZl6Ymc5Cr9jd8UGDKTw3oGxVo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AfJtab+Ukz3wv3uutNRcZZvZN8lGL9IBlfKA/vA3ahYoFYyqsTql4BtDEzvxrZ0kxYYMMDvZIDhhojIeYEWK3m71hVJ0AhzGnyuvVbu4Qu6A0tNI4NsinKvKd7a5c1J38vKIK30A7ZNQUvSa5oXHmKAlxBC0I3nbn5totIF32UA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FnQDYn+6; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a5561b88bb3so207744866b.0;
-        Fri, 19 Apr 2024 04:08:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713524928; x=1714129728; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2fP3T1HRg4APmOPCr1i20fy3OAFGb9fSrnxRLKsDwOU=;
-        b=FnQDYn+6iSLNMs9xOgGywna20u9bs/S15XW0t1y85QovUidQy5rFapaq06PRVB61Hk
-         Cisnk/PfejXxYWgfSpmCJ28IPV9Mivl6M2WMkS+Pb1noomVBjvUeV4sf0Wgc8c8b2tWc
-         UF82mCV/wBeqY4Do5hZbpSsY215JK2Oi78XqqAkxmviTt5CvQPjcS44UEAsAGavjNQ/0
-         qbra4Gcq8Qww4/QMR2GDzDNwLqKRZDuD/YoqACVSNNScWHLvvF2rg+pMMB1/34CNl3ak
-         dQAmKbAW9Zgeu6M0nT9m6FG39TAitVhpTQglh3joIAz/Mbx/sZ8pL9PbPU4glUxxL8BP
-         zjQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713524928; x=1714129728;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2fP3T1HRg4APmOPCr1i20fy3OAFGb9fSrnxRLKsDwOU=;
-        b=w6gTjJECk8WQifhJSTDRdbqyNhWVpdjSAJyM1d/KhmE0PW1b6f71+uufsHwasXB7k2
-         66vfygy8iSuBWAsZMil3UlYE7R6196kHSrVzx6MmtPhLwSQ0uDGFzXrrX9x7iPzUkjX5
-         i9QvEqmyCnmp9ziHQM5YgkJNH/6G9+j+AXFZgIIJjDn6g2oM94mWxkQmwaDy5eIvP02u
-         BWzTTxVa2RIp+4MngWxKcseiVLXSJB3AJ9S2eH5u1ZdqRhjehFKhRfGsm+gzut0a28nd
-         ethBqJSv+Q0CDi5SIvNKMAbJCOLCWOywBjTnuislRGdYL1/PONJrW1xwPh0+V1TAJV2K
-         HMJA==
-X-Forwarded-Encrypted: i=1; AJvYcCVCR7jymh/4t7ZkELLLjMo2vzUr9nxKufjLZGj2P/zI15E821EankDuOILkJAMxj5BXcPsSPdLTEzjHyjC/dMBeVIHeNDlc6iu+2hNM7PHeow9DzxLaH2Ef/1Ul
-X-Gm-Message-State: AOJu0YyX5TYhEdvEm8jqzzPS1bOWVjvPHthlBe94Muhhe+0n/LjNjqPk
-	E8fTy9h0bz2JWVjpAQ9YodKiPGs9JVNAFuLhw6ppvyR+PmWniXda3kYJOA==
-X-Google-Smtp-Source: AGHT+IFy2QsdrmLfOtT9EYc1USivrPyf0Bwi5GEdqAq0Fpn53sZdiNwWQaN42/Mf/SYmqQzPfik1yw==
-X-Received: by 2002:a17:906:a206:b0:a52:2c00:9850 with SMTP id r6-20020a170906a20600b00a522c009850mr1380280ejy.59.1713524927726;
-        Fri, 19 Apr 2024 04:08:47 -0700 (PDT)
-Received: from 127.0.0.1localhost ([163.114.131.193])
-        by smtp.gmail.com with ESMTPSA id z13-20020a17090655cd00b00a4739efd7cesm2082525ejp.60.2024.04.19.04.08.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Apr 2024 04:08:46 -0700 (PDT)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: io-uring@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	asml.silence@gmail.com,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Paul Durrant <paul@xen.org>,
-	xen-devel@lists.xenproject.org,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	virtualization@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: [PATCH io_uring-next/net-next v2 4/4] io_uring/notif: implement notification stacking
-Date: Fri, 19 Apr 2024 12:08:42 +0100
-Message-ID: <bf1e7f9b72f9ecc99999fdc0d2cded5eea87fd0b.1713369317.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <cover.1713369317.git.asml.silence@gmail.com>
-References: <cover.1713369317.git.asml.silence@gmail.com>
+	s=arc-20240116; t=1713525092; c=relaxed/simple;
+	bh=tcVBXciOzJSjulAKa3MG3FY6QKb2BBsFafnZyQuc03o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QI6PGUKixVeIkCaOZQLqmMG9LOYvm7LuQehiemNONHeab/7E6RFxa9IjqbxelyEc/+EJP0JbFRKIvXb3W95nyhzIqBvDXf/iAm8xshVf3Bgt044+p8opcXAHCSvEofKOaiuaoi9dUcBOMwTE3Jx3Ve4FMyRgxLWcY3W/bQqoE3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m00dxP3c; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A63EC072AA;
+	Fri, 19 Apr 2024 11:11:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713525091;
+	bh=tcVBXciOzJSjulAKa3MG3FY6QKb2BBsFafnZyQuc03o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=m00dxP3c/BmPRRNScAadFz8crQe41rfOZCmIb9HJiEVPT1VK5LNtZoCsEflJi6dTx
+	 EcbnNxdh4K+q3VdEgdsRYynzouqFgYNX/ieC1iA+8Sc4iPPWGwUdC221sbiPk5IO+/
+	 0f2CoFjzhWRMISHSkQkUd9ZJJK/bAyO1og7lznqNzBrowVMtDu+NT6DzIDv2jNAnZG
+	 Ep/FqAPfllkBx//uzrj6pUywdPBA/+gwMJbFAj2I+DkHSFIXAfTkfsvPkNui7R4DF1
+	 eapbdjBfsnUwCUEd9WwS1sUqNIhK4eQo7ctgv5WFd+m7MLM0N8pI4qc92qqilJ8LzX
+	 sbI0MJy/8nfuA==
+Date: Fri, 19 Apr 2024 12:11:26 +0100
+From: Simon Horman <horms@kernel.org>
+To: Sam Sun <samsun1006219@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	j.vosburgh@gmail.com, Hangbin Liu <liuhangbin@gmail.com>,
+	Eric Dumazet <edumazet@google.com>, pabeni@redhat.com,
+	kuba@kernel.org, andy@greyhouse.net, davem@davemloft.net
+Subject: Re: [PATCH net v3] drivers/net/bonding: Fix out-of-bounds read in
+ bond_option_arp_ip_targets_set()
+Message-ID: <20240419111126.GU3975545@kernel.org>
+References: <CAEkJfYOnsLLiCrtgOpq2Upr+_W0dViYVHU8YdjJOi-mxD8H9oQ@mail.gmail.com>
+ <20240416142428.GO2320920@kernel.org>
+ <CAEkJfYPR-jeZoVz63b2UmvjgBOen7DDy8yyrojLckD9OT2XaiQ@mail.gmail.com>
+ <20240418201023.GS3975545@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240418201023.GS3975545@kernel.org>
 
-The network stack allows only one ubuf_info per skb, and unlike
-MSG_ZEROCOPY, each io_uring zerocopy send will carry a separate
-ubuf_info. That means that send requests can't reuse a previosly
-allocated skb and need to get one more or more of new ones. That's fine
-for large sends, but otherwise it would spam the stack with lots of skbs
-carrying just a little data each.
+On Thu, Apr 18, 2024 at 09:10:23PM +0100, Simon Horman wrote:
+> On Wed, Apr 17, 2024 at 02:34:49PM +0800, Sam Sun wrote:
+> > On Tue, Apr 16, 2024 at 10:24 PM Simon Horman <horms@kernel.org> wrote:
+> > >
+> > > On Tue, Apr 16, 2024 at 08:09:44PM +0800, Sam Sun wrote:
+> > > > In function bond_option_arp_ip_targets_set(), if newval->string is an
+> > > > empty string, newval->string+1 will point to the byte after the
+> > > > string, causing an out-of-bound read.
+> > > >
+> > > > BUG: KASAN: slab-out-of-bounds in strlen+0x7d/0xa0 lib/string.c:418
+> > > > Read of size 1 at addr ffff8881119c4781 by task syz-executor665/8107
+> > > > CPU: 1 PID: 8107 Comm: syz-executor665 Not tainted 6.7.0-rc7 #1
+> > > > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+> > > > Call Trace:
+> > > >  <TASK>
+> > > >  __dump_stack lib/dump_stack.c:88 [inline]
+> > > >  dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
+> > > >  print_address_description mm/kasan/report.c:364 [inline]
+> > > >  print_report+0xc1/0x5e0 mm/kasan/report.c:475
+> > > >  kasan_report+0xbe/0xf0 mm/kasan/report.c:588
+> > > >  strlen+0x7d/0xa0 lib/string.c:418
+> > > >  __fortify_strlen include/linux/fortify-string.h:210 [inline]
+> > > >  in4_pton+0xa3/0x3f0 net/core/utils.c:130
+> > > >  bond_option_arp_ip_targets_set+0xc2/0x910
+> > > > drivers/net/bonding/bond_options.c:1201
+> > > >  __bond_opt_set+0x2a4/0x1030 drivers/net/bonding/bond_options.c:767
+> > > >  __bond_opt_set_notify+0x48/0x150 drivers/net/bonding/bond_options.c:792
+> > > >  bond_opt_tryset_rtnl+0xda/0x160 drivers/net/bonding/bond_options.c:817
+> > > >  bonding_sysfs_store_option+0xa1/0x120 drivers/net/bonding/bond_sysfs.c:156
+> > > >  dev_attr_store+0x54/0x80 drivers/base/core.c:2366
+> > > >  sysfs_kf_write+0x114/0x170 fs/sysfs/file.c:136
+> > > >  kernfs_fop_write_iter+0x337/0x500 fs/kernfs/file.c:334
+> > > >  call_write_iter include/linux/fs.h:2020 [inline]
+> > > >  new_sync_write fs/read_write.c:491 [inline]
+> > > >  vfs_write+0x96a/0xd80 fs/read_write.c:584
+> > > >  ksys_write+0x122/0x250 fs/read_write.c:637
+> > > >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> > > >  do_syscall_64+0x40/0x110 arch/x86/entry/common.c:83
+> > > >  entry_SYSCALL_64_after_hwframe+0x63/0x6b
+> > > > ---[ end trace ]---
+> > > >
+> > > > Fix it by adding a check of string length before using it.
+> > > >
+> > > > v2
+> > > > According to Jay and Hangbin's opinion, remove target address in
+> > > > netdev_err message since target is not initialized in error path and
+> > > > will not provide useful information.
+> > > >
+> > > > v3
+> > > > According to Hangbin's opinion, change Fixes tag from 4fb0ef585eb2
+> > > > ("bonding: convert arp_ip_target to use the new option API") to
+> > > > f9de11a16594 ("bonding: add ip checks when store ip target").
+> > > >
+> > > > Fixes: f9de11a16594 ("bonding: add ip checks when store ip target")
+> > > > Signed-off-by: Yue Sun <samsun1006219@gmail.com>
+> > > > ---
+> > >
+> > > Hi Sam Sun,
+> > >
+> > > Some comments about the formatting of this submission:
+> > >
+> > > * The list of chances, (v2, v3, ...) should be below rather than
+> > >   above the scissors ("---"), so it is not included when the patch
+> > >   is applied.
+> > >
+> > > * Looking at git history, the patch prefix should probably be "bonding:"
+> > >
+> > >         Subject: [PATCH net v3] bonding: ...
+> > >
+> > > * The diff seems to be a bit mangled, f.e. tabs seem to
+> > >   have been translated into spaces. So it does not apply.
+> > >   Which breaks automated testing. And for this reason
+> > >   I am asking you to repost this patch.
+> > >
+> > >   git send-email, and b4, are two tools that can typically be used
+> > >   to send patches in a way that this doesn't occur.
+> > >
+> > > ---
+> > > pw-bot: changes-requested
+> > 
+> > I sincerely apologize for not using git send-email. I tried to set up
+> > the environment but it did not work. For some reason, I needed to use
+> > a proxy to connect with my gmail account, but the proxy service
+> > provider banned using their proxy to send email through smtp. Maybe I
+> > need to rent a VPS and set up a working environment there, but it
+> > would take time and I don't know for sure whether the VPS provider
+> > would allow me to send email through smtp either.
+> > 
+> > Could you or anyone please help me submit this patch? Sorry for
+> > causing this trouble.
+> 
+> Sure, happy to help.
+> 
+> I'll look at doing this tomororw (Friday),
+> unless someone else does so beforehand.
 
-To help with that implement linking notification (i.e. an io_uring wrapper
-around ubuf_info) into a list. Each is refcounted by skbs and the stack
-as usual. additionally all non head entries keep a reference to the
-head, which they put down when their refcount hits 0. When the head have
-no more users, it'll efficiently put all notifications in a batch.
+I have posted the patch as v4.
+The only changes were:
+* Correct whitespace problems,
+  which I assume were added in transit as discussed above.
+* Update the patch prefix to 'bonding:' as described above
+* Move the changelog to below the scissors, as described above
 
-As mentioned previously about ->io_link_skb, the callback implementation
-always allows to bind to an skb without a ubuf_info.
+- [PATCH net v4] bonding: Fix out-of-bounds read in bond_option_arp_ip_targets_set()
+  https://lore.kernel.org/netdev/20240419-bond-oob-v4-1-69dd1a66db20@kernel.org/
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
----
- io_uring/notif.c | 71 +++++++++++++++++++++++++++++++++++++++++++-----
- io_uring/notif.h |  3 ++
- 2 files changed, 67 insertions(+), 7 deletions(-)
-
-diff --git a/io_uring/notif.c b/io_uring/notif.c
-index 26680176335f..d58cdc01e691 100644
---- a/io_uring/notif.c
-+++ b/io_uring/notif.c
-@@ -9,18 +9,28 @@
- #include "notif.h"
- #include "rsrc.h"
- 
-+static const struct ubuf_info_ops io_ubuf_ops;
-+
- static void io_notif_tw_complete(struct io_kiocb *notif, struct io_tw_state *ts)
- {
- 	struct io_notif_data *nd = io_notif_to_data(notif);
- 
--	if (unlikely(nd->zc_report) && (nd->zc_copied || !nd->zc_used))
--		notif->cqe.res |= IORING_NOTIF_USAGE_ZC_COPIED;
-+	do {
-+		notif = cmd_to_io_kiocb(nd);
- 
--	if (nd->account_pages && notif->ctx->user) {
--		__io_unaccount_mem(notif->ctx->user, nd->account_pages);
--		nd->account_pages = 0;
--	}
--	io_req_task_complete(notif, ts);
-+		lockdep_assert(refcount_read(&nd->uarg.refcnt) == 0);
-+
-+		if (unlikely(nd->zc_report) && (nd->zc_copied || !nd->zc_used))
-+			notif->cqe.res |= IORING_NOTIF_USAGE_ZC_COPIED;
-+
-+		if (nd->account_pages && notif->ctx->user) {
-+			__io_unaccount_mem(notif->ctx->user, nd->account_pages);
-+			nd->account_pages = 0;
-+		}
-+
-+		nd = nd->next;
-+		io_req_task_complete(notif, ts);
-+	} while (nd);
- }
- 
- void io_tx_ubuf_complete(struct sk_buff *skb, struct ubuf_info *uarg,
-@@ -39,12 +49,56 @@ void io_tx_ubuf_complete(struct sk_buff *skb, struct ubuf_info *uarg,
- 	if (!refcount_dec_and_test(&uarg->refcnt))
- 		return;
- 
-+	if (nd->head != nd) {
-+		io_tx_ubuf_complete(skb, &nd->head->uarg, success);
-+		return;
-+	}
- 	notif->io_task_work.func = io_notif_tw_complete;
- 	__io_req_task_work_add(notif, IOU_F_TWQ_LAZY_WAKE);
- }
- 
-+static int io_link_skb(struct sk_buff *skb, struct ubuf_info *uarg)
-+{
-+	struct io_notif_data *nd, *prev_nd;
-+	struct io_kiocb *prev_notif, *notif;
-+	struct ubuf_info *prev_uarg = skb_zcopy(skb);
-+
-+	nd = container_of(uarg, struct io_notif_data, uarg);
-+	notif = cmd_to_io_kiocb(nd);
-+
-+	if (!prev_uarg) {
-+		net_zcopy_get(&nd->uarg);
-+		skb_zcopy_init(skb, &nd->uarg);
-+		return 0;
-+	}
-+	/* handle it separately as we can't link a notif to itself */
-+	if (unlikely(prev_uarg == &nd->uarg))
-+		return 0;
-+	/* we can't join two links together, just request a fresh skb */
-+	if (unlikely(nd->head != nd || nd->next))
-+		return -EEXIST;
-+	/* don't mix zc providers */
-+	if (unlikely(prev_uarg->ops != &io_ubuf_ops))
-+		return -EEXIST;
-+
-+	prev_nd = container_of(prev_uarg, struct io_notif_data, uarg);
-+	prev_notif = cmd_to_io_kiocb(nd);
-+
-+	/* make sure all noifications can be finished in the same task_work */
-+	if (unlikely(notif->ctx != prev_notif->ctx ||
-+		     notif->task != prev_notif->task))
-+		return -EEXIST;
-+
-+	nd->head = prev_nd->head;
-+	nd->next = prev_nd->next;
-+	prev_nd->next = nd;
-+	net_zcopy_get(&nd->head->uarg);
-+	return 0;
-+}
-+
- static const struct ubuf_info_ops io_ubuf_ops = {
- 	.complete = io_tx_ubuf_complete,
-+	.link_skb = io_link_skb,
- };
- 
- struct io_kiocb *io_alloc_notif(struct io_ring_ctx *ctx)
-@@ -65,6 +119,9 @@ struct io_kiocb *io_alloc_notif(struct io_ring_ctx *ctx)
- 	nd = io_notif_to_data(notif);
- 	nd->zc_report = false;
- 	nd->account_pages = 0;
-+	nd->next = NULL;
-+	nd->head = nd;
-+
- 	nd->uarg.flags = IO_NOTIF_UBUF_FLAGS;
- 	nd->uarg.ops = &io_ubuf_ops;
- 	refcount_set(&nd->uarg.refcnt, 1);
-diff --git a/io_uring/notif.h b/io_uring/notif.h
-index 2cf9ff6abd7a..f3589cfef4a9 100644
---- a/io_uring/notif.h
-+++ b/io_uring/notif.h
-@@ -14,6 +14,9 @@ struct io_notif_data {
- 	struct file		*file;
- 	struct ubuf_info	uarg;
- 
-+	struct io_notif_data	*next;
-+	struct io_notif_data	*head;
-+
- 	unsigned		account_pages;
- 	bool			zc_report;
- 	bool			zc_used;
--- 
-2.44.0
 
 
