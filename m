@@ -1,132 +1,102 @@
-Return-Path: <netdev+bounces-89632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A42D8AAFBC
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:51:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ED3F8AAFCC
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:54:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0E7E1C214B5
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 13:51:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F3961C2181D
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 13:54:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 133CC12AAFD;
-	Fri, 19 Apr 2024 13:51:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE71B12B176;
+	Fri, 19 Apr 2024 13:54:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="A3CPRy7G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kz2F82eS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F24E112837C
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 13:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2AAA59
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 13:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713534684; cv=none; b=d+Kq9v2Iaea55c7RHMnRHDscJgSYNQ2/FWaUDjRM2K3bojk+h7wnGIhFl/kpP3twQufcfsX5haSfvIXnqbSOwzu4npvnjg5VvBKGnNFE+XSX54uO9SijgE51y0h8SE09yM5tATNvNap6wtmO7c/z6kecGncT2h3U4nVaxvgaQHk=
+	t=1713534868; cv=none; b=u2+d9+ydel/sS6v+fC9NRwo76U3HpLB+r2w5W2+MyWyj8zVKNI0WJyFdIQKmeZhcfye2EWDQ/7Vj1ZE/KW65/zG4lAzMGv74wIq9O4HgsX+udTRlp5MqFNdBHqihcX0fRP+6mx6YAtO+ljLt9v9QQWPqbX7P/HV8c89TpqFaHIc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713534684; c=relaxed/simple;
-	bh=mi6XnFalf9EtQ/ENxG+jKIfTecVDeLfY3D2+zCxoRBc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JI4qhrgb7mW23qI6aodFw/fqVsaadIdOeiakk/41+6LcOLkEA3V1tfzVT6XPUOgzbNUStUu2TuiAb82+U2V1smdw6A/5yjkDaWP7bz866vkiQ3xN/H628qtCHwkOrxXAnv0SoVCyhBac9Poi9kTkazq21BA2Hofn+ylz3BnpFNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=A3CPRy7G; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4196c62bb41so3943755e9.0
-        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 06:51:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1713534680; x=1714139480; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bdhA12ApYJzVjqZj6OB/MpvC9ZtmrqHdwY8N+5n/lLM=;
-        b=A3CPRy7GvWHbn+mkq686nnQ3EuzFUhPvesNf7KXzJ98sahrZ2fqoMe8s6B742OdbDX
-         lO3cswSfYBuZozdI16fhFMm9yxDsxXKYjGESVqyswCmMWW7Cq6f582L4/I5U5Gmscuf8
-         LYKNUY0MZ6Qq/wV9YO9MkANXxy9s6Ry64CGer0c4Yfgni6AK+kJBQT16ooxhrF8IdneC
-         XjL+1hC+TGPQjFAyuF5bKqxaoA3yi32fLv3N37YZhrwFgZ9UQ4MmWD1YBhAVbS69WF5K
-         gU/wPAc/7k/fy5pWl1MLpyyJ91SAjsbf+uw7YkWkYfXoD14sdGwtDNDBYA3LcBNWyFEj
-         9Z6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713534680; x=1714139480;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bdhA12ApYJzVjqZj6OB/MpvC9ZtmrqHdwY8N+5n/lLM=;
-        b=siBMe13+PwXOR07m6xe/Bl8FGbPGfv4u+GvtX6WeE9UDh/HoVCko0Mq+zvDc1z8Hub
-         08I24Onts48nPVP0mV9Wg1U/k2Nv7jrzdKVseSO45MRIOO74LdmPXFEE6y8onUsQdZMM
-         Ff3YfPl6MQW4P9gEBiYqazIw0fnUo0IeMiwL5cKYZlvU751WrkExoxy4GY19Z2qENYI6
-         ERiG0Xj1+pp9OF4SAjxHBUFGVk8iPNVnqkbhLZxj7E9uc3Eht+xcZbXMUt5K6Oo1Z8sJ
-         /BpqxswDJncaWcyvfKismwW1I1YqlGrA8qGevpyN9KaAavTmbJ7c4qH7bXe9PokydGV7
-         Z1wA==
-X-Gm-Message-State: AOJu0Yx9/46gtk7miqXJ08ZzmYlzognp5cvq8DRpNulH7Og/nzizHa+W
-	GpIUS7iMamC5kiJmxu1sewNtEUovtV87dZPKfUETU42wDkp1UxMKvm4HjPXvIZs=
-X-Google-Smtp-Source: AGHT+IGXzjcSLJNod0+4HL4Ih6pp20uZOLo+tZhLBwZQD5QFrAyhVsfR1DSp8c+sjOb8Yj00NhB9bA==
-X-Received: by 2002:a05:600c:3b06:b0:418:df5a:3fba with SMTP id m6-20020a05600c3b0600b00418df5a3fbamr1474289wms.32.1713534679953;
-        Fri, 19 Apr 2024 06:51:19 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id a12-20020a056000050c00b00349ac818326sm4463206wrf.43.2024.04.19.06.51.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Apr 2024 06:51:19 -0700 (PDT)
-Date: Fri, 19 Apr 2024 15:51:16 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Benjamin Poirier <benjamin.poirier@gmail.com>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, edumazet@google.com, parav@nvidia.com,
-	mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
-	shuah@kernel.org, petrm@nvidia.com, liuhangbin@gmail.com,
-	vladimir.oltean@nxp.com, idosch@nvidia.com,
-	virtualization@lists.linux.dev
-Subject: Re: [patch net-next v4 2/6] selftests: forwarding: move initial root
- check to the beginning
-Message-ID: <ZiJ21Pz0Pa1bo0KJ@nanopsycho>
-References: <20240418160830.3751846-1-jiri@resnulli.us>
- <20240418160830.3751846-3-jiri@resnulli.us>
- <ZiFq9EmbGZ3psdho@f4>
+	s=arc-20240116; t=1713534868; c=relaxed/simple;
+	bh=yChrZ19QUvriU+RMhHRAah20JT8+YXgxz5fTNxVIZno=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=NzbL2upsoDLLnfhJKLnZ9ZL37R4DJ3b1aMvcFCvJp9HWadtYWnrNKxbXDNvGAlbncK2d95WyKViWQaYtDB4hx7qIcp8n1CtL8URsaKPx+jHk5YA50FgLXooZsRNjcGIWQLsB9kRhiGFk0KKokg4Hgr9awNyVERENXfGRvTslArY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kz2F82eS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94706C072AA;
+	Fri, 19 Apr 2024 13:54:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1713534868;
+	bh=yChrZ19QUvriU+RMhHRAah20JT8+YXgxz5fTNxVIZno=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Kz2F82eSODfSaEihjuq0LReirSH84fZtpNTIWubTlPX+0U2SjOHDnNyyZEXAIowF+
+	 Wx5RG0gFtS5wWPItLO/6Wqe17ijnZ5HMz5rSSA2RdyZar2Ybl1XGNhx4UXjTA+lpR0
+	 nuoHyz3cXnEn6KueRcmByAl+V9fY7JLr9IkWShNPoAYv/prubzh9mr3zoGEW4/UYIQ
+	 r6/wZ5MyLNbtu4mv8f3I17u+QyD28d4wy1VfAs2/gVzDLAq4G0AfzgPm9IAFa7+tui
+	 RUnmPWOpEx+dVtcYvGxex3mHTBXzSmO3f0kN58jJ0+lPDUJFAYozGj4+LFc3Qemo8n
+	 5rtnQg0T71HXg==
+From: Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next 0/4] net: microchip: Correct spelling in comments
+Date: Fri, 19 Apr 2024 14:54:16 +0100
+Message-Id: <20240419-lan743x-confirm-v1-0-2a087617a3e5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZiFq9EmbGZ3psdho@f4>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIh3ImYC/x3MQQqDMBBG4avIrDsQ04DEq5QuYvxTB3QsiUhAv
+ HtDl9/ivYsKsqDQ2F2UcUqRXRv6R0dxCfoBy9xM1lhnXO95DTq4Z+W4a5K8sY9zCEiwg52oVd+
+ MJPV/fJHiYEU96H3fP2Ir4l1rAAAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Bryan Whitehead <bryan.whitehead@microchip.com>, 
+ Richard Cochran <richardcochran@gmail.com>, 
+ Horatiu Vultur <horatiu.vultur@microchip.com>, 
+ Lars Povlsen <lars.povlsen@microchip.com>, 
+ Steen Hegelund <Steen.Hegelund@microchip.com>, 
+ Daniel Machon <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, 
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+X-Mailer: b4 0.12.3
 
-Thu, Apr 18, 2024 at 08:48:20PM CEST, benjamin.poirier@gmail.com wrote:
->On 2024-04-18 18:08 +0200, Jiri Pirko wrote:
->> From: Jiri Pirko <jiri@nvidia.com>
->> 
->> This check can be done at the very beginning of the script.
->> As the follow up patch needs to add early code that needs to be executed
->> after the check, move it.
->> 
->> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
->> ---
->> v3->v4:
->> - removed NUM_NETIFS mode, rephrased the patch subject and description
->>   accordingly
->> ---
->>  tools/testing/selftests/net/forwarding/lib.sh | 10 +++++-----
->>  1 file changed, 5 insertions(+), 5 deletions(-)
->> 
->> diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
->> index 7913c6ee418d..b63a5866ce97 100644
->> --- a/tools/testing/selftests/net/forwarding/lib.sh
->> +++ b/tools/testing/selftests/net/forwarding/lib.sh
->> @@ -84,6 +84,11 @@ declare -A NETIFS=(
->>  # e.g. a low-power board.
->>  : "${KSFT_MACHINE_SLOW:=no}"
->>  
->> +if [[ "$(id -u)" -ne 0 ]]; then
->> +	echo "SKIP: need root privileges"
->> +	exit $ksft_skip
->> +fi
->> +
->
->There's a small problem here. ksft_skip is defined in net/lib.sh which
->hasn't yet been imported at this point.
->
->Also, on my system at least, the code in the next patch can run
->successfully as an unprivileged user. So what is this patch needed for
->exactly?
+Correct spelling in comments in Microchip drivers.
+Flagged by codespell.
 
-Okay, you are right. Will remove this patch.
+---
+Simon Horman (4):
+      net: lan743x: Correct spelling in comments
+      net: lan966x: Correct spelling in comments
+      net: encx24j600: Correct spelling in comments
+      net: sparx5: Correct spelling in comments
+
+ drivers/net/ethernet/microchip/encx24j600-regmap.c       | 4 ++--
+ drivers/net/ethernet/microchip/encx24j600.c              | 6 ++++--
+ drivers/net/ethernet/microchip/encx24j600_hw.h           | 2 +-
+ drivers/net/ethernet/microchip/lan743x_main.c            | 4 ++--
+ drivers/net/ethernet/microchip/lan743x_ptp.c             | 2 +-
+ drivers/net/ethernet/microchip/lan966x/lan966x_ifh.h     | 2 +-
+ drivers/net/ethernet/microchip/lan966x/lan966x_main.c    | 4 ++--
+ drivers/net/ethernet/microchip/lan966x/lan966x_main.h    | 2 +-
+ drivers/net/ethernet/microchip/lan966x/lan966x_port.c    | 2 +-
+ drivers/net/ethernet/microchip/lan966x/lan966x_vlan.c    | 2 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c      | 2 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_packet.c    | 2 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_port.c      | 2 +-
+ drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c | 2 +-
+ drivers/net/ethernet/microchip/vcap/vcap_ag_api.h        | 2 +-
+ drivers/net/ethernet/microchip/vcap/vcap_api.c           | 4 ++--
+ drivers/net/ethernet/microchip/vcap/vcap_api_client.h    | 2 +-
+ drivers/net/ethernet/microchip/vcap/vcap_api_private.h   | 2 +-
+ 18 files changed, 25 insertions(+), 23 deletions(-)
+
+base-commit: 4cad4efa6eb209cea88175e545020de55fe3c737
+
 
