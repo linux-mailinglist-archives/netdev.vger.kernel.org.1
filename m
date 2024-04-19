@@ -1,201 +1,135 @@
-Return-Path: <netdev+bounces-89638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 184028AAFD0
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:54:49 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B47E8AB043
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 16:08:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36EDF1C22463
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 13:54:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 978F2B2586D
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 14:08:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BA1C12D1F9;
-	Fri, 19 Apr 2024 13:54:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5888E136E1C;
+	Fri, 19 Apr 2024 14:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TnKfys5w"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SUqJ5VZg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA01312CD9C
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 13:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E0E12CDBF
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 14:04:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713534881; cv=none; b=GhCPkOErYagouBYYaxDut8hPJp45pQp6ZPxDp+mhfkSiGo6vsQpNH7BPbgHA7/hChZ8EN/f1PlVqz01h8poNp0uuGc0S+YODYZ8u0+D/Z7JieAHKgSId3rv0VGgA6TmGSQOzUf59bazyn32fWzCmU4UiCEwVC8CtkOEJazfKRnU=
+	t=1713535450; cv=none; b=mhOOx/GcLf9fXsqWYCXNSg/ddYEy/15jhvL+6MFAbya6nwUGQAbsMsR5bb0QkSDRhu3g3RaZbJR4MydGMvR60yAZcIso/dN+Om901k2M2DQvD5zAweNtI9+f5dKXU/9SQ+VTUzLpt+a5lk0yoGyjOPK72Xk8Djquj91uZVa1h1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713534881; c=relaxed/simple;
-	bh=CWp+GN9qxCNPsKYqst03RWYow2bzxMOhkKlXCPAazAQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=QDv3cgQJhRh+7Fv9p0rTXFUmalK4IotmQPTccfyy6ri8rC88RtkegXsQTF+gu3ROPqLuO+gLIwuUwW8epSTCHK2JvN5sZEE3Z5tn0bj+4fn/6UySSP9qwyOmZLvrt88ZX91Z+q6euoP3TEKS6dQhpOSQ8+XHSa/8yI1hq545fJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TnKfys5w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAC35C072AA;
-	Fri, 19 Apr 2024 13:54:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1713534880;
-	bh=CWp+GN9qxCNPsKYqst03RWYow2bzxMOhkKlXCPAazAQ=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=TnKfys5wxez8UPWxcUBIahwp/o7JLdZVxTQniR/pA/6Jp+j426bWsrwZeU7vuDXhU
-	 cOjJjh5zR1BMj3nG+bw0QYxqmt0psJNYZ0bxSU0D/BVqVKtjEl19Y898jlXHSkVCLr
-	 IgMg/1I/reVw8jGmO7urO49EhroWLr7jWFPd7onNLwjuWaRLZTen9c1nOCMrBqBdYI
-	 bAYiSBvuTEGly+mKNWi5tdKSSpfAV/wuccDDsoaiR81EfodJXmlYHgGuwtuM9rjjVb
-	 kUGm8zx+iM7L4J8Fe85yi+se7c4JGBmUpj8pC7TUHXFVHcHefPwecvUmu/aTx7nTfV
-	 z1ht3LMjeBg4Q==
-From: Simon Horman <horms@kernel.org>
-Date: Fri, 19 Apr 2024 14:54:20 +0100
-Subject: [PATCH net-next 4/4] net: sparx5: Correct spelling in comments
+	s=arc-20240116; t=1713535450; c=relaxed/simple;
+	bh=081xBFDfqL5Vw/xAQiMf19HcLzBElvmjCJcgVbDj85E=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rXY61ajyHvNrwWSV9qLSltJNVE9ClloIIdV8xP5x0jD7KaiqQmn1k+bhIc2SW4cjbu2a4/8D7etNtDrgmziTryicbVI+j1WE1leFt6fUaF5q82vZWj1XN0ZJ3OaghDOl/g3bZhCysB9yhKckZ8zDioogMfW/11Zt2eYUA76UOYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SUqJ5VZg; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-571b5fba660so12050a12.1
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 07:04:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1713535447; x=1714140247; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EgdjcSpW45D9KNDKVsCnocu4g8t94PkEWHXaAaMBiM4=;
+        b=SUqJ5VZgjaHqwKyfwPOn46b0Ek5CAQKMeZFfHJ7WGtMa9nxLoxtVqsaDeq9BJAU0zC
+         jPyXpMjITfTW30MIjYaxFNUAumJaP82t6w2kXTMoRf24sm+SAboCX/i/u/FshrKcSptm
+         G6fN1YgY2tipTQjUFt+nBewW8G0SBdkeuXjLydr5kP9IIegVrJjwBiCfarm82HbMcBAP
+         SEAE6fDJuTysLJbAyOpogQBAImwNYlNt6hPsQSDRlJVkZ2hhe/9Hg+yuOJScDeAZ0BE4
+         WViNNwvLIsbvt+Aj2hynAAXOcWijCcUfrS5+yfhXu8d5/BBqcbr6KSgTvyrT7IT4Ahld
+         uizQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713535447; x=1714140247;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EgdjcSpW45D9KNDKVsCnocu4g8t94PkEWHXaAaMBiM4=;
+        b=TtqYS64dJ9yYnbhERczbHZjIfH0xIB5p9x3HVKEdRuC3AWlTkjSKMpoEgzUyl5IEJo
+         x1v2xaTr6+jLZVUQ3L4dU+OmI2N6D+YzwNgkO9ZAkHlDUvQBn4FxsqwsZCTF+chNMhHm
+         epCbEW/P35YTlD9O1Nw0US9mN62xEl3u+WliP5Pf5igC8LhwzhSYQz/yNTf6vFq9gp9q
+         gbYbw6xF0IbMqHWiUeWFp0FZhMR0TohqdqIjtYzbS8X8G2aohasZ2upuUbNehlY9CIRG
+         W/qe5gdUIUXhMie7Npgw7+rS6l62ekItSTLKMayVc7W40Ktr1s13K+a22Keh7MG+uBP1
+         Jq6A==
+X-Forwarded-Encrypted: i=1; AJvYcCVd59yGOIw8SwG2cqQXQM134NS2CoVRXq0iOTOlEkKNhXnkgaV/4ngeZp44EyM3yflZgHhUxNJEwHpWzhMAr8bGgDMXQxJX
+X-Gm-Message-State: AOJu0YzZF3SkFBEnp8VVq5XZivpAKn78klT8e3awbVPY+gARgY9CzrKT
+	b1KRo0bOig3dZ1DYuMTwbNb8oiTl8c7j3u3DNFkmYFTTZtDRsGmybU8wTnsdVHC2hAlEADb1pz6
+	d4QdXU9VGwYoJhrtPHBrvB57WpcMtMWXA2gZa
+X-Google-Smtp-Source: AGHT+IGrCIxn0+mAAt74WL1Uh7YRnchWQBRUnU00Tsly++iSIFUA0fDnu/XcmtwzS840RE8Q8QtXCcAPzbd+n+gi7Kc=
+X-Received: by 2002:a05:6402:1e94:b0:571:bc8d:4b6e with SMTP id
+ f20-20020a0564021e9400b00571bc8d4b6emr184418edf.3.1713535446709; Fri, 19 Apr
+ 2024 07:04:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240419-lan743x-confirm-v1-4-2a087617a3e5@kernel.org>
-References: <20240419-lan743x-confirm-v1-0-2a087617a3e5@kernel.org>
-In-Reply-To: <20240419-lan743x-confirm-v1-0-2a087617a3e5@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: Bryan Whitehead <bryan.whitehead@microchip.com>, 
- Richard Cochran <richardcochran@gmail.com>, 
- Horatiu Vultur <horatiu.vultur@microchip.com>, 
- Lars Povlsen <lars.povlsen@microchip.com>, 
- Steen Hegelund <Steen.Hegelund@microchip.com>, 
- Daniel Machon <daniel.machon@microchip.com>, UNGLinuxDriver@microchip.com, 
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-X-Mailer: b4 0.12.3
+References: <20240419105332.2430179-1-edumazet@google.com> <20240419064552.5dbe33e6@kernel.org>
+ <CANn89iKjwOfGTiHjE-JaWaxxDZVfsWzaE7AkVigHGLEPwXaepA@mail.gmail.com>
+In-Reply-To: <CANn89iKjwOfGTiHjE-JaWaxxDZVfsWzaE7AkVigHGLEPwXaepA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 19 Apr 2024 16:03:55 +0200
+Message-ID: <CANn89iLmY26C05__4L9esOkBn1nEU8N7w0yBOU=CSbF7DQ6Aqg@mail.gmail.com>
+Subject: Re: [PATCH net] icmp: prevent possible NULL dereferences from icmp_build_probe()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	David Ahern <dsahern@kernel.org>, eric.dumazet@gmail.com, 
+	Andreas Roeseler <andreas.a.roeseler@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Correct spelling in comments, as flagged by codespell.
+On Fri, Apr 19, 2024 at 3:51=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Fri, Apr 19, 2024 at 3:45=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
+wrote:
+> >
+> > On Fri, 19 Apr 2024 10:53:32 +0000 Eric Dumazet wrote:
+> > > +     in6_dev =3D __in6_dev_get(dev);
+> > > +     if (in6_dev && !list_empty(&in6_dev->addr_list))
+> >
+> > There's got to be some conditional include somewhere because this seems
+> > to break cut-down builds (presumably IPv6=3Dn):
+> >
+> >
+> > net/ipv4/icmp.c: In function =E2=80=98icmp_build_probe=E2=80=99:
+> > net/ipv4/icmp.c:1125:19: error: implicit declaration of function =E2=80=
+=98__in6_dev_get=E2=80=99; did you mean =E2=80=98in_dev_get=E2=80=99? [-Wer=
+ror=3Dimplicit-function-declaration]
+> >  1125 |         in6_dev =3D __in6_dev_get(dev);
+> >       |                   ^~~~~~~~~~~~~
+> >       |                   in_dev_get
+> > net/ipv4/icmp.c:1125:17: error: assignment to =E2=80=98struct inet6_dev=
+ *=E2=80=99 from =E2=80=98int=E2=80=99 makes pointer from integer without a=
+ cast [-Werror=3Dint-conversion]
+> >  1125 |         in6_dev =3D __in6_dev_get(dev);
+> >       |                 ^
+> > --
+> > pw-bot: cr
+>
+> Ah right, __in6_dev_get() is not defined for CONFIG_IPV6=3Dn...
 
-Signed-off-by: Simon Horman <horms@kernel.org>
----
- drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c      | 2 +-
- drivers/net/ethernet/microchip/sparx5/sparx5_packet.c    | 2 +-
- drivers/net/ethernet/microchip/sparx5/sparx5_port.c      | 2 +-
- drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c | 2 +-
- drivers/net/ethernet/microchip/vcap/vcap_ag_api.h        | 2 +-
- drivers/net/ethernet/microchip/vcap/vcap_api.c           | 4 ++--
- drivers/net/ethernet/microchip/vcap/vcap_api_client.h    | 2 +-
- drivers/net/ethernet/microchip/vcap/vcap_api_private.h   | 2 +-
- 8 files changed, 9 insertions(+), 9 deletions(-)
+Nope, I just have to add one include, that was conditionally pulled.
 
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c b/drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c
-index 141897dfe388..1915998f6079 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_fdma.c
-@@ -143,7 +143,7 @@ static void sparx5_fdma_rx_activate(struct sparx5 *sparx5, struct sparx5_rx *rx)
- 
- static void sparx5_fdma_rx_deactivate(struct sparx5 *sparx5, struct sparx5_rx *rx)
- {
--	/* Dectivate the RX channel */
-+	/* Deactivate the RX channel */
- 	spx5_rmw(0, BIT(rx->channel_id) & FDMA_CH_ACTIVATE_CH_ACTIVATE,
- 		 sparx5, FDMA_CH_ACTIVATE);
- 
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
-index ac7e1cffbcec..f3f5fb420468 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_packet.c
-@@ -67,7 +67,7 @@ static void sparx5_xtr_grp(struct sparx5 *sparx5, u8 grp, bool byte_swap)
- 	for (i = 0; i < IFH_LEN; i++)
- 		ifh[i] = spx5_rd(sparx5, QS_XTR_RD(grp));
- 
--	/* Decode IFH (whats needed) */
-+	/* Decode IFH (what's needed) */
- 	sparx5_ifh_parse(ifh, &fi);
- 
- 	/* Map to port netdev */
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_port.c b/drivers/net/ethernet/microchip/sparx5/sparx5_port.c
-index 60dd2fd603a8..062e486c002c 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_port.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_port.c
-@@ -370,7 +370,7 @@ static int sparx5_port_disable(struct sparx5 *sparx5, struct sparx5_port *port,
- 	/* 6: Wait while the last frame is exiting the queues */
- 	usleep_range(8 * spd_prm, 10 * spd_prm);
- 
--	/* 7: Flush the queues accociated with the port->portno */
-+	/* 7: Flush the queues associated with the port->portno */
- 	spx5_rmw(HSCH_FLUSH_CTRL_FLUSH_PORT_SET(port->portno) |
- 		 HSCH_FLUSH_CTRL_FLUSH_DST_SET(1) |
- 		 HSCH_FLUSH_CTRL_FLUSH_SRC_SET(1) |
-diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c b/drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c
-index 4af85d108a06..0b4abc3eb53d 100644
---- a/drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c
-+++ b/drivers/net/ethernet/microchip/sparx5/sparx5_switchdev.c
-@@ -190,7 +190,7 @@ static int sparx5_port_bridge_join(struct sparx5_port *port,
- 	/* Remove standalone port entry */
- 	sparx5_mact_forget(sparx5, ndev->dev_addr, 0);
- 
--	/* Port enters in bridge mode therefor don't need to copy to CPU
-+	/* Port enters in bridge mode therefore don't need to copy to CPU
- 	 * frames for multicast in case the bridge is not requesting them
- 	 */
- 	__dev_mc_unsync(ndev, sparx5_mc_unsync);
-diff --git a/drivers/net/ethernet/microchip/vcap/vcap_ag_api.h b/drivers/net/ethernet/microchip/vcap/vcap_ag_api.h
-index c3569a4c7b69..4735fad05708 100644
---- a/drivers/net/ethernet/microchip/vcap/vcap_ag_api.h
-+++ b/drivers/net/ethernet/microchip/vcap/vcap_ag_api.h
-@@ -290,7 +290,7 @@ enum vcap_keyfield_set {
-  *   Sparx5: TCP flag RST , LAN966x: TCP: TCP flag RST. PTP over UDP: messageType
-  *   bit 3
-  * VCAP_KF_L4_SEQUENCE_EQ0_IS: W1, sparx5: is2/es2, lan966x: is2
-- *   Set if TCP sequence number is 0, LAN966x: Overlayed with PTP over UDP:
-+ *   Set if TCP sequence number is 0, LAN966x: Overlaid with PTP over UDP:
-  *   messageType bit 0
-  * VCAP_KF_L4_SPORT: W16, sparx5: is0/is2/es2, lan966x: is1/is2
-  *   TCP/UDP source port
-diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api.c b/drivers/net/ethernet/microchip/vcap/vcap_api.c
-index 80ae5e1708a6..a3b1dc7a5448 100644
---- a/drivers/net/ethernet/microchip/vcap/vcap_api.c
-+++ b/drivers/net/ethernet/microchip/vcap/vcap_api.c
-@@ -327,7 +327,7 @@ static int vcap_find_keystream_typegroup_sw(struct vcap_control *vctrl,
- }
- 
- /* Verify that the typegroup information, subword count, keyset and type id
-- * are in sync and correct, return the list of matchin keysets
-+ * are in sync and correct, return the list of matching keysets
-  */
- int
- vcap_find_keystream_keysets(struct vcap_control *vctrl,
-@@ -2943,7 +2943,7 @@ void vcap_netbytes_copy(u8 *dst, u8 *src, int count)
- }
- EXPORT_SYMBOL_GPL(vcap_netbytes_copy);
- 
--/* Convert validation error code into tc extact error message */
-+/* Convert validation error code into tc exact error message */
- void vcap_set_tc_exterr(struct flow_cls_offload *fco, struct vcap_rule *vrule)
- {
- 	switch (vrule->exterr) {
-diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api_client.h b/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
-index 56874f2adbba..d6c3e90745a7 100644
---- a/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
-+++ b/drivers/net/ethernet/microchip/vcap/vcap_api_client.h
-@@ -238,7 +238,7 @@ const struct vcap_set *vcap_keyfieldset(struct vcap_control *vctrl,
- /* Copy to host byte order */
- void vcap_netbytes_copy(u8 *dst, u8 *src, int count);
- 
--/* Convert validation error code into tc extact error message */
-+/* Convert validation error code into tc exact error message */
- void vcap_set_tc_exterr(struct flow_cls_offload *fco, struct vcap_rule *vrule);
- 
- /* Cleanup a VCAP instance */
-diff --git a/drivers/net/ethernet/microchip/vcap/vcap_api_private.h b/drivers/net/ethernet/microchip/vcap/vcap_api_private.h
-index df81d9ff502b..844bdf6b5f45 100644
---- a/drivers/net/ethernet/microchip/vcap/vcap_api_private.h
-+++ b/drivers/net/ethernet/microchip/vcap/vcap_api_private.h
-@@ -109,7 +109,7 @@ int vcap_addr_keysets(struct vcap_control *vctrl, struct net_device *ndev,
- 		      struct vcap_keyset_list *kslist);
- 
- /* Verify that the typegroup information, subword count, keyset and type id
-- * are in sync and correct, return the list of matchin keysets
-+ * are in sync and correct, return the list of matching keysets
-  */
- int vcap_find_keystream_keysets(struct vcap_control *vctrl, enum vcap_type vt,
- 				u32 *keystream, u32 *mskstream, bool mask,
+diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+index e1aaad4bf09cd43d9f3b376416b79a8b2c0a63ca..437e782b9663bb59acb900c0558=
+137ddd401cd02
+100644
+--- a/net/ipv4/icmp.c
++++ b/net/ipv4/icmp.c
+@@ -92,6 +92,7 @@
+ #include <net/inet_common.h>
+ #include <net/ip_fib.h>
+ #include <net/l3mdev.h>
++#include <net/addrconf.h>
 
--- 
-2.43.0
-
+ /*
+  *     Build xmit assembly blocks
 
