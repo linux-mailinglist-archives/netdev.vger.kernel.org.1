@@ -1,300 +1,218 @@
-Return-Path: <netdev+bounces-89763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B87628AB7F1
-	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 01:55:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA9468AB7F3
+	for <lists+netdev@lfdr.de>; Sat, 20 Apr 2024 01:55:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC5B31C21016
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 23:55:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CB0928236C
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 23:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AB5B13D8A6;
-	Fri, 19 Apr 2024 23:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83ECA13D8A1;
+	Fri, 19 Apr 2024 23:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="guLofEnj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WjqtHtqZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1D013D8A1
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 23:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BDB13D88F
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 23:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713570683; cv=none; b=LQXynUyKpbz14MAKcab8smqH4pmiKsrG/zkehlgO9M6tOj71dq26u9xbYjfq/S1Pog15GgQ7aRrM39aDDEj80tM/hMRjuUZ4ORJJ3Dnq9V/Uq+mHFT+CNjCRBODXGYvqh9y0mZT3q1ippfxgscyhzXIynvu4uX1LMo7HpNJ9WGo=
+	t=1713570803; cv=none; b=A70s7ry1oMZqHxenRhOh39p+H1KOB/HhDiiUBfi8676/G7w0fRruVj/xin6GGYDESNEu+v3ngOk0F/d9Ib8kDQqRM4ueXCH7cgYag2THtVUirG6XJRYxbeziTmqQS45KnBnnnX5ahYpPCoKzvL/Jm8C9UtAgjQRDjQyVtg+hcuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713570683; c=relaxed/simple;
-	bh=zDcZ4WllUuoVqnJ5i3SKt5ZrfExbGVJF9iRXQxdXoAs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=LyOggKnNGHQesnc8UTi0Mj3Utx4doXrxk+RH8//7cNhFB04EJTIo86sIfyt7v1wdPBHFmkPKMjRLbwiqFJy+zCG3oyLSlurLfoaFSGLk/RVCvVoaN0uN1IO1BN3y4/Ud6+M+0sJPW7QBHwskrBeGcQIovfmOGgNs4uWtsLQn0dE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=guLofEnj; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1713570681; x=1745106681;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=V5yPLwpLHasS5hmkfPz7rPmM37LADMLB103AEIblRu0=;
-  b=guLofEnj5/VpQa778mmC2pQ9u6se1TGau45tNgdYgadcoFssdYGt0sTS
-   N5q8AQU/d31pwkoDmL7N1flzvcX2pv3VjM47aXC0rD/P7Qa9a8bwDMkmH
-   gDklXgmJKEcND6BciTi4vDFXxd4UfmDTRdu0juAVT2lHX/F3rNNMkYMlL
-   c=;
-X-IronPort-AV: E=Sophos;i="6.07,215,1708387200"; 
-   d="scan'208";a="82762461"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 23:51:19 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:60362]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.60.130:2525] with esmtp (Farcaster)
- id 2464cab7-40df-4df0-beee-1ccf63957e05; Fri, 19 Apr 2024 23:51:19 +0000 (UTC)
-X-Farcaster-Flow-ID: 2464cab7-40df-4df0-beee-1ccf63957e05
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 19 Apr 2024 23:51:18 +0000
-Received: from 88665a182662.ant.amazon.com (10.119.231.92) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 19 Apr 2024 23:51:16 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>,
-	<syzbot+f3f3eef1d2100200e593@syzkaller.appspotmail.com>
-Subject: [PATCH v1 net-next] af_unix: Don't access successor in unix_del_edges() during GC.
-Date: Fri, 19 Apr 2024 16:51:02 -0700
-Message-ID: <20240419235102.31707-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1713570803; c=relaxed/simple;
+	bh=GLvDsVBBrETnc/EVOJI/JbZ5XgczOx7boHuUhQdlcYk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lrRA9h6imuYB82sTmYiUo28akVaKIri2+91v0BaxaKIK3rMWR9uxFJcz+15zSM5g354pm/VNoESdhIReD9vLfbWBFiJEIjgNeFtxGSvq+zgACv/wI4oW4uBCFW4LuKTLMy57u2Vtm9z3G1BPPalDLFapXYQIU+0fieZtt/gyztk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WjqtHtqZ; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1713570800; x=1745106800;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=GLvDsVBBrETnc/EVOJI/JbZ5XgczOx7boHuUhQdlcYk=;
+  b=WjqtHtqZgTmKyjlaZQt97XF1JSC8EIOSCPq2S0KIQQqn9WZmC/ch/UDY
+   HKhwbZawhQMqjJh5bYBJY1rJiA6dtgcBRhepKoXcrPTxYkJjcYlpqT/pF
+   eb0jVBjXH4z9empHa9ofF9Jnb9IdhnQNeSeWDcarp3aK73F+3f22fvbX+
+   8p9oGfUXk94Z+j+CHZqLxtg9ZB0JrCWxuMVRl2WK2tt8HPVUj/ESNsTzC
+   U+MBjU1KqBSFHpJZAJyR86wjJ3mPy/04PZ+TGhbZFeOvsu8wGoZ3ASpMs
+   /elCWPyOKZih8m+sbyREcBBGYIU7V9ICMKhQHA5D7RBQqgQQP+xxKaQPC
+   w==;
+X-CSE-ConnectionGUID: W85RokqaRsyovaM4LHrQXQ==
+X-CSE-MsgGUID: MQdEQAAPSZulbWi+y03vNw==
+X-IronPort-AV: E=McAfee;i="6600,9927,11049"; a="20614775"
+X-IronPort-AV: E=Sophos;i="6.07,215,1708416000"; 
+   d="scan'208";a="20614775"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2024 16:53:20 -0700
+X-CSE-ConnectionGUID: Fh4y3afkTVWr9clDu+msQg==
+X-CSE-MsgGUID: +brg9LJaRZKrR1TsNadywQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,215,1708416000"; 
+   d="scan'208";a="60919839"
+Received: from unknown (HELO 23c141fc0fd8) ([10.239.97.151])
+  by orviesa001.jf.intel.com with ESMTP; 19 Apr 2024 16:53:15 -0700
+Received: from kbuild by 23c141fc0fd8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rxy2Z-000AYy-2S;
+	Fri, 19 Apr 2024 23:53:11 +0000
+Date: Sat, 20 Apr 2024 07:52:59 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, edumazet@google.com, parav@nvidia.com,
+	mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	shuah@kernel.org, petrm@nvidia.com, liuhangbin@gmail.com,
+	vladimir.oltean@nxp.com, bpoirier@nvidia.com, idosch@nvidia.com,
+	virtualization@lists.linux.dev
+Subject: Re: [patch net-next v4 1/6] virtio: add debugfs infrastructure to
+ allow to debug virtio features
+Message-ID: <202404200721.zDtvSZST-lkp@intel.com>
+References: <20240418160830.3751846-2-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D044UWB002.ant.amazon.com (10.13.139.188) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240418160830.3751846-2-jiri@resnulli.us>
 
-syzbot reported use-after-free in unix_del_edges().  [0]
+Hi Jiri,
 
-What the repro does is basically repeat the following quickly.
+kernel test robot noticed the following build errors:
 
-  1. pass a fd of an AF_UNIX socket to itself
+[auto build test ERROR on net-next/main]
 
-    socketpair(AF_UNIX, SOCK_DGRAM, 0, [3, 4]) = 0
-    sendmsg(3, {..., msg_control=[{cmsg_len=20, cmsg_level=SOL_SOCKET,
-                                   cmsg_type=SCM_RIGHTS, cmsg_data=[4]}], ...}, 0) = 0
+url:    https://github.com/intel-lab-lkp/linux/commits/Jiri-Pirko/virtio-add-debugfs-infrastructure-to-allow-to-debug-virtio-features/20240419-004913
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240418160830.3751846-2-jiri%40resnulli.us
+patch subject: [patch net-next v4 1/6] virtio: add debugfs infrastructure to allow to debug virtio features
+config: sparc-randconfig-002-20240420 (https://download.01.org/0day-ci/archive/20240420/202404200721.zDtvSZST-lkp@intel.com/config)
+compiler: sparc64-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240420/202404200721.zDtvSZST-lkp@intel.com/reproduce)
 
-  2. pass other fds of AF_UNIX sockets to the socket above
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202404200721.zDtvSZST-lkp@intel.com/
 
-    socketpair(AF_UNIX, SOCK_SEQPACKET, 0, [5, 6]) = 0
-    sendmsg(3, {..., msg_control=[{cmsg_len=48, cmsg_level=SOL_SOCKET,
-                                   cmsg_type=SCM_RIGHTS, cmsg_data=[5, 6]}], ...}, 0) = 0
+All errors (new ones prefixed by >>, old ones prefixed by <<):
 
-  3. close all sockets
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8188-vdo1.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8192.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8192-aud.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8192-cam.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8192-imp_iic_wrap.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8192-ipe.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8192-mdp.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8192-mm.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8192-msdc.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8192-scp_adsp.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/mediatek/clk-mt8192-venc.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sunxi-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun20i-d1-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun50i-a64-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun50i-a100-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun50i-a100-r-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun50i-h6-r-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun50i-h616-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun4i-a10-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun6i-a31-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun8i-a23-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun8i-a33-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun8i-a83t-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun8i-h3-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun8i-r40-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun8i-v3s-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun8i-de2-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun9i-a80-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun9i-a80-de-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/sunxi-ng/sun9i-a80-usb-ccu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/clk_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/clk/clk-fractional-divider_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/dma/qcom/hdma_mgmt.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/dma/qcom/hdma.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/dma/dmatest.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/soc/ixp4xx/ixp4xx-npe.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/soc/qcom/spm.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/virtio/virtio.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/virtio/virtio_ring.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/virtio/virtio_dma_buf.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/regulator/da9121-regulator.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/regulator/rt4831-regulator.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/tty/serial/esp32_uart.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/tty/serial/esp32_acm.o
+WARNING: modpost: drivers/char/hw_random/mxc-rnga: section mismatch in reference: mxc_rnga_driver+0x10 (section: .data) -> mxc_rnga_remove (section: .exit.text)
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/char/lp.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/char/ppdev.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/panel/panel-newvision-nv3052c.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/panel/panel-novatek-nt39016.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/bridge/lontium-lt9611.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/bridge/sii9234.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/gud/gud.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/drm_panel_orientation_quirks.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/gpu/drm/drm_mipi_dbi.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-kunit.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-i2c.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-ram.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-raw-ram.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-spmi.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/base/regmap/regmap-w1.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/block/floppy.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/block/loop.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/misc/fastrpc.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mfd/arizona.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mfd/rt4831.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/mfd/qcom-pm8008.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/spi/spi-bitbang.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/cdrom/cdrom.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/host/ohci-exynos.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/host/xhci-pci-renesas.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/class/usbtmc.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/misc/yurex.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/gadget/function/usb_f_mass_storage.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/gadget/legacy/g_dbgp.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/mon/usbmon.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/usb/chipidea/ci_hdrc_msm.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/input/tests/input_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/rtc/lib_test.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/rtc/rtc-goldfish.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/i2c/busses/i2c-pxa.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/media/rc/rc-core.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/firmware/google/memconsole.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/firmware/google/memconsole-coreboot.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/perf/arm-ccn.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/perf/fsl_imx8_ddr_perf.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/perf/marvell_cn10k_ddr_pmu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/perf/arm_cspmu/arm_cspmu_module.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/perf/arm_cspmu/nvidia_cspmu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/perf/arm_cspmu/ampere_cspmu.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/hwtracing/intel_th/intel_th_msu_sink.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/interconnect/imx/imx-interconnect.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/interconnect/imx/imx8mq-interconnect.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/parport/parport.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/spmi/hisi-spmi-controller.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/pcmcia/pcmcia_rsrc.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-core.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-master-hub.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-master-gpio.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/fsi/fsi-scom.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/siox/siox-bus-gpio.o
+>> ERROR: modpost: "virtio_debug_device_exit" [drivers/virtio/virtio.ko] undefined!
+>> ERROR: modpost: "virtio_debug_init" [drivers/virtio/virtio.ko] undefined!
+>> ERROR: modpost: "virtio_debug_exit" [drivers/virtio/virtio.ko] undefined!
+>> ERROR: modpost: "virtio_debug_device_init" [drivers/virtio/virtio.ko] undefined!
+>> ERROR: modpost: "virtio_debug_device_filter_features" [drivers/virtio/virtio.ko] undefined!
 
-Here, two skb are created, and every unix_edge->successor is the first
-socket.  Then, __unix_gc() will garbage-collect the two skb:
-
-  (a) free skb with self-referencing fd
-  (b) free skb holding other sockets
-
-After (a), the self-referencing socket will be scheduled to be freed
-later by the delayed_fput() task.
-
-syzbot repeated the sequences above (1. ~ 3.) quickly and triggered
-the task concurrently while GC was running.
-
-So, at (b), the socket was already freed, and accessing it was illegal.
-
-unix_del_edges() accesses the receiver socket as edge->successor to
-optimise GC.  However, we should not do it during GC.
-
-Garbage-collecting sockets does not change the shape of the rest
-of the graph, so we need not call unix_update_graph() to update
-unix_graph_grouped when we purge skb.
-
-However, if we clean up all loops in the unix_walk_scc_fast() path,
-unix_graph_maybe_cyclic remains unchanged (true), and __unix_gc()
-will call unix_walk_scc_fast() continuously even though there is no
-socket to garbage-collect.
-
-To keep that optimisation while fixing UAF, let's add the same
-updating logic of unix_graph_maybe_cyclic in unix_walk_scc_fast()
-as done in unix_walk_scc() and __unix_walk_scc().
-
-Note that when unix_del_edges() is called from other places, the
-receiver socket is always alive:
-
-  - sendmsg: the successor's sk_refcnt is bumped by sock_hold()
-             unix_find_other() for SOCK_DGRAM, connect() for SOCK_STREAM
-
-  - recvmsg: the successor is the receiver, and its fd is alive
-
-[0]:
-BUG: KASAN: slab-use-after-free in unix_edge_successor net/unix/garbage.c:109 [inline]
-BUG: KASAN: slab-use-after-free in unix_del_edge net/unix/garbage.c:165 [inline]
-BUG: KASAN: slab-use-after-free in unix_del_edges+0x148/0x630 net/unix/garbage.c:237
-Read of size 8 at addr ffff888079c6e640 by task kworker/u8:6/1099
-
-CPU: 0 PID: 1099 Comm: kworker/u8:6 Not tainted 6.9.0-rc4-next-20240418-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 03/27/2024
-Workqueue: events_unbound __unix_gc
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- print_address_description mm/kasan/report.c:377 [inline]
- print_report+0x169/0x550 mm/kasan/report.c:488
- kasan_report+0x143/0x180 mm/kasan/report.c:601
- unix_edge_successor net/unix/garbage.c:109 [inline]
- unix_del_edge net/unix/garbage.c:165 [inline]
- unix_del_edges+0x148/0x630 net/unix/garbage.c:237
- unix_destroy_fpl+0x59/0x210 net/unix/garbage.c:298
- unix_detach_fds net/unix/af_unix.c:1811 [inline]
- unix_destruct_scm+0x13e/0x210 net/unix/af_unix.c:1826
- skb_release_head_state+0x100/0x250 net/core/skbuff.c:1127
- skb_release_all net/core/skbuff.c:1138 [inline]
- __kfree_skb net/core/skbuff.c:1154 [inline]
- kfree_skb_reason+0x16d/0x3b0 net/core/skbuff.c:1190
- __skb_queue_purge_reason include/linux/skbuff.h:3251 [inline]
- __skb_queue_purge include/linux/skbuff.h:3256 [inline]
- __unix_gc+0x1732/0x1830 net/unix/garbage.c:575
- process_one_work kernel/workqueue.c:3218 [inline]
- process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3299
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3380
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-Allocated by task 14427:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- unpoison_slab_object mm/kasan/common.c:312 [inline]
- __kasan_slab_alloc+0x66/0x80 mm/kasan/common.c:338
- kasan_slab_alloc include/linux/kasan.h:201 [inline]
- slab_post_alloc_hook mm/slub.c:3897 [inline]
- slab_alloc_node mm/slub.c:3957 [inline]
- kmem_cache_alloc_noprof+0x135/0x290 mm/slub.c:3964
- sk_prot_alloc+0x58/0x210 net/core/sock.c:2074
- sk_alloc+0x38/0x370 net/core/sock.c:2133
- unix_create1+0xb4/0x770
- unix_create+0x14e/0x200 net/unix/af_unix.c:1034
- __sock_create+0x490/0x920 net/socket.c:1571
- sock_create net/socket.c:1622 [inline]
- __sys_socketpair+0x33e/0x720 net/socket.c:1773
- __do_sys_socketpair net/socket.c:1822 [inline]
- __se_sys_socketpair net/socket.c:1819 [inline]
- __x64_sys_socketpair+0x9b/0xb0 net/socket.c:1819
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf5/0x240 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Freed by task 1805:
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:579
- poison_slab_object+0xe0/0x150 mm/kasan/common.c:240
- __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
- kasan_slab_free include/linux/kasan.h:184 [inline]
- slab_free_hook mm/slub.c:2190 [inline]
- slab_free mm/slub.c:4393 [inline]
- kmem_cache_free+0x145/0x340 mm/slub.c:4468
- sk_prot_free net/core/sock.c:2114 [inline]
- __sk_destruct+0x467/0x5f0 net/core/sock.c:2208
- sock_put include/net/sock.h:1948 [inline]
- unix_release_sock+0xa8b/0xd20 net/unix/af_unix.c:665
- unix_release+0x91/0xc0 net/unix/af_unix.c:1049
- __sock_release net/socket.c:659 [inline]
- sock_close+0xbc/0x240 net/socket.c:1421
- __fput+0x406/0x8b0 fs/file_table.c:422
- delayed_fput+0x59/0x80 fs/file_table.c:445
- process_one_work kernel/workqueue.c:3218 [inline]
- process_scheduled_works+0xa2c/0x1830 kernel/workqueue.c:3299
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3380
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-The buggy address belongs to the object at ffff888079c6e000
- which belongs to the cache UNIX of size 1920
-The buggy address is located 1600 bytes inside of
- freed 1920-byte region [ffff888079c6e000, ffff888079c6e780)
-
-Reported-by: syzbot+f3f3eef1d2100200e593@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=f3f3eef1d2100200e593
-Fixes: 77e5593aebba ("af_unix: Skip GC if no cycle exists.")
-Fixes: fd86344823b5 ("af_unix: Try not to hold unix_gc_lock during accept().")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/unix/garbage.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
-
-diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index 95240a59808f..d76450133e4f 100644
---- a/net/unix/garbage.c
-+++ b/net/unix/garbage.c
-@@ -158,11 +158,14 @@ static void unix_add_edge(struct scm_fp_list *fpl, struct unix_edge *edge)
- 	unix_update_graph(unix_edge_successor(edge));
- }
- 
-+static bool gc_in_progress;
-+
- static void unix_del_edge(struct scm_fp_list *fpl, struct unix_edge *edge)
- {
- 	struct unix_vertex *vertex = edge->predecessor->vertex;
- 
--	unix_update_graph(unix_edge_successor(edge));
-+	if (!gc_in_progress)
-+		unix_update_graph(unix_edge_successor(edge));
- 
- 	list_del(&edge->vertex_entry);
- 	vertex->out_degree--;
-@@ -237,8 +240,10 @@ void unix_del_edges(struct scm_fp_list *fpl)
- 		unix_del_edge(fpl, edge);
- 	} while (i < fpl->count_unix);
- 
--	receiver = fpl->edges[0].successor;
--	receiver->scm_stat.nr_unix_fds -= fpl->count_unix;
-+	if (!gc_in_progress) {
-+		receiver = fpl->edges[0].successor;
-+		receiver->scm_stat.nr_unix_fds -= fpl->count_unix;
-+	}
- 	WRITE_ONCE(unix_tot_inflight, unix_tot_inflight - fpl->count_unix);
- out:
- 	WRITE_ONCE(fpl->user->unix_inflight, fpl->user->unix_inflight - fpl->count);
-@@ -526,6 +531,8 @@ static void unix_walk_scc(struct sk_buff_head *hitlist)
- 
- static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
- {
-+	unix_graph_maybe_cyclic = false;
-+
- 	while (!list_empty(&unix_unvisited_vertices)) {
- 		struct unix_vertex *vertex;
- 		struct list_head scc;
-@@ -543,6 +550,8 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
- 
- 		if (scc_dead)
- 			unix_collect_skb(&scc, hitlist);
-+		else if (!unix_graph_maybe_cyclic)
-+			unix_graph_maybe_cyclic = unix_scc_cyclic(&scc);
- 
- 		list_del(&scc);
- 	}
-@@ -550,8 +559,6 @@ static void unix_walk_scc_fast(struct sk_buff_head *hitlist)
- 	list_replace_init(&unix_visited_vertices, &unix_unvisited_vertices);
- }
- 
--static bool gc_in_progress;
--
- static void __unix_gc(struct work_struct *work)
- {
- 	struct sk_buff_head hitlist;
 -- 
-2.30.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
