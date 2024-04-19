@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-89497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 404028AA6AC
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 03:50:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F37B8AA6A9
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 03:50:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F10DD283E78
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 01:50:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90B611C21B58
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 01:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A10B15C3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D77D1388;
 	Fri, 19 Apr 2024 01:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BNA5ASjL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HFqF7q82"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6623610F9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 662027E1;
 	Fri, 19 Apr 2024 01:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713491430; cv=none; b=NxGkspXTwgB4jmintODjm7ytYJPxIjRrfLUndQlGwgsTug4Ru+0QA4sPQJejhvH0Hwdeq678+LQVxIcpeTqX90+esHJgWYSW7GksASy/gDzsgzzo5w+XPxpnGfvPSW2GXw5HMbNwT2wiB+mDZgRah47q154R9M1gnnJF4Uu2Zfs=
+	t=1713491430; cv=none; b=N35gplS+NTAIFoE4NJyGhvv23CgvT9o2Fca8Z4HCw+bRarSSRx9JovUOfc1sm/ZJU1Y2/0wYMokTwk0uKrkcp+U3+vtCKY/I16L7yTA96NMFw2H7H8PyOumtmU9/j6XjkQRkkl4+IJXbGf2pzW4VUcBdcg22BhByHqeK5nHw+Cs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1713491430; c=relaxed/simple;
-	bh=8US40FU+8ErHCWlxLWXY/MDdXspdSrhsuMRmA/GFbTY=;
+	bh=P7QyU/lVlQX9RVc4B3xTSbRhqvl7Ll7dDC/jXXZ3nUY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BepgEj4+Y6tZvpwP3uy1ggI43DahQjEcSdKnFp7EJzvUkzKl4xU3ghGY0990ZcDECpgnYd80y4vqButEdi+J+D1ht9SgRJovQfwTMouNnU5zPyirSzbgosBJegU4clWJoOowO1vD/mciBRs8L+WyTiGFuK+gTGIZoweIsh9dspk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BNA5ASjL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EB338C3277B;
-	Fri, 19 Apr 2024 01:50:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=AX0IT+rmNXuKJ97ZdIIk7zGwyvufRDeQCoB26KFiVteBa2+iRay9xs1NKfRToc8ii/f9ZGI8aRg0HlaCTrjNLfmPf9g/qY7Q9KyazwO8eTrSh3TYtr3dNX5GYdA1msNZ2v5WXQ3lCG5xQesHabvTFOynh5BOQIBn9hiL8iReUP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HFqF7q82; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 06AE9C113CE;
+	Fri, 19 Apr 2024 01:50:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1713491430;
-	bh=8US40FU+8ErHCWlxLWXY/MDdXspdSrhsuMRmA/GFbTY=;
+	bh=P7QyU/lVlQX9RVc4B3xTSbRhqvl7Ll7dDC/jXXZ3nUY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BNA5ASjLi6k8o2pwe0Zguld5TokTeERFqmSBSQ2dF9GjPpgZkXGdNR2SvcoUE3J9o
-	 ORpI2dsoOMOmBzwuYVX0TZTXCPNPWcNYWusL0udbsdpSf1BaJlqoP0odD7CH8eTDmu
-	 H6XU9OYWCjPxst/7h08r/k3kfLQnAcC2DXMkclpGjRJdNqS7p2Y5tuT/xd9n29ei3X
-	 eaolEkZxEvFg1vJOmg40u2tx8GzKkV+nwVcJnk76qcq6o3WRGhAlIBbTnmGnaIEC9N
-	 eNFnqUzs52QctYDAYTeqWD6/adTP7m+pI7lNJH1SePa3WmC2uGeCQQJn2t/ijEIdLE
-	 LMkwrGWoJRU1Q==
+	b=HFqF7q82XO9yqLoY2842VZ0KZ1HZE3Lkmew0QsWU/QCNg+yYj3NVXn5cql4xxFj3p
+	 Dc9PvPSTnNEv9Z6cnI0q/uMMcrk+JQs8dSf1CzJJg5RfuPGLXbIfnsM3n7GNaF8shO
+	 Lju1YIWeiqq6oU1FkYoWvl79f6Ap7BoF5zYkqJfkbiukfnzt0eQW3gVNNlDACrwQHm
+	 Btvw3TDJzqUKfPCxbahKM/IHGmTWY+aSXerDW6oSin6f7ePoTgAlxh3+eDskM6FMS9
+	 Ge2AoNhdHebeqKpkJBFN02i7GK3D6LqbLbHhz31Wd5zx5Rqum79FplJA5sPAZGAUy+
+	 2N77BxKBk+MFQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D9623C395C5;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E38B9C43619;
 	Fri, 19 Apr 2024 01:50:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,70 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v9 01/14] ethtool: Expand Ethernet Power Equipment
- with c33 (PoE) alongside PoDL
+Subject: Re: [PATCH net-next] gve: Remove qpl_cfg struct since qpl_ids map with
+ queues respectively
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171349142988.11062.4384284372209376821.git-patchwork-notify@kernel.org>
+ <171349142992.11062.2278804601434624598.git-patchwork-notify@kernel.org>
 Date: Fri, 19 Apr 2024 01:50:29 +0000
-References: <20240417-feature_poe-v9-1-242293fd1900@bootlin.com>
-In-Reply-To: <20240417-feature_poe-v9-1-242293fd1900@bootlin.com>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, corbet@lwn.net, mcgrof@kernel.org, russ.weight@linux.dev,
- gregkh@linuxfoundation.org, rafael@kernel.org, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- o.rempel@pengutronix.de, broonie@kernel.org, frowand.list@gmail.com,
- andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- thomas.petazzoni@bootlin.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, dentproject@linuxfoundation.org,
- kernel@pengutronix.de, maxime.chevallier@bootlin.com
+References: <20240417205757.778551-1-ziweixiao@google.com>
+In-Reply-To: <20240417205757.778551-1-ziweixiao@google.com>
+To: Ziwei Xiao <ziweixiao@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, jeroendb@google.com,
+ pkaligineedi@google.com, shailend@google.com, willemb@google.com,
+ hramamurthy@google.com, rushilg@google.com, jfraker@google.com,
+ junfeng.guo@intel.com, Julia.Lawall@inria.fr, horms@kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 17 Apr 2024 16:39:49 +0200 you wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+On Wed, 17 Apr 2024 20:57:57 +0000 you wrote:
+> The qpl_cfg struct was used to make sure that no two different queues
+> are using QPL with the same qpl_id. We can remove that qpl_cfg struct
+> since now the qpl_ids map with the queues respectively as follows:
+> For tx queues: qpl_id = tx_qid
+> For rx queues: qpl_id = max_tx_queues + rx_qid
 > 
-> In the current PSE interface for Ethernet Power Equipment, support is
-> limited to PoDL. This patch extends the interface to accommodate the
-> objects specified in IEEE 802.3-2022 145.2 for Power sourcing
-> Equipment (PSE).
+> And when XDP is used, it will need the user to reduce the tx queues to
+> be at most half of the max_tx_queues. Then it will use the same number
+> of tx queues starting from the end of existing tx queues for XDP. So the
+> XDP queues will not exceed the max_tx_queues range and will not overlap
+> with the rx queues, where the qpl_ids will not have overlapping too.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v9,01/14] ethtool: Expand Ethernet Power Equipment with c33 (PoE) alongside PoDL
-    https://git.kernel.org/netdev/net-next/c/b58be8db6327
-  - [net-next,v9,02/14] net: pse-pd: Introduce PSE types enumeration
-    https://git.kernel.org/netdev/net-next/c/47e0dd53c5eb
-  - [net-next,v9,03/14] net: ethtool: pse-pd: Expand pse commands with the PSE PoE interface
-    https://git.kernel.org/netdev/net-next/c/4d18e3ddf427
-  - [net-next,v9,04/14] netlink: specs: Modify pse attribute prefix
-    https://git.kernel.org/netdev/net-next/c/57b30d2a5475
-  - [net-next,v9,05/14] netlink: specs: Expand the pse netlink command with PoE interface
-    https://git.kernel.org/netdev/net-next/c/f8586411e40e
-  - [net-next,v9,06/14] MAINTAINERS: Add myself to pse networking maintainer
-    https://git.kernel.org/netdev/net-next/c/edd79f084ad4
-  - [net-next,v9,07/14] net: pse-pd: Add support for PSE PIs
-    https://git.kernel.org/netdev/net-next/c/9be9567a7c59
-  - [net-next,v9,08/14] dt-bindings: net: pse-pd: Add another way of describing several PSE PIs
-    https://git.kernel.org/netdev/net-next/c/b17181a88fb9
-  - [net-next,v9,09/14] net: pse-pd: Add support for setup_pi_matrix callback
-    https://git.kernel.org/netdev/net-next/c/29e28d1d7a16
-  - [net-next,v9,10/14] net: pse-pd: Use regulator framework within PSE framework
-    https://git.kernel.org/netdev/net-next/c/d83e13761d5b
-  - [net-next,v9,11/14] dt-bindings: net: pse-pd: Add bindings for PD692x0 PSE controller
-    https://git.kernel.org/netdev/net-next/c/9c1de033afad
-  - [net-next,v9,12/14] net: pse-pd: Add PD692x0 PSE controller driver
-    https://git.kernel.org/netdev/net-next/c/9a9938451890
-  - [net-next,v9,13/14] dt-bindings: net: pse-pd: Add bindings for TPS23881 PSE controller
-    https://git.kernel.org/netdev/net-next/c/f562202fedad
-  - [net-next,v9,14/14] net: pse-pd: Add TI TPS23881 PSE controller driver
-    https://git.kernel.org/netdev/net-next/c/20e6d190ffe1
+  - [net-next] gve: Remove qpl_cfg struct since qpl_ids map with queues respectively
+    https://git.kernel.org/netdev/net-next/c/fdf412374379
 
 You are awesome, thank you!
 -- 
