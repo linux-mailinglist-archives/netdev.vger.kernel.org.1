@@ -1,224 +1,181 @@
-Return-Path: <netdev+bounces-89525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F0B88AA92F
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 09:29:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D26D58AA936
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 09:31:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 367D9281C94
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 07:29:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 029521C20FA0
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 07:31:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDFBE4087F;
-	Fri, 19 Apr 2024 07:29:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20620405EC;
+	Fri, 19 Apr 2024 07:31:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xch2L+pO"
+	dkim=pass (2048-bit key) header.d=LIVE.NL header.i=@LIVE.NL header.b="b86tHLWj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04olkn2074.outbound.protection.outlook.com [40.92.73.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 999773FBA3;
-	Fri, 19 Apr 2024 07:29:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713511766; cv=none; b=DycOwco8OcEOJ5/0Mqrpq9GbnRtuitYSuqEZKR2hWDacwWDS4XizBBuyD3kdO26DSg7oBVOWSlWzErcsfuu7SZuyjSwZsbVtu4VrQ+Qv45YONG7m8PAh8SrZkRq36KQEMGKizy+dg5GqwEx8pdG8qyT/WxtsO5GKz13AWyIbiO4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713511766; c=relaxed/simple;
-	bh=YBHXN+EIdeW6vhShWqeOPFESo+pgDUALFZPs/zUslNQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iLunS0BG0t7LgO/Nblcw7nyowl1mbE9CHgRR/GSXxFDrzo1ROCxmleKvBg43aTvk5/ymGb9qKlwcvCqFMrYFKZApzUYGEddqkFQVeti+/nSSA50hMuCtbxskG7gdHUNTiNdYSgI6Dt/xLo4F/4XmVwp0A2I4BcEeP71Lcpf+POg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xch2L+pO; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-56e6a1edecfso2553201a12.1;
-        Fri, 19 Apr 2024 00:29:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1713511763; x=1714116563; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WtPDD8qDRBcOKC0IiERMndRZmYHeHFoP6rR5g7QQLmw=;
-        b=Xch2L+pOrkHYX40BK8WEh6TGkEcUQUeFeNsVlqS0DEkOwpkvBsRaC6MHlXOZgNe7Nh
-         ZKUe1hnzdLgK2oZZl+tVkBOVtPYgs9unUj96R4D2/I+nbuMx7QuXfEukKNsejAM4RsJe
-         Z+Bq7DwlwoQpZrIhFxh6FfSQe8pM28/sfcWYwY4mfd/te7S+jgoG8YOXA4jQS99JgzEQ
-         mWHiNDuEidVf1Wal1llcRKUCSgHgKMkE7jUvNG2oiTN8Ivn7RTPa1wxdIQxoPuuZ8B3K
-         a5MiaUiYHSTp6bzoA7EoBk1yPASYZIdR8uNdZN8DXHi0GZejDvvixViyuPyiKFmhoVer
-         75DA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713511763; x=1714116563;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WtPDD8qDRBcOKC0IiERMndRZmYHeHFoP6rR5g7QQLmw=;
-        b=DFtMp49nRT68zBGKEMyRb5KSHjNE+XDROPkKo2T624Z2NBSIofno0LjuIQRfgb3SYz
-         xoLwfOfp+erRXVVWVV3DBOX4Boaad4ANN8Kf1ux5m4xeKH6Nvwy+sb0F6/cXdqBo3SAe
-         j3m70LCbOQCv9g9ULLdCMZeGkKeDWjHQAblFrwmevth1tfNtDbfbkwbftBvVQmHzBPCX
-         lnPiFlzXfFJ23ec3wq6y6UM1Iio8qfIoVuRsmQoqA8aZB91jbKOoCnPPWH5WLgAL1S/j
-         pcq3QdyaG9AbnKDLKAtqQDZ8f14WJ6PjGiiclAp/1q03X3LocAoqWFhMfCA3HTsdQD0L
-         A4Zg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjeq1Zw87AeDkBr8/w48qlQYFWsKjOjX6rrqH7mpu+7vs307AWB0wBoFxiszvov5FJr/ZXDb2nsgd0wM8qGIP3Bfry3j/MUWbRiy8aYwEIo7XOFGlBpdRT126UkcpKKprQA3h95QeWWBAc
-X-Gm-Message-State: AOJu0Yyew4qym4Js3QqiWQrfmGcZbRjRo2T9uWPn3f27cyEi5Ig4YA6W
-	/wydZW4wfX9nRpgAF5NGwY2PAS4tHjBopDc6COXsdfBT2Bn/ZGO27N6cXc6NCaCbSa0b+1SnLun
-	QWmb3EgSmCQNHbVfjPZV+e1eczkc=
-X-Google-Smtp-Source: AGHT+IH192geWnd40dMVNG+Xrm59NNfD0JGJjAFXyttFT12IO5h3wmzbFD/WC9V+arUHok8tZajijrIKuAjYm18pWT4=
-X-Received: by 2002:a17:906:2b4b:b0:a51:dd18:bd20 with SMTP id
- b11-20020a1709062b4b00b00a51dd18bd20mr1000803ejg.14.1713511762590; Fri, 19
- Apr 2024 00:29:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313013EA68;
+	Fri, 19 Apr 2024 07:30:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.73.74
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713511861; cv=fail; b=DUJ7zRhTCVpep0CGFCzf3w5M4zkFUlFYAHhBMcW8xSryUj5a5F3NkkHthLrlv2Gj4+00WuRGDfOdTnIfrouftKu9uVFbyp5qHu0oTJYfKvitrO+O0Z6ddp5aKpq7JIaKl/aFIgP9U9aTdRixwBgdQDDBOSeOlx9gIVBC7S6XZHo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713511861; c=relaxed/simple;
+	bh=DSb9ntBSXR/qhX2KpyB+jd678GHd59I20cXtfUP7xRw=;
+	h=From:To:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=CQNCvtNmwLwpcnEX0xL9+mXCcn5Ij4p7SReQV3aYdo/CFNjuhpUpKGkBrBkidlxb/By2JuaPEr3NzydaIZ+2t3ThMHkpJip3tjC6O6Pgi+bHq5IW5EVVWxgeFlx3bTZPo2HeLeTOULyoMpLnFUVLxcaboGyIZL2llIEEGrxI2ig=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=live.nl; spf=pass smtp.mailfrom=live.nl; dkim=pass (2048-bit key) header.d=LIVE.NL header.i=@LIVE.NL header.b=b86tHLWj; arc=fail smtp.client-ip=40.92.73.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=live.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=live.nl
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WIpLFVlFVPB9yJ0jmGvetx0C02+p0v+0FHb1+KDDh4qNckR1bt9ryCkH9GEDmpjbK/fwqljy5s1u2EbbF4wfJxrPefCaK9x1x/oEOTwCPRxjSzTRkCKog048jEM3VRO80B0+V2AMhCuffBiBTdEvIVCsVwxWUcD6y9qj+bm8VsFFXieVJ4J4LAUYHMwv7Jo8aHtLFahUFUVTJgbV2kuyrs3LOinTY8e0AQNhUEY2sb6UGSfFB/domWDge0ElzRI6ZjLS4wTKcThrnNNglHKfTpT5UFxPAN9jiWkgEqaLhjkJQEfY1KCyGalrwEN7abaIf36m5PGfXJAIohie4W/v9A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9ColtRm0WwPJhSjy8qJwx4v9yKzCuLUZ/PyKxhCl784=;
+ b=I4vv7keuL7CIl6EU0xcuUWgZMxrF+hlPouWeckKfFuxbdlnuQWEclUlu5ftJHh/2NY1Xzu6x9cXbrOTJ4BlT6mK95F8g9IpUuKZfFcRQG+JRDiBqwR/9Uplh6jv0uVZUwt0irCg8ldGLcU6wx/Y9AiRtTl2nGlFUqvH5Y1lsBneVXlRfTssdqEHUDSQ15g1XRATiROqZi6L8+cDrlD5tJhbZsxERNXw9LFwbY2yODWGA3qLq5M/U5B4mXXU9MspjRH8AUpgL0X7R5jw6022VA1eKYDc0VO+Xo8c+6/uakS2FNslfsw03UY0jyTsv2DdMPGNKme8pibAZjwgDbx1mFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=LIVE.NL; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9ColtRm0WwPJhSjy8qJwx4v9yKzCuLUZ/PyKxhCl784=;
+ b=b86tHLWjXBliaYCMa3yXIttQRqzoJRTFgTNLVL6Piz28UcV7UNGrbQAJ3/XxL4R2sG2ho7mvMznBz2srHPk4b8jKirQu45X09Pnrka7/XJ8NTDk6j1pkEkThetzKNwrkBa1aitj79I7uTa8AQOeoQzhZrlIu3YrPlHmX/Eg88D6bgSwBF7mcWDFAPaMheTiF1HS0h+MWMPUWav8/mzSz7d4Ipqsu/JLU52jOe/Yn8h5Hy3x6z6+md1oGXNqtHzFmKCcbsWe3ZyEhP8WUIuYUt5PjhickgtKjkflnJYmavu3umux5FE6MbTr/IjddoiiJwxNaJEKf8/pciTVAPvmVNA==
+Received: from AM0PR09MB2675.eurprd09.prod.outlook.com (2603:10a6:208:d3::24)
+ by PA2PR09MB7348.eurprd09.prod.outlook.com (2603:10a6:102:400::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.37; Fri, 19 Apr
+ 2024 07:30:56 +0000
+Received: from AM0PR09MB2675.eurprd09.prod.outlook.com
+ ([fe80::6881:178c:bae6:1644]) by AM0PR09MB2675.eurprd09.prod.outlook.com
+ ([fe80::6881:178c:bae6:1644%7]) with mapi id 15.20.7472.042; Fri, 19 Apr 2024
+ 07:30:56 +0000
+From: Paul Geurts <paul_geurts@live.nl>
+To: Krzysztof Kozlowski <krzk@kernel.org>, "mgreer@animalcreek.com"
+	<mgreer@animalcreek.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "robh@kernel.org"
+	<robh@kernel.org>, "conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/2] dt-bindings: net/nfc: ti,trf7970a: Add
+ rx-gain-reduction option
+Thread-Topic: [PATCH 1/2] dt-bindings: net/nfc: ti,trf7970a: Add
+ rx-gain-reduction option
+Thread-Index: AQHakEwHBYi4skvpo0K1SXdVsQmKiLFscReAgALmTgA=
+Date: Fri, 19 Apr 2024 07:30:56 +0000
+Message-ID: <acf1679f-4ee8-4b87-a793-0160affc4b64@live.nl>
+References: <cover.1713305374.git.paul_geurts@live.nl>
+ <AM0PR09MB267553535F7A85EA639D739C95082@AM0PR09MB2675.eurprd09.prod.outlook.com>
+ <150d467e-3ea6-40fb-8ddf-21d678b150d1@kernel.org>
+In-Reply-To: <150d467e-3ea6-40fb-8ddf-21d678b150d1@kernel.org>
+Accept-Language: nl-NL, en-US
+Content-Language: nl-NL
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+x-ms-exchange-imapappendstamp: AM0PR09MB4274.eurprd09.prod.outlook.com
+ (15.20.7495.000)
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tmn: [01Dwau3YQaWIGTHqRyN89BtVJ6vKc6V8]
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM0PR09MB2675:EE_|PA2PR09MB7348:EE_
+x-ms-office365-filtering-correlation-id: 91cbe567-b362-4891-0463-08dc6042a6db
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ 0K/3peregY4YEdQdNe9ngoOBu+7+eAzYPvmDJA3i2QzUioBb0Wwxy89xthRoqLlKRaC2Zwz9+0yDLNagi7D+8o/3FLWRABk7A9bCMCFXKoHoaMtywTsgu6o0XSvLNeMQ52WAcIfIbClR9kHWeXo+vpTceyFtwJUV8wQslTxBV7l9emSIEliwLwefwvujFsMvFvYne5JG92bwDQ1zQLheI5S4pHfyXTsDsyXo8o5wSvnIye+e2Y4fgNaSkHKIxSf1Be/3jODMU96IG7b5287BzaEdwKjUZIqto6003JAHlo7PmJeOdY0olbEA4owig1qhGX6ITD3apVSHs+XkTEY08GZx3YGDbfQ46/0qk4mzo19p6hCpMtAR0rz/8XmTAKD6QPDJxaH5g5brVbSSiYILDhKfhFmeN+in0nmVWUGSAZ9TQZu0oWa9UmOtYYdrFQ2xyNKnbIrwupc2GB0jkOyPy/IQtxGUp0HlC5QKldyzXiJKbBZU5KuE1ATKFxrm2cSVAQqV9UT+vMw5MUPle2GqmwppCcLOP6yRTKUtnftNPaRVb9rRWNKLA5vLAgsH0WO0
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?iso-8859-1?Q?+LlyY4gUffArP6P0FyYmsxqX4azd/Ums0aw7cKoFXk0CsMSrDY9vU4Qr0U?=
+ =?iso-8859-1?Q?GCuj3DL2dSShK0XTxKzGeeJz+vGIH+Zb7QlaDqvMqaKe5Z6aIX2FKl4g62?=
+ =?iso-8859-1?Q?+pynkhy1FsGDzV6bFz6vmdzgryti4Gdzfh9tiEuHz7MIegONUoA3lj+Nis?=
+ =?iso-8859-1?Q?6riUtaMS2xlRH/BQnE8b2CoRuHbNW0bcYQ64jGi+3hRQHSQHNltJTLEULP?=
+ =?iso-8859-1?Q?0t01/NqYYoEyaTwvz4FPzMjHTqIyH+K78ORRsg1pnSmtK+bTnyGgOpzWYj?=
+ =?iso-8859-1?Q?UuUmkEG8VQWC5xgKXCqMvDOVy3DJBrxkZVDG7or6pJs3Bk5ynEjw7dX76e?=
+ =?iso-8859-1?Q?/dyqLzlFURuoKeGcs7jxoKJbmgpD2oY1Pu3PcYsZ0WaryokDCGYGay29XR?=
+ =?iso-8859-1?Q?fbodg8xaJGaFRlZW5Z4uLqTzetiMB1AYA7kduHXfTj1zyKVK/6UoRBxe5c?=
+ =?iso-8859-1?Q?i3TjlA3SB6lR1d+XXQN1x9S/YuQ5ostcjF1RqyM9xCubG0pnzA6BOC++aZ?=
+ =?iso-8859-1?Q?ZGhbyiH6LK06+XPSKiyXbfLRzxuaKz/nPjnMUBLooWkcfFPj1aP/5oFO4m?=
+ =?iso-8859-1?Q?OFBIqHeUeY8981TNN4k6UMrDIBpOWfIhbCJZ0ztxsSoNibqUdbC1V4Bttu?=
+ =?iso-8859-1?Q?QmFMbz5tX7jFpvdk6/O+4+qMWvmYZBI6oW7YnMMtoAkAmbza012BxAYm1a?=
+ =?iso-8859-1?Q?mqElTbWRq84d0zwb6G3S4YcUgUZ0VT0ZKMQ2+SBgYiaa5bukEenIEkPBR2?=
+ =?iso-8859-1?Q?pnUlb1BWe1dw9WzweFhqlDJE2A/oxo1wC6HEX3B66hX9HDm028JXxX0Yaf?=
+ =?iso-8859-1?Q?BF6kRBzBji3S0KT+coGwXhdV08s2whsClryR9hw8u7Kz9US8/MNuCwP6hr?=
+ =?iso-8859-1?Q?idj0afXBEsmqpDU9nM+AmqabaS39ws814hnS0K31FTR0/UoWoFIM8LTeDa?=
+ =?iso-8859-1?Q?ZAUP/VwYqqTVbGOQrAcP0fjrJoFiJaAETX0K80HH8655ifLz4ss0npCTlT?=
+ =?iso-8859-1?Q?LknQef892qB1EcqnH/o/zETfZEmLGAHsrH3zuiXMxF8QsHmHjis+2PX6x5?=
+ =?iso-8859-1?Q?ljpSYaGi29rfM3KZyUKgKx3miMg4zJt00TPfmC2kn67W3ZLDn93aF83lJ+?=
+ =?iso-8859-1?Q?1pipNdRE8oAMzdEGC7Dnz13BOvDracOytQRU5W3zaRd4Q8iwn2h00zQZIP?=
+ =?iso-8859-1?Q?MXEeWlX2yQZLz7R/mK9ik5sVYfocxJ4eoGR5YLJvxdZZQ5eBNXwCiJA4t2?=
+ =?iso-8859-1?Q?ti1rAz+4sPjARfjKw1Dw=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID:
+ <4C962CEB9739EC4B8D4647A1CF8EB094@sct-15-20-4755-11-msonline-outlook-64da6.templateTenant>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240417085143.69578-1-kerneljasonxing@gmail.com>
- <CAL+tcoDJZe9pxjmVfgnq8z_sp6Zqe-jhWqoRnyuNwKXuPLGzVQ@mail.gmail.com>
- <20240418084646.68713c42@kernel.org> <CAL+tcoD4hyfBz4LrOOh6q6OO=6G7zpdXBQgR2k4rH3FwXsY3XA@mail.gmail.com>
- <CANn89iJ4pW7OFQ59RRHMimdYdN9PZ=D+vEq0je877s0ijH=xeg@mail.gmail.com>
- <CAL+tcoBV77KmL8_d1PTk8muA6Gg3hPYb99BpAXD9W1RcFsg7Bw@mail.gmail.com>
- <CAL+tcoAEN-OQeqn3m3zLGUiPZEaoTjz0WHaNL-xm702aot_m-g@mail.gmail.com> <CANn89iL9OzD5+Y56F_8Jqyxwa5eDQPaPjhX9Y-Y_b9+bcQE08Q@mail.gmail.com>
-In-Reply-To: <CANn89iL9OzD5+Y56F_8Jqyxwa5eDQPaPjhX9Y-Y_b9+bcQE08Q@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 19 Apr 2024 15:28:45 +0800
-Message-ID: <CAL+tcoBn8RHm8AbwMBJ6FM6PMLLotCwTxSgPS1ABd-_D7uBSxw@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 0/7] Implement reset reason mechanism to detect
-To: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, dsahern@kernel.org, matttbe@kernel.org, 
-	martineau@kernel.org, geliang@kernel.org, pabeni@redhat.com, 
-	davem@davemloft.net, rostedt@goodmis.org, mhiramat@kernel.org, 
-	mathieu.desnoyers@efficios.com, atenart@kernel.org, mptcp@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-64da6.templateTenant
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR09MB2675.eurprd09.prod.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 91cbe567-b362-4891-0463-08dc6042a6db
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Apr 2024 07:30:56.2945
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA2PR09MB7348
 
-On Fri, Apr 19, 2024 at 3:02=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Fri, Apr 19, 2024 at 4:31=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
-> >
-> > On Fri, Apr 19, 2024 at 7:26=E2=80=AFAM Jason Xing <kerneljasonxing@gma=
-il.com> wrote:
-> > >
-> > > > When I said "If you feel the need to put them in a special group, t=
-his
-> > > > is fine by me.",
-> > > > this was really about partitioning the existing enum into groups, i=
-f
-> > > > you prefer having a group of 'RES reasons'
-> > >
-> > > Are you suggesting copying what we need from enum skb_drop_reason{} t=
-o
-> > > enum sk_rst_reason{}? Why not reusing them directly. I have no idea
-> > > what the side effect of cast conversion itself is?
-> >
-> > Sorry that I'm writing this email. I'm worried my statement is not
-> > that clear, so I write one simple snippet which can help me explain
-> > well :)
-> >
-> > Allow me give NO_SOCKET as an example:
-> > diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-> > index e63a3bf99617..2c9f7364de45 100644
-> > --- a/net/ipv4/icmp.c
-> > +++ b/net/ipv4/icmp.c
-> > @@ -767,6 +767,7 @@ void __icmp_send(struct sk_buff *skb_in, int type,
-> > int code, __be32 info,
-> >         if (!fl4.saddr)
-> >                 fl4.saddr =3D htonl(INADDR_DUMMY);
-> >
-> > +       trace_icmp_send(skb_in, type, code);
-> >         icmp_push_reply(sk, &icmp_param, &fl4, &ipc, &rt);
-> >  ende:
-> >         ip_rt_put(rt);
-> > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> > index 1e650ec71d2f..d5963831280f 100644
-> > --- a/net/ipv4/tcp_ipv4.c
-> > +++ b/net/ipv4/tcp_ipv4.c
-> > @@ -2160,6 +2160,7 @@ int tcp_v4_rcv(struct sk_buff *skb)
-> >  {
-> >         struct net *net =3D dev_net(skb->dev);
-> >         enum skb_drop_reason drop_reason;
-> > +       enum sk_rst_reason rst_reason;
-> >         int sdif =3D inet_sdif(skb);
-> >         int dif =3D inet_iif(skb);
-> >         const struct iphdr *iph;
-> > @@ -2355,7 +2356,8 @@ int tcp_v4_rcv(struct sk_buff *skb)
-> >  bad_packet:
-> >                 __TCP_INC_STATS(net, TCP_MIB_INERRS);
-> >         } else {
-> > -               tcp_v4_send_reset(NULL, skb);
-> > +               rst_reason =3D RST_REASON_NO_SOCKET;
-> > +               tcp_v4_send_reset(NULL, skb, rst_reason);
-> >         }
-> >
-> >  discard_it:
-> >
-> > As you can see, we need to add a new 'rst_reason' variable which
-> > actually is the same as drop reason. They are the same except for the
-> > enum type... Such rst_reasons/drop_reasons are all over the place.
-> >
-> > Eric, if you have a strong preference, I can do it as you said.
-> >
-> > Well, how about explicitly casting them like this based on the current
-> > series. It looks better and clearer and more helpful to people who is
-> > reading codes to understand:
-> > diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-> > index 461b4d2b7cfe..eb125163d819 100644
-> > --- a/net/ipv4/tcp_ipv4.c
-> > +++ b/net/ipv4/tcp_ipv4.c
-> > @@ -1936,7 +1936,7 @@ int tcp_v4_do_rcv(struct sock *sk, struct sk_buff=
- *skb)
-> >         return 0;
-> >
-> >  reset:
-> > -       tcp_v4_send_reset(rsk, skb, (u32)reason);
-> > +       tcp_v4_send_reset(rsk, skb, (enum sk_rst_reason)reason);
-> >  discard:
-> >         kfree_skb_reason(skb, reason);
-> >         /* Be careful here. If this function gets more complicated and
->
-> It makes no sense to declare an enum sk_rst_reason and then convert it
-> to drop_reason
-> or vice versa.
->
-> Next thing you know, compiler guys will add a new -Woption that will
-> forbid such conversions.
->
-> Please add to tcp_v4_send_reset() an skb_drop_reason, not a new enum.
-
-Ah... It looks like I didn't make myself clear again. Sorry...
-Actually I wrote this part many times. My conclusion is that It's not
-feasible to do this.
-
-REASONS:
-If we __only__ need to deal with this passive reset in TCP, it's fine.
-We pass a skb_drop_reason which should also be converted to u32 type
-in tcp_v4_send_reset() as you said, it can work. People who use the
-trace will see the reason with the 'SKB_DROP_REASON' prefix stripped.
-
-But we have to deal with other cases. A few questions are listed here:
-1) What about tcp_send_active_reset() in TCP/MPTCP? Passing weird drop
-reasons? There is no drop reason at all. I think people will get
-confused. So I believe we should invent new definitions to cope with
-it.
-2) What about the .send_reset callback in the subflow_syn_recv_sock()
-in MPTCP? The reasons in MPTCP are only definitions (such as
-MPTCP_RST_EUNSPEC). I don't think we can convert them into the enum
-skb_drop_reason type.
-
-So where should we group those various reasons?
-
-Introducing a new enum is for extension and compatibility for all
-kinds of reset reasons.
-
-What do you think?
-
-Thanks,
-Jason
-
->
-> skb_drop_reason are simply values that are later converted to strings...
->
-> So : Do not declare a new enum.
+On 17-04-2024 15:12, Krzysztof Kozlowski wrote:=0A=
+> On 17/04/2024 00:18, Paul Geurts wrote:=0A=
+>> Add option to reduce the RX antenna gain to be able to reduce the=0A=
+>> sensitivity.=0A=
+>>=0A=
+>> Signed-off-by: Paul Geurts <paul_geurts@live.nl>=0A=
+>> ---=0A=
+>>  Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml | 6 ++++++=
+=0A=
+>>  1 file changed, 6 insertions(+)=0A=
+>>=0A=
+>> diff --git a/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml =
+b/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml=0A=
+>> index d0332eb76ad2..bbd045f6cf04 100644=0A=
+>> --- a/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml=0A=
+>> +++ b/Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml=0A=
+>> @@ -55,6 +55,11 @@ properties:=0A=
+>>      description: |=0A=
+>>        Regulator for supply voltage to VIN pin=0A=
+>>  =0A=
+>> +  rx-gain-reduction:=0A=
+> Missing vendor prefix.=0A=
+>=0A=
+>> +    $ref: /schemas/types.yaml#/definitions/uint32=0A=
+>> +    description: |=0A=
+> Do not need '|' unless you need to preserve formatting.=0A=
+>=0A=
+>> +      Specify a RX gain reduction to reduce antenna sensitivity.=0A=
+> Reduction by what? What are the units?=0A=
+=0A=
+Yes, this is a bit unclear indeed. Will clarify this.=0A=
+=0A=
+>=0A=
+>=0A=
+> Best regards,=0A=
+> Krzysztof=0A=
+=0A=
+Thanks!=0A=
+=0A=
+br,=0A=
+=0A=
+Paul=0A=
+=0A=
 
