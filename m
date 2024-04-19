@@ -1,73 +1,72 @@
-Return-Path: <netdev+bounces-89662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B51E18AB18E
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:18:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A0C28AB191
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 17:18:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6BA91C21BFE
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:18:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A5A81C2182C
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 15:18:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73ED112FB21;
-	Fri, 19 Apr 2024 15:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 767FB12FF95;
+	Fri, 19 Apr 2024 15:18:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PpElE5Nx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DkeoN7vB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB36812F376
-	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 15:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1758D12FB01
+	for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 15:18:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713539887; cv=none; b=BApC5o37nk788kCAo/YH9tngZk3dyPKbEo3C33jia+rrH8Z7FyJfhUBZT6XgKTpUp+GaGL4QZvlrFoA0rIPJCJVfh13IrTJ7n6P8SOLlWcuSFrLppoRFkab8Ib254gIuQI38wnlf9lJ1gDx3seF1XyhycViK3K7MPMbWm70B7o0=
+	t=1713539888; cv=none; b=h8fDUbcSaZMd00vdixYIlzWTxqPnm0Z5Eul5ME3DO3zlcfbpQeKY5emunEe0jn8t+tO7YLRUSJa+mDEjo8dilkw4nQozQQK3IWJ6eZEzBTLxcpgE2UJUonqQi4zwIlUwmYRDeOuVGLXg0NY0QFQIuBklv+n68/MnWvk3T+FYRMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713539887; c=relaxed/simple;
-	bh=fD4GtJkND5n3skuzOjX/NHgWkIf/VxMqfAgE+7qbH6A=;
+	s=arc-20240116; t=1713539888; c=relaxed/simple;
+	bh=e14D7TKpEvZf5OnwvIcuBGe61+yGxis+fUvADt/aWF8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Q+gRh42Iv+vJ5SU1jHp6LMzb1lbMICbDN4aOU+Ip9XtBjRGPhmVSMyNAHf177YAQfOzHhfjdeXqDnLOH2C0V2b8yphpaRYvLI3/qLdlC7CHIyBpsWb2xye3+qZ29fFqK7FOe5Zgu0NRd+yN1SnfQ/1S6GGEm/OYzGEaG/J5oE54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PpElE5Nx; arc=none smtp.client-ip=209.85.166.51
+	 MIME-Version; b=D/7BvTuhFbCY1yAzNZacVsCNDPA22cuHd02375sn+3YOkv/508pc7FLQN1/xNTaE6TFi3WPDvJkY0lBytVR2JcKMmyw5fBiQIpM35VPhYCMYV1oQFbmrBuVtONbwsMo6X0arIM1JUxXPlKopWbNlRkGStQcKX325FfaXWgSyaWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DkeoN7vB; arc=none smtp.client-ip=209.85.166.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-7da41c6aa37so59241139f.2
-        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 08:18:05 -0700 (PDT)
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-36c00924fc1so1718045ab.2
+        for <netdev@vger.kernel.org>; Fri, 19 Apr 2024 08:18:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1713539885; x=1714144685; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1713539886; x=1714144686; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ozWFvCz/JSLWpvmqAUWIX5N+6wqlehvl2PgyPqAmf3Y=;
-        b=PpElE5NxiDJcZR4OOvs5nu5/wF89pl4vwR75fkFv4T+er+HfAvvrX9fwAD7CJ93ALV
-         Z2uguRnOU8eQgzfN1ea0rqdJWm6IoYdwBkZHOQXyKi86iDoQ9n7DhSztABi+RiQ5oBoh
-         /bdzKio6xCE9/h/T2T7kbNi3HG8m4CXkEDtoYPOEBS1Na5basepfGJTvqUlrkHaAVA3f
-         5nSX7nBhESOL5I9bYezGRyv0dCy5RzAdV09IW82oTh3Vgr0rxHdUEgcY4n0DHYCDVkCw
-         EVmA1bD05rCGMy5ONiDYISGCty+Js2Sz5PjGviBFfoJwOw1zwiEHAHkCXOK7RcFah8z9
-         yA2Q==
+        bh=r1/gGz9kpYbLFaH+UuJD8Tkj5MFD/GFitlOxG2qqSIA=;
+        b=DkeoN7vBIArbqwo5yn5aa+wB11wkFXPKDN6Wur1K2Zk0iJFcQ9jraGQgq1VPAMZAUd
+         CGyu/2R4yY+pbEQnTJRMU/xRoTEzegwxL95PSzJNkhCjbf8PxR/O5gWP8XxHx3iYeuzV
+         crV7IysD6L7iZ/SaQIvZbJ8ioinZ8XrHP2AZLR5RKrVlkt6F6PNf22f2atWsUit7JmNt
+         V3AyEMuiL4M9Gc5jS22XWvANxPJG4bi20RU9ZasNXhaqz78a6FUHBBGE9wtyihno9bvg
+         AW32otsPUocuv0AmvwojygcX5pOW3wackxw7lr6EV7AP9+YZBkLbYTNBbjHAamUBsJtS
+         dpxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1713539885; x=1714144685;
+        d=1e100.net; s=20230601; t=1713539886; x=1714144686;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ozWFvCz/JSLWpvmqAUWIX5N+6wqlehvl2PgyPqAmf3Y=;
-        b=PUv6DZ/07vqyt9yQRlPARFnZxvQZStRYs7+jQmTRU2lTwg6+YDfm7J5gg7O052yufO
-         wCdmcvQxjauGoDL70crZ2J8coyLOHByvyujbZ/Cu71rUu52E9MP5enQjVXTLyAtf6Q3W
-         CGxpHIurLXUx7XwWZshbV48vcus0muTjjOtX/7rLzM1tEUvokmqdgRglfIuWzwpkM7td
-         M/au03XiEN5pcXSgVKHrP485teN5afBmRMp9KtSaU6KbKmtf7Wqgm5/I0vSix0JimpjS
-         6nOfESz8Ns/r9SVJL6GeJN4BBBf5LXnXtz/3f5zl5JY0n/EO99pn7XVnMBGyI7bTimdK
-         E1qg==
-X-Forwarded-Encrypted: i=1; AJvYcCW3Wu8OIBkpQZn2v+ruCJXfDdNfnI7qFE7brFUpse+QkiT+vthPbyF/vf770eF1cunahXCcUumYTi6ne5PrGGtrfjLQs//w
-X-Gm-Message-State: AOJu0YwZnPVGJKxVkciJMuY4eC7uFPjfY8bVRgkosSowh7uduSs5/y7D
-	i8iv1UGCvIqkfATwOzXMLiugTIoYrYyo7HrobXRIPEGmtfQHSyrfsx/jcACjSK+/sCAw8OtGEoc
-	z
-X-Google-Smtp-Source: AGHT+IEoLoAQWS9gMBMZDr7ok+++sYe7DskbfxC7uwOH1LqCCmAzw/fyNZQHJP1MEjnS2s9+s5izXg==
-X-Received: by 2002:a6b:ed0e:0:b0:7d5:f78f:ab0c with SMTP id n14-20020a6bed0e000000b007d5f78fab0cmr2950857iog.20.1713539885132;
-        Fri, 19 Apr 2024 08:18:05 -0700 (PDT)
+        bh=r1/gGz9kpYbLFaH+UuJD8Tkj5MFD/GFitlOxG2qqSIA=;
+        b=LQwvP8LCHBAfYCk2KP6BkA5CBZ5s/Mf5T/O71AyzjJ4Qej6iwrxwnCbmHn62/FvJVH
+         L/n/UuBp3XlYS+HtZWGOLpwspQrlyHFZhFPDid0cit2Y9Nun2S44NMzpgHCZRLjNjjOE
+         wPRtm48kLQoXQ3+UTk96+VzezfROINDL2y7GZ7GhThAQTsf5i1GswszpFT7Pe9TOymZP
+         oNRQ3HPFBr2O54h+s5pvlCpeDvUX72N4QcN9WtLBgGGUgrJYpqjGs4dBDVyMtsmVDZyv
+         b5X4QYtjFgw8HMTYnRDAaB23v02BWCVon9CNx9n698Ax1T6lndokcKDAfMmSeX+ji31m
+         0x3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUTI2j6qzo3fuL0GxdqbYB1ptr9h7f/fRXi0Y5GjYHEwsyTchS4momdm7Tpw8AQ4cPvV7gNSAr3fiEVnA2LvCqdFF01FsDX
+X-Gm-Message-State: AOJu0YzyTzj9tCx8ZqraD5EpoICUEypZkv9zKuS3bEePQhJHLePzhwYj
+	TlLA01rlIpJUVW1Wnz8PhXzgdfFAxvV0ttH5v5Z1WkjsYAqJmndnLJePcIoaeOs=
+X-Google-Smtp-Source: AGHT+IGmMBrA8dMR9MNSQF58KLAm84ynEVXwhg/TqwiDztGgWaBhEIIt+WXVFFaf50zLl0b9PEK4AA==
+X-Received: by 2002:a05:6602:4a86:b0:7da:1885:50b5 with SMTP id ej6-20020a0566024a8600b007da188550b5mr2631577iob.9.1713539886236;
+        Fri, 19 Apr 2024 08:18:06 -0700 (PDT)
 Received: from localhost.localdomain (c-73-228-159-35.hsd1.mn.comcast.net. [73.228.159.35])
-        by smtp.gmail.com with ESMTPSA id lc8-20020a056638958800b00484e9c7014bsm116126jab.153.2024.04.19.08.18.04
+        by smtp.gmail.com with ESMTPSA id lc8-20020a056638958800b00484e9c7014bsm116126jab.153.2024.04.19.08.18.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Apr 2024 08:18:04 -0700 (PDT)
+        Fri, 19 Apr 2024 08:18:05 -0700 (PDT)
 From: Alex Elder <elder@linaro.org>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -83,9 +82,9 @@ Cc: mka@chromium.org,
 	netdev@vger.kernel.org,
 	linux-arm-msm@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 1/8] net: ipa: maintain bitmap of suspend-enabled endpoints
-Date: Fri, 19 Apr 2024 10:17:53 -0500
-Message-Id: <20240419151800.2168903-2-elder@linaro.org>
+Subject: [PATCH net-next v2 2/8] net: ipa: only enable the SUSPEND IPA interrupt when needed
+Date: Fri, 19 Apr 2024 10:17:54 -0500
+Message-Id: <20240419151800.2168903-3-elder@linaro.org>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240419151800.2168903-1-elder@linaro.org>
 References: <20240419151800.2168903-1-elder@linaro.org>
@@ -97,85 +96,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Keep track of which endpoints have the SUSPEND IPA interrupt enabled
-in a variable-length bitmap.  This will be used in the next patch to
-allow the SUSPEND interrupt type to be disabled except when needed.
+Only enable the SUSPEND IPA interrupt type when at least one
+endpoint has that interrupt enabled.
 
 Signed-off-by: Alex Elder <elder@linaro.org>
 ---
- drivers/net/ipa/ipa_interrupt.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+ drivers/net/ipa/ipa_interrupt.c |  8 ++++++++
+ drivers/net/ipa/ipa_power.c     | 11 +----------
+ 2 files changed, 9 insertions(+), 10 deletions(-)
 
 diff --git a/drivers/net/ipa/ipa_interrupt.c b/drivers/net/ipa/ipa_interrupt.c
-index 4d472f4b0002e..18036e9cd161f 100644
+index 18036e9cd161f..2ef640f9197c7 100644
 --- a/drivers/net/ipa/ipa_interrupt.c
 +++ b/drivers/net/ipa/ipa_interrupt.c
-@@ -37,11 +37,13 @@
-  * @ipa:		IPA pointer
-  * @irq:		Linux IRQ number used for IPA interrupts
-  * @enabled:		Mask indicating which interrupts are enabled
-+ * @suspend_enabled:	Bitmap of endpoints with the SUSPEND interrupt enabled
-  */
- struct ipa_interrupt {
- 	struct ipa *ipa;
- 	u32 irq;
- 	u32 enabled;
-+	unsigned long *suspend_enabled;
- };
+@@ -196,6 +196,7 @@ static void ipa_interrupt_suspend_control(struct ipa_interrupt *interrupt,
+ 	u32 mask = BIT(endpoint_id % 32);
+ 	u32 unit = endpoint_id / 32;
+ 	const struct reg *reg;
++	unsigned long weight;
+ 	u32 offset;
+ 	u32 val;
  
- /* Clear the suspend interrupt for all endpoints that signaled it */
-@@ -211,6 +213,7 @@ static void ipa_interrupt_suspend_control(struct ipa_interrupt *interrupt,
- 		val |= mask;
- 	else
- 		val &= ~mask;
-+	__change_bit(endpoint_id, interrupt->suspend_enabled);
+@@ -205,6 +206,10 @@ static void ipa_interrupt_suspend_control(struct ipa_interrupt *interrupt,
+ 	if (ipa->version == IPA_VERSION_3_0)
+ 		return;
+ 
++	weight = bitmap_weight(interrupt->suspend_enabled, ipa->endpoint_count);
++	if (weight == 1 && !enable)
++		ipa_interrupt_disable(ipa, IPA_IRQ_TX_SUSPEND);
++
+ 	reg = ipa_reg(ipa, IRQ_SUSPEND_EN);
+ 	offset = reg_n_offset(reg, unit);
+ 	val = ioread32(ipa->reg_virt + offset);
+@@ -216,6 +221,9 @@ static void ipa_interrupt_suspend_control(struct ipa_interrupt *interrupt,
+ 	__change_bit(endpoint_id, interrupt->suspend_enabled);
  
  	iowrite32(val, ipa->reg_virt + offset);
- }
-@@ -246,7 +249,16 @@ int ipa_interrupt_config(struct ipa *ipa)
- 
- 	interrupt->ipa = ipa;
- 
--	/* Disable all IPA interrupt types */
-+	/* Initially all IPA interrupt types are disabled */
-+	interrupt->enabled = 0;
-+	interrupt->suspend_enabled = bitmap_zalloc(ipa->endpoint_count,
-+						   GFP_KERNEL);
-+	if (!interrupt->suspend_enabled) {
-+		ret = -ENOMEM;
-+		goto err_kfree;
-+	}
 +
-+	/* Disable IPA interrupt types */
- 	reg = ipa_reg(ipa, IPA_IRQ_EN);
- 	iowrite32(0, ipa->reg_virt + reg_offset(reg));
- 
-@@ -254,7 +266,7 @@ int ipa_interrupt_config(struct ipa *ipa)
- 				   "ipa", interrupt);
- 	if (ret) {
- 		dev_err(dev, "error %d requesting \"ipa\" IRQ\n", ret);
--		goto err_kfree;
-+		goto err_free_bitmap;
- 	}
- 
- 	ret = dev_pm_set_wake_irq(dev, irq);
-@@ -270,6 +282,8 @@ int ipa_interrupt_config(struct ipa *ipa)
- 
- err_free_irq:
- 	free_irq(interrupt->irq, interrupt);
-+err_free_bitmap:
-+	bitmap_free(interrupt->suspend_enabled);
- err_kfree:
- 	kfree(interrupt);
- 
-@@ -286,6 +300,7 @@ void ipa_interrupt_deconfig(struct ipa *ipa)
- 
- 	dev_pm_clear_wake_irq(dev);
- 	free_irq(interrupt->irq, interrupt);
-+	bitmap_free(interrupt->suspend_enabled);
++	if (!weight && enable)
++		ipa_interrupt_enable(ipa, IPA_IRQ_TX_SUSPEND);
  }
  
- /* Initialize the IPA interrupt structure */
+ /* Enable TX_SUSPEND for an endpoint */
+diff --git a/drivers/net/ipa/ipa_power.c b/drivers/net/ipa/ipa_power.c
+index 3a7049923c381..1a413061472d8 100644
+--- a/drivers/net/ipa/ipa_power.c
++++ b/drivers/net/ipa/ipa_power.c
+@@ -234,21 +234,12 @@ void ipa_power_retention(struct ipa *ipa, bool enable)
+ 
+ int ipa_power_setup(struct ipa *ipa)
+ {
+-	int ret;
+-
+-	ipa_interrupt_enable(ipa, IPA_IRQ_TX_SUSPEND);
+-
+-	ret = device_init_wakeup(ipa->dev, true);
+-	if (ret)
+-		ipa_interrupt_disable(ipa, IPA_IRQ_TX_SUSPEND);
+-
+-	return ret;
++	return device_init_wakeup(ipa->dev, true);
+ }
+ 
+ void ipa_power_teardown(struct ipa *ipa)
+ {
+ 	(void)device_init_wakeup(ipa->dev, false);
+-	ipa_interrupt_disable(ipa, IPA_IRQ_TX_SUSPEND);
+ }
+ 
+ /* Initialize IPA power management */
 -- 
 2.40.1
 
