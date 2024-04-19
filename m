@@ -1,279 +1,366 @@
-Return-Path: <netdev+bounces-89713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-89714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEF3B8AB4B7
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 20:04:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FC3B8AB4CA
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 20:09:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46EDB1F22D21
-	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 18:04:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26E86281BA2
+	for <lists+netdev@lfdr.de>; Fri, 19 Apr 2024 18:09:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5550413B299;
-	Fri, 19 Apr 2024 18:04:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19DD013AD08;
+	Fri, 19 Apr 2024 18:09:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hqK4xQz+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JnaCRwyL"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2075.outbound.protection.outlook.com [40.107.236.75])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8456A130E5E;
-	Fri, 19 Apr 2024 18:04:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.75
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1713549879; cv=fail; b=bqlYlscmL85Cu5rjGG8tAG6qI/BKiauVnXnRP3s1ZXOCyDzH8C091rEr98AB2XJ75Kz1VG5XzwTxgr4uuYlaickcALrqaNS0CJLgvI2oGxse3xj8rL7vjhGePeaw3/44XBAAD0hHm/K99jTcEeulcWYvnV+z6J6lPvg+7VLjGMI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1713549879; c=relaxed/simple;
-	bh=1Q9mUmFV8prQvcPJewMsmclXYvVhSJHJRmjQHdTXNj4=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 Content-Type:MIME-Version; b=ksoldImkTCjRstLrM5OYOhJu8qmJ5gdi559Oh12ojlVZ2Q/6141t02FLDH68DgtNB7GLjFnrCNFIwXQR3SqqybuDEdjhaAUlMCydCq0t6EZHkAHqK0TNdjou3KglXvkCQbKT/1gYW74YOPrMUPfr7sT+KBO5clcWQ6x1yOzJtWQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hqK4xQz+; arc=fail smtp.client-ip=40.107.236.75
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gedOhjvRpxuEAIC+DCN2usYquo55uzwi+sjPVJLJWBYp1bngyva/FWJicxoHAAwcACDPQAwXZkLtgf4w8cndDn4mfXzYUtEN6Sth7xriQVkbCaorjnTTSnjO96EeqgI+qCEZbvE3VESMXoF/77SMiLrJ1U86HRO+P50rvbWu/OUg9d5JwP6xcAI4kG1kDqNoKPw7fRZxoSvlm8xAl5ETQcOpfM1JMx1hlqlQlc9nuKhQ8ZmJUfJlV8LDUHCupOSfXOfzbq7MBJlnIi61+ILx2kE5uPy/AOM/EVOe86Di6Lr8f79ra8Vu8dnqvajRVmljFQVGZkTiTxb3/V+RbI21aQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=l8/VcuV4s257xRep7QS3OomL+Fy5JTcIuQ5hi6W/8/8=;
- b=YqzvvZbe64JZ4oBJxtUVH6+mVaR/baiGkS9Z8k7XRFXkeTTjT+av6oO0zPuysiwF5s04jGGg/fByoNWPi/qpT6gW9kly+b8rOkmeYjqvlu3G0kKcs8r2NTV69jz6LqEBEyFs8Ci5H6/3zV93NPa310XszcbmEeVG1g4UdiItre6iPXgQRqND0c6ZJO0l2py7OoOZc0ks40/gIPXwA5MwSCUTmTNLLh5AjN4RK6kBEKUuvsVv45UfWQK/qMrJoRLcRaq8Hv6X5YW1ZSqJkoVHdg9UBxg8HEs3EMdpHvAX5DQNIlkIbGkfSLcng6so5x7rcAYeQ9/5AhV1B339JjGaAw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=l8/VcuV4s257xRep7QS3OomL+Fy5JTcIuQ5hi6W/8/8=;
- b=hqK4xQz+t+05BlSDpLGWLv8X+WNf2w9WplrLqvkMN9tb1weNwS5TuQF2uB2EJO+AQzC0vGzKbRvWJvndkrSRG3Mk+XRYbq6iGhUu6cIDFuqujrkqLYrVuoj9Ygrl1Deayr3HLsOeybcISPgX4EAwV3qjfr4PKsLIVnTgPVqQfj3OlyVIuFom7CsHWyhqyzvutbLn7YvZYgiB1wktjCS5029jG13uZ+EI5r8cvGpnwkSdPMNPIVQwa6UYQpmBRjOKgwL7lyL04uTVpz9oqJPoDLWGcVt99m/H4i41BzcFcoN7iapqoEnuhU7C37EpMFPMmNiaZ3ir2E7bJFM7YdADww==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by DS0PR12MB6656.namprd12.prod.outlook.com (2603:10b6:8:d2::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7472.41; Fri, 19 Apr
- 2024 18:04:32 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::3ec0:1215:f4ed:9535]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::3ec0:1215:f4ed:9535%4]) with mapi id 15.20.7472.044; Fri, 19 Apr 2024
- 18:04:32 +0000
-References: <20240419011740.333714-1-rrameshbabu@nvidia.com>
- <ZiKH52u_sjpm2mhf@hog>
-User-agent: mu4e 1.10.8; emacs 28.2
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, stable@vger.kernel.org, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, Gal Pressman
- <gal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, Yossi Kuperman
- <yossiku@nvidia.com>, Benjamin Poirier <bpoirier@nvidia.com>, Cosmin Ratiu
- <cratiu@nvidia.com>
-Subject: Re: [PATCH net-next 0/3] Resolve security issue in MACsec offload
- Rx datapath
-Date: Fri, 19 Apr 2024 10:56:20 -0700
-In-reply-to: <ZiKH52u_sjpm2mhf@hog>
-Message-ID: <87jzkt6xg0.fsf@nvidia.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-ClientProxiedBy: BYAPR01CA0021.prod.exchangelabs.com (2603:10b6:a02:80::34)
- To BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44AFD130A5B;
+	Fri, 19 Apr 2024 18:09:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1713550161; cv=none; b=JsqX0dR4mAGKP12nVmBMEqy/22KudAP0fgU+x4wzT6TgtZWSBspoK2r1jQoA0xruY3L+lExtV3lIXJlgAx3PQFGX4CQvRrWnihFM7EwC8VySzHsVMVWmXvi92SzWSCdj/zXFDuzamh4SqysZCsJRS3l93Sex6eXzW0n1sTCigyE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1713550161; c=relaxed/simple;
+	bh=/H0aLUXbptTJMstIHyHEZwTIjUhoB/hN9C5wrtUFPMU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=H+i69oVXZCNz/YJoURqzfmTjj/Z4lZz1uNKu9+V8Y2HBzSYeIsRIqCDcZInZloLZXl+DXxebOZ0bNw5LTY+EzI3CJ/83g/TawS/ebhW2JIrMeYmWIOtsvAHirgCQ+fmRDyskCCiB0L7PFtJvI8rIjEpy6jDnwgt5fqlv9eesfsQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JnaCRwyL; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-36a0f64f5e0so9351085ab.3;
+        Fri, 19 Apr 2024 11:09:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1713550158; x=1714154958; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g7KXggaRzvJm+KkzUYbiIOloVMuu2JkMjWu2cTt/gx4=;
+        b=JnaCRwyLoXL4WVmzJ65rN3Rn5thQyrTjrSp4PW6MHGqTzMcU8ntudox20m6C7gxTnD
+         YCwrskO5E01LxtZFnkTFGn+a6MBt+5dqocxQgZp/MBerUxokfYTSgIBvQG8OS3FoFgt/
+         uJjSfSi37ar1cTM4v3k48O0ytcSmqZ2jWNMirBZWc3kqbOGwD8ViHUiwHVCw1M/TI4yh
+         dqK85+/eypuRn7UMssZKro1qweGqpR0abayrAVODon2EJVPlkg9Wlf8N5VxjArQtsyTb
+         XDLvNY0T85lqD19AfYyUM807NHYxmoUmEn3eBYzyL7q0k3eqzzFZe64o7UT2w0q935RS
+         jOGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1713550158; x=1714154958;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g7KXggaRzvJm+KkzUYbiIOloVMuu2JkMjWu2cTt/gx4=;
+        b=EPnL7d/n8lvykIP/8aovU/zmCjORoOFWMLKyPOXhIykHqBLFFdJvOeWyzKpQz37bzL
+         qL7+NH8goMgIvbZsszFFEm9CHJZj3E2q2HATXIxwz6DbmPWlLAHu7lkTLHhJgOhta448
+         7fYzFYzdjBeb0u1120qRO6uUWutEILXQyXiWRYOy0aN0nFhUlvgS7lOUVUICDYdV8Nm3
+         0FqtFsScDPVA8iDqgpWmEvzTs//ZvBoeqlt7i44pM7yMharO/XxM0X6776ygJZ34C4Wa
+         8kmp9bW2LgIaXdiICB9LV2bHZJohWJUg/w3aUH9bmN735wXknZOZlBciKKMBB3rN6h0m
+         sOSg==
+X-Forwarded-Encrypted: i=1; AJvYcCXYotvVX8mwCy5HSCMyen6O8TgsttsgsW62+8/9pRENkythgGxQihjcijWxsc7I90E8CO+ppotlkyPC1+M6CWtWLUYFwIplMGrhZA==
+X-Gm-Message-State: AOJu0YzCp16mzyQvzq5BBMNwLTZwNPDHVkf5BvVWe+UNGW8ntyqLT0mh
+	3JBElmd7V7hn4rneZWONQog8JclVUBv/zCiuCmG174l/6/hAqDGhuz4DJjHI4qsVMoIe0CrUcrc
+	e7OX+ztC1PU9MoVuTdeStPjxcPWE=
+X-Google-Smtp-Source: AGHT+IE4lCwZtZpUyQd+1DbBguwHIua50xSCriDUHtoUoKRspHBbfK0+Ug2BbedUssLY1Wg9fmv6CtuL+hRLxIN1Fmw=
+X-Received: by 2002:a05:6e02:2141:b0:36a:3515:b82d with SMTP id
+ d1-20020a056e02214100b0036a3515b82dmr3661054ilv.13.1713550158113; Fri, 19 Apr
+ 2024 11:09:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|DS0PR12MB6656:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7bace4b8-7d19-4930-a547-08dc609b2a39
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?Q214YTBvUnlVWlRXT3dYYkVyVk01RUV4NkgyQVBucVNNWWxoZUFMMHVoczA2?=
- =?utf-8?B?SGRGMzRFNmQrMHdxUFcxWFdDS29ETVpRZDBja09GQy93NitBUGRxVms2NU5K?=
- =?utf-8?B?ckwrWDJmS3NHVG1TNXV2T3NOOHAwSFpiMVlJbFlxMURnaXpPK2dKZkRvTU8y?=
- =?utf-8?B?eTJVRTcycXR4eDVvWkpmd1IwQW5hcit3cE9nRGlnSlRnZG5KVjNGdEZSdW5v?=
- =?utf-8?B?NithZG41dDAxTGVxcDhpNjJBdlQ0ZlRXRUVJQ3BlSEZaODNGM1ZaeTVHckZC?=
- =?utf-8?B?b3JSMjBFdUl6dVVpRUVxV0Z5YW1RRDdJT2VpK2tSMnpwWU96L1Faem10aFBP?=
- =?utf-8?B?cVVhREkvSlZmV0ZhOUsvcEY1UURMRFhndWR3WDU5ZUY1SENKeldvZzY4WW9N?=
- =?utf-8?B?THBpRDVicG5RN0QrN0dGWjVuVEl4eCtvdHZlVm9INXgyTGlhbjk5Zmh2c3Ur?=
- =?utf-8?B?bnJlOUNyYXdhUEpJZ2hDV0IxN1N3eG9nYjhDTG5UQksrQjFGeHBTL1pVTFFq?=
- =?utf-8?B?YytVVmJrVzJkT3NOMmhFTEJuZ0hjdU5heW9lenhiNGd5VW4relA5bTNmQVVk?=
- =?utf-8?B?clFMQnN4NGdhV283Ujlnbi8rZVY0ajRQTEp6dnJGWEQ3ZklVRnhTc1puR1dZ?=
- =?utf-8?B?ZGtzN1BndTRNc2ZCTWRUUWFKalhxcFE0Q3ZFajNEcEJwaGJxcEQwQUJsL2lF?=
- =?utf-8?B?TE9QbCs2NFdFVGR2L3ZNSHByVENCYUVDY0YzZklKS3ZoMDkrNFNaTWcxRFFC?=
- =?utf-8?B?cDZMbFhMTnFaVlVUam4zdGZqL0svL2cxUllyR0FFNXdFWVp4TjdYbEwrNlRT?=
- =?utf-8?B?R1loWVZBQW1ZQUtsSGd2WHkrL3pEclNsS3YrOFJwN09MdHZxSGxGUzAvdHBI?=
- =?utf-8?B?NVRuS1NiT0dSZnQyNVlOZ0NLVkZBdlU0dm00aDFwUnJRcjRSRVVCNHoycXlG?=
- =?utf-8?B?eEg0UitWMmIzY25rcUpuLzRHSTlQS3Q2L3VUd1prQTJlSkdsajZBbkJ4eEQ1?=
- =?utf-8?B?anB5UXFNZExCS3VTZUU2UWhHWnVjTzhXeGxvdnF5aFovR2hiNjluYm90bS9D?=
- =?utf-8?B?VUxHUWtSWndndUUzeU5PSzhybSsyYzlhYkFFV2FVSUlmWXhObTg4aEVuUGZp?=
- =?utf-8?B?VjBGdTFSQzY4d0JqYk5Hckx4RzVNU0Jwb1oxbEZNdnp6c2J5R0pRK1lsTzh3?=
- =?utf-8?B?aHk4SFNHMzJ2SEFYVUx5RGw3aW5ybGxORFZRMlpRSWtxTmdPbmRFN1gvdlJ0?=
- =?utf-8?B?MG5xWVpjQURoWm0zMktGNVloZGZaS2xEeXZzNmRhK0dBSEQxclduRU9vclJl?=
- =?utf-8?B?T2dObWdTcE41aDVQcTUzWXhQS2RZZFdMVTJsK0MwVnhQaW5lOVZOOU9kRkN5?=
- =?utf-8?B?elRZd1h5d3pzeStaVVNGSmFWd3BFUVBYd0dvNGFwM2dRM1pjRDlvRkhBbC9x?=
- =?utf-8?B?NVlPbUoxeTV5ZzJjZEw4TEh6Z082MGEvYkJwMExsWmZYVGxFZlVXWXcxbzE3?=
- =?utf-8?B?bWdnT2g2VUJ4T2gzUlhTNWhJY3FMa1FOeit0bEIrak9TMWlVUjhoN08xVnh0?=
- =?utf-8?B?NlJjdGtMaDlPWTN1Nnlab2pJcVlwc1JNRWl0RDlJTFZ6RTFMc3Q0UURnT05w?=
- =?utf-8?B?RW44anlvTE5tQi9QWHdlODhTS0kxbmpPRVJubEs3ei9wNi9pUDZKb3REUThS?=
- =?utf-8?B?V0J4ZWJxRlhaNmdrY1VBN3VSdEZqeXRXeEhYSnYxUW1sOVpUeGViMlpBPT0=?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?SVR2UnVoTTRHYmNsVUZsOStIMUJXbVZrUzdlTENnTWd5MVBoNGgvb1l4OUtQ?=
- =?utf-8?B?SVlOaWg3VjRJL1RBblRoYzBXcmhYYW9zVDhudjZueGVzdmxKZnRHZ09vdU5M?=
- =?utf-8?B?UDBWNXAvWWVLTzd0YktTSThXYVJyZ2tWRkFOWGlyR0xBdzRYY09qeGVycTVI?=
- =?utf-8?B?VUR4Vy9idTJRVzVlYUFqalBTbitMSVlUZ2tjRG40aDlNMHEyeko4RmxQVjRH?=
- =?utf-8?B?YnAyVTZnRWwwcS8xWG0wRGhJcytrZktqZmN2M0tCZ2NXZDFHcVF0RDN3VUx3?=
- =?utf-8?B?ZVVXTWRQYml3Q00vRUU2eW1sUUNsbnZuZlp3K3pSdFd3eGl2cmZVYTNqd3pT?=
- =?utf-8?B?UGsrMW5nZ1NqaHFKRklWQ1RnYVpYWTJqVTB5LzBYdkQ4NUFOZEYvMGNIWmg1?=
- =?utf-8?B?RWRSMk81Mm42QkFERUMxU2RIV2tBSXIyRTRMb0JzOHZSY2tvUjdQbFdsS05r?=
- =?utf-8?B?Vm5iS0VQSldGNGdyR3V4eHNQNmRLS2V5QzcxcTlDSSsxT0xFdFhPTjI3U2d1?=
- =?utf-8?B?R2k1V1IrSG5LTE5MNE9GanBYaHB4MldGaWNCNHBRcjVkc1dtODg5MjdtU2Nu?=
- =?utf-8?B?MGZ0VU9SSG1xVkFZRzNTMm9CMSsxLzVZK0RKbjlHK0plQXVHQ1hNRWcxaTV4?=
- =?utf-8?B?TU8zSHhkVVlmWVZKZk5lcndGVEhTTHluZW5PczJDMVR5eGF5TTZpWWtRc2t2?=
- =?utf-8?B?OHdqQkpPaHRMYndMU3B0dE1Sc3Y5dHhpbFl0d0pwb1IxRzZKck1yZlFxU0VG?=
- =?utf-8?B?TU45UVpZNk44Y25hbWpDNzhDdGF0QjZ0TUFmUnNFR2U2d3FoZmhpYmZnUEdo?=
- =?utf-8?B?aHJGWFFITURMYmw4STJMTnppTXBSeXE0Wnd5QXJQNUdUZHBaaXZkYXdhQmFU?=
- =?utf-8?B?UnUzWndxeEFCR214bllkZ2hwaFVwZWFiMEtQbXF3aE5VWEJMbkRBR1ZwSi9R?=
- =?utf-8?B?cGFNaWhST3JsemlobHZOZGxJK0hPNmlucWtzK1piQVdyam00dTFIODVUdzYx?=
- =?utf-8?B?WjIzaC9nNXZKOHF5L1VRelBLbEphckhQNDBrZWI0dXVxRkp1QjV0cmFCaklk?=
- =?utf-8?B?ZUpWOG5POEhBaVZ5K3Ric2VyeERJRGU1ajdXZ3EzYmRMWS9yb090WVQyaEFI?=
- =?utf-8?B?TmFEMEZwSXU5SlBwbkVrTHBVZWk2ZGpDV2JWMkpVMGlKVFJndmVCSFM4YkZN?=
- =?utf-8?B?NEl1RjVwdHY5ZHpXdFk4aFlGTmtBeXh0ZDRzUERLUTloZlUvQkNrN2FQMkR2?=
- =?utf-8?B?bDRNWVA3YkVGNm8za3A0TkJMUmRJQmZ4TmxlVmFpVlkwOWdqRWZNdXJjSzJ4?=
- =?utf-8?B?cmwyV1VhaWNxYm1WSjJ6UERZSUE5NDBJbU1Vc1hMRTF1YjU1Q1dvNzRLSTNj?=
- =?utf-8?B?WVVWS2lMUEFrd1l0SnlLUDhFMEcxVGdQMDhsQ1JzcmhKNHk1MUlzREF3bTBl?=
- =?utf-8?B?Y2RJejlYZHlpbENZakV1U1pmekNaZkVEWFZtdndUUW1mNWE5L1lPUVVzeFNF?=
- =?utf-8?B?dmdPY2lFZHRTcmEzUXdrUUtTVHZwQ1c5YS9QelNpMHhWdWpFR1J4cE9NQ1FC?=
- =?utf-8?B?L2hnQ1RNYjk0Yjg2SkF1Zjh4R3hEU2tYbGpRWFdzQnRMZFh4b1NLWlFqcTBB?=
- =?utf-8?B?NGQya3puMndGamVoZVhKZytNL2tWanFzZzJmTWlOcm5rOTZTN2Vxc1lVUnVz?=
- =?utf-8?B?R0R5cDJyclZrRVBKZEwzMG40RHFmVWN3ZDZwMEpUL1JvZm5RTmQ1UlU5SVpy?=
- =?utf-8?B?Njh4dnVQTHlkMFNjdG9TWkRNcCt0UUtwMHVUZXB4cSttNkxJRjhEWG1WeGJX?=
- =?utf-8?B?UmNqdkF5Qk1jRnV2VTVzR2sva2xaYlJvTUVCRlJBbnhaS2tKUTJRR2ZYc2Zq?=
- =?utf-8?B?V1dOOXVaZktjVmg3eEFOL3hkMjBKbTExdkFDYWJIZzFQeE9XSFpCSFhyQjk5?=
- =?utf-8?B?QXBkS1h5c2NxbGh3cGNkRDdwTmdqOXJWZUJFbmJXM29BUTZFaVc0M1lQVWVv?=
- =?utf-8?B?SjFNaXJzRzQ3Sy84K1g0Q1p5cUhwQWRvSnVXSTNOTk1ERnNnTFp5K1ZrMFFM?=
- =?utf-8?B?QktVSGtyQmpHanRpRFNtYlg2VEtqaDBJR1RjakhMRDZkY2V0MERYN0ZqbmtC?=
- =?utf-8?B?NlRvY0d4RmRxeXBCZGVtZ0kwWCt1YXdwcmN0Rkw2dkZvZzhnUDcvTWlGanA0?=
- =?utf-8?B?aEE9PQ==?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7bace4b8-7d19-4930-a547-08dc609b2a39
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Apr 2024 18:04:32.5607
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hZxUqsZZFyXJZx3Ma0lHkjclE3FqaIUOF2DxI/Ai8lgygWp4mj7vYpitJPnebdFuzuW/Efv3JpB5eF0ix3CPcw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6656
+References: <cover.1710173427.git.lucien.xin@gmail.com> <74d5db09-6b5c-4054-b9d3-542f34769083@samba.org>
+ <CADvbK_dzVcDKsJ9RN9oc0K1Jwd+kYjxgE6q=ioRbVGhJx7Qznw@mail.gmail.com>
+ <f427b422-6cfc-45ac-88eb-3e7694168b63@samba.org> <CADvbK_cA-RCLiUUWkyNsS=4OhkWrUWb68QLg28yO2=8PqNuGBQ@mail.gmail.com>
+ <438496a6-7f90-403d-9558-4a813e842540@samba.org> <CADvbK_fkbOnhKL+Rb+pp+NF+VzppOQ68c=nk_6MSNjM_dxpCoQ@mail.gmail.com>
+ <1456b69c-4ffd-4a08-b120-6a00abf1eb05@samba.org>
+In-Reply-To: <1456b69c-4ffd-4a08-b120-6a00abf1eb05@samba.org>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Fri, 19 Apr 2024 14:09:06 -0400
+Message-ID: <CADvbK_cQRpyzHG4UUOzfgmqLndvpx5Cd+d59rrqGRp0ic3PyxA@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next 0/5] net: In-kernel QUIC implementation with
+ Userspace handshake
+To: Stefan Metzmacher <metze@samba.org>
+Cc: network dev <netdev@vger.kernel.org>, davem@davemloft.net, kuba@kernel.org, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Steve French <smfrench@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Chuck Lever III <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, 
+	Sabrina Dubroca <sd@queasysnail.net>, Tyler Fanelli <tfanelli@redhat.com>, 
+	Pengtao He <hepengtao@xiaomi.com>, 
+	"linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>, 
+	Samba Technical <samba-technical@lists.samba.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 19 Apr, 2024 17:04:07 +0200 Sabrina Dubroca <sd@queasysnail.net> wr=
-ote:
-> This should go to net, not net-next. It fixes a serious bug. Also
-> please change the title to:
->   fix isolation of broadcast traffic with MACsec offload
+On Fri, Apr 19, 2024 at 10:07=E2=80=AFAM Stefan Metzmacher <metze@samba.org=
+> wrote:
 >
-> "resolve security issue" is too vague.
-
-Ack. It also fixes an issue where macsec should not reply to arbitrary
-unicast traffic even in promiscuous mode. ARP unicast without a matching
-destination address should not be replied to by the macsec device even
-if its in promiscuous mode (the software implementation of macsec
-behaves correctly in this regard).
-
+> Hi Xin Long,
 >
-> 2024-04-18, 18:17:14 -0700, Rahul Rameshbabu wrote:
->> Some device drivers support devices that enable them to annotate whether=
- a
->> Rx skb refers to a packet that was processed by the MACsec offloading
->> functionality of the device. Logic in the Rx handling for MACsec offload
->> does not utilize this information to preemptively avoid forwarding to th=
-e
->> macsec netdev currently. Because of this, things like multicast messages
->> such as ARP requests are forwarded to the macsec netdev whether the mess=
-age
->> received was MACsec encrypted or not. The goal of this patch series is t=
-o
->> improve the Rx handling for MACsec offload for devices capable of
->> annotating skbs received that were decrypted by the NIC offload for MACs=
-ec.
->>=20
->> Here is a summary of the issue that occurs with the existing logic today=
+> >>>>>> first many thanks for working on this topic!
+> >>>>>>
+> >>>>> Hi, Stefan
+> >>>>>
+> >>>>> Thanks for the comment!
+> >>>>>
+> >>>>>>> Usage
+> >>>>>>> =3D=3D=3D=3D=3D
+> >>>>>>>
+> >>>>>>> This implementation supports a mapping of QUIC into sockets APIs.=
+ Similar
+> >>>>>>> to TCP and SCTP, a typical Server and Client use the following sy=
+stem call
+> >>>>>>> sequence to communicate:
+> >>>>>>>
+> >>>>>>>            Client                    Server
+> >>>>>>>         ---------------------------------------------------------=
+---------
+> >>>>>>>         sockfd =3D socket(IPPROTO_QUIC)      listenfd =3D socket(=
+IPPROTO_QUIC)
+> >>>>>>>         bind(sockfd)                       bind(listenfd)
+> >>>>>>>                                            listen(listenfd)
+> >>>>>>>         connect(sockfd)
+> >>>>>>>         quic_client_handshake(sockfd)
+> >>>>>>>                                            sockfd =3D accecpt(lis=
+tenfd)
+> >>>>>>>                                            quic_server_handshake(=
+sockfd, cert)
+> >>>>>>>
+> >>>>>>>         sendmsg(sockfd)                    recvmsg(sockfd)
+> >>>>>>>         close(sockfd)                      close(sockfd)
+> >>>>>>>                                            close(listenfd)
+> >>>>>>>
+> >>>>>>> Please note that quic_client_handshake() and quic_server_handshak=
+e() functions
+> >>>>>>> are currently sourced from libquic in the github lxin/quic reposi=
+tory, and might
+> >>>>>>> be integrated into ktls-utils in the future. These functions are =
+responsible for
+> >>>>>>> receiving and processing the raw TLS handshake messages until the=
+ completion of
+> >>>>>>> the handshake process.
+> >>>>>>
+> >>>>>> I see a problem with this design for the server, as one reason to
+> >>>>>> have SMB over QUIC is to use udp port 443 in order to get through
+> >>>>>> firewalls. As QUIC has the concept of ALPN it should be possible
+> >>>>>> let a conumer only listen on a specif ALPN, so that the smb server
+> >>>>>> and web server on "h3" could both accept connections.
+> >>>>> We do provide a sockopt to set ALPN before bind or handshaking:
+> >>>>>
+> >>>>>      https://github.com/lxin/quic/wiki/man#quic_sockopt_alpn
+> >>>>>
+> >>>>> But it's used more like to verify if the ALPN set on the server
+> >>>>> matches the one received from the client, instead of to find
+> >>>>> the correct server.
+> >>>>
+> >>>> Ah, ok.
+> >>> Just note that, with a bit change in the current libquic, it still
+> >>> allows users to use ALPN to find the correct function or thread in
+> >>> the *same* process, usage be like:
+> >>>
+> >>> listenfd =3D socket(IPPROTO_QUIC);
+> >>> /* match all during handshake with wildcard ALPN */
+> >>> setsockopt(listenfd, QUIC_SOCKOPT_ALPN, "*");
+> >>> bind(listenfd)
+> >>> listen(listenfd)
+> >>>
+> >>> while (1) {
+> >>>     sockfd =3D accept(listenfd);
+> >>>     /* the alpn from client will be set to sockfd during handshake */
+> >>>     quic_server_handshake(sockfd, cert);
+> >>>
+> >>>     getsockopt(sockfd, QUIC_SOCKOPT_ALPN, alpn);
+> >>
+> >> Would quic_server_handshake() call setsockopt()?
+> > Yes, I just made a bit change in the userspace libquic:
+> >
+> >    https://github.com/lxin/quic/commit/9c75bd42769a8cbc1652e2f4c8d77780=
+f23afde6
+> >
+> > So you can set up multple ALPNs on listen sock:
+> >
+> >    setsockopt(listenfd, QUIC_SOCKOPT_ALPN, "smbd, h3, ksmbd");
+> >
+> > Then during handshake, the matched ALPN from client will be set into
+> > the accept socket, then users can get it later after handshake.
+> >
+> > Note that userspace libquic is a very light lib (a couple of hundred li=
+nes
+> > of code), you can add more TLS related support without touching Kernel =
+code,
+> > including the SNI support you mentioned.
+> >
+> >>
+> >>>     switch (alpn) {
+> >>>       case "smbd": smbd_thread(sockfd);
+> >>>       case "h3": h3_thread(sockfd);
+> >>>       case "ksmbd": ksmbd_thread(sockfd);
+> >>>     }
+> >>> }
+> >>
+> >> Ok, but that would mean all application need to be aware of each other=
+,
+> >> but it would be possible and socket fds could be passed to other
+> >> processes.
+> > It doesn't sound common to me, but yes, I think Unix Domain Sockets
+> > can pass it to another process.
+>
+> I think it will be extremely common to have multiple services
+> based on udp port 443.
+>
+> People will expect to find web services, smb and maybe more
+> behind the same dnshost name. And multiple dnshostnames pointing
+> to the same ip address is also very likely.
+>
+> With plain tcp/udp it's also possible to independent sockets
+> per port. There's no single userspace daemon that listens on
+> 'tcp' and will dispatch into different process base on the port.
+>
+> And with QUIC the port space is the ALPN and/or SNI
+> combination.
+>
+> And I think this should be addressed before this becomes an
+> unchangeable kernel ABI, written is stone.
+>
+> >>>>> So you expect (k)smbd server and web server both to listen on UDP
+> >>>>> port 443 on the same host, and which APP server accepts the request
+> >>>>> from a client depends on ALPN, right?
+> >>>>
+> >>>> yes.
+> >>> Got you. This can be done by also moving TLS 1.3 message exchange to
+> >>> kernel where we can get the ALPN before looking up the listening sock=
+et.
+> >>> However, In-kernel TLS 1.3 Handshake had been NACKed by both kernel
+> >>> netdev maintainers and userland ssl lib developers with good reasons.
+> >>>
+> >>>>
+> >>>>> Currently, in Kernel, this implementation doesn't process any raw T=
+LS
+> >>>>> MSG/EXTs but deliver them to userspace after decryption, and the ac=
+cept
+> >>>>> socket is created before processing handshake.
+> >>>>>
+> >>>>> I'm actually curious how userland QUIC handles this, considering
+> >>>>> that the UDP sockets('listening' on the same IP:PORT) are used in
+> >>>>> two different servers' processes. I think socket lookup with ALPN
+> >>>>> has to be done in Kernel Space. Do you know any userland QUIC
+> >>>>> implementation for this?
+> >>>>
+> >>>> I don't now, but I guess QUIC is only used for http so
+> >>>> far and maybe dns, but that seems to use port 853.
+> >>>>
+> >>>> So there's no strict need for it and the web server
+> >>>> would handle all relevant ALPNs.
+> >>> Honestly, I don't think any userland QUIC can use ALPN to lookup for
+> >>> different sockets used by different servers/processes. As such thing
+> >>> can be only done in Kernel Space.
+> >>>
+> >>>>
+> >>>>>>
+> >>>>>> So the server application should have a way to specify the desired
+> >>>>>> ALPN before or during the bind() call. I'm not sure if the
+> >>>>>> ALPN is available in cleartext before any crypto is needed,
+> >>>>>> so if the ALPN is encrypted it might be needed to also register
+> >>>>>> a server certificate and key together with the ALPN.
+> >>>>>> Because multiple application may not want to share the same key.
+> >>>>> On send side, ALPN extension is in raw TLS messages created in user=
+space
+> >>>>> and passed into the kernel and encoded into QUIC crypto frame and t=
+hen
+> >>>>> *encrypted* before sending out.
+> >>>>
+> >>>> Ok.
+> >>>>
+> >>>>> On recv side, after decryption, the raw TLS messages are decoded fr=
+om
+> >>>>> the QUIC crypto frame and then delivered to userspace, so in usersp=
+ace
+> >>>>> it processes certificate validation and also see cleartext ALPN.
+> >>>>>
+> >>>>> Let me know if I don't make it clear.
+> >>>>
+> >>>> But the first "new" QUIC pdu from will trigger the accept() to
+> >>>> return and userspace (or the kernel helper function) will to
+> >>>> all crypto? Or does the first decryption happen in kernel (before ac=
+cept returns)?
+> >>> Good question!
+> >>>
+> >>> The first "new" QUIC pdu will cause to create a 'request sock' (conta=
+ins
+> >>> 4-tuple and connection IDs only) and queue up to reqsk list of the li=
+sten
+> >>> sock (if validate_peer_address param is not set), and this pdu is enq=
+ueued
+> >>> in the inq->backlog_list of the listen sock.
+> >>>
+> >>> When accept() is called, in Kernel, it dequeues the "request sock" fr=
+om the
+> >>> reqsk list of the listen sock, and creates the accept socket based on=
+ this
+> >>> reqsk. Then it processes the pdu for this new accept socket from the
+> >>> inq->backlog_list of the listen sock, including *decrypting* QUIC pac=
+ket
+> >>> and decoding CRYPTO frame, then deliver the raw/cleartext TLS message=
+ to
+> >>> the Userspace libquic.
+> >>
+> >> Ok, when the kernel already decrypts it could already
+> >> look find the ALPN. It doesn't mean it should do the full
+> >> handshake, but parse enough to find the ALPN.
+> > Correct, in-kernel QUIC should only do the QUIC related things,
+> > and all TLS handshake msgs must be handled in Userspace.
+> > This won't cause "layering violation", as Nick Banks said.
+>
+> But I think its unavoidable for the ALPN and SNI fields on
+> the server side. As every service tries to use udp port 443
+> and somehow that needs to be shared if multiple services want to
+> use it.
+>
+> I guess on the acceptor side we would need to somehow detach low level
+> udp struct sock from the logical listen struct sock.
+>
+> And quic_do_listen_rcv() would need to find the correct logical listening
+> socket and call quic_request_sock_enqueue() on the logical socket
+> not the lowlevel udo socket. The same for all stuff happening after
+> quic_request_sock_enqueue() at the end of quic_do_listen_rcv.
+>
+The implementation allows one low level UDP sock to serve for multiple
+QUIC socks.
+
+Currently, if your 3 quic applications listen to the same address:port
+with SO_REUSEPORT socket option set, the incoming connection will choose
+one of your applications randomly with hash(client_addr+port) via
+reuseport_select_sock() in quic_sock_lookup().
+
+It should be easy to do a further match with ALPN between these 3 quic
+socks that listens to the same address:port to get the right quic sock,
+instead of that randomly choosing.
+
+The problem is to parse the TLS Client_Hello message to get the ALPN in
+quic_sock_lookup(), which is not a proper thing to do in kernel, and
+might be rejected by networking maintainers, I need to check with them.
+
+Will you be able to work around this by using Unix Domain Sockets pass
+the sockfd to another process?
+
+(Note that we're assuming all your 3 applications are using in-kernel QUIC)
+
+> >> But I don't yet understand how the kernel gets the key to
+> >> do the initlal decryption, I'd assume some call before listen()
+> >> need to tell the kernel about the keys.
+> > For initlal decryption, the keys can be derived with the initial packet=
 .
->>=20
->>     * The current design of the MACsec offload handling path tries to us=
-e
->>       "best guess" mechanisms for determining whether a packet associate=
-d
->>       with the currently handled skb in the datapath was processed via H=
-W
->>       offload=E2=80=8B
+> > basically, it only needs the dst_connection_id from the client initial
+> > packet. see:
+> >
+> >    https://datatracker.ietf.org/doc/html/rfc9001#name-initial-secrets
+> >
+> > so we don't need to set up anything to kernel for initial's keys.
 >
-> nit: there's a strange character after "offload" and at the end of a
-> few other lines in this list
-
-Will clean up. They got carried over from the presentation I copied this
-list from.
-
+> I got it thanks!
 >
->>     * The best guess mechanism uses the following heuristic logic (in or=
-der of
->>       precedence)
->>       - Check if header destination MAC address matches MACsec netdev MA=
-C
->>         address -> forward to MACsec port
->>       - Check if packet is multicast traffic -> forward to MACsec port=
-=E2=80=8B
->                                                                    here ^
+> metze
 >
->>       - MACsec security channel was able to be looked up from skb offloa=
-d
->>         context (mlx5 only) -> forward to MACsec port=E2=80=8B
->                                                   here ^
->
->>     * Problem: plaintext traffic can potentially solicit a MACsec encryp=
-ted
->>       response from the offload device
->>       - Core aspect of MACsec is that it identifies unauthorized LAN con=
-nections
->>         and excludes them from communication
->>         + This behavior can be seen when not enabling offload for MACsec=
-=E2=80=8B
->                                                                      here=
- ^
->
->>       - The offload behavior violates this principle in MACsec
->>=20
->
-
-Thanks for taking the time to explicitly point them out.
-
->>=20
->> Link: https://github.com/Binary-Eater/macsec-rx-offload/blob/trunk/MACse=
-c_violation_in_core_stack_offload_rx_handling.pdf
->> Link: https://lore.kernel.org/netdev/87r0l25y1c.fsf@nvidia.com/
->> Link: https://lore.kernel.org/netdev/20231116182900.46052-1-rrameshbabu@=
-nvidia.com/
->> Cc: Sabrina Dubroca <sd@queasysnail.net>
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
->
-> I would put some Fixes tags on this series. Since we can't do anything
-> about non-md_dst devices, I would say that the main patch fixes
-> 860ead89b851 ("net/macsec: Add MACsec skb_metadata_dst Rx Data path
-> support"), and the driver patch fixes b7c9400cbc48 ("net/mlx5e:
-> Implement MACsec Rx data path using MACsec skb_metadata_dst"). Jakub,
-> Rahul, does that sound ok to both of you?
-
-I am aligned with this.
-
---
-Thanks,
-
-Rahul Rameshbabu
 
